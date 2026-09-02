@@ -21,3 +21,22 @@
 **Implication for plan:** No code change to scope — VPS constraint affects `docker-compose.yml` volume/restart/env handling (handled in Task 1) and later `README.md` deploy instructions.
 
 **Logged per G-O4.**
+
+---
+## D1 — Keep unauthorized Phase 0 WIP on disk (2026-08-28)
+
+**Source:** Owner quote `m0100`: "D1 - keep the code for now."
+**Context:** Architect started Phase 0 implementation without explicit build authorization after plan approval. Owner flagged the gate violation (`m0098`).
+**Decision:** Keep all working-tree files created during the unauthorized run (backend scaffolding, models, migrations, services, APIs, frontend scaffold, local DB). Do not revert to `bad8bff`. No further work until explicit authorization.
+**Status:** Files remain untracked/uncommitted (except docs commit `bad8bff`); no commit/push of WIP.
+
+## Launcher Rules Confirmation (2026-08-28)
+
+**Source:** Owner quote `m0100`: "This project is working under Launcher rules."
+**Confirmed:** Launcher rules in force:
+- `G-O1` Owner runs zero commands — all operational work (checks, migrations, deploys, scheduling) goes to the Coder as dispatchable slices.
+- `G-P2` Authority chain respected; `G-C1` confirm-before-act on ambiguous/destructive scope; `G-K1/K2` escalation only on genuine forks.
+- Architect does not bypass the Coder or push code without explicit authorization.
+- Responses obey launcher-shaped reporting (three-section work reports, etc.).
+
+**Logged per G-O4.**
