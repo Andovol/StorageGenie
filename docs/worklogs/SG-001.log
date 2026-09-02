@@ -1,0 +1,84 @@
+SG-001 worklog
+start_utc=2026-09-02T11:57:55Z (systemd unit run-u18244.service ExecStart start_time)
+workdir=/home/andrei/StorageGenie
+base_ref=automation
+base_commit=5602ec27a03c272b5edd9c649ec7b3cd657d16a4
+packet_expected_top=dd95eec (FINDING: packet commit is tip)
+
+# identity (process args, not system prompt)
+parent_argv=/home/andrei/.grok/bin/grok-1.0.5 --always-approve --sandbox workspace --cwd /home/andrei/StorageGenie --reasoning-effort medium --prompt-file /home/andrei/StorageGenie/docs/packets/SG-001-host-setup-and-boundary-proof.md
+launcher=/run/user/1000/storagegenie-dispatch/SG-001.launcher.sh
+launcher_body=exec grok --always-approve --sandbox workspace --cwd /home/andrei/StorageGenie --reasoning-effort medium --prompt-file /home/andrei/StorageGenie/docs/packets/SG-001-host-setup-and-boundary-proof.md
+model=unknown (no -m/--model in argv; CODERS.md:59 no model id sent)
+effort=medium (--reasoning-effort medium)
+contract_sync=refresh version=0.17.2 (/run/user/1000/storagegenie-dispatch/SG-001.contract_sync)
+INVOCATION_ID=a35a827a76394f8388c41f6250517d45
+SYSTEMD_EXEC_PID=3950769
+unit=run-u18244.service
+
+# expected-condition verification (bound=120s each unless noted)
+git_branch=automation
+git_log_top=5602ec2 packet: SG-001 host setup and Coder boundary proof (grok, shared key)
+AGENTS.md:4=0.17.2
+/home/andrei/launcher/VERSION=0.17.2
+wrapper_ls=-rwxr-xr-x 1 nobody nogroup 13849 (FINDING vs expected root:root 755)
+DISPATCH_PATH=/home/andrei/.grok/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+reference/vps-info.md=ABSENT (FINDING; AGENTS.md cites it)
+
+# HEALTH start (CO-92) bound=10s
+curl -s http://localhost:8000/v1/health -> body="Not Found" curl_exit=0
+note: 127.0.0.1:8000 is a foreign uvicorn (plain-text 404), not StorageGenie
+TestClient fallback not runnable yet (no venv)
+
+# G3 confinement (live unit, not self-report)
+ProtectHome=read-only ProtectSystem=strict PrivateTmp=yes NoNewPrivileges=yes
+ReadWritePaths=/home/andrei/StorageGenie /run/user/1000/storagegenie-dispatch /run/user/1000 /home/andrei/.codex /home/andrei/.grok
+InaccessiblePaths includes /home/andrei/pip /var/run/docker.sock /run/docker.sock and other $home/*/ except ROOT and /home/andrei/launcher
+ls /home/andrei/pip -> Permission denied (exit 2)  bound=30s
+sudo -n true -> refused (no new privileges)  bound=15s
+docker volume ls -> permission denied docker.sock  UNANSWERED (privileged/confinement)
+mkdir -p /data/db /data/storage -> Read-only file system  bound=15s
+
+# G1 host setup
+mkdir -p data/db data/storage docs/worklogs  (host bind layout per docker-compose.yml:9-10)
+.env created 600 keys=DATABASE_URL,STORAGE_ROOT,HOUSEHOLD_DEFAULT_NAME,CORS_ORIGINS
+design: packet named sqlite:////data/db and STORAGE_ROOT=/data/storage (container paths). Host /data is ro. Used sqlite:////home/andrei/StorageGenie/data/db/storagegenie.db and STORAGE_ROOT=/home/andrei/StorageGenie/data/storage
+HOUSEHOLD_DEFAULT_NAME quoted ("Popescu Household") after unquoted source failed (Household: command not found)
+python3 -m venv venv  bound=120s  ok
+venv/bin/pip install -e backend[dev]  bound=300s  ok
+  pip cache warning: ~/.cache/pip not writable (ProtectHome)
+venv/bin/python -c import fastapi -> 0.141.1
+alembic upgrade head (cwd=backend, env sourced) bound=300s -> Running upgrade  -> 0201cf10c56c
+alembic current -> 0201cf10c56c (head)
+sqlite3 data/db/storagegenie.db tables include household, asset, evidence (also alembic_version assertion asset_evidence audit_event idempotency_key job job_step review_task user)
+docker compose config  bound=30s  exit=0  volumes.storage_data.name=storagegenie_storage_data
+docker volume ls  UNANSWERED (cannot prove named volume exists on daemon)
+
+# tests
+ruff check app  bound=120s  All checks passed
+mypy app  bound=120s  43 errors in 10 files  advisory not gated
+pytest -q  bound=120s  exit=5  no tests/ no test_*.py  VACUOUS (0 collected)
+npm ci first attempt failed EROFS ~/.npm (ProtectHome) exit=226
+npm ci --cache /tmp/sg-npm-cache  bound=300s  ok (217 packages)
+npm test  bound=120s  3 files / 7 tests passed
+
+# HEALTH end
+curl -s -w http_code -> Not Found http_code=404  (unchanged foreign listener)
+TestClient GET /v1/health -> 200 {'status': 'ok', 'db': 'ok', 'storage': 'ok'}
+
+# contract
+CO-42 quoted from /home/andrei/launcher/CODER_PRODUCTION.md:26 (NOT /opt/storagegenie-dispatch/, NOT CODER.md)
+/opt/storagegenie-dispatch contains only dispatch_coder.sh and finalize_dispatch_report.sh
+finalize_dispatch_report.sh is HealthyLaws-shaped (HL- id, worklogs/, origin/healthylaws-evidence)
+
+# bindings used (AGENTS.md Values table)
+WORKLOG_DIR=docs/worklogs
+HEALTH_CMD=curl -s http://localhost:8000/v1/health (fallback TestClient)
+RECEIPT_CMD=/opt/storagegenie-dispatch/finalize_dispatch_report.sh
+PROD_DB=not applicable
+TEST_DB=not applicable
+DEFAULT_BRANCH=automation
+DISPATCH_KEY=~/.ssh/storagegenie-architect-dispatch
+HOST=87.106.66.242
+HOST_SSH_PORT=2222
+HOST_USER=andrei
