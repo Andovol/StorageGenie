@@ -10,6 +10,7 @@ class Settings(BaseSettings):
     cors_origins: str = "http://localhost:5173"
     max_upload_bytes: int = 20 * 1024 * 1024
     thumbnail_sizes: list[int] = [256, 512]
+    allowed_mime_types: list[str] = ["image/jpeg", "image/png", "image/webp", "application/pdf"]
 
     model_config = {"env_file": ".env", "extra": "ignore"}
 
