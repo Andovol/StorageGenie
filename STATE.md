@@ -29,7 +29,7 @@
 - `m0072` formatting (quote: "Always put "My recommendation" text in bold, so I can easily see it.")
 - `m0106` next-session coder/effort (quote: "We will continue with Codex on High.") — SG-005+ run codex high until countermanded.
 
-**How owner wants work done (differs from defaults):** High-level overview in chat; full technical detail on disk. Coder does all build/deploy on VPS (`G-O1`). Confirm before any ambiguous/destructive act (`G-C1`). `My recommendation` always bold in owner-facing text (quote m0072: "Always put "My recommendation" text in bold, so I can easily see it.").
+**How owner wants work done (differs from defaults):** High-level overview in chat; full technical detail on disk. Coder does all build/deploy on VPS (`G-O1`). Confirm before any ambiguous/destructive act (`G-C1`). Batch file edits into few section-sized replacements, not many line-level ones (owner efficiency directive m0113). `My recommendation` always bold in owner-facing text (quote m0072: "Always put "My recommendation" text in bold, so I can easily see it.").
 
 ---
 
