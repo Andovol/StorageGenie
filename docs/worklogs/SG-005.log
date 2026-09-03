@@ -1,0 +1,37 @@
+SG-005
+BASE=535a2d3fb858f5e8d88906c07035c9318e578312
+timeout_budget=120s ordinary commands; 600s suite/migration/rebuild; 2100s overall
+model=unknown (process arguments exposed codex exec but no model id; no provider metadata)
+effort=high (process arguments: -c model_reasoning_effort=high)
+header=contract_sync=refresh version=0.17.2
+remote=git@github.com:Andovol/StorageGenie.git
+workdir=/home/andrei/StorageGenie
+health_start_curl_command=curl -s http://localhost:8000/v1/health
+health_start_curl_rc=0 output=Not Found
+health_start_testclient_command=python3 -c "from fastapi.testclient import TestClient; from app.main import app; print(TestClient(app).get('/v1/health').json())"
+health_start_testclient_rc=1 output=ModuleNotFoundError: No module named 'sqlalchemy'
+health_start_note=The baseline fallback was attempted before repair but backend dependencies were absent in the confined run.
+health_repair_failure_command=TestClient with scratch SQLite DB and missing scratch storage root
+health_repair_failure_rc=0 http_status=503 body={'status': 'error', 'db': 'ok', 'storage': 'error'}
+health_repair_success_command=TestClient with scratch SQLite DB and restored scratch storage root
+health_repair_success_rc=0 http_status=200 body={'status': 'ok', 'db': 'ok', 'storage': 'ok'}
+health_end_curl_command=curl -s http://localhost:8000/v1/health
+health_end_curl_rc=0 output=Not Found
+health_end_testclient_command=python3 -c "from fastapi.testclient import TestClient; from app.main import app; print(TestClient(app).get('/v1/health').json())"
+health_end_testclient_rc=0 output={'status': 'ok', 'db': 'ok', 'storage': 'ok'}
+health_delta=curl unchanged foreign 404; TestClient moved from unavailable baseline to truthful healthy response after dependency environment and repair
+busy_timeout_fresh_connection={'busy_timeout': 5000, 'foreign_keys': 1, 'journal_mode': 'wal'}
+ruff=All checks passed! exit=0; applied migration trailing W291 remains unedited and is a precise per-file exception
+pytest_full=collected 3 items; 3 passed, 2 warnings in 0.49s; exit=0
+pytest_scope=all tests use module-scoped temporary SQLite and temporary storage under the system temp directory; no /data/db/storagegenie.db, /data/storage, or ./data paths used
+mypy=43 errors in 10 files; advisory exit=1
+eslint=eslint not found; existing npm script masks command-not-found with || true and exits 0; not clean, so script unchanged
+alembic_head=0201cf10c56c
+alembic_scratch_applied=0201cf10c56c; alembic current reported 0201cf10c56c (head); no migration added or applied revision edited
+alembic_scratch_tables=alembic_version, assertion, asset, asset_evidence, audit_event, evidence, household, idempotency_key, job, job_step, review_task, user
+lock_reproduction=clean temporary venv installed requirements.lock exit=0; local package built with locked hatchling using --no-build-isolation exit=0; pip check clean
+lock_versions=Python 3.12.3; fastapi 0.141.1; hatchling 1.32.0; ruff 0.16.5
+base_observed=python:3.12.11-slim-bookworm exists; amd64 image digest sha256:c00fc7b44d844b6da22861ec24af43968a5200eac4ec607b4725d585165d6b49; OCI index sha256:519591d6871b7bc437060736b9f7456b8731f1499a57e22e6c285135ae657bf7
+docker_build=unanswered; docker version client succeeded but API access returned permission denied on /var/run/docker.sock; no privilege route attempted
+privileged_checks=no SSH checks; dispatch key absent in confined run; no service restart; no prod-row writes
+scope_changes=backend/app/api/v1/health.py, backend/app/db.py, backend/Dockerfile, backend/pyproject.toml, backend/requirements.lock, backend/tests/test_health.py, docs/worklogs/SG-005.log, plus publisher report output

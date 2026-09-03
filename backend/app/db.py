@@ -17,11 +17,14 @@ engine = create_engine(settings.database_url, connect_args=connect_args)
 # Enforce foreign keys for SQLite
 if settings.database_url.startswith("sqlite"):
 
+    SQLITE_BUSY_TIMEOUT_MS = 5000  # Wait 5 seconds for locked SQLite writers before failing.
+
     @event.listens_for(engine, "connect")
     def _set_sqlite_pragma(dbapi_connection, connection_record):  # type: ignore[no-untyped-def]
         cursor = dbapi_connection.cursor()
         cursor.execute("PRAGMA foreign_keys=ON")
         cursor.execute("PRAGMA journal_mode=WAL")
+        cursor.execute(f"PRAGMA busy_timeout={SQLITE_BUSY_TIMEOUT_MS}")
         cursor.close()
 
 

@@ -34,6 +34,7 @@ line-length = 100
 target-version = "py312"
 lint.select = ["E", "F", "W", "C90"]
 lint.ignore = ["E501"]
+lint.per-file-ignores = { "alembic/versions/0201cf10c56c_001_core_foundation.py" = ["W291"] }
 
 [tool.mypy]
 python_version = "3.12"
