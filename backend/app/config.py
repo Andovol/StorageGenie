@@ -9,6 +9,7 @@ class Settings(BaseSettings):
     household_default_name: str = "Popescu Household"
     cors_origins: str = "http://localhost:5173"
     max_upload_bytes: int = 20 * 1024 * 1024
+    max_image_pixels: int | None = None
     thumbnail_sizes: list[int] = [256, 512]
     allowed_mime_types: list[str] = ["image/jpeg", "image/png", "image/webp", "application/pdf"]
 

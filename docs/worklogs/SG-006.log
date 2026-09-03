@@ -1,0 +1,46 @@
+SG-006
+BASE_REF=automation
+BASE_RESOLVED=fd2c2f278bb07fb483f4affef8ced0f63d5465dc
+workdir=/home/andrei/StorageGenie
+remote=git@github.com:Andovol/StorageGenie.git
+timeout_budget=120s ordinary commands; 600s full suite; 2100s overall
+model=unknown (process arguments showed codex exec but no model id; no provider metadata available)
+effort=high (process arguments: -c model_reasoning_effort=high)
+contract_sync=refresh version=0.17.2
+database=none; all evidence tests use temporary SQLite under /tmp/storagegenie-evidence-tests-*/storagegenie.db
+storage_scope=all evidence tests use temporary storage under /tmp/storagegenie-evidence-tests-*/storage; no prod paths
+
+verify_expected_conditions=store_evidence signature matched (file_bytes, original_filename, media_type, household_id, db, actor=api); max_upload_bytes=20971520; thumbnail_sizes=[256,512]; storage/local_store.py exists (packet path evidence_service/local_store wording differed); POST /v1/evidence exists
+baseline_ruff_command=timeout 120s bash -lc "ruff check app tests"
+baseline_ruff_rc=127 output=bash: ruff: command not found
+baseline_pytest_command=timeout 600s bash -lc "pytest -q"
+baseline_pytest_rc=127 output=bash: pytest: command not found
+baseline_gate_environment=checked-in ../venv/bin tools were present; system PATH omitted them, so gates were rerun with ../venv/bin
+baseline_venv_ruff_command=timeout 120s bash -lc "../venv/bin/ruff check app tests"
+baseline_venv_ruff_rc=0 output=All checks passed!; checked app and tests; match count=0
+baseline_venv_pytest_command=timeout 600s bash -lc "../venv/bin/pytest -q"
+baseline_venv_pytest_rc=0 output=3 passed, 1 warning in 0.51s; collected 3; evidence module absent before this slice
+
+G1_repair=added temp-path tests; strict magic/signature matching; atomic thumbnail writes; named warning logger; used storage/local_store.py thumbnail_path
+G2_repair=added optional env-overridable settings.max_image_pixels default None; scoped Pillow DecompressionBombWarning escalation; configured/native rejection logs include sha and dimensions; rejection happens before original write
+G3_repair=decoded once with exif_transpose and saved derivatives with empty EXIF; original remains byte-identical; property tested by parsing written thumbnail EXIF/GPS
+G4_repair=endpoint maps UploadTooLargeError to 413 and EvidenceValidationError to 422; configured thumbnail sizes are used; duplicate/MIME/oversize paths tested through TestClient; removed dead duplicate return
+scope_paths=backend/app/services/evidence_service.py; backend/app/storage/local_store.py (read/use only); backend/app/api/v1/evidence.py; backend/app/config.py; backend/tests/test_evidence_upload.py; docs/worklogs/SG-006.log; report is canonical docs/worklogs/SG-006_report.md
+
+G2_failing_run_command=timeout 120s bash -lc "../venv/bin/pytest -q tests/test_evidence_upload.py -k bomb --log-cli-level=WARNING"
+G2_failing_run_rc=1; initial configured case passed, native Pillow case failed because logger dimensions=unknown; summary=1 failed, 1 passed, 6 deselected, 1 warning in 0.57s
+G2_failure_finding=Pillow warning text exposed total pixels only; requirement demanded pixel dimensions in log
+G2_repair_run_rc=0; output=2 passed, 6 deselected, 1 warning in 0.51s; logs sha=c8890a37282c0c2a76c436b5118d6e4655de744fc331aba3ce33a4a9989d93c0 dimensions=5000x5000 limit_kind=max_image_pixels and sha=2b8421250b02fb9d51225d5071399ee5a754fa0b51437b760f43c9b3f6f16a12 dimensions=10000x10000 limit_kind=pillow_max_image_pixels
+thumbnail_failure_gate=focused module output observed warnings for both size=256 and size=512 with sha; no bare thumbnail exception handler remains
+env_override_gate=MAX_IMAGE_PIXELS=1234 ../venv/bin/python printed 1234; unset process printed settings.max_image_pixels=None and Pillow Image.MAX_IMAGE_PIXELS=89478485
+
+focused_ruff_command=timeout 120s bash -lc "../venv/bin/ruff check app tests"
+focused_ruff_rc=0 output=All checks passed!; checked app and tests; match count=0
+focused_evidence_command=timeout 120s bash -lc "../venv/bin/pytest -q tests/test_evidence_upload.py --log-cli-level=WARNING"
+focused_evidence_rc=0 output=8 passed, 1 warning in 0.62s; collected 8; no skip
+full_suite_command=timeout 600s bash -lc "../venv/bin/pytest -q"
+full_suite_rc=0 output=11 passed, 1 warning in 0.59s; collected 11; no skip; exit 5 not observed
+warning_note=the sole warning is StarletteDeprecationWarning from installed fastapi/testclient.py recommending httpx2; no evidence test skipped
+diff_check=git diff --check rc=0; changed product paths match scope; no migrations, .env, secrets, restart, prod DB, or prod storage writes
+partial_file_check=bomb tests assert no evidence row, no household/sha storage directory, and no *.tmp under temporary storage root
+worklog_status=SG-006.log is this committed execution trace; SG-006_report.md will be the canonical publisher input and committed receipt artifact

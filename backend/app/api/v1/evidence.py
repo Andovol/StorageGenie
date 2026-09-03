@@ -5,17 +5,18 @@ from fastapi import APIRouter, Depends, File, Header, HTTPException, Query, Uplo
 from fastapi.responses import FileResponse
 from sqlalchemy.orm import Session
 
+from app.config import settings
 from app.db import get_db
 from app.models.evidence import Evidence
 from app.models.idempotency import IdempotencyKey
-from app.services.evidence_service import store_evidence
+from app.services.evidence_service import EvidenceValidationError, UploadTooLargeError, store_evidence
 from app.storage.local_store import absolute_path, thumbnail_path
 
 router = APIRouter()
 
 
 @router.post("/evidence", status_code=201)
-async def upload_evidence(
+async def upload_evidence(  # noqa: C901
     file: UploadFile = File(...),  # type: ignore[no-untyped-def]
     household_id: str = Query(...),
     db: Session = Depends(get_db),  # type: ignore[no-untyped-def]
@@ -48,8 +49,10 @@ async def upload_evidence(
             ev = store_evidence(
                 data, file.filename, file.content_type or "application/octet-stream", household_id, db
             )
-        except ValueError as e:
+        except UploadTooLargeError as e:
             raise HTTPException(status_code=413, detail=str(e))
+        except EvidenceValidationError as e:
+            raise HTTPException(status_code=422, detail=str(e))
         except Exception as e:
             # Could be FK violation for household
             raise HTTPException(status_code=422, detail=str(e))
@@ -60,14 +63,6 @@ async def upload_evidence(
             db.commit()
         except Exception:
             db.rollback()
-    return {
-        "id": ev.id,
-        "sha256": ev.sha256,
-        "storage_key": ev.storage_key,
-        "media_type": ev.media_type,
-        "size_bytes": ev.size_bytes,
-        "original_filename": ev.original_filename,
-    }
     return {
         "id": ev.id,
         "sha256": ev.sha256,
@@ -117,7 +112,7 @@ def get_thumbnail(evidence_id: str, size: int, household_id: str = Query(...), d
     if ev.household_id != household_id:
         raise HTTPException(status_code=403, detail="Household mismatch")
     # Allow only configured sizes
-    if size not in (256, 512):
+    if size not in settings.thumbnail_sizes:
         raise HTTPException(status_code=422, detail="Invalid thumbnail size")
     tp = thumbnail_path(ev.storage_key, size)
     if not tp.exists():
