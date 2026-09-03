@@ -1,12 +1,13 @@
+BLOCKED: candidate_not_remote
 SG-003 report
 
-Result: verification completed; receipt publication pending the final unmodified publisher invocation in this work sequence.
+Result: verification completed; receipt publication is blocked by the unmodified publisher’s candidate precondition.
 
 Work dir: /home/andrei/StorageGenie
 Remote: git@github.com:Andovol/StorageGenie.git
 BASE ref requested: automation
 BASE resolved at packet start: 6831e94ee063649d8673fe56972bea997bb621cf
-WORK_HEAD: pending until this report and log are committed
+WORK_HEAD: fb9546dbc25fad44cb1080475ec5a23ad6d1a1cd (the work commit containing the two output files)
 
 G1 — wrapper repair
 
@@ -49,10 +50,10 @@ Verification only: no product behavior, migration, `.env`, service restart, LLM/
 
 G5 — receipt
 
-The bound command is `/opt/storagegenie-dispatch/finalize_dispatch_report.sh`, invoked unmodified after WORK_HEAD is pushed. The evidence ref must carry the resulting commit with trailer `Dispatch-ID: SG-003`; its hash will be recorded here after artifact verification.
+The bound command `/opt/storagegenie-dispatch/finalize_dispatch_report.sh` was invoked unmodified after WORK_HEAD was pushed, with `SG-003`, `contract_sync=refresh version=0.17.2`, `docs/worklogs/SG-003_report.md`, and WORK_HEAD `fb9546dbc25fad44cb1080475ec5a23ad6d1a1cd`. It returned `DISPATCH_BLOCKED_REPORT: candidate_not_remote`. At invocation, `origin/storagegenie-evidence` was `637302e74fac291a383525518dc4d263ce88267c`, not WORK_HEAD. Therefore no `Dispatch-ID: SG-003` artifact exists; this acceptance criterion is FAIL/UNANSWERED. The evidence ref was not manually moved and no alternate publisher was used.
 
 Findings and unanswered checks: the direct SSH verification was unanswered because the referenced private key was absent from this process environment; no privileged operation was routed around. The wrapper file ownership/mode was observed as `root:root 755`. The foreign negative-test string at `dispatch_coder.sh:72` remains outside this slice.
 
 UNCLEAR FIRST READ: The packet’s expected SSH key was not available in this process, so host checks used directly readable host paths where possible and the SSH-only check remains unanswered.
 UNCLEAR DURING EXECUTION: The foreign-project grep is intentionally non-empty because `dispatch_coder.sh:72` names HealthyLaws in a negative test; finalize itself is clean.
-UNCLEAR REMAINING: Receipt commit hash and final WORK_HEAD are filled only after the unmodified publisher and remote artifact verification complete.
+UNCLEAR REMAINING: No SG-003 receipt hash can be quoted because the unmodified publisher stopped at candidate_not_remote; resolving that wrapper/pipeline precondition requires owner/launcher action outside this slice.

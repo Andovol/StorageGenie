@@ -1,3 +1,4 @@
+BLOCKED: candidate_not_remote
 SG-003 verification log
 BASE=6831e94ee063649d8673fe56972bea997bb621cf
 WORKDIR=/home/andrei/StorageGenie
@@ -32,9 +33,9 @@ G4 scope and outputs:
 Only docs/worklogs/SG-003.log and docs/worklogs/SG-003_report.md are outputs. No product files, migration, .env, restart, LLM/OCR action, or datastore write was performed. Initial and pre-report git status were clean. No accidental rows were observed or created.
 The report and this log are intended to be committed in WORK_HEAD; the receipt publisher is invoked after that commit is pushed to automation.
 
-G5 receipt plan:
-The unmodified bound command is /opt/storagegenie-dispatch/finalize_dispatch_report.sh. It will be invoked with SG-003, the bound required header value, docs/worklogs/SG-003_report.md, and WORK_HEAD. Artifact proof will inspect the resulting storagegenie-evidence commit trailer, not merely the command exit status.
+G5 receipt result:
+The unmodified bound command /opt/storagegenie-dispatch/finalize_dispatch_report.sh was invoked with SG-003, contract_sync=refresh version=0.17.2, docs/worklogs/SG-003_report.md, and WORK_HEAD fb9546dbc25fad44cb1080475ec5a23ad6d1a1cd. It returned DISPATCH_BLOCKED_REPORT: candidate_not_remote. The wrapper requires origin/storagegenie-evidence to equal CANDIDATE, but the evidence ref was 637302e74fac291a383525518dc4d263ce88267c while CANDIDATE was WORK_HEAD. No SG-003 receipt commit was created. Manual ref movement or a replacement publisher was not attempted.
 
 UNCLEAR FIRST READ: Packet expected the patched wrapper header and a dispatch key path, but the local wrapper had to be verified directly and ~/.ssh/storagegenie-architect-dispatch was absent in this process; direct SSH re-check was unanswered.
 UNCLEAR DURING EXECUTION: /opt/storagegenie-dispatch/dispatch_coder.sh retains one HealthyLaws-related negative-test string at line 72; it is outside finalize_dispatch_report.sh and was not changed under the scope ceiling.
-UNCLEAR REMAINING: Whether the evidence push and receipt trailer proof will succeed until the unmodified publisher runs after WORK_HEAD is pushed; no alternate publisher will be used.
+UNCLEAR REMAINING: The repaired header strings and health/version gates pass, but the required SG-003 evidence receipt is unanswered because the unmodified wrapper blocks at candidate_not_remote; no alternate publisher will be used.
