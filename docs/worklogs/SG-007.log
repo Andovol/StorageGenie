@@ -1,0 +1,44 @@
+SG-007
+BASE_REF=automation
+BASE_RESOLVED=89dbf72f6d31bfc67e7de21ec1bfa376a84451ef
+workdir=/home/andrei/StorageGenie
+remote=git@github.com:Andovol/StorageGenie.git
+timeout_budget=120s ordinary commands; 600s full suite; 2100s overall
+model=unknown (process arguments exposed no model id; no provider metadata available)
+effort=high (process arguments: -c model_reasoning_effort=high)
+contract_sync=refresh version=0.17.2
+database=none; all asset/assertion tests use temporary SQLite and temporary storage; no production rows
+scope=backend/tests/test_assets_crud.py; backend/tests/test_assertions.py; docs/worklogs/SG-007.log; no application repair
+
+initial_environment_probe_command=timeout 600s bash -lc '/usr/bin/time -f "ELAPSED_S=%e EXIT=%x" pytest -q tests/test_assets_crud.py tests/test_assertions.py'
+initial_environment_probe_rc=127 elapsed=0.00s output=/usr/bin/time: cannot run pytest: No such file or directory
+environment_resolution=./venv/bin/pytest, ./venv/bin/ruff, and ./venv/bin/mypy exist; system PATH does not expose them
+
+focused_initial_command=timeout 600s bash -lc '/usr/bin/time -f "ELAPSED_S=%e EXIT=%x" ./venv/bin/pytest -q backend/tests/test_assets_crud.py backend/tests/test_assertions.py'
+focused_initial_rc=1 elapsed=1.21s; 2 passed, 1 failed; the failure was a test assertion selecting the old display_name assertion from the update response, not an application failure
+focused_test_correction=selected the accepted updated display_name assertion; a second bounded run exposed the test's expected assertion count of 3 versus observed 4 because the payload serialization includes the default ACTIVE status; corrected that test expectation
+focused_correction_run_rc=1 elapsed=1.06s; 2 passed, 1 failed; application behavior remained unimplicated
+focused_pass_command=timeout 600s bash -lc '/usr/bin/time -f "ELAPSED_S=%e EXIT=%x" ./venv/bin/pytest -q backend/tests/test_assets_crud.py backend/tests/test_assertions.py'
+focused_pass_rc=0 elapsed=1.02s; output=3 passed, 1 warning in 0.70s; no skipped tests
+
+full_initial_command=timeout 600s bash -lc '/usr/bin/time -f "ELAPSED_S=%e EXIT=%x" ./venv/bin/pytest -q backend/tests'
+full_initial_rc=1 elapsed=1.32s; output=12 passed, 2 failed, 1 warning in 0.91s; existing evidence tests could not find files under their module-local temp root because eager app import in the new tests fixed settings.storage_root to another module's root
+test_isolation_correction=new test modules lazy-load app/database/service imports during fixture/test execution; no application source changed
+initial_ruff_command=timeout 120s bash -lc '/usr/bin/time -f "ELAPSED_S=%e EXIT=%x" ./venv/bin/ruff check backend/app backend/tests'
+initial_ruff_rc=1 elapsed=0.01s; output=one unused Assertion import in test_assets_crud.py
+initial_mypy_command=timeout 120s bash -lc '/usr/bin/time -f "ELAPSED_S=%e EXIT=%x" ./venv/bin/mypy backend/app backend/tests'
+initial_mypy_rc=1 elapsed=5.61s; advisory output=backend/app/services/evidence_service.py:95 incompatible ImageFile/Image assignment; this pre-existing evidence-path finding was not repaired
+
+full_pass_command=timeout 600s bash -lc '/usr/bin/time -f "ELAPSED_S=%e EXIT=%x" ./venv/bin/pytest -q backend/tests'
+full_pass_rc=0 elapsed=1.12s; output=14 passed, 1 warning in 0.77s; collected 14; no skipped tests; exit 5 not observed
+ruff_pass_command=timeout 120s bash -lc '/usr/bin/time -f "ELAPSED_S=%e EXIT=%x" ./venv/bin/ruff check backend/app backend/tests'
+ruff_pass_rc=0 elapsed=0.01s; output=All checks passed!; checked app and tests; match count=0
+mypy_advisory_command=timeout 120s bash -lc '/usr/bin/time -f "ELAPSED_S=%e EXIT=%x" ./venv/bin/mypy backend/app backend/tests'
+mypy_advisory_rc=1 elapsed=5.61s; advisory count=1; same pre-existing evidence_service.py:95 type error; not gated
+warning=one installed FastAPI/Starlette TestClient deprecation warning recommending httpx2; not a skipped gate
+
+verified_expected_conditions=Asset version default is 1 and create response detail includes evidence, accepted field assertions, and asset.create audit; If-Match supersession/stale no-op, archive/version/audit, route scoping, attach 404/403, cursor round-trip, and mixed q/asset_type/status/has_evidence filters all passed
+attach_observation=duplicate attach is harmless under SQLite in the exercised path; no asset_service repair was proved necessary; the broad catch remains an inspected concern outside the observed failing behavior
+production_safety=only /tmp/storagegenie-*-tests-* temporary databases/storage were used; no prod DB, storage, restart, sudo, docker, SSH, secret, or migration operation was used
+vacuity_audit=fixture sets contain matching and non-matching rows; pagination had 5 assets with limit 2, 3 non-empty pages, unique union equal to created set; full suite collected 14 and passed
+pending=commit this worklog with the two test modules, push automation, prefill evidence ref, then create the canonical report and invoke the unmodified receipt publisher
