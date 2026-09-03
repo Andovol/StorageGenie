@@ -5,7 +5,8 @@
 **Version:** `0.17.2` (`C:\Coding\Claude\Launcher\VERSION` @ `0.17.2`, global `RULES.md` byte-identical)
 **Branch:** `automation` (default), evidence ref `refs/heads/storagegenie-evidence`, remote `Andovol/StorageGenie`
 **Host:** `andrei@87.106.66.242:2222` → `/home/andrei/StorageGenie` (ubuntu, VPS, `reference/vps-info.md` is authority)
-**Status:** SG-006 landed and rated 98. Evidence path hardened: strict signature validation, dynamic bomb guard, EXIF-free derivatives, full suite 11 passed. Receipt `3bc9e61` (`Dispatch-ID: SG-006`) auto-published; parent/trailer/tip verified. No dispatch in flight. Next: SG-007 (asset CRUD slice per register) or the Launcher relay send.
+**Status:** SG-007 landed and rated 98. Pure verify slice: zero product repair justified — full asset CRUD, cursor pagination round-trip, supersession chain, 403/404/409 paths all proved by 3 committed test modules (suite 14 passed). Receipt `d43f4c1` (`Dispatch-ID: SG-007`) auto-published; parent/trailer verified. Empirical ssh test settled it: session still Running at receipt — receipt commit is the done-signal. No dispatch in flight. Next: SG-008 (search/export manifest, Task 11) or Launcher relay send.
+- Queued finding (mypy advisory, from SG-007 report): `backend/app/services/evidence_service.py:95` assignment-type error — destination: next slice touching that file.
 
 **What is live:**
 - `f80c6f5` AGENTS.md cutover (6406B, 0.17.2) + CLAUDE.md adapter, `5b1d1d2` decisions, `7320d6b` .gitignore — all pushed.
@@ -21,7 +22,7 @@
 
 - SG-006 (codex high): work `6d57bc2` (strict signature/MIME validation, dynamic bomb guard with named `max_image_pixels` setting, EXIF-free derivatives byte-proved, atomic tmp cleanup, dead-code removal, 8 committed tests incl. crafted-dimension PNG + fail-then-fix log) + merge `2d70e28` (CO-54 prefill, also restored SG-005 report onto automation); receipt `3bc9e61` auto-published (parent/trailer/tip verified). Rated 98. Waited in-turn per owner directive; detached trigger worked cleanly.
 
-**Next step (exact):** SG-007 APPROVED (asset CRUD slice, Codex High, L2, in-turn dispatch-and-wait) — executing this turn.
+**What is in flight:** SG-007 dispatch BLOCKED at wrapper gate — `DISPATCH_REJECTED g2b_divergence_refused` again (SG-006's publisher left the host worktree on the evidence line, same defect as SG-005; relay still unsent to Launcher). No retry burned. Own miss: the refusal was visible in the trigger log after 45 s but the wait ran the full 32 min — procedure now gates the wait on trigger acceptance within 60 s. Packet `89dbf72` pushed and valid; re-trigger after host reset to `89dbf72`.
 - Standing dispatch procedure (owner directive, verified 2026-09-03: a 240 s blocking call survives): dispatch turns are sequential bounded blocking waits IN-TURN until receipt or budget — no fire-and-forget, no between-turn polling, no dormant gaps. Trigger detached (`Start-Process` + log), then blocking wait loop (sleep + fetch + receipt check) inside the turn.
 
 **Decisions not derivable from code:**
