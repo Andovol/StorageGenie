@@ -22,7 +22,7 @@
 - `D1` (2026-08-28, quote m0100 "keep the code for now"): untracked Phase 0 WIP kept on disk, not committed — `backend/` FastAPI/SQLAlchemy/Alembic + `frontend/` Vite/React + `backend/data/db/storagegenie.db` (migration `0201cf10`). Pin `26e9e8b` conserved; 40 obligations `keep/covered/retire`, zero CONFLICT (disposition `m0064`).
 - Owner directives: `m0045` VPS folder `/home/andrei/StorageGenie`; `m0083` Coder `grok` + shared GitHub key (selectable per slice via `CODERS.md`); Phase 0 only — no LLM/OCR/barcode/Expiry plugin until authorized.
 
-**How owner wants work done (differs from defaults):** High-level overview in chat; full technical detail on disk. Coder does all build/deploy on VPS (`G-O1`). Confirm before any ambiguous/destructive act (`G-C1`).
+**How owner wants work done (differs from defaults):** High-level overview in chat; full technical detail on disk. Coder does all build/deploy on VPS (`G-O1`). Confirm before any ambiguous/destructive act (`G-C1`). `My recommendation` always bold in owner-facing text (owner formatting directive m0072).
 
 ---
 
