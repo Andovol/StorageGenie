@@ -5,7 +5,7 @@
 **Version:** `0.17.2` (`C:\Coding\Claude\Launcher\VERSION` @ `0.17.2`, global `RULES.md` byte-identical)
 **Branch:** `automation` (default), evidence ref `refs/heads/storagegenie-evidence`, remote `Andovol/StorageGenie`
 **Host:** `andrei@87.106.66.242:2222` → `/home/andrei/StorageGenie` (ubuntu, VPS, `reference/vps-info.md` is authority)
-**Status:** SG-007 landed and rated 98. Backend catalog path fully proved (suite 14 passed). Receipt `d43f4c1` auto-published; parent/trailer/tip verified. Session closed clean (`CLOSE_COMPLETE`): nothing in flight. Next: SG-008 (search/export manifest, Task 11) PROPOSED, awaiting owner approval. Launcher finding filed AND committed in Launcher repo HEAD (`proposals/2026-09-03-dispatch-payload-template-drift.md`, status proposed) — desk loop owns evaluation.
+**Status:** SG-007 landed and rated 98. Backend catalog path fully proved (suite 14 passed). Receipt `d43f4c1` auto-published; parent/trailer/tip verified. `a4eba14` Makefile `clean` committed (DEC-1). **L3 GRANTED 2026-09-03 (owner quote: "Okay, I agree with L3."):** Architect sequences Phase 0 exit (Tasks 11–15: SG-008 search/export/restore → frontend verify/repair Tasks 12–14 → Task 15 exit E2E) with no per-slice approvals; bounds: codex high (m0106 stands), temp-paths only, zero prod writes/restarts/secrets/infra, one retry per slice; hard stops: BLOCKED/STOP, score <95, unrecoverable dispatch refusal, any G-K1 fork or new sensitive-surface touch. R3 host fix (publisher-restore) still pending — first dispatch gated on it. Launcher finding filed AND committed in Launcher repo HEAD (`proposals/2026-09-03-dispatch-payload-template-drift.md`, status proposed) — desk loop owns evaluation.
 - Queued finding (mypy advisory, from SG-007 report): `backend/app/services/evidence_service.py:95` assignment-type error — destination: next slice touching that file.
 
 **What is live:**
@@ -38,6 +38,7 @@
 - `m0025` SG-005 APPROVED (quote: "Yes, approved.") — foundation verify/repair, Codex High, L2, with TS-1/TS-4/TS-5 + BM-3/BM-5 folded in. Packet + dispatch authorized.
 - SG-005 dispatch RUNNING (re-trigger accepted after host reset to `535a2d3`; first `high` passed the effort gate — wrapper echoed `contract_sync=refresh version=0.17.2`). Watch condition: commit with `Dispatch-ID: SG-005` on `storagegenie-evidence`, then pull + audit the diff.
 - Prevention relay drafted: `docs/launcher-relay/2026-09-03-publisher-restore-branch.md` (publisher must restore worktree branch after publishing; `g2b` stays). UNSENT — send with the Launcher batch after SG-005 lands; nothing commits/pushes to `automation` mid-flight.
+- `D2` (2026-09-03, quote "Okay, I agree with L3."): L3 stage autonomy granted for Phase 0 exit (Tasks 11–15) under the bounds + hard stops in the RESUME status line. Effort locked to codex high via standing `m0106` unless countermanded.
 
 **How owner wants work done (differs from defaults):** High-level overview in chat; full technical detail on disk. Coder does all build/deploy on VPS (`G-O1`). Confirm before any ambiguous/destructive act (`G-C1`). Batch file edits into few section-sized replacements, not many line-level ones (owner efficiency directive m0113). `My recommendation` always bold in owner-facing text (quote m0072: "Always put "My recommendation" text in bold, so I can easily see it.").
 
