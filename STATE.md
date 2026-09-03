@@ -5,7 +5,7 @@
 **Version:** `0.17.2` (`C:\Coding\Claude\Launcher\VERSION` @ `0.17.2`, global `RULES.md` byte-identical)
 **Branch:** `automation` (default), evidence ref `refs/heads/storagegenie-evidence`, remote `Andovol/StorageGenie`
 **Host:** `andrei@87.106.66.242:2222` → `/home/andrei/StorageGenie` (ubuntu, VPS, `reference/vps-info.md` is authority)
-**Status:** Pipeline proven end-to-end. Receipt `3294091` (`Dispatch-ID: SG-004`) auto-published with zero manual repair. Wrapper repaired twice (finalize re-parameterization verified; `receipt_valid` literal + effort gate fixed on host). No dispatch in flight. Next session opens with inception blueprint review, then Phase 0 build under Codex High.
+**Status:** SG-005 landed and rated 97. Foundation green: truthful health (503 on leg failure), non-vacuous pytest (3 pass), ruff clean, lockfile + pinned base, busy_timeout. Receipt `c3ea843` (`Dispatch-ID: SG-005`) auto-published; parent/trailer/tip verified. First `high` effort dispatch is the functional proof of the effort-gate repair. No dispatch in flight. Next: SG-006 (evidence/upload slice: TS-2/TS-3) or the Launcher relay send.
 
 **What is live:**
 - `f80c6f5` AGENTS.md cutover (6406B, 0.17.2) + CLAUDE.md adapter, `5b1d1d2` decisions, `7320d6b` .gitignore — all pushed.
@@ -16,11 +16,12 @@
 - SG-002 (grok ×2): zero artifacts — external grok outage, owner-confirmed (see Decisions). No commits.
 - SG-003 (codex medium): work `fb9546d` + `c8c58e3`, rated 82 packet-attributed (G5 omitted evidence-prefill push). Receipt blocked `candidate_not_remote` — honestly STOPped per `CO-54`.
 - SG-004 (codex medium): work `90c4cab` + merge `ec4254f` (CO-54-compliant prefill, content-neutral) + `c0a14ee`; receipt `3294091` auto-published, all five properties independently verified (parent/trailer/diff/remote-head/notes). Rated 96. Wrapper P5 `FAIL` on it was the stale-literal false negative, since repaired.
-- Ratings filed: `docs/ratings.md` (SG-003 82 packet, SG-004 96 coder). Packets SG-002/003/004 committed. `automation` @ `54172ca`, evidence @ `3294091`.
+- Ratings filed: `docs/ratings.md` (SG-003 82 packet, SG-004 96 coder, SG-005 97 no-deduction). Packets SG-002…SG-005 committed. `automation` @ `4532f27`, evidence @ `c3ea843`.
+- SG-005 (codex high): work `324857c` (truthful health + 503, `test_health.py` 3 pass, ruff clean, lockfile + digest-pinned base, busy_timeout 5000) + merge `4532f27` (CO-54 prefill, also restored SG-004 report onto automation); receipt `c3ea843` auto-published (parent/trailer/tip verified). Rated 97. Dispatch fired once at gate (`g2b_divergence_refused` — publisher had left host on evidence branch), recovered via owner-run reset to `535a2d3`, re-trigger accepted.
 
 **What is in flight:** Nothing. No dispatch, no open PR, no background job.
 
-**Next step (exact):** New session: (1) review the inception blueprint (`inception/`), (2) then first Phase 0 slice SG-005 under Codex High (owner directive m0106). G-C1 approval before dispatch; Coder builds on VPS (`G-O1`). Note: wrapper now accepts `high` (code-verified, first `high` dispatch is the functional proof); packet must still carry the G5-prefill block verbatim.
+**Next step (exact):** SG-006 — evidence/upload slice (plan Tasks 5/8: SHA-256 service verify, TS-2 dynamic Pillow guard, TS-3 EXIF-free derivatives) under Codex High. G-C1 approval before dispatch. Launcher relay (`docs/launcher-relay/2026-09-03-publisher-restore-branch.md`, committed) sends with the next batch — hand-off to the Launcher repo needs its own vehicle.
 
 **Decisions not derivable from code:**
 - `D1` (2026-08-28, quote m0100 "keep the code for now"): untracked Phase 0 WIP kept on disk, not committed — `backend/` FastAPI/SQLAlchemy/Alembic + `frontend/` Vite/React + `backend/data/db/storagegenie.db` (migration `0201cf10`). Pin `26e9e8b` conserved; 40 obligations `keep/covered/retire`, zero CONFLICT (disposition `m0064`).
@@ -32,6 +33,8 @@
 - `m0019` tech-stack verdict (quote: "Okay to all items."): TS-1…TS-5 ACCEPTED. Cap directive: prefer dynamic/config-driven limits over silent hard caps — every limit a named setting, logged when it binds, visible reject, no magic numbers (aligns `G-A8`; softens AGENTS.md 20 MB hard-cap narrowing — 20 MB stays as configured default with visible 413, adjustable via env).
 - Register: `docs/decisions/2026-09-03-accepted-optimizations.md` — all accepted UV/BM/TS items with use case + source + slice assignment; UV-3/UV-6 recorded rejected; blueprint v3 itself unchanged.
 - `m0025` SG-005 APPROVED (quote: "Yes, approved.") — foundation verify/repair, Codex High, L2, with TS-1/TS-4/TS-5 + BM-3/BM-5 folded in. Packet + dispatch authorized.
+- SG-005 dispatch RUNNING (re-trigger accepted after host reset to `535a2d3`; first `high` passed the effort gate — wrapper echoed `contract_sync=refresh version=0.17.2`). Watch condition: commit with `Dispatch-ID: SG-005` on `storagegenie-evidence`, then pull + audit the diff.
+- Prevention relay drafted: `docs/launcher-relay/2026-09-03-publisher-restore-branch.md` (publisher must restore worktree branch after publishing; `g2b` stays). UNSENT — send with the Launcher batch after SG-005 lands; nothing commits/pushes to `automation` mid-flight.
 
 **How owner wants work done (differs from defaults):** High-level overview in chat; full technical detail on disk. Coder does all build/deploy on VPS (`G-O1`). Confirm before any ambiguous/destructive act (`G-C1`). Batch file edits into few section-sized replacements, not many line-level ones (owner efficiency directive m0113). `My recommendation` always bold in owner-facing text (quote m0072: "Always put "My recommendation" text in bold, so I can easily see it.").
 
