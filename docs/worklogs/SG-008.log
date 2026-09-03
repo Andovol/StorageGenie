@@ -1,0 +1,51 @@
+SG-008
+BASE_REF_REQUESTED=automation
+BASE_RESOLVED=83ac4340bc90125196084ca6772efa3229ca36b8
+WORKDIR=/home/andrei/StorageGenie
+REMOTE=git@github.com:Andovol/StorageGenie.git
+TIMEOUT_BUDGET=120s ordinary commands; 600s backend suite; 2100s overall
+MODEL=unknown (process arguments exposed no model id; no provider metadata available)
+REASONING_EFFORT=high (process arguments exposed -c model_reasoning_effort=high)
+CONTRACT_SYNC=refresh version=0.17.2
+DATABASE=none; all new verification uses per-test temporary SQLite engines and temporary storage roots
+RESTART=none; no prod rows, service restart, sudo, docker, SSH, or secrets used
+
+verified_expected_conditions=
+  exports.py was 54 lines and lacked manifest_version, db_revision, attachment disposition, and an explicit read transaction;
+  assets.py filter branches were present at lines 129-139 and no filter source repair was needed;
+  jobs.py and review_tasks.py returned empty Phase 0 stubs with unasserted envelopes;
+  Alembic head command was `cd backend && timeout 120s venv/bin/alembic heads` and returned `0201cf10c56c (head)`;
+  ARCHITECT.md, PACKET.md, DISPATCH.md, CLOSE.md, LEDGER.md, and PRODUCTION.md were absent from the repository root.
+
+baseline_command=timeout 600s /home/andrei/StorageGenie/venv/bin/pytest -q backend/tests
+baseline_result=14 passed, 1 warning in 0.85s; exit 0; exit 5 was not observed
+
+fail_first_command=timeout 120s /home/andrei/StorageGenie/venv/bin/pytest -q backend/tests/test_export.py backend/tests/test_search.py
+fail_first_result=1 failed, 8 passed, 1 warning in 1.06s; exit 1
+fail_first_quote=FAILED test_export.py::test_export_manifest_is_complete_and_downloadable; KeyError: 'manifest_version'
+fail_first_interpretation=the new export behavior failed against the unmodified application; search, restore, stubs, and idempotency proofs passed unmodified, which is a verified already-correct finding rather than a vacuous pass
+
+repair=exports.py only; added manifest_version `1`, db_revision `0201cf10c56c`, attachment Content-Disposition, and `with db.begin()` around all export reads
+transaction_semantics=SQLAlchemy Session transaction boundary using SQLite default deferred transaction/read semantics; one session transaction is held, with no claim of BEGIN IMMEDIATE, writer exclusion, or stronger isolation
+scope_review=the initial draft collapsed the assertion N+1 query, but no acceptance test proved that performance behavior; it was reverted before the final candidate, so only the required/proven export contract changes remain
+
+first_repair_command=timeout 120s /home/andrei/StorageGenie/venv/bin/pytest -q backend/tests/test_export.py backend/tests/test_search.py
+first_repair_result=2 failed, 7 passed, 1 warning in 1.49s; exit 1; both failures were SQLAlchemy InvalidRequestError because the test override reused its seeding session, which had an autobegun transaction
+harness_correction=each API dependency override now creates and closes a fresh Session from the same isolated temporary engine; this was test-only and made the explicit export transaction exercise realistic
+
+targeted_final_command=timeout 600s /home/andrei/StorageGenie/venv/bin/pytest -q backend/tests/test_export.py backend/tests/test_search.py
+targeted_final_result=9 passed, 1 warning in 1.05s; exit 0
+full_final_command=timeout 600s /home/andrei/StorageGenie/venv/bin/pytest -q backend/tests
+full_final_result=23 passed, 1 warning in 1.42s; exit 0; collected non-vacuous tests; exit 5 would have been FAIL
+ruff_command=timeout 120s /home/andrei/StorageGenie/venv/bin/ruff check backend/app backend/tests
+ruff_result=All checks passed!; elapsed 0.00s; exit 0; violations=0
+mypy_command=timeout 120s /home/andrei/StorageGenie/venv/bin/mypy backend/app backend/tests
+mypy_result=elapsed 0.22s; exit 1; advisory error lines=1; `backend/app/services/evidence_service.py:95` ImageFile/Image assignment; two untyped-test notes; not gated and pre-existing/out of slice
+diff_check=timeout 120s git diff --check; exit 0; no whitespace diagnostics
+
+vacuity_audit=export fixture seeded 2 assets, 2 evidence rows, generated assertions and audit events; search fixture had 5 assets with matching and non-matching rows; has_evidence asserted true and false exact disjoint sets; restore sink was a separately created `restored.db`, not the source connection; stubs asserted envelope shape only and did not treat empty items as data proof; full pytest collected 23 and passed
+search_overlap=the canonical search module intentionally overlaps SG-007 mixed-filter coverage as the named Task 11 artifact; no assets.py repair was needed because all four filters passed unmodified
+idempotency_findings=the existing two-transaction create-asset/idempotency-row race window remains; IdempotencyKey has no TTL column; both were reported only, with no redesign or migration
+warning=one installed FastAPI/Starlette TestClient deprecation warning recommends httpx2; no test was skipped
+implementation_commit=0ffb29ee76a1895211b24fabfcb0dcc1338bdb7d
+next_candidate=the subsequent candidate commit will add this worklog; its resolved WORK_HEAD and evidence-prefill/publisher hashes are recorded in SG-008_report.md
