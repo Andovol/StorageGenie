@@ -1,0 +1,19 @@
+SG-004
+BASE=31e6b7d36c3ae5b06112a2b0ec48b18d0168acb2
+timeout_budget=120s ordinary commands; 2100s overall
+model=unknown (no model/provider metadata in process arguments)
+effort=unknown (no model/provider metadata in process arguments)
+contract_path=/home/andrei/launcher/CODER.md; production_contract=/home/andrei/launcher/CODER_PRODUCTION.md
+wrapper=/opt/storagegenie-dispatch/finalize_dispatch_report.sh
+header_lines=6 ID regex SG-; 9 REPORT_PATH docs/worklogs; 12,19,33,42 evidence ref storagegenie-evidence
+foreign_grep=/opt/storagegenie-dispatch/*; matches=1; dispatch_coder.sh:72 contains HL- in negative probe paths; finalize matches=0
+workstation_version=AGENTS.md records 0.17.2
+host_payload_version=/home/andrei/launcher/VERSION=0.17.2\n
+evidence_ref_before=637302e74fac291a383525518dc4d263ce88267c
+health_start_curl_rc=0 output=Not Found
+health_start_testclient_rc=1 output=ModuleNotFoundError: No module named 'sqlalchemy'
+health_end_curl_rc=0 output=Not Found
+health_end_testclient_rc=1 output=ModuleNotFoundError: No module named 'sqlalchemy'
+health_delta=curl unchanged foreign 404; TestClient unchanged import failure; application health unanswered
+initial_fallback_orchestration=malformed quoting caused SyntaxError; corrected valid fallback then reached missing dependency
+scope=no product change, no migration, no .env modification, no restart, no datastore write, no suite
