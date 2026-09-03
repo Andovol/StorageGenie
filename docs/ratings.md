@@ -7,6 +7,7 @@ Schema: shared `LEDGER.md` — nine columns, `guards_invoked` + `deduction_attri
 | SG-003 | Phase 0 | codex (audit: gpt-5.6-luna) | medium | 82 |  | G5-prefill: every future SG packet orders push-WORK_HEAD-to-evidence-ref + verify equality BEFORE invoking RECEIPT_CMD (verbatim block carried in SG-004) | PG-EV-01, PG-EV-02, PG-EV-05, PG-EV-10, PG-EV-06, PG-PR-03, PG-PR-04 | packet |
 | SG-004 | Phase 0 | codex (audit: unknown per identity line) | medium | 96 |  |  | PG-EV-01, PG-EV-02, PG-EV-05, PG-EV-10, PG-EV-06, PG-PR-03, PG-PR-04 | coder |
 | SG-005 | Phase 0 | codex (audit: unknown per identity line) | high | 97 |  |  | PG-EV-02, PG-EV-05, PG-EV-06, PG-EV-09 |  |
+| SG-006 | Phase 0 | codex (audit: unknown per identity line) | high | 98 |  |  | PG-EV-02, PG-EV-05, PG-EV-06, PG-EV-09 |  |
 
 ## SG-003 investigation (score 82 < 95)
 

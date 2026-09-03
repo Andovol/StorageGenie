@@ -5,7 +5,7 @@
 **Version:** `0.17.2` (`C:\Coding\Claude\Launcher\VERSION` @ `0.17.2`, global `RULES.md` byte-identical)
 **Branch:** `automation` (default), evidence ref `refs/heads/storagegenie-evidence`, remote `Andovol/StorageGenie`
 **Host:** `andrei@87.106.66.242:2222` → `/home/andrei/StorageGenie` (ubuntu, VPS, `reference/vps-info.md` is authority)
-**Status:** SG-005 landed and rated 97. Foundation green: truthful health (503 on leg failure), non-vacuous pytest (3 pass), ruff clean, lockfile + pinned base, busy_timeout. Receipt `c3ea843` (`Dispatch-ID: SG-005`) auto-published; parent/trailer/tip verified. First `high` effort dispatch is the functional proof of the effort-gate repair. No dispatch in flight. Next: SG-006 (evidence/upload slice: TS-2/TS-3) or the Launcher relay send.
+**Status:** SG-006 landed and rated 98. Evidence path hardened: strict signature validation, dynamic bomb guard, EXIF-free derivatives, full suite 11 passed. Receipt `3bc9e61` (`Dispatch-ID: SG-006`) auto-published; parent/trailer/tip verified. No dispatch in flight. Next: SG-007 (asset CRUD slice per register) or the Launcher relay send.
 
 **What is live:**
 - `f80c6f5` AGENTS.md cutover (6406B, 0.17.2) + CLAUDE.md adapter, `5b1d1d2` decisions, `7320d6b` .gitignore — all pushed.
@@ -19,7 +19,7 @@
 - Ratings filed: `docs/ratings.md` (SG-003 82 packet, SG-004 96 coder, SG-005 97 no-deduction). Packets SG-002…SG-005 committed. `automation` @ `4532f27`, evidence @ `c3ea843`.
 - SG-005 (codex high): work `324857c` (truthful health + 503, `test_health.py` 3 pass, ruff clean, lockfile + digest-pinned base, busy_timeout 5000) + merge `4532f27` (CO-54 prefill, also restored SG-004 report onto automation); receipt `c3ea843` auto-published (parent/trailer/tip verified). Rated 97. Dispatch fired once at gate (`g2b_divergence_refused` — publisher had left host on evidence branch), recovered via owner-run reset to `535a2d3`, re-trigger accepted.
 
-**What is in flight:** Nothing. No dispatch, no open PR, no background job.
+- SG-006 (codex high): work `6d57bc2` (strict signature/MIME validation, dynamic bomb guard with named `max_image_pixels` setting, EXIF-free derivatives byte-proved, atomic tmp cleanup, dead-code removal, 8 committed tests incl. crafted-dimension PNG + fail-then-fix log) + merge `2d70e28` (CO-54 prefill, also restored SG-005 report onto automation); receipt `3bc9e61` auto-published (parent/trailer/tip verified). Rated 98. Waited in-turn per owner directive; detached trigger worked cleanly.
 
 **Next step (exact):** SG-006 — evidence/upload slice (plan Tasks 5/8: SHA-256 service verify, TS-2 dynamic Pillow guard, TS-3 EXIF-free derivatives) under Codex High. G-C1 approval before dispatch. Launcher relay (`docs/launcher-relay/2026-09-03-publisher-restore-branch.md`, committed) sends with the next batch — hand-off to the Launcher repo needs its own vehicle.
 
@@ -32,6 +32,7 @@
 - `m0015` blueprint suggestions verdict (quote: "No to UV3 and UV6, I don't like that directions." + "Okay to all other suggestions."): UV-3 (barcode-first ordering) and UV-6 (static dosage guardrails) REJECTED — plan order and §10 stand unchanged. UV-1/UV-2/UV-4/UV-5 + BM-1…BM-8 ACCEPTED as backlog/ADR input; tech-stack question asked next.
 - `m0019` tech-stack verdict (quote: "Okay to all items."): TS-1…TS-5 ACCEPTED. Cap directive: prefer dynamic/config-driven limits over silent hard caps — every limit a named setting, logged when it binds, visible reject, no magic numbers (aligns `G-A8`; softens AGENTS.md 20 MB hard-cap narrowing — 20 MB stays as configured default with visible 413, adjustable via env).
 - Register: `docs/decisions/2026-09-03-accepted-optimizations.md` — all accepted UV/BM/TS items with use case + source + slice assignment; UV-3/UV-6 recorded rejected; blueprint v3 itself unchanged.
+- Owner directive 2026-09-03 (quotes: "Dec1 - ok, but please make sure you follow the new process for dispatch that you mentioned." + "you can do a cross-project handoff directly to the Launcher folder."): SG-006 APPROVED under Codex High L2 with the detached-dispatch process (Start-Process + log file, never Start-Job); cross-project Launcher handoff AUTHORIZED as files into the Launcher tree. (Not tagged `m0083` — that ID is already the `m0083` Coder-grok directive above; collision avoided.)
 - `m0025` SG-005 APPROVED (quote: "Yes, approved.") — foundation verify/repair, Codex High, L2, with TS-1/TS-4/TS-5 + BM-3/BM-5 folded in. Packet + dispatch authorized.
 - SG-005 dispatch RUNNING (re-trigger accepted after host reset to `535a2d3`; first `high` passed the effort gate — wrapper echoed `contract_sync=refresh version=0.17.2`). Watch condition: commit with `Dispatch-ID: SG-005` on `storagegenie-evidence`, then pull + audit the diff.
 - Prevention relay drafted: `docs/launcher-relay/2026-09-03-publisher-restore-branch.md` (publisher must restore worktree branch after publishing; `g2b` stays). UNSENT — send with the Launcher batch after SG-005 lands; nothing commits/pushes to `automation` mid-flight.
