@@ -5,7 +5,7 @@
 **Version:** `0.17.2` (`C:\Coding\Claude\Launcher\VERSION` @ `0.17.2`, global `RULES.md` byte-identical)
 **Branch:** `automation` (default), evidence ref `refs/heads/storagegenie-evidence`, remote `Andovol/StorageGenie`
 **Host:** `andrei@87.106.66.242:2222` → `/home/andrei/StorageGenie` (ubuntu, VPS, `reference/vps-info.md` is authority)
-**Status:** SG-007 landed and rated 98. Pure verify slice: zero product repair justified — full asset CRUD, cursor pagination round-trip, supersession chain, 403/404/409 paths all proved by 3 committed test modules (suite 14 passed). Receipt `d43f4c1` (`Dispatch-ID: SG-007`) auto-published; parent/trailer verified. Empirical ssh test settled it: session still Running at receipt — receipt commit is the done-signal. No dispatch in flight. Next: SG-008 (search/export manifest, Task 11) or Launcher relay send.
+**Status:** SG-007 landed and rated 98. Backend catalog path fully proved (suite 14 passed). Receipt `d43f4c1` auto-published; parent/trailer/tip verified. Session closed clean (`CLOSE_COMPLETE`): nothing in flight. Next: SG-008 (search/export manifest, Task 11) PROPOSED, awaiting owner approval. Launcher finding filed AND committed in Launcher repo HEAD (`proposals/2026-09-03-dispatch-payload-template-drift.md`, status proposed) — desk loop owns evaluation.
 - Queued finding (mypy advisory, from SG-007 report): `backend/app/services/evidence_service.py:95` assignment-type error — destination: next slice touching that file.
 
 **What is live:**
