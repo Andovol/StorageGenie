@@ -28,6 +28,10 @@
 - `m0050` grok outage (quote: "Grok is down, thats why its not working.") — SG-002 diagnosis basis; slices moved to codex.
 - `m0072` formatting (quote: "Always put "My recommendation" text in bold, so I can easily see it.")
 - `m0106` next-session coder/effort (quote: "We will continue with Codex on High.") — SG-005+ run codex high until countermanded.
+- `m0015` blueprint suggestions verdict (quote: "No to UV3 and UV6, I don't like that directions." + "Okay to all other suggestions."): UV-3 (barcode-first ordering) and UV-6 (static dosage guardrails) REJECTED — plan order and §10 stand unchanged. UV-1/UV-2/UV-4/UV-5 + BM-1…BM-8 ACCEPTED as backlog/ADR input; tech-stack question asked next.
+- `m0019` tech-stack verdict (quote: "Okay to all items."): TS-1…TS-5 ACCEPTED. Cap directive: prefer dynamic/config-driven limits over silent hard caps — every limit a named setting, logged when it binds, visible reject, no magic numbers (aligns `G-A8`; softens AGENTS.md 20 MB hard-cap narrowing — 20 MB stays as configured default with visible 413, adjustable via env).
+- Register: `docs/decisions/2026-09-03-accepted-optimizations.md` — all accepted UV/BM/TS items with use case + source + slice assignment; UV-3/UV-6 recorded rejected; blueprint v3 itself unchanged.
+- `m0025` SG-005 APPROVED (quote: "Yes, approved.") — foundation verify/repair, Codex High, L2, with TS-1/TS-4/TS-5 + BM-3/BM-5 folded in. Packet + dispatch authorized.
 
 **How owner wants work done (differs from defaults):** High-level overview in chat; full technical detail on disk. Coder does all build/deploy on VPS (`G-O1`). Confirm before any ambiguous/destructive act (`G-C1`). Batch file edits into few section-sized replacements, not many line-level ones (owner efficiency directive m0113). `My recommendation` always bold in owner-facing text (quote m0072: "Always put "My recommendation" text in bold, so I can easily see it.").
 
