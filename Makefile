@@ -1,4 +1,4 @@
-.PHONY: dev test lint backend-test frontend-test migrate
+.PHONY: dev test lint backend-test frontend-test migrate clean
 
 dev:
 	docker compose up --build
@@ -17,3 +17,6 @@ lint:
 
 migrate:
 	cd backend && python -m alembic upgrade head
+
+clean:
+	powershell -NoProfile -Command "Get-ChildItem -Path '.' -Recurse -Force -Directory -Include '__pycache__','.mypy_cache','.ruff_cache','.pytest_cache' -ErrorAction SilentlyContinue | Remove-Item -Recurse -Force; Remove-Item -Recurse -Force -LiteralPath 'frontend/dist' -ErrorAction SilentlyContinue"
