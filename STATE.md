@@ -21,7 +21,8 @@
 
 - SG-006 (codex high): work `6d57bc2` (strict signature/MIME validation, dynamic bomb guard with named `max_image_pixels` setting, EXIF-free derivatives byte-proved, atomic tmp cleanup, dead-code removal, 8 committed tests incl. crafted-dimension PNG + fail-then-fix log) + merge `2d70e28` (CO-54 prefill, also restored SG-005 report onto automation); receipt `3bc9e61` auto-published (parent/trailer/tip verified). Rated 98. Waited in-turn per owner directive; detached trigger worked cleanly.
 
-**Next step (exact):** SG-006 — evidence/upload slice (plan Tasks 5/8: SHA-256 service verify, TS-2 dynamic Pillow guard, TS-3 EXIF-free derivatives) under Codex High. G-C1 approval before dispatch. Launcher relay (`docs/launcher-relay/2026-09-03-publisher-restore-branch.md`, committed) sends with the next batch — hand-off to the Launcher repo needs its own vehicle.
+**Next step (exact):** SG-007 APPROVED (asset CRUD slice, Codex High, L2, in-turn dispatch-and-wait) — executing this turn.
+- Standing dispatch procedure (owner directive, verified 2026-09-03: a 240 s blocking call survives): dispatch turns are sequential bounded blocking waits IN-TURN until receipt or budget — no fire-and-forget, no between-turn polling, no dormant gaps. Trigger detached (`Start-Process` + log), then blocking wait loop (sleep + fetch + receipt check) inside the turn.
 
 **Decisions not derivable from code:**
 - `D1` (2026-08-28, quote m0100 "keep the code for now"): untracked Phase 0 WIP kept on disk, not committed — `backend/` FastAPI/SQLAlchemy/Alembic + `frontend/` Vite/React + `backend/data/db/storagegenie.db` (migration `0201cf10`). Pin `26e9e8b` conserved; 40 obligations `keep/covered/retire`, zero CONFLICT (disposition `m0064`).
