@@ -9,6 +9,7 @@
 - Queued finding (mypy advisory, from SG-007 report): `backend/app/services/evidence_service.py:95` assignment-type error — destination: next slice touching that file.
 - Queued finding (from SG-008 audit): `backend/app/api/v1/exports.py` pins `ALEMBIC_HEAD = "0201cf10c56c"` as a literal — the next migration must update it or the manifest lies; destination: next slice touching exports or adding a revision.
 
+- `0.18.1` adoption: sign-off A GIVEN 2026-09-05 (P1-P5, D1-D5 all approved). AGENTS.md: harness Class 4 recorded, Coder `codex` (m0106, m0083 history), stale self-refs repaired. Parameter block with desk: `docs/launcher-relay/2026-09-05-runner-install-parameter-block.md`. Version stays `0.17.2` until proof passes. STOPPED before step 6 (serialised; proof slice SG-009 needs sign-off C).
 **What is live:**
 - `f80c6f5` AGENTS.md cutover (6406B, 0.17.2) + CLAUDE.md adapter, `5b1d1d2` decisions, `7320d6b` .gitignore — all pushed.
 - Host provisioned: dispatch key `~/.ssh/storagegenie-architect-dispatch` (ed25519 432B), wrapper `/opt/storagegenie-dispatch/` (13849 + 2807, outside tree, `root:root 755`), `authorized_keys` 6 lines `restrict,pty,command=...`, GitHub repo `Andovol/StorageGenie` created, cloned to `/home/andrei/StorageGenie` (`automation`).

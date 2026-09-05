@@ -12,10 +12,11 @@
 | **Host** | `87.106.66.242:2222` (`ubuntu`, `andrei`) | `reference/vps-info.md:27-28` — pin against `[87.106.66.242]:2222` in `~/.ssh/known_hosts` |
 | **Host project path** | `/home/andrei/StorageGenie` | Owner directive `m0045` — use this folder |
 | **Credential reference** | `~/.ssh/storagegenie-architect-dispatch` (ed25519, `~/.ssh/storagegenie-architect-dispatch.pub` on host forced-command) + unrestricted `C:\Users\popes\Desktop\key_Andrei.ppk` (Launcher-only, provisioning) | Naming `<project>-architect-dispatch` per `PROVISIONING.md:129` — private never on host |
-| **Coder** | `grok` (SELECTED from `global/CODERS.md` — `grok --always-approve --sandbox workspace --cwd <workdir> [-m <model>] [--reasoning-effort <effort>] --prompt-file <prompt-file>`) | Owner directive `m0083` — `codex` → `grok`. `G-O2` — packet says "the Coder", config names it. Allowed effort `low|medium|high|xhigh` (`medium` default) |
-| **Dispatch verb** | `SG-<nnn> <coder> [effort]` (2-6 tokens, e.g. `SG-001 codex medium`) | Per `CODERS.md:284` — ID prefix `SG-` for StorageGenie |
+| **Coder** | `codex` (SELECTED from `global/CODERS.md` — `codex exec --sandbox danger-full-access [-m <model>] [-c model_reasoning_effort=<effort>] -C <workdir> < <prompt-file>`) | Owner directive `m0106` — codex high until countermanded; supersedes `m0083` (`codex` → `grok`, kept as history). `G-O2` — packet says "the Coder", config names it. Allowed effort `low|medium|high|xhigh` (`medium` default; `xhigh` valid on the `0.18.1` runner — the old wrapper's `max` was the drift) |
+| **Dispatch verb** | `SG-<nnn> <coder> [effort]` (2-6 tokens, e.g. `SG-001 codex medium`) | ID prefix `SG-` for StorageGenie. Transitional (`ISS-77`): keep params in verb until the `0.18.1` runner parses the short form |
+| **Harness** | OpenCode — **Class 4** | `HARNESSES.md` — the Class 2 `prompt_async` path is DOCUMENTED with addressing unverified, so this harness operates as Class 4 until a wake probe observes a resume. Checks run the status verb, never the trigger log (`DISPATCH.md` §2c) |
 | **Wrapper** | `/opt/storagegenie-dispatch/dispatch_coder.sh` (`root:root 755`, outside project tree) | Per `PROVISIONING.md:132-142` four fixes — outside `ReadWritePaths`, explicit `PATH`, `ReadWritePaths=~/.codex + ~/.grok`, enumerate `InaccessiblePaths` at dispatch time |
-| **Model policy** | No model id sent; CLI default IS model (`AGENTS.md:59`, `CODERS.md:59`) | Effort is sent, model is not |
+| **Model policy** | No model id sent; CLI default IS model | Per `CODERS.md` Effort section — effort chosen per slice and recorded, model omitted |
 | **Packet directory** | `docs/packets` (committed, pushed) | `DISPATCH.md:29` — unpushed packet fails as `packet_missing` |
 | **Autonomy** | `L2` (slice autonomy, 1 retry, per `ARCHITECT.md:78-88`) — escalates to `L3` only after clean stage | State the level in approval message |
 | **Values bindings** | See Values table below — every `{{NAME}}` the contract uses is bound there | `CO-08` stop if unbound |
@@ -41,7 +42,7 @@
 
 `ARCHITECT.md` before planning/packet/dispatch/audit/rating/touching state · `PACKET.md` before writing a packet · `DISPATCH.md` before dispatching · `CLOSE.md` before closing · `LEDGER.md` before rating · `RATIONALE.md` before changing a rule
 
-Coder reads read-only copy on host (`/opt/storagegenie-dispatch/` + global `CODER.md` `0.17.2` + `lang/python.md`) — never from repo (`AGENTS.md:94-100` pattern).
+Coder reads read-only copy on host (`/opt/storagegenie-dispatch/` + global `CODER.md` + `lang/python.md`) — never from repo (cutover pattern; the copy's version tracks the adopted rule set).
 
 ## Project narrowings of global rules — may narrow, never contradict (`G-P2`)
 
