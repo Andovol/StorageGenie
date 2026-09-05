@@ -1,5 +1,9 @@
 # SG-009 — Frontend verify/repair + lint unmasking (Codex High)
 
+**Dispatch params for the new runner (read from this committed packet; model is the CLI default and is omitted per policy):**
+coder: codex
+effort: high
+
 > Facts below are what I believe from the tree that carries this packet. **They are EXPECTED conditions,
 > not established truth. Verify each before building on it; a difference is a finding, not an obstacle.**
 > For any number, path or quoted line I hand you: if your figures differ from mine, investigate and
@@ -35,7 +39,7 @@
 
 `frontend/src` carries the Task 12–14 surface — `api/client.ts` (fetch wrapper with household injection + RFC9457 error parsing), `CatalogPage`, `AssetDetailPage`, `CapturePage`, `AssetForm`, `EvidenceGallery`, `ProvenanceBadge`, `useAssets` hook — with three test modules (`client.test.ts`, `AssetCard.test.tsx`, `ProvenanceBadge.test.tsx`) recorded at 3 files / 7 passing, but that figure is inherited, not re-verified (`PG-IC-09`: re-prove it here). The standing defect is `frontend/package.json:10`: `"lint": "eslint src --ext ts,tsx || true"` — a gate that cannot fail — and `eslint` is absent from `devDependencies`, so the mask may be load-bearing rather than historical (`TS-5`). Backend is proved through SG-008 (suite 23) and is out of scope: no backend file may change in this slice.
 
-Answers to prior open items, so they are not rediscovered: run frontend gates with `./node_modules/.bin` (or `npx --no-install`) inside `frontend/`; the ARCHITECT/PACKET/DISPATCH/CLOSE/LEDGER/PRODUCTION contract files are absent on the host, so all needed context is embedded here; a non-fast-forward prefill resolves content-neutrally per G5, never force-push.
+Answers to prior open items, so they are not rediscovered: run frontend gates with `./node_modules/.bin` (or `npx --no-install`) inside `frontend/`; the ARCHITECT/PACKET/DISPATCH/CLOSE/LEDGER/PRODUCTION contract files are absent on the host, so all needed context is embedded here; a non-fast-forward work-branch push resolves by content-neutral merge per CO-54, never force-push.
 
 ## G1 — Vitest suite, re-proved and repaired where broken
 
@@ -57,12 +61,12 @@ Answers to prior open items, so they are not rediscovered: run frontend gates wi
 
 - `{{WORKLOG_DIR}}/SG-009.log` and `{{WORKLOG_DIR}}/SG-009_report.md`, first token `SG-009`, every output path named in the report committed, three UNCLEAR lines at the end.
 
-## G5 — Prefill the evidence ref, then auto-publish
+## G5 — Receipt note on the notes ref (re-targeted for the 0.18.0 runner migration; the receipt-proves-work obligation is unchanged, the evidence-branch prefill is retired)
 
-- After WORK_HEAD is pushed to `automation`: `git push origin <WORK_HEAD>:refs/heads/storagegenie-evidence` (120s bound), then `git fetch origin refs/heads/storagegenie-evidence` and verify `git rev-parse origin/storagegenie-evidence` equals WORK_HEAD — quote both hashes. The publisher gates on this equality (`candidate_not_remote`); the prefill is what establishes it. If the push is non-fast-forward, merge content-neutrally and push the merge — never force-push (`CO-54`, as SG-005…SG-008 demonstrated).
-- Only then invoke `{{RECEIPT_CMD}}` with (`SG-009`, header `contract_sync=refresh version=0.17.2`, report path, WORK_HEAD), unmodified. A repair need is a finding, never a local patch to the wrapper.
-- A `candidate_not_remote` from the unmodified publisher AFTER the verified prefill is a STOP — commit `BLOCKED`, push, report. Never hand-move the ref by other means and never force-push outside the publisher (`CO-54`).
-- Verify the artifact, not the command: the evidence ref carries a commit with the `Dispatch-ID: SG-009` trailer — quote its hash. A zero-exit publish with no such commit is a FAIL.
+- Push the work to `automation` and leave the worktree clean: the runner proves HEAD movement without rewrite (P1/P2) and a clean tree (P6) itself. No push to `storagegenie-evidence`, no `{{RECEIPT_CMD}}` — the legacy publisher leaves with the old wrapper.
+- Attach the receipt note to the work HEAD LAST, with no commit after it (120s bound): `git notes --ref=refs/notes/storagegenie-coder-reports add -m "Dispatch-ID: SG-009 | Report: docs/worklogs/SG-009_report.md | Work-HEAD: <hash>" <WORK_HEAD>` — the first line carries BOTH `Dispatch-ID:` and `Report:` (`CO-97`; the dispatch gate greps the ID, the runner parses the path, P3/P5). Then verify locally with `git notes --ref=refs/notes/storagegenie-coder-reports show <WORK_HEAD>` and quote the note. The RUNNER pushes the notes ref and reads it back from the remote — a note existing only locally is not a receipt.
+- If `git notes add` refuses because a note already exists for that commit, STOP — a receipted commit running again is the replay case; never force-replace the note (`CO-97`).
+- Verify the artifact, not the command: after the run the dispatch result line must report `note=yes` for this ID. A zero-exit run with `note=no` is a FAIL.
 
 ## Constraints
 
@@ -82,14 +86,14 @@ Answers to prior open items, so they are not rediscovered: run frontend gates wi
 - `tsc` typecheck exit 0 quoted, no new suppressions.
 - `npm run lint` runs unmasked and exits 0 quoted, with the fire-control demonstrated; `package-lock.json` records the pinned eslint tree.
 - `docs/worklogs/SG-009.log` and `docs/worklogs/SG-009_report.md` committed; every output path in the report committed.
-- `storagegenie-evidence` carries the `Dispatch-ID: SG-009` receipt commit; hash quoted; prefill equality quoted before publish.
+- the notes ref carries the `Dispatch-ID: SG-009` + `Report:` note on the work HEAD; note quoted; dispatch result line `note=yes`.
 - No criterion passed vacuously.
 
 ## Report
 
-- Work dir `/home/andrei/StorageGenie`, remote `git@github.com:Andovol/StorageGenie.git`, `BASE` = packet start HEAD, `WORK_HEAD` = work commit hash.
+- Work dir `/home/andrei/StorageGenie`, origin remote as configured on the host (workstation measures `https://github.com/Andovol/StorageGenie.git`), `BASE` = packet start HEAD, `WORK_HEAD` = work commit hash.
 - State model/effort provenance per `CO-78` — never from a system-prompt identity line.
 
 ## Budget
 
-120s ordinary, 300s install + suite legs, 2100s overall (`TIMEOUT_S=2100` in wrapper).
+120s ordinary, 300s install + suite legs, 2100s overall (`RUN_BUDGET_S=2100` in the dispatch conf).
