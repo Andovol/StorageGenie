@@ -5,12 +5,14 @@ import json
 from pathlib import Path
 
 import pytest
+from alembic.script import ScriptDirectory
 from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session, sessionmaker
 from PIL import Image
 
 from app.config import settings
+from app.api.v1 import exports as exports_api
 from app.db import Base, get_db
 from app.main import app
 from app.models import Asset, Evidence, Household, IdempotencyKey
@@ -109,7 +111,9 @@ def test_export_manifest_is_complete_and_downloadable(isolated_db) -> None:  # t
     assert body["assertions"]
     assert body["audit_events"]
     assert body["manifest_version"] == "1"
-    assert body["db_revision"] == "0201cf10c56c"
+    expected_head = ScriptDirectory(str(Path(__file__).resolve().parents[1] / "alembic")).get_current_head()
+    assert body["db_revision"] == exports_api.ALEMBIC_HEAD
+    assert body["db_revision"] == expected_head
     assert "attachment" in response.headers.get("content-disposition", "").lower()
 
 

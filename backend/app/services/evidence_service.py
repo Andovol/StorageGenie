@@ -92,9 +92,9 @@ def _decode_image(file_bytes: bytes, sha: str) -> Image.Image:
                 raise EvidenceValidationError(
                     f"decompression_bomb limit exceeded: max_image_pixels ({dimensions})"
                 )
-            image = ImageOps.exif_transpose(image)
-            image.load()
-            return image
+            transposed_image = ImageOps.exif_transpose(image)
+            transposed_image.load()
+            return transposed_image
         except (Image.DecompressionBombWarning, Image.DecompressionBombError) as exc:
             dimensions = _image_dimensions(file_bytes, str(exc))
             logger.warning(

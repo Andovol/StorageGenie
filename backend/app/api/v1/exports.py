@@ -1,5 +1,7 @@
 import datetime
+from pathlib import Path
 
+from alembic.script import ScriptDirectory
 from fastapi import APIRouter, Depends, Query
 from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session
@@ -14,7 +16,17 @@ from app.schemas.common import loads_json
 router = APIRouter()
 
 MANIFEST_VERSION = "1"
-ALEMBIC_HEAD = "0201cf10c56c"
+
+
+def _alembic_head() -> str:
+    alembic_path = Path(__file__).resolve().parents[3] / "alembic"
+    head = ScriptDirectory(str(alembic_path)).get_current_head()
+    if head is None:
+        raise RuntimeError(f"No Alembic head found at {alembic_path}")
+    return head
+
+
+ALEMBIC_HEAD = _alembic_head()
 
 
 @router.get("/export")
