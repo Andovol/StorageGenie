@@ -12,6 +12,7 @@
 - `0.18.1` adoption: sign-off A GIVEN 2026-09-05 (P1-P5, D1-D5 all approved). AGENTS.md: harness Class 4 recorded, Coder `codex` (m0106, m0083 history), stale self-refs repaired. Parameter block with desk: `docs/launcher-relay/2026-09-05-runner-install-parameter-block.md`. Version stays `0.17.2` until proof passes. STOPPED before step 6 (serialised; proof slice SG-009 needs sign-off C). 0.19.0 delta approved same day (S1–S6 one unit): provisioning request FILED as Launcher issue #8 (2026-09-05, 9 keys, XDG_RUNTIME_DIR omitted per D2) — desk steps 2–5 pending; our steps 6–9 then 0.19.0 refresh+flip resume when install lands. U1 filed as Launcher issue #10 (2026-09-05, `type: finding`, step-1 refresh-actor question); no host action until the desk verdict. #8 completed same day: two-line reply posted (`ID_PATTERN`, `LOCK`, single-quoted, verified verbatim).
 - `0.19.2` adoption: D1 APPROVED 2026-09-06 (owner quote: "Yes, approved.") as one unit (`0.18.0` steps with project values → corrected `0.19.0`, SG-009 IS the step-6 vehicle per answered U1 with no separate refresh slice → record `0.19.2` once at end). #8 second round-trip POSTED 2026-09-06 (`CONTRACT_DIR='/home/andrei/storagegenie-contract'` proposed/new path, REMOTE/BRANCH measured @ `0.19.2`, `values: proposed`, verified verbatim). Installed file hash-verified ISS-115 (`8ba490ac…`). SG-009 G5 re-targeted to notes-ref receipt + in-packet `coder:`/`effort:` (scope unchanged). Steps 6–9 held for desk queue (no ping per U2) + sign-off C. Premature local `0.19.1` stamp (`d23c6b3`) stands until the record-once write; effective base `0.17.2`.
 - Migration COMPLETE 2026-09-07 (desk #8): step-6 proof on SG-009 `result=done exit=0` 425s/2100s, all P PASS, receipt `d0c5a44` on `refs/notes/storagegenie-coder-reports` read from remote, `--status done`, `_UID=1000` (dispatch account, not root). Contract checkout `/home/andrei/storagegenie-contract` @ `0.19.3`. Quarantined host-ahead `6d96856` (`receipt(SG-008)`) verified present on `origin/storagegenie-evidence` — nothing lost. Step 7 repoint done by desk (ISS-132): forced command now `/usr/local/bin/dispatch` + `DISPATCH_CONF`. Transport notes: `RUN_BUDGET_S=2100` binds for the first time (35min kill real); `CONTRACT_REMOTE/BRANCH` desk-owned; `DISPATCH_PATH` is a complete PATH replacement. SG-009 rated 98 (no flag).
+- Sign-off D GRANTED 2026-09-07 (owner quote: "D1 - ok"). Step-9 branch half VERIFIED NO-OP same day: `git ls-files` carries zero wrapper files (no `.sh`, no dispatch helpers — only historical packet docs, which stay); nothing deleted, nothing to delete. Desk host half (`/opt/storagegenie-dispatch/` removal) is desk-owned; desk notified on #8.
 - Step 8 DONE 2026-09-07 (SG-011, first self-run through repointed command): bare-ID trigger accepted (`activating`→`done`), work `384ba99` + record `70e1943`, notes-ref receipt verified from remote-fetched ref, rated 98 (no flag). Transport notes: status verb is `SG-011 --status`; notes ref needs the explicit refspec fetch (default fetch misses it); the trigger ssh returns empty — result comes via `--status` + notes, never the trigger log. Coder-side `python`/`pytest` absent on host PATH — future packets name `venv/bin/` binaries.
 **What is live:**
 - `f80c6f5` AGENTS.md cutover (6406B, 0.17.2) + CLAUDE.md adapter, `5b1d1d2` decisions, `7320d6b` .gitignore — all pushed.
@@ -27,7 +28,7 @@
 
 - SG-006 (codex high): work `6d57bc2` (strict signature/MIME validation, dynamic bomb guard with named `max_image_pixels` setting, EXIF-free derivatives byte-proved, atomic tmp cleanup, dead-code removal, 8 committed tests incl. crafted-dimension PNG + fail-then-fix log) + merge `2d70e28` (CO-54 prefill, also restored SG-005 report onto automation); receipt `3bc9e61` auto-published (parent/trailer/tip verified). Rated 98. Waited in-turn per owner directive; detached trigger worked cleanly.
 
-**What is in flight:** step 9 branch half (remove dead wrapper from `automation`) after sign-off D. Phase 0 exit resumes after (SG-010 drafted, untracked).
+**What is in flight:** nothing owned — desk host half of step 9 outstanding (desk-owned, desk-observed). Next session (owner-directed): review blueprint + implementation docs + overall plan + autonomy levels.
 - Standing dispatch procedure (owner directive, verified 2026-09-03: a 240 s blocking call survives): dispatch turns are sequential bounded blocking waits IN-TURN until receipt or budget — no fire-and-forget, no between-turn polling, no dormant gaps. Trigger detached (`Start-Process` + log), then blocking wait loop (sleep + fetch + receipt check) inside the turn. Gate every wait on trigger acceptance within 60 s (lesson from the SG-007-day 32 min blind wait).
 
 **Decisions not derivable from code:**
@@ -66,15 +67,6 @@
 
 ## History (recent, terse)
 
-- `54172ca` — state: wrapper P5 + effort-gate repairs recorded
-- `326db08` — ratings: SG-004 row (96, coder)
-- `3294091` — receipt SG-004 (auto, `storagegenie-evidence`, `Dispatch-ID: SG-004 | Work-HEAD: c0a14ee`)
-- `c0a14ee` — work SG-004 (+ merge `ec4254f` evidence prefill, + `90c4cab`)
-- `31e6b7d` — packet SG-004 + bold-recommendation state tweak
-- `82ef49c` — ratings: SG-003 row (82, packet)
-- `c8c58e3` — work SG-003 (`fb9546d` + blocker record, codex)
-- `6831e94` — packet SG-003 (codex, grok outage)
-- `ed62f54` — packet SG-002 (wrapper receipt proof)
-- `637302e` — receipt SG-001 (manual, `storagegenie-evidence`, `Dispatch-ID: SG-001 | Work-HEAD: 2abf9f1`)
+Retired 2026-09-07 (SG-001…SG-004 era rows): recoverable from `git log --oneline`; live receipts stay in the status block above.
 
 Full onboarding narrative: `docs/launcher-onboarding-feedback.md` (for Launcher Architect).
