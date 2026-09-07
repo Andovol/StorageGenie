@@ -1,7 +1,7 @@
 # StorageGenie — project configuration
 
 > **Canonical for this repo. `CLAUDE.md` is a one-line adapter `@AGENTS.md` — edit here, never there.**
-> Rule-set version this project records: **0.19.1** (`C:\Coding\Claude\Launcher\VERSION` @ `0.19.1`, global `RULES.md` sha256 `8ba490ace894e56b6ad14c3cba648441ace475e44e96d02fa82db9bb57c8505e` verified ISS-115).
+> Rule-set version this project records: **0.19.4** (`C:\Coding\Claude\Launcher\VERSION` @ `0.19.4`, global `RULES.md` sha256 `8ba490ace894e56b6ad14c3cba648441ace475e44e96d02fa82db9bb57c8505e` re-verified 2026-09-07, D1 record-only per Launcher `CHANGELOG.md:14`).
 
 ## Configuration table — the single source of every project value
 

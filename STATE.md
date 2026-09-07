@@ -2,7 +2,7 @@
 
 ## RESUME HERE
 
-**Version:** `0.19.3` (record-once: desk-measured `contract=0.19.3` on the SG-009 proof dispatch 2026-09-07 + Launcher `VERSION` @ `0.19.3`; supersedes D1's `0.19.2` target on measurement grounds. Global `RULES.md` sha256 unchanged `8ba490ac…` per ISS-115.)
+**Version:** `0.19.4` (D1 record-only 2026-09-07: desk `VERSION` @ `0.19.4`, `RULES.md` sha256 re-verified `8ba490ac…` — content identical, no re-cutover/proof per Launcher `CHANGELOG.md:14`; supersedes `0.19.3`.)
 **Branch:** `automation` (default), evidence ref `refs/heads/storagegenie-evidence`, remote `Andovol/StorageGenie`
 **Host:** `andrei@87.106.66.242:2222` → `/home/andrei/StorageGenie` (ubuntu, VPS, `reference/vps-info.md` is authority)
 **Status:** SG-007 landed and rated 98. Backend catalog path fully proved (suite 14 passed). Receipt `d43f4c1` auto-published; parent/trailer/tip verified. `a4eba14` Makefile `clean` committed (DEC-1). **L3 GRANTED 2026-09-03 (owner quote: "Okay, I agree with L3."):** Architect sequences Phase 0 exit (Tasks 11–15: SG-008 search/export/restore → frontend verify/repair Tasks 12–14 → Task 15 exit E2E) with no per-slice approvals; bounds: codex high (m0106 stands), temp-paths only, zero prod writes/restarts/secrets/infra, one retry per slice; hard stops: BLOCKED/STOP, score <95, unrecoverable dispatch refusal, any G-K1 fork or new sensitive-surface touch. SG-008 landed and rated 98 (receipt `6d96856`, suite 23 passed, parent/trailer/tip verified; `SG-008_report.md` evidence-only until next prefill restores it). R3 stranding recurred at the SG-008 gate (`g2b_divergence_refused`), cleared by owner-run host reset to `83ac434` — publisher-restore relay still pending at the desk loop. Next under L3: frontend verify/repair (Tasks 12–14). Launcher finding filed AND committed in Launcher repo HEAD (`proposals/2026-09-03-dispatch-payload-template-drift.md`, status proposed) — desk loop owns evaluation.
@@ -28,7 +28,7 @@
 
 - SG-006 (codex high): work `6d57bc2` (strict signature/MIME validation, dynamic bomb guard with named `max_image_pixels` setting, EXIF-free derivatives byte-proved, atomic tmp cleanup, dead-code removal, 8 committed tests incl. crafted-dimension PNG + fail-then-fix log) + merge `2d70e28` (CO-54 prefill, also restored SG-005 report onto automation); receipt `3bc9e61` auto-published (parent/trailer/tip verified). Rated 98. Waited in-turn per owner directive; detached trigger worked cleanly.
 
-**What is in flight:** nothing owned — desk host half of step 9 outstanding (desk-owned, desk-observed). Next session (owner-directed): review blueprint + implementation docs + overall plan + autonomy levels.
+**What is in flight:** SG-010 (Phase 0 exit E2E + ADRs + runbook) — D5 authorized 2026-09-07, dispatching codex high under L3. Desk host half of step 9 (`/opt` removal) still outstanding — desk-owned, desk-observed, notified on #8, no ping per U2. Review `docs/reviews/2026-09-07-phase0-tasks-11-15-review.md` filed this session.
 - Standing dispatch procedure (owner directive, verified 2026-09-03: a 240 s blocking call survives): dispatch turns are sequential bounded blocking waits IN-TURN until receipt or budget — no fire-and-forget, no between-turn polling, no dormant gaps. Trigger detached (`Start-Process` + log), then blocking wait loop (sleep + fetch + receipt check) inside the turn. Gate every wait on trigger acceptance within 60 s (lesson from the SG-007-day 32 min blind wait).
 
 **Decisions not derivable from code:**
@@ -46,6 +46,8 @@
 - Prevention relay drafted: `docs/launcher-relay/2026-09-03-publisher-restore-branch.md` (publisher must restore worktree branch after publishing; `g2b` stays). UNSENT — send with the Launcher batch after SG-005 lands; nothing commits/pushes to `automation` mid-flight.
 - `D2` (2026-09-03, quote "Okay, I agree with L3."): L3 stage autonomy granted for Phase 0 exit (Tasks 11–15) under the bounds + hard stops in the RESUME status line. Effort locked to codex high via standing `m0106` unless countermanded.
 - `D3` (2026-09-05, owner quote "D1 - ok"): `AGENTS.md:30` receipt-header stays at the measured wrapper echo (`contract_sync=refresh version=0.17.2`) until the `0.19.0` step-1 contract refresh re-measures it — rule-set stamp (`0.19.1`) and wrapper echo are separate facts, never hand-synced.
+- `D4` (2026-09-07, owner quote "Okay to D1 and D2"): `0.19.4` record-only adoption — `AGENTS.md:4` + RESUME stamp to `0.19.4`, `RULES.md` hash re-verified unchanged; no packet change, no re-proof.
+- `D5` (2026-09-07, same quote): SG-010 commit + dispatch authorized as the last L3 slice (codex high); packet re-targeted to notes-ref receipt + in-packet `coder:`/`effort:` before push (scope unchanged — the committed G7 named the retired evidence-branch publisher).
 
 **How owner wants work done (differs from defaults):** High-level overview in chat; full technical detail on disk. Coder does all build/deploy on VPS (`G-O1`). Confirm before any ambiguous/destructive act (`G-C1`). Batch file edits into few section-sized replacements, not many line-level ones (owner efficiency directive m0113). `My recommendation` always bold in owner-facing text (quote m0072: "Always put "My recommendation" text in bold, so I can easily see it.").
 
