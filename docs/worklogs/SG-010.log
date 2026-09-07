@@ -1,0 +1,52 @@
+SG-010 — Phase 0 exit worklog
+
+Context and provenance
+- BASE_REF_REQUESTED: automation
+- BASE_RESOLVED_COMMIT: 97ea0eb2048b63f19cf475388867551a72e8b0d2 (packet start HEAD)
+- WORK_HEAD_IMPLEMENTATION: 001e52b928b965f78a149d7f95f7970cd09d3cd8
+- Remote: git@github.com:Andovol/StorageGenie.git
+- Work dir: /home/andrei/StorageGenie
+- Process provenance: the live process arguments contained `codex exec --sandbox danger-full-access -c model_reasoning_effort=high -C /home/andrei/StorageGenie`; coder `codex`, reasoning effort `high`, model ID `unknown` because no model ID was present in process arguments or provider metadata.
+- The repository has no copies of ARCHITECT.md, PACKET.md, DISPATCH.md, CLOSE.md, LEDGER.md, RATIONALE.md, or PRODUCTION.md. The committed packet, AGENTS.md, and STATE.md were used.
+
+Fact verification before edits
+- `docs/adr/` and root `README.md` were absent; `backend/tests/test_phase0_e2e.py` was absent.
+- `POST /v1/assets/{id}/evidence` was present at `backend/app/api/v1/assets.py:246-269`; export was present at `backend/app/api/v1/exports.py:28-76`; asset detail already returned evidence, assertions, and audit rows.
+- Existing manual creation wrote `asset.create`, but no `asset.accepted` audit row existed. The E2E test was written to prove that gap rather than assuming the packet was correct.
+- The packet expected a 23-test backend baseline; the final suite is 24 because this slice adds one committed test. The final configured mypy count is 43 advisory errors, matching the carried baseline after SG-011.
+
+Bounds and no-vacuity controls
+- Ordinary command bound: 120s. Full backend suite bound: 600s. Overall budget: 2100s.
+- No command timed out or was killed. Timed final gate legs were target 1.02s/120s, full suite 1.98s/600s, Ruff 0.02s/120s, mypy 0.16s/120s, and the runbook tree check under 0.1s/120s.
+- The E2E fixture creates a fresh household/database/storage root and captures runtime asset/evidence IDs. It does not use fixed IDs or a pre-existing row.
+- The test executes all five legs and then queries that fixture's own asset audit rows. It asserts exactly one `asset.create` and one `asset.accepted`, non-null timestamps, sorted audit timestamps, event order, and a non-negative accepted-minus-created duration.
+
+Fail-first and repair
+- Fail-first command: `timeout 120s /home/andrei/StorageGenie/venv/bin/pytest -q backend/tests/test_phase0_e2e.py::test_phase0_exit_condition`.
+- Fail-first result: exit 1, `1 failed, 1 warning in 0.71s`; the create/upload/attach/search/export/detail assertions ran, then `assert len(accepted_events) == 1` failed with `0`.
+- Repair: `backend/app/services/asset_service.py` now records `asset.accepted` in the existing audit path after the accepted manual assertions are assembled and before the transaction commits. No schema, migration, endpoint, or restart was added.
+- Final targeted result: the same command exited 0 with `1 passed, 1 warning in 0.64s` (outer bound timer 1.02s). The Starlette/httpx TestClient deprecation warning is pre-existing.
+
+Durability files
+- `docs/adr/ADR-001-local-first-storage.md` records SQLite WAL + local filesystem now, PostgreSQL + S3-compatible storage later, the SQLAlchemy/Alembic boundary, and the runtime-head/restore tests that keep the migration path honest.
+- `docs/adr/ADR-002-evidence-provenance.md` records immutable originals, hash identity, assertion supersession/review state, Phase 0 audit paths, and the deferred observation/identifier/classification/location/lifecycle_event/asset_relation table recipe. It explicitly does not claim those tables exist.
+- `README.md` records prerequisites, Compose startup, migration, seed, health output, backend/frontend gates, data locations, gitignore rationale, and the BM-8 trust boundary: LAN-only, single household, no authentication; household scoping is namespacing, never security.
+- The runbook tree check tested 10 named paths, matched 8 command patterns, and passed `git diff --check`. Docker Compose was not started: no service restart or datastore write was in scope. This is static command/path verification, not a claim of a live Compose run.
+
+Final gates
+- `timeout 600s ../venv/bin/python -m pytest -q` from `backend/`: exit 0, `........................`, `24 passed, 1 warning in 1.46s`. Collection was non-empty; exit 5 did not occur.
+- `timeout 120s ../venv/bin/python -m ruff check app tests` from `backend/`: exit 0, exact output `All checks passed!`; it checked 47 Python files (40 app, 7 tests) and found 0 Ruff matches.
+- `timeout 120s ../venv/bin/python -m mypy app` from `backend/`: exit 1, `Found 43 errors in 10 files (checked 40 source files)`. Advisory only; no mypy repair was made. The findings are in schemas/asset.py, models/base.py, services/audit_service.py, services/asset_service.py, api/v1/review_tasks.py, api/v1/jobs.py, api/v1/households.py, api/v1/evidence.py, api/v1/assets.py, and main.py.
+- Frontend from `frontend/`: `npm test -- --run` exited 0 with `Test Files 3 passed (3)` and `Tests 7 passed (7)`; `npm run lint` exited 0. React Router future-flag warnings remain.
+- An initial accidental `npm test -- --run` from the repository root exited 254 because root `package.json` is absent. Re-running from `frontend/`, exactly as the README states, passed; this was a command-location finding, not a product failure.
+- No `.env`, token, auth file, migration, frontend source, production database, service, restart, privileged operation, or SSH check was touched.
+
+Commit and receipt handoff
+- Implementation/doc commit: `001e52b928b965f78a149d7f95f7970cd09d3cd8`.
+- Evidence outputs committed by the following evidence commit: `docs/worklogs/SG-010.log` and `docs/worklogs/SG-010_report.md`; all implementation output paths named in the report are committed.
+- The final evidence commit is the notes receipt target. The note is added only after the final evidence commit and push, with no commit after it. The note must carry `Dispatch-ID: SG-010`, `Report: docs/worklogs/SG-010_report.md`, and that final target hash on its first line.
+- No `storagegenie-evidence` push and no legacy receipt publisher were used, per G7. Coder-side SSH/remote note-read verification is unavailable in this confined process; the local note and the runner's remote readback are separate obligations.
+
+UNCLEAR: FIRST READ — The expected endpoint and export were present, but the two ADR/runbook targets and the E2E test were absent; the contract files named by project routing were also absent.
+UNCLEAR: DURING EXECUTION — The fail-first test exposed the missing accepted audit event; the first frontend invocation used the wrong directory and was corrected without changing the tree beyond the scoped files.
+UNCLEAR: REMAINING — Forty-three advisory mypy findings, TestClient/React Router warnings, and live Docker/remote-note readback remain outside this confined Coder verification; the notes runner must publish and report `note=yes`.
