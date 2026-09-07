@@ -1,0 +1,48 @@
+SG-011 — queued findings worklog
+
+Context
+- BASE_REF_REQUESTED: automation
+- BASE_RESOLVED_COMMIT: c67026f1778c72e2497e046f8343cc61f4cdebea
+- Worktree was clean at start on branch automation; origin is git@github.com:Andovol/StorageGenie.git.
+- Process provenance from process arguments/environment: `/usr/local/bin/codex exec --sandbox danger-full-access -c model_reasoning_effort=high -C /home/andrei/StorageGenie`; coder `codex`, effort `high`, model ID `unknown` because no model ID was present in process arguments or provider metadata.
+- Scope check: only the two application files, one backend test, and the SG-011 worklog/report were changed. No migration, database, restart, environment, secret, infrastructure, or host operation was performed.
+
+Packet fact verification
+- `backend/app/services/evidence_service.py:95` exactly contained `image = ImageOps.exif_transpose(image)`.
+- `backend/alembic/versions/` contained exactly one file: `0201cf10c56c_001_core_foundation.py`. Its revision identifier is `0201cf10c56c`.
+- The packet/state expected 43 repo-wide mypy errors, but the measured baseline was 44 because the queued evidence error was still present. This discrepancy is reported, not normalized away.
+
+Bounds and baseline
+- Ordinary commands used `timeout 120s`; evidence/export and full pytest suite legs used `timeout 300s`; overall `RUN_BUDGET_S=2100`.
+- Initial PATH probes using `python`/`pytest` returned exit 127 (`python: command not found`, `pytest: command not found`). The project-local `venv/bin/mypy` and `venv/bin/pytest` were present and used for all gates; no installation or privileged operation was attempted.
+- `timeout 120s ../venv/bin/mypy app/services/evidence_service.py`: exit 1. Exact output: `app/services/evidence_service.py:95: error: Incompatible types in assignment (expression has type "Image", variable has type "ImageFile")  [assignment]`; `Found 1 error in 1 file (checked 1 source file)`.
+- `timeout 120s ../venv/bin/mypy app`: exit 1; `Found 44 errors in 11 files (checked 40 source files)`.
+- `timeout 300s ../venv/bin/pytest -q tests/test_evidence_upload.py tests/test_export.py`: exit 0; `13 passed, 1 warning in 1.04s`. Both named modules ran; no skips or empty collection. Warning: Starlette deprecation for httpx/TestClient.
+
+Changes
+- `evidence_service.py`: bound the EXIF-transposed result to `transposed_image`, preserving load/return behavior while eliminating the `ImageFile` rebinding.
+- `exports.py`: replaced the migration-head literal with `ScriptDirectory(...).get_current_head()` rooted at the repository Alembic directory; no new dependency was added. The existing `db_revision: ALEMBIC_HEAD` read-back route remains in place.
+- `test_export.py`: asserts the response `db_revision` equals both the exported computed head and the current Alembic script head.
+
+Fire-control perturbation
+- A temporary scratch copy changed only the migration revision from `0201cf10c56c` to `0201cf10c56d`; it was removed after the check and was never committed.
+- Quoted result: `scratch db_revision=0201cf10c56d`; `scratch alembic_head=0201cf10c56d`; `original literal=0201cf10c56c`; `CAUGHT: runtime export revision diverged from the old literal after scratch migration perturbation`.
+- The assertions verified computed export head equals Alembic’s discovered head and differs from the stale literal. This demonstrates the mechanism against the divergence class; it is not a vacuous pass.
+
+Final gates
+- `timeout 120s ../venv/bin/mypy app/services/evidence_service.py`: exit 0; `Success: no issues found in 1 source file`.
+- `timeout 120s ../venv/bin/mypy app`: exit 1; `Found 43 errors in 10 files (checked 40 source files)`. The count fell by one and did not grow. Remaining findings, all outside this slice: `app/schemas/asset.py:53,55` type-arg; `app/models/base.py:8` unused-ignore; `app/api/v1/review_tasks.py:13,41` no-untyped-def and `:17,18,45,46` unused-ignore; `app/api/v1/jobs.py:13` no-untyped-def and `:17,18` unused-ignore; `app/api/v1/households.py:18,58` no-untyped-def and `:20,22,59,60` unused-ignore; `app/services/audit_service.py:16,17` type-arg; `app/services/asset_service.py:15,62` type-arg; `app/api/v1/assets.py:20,118,191,247` no-untyped-def, `:23,25,50,126,127,195,197,251,252` unused-ignore, and `:50,249` type-arg; `app/api/v1/evidence.py:19` no-untyped-def and `:20,22,24` unused-ignore; `app/main.py:37,43` unused-ignore.
+- `timeout 300s ../venv/bin/pytest -q tests/test_evidence_upload.py tests/test_export.py`: exit 0; `13 passed, 1 warning in 0.96s`. No skips or empty collection.
+- `timeout 300s ../venv/bin/pytest -q`: exit 0; `23 passed, 1 warning in 1.45s`. Full backend collection was non-empty.
+- `timeout 120s ../venv/bin/ruff check app tests`: exit 0; `All checks passed!`.
+- `timeout 120s git diff --check`: exit 0; no whitespace errors.
+- No command produced no-output success, timed out, or was killed. The full gate remained within the 2100-second overall budget; timed suite legs totaled 3.45 seconds.
+
+Commits and receipt
+- Implementation commit: 384ba99257de3a4e585edda196ec1d61ef229922 (`SG-011 fix queued findings`).
+- Evidence paths added in the next commit: `docs/worklogs/SG-011.log` and `docs/worklogs/SG-011_report.md`.
+- The final evidence commit is the receipt target; its exact hash is recorded in the notes receipt after push, with no commit after the note.
+
+UNCLEAR: FIRST READ — The line-95 and exactly-one-migration expectations matched; the stated 43-error baseline differed from the measured 44 because the queued error was still present, and PATH lacked direct Python/test commands.
+UNCLEAR: DURING EXECUTION — The runtime Alembic lookup and export route passed normally; the scratch migration perturbation produced the required divergent output and was removed.
+UNCLEAR: REMAINING — Forty-three advisory mypy findings remain in ten out-of-scope files, plus one Starlette httpx/TestClient deprecation warning; no migration or production verification was in scope.
