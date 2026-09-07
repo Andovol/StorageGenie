@@ -51,6 +51,16 @@ def create_asset(
         after=payload,
         household_id=household_id,
     )
+    audit_service.record(
+        db,
+        actor=actor,
+        action="asset.accepted",
+        entity_type="asset",
+        entity_id=asset.id,
+        before=None,
+        after={"review_state": "accepted"},
+        household_id=household_id,
+    )
     db.commit()
     db.refresh(asset)
     return asset
