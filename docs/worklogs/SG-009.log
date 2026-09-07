@@ -1,0 +1,47 @@
+SG-009 — frontend verification and lint unmasking worklog
+
+Context
+- BASE_REF_REQUESTED: automation
+- BASE_RESOLVED_COMMIT: 1567ff4a7ecad9321accffbb3ed94c7f64aaf120
+- Worktree was clean at start; branch was automation.
+- Process provenance: `/usr/local/bin/codex exec --sandbox danger-full-access -c model_reasoning_effort=high -C /home/andrei/StorageGenie`; effort is high; model ID was not exposed by process arguments/provider metadata, so model is unknown.
+- Scope check: no backend, database, service, restart, migration, environment, secret, or infrastructure path was touched.
+
+Bounds and baseline
+- Ordinary commands used a 120s bound; frontend suite and npm install used a 300s bound.
+- Baseline `timeout 300s ./node_modules/.bin/vitest run` from `frontend/`: exit 0. Output: `Test Files  3 passed (3)` and `Tests  7 passed (7)`. No skipped tests. React Router emitted two future-flag warnings on stderr.
+- Baseline `timeout 120s ./node_modules/.bin/tsc --noEmit` from `frontend/`: exit 0; stdout was empty.
+- Baseline `timeout 120s npm run lint` from `frontend/`: exit 0 only because the script was `eslint src --ext ts,tsx || true`; output included `sh: 1: eslint: not found`. This was a masked false-green.
+
+Install and configuration
+- `timeout 300s npm install --save-dev --save-exact --cache /tmp/storagegenie-npm-cache eslint@9 typescript-eslint@8`: exit 0; observed 4.7s against 300s. Installer pinned `eslint` 9.39.5 and `typescript-eslint` 8.69.0, updated `frontend/package-lock.json`, and reported six audit vulnerabilities (4 moderate, 1 high, 1 critical). No audit fix was run.
+- Added `frontend/eslint.config.js` using ESLint 9 flat config and the `typescript-eslint` recommended preset. The `@typescript-eslint/no-unused-expressions` rule allows intentional short-circuit assignments; the source at `frontend/src/routes/AssetDetailPage.tsx:43` was not structurally redesigned.
+- First unmasked lint run: exit 1, reporting `frontend/src/routes/AssetDetailPage.tsx:43:7 error Expected an assignment or function call and instead saw an expression @typescript-eslint/no-unused-expressions`. After the config option, the final lint passed.
+
+Fire-control
+- Added temporary untracked `frontend/.scratch/unused-variable.ts` containing `const unusedScratch = 1;` using the requested scratch-only control.
+- `timeout 120s ./node_modules/.bin/eslint .scratch/unused-variable.ts`: exit 1. Output: `1:7 error 'unusedScratch' is assigned a value but never used @typescript-eslint/no-unused-vars`.
+- Removed the scratch file with no committed copy; final hygiene check reported `scratch_removed=yes`.
+
+Final gates
+- `timeout 300s ./node_modules/.bin/vitest run`: exit 0; observed 1.10s against 300s. Output:
+  `Test Files  3 passed (3)`
+  `Tests  7 passed (7)`
+  No skipped tests and no vacuous collection. The same two React Router future-flag warnings appeared on stderr.
+- `timeout 120s ./node_modules/.bin/tsc --noEmit`: exit 0; observed 1.34s against 120s; stdout was empty.
+- `timeout 120s npm run lint`: exit 0; observed 0.92s against 120s. Output:
+  `> storagegenie-frontend@0.1.0 lint`
+  `> eslint src`
+  No lint errors.
+- `timeout 120s git diff --check`: exit 0; no whitespace errors.
+- `timeout 120s npm ls eslint typescript-eslint --depth=0` from `frontend/`: exit 0; output was `eslint@9.39.5` and `typescript-eslint@8.69.0`.
+
+Changes and commits
+- Implementation files: `frontend/package.json`, `frontend/package-lock.json`, `frontend/eslint.config.js`.
+- No frontend source/test repair was needed because the baseline suite already passed; no new suppressions were added.
+- Implementation WORK_HEAD: 10c9e743fec1289888534ba5a2ae266993d937e3 (`SG-009 unmask frontend lint`).
+- Evidence files to commit next: `docs/worklogs/SG-009.log` and `docs/worklogs/SG-009_report.md`.
+
+UNCLEAR: FIRST READ — The inherited 3-file/7-test count was accurate; lint was genuinely unavailable and masked at baseline.
+UNCLEAR: DURING EXECUTION — No test or type failure required a frontend source repair; the only strict lint finding was the intentional short-circuit expression at AssetDetailPage.tsx:43.
+UNCLEAR: REMAINING — npm reported six dependency audit vulnerabilities and Vitest reported React Router future warnings; both remain outside this slice.
