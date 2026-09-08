@@ -1,0 +1,43 @@
+SG-018
+
+Status: BLOCKED
+BASE requested ref: automation
+BASE resolved at slice start: 9c1a3238c4a9d3c3f313e0e3ee862a0c73c4f4c1
+Coder: codex
+Model: unknown (no model id in readable process arguments; CLI default omitted the id)
+Reasoning effort: high (verified from live process arguments: `codex exec ... -c model_reasoning_effort=high`)
+Overall bound: 2100 s (35 min); no command was killed
+
+Verification performed before the STOP:
+- `timeout 600s bash -lc 'cd backend && venv/bin/python -m pytest -q'`
+  returned 54 passed / 3 failed. The failures were the stale
+  `tests/test_candidates.py::test_candidate_migration_upgrade_downgrade_upgrade`
+  assertion and the two carried ISS-1 decoder nodes:
+  `tests/test_signals.py::test_generated_codes_are_validated_and_bad_checksum_is_not_an_identifier`
+  and `tests/test_signals.py::test_ocr_has_text_boxes_and_mean_confidence`.
+- `timeout 120s venv/bin/python - <<'PY' ... PY` generated a real Pillow TIFF and
+  posted it through `POST /v1/evidence`; observed result was `422` with
+  `media_type_mismatch: unsupported media signature`.
+- `backend/app/config.py` lists `image/tiff` in `allowed_mime_types`, but
+  `backend/app/services/evidence_service.py::_detect_media_type` has no TIFF
+  signature branch. `backend/app/services/signals.py` does list TIFF as a
+  supported image type; the failure is at evidence upload before import.
+
+STOP reason: G1 requires five generated inputs, including a real TIFF, to be
+uploaded as evidence and chained through one import. The product behavior
+rejects that required input. The scope ceiling forbids changing the evidence
+product service, and a direct database row, monkeypatch, or non-TIFF payload
+would make the acceptance proof dishonest. No implementation was attempted
+after this constraint was established.
+
+No migration, live database write, restart, docker/sudo operation, secret,
+frontend file, product file, or dependency change was made.
+
+UNCLEAR — FIRST READ: The packet expected TIFF upload to be available, but the
+actual detector did not implement the configured TIFF MIME type.
+UNCLEAR — DURING EXECUTION: G1 is unanswered; the mandated ceiling prevents
+repairing the product mismatch, so the stale-test repair and remaining gates
+were not claimed.
+UNCLEAR — REMAINING: Add TIFF signature support in a separately authorized
+product slice, then resume SG-018 from a fresh packet/base and re-run all exit
+proof, suite, runbook, and Phase 2 ledger gates.
