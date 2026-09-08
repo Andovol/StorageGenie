@@ -4,10 +4,12 @@ import datetime
 import json
 from collections.abc import Sequence
 
+from sqlalchemy import inspect
 from sqlalchemy.orm import Session
 
 from app.models.job import Job, JobStep
 from app.services import audit_service
+from app.services import signals
 
 STEP_NAMES = (
     "VALIDATING_INPUT",
@@ -105,12 +107,30 @@ def create_job(
 def execute_step(db: Session, job: Job, step: JobStep) -> dict[str, object]:
     """Execute one deterministic Phase 1 step.
 
-    The signal, deduplication, and catalog commit bodies deliberately remain
-    stubs for SG-013/SG-014.  Keeping this function as the seam makes failure
-    injection and a future queue worker possible without changing persistence.
+    The signal body is synchronous by design for Phase 1. Deduplication and
+    catalog commit remain SG-014 stubs and are deliberately untouched.
     """
     if step.step_name == "VALIDATING_INPUT":
         return {"status": "ok", "step": step.step_name}
+    if step.step_name == "EXTRACTING_DETERMINISTIC_SIGNALS":
+        config = json.loads(job.config_snapshot or "{}")
+        evidence_ids = config.get("evidence_ids", [])
+        if not isinstance(evidence_ids, list):
+            raise ValueError("invalid evidence_ids in job config")
+        observations = []
+        for evidence_id in evidence_ids:
+            extracted = signals.extract_observations(str(evidence_id), db)
+            for observation in extracted:
+                if inspect(observation).transient:
+                    db.add(observation)
+            observations.extend(extracted)
+        db.flush()
+        return {
+            "status": "ok",
+            "step": step.step_name,
+            "observation_ids": [row.id for row in observations],
+            "counts": signals.observation_counts(observations),
+        }
     if step.step_name == "AWAITING_REVIEW":
         return {"status": "awaiting_review", "step": step.step_name}
     return {"status": "not_implemented", "step": step.step_name}

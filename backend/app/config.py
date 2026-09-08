@@ -10,8 +10,10 @@ class Settings(BaseSettings):
     cors_origins: str = "http://localhost:5173"
     max_upload_bytes: int = 20 * 1024 * 1024
     max_image_pixels: int | None = None
+    exif_timestamps_enabled: bool = False
+    dhash_near_threshold: int = 10
     thumbnail_sizes: list[int] = [256, 512]
-    allowed_mime_types: list[str] = ["image/jpeg", "image/png", "image/webp", "application/pdf"]
+    allowed_mime_types: list[str] = ["image/jpeg", "image/png", "image/webp", "image/tiff", "application/pdf"]
 
     model_config = {"env_file": ".env", "extra": "ignore"}
 

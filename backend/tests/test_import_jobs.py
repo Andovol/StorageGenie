@@ -1,9 +1,11 @@
 from __future__ import annotations
 
 import json
+import io
 
 import pytest
 from fastapi.testclient import TestClient
+from PIL import Image
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session, sessionmaker
 
@@ -40,11 +42,11 @@ def isolated_db(tmp_path, monkeypatch):  # type: ignore[no-untyped-def]
     evidence = Evidence(
         household_id=household.id,
         sha256="a" * 64,
-        storage_key="import/evidence.bin",
-        media_type="application/octet-stream",
-        original_filename="evidence.bin",
+        storage_key="import/evidence.png",
+        media_type="image/png",
+        original_filename="evidence.png",
         source_kind="upload",
-        size_bytes=1,
+        size_bytes=80,
     )
     other_evidence = Evidence(
         household_id=other_household.id,
@@ -57,6 +59,11 @@ def isolated_db(tmp_path, monkeypatch):  # type: ignore[no-untyped-def]
     )
     session.add_all([evidence, other_evidence])
     session.commit()
+    output = io.BytesIO()
+    Image.new("RGB", (32, 32), "white").save(output, format="PNG")
+    evidence_path = storage_root / evidence.storage_key
+    evidence_path.parent.mkdir(parents=True, exist_ok=True)
+    evidence_path.write_bytes(output.getvalue())
     try:
         yield session, household.id, other_household.id, evidence.id, other_evidence.id
     finally:
@@ -95,7 +102,8 @@ def test_import_create_run_and_jobs_list(isolated_db) -> None:  # type: ignore[n
         "PENDING",
     ]
     assert all(step["attempts"] == 1 for step in body["steps"][:5])
-    assert body["steps"][2]["output"]["status"] == "not_implemented"
+    assert body["steps"][2]["output"]["status"] == "ok"
+    assert body["steps"][2]["output"]["counts"]["phash"] == 1
     assert listed.status_code == 200
     assert listed.json()["items"][0]["id"] == job_id
     assert listed.json()["items"][0]["state"] == "AWAITING_REVIEW"
@@ -105,8 +113,9 @@ def test_import_create_run_and_jobs_list(isolated_db) -> None:  # type: ignore[n
     assert persisted.state == "AWAITING_REVIEW"
     assert len(persisted_steps) == 6
     persisted_output = json.loads(persisted_steps[2].output_refs or "{}")
-    assert persisted_output["status"] == "not_implemented"
+    assert persisted_output["status"] == "ok"
     assert persisted_output["step"] == "EXTRACTING_DETERMINISTIC_SIGNALS"
+    assert persisted_output["observation_ids"]
     assert persisted_output["completed_at"]
 
 

@@ -1,0 +1,57 @@
+SG-013
+
+BASE=automation:c48b00dfd4bb7d639fb235629539e597262d1f07
+Requested ref=automation; resolved BASE above. Work-HEAD is the final commit carrying this log/report and is quoted by the notes receipt.
+Process provenance: shell process arguments exposed only the bounded bash command; no model/provider metadata or reasoning-effort argument was exposed. Recorded as model=unknown, effort=unknown.
+
+Bounds
+- Ordinary shell commands: timeout 120s.
+- Dependency installation, migrations, and test-suite legs: timeout 600s.
+- Overall dispatch budget: 2100s (35 minutes). Measured tool wall time was approximately 15 seconds; no command was killed for exceeding its bound.
+
+Fail-first
+- Before implementation, the new focused test command was `timeout 600s venv/bin/pytest -q tests/test_signals.py tests/test_import_jobs.py`.
+- It failed during collection with `ImportError: cannot import name 'signals' from 'app.services'`; no new signal module/table/step body existed. This is a non-vacuous fail-first result.
+
+Implementation
+- Added `backend/app/services/signals.py` for immutable-original reads, OCR, pyzbar QR/barcodes, EAN-13/UPC-A check digits, QR UTF-8/non-empty syntax checks, EXIF timestamp gate, GPS exclusion, dHash, quarantine, and getter/count helpers.
+- Added `backend/app/services/observations.py` with the single Observation ORM table model.
+- Added exactly one revision: `backend/alembic/versions/20260908_sg013_observation.py`, down_revision `0201cf10c56c`.
+- Filled only the `EXTRACTING_DETERMINISTIC_SIGNALS` branch in `backend/app/services/job_service.py`; DEDUPLICATING and COMMITTING remain `not_implemented`.
+- Added named `exif_timestamps_enabled=False`, `dhash_near_threshold=10`, and `image/tiff` to `allowed_mime_types`.
+- Added runtime pins `pyzbar==0.1.9`, `pytesseract==0.3.13`; added dev-only `qrcode==8.2` for generated QR fixtures because no committed binary fixtures were added.
+- Dockerfile apt diff adds exactly `tesseract-ocr` and `libzbar0` while retaining curl and `--no-install-recommends`.
+
+Controls and proof
+- Generated QR/EAN fixtures are produced at test time in temp paths. The EAN fallback/control produced valid `5901234123457` with check=true and invalid `5901234123450` with check=false; invalid observation payload omits the candidate value/identifier and confidence is 0.1. The real pyzbar leg remains unanswered below because libzbar is absent.
+- OCR fixture is Pillow-rendered text with boxes/mean-confidence assertions. The real tesseract leg remains unanswered below because tesseract is absent.
+- EXIF gate, GPS exclusion, dHash equality/resize/difference, corrupt quarantine, retry-after-quarantine, output refs, service getter, and migration round-trip tests passed.
+- dHash values: base `00d4d4d4d4d4c400`; resized copy same value, distance 0; different image `8070c8d4c8f03044`, distance 19; named threshold 10.
+- `backend/tests/test_import_jobs.py`: 3 passed, including output_refs observation IDs/counts and the SG-012 seam.
+- `backend/tests/test_export.py`: 5 passed, including independently discovered Alembic head.
+- Full collection: 34 tests. Post-change full run: 32 passed, 2 failed only at the real QR/OCR dependency legs. No gate was skipped or declared passing vacuously.
+- Non-binary focused signal/migration run: 5 passed, 2 dependency-focused tests failed for the stated missing packages.
+- Ruff: clean.
+- Mypy advisory: 41 pre-existing errors after repairing all SG-013 errors; no out-of-ceiling typing repairs made.
+- Migration test: temp SQLite `upgrade head` -> `downgrade -1` -> `upgrade head` passed; current head is `20260908_sg013_observation`.
+
+Environment findings
+- `tesseract` executable absent; `libzbar` absent; `dpkg-query` reports neither package installed.
+- Local apt cache provides tesseract provenance: `tesseract-ocr` version `5.3.4-1build5`, Ubuntu, SHA256 `2dfac382d77215aee0c3de4a2a2205505d5f2195e72e79b54ad32154fc08da77`.
+- `apt-cache show libzbar0` returned no local package record.
+- Bounded install attempt: `sudo -n apt-get install -y --no-install-recommends tesseract-ocr libzbar0`; exact denial: `sudo: The "no new privileges" flag is set, which prevents sudo from running as root.` This fixed-package leg is unanswered; no source build, vendored binary, Docker workaround, or privileged route-around was attempted.
+- Docker build was not run per packet: no privilege; Dockerfile diff and apt provenance are the only image evidence. Deferred compose/image proof is a manual pass.
+- Initial uv bootstrap also found `/home/andrei/.cache` read-only; only the cache was redirected to `/tmp/storagegenie-sg013-uv-cache`.
+
+Scope/audit
+- Modified paths are limited to the packet ceiling plus the two worklog files. No API route file changed, no new route was added, no source_type or assertion semantics were minted, no production DB/storage/restart/secret/SSH operation was used, and all fixtures/databases were temp-path only.
+- Existing route decorator grep match list: assets `19,117,180,190,217,246`; evidence `18,76,94,107`; jobs/imports `32,78,88,98,107,139`; households `12,17,49,57`; users `12,20`; export `32`; health `15`; review tasks `12,40`. The API tree was unchanged.
+- ADR-003 was not edited. Finding: its `no-migration-needed` verdict at lines 41 and 51 is stale for this slice because SG-013 necessarily adds the authorised observation revision; amendment is outside this slice ceiling and is handed to SG-014/close-out.
+- Observation HTTP serving is intentionally absent. `get_observations` is the service-level read-back covered here; an HTTP route arrives in SG-014/SG-016 as packet-bound.
+
+Receipt/push
+- Required work commit is pushed to `automation`; notes ref attachment is the final operation after the work commit. The final dispatch evidence must show `Dispatch-ID: SG-013`, `Report: docs/worklogs/SG-013_report.md`, and `note=yes`.
+
+FIRST READ: expected current base was verified as c48b00d; migration head was verified as 0201cf10c56c before adding the one SG-013 revision.
+DURING EXECUTION: host tesseract/libzbar were absent and the no-new-privileges policy denied sudo; the fixed package legs remained unanswered.
+REMAINING: remote notes-ref readback and dispatch `note=yes` verification remain after push; Docker/image proof remains the documented manual pass.
