@@ -19,8 +19,8 @@ Origin: `git@github.com:Andovol/StorageGenie.git`
 
 Coder: `codex`
 
-Model: `unknown` — no model id appeared in readable process arguments; the CLI used its
-default model and the model id was omitted by policy.
+Model: `gpt-5.6-luna` — read from provider metadata in `output/dispatch/SG-021.log`
+(line 5), not inferred from a system-prompt identity line.
 
 Reasoning effort: `high` — proven from the live process arguments containing
 `-c model_reasoning_effort=high`.
@@ -159,6 +159,11 @@ Dispatch-ID: SG-021 | Report: docs/worklogs/SG-021_report.md | Work-HEAD: <hash>
 ```
 
 The dispatch result must report `note=yes`; a local-only note is not sufficient.
+The local dispatch artifact contains no runner result record for this direct session,
+so no `note=yes` result line is claimed. The note artifact itself was verified: it was
+added locally to the final metadata commit, pushed to the notes ref, and read back from
+a separately fetched remote verification ref with the exact required first line. Any
+runner-side result line remains an external verification delta.
 
 UNCLEAR — FIRST READ: Docker and Compose binaries existed, but the Docker API socket
 was inaccessible; port 8000 also returned the packet's known shared-host foreign 404.

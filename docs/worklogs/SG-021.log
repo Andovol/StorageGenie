@@ -4,7 +4,7 @@ Status: BLOCKED
 BASE requested ref: automation
 BASE resolved at slice start: 06ea9b520d721870c74f8d33eb3d9b7014f686fc
 Coder: codex
-Model: unknown (no model id appeared in readable process arguments; the CLI default omitted the id)
+Model: gpt-5.6-luna (read from provider metadata in `output/dispatch/SG-021.log`, line 5)
 Reasoning effort: high (verified from live process arguments containing `-c model_reasoning_effort=high`)
 Overall bound: 2100 s (35 min); no command was killed
 
