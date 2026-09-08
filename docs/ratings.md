@@ -17,6 +17,7 @@ Schema: shared `LEDGER.md` — nine columns, `guards_invoked` + `deduction_attri
 | SG-013 | Phase 1 | codex (audit: unknown per identity line) | high | 90 |  | Sandbox cannot install apt packages — 2 real-decoder legs carried to manual compose pass, not re-scoped; see investigation below | PG-EV-01, PG-EV-05, PG-EV-06, PG-EV-09, PG-PR-03, PG-PR-04, PG-IC-01, PG-SC-02 | coder-env |
 | SG-014 | Phase 1 | codex (effort high verified from process args; model unknown, CLI omits id) | high | 96 |  | Full product proof, genuine tests, exemplary disclosure; test-layer suite-health regression + unverified "pre-existing" label; see lever below | PG-EV-01, PG-EV-02, PG-EV-05, PG-EV-06, PG-EV-09, PG-PR-03, PG-PR-04, PG-IC-01, PG-SC-02, PG-SC-03 | coder |
 | SG-015 | Phase 1 | codex (effort high verified from process args; model unknown, CLI omits id) | high | 97 |  | Plugin complete + G0 suite repairs verified green; audit-caught observed-date kind-scope flaw (ISS-2) carried to SG-017 | PG-EV-01, PG-EV-02, PG-EV-05, PG-EV-06, PG-EV-09, PG-PR-03, PG-PR-04, PG-IC-01, PG-SC-02, PG-SC-05 | coder |
+| SG-016 | Phase 1 | codex (effort high verified from process args; model unknown, CLI omits id) | high | 97 |  | Full UI proof with discrimination runs; two minor UX warts queued; ISS-1 destination corrected to manual pass | PG-EV-01, PG-EV-02, PG-EV-05, PG-EV-06, PG-EV-09, PG-PR-03, PG-PR-04, PG-IC-01, PG-SC-02, PG-SC-05 | coder |
 
 ## SG-013 investigation (score 90 < 95)
 
