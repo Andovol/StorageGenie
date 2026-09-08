@@ -226,7 +226,9 @@ def test_observation_migration_upgrade_downgrade_upgrade(tmp_path: Path, monkeyp
     config.set_main_option("sqlalchemy.url", url)
     command.upgrade(config, "head")
     assert "observation" in inspect(create_engine(url)).get_table_names()
-    command.downgrade(config, "-1")
-    assert "observation" not in inspect(create_engine(url)).get_table_names()
+    command.downgrade(config, "20260908_sg013_observation")
+    tables_after_sg014_downgrade = inspect(create_engine(url)).get_table_names()
+    assert "observation" in tables_after_sg014_downgrade
+    assert "candidate" not in tables_after_sg014_downgrade
     command.upgrade(config, "head")
     assert "observation" in inspect(create_engine(url)).get_table_names()

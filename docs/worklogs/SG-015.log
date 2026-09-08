@@ -1,0 +1,40 @@
+SG-015 verification and implementation log
+
+BASE requested: automation
+BASE resolved: 340060579a9fcdf3d5f1a3f6918441aaf94bee6e
+WORK_DIR: /home/andrei/StorageGenie
+Runner process evidence: ps showed `node ... codex exec --sandbox danger-full-access -c model_reasoning_effort=high -C /home/andrei/StorageGenie`; model id was not present.
+
+Read-before-build findings
+- The checkout was clean on automation at BASE 3400605.
+- The packet's referenced ARCHITECT.md, PACKET.md, DISPATCH.md, and PRODUCTION.md are absent from this checkout. AGENTS.md and STATE.md were available and used; this is recorded rather than silently inferred.
+- The current tree has SG-013 observation and SG-014 candidate migrations. SG-015 uses assertion rows with a reserved plugin prefix, so it adds zero migration files.
+- The SG-014 migration assertion was stale: downgrade -1 from head removes candidate, not observation. The test now downgrades explicitly to 20260908_sg013_observation and proves observation remains and candidate is absent.
+
+Implementation
+- Added versioned registry and built-in expiry-tracker 1.0.0 registration.
+- Added taxonomy/profile data, date and unit enums, JSON-Schema-shaped extension contract, validators, explicit assertion-state transitions, no-date fallback, review task creation, and manual user entry.
+- Added namespaced classification GET/POST, expiry entry, and extension GET/POST routes; mounted only under /v1/plugins/expiry-tracker.
+- Added six non-vacuous plugin tests, including database read-back, profile values, all four core-field guards, state identity before/after manual entry, non-perishable absence, evidence linkage, and invalid enums.
+- Repaired evidence tests to create engine/session lazily from the test module's explicit environment at fixture time, override the API dependency, and capture warning calls order-independently. Product files were untouched for G0.
+- No today/now/timedelta match exists in backend/app/plugins. Date observations are copied only as proposed values after strict parsing; resolved accepted dates can only enter via the manual route.
+
+Verification commands and results (all commands bounded; ordinary 120s, test legs 600s)
+- `timeout 600s cd backend && venv/bin/python -m pytest -q tests/test_plugin_expiry.py`: 6 passed.
+- `timeout 600s cd backend && venv/bin/python -m pytest -q tests/test_evidence_upload.py`: 8 passed, 2 warnings.
+- `timeout 600s cd backend && venv/bin/python -m pytest -q tests/test_candidates.py tests/test_evidence_upload.py`: 11 passed, 5 warnings; proves G0 in-suite ordering repair.
+- `timeout 600s cd backend && venv/bin/python -m pytest -q tests/test_import_jobs.py tests/test_signals.py tests/test_dedup.py tests/test_candidates.py tests/test_export.py -k 'not generated_codes_are_validated_and_bad_checksum_is_not_an_identifier and not ocr_has_text_boxes_and_mean_confidence'`: 20 passed, 2 deselected, 8 warnings. This includes 3 SG-012 nodes, 7 SG-013 nodes with the 2 carried decoder nodes deselected, 4 SG-014 dedup nodes, 3 candidate nodes, and 4 export nodes; the export head/migration tests are green.
+- `timeout 600s cd backend && venv/bin/python -m pytest -q`: 47 collected; 45 passed and exactly 2 failed. The failures are the carried SG-013 decoder nodes `tests/test_signals.py::test_generated_codes_are_validated_and_bad_checksum_is_not_an_identifier` and `tests/test_signals.py::test_ocr_has_text_boxes_and_mean_confidence`; logs show pyzbar/libzbar and tesseract unavailable. No other red test remains.
+- `timeout 120s cd backend && venv/bin/ruff check app tests`: clean.
+- `timeout 120s cd backend && venv/bin/python -m mypy app`: advisory failure, 40 errors in 9 files, 50 source files checked; this matches the SG-014 baseline and no out-of-ceiling repair was attempted.
+- `timeout 120s rg -n '^@(router|app)\\.(get|post|patch|put|delete)' backend/app/api/v1/plugins.py backend/app/api/v1/assets.py`: only the five new plugin decorators plus the pre-existing assets decorators; no assets route changed.
+- `timeout 120s rg -n -i '\\btoday\\b|\\bnow\\b|timedelta' backend/app/plugins`: no matches; non-vacuous because the package contains expiry implementation code and six executed tests.
+- `timeout 120s git diff --check`: clean.
+
+Elapsed: 1097 s (18 m 17 s) observed from the runner process start at final gate, against 2100 s (35 m) budget. No command was killed. No privileged operation, SSH check, production write, restart, secret, or infrastructure action was attempted.
+
+Output paths committed by this slice: backend/app/plugins/__init__.py, backend/app/plugins/registry.py, backend/app/plugins/expiry_tracker.py, backend/app/api/v1/plugins.py, backend/app/main.py, backend/tests/test_plugin_expiry.py, backend/tests/test_evidence_upload.py, backend/tests/test_signals.py, docs/adr/ADR-005-plugin-contract.md, docs/adr/ADR-009-expiry-tracker-design.md, docs/worklogs/SG-015.log, docs/worklogs/SG-015_report.md.
+
+UNCLEAR — FIRST READ: The four method-routing contract files named by AGENTS.md are absent from the repository; the packet, AGENTS.md, and STATE.md supplied the available contract.
+UNCLEAR — DURING EXECUTION: The host lacks the decoder runtime libraries; the two named SG-013 decoder nodes remain red and are carried to the manual compose pass. The standalone pytest launcher also required the explicit venv/bin/python -m pytest form.
+UNCLEAR — REMAINING: No migration was needed for SG-015. Phase 3 inactive categories, opened-date behavior, UI, and AI/provider work remain intentionally deferred; the two decoder nodes remain for SG-018/manual compose proof.

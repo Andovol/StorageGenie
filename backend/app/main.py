@@ -10,6 +10,7 @@ from app.api.v1.exports import router as export_router
 from app.api.v1.health import router as health_router
 from app.api.v1.households import router as households_router
 from app.api.v1.jobs import router as jobs_router
+from app.api.v1.plugins import router as plugins_router
 from app.api.v1.review_tasks import router as review_tasks_router
 from app.api.v1.users import router as users_router
 from app.config import settings
@@ -53,6 +54,7 @@ app.include_router(export_router, prefix="/v1")
 app.include_router(jobs_router, prefix="/v1")
 app.include_router(review_tasks_router, prefix="/v1")
 app.include_router(candidates_router, prefix="/v1")
+app.include_router(plugins_router, prefix="/v1")
 
 
 @app.get("/")

@@ -16,21 +16,51 @@ os.environ["STORAGE_ROOT"] = str(TEST_STORAGE_ROOT)
 
 from fastapi.testclient import TestClient  # noqa: E402
 from PIL import ExifTags, Image  # noqa: E402
+from sqlalchemy import create_engine  # noqa: E402
+from sqlalchemy.orm import sessionmaker  # noqa: E402
 
 from app.config import settings  # noqa: E402
-from app.db import Base, SessionLocal, engine  # noqa: E402
+from app.db import Base, get_db  # noqa: E402
 from app.main import app  # noqa: E402
 from app.models import AuditEvent, Evidence, Household  # noqa: E402
 import app.services.evidence_service as evidence_service  # noqa: E402
 from app.services.evidence_service import store_evidence  # noqa: E402
 from app.storage.local_store import thumbnail_path  # noqa: E402
 
-Base.metadata.create_all(engine)
+@pytest.fixture
+def warning_messages(monkeypatch) -> list[str]:  # type: ignore[no-untyped-def]
+    messages: list[str] = []
+
+    def record(message: str, *args: object, **kwargs: object) -> None:
+        del kwargs
+        messages.append(message % args if args else message)
+
+    monkeypatch.setattr(evidence_service.logger, "warning", record)
+    return messages
 
 
 @pytest.fixture
-def db():  # type: ignore[no-untyped-def]
-    session = SessionLocal()
+def db(monkeypatch):  # type: ignore[no-untyped-def]
+    # Reassert this module's explicit fixture environment at test time: other
+    # top-level test modules also configure settings while pytest collects.
+    database_url = f"sqlite:///{TEST_ROOT / 'storagegenie.db'}"
+    storage_root = str(TEST_STORAGE_ROOT)
+    monkeypatch.setenv("DATABASE_URL", database_url)
+    monkeypatch.setenv("STORAGE_ROOT", storage_root)
+    test_engine = create_engine(database_url, connect_args={"check_same_thread": False})
+    Base.metadata.create_all(test_engine)
+    factory = sessionmaker(bind=test_engine, expire_on_commit=False)
+    monkeypatch.setattr(settings, "storage_root", storage_root)
+
+    def override_get_db():  # type: ignore[no-untyped-def]
+        request_session = factory()
+        try:
+            yield request_session
+        finally:
+            request_session.close()
+
+    app.dependency_overrides[get_db] = override_get_db
+    session = factory()
     household = Household(name="Evidence Test Household")
     session.add(household)
     session.commit()
@@ -38,6 +68,8 @@ def db():  # type: ignore[no-untyped-def]
         yield session, household.id
     finally:
         session.close()
+        app.dependency_overrides.pop(get_db, None)
+        test_engine.dispose()
 
 
 def jpeg_bytes(color: str = "red", with_gps: bool = False) -> bytes:
@@ -107,7 +139,7 @@ def test_thumbnail_has_no_exif_or_gps_and_original_is_immutable(db) -> None:  # 
     assert hashlib.sha256(original.read_bytes()).hexdigest() == original_hash
 
 
-def test_thumbnail_failure_is_logged_with_sha_and_size(db, monkeypatch, caplog) -> None:  # type: ignore[no-untyped-def]
+def test_thumbnail_failure_is_logged_with_sha_and_size(db, monkeypatch, warning_messages) -> None:  # type: ignore[no-untyped-def]
     session, household_id = db
 
     def fail_thumbnail(*args, **kwargs):  # type: ignore[no-untyped-def]
@@ -119,7 +151,7 @@ def test_thumbnail_failure_is_logged_with_sha_and_size(db, monkeypatch, caplog) 
     evidence = store_evidence(original_bytes, "failed-thumb.jpg", "image/jpeg", household_id, session)
 
     assert evidence.sha256 == sha
-    assert f"Thumbnail generation failed sha={sha} size={settings.thumbnail_sizes[0]}" in caplog.text
+    assert f"Thumbnail generation failed sha={sha} size={settings.thumbnail_sizes[0]}" in " ".join(warning_messages)
 
 
 @pytest.mark.parametrize(
@@ -127,7 +159,7 @@ def test_thumbnail_failure_is_logged_with_sha_and_size(db, monkeypatch, caplog) 
     [(1000, 5000, 5000), (None, 10000, 10000)],
 )
 def test_bomb_is_rejected_before_any_storage_or_row(  # type: ignore[no-untyped-def]
-    db, monkeypatch, caplog, configured_limit, width, height
+    db, monkeypatch, warning_messages, configured_limit, width, height
 ) -> None:
     session, household_id = db
     image_bytes = small_png_with_dimensions(width, height)
@@ -144,8 +176,8 @@ def test_bomb_is_rejected_before_any_storage_or_row(  # type: ignore[no-untyped-
     assert response.status_code == 422
     assert "decompression_bomb" in response.json()["detail"]
     assert "max_image_pixels" in response.json()["detail"]
-    assert sha in caplog.text
-    assert f"{width}x{height}" in caplog.text
+    assert sha in " ".join(warning_messages)
+    assert f"{width}x{height}" in " ".join(warning_messages)
     assert session.query(Evidence).filter_by(sha256=sha).count() == 0
     assert not (TEST_STORAGE_ROOT / household_id / sha[:2]).exists()
     assert not list(TEST_STORAGE_ROOT.rglob("*.tmp"))
