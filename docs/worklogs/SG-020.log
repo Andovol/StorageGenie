@@ -1,0 +1,15 @@
+SG-020
+BASE requested_ref=automation resolved=529643d986a4a3d3c8603ab40e713d0d7b346b0a
+provenance process_args="codex exec --sandbox danger-full-access -c model_reasoning_effort=high -C /home/andrei/StorageGenie" model=unknown effort=high
+budget ordinary=120s suite=600s overall=2100s; no command was killed
+first_read method-routing files ARCHITECT.md PACKET.md DISPATCH.md PRODUCTION.md CLOSE.md LEDGER.md RATIONALE.md absent; used packet, AGENTS.md, STATE.md
+baseline after installing declared qrcode==8.2: 65 collected, 62 passed, 3 failed (stale candidate migration plus two named ISS-1 decoder nodes)
+repair backend/tests/test_candidates.py:163 changed downgrade -1 to explicit 20260908_sg013_observation
+e2e first attempt found test fixture SQLite write transaction left open; added test-only commit before next real upload
+focused E2E: 1 passed; decoder_status qr=degraded ean=present; retry=AWAITING_REVIEW; collision_409=409; uv5_seconds=0.132902
+focused repair+E2E: 2 passed; ruff: All checks passed!
+full backend: 66 collected, 64 passed, 2 failed; only named ISS-1 decoder nodes
+mypy advisory: 40 errors in 9 files (checked 51 source files)
+make check-postgres-dialect: 1 passed
+downgrade grep: candidate and observation explicit revisions; test_search.py:247 intentional FTS-only -1
+scope: README.md, backend/tests/test_candidates.py, backend/tests/test_phase1_e2e.py, docs/worklogs/SG-020.log, docs/worklogs/SG-020_report.md only

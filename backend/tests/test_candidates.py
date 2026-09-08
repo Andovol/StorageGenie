@@ -160,7 +160,7 @@ def test_candidate_migration_upgrade_downgrade_upgrade(tmp_path: Path, monkeypat
     config.set_main_option("sqlalchemy.url", url)
     command.upgrade(config, "head")
     assert "candidate" in inspect(create_engine(url)).get_table_names()
-    command.downgrade(config, "-1")
+    command.downgrade(config, "20260908_sg013_observation")
     assert "candidate" not in inspect(create_engine(url)).get_table_names()
     command.upgrade(config, "head")
     assert "candidate" in inspect(create_engine(url)).get_table_names()
