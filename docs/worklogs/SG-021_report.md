@@ -10,7 +10,8 @@ BASE requested ref: `automation`
 
 BASE resolved at slice start: `592ba42fc8c5232ff6a6041bfd2f3d55b179eb0d`
 
-WORK_HEAD: to be filled after the final content commit below.
+WORK_HEAD: `a2e1f5c` (the evidence content commit; the metadata fix below is a
+separate record-only commit so this report can name the immutable work commit).
 
 Work dir: `/home/andrei/StorageGenie`
 
