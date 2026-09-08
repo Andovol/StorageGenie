@@ -1,4 +1,4 @@
-.PHONY: dev test lint backend-test frontend-test migrate clean
+.PHONY: dev test lint backend-test frontend-test check-postgres-dialect migrate clean
 
 dev:
 	docker compose up --build
@@ -13,7 +13,10 @@ frontend-test:
 
 lint:
 	cd backend && python -m ruff check . && python -m mypy app
-	cd frontend && npm run lint || true
+	cd frontend && npm run lint
+
+check-postgres-dialect:
+	cd backend && venv/bin/python -m pytest -q tests/test_postgres_dialect.py
 
 migrate:
 	cd backend && python -m alembic upgrade head

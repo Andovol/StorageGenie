@@ -10,9 +10,10 @@ from sqlalchemy.orm import Session, sessionmaker
 
 from app.db import Base, get_db
 from app.main import app
-from app.models import Assertion, Asset, Evidence, Household, ReviewTask
+from app.models import Assertion, Asset, Evidence, Household, ReviewTask, asset_evidence
 from app.plugins.expiry_tracker import EXPIRY_FIELD
 from app.plugins.registry import PluginError, get_plugin
+from app.services.observations import Observation
 
 
 @pytest.fixture
@@ -187,6 +188,67 @@ def test_dateless_import_requires_manual_entry_and_reads_back(plugin_db) -> None
     resolved = [row for row in post_entry.json()["assertions"] if row["field_path"] == EXPIRY_FIELD and row["review_state"] == "accepted"]
     assert len(resolved) == 1 and resolved[0]["value"]["date_type"] == "best_before"
     assert session.query(ReviewTask).filter_by(task_type="expiry.manual_entry", status="resolved").count() == 1
+
+
+def test_expiry_observed_date_uses_visible_observation_kinds_only(plugin_db) -> None:  # type: ignore[no-untyped-def]
+    session, household_id = plugin_db
+    exif_asset = make_asset(session, household_id, "EXIF dated item")
+    ocr_asset = make_asset(session, household_id, "OCR dated item")
+    exif_evidence = Evidence(
+        household_id=household_id,
+        sha256="x" * 64,
+        storage_key="plugin/exif.jpg",
+        media_type="image/jpeg",
+        original_filename="exif.jpg",
+        source_kind="upload",
+        size_bytes=1,
+    )
+    ocr_evidence = Evidence(
+        household_id=household_id,
+        sha256="o" * 64,
+        storage_key="plugin/ocr.jpg",
+        media_type="image/jpeg",
+        original_filename="ocr.jpg",
+        source_kind="upload",
+        size_bytes=1,
+    )
+    session.add_all([exif_evidence, ocr_evidence])
+    session.commit()
+    session.execute(
+        asset_evidence.insert(),
+        [
+            {"asset_id": exif_asset.id, "evidence_id": exif_evidence.id},
+            {"asset_id": ocr_asset.id, "evidence_id": ocr_evidence.id},
+        ],
+    )
+    session.add_all(
+        [
+            Observation(
+                evidence_id=exif_evidence.id,
+                kind="exif",
+                value_json=json.dumps({"captured_at": "2030-05-06"}),
+                confidence=1.0,
+            ),
+            Observation(
+                evidence_id=ocr_evidence.id,
+                kind="ocr",
+                value_json=json.dumps({"text": "best before 2030-05-06"}),
+                confidence=1.0,
+            ),
+        ]
+    )
+    session.commit()
+
+    with TestClient(app) as client:
+        exif = classify(client, exif_asset.id, household_id, "food")
+        ocr = classify(client, ocr_asset.id, household_id, "food")
+
+    assert exif.status_code == 200
+    assert exif.json()["expiry_assertion"]["review_state"] == "needs_evidence"
+    assert ocr.status_code == 200
+    ocr_assertion = ocr.json()["expiry_assertion"]
+    assert ocr_assertion["review_state"] == "proposed"
+    assert ocr_assertion["source_evidence_ids"] == [ocr_evidence.id]
 
 
 def test_manual_expiry_enforces_date_type_and_unit_enums(plugin_db) -> None:  # type: ignore[no-untyped-def]

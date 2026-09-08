@@ -1,7 +1,7 @@
 import json
 
 from fastapi import APIRouter, Depends, Header, HTTPException, Query
-from sqlalchemy import and_, func, or_
+from sqlalchemy import and_, func, or_, select, text
 from sqlalchemy.orm import Session
 
 from app.db import get_db
@@ -13,6 +13,7 @@ from app.schemas.asset import AssetCreate, AssetUpdate
 from app.schemas.common import decode_cursor, encode_cursor, loads_json
 from app.services import audit_service
 from app.services.asset_service import attach_evidence, create_asset, update_asset
+from app.services.fts import ensure_asset_fts, sanitize_fts_query
 
 router = APIRouter()
 
@@ -128,7 +129,17 @@ def list_assets(
 ):  # type: ignore[no-untyped-def]
     query = db.query(Asset).filter(Asset.household_id == household_id)
     if q:
-        query = query.filter(Asset.display_name.ilike(f"%{q}%"))
+        # MATCH is deliberately narrowed before the existing filters are
+        # applied. The outer Asset query keeps the established serializer,
+        # ordering, and cursor envelope unchanged.
+        ensure_asset_fts(db.connection())
+        fts_ids = (
+            select(text("asset_id"))
+            .select_from(text("asset_fts"))
+            .where(text("asset_fts MATCH :fts_query"))
+            .params(fts_query=sanitize_fts_query(q))
+        )
+        query = query.filter(Asset.id.in_(fts_ids))
     if asset_type:
         query = query.filter(Asset.asset_type == asset_type)
     if status:

@@ -246,7 +246,14 @@ def _observed_date(db: Session, asset: Asset) -> tuple[str, list[str]] | None:
     evidence_ids = [row.evidence_id for row in links]
     if not evidence_ids:
         return None
-    rows = db.query(Observation).filter(Observation.evidence_id.in_(evidence_ids)).all()
+    rows = (
+        db.query(Observation)
+        .filter(
+            Observation.evidence_id.in_(evidence_ids),
+            Observation.kind.in_(("ocr", "barcode_qr")),
+        )
+        .all()
+    )
     for row in rows:
         try:
             value = json.loads(row.value_json)
