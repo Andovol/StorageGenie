@@ -1,55 +1,163 @@
 SG-021
+BLOCKED: G2 rootless builder activity path is read-only; G4 also stopped by a foreign listener on authorized port 8001.
 
 Status: BLOCKED
+Run date: 2026-09-08 UTC
 BASE requested ref: automation
-BASE resolved at slice start: 06ea9b520d721870c74f8d33eb3d9b7014f686fc
+BASE resolved at slice start: 592ba42fc8c5232ff6a6041bfd2f3d55b179eb0d
 Coder: codex
-Model: gpt-5.6-luna (read from provider metadata in `output/dispatch/SG-021.log`, line 5)
-Reasoning effort: high (verified from live process arguments containing `-c model_reasoning_effort=high`)
+Model: unknown (no model ID in the live process arguments or available provider metadata)
+Reasoning effort: high (proven from live process arguments: -c model_reasoning_effort=high)
+Autonomy: L2, D12 single slice
 Overall bound: 2100 s (35 min); no command was killed
 
-G1 read-only probe, all ordinary commands bounded at 120 s:
-- `/usr/bin/docker` resolved; Docker 29.6.2 and Compose v5.3.1 resolved.
-- `timeout 120s docker info` reached the client but failed at the server with:
-  `permission denied while trying to connect to the Docker API at unix:///var/run/docker.sock`.
-- `timeout 120s docker compose config --quiet` exited 0 in 0.06 s.
-- `.env` presence was confirmed without reading content: mode 600, owner andrei:andrei, size 203 bytes.
-- `frontend/Dockerfile` was present: mode 664, size 181 bytes.
-- Port 8000 answered `HTTP/1.1 404 Not Found`, `server: uvicorn`, body `Not Found`;
-  this is the shared-host foreign 404 condition. `ss` exposed no owning PID for this
-  listener in the confined process view.
-- Port 5173 was closed: curl returned `Failed to connect to 127.0.0.1 port 5173`.
-- `timeout 120s docker compose ps` was also denied by the same Docker socket error.
-- G1 elapsed approximately 0.50 s / 120 s bound; no command was killed.
+G1 — capability, collision, and shape probe (ordinary-command bound: 120 s)
 
-STOP: G1 requires a Docker capability verdict. The exact Docker API denial is a whole-
-slice stop under the packet. No sudo, socket chmod, group change, volume inspection,
-fallback host install, build, image run, compose up, exec, port remap, or restart was
-attempted after the denial. The foreign 8000 occupancy independently prevents G4.
+Resolved binaries: /usr/bin/docker, /usr/bin/curl, /usr/bin/git, /usr/bin/ps,
+/usr/bin/ss, /usr/bin/python3, /usr/local/bin/npm. `pytest` was absent from the
+host PATH; no host pytest invocation was required.
 
-G2, G3, G4: unanswered after the mandatory G1 stop; no build, in-image decoder test,
-full suite, health request to the project service, UI served-byte probe, or backend
-restart was run. No test gate emitted output, so no test count or green result is
-claimed. The two ISS-1 nodes remain unanswered in the image: 
-`tests/test_signals.py::test_generated_codes_are_validated_and_bad_checksum_is_not_an_identifier`
-and `tests/test_signals.py::test_ocr_has_text_boxes_and_mean_confidence`.
+Docker capability passed through the provisioned rootless runtime. `timeout 120s
+docker info` exited 0 in approximately 0.057 s and reported Docker Engine 29.6.2,
+rootless context, Compose plugin v5.3.1, storage driver overlayfs, and Docker Root
+Dir `/home/andrei/.local/share/docker`. The relevant server evidence was:
 
-No migration, catalog write, live service write, restart, secret read, product-file
-change, or README correction was made. `mypy` was not run because the G1 hard stop
-precluded all later gates.
+    Context:    rootless
+    Server Version: 29.6.2
+    Storage Driver: overlayfs
+    Security Options:
+      rootless
+    Docker Root Dir: /home/andrei/.local/share/docker
 
-No acceptance criterion passed vacuously: only non-mutating G1 checks with observable
-output are recorded; all image, suite, health, UI, and restart criteria are explicitly
-unanswered.
+`timeout 120s docker compose config --quiet` exited 0 in approximately 0.058 s.
+This gate emitted observable exit evidence and is not vacuous.
 
-UNCLEAR — FIRST READ: Docker and Compose binaries were available, but the Docker API
-socket was not accessible to this process; the packet's expected shared-host port state
-was also rechecked rather than assumed.
-UNCLEAR — DURING EXECUTION: G1 stopped the whole slice on the exact Docker socket
-permission denial; port 8000 simultaneously returned the shared-host foreign Uvicorn
-404, so no route-around or port rebind was permissible.
-UNCLEAR — REMAINING: Desk-side provisioning must grant the authorized runner Docker
-access and an owner must resolve the 8000 collision (or authorize the required compose/
-frontend/runbook cascade); then a fresh SG-021 attempt must build the image, re-prove
-both decoder nodes, run the full in-image suite, bring up the UI, and prove backend
-restart recovery.
+`.env` presence was confirmed without reading content:
+
+    env_present=yes mode=600 owner=andrei:andrei size=203 bytes
+
+`frontend/Dockerfile` was present:
+
+    frontend_Dockerfile=present mode=664 owner=andrei:andrei size=181 bytes
+
+Port probes used curl with a 10 s per-request bound inside the ordinary 120 s
+command bound, plus `ss` for ownership:
+
+    PORT 8000
+    HTTP/1.1 404 Not Found
+    server: uvicorn
+    content-length: 9
+    content-type: text/plain; charset=utf-8
+    body: Not Found
+
+This is the expected foreign shared-host Uvicorn 404 (desk Ask 2 identifies the
+foreign service as finnhub-mcp). The confined `ss` view exposed no owning PID for
+127.0.0.1:8000. It was not touched.
+
+    PORT 8001
+    HTTP/1.1 303 See Other
+    server: uvicorn
+    location: /login
+
+The listener identity was exposed exactly as:
+
+    PID 761216, user andrei
+    /home/andrei/ShoperOS/venv/bin/python3 /home/andrei/ShoperOS/venv/bin/uvicorn services.api.app.main:app --host 127.0.0.1 --port 8001
+    cwd=/home/andrei/ShoperOS
+
+A direct `/v1/health` request to that listener returned `HTTP/1.1 404 Not Found`
+with body `{"detail":"Not Found"}`. Docker simultaneously reported zero running
+and zero stopped containers before the build, so this is foreign to StorageGenie.
+This is a G4 collision STOP; no rebind was attempted.
+
+    PORT 5173
+    curl: (7) Failed to connect to 127.0.0.1 port 5173 after 0 ms: Couldn't connect to server
+
+The final `ss` probe showed listeners only on 8000 and 8001; 5173 was free.
+G1 elapsed approximately 0.18 s / 120 s bound, plus approximately 0.10 s for the
+read-only listener identity/fingerprint follow-up. No command was killed.
+
+G2 — backend image build (bound: 1500 s)
+
+Docker access granted G2, so `timeout 1500s docker compose build backend` was run.
+It exited 1 in approximately 0.20 s before any Dockerfile layer executed. Exact
+failure:
+
+    failed to update builder last activity time: open /home/andrei/.docker/buildx/activity/.tmp-default1766839524: read-only file system
+
+The Dockerfile apt line is present but unproved:
+
+    backend/Dockerfile:3 RUN apt-get update && apt-get install -y --no-install-recommends curl tesseract-ocr libzbar0 && rm -rf /var/lib/apt/lists/*
+
+This is a rootless builder filesystem/provisioning finding, not an apt-layer
+failure. No Dockerfile redesign or workaround was attempted.
+
+G3 — in-image ISS-1 and full backend suite (each bound: 600 s)
+
+UNANSWERED. G2 did not produce a built image, so the in-image decoder command and
+full backend suite were not invoked. The required decoder nodes are therefore not
+claimed green:
+
+    tests/test_signals.py::test_generated_codes_are_validated_and_bad_checksum_is_not_an_identifier
+    tests/test_signals.py::test_ocr_has_text_boxes_and_mean_confidence
+
+No test gate emitted output; no collection/pass/failure count is claimed. This is
+explicitly not a vacuous pass. No live catalog or database write occurred.
+
+G4 — remap, compose up, health, suite, UI, restart (bound: 1800 s early-close)
+
+UNANSWERED/STOPPED. The authorized D14 remap was not applied because 8001 was
+occupied by the foreign ShoperOS listener above. No `docker compose up`, project
+health request to 8001, compose exec suite, frontend served-byte probe, or
+`docker compose restart backend` was run. The current compose file therefore still
+publishes `8000:8000` and sets `VITE_API_BASE=http://localhost:8000`; this run did
+not change it. No README correction is justified because the StorageGenie service
+was never served through Compose in this run.
+
+G5 — scope and side effects
+
+Only the two permitted worklog/report files were changed. No product, migration,
+compose, frontend, port, or configuration file changed. No `.env` content was read.
+No volume/server inspection, sudo, socket chmod, group change, migration, catalog
+write, live service write, restart, or teardown occurred. `mypy` was not run because
+the G2/G4 stops precluded the later gates; this slice expected no code change and
+does not claim a mypy result.
+
+No acceptance criterion passed vacuously: G1 checks had observable outputs; the
+Docker capability and Compose config passed; the 8001 collision and G2 builder
+failure are quoted; G3/G4 are explicitly unanswered.
+
+Live-state ledger at close-out:
+
+    containers: none (docker ps -a emitted only the header; Docker info also reported 0/0)
+    8000: occupied by foreign Uvicorn 404; PID not exposed in this process view; untouched
+    8001: occupied by foreign ShoperOS Uvicorn PID 761216; untouched
+    5173: closed/free at final probe
+    StorageGenie health: unanswered; no project container exists
+    restart state: unchanged; backend restart not attempted
+
+Exact remaining delta: desk/host provisioning must make the rootless BuildKit
+activity path writable, and the owner/foreign tenant must clear 8001. A fresh
+SG-021 attempt must then build the image, prove both decoder nodes and the full
+in-image suite, apply the already-authorized D14 8001 remap plus API/runbook
+cascade, bring up Compose, prove health/UI bytes, and prove backend restart
+recovery. Port 8000 remains foreign and must never be reclaimed.
+
+Output paths committed by this run:
+
+    docs/worklogs/SG-021.log
+    docs/worklogs/SG-021_report.md
+
+Receipt note target is the final work commit and must have no later commit. Required
+first line:
+
+    Dispatch-ID: SG-021 | Report: docs/worklogs/SG-021_report.md | Work-HEAD: <hash>
+
+UNCLEAR — FIRST READ: Rootless Docker capability was provisioned and passed, but the
+expected free D14 port 8001 was occupied by a foreign ShoperOS Uvicorn service; the
+prior blocked-run model metadata was not reused, so this run records model unknown.
+UNCLEAR — DURING EXECUTION: The G4 collision prevented rebind/up, while the G2
+rootless BuildKit activity path failed read-only before the apt layer; no workaround
+or privileged route was attempted.
+UNCLEAR — REMAINING: Make the rootless builder activity path writable and clear 8001
+owner-side, then rerun the remaining image, ISS-1, Compose, UI, and restart proofs.
