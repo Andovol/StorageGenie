@@ -6,7 +6,9 @@ BASE requested ref: `automation`
 
 BASE resolved: `ef1fa999f754e6d117680168c00ed20b8994cf4b`
 
-WORK_HEAD: to be filled after the implementation/report commit.
+WORK_HEAD (implementation/report content commit): `dfe9981c6d7b5e691f15885f2e67b0d786c03765`
+
+The final receipt target is the metadata commit that records this resolved worklog hash; it will be quoted in the receipt note and final handoff.
 
 Work dir: `/home/andrei/StorageGenie`
 
