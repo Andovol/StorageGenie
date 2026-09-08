@@ -7,7 +7,10 @@ BASE requested ref: `automation`
 
 BASE resolved: `9c1a3233ceb4403a6355f8664ef8fe0145f7f9f2`
 
-WORK_HEAD: to be filled after the blocked close-out commit.
+WORK_HEAD (blocked close-out content commit): `14a0ea9384287062efa8002228b4074820e7bca7`
+
+The final receipt target is the metadata commit that records this resolved
+worklog hash; it is quoted in the final handoff and in the notes receipt.
 
 Work dir: `/home/andrei/StorageGenie`
 
