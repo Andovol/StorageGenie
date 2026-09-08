@@ -1,0 +1,45 @@
+SG-012 — job engine core worklog
+
+Context
+- BASE_REF_REQUESTED: `automation`.
+- BASE_RESOLVED_COMMIT: `86e8860f4d614f06f530e1ab4d1fbc02bcb2c611`.
+- Work dir: `/home/andrei/StorageGenie`; origin: `git@github.com:Andovol/StorageGenie.git`.
+- Start worktree was clean on branch `automation`; packet commit was the tip.
+- Process provenance available to this run: coder `codex`, requested effort `high`; model ID `unknown` because no model ID was present in process arguments or provider metadata. No system-prompt identity was used.
+- Direct `python`/`pytest` were not on PATH. Project-local `venv/bin/pytest`, `venv/bin/ruff`, and `venv/bin/mypy` were used explicitly. No SSH, sudo, Docker, restart, live database, production storage, secret, or infrastructure operation was attempted.
+- `docs/ARCHITECT.md` was not present at the project path named by the repository adapter; the committed packet and existing AGENTS/STATE instructions were used, and this discrepancy is reported.
+
+Bounds
+- Ordinary commands: `timeout 120s` bound.
+- Test/mypy suite legs: `timeout 600s` bound.
+- Overall transport budget: `2100s` (35 minutes).
+- No command timed out, produced a silent success, or was killed.
+
+Fail-first
+- Added `backend/tests/test_import_jobs.py` before implementation.
+- Command: `timeout 600s ./venv/bin/pytest -q backend/tests/test_import_jobs.py`.
+- Unchanged-tree result: `3 failed, 1 warning in 0.97s`.
+- Concrete failure evidence: first test invoked `POST /v1/imports` and received `404` instead of `201`; the second could not import the absent `app.services.job_service`; the third received a `KeyError: 'id'` after the unimplemented route returned 404. This was a real non-empty failing gate, not a vacuous pass.
+
+Implementation
+- `backend/app/services/job_service.py`: durable six-step catalog, create/audit, inline step execution, per-step attempts and JSON output/error timestamps, failure parking, retry-resume, serialization, and list items.
+- `backend/app/api/v1/jobs.py`: import create/run/retry/detail routes, idempotency-table replay, evidence household validation, cross-household 403 checks, and real cursor list items. `main.py` was not changed because the existing jobs router is already mounted and the packet ceiling explicitly permits extending `jobs.py`.
+- `backend/tests/test_import_jobs.py`: create/run read-back from the database, injected failure and retry, double-run/double-retry, idempotency, audit, catalog-unchanged, and cross-household tests.
+- `docs/adr/ADR-003-job-orchestration.md`: decision and file/line traces.
+- `docs/worklogs/SG-012.log` and `docs/worklogs/SG-012_report.md`: required evidence.
+- No migration: `no-migration-needed`; existing job/job_step columns map to all values persisted by this slice. `backend/alembic/versions/0201cf10c56c_001_core_foundation.py` remains the only revision.
+
+Verification
+- `timeout 600s ./venv/bin/ruff check backend`: exit 0, `All checks passed!`.
+- `timeout 600s ./venv/bin/pytest -q backend/tests/test_import_jobs.py backend/tests/test_export.py`: exit 0, `8 passed, 1 warning in 1.15s` after implementation. The warning is the existing Starlette/httpx TestClient deprecation.
+- `timeout 600s ./venv/bin/pytest -q backend/tests`: exit 0, `27 passed, 1 warning in 1.79s`; collection was non-empty and no tests were skipped.
+- `timeout 600s ../venv/bin/mypy app` from `backend`: exit 1, `Found 40 errors in 9 files (checked 41 source files)`. This is advisory and remains out of gate scope. The in-scope jobs annotations removed three stale advisory findings; no new job-service findings were introduced. Remaining findings are outside this slice.
+- `git diff --check`: exit 0.
+- Route decorator grep in the changed file: `POST /imports`, `POST /imports/{job_id}/run`, `POST /imports/{job_id}/retry`, `GET /imports/{job_id}`, existing `GET /jobs`, existing `GET /jobs/{job_id}`. The `/review_tasks` alias was not changed.
+
+Timing
+- Named suite legs: fail-first 0.97s; post-change import/export 1.15s; full backend suite 1.79s; mypy 0.4s; command-runtime subtotal under 5s / 2100s. The transport bound remained active for every leg; no kill occurred.
+
+UNCLEAR: FIRST READ — The packet’s cited `docs/ARCHITECT.md` path was absent; the packet itself and repository AGENTS/STATE governance were available. Existing job/job_step columns were sufficient, so no migration was justified.
+UNCLEAR: DURING EXECUTION — The expected 43 advisory mypy count was not reproduced: after in-scope jobs annotations, the measured result was 40 errors in 9 files. The decrease is recorded rather than normalized; all remaining errors are advisory and outside scope.
+UNCLEAR: REMAINING — The synchronous runner remains request-bound, catalog commit internals remain intentionally deferred to SG-014, and the known Starlette warning remains. Docker/restart/live-service verification was not performed per packet.
