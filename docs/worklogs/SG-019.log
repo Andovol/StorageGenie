@@ -1,0 +1,41 @@
+SG-019
+
+Status: LANDED; implementation and verification complete before receipt note.
+BASE requested ref: automation
+BASE resolved at slice start: ef1fa999f754e6d117680168c00ed20b8994cf4b
+Coder: codex
+Model: unknown (no model id appeared in readable process arguments; CLI default model id was omitted by policy)
+Reasoning effort: high (proven from live process arguments: `codex exec --sandbox danger-full-access -c model_reasoning_effort=high -C /home/andrei/StorageGenie`)
+Overall bound: 2100 s (35 min); no command was killed and no command lacked observable progress.
+
+Required method-routing discrepancy:
+- The repository has no ARCHITECT.md, PACKET.md, DISPATCH.md, or PRODUCTION.md checkout files. The committed SG-019 packet, AGENTS.md, and STATE.md supplied the available project contract; this discrepancy is reported, not treated as a pass.
+
+Fail-first baseline:
+- `timeout 120s bash -lc 'cd backend && venv/bin/python - <<\'PY\' ... \n+PY'` generated a real Pillow classic TIFF and posted it to `/v1/evidence` as `image/tiff` through TestClient.
+- Observed `tiff_magic= 49492a00`, `tiff_upload_status= 422`, and `tiff_upload_body= {'type': 'about:blank', 'title': 'Unprocessable Entity', 'status': 422, 'detail': 'media_type_mismatch: unsupported media signature'}`.
+
+Implementation:
+- Added only the classic TIFF detector branch in `backend/app/services/evidence_service.py`, matching `II*\\0` and `MM\\0*` and returning exactly `image/tiff`.
+- Added focused detector legs and a real route proof in `backend/tests/test_evidence_upload.py`. The little-endian fixture is Pillow-generated; the big-endian classic fixture is crafted with valid TIFF structure and decoded by Pillow. Both route posts assert 201 and decode stored originals as 17x11.
+- BigTIFF remains out of scope and rejected: the branch matches classic magic byte `0x2a`, not BigTIFF magic byte `0x2b`; no BigTIFF upload was attempted.
+
+Verification commands and observed results:
+- An initial pre-commit guard incorrectly parsed the bare first token with a space-dependent `sed` expression and therefore emitted no output before stopping. File inspection confirmed both records existed and were untracked; the corrected validation below checks the exact first line explicitly and emits status/diff output.
+- `timeout 600s bash -lc 'cd backend && venv/bin/python -m pytest -q tests/test_evidence_upload.py'`: 16 passed, 2 existing deprecation warnings.
+- `timeout 600s bash -lc 'cd backend && venv/bin/python -m pytest -vv -q tests/test_evidence_upload.py -k "detect_media_type or endpoint_accepts_classic_tiff"'`: 8 passed, 8 deselected, 2 warnings. The six supported-signature parameter legs, exact unknown-signature negative, and both-endian route leg all executed; this is not a vacuous pass.
+- `timeout 600s bash -lc 'cd backend && venv/bin/python -m pytest -q'`: 65 collected, 62 passed, 3 failed. The only failures were `tests/test_candidates.py::test_candidate_migration_upgrade_downgrade_upgrade` (known stale migration assertion owned by SG-020), `tests/test_signals.py::test_generated_codes_are_validated_and_bad_checksum_is_not_an_identifier` (ISS-1 decoder node), and `tests/test_signals.py::test_ocr_has_text_boxes_and_mean_confidence` (ISS-1 decoder node). No decoder-dependent test was added or repaired.
+- `timeout 600s bash -lc 'cd backend && venv/bin/python -m pytest -q tests/test_export.py::test_export_manifest_is_complete_and_downloadable'`: 1 passed, 2 warnings.
+- `timeout 120s bash -lc 'cd backend && venv/bin/ruff check app tests'`: `All checks passed!`.
+- `timeout 120s bash -lc 'cd backend && venv/bin/python -m mypy app'`: advisory failure, 40 errors in 9 files / 51 source files; no out-of-ceiling repair was attempted.
+- `timeout 120s bash -lc 'git diff --check'`: clean.
+- Route-decorator diff check emitted no changed `backend/app/api/v1` paths. The detector/config literal check quoted configured `image/tiff` at `backend/app/config.py:16` and detected `image/tiff` at `backend/app/services/evidence_service.py:67`; they match exactly.
+
+Scope and safety:
+- Changed paths are `backend/app/services/evidence_service.py`, `backend/tests/test_evidence_upload.py`, `docs/worklogs/SG-019.log`, and `docs/worklogs/SG-019_report.md`.
+- No migration, live database, restart, privileged operation, SSH check, dependency, frontend file, provider/AI code, `.env`, token, or secret changed.
+- The initial implementation diff was non-empty and every new test invoked the detector or real route. No acceptance criterion was claimed through an empty diff, skipped gate, or uninvoked function.
+
+UNCLEAR — FIRST READ: The packet’s ARCHITECT.md, PACKET.md, DISPATCH.md, and PRODUCTION.md routing files were absent from the checkout; the committed packet plus AGENTS.md and STATE.md were used.
+UNCLEAR — DURING EXECUTION: The full backend suite retained the three named failures: the stale candidate migration assertion and the two ISS-1 decoder nodes; mypy retained its 40 advisory errors. No privileged workaround was attempted.
+UNCLEAR — REMAINING: SG-020 must re-run the Phase 1 exit fixture and own the stale migration assertion; the manual compose pass remains the destination for the two decoder nodes. BigTIFF support remains intentionally out of scope.

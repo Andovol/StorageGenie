@@ -63,6 +63,8 @@ def _detect_media_type(file_bytes: bytes, claimed: str) -> str:
         detected = "application/pdf"
     elif file_bytes.startswith(b"RIFF") and len(file_bytes) >= 12 and file_bytes[8:12] == b"WEBP":
         detected = "image/webp"
+    elif file_bytes.startswith((b"II*\x00", b"MM\x00*")):
+        detected = "image/tiff"
 
     if detected is None:
         raise EvidenceValidationError("media_type_mismatch: unsupported media signature")

@@ -95,6 +95,79 @@ def small_png_with_dimensions(width: int, height: int) -> bytes:
     return bytes(data)
 
 
+def classic_tiff_bytes(byteorder: str) -> bytes:
+    if byteorder == "II":
+        output = io.BytesIO()
+        Image.new("RGB", (17, 11), "red").save(output, format="TIFF")
+        return output.getvalue()
+    if byteorder != "MM":
+        raise ValueError(f"unsupported TIFF byte order: {byteorder}")
+
+    width, height = 17, 11
+    entries = [
+        (256, 3, 1, struct.pack(">H", width) + b"\0\0"),
+        (257, 3, 1, struct.pack(">H", height) + b"\0\0"),
+        (258, 3, 3, struct.pack(">I", 134)),
+        (259, 3, 1, struct.pack(">H", 1) + b"\0\0"),
+        (262, 3, 1, struct.pack(">H", 2) + b"\0\0"),
+        (273, 4, 1, struct.pack(">I", 140)),
+        (277, 3, 1, struct.pack(">H", 3) + b"\0\0"),
+        (278, 3, 1, struct.pack(">H", height) + b"\0\0"),
+        (279, 4, 1, struct.pack(">I", width * height * 3)),
+        (284, 3, 1, struct.pack(">H", 1) + b"\0\0"),
+    ]
+    output = io.BytesIO()
+    output.write(b"MM\x00*" + struct.pack(">I", 8) + struct.pack(">H", len(entries)))
+    for tag, tag_type, count, value in entries:
+        output.write(struct.pack(">HHI", tag, tag_type, count))
+        output.write(value)
+    output.write(struct.pack(">I", 0))
+    output.write(struct.pack(">HHH", 8, 8, 8))
+    output.write(bytes([255, 0, 0]) * (width * height))
+    return output.getvalue()
+
+
+@pytest.mark.parametrize(
+    ("file_bytes", "claimed", "expected"),
+    [
+        (b"\xff\xd8\xfffixture", "image/jpeg", "image/jpeg"),
+        (b"\x89PNG\r\n\x1afixture", "image/png", "image/png"),
+        (b"%PDF-1.7 fixture", "application/pdf", "application/pdf"),
+        (b"RIFF\x00\x00\x00\x00WEBP", "image/webp", "image/webp"),
+        (b"II*\x00fixture", "image/tiff", "image/tiff"),
+        (b"MM\x00*fixture", "image/tiff", "image/tiff"),
+    ],
+)
+def test_detect_media_type_accepts_every_supported_signature(file_bytes, claimed, expected) -> None:  # type: ignore[no-untyped-def]
+    assert evidence_service._detect_media_type(file_bytes, claimed) == expected
+
+
+def test_detect_media_type_rejects_unknown_signature() -> None:
+    with pytest.raises(evidence_service.EvidenceValidationError) as exc_info:
+        evidence_service._detect_media_type(b"not-an-image", "application/octet-stream")
+
+    assert str(exc_info.value) == "media_type_mismatch: unsupported media signature"
+
+
+def test_endpoint_accepts_classic_tiff_in_both_byte_orders(db) -> None:  # type: ignore[no-untyped-def]
+    _, household_id = db
+    for byteorder in ("II", "MM"):
+        image_bytes = classic_tiff_bytes(byteorder)
+        with TestClient(app) as client:
+            response = client.post(
+                "/v1/evidence",
+                params={"household_id": household_id},
+                files={"file": (f"fixture-{byteorder}.tiff", image_bytes, "image/tiff")},
+            )
+
+        assert response.status_code == 201
+        payload = response.json()
+        assert payload["media_type"] == "image/tiff"
+        with Image.open(TEST_STORAGE_ROOT / payload["storage_key"]) as decoded:
+            assert decoded.size == (17, 11)
+            decoded.load()
+
+
 def test_store_is_idempotent_audited_and_writes_thumbnail(db) -> None:  # type: ignore[no-untyped-def]
     session, household_id = db
     first_bytes = jpeg_bytes()
