@@ -18,6 +18,7 @@ Schema: shared `LEDGER.md` — nine columns, `guards_invoked` + `deduction_attri
 | SG-014 | Phase 1 | codex (effort high verified from process args; model unknown, CLI omits id) | high | 96 |  | Full product proof, genuine tests, exemplary disclosure; test-layer suite-health regression + unverified "pre-existing" label; see lever below | PG-EV-01, PG-EV-02, PG-EV-05, PG-EV-06, PG-EV-09, PG-PR-03, PG-PR-04, PG-IC-01, PG-SC-02, PG-SC-03 | coder |
 | SG-015 | Phase 1 | codex (effort high verified from process args; model unknown, CLI omits id) | high | 97 |  | Plugin complete + G0 suite repairs verified green; audit-caught observed-date kind-scope flaw (ISS-2) carried to SG-017 | PG-EV-01, PG-EV-02, PG-EV-05, PG-EV-06, PG-EV-09, PG-PR-03, PG-PR-04, PG-IC-01, PG-SC-02, PG-SC-05 | coder |
 | SG-016 | Phase 1 | codex (effort high verified from process args; model unknown, CLI omits id) | high | 97 |  | Full UI proof with discrimination runs; two minor UX warts queued; ISS-1 destination corrected to manual pass | PG-EV-01, PG-EV-02, PG-EV-05, PG-EV-06, PG-EV-09, PG-PR-03, PG-PR-04, PG-IC-01, PG-SC-02, PG-SC-05 | coder |
+| SG-017 | Phase 1 | codex (effort high verified from process args; model unknown, CLI omits id) | high | 97 |  | All legs proved + ISS-2 closed with regression tests; new stale migration test disclosed with base evidence, queued to SG-018 | PG-EV-01, PG-EV-02, PG-EV-05, PG-EV-06, PG-EV-09, PG-PR-03, PG-PR-04, PG-IC-01, PG-SC-02, PG-SC-05 | coder |
 
 ## SG-013 investigation (score 90 < 95)
 
