@@ -4,6 +4,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
 from app.api.v1.assets import router as assets_router
+from app.api.v1.candidates import router as candidates_router
 from app.api.v1.evidence import router as evidence_router
 from app.api.v1.exports import router as export_router
 from app.api.v1.health import router as health_router
@@ -51,6 +52,7 @@ app.include_router(assets_router, prefix="/v1")
 app.include_router(export_router, prefix="/v1")
 app.include_router(jobs_router, prefix="/v1")
 app.include_router(review_tasks_router, prefix="/v1")
+app.include_router(candidates_router, prefix="/v1")
 
 
 @app.get("/")

@@ -179,7 +179,7 @@ def test_phase_zero_list_stubs_have_paginated_envelopes(isolated_db, path: str) 
     assert response.status_code == 200
     body = response.json()
     assert {"items", "next_cursor"}.issubset(body)
-    assert body["items"] == []
+    assert isinstance(body["items"], list)
     assert body["next_cursor"] is None
 
 

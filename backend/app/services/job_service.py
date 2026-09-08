@@ -9,6 +9,8 @@ from sqlalchemy.orm import Session
 
 from app.models.job import Job, JobStep
 from app.services import audit_service
+from app.services import candidates
+from app.services import dedup
 from app.services import signals
 
 STEP_NAMES = (
@@ -107,8 +109,8 @@ def create_job(
 def execute_step(db: Session, job: Job, step: JobStep) -> dict[str, object]:
     """Execute one deterministic Phase 1 step.
 
-    The signal body is synchronous by design for Phase 1. Deduplication and
-    catalog commit remain SG-014 stubs and are deliberately untouched.
+    All Phase 1 steps run synchronously. Candidate commit is kept at this
+    boundary so SQLAlchemy can roll back the complete catalog write.
     """
     if step.step_name == "VALIDATING_INPUT":
         return {"status": "ok", "step": step.step_name}
@@ -131,8 +133,12 @@ def execute_step(db: Session, job: Job, step: JobStep) -> dict[str, object]:
             "observation_ids": [row.id for row in observations],
             "counts": signals.observation_counts(observations),
         }
+    if step.step_name == "DEDUPLICATING":
+        return dedup.deduplicate_job(db, job)
     if step.step_name == "AWAITING_REVIEW":
         return {"status": "awaiting_review", "step": step.step_name}
+    if step.step_name == "COMMITTING":
+        return candidates.commit_job_candidate(db, job)
     return {"status": "not_implemented", "step": step.step_name}
 
 
@@ -157,8 +163,6 @@ def run_job(db: Session, job: Job) -> Job:
     for step in _steps(db, job.id):
         if step.state == COMPLETED_STEP:
             continue
-        if step.step_name == "COMMITTING":
-            break
         if step.state == AWAITING_REVIEW_STATE:
             _transition(db, job, AWAITING_REVIEW_STATE)
             db.commit()
@@ -186,6 +190,10 @@ def run_job(db: Session, job: Job) -> Job:
             step.state = AWAITING_REVIEW_STATE
             job = db.query(Job).filter_by(id=job.id).one()
             _transition(db, job, AWAITING_REVIEW_STATE)
+        elif step.step_name == "COMMITTING":
+            step.state = COMPLETED_STEP
+            job = db.query(Job).filter_by(id=job.id).one()
+            _transition(db, job, "COMPLETED")
         else:
             step.state = COMPLETED_STEP
         db.commit()

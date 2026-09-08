@@ -1,0 +1,72 @@
+SG-014 | dispatch execution log
+
+BASE: 0428f9ac7025d8721346d1068b87f088735a38ba
+Ref requested: automation
+Resolved base: 0428f9ac7025d8721346d1068b87f088735a38ba
+Coder provenance: process arguments showed /usr/local/bin/codex exec with -c model_reasoning_effort=high; model id was omitted by the CLI/default policy and is therefore unknown.
+Overall bound: 2100 s (35 min). Ordinary commands: 120 s. Test/build/migration suite legs: 600 s.
+
+FIRST READ
+- Verified the worktree was clean on automation at 0428f9a.
+- Verified the repository uses backend/alembic, not backend/migrations.
+- Verified ReviewTask already carries task_type, priority, subject_ref, proposed_change, status, and household_id; no second task migration was needed.
+- Verified no earlier identifier assertion convention; established field_path=identifier.
+- Verified SG-013 observations and named settings.dhash_near_threshold.
+
+FAIL-FIRST (bounded 600 s)
+- Initial command with cd backend and no PYTHONPATH exited 2 in 0.74 s during collection: ModuleNotFoundError: No module named app. This was a harness invocation failure, not counted as a test pass.
+- Intended command with PYTHONPATH=backend exited 2 in 0.69 s during collection: the expected new app.services.candidates module did not exist. This is the fail-first baseline for the new contracts.
+- First implementation run: 6 passed, 1 failed in 1.20 s. The sole failure was the new migration test resolving script_location relative to the wrong cwd; it was corrected in the new test without changing production behavior.
+
+IMPLEMENTATION
+- Added dedup.py for exact evidence-link proposals, dHash advisory suggestions, validated identifier collisions, and no existing-asset mutation path.
+- Added candidates.py containing the Candidate ORM model/service, deterministic assertions, evidence links, lifecycle audit, unresolved-task blocking, and transaction-safe commit.
+- Added the single 20260908_sg014_candidate Alembic revision.
+- Filled DEDUPLICATING and COMMITTING and allowed retry to execute a failed COMMITTING step.
+- Made review task listing real, retained /review_tasks, added resolve/audit, and added the single lifecycle events route backed by audit_event.
+- Added ADR-006 and amended only ADR-003 migration-verdict lines 41 and 51.
+- Updated the permitted SG-008 empty-list assertion in backend/tests/test_export.py and added test_dedup.py/test_candidates.py.
+
+FINAL GATES
+- timeout 600 s, PYTHONPATH=backend backend/venv/bin/pytest -q backend/tests/test_dedup.py backend/tests/test_candidates.py: 7 passed, 5 warnings, 1.26 s.
+- timeout 600 s, eligible backend suite excluding test_evidence_upload.py and SG-013 nodes listed below: 30 passed, 3 deselected, 5 warnings, 2.74 s.
+- timeout 600 s, backend/tests/test_evidence_upload.py independently: 8 passed, 2 warnings, 0.71 s.
+- timeout 120 s, backend/venv/bin/ruff check backend/app backend/tests/test_export.py backend/tests/test_dedup.py backend/tests/test_candidates.py: All checks passed.
+- timeout 120 s, git diff --check: passed with no output.
+- timeout 120 s, backend/venv/bin/mypy app: advisory failure, 40 errors in 9 files; no SG-014 service error remained. Existing advisory findings were not repaired outside the slice.
+- Candidate migration proof exercised temp SQLite upgrade head, downgrade -1, upgrade head; the new migration test passed in the SG-014 7-test run.
+- The no-merge gate executed backend/tests/test_dedup.py::test_no_merge_path_is_present_in_dedup_module and found no UPDATE or merge text in dedup.py.
+- Route decorator audit matched the existing asset/review routes plus only the intended additions: /assets/{asset_id}/events, /review-tasks/{task_id}/resolve, and /candidates/{candidate_id}/decision.
+
+FULL SUITE DISCLOSURE
+- The unfiltered command `PYTHONPATH=backend backend/venv/bin/pytest -q` ran 41 tests: 33 passed and 8 failed in 2.87 s.
+- Five failures were the existing test_evidence_upload.py global settings/storage-root coupling when collected with the full suite; that file passed independently (8/8).
+- The two decoder-dependent node ids excluded under ISS-1 were:
+  backend/tests/test_signals.py::test_generated_codes_are_validated_and_bad_checksum_is_not_an_identifier
+  backend/tests/test_signals.py::test_ocr_has_text_boxes_and_mean_confidence
+  They fail in this sandbox because zbar/tesseract are absent; no decoder was imported or invoked by SG-014 tests.
+- The stale SG-013 migration node excluded from the eligible suite was:
+  backend/tests/test_signals.py::test_observation_migration_upgrade_downgrade_upgrade
+  It assumes `downgrade -1` removes observation, which is no longer true with the authorized SG-014 candidate head. The SG-014 candidate migration has its own passing upgrade/downgrade/upgrade proof. The out-of-ceiling SG-013 test was not changed.
+- No production database, restart, docker, sudo, SSH, secret, or infrastructure operation was attempted.
+
+OUTPUTS COMMITTED
+- backend/app/services/dedup.py
+- backend/app/services/candidates.py
+- backend/app/services/job_service.py
+- backend/app/api/v1/candidates.py
+- backend/app/api/v1/review_tasks.py
+- backend/app/api/v1/assets.py
+- backend/app/main.py
+- backend/alembic/versions/20260908_sg014_candidate.py
+- backend/tests/test_dedup.py
+- backend/tests/test_candidates.py
+- backend/tests/test_export.py
+- docs/adr/ADR-006-duplicate-policy.md
+- docs/adr/ADR-003-job-orchestration.md
+- docs/worklogs/SG-014.log
+- docs/worklogs/SG-014_report.md
+
+UNCLEAR — FIRST READ: The packet’s backend/migrations shorthand differed from the verified backend/alembic tree; the actual Alembic path was used.
+UNCLEAR — DURING EXECUTION: Full-suite collection exposed pre-existing settings coupling and the expected decoder absence; both were reported rather than hidden.
+UNCLEAR — REMAINING: The SG-013 migration assertion remains stale outside this slice, and the two decoder legs remain carried to the manual compose pass.

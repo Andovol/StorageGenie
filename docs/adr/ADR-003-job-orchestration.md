@@ -38,7 +38,7 @@ injected pre-commit failure leaves those catalog tables unchanged
 
 ## Migration verdict
 
-`no-migration-needed`. The existing foundation revision is sufficient:
+`20260908_sg013_observation` added durable observations; the foundation revision remains sufficient for job orchestration:
 
 | Required durable value | Existing storage |
 | --- | --- |
@@ -48,7 +48,7 @@ injected pre-commit failure leaves those catalog tables unchanged
 | Evidence input references | `job.config_snapshot` and `job_step.input_refs` (`backend/app/models/job.py:18-21,35-39`) |
 | Outputs, errors, and step timestamps | JSON values in `job_step.output_refs` (`backend/app/services/job_service.py:147-164`) |
 
-No Alembic revision was added. The existing export regression remains the
+`20260908_sg013_observation` is the later revision at this boundary. The existing export regression remains the
 mechanism check: `backend/tests/test_export.py:95-117` compares the exported
 revision to the independently discovered Alembic head.
 

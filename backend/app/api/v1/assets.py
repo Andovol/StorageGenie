@@ -11,6 +11,7 @@ from app.models.asset import Asset
 from app.models.evidence import Evidence, asset_evidence
 from app.schemas.asset import AssetCreate, AssetUpdate
 from app.schemas.common import decode_cursor, encode_cursor, loads_json
+from app.services import audit_service
 from app.services.asset_service import attach_evidence, create_asset, update_asset
 
 router = APIRouter()
@@ -267,3 +268,32 @@ def post_asset_evidence(
             raise HTTPException(status_code=403, detail="Evidence household mismatch")
     attach_evidence(db, a, evidence_ids)
     return _asset_to_dict(a, db)
+
+
+@router.post("/assets/{asset_id}/events", status_code=201)
+def post_asset_event(
+    asset_id: str,
+    payload: dict[str, object],
+    household_id: str = Query(...),
+    db: Session = Depends(get_db),
+) -> dict[str, object]:
+    asset = db.query(Asset).filter_by(id=asset_id).first()
+    if asset is None:
+        raise HTTPException(status_code=404, detail="Asset not found")
+    if asset.household_id != household_id:
+        raise HTTPException(status_code=403, detail="Household mismatch")
+    event_type = payload.get("type") or payload.get("event_type")
+    if not isinstance(event_type, str) or not event_type or "." in event_type or " " in event_type:
+        raise HTTPException(status_code=422, detail="event type must be a non-empty name")
+    audit_service.record(
+        db,
+        actor="api",
+        action=f"asset.lifecycle.{event_type}",
+        entity_type="asset",
+        entity_id=asset.id,
+        before=None,
+        after=payload,
+        household_id=asset.household_id,
+    )
+    db.commit()
+    return {"asset_id": asset.id, "action": f"asset.lifecycle.{event_type}"}
