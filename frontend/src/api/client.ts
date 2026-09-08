@@ -1,3 +1,5 @@
+import type { Assertion } from "./types";
+
 const BASE = import.meta.env.VITE_API_BASE || "http://localhost:8000";
 
 export function buildUrl(path: string, params: Record<string, string> = {}): string {
@@ -80,4 +82,37 @@ export async function uploadEvidence(
     throw new Error(parseRfc9457(b, `Upload failed: ${r.status}`));
   }
   return r.json();
+}
+
+export function candidateDecision(
+  candidateId: string,
+  householdId: string,
+  action: "accept" | "edit" | "hold" | "reject",
+  correctedFields: Record<string, unknown> = {}
+) {
+  return apiPost<{ candidate_id?: string; id?: string; state: string; asset_id?: string }>(
+    `/v1/candidates/${candidateId}/decision`,
+    { action, corrected_fields: correctedFields },
+    { household_id: householdId }
+  );
+}
+
+export function resolveReviewTask(taskId: string, householdId: string) {
+  return apiPost<{ id: string; status: string }>(
+    `/v1/review-tasks/${taskId}/resolve`,
+    {},
+    { household_id: householdId }
+  );
+}
+
+export function enterManualExpiry(
+  assetId: string,
+  householdId: string,
+  payload: { expiry_date: string; date_type: string; source_evidence_ids?: string[] }
+) {
+  return apiPost<{ asset_id: string; assertion: Assertion; resolved_review_task_ids: string[] }>(
+    `/v1/plugins/expiry-tracker/assets/${assetId}/expiry`,
+    payload,
+    { household_id: householdId }
+  );
 }

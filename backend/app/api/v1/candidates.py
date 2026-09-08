@@ -67,3 +67,41 @@ def decide_candidate(
     commit_step = next((step for step in job_service._steps(db, job.id) if step.step_name == "COMMITTING"), None)
     output = json.loads(commit_step.output_refs) if commit_step and commit_step.output_refs else {}
     return {"candidate_id": candidate.id, "state": candidate.state, "job": job_service.serialize_job(db, result), **output}
+
+
+@router.get("/candidates/{candidate_id}")
+def get_candidate(
+    candidate_id: str,
+    household_id: str = Query(...),
+    db: Session = Depends(get_db),
+) -> dict[str, object]:
+    candidate = db.query(candidates.Candidate).filter_by(id=candidate_id).first()
+    if candidate is None:
+        raise HTTPException(status_code=404, detail="Candidate not found")
+    if candidate.household_id != household_id:
+        raise HTTPException(status_code=403, detail="Household mismatch")
+
+    proposal = candidates.load_proposal(candidate)
+    evidence_ids = json.loads(candidate.evidence_ids_json)
+    if not isinstance(evidence_ids, list):
+        raise HTTPException(status_code=500, detail="Candidate evidence is invalid")
+    review_task_ids = proposal.get("review_task_ids", [])
+    if not isinstance(review_task_ids, list):
+        review_task_ids = []
+    dedup_matches = proposal.get("dedup_matches", [])
+    if not isinstance(dedup_matches, list):
+        dedup_matches = []
+    fields = proposal.get("fields", {})
+    if not isinstance(fields, dict):
+        fields = {}
+    asset_id = proposal.get("asset_id")
+    return {
+        "id": candidate.id,
+        "state": candidate.state,
+        "job_id": candidate.job_id,
+        "fields": fields,
+        "dedup_matches": dedup_matches,
+        "review_task_ids": review_task_ids,
+        "evidence_ids": [str(item) for item in evidence_ids],
+        "asset_id": asset_id if isinstance(asset_id, str) else None,
+    }

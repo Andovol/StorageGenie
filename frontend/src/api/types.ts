@@ -46,3 +46,53 @@ export type AssetListResponse = {
   items: Asset[];
   next_cursor: string | null;
 };
+
+export type JobStep = {
+  id: string;
+  step_name: string;
+  state: string;
+  attempts: number;
+  input: unknown;
+  output: Record<string, unknown> | null;
+  error: string | null;
+};
+
+export type JobProgress = { completed: number; total: number; failed: number; pending: number };
+export type Job = {
+  id: string;
+  job_type: string;
+  state: string;
+  household_id: string;
+  created_at: string | null;
+  updated_at: string | null;
+  steps?: JobStep[];
+  progress?: JobProgress;
+  errors?: string[];
+};
+export type JobListResponse = { items: Job[]; next_cursor: string | null; total: number };
+
+export type ReviewTask = {
+  id: string;
+  task_type: string;
+  priority: string;
+  subject_ref: string;
+  proposed_change: unknown;
+  status: string;
+  household_id: string;
+  created_at: string | null;
+  updated_at: string | null;
+};
+export type ReviewTaskListResponse = { items: ReviewTask[]; next_cursor: string | null; total: number };
+
+export type CandidateField = unknown | { value?: unknown; confidence?: number | null; source_type?: string; source?: string };
+export type DedupMatch = { type: string; asset_id?: string; evidence_id?: string; identifier?: string; distance?: number };
+export type Candidate = {
+  id: string;
+  state: string;
+  job_id: string;
+  fields: Record<string, CandidateField>;
+  dedup_matches: DedupMatch[];
+  review_task_ids: string[];
+  evidence_ids: string[];
+  asset_id?: string | null;
+};
