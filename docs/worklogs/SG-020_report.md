@@ -6,7 +6,7 @@ BASE requested ref: automation
 
 BASE resolved: 529643d986a4a3d3c8603ab40e713d0d7b346b0a
 
-WORK_HEAD (implementation/report content commit): to be filled after the implementation/report commit.
+WORK_HEAD (implementation/report content commit): fd03dccb7c19f0ab5f50afde9e1ee1021d70a0d4.
 
 Work dir: /home/andrei/StorageGenie
 
