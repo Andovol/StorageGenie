@@ -1,0 +1,30 @@
+SG-016 backend-relevant execution log
+
+BASE requested: automation
+BASE resolved: fbe7fea (packet SG-016 was the branch tip)
+WORK_DIR: /home/andrei/StorageGenie
+Toolchain: frontend uses /home/andrei/.nvm/versions/node/v24.14.1/bin/node and npm with frontend/node_modules/.bin; backend uses backend/venv/bin/python, pytest, ruff, and mypy. Bare host python/pytest were not assumed.
+Process provenance: ps showed `node /usr/local/bin/codex exec --sandbox danger-full-access -c model_reasoning_effort=high -C /home/andrei/StorageGenie` and the vendored Codex process. Model id was absent from readable process arguments: unknown. Effort: high.
+
+Read-before-build findings
+- The checkout was clean on automation at fbe7fea.
+- The packet-referenced ARCHITECT.md, PACKET.md, DISPATCH.md, and PRODUCTION.md files are absent from this checkout. AGENTS.md and STATE.md were available; this discrepancy is reported rather than silently inferred.
+- Candidate decisions existed at backend/app/api/v1/candidates.py:21-69, but candidate read-back did not. Job detail serialization already exposed steps/progress/errors at backend/app/services/job_service.py:220-256. Plugin manual expiry accepts flat fields at backend/app/api/v1/plugins.py:100-151; the attributes nesting rule is for extensions at :163-176.
+
+Backend implementation and proof
+- Added only `GET /v1/candidates/{candidate_id}` at backend/app/api/v1/candidates.py:72-109. It returns id, state, job_id, fields, dedup_matches, review_task_ids, evidence_ids, and optional asset_id, with candidate-first 404 and household 403 checks.
+- Added backend/tests/test_candidate_read.py. Its temp SQLite/TestClient fixture creates a real candidate and task, asserts read-back identity and fields, and invokes both cross-household and missing-id legs: 1 passed.
+- No candidate linkage was added to GET /v1/jobs: it was optional and unnecessary because the selected import detail already carries the dedup candidate_id. No migration, existing backend route change, expiry_tracker.py edit, live DB, restart, privileged operation, SSH check, secret, or runtime dependency was used.
+- Backend decorator grep match list: existing `@router.post("/candidates/{candidate_id}/decision")` at candidates.py:21; new `@router.get("/candidates/{candidate_id}")` at candidates.py:72. No other backend route decorator was changed.
+
+Backend gates (ordinary command bound 120s; suite command bound 600s)
+- `timeout 600s env PYTHONPATH=. ./venv/bin/python -m pytest -q` from backend: 48 collected; 46 passed, 2 failed. The only failures are the explicitly carried ISS-1 decoder nodes `tests/test_signals.py::test_generated_codes_are_validated_and_bad_checksum_is_not_an_identifier` (QR/EAN) and `tests/test_signals.py::test_ocr_has_text_boxes_and_mean_confidence` (OCR). Their failures are unavailable pyzbar/libzbar/tesseract capabilities; no decoder-dependent test was added.
+- `timeout 120s ./venv/bin/ruff check app tests`: clean.
+- `timeout 120s ./venv/bin/mypy app`: advisory failure, 40 errors in 9 files across 50 checked sources, all pre-existing untyped/unused-ignore findings outside this ceiling; no repairs made.
+- `timeout 120s git diff --check`: clean.
+
+Issues observed during execution
+- The first frontend test run exposed test-only query/mocking mistakes (input values queried as text, duplicate error text, and an incomplete wrong-task envelope). They were corrected before final gates; no product behavior was weakened and no gate was skipped.
+- React Router emitted its existing v7 future-flag warnings in jsdom tests. These are warnings only; lint and type checks remained clean.
+
+Elapsed wall-clock execution was approximately 6 min (approximately 360 s) against the 2100 s (35 min) run budget. No command was killed for timeout or lack of progress.

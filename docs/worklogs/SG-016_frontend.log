@@ -1,0 +1,21 @@
+SG-016 frontend execution log
+
+Frontend toolchain: `/home/andrei/.nvm/versions/node/v24.14.1/bin/npm`; local binaries in `frontend/node_modules/.bin`.
+
+Passing behavior run
+- Command: `timeout 600s /home/andrei/.nvm/versions/node/v24.14.1/bin/npm test -- --run`
+- Result: 8 test files passed; 19 tests passed. This covers JobCard, InboxPage, CandidateCard, ReviewPage, ExpiryEntryForm, existing AssetCard/ProvenanceBadge, and client tests.
+- Inbox behavior uses loaded job/task IDs, selected-job progress and step errors, retry fan-out to `/v1/imports/<loaded-id>/retry`, both empty states, queue resolve, and task review links.
+- Review behavior uses loaded candidate IDs for accept/edit/hold/reject, co-present fields/evidence, collision blocking, keyboard actions, and loaded evidence IDs. Expiry behavior posts selected date type and source evidence IDs, then invalidates and re-reads the asset to show accepted after needs_evidence.
+
+Discriminating wrong-mock run
+- Command: `timeout 600s ./node_modules/.bin/vitest run --run -t wrong`
+- Result: 4 tests passed, 15 skipped. Each wrong-fixture test deliberately replaces a loaded identity/state/evidence/error with a wrong value and wraps the normal contract assertion in `expect(...).toThrow()`. The inner assertion therefore fails for the wrong response; the outer test passes only because that failure is the required discrimination proof.
+- Groups: CandidateCard wrong evidence id; InboxPage wrong job error; ReviewPage wrong evidence id; ExpiryEntryForm wrong unresolved read-back. No behavior test passes unchanged against both the correct and wrong fixture.
+
+Frontend gates (ordinary command bound 120s)
+- `timeout 120s /home/andrei/.nvm/versions/node/v24.14.1/bin/npm run lint`: exit 0, no output errors.
+- `timeout 120s ./node_modules/.bin/tsc --noEmit -p tsconfig.json`: exit 0.
+- React Router v7 future-flag warnings were emitted by existing test runtime behavior; they do not affect the passing gate results.
+
+Batch accept was deliberately dropped: the packet made it the last, explicitly droppable goal, and client-side fan-out would add no value to the required single-decision workflow in this bounded slice.
