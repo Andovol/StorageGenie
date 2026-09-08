@@ -1,0 +1,50 @@
+SG-017 execution log
+
+BASE requested: automation
+BASE resolved: acdad450a1b855f0e23225badab6d3fc7b75a475 (packet tip)
+WORK_DIR: /home/andrei/StorageGenie
+Origin: git@github.com:Andovol/StorageGenie.git
+Coder: codex
+Model provenance: unknown; no model id appeared in readable process arguments.
+Effort provenance: high; `ps` showed `node /usr/local/bin/codex exec --sandbox danger-full-access -c model_reasoning_effort=high -C /home/andrei/StorageGenie`.
+Run budget: 2100 s (35 min). Ordinary command bound: 120 s. Suite/migration bound: 600 s.
+
+Read-before-build
+- Worktree was clean on automation at BASE.
+- The packet-referenced ARCHITECT.md, PACKET.md, DISPATCH.md, and PRODUCTION.md files are absent from this checkout. AGENTS.md, STATE.md, the committed packet, and the phase plan were available.
+- Bare host python/pytest were not used. Backend commands used `backend/venv/bin/python` and `backend/venv/bin/pytest` equivalents via `venv/bin/python -m pytest` from backend.
+- No SSH, docker, sudo, live database, restart, secret, .env, or infrastructure operation was attempted.
+
+Fail-first evidence
+- Initial SG-017 targeted run: `timeout 600s bash -lc 'cd backend && venv/bin/python -m pytest -q tests/test_search.py tests/test_plugin_expiry.py tests/test_postgres_dialect.py'` returned 7 failed / 12 passed. FTS bootstrap rebuild used ordinary DELETE and raised `database disk image is malformed`; the dialect assertion incorrectly assumed PostgreSQL would not quote reserved `user`.
+- With the expiry kind-scope temporarily removed, `timeout 120s bash -lc 'cd backend && venv/bin/python -m pytest -q tests/test_plugin_expiry.py::test_expiry_observed_date_uses_visible_observation_kinds_only'` returned 1 failed: EXIF-only input classified `proposed` instead of `needs_evidence`.
+- The repair was restored exactly to `_observed_date`, and the same command returned 1 passed. The final targeted SG-017 group returned 19 passed.
+
+Implementation evidence
+- Added `backend/app/services/fts.py`: literal-token sanitizer, SQLite external-content FTS5 projection, insert/update/delete triggers, and named re-runnable `rebuild_asset_fts(connection)`.
+- Added one Alembic revision `backend/alembic/versions/20260908_sg017_fts.py`; upgrade/downgrade/upgrade was exercised on a temp SQLite DB.
+- Replaced only the non-empty `q` branch in assets list with FTS MATCH narrowing. Empty/no q retains the existing no-MATCH path; filters, `(created_at DESC, id DESC)` ordering, cursor envelope, and row serializer remain unchanged.
+- Added FTS multi-token, hostile syntax (`" OR "1"="1` and unterminated quote), household identity isolation, rebuild, trigger lifecycle, migration, and 10k latency tests.
+- Added offline PostgreSQL DDL compilation inventory for all 13 metadata tables. FTS migration exclusion is explicit in the test module docstring and ADR-008.
+- Restricted `_observed_date` scanning to `ocr` and `barcode_qr`; the diff contains no other expiry_tracker.py changes.
+- Added ADR-008 and unmasked frontend lint; `check-postgres-dialect` runs the exact dialect test file.
+
+Verification commands/results
+- SG-017 targeted group: 19 passed, 5 warnings.
+- 10k fixture: 10,000 assets plus evidence links on every 1,000th row; one shared-hardware run on `ubuntu`, Linux 6.8.0-136-generic-x86_64 with glibc 2.39; 20 requests; p50 16.31 ms, p95 19.53 ms. This is an observation, not a throughput rate.
+- Query plan: `(5, 0, 0, 'SEARCH asset USING INDEX ix_asset_household_id (household_id=?)')`; `(15, 0, 0, 'LIST SUBQUERY 1')`; `(17, 15, 0, 'SCAN asset_fts VIRTUAL TABLE INDEX 0:M3')`; `(51, 0, 0, 'USE TEMP B-TREE FOR ORDER BY')`.
+- `tests/test_export.py::test_export_manifest_is_complete_and_downloadable`: 1 passed; migration head matched.
+- `make check-postgres-dialect`: 1 passed.
+- `cd frontend && npm run lint`: exit 0.
+- `backend/venv/bin/python -m ruff check app tests alembic`: clean.
+- `backend/venv/bin/python -m mypy app`: advisory, 40 errors in 9 files / 51 source files; no out-of-ceiling repairs.
+- Final backend `timeout 600s bash -lc 'cd backend && venv/bin/python -m pytest -q'`: 57 collected, 54 passed, 3 failed.
+- Packet-start baseline at BASE with the same full-suite command: 46 passed, 2 failed. The two baseline failures were the carried ISS-1 decoder nodes: `tests/test_signals.py::test_generated_codes_are_validated_and_bad_checksum_is_not_an_identifier` and `tests/test_signals.py::test_ocr_has_text_boxes_and_mean_confidence`.
+
+Findings
+- New, out-of-ceiling test-layer finding: `backend/tests/test_candidates.py::test_candidate_migration_upgrade_downgrade_upgrade` fails after SG-017 because `upgrade head; downgrade -1` now downgrades SG-017 and correctly leaves SG-014's candidate table. The base run passed this test. Destination: standing SG-014 lever line; `test_candidates.py` was not edited because it is outside the packet ceiling.
+- ISS-1 remains exactly the two packet-carried decoder failures above and is reserved for the manual compose pass; no decoder-dependent test was added here.
+- The first read-only git status/log probe was not wrapped in the requested timeout, completed in under one second, and caused no mutation. All substantive shell commands and suite legs thereafter used the stated 120 s/600 s bounds; no command was killed.
+- No acceptance criterion relied on a skipped gate, empty diff, empty set, or uninvoked function. The 10k fixture, migration transitions, FTS rebuild, household identity, both observation-kind legs, and dialect inventory all execute real paths.
+
+Elapsed at report generation: approximately 1,100 s (18 min 20 s) / 2,100 s (35 min); no timeout kill.
