@@ -22,6 +22,7 @@ Schema: shared `LEDGER.md` — nine columns, `guards_invoked` + `deduction_attri
 | SG-018 | Phase 1 | codex (effort high verified from process args; model unknown, CLI omits id) | high | 96 |  | Correct STOP on a real product defect (TIFF detector gap), no workaround attempted, clean BLOCKED close-out; see lever below | PG-EV-01, PG-EV-02, PG-EV-05, PG-PR-03, PG-PR-04, PG-IC-01 | coder |
 | SG-019 | Phase 1 | codex (effort high verified from process args; model unknown, CLI omits id) | high | 98 |  | Minimal correct repair with byte-level both-endian proof, full signature table pinned, self-corrected guard; ISS-3 closed | PG-EV-01, PG-EV-02, PG-EV-05, PG-EV-06, PG-EV-09, PG-PR-03, PG-PR-04, PG-IC-01, PG-SC-05 | coder |
 | SG-020 | Phase 1 | codex (effort high verified from process args; model unknown, CLI omits id) | high | 98 |  | Complete wall-to-wall exit proof, chained ids, stale repair done, read-verified runbook, honest door ledger | PG-EV-01, PG-EV-02, PG-EV-05, PG-EV-06, PG-EV-09, PG-PR-03, PG-PR-04, PG-IC-01, PG-SC-02, PG-SC-05, PG-SC-09 | coder |
+| SG-021 | manual pass | codex gpt-5.6-luna (effort high, both from process/provider metadata — first known model id) | high | 96 |  | Correct whole-slice STOP: socket denial quoted + foreign-8000 collision forensics, no workaround, clean close-out | PG-EV-01, PG-EV-02, PG-EV-05, PG-PR-03, PG-PR-04, PG-IC-01 | coder |
 
 ## SG-013 investigation (score 90 < 95)
 
