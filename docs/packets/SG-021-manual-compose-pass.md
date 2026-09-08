@@ -1,0 +1,107 @@
+# SG-021 — Manual compose pass: image, ISS-1 re-proof, up, UI, restart (Codex High)
+
+**Dispatch params for the new runner (read from this committed packet; model is the CLI default and is omitted per policy):**
+coder: codex
+effort: high
+
+**Stage:** D12 manual compose pass (L2 single slice) — closes ISS-1 and proves the deployment the AI phase will run in. L3 ended with the Phase 1 verdict; this slice's approval IS D12. Prior art: SG-018's probe shape, SG-013's denial handling, SG-020's exit proof (all green, untouched here).
+**Standing lines:** a "pre-existing failure" claim cites the base commit + base-run command and output, or it is a new finding with a destination; decoder legs are proved HERE (this pass owns ISS-1 — no further carry).
+
+> Facts below are what I believe from the tree that carries this packet. **They are EXPECTED conditions,
+> not established truth. Verify each before building on it; a difference is a finding, not an obstacle.**
+> For any number, path or quoted line I hand you: if your figures differ from mine, investigate and
+> explain — **do not bend your answer to match mine. Correcting me is worth more than agreeing with me.**
+
+> A denied privileged operation is never a signal to route around it. **A step you cannot complete
+> without privilege is reported as unanswered, and the rest of the slice still ships.**
+
+> If any acceptance criterion could pass **vacuously** — an empty diff, an empty set, a skipped gate, a
+> test that never invokes the function, a grep scoped so narrowly it could not have matched — say so
+> loudly rather than reporting a pass.
+
+> Report the model and reasoning effort by reading them from your process arguments or provider metadata,
+> never from a system-prompt identity line. **Write `unknown` rather than a plausible guess.** (Effort is proven readable from process arguments — do the same.)
+
+> **DO NOT HANG.** Every command runs under a stated timeout. **Name the bound in the packet** — 120s is
+> a reasonable default for ordinary commands, and a build, a test suite or a migration gets the bound its
+> own work needs. **A command producing no observable progress within its bound is killed and reported.**
+> Never run an interactive command. A command you had to kill is a finding worth reporting, not a failure
+> to hide. *(D17: a single global 120s kill was an uncalibrated hard cap that would terminate valid work.)*
+
+> Design calls inside these constraints are yours: decide and report, do not ask. A constraint you find
+> wrong or impossible is a STOP. **If you stop for any reason**, commit what you have with
+> `BLOCKED: <reason>` as the first line, push, publish the receipt, and leave the worktree clean.
+> Report every issue and disagreement, including ones outside this slice's scope. End with the three
+> UNCLEAR lines — FIRST READ, DURING EXECUTION, REMAINING.
+
+**BASE REF: automation.** A packet naming a tree hash is wrong by the time it runs — the packet commit becomes the tip. **The ref is what the packet requests; the commit it resolved to is what the report states back — two fields, never one.**
+
+**DATABASE: live mounts, zero catalog writes. Restart: own backend container only (allowlisted `restart: unless-stopped`).** This slice touches the live host, which is authorised by D12 with these explicit bounds: `docker compose build/run/up/exec/restart` against THIS project's compose file only; no `docker volume/server` inspection beyond the probe (a past denial — report, don't route around); no catalog writes (health checks + test exec use temp DBs; the running service is exercised, never written to); no port reconfiguration (see G4 stop); no `.env` content changes (presence check only — secrets stay secret, `CO-44`). Test rows live and die in temp databases (`PG-EV-06`, `PG-PR-10`). The 35-minute transport kill is real (`RUN_BUDGET_S=2100`): at 1800 s elapsed STOP starting new work, close out with what proved, publish the receipt — a partial slice WITH a receipt is a success. Report elapsed per leg. Coder-side `python`/`pytest`/`docker` may be absent on the host PATH — resolve actual binaries/verbs first and name them, never assume.
+
+## Why this exists
+
+Everything Phase 1 proved ran in-process (TestClient + temp DBs). Unproved on live infrastructure: the image builds with the new apt packages (SG-013's Dockerfile lines never built — `docker build` was unrunnable in-sandbox); the two decoder legs (ISS-1) go green where libzbar/tesseract exist; `compose up` survives the shared host (port `8000` served a FOREIGN 404 in Phase 0 findings — a bind collision fails the up leg); the UI serves; restart recovers to healthy. Handed tree facts (verify): `docker-compose.yml` publishes `8000:8000` + `5173:5173`, bind-mounts `./backend` + `./data/db`, names volume `storage_data`, requires `.env` (`env_file`), runs uvicorn `--reload`, healthchecks `GET /v1/health`, frontend `npm run dev` with `VITE_API_BASE=http://localhost:8000`, both `restart: unless-stopped`; backend health proves DB+storage (`health.py`); runbook `README.md:37-50,93-180`.
+
+## G1 — capability + collision probe (report only; every leg has a stop)
+
+- `docker info` (or the compose equivalent that works here): denial (e.g. the known `docker volume ls` nobody:nogroup shape) → STOP THE WHOLE SLICE with the exact denial quoted (the fallback is desk-side provisioning, not a workaround — name it, do not attempt it).
+- TCP occupancy of `8000` and `5173` on the host (read-only probe, e.g. `/dev/tcp` or the toolchain's equivalent — your call): record WHO answers each port (ours vs foreign 404 vs closed).
+- `docker compose config` validity + `.env` presence (never content) + `frontend/Dockerfile` existence (unverified premise — confirm or report absent).
+- Stopping is a SUCCESS where stated; stopping because a probe "feels risky" without a denial or collision is NOT grounds to stop.
+
+## G2 — image build (only if G1 grants docker)
+
+- `docker compose build backend` (bound 1500 s): proves the SG-013 apt lines (`tesseract-ocr`, `libzbar0`) install on bookworm-slim. Build failure → STOP with the failing layer quoted (do not redesign the Dockerfile beyond the failing line's evidence).
+
+## G3 — ISS-1 re-proof in the image (only if G2 built; no ports, no live writes)
+
+- `docker compose run --rm --no-deps backend venv/bin/python -m pytest -q tests/test_signals.py` (or the in-image equivalent path — resolve, don't assume): the two named decoder nodes must go GREEN. Quote both. Any other red is a finding with a destination, never silent. Then the full backend suite in the same shape: green except NOTHING (in-image there is no sandbox excuse — any non-decoder red is a defect finding).
+
+## G4 — up, health, suites, UI, restart (only if G1 shows BOTH ports free of foreign occupants)
+
+- If either port answers foreign: STOP THIS GOAL with the occupancy evidence quoted (port remap on a shared host with a hardcoded `VITE_API_BASE` is an owner decision — it cascades to frontend config and the runbook; it is not a slice design call).
+- `docker compose up -d --build` (or up since G2 built — your call): `GET /v1/health` via curl returns the runbook's expected JSON (if curl hits the foreign 404 instead, that IS the collision signal — stop per above); backend suite via `compose exec`; frontend `npm run build`-clean OR dev-server HTML shell containing the app root via curl (your call by what the tree supports — prove served bytes, never a log line claiming serve); `docker compose restart backend` → healthy again within the healthcheck retries (quote the recovery).
+- No catalog writes in any leg (health + suites + shell only); any write need is a STOP.
+
+## G5 — Worklog and report (unconditional per `CO-57`)
+
+- `{{WORKLOG_DIR}}/SG-021.log` and `{{WORKLOG_DIR}}/SG-021_report.md`, first token `SG-021`, every output path named in the report committed, three UNCLEAR lines at the end, elapsed-versus-budget PER LEG with units. State model/effort provenance from process arguments. The report carries the live-state ledger: what runs now (containers, ports, health), what was proved per goal, every stop with its evidence, and the exact remaining delta (if any) for a follow-up.
+
+## G6 — Receipt note on the notes ref (proven shape, unchanged obligation)
+
+- Push the work to `automation` and leave the worktree clean (`CO-55`): the runner proves HEAD movement without rewrite (P1/P2) and a clean tree (P6) itself. No push to `storagegenie-evidence`, no `{{RECEIPT_CMD}}` — the legacy publisher is dead.
+- Attach the receipt note to the work HEAD LAST, with no commit after it (120s bound): `git notes --ref=refs/notes/storagegenie-coder-reports add -m "Dispatch-ID: SG-021 | Report: docs/worklogs/SG-021_report.md | Work-HEAD: <hash>" <WORK_HEAD>` — the first line carries BOTH `Dispatch-ID:` and `Report:` (`CO-97`; the dispatch gate greps the ID, the runner parses the path, P3/P5). Then verify locally with `git notes --ref=refs/notes/storagegenie-coder-reports show <WORK_HEAD>` and quote the note. The RUNNER pushes the notes ref and reads it back from the remote — a note existing only locally is not a receipt.
+- If `git notes add` refuses because a note already exists for that commit, STOP — a receipted commit running again is the replay case; never force-replace the note (`CO-97`).
+- Verify the artifact, not the command: after the run the dispatch result line must report `note=yes` for this ID. A zero-exit run with `note=no` is a FAIL.
+
+## Constraints
+
+- Scope ceiling: NO product file changes expected — this is a prove-and-report slice. Permitted changes ONLY: `README.md` runbook corrections where live behavior contradicts it (quote each), `docs/worklogs` files, the G6 note mechanism. A product/migration/port/compose-file change need is a STOP with evidence, never a quiet edit ("STOP and report" is not satisfiable by disclosure). The 1800 s early-close rule above binds all goals.
+- Cross-product (`PG-IC-01`): G2 needs only the Dockerfile as built; G3 needs only the built image; G4 needs only free ports + `.env` presence. No goal requires what the ceiling forbids. Recorded here once, not per criterion.
+- Secrets: never read out, print, or commit `.env` contents — presence check only, redact per `CO-44`.
+- Privileged-denial: a denied `sudo`/`docker` operation is reported as unanswered with its exact text per the block above, not routed around. No `sudo docker`, no socket chmod, no group changes — the confinement is the finding if it binds.
+- Stash: worktree ends clean per `CO-55`. Running containers are REPORTED (names, ports, health), not left ambiguous — but do not tear down what `up` started unless it is unhealthy (state either way).
+- Test scope: every gate names what it checked with counts and elapsed; a gate emitting no output is a FAIL. mypy not run (no code change expected — say so, don't silently omit).
+- Budget: 120s ordinary probes, 1500s build leg, 600s suite legs, 1800 s early-close, 2100s overall — actual-versus-budget per leg with units.
+- Simplicity: verify before asserting; write no new checklist (`G-A7`).
+- No Coder-side SSH checks: the dispatch key is absent inside the confined run. Do not require what the confinement forbids.
+
+## Acceptance criteria
+
+- G1 evidence quoted per leg (docker verdict, per-port occupant, config validity, `.env` presence, frontend Dockerfile verdict), each with its stop obeyed or explicitly passed.
+- G2 build green with apt-layer evidence quoted, or STOP with the failing layer.
+- G3 decoder nodes green IN THE IMAGE (node IDs + output quoted); full in-image suite with any non-decoder red named as defect finding.
+- G4 (if ports free): healthy JSON quoted, exec suites quoted, served-UI bytes quoted, restart→healthy recovery quoted; (if occupied): STOP with occupancy evidence, no rebind attempted.
+- README corrections, if any, each quote the contradicted line and the live evidence.
+- Live-state ledger complete (containers/ports/health/stops/delta).
+- Worklog + report committed; notes ref carries the `Dispatch-ID: SG-021` + `Report:` note, quoted, dispatch result line `note=yes`.
+- No criterion passed vacuously.
+
+## Report
+
+- Work dir `/home/andrei/StorageGenie`, origin remote as configured on the host, `BASE` = packet start HEAD, `WORK_HEAD` = work commit hash.
+- State model/effort provenance per `CO-78` — from process arguments (proven readable), never from a system-prompt identity line.
+
+## Budget
+
+120s probes, 1500s build, 600s suite legs, 1800 s early-close, 2100s overall (`RUN_BUDGET_S=2100` in the dispatch conf — the kill is real, finish inside it).
