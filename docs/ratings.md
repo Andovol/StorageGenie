@@ -14,6 +14,16 @@ Schema: shared `LEDGER.md` — nine columns, `guards_invoked` + `deduction_attri
 | SG-011 | Phase 0 | codex (audit: unknown per identity line) | high | 98 |  |  | PG-EV-01, PG-EV-02, PG-EV-09, PG-SC-02, PG-IC-09 |  |
 | SG-010 | Phase 0 | codex (audit: unknown per identity line) | high | 98 |  |  | PG-EV-01, PG-EV-02, PG-EV-05, PG-EV-06, PG-EV-09, PG-EV-10, PG-IC-01, PG-IC-09 |  |
 | SG-012 | Phase 1 | codex (audit: unknown per identity line) | high | 98 |  |  | PG-EV-01, PG-EV-02, PG-EV-05, PG-EV-06, PG-EV-09, PG-PR-03, PG-PR-04, PG-IC-01, PG-SC-02, PG-SC-03 |  |
+| SG-013 | Phase 1 | codex (audit: unknown per identity line) | high | 90 |  | Sandbox cannot install apt packages — 2 real-decoder legs carried to manual compose pass, not re-scoped; see investigation below | PG-EV-01, PG-EV-05, PG-EV-06, PG-EV-09, PG-PR-03, PG-PR-04, PG-IC-01, PG-SC-02 | coder-env |
+
+## SG-013 investigation (score 90 < 95)
+
+1. **Failure class:** environment.
+2. **Root cause:** the dispatch sandbox sets no-new-privileges (`sudo: The "no new privileges" flag is set`, quoted in report); `tesseract-ocr`/`libzbar0` uninstallable, so the generated-QR/EAN-decode and rendered-text-OCR legs fail with `pyzbar/libzbar is not installed` / `tesseract is not installed`. Pure-python controls (check-digit math both polarities, dHash 0/19 vs threshold 10, EXIF gate + GPS exclusion, quarantine + retry, migration round-trip) all green; full suite 32 passed / 2 failed, honestly reported (not class 13 — targeted-green never presented as suite-green; not class 6 — no "pre-existing" claim).
+3. **Exact correction:** re-run the 2 red legs where the packages exist — the compose image (`backend/Dockerfile` already carries both apt lines) during the deferred manual compose pass; record green there. No code change unless they fail there too (then a repair slice).
+4. **Recurrence guard:** every slice premise now carries its environment capability (sandbox: no apt/sudo/docker; compose image: full) — recorded in the stage plan; decoder legs pre-declared carried in SG-018's amended fixture scope.
+5. **Owner impact:** trigger-to-`done` ≈17 min observed via status checks, inside the 2100 s bound; cost unavailable (platform exposes none).
+6. **Attribution note:** Coder execution was contract-correct throughout (graceful degradation with warnings, privileged-denial reported as unanswered per packet, ADR-003 staleness reported as a finding instead of silently edited, no scope overreach into DEDUPLICATING/COMMITTING). Deduction is environment, not execution — hence 90, not lower.
 
 ## SG-003 investigation (score 82 < 95)
 
