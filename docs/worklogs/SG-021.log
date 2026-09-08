@@ -1,0 +1,55 @@
+SG-021
+
+Status: BLOCKED
+BASE requested ref: automation
+BASE resolved at slice start: 06ea9b520d721870c74f8d33eb3d9b7014f686fc
+Coder: codex
+Model: unknown (no model id appeared in readable process arguments; the CLI default omitted the id)
+Reasoning effort: high (verified from live process arguments containing `-c model_reasoning_effort=high`)
+Overall bound: 2100 s (35 min); no command was killed
+
+G1 read-only probe, all ordinary commands bounded at 120 s:
+- `/usr/bin/docker` resolved; Docker 29.6.2 and Compose v5.3.1 resolved.
+- `timeout 120s docker info` reached the client but failed at the server with:
+  `permission denied while trying to connect to the Docker API at unix:///var/run/docker.sock`.
+- `timeout 120s docker compose config --quiet` exited 0 in 0.06 s.
+- `.env` presence was confirmed without reading content: mode 600, owner andrei:andrei, size 203 bytes.
+- `frontend/Dockerfile` was present: mode 664, size 181 bytes.
+- Port 8000 answered `HTTP/1.1 404 Not Found`, `server: uvicorn`, body `Not Found`;
+  this is the shared-host foreign 404 condition. `ss` exposed no owning PID for this
+  listener in the confined process view.
+- Port 5173 was closed: curl returned `Failed to connect to 127.0.0.1 port 5173`.
+- `timeout 120s docker compose ps` was also denied by the same Docker socket error.
+- G1 elapsed approximately 0.50 s / 120 s bound; no command was killed.
+
+STOP: G1 requires a Docker capability verdict. The exact Docker API denial is a whole-
+slice stop under the packet. No sudo, socket chmod, group change, volume inspection,
+fallback host install, build, image run, compose up, exec, port remap, or restart was
+attempted after the denial. The foreign 8000 occupancy independently prevents G4.
+
+G2, G3, G4: unanswered after the mandatory G1 stop; no build, in-image decoder test,
+full suite, health request to the project service, UI served-byte probe, or backend
+restart was run. No test gate emitted output, so no test count or green result is
+claimed. The two ISS-1 nodes remain unanswered in the image: 
+`tests/test_signals.py::test_generated_codes_are_validated_and_bad_checksum_is_not_an_identifier`
+and `tests/test_signals.py::test_ocr_has_text_boxes_and_mean_confidence`.
+
+No migration, catalog write, live service write, restart, secret read, product-file
+change, or README correction was made. `mypy` was not run because the G1 hard stop
+precluded all later gates.
+
+No acceptance criterion passed vacuously: only non-mutating G1 checks with observable
+output are recorded; all image, suite, health, UI, and restart criteria are explicitly
+unanswered.
+
+UNCLEAR — FIRST READ: Docker and Compose binaries were available, but the Docker API
+socket was not accessible to this process; the packet's expected shared-host port state
+was also rechecked rather than assumed.
+UNCLEAR — DURING EXECUTION: G1 stopped the whole slice on the exact Docker socket
+permission denial; port 8000 simultaneously returned the shared-host foreign Uvicorn
+404, so no route-around or port rebind was permissible.
+UNCLEAR — REMAINING: Desk-side provisioning must grant the authorized runner Docker
+access and an owner must resolve the 8000 collision (or authorize the required compose/
+frontend/runbook cascade); then a fresh SG-021 attempt must build the image, re-prove
+both decoder nodes, run the full in-image suite, bring up the UI, and prove backend
+restart recovery.
