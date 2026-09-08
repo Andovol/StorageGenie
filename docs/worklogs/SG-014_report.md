@@ -2,14 +2,14 @@ SG-014 | Deduplication, candidates, review decisions, lifecycle events
 
 BASE ref requested: automation
 BASE resolved: 0428f9ac7025d8721346d1068b87f088735a38ba
-WORK_HEAD: pending until the final commit is created
+WORK_HEAD (implementation/doc commit): 597b8cb71a517baa947b5ecce3e6ea5db6110a4d
 Work dir: /home/andrei/StorageGenie
 Origin: git@github.com:Andovol/StorageGenie.git
 Coder: codex
 Model: unknown (the CLI process omitted the model id and uses its default)
 Reasoning effort: high (verified from process arguments: `codex exec --sandbox danger-full-access -c model_reasoning_effort=high -C /home/andrei/StorageGenie`)
 Autonomy: L3, Phase 1 slice 3 of 7
-Elapsed: within the 2100 s overall bound; final process elapsed is recorded at close-out.
+Elapsed at finalization: 1027 s (17 m 7 s) / 2100 s overall bound.
 
 Implemented
 
