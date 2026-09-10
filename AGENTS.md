@@ -1,7 +1,7 @@
 # StorageGenie — project configuration
 
 > **Canonical for this repo. `CLAUDE.md` is a one-line adapter `@AGENTS.md` — edit here, never there.**
-> Rule-set version this project records: **0.19.4** (`C:\Coding\Claude\Launcher\VERSION` @ `0.19.4`, global `RULES.md` sha256 `8ba490ace894e56b6ad14c3cba648441ace475e44e96d02fa82db9bb57c8505e` re-verified 2026-09-07, D1 record-only per Launcher `CHANGELOG.md:14`).
+> Rule-set version this project records: **0.21.1** (shared `VERSION` @ `0.21.1`, contract tag `contract-v0.21.1` @ `0a38d47`, `.rules-cache/` clean, `RULES.md` 20673B CR0 + `run-coder` 36044B CR0 verified 2026-09-10, D138 git-never-disk per Launcher `CHANGELOG.md:0.21.0-0.21.1`).
 
 ## Configuration table — the single source of every project value
 
@@ -13,7 +13,7 @@
 | **Host project path** | `/home/andrei/StorageGenie` | Owner directive `m0045` — use this folder |
 | **Credential reference** | `~/.ssh/storagegenie-architect-dispatch` (ed25519, `~/.ssh/storagegenie-architect-dispatch.pub` on host forced-command) + unrestricted `C:\Users\popes\Desktop\key_Andrei.ppk` (Launcher-only, provisioning) | Naming `<project>-architect-dispatch` per `PROVISIONING.md:129` — private never on host |
 | **Coder** | `codex` (SELECTED from `global/CODERS.md` — `codex exec --sandbox danger-full-access [-m <model>] [-c model_reasoning_effort=<effort>] -C <workdir> < <prompt-file>`) | Owner directive `m0106` — codex high until countermanded; supersedes `m0083` (`codex` → `grok`, kept as history). `G-O2` — packet says "the Coder", config names it. Allowed effort `low|medium|high|xhigh` (`medium` default; `xhigh` valid on the `0.18.1` runner — the old wrapper's `max` was the drift) |
-| **Dispatch verb** | `SG-<nnn> <coder> [effort]` (2-6 tokens, e.g. `SG-001 codex medium`) | ID prefix `SG-` for StorageGenie. Transitional (`ISS-77`): keep params in verb until the `0.18.1` runner parses the short form |
+| **Dispatch verb** | `SG-<nnn> [--status\|--attach\|--force]` (e.g. `SG-021 --force`) | ID prefix `SG-` for StorageGenie. Short form live (cutover 2026-09-09): coder/effort from packet `coder:`/`effort:` head, `--force` bypasses replay guard only, packet resolves `$ID.md\|$ID-*.md` exactly-one |
 | **Harness** | OpenCode — **Class 4** | `HARNESSES.md` — the Class 2 `prompt_async` path is DOCUMENTED with addressing unverified, so this harness operates as Class 4 until a wake probe observes a resume. Checks run the status verb, never the trigger log (`DISPATCH.md` §2c) |
 | **Wrapper** | `/opt/storagegenie-dispatch/dispatch_coder.sh` (`root:root 755`, outside project tree) | Per `PROVISIONING.md:132-142` four fixes — outside `ReadWritePaths`, explicit `PATH`, `ReadWritePaths=~/.codex + ~/.grok`, enumerate `InaccessiblePaths` at dispatch time |
 | **Model policy** | No model id sent; CLI default IS model | Per `CODERS.md` Effort section — effort chosen per slice and recorded, model omitted |
@@ -58,6 +58,6 @@ Pinned pre-conversion state `26e9e8b` (local `automation` head `26e9e8b→9f1cc0
 
 ## Loading
 
-- Session start: this file + global `RULES.md` (via `~/.config/opencode/AGENTS.md`) + `STATE.md:1` RESUME.
+- Session start: this file + `.rules-cache/` (contract `contract-v0.21.1`, git never disk per D138, refreshed off `G-L1`) + `STATE.md:1` RESUME.
 - Before packet: `PACKET.md`; before dispatch: `DISPATCH.md` (+ `PRODUCTION.md:1` because host + SQLite are live).
 - Never copy shared contract into repo — project holds only values and narrowings.

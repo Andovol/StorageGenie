@@ -30,3 +30,6 @@ Thumbs.db
 .vscode/
 .idea/
 *.swp
+
+# Launcher rule cache (D138, 0.21.0) — git, never disk; never tracked
+.rules-cache/
