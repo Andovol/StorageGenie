@@ -45,11 +45,23 @@ honored, repair-prompt retried exactly once per §5.3 then step fails).
 **Tests:** contract tests green on the fake; eval runner scores a 5-fixture smoke corpus and prints the baseline.
 **Deliverable:** eval baseline number recorded (single-run honesty, `G-A3`).
 
-## Slice 3 — SG-027: the one cloud adapter (owner forks F1–F3 gate it)
+## Slice 3 — SG-027: the one cloud adapter (owner forks F1–F3 settled 2026-09-11)
 
-**Outcome:** exactly one provider answers real calls with keys, budget, and privacy controls enforced in code.
-**Files:** modify `backend/app/services/providers/` (new `<provider>.py` adapter: SDK call, JSON repair
-attempt, usage/cost capture, timeouts named); `backend/app/config.py` (named settings: provider id, key
+**Vendors + relay basis:** OpenCode GO docs (endpoints per model; `deepseek-v4-flash-vision-exp` listed) +
+PIP relay 2026-09-11 (chat/completions only, raw httpx, identity headers required, per-model schema modes —
+all cited below as relayed, re-verified live in-slice before building on them).
+**G0 VISION SPIKE FIRST (fail-fast amendment):** before any adapter code, send one real photo through the
+listed vision path and prove an image comes back as structured output. No vision = STOP with the
+vendor response quoted — the Phase 2 premise fails and the fork returns to the owner (different provider
+or rescoped phase), never a workaround. Only on a green spike does the adapter get built.
+**Outcome:** exactly one provider answers real calls with keys, budget posture, and privacy controls
+enforced in code.
+**Files:** modify `backend/app/services/providers/` (new `opencode_go.py` adapter: raw httpx, NO SDK —
+relayed PIP shape; `POST {base}/chat/completions` with `stream: false`; per-model `response_format` map:
+`json_object` for DeepSeek kin, `json_schema` elsewhere — re-verified live, never inherited); identity
+headers MANDATORY on every call (own `User-Agent`, one stable `x-opencode-session` per conversation —
+never `pintel-*`, never random-per-call; relayed 3h outage); guards: reject 200-with-empty-content, require
+non-zero `usage`, strip leading `<think>` only then fail loudly, size `max_tokens` past truncation; `backend/app/config.py` (named settings: provider id, key
 source = backend env ONLY, per-job cost cap, monthly cap, consent flag — all env-overridable, logged when
 they bind, `413`/`422` on breach per cap policy); `.env.example` (key names, never values); redaction helper
 (EXIF-GPS never leaves the box unless ADR-007 consent says so — default strips); `backend/tests/`
