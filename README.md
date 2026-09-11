@@ -37,7 +37,7 @@ docker compose exec backend python -m app.seed
 Check the backend health endpoint:
 
 ```sh
-curl -s http://localhost:8000/v1/health
+curl -s http://localhost:8003/v1/health
 ```
 
 Expected output:
@@ -101,20 +101,20 @@ keep the returned evidence IDs. Create one import job with an idempotency key,
 then run and inspect it:
 
 ```sh
-curl -sS -X POST 'http://localhost:8000/v1/evidence?household_id=<HOUSEHOLD_ID>' \
+curl -sS -X POST 'http://localhost:8003/v1/evidence?household_id=<HOUSEHOLD_ID>' \
   -F 'file=@/path/to/input.jpg;type=image/jpeg'
-curl -sS -X POST 'http://localhost:8000/v1/imports?household_id=<HOUSEHOLD_ID>' \
+curl -sS -X POST 'http://localhost:8003/v1/imports?household_id=<HOUSEHOLD_ID>' \
   -H 'Content-Type: application/json' -H 'Idempotency-Key: <IMPORT_KEY>' \
   -d '{"evidence_ids":["<EVIDENCE_ID_1>","<EVIDENCE_ID_2>"]}'
-curl -sS -X POST 'http://localhost:8000/v1/imports/<JOB_ID>/run?household_id=<HOUSEHOLD_ID>'
-curl -sS 'http://localhost:8000/v1/imports/<JOB_ID>?household_id=<HOUSEHOLD_ID>'
+curl -sS -X POST 'http://localhost:8003/v1/imports/<JOB_ID>/run?household_id=<HOUSEHOLD_ID>'
+curl -sS 'http://localhost:8003/v1/imports/<JOB_ID>?household_id=<HOUSEHOLD_ID>'
 ```
 
 If a run is `FAILED`, inspect the `steps`, `errors`, and `progress` fields, fix
 the input or service condition, and resume the same job once:
 
 ```sh
-curl -sS -X POST 'http://localhost:8000/v1/imports/<JOB_ID>/retry?household_id=<HOUSEHOLD_ID>'
+curl -sS -X POST 'http://localhost:8003/v1/imports/<JOB_ID>/retry?household_id=<HOUSEHOLD_ID>'
 ```
 
 When the job reaches `AWAITING_REVIEW`, use the review queue, candidate detail,
@@ -122,11 +122,11 @@ and candidate decision routes. An accept/edit decision returns `409` while a
 candidate's review tasks remain open; resolve each task first:
 
 ```sh
-curl -sS 'http://localhost:8000/v1/review-tasks?household_id=<HOUSEHOLD_ID>'
-curl -sS 'http://localhost:8000/v1/candidates/<CANDIDATE_ID>?household_id=<HOUSEHOLD_ID>'
-curl -sS -X POST 'http://localhost:8000/v1/review-tasks/<TASK_ID>/resolve?household_id=<HOUSEHOLD_ID>' \
+curl -sS 'http://localhost:8003/v1/review-tasks?household_id=<HOUSEHOLD_ID>'
+curl -sS 'http://localhost:8003/v1/candidates/<CANDIDATE_ID>?household_id=<HOUSEHOLD_ID>'
+curl -sS -X POST 'http://localhost:8003/v1/review-tasks/<TASK_ID>/resolve?household_id=<HOUSEHOLD_ID>' \
   -H 'Content-Type: application/json' -d '{"resolution":"confirmed"}'
-curl -sS -X POST 'http://localhost:8000/v1/candidates/<CANDIDATE_ID>/decision?household_id=<HOUSEHOLD_ID>' \
+curl -sS -X POST 'http://localhost:8003/v1/candidates/<CANDIDATE_ID>/decision?household_id=<HOUSEHOLD_ID>' \
   -H 'Content-Type: application/json' -d '{"action":"accept","corrected_fields":{}}'
 ```
 
@@ -135,9 +135,9 @@ For an expiry-tracker asset, classify it first. If classification returns a
 manual review task and records a user-sourced accepted assertion:
 
 ```sh
-curl -sS -X POST 'http://localhost:8000/v1/plugins/expiry-tracker/assets/<ASSET_ID>/classification?household_id=<HOUSEHOLD_ID>' \
+curl -sS -X POST 'http://localhost:8003/v1/plugins/expiry-tracker/assets/<ASSET_ID>/classification?household_id=<HOUSEHOLD_ID>' \
   -H 'Content-Type: application/json' -d '{"category":"food"}'
-curl -sS -X POST 'http://localhost:8000/v1/plugins/expiry-tracker/assets/<ASSET_ID>/expiry?household_id=<HOUSEHOLD_ID>' \
+curl -sS -X POST 'http://localhost:8003/v1/plugins/expiry-tracker/assets/<ASSET_ID>/expiry?household_id=<HOUSEHOLD_ID>' \
   -H 'Content-Type: application/json' \
   -d '{"expiry_date":"2030-05-06","date_type":"best_before","unit":"piece","source_evidence_ids":["<EVIDENCE_ID>"]}'
 ```

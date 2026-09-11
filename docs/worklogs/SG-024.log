@@ -1,0 +1,50 @@
+SG-024 execution log — opencode / medium — 2026-09-11 ~14:2x UTC
+BASE: automation -> 11d92f159b3ea76aef7e9f498239d36ccd191bb4
+Work dir: /home/andrei/StorageGenie | origin: git@github.com:Andovol/StorageGenie.git
+
+G1 (bounds: 120s probes)
+- git status --porcelain: EMPTY (clean). branch automation, HEAD 11d92f1.
+- docker info: alive, Client+Server 29.6.2, Context rootless. buildx ls: rootless runner running (v0.31.2); `default` builder errors (permission denied on /var/run/docker.sock) — not ours, never selected.
+- listeners: 8000 foreign (no owning pid visible, curl /v1/health -> "Not Found" plain text = NOT our backend), 8001 foreign (uvicorn pid 730504, FastAPI {"detail":"Not Found"} = NOT our backend). 8003/5173: NO LISTENERS (free). Untouched 8000/8001 throughout.
+- docker compose config: VALID as-handed (8000:8000, VITE_API_BASE=http://localhost:8000).
+- premises verified: .cache/buildx exists + .gitignore entry (line 38 `.cache/`); .env present (203B, presence only); README 12x `:8000` lines (:40,104,106,109,110,117,125,126,127,129,138,140); uv 0.11.28 at /usr/local/bin/uv (needed UV_CACHE_DIR=/tmp/uv-cache: HOME cache is read-only).
+- G1 VERDICT: PASS.
+
+G2 (bounds: 300s lock, 1500s build)
+- LOCK-FIRST attempt: `uv pip compile --all-extras --python-version 3.12 backend/pyproject.toml -o /tmp/requirements.lock.new` exit 0. Result: NO hatchling entry (build-system requires are by design invisible to pip-compile of project deps) AND 5 unrelated pins churned (alembic 1.19.1->1.19.2, anyio 4.15.0->4.15.1, ast-serialize 0.9.0->0.11.1, ruff 0.16.5->0.16.7, uuid-utils 0.17.0->1.0.0) — adopting it would violate the HATCHLING-SCOPED constraint. Quoted compile-impossible evidence -> FALLBACK once (PG-IC-03).
+- Resolved pins for fallback: hatchling==1.32.0, editables==0.6 (via `uv pip compile` of hatchling reqs).
+- Fallback line added (backend/Dockerfile:7): RUN pip install --no-cache-dir "hatchling==1.32.0" "editables==0.6"
+  - First attempt with hatchling alone exposed missing `editables` (ModuleNotFoundError from hatchling editable builder under --no-build-isolation --no-deps). Same-layer same-cause family (build-isolation-off room lacks build backend deps); extended the ONE line, no redesign. Reported, not hidden.
+- BUILD ROUTE FINDING: bare `docker compose build` / `docker buildx build` fail with `failed to update builder last activity time: ... read-only file system` because BUILDX_CONFIG was unset in this shell; with BUILDX_CONFIG=/home/andrei/StorageGenie/.cache/buildx (carried D12 route) the build proceeds. (Compose exit code is 0 even on build failure — output text is the verdict source, never the code.)
+- REBUILD with route set: step 8/8 green — "Building editable for storagegenie-backend (pyproject.toml): finished with status 'done'", "Successfully installed storagegenie-backend-0.1.0", image exported+unpacked. No other red layer.
+- requirements.lock: UNTOUCHED (no diff). pyproject.toml: untouched.
+- G2 VERDICT: PASS (via documented fallback).
+
+G3 (bounds: 600s suites; no ports, no live writes)
+- compose run --rm --no-deps backend python -m pytest -v tests/test_signals.py -k "<decoder1> or <decoder2>": 2 passed, 5 deselected in 0.94s. Nodes quoted in report.
+- Full in-image suite (compose run): 66 passed, 11 warnings in 6.38s. Green-except-nothing.
+- NOTE: packet names `venv/bin/python` in-image; image has system python only (no venv) — used `python`, resolved not assumed. Same interpreter family (3.12), pytest collects identically.
+- mypy NOT run: no Python code changed (Dockerfile + compose + README only) — stated, not silently omitted.
+- G3 VERDICT: PASS. ISS-1 owned HERE (no further carry).
+
+G4 (bounds: 600s suites; precondition 8003+5173 free reconfirmed)
+- Pre-bind recheck immediately before up: PREBIND-FREE-8003-5173; 8000/8001 still foreign.
+- Remap diff: docker-compose.yml `8000:8000`->`8003:8000`, VITE_API_BASE -> http://localhost:8003; README 12x localhost:8000 -> localhost:8003 (verified: grep -c 8000 = 0, grep -c 8003 runbook lines = 12). Container-internal port 8000 unchanged; CORS_ORIGINS :5173 unchanged. `docker compose config` valid (published 8003, VITE_API_BASE :8003).
+- `docker compose up -d --build`: backend Built, frontend Built; backend reached Healthy before frontend started (depends_on service_healthy).
+- Health: curl http://localhost:8003/v1/health -> {"status":"ok","db":"ok","storage":"ok"} (our backend answering; no collision).
+- Exec suite: compose exec -T backend pytest -q tests/ -> 66 passed in 6.49s.
+- UI: dev-server HTML shell via curl :5173 (DOCTYPE, <title>StorageGenie</title>, div#root, /src/main.tsx) — served bytes, not a log line. (npm run build NOT run; OR-leg satisfied by shell proof.)
+- Restart: compose restart backend -> Started; ps shows `Up 15 seconds (healthy)` + `0.0.0.0:8003->8000/tcp`; health JSON ok post-restart; 3x inspect Health.Status = healthy/healthy/healthy.
+- Zero catalog writes: all suites ran against temp DBs; live DB only health-probed. One read-only integrity probe (`pragma integrity_check` -> ok) via host venv python; table-name guess in same probe errored (no such table: households) — probe artifact only, no write, no defect.
+- RUNTIME-DIRT FINDING: running/stopping the stack (and even a read-only sqlite open) creates data/db/*-shm/-wal sidecars NOT covered by .gitignore (`data/db/*.db` matches only the main file). Removed the 0B-wal + shm remnant with no holders (fuser exit 1) AFTER final proofs; integrity `ok` confirmed before removal. No .gitignore change (out of ceiling). Follow-up destination: a future slice may propose ignoring `data/db/*.db-shm` + `*.db-wal` (owner decision, not taken here).
+- End state: stack STOPPED after proof (compose stop; matches SG-023 end-state of 0 running containers). `up -d` restores :8003/:5173.
+- G4 VERDICT: PASS.
+
+G5: this log + SG-024_report.md (CO-57). ELF: legs observed within bounds (pytest 0.94s/1.66s/6.38s/6.49s of 600s; lock ~60s of 300s; build well within 1500s; probes within 120s; whole slice far below 1800s early-close / 2100s overall — leg wall-clock not separately instrumented, no bound approached).
+
+G6: commit+push to automation, worktree clean (only M README.md, M backend/Dockerfile, M docker-compose.yml + 2 worklogs), notes ref note with Dispatch-ID + Report, verified via show, result note=yes|no recorded in report.
+
+MODEL: unknown (no --model in `opencode run --auto --dir /home/andrei/StorageGenie --variant medium` parent argv; CLI default per policy). EFFORT: medium (--variant medium, same argv). Provenance quoted in report.
+UNCLEAR (FIRST READ): none — every premise verified live before use.
+UNCLEAR (DURING EXECUTION): none blocking — two findings (BUILDX_CONFIG unset in fresh shell; editables gap) both resolved inside bounds and quoted.
+UNCLEAR (REMAINING): *-shm/-wal gitignore gap (destination named above); next slice re-runs `up -d` to restore live :8003.
