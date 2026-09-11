@@ -1,0 +1,91 @@
+SG-023 worklog — manual compose pass (opencode, medium) under D30
+BASE ref: automation @ e0adff9e36e76ab1ea427dcb4237fb605e4f884b (packet tip at start)
+Work dir: /home/andrei/StorageGenie | origin: git@github.com:Andovol/StorageGenie.git
+Slice start: 2026-09-11 14:14:08 UTC | RUN_BUDGET_S=2100 (early-close 1800 s)
+
+LEG G1 — capability + collision probe (bound 120 s, actual ~75 s) — PASS
+- `git status --porcelain` → empty (clean; wedge question stays closed, SG-022 LEG4 clean confirmed).
+- `git log --oneline -5` → e0adff9 (SG-023 packet) / 76cae84 (D29) / c1f46b0 / 82312ef / cf2f157.
+- `which docker` → /usr/bin/docker. `docker info` exit 0: Server 29.6.2, rootless, Context rootless,
+  Docker Root Dir /home/andrei/.local/share/docker, Containers 0 Running 0 Images 0.
+  No denial — whole-slice STOP not triggered. Binaries: python3 /usr/bin/python3 (3.12.3),
+  curl /usr/bin/curl, pytest not on host PATH (in-image path reserved, never assumed).
+- `docker context ls` → rootless * (unix:///run/user/1000/docker.sock); default errs on
+  /var/run/docker.sock (expected, no root socket — not a finding).
+- `docker buildx ls` (BUILDX_CONFIG unset at probe time) → rootless* driver docker,
+  node rootless running v0.31.2 linux/amd64 (+3); default builder error:
+  "Cannot load builder default: permission denied while trying to connect to the docker API
+  at unix:///var/run/docker.sock" (expected under rootless, not a STOP).
+- Port occupancy (`ss -tlnp` + /dev/tcp + curl /v1/health, read-only):
+  8000 OPEN — ss 127.0.0.1:8000 LISTEN (no process name in unprivileged view), curl :8000/v1/health → 404.
+    Foreign occupant, EXPECTED per desk #18 — recorded, not touched, no stop.
+  8001 OPEN — ss 127.0.0.1:8001 LISTEN users:(("uvicorn",pid=730504,fd=7)), curl → 404.
+    Foreign (shoperos-api), EXPECTED — recorded, not touched, no stop.
+  8003 CLOSED — /dev/tcp connection refused, curl exit 7 (000). Free of foreign occupants → G4 gate passes.
+  5173 CLOSED — /dev/tcp connection refused, curl exit 7 (000). Free → G4 gate passes.
+  Cross-check: 0.0.0.0:8002 python pid=3780707 (desk foreign map shoperos-mcp) — consistent, untouched.
+  Occupancy signal obtainable (ss + /dev/tcp + curl all worked) — blind-bind STOP not triggered.
+- `docker compose config` exit 0 (CONFIG_EXIT:0) — valid as-handed.
+- `.env` presence: -rw------- 600, 203B — present; contents never read (CO-44).
+- `frontend/Dockerfile` EXISTS (181B, node:20-alpine, EXPOSE 5173) — premise confirmed.
+- Handed-tree verification deltas (PG-IC-09, correcting the packet where it differs):
+  compose still publishes 8000:8000 (D20 remap NOT yet applied — no prior attempt applied it);
+  VITE_API_BASE still http://localhost:8000 (not yet carried); README names :8000 on 11 lines
+  (:40,104,106,109,110,117,125,126,127,129,138,140 — packet said ~10, actual 12 incl :40);
+  .gitignore had NO .cache entry and .cache/ did NOT exist (SG-021 crash left neither behind).
+  Backend Dockerfile line 3 apt install curl tesseract-ocr libzbar0 — confirmed as-handed.
+
+LEG G2 — builder-state placement + image build (build bound 1500 s) — STOP (apt GREEN, pip layer RED)
+- Desk #18 route applied FIRST, verify-first: .cache/ absent + .gitignore entry absent → created
+  .cache/buildx (mkdir -p, empty at creation) + added one .gitignore entry:
+  "# Buildx builder-state (SG-023 desk #18 route — project-local, never committed per PG-SC-10)" + ".cache/".
+  /home/andrei/.docker/buildx never touched; DOCKER_CONFIG never relocated (stayed unset).
+- BUILDX_CONFIG=/home/andrei/StorageGenie/.cache/buildx exported for every build invocation.
+- `docker buildx ls` under route → rootless* running v0.31.2 (same selection, quoted above);
+  activity-path read-only failure did NOT recur under this route (no denial observed) — desk route holds.
+- Attempt 1 `docker compose build backend` (14:14:33 UTC, actual 22.8 s of 1500 s budget) → exit 1.
+  Failing layer quoted: `> [7/7] RUN pip install --no-cache-dir --no-build-isolation --no-deps -e .:`
+  `pip._vendor.pyproject_hooks._impl.BackendUnavailable: Cannot import 'hatchling.build'` (exit code 2).
+  Dockerfile:7. No Dockerfile redesign attempted (ceiling STOP wins per PG-IC-03).
+- Attempt 2 (L2 single transient retry, 14:15:06 UTC, actual ~20 s) → exit 1, identical failure;
+  apt step `[3/7] RUN apt-get update && apt-get install -y --no-install-recommends curl tesseract-ocr
+  libzbar0 && rm -rf /var/lib/apt/lists/*` shows CACHED (succeeded on attempt 1, reused on retry).
+  Deterministic, not transient — retry itch ends here, STOP stands.
+- Defect destination (new finding, not pre-existing — no base-commit claim made):
+  backend/pyproject.toml:51-52 `requires = ["hatchling"]`, `build-backend = "hatchling.build"`, but
+  backend/requirements.lock (uv pip compile output) contains NO hatchling entry (grep hatch → only the
+  pyproject tool.hatch section); Dockerfile installs requirements.lock then runs
+  `pip install --no-build-isolation --no-deps -e .` which needs hatchling present without isolation.
+  Fix belongs to a follow-up slice (Dockerfile and/or lock change exceeds this slice's ceiling) — reported,
+  never quietly edited.
+
+LEG G3 — ISS-1 re-proof in image (needs built image) — UNANSWERED (blocked by G2 STOP)
+- No image → `docker compose run` gate never invoked (invoking it image-less would fail vacuously;
+  not run, loudly reported instead). Decoder node IDs resolved for the follow-up (not executed):
+  tests/test_signals.py::test_generated_codes_are_validated_and_bad_checksum_is_not_an_identifier
+  (barcode_qr via qrcode+EAN, exercises pyzbar/libzbar path in app/services/signals.py:100-113) and
+  tests/test_signals.py::test_ocr_has_text_boxes_and_mean_confidence (tesseract path).
+  ISS-1 stays owned by THIS pass per packet — carried as exact delta, no further carry authorized.
+- mypy not run (no code change in slice — stated, not silently omitted).
+
+LEG G4 — remap, up, health, suites, UI, restart — UNANSWERED (blocked by G2 STOP; ports gate had passed)
+- Ports gate HAD passed (8003+5173 free, 8000+8001 foreign expected) but up needs the image G2 failed to
+  produce. D20 remap deliberately NOT applied: applying compose/README changes without the live proof
+  (up+health on :8003) would leave an unproved product change in the tree. Remap files stay as-handed
+  (8000:8000, VITE_API_BASE :8000, README :8000 lines) — exact delta for follow-up.
+- No containers started by this slice (`docker info` showed 0; none started after) — live-state ledger:
+  nothing runs under this project; foreign listeners on 8000/8001/8002 untouched; 8003/5173 still free
+  at probe time (candidate, not reservation — recheck owed before any future bind).
+- Zero catalog writes performed (no health/suite/shell against live service — none exists to write to).
+
+LEG G5 — worklog + report — SHIPPED (this file + SG-023_report.md)
+LEG G6 — receipt note — pending at log write time; see report.
+MODEL: unknown (no model id in `opencode run` argv or environment; CLI default per policy — stated, not guessed)
+EFFORT: medium (provenance: parent process argv `opencode run --auto --dir /home/andrei/StorageGenie
+  --variant medium ...`, quoted from /proc/$PPID/cmdline)
+CODER: opencode (argv + CODER=opencode + OPENCODE=1 in environment)
+
+UNCLEAR — FIRST READ: none (packet G-structure matched SG-021/SG-022 prior art; all premises verifiable).
+UNCLEAR — DURING EXECUTION: none (every probe produced a signal; build failure signature unambiguous).
+UNCLEAR — REMAINING: whether the follow-up fixes the pip layer via lock (add hatchling) or Dockerfile
+  (drop --no-build-isolation / install hatchling first) — desk/owner design call, not made here.

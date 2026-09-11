@@ -33,3 +33,6 @@ Thumbs.db
 
 # Launcher rule cache (D138, 0.21.0) — git, never disk; never tracked
 .rules-cache/
+
+# Buildx builder-state (SG-023 desk #18 route — project-local, never committed per PG-SC-10)
+.cache/
