@@ -76,9 +76,11 @@ Parked LIFTED 2026-09-10: desk ANSWERED + CLOSED #18 (builder route = project-lo
 - `D26` (2026-09-11, owner session-label "D3", same quote): SG-021 re-fire stays HELD pending owner host-tree-clean + quota-reset confirmation; `0.22.0` adoption changes nothing on the host.
 - `D28` (2026-09-11, proposed, never answered): SUPERSEDED by `D29` — codex-quota gate moot after the Coder switch.
 - `D29` (2026-09-11, owner quote "Going forward use OpenCode as coder."): Coder codex→opencode; `AGENTS.md` re-selected, `m0106` superseded (history kept); effort default `medium`, uncalibrated (`G-A9`); 128 KiB packet ceiling standing.
+- `D30` (2026-09-11, owner quote "D30 - approved."): SG-023 manual compose pass FIRES — SG-021 scope retargeted to opencode/`medium`, L2 single slice one retry, bounds D12+D20+`BUILDX_CONFIG` carried.
+- `D31` (2026-09-11, owner quote "D31 - ok."): autonomy STAYS L2 through SG-023; L3 revisited for the Phase 2 stage after SG-023 lands (new Coder uncalibrated, live surfaces, stage not closed).
 - Architect miss M1 (2026-09-07, self-caught): rewrote the RESUME status line from memory and deleted durable L3/SG-008 context; repaired by restoring verbatim + appending. Counter-rule: status lines are restore-then-append, never rewritten — diff every state edit before committing.
 
-**How owner wants work done (differs from defaults):** High-level overview in chat; full technical detail on disk. Coder does all build/deploy on VPS (`G-O1`). Confirm before any ambiguous/destructive act (`G-C1`). Batch file edits into few section-sized replacements, not many line-level ones (owner efficiency directive m0113). `My recommendation` always bold in owner-facing text (quote m0072: "Always put "My recommendation" text in bold, so I can easily see it.").
+**How owner wants work done (differs from defaults):** High-level overview in chat; full technical detail on disk. Coder does all build/deploy on VPS (`G-O1`). Confirm before any ambiguous/destructive act (`G-C1`). Batch file edits into few section-sized replacements, not many line-level ones (owner efficiency directive m0113). `My recommendation` always bold in owner-facing text (quote m0072: "Always put "My recommendation" text in bold, so I can easily see it."). Report the Coder model after every slice (owner directive 2026-09-11: opencode serves multiple models).
 
 ---
 
