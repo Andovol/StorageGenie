@@ -1,0 +1,30 @@
+SG-022 worklog — opencode lane proof (read-only probe)
+START_UTC 2026-09-11T12:41:48Z
+BASE cf2f157291177524d93d5b89cfe7d218a4fd2856 (automation, pre-work HEAD)
+effort provenance: $OPENCODE_PID command line = "opencode run --auto --dir /home/andrei/StorageGenie --variant low" -> --variant low => effort=low
+model provenance: no --model flag on command line; opencode.jsonc has no provider/model block; no OPENAI_/ANTHROPIC_/provider env vars => model=unknown (CLI default)
+
+LEG1 contract read (read-only)
+- path read: /home/andrei/storagegenie-contract/CODER.md (NOT /opt/storagegenie-dispatch/ and NOT ~/.config/opencode/ — both lack CODER.md; AGENTS.md §"Method routing" claim is stale)
+- first line verbatim: "# Coder operating contract"
+- contract version line (line 3): "**Contract version: 0.22.0**"
+- FINDING: packet hypothesized first-line/version "0.21.1"; actual host copy is 0.22.0. Host copy does NOT predate recorded 0.22.0. Divergence from packet premise, not a stop.
+
+LEG2 launch + provider
+- launch shape (process args, $OPENCODE_PID): opencode run --auto --dir /home/andrei/StorageGenie --variant low
+- provider authenticated: unknown. This run is a direct opencode launch, NOT the dispatch forced-command wrapper, so no OAuth refresh path was exercised. Desk note's "OAuth refresh vs API-key fallback" framing applies to the wrapper path and is not applicable here. Evidence: no --provider/--model flag; opencode.jsonc (mcp only) defines no provider; env has no provider/key vars. Per CO-78 model=unknown.
+
+LEG3 health (in-process TestClient, 120s bound, no network/port)
+- command: venv/bin/python -c "from fastapi.testclient import TestClient; from app.main import app; print(TestClient(app).get('/v1/health').json())" (run from backend/)
+- stdout JSON verbatim: {'status': 'error', 'db': 'error', 'storage': 'error'}
+- stderr: StarletteDeprecationWarning (httpx/starlette.testclient deprecated) — non-fatal, module still answered.
+- In-scope: in-process only. No port/network call made.
+
+LEG4 git status (read-only, do NOT touch dirt)
+- command: git status --porcelain
+- output: EMPTY (zero lines)
+- FINDING: packet expected SG-021 wedge dirt ("dirty_unattributable"). None present. Premise false — reported, not bent. No stage/stash/clean/amend performed.
+
+SCOPE: probe-and-report only. Permitted writes this slice: docs/worklogs/SG-022.log, docs/worklogs/SG-022_report.md, G6 notes ref. No product/compose/port/migration change.
+
+G6 plan: commit SG-022.log + SG-022_report.md to automation; push origin automation; git notes --ref=refs/notes/storagegenie-coder-reports add on WORK_HEAD; push notes ref; verify note locally + expect runner to read from remote.
