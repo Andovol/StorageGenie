@@ -16,6 +16,8 @@ frontend/.vite/
 
 # Data (never commit)
 data/db/*.db
+data/db/*.db-shm
+data/db/*.db-wal
 data/db/*.sqlite
 data/storage/
 storage_data/
