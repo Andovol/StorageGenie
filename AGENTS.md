@@ -1,7 +1,7 @@
 # StorageGenie — project configuration
 
 > **Canonical for this repo. `CLAUDE.md` is a one-line adapter `@AGENTS.md` — edit here, never there.**
-> Rule-set version this project records: **0.21.1** (shared `VERSION` @ `0.21.1`, contract tag `contract-v0.21.1` @ `0a38d47`, `.rules-cache/` clean, `RULES.md` 20673B CR0 + `run-coder` 36044B CR0 verified 2026-09-10, D138 git-never-disk per Launcher `CHANGELOG.md:0.21.0-0.21.1`).
+> Rule-set version this project records: **0.22.0** (shared `VERSION` @ `0.22.0`, contract tag `contract-v0.22.0` @ `9baadc7`, `.rules-cache/` clean, `RULES.md` 20862B CR0 + `run-coder` 36044B CR0 verified 2026-09-11, D138 tag route per `contract-v0.22.0` note).
 
 ## Configuration table — the single source of every project value
 
@@ -58,6 +58,6 @@ Pinned pre-conversion state `26e9e8b` (local `automation` head `26e9e8b→9f1cc0
 
 ## Loading
 
-- Session start: this file + `.rules-cache/` (contract `contract-v0.21.1`, git never disk per D138, refreshed off `G-L1`) + `STATE.md:1` RESUME.
+- Session start: this file + `.rules-cache/` (contract `contract-v0.22.0`, tag checkout per D138, refreshed off `G-L1`) + `STATE.md:1` RESUME.
 - Before packet: `PACKET.md`; before dispatch: `DISPATCH.md` (+ `PRODUCTION.md:1` because host + SQLite are live).
 - Never copy shared contract into repo — project holds only values and narrowings.
