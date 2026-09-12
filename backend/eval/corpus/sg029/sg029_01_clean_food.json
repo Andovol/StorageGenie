@@ -1,0 +1,54 @@
+{
+  "id": "sg029-01-clean-food",
+  "class": "clean",
+  "category": "food",
+  "image": "images/sg029_01_clean_food.png",
+  "note": "Synthetic front-lit milk label: name and full best-before date legible. Deterministic recipe (generate.py); no EXIF/GPS.",
+  "ground_truth": {
+    "items": [
+      {
+        "name": "Milk",
+        "expiry_date": "2031-03-15"
+      }
+    ],
+    "unknowns": [],
+    "needs_evidence": false,
+    "expectation_class": "exact"
+  },
+  "provider_output": {
+    "items": [
+      {
+        "name": "MILK",
+        "expiry_date": "2031-03-15",
+        "date_type": "best_before",
+        "lot": null,
+        "confidence": 1.0,
+        "uncertainty_reasons": []
+      }
+    ],
+    "unknowns": [],
+    "needs_evidence": false
+  },
+  "provider_calls": [
+    {
+      "provider": "opencode-go",
+      "model": "deepseek-v4-flash-vision-exp",
+      "latency_ms": 2904.921288136393,
+      "usage": {
+        "prompt_tokens": 754,
+        "completion_tokens": 455,
+        "total_tokens": 1209,
+        "prompt_cache_hit_tokens": 512,
+        "prompt_cache_miss_tokens": 242,
+        "prompt_tokens_details": {
+          "cached_tokens": 512
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 399
+        }
+      },
+      "cost": 0.0003861,
+      "error_state": null
+    }
+  ]
+}

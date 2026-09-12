@@ -99,6 +99,24 @@ def load_prompt(category: str) -> tuple[str, str]:
     return text, version
 
 
+def repair_prompt(prompt: str) -> str:
+    """The §5.3 repair message appended for the ONE retry (SG-029).
+
+    The base prompt is a frozen versioned file and is never edited; this is the
+    runtime repair turn the prompt's own `## Repair` section describes. The
+    SG-029 metered run showed the vision model prepending the requested
+    `response_format` object (`{"type": "json_object"}`) before the real payload,
+    which no blind re-send could correct.
+    """
+    return (
+        prompt
+        + "\n\n## Repair\n"
+        + "Your previous response was rejected as invalid JSON. Return ONE JSON object "
+        + "with keys `items`, `unknowns`, `needs_evidence` and nothing else. Do NOT "
+        + 'prepend a `{"type": "json_object"}` wrapper, a code fence, or any prose.'
+    )
+
+
 def _job_evidence_ids(job: Job) -> list[str]:
     config = json.loads(job.config_snapshot or "{}")
     value = config.get("evidence_ids", [])
@@ -155,6 +173,52 @@ def _write_ledger(
     return row
 
 
+def _estimate_call(provider: Any, image_bytes: bytes, prompt: str) -> float:
+    """Bounded worst-case cost handed to the router BEFORE any call (SG-029 G0).
+
+    A provider with no rate table (the test doubles) reports 0.0, so caps bind
+    only where a real estimate exists — never on a guessed number.
+    """
+    estimator = getattr(provider, "estimate_cost", None)
+    if callable(estimator):
+        return float(estimator(image_bytes, prompt))
+    return 0.0
+
+
+def _write_error_ledger(
+    db: Session,
+    job: Job,
+    provider_id: str,
+    model_id: str,
+    template_version: str,
+    image_bytes: bytes,
+    exc: ProviderError,
+) -> ProviderCall:
+    """Persist a failed provider call. COMMITTED so `run_job`'s rollback cannot erase it.
+
+    Cost/usage are whatever the error actually carried (`0.0`/absent when the
+    failure happened before a completed 200 body).
+    """
+    usage = getattr(exc, "usage", None)
+    cost = getattr(exc, "cost", None)
+    latency_ms = getattr(exc, "latency_ms", None)
+    row = ProviderCall(
+        provider=provider_id,
+        model=str(model_id or settings.sg_model_id),
+        prompt_template_version=template_version,
+        input_hashes=json.dumps({"image_sha256": hashlib.sha256(image_bytes).hexdigest()}),
+        output_payload=None,
+        cost=float(cost) if cost is not None else 0.0,
+        usage_json=json.dumps(usage, ensure_ascii=False) if usage else None,
+        latency_ms=float(latency_ms) if latency_ms is not None else None,
+        error_state=f"{getattr(exc, 'kind', 'error')}: {exc}"[:200],
+        job_id=job.id,
+    )
+    db.add(row)
+    db.commit()
+    return row
+
+
 def _extract_one(
     db: Session,
     job: Job,
@@ -162,16 +226,36 @@ def _extract_one(
     image_bytes: bytes,
     prompt: str,
     provider_id: str,
+    model_id: str,
     template_version: str,
+    estimated_cost: float,
 ) -> tuple[ExtractionOutput, list[str]]:
-    """One evidence, one logical call, at most one repair (§5.3)."""
+    """One evidence, one logical call, at most one repair (§5.3).
+
+    Every failed attempt leaves a committed `error_state` ledger row; a budget
+    refusal raises before any provider call and therefore writes no row.
+    """
     call_ids: list[str] = []
+    attempt = {"n": 0}
 
     def supply() -> object:
+        attempt["n"] += 1
+        call_prompt = prompt if attempt["n"] == 1 else repair_prompt(prompt)
         try:
-            result = router.execute("extract_items", image_bytes, prompt)
+            result = router.execute(
+                "extract_items", image_bytes, call_prompt, estimated_cost=estimated_cost
+            )
         except PydanticValidationError as exc:
-            raise ProviderError("invalid_json", "adapter schema parse failed") from exc
+            provider_exc = ProviderError("invalid_json", "adapter schema parse failed")
+            _write_error_ledger(
+                db, job, provider_id, model_id, template_version, image_bytes, provider_exc
+            )
+            raise provider_exc from exc
+        except ProviderError as exc:
+            _write_error_ledger(
+                db, job, provider_id, model_id, template_version, image_bytes, exc
+            )
+            raise
         row = _write_ledger(db, job, provider_id, template_version, image_bytes, result)
         call_ids.append(row.id)
         return result.normalized_output
@@ -225,8 +309,17 @@ def run_ai_extraction(db: Session, job: Job) -> dict[str, object]:
     for evidence in evidence_rows:
         raw = resolve_original_bytes(db, evidence.id)
         redacted = redact_image(raw)
+        estimate = _estimate_call(provider, redacted, prompt)
         output, evidence_call_ids = _extract_one(
-            db, job, router, redacted, prompt, provider_id, template_version
+            db,
+            job,
+            router,
+            redacted,
+            prompt,
+            provider_id,
+            model_id,
+            template_version,
+            estimate,
         )
         offset = len(items)
         items.extend(item.model_dump() for item in output.items)

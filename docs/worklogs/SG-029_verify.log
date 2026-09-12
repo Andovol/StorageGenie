@@ -1,0 +1,111 @@
+SG-029 verify log — raw runs and transcripts (bound: probes 120s, fixture legs 600s, metered 900s, early-close 1800s, overall 2400s)
+
+=== 0. Starting tree + BASE ===
+$ git branch --show-current ; git rev-parse HEAD ; git status --porcelain
+automation
+b334a971f12cd0225580a99e2c56fe0841fae39b
+(empty — clean tree; observed at dispatch start before any edit)
+BASE REF: automation -> resolved commit b334a971f12cd0225580a99e2c56fe0841fae39b
+
+=== 1. G0 PRE-FIX (tests present, fix absent) — bound 120s, actual 0.72s ===
+$ cd backend && venv/bin/python -m pytest tests/test_ai_pipeline.py -k "cap_binds or ledgered" -q
+FF                                                                       [100%]
+...
+>       assert provider.invocations == 0
+E       assert 1 == 0
+tests/test_ai_pipeline.py:486: AssertionError
+...
+>       assert len(rows) == 2
+E       assert 0 == 2
+tests/test_ai_pipeline.py:509: AssertionError
+...
+FAILED tests/test_ai_pipeline.py::test_cap_binds_from_pipeline_zero_calls_zero_rows
+FAILED tests/test_ai_pipeline.py::test_provider_error_is_ledgered_and_survives_rollback
+2 failed, 11 deselected, 2 warnings in 0.72s
+
+=== 2. G0 POST-FIX — bound 120s, actual 0.72s ===
+$ cd backend && venv/bin/python -m pytest tests/test_ai_pipeline.py -k "cap_binds or ledgered" -q
+..                                                                       [100%]
+2 passed, 11 deselected, 2 warnings in 0.72s
+
+=== 3. Full AI pipeline file (13 tests) — actual 1.73s ===
+$ cd backend && venv/bin/python -m pytest tests/test_ai_pipeline.py -q
+13 passed, 2 warnings in 1.73s
+
+=== 4. Corpus integrity + scorer discrimination — bound 600s, actual 0.27s ===
+$ cd backend && venv/bin/python -m pytest tests/test_eval_corpus.py -q
+......                                                                   [100%]
+6 passed in 0.27s
+$ cd backend && venv/bin/python eval/run.py --check-only
+corpus integrity OK: 7 fixtures (manifest count 7)
+
+=== 5. Offline scoring reproducible from the committed cache — bound 120s ===
+$ cd backend && venv/bin/python eval/run.py
+fixture sg029-01-clean-food: score=1.000 needs=1 unknowns=1 items=1.00
+fixture sg029-02-clean-medicine: score=1.000 needs=1 unknowns=1 items=1.00
+fixture sg029-03-glare-food: score=0.000 needs=0 unknowns=0 items=0.00
+fixture sg029-04-clutter-food: score=1.000 needs=1 unknowns=1 items=1.00
+fixture sg029-05-partial-label-food: score=0.667 needs=1 unknowns=0 items=1.00
+fixture sg029-06-partial-label-medicine: score=1.000 needs=1 unknowns=1 items=1.00
+fixture sg029-07-no-date-visible-medicine: score=0.667 needs=1 unknowns=0 items=1.00
+field_accuracy=0.762 over 7 fixtures
+unknown_rate=2/5=0.400
+correction_rate=0/4=0.000 (audit_event plugin.assertion.write rows=4)
+
+=== 6. METERED ATTEMPT 1 (aborted on fixture 1 parse) — bound 900s, actual 5s ===
+$ SG_CONSENT=true SG_PROVIDER_ID=opencode-go venv/bin/python backend/eval/run.py --live
+SPEND CEILING=$0.05; mode=live provider=opencode-go
+app.services.providers.schemas.ExtractionFailedError: extraction supply failed (attempt 2/2, kind=invalid_json)
+  cause: pydantic ValidationError for ExtractionOutput: items/unknowns required; prose extra
+  input_value={'prose': '{"type": "json_object"}{...}...needs_evidence": false}'}
+  (the model returned two concatenated JSON objects; no call cost was ledgered on the error path)
+
+=== 7. METERED BASELINE RUN (ONE successful run) — bound 900s, actual 20s ===
+$ SG_CONSENT=true SG_PROVIDER_ID=opencode-go venv/bin/python backend/eval/run.py --live
+SPEND CEILING=$0.05; mode=live provider=opencode-go
+call fixture=sg029-01-clean-food provider=opencode-go model=deepseek-v4-flash-vision-exp latency_ms=2904.921288136393 usage={"prompt_tokens": 754, "completion_tokens": 455, "total_tokens": 1209, "prompt_cache_hit_tokens": 512, "prompt_cache_miss_tokens": 242, "prompt_tokens_details": {"cached_tokens": 512}, "completion_tokens_details": {"reasoning_tokens": 399}} cost=$0.000386 error_state=None
+fixture sg029-01-clean-food: cached provider_output; fixture_spend=$0.000386
+call fixture=sg029-02-clean-medicine provider=opencode-go model=deepseek-v4-flash-vision-exp latency_ms=2588.2745319977403 usage={"prompt_tokens": 785, "completion_tokens": 316, "total_tokens": 1101, "prompt_cache_hit_tokens": 0, "prompt_cache_miss_tokens": 785, "prompt_tokens_details": {"cached_tokens": 0}, "completion_tokens_details": {"reasoning_tokens": 244}} cost=$0.000307 error_state=None
+fixture sg029-02-clean-medicine: cached provider_output; fixture_spend=$0.000307
+call fixture=sg029-03-glare-food provider=opencode-go model=deepseek-v4-flash-vision-exp latency_ms=2881.42925594002 usage={"prompt_tokens": 754, "completion_tokens": 341, "total_tokens": 1095, "prompt_cache_hit_tokens": 384, "prompt_cache_miss_tokens": 370, "prompt_tokens_details": {"cached_tokens": 384}, "completion_tokens_details": {"reasoning_tokens": 269}} cost=$0.000318 error_state=None
+fixture sg029-03-glare-food: cached provider_output; fixture_spend=$0.000318
+call fixture=sg029-04-clutter-food provider=opencode-go model=deepseek-v4-flash-vision-exp latency_ms=2641.315091867 usage={"prompt_tokens": 754, "completion_tokens": 355, "total_tokens": 1109, "prompt_cache_hit_tokens": 384, "prompt_cache_miss_tokens": 370, "prompt_tokens_details": {"cached_tokens": 384}, "completion_tokens_details": {"reasoning_tokens": 284}} cost=$0.000326 error_state=None
+fixture sg029-04-clutter-food: cached provider_output; fixture_spend=$0.000326
+call fixture=sg029-05-partial-label-food provider=opencode-go model=deepseek-v4-flash-vision-exp latency_ms=3468.4823430143297 usage={"prompt_tokens": 754, "completion_tokens": 546, "total_tokens": 1300, "prompt_cache_hit_tokens": 384, "prompt_cache_miss_tokens": 370, "prompt_tokens_details": {"cached_tokens": 384}, "completion_tokens_details": {"reasoning_tokens": 474}} cost=$0.000441 error_state=None
+fixture sg029-05-partial-label-food: cached provider_output; fixture_spend=$0.000441
+call fixture=sg029-06-partial-label-medicine provider=opencode-go model=deepseek-v4-flash-vision-exp latency_ms=2608.2154558971524 usage={"prompt_tokens": 785, "completion_tokens": 214, "total_tokens": 999, "prompt_cache_hit_tokens": 384, "prompt_cache_miss_tokens": 401, "prompt_tokens_details": {"cached_tokens": 384}, "completion_tokens_details": {"reasoning_tokens": 128}} cost=$0.000246 error_state=None
+fixture sg029-06-partial-label-medicine: cached provider_output; fixture_spend=$0.000246
+call fixture=sg029-07-no-date-visible-medicine provider=opencode-go model=deepseek-v4-flash-vision-exp latency_ms=2779.090258292854 usage={"prompt_tokens": 785, "completion_tokens": 311, "total_tokens": 1096, "prompt_cache_hit_tokens": 384, "prompt_cache_miss_tokens": 401, "prompt_tokens_details": {"cached_tokens": 384}, "completion_tokens_details": {"reasoning_tokens": 214}} cost=$0.000304 error_state=None
+fixture sg029-07-no-date-visible-medicine: cached provider_output; fixture_spend=$0.000304
+TOTAL_SPEND=$0.002328 of ceiling $0.05
+(offline scores: field_accuracy=0.762; unknown_rate=2/5=0.400; correction_rate=0/4=0.000)
+
+=== 8. PG-EV-04 (bytes handed to provider = redacted PNG; prompt = exact versioned file) ===
+$ cd backend && venv/bin/python -m pytest "tests/test_ai_pipeline.py::test_provider_call_ledger_row_per_call_with_job_link" -v
+tests/test_ai_pipeline.py::test_provider_call_ledger_row_per_call_with_job_link PASSED [100%]
+1 passed, 2 warnings in 0.71s
+(asserts: provider.images[0][:8] == b"\x89PNG\r\n\x1a\n"; dict(Image.open(...).getexif()) == {};
+ provider.prompts == [reader.load_prompt("food")[0]] == [extract-food-v1.md content])
+
+=== 9. Full backend suite from backend/ — bound 600s, actual 6.22s ===
+$ cd backend && venv/bin/python -m pytest -q
+FAILED tests/test_signals.py::test_generated_codes_are_validated_and_bad_checksum_is_not_an_identifier
+FAILED tests/test_signals.py::test_ocr_has_text_boxes_and_mean_confidence
+2 failed, 106 passed, 11 warnings in 6.22s
+(base-proved decoder environment reds: pyzbar/libzbar absent; tesseract absent)
+
+=== 10. ruff — bound 120s ===
+$ cd backend && venv/bin/python -m ruff check .
+All checks passed!
+
+=== 11. mypy — bound 300s ===
+$ cd backend && venv/bin/python -m mypy app
+Found 40 errors in 9 files (checked 59 source files)
+(identical count to the base; grep of the report for reader.py/opencode_go.py/run.py -> none in touched files)
+
+=== 12. Prompt / migration / secret gates ===
+$ git diff --stat -- backend/app/services/providers/prompts/    -> (empty; no prompt file changed)
+$ git status --short -- backend/alembic                        -> (empty; no migration)
+$ git grep -nE 'sk-[A-Za-z0-9_-]{20,}' -- . ':(exclude)backend/venv'  -> 0 matches
+$ (python) scan all 256 tracked files for the literal .env OPENCODE_API_KEY value -> NONE
+$ git check-ignore -v .env  -> .gitignore:6:.env  .env (ignored, never committed)

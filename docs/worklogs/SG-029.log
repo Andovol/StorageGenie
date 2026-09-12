@@ -1,0 +1,44 @@
+SG-029 worklog — Food/Medicine eval corpus + first metered baseline (opencode, medium)
+
+Coder model/effort (process args + provider metadata, never an identity line): argv
+`opencode run --auto --dir /home/andrei/StorageGenie --variant medium "<packet>"` -> effort=medium; model flag absent
+(CLI default). Provider metadata providerID=opencode-go modelID=deepseek-v4.1-flash
+(~/.local/share/opencode/log/opencode.log). Adapter target model (provider-returned): deepseek-v4-flash-vision-exp.
+
+BASE: automation -> resolved commit b334a971f12cd0225580a99e2c56fe0841fae39b. Starting tree clean (empty porcelain).
+
+Legs (elapsed vs budget, units seconds):
+- recon + premise verification: ~120s vs 120s probe bound
+- G0 pre-fix raw run: 0.72s vs 120s (FAIL x2)
+- G0 fix + post-fix raw run: 0.72s vs 120s (PASS x2)
+- full test_ai_pipeline (13): 1.73s vs 600s
+- corpus generator + 7 PNG renders: <2s vs 600s
+- corpus integrity + scorer discrimination: 0.27s vs 600s
+- live-path offline dry-run (scripted provider, temp corpus): <2s vs 600s
+- offline scoring from cache: <2s vs 600s
+- METERED attempt 1 (aborted on fixture 1 parse): 5s vs 900s
+- METERED baseline run (7 calls): 20s vs 900s
+- full backend suite: 6.22s vs 600s
+- ruff: <5s vs 120s
+- mypy app: <30s vs 300s
+
+Spend lines:
+- METERED baseline: 7 calls, per-call $0.000386 / $0.000307 / $0.000318 / $0.000326 / $0.000441 / $0.000246 /
+  $0.000304; TOTAL $0.002328 of ceiling $0.05 (never approached).
+- METERED attempt 1: 2 provider calls on fixture 1, usage incurred but error-ledger cost=0.0 (finding 3),
+  estimated <= $0.0008.
+- All other legs: $0.00 (offline).
+
+Live-state ledger:
+- database: none — temp SQLite only (live `/data/db/storagegenie.db` never opened; `app.db.engine` created but unused).
+- restart: none; no service touched.
+- sensitive surfaces: evidence store and live SQLite untouched; `/data/storage` not read; synthetic images only;
+  GPS never leaves the box (shared redact_image at call time).
+- git: work on `automation`; no push to storagegenie-evidence; no {{RECEIPT_CMD}}.
+
+UNCLEAR:
+- FIRST READ: whether the aborted metered attempt + successful retry violates "exactly one run" (read as one
+  successful baseline run, both transcripts disclosed).
+- DURING EXECUTION: whether the `{"type": "json_object"}` wrapper was in-scope; read as out (fixed the repair turn
+  in the in-scope reader instead).
+- REMAINING: disposition of the base-proved decoder env reds and the corpus/scorer/error-cost follow-ups.

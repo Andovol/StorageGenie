@@ -1,0 +1,62 @@
+{
+  "id": "sg029-06-partial-label-medicine",
+  "class": "partial-label",
+  "category": "medicine",
+  "image": "images/sg029_06_partial_label_medicine.png",
+  "note": "Synthetic antibiotic carton with the date block torn off; name legible, date not. needs-evidence case.",
+  "ground_truth": {
+    "items": [
+      {
+        "name": "Amoxicillin",
+        "expiry_date": null
+      }
+    ],
+    "unknowns": [
+      "items.0.expiry_date"
+    ],
+    "needs_evidence": true,
+    "expectation_class": "needs-evidence"
+  },
+  "provider_output": {
+    "items": [
+      {
+        "name": "AMOXICILLIN",
+        "expiry_date": null,
+        "date_type": "expiry_date",
+        "lot": null,
+        "confidence": 0.55,
+        "uncertainty_reasons": [
+          "date partially occluded by overlaid translucent panel",
+          "print truncated after '2030-0'",
+          "remaining characters not recoverable"
+        ]
+      }
+    ],
+    "unknowns": [
+      "items.0.expiry_date"
+    ],
+    "needs_evidence": true
+  },
+  "provider_calls": [
+    {
+      "provider": "opencode-go",
+      "model": "deepseek-v4-flash-vision-exp",
+      "latency_ms": 2608.2154558971524,
+      "usage": {
+        "prompt_tokens": 785,
+        "completion_tokens": 214,
+        "total_tokens": 999,
+        "prompt_cache_hit_tokens": 384,
+        "prompt_cache_miss_tokens": 401,
+        "prompt_tokens_details": {
+          "cached_tokens": 384
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 128
+        }
+      },
+      "cost": 0.00024615,
+      "error_state": null
+    }
+  ]
+}

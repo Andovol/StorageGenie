@@ -1,0 +1,62 @@
+{
+  "id": "sg029-05-partial-label-food",
+  "class": "partial-label",
+  "category": "food",
+  "image": "images/sg029_05_partial_label_food.png",
+  "note": "Synthetic beans label with the date half torn away; the product name survives, no character-complete date does.",
+  "ground_truth": {
+    "items": [
+      {
+        "name": "Baked beans",
+        "expiry_date": null
+      }
+    ],
+    "unknowns": [
+      "items.0.expiry_date"
+    ],
+    "needs_evidence": true,
+    "expectation_class": "unknown-expected"
+  },
+  "provider_output": {
+    "items": [
+      {
+        "name": "BAKED BEANS",
+        "expiry_date": null,
+        "date_type": null,
+        "lot": null,
+        "confidence": 0.55,
+        "uncertainty_reasons": [
+          "occlusion",
+          "truncated print"
+        ]
+      }
+    ],
+    "unknowns": [
+      "items.0.expiry_date",
+      "items.0.date_type"
+    ],
+    "needs_evidence": true
+  },
+  "provider_calls": [
+    {
+      "provider": "opencode-go",
+      "model": "deepseek-v4-flash-vision-exp",
+      "latency_ms": 3468.4823430143297,
+      "usage": {
+        "prompt_tokens": 754,
+        "completion_tokens": 546,
+        "total_tokens": 1300,
+        "prompt_cache_hit_tokens": 384,
+        "prompt_cache_miss_tokens": 370,
+        "prompt_tokens_details": {
+          "cached_tokens": 384
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 474
+        }
+      },
+      "cost": 0.0004406999999999999,
+      "error_state": null
+    }
+  ]
+}

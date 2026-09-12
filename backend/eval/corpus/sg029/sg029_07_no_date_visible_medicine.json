@@ -1,0 +1,61 @@
+{
+  "id": "sg029-07-no-date-visible-medicine",
+  "class": "no-date-visible",
+  "category": "medicine",
+  "image": "images/sg029_07_no_date_visible_medicine.png",
+  "note": "Synthetic supplement label photographed from the front panel: no date appears anywhere in frame. needs-evidence case.",
+  "ground_truth": {
+    "items": [
+      {
+        "name": "Vitamin D3",
+        "expiry_date": null
+      }
+    ],
+    "unknowns": [
+      "items.0.expiry_date"
+    ],
+    "needs_evidence": true,
+    "expectation_class": "needs-evidence"
+  },
+  "provider_output": {
+    "items": [
+      {
+        "name": "VITAMIN D3",
+        "expiry_date": null,
+        "date_type": null,
+        "lot": null,
+        "confidence": 0.9,
+        "uncertainty_reasons": [
+          "no expiry or use-by date printed on the visible label panel; only product name, strength and count are shown"
+        ]
+      }
+    ],
+    "unknowns": [
+      "items.0.expiry_date",
+      "items.0.date_type"
+    ],
+    "needs_evidence": true
+  },
+  "provider_calls": [
+    {
+      "provider": "opencode-go",
+      "model": "deepseek-v4-flash-vision-exp",
+      "latency_ms": 2779.090258292854,
+      "usage": {
+        "prompt_tokens": 785,
+        "completion_tokens": 311,
+        "total_tokens": 1096,
+        "prompt_cache_hit_tokens": 384,
+        "prompt_cache_miss_tokens": 401,
+        "prompt_tokens_details": {
+          "cached_tokens": 384
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 214
+        }
+      },
+      "cost": 0.00030435,
+      "error_state": null
+    }
+  ]
+}

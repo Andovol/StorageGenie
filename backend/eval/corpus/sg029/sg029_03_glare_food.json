@@ -1,0 +1,58 @@
+{
+  "id": "sg029-03-glare-food",
+  "class": "glare",
+  "category": "food",
+  "image": "images/sg029_03_glare_food.png",
+  "note": "Synthetic juice label; a bright diagonal glare washes out the date line so it is not fully legible. Expected-unknown case.",
+  "ground_truth": {
+    "items": [
+      {
+        "name": "Orange juice",
+        "expiry_date": null
+      }
+    ],
+    "unknowns": [
+      "items.0.expiry_date"
+    ],
+    "needs_evidence": true,
+    "expectation_class": "unknown-expected"
+  },
+  "provider_output": {
+    "items": [
+      {
+        "name": "ORANGE JUICE",
+        "expiry_date": "2031-08-12",
+        "date_type": "best_before",
+        "lot": null,
+        "confidence": 0.96,
+        "uncertainty_reasons": [
+          "diagonal reflection band reduces contrast over the left portion of the label text"
+        ]
+      }
+    ],
+    "unknowns": [],
+    "needs_evidence": false
+  },
+  "provider_calls": [
+    {
+      "provider": "opencode-go",
+      "model": "deepseek-v4-flash-vision-exp",
+      "latency_ms": 2881.42925594002,
+      "usage": {
+        "prompt_tokens": 754,
+        "completion_tokens": 341,
+        "total_tokens": 1095,
+        "prompt_cache_hit_tokens": 384,
+        "prompt_cache_miss_tokens": 370,
+        "prompt_tokens_details": {
+          "cached_tokens": 384
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 269
+        }
+      },
+      "cost": 0.00031769999999999997,
+      "error_state": null
+    }
+  ]
+}

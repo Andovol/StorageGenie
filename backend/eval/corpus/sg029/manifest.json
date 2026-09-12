@@ -1,0 +1,15 @@
+{
+  "corpus": "sg029",
+  "description": "Synthetic Food/Medicine image corpus for the SG-029 metered baseline. Ground truth is authored from the committed render recipe (generate.py); provider_output caches are written by the one metered run and scored offline thereafter.",
+  "base_dir": "sg029",
+  "count": 7,
+  "fixtures": [
+    "sg029_01_clean_food.json",
+    "sg029_02_clean_medicine.json",
+    "sg029_03_glare_food.json",
+    "sg029_04_clutter_food.json",
+    "sg029_05_partial_label_food.json",
+    "sg029_06_partial_label_medicine.json",
+    "sg029_07_no_date_visible_medicine.json"
+  ]
+}

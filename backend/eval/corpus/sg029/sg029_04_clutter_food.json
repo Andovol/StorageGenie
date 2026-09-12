@@ -1,0 +1,62 @@
+{
+  "id": "sg029-04-clutter-food",
+  "class": "clutter",
+  "category": "food",
+  "image": "images/sg029_04_clutter_food.png",
+  "note": "Synthetic soup label on a cluttered bench; a second package occludes the date line from the left. Hard expected-unknown case.",
+  "ground_truth": {
+    "items": [
+      {
+        "name": "Tomato soup",
+        "expiry_date": null
+      }
+    ],
+    "unknowns": [
+      "items.0.expiry_date"
+    ],
+    "needs_evidence": true,
+    "expectation_class": "unknown-expected"
+  },
+  "provider_output": {
+    "items": [
+      {
+        "name": "TOMATO SOUP",
+        "expiry_date": null,
+        "date_type": "best_before",
+        "lot": null,
+        "confidence": 0.6,
+        "uncertainty_reasons": [
+          "occlusion",
+          "torn label",
+          "tiny print"
+        ]
+      }
+    ],
+    "unknowns": [
+      "items.0.expiry_date"
+    ],
+    "needs_evidence": true
+  },
+  "provider_calls": [
+    {
+      "provider": "opencode-go",
+      "model": "deepseek-v4-flash-vision-exp",
+      "latency_ms": 2641.315091867,
+      "usage": {
+        "prompt_tokens": 754,
+        "completion_tokens": 355,
+        "total_tokens": 1109,
+        "prompt_cache_hit_tokens": 384,
+        "prompt_cache_miss_tokens": 370,
+        "prompt_tokens_details": {
+          "cached_tokens": 384
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 284
+        }
+      },
+      "cost": 0.0003261,
+      "error_state": null
+    }
+  ]
+}

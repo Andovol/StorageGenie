@@ -103,6 +103,22 @@ def compute_cost(usage: dict[str, Any]) -> float:
     return (tokens_in * INPUT_USD_PER_1M + tokens_out * OUTPUT_USD_PER_1M) / 1_000_000
 
 
+def estimate_call_cost(
+    image_bytes: bytes, prompt: str, *, max_tokens: int = DEFAULT_MAX_TOKENS
+) -> float:
+    """Bounded worst-case USD for ONE call from the same vendor rate table (SG-029 G0).
+
+    Input tokens are bounded above by one token per source byte (prompt bytes plus
+    the base64 body of the image); output is bounded by `max_tokens`. This
+    deliberately over-counts the real tokenizer: it is an upper bound, not a
+    forecast, so a cap compared against it can never be surprised by a call it
+    admitted. No clock, no network, no key (`PG-IC-07`).
+    """
+    base64_len = ((len(image_bytes) + 2) // 3) * 4
+    input_tokens = len(prompt.encode("utf-8")) + base64_len
+    return (input_tokens * INPUT_USD_PER_1M + max_tokens * OUTPUT_USD_PER_1M) / 1_000_000
+
+
 def build_chat_payload(model: str, prompt: str, image_b64: str) -> dict[str, Any]:
     """The exact outgoing wire shape (PG-EV-04): no key material, ever."""
     return {
@@ -159,6 +175,14 @@ class OpenCodeGoProvider:
             "uncapped" if per_job_cap is None else per_job_cap,
             "uncapped" if monthly_cap is None else monthly_cap,
         )
+
+    def estimate_cost(self, image_bytes: bytes, prompt: str) -> float:
+        """Bounded worst-case cost for one call; consumed by the SG-028 reader.
+
+        The reader passes this to the router so a cap refuses BEFORE any network
+        call. It is intentionally the upper bound from `estimate_call_cost`.
+        """
+        return estimate_call_cost(image_bytes, prompt)
 
     def _resolve_api_key(self) -> str:
         key = self._api_key or os.environ.get("OPENCODE_API_KEY", "")

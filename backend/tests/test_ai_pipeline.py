@@ -423,7 +423,14 @@ def test_repair_once_then_success(ai_env, monkeypatch: pytest.MonkeyPatch) -> No
 
     assert job.state == "AWAITING_REVIEW"
     assert provider.invocations == 2
-    assert session.query(ProviderCall).filter_by(job_id=job.id).count() == 1
+    # SG-029 G0: the failed first attempt is itself ledgered (error_state), so a
+    # success after the single repair leaves TWO durable call rows, not one.
+    rows = session.query(ProviderCall).filter_by(job_id=job.id).all()
+    assert len(rows) == 2
+    assert sorted(row.error_state is not None for row in rows) == [False, True]
+    # SG-029: the ONE §5.3 repair is a real repair turn, not a blind re-send.
+    assert provider.prompts[0] != provider.prompts[1]
+    assert "## Repair" in provider.prompts[1]
 
 
 def test_second_failure_fails_the_step_loudly(ai_env, monkeypatch: pytest.MonkeyPatch) -> None:  # type: ignore[no-untyped-def]
@@ -437,6 +444,82 @@ def test_second_failure_fails_the_step_loudly(ai_env, monkeypatch: pytest.Monkey
     assert steps["BUILDING_CANDIDATES"].state == "PENDING"
     assert provider.invocations == 2
     assert session.query(Candidate).filter_by(job_id=job.id).count() == 0
+
+
+class _CapProbeProvider:
+    """Estimating provider used ONLY to prove a cap binds before any call (SG-029 G0).
+
+    The shipped `ScriptedProvider` reports no estimate, so it cannot exercise the
+    pre-call refusal; this probe returns a bounded worst-case estimate and would
+    raise loudly if the pipeline invoked it despite the refusal.
+    """
+
+    provider_id = "capped"
+    model_id = "capped-model"
+
+    def __init__(self) -> None:
+        self.invocations = 0
+
+    def estimate_cost(self, image_bytes: bytes, prompt: str) -> float:
+        return 1.0
+
+    def extract_items(  # type: ignore[no-untyped-def]
+        self, image_bytes: bytes, prompt: str, *, estimated_cost: float = 0.0
+    ):
+        self.invocations += 1
+        raise AssertionError("provider must not be invoked on budget refusal")
+
+
+def test_cap_binds_from_pipeline_zero_calls_zero_rows(ai_env, monkeypatch: pytest.MonkeyPatch) -> None:  # type: ignore[no-untyped-def]
+    """SG-029 G0: a cap below the pipeline's supplied estimate refuses BEFORE a call.
+
+    Pre-fix the pipeline passed no estimate (router default 0.0), so the cap could
+    never bind and the provider was invoked. Post-fix: 0 invocations, 0 ledger rows,
+    no network, step FAILED with the budget refusal.
+    """
+    session, household_id, evidence_id = ai_env
+    from app.services.providers import reader as reader_mod
+
+    provider = _CapProbeProvider()
+    monkeypatch.setattr(reader_mod, "provider_registry", lambda: {provider.provider_id: provider})
+    monkeypatch.setattr(settings, "sg_consent", True)
+    monkeypatch.setattr(settings, "sg_provider_id", provider.provider_id)
+    monkeypatch.setattr(settings, "sg_prompt_category", "food")
+    monkeypatch.setattr(settings, "sg_per_job_cap", 0.01)
+
+    job = _run(session, household_id, evidence_id)
+
+    assert job.state == "FAILED"
+    assert provider.invocations == 0
+    assert session.query(ProviderCall).count() == 0
+    steps = {step.step_name: step for step in job_service._steps(session, job.id)}
+    error = json.loads(steps["ANALYZING_WITH_AI"].output_refs or "{}")
+    assert "estimated cost 1.0 exceeds" in error["error"]
+
+
+def test_provider_error_is_ledgered_and_survives_rollback(ai_env, monkeypatch: pytest.MonkeyPatch) -> None:  # type: ignore[no-untyped-def]
+    """SG-029 G0: every failed provider call leaves a durable `error_state` ledger row.
+
+    Pre-fix a ProviderError raised inside the supply closure wrote no row and the
+    `run_job` rollback erased any pending writes. Post-fix each of the two attempts
+    (strict parse + single §5.3 repair) leaves exactly one committed error row that
+    survives the step rollback.
+    """
+    session, household_id, evidence_id = ai_env
+    monkeypatch.setattr(settings, "sg_per_job_cap", None)
+    provider = _enable(monkeypatch, _payload([_valid_item()]), fail_times=2)
+    job = _run(session, household_id, evidence_id)
+
+    assert job.state == "FAILED"
+    assert provider.invocations == 2
+    rows = session.query(ProviderCall).filter_by(job_id=job.id).all()
+    assert len(rows) == 2
+    for row in rows:
+        assert row.error_state is not None
+        assert "invalid_json" in row.error_state
+        assert row.cost == 0.0
+    steps = {step.step_name: step for step in job_service._steps(session, job.id)}
+    assert steps["ANALYZING_WITH_AI"].state == "FAILED"
 
 
 def test_ai_candidate_still_receives_dedup_matches(ai_env, monkeypatch: pytest.MonkeyPatch) -> None:  # type: ignore[no-untyped-def]

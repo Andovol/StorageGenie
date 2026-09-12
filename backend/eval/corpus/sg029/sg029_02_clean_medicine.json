@@ -1,0 +1,56 @@
+{
+  "id": "sg029-02-clean-medicine",
+  "class": "clean",
+  "category": "medicine",
+  "image": "images/sg029_02_clean_medicine.png",
+  "note": "Synthetic medicine carton: name and full EXP date legible. Deterministic recipe (generate.py); no EXIF/GPS.",
+  "ground_truth": {
+    "items": [
+      {
+        "name": "Paracetamol",
+        "expiry_date": "2030-06-30"
+      }
+    ],
+    "unknowns": [],
+    "needs_evidence": false,
+    "expectation_class": "exact"
+  },
+  "provider_output": {
+    "items": [
+      {
+        "name": "PARACETAMOL",
+        "expiry_date": "2030-06-30",
+        "date_type": "expiry_date",
+        "lot": null,
+        "confidence": 0.95,
+        "uncertainty_reasons": [
+          "slight image softness / low render resolution around small printed characters"
+        ]
+      }
+    ],
+    "unknowns": [],
+    "needs_evidence": false
+  },
+  "provider_calls": [
+    {
+      "provider": "opencode-go",
+      "model": "deepseek-v4-flash-vision-exp",
+      "latency_ms": 2588.2745319977403,
+      "usage": {
+        "prompt_tokens": 785,
+        "completion_tokens": 316,
+        "total_tokens": 1101,
+        "prompt_cache_hit_tokens": 0,
+        "prompt_cache_miss_tokens": 785,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 244
+        }
+      },
+      "cost": 0.00030735,
+      "error_state": null
+    }
+  ]
+}
