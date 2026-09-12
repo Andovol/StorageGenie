@@ -4,8 +4,9 @@
 coder: opencode
 effort: medium
 
-**Stage:** Phase 2 Slice 1 under D35 L3 (SG-025/026 cleared to fire; SG-027 alone waits on the Q2 key). This slice's approval IS D35 — no per-slice approval. Previous-slice UNCLEARs answered: SG-024's shm/wal `.gitignore` gap CLOSED by D33 (`ef60563` — verify live, don't re-litigate); `npm run build`-clean proof still queued (not this slice).
+**Stage:** Phase 2 Slice 1 under D35 L3 (SG-025/026 cleared to fire; SG-027 alone waits on the Q2 key). Approvals: D35 (stage) + D38 (attempt-2 re-fire with the G0 salvage clause) under D39 (contract 0.23.0). Previous-slice UNCLEARs answered: SG-024's shm/wal `.gitignore` gap CLOSED by D33 (`ef60563` — verify live, don't re-litigate); `npm run build`-clean proof still queued (not this slice). Attempt-1 forensics (desk-measured, don't re-litigate): unit ran 429 s, opencode exit 0, zero commits, lane dirty — G0 below salvages it.
 **Standing lines:** a "pre-existing failure" claim cites the base commit + base-run command and output, or it is a new finding with a destination; new migration heads update head-relative downgrade assertions (grep `downgrade`, list hits).
+**Guards invoked (0.23.0 step 2 — Architect copies these to the rating row):** `PG-EV-01` fail-then-pass · `PG-EV-02` artifact-exists · `PG-EV-04` fake-shape-of-payload · `PG-EV-09` both-runs-committed · `PG-SC-02` ledger-readback · `PG-SC-05` rule-exclusion+grep · `PG-SC-10` no-ignored-commit · `PG-SC-11` migration-append · `PG-IC-01` cross-product · `PG-IC-03` stop-wins · `PG-IC-07` no-fixed-dates (the revision id follows the repo date-prefix convention — a name, not a gate) · `PG-IC-09` premises-live · `PG-PR-03/04/06/10`.
 
 > My premises are hypotheses about the tree carrying this packet. **Verify each before building on it; a
 > difference is a finding, not an obstacle.** Where your numbers, paths or quotes differ from mine,
@@ -40,6 +41,10 @@ effort: medium
 
 Blueprint §6 requires the provider abstraction before any cloud call; §3.3 requires every AI call ledgered (provider, model, prompt-template version, input hashes, output payload, cost/usage, latency, error state); SG-018 deferred ADR-004/007/010 to the Phase 2 door. Starting premises (verify live — `PG-IC-09`): zero provider code in tree (no gateway, adapter, prompt, or key under `backend/`); current migration head `20260908_sg017_fts`; backend suite green baseline; patterns to follow are `backend/app/models/audit_event.py` + `job.py` (TimestampMixin, `new_id`), migration `backend/alembic/versions/20260908_sg014_candidate.py` (create_table + downgrade), test header `backend/tests/test_health.py:1-14` (temp-DB env override before import).
 Owner-settled decisions binding this slice (not re-decidable — dispute is a STOP, never a redesign): provider = OpenCode GO on its OWN subscription (Q1); spend uncapped for now but every call ledgered (F2); both users in, GPS-default-strip (F3); guardrail Stage 0, human confirmation mandatory (F4).
+
+## G0 — salvage check on attempt-1 debris (first, read-only)
+
+- Quote `git status --porcelain` and list `refs/quarantine/SG-025-*` (`git for-each-ref`; also quote any `quarantined=` the trigger printed — read-only, never re-trigger). Attempt 1 exited 0 with work uncommitted: if debris or a quarantine ref exists, inspect the diff against BASE, adopt-if-sound into G2–G5 (verify-before-build — adopted code meets every G4 gate exactly as your own), and report adopted-vs-rebuilt line by line. Never silently drop it; if it contradicts this packet, STOP with the diff quoted. Clean tree + no ref = one line, proceed to G1.
 
 ## G1 — gates + Q2 presence probe (Q2 is INFORMATION ONLY, never a gate)
 
