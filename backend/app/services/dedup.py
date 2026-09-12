@@ -11,7 +11,7 @@ from app.models.assertion import Assertion
 from app.models.evidence import Evidence, asset_evidence
 from app.models.job import Job
 from app.models.review_task import ReviewTask
-from app.services.candidates import Candidate
+from app.services.candidates import Candidate, load_proposal
 from app.services.observations import Observation
 from app.services.signals import hamming_distance
 
@@ -99,10 +99,6 @@ def _display_name(evidence: Evidence | None) -> str:
 
 
 def deduplicate_job(db: Session, job: Job) -> dict[str, object]:  # noqa: C901
-    existing = db.query(Candidate).filter_by(job_id=job.id).first()
-    if existing is not None:
-        return {"status": "ok", "step": "DEDUPLICATING", "candidate_id": existing.id, "reused": True}
-
     evidence_ids = _evidence_ids(job)
     evidence_rows = db.query(Evidence).filter(Evidence.id.in_(evidence_ids)).all() if evidence_ids else []
     by_id = {row.id: row for row in evidence_rows}
@@ -142,30 +138,46 @@ def deduplicate_job(db: Session, job: Job) -> dict[str, object]:  # noqa: C901
         kind = "new_asset"
         asset_id = None
 
-    fields: dict[str, object] = {
-        "display_name": _display_name(evidence_rows[0] if evidence_rows else None),
-        "asset_type": "unknown",
-        "status": "ACTIVE",
-    }
-    if identifier is not None:
-        fields["identifier"] = identifier
-    proposal: dict[str, object] = {
-        "kind": kind,
-        "asset_id": asset_id,
-        "fields": fields,
-        "dedup_matches": matches,
-        "review_task_ids": [],
-    }
-    candidate = Candidate(
-        job_id=job.id,
-        evidence_ids_json=json.dumps(evidence_ids),
-        proposed_fields_json=json.dumps(proposal, ensure_ascii=False),
-        state="proposed",
-        household_id=job.household_id or "",
+    # A candidate may already exist when BUILDING_CANDIDATES ran (AI enabled):
+    # this step then reconciles dedup matches INTO it instead of creating a
+    # second one. Its fields and any review tasks it opened are preserved.
+    candidate = db.query(Candidate).filter_by(job_id=job.id).first()
+    created = candidate is None
+    proposal: dict[str, object]
+    if candidate is None:
+        fields: dict[str, object] = {
+            "display_name": _display_name(evidence_rows[0] if evidence_rows else None),
+            "asset_type": "unknown",
+            "status": "ACTIVE",
+        }
+        if identifier is not None:
+            fields["identifier"] = identifier
+        proposal = {
+            "kind": kind,
+            "asset_id": asset_id,
+            "fields": fields,
+            "dedup_matches": matches,
+            "review_task_ids": [],
+        }
+        candidate = Candidate(
+            job_id=job.id,
+            evidence_ids_json=json.dumps(evidence_ids),
+            proposed_fields_json=json.dumps(proposal, ensure_ascii=False),
+            state="proposed",
+            household_id=job.household_id or "",
+        )
+        db.add(candidate)
+        db.flush()
+    else:
+        proposal = load_proposal(candidate)
+        proposal["kind"] = kind
+        proposal["asset_id"] = asset_id
+        proposal["dedup_matches"] = matches
+
+    existing_task_ids = proposal.get("review_task_ids", [])
+    task_ids: list[str] = (
+        [str(item) for item in existing_task_ids] if isinstance(existing_task_ids, list) else []
     )
-    db.add(candidate)
-    db.flush()
-    task_ids: list[str] = []
     for collision in collisions:
         task = ReviewTask(
             task_type="identifier_collision",
@@ -189,4 +201,5 @@ def deduplicate_job(db: Session, job: Job) -> dict[str, object]:  # noqa: C901
         "asset_id": asset_id,
         "review_task_ids": task_ids,
         "dedup_matches": matches,
+        "reused": not created,
     }

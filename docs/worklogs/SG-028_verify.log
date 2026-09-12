@@ -1,0 +1,140 @@
+SG-028 verify log — both runs raw (PG-EV-01 fail-then-pass / PG-EV-09 both committed)
+All commands run from /home/andrei/StorageGenie/backend with the backend venv unless stated.
+Bounds: ordinary 120s, fixture legs 600s, early-close 1800s, overall 2400s. No command was killed.
+
+================================================================================
+[0] STARTING TREE + BASE (bound 120s -> <1s)
+================================================================================
+$ git status --porcelain
+(empty)
+$ git branch --show-current
+automation
+$ git rev-parse HEAD
+f7de15c38acfbf9d4d6648e9b7d47c8907577ce8
+$ git log --oneline -1
+f7de15c Packet SG-028: pipeline wiring (AI step + candidates + gating), offline only
+
+================================================================================
+[1] BASE SUITE — detached worktree at f7de15c (bound 600s -> 5.24s; exit 1)
+================================================================================
+$ git worktree add --detach /tmp/opencode/sg028-base HEAD
+BASE HEAD: f7de15c38acfbf9d4d6648e9b7d47c8907577ce8
+$ /home/andrei/StorageGenie/backend/venv/bin/python -m pytest -q      # cwd worktree/backend
+=========================== short test summary info ============================
+FAILED tests/test_search.py::test_fts_migration_upgrade_downgrade_upgrade - A...
+FAILED tests/test_signals.py::test_generated_codes_are_validated_and_bad_checksum_is_not_an_identifier
+FAILED tests/test_signals.py::test_ocr_has_text_boxes_and_mean_confidence - a...
+FAILED tests/test_signals.py::test_observation_migration_upgrade_downgrade_upgrade
+4 failed, 85 passed, 7 warnings in 5.24s
+# The 2 decoder legs log the cause in-run:
+#   WARNING app.services.signals:signals.py:104 Barcode extraction unavailable: pyzbar/libzbar is not installed
+#   WARNING app.services.signals:signals.py:215 OCR extraction unavailable: tesseract is not installed or it's not in your PATH.
+
+================================================================================
+[2] PRE-FAIL RAW — implementation stashed, new test file present (bound 600s -> 1.16s; exit 1)
+================================================================================
+$ git stash push -u -- backend/app
+$ /home/andrei/StorageGenie/backend/venv/bin/python -m pytest -q tests/test_ai_pipeline.py
+=========================== short test summary info ============================
+FAILED tests/test_ai_pipeline.py::test_low_risk_auto_accept_at_or_above_threshold
+FAILED tests/test_ai_pipeline.py::test_expiry_always_proposed_never_auto_accepted
+FAILED tests/test_ai_pipeline.py::test_needs_evidence_opens_manual_entry_and_keeps_unknowns
+FAILED tests/test_ai_pipeline.py::test_correction_chain_supersedes_and_audits
+FAILED tests/test_ai_pipeline.py::test_default_config_is_phase1_skip - KeyErr...
+FAILED tests/test_ai_pipeline.py::test_multi_item_preserved_and_blocking_task_resolves_to_commit
+FAILED tests/test_ai_pipeline.py::test_provider_call_ledger_row_per_call_with_job_link
+FAILED tests/test_ai_pipeline.py::test_real_provider_without_consent_skips_and_never_networks
+FAILED tests/test_ai_pipeline.py::test_repair_once_then_success - ImportError...
+FAILED tests/test_ai_pipeline.py::test_second_failure_fails_the_step_loudly
+FAILED tests/test_ai_pipeline.py::test_ai_candidate_still_receives_dedup_matches
+11 failed, 2 warnings in 1.16s
+# Representative raw errors (captured at the first pre-run, before the test file used the temp-root preamble):
+#   E   ImportError: cannot import name 'reader' from 'app.services.providers' (unknown location)
+#   E   KeyError: 'ANALYZING_WITH_AI'   # default-config test reached for a step the base tree does not have
+$ git stash pop
+ok stash pop
+
+================================================================================
+[3] POST-GREEN RAW — implementation restored (bound 600s -> 1.65s; exit 0)
+================================================================================
+$ /home/andrei/StorageGenie/backend/venv/bin/python -m pytest -q tests/test_ai_pipeline.py
+11 passed, 2 warnings in 1.65s
+
+================================================================================
+[4] FULL SUITE POST — from backend/ (bound 600s -> 6.39s; exit 1)
+================================================================================
+$ /home/andrei/StorageGenie/backend/venv/bin/python -m pytest -q
+=========================== short test summary info ============================
+FAILED tests/test_signals.py::test_generated_codes_are_validated_and_bad_checksum_is_not_an_identifier
+FAILED tests/test_signals.py::test_ocr_has_text_boxes_and_mean_confidence - a...
+2 failed, 98 passed, 11 warnings in 6.39s
+# Residual reds are exactly the 2 base-proved decoder ENVIRONMENT legs (step [1]); both fail because
+# libzbar/tesseract are absent. The 2 config-pollution reds in [1] are GREEN here (carried fix proof, [8]).
+
+================================================================================
+[5] RUFF (bound 120s -> <1s; exit 0)
+================================================================================
+$ /home/andrei/StorageGenie/backend/venv/bin/python -m ruff check .
+All checks passed!
+
+================================================================================
+[6] MYPY (bound 300s -> completed; exit 1)
+================================================================================
+$ /home/andrei/StorageGenie/backend/venv/bin/python -m mypy app                     # POST
+Found 40 errors in 9 files (checked 59 source files)
+$ /home/andrei/StorageGenie/backend/venv/bin/python -m mypy app                     # BASE worktree
+Found 40 errors in 9 files (checked 58 source files)
+# DELTA = 0. Errors are in unmodified files (models/base, api/v1/households, audit_service, review_tasks,
+# asset_service, assets, evidence, main). Grep of mypy output for the touched files returned no matches:
+$ python -m mypy app | grep -E "reader\.py|candidates\.py|dedup\.py|job_service\.py|config\.py|fake\.py|schemas\.py"   -> (none)
+
+================================================================================
+[7] CONFIG READ-BACK (PG-SC-02)
+================================================================================
+$ python -c "from app.config import Settings; s=Settings(); print(...)"             # no env set
+DEFAULTS threshold= 0.9 category= food consent= False provider= fake
+$ SG_CONFIDENCE_THRESHOLD=0.77 SG_PROMPT_CATEGORY=medicine python -c "..."          # env-overridden fresh Settings
+sg_confidence_threshold 0.77 float
+sg_prompt_category medicine str
+prompt_categories ['food', 'medicine']
+$ python -c "from app.services.job_service import STEP_NAMES; print(len(STEP_NAMES), list(STEP_NAMES))"
+STEP_NAMES 8 ['VALIDATING_INPUT', 'NORMALIZING', 'EXTRACTING_DETERMINISTIC_SIGNALS', 'ANALYZING_WITH_AI',
+'BUILDING_CANDIDATES', 'DEDUPLICATING', 'AWAITING_REVIEW', 'COMMITTING']
+
+================================================================================
+[8] CARRIED-FIX POLLUTION PROOF
+================================================================================
+BASE ([1]): tests/test_search.py::test_fts_migration_upgrade_downgrade_upgrade          FAILED
+BASE ([1]): tests/test_signals.py::test_observation_migration_upgrade_downgrade_upgrade FAILED
+POST ([4]): neither appears in the summary -> both GREEN in a plain full-suite run from backend/.
+Root cause: test_opencode_go.py::test_config_readback_new_values importlib.reload(app.config) rebound the shared
+settings object; later migration tests monkeypatched the original while alembic env.py re-imported the reloaded
+one. Fix: read a fresh Settings() and assert `cfgmod.settings is original` in finally.
+
+================================================================================
+[9] NETWORK / LEDGER / NO-MIGRATION PROOF
+================================================================================
+- No provider HTTP: enabled tests inject ScriptedProvider (in-process). test_real_provider_without_consent... patches
+  `opencode_go.OpenCodeGoProvider._post` to raise and asserts it never fires; analysing status == skipped.
+- provider_call ledger: exactly 1 row for a valid scripted call, job_id linked, cost 0.0, error_state None;
+  0 rows on the default-off path. `output_payload`/`input_hashes` populated.
+- No migration: models/assertion.py already carries `model_json` (line 21); models/provider_call.py already exists.
+- Redaction in path: the bytes the scripted provider received start `\x89PNG\r\n\x1a\n` and
+  `dict(Image.open(...).getexif()) == {}` (GPS never left).
+
+================================================================================
+[10] FILES TOUCHED (git diff --stat; untracked = reader.py + test_ai_pipeline.py)
+================================================================================
+backend/app/config.py                     |   6 +
+backend/app/services/candidates.py        | 311 ++++++++++++++++++++++++++++--
+backend/app/services/dedup.py             |  69 ++++---
+backend/app/services/job_service.py       |   9 +-
+backend/app/services/providers/fake.py    |  52 +++++
+backend/app/services/providers/schemas.py |   4 +-
+backend/tests/test_import_jobs.py         |  10 +-
+backend/tests/test_opencode_go.py         |  20 +-
+backend/tests/test_phase1_e2e.py          |   4 +-
++ backend/app/services/providers/reader.py        (new, the ONE reader bridge)
++ backend/tests/test_ai_pipeline.py               (new, 11 tests)
++ docs/worklogs/SG-028.{log,report.md,verify.log}
+# No file outside the packet ceiling was modified. No ignored file is staged/committed.

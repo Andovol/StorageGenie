@@ -30,6 +30,12 @@ class Settings(BaseSettings):
     sg_per_job_cap: float | None = None
     sg_monthly_cap: float | None = None
     sg_consent: bool = False
+    # SG-028: confidence gate for AI auto-accept of low-risk fields. Every
+    # gated field (identifier/expiry/expiry_date/condition/lot) is always
+    # routed to review regardless of this value. Uncalibrated per G-A9.
+    sg_confidence_threshold: float = 0.9
+    # SG-028: selectable extraction prompt category ("food" default; "medicine").
+    sg_prompt_category: str = "food"
 
     model_config = {"env_file": ".env", "extra": "ignore"}
 

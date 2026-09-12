@@ -188,7 +188,7 @@ def test_phase1_exit_condition(phase1_fixture, monkeypatch: pytest.MonkeyPatch) 
         assert created.status_code == 201, created.text
         job_id = str(created.json()["id"])
         assert [step["step_name"] for step in created.json()["steps"]] == list(job_service.STEP_NAMES)
-        assert len(session.query(JobStep).filter_by(job_id=job_id).all()) == 6
+        assert len(session.query(JobStep).filter_by(job_id=job_id).all()) == 8
 
         asset_ids_before_failure = {
             row.id for row in session.query(Asset).filter_by(household_id=household_id).all()
@@ -223,7 +223,7 @@ def test_phase1_exit_condition(phase1_fixture, monkeypatch: pytest.MonkeyPatch) 
         awaiting = client.get(f"/v1/imports/{job_id}", params={"household_id": household_id})
         assert awaiting.status_code == 200
         assert awaiting.json()["state"] == "AWAITING_REVIEW"
-        assert awaiting.json()["progress"] == {"completed": 4, "total": 6, "failed": 0, "pending": 1}
+        assert awaiting.json()["progress"] == {"completed": 6, "total": 8, "failed": 0, "pending": 1}
         assert failed_once
 
         observation_rows = (

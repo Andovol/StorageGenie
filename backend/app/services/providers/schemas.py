@@ -119,8 +119,8 @@ def extract_with_single_repair(supply: Callable[[], Any]) -> ExtractionOutput:
     A retryable-shaped failure on the FIRST attempt only (ProviderError with
     kind "invalid_json", or a schema ValidationError) triggers one more
     supply() call. Any failure on the second attempt — or a non-retryable
-    ProviderError on either attempt — raises ExtractionFailedError (or the
-    original non-retryable error) with no further calls.
+    ProviderError on either attempt — raises ExtractionFailedError, chaining
+    the original error as its cause, with no further calls.
     """
     last_error: Exception | None = None
     for attempt in range(2):

@@ -153,17 +153,19 @@ def test_outgoing_payload_shape_no_key_material():
 def test_config_readback_new_values():
     import os
 
+    from app import config as cfgmod
+
+    original = cfgmod.settings
     os.environ["SG_PROVIDER_ID"] = "opencode-go"
     os.environ["SG_PER_JOB_CAP"] = "0.5"
     os.environ["SG_MONTHLY_CAP"] = "5.0"
     os.environ["SG_CONSENT"] = "true"
     try:
-        from app import config as cfgmod
-
-        import importlib
-
-        importlib.reload(cfgmod)
-        s = cfgmod.settings
+        # SG-028 carried fix: read the environment through a fresh Settings()
+        # instead of importlib.reload(cfgmod). Reloading rebound the shared
+        # app.config.settings object, which leaked this test env into the
+        # later migration tests (test_search / test_signals).
+        s = cfgmod.Settings()
         assert s.sg_provider_id == "opencode-go"
         assert s.sg_per_job_cap == 0.5
         assert s.sg_monthly_cap == 5.0
@@ -172,8 +174,4 @@ def test_config_readback_new_values():
     finally:
         for k in ("SG_PROVIDER_ID", "SG_PER_JOB_CAP", "SG_MONTHLY_CAP", "SG_CONSENT"):
             os.environ.pop(k, None)
-        import importlib as _il
-
-        from app import config as _cfg
-
-        _il.reload(_cfg)
+        assert cfgmod.settings is original

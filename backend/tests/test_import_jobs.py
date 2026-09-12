@@ -82,7 +82,7 @@ def test_import_create_run_and_jobs_list(isolated_db) -> None:  # type: ignore[n
         )
         assert created.status_code == 201
         job_id = created.json()["id"]
-        assert session.query(JobStep).filter_by(job_id=job_id).count() == 6
+        assert session.query(JobStep).filter_by(job_id=job_id).count() == 8
 
         ran = client.post(f"/v1/imports/{job_id}/run", params={"household_id": household_id})
         detail = client.get(f"/v1/imports/{job_id}", params={"household_id": household_id})
@@ -92,8 +92,10 @@ def test_import_create_run_and_jobs_list(isolated_db) -> None:  # type: ignore[n
     assert detail.status_code == 200
     body = detail.json()
     assert body["state"] == "AWAITING_REVIEW"
-    assert body["progress"] == {"completed": 4, "total": 6, "failed": 0, "pending": 1}
+    assert body["progress"] == {"completed": 6, "total": 8, "failed": 0, "pending": 1}
     assert [step["state"] for step in body["steps"]] == [
+        "COMPLETED",
+        "COMPLETED",
         "COMPLETED",
         "COMPLETED",
         "COMPLETED",
@@ -111,7 +113,7 @@ def test_import_create_run_and_jobs_list(isolated_db) -> None:  # type: ignore[n
     persisted = session.query(Job).filter_by(id=job_id).one()
     persisted_steps = session.query(JobStep).filter_by(job_id=job_id).order_by(JobStep.id).all()
     assert persisted.state == "AWAITING_REVIEW"
-    assert len(persisted_steps) == 6
+    assert len(persisted_steps) == 8
     persisted_output = json.loads(persisted_steps[2].output_refs or "{}")
     assert persisted_output["status"] == "ok"
     assert persisted_output["step"] == "EXTRACTING_DETERMINISTIC_SIGNALS"
@@ -164,7 +166,7 @@ def test_failure_retry_is_durable_and_idempotent(isolated_db, monkeypatch) -> No
     assert retry_again.json()["id"] == job_id
     assert run_again.status_code == 200
     assert run_again.json()["state"] == "AWAITING_REVIEW"
-    assert session.query(JobStep).filter_by(job_id=job_id).count() == 6
+    assert session.query(JobStep).filter_by(job_id=job_id).count() == 8
     assert session.query(Asset).filter_by(household_id=household_id).count() == 0
     assert session.query(Assertion).count() == 0
     assert session.query(AuditEvent).filter_by(entity_type="job", entity_id=job_id).count() >= 3

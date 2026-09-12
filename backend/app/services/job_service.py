@@ -12,11 +12,14 @@ from app.services import audit_service
 from app.services import candidates
 from app.services import dedup
 from app.services import signals
+from app.services.providers import reader
 
 STEP_NAMES = (
     "VALIDATING_INPUT",
     "NORMALIZING",
     "EXTRACTING_DETERMINISTIC_SIGNALS",
+    "ANALYZING_WITH_AI",
+    "BUILDING_CANDIDATES",
     "DEDUPLICATING",
     "AWAITING_REVIEW",
     "COMMITTING",
@@ -106,7 +109,7 @@ def create_job(
     return job
 
 
-def execute_step(db: Session, job: Job, step: JobStep) -> dict[str, object]:
+def execute_step(db: Session, job: Job, step: JobStep) -> dict[str, object]:  # noqa: C901
     """Execute one deterministic Phase 1 step.
 
     All Phase 1 steps run synchronously. Candidate commit is kept at this
@@ -133,6 +136,10 @@ def execute_step(db: Session, job: Job, step: JobStep) -> dict[str, object]:
             "observation_ids": [row.id for row in observations],
             "counts": signals.observation_counts(observations),
         }
+    if step.step_name == "ANALYZING_WITH_AI":
+        return reader.run_ai_extraction(db, job)
+    if step.step_name == "BUILDING_CANDIDATES":
+        return candidates.build_candidates_step(db, job)
     if step.step_name == "DEDUPLICATING":
         return dedup.deduplicate_job(db, job)
     if step.step_name == "AWAITING_REVIEW":

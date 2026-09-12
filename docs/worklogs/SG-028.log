@@ -1,0 +1,50 @@
+SG-028 run log — pipeline wiring (ANALYZING_WITH_AI + BUILDING_CANDIDATES), offline, zero spend
+
+MODEL + EFFORT PROVENANCE (owner rule: process arguments / provider metadata, never an identity line)
+- process argv (read from /proc/1899830/cmdline via the parent chain, PID 1899830 = `opencode run`):
+  `opencode run --auto --dir /home/andrei/StorageGenie --variant medium "<SG-028 packet text>"`
+  -> effort = `medium` (`--variant medium`); model flag absent from argv (packet: CLI default, omitted per policy).
+- provider metadata (opencode.log line 139244, session.id=ses_f68e41ec9ffeLob6Tkr52Wzf6X, run=3155b705):
+  `providerID=opencode-go modelID=deepseek-v4.1-flash`
+  -> model = `deepseek-v4.1-flash` (from provider metadata, NOT the system-prompt identity line).
+- Slice never calls a provider: zero live calls, so no adapter-target model usage this slice.
+
+LEGS, ELAPSED vs BUDGET (bound -> actual)
+- G0 tree/branch/HEAD probe: ordinary bound 120s -> <1s. `git status --porcelain` empty.
+- G0 base suite (detached worktree f7de15c, from backend/): fixture bound 600s -> 5.24s; 4 failed, 85 passed.
+- Build (config/fake/reader/job_service/candidates/dedup + carried fixes + goldens): 120s probes -> <1s/write.
+- PRE-FAIL leg, test_ai_pipeline.py (implementation stashed): fixture bound 600s -> 1.16s; 11 failed (raw in verify log).
+- POST leg, test_ai_pipeline.py: fixture bound 600s -> 1.65s; 11 passed.
+- Full suite from backend/ (POST): fixture bound 600s -> 6.39s; 2 failed, 98 passed (both base-proved env reds).
+- ruff check .: ordinary bound 120s -> <1s, exit 0 "All checks passed!".
+- mypy app: ordinary bound 300s -> completed, exit 1, 40 pre-existing errors in 9 files (base: 40/9; 0 in touched files).
+- G5/G6 (worklogs, commit, push, notes note): ordinary bound 120s per probe -> within bound.
+- Overall wall clock ~19:33Z-~19:5xZ, far inside the 2400s overall bound; early-close 1800s not reached.
+
+SPEND
+- $0.00 — fake/scripted provider only (`ScriptedProvider.cost = 0.0`), zero provider HTTP attempts, zero live calls.
+- Caps `sg_per_job_cap=None`, `sg_monthly_cap=None` (uncapped per F2), never bound.
+
+LIVE-STATE LEDGER
+- DB: none — temp SQLite only (tests) + one pre-existing gitignored dev file not touched by this slice. Zero live rows.
+- Services/restarts/deploys/prod writes: none. Network attempts: 0 (proven: `opencode_go._post` patched to raise never fires; skip path).
+- Secrets: names/counts only. `OPENCODE_API_KEY` never read or logged this slice. `.env` never read.
+- Sensitive surfaces (`G-K3`): none touched.
+
+GATES (detail + raw in SG-028_verify.log)
+- Starting tree clean (quoted); BASE ref `automation` -> commit `f7de15c38acfbf9d4d6648e9b7d47c8907577ce8`.
+- Steps in blueprint §5.1 order: VALIDATING,NORMALIZING,EXTRACTING_DETERMINISTIC_SIGNALS,ANALYZING_WITH_AI,
+  BUILDING_CANDIDATES,DEDUPLICATING,AWAITING_REVIEW,COMMITTING (8).
+- Default OFF proved: both AI steps `{"status":"skipped","reason":"consent_disabled"}`; 0 ProviderCall rows;
+  candidate fields Phase-1-flat (`display_name == "milk"`).
+- Enabled offline path proved end-to-end on ScriptedProvider: redacted PNG bytes + versioned prompt reach the
+  provider; strict validation via `extract_with_single_repair`; exactly one repair then FAILED step on second failure.
+- Ledger: exactly 1 `provider_call` row per valid call, `job_id` linked, cost 0.0, error_state None.
+- Gating negative tests: expiry always `proposed`; no `accepted` expiry without a user decision.
+- needs_evidence: no expiry field derived, `expiry.manual_entry` open task, unknowns preserved, commit yields no expiry assertion.
+- Correction chain: committed `display_name` (extraction) superseded by a new `accepted` user assertion + audit rows.
+- Dedup reconciliation: AI candidate still receives `similar` matches; matches semantics unchanged.
+- Carried fixes: schemas.py docstring one-liner; config-readback leak-free (both migration tests green in plain suite).
+- ruff clean; mypy quoted; config read-back quoted; both runs committed raw.
+
+FINDINGS, DISAGREEMENTS, UNCLEAR: see `docs/worklogs/SG-028_report.md`. Three UNCLEAR lines there.
