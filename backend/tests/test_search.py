@@ -244,7 +244,7 @@ def test_fts_migration_upgrade_downgrade_upgrade(tmp_path: Path, monkeypatch: py
             assert connection.execute(
                 text("SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = 'asset_fts'")
             ).first()
-        command.downgrade(config, "-1")
+        command.downgrade(config, "20260908_sg014_candidate")
         with engine.connect() as connection:
             assert connection.execute(
                 text("SELECT 1 FROM sqlite_master WHERE name = 'asset_fts'")

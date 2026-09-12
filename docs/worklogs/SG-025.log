@@ -1,0 +1,41 @@
+SG-025 worklog — provider seam (ADR-004/007/010 + gateway + ledger + fake)
+BASE=737765ee27094218b9cae7efc9338224f8c4e672 branch=automation
+MODEL=unknown (CLI default; parent argv carries no --model) | effort=medium (--variant medium in parent argv)
+
+G0 salvage (read-only first): `git status --porcelain` empty (clean). Quarantine ref
+refs/quarantine/SG-025-20260912T164340Z (b6f17d5) exists — 15 files, 736 insertions.
+VERDICT: rebuilt, not adopted. Reasons: (1) debris reverts AGENTS.md+STATE.md to
+contract 0.22.0, contradicting D39/0.23.0 this packet fires under; (2) debris edits
+the packet itself (removes G0+guards); (3) verify log sits at backend/docs/worklogs
+(wrong path; Values bind docs/worklogs). G2-G5 code shapes verified sound and rebuilt
+to same shape; adopted-vs-rebuilt: 0 lines adopted verbatim, all files rewritten fresh
+after verifying each gate. Nothing silently dropped — diff quoted in report.
+
+G1 gates: status clean (quoted in report). Live head 20260908_sg017_fts (versions-dir
+listing; hypothesis CONFIRMED). Baseline suite 4.85s: 64 passed, 2 failed
+(test_signals QR-validation + OCR-boxes — pre-existing, base-run proof in report).
+.env present mode 600. Q2 `grep -c '^OPENCODE_API_KEY=' .env` = 0 (REPORTED, not a STOP).
+
+G2 providers/: protocols.py (4 Protocols + ProviderResult envelope, sync by design),
+router.py (RouterConfig + budget-first + retryable-only fallback), fake.py (4 shapes).
+Network grep under providers/: no matches. config.py untouched (no routing settings
+needed — RouterConfig dataclass covers it).
+
+G3 ledger: provider_call.py (all §3.3 fields, TimestampMixin+new_id) + __init__ export.
+Migration 20260912_sg025_provider_call (down_revision=live head): temp-DB leg
+HEAD-UP present True / DOWN-1 absent True / RE-UP present True; `alembic heads` =
+20260912_sg025_provider_call (head). downgrade grep hits: 4 version files + 3 pinned
+test call-sites; test_search.py -1 → pinned 20260908_sg014_candidate (PG-SC-11);
+test_postgres_dialect.py EXPECTED_TABLES + import (else suite red).
+
+G4 tests: PRE-change FAIL ModuleNotFoundError app.models.provider_call (1 error in
+0.27s) committed to SG-025_verify.log; POST-change 5 passed in 0.26s appended to same
+log. Full suite 5.45s: 69 passed (64+5), same 2 pre-existing signals reds. ruff clean
+on all touched files. mypy: 1 error app/models/base.py:8 unused type-ignore —
+PRE-EXISTING (file untouched by this slice; followed via import).
+
+G5 ADRs: ADR-004/007/010 committed with status+date+slice.
+
+Elapsed-vs-budget: G0/G1 ~120s vs 120s probes OK; baseline 4.85s vs 600s; migration leg
+~60s vs 300s; full suite 5.45s vs 600s; overall ~25min vs 900s.
+DATABASE: none — temp SQLite only. Restart: none — service untouched.

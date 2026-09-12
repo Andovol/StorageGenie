@@ -6,6 +6,7 @@ from app.models.evidence import Evidence, asset_evidence
 from app.models.household import Household
 from app.models.idempotency import IdempotencyKey
 from app.models.job import Job, JobStep
+from app.models.provider_call import ProviderCall
 from app.models.review_task import ReviewTask
 from app.models.user import User
 
@@ -19,6 +20,7 @@ __all__ = [
     "IdempotencyKey",
     "Job",
     "JobStep",
+    "ProviderCall",
     "ReviewTask",
     "User",
     "Base",

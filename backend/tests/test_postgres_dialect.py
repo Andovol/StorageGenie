@@ -19,6 +19,7 @@ from app.models import (  # noqa: F401
     IdempotencyKey,
     Job,
     JobStep,
+    ProviderCall,
     ReviewTask,
     User,
     asset_evidence,
@@ -39,6 +40,7 @@ EXPECTED_TABLES = {
     "job",
     "job_step",
     "observation",
+    "provider_call",
     "review_task",
     "user",
 }
