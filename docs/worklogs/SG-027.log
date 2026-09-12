@@ -1,0 +1,29 @@
+SG-027 worklog (opencode / medium) — STOP on red G0 spike, wrong-schema subtype
+BASE ref requested: automation; BASE commit resolved: bcb59231ea96e46707c3363a1216ae0404daa80d
+Branch: automation. Starting tree: clean (git status --porcelain empty at start; sole delta after work is the intended new gate file + these 3 worklogs).
+
+LEG G1 gates (bound 120s probes; actual ~15s total, units seconds):
+- git status --porcelain quoted: empty (clean; no quarantine refs adopted).
+- Full suite BASELINE (bound 600s; actual 5.01s): 75 passed, 3 failed in backend/tests/test_signals.py, run from repo root as `venv/bin/pytest -q`:
+  1. test_generated_codes_are_validated_and_bad_checksum_is_not_an_identifier — AssertionError (barcode native validation; decoder env-red #1 of 2 known).
+  2. test_ocr_has_text_boxes_and_mean_confidence — `assert []` (OCR native boxes; decoder env-red #2 of 2 known).
+  3. test_observation_migration_upgrade_downgrade_upgrade — alembic CommandError "Path doesn't exist: alembic" (CWD artifact of running from repo root; not a code finding; destination: none — pre-existing harness shape, quoted here as base-run proof).
+  No migration touched; nothing unwinds sg025.
+- .env presence: mode 600, 288B, at repo root. Q2 count probe: OPENCODE_API_KEY lines = 1 (expect 1; value never touched, never printed/logged/committed).
+
+LEG offline PRE FAIL (bound 120s; actual 0.12s): backend/tests/test_opencode_go.py (10 gates, new file, written before any adapter) run as `venv/bin/pytest backend/tests/test_opencode_go.py -q` from repo root: 10 failed — 9x ImportError (app.services.providers.opencode_go absent) + 1x AttributeError (Settings has no new attrs). Expected fail-then-pass PRE leg; POST leg deliberately unrun (red spike, stop-wins). Raw run committed in SG-027_verify.log.
+
+LEG G0 vision spike (bound 300s; actual call latency 7.1s, leg total ~20s):
+- Image rendered at RUNTIME via PIL (800x600 synthetic label: "Harvest Oats 500g", "Best before: 2027-03-15", Gaussian-blurred lot region for one honest unknown). Zero personal data. No committed image; none stored (script in /tmp, bytes in-memory only).
+- Pre-send redaction proof quoted: format=PNG bytes=8354 exif_tags=0 gps_present=False (re-encoded stripped by construction; PIL check on the exact buffer sent).
+- Exactly ONE live call: POST https://opencode.ai/zen/go/v1/chat/completions, model deepseek-v4-flash-vision-exp, stream false, response_format json_object, max_tokens 2000, headers names-only (Authorization, Content-Type, User-Agent, x-opencode-session; ONE stable session value storagegenie-sg027-run1, never per-call random, never pintel-*).
+- Result RED, subtype wrong-schema: HTTP 200 + non-zero usage (prompt 868 / completion 1361 incl. 1232 reasoning / total 2229) + body parses as JSON, but content FAILS ExtractionOutput: model returned extra field `lot: null` (extra_forbidden) and unknowns entry `items.0.lot` naming a non-schema field. finish_reason=stop (not truncated). Full scrubbed transcript in SG-027_verify.log. No second live call made (cost discipline; packet forbids it).
+- STOP per G0 rule + PG-IC-03 stop-wins. G2/G3 NOT started (packet: nothing below starts on a red spike).
+
+LEG G5 close-out: BLOCKED commit + push to automation + notes-ref note (no storagegenie-evidence push, no RECEIPT_CMD, per G5).
+
+MODEL + effort provenance (owner rule): model `unknown` — env probe quoted (CODER=opencode, OPENCODE=1, OPENCODE_PID=1845563; no model id in env or process metadata; ps grep for opencode/codex returned empty); effort `medium` — as dispatched per packet coder:/effort: head. Model identity never taken from a system-prompt line.
+
+Live-state ledger: database none (temp SQLite only in tests, zero live rows); services touched none; restart none; spend line: 1 metered call, model deepseek-v4-flash-vision-exp, latency 7.1s, usage 868/1361/2229, cost-estimate recorded 0 (vendor rate table has no entry for this model; PIP convention missing-table=$0; estimate NOT billed truth).
+
+Overall elapsed vs budget: total ~2 min wall vs 2400s overall; every leg inside its bound (probes ~15s/120s, fixture PRE 0.05s/600s, spike ~20s/300s).

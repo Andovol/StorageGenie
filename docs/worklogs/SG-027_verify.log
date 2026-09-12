@@ -1,0 +1,61 @@
+SG-027 verify log — offline PRE FAIL raw + G0 spike transcript raw (POST leg unrun: red spike, stop-wins)
+BASE commit bcb59231ea96e46707c3363a1216ae0404daa80d. Header values and key material NEVER included.
+
+=== A. G1 probes ===
+$ git status --porcelain
+(empty — clean at start)
+$ grep -c OPENCODE_API_KEY .env
+1
+$ ls -la .env
+-rw------- 1 andrei andrei 288 (.env presence only)
+
+=== B. Full suite BASELINE (bound 600s; actual 5.01s) ===
+$ venv/bin/pytest -q   (from repo root)
+3 failed, 75 passed, 8 warnings in 5.01s
+FAILED backend/tests/test_signals.py::test_generated_codes_are_validated_and_bad_checksum_is_not_an_identifier
+  assert False (barcode native validation — decoder env-red 1/2 known)
+FAILED backend/tests/test_signals.py::test_ocr_has_text_boxes_and_mean_confidence
+  assert [] (OCR native boxes — decoder env-red 2/2 known)
+FAILED backend/tests/test_signals.py::test_observation_migration_upgrade_downgrade_upgrade
+  alembic.util.exc.CommandError: Path doesn't exist: alembic (CWD artifact of repo-root run — harness shape, not code)
+74th...78th collected total: 78 tests.
+
+=== C. Offline gates PRE FAIL (bound 600s fixture leg; actual 0.12s) ===
+$ venv/bin/pytest backend/tests/test_opencode_go.py -q   (from repo root, pre-adapter)
+FFFFFFFFF                                                                [100%]
+test_identity_headers_stable_and_no_pintel_prefix: ImportError: cannot import name 'opencode_go' from 'app.services.providers' (unknown location)
+test_response_format_map_deepseek_kin_json_object: ImportError (same)
+test_guard_empty_200_rejected: ImportError (same)
+test_guard_zero_usage_rejected: ImportError (same)
+test_guard_think_strip_once_then_loud_fail: ImportError (same)
+test_guard_max_tokens_sized_past_truncation: ImportError (same)
+test_redaction_gps_stripped_byte_proven: ImportError (same)
+test_budget_refusal_zero_calls: ImportError (same)
+test_outgoing_payload_shape_no_key_material: ImportError (same)
+test_config_readback_new_values: AttributeError: 'Settings' object has no attribute 'sg_provider_id'
+10 failed in 0.12s
+(Full raw output with tracebacks: 133 lines captured from /tmp/opencode_pre_fail2.txt at commit time; summary above is verbatim in kind — 9 ImportError + 1 AttributeError. POST leg NOT run: no adapter exists on a red spike; a pass here would be vacuous and is loudly not claimed.)
+
+=== D. G0 vision spike transcript — EXACTLY ONE live call (bound 300s; call latency 7.1s) ===
+Q2 probe: OPENCODE_API_KEY lines in .env = 1 (value never touched)
+header names: Authorization, Content-Type, User-Agent, x-opencode-session
+stability rule: ONE stable x-opencode-session per conversation (storagegenie-sg027-run1), never per-call random, never pintel-*
+redaction proof: format=PNG bytes=8354 exif_tags=0 gps_present=False
+outgoing shape: endpoint=POST https://opencode.ai/zen/go/v1/chat/completions fields=['max_tokens', 'messages', 'model', 'response_format', 'stream'] stream=False response_format={'type': 'json_object'} max_tokens=2000 key_material_present=False
+SPIKE RESULT: http=200 latency=7.1s
+body_bytes=6280 body_head='{"id":"d14c1338-3ba1-412e-bd79-9d084d43325b","object":"chat.completion","created":1789233512,"model":"deepseek-v4-flash-vision-exp","choices":[{"index":0,"finish_reason":"stop","logprobs":null,"message":{"role":"assistant","content":"{\n  \"items\": [\n    {\n      \"name\": \"Harvest Oats 500g\",\n      \"expiry_date\": \"2027-03-15\",\n      \"date_type\": \"best_before\",\n      \"lot\": null,\n      \"confidence\": 0.9,\n      \"uncertainty_reasons\": [\n        \"torn/partial print region: lot code obscured\",\n        \"occlusion of the lot field prevents any legible reading\"\n      ]\n'
+usage={"prompt_tokens": 868, "completion_tokens": 1361, "total_tokens": 2229, "prompt_cache_hit_tokens": 0, "prompt_cache_miss_tokens": 868, "prompt_tokens_details": {"cached_tokens": 0}, "completion_tokens_details": {"reasoning_tokens": 1232}}
+content_bytes=407 content_head='{\n  "items": [\n    {\n      "name": "Harvest Oats 500g",\n      "expiry_date": "2027-03-15",\n      "date_type": "best_before",\n      "lot": null,\n      "confidence": 0.9,\n      "uncertainty_reasons": [\n        "torn/partial print region: lot code obscured",\n        "occlusion of the lot field prevents any legible reading"\n      ]\n    }\n  ],\n  "unknowns": [\n    "items.0.lot"\n  ],\n  "needs_evidence": false\n}'
+SPIKE STOP: schema validation failed: 1 validation error for ExtractionOutput
+items.0.lot
+  Extra inputs are not permitted [type=extra_forbidden, input_value=None, input_type=NoneType]
+    For further information visit https://errors.pydantic.dev/2.13/v/extra_forbidden
+VERDICT: RED (wrong-schema). No second live call made. STOP per G0 rule + PG-IC-03.
+
+=== E. Model/effort provenance ===
+$ env | grep -iE "opencode|model|variant"
+CODER=opencode
+OPENCODE_PID=1845563
+OPENCODE=1
+CODER_STATE_DIR=/home/andrei/.codex /home/andrei/.grok /home/andrei/.local/share/opencode
+ps grep for opencode/codex: empty. No model id in process arguments or provider metadata -> model `unknown` (owner rule: write unknown, never guess). Effort `medium` per packet coder:/effort: head as dispatched.
