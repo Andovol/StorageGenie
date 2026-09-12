@@ -23,6 +23,7 @@ from pathlib import Path
 from typing import Any
 
 from pydantic import ValidationError as PydanticValidationError
+from sqlalchemy import func
 from sqlalchemy.orm import Session
 
 from app.config import settings
@@ -33,11 +34,13 @@ from app.services.providers.fake import FakeProvider
 from app.services.providers.opencode_go import OpenCodeGoProvider
 from app.services.providers.redaction import redact_image
 from app.services.providers.router import (
+    BudgetExceededError,
     ProviderError,
     ProviderRouter,
     RouterConfig,
 )
 from app.services.providers.schemas import (
+    ExtractionFailedError,
     ExtractionOutput,
     extract_with_single_repair,
 )
@@ -185,6 +188,47 @@ def _estimate_call(provider: Any, image_bytes: bytes, prompt: str) -> float:
     return 0.0
 
 
+def _recorded_spend(db: Session, household_id: str) -> float:
+    """Durable spend for one household, derived from the committed ledger (SG-030 ISS-10).
+
+    The provider instance is rebuilt every step, so an in-process counter resets
+    and a monthly cap built on it can never bind across jobs. Summing the
+    committed `provider_call` cost rows through their jobs survives that rebuild
+    and is the same figure the audit trail already carries.
+    """
+    total = (
+        db.query(func.coalesce(func.sum(ProviderCall.cost), 0.0))
+        .join(Job, ProviderCall.job_id == Job.id)
+        .filter(Job.household_id == household_id)
+        .scalar()
+    )
+    return float(total or 0.0)
+
+
+def _mark_calls_failed(db: Session, call_ids: list[str], reason: str) -> None:
+    """Mark returned-body ledger rows as errored and COMMIT them (SG-030 ISS-11).
+
+    A call that reached the provider and returned a body already carries the
+    real cost/usage; when the content then fails schema validation on both
+    attempts, the row must survive `run_job`'s rollback with `error_state` set
+    rather than be erased as a pending success.
+    """
+    if not call_ids:
+        return
+    rows = (
+        db.query(ProviderCall)
+        .filter(ProviderCall.id.in_(call_ids), ProviderCall.error_state.is_(None))
+        .all()
+    )
+    if not rows:
+        return
+    for row in rows:
+        row.error_state = (
+            f"{reason}: payload failed schema validation after the single repair"[:200]
+        )
+    db.commit()
+
+
 def _write_error_ledger(
     db: Session,
     job: Job,
@@ -260,7 +304,11 @@ def _extract_one(
         call_ids.append(row.id)
         return result.normalized_output
 
-    output = extract_with_single_repair(supply)
+    try:
+        output = extract_with_single_repair(supply)
+    except ExtractionFailedError:
+        _mark_calls_failed(db, call_ids, "schema_validation")
+        raise
     return output, call_ids
 
 
@@ -302,14 +350,30 @@ def run_ai_extraction(db: Session, job: Job) -> dict[str, object]:
             "reason": "no_analyzable_image",
         }
 
+    prepared: list[tuple[Evidence, bytes, float]] = []
+    for evidence in evidence_rows:
+        raw = resolve_original_bytes(db, evidence.id)
+        redacted = redact_image(raw)
+        prepared.append((evidence, redacted, _estimate_call(provider, redacted, prompt)))
+
+    # SG-030 ISS-10: the monthly cap binds across jobs from the durable ledger,
+    # never a per-instance counter a fresh step resets. Refuse BEFORE any call
+    # when the whole job's worst-case estimate would cross the cap.
+    if settings.sg_monthly_cap is not None:
+        already_spent = _recorded_spend(db, job.household_id or "")
+        projected = already_spent + sum(estimate for _, _, estimate in prepared)
+        if projected > settings.sg_monthly_cap:
+            raise BudgetExceededError(
+                f"estimated monthly cost {projected:.6f} exceeds monthly cap "
+                f"{settings.sg_monthly_cap} ({already_spent:.6f} already recorded "
+                f"for this household)"
+            )
+
     items: list[dict[str, object]] = []
     unknowns: list[str] = []
     call_ids: list[str] = []
     needs_evidence = False
-    for evidence in evidence_rows:
-        raw = resolve_original_bytes(db, evidence.id)
-        redacted = redact_image(raw)
-        estimate = _estimate_call(provider, redacted, prompt)
+    for _, redacted, estimate in prepared:
         output, evidence_call_ids = _extract_one(
             db,
             job,

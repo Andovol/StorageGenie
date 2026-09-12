@@ -1,0 +1,156 @@
+# SG-030 verify log — FAIL-then-PASS raw, gates, read-back, secret scan
+# Generated: 2026-09-12T20:10:16Z on ubuntu (VPS /home/andrei/StorageGenie)
+# BASE REF automation -> resolved 995e69d9214c5fd08d7f06a2b8f13643db7cfbeb
+# MODEL + effort: see report (from process argv / provider metadata, never an identity line)
+
+## 0. Starting tree — dispatch start was CLEAN (verified before any edit)
+$ git status --short   # at dispatch start, before edits:
+(empty)
+$ git branch --show-current
+automation
+$ git rev-parse HEAD
+995e69d9214c5fd08d7f06a2b8f13643db7cfbeb
+$ git rev-parse automation
+995e69d9214c5fd08d7f06a2b8f13643db7cfbeb
+
+Working diff after in-slice edits (expected files only):
+$ git status --short
+ M .env.example
+ M README.md
+ M backend/app/services/providers/reader.py
+ M backend/tests/test_ai_pipeline.py
+?? backend/tests/test_phase2_e2e.py
+?? docs/worklogs/SG-030_verify.log
+
+## 1. RUN A — new tests against the BASE reader.py (pre-fix): G0 FAILS, G1 passes
+$ git checkout HEAD -- backend/app/services/providers/reader.py   # base reader
+$ cd backend && ../venv/bin/python -m pytest tests/test_ai_pipeline.py tests/test_phase2_e2e.py -q -p no:cacheprovider --tb=line
+.............FF......                                                    [100%]
+=================================== FAILURES ===================================
+E   assert 0 == 2
+     +  where 0 = len([])
+/home/andrei/StorageGenie/backend/tests/test_ai_pipeline.py:617: assert 0 == 2
+E   AssertionError: assert 'AWAITING_REVIEW' == 'FAILED'
+      
+      - FAILED
+      + AWAITING_REVIEW
+/home/andrei/StorageGenie/backend/tests/test_ai_pipeline.py:696: AssertionError: assert 'AWAITING_REVIEW' == 'FAILED'
+=============================== warnings summary ===============================
+../venv/lib/python3.12/site-packages/fastapi/testclient.py:1
+  /home/andrei/StorageGenie/venv/lib/python3.12/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/test_ai_pipeline.py::test_returned_body_failing_schema_is_ledgered_durably
+FAILED tests/test_ai_pipeline.py::test_monthly_cap_binds_across_jobs_from_durable_ledger
+2 failed, 19 passed, 1 warning in 2.80s
+PYTEST_RUN_A_EXIT=1
+$ # reader.py restored (fixed); diff stat vs HEAD:
+ backend/app/services/providers/reader.py | 74 +++++++++++++++++++++++++++++---
+ 1 file changed, 69 insertions(+), 5 deletions(-)
+
+## 2. RUN B — same new tests against the FIXED reader.py: all PASS
+$ cd backend && ../venv/bin/python -m pytest tests/test_ai_pipeline.py tests/test_phase2_e2e.py -q -p no:cacheprovider --tb=line
+.....................                                                    [100%]
+=============================== warnings summary ===============================
+../venv/lib/python3.12/site-packages/fastapi/testclient.py:1
+  /home/andrei/StorageGenie/venv/lib/python3.12/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+21 passed, 1 warning in 2.65s
+PYTEST_RUN_B_EXIT=0
+
+## 3. G1 non-vacuity — mutation proofs (E2E passes on base, so sensitivity is proved here)
+### 3a. Mutation A: candidates._review_state_for auto-accepts GATED_FIELDS -> E2E #1 must FAIL
+=========================== short test summary info ============================
+FAILED tests/test_phase2_e2e.py::test_ai_proposes_expiry_candidates_for_food_and_medicine
+1 failed, 1 warning in 0.79s
+MUTATION_A_EXIT=1 (1 = E2E caught the broken gated routing)
+### 3b. Mutation B: assertion_service no longer supersedes -> E2E #4 must FAIL
+=========================== short test summary info ============================
+FAILED tests/test_phase2_e2e.py::test_correction_supersedes_auditably - Asser...
+1 failed, 1 warning in 0.73s
+MUTATION_B_EXIT=1 (1 = E2E caught the non-superseding correction)
+### 3c. Mutation C: job_service.run_job skips rollback -> E2E #2 must FAIL
+=========================== short test summary info ============================
+FAILED tests/test_phase2_e2e.py::test_accept_commit_is_atomic_and_rolls_back_on_forced_failure
+1 failed, 1 warning in 0.69s
+MUTATION_C_EXIT=1 (1 = E2E caught the missing rollback)
+$ git diff --stat -- app/services/candidates.py app/services/assertion_service.py app/services/job_service.py   # must be empty after revert:
+
+## 4. Gates — full backend suite (bound 600s), ruff, mypy
+$ ../venv/bin/python -m pytest -q -p no:cacheprovider --tb=line
+tests/test_search.py::test_fts_migration_upgrade_downgrade_upgrade
+tests/test_signals.py::test_observation_migration_upgrade_downgrade_upgrade
+tests/test_signals.py::test_observation_migration_upgrade_downgrade_upgrade
+tests/test_signals.py::test_observation_migration_upgrade_downgrade_upgrade
+  /home/andrei/StorageGenie/venv/lib/python3.12/site-packages/alembic/config.py:604: DeprecationWarning: No path_separator found in configuration; falling back to legacy splitting on spaces, commas, and colons for prepend_sys_path.  Consider adding path_separator=os to Alembic config.
+    util.warn_deprecated(
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/test_signals.py::test_generated_codes_are_validated_and_bad_checksum_is_not_an_identifier
+FAILED tests/test_signals.py::test_ocr_has_text_boxes_and_mean_confidence - a...
+2 failed, 114 passed, 10 warnings in 7.40s
+PYTEST_SUITE_EXIT=1
+
+$ ../venv/bin/python -m ruff check app tests
+All checks passed!
+RUFF_EXIT=0
+
+$ ../venv/bin/python -m mypy app   # advisory in Phase 0; 40 errors at base, identical now
+app/main.py:39: error: Unused "type: ignore" comment  [unused-ignore]
+app/main.py:45: error: Unused "type: ignore" comment  [unused-ignore]
+Found 40 errors in 9 files (checked 59 source files)
+MYPY_EXIT=1
+
+## 5. Base-proved reds, config read-back, secret scan, scope, network proof
+
+### 5a. The 2 suite reds are pre-existing (base commit proof)
+$ # BASE tree (reader.py at HEAD), same command:
+$ cd backend && ../venv/bin/python -m pytest -q        # BASE
+2 failed, 106 passed, 10 warnings in 6.46s
+FAILED tests/test_signals.py::test_generated_codes_are_validated_and_bad_checksum_is_not_an_identifier
+FAILED tests/test_signals.py::test_ocr_has_text_boxes_and_mean_confidence
+$ # (decoder env: pyzbar/pytesseract absent; same two reds after the change: 2 failed, 114 passed)
+
+### 5b. PG-SC-02 read-back of touched settings (env-overridden fresh Settings)
+$ SG_CONFIDENCE_THRESHOLD=0.42 SG_PROMPT_CATEGORY=medicine SG_MONTHLY_CAP=3.5 ../venv/bin/python -c "from app.config import Settings; s=Settings(); print(...)"
+sg_confidence_threshold= 0.42
+sg_prompt_category= medicine
+sg_monthly_cap= 3.5
+
+### 5c. Secret scan (names/counts only; CO-44) and no ignored file staged
+$ git grep -nE '(sk-[A-Za-z0-9_-]{12,}|OPENCODE_API_KEY=[A-Za-z0-9])' -- . ':!*.lock'   # expects 0
+0 matches
+$ grep -c '^OPENCODE_API_KEY=' .env   # count only, value never read
+1
+$ git diff --cached --name-only   # expects empty (nothing staged yet)
+(empty)
+
+### 5d. Scope check: changed paths only (no migration / prompt / corpus / UI)
+$ git status --short
+ M .env.example
+ M README.md
+ M backend/app/services/providers/reader.py
+ M backend/tests/test_ai_pipeline.py
+?? backend/tests/test_phase2_e2e.py
+?? docs/worklogs/SG-030_verify.log
+$ git diff --name-only HEAD
+.env.example
+README.md
+backend/app/services/providers/reader.py
+backend/tests/test_ai_pipeline.py
+$ ls backend/app/services/providers/prompts/   # prompt files unchanged (no diff above)
+extract-food-v1.md
+extract-medicine-v1.md
+
+### 5e. Network proof (zero live calls, spend $0)
+$ # The E2E fixture patches the real adapter's _post to raise; each test asserts the list is empty:
+backend/tests/test_phase2_e2e.py:69:        network_attempts.append("post")
+backend/tests/test_phase2_e2e.py:70:        raise AssertionError("network must never be attempted in the offline E2E")
+backend/tests/test_phase2_e2e.py:72:    monkeypatch.setattr(opencode_go.OpenCodeGoProvider, "_post", _forbidden)
+backend/tests/test_phase2_e2e.py:284,335,398,429,464,495:  assert network == []
+$ # No live/eval run was executed in this slice; no provider key was used; spend $0.000000

@@ -41,6 +41,7 @@ from app.services import job_service  # noqa: E402
 from app.services.asset_service import create_asset  # noqa: E402
 from app.services.candidates import Candidate  # noqa: E402
 from app.services.observations import Observation  # noqa: E402
+from app.services.providers.protocols import ProviderResult  # noqa: E402
 
 
 def _gps_jpeg_bytes() -> bytes:
@@ -558,3 +559,143 @@ def test_ai_candidate_still_receives_dedup_matches(ai_env, monkeypatch: pytest.M
     # exactly the BUILDING_CANDIDATES candidate was reconciled, not a second one
     assert session.query(Candidate).filter_by(job_id=job.id).count() == 1
     assert "source_type" in proposal["fields"]["display_name"]  # type: ignore[index]
+
+
+class _InvalidBodyProvider:
+    """A provider whose returned body carries usage/cost but fails the schema (SG-030 ISS-11).
+
+    The call reached the provider and came back with a billable-looking body; the
+    reader's strict parse rejects it on both attempts (initial + one repair).
+    """
+
+    provider_id = "invalid-body"
+    model_id = "invalid-body-model"
+
+    def __init__(self, *, cost: float = 0.0023) -> None:
+        self.cost = cost
+        self.invocations = 0
+
+    def extract_items(  # type: ignore[no-untyped-def]
+        self, image_bytes: bytes, prompt: str, *, estimated_cost: float = 0.0
+    ):
+        self.invocations += 1
+        return ProviderResult(
+            normalized_output={"prose": "this body is not the extraction schema"},
+            raw_payload={"provider": self.provider_id, "attempt": self.invocations},
+            request_id=f"invalid-body-{self.invocations}",
+            usage={"prompt_tokens": 11, "completion_tokens": 7, "total_tokens": 18},
+            cost=self.cost,
+            model_id=self.model_id,
+            latency_ms=2.5,
+        )
+
+
+def test_returned_body_failing_schema_is_ledgered_durably(ai_env, monkeypatch: pytest.MonkeyPatch) -> None:  # type: ignore[no-untyped-def]
+    """SG-030 ISS-11: a returned body keeps its real cost/usage and an error_state.
+
+    Pre-fix the success-shaped rows written for a body that then failed schema
+    validation were flushed but erased by the step rollback, and carried no
+    error_state. Post-fix each of the two attempts leaves one committed row with
+    the returned cost/usage AND `error_state`.
+    """
+    session, household_id, evidence_id = ai_env
+    from app.services.providers import reader as reader_mod
+
+    provider = _InvalidBodyProvider(cost=0.0023)
+    monkeypatch.setattr(reader_mod, "provider_registry", lambda: {provider.provider_id: provider})
+    monkeypatch.setattr(settings, "sg_consent", True)
+    monkeypatch.setattr(settings, "sg_provider_id", provider.provider_id)
+    monkeypatch.setattr(settings, "sg_prompt_category", "food")
+    monkeypatch.setattr(settings, "sg_per_job_cap", None)
+    monkeypatch.setattr(settings, "sg_monthly_cap", None)
+
+    job = _run(session, household_id, evidence_id)
+
+    assert job.state == "FAILED"
+    assert provider.invocations == 2
+    rows = session.query(ProviderCall).filter_by(job_id=job.id).order_by(ProviderCall.created_at).all()
+    assert len(rows) == 2
+    for row in rows:
+        assert row.error_state is not None
+        assert "schema_validation" in row.error_state
+        assert row.cost == 0.0023
+        assert row.output_payload is not None
+        assert json.loads(row.usage_json or "{}")["total_tokens"] == 18
+
+
+class _MonthlyProbeProvider:
+    """An estimating provider that records a real cost per call (SG-030 ISS-10)."""
+
+    provider_id = "monthly-probe"
+    model_id = "monthly-probe-model"
+
+    def __init__(self, *, estimate: float, cost: float) -> None:
+        self.estimate = estimate
+        self.cost = cost
+        self.invocations = 0
+
+    def estimate_cost(self, image_bytes: bytes, prompt: str) -> float:
+        return self.estimate
+
+    def extract_items(  # type: ignore[no-untyped-def]
+        self, image_bytes: bytes, prompt: str, *, estimated_cost: float = 0.0
+    ):
+        self.invocations += 1
+        return ProviderResult(
+            normalized_output={
+                "items": [
+                    {
+                        "name": "Monthly Milk",
+                        "expiry_date": None,
+                        "date_type": None,
+                        "lot": None,
+                        "confidence": 1.0,
+                        "uncertainty_reasons": [],
+                    }
+                ],
+                "unknowns": [],
+                "needs_evidence": False,
+            },
+            raw_payload={"provider": self.provider_id},
+            request_id=f"monthly-{self.invocations}",
+            usage={"prompt_tokens": 10, "completion_tokens": 5, "total_tokens": 15},
+            cost=self.cost,
+            model_id=self.model_id,
+            latency_ms=1.0,
+        )
+
+
+def test_monthly_cap_binds_across_jobs_from_durable_ledger(ai_env, monkeypatch: pytest.MonkeyPatch) -> None:  # type: ignore[no-untyped-def]
+    """SG-030 ISS-10: recorded spend counts toward the next job's pre-call check.
+
+    Pre-fix `_monthly_spent` lived on a provider instance rebuilt per step, so it
+    reset and the second job called out again. Post-fix the reader derives the
+    baseline from the committed `provider_call` ledger: job 1 succeeds and records
+    0.6; job 2 estimates 1.0 against a 1.5 cap and refuses with 0 invocations and
+    0 new ledger rows, with the refusal visible in the step error.
+    """
+    session, household_id, evidence_id = ai_env
+    from app.services.providers import reader as reader_mod
+
+    provider = _MonthlyProbeProvider(estimate=1.0, cost=0.6)
+    monkeypatch.setattr(reader_mod, "provider_registry", lambda: {provider.provider_id: provider})
+    monkeypatch.setattr(settings, "sg_consent", True)
+    monkeypatch.setattr(settings, "sg_provider_id", provider.provider_id)
+    monkeypatch.setattr(settings, "sg_prompt_category", "food")
+    monkeypatch.setattr(settings, "sg_per_job_cap", None)
+    monkeypatch.setattr(settings, "sg_monthly_cap", 1.5)
+
+    first = _run(session, household_id, evidence_id)
+    assert first.state == "AWAITING_REVIEW"
+    assert provider.invocations == 1
+    first_rows = session.query(ProviderCall).filter_by(job_id=first.id).all()
+    assert len(first_rows) == 1
+    assert first_rows[0].cost == 0.6
+
+    second = _run(session, household_id, evidence_id)
+    assert second.state == "FAILED"
+    assert provider.invocations == 1
+    assert session.query(ProviderCall).filter_by(job_id=second.id).count() == 0
+    steps = {step.step_name: step for step in job_service._steps(session, second.id)}
+    error = json.loads(steps["ANALYZING_WITH_AI"].output_refs or "{}")
+    assert "monthly" in error["error"]

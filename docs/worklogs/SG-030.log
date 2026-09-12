@@ -1,0 +1,60 @@
+SG-030 execution log
+
+Dispatcher: not run by the Coder (role guard: the Coder never runs the dispatch verb).
+Unit: opencode run --auto --dir /home/andrei/StorageGenie --variant medium "<packet SG-030>"
+Start (Coder proc): 2026-09-12T20:03:45Z (run-coder 20:03:43Z). End: ~20:12Z.
+MODEL + effort (CO-78, from process argv + provider metadata, never an identity line):
+  effort = medium   (argv: --variant medium)
+  model  = deepseek-v4.1-flash
+           (argv carries NO model flag — CLI default omitted per policy;
+            provider metadata opencode.log run=e589127c: providerID=opencode-go modelID=deepseek-v4.1-flash)
+
+BASE REF: automation -> resolved 995e69d9214c5fd08d7f06a2b8f13643db7cfbeb (two fields).
+Starting tree: CLEAN (git status --short empty before any edit).
+WORK_HEAD: the commit carrying this file (hash quoted by the G6 receipt note).
+
+Elapsed versus budget (PG-PR-06, uncalibrated per G-A9):
+  leg                                    actual        budget      unit
+  read/premise probes                    ~4 min       120 s/probe  (many, each bounded)
+  G0 tests FAIL run (base reader)        2.74 s       120 s
+  G0 tests PASS run (fixed reader)       2.57 s       120 s
+  G1 E2E authoring + run                 1.41-1.48 s  180 s
+  G1 mutation proofs (A,B,C)             0.69-0.80 s  120 s each
+  full backend suite                     7.40 s       600 s
+  ruff check app tests                   <1 s         120 s
+  mypy app (advisory)                    bounded 300 s, 40 errors (base-identical)
+  verify log generation (all runs)       ~30 s        -
+  OVERALL WALL                           ~470 s       2400 s
+
+Spend: $0.000000 (zero live provider calls; no metered eval run).
+Live-state ledger:
+  DATABASE  none — temp SQLite per test only; live /data/db never opened.
+  RESTART   none — no service touched; nothing deployed.
+  NETWORK   0 attempts — E2E patches OpenCodeGoProvider._post to raise and every
+            test asserts `network == []`; no --live eval run executed.
+  SECRETS   names/counts only (CO-44). `grep -c '^OPENCODE_API_KEY=' .env` = 1
+            (count only; value never read/printed/logged).
+  MIGRATION none. PROMPT/Corpus/UI files unchanged.
+
+Artifacts:
+  backend/tests/test_ai_pipeline.py   +2 G0 tests (ISS-10, ISS-11)
+  backend/tests/test_phase2_e2e.py    new, 6 E2E behaviours
+  backend/app/services/providers/reader.py  G0 fixes (durable ledger spend; durable error rows)
+  README.md                           Phase 2 runbook + Phase 3 non-goals
+  .env.example                        +SG_CONFIDENCE_THRESHOLD, +SG_PROMPT_CATEGORY (names only)
+  docs/worklogs/SG-030.log | SG-030_report.md | SG-030_verify.log
+
+UNCLEAR lines:
+  FIRST READ     — the packet's G3 says FAIL-then-PASS for "every new test (G0 + G1)".
+                   Read literally, G1 is a proof-of-existing-flow file: its six tests
+                   PASS on the unmodified base tree, so only the two G0 tests are
+                   fail-then-pass. Reported as a premise difference and answered with
+                   three source-mutation proofs for G1 (verify log §3) instead of a fake
+                   pre-fix failure.
+  DURING EXECUTION — whether the monthly cap should stay on the adapter instance as well
+                   as the reader. Read as: the durable ledger-derived reader check is the
+                   binding mechanism; the adapter's instance counter remains only for
+                   direct-call safety and cannot see across jobs.
+  REMAINING      — owner/Architect disposition of the archive-worthy but out-of-scope
+                   findings (adapter repair-turn tolerance, error-cost when the adapter
+                   raises before compute_cost, no split/manual-by-component UI).

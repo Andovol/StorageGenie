@@ -178,3 +178,68 @@ nodes that require `libzbar` and `tesseract` remain ISS-1 work for the manual
 compose pass, whose scope is image build plus compose-up/UI/restart re-proof.
 No browser automation is part of this verification map; frontend behavior was
 previously covered by its frontend suite and no frontend file is changed here.
+
+## Phase 2 runbook — AI extraction (Food + Medicine)
+
+Phase 2 adds one cloud vision provider behind the existing provider seam. It
+remains LAN-only, single-household, and unauthenticated like the earlier phases,
+and it is OFF by default: with the shipped defaults the pipeline skips the AI
+steps and behaves like Phase 1 (proved by
+`backend/tests/test_ai_pipeline.py::test_default_config_is_phase1_skip`).
+
+### Provider setup
+
+1. Subscribe to OpenCode GO and obtain an API key.
+2. Put the key in the host `.env` as `OPENCODE_API_KEY` (see `.env.example`).
+   `.env` is gitignored (`.gitignore:7`); the key value is never printed, logged,
+   or committed, and the adapter re-reads it from the backend environment only.
+3. Enable cloud use explicitly with `SG_CONSENT=true`. Consent is OFF by default;
+   without it no provider key is read and no network call is attempted.
+
+### Settings (names only; real values live in the uncommitted `.env`)
+
+| Setting | Purpose | Shipped default |
+|---|---|---|
+| `SG_PROVIDER_ID` | adapter id; `fake` keeps everything local | `fake` |
+| `SG_MODEL_ID` | vision model id for the adapter | `deepseek-v4-flash-vision-exp` |
+| `SG_CONFIDENCE_THRESHOLD` | auto-accept floor for non-gated fields (uncalibrated, `G-A9`) | `0.9` |
+| `SG_PROMPT_CATEGORY` | versioned prompt selection (`food` or `medicine`) | `food` |
+| `SG_PER_JOB_CAP` | per-job worst-case cost cap in USD | `none` (uncapped) |
+| `SG_MONTHLY_CAP` | household monthly cap in USD, enforced from the durable `provider_call` ledger | `none` (uncapped) |
+| `SG_CONSENT` | cloud consent switch | `false` |
+
+### Run the eval
+
+From `backend/`:
+
+```sh
+venv/bin/python eval/run.py               # offline: integrity + committed-cache scoring, $0
+venv/bin/python eval/run.py --check-only  # integrity checks only
+SG_CONSENT=true SG_PROVIDER_ID=opencode-go venv/bin/python eval/run.py --live
+```
+
+`--live` is the ONE metered mode: it prints the `$0.05` ceiling and per-call cost,
+reads the key from the environment, redacts each image through the shared
+`redact_image`, and reuses the same reader path production uses. Every call prints
+the provider-returned model, latency, usage, and cost. Do not run `--live` without
+intent: it spends real money.
+
+### Budget posture
+
+Per owner fork F2 the caps ship **uncapped**; re-evaluation is owed. The
+mechanisms exist and can refuse before any call: the per-job cap is checked by the
+router, and the monthly cap is checked by the reader against the committed
+`provider_call` ledger so it binds across jobs (not just within one instance). A
+refused job fails its `ANALYZING_WITH_AI` step with the cap reason and makes zero
+provider calls and zero ledger rows.
+
+### Phase 3 non-goals (owned by the next phase, not delivered here)
+
+- Web enrichment / `search_and_summarize` calls.
+- Planning and chat agents.
+- Categories beyond the Food and Medicine prompt files.
+- Prompt tuning (prompt v1 is frozen; the eval corpus is its guard).
+- A second provider or multi-provider routing/fallback.
+
+Phase 2 is proved by `backend/tests/test_phase2_e2e.py` (six offline behaviours on
+the real HTTP path, zero network) and closes on blueprint:522.
