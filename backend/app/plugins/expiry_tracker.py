@@ -22,6 +22,7 @@ from app.models.evidence import asset_evidence
 from app.models.review_task import ReviewTask
 from app.services import audit_service
 from app.services.observations import Observation
+from app.services.providers.schemas import ExtractionOutput
 
 PLUGIN_ID = "expiry-tracker"
 PLUGIN_VERSION = "1.0.0"
@@ -345,6 +346,34 @@ def _manual_task(db: Session, asset: Asset) -> ReviewTask:
     db.add(task)
     db.flush()
     return task
+
+
+def apply_extraction_result(
+    db: Session, asset: Asset, result: ExtractionOutput
+) -> tuple[Assertion | None, ReviewTask | None]:
+    """Map a validated extraction output onto the EXISTING manual-entry path.
+
+    Callable mapping only — not a job step, no pipeline changes (SG-028 owns
+    wiring). When the output carries needs_evidence, this writes the SAME
+    assertion kind classify_asset writes for a dateless asset (EXPIRY_FIELD,
+    {"status": "unknown"}, review_state "needs_evidence") and opens the SAME
+    "expiry.manual_entry" task via _manual_task — no new task type.
+    source_type is "extraction" (not classify's "deterministic") so provenance
+    stays honest. Outputs without needs_evidence map to (None, None): nothing
+    written, no task opened.
+    """
+    if not result.needs_evidence:
+        return None, None
+    assertion = _write_assertion(
+        db,
+        asset,
+        EXPIRY_FIELD,
+        {"status": "unknown"},
+        "extraction",
+        "needs_evidence",
+        None,
+    )
+    return assertion, _manual_task(db, asset)
 
 
 def classify_asset(db: Session, asset: Asset, category: Category, tier: str | None) -> dict[str, object]:

@@ -1,0 +1,104 @@
+SG-026 verify log — raw runs (PG-EV-01 / PG-EV-09: PRE FAIL + POST green, both committed)
+BASE ref automation = bd2c112beafdb5f50b6c727c0e661f704b4ecd4b (start HEAD, work dir /home/andrei/StorageGenie)
+
+================================================================
+SECTION 1 — PRE-change FAIL (test file present, implementation absent)
+command: venv/bin/python -m pytest -q tests/test_extraction_contract.py   (run from backend/, bound 120s)
+elapsed: 1s ( TTY tail showed 0.33s collection)
+
+
+==================================== ERRORS ====================================
+______________ ERROR collecting tests/test_extraction_contract.py ______________
+ImportError while importing test module '/home/andrei/StorageGenie/backend/tests/test_extraction_contract.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+/usr/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_extraction_contract.py:23: in <module>
+    from app.plugins.expiry_tracker import EXPIRY_FIELD, apply_extraction_result
+E   ImportError: cannot import name 'apply_extraction_result' from 'app.plugins.expiry_tracker' (/home/andrei/StorageGenie/backend/app/plugins/expiry_tracker.py)
+=========================== short test summary info ============================
+ERROR tests/test_extraction_contract.py
+!!!!!!!!!!!!!!!!!!!! Interrupted: 1 error during collection !!!!!!!!!!!!!!!!!!!!
+1 error in 0.33s
+
+================================================================
+SECTION 2 — POST-change GREEN (after G2+G3 implementation + prompt phrase fix)
+command: venv/bin/python -m pytest tests/test_extraction_contract.py   (run from backend/, bound 120s)
+elapsed: <1s (0.34s)
+
+============================= test session starts ==============================
+platform linux -- Python 3.12.3, pytest-9.1.1, pluggy-1.6.0
+rootdir: /home/andrei/StorageGenie/backend
+configfile: pyproject.toml
+plugins: asyncio-1.4.0, anyio-4.15.0
+asyncio: mode=Mode.AUTO, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collected 7 items
+
+tests/test_extraction_contract.py .......                                [100%]
+
+============================== 7 passed in 0.34s ===============================
+
+================================================================
+SECTION 3 — FULL SUITE POST-change (bound 600s, elapsed 6s / 5.24s run)
+command: venv/bin/python -m pytest -q   (run from backend/)
+
+=========================== short test summary info ============================
+FAILED tests/test_signals.py::test_generated_codes_are_validated_and_bad_checksum_is_not_an_identifier
+FAILED tests/test_signals.py::test_ocr_has_text_boxes_and_mean_confidence - a...
+2 failed, 76 passed, 11 warnings in 5.24s
+
+(The 2 failures are the BASELINE-proved decoder env-reds: base run at start
+HEAD showed 2 failed, 69 passed in 5.08s with the same two test IDs. Delta
++7 passed = the new contract file. No new finding.)
+
+================================================================
+SECTION 4 — EVAL SMOKE RUN (bound 600s, elapsed 1s, exit 0)
+command: venv/bin/python eval/run.py   (run from backend/)
+
+fixture sg026-01-clean: score=1.000 needs=1 unknowns=1 items=1.00
+fixture sg026-02-glare: score=1.000 needs=1 unknowns=1 items=1.00
+fixture sg026-03-clutter: score=0.167 needs=0 unknowns=0 items=0.50
+fixture sg026-04-partial-label: score=1.000 needs=1 unknowns=1 items=1.00
+fixture sg026-05-no-date-visible: score=1.000 needs=1 unknowns=1 items=1.00
+field_accuracy=0.833 over 5 fixtures
+expected_unknown_cases=3/4
+correction_rate=0/3=0.000 (audit_event plugin.assertion.write rows=3)
+
+================================================================
+SECTION 5 — RUFF (elapsed <120s)
+command: venv/bin/python -m ruff check .   (run from backend/)
+
+All checks passed!
+
+================================================================
+SECTION 6 — MYPY (elapsed <120s)
+command: venv/bin/python -m mypy app   (run from backend/)
+
+Found 40 errors in 9 files (checked 56 source files)
+Touched-file mentions: 0 lines matching
+^app/(services/providers/schemas|plugins/expiry_tracker)\.py — both new/edited
+app files are strict-clean. The 40 errors sit in 9 untouched files:
+app/api/v1/assets.py (16), app/api/v1/evidence.py (4),
+app/api/v1/households.py (6), app/api/v1/review_tasks.py (6), app/main.py (2),
+app/models/base.py (1), app/schemas/asset.py (2), app/services/asset_service.py (2),
+app/services/audit_service.py (2) — findings with destinations, never silent.
+Count matches the standing "mypy 40 advisory in 9 files" gate note.
+
+================================================================
+SECTION 7 — SECRET / SDK EXCLUSION GREP (PG-SC-05)
+command (run from backend/): grep -rn
+"openai\|anthropic\|requests\|httpx\|urllib\|API_KEY\|sk-ant\|Bearer"
+app/services/providers/schemas.py app/services/providers/prompts/ eval/run.py
+eval/corpus/ tests/test_extraction_contract.py
+result: zero matches (grep exit 1). No real SDK/key/network import in slice scope.
+
+================================================================
+SECTION 8 — MODEL / EFFORT PROVENANCE (owner rule, from process arguments)
+parent process cmdline (verbatim): opencode run --auto
+--dir /home/andrei/StorageGenie --variant medium # SG-026 — ...
+coder orig: opencode (argv `opencode run`); effort: medium (argv `--variant medium`).
+Model: no model flag/ID anywhere in process arguments or model-bearing env
+(only OPENCODE/OPENCODE_PID presence markers) — therefore MODEL=unknown
+(CLI default per packet policy; never guessed from identity text).

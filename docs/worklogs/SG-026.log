@@ -1,0 +1,86 @@
+SG-026 worklog — prompts, schemas, fallback, eval scaffolding (fake only)
+coder: opencode / effort: medium (argv `--variant medium`; model unknown — no model flag in process args)
+BASE ref automation = bd2c112beafdb5f50b6c727c0e661f704b4ecd4b | work dir /home/andrei/StorageGenie
+
+G1 GATES (report only, elapsed ~10s vs 120s probes / 600s suite budget)
+- git status --porcelain: EMPTY (clean; start HEAD bd2c112).
+- Full suite BASELINE: 2 failed, 69 passed in 5.08s. The 2 reds are the known
+  decoder env-reds (test_generated_codes_are_validated..., test_ocr_has_text_boxes...;
+  barcode/QR + OCR native-decode assertions, empty decodes in sandbox) — cited, not relitigated.
+- .env: present (203B, presence only per CO-44).
+- Q2 re-probe `grep -c '^OPENCODE_API_KEY=' .env` = 0 (exit 1 = zero matches; INFORMATION ONLY, never a gate).
+- SG-025 surface live: protocols.py / router.py / fake.py present; migration
+  20260912_sg025_provider_call.py present. downgrade grep hits: 5 version files +
+  3 head-relative migration tests — no new migration this slice, nothing to update.
+- Premises verified live (PG-IC-09): backend/eval/ absent, prompts/ absent,
+  schemas.py absent; manual-entry flow at expiry_tracker.py:350-364 (classify writes
+  needs_evidence + _manual_task) resolved at :389-413 (store_manual_expiry resolves
+  open tasks); review_task model + audit_service.record confirmed.
+
+G2 PROMPTS + SCHEMAS (design calls reported)
+- Format decision: Markdown + YAML front-matter. Rationale: human-reviewable in the
+  repo, version pinned in filename AND front-matter, parseable with a stdlib-only
+  split (no new dependency, no network).
+- backend/app/services/providers/prompts/extract-food-v1.md +
+  extract-medicine-v1.md: versioned files; system instruction carries the
+  provider-neutral rule "never infer beyond visible evidence".
+- backend/app/services/providers/schemas.py (Pydantic v2, sync, extra=forbid):
+  ExtractionItem (name, expiry_date YYYY-MM-DD, date_type, confidence 0..1,
+  uncertainty_reasons required when confidence<1.0); ExtractionOutput (items,
+  unknowns REQUIRED, needs_evidence; needs_evidence=>unknowns non-empty;
+  unknowns entries must be items.<i>.<field> pointing at a null field —
+  fabricated values fail). parse_extraction_output: prose/wrong-types fail as
+  ValidationError (single exception type, prose never parsed).
+- Repair: extract_with_single_repair(supply) — exactly ONE retry on first-attempt
+  invalid_json ProviderError or ValidationError, then ExtractionFailedError.
+  NO new extraction.py: quoted reason — the helper is pure validation logic over
+  in-memory payloads (no I/O, no provider wiring, no reader); a second module would
+  add import surface with no caller. SG-028 owns the production reader.
+
+G3 BRIDGE + EVAL
+- expiry_tracker.py ONLY touched file (+29 lines): import + apply_extraction_result
+  (callable mapping, not a job step; no step/job/api changes). needs_evidence=True
+  writes SAME kind as classify (EXPIRY_FIELD, {"status":"unknown"}, "needs_evidence")
+  + SAME open task via _manual_task ("expiry.manual_entry", no new task type).
+  source_type "extraction" (not classify's "deterministic") — honest provenance,
+  stated loudly. needs_evidence=False maps to (None,None), nothing written.
+- backend/eval/corpus/: 5 smoke fixtures (clean, glare, clutter, partial-label,
+  no-date-visible) — fabricated JSON observations + ground truth incl.
+  needs_evidence + expectation_class; no real photos, nothing leaves the box.
+- backend/eval/run.py: validates, scores (needs/unknowns/items thirds),
+  applies bridge in temp SQLite, reads correction rate from audit_event,
+  exits non-zero on integrity failure. Run: field_accuracy=0.833,
+  expected_unknown_cases=3/4, correction_rate=0/3=0.000 (audit writes=3), exit 0, ~1s.
+- backend/eval/baseline_sg026.md records the numbers (ID-suffixed, never dated).
+  Clutter carries an INTENTIONAL provider miss so the scorer proves discrimination.
+  No tuning performed (would be STOP-worthy scope breach).
+
+G4 CONTRACT (elapsed: POST <1s; suite 6s/600s; eval 1s/600s; ruff+mypy <120s)
+- backend/tests/test_extraction_contract.py: 7 tests (prose rejects; unknowns
+  honored x3 incl. fabricated-fails; repair-once via fake invalid_json_once
+  invocations==2 + always-prose ExtractionFailedError with supply_calls==2;
+  bridge asserts the OPEN task row, not a mock; no-bridge negative; corpus
+  integrity; prompt versioning).
+- FAIL-then-PASS: PRE collection ImportError (apply_extraction_result missing) +
+  POST 7 passed — both raw runs in SG-026_verify.log.
+- Full suite: 2 failed (base-proved reds), 76 passed (+7 = new file; no new finding).
+- ruff: All checks passed. mypy app: 40 errors in 9 files, 0 in touched files
+  (destinations listed in verify log §6; matches standing 40-in-9 advisory).
+- PG-SC-05 grep (SDK/key/network over all slice files): zero matches.
+- PG-SC-10: git check-ignore on all new paths — none ignored.
+- PG-SC-02 read-back: schema fields are read back by the 7 contract tests + the
+  eval scorer; the PRODUCTION reader arrives SG-028 — stated explicitly.
+
+G5/G6 remaining at log write: commit + push automation + notes ref.
+
+Live-state ledger: DATABASE none (temp SQLite only, zero live rows). Restart none.
+No privileged operation attempted, no denial to report. No key/network/SDK touched.
+Cross-product (PG-IC-01): G2 needs only SG-025 protocols/router/fake shapes; G3 only
+the listed manual-entry sites + audit_event; G4 only the fake; G1 only host gates +
+count probe. Recorded once.
+Disagreements with packet premises: NONE — all premises verified live (line numbers
+shifted slightly vs packet cites: classify block at :350-364 not :351-357; resolution
+at :389-413 vs :382-410 — same shapes, drift noted, no finding).
+Vacuity audit: no empty diff (29-line bridge + 5 new paths), no empty set (5 fixtures,
+7 tests), no skipped gate (every gate names file+count+elapsed), scorer proven
+non-vacuous by the intentional clutter miss (0.167 < 1.000 observed).

@@ -1,0 +1,24 @@
+{
+  "id": "sg026-02-glare",
+  "class": "glare",
+  "note": "Date block washed out by window glare. Fabricated observation, never a real photo.",
+  "provider_output": {
+    "items": [
+      {
+        "name": "Milk",
+        "expiry_date": null,
+        "date_type": null,
+        "confidence": 0.4,
+        "uncertainty_reasons": ["date region obscured by glare"]
+      }
+    ],
+    "unknowns": ["items.0.expiry_date"],
+    "needs_evidence": true
+  },
+  "ground_truth": {
+    "items": [{"name": "Milk", "expiry_date": null}],
+    "unknowns": ["items.0.expiry_date"],
+    "needs_evidence": true,
+    "expectation_class": "unknown-expected"
+  }
+}

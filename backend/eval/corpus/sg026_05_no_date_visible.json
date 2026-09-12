@@ -1,0 +1,24 @@
+{
+  "id": "sg026-05-no-date-visible",
+  "class": "no-date-visible",
+  "note": "Jar photographed from the lid side; no date anywhere in frame. Fabricated observation, never a real photo.",
+  "provider_output": {
+    "items": [
+      {
+        "name": "Mystery jar",
+        "expiry_date": null,
+        "date_type": null,
+        "confidence": 0.2,
+        "uncertainty_reasons": ["no date visible anywhere in frame"]
+      }
+    ],
+    "unknowns": ["items.0.expiry_date"],
+    "needs_evidence": true
+  },
+  "ground_truth": {
+    "items": [{"name": "Mystery jar", "expiry_date": null}],
+    "unknowns": ["items.0.expiry_date"],
+    "needs_evidence": true,
+    "expectation_class": "needs-evidence"
+  }
+}

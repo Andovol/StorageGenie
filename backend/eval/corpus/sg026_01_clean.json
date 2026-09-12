@@ -1,0 +1,24 @@
+{
+  "id": "sg026-01-clean",
+  "class": "clean",
+  "note": "Fully legible milk carton, front-lit. Fabricated observation, never a real photo.",
+  "provider_output": {
+    "items": [
+      {
+        "name": "Milk",
+        "expiry_date": "2030-01-15",
+        "date_type": "expiry_date",
+        "confidence": 1.0,
+        "uncertainty_reasons": []
+      }
+    ],
+    "unknowns": [],
+    "needs_evidence": false
+  },
+  "ground_truth": {
+    "items": [{"name": "Milk", "expiry_date": "2030-01-15"}],
+    "unknowns": [],
+    "needs_evidence": false,
+    "expectation_class": "exact"
+  }
+}
