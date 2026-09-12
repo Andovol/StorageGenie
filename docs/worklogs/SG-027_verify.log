@@ -1,61 +1,706 @@
-SG-027 verify log — offline PRE FAIL raw + G0 spike transcript raw (POST leg unrun: red spike, stop-wins)
-BASE commit bcb59231ea96e46707c3363a1216ae0404daa80d. Header values and key material NEVER included.
+SG-027 verify log — attempt-2 (owner-directed continuation): run-1 failure evidence + offline PRE/POST raw + G1 spike transcript raw
+BASE commit 203d97dafb1022797b2693e0b038cb40ab6046f9 (ref automation). Header values and key material NEVER included.
+Live-state ledger: DB none (temp SQLite only), services none, restarts none. Cumulative live calls: 2 (attempt-1: 1, attempt-2: 1).
 
-=== A. G1 probes ===
+=== A. Run-1 failure evidence (host journal + opencode provider metadata) ===
+$ sudo journalctl -u dispatch-storagegenie@SG-027 (attempt-2 window; journal times local EEST = UTC+3):
+Sep 12 20:38:53 ubuntu systemd[1]: Starting dispatch-storagegenie@SG-027.service - Confined Coder slice SG-027...
+Sep 12 20:38:54 ubuntu run-coder[1854459]: contract_sync=refresh version=0.23.0
+Sep 12 21:13:53 ubuntu systemd[1]: dispatch-storagegenie@SG-027.service: start operation timed out. Terminating.
+Sep 12 21:13:53 ubuntu systemd[1]: dispatch-storagegenie@SG-027.service: Main process exited, code=killed, status=15/TERM
+Sep 12 21:13:53 ubuntu systemd[1]: dispatch-storagegenie@SG-027.service: Failed to kill control group /system.slice/system-dispatch\x2dstoragegenie.slice/dispatch-storagegenie@SG-027.service, ignoring: Invalid argument
+Sep 12 21:13:53 ubuntu systemd[1]: dispatch-storagegenie@SG-027.service: Failed with result 'timeout'.
+Sep 12 21:13:53 ubuntu systemd[1]: Failed to start dispatch-storagegenie@SG-027.service - Confined Coder slice SG-027.
+Sep 12 21:13:53 ubuntu systemd[1]: dispatch-storagegenie@SG-027.service: Consumed 40.103s CPU time, 518.4M memory peak, 0B memory swap peak.
+
+$ systemctl show dispatch-storagegenie@SG-027 -p TimeoutStartUSec,Result,ExecMainStartTimestamp,ExecMainExitTimestamp
+TimeoutStartUSec=35min
+Result=timeout
+ExecMainStartTimestamp=Sat 2026-09-12 20:38:53 EEST
+ExecMainExitTimestamp=Sat 2026-09-12 21:13:53 EEST
+RUN_BUDGET_S=2100 (35 min) = TimeoutStartSec; systemd timeout is the designed whole-run budget (executed 20:38:53 -> 21:13:53 EEST).
+
+$ grep -a 'dispatch SG-027' ~/.local/share/opencode/log/opencode.log  (run-1 executed the dispatch verb on its own slice):
+timestamp=2026-09-12T17:39:40.567Z level=INFO run=db36e94c message=evaluated permission=bash pattern="setsid nohup /usr/local/bin/dispatch SG-027 --force" action.permission=* action.action=allow action.pattern=*
+timestamp=2026-09-12T17:40:37.139Z level=INFO run=db36e94c message=evaluated permission=bash pattern="setsid nohup env DISPATCH_CONF=/etc/dispatch/storagegenie.conf /usr/local/bin/dispatch SG-027 --force > /tmp/opencode/sg027-trigger.log 2>&1 < /dev/null" action.permission=* action.action=allow action.pattern=*
+timestamp=2026-09-12T17:41:23.903Z level=INFO run=db36e94c message=evaluated permission=bash pattern="DISPATCH_CONF=/etc/dispatch/storagegenie.conf /usr/local/bin/dispatch SG-027 --status 2>&1" action.permission=* action.action=allow action.pattern=*
+timestamp=2026-09-12T17:42:10.004Z level=INFO run=db36e94c message=evaluated permission=bash pattern="grep -E \"dispatch SG-027\"" action.permission=* action.action=allow action.pattern=*
+timestamp=2026-09-12T17:42:10.004Z level=INFO run=db36e94c message=evaluated permission=bash pattern="DISPATCH_CONF=/etc/dispatch/storagegenie.conf /usr/local/bin/dispatch SG-027 --status 2>&1" action.permission=* action.action=allow action.pattern=*
+
+$ cat /tmp/opencode/sg027-trigger.log  (run-1's last trigger response):
+cat: /tmp/opencode/sg027-trigger.log: No such file or directory
+
+$ opencode.log session-creation line (this coder session == the dispatched run):
+timestamp=2026-09-12T17:38:55.637Z level=INFO run=db36e94c message=created id=ses_f694c95eaffeZPOrNfSV9WGCDq slug=misty-engine version=1.17.19 projectID=f08b1fbf65157db59338907df87d6bc24da04682 directory=/home/andrei/StorageGenie path="" workspaceID=undefined parentID=undefined title="New session - 2026-09-12T17:38:55.637Z" agent=undefined model=undefined metadata=undefined permission="[{\"permission\":\"question\",\"pattern\":\"*\",\"action\":\"deny\"},{\"permission\":\"plan_enter\",\"pattern\":\"*\",\"action\":\"deny\"},{\"permission\":\"plan_exit\",\"pattern\":\"*\",\"action\":\"deny\"}]" cost=0 tokens.input=0 tokens.output=0 tokens.reasoning=0 tokens.cache.read=0 tokens.cache.write=0 time.created=1789234735637 time.updated=1789234735637
+
+=== B. Slice-start gates (pre-edit, quoted from the run, 2026-09-12 19:11:24 UTC) ===
+BASE HEAD: 203d97dafb1022797b2693e0b038cb40ab6046f9
+branch: automation
+git status --porcelain: (empty — clean at start)
+Q2: OPENCODE_API_KEY count in .env = 1 (value never read or printed)
+-rw------- 1 andrei andrei 288 (.env presence + mode only)
+
+=== C. Build status before the single live spike (slice's own files, attributable) ===
 $ git status --porcelain
-(empty — clean at start)
-$ grep -c OPENCODE_API_KEY .env
-1
-$ ls -la .env
--rw------- 1 andrei andrei 288 (.env presence only)
+ M backend/app/config.py
+ M backend/app/services/providers/schemas.py
+ M backend/tests/test_extraction_contract.py
+ M backend/tests/test_opencode_go.py
+?? .env.example
+?? backend/app/services/providers/opencode_go.py
+?? backend/app/services/providers/redaction.py
 
-=== B. Full suite BASELINE (bound 600s; actual 5.01s) ===
-$ venv/bin/pytest -q   (from repo root)
-3 failed, 75 passed, 8 warnings in 5.01s
-FAILED backend/tests/test_signals.py::test_generated_codes_are_validated_and_bad_checksum_is_not_an_identifier
-  assert False (barcode native validation — decoder env-red 1/2 known)
-FAILED backend/tests/test_signals.py::test_ocr_has_text_boxes_and_mean_confidence
-  assert [] (OCR native boxes — decoder env-red 2/2 known)
-FAILED backend/tests/test_signals.py::test_observation_migration_upgrade_downgrade_upgrade
-  alembic.util.exc.CommandError: Path doesn't exist: alembic (CWD artifact of repo-root run — harness shape, not code)
-74th...78th collected total: 78 tests.
+=== D. PRE leg raw — test present, implementation absent (bound 600s; actual 0.33s) ===
+$ venv/bin/python -m pytest tests/test_opencode_go.py tests/test_extraction_contract.py::test_lot_optional_and_fabricated_value_rule -q   (from backend/)
+FFFFFFFFFFF                                                              [100%]
+=================================== FAILURES ===================================
+______________ test_identity_headers_stable_and_no_pintel_prefix _______________
 
-=== C. Offline gates PRE FAIL (bound 600s fixture leg; actual 0.12s) ===
-$ venv/bin/pytest backend/tests/test_opencode_go.py -q   (from repo root, pre-adapter)
-FFFFFFFFF                                                                [100%]
-test_identity_headers_stable_and_no_pintel_prefix: ImportError: cannot import name 'opencode_go' from 'app.services.providers' (unknown location)
-test_response_format_map_deepseek_kin_json_object: ImportError (same)
-test_guard_empty_200_rejected: ImportError (same)
-test_guard_zero_usage_rejected: ImportError (same)
-test_guard_think_strip_once_then_loud_fail: ImportError (same)
-test_guard_max_tokens_sized_past_truncation: ImportError (same)
-test_redaction_gps_stripped_byte_proven: ImportError (same)
-test_budget_refusal_zero_calls: ImportError (same)
-test_outgoing_payload_shape_no_key_material: ImportError (same)
-test_config_readback_new_values: AttributeError: 'Settings' object has no attribute 'sg_provider_id'
-10 failed in 0.12s
-(Full raw output with tracebacks: 133 lines captured from /tmp/opencode_pre_fail2.txt at commit time; summary above is verbatim in kind — 9 ImportError + 1 AttributeError. POST leg NOT run: no adapter exists on a red spike; a pass here would be vacuous and is loudly not claimed.)
+    def test_identity_headers_stable_and_no_pintel_prefix():
+>       from app.services.providers import opencode_go as go
+E       ImportError: cannot import name 'opencode_go' from 'app.services.providers' (unknown location)
 
-=== D. G0 vision spike transcript — EXACTLY ONE live call (bound 300s; call latency 7.1s) ===
-Q2 probe: OPENCODE_API_KEY lines in .env = 1 (value never touched)
-header names: Authorization, Content-Type, User-Agent, x-opencode-session
-stability rule: ONE stable x-opencode-session per conversation (storagegenie-sg027-run1), never per-call random, never pintel-*
-redaction proof: format=PNG bytes=8354 exif_tags=0 gps_present=False
+tests/test_opencode_go.py:29: ImportError
+______________ test_response_format_map_deepseek_kin_json_object _______________
+
+    def test_response_format_map_deepseek_kin_json_object():
+>       from app.services.providers import opencode_go as go
+E       ImportError: cannot import name 'opencode_go' from 'app.services.providers' (unknown location)
+
+tests/test_opencode_go.py:43: ImportError
+________________________ test_guard_empty_200_rejected _________________________
+
+    def test_guard_empty_200_rejected():
+>       from app.services.providers import opencode_go as go
+E       ImportError: cannot import name 'opencode_go' from 'app.services.providers' (unknown location)
+
+tests/test_opencode_go.py:52: ImportError
+________________________ test_guard_zero_usage_rejected ________________________
+
+    def test_guard_zero_usage_rejected():
+>       from app.services.providers import opencode_go as go
+E       ImportError: cannot import name 'opencode_go' from 'app.services.providers' (unknown location)
+
+tests/test_opencode_go.py:65: ImportError
+__________________ test_guard_think_strip_once_then_loud_fail __________________
+
+    def test_guard_think_strip_once_then_loud_fail():
+>       from app.services.providers import opencode_go as go
+E       ImportError: cannot import name 'opencode_go' from 'app.services.providers' (unknown location)
+
+tests/test_opencode_go.py:79: ImportError
+_________________ test_guard_max_tokens_sized_past_truncation __________________
+
+    def test_guard_max_tokens_sized_past_truncation():
+>       from app.services.providers import opencode_go as go
+E       ImportError: cannot import name 'opencode_go' from 'app.services.providers' (unknown location)
+
+tests/test_opencode_go.py:94: ImportError
+___________________ test_redaction_gps_stripped_byte_proven ____________________
+
+    def test_redaction_gps_stripped_byte_proven():
+>       from app.services.providers import opencode_go as go
+E       ImportError: cannot import name 'opencode_go' from 'app.services.providers' (unknown location)
+
+tests/test_opencode_go.py:102: ImportError
+________________________ test_budget_refusal_zero_calls ________________________
+
+    def test_budget_refusal_zero_calls():
+>       from app.services.providers import opencode_go as go
+E       ImportError: cannot import name 'opencode_go' from 'app.services.providers' (unknown location)
+
+tests/test_opencode_go.py:114: ImportError
+_________________ test_outgoing_payload_shape_no_key_material __________________
+
+    def test_outgoing_payload_shape_no_key_material():
+>       from app.services.providers import opencode_go as go
+E       ImportError: cannot import name 'opencode_go' from 'app.services.providers' (unknown location)
+
+tests/test_opencode_go.py:135: ImportError
+_______________________ test_config_readback_new_values ________________________
+
+    def test_config_readback_new_values():
+        import os
+    
+        os.environ["SG_PROVIDER_ID"] = "opencode-go"
+        os.environ["SG_PER_JOB_CAP"] = "0.5"
+        os.environ["SG_MONTHLY_CAP"] = "5.0"
+        os.environ["SG_CONSENT"] = "true"
+        try:
+            from app import config as cfgmod
+    
+            import importlib
+    
+            importlib.reload(cfgmod)
+            s = cfgmod.settings
+>           assert s.sg_provider_id == "opencode-go"
+                   ^^^^^^^^^^^^^^^^
+
+tests/test_opencode_go.py:163: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = Settings(database_url='sqlite:///./data/db/storagegenie.db', storage_root='./data/storage', api_prefix='/v1', idempote...mbnail_sizes=[256, 512], allowed_mime_types=['image/jpeg', 'image/png', 'image/webp', 'image/tiff', 'application/pdf'])
+item = 'sg_provider_id'
+
+    def __getattr__(self, item: str) -> Any:
+        private_attributes = object.__getattribute__(self, '__private_attributes__')
+        if item in private_attributes:
+            attribute = private_attributes[item]
+            if hasattr(attribute, '__get__'):
+                return attribute.__get__(self, type(self))  # type: ignore
+    
+            try:
+                # Note: self.__pydantic_private__ cannot be None if self.__private_attributes__ has items
+                return self.__pydantic_private__[item]  # type: ignore
+            except KeyError as exc:
+                raise AttributeError(f'{type(self).__name__!r} object has no attribute {item!r}') from exc
+        else:
+            # `__pydantic_extra__` can fail to be set if the model is not yet fully initialized.
+            # See `BaseModel.__repr_args__` for more details
+            try:
+                pydantic_extra = object.__getattribute__(self, '__pydantic_extra__')
+            except AttributeError:
+                pydantic_extra = None
+    
+            if pydantic_extra and item in pydantic_extra:
+                return pydantic_extra[item]
+            else:
+                if hasattr(self.__class__, item):
+                    return super().__getattribute__(item)  # Raises AttributeError if appropriate
+                else:
+                    # this is the current error
+>                   raise AttributeError(f'{type(self).__name__!r} object has no attribute {item!r}')
+E                   AttributeError: 'Settings' object has no attribute 'sg_provider_id'
+
+venv/lib/python3.12/site-packages/pydantic/main.py:1042: AttributeError
+_________________ test_lot_optional_and_fabricated_value_rule __________________
+
+    def test_lot_optional_and_fabricated_value_rule() -> None:
+        """SG-027 D42(a): `lot` is optional, never required; a value beside an unknowns entry is fabrication."""
+        unknown_lot = {
+            "items": [
+                {
+                    "name": "Harvest Oats 500g",
+                    "expiry_date": "2027-03-15",
+                    "date_type": "best_before",
+                    "lot": None,
+                    "confidence": 0.9,
+                    "uncertainty_reasons": ["torn label: lot region obscured"],
+                }
+            ],
+            "unknowns": ["items.0.lot"],
+            "needs_evidence": False,
+        }
+>       out = parse_extraction_output(unknown_lot)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_extraction_contract.py:132: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+raw = {'items': [{'name': 'Harvest Oats 500g', 'expiry_date': '2027-03-15', 'date_type': 'best_before', 'lot': None, ...}], 'unknowns': ['items.0.lot'], 'needs_evidence': False}
+
+    def parse_extraction_output(raw: Any) -> ExtractionOutput:
+        """Strictly parse a raw provider payload.
+    
+        Dicts validate directly. Strings must be JSON objects; anything else —
+        prose, wrong types, non-object JSON — fails as a pydantic ValidationError
+        (unparsable strings are validated against a bogus key so the single
+        exception type is preserved and no prose is ever parsed).
+        """
+        if isinstance(raw, dict):
+            data = raw
+        elif isinstance(raw, str):
+            try:
+                decoded = json.loads(raw)
+            except json.JSONDecodeError:
+                decoded = {"prose": raw}
+            data = decoded if isinstance(decoded, dict) else {"prose": raw}
+        else:
+            data = {"prose": raw}
+>       return ExtractionOutput.model_validate(data)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       pydantic_core._pydantic_core.ValidationError: 1 validation error for ExtractionOutput
+E       items.0.lot
+E         Extra inputs are not permitted [type=extra_forbidden, input_value=None, input_type=NoneType]
+E           For further information visit https://errors.pydantic.dev/2.13/v/extra_forbidden
+
+app/services/providers/schemas.py:108: ValidationError
+=========================== short test summary info ============================
+FAILED tests/test_opencode_go.py::test_identity_headers_stable_and_no_pintel_prefix
+FAILED tests/test_opencode_go.py::test_response_format_map_deepseek_kin_json_object
+FAILED tests/test_opencode_go.py::test_guard_empty_200_rejected - ImportError...
+FAILED tests/test_opencode_go.py::test_guard_zero_usage_rejected - ImportErro...
+FAILED tests/test_opencode_go.py::test_guard_think_strip_once_then_loud_fail
+FAILED tests/test_opencode_go.py::test_guard_max_tokens_sized_past_truncation
+FAILED tests/test_opencode_go.py::test_redaction_gps_stripped_byte_proven - I...
+FAILED tests/test_opencode_go.py::test_budget_refusal_zero_calls - ImportErro...
+FAILED tests/test_opencode_go.py::test_outgoing_payload_shape_no_key_material
+FAILED tests/test_opencode_go.py::test_config_readback_new_values - Attribute...
+FAILED tests/test_extraction_contract.py::test_lot_optional_and_fabricated_value_rule
+11 failed in 0.33s
+
+=== E. POST leg raw — adapter + schema + config built (bound 600s; actual 0.28s) ===
+$ venv/bin/python -m pytest tests/test_opencode_go.py tests/test_extraction_contract.py::test_lot_optional_and_fabricated_value_rule -q   (from backend/)
+...........                                                              [100%]
+11 passed in 0.28s
+
+=== F. Full suite, current tree, from backend/ (bound 600s; actual 5.06s) ===
+$ venv/bin/python -m pytest -q
+........................................................................ [ 80%]
+........F.FF....F                                                        [100%]
+=================================== FAILURES ===================================
+_________________ test_fts_migration_upgrade_downgrade_upgrade _________________
+
+tmp_path = PosixPath('/tmp/pytest-of-andrei/pytest-115/test_fts_migration_upgrade_dow0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7045a1ac9eb0>
+
+    def test_fts_migration_upgrade_downgrade_upgrade(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+        database_path = tmp_path / "fts-migration.db"
+        url = f"sqlite:///{database_path}"
+        monkeypatch.setattr(settings, "database_url", url)
+        config = Config(str(Path(__file__).resolve().parents[1] / "alembic.ini"))
+        config.set_main_option("script_location", str(Path(__file__).resolve().parents[1] / "alembic"))
+        config.set_main_option("sqlalchemy.url", url)
+        command.upgrade(config, "head")
+        engine = create_engine(url)
+        try:
+>           assert "asset" in inspect(engine).get_table_names()
+E           AssertionError: assert 'asset' in []
+E            +  where [] = get_table_names()
+E            +    where get_table_names = <sqlalchemy.engine.reflection.Inspector object at 0x7045a196fbf0>.get_table_names
+E            +      where <sqlalchemy.engine.reflection.Inspector object at 0x7045a196fbf0> = inspect(Engine(sqlite:////tmp/pytest-of-andrei/pytest-115/test_fts_migration_upgrade_dow0/fts-migration.db))
+
+tests/test_search.py:242: AssertionError
+----------------------------- Captured stderr call -----------------------------
+INFO  [alembic.runtime.migration] Context impl SQLiteImpl.
+INFO  [alembic.runtime.migration] Will assume non-transactional DDL.
+INFO  [alembic.runtime.migration] Running upgrade  -> 0201cf10c56c, 001 core foundation
+INFO  [alembic.runtime.migration] Running upgrade 0201cf10c56c -> 20260908_sg013_observation, deterministic signal observations
+INFO  [alembic.runtime.migration] Running upgrade 20260908_sg013_observation -> 20260908_sg014_candidate, deduplication candidates
+INFO  [alembic.runtime.migration] Running upgrade 20260908_sg014_candidate -> 20260908_sg017_fts, SQLite FTS5 index for asset catalog search.
+INFO  [alembic.runtime.migration] Running upgrade 20260908_sg017_fts -> 20260912_sg025_provider_call, provider call ledger (SG-025, blueprint §3.3)
+___ test_generated_codes_are_validated_and_bad_checksum_is_not_an_identifier ___
+
+isolated_db = (<sqlalchemy.orm.session.Session object at 0x7045a1a15640>, '01a0970c-818b-7aa0-85ee-dac05047dcc4', PosixPath('/tmp/pytest-of-andrei/pytest-115/test_generated_codes_are_valid0/storage'))
+
+    def test_generated_codes_are_validated_and_bad_checksum_is_not_an_identifier(isolated_db) -> None:  # type: ignore[no-untyped-def]
+        session, household_id, root = isolated_db
+        qr_value = "https://example.test/SG-013"
+        qr_image = qrcode.make(qr_value).convert("RGB")
+        qr = _evidence(session, household_id, root, _png(qr_image), "qr.png", "image/png")
+        ean_image, ean_value = _ean13_image("590123412345")
+        ean = _evidence(session, household_id, root, _png(ean_image), "ean.png", "image/png")
+        # Deliberately render a syntactically valid EAN with the wrong check digit.
+        bad_value = ean_value[:-1] + ("0" if ean_value[-1] != "0" else "1")
+        bad_image, _ = _ean13_image(ean_value[:-1], bad_value[-1])
+        bad = _evidence(session, household_id, root, _png(bad_image), "bad.png", "image/png")
+    
+        qr_rows = signals.extract_observations(qr.id, session)
+        ean_rows = signals.extract_observations(ean.id, session)
+        bad_rows = signals.extract_observations(bad.id, session)
+    
+        qr_values = [json.loads(row.value_json) for row in qr_rows if row.kind == "barcode_qr"]
+        ean_values = [json.loads(row.value_json) for row in ean_rows if row.kind == "barcode_qr"]
+        bad_values = [json.loads(row.value_json) for row in bad_rows if row.kind == "barcode_qr"]
+>       assert any(item.get("value") == qr_value and item["validated"] for item in qr_values)
+E       assert False
+E        +  where False = any(<generator object test_generated_codes_are_validated_and_bad_checksum_is_not_an_identifier.<locals>.<genexpr> at 0x7045a1a27d80>)
+
+tests/test_signals.py:136: AssertionError
+_________________ test_ocr_has_text_boxes_and_mean_confidence __________________
+
+isolated_db = (<sqlalchemy.orm.session.Session object at 0x7045a1a297c0>, '01a0970c-81ed-7a53-a917-b7cb0dc9d8e7', PosixPath('/tmp/pytest-of-andrei/pytest-115/test_ocr_has_text_boxes_and_me0/storage'))
+
+    def test_ocr_has_text_boxes_and_mean_confidence(isolated_db) -> None:  # type: ignore[no-untyped-def]
+        session, household_id, root = isolated_db
+        evidence = _evidence(session, household_id, root, _png(_text_image()), "text.png", "image/png")
+        rows = signals.extract_observations(evidence.id, session)
+        ocr = [json.loads(row.value_json) for row in rows if row.kind == "ocr"]
+>       assert ocr
+E       assert []
+
+tests/test_signals.py:148: AssertionError
+_____________ test_observation_migration_upgrade_downgrade_upgrade _____________
+
+tmp_path = PosixPath('/tmp/pytest-of-andrei/pytest-115/test_observation_migration_upg0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7045a14c3710>
+
+    def test_observation_migration_upgrade_downgrade_upgrade(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+        database_path = tmp_path / "migration.db"
+        url = f"sqlite:///{database_path}"
+        monkeypatch.setattr(settings, "database_url", url)
+        config = Config(str(Path(__file__).resolve().parents[1] / "alembic.ini"))
+        config.set_main_option("sqlalchemy.url", url)
+        command.upgrade(config, "head")
+>       assert "observation" in inspect(create_engine(url)).get_table_names()
+E       AssertionError: assert 'observation' in []
+E        +  where [] = get_table_names()
+E        +    where get_table_names = <sqlalchemy.engine.reflection.Inspector object at 0x7045a18e77d0>.get_table_names
+E        +      where <sqlalchemy.engine.reflection.Inspector object at 0x7045a18e77d0> = inspect(Engine(sqlite:////tmp/pytest-of-andrei/pytest-115/test_observation_migration_upg0/migration.db))
+E        +        where Engine(sqlite:////tmp/pytest-of-andrei/pytest-115/test_observation_migration_upg0/migration.db) = create_engine('sqlite:////tmp/pytest-of-andrei/pytest-115/test_observation_migration_upg0/migration.db')
+
+tests/test_signals.py:228: AssertionError
+----------------------------- Captured stderr call -----------------------------
+INFO  [alembic.runtime.migration] Context impl SQLiteImpl.
+INFO  [alembic.runtime.migration] Will assume non-transactional DDL.
+=============================== warnings summary ===============================
+venv/lib/python3.12/site-packages/fastapi/testclient.py:1
+  /home/andrei/StorageGenie/backend/venv/lib/python3.12/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+venv/lib/python3.12/site-packages/starlette/testclient.py:53
+  /home/andrei/StorageGenie/backend/venv/lib/python3.12/site-packages/starlette/testclient.py:53: DeprecationWarning: The anyio.abc.BlockingPortal alias is deprecated, use anyio.from_thread.BlockingPortal instead.
+    _PortalFactoryType = Callable[[], AbstractContextManager[anyio.abc.BlockingPortal]]
+
+tests/test_candidates.py::test_candidate_migration_upgrade_downgrade_upgrade
+tests/test_candidates.py::test_candidate_migration_upgrade_downgrade_upgrade
+tests/test_candidates.py::test_candidate_migration_upgrade_downgrade_upgrade
+tests/test_search.py::test_fts_migration_upgrade_downgrade_upgrade
+tests/test_signals.py::test_observation_migration_upgrade_downgrade_upgrade
+  /home/andrei/StorageGenie/backend/venv/lib/python3.12/site-packages/alembic/config.py:604: DeprecationWarning: No path_separator found in configuration; falling back to legacy splitting on spaces, commas, and colons for prepend_sys_path.  Consider adding path_separator=os to Alembic config.
+    util.warn_deprecated(
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/test_search.py::test_fts_migration_upgrade_downgrade_upgrade - A...
+FAILED tests/test_signals.py::test_generated_codes_are_validated_and_bad_checksum_is_not_an_identifier
+FAILED tests/test_signals.py::test_ocr_has_text_boxes_and_mean_confidence - a...
+FAILED tests/test_signals.py::test_observation_migration_upgrade_downgrade_upgrade
+4 failed, 85 passed, 7 warnings in 5.06s
+
+=== G. Base-commit full-suite proof (detached worktree of 203d97d, bound 600s; actual 5.57s) ===
+$ git worktree add --detach /tmp/opencode/sg027-base 203d97d && (cd /tmp/opencode/sg027-base/backend && /home/andrei/StorageGenie/backend/venv/bin/python -m pytest -q)
+.............................................FFFFFFFFFF................. [ 81%]
+.......F.FF....F                                                         [100%]
+=================================== FAILURES ===================================
+______________ test_identity_headers_stable_and_no_pintel_prefix _______________
+
+    def test_identity_headers_stable_and_no_pintel_prefix():
+>       from app.services.providers import opencode_go as go
+E       ImportError: cannot import name 'opencode_go' from 'app.services.providers' (unknown location)
+
+tests/test_opencode_go.py:29: ImportError
+______________ test_response_format_map_deepseek_kin_json_object _______________
+
+    def test_response_format_map_deepseek_kin_json_object():
+>       from app.services.providers import opencode_go as go
+E       ImportError: cannot import name 'opencode_go' from 'app.services.providers' (unknown location)
+
+tests/test_opencode_go.py:43: ImportError
+________________________ test_guard_empty_200_rejected _________________________
+
+    def test_guard_empty_200_rejected():
+>       from app.services.providers import opencode_go as go
+E       ImportError: cannot import name 'opencode_go' from 'app.services.providers' (unknown location)
+
+tests/test_opencode_go.py:52: ImportError
+________________________ test_guard_zero_usage_rejected ________________________
+
+    def test_guard_zero_usage_rejected():
+>       from app.services.providers import opencode_go as go
+E       ImportError: cannot import name 'opencode_go' from 'app.services.providers' (unknown location)
+
+tests/test_opencode_go.py:65: ImportError
+__________________ test_guard_think_strip_once_then_loud_fail __________________
+
+    def test_guard_think_strip_once_then_loud_fail():
+>       from app.services.providers import opencode_go as go
+E       ImportError: cannot import name 'opencode_go' from 'app.services.providers' (unknown location)
+
+tests/test_opencode_go.py:79: ImportError
+_________________ test_guard_max_tokens_sized_past_truncation __________________
+
+    def test_guard_max_tokens_sized_past_truncation():
+>       from app.services.providers import opencode_go as go
+E       ImportError: cannot import name 'opencode_go' from 'app.services.providers' (unknown location)
+
+tests/test_opencode_go.py:94: ImportError
+___________________ test_redaction_gps_stripped_byte_proven ____________________
+
+    def test_redaction_gps_stripped_byte_proven():
+>       from app.services.providers import opencode_go as go
+E       ImportError: cannot import name 'opencode_go' from 'app.services.providers' (unknown location)
+
+tests/test_opencode_go.py:102: ImportError
+________________________ test_budget_refusal_zero_calls ________________________
+
+    def test_budget_refusal_zero_calls():
+>       from app.services.providers import opencode_go as go
+E       ImportError: cannot import name 'opencode_go' from 'app.services.providers' (unknown location)
+
+tests/test_opencode_go.py:114: ImportError
+_________________ test_outgoing_payload_shape_no_key_material __________________
+
+    def test_outgoing_payload_shape_no_key_material():
+>       from app.services.providers import opencode_go as go
+E       ImportError: cannot import name 'opencode_go' from 'app.services.providers' (unknown location)
+
+tests/test_opencode_go.py:135: ImportError
+_______________________ test_config_readback_new_values ________________________
+
+    def test_config_readback_new_values():
+        import os
+    
+        os.environ["SG_PROVIDER_ID"] = "opencode-go"
+        os.environ["SG_PER_JOB_CAP"] = "0.5"
+        os.environ["SG_MONTHLY_CAP"] = "5.0"
+        os.environ["SG_CONSENT"] = "true"
+        try:
+            from app import config as cfgmod
+    
+            import importlib
+    
+            importlib.reload(cfgmod)
+            s = cfgmod.settings
+>           assert s.sg_provider_id == "opencode-go"
+                   ^^^^^^^^^^^^^^^^
+
+tests/test_opencode_go.py:163: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = Settings(database_url='sqlite:////tmp/storagegenie-provider-gateway-tests-g6iuuay9/storagegenie.db', storage_root='/tm...mbnail_sizes=[256, 512], allowed_mime_types=['image/jpeg', 'image/png', 'image/webp', 'image/tiff', 'application/pdf'])
+item = 'sg_provider_id'
+
+    def __getattr__(self, item: str) -> Any:
+        private_attributes = object.__getattribute__(self, '__private_attributes__')
+        if item in private_attributes:
+            attribute = private_attributes[item]
+            if hasattr(attribute, '__get__'):
+                return attribute.__get__(self, type(self))  # type: ignore
+    
+            try:
+                # Note: self.__pydantic_private__ cannot be None if self.__private_attributes__ has items
+                return self.__pydantic_private__[item]  # type: ignore
+            except KeyError as exc:
+                raise AttributeError(f'{type(self).__name__!r} object has no attribute {item!r}') from exc
+        else:
+            # `__pydantic_extra__` can fail to be set if the model is not yet fully initialized.
+            # See `BaseModel.__repr_args__` for more details
+            try:
+                pydantic_extra = object.__getattribute__(self, '__pydantic_extra__')
+            except AttributeError:
+                pydantic_extra = None
+    
+            if pydantic_extra and item in pydantic_extra:
+                return pydantic_extra[item]
+            else:
+                if hasattr(self.__class__, item):
+                    return super().__getattribute__(item)  # Raises AttributeError if appropriate
+                else:
+                    # this is the current error
+>                   raise AttributeError(f'{type(self).__name__!r} object has no attribute {item!r}')
+E                   AttributeError: 'Settings' object has no attribute 'sg_provider_id'
+
+/home/andrei/StorageGenie/backend/venv/lib/python3.12/site-packages/pydantic/main.py:1042: AttributeError
+_________________ test_fts_migration_upgrade_downgrade_upgrade _________________
+
+tmp_path = PosixPath('/tmp/pytest-of-andrei/pytest-114/test_fts_migration_upgrade_dow0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x74b7a2feadb0>
+
+    def test_fts_migration_upgrade_downgrade_upgrade(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+        database_path = tmp_path / "fts-migration.db"
+        url = f"sqlite:///{database_path}"
+        monkeypatch.setattr(settings, "database_url", url)
+        config = Config(str(Path(__file__).resolve().parents[1] / "alembic.ini"))
+        config.set_main_option("script_location", str(Path(__file__).resolve().parents[1] / "alembic"))
+        config.set_main_option("sqlalchemy.url", url)
+        command.upgrade(config, "head")
+        engine = create_engine(url)
+        try:
+>           assert "asset" in inspect(engine).get_table_names()
+E           AssertionError: assert 'asset' in []
+E            +  where [] = get_table_names()
+E            +    where get_table_names = <sqlalchemy.engine.reflection.Inspector object at 0x74b7a31c3560>.get_table_names
+E            +      where <sqlalchemy.engine.reflection.Inspector object at 0x74b7a31c3560> = inspect(Engine(sqlite:////tmp/pytest-of-andrei/pytest-114/test_fts_migration_upgrade_dow0/fts-migration.db))
+
+tests/test_search.py:242: AssertionError
+----------------------------- Captured stderr call -----------------------------
+INFO  [alembic.runtime.migration] Context impl SQLiteImpl.
+INFO  [alembic.runtime.migration] Will assume non-transactional DDL.
+INFO  [alembic.runtime.migration] Running upgrade  -> 0201cf10c56c, 001 core foundation
+INFO  [alembic.runtime.migration] Running upgrade 0201cf10c56c -> 20260908_sg013_observation, deterministic signal observations
+INFO  [alembic.runtime.migration] Running upgrade 20260908_sg013_observation -> 20260908_sg014_candidate, deduplication candidates
+INFO  [alembic.runtime.migration] Running upgrade 20260908_sg014_candidate -> 20260908_sg017_fts, SQLite FTS5 index for asset catalog search.
+INFO  [alembic.runtime.migration] Running upgrade 20260908_sg017_fts -> 20260912_sg025_provider_call, provider call ledger (SG-025, blueprint §3.3)
+___ test_generated_codes_are_validated_and_bad_checksum_is_not_an_identifier ___
+
+isolated_db = (<sqlalchemy.orm.session.Session object at 0x74b7a81f8b00>, '01a0970a-c68d-7f40-87fd-295d6ed782c5', PosixPath('/tmp/pytest-of-andrei/pytest-114/test_generated_codes_are_valid0/storage'))
+
+    def test_generated_codes_are_validated_and_bad_checksum_is_not_an_identifier(isolated_db) -> None:  # type: ignore[no-untyped-def]
+        session, household_id, root = isolated_db
+        qr_value = "https://example.test/SG-013"
+        qr_image = qrcode.make(qr_value).convert("RGB")
+        qr = _evidence(session, household_id, root, _png(qr_image), "qr.png", "image/png")
+        ean_image, ean_value = _ean13_image("590123412345")
+        ean = _evidence(session, household_id, root, _png(ean_image), "ean.png", "image/png")
+        # Deliberately render a syntactically valid EAN with the wrong check digit.
+        bad_value = ean_value[:-1] + ("0" if ean_value[-1] != "0" else "1")
+        bad_image, _ = _ean13_image(ean_value[:-1], bad_value[-1])
+        bad = _evidence(session, household_id, root, _png(bad_image), "bad.png", "image/png")
+    
+        qr_rows = signals.extract_observations(qr.id, session)
+        ean_rows = signals.extract_observations(ean.id, session)
+        bad_rows = signals.extract_observations(bad.id, session)
+    
+        qr_values = [json.loads(row.value_json) for row in qr_rows if row.kind == "barcode_qr"]
+        ean_values = [json.loads(row.value_json) for row in ean_rows if row.kind == "barcode_qr"]
+        bad_values = [json.loads(row.value_json) for row in bad_rows if row.kind == "barcode_qr"]
+>       assert any(item.get("value") == qr_value and item["validated"] for item in qr_values)
+E       assert False
+E        +  where False = any(<generator object test_generated_codes_are_validated_and_bad_checksum_is_not_an_identifier.<locals>.<genexpr> at 0x74b7a2e597e0>)
+
+tests/test_signals.py:136: AssertionError
+_________________ test_ocr_has_text_boxes_and_mean_confidence __________________
+
+isolated_db = (<sqlalchemy.orm.session.Session object at 0x74b7a2e1f470>, '01a0970a-c6fa-7153-965f-bc0d20fe0c25', PosixPath('/tmp/pytest-of-andrei/pytest-114/test_ocr_has_text_boxes_and_me0/storage'))
+
+    def test_ocr_has_text_boxes_and_mean_confidence(isolated_db) -> None:  # type: ignore[no-untyped-def]
+        session, household_id, root = isolated_db
+        evidence = _evidence(session, household_id, root, _png(_text_image()), "text.png", "image/png")
+        rows = signals.extract_observations(evidence.id, session)
+        ocr = [json.loads(row.value_json) for row in rows if row.kind == "ocr"]
+>       assert ocr
+E       assert []
+
+tests/test_signals.py:148: AssertionError
+_____________ test_observation_migration_upgrade_downgrade_upgrade _____________
+
+tmp_path = PosixPath('/tmp/pytest-of-andrei/pytest-114/test_observation_migration_upg0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x74b7a2eb1430>
+
+    def test_observation_migration_upgrade_downgrade_upgrade(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+        database_path = tmp_path / "migration.db"
+        url = f"sqlite:///{database_path}"
+        monkeypatch.setattr(settings, "database_url", url)
+        config = Config(str(Path(__file__).resolve().parents[1] / "alembic.ini"))
+        config.set_main_option("sqlalchemy.url", url)
+        command.upgrade(config, "head")
+>       assert "observation" in inspect(create_engine(url)).get_table_names()
+E       AssertionError: assert 'observation' in []
+E        +  where [] = get_table_names()
+E        +    where get_table_names = <sqlalchemy.engine.reflection.Inspector object at 0x74b7a2e7f470>.get_table_names
+E        +      where <sqlalchemy.engine.reflection.Inspector object at 0x74b7a2e7f470> = inspect(Engine(sqlite:////tmp/pytest-of-andrei/pytest-114/test_observation_migration_upg0/migration.db))
+E        +        where Engine(sqlite:////tmp/pytest-of-andrei/pytest-114/test_observation_migration_upg0/migration.db) = create_engine('sqlite:////tmp/pytest-of-andrei/pytest-114/test_observation_migration_upg0/migration.db')
+
+tests/test_signals.py:228: AssertionError
+----------------------------- Captured stderr call -----------------------------
+INFO  [alembic.runtime.migration] Context impl SQLiteImpl.
+INFO  [alembic.runtime.migration] Will assume non-transactional DDL.
+=============================== warnings summary ===============================
+../../../../home/andrei/StorageGenie/backend/venv/lib/python3.12/site-packages/fastapi/testclient.py:1
+  /home/andrei/StorageGenie/backend/venv/lib/python3.12/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+../../../../home/andrei/StorageGenie/backend/venv/lib/python3.12/site-packages/starlette/testclient.py:53
+  /home/andrei/StorageGenie/backend/venv/lib/python3.12/site-packages/starlette/testclient.py:53: DeprecationWarning: The anyio.abc.BlockingPortal alias is deprecated, use anyio.from_thread.BlockingPortal instead.
+    _PortalFactoryType = Callable[[], AbstractContextManager[anyio.abc.BlockingPortal]]
+
+tests/test_candidates.py::test_candidate_migration_upgrade_downgrade_upgrade
+tests/test_candidates.py::test_candidate_migration_upgrade_downgrade_upgrade
+tests/test_candidates.py::test_candidate_migration_upgrade_downgrade_upgrade
+tests/test_search.py::test_fts_migration_upgrade_downgrade_upgrade
+tests/test_signals.py::test_observation_migration_upgrade_downgrade_upgrade
+  /home/andrei/StorageGenie/backend/venv/lib/python3.12/site-packages/alembic/config.py:604: DeprecationWarning: No path_separator found in configuration; falling back to legacy splitting on spaces, commas, and colons for prepend_sys_path.  Consider adding path_separator=os to Alembic config.
+    util.warn_deprecated(
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/test_opencode_go.py::test_identity_headers_stable_and_no_pintel_prefix
+FAILED tests/test_opencode_go.py::test_response_format_map_deepseek_kin_json_object
+FAILED tests/test_opencode_go.py::test_guard_empty_200_rejected - ImportError...
+FAILED tests/test_opencode_go.py::test_guard_zero_usage_rejected - ImportErro...
+FAILED tests/test_opencode_go.py::test_guard_think_strip_once_then_loud_fail
+FAILED tests/test_opencode_go.py::test_guard_max_tokens_sized_past_truncation
+FAILED tests/test_opencode_go.py::test_redaction_gps_stripped_byte_proven - I...
+FAILED tests/test_opencode_go.py::test_budget_refusal_zero_calls - ImportErro...
+FAILED tests/test_opencode_go.py::test_outgoing_payload_shape_no_key_material
+FAILED tests/test_opencode_go.py::test_config_readback_new_values - Attribute...
+FAILED tests/test_search.py::test_fts_migration_upgrade_downgrade_upgrade - A...
+FAILED tests/test_signals.py::test_generated_codes_are_validated_and_bad_checksum_is_not_an_identifier
+FAILED tests/test_signals.py::test_ocr_has_text_boxes_and_mean_confidence - a...
+FAILED tests/test_signals.py::test_observation_migration_upgrade_downgrade_upgrade
+14 failed, 74 passed, 7 warnings in 5.57s
+
+=== H. ruff + mypy (from backend/) ===
+$ venv/bin/ruff check .   (exit 0)
+All checks passed!
+
+$ venv/bin/mypy app   (exit 1; 40 pre-existing errors in 9 files; 0 mentions of opencode_go.py / redaction.py)
+app/schemas/asset.py:53: error: Missing type arguments for generic type "dict"  [type-arg]
+app/schemas/asset.py:55: error: Missing type arguments for generic type "dict"  [type-arg]
+app/models/base.py:8: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/households.py:18: error: Function is missing a return type annotation  [no-untyped-def]
+app/api/v1/households.py:20: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/households.py:22: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/households.py:58: error: Function is missing a return type annotation  [no-untyped-def]
+app/api/v1/households.py:59: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/households.py:60: error: Unused "type: ignore" comment  [unused-ignore]
+app/services/audit_service.py:16: error: Missing type arguments for generic type "dict"  [type-arg]
+app/services/audit_service.py:17: error: Missing type arguments for generic type "dict"  [type-arg]
+app/api/v1/review_tasks.py:17: error: Function is missing a return type annotation  [no-untyped-def]
+app/api/v1/review_tasks.py:21: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/review_tasks.py:22: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/review_tasks.py:62: error: Function is missing a return type annotation  [no-untyped-def]
+app/api/v1/review_tasks.py:66: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/review_tasks.py:67: error: Unused "type: ignore" comment  [unused-ignore]
+app/services/asset_service.py:15: error: Missing type arguments for generic type "dict"  [type-arg]
+app/services/asset_service.py:72: error: Missing type arguments for generic type "dict"  [type-arg]
+app/api/v1/assets.py:22: error: Function is missing a return type annotation  [no-untyped-def]
+app/api/v1/assets.py:25: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/assets.py:27: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/assets.py:52: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/assets.py:52: error: Missing type arguments for generic type "dict"  [type-arg]
+app/api/v1/assets.py:52: note: Error code "type-arg" not covered by "type: ignore[no-untyped-def]" comment
+app/api/v1/assets.py:120: error: Function is missing a return type annotation  [no-untyped-def]
+app/api/v1/assets.py:128: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/assets.py:129: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/assets.py:203: error: Function is missing a return type annotation  [no-untyped-def]
+app/api/v1/assets.py:207: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/assets.py:209: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/assets.py:259: error: Function is missing a return type annotation  [no-untyped-def]
+app/api/v1/assets.py:261: error: Missing type arguments for generic type "dict"  [type-arg]
+app/api/v1/assets.py:263: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/assets.py:264: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/evidence.py:19: error: Function is missing a return type annotation  [no-untyped-def]
+app/api/v1/evidence.py:20: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/evidence.py:22: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/evidence.py:24: error: Unused "type: ignore" comment  [unused-ignore]
+app/main.py:39: error: Unused "type: ignore" comment  [unused-ignore]
+app/main.py:45: error: Unused "type: ignore" comment  [unused-ignore]
+Found 40 errors in 9 files (checked 58 source files)
+
+=== I. G1 spike transcript — EXACTLY ONE live call (bound 300s; call latency 3.5s) ===
+Q2 probe: OPENCODE_API_KEY present=True (value never printed)
+source: bytes=24132 exif_tags=2 gps_tags=4
+redaction proof (exact buffer sent): format=PNG bytes=41638 exif_tags=0 gps_present=False
+header names=['content-type', 'user-agent', 'x-opencode-session'] stable=True session_len=23 (value not logged)
 outgoing shape: endpoint=POST https://opencode.ai/zen/go/v1/chat/completions fields=['max_tokens', 'messages', 'model', 'response_format', 'stream'] stream=False response_format={'type': 'json_object'} max_tokens=2000 key_material_present=False
-SPIKE RESULT: http=200 latency=7.1s
-body_bytes=6280 body_head='{"id":"d14c1338-3ba1-412e-bd79-9d084d43325b","object":"chat.completion","created":1789233512,"model":"deepseek-v4-flash-vision-exp","choices":[{"index":0,"finish_reason":"stop","logprobs":null,"message":{"role":"assistant","content":"{\n  \"items\": [\n    {\n      \"name\": \"Harvest Oats 500g\",\n      \"expiry_date\": \"2027-03-15\",\n      \"date_type\": \"best_before\",\n      \"lot\": null,\n      \"confidence\": 0.9,\n      \"uncertainty_reasons\": [\n        \"torn/partial print region: lot code obscured\",\n        \"occlusion of the lot field prevents any legible reading\"\n      ]\n'
-usage={"prompt_tokens": 868, "completion_tokens": 1361, "total_tokens": 2229, "prompt_cache_hit_tokens": 0, "prompt_cache_miss_tokens": 868, "prompt_tokens_details": {"cached_tokens": 0}, "completion_tokens_details": {"reasoning_tokens": 1232}}
-content_bytes=407 content_head='{\n  "items": [\n    {\n      "name": "Harvest Oats 500g",\n      "expiry_date": "2027-03-15",\n      "date_type": "best_before",\n      "lot": null,\n      "confidence": 0.9,\n      "uncertainty_reasons": [\n        "torn/partial print region: lot code obscured",\n        "occlusion of the lot field prevents any legible reading"\n      ]\n    }\n  ],\n  "unknowns": [\n    "items.0.lot"\n  ],\n  "needs_evidence": false\n}'
-SPIKE STOP: schema validation failed: 1 validation error for ExtractionOutput
-items.0.lot
-  Extra inputs are not permitted [type=extra_forbidden, input_value=None, input_type=NoneType]
-    For further information visit https://errors.pydantic.dev/2.13/v/extra_forbidden
-VERDICT: RED (wrong-schema). No second live call made. STOP per G0 rule + PG-IC-03.
+status=200 model=deepseek-v4-flash-vision-exp latency_s=3.5 (whole=3.5)
+usage={"prompt_tokens": 728, "completion_tokens": 383, "total_tokens": 1111, "prompt_cache_hit_tokens": 0, "prompt_cache_miss_tokens": 728, "prompt_tokens_details": {"cached_tokens": 0}, "completion_tokens_details": {"reasoning_tokens": 302}}
+cost_usd=0.000339 recomputed=0.000339
+validated=True items=1 unknowns=[] needs_evidence=False
+normalized={"items": [{"name": "HARVEST OATS 500g", "expiry_date": "2027-03-15", "date_type": "best_before", "lot": null, "confidence": 0.95, "uncertainty_reasons": ["grey block occludes part of the label"]}], "unknowns": [], "needs_evidence": false}
+request_id=2d463c36-1f60-4b36-856f-8887a5d8adc9
 
-=== E. Model/effort provenance ===
-$ env | grep -iE "opencode|model|variant"
-CODER=opencode
-OPENCODE_PID=1845563
-OPENCODE=1
-CODER_STATE_DIR=/home/andrei/.codex /home/andrei/.grok /home/andrei/.local/share/opencode
-ps grep for opencode/codex: empty. No model id in process arguments or provider metadata -> model `unknown` (owner rule: write unknown, never guess). Effort `medium` per packet coder:/effort: head as dispatched.
+=== J. Config read-back (offline env-override proof; every new setting; no key value) ===
+$ SG_PROVIDER_ID=probe-provider SG_MODEL_ID=probe-model SG_PER_JOB_CAP=0.25 SG_MONTHLY_CAP=9.5 SG_CONSENT=true venv/bin/python -c 'from app.config import settings; ...'
+provider_id= probe-provider
+model_id= probe-model
+per_job_cap= 0.25
+monthly_cap= 9.5
+consent= True
+key_attr_present= True
+
+=== K. Secret / SDK / header gates ===
+$ grep -n '^import |^from ' backend/app/services/providers/opencode_go.py  -> base64/logging/os/re/time/typing/httpx + app modules only; no vendor SDK
+$ grep -n 'openai|anthropic|generativeai|cohere' backend/app/services/providers/opencode_go.py  -> none
+$ grep -n 'logger\.' backend/app/services/providers/opencode_go.py  -> line 156 only (bind line: model + caps; no header values)
+$ K=$(grep '^OPENCODE_API_KEY=' .env | cut -d= -f2-); grep -rF --exclude=.env --exclude-dir=.git --exclude-dir=venv --exclude-dir=node_modules --exclude-dir=.pytest_cache -- "$K" . | wc -l  -> 0
+$ git check-ignore -v .env  -> .gitignore:6:.env	.env (ignored, never committed)
+
+=== L. Model / effort provenance (owner rule; no header values) ===
+run-1 argv (headless dispatch, from systemctl status cgroup): opencode run --auto --dir /home/andrei/StorageGenie --variant medium "# SG-027 ..." (packet text elided)
+run-1 provider metadata: providerID=opencode modelID=muse-spark-1.3-contributor-free (opencode.log stream lines 17:52-18:10Z)
+run-2 (this continuation) process argv: opencode (interactive, owner-resumed); provider metadata stream line:
+timestamp=2026-09-12T19:16:16.025Z level=INFO run=93b2e944 message=stream providerID=opencode-go modelID=deepseek-v4.1-flash session.id=ses_f694c95eaffeZPOrNfSV9WGCDq small=false agent=build mode=primary
+effort: packet head 'effort: medium'; run-2 argv carries no --variant (resumed interactive); recorded as medium per packet, unknown at process level.

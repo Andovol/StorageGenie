@@ -2,6 +2,15 @@ from pydantic_settings import BaseSettings
 
 
 class Settings(BaseSettings):
+    """Runtime settings. Phase 2 additions (SG-027) are named settings only.
+
+    Cloud use stays OFF until selected: the provider id defaults to the
+    deterministic fake double, both cost caps default to None (uncapped) per
+    F2 (owner 2026-09-11: "no caps at first, we will re-evaluate later."), and
+    consent defaults to False. Every value is env-overridable; nothing binds
+    silently. The window that logs a bound cap is the provider (SG-027 G2).
+    """
+
     database_url: str = "sqlite:///./data/db/storagegenie.db"
     storage_root: str = "./data/storage"
     api_prefix: str = "/v1"
@@ -14,6 +23,13 @@ class Settings(BaseSettings):
     dhash_near_threshold: int = 10
     thumbnail_sizes: list[int] = [256, 512]
     allowed_mime_types: list[str] = ["image/jpeg", "image/png", "image/webp", "image/tiff", "application/pdf"]
+
+    sg_provider_id: str = "fake"
+    sg_model_id: str = "deepseek-v4-flash-vision-exp"
+    opencode_api_key: str | None = None
+    sg_per_job_cap: float | None = None
+    sg_monthly_cap: float | None = None
+    sg_consent: bool = False
 
     model_config = {"env_file": ".env", "extra": "ignore"}
 

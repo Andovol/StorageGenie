@@ -19,7 +19,11 @@ def _gps_jpeg_bytes() -> bytes:
     buf = io.BytesIO()
     exif = img.getexif()
     exif[0x010F] = "TestMake"  # Make
-    exif[0x8825] = 12345  # GPSInfo tag id (payload shape only, value opaque)
+    gps = exif.get_ifd(0x8825)  # GPSInfo IFD (Pillow 12 API; a bare int pointer cannot serialize)
+    gps[1] = "N"
+    gps[2] = (51.0, 30.0, 0.0)
+    gps[3] = "E"
+    gps[4] = (0.0, 7.0, 0.0)
     buf = io.BytesIO()
     img.save(buf, format="JPEG", exif=exif)
     return buf.getvalue()

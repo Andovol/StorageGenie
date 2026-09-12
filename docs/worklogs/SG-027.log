@@ -1,29 +1,53 @@
-SG-027 worklog (opencode / medium) — STOP on red G0 spike, wrong-schema subtype
-BASE ref requested: automation; BASE commit resolved: bcb59231ea96e46707c3363a1216ae0404daa80d
-Branch: automation. Starting tree: clean (git status --porcelain empty at start; sole delta after work is the intended new gate file + these 3 worklogs).
+SG-027 run log — attempt-2 (opencode; owner-directed continuation after the run-1 dispatch-loop failure)
 
-LEG G1 gates (bound 120s probes; actual ~15s total, units seconds):
-- git status --porcelain quoted: empty (clean; no quarantine refs adopted).
-- Full suite BASELINE (bound 600s; actual 5.01s): 75 passed, 3 failed in backend/tests/test_signals.py, run from repo root as `venv/bin/pytest -q`:
-  1. test_generated_codes_are_validated_and_bad_checksum_is_not_an_identifier — AssertionError (barcode native validation; decoder env-red #1 of 2 known).
-  2. test_ocr_has_text_boxes_and_mean_confidence — `assert []` (OCR native boxes; decoder env-red #2 of 2 known).
-  3. test_observation_migration_upgrade_downgrade_upgrade — alembic CommandError "Path doesn't exist: alembic" (CWD artifact of running from repo root; not a code finding; destination: none — pre-existing harness shape, quoted here as base-run proof).
-  No migration touched; nothing unwinds sg025.
-- .env presence: mode 600, 288B, at repo root. Q2 count probe: OPENCODE_API_KEY lines = 1 (expect 1; value never touched, never printed/logged/committed).
+MODEL + EFFORT PROVENANCE (owner rule: process arguments / provider metadata, never an identity line)
+- run-1 (headless dispatch, 2026-09-12 17:38:53Z-18:13:53Z): argv `opencode run --auto --dir /home/andrei/StorageGenie --variant medium "<packet>"` (cgroup argv); provider metadata stream lines: providerID=opencode modelID=muse-spark-1.3-contributor-free.
+- run-2 (owner-resumed continuation, from 19:00:55Z): argv `opencode` (interactive; no --variant); provider metadata stream line: providerID=opencode-go modelID=deepseek-v4.1-flash. Effort `medium` per packet head; absent from the resumed argv, so `unknown` at process level and recorded as packet-declared medium.
+- Adapter target model (live-verified, one call): `deepseek-v4-flash-vision-exp`.
 
-LEG offline PRE FAIL (bound 120s; actual 0.12s): backend/tests/test_opencode_go.py (10 gates, new file, written before any adapter) run as `venv/bin/pytest backend/tests/test_opencode_go.py -q` from repo root: 10 failed — 9x ImportError (app.services.providers.opencode_go absent) + 1x AttributeError (Settings has no new attrs). Expected fail-then-pass PRE leg; POST leg deliberately unrun (red spike, stop-wins). Raw run committed in SG-027_verify.log.
+RUN 1 — FAILURE AND ROOT CAUSE (correction to the ISS-9 record)
+This coder session (ses_f694c95eaffeZPOrNfSV9WGCDq, created 17:38:55.637Z per opencode.log) IS the run the
+SG-027 unit launched at 17:38:53Z. Run-1 did not execute the packet: it invoked
+`/usr/local/bin/dispatch SG-027 --force` on its own slice (17:39:40Z first attempt -> `reason=conf_unreadable`;
+17:40:37Z second attempt with the project conf -> `reason=lock_held`, its own unit held the lock), then polled its
+own unit until systemd killed it at TimeoutStartSec = RUN_BUDGET_S = 2100s (35 min):
+"start operation timed out. Terminating." 18:13:53Z, `Failed with result 'timeout'`, 40.1s CPU, 518.4M peak.
+Zero commits, zero files, zero live calls. The earlier record "cause unknown, no readable host evidence" is
+corrected: journal + opencode.log hold the evidence, and the failure was coder-side (self-dispatch), not the lane.
+(SG-032, commit 203d97d, proved the lane green afterwards; its receipt note verified.)
 
-LEG G0 vision spike (bound 300s; actual call latency 7.1s, leg total ~20s):
-- Image rendered at RUNTIME via PIL (800x600 synthetic label: "Harvest Oats 500g", "Best before: 2027-03-15", Gaussian-blurred lot region for one honest unknown). Zero personal data. No committed image; none stored (script in /tmp, bytes in-memory only).
-- Pre-send redaction proof quoted: format=PNG bytes=8354 exif_tags=0 gps_present=False (re-encoded stripped by construction; PIL check on the exact buffer sent).
-- Exactly ONE live call: POST https://opencode.ai/zen/go/v1/chat/completions, model deepseek-v4-flash-vision-exp, stream false, response_format json_object, max_tokens 2000, headers names-only (Authorization, Content-Type, User-Agent, x-opencode-session; ONE stable session value storagegenie-sg027-run1, never per-call random, never pintel-*).
-- Result RED, subtype wrong-schema: HTTP 200 + non-zero usage (prompt 868 / completion 1361 incl. 1232 reasoning / total 2229) + body parses as JSON, but content FAILS ExtractionOutput: model returned extra field `lot: null` (extra_forbidden) and unknowns entry `items.0.lot` naming a non-schema field. finish_reason=stop (not truncated). Full scrubbed transcript in SG-027_verify.log. No second live call made (cost discipline; packet forbids it).
-- STOP per G0 rule + PG-IC-03 stop-wins. G2/G3 NOT started (packet: nothing below starts on a red spike).
+RUN 2 — LEGS, ELAPSED vs BUDGET (bound -> actual)
+- Slice-start gate (status/branch/BASE/Q2): probe bound 120s -> <1s. Tree clean; Q2 count = 1.
+- Build (G0+G2 edits: schemas lot, lot test, adapter, redaction, config, .env.example): 120s probe bound -> <1s each write.
+- PRE leg, 11 tests (10 banked + lot): fixture bound 600s -> 0.33s; result 11 failed (raw in verify log).
+- POST leg, same 11 tests: fixture bound 600s -> 0.28s; result 11 passed.
+- Full suite, current tree, from backend/: fixture bound 600s -> 5.06s; 4 failed, 85 passed.
+- Base-commit suite proof (detached worktree 203d97d): fixture bound 600s -> 5.57s; 14 failed, 74 passed.
+- ruff check .: 120s bound -> <1s, exit 0 "All checks passed!".
+- mypy app: 300s bound -> completed, exit 1, 40 pre-existing errors in 9 files (0 in new files).
+- G1 live spike (EXACTLY ONE call): single-call bound 300s -> 3.5s call (3.5s whole script), exit 0 GREEN.
+- G4+G5 (worklogs, commit, push, note): 120s bound per probe -> within bound; note verified (see report G5).
 
-LEG G5 close-out: BLOCKED commit + push to automation + notes-ref note (no storagegenie-evidence push, no RECEIPT_CMD, per G5).
+SPEND (computed from the packet rate table; off-peak base rates, images billed as input tokens)
+- attempt-1 call: 868 in / 1361 out -> $0.000947
+- attempt-2 call: 728 in / 383 out -> $0.000339 (usage quoted in verify log; `compute_cost` quoted)
+- cumulative: $0.001286 across exactly 2 live calls (one this attempt; a third was never made)
+- caps: `sg_per_job_cap=None`, `sg_monthly_cap=None` -> uncapped per F2 (owner 2026-09-11: "no caps at first, we
+  will re-evaluate later."). Mechanisms ship; nothing binds; re-evaluation owed. Vision model allotment $15/mo.
 
-MODEL + effort provenance (owner rule): model `unknown` — env probe quoted (CODER=opencode, OPENCODE=1, OPENCODE_PID=1845563; no model id in env or process metadata; ps grep for opencode/codex returned empty); effort `medium` — as dispatched per packet coder:/effort: head. Model identity never taken from a system-prompt line.
+LIVE-STATE LEDGER
+DB: none — temp SQLite only (tests) + the gitignored local dev file `backend/data/db/storagegenie.db` (written by
+the base-proved alembic pollution, pre-existing; no service uses it). Services: none started/stopped. Restarts:
+none. Deploys: none. Prod writes: zero. Secrets: names/counts only; key value never printed; grep gate = 0 matches
+outside `.env`; `.env` ignored and never committed.
 
-Live-state ledger: database none (temp SQLite only in tests, zero live rows); services touched none; restart none; spend line: 1 metered call, model deepseek-v4-flash-vision-exp, latency 7.1s, usage 868/1361/2229, cost-estimate recorded 0 (vendor rate table has no entry for this model; PIP convention missing-table=$0; estimate NOT billed truth).
+GATES (detail + raw in the verify log)
+- Starting tree clean (quoted); BASE `203d97dafb1022797b2693e0b038cb40ab6046f9`.
+- lot modeled; fabricated-value rule proven (valued + listed -> ValidationError); 10 banked tests POST-green.
+- One live call quoted: HTTP 200, model/deepseek-v4-flash-vision-exp, 3.5s, usage 728/383/1111, cost $0.000339,
+  content validated through the amended schema (`lot` honored; value null, unknowns []).
+- SDK grep clean; header-value logging grep clean (one bind log line, model+caps only); redaction GPS/EXIF proof
+  pre-send (exif_tags=0 gps_present=False on the exact buffer); budget refusal zero calls (banked test green).
+- Full suite green except base-proved reds; ruff clean; mypy quoted; every new config value read back offline.
 
-Overall elapsed vs budget: total ~2 min wall vs 2400s overall; every leg inside its bound (probes ~15s/120s, fixture PRE 0.05s/600s, spike ~20s/300s).
+FINDINGS, DISAGREEMENTS, UNCLEAR: see `docs/worklogs/SG-027_report.md` (same directory) — session follows.

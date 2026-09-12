@@ -11,6 +11,7 @@ files versioned with the provider-neutral no-inference rule.
 from __future__ import annotations
 
 import json
+from copy import deepcopy
 from pathlib import Path
 
 import pytest
@@ -110,6 +111,43 @@ def test_unknowns_honored() -> None:
     }
     with pytest.raises(ValidationError):
         parse_extraction_output(fabricated)
+
+
+def test_lot_optional_and_fabricated_value_rule() -> None:
+    """SG-027 D42(a): `lot` is optional, never required; a value beside an unknowns entry is fabrication."""
+    unknown_lot = {
+        "items": [
+            {
+                "name": "Harvest Oats 500g",
+                "expiry_date": "2027-03-15",
+                "date_type": "best_before",
+                "lot": None,
+                "confidence": 0.9,
+                "uncertainty_reasons": ["torn label: lot region obscured"],
+            }
+        ],
+        "unknowns": ["items.0.lot"],
+        "needs_evidence": False,
+    }
+    out = parse_extraction_output(unknown_lot)
+    assert out.items[0].lot is None
+    assert out.unknowns == ["items.0.lot"]
+
+    valued = deepcopy(unknown_lot)
+    valued["items"][0]["lot"] = "L24-0716"
+    valued["unknowns"] = []
+    assert parse_extraction_output(valued).items[0].lot == "L24-0716"
+
+    fabricated = deepcopy(unknown_lot)
+    fabricated["items"][0]["lot"] = "L24-0716"
+    with pytest.raises(ValidationError):
+        parse_extraction_output(fabricated)
+
+    non_string = deepcopy(unknown_lot)
+    non_string["items"][0]["lot"] = 12345
+    non_string["unknowns"] = []
+    with pytest.raises(ValidationError):
+        parse_extraction_output(non_string)
 
 
 def test_repair_retried_exactly_once_then_step_fails() -> None:
