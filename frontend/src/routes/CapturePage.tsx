@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import type { Household } from "../api/types";
+import { HouseholdSelector } from "../components/HouseholdSelector";
 import { useHouseholds } from "../hooks/useAssets";
 import { AssetForm } from "../components/AssetForm";
 
@@ -22,23 +24,18 @@ export function CapturePage() {
     <div style={{ padding: 24 }}>
       <h1>Capture — Manual Create</h1>
       <div style={{ marginBottom: 16, display: "flex", gap: 12, alignItems: "center" }}>
-        <label style={{ fontSize: 13 }}>
-          Household{" "}
-          <select
-            value={effective}
-            onChange={(e) => {
-              setHouseholdId(e.target.value);
-              localStorage.setItem("household_id", e.target.value);
-            }}
-            style={{ padding: 6, borderRadius: 6, marginLeft: 6 }}
-          >
-            {(households || []).map((h) => (
-              <option key={h.id} value={h.id}>
-                {h.name}
-              </option>
-            ))}
-          </select>
-        </label>
+        <HouseholdSelector
+          value={effective}
+          onChange={(id) => {
+            setHouseholdId(id);
+            localStorage.setItem("household_id", id);
+          }}
+          households={households as Household[] | undefined}
+          showLabel={true}
+          labelStyle={{ fontSize: 13 }}
+          selectStyle={{ padding: 6, borderRadius: 6, marginLeft: 6 }}
+          emptyOptionLabel=""
+        />
       </div>
       {!effective ? (
         <div style={{ color: "#6b7280" }}>No household available — seed the database first.</div>
