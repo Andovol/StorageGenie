@@ -248,3 +248,92 @@ provider calls and zero ledger rows.
 
 Phase 2 is proved by `backend/tests/test_phase2_e2e.py` (six offline behaviours on
 the real HTTP path, zero network) and closes on blueprint:522.
+
+## Phase 3 runbook — usability block, planning, chat, Cosmetics
+
+Phase 3 keeps the same LAN-only, single-household, unauthenticated stack as Phases
+0–2. It adds the usability block (tested-model picker, multi-item split, manual entry
+per field, on-screen corrections), a daily planning agent on a button, grounded
+category chat, and the Cosmetics category with opened-date tracking. **AI stays OFF
+by default**: with the shipped defaults (`SG_PROVIDER_ID=fake`, `SG_CONSENT=false`) a
+planning run and a chat call refuse before any provider object is built, and the
+import pipeline skips the AI steps exactly as Phase 1.
+
+### What the stage added
+
+- **Model picker** (`GET`/`PUT /v1/settings/ai`): lists the server-side tested-model
+  allowlist, selects one at runtime, and an out-of-set id is an enforced `422`. The
+  provider key is named nowhere on the response path (exclusion by rule). The
+  selection is process-side, so **a backend restart resets it to `SG_MODEL_ID`**.
+- **Multi-item split** (`POST /v1/candidates/{id}/split`): a photo holding several
+  items becomes one candidate per item, each keeping its own fields, the shared
+  evidence and its origin provenance. The request must name every item exactly once;
+  a partial selection is an enforced `422` that creates nothing.
+- **Manual entry per field + on-screen corrections** (`POST
+  /v1/plugins/expiry-tracker/assets/{id}/expiry`, `PATCH /v1/assets/{id}`): every
+  field is hand-typeable, `Unknown` stays valid, and an accepted value is superseded
+  (never overwritten) with the old value visible in asset history.
+- **Daily planning on a button** (`POST /v1/planning/run`): reads the catalogue and
+  confirmed label data, is consent-gated before any call, and writes `pending`
+  suggestions with backing refs plus one `suggestion` guardrail row. Nothing
+  executes: confirm/dismiss are the only transitions (`GET
+  /v1/planning/suggestions`, `POST .../confirm`, `POST .../dismiss`); a dismissal with
+  a reason writes one append-only `correction` row; an illegal move is `422`.
+- **Category chat** (`POST /v1/chat/{category}`): a grounded answer for Food or
+  Medicine built from that category's catalogue, sent as delimited untrusted DATA.
+  An unsupported category is `422`; the explicit `POST /v1/chat/{category}/corrections`
+  is the ONLY write action (user-initiated), and model output alone writes no row.
+- **Cosmetics + opened-date**: `cosmetics_personal_care` is active with
+  `opened_date_tracking`, and `extract-cosmetics-v1` feeds `ExtractionItem.opened_date`
+  through candidate accept to a persisted, gated (`review_state="proposed"`)
+  `opened_date` assertion that planning and chat grounding read. An item without an
+  opened date stays `null`, never inferred.
+
+### Switches in play (names only; values live in the uncommitted `.env`)
+
+| Setting | Purpose | Shipped default |
+|---|---|---|
+| `SG_PROVIDER_ID` | adapter id; `fake` keeps everything local | `fake` |
+| `SG_MODEL_ID` | vision model id; the Settings picker overrides it at runtime | `deepseek-v4-flash-vision-exp` |
+| `SG_PROMPT_CATEGORY` | versioned extraction prompt selection (`food`, `medicine`, `cosmetics`) | `food` |
+| `SG_CONFIDENCE_THRESHOLD` | auto-accept floor for non-gated fields (uncalibrated, `G-A9`) | `0.9` |
+| `SG_PER_JOB_CAP` | per-job worst-case cost cap in USD | `none` (uncapped) |
+| `SG_MONTHLY_CAP` | household monthly cap in USD, enforced from the durable `provider_call` ledger | `none` (uncapped) |
+| `SG_CONSENT` | cloud consent switch; OFF means no key read and no call | `false` |
+
+### Run planning and chat
+
+With consent on (`SG_CONSENT=true` and a configured `SG_PROVIDER_ID`) against the API:
+
+```sh
+curl -sS -X POST 'http://localhost:8003/v1/planning/run?household_id=<HOUSEHOLD_ID>'
+curl -sS 'http://localhost:8003/v1/planning/suggestions?household_id=<HOUSEHOLD_ID>'
+curl -sS -X POST 'http://localhost:8003/v1/planning/suggestions/<SUGGESTION_ID>/confirm?household_id=<HOUSEHOLD_ID>'
+curl -sS -X POST 'http://localhost:8003/v1/chat/food?household_id=<HOUSEHOLD_ID>' \
+  -H 'Content-Type: application/json' -d '{"message":"When does the milk expire?"}'
+```
+
+Planning and chat change no catalogue state; each metered call leaves one
+`provider_call` ledger row and is consent-gated before the call.
+
+### What stays OFF by default
+
+Nothing calls a provider until `SG_CONSENT=true`; the planning button and the chat
+screen then refuse with a visible reason (`consent_disabled`) and make zero calls and
+zero rows. No scheduling, no automatic run, no streaming. Caps ship **uncapped** per
+owner fork F2 — re-evaluation is owed; when a cap is set the mechanisms refuse
+**before** any call (the per-job cap in the router, the monthly cap summed from the
+committed ledger across jobs).
+
+### Phase 3 non-goals (owned by the next phase, not delivered here)
+
+- Live web enrichment / `search_and_summarize` (owner: nice-to-have, deferred).
+- Auto-scheduling or automatically running suggestions.
+- A second provider or multi-provider routing/fallback.
+- Streaming chat, or persisted chat history (the transcript is component state only).
+- Per-field accept UI for gated values beyond what exists (a proposed `opened_date`
+  stays proposed until a later acceptance surface).
+- Provider analytics / dashboards.
+
+Phase 3 is proved by `backend/tests/test_phase3_e2e.py` (six gate groups on the real
+HTTP path, zero network) plus the per-slice suites, and closes on blueprint:531.

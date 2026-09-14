@@ -1,0 +1,236 @@
+SG-039 verify log — raw proofs (mutation proofs + both-runs + live receipt + tally)
+
+================================================================================
+1. STARTING TREE (quoted)
+================================================================================
+$ git status --porcelain=v1
+(empty)
+$ git branch --show-current
+automation
+$ git rev-parse HEAD
+68f905a03861f699d41600e63b0d239b5386f91e
+$ git remote -v
+origin  git@github.com:Andovol/StorageGenie.git (fetch)
+origin  git@github.com:Andovol/StorageGenie.git (push)
+
+================================================================================
+2. G1 E2E — 15 passed, zero network (adapter _post patched to raise)
+================================================================================
+$ cd backend && ../venv/bin/python -m pytest tests/test_phase3_e2e.py -q
+...............                                                          [100%]
+15 passed, 1 warning in 2.14s
+
+================================================================================
+3. MUTATION A — split coverage (source: backend/app/services/candidates.py)
+================================================================================
+MUTATED (verbatim diff):
+-    if set(item_indexes) != set(range(len(items))):
++    if set(item_indexes) > set(range(len(items))):
+         raise CandidateSplitError(
+             "item_indexes must name every item exactly once", status_code=422
+         )
+
+$ ../venv/bin/python -m pytest tests/test_phase3_e2e.py::test_multi_item_split_full_coverage_and_partial_refused -q
+>           assert partial.status_code == 422, partial.text
+E           AssertionError: {"candidate_id":"01a09fa4-...","state":"split",...,"children":[{...},{...}]}
+E           assert 200 == 422
+E            +  where 200 = <Response [200 OK]>.status_code
+FAILED tests/test_phase3_e2e.py::test_multi_item_split_full_coverage_and_partial_refused
+1 failed, 1 warning in 0.84s
+CAUGHT: a partial split returned 200 (created children) instead of the enforced 422.
+
+REVERTED-CLEAN:
+$ git checkout -- app/services/candidates.py && git status --porcelain app/services/candidates.py
+(empty)
+candidates.py reverted-clean
+
+================================================================================
+4. MUTATION B — correction-chain supersession (source: backend/app/services/assertion_service.py)
+================================================================================
+MUTATED (verbatim diff):
+     if prev:
+-        prev.review_state = "superseded"
++        prev.review_state = "accepted"
+
+$ ../venv/bin/python -m pytest tests/test_phase3_e2e.py::test_correction_chain_supersedes_and_audits -q
+>       assert states.count("accepted") == 1 and "superseded" in states, states
+E       AssertionError: ['accepted', 'accepted']
+E       assert (2 == 1)
+FAILED tests/test_phase3_e2e.py::test_correction_chain_supersedes_and_audits
+1 failed, 1 warning in 0.76s
+CAUGHT: the prior assertion was not superseded; two 'accepted' rows remained.
+
+REVERTED-CLEAN:
+$ git checkout -- app/services/assertion_service.py && git status --porcelain app/services/assertion_service.py
+(empty)
+assertion_service.py reverted-clean
+
+================================================================================
+5. MUTATION C — guardrail write (source: backend/app/services/chat/service.py)
+================================================================================
+MUTATED (verbatim diff):
+     db.add(event)
+-    db.commit()
+-    db.refresh(event)
++    # MUTATION: guardrail write suppressed for the proof
+     return event
+
+$ ../venv/bin/python -m pytest tests/test_phase3_e2e.py::test_chat_correction_is_user_only_and_model_output_writes_nothing tests/test_phase3_e2e.py::test_guardrail_log_rows_readable -q
+>       assert kinds == {"suggestion", "correction"}
+E       AssertionError: assert {'suggestion'} == {'correction', 'suggestion'}
+E         Extra items in the right set:
+E         'correction'
+FAILED tests/test_phase3_e2e.py::test_chat_correction_is_user_only_and_model_output_writes_nothing
+FAILED tests/test_phase3_e2e.py::test_guardrail_log_rows_readable
+2 failed, 1 warning in 0.86s
+CAUGHT: the user-initiated correction wrote no append-only row.
+
+REVERTED-CLEAN:
+$ git checkout -- app/services/chat/service.py && git status --porcelain app/services/chat/service.py
+(empty)
+chat/service.py reverted-clean
+
+POST-REVERT: $ git diff --stat (empty); $ git status --porcelain
+?? backend/tests/test_phase3_e2e.py
+$ ../venv/bin/python -m pytest tests/test_phase3_e2e.py -q
+15 passed, 1 warning in 2.14s
+
+================================================================================
+6. FULL SUITE + BASE DECODER REDS (re-verified, not inherited)
+================================================================================
+$ cd backend && timeout 600 ../venv/bin/python -m pytest -q
+FAILED tests/test_signals.py::test_generated_codes_are_validated_and_bad_checksum_is_not_an_identifier
+FAILED tests/test_signals.py::test_ocr_has_text_boxes_and_mean_confidence - a...
+2 failed, 180 passed, 13 warnings in 12.31s
+
+$ git worktree add --detach /tmp/sg039-base 68f905a
+$ cd /tmp/sg039-base/backend && /home/andrei/StorageGenie/venv/bin/python -m pytest \
+    tests/test_signals.py::test_generated_codes_are_validated_and_bad_checksum_is_not_an_identifier \
+    tests/test_signals.py::test_ocr_has_text_boxes_and_mean_confidence -q
+WARNING  app.services.signals:signals.py:104 Barcode extraction unavailable: pyzbar/libzbar is not installed
+WARNING  app.services.signals:signals.py:210 OCR extraction unavailable: pytesseract is not installed
+FAILED tests/test_signals.py::test_generated_codes_are_validated_and_bad_checksum_is_not_an_identifier
+FAILED tests/test_signals.py::test_ocr_has_text_boxes_and_mean_confidence - a...
+2 failed in 0.69s
+=> same 2 at base 68f905a: environment, not new code.
+
+================================================================================
+7. LIVE LEG (ONE run) — ceiling pre-check, transcript, per-call receipt
+================================================================================
+CEILING PRE-CHECK BEFORE ANY SPEND:
+CEILING=$0.05000 fixtures=10
+... per-fixture worst_case_2call between $0.006865 and $0.010274 ...
+worst_case_total(2 calls each)=$0.081904
+ceiling_check=FAIL   # cumulative bound exceeds; the runner guards per fixture
+
+RUN (from repo root so .env supplies the key; key never printed):
+$ SG_CONSENT=true SG_PROVIDER_ID=opencode-go venv/bin/python backend/eval/run.py --live
+SPEND CEILING=$0.05; mode=live provider=opencode-go
+call fixture=sg029-01-clean-food provider=opencode-go model=deepseek-v4-flash-vision-exp latency_ms=1961.740450002253 usage={"prompt_tokens": 754, "completion_tokens": 180, "total_tokens": 934, "prompt_cache_hit_tokens": 512, "prompt_cache_miss_tokens": 242, "prompt_tokens_details": {"cached_tokens": 512}, "completion_tokens_details": {"reasoning_tokens": 114}} cost=$0.000221 error_state=None
+fixture sg029-01-clean-food: cached provider_output; fixture_spend=$0.000221
+call fixture=sg029-02-clean-medicine provider=opencode-go model=deepseek-v4-flash-vision-exp latency_ms=2648.8342192023993 usage={"prompt_tokens": 785, "completion_tokens": 264, "total_tokens": 1049, "prompt_cache_hit_tokens": 640, "prompt_cache_miss_tokens": 145, "prompt_tokens_details": {"cached_tokens": 640}, "completion_tokens_details": {"reasoning_tokens": 206}} cost=$0.000276 error_state=None
+fixture sg029-02-clean-medicine: cached provider_output; fixture_spend=$0.000276
+call fixture=sg029-03-glare-food provider=opencode-go model=deepseek-v4-flash-vision-exp latency_ms=None usage=null cost=$0.000000 error_state=invalid_json: adapter schema parse failed
+call fixture=sg029-03-glare-food provider=opencode-go model=deepseek-v4-flash-vision-exp latency_ms=None usage=null cost=$0.000000 error_state=invalid_json: adapter schema parse failed
+fixture sg029-03-glare-food: FAILED ExtractionFailedError: extraction supply failed (attempt 2/2, kind=invalid_json); fixture_spend=$0.000000
+call fixture=sg029-04-clutter-food provider=opencode-go model=deepseek-v4-flash-vision-exp latency_ms=3227.955092675984 usage={"prompt_tokens": 754, "completion_tokens": 364, "total_tokens": 1118, "prompt_cache_hit_tokens": 512, "prompt_cache_miss_tokens": 242, "prompt_tokens_details": {"cached_tokens": 512}, "completion_tokens_details": {"reasoning_tokens": 219}} cost=$0.000331 error_state=None
+fixture sg029-04-clutter-food: cached provider_output; fixture_spend=$0.000331
+call fixture=sg029-05-partial-label-food provider=opencode-go model=deepseek-v4-flash-vision-exp latency_ms=4662.5747079961 usage={"prompt_tokens": 754, "completion_tokens": 760, "total_tokens": 1514, "prompt_cache_hit_tokens": 512, "prompt_cache_miss_tokens": 242, "prompt_tokens_details": {"cached_tokens": 512}, "completion_tokens_details": {"reasoning_tokens": 665}} cost=$0.000569 error_state=None
+fixture sg029-05-partial-label-food: cached provider_output; fixture_spend=$0.000569
+call fixture=sg029-06-partial-label-medicine provider=opencode-go model=deepseek-v4-flash-vision-exp latency_ms=3873.3754768036306 usage={"prompt_tokens": 785, "completion_tokens": 439, "total_tokens": 1224, "prompt_cache_hit_tokens": 640, "prompt_cache_miss_tokens": 145, "prompt_tokens_details": {"cached_tokens": 640}, "completion_tokens_details": {"reasoning_tokens": 356}} cost=$0.000381 error_state=None
+fixture sg029-06-partial-label-medicine: cached provider_output; fixture_spend=$0.000381
+call fixture=sg029-07-no-date-visible-medicine provider=opencode-go model=deepseek-v4-flash-vision-exp latency_ms=3107.4304548092186 usage={"prompt_tokens": 785, "completion_tokens": 336, "total_tokens": 1121, "prompt_cache_hit_tokens": 640, "prompt_cache_miss_tokens": 145, "prompt_tokens_details": {"cached_tokens": 640}, "completion_tokens_details": {"reasoning_tokens": 249}} cost=$0.000319 error_state=None
+fixture sg029-07-no-date-visible-medicine: cached provider_output; fixture_spend=$0.000319
+call fixture=sg029-08-clean-cosmetics provider=opencode-go model=deepseek-v4-flash-vision-exp latency_ms=7017.837502993643 usage={"prompt_tokens": 818, "completion_tokens": 1250, "total_tokens": 2068, "prompt_cache_hit_tokens": 0, "prompt_cache_miss_tokens": 818, "prompt_tokens_details": {"cached_tokens": 0}, "completion_tokens_details": {"reasoning_tokens": 1127}} cost=$0.000873 error_state=None
+fixture sg029-08-clean-cosmetics: cached provider_output; fixture_spend=$0.000873
+call fixture=sg029-09-no-date-visible-cosmetics provider=opencode-go model=deepseek-v4-flash-vision-exp latency_ms=3878.618119750172 usage={"prompt_tokens": 877, "completion_tokens": 543, "total_tokens": 1420, "prompt_cache_hit_tokens": 384, "prompt_cache_miss_tokens": 493, "prompt_tokens_details": {"cached_tokens": 384}, "completion_tokens_details": {"reasoning_tokens": 450}} cost=$0.000457 error_state=None
+fixture sg029-09-no-date-visible-cosmetics: cached provider_output; fixture_spend=$0.000457
+call fixture=sg029-10-partial-label-cosmetics provider=opencode-go model=deepseek-v4-flash-vision-exp latency_ms=3444.399473257363 usage={"prompt_tokens": 818, "completion_tokens": 496, "total_tokens": 1314, "prompt_cache_hit_tokens": 384, "prompt_cache_miss_tokens": 434, "prompt_tokens_details": {"cached_tokens": 384}, "completion_tokens_details": {"reasoning_tokens": 379}} cost=$0.000420 error_state=None
+fixture sg029-10-partial-label-cosmetics: cached provider_output; fixture_spend=$0.000420
+TOTAL_SPEND=$0.003849 of ceiling $0.05
+fixture sg029-01-clean-food: score=1.000 needs=1 unknowns=1 items=1.00
+fixture sg029-02-clean-medicine: score=1.000 needs=1 unknowns=1 items=1.00
+fixture sg029-03-glare-food: score=0.000 needs=0 unknowns=0 items=0.00
+fixture sg029-04-clutter-food: score=0.667 needs=1 unknowns=0 items=1.00
+fixture sg029-05-partial-label-food: score=1.000 needs=1 unknowns=1 items=1.00
+fixture sg029-06-partial-label-medicine: score=1.000 needs=1 unknowns=1 items=1.00
+fixture sg029-07-no-date-visible-medicine: score=0.667 needs=1 unknowns=0 items=1.00
+fixture sg029-08-clean-cosmetics: score=0.667 needs=1 unknowns=0 items=1.00
+fixture sg029-09-no-date-visible-cosmetics: score=0.667 needs=1 unknowns=0 items=1.00
+fixture sg029-10-partial-label-cosmetics: score=0.667 needs=1 unknowns=0 items=1.00
+field_accuracy=0.733 over 10 fixtures
+unknown_rate=2/7=0.286
+correction_rate=0/6=0.000 (audit_event plugin.assertion.write rows=6)
+EXIT=0
+
+FIXTURE CACHE WRITES (reverted — outside the scope ceiling):
+$ git diff --stat
+ 9 files changed, 160 insertions(+), 78 deletions(-)   # sg029-01..10 minus 03 (FAILED, not rewritten)
+$ git checkout -- backend/eval/corpus/sg029/ && git diff --stat
+(empty)
+
+================================================================================
+8. STAGE TALLY — durable ledger query (read the table, quoted)
+================================================================================
+(a) durable provider_call DB table:
+  data/db/storagegenie.db: provider_call table -> ABSENT
+(b) committed durable ledger (eval fixture provider_calls), 7 rows:
+  ('sg029-01-clean-food', 'food', 'deepseek-v4-flash-vision-exp', 0.0003861, None)
+  ('sg029-02-clean-medicine', 'medicine', 'deepseek-v4-flash-vision-exp', 0.00030735, None)
+  ('sg029-03-glare-food', 'food', 'deepseek-v4-flash-vision-exp', 0.0003177, None)
+  ('sg029-04-clutter-food', 'food', 'deepseek-v4-flash-vision-exp', 0.0003261, None)
+  ('sg029-05-partial-label-food', 'food', 'deepseek-v4-flash-vision-exp', 0.0004407, None)
+  ('sg029-06-partial-label-medicine', 'medicine', 'deepseek-v4-flash-vision-exp', 0.00024615, None)
+  ('sg029-07-no-date-visible-medicine', 'medicine', 'deepseek-v4-flash-vision-exp', 0.00030435, None)
+  rows=7 sum_cost=$0.0023285
+(c) packet reference (committed worklogs): SG-037 $0.000722 + SG-038 $0.0001833 = $0.0009053
+    (matches the committed worklogs exactly; not present in any queryable ledger).
+    This leg adds $0.003849 => Phase 3 metered total $0.0047543.
+
+================================================================================
+9. HYGIENE GATES (raw)
+================================================================================
+$ ruff check app tests
+All checks passed!
+
+$ mypy app
+Found 40 errors in 9 files (checked 69 source files)   # base-identical (40/9)
+(touched files: search of output for test_phase3/README -> NONE)
+
+$ git diff --stat -- backend/alembic backend/app/models
+(empty)
+$ alembic heads
+20260914_sg035_foundations (head)
+$ git diff --stat -- backend/app/services/providers/prompts
+(empty)
+$ git diff --check
+(empty)
+$ git status --porcelain
+ M README.md
+?? backend/tests/test_phase3_e2e.py
+  # no ignored file staged; no migration; no frozen-prompt diff
+
+Secret scan (changed files):
+  backend/tests/test_phase3_e2e.py:406  monkeypatch.setattr(settings, "opencode_api_key", SENTINEL_KEY)
+  backend/tests/test_phase3_e2e.py:430  assert "opencode_api_key" not in raw
+  README.md:83,193 (doc prose naming the setting)
+  => 0 real secret material; the only sk- token is the deliberate test sentinel.
+
+Eval guard:
+  eval CATEGORIES: ['cosmetics', 'food', 'medicine']; cosmetics in CATEGORIES: True
+  PROMPT_FILES: food=extract-food-v1.md medicine=extract-medicine-v1.md cosmetics=extract-cosmetics-v1.md
+  load_prompt versions: extract-food-v1 / extract-medicine-v1 / extract-cosmetics-v1
+  chat: chat-v1 planning: planning-v1
+
+Health probe:
+  $ docker compose ps
+  NAME  IMAGE  COMMAND  SERVICE  CREATED  STATUS  PORTS
+  port 8000: Not Found
+  port 8001: {"detail":"Not Found"}
+  port 8002: Not Found
+  port 8003: (no listener)
+  => unanswered: no stack running; starting one is deploying (out of scope).
+
+Frontend diff:
+  $ git diff --stat -- frontend
+  (empty)  => npm run build / npx vitest run NOT run (packet SG-035/036/040 precedent).
