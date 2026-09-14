@@ -338,6 +338,34 @@ def test_chat_grounded_answer_uses_category_catalogue_and_one_ledger_row(
     assert session.query(GuardrailEvent).count() == 0
 
 
+def test_catalog_carries_persisted_opened_date_and_null_without(chat_fixture) -> None:  # type: ignore[no-untyped-def]
+    """SG-040 G2/G3: chat grounding reads the asset's active opened_date assertion.
+
+    An asset with a persisted opened date surfaces it; an asset without one stays
+    `null` exactly as before this slice (nothing is inferred from the expiry row).
+    """
+    from app.services.chat.service import build_catalog
+
+    session, household_id, _ = chat_fixture
+    with_open = _seed_asset(session, household_id, "With open")
+    session.add(
+        Assertion(
+            asset_id=with_open.id,
+            field_path="opened_date",
+            value_json=json.dumps("2031-04-10"),
+            source_type="extraction",
+            review_state="proposed",
+        )
+    )
+    _seed_asset(session, household_id, "Without open")
+    session.commit()
+
+    catalog = {entry["label"]: entry for entry in build_catalog(session, household_id, "food")}
+    assert catalog["With open"]["opened_date"] == "2031-04-10"
+    assert catalog["Without open"]["opened_date"] is None
+    assert catalog["Without open"]["expiry_date"] == "2026-09-16"
+
+
 def test_no_consent_refuses_zero_calls_and_zero_rows(
     chat_fixture, monkeypatch: pytest.MonkeyPatch
 ) -> None:

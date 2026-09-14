@@ -51,6 +51,7 @@ PLANNING_PROMPT_FILE = "planning-v1.md"
 PLANNING_OPERATION = "extract_items"
 CLASSIFICATION_FIELD = "plugin:expiry-tracker/classification"
 EXPIRY_FIELD = "plugin:expiry-tracker/expiry_date"
+OPENED_DATE_FIELD = "opened_date"
 
 ALLOWED_STATUSES: tuple[str, ...] = ("pending", "confirmed", "dismissed")
 SUGGESTION_KINDS: tuple[str, ...] = ("use_first", "restock", "days_math")
@@ -123,8 +124,10 @@ def build_catalog(db: Session, household_id: str) -> list[dict[str, Any]]:
             except (json.JSONDecodeError, AttributeError):
                 category = None
         expiry_date: str | None = None
+        opened_date: str | None = None
         date_type: str | None = None
         expiry_assertion_id: str | None = None
+        opened_assertion_id: str | None = None
         expiry = _active_assertion(db, asset.id, EXPIRY_FIELD)
         if expiry is not None:
             expiry_assertion_id = expiry.id
@@ -135,16 +138,26 @@ def build_catalog(db: Session, household_id: str) -> list[dict[str, Any]]:
             if isinstance(value, dict):
                 expiry_date = value.get("expiry_date")
                 date_type = value.get("date_type")
+        opened = _active_assertion(db, asset.id, OPENED_DATE_FIELD)
+        if opened is not None:
+            opened_assertion_id = opened.id
+            try:
+                opened_value = json.loads(opened.value_json)
+            except json.JSONDecodeError:
+                opened_value = None
+            if isinstance(opened_value, str):
+                opened_date = opened_value
         catalog.append(
             {
                 "id": asset.id,
                 "label": asset.display_name,
                 "category": category,
                 "expiry_date": expiry_date,
-                "opened_date": None,
+                "opened_date": opened_date,
                 "date_type": date_type,
                 "status": asset.status,
                 "expiry_assertion_id": expiry_assertion_id,
+                "opened_assertion_id": opened_assertion_id,
             }
         )
     return catalog
@@ -296,6 +309,15 @@ def _backing_refs(item: ExtractionItem, index: dict[str, dict[str, Any]]) -> lis
                 "id": entry["expiry_assertion_id"],
                 "field_path": EXPIRY_FIELD,
                 "value": entry.get("expiry_date"),
+            }
+        )
+    if entry.get("opened_assertion_id"):
+        refs.append(
+            {
+                "type": "assertion",
+                "id": entry["opened_assertion_id"],
+                "field_path": OPENED_DATE_FIELD,
+                "value": entry.get("opened_date"),
             }
         )
     return refs

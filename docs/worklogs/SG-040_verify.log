@@ -1,0 +1,93 @@
+SG-040 verify log — raw both-runs and hygiene (offline, temp SQLite, zero network)
+Collected 2026-09-14, BASE automation=e5494a1
+======================================================================
+### SG-040 verify — raw FAIL-then-PASS for the 5 new tests
+### Collected 2026-09-14T10:58:53Z at BASE e5494a1 (source stashed) then WORK_HEAD (source restored)
+
+===== RUN 1: FAIL at base (source files stashed, new tests present) =====
+stash: applied (source reverted to base; tests kept)
+    _PortalFactoryType = Callable[[], AbstractContextManager[anyio.abc.BlockingPortal]]
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/test_ai_pipeline.py::test_opened_date_persisted_gated_with_value
+FAILED tests/test_ai_pipeline.py::test_split_children_keep_their_item_opened_date
+FAILED tests/test_chat.py::test_catalog_carries_persisted_opened_date_and_null_without
+FAILED tests/test_planning.py::test_catalog_carries_persisted_opened_date_and_backing_ref
+4 failed, 1 passed, 2 warnings in 1.07s
+stash: popped (source restored)
+
+===== RUN 2: PASS post-change (source restored) =====
+    _PortalFactoryType = Callable[[], AbstractContextManager[anyio.abc.BlockingPortal]]
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+5 passed, 2 warnings in 1.02s
+
+===== FULL SUITE POST =====
+=========================== short test summary info ============================
+FAILED tests/test_signals.py::test_generated_codes_are_validated_and_bad_checksum_is_not_an_identifier
+FAILED tests/test_signals.py::test_ocr_has_text_boxes_and_mean_confidence - a...
+2 failed, 165 passed, 14 warnings in 10.91s
+
+real	0m12.613s
+user	0m7.738s
+sys	0m1.965s
+
+======================================================================
+===== RUFF (post) =====
+All checks passed!
+
+===== MYPY (post) =====
+app/main.py:48: error: Unused "type: ignore" comment  [unused-ignore]
+Found 40 errors in 9 files (checked 69 source files)
+
+===== MYPY: touched files present? =====
+NONE (touched files add zero errors)
+
+===== ALEMBIC HEADS =====
+20260914_sg035_foundations (head)
+
+======================================================================
+===== git diff --stat (all) =====
+backend/app/services/candidates.py       |  26 +++++++-
+ backend/app/services/chat/service.py     |  15 ++++-
+ backend/app/services/planning/service.py |  24 +++++++-
+ backend/tests/test_ai_pipeline.py        | 102 +++++++++++++++++++++++++++++++
+ backend/tests/test_chat.py               |  28 +++++++++
+ backend/tests/test_planning.py           |  39 ++++++++++++
+ 6 files changed, 230 insertions(+), 4 deletions(-)
+
+===== frozen prompts diff (empty=clean) =====
+
+(end)
+
+===== alembic dir diff (empty=clean) =====
+
+(end)
+
+===== untracked/staged (porcelain) =====
+ M backend/app/services/candidates.py
+ M backend/app/services/chat/service.py
+ M backend/app/services/planning/service.py
+ M backend/tests/test_ai_pipeline.py
+ M backend/tests/test_chat.py
+ M backend/tests/test_planning.py
+===== staged cached (should be empty) =====
+
+(end)
+
+======================================================================
+Rule-exclusion + grep (PG-SC-05): no test pins GATED_FIELDS/ALLOWED_CANDIDATE_FIELDS content
+-- ALLOWED_CANDIDATE_FIELDS refs (only candidates.py itself) --
+/home/andrei/StorageGenie/backend/app/services/candidates.py:26:ALLOWED_CANDIDATE_FIELDS = frozenset(
+/home/andrei/StorageGenie/backend/app/services/candidates.py:369:        if field_path not in ALLOWED_CANDIDATE_FIELDS:
+-- GATED_FIELDS refs (only dynamic membership at test_phase2_e2e.py:287) --
+/home/andrei/StorageGenie/backend/tests/test_phase2_e2e.py:30:from app.services.candidates import GATED_FIELDS, Candidate
+/home/andrei/StorageGenie/backend/tests/test_phase2_e2e.py:287:        gated = [row for row in rows if row.field_path in GATED_FIELDS]
+/home/andrei/StorageGenie/backend/app/services/candidates.py:25:GATED_FIELDS = frozenset({"identifier", "expiry", "expiry_date", "opened_date", "condition", "lot"})
+/home/andrei/StorageGenie/backend/app/services/candidates.py:76:    if field_path in GATED_FIELDS:
+
+Health probe (standing line): docker compose ps -> no services; port 8000 -> foreign 'Not Found'
+Frontend diff (empty => no npm build/vitest per SG-035/036 precedent):
+
+(end frontend diff)

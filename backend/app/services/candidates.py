@@ -22,7 +22,7 @@ from app.services.providers.schemas import ExtractionOutput
 # SG-028 §5.2-7: safety-critical/serialized fields always route to review,
 # whatever the confidence. Every other field auto-accepts at/above the single
 # configured threshold (`settings.sg_confidence_threshold`, uncalibrated).
-GATED_FIELDS = frozenset({"identifier", "expiry", "expiry_date", "condition", "lot"})
+GATED_FIELDS = frozenset({"identifier", "expiry", "expiry_date", "opened_date", "condition", "lot"})
 ALLOWED_CANDIDATE_FIELDS = frozenset(
     {
         "display_name",
@@ -34,6 +34,7 @@ ALLOWED_CANDIDATE_FIELDS = frozenset(
         "identifier",
         "expiry",
         "expiry_date",
+        "opened_date",
         "lot",
     }
 )
@@ -223,6 +224,16 @@ def build_candidate_from_extraction(
         if item.expiry_date is not None:
             fields["expiry_date"] = _provenance(
                 item.expiry_date,
+                source_type="extraction",
+                confidence=item.confidence,
+                provider=provider,
+                model=model,
+                template_version=version,
+                provider_call_id=primary_call,
+            )
+        if item.opened_date is not None:
+            fields["opened_date"] = _provenance(
+                item.opened_date,
                 source_type="extraction",
                 confidence=item.confidence,
                 provider=provider,
@@ -484,7 +495,7 @@ def _split_child_fields(
     fields: dict[str, object] = {
         key: raw
         for key, raw in origin_fields.items()
-        if key not in {"display_name", "expiry_date", "lot"}
+        if key not in {"display_name", "expiry_date", "opened_date", "lot"}
     }
     fields["display_name"] = _provenance(
         name,
@@ -499,6 +510,17 @@ def _split_child_fields(
     if expiry_date is not None:
         fields["expiry_date"] = _provenance(
             expiry_date,
+            source_type="extraction",
+            confidence=confidence,
+            provider=provider,
+            model=model,
+            template_version=version,
+            provider_call_id=provider_call_id,
+        )
+    opened_date = item.get("opened_date")
+    if opened_date is not None:
+        fields["opened_date"] = _provenance(
+            opened_date,
             source_type="extraction",
             confidence=confidence,
             provider=provider,

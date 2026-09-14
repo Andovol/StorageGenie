@@ -229,6 +229,108 @@ def test_expiry_always_proposed_never_auto_accepted(ai_env, monkeypatch: pytest.
     ).count()
 
 
+def test_opened_date_persisted_gated_with_value(ai_env, monkeypatch: pytest.MonkeyPatch) -> None:  # type: ignore[no-untyped-def]
+    """SG-040 G1/G3: an extraction-carried opened date reaches the asset, gated.
+
+    The candidate field must carry the extraction provenance envelope, and the
+    committed assertion must carry the exact value, `source_type="extraction"`
+    and `review_state="proposed"` (dates are safety-critical, never auto-accepted).
+    """
+    session, household_id, evidence_id = ai_env
+    from app.services.providers import opencode_go
+
+    network_attempts: list[str] = []
+
+    def _forbidden(self: object, payload: dict[str, object]) -> dict[str, object]:
+        network_attempts.append("post")
+        raise AssertionError("network must never be attempted in the offline opened-date gates")
+
+    monkeypatch.setattr(opencode_go.OpenCodeGoProvider, "_post", _forbidden)
+    _enable(monkeypatch, _payload([_valid_item(opened_date="2031-04-10")]))
+    job = _run(session, household_id, evidence_id)
+    candidate = _candidate(session, job.id)
+    proposal = _proposal(session, job.id)
+
+    opened = proposal["fields"]["opened_date"]  # type: ignore[index]
+    assert opened["value"] == "2031-04-10"
+    assert opened["source_type"] == "extraction"
+    assert opened["confidence"] == 0.95
+    assert opened["provider_call_id"]
+    assert network_attempts == []
+
+    with TestClient(app) as client:
+        accepted = client.post(
+            f"/v1/candidates/{candidate.id}/decision",
+            params={"household_id": household_id},
+            json={"action": "accept"},
+        )
+    assert accepted.status_code == 200, accepted.text
+    asset_id = str(accepted.json()["asset_id"])
+    rows = (
+        session.query(Assertion)
+        .filter_by(asset_id=asset_id, field_path="opened_date")
+        .all()
+    )
+    assert rows, "the committed asset must carry an opened_date assertion"
+    assert {json.loads(row.value_json) for row in rows} == {"2031-04-10"}
+    assert all(row.review_state == "proposed" for row in rows), "dates stay gated"
+    assert all(row.source_type == "extraction" for row in rows)
+    envelope = json.loads(rows[0].model_json or "{}")
+    assert envelope["provider"] == "scripted"
+    assert envelope["evidence_ids"] == [evidence_id]
+
+
+def test_opened_date_none_writes_no_field_and_no_assertion(ai_env, monkeypatch: pytest.MonkeyPatch) -> None:  # type: ignore[no-untyped-def]
+    """SG-040 G1/G3: a null opened date is absent, never a guessed value."""
+    session, household_id, evidence_id = ai_env
+    _enable(monkeypatch, _payload([_valid_item(opened_date=None)]))
+    job = _run(session, household_id, evidence_id)
+    candidate = _candidate(session, job.id)
+    proposal = _proposal(session, job.id)
+    assert "opened_date" not in proposal["fields"]  # type: ignore[operator]
+
+    with TestClient(app) as client:
+        accepted = client.post(
+            f"/v1/candidates/{candidate.id}/decision",
+            params={"household_id": household_id},
+            json={"action": "accept"},
+        )
+    assert accepted.status_code == 200, accepted.text
+    asset_id = str(accepted.json()["asset_id"])
+    assert not session.query(Assertion).filter_by(
+        asset_id=asset_id, field_path="opened_date"
+    ).count()
+
+
+def test_split_children_keep_their_item_opened_date(ai_env, monkeypatch: pytest.MonkeyPatch) -> None:  # type: ignore[no-untyped-def]
+    """SG-040 G1/G3: the split path replaces opened_date per item, like expiry/lot."""
+    session, household_id, evidence_id = ai_env
+    payload = _payload(
+        [
+            _valid_item(name="Milk", opened_date="2031-04-10"),
+            _valid_item(name="Yogurt", opened_date=None),
+        ]
+    )
+    _enable(monkeypatch, payload)
+    job = _run(session, household_id, evidence_id)
+    candidate = _candidate(session, job.id)
+
+    with TestClient(app) as client:
+        response = client.post(
+            f"/v1/candidates/{candidate.id}/split",
+            params={"household_id": household_id},
+            json={"item_indexes": [0, 1]},
+        )
+    assert response.status_code == 200, response.text
+    children = response.json()["children"]
+    assert len(children) == 2
+    first, second = children[0]["fields"], children[1]["fields"]
+    assert first["opened_date"]["value"] == "2031-04-10"
+    assert first["opened_date"]["source_type"] == "extraction"
+    assert "opened_date" not in second, "an item with no opened date adds no field"
+    assert second["expiry_date"]["value"] == "2030-01-15"
+
+
 def test_needs_evidence_opens_manual_entry_and_keeps_unknowns(ai_env, monkeypatch: pytest.MonkeyPatch) -> None:  # type: ignore[no-untyped-def]
     session, household_id, evidence_id = ai_env
     payload = _payload(

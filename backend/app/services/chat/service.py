@@ -43,6 +43,7 @@ CHAT_PROMPT_FILE = "chat-v1.md"
 CHAT_OPERATION = "extract_text"
 CLASSIFICATION_FIELD = "plugin:expiry-tracker/classification"
 EXPIRY_FIELD = "plugin:expiry-tracker/expiry_date"
+OPENED_DATE_FIELD = "opened_date"
 
 DATA_OPEN = "<<<CATALOGUE_DATA>>>"
 DATA_CLOSE = "<<<END_CATALOGUE_DATA>>>"
@@ -103,6 +104,18 @@ def _active_assertion(db: Session, asset_id: str, field_path: str) -> Assertion 
     )
 
 
+def _date_assertion_value(db: Session, asset_id: str, field_path: str) -> str | None:
+    """The active assertion's JSON value when it is a plain string, else None."""
+    assertion = _active_assertion(db, asset_id, field_path)
+    if assertion is None:
+        return None
+    try:
+        value = json.loads(assertion.value_json)
+    except json.JSONDecodeError:
+        return None
+    return value if isinstance(value, str) else None
+
+
 def _source_attributions(db: Session, asset_id: str) -> list[dict[str, Any]]:
     rows = (
         db.query(SourceAttribution)
@@ -158,8 +171,8 @@ def build_catalog(db: Session, household_id: str, category: str) -> list[dict[st
                 value = {}
             if isinstance(value, dict):
                 expiry_date = value.get("expiry_date")
-                opened_date = value.get("opened_date")
                 date_type = value.get("date_type")
+        opened_date = _date_assertion_value(db, asset.id, OPENED_DATE_FIELD)
         catalog.append(
             {
                 "id": asset.id,

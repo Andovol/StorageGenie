@@ -1,0 +1,62 @@
+SG-040 — Persist opened_date end to end — running log (opencode, medium)
+
+BASE REF: automation -> resolved commit e5494a1afd3c28313c6118a23189b40fc7345532
+WORK_HEAD: the commit carrying this log (hash quoted by the G6 receipt note; note added last, no commit after)
+Work dir: /home/andrei/StorageGenie
+Origin: git@github.com:Andovol/StorageGenie.git
+MODEL/effort per CO-78 (process arguments, never an identity line):
+  argv = opencode run --auto --dir /home/andrei/StorageGenie --variant medium "<packet>"
+  -> effort medium; no model flag on argv (packet: CLI default, omitted per policy)
+  provider metadata (opencode.log, read 2026-09-14T10:59Z): providerID=opencode-go modelID=deepseek-v4.1-flash
+
+DATABASE: none. Temp SQLite only, per-test files under pytest tmp_path. Zero live rows.
+RESTART: none. No service started, nothing deployed.
+NETWORK: none. All proof is in-process; real adapter _post never reached. Spend $0.
+
+TIMELINE / ELAPSED vs BOUND (per leg)
+- Session overall: started 2026-09-14T10:55:14Z, log capture 10:59:32Z -> ~260 s (bound 2400 s overall,
+  1800 s early-close) -> PASS.
+- Premise probes (reads of candidates.py/chat/planning/schemas/plugin/tests/frontend): ~120 s wall
+  (bound 120 s/probe) -> PASS.
+- BASE full suite (pre-change): real 11.997 s, report 10.39 s (bound 600 s) -> 2 failed, 160 passed.
+- BASE ruff: <1 s -> All checks passed. BASE mypy: a few s -> 40 errors in 9 files.
+- FAIL run (source stashed, new tests present): 1.07 s -> 4 failed, 1 passed (bound 600 s).
+- PASS run (source restored): 1.02 s -> 5 passed (bound 600 s).
+- POST full suite: real 12.613 s, report 10.91 s -> 2 failed, 165 passed (bound 600 s).
+- POST ruff: <1 s -> All checks passed. POST mypy: a few s -> 40 errors in 9 files (delta 0; touched files
+  absent from the output list).
+- Frontend: EMPTY diff -> npm run build / vitest not run (SG-035/036 precedent; bounds 600 s each not used).
+- Health probe: docker compose ps -> 0 services; curl localhost:8000/v1/health -> "Not Found" (foreign
+  service). No stack runs; starting one is deploying -> reported `unanswered` (standing line).
+
+WHAT I DID
+1. Verified every packet premise before building (see report "Premise findings").
+2. Wrote 5 new tests FIRST (test_ai_pipeline.py x3, test_chat.py x1, test_planning.py x1); captured raw FAIL
+   at base (4 failed, 1 passed — the null-date foil passes at base by design).
+3. G1 candidates.py: opened_date added to GATED_FIELDS + ALLOWED_CANDIDATE_FIELDS; mapped in
+   build_candidate_from_extraction with the expiry_date provenance envelope; split-child key set + mapping
+   extended.
+4. G2 chat/service.py: dedicated opened_date assertion read (field_path "opened_date"); expiry_date/date_type
+   unchanged. planning/service.py: hardcoded None replaced with the same read; opened_assertion_id added and
+   _backing_refs appends the opened assertion ref.
+5. G3: raw FAIL-then-PASS captured; full suite 2 failed/165 passed (same 2 base decoder reds); ruff clean;
+   mypy 40/9 delta 0; no migration; no frozen-prompt diff; secret scan 0; no ignored file staged.
+
+DECISIONS (recorded, not asked)
+- Field vocabulary: field_path is the bare "opened_date" (same shape as every other candidate-derived
+  assertion: display_name, expiry_date, lot). No plugin prefix, no new vocabulary.
+- Gating: opened_date is in GATED_FIELDS (dates are safety-critical per 5.2-7; human-confirmed).
+- Consumer mechanism: direct read of the asset's ACTIVE opened_date assertion (not the expiry value's old
+  dead field). The old chat line `value.get("opened_date")` read a field the plugin never writes -> always
+  null; replaced.
+- _backing_refs: opted IN to adding the opened-date assertion ref (parity with expiry).
+
+ISSUES / DISAGREEMENTS
+- The G3 wording "after accept an accepted opened_date assertion" conflicts with gating: a GATED field is
+  committed `review_state="proposed"`, never "accepted", on candidate accept (proved by the existing
+  `test_expiry_always_proposed_never_auto_accepted`). I asserted the VALUE and `review_state="proposed"` and
+  report the tension; see report finding F-SG040-1.
+- chat/service.py build_catalog hit ruff C901 (complexity 11>10) after the first pass; extracted the string
+  assertion read into `_date_assertion_value` -> ruff clean again.
+
+END: note=yes (see report G5).

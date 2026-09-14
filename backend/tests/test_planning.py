@@ -260,6 +260,45 @@ def test_run_writes_pending_suggestion_backing_refs_and_guardrail(
     assert call.model == "scripted-plan-1"
 
 
+def test_catalog_carries_persisted_opened_date_and_backing_ref(planning_fixture) -> None:  # type: ignore[no-untyped-def]
+    """SG-040 G2/G3: planning catalog reads the active opened_date assertion.
+
+    The persisted date reaches the catalog (and thus the prompt) and, when the
+    suggestion names that asset, the backing refs carry the opened assertion too;
+    an asset without one stays `null` exactly as before this slice.
+    """
+    from app.services.planning.service import _backing_refs, build_catalog
+    from app.services.providers.schemas import ExtractionItem
+
+    session, household_id, _ = planning_fixture
+    with_open, _ = _seed_asset(session, household_id, "With open")
+    opened = Assertion(
+        asset_id=with_open.id,
+        field_path="opened_date",
+        value_json=json.dumps("2031-04-10"),
+        source_type="extraction",
+        review_state="proposed",
+    )
+    session.add(opened)
+    _seed_asset(session, household_id, "Without open")
+    session.commit()
+    opened_id = opened.id
+
+    catalog = {entry["label"]: entry for entry in build_catalog(session, household_id)}
+    assert catalog["With open"]["opened_date"] == "2031-04-10"
+    assert catalog["Without open"]["opened_date"] is None
+    assert catalog["Without open"]["expiry_date"] == "2026-09-16"
+
+    item = ExtractionItem(name='Use "With open"', lot=with_open.id, confidence=1.0)
+    refs = _backing_refs(item, {with_open.id: catalog["With open"]})
+    assert {
+        "type": "assertion",
+        "id": opened_id,
+        "field_path": "opened_date",
+        "value": "2031-04-10",
+    } in refs
+
+
 def test_confirm_and_dismiss_transitions_with_422_on_illegal_moves(
     planning_fixture, monkeypatch: pytest.MonkeyPatch
 ) -> None:
