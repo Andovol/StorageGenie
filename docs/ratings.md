@@ -40,6 +40,8 @@ Schema: shared `LEDGER.md` — nine columns, `guards_invoked` + `deduction_attri
 
 | SG-033 | Phase 3 (D46) | opencode (model unknown with argv provenance quoted per owner rule; effort medium verified from process args) | medium | 98 |  | COMPLETE split op + UI: per-item children with shared evidence + provenance, origin 409, multi_item resolved, empty/single/partial/dup/out-of-range 422; UI action iff multi-item open, children linked; premise correction F-SG033-1 CONFIRMED (packet-side, M8); manual_entry orphan flagged to SG-034; full-coverage rule + GET deferral confirmed; suite 126 passed + 2 base-proved reds; build green; $0 | PG-EV-01, PG-EV-02, PG-EV-05, PG-EV-09, PG-SC-02, PG-SC-07, PG-SC-10, PG-IC-01, PG-IC-03, PG-IC-07, PG-IC-09, PG-PR-03, PG-PR-04, PG-PR-06, PG-PR-10 |  |
 
+| SG-034 | Phase 3 (D46) | opencode (model unknown with argv provenance quoted per owner rule; effort medium verified from process args) | medium | 98 |  | COMPLETE corrections + manual entry on detail: PATCH panel extended (chain-safe, supersede visible), needs_evidence hand entry on detail page, orphan pickup resolves origin orphans audited (unrelated stays open); G1 backend covered premise cited with base run; link-key CONFIRMED asset-linked; co-evidence over-resolution named as advisory; suite 127 passed + 2 base-proved reds; build green; vitest 27 passed; $0 | PG-EV-01, PG-EV-02, PG-EV-05, PG-EV-09, PG-SC-02, PG-SC-07, PG-SC-10, PG-IC-01, PG-IC-03, PG-IC-07, PG-IC-09, PG-PR-03, PG-PR-04, PG-PR-06, PG-PR-10 |  |
+
 ## SG-013 investigation (score 90 < 95)
 
 1. **Failure class:** environment.
