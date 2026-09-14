@@ -13,10 +13,10 @@ backend dependency lock is `backend/requirements.lock`; the frontend lock is
 `frontend/package-lock.json`. For the checked VPS workspace, the backend test tools
 are already available in `/home/andrei/StorageGenie/venv/bin`.
 
-Compose is configured to read the local deployment environment file named by
-`docker-compose.yml:15`. If no overrides are needed, create an empty `.env` before
-starting Compose; keep any real values uncommitted because `.env` is ignored by
-`.gitignore:7`.
+Compose is configured to read the local deployment environment file named by the
+`env_file` key in `docker-compose.yml`. If no overrides are needed, create an empty
+`.env` before starting Compose; keep any real values uncommitted because `.env` is
+ignored by `.gitignore:7`.
 
 ### Start the Phase 0 services
 
@@ -49,6 +49,28 @@ Expected output:
 The health route is implemented at `backend/app/api/v1/health.py:15-35` and proves
 both database and evidence-storage access.
 
+### Production shape (single service)
+
+The default Compose shape is one service: the backend image serves the JSON API
+**and** the built UI on one loopback port. The UI is built from the committed
+frontend sources during the image build (`backend/Dockerfile`, node stage) with
+`VITE_API_BASE=https://storagegenie.dynv6.net`; `frontend/dist` is gitignored and
+never committed or baked in from disk. The app resolves the built files from
+`/app/static` (override `SG_STATIC_DIR` for a bare dev run; with no built UI it
+still starts and serves `/v1`, and `GET /` returns the legacy JSON placeholder).
+
+```sh
+docker compose up --build -d
+docker compose exec backend python -m alembic upgrade head
+docker compose exec backend python -m app.seed
+curl -s http://127.0.0.1:8003/v1/health
+curl -s http://127.0.0.1:8003/            # built index.html
+```
+
+`docker-compose.yml` publishes `127.0.0.1:8003:8000` only. `--profile dev` restores
+the two-service development setup (the Vite dev server on `127.0.0.1:5173` plus the
+backend).
+
 ### Run the suites
 
 Backend, using the project-local environment on the checked workspace:
@@ -76,16 +98,18 @@ pytest and Ruff are the required backend gates.
 
 In Compose, SQLite is mounted from `./data/db` into `/data/db` and evidence is in
 the named `storage_data` volume mounted at `/data/storage`
-(`docker-compose.yml:8-14,43`). In a direct backend run, the defaults are
+(`docker-compose.yml:10-11,43`). In a direct backend run, the defaults are
 `backend/data/db/storagegenie.db` and `backend/data/storage`
 (`backend/app/config.py:4-6`), while tests use temporary paths. These database,
 storage, cache, and environment paths are gitignored (`.gitignore:7-21`) because
 they contain local state, user evidence, or secrets rather than reviewable source.
 Back up the database and the evidence manifest together.
 
-Phase 0 is LAN-only, for a single household, and has no authentication. Household
-scoping is namespacing, never security. Do not expose the Compose ports to an
-untrusted network until authentication and deployment controls are implemented.
+Phase 0 is for a single household and has no authentication. Household scoping is
+namespacing, never security. The app binds **loopback only** (`docker-compose.yml`
+publishes `127.0.0.1:8003:8000`); the public entry is the host standard's nginx +
+https + login (planned, not yet live). Do not publish the port on a non-loopback
+interface until authentication and deployment controls are implemented.
 
 The Phase 0 test is backend API E2E, not browser automation; frontend behavior
 remains covered by its unit/component suite.
@@ -165,7 +189,7 @@ make check-postgres-dialect
 The unchanged data locations are Compose SQLite `./data/db` mounted at
 `/data/db`, the named `storage_data` volume mounted at `/data/storage`, and
 direct-backend defaults `backend/data/db/storagegenie.db` and
-`backend/data/storage` (`docker-compose.yml:8-14,43`; `backend/app/config.py:4-6`).
+`backend/data/storage` (`docker-compose.yml:10-11,43`; `backend/app/config.py:4-6`).
 Keep database and evidence manifests together when backing up.
 
 Verification map: `backend/tests/test_phase1_e2e.py::test_phase1_exit_condition`

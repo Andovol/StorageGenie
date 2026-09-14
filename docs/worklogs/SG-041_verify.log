@@ -1,0 +1,226 @@
+SG-041 verify log — raw evidence (deploy proof, FAIL-then-PASS, loops)
+
+=== §0 STARTING TREE + PREMISE READS =========================================
+$ git status --porcelain      -> (empty)
+$ git branch --show-current   -> automation
+$ git rev-parse HEAD          -> cec98374fcb0ba72e761fba60cc06fc99448b877
+$ git rev-parse origin/automation -> cec98374fcb0ba72e761fba60cc06fc99448b877
+main.py:66-68 (base): @app.get("/") / def root(): / return {"name": "StorageGenie", "version": "0.1.0"}
+docker-compose.yml:6  -> ports: ["8003:8000"]
+docker-compose.yml:30 -> ports: ["5173:5173"]
+frontend/Dockerfile:7 -> CMD ["npm", "run", "dev", "--", "--host", "0.0.0.0", "--port", "5173"]
+frontend/src/api/client.ts:12 -> const BASE = import.meta.env.VITE_API_BASE || "http://localhost:8000";
+backend/app/config.py:19 -> cors_origins: str = "http://localhost:5173"
+frontend/dist (stale, gitignored, on disk): 5x http://localhost:8000, 0x dynv6
+
+=== §1 BASE BEHAVIOR PROBE (TestClient, unmodified app) ======================
+/                                        -> 200 application/json '{"name":"StorageGenie","version":"0.1.0"}'
+/v1/this-route-does-not-exist            -> 404 application/json '{"detail":"Not Found"}'
+/catalog/whatever                        -> 404 application/json '{"detail":"Not Found"}'
+/docs                                    -> 200 text/html; charset=utf-8
+/openapi.json                            -> 200 application/json ...
+NOTE: pre-change unmatched routes are plain application/json, NOT problem+json
+(packet acceptance states problem+json pre-change; corrected as F-SG041-2).
+
+=== §2 BASE TEST SUITE (base commit cec9837) =================================
+$ venv/bin/pytest -q
+FAILED tests/test_signals.py::test_generated_codes_are_validated_and_bad_checksum_is_not_an_identifier
+FAILED tests/test_signals.py::test_ocr_has_text_boxes_and_mean_confidence
+2 failed, 180 passed, 13 warnings in 12.93s
+
+=== §3 FAIL RUN (pre-change, new test vs base main.py) — RAW =================
+$ venv/bin/pytest -q tests/test_production_serving.py
+FFFF.F                                                                   [100%]
+=================================== FAILURES ===================================
+_________________________ test_root_serves_built_index _________________________
+
+tmp_path = PosixPath('/tmp/pytest-of-andrei/pytest-1/test_root_serves_built_index0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x78779d6e6330>
+
+    def test_root_serves_built_index(tmp_path: Path, monkeypatch) -> None:  # type: ignore[no-untyped-def]
+        monkeypatch.setenv("SG_STATIC_DIR", str(_built_ui(tmp_path)))
+    
+        with TestClient(app) as client:
+            response = client.get("/")
+    
+        assert response.status_code == 200
+>       assert response.headers["content-type"].startswith("text/html")
+E       AssertionError: assert False
+E        +  where False = <built-in method startswith of str object at 0x78779d878470>('text/html')
+E        +    where <built-in method startswith of str object at 0x78779d878470> = 'application/json'.startswith
+
+tests/test_production_serving.py:35: AssertionError
+_____________________ test_spa_fallback_serves_built_index _____________________
+
+tmp_path = PosixPath('/tmp/pytest-of-andrei/pytest-1/test_spa_fallback_serves_built0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x78779d6e7260>
+
+    def test_spa_fallback_serves_built_index(tmp_path: Path, monkeypatch) -> None:  # type: ignore[no-untyped-def]
+        monkeypatch.setenv("SG_STATIC_DIR", str(_built_ui(tmp_path)))
+    
+        with TestClient(app) as client:
+            response = client.get("/catalog/whatever")
+    
+>       assert response.status_code == 200
+E       assert 404 == 200
+E        +  where 404 = <Response [404 Not Found]>.status_code
+
+tests/test_production_serving.py:45: AssertionError
+_________________________ test_hashed_asset_is_served __________________________
+
+tmp_path = PosixPath('/tmp/pytest-of-andrei/pytest-1/test_hashed_asset_is_served0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x78779cd7fe90>
+
+    def test_hashed_asset_is_served(tmp_path: Path, monkeypatch) -> None:  # type: ignore[no-untyped-def]
+        monkeypatch.setenv("SG_STATIC_DIR", str(_built_ui(tmp_path)))
+    
+        with TestClient(app) as client:
+            response = client.get("/assets/index-test.js")
+    
+>       assert response.status_code == 200
+E       assert 404 == 200
+E        +  where 404 = <Response [404 Not Found]>.status_code
+
+tests/test_production_serving.py:56: AssertionError
+_______________ test_v1_unknown_route_is_problem_json_never_html _______________
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x78779cde7f20>
+
+    def test_v1_unknown_route_is_problem_json_never_html(monkeypatch) -> None:  # type: ignore[no-untyped-def]
+        monkeypatch.setenv("SG_STATIC_DIR", "/nonexistent-static-root")
+    
+        with TestClient(app) as client:
+            response = client.get("/v1/this-route-does-not-exist")
+    
+        assert response.status_code == 404
+>       assert response.headers["content-type"].startswith("application/problem+json")
+E       AssertionError: assert False
+E        +  where False = <built-in method startswith of str object at 0x78779d6f5670>('application/problem+json')
+E        +    where <built-in method startswith of str object at 0x78779d6f5670> = 'application/json'.startswith
+
+tests/test_production_serving.py:67: AssertionError
+______________ test_absent_static_root_still_starts_and_serves_v1 ______________
+
+tmp_path = PosixPath('/tmp/pytest-of-andrei/pytest-1/test_absent_static_root_still_0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x78779cdfc4a0>
+
+    def test_absent_static_root_still_starts_and_serves_v1(tmp_path: Path, monkeypatch) -> None:  # type: ignore[no-untyped-def]
+        monkeypatch.setenv("SG_STATIC_DIR", str(tmp_path / "not-built"))
+    
+        with TestClient(app) as client:
+            unknown_v1 = client.get("/v1/this-route-does-not-exist")
+            root = client.get("/")
+    
+        assert unknown_v1.status_code == 404
+>       assert unknown_v1.headers["content-type"].startswith("application/problem+json")
+E       AssertionError: assert False
+E        +  where False = <built-in method startswith of str object at 0x78779c42f630>('application/problem+json')
+E        +    where <built-in method startswith of str object at 0x78779c42f630> = 'application/json'.startswith
+
+tests/test_production_serving.py:92: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_production_serving.py::test_root_serves_built_index
+FAILED tests/test_production_serving.py::test_spa_fallback_serves_built_index
+FAILED tests/test_production_serving.py::test_hashed_asset_is_served
+FAILED tests/test_production_serving.py::test_v1_unknown_route_is_problem_json_never_html
+FAILED tests/test_production_serving.py::test_absent_static_root_still_starts_and_serves_v1
+5 failed, 1 passed, 1 warning in 0.69s
+
+=== §4 PASS RUN (post-change) — RAW ==========================================
+$ venv/bin/pytest -q tests/test_production_serving.py
+......                                                                   [100%]
+6 passed, 1 warning in 0.66s
+
+=== §5 POST-CHANGE FULL SUITE ================================================
+$ venv/bin/pytest -q
+FAILED tests/test_signals.py::test_generated_codes_are_validated_and_bad_checksum_is_not_an_identifier
+FAILED tests/test_signals.py::test_ocr_has_text_boxes_and_mean_confidence
+2 failed, 186 passed, 13 warnings in 12.43s
+
+=== §6 BUILD (TEXT VERDICT) + BAKED ASSET ====================================
+$ BUILDX_CONFIG=/home/andrei/StorageGenie/.cache docker compose build --progress=plain
+#4 [internal] load metadata for docker.io/library/node:20-alpine
+#20 [frontend-build 6/6] RUN npm run build
+#20 3.274 vite v5.4.21 building for production...
+#20 4.390 dist/assets/index-khM4mS2k.js  251.56 kB │ gzip: 76.70 kB
+#20 4.390 ✓ built in 1.09s
+#21 [stage-1 9/9] COPY --from=frontend-build /ui/dist ./static
+ Image storagegenie-backend Built
+
+$ docker run --rm --entrypoint sh storagegenie-backend -c 'ls -la /app/static /app/static/assets; ...'
+/app/static/assets/index-khM4mS2k.js  (251628 bytes)
+dynv6: 5
+localhost:8000: 0
+
+=== §7 DB PRE-STATE -> MIGRATE -> SEED =======================================
+$ docker compose exec -T backend python -m alembic current
+0201cf10c56c
+$ per-table row counts (pre-write): every data table 0 (assertion, asset, asset_evidence,
+  audit_event, evidence, household, idempotency_key, job, job_step, review_task, user),
+  alembic_version=1
+$ docker compose exec -T backend python -m alembic upgrade head
+Running upgrade 0201cf10c56c -> 20260908_sg013_observation
+Running upgrade 20260908_sg013_observation -> 20260908_sg014_candidate
+Running upgrade 20260908_sg014_candidate -> 20260908_sg017_fts
+Running upgrade 20260908_sg017_fts -> 20260912_sg025_provider_call
+Running upgrade 20260908_sg025_provider_call -> 20260914_sg035_foundations
+$ docker compose exec -T backend python -m app.seed
+Seeded household 01a0a029-1477-7ca0-b200-bce78a96c679 name=Popescu Household
+$ ids/counts (post): household 1 -> 01a0a029-1477-7ca0-b200-bce78a96c679
+  user 2 -> 01a0a029-147b-7190-a0c8-64ea7bd649e6, 01a0a029-147b-7190-a0c8-64fade707109
+$ docker compose exec -T backend python -m alembic current
+20260914_sg035_foundations (head)
+
+=== §8 DEPLOY VERIFY (served responses, not exits) ===========================
+$ curl -s http://127.0.0.1:8003/v1/health
+{"status":"ok","db":"ok","storage":"ok"}
+$ curl -s -D - http://127.0.0.1:8003/ | head -5
+HTTP/1.1 200 OK
+content-type: text/html; charset=utf-8
+<div id="root"></div>
+/assets/index-khM4mS2k.js
+$ curl -s -o /dev/null -w '%{http_code} %{content_type}\n' http://127.0.0.1:8003/catalog/whatever
+200 text/html; charset=utf-8
+$ curl -s -D - http://127.0.0.1:8003/v1/this-route-does-not-exist
+HTTP/1.1 404 Not Found
+content-type: application/problem+json
+{"type":"about:blank","title":"Not Found","status":404,"detail":"Not Found: /v1/this-route-does-not-exist"}
+$ curl -o /dev/null -w ... /assets/index-khM4mS2k.js -> 200 text/javascript; charset=utf-8
+$ curl -o /dev/null -w ... /docs -> 200 text/html; charset=utf-8
+$ ss -ltnp | grep -E ':(8003|8000|5173)'
+LISTEN 0 4096 127.0.0.1:8000 0.0.0.0:*
+LISTEN 0 4096 127.0.0.1:8003 0.0.0.0:* users:(("rootlesskit",pid=3814163,fd=32))
+(no 0.0.0.0 / :: listener for 8003/8000/5173)
+$ docker stats --no-stream
+CONTAINER ID   NAME                     CPU %   MEM USAGE / LIMIT     MEM %   NET I/O
+62b8cf6b0ce3   storagegenie-backend-1   0.15%   85.85MiB / 7.688GiB   1.09%   4.91kB / 257kB
+
+=== §9 SECOND CONSECUTIVE BRING-UP + GATE-FAIL ===============================
+$ docker compose up -d --build          # run 2
+ Image storagegenie-backend Building
+failed to update builder last activity time: open /home/andrei/.docker/buildx/activity/.tmp-default126917355: read-only file system
+$ curl -s http://127.0.0.1:8003/v1/health        # run 2
+{"status":"ok","db":"ok","storage":"ok"}
+$ curl / -> 200 text/html; charset=utf-8
+$ ss -> 127.0.0.1:8003 only (plus foreign 127.0.0.1:8000)
+$ docker stats --no-stream -> 85.85MiB / 7.688GiB (1.09%)
+GATE-FAIL (PG-EV-01): probe expecting /v1 unknown to be text/html:
+  served content-type: application/problem+json
+  WRONG-expectation gate (should be False): False
+  AssertionError: gate correctly FAILED: /v1 unknown is NOT html
+  exit=1
+
+=== §10 CODE GATES ==========================================================
+$ ruff check backend/app backend/tests      -> All checks passed!
+$ mypy app/main.py -> app/main.py:45 unused-ignore, app/main.py:51 unused-ignore
+                      (same 2 as base cec9837; delta 0)
+$ mypy tests/test_production_serving.py      -> Success: no issues found
+$ git diff --check                            -> clean
+$ git diff | grep -c 'sk-...'                 -> 0
+$ git diff --name-only -- backend/alembic backend/app/models -> (empty)
+$ git diff --name-only -- frontend            -> (empty)
+$ git diff --name-only | grep -i prompt       -> (none)
+$ git check-ignore -v frontend/dist           -> .gitignore:14:frontend/dist/
+$ git status --porcelain (final): M README.md, M backend/Dockerfile, M backend/app/main.py,
+  M docker-compose.yml, ?? .dockerignore, ?? backend/tests/test_production_serving.py,
+  ?? docs/worklogs/SG-041.log, ?? docs/worklogs/SG-041_report.md, ?? docs/worklogs/SG-041_verify.log

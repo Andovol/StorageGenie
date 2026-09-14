@@ -1,0 +1,82 @@
+SG-041 coder log — production exposure shape: built UI served same-origin, loopback-only bind, deploy proof
+(opencode, medium)
+
+BASE REF: automation -> resolved commit cec98374fcb0ba72e761fba60cc06fc99448b877
+Work dir /home/andrei/StorageGenie
+Coder argv (own process, pid 2969325): opencode run --auto --dir /home/andrei/StorageGenie --variant medium <packet>
+Effort: medium (from argv --variant medium). Model: unknown — no --model flag on argv
+(packet: CLI default, omitted per policy); not read from any identity line.
+Branch automation; origin git@github.com:Andovol/StorageGenie.git.
+
+Timing is wall-clock, bounded by /tmp artifact mtimes; per-command instrumentation was not available.
+Span of the measured work: first premise probe /tmp/probe_root.py 13:40:37 UTC -> final verify
+/tmp/sg041_verify_raw.txt 13:47:32 UTC ~= 415s, plus recon before the first artifact. Overall well under
+2700s / 2100s early-close.
+
+LEG 0 — premise verification (ordinary probes, budget 120s each):
+- starting tree CLEAN (git status --porcelain empty); HEAD == origin/automation == cec9837.
+- main.py:66-68 confirmed pre-change JSON placeholder root.
+- docker-compose.yml:6 `8003:8000` and :30 `5173:5173` confirmed (all-interface publish).
+- frontend/Dockerfile:7 `npm run dev` confirmed; frontend/dist exists on disk (gitignored) but was
+  stale (5x `http://localhost:8000`, 0x dynv6) -> excluded from the build, rebuilt fresh.
+- FINDING F-SG041-1: preamble says client.ts:12 "hardcodes http://localhost:8003". Actual line 12 is
+  `const BASE = import.meta.env.VITE_API_BASE || "http://localhost:8000";` — the 8003 came from the
+  compose dev `environment:` var, not the source. Checked against the tree, not bent.
+- FINDING F-SG041-2: acceptance says pre-change `GET /catalog/x` is `404 application/problem+json`.
+  Actual pre-change is `404 application/json {"detail":"Not Found"}` (FastAPI's default unmatched-route
+  handler; the app's problem handler is registered for fastapi.HTTPException, which is not in the MRO of
+  Starlette's router 404). Same for `/v1/this-route-does-not-exist`. I made the new catch-all emit the
+  problem shape for `/v1` unknowns, which is what the acceptance's post-change half requires.
+- Pre-state DB data/db/storagegenie.db: alembic_version=0201cf10c56c (early core foundation), all data
+  tables 0 rows, `provider_call` absent. No unexpected real rows -> no STOP.
+
+LEG 1 — G1 static serving in backend/app/main.py (touched file):
+- added `_static_root()` (env `SG_STATIC_DIR`, default `/app/static`) and `_static_file()` (asset, else
+  SPA index, else None), root now serves the built index (legacy JSON only when no built UI), and a
+  catch-all `/{full_path:path}` registered AFTER all routers that returns problem+json 404 for `/v1*`
+  (never HTML), serves the index for other unknown paths, and keeps `/docs` + `/openapi.json`.
+- fallback when static absent: app starts, `/v1` unaffected, `GET /` -> legacy JSON placeholder.
+
+LEG 2 — new test backend/tests/test_production_serving.py (6 tests, no DB):
+- FAIL-then-PASS captured raw: pre-change 5 failed / 1 passed in 0.69s; post-change 6 passed in 0.66s.
+
+LEG 3 — G2 backend/Dockerfile (multi-stage node:20-alpine builder -> pinned python runtime) and
+docker-compose.yml: repo-root build context + `.dockerignore` (new), `args.VITE_API_BASE=
+https://storagegenie.dynv6.net`, backend is the only default service on `127.0.0.1:8003:8000`,
+frontend moved behind `profiles: ["dev"]` on `127.0.0.1:5173:5173`. Removed the backend `./backend:/app`
+bind and the `--reload` command so the baked `/app/static` is not shadowed and live code comes from the
+image (PG-PR-04). Design call, reported: backend live-reload no longer exists; dev profile keeps the
+frontend dev server. Healthcheck + restart unchanged.
+
+LEG 4 — G3 deploy (live DB, D54):
+- build (BUILDX_CONFIG=/home/andrei/StorageGenie/.cache): text verdict `Image storagegenie-backend Built`;
+  baked `/app/static/assets/index-khM4mS2k.js` has 5x dynv6, 0x localhost:8000.
+- pre-write quoted (alembic current + row counts), `alembic upgrade head`, seed.
+- verify by value: health, `/`, SPA fallback, `/v1` unknown, ss loopback-only, docker stats 85.85MiB.
+- second `docker compose up -d --build`: healthy (cached image, same container, no recreate); rootless
+  default-builder read-only activity warning quoted, not routed around.
+
+LEG 5 — G4 README: trust-boundary text replaced with loopback-only + planned nginx/https/login; new
+`### Production shape (single service)` section; stale line-number refs corrected. Phase runbooks intact.
+
+LEG 6 — gates: full suite 2 failed / 186 passed in 12.43s (the same 2 base decoder env reds, re-run at
+base: 2 failed / 180 passed in 12.93s); ruff clean; mypy app/main.py 2 pre-existing unused-ignore errors
+(delta 0, test file 0); secret scan 0 in diff; no migration; no frozen-prompt diff; no frontend diff;
+no ignored file staged; git diff --check clean.
+
+LEG 7 — worklogs (first token SG-041), commit, push, notes-ref receipt.
+
+LIVE-STATE LEDGER:
+- DB writes: `alembic upgrade head` (0201cf10c56c -> 20260914_sg035_foundations) + `app.seed`.
+  household 01a0a029-1477-7ca0-b200-bce78a96c679;
+  users 01a0a029-147b-7190-a0c8-64ea7bd649e6 and 01a0a029-147b-7190-a0c8-64fade707109. Left in place.
+- Spend: $0. SG_CONSENT=false, no provider object built, zero provider calls.
+- Network: build pulls only (npm ci + docker/pip metadata). No app egress.
+- Restart: compose stack only (`up -d`, then `up -d --build`). Nothing else.
+
+UNCLEAR — FIRST READ: whether "one mount" in G-A7 meant the dev service must also lose its source mounts;
+I kept production at one bind (data) and left the frontend dev mounts under the dev profile.
+UNCLEAR — DURING EXECUTION: whether removing the backend source bind (needed so `/app/static` is not
+shadowed) is an acceptable loss of backend live-reload; reported as a design call rather than hidden.
+UNCLEAR — REMAINING: whether the Architect wants `docker compose config`'s plaintext-secret emission
+(host `.env`) addressed now or in the exposure slice; it is outside this ceiling and unchanged by me.

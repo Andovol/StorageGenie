@@ -1,7 +1,10 @@
-from fastapi import FastAPI, HTTPException, Request
+import os
+from pathlib import Path
+
+from fastapi import FastAPI, HTTPException, Request, Response
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
+from fastapi.responses import FileResponse, JSONResponse
 
 from app.api.v1.assets import router as assets_router
 from app.api.v1.candidates import router as candidates_router
@@ -63,6 +66,35 @@ app.include_router(planning_router, prefix="/v1")
 app.include_router(settings_router, prefix="/v1")
 
 
+def _static_root() -> Path:
+    """Directory holding the built UI. Default is the path baked into the image."""
+    return Path(os.environ.get("SG_STATIC_DIR", "/app/static"))
+
+
+def _static_file(full_path: str) -> Path | None:
+    """Return the requested asset, else the SPA entrypoint, else None."""
+    root = _static_root().resolve()
+    candidate = (root / full_path).resolve()
+    if full_path and candidate.is_file() and candidate.is_relative_to(root):
+        return candidate
+    index = root / "index.html"
+    return index if index.is_file() else None
+
+
 @app.get("/")
-def root():  # type: ignore[no-untyped-def]
-    return {"name": "StorageGenie", "version": "0.1.0"}
+def root() -> Response:
+    index = _static_root() / "index.html"
+    if index.is_file():
+        return FileResponse(index, media_type="text/html")
+    return JSONResponse(content={"name": "StorageGenie", "version": "0.1.0"})
+
+
+@app.get("/{full_path:path}", include_in_schema=False)
+def spa_fallback(full_path: str) -> Response:
+    """Serve the built UI for client-side routes; never shadow the JSON API."""
+    if full_path == "v1" or full_path.startswith("v1/"):
+        return _problem_response(404, f"Not Found: /{full_path}")
+    served = _static_file(full_path)
+    if served is None:
+        return _problem_response(404, f"Not Found: /{full_path}")
+    return FileResponse(served)

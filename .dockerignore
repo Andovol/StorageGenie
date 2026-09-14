@@ -1,0 +1,22 @@
+# SG-041: build context widened to the repo root for the multi-stage UI build.
+# Exclusions: VCS/local state, caches, host dependency trees, the stale/ignored
+# frontend/dist (rebuilt in the node stage), live data, and the secret .env.
+.git
+.gitignore
+.cache
+.rules-cache
+.venv
+venv
+**/__pycache__
+**/*.py[cod]
+**/.pytest_cache
+**/.mypy_cache
+**/.ruff_cache
+frontend/node_modules
+frontend/dist
+frontend/.vite
+frontend/.scratch
+data
+backend/data
+docs
+.env
