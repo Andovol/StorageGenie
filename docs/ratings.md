@@ -38,6 +38,8 @@ Schema: shared `LEDGER.md` — nine columns, `guards_invoked` + `deduction_attri
 
 | SG-031 | Phase 3 (D46) | opencode (model unknown with argv provenance quoted per owner rule; effort medium verified from process args) | medium | 98 |  | COMPLETE picker + safe endpoint: GET safe subset with sentinel-proven key absence, PUT whitelist 422-enforced, reader override recorded on offline call, UI renders endpoint list, npm build green (queued proof landed); premise correction F-SG031-1 CONFIRMED (packet-side, M7); health unanswered accepted (no stack running, nothing deployed); suite 121 passed + 2 base-proved decoder reds; ruff clean; mypy delta 0; $0 | PG-EV-01, PG-EV-02, PG-EV-03, PG-EV-05, PG-EV-09, PG-SC-02, PG-SC-05, PG-SC-07, PG-SC-10, PG-IC-01, PG-IC-03, PG-IC-07, PG-IC-09, PG-PR-03, PG-PR-04, PG-PR-06, PG-PR-10 |  |
 
+| SG-033 | Phase 3 (D46) | opencode (model unknown with argv provenance quoted per owner rule; effort medium verified from process args) | medium | 98 |  | COMPLETE split op + UI: per-item children with shared evidence + provenance, origin 409, multi_item resolved, empty/single/partial/dup/out-of-range 422; UI action iff multi-item open, children linked; premise correction F-SG033-1 CONFIRMED (packet-side, M8); manual_entry orphan flagged to SG-034; full-coverage rule + GET deferral confirmed; suite 126 passed + 2 base-proved reds; build green; $0 | PG-EV-01, PG-EV-02, PG-EV-05, PG-EV-09, PG-SC-02, PG-SC-07, PG-SC-10, PG-IC-01, PG-IC-03, PG-IC-07, PG-IC-09, PG-PR-03, PG-PR-04, PG-PR-06, PG-PR-10 |  |
+
 ## SG-013 investigation (score 90 < 95)
 
 1. **Failure class:** environment.
