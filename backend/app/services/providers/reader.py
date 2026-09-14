@@ -56,6 +56,24 @@ RETRYABLE_ERRORS = frozenset(
     {"outage", "timeout", "rate_limited", "transport", "http_status", "invalid_json"}
 )
 
+# SG-031: process-side runtime model override. Settings are env-loaded pydantic
+# with no runtime write path and the backend is one process, so the override
+# lives here and a backend restart resets it to `settings.sg_model_id` (the host
+# `.env` default). There is no silent fallback: the settings API whitelists a
+# tested model before it calls `set_runtime_model_id`.
+_runtime_model_id: str | None = None
+
+
+def set_runtime_model_id(model_id: str | None) -> None:
+    """Set (or clear, with None) the process-side model override."""
+    global _runtime_model_id
+    _runtime_model_id = model_id
+
+
+def effective_model_id() -> str:
+    """The model a call will use: the runtime selection, else the env default."""
+    return _runtime_model_id or settings.sg_model_id
+
 
 def provider_registry() -> dict[str, Any]:
     """Build the id -> provider map from settings.
@@ -68,7 +86,7 @@ def provider_registry() -> dict[str, Any]:
         registry["opencode-go"] = OpenCodeGoProvider(
             session_id="storagegenie-sg028",
             api_key=settings.opencode_api_key,
-            model_id=settings.sg_model_id,
+            model_id=effective_model_id(),
             per_job_cap=settings.sg_per_job_cap,
             monthly_cap=settings.sg_monthly_cap,
         )
@@ -331,7 +349,7 @@ def run_ai_extraction(db: Session, job: Job) -> dict[str, object]:
     registry = provider_registry()
     provider_id = settings.sg_provider_id
     provider = registry[provider_id]
-    model_id = str(getattr(provider, "model_id", settings.sg_model_id))
+    model_id = str(getattr(provider, "model_id", effective_model_id()))
 
     config = RouterConfig(
         provider_id=provider_id,

@@ -208,6 +208,11 @@ steps and behaves like Phase 1 (proved by
 | `SG_MONTHLY_CAP` | household monthly cap in USD, enforced from the durable `provider_call` ledger | `none` (uncapped) |
 | `SG_CONSENT` | cloud consent switch | `false` |
 
+The effective model can also be selected at runtime from the Settings screen
+(`GET`/`PUT /v1/settings/ai`; tested models only, currently
+`deepseek-v4-flash-vision-exp`). That override lives in the backend process, so
+**a backend restart resets it to `SG_MODEL_ID` from the environment**.
+
 ### Run the eval
 
 From `backend/`:

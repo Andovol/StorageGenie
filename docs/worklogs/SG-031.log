@@ -1,0 +1,82 @@
+SG-031 execution log (chronological; elapsed in seconds unless noted)
+
+[00] Recon — BASE REF automation -> fafe16669718d2acb8f8f254805b6261967cdb77
+     git status --porcelain => (empty, clean). Branch automation. Origin
+     git@github.com:Andovol/StorageGenie.git. Packet read at
+     docs/packets/SG-031-model-picker-ui.md.
+     Premises checked (quoted reads):
+     - config.py:28 sg_model_id default deepseek-v4-flash-vision-exp.
+     - reader.py:60-75 provider_registry builds OpenCodeGoProvider from settings.
+     - backend/app/api/v1/ has NO settings module; frontend/src/api/ has no
+       settings types.
+     - main.py registers routers with prefix /v1 (verified pattern).
+     - docker-compose.yml maps "8003:8000" (confirmed).
+     - health line README.md:40 -> http://localhost:8003/v1/health.
+
+[01] PREMISE CORRECTION F-SG031-1 (invited by packet G1)
+     Packet whitelist premise: deepseek-v4-flash-vision-exp AND deepseek-v4-flash
+     "(SG-027run2...SG-030 metered runs)".
+     Tree/ratings evidence: grep of *.py/*.md/*.ts for "deepseek-v4-flash" shows
+     only the -vision-exp id in every metered artifact:
+       SG-029 report/baseline: all 7 metered calls model=deepseek-v4-flash-vision-exp.
+       docs/ratings.md SG-027/028/029/030 "deepseek-v4.1-flash" is the CODER lane
+       model (provider metadata), not the extraction model.
+     Therefore deepseek-v4-flash was never exercised by a metered extraction run
+     and is not a vision path. Tested-models-only => whitelist collapses to
+     ("deepseek-v4-flash-vision-exp",). Recorded as a correction, not bent.
+
+[02] PRE-change tests written (FAIL first):
+     backend/tests/test_settings.py (new)
+     frontend/src/routes/SettingsPage.test.tsx (new)
+     PRE backend: cd backend && ../venv/bin/python -m pytest tests/test_settings.py -q
+       => 5 failed, 2 errors in 0.87s (routes 404 / module absent). Raw committed.
+     PRE frontend: ./node_modules/.bin/vitest run src/routes/SettingsPage.test.tsx
+       => 3 failed (component absent: "Unable to find a label with the text of: AI model").
+       Raw committed.
+
+[03] G1 implemented:
+     backend/app/api/v1/settings.py (new): GET/PUT /v1/settings/ai;
+       AiSettingsOut = safe subset ONLY (provider_id, model_id, allowed_model_ids,
+       consent, per_job_cap, monthly_cap, prompt_category); key named nowhere;
+       PUT whitelist -> HTTPException 422 with selection unchanged.
+     backend/app/main.py: import + include_router(settings_router, prefix="/v1").
+     backend/app/services/providers/reader.py: process-side override
+       (_runtime_model_id, set_runtime_model_id, effective_model_id);
+       provider_registry uses effective_model_id(); run_ai_extraction model
+       fallback uses effective_model_id().
+
+[04] G2 proof: real provider_registry with OpenCodeGoProvider._post replaced by
+     an in-process double (no network, no key read). After PUT ALLOWED_MODEL while
+     sg_model_id is a distinct sentinel, the captured outgoing payload model, the
+     step output model, and every ProviderCall.model all equal the selection.
+
+[05] POST tests:
+     backend: 7 passed, 1 warning in 0.69s.
+     frontend: 3 passed in 0.68s.
+     FULL backend suite: 2 failed, 121 passed in 7.91s. The 2 reds are the known
+     decoder env tests; re-verified at BASE fafe166 (worktree) with the same
+     command: 2 failed in 0.56s (pyzbar/libzbar and pytesseract not installed).
+
+[06] G4 gates:
+     ruff check app tests => "All checks passed!" (exit 0).
+     mypy app => 40 errors in 9 files (baseline 40-in-9 unchanged; none in the new
+       settings.py or edited reader.py).
+     npm run build (tsc && vite build) => green, built in 846ms, dist quoted.
+     ./node_modules/.bin/vitest run => 9 files, 22 tests passed.
+     Secret scan: worktree-wide (incl. untracked) real-key-shape scan => 0; the 4
+       tracked "sk-" regex hits are desk-/risk- false positives; sentinel string
+       exists only in backend/tests/test_settings.py; .env untracked (0 tracked).
+
+[07] HEALTH PROBE (CO-92): port 8003 has NO listener (curl exit 7); docker compose
+     ps => 0 services; port 8000 has an unrelated listener answering "Not Found".
+     No service is running and the slice deploys nothing, so the daemon health
+     delta is "not running -> not running" (0). Reported, not worked around.
+
+[08] README.md: one restart-resets line added under the Settings table.
+
+[09] Commit + push to automation; receipt note on WORK_HEAD (ref
+     refs/notes/storagegenie-coder-reports). note=yes.
+
+MODEL: unknown (CLI default omitted per policy) — parent argv quoted in report.
+EFFORT: medium — parent argv --variant medium.
+SPEND: $0. NETWORK ATTEMPTS: 0.

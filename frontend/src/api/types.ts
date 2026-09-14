@@ -96,3 +96,13 @@ export type Candidate = {
   evidence_ids: string[];
   asset_id?: string | null;
 };
+
+export type AiSettings = {
+  provider_id: string;
+  model_id: string;
+  allowed_model_ids: string[];
+  consent: boolean;
+  per_job_cap: number | null;
+  monthly_cap: number | null;
+  prompt_category: string;
+};

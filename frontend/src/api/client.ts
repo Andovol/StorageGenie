@@ -1,4 +1,4 @@
-import type { Assertion } from "./types";
+import type { AiSettings, Assertion } from "./types";
 
 const BASE = import.meta.env.VITE_API_BASE || "http://localhost:8000";
 
@@ -65,6 +65,32 @@ export async function apiPatch<T>(
     throw new Error(parseRfc9457(b, `PATCH ${path} failed: ${r.status}`));
   }
   return r.json() as Promise<T>;
+}
+
+export async function apiPut<T>(
+  path: string,
+  body: unknown,
+  params: Record<string, string> = {},
+  headers: Record<string, string> = {}
+): Promise<T> {
+  const r = await fetch(buildUrl(path, params), {
+    method: "PUT",
+    headers: { "Content-Type": "application/json", ...headers },
+    body: JSON.stringify(body),
+  });
+  if (!r.ok) {
+    const b = await r.json().catch(() => ({ detail: r.statusText }));
+    throw new Error(parseRfc9457(b, `PUT ${path} failed: ${r.status}`));
+  }
+  return r.json() as Promise<T>;
+}
+
+export function fetchAiSettings() {
+  return apiGet<AiSettings>("/v1/settings/ai");
+}
+
+export function updateAiModel(modelId: string) {
+  return apiPut<AiSettings>("/v1/settings/ai", { model_id: modelId });
 }
 
 export async function uploadEvidence(
