@@ -118,8 +118,7 @@ the owner — never auto-chained.
 
 ## Slice order and IDs
 
-SG-031 → SG-033 → SG-034 → SG-035 → SG-036 → SG-037 → SG-038 → SG-039. Eight slices, each one
-dispatch. Reordering past a hard stop is forbidden. SG-035 (migration) and SG-037/038 (first metered
+SG-031 → SG-033 → SG-034 → SG-035 → SG-036 → SG-037 → SG-038 → **SG-040** → SG-039. Eight slices as approved (D45), plus **SG-040** added by owner decision `D47` (2026-09-14): opened-date persistence, closing SG-037 finding `F-SG037-3` — the exit bar "Cosmetics tracked with opened-date" was otherwise unmet. SG-040 runs BEFORE the exit; SG-039 stays last. Each slice is one dispatch. Reordering past a hard stop is forbidden. SG-035 (migration) and SG-037/038 (first metered
 runs) carry their bounds in-packet; a metered run fires only under its stated ceiling with consent on.
 
 ## Owner forks (answered before they bind — none auto-decided)
