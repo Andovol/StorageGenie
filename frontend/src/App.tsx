@@ -5,6 +5,7 @@ import { AssetDetailPage } from "./routes/AssetDetailPage";
 import { SettingsPage } from "./routes/SettingsPage";
 import { InboxPage } from "./routes/InboxPage";
 import { ReviewPage } from "./routes/ReviewPage";
+import { PlanningPage } from "./routes/PlanningPage";
 
 function Nav() {
   const linkStyle = (active: boolean): React.CSSProperties => ({
@@ -33,6 +34,9 @@ function Nav() {
       <NavLink to="/inbox" style={({ isActive }) => linkStyle(isActive)}>
         Inbox
       </NavLink>
+      <NavLink to="/planning" style={({ isActive }) => linkStyle(isActive)}>
+        Planning
+      </NavLink>
       <span style={{ marginLeft: "auto", fontSize: 11, color: "#9ca3af" }}>Phase 0 · local-first</span>
     </nav>
   );
@@ -48,6 +52,7 @@ export default function App() {
         <Route path="/assets/:id" element={<AssetDetailPage />} />
         <Route path="/settings" element={<SettingsPage />} />
         <Route path="/inbox" element={<InboxPage />} />
+        <Route path="/planning" element={<PlanningPage />} />
         <Route path="/review/:candidateId" element={<ReviewPage />} />
       </Routes>
     </div>

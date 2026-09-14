@@ -1,0 +1,62 @@
+SG-037 coder log — Daily Planning Agent on a button, Stage 0 (opencode, medium)
+
+BASE REF: automation -> resolved commit c251463cd418beb97b29fada27d0318c5a8a43df
+Work dir /home/andrei/StorageGenie
+Coder argv: opencode run --auto --dir /home/andrei/StorageGenie --variant medium <packet>
+Effort: medium (from argv --variant medium). Model: deepseek-v4.1-flash
+(provider metadata providerID=opencode-go modelID=deepseek-v4.1-flash,
+~/.local/share/opencode/log/opencode.log, read 2026-09-14 10:39 UTC).
+Provider-returned vision model in the live leg: deepseek-v4-flash-vision-exp.
+
+T0 START  10:31:50 UTC approx (opencode process etimes=474s at 10:39:44).
+
+LEG 0 — premise verification (budget 120s/probe):
+- tree clean, HEAD c251463, branch automation, origin git@github.com:Andovol/StorageGenie.git.
+- alembic head 20260914_sg035_foundations (no new migration expected/created).
+- reader.seam read: ai_status() reader.py:97-103; provider_registry() single injection seam.
+- IMPORTANT PREMISE FINDING F-SG037-1: the seam's ONLY real operation is
+  extract_items(image_bytes, prompt), and the SG-027 adapter binds its response to the
+  strict ExtractionOutput schema. There is no text/chat operation. Ceiling forbids
+  extending protocols/router/opencode_go. Resolved in-scope: planning reuses
+  extract_items with a 1x1 carrier image and asks the model for the same strict envelope;
+  each item maps to one PlanningSuggestion; catalogue data resolves backing refs.
+- PREMISE FINDING F-SG037-3: opened_date exists only on ExtractionItem (SG-036), never
+  persisted to an assertion; the catalogue reports opened_date=None. Destination named.
+- PREMISE FINDING F-SG037-2 (M6): the ceiling omits frontend/src/App.tsx, required to
+  register the new route/nav. Minimal 5-line registration included and reported.
+
+LEG 1 — backend implementation:
+- new backend/app/services/providers/prompts/planning-v1.md (frozen, front matter).
+- new backend/app/services/planning/{__init__.py,service.py}: build_catalog, prompt loader,
+  consent gate first, empty-catalog guardrail note, one-repair seam call, ledger writer
+  (job_id NULL), suggestion writer with backing refs, append-only guardrail events,
+  confirm/dismiss with service-level 422.
+- new backend/app/api/v1/planning.py: run/list/confirm/dismiss; registered in main.py.
+- new backend/tests/test_planning.py: 12 tests, zero network (adapter _post patched to raise).
+
+LEG 2 — frontend implementation:
+- new frontend/src/routes/PlanningPage.{tsx,test.tsx},
+  frontend/src/components/PlanningSuggestionCard.{tsx,test.tsx}.
+- client.ts + types.ts additions; App.tsx route/nav registration (F-SG037-2).
+- no schedule UI, no auto-refresh.
+
+LEG 3 — proof:
+- PRE backend: tests/test_planning.py = 12 failed (1.33s) at base worktree; POST = 12 passed (1.49s).
+- PRE frontend: 2 test files failed (screen/component absent, 0.51s); POST = 6 passed (0.88s).
+- full backend suite: 2 failed, 149 passed in 10.15s (2 = base decoder env reds).
+- ruff: All checks passed. mypy: 40 errors (delta 0 vs base).
+- npm run build: green, 876ms, 95 modules. vitest full: 33 passed (12 files).
+- secret scan: 0; no key identifiers in the new service/route/prompt.
+- alembic heads unchanged; no frozen prompt diff; no ignored file staged.
+
+LEG 4 — ONE metered live run (temp SQLite):
+- ceiling printed/checked first: $0.05000; worst-case 2-call estimate $0.003309 < ceiling.
+- ONE call: model deepseek-v4-flash-vision-exp, latency 5224.48ms,
+  usage prompt=1142 completion=918 total=2060 (reasoning 474), cost $0.000722.
+- total $0.000722 / $0.05000; 3 pending suggestions with backing refs; 1 guardrail row;
+  1 provider_call ledger row; no key material printed. No second live run.
+
+LEG 5 — worklogs + receipt note; worktree clean; note added LAST.
+
+Close: overall elapsed ~8 min (474s at log capture) vs 2400s overall / 1800s early-close.
+Spend: live $0.000722, offline $0.

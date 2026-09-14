@@ -1,0 +1,161 @@
+SG-037 verify log — raw both-runs, suite, build, and live-leg receipt
+
+BASE REF: automation -> c251463cd418beb97b29fada27d0318c5a8a43df
+Work dir /home/andrei/StorageGenie
+All commands run from backend/ (python) or frontend/ (node); no Coder-side SSH.
+
+================================================================================
+§1 PRE-CHANGE BACKEND — base worktree c251463, tests/test_planning.py present
+   command: venv/bin/python -m pytest tests/test_planning.py -q
+   (run in /tmp/opencode/sg037-base/backend, the base worktree)
+================================================================================
+12 failed, 1 warning in 1.33s
+
+FAILED tests/test_planning.py::test_run_writes_pending_suggestion_backing_refs_and_guardrail
+FAILED tests/test_planning.py::test_confirm_and_dismiss_transitions_with_422_on_illegal_moves
+FAILED tests/test_planning.py::test_dismiss_without_reason_writes_no_correction_event
+FAILED tests/test_planning.py::test_no_consent_refuses_with_zero_calls_and_zero_rows
+FAILED tests/test_planning.py::test_empty_catalog_yields_empty_list_with_guardrail_note
+FAILED tests/test_planning.py::test_catalog_bytes_identical_before_and_after_run
+FAILED tests/test_planning.py::test_no_key_material_in_any_written_row - Asse...
+FAILED tests/test_planning.py::test_list_filter_and_illegal_status_are_enforced
+FAILED tests/test_planning.py::test_household_mismatch_and_missing_suggestion
+FAILED tests/test_planning.py::test_single_repair_turn_then_success - Asserti...
+FAILED tests/test_planning.py::test_budget_refusal_before_any_call - Assertio...
+FAILED tests/test_planning.py::test_prompt_is_versioned_and_carries_catalog_label_data
+
+================================================================================
+§2 POST-CHANGE BACKEND — tests/test_planning.py
+   command: venv/bin/python -m pytest tests/test_planning.py -q
+================================================================================
+12 passed, 2 warnings in 1.49s
+
+================================================================================
+§3 PRE-CHANGE FRONTEND — base tree, PlanningPage.tsx / PlanningSuggestionCard.tsx
+   held aside; command: ./node_modules/.bin/vitest run
+     src/routes/PlanningPage.test.tsx src/components/PlanningSuggestionCard.test.tsx
+================================================================================
+ FAIL  src/routes/PlanningPage.test.tsx [ src/routes/PlanningPage.test.tsx ]
+Error: Failed to resolve import "./PlanningPage" from "src/routes/PlanningPage.test.tsx". Does the file exist?
+
+ Test Files  2 failed (2)
+      Tests  no tests
+   Start at  10:39:15
+   Duration  513ms (transform 21ms, setup 67ms, collect 0ms, tests 0ms, environment 492ms, prepare 123ms)
+
+================================================================================
+§4 POST-CHANGE FRONTEND — the two new test files
+================================================================================
+ ✓ src/components/PlanningSuggestionCard.test.tsx  (2 tests) 71ms
+ ✓ src/routes/PlanningPage.test.tsx  (4 tests) 273ms
+
+ Test Files  2 passed (2)
+      Tests  6 passed (6)
+   Start at  10:39:16
+   Duration  882ms (transform 103ms, setup 82ms, collect 174ms, tests 344ms, environment 511ms, prepare 117ms)
+
+================================================================================
+§5 FULL BACKEND SUITE — command: venv/bin/python -m pytest -q   (600s bound)
+================================================================================
+........................................................................ [ 47%]
+........................................................................ [ 95%]
+FF.....                                                                  [100%]
+=== FAILURES ===
+___ test_generated_codes_are_validated_and_bad_checksum_is_not_an_identifier ___
+>       assert any(item.get("value") == qr_value and item["validated"] for item in qr_values)
+E       assert False
+tests/test_signals.py:136: AssertionError
+_________________ test_ocr_has_text_boxes_and_mean_confidence __________________
+>       assert ocr
+E       assert []
+tests/test_signals.py:148: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_signals.py::test_generated_codes_are_validated_and_bad_checksum_is_not_an_identifier
+FAILED tests/test_signals.py::test_ocr_has_text_boxes_and_mean_confidence - a...
+2 failed, 149 passed, 14 warnings in 10.15s
+(2 = base-proved decoder environment reds: pyzbar/libzbar and pytesseract/tesseract absent)
+
+================================================================================
+§6 RUFF + MYPY — commands: venv/bin/python -m ruff check app tests
+                              venv/bin/python -m mypy app
+================================================================================
+ruff: All checks passed!   (exit 0)
+mypy: Found 40 errors in 9 files (checked 66 source files)   [delta 0 vs base;
+      no error in any touched file]
+
+================================================================================
+§7 BUILD — command: npm run build   (600s bound)
+================================================================================
+> tsc && vite build
+vite v5.4.21 building for production...
+✓ 95 modules transformed.
+dist/index.html                  0.32 kB │ gzip:  0.24 kB
+dist/assets/index-CMqxwbBX.js  247.95 kB │ gzip: 76.02 kB
+✓ built in 876ms
+
+================================================================================
+§8 FULL VITEST — command: ./node_modules/.bin/vitest run   (600s bound)
+================================================================================
+ Test Files  12 passed (12)
+      Tests  33 passed (33)
+   Start at  10:38:03
+   Duration  2.15s
+
+================================================================================
+§9 HYGIENE
+================================================================================
+key-name grep over new service/route/prompt:
+  matches only the word "secrets" in two docstrings ("no secrets"); no
+  api_key / OPENCODE_API_KEY / Bearer / token identifier.
+secret scan over new backend + frontend files: 0 matches.
+tracked repo secret scan (sk-...): 0 matches.
+alembic heads: 20260914_sg035_foundations (head)   [unchanged; NO new migration]
+frozen prompts: no extract-*-v1.md in `git diff --name-only`.
+ignored files: none staged (only intended files added).
+git status (pre-commit):
+ M backend/app/main.py
+ M frontend/src/App.tsx
+ M frontend/src/api/client.ts
+ M frontend/src/api/types.ts
+?? backend/app/api/v1/planning.py
+?? backend/app/services/planning/
+?? backend/app/services/providers/prompts/planning-v1.md
+?? backend/tests/test_planning.py
+?? frontend/src/components/PlanningSuggestionCard.test.tsx
+?? frontend/src/components/PlanningSuggestionCard.tsx
+?? frontend/src/routes/PlanningPage.test.tsx
+?? frontend/src/routes/PlanningPage.tsx
+
+================================================================================
+§10 LIVE LEG RECEIPT — the ONE metered run (temp SQLite)
+   command (CWD repo root; key loaded from host .env; never printed):
+   DATABASE_URL=sqlite:////tmp/opencode/sg037/live.db \
+   STORAGE_ROOT=/tmp/opencode/sg037/storage SG_CONSENT=true \
+   SG_PROVIDER_ID=opencode-go PYTHONPATH=backend venv/bin/python /tmp/opencode/sg037/live_run.py
+================================================================================
+mode=LIVE database=sqlite:////tmp/opencode/sg037/live.db
+key_present=True catalog_size=3
+prompt_version=planning-v1
+CEILING=$0.05000 worst_case_estimate(2 calls)=$0.003309
+ceiling_check=PASS
+run_status=ok suggestion_count=3 provider=opencode-go model=deepseek-v4-flash-vision-exp
+CALL provider=opencode-go model=deepseek-v4-flash-vision-exp latency_ms=5224.484376143664 usage={"prompt_tokens": 1142, "completion_tokens": 918, "total_tokens": 2060, "prompt_cache_hit_tokens": 0, "prompt_cache_miss_tokens": 1142, "prompt_tokens_details": {"cached_tokens": 0}, "completion_tokens_details": {"reasoning_tokens": 474}} cost=$0.000722 error=None
+TOTAL=$0.000722 / CEILING=$0.05000
+SUGGESTION status=pending kind=use_first title=Use "Whole milk" before 2026-09-16 backing=[{"type": "asset", "id": "01a09f7f-946a-7092-808c-7248d53f1fe8", "label": "Whole milk", "category": "food_beverages"}, {"type": "assertion", "id": "01a09f7f-946a-7092-808c-726282040b58", "field_path": "plugin:expiry-tracker/expiry_date", "value": "2026-09-16"}]
+SUGGESTION status=pending kind=use_first title=Use "Greek yoghurt" before 2026-09-20 backing=[{"type": "asset", "id": "01a09f7f-946b-7000-aefd-c625656e6293", "label": "Greek yoghurt", "category": "food_beverages"}, {"type": "assertion", "id": "01a09f7f-946b-7000-aefd-c64bf28b5f91", "field_path": "plugin:expiry-tracker/expiry_date", "value": "2026-09-20"}]
+SUGGESTION status=pending kind=use_first title=Use "Paracetamol" before 2027-01-01 backing=[{"type": "asset", "id": "01a09f7f-946c-79b1-930b-4bb2c2b70f9c", "label": "Paracetamol", "category": "food_beverages"}, {"type": "assertion", "id": "01a09f7f-946c-79b1-930b-4bd4a63f8c5a", "field_path": "plugin:expiry-tracker/expiry_date", "value": "2027-01-01"}]
+suggestion_rows=3 guardrail_rows=1 provider_call_rows=1
+ceiling_total_check=PASS
+EXIT=0 elapsed_s=5
+(offline dry-run of the same real-adapter path with a canned 200 body: same shape,
+ suggestion_rows=1, TOTAL=$0.000297, zero network — run before the live leg to de-risk it.)
+
+================================================================================
+§11 HEALTH PROBE — standing line (no service started)
+================================================================================
+docker compose ps:
+NAME      IMAGE     COMMAND   SERVICE   CREATED   STATUS    PORTS
+(empty — no services)
+listeners: 8000 -> Not Found; 8001 -> {"detail":"Not Found"}; 8002 -> Not Found;
+           8003 -> connection failed. No StorageGenie stack running.
+health = unanswered (no stack; starting one is deploying, out of scope).

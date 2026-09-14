@@ -1,4 +1,11 @@
-import type { AiSettings, Assertion, CandidateSplitResponse } from "./types";
+import type {
+  AiSettings,
+  Assertion,
+  CandidateSplitResponse,
+  PlanningRunResult,
+  PlanningSuggestion,
+  PlanningSuggestionListResponse,
+} from "./types";
 
 const BASE = import.meta.env.VITE_API_BASE || "http://localhost:8000";
 
@@ -151,6 +158,37 @@ export function enterManualExpiry(
   return apiPost<{ asset_id: string; assertion: Assertion; resolved_review_task_ids: string[] }>(
     `/v1/plugins/expiry-tracker/assets/${assetId}/expiry`,
     payload,
+    { household_id: householdId }
+  );
+}
+
+export function runPlanning(householdId: string) {
+  return apiPost<PlanningRunResult>("/v1/planning/run", {}, { household_id: householdId });
+}
+
+export function fetchPlanningSuggestions(householdId: string, status?: string) {
+  return apiGet<PlanningSuggestionListResponse>("/v1/planning/suggestions", {
+    household_id: householdId,
+    ...(status ? { status } : {}),
+  });
+}
+
+export function confirmPlanningSuggestion(suggestionId: string, householdId: string) {
+  return apiPost<PlanningSuggestion>(
+    `/v1/planning/suggestions/${suggestionId}/confirm`,
+    {},
+    { household_id: householdId }
+  );
+}
+
+export function dismissPlanningSuggestion(
+  suggestionId: string,
+  householdId: string,
+  reason?: string
+) {
+  return apiPost<PlanningSuggestion>(
+    `/v1/planning/suggestions/${suggestionId}/dismiss`,
+    { reason: reason ?? null },
     { household_id: householdId }
   );
 }

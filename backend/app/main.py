@@ -10,6 +10,7 @@ from app.api.v1.exports import router as export_router
 from app.api.v1.health import router as health_router
 from app.api.v1.households import router as households_router
 from app.api.v1.jobs import router as jobs_router
+from app.api.v1.planning import router as planning_router
 from app.api.v1.plugins import router as plugins_router
 from app.api.v1.review_tasks import router as review_tasks_router
 from app.api.v1.settings import router as settings_router
@@ -56,6 +57,7 @@ app.include_router(jobs_router, prefix="/v1")
 app.include_router(review_tasks_router, prefix="/v1")
 app.include_router(candidates_router, prefix="/v1")
 app.include_router(plugins_router, prefix="/v1")
+app.include_router(planning_router, prefix="/v1")
 app.include_router(settings_router, prefix="/v1")
 
 

@@ -121,3 +121,48 @@ export type AiSettings = {
   monthly_cap: number | null;
   prompt_category: string;
 };
+
+export type PlanningBackingRef = {
+  type: string;
+  id?: string;
+  label?: string | null;
+  category?: string | null;
+  field_path?: string;
+  value?: unknown;
+};
+
+export type PlanningSuggestionBody = {
+  rationale?: string[];
+  expiry_date?: string | null;
+  opened_date?: string | null;
+  confidence?: number;
+  asset_ref?: string | null;
+};
+
+export type PlanningSuggestion = {
+  id: string;
+  household_id: string;
+  kind: string;
+  title: string;
+  body: PlanningSuggestionBody | null;
+  backing_refs: PlanningBackingRef[];
+  status: string;
+  created_at: string | null;
+  updated_at: string | null;
+};
+
+export type PlanningSuggestionListResponse = {
+  items: PlanningSuggestion[];
+  total: number;
+};
+
+export type PlanningRunResult = {
+  status: string;
+  reason?: string;
+  suggestion_count: number;
+  catalog_size: number;
+  provider?: string | null;
+  model?: string | null;
+  guardrail_event_id?: string;
+  provider_call_ids?: string[];
+};
