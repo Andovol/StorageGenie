@@ -1,15 +1,15 @@
 # StorageGenie — project configuration
 
 > **Canonical for this repo. `CLAUDE.md` is a one-line adapter `@AGENTS.md` — edit here, never there.**
-> Rule-set version this project records: **0.24.0** (D52 adoption 2026-09-14: tag `contract-v0.24.0` checkout; `RULES.md` delta = the `G-L1` byte-compare half + `G-M3`/`G-M5` spacing; installed global rules file `a8ba7897…` byte-identical to the payload `RULES.sha256` — not forked, superseded local cache `5d7193…` = 0.23.0; project `AGENTS.md` measured 7,318 B, under the 11,103 B cap; `dispatch`/`run-coder` untouched until Launcher's host install; supersedes `0.23.0`).
+> Rule-set version this project records: **0.25.0** (D53 adoption 2026-09-14: tag `contract-v0.25.0` checkout; delta = new contract `VPS.md` (host standards + measured facts — retires the never-in-tree `reference/vps-info.md` as authority), `G-M13`/`G-T14` added, dispatch-engine updates (host-install side, nothing ours); installed global rules file `a66aa431…` byte-identical to the payload `RULES.sha256` — not forked; supersedes `0.24.0`).
 
 ## Configuration table — the single source of every project value
 
 | Field | Value | Notes |
 |---|---|---|
-| **Workspace** | `C:\Coding\OpenCode\StorageGenie` (local) → `/home/andrei/StorageGenie` (VPS) | Local is `automation` branch, VPS is `andrei@87.106.66.242:2222:/home/andrei/StorageGenie` — `reference/vps-info.md` is authority |
+| **Workspace** | `C:\Coding\OpenCode\StorageGenie` (local) → `/home/andrei/StorageGenie` (VPS) | Local is `automation` branch, VPS is `andrei@87.106.66.242:2222:/home/andrei/StorageGenie` — `VPS.md` (contract `.rules-cache/`) is the host authority |
 | **Repository** | `Andovol/StorageGenie` (`git@github.com:Andovol/StorageGenie.git`) | Create if absent; default branch `automation`, evidence ref `refs/heads/storagegenie-evidence` (per `CO-86`) |
-| **Host** | `87.106.66.242:2222` (`ubuntu`, `andrei`) | `reference/vps-info.md:27-28` — pin against `[87.106.66.242]:2222` in `~/.ssh/known_hosts` |
+| **Host** | `87.106.66.242:2222` (`ubuntu`, `andrei`) | `VPS.md` F2 — pin against `[87.106.66.242]:2222` in `~/.ssh/known_hosts` |
 | **Host project path** | `/home/andrei/StorageGenie` | Owner directive `m0045` — use this folder |
 | **Credential reference** | `~/.ssh/storagegenie-architect-dispatch` (ed25519, `~/.ssh/storagegenie-architect-dispatch.pub` on host forced-command) + unrestricted `C:\Users\popes\Desktop\key_Andrei.ppk` (Launcher-only, provisioning) | Naming `<project>-architect-dispatch` per `PROVISIONING.md:129` — private never on host |
 | **Coder** | `opencode` (SELECTED from `CODERS.md` — `opencode run --auto --dir <workdir> [--variant <effort>] <prompt-text>`, prompt travels on argv) | Owner directive `D29` (2026-09-11) — opencode going forward; supersedes `m0106` (codex high, kept as history). `G-O2` — packet says "the Coder", config names it. Effort `low|medium|high|xhigh` → `--variant` (`medium` default, uncalibrated for this Coder per `G-A9`). Hard ceiling: packet file stays far under the 128 KiB single-argv limit. Provider partially unproven (`ISS-6`); entry-point run-2 owed (`ISS-7`) |
@@ -32,15 +32,15 @@
 | `{{TEST_DB}}` | `not applicable` | Same — tests use `TestClient` + temp SQLite |
 | `{{DEFAULT_BRANCH}}` | `automation` | Current branch (`git branch --show-current`) — evidence `storagegenie-evidence` |
 | `{{DISPATCH_KEY}}` | `~/.ssh/storagegenie-architect-dispatch` | Layer A — forced-command at `andrei@87.106.66.242:2222` |
-| `{{HOST}}` | `87.106.66.242` | `vps-info.md:28` |
-| `{{HOST_SSH_PORT}}` | `2222` | `vps-info.md:28` |
-| `{{HOST_USER}}` | `andrei` | `vps-info.md:15` |
+| `{{HOST}}` | `87.106.66.242` | `VPS.md` F2 |
+| `{{HOST_SSH_PORT}}` | `2222` | `VPS.md` F2 |
+| `{{HOST_USER}}` | `andrei` | `VPS.md` F2 + dispatch key binding |
 
 `{{NAME}}` not listed is a `CO-08` STOP — never guess, never use placeholder literally.
 
 ## Method routing — what loads, when
 
-`ARCHITECT.md` before planning/packet/dispatch/audit/rating/touching state · `PACKET.md` before writing a packet · `DISPATCH.md` before dispatching · `CLOSE.md` before closing · `LEDGER.md` before rating · `RATIONALE.md` before changing a rule
+`ARCHITECT.md` before planning/packet/dispatch/audit/rating/touching state · `PACKET.md` before writing a packet · `DISPATCH.md` before dispatching · `CLOSE.md` before closing · `LEDGER.md` before rating · `RATIONALE.md` before changing a rule · `VPS.md` before planning anything on the shared VPS (a web page, a hostname, a port, a database, heavy work)
 
 Coder reads read-only copy on host (`/opt/storagegenie-dispatch/` + global `CODER.md` + `lang/python.md`) — never from repo (cutover pattern; the copy's version tracks the adopted rule set).
 
@@ -58,6 +58,6 @@ Pinned pre-conversion state `26e9e8b` (local `automation` head `26e9e8b→9f1cc0
 
 ## Loading
 
-- Session start: `G-L1` version check FIRST (fetch `origin contract` in `.rules-cache/`, read `FETCH_HEAD:VERSION`, and hash the installed global rules file against the payload `RULES.sha256` — never checkout-vs-stamp, M3), then this file + `.rules-cache/` (contract `contract-v0.24.0`) + `STATE.md:1` RESUME.
+- Session start: `G-L1` version check FIRST (fetch `origin contract` in `.rules-cache/`, read `FETCH_HEAD:VERSION`, and hash the installed global rules file against the payload `RULES.sha256` — never checkout-vs-stamp, M3), then this file + `.rules-cache/` (contract `contract-v0.25.0`) + `STATE.md:1` RESUME.
 - Before packet: `PACKET.md`; before dispatch: `DISPATCH.md` (+ `PRODUCTION.md:1` because host + SQLite are live).
 - Never copy shared contract into repo — project holds only values and narrowings.
