@@ -3,6 +3,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
 import { apiGet, apiPost, resolveReviewTask } from "../api/client";
 import type { Household, Job, JobListResponse, ReviewTaskListResponse } from "../api/types";
+import { HouseholdSelector } from "../components/HouseholdSelector";
 import { JobCard } from "../components/JobCard";
 import { useHouseholds } from "../hooks/useAssets";
 
@@ -20,7 +21,14 @@ export function InboxPage() {
   const resolve = useMutation({ mutationFn: (taskId: string) => resolveReviewTask(taskId, effectiveHousehold), onSuccess: () => qc.invalidateQueries({ queryKey: ["review-tasks", effectiveHousehold] }) });
 
   return <div style={{ padding: 24, maxWidth: 1100 }}>
-    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}><h1>Inbox</h1><label>Household <select value={effectiveHousehold} onChange={(event) => { setHouseholdId(event.target.value); localStorage.setItem("household_id", event.target.value); }}><option value="">Select household</option>{(households as Household[] | undefined)?.map((household) => <option key={household.id} value={household.id}>{household.name}</option>)}</select></label></div>
+    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+      <h1>Inbox</h1>
+      <HouseholdSelector
+        value={effectiveHousehold}
+        onChange={(eventValue) => { setHouseholdId(eventValue); localStorage.setItem("household_id", eventValue); }}
+        households={households as Household[] | undefined}
+      />
+    </div>
     <div style={{ display: "grid", gridTemplateColumns: "minmax(260px, .8fr) minmax(320px, 1.2fr)", gap: 20 }}>
       <section><h2>Import jobs</h2>{jobs.isLoading && <div>Loading jobs…</div>}{!jobs.isLoading && jobs.data?.items.length === 0 && <div role="status">No import jobs yet.</div>}<div style={{ display: "grid", gap: 8 }}>{jobs.data?.items.map((job) => <JobCard key={job.id} job={job} selected={selectedJobId === job.id} onSelect={() => setSelectedJobId(job.id)} />)}</div></section>
       <section><h2>Selected job</h2>{!selectedJobId && <div>Select a job to see progress and errors.</div>}{detail.isLoading && <div>Loading job detail…</div>}{detail.data && <div><div><strong>{detail.data.state}</strong> · {detail.data.progress?.completed || 0}/{detail.data.progress?.total || 0} complete · {detail.data.progress?.failed || 0} failed · {detail.data.progress?.pending || 0} pending</div>{detail.data.errors?.map((error) => <div key={error} role="alert" style={{ color: "#b91c1c", marginTop: 8 }}>{error}</div>)}{detail.data.steps?.map((step) => <div key={step.id} style={{ marginTop: 8, padding: 8, background: "#f9fafb" }}><strong>{step.step_name}</strong>: {step.state}{step.error && <div role="alert">{step.error}</div>}</div>)}{detail.data.state === "FAILED" && <button type="button" onClick={() => retry.mutate(detail.data!.id)} disabled={retry.isPending} style={{ marginTop: 12 }}>{retry.isPending ? "Retrying…" : "Retry failed job"}</button>}</div>}</section>

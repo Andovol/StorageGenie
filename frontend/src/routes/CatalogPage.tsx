@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
 import { useAssets, useHouseholds } from "../hooks/useAssets";
 import { AssetCard } from "../components/AssetCard";
-import type { Asset } from "../api/types";
+import { HouseholdSelector } from "../components/HouseholdSelector";
+import type { Asset, Household } from "../api/types";
 
 function useDebounced<T>(value: T, delayMs: number): T {
   const [debounced, setDebounced] = useState(value);
@@ -60,21 +61,17 @@ export function CatalogPage() {
     <div style={{ padding: 24 }}>
       <h1>Catalog</h1>
       <div style={{ display: "flex", gap: 12, marginBottom: 16, flexWrap: "wrap" }}>
-        <select
+        <HouseholdSelector
           value={effectiveHousehold}
-          onChange={(e) => {
-            setHouseholdId(e.target.value);
-            localStorage.setItem("household_id", e.target.value);
+          onChange={(id) => {
+            setHouseholdId(id);
+            localStorage.setItem("household_id", id);
           }}
-          style={{ padding: 8, borderRadius: 6, border: "1px solid #d1d5db" }}
-        >
-          {(households || []).map((h) => (
-            <option key={h.id} value={h.id}>
-              {h.name}
-            </option>
-          ))}
-          {(!households || households.length === 0) && <option value="">No households</option>}
-        </select>
+          households={households as Household[] | undefined}
+          showLabel={false}
+          selectStyle={{ padding: 8, borderRadius: 6, border: "1px solid #d1d5db" }}
+          emptyOptionLabel={!households || households.length === 0 ? "No households" : ""}
+        />
         <input
           placeholder="Search..."
           value={qRaw}

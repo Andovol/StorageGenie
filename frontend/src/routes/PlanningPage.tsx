@@ -11,6 +11,7 @@ import type {
   PlanningRunResult,
   PlanningSuggestionListResponse,
 } from "../api/types";
+import { HouseholdSelector } from "../components/HouseholdSelector";
 import { PlanningSuggestionCard } from "../components/PlanningSuggestionCard";
 import { useHouseholds } from "../hooks/useAssets";
 
@@ -66,23 +67,14 @@ export function PlanningPage() {
         style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}
       >
         <h1>Planning</h1>
-        <label>
-          Household{" "}
-          <select
-            value={effectiveHousehold}
-            onChange={(event) => {
-              setHouseholdId(event.target.value);
-              localStorage.setItem("household_id", event.target.value);
-            }}
-          >
-            <option value="">Select household</option>
-            {(households as Household[] | undefined)?.map((household) => (
-              <option key={household.id} value={household.id}>
-                {household.name}
-              </option>
-            ))}
-          </select>
-        </label>
+        <HouseholdSelector
+          value={effectiveHousehold}
+          onChange={(id) => {
+            setHouseholdId(id);
+            localStorage.setItem("household_id", id);
+          }}
+          households={households as Household[] | undefined}
+        />
       </div>
       <p style={{ color: "#6b7280", fontSize: 13 }}>
         Suggestions are proposals only. Confirming or dismissing one changes no asset, job

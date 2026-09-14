@@ -3,6 +3,7 @@ import { useMutation } from "@tanstack/react-query";
 import { logChatCorrection, sendChat } from "../api/client";
 import type { ChatMessage, ChatResponse, Household } from "../api/types";
 import { ChatTranscript } from "../components/ChatTranscript";
+import { HouseholdSelector } from "../components/HouseholdSelector";
 import { useHouseholds } from "../hooks/useAssets";
 
 const CATEGORIES = [
@@ -69,23 +70,14 @@ export function ChatPage() {
     <div style={{ padding: 24, maxWidth: 900 }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
         <h1>Chat</h1>
-        <label>
-          Household{" "}
-          <select
-            value={effectiveHousehold}
-            onChange={(event) => {
-              setHouseholdId(event.target.value);
-              localStorage.setItem("household_id", event.target.value);
-            }}
-          >
-            <option value="">Select household</option>
-            {(households as Household[] | undefined)?.map((household) => (
-              <option key={household.id} value={household.id}>
-                {household.name}
-              </option>
-            ))}
-          </select>
-        </label>
+        <HouseholdSelector
+          value={effectiveHousehold}
+          onChange={(id) => {
+            setHouseholdId(id);
+            localStorage.setItem("household_id", id);
+          }}
+          households={households as Household[] | undefined}
+        />
       </div>
 
       <p style={{ color: "#6b7280", fontSize: 13 }}>
