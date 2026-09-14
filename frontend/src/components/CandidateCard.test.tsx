@@ -34,4 +34,15 @@ describe("CandidateCard", () => {
     render(<CandidateCard candidate={{ ...candidate, evidence_ids: ["wrong-evidence"] }} householdId="h" onDecision={vi.fn()} />);
     expect(() => expect(screen.getByRole("article").querySelector("img")).toHaveAttribute("src", expect.stringContaining("evidence-loaded-7"))).toThrow();
   });
+
+  test("split action appears only when a multi-item count is supplied and fires once", () => {
+    const onSplit = vi.fn();
+    const { rerender } = render(<CandidateCard candidate={{ ...candidate, review_task_ids: [] }} householdId="h" onDecision={vi.fn()} />);
+    expect(screen.queryByRole("button", { name: /split/i })).toBeNull();
+    rerender(<CandidateCard candidate={{ ...candidate, review_task_ids: [] }} householdId="h" onDecision={vi.fn()} splitItemCount={2} onSplit={onSplit} />);
+    const button = screen.getByRole("button", { name: /split/i });
+    expect(button).toHaveTextContent("2");
+    fireEvent.click(button);
+    expect(onSplit).toHaveBeenCalledTimes(1);
+  });
 });

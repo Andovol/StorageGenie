@@ -25,11 +25,17 @@ export function CandidateCard({
   householdId,
   onDecision,
   busy = false,
+  splitItemCount = null,
+  onSplit,
+  splitBusy = false,
 }: {
   candidate: Candidate;
   householdId: string;
   onDecision: (action: "accept" | "edit" | "hold" | "reject", correctedFields?: Record<string, unknown>) => void;
   busy?: boolean;
+  splitItemCount?: number | null;
+  onSplit?: () => void;
+  splitBusy?: boolean;
 }) {
   const [values, setValues] = useState<Record<string, unknown>>(() => {
     const initial: Record<string, unknown> = {};
@@ -81,6 +87,9 @@ export function CandidateCard({
         <button type="button" onClick={() => onDecision("edit", values)} disabled={busy}>Save edits</button>
         <button type="button" onClick={() => onDecision("hold")} disabled={busy}>Hold / Unknown</button>
         <button type="button" onClick={() => onDecision("reject")} disabled={busy}>Reject</button>
+        {splitItemCount != null && onSplit && (
+          <button type="button" onClick={onSplit} disabled={busy || splitBusy}>Split into {splitItemCount} items</button>
+        )}
       </div>
     </article>
   );

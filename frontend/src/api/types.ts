@@ -97,6 +97,21 @@ export type Candidate = {
   asset_id?: string | null;
 };
 
+export type CandidateSplitChild = {
+  id: string;
+  state: string;
+  job_id: string;
+  fields: Record<string, CandidateField>;
+  evidence_ids: string[];
+  split_item_index?: number | null;
+};
+export type CandidateSplitResponse = {
+  candidate_id: string;
+  state: string;
+  resolved_task_ids: string[];
+  children: CandidateSplitChild[];
+};
+
 export type AiSettings = {
   provider_id: string;
   model_id: string;

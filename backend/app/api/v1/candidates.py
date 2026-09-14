@@ -18,6 +18,10 @@ class CandidateDecision(BaseModel):
     corrected_fields: dict[str, object] = Field(default_factory=dict)
 
 
+class CandidateSplitRequest(BaseModel):
+    item_indexes: list[int] = Field(default_factory=list)
+
+
 @router.post("/candidates/{candidate_id}/decision")
 def decide_candidate(
     candidate_id: str,
@@ -30,8 +34,8 @@ def decide_candidate(
         raise HTTPException(status_code=404, detail="Candidate not found")
     if candidate.household_id != household_id:
         raise HTTPException(status_code=403, detail="Household mismatch")
-    if candidate.state == "rejected":
-        raise HTTPException(status_code=409, detail="Candidate is rejected")
+    if candidate.state in {"rejected", "split"}:
+        raise HTTPException(status_code=409, detail=f"Candidate is {candidate.state}")
 
     if payload.action in {"hold", "reject"}:
         candidate.state = "held" if payload.action == "hold" else "rejected"
@@ -67,6 +71,50 @@ def decide_candidate(
     commit_step = next((step for step in job_service._steps(db, job.id) if step.step_name == "COMMITTING"), None)
     output = json.loads(commit_step.output_refs) if commit_step and commit_step.output_refs else {}
     return {"candidate_id": candidate.id, "state": candidate.state, "job": job_service.serialize_job(db, result), **output}
+
+
+def _serialize_split_child(child: candidates.Candidate) -> dict[str, object]:
+    proposal = candidates.load_proposal(child)
+    fields = proposal.get("fields", {})
+    evidence_ids = json.loads(child.evidence_ids_json)
+    return {
+        "id": child.id,
+        "state": child.state,
+        "job_id": child.job_id,
+        "fields": fields if isinstance(fields, dict) else {},
+        "evidence_ids": (
+            [str(item) for item in evidence_ids] if isinstance(evidence_ids, list) else []
+        ),
+        "split_item_index": proposal.get("split_item_index"),
+    }
+
+
+@router.post("/candidates/{candidate_id}/split")
+def split_candidate(
+    candidate_id: str,
+    payload: CandidateSplitRequest,
+    household_id: str = Query(...),
+    db: Session = Depends(get_db),
+) -> dict[str, object]:
+    candidate = db.query(candidates.Candidate).filter_by(id=candidate_id).first()
+    if candidate is None:
+        raise HTTPException(status_code=404, detail="Candidate not found")
+    if candidate.household_id != household_id:
+        raise HTTPException(status_code=403, detail="Household mismatch")
+    try:
+        children, resolved_task_ids = candidates.split_candidate(
+            db, candidate, payload.item_indexes
+        )
+    except candidates.CandidateSplitError as exc:
+        db.rollback()
+        raise HTTPException(status_code=exc.status_code, detail=str(exc)) from exc
+    db.commit()
+    return {
+        "candidate_id": candidate.id,
+        "state": candidate.state,
+        "resolved_task_ids": resolved_task_ids,
+        "children": [_serialize_split_child(child) for child in children],
+    }
 
 
 @router.get("/candidates/{candidate_id}")

@@ -1,4 +1,4 @@
-import type { AiSettings, Assertion } from "./types";
+import type { AiSettings, Assertion, CandidateSplitResponse } from "./types";
 
 const BASE = import.meta.env.VITE_API_BASE || "http://localhost:8000";
 
@@ -119,6 +119,18 @@ export function candidateDecision(
   return apiPost<{ candidate_id?: string; id?: string; state: string; asset_id?: string }>(
     `/v1/candidates/${candidateId}/decision`,
     { action, corrected_fields: correctedFields },
+    { household_id: householdId }
+  );
+}
+
+export function candidateSplit(
+  candidateId: string,
+  householdId: string,
+  itemIndexes: number[]
+) {
+  return apiPost<CandidateSplitResponse>(
+    `/v1/candidates/${candidateId}/split`,
+    { item_indexes: itemIndexes },
     { household_id: householdId }
   );
 }

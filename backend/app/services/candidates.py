@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import datetime
 import json
 from pathlib import Path
 
@@ -95,6 +96,17 @@ class Candidate(TimestampMixin, Base):
 
 class CandidateBlockedError(RuntimeError):
     pass
+
+
+class CandidateSplitError(RuntimeError):
+    """A split request the operation refuses; `status_code` is the HTTP mapping."""
+
+    def __init__(self, message: str, status_code: int = 422) -> None:
+        super().__init__(message)
+        self.status_code = status_code
+
+
+SPLIT_ORIGIN_STATE = "split"
 
 
 def load_proposal(candidate: Candidate) -> dict[str, object]:
@@ -446,3 +458,196 @@ def commit_job_candidate(db: Session, job: Job) -> dict[str, object]:
         raise ValueError("job has no candidate")
     result = commit_candidate(db, candidate)
     return {"status": "ok", "step": "COMMITTING", "candidate_id": candidate.id, **result}
+
+
+def _split_child_fields(
+    origin_fields: dict[str, object],
+    item: dict[str, object],
+    *,
+    provider: object,
+    model: object,
+    version: object,
+    provider_call_id: object,
+) -> dict[str, object]:
+    """Build one child's fields from the origin fields + ITS extraction item.
+
+    Item-derived fields (`display_name`, `expiry_date`, `lot`) are replaced by
+    this item's values; every other origin field (deterministic asset_type,
+    status, barcode identifier) is shared unchanged. A field with no item value
+    is omitted, never guessed.
+    """
+    name = item.get("name")
+    if not isinstance(name, str) or not name:
+        raise CandidateSplitError("candidate item is missing a name")
+    raw_confidence = item.get("confidence")
+    confidence = raw_confidence if isinstance(raw_confidence, (int, float)) else None
+    fields: dict[str, object] = {
+        key: raw
+        for key, raw in origin_fields.items()
+        if key not in {"display_name", "expiry_date", "lot"}
+    }
+    fields["display_name"] = _provenance(
+        name,
+        source_type="extraction",
+        confidence=confidence,
+        provider=provider,
+        model=model,
+        template_version=version,
+        provider_call_id=provider_call_id,
+    )
+    expiry_date = item.get("expiry_date")
+    if expiry_date is not None:
+        fields["expiry_date"] = _provenance(
+            expiry_date,
+            source_type="extraction",
+            confidence=confidence,
+            provider=provider,
+            model=model,
+            template_version=version,
+            provider_call_id=provider_call_id,
+        )
+    lot = item.get("lot")
+    if lot is not None:
+        fields["lot"] = _provenance(
+            lot,
+            source_type="extraction",
+            confidence=confidence,
+            provider=provider,
+            model=model,
+            template_version=version,
+            provider_call_id=provider_call_id,
+        )
+    return fields
+
+
+def split_candidate(
+    db: Session, candidate: Candidate, item_indexes: list[int]
+) -> tuple[list[Candidate], list[str]]:
+    """Split a multi-item candidate into one `proposed` child per named item.
+
+    The request must name every item index exactly once (>= 2 items): a partial
+    or single selection is refused before anything is written so no item is
+    silently dropped. Children share the origin evidence and provider
+    provenance; the origin leaves the decidable set and its `candidate.multi_item`
+    task(s) resolve. The caller commits.
+    """
+    if candidate.state != "proposed":
+        raise CandidateSplitError(
+            f"candidate state {candidate.state} is not splittable", status_code=409
+        )
+    proposal = load_proposal(candidate)
+    items = proposal.get("ai_items")
+    if not isinstance(items, list) or len(items) < 2:
+        raise CandidateSplitError("candidate has no multi-item list to split", status_code=422)
+    if not isinstance(item_indexes, list) or any(
+        isinstance(index, bool) or not isinstance(index, int) for index in item_indexes
+    ):
+        raise CandidateSplitError("item_indexes must be a list of integers", status_code=422)
+    if len(item_indexes) < 2:
+        raise CandidateSplitError("split requires at least two item indexes", status_code=422)
+    if len(set(item_indexes)) != len(item_indexes):
+        raise CandidateSplitError("item_indexes must be unique", status_code=422)
+    if set(item_indexes) != set(range(len(items))):
+        raise CandidateSplitError(
+            "item_indexes must name every item exactly once", status_code=422
+        )
+
+    origin_fields = _asset_fields(proposal)
+    provider = proposal.get("ai_provider")
+    model = proposal.get("ai_model")
+    version = proposal.get("prompt_template_version")
+    raw_calls = proposal.get("provider_call_ids", [])
+    call_ids = [str(item) for item in raw_calls] if isinstance(raw_calls, list) else []
+    primary_call = call_ids[0] if call_ids else None
+    raw_unknowns = proposal.get("ai_unknowns", [])
+    unknowns = [str(entry) for entry in raw_unknowns] if isinstance(raw_unknowns, list) else []
+
+    children: list[Candidate] = []
+    for index in item_indexes:
+        item = items[index]
+        if not isinstance(item, dict):
+            raise CandidateSplitError("candidate item is invalid", status_code=422)
+        prefix = f"items.{index}."
+        child_unknowns = [
+            f"items.0.{entry[len(prefix):]}"
+            for entry in unknowns
+            if entry.startswith(prefix)
+        ]
+        child_proposal: dict[str, object] = {
+            "kind": "new_asset",
+            "asset_id": None,
+            "fields": _split_child_fields(
+                origin_fields,
+                item,
+                provider=provider,
+                model=model,
+                version=version,
+                provider_call_id=primary_call,
+            ),
+            "dedup_matches": [],
+            "review_task_ids": [],
+            "ai_items": [item],
+            "ai_unknowns": child_unknowns,
+            "needs_evidence": bool(child_unknowns),
+            "ai_provider": provider,
+            "ai_model": model,
+            "prompt_template_version": version,
+            "provider_call_ids": call_ids,
+            "split_from": candidate.id,
+            "split_item_index": index,
+        }
+        child = Candidate(
+            job_id=candidate.job_id,
+            evidence_ids_json=candidate.evidence_ids_json,
+            proposed_fields_json=json.dumps(child_proposal, ensure_ascii=False),
+            state="proposed",
+            household_id=candidate.household_id,
+        )
+        db.add(child)
+        children.append(child)
+    db.flush()
+
+    candidate.state = SPLIT_ORIGIN_STATE
+    resolved_task_ids: list[str] = []
+    open_tasks = (
+        db.query(ReviewTask)
+        .filter_by(
+            subject_ref=candidate.id,
+            household_id=candidate.household_id,
+            task_type="candidate.multi_item",
+            status="open",
+        )
+        .all()
+    )
+    for task in open_tasks:
+        before = {"status": task.status}
+        task.status = "resolved"
+        task.updated_at = datetime.datetime.now(datetime.timezone.utc)
+        audit_service.record(
+            db,
+            actor="api",
+            action="review_task.resolve",
+            entity_type="review_task",
+            entity_id=task.id,
+            before=before,
+            after={"status": task.status, "resolution": {"split": candidate.id}},
+            household_id=task.household_id,
+        )
+        resolved_task_ids.append(task.id)
+
+    audit_service.record(
+        db,
+        actor="api",
+        action="candidate.split",
+        entity_type="candidate",
+        entity_id=candidate.id,
+        before={"state": "proposed", "item_count": len(items)},
+        after={
+            "state": candidate.state,
+            "child_ids": [child.id for child in children],
+            "item_indexes": list(item_indexes),
+        },
+        household_id=candidate.household_id,
+    )
+    db.flush()
+    return children, resolved_task_ids

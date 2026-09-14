@@ -1,0 +1,84 @@
+SG-033 execution log (chronological; elapsed in seconds unless noted)
+
+[00] Recon — BASE REF automation -> 042e9c75ec891f97fd136e18cebceb6ef6840c31
+     git status --porcelain -b => clean; branch automation; origin
+     git@github.com:Andovol/StorageGenie.git. Packet read:
+     docs/packets/SG-033-multi-item-split.md.
+     Premises checked (quoted reads; see verify log §2):
+     - services/candidates.py:238 ai_items; :257-270 multi_item task.
+     - api/v1/candidates.py decision route whole-candidate only (BASE lines 16-22).
+     - models/evidence.py:7 m2m "one photo can back multiple assets after split/merge".
+     - No "split" source in api/v1/ or frontend/src/ at BASE.
+     FINDING F-SG033-1: packet says the proposal carries evidence_ids; it does NOT
+     (evidence ids are on Candidate.evidence_ids_json, candidates.py:248). Used the
+     Candidate row as the shared-evidence source.
+
+[01] Baselines before any edit:
+     backend pytest -q (BASE)      => 2 failed, 121 passed, 7.48s (2 known decoder reds).
+     frontend npx vitest run (BASE)=> 9 files, 22 passed, 1.51s.
+     mypy app (BASE worktree)      => 40 errors in 9 files.
+     Health probe: docker compose ps => 0 services; curl :8000/v1/health => 404;
+     :8000 listener is unrelated. Reported unanswered (no service deployed).
+
+[02] PRE-change tests written (FAIL first):
+     backend/tests/test_review_split.py (new) + additions to
+     frontend/src/components/CandidateCard.test.tsx and
+     frontend/src/routes/ReviewPage.test.tsx.
+     PRE backend (BASE worktree): 5 failed (route 404). Raw committed.
+     PRE frontend (BASE worktree): 3 failed | 5 passed ("Unable to find role button /split/i").
+     Raw committed (verify log §3-4).
+
+[03] G1 implemented:
+     backend/app/services/candidates.py:
+       CandidateSplitError (+ HTTP status_code), SPLIT_ORIGIN_STATE="split",
+       _split_child_fields(), split_candidate(): validates state==proposed,
+       ai_items list >=2, item_indexes unique ints covering every index exactly once
+       and len>=2 (empty/single/partial/dup/out-of-range -> 422 before any write);
+       per-item fields + shared deterministic fields; shared evidence; origin
+       provider/model/template/call ids; ai_unknowns remapped per item; needs_evidence
+       derived; split_from/split_item_index provenance; origin -> "split"; resolves
+       open candidate.multi_item task(s) with an audit row; candidate.split audit row.
+     backend/app/api/v1/candidates.py:
+       CandidateSplitRequest; POST /v1/candidates/{id}/split (404/403/422/409);
+       merged the non-decidable guard to `state in {"rejected","split"}` -> 409
+       (preserves the rejected message). The guard is the G1 "origin leaves the
+       decidable set" requirement in the ceiling file; the only added route is split.
+
+[04] G2 implemented:
+     frontend/src/api/types.ts: CandidateSplitChild, CandidateSplitResponse.
+     frontend/src/api/client.ts: candidateSplit() beside candidateDecision().
+     frontend/src/components/CandidateCard.tsx: optional splitItemCount/onSplit/splitBusy;
+       button rendered iff a multi-item count is supplied (label from the data count).
+     frontend/src/routes/ReviewPage.tsx: react-query fetch of /v1/review-tasks (existing
+       route) -> open candidate.multi_item task for this candidate -> item_count drives
+       the split indexes (data, no hardcoded list); split mutation invalidates candidate +
+       review-tasks queries and presents the children as links from the response.
+
+[05] POST tests:
+     backend test_review_split.py => 5 passed, 1 warning in 1.08s.
+     frontend two files          => 8 passed in 842ms.
+     FULL backend suite          => 2 failed, 126 passed in 8.69s (known decoder reds).
+     ruff check app tests        => All checks passed!
+     mypy app                    => 40 errors in 9 files (baseline 40-in-9; none in edited files).
+     npm run build               => green, 93 modules, built in 864ms.
+     npx vitest run              => 9 files, 25 passed.
+     Secret scan                 => 0 real-key matches (SG-031 sentinel only).
+     No migration, no prompt diff, no ignored file staged, no network (verify log §5c-5e).
+
+[06] DESIGN CALLS (mine, reported):
+     - Full-coverage item_indexes (name every item exactly once) so no item is silently
+       dropped when the origin retires.
+     - Origin state "split" -> later decision 409.
+     - Child dedup_matches=[] (not computed per item) and ai_unknowns remapped to item 0;
+       no child review tasks created.
+     - UI "multi-item open" detected from /v1/review-tasks; ai_items NOT added to the
+       candidate GET route (kept the "split route only" ceiling).
+     - New dedicated test file (the split seam deserves its own file).
+
+[07] Commit + push to automation; receipt note on WORK_HEAD (ref
+     refs/notes/storagegenie-coder-reports). note=yes (see report G5).
+
+MODEL: unknown (CLI default omitted per policy) — parent argv:
+       opencode run --auto --dir /home/andrei/StorageGenie --variant medium # SG-033 ...
+EFFORT: medium — parent argv --variant medium.
+SPEND: $0. NETWORK ATTEMPTS: 0 (in-process tests only).

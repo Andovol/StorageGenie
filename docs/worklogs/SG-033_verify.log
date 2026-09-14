@@ -1,0 +1,202 @@
+# SG-033 verify log — FAIL-then-PASS raw, gates, read-back, secret scan, scope, network proof
+
+First token `SG-033`. BASE REF `automation` -> resolved `042e9c75ec891f97fd136e18cebceb6ef6840c31`.
+All backend commands run from `backend/` with `/home/andrei/StorageGenie/venv/bin/python`
+(the checked workspace venv named in README.md:36). Frontend via the nvm `npx`
+(`/home/andrei/.nvm/versions/node/v24.14.1/bin/npx`; `npx` is not on the dispatch PATH —
+the local `node_modules/.bin/vitest` is the same binary). Per-command-class timeouts:
+120s probes, 600s suite, 600s build, 600s vitest.
+
+## 1. Starting tree (clean expected)
+
+$ git status --porcelain=v1 -b        # at BASE
+## automation...origin/automation
+$ git rev-parse HEAD
+042e9c75ec891f97fd136e18cebceb6ef6840c31
+$ git branch --show-current
+automation
+
+Clean before work (no entries above the branch line). Branch `automation`, origin
+`git@github.com:Andovol/StorageGenie.git`.
+
+## 2. Premise reads (quoted)
+
+- Multi-item candidate -> `candidate.multi_item` task, `backend/app/services/candidates.py:257-270`:
+      task_ids: list[str] = []
+      if len(extraction.items) > 1:
+          task = ReviewTask(
+              task_type="candidate.multi_item",
+              priority="high",
+              subject_ref=candidate.id,
+              proposed_change=json.dumps(
+                  {"candidate_id": candidate.id, "item_count": len(extraction.items)}
+              ),
+              status="open",
+              household_id=job.household_id,
+          )
+- Proposal carries the item list + provenance, `backend/app/services/candidates.py:232-245`:
+      proposal: dict[str, object] = {
+          "kind": "new_asset",
+          "asset_id": None,
+          "fields": fields,
+          "dedup_matches": [],
+          "review_task_ids": [],
+          "ai_items": [item.model_dump() for item in extraction.items],
+          "ai_unknowns": list(extraction.unknowns),
+          "needs_evidence": extraction.needs_evidence,
+          "ai_provider": provider,
+          "ai_model": model,
+          "prompt_template_version": version,
+          "provider_call_ids": call_ids,
+      }
+  FINDING F-SG033-1: the packet says the proposal carries `evidence_ids`; it does not. Evidence
+  ids live on the Candidate row (`evidence_ids_json`, `candidates.py:248`). The split uses
+  `candidate.evidence_ids_json` for the shared evidence, which is the real source.
+- Candidate columns, `backend/app/services/candidates.py:246-252`: `job_id`, `evidence_ids_json`,
+  `proposed_fields_json`, `state`, `household_id` (verified).
+- Decision route was whole-candidate only, `backend/app/api/v1/candidates.py:16-22` (BASE):
+      class CandidateDecision(BaseModel):
+          action: Literal["accept", "edit", "hold", "reject"]
+          corrected_fields: dict[str, object] = Field(default_factory=dict)
+
+
+      @router.post("/candidates/{candidate_id}/decision")
+      def decide_candidate(
+- Schema already supports many-to-many asset<->evidence, `backend/app/models/evidence.py:7`:
+      # Join table: many-to-many asset ↔ evidence (one photo can back multiple assets after split/merge)
+- No split route/UI existed pre-change: a source grep of `backend/app/api/v1/` and
+  `frontend/src/` for "split" returned no matches at BASE.
+
+## 3. FAIL-then-PASS — backend (`tests/test_review_split.py`, new; seam deserves its own file)
+
+PRE (BASE `042e9c7` in a throwaway worktree carrying only the new test file):
+
+  $ cd backend && ../venv/bin/python -m pytest tests/test_review_split.py -q
+  >           assert response.status_code == 200, response.text
+  E           assert 404 == 200
+  E            +  where 404 = <Response [404 Not Found]>.status_code
+  ...
+  FAILED tests/test_review_split.py::test_split_yields_per_item_children_with_shared_evidence_and_provenance
+  FAILED tests/test_review_split.py::test_split_empty_selection_is_422_and_creates_nothing
+  FAILED tests/test_review_split.py::test_split_single_item_is_422_and_creates_nothing
+  FAILED tests/test_review_split.py::test_split_out_of_range_or_duplicate_indexes_is_422
+  FAILED tests/test_review_split.py::test_split_is_refused_for_unknown_candidate_and_wrong_household
+  5 failed, 1 warning in 0.93s
+
+POST (working tree):
+  $ cd backend && ../venv/bin/python -m pytest tests/test_review_split.py -q
+  5 passed, 1 warning in 1.08s
+
+## 4. FAIL-then-PASS — frontend (`CandidateCard.test.tsx` + `ReviewPage.test.tsx`)
+
+PRE (BASE tree, modified test files only, node_modules symlinked):
+
+  $ npx vitest run src/components/CandidateCard.test.tsx src/routes/ReviewPage.test.tsx
+   ❯ src/components/CandidateCard.test.tsx  (4 tests | 1 failed)
+       → Unable to find an accessible element with the role "button" and name `/split/i`
+   ❯ src/routes/ReviewPage.test.tsx  (4 tests | 2 failed)
+       → Unable to find role="button" and name `/split/i`
+   FAIL  src/components/CandidateCard.test.tsx > CandidateCard > split action appears only when a multi-item count is supplied and fires once
+   FAIL  src/routes/ReviewPage.test.tsx > ReviewPage > multi-item task reveals the split action and presents the children after split
+   FAIL  src/routes/ReviewPage.test.tsx > ReviewPage > split rejection surfaces an alert
+   Test Files  2 failed (2)
+        Tests  3 failed | 5 passed (8)
+
+POST (working tree):
+  $ npx vitest run src/components/CandidateCard.test.tsx src/routes/ReviewPage.test.tsx
+   Test Files  2 passed (2)
+        Tests  8 passed (8)
+        Duration  842ms
+
+## 5. Full gates
+
+$ cd backend && ../venv/bin/python -m pytest -q
+2 failed, 126 passed, 10 warnings in 8.69s
+FAILED tests/test_signals.py::test_generated_codes_are_validated_and_bad_checksum_is_not_an_identifier
+FAILED tests/test_signals.py::test_ocr_has_text_boxes_and_mean_confidence
+
+$ cd backend && ../venv/bin/python -m ruff check app tests
+All checks passed!
+
+$ cd backend && ../venv/bin/python -m mypy app
+Found 40 errors in 9 files (checked 60 source files)
+# none in the two edited source files (app/api/v1/candidates.py, app/services/candidates.py)
+
+$ cd frontend && npm run build
+vite v5.4.21 building for production...
+✓ 93 modules transformed.
+dist/index.html                  0.32 kB │ gzip:  0.24 kB
+dist/assets/index-4QhI8m_m.js  242.57 kB │ gzip: 74.92 kB
+✓ built in 864ms
+
+$ cd frontend && npx vitest run
+ Test Files  9 passed (9)
+      Tests  25 passed (25)
+
+### 5a. The 2 suite reds are pre-existing (base-commit proof)
+
+$ cd backend && ../venv/bin/python -m pytest -q        # BASE 042e9c7
+2 failed, 121 passed, 10 warnings in 7.48s
+FAILED tests/test_signals.py::test_generated_codes_are_validated_and_bad_checksum_is_not_an_identifier
+FAILED tests/test_signals.py::test_ocr_has_text_boxes_and_mean_confidence
+# (decoder env: pyzbar/libzbar + pytesseract absent; same two reds before and after)
+
+### 5b. mypy baseline (pre-existing, not introduced)
+
+$ # BASE 042e9c7 worktree, same command:
+Found 40 errors in 9 files (checked 60 source files)
+$ # working tree: Found 40 errors in 9 files (checked 60 source files)
+# error files: assets.py, evidence.py, households.py, review_tasks.py, main.py, base.py,
+#              schemas/asset.py, asset_service.py, audit_service.py — none of them edited here.
+
+### 5c. Secret scan (names/counts only; CO-44) and no ignored file staged
+
+$ git grep -nE '(sk-[A-Za-z0-9_-]{12,}|OPENCODE_API_KEY=[A-Za-z0-9])' -- . ':!*.lock'
+backend/tests/test_settings.py:47:SENTINEL_KEY = "sk-SENTINEL-KEY-MUST-NEVER-APPEAR"
+$ # excluding the known SG-031 test sentinel:
+0 real-key matches
+$ git diff --cached --name-only
+(empty — nothing staged)
+
+### 5d. Scope check: changed paths only (no migration / prompt / corpus)
+
+$ git diff --name-only HEAD
+backend/app/api/v1/candidates.py
+backend/app/services/candidates.py
+frontend/src/api/client.ts
+frontend/src/api/types.ts
+frontend/src/components/CandidateCard.test.tsx
+frontend/src/components/CandidateCard.tsx
+frontend/src/routes/ReviewPage.test.tsx
+frontend/src/routes/ReviewPage.tsx
+$ git status --short
+?? backend/tests/test_review_split.py
+$ git status --short | grep -E "alembic|prompts"
+(no migration/prompt changes)
+
+### 5e. Network proof (zero live calls, spend $0)
+
+$ grep -nE "httpx|requests|urlopen|socket|_post|http://|https://" backend/tests/test_review_split.py
+(no network symbols in the new test file)
+$ # All split proofs go through fastapi.testclient.TestClient (in-process ASGI) against a temp
+$ # SQLite database; the split service and route perform no provider/network I/O; no provider
+$ # registry or consent toggle is touched; no key is read. No live/eval run was executed.
+
+### 5f. Health probe (CO-92) — unanswered, not worked around
+
+$ docker compose ps
+[compose] 0 services
+$ curl -s --max-time 5 -o /dev/null -w "http_code=%{http_code}\n" http://localhost:8000/v1/health
+http_code=404
+$ ss -ltnp | grep -E ":8000|:8003"
+LISTEN 0      4096       127.0.0.1:8000       0.0.0.0:*
+# listener is unrelated (answers "Not Found" for /v1/health); no compose service runs.
+# No service was started or deployed (deploying is out of scope). Start=end=not running, delta 0.
+
+## 6. PG-SC-02 read-back
+
+The split response names each child (`id`), and the tests read each child back through the
+existing candidate route `GET /v1/candidates/{candidate_id}` (200) plus the persisted
+`proposed_fields_json`, proving `ai_items` traced origin -> child:
+`child["ai_items"][0]["name"] == origin["ai_items"][i]["name"]`, with `split_from == candidate.id`.
+The origin's `candidate.multi_item` task status is `resolved` in the same committed session.
