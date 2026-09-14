@@ -69,6 +69,7 @@ class Category:
     tier_defaults: dict[str, int]
     default_tier: str
     phase: str | None = None
+    opened_date_tracking: bool = False
 
     def profile(self, tier: str | None = None) -> dict[str, Any]:
         if not self.tier_defaults:
@@ -76,7 +77,7 @@ class Category:
                 "notification_tier": None,
                 "notification_days": None,
                 "tier_defaults": {},
-                "opened_date_tracking": False,
+                "opened_date_tracking": self.opened_date_tracking,
                 "disposal_guidance": False,
             }
         selected = tier or self.default_tier
@@ -86,7 +87,7 @@ class Category:
             "notification_tier": selected,
             "notification_days": self.tier_defaults[selected],
             "tier_defaults": dict(self.tier_defaults),
-            "opened_date_tracking": False,
+            "opened_date_tracking": self.opened_date_tracking,
             "disposal_guidance": self.slug in {"food_beverages", "medicine_pharma"},
         }
 
@@ -101,6 +102,11 @@ MEDICINE_TIERS = {
     NotificationTier.URGENT.value: 3,
     NotificationTier.UPCOMING.value: 14,
 }
+COSMETICS_TIERS = {
+    NotificationTier.CRITICAL.value: 7,
+    NotificationTier.URGENT.value: 30,
+    NotificationTier.UPCOMING.value: 90,
+}
 
 CATEGORIES: dict[str, Category] = {
     "food_beverages": Category(
@@ -110,7 +116,13 @@ CATEGORIES: dict[str, Category] = {
         "medicine_pharma", "Medicine/pharma", True, True, MEDICINE_TIERS, NotificationTier.UPCOMING.value
     ),
     "cosmetics_personal_care": Category(
-        "cosmetics_personal_care", "Cosmetics/personal care", False, True, {}, "", "Phase 3"
+        "cosmetics_personal_care",
+        "Cosmetics/personal care",
+        True,
+        True,
+        COSMETICS_TIERS,
+        NotificationTier.UPCOMING.value,
+        opened_date_tracking=True,
     ),
     "household_chemicals": Category(
         "household_chemicals", "Household chemicals", False, True, {}, "", "Phase 3"

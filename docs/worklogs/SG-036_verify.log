@@ -1,0 +1,211 @@
+SG-036 verify log — raw runs and transcripts
+Bounds per command class: probes 120s, backend suite 600s, early-close 1800s, overall 2400s.
+No command was killed; every command observed progress and exited.
+
+## 0. Starting tree + base reference
+
+$ git status --porcelain            # (empty => clean starting tree)
+$ git branch --show-current
+automation
+$ git rev-parse HEAD
+bc9d69f267f619a1dfe70e6a14b9ed620f59b615
+$ git fetch origin automation       # ok fetched (1 new refs) — already current
+$ git rev-parse origin/automation
+bc9d69f267f619a1dfe70e6a14b9ed620f59b615
+$ git remote -v
+origin  git@github.com:Andovol/StorageGenie.git (fetch)
+origin  git@github.com:Andovol/StorageGenie.git (push)
+
+Premise reads (paths named in the packet):
+- backend/app/services/providers/schemas.py:30-54 — ExtractionItem fields + expiry_date-only validator.
+- backend/app/services/providers/reader.py:51-54 — PROMPT_FILES = {"food", "medicine"}.
+- backend/app/plugins/expiry_tracker.py:112-114 — cosmetics_personal_care active False, {} tiers, "Phase 3".
+- backend/app/plugins/expiry_tracker.py:79,89 — opened_date_tracking False hardcoded in both profile() branches.
+- backend/eval/corpus/sg029/manifest.json:5 — "count": 7 (Food/Medicine). Top-level
+  backend/eval/corpus/*.json = 5 SG-026 fixtures (no images). PATH NUANCE, work unaffected.
+
+## 1. BASE run (detached worktree @ bc9d69f) — re-verified, not inherited
+
+$ git worktree add --detach /tmp/opencode/sg036-base bc9d69f...
+$ cd /tmp/opencode/sg036-base/backend && /usr/bin/time -f "ELAPSED=%es" timeout 600 venv/bin/python -m pytest -q
+...
+2 failed, 132 passed, 14 warnings in 9.83s
+Command exited with non-zero status 1
+ELAPSED=11.26s
+FAILED tests/test_signals.py::test_generated_codes_are_validated_and_bad_checksum_is_not_an_identifier
+FAILED tests/test_signals.py::test_ocr_has_text_boxes_and_mean_confidence
+
+$ timeout 120 venv/bin/python -m mypy app
+Found 40 errors in 9 files (checked 63 source files)
+$ timeout 120 venv/bin/python -m ruff check app tests
+All checks passed!
+
+The 2 reds are the carried decoder env nodes (pyzbar/libzbar and pytesseract absent on this host).
+
+## 2. FAIL-then-PASS — PRE change (implementation stashed; tests + corpus kept)
+
+$ git stash push -u -- backend/app backend/eval/run.py
+ok stashed
+$ cd backend && timeout 300 venv/bin/python -m pytest -q \
+    tests/test_extraction_contract.py tests/test_plugin_expiry.py tests/test_eval_corpus.py
+...
+E       pydantic_core._pydantic_core.ValidationError: 1 validation error for ExtractionOutput
+E       items.0.opened_date
+E         Extra inputs are not permitted [type=extra_forbidden, input_value='2031-04-10', input_type=str]
+...
+FAILED tests/test_extraction_contract.py::test_opened_date_honors_iso_discipline
+FAILED tests/test_extraction_contract.py::test_unknowns_may_name_opened_date
+FAILED tests/test_extraction_contract.py::test_load_prompt_cosmetics_versioned_and_unknown_category_raises
+FAILED tests/test_extraction_contract.py::test_prompt_files_versioned - FileN...
+FAILED tests/test_plugin_expiry.py::test_classification_profiles_round_trip_and_inactive_phase
+FAILED tests/test_plugin_expiry.py::test_cosmetics_classifies_without_a_new_task_type
+FAILED tests/test_eval_corpus.py::test_provider_output_cache_parses_strictly
+7 failed, 20 passed, 2 warnings in 1.51s
+
+Pre-change facts: `opened_date` is not a field (extra_forbidden); `load_prompt("cosmetics")` raises
+(no PROMPT_FILES entry / no file); cosmetics is an inactive category.
+
+## 3. FAIL-then-PASS — POST change
+
+$ git stash pop
+ok stash pop
+$ cd backend && timeout 300 venv/bin/python -m pytest -q \
+    tests/test_extraction_contract.py tests/test_plugin_expiry.py tests/test_eval_corpus.py
+27 passed, 2 warnings in 1.40s
+
+## 4. POST full backend suite
+
+$ cd backend && /usr/bin/time -f "ELAPSED=%es" timeout 600 venv/bin/python -m pytest -q
+...
+2 failed, 137 passed, 14 warnings in 9.71s
+Command exited with non-zero status 1
+ELAPSED=11.15s
+FAILED tests/test_signals.py::test_generated_codes_are_validated_and_bad_checksum_is_not_an_identifier
+FAILED tests/test_signals.py::test_ocr_has_text_boxes_and_mean_confidence
+
+Same two base-proved decoder reds; 132 -> 137 passed (5 new tests). No new red.
+
+## 5. Lint / types / offline eval
+
+$ timeout 120 venv/bin/python -m ruff check app tests
+All checks passed!
+
+$ timeout 180 venv/bin/python -m mypy app
+Found 40 errors in 9 files (checked 63 source files)
+
+$ timeout 180 venv/bin/python -m mypy \
+    app/services/providers/schemas.py app/services/providers/reader.py app/plugins/expiry_tracker.py
+app/models/base.py:8: error: Unused "type: ignore" comment  [unused-ignore]
+app/services/audit_service.py:16: error: Missing type arguments for generic type "dict"  [type-arg]
+app/services/audit_service.py:17: error: Missing type arguments for generic type "dict"  [type-arg]
+Found 3 errors in 2 files (checked 3 source files)
+# The 3 reported errors are in dependencies (base.py, audit_service.py); ZERO in the touched files.
+# mypy delta vs BASE = 0 (40-in-9 checked 63 both before and after).
+
+$ timeout 120 venv/bin/python eval/run.py --check-only
+corpus integrity OK: 10 fixtures (manifest count 10)
+
+$ timeout 120 venv/bin/python eval/run.py
+fixture sg029-01-clean-food: score=1.000 needs=1 unknowns=1 items=1.00
+fixture sg029-02-clean-medicine: score=1.000 needs=1 unknowns=1 items=1.00
+fixture sg029-03-glare-food: score=0.000 needs=0 unknowns=0 items=0.00
+fixture sg029-04-clutter-food: score=1.000 needs=1 unknowns=1 items=1.00
+fixture sg029-05-partial-label-food: score=0.667 needs=1 unknowns=0 items=1.00
+fixture sg029-06-partial-label-medicine: score=1.000 needs=1 unknowns=1 items=1.00
+fixture sg029-07-no-date-visible-medicine: score=0.667 needs=1 unknowns=0 items=1.00
+fixture sg029-08-clean-cosmetics: score=1.000 needs=1 unknowns=1 items=1.00
+fixture sg029-09-no-date-visible-cosmetics: score=1.000 needs=1 unknowns=1 items=1.00
+fixture sg029-10-partial-label-cosmetics: score=1.000 needs=1 unknowns=1 items=1.00
+field_accuracy=0.833 over 10 fixtures
+unknown_rate=4/7=0.571
+correction_rate=0/6=0.000 (audit_event plugin.assertion.write rows=6)
+
+Food/Medicine per-fixture scores are IDENTICAL to the SG-029 baseline (regression check: no change
+to the existing scorer path). Cosmetics 1.000 is against AUTHORED offline references, not a model —
+see report §Vacuous-pass; no live leg was run (zero calls, $0).
+
+## 6. Negative proofs
+
+$ git diff --name-only -- backend/alembic        # (empty)
+$ git diff --stat -- backend/app/services/providers/prompts/extract-food-v1.md \
+      backend/app/services/providers/prompts/extract-medicine-v1.md   # (empty — byte-identical)
+$ git diff --name-only -- frontend               # (empty — zero frontend files; no build needed)
+$ cd backend && timeout 120 venv/bin/python -m pytest -q tests/test_postgres_dialect.py
+1 passed in 0.23s
+# NO registry change: no tables were added, so EXPECTED_TABLES == Base.metadata.tables already holds.
+
+$ git diff --check                              # (clean)
+
+## 7. Secrets / network / health
+
+Secret-VALUE scan (literal assignments / private-key blocks / sk- prefixes; identifiers and
+OPENCODE_API_KEY *names* are excluded per CO-44 — only names/counts reported):
+$ rg -n --hidden -g '!venv/**' -g '!.git/**' -g '!node_modules/**' -g '!*.log' -g '!docs/**' \
+    '(api[_-]?key|secret|password|token)\s*[:=]\s*["'\''][^"'\'']{6,}["'\'']|sk-[A-Za-z0-9]{16,}|BEGIN [A-Z ]*PRIVATE KEY' backend
+# 0 matches
+$ test -f .env && grep -c '^OPENCODE_API_KEY=' .env
+1                          # presence COUNTS only; value never printed/read
+$ git ls-files | rg -i '(^|/)\.env$'
+# 0 (no .env tracked)
+
+Network symbols in changed/new files:
+$ rg -n 'requests\.|httpx\.|urllib|socket\.|urlopen|https?://' <changed files>
+backend/app/plugins/expiry_tracker.py:155:  "$schema": "https://json-schema.org/draft/2020-12/schema",
+# The single hit is the pre-existing JSON-Schema $schema identifier constant (not a call site).
+
+$ timeout 30 docker compose ps
+NAME      IMAGE     COMMAND   SERVICE   CREATED   STATUS    PORTS
+# 0 services
+$ timeout 20 curl -s -m 10 http://localhost:8000/v1/health
+Not Found
+$ ss -ltnp | rg ':8000'
+LISTEN 0  4096  127.0.0.1:8000  0.0.0.0:*
+# A foreign process owns :8000 (no project service); /v1/health is answered by that occupant, not us.
+# HEALTH = unanswered (no stack deployed this slice; starting one is deploying, out of scope).
+
+## 8. Scope / changed tree
+
+$ git status --porcelain
+ M backend/app/plugins/expiry_tracker.py
+ M backend/app/services/providers/reader.py
+ M backend/app/services/providers/schemas.py
+ M backend/eval/corpus/sg029/generate.py
+ M backend/eval/corpus/sg029/manifest.json
+ M backend/eval/run.py
+ M backend/tests/test_eval_corpus.py
+ M backend/tests/test_extraction_contract.py
+ M backend/tests/test_plugin_expiry.py
+?? backend/app/services/providers/prompts/extract-cosmetics-v1.md
+?? backend/eval/corpus/sg029/images/sg029_08_clean_cosmetics.png
+?? backend/eval/corpus/sg029/images/sg029_09_no_date_visible_cosmetics.png
+?? backend/eval/corpus/sg029/images/sg029_10_partial_label_cosmetics.png
+?? backend/eval/corpus/sg029/sg029_08_clean_cosmetics.json
+?? backend/eval/corpus/sg029/sg029_09_no_date_visible_cosmetics.json
+?? backend/eval/corpus/sg029/sg029_10_partial_label_cosmetics.json
+(plus the 3 new docs/worklogs/SG-036_* files committed with this)
+
+Ignored artifact confirmation (never staged): venv/, .env, __pycache__/, .pytest_cache/... remain
+untracked-ignored. No ignored file is staged.
+
+## 9. Generator determinism
+
+$ cd backend/eval/corpus/sg029 && venv/bin/python generate.py
+wrote images/sg029_01_clean_food.png (9709 bytes)
+... (07 originals unchanged) ...
+wrote images/sg029_08_clean_cosmetics.png (14260 bytes)
+wrote images/sg029_09_no_date_visible_cosmetics.png (9643 bytes)
+wrote images/sg029_10_partial_label_cosmetics.png (10001 bytes)
+$ git status --porcelain -- backend/eval/corpus/sg029/images
+?? backend/eval/corpus/sg029/images/sg029_08_clean_cosmetics.png
+?? backend/eval/corpus/sg029/images/sg029_09_no_date_visible_cosmetics.png
+?? backend/eval/corpus/sg029/images/sg029_10_partial_label_cosmetics.png
+# Only the 3 new PNGs differ: the 7 committed originals reproduced byte-for-byte.
+
+## 10. Model / effort provenance (CO-78, from process arguments)
+
+$ tr '\0' ' ' < /proc/$PPID/cmdline
+opencode run --auto --dir /home/andrei/StorageGenie --variant medium # SG-036 — Cosmetics category + opened-date tracking (opencode, medium)
+$ grandparent cmdline
+bash /usr/local/lib/dispatch/run-coder SG-036
+# Coder = opencode; effort = medium (--variant medium); model id is ABSENT from argv =>
+# ERROR_MODEL=unknown per policy (never a guess from a system-prompt identity line).

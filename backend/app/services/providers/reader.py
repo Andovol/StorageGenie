@@ -51,6 +51,7 @@ PROMPTS_DIR = Path(__file__).resolve().parent / "prompts"
 PROMPT_FILES = {
     "food": "extract-food-v1.md",
     "medicine": "extract-medicine-v1.md",
+    "cosmetics": "extract-cosmetics-v1.md",
 }
 RETRYABLE_ERRORS = frozenset(
     {"outage", "timeout", "rate_limited", "transport", "http_status", "invalid_json"}

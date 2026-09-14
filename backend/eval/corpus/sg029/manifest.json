@@ -1,8 +1,8 @@
 {
   "corpus": "sg029",
-  "description": "Synthetic Food/Medicine image corpus for the SG-029 metered baseline. Ground truth is authored from the committed render recipe (generate.py); provider_output caches are written by the one metered run and scored offline thereafter.",
+  "description": "Synthetic Food/Medicine/Cosmetics image corpus for the SG-029 metered baseline and the SG-036 cosmetics extension. Ground truth is authored from the committed render recipe (generate.py); Food/Medicine provider_output caches are written by the one metered SG-029 run and scored offline thereafter, while the SG-036 cosmetics provider_output entries are authored offline references (no live call in SG-036).",
   "base_dir": "sg029",
-  "count": 7,
+  "count": 10,
   "fixtures": [
     "sg029_01_clean_food.json",
     "sg029_02_clean_medicine.json",
@@ -10,6 +10,9 @@
     "sg029_04_clutter_food.json",
     "sg029_05_partial_label_food.json",
     "sg029_06_partial_label_medicine.json",
-    "sg029_07_no_date_visible_medicine.json"
+    "sg029_07_no_date_visible_medicine.json",
+    "sg029_08_clean_cosmetics.json",
+    "sg029_09_no_date_visible_cosmetics.json",
+    "sg029_10_partial_label_cosmetics.json"
   ]
 }

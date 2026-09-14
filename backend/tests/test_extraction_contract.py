@@ -23,6 +23,7 @@ from app.db import Base
 from app.models import Asset, Household, ReviewTask
 from app.plugins.expiry_tracker import EXPIRY_FIELD, apply_extraction_result
 from app.services.providers.fake import FakeProvider
+from app.services.providers.reader import load_prompt
 from app.services.providers.schemas import (
     ExtractionFailedError,
     ExtractionOutput,
@@ -246,6 +247,66 @@ def test_no_bridge_without_needs_evidence(bridge_db) -> None:  # type: ignore[no
     assert session.query(ReviewTask).filter_by(subject_ref=asset.id).count() == 0
 
 
+def test_opened_date_honors_iso_discipline() -> None:
+    """SG-036: opened_date shares expiry_date's YYYY-MM-DD discipline, not a loose copy."""
+    base = {
+        "items": [
+            {
+                "name": "Face cream",
+                "expiry_date": None,
+                "opened_date": "2031-04-10",
+                "date_type": None,
+                "confidence": 1.0,
+                "uncertainty_reasons": [],
+            }
+        ],
+        "unknowns": [],
+        "needs_evidence": False,
+    }
+    assert parse_extraction_output(base).items[0].opened_date == "2031-04-10"
+
+    for bad in ("2031/04/10", "2031-4-10", "2031-04-10T00:00:00", "not-a-date"):
+        broken = deepcopy(base)
+        broken["items"][0]["opened_date"] = bad
+        with pytest.raises(ValidationError):
+            parse_extraction_output(broken)
+
+
+def test_unknowns_may_name_opened_date() -> None:
+    """The unknowns validator reads model_fields, so opened_date flows without a new path."""
+    unknown = {
+        "items": [
+            {
+                "name": "Shampoo",
+                "expiry_date": None,
+                "opened_date": None,
+                "date_type": None,
+                "confidence": 0.5,
+                "uncertainty_reasons": ["opened date not legible"],
+            }
+        ],
+        "unknowns": ["items.0.opened_date"],
+        "needs_evidence": True,
+    }
+    out = parse_extraction_output(unknown)
+    assert out.unknowns == ["items.0.opened_date"]
+    assert out.items[0].opened_date is None
+
+    fabricated = deepcopy(unknown)
+    fabricated["items"][0]["opened_date"] = "2031-04-10"
+    with pytest.raises(ValidationError):
+        parse_extraction_output(fabricated)
+
+
+def test_load_prompt_cosmetics_versioned_and_unknown_category_raises() -> None:
+    text, version = load_prompt("cosmetics")
+    assert version == "extract-cosmetics-v1"
+    assert "never infer beyond visible evidence" in text
+    assert "opened_date" in text
+    with pytest.raises(ValueError):
+        load_prompt("does-not-exist")
+
+
 def test_corpus_integrity() -> None:
     fixtures = sorted(CORPUS_DIR.glob("*.json"))
     assert len(fixtures) == 5
@@ -259,7 +320,7 @@ def test_corpus_integrity() -> None:
 
 
 def test_prompt_files_versioned() -> None:
-    for name in ("extract-food-v1", "extract-medicine-v1"):
+    for name in ("extract-food-v1", "extract-medicine-v1", "extract-cosmetics-v1"):
         path = PROMPTS_DIR / f"{name}.md"
         text = path.read_text(encoding="utf-8")
         assert text.startswith("---\n")

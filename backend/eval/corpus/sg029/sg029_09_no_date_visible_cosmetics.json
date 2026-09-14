@@ -1,0 +1,39 @@
+{
+  "id": "sg029-09-no-date-visible-cosmetics",
+  "class": "no-date-visible",
+  "category": "cosmetics",
+  "image": "images/sg029_09_no_date_visible_cosmetics.png",
+  "note": "Synthetic shampoo label showing only volume and claim text: no opened or expiry date appears in frame. needs-evidence case. provider_output is an AUTHORED offline reference for SG-036 integrity scoring, never a live model read (zero calls this slice).",
+  "ground_truth": {
+    "items": [
+      {
+        "name": "Shampoo",
+        "opened_date": null
+      }
+    ],
+    "unknowns": [
+      "items.0.opened_date"
+    ],
+    "needs_evidence": true,
+    "expectation_class": "needs-evidence"
+  },
+  "provider_output": {
+    "items": [
+      {
+        "name": "SHAMPOO",
+        "expiry_date": null,
+        "opened_date": null,
+        "date_type": null,
+        "lot": null,
+        "confidence": 0.9,
+        "uncertainty_reasons": [
+          "no opened or expiry date printed on the visible panel; only volume and claim text are shown"
+        ]
+      }
+    ],
+    "unknowns": [
+      "items.0.opened_date"
+    ],
+    "needs_evidence": true
+  }
+}

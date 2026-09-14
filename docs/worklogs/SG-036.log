@@ -1,0 +1,86 @@
+SG-036 execution log (chronological; elapsed in seconds unless noted)
+Dispatch: SG-036 — Cosmetics category + opened-date tracking (opencode, medium)
+
+[00] Recon — BASE REF `automation` -> resolved commit bc9d69f267f619a1dfe70e6a14b9ed620f59b615
+     (two fields: ref = automation, commit = bc9d69f...). `git status --porcelain` empty (clean);
+     branch automation; origin git@github.com:Andovol/StorageGenie.git. Packet read:
+     docs/packets (committed as HEAD bc9d69f "Packet SG-036 ...").
+
+     Premises verified against the tree (quoted reads; verify log §0):
+     - schemas.py ExtractionItem fields name/expiry_date/date_type/lot/confidence/uncertainty_reasons;
+       ISO validator on expiry_date only. No opened_date. VERIFIED.
+     - reader.py PROMPT_FILES = {food, medicine}. No cosmetics. VERIFIED.
+     - expiry_tracker.py cosmetics_personal_care active=False, tiers {}, phase "Phase 3";
+       profile() hardcodes opened_date_tracking False in BOTH branches. has_expiry already True.
+       VERIFIED.
+     - eval corpus: the 7-fixture manifest is backend/eval/corpus/sg029/manifest.json (count 7,
+       Food/Medicine). The top-level backend/eval/corpus/ holds 5 SG-026 JSONs (no images).
+       PATH NUANCE recorded, not a discrepancy that changes the work.
+     - Frozen prompts extract-food-v1.md / extract-medicine-v1.md exist; never edited.
+
+[01] Baselines before ANY edit (base worktree /tmp/opencode/sg036-base @ bc9d69f; bound 120/600):
+     - full suite: 2 failed, 132 passed, 14 warnings in 9.83s — exactly the 2 known decoder env reds
+       (test_signals.py pyzbar/libzbar + pytesseract absent). RE-VERIFIED, not inherited.
+     - mypy app: 40 errors in 9 files (checked 63). ruff: All checks passed!
+     - health: docker compose ps => 0 services; curl :8000/v1/health => "Not Found";
+       :8000 LISTEN owned by a foreign process (SG-021 identified a ShoperOS Uvicorn occupant).
+       Reported unanswered (no service deployed).
+
+[02] G1 implemented (all within ceiling):
+     - schemas.py: ExtractionItem.opened_date: str | None = None; the existing `_date_is_iso`
+       validator now covers ("expiry_date", "opened_date") and names the offending field via
+       ValidationInfo.field_name. One shared validator, no loose duplicate.
+     - new prompts/extract-cosmetics-v1.md following the food shape exactly (front matter
+       template_version/category/output_schema/repair_policy; 9 rules; unknowns discipline;
+       single-repair section). PAO/open-jar printed date -> opened_date only when fully legible;
+       `12M`-style period prints are explicitly NOT open dates.
+     - reader.py: PROMPT_FILES += "cosmetics": "extract-cosmetics-v1.md" (that line only).
+     - expiry_tracker.py: Category gains `opened_date_tracking: bool = False` (after phase, so
+       positional construction is preserved); profile() returns self.opened_date_tracking in BOTH
+       branches (flag is now per-category); COSMETICS_TIERS = {critical:7, urgent:30, upcoming:90};
+       cosmetics_personal_care activated (active True, tiers, default upcoming, opened=True).
+       Tier values DECLARED UNCALIBRATED per G-A9.
+
+[03] G2 implemented:
+     - generate.py: 3 cosmetics recipes (clean_cosmetics / no_date_cosmetics /
+       partial_label_cosmetics) + RECIPES entries 08/09/10. Re-running generate.py reproduced the
+       7 original PNGs byte-for-byte (git status clean for them); only the 3 new PNGs are new.
+     - 3 fixture JSONs (sg029_08/09/10) with recipe-authored ground truth + authored offline
+       provider_output references; manifest count 7 -> 10 (corpus ceiling <=10 satisfied exactly).
+     - eval/run.py touched CONDITIONALLY (allowed by the packet): CATEGORIES += "cosmetics";
+       score_fixture compares every date field the ground-truth item declares (expiry_date and/or
+       opened_date), preserving food/medicine scoring exactly.
+     - tests: test_extraction_contract + test_plugin_expiry + test_eval_corpus extended.
+
+[04] FAIL-then-PASS raw (PG-EV-01 / PG-EV-09; verify log §2-§3):
+     - PRE: `git stash push -u -- backend/app backend/eval/run.py` (tests + corpus kept):
+       pytest tests/test_extraction_contract.py tests/test_plugin_expiry.py tests/test_eval_corpus.py
+       => 7 failed, 20 passed, 2 warnings in 1.51s. The raw red includes pydantic
+       `extra_forbidden` on items.0.opened_date and `load_prompt("cosmetics")` ValueError.
+     - POST: `git stash pop`; same command => 27 passed, 2 warnings in 1.40s.
+
+[05] G3 proof (verify log §4-§8):
+     - full suite: 2 failed, 137 passed, 14 warnings in 9.71s — the SAME 2 base-proved decoder reds
+       (base 132 passed + 5 new tests).
+     - ruff app tests: All checks passed!  mypy app: 40 errors in 9 files (checked 63) = BASE
+       (delta 0); the 3 errors mypy reports for the touched files belong to dependencies
+       (base.py, audit_service.py), zero in schemas/reader/expiry_tracker.
+     - eval --check-only: corpus integrity OK: 10 fixtures (manifest count 10).
+       eval offline: 10 fixtures, field_accuracy=0.833; cosmetics 08/09/10 all 1.000.
+     - negatives: alembic diff empty; frozen-prompt diff empty; frontend diff empty; no .env tracked;
+       secret-value scan 0; git diff --check clean; test_postgres_dialect.py 1 passed (NO registry
+       change; no tables added).
+     - health: unanswered (compose 0 services; foreign :8000 listener).
+
+[06] Design calls / findings:
+     - run.py was touched — the packet's conditional ("touch ONLY if cosmetics scoring needs it").
+       It IS needed: the corpus category allowlist and score_fixture otherwise reject cosmetics.
+     - Cosmetics provider_output is an AUTHORED offline reference, not a model read (zero live calls
+       this slice). Therefore cosmetics 1.000 scores are corpus-integrity evidence, NOT a
+       model-accuracy measurement. Stated loudly to avoid a vacuous "scoring green".
+     - No tables touched => the SG-035 CHECK-constraint question does not bind here; deferred to
+       SG-037 as the packet directs.
+     - test_plugin_expiry.py previously asserted Cosmetics was an inactive 422 category; the ceiling
+       includes that file, so updating it is expected, not a deviation.
+
+[07] Worklogs written; commit; push to automation; receipt note on the notes ref (G5).

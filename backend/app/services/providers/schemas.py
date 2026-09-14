@@ -19,7 +19,7 @@ from collections.abc import Callable
 from datetime import date
 from typing import Any
 
-from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
+from pydantic import BaseModel, ConfigDict, Field, ValidationInfo, field_validator, model_validator
 from pydantic import ValidationError as PydanticValidationError
 
 from app.services.providers.router import ProviderError
@@ -34,22 +34,24 @@ class ExtractionItem(BaseModel):
 
     name: str = Field(min_length=1)
     expiry_date: str | None = None
+    opened_date: str | None = None
     date_type: str | None = None
     lot: str | None = None
     confidence: float = Field(ge=0.0, le=1.0)
     uncertainty_reasons: list[str] = Field(default_factory=list)
 
-    @field_validator("expiry_date")
+    @field_validator("expiry_date", "opened_date")
     @classmethod
-    def _date_is_iso(cls, value: str | None) -> str | None:
+    def _date_is_iso(cls, value: str | None, info: ValidationInfo) -> str | None:
         if value is None:
             return None
+        field = info.field_name
         try:
             parsed = date.fromisoformat(value)
         except ValueError as exc:
-            raise ValueError(f"expiry_date must be a valid YYYY-MM-DD date: {value!r}") from exc
+            raise ValueError(f"{field} must be a valid YYYY-MM-DD date: {value!r}") from exc
         if parsed.isoformat() != value:
-            raise ValueError(f"expiry_date must use YYYY-MM-DD format: {value!r}")
+            raise ValueError(f"{field} must use YYYY-MM-DD format: {value!r}")
         return value
 
     @model_validator(mode="after")

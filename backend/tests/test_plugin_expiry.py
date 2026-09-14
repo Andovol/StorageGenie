@@ -69,16 +69,18 @@ def test_classification_profiles_round_trip_and_inactive_phase(plugin_db) -> Non
     session, household_id = plugin_db
     food = make_asset(session, household_id, "Canned beans")
     medicine = make_asset(session, household_id, "Medicine")
+    cosmetics = make_asset(session, household_id, "Moisturiser")
     with TestClient(app) as client:
         food_response = classify(client, food.id, household_id, "Food & beverages")
         medicine_response = classify(client, medicine.id, household_id, "Medicine/pharma")
+        cosmetics_response = classify(client, cosmetics.id, household_id, "Cosmetics/personal care")
         readback = client.get(
             f"/v1/plugins/expiry-tracker/assets/{food.id}/classification",
             params={"household_id": household_id},
         )
         inactive = [
             classify(client, food.id, household_id, category)
-            for category in ("Cosmetics/personal care", "Household chemicals", "Documents/other")
+            for category in ("Household chemicals", "Documents/other")
         ]
     assert food_response.status_code == 200
     assert food_response.json()["classification"]["profile"]["tier_defaults"] == {
@@ -86,17 +88,40 @@ def test_classification_profiles_round_trip_and_inactive_phase(plugin_db) -> Non
         "urgent": 7,
         "upcoming": 30,
     }
+    assert food_response.json()["classification"]["profile"]["opened_date_tracking"] is False
     assert medicine_response.status_code == 200
     assert medicine_response.json()["classification"]["profile"]["tier_defaults"] == {
         "critical": 1,
         "urgent": 3,
         "upcoming": 14,
     }
+    assert medicine_response.json()["classification"]["profile"]["opened_date_tracking"] is False
+    assert cosmetics_response.status_code == 200
+    cosmetics_profile = cosmetics_response.json()["classification"]["profile"]
+    assert cosmetics_profile["tier_defaults"] == {"critical": 7, "urgent": 30, "upcoming": 90}
+    assert cosmetics_profile["opened_date_tracking"] is True
+    assert cosmetics_response.json()["classification"]["category"] == "cosmetics_personal_care"
     assert readback.status_code == 200
     assert readback.json()["classification"]["category"] == "food_beverages"
     stored = session.query(Assertion).filter_by(asset_id=food.id, field_path="plugin:expiry-tracker/classification").one()
     assert json.loads(stored.value_json)["category"] == readback.json()["classification"]["category"]
     assert all(response.status_code == 422 and "Phase 3" in response.json()["detail"] for response in inactive)
+
+
+def test_cosmetics_classifies_without_a_new_task_type(plugin_db) -> None:  # type: ignore[no-untyped-def]
+    """SG-036: the activated category rides the existing classify + manual-entry path."""
+    session, household_id = plugin_db
+    asset = make_asset(session, household_id, "Face cream")
+    with TestClient(app) as client:
+        response = classify(client, asset.id, household_id, "cosmetics")
+    assert response.status_code == 200
+    body = response.json()
+    assert body["classification"]["category"] == "cosmetics_personal_care"
+    assert body["classification"]["profile"]["opened_date_tracking"] is True
+    assert body["expiry_assertion"]["review_state"] == "needs_evidence"
+    assert body["review_task"] is not None
+    tasks = session.query(ReviewTask).filter_by(subject_ref=asset.id).all()
+    assert len(tasks) == 1 and tasks[0].task_type == "expiry.manual_entry"
 
 
 def test_plugin_and_extension_validation_rejects_all_core_overrides(plugin_db) -> None:  # type: ignore[no-untyped-def]

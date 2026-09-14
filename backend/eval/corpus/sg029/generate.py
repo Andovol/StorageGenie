@@ -118,6 +118,25 @@ def no_date_medicine() -> Image.Image:
     return img
 
 
+def clean_cosmetics() -> Image.Image:
+    img = Image.new("RGB", CANVAS, (238, 225, 232))
+    _label(img, _label_box(), "MOISTURISER", ["OPENED 2031-04-10", "50 ML", "PAO 12M"])
+    return img
+
+
+def no_date_cosmetics() -> Image.Image:
+    img = Image.new("RGB", CANVAS, (236, 228, 224))
+    _label(img, _label_box(), "SHAMPOO", ["400 ML", "SULFATE FREE"])
+    return img
+
+
+def partial_label_cosmetics() -> Image.Image:
+    img = Image.new("RGB", CANVAS, (230, 232, 236))
+    _label(img, _label_box(), "FACE CREAM", ["OPENED 2030-12-01", "30 ML"])
+    _tear(img)
+    return img
+
+
 RECIPES = {
     "sg029_01_clean_food": clean_food,
     "sg029_02_clean_medicine": clean_medicine,
@@ -126,6 +145,9 @@ RECIPES = {
     "sg029_05_partial_label_food": partial_label_food,
     "sg029_06_partial_label_medicine": partial_label_medicine,
     "sg029_07_no_date_visible_medicine": no_date_medicine,
+    "sg029_08_clean_cosmetics": clean_cosmetics,
+    "sg029_09_no_date_visible_cosmetics": no_date_cosmetics,
+    "sg029_10_partial_label_cosmetics": partial_label_cosmetics,
 }
 
 

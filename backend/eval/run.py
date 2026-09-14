@@ -50,7 +50,7 @@ CORPUS_DIR = Path(__file__).resolve().parent / "corpus"
 MANIFEST_PATH = CORPUS_DIR / "sg029" / "manifest.json"
 EXPECTATION_CLASSES = frozenset({"exact", "unknown-expected", "needs-evidence"})
 CASE_CLASSES = frozenset({"clean", "glare", "clutter", "partial-label", "no-date-visible"})
-CATEGORIES = frozenset({"food", "medicine"})
+CATEGORIES = frozenset({"food", "medicine", "cosmetics"})
 SPEND_CEILING_USD = 0.05
 
 
@@ -144,7 +144,10 @@ def score_fixture(raw: dict[str, Any]) -> dict[str, float]:
         if index >= len(parsed.items):
             continue
         got = parsed.items[index]
-        if _norm_name(got.name) == _norm_name(gt_item["name"]) and got.expiry_date == gt_item["expiry_date"]:
+        date_fields = [field for field in ("expiry_date", "opened_date") if field in gt_item]
+        name_matches = _norm_name(got.name) == _norm_name(gt_item["name"])
+        dates_match = all(getattr(got, field) == gt_item[field] for field in date_fields)
+        if name_matches and dates_match:
             hits += 1
     items_match = hits / max(len(gt_items), 1)
     return {

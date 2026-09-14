@@ -1,0 +1,33 @@
+{
+  "id": "sg029-08-clean-cosmetics",
+  "class": "clean",
+  "category": "cosmetics",
+  "image": "images/sg029_08_clean_cosmetics.png",
+  "note": "Synthetic moisturiser label: name and a fully legible printed opened date. Deterministic recipe (generate.py); no EXIF/GPS. provider_output is an AUTHORED offline reference for SG-036 integrity scoring, never a live model read (zero calls this slice).",
+  "ground_truth": {
+    "items": [
+      {
+        "name": "Moisturiser",
+        "opened_date": "2031-04-10"
+      }
+    ],
+    "unknowns": [],
+    "needs_evidence": false,
+    "expectation_class": "exact"
+  },
+  "provider_output": {
+    "items": [
+      {
+        "name": "MOISTURISER",
+        "expiry_date": null,
+        "opened_date": "2031-04-10",
+        "date_type": null,
+        "lot": null,
+        "confidence": 1.0,
+        "uncertainty_reasons": []
+      }
+    ],
+    "unknowns": [],
+    "needs_evidence": false
+  }
+}

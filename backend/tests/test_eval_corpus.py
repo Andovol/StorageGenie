@@ -23,7 +23,7 @@ RUN_PY = BACKEND_DIR / "eval" / "run.py"
 
 EXPECTATION_CLASSES = frozenset({"exact", "unknown-expected", "needs-evidence"})
 CASE_CLASSES = frozenset({"clean", "glare", "clutter", "partial-label", "no-date-visible"})
-CATEGORIES = frozenset({"food", "medicine"})
+CATEGORIES = frozenset({"food", "medicine", "cosmetics"})
 
 
 def _load_runner() -> ModuleType:
@@ -75,13 +75,25 @@ def test_every_fixture_has_image_truth_class_and_category() -> None:
     assert len(set(ids)) == len(ids), "fixture ids must be unique"
 
 
-def test_both_categories_and_all_case_shapes_present() -> None:
+def test_categories_and_all_case_shapes_present() -> None:
     fixtures = _fixtures()
-    assert {raw["category"] for raw in fixtures} == {"food", "medicine"}
+    assert {raw["category"] for raw in fixtures} == {"food", "medicine", "cosmetics"}
     assert {raw["class"] for raw in fixtures} == CASE_CLASSES
     assert any(raw["ground_truth"]["expectation_class"] != "exact" for raw in fixtures), (
         "at least one deliberately hard/expected-unknown case is required"
     )
+
+
+def test_cosmetics_fixtures_carry_opened_date_truth() -> None:
+    """SG-036: the third category is covered clean/no-date/partial, opened_date first-class."""
+    fixtures = [raw for raw in _fixtures() if raw["category"] == "cosmetics"]
+    assert {raw["class"] for raw in fixtures} == {"clean", "no-date-visible", "partial-label"}
+    for raw in fixtures:
+        item = raw["ground_truth"]["items"][0]
+        assert "opened_date" in item, f"{raw['id']}: ground truth must carry opened_date"
+        assert raw["provider_output"]["items"][0]["opened_date"] == item["opened_date"]
+    clean = next(raw for raw in fixtures if raw["class"] == "clean")
+    assert clean["ground_truth"]["items"][0]["opened_date"] == "2031-04-10"
 
 
 def test_provider_output_cache_parses_strictly() -> None:

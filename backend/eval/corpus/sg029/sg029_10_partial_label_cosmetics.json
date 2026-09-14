@@ -1,0 +1,40 @@
+{
+  "id": "sg029-10-partial-label-cosmetics",
+  "class": "partial-label",
+  "category": "cosmetics",
+  "image": "images/sg029_10_partial_label_cosmetics.png",
+  "note": "Synthetic face-cream label with the opened-date block half torn away; the product name survives, no character-complete date does. provider_output is an AUTHORED offline reference for SG-036 integrity scoring, never a live model read (zero calls this slice).",
+  "ground_truth": {
+    "items": [
+      {
+        "name": "Face cream",
+        "opened_date": null
+      }
+    ],
+    "unknowns": [
+      "items.0.opened_date"
+    ],
+    "needs_evidence": true,
+    "expectation_class": "unknown-expected"
+  },
+  "provider_output": {
+    "items": [
+      {
+        "name": "FACE CREAM",
+        "expiry_date": null,
+        "opened_date": null,
+        "date_type": null,
+        "lot": null,
+        "confidence": 0.55,
+        "uncertainty_reasons": [
+          "occlusion",
+          "truncated print"
+        ]
+      }
+    ],
+    "unknowns": [
+      "items.0.opened_date"
+    ],
+    "needs_evidence": true
+  }
+}
