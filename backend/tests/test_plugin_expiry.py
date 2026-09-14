@@ -10,7 +10,7 @@ from sqlalchemy.orm import Session, sessionmaker
 
 from app.db import Base, get_db
 from app.main import app
-from app.models import Assertion, Asset, Evidence, Household, ReviewTask, asset_evidence
+from app.models import Assertion, Asset, AuditEvent, Evidence, Household, ReviewTask, asset_evidence
 from app.plugins.expiry_tracker import EXPIRY_FIELD
 from app.plugins.registry import PluginError, get_plugin
 from app.services.observations import Observation
@@ -285,3 +285,113 @@ def test_non_perishable_has_no_expiry_and_manual_entry_is_rejected(plugin_db) ->
     assert classified.json()["expiry_assertion"] is None
     assert entered.status_code == 422 and "non-perishable" in entered.json()["detail"]
     assert not any(row["field_path"] == EXPIRY_FIELD for row in detail.json()["assertions"])
+
+
+def _split_origin_with_manual_task(
+    session: Session, household_id: str, evidence_ids: list[str]
+) -> tuple[object, ReviewTask]:
+    """Seed the SG-033 F-SG033-2 shape: a retired split origin + orphan task."""
+    from app.services import job_service
+    from app.services.candidates import Candidate
+
+    job = job_service.create_job(session, household_id, evidence_ids)
+    origin = Candidate(
+        job_id=job.id,
+        evidence_ids_json=json.dumps(evidence_ids),
+        proposed_fields_json=json.dumps({"kind": "new_asset", "fields": {}}),
+        state="split",
+        household_id=household_id,
+    )
+    session.add(origin)
+    session.flush()
+    task = ReviewTask(
+        task_type="expiry.manual_entry",
+        priority="high",
+        subject_ref=origin.id,
+        proposed_change=json.dumps({"prompt": "Enter expiry date manually"}),
+        status="open",
+        household_id=household_id,
+    )
+    session.add(task)
+    session.commit()
+    return origin, task
+
+
+def test_manual_entry_resolves_own_and_split_origin_orphan_tasks(plugin_db) -> None:  # type: ignore[no-untyped-def]
+    session, household_id = plugin_db
+    shared = Evidence(
+        household_id=household_id,
+        sha256="s" * 64,
+        storage_key="plugin/shared.png",
+        media_type="image/png",
+        original_filename="shared.png",
+        source_kind="upload",
+        size_bytes=1,
+    )
+    unrelated = Evidence(
+        household_id=household_id,
+        sha256="u" * 64,
+        storage_key="plugin/unrelated.png",
+        media_type="image/png",
+        original_filename="unrelated.png",
+        source_kind="upload",
+        size_bytes=1,
+    )
+    session.add_all([shared, unrelated])
+    session.commit()
+
+    asset = make_asset(session, household_id, "Split child item")
+    session.execute(asset_evidence.insert().values(asset_id=asset.id, evidence_id=shared.id))
+    session.commit()
+
+    origin, orphan = _split_origin_with_manual_task(session, household_id, [shared.id])
+    _other_origin, unrelated_task = _split_origin_with_manual_task(
+        session, household_id, [unrelated.id]
+    )
+
+    with TestClient(app) as client:
+        classified = classify(client, asset.id, household_id, "food")
+        assert classified.status_code == 200
+        entered = client.post(
+            f"/v1/plugins/expiry-tracker/assets/{asset.id}/expiry",
+            params={"household_id": household_id},
+            json={
+                "expiry_date": "2030-05-06",
+                "date_type": "expiry_date",
+                "source_evidence_ids": [shared.id],
+            },
+        )
+
+    assert entered.status_code == 200, entered.text
+    resolved_ids = entered.json()["resolved_review_task_ids"]
+
+    session.expire_all()
+    own_tasks = (
+        session.query(ReviewTask)
+        .filter_by(subject_ref=asset.id, task_type="expiry.manual_entry")
+        .all()
+    )
+    assert own_tasks and all(task.status == "resolved" for task in own_tasks)
+    assert {task.id for task in own_tasks} <= set(resolved_ids)
+
+    session.refresh(orphan)
+    assert orphan.status == "resolved"
+    assert orphan.id in resolved_ids
+    assert session.query(ReviewTask).filter_by(id=orphan.id).count() == 1  # resolved, never deleted
+    assert origin.id == orphan.subject_ref
+
+    session.refresh(unrelated_task)
+    assert unrelated_task.status == "open"
+    assert unrelated_task.id not in resolved_ids
+
+    assertion = entered.json()["assertion"]
+    assert assertion["review_state"] == "accepted"
+    assert assertion["value"]["expiry_date"] == "2030-05-06"
+
+    audit_rows = (
+        session.query(AuditEvent)
+        .filter_by(action="review_task.resolve", entity_type="review_task", entity_id=orphan.id)
+        .all()
+    )
+    assert len(audit_rows) == 1
+    assert json.loads(audit_rows[0].after_json)["resolution"]["manual_entry_orphan"] is True

@@ -1,0 +1,231 @@
+SG-034 verify log — manual entry on asset detail + on-screen corrections (both runs, raw)
+
+Work dir: /home/andrei/StorageGenie
+BASE REF: automation -> resolved 7987b8ec52dc35eb0de280c92377f5eaf1615bfb
+WORK_HEAD: the commit carrying this log (recorded by the G5 receipt note).
+Environment: backend/venv (python 3.12) for pytest/mypy/ruff; node v24.14.1 + frontend/node_modules for vite/vitest.
+Timeouts per command class: 120s ordinary, 600s backend suite, 600s build, 600s vitest. No command was killed.
+
+======================================================================
+1. STARTING TREE (clean expected; dirt = STOP)
+======================================================================
+
+$ git status --porcelain=v1
+(empty — clean)
+$ git branch --show-current
+automation
+$ git rev-parse HEAD
+7987b8ec52dc35eb0de280c92377f5eaf1615bfb
+$ git remote -v
+origin  git@github.com:Andovol/StorageGenie.git (fetch)
+origin  git@github.com:Andovol/StorageGenie.git (push)
+
+======================================================================
+2. PREMISE VERIFICATION (quoted reads at BASE)
+======================================================================
+
+P1 backend chain `PATCH /v1/assets/{id}` -> update_asset upserts one assertion per field + audit:
+  backend/app/services/asset_service.py:77-82
+    for field in ("display_name", "asset_type", "quantity", "unit", "condition", "status"):
+        if field in payload:
+            setattr(asset, field, payload[field])
+            upsert_assertion(db, asset.id, field, payload[field], asset.household_id)
+    asset.version = (asset.version or 1) + 1
+  backend/app/services/assertion_service.py:24-47 — prev accepted -> "superseded"; new accepted;
+  audit assertion.upsert recorded. VERIFIED.
+
+P2 AssetDetail edit panel edits display_name only:
+  BASE frontend/src/routes/AssetDetailPage.tsx:77-92 -> one input (editName) + Save
+  `patchMut.mutate({ display_name: editName })`. VERIFIED.
+
+P3 `store_manual_expiry` resolves open manual-entry tasks by subject_ref=asset.id only:
+  BASE backend/app/plugins/expiry_tracker.py:430-442
+    db.query(ReviewTask).filter_by(subject_ref=asset.id, ... task_type="expiry.manual_entry", status="open").all()
+    for task in tasks: task.status = "resolved"
+  VERIFIED (no evidence/origin lookup at BASE).
+
+P4 split origins keep their `expiry.manual_entry` task; children carry split_from + shared evidence:
+  backend/app/services/candidates.py:610-636 resolves only task_type == "candidate.multi_item"
+  on the origin; children copy evidence_ids_json (candidates.py:601) and set
+  "split_from": candidate.id (candidates.py:596). VERIFIED (F-SG033-2 root cause).
+
+P5 G1 backend supersede-chain coverage already exists:
+  backend/tests/test_assertions.py:48-101
+  test_patch_supersedes_assertion_stale_match_and_attaches_evidence asserts
+  {("Original Name","superseded"),("Renamed Asset","accepted")} + one assertion.upsert audit row.
+  -> covered premise; no new backend test added for G1 (per packet: only if uncovered).
+
+======================================================================
+3. BACKEND FAIL-then-PASS (raw)
+======================================================================
+
+--- 3a. PRE-CHANGE: new test against unmodified expiry_tracker.py ---
+$ cd backend && ./venv/bin/python -m pytest tests/test_plugin_expiry.py::test_manual_entry_resolves_own_and_split_origin_orphan_tasks -q
+...
+        assert entered.status_code == 200, entered.text
+        resolved_ids = entered.json()["resolved_review_task_ids"]
+        session.expire_all()
+        own_tasks = (
+            session.query(ReviewTask)
+            .filter_by(subject_ref=asset.id, task_type="expiry.manual_entry")
+            .all()
+        )
+        assert own_tasks and all(task.status == "resolved" for task in own_tasks)
+        assert {task.id for task in own_tasks} <= set(resolved_ids)
+        session.refresh(orphan)
+>       assert orphan.status == "resolved"
+E       AssertionError: assert 'open' == 'resolved'
+E         - resolved
+E         + open
+tests/test_plugin_expiry.py:378: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_plugin_expiry.py::test_manual_entry_resolves_own_and_split_origin_orphan_tasks
+1 failed, 2 warnings in 0.85s
+
+--- 3b. POST-CHANGE: whole file after expiry_tracker.py edit ---
+$ cd backend && ./venv/bin/python -m pytest tests/test_plugin_expiry.py -q
+........                                                                 [100%]
+8 passed, 2 warnings in 1.01s
+
+======================================================================
+4. FRONTEND FAIL-then-PASS (raw)
+======================================================================
+
+--- 4a. PRE-CHANGE: new test file against unmodified AssetDetailPage.tsx ---
+$ cd frontend && ./node_modules/.bin/vitest run src/routes/AssetDetailPage.test.tsx
+ FAIL  src/routes/AssetDetailPage.test.tsx > AssetDetailPage > editing quantity patches via PATCH and shows the superseded prior value in history
+TestingLibraryElementError: Unable to find a label with the text of: Quantity
+ FAIL  src/routes/AssetDetailPage.test.tsx > AssetDetailPage > a needs_evidence asset offers hand entry beside its detail and refuses an empty date
+TestingLibraryElementError: Unable to find an element with the text: Manual expiry entry. ...
+ Test Files  1 failed (1)
+      Tests  2 failed (2)
+
+--- 4b. POST-CHANGE ---
+$ cd frontend && ./node_modules/.bin/vitest run src/routes/AssetDetailPage.test.tsx
+ ✓ src/routes/AssetDetailPage.test.tsx  (2 tests) 155ms
+ Test Files  1 passed (1)
+      Tests  2 passed (2)
+
+======================================================================
+5. G3 PROOF GATES
+======================================================================
+
+--- 5a. Full backend suite, WORK (600s bound) ---
+$ cd backend && ./venv/bin/python -m pytest -q
+FAILED tests/test_signals.py::test_generated_codes_are_validated_and_bad_checksum_is_not_an_identifier
+FAILED tests/test_signals.py::test_ocr_has_text_boxes_and_mean_confidence - a...
+2 failed, 127 passed, 11 warnings in 7.94s
+
+--- 5b. Full backend suite re-verified at BASE 7987b8e in a detached git worktree (600s bound) ---
+$ git worktree add --detach /tmp/opencode/sg034-base 7987b8ec52dc35eb0de280c92377f5eaf1615bfb
+$ (cd /tmp/opencode/sg034-base/backend && /home/andrei/StorageGenie/backend/venv/bin/python -m pytest -q)
+FAILED tests/test_signals.py::test_generated_codes_are_validated_and_bad_checksum_is_not_an_identifier
+FAILED tests/test_signals.py::test_ocr_has_text_boxes_and_mean_confidence - a...
+2 failed, 126 passed, 11 warnings in 8.33s
+# same two decoder env reds (pyzbar/libzbar + pytesseract absent) at BASE; base-proved, not inherited.
+# WORK has one extra passing test (the new orphan test) -> 126 vs 127 passed.
+$ git worktree remove /tmp/opencode/sg034-base --force
+ok
+
+--- 5c. Existing G1 supersede-chain coverage at WORK (citation, 120s) ---
+$ cd backend && ./venv/bin/python -m pytest tests/test_assertions.py -q
+1 passed, 2 warnings in 0.69s
+
+--- 5d. ruff (120s) ---
+$ cd backend && ./venv/bin/ruff check app tests
+All checks passed!
+
+--- 5e. mypy (300s; baseline advisory) ---
+$ cd backend && ./venv/bin/mypy app
+...
+Found 40 errors in 9 files (checked 60 source files)
+# per-file: assets.py 16, review_tasks.py 6, households.py 6, evidence.py 4,
+#           audit_service.py 2, asset_service.py 2, schemas/asset.py 2, main.py 2, models/base.py 1
+# expiry_tracker.py mentions: NONE. Baseline 40-in-9 unchanged; no new error in the edited file.
+
+--- 5f. Build (600s) ---
+$ cd frontend && npm run build
+> tsc && vite build
+vite v5.4.21 building for production...
+✓ 93 modules transformed.
+dist/assets/index-B1QFpQAn.js  243.81 kB │ gzip: 75.16 kB
+✓ built in 885ms
+
+--- 5g. vitest run (600s) ---
+$ cd frontend && ./node_modules/.bin/vitest run
+ ✓ src/routes/AssetDetailPage.test.tsx  (2 tests) 232ms
+ ✓ src/routes/InboxPage.test.tsx  (4 tests) 266ms
+ ✓ src/routes/ReviewPage.test.tsx  (4 tests) 257ms
+ ✓ src/components/JobCard.test.tsx  (1 test) 45ms
+ ✓ src/api/client.test.ts  (3 tests) 4ms
+ ✓ src/components/ProvenanceBadge.test.tsx  (3 tests) 53ms
+ ✓ src/components/AssetCard.test.tsx  (1 test) 56ms
+ ✓ src/components/ExpiryEntryForm.test.tsx  (2 tests) 106ms
+ Test Files  10 passed (10)   (SG-033 was 9 files / 25)
+      Tests  27 passed (27)   (SG-033 was 25; +2 new)
+
+--- 5h. Secret scan (names/counts only; CO-44) ---
+$ git grep -nE '(sk-[A-Za-z0-9_-]{12,}|OPENCODE_API_KEY=[A-Za-z0-9])' -- . ':!*.lock'
+backend/tests/test_settings.py:47:SENTINEL_KEY = "sk-SENTINEL-KEY-MUST-NEVER-APPEAR"
+docs/worklogs/SG-033_verify.log:155:backend/tests/test_settings.py:47:SENTINEL_KEY = "sk-SENTINEL-KEY-MUST-NEVER-APPEAR"
+$ git ls-files | rg -i '(^|/)\.env$'
+(0 tracked .env)
+# Both hits are the SAME known SG-031 test sentinel (one is SG-033's verify log quoting it).
+# 0 real-key matches.
+
+--- 5i. Scope / no migration / no prompt / nothing ignored staged ---
+$ git diff --name-only HEAD
+backend/app/plugins/expiry_tracker.py
+backend/tests/test_plugin_expiry.py
+frontend/src/routes/AssetDetailPage.tsx
+$ git status --short
+ M backend/app/plugins/expiry_tracker.py
+ M backend/tests/test_plugin_expiry.py
+ M frontend/src/routes/AssetDetailPage.tsx
+?? frontend/src/routes/AssetDetailPage.test.tsx
+$ (git diff --name-only HEAD | rg -i 'alembic|prompts') || echo none
+none
+$ git diff --cached --name-only
+(empty — nothing staged/ignored)
+
+--- 5j. Network proof (zero live calls, spend $0) ---
+$ rg -n "httpx|requests|urlopen|socket|http://|https://" backend/tests/test_plugin_expiry.py backend/tests/test_assets_crud.py frontend/src/routes/AssetDetailPage.test.tsx
+(none)
+# All proofs run through fastapi.testclient.TestClient (in-process ASGI) against temp SQLite.
+# The orphan pickup is pure SQLAlchemy/session work; no provider registry, consent toggle, key read,
+# socket, or HTTP call. No live/eval run was executed.
+
+--- 5k. Health probe (CO-92) — unanswered, not worked around ---
+$ docker compose ps
+[compose] 0 services
+$ ss -ltnp | rg ':(8000|8003|5173)'
+LISTEN 0  4096  127.0.0.1:8000  0.0.0.0:*
+$ curl -s -m 5 -o /dev/null -w "http_code=%{http_code}\n" http://localhost:8000/v1/health
+http_code=404
+# The :8000 listener is unrelated (it answers 404 for /v1/health); no compose service runs.
+# No service was started or deployed. start=end=not running, delta 0.
+
+======================================================================
+6. PG-SC-02 read-back trace (entry -> assertion -> resolved task list)
+======================================================================
+
+In test_manual_entry_resolves_own_and_split_origin_orphan_tasks (one test):
+  entry: POST /v1/plugins/expiry-tracker/assets/{asset.id}/expiry
+         {"expiry_date":"2030-05-06","date_type":"expiry_date","source_evidence_ids":[shared.id]}
+  assertion: response assertion review_state == "accepted",
+             value["expiry_date"] == "2030-05-06"
+  resolved task list (own + orphan): {own_tasks} <= resolved_review_task_ids;
+             orphan.id in resolved_review_task_ids; own task status resolved;
+  orphan row still present (resolved, never deleted): count == 1
+  unrelated-evidence task stays open (PG-SC-07): status == "open", id not in resolved list
+  audit: exactly one review_task.resolve row for the orphan with
+         resolution.manual_entry_orphan == True
+
+======================================================================
+7. DIFFSTAT
+======================================================================
+
+ backend/app/plugins/expiry_tracker.py   | 72 +++++++++++++++++++++++++++++++++
+ frontend/src/routes/AssetDetailPage.tsx | 40 ++++++++++++++----
+ backend/tests/test_plugin_expiry.py     | 90 +++++++++++++++++++++++++++++++++ (after import line)
+ frontend/src/routes/AssetDetailPage.test.tsx | new (2 tests)

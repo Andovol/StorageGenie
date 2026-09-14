@@ -415,6 +415,51 @@ def store_extensions(db: Session, asset: Asset, attributes: dict[str, object]) -
     return rows
 
 
+def _orphan_manual_tasks(
+    db: Session, asset: Asset, evidence_ids: list[str]
+) -> list[ReviewTask]:
+    """Open manual-entry tasks on split origins that share this asset's evidence.
+
+    SG-033 leaves an origin's `expiry.manual_entry` task orphaned when a
+    multi-item candidate splits: the task stays on the retired origin while the
+    children carry the unknowns and share the evidence. A real hand-entered date
+    on a child's asset is the moment that orphan can be honestly resolved. A task
+    whose origin did not share the evidence is left untouched.
+    """
+    if not evidence_ids:
+        return []
+    from app.services.candidates import SPLIT_ORIGIN_STATE, Candidate
+
+    shared = {str(item) for item in evidence_ids}
+    origin_ids: list[str] = []
+    origins = (
+        db.query(Candidate)
+        .filter_by(state=SPLIT_ORIGIN_STATE, household_id=asset.household_id)
+        .all()
+    )
+    for origin in origins:
+        try:
+            origin_evidence = json.loads(origin.evidence_ids_json)
+        except json.JSONDecodeError:
+            continue
+        if not isinstance(origin_evidence, list):
+            continue
+        if shared & {str(item) for item in origin_evidence}:
+            origin_ids.append(origin.id)
+    if not origin_ids:
+        return []
+    return (
+        db.query(ReviewTask)
+        .filter(
+            ReviewTask.subject_ref.in_(origin_ids),
+            ReviewTask.household_id == asset.household_id,
+            ReviewTask.task_type == "expiry.manual_entry",
+            ReviewTask.status == "open",
+        )
+        .all()
+    )
+
+
 def store_manual_expiry(
     db: Session, asset: Asset, entry: dict[str, object], evidence_ids: list[str] | None
 ) -> tuple[Assertion, list[ReviewTask]]:
@@ -439,4 +484,31 @@ def store_manual_expiry(
     )
     for task in tasks:
         task.status = "resolved"
+    resolved_ids = {task.id for task in tasks}
+    asset_evidence_ids = [
+        row.evidence_id
+        for row in db.execute(
+            asset_evidence.select().where(asset_evidence.c.asset_id == asset.id)
+        ).fetchall()
+    ]
+    for task in _orphan_manual_tasks(db, asset, asset_evidence_ids):
+        if task.id in resolved_ids:
+            continue
+        before = {"status": task.status}
+        task.status = "resolved"
+        audit_service.record(
+            db,
+            actor="expiry-tracker",
+            action="review_task.resolve",
+            entity_type="review_task",
+            entity_id=task.id,
+            before=before,
+            after={
+                "status": task.status,
+                "resolution": {"manual_entry_orphan": True, "asset_id": asset.id},
+            },
+            household_id=task.household_id,
+        )
+        resolved_ids.add(task.id)
+        tasks.append(task)
     return assertion, tasks

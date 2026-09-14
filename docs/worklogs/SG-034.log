@@ -1,0 +1,85 @@
+SG-034 execution log (chronological; elapsed in seconds unless noted)
+
+[00] Recon — BASE REF automation -> 7987b8ec52dc35eb0de280c92377f5eaf1615bfb.
+     git status --porcelain=v1 => clean; branch automation;
+     origin git@github.com:Andovol/StorageGenie.git. Packet read:
+     docs/packets/SG-034-manual-entry-corrections.md.
+     Premises checked (quoted reads; see verify log §2):
+     - asset_service.py:77-82 update_asset loops quantity/unit/condition -> upsert_assertion.
+     - assertion_service.py:24-47 prev accepted -> superseded + assertion.upsert audit.
+     - BASE AssetDetailPage.tsx:77-92 edits display_name only.
+     - BASE expiry_tracker.py:430-442 resolves subject_ref=asset.id only.
+     - candidates.py:610-636 split resolves ONLY candidate.multi_item; children copy
+       evidence_ids_json and set split_from (F-SG033-2 root cause).
+     - test_assertions.py:48-101 already covers the PATCH supersede chain -> no new
+       backend G1 test (packet: only if uncovered).
+
+[01] Baselines before any edit:
+     backend pytest -q (WORK/BASE shared tree) => 2 failed, 126 passed, 8.33s at BASE;
+     2 known decoder env reds (test_signals.py: pyzbar/libzbar + pytesseract absent).
+     frontend vitest (BASE) => 9 files, 25 passed.
+     mypy app => 40 errors in 9 files (baseline 40-in-9; none in edited files).
+     Health probe: docker compose ps => 0 services; curl :8000/v1/health => 404;
+     :8000 listener unrelated. Reported unanswered (no service deployed).
+
+[02] PRE-change tests written (FAIL first):
+     backend/tests/test_plugin_expiry.py::test_manual_entry_resolves_own_and_split_origin_orphan_tasks
+     (plus _split_origin_with_manual_task helper).
+     PRE backend: 1 failed in 0.85s — `AssertionError: assert 'open' == 'resolved'`
+     (orphan stays open) . Raw committed (verify log §3a).
+     frontend/src/routes/AssetDetailPage.test.tsx (new, 2 tests).
+     PRE frontend: 2 failed | 0 passed — "Unable to find a label with the text of: Quantity"
+     and "Unable to find an element with the text: Manual expiry entry". Raw committed (§4a).
+
+[03] G2 backend implemented (backend/app/plugins/expiry_tracker.py):
+     - _orphan_manual_tasks(db, asset, evidence_ids): among Candidate rows with
+       state == SPLIT_ORIGIN_STATE and same household, keep those whose
+       evidence_ids_json intersects the asset's linked evidence; return their open
+       expiry.manual_entry tasks. Lazy import of Candidate/SPLIT_ORIGIN_STATE avoids any
+       plugins<->services import cycle at registry load.
+     - store_manual_expiry: after resolving own subject_ref=asset.id tasks, resolve each
+       orphan (skip duplicates), set status="resolved", record a review_task.resolve audit
+       with resolution {"manual_entry_orphan": True, "asset_id": asset.id}; append to the
+       returned task list so resolved_review_task_ids carries own + orphan without any
+       api/v1/plugins.py change. Never deletes a task.
+     POST backend: tests/test_plugin_expiry.py => 8 passed, 1.01s.
+
+[04] G1+G2 frontend implemented (frontend/src/routes/AssetDetailPage.tsx):
+     - edit panel gains Quantity (number) / Unit / Condition inputs beside Display name,
+       initialized from the asset on Edit; Save builds {display_name, quantity?, unit?,
+       condition?} and sends it through the EXISTING apiPatch PATCH /v1/assets/{id} with
+       the existing If-Match header. No bypass; no backend write added.
+     - render <ExpiryEntryForm assetId householdId evidenceIds={evidence.ids}/> when the
+       asset's expiry assertion review_state == "needs_evidence" (reuse; component untouched,
+       client.ts/types.ts untouched).
+     POST frontend: AssetDetailPage.test.tsx => 2 passed, 155ms.
+
+[05] POST gates:
+     FULL backend suite (WORK)   => 2 failed, 127 passed in 7.94s (known decoder reds).
+     FULL backend suite (BASE wt) => 2 failed, 126 passed in 8.33s (same two reds; base-proved).
+     ruff check app tests         => All checks passed!
+     mypy app                     => 40 errors in 9 files (baseline unchanged; expiry_tracker none).
+     npm run build                => green, 93 modules, built in 885ms.
+     vitest run                   => 10 files, 27 passed.
+     Secret scan                  => 0 real-key matches (only the SG-031 sentinel, twice-quoted).
+     No migration, no prompt diff, no ignored file staged, no network (verify log §5h-5j).
+     Health probe unanswered (compose 0 services; :8000 unrelated 404).
+
+[06] DESIGN CALLS (mine, reported):
+     - Orphan link key: the asset's LINKED evidence (asset_evidence), NOT the request's
+       source_evidence_ids; the child's asset is the anchor and classification may be entered
+       with or without evidence ids.
+     - Only candidates in state "split" are orphan sources; a still-open non-split candidate's
+       task is never resolved by an asset entry (it has not been committed).
+     - Orphan resolution is audited (review_task.resolve, resolution.manual_entry_orphan);
+       own tasks keep their existing resolution shape. plugins.py read-only; no route touched.
+     - New frontend test lived beside the page; the form component and client were reused
+       unchanged, so client.ts/types.ts were not modified.
+
+[07] Commit + push to automation; receipt note on WORK_HEAD (ref
+     refs/notes/storagegenie-coder-reports). note=yes (see report G5).
+
+MODEL: unknown (CLI default omitted per policy) — parent argv:
+       opencode run --auto --dir /home/andrei/StorageGenie --variant medium # SG-034 ...
+EFFORT: medium — parent argv --variant medium.
+SPEND: $0. NETWORK ATTEMPTS: 0 (in-process tests only; localhost health probe is the sole socket).

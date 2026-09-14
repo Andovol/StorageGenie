@@ -4,6 +4,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAsset } from "../hooks/useAssets";
 import { EvidenceGallery } from "../components/EvidenceGallery";
 import { ProvenanceBadge } from "../components/ProvenanceBadge";
+import { ExpiryEntryForm } from "../components/ExpiryEntryForm";
 import { apiPatch, apiPost, uploadEvidence } from "../api/client";
 
 export function AssetDetailPage() {
@@ -14,11 +15,14 @@ export function AssetDetailPage() {
   const qc = useQueryClient();
   const [editing, setEditing] = useState(false);
   const [editName, setEditName] = useState("");
+  const [editQuantity, setEditQuantity] = useState("");
+  const [editUnit, setEditUnit] = useState("");
+  const [editCondition, setEditCondition] = useState("");
   const [attachFiles, setAttachFiles] = useState<FileList | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   const patchMut = useMutation({
-    mutationFn: (payload: { display_name: string }) =>
+    mutationFn: (payload: Record<string, unknown>) =>
       apiPatch(`/v1/assets/${id}`, payload, { household_id: householdId }, { "If-Match": String(asset?.version ?? 1) }),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["asset", id] });
@@ -51,6 +55,7 @@ export function AssetDetailPage() {
 
   const evidence = (asset as unknown as { evidence: { id: string; storage_key: string; sha256: string; original_filename: string }[] }).evidence || [];
   const assertions = asset.assertions || [];
+  const expiryAssertion = assertions.find((item) => item.field_path.endsWith("expiry_date"));
   const audits = (asset as unknown as { audit_events: { id: string; action: string; actor: string; timestamp: string; before: unknown; after: unknown }[] }).audit_events || [];
 
   return (
@@ -61,6 +66,9 @@ export function AssetDetailPage() {
         <button
           onClick={() => {
             setEditName(asset.display_name);
+            setEditQuantity(asset.quantity != null ? String(asset.quantity) : "");
+            setEditUnit(asset.unit ?? "");
+            setEditCondition(asset.condition ?? "");
             setEditing((v) => !v);
           }}
           style={{ padding: "6px 12px", borderRadius: 6, border: "1px solid #d1d5db", background: "white", cursor: "pointer" }}
@@ -76,22 +84,40 @@ export function AssetDetailPage() {
 
       {editing && (
         <div style={{ border: "1px solid #e5e7eb", borderRadius: 8, padding: 12, marginBottom: 16, background: "#f9fafb" }}>
-          <label style={{ display: "flex", gap: 8, alignItems: "center" }}>
-            <span style={{ fontSize: 13 }}>Display name</span>
-            <input value={editName} onChange={(e) => setEditName(e.target.value)} style={{ flex: 1, padding: 8, borderRadius: 6, border: "1px solid #d1d5db" }} />
+          <div style={{ display: "grid", gridTemplateColumns: "110px 1fr", gap: 8, alignItems: "center" }}>
+            <label htmlFor="edit-display-name" style={{ fontSize: 13 }}>Display name</label>
+            <input id="edit-display-name" value={editName} onChange={(e) => setEditName(e.target.value)} style={{ padding: 8, borderRadius: 6, border: "1px solid #d1d5db" }} />
+            <label htmlFor="edit-quantity" style={{ fontSize: 13 }}>Quantity</label>
+            <input id="edit-quantity" type="number" value={editQuantity} onChange={(e) => setEditQuantity(e.target.value)} style={{ padding: 8, borderRadius: 6, border: "1px solid #d1d5db" }} />
+            <label htmlFor="edit-unit" style={{ fontSize: 13 }}>Unit</label>
+            <input id="edit-unit" value={editUnit} onChange={(e) => setEditUnit(e.target.value)} style={{ padding: 8, borderRadius: 6, border: "1px solid #d1d5db" }} />
+            <label htmlFor="edit-condition" style={{ fontSize: 13 }}>Condition</label>
+            <input id="edit-condition" value={editCondition} onChange={(e) => setEditCondition(e.target.value)} style={{ padding: 8, borderRadius: 6, border: "1px solid #d1d5db" }} />
+          </div>
+          <div style={{ display: "flex", gap: 8, alignItems: "center", marginTop: 10 }}>
             <button
-              onClick={() => patchMut.mutate({ display_name: editName })}
+              onClick={() => {
+                const payload: Record<string, unknown> = { display_name: editName.trim() };
+                if (editQuantity.trim() !== "") payload.quantity = Number(editQuantity);
+                if (editUnit.trim() !== "") payload.unit = editUnit.trim();
+                if (editCondition.trim() !== "") payload.condition = editCondition.trim();
+                patchMut.mutate(payload);
+              }}
               disabled={patchMut.isPending || !editName.trim()}
               style={{ padding: "6px 12px", background: "#111827", color: "white", borderRadius: 6, border: "none", cursor: "pointer" }}
             >
               {patchMut.isPending ? "Saving..." : "Save"}
             </button>
-          </label>
-          <div style={{ fontSize: 11, color: "#6b7280", marginTop: 6 }}>Uses If-Match: {asset.version} for optimistic concurrency</div>
+            <span style={{ fontSize: 11, color: "#6b7280" }}>Uses If-Match: {asset.version} for optimistic concurrency</span>
+          </div>
         </div>
       )}
 
       {error && <div style={{ color: "#dc2626", fontSize: 13, marginBottom: 12 }}>{error}</div>}
+
+      {expiryAssertion?.review_state === "needs_evidence" && (
+        <ExpiryEntryForm assetId={asset.id} householdId={householdId} evidenceIds={evidence.map((item) => item.id)} />
+      )}
 
       <h3>Evidence</h3>
       <EvidenceGallery evidence={evidence} householdId={householdId} />
