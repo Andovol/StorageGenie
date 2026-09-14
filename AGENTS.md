@@ -1,7 +1,7 @@
 # StorageGenie — project configuration
 
 > **Canonical for this repo. `CLAUDE.md` is a one-line adapter `@AGENTS.md` — edit here, never there.**
-> Rule-set version this project records: **0.23.0** (D39 adoption 2026-09-12: tag `contract-v0.23.0` checkout, `RULES.md` unchanged per tag note, `PACKET.md` PG-ID naming + `--status` tokens noted; supersedes `0.22.0`).
+> Rule-set version this project records: **0.24.0** (D52 adoption 2026-09-14: tag `contract-v0.24.0` checkout; `RULES.md` delta = the `G-L1` byte-compare half + `G-M3`/`G-M5` spacing; installed global rules file `a8ba7897…` byte-identical to the payload `RULES.sha256` — not forked, superseded local cache `5d7193…` = 0.23.0; project `AGENTS.md` measured 7,318 B, under the 11,103 B cap; `dispatch`/`run-coder` untouched until Launcher's host install; supersedes `0.23.0`).
 
 ## Configuration table — the single source of every project value
 
@@ -58,6 +58,6 @@ Pinned pre-conversion state `26e9e8b` (local `automation` head `26e9e8b→9f1cc0
 
 ## Loading
 
-- Session start: `G-L1` version check FIRST (fetch `origin contract` in `.rules-cache/`, read `FETCH_HEAD:VERSION` — never checkout-vs-stamp, M3), then this file + `.rules-cache/` (contract `contract-v0.23.0`) + `STATE.md:1` RESUME.
+- Session start: `G-L1` version check FIRST (fetch `origin contract` in `.rules-cache/`, read `FETCH_HEAD:VERSION`, and hash the installed global rules file against the payload `RULES.sha256` — never checkout-vs-stamp, M3), then this file + `.rules-cache/` (contract `contract-v0.24.0`) + `STATE.md:1` RESUME.
 - Before packet: `PACKET.md`; before dispatch: `DISPATCH.md` (+ `PRODUCTION.md:1` because host + SQLite are live).
 - Never copy shared contract into repo — project holds only values and narrowings.
