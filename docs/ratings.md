@@ -44,6 +44,8 @@ Schema: shared `LEDGER.md` — nine columns, `guards_invoked` + `deduction_attri
 
 | SG-035 | Phase 3 (D46) | opencode (model unknown with argv provenance quoted per owner rule; effort medium verified from process args) | medium | 98 |  | COMPLETE foundations migration: 3 tables + indexes, upgrade/downgrade/upgrade, per-table round-trips, head flows live; registry-file touch CONFIRMED correct per SG-025 precedent (packet-side M9, no penalty — M4); no-writer state stated with SG-037/038 destinations; CHECK-constraint choice to SG-037; suite 132 passed + 2 base-proved reds; mypy delta 0; $0, 0 live writes | PG-EV-01, PG-EV-02, PG-EV-05, PG-EV-09, PG-SC-02, PG-SC-05, PG-SC-10, PG-SC-11, PG-IC-01, PG-IC-03, PG-IC-07, PG-IC-09, PG-PR-03, PG-PR-04, PG-PR-06, PG-PR-10 |  |
 
+| SG-036 | Phase 3 (D46) | opencode (model unknown with argv provenance quoted per owner rule; effort medium verified from process args) | medium | 98 |  | COMPLETE cosmetics: opened_date ISO-shared validator, versioned prompt, registry line, active taxonomy with per-category tracking flag + uncalibrated tiers, corpus 10 with recipe truth, run.py conditional CONFIRMED necessary; PAO-periods→unknown CONFIRMED; authored-cache 1.000s honestly labelled integrity-only with metered leg to SG-039; suite 137 passed + 2 base-proved reds; mypy delta 0; $0 | PG-EV-01, PG-EV-02, PG-EV-05, PG-EV-09, PG-SC-02, PG-SC-07, PG-SC-10, PG-IC-01, PG-IC-03, PG-IC-07, PG-IC-09, PG-PR-03, PG-PR-04, PG-PR-06, PG-PR-10 |  |
+
 ## SG-013 investigation (score 90 < 95)
 
 1. **Failure class:** environment.
