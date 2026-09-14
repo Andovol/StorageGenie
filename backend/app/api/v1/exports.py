@@ -34,18 +34,22 @@ def export_catalog(household_id: str = Query(...), db: Session = Depends(get_db)
     with db.begin():
         assets = db.query(Asset).filter_by(household_id=household_id).all()
         evidence = db.query(Evidence).filter_by(household_id=household_id).all()
-        assertions = []
-        for asset in assets:
-            for ass in db.query(Assertion).filter_by(asset_id=asset.id).all():
-                assertions.append(
-                    {
-                        "id": ass.id,
-                        "asset_id": ass.asset_id,
-                        "field_path": ass.field_path,
-                        "value": loads_json(ass.value_json),
-                        "review_state": ass.review_state,
-                    }
-                )
+        assertion_rows = (
+            db.query(Assertion)
+            .join(Asset, Assertion.asset_id == Asset.id)
+            .filter(Asset.household_id == household_id)
+            .all()
+        )
+        assertions = [
+            {
+                "id": ass.id,
+                "asset_id": ass.asset_id,
+                "field_path": ass.field_path,
+                "value": loads_json(ass.value_json),
+                "review_state": ass.review_state,
+            }
+            for ass in assertion_rows
+        ]
         audits = db.query(AuditEvent).filter_by(household_id=household_id).all()
         body = {
             "household_id": household_id,
