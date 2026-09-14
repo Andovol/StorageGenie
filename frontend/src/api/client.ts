@@ -2,6 +2,8 @@ import type {
   AiSettings,
   Assertion,
   CandidateSplitResponse,
+  ChatCorrectionResponse,
+  ChatResponse,
   PlanningRunResult,
   PlanningSuggestion,
   PlanningSuggestionListResponse,
@@ -189,6 +191,22 @@ export function dismissPlanningSuggestion(
   return apiPost<PlanningSuggestion>(
     `/v1/planning/suggestions/${suggestionId}/dismiss`,
     { reason: reason ?? null },
+    { household_id: householdId }
+  );
+}
+
+export function sendChat(category: string, householdId: string, message: string) {
+  return apiPost<ChatResponse>(
+    `/v1/chat/${category}`,
+    { message },
+    { household_id: householdId }
+  );
+}
+
+export function logChatCorrection(category: string, householdId: string, message: string) {
+  return apiPost<ChatCorrectionResponse>(
+    `/v1/chat/${category}/corrections`,
+    { message },
     { household_id: householdId }
   );
 }

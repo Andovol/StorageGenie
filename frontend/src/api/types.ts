@@ -166,3 +166,32 @@ export type PlanningRunResult = {
   guardrail_event_id?: string;
   provider_call_ids?: string[];
 };
+
+export type ChatMessage = {
+  role: "user" | "assistant";
+  text: string;
+};
+
+export type ChatResponse = {
+  status: string;
+  reason?: string | null;
+  answer?: string | null;
+  grounded: boolean;
+  empty_catalogue: boolean;
+  category: string;
+  catalogue_size: number;
+  provider?: string | null;
+  model?: string | null;
+  provider_call_id?: string | null;
+  usage?: Record<string, unknown>;
+  cost?: number;
+  latency_ms?: number;
+};
+
+export type ChatCorrectionResponse = {
+  id: string;
+  kind: string;
+  category: string;
+  message: string;
+  created_at: string | null;
+};

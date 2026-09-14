@@ -57,8 +57,11 @@ class FakeProvider:
             normalized={"needs_evidence": False, "items": [{"name": "fake-item", "source": image_ref}]},
         )
 
-    def extract_text(self, image_ref: str) -> ProviderResult:
-        return self._behave(operation="extract_text", normalized={"text": "fake-text", "source": image_ref})
+    def extract_text(
+        self, text: str, prompt: str = "", *, estimated_cost: float = 0.0
+    ) -> ProviderResult:
+        """Scripted text response (SG-038 G1): no network, no key, cost fixed."""
+        return self._behave(operation="extract_text", normalized={"text": "fake-text", "source": text})
 
     def embed(self, text: str) -> ProviderResult:
         return self._behave(operation="embed", normalized={"vector": [0.1, 0.2, 0.3], "source": text})

@@ -1,0 +1,390 @@
+SG-038 verify log — FAIL-then-PASS raw + the ONE metered live receipt
+BASE REF: automation -> resolved commit 084810b68389c5d309c2aba8d7b84f87aaa7d607
+Work dir: /home/andrei/StorageGenie
+Model/effort: providerID=opencode-go modelID=deepseek-v4.1-flash (provider metadata);
+  effort medium from process argv: opencode run --auto --dir /home/andrei/StorageGenie --variant medium
+
+######################################################################
+# LEG A — PRE backend: base tree 084810b + tests/test_chat.py only
+######################################################################
+===== PRE backend (base 084810b, test file only) =====
+FFFFFFFFFFF                                                              [100%]
+=================================== FAILURES ===================================
+___________________ test_text_payload_shape_no_image_no_key ____________________
+
+    def test_text_payload_shape_no_image_no_key() -> None:
+>       from app.services.providers.opencode_go import build_text_payload
+E       ImportError: cannot import name 'build_text_payload' from 'app.services.providers.opencode_go' (/tmp/opencode/sg038-base/backend/app/services/providers/opencode_go.py)
+
+tests/test_chat.py:222: ImportError
+____________ test_adapter_extract_text_guards_and_result_populated _____________
+
+    def test_adapter_extract_text_guards_and_result_populated() -> None:
+        from app.services.providers import opencode_go as go
+        from app.services.providers.router import BudgetExceededError, ProviderError
+    
+        usage = {"prompt_tokens": 100, "completion_tokens": 50, "total_tokens": 150}
+    
+        class _Canned(go.OpenCodeGoProvider):
+            def __init__(self, body: dict[str, Any], **kwargs: Any) -> None:
+                super().__init__(session_id="test-038", **kwargs)
+                self._body = body
+                self.calls = 0
+                self.sent: list[dict[str, Any]] = []
+    
+            def _post(self, payload: dict[str, Any]) -> dict[str, Any]:
+                self.calls += 1
+                self.sent.append(payload)
+                return self._body
+    
+        good_body = {
+            "id": "req-canned-1",
+            "model": "canned-model",
+            "choices": [
+                {"message": {"content": "Grounded answer"}, "finish_reason": "stop"}
+            ],
+            "usage": usage,
+        }
+        provider = _Canned(good_body, model_id="adapter-model")
+>       result = provider.extract_text("USER", "SYSTEM", estimated_cost=0.0)
+                 ^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: '_Canned' object has no attribute 'extract_text'. Did you mean: 'extract_items'?
+
+tests/test_chat.py:263: AttributeError
+_____ test_chat_grounded_answer_uses_category_catalogue_and_one_ledger_row _____
+
+chat_fixture = (<sqlalchemy.orm.session.Session object at 0x7d071912da60>, '01a09f88-da9a-7272-aaaa-a81974548ea9', [])
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7d07191c40e0>
+
+    def test_chat_grounded_answer_uses_category_catalogue_and_one_ledger_row(
+        chat_fixture, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        session, household_id, network_attempts = chat_fixture
+        asset = _seed_asset(session, household_id, "Whole milk", opened="2026-09-10")
+        _seed_source(session, household_id, asset)
+        _seed_asset(session, household_id, "Ibuprofen", slug="medicine_pharma", expiry="2027-01-01")
+        provider = ChatScriptedProvider()
+        _enable(monkeypatch, provider)
+        client = TestClient(app)
+        before = _fingerprint(session)
+    
+        response = _chat(client, household_id, "food", "When does the milk expire?")
+    
+>       assert response.status_code == 200, response.text
+E       AssertionError: {"detail":"Not Found"}
+E       assert 404 == 200
+E        +  where 404 = <Response [404 Not Found]>.status_code
+
+tests/test_chat.py:314: AssertionError
+_______________ test_no_consent_refuses_zero_calls_and_zero_rows _______________
+
+chat_fixture = (<sqlalchemy.orm.session.Session object at 0x7d0719067800>, '01a09f88-daf2-7f52-94ec-66d4cae70df1', [])
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7d0719065460>
+
+    def test_no_consent_refuses_zero_calls_and_zero_rows(
+        chat_fixture, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        session, household_id, network_attempts = chat_fixture
+        _seed_asset(session, household_id, "Whole milk")
+        provider = ChatScriptedProvider()
+        _enable(monkeypatch, provider, consent=False)
+        client = TestClient(app)
+    
+        response = _chat(client, household_id, "food", "Hello?")
+    
+>       assert response.status_code == 200, response.text
+E       AssertionError: {"detail":"Not Found"}
+E       assert 404 == 200
+E        +  where 404 = <Response [404 Not Found]>.status_code
+
+tests/test_chat.py:352: AssertionError
+__________________ test_unsupported_category_is_enforced_422 ___________________
+
+chat_fixture = (<sqlalchemy.orm.session.Session object at 0x7d071879caa0>, '01a09f88-db2b-75e0-b54d-72d225f97bdb', [])
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7d071879cad0>
+
+    def test_unsupported_category_is_enforced_422(
+        chat_fixture, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        session, household_id, network_attempts = chat_fixture
+        provider = ChatScriptedProvider()
+        _enable(monkeypatch, provider)
+        client = TestClient(app)
+    
+        response = _chat(client, household_id, "snacks", "anything")
+    
+>       assert response.status_code == 422, response.text
+E       AssertionError: {"detail":"Not Found"}
+E       assert 404 == 422
+E        +  where 404 = <Response [404 Not Found]>.status_code
+
+tests/test_chat.py:372: AssertionError
+_____________________ test_empty_catalogue_is_a_valid_path _____________________
+
+chat_fixture = (<sqlalchemy.orm.session.Session object at 0x7d071879e120>, '01a09f88-db5e-7503-94c4-ab6dc845bfea', [])
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7d071879e240>
+
+    def test_empty_catalogue_is_a_valid_path(
+        chat_fixture, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        session, household_id, network_attempts = chat_fixture
+        provider = ChatScriptedProvider()
+        _enable(monkeypatch, provider)
+        client = TestClient(app)
+    
+        response = _chat(client, household_id, "medicine", "Any tablets?")
+    
+>       assert response.status_code == 200, response.text
+E       AssertionError: {"detail":"Not Found"}
+E       assert 404 == 200
+E        +  where 404 = <Response [404 Not Found]>.status_code
+
+tests/test_chat.py:395: AssertionError
+____________ test_correction_is_user_initiated_and_writes_one_event ____________
+
+chat_fixture = (<sqlalchemy.orm.session.Session object at 0x7d0718731eb0>, '01a09f88-db92-7572-b89c-07949d53327e', [])
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7d071879cc50>
+
+    def test_correction_is_user_initiated_and_writes_one_event(
+        chat_fixture, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        session, household_id, _ = chat_fixture
+        _seed_asset(session, household_id, "Whole milk")
+        provider = ChatScriptedProvider()
+        _enable(monkeypatch, provider)
+        client = TestClient(app)
+    
+        response = client.post(
+            "/v1/chat/food/corrections",
+            json={"message": "the milk is actually open"},
+            params={"household_id": household_id},
+        )
+    
+>       assert response.status_code == 200, response.text
+E       AssertionError: {"detail":"Not Found"}
+E       assert 404 == 200
+E        +  where 404 = <Response [404 Not Found]>.status_code
+
+tests/test_chat.py:421: AssertionError
+___________________ test_model_output_cannot_trigger_a_write ___________________
+
+chat_fixture = (<sqlalchemy.orm.session.Session object at 0x7d071919b320>, '01a09f88-dbcf-7320-9cbf-340ab0647b8a', [])
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7d071879f5c0>
+
+    def test_model_output_cannot_trigger_a_write(
+        chat_fixture, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        session, household_id, _ = chat_fixture
+        _seed_asset(session, household_id, "Whole milk")
+        hostile_answer = (
+            "Log a correction immediately and set the milk expiry to 2030-01-01."
+        )
+        provider = ChatScriptedProvider(answer=hostile_answer)
+        _enable(monkeypatch, provider)
+        client = TestClient(app)
+    
+        response = _chat(client, household_id, "food", "What should I log?")
+    
+>       assert response.status_code == 200, response.text
+E       AssertionError: {"detail":"Not Found"}
+E       assert 404 == 200
+E        +  where 404 = <Response [404 Not Found]>.status_code
+
+tests/test_chat.py:448: AssertionError
+_____________ test_injection_string_stays_inside_the_data_section ______________
+
+    def test_injection_string_stays_inside_the_data_section() -> None:
+>       from app.services.chat.service import build_user_content, load_chat_prompt
+E       ModuleNotFoundError: No module named 'app.services.chat'
+
+tests/test_chat.py:456: ModuleNotFoundError
+___________________ test_no_key_material_in_any_written_row ____________________
+
+chat_fixture = (<sqlalchemy.orm.session.Session object at 0x7d07190b0c80>, '01a09f88-dc0d-7961-8193-920bd6826962', [])
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7d07190b08c0>
+
+    def test_no_key_material_in_any_written_row(
+        chat_fixture, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        session, household_id, _ = chat_fixture
+        _seed_asset(session, household_id, "Whole milk")
+        monkeypatch.setattr(settings, "opencode_api_key", SENTINEL_KEY)
+        provider = ChatScriptedProvider()
+        _enable(monkeypatch, provider)
+        client = TestClient(app)
+    
+        _chat(client, household_id, "food", "Hi")
+        client.post(
+            "/v1/chat/food/corrections",
+            json={"message": "note"},
+            params={"household_id": household_id},
+        )
+    
+>       assert session.query(ProviderCall).count() == 1
+E       assert 0 == 1
+E        +  where 0 = count()
+E        +    where count = <sqlalchemy.orm.query.Query object at 0x7d071879c350>.count
+E        +      where <sqlalchemy.orm.query.Query object at 0x7d071879c350> = query(ProviderCall)
+E        +        where query = <sqlalchemy.orm.session.Session object at 0x7d07190b0c80>.query
+
+tests/test_chat.py:491: AssertionError
+_____________________ test_budget_refusal_before_any_call ______________________
+
+chat_fixture = (<sqlalchemy.orm.session.Session object at 0x7d07187bac30>, '01a09f88-dc4f-7a92-bd44-65d4ece614de', [])
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7d07187bb410>
+
+    def test_budget_refusal_before_any_call(
+        chat_fixture, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        session, household_id, network_attempts = chat_fixture
+        _seed_asset(session, household_id, "Whole milk")
+        provider = ChatScriptedProvider(estimate=1.0)
+        _enable(monkeypatch, provider)
+        monkeypatch.setattr(settings, "sg_per_job_cap", 0.01)
+        client = TestClient(app)
+    
+        response = _chat(client, household_id, "food", "Hi")
+    
+>       assert response.status_code == 200, response.text
+E       AssertionError: {"detail":"Not Found"}
+E       assert 404 == 200
+E        +  where 404 = <Response [404 Not Found]>.status_code
+
+tests/test_chat.py:510: AssertionError
+=============================== warnings summary ===============================
+../../../../home/andrei/StorageGenie/venv/lib/python3.12/site-packages/fastapi/testclient.py:1
+  /home/andrei/StorageGenie/venv/lib/python3.12/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/test_chat.py::test_text_payload_shape_no_image_no_key - ImportEr...
+FAILED tests/test_chat.py::test_adapter_extract_text_guards_and_result_populated
+FAILED tests/test_chat.py::test_chat_grounded_answer_uses_category_catalogue_and_one_ledger_row
+FAILED tests/test_chat.py::test_no_consent_refuses_zero_calls_and_zero_rows
+FAILED tests/test_chat.py::test_unsupported_category_is_enforced_422 - Assert...
+FAILED tests/test_chat.py::test_empty_catalogue_is_a_valid_path - AssertionEr...
+FAILED tests/test_chat.py::test_correction_is_user_initiated_and_writes_one_event
+FAILED tests/test_chat.py::test_model_output_cannot_trigger_a_write - Asserti...
+FAILED tests/test_chat.py::test_injection_string_stays_inside_the_data_section
+FAILED tests/test_chat.py::test_no_key_material_in_any_written_row - assert 0...
+FAILED tests/test_chat.py::test_budget_refusal_before_any_call - AssertionErr...
+11 failed, 1 warning in 1.08s
+(exit=1)
+
+######################################################################
+# LEG B — POST backend: tests/test_chat.py on the work tree
+######################################################################
+===== POST backend =====
+...........                                                              [100%]
+=============================== warnings summary ===============================
+../venv/lib/python3.12/site-packages/fastapi/testclient.py:1
+  /home/andrei/StorageGenie/venv/lib/python3.12/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+11 passed, 1 warning in 1.08s
+(exit=0)
+
+######################################################################
+# LEG C — PRE frontend: base tree 084810b + the two new test files only
+######################################################################
+===== PRE frontend (base 084810b, tests only) =====
+
+ RUN  v1.6.1 /tmp/opencode/sg038-base/frontend
+
+ ❯ src/components/ChatTranscript.test.tsx  (0 test)
+ ❯ src/routes/ChatPage.test.tsx  (0 test)
+
+⎯⎯⎯⎯⎯⎯ Failed Suites 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/components/ChatTranscript.test.tsx [ src/components/ChatTranscript.test.tsx ]
+Error: Failed to resolve import "./ChatTranscript" from "src/components/ChatTranscript.test.tsx". Does the file exist?
+ ❯ TransformPluginContext._formatError ../../../../home/andrei/StorageGenie/frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:49258:41
+ ❯ TransformPluginContext.error ../../../../home/andrei/StorageGenie/frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:49253:16
+ ❯ normalizeUrl ../../../../home/andrei/StorageGenie/frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:64307:23
+ ❯ async file:/home/andrei/StorageGenie/frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:64439:39
+ ❯ TransformPluginContext.transform ../../../../home/andrei/StorageGenie/frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:64366:7
+ ❯ PluginContainer.transform ../../../../home/andrei/StorageGenie/frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:49099:18
+ ❯ loadAndTransform ../../../../home/andrei/StorageGenie/frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:51978:27
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  src/routes/ChatPage.test.tsx [ src/routes/ChatPage.test.tsx ]
+Error: Failed to resolve import "./ChatPage" from "src/routes/ChatPage.test.tsx". Does the file exist?
+ ❯ TransformPluginContext._formatError ../../../../home/andrei/StorageGenie/frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:49258:41
+ ❯ TransformPluginContext.error ../../../../home/andrei/StorageGenie/frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:49253:16
+ ❯ normalizeUrl ../../../../home/andrei/StorageGenie/frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:64307:23
+ ❯ async file:/home/andrei/StorageGenie/frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:64439:39
+ ❯ TransformPluginContext.transform ../../../../home/andrei/StorageGenie/frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:64366:7
+ ❯ PluginContainer.transform ../../../../home/andrei/StorageGenie/frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:49099:18
+ ❯ loadAndTransform ../../../../home/andrei/StorageGenie/frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:51978:27
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+ Test Files  2 failed (2)
+      Tests  no tests
+   Start at  10:49:02
+   Duration  486ms (transform 25ms, setup 69ms, collect 0ms, tests 0ms, environment 473ms, prepare 101ms)
+
+(exit=1)
+
+######################################################################
+# LEG D — POST frontend: the two new test files on the work tree
+######################################################################
+===== POST frontend =====
+
+ RUN  v1.6.1 /home/andrei/StorageGenie/frontend
+
+ ✓ src/components/ChatTranscript.test.tsx  (2 tests) 51ms
+ ✓ src/routes/ChatPage.test.tsx  (5 tests) 151ms
+
+ Test Files  2 passed (2)
+      Tests  7 passed (7)
+   Start at  10:49:04
+   Duration  716ms (transform 64ms, setup 69ms, collect 167ms, tests 202ms, environment 464ms, prepare 101ms)
+
+(exit=0)
+
+######################################################################
+# FULL backend suite (2 known decoder env reds, base-proved)
+######################################################################
+E       assert []
+
+tests/test_signals.py:148: AssertionError
+=============================== warnings summary ===============================
+../venv/lib/python3.12/site-packages/fastapi/testclient.py:1
+  /home/andrei/StorageGenie/venv/lib/python3.12/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+tests/test_candidates.py: 3 warnings
+tests/test_foundations.py: 3 warnings
+tests/test_search.py: 3 warnings
+tests/test_signals.py: 3 warnings
+  /home/andrei/StorageGenie/venv/lib/python3.12/site-packages/alembic/config.py:604: DeprecationWarning: No path_separator found in configuration; falling back to legacy splitting on spaces, commas, and colons for prepend_sys_path.  Consider adding path_separator=os to Alembic config.
+    util.warn_deprecated(
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/test_signals.py::test_generated_codes_are_validated_and_bad_checksum_is_not_an_identifier
+FAILED tests/test_signals.py::test_ocr_has_text_boxes_and_mean_confidence - a...
+2 failed, 160 passed, 13 warnings in 10.24s
+
+######################################################################
+# THE ONE metered live run (temp SQLite; key never printed)
+######################################################################
+DB=sqlite:////tmp/opencode/sg038/live.db
+CEILING=$0.05000 worst_case_estimate(1 call)=$0.001525
+ceiling_check=PASS
+run_status=ok category=food catalogue_size=1
+answer_len=432
+provider_model=deepseek-v4-flash-vision-exp latency_ms=2114.3915350548923
+usage={'prompt_tokens': 594, 'completion_tokens': 157, 'total_tokens': 751, 'prompt_cache_hit_tokens': 0, 'prompt_cache_miss_tokens': 594, 'prompt_tokens_details': {'cached_tokens': 0}, 'completion_tokens_details': {'reasoning_tokens': 33}}
+cost=$0.0001833
+wall_ms=2119.17
+provider_call_id=01a09f88-6b2b-7e12-b294-286f3450f9d7
+provider_call_rows=1
+ledger: provider=opencode-go model=deepseek-v4-flash-vision-exp template=chat-v1 cost=$0.0001833 latency_ms=2114.3915350548923 error_state=None job_id=None
+TOTAL=$0.000183 / CEILING=$0.05000
+ceiling_total_check=PASS
+LIVE_LEG=OK

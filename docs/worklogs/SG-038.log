@@ -1,0 +1,68 @@
+SG-038 coder log — Category chat (Food, then Medicine), grounded, adapter text op (opencode, medium)
+
+BASE REF: automation -> resolved commit 084810b68389c5d309c2aba8d7b84f87aaa7d607
+Work dir /home/andrei/StorageGenie
+Coder argv: opencode run --auto --dir /home/andrei/StorageGenie --variant medium <packet>
+Effort: medium (from argv --variant medium). Model: deepseek-v4.1-flash
+(provider metadata providerID=opencode-go modelID=deepseek-v4.1-flash,
+~/.local/share/opencode/log/opencode.log, read 2026-09-14 10:48 UTC).
+Provider-returned vision model in the live leg: deepseek-v4-flash-vision-exp.
+
+T0 START 10:43:15 UTC approx (opencode process started 10:43:15 UTC).
+
+LEG 0 — premise verification (budget 120s/probe):
+- tree clean, HEAD 084810b, branch automation, origin git@github.com:Andovol/StorageGenie.git.
+- alembic head 20260914_sg035_foundations (no new migration created).
+- protocols.py:34-37 declares OcrProvider.extract_text(image_ref); fake implemented it;
+  opencode_go.py implemented ONLY extract_items(image_bytes, prompt). CONFIRMED.
+- router.py:52-72 dispatches by operation name via getattr; no routing change needed. CONFIRMED.
+- reader.ai_status() providers/providers/reader.py:97-103 gates consent before any provider
+  object is built; planning/service.py already writes guardrail_event rows; the per-call
+  ledger shape is reader._write_ledger/_write_error_ledger. CONFIRMED.
+- category slugs: food -> food_beverages, medicine -> medicine_pharma (expiry_tracker.py:111-152).
+- PREMISE FINDING F-SG038-1 (not an obstacle): the packet's `protocols.py:34-37` reference is
+  correct, but OcrProvider is an OCR-from-image capability. The chat text op does NOT match
+  that signature (text+prompt, no image_ref). The Protocol is documentation only — the router
+  never type-checks it. I left protocols.py UNCHANGED rather than overload the OCR protocol
+  with chat semantics (packet: no new protocol, no new vocabulary). Decision reported.
+
+LEG 1 — backend implementation:
+- opencode_go.py: new build_text_payload(model, prompt, text) (system+user messages,
+  stream:False, NO response_format, no image) + extract_text(text, prompt, *, estimated_cost=0.0)
+  mirroring extract_items guards exactly. normalized_output shape decided:
+  {"text": <content>, "model": <model>, "finish_reason": <choice.finish_reason>}.
+- fake.py: extract_text(text, prompt="", *, estimated_cost=0.0) scripted response; backward
+  compatible with the existing router tests that call extract_text("img-1").
+- new prompts/chat-v1.md (frozen front matter; delimited-data injection posture).
+- new services/chat/{__init__.py,service.py}: consent gate first, category-scoped catalogue
+  grounding (assets + expiry/opened assertions + source attributions), delimited DATA section,
+  one-repair-free single call, one provider_call ledger row (job_id NULL), corrections writer.
+- new api/v1/chat.py: POST /v1/chat/{category} + POST /v1/chat/{category}/corrections;
+  unsupported category -> 422; registered in main.py.
+- new tests/test_chat.py: 11 tests, zero network (adapter _post patched to raise).
+
+LEG 2 — frontend implementation:
+- new routes/ChatPage.{tsx,test.tsx}, components/ChatTranscript.{tsx,test.tsx}.
+- client.ts + types.ts additions; App.tsx route/nav registration.
+- no schedule, no auto-send, no streaming.
+
+LEG 3 — proof:
+- PRE backend: tests/test_chat.py = 11 failed (1.06s) at base worktree; POST = 11 passed (1.08s).
+- PRE frontend: 2 test files failed (screen/component absent, collect 0 tests); POST = 7 passed.
+- full backend suite: 2 failed, 160 passed in 10.24s (2 = base decoder env reds, re-verified).
+- ruff: All checks passed. mypy: 40 errors / 9 files at base AND post (delta 0; no touched file listed).
+- npm run build: green, 881ms, 97 modules. full vitest: 40 passed (14 files).
+- secret scan: 0 in new/changed source (only pre-existing key lines in opencode_go.py's resolver).
+- alembic heads unchanged; no frozen prompt diff; no ignored file staged.
+
+LEG 4 — ONE metered live run (temp SQLite /tmp/opencode/sg038/live.db):
+- ceiling printed/checked first: $0.05000; worst-case 1-call estimate $0.001525 < ceiling.
+- ONE call: model deepseek-v4-flash-vision-exp, latency 2114.39ms,
+  usage prompt=594 completion=157 total=751 (reasoning 33), cost $0.0001833.
+- total $0.000183 / $0.05000; 1 provider_call ledger row (chat-v1, job_id NULL);
+  answer_len=432; no key material printed. No second live run.
+
+LEG 5 — worklogs + receipt note; worktree clean; note added LAST.
+
+Close: overall elapsed ~361s at log capture vs 2400s overall / 1800s early-close.
+Spend: live total $0.0009053 (prior $0.000722 + $0.0001833), offline $0.

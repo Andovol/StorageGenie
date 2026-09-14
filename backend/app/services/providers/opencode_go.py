@@ -141,6 +141,25 @@ def build_chat_payload(model: str, prompt: str, image_b64: str) -> dict[str, Any
     }
 
 
+def build_text_payload(model: str, prompt: str, text: str) -> dict[str, Any]:
+    """The exact outgoing wire shape for a text turn (PG-EV-04).
+
+    `prompt` is the system instruction (the versioned chat prompt); `text` is
+    the user turn (the delimited catalogue data plus the question). Plain text
+    content: no image part, no `response_format` (the answer is free text), and
+    never any key material.
+    """
+    return {
+        "model": model,
+        "stream": False,
+        "max_tokens": DEFAULT_MAX_TOKENS,
+        "messages": [
+            {"role": "system", "content": prompt},
+            {"role": "user", "content": text},
+        ],
+    }
+
+
 class OpenCodeGoProvider:
     """Raw-httpx implementation of the vision extraction operation.
 
@@ -254,5 +273,61 @@ class OpenCodeGoProvider:
             usage=usage,
             cost=cost,
             model_id=str(body.get("model") or self._model_id),
+            latency_ms=latency_ms,
+        )
+
+    def extract_text(
+        self,
+        text: str,
+        prompt: str,
+        *,
+        estimated_cost: float = 0.0,
+    ) -> ProviderResult:
+        """Text turn on the real adapter (SG-038 G1), same guards as `extract_items`.
+
+        Pre-call per-job + monthly refusal, identity headers, 200/envelope
+        checks, `guard_usage`, `strip_single_think`/`guard_content`, cost from
+        usage, one fully populated `ProviderResult`. No image, no base64, no
+        `parse_extraction_output`: the normalized output is the answer text plus
+        the response metadata (`model`, `finish_reason`) — decided here and
+        reported.
+        """
+        if self._per_job_cap is not None and estimated_cost > self._per_job_cap:
+            raise BudgetExceededError(
+                f"estimated cost {estimated_cost} exceeds per-job cap {self._per_job_cap}"
+            )
+        if (
+            self._monthly_cap is not None
+            and self._monthly_spent + estimated_cost > self._monthly_cap
+        ):
+            raise BudgetExceededError(
+                f"estimated cost {estimated_cost} exceeds remaining monthly budget "
+                f"({self._monthly_spent} spent of {self._monthly_cap})"
+            )
+        payload = build_text_payload(self._model_id, prompt, text)
+        started = time.monotonic()
+        body = self._post(payload)
+        latency_ms = (time.monotonic() - started) * 1000.0
+        usage = guard_usage(body.get("usage") or {})
+        choices = body.get("choices") or []
+        if not isinstance(choices, list) or not choices:
+            raise ProviderError("invalid_json", "provider 200 with no choices")
+        choice = choices[0]
+        message = choice.get("message") or {}
+        content = strip_single_think(guard_content(message.get("content")))
+        model_id = str(body.get("model") or self._model_id)
+        cost = compute_cost(usage)
+        self._monthly_spent += cost
+        return ProviderResult(
+            normalized_output={
+                "text": content,
+                "model": model_id,
+                "finish_reason": choice.get("finish_reason"),
+            },
+            raw_payload=body,
+            request_id=str(body.get("id") or ""),
+            usage=usage,
+            cost=cost,
+            model_id=model_id,
             latency_ms=latency_ms,
         )
