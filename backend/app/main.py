@@ -24,10 +24,11 @@ from app.config import settings
 app = FastAPI(title="StorageGenie", version="0.1.0")
 
 origins = [o.strip() for o in settings.cors_origins.split(",") if o.strip()]
+allow_credentials = "*" not in origins
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
-    allow_credentials=True,
+    allow_credentials=allow_credentials,
     allow_methods=["*"],
     allow_headers=["*"],
 )
