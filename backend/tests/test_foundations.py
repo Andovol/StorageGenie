@@ -155,6 +155,23 @@ def test_planning_suggestion_round_trips(foundation_db) -> None:  # type: ignore
     assert json.loads(loaded.backing_refs_json) == [assertion.id]
 
 
+def test_sqlite_busy_timeout_pragma(tmp_path: Path) -> None:
+    from app.db import _set_sqlite_pragma
+    import sqlite3
+
+    db_path = tmp_path / "test_pragma.db"
+    conn = sqlite3.connect(str(db_path))
+    _set_sqlite_pragma(conn, None)
+
+    cursor = conn.cursor()
+    cursor.execute("PRAGMA busy_timeout;")
+    timeout = cursor.fetchone()[0]
+    cursor.close()
+    conn.close()
+
+    assert timeout == 5000
+
+
 def test_guardrail_event_round_trips(foundation_db) -> None:  # type: ignore[no-untyped-def]
     session, household, _, assertion = foundation_db
     event = GuardrailEvent(
