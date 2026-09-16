@@ -1,0 +1,259 @@
+SG-043 verify log — raw command outputs (first token SG-043)
+Generated 2026-09-16T11:14:05Z — all timestamps from the live clock (PG-IC-07).
+
+################################################################
+# 1. PRE-CHANGE HOLLOW RUN (LABEL: HOLLOW — class 8, NOT EVIDENCE)
+#    New test modules do not exist on BASE 1bc4551, so vitest fails on
+#    unresolvable imports. Quoted as context only; the discriminating
+#    proof is the post-change mutation run in section 2.
+################################################################
+
+> storagegenie-frontend@0.1.0 test
+> vitest run src/theme/theme.test.tsx src/types/product.test.ts
+
+
+ RUN  v1.6.1 /home/andrei/StorageGenie/frontend
+
+ ❯ src/types/product.test.ts  (0 test)
+ ❯ src/theme/theme.test.tsx  (0 test)
+
+⎯⎯⎯⎯⎯⎯ Failed Suites 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/theme/theme.test.tsx [ src/theme/theme.test.tsx ]
+Error: Failed to resolve import "./ThemeProvider" from "src/theme/theme.test.tsx". Does the file exist?
+ ❯ TransformPluginContext._formatError node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:49258:41
+ ❯ TransformPluginContext.error node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:49253:16
+ ❯ normalizeUrl node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:64307:23
+ ❯ async file:/home/andrei/StorageGenie/frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:64439:39
+ ❯ TransformPluginContext.transform node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:64366:7
+ ❯ PluginContainer.transform node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:49099:18
+ ❯ loadAndTransform node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:51978:27
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  src/types/product.test.ts [ src/types/product.test.ts ]
+Error: Failed to resolve import "./product" from "src/types/product.test.ts". Does the file exist?
+ ❯ TransformPluginContext._formatError node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:49258:41
+ ❯ TransformPluginContext.error node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:49253:16
+ ❯ normalizeUrl node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:64307:23
+ ❯ async file:/home/andrei/StorageGenie/frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:64439:39
+ ❯ TransformPluginContext.transform node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:64366:7
+ ❯ PluginContainer.transform node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:49099:18
+ ❯ loadAndTransform node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:51978:27
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+ Test Files  2 failed (2)
+      Tests  no tests
+   Start at  11:11:02
+   Duration  709ms (transform 26ms, setup 145ms, collect 0ms, tests 0ms, environment 747ms, prepare 150ms)
+
+
+################################################################
+# 2. POST-CHANGE MUTATION RUN (PG-EV-01: deliberately wrong values)
+#    Each mutation applied, run, reverted. Raw output below.
+################################################################
+########## MUTATION 1: tokens.css .dark --card 30 7.7% 10.2% -> 30 7.7% 12% ##########
+     → expected '#211F1C' to be '#1C1A18' // Object.is equality
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+ FAIL  src/theme/theme.test.tsx > tokens.css > declares the exact DQ3 dark elevation layers
+      Tests  1 failed | 9 passed (10)
+MUT1_TEST_EXIT=1
+reverted; grep shows: 28:  --card: 30 7.7% 10.2%;
+
+########## MUTATION 2: product.ts job default idle -> failed ##########
+     → expected 'failed' to be 'idle' // Object.is equality
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+ FAIL  src/types/product.test.ts > jobToRenderJob > unmapped job states fall back to idle
+      Tests  1 failed | 10 passed (11)
+MUT2_TEST_EXIT=1
+reverted; grep shows: 126:    status: JOB_STATE_MAP[state] ?? "idle",
+
+########## MUTATION 3: CANONICAL_CATEGORIES drop Accessories ##########
+     → expected [ 'Tops', 'Bottoms', 'Dresses', …(2) ] to have a length of 6 but got 5
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+ FAIL  src/types/product.test.ts > CANONICAL_CATEGORIES > exports the six canonical categories
+      Tests  1 failed | 10 passed (11)
+MUT3_TEST_EXIT=1
+reverted; grep shows: 13:  "Accessories",
+
+################################################################
+# 3. POST-CHANGE GREEN RUN (suite + lint + build, 600s bound)
+################################################################
+=== npm test (full) ===
+
+> storagegenie-frontend@0.1.0 test
+> vitest run
+
+
+ RUN  v1.6.1 /home/andrei/StorageGenie/frontend
+
+ ✓ src/types/product.test.ts  (11 tests) 6ms
+stderr | src/routes/InboxPage.test.tsx > InboxPage > renders failed loaded job detail and retries that loaded id
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+stderr | src/routes/ReviewPage.test.tsx > ReviewPage > posts every decision with the loaded candidate id and supports keyboard actions
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+stderr | src/routes/AssetDetailPage.test.tsx > AssetDetailPage > editing quantity patches via PATCH and shows the superseded prior value in history
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+ ✓ src/theme/theme.test.tsx  (10 tests) 113ms
+ ✓ src/routes/AssetDetailPage.test.tsx  (2 tests) 230ms
+ ✓ src/routes/ReviewPage.test.tsx  (4 tests) 287ms
+ ✓ src/routes/InboxPage.test.tsx  (4 tests) 320ms
+ ✓ src/routes/PlanningPage.test.tsx  (4 tests) 283ms
+ ✓ src/components/AssetForm.test.tsx  (4 tests) 190ms
+ ✓ src/components/CandidateCard.test.tsx  (4 tests) 127ms
+ ✓ src/routes/SettingsPage.test.tsx  (3 tests) 144ms
+ ✓ src/routes/ChatPage.test.tsx  (5 tests) 206ms
+ ✓ src/components/ExpiryEntryForm.test.tsx  (2 tests) 102ms
+ ✓ src/components/PlanningSuggestionCard.test.tsx  (2 tests) 84ms
+ ✓ src/components/JobCard.test.tsx  (1 test) 46ms
+ ✓ src/components/ChatTranscript.test.tsx  (2 tests) 67ms
+ ✓ src/components/ProvenanceBadge.test.tsx  (3 tests) 56ms
+ ✓ src/api/client.test.ts  (3 tests) 3ms
+ ✓ src/components/AssetCard.test.tsx  (1 test) 35ms
+stderr | src/components/AssetCard.test.tsx > AssetCard > renders display_name and type
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+
+ Test Files  17 passed (17)
+      Tests  65 passed (65)
+   Start at  11:13:40
+   Duration  2.89s (transform 613ms, setup 571ms, collect 1.93s, tests 2.30s, environment 4.56s, prepare 1.19s)
+
+TEST_EXIT=0
+TEST_ELAPSED=3s
+=== npm run lint ===
+
+> storagegenie-frontend@0.1.0 lint
+> eslint src
+
+LINT_EXIT=0
+LINT_ELAPSED=1s
+=== npm run build ===
+
+> storagegenie-frontend@0.1.0 build
+> tsc && vite build
+
+vite v5.4.21 building for production...
+transforming...
+✓ 99 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                   0.94 kB │ gzip:  0.47 kB
+dist/assets/index-DxKo-z_g.css    2.65 kB │ gzip:  0.82 kB
+dist/assets/index-BbtiSgfY.js   253.15 kB │ gzip: 77.18 kB
+✓ built in 847ms
+BUILD_EXIT=0
+BUILD_ELAPSED=3s
+TOTAL_ELAPSED=7s
+
+################################################################
+# 4. TREE / DIFF / SECRET EVIDENCE
+################################################################
+########## GIT STATUS ##########
+(empty above = clean)
+
+########## BASE..WORK diffstat ##########
+frontend/index.html                  |  15 +++
+ frontend/package-lock.json           |  10 ++
+ frontend/package.json                |   1 +
+ frontend/src/main.tsx                |  10 +-
+ frontend/src/theme/ThemeProvider.tsx |  85 ++++++++++++++
+ frontend/src/theme/ThemeToggle.tsx   |  34 ++++++
+ frontend/src/theme/theme.test.tsx    | 209 +++++++++++++++++++++++++++++++++++
+ frontend/src/theme/tokens.css        | 154 ++++++++++++++++++++++++++
+ frontend/src/types/product.test.ts   | 128 +++++++++++++++++++++
+ frontend/src/types/product.ts        | 129 +++++++++++++++++++++
+ 10 files changed, 772 insertions(+), 3 deletions(-)
+
+########## backend/ diff (expect empty) ##########
+
+(empty above = no backend change)
+
+########## alembic/migration diff (expect empty) ##########
+
+(empty above = no migration)
+
+########## package.json diff (lucide line only) ##########
+frontend/package.json | 1 +
+ 1 file changed, 1 insertion(+)
+
+Changes:
+
+frontend/package.json
+  @@ -11,6 +11,7 @@
+  +    "lucide-react": "^1.46.0",
+       "react": "^18.3.1",
+       "react-dom": "^18.3.1",
+       "react-router-dom": "^6.23.0"
+  +1 -0
+
+########## index.html gated hunk ##########
+frontend/index.html | 15 +++++++++++++++
+ 1 file changed, 15 insertions(+)
+
+Changes:
+
+frontend/index.html
+  @@ -4,6 +4,21 @@
+  +    <script>
+  +      (function () {
+  +        try {
+  +          var stored = localStorage.getItem("sg-theme");
+  +          var dark =
+  +            stored === "dark" ||
+  +            ((stored === null || stored === "system") &&
+  +              window.matchMedia("(prefers-color-scheme: dark)").matches);
+  +          document.documentElement.classList.toggle("dark", dark);
+  +          document.documentElement.classList.toggle("light", !dark);
+  +        } catch (error) {
+  +          document.documentElement.classList.add("light");
+  +        }
+  +      })();
+  +    </script>
+     </head>
+     <body>
+       <div id="root"></div>
+  +15 -0
+
+########## main.tsx gated hunks ##########
+frontend/src/main.tsx | 10 +++++++---
+ 1 file changed, 7 insertions(+), 3 deletions(-)
+
+Changes:
+
+frontend/src/main.tsx
+  @@ -3,6 +3,8 @@ import ReactDOM from "react-dom/client";
+  +import "./theme/tokens.css";
+  +import { ThemeProvider } from "./theme/ThemeProvider";
+   
+   const qc = new QueryClient({
+     defaultOptions: { queries: { retry: 1, refetchOnWindowFocus: false } },
+  @@ -11,9 +13,11 @@ const qc = new QueryClient({
+  -      <BrowserRouter>
+  -        <App />
+  -      </BrowserRouter>
+  +      <ThemeProvider>
+  +        <BrowserRouter>
+  +          <App />
+  +        </BrowserRouter>
+  +      </ThemeProvider>
+       </QueryClientProvider>
+     </React.StrictMode>
+   );
+  +7 -3
+
+########## frozen prompt bytes changed? (grep prompt files) ##########
+none
+
+SECRET SCAN (tight — real secret shapes on changed source, excluding lockfile token-named packages):
+SECRET_HITS=0
+
+END OF SG-043 VERIFY LOG
