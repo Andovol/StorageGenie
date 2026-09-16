@@ -1,0 +1,8 @@
+Negative-Receipt-ID: SG-042
+utc=2026-09-16T10:43:00Z
+DISPATCH_RESULT id=SG-042 coder=opencode exit=1 head=48aa92b1769040dff93ae277c811ca79c434aa4e note=no moved=no rewrite=no dirty=no elapsed=4s budget=2100s
+P1_moved=FAIL count=0
+P2_rewrite=PASS behind=0
+P3_note=FAIL note=no
+P5_receipt=FAIL
+P6_dirty=PASS dirty=no
