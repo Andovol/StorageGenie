@@ -1,7 +1,9 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { Upload } from "lucide-react";
 import { ThemeToggle } from "../../theme/ThemeToggle";
+import { AssetImportModal } from "./AssetImportModal";
+import { useHouseholds } from "../../hooks/useAssets";
 
 type AppHeaderProps = {
   loadedCount: number;
@@ -11,6 +13,12 @@ type AppHeaderProps = {
 
 export function AppHeader({ loadedCount, searchValue, onSearchChange }: AppHeaderProps) {
   const searchRef = useRef<HTMLInputElement>(null);
+  const { data: households } = useHouseholds();
+  const [importOpen, setImportOpen] = useState(false);
+  const householdId =
+    (typeof localStorage !== "undefined" ? localStorage.getItem("household_id") : "") ||
+    households?.[0]?.id ||
+    "";
 
   useEffect(() => {
     const handler = (event: KeyboardEvent) => {
@@ -77,6 +85,10 @@ export function AppHeader({ loadedCount, searchValue, onSearchChange }: AppHeade
       <ThemeToggle />
       <Link
         to="/capture"
+        onClick={(event) => {
+          event.preventDefault();
+          setImportOpen(true);
+        }}
         className="bg-primary text-primary-foreground focus-ring"
         style={{
           padding: "6px 12px",
@@ -92,6 +104,9 @@ export function AppHeader({ loadedCount, searchValue, onSearchChange }: AppHeade
         <Upload size={16} aria-hidden="true" />
         Import Asset
       </Link>
+      {importOpen ? (
+        <AssetImportModal householdId={householdId} onClose={() => setImportOpen(false)} />
+      ) : null}
     </div>
   );
 }

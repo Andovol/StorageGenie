@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import type { Density } from "../shell/CatalogToolbar";
 import { ProductCard, cardMedia, statusBadgeClass, STATUS_LABEL, type CatalogProduct } from "./ProductCard";
 import { ProductCardSkeleton } from "./ProductCardSkeleton";
+import { AssetImportModal } from "../shell/AssetImportModal";
 
 /**
  * 2 cols mobile -> 3 tablet -> 4 desktop -> 5 ultrawide, gap-4 / md:gap-5.
@@ -258,6 +259,8 @@ export function ProductGrid({
   limit = 20,
   onSelect,
 }: ProductGridProps) {
+  const [importOpen, setImportOpen] = useState(false);
+
   if (loading) {
     return (
       <div
@@ -287,12 +290,24 @@ export function ProductGrid({
         <p className="text-muted-foreground" style={{ margin: 0 }}>
           No items match the current view.
         </p>
-        <Link to="/capture" className="bg-primary text-primary-foreground focus-ring" style={ctaStyle}>
+        <Link
+          to="/capture"
+          onClick={(event) => {
+            event.preventDefault();
+            setImportOpen(true);
+          }}
+          className="bg-primary text-primary-foreground focus-ring"
+          style={ctaStyle}
+        >
           Import New Item
         </Link>
         <p className="text-muted-foreground" style={{ margin: 0, fontSize: 12 }}>
-          Opens the Capture route; the DQ9 import modal arrives with SG-047.
+          Opens the import dialog: drop, select or paste photos. The Capture route stays for direct
+          navigation.
         </p>
+        {importOpen ? (
+          <AssetImportModal householdId={householdId} onClose={() => setImportOpen(false)} />
+        ) : null}
       </div>
     );
   }
