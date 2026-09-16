@@ -1,12 +1,19 @@
-import { describe, expect, test } from "vitest";
-import { fireEvent, render, screen } from "@testing-library/react";
+import { beforeEach, describe, expect, test, vi } from "vitest";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { MemoryRouter, Route, Routes } from "react-router-dom";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import type { ReactElement } from "react";
 import type { ProductStatus } from "../../types/product";
+import type { Asset } from "../../api/types";
+import { CatalogPage } from "../../routes/CatalogPage";
+import { ThemeProvider } from "../../theme/ThemeProvider";
 import { BADGE_CLASS, ProductCard, type CatalogProduct } from "./ProductCard";
 import { ProductCardSkeleton } from "./ProductCardSkeleton";
 import { ProductGrid, formatRelativeDate } from "./ProductGrid";
 import { MOCK_PRODUCTS } from "./mockProducts";
+
+const api = vi.hoisted(() => ({ apiGet: vi.fn(), apiPatch: vi.fn() }));
+vi.mock("../../api/client", () => api);
 
 const DQ3_PAIRS: Record<ProductStatus, string[]> = {
   raw: [
@@ -254,5 +261,205 @@ describe("mockProducts", () => {
     for (const product of MOCK_PRODUCTS) {
       expect(hasRawResponseKey(product)).toBe(false);
     }
+  });
+});
+
+describe("ProductCard onSelect", () => {
+  const item = MOCK_PRODUCTS[0];
+
+  test("with onSelect, a click selects the asset id and does not navigate", () => {
+    const onSelect = vi.fn();
+    render(
+      <MemoryRouter initialEntries={["/"]}>
+        <Routes>
+          <Route
+            path="/"
+            element={<ProductCard item={item} householdId="h1" onSelect={onSelect} />}
+          />
+          <Route path="/assets/:id" element={<div>detail probe</div>} />
+        </Routes>
+      </MemoryRouter>
+    );
+
+    fireEvent.click(screen.getByTestId("product-card"));
+
+    expect(onSelect).toHaveBeenCalledTimes(1);
+    expect(onSelect).toHaveBeenCalledWith(item.id);
+    expect(screen.queryByText("detail probe")).not.toBeInTheDocument();
+  });
+
+  test("with onSelect, Enter and Space select the asset id without navigating", () => {
+    const onSelect = vi.fn();
+    render(
+      <MemoryRouter initialEntries={["/"]}>
+        <Routes>
+          <Route
+            path="/"
+            element={<ProductCard item={item} householdId="h1" onSelect={onSelect} />}
+          />
+          <Route path="/assets/:id" element={<div>detail probe</div>} />
+        </Routes>
+      </MemoryRouter>
+    );
+
+    const card = screen.getByTestId("product-card");
+    fireEvent.keyDown(card, { key: "Enter" });
+    fireEvent.keyDown(card, { key: " " });
+
+    expect(onSelect).toHaveBeenNthCalledWith(1, item.id);
+    expect(onSelect).toHaveBeenNthCalledWith(2, item.id);
+    expect(screen.queryByText("detail probe")).not.toBeInTheDocument();
+  });
+
+  test("without onSelect, a click still navigates to the detail route", async () => {
+    render(
+      <MemoryRouter initialEntries={["/"]}>
+        <Routes>
+          <Route path="/" element={<ProductCard item={item} householdId="h1" />} />
+          <Route path="/assets/:id" element={<div>detail probe</div>} />
+        </Routes>
+      </MemoryRouter>
+    );
+
+    fireEvent.click(screen.getByTestId("product-card"));
+
+    expect(await screen.findByText("detail probe")).toBeInTheDocument();
+  });
+});
+
+describe("ProductGrid onSelect", () => {
+  const item = MOCK_PRODUCTS[0];
+
+  function renderGrid(density: "grid" | "table", onSelect: (id: string) => void) {
+    return render(
+      <MemoryRouter initialEntries={["/"]}>
+        <Routes>
+          <Route
+            path="/"
+            element={
+              <ProductGrid items={[item]} density={density} householdId="h1" onSelect={onSelect} />
+            }
+          />
+          <Route path="/assets/:id" element={<div>detail probe</div>} />
+        </Routes>
+      </MemoryRouter>
+    );
+  }
+
+  test("a table row click with onSelect selects instead of navigating", () => {
+    const onSelect = vi.fn();
+    renderGrid("table", onSelect);
+
+    fireEvent.click(screen.getByTestId("product-row"));
+
+    expect(onSelect).toHaveBeenCalledWith(item.id);
+    expect(screen.queryByText("detail probe")).not.toBeInTheDocument();
+  });
+
+  test("Enter on a table row with onSelect selects instead of navigating", () => {
+    const onSelect = vi.fn();
+    renderGrid("table", onSelect);
+
+    fireEvent.keyDown(screen.getByTestId("product-row"), { key: "Enter" });
+
+    expect(onSelect).toHaveBeenCalledWith(item.id);
+    expect(screen.queryByText("detail probe")).not.toBeInTheDocument();
+  });
+
+  test("the ... actions button with onSelect selects instead of navigating", () => {
+    const onSelect = vi.fn();
+    renderGrid("table", onSelect);
+
+    fireEvent.click(screen.getByRole("button", { name: `Actions for ${item.name}` }));
+
+    expect(onSelect).toHaveBeenCalledWith(item.id);
+    expect(screen.queryByText("detail probe")).not.toBeInTheDocument();
+  });
+
+  test("the grid density passes onSelect through to the cards", () => {
+    const onSelect = vi.fn();
+    renderGrid("grid", onSelect);
+
+    fireEvent.click(screen.getByTestId("product-card"));
+
+    expect(onSelect).toHaveBeenCalledWith(item.id);
+    expect(screen.queryByText("detail probe")).not.toBeInTheDocument();
+  });
+});
+
+describe("CatalogPage drawer wiring", () => {
+  const catalogAsset: Asset = {
+    id: "a-drill",
+    household_id: "h1",
+    display_name: "Drill",
+    asset_type: "Hardware & Tools",
+    status: "ACTIVE",
+    quantity: null,
+    unit: null,
+    condition: null,
+    version: 1,
+    created_at: "2026-09-10T00:00:00Z",
+    updated_at: null,
+  };
+
+  function renderCatalog(client: QueryClient) {
+    return render(
+      <QueryClientProvider client={client}>
+        <ThemeProvider>
+          <MemoryRouter initialEntries={["/"]}>
+            <CatalogPage />
+          </MemoryRouter>
+        </ThemeProvider>
+      </QueryClientProvider>
+    );
+  }
+
+  beforeEach(() => {
+    window.localStorage.clear();
+    api.apiGet.mockReset();
+    api.apiPatch.mockReset();
+    api.apiGet.mockImplementation((path: string) => {
+      if (path === "/v1/households") {
+        return Promise.resolve([{ id: "h1", name: "Home", created_at: "2026-09-01T00:00:00Z" }]);
+      }
+      if (path === "/v1/assets") {
+        return Promise.resolve({ items: [catalogAsset], next_cursor: null });
+      }
+      if (path === "/v1/assets/a-drill") {
+        return Promise.resolve(catalogAsset);
+      }
+      return Promise.resolve(null);
+    });
+  });
+
+  test("a catalog card click opens the drawer for that asset and close clears it", async () => {
+    renderCatalog(new QueryClient({ defaultOptions: { queries: { retry: false } } }));
+
+    fireEvent.click(await screen.findByTestId("product-card"));
+
+    expect(await screen.findByTestId("inspector-drawer")).toBeInTheDocument();
+    expect(screen.getByTestId("drawer-title")).toHaveTextContent("Drill");
+
+    fireEvent.click(screen.getByRole("button", { name: "Close inspector" }));
+
+    await waitFor(() =>
+      expect(screen.queryByTestId("inspector-drawer")).not.toBeInTheDocument()
+    );
+  });
+
+  test("a save from the mounted drawer invalidates the assets + asset query keys", async () => {
+    const client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+    const spy = vi.spyOn(client, "invalidateQueries");
+    api.apiPatch.mockResolvedValue({ ...catalogAsset, display_name: "Renamed" });
+    renderCatalog(client);
+
+    fireEvent.click(await screen.findByTestId("product-card"));
+    await screen.findByTestId("inspector-drawer");
+
+    fireEvent.change(screen.getByLabelText("Title"), { target: { value: "Renamed" } });
+    fireEvent.click(screen.getByRole("button", { name: "Save changes" }));
+
+    await waitFor(() => expect(spy).toHaveBeenCalledWith({ queryKey: ["assets"] }));
+    expect(spy).toHaveBeenCalledWith({ queryKey: ["asset", "a-drill"] });
   });
 });

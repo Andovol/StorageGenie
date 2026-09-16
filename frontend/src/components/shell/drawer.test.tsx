@@ -209,4 +209,21 @@ describe("ItemInspectorDrawer", () => {
     await screen.findByTestId("inspector-drawer");
     expect(screen.getByTestId("source-empty")).toHaveTextContent(/no source photo is attached/i);
   });
+
+  test("a successful save invalidates the assets and asset query keys", async () => {
+    const client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+    const spy = vi.spyOn(client, "invalidateQueries");
+    render(
+      <QueryClientProvider client={client}>
+        <ItemInspectorDrawer asset={baseAsset} householdId="h1" onClose={vi.fn()} />
+      </QueryClientProvider>
+    );
+    await screen.findByTestId("inspector-drawer");
+
+    fireEvent.change(screen.getByLabelText("Title"), { target: { value: "Renamed Drill" } });
+    fireEvent.click(screen.getByRole("button", { name: "Save changes" }));
+
+    await waitFor(() => expect(spy).toHaveBeenCalledWith({ queryKey: ["assets"] }));
+    expect(spy).toHaveBeenCalledWith({ queryKey: ["asset", "asset-1"] });
+  });
 });
