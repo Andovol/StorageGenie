@@ -1,0 +1,2564 @@
+SG-042_verify — raw FAIL-then-PASS evidence (ANSI stripped)
+BASE=48aa92b1769040dff93ae277c811ca79c434aa4e  contract=0.27.0
+live clock: 2026-09-16T10:52Z
+
+===== SECTION 1: PRE-CHANGE RUN (new tests on base tree, feature absent) =====
+cmd: cd frontend && ./node_modules/.bin/vitest run src/components/AssetForm.test.tsx
+
+ RUN  v1.6.1 /home/andrei/StorageGenie/frontend
+
+ ❯ src/components/AssetForm.test.tsx  (4 tests | 4 failed) 3088ms
+   ❯ src/components/AssetForm.test.tsx > AssetForm > a paste carrying an image file stages it with name and size, and remove deletes it
+     → Unable to find an element with the text: /pasted\.png/. This could be because the text is broken up by multiple elements. In this case, you can provide a function for your text matcher to make your matcher more flexible.
+
+Ignored nodes: comments, script, style
+<body>
+  <div>
+    <form
+      style="display: flex; flex-direction: column; gap: 12px; max-width: 520px;"
+    >
+      <label
+        style="display: flex; flex-direction: column; gap: 4px;"
+      >
+        <span>
+          Display name *
+        </span>
+        <input
+          placeholder="e.g. Hammer"
+          required=""
+          style="width: 100%; padding: 8px; border: 1px solid rgb(209, 213, 219); border-radius: 6px;"
+          value=""
+        />
+      </label>
+      <label
+        style="display: flex; flex-direction: column; gap: 4px;"
+      >
+        <span>
+          Asset type
+        </span>
+        <select
+          style="width: 100%; padding: 8px; border-radius: 6px;"
+        >
+          <option
+            value="unknown"
+          >
+            unknown
+          </option>
+          <option
+            value="equipment"
+          >
+            equipment
+          </option>
+          <option
+            value="product"
+          >
+            product
+          </option>
+          <option
+            value="component"
+          >
+            component
+          </option>
+          <option
+            value="consumable"
+          >
+            consumable
+          </option>
+          <option
+            value="container"
+          >
+            container
+          </option>
+          <option
+            value="document"
+          >
+            document
+          </option>
+          <option
+            value="collection"
+          >
+            collection
+          </option>
+        </select>
+      </label>
+      <div
+        style="display: flex; gap: 12px;"
+      >
+        <label
+          style="flex: 1 1 0%; display: flex; flex-direction: column; gap: 4px;"
+        >
+          <span>
+            Quantity
+          </span>
+          <input
+            step="any"
+            style="padding: 8px; border: 1px solid rgb(209, 213, 219); border-radius: 6px;"
+            type="number"
+            value=""
+          />
+        </label>
+        <label
+          style="flex: 1 1 0%; display: flex; flex-direction: column; gap: 4px;"
+        >
+          <span>
+            Unit
+          </span>
+          <input
+            placeholder="pcs, kg…"
+            style="padding: 8px; border: 1px solid rgb(209, 213, 219); border-radius: 6px;"
+            value=""
+          />
+        </label>
+        <label
+          style="flex: 1 1 0%; display: flex; flex-direction: column; gap: 4px;"
+        >
+          <span>
+            Condition
+          </span>
+          <input
+            placeholder="new, used…"
+            style="padding: 8px; border: 1px solid rgb(209, 213, 219); border-radius: 6px;"
+            value=""
+          />
+        </label>
+      </div>
+      <div
+        style="border: 2px dashed rgb(209, 213, 219); border-radius: 8px; padding: 16px; background: rgb(249, 250, 251); text-align: center;"
+      >
+        <div
+          style="font-size: 13px; color: rgb(107, 114, 128); margin-bottom: 8px;"
+        >
+          Drag & drop photos here or click to select
+        </div>
+        <input
+          accept="image/*,.pdf"
+          multiple=""
+          type="file"
+        />
+      </div>
+      <button
+        style="padding: 10px 16px; background: rgb(17, 24, 39); color: white; border-radius: 6px; cursor: pointer;"
+        type="submit"
+      >
+        Create asset
+      </button>
+    </form>
+  </div>
+</body>
+
+Ignored nodes: comments, script, style
+<body>
+  <div>
+    <form
+      style="display: flex; flex-direction: column; gap: 12px; max-width: 520px;"
+    >
+      <label
+        style="display: flex; flex-direction: column; gap: 4px;"
+      >
+        <span>
+          Display name *
+        </span>
+        <input
+          placeholder="e.g. Hammer"
+          required=""
+          style="width: 100%; padding: 8px; border: 1px solid rgb(209, 213, 219); border-radius: 6px;"
+          value=""
+        />
+      </label>
+      <label
+        style="display: flex; flex-direction: column; gap: 4px;"
+      >
+        <span>
+          Asset type
+        </span>
+        <select
+          style="width: 100%; padding: 8px; border-radius: 6px;"
+        >
+          <option
+            value="unknown"
+          >
+            unknown
+          </option>
+          <option
+            value="equipment"
+          >
+            equipment
+          </option>
+          <option
+            value="product"
+          >
+            product
+          </option>
+          <option
+            value="component"
+          >
+            component
+          </option>
+          <option
+            value="consumable"
+          >
+            consumable
+          </option>
+          <option
+            value="container"
+          >
+            container
+          </option>
+          <option
+            value="document"
+          >
+            document
+          </option>
+          <option
+            value="collection"
+          >
+            collection
+          </option>
+        </select>
+      </label>
+      <div
+        style="display: flex; gap: 12px;"
+      >
+        <label
+          style="flex: 1 1 0%; display: flex; flex-direction: column; gap: 4px;"
+        >
+          <span>
+            Quantity
+          </span>
+          <input
+            step="any"
+            style="padding: 8px; border: 1px solid rgb(209, 213, 219); border-radius: 6px;"
+            type="number"
+            value=""
+          />
+        </label>
+        <label
+          style="flex: 1 1 0%; display: flex; flex-direction: column; gap: 4px;"
+        >
+          <span>
+            Unit
+          </span>
+          <input
+            placeholder="pcs, kg…"
+            style="padding: 8px; border: 1px solid rgb(209, 213, 219); border-radius: 6px;"
+            value=""
+          />
+        </label>
+        <label
+          style="flex: 1 1 0%; display: flex; flex-direction: column; gap: 4px;"
+        >
+          <span>
+            Condition
+          </span>
+          <input
+            placeholder="new, used…"
+            style="padding: 8px; border: 1px solid rgb(209, 213, 219); border-radius: 6px;"
+            value=""
+          />
+        </label>
+      </div>
+      <div
+        style="border: 2px dashed rgb(209, 213, 219); border-radius: 8px; padding: 16px; background: rgb(249, 250, 251); text-align: center;"
+      >
+        <div
+          style="font-size: 13px; color: rgb(107, 114, 128); margin-bottom: 8px;"
+        >
+          Drag & drop photos here or click to select
+        </div>
+        <input
+          accept="image/*,.pdf"
+          multiple=""
+          type="file"
+        />
+      </div>
+      <button
+        style="padding: 10px 16px; background: rgb(17, 24, 39); color: white; border-radius: 6px; cursor: pointer;"
+        type="submit"
+      >
+        Create asset
+      </button>
+    </form>
+  </div>
+</body>
+   ❯ src/components/AssetForm.test.tsx > AssetForm > a text-only paste stages nothing and disturbs no existing entry
+     → Unable to find an element with the text: /kept\.png/. This could be because the text is broken up by multiple elements. In this case, you can provide a function for your text matcher to make your matcher more flexible.
+
+Ignored nodes: comments, script, style
+<body>
+  <div>
+    <form
+      style="display: flex; flex-direction: column; gap: 12px; max-width: 520px;"
+    >
+      <label
+        style="display: flex; flex-direction: column; gap: 4px;"
+      >
+        <span>
+          Display name *
+        </span>
+        <input
+          placeholder="e.g. Hammer"
+          required=""
+          style="width: 100%; padding: 8px; border: 1px solid rgb(209, 213, 219); border-radius: 6px;"
+          value=""
+        />
+      </label>
+      <label
+        style="display: flex; flex-direction: column; gap: 4px;"
+      >
+        <span>
+          Asset type
+        </span>
+        <select
+          style="width: 100%; padding: 8px; border-radius: 6px;"
+        >
+          <option
+            value="unknown"
+          >
+            unknown
+          </option>
+          <option
+            value="equipment"
+          >
+            equipment
+          </option>
+          <option
+            value="product"
+          >
+            product
+          </option>
+          <option
+            value="component"
+          >
+            component
+          </option>
+          <option
+            value="consumable"
+          >
+            consumable
+          </option>
+          <option
+            value="container"
+          >
+            container
+          </option>
+          <option
+            value="document"
+          >
+            document
+          </option>
+          <option
+            value="collection"
+          >
+            collection
+          </option>
+        </select>
+      </label>
+      <div
+        style="display: flex; gap: 12px;"
+      >
+        <label
+          style="flex: 1 1 0%; display: flex; flex-direction: column; gap: 4px;"
+        >
+          <span>
+            Quantity
+          </span>
+          <input
+            step="any"
+            style="padding: 8px; border: 1px solid rgb(209, 213, 219); border-radius: 6px;"
+            type="number"
+            value=""
+          />
+        </label>
+        <label
+          style="flex: 1 1 0%; display: flex; flex-direction: column; gap: 4px;"
+        >
+          <span>
+            Unit
+          </span>
+          <input
+            placeholder="pcs, kg…"
+            style="padding: 8px; border: 1px solid rgb(209, 213, 219); border-radius: 6px;"
+            value=""
+          />
+        </label>
+        <label
+          style="flex: 1 1 0%; display: flex; flex-direction: column; gap: 4px;"
+        >
+          <span>
+            Condition
+          </span>
+          <input
+            placeholder="new, used…"
+            style="padding: 8px; border: 1px solid rgb(209, 213, 219); border-radius: 6px;"
+            value=""
+          />
+        </label>
+      </div>
+      <div
+        style="border: 2px dashed rgb(209, 213, 219); border-radius: 8px; padding: 16px; background: rgb(249, 250, 251); text-align: center;"
+      >
+        <div
+          style="font-size: 13px; color: rgb(107, 114, 128); margin-bottom: 8px;"
+        >
+          Drag & drop photos here or click to select
+        </div>
+        <input
+          accept="image/*,.pdf"
+          multiple=""
+          type="file"
+        />
+      </div>
+      <button
+        style="padding: 10px 16px; background: rgb(17, 24, 39); color: white; border-radius: 6px; cursor: pointer;"
+        type="submit"
+      >
+        Create asset
+      </button>
+    </form>
+  </div>
+</body>
+
+Ignored nodes: comments, script, style
+<body>
+  <div>
+    <form
+      style="display: flex; flex-direction: column; gap: 12px; max-width: 520px;"
+    >
+      <label
+        style="display: flex; flex-direction: column; gap: 4px;"
+      >
+        <span>
+          Display name *
+        </span>
+        <input
+          placeholder="e.g. Hammer"
+          required=""
+          style="width: 100%; padding: 8px; border: 1px solid rgb(209, 213, 219); border-radius: 6px;"
+          value=""
+        />
+      </label>
+      <label
+        style="display: flex; flex-direction: column; gap: 4px;"
+      >
+        <span>
+          Asset type
+        </span>
+        <select
+          style="width: 100%; padding: 8px; border-radius: 6px;"
+        >
+          <option
+            value="unknown"
+          >
+            unknown
+          </option>
+          <option
+            value="equipment"
+          >
+            equipment
+          </option>
+          <option
+            value="product"
+          >
+            product
+          </option>
+          <option
+            value="component"
+          >
+            component
+          </option>
+          <option
+            value="consumable"
+          >
+            consumable
+          </option>
+          <option
+            value="container"
+          >
+            container
+          </option>
+          <option
+            value="document"
+          >
+            document
+          </option>
+          <option
+            value="collection"
+          >
+            collection
+          </option>
+        </select>
+      </label>
+      <div
+        style="display: flex; gap: 12px;"
+      >
+        <label
+          style="flex: 1 1 0%; display: flex; flex-direction: column; gap: 4px;"
+        >
+          <span>
+            Quantity
+          </span>
+          <input
+            step="any"
+            style="padding: 8px; border: 1px solid rgb(209, 213, 219); border-radius: 6px;"
+            type="number"
+            value=""
+          />
+        </label>
+        <label
+          style="flex: 1 1 0%; display: flex; flex-direction: column; gap: 4px;"
+        >
+          <span>
+            Unit
+          </span>
+          <input
+            placeholder="pcs, kg…"
+            style="padding: 8px; border: 1px solid rgb(209, 213, 219); border-radius: 6px;"
+            value=""
+          />
+        </label>
+        <label
+          style="flex: 1 1 0%; display: flex; flex-direction: column; gap: 4px;"
+        >
+          <span>
+            Condition
+          </span>
+          <input
+            placeholder="new, used…"
+            style="padding: 8px; border: 1px solid rgb(209, 213, 219); border-radius: 6px;"
+            value=""
+          />
+        </label>
+      </div>
+      <div
+        style="border: 2px dashed rgb(209, 213, 219); border-radius: 8px; padding: 16px; background: rgb(249, 250, 251); text-align: center;"
+      >
+        <div
+          style="font-size: 13px; color: rgb(107, 114, 128); margin-bottom: 8px;"
+        >
+          Drag & drop photos here or click to select
+        </div>
+        <input
+          accept="image/*,.pdf"
+          multiple=""
+          type="file"
+        />
+      </div>
+      <button
+        style="padding: 10px 16px; background: rgb(17, 24, 39); color: white; border-radius: 6px; cursor: pointer;"
+        type="submit"
+      >
+        Create asset
+      </button>
+    </form>
+  </div>
+</body>
+   ❯ src/components/AssetForm.test.tsx > AssetForm > the camera input carries capture=environment and an image-only accept
+     → Unable to find a label with the text of: Take a photo
+
+Ignored nodes: comments, script, style
+<body>
+  <div>
+    <form
+      style="display: flex; flex-direction: column; gap: 12px; max-width: 520px;"
+    >
+      <label
+        style="display: flex; flex-direction: column; gap: 4px;"
+      >
+        <span>
+          Display name *
+        </span>
+        <input
+          placeholder="e.g. Hammer"
+          required=""
+          style="width: 100%; padding: 8px; border: 1px solid rgb(209, 213, 219); border-radius: 6px;"
+          value=""
+        />
+      </label>
+      <label
+        style="display: flex; flex-direction: column; gap: 4px;"
+      >
+        <span>
+          Asset type
+        </span>
+        <select
+          style="width: 100%; padding: 8px; border-radius: 6px;"
+        >
+          <option
+            value="unknown"
+          >
+            unknown
+          </option>
+          <option
+            value="equipment"
+          >
+            equipment
+          </option>
+          <option
+            value="product"
+          >
+            product
+          </option>
+          <option
+            value="component"
+          >
+            component
+          </option>
+          <option
+            value="consumable"
+          >
+            consumable
+          </option>
+          <option
+            value="container"
+          >
+            container
+          </option>
+          <option
+            value="document"
+          >
+            document
+          </option>
+          <option
+            value="collection"
+          >
+            collection
+          </option>
+        </select>
+      </label>
+      <div
+        style="display: flex; gap: 12px;"
+      >
+        <label
+          style="flex: 1 1 0%; display: flex; flex-direction: column; gap: 4px;"
+        >
+          <span>
+            Quantity
+          </span>
+          <input
+            step="any"
+            style="padding: 8px; border: 1px solid rgb(209, 213, 219); border-radius: 6px;"
+            type="number"
+            value=""
+          />
+        </label>
+        <label
+          style="flex: 1 1 0%; display: flex; flex-direction: column; gap: 4px;"
+        >
+          <span>
+            Unit
+          </span>
+          <input
+            placeholder="pcs, kg…"
+            style="padding: 8px; border: 1px solid rgb(209, 213, 219); border-radius: 6px;"
+            value=""
+          />
+        </label>
+        <label
+          style="flex: 1 1 0%; display: flex; flex-direction: column; gap: 4px;"
+        >
+          <span>
+            Condition
+          </span>
+          <input
+            placeholder="new, used…"
+            style="padding: 8px; border: 1px solid rgb(209, 213, 219); border-radius: 6px;"
+            value=""
+          />
+        </label>
+      </div>
+      <div
+        style="border: 2px dashed rgb(209, 213, 219); border-radius: 8px; padding: 16px; background: rgb(249, 250, 251); text-align: center;"
+      >
+        <div
+          style="font-size: 13px; color: rgb(107, 114, 128); margin-bottom: 8px;"
+        >
+          Drag & drop photos here or click to select
+        </div>
+        <input
+          accept="image/*,.pdf"
+          multiple=""
+          type="file"
+        />
+      </div>
+      <button
+        style="padding: 10px 16px; background: rgb(17, 24, 39); color: white; border-radius: 6px; cursor: pointer;"
+        type="submit"
+      >
+        Create asset
+      </button>
+    </form>
+  </div>
+</body>
+   ❯ src/components/AssetForm.test.tsx > AssetForm > submitting with a staged file posts display_name and evidence_ids
+     → Unable to find an element with the text: /shot\.png/. This could be because the text is broken up by multiple elements. In this case, you can provide a function for your text matcher to make your matcher more flexible.
+
+Ignored nodes: comments, script, style
+<body>
+  <div>
+    <form
+      style="display: flex; flex-direction: column; gap: 12px; max-width: 520px;"
+    >
+      <label
+        style="display: flex; flex-direction: column; gap: 4px;"
+      >
+        <span>
+          Display name *
+        </span>
+        <input
+          placeholder="e.g. Hammer"
+          required=""
+          style="width: 100%; padding: 8px; border: 1px solid rgb(209, 213, 219); border-radius: 6px;"
+          value=""
+        />
+      </label>
+      <label
+        style="display: flex; flex-direction: column; gap: 4px;"
+      >
+        <span>
+          Asset type
+        </span>
+        <select
+          style="width: 100%; padding: 8px; border-radius: 6px;"
+        >
+          <option
+            value="unknown"
+          >
+            unknown
+          </option>
+          <option
+            value="equipment"
+          >
+            equipment
+          </option>
+          <option
+            value="product"
+          >
+            product
+          </option>
+          <option
+            value="component"
+          >
+            component
+          </option>
+          <option
+            value="consumable"
+          >
+            consumable
+          </option>
+          <option
+            value="container"
+          >
+            container
+          </option>
+          <option
+            value="document"
+          >
+            document
+          </option>
+          <option
+            value="collection"
+          >
+            collection
+          </option>
+        </select>
+      </label>
+      <div
+        style="display: flex; gap: 12px;"
+      >
+        <label
+          style="flex: 1 1 0%; display: flex; flex-direction: column; gap: 4px;"
+        >
+          <span>
+            Quantity
+          </span>
+          <input
+            step="any"
+            style="padding: 8px; border: 1px solid rgb(209, 213, 219); border-radius: 6px;"
+            type="number"
+            value=""
+          />
+        </label>
+        <label
+          style="flex: 1 1 0%; display: flex; flex-direction: column; gap: 4px;"
+        >
+          <span>
+            Unit
+          </span>
+          <input
+            placeholder="pcs, kg…"
+            style="padding: 8px; border: 1px solid rgb(209, 213, 219); border-radius: 6px;"
+            value=""
+          />
+        </label>
+        <label
+          style="flex: 1 1 0%; display: flex; flex-direction: column; gap: 4px;"
+        >
+          <span>
+            Condition
+          </span>
+          <input
+            placeholder="new, used…"
+            style="padding: 8px; border: 1px solid rgb(209, 213, 219); border-radius: 6px;"
+            value=""
+          />
+        </label>
+      </div>
+      <div
+        style="border: 2px dashed rgb(209, 213, 219); border-radius: 8px; padding: 16px; background: rgb(249, 250, 251); text-align: center;"
+      >
+        <div
+          style="font-size: 13px; color: rgb(107, 114, 128); margin-bottom: 8px;"
+        >
+          Drag & drop photos here or click to select
+        </div>
+        <input
+          accept="image/*,.pdf"
+          multiple=""
+          type="file"
+        />
+      </div>
+      <button
+        style="padding: 10px 16px; background: rgb(17, 24, 39); color: white; border-radius: 6px; cursor: pointer;"
+        type="submit"
+      >
+        Create asset
+      </button>
+    </form>
+  </div>
+</body>
+
+Ignored nodes: comments, script, style
+<body>
+  <div>
+    <form
+      style="display: flex; flex-direction: column; gap: 12px; max-width: 520px;"
+    >
+      <label
+        style="display: flex; flex-direction: column; gap: 4px;"
+      >
+        <span>
+          Display name *
+        </span>
+        <input
+          placeholder="e.g. Hammer"
+          required=""
+          style="width: 100%; padding: 8px; border: 1px solid rgb(209, 213, 219); border-radius: 6px;"
+          value=""
+        />
+      </label>
+      <label
+        style="display: flex; flex-direction: column; gap: 4px;"
+      >
+        <span>
+          Asset type
+        </span>
+        <select
+          style="width: 100%; padding: 8px; border-radius: 6px;"
+        >
+          <option
+            value="unknown"
+          >
+            unknown
+          </option>
+          <option
+            value="equipment"
+          >
+            equipment
+          </option>
+          <option
+            value="product"
+          >
+            product
+          </option>
+          <option
+            value="component"
+          >
+            component
+          </option>
+          <option
+            value="consumable"
+          >
+            consumable
+          </option>
+          <option
+            value="container"
+          >
+            container
+          </option>
+          <option
+            value="document"
+          >
+            document
+          </option>
+          <option
+            value="collection"
+          >
+            collection
+          </option>
+        </select>
+      </label>
+      <div
+        style="display: flex; gap: 12px;"
+      >
+        <label
+          style="flex: 1 1 0%; display: flex; flex-direction: column; gap: 4px;"
+        >
+          <span>
+            Quantity
+          </span>
+          <input
+            step="any"
+            style="padding: 8px; border: 1px solid rgb(209, 213, 219); border-radius: 6px;"
+            type="number"
+            value=""
+          />
+        </label>
+        <label
+          style="flex: 1 1 0%; display: flex; flex-direction: column; gap: 4px;"
+        >
+          <span>
+            Unit
+          </span>
+          <input
+            placeholder="pcs, kg…"
+            style="padding: 8px; border: 1px solid rgb(209, 213, 219); border-radius: 6px;"
+            value=""
+          />
+        </label>
+        <label
+          style="flex: 1 1 0%; display: flex; flex-direction: column; gap: 4px;"
+        >
+          <span>
+            Condition
+          </span>
+          <input
+            placeholder="new, used…"
+            style="padding: 8px; border: 1px solid rgb(209, 213, 219); border-radius: 6px;"
+            value=""
+          />
+        </label>
+      </div>
+      <div
+        style="border: 2px dashed rgb(209, 213, 219); border-radius: 8px; padding: 16px; background: rgb(249, 250, 251); text-align: center;"
+      >
+        <div
+          style="font-size: 13px; color: rgb(107, 114, 128); margin-bottom: 8px;"
+        >
+          Drag & drop photos here or click to select
+        </div>
+        <input
+          accept="image/*,.pdf"
+          multiple=""
+          type="file"
+        />
+      </div>
+      <button
+        style="padding: 10px 16px; background: rgb(17, 24, 39); color: white; border-radius: 6px; cursor: pointer;"
+        type="submit"
+      >
+        Create asset
+      </button>
+    </form>
+  </div>
+</body>
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 4 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/components/AssetForm.test.tsx > AssetForm > a paste carrying an image file stages it with name and size, and remove deletes it
+TestingLibraryElementError: Unable to find an element with the text: /pasted\.png/. This could be because the text is broken up by multiple elements. In this case, you can provide a function for your text matcher to make your matcher more flexible.
+
+Ignored nodes: comments, script, style
+<body>
+  <div>
+    <form
+      style="display: flex; flex-direction: column; gap: 12px; max-width: 520px;"
+    >
+      <label
+        style="display: flex; flex-direction: column; gap: 4px;"
+      >
+        <span>
+          Display name *
+        </span>
+        <input
+          placeholder="e.g. Hammer"
+          required=""
+          style="width: 100%; padding: 8px; border: 1px solid rgb(209, 213, 219); border-radius: 6px;"
+          value=""
+        />
+      </label>
+      <label
+        style="display: flex; flex-direction: column; gap: 4px;"
+      >
+        <span>
+          Asset type
+        </span>
+        <select
+          style="width: 100%; padding: 8px; border-radius: 6px;"
+        >
+          <option
+            value="unknown"
+          >
+            unknown
+          </option>
+          <option
+            value="equipment"
+          >
+            equipment
+          </option>
+          <option
+            value="product"
+          >
+            product
+          </option>
+          <option
+            value="component"
+          >
+            component
+          </option>
+          <option
+            value="consumable"
+          >
+            consumable
+          </option>
+          <option
+            value="container"
+          >
+            container
+          </option>
+          <option
+            value="document"
+          >
+            document
+          </option>
+          <option
+            value="collection"
+          >
+            collection
+          </option>
+        </select>
+      </label>
+      <div
+        style="display: flex; gap: 12px;"
+      >
+        <label
+          style="flex: 1 1 0%; display: flex; flex-direction: column; gap: 4px;"
+        >
+          <span>
+            Quantity
+          </span>
+          <input
+            step="any"
+            style="padding: 8px; border: 1px solid rgb(209, 213, 219); border-radius: 6px;"
+            type="number"
+            value=""
+          />
+        </label>
+        <label
+          style="flex: 1 1 0%; display: flex; flex-direction: column; gap: 4px;"
+        >
+          <span>
+            Unit
+          </span>
+          <input
+            placeholder="pcs, kg…"
+            style="padding: 8px; border: 1px solid rgb(209, 213, 219); border-radius: 6px;"
+            value=""
+          />
+        </label>
+        <label
+          style="flex: 1 1 0%; display: flex; flex-direction: column; gap: 4px;"
+        >
+          <span>
+            Condition
+          </span>
+          <input
+            placeholder="new, used…"
+            style="padding: 8px; border: 1px solid rgb(209, 213, 219); border-radius: 6px;"
+            value=""
+          />
+        </label>
+      </div>
+      <div
+        style="border: 2px dashed rgb(209, 213, 219); border-radius: 8px; padding: 16px; background: rgb(249, 250, 251); text-align: center;"
+      >
+        <div
+          style="font-size: 13px; color: rgb(107, 114, 128); margin-bottom: 8px;"
+        >
+          Drag & drop photos here or click to select
+        </div>
+        <input
+          accept="image/*,.pdf"
+          multiple=""
+          type="file"
+        />
+      </div>
+      <button
+        style="padding: 10px 16px; background: rgb(17, 24, 39); color: white; border-radius: 6px; cursor: pointer;"
+        type="submit"
+      >
+        Create asset
+      </button>
+    </form>
+  </div>
+</body>
+
+Ignored nodes: comments, script, style
+<body>
+  <div>
+    <form
+      style="display: flex; flex-direction: column; gap: 12px; max-width: 520px;"
+    >
+      <label
+        style="display: flex; flex-direction: column; gap: 4px;"
+      >
+        <span>
+          Display name *
+        </span>
+        <input
+          placeholder="e.g. Hammer"
+          required=""
+          style="width: 100%; padding: 8px; border: 1px solid rgb(209, 213, 219); border-radius: 6px;"
+          value=""
+        />
+      </label>
+      <label
+        style="display: flex; flex-direction: column; gap: 4px;"
+      >
+        <span>
+          Asset type
+        </span>
+        <select
+          style="width: 100%; padding: 8px; border-radius: 6px;"
+        >
+          <option
+            value="unknown"
+          >
+            unknown
+          </option>
+          <option
+            value="equipment"
+          >
+            equipment
+          </option>
+          <option
+            value="product"
+          >
+            product
+          </option>
+          <option
+            value="component"
+          >
+            component
+          </option>
+          <option
+            value="consumable"
+          >
+            consumable
+          </option>
+          <option
+            value="container"
+          >
+            container
+          </option>
+          <option
+            value="document"
+          >
+            document
+          </option>
+          <option
+            value="collection"
+          >
+            collection
+          </option>
+        </select>
+      </label>
+      <div
+        style="display: flex; gap: 12px;"
+      >
+        <label
+          style="flex: 1 1 0%; display: flex; flex-direction: column; gap: 4px;"
+        >
+          <span>
+            Quantity
+          </span>
+          <input
+            step="any"
+            style="padding: 8px; border: 1px solid rgb(209, 213, 219); border-radius: 6px;"
+            type="number"
+            value=""
+          />
+        </label>
+        <label
+          style="flex: 1 1 0%; display: flex; flex-direction: column; gap: 4px;"
+        >
+          <span>
+            Unit
+          </span>
+          <input
+            placeholder="pcs, kg…"
+            style="padding: 8px; border: 1px solid rgb(209, 213, 219); border-radius: 6px;"
+            value=""
+          />
+        </label>
+        <label
+          style="flex: 1 1 0%; display: flex; flex-direction: column; gap: 4px;"
+        >
+          <span>
+            Condition
+          </span>
+          <input
+            placeholder="new, used…"
+            style="padding: 8px; border: 1px solid rgb(209, 213, 219); border-radius: 6px;"
+            value=""
+          />
+        </label>
+      </div>
+      <div
+        style="border: 2px dashed rgb(209, 213, 219); border-radius: 8px; padding: 16px; background: rgb(249, 250, 251); text-align: center;"
+      >
+        <div
+          style="font-size: 13px; color: rgb(107, 114, 128); margin-bottom: 8px;"
+        >
+          Drag & drop photos here or click to select
+        </div>
+        <input
+          accept="image/*,.pdf"
+          multiple=""
+          type="file"
+        />
+      </div>
+      <button
+        style="padding: 10px 16px; background: rgb(17, 24, 39); color: white; border-radius: 6px; cursor: pointer;"
+        type="submit"
+      >
+        Create asset
+      </button>
+    </form>
+  </div>
+</body>
+ ❯ waitForWrapper node_modules/@testing-library/dom/dist/wait-for.js:163:27
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:86:33
+ ❯ src/components/AssetForm.test.tsx:27:25
+     25|     });
+     26| 
+     27|     expect(await screen.findByText(/pasted\.png/)).toBeInTheDocument();
+       |                         ^
+     28|     expect(screen.getByText(/KB/)).toBeInTheDocument();
+     29| 
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/4]⎯
+
+ FAIL  src/components/AssetForm.test.tsx > AssetForm > a text-only paste stages nothing and disturbs no existing entry
+TestingLibraryElementError: Unable to find an element with the text: /kept\.png/. This could be because the text is broken up by multiple elements. In this case, you can provide a function for your text matcher to make your matcher more flexible.
+
+Ignored nodes: comments, script, style
+<body>
+  <div>
+    <form
+      style="display: flex; flex-direction: column; gap: 12px; max-width: 520px;"
+    >
+      <label
+        style="display: flex; flex-direction: column; gap: 4px;"
+      >
+        <span>
+          Display name *
+        </span>
+        <input
+          placeholder="e.g. Hammer"
+          required=""
+          style="width: 100%; padding: 8px; border: 1px solid rgb(209, 213, 219); border-radius: 6px;"
+          value=""
+        />
+      </label>
+      <label
+        style="display: flex; flex-direction: column; gap: 4px;"
+      >
+        <span>
+          Asset type
+        </span>
+        <select
+          style="width: 100%; padding: 8px; border-radius: 6px;"
+        >
+          <option
+            value="unknown"
+          >
+            unknown
+          </option>
+          <option
+            value="equipment"
+          >
+            equipment
+          </option>
+          <option
+            value="product"
+          >
+            product
+          </option>
+          <option
+            value="component"
+          >
+            component
+          </option>
+          <option
+            value="consumable"
+          >
+            consumable
+          </option>
+          <option
+            value="container"
+          >
+            container
+          </option>
+          <option
+            value="document"
+          >
+            document
+          </option>
+          <option
+            value="collection"
+          >
+            collection
+          </option>
+        </select>
+      </label>
+      <div
+        style="display: flex; gap: 12px;"
+      >
+        <label
+          style="flex: 1 1 0%; display: flex; flex-direction: column; gap: 4px;"
+        >
+          <span>
+            Quantity
+          </span>
+          <input
+            step="any"
+            style="padding: 8px; border: 1px solid rgb(209, 213, 219); border-radius: 6px;"
+            type="number"
+            value=""
+          />
+        </label>
+        <label
+          style="flex: 1 1 0%; display: flex; flex-direction: column; gap: 4px;"
+        >
+          <span>
+            Unit
+          </span>
+          <input
+            placeholder="pcs, kg…"
+            style="padding: 8px; border: 1px solid rgb(209, 213, 219); border-radius: 6px;"
+            value=""
+          />
+        </label>
+        <label
+          style="flex: 1 1 0%; display: flex; flex-direction: column; gap: 4px;"
+        >
+          <span>
+            Condition
+          </span>
+          <input
+            placeholder="new, used…"
+            style="padding: 8px; border: 1px solid rgb(209, 213, 219); border-radius: 6px;"
+            value=""
+          />
+        </label>
+      </div>
+      <div
+        style="border: 2px dashed rgb(209, 213, 219); border-radius: 8px; padding: 16px; background: rgb(249, 250, 251); text-align: center;"
+      >
+        <div
+          style="font-size: 13px; color: rgb(107, 114, 128); margin-bottom: 8px;"
+        >
+          Drag & drop photos here or click to select
+        </div>
+        <input
+          accept="image/*,.pdf"
+          multiple=""
+          type="file"
+        />
+      </div>
+      <button
+        style="padding: 10px 16px; background: rgb(17, 24, 39); color: white; border-radius: 6px; cursor: pointer;"
+        type="submit"
+      >
+        Create asset
+      </button>
+    </form>
+  </div>
+</body>
+
+Ignored nodes: comments, script, style
+<body>
+  <div>
+    <form
+      style="display: flex; flex-direction: column; gap: 12px; max-width: 520px;"
+    >
+      <label
+        style="display: flex; flex-direction: column; gap: 4px;"
+      >
+        <span>
+          Display name *
+        </span>
+        <input
+          placeholder="e.g. Hammer"
+          required=""
+          style="width: 100%; padding: 8px; border: 1px solid rgb(209, 213, 219); border-radius: 6px;"
+          value=""
+        />
+      </label>
+      <label
+        style="display: flex; flex-direction: column; gap: 4px;"
+      >
+        <span>
+          Asset type
+        </span>
+        <select
+          style="width: 100%; padding: 8px; border-radius: 6px;"
+        >
+          <option
+            value="unknown"
+          >
+            unknown
+          </option>
+          <option
+            value="equipment"
+          >
+            equipment
+          </option>
+          <option
+            value="product"
+          >
+            product
+          </option>
+          <option
+            value="component"
+          >
+            component
+          </option>
+          <option
+            value="consumable"
+          >
+            consumable
+          </option>
+          <option
+            value="container"
+          >
+            container
+          </option>
+          <option
+            value="document"
+          >
+            document
+          </option>
+          <option
+            value="collection"
+          >
+            collection
+          </option>
+        </select>
+      </label>
+      <div
+        style="display: flex; gap: 12px;"
+      >
+        <label
+          style="flex: 1 1 0%; display: flex; flex-direction: column; gap: 4px;"
+        >
+          <span>
+            Quantity
+          </span>
+          <input
+            step="any"
+            style="padding: 8px; border: 1px solid rgb(209, 213, 219); border-radius: 6px;"
+            type="number"
+            value=""
+          />
+        </label>
+        <label
+          style="flex: 1 1 0%; display: flex; flex-direction: column; gap: 4px;"
+        >
+          <span>
+            Unit
+          </span>
+          <input
+            placeholder="pcs, kg…"
+            style="padding: 8px; border: 1px solid rgb(209, 213, 219); border-radius: 6px;"
+            value=""
+          />
+        </label>
+        <label
+          style="flex: 1 1 0%; display: flex; flex-direction: column; gap: 4px;"
+        >
+          <span>
+            Condition
+          </span>
+          <input
+            placeholder="new, used…"
+            style="padding: 8px; border: 1px solid rgb(209, 213, 219); border-radius: 6px;"
+            value=""
+          />
+        </label>
+      </div>
+      <div
+        style="border: 2px dashed rgb(209, 213, 219); border-radius: 8px; padding: 16px; background: rgb(249, 250, 251); text-align: center;"
+      >
+        <div
+          style="font-size: 13px; color: rgb(107, 114, 128); margin-bottom: 8px;"
+        >
+          Drag & drop photos here or click to select
+        </div>
+        <input
+          accept="image/*,.pdf"
+          multiple=""
+          type="file"
+        />
+      </div>
+      <button
+        style="padding: 10px 16px; background: rgb(17, 24, 39); color: white; border-radius: 6px; cursor: pointer;"
+        type="submit"
+      >
+        Create asset
+      </button>
+    </form>
+  </div>
+</body>
+ ❯ waitForWrapper node_modules/@testing-library/dom/dist/wait-for.js:163:27
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:86:33
+ ❯ src/components/AssetForm.test.tsx:49:25
+     47|       clipboardData: { files: [imageFile("kept.png")] },
+     48|     });
+     49|     expect(await screen.findByText(/kept\.png/)).toBeInTheDocument();
+       |                         ^
+     50|   });
+     51| 
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/4]⎯
+
+ FAIL  src/components/AssetForm.test.tsx > AssetForm > the camera input carries capture=environment and an image-only accept
+TestingLibraryElementError: Unable to find a label with the text of: Take a photo
+
+Ignored nodes: comments, script, style
+<body>
+  <div>
+    <form
+      style="display: flex; flex-direction: column; gap: 12px; max-width: 520px;"
+    >
+      <label
+        style="display: flex; flex-direction: column; gap: 4px;"
+      >
+        <span>
+          Display name *
+        </span>
+        <input
+          placeholder="e.g. Hammer"
+          required=""
+          style="width: 100%; padding: 8px; border: 1px solid rgb(209, 213, 219); border-radius: 6px;"
+          value=""
+        />
+      </label>
+      <label
+        style="display: flex; flex-direction: column; gap: 4px;"
+      >
+        <span>
+          Asset type
+        </span>
+        <select
+          style="width: 100%; padding: 8px; border-radius: 6px;"
+        >
+          <option
+            value="unknown"
+          >
+            unknown
+          </option>
+          <option
+            value="equipment"
+          >
+            equipment
+          </option>
+          <option
+            value="product"
+          >
+            product
+          </option>
+          <option
+            value="component"
+          >
+            component
+          </option>
+          <option
+            value="consumable"
+          >
+            consumable
+          </option>
+          <option
+            value="container"
+          >
+            container
+          </option>
+          <option
+            value="document"
+          >
+            document
+          </option>
+          <option
+            value="collection"
+          >
+            collection
+          </option>
+        </select>
+      </label>
+      <div
+        style="display: flex; gap: 12px;"
+      >
+        <label
+          style="flex: 1 1 0%; display: flex; flex-direction: column; gap: 4px;"
+        >
+          <span>
+            Quantity
+          </span>
+          <input
+            step="any"
+            style="padding: 8px; border: 1px solid rgb(209, 213, 219); border-radius: 6px;"
+            type="number"
+            value=""
+          />
+        </label>
+        <label
+          style="flex: 1 1 0%; display: flex; flex-direction: column; gap: 4px;"
+        >
+          <span>
+            Unit
+          </span>
+          <input
+            placeholder="pcs, kg…"
+            style="padding: 8px; border: 1px solid rgb(209, 213, 219); border-radius: 6px;"
+            value=""
+          />
+        </label>
+        <label
+          style="flex: 1 1 0%; display: flex; flex-direction: column; gap: 4px;"
+        >
+          <span>
+            Condition
+          </span>
+          <input
+            placeholder="new, used…"
+            style="padding: 8px; border: 1px solid rgb(209, 213, 219); border-radius: 6px;"
+            value=""
+          />
+        </label>
+      </div>
+      <div
+        style="border: 2px dashed rgb(209, 213, 219); border-radius: 8px; padding: 16px; background: rgb(249, 250, 251); text-align: center;"
+      >
+        <div
+          style="font-size: 13px; color: rgb(107, 114, 128); margin-bottom: 8px;"
+        >
+          Drag & drop photos here or click to select
+        </div>
+        <input
+          accept="image/*,.pdf"
+          multiple=""
+          type="file"
+        />
+      </div>
+      <button
+        style="padding: 10px 16px; background: rgb(17, 24, 39); color: white; border-radius: 6px; cursor: pointer;"
+        type="submit"
+      >
+        Create asset
+      </button>
+    </form>
+  </div>
+</body>
+ ❯ Object.getElementError node_modules/@testing-library/dom/dist/config.js:37:19
+ ❯ getAllByLabelText node_modules/@testing-library/dom/dist/queries/label-text.js:111:38
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:52:17
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:95:19
+ ❯ src/components/AssetForm.test.tsx:55:27
+     53|     render(<AssetForm householdId="hh-1" onCreated={() => {}} />);
+     54| 
+     55|     const camera = screen.getByLabelText("Take a photo");
+       |                           ^
+     56|     expect(camera).toHaveAttribute("type", "file");
+     57|     expect(camera).toHaveAttribute("capture", "environment");
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/4]⎯
+
+ FAIL  src/components/AssetForm.test.tsx > AssetForm > submitting with a staged file posts display_name and evidence_ids
+TestingLibraryElementError: Unable to find an element with the text: /shot\.png/. This could be because the text is broken up by multiple elements. In this case, you can provide a function for your text matcher to make your matcher more flexible.
+
+Ignored nodes: comments, script, style
+<body>
+  <div>
+    <form
+      style="display: flex; flex-direction: column; gap: 12px; max-width: 520px;"
+    >
+      <label
+        style="display: flex; flex-direction: column; gap: 4px;"
+      >
+        <span>
+          Display name *
+        </span>
+        <input
+          placeholder="e.g. Hammer"
+          required=""
+          style="width: 100%; padding: 8px; border: 1px solid rgb(209, 213, 219); border-radius: 6px;"
+          value=""
+        />
+      </label>
+      <label
+        style="display: flex; flex-direction: column; gap: 4px;"
+      >
+        <span>
+          Asset type
+        </span>
+        <select
+          style="width: 100%; padding: 8px; border-radius: 6px;"
+        >
+          <option
+            value="unknown"
+          >
+            unknown
+          </option>
+          <option
+            value="equipment"
+          >
+            equipment
+          </option>
+          <option
+            value="product"
+          >
+            product
+          </option>
+          <option
+            value="component"
+          >
+            component
+          </option>
+          <option
+            value="consumable"
+          >
+            consumable
+          </option>
+          <option
+            value="container"
+          >
+            container
+          </option>
+          <option
+            value="document"
+          >
+            document
+          </option>
+          <option
+            value="collection"
+          >
+            collection
+          </option>
+        </select>
+      </label>
+      <div
+        style="display: flex; gap: 12px;"
+      >
+        <label
+          style="flex: 1 1 0%; display: flex; flex-direction: column; gap: 4px;"
+        >
+          <span>
+            Quantity
+          </span>
+          <input
+            step="any"
+            style="padding: 8px; border: 1px solid rgb(209, 213, 219); border-radius: 6px;"
+            type="number"
+            value=""
+          />
+        </label>
+        <label
+          style="flex: 1 1 0%; display: flex; flex-direction: column; gap: 4px;"
+        >
+          <span>
+            Unit
+          </span>
+          <input
+            placeholder="pcs, kg…"
+            style="padding: 8px; border: 1px solid rgb(209, 213, 219); border-radius: 6px;"
+            value=""
+          />
+        </label>
+        <label
+          style="flex: 1 1 0%; display: flex; flex-direction: column; gap: 4px;"
+        >
+          <span>
+            Condition
+          </span>
+          <input
+            placeholder="new, used…"
+            style="padding: 8px; border: 1px solid rgb(209, 213, 219); border-radius: 6px;"
+            value=""
+          />
+        </label>
+      </div>
+      <div
+        style="border: 2px dashed rgb(209, 213, 219); border-radius: 8px; padding: 16px; background: rgb(249, 250, 251); text-align: center;"
+      >
+        <div
+          style="font-size: 13px; color: rgb(107, 114, 128); margin-bottom: 8px;"
+        >
+          Drag & drop photos here or click to select
+        </div>
+        <input
+          accept="image/*,.pdf"
+          multiple=""
+          type="file"
+        />
+      </div>
+      <button
+        style="padding: 10px 16px; background: rgb(17, 24, 39); color: white; border-radius: 6px; cursor: pointer;"
+        type="submit"
+      >
+        Create asset
+      </button>
+    </form>
+  </div>
+</body>
+
+Ignored nodes: comments, script, style
+<body>
+  <div>
+    <form
+      style="display: flex; flex-direction: column; gap: 12px; max-width: 520px;"
+    >
+      <label
+        style="display: flex; flex-direction: column; gap: 4px;"
+      >
+        <span>
+          Display name *
+        </span>
+        <input
+          placeholder="e.g. Hammer"
+          required=""
+          style="width: 100%; padding: 8px; border: 1px solid rgb(209, 213, 219); border-radius: 6px;"
+          value=""
+        />
+      </label>
+      <label
+        style="display: flex; flex-direction: column; gap: 4px;"
+      >
+        <span>
+          Asset type
+        </span>
+        <select
+          style="width: 100%; padding: 8px; border-radius: 6px;"
+        >
+          <option
+            value="unknown"
+          >
+            unknown
+          </option>
+          <option
+            value="equipment"
+          >
+            equipment
+          </option>
+          <option
+            value="product"
+          >
+            product
+          </option>
+          <option
+            value="component"
+          >
+            component
+          </option>
+          <option
+            value="consumable"
+          >
+            consumable
+          </option>
+          <option
+            value="container"
+          >
+            container
+          </option>
+          <option
+            value="document"
+          >
+            document
+          </option>
+          <option
+            value="collection"
+          >
+            collection
+          </option>
+        </select>
+      </label>
+      <div
+        style="display: flex; gap: 12px;"
+      >
+        <label
+          style="flex: 1 1 0%; display: flex; flex-direction: column; gap: 4px;"
+        >
+          <span>
+            Quantity
+          </span>
+          <input
+            step="any"
+            style="padding: 8px; border: 1px solid rgb(209, 213, 219); border-radius: 6px;"
+            type="number"
+            value=""
+          />
+        </label>
+        <label
+          style="flex: 1 1 0%; display: flex; flex-direction: column; gap: 4px;"
+        >
+          <span>
+            Unit
+          </span>
+          <input
+            placeholder="pcs, kg…"
+            style="padding: 8px; border: 1px solid rgb(209, 213, 219); border-radius: 6px;"
+            value=""
+          />
+        </label>
+        <label
+          style="flex: 1 1 0%; display: flex; flex-direction: column; gap: 4px;"
+        >
+          <span>
+            Condition
+          </span>
+          <input
+            placeholder="new, used…"
+            style="padding: 8px; border: 1px solid rgb(209, 213, 219); border-radius: 6px;"
+            value=""
+          />
+        </label>
+      </div>
+      <div
+        style="border: 2px dashed rgb(209, 213, 219); border-radius: 8px; padding: 16px; background: rgb(249, 250, 251); text-align: center;"
+      >
+        <div
+          style="font-size: 13px; color: rgb(107, 114, 128); margin-bottom: 8px;"
+        >
+          Drag & drop photos here or click to select
+        </div>
+        <input
+          accept="image/*,.pdf"
+          multiple=""
+          type="file"
+        />
+      </div>
+      <button
+        style="padding: 10px 16px; background: rgb(17, 24, 39); color: white; border-radius: 6px; cursor: pointer;"
+        type="submit"
+      >
+        Create asset
+      </button>
+    </form>
+  </div>
+</body>
+ ❯ waitForWrapper node_modules/@testing-library/dom/dist/wait-for.js:163:27
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:86:33
+ ❯ src/components/AssetForm.test.tsx:77:25
+     75|       clipboardData: { files: [imageFile("shot.png")] },
+     76|     });
+     77|     expect(await screen.findByText(/shot\.png/)).toBeInTheDocument();
+       |                         ^
+     78| 
+     79|     fireEvent.change(screen.getByPlaceholderText("e.g. Hammer"), { tar…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/4]⎯
+
+ Test Files  1 failed (1)
+      Tests  4 failed (4)
+   Start at  10:51:58
+   Duration  3.86s (transform 60ms, setup 82ms, collect 102ms, tests 3.09s, environment 368ms, prepare 63ms)
+
+
+===== SECTION 2: PG-EV-01 WRONG-EXPECTATION MUTATION RUN (deliberately wrong expectations, post-change) =====
+cmd: cd frontend && ./node_modules/.bin/vitest run src/components/AssetForm.test.tsx
+
+ RUN  v1.6.1 /home/andrei/StorageGenie/frontend
+
+ ❯ src/components/AssetForm.test.tsx  (4 tests | 4 failed) 1125ms
+   ❯ src/components/AssetForm.test.tsx > AssetForm > a paste carrying an image file stages it with name and size, and remove deletes it
+     → expect(element).not.toBeInTheDocument()
+
+expected document not to contain element, found <li
+  style="font-size: 12px; margin-bottom: 4px;"
+>
+  pasted.png
+   — 
+  0.0
+   KB 
+  <button
+    style="margin-left: 8px; font-size: 11px;"
+    type="button"
+  >
+    remove
+  </button>
+</li> instead
+   ❯ src/components/AssetForm.test.tsx > AssetForm > a text-only paste stages nothing and disturbs no existing entry
+     → expect(received).toBeInTheDocument()
+
+received value must be an HTMLElement or an SVGElement.
+
+   ❯ src/components/AssetForm.test.tsx > AssetForm > the camera input carries capture=environment and an image-only accept
+     → expect(element).toHaveAttribute("capture", "user") // element.getAttribute("capture") === "user"
+
+Expected the element to have attribute:
+  capture="user"
+Received:
+  capture="environment"
+   ❯ src/components/AssetForm.test.tsx > AssetForm > submitting with a staged file posts display_name and evidence_ids
+     → expected "spy" to be called with arguments: [ '/v1/assets', …(3) ]
+
+Received: 
+
+  1st spy call:
+
+  Array [
+    "/v1/assets",
+-   ObjectContaining {
+-     "display_name": "Wrong",
++   Object {
++     "asset_type": "unknown",
++     "display_name": "Drill",
+      "evidence_ids": Array [
+        "ev-1",
+      ],
+    },
+    Object {
+      "household_id": "hh-1",
+    },
+    Object {
+-     "Idempotency-Key": Any<String>,
++     "Idempotency-Key": "ef1234ae-1b32-40d6-b7fe-238966f9d486",
+    },
+  ]
+
+
+Number of calls: 1
+
+
+Ignored nodes: comments, script, style
+<html>
+  <head />
+  <body>
+    <div>
+      <form
+        style="display: flex; flex-direction: column; gap: 12px; max-width: 520px;"
+      >
+        <label
+          style="display: flex; flex-direction: column; gap: 4px;"
+        >
+          <span>
+            Display name *
+          </span>
+          <input
+            placeholder="e.g. Hammer"
+            required=""
+            style="width: 100%; padding: 8px; border: 1px solid rgb(209, 213, 219); border-radius: 6px;"
+            value="Drill"
+          />
+        </label>
+        <label
+          style="display: flex; flex-direction: column; gap: 4px;"
+        >
+          <span>
+            Asset type
+          </span>
+          <select
+            style="width: 100%; padding: 8px; border-radius: 6px;"
+          >
+            <option
+              value="unknown"
+            >
+              unknown
+            </option>
+            <option
+              value="equipment"
+            >
+              equipment
+            </option>
+            <option
+              value="product"
+            >
+              product
+            </option>
+            <option
+              value="component"
+            >
+              component
+            </option>
+            <option
+              value="consumable"
+            >
+              consumable
+            </option>
+            <option
+              value="container"
+            >
+              container
+            </option>
+            <option
+              value="document"
+            >
+              document
+            </option>
+            <option
+              value="collection"
+            >
+              collection
+            </option>
+          </select>
+        </label>
+        <div
+          style="display: flex; gap: 12px;"
+        >
+          <label
+            style="flex: 1 1 0%; display: flex; flex-direction: column; gap: 4px;"
+          >
+            <span>
+              Quantity
+            </span>
+            <input
+              step="any"
+              style="padding: 8px; border: 1px solid rgb(209, 213, 219); border-radius: 6px;"
+              type="number"
+              value=""
+            />
+          </label>
+          <label
+            style="flex: 1 1 0%; display: flex; flex-direction: column; gap: 4px;"
+          >
+            <span>
+              Unit
+            </span>
+            <input
+              placeholder="pcs, kg…"
+              style="padding: 8px; border: 1px solid rgb(209, 213, 219); border-radius: 6px;"
+              value=""
+            />
+          </label>
+          <label
+            style="flex: 1 1 0%; display: flex; flex-direction: column; gap: 4px;"
+          >
+            <span>
+              Condition
+            </span>
+            <input
+              placeholder="new, used…"
+              style="padding: 8px; border: 1px solid rgb(209, 213, 219); border-radius: 6px;"
+              value=""
+            />
+          </label>
+        </div>
+        <div
+          style="border: 2px dashed rgb(209, 213, 219); border-radius: 8px; padding: 16px; background: rgb(249, 250, 251); text-align: center;"
+        >
+          <div
+            style="font-size: 13px; color: rgb(107, 114, 128); margin-bottom: 8px;"
+          >
+            Drag & drop photos here, click to select, or paste
+          </div>
+          <input
+            accept="image/*,.pdf"
+            multiple=""
+            type="file"
+          />
+          <label
+            style="display: inline-flex; flex-direction: column; gap: 4px; margin-top: 12px; font-size: 13px; color: rgb(107, 114, 128);"
+          >
+            Take a photo
+            <input
+              accept="image/*"
+              capture="environment"
+              type="file"
+            />
+          </label>
+          <ul
+            style="text-align: left; margin-top: 12px; padding-left: 16px;"
+          >
+            <li
+              style="font-size: 12px; margin-bottom: 4px;"
+            >
+              shot.png
+               — 
+              0.0
+               KB 
+              <button
+                style="margin-left: 8px; font-size: 11px;"
+                type="button"
+              >
+                remove
+              </button>
+            </li>
+          </ul>
+        </div>
+        <button
+          style="padding: 10px 16px; background: rgb(17, 24, 39); color: white; border-radius: 6px; cursor: pointer;"
+          type="submit"
+        >
+          Create asset
+        </button>
+      </form>
+    </div>
+  </body>
+</html>
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 4 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/components/AssetForm.test.tsx > AssetForm > a paste carrying an image file stages it with name and size, and remove deletes it
+Error: expect(element).not.toBeInTheDocument()
+
+expected document not to contain element, found <li
+  style="font-size: 12px; margin-bottom: 4px;"
+>
+  pasted.png
+   — 
+  0.0
+   KB 
+  <button
+    style="margin-left: 8px; font-size: 11px;"
+    type="button"
+  >
+    remove
+  </button>
+</li> instead
+ ❯ src/components/AssetForm.test.tsx:27:56
+     25|     });
+     26| 
+     27|     expect(await screen.findByText(/pasted\.png/)).not.toBeInTheDocume…
+       |                                                        ^
+     28|     expect(screen.getByText(/KB/)).toBeInTheDocument();
+     29| 
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/4]⎯
+
+ FAIL  src/components/AssetForm.test.tsx > AssetForm > a text-only paste stages nothing and disturbs no existing entry
+Error: expect(received).toBeInTheDocument()
+
+received value must be an HTMLElement or an SVGElement.
+
+ ❯ src/components/AssetForm.test.tsx:44:38
+     42|       },
+     43|     });
+     44|     expect(screen.queryByText(/KB/)).toBeInTheDocument();
+       |                                      ^
+     45| 
+     46|     fireEvent.paste(screen.getByPlaceholderText("e.g. Hammer"), {
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/4]⎯
+
+ FAIL  src/components/AssetForm.test.tsx > AssetForm > the camera input carries capture=environment and an image-only accept
+Error: expect(element).toHaveAttribute("capture", "user") // element.getAttribute("capture") === "user"
+
+Expected the element to have attribute:
+  capture="user"
+Received:
+  capture="environment"
+ ❯ src/components/AssetForm.test.tsx:57:20
+     55|     const camera = screen.getByLabelText("Take a photo");
+     56|     expect(camera).toHaveAttribute("type", "file");
+     57|     expect(camera).toHaveAttribute("capture", "user");
+       |                    ^
+     58|     expect(camera).toHaveAttribute("accept", "image/*");
+     59|     expect(camera).not.toHaveAttribute("multiple");
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/4]⎯
+
+ FAIL  src/components/AssetForm.test.tsx > AssetForm > submitting with a staged file posts display_name and evidence_ids
+AssertionError: expected "spy" to be called with arguments: [ '/v1/assets', …(3) ]
+
+Received: 
+
+  1st spy call:
+
+  Array [
+    "/v1/assets",
+-   ObjectContaining {
+-     "display_name": "Wrong",
++   Object {
++     "asset_type": "unknown",
++     "display_name": "Drill",
+      "evidence_ids": Array [
+        "ev-1",
+      ],
+    },
+    Object {
+      "household_id": "hh-1",
+    },
+    Object {
+-     "Idempotency-Key": Any<String>,
++     "Idempotency-Key": "ef1234ae-1b32-40d6-b7fe-238966f9d486",
+    },
+  ]
+
+
+Number of calls: 1
+
+
+Ignored nodes: comments, script, style
+<html>
+  <head />
+  <body>
+    <div>
+      <form
+        style="display: flex; flex-direction: column; gap: 12px; max-width: 520px;"
+      >
+        <label
+          style="display: flex; flex-direction: column; gap: 4px;"
+        >
+          <span>
+            Display name *
+          </span>
+          <input
+            placeholder="e.g. Hammer"
+            required=""
+            style="width: 100%; padding: 8px; border: 1px solid rgb(209, 213, 219); border-radius: 6px;"
+            value="Drill"
+          />
+        </label>
+        <label
+          style="display: flex; flex-direction: column; gap: 4px;"
+        >
+          <span>
+            Asset type
+          </span>
+          <select
+            style="width: 100%; padding: 8px; border-radius: 6px;"
+          >
+            <option
+              value="unknown"
+            >
+              unknown
+            </option>
+            <option
+              value="equipment"
+            >
+              equipment
+            </option>
+            <option
+              value="product"
+            >
+              product
+            </option>
+            <option
+              value="component"
+            >
+              component
+            </option>
+            <option
+              value="consumable"
+            >
+              consumable
+            </option>
+            <option
+              value="container"
+            >
+              container
+            </option>
+            <option
+              value="document"
+            >
+              document
+            </option>
+            <option
+              value="collection"
+            >
+              collection
+            </option>
+          </select>
+        </label>
+        <div
+          style="display: flex; gap: 12px;"
+        >
+          <label
+            style="flex: 1 1 0%; display: flex; flex-direction: column; gap: 4px;"
+          >
+            <span>
+              Quantity
+            </span>
+            <input
+              step="any"
+              style="padding: 8px; border: 1px solid rgb(209, 213, 219); border-radius: 6px;"
+              type="number"
+              value=""
+            />
+          </label>
+          <label
+            style="flex: 1 1 0%; display: flex; flex-direction: column; gap: 4px;"
+          >
+            <span>
+              Unit
+            </span>
+            <input
+              placeholder="pcs, kg…"
+              style="padding: 8px; border: 1px solid rgb(209, 213, 219); border-radius: 6px;"
+              value=""
+            />
+          </label>
+          <label
+            style="flex: 1 1 0%; display: flex; flex-direction: column; gap: 4px;"
+          >
+            <span>
+              Condition
+            </span>
+            <input
+              placeholder="new, used…"
+              style="padding: 8px; border: 1px solid rgb(209, 213, 219); border-radius: 6px;"
+              value=""
+            />
+          </label>
+        </div>
+        <div
+          style="border: 2px dashed rgb(209, 213, 219); border-radius: 8px; padding: 16px; background: rgb(249, 250, 251); text-align: center;"
+        >
+          <div
+            style="font-size: 13px; color: rgb(107, 114, 128); margin-bottom: 8px;"
+          >
+            Drag & drop photos here, click to select, or paste
+          </div>
+          <input
+            accept="image/*,.pdf"
+            multiple=""
+            type="file"
+          />
+          <label
+            style="display: inline-flex; flex-direction: column; gap: 4px; margin-top: 12px; font-size: 13px; color: rgb(107, 114, 128);"
+          >
+            Take a photo
+            <input
+              accept="image/*"
+              capture="environment"
+              type="file"
+            />
+          </label>
+          <ul
+            style="text-align: left; margin-top: 12px; padding-left: 16px;"
+          >
+            <li
+              style="font-size: 12px; margin-bottom: 4px;"
+            >
+              shot.png
+               — 
+              0.0
+               KB 
+              <button
+                style="margin-left: 8px; font-size: 11px;"
+                type="button"
+              >
+                remove
+              </button>
+            </li>
+          </ul>
+        </div>
+        <button
+          style="padding: 10px 16px; background: rgb(17, 24, 39); color: white; border-radius: 6px; cursor: pointer;"
+          type="submit"
+        >
+          Create asset
+        </button>
+      </form>
+    </div>
+  </body>
+</html>
+ ❯ src/components/AssetForm.test.tsx:83:27
+     81| 
+     82|     await waitFor(() =>
+     83|       expect(api.apiPost).toHaveBeenCalledWith(
+       |                           ^
+     84|         "/v1/assets",
+     85|         expect.objectContaining({ display_name: "Wrong", evidence_ids:…
+ ❯ runWithExpensiveErrorDiagnosticsDisabled node_modules/@testing-library/dom/dist/config.js:47:12
+ ❯ checkCallback node_modules/@testing-library/dom/dist/wait-for.js:124:77
+ ❯ Timeout.checkRealTimersCallback node_modules/@testing-library/dom/dist/wait-for.js:118:16
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/4]⎯
+
+ Test Files  1 failed (1)
+      Tests  4 failed (4)
+   Start at  10:52:19
+   Duration  1.72s (transform 56ms, setup 36ms, collect 84ms, tests 1.13s, environment 245ms, prepare 58ms)
+
+
+===== SECTION 3: POST-CHANGE TARGETED RUN (green) =====
+cmd: cd frontend && ./node_modules/.bin/vitest run src/components/AssetForm.test.tsx
+
+ RUN  v1.6.1 /home/andrei/StorageGenie/frontend
+
+ ✓ src/components/AssetForm.test.tsx  (4 tests) 132ms
+
+ Test Files  1 passed (1)
+      Tests  4 passed (4)
+   Start at  10:52:12
+   Duration  663ms (transform 55ms, setup 38ms, collect 85ms, tests 132ms, environment 223ms, prepare 45ms)
+
+
+===== SECTION 4: FULL SUITE (green) =====
+cmd: cd frontend && npm test  (vitest run)
+
+> storagegenie-frontend@0.1.0 test
+> vitest run
+
+
+ RUN  v1.6.1 /home/andrei/StorageGenie/frontend
+
+stderr | src/routes/AssetDetailPage.test.tsx > AssetDetailPage > editing quantity patches via PATCH and shows the superseded prior value in history
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+stderr | src/routes/ReviewPage.test.tsx > ReviewPage > posts every decision with the loaded candidate id and supports keyboard actions
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+stderr | src/routes/InboxPage.test.tsx > InboxPage > renders failed loaded job detail and retries that loaded id
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+ ✓ src/routes/ChatPage.test.tsx  (5 tests) 200ms
+ ✓ src/routes/AssetDetailPage.test.tsx  (2 tests) 212ms
+ ✓ src/routes/ReviewPage.test.tsx  (4 tests) 218ms
+ ✓ src/routes/InboxPage.test.tsx  (4 tests) 357ms
+ ✓ src/routes/PlanningPage.test.tsx  (4 tests) 370ms
+ ✓ src/components/CandidateCard.test.tsx  (4 tests) 107ms
+ ✓ src/components/ExpiryEntryForm.test.tsx  (2 tests) 116ms
+ ✓ src/routes/SettingsPage.test.tsx  (3 tests) 140ms
+ ✓ src/components/AssetForm.test.tsx  (4 tests) 176ms
+ ✓ src/components/PlanningSuggestionCard.test.tsx  (2 tests) 149ms
+ ✓ src/components/ChatTranscript.test.tsx  (2 tests) 61ms
+ ✓ src/components/JobCard.test.tsx  (1 test) 36ms
+ ✓ src/components/ProvenanceBadge.test.tsx  (3 tests) 36ms
+ ✓ src/api/client.test.ts  (3 tests) 4ms
+stderr | src/components/AssetCard.test.tsx > AssetCard > renders display_name and type
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+ ✓ src/components/AssetCard.test.tsx  (1 test) 57ms
+
+ Test Files  15 passed (15)
+      Tests  44 passed (44)
+   Start at  10:52:40
+   Duration  2.44s (transform 527ms, setup 521ms, collect 1.49s, tests 2.24s, environment 4.31s, prepare 1.11s)
+
+
+===== SECTION 5: LINT =====
+cmd: cd frontend && npm run lint
+
+> storagegenie-frontend@0.1.0 lint
+> eslint src
+
+
+===== SECTION 6: BUILD (tsc + vite) =====
+cmd: cd frontend && npm run build
+
+> storagegenie-frontend@0.1.0 build
+> tsc && vite build
+
+vite v5.4.21 building for production...
+transforming...
+✓ 97 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                  0.32 kB │ gzip:  0.24 kB
+dist/assets/index-Rwf1cZZY.js  252.05 kB │ gzip: 76.81 kB
+✓ built in 883ms

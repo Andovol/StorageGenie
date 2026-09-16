@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { apiPost, uploadEvidence } from "../api/client";
 
 type Props = {
@@ -50,6 +50,18 @@ export function AssetForm({ householdId, onCreated }: Props) {
     },
     [addFiles]
   );
+
+  useEffect(() => {
+    const onPaste = async (e: ClipboardEvent) => {
+      const files = e.clipboardData?.files;
+      if (files && files.length) {
+        e.preventDefault();
+        await addFiles(files);
+      }
+    };
+    window.addEventListener("paste", onPaste);
+    return () => window.removeEventListener("paste", onPaste);
+  }, [addFiles]);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -150,7 +162,7 @@ export function AssetForm({ householdId, onCreated }: Props) {
           textAlign: "center",
         }}
       >
-        <div style={{ fontSize: 13, color: "#6b7280", marginBottom: 8 }}>Drag & drop photos here or click to select</div>
+        <div style={{ fontSize: 13, color: "#6b7280", marginBottom: 8 }}>Drag & drop photos here, click to select, or paste</div>
         <input
           type="file"
           multiple
@@ -159,6 +171,17 @@ export function AssetForm({ householdId, onCreated }: Props) {
             if (e.target.files?.length) await addFiles(e.target.files);
           }}
         />
+        <label style={{ display: "inline-flex", flexDirection: "column", gap: 4, marginTop: 12, fontSize: 13, color: "#6b7280" }}>
+          Take a photo
+          <input
+            type="file"
+            accept="image/*"
+            capture="environment"
+            onChange={async (e) => {
+              if (e.target.files?.length) await addFiles(e.target.files);
+            }}
+          />
+        </label>
         {previewFiles.length > 0 && (
           <ul style={{ textAlign: "left", marginTop: 12, paddingLeft: 16 }}>
             {previewFiles.map((pf, i) => (

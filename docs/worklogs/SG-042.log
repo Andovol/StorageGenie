@@ -1,0 +1,88 @@
+SG-042 coder log — paste-to-add photos + mobile camera capture on the Capture screen (frontend-only)
+(opencode, medium)
+
+BASE REF: automation -> resolved commit 48aa92b1769040dff93ae277c811ca79c434aa4e
+Work dir /home/andrei/StorageGenie
+Coder argv (own process, pid 350974): opencode run --auto --dir /home/andrei/StorageGenie --variant medium <packet>
+Effort: medium (from argv --variant medium). Model: unknown — no --model flag on argv
+(packet: CLI default, omitted per policy); not read from any identity line.
+Branch automation; origin git@github.com:Andovol/StorageGenie.git.
+Contract: installed global rules RULES.md sha256 a66aa4313d62cebff8b44f10299928288e05dc4d7c45f4f4e83e0bbd954c131d
+== payload RULES.sha256; VERSION 0.27.0 (offline read of /home/andrei/storagegenie-contract; no fetch).
+
+Timing is wall-clock, from /tmp/opencode/sg042_<leg>_{start,end}.txt sampled around each command.
+LEG timings (budgets 120s ordinary / 600s suite+lint+build / 1500s early-close / 2100s overall):
+- pre-change targeted run: 4.22s (<< 120s)
+- post-change targeted run: 0.94s (<< 120s)
+- PG-EV-01 mutation run: 1.72s test duration, run itself ~ a few s (<< 120s)
+- full suite: 2.89s (<< 600s)
+- lint + build: 3.63s (<< 600s)
+- recon/premise leg + worklog leg: ordinary, well under budget. Overall far below 1500s early-close.
+
+LEG 0 — premise verification (ordinary probes, 120s each):
+- starting tree CLEAN: `git status --porcelain` empty; HEAD == origin/automation == 48aa92b.
+- AssetForm.tsx:30-43 addFiles (sha256Hex, preview push) CONFIRMED.
+- AssetForm.tsx:45-52 onDrop -> addFiles CONFIRMED.
+- AssetForm.tsx:138-174 drop zone (dragOver + dashed border + onDrop + preview <ul> with remove) CONFIRMED.
+- AssetForm.tsx:154-161 input type=file multiple accept="image/*,.pdf" CONFIRMED.
+- AssetForm.tsx:56-59 display-name-required guard and :101-108 label/input CONFIRMED untouched.
+- CapturePage.tsx:46-49 renders <AssetForm householdId onCreated> CONFIRMED.
+- package.json:9 "test": "vitest run" CONFIRMED.
+- client.ts:105-120 uploadEvidence(householdId, file) -> FormData POST /v1/evidence CONFIRMED.
+- grep re-verify BEFORE change: `onPaste` = 0 hits, `capture=` = 0 hits in frontend/src.
+- node_modules PRESENT (frontend/node_modules); no npm install / no network used.
+- FINDING F-SG042-1 (path, not content): packet cites the mock pattern as `AssetDetailPage.test.tsx:7-14`
+  implying `frontend/src/components/`; the real file is `frontend/src/routes/AssetDetailPage.test.tsx`
+  and its lines 7-14 ARE the vi.hoisted + vi.mock("../api/client") pattern. Content matched; path
+  restated for the record. Cross-product read-only context, not bent.
+
+LEG 1 — G1 paste handling in AssetForm.tsx (touched file):
+- added window-level `paste` listener in a useEffect (native ClipboardEvent), reads
+  `e.clipboardData?.files`; only when `files.length` does it preventDefault + addFiles(files) — the same
+  path dropped files use. Cleanup removes the listener on unmount.
+- scope decision: WINDOW (with cleanup), not the form or drop zone. Rationale: the requirement is
+  "anywhere the capture screen can receive keyboard focus"; the household <select> is outside the <form>
+  but on the same screen, so a form-scoped handler would miss it. Evidence that a real paste event
+  reaches it: the test fires the paste on the focusable display-name input (inside the screen) and it
+  bubbles to the window handler and stages the file — see verify Section 3 test (a)/(d).
+- text-only paste: no <input>-less content, files.length === 0 -> handler returns without preventDefault,
+  nothing staged, no error (test (b)).
+- pasted file staged as-is, never renamed (no naming logic); hint text changed to
+  "Drag & drop photos here, click to select, or paste" — plain, promises no AI naming/derivation.
+
+LEG 2 — G2 camera control in AssetForm.tsx:
+- added <label>Take a photo <input type="file" accept="image/*" capture="environment"> </label> beside
+  the existing multi-file input; single shot (no `multiple`). Existing multi input byte-for-byte
+  unchanged (still multiple, accept="image/*,.pdf").
+
+LEG 3 — G3 new frontend/src/components/AssetForm.test.tsx (4 named tests, direct render, no router;
+vi.hoisted + vi.mock("../api/client")):
+- FAIL-then-PASS captured raw in SG-042_verify.log: pre-change 4 failed / 4 (paste stages nothing,
+  no camera label); post-change 4 passed / 4. Test file itself is commit 24e7b7e on the base tree.
+- PG-EV-01: deliberately wrong expectations fed to all 4 tests in one run -> 4 failed / 4 (raw Section 2),
+  proving each assertion is load-bearing (not vacuous). File restored via `git checkout --`.
+
+LEG 4 — gates: `npm test` = vitest run -> 15 files / 44 tests passed, 2.89s; `npm run lint` clean;
+`npm run build` (tsc + vite) clean, 97 modules. Secret scan in the diff: 0 hits. No backend/ diff, no
+alembic diff, no frozen-prompt diff, no ignored file staged. React Router v7 future-flag warnings are
+pre-existing console noise, not failures.
+
+LEG 5 — worklogs (first token SG-042), commit, push to automation, notes-ref receipt on the work HEAD.
+
+PREMISE / SCOPE LEDGER:
+- touched exactly: frontend/src/components/AssetForm.tsx, frontend/src/components/AssetForm.test.tsx
+  (new), docs/worklogs/SG-042_{log,report.md,verify.log}. No CapturePage change needed (form renders
+  as-is) -> finding none. No backend/, no migration, no new dependency, no network.
+
+LIVE-STATE LEDGER: no DB writes; no server restart; live spend $0 (zero provider calls, AI OFF);
+no network (no fetch, no npm install).
+
+UNCLEAR — FIRST READ: whether "anywhere the capture screen can receive keyboard focus" is satisfied by a
+window-scoped handler that also catches pastes while focus is outside the AssetForm (e.g. the household
+select) — I read it as yes and chose window; a form-scoped handler would have been the narrower reading.
+UNCLEAR — DURING EXECUTION: whether the pasted image should be filtered by MIME/extension or accepted
+verbatim; G1 says "staged as-is, never renamed", so I accept whatever the clipboard offers as files and
+apply no image filter on paste (the camera input is the only image-typed control).
+UNCLEAR — REMAINING: whether S2 will want the paste handler to survive AssetForm being rendered outside
+the Capture screen; the listener is window-global for the component's mounted life, so a future second
+mount point would add a second listener (harmless today: single mount at CapturePage.tsx:46-49).
