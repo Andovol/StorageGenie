@@ -1,0 +1,1120 @@
+# SG-044 — verify log (raw command output, verbatim; no summaries substituted)
+# generated_utc=2026-09-16T11:33:27Z
+# base=ecbad87a0f024804c59ec64ce618304eb693d0a9  work-log-commit=the commit carrying this file (published in the receipt note)
+#
+######################################################################
+## §1  G0 — note recovery classification + push/fetch/fetched-ref verify
+######################################################################
+================ G0 NOTE RECOVERY ================
+date_utc=2026-09-16T11:33:04Z
+--- lane-local notes ref: a849a4782def60ce7ea5487604f5dd6ae8b595cb
+--- runner classification inputs (reproduces /usr/local/bin/dispatch classify_receipt) ---
+refs/notes/storagegenie-coder-reports:0c3b5702a7fede00cb939b88aa605fdd766b9062:Dispatch-ID: SG-042 | Report: docs/worklogs/SG-042_report.md | Work-HEAD: 0c3b5702a7fede00cb939b88aa605fdd766b9062
+refs/notes/storagegenie-coder-reports:307ae8c8698a2950fe22d8f7f04d67be30b16f8f:Dispatch-ID: SG-043 | Report: docs/worklogs/SG-043_report.md | Work-HEAD: 307ae8c8698a2950fe22d8f7f04d67be30b16f8f
+SG-042 note obj 0c3b5702 ancestor-of-HEAD: yes
+SG-043 note obj 307ae8c8 ancestor-of-HEAD: yes
+SG-042 cat-file -e 0c3b5702:docs/worklogs/SG-042_report.md -> RESOLVES (exit 0)
+SG-043 cat-file -e 307ae8c8:docs/worklogs/SG-043_report.md -> RESOLVES (exit 0)
+--- action: push notes ref (300s bound) ---
+Everything up-to-date
+push_exit=0
+--- action: explicit refspec fetch into a verify ref (default fetch never carries notes) ---
+fetch_exit=0
+--- verify: show against the FETCHED ref ---
+Dispatch-ID: SG-042 | Report: docs/worklogs/SG-042_report.md | Work-HEAD: 0c3b5702a7fede00cb939b88aa605fdd766b9062
+Dispatch-ID: SG-043 | Report: docs/worklogs/SG-043_report.md | Work-HEAD: 307ae8c8698a2950fe22d8f7f04d67be30b16f8f
+--- fetched ref sha: a849a4782def60ce7ea5487604f5dd6ae8b595cb ; remote: a849a4782def60ce7ea5487604f5dd6ae8b595cb
+G0 RESULT: notes-recovered
+
+######################################################################
+## §2  Pre-change run — ***LABELED HOLLOW*** (new module unresolvable imports)
+##     plus the two REAL pre-change taxonomy assertion failures.
+##     This leg is class-8 hollow context, NOT evidence of a defect fix.
+######################################################################
+
+> storagegenie-frontend@0.1.0 test
+> vitest run
+
+
+ RUN  v1.6.1 /home/andrei/StorageGenie/frontend
+
+ ❯ src/components/shell/shell.test.tsx  (0 test)
+ ❯ src/types/product.test.ts  (11 tests | 2 failed) 10ms
+   ❯ src/types/product.test.ts > CANONICAL_CATEGORIES > exports the DQ1 six canonical categories exactly
+     → expected [ 'Tops', 'Bottoms', 'Dresses', …(3) ] to deeply equal [ 'Hardware & Tools', …(5) ]
+   ❯ src/types/product.test.ts > CANONICAL_CATEGORIES > custom categories pass through and canonical casing is normalised
+     → expected 'hardware & tools' to be 'Hardware & Tools' // Object.is equality
+stderr | src/routes/InboxPage.test.tsx > InboxPage > renders failed loaded job detail and retries that loaded id
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+stderr | src/routes/ReviewPage.test.tsx > ReviewPage > posts every decision with the loaded candidate id and supports keyboard actions
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+ ✓ src/theme/theme.test.tsx  (10 tests) 120ms
+ ✓ src/routes/InboxPage.test.tsx  (4 tests) 291ms
+ ✓ src/routes/ReviewPage.test.tsx  (4 tests) 292ms
+stderr | src/routes/AssetDetailPage.test.tsx > AssetDetailPage > editing quantity patches via PATCH and shows the superseded prior value in history
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+ ✓ src/routes/AssetDetailPage.test.tsx  (2 tests) 238ms
+ ✓ src/routes/PlanningPage.test.tsx  (4 tests) 333ms
+ ✓ src/routes/ChatPage.test.tsx  (5 tests) 216ms
+ ✓ src/components/CandidateCard.test.tsx  (4 tests) 144ms
+ ✓ src/components/AssetForm.test.tsx  (4 tests) 235ms
+ ✓ src/routes/SettingsPage.test.tsx  (3 tests) 134ms
+ ✓ src/components/ExpiryEntryForm.test.tsx  (2 tests) 122ms
+ ✓ src/components/PlanningSuggestionCard.test.tsx  (2 tests) 104ms
+ ✓ src/components/ChatTranscript.test.tsx  (2 tests) 68ms
+ ✓ src/components/JobCard.test.tsx  (1 test) 46ms
+ ✓ src/components/ProvenanceBadge.test.tsx  (3 tests) 31ms
+ ✓ src/api/client.test.ts  (3 tests) 10ms
+ ✓ src/components/AssetCard.test.tsx  (1 test) 37ms
+stderr | src/components/AssetCard.test.tsx > AssetCard > renders display_name and type
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+
+⎯⎯⎯⎯⎯⎯ Failed Suites 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/components/shell/shell.test.tsx [ src/components/shell/shell.test.tsx ]
+Error: Failed to resolve import "./CatalogToolbar" from "src/components/shell/shell.test.tsx". Does the file exist?
+ ❯ TransformPluginContext._formatError node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:49258:41
+ ❯ TransformPluginContext.error node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:49253:16
+ ❯ normalizeUrl node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:64307:23
+ ❯ async file:/home/andrei/StorageGenie/frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:64439:39
+ ❯ TransformPluginContext.transform node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:64366:7
+ ❯ PluginContainer.transform node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:49099:18
+ ❯ loadAndTransform node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:51978:27
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/3]⎯
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/types/product.test.ts > CANONICAL_CATEGORIES > exports the DQ1 six canonical categories exactly
+AssertionError: expected [ 'Tops', 'Bottoms', 'Dresses', …(3) ] to deeply equal [ 'Hardware & Tools', …(5) ]
+
+- Expected
++ Received
+
+  Array [
+-   "Hardware & Tools",
+-   "Electronics & Gadgets",
+-   "Apparel & Textiles",
+-   "Home & Decor",
+-   "Packaging & Materials",
+-   "Uncategorized",
++   "Tops",
++   "Bottoms",
++   "Dresses",
++   "Outerwear",
++   "Footwear",
++   "Accessories",
+  ]
+
+ ❯ src/types/product.test.ts:52:34
+     50| describe("CANONICAL_CATEGORIES", () => {
+     51|   test("exports the DQ1 six canonical categories exactly", () => {
+     52|     expect(CANONICAL_CATEGORIES).toEqual([
+       |                                  ^
+     53|       "Hardware & Tools",
+     54|       "Electronics & Gadgets",
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/3]⎯
+
+ FAIL  src/types/product.test.ts > CANONICAL_CATEGORIES > custom categories pass through and canonical casing is normalised
+AssertionError: expected 'hardware & tools' to be 'Hardware & Tools' // Object.is equality
+
+- Expected
++ Received
+
+- Hardware & Tools
++ hardware & tools
+
+ ❯ src/types/product.test.ts:64:51
+     62|   test("custom categories pass through and canonical casing is normali…
+     63|     expect(toProductCategory("Vintage Denim")).toBe("Vintage Denim");
+     64|     expect(toProductCategory("hardware & tools")).toBe("Hardware & Too…
+       |                                                   ^
+     65|     expect(toProductCategory("")).toBe("Uncategorized");
+     66|     expect(toProductCategory("unknown")).toBe("Uncategorized");
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/3]⎯
+
+ Test Files  2 failed | 16 passed (18)
+      Tests  2 failed | 63 passed (65)
+   Start at  11:31:09
+   Duration  3.14s (transform 427ms, setup 754ms, collect 1.75s, tests 2.43s, environment 5.73s, prepare 1.33s)
+
+
+######################################################################
+## §3  Post-change GREEN — full suite + lint + build
+######################################################################
+=== FULL SUITE ===
+
+> storagegenie-frontend@0.1.0 test
+> vitest run
+
+
+ RUN  v1.6.1 /home/andrei/StorageGenie/frontend
+
+ ✓ src/types/product.test.ts  (11 tests) 4ms
+stderr | src/routes/InboxPage.test.tsx > InboxPage > renders failed loaded job detail and retries that loaded id
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+stderr | src/routes/ReviewPage.test.tsx > ReviewPage > posts every decision with the loaded candidate id and supports keyboard actions
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+ ✓ src/theme/theme.test.tsx  (10 tests) 120ms
+stderr | src/components/shell/shell.test.tsx > Catalog shell > the header labels the LOADED item count, not a household total
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+ ✓ src/routes/ReviewPage.test.tsx  (4 tests) 232ms
+ ✓ src/routes/InboxPage.test.tsx  (4 tests) 340ms
+stderr | src/routes/AssetDetailPage.test.tsx > AssetDetailPage > editing quantity patches via PATCH and shows the superseded prior value in history
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+ ✓ src/routes/AssetDetailPage.test.tsx  (2 tests) 193ms
+ ✓ src/components/shell/shell.test.tsx  (12 tests) 620ms
+ ✓ src/routes/PlanningPage.test.tsx  (4 tests) 342ms
+ ✓ src/components/AssetForm.test.tsx  (4 tests) 151ms
+ ✓ src/routes/ChatPage.test.tsx  (5 tests) 163ms
+ ✓ src/components/CandidateCard.test.tsx  (4 tests) 154ms
+ ✓ src/routes/SettingsPage.test.tsx  (3 tests) 176ms
+ ✓ src/components/ChatTranscript.test.tsx  (2 tests) 49ms
+ ✓ src/components/ExpiryEntryForm.test.tsx  (2 tests) 89ms
+ ✓ src/components/PlanningSuggestionCard.test.tsx  (2 tests) 83ms
+ ✓ src/components/JobCard.test.tsx  (1 test) 31ms
+ ✓ src/components/ProvenanceBadge.test.tsx  (3 tests) 37ms
+ ✓ src/api/client.test.ts  (3 tests) 3ms
+ ✓ src/components/AssetCard.test.tsx  (1 test) 49ms
+stderr | src/components/AssetCard.test.tsx > AssetCard > renders display_name and type
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+
+ Test Files  18 passed (18)
+      Tests  77 passed (77)
+   Start at  11:32:18
+   Duration  2.99s (transform 433ms, setup 622ms, collect 1.82s, tests 2.84s, environment 5.03s, prepare 1.07s)
+
+
+real	0m3.411s
+user	0m12.097s
+sys	0m2.510s
+SUITE_EXIT=0
+
+=== LINT ===
+
+> storagegenie-frontend@0.1.0 lint
+> eslint src
+
+
+real	0m1.373s
+user	0m1.794s
+sys	0m0.406s
+LINT_EXIT=0
+
+=== BUILD ===
+
+> storagegenie-frontend@0.1.0 build
+> tsc && vite build
+
+vite v5.4.21 building for production...
+transforming...
+✓ 1956 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                   0.94 kB │ gzip:  0.48 kB
+dist/assets/index-DxKo-z_g.css    2.65 kB │ gzip:  0.82 kB
+dist/assets/index-ByGzaKX5.js   264.66 kB │ gzip: 80.65 kB
+✓ built in 1.52s
+
+real	0m3.561s
+user	0m5.321s
+sys	0m0.834s
+BUILD_EXIT=0
+
+######################################################################
+## §4  Mutation runs (PG-EV-01) — 3 wrong values fed, each caught SINGLY,
+##     each reverted clean (see per-mutation 'reverted, status:' lines).
+######################################################################
+================ MUTATION: pill label All->Everything ================
+--- file: src/components/shell/CatalogToolbar.tsx | sed: s/\["All", \.\.\.CANONICAL_CATEGORIES\]/["Everything", ...CANONICAL_CATEGORIES]/ ---
+21:export const CATEGORY_PILLS: readonly string[] = ["Everything", ...CANONICAL_CATEGORIES];
+35:    if (options.sort === "name") return a.name.localeCompare(b.name);
+36:    if (options.sort === "status") return a.status.localeCompare(b.status);
+37:    return b.dateAdded.localeCompare(a.dateAdded);
+
+ RUN  v1.6.1 /home/andrei/StorageGenie/frontend
+
+stderr | src/components/shell/shell.test.tsx > Catalog shell > the header labels the LOADED item count, not a household total
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+ ❯ src/components/shell/shell.test.tsx  (12 tests | 2 failed) 534ms
+   ❯ src/components/shell/shell.test.tsx > Catalog shell > the toolbar renders All plus the DQ1 six, with All active by default
+     → expected [ 'Everything', …(6) ] to deeply equal [ 'All', 'Hardware & Tools', …(5) ]
+   ❯ src/components/shell/shell.test.tsx > Catalog shell > Clear all empties all three filters: query, pill and sort
+     → Unable to find an accessible element with the role "button" and name "All"
+
+Here are the accessible roles:
+
+  link:
+
+  Name "StorageGenie":
+  [36m<a[39m
+    [33mclass[39m=[32m"text-foreground focus-ring"[39m
+    [33mhref[39m=[32m"/"[39m
+    [33mstyle[39m=[32m"font-weight: 700; text-decoration: none; margin-right: 4px;"[39m
+  [36m/>[39m
+
+  Name "Import Asset":
+  [36m<a[39m
+    [33mclass[39m=[32m"bg-primary text-primary-foreground focus-ring"[39m
+    [33mhref[39m=[32m"/capture"[39m
+    [33mstyle[39m=[32m"padding: 6px 12px; border-radius: 6px; text-decoration: none; font-weight: 600; font-size: 13px; display: inline-flex; align-items: center; gap: 6px;"[39m
+  [36m/>[39m
+
+  Name "no image Mystery unknown · ARCHIVED 0 evidence v1":
+  [36m<a[39m
+    [33mhref[39m=[32m"/assets/a-mystery?household_id=h1"[39m
+    [33mstyle[39m=[32m"border: 1px solid rgb(229, 231, 235); border-radius: 8px; padding: 12px; display: block; text-decoration: none; color: inherit; background: white;"[39m
+  [36m/>[39m
+
+  Name "no image Zap Electronics & Gadgets · DRAFT 0 evidence v1":
+  [36m<a[39m
+    [33mhref[39m=[32m"/assets/a-zap?household_id=h1"[39m
+    [33mstyle[39m=[32m"border: 1px solid rgb(229, 231, 235); border-radius: 8px; padding: 12px; display: block; text-decoration: none; color: inherit; background: white;"[39m
+  [36m/>[39m
+
+  Name "no image Shirt Apparel & Textiles · PENDING_REVIEW 0 evidence v1":
+  [36m<a[39m
+    [33mhref[39m=[32m"/assets/a-shirt?household_id=h1"[39m
+    [33mstyle[39m=[32m"border: 1px solid rgb(229, 231, 235); border-radius: 8px; padding: 12px; display: block; text-decoration: none; color: inherit; background: white;"[39m
+  [36m/>[39m
+
+  Name "no image Drill Hardware & Tools · ACTIVE 0 evidence v1":
+  [36m<a[39m
+    [33mhref[39m=[32m"/assets/a-drill?household_id=h1"[39m
+    [33mstyle[39m=[32m"border: 1px solid rgb(229, 231, 235); border-radius: 8px; padding: 12px; display: block; text-decoration: none; color: inherit; background: white;"[39m
+  [36m/>[39m
+
+  --------------------------------------------------
+  searchbox:
+
+  Name "Search catalog":
+  [36m<input[39m
+    [33maria-label[39m=[32m"Search catalog"[39m
+    [33mclass[39m=[32m"bg-background text-foreground border-border focus-ring"[39m
+    [33mplaceholder[39m=[32m"Search…"[39m
+    [33mstyle[39m=[32m"padding: 6px 10px; border-radius: 6px; border-style: solid; border-width: 1px; min-width: 200px; font-size: 13px;"[39m
+    [33mtype[39m=[32m"search"[39m
+    [33mvalue[39m=[32m""[39m
+  [36m/>[39m
+
+  --------------------------------------------------
+  button:
+
+  Name "Switch to dark theme":
+  [36m<button[39m
+    [33maria-label[39m=[32m"Switch to dark theme"[39m
+    [33mclass[39m=[32m"bg-card text-foreground border-border focus-ring"[39m
+    [33mstyle[39m=[32m"display: inline-flex; align-items: center; justify-content: center; padding: 6px; border-radius: 6px; border-style: solid; border-width: 1px; cursor: pointer;"[39m
+    [33mtitle[39m=[32m"Switch to dark theme"[39m
+    [33mtype[39m=[32m"button"[39m
+  [36m/>[39m
+
+  Name "Everything":
+  [36m<button[39m
+    [33maria-pressed[39m=[32m"false"[39m
+    [33mclass[39m=[32m"bg-card-muted text-muted-foreground focus-ring"[39m
+    [33mstyle[39m=[32m"padding: 4px 10px; border-radius: 6px; border-style: solid; border-width: 1px; font-size: 13px; cursor: pointer; font-weight: 400;"[39m
+    [33mtype[39m=[32m"button"[39m
+  [36m/>[39m
+
+  Name "Hardware & Tools":
+  [36m<button[39m
+    [33maria-pressed[39m=[32m"false"[39m
+    [33mclass[39m=[32m"bg-card-muted text-muted-foreground focus-ring"[39m
+    [33mstyle[39m=[32m"padding: 4px 10px; border-radius: 6px; border-style: solid; border-width: 1px; font-size: 13px; cursor: pointer; font-weight: 400;"[39m
+    [33mtype[39m=[32m"button"[39m
+  [36m/>[39m
+
+  Name "Electronics & Gadgets":
+  [36m<button[39m
+    [33maria-pressed[39m=[32m"false"[39m
+    [33mclass[39m=[32m"bg-card-muted text-muted-foreground focus-ring"[39m
+    [33mstyle[39m=[32m"padding: 4px 10px; border-radius: 6px; border-style: solid; border-width: 1px; font-size: 13px; cursor: pointer; font-weight: 400;"[39m
+    [33mtype[39m=[32m"button"[39m
+  [36m/>[39m
+
+  Name "Apparel & Textiles":
+  [36m<button[39m
+    [33maria-pressed[39m=[32m"false"[39m
+    [33mclass[39m=[32m"bg-card-muted text-muted-foreground focus-ring"[39m
+    [33mstyle[39m=[32m"padding: 4px 10px; border-radius: 6px; border-style: solid; border-width: 1px; font-size: 13px; cursor: pointer; font-weight: 400;"[39m
+    [33mtype[39m=[32m"button"[39m
+  [36m/>[39m
+
+  Name "Home & Decor":
+  [36m<button[39m
+    [33maria-pressed[39m=[32m"false"[39m
+    [33mclass[39m=[32m"bg-card-muted text-muted-foreground focus-ring"[39m
+    [33mstyle[39m=[32m"padding: 4px 10px; border-radius: 6px; border-style: solid; border-width: 1px; font-size: 13px; cursor: pointer; font-weight: 400;"[39m
+    [33mtype[39m=[32m"button"[39m
+  [36m/>[39m
+
+  Name "Packaging & Materials":
+  [36m<button[39m
+    [33maria-pressed[39m=[32m"false"[39m
+    [33mclass[39m=[32m"bg-card-muted text-muted-foreground focus-ring"[39m
+    [33mstyle[39m=[32m"padding: 4px 10px; border-radius: 6px; border-style: solid; border-width: 1px; font-size: 13px; cursor: pointer; font-weight: 400;"[39m
+    [33mtype[39m=[32m"button"[39m
+  [36m/>[39m
+
+  Name "Uncategorized":
+  [36m<button[39m
+    [33maria-pressed[39m=[32m"false"[39m
+    [33mclass[39m=[32m"bg-card-muted text-muted-foreground focus-ring"[39m
+    [33mstyle[39m=[32m"padding: 4px 10px; border-radius: 6px; border-style: solid; border-width: 1px; font-size: 13px; cursor: pointer; font-weight: 400;"[39m
+    [33mtype[39m=[32m"button"[39m
+  [36m/>[39m
+
+  Name "Standard Grid":
+  [36m<button[39m
+    [33maria-pressed[39m=[32m"true"[39m
+    [33mclass[39m=[32m"bg-primary text-primary-foreground focus-ring"[39m
+    [33mstyle[39m=[32m"padding: 4px 10px; border-radius: 6px; border-style: solid; border-width: 1px; font-size: 13px; cursor: pointer; font-weight: 600;"[39m
+    [33mtype[39m=[32m"button"[39m
+  [36m/>[39m
+
+  Name "Compact Table":
+  [36m<button[39m
+    [33maria-pressed[39m=[32m"false"[39m
+    [33mclass[39m=[32m"bg-card-muted text-muted-foreground focus-ring"[39m
+    [33mstyle[39m=[32m"padding: 4px 10px; border-radius: 6px; border-style: solid; border-width: 1px; font-size: 13px; cursor: pointer; font-weight: 400;"[39m
+    [33mtype[39m=[32m"button"[39m
+  [36m/>[39m
+
+  --------------------------------------------------
+  combobox:
+
+  Name "Household":
+  [36m<select[39m
+    [33maria-label[39m=[32m"Household"[39m
+    [33mclass[39m=[32m"bg-background text-foreground border-border focus-ring"[39m
+    [33mstyle[39m=[32m"padding: 4px 10px; border-radius: 6px; border-style: solid; border-width: 1px; font-size: 13px; cursor: pointer;"[39m
+  [36m/>[39m
+
+  Name "Sort catalog":
+  [36m<select[39m
+    [33maria-label[39m=[32m"Sort catalog"[39m
+    [33mclass[39m=[32m"bg-background text-foreground border-border focus-ring"[39m
+    [33mstyle[39m=[32m"padding: 4px 10px; border-radius: 6px; border-style: solid; border-width: 1px; font-size: 13px; cursor: pointer;"[39m
+  [36m/>[39m
+
+  --------------------------------------------------
+  option:
+
+  Name "Home":
+  [36m<option[39m
+    [33mvalue[39m=[32m"h1"[39m
+  [36m/>[39m
+
+  Name "Recently Added":
+  [36m<option[39m
+    [33mvalue[39m=[32m"recent"[39m
+  [36m/>[39m
+
+  Name "Name (A-Z)":
+  [36m<option[39m
+    [33mvalue[39m=[32m"name"[39m
+  [36m/>[39m
+
+  Name "Processing Status":
+  [36m<option[39m
+    [33mvalue[39m=[32m"status"[39m
+  [36m/>[39m
+
+  --------------------------------------------------
+  group:
+
+  Name "Density":
+  [36m<div[39m
+    [33maria-label[39m=[32m"Density"[39m
+    [33mrole[39m=[32m"group"[39m
+    [33mstyle[39m=[32m"display: inline-flex; gap: 4px;"[39m
+  [36m/>[39m
+
+  --------------------------------------------------
+  main:
+
+  Name "":
+  [36m<main[39m
+    [33mstyle[39m=[32m"padding: 24px;"[39m
+  [36m/>[39m
+
+  --------------------------------------------------
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<div[39m
+      [33mclass[39m=[32m"bg-background text-foreground"[39m
+      [33mstyle[39m=[32m"min-height: 100vh;"[39m
+    [36m>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"bg-background"[39m
+        [33mstyle[39m=[32m"position: sticky; top: 0px; z-index: 10;"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"bg-card border-border"[39m
+          [33mstyle[39m=[32m"display: flex; align-items: center; gap: 12px; padding: 10px 24px; border-bottom-style: solid; border-bottom-width: 1px;"[39m
+        [36m>[39m
+          [36m<a[39m
+            [33mclass[39m=[32m"text-foreground focus-ring"[39m
+            [33mhref[39m=[32m"/"[39m
+            [33mstyle[39m=[32m"font-weight: 700; text-decoration: none; margin-right: 4px;"[39m
+          [36m>[39m
+            [0mStorageGenie[0m
+          [36m</a>[39m
+          [36m<span[39m
+            [33maria-label[39m=[32m"Total loaded items: 4"[39m
+            [33mclass[39m=[32m"bg-card-muted text-muted-foreground"[39m
+            [33mstyle[39m=[32m"font-size: 12px; padding: 2px 8px; border-radius: 999px;"[39m
+            [33mtitle[39m=[32m"Items loaded on this page, not the household total"[39m
+          [36m>[39m
+            [0mTotal: [0m
+            [0m4[0m
+            [0m items[0m
+          [36m</span>[39m
+          [36m<div[39m
+            [33maria-hidden[39m=[32m"true"[39m
+            [33mstyle[39m=[32m"flex: 1 1 0%;"[39m
+          [36m/>[39m
+          [36m<input[39m
+            [33maria-label[39m=[32m"Search catalog"[39m
+            [33mclass[39m=[32m"bg-background text-foreground border-border focus-ring"[39m
+            [33mplaceholder[39m=[32m"Search…"[39m
+            [33mstyle[39m=[32m"padding: 6px 10px; border-radius: 6px; border-style: solid; border-width: 1px; min-width: 200px; font-size: 13px;"[39m
+            [33mtype[39m=[32m"search"[39m
+            [33mvalue[39m=[32m""[39m
+          [36m/>[39m
+          [36m<button[39m
+            [33maria-label[39m=[32m"Switch to dark theme"[39m
+            [33mclass[39m=[32m"bg-card text-foreground border-border focus-ring"[39m
+            [33mstyle[39m=[32m"display: inline-flex; align-items: center; justify-content: center; padding: 6px; border-radius: 6px; border-style: solid; border-width: 1px; cursor: pointer;"[39m
+            [33mtitle[39m=[32m"Switch to dark theme"[39m
+            [33mtype[39m=[32m"button"[39m
+          [36m>[39m
+            [36m<svg[39m
+              [33maria-hidden[39m=[32m"true"[39m
+              [33mclass[39m=[32m"lucide lucide-moon"[39m
+              [33mfill[39m=[32m"none"[39m
+              [33mheight[39m=[32m"18"[39m
+              [33mstroke[39m=[32m"currentColor"[39m
+              [33mstroke-linecap[39m=[32m"round"[39m
+              [33mstroke-linejoin[39m=[32m"round"[39m
+              [33mstroke-width[39m=[32m"2"[39m
+              [33mviewBox[39m=[32m"0 0 24 24"[39m
+              [33mwidth[39m=[32m"18"[39m
+              [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+            [36m>[39m
+              [36m<path[39m
+                [33md[39m=[32m"M20.985 12.486a9 9 0 1 1-9.473-9.472c.405-.022.617.46.402.803a6 6 0 0 0 8.268 8.268c.344-.215.825-.004.803.401"[39m
+              [36m/>[39m
+            [36m</svg>[39m
+          [36m</button>[39m
+          [36m<a[39m
+            [33mclass[39m=[32m"bg-primary text-primary-foreground focus-ring"[39m
+            [33mhref[39m=[32m"/capture"[39m
+            [33mstyle[39m=[32m"padding: 6px 12px; border-radius: 6px; text-decoration: none; font-weight: 600; font-size: 13px; display: inline-flex; align-items: center; gap: 6px;"[39m
+          [36m>[39m
+            [36m<svg[39m
+              [33maria-hidden[39m=[32m"true"[39m
+              [33mclass[39m=[32m"lucide lucide-upload"[39m
+              [33mfill[39m=[32m"none"[39m
+              [33mheight[39m=[32m"16"[39m
+              [33mstroke[39m=[32m"currentColor"[39m
+              [33mstroke-linecap[39m=[32m"round"[39m
+              [33mstroke-linejoin[39m=[32m"round"[39m
+              [33mstroke-width[39m=[32m"2"[39m
+              [33mviewBox[39m=[32m"0 0 24 24"[39m
+              [33mwidth[39m=[32m"16"[39m
+              [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+            [36m>[39m
+              [36m<path[39m
+                [33md[39m=[32m"M12 3v12"[39m
+              [36m/>[39m
+              [36m<path[39m
+                [33md[39m=[32m"m17 8-5-5-5 5"[39m
+              [36m/>[39m
+              [36m<path[39m
+                [33md[39m=[32m"M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"[39m
+              [36m/>[39m
+            [36m</svg>[39m
+            [0mImport Asset[0m
+          [36m</a>[39m
+        [36m</div>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"bg-card border-border"[39m
+          [33mstyle[39m=[32m"display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 8px 24px; border-bottom-style: solid; border-bottom-width: 1px;"[39m
+        [36m>[39m
+          [36m<select[39m
+            [33maria-label[39m=[32m"Household"[39m
+            [33mclass[39m=[32m"bg-background text-foreground border-border focus-ring"[39m
+            [33mstyle[39m=[32m"padding: 4px 10px; border-radius: 6px; border-style: solid; border-width: 1px; font-size: 13px; cursor: pointer;"[39m
+          [36m>[39m
+            [36m<option[39m
+              [33mvalue[39m=[32m"h1"[39m
+            [36m>[39m
+              [0mHome[0m
+            [36m</option>[39m
+          [36m</select>[39m
+          [36m<button[39m
+            [33maria-pressed[39m=[32m"false"[39m
+            [33mclass[39m=[32m"bg-card-muted text-muted-foreground focus-ring"[39m
+            [33mstyle[39m=[32m"padding: 4px 10px; border-radius: 6px; border-style: solid; border-width: 1px; font-size: 13px; cursor: pointer; font-weight: 400;"[39m
+            [33mtype[39m=[32m"button"[39m
+          [36m>[39m
+            [0mEverything[0m
+          [36m</button>[39m
+          [36m<button[39m
+            [33maria-pressed[39m=[32m"false"[39m
+            [33mclass[39m=[32m"bg-card-muted text-muted-foreground focus-ring"[39m
+            [33mstyle[39m=[32m"padding: 4px 10px; border-radius: 6px; border-style: solid; border-width: 1px; font-size: 13px; cursor: pointer; font-weight: 400;"[39m
+            [33mtype[39m=[32m"button"[39m
+          [36m>[39m
+            [0mHardware & Tools[0m
+          [36m</button>[39m
+          [36m<button[39m
+            [33maria-pressed[39m=[32m"false"[39m
+            [33mclass[39m=[32m"bg-card-muted text-muted-foreground focus-ring"[39m
+            [33mstyle[39m=[32m"padding: 4px 10px; border-radius: 6px; border-style: solid; bord...
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/components/shell/shell.test.tsx > Catalog shell > the toolbar renders All plus the DQ1 six, with All active by default
+AssertionError: expected [ 'Everything', …(6) ] to deeply equal [ 'All', 'Hardware & Tools', …(5) ]
+
+- Expected
++ Received
+
+  Array [
+-   "All",
++   "Everything",
+    "Hardware & Tools",
+    "Electronics & Gadgets",
+    "Apparel & Textiles",
+    "Home & Decor",
+    "Packaging & Materials",
+    "Uncategorized",
+  ]
+
+ ❯ src/components/shell/shell.test.tsx:169:28
+    167|     renderCatalog();
+    168|     await screen.findByText("Drill");
+    169|     expect(CATEGORY_PILLS).toEqual(["All", ...CANONICAL_CATEGORIES]);
+       |                            ^
+    170|     for (const category of CANONICAL_CATEGORIES) {
+    171|       expect(screen.getByRole("button", { name: category })).toBeInThe…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  src/components/shell/shell.test.tsx > Catalog shell > Clear all empties all three filters: query, pill and sort
+TestingLibraryElementError: Unable to find an accessible element with the role "button" and name "All"
+
+Here are the accessible roles:
+
+  link:
+
+  Name "StorageGenie":
+  [36m<a[39m
+    [33mclass[39m=[32m"text-foreground focus-ring"[39m
+    [33mhref[39m=[32m"/"[39m
+    [33mstyle[39m=[32m"font-weight: 700; text-decoration: none; margin-right: 4px;"[39m
+  [36m/>[39m
+
+  Name "Import Asset":
+  [36m<a[39m
+    [33mclass[39m=[32m"bg-primary text-primary-foreground focus-ring"[39m
+    [33mhref[39m=[32m"/capture"[39m
+    [33mstyle[39m=[32m"padding: 6px 12px; border-radius: 6px; text-decoration: none; font-weight: 600; font-size: 13px; display: inline-flex; align-items: center; gap: 6px;"[39m
+  [36m/>[39m
+
+  Name "no image Mystery unknown · ARCHIVED 0 evidence v1":
+  [36m<a[39m
+    [33mhref[39m=[32m"/assets/a-mystery?household_id=h1"[39m
+    [33mstyle[39m=[32m"border: 1px solid rgb(229, 231, 235); border-radius: 8px; padding: 12px; display: block; text-decoration: none; color: inherit; background: white;"[39m
+  [36m/>[39m
+
+  Name "no image Zap Electronics & Gadgets · DRAFT 0 evidence v1":
+  [36m<a[39m
+    [33mhref[39m=[32m"/assets/a-zap?household_id=h1"[39m
+    [33mstyle[39m=[32m"border: 1px solid rgb(229, 231, 235); border-radius: 8px; padding: 12px; display: block; text-decoration: none; color: inherit; background: white;"[39m
+  [36m/>[39m
+
+  Name "no image Shirt Apparel & Textiles · PENDING_REVIEW 0 evidence v1":
+  [36m<a[39m
+    [33mhref[39m=[32m"/assets/a-shirt?household_id=h1"[39m
+    [33mstyle[39m=[32m"border: 1px solid rgb(229, 231, 235); border-radius: 8px; padding: 12px; display: block; text-decoration: none; color: inherit; background: white;"[39m
+  [36m/>[39m
+
+  Name "no image Drill Hardware & Tools · ACTIVE 0 evidence v1":
+  [36m<a[39m
+    [33mhref[39m=[32m"/assets/a-drill?household_id=h1"[39m
+    [33mstyle[39m=[32m"border: 1px solid rgb(229, 231, 235); border-radius: 8px; padding: 12px; display: block; text-decoration: none; color: inherit; background: white;"[39m
+  [36m/>[39m
+
+  --------------------------------------------------
+  searchbox:
+
+  Name "Search catalog":
+  [36m<input[39m
+    [33maria-label[39m=[32m"Search catalog"[39m
+    [33mclass[39m=[32m"bg-background text-foreground border-border focus-ring"[39m
+    [33mplaceholder[39m=[32m"Search…"[39m
+    [33mstyle[39m=[32m"padding: 6px 10px; border-radius: 6px; border-style: solid; border-width: 1px; min-width: 200px; font-size: 13px;"[39m
+    [33mtype[39m=[32m"search"[39m
+    [33mvalue[39m=[32m""[39m
+  [36m/>[39m
+
+  --------------------------------------------------
+  button:
+
+  Name "Switch to dark theme":
+  [36m<button[39m
+    [33maria-label[39m=[32m"Switch to dark theme"[39m
+    [33mclass[39m=[32m"bg-card text-foreground border-border focus-ring"[39m
+    [33mstyle[39m=[32m"display: inline-flex; align-items: center; justify-content: center; padding: 6px; border-radius: 6px; border-style: solid; border-width: 1px; cursor: pointer;"[39m
+    [33mtitle[39m=[32m"Switch to dark theme"[39m
+    [33mtype[39m=[32m"button"[39m
+  [36m/>[39m
+
+  Name "Everything":
+  [36m<button[39m
+    [33maria-pressed[39m=[32m"false"[39m
+    [33mclass[39m=[32m"bg-card-muted text-muted-foreground focus-ring"[39m
+    [33mstyle[39m=[32m"padding: 4px 10px; border-radius: 6px; border-style: solid; border-width: 1px; font-size: 13px; cursor: pointer; font-weight: 400;"[39m
+    [33mtype[39m=[32m"button"[39m
+  [36m/>[39m
+
+  Name "Hardware & Tools":
+  [36m<button[39m
+    [33maria-pressed[39m=[32m"false"[39m
+    [33mclass[39m=[32m"bg-card-muted text-muted-foreground focus-ring"[39m
+    [33mstyle[39m=[32m"padding: 4px 10px; border-radius: 6px; border-style: solid; border-width: 1px; font-size: 13px; cursor: pointer; font-weight: 400;"[39m
+    [33mtype[39m=[32m"button"[39m
+  [36m/>[39m
+
+  Name "Electronics & Gadgets":
+  [36m<button[39m
+    [33maria-pressed[39m=[32m"false"[39m
+    [33mclass[39m=[32m"bg-card-muted text-muted-foreground focus-ring"[39m
+    [33mstyle[39m=[32m"padding: 4px 10px; border-radius: 6px; border-style: solid; border-width: 1px; font-size: 13px; cursor: pointer; font-weight: 400;"[39m
+    [33mtype[39m=[32m"button"[39m
+  [36m/>[39m
+
+  Name "Apparel & Textiles":
+  [36m<button[39m
+    [33maria-pressed[39m=[32m"false"[39m
+    [33mclass[39m=[32m"bg-card-muted text-muted-foreground focus-ring"[39m
+    [33mstyle[39m=[32m"padding: 4px 10px; border-radius: 6px; border-style: solid; border-width: 1px; font-size: 13px; cursor: pointer; font-weight: 400;"[39m
+    [33mtype[39m=[32m"button"[39m
+  [36m/>[39m
+
+  Name "Home & Decor":
+  [36m<button[39m
+    [33maria-pressed[39m=[32m"false"[39m
+    [33mclass[39m=[32m"bg-card-muted text-muted-foreground focus-ring"[39m
+    [33mstyle[39m=[32m"padding: 4px 10px; border-radius: 6px; border-style: solid; border-width: 1px; font-size: 13px; cursor: pointer; font-weight: 400;"[39m
+    [33mtype[39m=[32m"button"[39m
+  [36m/>[39m
+
+  Name "Packaging & Materials":
+  [36m<button[39m
+    [33maria-pressed[39m=[32m"false"[39m
+    [33mclass[39m=[32m"bg-card-muted text-muted-foreground focus-ring"[39m
+    [33mstyle[39m=[32m"padding: 4px 10px; border-radius: 6px; border-style: solid; border-width: 1px; font-size: 13px; cursor: pointer; font-weight: 400;"[39m
+    [33mtype[39m=[32m"button"[39m
+  [36m/>[39m
+
+  Name "Uncategorized":
+  [36m<button[39m
+    [33maria-pressed[39m=[32m"false"[39m
+    [33mclass[39m=[32m"bg-card-muted text-muted-foreground focus-ring"[39m
+    [33mstyle[39m=[32m"padding: 4px 10px; border-radius: 6px; border-style: solid; border-width: 1px; font-size: 13px; cursor: pointer; font-weight: 400;"[39m
+    [33mtype[39m=[32m"button"[39m
+  [36m/>[39m
+
+  Name "Standard Grid":
+  [36m<button[39m
+    [33maria-pressed[39m=[32m"true"[39m
+    [33mclass[39m=[32m"bg-primary text-primary-foreground focus-ring"[39m
+    [33mstyle[39m=[32m"padding: 4px 10px; border-radius: 6px; border-style: solid; border-width: 1px; font-size: 13px; cursor: pointer; font-weight: 600;"[39m
+    [33mtype[39m=[32m"button"[39m
+  [36m/>[39m
+
+  Name "Compact Table":
+  [36m<button[39m
+    [33maria-pressed[39m=[32m"false"[39m
+    [33mclass[39m=[32m"bg-card-muted text-muted-foreground focus-ring"[39m
+    [33mstyle[39m=[32m"padding: 4px 10px; border-radius: 6px; border-style: solid; border-width: 1px; font-size: 13px; cursor: pointer; font-weight: 400;"[39m
+    [33mtype[39m=[32m"button"[39m
+  [36m/>[39m
+
+  --------------------------------------------------
+  combobox:
+
+  Name "Household":
+  [36m<select[39m
+    [33maria-label[39m=[32m"Household"[39m
+    [33mclass[39m=[32m"bg-background text-foreground border-border focus-ring"[39m
+    [33mstyle[39m=[32m"padding: 4px 10px; border-radius: 6px; border-style: solid; border-width: 1px; font-size: 13px; cursor: pointer;"[39m
+  [36m/>[39m
+
+  Name "Sort catalog":
+  [36m<select[39m
+    [33maria-label[39m=[32m"Sort catalog"[39m
+    [33mclass[39m=[32m"bg-background text-foreground border-border focus-ring"[39m
+    [33mstyle[39m=[32m"padding: 4px 10px; border-radius: 6px; border-style: solid; border-width: 1px; font-size: 13px; cursor: pointer;"[39m
+  [36m/>[39m
+
+  --------------------------------------------------
+  option:
+
+  Name "Home":
+  [36m<option[39m
+    [33mvalue[39m=[32m"h1"[39m
+  [36m/>[39m
+
+  Name "Recently Added":
+  [36m<option[39m
+    [33mvalue[39m=[32m"recent"[39m
+  [36m/>[39m
+
+  Name "Name (A-Z)":
+  [36m<option[39m
+    [33mvalue[39m=[32m"name"[39m
+  [36m/>[39m
+
+  Name "Processing Status":
+  [36m<option[39m
+    [33mvalue[39m=[32m"status"[39m
+  [36m/>[39m
+
+  --------------------------------------------------
+  group:
+
+  Name "Density":
+  [36m<div[39m
+    [33maria-label[39m=[32m"Density"[39m
+    [33mrole[39m=[32m"group"[39m
+    [33mstyle[39m=[32m"display: inline-flex; gap: 4px;"[39m
+  [36m/>[39m
+
+  --------------------------------------------------
+  main:
+
+  Name "":
+  [36m<main[39m
+    [33mstyle[39m=[32m"padding: 24px;"[39m
+  [36m/>[39m
+
+  --------------------------------------------------
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<div[39m
+      [33mclass[39m=[32m"bg-background text-foreground"[39m
+      [33mstyle[39m=[32m"min-height: 100vh;"[39m
+    [36m>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"bg-background"[39m
+        [33mstyle[39m=[32m"position: sticky; top: 0px; z-index: 10;"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"bg-card border-border"[39m
+          [33mstyle[39m=[32m"display: flex; align-items: center; gap: 12px; padding: 10px 24px; border-bottom-style: solid; border-bottom-width: 1px;"[39m
+        [36m>[39m
+          [36m<a[39m
+            [33mclass[39m=[32m"text-foreground focus-ring"[39m
+            [33mhref[39m=[32m"/"[39m
+            [33mstyle[39m=[32m"font-weight: 700; text-decoration: none; margin-right: 4px;"[39m
+          [36m>[39m
+            [0mStorageGenie[0m
+          [36m</a>[39m
+          [36m<span[39m
+            [33maria-label[39m=[32m"Total loaded items: 4"[39m
+            [33mclass[39m=[32m"bg-card-muted text-muted-foreground"[39m
+            [33mstyle[39m=[32m"font-size: 12px; padding: 2px 8px; border-radius: 999px;"[39m
+            [33mtitle[39m=[32m"Items loaded on this page, not the household total"[39m
+          [36m>[39m
+            [0mTotal: [0m
+            [0m4[0m
+            [0m items[0m
+          [36m</span>[39m
+          [36m<div[39m
+            [33maria-hidden[39m=[32m"true"[39m
+            [33mstyle[39m=[32m"flex: 1 1 0%;"[39m
+          [36m/>[39m
+          [36m<input[39m
+            [33maria-label[39m=[32m"Search catalog"[39m
+            [33mclass[39m=[32m"bg-background text-foreground border-border focus-ring"[39m
+            [33mplaceholder[39m=[32m"Search…"[39m
+            [33mstyle[39m=[32m"padding: 6px 10px; border-radius: 6px; border-style: solid; border-width: 1px; min-width: 200px; font-size: 13px;"[39m
+            [33mtype[39m=[32m"search"[39m
+            [33mvalue[39m=[32m""[39m
+          [36m/>[39m
+          [36m<button[39m
+            [33maria-label[39m=[32m"Switch to dark theme"[39m
+            [33mclass[39m=[32m"bg-card text-foreground border-border focus-ring"[39m
+            [33mstyle[39m=[32m"display: inline-flex; align-items: center; justify-content: center; padding: 6px; border-radius: 6px; border-style: solid; border-width: 1px; cursor: pointer;"[39m
+            [33mtitle[39m=[32m"Switch to dark theme"[39m
+            [33mtype[39m=[32m"button"[39m
+          [36m>[39m
+            [36m<svg[39m
+              [33maria-hidden[39m=[32m"true"[39m
+              [33mclass[39m=[32m"lucide lucide-moon"[39m
+              [33mfill[39m=[32m"none"[39m
+              [33mheight[39m=[32m"18"[39m
+              [33mstroke[39m=[32m"currentColor"[39m
+              [33mstroke-linecap[39m=[32m"round"[39m
+              [33mstroke-linejoin[39m=[32m"round"[39m
+              [33mstroke-width[39m=[32m"2"[39m
+              [33mviewBox[39m=[32m"0 0 24 24"[39m
+              [33mwidth[39m=[32m"18"[39m
+              [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+            [36m>[39m
+              [36m<path[39m
+                [33md[39m=[32m"M20.985 12.486a9 9 0 1 1-9.473-9.472c.405-.022.617.46.402.803a6 6 0 0 0 8.268 8.268c.344-.215.825-.004.803.401"[39m
+              [36m/>[39m
+            [36m</svg>[39m
+          [36m</button>[39m
+          [36m<a[39m
+            [33mclass[39m=[32m"bg-primary text-primary-foreground focus-ring"[39m
+            [33mhref[39m=[32m"/capture"[39m
+            [33mstyle[39m=[32m"padding: 6px 12px; border-radius: 6px; text-decoration: none; font-weight: 600; font-size: 13px; display: inline-flex; align-items: center; gap: 6px;"[39m
+          [36m>[39m
+            [36m<svg[39m
+              [33maria-hidden[39m=[32m"true"[39m
+              [33mclass[39m=[32m"lucide lucide-upload"[39m
+              [33mfill[39m=[32m"none"[39m
+              [33mheight[39m=[32m"16"[39m
+              [33mstroke[39m=[32m"currentColor"[39m
+              [33mstroke-linecap[39m=[32m"round"[39m
+              [33mstroke-linejoin[39m=[32m"round"[39m
+              [33mstroke-width[39m=[32m"2"[39m
+              [33mviewBox[39m=[32m"0 0 24 24"[39m
+              [33mwidth[39m=[32m"16"[39m
+              [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+            [36m>[39m
+              [36m<path[39m
+                [33md[39m=[32m"M12 3v12"[39m
+              [36m/>[39m
+              [36m<path[39m
+                [33md[39m=[32m"m17 8-5-5-5 5"[39m
+              [36m/>[39m
+              [36m<path[39m
+                [33md[39m=[32m"M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"[39m
+              [36m/>[39m
+            [36m</svg>[39m
+            [0mImport Asset[0m
+          [36m</a>[39m
+        [36m</div>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"bg-card border-border"[39m
+          [33mstyle[39m=[32m"display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 8px 24px; border-bottom-style: solid; border-bottom-width: 1px;"[39m
+        [36m>[39m
+          [36m<select[39m
+            [33maria-label[39m=[32m"Household"[39m
+            [33mclass[39m=[32m"bg-background text-foreground border-border focus-ring"[39m
+            [33mstyle[39m=[32m"padding: 4px 10px; border-radius: 6px; border-style: solid; border-width: 1px; font-size: 13px; cursor: pointer;"[39m
+          [36m>[39m
+            [36m<option[39m
+              [33mvalue[39m=[32m"h1"[39m
+            [36m>[39m
+              [0mHome[0m
+            [36m</option>[39m
+          [36m</select>[39m
+          [36m<button[39m
+            [33maria-pressed[39m=[32m"false"[39m
+            [33mclass[39m=[32m"bg-card-muted text-muted-foreground focus-ring"[39m
+            [33mstyle[39m=[32m"padding: 4px 10px; border-radius: 6px; border-style: solid; border-width: 1px; font-size: 13px; cursor: pointer; font-weight: 400;"[39m
+            [33mtype[39m=[32m"button"[39m
+          [36m>[39m
+            [0mEverything[0m
+          [36m</button>[39m
+          [36m<button[39m
+            [33maria-pressed[39m=[32m"false"[39m
+            [33mclass[39m=[32m"bg-card-muted text-muted-foreground focus-ring"[39m
+            [33mstyle[39m=[32m"padding: 4px 10px; border-radius: 6px; border-style: solid; border-width: 1px; font-size: 13px; cursor: pointer; font-weight: 400;"[39m
+            [33mtype[39m=[32m"button"[39m
+          [36m>[39m
+            [0mHardware & Tools[0m
+          [36m</button>[39m
+          [36m<button[39m
+            [33maria-pressed[39m=[32m"false"[39m
+            [33mclass[39m=[32m"bg-card-muted text-muted-foreground focus-ring"[39m
+            [33mstyle[39m=[32m"padding: 4px 10px; border-radius: 6px; border-style: solid; bord...
+ ❯ Object.getElementError node_modules/@testing-library/dom/dist/config.js:37:19
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:76:38
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:52:17
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:95:19
+ ❯ src/components/shell/shell.test.tsx:219:19
+    217| 
+    218|     expect(screen.getByLabelText("Search catalog")).toHaveValue("");
+    219|     expect(screen.getByRole("button", { name: "All" })).toHaveAttribut…
+       |                   ^
+    220|     expect(screen.getByLabelText("Sort catalog")).toHaveValue("recent"…
+    221|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+ Test Files  1 failed (1)
+      Tests  2 failed | 10 passed (12)
+   Start at  11:32:49
+   Duration  1.25s (transform 107ms, setup 40ms, collect 226ms, tests 534ms, environment 234ms, prepare 61ms)
+
+MUTATION_EXIT=1
+--- reverted, status: 
+
+================ MUTATION: sort comparator name A-Z -> Z-A ================
+--- file: src/components/shell/CatalogToolbar.tsx | sed: s/if (options.sort === "name") return a.name.localeCompare(b.name);/if (options.sort === "name") return b.name.localeCompare(a.name);/ ---
+35:    if (options.sort === "name") return b.name.localeCompare(a.name);
+36:    if (options.sort === "status") return a.status.localeCompare(b.status);
+37:    return b.dateAdded.localeCompare(a.dateAdded);
+
+ RUN  v1.6.1 /home/andrei/StorageGenie/frontend
+
+stderr | src/components/shell/shell.test.tsx > Catalog shell > the header labels the LOADED item count, not a household total
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+ ❯ src/components/shell/shell.test.tsx  (12 tests | 2 failed) 458ms
+   ❯ src/components/shell/shell.test.tsx > filterAndSortCatalog (real mapper data) > orders by recently added, name, and processing status
+     → expected [ 'Zap', 'Shirt', 'Mystery', 'Drill' ] to deeply equal [ 'Drill', 'Mystery', 'Shirt', 'Zap' ]
+   ❯ src/components/shell/shell.test.tsx > Catalog shell > the sort dropdown orders the loaded set client-side
+     → expected 'no imageZapElectronics & Gadgets · DR…' to contain 'Drill'
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/components/shell/shell.test.tsx > filterAndSortCatalog (real mapper data) > orders by recently added, name, and processing status
+AssertionError: expected [ 'Zap', 'Shirt', 'Mystery', 'Drill' ] to deeply equal [ 'Drill', 'Mystery', 'Shirt', 'Zap' ]
+
+- Expected
++ Received
+
+  Array [
+-   "Drill",
+-   "Mystery",
+-   "Shirt",
+    "Zap",
++   "Shirt",
++   "Mystery",
++   "Drill",
+  ]
+
+ ❯ src/components/shell/shell.test.tsx:149:7
+    147|     expect(
+    148|       filterAndSortCatalog(products, { q: "", category: "All", sort: "…
+    149|     ).toEqual(["Drill", "Mystery", "Shirt", "Zap"]);
+       |       ^
+    150| 
+    151|     const statuses: ProductStatus[] = ["processed", "raw", "rendered",…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  src/components/shell/shell.test.tsx > Catalog shell > the sort dropdown orders the loaded set client-side
+AssertionError: expected 'no imageZapElectronics & Gadgets · DR…' to contain 'Drill'
+
+- Expected
++ Received
+
+- Drill
++ no imageZapElectronics & Gadgets · DRAFT0 evidencev1
+
+ ❯ src/components/shell/shell.test.tsx:204:34
+    202| 
+    203|     const cards = renderedAssetCards();
+    204|     expect(cards[0].textContent).toContain("Drill");
+       |                                  ^
+    205|     expect(cards[1].textContent).toContain("Mystery");
+    206|     expect(cards[2].textContent).toContain("Shirt");
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+ Test Files  1 failed (1)
+      Tests  2 failed | 10 passed (12)
+   Start at  11:32:50
+   Duration  1.16s (transform 93ms, setup 39ms, collect 238ms, tests 458ms, environment 232ms, prepare 47ms)
+
+MUTATION_EXIT=1
+--- reverted, status: 
+
+================ MUTATION: taxonomy drop Uncategorized ================
+--- file: src/types/product.ts | sed: /^  "Uncategorized",$/d ---
+12:  "Packaging & Materials",
+
+ RUN  v1.6.1 /home/andrei/StorageGenie/frontend
+
+ ❯ src/types/product.test.ts  (11 tests | 1 failed) 9ms
+   ❯ src/types/product.test.ts > CANONICAL_CATEGORIES > exports the DQ1 six canonical categories exactly
+     → expected [ 'Hardware & Tools', …(4) ] to deeply equal [ 'Hardware & Tools', …(5) ]
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/types/product.test.ts > CANONICAL_CATEGORIES > exports the DQ1 six canonical categories exactly
+AssertionError: expected [ 'Hardware & Tools', …(4) ] to deeply equal [ 'Hardware & Tools', …(5) ]
+
+- Expected
++ Received
+
+  Array [
+    "Hardware & Tools",
+    "Electronics & Gadgets",
+    "Apparel & Textiles",
+    "Home & Decor",
+    "Packaging & Materials",
+-   "Uncategorized",
+  ]
+
+ ❯ src/types/product.test.ts:52:34
+     50| describe("CANONICAL_CATEGORIES", () => {
+     51|   test("exports the DQ1 six canonical categories exactly", () => {
+     52|     expect(CANONICAL_CATEGORIES).toEqual([
+       |                                  ^
+     53|       "Hardware & Tools",
+     54|       "Electronics & Gadgets",
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 10 passed (11)
+   Start at  11:32:52
+   Duration  492ms (transform 40ms, setup 38ms, collect 26ms, tests 9ms, environment 234ms, prepare 48ms)
+
+MUTATION_EXIT=1
+--- reverted, status: 
+
+
+######################################################################
+## §5  Post-mutation clean-tree + scope gate raw
+######################################################################
+$ git status --porcelain
+?? docs/worklogs/SG-044_verify.log
+(empty above = clean)
+$ git diff --name-only ecbad87..HEAD -- backend/
+(empty above = no backend diff)
+$ git diff --name-only ecbad87..HEAD -- '*alembic*' '*versions*' '*migration*'
+(empty above = no migration)
+$ git diff --name-only ecbad87..HEAD -- frontend/package.json frontend/package-lock.json
+(empty above = deps unchanged)

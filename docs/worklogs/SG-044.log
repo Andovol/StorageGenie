@@ -1,0 +1,47 @@
+SG-044 catalog shell: header, toolbar, taxonomy correction, note recovery
+coder: opencode
+MODEL: unknown from argv (no --model on the dispatch line; per policy the CLI default is the model and is omitted). Provider metadata banner in output/dispatch/SG-044.log prints `deepseek-v4.1-flash`; recorded as provider metadata, not as an argv fact.
+EFFORT: medium — read from process args: `opencode run --auto --dir /home/andrei/StorageGenie --variant medium ...` (/proc/415950/cmdline; also echoed in output/dispatch/SG-044.log)
+CONTRACT: 0.27.0
+SPEND: $0 metered (no provider calls; AI OFF). No new dependency (lucide-react already present).
+NETWORK: none (no fetch of npm; only the G0/receipt git refspec pushes+fetches over the existing origin remote).
+BASE REF: origin/automation (requested)
+BASE COMMIT: ecbad87a0f024804c59ec64ce618304eb693d0a9 (resolved; equals origin/automation at start; worktree clean)
+WORK: de61973 (failing-tests leg) -> 0ecb035 (implementation) -> WORK_HEAD (this worklog/report/verify commit)
+
+LEGS — actual vs budget (every command bounded; nothing killed, nothing hung):
+- recon / premise verification (reads, G0 runner-code read, dispatch config): ~220 s wall across many bounded reads; budget 120 s per command (none hit the bound).
+- G0 note classification + push/fetch/fetched-ref verify: 8 s (11:29:49Z -> 11:29:57Z). Budget 120 s ordinary; push/fetch each under the 300 s bound.
+- pre-change (fail leg) full suite: 3.14 s (2 failed files: hollow import + 2 real taxonomy assertions). Budget 600 s.
+- implementation edits + targeted run: ~45 s; targeted run 1.13 s. Budget 120 s per command.
+- suite + lint + build (green): 8.3 s total (suite 2.99 s, lint 1.37 s, build 3.56 s). Budget 600 s.
+- mutation run (3 mutations, apply/run/revert, recorded): ~12 s. Budget 120 s per command.
+- worklog + report + verify log + receipt: in progress at drafting; 1500 s early-close not reached.
+- overall at report drafting: ~430 s of the 2100 s overall bound.
+
+WHAT LANDED (commits on automation, pushed in the receipt step):
+- de61973: frontend/src/types/product.test.ts (DQ1-six lock) + frontend/src/components/shell/shell.test.tsx (new; pre-change hollow on `./CatalogToolbar`)
+- 0ecb035: frontend/src/types/product.ts (DQ1 six), frontend/src/components/shell/{CatalogToolbar,AppHeader,AppShell}.tsx (new), frontend/src/routes/CatalogPage.tsx (filter-row -> AppShell; load-more button de-hexed)
+- WORK_HEAD: docs/worklogs/SG-044.{log,report.md,verify.log}
+
+G0: notes-recovered. Both lane-local notes (SG-042 on 0c3b5702, SG-043 on 307ae8c8) are present in refs/notes/storagegenie-coder-reports and `git cat-file -e <obj>:docs/worklogs/SG-0xx_report.md` RESOLVES for both -> the runner's own classify_receipt would return `done`, NOT `report_missing`. Push was `Everything up-to-date` (remote already a849a47); the explicit refspec fetch updated the stale refs/notes/...-remote (e8adff2 -> a849a47) and the fetched-ref `show` prints both notes. See SG-044_verify.log §1. PREMISE DIFFERENCE: the packet's `report_missing` did not reproduce in-slice (F-1).
+
+TESTS: full frontend suite 18 files / 77 tests passed; lint clean; build clean (tsc + vite build, CSS 2.65 kB).
+MUTATIONS: 3/3 caught singly and reverted clean (pill label, sort comparator, taxonomy list) — raw in SG-044_verify.log §4.
+PRE-CHANGE: hollow import failure + 2 real taxonomy assertion failures, quoted and labeled hollow — SG-044_verify.log §2 (class 8, not evidence).
+
+KEY FINDINGS (full detail in SG-044_report.md):
+- F-1 G0 premise `report_missing` did not reproduce: both notes resolve; only the fetched `-remote` ref was stale.
+- F-2 packet's `vi.mock("../api/client")` path is wrong at shell/ depth; the correct specifier is `../../api/client`.
+- F-3 packet wording "All + the DQ1 six + Uncategorized" would duplicate Uncategorized; shipped All + six = 7 pills (DQ1 top-5 + All + Uncategorized).
+- F-4 "Processing Status" sort orders by ProductItem.status, which assetToProductItem hardcodes to "raw" (DQ10) until derivation lands.
+- F-5 household selector (part of the replaced filter row, unnamed in the spec) kept in the toolbar to avoid regressing household switching.
+- F-6 no server-side category aggregation: named destination = a backend per-category counts slice.
+- F-7 load-more button de-hexed to satisfy "zero arbitrary colors".
+- F-8 App.tsx root inline white bg/#111827 untouched by rule (out of ceiling), noted.
+
+UNCLEAR — FIRST READ: whether G0 wanted the already-resolving notes treated as `notes-recovered` (done, idempotently) or a re-point preferred; `report_missing` never reproduced (F-1).
+UNCLEAR — DURING EXECUTION: whether `Processing Status` should sort by `ProductItem.status` (all `raw` today) or by the underlying `Asset.status`; followed the product model and reported the no-op (F-4).
+UNCLEAR — REMAINING: the backend per-category counts endpoint (F-6), SG-045 cards/density views, SG-047 import modal.
+
+END: note=yes (pasted `show` output in SG-044_report.md Receipt and in the delivery message).
