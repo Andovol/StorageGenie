@@ -248,13 +248,14 @@ describe("Catalog shell", () => {
     expect(screen.getByRole("link", { name: /import asset/i })).toHaveAttribute("href", "/capture");
   });
 
-  test("Compact Table is present but honestly keeps the grid until the new cards land", async () => {
+  test("Compact Table renders the real table view (the SG-045 note is gone)", async () => {
     renderCatalog();
     await screen.findByText("Drill");
     fireEvent.click(screen.getByRole("button", { name: "Compact Table" }));
 
     expect(screen.getByRole("button", { name: "Compact Table" })).toHaveAttribute("aria-pressed", "true");
-    expect(screen.getByText(/table view arrives with the new cards/i)).toBeInTheDocument();
+    expect(screen.queryByText(/table view arrives with the new cards/i)).not.toBeInTheDocument();
+    expect(screen.getByRole("table", { name: "Product results" })).toBeInTheDocument();
     expect(screen.getByText("Drill")).toBeInTheDocument();
   });
 });

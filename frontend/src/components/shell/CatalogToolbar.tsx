@@ -153,12 +153,6 @@ export function CatalogToolbar({
         })}
       </div>
 
-      {density === "table" && (
-        <span className="text-muted-foreground" style={{ fontSize: 12 }}>
-          Table view arrives with the new cards (SG-045) — showing the grid for now.
-        </span>
-      )}
-
       <div style={{ flex: 1 }} />
 
       {activeFilters.length > 0 && (

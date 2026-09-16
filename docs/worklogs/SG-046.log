@@ -1,0 +1,65 @@
+SG-046 worklog — inspector drawer (opencode, medium). First token: SG-046.
+Append-only. Times are live box clock, UTC.
+
+MODEL: unknown from argv (no --model on the process args; per policy the CLI default is
+the model and is omitted). Provider banner in output/dispatch/SG-046.log reads
+`build · deepseek-v4.1-flash` — recorded as provider metadata, not an argv fact (CO-78).
+EFFORT: medium (process args: `--variant medium`, read from SG-046.launcher.sh).
+
+BASE REF: origin/automation. BASE COMMIT (resolved): ec22539d00360a3fdbad7f1af7d8fd21800eb995.
+Start tree: `git status --porcelain` empty; HEAD == origin/automation == ec22539.
+
+15:08:46Z  slice start.
+15:08-15:11  Premise verification (quoted reads):
+  - AssetDetailPage.tsx:1-183 read in full: PATCH via apiPatch with If-Match at :24-32;
+    payload fields display_name/quantity/unit/condition at :100-104. CONFIRMED.
+  - backend/app/api/v1/assets.py: PATCH at :202, DELETE at :229. CONFIRMED (no backend touched).
+  - EvidenceGallery.tsx:11 file route, :17 thumb route. CONFIRMED.
+  - api/types.ts:11-20 Assertion carries field_path/value/source_type/review_state/
+    confidence/source_evidence_ids. CONFIRMED.
+  - CatalogToolbar.tsx:156-160 stale "Table view arrives…" note; shell.test.tsx:251-259 asserts it.
+    CONFIRMED. (F-3.)
+  - ProductGrid.tsx:99-100 (TableView useNavigate) and ProductCard.tsx:73-74 (Link to=/assets/:id)
+    OWN the card/table click destination — NOT CatalogPage. This falsifies the packet's G2
+    premise that CatalogPage owns card/table click handling.
+  - No .rules-cache/ in tree; contract lives at /home/andrei/storagegenie-contract (VERSION 0.27.0,
+    RULES.md sha256 a66aa431… matches RULES.sha256; git HEAD fc2a619 "Contract payload 0.27.0").
+
+15:11  STOP DECISION. Packet G2 requires "card/table clicks open the drawer (replacing
+  detail-route nav on those clicks)". The click handlers live in frontend/src/components/catalog/
+  ProductCard.tsx and ProductGrid.tsx. The packet's scope ceiling names neither; it names only
+  frontend/src/routes/CatalogPage.tsx (drawer-state hunk only). The packet's own line:
+  "Every requirement above names a file the ceiling enables it; if you find one that does not,
+  STOP and say which." A wire-up edit to ProductCard/ProductGrid is an out-of-ceiling edit;
+  the ceiling says "Anything else is a STOP". Per the role guard, stops win and are stated.
+  I therefore reverted every out-of-ceiling edit (ProductCard.tsx, ProductGrid.tsx,
+  CatalogPage.tsx) and ship the in-ceiling remainder BLOCKED on G2.
+
+15:12-15:14  Wrote frontend/src/components/shell/ItemInspectorDrawer.tsx (new, in ceiling)
+  and frontend/src/components/shell/drawer.test.tsx (new, in ceiling). Drawer is a
+  self-contained component: props { asset, householdId, onClose }. It fetches the full record
+  by id (["asset", id, householdId], initialData = the summary Asset) so evidence + assertions
+  are present without a parent change. Edits PATCH via apiPatch with If-Match, invalidating
+  ["assets"] + ["asset", id].
+
+15:14:10  Drawer test alone: 11 passed (1.01s).
+15:14:17  Full suite: 20 files / 107 tests passed (3.57s).
+15:15  eslint src exit 0; tsc exit 0; vite build exit 0 (272.24 kB JS, 1.66s).
+
+15:15-15:16  Mutation run (PG-EV-01, discriminating), each fed a wrong value in the same run
+  and each caught singly, each reverted to the byte-identical original (`diff` [ok]):
+  M1 tab label "Isolated Cutout" -> "Isolated Cutout MUTANT": 1 failed / 10 passed.
+  M2 payload key display_name -> display_name_mutant: 1 failed / 10 passed.
+  M3 Esc handler "Escape" -> "Escape_MUTANT": 1 failed / 10 passed.
+  Post-revert drawer test green again: 11 passed.
+
+15:16:53  Hollow pre-change run (class 8, LABELED HOLLOW, not evidence): module hidden,
+  drawer.test.tsx fails to resolve ./ItemInspectorDrawer; 0 tests. Raw in SG-046_verify.log §2.
+
+15:17  Gates: secret scan on diff + new files 0; backend/ diff empty; migration diff empty;
+  package.json/package-lock.json diff empty; git check-ignore exit 1 on all four paths
+  (no ignored file); no `storagegenie-evidence` push.
+
+15:18  Wrote worklog, report, verify log. Commit with BLOCKED first line. Push to automation.
+  Receipt note on refs/notes/storagegenie-coder-reports, then push the notes ref explicitly,
+  then fetch the refspec explicitly and paste `show` output.

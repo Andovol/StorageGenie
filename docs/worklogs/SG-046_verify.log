@@ -1,0 +1,155 @@
+# SG-046 — verify log (raw command output, verbatim; no summaries substituted)
+# generated_utc=2026-09-16T15:18:07Z
+# base=ec22539d00360a3fdbad7f1af7d8fd21800eb995
+# work commit: the commit carrying this file (published in the receipt note) — labelled work commit, not a tip (CO-55c)
+# MODEL: unknown from argv (no --model; CLI default per policy); banner in output/dispatch/SG-046.log = `build · deepseek-v4.1-flash`
+# EFFORT: medium (process args: --variant medium)
+# STOP: G2 wiring imposed on ProductCard.tsx/ProductGrid.tsx, outside the ceiling. In-ceiling work shipped BLOCKED.
+#
+######################################################################
+## §1  Starting tree + premise verification (quoted reads)
+######################################################################
+================ STARTING TREE ================
+$ git status --porcelain
+(empty)
+$ git branch --show-current
+automation
+$ git rev-parse HEAD
+ec22539d00360a3fdbad7f1af7d8fd21800eb995
+$ git rev-parse origin/automation
+ec22539d00360a3fdbad7f1af7d8fd21800eb995
+
+================ PREMISE READS (command -> relevant output) ================
+$ sed -n '24,32p' frontend/src/routes/AssetDetailPage.tsx
+  const patchMut = useMutation({
+    mutationFn: (payload: Record<string, unknown>) =>
+      apiPatch(`/v1/assets/${id}`, payload, { household_id: householdId }, { "If-Match": String(asset?.version ?? 1) }),
+...
+CONFIRMED with If-Match version pattern.
+
+$ sed -n '100,104p' frontend/src/routes/AssetDetailPage.tsx
+                const payload: Record<string, unknown> = { display_name: editName.trim() };
+                if (editQuantity.trim() !== "") payload.quantity = Number(editQuantity);
+                if (editUnit.trim() !== "") payload.unit = editUnit.trim();
+                if (editCondition.trim() !== "") payload.condition = editCondition.trim();
+                patchMut.mutate(payload);
+CONFIRMED.
+
+$ grep -n '@router.patch("/assets/{asset_id}")\|@router.delete("/assets/{asset_id}")' backend/app/api/v1/assets.py
+202:@router.patch("/assets/{asset_id}")
+229:@router.delete("/assets/{asset_id}")
+CONFIRMED (backend untouched).
+
+$ grep -n "v1/evidence" frontend/src/components/EvidenceGallery.tsx
+11:          href={`${base}/v1/evidence/${e.id}/file?household_id=${householdId}`}
+17:            src={`${base}/v1/evidence/${e.id}/thumb/256?household_id=${householdId}`}
+CONFIRMED.
+
+$ sed -n '11,20p' frontend/src/api/types.ts
+export type Assertion = {
+  id: string;
+  field_path: string;
+  value: unknown;
+  source_type: string;
+  review_state: string;
+  confidence: number | null;
+  source_evidence_ids: string[] | null;
+  created_at: string | null;
+};
+CONFIRMED.
+
+$ sed -n '156,160p' frontend/src/components/shell/CatalogToolbar.tsx
+      {density === "table" && (
+        <span className="text-muted-foreground" style={{ fontSize: 12 }}>
+          Table view arrives with the new cards (SG-045) — showing the grid for now.
+        </span>
+      )}
+CONFIRMED (pre-change; removed in-slice, F-3).
+
+$ sed -n '99,100p' frontend/src/components/catalog/ProductGrid.tsx
+  const openDetail = (item: CatalogProduct) => navigate(`/assets/${item.id}?household_id=${householdId}`);
+CONFIRMED — click destination lives in ProductGrid, NOT CatalogPage.
+
+$ sed -n '73,74p' frontend/src/components/catalog/ProductCard.tsx
+    <Link
+      to={`/assets/${item.id}?household_id=${householdId}`}
+CONFIRMED — click destination lives in ProductCard, NOT CatalogPage.
+
+Contract check: /home/andrei/storagegenie-contract/VERSION = 0.27.0; RULES.md sha256 a66aa431… matches RULES.sha256.
+
+######################################################################
+## §2  Pre-change run — ***LABELED HOLLOW*** (new module unresolvable import)
+##     class-8 hollow context, NOT evidence of a defect fix.
+######################################################################
+$ mv src/components/shell/ItemInspectorDrawer.tsx /tmp/opencode/drawer.hidden.tsx
+$ ./node_modules/.bin/vitest run src/components/shell/drawer.test.tsx
+
+ RUN  v1.6.1 /home/andrei/StorageGenie/frontend
+
+ ❯ src/components/shell/drawer.test.tsx  (0 test)
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Suites 1 ⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/components/shell/drawer.test.tsx [ src/components/shell/drawer.test.tsx ]
+Error: Failed to resolve import "./ItemInspectorDrawer" from "src/components/shell/drawer.test.tsx". Does the file exist?
+
+ Test Files  1 failed (1)
+      Tests  no tests
+   Duration  493ms
+
+LABEL: HOLLOW — the failure is an unresolved new-module import, not a behavioural assertion.
+
+######################################################################
+## §3  Post-change GREEN — suite + lint + build
+######################################################################
+$ ./node_modules/.bin/vitest run
+ ✓ src/components/shell/drawer.test.tsx  (11 tests) 456ms
+ ✓ src/components/shell/shell.test.tsx  (12 tests) 725ms
+ ... (18 further files pass) ...
+
+ Test Files  20 passed (20)
+      Tests  107 passed (107)
+   Duration  3.57s
+
+$ ./node_modules/.bin/eslint src
+(no output) ; ESLINT_EXIT=0
+
+$ ./node_modules/.bin/tsc
+(no output) ; TSC_EXIT=0
+
+$ ./node_modules/.bin/vite build
+dist/assets/index-Dui2MNwD.js   272.24 kB │ gzip: 82.44 kB
+✓ built in 1.66s ; BUILD_EXIT=0
+
+######################################################################
+## §4  Mutation run (PG-EV-01) — each wrong value caught singly, reverted clean
+######################################################################
+M1  label: "Isolated Cutout" -> "Isolated Cutout MUTANT"
+$ ./node_modules/.bin/vitest run src/components/shell/drawer.test.tsx
+ Test Files  1 failed (1)
+      Tests  1 failed | 10 passed (11)
+(reverted: diff /tmp/opencode/drawer.orig.tsx … -> [ok] Files are identical)
+
+M2  display_name: title.trim() -> display_name_mutant: title.trim()
+ Test Files  1 failed (1)
+      Tests  1 failed | 10 passed (11)
+(reverted clean)
+
+M3  event.key === "Escape" -> event.key === "Escape_MUTANT"
+ Test Files  1 failed (1)
+      Tests  1 failed | 10 passed (11)
+(reverted clean; post-revert re-run: 11 passed)
+
+######################################################################
+## §5  Gates / ledger
+######################################################################
+backend/ diff                     : empty
+migration (alembic/versions) diff : empty
+package.json + lock diff          : empty
+secret scan (diff + new files)    : 0 matches
+git check-ignore (4 changed paths): exit 1 (none ignored)
+ignored file staged               : none
+storagegenie-evidence push        : none
+live DB writes / restart / spend  : none / none / $0
+vacuous pass                      : none claimed; hollow leg labelled hollow
+OUT-OF-CEILING EDITS              : reverted (ProductCard.tsx, ProductGrid.tsx, CatalogPage.tsx)
