@@ -1,7 +1,7 @@
 # StorageGenie — project configuration
 
 > **Canonical for this repo. `CLAUDE.md` is a one-line adapter `@AGENTS.md` — edit here, never there.**
-> Rule-set version this project records: **0.25.0** (D53 adoption 2026-09-14: tag `contract-v0.25.0` checkout; delta = new contract `VPS.md` (host standards + measured facts — retires the never-in-tree `reference/vps-info.md` as authority), `G-M13`/`G-T14` added, dispatch-engine updates (host-install side, nothing ours); installed global rules file `a66aa431…` byte-identical to the payload `RULES.sha256` — not forked; supersedes `0.24.0`).
+> Rule-set version this project records: **0.27.0** (D57 adoption 2026-09-16: tag `contract-v0.27.0` checkout; delta = `CODER.md` echo 0.27.0 + failed-check third-state rule, `ARCHITECT.md` G-L1 provisioning-pass deferral (`D190` pin), `DISPATCH.md` version-chain pin placement, `ONBOARDING.md` step-3 pin pointer, `PROPOSING.md` PR-06 filing inputs + `LAUNCHER-DESK-REPLY` marker; 0.25.1–0.26.2 = dispatch-engine/host side only, no project steps; installed global rules file `a66aa431…` = payload `RULES.sha256` — not forked; supersedes `0.25.0`).
 
 ## Configuration table — the single source of every project value
 
