@@ -15,7 +15,7 @@ export const CANONICAL_CATEGORIES = [
 
 export type CanonicalCategory = (typeof CANONICAL_CATEGORIES)[number];
 
-export type ProductStatus = "raw" | "processed" | "rendered";
+export type ProductStatus = "raw" | "processed" | "rendered" | "failed";
 
 export type ProductMetadata = {
   dimensions?: string;

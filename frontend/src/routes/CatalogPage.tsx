@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { useAssets, useHouseholds } from "../hooks/useAssets";
-import { AssetCard } from "../components/AssetCard";
+import { ProductGrid } from "../components/catalog/ProductGrid";
 import { AppShell } from "../components/shell/AppShell";
 import {
   CATEGORY_PILLS,
@@ -68,18 +68,14 @@ export function CatalogPage() {
 
   // Category/sort are client-side over the loaded page: the list API returns no
   // per-category counts and there is no aggregation endpoint yet. See the report.
-  const assetsById = useMemo(() => {
-    const map = new Map<string, Asset>();
-    for (const asset of displayed) map.set(asset.id, asset);
-    return map;
-  }, [displayed]);
-
-  const visibleAssets = useMemo(() => {
-    const items = displayed.map(assetToProductItem);
-    return filterAndSortCatalog(items, { q: qRaw, category, sort })
-      .map((item) => assetsById.get(item.id))
-      .filter((asset): asset is Asset => Boolean(asset));
-  }, [displayed, assetsById, qRaw, category, sort]);
+  const visibleItems = useMemo(() => {
+    const items = displayed.map((asset) => {
+      const item = assetToProductItem(asset);
+      const firstEvidence = asset.evidence?.[0];
+      return firstEvidence ? { ...item, evidenceId: firstEvidence.id } : item;
+    });
+    return filterAndSortCatalog(items, { q: qRaw, category, sort });
+  }, [displayed, qRaw, category, sort]);
 
   const activeFilters = useMemo(() => {
     const filters: string[] = [];
@@ -117,14 +113,16 @@ export function CatalogPage() {
       }}
     >
       {isLoading && !data ? (
-        <div>Loading...</div>
+        <ProductGrid
+          items={[]}
+          density={density}
+          householdId={effectiveHousehold}
+          loading
+          limit={20}
+        />
       ) : (
         <>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))", gap: 12 }}>
-            {visibleAssets.map((a) => (
-              <AssetCard key={a.id} asset={a} householdId={effectiveHousehold} />
-            ))}
-          </div>
+          <ProductGrid items={visibleItems} density={density} householdId={effectiveHousehold} />
           <div style={{ marginTop: 16, display: "flex", gap: 12, alignItems: "center" }}>
             {nextCursor && (
               <button
@@ -138,16 +136,6 @@ export function CatalogPage() {
             )}
             {isFetching && <span className="text-muted-foreground" style={{ fontSize: 12 }}>Fetching...</span>}
           </div>
-          {displayed.length === 0 && (
-            <div className="text-muted-foreground" style={{ marginTop: 16 }}>
-              No assets yet — create one via Capture.
-            </div>
-          )}
-          {displayed.length > 0 && visibleAssets.length === 0 && (
-            <div className="text-muted-foreground" style={{ marginTop: 16 }}>
-              No assets match the current filters.
-            </div>
-          )}
         </>
       )}
     </AppShell>
