@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 import { fireEvent, render, screen } from "@testing-library/react";
-import { MemoryRouter } from "react-router-dom";
+import { MemoryRouter, Route, Routes } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { CatalogPage } from "../../routes/CatalogPage";
 import { ThemeProvider } from "../../theme/ThemeProvider";
@@ -242,10 +242,25 @@ describe("Catalog shell", () => {
     expect(document.documentElement.classList.contains("dark")).toBe(true);
   });
 
-  test("Import Asset routes to /capture", async () => {
-    renderCatalog();
+  test("the header Import Asset CTA opens the import dialog and does not render /capture", async () => {
+    render(
+      <QueryClientProvider client={new QueryClient({ defaultOptions: { queries: { retry: false } } })}>
+        <ThemeProvider>
+          <MemoryRouter initialEntries={["/"]}>
+            <Routes>
+              <Route path="/" element={<CatalogPage />} />
+              <Route path="/capture" element={<div>capture probe</div>} />
+            </Routes>
+          </MemoryRouter>
+        </ThemeProvider>
+      </QueryClientProvider>
+    );
     await screen.findByText("Drill");
-    expect(screen.getByRole("link", { name: /import asset/i })).toHaveAttribute("href", "/capture");
+
+    fireEvent.click(screen.getByRole("link", { name: /import asset/i }));
+
+    expect(screen.getByRole("dialog", { name: "Import assets" })).toBeInTheDocument();
+    expect(screen.queryByText("capture probe")).not.toBeInTheDocument();
   });
 
   test("Compact Table renders the real table view (the SG-045 note is gone)", async () => {

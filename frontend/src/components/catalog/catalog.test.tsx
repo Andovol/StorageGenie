@@ -204,10 +204,21 @@ describe("ProductGrid", () => {
     expect(await screen.findByText("detail probe")).toBeInTheDocument();
   });
 
-  test("an empty result shows the dashed canvas with the Import New Item CTA to /capture", () => {
-    renderWithRouter(<ProductGrid items={[]} density="grid" householdId="h1" />);
+  test("an empty result shows the dashed canvas whose Import New Item CTA opens the import dialog", () => {
+    render(
+      <MemoryRouter initialEntries={["/"]}>
+        <Routes>
+          <Route path="/" element={<ProductGrid items={[]} density="grid" householdId="h1" />} />
+          <Route path="/capture" element={<div>capture probe</div>} />
+        </Routes>
+      </MemoryRouter>
+    );
 
-    expect(screen.getByText(/import new item/i)).toHaveAttribute("href", "/capture");
+    expect(screen.getByTestId("catalog-grid-empty")).toBeInTheDocument();
+    fireEvent.click(screen.getByText(/import new item/i));
+
+    expect(screen.getByRole("dialog", { name: "Import assets" })).toBeInTheDocument();
+    expect(screen.queryByText("capture probe")).not.toBeInTheDocument();
   });
 
   test("loading shows skeleton cards equal to the page limit and marks the region busy", () => {
