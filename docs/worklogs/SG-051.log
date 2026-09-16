@@ -1,0 +1,54 @@
+SG-051 — test-truth: stale CTA tests assert the dialog (opencode, medium)
+
+Coder: opencode (SELECTED, D29) · Effort: medium — read from process argv
+(`opencode run --auto --dir /home/andrei/StorageGenie --variant medium`, PID 598945) · Model:
+`unknown` — no `--model` on argv; per model policy the CLI default IS the model and is omitted
+(`CO-78`), so no model id is asserted. Contract: 0.27.0.
+
+BASE REF: `origin/automation` — BASE COMMIT (resolved): `2df30a40fe14f68152c3c6237258eea3610bf164`
+(= start HEAD). Start tree: clean, `git status --porcelain` empty. Work dir
+`/home/andrei/StorageGenie`; remote `git@github.com:Andovol/StorageGenie.git` (as on host).
+WORK_HEAD: the work commit carrying this log + report + verify log (hash published in the receipt
+note; labelled work commit per `CO-55c` — it is part of the commit it names).
+
+Clock (UTC, live): first read 16:18:34Z; end 16:20:28Z.
+
+LEG TIMINGS — actual vs budget, units stated
+- premises + design (quoted reads of the two stale tests, the modal, both intercept hunks, packet):
+  ~25 s / 120 s ordinary.
+- baseline targeted run at BASE source (shell.test.tsx + catalog.test.tsx, pre-change): 1.29 s / 120 s.
+- implementation (two test rewrites; one extra import line in shell.test.tsx): ~15 s / 120 s.
+- green targeted run of the rewritten tests on real product code (40 passed): 1.29 s / 120 s.
+- FAIL leg (two intercept `onClick` hunks reverted, both rewritten tests red): 1.35 s / 120 s.
+- intercept restore + byte-identical `diff` proof: ~5 s / 120 s.
+- green run: full suite 3.85 s + eslint ~2 s + build 1.74 s ≈ 8 s / 600 s.
+- scope gates (backend/migration/deps diff, secret scan, check-ignore): ~10 s / 120 s.
+- worklogs + commit + push + receipt note: ~120 s / 120 s.
+- overall: ≈ 120 s active to the green run; full slice incl. report/commit/note ≈ 300 s / 2100 s
+  (early-close 1500 s not approached). Retries: 0. Provider calls: 0. Commands killed: none.
+
+SPEND: `$0` slice-metered. No model call is made by the slice (test-only; no product file changed).
+NETWORK: none — no npm install, no registry, no app request. DB: none. Restart: none. AI: OFF.
+Tests execute only under vitest with `../api/client` mocked; no live traffic.
+
+FAIL-then-PASS: FAIL leg is a REAL behavioural fail (click navigates to `/capture`, the DOM shows
+`capture probe`, so the dialog never opens) — not an import hollow. Both rewritten tests fail in that
+leg, so no separate mutation run is owed (`PG-EV-01` satisfied by the FAIL leg itself). Both runs raw
+in `SG-051_verify.log` (`PG-EV-09`). Intercept restoration proven byte-identical (`git diff` of both
+product files empty; `diff` against `HEAD` blob prints identical).
+
+UNCLEAR — FIRST READ: whether the `shell.test.tsx` "one-test hunk" ceiling permitted the one extra
+import line (`MemoryRouter` -> `MemoryRouter, Route, Routes`) required to mount the `/capture` route
+probe. Without a probe the "no `/capture` route renders" assertion would be vacuous, so I treated the
+import as part of the named file's one test and disclosed it as a second hunk in that file (report
+F-1). `catalog.test.tsx` already imported `Route`/`Routes`, so it is a true one-test hunk.
+UNCLEAR — DURING EXECUTION: none unresolved; the FAIL leg confirmed the tests falsify the retired
+behaviour rather than the rewrite passing on a technicality.
+UNCLEAR — REMAINING: (1) the CTA links still expose `href="/capture"` for middle-click / open-in-new-
+tab (intentional per SG-047 F-1, unassigned); (2) `shell.test.tsx` imports `Route`/`Routes` now used
+only by the rewritten test — a lint-clean choice, no dead import.
+
+Receipt: work pushed to `automation`, worktree clean (`CO-55`); no push to `storagegenie-evidence`,
+no `{{RECEIPT_CMD}}`; note added on WORK_HEAD carrying `Dispatch-ID:` and `Report:` (`CO-97`), notes
+ref pushed and fetched with the explicit refspec (M21), `show` output pasted in the delivery. Final
+line: `note=yes`.

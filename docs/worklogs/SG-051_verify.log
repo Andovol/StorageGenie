@@ -1,0 +1,226 @@
+SG-051 — verify log (both runs raw). Contract 0.27.0.
+BASE COMMIT (resolved from origin/automation): 2df30a40fe14f68152c3c6237258eea3610bf164
+Coder: opencode. Effort: medium (process argv `--variant medium`, PID 598945). Model: unknown
+(no `--model` on argv; per model policy the CLI default IS the model and is omitted, `CO-78`).
+ANSI colour escapes from vitest were stripped for readability; all text otherwise byte-for-byte.
+
+================================================================================
+LEG 1 — FAIL LEG (PG-EV-01). Product intercept reverted temporarily (interception
+`onClick` removed from AppHeader.tsx and ProductGrid.tsx). Tests run:
+  ./node_modules/.bin/vitest run src/components/shell/shell.test.tsx src/components/catalog/catalog.test.tsx
+CLASS: real behavioural FAIL — the click navigates to /capture (DOM shows "capture probe"),
+so the dialog never opens. Not an import hollow.
+================================================================================
+
+ RUN  v1.6.1 /home/andrei/StorageGenie/frontend
+
+stderr | src/components/shell/shell.test.tsx > Catalog shell > the header labels the LOADED item count, not a household total
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+stderr | src/components/catalog/catalog.test.tsx > ProductCard > renders the name, the category micro-pill and the primary-color dots
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+ ❯ src/components/catalog/catalog.test.tsx  (28 tests | 1 failed) 422ms
+   ❯ src/components/catalog/catalog.test.tsx > ProductGrid > an empty result shows the dashed canvas whose Import New Item CTA opens the import dialog
+     → Unable to find an accessible element with the role "dialog" and name "Import assets"
+
+There are no accessible roles. But there might be some inaccessible roles. If you wish to access them, then set the `hidden` option to `true`. Learn more about this here: https://testing-library.com/docs/dom-testing-library/api-queries#byrole
+
+Ignored nodes: comments, script, style
+<body>
+  <div>
+    <div>
+      capture probe
+    </div>
+  </div>
+</body>
+ ❯ src/components/shell/shell.test.tsx  (12 tests | 1 failed) 543ms
+   ❯ src/components/shell/shell.test.tsx > Catalog shell > the header Import Asset CTA opens the import dialog and does not render /capture
+     → Unable to find an accessible element with the role "dialog" and name "Import assets"
+
+There are no accessible roles. But there might be some inaccessible roles. If you wish to access them, then set the `hidden` option to `true`. Learn more about this here: https://testing-library.com/docs/dom-testing-library/api-queries#byrole
+
+Ignored nodes: comments, script, style
+<body>
+  <div>
+    <div>
+      capture probe
+    </div>
+  </div>
+</body>
+
+⎯⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/components/catalog/catalog.test.tsx > ProductGrid > an empty result shows the dashed canvas whose Import New Item CTA opens the import dialog
+TestingLibraryElementError: Unable to find an accessible element with the role "dialog" and name "Import assets"
+
+There are no accessible roles. But there might be some inaccessible roles. If you wish to access them, then set the `hidden` option to `true`. Learn more about this here: https://testing-library.com/docs/dom-testing-library/api-queries#byrole
+
+Ignored nodes: comments, script, style
+<body>
+  <div>
+    <div>
+      capture probe
+    </div>
+  </div>
+</body>
+ ❯ Object.getElementError node_modules/@testing-library/dom/dist/config.js:37:19
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:76:38
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:52:17
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:95:19
+ ❯ src/components/catalog/catalog.test.tsx:220:19
+    218|     fireEvent.click(screen.getByText(/import new item/i));
+    219| 
+    220|     expect(screen.getByRole("dialog", { name: "Import assets" })).toBe…
+       |                   ^
+    221|     expect(screen.queryByText("capture probe")).not.toBeInTheDocument(…
+    222|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  src/components/shell/shell.test.tsx > Catalog shell > the header Import Asset CTA opens the import dialog and does not render /capture
+TestingLibraryElementError: Unable to find an accessible element with the role "dialog" and name "Import assets"
+
+There are no accessible roles. But there might be some inaccessible roles. If you wish to access them, then set the `hidden` option to `true`. Learn more about this here: https://testing-library.com/docs/dom-testing-library/api-queries#byrole
+
+Ignored nodes: comments, script, style
+<body>
+  <div>
+    <div>
+      capture probe
+    </div>
+  </div>
+</body>
+ ❯ Object.getElementError node_modules/@testing-library/dom/dist/config.js:37:19
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:76:38
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:52:17
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:95:19
+ ❯ src/components/shell/shell.test.tsx:262:19
+    260|     fireEvent.click(screen.getByRole("link", { name: /import asset/i }…
+    261| 
+    262|     expect(screen.getByRole("dialog", { name: "Import assets" })).toBe…
+       |                   ^
+    263|     expect(screen.queryByText("capture probe")).not.toBeInTheDocument(…
+    264|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+ Test Files  2 failed (2)
+      Tests  2 failed | 38 passed (40)
+   Start at  16:19:27
+   Duration  1.35s (transform 230ms, setup 89ms, collect 619ms, tests 965ms, environment 492ms, prepare 112ms)
+
+================================================================================
+INTERCEPT RESTORATION PROOF (byte-identical to BASE)
+  git checkout -- frontend/src/components/shell/AppHeader.tsx \
+                   frontend/src/components/catalog/ProductGrid.tsx
+  git diff -- <two product files>            -> empty
+  diff <(git show HEAD:...AppHeader.tsx) <file>   -> "AppHeader byte-identical to HEAD"
+  diff <(git show HEAD:...ProductGrid.tsx) <file> -> "ProductGrid byte-identical to HEAD"
+  git status --porcelain -> only:
+     M frontend/src/components/catalog/catalog.test.tsx
+     M frontend/src/components/shell/shell.test.tsx
+================================================================================
+
+================================================================================
+LEG 2 — GREEN RUN. Full frontend suite + lint + build, all exit 0.
+  ./node_modules/.bin/vitest run
+  ./node_modules/.bin/eslint src
+  npm run build        (tsc && vite build)
+================================================================================
+
+===== FULL VITEST SUITE =====
+
+ RUN  v1.6.1 /home/andrei/StorageGenie/frontend
+
+ ✓ src/theme/theme.test.tsx  (10 tests) 136ms
+stderr | src/components/shell/shell.test.tsx > Catalog shell > the header labels the LOADED item count, not a household total
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+stderr | src/components/catalog/catalog.test.tsx > ProductCard > renders the name, the category micro-pill and the primary-color dots
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+stderr | src/components/shell/import-modal.test.tsx > AssetImportModal staging > drop stages accepted files as Ready with a live count
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+ ✓ src/components/shell/import-modal.test.tsx  (14 tests) 360ms
+ ✓ src/components/shell/drawer.test.tsx  (12 tests) 600ms
+ ✓ src/components/catalog/catalog.test.tsx  (28 tests) 573ms
+stderr | src/routes/ReviewPage.test.tsx > ReviewPage > posts every decision with the loaded candidate id and supports keyboard actions
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+ ✓ src/components/shell/shell.test.tsx  (12 tests) 814ms
+ ✓ src/types/product.test.ts  (11 tests) 23ms
+ ✓ src/routes/ReviewPage.test.tsx  (4 tests) 254ms
+stderr | src/routes/InboxPage.test.tsx > InboxPage > renders failed loaded job detail and retries that loaded id
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+stderr | src/routes/AssetDetailPage.test.tsx > AssetDetailPage > editing quantity patches via PATCH and shows the superseded prior value in history
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+ ✓ src/routes/AssetDetailPage.test.tsx  (2 tests) 197ms
+ ✓ src/routes/InboxPage.test.tsx  (4 tests) 278ms
+ ✓ src/components/AssetForm.test.tsx  (4 tests) 176ms
+ ✓ src/routes/ChatPage.test.tsx  (5 tests) 188ms
+ ✓ src/routes/PlanningPage.test.tsx  (4 tests) 345ms
+ ✓ src/components/CandidateCard.test.tsx  (4 tests) 138ms
+ ✓ src/routes/SettingsPage.test.tsx  (3 tests) 138ms
+ ✓ src/components/ChatTranscript.test.tsx  (2 tests) 53ms
+ ✓ src/components/ExpiryEntryForm.test.tsx  (2 tests) 96ms
+ ✓ src/components/PlanningSuggestionCard.test.tsx  (2 tests) 97ms
+ ✓ src/components/JobCard.test.tsx  (1 test) 34ms
+ ✓ src/components/ProvenanceBadge.test.tsx  (3 tests) 32ms
+ ✓ src/api/client.test.ts  (3 tests) 3ms
+stderr | src/components/AssetCard.test.tsx > AssetCard > renders display_name and type
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+ ✓ src/components/AssetCard.test.tsx  (1 test) 52ms
+
+ Test Files  21 passed (21)
+      Tests  131 passed (131)
+   Start at  16:19:37
+   Duration  3.85s (transform 615ms, setup 670ms, collect 2.57s, tests 4.59s, environment 5.86s, prepare 1.32s)
+
+VITEST_EXIT=0
+
+===== ESLINT =====
+ESLINT_EXIT=0
+
+===== BUILD (tsc && vite build) =====
+
+> storagegenie-frontend@0.1.0 build
+> tsc && vite build
+
+vite v5.4.21 building for production...
+transforming...
+✓ 1960 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                   0.94 kB │ gzip:  0.48 kB
+dist/assets/index-DxKo-z_g.css    2.65 kB │ gzip:  0.82 kB
+dist/assets/index-C8WJqsQX.js   292.21 kB │ gzip: 86.95 kB
+✓ built in 1.74s
+BUILD_EXIT=0
+
+================================================================================
+SCOPE GATES
+  git status --porcelain (pre-worklog):
+     M frontend/src/components/catalog/catalog.test.tsx
+     M frontend/src/components/shell/shell.test.tsx
+  git diff -- backend/                                  -> empty
+  git status --porcelain -- backend/alembic backend/migrations -> empty (no migration)
+  git diff -- frontend/package.json frontend/package-lock.json -> empty (no dep change)
+  secret scan (password|secret|token|api[_-]?key|PRIVATE KEY|AKIA|ghp_) on the two test files
+     -> 0 matches (grep exit 1)
+  git check-ignore -v <two test files> -> exit 1 (neither ignored)
+  Nothing pushed to storagegenie-evidence; no {{RECEIPT_CMD}}.
+================================================================================
