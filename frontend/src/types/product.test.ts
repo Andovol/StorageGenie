@@ -13,7 +13,7 @@ const asset: Asset = {
   id: "a1",
   household_id: "h1",
   display_name: "Oxford Shirt",
-  asset_type: "Tops",
+  asset_type: "Apparel & Textiles",
   status: "ACTIVE",
   quantity: null,
   unit: null,
@@ -48,18 +48,20 @@ function hasRawResponseKey(value: unknown): boolean {
 }
 
 describe("CANONICAL_CATEGORIES", () => {
-  test("exports the six canonical categories", () => {
-    expect(CANONICAL_CATEGORIES).toHaveLength(6);
-    for (const category of CANONICAL_CATEGORIES) {
-      expect(typeof category).toBe("string");
-    }
-    expect(CANONICAL_CATEGORIES).toContain("Tops");
-    expect(CANONICAL_CATEGORIES).toContain("Accessories");
+  test("exports the DQ1 six canonical categories exactly", () => {
+    expect(CANONICAL_CATEGORIES).toEqual([
+      "Hardware & Tools",
+      "Electronics & Gadgets",
+      "Apparel & Textiles",
+      "Home & Decor",
+      "Packaging & Materials",
+      "Uncategorized",
+    ]);
   });
 
   test("custom categories pass through and canonical casing is normalised", () => {
     expect(toProductCategory("Vintage Denim")).toBe("Vintage Denim");
-    expect(toProductCategory("tops")).toBe("Tops");
+    expect(toProductCategory("hardware & tools")).toBe("Hardware & Tools");
     expect(toProductCategory("")).toBe("Uncategorized");
     expect(toProductCategory("unknown")).toBe("Uncategorized");
   });
@@ -70,7 +72,7 @@ describe("assetToProductItem", () => {
     const item = assetToProductItem(asset);
     expect(item.id).toBe("a1");
     expect(item.name).toBe("Oxford Shirt");
-    expect(item.category).toBe("Tops");
+    expect(item.category).toBe("Apparel & Textiles");
     expect(item.dateAdded).toBe("2026-09-16T10:00:00Z");
   });
 
