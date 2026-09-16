@@ -1,0 +1,2209 @@
+SG-054_verify.log
+# SG-054 — shell unification + sourceless fallback icon + table overflow + count grammar — RAW captures
+# Host: andrei@87.106.66.242:2222   Work dir: /home/andrei/StorageGenie
+# BASE (start HEAD) = 9fb738b9df29fef696a9ed74f607e2a41b8b14a4  (== origin/automation)
+# Contract: 0.27.0   Coder: opencode   Effort: medium (argv --variant medium)   Model: unknown
+# Slice process start (run-coder SG-054): 2026-09-16T18:29:02Z
+# NOTE: `rtk` is the host's output-compacting CLI wrapper. ANSI colour stripped; bytes/content otherwise verbatim.
+
+########################################################################
+=== STARTING TREE (clean; PG-IC-09) ===
+########################################################################
+$ git status --porcelain=v1 -b
+## automation...origin/automation
+$ git rev-parse HEAD
+9fb738b9df29fef696a9ed74f607e2a41b8b14a4
+$ git rev-parse origin/automation
+9fb738b9df29fef696a9ed74f607e2a41b8b14a4
+
+########################################################################
+=== G5 PRE-CHANGE (new tests, OLD code) — FAIL run raw ===
+# command: npm test   (vitest run)   result: 6 failed / 131 passed (137) / 21 files / 4.07s / exit 1
+########################################################################
+
+> storagegenie-frontend@0.1.0 test
+> vitest run
+
+
+ RUN  v1.6.1 /home/andrei/StorageGenie/frontend
+
+ ✓ src/theme/theme.test.tsx  (10 tests) 134ms
+stderr | src/components/shell/shell.test.tsx > Catalog shell > the header labels the LOADED item count, not a household total
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+stderr | src/components/shell/import-modal.test.tsx > AssetImportModal staging > drop stages accepted files as Ready with a live count
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+stderr | src/components/catalog/catalog.test.tsx > ProductCard > renders the name, the category micro-pill and the primary-color dots
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+ ✓ src/components/shell/import-modal.test.tsx  (14 tests) 420ms
+ ✓ src/components/shell/drawer.test.tsx  (12 tests) 536ms
+ ❯ src/components/catalog/catalog.test.tsx  (31 tests | 4 failed) 578ms
+   ❯ src/components/catalog/catalog.test.tsx > ProductCard > a broken image falls back to the neutral glyph and never renders a broken icon
+     → Unable to find an element by: [data-testid="product-fallback-icon"]
+
+Ignored nodes: comments, script, style
+<body>
+  <div>
+    <a
+      class="product-card bg-card border-border focus-ring"
+      data-testid="product-card"
+      href="/assets/mock-drill?household_id=h1"
+      style="display: flex; flex-direction: column; gap: 10px; border-style: solid; border-width: 1px; border-radius: 12px; padding: 10px; text-decoration: none; color: inherit; aspect-ratio: 3 / 4;"
+    >
+      <div
+        class="bg-card-muted"
+        data-testid="product-card-well"
+        style="position: relative; aspect-ratio: 1 / 1; border-radius: 8px; overflow: hidden; display: flex; align-items: center; justify-content: center;"
+      >
+        <span
+          class="badge-raw bg-stone-100 text-stone-700 border-stone-200 dark:bg-stone-800/50 dark:text-stone-400 dark:border-stone-700/50"
+          data-testid="status-badge"
+          style="position: absolute; top: 8px; right: 8px; border-style: solid; border-width: 1px; border-radius: 999px; padding: 2px 8px; font-size: 11px; font-weight: 600;"
+        >
+          Source Only
+        </span>
+      </div>
+      <div
+        style="display: flex; flex-direction: column; gap: 6px; min-width: 0;"
+      >
+        <div
+          style="display: flex; align-items: center; gap: 6px; min-width: 0;"
+        >
+          <span
+            style="font-weight: 600; font-size: 14px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"
+            title="Cordless Drill"
+          >
+            Cordless Drill
+          </span>
+        </div>
+        <span
+          class="bg-card-muted text-muted-foreground font-mono"
+          style="align-self: flex-start; font-size: 11px; padding: 2px 6px; border-radius: 4px; white-space: nowrap;"
+        >
+          Hardware & Tools
+        </span>
+        <div
+          data-testid="color-dots"
+          style="display: flex; gap: 4px;"
+        >
+          <span
+            style="width: 8px; height: 8px; border-radius: 999px; background-color: rgb(31, 41, 55); border-width: 1px; border-style: solid; border-color: hsl(var(--border));"
+          />
+          <span
+            style="width: 8px; height: 8px; border-radius: 999px; background-color: rgb(245, 158, 11); border-width: 1px; border-style: solid; border-color: hsl(var(--border));"
+          />
+        </div>
+      </div>
+    </a>
+  </div>
+</body>
+   ❯ src/components/catalog/catalog.test.tsx > ProductCard > the fallback glyph shows only for a sourceless item and vanishes when media exists
+     → Unable to find an element by: [data-testid="product-fallback-icon"]
+
+Ignored nodes: comments, script, style
+<body>
+  <div />
+  <div>
+    <a
+      class="product-card bg-card border-border focus-ring"
+      data-testid="product-card"
+      href="/assets/mock-drill?household_id=h1"
+      style="display: flex; flex-direction: column; gap: 10px; border-style: solid; border-width: 1px; border-radius: 12px; padding: 10px; text-decoration: none; color: inherit; aspect-ratio: 3 / 4;"
+    >
+      <div
+        class="bg-card-muted"
+        data-testid="product-card-well"
+        style="position: relative; aspect-ratio: 1 / 1; border-radius: 8px; overflow: hidden; display: flex; align-items: center; justify-content: center;"
+      >
+        <span
+          class="badge-raw bg-stone-100 text-stone-700 border-stone-200 dark:bg-stone-800/50 dark:text-stone-400 dark:border-stone-700/50"
+          data-testid="status-badge"
+          style="position: absolute; top: 8px; right: 8px; border-style: solid; border-width: 1px; border-radius: 999px; padding: 2px 8px; font-size: 11px; font-weight: 600;"
+        >
+          Source Only
+        </span>
+      </div>
+      <div
+        style="display: flex; flex-direction: column; gap: 6px; min-width: 0;"
+      >
+        <div
+          style="display: flex; align-items: center; gap: 6px; min-width: 0;"
+        >
+          <span
+            style="font-weight: 600; font-size: 14px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"
+            title="Cordless Drill"
+          >
+            Cordless Drill
+          </span>
+        </div>
+        <span
+          class="bg-card-muted text-muted-foreground font-mono"
+          style="align-self: flex-start; font-size: 11px; padding: 2px 6px; border-radius: 4px; white-space: nowrap;"
+        >
+          Hardware & Tools
+        </span>
+        <div
+          data-testid="color-dots"
+          style="display: flex; gap: 4px;"
+        >
+          <span
+            style="width: 8px; height: 8px; border-radius: 999px; background-color: rgb(31, 41, 55); border-width: 1px; border-style: solid; border-color: hsl(var(--border));"
+          />
+          <span
+            style="width: 8px; height: 8px; border-radius: 999px; background-color: rgb(245, 158, 11); border-width: 1px; border-style: solid; border-color: hsl(var(--border));"
+          />
+        </div>
+      </div>
+    </a>
+  </div>
+</body>
+   ❯ src/components/catalog/catalog.test.tsx > ProductGrid > a sourceless row renders the fallback glyph in the table thumb
+     → Unable to find an element by: [data-testid="product-fallback-icon"]
+
+Ignored nodes: comments, script, style
+<body>
+  <div>
+    <table
+      aria-label="Product results"
+      role="table"
+      style="width: 100%; border-collapse: collapse;"
+    >
+      <colgroup>
+        <col
+          style="width: 56px; min-width: 56px;"
+        />
+        <col
+          style="width: 200px; min-width: 200px;"
+        />
+        <col
+          style="width: 140px; min-width: 140px;"
+        />
+        <col
+          style="width: 130px; min-width: 130px;"
+        />
+        <col
+          style="width: 120px; min-width: 120px;"
+        />
+        <col
+          style="width: 110px; min-width: 110px;"
+        />
+        <col
+          style="width: 48px; min-width: 48px;"
+        />
+      </colgroup>
+      <thead>
+        <tr
+          class="border-border"
+          style="border-bottom-style: solid; border-bottom-width: 1px;"
+        >
+          <th
+            class="text-muted-foreground"
+            scope="col"
+            style="text-align: center; font-size: 11px; font-weight: 600; padding: 8px 10px; white-space: nowrap;"
+          >
+            Asset
+          </th>
+          <th
+            class="text-muted-foreground"
+            scope="col"
+            style="text-align: left; font-size: 11px; font-weight: 600; padding: 8px 10px; white-space: nowrap;"
+          >
+            Name
+          </th>
+          <th
+            class="text-muted-foreground"
+            scope="col"
+            style="text-align: left; font-size: 11px; font-weight: 600; padding: 8px 10px; white-space: nowrap;"
+          >
+            Category
+          </th>
+          <th
+            class="text-muted-foreground"
+            scope="col"
+            style="text-align: left; font-size: 11px; font-weight: 600; padding: 8px 10px; white-space: nowrap;"
+          >
+            Status
+          </th>
+          <th
+            class="text-muted-foreground"
+            scope="col"
+            style="text-align: left; font-size: 11px; font-weight: 600; padding: 8px 10px; white-space: nowrap;"
+          >
+            Dimensions/Specs
+          </th>
+          <th
+            class="text-muted-foreground"
+            scope="col"
+            style="text-align: right; font-size: 11px; font-weight: 600; padding: 8px 10px; white-space: nowrap;"
+          >
+            Added
+          </th>
+          <th
+            class="text-muted-foreground"
+            scope="col"
+            style="text-align: center; font-size: 11px; font-weight: 600; padding: 8px 10px; white-space: nowrap;"
+          >
+            Actions
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr
+          aria-label="Open Cordless Drill"
+          class="border-border focus-ring"
+          data-testid="product-row"
+          role="link"
+          style="border-bottom-style: solid; border-bottom-width: 1px; cursor: pointer;"
+          tabindex="0"
+        >
+          <td
+            style="padding: 8px 10px; text-align: center;"
+          >
+            <span
+              class="bg-card-muted"
+              style="display: inline-flex; width: 40px; height: 40px; border-radius: 6px; overflow: hidden; align-items: center; justify-content: center;"
+            />
+          </td>
+          <td
+            style="padding: 8px 10px; max-width: 200px;"
+          >
+            <span
+              style="display: inline-block; max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; vertical-align: middle;"
+            >
+              Cordless Drill
+            </span>
+          </td>
+          <td
+            style="padding: 8px 10px;"
+          >
+            <span
+              class="bg-card-muted text-muted-foreground font-mono"
+              style="font-size: 11px; padding: 2px 6px; border-radius: 4px; white-space: nowrap;"
+            >
+              Hardware & Tools
+            </span>
+          </td>
+          <td
+            style="padding: 8px 10px;"
+          >
+            <span
+              style="display: inline-flex; align-items: center; gap: 6px;"
+            >
+              <span
+                data-testid="status-dot"
+                style="width: 8px; height: 8px; border-radius: 999px; background-color: hsl(var(--badge-raw-fg));"
+              />
+              <span
+                class="badge-raw bg-stone-100 text-stone-700 border-stone-200 dark:bg-stone-800/50 dark:text-stone-400 dark:border-stone-700/50"
+                style="border-style: solid; border-width: 1px; border-radius: 999px; padding: 2px 8px; font-size: 11px; font-weight: 600; white-space: nowrap;"
+              >
+                Source Only
+              </span>
+            </span>
+          </td>
+          <td
+            style="padding: 8px 10px; white-space: nowrap;"
+          >
+            30 x 8 x 22 cm
+          </td>
+          <td
+            class="font-mono text-muted-foreground"
+            style="padding: 8px 10px; text-align: right; white-space: nowrap;"
+          >
+            2d ago
+          </td>
+          <td
+            style="padding: 8px 10px; text-align: center;"
+          >
+            <button
+              aria-label="Actions for Cordless Drill"
+              class="text-muted-foreground focus-ring"
+              style="background: none; cursor: pointer; font-size: 16px; line-height: 1; padding: 4px 6px; border-radius: 4px;"
+              type="button"
+            >
+              ...
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</body>
+   ❯ src/components/catalog/catalog.test.tsx > ProductGrid > the compact table rides in a labelled horizontal scroll container (no page-level overflow)
+     → Unable to find an element by: [data-testid="table-scroll"]
+
+Ignored nodes: comments, script, style
+<body>
+  <div>
+    <table
+      aria-label="Product results"
+      role="table"
+      style="width: 100%; border-collapse: collapse;"
+    >
+      <colgroup>
+        <col
+          style="width: 56px; min-width: 56px;"
+        />
+        <col
+          style="width: 200px; min-width: 200px;"
+        />
+        <col
+          style="width: 140px; min-width: 140px;"
+        />
+        <col
+          style="width: 130px; min-width: 130px;"
+        />
+        <col
+          style="width: 120px; min-width: 120px;"
+        />
+        <col
+          style="width: 110px; min-width: 110px;"
+        />
+        <col
+          style="width: 48px; min-width: 48px;"
+        />
+      </colgroup>
+      <thead>
+        <tr
+          class="border-border"
+          style="border-bottom-style: solid; border-bottom-width: 1px;"
+        >
+          <th
+            class="text-muted-foreground"
+            scope="col"
+            style="text-align: center; font-size: 11px; font-weight: 600; padding: 8px 10px; white-space: nowrap;"
+          >
+            Asset
+          </th>
+          <th
+            class="text-muted-foreground"
+            scope="col"
+            style="text-align: left; font-size: 11px; font-weight: 600; padding: 8px 10px; white-space: nowrap;"
+          >
+            Name
+          </th>
+          <th
+            class="text-muted-foreground"
+            scope="col"
+            style="text-align: left; font-size: 11px; font-weight: 600; padding: 8px 10px; white-space: nowrap;"
+          >
+            Category
+          </th>
+          <th
+            class="text-muted-foreground"
+            scope="col"
+            style="text-align: left; font-size: 11px; font-weight: 600; padding: 8px 10px; white-space: nowrap;"
+          >
+            Status
+          </th>
+          <th
+            class="text-muted-foreground"
+            scope="col"
+            style="text-align: left; font-size: 11px; font-weight: 600; padding: 8px 10px; white-space: nowrap;"
+          >
+            Dimensions/Specs
+          </th>
+          <th
+            class="text-muted-foreground"
+            scope="col"
+            style="text-align: right; font-size: 11px; font-weight: 600; padding: 8px 10px; white-space: nowrap;"
+          >
+            Added
+          </th>
+          <th
+            class="text-muted-foreground"
+            scope="col"
+            style="text-align: center; font-size: 11px; font-weight: 600; padding: 8px 10px; white-space: nowrap;"
+          >
+            Actions
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr
+          aria-label="Open Cordless Drill"
+          class="border-border focus-ring"
+          data-testid="product-row"
+          role="link"
+          style="border-bottom-style: solid; border-bottom-width: 1px; cursor: pointer;"
+          tabindex="0"
+        >
+          <td
+            style="padding: 8px 10px; text-align: center;"
+          >
+            <span
+              class="bg-card-muted"
+              style="display: inline-flex; width: 40px; height: 40px; border-radius: 6px; overflow: hidden; align-items: center; justify-content: center;"
+            >
+              <img
+                alt="Cordless Drill"
+                src="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22120%22%20height%3D%22120%22%20viewBox%3D%220%200%20120%20120%22%3E%3Crect%20width%3D%22120%22%20height%3D%22120%22%20rx%3D%2212%22%20fill%3D%22%231f2937%22%2F%3E%3Ctext%20x%3D%2260%22%20y%3D%2264%22%20font-family%3D%22monospace%22%20font-size%3D%2211%22%20text-anchor%3D%22middle%22%20fill%3D%22%23ffffff%22%3EDRL%3C%2Ftext%3E%3C%2Fsvg%3E"
+                style="width: 100%; height: 100%; object-fit: contain;"
+              />
+            </span>
+          </td>
+          <td
+            style="padding: 8px 10px; max-width: 200px;"
+          >
+            <span
+              style="display: inline-block; max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; vertical-align: middle;"
+            >
+              Cordless Drill
+            </span>
+          </td>
+          <td
+            style="padding: 8px 10px;"
+          >
+            <span
+              class="bg-card-muted text-muted-foreground font-mono"
+              style="font-size: 11px; padding: 2px 6px; border-radius: 4px; white-space: nowrap;"
+            >
+              Hardware & Tools
+            </span>
+          </td>
+          <td
+            style="padding: 8px 10px;"
+          >
+            <span
+              style="display: inline-flex; align-items: center; gap: 6px;"
+            >
+              <span
+                data-testid="status-dot"
+                style="width: 8px; height: 8px; border-radius: 999px; background-color: hsl(var(--badge-raw-fg));"
+              />
+              <span
+                class="badge-raw bg-stone-100 text-stone-700 border-stone-200 dark:bg-stone-800/50 dark:text-stone-400 dark:border-stone-700/50"
+                style="border-style: solid; border-width: 1px; border-radius...
+stderr | src/routes/ReviewPage.test.tsx > ReviewPage > posts every decision with the loaded candidate id and supports keyboard actions
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+ ✓ src/routes/ReviewPage.test.tsx  (4 tests) 252ms
+ ❯ src/components/shell/shell.test.tsx  (15 tests | 2 failed) 841ms
+   ❯ src/components/shell/shell.test.tsx > Catalog shell > the catalog route renders ONE StorageGenie wordmark (legacy nav gone)
+     → expected [ <a …(2)></a>, <a …(3)></a> ] to have a length of 1 but got 2
+   ❯ src/components/shell/shell.test.tsx > Catalog shell > the header count uses the singular only for one loaded item
+     → Unable to find an element with the text: Total: 1 item. This could be because the text is broken up by multiple elements. In this case, you can provide a function for your text matcher to make your matcher more flexible.
+
+Ignored nodes: comments, script, style
+<body>
+  <div>
+    <div
+      class="bg-background text-foreground"
+      style="min-height: 100vh;"
+    >
+      <div
+        class="bg-background"
+        style="position: sticky; top: 0px; z-index: 10;"
+      >
+        <div
+          class="bg-card border-border"
+          style="display: flex; align-items: center; gap: 12px; padding: 10px 24px; border-bottom-style: solid; border-bottom-width: 1px;"
+        >
+          <a
+            class="text-foreground focus-ring"
+            href="/"
+            style="font-weight: 700; text-decoration: none; margin-right: 4px;"
+          >
+            StorageGenie
+          </a>
+          <span
+            aria-label="Total loaded items: 1"
+            class="bg-card-muted text-muted-foreground"
+            style="font-size: 12px; padding: 2px 8px; border-radius: 999px;"
+            title="Items loaded on this page, not the household total"
+          >
+            Total: 
+            1
+             items
+          </span>
+          <div
+            aria-hidden="true"
+            style="flex: 1 1 0%;"
+          />
+          <input
+            aria-label="Search catalog"
+            class="bg-background text-foreground border-border focus-ring"
+            placeholder="Search…"
+            style="padding: 6px 10px; border-radius: 6px; border-style: solid; border-width: 1px; min-width: 200px; font-size: 13px;"
+            type="search"
+            value=""
+          />
+          <button
+            aria-label="Switch to dark theme"
+            class="bg-card text-foreground border-border focus-ring"
+            style="display: inline-flex; align-items: center; justify-content: center; padding: 6px; border-radius: 6px; border-style: solid; border-width: 1px; cursor: pointer;"
+            title="Switch to dark theme"
+            type="button"
+          >
+            <svg
+              aria-hidden="true"
+              class="lucide lucide-moon"
+              fill="none"
+              height="18"
+              stroke="currentColor"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              viewBox="0 0 24 24"
+              width="18"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M20.985 12.486a9 9 0 1 1-9.473-9.472c.405-.022.617.46.402.803a6 6 0 0 0 8.268 8.268c.344-.215.825-.004.803.401"
+              />
+            </svg>
+          </button>
+          <a
+            class="bg-primary text-primary-foreground focus-ring"
+            href="/capture"
+            style="padding: 6px 12px; border-radius: 6px; text-decoration: none; font-weight: 600; font-size: 13px; display: inline-flex; align-items: center; gap: 6px;"
+          >
+            <svg
+              aria-hidden="true"
+              class="lucide lucide-upload"
+              fill="none"
+              height="16"
+              stroke="currentColor"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              viewBox="0 0 24 24"
+              width="16"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M12 3v12"
+              />
+              <path
+                d="m17 8-5-5-5 5"
+              />
+              <path
+                d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"
+              />
+            </svg>
+            Import Asset
+          </a>
+        </div>
+        <div
+          class="bg-card border-border"
+          style="display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 8px 24px; border-bottom-style: solid; border-bottom-width: 1px;"
+        >
+          <select
+            aria-label="Household"
+            class="bg-background text-foreground border-border focus-ring"
+            style="padding: 4px 10px; border-radius: 6px; border-style: solid; border-width: 1px; font-size: 13px; cursor: pointer;"
+          >
+            <option
+              value="h1"
+            >
+              Home
+            </option>
+          </select>
+          <button
+            aria-pressed="true"
+            class="bg-primary text-primary-foreground focus-ring"
+            style="padding: 4px 10px; border-radius: 6px; border-style: solid; border-width: 1px; font-size: 13px; cursor: pointer; font-weight: 600;"
+            type="button"
+          >
+            All
+          </button>
+          <button
+            aria-pressed="false"
+            class="bg-card-muted text-muted-foreground focus-ring"
+            style="padding: 4px 10px; border-radius: 6px; border-style: solid; border-width: 1px; font-size: 13px; cursor: pointer; font-weight: 400;"
+            type="button"
+          >
+            Hardware & Tools
+          </button>
+          <button
+            aria-pressed="false"
+            class="bg-card-muted text-muted-foreground focus-ring"
+            style="padding: 4px 10px; border-radius: 6px; border-style: solid; border-width:...
+ ✓ src/types/product.test.ts  (11 tests) 3ms
+stderr | src/routes/InboxPage.test.tsx > InboxPage > renders failed loaded job detail and retries that loaded id
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+stderr | src/routes/AssetDetailPage.test.tsx > AssetDetailPage > editing quantity patches via PATCH and shows the superseded prior value in history
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+ ✓ src/routes/AssetDetailPage.test.tsx  (2 tests) 178ms
+ ✓ src/routes/InboxPage.test.tsx  (4 tests) 292ms
+ ✓ src/components/AssetForm.test.tsx  (4 tests) 170ms
+ ✓ src/routes/ChatPage.test.tsx  (5 tests) 175ms
+ ✓ src/routes/PlanningPage.test.tsx  (4 tests) 308ms
+ ✓ src/components/CandidateCard.test.tsx  (4 tests) 130ms
+ ✓ src/routes/SettingsPage.test.tsx  (3 tests) 138ms
+ ✓ src/components/PlanningSuggestionCard.test.tsx  (2 tests) 68ms
+ ✓ src/components/ExpiryEntryForm.test.tsx  (2 tests) 95ms
+ ✓ src/components/ChatTranscript.test.tsx  (2 tests) 64ms
+ ✓ src/components/JobCard.test.tsx  (1 test) 31ms
+ ✓ src/components/ProvenanceBadge.test.tsx  (3 tests) 30ms
+ ✓ src/api/client.test.ts  (3 tests) 4ms
+stderr | src/components/AssetCard.test.tsx > AssetCard > renders display_name and type
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+ ✓ src/components/AssetCard.test.tsx  (1 test) 35ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 6 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/components/catalog/catalog.test.tsx > ProductCard > a broken image falls back to the neutral glyph and never renders a broken icon
+TestingLibraryElementError: Unable to find an element by: [data-testid="product-fallback-icon"]
+
+Ignored nodes: comments, script, style
+<body>
+  <div>
+    <a
+      class="product-card bg-card border-border focus-ring"
+      data-testid="product-card"
+      href="/assets/mock-drill?household_id=h1"
+      style="display: flex; flex-direction: column; gap: 10px; border-style: solid; border-width: 1px; border-radius: 12px; padding: 10px; text-decoration: none; color: inherit; aspect-ratio: 3 / 4;"
+    >
+      <div
+        class="bg-card-muted"
+        data-testid="product-card-well"
+        style="position: relative; aspect-ratio: 1 / 1; border-radius: 8px; overflow: hidden; display: flex; align-items: center; justify-content: center;"
+      >
+        <span
+          class="badge-raw bg-stone-100 text-stone-700 border-stone-200 dark:bg-stone-800/50 dark:text-stone-400 dark:border-stone-700/50"
+          data-testid="status-badge"
+          style="position: absolute; top: 8px; right: 8px; border-style: solid; border-width: 1px; border-radius: 999px; padding: 2px 8px; font-size: 11px; font-weight: 600;"
+        >
+          Source Only
+        </span>
+      </div>
+      <div
+        style="display: flex; flex-direction: column; gap: 6px; min-width: 0;"
+      >
+        <div
+          style="display: flex; align-items: center; gap: 6px; min-width: 0;"
+        >
+          <span
+            style="font-weight: 600; font-size: 14px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"
+            title="Cordless Drill"
+          >
+            Cordless Drill
+          </span>
+        </div>
+        <span
+          class="bg-card-muted text-muted-foreground font-mono"
+          style="align-self: flex-start; font-size: 11px; padding: 2px 6px; border-radius: 4px; white-space: nowrap;"
+        >
+          Hardware & Tools
+        </span>
+        <div
+          data-testid="color-dots"
+          style="display: flex; gap: 4px;"
+        >
+          <span
+            style="width: 8px; height: 8px; border-radius: 999px; background-color: rgb(31, 41, 55); border-width: 1px; border-style: solid; border-color: hsl(var(--border));"
+          />
+          <span
+            style="width: 8px; height: 8px; border-radius: 999px; background-color: rgb(245, 158, 11); border-width: 1px; border-style: solid; border-color: hsl(var(--border));"
+          />
+        </div>
+      </div>
+    </a>
+  </div>
+</body>
+ ❯ Object.getElementError node_modules/@testing-library/dom/dist/config.js:37:19
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:76:38
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:52:17
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:95:19
+ ❯ src/components/catalog/catalog.test.tsx:117:19
+    115|     expect(screen.queryByRole("img")).not.toBeInTheDocument();
+    116|     expect(screen.queryByTestId("failed-warning")).not.toBeInTheDocume…
+    117|     expect(screen.getByTestId("product-fallback-icon")).toBeInTheDocum…
+       |                   ^
+    118|   });
+    119| 
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/6]⎯
+
+ FAIL  src/components/catalog/catalog.test.tsx > ProductCard > the fallback glyph shows only for a sourceless item and vanishes when media exists
+TestingLibraryElementError: Unable to find an element by: [data-testid="product-fallback-icon"]
+
+Ignored nodes: comments, script, style
+<body>
+  <div />
+  <div>
+    <a
+      class="product-card bg-card border-border focus-ring"
+      data-testid="product-card"
+      href="/assets/mock-drill?household_id=h1"
+      style="display: flex; flex-direction: column; gap: 10px; border-style: solid; border-width: 1px; border-radius: 12px; padding: 10px; text-decoration: none; color: inherit; aspect-ratio: 3 / 4;"
+    >
+      <div
+        class="bg-card-muted"
+        data-testid="product-card-well"
+        style="position: relative; aspect-ratio: 1 / 1; border-radius: 8px; overflow: hidden; display: flex; align-items: center; justify-content: center;"
+      >
+        <span
+          class="badge-raw bg-stone-100 text-stone-700 border-stone-200 dark:bg-stone-800/50 dark:text-stone-400 dark:border-stone-700/50"
+          data-testid="status-badge"
+          style="position: absolute; top: 8px; right: 8px; border-style: solid; border-width: 1px; border-radius: 999px; padding: 2px 8px; font-size: 11px; font-weight: 600;"
+        >
+          Source Only
+        </span>
+      </div>
+      <div
+        style="display: flex; flex-direction: column; gap: 6px; min-width: 0;"
+      >
+        <div
+          style="display: flex; align-items: center; gap: 6px; min-width: 0;"
+        >
+          <span
+            style="font-weight: 600; font-size: 14px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"
+            title="Cordless Drill"
+          >
+            Cordless Drill
+          </span>
+        </div>
+        <span
+          class="bg-card-muted text-muted-foreground font-mono"
+          style="align-self: flex-start; font-size: 11px; padding: 2px 6px; border-radius: 4px; white-space: nowrap;"
+        >
+          Hardware & Tools
+        </span>
+        <div
+          data-testid="color-dots"
+          style="display: flex; gap: 4px;"
+        >
+          <span
+            style="width: 8px; height: 8px; border-radius: 999px; background-color: rgb(31, 41, 55); border-width: 1px; border-style: solid; border-color: hsl(var(--border));"
+          />
+          <span
+            style="width: 8px; height: 8px; border-radius: 999px; background-color: rgb(245, 158, 11); border-width: 1px; border-style: solid; border-color: hsl(var(--border));"
+          />
+        </div>
+      </div>
+    </a>
+  </div>
+</body>
+ ❯ Object.getElementError node_modules/@testing-library/dom/dist/config.js:37:19
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:76:38
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:52:17
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:95:19
+ ❯ src/components/catalog/catalog.test.tsx:133:19
+    131| 
+    132|     renderWithRouter(<ProductCard item={sourceless} householdId="h1" /…
+    133|     expect(screen.getByTestId("product-fallback-icon")).toBeInTheDocum…
+       |                   ^
+    134|   });
+    135| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/6]⎯
+
+ FAIL  src/components/catalog/catalog.test.tsx > ProductGrid > a sourceless row renders the fallback glyph in the table thumb
+TestingLibraryElementError: Unable to find an element by: [data-testid="product-fallback-icon"]
+
+Ignored nodes: comments, script, style
+<body>
+  <div>
+    <table
+      aria-label="Product results"
+      role="table"
+      style="width: 100%; border-collapse: collapse;"
+    >
+      <colgroup>
+        <col
+          style="width: 56px; min-width: 56px;"
+        />
+        <col
+          style="width: 200px; min-width: 200px;"
+        />
+        <col
+          style="width: 140px; min-width: 140px;"
+        />
+        <col
+          style="width: 130px; min-width: 130px;"
+        />
+        <col
+          style="width: 120px; min-width: 120px;"
+        />
+        <col
+          style="width: 110px; min-width: 110px;"
+        />
+        <col
+          style="width: 48px; min-width: 48px;"
+        />
+      </colgroup>
+      <thead>
+        <tr
+          class="border-border"
+          style="border-bottom-style: solid; border-bottom-width: 1px;"
+        >
+          <th
+            class="text-muted-foreground"
+            scope="col"
+            style="text-align: center; font-size: 11px; font-weight: 600; padding: 8px 10px; white-space: nowrap;"
+          >
+            Asset
+          </th>
+          <th
+            class="text-muted-foreground"
+            scope="col"
+            style="text-align: left; font-size: 11px; font-weight: 600; padding: 8px 10px; white-space: nowrap;"
+          >
+            Name
+          </th>
+          <th
+            class="text-muted-foreground"
+            scope="col"
+            style="text-align: left; font-size: 11px; font-weight: 600; padding: 8px 10px; white-space: nowrap;"
+          >
+            Category
+          </th>
+          <th
+            class="text-muted-foreground"
+            scope="col"
+            style="text-align: left; font-size: 11px; font-weight: 600; padding: 8px 10px; white-space: nowrap;"
+          >
+            Status
+          </th>
+          <th
+            class="text-muted-foreground"
+            scope="col"
+            style="text-align: left; font-size: 11px; font-weight: 600; padding: 8px 10px; white-space: nowrap;"
+          >
+            Dimensions/Specs
+          </th>
+          <th
+            class="text-muted-foreground"
+            scope="col"
+            style="text-align: right; font-size: 11px; font-weight: 600; padding: 8px 10px; white-space: nowrap;"
+          >
+            Added
+          </th>
+          <th
+            class="text-muted-foreground"
+            scope="col"
+            style="text-align: center; font-size: 11px; font-weight: 600; padding: 8px 10px; white-space: nowrap;"
+          >
+            Actions
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr
+          aria-label="Open Cordless Drill"
+          class="border-border focus-ring"
+          data-testid="product-row"
+          role="link"
+          style="border-bottom-style: solid; border-bottom-width: 1px; cursor: pointer;"
+          tabindex="0"
+        >
+          <td
+            style="padding: 8px 10px; text-align: center;"
+          >
+            <span
+              class="bg-card-muted"
+              style="display: inline-flex; width: 40px; height: 40px; border-radius: 6px; overflow: hidden; align-items: center; justify-content: center;"
+            />
+          </td>
+          <td
+            style="padding: 8px 10px; max-width: 200px;"
+          >
+            <span
+              style="display: inline-block; max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; vertical-align: middle;"
+            >
+              Cordless Drill
+            </span>
+          </td>
+          <td
+            style="padding: 8px 10px;"
+          >
+            <span
+              class="bg-card-muted text-muted-foreground font-mono"
+              style="font-size: 11px; padding: 2px 6px; border-radius: 4px; white-space: nowrap;"
+            >
+              Hardware & Tools
+            </span>
+          </td>
+          <td
+            style="padding: 8px 10px;"
+          >
+            <span
+              style="display: inline-flex; align-items: center; gap: 6px;"
+            >
+              <span
+                data-testid="status-dot"
+                style="width: 8px; height: 8px; border-radius: 999px; background-color: hsl(var(--badge-raw-fg));"
+              />
+              <span
+                class="badge-raw bg-stone-100 text-stone-700 border-stone-200 dark:bg-stone-800/50 dark:text-stone-400 dark:border-stone-700/50"
+                style="border-style: solid; border-width: 1px; border-radius: 999px; padding: 2px 8px; font-size: 11px; font-weight: 600; white-space: nowrap;"
+              >
+                Source Only
+              </span>
+            </span>
+          </td>
+          <td
+            style="padding: 8px 10px; white-space: nowrap;"
+          >
+            30 x 8 x 22 cm
+          </td>
+          <td
+            class="font-mono text-muted-foreground"
+            style="padding: 8px 10px; text-align: right; white-space: nowrap;"
+          >
+            2d ago
+          </td>
+          <td
+            style="padding: 8px 10px; text-align: center;"
+          >
+            <button
+              aria-label="Actions for Cordless Drill"
+              class="text-muted-foreground focus-ring"
+              style="background: none; cursor: pointer; font-size: 16px; line-height: 1; padding: 4px 6px; border-radius: 4px;"
+              type="button"
+            >
+              ...
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</body>
+ ❯ Object.getElementError node_modules/@testing-library/dom/dist/config.js:37:19
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:76:38
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:52:17
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:95:19
+ ❯ src/components/catalog/catalog.test.tsx:191:19
+    189|     renderWithRouter(<ProductGrid items={[sourceless]} density="table"…
+    190| 
+    191|     expect(screen.getByTestId("product-fallback-icon")).toBeInTheDocum…
+       |                   ^
+    192|   });
+    193| 
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/6]⎯
+
+ FAIL  src/components/catalog/catalog.test.tsx > ProductGrid > the compact table rides in a labelled horizontal scroll container (no page-level overflow)
+TestingLibraryElementError: Unable to find an element by: [data-testid="table-scroll"]
+
+Ignored nodes: comments, script, style
+<body>
+  <div>
+    <table
+      aria-label="Product results"
+      role="table"
+      style="width: 100%; border-collapse: collapse;"
+    >
+      <colgroup>
+        <col
+          style="width: 56px; min-width: 56px;"
+        />
+        <col
+          style="width: 200px; min-width: 200px;"
+        />
+        <col
+          style="width: 140px; min-width: 140px;"
+        />
+        <col
+          style="width: 130px; min-width: 130px;"
+        />
+        <col
+          style="width: 120px; min-width: 120px;"
+        />
+        <col
+          style="width: 110px; min-width: 110px;"
+        />
+        <col
+          style="width: 48px; min-width: 48px;"
+        />
+      </colgroup>
+      <thead>
+        <tr
+          class="border-border"
+          style="border-bottom-style: solid; border-bottom-width: 1px;"
+        >
+          <th
+            class="text-muted-foreground"
+            scope="col"
+            style="text-align: center; font-size: 11px; font-weight: 600; padding: 8px 10px; white-space: nowrap;"
+          >
+            Asset
+          </th>
+          <th
+            class="text-muted-foreground"
+            scope="col"
+            style="text-align: left; font-size: 11px; font-weight: 600; padding: 8px 10px; white-space: nowrap;"
+          >
+            Name
+          </th>
+          <th
+            class="text-muted-foreground"
+            scope="col"
+            style="text-align: left; font-size: 11px; font-weight: 600; padding: 8px 10px; white-space: nowrap;"
+          >
+            Category
+          </th>
+          <th
+            class="text-muted-foreground"
+            scope="col"
+            style="text-align: left; font-size: 11px; font-weight: 600; padding: 8px 10px; white-space: nowrap;"
+          >
+            Status
+          </th>
+          <th
+            class="text-muted-foreground"
+            scope="col"
+            style="text-align: left; font-size: 11px; font-weight: 600; padding: 8px 10px; white-space: nowrap;"
+          >
+            Dimensions/Specs
+          </th>
+          <th
+            class="text-muted-foreground"
+            scope="col"
+            style="text-align: right; font-size: 11px; font-weight: 600; padding: 8px 10px; white-space: nowrap;"
+          >
+            Added
+          </th>
+          <th
+            class="text-muted-foreground"
+            scope="col"
+            style="text-align: center; font-size: 11px; font-weight: 600; padding: 8px 10px; white-space: nowrap;"
+          >
+            Actions
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr
+          aria-label="Open Cordless Drill"
+          class="border-border focus-ring"
+          data-testid="product-row"
+          role="link"
+          style="border-bottom-style: solid; border-bottom-width: 1px; cursor: pointer;"
+          tabindex="0"
+        >
+          <td
+            style="padding: 8px 10px; text-align: center;"
+          >
+            <span
+              class="bg-card-muted"
+              style="display: inline-flex; width: 40px; height: 40px; border-radius: 6px; overflow: hidden; align-items: center; justify-content: center;"
+            >
+              <img
+                alt="Cordless Drill"
+                src="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22120%22%20height%3D%22120%22%20viewBox%3D%220%200%20120%20120%22%3E%3Crect%20width%3D%22120%22%20height%3D%22120%22%20rx%3D%2212%22%20fill%3D%22%231f2937%22%2F%3E%3Ctext%20x%3D%2260%22%20y%3D%2264%22%20font-family%3D%22monospace%22%20font-size%3D%2211%22%20text-anchor%3D%22middle%22%20fill%3D%22%23ffffff%22%3EDRL%3C%2Ftext%3E%3C%2Fsvg%3E"
+                style="width: 100%; height: 100%; object-fit: contain;"
+              />
+            </span>
+          </td>
+          <td
+            style="padding: 8px 10px; max-width: 200px;"
+          >
+            <span
+              style="display: inline-block; max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; vertical-align: middle;"
+            >
+              Cordless Drill
+            </span>
+          </td>
+          <td
+            style="padding: 8px 10px;"
+          >
+            <span
+              class="bg-card-muted text-muted-foreground font-mono"
+              style="font-size: 11px; padding: 2px 6px; border-radius: 4px; white-space: nowrap;"
+            >
+              Hardware & Tools
+            </span>
+          </td>
+          <td
+            style="padding: 8px 10px;"
+          >
+            <span
+              style="display: inline-flex; align-items: center; gap: 6px;"
+            >
+              <span
+                data-testid="status-dot"
+                style="width: 8px; height: 8px; border-radius: 999px; background-color: hsl(var(--badge-raw-fg));"
+              />
+              <span
+                class="badge-raw bg-stone-100 text-stone-700 border-stone-200 dark:bg-stone-800/50 dark:text-stone-400 dark:border-stone-700/50"
+                style="border-style: solid; border-width: 1px; border-radius...
+ ❯ Object.getElementError node_modules/@testing-library/dom/dist/config.js:37:19
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:76:38
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:52:17
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:95:19
+ ❯ src/components/catalog/catalog.test.tsx:197:29
+    195|     renderWithRouter(<ProductGrid items={MOCK_PRODUCTS} density="table…
+    196| 
+    197|     const scroller = screen.getByTestId("table-scroll");
+       |                             ^
+    198|     expect(scroller).toHaveAttribute("role", "region");
+    199|     expect(scroller).toHaveAccessibleName("Product results table");
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/6]⎯
+
+ FAIL  src/components/shell/shell.test.tsx > Catalog shell > the catalog route renders ONE StorageGenie wordmark (legacy nav gone)
+AssertionError: expected [ <a …(2)></a>, <a …(3)></a> ] to have a length of 1 but got 2
+
+- Expected
++ Received
+
+- 1
++ 2
+
+ ❯ src/components/shell/shell.test.tsx:294:49
+    292|     await screen.findByText("Drill");
+    293| 
+    294|     expect(screen.getAllByText("StorageGenie")).toHaveLength(1);
+       |                                                 ^
+    295|     expect(screen.queryByText("Phase 0 · local-first")).not.toBeInTheD…
+    296|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/6]⎯
+
+ FAIL  src/components/shell/shell.test.tsx > Catalog shell > the header count uses the singular only for one loaded item
+TestingLibraryElementError: Unable to find an element with the text: Total: 1 item. This could be because the text is broken up by multiple elements. In this case, you can provide a function for your text matcher to make your matcher more flexible.
+
+Ignored nodes: comments, script, style
+<body>
+  <div>
+    <div
+      class="bg-background text-foreground"
+      style="min-height: 100vh;"
+    >
+      <div
+        class="bg-background"
+        style="position: sticky; top: 0px; z-index: 10;"
+      >
+        <div
+          class="bg-card border-border"
+          style="display: flex; align-items: center; gap: 12px; padding: 10px 24px; border-bottom-style: solid; border-bottom-width: 1px;"
+        >
+          <a
+            class="text-foreground focus-ring"
+            href="/"
+            style="font-weight: 700; text-decoration: none; margin-right: 4px;"
+          >
+            StorageGenie
+          </a>
+          <span
+            aria-label="Total loaded items: 1"
+            class="bg-card-muted text-muted-foreground"
+            style="font-size: 12px; padding: 2px 8px; border-radius: 999px;"
+            title="Items loaded on this page, not the household total"
+          >
+            Total: 
+            1
+             items
+          </span>
+          <div
+            aria-hidden="true"
+            style="flex: 1 1 0%;"
+          />
+          <input
+            aria-label="Search catalog"
+            class="bg-background text-foreground border-border focus-ring"
+            placeholder="Search…"
+            style="padding: 6px 10px; border-radius: 6px; border-style: solid; border-width: 1px; min-width: 200px; font-size: 13px;"
+            type="search"
+            value=""
+          />
+          <button
+            aria-label="Switch to dark theme"
+            class="bg-card text-foreground border-border focus-ring"
+            style="display: inline-flex; align-items: center; justify-content: center; padding: 6px; border-radius: 6px; border-style: solid; border-width: 1px; cursor: pointer;"
+            title="Switch to dark theme"
+            type="button"
+          >
+            <svg
+              aria-hidden="true"
+              class="lucide lucide-moon"
+              fill="none"
+              height="18"
+              stroke="currentColor"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              viewBox="0 0 24 24"
+              width="18"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M20.985 12.486a9 9 0 1 1-9.473-9.472c.405-.022.617.46.402.803a6 6 0 0 0 8.268 8.268c.344-.215.825-.004.803.401"
+              />
+            </svg>
+          </button>
+          <a
+            class="bg-primary text-primary-foreground focus-ring"
+            href="/capture"
+            style="padding: 6px 12px; border-radius: 6px; text-decoration: none; font-weight: 600; font-size: 13px; display: inline-flex; align-items: center; gap: 6px;"
+          >
+            <svg
+              aria-hidden="true"
+              class="lucide lucide-upload"
+              fill="none"
+              height="16"
+              stroke="currentColor"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              viewBox="0 0 24 24"
+              width="16"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M12 3v12"
+              />
+              <path
+                d="m17 8-5-5-5 5"
+              />
+              <path
+                d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"
+              />
+            </svg>
+            Import Asset
+          </a>
+        </div>
+        <div
+          class="bg-card border-border"
+          style="display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 8px 24px; border-bottom-style: solid; border-bottom-width: 1px;"
+        >
+          <select
+            aria-label="Household"
+            class="bg-background text-foreground border-border focus-ring"
+            style="padding: 4px 10px; border-radius: 6px; border-style: solid; border-width: 1px; font-size: 13px; cursor: pointer;"
+          >
+            <option
+              value="h1"
+            >
+              Home
+            </option>
+          </select>
+          <button
+            aria-pressed="true"
+            class="bg-primary text-primary-foreground focus-ring"
+            style="padding: 4px 10px; border-radius: 6px; border-style: solid; border-width: 1px; font-size: 13px; cursor: pointer; font-weight: 600;"
+            type="button"
+          >
+            All
+          </button>
+          <button
+            aria-pressed="false"
+            class="bg-card-muted text-muted-foreground focus-ring"
+            style="padding: 4px 10px; border-radius: 6px; border-style: solid; border-width: 1px; font-size: 13px; cursor: pointer; font-weight: 400;"
+            type="button"
+          >
+            Hardware & Tools
+          </button>
+          <button
+            aria-pressed="false"
+            class="bg-card-muted text-muted-foreground focus-ring"
+            style="padding: 4px 10px; border-radius: 6px; border-style: solid; border-width:...
+ ❯ Object.getElementError node_modules/@testing-library/dom/dist/config.js:37:19
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:76:38
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:52:17
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:95:19
+ ❯ src/components/shell/shell.test.tsx:320:19
+    318|     await screen.findByText("Drill");
+    319| 
+    320|     expect(screen.getByText("Total: 1 item")).toBeInTheDocument();
+       |                   ^
+    321|     expect(screen.queryByText("Total: 1 items")).not.toBeInTheDocument…
+    322|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/6]⎯
+
+ Test Files  2 failed | 19 passed (21)
+      Tests  6 failed | 131 passed (137)
+   Start at  18:30:52
+   Duration  4.07s (transform 864ms, setup 808ms, collect 2.73s, tests 4.48s, environment 6.71s, prepare 1.58s)
+
+
+########################################################################
+=== G5 GREEN (post-change) — suite raw ===
+# command: ./node_modules/.bin/vitest run   result: 21 files / 137 passed / 3.89-4s / exit 0
+########################################################################
+
+ RUN  v1.6.1 /home/andrei/StorageGenie/frontend
+
+ ✓ src/theme/theme.test.tsx  (10 tests) 106ms
+stderr | src/components/shell/shell.test.tsx > Catalog shell > the header labels the LOADED item count, not a household total
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+stderr | src/components/shell/import-modal.test.tsx > AssetImportModal staging > drop stages accepted files as Ready with a live count
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+stderr | src/components/catalog/catalog.test.tsx > ProductCard > renders the name, the category micro-pill and the primary-color dots
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+ ✓ src/components/shell/import-modal.test.tsx  (14 tests) 350ms
+ ✓ src/components/shell/drawer.test.tsx  (12 tests) 570ms
+ ✓ src/components/catalog/catalog.test.tsx  (31 tests) 599ms
+stderr | src/routes/ReviewPage.test.tsx > ReviewPage > posts every decision with the loaded candidate id and supports keyboard actions
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+ ✓ src/types/product.test.ts  (11 tests) 8ms
+ ✓ src/components/shell/shell.test.tsx  (15 tests) 819ms
+ ✓ src/routes/ReviewPage.test.tsx  (4 tests) 270ms
+stderr | src/routes/InboxPage.test.tsx > InboxPage > renders failed loaded job detail and retries that loaded id
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+stderr | src/routes/AssetDetailPage.test.tsx > AssetDetailPage > editing quantity patches via PATCH and shows the superseded prior value in history
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+ ✓ src/routes/AssetDetailPage.test.tsx  (2 tests) 172ms
+ ✓ src/routes/InboxPage.test.tsx  (4 tests) 288ms
+ ✓ src/routes/ChatPage.test.tsx  (5 tests) 157ms
+ ✓ src/components/AssetForm.test.tsx  (4 tests) 156ms
+ ✓ src/routes/PlanningPage.test.tsx  (4 tests) 378ms
+ ✓ src/components/CandidateCard.test.tsx  (4 tests) 121ms
+ ✓ src/routes/SettingsPage.test.tsx  (3 tests) 148ms
+ ✓ src/components/PlanningSuggestionCard.test.tsx  (2 tests) 71ms
+ ✓ src/components/ChatTranscript.test.tsx  (2 tests) 73ms
+ ✓ src/components/ExpiryEntryForm.test.tsx  (2 tests) 120ms
+ ✓ src/components/JobCard.test.tsx  (1 test) 32ms
+ ✓ src/components/ProvenanceBadge.test.tsx  (3 tests) 35ms
+ ✓ src/api/client.test.ts  (3 tests) 3ms
+ ✓ src/components/AssetCard.test.tsx  (1 test) 36ms
+stderr | src/components/AssetCard.test.tsx > AssetCard > renders display_name and type
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+
+ Test Files  21 passed (21)
+      Tests  137 passed (137)
+   Start at  18:32:32
+   Duration  3.74s (transform 656ms, setup 643ms, collect 2.60s, tests 4.51s, environment 5.81s, prepare 1.38s)
+
+
+########################################################################
+=== LINT ===
+# command: npm run lint   (eslint src)   exit 0
+########################################################################
+
+> storagegenie-frontend@0.1.0 lint
+> eslint src
+
+
+########################################################################
+=== BUILD ===
+# command: npm run build   (tsc && vite build)   exit 0
+# local dist asset: dist/assets/index-CetG7rOc.js (local VITE_API_BASE default; docker build uses dynv6 -> different hash)
+########################################################################
+
+> storagegenie-frontend@0.1.0 build
+> tsc && vite build
+
+vite v5.4.21 building for production...
+transforming...
+✓ 1960 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                   0.94 kB │ gzip:  0.47 kB
+dist/assets/index-DxKo-z_g.css    2.65 kB │ gzip:  0.82 kB
+dist/assets/index-CetG7rOc.js   293.16 kB │ gzip: 87.22 kB
+✓ built in 1.60s
+
+########################################################################
+=== MUTATION M1 — fallback branch  (!media || broken) -> (!media && broken)  (caught SINGLY) ===
+# command: ./node_modules/.bin/vitest run src/components/catalog/catalog.test.tsx
+# result: 2 failed / 29 passed -> caught by the two fallback tests; reverted clean
+########################################################################
+
+ RUN  v1.6.1 /home/andrei/StorageGenie/frontend
+
+stderr | src/components/catalog/catalog.test.tsx > ProductCard > renders the name, the category micro-pill and the primary-color dots
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+ ❯ src/components/catalog/catalog.test.tsx  (31 tests | 2 failed) 442ms
+   ❯ src/components/catalog/catalog.test.tsx > ProductCard > a broken image falls back to the neutral glyph and never renders a broken icon
+     → Unable to find an element by: [data-testid="product-fallback-icon"]
+
+Ignored nodes: comments, script, style
+<body>
+  <div>
+    <a
+      class="product-card bg-card border-border focus-ring"
+      data-testid="product-card"
+      href="/assets/mock-drill?household_id=h1"
+      style="display: flex; flex-direction: column; gap: 10px; border-style: solid; border-width: 1px; border-radius: 12px; padding: 10px; text-decoration: none; color: inherit; aspect-ratio: 3 / 4;"
+    >
+      <div
+        class="bg-card-muted"
+        data-testid="product-card-well"
+        style="position: relative; aspect-ratio: 1 / 1; border-radius: 8px; overflow: hidden; display: flex; align-items: center; justify-content: center;"
+      >
+        <span
+          class="badge-raw bg-stone-100 text-stone-700 border-stone-200 dark:bg-stone-800/50 dark:text-stone-400 dark:border-stone-700/50"
+          data-testid="status-badge"
+          style="position: absolute; top: 8px; right: 8px; border-style: solid; border-width: 1px; border-radius: 999px; padding: 2px 8px; font-size: 11px; font-weight: 600;"
+        >
+          Source Only
+        </span>
+      </div>
+      <div
+        style="display: flex; flex-direction: column; gap: 6px; min-width: 0;"
+      >
+        <div
+          style="display: flex; align-items: center; gap: 6px; min-width: 0;"
+        >
+          <span
+            style="font-weight: 600; font-size: 14px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"
+            title="Cordless Drill"
+          >
+            Cordless Drill
+          </span>
+        </div>
+        <span
+          class="bg-card-muted text-muted-foreground font-mono"
+          style="align-self: flex-start; font-size: 11px; padding: 2px 6px; border-radius: 4px; white-space: nowrap;"
+        >
+          Hardware & Tools
+        </span>
+        <div
+          data-testid="color-dots"
+          style="display: flex; gap: 4px;"
+        >
+          <span
+            style="width: 8px; height: 8px; border-radius: 999px; background-color: rgb(31, 41, 55); border-width: 1px; border-style: solid; border-color: hsl(var(--border));"
+          />
+          <span
+            style="width: 8px; height: 8px; border-radius: 999px; background-color: rgb(245, 158, 11); border-width: 1px; border-style: solid; border-color: hsl(var(--border));"
+          />
+        </div>
+      </div>
+    </a>
+  </div>
+</body>
+   ❯ src/components/catalog/catalog.test.tsx > ProductCard > the fallback glyph shows only for a sourceless item and vanishes when media exists
+     → Unable to find an element by: [data-testid="product-fallback-icon"]
+
+Ignored nodes: comments, script, style
+<body>
+  <div />
+  <div>
+    <a
+      class="product-card bg-card border-border focus-ring"
+      data-testid="product-card"
+      href="/assets/mock-drill?household_id=h1"
+      style="display: flex; flex-direction: column; gap: 10px; border-style: solid; border-width: 1px; border-radius: 12px; padding: 10px; text-decoration: none; color: inherit; aspect-ratio: 3 / 4;"
+    >
+      <div
+        class="bg-card-muted"
+        data-testid="product-card-well"
+        style="position: relative; aspect-ratio: 1 / 1; border-radius: 8px; overflow: hidden; display: flex; align-items: center; justify-content: center;"
+      >
+        <span
+          class="badge-raw bg-stone-100 text-stone-700 border-stone-200 dark:bg-stone-800/50 dark:text-stone-400 dark:border-stone-700/50"
+          data-testid="status-badge"
+          style="position: absolute; top: 8px; right: 8px; border-style: solid; border-width: 1px; border-radius: 999px; padding: 2px 8px; font-size: 11px; font-weight: 600;"
+        >
+          Source Only
+        </span>
+      </div>
+      <div
+        style="display: flex; flex-direction: column; gap: 6px; min-width: 0;"
+      >
+        <div
+          style="display: flex; align-items: center; gap: 6px; min-width: 0;"
+        >
+          <span
+            style="font-weight: 600; font-size: 14px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"
+            title="Cordless Drill"
+          >
+            Cordless Drill
+          </span>
+        </div>
+        <span
+          class="bg-card-muted text-muted-foreground font-mono"
+          style="align-self: flex-start; font-size: 11px; padding: 2px 6px; border-radius: 4px; white-space: nowrap;"
+        >
+          Hardware & Tools
+        </span>
+        <div
+          data-testid="color-dots"
+          style="display: flex; gap: 4px;"
+        >
+          <span
+            style="width: 8px; height: 8px; border-radius: 999px; background-color: rgb(31, 41, 55); border-width: 1px; border-style: solid; border-color: hsl(var(--border));"
+          />
+          <span
+            style="width: 8px; height: 8px; border-radius: 999px; background-color: rgb(245, 158, 11); border-width: 1px; border-style: solid; border-color: hsl(var(--border));"
+          />
+        </div>
+      </div>
+    </a>
+  </div>
+</body>
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/components/catalog/catalog.test.tsx > ProductCard > a broken image falls back to the neutral glyph and never renders a broken icon
+TestingLibraryElementError: Unable to find an element by: [data-testid="product-fallback-icon"]
+
+Ignored nodes: comments, script, style
+<body>
+  <div>
+    <a
+      class="product-card bg-card border-border focus-ring"
+      data-testid="product-card"
+      href="/assets/mock-drill?household_id=h1"
+      style="display: flex; flex-direction: column; gap: 10px; border-style: solid; border-width: 1px; border-radius: 12px; padding: 10px; text-decoration: none; color: inherit; aspect-ratio: 3 / 4;"
+    >
+      <div
+        class="bg-card-muted"
+        data-testid="product-card-well"
+        style="position: relative; aspect-ratio: 1 / 1; border-radius: 8px; overflow: hidden; display: flex; align-items: center; justify-content: center;"
+      >
+        <span
+          class="badge-raw bg-stone-100 text-stone-700 border-stone-200 dark:bg-stone-800/50 dark:text-stone-400 dark:border-stone-700/50"
+          data-testid="status-badge"
+          style="position: absolute; top: 8px; right: 8px; border-style: solid; border-width: 1px; border-radius: 999px; padding: 2px 8px; font-size: 11px; font-weight: 600;"
+        >
+          Source Only
+        </span>
+      </div>
+      <div
+        style="display: flex; flex-direction: column; gap: 6px; min-width: 0;"
+      >
+        <div
+          style="display: flex; align-items: center; gap: 6px; min-width: 0;"
+        >
+          <span
+            style="font-weight: 600; font-size: 14px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"
+            title="Cordless Drill"
+          >
+            Cordless Drill
+          </span>
+        </div>
+        <span
+          class="bg-card-muted text-muted-foreground font-mono"
+          style="align-self: flex-start; font-size: 11px; padding: 2px 6px; border-radius: 4px; white-space: nowrap;"
+        >
+          Hardware & Tools
+        </span>
+        <div
+          data-testid="color-dots"
+          style="display: flex; gap: 4px;"
+        >
+          <span
+            style="width: 8px; height: 8px; border-radius: 999px; background-color: rgb(31, 41, 55); border-width: 1px; border-style: solid; border-color: hsl(var(--border));"
+          />
+          <span
+            style="width: 8px; height: 8px; border-radius: 999px; background-color: rgb(245, 158, 11); border-width: 1px; border-style: solid; border-color: hsl(var(--border));"
+          />
+        </div>
+      </div>
+    </a>
+  </div>
+</body>
+ ❯ Object.getElementError node_modules/@testing-library/dom/dist/config.js:37:19
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:76:38
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:52:17
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:95:19
+ ❯ src/components/catalog/catalog.test.tsx:117:19
+    115|     expect(screen.queryByRole("img")).not.toBeInTheDocument();
+    116|     expect(screen.queryByTestId("failed-warning")).not.toBeInTheDocume…
+    117|     expect(screen.getByTestId("product-fallback-icon")).toBeInTheDocum…
+       |                   ^
+    118|   });
+    119| 
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  src/components/catalog/catalog.test.tsx > ProductCard > the fallback glyph shows only for a sourceless item and vanishes when media exists
+TestingLibraryElementError: Unable to find an element by: [data-testid="product-fallback-icon"]
+
+Ignored nodes: comments, script, style
+<body>
+  <div />
+  <div>
+    <a
+      class="product-card bg-card border-border focus-ring"
+      data-testid="product-card"
+      href="/assets/mock-drill?household_id=h1"
+      style="display: flex; flex-direction: column; gap: 10px; border-style: solid; border-width: 1px; border-radius: 12px; padding: 10px; text-decoration: none; color: inherit; aspect-ratio: 3 / 4;"
+    >
+      <div
+        class="bg-card-muted"
+        data-testid="product-card-well"
+        style="position: relative; aspect-ratio: 1 / 1; border-radius: 8px; overflow: hidden; display: flex; align-items: center; justify-content: center;"
+      >
+        <span
+          class="badge-raw bg-stone-100 text-stone-700 border-stone-200 dark:bg-stone-800/50 dark:text-stone-400 dark:border-stone-700/50"
+          data-testid="status-badge"
+          style="position: absolute; top: 8px; right: 8px; border-style: solid; border-width: 1px; border-radius: 999px; padding: 2px 8px; font-size: 11px; font-weight: 600;"
+        >
+          Source Only
+        </span>
+      </div>
+      <div
+        style="display: flex; flex-direction: column; gap: 6px; min-width: 0;"
+      >
+        <div
+          style="display: flex; align-items: center; gap: 6px; min-width: 0;"
+        >
+          <span
+            style="font-weight: 600; font-size: 14px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"
+            title="Cordless Drill"
+          >
+            Cordless Drill
+          </span>
+        </div>
+        <span
+          class="bg-card-muted text-muted-foreground font-mono"
+          style="align-self: flex-start; font-size: 11px; padding: 2px 6px; border-radius: 4px; white-space: nowrap;"
+        >
+          Hardware & Tools
+        </span>
+        <div
+          data-testid="color-dots"
+          style="display: flex; gap: 4px;"
+        >
+          <span
+            style="width: 8px; height: 8px; border-radius: 999px; background-color: rgb(31, 41, 55); border-width: 1px; border-style: solid; border-color: hsl(var(--border));"
+          />
+          <span
+            style="width: 8px; height: 8px; border-radius: 999px; background-color: rgb(245, 158, 11); border-width: 1px; border-style: solid; border-color: hsl(var(--border));"
+          />
+        </div>
+      </div>
+    </a>
+  </div>
+</body>
+ ❯ Object.getElementError node_modules/@testing-library/dom/dist/config.js:37:19
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:76:38
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:52:17
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:95:19
+ ❯ src/components/catalog/catalog.test.tsx:133:19
+    131| 
+    132|     renderWithRouter(<ProductCard item={sourceless} householdId="h1" /…
+    133|     expect(screen.getByTestId("product-fallback-icon")).toBeInTheDocum…
+       |                   ^
+    134|   });
+    135| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+ Test Files  1 failed (1)
+      Tests  2 failed | 29 passed (31)
+   Start at  18:35:06
+   Duration  1.20s (transform 158ms, setup 38ms, collect 303ms, tests 442ms, environment 225ms, prepare 49ms)
+
+
+########################################################################
+=== MUTATION M2 — grammar branch  ternary -> hard-coded "items"  (caught SINGLY) ===
+# command: ./node_modules/.bin/vitest run src/components/shell/shell.test.tsx
+# result: 1 failed / 14 passed -> caught by the singular test; reverted clean
+########################################################################
+
+ RUN  v1.6.1 /home/andrei/StorageGenie/frontend
+
+stderr | src/components/shell/shell.test.tsx > Catalog shell > the header labels the LOADED item count, not a household total
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+ ❯ src/components/shell/shell.test.tsx  (15 tests | 1 failed) 568ms
+   ❯ src/components/shell/shell.test.tsx > Catalog shell > the header count uses the singular only for one loaded item
+     → Unable to find an element with the text: Total: 1 item. This could be because the text is broken up by multiple elements. In this case, you can provide a function for your text matcher to make your matcher more flexible.
+
+Ignored nodes: comments, script, style
+<body>
+  <div>
+    <div
+      class="bg-background text-foreground"
+      style="min-height: 100vh;"
+    >
+      <div
+        class="bg-background"
+        style="position: sticky; top: 0px; z-index: 10;"
+      >
+        <div
+          class="bg-card border-border"
+          style="display: flex; align-items: center; gap: 12px; padding: 10px 24px; border-bottom-style: solid; border-bottom-width: 1px;"
+        >
+          <a
+            class="text-foreground focus-ring"
+            href="/"
+            style="font-weight: 700; text-decoration: none; margin-right: 4px;"
+          >
+            StorageGenie
+          </a>
+          <span
+            aria-label="Total loaded items: 1"
+            class="bg-card-muted text-muted-foreground"
+            style="font-size: 12px; padding: 2px 8px; border-radius: 999px;"
+            title="Items loaded on this page, not the household total"
+          >
+            Total: 
+            1
+             items
+          </span>
+          <div
+            aria-hidden="true"
+            style="flex: 1 1 0%;"
+          />
+          <input
+            aria-label="Search catalog"
+            class="bg-background text-foreground border-border focus-ring"
+            placeholder="Search…"
+            style="padding: 6px 10px; border-radius: 6px; border-style: solid; border-width: 1px; min-width: 200px; font-size: 13px;"
+            type="search"
+            value=""
+          />
+          <button
+            aria-label="Switch to dark theme"
+            class="bg-card text-foreground border-border focus-ring"
+            style="display: inline-flex; align-items: center; justify-content: center; padding: 6px; border-radius: 6px; border-style: solid; border-width: 1px; cursor: pointer;"
+            title="Switch to dark theme"
+            type="button"
+          >
+            <svg
+              aria-hidden="true"
+              class="lucide lucide-moon"
+              fill="none"
+              height="18"
+              stroke="currentColor"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              viewBox="0 0 24 24"
+              width="18"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M20.985 12.486a9 9 0 1 1-9.473-9.472c.405-.022.617.46.402.803a6 6 0 0 0 8.268 8.268c.344-.215.825-.004.803.401"
+              />
+            </svg>
+          </button>
+          <a
+            class="bg-primary text-primary-foreground focus-ring"
+            href="/capture"
+            style="padding: 6px 12px; border-radius: 6px; text-decoration: none; font-weight: 600; font-size: 13px; display: inline-flex; align-items: center; gap: 6px;"
+          >
+            <svg
+              aria-hidden="true"
+              class="lucide lucide-upload"
+              fill="none"
+              height="16"
+              stroke="currentColor"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              viewBox="0 0 24 24"
+              width="16"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M12 3v12"
+              />
+              <path
+                d="m17 8-5-5-5 5"
+              />
+              <path
+                d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"
+              />
+            </svg>
+            Import Asset
+          </a>
+        </div>
+        <div
+          class="bg-card border-border"
+          style="display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 8px 24px; border-bottom-style: solid; border-bottom-width: 1px;"
+        >
+          <select
+            aria-label="Household"
+            class="bg-background text-foreground border-border focus-ring"
+            style="padding: 4px 10px; border-radius: 6px; border-style: solid; border-width: 1px; font-size: 13px; cursor: pointer;"
+          >
+            <option
+              value="h1"
+            >
+              Home
+            </option>
+          </select>
+          <button
+            aria-pressed="true"
+            class="bg-primary text-primary-foreground focus-ring"
+            style="padding: 4px 10px; border-radius: 6px; border-style: solid; border-width: 1px; font-size: 13px; cursor: pointer; font-weight: 600;"
+            type="button"
+          >
+            All
+          </button>
+          <button
+            aria-pressed="false"
+            class="bg-card-muted text-muted-foreground focus-ring"
+            style="padding: 4px 10px; border-radius: 6px; border-style: solid; border-width: 1px; font-size: 13px; cursor: pointer; font-weight: 400;"
+            type="button"
+          >
+            Hardware & Tools
+          </button>
+          <button
+            aria-pressed="false"
+            class="bg-card-muted text-muted-foreground focus-ring"
+            style="padding: 4px 10px; border-radius: 6px; border-style: solid; border-width:...
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/components/shell/shell.test.tsx > Catalog shell > the header count uses the singular only for one loaded item
+TestingLibraryElementError: Unable to find an element with the text: Total: 1 item. This could be because the text is broken up by multiple elements. In this case, you can provide a function for your text matcher to make your matcher more flexible.
+
+Ignored nodes: comments, script, style
+<body>
+  <div>
+    <div
+      class="bg-background text-foreground"
+      style="min-height: 100vh;"
+    >
+      <div
+        class="bg-background"
+        style="position: sticky; top: 0px; z-index: 10;"
+      >
+        <div
+          class="bg-card border-border"
+          style="display: flex; align-items: center; gap: 12px; padding: 10px 24px; border-bottom-style: solid; border-bottom-width: 1px;"
+        >
+          <a
+            class="text-foreground focus-ring"
+            href="/"
+            style="font-weight: 700; text-decoration: none; margin-right: 4px;"
+          >
+            StorageGenie
+          </a>
+          <span
+            aria-label="Total loaded items: 1"
+            class="bg-card-muted text-muted-foreground"
+            style="font-size: 12px; padding: 2px 8px; border-radius: 999px;"
+            title="Items loaded on this page, not the household total"
+          >
+            Total: 
+            1
+             items
+          </span>
+          <div
+            aria-hidden="true"
+            style="flex: 1 1 0%;"
+          />
+          <input
+            aria-label="Search catalog"
+            class="bg-background text-foreground border-border focus-ring"
+            placeholder="Search…"
+            style="padding: 6px 10px; border-radius: 6px; border-style: solid; border-width: 1px; min-width: 200px; font-size: 13px;"
+            type="search"
+            value=""
+          />
+          <button
+            aria-label="Switch to dark theme"
+            class="bg-card text-foreground border-border focus-ring"
+            style="display: inline-flex; align-items: center; justify-content: center; padding: 6px; border-radius: 6px; border-style: solid; border-width: 1px; cursor: pointer;"
+            title="Switch to dark theme"
+            type="button"
+          >
+            <svg
+              aria-hidden="true"
+              class="lucide lucide-moon"
+              fill="none"
+              height="18"
+              stroke="currentColor"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              viewBox="0 0 24 24"
+              width="18"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M20.985 12.486a9 9 0 1 1-9.473-9.472c.405-.022.617.46.402.803a6 6 0 0 0 8.268 8.268c.344-.215.825-.004.803.401"
+              />
+            </svg>
+          </button>
+          <a
+            class="bg-primary text-primary-foreground focus-ring"
+            href="/capture"
+            style="padding: 6px 12px; border-radius: 6px; text-decoration: none; font-weight: 600; font-size: 13px; display: inline-flex; align-items: center; gap: 6px;"
+          >
+            <svg
+              aria-hidden="true"
+              class="lucide lucide-upload"
+              fill="none"
+              height="16"
+              stroke="currentColor"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              viewBox="0 0 24 24"
+              width="16"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M12 3v12"
+              />
+              <path
+                d="m17 8-5-5-5 5"
+              />
+              <path
+                d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"
+              />
+            </svg>
+            Import Asset
+          </a>
+        </div>
+        <div
+          class="bg-card border-border"
+          style="display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 8px 24px; border-bottom-style: solid; border-bottom-width: 1px;"
+        >
+          <select
+            aria-label="Household"
+            class="bg-background text-foreground border-border focus-ring"
+            style="padding: 4px 10px; border-radius: 6px; border-style: solid; border-width: 1px; font-size: 13px; cursor: pointer;"
+          >
+            <option
+              value="h1"
+            >
+              Home
+            </option>
+          </select>
+          <button
+            aria-pressed="true"
+            class="bg-primary text-primary-foreground focus-ring"
+            style="padding: 4px 10px; border-radius: 6px; border-style: solid; border-width: 1px; font-size: 13px; cursor: pointer; font-weight: 600;"
+            type="button"
+          >
+            All
+          </button>
+          <button
+            aria-pressed="false"
+            class="bg-card-muted text-muted-foreground focus-ring"
+            style="padding: 4px 10px; border-radius: 6px; border-style: solid; border-width: 1px; font-size: 13px; cursor: pointer; font-weight: 400;"
+            type="button"
+          >
+            Hardware & Tools
+          </button>
+          <button
+            aria-pressed="false"
+            class="bg-card-muted text-muted-foreground focus-ring"
+            style="padding: 4px 10px; border-radius: 6px; border-style: solid; border-width:...
+ ❯ Object.getElementError node_modules/@testing-library/dom/dist/config.js:37:19
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:76:38
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:52:17
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:95:19
+ ❯ src/components/shell/shell.test.tsx:320:19
+    318|     await screen.findByText("Drill");
+    319| 
+    320|     expect(screen.getByText("Total: 1 item")).toBeInTheDocument();
+       |                   ^
+    321|     expect(screen.queryByText("Total: 1 items")).not.toBeInTheDocument…
+    322|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 14 passed (15)
+   Start at  18:35:10
+   Duration  1.39s (transform 208ms, setup 39ms, collect 362ms, tests 568ms, environment 219ms, prepare 55ms)
+
+
+########################################################################
+=== MUTATION M3 — scroll wrapper  overflowX:"auto" -> "hidden"  (caught SINGLY) ===
+# command: ./node_modules/.bin/vitest run src/components/catalog/catalog.test.tsx
+# result: 1 failed / 30 passed -> caught by the scroll-container test; reverted clean
+########################################################################
+
+ RUN  v1.6.1 /home/andrei/StorageGenie/frontend
+
+stderr | src/components/catalog/catalog.test.tsx > ProductCard > renders the name, the category micro-pill and the primary-color dots
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+ ❯ src/components/catalog/catalog.test.tsx  (31 tests | 1 failed) 463ms
+   ❯ src/components/catalog/catalog.test.tsx > ProductGrid > the compact table rides in a labelled horizontal scroll container (no page-level overflow)
+     → expect(element).toHaveStyle()
+
+- Expected
+
+- overflowX: auto;
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/components/catalog/catalog.test.tsx > ProductGrid > the compact table rides in a labelled horizontal scroll container (no page-level overflow)
+Error: expect(element).toHaveStyle()
+
+- Expected
+
+- overflowX: auto;
+ ❯ src/components/catalog/catalog.test.tsx:200:22
+    198|     expect(scroller).toHaveAttribute("role", "region");
+    199|     expect(scroller).toHaveAccessibleName("Product results table");
+    200|     expect(scroller).toHaveStyle({ overflowX: "auto" });
+       |                      ^
+    201|     expect(scroller).toContainElement(screen.getByRole("table", { name…
+    202| 
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 30 passed (31)
+   Start at  18:35:15
+   Duration  1.32s (transform 179ms, setup 39ms, collect 319ms, tests 463ms, environment 260ms, prepare 48ms)
+
+
+########################################################################
+=== DOCKER BUILD/UP RAW (see G6 block below for before/after) ===
+########################################################################
+$ BUILDX_CONFIG=/run/user/1000/sg054-buildx docker compose build backend
+[compose] Image storagegenie-backend Building
+  Services: internal, stage-1, frontend-build
+
+$ docker compose up -d backend
+ Container storagegenie-backend-1 Recreate 
+ Container storagegenie-backend-1 Recreated 
+ Container storagegenie-backend-1 Starting 
+ Container storagegenie-backend-1 Started 
+
+########################################################################
+=== G6 BEFORE (read-only) — tree, stack, image, bundle, health, markers, DB, listeners, gate ===
+########################################################################
+
+$ git status --porcelain=v1 -b
+## automation...origin/automation
+
+$ git rev-parse HEAD
+9fb738b9df29fef696a9ed74f607e2a41b8b14a4
+
+$ git rev-parse origin/automation
+9fb738b9df29fef696a9ed74f607e2a41b8b14a4
+
+$ docker ps --format '{{.Names}}\t{{.Image}}\t{{.Status}}\t{{.Ports}}'
+storagegenie-backend-1	storagegenie-backend	Up About an hour (healthy)	127.0.0.1:8003->8000/tcp
+
+$ docker inspect -f '{{.Id}} RestartCount={{.RestartCount}} Image={{.Image}}' storagegenie-backend-1
+244465492ac05809e0a088d60e15b1d4283fa5ef09d5fbe76ca2b0e7af806652 RestartCount=0 Image=sha256:86f7436d5a61ae35cf58ed470de17b0ae196f710e466d3d050099565601d9d92
+
+$ curl -s http://127.0.0.1:8003/v1/health
+{"status":"ok","db":"ok","storage":"ok"}
+
+$ curl -s http://127.0.0.1:8003/ | grep -o 'assets/index-[A-Za-z0-9_-]*\.js'
+assets/index-CuxlcH9v.js
+
+# served bundle bytes fetched to /tmp/opencode/sg054_before_bundle.js (285.5K)
+$ grep -c 'f9fafb' /tmp/opencode/sg054_before_bundle.js
+1
+$ for m in product-fallback-icon table-scroll; do grep -c "$m" ...; done
+product-fallback-icon: 0
+table-scroll: 0
+
+$ docker exec storagegenie-backend-1 python -c "<counts>"
+household 1
+user 2
+asset 1
+evidence 1
+assertion 3
+audit_event 3
+asset rows: [('01a0a467-eb0e-7b83-a227-af122dc9268b', 'Toothpaste', 'unknown', 'ACTIVE')]
+evidence rows: [('01a0a467-eacf-7e13-bbd0-078b1bc93860', 'pasta-de-dinti-colgate-50-ml-total-original-iN6RhsW3.jpg')]
+# == packet's blessed set exactly (household=1,user=2,asset=1 Toothpaste,evidence=1,assertion=3,audit_event=3) -> no PG-IC-08 stop
+
+$ ss -tlnp | grep -E ':(80|443|8003|5173|8000)\b'
+LISTEN 0.0.0.0:80
+LISTEN 0.0.0.0:443
+LISTEN 127.0.0.1:8000            # FOREIGN service (pre-existing; SG-053 F-SG053-1), returns HTTP 404 at /
+LISTEN 127.0.0.1:8003            # ours (rootlesskit)
+LISTEN [::]:80
+LISTEN [::]:443
+
+$ curl -s -o /dev/null -w 'http=%{http_code} redirect=%{redirect_url}\n' -H 'Host: storagegenie.dynv6.net' http://127.0.0.1/
+http=301 redirect=https://storagegenie.dynv6.net/
+$ curl -s -k -o /dev/null -w 'https=%{http_code}\n' -H 'Host: storagegenie.dynv6.net' https://127.0.0.1/
+https=401
+
+########################################################################
+=== G6 REBUILD + UP (authority D71; PG-PR-04) ===
+########################################################################
+# NB: this Coder session runs inside the dispatch systemd sandbox. Root fs is
+# ProtectSystem=strict + ProtectHome=read-only; ~/.docker (buildx client cache)
+# is read-only, so `docker compose build` fails at the buildx activity file.
+# The wrapper's confine() makes /var/run/docker.sock + /run/docker.sock
+# InaccessiblePaths but leaves XDG_RUNTIME_DIR (/run/user/1000) read-write — the
+# rootless context (unix:///run/user/1000/docker.sock) IS reachable. Same
+# rootless daemon, no sudo, no privilege escalation; only the buildx CLIENT
+# cache path is redirected to the writable XDG_RUNTIME_DIR. Base layers resolved
+# from the local builder cache (no registry pull, no new runtime).
+
+$ docker compose build backend            # (default ~/.docker)
+failed to update builder last activity time: open /home/andrei/.docker/buildx/activity/.tmp-default976701287: read-only file system
+[exit 1]
+
+$ BUILDX_CONFIG=/run/user/1000/sg054-buildx docker compose build backend
+[compose] Image storagegenie-backend Building
+  Services: internal, stage-1, frontend-build
+[exit 0 elapsed 9s]
+
+$ docker images storagegenie-backend
+storagegenie-backend:latest b619f62b5336 4 seconds ago 825MB
+# BEFORE image sha256:86f7436d5a61...  ->  AFTER sha256:b619f62b5336...
+
+$ docker compose up -d backend
+ Container storagegenie-backend-1 Recreate
+ Container storagegenie-backend-1 Recreated
+ Container storagegenie-backend-1 Starting
+ Container storagegenie-backend-1 Started
+[exit 0 elapsed 1s]
+
+########################################################################
+=== G6 AFTER — health, bundle, markers, DB, listeners, gate, idempotent re-up ===
+########################################################################
+
+$ docker inspect -f '{{.Id}} RestartCount={{.RestartCount}} Image={{.Image}}' storagegenie-backend-1
+dac0bf5c60a45ad3fff4f8176cb91e705508812749856a842a88abd6f7381b39 RestartCount=0 Image=sha256:b619f62b5336830cc918eae3d8c50415d51bc690cd3c0690b139705806262cf2
+
+$ curl -s http://127.0.0.1:8003/v1/health
+{"status":"ok","db":"ok","storage":"ok"}
+
+$ curl -s http://127.0.0.1:8003/ | grep -o 'assets/index-[A-Za-z0-9_-]*\.js'
+assets/index-DQSbiXPE.js
+# BEFORE index-CuxlcH9v.js -> AFTER index-DQSbiXPE.js  (CHANGED)
+
+$ grep -c 'f9fafb' /tmp/opencode/sg054_after_bundle.js
+1                                  # PRESENT, not absent -> FINDING F-SG054-1 (see report)
+$ marker before/after:
+f9fafb: before=1 after=1
+product-fallback-icon: before=0 after=2     # new code IS live
+table-scroll: before=0 after=1              # new code IS live
+Total loaded items: before=1 after=1
+
+$ docker exec storagegenie-backend-1 python -c "<counts>"
+household 1
+user 2
+asset 1
+evidence 1
+assertion 3
+audit_event 3
+asset rows: [('Toothpaste', 'unknown')]
+# == BEFORE, EQUAL
+
+$ ss -tlnp | grep -E ':8003\b'
+LISTEN 0 4096 127.0.0.1:8003 0.0.0.0:* users:(("rootlesskit",pid=3814163,fd=32))
+# loopback-only, unchanged
+
+$ curl -s -o /dev/null -w 'http=%{http_code} redirect=%{redirect_url}\n' -H 'Host: storagegenie.dynv6.net' http://127.0.0.1/
+http=301 redirect=https://storagegenie.dynv6.net/
+$ curl -s -k -o /dev/null -w 'https=%{http_code}\n' -H 'Host: storagegenie.dynv6.net' https://127.0.0.1/
+https=401
+
+$ docker compose up -d backend
+ Container storagegenie-backend-1 Running
+$ docker inspect -f '{{.Id}} RestartCount={{.RestartCount}}' storagegenie-backend-1
+dac0bf5c60a45ad3fff4f8176cb91e705508812749856a842a88abd6f7381b39 RestartCount=0
+# idempotent: SAME container id, RestartCount=0, no recreate

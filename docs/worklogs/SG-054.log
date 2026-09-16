@@ -1,0 +1,32 @@
+SG-054 worklog — shell unification + sourceless fallback icon + table overflow + count grammar
+Work dir /home/andrei/StorageGenie   Host 87.106.66.242:2222   Coder opencode   Effort medium (argv `--variant medium`)   Model unknown (no id on argv per policy)
+BASE (start HEAD) 9fb738b9df29fef696a9ed74f607e2a41b8b14a4  (== origin/automation)
+Contract 0.27.0.  Slice wall-clock start 2026-09-16T18:29:02Z.  Spend $0 metered (AI OFF).
+
+[recon] tree clean; HEAD == origin/automation == 9fb738b. Premises re-read live:
+  App.tsx:22 Nav background "#f9fafb"; links :26-43; root :51 background "white".
+  AppShell.tsx:44-63; AppHeader.tsx:37-112 (count pill :56-63).
+  ProductCard.tsx:136-144 empty media branch; ProductGrid.tsx:71-97 TableThumb; :41-49 COLUMNS; :113 bare <table>.
+  lucide-react 1.46.0 installed; `Package` export confirmed in dist (esm `index_Package as Package`; d.ts `declare const Package`).
+  CatalogToolbar.tsx:81-92 pills row is flexWrap:"wrap" -> no pill restyle needed (G3 check).
+[G5-pre] wrote new tests first; pre-change suite: 6 failed / 131 passed / 21 files (raw: verify.log). Failing = exactly the new assertions.
+[G1-G4] edits: App.tsx useLocation conditional; ProductCard Package fallback; ProductGrid Package thumb + table-scroll region; AppHeader singular/plural.
+[G5-green] suite 137 passed / 21 files; lint exit 0; build exit 0 (dist asset index-CetG7rOc.js local).
+[G5-mut] M1 fallback branch (|| -> &&) caught by 2 tests; M2 grammar hardcode caught by 1; M3 overflowX auto->hidden caught by 1. All reverted clean.
+[G6-before] health exact; asset index-CuxlcH9v.js; f9fafb present; blessed counts == packet exactly (household1/user2/asset1 Toothpaste/evidence1/assertion3/audit_event3); 8003 loopback-only; gate 301/401.
+[G6-deploy] buildx client cache read-only under sandbox -> redirected BUILDX_CONFIG to XDG_RUNTIME_DIR (same rootless daemon, no sudo). Build exit 0 (9s, cached base layers, no pull). Image 86f7436d5a61 -> b619f62b5336. up -d recreated container 244465492ac0 -> dac0bf5c60a4.
+[G6-after] health exact; served asset index-DQSbiXPE.js (CHANGED); product-fallback-icon 0->2, table-scroll 0->1 (new code live); f9fafb still 1 -> FINDING F-SG054-1; blessed counts EQUAL; 8003 loopback-only; gate 301/401; idempotent re-up same container RestartCount=0.
+[G7] worklog + report + verify log. Commit to automation, push, note on WORK_HEAD, push notes ref, verify via fetched ref.
+
+Budgets (actual vs cap): pre/green suite 4s + 4s vs 600s; lint 2s + build 4s vs 600s; docker build 9s + up 1s + re-up 1s vs 900s; mutations a few seconds each; overall ~ (frozen at commit) vs 2100s. $0 metered.
+
+Findings:
+  F-SG054-1  G6 "legacy marker ABSENT from served bundle" is unsatisfiable while G1 keeps the legacy Nav
+             byte-identical on non-catalog routes. `#f9fafb` is a literal in the global SPA bundle and must
+             remain; measured before=1 after=1. Premise defect, not an implementation gap (new code proven
+             live by product-fallback-icon/table-scroll markers + asset-hash change). Full text in report.
+  F-SG054-2  Foreign 127.0.0.1:8000 still bound (pre-existing SG-053 F-SG053-1), returns 404 at /. Not ours.
+  F-SG054-3  Dispatch sandbox makes ~/.docker read-only; deploy ran via BUILDX_CONFIG redirect to the
+             writable XDG_RUNTIME_DIR against the same rootless daemon. No privilege escalation.
+
+UNCLEAR (see report for full text): FIRST READ — the G6 legacy-marker-absence line vs G1. DURING EXECUTION — buildx cache path. REMAINING — whether a browser-level live DOM check is wanted.
