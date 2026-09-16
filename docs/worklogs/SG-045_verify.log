@@ -1,0 +1,267 @@
+# SG-045 — verify log (raw command output, verbatim; no summaries substituted)
+# generated_utc=2026-09-16T12:08:05Z
+# base=9a84bbdf79fbe15b6d1a3f8a9adab975cbcf6bc5  fail-leg=2d5bed3  impl=d08de8caaeb314614093859e65c5abcc068cf139
+# work-log-commit=the commit carrying this file (published in the receipt note)
+# MODEL: unknown from argv (no --model; CLI default per policy); banner in output/dispatch/SG-045.log = `build · deepseek-v4.1-flash`
+# EFFORT: medium (process args: --variant medium)
+#
+######################################################################
+## §1  Starting tree + premise verification (quoted reads)
+######################################################################
+================ STARTING TREE ================
+$ git status --porcelain=v1 -b
+## automation...origin/automation
+$ git branch --show-current
+automation
+$ git rev-parse HEAD
+9a84bbdf79fbe15b6d1a3f8a9adab975cbcf6bc5
+$ git rev-parse origin/automation
+9a84bbdf79fbe15b6d1a3f8a9adab975cbcf6bc5
+--- clean: `git status --porcelain` produced no lines ---
+
+================ PREMISE READS (command -> relevant output) ================
+$ grep -n "thumb/256" frontend/src/components/AssetCard.tsx frontend/src/components/EvidenceGallery.tsx
+frontend/src/components/AssetCard.tsx:9:    ? `${base}/v1/evidence/${thumbEvidence.id}/thumb/256?household_id=${householdId}`
+frontend/src/components/EvidenceGallery.tsx:17:            src={`${base}/v1/evidence/${e.id}/thumb/256?household_id=${householdId}`}
+$ grep -n "assets/" frontend/src/components/AssetCard.tsx
+frontend/src/components/AssetCard.tsx:18:      to={`/assets/${asset.id}?household_id=${householdId}`}
+$ grep -n "export type Density\|DENSITY_LABELS" frontend/src/components/shell/CatalogToolbar.tsx
+6:export type Density = "grid" | "table";
+14:export const DENSITY_LABELS: Record<Density, string> = {
+$ grep -n "ProductStatus =" frontend/src/types/product.ts
+18:export type ProductStatus = "raw" | "processed" | "rendered";
+$ grep -n "SG-045 grid mocks" frontend/src/types/product.ts
+82:    // tags: populated by the SG-045 grid mocks / SG-047 import modal.
+DQ3/DQ5 embedded: docs/design/DQ-answers.md:41-50 (four badge pairs), :66-73 (seven columns).
+Tailwind check: `ls frontend/node_modules/tailwindcss` -> No such file or directory; no `tailwind` entry in frontend/package.json.
+
+######################################################################
+## §2  Pre-change run — ***LABELED HOLLOW*** (new module unresolvable imports)
+##     class-8 hollow context, NOT evidence of a defect fix.
+######################################################################
+$ cd frontend && npm test        # at fail leg 2d5bed3 (base 9a84bbd + catalog.test.tsx only)
+
+> storagegenie-frontend@0.1.0 test
+> vitest run
+
+ RUN  v1.6.1 /home/andrei/StorageGenie/frontend
+
+ ❯ src/components/catalog/catalog.test.tsx  (0 test)
+ ✓ src/types/product.test.ts  (11 tests) 6ms
+ ... (17 further existing files pass) ...
+ ✓ src/components/AssetCard.test.tsx  (1 test) 51ms
+
+⎯⎯⎯⎯⎯⎯ Failed Suites 1 ⎯⎯⎯⎯
+
+ FAIL  src/components/catalog/catalog.test.tsx [ src/components/catalog/catalog.test.tsx ]
+Error: Failed to resolve import "./ProductCard" from "src/components/catalog/catalog.test.tsx". Does the file exist?
+ ❯ TransformPluginContext._formatError node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:49258:41
+ ❯ TransformPluginContext.error node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:49253:16
+ ❯ normalizeUrl node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:64307:23
+ ❯ async file:/home/andrei/StorageGenie/frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:64439:39
+ ❯ PluginContainer.transform node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:64366:7
+ ❯ PluginContainer.loadAndTransform node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:49099:18
+ ❯ loadAndTransform node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:51978:27
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+ Test Files  1 failed | 18 passed (19)
+      Tests  77 passed (77)
+   Start at  12:05:41
+   Duration  3.07s (transform 432ms, setup 606ms, collect 1.77s, tests 2.68s, environment 5.33s, prepare 1.18s)
+
+LABEL: HOLLOW — the failure is an unresolved new-module import, not a behavioural assertion.
+
+######################################################################
+## §3  Post-change GREEN — suite + lint + build (post-mutation-revert state)
+######################################################################
+$ cd frontend && npm test
+
+> storagegenie-frontend@0.1.0 test
+> vitest run
+
+ RUN  v1.6.1 /home/andrei/StorageGenie/frontend
+
+ ✓ src/types/product.test.ts  (11 tests) 4ms
+ ✓ src/theme/theme.test.tsx  (10 tests) 270ms
+ ✓ src/routes/ReviewPage.test.tsx  (4 tests) 472ms
+ ✓ src/components/catalog/catalog.test.tsx  (19 tests) 367ms
+ ✓ src/components/shell/shell.test.tsx  (12 tests) 768ms
+ ✓ src/routes/InboxPage.test.tsx  (4 tests) 298ms
+ ✓ src/routes/AssetDetailPage.test.tsx  (2 tests) 249ms
+ ✓ src/routes/ChatPage.test.tsx  (5 tests) 202ms
+ ✓ src/routes/PlanningPage.test.tsx  (4 tests) 305ms
+ ✓ src/components/AssetForm.test.tsx  (4 tests) 166ms
+ ✓ src/components/CandidateCard.test.tsx  (4 tests) 153ms
+ ✓ src/routes/SettingsPage.test.tsx  (3 tests) 163ms
+ ✓ src/components/ExpiryEntryForm.test.tsx  (2 tests) 103ms
+ ✓ src/components/PlanningSuggestionCard.test.tsx  (2 tests) 80ms
+ ✓ src/components/JobCard.test.tsx  (1 test) 32ms
+ ✓ src/components/ChatTranscript.test.tsx  (2 tests) 53ms
+ ✓ src/api/client.test.ts  (3 tests) 3ms
+ ✓ src/components/ProvenanceBadge.test.tsx  (3 tests) 37ms
+ ✓ src/components/AssetCard.test.tsx  (1 test) 67ms
+
+ Test Files  19 passed (19)
+      Tests  96 passed (96)
+   Start at  12:07:56
+   Duration  3.65s (transform 726ms, setup 732ms, collect 2.79s, tests 3.79s, environment 5.83s, prepare 1.39s)
+
+$ cd frontend && npm run lint
+> storagegenie-frontend@0.1.0 lint
+> eslint src
+lint_exit=0
+
+$ cd frontend && npm run build
+> storagegenie-frontend@0.1.0 build
+> tsc && vite build
+
+vite v5.4.21 building for production...
+transforming...
+✓ 1958 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                   0.94 kB │ gzip:  0.48 kB
+dist/assets/index-DxKo-z_g.css    2.65 kB │ gzip:  0.82 kB
+dist/assets/index-C3uSSi8j.js   272.41 kB │ gzip: 82.49 kB
+✓ built in 1.68s
+build_exit=0
+
+######################################################################
+## §4  Mutation run (PG-EV-01) — 3 wrong values, each caught singly, reverted clean
+##     Each mutation applied to the committed implementation (d08de8c), run, then
+##     `git checkout -- <file>`; `git status --porcelain` empty after each.
+######################################################################
+--- MUTATION 1: ProductCard.tsx raw badge `bg-stone-100` -> `bg-stone-200` ---
+$ ./node_modules/.bin/vitest run src/components/catalog/catalog.test.tsx
+ ❯ src/components/catalog/catalog.test.tsx  (19 tests | 1 failed) 168ms
+   ❯ src/components/catalog/catalog.test.tsx > ProductCard > uses the exact DQ3 badge class pair for every status
+     → expect(element).toHaveClass("bg-stone-100 text-stone-700 border-stone-200 dark:bg-stone-800/50 dark:text-stone-400 dark:border-stone-700/50")
+
+Expected the element to have class:
+  bg-stone-100 text-stone-700 border-stone-200 dark:bg-stone-800/50 dark:text-stone-400 dark:border-stone-700/50
+Received:
+  badge-raw bg-stone-200 text-stone-700 border-stone-200 dark:bg-stone-800/50 dark:text-stone-400 dark:border-stone-700/50
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯
+ FAIL  src/components/catalog/catalog.test.tsx > ProductCard > uses the exact DQ3 badge class pair for every status
+ Test Files  1 failed (1)
+      Tests  1 failed | 18 passed (19)
+revert -> git status --porcelain: (empty)
+
+--- MUTATION 2: ProductGrid.tsx column order, swap Status / Dimensions-Specs ---
+$ ./node_modules/.bin/vitest run src/components/catalog/catalog.test.tsx
+ ❯ src/components/catalog/catalog.test.tsx  (19 tests | 1 failed) 189ms
+   ❯ src/components/catalog/catalog.test.tsx > ProductGrid > the compact table renders the seven DQ5 columns in order
+AssertionError: expected [ 'Asset', 'Name', 'Category', …(4) ] to deeply equal [ 'Asset', 'Name', 'Category', …(4) ]
+
+- Expected
++ Received
+
+  Array [
+    "Asset",
+    "Name",
+    "Category",
+-   "Status",
+    "Dimensions/Specs",
++   "Status",
+    "Added",
+    "Actions",
+  ]
+
+⎯⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯
+ FAIL  src/components/catalog/catalog.test.tsx > ProductGrid > the compact table renders the seven DQ5 columns in order
+ Test Files  1 failed (1)
+      Tests  1 failed | 18 passed (19)
+revert -> git status --porcelain: (empty)
+
+--- MUTATION 3: mockProducts.ts mock-hub status `failed` -> `raw` ---
+$ ./node_modules/.bin/vitest run src/components/catalog/catalog.test.tsx
+ ❯ src/components/catalog/catalog.test.tsx  (19 tests | 1 failed) 192ms
+   ❯ src/components/catalog/catalog.test.tsx > mockProducts > spans at least four DQ1 categories and all four statuses via the real mapper
+     → expected Set{ 'raw', 'processed', 'rendered' } to deeply equal Set{ 'raw', 'processed', …(2) }
+
+- Expected
++ Received
+
+  Set {
+-   "failed",
+    "processed",
+    "raw",
+    "rendered",
+  }
+
+⎯⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯
+ FAIL  src/components/catalog/catalog.test.tsx > mockProducts > spans at least four DQ1 categories and all four statuses via the real mapper
+ Test Files  1 failed (1)
+      Tests  1 failed | 18 passed (19)
+revert -> git status --porcelain: (empty)
+
+######################################################################
+## §5  Gate evidence
+######################################################################
+$ git rev-parse 9a84bbd ; git rev-parse HEAD
+9a84bbdf79fbe15b6d1a3f8a9adab975cbcf6bc5
+d08de8caaeb314614093859e65c5abcc068cf139
+$ git status --porcelain
+(output empty)
+
+$ git diff --stat 9a84bbd..HEAD
+ frontend/src/components/catalog/ProductCard.tsx    | 201 ++++++++++++++
+ frontend/src/components/catalog/ProductCardSkeleton.tsx |  25 ++
+ frontend/src/components/catalog/ProductGrid.tsx    | 301 +++++++++++++++++++++
+ frontend/src/components/catalog/catalog.test.tsx   | 258 ++++++++++++++++++++++
+ frontend/src/components/catalog/mockProducts.ts    | 136 ++++++++++++++
+ frontend/src/routes/CatalogPage.tsx                |  46 ++--
+ frontend/src/types/product.ts                     |   2 +-
+ 7 files changed, 939 insertions(+), 30 deletions(-)
+
+$ git diff --name-only 9a84bbd..HEAD -- backend/
+(output empty)  -> backend_exit=0
+
+$ git diff --name-only 9a84bbd..HEAD -- 'backend/alembic' 'backend/**/versions' '**/alembic/**'
+(output empty)  -> no migration diff
+
+$ git diff 9a84bbd..HEAD -- frontend/package.json frontend/package-lock.json | wc -l
+0  -> dependency list unchanged
+
+$ git diff --name-only 9a84bbd..HEAD -- frontend/src/components/AssetCard.tsx frontend/src/theme/tokens.css frontend/src/types/product.test.ts
+(output empty)  -> AssetCard/tokens/product.test untouched
+
+--- DQ3 badge pairs greppable (count per exact string in ProductCard.tsx) ---
+$ grep -c 'bg-stone-100 text-stone-700 border-stone-200 dark:bg-stone-800/50 dark:text-stone-400 dark:border-stone-700/50' frontend/src/components/catalog/ProductCard.tsx
+1
+$ grep -c 'bg-sky-50 text-sky-800 border-sky-200 dark:bg-sky-950/40 dark:text-sky-400 dark:border-sky-800/50' frontend/src/components/catalog/ProductCard.tsx
+1
+$ grep -c 'bg-emerald-50 text-emerald-800 border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-400 dark:border-emerald-800/50' frontend/src/components/catalog/ProductCard.tsx
+1
+$ grep -c 'bg-rose-50 text-rose-800 border-rose-200 dark:bg-rose-950/40 dark:text-rose-400 dark:border-rose-800/50' frontend/src/components/catalog/ProductCard.tsx
+1
+$ grep -c 'border-rose-500/30' frontend/src/components/catalog/ProductCard.tsx
+1
+$ grep -c 'bg-muted/50 animate-pulse' frontend/src/components/catalog/ProductCardSkeleton.tsx
+1
+
+--- Secret scan on added lines ---
+$ git diff 9a84bbd..HEAD | grep -E '^\+' | grep -Ei 'BEGIN [A-Z ]*PRIVATE KEY|AKIA[0-9A-Z]{16}|ghp_[A-Za-z0-9]{20,}|sk-[A-Za-z0-9]{20,}|password\s*[:=]|secret\s*[:=]|api[_-]?key\s*[:=]'
+(output empty)  -> 0 secret shapes
+
+--- Arbitrary hex in changed card/grid/route/types sources ---
+$ grep -nE '#[0-9a-fA-F]{3,8}' frontend/src/components/catalog/ProductCard.tsx frontend/src/components/catalog/ProductGrid.tsx frontend/src/components/catalog/ProductCardSkeleton.tsx frontend/src/routes/CatalogPage.tsx frontend/src/types/product.ts
+(output empty)  -> none; mock data colors live only in mockProducts.ts (F-4)
+
+--- Ignored-file stage check ---
+$ git check-ignore frontend/src/components/catalog/*.ts frontend/src/components/catalog/*.tsx
+(output empty)  -> exit 1 (not ignored)
+$ git ls-files -ci --exclude-standard
+(output empty)  -> no ignored tracked file
+
+######################################################################
+## §6  Receipt — executed after this file's commit (raw `show` pasted in the delivery message)
+######################################################################
+$ git push origin automation
+$ git notes --ref=refs/notes/storagegenie-coder-reports add -m "Dispatch-ID: SG-045 | Report: docs/worklogs/SG-045_report.md | Work-HEAD: <WORK_HEAD>" <WORK_HEAD>
+$ git push origin refs/notes/storagegenie-coder-reports
+$ git fetch origin refs/notes/storagegenie-coder-reports:refs/notes/storagegenie-coder-reports-remote
+$ git notes --ref=refs/notes/storagegenie-coder-reports-remote show <WORK_HEAD>
+-> raw output pasted verbatim in the delivery message (the note is attached to this file's own commit).

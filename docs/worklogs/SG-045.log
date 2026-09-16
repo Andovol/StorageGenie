@@ -1,0 +1,42 @@
+SG-045 catalog grid: product cards, grid/table densities, skeletons, empty state, honest mocks
+coder: opencode
+MODEL: unknown from argv (no `--model` on the dispatch line; per policy the CLI default is the model and is omitted). Provider metadata banner in output/dispatch/SG-045.log prints `deepseek-v4.1-flash`; recorded as provider metadata, not as an argv fact.
+EFFORT: medium — read from process args: `opencode run --auto --dir /home/andrei/StorageGenie --variant medium "$(cat docs/packets/SG-045-catalog-grid-cards.md)"` (output/dispatch/SG-045.launcher.sh; banner echoed in output/dispatch/SG-045.log).
+CONTRACT: 0.27.0
+SPEND: $0 metered (no provider calls; AI OFF). No new dependency (lucide-react 1.46.0 already present; no package.json/lock diff).
+NETWORK: none (no npm install, no external fetch; only the receipt git refspec push/fetch over the existing origin remote).
+BASE REF: origin/automation (requested)
+BASE COMMIT: 9a84bbdf79fbe15b6d1a3f8a9adab975cbcf6bc5 (resolved; equals origin/automation at start; worktree clean)
+WORK: 2d5bed3 (failing-tests leg) -> d08de8c (implementation) -> WORK_HEAD (this worklog/report/verify commit; published in the receipt note)
+
+LEGS — actual vs budget (every command bounded; nothing killed, nothing hung):
+- recon / premise verification (reads of AssetCard, EvidenceGallery, CatalogToolbar, CatalogPage, product.ts, tokens.css, DQ-answers, packet, older worklog): many bounded reads, each well under the 120 s ordinary bound.
+- pre-change (fail leg) full suite: 3.07 s (vitest) — catalog.test.tsx hollow (unresolved imports), 18 passed files / 77 passed tests. Budget 600 s.
+- implementation + targeted run: ~60 s editing; targeted/full vitest legs ~3.4 s each. Budget 120 s per command.
+- suite + lint + build (green, post-revert): 3.65 s + ~1.4 s + 1.68 s ≈ 6.7 s. Budget 600 s.
+- mutation run (3 mutations, apply/run/revert each): 868 ms + 850 ms + 894 ms ≈ 2.6 s of test time (plus edits). Budget 120 s per command. All reverted; worktree clean after each (`git status --porcelain` empty).
+- worklog + report + verify log + receipt: drafted before the 1500 s early-close mark; final receipt leg well under the 2100 s overall bound.
+
+WHAT LANDED (commits on automation, pushed in the receipt step):
+- 2d5bed3: frontend/src/components/catalog/catalog.test.tsx (new; pre-change hollow on `./ProductCard`).
+- d08de8c: frontend/src/components/catalog/{ProductCard,ProductCardSkeleton,ProductGrid,mockProducts}.tsx|ts (new), frontend/src/routes/CatalogPage.tsx (AssetCard map -> density-aware ProductGrid; loading -> skeletons), frontend/src/types/product.ts (ProductStatus += "failed").
+- WORK_HEAD: docs/worklogs/SG-045.{log,report.md,verify.log}.
+
+TESTS: full frontend suite 19 files / 96 tests passed (77 base + 19 new); lint clean; build clean (`tsc && vite build`, CSS 2.65 kB, js 272.41 kB).
+MUTATIONS: 3/3 caught singly and reverted clean (a raw badge class, the table column order, a mock status) — raw in SG-045_verify.log §4.
+PRE-CHANGE: catalog.test.tsx failed only on unresolvable new-module imports — quoted and labeled HOLLOW, never evidence — SG-045_verify.log §2.
+
+KEY FINDINGS (full detail in SG-045_report.md):
+- F-1 DQ2 vs DQ3: the packet's DQ3 badge pairs are Tailwind utility strings, but Tailwind is not installed (DQ2). They are embedded verbatim on the badge AND paired with the SG-043 semantic token classes (`badge-raw|processed|rendered|failed`) that carry the same swatches, so the badge is actually styled. Without Tailwind the DQ3 utilities alone are inert.
+- F-2 Same inertness applies to `bg-muted/50 animate-pulse` on the skeleton and `border-rose-500/30` on the failed well; the skeleton keeps the `bg-muted` token, the failed well gets an inline `hsl(var(--badge-failed-fg) / 0.3)` hairline. No keyframe animation ships.
+- F-3 CatalogToolbar.tsx:156-160 still says "Table view arrives with the new cards (SG-045) — showing the grid for now." The table now ships, so that note is stale. CatalogToolbar is outside the ceiling (SG-044 owns it) — NOT edited; shell.test.tsx:251-259 still asserts the stale note, and it still passes. Destination: SG-046 / shell cleanup.
+- F-4 mockProducts.ts carries hex *data* colors (inline SVG fills and metadata.primaryColors), not design constants; the card chrome is token-class only. catalog.test.tsx consumes all 8 mocks; CatalogPage renders live assets.
+- F-5 CatalogPage's two old empty messages are replaced by ProductGrid's single dashed empty state with the `Import New Item` -> /capture CTA.
+- F-6 `AssetCard.tsx` left on disk untouched (dead file); destination: later cleanup.
+- F-7 Pre-existing `ProvenanceBadge` classes `badge-green|amber|grey` are undefined in tokens.css (pre-existing, out of scope, not touched).
+
+UNCLEAR — FIRST READ: whether CatalogPage should render the 8 committed mocks or live assets; chose live assets so every click lands on a real `/assets/:id` route, with mocks as the deterministic test fixture (F-4).
+UNCLEAR — DURING EXECUTION: how to reconcile DQ3 Tailwind utility strings with DQ2's "no Tailwind"; shipped both (exact DQ3 strings + SG-043 token class) and reported the inert-utility tension (F-1, F-2).
+UNCLEAR — REMAINING: the SG-046 inspector drawer (card/row click target), the SG-047 import modal, delete (does not exist — no control ships), and server-side category aggregation (backend slice; excluded by rule).
+
+END: note=yes (pasted `show` output in SG-045_report.md Receipt and in the delivery message).
