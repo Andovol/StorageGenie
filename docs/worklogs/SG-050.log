@@ -1,0 +1,68 @@
+SG-050 worklog — drawer click wiring: onSelect props + catalog mount (opencode, medium).
+Append-only. Times are the live box clock, UTC (`date -u`). First token: SG-050.
+
+MODEL: unknown from argv. Process args (read from /proc/<ppid>/cmdline):
+`opencode run --auto --dir /home/andrei/StorageGenie --variant medium` — no `--model` on argv;
+per policy the CLI default is the model and is omitted. Provider metadata banner in
+`output/dispatch/SG-050.log:2` reads `build · deepseek-v4.1-flash` (recorded as provider
+metadata, not an argv fact — CO-78).
+EFFORT: medium (process args: `--variant medium`, also in `output/dispatch/SG-050.launcher.sh`).
+
+BASE REF: origin/automation. BASE COMMIT (resolved): 7c15083dc20867bcfa74d195d23dd461029e98cd.
+Start tree: `git status --porcelain` empty; HEAD == origin/automation == 7c15083.
+CONTRACT: 0.27.0 (/home/andrei/storagegenie-contract/VERSION), sha256 a66aa431… (per SG-046 record).
+
+15:25:45Z  slice start (first premise command; slice start ~15:25:00Z).
+15:25:45–15:26:55  Premise verification (quoted reads; full text in SG-050_verify.log §1):
+  - ProductCard.tsx:73-74 `<Link to={`/assets/${item.id}?household_id=${householdId}`}>` owns the
+    card click. CONFIRMED.
+  - ProductGrid.tsx:100 `const openDetail = (item) => navigate(`/assets/${item.id}?...`)` is the
+    navigate definition; the row owner is :139 onClick + :140-142 onKeyDown(Enter) and the `...`
+    action is :206-212 (stopPropagation + openDetail). Packet's ":99-100" names the definition
+    line, not the row handler lines — same owner, noted (not a contradiction).
+  - CatalogPage.tsx (base) renders `<ProductGrid>` at :125 and owns no card/row click. CONFIRMED.
+  - Drawer path `frontend/src/components/shell/ItemInspectorDrawer.tsx` present and complete (430
+    lines). CONFIRMED.
+  - Invalidation pattern: the drawer ALREADY invalidates `["assets"]` + `["asset", asset.id]` at
+    ItemInspectorDrawer.tsx:118-120 (shipped SG-046). PREMISE CORRECTION: G2's "pattern SG-046
+    prepared but reverted" applies only to the CatalogPage hunk; the drawer's own invalidation is
+    live, so mounting is sufficient and no duplicate invalidation is added (G-A7). See report §a.
+  - `git show HEAD:<file> | grep -n onSelect` = exit 1 (no match) on all three source files →
+    the property does not exist on base (class-8 hollow context, quoted in verify §2).
+
+15:26:56–15:26:58  Wrote test hunks (catalog.test.tsx + drawer.test.tsx) BEFORE source changes.
+15:26:59  PRE-CHANGE run (base source, tests present): 8 failed | 32 passed (40), 3.17s.
+  Failures are the new G1/G2 assertions (onSelect never called; drawer never mounts). Drawer's own
+  12 tests green (drawer shipped SG-046). LABEL: pre-change FAIL — hollow context (feature absent),
+  NOT evidence. Raw in SG-050_verify.log §2.
+15:27:00–15:27:15  Implemented G1 (ProductCard onSelect click/keydown branch; ProductGrid pass-through
+  to cards + TableView openDetail) and G2 (CatalogPage selectedAssetId state, mount, onSelect wiring).
+15:27:16  GREEN suite: 20 files / 117 tests passed (3.56s) — was 107, +10 new tests.
+15:27:20–15:27:35  eslint src exit 0; tsc exit 0; vite build exit 0 (285.40 kB JS, 1.63s).
+15:27:40  Mutation M1 (navigate-vs-select branch): ProductCard click branch drops
+  `event.preventDefault()` → card click selects AND navigates. Caught: 2 failed | 38 passed (1.28s).
+  Reverted via saved copy; `diff` → Files are identical.
+15:27:50  Mutation M2 (invalidation key): ItemInspectorDrawer `queryKey: ["assets"]` →
+  `["assets_mutant"]` (temporary mutation only; drawer NOT in shipped ceiling, tree unchanged after
+  revert). Caught: 2 failed | 38 passed (2.09s). Reverted; `diff` → Files are identical.
+15:28:02  POST-REVERT GREEN suite: 20 files / 117 tests passed (3.94s). eslint/tsc/build exit 0.
+15:28:32  Gates (raw §5): changed files exactly 5 (ceiling); backend/ diff empty; backend/alembic diff
+  empty; package.json + package-lock.json diff empty (no new dependency); secret scan 0 matches;
+  `git check-ignore` exit 1 on all 5 paths (none ignored); index empty (no ignored file staged);
+  no `storagegenie-evidence` push; no DB / restart / network; live spend $0.
+15:29  Wrote SG-050.log, SG-050_report.md, SG-050_verify.log. Commit work; push to automation.
+  Receipt note on refs/notes/storagegenie-coder-reports, push the notes ref explicitly, fetch the
+  refspec explicitly, paste `show` output.
+
+Budget (uncalibrated per G-A9; actual-vs-budget, units = seconds s):
+  premise reads + design        ~70 s  / 120 s ordinary bound   (58%)
+  pre-change run                 3.17 s / 120 s ordinary bound
+  implementation writes          ~15 s  / 120 s ordinary bound
+  suite+lint+build (green)       ~20 s  / 600 s suite bound      (3%)
+  mutation M1                    1.28 s / 120 s ordinary bound
+  mutation M2                    2.09 s / 120 s ordinary bound
+  post-revert suite+lint+build   ~9 s   / 600 s suite bound
+  gates + commit/report          ~60 s  / 120 s ordinary bound
+  TOTAL to 15:28:32              ~212 s / 2100 s overall bound   (10%)
+  Early-close (1500 s) not approached. Retry count: 0. Provider calls: 0. Health delta: none
+  (no HEALTH_CMD run — frontend-only, no DB, no restart, no live service touched).

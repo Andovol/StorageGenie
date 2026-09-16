@@ -1,0 +1,161 @@
+# SG-050 — verify log (raw command output, verbatim; no summaries substituted)
+# generated_utc=2026-09-16T15:29Z
+# BASE REF: origin/automation  BASE COMMIT (resolved): 7c15083dc20867bcfa74d195d23dd461029e98cd
+# WORK_HEAD: the commit carrying this file (published in the receipt note) — labelled work commit, not a tip (CO-55c)
+# MODEL: unknown from argv (no --model; CLI default per policy); banner output/dispatch/SG-050.log:2 = `build · deepseek-v4.1-flash`
+# EFFORT: medium (process args: `--variant medium`)
+# Contract: 0.27.0
+#
+######################################################################
+## §1  Starting tree + premise verification (quoted reads)
+######################################################################
+================ STARTING TREE ================
+$ git status --porcelain
+(empty)
+$ git branch --show-current
+automation
+$ git rev-parse HEAD
+7c15083dc20867bcfa74d195d23dd461029e98cd
+$ git rev-parse origin/automation
+7c15083dc20867bcfa74d195d23dd461029e98cd
+
+================ PREMISE READS (command -> relevant output) ================
+$ sed -n '73,74p' frontend/src/components/catalog/ProductCard.tsx
+    <Link
+      to={`/assets/${item.id}?household_id=${householdId}`}
+CONFIRMED — the card click destination is owned by ProductCard.
+
+$ sed -n '99,100p' frontend/src/components/catalog/ProductGrid.tsx
+  const navigate = useNavigate();
+  const openDetail = (item: CatalogProduct) => navigate(`/assets/${item.id}?household_id=${householdId}`);
+CONFIRMED navigate definition; the row handlers are the onClick at :139 and
+onKeyDown(Enter) at :140-142, and the `...` action at :206-212 (same owner, corrected anchors).
+
+$ sed -n '124,126p' frontend/src/routes/CatalogPage.tsx     # base
+        <>
+          <ProductGrid items={visibleItems} density={density} householdId={effectiveHousehold} />
+          <div style={{ marginTop: 16, display: "flex", gap: 12, alignItems: "center" }}>
+CONFIRMED — CatalogPage renders ProductGrid and owns no card/row click event.
+
+$ ls frontend/src/components/shell/ItemInspectorDrawer.tsx
+frontend/src/components/shell/ItemInspectorDrawer.tsx
+CONFIRMED — drawer component path exists (430 lines).
+
+$ sed -n '115,124p' frontend/src/components/shell/ItemInspectorDrawer.tsx
+  const patchMut = useMutation({
+    mutationFn: (payload: Record<string, unknown>) =>
+      apiPatch(`/v1/assets/${asset.id}`, payload, { household_id: householdId }, { "If-Match": String(current.version ?? 1) }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["assets"] });
+      qc.invalidateQueries({ queryKey: ["asset", asset.id] });
+      setError(null);
+    },
+SET CONFIRMED — the invalidation pattern ALREADY lives in the drawer (shipped SG-046).
+
+$ git show HEAD:frontend/src/components/catalog/ProductCard.tsx | grep -n "onSelect" ; echo "exit=$?"
+exit=1
+$ git show HEAD:frontend/src/components/catalog/ProductGrid.tsx | grep -n "onSelect" ; echo "exit=$?"
+exit=1
+$ git show HEAD:frontend/src/routes/CatalogPage.tsx | grep -n "onSelect\|ItemInspectorDrawer" ; echo "exit=$?"
+exit=1
+HOLLOW CONTEXT QUOTE — the `onSelect` property does not exist on base (class 8), and CatalogPage
+does not import the drawer. This is context, not evidence.
+
+######################################################################
+## §2  Pre-change run — base source + new tests.  LABEL: pre-change FAIL / HOLLOW CONTEXT
+##     (feature absent). NOT evidence of a fix.
+######################################################################
+$ ./node_modules/.bin/vitest run src/components/catalog/catalog.test.tsx src/components/shell/drawer.test.tsx
+
+ FAIL  src/components/catalog/catalog.test.tsx > ProductCard onSelect > with onSelect, a click selects the asset id and does not navigate
+AssertionError: expected "spy" to be called 1 times, but got 0 times
+ FAIL  src/components/catalog/catalog.test.tsx > ProductCard onSelect > with onSelect, Enter and Space select the asset id without navigating
+AssertionError: expected 1st "spy" call to have been called with [ 'mock-drill' ], but called only 0 times
+ FAIL  src/components/catalog/catalog.test.tsx > ProductGrid onSelect > a table row click with onSelect selects instead of navigating
+AssertionError: expected "spy" to be called with arguments: [ 'mock-drill' ]  Received:  Number of calls: 0
+ FAIL  src/components/catalog/catalog.test.tsx > ProductGrid onSelect > Enter on a table row with onSelect selects instead of navigating
+ FAIL  src/components/catalog/catalog.test.tsx > ProductGrid onSelect > the ... actions button with onSelect selects instead of navigating
+ FAIL  src/components/catalog/catalog.test.tsx > ProductGrid onSelect > the grid density passes onSelect through to the cards
+ FAIL  src/components/catalog/catalog.test.tsx > CatalogPage drawer wiring > a catalog card click opens the drawer for that asset and close clears it
+ FAIL  src/components/catalog/catalog.test.tsx > CatalogPage drawer wiring > a save from the mounted drawer invalidates the assets + asset query keys
+
+ Test Files  1 failed | 1 passed (2)
+      Tests  8 failed | 32 passed (40)
+   Start at  15:26:59
+   Duration  3.17s (transform 243ms, setup 88ms, collect 578ms, tests 2.81s, environment 490ms, prepare 120ms)
+
+LABEL: PRE-CHANGE FAIL (hollow context — `onSelect`/mount absent). The 8 failures are the new G1/G2
+assertions; the drawer's own 12 tests pass (drawer shipped SG-046). NOT evidence.
+
+######################################################################
+## §3  Post-change GREEN — suite + lint + build (post-revert re-run)
+######################################################################
+$ ./node_modules/.bin/vitest run
+
+ Test Files  20 passed (20)
+      Tests  117 passed (117)
+   Start at  15:28:02
+   Duration  3.94s (transform 719ms, setup 699ms, collect 2.44s, tests 5.43s, environment 5.86s, prepare 1.43s)
+
+$ ./node_modules/.bin/eslint src
+(no output) ; LINT_EXIT=0
+
+$ ./node_modules/.bin/tsc
+(no output) ; TSC_EXIT=0
+
+$ ./node_modules/.bin/vite build
+dist/index.html                   0.94 kB │ gzip:  0.48 kB
+dist/assets/index-DxKo-z_g.css    2.65 kB │ gzip:  0.82 kB
+dist/assets/index-B6VKKSIQ.js   285.40 kB │ gzip: 85.24 kB
+✓ built in 1.63s ; BUILD_EXIT=0
+
+The §3 conditional derived-test-set block is NOT pasted (not required by this packet).
+
+######################################################################
+## §4  Mutation run (PG-EV-01) — each wrong value caught singly, reverted clean
+######################################################################
+M1  navigate-vs-select branch: ProductCard click branch drops `event.preventDefault()`
+$ ./node_modules/.bin/vitest run src/components/catalog/catalog.test.tsx src/components/shell/drawer.test.tsx
+ FAIL  ... > ProductCard onSelect > with onSelect, a click selects the asset id and does not navigate
+ FAIL  ... > ProductGrid onSelect > the grid density passes onSelect through to the cards
+ Test Files  1 failed | 1 passed (2)
+      Tests  2 failed | 38 passed (40)
+   Start at  15:27:40
+   Duration  1.28s
+(reverted: diff /tmp/opencode/sg050/ProductCard.orig.tsx … -> [ok] Files are identical)
+
+M2  invalidation key: ItemInspectorDrawer `["assets"]` -> `["assets_mutant"]`  (temporary; drawer not shipped-edited)
+$ ./node_modules/.bin/vitest run src/components/shell/drawer.test.tsx src/components/catalog/catalog.test.tsx
+ FAIL  ... > CatalogPage drawer wiring > a save from the mounted drawer invalidates the assets + asset query keys
+ FAIL  ... > ItemInspectorDrawer > a successful save invalidates the assets and asset query keys
+ Test Files  2 failed (2)
+      Tests  2 failed | 38 passed (40)
+   Start at  15:27:50
+   Duration  2.09s
+(reverted: diff /tmp/opencode/sg050/ItemInspectorDrawer.orig.tsx … -> [ok] Files are identical)
+
+Post-revert full suite green again: 20 files / 117 passed (§3).
+
+######################################################################
+## §5  Gates / ledger
+######################################################################
+$ git diff --name-only
+frontend/src/components/catalog/ProductCard.tsx
+frontend/src/components/catalog/ProductGrid.tsx
+frontend/src/components/catalog/catalog.test.tsx
+frontend/src/components/shell/drawer.test.tsx
+frontend/src/routes/CatalogPage.tsx
+(5 files — all in the ceiling; the drawer file is NOT present)
+
+$ git diff --name-only -- backend/          -> (empty)
+$ git diff --name-only -- backend/alembic/  -> (empty)   # no migration
+$ git diff -- frontend/package.json frontend/package-lock.json -> (empty)   # dep list unchanged
+$ git diff | grep -inE "password|passwd|secret|api[_-]?key|private[ _-]?key|BEGIN [A-Z ]*PRIVATE KEY|AKIA[0-9A-Z]{16}|ghp_[A-Za-z0-9]{20,}|xoxb-|bearer [A-Za-z0-9]"
+(scan_exit=1 -> 0 matches)
+$ git check-ignore -v <5 changed paths>
+(ignore_exit=1 -> none ignored)
+$ git diff --cached --name-only
+(empty — no ignored file staged)
+storagegenie-evidence push : none
+live DB writes / restart / network / spend : none / none / none / $0
+vacuous pass : none claimed; pre-change leg labelled as hollow context, not a pass
