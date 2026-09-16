@@ -95,9 +95,18 @@ function TableThumb({ item, householdId }: { item: CatalogProduct; householdId: 
   );
 }
 
-function TableView({ items, householdId }: { items: CatalogProduct[]; householdId: string }) {
+function TableView({
+  items,
+  householdId,
+  onSelect,
+}: {
+  items: CatalogProduct[];
+  householdId: string;
+  onSelect?: (id: string) => void;
+}) {
   const navigate = useNavigate();
-  const openDetail = (item: CatalogProduct) => navigate(`/assets/${item.id}?household_id=${householdId}`);
+  const openDetail = (item: CatalogProduct) =>
+    onSelect ? onSelect(item.id) : navigate(`/assets/${item.id}?household_id=${householdId}`);
 
   return (
     <table role="table" aria-label="Product results" style={{ width: "100%", borderCollapse: "collapse" }}>
@@ -238,9 +247,17 @@ type ProductGridProps = {
   householdId: string;
   loading?: boolean;
   limit?: number;
+  onSelect?: (id: string) => void;
 };
 
-export function ProductGrid({ items, density, householdId, loading = false, limit = 20 }: ProductGridProps) {
+export function ProductGrid({
+  items,
+  density,
+  householdId,
+  loading = false,
+  limit = 20,
+  onSelect,
+}: ProductGridProps) {
   if (loading) {
     return (
       <div
@@ -281,7 +298,7 @@ export function ProductGrid({ items, density, householdId, loading = false, limi
   }
 
   if (density === "table") {
-    return <TableView items={items} householdId={householdId} />;
+    return <TableView items={items} householdId={householdId} onSelect={onSelect} />;
   }
 
   return (
@@ -294,7 +311,7 @@ export function ProductGrid({ items, density, householdId, loading = false, limi
     >
       <style data-testid="catalog-grid-style">{GRID_CSS}</style>
       {items.map((item) => (
-        <ProductCard key={item.id} item={item} householdId={householdId} />
+        <ProductCard key={item.id} item={item} householdId={householdId} onSelect={onSelect} />
       ))}
     </div>
   );

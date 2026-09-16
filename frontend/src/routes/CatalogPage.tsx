@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useAssets, useHouseholds } from "../hooks/useAssets";
 import { ProductGrid } from "../components/catalog/ProductGrid";
 import { AppShell } from "../components/shell/AppShell";
+import { ItemInspectorDrawer } from "../components/shell/ItemInspectorDrawer";
 import {
   CATEGORY_PILLS,
   SORT_LABELS,
@@ -31,6 +32,7 @@ export function CatalogPage() {
   const [density, setDensity] = useState<Density>("grid");
   const [cursor, setCursor] = useState<string | undefined>(undefined);
   const [allItems, setAllItems] = useState<Asset[]>([]);
+  const [selectedAssetId, setSelectedAssetId] = useState<string | null>(null);
 
   const effectiveHousehold = useMemo(
     () => householdId || households?.[0]?.id || "",
@@ -65,6 +67,13 @@ export function CatalogPage() {
 
   const displayed = allItems.length ? allItems : (data?.items || []);
   const nextCursor = data?.next_cursor;
+
+  // The card/table rows hand back an id; the summary Asset for it is already in
+  // the loaded page, which is all the drawer needs (it fetches the full record).
+  const selectedAsset = useMemo(
+    () => (selectedAssetId ? displayed.find((asset) => asset.id === selectedAssetId) ?? null : null),
+    [displayed, selectedAssetId]
+  );
 
   // Category/sort are client-side over the loaded page: the list API returns no
   // per-category counts and there is no aggregation endpoint yet. See the report.
@@ -122,7 +131,12 @@ export function CatalogPage() {
         />
       ) : (
         <>
-          <ProductGrid items={visibleItems} density={density} householdId={effectiveHousehold} />
+          <ProductGrid
+            items={visibleItems}
+            density={density}
+            householdId={effectiveHousehold}
+            onSelect={setSelectedAssetId}
+          />
           <div style={{ marginTop: 16, display: "flex", gap: 12, alignItems: "center" }}>
             {nextCursor && (
               <button
@@ -136,6 +150,13 @@ export function CatalogPage() {
             )}
             {isFetching && <span className="text-muted-foreground" style={{ fontSize: 12 }}>Fetching...</span>}
           </div>
+          {selectedAsset ? (
+            <ItemInspectorDrawer
+              asset={selectedAsset}
+              householdId={effectiveHousehold}
+              onClose={() => setSelectedAssetId(null)}
+            />
+          ) : null}
         </>
       )}
     </AppShell>

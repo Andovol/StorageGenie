@@ -64,7 +64,15 @@ export function cardMedia(item: CatalogProduct, householdId: string): string | n
   return null;
 }
 
-export function ProductCard({ item, householdId }: { item: CatalogProduct; householdId: string }) {
+export function ProductCard({
+  item,
+  householdId,
+  onSelect,
+}: {
+  item: CatalogProduct;
+  householdId: string;
+  onSelect?: (id: string) => void;
+}) {
   const [broken, setBroken] = useState(false);
   const failed = item.status === "failed";
   const media = cardMedia(item, householdId);
@@ -73,6 +81,24 @@ export function ProductCard({ item, householdId }: { item: CatalogProduct; house
     <Link
       to={`/assets/${item.id}?household_id=${householdId}`}
       data-testid="product-card"
+      onClick={
+        onSelect
+          ? (event) => {
+              event.preventDefault();
+              onSelect(item.id);
+            }
+          : undefined
+      }
+      onKeyDown={
+        onSelect
+          ? (event) => {
+              if (event.key === "Enter" || event.key === " ") {
+                event.preventDefault();
+                onSelect(item.id);
+              }
+            }
+          : undefined
+      }
       className="product-card bg-card border-border focus-ring"
       style={{
         display: "flex",
