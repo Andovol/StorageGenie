@@ -1,0 +1,160 @@
+SG-047 verify log — raw captured output (hollow labeled, mutations raw). Time reads the live clock.
+
+================================================================================
+0. START STATE / PREMISES
+================================================================================
+$ git status --porcelain          => (empty; clean)
+$ git branch --show-current       => automation
+$ git rev-parse HEAD              => 00e77a8694da723f7a5bbc207294cffb2aee2461
+$ git rev-parse origin/automation => 00e77a8694da723f7a5bbc207294cffb2aee2461
+$ git rev-list --left-right --count origin/automation...HEAD => 0	0
+
+Premise reads (quoted in the report):
+  backend/app/api/v1/jobs.py:18-20  class ImportCreate(BaseModel): evidence_ids / config
+  backend/app/api/v1/jobs.py:32-75  @router.post("/imports", status_code=201) ... Idempotency-Key
+  backend/app/api/v1/jobs.py:78-85  @router.post("/imports/{job_id}/run")
+  frontend/src/api/client.ts:105-120 uploadEvidence(householdId, file)
+  frontend/src/components/shell/AppHeader.tsx:78-94  <Link to="/capture"> ... Import Asset
+  frontend/src/components/catalog/ProductGrid.tsx:290-295 <Link to="/capture">Import New Item</Link>
+  frontend/src/routes/InboxPage.tsx:16-26  jobs query GET /v1/jobs + JobCard list
+
+================================================================================
+1. BASELINE SUITE (base source, pre-change)
+================================================================================
+$ (cd frontend && npm test)
+ Test Files  20 passed (20)
+      Tests  117 passed (117)
+   Start at  15:40:20
+   Duration  3.95s (transform 591ms, setup 695ms, collect 2.64s, tests 4.87s, ...)
+
+================================================================================
+2. HOLLOW RUN — LABEL: HOLLOW, NOT EVIDENCE (class 8)
+   new test file present; new module parked so the import is unresolvable
+================================================================================
+$ cp frontend/src/components/shell/AssetImportModal.tsx /tmp/opencode/sg047/AssetImportModal.orig.tsx
+$ mv frontend/src/components/shell/AssetImportModal.tsx /tmp/opencode/sg047/AssetImportModal.parked.tsx
+$ (cd frontend && npm test -- src/components/shell/import-modal.test.tsx)
+
+ RUN  v1.6.1 /home/andrei/StorageGenie/frontend
+
+ ❯ src/components/shell/import-modal.test.tsx  (0 test)
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Suites 1 ⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/components/shell/import-modal.test.tsx [ src/components/shell/import-modal.test.tsx ]
+Error: Failed to resolve import "./AssetImportModal" from "src/components/shell/import-modal.test.tsx". Does the file exist?
+
+ Test Files  1 failed (1)
+      Tests  no tests
+   Duration  492ms (transform 23ms, setup 41ms, collect 0ms, tests 0ms, environment 235ms, prepare 52ms)
+
+$ mv /tmp/opencode/sg047/AssetImportModal.parked.tsx frontend/src/components/shell/AssetImportModal.tsx
+$ diff -q /tmp/opencode/sg047/AssetImportModal.orig.tsx frontend/src/components/shell/AssetImportModal.tsx && echo IDENTICAL
+IDENTICAL
+
+================================================================================
+3. GREEN RUN (post-change)
+================================================================================
+$ (cd frontend && npm test -- src/components/shell/import-modal.test.tsx)
+ ✓ src/components/shell/import-modal.test.tsx  (14 tests) 315ms
+ Test Files  1 passed (1)
+      Tests  14 passed (14)
+   Duration  1.09s (transform 127ms, setup 44ms, collect 262ms, tests 315ms, ...)
+
+================================================================================
+4. MUTATIONS (PG-EV-01) — wrong value fed singly, raw, each reverted byte-identical
+================================================================================
+================ M1 checkbox branch inverted ================
+  (if (autoDetect) {  ->  if (!autoDetect) { )
+⎯⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯
+ FAIL  ... > checked (default): one import with a UUID Idempotency-Key, then run, then route to /inbox
+AssertionError: expected 2nd "spy" call to have been called with [ '/v1/imports/job-1/run', {}, …(1) ], but called only 1 times
+ FAIL  ... > unchecked: creates the job WITHOUT running it and states it waits in the Inbox
+AssertionError: expected "spy" to be called 1 times, but got 2 times
+      Tests  2 failed | 12 passed (14)
+M1 reverted clean
+
+================ M2 idempotency header removed ================
+  ({ "Idempotency-Key": crypto.randomUUID() }  ->  {})
+⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯
+ FAIL  ... > checked (default): one import with a UUID Idempotency-Key, then run, then route to /inbox
+AssertionError: expected 1st "spy" call to have been called with [ '/v1/imports', …(3) ]
+ FAIL  ... > unchecked: creates the job WITHOUT running it and states it waits in the Inbox
+AssertionError: expected "spy" to be called with arguments: [ '/v1/imports', { …(2) }, …(2) ]
+      Tests  2 failed | 12 passed (14)
+M2 reverted clean
+
+================ M3 queue count wrong ================
+  (Pending queue ({staged.length})  ->  Pending queue (0))
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯
+ FAIL  ... > drop stages accepted files as Ready with a live count
+      Tests  1 failed | 13 passed (14)
+M3 reverted clean
+
+================================================================================
+5. POST-REVERT FULL SUITE + LINT + BUILD
+================================================================================
+$ (cd frontend && npm test)
+ Test Files  21 passed (21)
+      Tests  131 passed (131)
+   Start at  15:43:08
+   Duration  3.81s (transform 682ms, setup 717ms, collect 2.65s, tests 4.42s, ...)
+
+$ npm run lint   => > eslint src   (exit 0, no output)
+$ npm run build  => > tsc && vite build
+vite v5.4.21 building for production...
+✓ 1960 modules transformed.
+dist/index.html                   0.94 kB │ gzip:  0.48 kB
+dist/assets/index-DxKo-z_g.css    2.65 kB │ gzip:  0.82 kB
+dist/assets/index-C8WJqsQX.js   292.21 kB │ gzip: 86.95 kB
+✓ built in 1.67s
+
+================================================================================
+6. PRE-CHANGE HOLLOW-COLOUR RUN (implementation absent, tests present)
+   NOTE: distinct from §2's hollow run; §2 is the class-8 quote.
+================================================================================
+$ (cd frontend && npm test -- src/components/shell/import-modal.test.tsx)   # after module restored
+ ✓ src/components/shell/import-modal.test.tsx  (14 tests) 315ms   => 14 passed
+(§2 documents the un-resolvable-import failure; the module was then implemented.)
+
+================================================================================
+7. SCOPE GATES
+================================================================================
+$ git status --porcelain
+ M frontend/src/components/catalog/ProductGrid.tsx
+ M frontend/src/components/shell/AppHeader.tsx
+?? frontend/src/components/shell/AssetImportModal.tsx
+?? frontend/src/components/shell/import-modal.test.tsx
+
+$ git diff --stat
+ frontend/src/components/catalog/ProductGrid.tsx | 19 +++++++++++++++++--
+ frontend/src/components/shell/AppHeader.tsx     | 17 ++++++++++++++++-
+ 2 files changed, 33 insertions(+), 3 deletions(-)
+
+$ git diff -- backend/                                  => (empty)
+$ git status --porcelain -- backend/alembic backend/migrations => (empty)
+$ git diff -- frontend/package.json frontend/package-lock.json => (empty)
+
+$ secret scan (grep -nEi "api[_-]?key|secret|token|password|BEGIN .* PRIVATE KEY|AKIA[0-9A-Z]{16}")
+frontend/src/components/catalog/ProductGrid.tsx:11: * custom-property tokens are the requirement ...
+  => 1 hit, FALSE POSITIVE (pre-existing comment word "tokens"); 0 real secrets.
+
+$ git check-ignore -q <each of the 4 paths>  => ignored=1 (not ignored) for all 4
+$ git log --oneline -1 refs/heads/storagegenie-evidence => 637302e receipt(SG-001)  (nothing pushed)
+
+$ date -u +%Y-%m-%dT%H:%M:%SZ                    => 2026-09-16T15:44:55Z
+$ curl -s --max-time 5 http://localhost:8000/v1/health => Not Found  (exit 0; probe only, no write)
+
+$ process argv (PID 570911): opencode run --auto --dir /home/andrei/StorageGenie --variant medium <packet>
+  => effort = medium (argv); model = unknown (no --model on argv, policy omits it)
+
+================================================================================
+8. NOTES REF STATE (before)
+================================================================================
+$ git for-each-ref refs/notes/
+e7734574... commit refs/notes/storagegenie-coder-reports
+$ git notes --ref=refs/notes/storagegenie-coder-reports show 00e77a86...
+error: no note found for object 00e77a8694da723f7a5bbc207294cffb2aee2461.
+$ git ls-remote origin automation refs/notes/storagegenie-coder-reports
+00e77a8694da723f7a5bbc207294cffb2aee2461 refs/heads/automation
+e7734574ed9691c743ca2ee72ad5575769205bf1 refs/notes/storagegenie-coder-reports

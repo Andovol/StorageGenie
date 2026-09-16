@@ -1,0 +1,44 @@
+SG-047 — import modal: staged queue, auto-detect, real pipeline (opencode, medium)
+
+Coder: opencode (SELECTED, D29) · Effort: medium — read from process argv
+(`opencode run --auto --dir /home/andrei/StorageGenie --variant medium`, PID 570911) · Model:
+`unknown` — no `--model` on argv; per model policy the CLI default IS the model and is omitted
+(`CO-78`), so no model id is asserted. Contract: 0.27.0.
+
+BASE REF: `origin/automation` — BASE COMMIT (resolved): `00e77a8694da723f7a5bbc207294cffb2aee2461`
+(= start HEAD). Start tree: clean, `git status --porcelain` empty. Work dir
+`/home/andrei/StorageGenie`; remote `git@github.com:Andovol/StorageGenie.git` (as on host).
+WORK_HEAD: the work commit carrying this log + report + verify log (hash published in the receipt
+note; labelled work commit per `CO-55c` — it is part of the commit it names).
+
+Clock (UTC, live): first read ~15:39; health probe + process-args read 15:44:55Z.
+
+LEG TIMINGS — actual vs budget, units stated
+- premises + design (reads + quoted verification): ~120 s / 120 s ordinary.
+- baseline suite (pre-change, base source): 3.95 s / 600 s.
+- pre-change hollow run (new test file present, module parked → unresolvable import): 0.49 s / 120 s.
+- implementation (modal + test file + 2 CTA hunks): ~90 s / 120 s.
+- green targeted run (new file, 14 tests): 1.09 s / 120 s.
+- full suite + lint + build: 3.85 s + ~2 s + ~4 s ≈ 10 s / 600 s.
+- mutation runs M1/M2/M3: ~3 × 1.2 s ≈ 4 s / 120 s each.
+- post-revert full suite: 3.81 s / 600 s.
+- scope gates + commit + report + note: ~90 s / 120 s.
+- overall: ≈ 400 s / 2100 s (early-close 1500 s not approached). Retries: 0. Provider calls: 0.
+
+SPEND: `$0` slice-metered. No model call is made by the slice (the modal only drives the existing
+deterministic import endpoints; AI legs remain consent-gated server-side). Live jobs created: **none**
+— every `uploadEvidence`/`apiPost`/`apiGet` call ran under vitest with `../api/client` mocked; the
+only real network was a 5 s `GET /v1/health` probe (answered `Not Found`, exit 0), no write.
+NETWORK: app API only; no npm install, no registry. DB: none new. Restart: none.
+
+UNCLEAR — FIRST READ: whether the two CTA sites should become `<button>`s (and thus require editing
+`shell.test.tsx` / `catalog.test.tsx`, both OUTSIDE the scope ceiling) or stay `<Link>`s with the
+click intercepted. The ceiling forbids touching the test files, so interception won — see the report
+finding F-1.
+UNCLEAR — DURING EXECUTION: whether the "25 MB gate target" should also be a client-side size
+rejection. The packet scopes client-side filtering to format only, so size is named + the server cap
+is disclosed and the server remains the enforcer.
+UNCLEAR — REMAINING: (1) the two stale tests still assert the old routing and now pass vacuously
+w.r.t. their names — a follow-up should update them once the ceiling allows; (2) the modal has no
+live-backend test (frontend-only ceiling); (3) `Import Asset` still carries `href="/capture"` for
+middle-click / open-in-new-tab — intentional, same tradeoff SG-050 documented.
