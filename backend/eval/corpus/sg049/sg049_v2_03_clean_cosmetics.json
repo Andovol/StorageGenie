@@ -1,0 +1,38 @@
+{
+  "id": "sg049-v2-03-clean-cosmetics",
+  "class": "clean",
+  "category": "cosmetics",
+  "note": "SG-049 v2 scoring fixture, authored offline (no live call). Cosmetic jar: volume and product kind printed; no unit arithmetic applied.",
+  "ground_truth": {
+    "items": [
+      {
+        "name": "Face cream",
+        "opened_date": "2031-04-10",
+        "quantity": 50,
+        "unit": "ml",
+        "asset_type": "cream"
+      }
+    ],
+    "unknowns": [],
+    "needs_evidence": false,
+    "expectation_class": "exact"
+  },
+  "provider_output": {
+    "items": [
+      {
+        "name": "FACE CREAM",
+        "expiry_date": null,
+        "opened_date": "2031-04-10",
+        "date_type": "period_after_opening",
+        "lot": null,
+        "quantity": 50,
+        "unit": "ml",
+        "asset_type": "cream",
+        "confidence": 1.0,
+        "uncertainty_reasons": []
+      }
+    ],
+    "unknowns": [],
+    "needs_evidence": false
+  }
+}

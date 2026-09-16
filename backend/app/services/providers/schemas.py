@@ -14,6 +14,7 @@ schemas arrives in SG-028.
 from __future__ import annotations
 
 import json
+import math
 import re
 from collections.abc import Callable
 from datetime import date
@@ -37,8 +38,29 @@ class ExtractionItem(BaseModel):
     opened_date: str | None = None
     date_type: str | None = None
     lot: str | None = None
+    # SG-049 v2: transcribe-only quantity/unit and the printed product kind.
+    # Illegible/absent -> null plus an `unknowns` entry (never guessed).
+    quantity: float | None = None
+    unit: str | None = Field(default=None, max_length=50)
+    asset_type: str | None = Field(default=None, max_length=50)
     confidence: float = Field(ge=0.0, le=1.0)
     uncertainty_reasons: list[str] = Field(default_factory=list)
+
+    @field_validator("quantity")
+    @classmethod
+    def _quantity_finite_non_negative(cls, value: float | None) -> float | None:
+        if value is None:
+            return None
+        if not math.isfinite(value) or value < 0:
+            raise ValueError("quantity must be a finite number >= 0")
+        return value
+
+    @field_validator("unit", "asset_type")
+    @classmethod
+    def _non_blank_when_present(cls, value: str | None, info: ValidationInfo) -> str | None:
+        if value is not None and not value.strip():
+            raise ValueError(f"{info.field_name} must be non-blank when present")
+        return value
 
     @field_validator("expiry_date", "opened_date")
     @classmethod

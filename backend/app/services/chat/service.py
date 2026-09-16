@@ -26,7 +26,7 @@ from sqlalchemy.orm import Session
 
 from app.config import settings
 from app.models.assertion import Assertion
-from app.models.asset import Asset
+from app.models.asset import UNTITLED_LABEL, Asset
 from app.models.guardrail_event import GuardrailEvent
 from app.models.provider_call import ProviderCall
 from app.models.source_attribution import SourceAttribution
@@ -176,7 +176,7 @@ def build_catalog(db: Session, household_id: str, category: str) -> list[dict[st
         catalog.append(
             {
                 "id": asset.id,
-                "label": asset.display_name,
+                "label": asset.display_name or UNTITLED_LABEL,
                 "category": asset_category,
                 "expiry_date": expiry_date,
                 "opened_date": opened_date,

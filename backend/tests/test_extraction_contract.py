@@ -300,11 +300,77 @@ def test_unknowns_may_name_opened_date() -> None:
 
 def test_load_prompt_cosmetics_versioned_and_unknown_category_raises() -> None:
     text, version = load_prompt("cosmetics")
-    assert version == "extract-cosmetics-v1"
+    assert version == "extract-cosmetics-v2"
     assert "never infer beyond visible evidence" in text
     assert "opened_date" in text
     with pytest.raises(ValueError):
         load_prompt("does-not-exist")
+
+
+def test_v2_new_fields_parse_and_invalid_shapes_fail() -> None:
+    """SG-049 G1: quantity/unit/asset_type parse; every invalid shape fails."""
+    base = {
+        "items": [
+            {
+                "name": "Milk",
+                "quantity": 2,
+                "unit": "bottles",
+                "asset_type": "beverage",
+                "confidence": 1.0,
+                "uncertainty_reasons": [],
+            }
+        ],
+        "unknowns": [],
+        "needs_evidence": False,
+    }
+    out = parse_extraction_output(base)
+    assert out.items[0].quantity == 2.0
+    assert out.items[0].unit == "bottles"
+    assert out.items[0].asset_type == "beverage"
+
+    for bad in (
+        {"quantity": -1},
+        {"quantity": float("nan")},
+        {"quantity": float("inf")},
+        {"quantity": "two"},
+        {"unit": ""},
+        {"unit": "   "},
+        {"unit": "u" * 51},
+        {"asset_type": ""},
+        {"asset_type": ["beverage"]},
+        {"asset_type": "a" * 51},
+    ):
+        broken = deepcopy(base)
+        broken["items"][0].update(bad)
+        with pytest.raises(ValidationError):
+            parse_extraction_output(broken)
+
+
+def test_v2_unknowns_entry_rules_hold_for_new_paths() -> None:
+    honest = {
+        "items": [
+            {
+                "name": "Tablets",
+                "quantity": None,
+                "unit": None,
+                "asset_type": None,
+                "confidence": 0.6,
+                "uncertainty_reasons": ["torn label"],
+            }
+        ],
+        "unknowns": ["items.0.quantity", "items.0.unit", "items.0.asset_type"],
+        "needs_evidence": False,
+    }
+    assert set(parse_extraction_output(honest).unknowns) == {
+        "items.0.quantity",
+        "items.0.unit",
+        "items.0.asset_type",
+    }
+
+    fabricated = deepcopy(honest)
+    fabricated["items"][0]["unit"] = "tablets"
+    with pytest.raises(ValidationError):
+        parse_extraction_output(fabricated)
 
 
 def test_corpus_integrity() -> None:

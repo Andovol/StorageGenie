@@ -22,7 +22,21 @@ from app.services.providers.schemas import ExtractionOutput
 # SG-028 §5.2-7: safety-critical/serialized fields always route to review,
 # whatever the confidence. Every other field auto-accepts at/above the single
 # configured threshold (`settings.sg_confidence_threshold`, uncalibrated).
-GATED_FIELDS = frozenset({"identifier", "expiry", "expiry_date", "opened_date", "condition", "lot"})
+GATED_FIELDS = frozenset(
+    {
+        "identifier",
+        "expiry",
+        "expiry_date",
+        "opened_date",
+        "condition",
+        "lot",
+        # SG-049 v2: extraction-sourced quantity/unit/asset_type are always
+        # human-confirmed (F4 Stage 0), never threshold-auto-accepted.
+        "quantity",
+        "unit",
+        "asset_type",
+    }
+)
 ALLOWED_CANDIDATE_FIELDS = frozenset(
     {
         "display_name",
@@ -70,6 +84,31 @@ def _provenance(
         "prompt_template_version": template_version,
         "provider_call_id": provider_call_id,
     }
+
+
+def _extraction_value_field(
+    fields: dict[str, object],
+    name: str,
+    value: object,
+    *,
+    item: object,
+    provider: object,
+    model: object,
+    template_version: object,
+    provider_call_id: object,
+) -> None:
+    """Add an extraction-sourced field unless its value is absent (never guessed)."""
+    if value is None:
+        return
+    fields[name] = _provenance(
+        value,
+        source_type="extraction",
+        confidence=item.confidence,  # type: ignore[attr-defined]
+        provider=provider,
+        model=model,
+        template_version=template_version,
+        provider_call_id=provider_call_id,
+    )
 
 
 def _review_state_for(field_path: str, confidence: float | None) -> str:
@@ -246,6 +285,21 @@ def build_candidate_from_extraction(
                 item.lot,
                 source_type="extraction",
                 confidence=item.confidence,
+                provider=provider,
+                model=model,
+                template_version=version,
+                provider_call_id=primary_call,
+            )
+        for field_name, value in (
+            ("quantity", item.quantity),
+            ("unit", item.unit),
+            ("asset_type", item.asset_type),
+        ):
+            _extraction_value_field(
+                fields,
+                field_name,
+                value,
+                item=item,
                 provider=provider,
                 model=model,
                 template_version=version,

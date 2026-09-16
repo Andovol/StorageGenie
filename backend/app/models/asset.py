@@ -4,6 +4,12 @@ from sqlalchemy.orm import Mapped, mapped_column
 from app.db import Base
 from app.models.base import TimestampMixin, new_id
 
+# SG-049 F-SG048-2: the ONE label a nameless asset shows in the AI catalogue
+# grounding built by planning/service.py and chat/service.py. This module is the
+# safe home: it imports only `app.db` + `app.models.base`, so importing the
+# constant here can never create a cycle with the service layer that imports it.
+UNTITLED_LABEL = "Untitled"
+
 
 class Asset(TimestampMixin, Base):
     __tablename__ = "asset"

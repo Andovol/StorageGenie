@@ -1,0 +1,76 @@
+SG-049 coder log — extraction v2 (quantity/unit/asset_type) + label fallback + chat pointer
+work dir: /home/andrei/StorageGenie
+BASE (origin/automation at start): a969e188124c34d08aaeb3caccc5d2bd92410b32
+MODEL: unknown (no --model in the dispatch argv; per model policy the CLI default IS the model and is omitted — not read from any identity line)
+EFFORT: medium (from the dispatch argv `opencode run --auto --dir /home/andrei/StorageGenie --variant medium # SG-049 ...`)
+started: 2026-09-16T20:42:24Z (live clock)
+
+OUTCOME: G0 STOP-as-SUCCESS. `SG_CONSENT=false` on the live backend, so the metered
+live leg (G5) is UNRUN and no provider call was made. The offline slice (G1, G2, G3,
+G4-offline, G6-source) is implemented, tested, and committed with a `BLOCKED:` first
+line per the packet's stop path. This is the successful outcome for a STOP gate.
+
+LEG TIMINGS (live clock, actual vs budget):
+- G0 reconnaissance + G0 proof (read-only)      : ~35 s   / 120 s ordinary
+- G1-G3 + G6 source edits                         : ~120 s  / 2400 s overall
+- G4 offline eval pre + G2 prompts                : ~60 s   / 600 s
+- Test authoring + pre-change failing run         : ~120 s  / 600 s
+- Suite + lint + build (backend + frontend)       : ~75 s   / 600 s
+   (backend pytest 14.06 s, ruff <1 s, frontend vitest 4.05 s, tsc+vite 1.64 s)
+- Mutation checks (4, applied singly)             : ~25 s   / 120 s
+- G5 live metered leg                             : 0 s     / G5 bound (UNRUN — G0 STOP)
+cumulative wall-clock to close: ~5m50s / early-close 1500 s, overall 2400 s — well inside.
+
+SPEND: real metered $ = $0.000000 (zero calls; zero ledger rows). Worst-case bound G5
+= 3 x per-call estimate ceiling — NOT computed because no live call was admitted; the
+estimator is still present (`estimate_call_cost`) and unchanged.
+
+STEPS:
+1. G0 read-only FIRST: fetched origin/automation (a969e18 = BASE); worktree clean; backend
+   container healthy on 127.0.0.1:8003->8000. `GET /v1/settings/ai` (the real path; the packet
+   wrote `/settings/ai` and the api prefix is `/v1` — finding) returned consent=false,
+   provider_id=fake, model=deepseek-v4-flash-vision-exp. Existence-only key probe: present=True,
+   len=67 (no key bytes printed). `ai_status()` = (False, 'consent_disabled').
+   => STOP. No provider call made.
+2. Premises re-verified: schemas.py:30-41 (name/expiry/opened/date_type/lot, extra="forbid");
+   candidates.py GATED_FIELDS + _review_state_for + build_candidate_from_extraction lot block as
+   template + _create_asset_for_candidate already reading quantity/unit (:349-350) and asset_type
+   (:347); reader.py PROMPT_FILES + ai_status; settings.py ALLOWED_MODEL_IDS; three v1 prompts;
+   planning/service.py:153 + chat/service.py:179 raw label; ChatPage notice block; sg029 manifest.
+   Corpus count correction: 10 sg029 fixtures, not 9 (packet said nine).
+3. G1: schemas.py — added quantity (finite, >=0), unit/asset_type (non-blank when present,
+   max_length=50); extra="forbid" unchanged; unknowns machinery generic, untouched.
+4. G2: three NEW `extract-{food,medicine,cosmetics}-v2.md` (template_version v2) with
+   transcribe-only quantity / verbatim unit / printed asset_type; PROMPT_FILES -> v2. v1 bytes
+   provably untouched (`git diff` empty). repair_prompt unchanged (names no fields).
+5. G3: GATED_FIELDS += quantity/unit/asset_type; build_candidate_from_extraction sets the three
+   fields with extraction provenance through a small `_extraction_value_field` helper (keeps ruff
+   C901 green); `_create_asset_for_candidate` untouched (reads confirmed). F-SG048-2: shared
+   `UNTITLED_LABEL = "Untitled"` in app/models/asset.py (cycle-free: imports only app.db +
+   app.models.base) used by planning/service.py:153 and chat/service.py:179.
+6. G4: v1 eval path pre/post byte-identical (field_accuracy=0.833, unknown_rate=4/7=0.571,
+   correction_rate=0/6=0.000). v2 ground truth rides NEW scoring-only fixtures under
+   backend/eval/corpus/sg049/ (authored offline, no live call, no image) scored by
+   tests/test_sg049_v2_extraction.py. SG-029 fixtures/manifest untouched.
+7. G6 source only: ChatPage.tsx consent_disabled notice gains the line+link
+   "Enable AI in Settings to use chat" -> /settings. Container rebuild/deploy NOT run (G0 STOP;
+   restart belongs to the live leg per the DATABASE line). Local build bundle hash changed
+   index-GQSnPT8t.js -> index-DgNLBrnK.js.
+8. Tests: new backend/tests/test_sg049_v2_extraction.py + contract hunks in
+   tests/test_extraction_contract.py + label hunk in test_sg048_name_optional.py + ChatPage.test.tsx
+   pointer test. PRE-change failing run captured (raw in SG-049_verify.log), POST green (49 passed
+   targeted; full suite 222 passed). 4 mutations each caught singly.
+9. Lint/build: ruff green; frontend eslint green, tsc+vite green; secret scan 0; no migration;
+   deps unchanged. Backend suite: only the 2 PRE-EXISTING test_signals failures remain (OCR/barcode
+   environment; base commit a969e18, test_signals.py unmodified by this slice).
+
+DEVIATION (disclosed, rated by the Architect): the PROMPT_FILES -> v2 hunk changes the recorded
+`prompt_template_version`, which two out-of-ceiling test files assert as a literal v1 string
+(tests/test_ai_pipeline.py x3, tests/test_phase2_e2e.py x2). I updated exactly those five literals
+to v2 (only the version strings) so the mandated green suite holds; this is more than the ceiling's
+named test files. I judged it covered in spirit by "plumbing test hunks" and report it loudly.
+
+PROCESS WARNING (out of slice scope): adding asset_type to GATED_FIELDS also gates the DETERMINISTIC
+asset_type="unknown" assertion to review_state="proposed". The default VALUE stays "unknown" as the
+packet requires, but the deterministic placeholder now enters human review. No in-scope test breaks
+(test_phase2_e2e asserts all GATED_FIELDS rows are proposed). Flagged for the Architect.

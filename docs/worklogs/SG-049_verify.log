@@ -1,0 +1,574 @@
+SG-049 verify log — raw transcripts (assembled mechanically from captured command output)
+work dir: /home/andrei/StorageGenie
+BASE (origin/automation at start): a969e188124c34d08aaeb3caccc5d2bd92410b32
+generated: 2026-09-16T20:48:20Z  (live clock, PG-IC-07)
+
+===== G0 — enablement gate, read-only FIRST =====
+$ curl -s http://localhost:8003/v1/settings/ai
+{"provider_id":"fake","model_id":"deepseek-v4-flash-vision-exp","allowed_model_ids":["deepseek-v4-flash-vision-exp"],"consent":false,"per_job_cap":null,"monthly_cap":null,"prompt_category":"food"}
+$ docker exec storagegenie-backend-1 python -c "from app.config import settings; print bool(key), len, consent, provider_id"
+opencode_api_key_present= True
+key_len= 67
+consent= False
+provider_id= fake
+$ docker exec storagegenie-backend-1 python -c "from app.services.providers.reader import ai_status; print(ai_status())"
+ai_status= (False, 'consent_disabled')
+$ curl -s http://localhost:8003/v1/health
+{"status":"ok","db":"ok","storage":"ok"}
+VERDICT: (a) consent=true? NO (consent=false). (b) key exists? YES (boolean only; 0 key bytes printed).
+         (c) ai_status enabled? NO ('consent_disabled'). => STOP-as-SUCCESS: offline proofs ship, live leg unrun.
+
+===== G4 v1 baseline — PRE-change (frozen v1 eval path) =====
+$ backend/venv/bin/python backend/eval/run.py
+fixture sg029-01-clean-food: score=1.000 needs=1 unknowns=1 items=1.00
+fixture sg029-02-clean-medicine: score=1.000 needs=1 unknowns=1 items=1.00
+fixture sg029-03-glare-food: score=0.000 needs=0 unknowns=0 items=0.00
+fixture sg029-04-clutter-food: score=1.000 needs=1 unknowns=1 items=1.00
+fixture sg029-05-partial-label-food: score=0.667 needs=1 unknowns=0 items=1.00
+fixture sg029-06-partial-label-medicine: score=1.000 needs=1 unknowns=1 items=1.00
+fixture sg029-07-no-date-visible-medicine: score=0.667 needs=1 unknowns=0 items=1.00
+fixture sg029-08-clean-cosmetics: score=1.000 needs=1 unknowns=1 items=1.00
+fixture sg029-09-no-date-visible-cosmetics: score=1.000 needs=1 unknowns=1 items=1.00
+fixture sg029-10-partial-label-cosmetics: score=1.000 needs=1 unknowns=1 items=1.00
+field_accuracy=0.833 over 10 fixtures
+unknown_rate=4/7=0.571
+correction_rate=0/6=0.000 (audit_event plugin.assertion.write rows=6)
+
+===== G4 v1 baseline — POST-change =====
+$ backend/venv/bin/python backend/eval/run.py
+fixture sg029-01-clean-food: score=1.000 needs=1 unknowns=1 items=1.00
+fixture sg029-02-clean-medicine: score=1.000 needs=1 unknowns=1 items=1.00
+fixture sg029-03-glare-food: score=0.000 needs=0 unknowns=0 items=0.00
+fixture sg029-04-clutter-food: score=1.000 needs=1 unknowns=1 items=1.00
+fixture sg029-05-partial-label-food: score=0.667 needs=1 unknowns=0 items=1.00
+fixture sg029-06-partial-label-medicine: score=1.000 needs=1 unknowns=1 items=1.00
+fixture sg029-07-no-date-visible-medicine: score=0.667 needs=1 unknowns=0 items=1.00
+fixture sg029-08-clean-cosmetics: score=1.000 needs=1 unknowns=1 items=1.00
+fixture sg029-09-no-date-visible-cosmetics: score=1.000 needs=1 unknowns=1 items=1.00
+fixture sg029-10-partial-label-cosmetics: score=1.000 needs=1 unknowns=1 items=1.00
+field_accuracy=0.833 over 10 fixtures
+unknown_rate=4/7=0.571
+correction_rate=0/6=0.000 (audit_event plugin.assertion.write rows=6)
+
+$ diff <pre> <post>
+[ok] Files are identical
+
+===== PG-EV-09 PRE-change failing run (raw) =====
+$ ./venv/bin/python -m pytest tests/test_sg049_v2_extraction.py tests/test_extraction_contract.py tests/test_sg048_name_optional.py -q
+
+==================================== ERRORS ====================================
+______________ ERROR collecting tests/test_sg049_v2_extraction.py ______________
+ImportError while importing test module '/home/andrei/StorageGenie/backend/tests/test_sg049_v2_extraction.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+/usr/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_sg049_v2_extraction.py:32: in <module>
+    from app.models.asset import UNTITLED_LABEL
+E   ImportError: cannot import name 'UNTITLED_LABEL' from 'app.models.asset' (/home/andrei/StorageGenie/backend/app/models/asset.py)
+=========================== short test summary info ============================
+ERROR tests/test_sg049_v2_extraction.py
+!!!!!!!!!!!!!!!!!!!! Interrupted: 1 error during collection !!!!!!!!!!!!!!!!!!!!
+1 error in 0.32s
+
+--- existing contract + sg048 (pre-change) ---
+........FFF..........F                                                   [100%]
+=================================== FAILURES ===================================
+_______ test_load_prompt_cosmetics_versioned_and_unknown_category_raises _______
+
+    def test_load_prompt_cosmetics_versioned_and_unknown_category_raises() -> None:
+        text, version = load_prompt("cosmetics")
+>       assert version == "extract-cosmetics-v2"
+E       AssertionError: assert 'extract-cosmetics-v1' == 'extract-cosmetics-v2'
+E         
+E         - extract-cosmetics-v2
+E         ?                    ^
+E         + extract-cosmetics-v1
+E         ?                    ^
+
+tests/test_extraction_contract.py:303: AssertionError
+_______________ test_v2_new_fields_parse_and_invalid_shapes_fail _______________
+
+    def test_v2_new_fields_parse_and_invalid_shapes_fail() -> None:
+        """SG-049 G1: quantity/unit/asset_type parse; every invalid shape fails."""
+        base = {
+            "items": [
+                {
+                    "name": "Milk",
+                    "quantity": 2,
+                    "unit": "bottles",
+                    "asset_type": "beverage",
+                    "confidence": 1.0,
+                    "uncertainty_reasons": [],
+                }
+            ],
+            "unknowns": [],
+            "needs_evidence": False,
+        }
+>       out = parse_extraction_output(base)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_extraction_contract.py:326: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+raw = {'items': [{'name': 'Milk', 'quantity': 2, 'unit': 'bottles', 'asset_type': 'beverage', ...}], 'unknowns': [], 'needs_evidence': False}
+
+    def parse_extraction_output(raw: Any) -> ExtractionOutput:
+        """Strictly parse a raw provider payload.
+    
+        Dicts validate directly. Strings must be JSON objects; anything else —
+        prose, wrong types, non-object JSON — fails as a pydantic ValidationError
+        (unparsable strings are validated against a bogus key so the single
+        exception type is preserved and no prose is ever parsed).
+        """
+        if isinstance(raw, dict):
+            data = raw
+        elif isinstance(raw, str):
+            try:
+                decoded = json.loads(raw)
+            except json.JSONDecodeError:
+                decoded = {"prose": raw}
+            data = decoded if isinstance(decoded, dict) else {"prose": raw}
+        else:
+            data = {"prose": raw}
+>       return ExtractionOutput.model_validate(data)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       pydantic_core._pydantic_core.ValidationError: 3 validation errors for ExtractionOutput
+E       items.0.quantity
+E         Extra inputs are not permitted [type=extra_forbidden, input_value=2, input_type=int]
+E           For further information visit https://errors.pydantic.dev/2.13/v/extra_forbidden
+E       items.0.unit
+E         Extra inputs are not permitted [type=extra_forbidden, input_value='bottles', input_type=str]
+E           For further information visit https://errors.pydantic.dev/2.13/v/extra_forbidden
+E       items.0.asset_type
+E         Extra inputs are not permitted [type=extra_forbidden, input_value='beverage', input_type=str]
+E           For further information visit https://errors.pydantic.dev/2.13/v/extra_forbidden
+
+app/services/providers/schemas.py:111: ValidationError
+_______________ test_v2_unknowns_entry_rules_hold_for_new_paths ________________
+
+    def test_v2_unknowns_entry_rules_hold_for_new_paths() -> None:
+        honest = {
+            "items": [
+                {
+                    "name": "Tablets",
+                    "quantity": None,
+                    "unit": None,
+                    "asset_type": None,
+                    "confidence": 0.6,
+                    "uncertainty_reasons": ["torn label"],
+                }
+            ],
+            "unknowns": ["items.0.quantity", "items.0.unit", "items.0.asset_type"],
+            "needs_evidence": False,
+        }
+>       assert set(parse_extraction_output(honest).unknowns) == {
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+            "items.0.quantity",
+            "items.0.unit",
+            "items.0.asset_type",
+        }
+
+tests/test_extraction_contract.py:364: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+raw = {'items': [{'name': 'Tablets', 'quantity': None, 'unit': None, 'asset_type': None, ...}], 'unknowns': ['items.0.quantity', 'items.0.unit', 'items.0.asset_type'], 'needs_evidence': False}
+
+    def parse_extraction_output(raw: Any) -> ExtractionOutput:
+        """Strictly parse a raw provider payload.
+    
+        Dicts validate directly. Strings must be JSON objects; anything else —
+        prose, wrong types, non-object JSON — fails as a pydantic ValidationError
+        (unparsable strings are validated against a bogus key so the single
+        exception type is preserved and no prose is ever parsed).
+        """
+        if isinstance(raw, dict):
+            data = raw
+        elif isinstance(raw, str):
+            try:
+                decoded = json.loads(raw)
+            except json.JSONDecodeError:
+                decoded = {"prose": raw}
+            data = decoded if isinstance(decoded, dict) else {"prose": raw}
+        else:
+            data = {"prose": raw}
+>       return ExtractionOutput.model_validate(data)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       pydantic_core._pydantic_core.ValidationError: 3 validation errors for ExtractionOutput
+E       items.0.quantity
+E         Extra inputs are not permitted [type=extra_forbidden, input_value=None, input_type=NoneType]
+E           For further information visit https://errors.pydantic.dev/2.13/v/extra_forbidden
+E       items.0.unit
+E         Extra inputs are not permitted [type=extra_forbidden, input_value=None, input_type=NoneType]
+E           For further information visit https://errors.pydantic.dev/2.13/v/extra_forbidden
+E       items.0.asset_type
+E         Extra inputs are not permitted [type=extra_forbidden, input_value=None, input_type=NoneType]
+E           For further information visit https://errors.pydantic.dev/2.13/v/extra_forbidden
+
+app/services/providers/schemas.py:111: ValidationError
+___________________ test_catalog_builders_tolerate_null_name ___________________
+
+asset_db = (<sqlalchemy.orm.session.Session object at 0x77ee37e5a6f0>, '01a0abf7-fa3c-7352-8be7-25ca526d8ec2')
+
+    def test_catalog_builders_tolerate_null_name(asset_db) -> None:  # type: ignore[no-untyped-def]
+        from app.services.chat.service import CLASSIFICATION_FIELD as CHAT_FIELD
+        from app.services.chat.service import build_catalog as build_chat_catalog
+        from app.services.planning.service import CLASSIFICATION_FIELD as PLANNING_FIELD
+        from app.services.planning.service import build_catalog as build_planning_catalog
+    
+        session, household_id = asset_db
+        nameless = create_asset(
+            session, household_id, {"display_name": None, "status": "ACTIVE"}
+        )
+        session.add(
+            Assertion(
+                asset_id=nameless.id,
+                field_path=CHAT_FIELD,
+                value_json=json.dumps({"category": "food_beverages"}),
+                source_type="user",
+                review_state="accepted",
+            )
+        )
+        session.add(
+            Assertion(
+                asset_id=nameless.id,
+                field_path=PLANNING_FIELD,
+                value_json=json.dumps({"category": "food_beverages"}),
+                source_type="user",
+                review_state="accepted",
+            )
+        )
+        session.commit()
+    
+>       from app.models.asset import UNTITLED_LABEL
+E       ImportError: cannot import name 'UNTITLED_LABEL' from 'app.models.asset' (/home/andrei/StorageGenie/backend/app/models/asset.py)
+
+tests/test_sg048_name_optional.py:305: ImportError
+=============================== warnings summary ===============================
+tests/test_sg048_name_optional.py::test_sg048_migration_round_trip_restores_nullability
+tests/test_sg048_name_optional.py::test_sg048_migration_round_trip_restores_nullability
+tests/test_sg048_name_optional.py::test_sg048_migration_round_trip_restores_nullability
+tests/test_sg048_name_optional.py::test_sg048_nameless_row_survives_upgrade_and_blocks_downgrade
+tests/test_sg048_name_optional.py::test_sg048_nameless_row_survives_upgrade_and_blocks_downgrade
+tests/test_sg048_name_optional.py::test_nameless_create_through_full_migration_chain
+  /home/andrei/StorageGenie/backend/venv/lib/python3.12/site-packages/alembic/config.py:604: DeprecationWarning: No path_separator found in configuration; falling back to legacy splitting on spaces, commas, and colons for prepend_sys_path.  Consider adding path_separator=os to Alembic config.
+    util.warn_deprecated(
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/test_extraction_contract.py::test_load_prompt_cosmetics_versioned_and_unknown_category_raises
+FAILED tests/test_extraction_contract.py::test_v2_new_fields_parse_and_invalid_shapes_fail
+FAILED tests/test_extraction_contract.py::test_v2_unknowns_entry_rules_hold_for_new_paths
+FAILED tests/test_sg048_name_optional.py::test_catalog_builders_tolerate_null_name
+4 failed, 18 passed, 6 warnings in 1.17s
+
+--- consumer version asserts (pre-change) ---
+FF                                                                       [100%]
+=================================== FAILURES ===================================
+_____________ test_provider_call_ledger_row_per_call_with_job_link _____________
+
+ai_env = (<sqlalchemy.orm.session.Session object at 0x7452fb8c2870>, '01a0abf8-006c-7a63-9567-b7ac31585779', '01a0abf8-006e-7351-98ea-5171ffc4a87b')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7452fb9096d0>
+
+    def test_provider_call_ledger_row_per_call_with_job_link(ai_env, monkeypatch: pytest.MonkeyPatch) -> None:  # type: ignore[no-untyped-def]
+        session, household_id, evidence_id = ai_env
+        provider = _enable(monkeypatch, _payload([_valid_item()]))
+        job = _run(session, household_id, evidence_id)
+    
+        rows = session.query(ProviderCall).filter_by(job_id=job.id).all()
+        assert len(rows) == 1
+        row = rows[0]
+        assert row.provider == "scripted"
+        assert row.model == "scripted-model-1"
+>       assert row.prompt_template_version == "extract-food-v2"
+E       AssertionError: assert 'extract-food-v1' == 'extract-food-v2'
+E         
+E         - extract-food-v2
+E         ?               ^
+E         + extract-food-v1
+E         ?               ^
+
+tests/test_ai_pipeline.py:480: AssertionError
+___________ test_ai_proposes_expiry_candidates_for_food_and_medicine ___________
+
+phase2_fixture = (<sqlalchemy.orm.session.Session object at 0x7452fb8e7a10>, '01a0abf8-00fe-7f41-a256-5de4fa78b8d9', [])
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7452fb924890>
+
+    def test_ai_proposes_expiry_candidates_for_food_and_medicine(phase2_fixture, monkeypatch: pytest.MonkeyPatch) -> None:  # type: ignore[no-untyped-def]
+        session, household_id, network = phase2_fixture
+        provider = ScriptedPhase2Provider([_food_output(), _medicine_output()])
+        with TestClient(app) as client:
+            food_evidence = _upload(client, household_id, "phase2-food.png", _png("green"))
+            _enable(monkeypatch, provider, category="food")
+            food_job = _run_import(client, household_id, [str(food_evidence["id"])], "phase2-food")
+            food_candidate = _candidate(session, _candidate_id(food_job))
+            food_proposal = json.loads(food_candidate.proposed_fields_json)
+            assert food_proposal["ai_items"][0]["name"] == "Whole Milk"  # type: ignore[index]
+            food_expiry = food_proposal["fields"]["expiry_date"]  # type: ignore[index]
+            assert food_expiry["value"] == "2030-01-15"
+            assert food_expiry["source_type"] == "extraction"
+            assert food_expiry["provider"] == provider.provider_id
+            assert food_expiry["model"] == provider.model_id
+>           assert food_expiry["prompt_template_version"] == "extract-food-v2"
+E           AssertionError: assert 'extract-food-v1' == 'extract-food-v2'
+E             
+E             - extract-food-v2
+E             ?               ^
+E             + extract-food-v1
+E             ?               ^
+
+tests/test_phase2_e2e.py:254: AssertionError
+------------------------------ Captured log call -------------------------------
+WARNING  app.services.signals:signals.py:104 Barcode extraction unavailable: pyzbar/libzbar is not installed
+WARNING  app.services.signals:signals.py:215 OCR extraction unavailable: tesseract is not installed or it's not in your PATH. See README file for more information.
+=============================== warnings summary ===============================
+venv/lib/python3.12/site-packages/fastapi/testclient.py:1
+  /home/andrei/StorageGenie/backend/venv/lib/python3.12/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+venv/lib/python3.12/site-packages/starlette/testclient.py:53
+  /home/andrei/StorageGenie/backend/venv/lib/python3.12/site-packages/starlette/testclient.py:53: DeprecationWarning: The anyio.abc.BlockingPortal alias is deprecated, use anyio.from_thread.BlockingPortal instead.
+    _PortalFactoryType = Callable[[], AbstractContextManager[anyio.abc.BlockingPortal]]
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/test_ai_pipeline.py::test_provider_call_ledger_row_per_call_with_job_link
+FAILED tests/test_phase2_e2e.py::test_ai_proposes_expiry_candidates_for_food_and_medicine
+2 failed, 2 warnings in 0.91s
+
+===== PG-EV-09 POST-change green run (targeted) =====
+(see SG-049.log for the exact command and 49 passed line)
+
+===== PG-EV-09 mutations caught singly (raw) =====
+--- A: schemas.py quantity validator neutralised ---
+FFFF.                                                                    [100%]
+=================================== FAILURES ===================================
+____________________ test_v2_invalid_quantity_rejected[-1] _____________________
+
+bad = -1
+
+    @pytest.mark.parametrize("bad", [-1, -0.5, float("nan"), float("inf"), "two"])
+    def test_v2_invalid_quantity_rejected(bad: object) -> None:
+>       with pytest.raises(ValidationError):
+E       Failed: DID NOT RAISE ValidationError
+
+tests/test_sg049_v2_extraction.py:87: Failed
+___________________ test_v2_invalid_quantity_rejected[-0.5] ____________________
+
+bad = -0.5
+
+    @pytest.mark.parametrize("bad", [-1, -0.5, float("nan"), float("inf"), "two"])
+    def test_v2_invalid_quantity_rejected(bad: object) -> None:
+>       with pytest.raises(ValidationError):
+E       Failed: DID NOT RAISE ValidationError
+
+tests/test_sg049_v2_extraction.py:87: Failed
+____________________ test_v2_invalid_quantity_rejected[nan] ____________________
+
+bad = nan
+
+    @pytest.mark.parametrize("bad", [-1, -0.5, float("nan"), float("inf"), "two"])
+    def test_v2_invalid_quantity_rejected(bad: object) -> None:
+>       with pytest.raises(ValidationError):
+E       Failed: DID NOT RAISE ValidationError
+
+tests/test_sg049_v2_extraction.py:87: Failed
+____________________ test_v2_invalid_quantity_rejected[inf] ____________________
+
+bad = inf
+
+    @pytest.mark.parametrize("bad", [-1, -0.5, float("nan"), float("inf"), "two"])
+    def test_v2_invalid_quantity_rejected(bad: object) -> None:
+>       with pytest.raises(ValidationError):
+E       Failed: DID NOT RAISE ValidationError
+
+tests/test_sg049_v2_extraction.py:87: Failed
+=========================== short test summary info ============================
+FAILED tests/test_sg049_v2_extraction.py::test_v2_invalid_quantity_rejected[-1]
+FAILED tests/test_sg049_v2_extraction.py::test_v2_invalid_quantity_rejected[-0.5]
+FAILED tests/test_sg049_v2_extraction.py::test_v2_invalid_quantity_rejected[nan]
+FAILED tests/test_sg049_v2_extraction.py::test_v2_invalid_quantity_rejected[inf]
+4 failed, 1 passed in 0.33s
+--- B: candidates.py GATED_FIELDS membership removed ---
+F                                                                        [100%]
+=================================== FAILURES ===================================
+___________ test_extraction_new_fields_always_proposed_and_committed ___________
+
+tmp_path = PosixPath('/tmp/pytest-of-andrei/pytest-7/test_extraction_new_fields_alw0')
+
+    def test_extraction_new_fields_always_proposed_and_committed(tmp_path: Path) -> None:
+        session, household_id = _scratch_db(tmp_path, "plumbing.db")
+        try:
+            job = _job(session, household_id)
+            extraction = parse_extraction_output(_payload(_valid_item()))
+            candidate = build_candidate_from_extraction(
+                session,
+                job,
+                extraction,
+                {
+                    "provider": "scripted",
+                    "model": "scripted-model-1",
+                    "prompt_template_version": "extract-food-v2",
+                    "provider_call_ids": ["call-1"],
+                },
+            )
+            proposal = json.loads(candidate.proposed_fields_json)
+            for field in NEW_FIELDS:
+                envelope = proposal["fields"][field]
+                assert envelope["source_type"] == "extraction"
+                assert envelope["provider_call_id"] == "call-1"
+                assert envelope["prompt_template_version"] == "extract-food-v2"
+            assert proposal["fields"]["quantity"]["value"] == 2.0
+            assert proposal["fields"]["unit"]["value"] == "bottles"
+            assert proposal["fields"]["asset_type"]["value"] == "beverage"
+            for field in NEW_FIELDS:
+>               assert field in GATED_FIELDS, f"{field} must be gated"
+E               AssertionError: quantity must be gated
+E               assert 'quantity' in frozenset({'', 'condition', 'expiry', 'expiry_date', 'identifier', 'lot', ...})
+
+tests/test_sg049_v2_extraction.py:218: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_sg049_v2_extraction.py::test_extraction_new_fields_always_proposed_and_committed
+1 failed in 0.40s
+--- C: chat/service.py label fallback removed ---
+F                                                                        [100%]
+=================================== FAILURES ===================================
+______________ test_nameless_labels_fall_back_in_both_ai_catalogs ______________
+
+tmp_path = PosixPath('/tmp/pytest-of-andrei/pytest-8/test_nameless_labels_fall_back0')
+
+    def test_nameless_labels_fall_back_in_both_ai_catalogs(tmp_path: Path) -> None:
+        """F-SG048-2: the shared constant is read by BOTH catalog builders."""
+        session, household_id = _scratch_db(tmp_path, "labels.db")
+        try:
+            from app.models import Asset
+    
+            asset = Asset(
+                household_id=household_id,
+                display_name=None,
+                asset_type="unknown",
+                status="ACTIVE",
+            )
+            session.add(asset)
+            session.flush()
+            for field_path in (CHAT_FIELD, PLANNING_FIELD):
+                session.add(
+                    Assertion(
+                        asset_id=asset.id,
+                        field_path=field_path,
+                        value_json=json.dumps({"category": "food_beverages"}),
+                        source_type="user",
+                        review_state="accepted",
+                    )
+                )
+            session.commit()
+    
+            planning = build_planning_catalog(session, household_id)
+            planning_entry = next(item for item in planning if item["id"] == asset.id)
+            assert planning_entry["label"] == UNTITLED_LABEL
+    
+            chat = build_chat_catalog(session, household_id, "food")
+            chat_entry = next(item for item in chat if item["id"] == asset.id)
+>           assert chat_entry["label"] == UNTITLED_LABEL
+E           AssertionError: assert None == 'Untitled'
+
+tests/test_sg049_v2_extraction.py:294: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_sg049_v2_extraction.py::test_nameless_labels_fall_back_in_both_ai_catalogs
+1 failed in 0.44s
+--- D: reader.py PROMPT_FILES reverted to v1 ---
+F..                                                                      [100%]
+=================================== FAILURES ===================================
+_________ test_configured_prompts_are_v2_and_ask_for_new_fields[food] __________
+
+category = 'food'
+
+    @pytest.mark.parametrize("category", ["food", "medicine", "cosmetics"])
+    def test_configured_prompts_are_v2_and_ask_for_new_fields(category: str) -> None:
+        text, version = reader.load_prompt(category)
+>       assert version == f"extract-{category}-v2"
+E       AssertionError: assert 'extract-food-v1' == 'extract-food-v2'
+E         
+E         - extract-food-v2
+E         ?               ^
+E         + extract-food-v1
+E         ?               ^
+
+tests/test_sg049_v2_extraction.py:137: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_sg049_v2_extraction.py::test_configured_prompts_are_v2_and_ask_for_new_fields[food]
+1 failed, 2 passed in 0.34s
+
+===== Full backend suite (final, post-change) =====
+........................................................................ [ 32%]
+........................................................................ [ 64%]
+........................................................................ [ 96%]
+.FF.....                                                                 [100%]
+=================================== FAILURES ===================================
+___ test_generated_codes_are_validated_and_bad_checksum_is_not_an_identifier ___
+
+isolated_db = (<sqlalchemy.orm.session.Session object at 0x7d96e1fa9670>, '01a0abf9-dd84-7770-b3e3-80e043bd2766', PosixPath('/tmp/pytest-of-andrei/pytest-10/test_generated_codes_are_valid0/storage'))
+
+    def test_generated_codes_are_validated_and_bad_checksum_is_not_an_identifier(isolated_db) -> None:  # type: ignore[no-untyped-def]
+        session, household_id, root = isolated_db
+        qr_value = "https://example.test/SG-013"
+        qr_image = qrcode.make(qr_value).convert("RGB")
+        qr = _evidence(session, household_id, root, _png(qr_image), "qr.png", "image/png")
+        ean_image, ean_value = _ean13_image("590123412345")
+        ean = _evidence(session, household_id, root, _png(ean_image), "ean.png", "image/png")
+        # Deliberately render a syntactically valid EAN with the wrong check digit.
+        bad_value = ean_value[:-1] + ("0" if ean_value[-1] != "0" else "1")
+        bad_image, _ = _ean13_image(ean_value[:-1], bad_value[-1])
+        bad = _evidence(session, household_id, root, _png(bad_image), "bad.png", "image/png")
+    
+        qr_rows = signals.extract_observations(qr.id, session)
+        ean_rows = signals.extract_observations(ean.id, session)
+        bad_rows = signals.extract_observations(bad.id, session)
+    
+        qr_values = [json.loads(row.value_json) for row in qr_rows if row.kind == "barcode_qr"]
+        ean_values = [json.loads(row.value_json) for row in ean_rows if row.kind == "barcode_qr"]
+        bad_values = [json.loads(row.value_json) for row in bad_rows if row.kind == "barcode_qr"]
+>       assert any(item.get("value") == qr_value and item["validated"] for item in qr_values)
+E       assert False
+E        +  where False = any(<generator object test_generated_codes_are_validated_and_bad_checksum_is_not_an_identifier.<locals>.<genexpr> at 0x7d96e22fa500>)
+
+tests/test_signals.py:136: AssertionError
+_________________ test_ocr_has_text_boxes_and_mean_confidence __________________
+
+isolated_db = (<sqlalchemy.orm.session.Session object at 0x7d96e1fa8860>, '01a0abf9-ddff-7bc3-ae0a-7b921f451eb6', PosixPath('/tmp/pytest-of-andrei/pytest-10/test_ocr_has_text_boxes_and_me0/storage'))
+
+    def test_ocr_has_text_boxes_and_mean_confidence(isolated_db) -> None:  # type: ignore[no-untyped-def]
+        session, household_id, root = isolated_db
+        evidence = _evidence(session, household_id, root, _png(_text_image()), "text.png", "image/png")
+        rows = signals.extract_observations(evidence.id, session)
+        ocr = [json.loads(row.value_json) for row in rows if row.kind == "ocr"]
+>       assert ocr
+E       assert []
+
+tests/test_signals.py:148: AssertionError
+=============================== warnings summary ===============================
+venv/lib/python3.12/site-packages/fastapi/testclient.py:1
+  /home/andrei/StorageGenie/backend/venv/lib/python3.12/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+venv/lib/python3.12/site-packages/starlette/testclient.py:53
+  /home/andrei/StorageGenie/backend/venv/lib/python3.12/site-packages/starlette/testclient.py:53: DeprecationWarning: The anyio.abc.BlockingPortal alias is deprecated, use anyio.from_thread.BlockingPortal instead.
+    _PortalFactoryType = Callable[[], AbstractContextManager[anyio.abc.BlockingPortal]]
+
+tests/test_candidates.py: 3 warnings
+tests/test_foundations.py: 3 warnings
+tests/test_search.py: 3 warnings
+tests/test_sg048_name_optional.py: 6 warnings
+tests/test_signals.py: 3 warnings
+  /home/andrei/StorageGenie/backend/venv/lib/python3.12/site-packages/alembic/config.py:604: DeprecationWarning: No path_separator found in configuration; falling back to legacy splitting on spaces, commas, and colons for prepend_sys_path.  Consider adding path_separator=os to Alembic config.
+    util.warn_deprecated(
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/test_signals.py::test_generated_codes_are_validated_and_bad_checksum_is_not_an_identifier
+FAILED tests/test_signals.py::test_ocr_has_text_boxes_and_mean_confidence - a...
+2 failed, 222 passed, 20 warnings in 14.06s
+
+===== G5 — live metered leg: UNRUN =====
+No provider call was made. G0 STOP condition (consent=false). Zero live images, zero calls, zero ledger rows, real spend = $0.000000.

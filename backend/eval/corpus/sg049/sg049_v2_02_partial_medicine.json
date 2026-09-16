@@ -1,0 +1,37 @@
+{
+  "id": "sg049-v2-02-partial-medicine",
+  "class": "partial-label",
+  "category": "medicine",
+  "note": "SG-049 v2 scoring fixture, authored offline (no live call). Count region torn: quantity must arrive null WITH an unknowns entry, never guessed.",
+  "ground_truth": {
+    "items": [
+      {
+        "name": "Tablets",
+        "expiry_date": "2029-11-30",
+        "quantity": null,
+        "unit": "tablets",
+        "asset_type": "medicine"
+      }
+    ],
+    "unknowns": ["items.0.quantity"],
+    "needs_evidence": false,
+    "expectation_class": "unknown-expected"
+  },
+  "provider_output": {
+    "items": [
+      {
+        "name": "TABLETS",
+        "expiry_date": "2029-11-30",
+        "date_type": "expiry_date",
+        "lot": null,
+        "quantity": null,
+        "unit": "tablets",
+        "asset_type": "medicine",
+        "confidence": 0.7,
+        "uncertainty_reasons": ["torn label: count region illegible"]
+      }
+    ],
+    "unknowns": ["items.0.quantity"],
+    "needs_evidence": false
+  }
+}

@@ -203,7 +203,7 @@ def test_low_risk_auto_accept_at_or_above_threshold(ai_env, monkeypatch: pytest.
     envelope = json.loads(display.model_json or "{}")
     assert envelope["provider"] == "scripted"
     assert envelope["model"] == "scripted-model-1"
-    assert envelope["prompt_template_version"] == "extract-food-v1"
+    assert envelope["prompt_template_version"] == "extract-food-v2"
     assert envelope["provider_call_id"]
     assert envelope["evidence_ids"] == [evidence_id]
 
@@ -477,7 +477,7 @@ def test_provider_call_ledger_row_per_call_with_job_link(ai_env, monkeypatch: py
     row = rows[0]
     assert row.provider == "scripted"
     assert row.model == "scripted-model-1"
-    assert row.prompt_template_version == "extract-food-v1"
+    assert row.prompt_template_version == "extract-food-v2"
     assert row.input_hashes and json.loads(row.input_hashes)["image_sha256"]
     assert row.output_payload is not None
     assert row.cost == 0.0
@@ -490,7 +490,7 @@ def test_provider_call_ledger_row_per_call_with_job_link(ai_env, monkeypatch: py
     from app.services.providers import reader as reader_mod
 
     prompt_text, prompt_version = reader_mod.load_prompt("food")
-    assert prompt_version == "extract-food-v1"
+    assert prompt_version == "extract-food-v2"
     assert provider.prompts == [prompt_text]
     assert provider.images[0][:8] == b"\x89PNG\r\n\x1a\n"
     assert dict(Image.open(io.BytesIO(provider.images[0])).getexif()) == {}

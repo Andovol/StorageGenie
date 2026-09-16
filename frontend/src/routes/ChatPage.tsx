@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useMutation } from "@tanstack/react-query";
+import { Link } from "react-router-dom";
 import { logChatCorrection, sendChat } from "../api/client";
 import type { ChatMessage, ChatResponse, Household } from "../api/types";
 import { ChatTranscript } from "../components/ChatTranscript";
@@ -20,6 +21,7 @@ export function ChatPage() {
   const [correction, setCorrection] = useState("");
   const [transcript, setTranscript] = useState<ChatMessage[]>([]);
   const [notice, setNotice] = useState("");
+  const [aiDisabled, setAiDisabled] = useState(false);
   const effectiveHousehold = householdId || households?.[0]?.id || "";
 
   useEffect(() => {
@@ -34,6 +36,7 @@ export function ChatPage() {
     onSuccess: (result: ChatResponse) => {
       if (result.status === "skipped") {
         setNotice(`Chat did not run: ${result.reason ?? "skipped"}`);
+        setAiDisabled(result.reason === "consent_disabled");
         setTranscript((messages) => [
           ...messages,
           { role: "user", text: input },
@@ -41,7 +44,9 @@ export function ChatPage() {
         ]);
       } else if (result.status !== "ok") {
         setNotice(`Chat failed: ${result.reason ?? result.status}`);
+        setAiDisabled(false);
       } else {
+        setAiDisabled(false);
         setNotice(
           result.empty_catalogue ? "No catalogue data for this category yet." : ""
         );
@@ -111,6 +116,11 @@ export function ChatPage() {
       {notice && (
         <div role="alert" style={{ marginTop: 12, color: "#374151" }}>
           {notice}
+          {aiDisabled && (
+            <div style={{ marginTop: 4 }}>
+              <Link to="/settings">Enable AI in Settings to use chat</Link>
+            </div>
+          )}
         </div>
       )}
 

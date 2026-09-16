@@ -302,8 +302,10 @@ def test_catalog_builders_tolerate_null_name(asset_db) -> None:  # type: ignore[
     )
     session.commit()
 
+    from app.models.asset import UNTITLED_LABEL
+
     planning = build_planning_catalog(session, household_id)
-    assert planning and planning[0]["label"] is None
+    assert planning and planning[0]["label"] == UNTITLED_LABEL
 
     chat = build_chat_catalog(session, household_id, "food")
-    assert chat and chat[0]["label"] is None
+    assert chat and chat[0]["label"] == UNTITLED_LABEL

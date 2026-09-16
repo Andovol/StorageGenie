@@ -49,9 +49,9 @@ from app.storage.local_store import storage_path
 
 PROMPTS_DIR = Path(__file__).resolve().parent / "prompts"
 PROMPT_FILES = {
-    "food": "extract-food-v1.md",
-    "medicine": "extract-medicine-v1.md",
-    "cosmetics": "extract-cosmetics-v1.md",
+    "food": "extract-food-v2.md",
+    "medicine": "extract-medicine-v2.md",
+    "cosmetics": "extract-cosmetics-v2.md",
 }
 RETRYABLE_ERRORS = frozenset(
     {"outage", "timeout", "rate_limited", "transport", "http_status", "invalid_json"}

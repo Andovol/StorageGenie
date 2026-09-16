@@ -1,6 +1,7 @@
 import { afterEach, describe, expect, test, vi } from "vitest";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { MemoryRouter } from "react-router-dom";
 import { ChatPage } from "./ChatPage";
 
 const household = { id: "hh-chat", name: "Chat home", created_at: "2026-01-01" };
@@ -15,7 +16,9 @@ vi.mock("../hooks/useAssets", () => ({ useHouseholds: () => ({ data: [household]
 function renderPage() {
   return render(
     <QueryClientProvider client={new QueryClient({ defaultOptions: { queries: { retry: false } } })}>
-      <ChatPage />
+      <MemoryRouter>
+        <ChatPage />
+      </MemoryRouter>
     </QueryClientProvider>
   );
 }
@@ -106,6 +109,42 @@ describe("ChatPage", () => {
     expect(await screen.findByRole("alert")).toHaveTextContent(
       "Chat did not run: consent_disabled"
     );
+  });
+
+  test("the disabled state links to Settings; the enabled path does not", async () => {
+    api.sendChat.mockResolvedValue({
+      status: "skipped",
+      reason: "consent_disabled",
+      answer: null,
+      grounded: false,
+      empty_catalogue: false,
+      category: "food",
+      catalogue_size: 1,
+    });
+    const { unmount } = renderPage();
+
+    fireEvent.change(screen.getByLabelText("Question"), { target: { value: "Hello?" } });
+    fireEvent.click(screen.getByRole("button", { name: "Send" }));
+
+    const link = await screen.findByRole("link", { name: "Enable AI in Settings to use chat" });
+    expect(link.getAttribute("href") || "").toContain("/settings");
+    unmount();
+
+    api.sendChat.mockResolvedValue({
+      status: "ok",
+      answer: "Whole milk expires on 2026-09-16.",
+      grounded: true,
+      empty_catalogue: false,
+      category: "food",
+      catalogue_size: 1,
+    });
+    renderPage();
+    fireEvent.change(screen.getByLabelText("Question"), { target: { value: "When?" } });
+    fireEvent.click(screen.getByRole("button", { name: "Send" }));
+    await screen.findByText("Whole milk expires on 2026-09-16.");
+    expect(
+      screen.queryByRole("link", { name: "Enable AI in Settings to use chat" })
+    ).not.toBeInTheDocument();
   });
 
   test("an unsupported category error surfaces", async () => {

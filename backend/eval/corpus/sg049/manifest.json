@@ -1,0 +1,11 @@
+{
+  "corpus": "sg049",
+  "description": "SG-049 extraction-v2 (quantity/unit/asset_type) SCORING-ONLY fixtures. These carry v2 ground truth plus an offline-authored provider_output reference (no live call: G0 found SG_CONSENT=false, so the metered leg is unrun under the STOP-as-SUCCESS path). No images and no metered provider_calls: the fixtures exist so the new-field scorer and the unknowns-honesty property are measured against authored v2 truth, never against the frozen SG-029 v1 cache.",
+  "base_dir": "sg049",
+  "count": 3,
+  "fixtures": [
+    "sg049_v2_01_clean_food.json",
+    "sg049_v2_02_partial_medicine.json",
+    "sg049_v2_03_clean_cosmetics.json"
+  ]
+}
