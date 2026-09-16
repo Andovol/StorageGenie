@@ -1,5 +1,6 @@
 import { useState, type CSSProperties } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { Package } from "lucide-react";
 import type { Density } from "../shell/CatalogToolbar";
 import { ProductCard, cardMedia, statusBadgeClass, STATUS_LABEL, type CatalogProduct } from "./ProductCard";
 import { ProductCardSkeleton } from "./ProductCardSkeleton";
@@ -91,7 +92,14 @@ function TableThumb({ item, householdId }: { item: CatalogProduct; householdId: 
           style={{ width: "100%", height: "100%", objectFit: "contain" }}
           onError={() => setBroken(true)}
         />
-      ) : null}
+      ) : (
+        <Package
+          data-testid="product-fallback-icon"
+          aria-hidden="true"
+          size={20}
+          className="text-muted-foreground"
+        />
+      )}
     </span>
   );
 }
@@ -110,135 +118,142 @@ function TableView({
     onSelect ? onSelect(item.id) : navigate(`/assets/${item.id}?household_id=${householdId}`);
 
   return (
-    <table role="table" aria-label="Product results" style={{ width: "100%", borderCollapse: "collapse" }}>
-      <colgroup>
-        {COLUMNS.map((column) => (
-          <col key={column.label} style={{ width: column.width, minWidth: column.width }} />
-        ))}
-      </colgroup>
-      <thead>
-        <tr className="border-border" style={{ borderBottomStyle: "solid", borderBottomWidth: 1 }}>
+    <div
+      data-testid="table-scroll"
+      role="region"
+      aria-label="Product results table"
+      style={{ overflowX: "auto" }}
+    >
+      <table role="table" aria-label="Product results" style={{ width: "100%", borderCollapse: "collapse" }}>
+        <colgroup>
           {COLUMNS.map((column) => (
-            <th
-              key={column.label}
-              scope="col"
-              className="text-muted-foreground"
-              style={{
-                textAlign: column.align ?? "left",
-                fontSize: 11,
-                fontWeight: 600,
-                padding: "8px 10px",
-                whiteSpace: "nowrap",
-              }}
-            >
-              {column.label}
-            </th>
+            <col key={column.label} style={{ width: column.width, minWidth: column.width }} />
           ))}
-        </tr>
-      </thead>
-      <tbody>
-        {items.map((item) => {
-          const specs = item.metadata.dimensions ?? item.metadata.material ?? "—";
-          return (
-            <tr
-              key={item.id}
-              data-testid="product-row"
-              role="link"
-              tabIndex={0}
-              aria-label={`Open ${item.name}`}
-              onClick={() => openDetail(item)}
-              onKeyDown={(event) => {
-                if (event.key === "Enter") openDetail(item);
-              }}
-              className="border-border focus-ring"
-              style={{ borderBottomStyle: "solid", borderBottomWidth: 1, cursor: "pointer" }}
-            >
-              <td style={{ padding: "8px 10px", textAlign: "center" }}>
-                <TableThumb item={item} householdId={householdId} />
-              </td>
-              <td style={{ padding: "8px 10px", maxWidth: 200 }}>
-                <span
-                  style={{
-                    display: "inline-block",
-                    maxWidth: 200,
-                    overflow: "hidden",
-                    textOverflow: "ellipsis",
-                    whiteSpace: "nowrap",
-                    verticalAlign: "middle",
-                  }}
-                >
-                  {item.name}
-                </span>
-              </td>
-              <td style={{ padding: "8px 10px" }}>
-                <span
-                  className="bg-card-muted text-muted-foreground font-mono"
-                  style={{ fontSize: 11, padding: "2px 6px", borderRadius: 4, whiteSpace: "nowrap" }}
-                >
-                  {item.category}
-                </span>
-              </td>
-              <td style={{ padding: "8px 10px" }}>
-                <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
+        </colgroup>
+        <thead>
+          <tr className="border-border" style={{ borderBottomStyle: "solid", borderBottomWidth: 1 }}>
+            {COLUMNS.map((column) => (
+              <th
+                key={column.label}
+                scope="col"
+                className="text-muted-foreground"
+                style={{
+                  textAlign: column.align ?? "left",
+                  fontSize: 11,
+                  fontWeight: 600,
+                  padding: "8px 10px",
+                  whiteSpace: "nowrap",
+                }}
+              >
+                {column.label}
+              </th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {items.map((item) => {
+            const specs = item.metadata.dimensions ?? item.metadata.material ?? "—";
+            return (
+              <tr
+                key={item.id}
+                data-testid="product-row"
+                role="link"
+                tabIndex={0}
+                aria-label={`Open ${item.name}`}
+                onClick={() => openDetail(item)}
+                onKeyDown={(event) => {
+                  if (event.key === "Enter") openDetail(item);
+                }}
+                className="border-border focus-ring"
+                style={{ borderBottomStyle: "solid", borderBottomWidth: 1, cursor: "pointer" }}
+              >
+                <td style={{ padding: "8px 10px", textAlign: "center" }}>
+                  <TableThumb item={item} householdId={householdId} />
+                </td>
+                <td style={{ padding: "8px 10px", maxWidth: 200 }}>
                   <span
-                    data-testid="status-dot"
                     style={{
-                      width: 8,
-                      height: 8,
-                      borderRadius: 999,
-                      backgroundColor: `hsl(var(--badge-${item.status}-fg))`,
-                    }}
-                  />
-                  <span
-                    className={statusBadgeClass(item.status)}
-                    style={{
-                      borderStyle: "solid",
-                      borderWidth: 1,
-                      borderRadius: 999,
-                      padding: "2px 8px",
-                      fontSize: 11,
-                      fontWeight: 600,
+                      display: "inline-block",
+                      maxWidth: 200,
+                      overflow: "hidden",
+                      textOverflow: "ellipsis",
                       whiteSpace: "nowrap",
+                      verticalAlign: "middle",
                     }}
                   >
-                    {STATUS_LABEL[item.status]}
+                    {item.name}
                   </span>
-                </span>
-              </td>
-              <td style={{ padding: "8px 10px", whiteSpace: "nowrap" }}>{specs}</td>
-              <td
-                className="font-mono text-muted-foreground"
-                style={{ padding: "8px 10px", textAlign: "right", whiteSpace: "nowrap" }}
-              >
-                {formatRelativeDate(item.dateAdded)}
-              </td>
-              <td style={{ padding: "8px 10px", textAlign: "center" }}>
-                <button
-                  type="button"
-                  aria-label={`Actions for ${item.name}`}
-                  onClick={(event) => {
-                    event.stopPropagation();
-                    openDetail(item);
-                  }}
-                  className="text-muted-foreground focus-ring"
-                  style={{
-                    background: "none",
-                    border: "none",
-                    cursor: "pointer",
-                    fontSize: 16,
-                    lineHeight: 1,
-                    padding: "4px 6px",
-                    borderRadius: 4,
-                  }}
+                </td>
+                <td style={{ padding: "8px 10px" }}>
+                  <span
+                    className="bg-card-muted text-muted-foreground font-mono"
+                    style={{ fontSize: 11, padding: "2px 6px", borderRadius: 4, whiteSpace: "nowrap" }}
+                  >
+                    {item.category}
+                  </span>
+                </td>
+                <td style={{ padding: "8px 10px" }}>
+                  <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
+                    <span
+                      data-testid="status-dot"
+                      style={{
+                        width: 8,
+                        height: 8,
+                        borderRadius: 999,
+                        backgroundColor: `hsl(var(--badge-${item.status}-fg))`,
+                      }}
+                    />
+                    <span
+                      className={statusBadgeClass(item.status)}
+                      style={{
+                        borderStyle: "solid",
+                        borderWidth: 1,
+                        borderRadius: 999,
+                        padding: "2px 8px",
+                        fontSize: 11,
+                        fontWeight: 600,
+                        whiteSpace: "nowrap",
+                      }}
+                    >
+                      {STATUS_LABEL[item.status]}
+                    </span>
+                  </span>
+                </td>
+                <td style={{ padding: "8px 10px", whiteSpace: "nowrap" }}>{specs}</td>
+                <td
+                  className="font-mono text-muted-foreground"
+                  style={{ padding: "8px 10px", textAlign: "right", whiteSpace: "nowrap" }}
                 >
-                  ...
-                </button>
-              </td>
-            </tr>
-          );
-        })}
-      </tbody>
-    </table>
+                  {formatRelativeDate(item.dateAdded)}
+                </td>
+                <td style={{ padding: "8px 10px", textAlign: "center" }}>
+                  <button
+                    type="button"
+                    aria-label={`Actions for ${item.name}`}
+                    onClick={(event) => {
+                      event.stopPropagation();
+                      openDetail(item);
+                    }}
+                    className="text-muted-foreground focus-ring"
+                    style={{
+                      background: "none",
+                      border: "none",
+                      cursor: "pointer",
+                      fontSize: 16,
+                      lineHeight: 1,
+                      padding: "4px 6px",
+                      borderRadius: 4,
+                    }}
+                  >
+                    ...
+                  </button>
+                </td>
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
+    </div>
   );
 }
 

@@ -1,4 +1,4 @@
-import { Link, Routes, Route, NavLink } from "react-router-dom";
+import { Link, Routes, Route, NavLink, useLocation } from "react-router-dom";
 import { CatalogPage } from "./routes/CatalogPage";
 import { CapturePage } from "./routes/CapturePage";
 import { AssetDetailPage } from "./routes/AssetDetailPage";
@@ -47,9 +47,10 @@ function Nav() {
 }
 
 export default function App() {
+  const { pathname } = useLocation();
   return (
     <div style={{ minHeight: "100vh", background: "white", color: "#111827" }}>
-      <Nav />
+      {pathname === "/" ? null : <Nav />}
       <Routes>
         <Route path="/" element={<CatalogPage />} />
         <Route path="/capture" element={<CapturePage />} />

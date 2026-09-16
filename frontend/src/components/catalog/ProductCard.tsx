@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { AlertTriangle } from "lucide-react";
+import { AlertTriangle, Package } from "lucide-react";
 import type { ProductItem, ProductStatus } from "../../types/product";
 
 /**
@@ -140,6 +140,14 @@ export function ProductCard({
             className="object-contain"
             style={{ width: "100%", height: "100%", objectFit: "contain" }}
             onError={() => setBroken(true)}
+          />
+        ) : null}
+        {!failed && (!media || broken) ? (
+          <Package
+            data-testid="product-fallback-icon"
+            aria-hidden="true"
+            size={28}
+            className="text-muted-foreground"
           />
         ) : null}
         {failed ? (

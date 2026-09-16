@@ -59,7 +59,7 @@ export function AppHeader({ loadedCount, searchValue, onSearchChange }: AppHeade
         title="Items loaded on this page, not the household total"
         style={{ fontSize: 12, padding: "2px 8px", borderRadius: 999 }}
       >
-        Total: {loadedCount} items
+        Total: {loadedCount} {loadedCount === 1 ? "item" : "items"}
       </span>
 
       {/* center stays reserved: category pills live in the toolbar, not here */}

@@ -2,6 +2,7 @@ import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 import { fireEvent, render, screen } from "@testing-library/react";
 import { MemoryRouter, Route, Routes } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import App from "../../App";
 import { CatalogPage } from "../../routes/CatalogPage";
 import { ThemeProvider } from "../../theme/ThemeProvider";
 import {
@@ -95,6 +96,18 @@ function renderCatalog() {
       <ThemeProvider>
         <MemoryRouter initialEntries={["/"]}>
           <CatalogPage />
+        </MemoryRouter>
+      </ThemeProvider>
+    </QueryClientProvider>
+  );
+}
+
+function renderApp(initialEntries: string[]) {
+  return render(
+    <QueryClientProvider client={new QueryClient({ defaultOptions: { queries: { retry: false } } })}>
+      <ThemeProvider>
+        <MemoryRouter initialEntries={initialEntries}>
+          <App />
         </MemoryRouter>
       </ThemeProvider>
     </QueryClientProvider>
@@ -272,5 +285,39 @@ describe("Catalog shell", () => {
     expect(screen.queryByText(/table view arrives with the new cards/i)).not.toBeInTheDocument();
     expect(screen.getByRole("table", { name: "Product results" })).toBeInTheDocument();
     expect(screen.getByText("Drill")).toBeInTheDocument();
+  });
+
+  test("the catalog route renders ONE StorageGenie wordmark (legacy nav gone)", async () => {
+    renderApp(["/"]);
+    await screen.findByText("Drill");
+
+    expect(screen.getAllByText("StorageGenie")).toHaveLength(1);
+    expect(screen.queryByText("Phase 0 · local-first")).not.toBeInTheDocument();
+  });
+
+  test("a non-catalog route keeps the byte-identical legacy nav", async () => {
+    renderApp(["/capture"]);
+
+    expect(await screen.findByText("Phase 0 · local-first")).toBeInTheDocument();
+    expect(screen.getByText("Capture — Manual Create")).toBeInTheDocument();
+    expect(screen.getAllByText("StorageGenie")).toHaveLength(1);
+  });
+
+  test("the header count uses the singular only for one loaded item", async () => {
+    api.apiGet.mockImplementation((path: string) => {
+      if (path === "/v1/households") {
+        return Promise.resolve([{ id: "h1", name: "Home", created_at: "2026-09-01T00:00:00Z" }]);
+      }
+      if (path === "/v1/assets") {
+        return Promise.resolve({ items: [assets[0]], next_cursor: null });
+      }
+      return Promise.resolve(null);
+    });
+
+    renderCatalog();
+    await screen.findByText("Drill");
+
+    expect(screen.getByText("Total: 1 item")).toBeInTheDocument();
+    expect(screen.queryByText("Total: 1 items")).not.toBeInTheDocument();
   });
 });

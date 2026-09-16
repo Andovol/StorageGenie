@@ -105,7 +105,7 @@ describe("ProductCard", () => {
     );
   });
 
-  test("a broken image falls back to the empty well and never renders a broken icon", () => {
+  test("a broken image falls back to the neutral glyph and never renders a broken icon", () => {
     const item = MOCK_PRODUCTS.find((product) => product.cutoutUrl)!;
     renderWithRouter(<ProductCard item={item} householdId="h1" />);
     const image = screen.getByRole("img");
@@ -114,6 +114,23 @@ describe("ProductCard", () => {
 
     expect(screen.queryByRole("img")).not.toBeInTheDocument();
     expect(screen.queryByTestId("failed-warning")).not.toBeInTheDocument();
+    expect(screen.getByTestId("product-fallback-icon")).toBeInTheDocument();
+  });
+
+  test("the fallback glyph shows only for a sourceless item and vanishes when media exists", () => {
+    const sourceless: CatalogProduct = {
+      ...MOCK_PRODUCTS[0],
+      cutoutUrl: undefined,
+      sceneUrl: undefined,
+      evidenceId: undefined,
+    };
+
+    const withMedia = renderWithRouter(<ProductCard item={MOCK_PRODUCTS[0]} householdId="h1" />);
+    expect(screen.queryByTestId("product-fallback-icon")).not.toBeInTheDocument();
+    withMedia.unmount();
+
+    renderWithRouter(<ProductCard item={sourceless} householdId="h1" />);
+    expect(screen.getByTestId("product-fallback-icon")).toBeInTheDocument();
   });
 });
 
@@ -160,6 +177,35 @@ describe("ProductGrid", () => {
       "Added",
       "Actions",
     ]);
+  });
+
+  test("a sourceless row renders the fallback glyph in the table thumb", () => {
+    const sourceless: CatalogProduct = {
+      ...MOCK_PRODUCTS[0],
+      cutoutUrl: undefined,
+      sceneUrl: undefined,
+      evidenceId: undefined,
+    };
+    renderWithRouter(<ProductGrid items={[sourceless]} density="table" householdId="h1" />);
+
+    expect(screen.getByTestId("product-fallback-icon")).toBeInTheDocument();
+  });
+
+  test("the compact table rides in a labelled horizontal scroll container (no page-level overflow)", () => {
+    renderWithRouter(<ProductGrid items={MOCK_PRODUCTS} density="table" householdId="h1" />);
+
+    const scroller = screen.getByTestId("table-scroll");
+    expect(scroller).toHaveAttribute("role", "region");
+    expect(scroller).toHaveAccessibleName("Product results table");
+    expect(scroller).toHaveStyle({ overflowX: "auto" });
+    expect(scroller).toContainElement(screen.getByRole("table", { name: "Product results" }));
+
+    let node: HTMLElement | null = scroller.parentElement;
+    while (node && node !== document.body) {
+      expect(node.style.overflowX).not.toBe("auto");
+      expect(node.style.overflowX).not.toBe("scroll");
+      node = node.parentElement;
+    }
   });
 
   test("absent specs render an honest em dash, never an invented value", () => {
