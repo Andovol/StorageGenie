@@ -1,8 +1,11 @@
+// @ts-expect-error: node:fs is available in the vitest runtime; @types/node is intentionally not a project dependency
+import { readFileSync } from "node:fs";
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 import { fireEvent, render, screen } from "@testing-library/react";
 import { ThemeProvider, useTheme } from "./ThemeProvider";
 import { ThemeToggle } from "./ThemeToggle";
-import tokensCss from "./tokens.css?raw";
+
+const tokensCss = readFileSync("src/theme/tokens.css", "utf8");
 
 function mockMatchMedia(matches: boolean) {
   Object.defineProperty(window, "matchMedia", {

@@ -1,0 +1,154 @@
+:root {
+  --background: 60 9.1% 97.8%;
+  --foreground: 24 9.8% 10%;
+  --card: 0 0% 100%;
+  --card-muted: 60 4.8% 95.9%;
+  --border: 20 5.9% 90%;
+  --muted: 60 4.8% 95.9%;
+  --muted-foreground: 25 5.3% 44.7%;
+  --primary: 2 41% 30.6%;
+  --primary-foreground: 60 9.1% 97.8%;
+
+  --badge-raw-bg: 60 4.8% 95.9%;
+  --badge-raw-fg: 30 6.3% 25.1%;
+  --badge-processed-bg: 204 93.8% 93.7%;
+  --badge-processed-fg: 201 90% 27.5%;
+  --badge-rendered-bg: 149 80.4% 90%;
+  --badge-rendered-fg: 163 88.1% 19.8%;
+  --badge-failed-bg: 356 100% 94.7%;
+  --badge-failed-fg: 343.4 79.7% 34.7%;
+
+  --font-sans: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+}
+
+.dark {
+  --background: 30 7.1% 5.5%;
+  --foreground: 60 4.8% 95.9%;
+  --card: 30 7.7% 10.2%;
+  --card-muted: 30 8.6% 13.7%;
+  --border: 30 7.3% 16.1%;
+  --muted: 30 8.6% 13.7%;
+  --muted-foreground: 24 5.7% 82.9%;
+  --primary: 2 41% 30.6%;
+  --primary-foreground: 60 9.1% 97.8%;
+
+  --badge-raw-bg: 30 8.6% 13.7%;
+  --badge-raw-fg: 24 5.7% 82.9%;
+  --badge-processed-bg: 204 80.2% 15.9%;
+  --badge-processed-fg: 199.4 95.5% 73.9%;
+  --badge-rendered-bg: 166 91.3% 9%;
+  --badge-rendered-fg: 156 71.6% 66.9%;
+  --badge-failed-bg: 343 87.7% 15.9%;
+  --badge-failed-fg: 353 95.7% 81.8%;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+}
+
+body {
+  background-color: hsl(var(--background));
+  color: hsl(var(--foreground));
+  font-family: var(--font-sans);
+}
+
+.bg-background {
+  background-color: hsl(var(--background));
+}
+
+.bg-card {
+  background-color: hsl(var(--card));
+}
+
+.bg-card-muted {
+  background-color: hsl(var(--card-muted));
+}
+
+.bg-muted {
+  background-color: hsl(var(--muted));
+}
+
+.bg-primary {
+  background-color: hsl(var(--primary));
+}
+
+.text-background {
+  color: hsl(var(--background));
+}
+
+.text-foreground {
+  color: hsl(var(--foreground));
+}
+
+.text-card {
+  color: hsl(var(--card));
+}
+
+.text-card-muted {
+  color: hsl(var(--card-muted));
+}
+
+.text-muted {
+  color: hsl(var(--muted));
+}
+
+.text-muted-foreground {
+  color: hsl(var(--muted-foreground));
+}
+
+.text-primary {
+  color: hsl(var(--primary));
+}
+
+.text-primary-foreground {
+  color: hsl(var(--primary-foreground));
+}
+
+.border-border {
+  border-color: hsl(var(--border));
+}
+
+.border-primary {
+  border-color: hsl(var(--primary));
+}
+
+.badge-raw {
+  background-color: hsl(var(--badge-raw-bg));
+  color: hsl(var(--badge-raw-fg));
+}
+
+.badge-processed {
+  background-color: hsl(var(--badge-processed-bg));
+  color: hsl(var(--badge-processed-fg));
+}
+
+.badge-rendered {
+  background-color: hsl(var(--badge-rendered-bg));
+  color: hsl(var(--badge-rendered-fg));
+}
+
+.badge-failed {
+  background-color: hsl(var(--badge-failed-bg));
+  color: hsl(var(--badge-failed-fg));
+}
+
+.font-sans {
+  font-family: var(--font-sans);
+}
+
+.font-mono {
+  font-family: var(--font-mono);
+}
+
+.focus-ring:focus-visible {
+  outline: 2px solid hsl(var(--primary));
+  outline-offset: 2px;
+}
