@@ -210,6 +210,15 @@ describe("ItemInspectorDrawer", () => {
     expect(screen.getByTestId("source-empty")).toHaveTextContent(/no source photo is attached/i);
   });
 
+  test("a null display_name shows the Untitled asset fallback and an empty editable title", async () => {
+    const nameless: Asset = { ...baseAsset, display_name: null, evidence: [] };
+    api.apiGet.mockResolvedValue(nameless);
+    renderDrawer(nameless);
+    await screen.findByTestId("inspector-drawer");
+    expect(screen.getByTestId("drawer-title")).toHaveTextContent("Untitled asset");
+    expect(screen.getByLabelText("Title")).toHaveValue("");
+  });
+
   test("a successful save invalidates the assets and asset query keys", async () => {
     const client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
     const spy = vi.spyOn(client, "invalidateQueries");

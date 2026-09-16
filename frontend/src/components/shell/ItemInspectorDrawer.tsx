@@ -3,7 +3,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { ChevronDown, ChevronRight, ScanLine, Sparkles, X } from "lucide-react";
 import { apiGet, apiPatch } from "../../api/client";
 import type { Asset, Assertion, Evidence } from "../../api/types";
-import { CANONICAL_CATEGORIES, toProductCategory } from "../../types/product";
+import { CANONICAL_CATEGORIES, toProductCategory, UNTITLED_ASSET_NAME } from "../../types/product";
 
 type ViewerTab = "cutout" | "scene" | "source";
 
@@ -56,7 +56,7 @@ export function ItemInspectorDrawer({ asset, householdId, onClose }: ItemInspect
   );
 
   const [tab, setTab] = useState<ViewerTab>("source");
-  const [title, setTitle] = useState(asset.display_name);
+  const [title, setTitle] = useState(asset.display_name ?? "");
   const [category, setCategory] = useState(toProductCategory(asset.asset_type));
   const [quantity, setQuantity] = useState(asset.quantity != null ? String(asset.quantity) : "");
   const [unit, setUnit] = useState(asset.unit ?? "");
@@ -76,13 +76,14 @@ export function ItemInspectorDrawer({ asset, householdId, onClose }: ItemInspect
   });
 
   const current = full ?? asset;
+  const displayName = current.display_name || UNTITLED_ASSET_NAME;
   const assertions = useMemo(() => current.assertions ?? [], [current.assertions]);
   const evidence = useMemo(() => current.evidence ?? [], [current.evidence]);
 
   // Reset the editable fields when the record changes underneath us (e.g. after
   // a successful PATCH or when a different asset is selected without unmount).
   useEffect(() => {
-    setTitle(current.display_name);
+    setTitle(current.display_name ?? "");
     setCategory(toProductCategory(current.asset_type));
     setQuantity(current.quantity != null ? String(current.quantity) : "");
     setUnit(current.unit ?? "");
@@ -167,13 +168,13 @@ export function ItemInspectorDrawer({ asset, householdId, onClose }: ItemInspect
       <aside
         role="dialog"
         aria-modal="true"
-        aria-label={`Inspector: ${current.display_name}`}
+        aria-label={`Inspector: ${displayName}`}
         className={EMPTY_PANEL}
         style={{ position: "fixed", top: 0, right: 0, height: "100vh" }}
       >
         <header style={{ display: "flex", alignItems: "flex-start", gap: 8, marginBottom: 16 }}>
           <div style={{ flex: 1, minWidth: 0 }}>
-            <h2 data-testid="drawer-title" style={{ margin: 0, fontSize: 20 }}>{current.display_name}</h2>
+            <h2 data-testid="drawer-title" style={{ margin: 0, fontSize: 20 }}>{displayName}</h2>
             <span
               data-testid="drawer-category"
               className="bg-card-muted text-muted-foreground font-mono"
@@ -251,7 +252,7 @@ export function ItemInspectorDrawer({ asset, householdId, onClose }: ItemInspect
               <img
                 data-testid="source-image"
                 src={sourceUrl}
-                alt={current.display_name}
+                alt={displayName}
                 style={{ width: "100%", height: "100%", objectFit: "contain" }}
               />
             ) : (

@@ -29,7 +29,7 @@ export type AuditEvent = {
 export type Asset = {
   id: string;
   household_id: string;
-  display_name: string;
+  display_name: string | null;
   asset_type: string;
   status: string;
   quantity: number | null;

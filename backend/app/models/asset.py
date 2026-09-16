@@ -12,7 +12,7 @@ class Asset(TimestampMixin, Base):
     household_id: Mapped[str] = mapped_column(
         String(36), ForeignKey("household.id", ondelete="CASCADE"), nullable=False, index=True
     )
-    display_name: Mapped[str] = mapped_column(String(300), nullable=False)
+    display_name: Mapped[str | None] = mapped_column(String(300), nullable=True)
     asset_type: Mapped[str] = mapped_column(String(50), nullable=False, default="unknown")
     status: Mapped[str] = mapped_column(String(30), nullable=False, default="ACTIVE")
     quantity: Mapped[float | None] = mapped_column(nullable=True)

@@ -1,0 +1,3454 @@
+SG-048_verify.log
+# SG-048 — name-optional capture: nullable display_name + photo-derived default + form — RAW captures
+# Host: andrei@87.106.66.242:2222   Work dir: /home/andrei/StorageGenie
+# BASE (start HEAD) = 2a0c572212c91cbd2c98f0bf386bb8f3af977140  (== origin/automation)
+# Contract: 0.27.0   Coder: opencode   Effort: medium (argv --variant medium)   Model: unknown
+# NOTE: `rtk` is the host's output-compacting CLI wrapper. ANSI colour stripped; bytes/content otherwise verbatim.
+
+########################################################################
+=== STARTING TREE (clean; PG-IC-09) ===
+########################################################################
+$ git status --porcelain=v1 -b
+## automation...origin/automation
+ M backend/app/models/asset.py
+ M backend/app/schemas/asset.py
+ M backend/app/services/asset_service.py
+ M frontend/src/api/types.ts
+ M frontend/src/components/AssetCard.test.tsx
+ M frontend/src/components/AssetCard.tsx
+ M frontend/src/components/AssetForm.test.tsx
+ M frontend/src/components/AssetForm.tsx
+ M frontend/src/components/shell/ItemInspectorDrawer.tsx
+ M frontend/src/components/shell/drawer.test.tsx
+ M frontend/src/routes/AssetDetailPage.tsx
+ M frontend/src/types/product.test.ts
+ M frontend/src/types/product.ts
+?? backend/alembic/versions/20260916_sg048_name_optional.py
+?? backend/tests/test_sg048_name_optional.py
+?? docs/worklogs/SG-048_verify.log
+$ git rev-parse HEAD
+2a0c572212c91cbd2c98f0bf386bb8f3af977140
+$ git rev-parse origin/automation
+2a0c572212c91cbd2c98f0bf386bb8f3af977140
+
+########################################################################
+=== BASE-RUN: pre-existing failures proof (BEFORE any change) ===
+########################################################################
+# base commit == 2a0c572 (start HEAD); command: ../venv/bin/python -m pytest -q
+# result: 2 failed, 186 passed, 13 warnings in 15.83s / exit 1
+#   FAILED tests/test_signals.py::test_generated_codes_are_validated_and_bad_checksum_is_not_an_identifier
+#   FAILED tests/test_signals.py::test_ocr_has_text_boxes_and_mean_confidence
+# frontend baseline: npm test -- --run -> 137 passed / 21 files / exit 0
+
+########################################################################
+=== G5 PRE-CHANGE FAIL RUN — new tests, OLD code (all implementation reverted) ===
+########################################################################
+$ git stash push -- <all 9 implementation files> ; mv backend/alembic/versions/20260916_sg048_name_optional.py /tmp/opencode/
+$ (cd backend && ../venv/bin/python -m pytest -q)
+........................................................................ [ 36%]
+........................................................................ [ 73%]
+.....................................FFFFFF.FFFF.....                    [100%]
+=================================== FAILURES ===================================
+_____________ test_sg048_migration_round_trip_restores_nullability _____________
+
+tmp_path = PosixPath('/tmp/pytest-of-andrei/pytest-10/test_sg048_migration_round_tri0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x709a7aca41a0>
+
+    def test_sg048_migration_round_trip_restores_nullability(tmp_path: Path, monkeypatch) -> None:
+        url = f"sqlite:///{tmp_path / 'roundtrip.db'}"
+        monkeypatch.setattr(settings, "database_url", url)
+        config = _alembic_config(url)
+    
+        command.upgrade(config, "head")
+>       assert _display_name_notnull(url) == 0
+E       AssertionError: assert 1 == 0
+E        +  where 1 = _display_name_notnull('sqlite:////tmp/pytest-of-andrei/pytest-10/test_sg048_migration_round_tri0/roundtrip.db')
+
+tests/test_sg048_name_optional.py:56: AssertionError
+----------------------------- Captured stderr call -----------------------------
+INFO  [alembic.runtime.migration] Context impl SQLiteImpl.
+INFO  [alembic.runtime.migration] Will assume non-transactional DDL.
+INFO  [alembic.runtime.migration] Running upgrade  -> 0201cf10c56c, 001 core foundation
+INFO  [alembic.runtime.migration] Running upgrade 0201cf10c56c -> 20260908_sg013_observation, deterministic signal observations
+INFO  [alembic.runtime.migration] Running upgrade 20260908_sg013_observation -> 20260908_sg014_candidate, deduplication candidates
+INFO  [alembic.runtime.migration] Running upgrade 20260908_sg014_candidate -> 20260908_sg017_fts, SQLite FTS5 index for asset catalog search.
+INFO  [alembic.runtime.migration] Running upgrade 20260908_sg017_fts -> 20260912_sg025_provider_call, provider call ledger (SG-025, blueprint §3.3)
+INFO  [alembic.runtime.migration] Running upgrade 20260912_sg025_provider_call -> 20260914_sg035_foundations, data foundations: source attribution, planning suggestions, guardrail log (SG-035, Phase 3 S2/S3)
+________ test_sg048_nameless_row_survives_upgrade_and_blocks_downgrade _________
+
+self = <sqlalchemy.engine.base.Connection object at 0x709a7bdd6ae0>
+dialect = <sqlalchemy.dialects.sqlite.pysqlite.SQLiteDialect_pysqlite object at 0x709a7ac608c0>
+context = <sqlalchemy.dialects.sqlite.base.SQLiteExecutionContext object at 0x709a7a435bb0>
+statement = <sqlalchemy.dialects.sqlite.base.SQLiteCompiler object at 0x709a7a436d80>
+parameters = [('a9d02b8ec3e94c94a42e89d0f41a59d1', '932a72e7de484a9e856d1eedeaabfa55')]
+
+    def _exec_single_context(
+        self,
+        dialect: Dialect,
+        context: ExecutionContext,
+        statement: Union[str, Compiled],
+        parameters: Optional[_AnyMultiExecuteParams],
+    ) -> CursorResult[Any]:
+        """continue the _execute_context() method for a single DBAPI
+        cursor.execute() or cursor.executemany() call.
+    
+        """
+        if dialect.bind_typing is BindTyping.SETINPUTSIZES:
+            generic_setinputsizes = context._prepare_set_input_sizes()
+    
+            if generic_setinputsizes:
+                try:
+                    dialect.do_set_input_sizes(
+                        context.cursor, generic_setinputsizes, context
+                    )
+                except BaseException as e:
+                    self._handle_dbapi_exception(
+                        e, str(statement), parameters, None, context
+                    )
+    
+        cursor, str_statement, parameters = (
+            context.cursor,
+            context.statement,
+            context.parameters,
+        )
+    
+        effective_parameters: Optional[_AnyExecuteParams]
+    
+        if not context.executemany:
+            effective_parameters = parameters[0]
+        else:
+            effective_parameters = parameters
+    
+        if self._has_events or self.engine._has_events:
+            for fn in self.dispatch.before_cursor_execute:
+                str_statement, effective_parameters = fn(
+                    self,
+                    cursor,
+                    str_statement,
+                    effective_parameters,
+                    context,
+                    context.executemany,
+                )
+    
+        if self._echo:
+            self._log_info(str_statement)
+    
+            stats = context._get_cache_stats()
+    
+            if not self.engine.hide_parameters:
+                self._log_info(
+                    "[%s] %r",
+                    stats,
+                    sql_util._repr_params(
+                        effective_parameters,
+                        batches=10,
+                        ismulti=context.executemany,
+                    ),
+                )
+            else:
+                self._log_info(
+                    "[%s] [SQL parameters hidden due to hide_parameters=True]",
+                    stats,
+                )
+    
+        evt_handled: bool = False
+        try:
+            if context.execute_style is ExecuteStyle.EXECUTEMANY:
+                effective_parameters = cast(
+                    "_CoreMultiExecuteParams", effective_parameters
+                )
+                if self.dialect._has_events:
+                    for fn in self.dialect.dispatch.do_executemany:
+                        if fn(
+                            cursor,
+                            str_statement,
+                            effective_parameters,
+                            context,
+                        ):
+                            evt_handled = True
+                            break
+                if not evt_handled:
+                    self.dialect.do_executemany(
+                        cursor,
+                        str_statement,
+                        effective_parameters,
+                        context,
+                    )
+            elif not effective_parameters and context.no_parameters:
+                if self.dialect._has_events:
+                    for fn in self.dialect.dispatch.do_execute_no_params:
+                        if fn(cursor, str_statement, context):
+                            evt_handled = True
+                            break
+                if not evt_handled:
+                    self.dialect.do_execute_no_params(
+                        cursor, str_statement, context
+                    )
+            else:
+                effective_parameters = cast(
+                    "_CoreSingleExecuteParams", effective_parameters
+                )
+                if self.dialect._has_events:
+                    for fn in self.dialect.dispatch.do_execute:
+                        if fn(
+                            cursor,
+                            str_statement,
+                            effective_parameters,
+                            context,
+                        ):
+                            evt_handled = True
+                            break
+                if not evt_handled:
+>                   self.dialect.do_execute(
+                        cursor, str_statement, effective_parameters, context
+                    )
+
+../venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py:1969: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <sqlalchemy.dialects.sqlite.pysqlite.SQLiteDialect_pysqlite object at 0x709a7ac608c0>
+cursor = <sqlite3.Cursor object at 0x709a7a478a40>
+statement = "INSERT INTO asset (id, household_id, display_name, asset_type, status, version) VALUES (?, ?, NULL, 'unknown', 'ACTIVE', 1)"
+parameters = ('a9d02b8ec3e94c94a42e89d0f41a59d1', '932a72e7de484a9e856d1eedeaabfa55')
+context = <sqlalchemy.dialects.sqlite.base.SQLiteExecutionContext object at 0x709a7a435bb0>
+
+    def do_execute(self, cursor, statement, parameters, context=None):
+>       cursor.execute(statement, parameters)
+E       sqlite3.IntegrityError: NOT NULL constraint failed: asset.display_name
+
+../venv/lib/python3.12/site-packages/sqlalchemy/engine/default.py:952: IntegrityError
+
+The above exception was the direct cause of the following exception:
+
+tmp_path = PosixPath('/tmp/pytest-of-andrei/pytest-10/test_sg048_nameless_row_surviv0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x709a7a40a4e0>
+
+    def test_sg048_nameless_row_survives_upgrade_and_blocks_downgrade(
+        tmp_path: Path, monkeypatch
+    ) -> None:
+        url = f"sqlite:///{tmp_path / 'nameless.db'}"
+        monkeypatch.setattr(settings, "database_url", url)
+        config = _alembic_config(url)
+        command.upgrade(config, "head")
+    
+        household_id = uuid.uuid4().hex
+        asset_id = uuid.uuid4().hex
+        engine = create_engine(url)
+        with engine.begin() as conn:
+            conn.execute(text("INSERT INTO household (id, name) VALUES (:id, 'H')"), {"id": household_id})
+>           conn.execute(
+                text(
+                    "INSERT INTO asset (id, household_id, display_name, asset_type, status, version) "
+                    "VALUES (:id, :h, NULL, 'unknown', 'ACTIVE', 1)"
+                ),
+                {"id": asset_id, "h": household_id},
+            )
+
+tests/test_sg048_name_optional.py:83: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py:1421: in execute
+    return meth(
+../venv/lib/python3.12/site-packages/sqlalchemy/sql/elements.py:526: in _execute_on_connection
+    return connection._execute_clauseelement(
+../venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py:1643: in _execute_clauseelement
+    ret = self._execute_context(
+../venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py:1848: in _execute_context
+    return self._exec_single_context(
+../venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py:1988: in _exec_single_context
+    self._handle_dbapi_exception(
+../venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py:2365: in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+../venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py:1969: in _exec_single_context
+    self.dialect.do_execute(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <sqlalchemy.dialects.sqlite.pysqlite.SQLiteDialect_pysqlite object at 0x709a7ac608c0>
+cursor = <sqlite3.Cursor object at 0x709a7a478a40>
+statement = "INSERT INTO asset (id, household_id, display_name, asset_type, status, version) VALUES (?, ?, NULL, 'unknown', 'ACTIVE', 1)"
+parameters = ('a9d02b8ec3e94c94a42e89d0f41a59d1', '932a72e7de484a9e856d1eedeaabfa55')
+context = <sqlalchemy.dialects.sqlite.base.SQLiteExecutionContext object at 0x709a7a435bb0>
+
+    def do_execute(self, cursor, statement, parameters, context=None):
+>       cursor.execute(statement, parameters)
+E       sqlalchemy.exc.IntegrityError: (sqlite3.IntegrityError) NOT NULL constraint failed: asset.display_name
+E       [SQL: INSERT INTO asset (id, household_id, display_name, asset_type, status, version) VALUES (?, ?, NULL, 'unknown', 'ACTIVE', 1)]
+E       [parameters: ('a9d02b8ec3e94c94a42e89d0f41a59d1', '932a72e7de484a9e856d1eedeaabfa55')]
+E       (Background on this error at: https://sqlalche.me/e/20/gkpj)
+
+../venv/lib/python3.12/site-packages/sqlalchemy/engine/default.py:952: IntegrityError
+----------------------------- Captured stderr call -----------------------------
+INFO  [alembic.runtime.migration] Context impl SQLiteImpl.
+INFO  [alembic.runtime.migration] Will assume non-transactional DDL.
+INFO  [alembic.runtime.migration] Running upgrade  -> 0201cf10c56c, 001 core foundation
+INFO  [alembic.runtime.migration] Running upgrade 0201cf10c56c -> 20260908_sg013_observation, deterministic signal observations
+INFO  [alembic.runtime.migration] Running upgrade 20260908_sg013_observation -> 20260908_sg014_candidate, deduplication candidates
+INFO  [alembic.runtime.migration] Running upgrade 20260908_sg014_candidate -> 20260908_sg017_fts, SQLite FTS5 index for asset catalog search.
+INFO  [alembic.runtime.migration] Running upgrade 20260908_sg017_fts -> 20260912_sg025_provider_call, provider call ledger (SG-025, blueprint §3.3)
+INFO  [alembic.runtime.migration] Running upgrade 20260912_sg025_provider_call -> 20260914_sg035_foundations, data foundations: source attribution, planning suggestions, guardrail log (SG-035, Phase 3 S2/S3)
+______________ test_nameless_create_through_full_migration_chain _______________
+
+tmp_path = PosixPath('/tmp/pytest-of-andrei/pytest-10/test_nameless_create_through_f0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x709a7a4cc530>
+
+    def test_nameless_create_through_full_migration_chain(tmp_path: Path, monkeypatch) -> None:
+        """The nameless-create path against the real schema, not a hand-built one.
+    
+        Mirrors production: a scratch SQLite upgraded from base through every
+        revision, then the API service writes a nameless row (NULL) and a named
+        row. No test rows ever touch the production database.
+        """
+        url = f"sqlite:///{tmp_path / 'fullchain.db'}"
+        monkeypatch.setattr(settings, "database_url", url)
+        storage_root = tmp_path / "storage"
+        storage_root.mkdir()
+        monkeypatch.setattr(settings, "storage_root", str(storage_root))
+        command.upgrade(_alembic_config(url), "head")
+    
+        engine = create_engine(url)
+        factory = sessionmaker(bind=engine, expire_on_commit=False)
+        session: Session = factory()
+        try:
+            household = Household(name="Full chain household")
+            session.add(household)
+            session.commit()
+    
+>           nameless = create_asset(session, household.id, {"status": "ACTIVE"})
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_sg048_name_optional.py:134: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+db = <sqlalchemy.orm.session.Session object at 0x709a7acd96a0>
+household_id = '01a0abcb-f6e7-71c1-b231-71464bf5f762'
+payload = {'status': 'ACTIVE'}, actor = 'api'
+
+    def create_asset(
+        db: Session,
+        household_id: str,
+        payload: dict,
+        actor: str = "api",
+    ) -> Asset:
+        asset = Asset(
+            household_id=household_id,
+>           display_name=payload["display_name"],
+                         ^^^^^^^^^^^^^^^^^^^^^^^
+            asset_type=payload.get("asset_type", "unknown"),
+            status=payload.get("status", "ACTIVE"),
+            quantity=payload.get("quantity"),
+            unit=payload.get("unit"),
+            condition=payload.get("condition"),
+        )
+E       KeyError: 'display_name'
+
+app/services/asset_service.py:20: KeyError
+----------------------------- Captured stderr call -----------------------------
+INFO  [alembic.runtime.migration] Context impl SQLiteImpl.
+INFO  [alembic.runtime.migration] Will assume non-transactional DDL.
+INFO  [alembic.runtime.migration] Running upgrade  -> 0201cf10c56c, 001 core foundation
+INFO  [alembic.runtime.migration] Running upgrade 0201cf10c56c -> 20260908_sg013_observation, deterministic signal observations
+INFO  [alembic.runtime.migration] Running upgrade 20260908_sg013_observation -> 20260908_sg014_candidate, deduplication candidates
+INFO  [alembic.runtime.migration] Running upgrade 20260908_sg014_candidate -> 20260908_sg017_fts, SQLite FTS5 index for asset catalog search.
+INFO  [alembic.runtime.migration] Running upgrade 20260908_sg017_fts -> 20260912_sg025_provider_call, provider call ledger (SG-025, blueprint §3.3)
+INFO  [alembic.runtime.migration] Running upgrade 20260912_sg025_provider_call -> 20260914_sg035_foundations, data foundations: source attribution, planning suggestions, guardrail log (SG-035, Phase 3 S2/S3)
+_____ test_nameless_with_evidence_uses_photo_stem_deterministic_assertion ______
+
+self = <sqlalchemy.engine.base.Connection object at 0x709a7a435be0>
+dialect = <sqlalchemy.dialects.sqlite.pysqlite.SQLiteDialect_pysqlite object at 0x709a7a434e00>
+context = <sqlalchemy.dialects.sqlite.base.SQLiteExecutionContext object at 0x709a7a802a80>
+statement = <sqlalchemy.dialects.sqlite.base.SQLiteCompiler object at 0x709a7a803080>
+parameters = [('01a0abcb-f722-77e0-b84c-089e82cbd2b0', '01a0abcb-f71b-7c10-a823-d493edf075cc', None, 'unknown', 'ACTIVE', None, ...)]
+
+    def _exec_single_context(
+        self,
+        dialect: Dialect,
+        context: ExecutionContext,
+        statement: Union[str, Compiled],
+        parameters: Optional[_AnyMultiExecuteParams],
+    ) -> CursorResult[Any]:
+        """continue the _execute_context() method for a single DBAPI
+        cursor.execute() or cursor.executemany() call.
+    
+        """
+        if dialect.bind_typing is BindTyping.SETINPUTSIZES:
+            generic_setinputsizes = context._prepare_set_input_sizes()
+    
+            if generic_setinputsizes:
+                try:
+                    dialect.do_set_input_sizes(
+                        context.cursor, generic_setinputsizes, context
+                    )
+                except BaseException as e:
+                    self._handle_dbapi_exception(
+                        e, str(statement), parameters, None, context
+                    )
+    
+        cursor, str_statement, parameters = (
+            context.cursor,
+            context.statement,
+            context.parameters,
+        )
+    
+        effective_parameters: Optional[_AnyExecuteParams]
+    
+        if not context.executemany:
+            effective_parameters = parameters[0]
+        else:
+            effective_parameters = parameters
+    
+        if self._has_events or self.engine._has_events:
+            for fn in self.dispatch.before_cursor_execute:
+                str_statement, effective_parameters = fn(
+                    self,
+                    cursor,
+                    str_statement,
+                    effective_parameters,
+                    context,
+                    context.executemany,
+                )
+    
+        if self._echo:
+            self._log_info(str_statement)
+    
+            stats = context._get_cache_stats()
+    
+            if not self.engine.hide_parameters:
+                self._log_info(
+                    "[%s] %r",
+                    stats,
+                    sql_util._repr_params(
+                        effective_parameters,
+                        batches=10,
+                        ismulti=context.executemany,
+                    ),
+                )
+            else:
+                self._log_info(
+                    "[%s] [SQL parameters hidden due to hide_parameters=True]",
+                    stats,
+                )
+    
+        evt_handled: bool = False
+        try:
+            if context.execute_style is ExecuteStyle.EXECUTEMANY:
+                effective_parameters = cast(
+                    "_CoreMultiExecuteParams", effective_parameters
+                )
+                if self.dialect._has_events:
+                    for fn in self.dialect.dispatch.do_executemany:
+                        if fn(
+                            cursor,
+                            str_statement,
+                            effective_parameters,
+                            context,
+                        ):
+                            evt_handled = True
+                            break
+                if not evt_handled:
+                    self.dialect.do_executemany(
+                        cursor,
+                        str_statement,
+                        effective_parameters,
+                        context,
+                    )
+            elif not effective_parameters and context.no_parameters:
+                if self.dialect._has_events:
+                    for fn in self.dialect.dispatch.do_execute_no_params:
+                        if fn(cursor, str_statement, context):
+                            evt_handled = True
+                            break
+                if not evt_handled:
+                    self.dialect.do_execute_no_params(
+                        cursor, str_statement, context
+                    )
+            else:
+                effective_parameters = cast(
+                    "_CoreSingleExecuteParams", effective_parameters
+                )
+                if self.dialect._has_events:
+                    for fn in self.dialect.dispatch.do_execute:
+                        if fn(
+                            cursor,
+                            str_statement,
+                            effective_parameters,
+                            context,
+                        ):
+                            evt_handled = True
+                            break
+                if not evt_handled:
+>                   self.dialect.do_execute(
+                        cursor, str_statement, effective_parameters, context
+                    )
+
+../venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py:1969: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <sqlalchemy.dialects.sqlite.pysqlite.SQLiteDialect_pysqlite object at 0x709a7a434e00>
+cursor = <sqlite3.Cursor object at 0x709a7a4be1c0>
+statement = 'INSERT INTO asset (id, household_id, display_name, asset_type, status, quantity, unit, condition, version) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING created_at, updated_at'
+parameters = ('01a0abcb-f722-77e0-b84c-089e82cbd2b0', '01a0abcb-f71b-7c10-a823-d493edf075cc', None, 'unknown', 'ACTIVE', None, ...)
+context = <sqlalchemy.dialects.sqlite.base.SQLiteExecutionContext object at 0x709a7a802a80>
+
+    def do_execute(self, cursor, statement, parameters, context=None):
+>       cursor.execute(statement, parameters)
+E       sqlite3.IntegrityError: NOT NULL constraint failed: asset.display_name
+
+../venv/lib/python3.12/site-packages/sqlalchemy/engine/default.py:952: IntegrityError
+
+The above exception was the direct cause of the following exception:
+
+asset_db = (<sqlalchemy.orm.session.Session object at 0x709a7acd9250>, '01a0abcb-f71b-7c10-a823-d493edf075cc')
+
+    def test_nameless_with_evidence_uses_photo_stem_deterministic_assertion(asset_db) -> None:  # type: ignore[no-untyped-def]
+        session, household_id = asset_db
+        evidence = _evidence(session, household_id, "before-photo.jpg")
+    
+>       asset = create_asset(
+            session,
+            household_id,
+            {"display_name": None, "asset_type": "unknown", "evidence_ids": [evidence.id]},
+        )
+
+tests/test_sg048_name_optional.py:181: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+app/services/asset_service.py:28: in create_asset
+    db.flush()
+../venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py:4353: in flush
+    self._flush(objects)
+../venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py:4488: in _flush
+    with util.safe_reraise():
+../venv/lib/python3.12/site-packages/sqlalchemy/util/langhelpers.py:122: in __exit__
+    raise exc_value.with_traceback(exc_tb)
+../venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py:4449: in _flush
+    flush_context.execute()
+../venv/lib/python3.12/site-packages/sqlalchemy/orm/unitofwork.py:465: in execute
+    rec.execute(self)
+../venv/lib/python3.12/site-packages/sqlalchemy/orm/unitofwork.py:641: in execute
+    util.preloaded.orm_persistence.save_obj(
+../venv/lib/python3.12/site-packages/sqlalchemy/orm/persistence.py:94: in save_obj
+    _emit_insert_statements(
+../venv/lib/python3.12/site-packages/sqlalchemy/orm/persistence.py:1234: in _emit_insert_statements
+    result = connection.execute(
+../venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py:1421: in execute
+    return meth(
+../venv/lib/python3.12/site-packages/sqlalchemy/sql/elements.py:526: in _execute_on_connection
+    return connection._execute_clauseelement(
+../venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py:1643: in _execute_clauseelement
+    ret = self._execute_context(
+../venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py:1848: in _execute_context
+    return self._exec_single_context(
+../venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py:1988: in _exec_single_context
+    self._handle_dbapi_exception(
+../venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py:2365: in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+../venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py:1969: in _exec_single_context
+    self.dialect.do_execute(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <sqlalchemy.dialects.sqlite.pysqlite.SQLiteDialect_pysqlite object at 0x709a7a434e00>
+cursor = <sqlite3.Cursor object at 0x709a7a4be1c0>
+statement = 'INSERT INTO asset (id, household_id, display_name, asset_type, status, quantity, unit, condition, version) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING created_at, updated_at'
+parameters = ('01a0abcb-f722-77e0-b84c-089e82cbd2b0', '01a0abcb-f71b-7c10-a823-d493edf075cc', None, 'unknown', 'ACTIVE', None, ...)
+context = <sqlalchemy.dialects.sqlite.base.SQLiteExecutionContext object at 0x709a7a802a80>
+
+    def do_execute(self, cursor, statement, parameters, context=None):
+>       cursor.execute(statement, parameters)
+E       sqlalchemy.exc.IntegrityError: (sqlite3.IntegrityError) NOT NULL constraint failed: asset.display_name
+E       [SQL: INSERT INTO asset (id, household_id, display_name, asset_type, status, quantity, unit, condition, version) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING created_at, updated_at]
+E       [parameters: ('01a0abcb-f722-77e0-b84c-089e82cbd2b0', '01a0abcb-f71b-7c10-a823-d493edf075cc', None, 'unknown', 'ACTIVE', None, None, None, 1)]
+E       (Background on this error at: https://sqlalche.me/e/20/gkpj)
+
+../venv/lib/python3.12/site-packages/sqlalchemy/engine/default.py:952: IntegrityError
+_________ test_nameless_photoless_stores_null_and_writes_no_assertion __________
+
+asset_db = (<sqlalchemy.orm.session.Session object at 0x709a7a801790>, '01a0abcb-f921-7110-9f63-6c9d7b463a0d')
+
+    def test_nameless_photoless_stores_null_and_writes_no_assertion(asset_db) -> None:  # type: ignore[no-untyped-def]
+        session, household_id = asset_db
+    
+>       asset = create_asset(
+            session, household_id, {"asset_type": "unknown", "status": "ACTIVE"}
+        )
+
+tests/test_sg048_name_optional.py:201: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+db = <sqlalchemy.orm.session.Session object at 0x709a7a801790>
+household_id = '01a0abcb-f921-7110-9f63-6c9d7b463a0d'
+payload = {'asset_type': 'unknown', 'status': 'ACTIVE'}, actor = 'api'
+
+    def create_asset(
+        db: Session,
+        household_id: str,
+        payload: dict,
+        actor: str = "api",
+    ) -> Asset:
+        asset = Asset(
+            household_id=household_id,
+>           display_name=payload["display_name"],
+                         ^^^^^^^^^^^^^^^^^^^^^^^
+            asset_type=payload.get("asset_type", "unknown"),
+            status=payload.get("status", "ACTIVE"),
+            quantity=payload.get("quantity"),
+            unit=payload.get("unit"),
+            condition=payload.get("condition"),
+        )
+E       KeyError: 'display_name'
+
+app/services/asset_service.py:20: KeyError
+_________________ test_blank_name_is_missing_in_both_branches __________________
+
+asset_db = (<sqlalchemy.orm.session.Session object at 0x709a7a437020>, '01a0abcb-f951-7a23-87fe-758f48b0df93')
+
+    def test_blank_name_is_missing_in_both_branches(asset_db) -> None:  # type: ignore[no-untyped-def]
+        session, household_id = asset_db
+        evidence = _evidence(session, household_id, "pasted-shot.png")
+    
+        with_evidence = create_asset(
+            session,
+            household_id,
+            {"display_name": "   ", "evidence_ids": [evidence.id]},
+        )
+>       assert with_evidence.display_name == "pasted-shot"
+E       AssertionError: assert '   ' == 'pasted-shot'
+E         
+E         Strings contain only whitespace, escaping them using repr()
+E         - 'pasted-shot'
+E         + '   '
+
+tests/test_sg048_name_optional.py:225: AssertionError
+_____________ test_nameless_asset_neither_errors_nor_corrupts_fts ______________
+
+self = <sqlalchemy.engine.base.Connection object at 0x709a7a40a5a0>
+dialect = <sqlalchemy.dialects.sqlite.pysqlite.SQLiteDialect_pysqlite object at 0x709a7a40b860>
+context = <sqlalchemy.dialects.sqlite.base.SQLiteExecutionContext object at 0x709a7a4370b0>
+statement = <sqlalchemy.dialects.sqlite.base.SQLiteCompiler object at 0x709a7a436480>
+parameters = [('01a0abcb-f9c4-7662-9115-5ac40dd8fa1d', '01a0abcb-f9bf-7ee3-9a3e-73f2bc00cab4', None, 'unknown', 'ACTIVE', None, ...)]
+
+    def _exec_single_context(
+        self,
+        dialect: Dialect,
+        context: ExecutionContext,
+        statement: Union[str, Compiled],
+        parameters: Optional[_AnyMultiExecuteParams],
+    ) -> CursorResult[Any]:
+        """continue the _execute_context() method for a single DBAPI
+        cursor.execute() or cursor.executemany() call.
+    
+        """
+        if dialect.bind_typing is BindTyping.SETINPUTSIZES:
+            generic_setinputsizes = context._prepare_set_input_sizes()
+    
+            if generic_setinputsizes:
+                try:
+                    dialect.do_set_input_sizes(
+                        context.cursor, generic_setinputsizes, context
+                    )
+                except BaseException as e:
+                    self._handle_dbapi_exception(
+                        e, str(statement), parameters, None, context
+                    )
+    
+        cursor, str_statement, parameters = (
+            context.cursor,
+            context.statement,
+            context.parameters,
+        )
+    
+        effective_parameters: Optional[_AnyExecuteParams]
+    
+        if not context.executemany:
+            effective_parameters = parameters[0]
+        else:
+            effective_parameters = parameters
+    
+        if self._has_events or self.engine._has_events:
+            for fn in self.dispatch.before_cursor_execute:
+                str_statement, effective_parameters = fn(
+                    self,
+                    cursor,
+                    str_statement,
+                    effective_parameters,
+                    context,
+                    context.executemany,
+                )
+    
+        if self._echo:
+            self._log_info(str_statement)
+    
+            stats = context._get_cache_stats()
+    
+            if not self.engine.hide_parameters:
+                self._log_info(
+                    "[%s] %r",
+                    stats,
+                    sql_util._repr_params(
+                        effective_parameters,
+                        batches=10,
+                        ismulti=context.executemany,
+                    ),
+                )
+            else:
+                self._log_info(
+                    "[%s] [SQL parameters hidden due to hide_parameters=True]",
+                    stats,
+                )
+    
+        evt_handled: bool = False
+        try:
+            if context.execute_style is ExecuteStyle.EXECUTEMANY:
+                effective_parameters = cast(
+                    "_CoreMultiExecuteParams", effective_parameters
+                )
+                if self.dialect._has_events:
+                    for fn in self.dialect.dispatch.do_executemany:
+                        if fn(
+                            cursor,
+                            str_statement,
+                            effective_parameters,
+                            context,
+                        ):
+                            evt_handled = True
+                            break
+                if not evt_handled:
+                    self.dialect.do_executemany(
+                        cursor,
+                        str_statement,
+                        effective_parameters,
+                        context,
+                    )
+            elif not effective_parameters and context.no_parameters:
+                if self.dialect._has_events:
+                    for fn in self.dialect.dispatch.do_execute_no_params:
+                        if fn(cursor, str_statement, context):
+                            evt_handled = True
+                            break
+                if not evt_handled:
+                    self.dialect.do_execute_no_params(
+                        cursor, str_statement, context
+                    )
+            else:
+                effective_parameters = cast(
+                    "_CoreSingleExecuteParams", effective_parameters
+                )
+                if self.dialect._has_events:
+                    for fn in self.dialect.dispatch.do_execute:
+                        if fn(
+                            cursor,
+                            str_statement,
+                            effective_parameters,
+                            context,
+                        ):
+                            evt_handled = True
+                            break
+                if not evt_handled:
+>                   self.dialect.do_execute(
+                        cursor, str_statement, effective_parameters, context
+                    )
+
+../venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py:1969: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <sqlalchemy.dialects.sqlite.pysqlite.SQLiteDialect_pysqlite object at 0x709a7a40b860>
+cursor = <sqlite3.Cursor object at 0x709a7ac71740>
+statement = 'INSERT INTO asset (id, household_id, display_name, asset_type, status, quantity, unit, condition, version) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING created_at, updated_at'
+parameters = ('01a0abcb-f9c4-7662-9115-5ac40dd8fa1d', '01a0abcb-f9bf-7ee3-9a3e-73f2bc00cab4', None, 'unknown', 'ACTIVE', None, ...)
+context = <sqlalchemy.dialects.sqlite.base.SQLiteExecutionContext object at 0x709a7a4370b0>
+
+    def do_execute(self, cursor, statement, parameters, context=None):
+>       cursor.execute(statement, parameters)
+E       sqlite3.IntegrityError: NOT NULL constraint failed: asset.display_name
+
+../venv/lib/python3.12/site-packages/sqlalchemy/engine/default.py:952: IntegrityError
+
+The above exception was the direct cause of the following exception:
+
+asset_db = (<sqlalchemy.orm.session.Session object at 0x709a7a40bdd0>, '01a0abcb-f9bf-7ee3-9a3e-73f2bc00cab4')
+
+    def test_nameless_asset_neither_errors_nor_corrupts_fts(asset_db) -> None:  # type: ignore[no-untyped-def]
+        from app.services.fts import ensure_asset_fts, rebuild_asset_fts
+    
+        session, household_id = asset_db
+        named = create_asset(session, household_id, {"display_name": "Toothbrush"})
+>       nameless = create_asset(session, household_id, {"display_name": None})
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_sg048_name_optional.py:257: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+app/services/asset_service.py:28: in create_asset
+    db.flush()
+../venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py:4353: in flush
+    self._flush(objects)
+../venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py:4488: in _flush
+    with util.safe_reraise():
+../venv/lib/python3.12/site-packages/sqlalchemy/util/langhelpers.py:122: in __exit__
+    raise exc_value.with_traceback(exc_tb)
+../venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py:4449: in _flush
+    flush_context.execute()
+../venv/lib/python3.12/site-packages/sqlalchemy/orm/unitofwork.py:465: in execute
+    rec.execute(self)
+../venv/lib/python3.12/site-packages/sqlalchemy/orm/unitofwork.py:641: in execute
+    util.preloaded.orm_persistence.save_obj(
+../venv/lib/python3.12/site-packages/sqlalchemy/orm/persistence.py:94: in save_obj
+    _emit_insert_statements(
+../venv/lib/python3.12/site-packages/sqlalchemy/orm/persistence.py:1234: in _emit_insert_statements
+    result = connection.execute(
+../venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py:1421: in execute
+    return meth(
+../venv/lib/python3.12/site-packages/sqlalchemy/sql/elements.py:526: in _execute_on_connection
+    return connection._execute_clauseelement(
+../venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py:1643: in _execute_clauseelement
+    ret = self._execute_context(
+../venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py:1848: in _execute_context
+    return self._exec_single_context(
+../venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py:1988: in _exec_single_context
+    self._handle_dbapi_exception(
+../venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py:2365: in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+../venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py:1969: in _exec_single_context
+    self.dialect.do_execute(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <sqlalchemy.dialects.sqlite.pysqlite.SQLiteDialect_pysqlite object at 0x709a7a40b860>
+cursor = <sqlite3.Cursor object at 0x709a7ac71740>
+statement = 'INSERT INTO asset (id, household_id, display_name, asset_type, status, quantity, unit, condition, version) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING created_at, updated_at'
+parameters = ('01a0abcb-f9c4-7662-9115-5ac40dd8fa1d', '01a0abcb-f9bf-7ee3-9a3e-73f2bc00cab4', None, 'unknown', 'ACTIVE', None, ...)
+context = <sqlalchemy.dialects.sqlite.base.SQLiteExecutionContext object at 0x709a7a4370b0>
+
+    def do_execute(self, cursor, statement, parameters, context=None):
+>       cursor.execute(statement, parameters)
+E       sqlalchemy.exc.IntegrityError: (sqlite3.IntegrityError) NOT NULL constraint failed: asset.display_name
+E       [SQL: INSERT INTO asset (id, household_id, display_name, asset_type, status, quantity, unit, condition, version) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING created_at, updated_at]
+E       [parameters: ('01a0abcb-f9c4-7662-9115-5ac40dd8fa1d', '01a0abcb-f9bf-7ee3-9a3e-73f2bc00cab4', None, 'unknown', 'ACTIVE', None, None, None, 1)]
+E       (Background on this error at: https://sqlalche.me/e/20/gkpj)
+
+../venv/lib/python3.12/site-packages/sqlalchemy/engine/default.py:952: IntegrityError
+___________________ test_catalog_builders_tolerate_null_name ___________________
+
+self = <sqlalchemy.engine.base.Connection object at 0x709a7acdba40>
+dialect = <sqlalchemy.dialects.sqlite.pysqlite.SQLiteDialect_pysqlite object at 0x709a7a40b7a0>
+context = <sqlalchemy.dialects.sqlite.base.SQLiteExecutionContext object at 0x709a7a40bd70>
+statement = <sqlalchemy.dialects.sqlite.base.SQLiteCompiler object at 0x709a7a435f10>
+parameters = [('01a0abcb-fa92-7c20-8449-18ef56ddcb02', '01a0abcb-fa90-7af0-a8a9-1e0fe0f15ae5', None, 'unknown', 'ACTIVE', None, ...)]
+
+    def _exec_single_context(
+        self,
+        dialect: Dialect,
+        context: ExecutionContext,
+        statement: Union[str, Compiled],
+        parameters: Optional[_AnyMultiExecuteParams],
+    ) -> CursorResult[Any]:
+        """continue the _execute_context() method for a single DBAPI
+        cursor.execute() or cursor.executemany() call.
+    
+        """
+        if dialect.bind_typing is BindTyping.SETINPUTSIZES:
+            generic_setinputsizes = context._prepare_set_input_sizes()
+    
+            if generic_setinputsizes:
+                try:
+                    dialect.do_set_input_sizes(
+                        context.cursor, generic_setinputsizes, context
+                    )
+                except BaseException as e:
+                    self._handle_dbapi_exception(
+                        e, str(statement), parameters, None, context
+                    )
+    
+        cursor, str_statement, parameters = (
+            context.cursor,
+            context.statement,
+            context.parameters,
+        )
+    
+        effective_parameters: Optional[_AnyExecuteParams]
+    
+        if not context.executemany:
+            effective_parameters = parameters[0]
+        else:
+            effective_parameters = parameters
+    
+        if self._has_events or self.engine._has_events:
+            for fn in self.dispatch.before_cursor_execute:
+                str_statement, effective_parameters = fn(
+                    self,
+                    cursor,
+                    str_statement,
+                    effective_parameters,
+                    context,
+                    context.executemany,
+                )
+    
+        if self._echo:
+            self._log_info(str_statement)
+    
+            stats = context._get_cache_stats()
+    
+            if not self.engine.hide_parameters:
+                self._log_info(
+                    "[%s] %r",
+                    stats,
+                    sql_util._repr_params(
+                        effective_parameters,
+                        batches=10,
+                        ismulti=context.executemany,
+                    ),
+                )
+            else:
+                self._log_info(
+                    "[%s] [SQL parameters hidden due to hide_parameters=True]",
+                    stats,
+                )
+    
+        evt_handled: bool = False
+        try:
+            if context.execute_style is ExecuteStyle.EXECUTEMANY:
+                effective_parameters = cast(
+                    "_CoreMultiExecuteParams", effective_parameters
+                )
+                if self.dialect._has_events:
+                    for fn in self.dialect.dispatch.do_executemany:
+                        if fn(
+                            cursor,
+                            str_statement,
+                            effective_parameters,
+                            context,
+                        ):
+                            evt_handled = True
+                            break
+                if not evt_handled:
+                    self.dialect.do_executemany(
+                        cursor,
+                        str_statement,
+                        effective_parameters,
+                        context,
+                    )
+            elif not effective_parameters and context.no_parameters:
+                if self.dialect._has_events:
+                    for fn in self.dialect.dispatch.do_execute_no_params:
+                        if fn(cursor, str_statement, context):
+                            evt_handled = True
+                            break
+                if not evt_handled:
+                    self.dialect.do_execute_no_params(
+                        cursor, str_statement, context
+                    )
+            else:
+                effective_parameters = cast(
+                    "_CoreSingleExecuteParams", effective_parameters
+                )
+                if self.dialect._has_events:
+                    for fn in self.dialect.dispatch.do_execute:
+                        if fn(
+                            cursor,
+                            str_statement,
+                            effective_parameters,
+                            context,
+                        ):
+                            evt_handled = True
+                            break
+                if not evt_handled:
+>                   self.dialect.do_execute(
+                        cursor, str_statement, effective_parameters, context
+                    )
+
+../venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py:1969: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <sqlalchemy.dialects.sqlite.pysqlite.SQLiteDialect_pysqlite object at 0x709a7a40b7a0>
+cursor = <sqlite3.Cursor object at 0x709a7ac923c0>
+statement = 'INSERT INTO asset (id, household_id, display_name, asset_type, status, quantity, unit, condition, version) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING created_at, updated_at'
+parameters = ('01a0abcb-fa92-7c20-8449-18ef56ddcb02', '01a0abcb-fa90-7af0-a8a9-1e0fe0f15ae5', None, 'unknown', 'ACTIVE', None, ...)
+context = <sqlalchemy.dialects.sqlite.base.SQLiteExecutionContext object at 0x709a7a40bd70>
+
+    def do_execute(self, cursor, statement, parameters, context=None):
+>       cursor.execute(statement, parameters)
+E       sqlite3.IntegrityError: NOT NULL constraint failed: asset.display_name
+
+../venv/lib/python3.12/site-packages/sqlalchemy/engine/default.py:952: IntegrityError
+
+The above exception was the direct cause of the following exception:
+
+asset_db = (<sqlalchemy.orm.session.Session object at 0x709a7aca4fe0>, '01a0abcb-fa90-7af0-a8a9-1e0fe0f15ae5')
+
+    def test_catalog_builders_tolerate_null_name(asset_db) -> None:  # type: ignore[no-untyped-def]
+        from app.services.chat.service import CLASSIFICATION_FIELD as CHAT_FIELD
+        from app.services.chat.service import build_catalog as build_chat_catalog
+        from app.services.planning.service import CLASSIFICATION_FIELD as PLANNING_FIELD
+        from app.services.planning.service import build_catalog as build_planning_catalog
+    
+        session, household_id = asset_db
+>       nameless = create_asset(
+            session, household_id, {"display_name": None, "status": "ACTIVE"}
+        )
+
+tests/test_sg048_name_optional.py:282: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+app/services/asset_service.py:28: in create_asset
+    db.flush()
+../venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py:4353: in flush
+    self._flush(objects)
+../venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py:4488: in _flush
+    with util.safe_reraise():
+../venv/lib/python3.12/site-packages/sqlalchemy/util/langhelpers.py:122: in __exit__
+    raise exc_value.with_traceback(exc_tb)
+../venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py:4449: in _flush
+    flush_context.execute()
+../venv/lib/python3.12/site-packages/sqlalchemy/orm/unitofwork.py:465: in execute
+    rec.execute(self)
+../venv/lib/python3.12/site-packages/sqlalchemy/orm/unitofwork.py:641: in execute
+    util.preloaded.orm_persistence.save_obj(
+../venv/lib/python3.12/site-packages/sqlalchemy/orm/persistence.py:94: in save_obj
+    _emit_insert_statements(
+../venv/lib/python3.12/site-packages/sqlalchemy/orm/persistence.py:1234: in _emit_insert_statements
+    result = connection.execute(
+../venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py:1421: in execute
+    return meth(
+../venv/lib/python3.12/site-packages/sqlalchemy/sql/elements.py:526: in _execute_on_connection
+    return connection._execute_clauseelement(
+../venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py:1643: in _execute_clauseelement
+    ret = self._execute_context(
+../venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py:1848: in _execute_context
+    return self._exec_single_context(
+../venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py:1988: in _exec_single_context
+    self._handle_dbapi_exception(
+../venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py:2365: in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+../venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py:1969: in _exec_single_context
+    self.dialect.do_execute(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <sqlalchemy.dialects.sqlite.pysqlite.SQLiteDialect_pysqlite object at 0x709a7a40b7a0>
+cursor = <sqlite3.Cursor object at 0x709a7ac923c0>
+statement = 'INSERT INTO asset (id, household_id, display_name, asset_type, status, quantity, unit, condition, version) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING created_at, updated_at'
+parameters = ('01a0abcb-fa92-7c20-8449-18ef56ddcb02', '01a0abcb-fa90-7af0-a8a9-1e0fe0f15ae5', None, 'unknown', 'ACTIVE', None, ...)
+context = <sqlalchemy.dialects.sqlite.base.SQLiteExecutionContext object at 0x709a7a40bd70>
+
+    def do_execute(self, cursor, statement, parameters, context=None):
+>       cursor.execute(statement, parameters)
+E       sqlalchemy.exc.IntegrityError: (sqlite3.IntegrityError) NOT NULL constraint failed: asset.display_name
+E       [SQL: INSERT INTO asset (id, household_id, display_name, asset_type, status, quantity, unit, condition, version) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING created_at, updated_at]
+E       [parameters: ('01a0abcb-fa92-7c20-8449-18ef56ddcb02', '01a0abcb-fa90-7af0-a8a9-1e0fe0f15ae5', None, 'unknown', 'ACTIVE', None, None, None, 1)]
+E       (Background on this error at: https://sqlalche.me/e/20/gkpj)
+
+../venv/lib/python3.12/site-packages/sqlalchemy/engine/default.py:952: IntegrityError
+___ test_generated_codes_are_validated_and_bad_checksum_is_not_an_identifier ___
+
+isolated_db = (<sqlalchemy.orm.session.Session object at 0x709a7acd9b20>, '01a0abcb-fb5e-7f11-9ec0-2d4eaeff589a', PosixPath('/tmp/pytest-of-andrei/pytest-10/test_generated_codes_are_valid0/storage'))
+
+    def test_generated_codes_are_validated_and_bad_checksum_is_not_an_identifier(isolated_db) -> None:  # type: ignore[no-untyped-def]
+        session, household_id, root = isolated_db
+        qr_value = "https://example.test/SG-013"
+        qr_image = qrcode.make(qr_value).convert("RGB")
+        qr = _evidence(session, household_id, root, _png(qr_image), "qr.png", "image/png")
+        ean_image, ean_value = _ean13_image("590123412345")
+        ean = _evidence(session, household_id, root, _png(ean_image), "ean.png", "image/png")
+        # Deliberately render a syntactically valid EAN with the wrong check digit.
+        bad_value = ean_value[:-1] + ("0" if ean_value[-1] != "0" else "1")
+        bad_image, _ = _ean13_image(ean_value[:-1], bad_value[-1])
+        bad = _evidence(session, household_id, root, _png(bad_image), "bad.png", "image/png")
+    
+        qr_rows = signals.extract_observations(qr.id, session)
+        ean_rows = signals.extract_observations(ean.id, session)
+        bad_rows = signals.extract_observations(bad.id, session)
+    
+        qr_values = [json.loads(row.value_json) for row in qr_rows if row.kind == "barcode_qr"]
+        ean_values = [json.loads(row.value_json) for row in ean_rows if row.kind == "barcode_qr"]
+        bad_values = [json.loads(row.value_json) for row in bad_rows if row.kind == "barcode_qr"]
+>       assert any(item.get("value") == qr_value and item["validated"] for item in qr_values)
+E       assert False
+E        +  where False = any(<generator object test_generated_codes_are_validated_and_bad_checksum_is_not_an_identifier.<locals>.<genexpr> at 0x709a7a4718c0>)
+
+tests/test_signals.py:136: AssertionError
+_________________ test_ocr_has_text_boxes_and_mean_confidence __________________
+
+isolated_db = (<sqlalchemy.orm.session.Session object at 0x709a7ac62f30>, '01a0abcb-fba5-7632-9196-ae8c4e5f4b94', PosixPath('/tmp/pytest-of-andrei/pytest-10/test_ocr_has_text_boxes_and_me0/storage'))
+
+    def test_ocr_has_text_boxes_and_mean_confidence(isolated_db) -> None:  # type: ignore[no-untyped-def]
+        session, household_id, root = isolated_db
+        evidence = _evidence(session, household_id, root, _png(_text_image()), "text.png", "image/png")
+        rows = signals.extract_observations(evidence.id, session)
+        ocr = [json.loads(row.value_json) for row in rows if row.kind == "ocr"]
+>       assert ocr
+E       assert []
+
+tests/test_signals.py:148: AssertionError
+=============================== warnings summary ===============================
+../venv/lib/python3.12/site-packages/fastapi/testclient.py:1
+  /home/andrei/StorageGenie/venv/lib/python3.12/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+tests/test_candidates.py: 3 warnings
+tests/test_foundations.py: 3 warnings
+tests/test_search.py: 3 warnings
+tests/test_sg048_name_optional.py: 3 warnings
+tests/test_signals.py: 3 warnings
+  /home/andrei/StorageGenie/venv/lib/python3.12/site-packages/alembic/config.py:604: DeprecationWarning: No path_separator found in configuration; falling back to legacy splitting on spaces, commas, and colons for prepend_sys_path.  Consider adding path_separator=os to Alembic config.
+    util.warn_deprecated(
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/test_sg048_name_optional.py::test_sg048_migration_round_trip_restores_nullability
+FAILED tests/test_sg048_name_optional.py::test_sg048_nameless_row_survives_upgrade_and_blocks_downgrade
+FAILED tests/test_sg048_name_optional.py::test_nameless_create_through_full_migration_chain
+FAILED tests/test_sg048_name_optional.py::test_nameless_with_evidence_uses_photo_stem_deterministic_assertion
+FAILED tests/test_sg048_name_optional.py::test_nameless_photoless_stores_null_and_writes_no_assertion
+FAILED tests/test_sg048_name_optional.py::test_blank_name_is_missing_in_both_branches
+FAILED tests/test_sg048_name_optional.py::test_nameless_asset_neither_errors_nor_corrupts_fts
+FAILED tests/test_sg048_name_optional.py::test_catalog_builders_tolerate_null_name
+FAILED tests/test_signals.py::test_generated_codes_are_validated_and_bad_checksum_is_not_an_identifier
+FAILED tests/test_signals.py::test_ocr_has_text_boxes_and_mean_confidence - a...
+10 failed, 187 passed, 16 warnings in 13.78s
+PYTEST_EXIT=1
+
+$ (cd frontend && npm test -- --run)
+
+> storagegenie-frontend@0.1.0 test
+> vitest run --run
+
+
+ RUN  v1.6.1 /home/andrei/StorageGenie/frontend
+
+ ✓ src/theme/theme.test.tsx  (10 tests) 106ms
+stderr | src/components/shell/import-modal.test.tsx > AssetImportModal staging > drop stages accepted files as Ready with a live count
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+stderr | src/components/shell/shell.test.tsx > Catalog shell > the header labels the LOADED item count, not a household total
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+stderr | src/components/catalog/catalog.test.tsx > ProductCard > renders the name, the category micro-pill and the primary-color dots
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+ ✓ src/components/shell/import-modal.test.tsx  (14 tests) 350ms
+stderr | src/components/shell/drawer.test.tsx > ItemInspectorDrawer > a null display_name shows the Untitled asset fallback and an empty editable title
+Error: Uncaught [TypeError: Cannot read properties of null (reading 'trim')]
+    at reportException (/home/andrei/StorageGenie/frontend/node_modules/jsdom/lib/jsdom/living/helpers/runtime-script-errors.js:66:24)
+    at innerInvokeEventListeners (/home/andrei/StorageGenie/frontend/node_modules/jsdom/lib/jsdom/living/events/EventTarget-impl.js:353:9)
+    at invokeEventListeners (/home/andrei/StorageGenie/frontend/node_modules/jsdom/lib/jsdom/living/events/EventTarget-impl.js:286:3)
+    at HTMLUnknownElementImpl._dispatch (/home/andrei/StorageGenie/frontend/node_modules/jsdom/lib/jsdom/living/events/EventTarget-impl.js:233:9)
+    at HTMLUnknownElementImpl.dispatchEvent (/home/andrei/StorageGenie/frontend/node_modules/jsdom/lib/jsdom/living/events/EventTarget-impl.js:104:17)
+    at HTMLUnknownElement.dispatchEvent (/home/andrei/StorageGenie/frontend/node_modules/jsdom/lib/jsdom/living/generated/EventTarget.js:241:34)
+    at Object.invokeGuardedCallbackDev (/home/andrei/StorageGenie/frontend/node_modules/react-dom/cjs/react-dom.development.js:4213:16)
+    at invokeGuardedCallback (/home/andrei/StorageGenie/frontend/node_modules/react-dom/cjs/react-dom.development.js:4277:31)
+    at beginWork$1 (/home/andrei/StorageGenie/frontend/node_modules/react-dom/cjs/react-dom.development.js:27490:7)
+    at performUnitOfWork (/home/andrei/StorageGenie/frontend/node_modules/react-dom/cjs/react-dom.development.js:26599:12) TypeError: Cannot read properties of null (reading 'trim')
+    at ItemInspectorDrawer (/home/andrei/StorageGenie/frontend/src/components/shell/ItemInspectorDrawer.tsx:322:54)
+    at renderWithHooks (/home/andrei/StorageGenie/frontend/node_modules/react-dom/cjs/react-dom.development.js:15486:18)
+    at mountIndeterminateComponent (/home/andrei/StorageGenie/frontend/node_modules/react-dom/cjs/react-dom.development.js:20103:13)
+    at beginWork (/home/andrei/StorageGenie/frontend/node_modules/react-dom/cjs/react-dom.development.js:21626:16)
+    at HTMLUnknownElement.callCallback (/home/andrei/StorageGenie/frontend/node_modules/react-dom/cjs/react-dom.development.js:4164:14)
+    at HTMLUnknownElement.callTheUserObjectsOperation (/home/andrei/StorageGenie/frontend/node_modules/jsdom/lib/jsdom/living/generated/EventListener.js:26:30)
+    at innerInvokeEventListeners (/home/andrei/StorageGenie/frontend/node_modules/jsdom/lib/jsdom/living/events/EventTarget-impl.js:350:25)
+    at invokeEventListeners (/home/andrei/StorageGenie/frontend/node_modules/jsdom/lib/jsdom/living/events/EventTarget-impl.js:286:3)
+    at HTMLUnknownElementImpl._dispatch (/home/andrei/StorageGenie/frontend/node_modules/jsdom/lib/jsdom/living/events/EventTarget-impl.js:233:9)
+    at HTMLUnknownElementImpl.dispatchEvent (/home/andrei/StorageGenie/frontend/node_modules/jsdom/lib/jsdom/living/events/EventTarget-impl.js:104:17)
+Error: Uncaught [TypeError: Cannot read properties of null (reading 'trim')]
+    at reportException (/home/andrei/StorageGenie/frontend/node_modules/jsdom/lib/jsdom/living/helpers/runtime-script-errors.js:66:24)
+    at innerInvokeEventListeners (/home/andrei/StorageGenie/frontend/node_modules/jsdom/lib/jsdom/living/events/EventTarget-impl.js:353:9)
+    at invokeEventListeners (/home/andrei/StorageGenie/frontend/node_modules/jsdom/lib/jsdom/living/events/EventTarget-impl.js:286:3)
+    at HTMLUnknownElementImpl._dispatch (/home/andrei/StorageGenie/frontend/node_modules/jsdom/lib/jsdom/living/events/EventTarget-impl.js:233:9)
+    at HTMLUnknownElementImpl.dispatchEvent (/home/andrei/StorageGenie/frontend/node_modules/jsdom/lib/jsdom/living/events/EventTarget-impl.js:104:17)
+    at HTMLUnknownElement.dispatchEvent (/home/andrei/StorageGenie/frontend/node_modules/jsdom/lib/jsdom/living/generated/EventTarget.js:241:34)
+    at Object.invokeGuardedCallbackDev (/home/andrei/StorageGenie/frontend/node_modules/react-dom/cjs/react-dom.development.js:4213:16)
+    at invokeGuardedCallback (/home/andrei/StorageGenie/frontend/node_modules/react-dom/cjs/react-dom.development.js:4277:31)
+    at beginWork$1 (/home/andrei/StorageGenie/frontend/node_modules/react-dom/cjs/react-dom.development.js:27490:7)
+    at performUnitOfWork (/home/andrei/StorageGenie/frontend/node_modules/react-dom/cjs/react-dom.development.js:26599:12) TypeError: Cannot read properties of null (reading 'trim')
+    at ItemInspectorDrawer (/home/andrei/StorageGenie/frontend/src/components/shell/ItemInspectorDrawer.tsx:322:54)
+    at renderWithHooks (/home/andrei/StorageGenie/frontend/node_modules/react-dom/cjs/react-dom.development.js:15486:18)
+    at mountIndeterminateComponent (/home/andrei/StorageGenie/frontend/node_modules/react-dom/cjs/react-dom.development.js:20103:13)
+    at beginWork (/home/andrei/StorageGenie/frontend/node_modules/react-dom/cjs/react-dom.development.js:21626:16)
+    at HTMLUnknownElement.callCallback (/home/andrei/StorageGenie/frontend/node_modules/react-dom/cjs/react-dom.development.js:4164:14)
+    at HTMLUnknownElement.callTheUserObjectsOperation (/home/andrei/StorageGenie/frontend/node_modules/jsdom/lib/jsdom/living/generated/EventListener.js:26:30)
+    at innerInvokeEventListeners (/home/andrei/StorageGenie/frontend/node_modules/jsdom/lib/jsdom/living/events/EventTarget-impl.js:350:25)
+    at invokeEventListeners (/home/andrei/StorageGenie/frontend/node_modules/jsdom/lib/jsdom/living/events/EventTarget-impl.js:286:3)
+    at HTMLUnknownElementImpl._dispatch (/home/andrei/StorageGenie/frontend/node_modules/jsdom/lib/jsdom/living/events/EventTarget-impl.js:233:9)
+    at HTMLUnknownElementImpl.dispatchEvent (/home/andrei/StorageGenie/frontend/node_modules/jsdom/lib/jsdom/living/events/EventTarget-impl.js:104:17)
+The above error occurred in the <ItemInspectorDrawer> component:
+
+    at ItemInspectorDrawer (/home/andrei/StorageGenie/frontend/src/components/shell/ItemInspectorDrawer.tsx:34:32)
+    at QueryClientProvider (file:///home/andrei/StorageGenie/frontend/node_modules/@tanstack/react-query/build/modern/QueryClientProvider.js:12:32)
+
+Consider adding an error boundary to your tree to customize error handling behavior.
+Visit https://reactjs.org/link/error-boundaries to learn more about error boundaries.
+
+ ❯ src/components/shell/drawer.test.tsx  (13 tests | 1 failed) 554ms
+   ❯ src/components/shell/drawer.test.tsx > ItemInspectorDrawer > a null display_name shows the Untitled asset fallback and an empty editable title
+     → Cannot read properties of null (reading 'trim')
+ ✓ src/components/catalog/catalog.test.tsx  (31 tests) 589ms
+stderr | src/routes/ReviewPage.test.tsx > ReviewPage > posts every decision with the loaded candidate id and supports keyboard actions
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+ ✓ src/routes/ReviewPage.test.tsx  (4 tests) 227ms
+ ❯ src/types/product.test.ts  (12 tests | 1 failed) 7ms
+   ❯ src/types/product.test.ts > assetToProductItem > a null display_name falls back to the display-only Untitled asset constant
+     → expected null to be undefined // Object.is equality
+ ✓ src/components/shell/shell.test.tsx  (15 tests) 906ms
+stderr | src/routes/InboxPage.test.tsx > InboxPage > renders failed loaded job detail and retries that loaded id
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+ ✓ src/routes/InboxPage.test.tsx  (4 tests) 242ms
+stderr | src/routes/AssetDetailPage.test.tsx > AssetDetailPage > editing quantity patches via PATCH and shows the superseded prior value in history
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+ ✓ src/routes/AssetDetailPage.test.tsx  (2 tests) 166ms
+ ✓ src/routes/ChatPage.test.tsx  (5 tests) 151ms
+ ✓ src/routes/PlanningPage.test.tsx  (4 tests) 280ms
+ ✓ src/components/CandidateCard.test.tsx  (4 tests) 113ms
+ ✓ src/components/ExpiryEntryForm.test.tsx  (2 tests) 79ms
+ ✓ src/routes/SettingsPage.test.tsx  (3 tests) 111ms
+ ✓ src/components/PlanningSuggestionCard.test.tsx  (2 tests) 118ms
+ ❯ src/components/AssetCard.test.tsx  (2 tests | 1 failed) 49ms
+   ❯ src/components/AssetCard.test.tsx > AssetCard > a null display_name renders the Untitled asset fallback
+     → Unable to find an element with the text: Untitled asset. This could be because the text is broken up by multiple elements. In this case, you can provide a function for your text matcher to make your matcher more flexible.
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<a[39m
+      [33mhref[39m=[32m"/assets/2?household_id=h1"[39m
+      [33mstyle[39m=[32m"border: 1px solid rgb(229, 231, 235); border-radius: 8px; padding: 12px; display: block; text-decoration: none; color: inherit; background: white;"[39m
+    [36m>[39m
+      [36m<div[39m
+        [33mstyle[39m=[32m"width: 100%; height: 120px; border-radius: 6px; margin-bottom: 8px; background: rgb(243, 244, 246); display: flex; align-items: center; justify-content: center; color: rgb(156, 163, 175); font-size: 12px;"[39m
+      [36m>[39m
+        [0mno image[0m
+      [36m</div>[39m
+      [36m<div[39m
+        [33mstyle[39m=[32m"font-weight: 600; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"[39m
+      [36m/>[39m
+      [36m<div[39m
+        [33mstyle[39m=[32m"font-size: 12px; color: rgb(107, 114, 128);"[39m
+      [36m>[39m
+        [0munknown[0m
+        [0m · [0m
+        [0mACTIVE[0m
+      [36m</div>[39m
+      [36m<div[39m
+        [33mstyle[39m=[32m"display: flex; gap: 6px; margin-top: 6px; align-items: center; flex-wrap: wrap;"[39m
+      [36m>[39m
+        [36m<span[39m
+          [33mstyle[39m=[32m"font-size: 11px; color: rgb(107, 114, 128);"[39m
+        [36m>[39m
+          [0m0[0m
+          [0m evidence[0m
+        [36m</span>[39m
+        [36m<span[39m
+          [33mstyle[39m=[32m"font-size: 11px; color: rgb(156, 163, 175);"[39m
+        [36m>[39m
+          [0mv[0m
+          [0m1[0m
+        [36m</span>[39m
+      [36m</div>[39m
+    [36m</a>[39m
+  [36m</div>[39m
+[36m</body>[39m
+stderr | src/components/AssetCard.test.tsx > AssetCard > renders display_name and type
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+ ✓ src/components/JobCard.test.tsx  (1 test) 34ms
+ ✓ src/components/ChatTranscript.test.tsx  (2 tests) 49ms
+ ✓ src/components/ProvenanceBadge.test.tsx  (3 tests) 57ms
+ ✓ src/api/client.test.ts  (3 tests) 3ms
+ ❯ src/components/AssetForm.test.tsx  (7 tests | 3 failed) 2254ms
+   ❯ src/components/AssetForm.test.tsx > AssetForm > the name field reads optional and explains the filename fallback
+     → Unable to find an element with the text: Display name (optional). This could be because the text is broken up by multiple elements. In this case, you can provide a function for your text matcher to make your matcher more flexible.
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<form[39m
+      [33mstyle[39m=[32m"display: flex; flex-direction: column; gap: 12px; max-width: 520px;"[39m
+    [36m>[39m
+      [36m<label[39m
+        [33mstyle[39m=[32m"display: flex; flex-direction: column; gap: 4px;"[39m
+      [36m>[39m
+        [36m<span>[39m
+          [0mDisplay name *[0m
+        [36m</span>[39m
+        [36m<input[39m
+          [33mplaceholder[39m=[32m"e.g. Hammer"[39m
+          [33mrequired[39m=[32m""[39m
+          [33mstyle[39m=[32m"width: 100%; padding: 8px; border: 1px solid rgb(209, 213, 219); border-radius: 6px;"[39m
+          [33mvalue[39m=[32m""[39m
+        [36m/>[39m
+      [36m</label>[39m
+      [36m<label[39m
+        [33mstyle[39m=[32m"display: flex; flex-direction: column; gap: 4px;"[39m
+      [36m>[39m
+        [36m<span>[39m
+          [0mAsset type[0m
+        [36m</span>[39m
+        [36m<select[39m
+          [33mstyle[39m=[32m"width: 100%; padding: 8px; border-radius: 6px;"[39m
+        [36m>[39m
+          [36m<option[39m
+            [33mvalue[39m=[32m"unknown"[39m
+          [36m>[39m
+            [0munknown[0m
+          [36m</option>[39m
+          [36m<option[39m
+            [33mvalue[39m=[32m"equipment"[39m
+          [36m>[39m
+            [0mequipment[0m
+          [36m</option>[39m
+          [36m<option[39m
+            [33mvalue[39m=[32m"product"[39m
+          [36m>[39m
+            [0mproduct[0m
+          [36m</option>[39m
+          [36m<option[39m
+            [33mvalue[39m=[32m"component"[39m
+          [36m>[39m
+            [0mcomponent[0m
+          [36m</option>[39m
+          [36m<option[39m
+            [33mvalue[39m=[32m"consumable"[39m
+          [36m>[39m
+            [0mconsumable[0m
+          [36m</option>[39m
+          [36m<option[39m
+            [33mvalue[39m=[32m"container"[39m
+          [36m>[39m
+            [0mcontainer[0m
+          [36m</option>[39m
+          [36m<option[39m
+            [33mvalue[39m=[32m"document"[39m
+          [36m>[39m
+            [0mdocument[0m
+          [36m</option>[39m
+          [36m<option[39m
+            [33mvalue[39m=[32m"collection"[39m
+          [36m>[39m
+            [0mcollection[0m
+          [36m</option>[39m
+        [36m</select>[39m
+      [36m</label>[39m
+      [36m<div[39m
+        [33mstyle[39m=[32m"display: flex; gap: 12px;"[39m
+      [36m>[39m
+        [36m<label[39m
+          [33mstyle[39m=[32m"flex: 1 1 0%; display: flex; flex-direction: column; gap: 4px;"[39m
+        [36m>[39m
+          [36m<span>[39m
+            [0mQuantity[0m
+          [36m</span>[39m
+          [36m<input[39m
+            [33mstep[39m=[32m"any"[39m
+            [33mstyle[39m=[32m"padding: 8px; border: 1px solid rgb(209, 213, 219); border-radius: 6px;"[39m
+            [33mtype[39m=[32m"number"[39m
+            [33mvalue[39m=[32m""[39m
+          [36m/>[39m
+        [36m</label>[39m
+        [36m<label[39m
+          [33mstyle[39m=[32m"flex: 1 1 0%; display: flex; flex-direction: column; gap: 4px;"[39m
+        [36m>[39m
+          [36m<span>[39m
+            [0mUnit[0m
+          [36m</span>[39m
+          [36m<input[39m
+            [33mplaceholder[39m=[32m"pcs, kg…"[39m
+            [33mstyle[39m=[32m"padding: 8px; border: 1px solid rgb(209, 213, 219); border-radius: 6px;"[39m
+            [33mvalue[39m=[32m""[39m
+          [36m/>[39m
+        [36m</label>[39m
+        [36m<label[39m
+          [33mstyle[39m=[32m"flex: 1 1 0%; display: flex; flex-direction: column; gap: 4px;"[39m
+        [36m>[39m
+          [36m<span>[39m
+            [0mCondition[0m
+          [36m</span>[39m
+          [36m<input[39m
+            [33mplaceholder[39m=[32m"new, used…"[39m
+            [33mstyle[39m=[32m"padding: 8px; border: 1px solid rgb(209, 213, 219); border-radius: 6px;"[39m
+            [33mvalue[39m=[32m""[39m
+          [36m/>[39m
+        [36m</label>[39m
+      [36m</div>[39m
+      [36m<div[39m
+        [33mstyle[39m=[32m"border: 2px dashed rgb(209, 213, 219); border-radius: 8px; padding: 16px; background: rgb(249, 250, 251); text-align: center;"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mstyle[39m=[32m"font-size: 13px; color: rgb(107, 114, 128); margin-bottom: 8px;"[39m
+        [36m>[39m
+          [0mDrag & drop photos here, click to select, or paste[0m
+        [36m</div>[39m
+        [36m<input[39m
+          [33maccept[39m=[32m"image/*,.pdf"[39m
+          [33mmultiple[39m=[32m""[39m
+          [33mtype[39m=[32m"file"[39m
+        [36m/>[39m
+        [36m<label[39m
+          [33mstyle[39m=[32m"display: inline-flex; flex-direction: column; gap: 4px; margin-top: 12px; font-size: 13px; color: rgb(107, 114, 128);"[39m
+        [36m>[39m
+          [0mTake a photo[0m
+          [36m<input[39m
+            [33maccept[39m=[32m"image/*"[39m
+            [33mcapture[39m=[32m"environment"[39m
+            [33mtype[39m=[32m"file"[39m
+          [36m/>[39m
+        [36m</label>[39m
+      [36m</div>[39m
+      [36m<button[39m
+        [33mstyle[39m=[32m"padding: 10px 16px; background: rgb(17, 24, 39); color: white; border-radius: 6px; cursor: pointer;"[39m
+        [33mtype[39m=[32m"submit"[39m
+      [36m>[39m
+        [0mCreate asset[0m
+      [36m</button>[39m
+    [36m</form>[39m
+  [36m</div>[39m
+[36m</body>[39m
+   ❯ src/components/AssetForm.test.tsx > AssetForm > a nameless capture with a photo posts no display_name key
+     → expected "spy" to be called 1 times, but got 0 times
+
+Ignored nodes: comments, script, style
+[36m<html>[39m
+  [36m<head />[39m
+  [36m<body>[39m
+    [36m<div>[39m
+      [36m<form[39m
+        [33mstyle[39m=[32m"display: flex; flex-direction: column; gap: 12px; max-width: 520px;"[39m
+      [36m>[39m
+        [36m<label[39m
+          [33mstyle[39m=[32m"display: flex; flex-direction: column; gap: 4px;"[39m
+        [36m>[39m
+          [36m<span>[39m
+            [0mDisplay name *[0m
+          [36m</span>[39m
+          [36m<input[39m
+            [33mplaceholder[39m=[32m"e.g. Hammer"[39m
+            [33mrequired[39m=[32m""[39m
+            [33mstyle[39m=[32m"width: 100%; padding: 8px; border: 1px solid rgb(209, 213, 219); border-radius: 6px;"[39m
+            [33mvalue[39m=[32m""[39m
+          [36m/>[39m
+        [36m</label>[39m
+        [36m<label[39m
+          [33mstyle[39m=[32m"display: flex; flex-direction: column; gap: 4px;"[39m
+        [36m>[39m
+          [36m<span>[39m
+            [0mAsset type[0m
+          [36m</span>[39m
+          [36m<select[39m
+            [33mstyle[39m=[32m"width: 100%; padding: 8px; border-radius: 6px;"[39m
+          [36m>[39m
+            [36m<option[39m
+              [33mvalue[39m=[32m"unknown"[39m
+            [36m>[39m
+              [0munknown[0m
+            [36m</option>[39m
+            [36m<option[39m
+              [33mvalue[39m=[32m"equipment"[39m
+            [36m>[39m
+              [0mequipment[0m
+            [36m</option>[39m
+            [36m<option[39m
+              [33mvalue[39m=[32m"product"[39m
+            [36m>[39m
+              [0mproduct[0m
+            [36m</option>[39m
+            [36m<option[39m
+              [33mvalue[39m=[32m"component"[39m
+            [36m>[39m
+              [0mcomponent[0m
+            [36m</option>[39m
+            [36m<option[39m
+              [33mvalue[39m=[32m"consumable"[39m
+            [36m>[39m
+              [0mconsumable[0m
+            [36m</option>[39m
+            [36m<option[39m
+              [33mvalue[39m=[32m"container"[39m
+            [36m>[39m
+              [0mcontainer[0m
+            [36m</option>[39m
+            [36m<option[39m
+              [33mvalue[39m=[32m"document"[39m
+            [36m>[39m
+              [0mdocument[0m
+            [36m</option>[39m
+            [36m<option[39m
+              [33mvalue[39m=[32m"collection"[39m
+            [36m>[39m
+              [0mcollection[0m
+            [36m</option>[39m
+          [36m</select>[39m
+        [36m</label>[39m
+        [36m<div[39m
+          [33mstyle[39m=[32m"display: flex; gap: 12px;"[39m
+        [36m>[39m
+          [36m<label[39m
+            [33mstyle[39m=[32m"flex: 1 1 0%; display: flex; flex-direction: column; gap: 4px;"[39m
+          [36m>[39m
+            [36m<span>[39m
+              [0mQuantity[0m
+            [36m</span>[39m
+            [36m<input[39m
+              [33mstep[39m=[32m"any"[39m
+              [33mstyle[39m=[32m"padding: 8px; border: 1px solid rgb(209, 213, 219); border-radius: 6px;"[39m
+              [33mtype[39m=[32m"number"[39m
+              [33mvalue[39m=[32m""[39m
+            [36m/>[39m
+          [36m</label>[39m
+          [36m<label[39m
+            [33mstyle[39m=[32m"flex: 1 1 0%; display: flex; flex-direction: column; gap: 4px;"[39m
+          [36m>[39m
+            [36m<span>[39m
+              [0mUnit[0m
+            [36m</span>[39m
+            [36m<input[39m
+              [33mplaceholder[39m=[32m"pcs, kg…"[39m
+              [33mstyle[39m=[32m"padding: 8px; border: 1px solid rgb(209, 213, 219); border-radius: 6px;"[39m
+              [33mvalue[39m=[32m""[39m
+            [36m/>[39m
+          [36m</label>[39m
+          [36m<label[39m
+            [33mstyle[39m=[32m"flex: 1 1 0%; display: flex; flex-direction: column; gap: 4px;"[39m
+          [36m>[39m
+            [36m<span>[39m
+              [0mCondition[0m
+            [36m</span>[39m
+            [36m<input[39m
+              [33mplaceholder[39m=[32m"new, used…"[39m
+              [33mstyle[39m=[32m"padding: 8px; border: 1px solid rgb(209, 213, 219); border-radius: 6px;"[39m
+              [33mvalue[39m=[32m""[39m
+            [36m/>[39m
+          [36m</label>[39m
+        [36m</div>[39m
+        [36m<div[39m
+          [33mstyle[39m=[32m"border: 2px dashed rgb(209, 213, 219); border-radius: 8px; padding: 16px; background: rgb(249, 250, 251); text-align: center;"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mstyle[39m=[32m"font-size: 13px; color: rgb(107, 114, 128); margin-bottom: 8px;"[39m
+          [36m>[39m
+            [0mDrag & drop photos here, click to select, or paste[0m
+          [36m</div>[39m
+          [36m<input[39m
+            [33maccept[39m=[32m"image/*,.pdf"[39m
+            [33mmultiple[39m=[32m""[39m
+            [33mtype[39m=[32m"file"[39m
+          [36m/>[39m
+          [36m<label[39m
+            [33mstyle[39m=[32m"display: inline-flex; flex-direction: column; gap: 4px; margin-top: 12px; font-size: 13px; color: rgb(107, 114, 128);"[39m
+          [36m>[39m
+            [0mTake a photo[0m
+            [36m<input[39m
+              [33maccept[39m=[32m"image/*"[39m
+              [33mcapture[39m=[32m"environment"[39m
+              [33mtype[39m=[32m"file"[39m
+            [36m/>[39m
+          [36m</label>[39m
+          [36m<ul[39m
+            [33mstyle[39m=[32m"text-align: left; margin-top: 12px; padding-left: 16px;"[39m
+          [36m>[39m
+            [36m<li[39m
+              [33mstyle[39m=[32m"font-size: 12px; margin-bottom: 4px;"[39m
+            [36m>[39m
+              [0mnameless.png[0m
+              [0m — [0m
+              [0m0.0[0m
+              [0m KB [0m
+              [36m<button[39m
+                [33mstyle[39m=[32m"margin-left: 8px; font-size: 11px;"[39m
+                [33mtype[39m=[32m"button"[39m
+              [36m>[39m
+                [0mremove[0m
+              [36m</button>[39m
+            [36m</li>[39m
+          [36m</ul>[39m
+        [36m</div>[39m
+        [36m<button[39m
+          [33mstyle[39m=[32m"padding: 10px 16px; background: rgb(17, 24, 39); color: white; border-radius: 6px; cursor: pointer;"[39m
+          [33mtype[39m=[32m"submit"[39m
+        [36m>[39m
+          [0mCreate asset[0m
+        [36m</button>[39m
+      [36m</form>[39m
+    [36m</div>[39m
+  [36m</body>[39m
+[36m</html>[39m
+   ❯ src/components/AssetForm.test.tsx > AssetForm > a nameless photoless submit is refused with a named error and sends nothing
+     → Unable to find an element with the text: Add a photo or a display name. This could be because the text is broken up by multiple elements. In this case, you can provide a function for your text matcher to make your matcher more flexible.
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<form[39m
+      [33mstyle[39m=[32m"display: flex; flex-direction: column; gap: 12px; max-width: 520px;"[39m
+    [36m>[39m
+      [36m<label[39m
+        [33mstyle[39m=[32m"display: flex; flex-direction: column; gap: 4px;"[39m
+      [36m>[39m
+        [36m<span>[39m
+          [0mDisplay name *[0m
+        [36m</span>[39m
+        [36m<input[39m
+          [33mplaceholder[39m=[32m"e.g. Hammer"[39m
+          [33mrequired[39m=[32m""[39m
+          [33mstyle[39m=[32m"width: 100%; padding: 8px; border: 1px solid rgb(209, 213, 219); border-radius: 6px;"[39m
+          [33mvalue[39m=[32m""[39m
+        [36m/>[39m
+      [36m</label>[39m
+      [36m<label[39m
+        [33mstyle[39m=[32m"display: flex; flex-direction: column; gap: 4px;"[39m
+      [36m>[39m
+        [36m<span>[39m
+          [0mAsset type[0m
+        [36m</span>[39m
+        [36m<select[39m
+          [33mstyle[39m=[32m"width: 100%; padding: 8px; border-radius: 6px;"[39m
+        [36m>[39m
+          [36m<option[39m
+            [33mvalue[39m=[32m"unknown"[39m
+          [36m>[39m
+            [0munknown[0m
+          [36m</option>[39m
+          [36m<option[39m
+            [33mvalue[39m=[32m"equipment"[39m
+          [36m>[39m
+            [0mequipment[0m
+          [36m</option>[39m
+          [36m<option[39m
+            [33mvalue[39m=[32m"product"[39m
+          [36m>[39m
+            [0mproduct[0m
+          [36m</option>[39m
+          [36m<option[39m
+            [33mvalue[39m=[32m"component"[39m
+          [36m>[39m
+            [0mcomponent[0m
+          [36m</option>[39m
+          [36m<option[39m
+            [33mvalue[39m=[32m"consumable"[39m
+          [36m>[39m
+            [0mconsumable[0m
+          [36m</option>[39m
+          [36m<option[39m
+            [33mvalue[39m=[32m"container"[39m
+          [36m>[39m
+            [0mcontainer[0m
+          [36m</option>[39m
+          [36m<option[39m
+            [33mvalue[39m=[32m"document"[39m
+          [36m>[39m
+            [0mdocument[0m
+          [36m</option>[39m
+          [36m<option[39m
+            [33mvalue[39m=[32m"collection"[39m
+          [36m>[39m
+            [0mcollection[0m
+          [36m</option>[39m
+        [36m</select>[39m
+      [36m</label>[39m
+      [36m<div[39m
+        [33mstyle[39m=[32m"display: flex; gap: 12px;"[39m
+      [36m>[39m
+        [36m<label[39m
+          [33mstyle[39m=[32m"flex: 1 1 0%; display: flex; flex-direction: column; gap: 4px;"[39m
+        [36m>[39m
+          [36m<span>[39m
+            [0mQuantity[0m
+          [36m</span>[39m
+          [36m<input[39m
+            [33mstep[39m=[32m"any"[39m
+            [33mstyle[39m=[32m"padding: 8px; border: 1px solid rgb(209, 213, 219); border-radius: 6px;"[39m
+            [33mtype[39m=[32m"number"[39m
+            [33mvalue[39m=[32m""[39m
+          [36m/>[39m
+        [36m</label>[39m
+        [36m<label[39m
+          [33mstyle[39m=[32m"flex: 1 1 0%; display: flex; flex-direction: column; gap: 4px;"[39m
+        [36m>[39m
+          [36m<span>[39m
+            [0mUnit[0m
+          [36m</span>[39m
+          [36m<input[39m
+            [33mplaceholder[39m=[32m"pcs, kg…"[39m
+            [33mstyle[39m=[32m"padding: 8px; border: 1px solid rgb(209, 213, 219); border-radius: 6px;"[39m
+            [33mvalue[39m=[32m""[39m
+          [36m/>[39m
+        [36m</label>[39m
+        [36m<label[39m
+          [33mstyle[39m=[32m"flex: 1 1 0%; display: flex; flex-direction: column; gap: 4px;"[39m
+        [36m>[39m
+          [36m<span>[39m
+            [0mCondition[0m
+          [36m</span>[39m
+          [36m<input[39m
+            [33mplaceholder[39m=[32m"new, used…"[39m
+            [33mstyle[39m=[32m"padding: 8px; border: 1px solid rgb(209, 213, 219); border-radius: 6px;"[39m
+            [33mvalue[39m=[32m""[39m
+          [36m/>[39m
+        [36m</label>[39m
+      [36m</div>[39m
+      [36m<div[39m
+        [33mstyle[39m=[32m"border: 2px dashed rgb(209, 213, 219); border-radius: 8px; padding: 16px; background: rgb(249, 250, 251); text-align: center;"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mstyle[39m=[32m"font-size: 13px; color: rgb(107, 114, 128); margin-bottom: 8px;"[39m
+        [36m>[39m
+          [0mDrag & drop photos here, click to select, or paste[0m
+        [36m</div>[39m
+        [36m<input[39m
+          [33maccept[39m=[32m"image/*,.pdf"[39m
+          [33mmultiple[39m=[32m""[39m
+          [33mtype[39m=[32m"file"[39m
+        [36m/>[39m
+        [36m<label[39m
+          [33mstyle[39m=[32m"display: inline-flex; flex-direction: column; gap: 4px; margin-top: 12px; font-size: 13px; color: rgb(107, 114, 128);"[39m
+        [36m>[39m
+          [0mTake a photo[0m
+          [36m<input[39m
+            [33maccept[39m=[32m"image/*"[39m
+            [33mcapture[39m=[32m"environment"[39m
+            [33mtype[39m=[32m"file"[39m
+          [36m/>[39m
+        [36m</label>[39m
+      [36m</div>[39m
+      [36m<button[39m
+        [33mstyle[39m=[32m"padding: 10px 16px; background: rgb(17, 24, 39); color: white; border-radius: 6px; cursor: pointer;"[39m
+        [33mtype[39m=[32m"submit"[39m
+      [36m>[39m
+        [0mCreate asset[0m
+      [36m</button>[39m
+    [36m</form>[39m
+  [36m</div>[39m
+[36m</body>[39m
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<form[39m
+      [33mstyle[39m=[32m"display: flex; flex-direction: column; gap: 12px; max-width: 520px;"[39m
+    [36m>[39m
+      [36m<label[39m
+        [33mstyle[39m=[32m"display: flex; flex-direction: column; gap: 4px;"[39m
+      [36m>[39m
+        [36m<span>[39m
+          [0mDisplay name *[0m
+        [36m</span>[39m
+        [36m<input[39m
+          [33mplaceholder[39m=[32m"e.g. Hammer"[39m
+          [33mrequired[39m=[32m""[39m
+          [33mstyle[39m=[32m"width: 100%; padding: 8px; border: 1px solid rgb(209, 213, 219); border-radius: 6px;"[39m
+          [33mvalue[39m=[32m""[39m
+        [36m/>[39m
+      [36m</label>[39m
+      [36m<label[39m
+        [33mstyle[39m=[32m"display: flex; flex-direction: column; gap: 4px;"[39m
+      [36m>[39m
+        [36m<span>[39m
+          [0mAsset type[0m
+        [36m</span>[39m
+        [36m<select[39m
+          [33mstyle[39m=[32m"width: 100%; padding: 8px; border-radius: 6px;"[39m
+        [36m>[39m
+          [36m<option[39m
+            [33mvalue[39m=[32m"unknown"[39m
+          [36m>[39m
+            [0munknown[0m
+          [36m</option>[39m
+          [36m<option[39m
+            [33mvalue[39m=[32m"equipment"[39m
+          [36m>[39m
+            [0mequipment[0m
+          [36m</option>[39m
+          [36m<option[39m
+            [33mvalue[39m=[32m"product"[39m
+          [36m>[39m
+            [0mproduct[0m
+          [36m</option>[39m
+          [36m<option[39m
+            [33mvalue[39m=[32m"component"[39m
+          [36m>[39m
+            [0mcomponent[0m
+          [36m</option>[39m
+          [36m<option[39m
+            [33mvalue[39m=[32m"consumable"[39m
+          [36m>[39m
+            [0mconsumable[0m
+          [36m</option>[39m
+          [36m<option[39m
+            [33mvalue[39m=[32m"container"[39m
+          [36m>[39m
+            [0mcontainer[0m
+          [36m</option>[39m
+          [36m<option[39m
+            [33mvalue[39m=[32m"document"[39m
+          [36m>[39m
+            [0mdocument[0m
+          [36m</option>[39m
+          [36m<option[39m
+            [33mvalue[39m=[32m"collection"[39m
+          [36m>[39m
+            [0mcollection[0m
+          [36m</option>[39m
+        [36m</select>[39m
+      [36m</label>[39m
+      [36m<div[39m
+        [33mstyle[39m=[32m"display: flex; gap: 12px;"[39m
+      [36m>[39m
+        [36m<label[39m
+          [33mstyle[39m=[32m"flex: 1 1 0%; display: flex; flex-direction: column; gap: 4px;"[39m
+        [36m>[39m
+          [36m<span>[39m
+            [0mQuantity[0m
+          [36m</span>[39m
+          [36m<input[39m
+            [33mstep[39m=[32m"any"[39m
+            [33mstyle[39m=[32m"padding: 8px; border: 1px solid rgb(209, 213, 219); border-radius: 6px;"[39m
+            [33mtype[39m=[32m"number"[39m
+            [33mvalue[39m=[32m""[39m
+          [36m/>[39m
+        [36m</label>[39m
+        [36m<label[39m
+          [33mstyle[39m=[32m"flex: 1 1 0%; display: flex; flex-direction: column; gap: 4px;"[39m
+        [36m>[39m
+          [36m<span>[39m
+            [0mUnit[0m
+          [36m</span>[39m
+          [36m<input[39m
+            [33mplaceholder[39m=[32m"pcs, kg…"[39m
+            [33mstyle[39m=[32m"padding: 8px; border: 1px solid rgb(209, 213, 219); border-radius: 6px;"[39m
+            [33mvalue[39m=[32m""[39m
+          [36m/>[39m
+        [36m</label>[39m
+        [36m<label[39m
+          [33mstyle[39m=[32m"flex: 1 1 0%; display: flex; flex-direction: column; gap: 4px;"[39m
+        [36m>[39m
+          [36m<span>[39m
+            [0mCondition[0m
+          [36m</span>[39m
+          [36m<input[39m
+            [33mplaceholder[39m=[32m"new, used…"[39m
+            [33mstyle[39m=[32m"padding: 8px; border: 1px solid rgb(209, 213, 219); border-radius: 6px;"[39m
+            [33mvalue[39m=[32m""[39m
+          [36m/>[39m
+        [36m</label>[39m
+      [36m</div>[39m
+      [36m<div[39m
+        [33mstyle[39m=[32m"border: 2px dashed rgb(209, 213, 219); border-radius: 8px; padding: 16px; background: rgb(249, 250, 251); text-align: center;"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mstyle[39m=[32m"font-size: 13px; color: rgb(107, 114, 128); margin-bottom: 8px;"[39m
+        [36m>[39m
+          [0mDrag & drop photos here, click to select, or paste[0m
+        [36m</div>[39m
+        [36m<input[39m
+          [33maccept[39m=[32m"image/*,.pdf"[39m
+          [33mmultiple[39m=[32m""[39m
+          [33mtype[39m=[32m"file"[39m
+        [36m/>[39m
+        [36m<label[39m
+          [33mstyle[39m=[32m"display: inline-flex; flex-direction: column; gap: 4px; margin-top: 12px; font-size: 13px; color: rgb(107, 114, 128);"[39m
+        [36m>[39m
+          [0mTake a photo[0m
+          [36m<input[39m
+            [33maccept[39m=[32m"image/*"[39m
+            [33mcapture[39m=[32m"environment"[39m
+            [33mtype[39m=[32m"file"[39m
+          [36m/>[39m
+        [36m</label>[39m
+      [36m</div>[39m
+      [36m<button[39m
+        [33mstyle[39m=[32m"padding: 10px 16px; background: rgb(17, 24, 39); color: white; border-radius: 6px; cursor: pointer;"[39m
+        [33mtype[39m=[32m"submit"[39m
+      [36m>[39m
+        [0mCreate asset[0m
+      [36m</button>[39m
+    [36m</form>[39m
+  [36m</div>[39m
+[36m</body>[39m
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 6 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/components/AssetCard.test.tsx > AssetCard > a null display_name renders the Untitled asset fallback
+TestingLibraryElementError: Unable to find an element with the text: Untitled asset. This could be because the text is broken up by multiple elements. In this case, you can provide a function for your text matcher to make your matcher more flexible.
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<a[39m
+      [33mhref[39m=[32m"/assets/2?household_id=h1"[39m
+      [33mstyle[39m=[32m"border: 1px solid rgb(229, 231, 235); border-radius: 8px; padding: 12px; display: block; text-decoration: none; color: inherit; background: white;"[39m
+    [36m>[39m
+      [36m<div[39m
+        [33mstyle[39m=[32m"width: 100%; height: 120px; border-radius: 6px; margin-bottom: 8px; background: rgb(243, 244, 246); display: flex; align-items: center; justify-content: center; color: rgb(156, 163, 175); font-size: 12px;"[39m
+      [36m>[39m
+        [0mno image[0m
+      [36m</div>[39m
+      [36m<div[39m
+        [33mstyle[39m=[32m"font-weight: 600; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"[39m
+      [36m/>[39m
+      [36m<div[39m
+        [33mstyle[39m=[32m"font-size: 12px; color: rgb(107, 114, 128);"[39m
+      [36m>[39m
+        [0munknown[0m
+        [0m · [0m
+        [0mACTIVE[0m
+      [36m</div>[39m
+      [36m<div[39m
+        [33mstyle[39m=[32m"display: flex; gap: 6px; margin-top: 6px; align-items: center; flex-wrap: wrap;"[39m
+      [36m>[39m
+        [36m<span[39m
+          [33mstyle[39m=[32m"font-size: 11px; color: rgb(107, 114, 128);"[39m
+        [36m>[39m
+          [0m0[0m
+          [0m evidence[0m
+        [36m</span>[39m
+        [36m<span[39m
+          [33mstyle[39m=[32m"font-size: 11px; color: rgb(156, 163, 175);"[39m
+        [36m>[39m
+          [0mv[0m
+          [0m1[0m
+        [36m</span>[39m
+      [36m</div>[39m
+    [36m</a>[39m
+  [36m</div>[39m
+[36m</body>[39m
+ ❯ Object.getElementError node_modules/@testing-library/dom/dist/config.js:37:19
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:76:38
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:52:17
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:95:19
+ ❯ src/components/AssetCard.test.tsx:22:19
+     20|       </MemoryRouter>
+     21|     );
+     22|     expect(screen.getByText("Untitled asset")).toBeInTheDocument();
+       |                   ^
+     23|   });
+     24| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/6]⎯
+
+ FAIL  src/components/AssetForm.test.tsx > AssetForm > the name field reads optional and explains the filename fallback
+TestingLibraryElementError: Unable to find an element with the text: Display name (optional). This could be because the text is broken up by multiple elements. In this case, you can provide a function for your text matcher to make your matcher more flexible.
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<form[39m
+      [33mstyle[39m=[32m"display: flex; flex-direction: column; gap: 12px; max-width: 520px;"[39m
+    [36m>[39m
+      [36m<label[39m
+        [33mstyle[39m=[32m"display: flex; flex-direction: column; gap: 4px;"[39m
+      [36m>[39m
+        [36m<span>[39m
+          [0mDisplay name *[0m
+        [36m</span>[39m
+        [36m<input[39m
+          [33mplaceholder[39m=[32m"e.g. Hammer"[39m
+          [33mrequired[39m=[32m""[39m
+          [33mstyle[39m=[32m"width: 100%; padding: 8px; border: 1px solid rgb(209, 213, 219); border-radius: 6px;"[39m
+          [33mvalue[39m=[32m""[39m
+        [36m/>[39m
+      [36m</label>[39m
+      [36m<label[39m
+        [33mstyle[39m=[32m"display: flex; flex-direction: column; gap: 4px;"[39m
+      [36m>[39m
+        [36m<span>[39m
+          [0mAsset type[0m
+        [36m</span>[39m
+        [36m<select[39m
+          [33mstyle[39m=[32m"width: 100%; padding: 8px; border-radius: 6px;"[39m
+        [36m>[39m
+          [36m<option[39m
+            [33mvalue[39m=[32m"unknown"[39m
+          [36m>[39m
+            [0munknown[0m
+          [36m</option>[39m
+          [36m<option[39m
+            [33mvalue[39m=[32m"equipment"[39m
+          [36m>[39m
+            [0mequipment[0m
+          [36m</option>[39m
+          [36m<option[39m
+            [33mvalue[39m=[32m"product"[39m
+          [36m>[39m
+            [0mproduct[0m
+          [36m</option>[39m
+          [36m<option[39m
+            [33mvalue[39m=[32m"component"[39m
+          [36m>[39m
+            [0mcomponent[0m
+          [36m</option>[39m
+          [36m<option[39m
+            [33mvalue[39m=[32m"consumable"[39m
+          [36m>[39m
+            [0mconsumable[0m
+          [36m</option>[39m
+          [36m<option[39m
+            [33mvalue[39m=[32m"container"[39m
+          [36m>[39m
+            [0mcontainer[0m
+          [36m</option>[39m
+          [36m<option[39m
+            [33mvalue[39m=[32m"document"[39m
+          [36m>[39m
+            [0mdocument[0m
+          [36m</option>[39m
+          [36m<option[39m
+            [33mvalue[39m=[32m"collection"[39m
+          [36m>[39m
+            [0mcollection[0m
+          [36m</option>[39m
+        [36m</select>[39m
+      [36m</label>[39m
+      [36m<div[39m
+        [33mstyle[39m=[32m"display: flex; gap: 12px;"[39m
+      [36m>[39m
+        [36m<label[39m
+          [33mstyle[39m=[32m"flex: 1 1 0%; display: flex; flex-direction: column; gap: 4px;"[39m
+        [36m>[39m
+          [36m<span>[39m
+            [0mQuantity[0m
+          [36m</span>[39m
+          [36m<input[39m
+            [33mstep[39m=[32m"any"[39m
+            [33mstyle[39m=[32m"padding: 8px; border: 1px solid rgb(209, 213, 219); border-radius: 6px;"[39m
+            [33mtype[39m=[32m"number"[39m
+            [33mvalue[39m=[32m""[39m
+          [36m/>[39m
+        [36m</label>[39m
+        [36m<label[39m
+          [33mstyle[39m=[32m"flex: 1 1 0%; display: flex; flex-direction: column; gap: 4px;"[39m
+        [36m>[39m
+          [36m<span>[39m
+            [0mUnit[0m
+          [36m</span>[39m
+          [36m<input[39m
+            [33mplaceholder[39m=[32m"pcs, kg…"[39m
+            [33mstyle[39m=[32m"padding: 8px; border: 1px solid rgb(209, 213, 219); border-radius: 6px;"[39m
+            [33mvalue[39m=[32m""[39m
+          [36m/>[39m
+        [36m</label>[39m
+        [36m<label[39m
+          [33mstyle[39m=[32m"flex: 1 1 0%; display: flex; flex-direction: column; gap: 4px;"[39m
+        [36m>[39m
+          [36m<span>[39m
+            [0mCondition[0m
+          [36m</span>[39m
+          [36m<input[39m
+            [33mplaceholder[39m=[32m"new, used…"[39m
+            [33mstyle[39m=[32m"padding: 8px; border: 1px solid rgb(209, 213, 219); border-radius: 6px;"[39m
+            [33mvalue[39m=[32m""[39m
+          [36m/>[39m
+        [36m</label>[39m
+      [36m</div>[39m
+      [36m<div[39m
+        [33mstyle[39m=[32m"border: 2px dashed rgb(209, 213, 219); border-radius: 8px; padding: 16px; background: rgb(249, 250, 251); text-align: center;"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mstyle[39m=[32m"font-size: 13px; color: rgb(107, 114, 128); margin-bottom: 8px;"[39m
+        [36m>[39m
+          [0mDrag & drop photos here, click to select, or paste[0m
+        [36m</div>[39m
+        [36m<input[39m
+          [33maccept[39m=[32m"image/*,.pdf"[39m
+          [33mmultiple[39m=[32m""[39m
+          [33mtype[39m=[32m"file"[39m
+        [36m/>[39m
+        [36m<label[39m
+          [33mstyle[39m=[32m"display: inline-flex; flex-direction: column; gap: 4px; margin-top: 12px; font-size: 13px; color: rgb(107, 114, 128);"[39m
+        [36m>[39m
+          [0mTake a photo[0m
+          [36m<input[39m
+            [33maccept[39m=[32m"image/*"[39m
+            [33mcapture[39m=[32m"environment"[39m
+            [33mtype[39m=[32m"file"[39m
+          [36m/>[39m
+        [36m</label>[39m
+      [36m</div>[39m
+      [36m<button[39m
+        [33mstyle[39m=[32m"padding: 10px 16px; background: rgb(17, 24, 39); color: white; border-radius: 6px; cursor: pointer;"[39m
+        [33mtype[39m=[32m"submit"[39m
+      [36m>[39m
+        [0mCreate asset[0m
+      [36m</button>[39m
+    [36m</form>[39m
+  [36m</div>[39m
+[36m</body>[39m
+ ❯ Object.getElementError node_modules/@testing-library/dom/dist/config.js:37:19
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:76:38
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:52:17
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:95:19
+ ❯ src/components/AssetForm.test.tsx:96:19
+     94|     render(<AssetForm householdId="hh-1" onCreated={() => {}} />);
+     95| 
+     96|     expect(screen.getByText("Display name (optional)")).toBeInTheDocum…
+       |                   ^
+     97|     expect(screen.getByText(/we use the photo's filename/i)).toBeInThe…
+     98|     expect(screen.getByPlaceholderText("e.g. Hammer")).not.toBeRequire…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/6]⎯
+
+ FAIL  src/components/AssetForm.test.tsx > AssetForm > a nameless capture with a photo posts no display_name key
+AssertionError: expected "spy" to be called 1 times, but got 0 times
+
+Ignored nodes: comments, script, style
+[36m<html>[39m
+  [36m<head />[39m
+  [36m<body>[39m
+    [36m<div>[39m
+      [36m<form[39m
+        [33mstyle[39m=[32m"display: flex; flex-direction: column; gap: 12px; max-width: 520px;"[39m
+      [36m>[39m
+        [36m<label[39m
+          [33mstyle[39m=[32m"display: flex; flex-direction: column; gap: 4px;"[39m
+        [36m>[39m
+          [36m<span>[39m
+            [0mDisplay name *[0m
+          [36m</span>[39m
+          [36m<input[39m
+            [33mplaceholder[39m=[32m"e.g. Hammer"[39m
+            [33mrequired[39m=[32m""[39m
+            [33mstyle[39m=[32m"width: 100%; padding: 8px; border: 1px solid rgb(209, 213, 219); border-radius: 6px;"[39m
+            [33mvalue[39m=[32m""[39m
+          [36m/>[39m
+        [36m</label>[39m
+        [36m<label[39m
+          [33mstyle[39m=[32m"display: flex; flex-direction: column; gap: 4px;"[39m
+        [36m>[39m
+          [36m<span>[39m
+            [0mAsset type[0m
+          [36m</span>[39m
+          [36m<select[39m
+            [33mstyle[39m=[32m"width: 100%; padding: 8px; border-radius: 6px;"[39m
+          [36m>[39m
+            [36m<option[39m
+              [33mvalue[39m=[32m"unknown"[39m
+            [36m>[39m
+              [0munknown[0m
+            [36m</option>[39m
+            [36m<option[39m
+              [33mvalue[39m=[32m"equipment"[39m
+            [36m>[39m
+              [0mequipment[0m
+            [36m</option>[39m
+            [36m<option[39m
+              [33mvalue[39m=[32m"product"[39m
+            [36m>[39m
+              [0mproduct[0m
+            [36m</option>[39m
+            [36m<option[39m
+              [33mvalue[39m=[32m"component"[39m
+            [36m>[39m
+              [0mcomponent[0m
+            [36m</option>[39m
+            [36m<option[39m
+              [33mvalue[39m=[32m"consumable"[39m
+            [36m>[39m
+              [0mconsumable[0m
+            [36m</option>[39m
+            [36m<option[39m
+              [33mvalue[39m=[32m"container"[39m
+            [36m>[39m
+              [0mcontainer[0m
+            [36m</option>[39m
+            [36m<option[39m
+              [33mvalue[39m=[32m"document"[39m
+            [36m>[39m
+              [0mdocument[0m
+            [36m</option>[39m
+            [36m<option[39m
+              [33mvalue[39m=[32m"collection"[39m
+            [36m>[39m
+              [0mcollection[0m
+            [36m</option>[39m
+          [36m</select>[39m
+        [36m</label>[39m
+        [36m<div[39m
+          [33mstyle[39m=[32m"display: flex; gap: 12px;"[39m
+        [36m>[39m
+          [36m<label[39m
+            [33mstyle[39m=[32m"flex: 1 1 0%; display: flex; flex-direction: column; gap: 4px;"[39m
+          [36m>[39m
+            [36m<span>[39m
+              [0mQuantity[0m
+            [36m</span>[39m
+            [36m<input[39m
+              [33mstep[39m=[32m"any"[39m
+              [33mstyle[39m=[32m"padding: 8px; border: 1px solid rgb(209, 213, 219); border-radius: 6px;"[39m
+              [33mtype[39m=[32m"number"[39m
+              [33mvalue[39m=[32m""[39m
+            [36m/>[39m
+          [36m</label>[39m
+          [36m<label[39m
+            [33mstyle[39m=[32m"flex: 1 1 0%; display: flex; flex-direction: column; gap: 4px;"[39m
+          [36m>[39m
+            [36m<span>[39m
+              [0mUnit[0m
+            [36m</span>[39m
+            [36m<input[39m
+              [33mplaceholder[39m=[32m"pcs, kg…"[39m
+              [33mstyle[39m=[32m"padding: 8px; border: 1px solid rgb(209, 213, 219); border-radius: 6px;"[39m
+              [33mvalue[39m=[32m""[39m
+            [36m/>[39m
+          [36m</label>[39m
+          [36m<label[39m
+            [33mstyle[39m=[32m"flex: 1 1 0%; display: flex; flex-direction: column; gap: 4px;"[39m
+          [36m>[39m
+            [36m<span>[39m
+              [0mCondition[0m
+            [36m</span>[39m
+            [36m<input[39m
+              [33mplaceholder[39m=[32m"new, used…"[39m
+              [33mstyle[39m=[32m"padding: 8px; border: 1px solid rgb(209, 213, 219); border-radius: 6px;"[39m
+              [33mvalue[39m=[32m""[39m
+            [36m/>[39m
+          [36m</label>[39m
+        [36m</div>[39m
+        [36m<div[39m
+          [33mstyle[39m=[32m"border: 2px dashed rgb(209, 213, 219); border-radius: 8px; padding: 16px; background: rgb(249, 250, 251); text-align: center;"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mstyle[39m=[32m"font-size: 13px; color: rgb(107, 114, 128); margin-bottom: 8px;"[39m
+          [36m>[39m
+            [0mDrag & drop photos here, click to select, or paste[0m
+          [36m</div>[39m
+          [36m<input[39m
+            [33maccept[39m=[32m"image/*,.pdf"[39m
+            [33mmultiple[39m=[32m""[39m
+            [33mtype[39m=[32m"file"[39m
+          [36m/>[39m
+          [36m<label[39m
+            [33mstyle[39m=[32m"display: inline-flex; flex-direction: column; gap: 4px; margin-top: 12px; font-size: 13px; color: rgb(107, 114, 128);"[39m
+          [36m>[39m
+            [0mTake a photo[0m
+            [36m<input[39m
+              [33maccept[39m=[32m"image/*"[39m
+              [33mcapture[39m=[32m"environment"[39m
+              [33mtype[39m=[32m"file"[39m
+            [36m/>[39m
+          [36m</label>[39m
+          [36m<ul[39m
+            [33mstyle[39m=[32m"text-align: left; margin-top: 12px; padding-left: 16px;"[39m
+          [36m>[39m
+            [36m<li[39m
+              [33mstyle[39m=[32m"font-size: 12px; margin-bottom: 4px;"[39m
+            [36m>[39m
+              [0mnameless.png[0m
+              [0m — [0m
+              [0m0.0[0m
+              [0m KB [0m
+              [36m<button[39m
+                [33mstyle[39m=[32m"margin-left: 8px; font-size: 11px;"[39m
+                [33mtype[39m=[32m"button"[39m
+              [36m>[39m
+                [0mremove[0m
+              [36m</button>[39m
+            [36m</li>[39m
+          [36m</ul>[39m
+        [36m</div>[39m
+        [36m<button[39m
+          [33mstyle[39m=[32m"padding: 10px 16px; background: rgb(17, 24, 39); color: white; border-radius: 6px; cursor: pointer;"[39m
+          [33mtype[39m=[32m"submit"[39m
+        [36m>[39m
+          [0mCreate asset[0m
+        [36m</button>[39m
+      [36m</form>[39m
+    [36m</div>[39m
+  [36m</body>[39m
+[36m</html>[39m
+ ❯ src/components/AssetForm.test.tsx:120:45
+    118|     fireEvent.click(screen.getByRole("button", { name: "Create asset" …
+    119| 
+    120|     await waitFor(() => expect(api.apiPost).toHaveBeenCalledTimes(1));
+       |                                             ^
+    121|     const payload = api.apiPost.mock.calls[0][1] as Record<string, unk…
+    122|     expect(payload).not.toHaveProperty("display_name");
+ ❯ runWithExpensiveErrorDiagnosticsDisabled node_modules/@testing-library/dom/dist/config.js:47:12
+ ❯ checkCallback node_modules/@testing-library/dom/dist/wait-for.js:124:77
+ ❯ Timeout.checkRealTimersCallback node_modules/@testing-library/dom/dist/wait-for.js:118:16
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/6]⎯
+
+ FAIL  src/components/AssetForm.test.tsx > AssetForm > a nameless photoless submit is refused with a named error and sends nothing
+TestingLibraryElementError: Unable to find an element with the text: Add a photo or a display name. This could be because the text is broken up by multiple elements. In this case, you can provide a function for your text matcher to make your matcher more flexible.
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<form[39m
+      [33mstyle[39m=[32m"display: flex; flex-direction: column; gap: 12px; max-width: 520px;"[39m
+    [36m>[39m
+      [36m<label[39m
+        [33mstyle[39m=[32m"display: flex; flex-direction: column; gap: 4px;"[39m
+      [36m>[39m
+        [36m<span>[39m
+          [0mDisplay name *[0m
+        [36m</span>[39m
+        [36m<input[39m
+          [33mplaceholder[39m=[32m"e.g. Hammer"[39m
+          [33mrequired[39m=[32m""[39m
+          [33mstyle[39m=[32m"width: 100%; padding: 8px; border: 1px solid rgb(209, 213, 219); border-radius: 6px;"[39m
+          [33mvalue[39m=[32m""[39m
+        [36m/>[39m
+      [36m</label>[39m
+      [36m<label[39m
+        [33mstyle[39m=[32m"display: flex; flex-direction: column; gap: 4px;"[39m
+      [36m>[39m
+        [36m<span>[39m
+          [0mAsset type[0m
+        [36m</span>[39m
+        [36m<select[39m
+          [33mstyle[39m=[32m"width: 100%; padding: 8px; border-radius: 6px;"[39m
+        [36m>[39m
+          [36m<option[39m
+            [33mvalue[39m=[32m"unknown"[39m
+          [36m>[39m
+            [0munknown[0m
+          [36m</option>[39m
+          [36m<option[39m
+            [33mvalue[39m=[32m"equipment"[39m
+          [36m>[39m
+            [0mequipment[0m
+          [36m</option>[39m
+          [36m<option[39m
+            [33mvalue[39m=[32m"product"[39m
+          [36m>[39m
+            [0mproduct[0m
+          [36m</option>[39m
+          [36m<option[39m
+            [33mvalue[39m=[32m"component"[39m
+          [36m>[39m
+            [0mcomponent[0m
+          [36m</option>[39m
+          [36m<option[39m
+            [33mvalue[39m=[32m"consumable"[39m
+          [36m>[39m
+            [0mconsumable[0m
+          [36m</option>[39m
+          [36m<option[39m
+            [33mvalue[39m=[32m"container"[39m
+          [36m>[39m
+            [0mcontainer[0m
+          [36m</option>[39m
+          [36m<option[39m
+            [33mvalue[39m=[32m"document"[39m
+          [36m>[39m
+            [0mdocument[0m
+          [36m</option>[39m
+          [36m<option[39m
+            [33mvalue[39m=[32m"collection"[39m
+          [36m>[39m
+            [0mcollection[0m
+          [36m</option>[39m
+        [36m</select>[39m
+      [36m</label>[39m
+      [36m<div[39m
+        [33mstyle[39m=[32m"display: flex; gap: 12px;"[39m
+      [36m>[39m
+        [36m<label[39m
+          [33mstyle[39m=[32m"flex: 1 1 0%; display: flex; flex-direction: column; gap: 4px;"[39m
+        [36m>[39m
+          [36m<span>[39m
+            [0mQuantity[0m
+          [36m</span>[39m
+          [36m<input[39m
+            [33mstep[39m=[32m"any"[39m
+            [33mstyle[39m=[32m"padding: 8px; border: 1px solid rgb(209, 213, 219); border-radius: 6px;"[39m
+            [33mtype[39m=[32m"number"[39m
+            [33mvalue[39m=[32m""[39m
+          [36m/>[39m
+        [36m</label>[39m
+        [36m<label[39m
+          [33mstyle[39m=[32m"flex: 1 1 0%; display: flex; flex-direction: column; gap: 4px;"[39m
+        [36m>[39m
+          [36m<span>[39m
+            [0mUnit[0m
+          [36m</span>[39m
+          [36m<input[39m
+            [33mplaceholder[39m=[32m"pcs, kg…"[39m
+            [33mstyle[39m=[32m"padding: 8px; border: 1px solid rgb(209, 213, 219); border-radius: 6px;"[39m
+            [33mvalue[39m=[32m""[39m
+          [36m/>[39m
+        [36m</label>[39m
+        [36m<label[39m
+          [33mstyle[39m=[32m"flex: 1 1 0%; display: flex; flex-direction: column; gap: 4px;"[39m
+        [36m>[39m
+          [36m<span>[39m
+            [0mCondition[0m
+          [36m</span>[39m
+          [36m<input[39m
+            [33mplaceholder[39m=[32m"new, used…"[39m
+            [33mstyle[39m=[32m"padding: 8px; border: 1px solid rgb(209, 213, 219); border-radius: 6px;"[39m
+            [33mvalue[39m=[32m""[39m
+          [36m/>[39m
+        [36m</label>[39m
+      [36m</div>[39m
+      [36m<div[39m
+        [33mstyle[39m=[32m"border: 2px dashed rgb(209, 213, 219); border-radius: 8px; padding: 16px; background: rgb(249, 250, 251); text-align: center;"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mstyle[39m=[32m"font-size: 13px; color: rgb(107, 114, 128); margin-bottom: 8px;"[39m
+        [36m>[39m
+          [0mDrag & drop photos here, click to select, or paste[0m
+        [36m</div>[39m
+        [36m<input[39m
+          [33maccept[39m=[32m"image/*,.pdf"[39m
+          [33mmultiple[39m=[32m""[39m
+          [33mtype[39m=[32m"file"[39m
+        [36m/>[39m
+        [36m<label[39m
+          [33mstyle[39m=[32m"display: inline-flex; flex-direction: column; gap: 4px; margin-top: 12px; font-size: 13px; color: rgb(107, 114, 128);"[39m
+        [36m>[39m
+          [0mTake a photo[0m
+          [36m<input[39m
+            [33maccept[39m=[32m"image/*"[39m
+            [33mcapture[39m=[32m"environment"[39m
+            [33mtype[39m=[32m"file"[39m
+          [36m/>[39m
+        [36m</label>[39m
+      [36m</div>[39m
+      [36m<button[39m
+        [33mstyle[39m=[32m"padding: 10px 16px; background: rgb(17, 24, 39); color: white; border-radius: 6px; cursor: pointer;"[39m
+        [33mtype[39m=[32m"submit"[39m
+      [36m>[39m
+        [0mCreate asset[0m
+      [36m</button>[39m
+    [36m</form>[39m
+  [36m</div>[39m
+[36m</body>[39m
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<form[39m
+      [33mstyle[39m=[32m"display: flex; flex-direction: column; gap: 12px; max-width: 520px;"[39m
+    [36m>[39m
+      [36m<label[39m
+        [33mstyle[39m=[32m"display: flex; flex-direction: column; gap: 4px;"[39m
+      [36m>[39m
+        [36m<span>[39m
+          [0mDisplay name *[0m
+        [36m</span>[39m
+        [36m<input[39m
+          [33mplaceholder[39m=[32m"e.g. Hammer"[39m
+          [33mrequired[39m=[32m""[39m
+          [33mstyle[39m=[32m"width: 100%; padding: 8px; border: 1px solid rgb(209, 213, 219); border-radius: 6px;"[39m
+          [33mvalue[39m=[32m""[39m
+        [36m/>[39m
+      [36m</label>[39m
+      [36m<label[39m
+        [33mstyle[39m=[32m"display: flex; flex-direction: column; gap: 4px;"[39m
+      [36m>[39m
+        [36m<span>[39m
+          [0mAsset type[0m
+        [36m</span>[39m
+        [36m<select[39m
+          [33mstyle[39m=[32m"width: 100%; padding: 8px; border-radius: 6px;"[39m
+        [36m>[39m
+          [36m<option[39m
+            [33mvalue[39m=[32m"unknown"[39m
+          [36m>[39m
+            [0munknown[0m
+          [36m</option>[39m
+          [36m<option[39m
+            [33mvalue[39m=[32m"equipment"[39m
+          [36m>[39m
+            [0mequipment[0m
+          [36m</option>[39m
+          [36m<option[39m
+            [33mvalue[39m=[32m"product"[39m
+          [36m>[39m
+            [0mproduct[0m
+          [36m</option>[39m
+          [36m<option[39m
+            [33mvalue[39m=[32m"component"[39m
+          [36m>[39m
+            [0mcomponent[0m
+          [36m</option>[39m
+          [36m<option[39m
+            [33mvalue[39m=[32m"consumable"[39m
+          [36m>[39m
+            [0mconsumable[0m
+          [36m</option>[39m
+          [36m<option[39m
+            [33mvalue[39m=[32m"container"[39m
+          [36m>[39m
+            [0mcontainer[0m
+          [36m</option>[39m
+          [36m<option[39m
+            [33mvalue[39m=[32m"document"[39m
+          [36m>[39m
+            [0mdocument[0m
+          [36m</option>[39m
+          [36m<option[39m
+            [33mvalue[39m=[32m"collection"[39m
+          [36m>[39m
+            [0mcollection[0m
+          [36m</option>[39m
+        [36m</select>[39m
+      [36m</label>[39m
+      [36m<div[39m
+        [33mstyle[39m=[32m"display: flex; gap: 12px;"[39m
+      [36m>[39m
+        [36m<label[39m
+          [33mstyle[39m=[32m"flex: 1 1 0%; display: flex; flex-direction: column; gap: 4px;"[39m
+        [36m>[39m
+          [36m<span>[39m
+            [0mQuantity[0m
+          [36m</span>[39m
+          [36m<input[39m
+            [33mstep[39m=[32m"any"[39m
+            [33mstyle[39m=[32m"padding: 8px; border: 1px solid rgb(209, 213, 219); border-radius: 6px;"[39m
+            [33mtype[39m=[32m"number"[39m
+            [33mvalue[39m=[32m""[39m
+          [36m/>[39m
+        [36m</label>[39m
+        [36m<label[39m
+          [33mstyle[39m=[32m"flex: 1 1 0%; display: flex; flex-direction: column; gap: 4px;"[39m
+        [36m>[39m
+          [36m<span>[39m
+            [0mUnit[0m
+          [36m</span>[39m
+          [36m<input[39m
+            [33mplaceholder[39m=[32m"pcs, kg…"[39m
+            [33mstyle[39m=[32m"padding: 8px; border: 1px solid rgb(209, 213, 219); border-radius: 6px;"[39m
+            [33mvalue[39m=[32m""[39m
+          [36m/>[39m
+        [36m</label>[39m
+        [36m<label[39m
+          [33mstyle[39m=[32m"flex: 1 1 0%; display: flex; flex-direction: column; gap: 4px;"[39m
+        [36m>[39m
+          [36m<span>[39m
+            [0mCondition[0m
+          [36m</span>[39m
+          [36m<input[39m
+            [33mplaceholder[39m=[32m"new, used…"[39m
+            [33mstyle[39m=[32m"padding: 8px; border: 1px solid rgb(209, 213, 219); border-radius: 6px;"[39m
+            [33mvalue[39m=[32m""[39m
+          [36m/>[39m
+        [36m</label>[39m
+      [36m</div>[39m
+      [36m<div[39m
+        [33mstyle[39m=[32m"border: 2px dashed rgb(209, 213, 219); border-radius: 8px; padding: 16px; background: rgb(249, 250, 251); text-align: center;"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mstyle[39m=[32m"font-size: 13px; color: rgb(107, 114, 128); margin-bottom: 8px;"[39m
+        [36m>[39m
+          [0mDrag & drop photos here, click to select, or paste[0m
+        [36m</div>[39m
+        [36m<input[39m
+          [33maccept[39m=[32m"image/*,.pdf"[39m
+          [33mmultiple[39m=[32m""[39m
+          [33mtype[39m=[32m"file"[39m
+        [36m/>[39m
+        [36m<label[39m
+          [33mstyle[39m=[32m"display: inline-flex; flex-direction: column; gap: 4px; margin-top: 12px; font-size: 13px; color: rgb(107, 114, 128);"[39m
+        [36m>[39m
+          [0mTake a photo[0m
+          [36m<input[39m
+            [33maccept[39m=[32m"image/*"[39m
+            [33mcapture[39m=[32m"environment"[39m
+            [33mtype[39m=[32m"file"[39m
+          [36m/>[39m
+        [36m</label>[39m
+      [36m</div>[39m
+      [36m<button[39m
+        [33mstyle[39m=[32m"padding: 10px 16px; background: rgb(17, 24, 39); color: white; border-radius: 6px; cursor: pointer;"[39m
+        [33mtype[39m=[32m"submit"[39m
+      [36m>[39m
+        [0mCreate asset[0m
+      [36m</button>[39m
+    [36m</form>[39m
+  [36m</div>[39m
+[36m</body>[39m
+ ❯ waitForWrapper node_modules/@testing-library/dom/dist/wait-for.js:163:27
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:86:33
+ ❯ src/components/AssetForm.test.tsx:132:25
+    130|     fireEvent.click(screen.getByRole("button", { name: "Create asset" …
+    131| 
+    132|     expect(await screen.findByText("Add a photo or a display name")).t…
+       |                         ^
+    133|     expect(api.uploadEvidence).not.toHaveBeenCalled();
+    134|     expect(api.apiPost).not.toHaveBeenCalled();
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/6]⎯
+
+ FAIL  src/types/product.test.ts > assetToProductItem > a null display_name falls back to the display-only Untitled asset constant
+AssertionError: expected null to be undefined // Object.is equality
+
+- Expected: 
+undefined
+
++ Received: 
+null
+
+ ❯ src/types/product.test.ts:92:23
+     90|   test("a null display_name falls back to the display-only Untitled as…
+     91|     const item = assetToProductItem({ ...asset, display_name: null });
+     92|     expect(item.name).toBe(UNTITLED_ASSET_NAME);
+       |                       ^
+     93|     expect(UNTITLED_ASSET_NAME).toBe("Untitled asset");
+     94|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/6]⎯
+
+ FAIL  src/components/shell/drawer.test.tsx > ItemInspectorDrawer > a null display_name shows the Untitled asset fallback and an empty editable title
+TypeError: Cannot read properties of null (reading 'trim')
+ ❯ ItemInspectorDrawer src/components/shell/ItemInspectorDrawer.tsx:322:54
+    320|               type="button"
+    321|               onClick={save}
+    322|               disabled={patchMut.isPending || !title.trim()}
+       |                                                      ^
+    323|               className="bg-primary text-primary-foreground focus-ring"
+    324|               style={{ padding: "6px 12px", borderRadius: 6, border: "…
+ ❯ renderWithHooks node_modules/react-dom/cjs/react-dom.development.js:15486:18
+ ❯ mountIndeterminateComponent node_modules/react-dom/cjs/react-dom.development.js:20103:13
+ ❯ beginWork node_modules/react-dom/cjs/react-dom.development.js:21626:16
+ ❯ beginWork$1 node_modules/react-dom/cjs/react-dom.development.js:27465:14
+ ❯ performUnitOfWork node_modules/react-dom/cjs/react-dom.development.js:26599:12
+ ❯ workLoopSync node_modules/react-dom/cjs/react-dom.development.js:26505:5
+ ❯ renderRootSync node_modules/react-dom/cjs/react-dom.development.js:26473:7
+ ❯ recoverFromConcurrentError node_modules/react-dom/cjs/react-dom.development.js:25889:20
+ ❯ performSyncWorkOnRoot node_modules/react-dom/cjs/react-dom.development.js:26135:20
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/6]⎯
+
+ Test Files  4 failed | 17 passed (21)
+      Tests  6 failed | 137 passed (143)
+   Start at  19:57:49
+   Duration  4.09s (transform 730ms, setup 644ms, collect 2.61s, tests 6.45s, environment 5.69s, prepare 1.29s)
+
+VITEST_EXIT=1
+
+# PRE-CHANGE RESULT: backend failed tests = all 8 new SG-048 tests + the 2 pre-existing decoder reds;
+#                    frontend failed tests = all 6 new SG-048 assertions.
+
+########################################################################
+=== G5 GREEN RUN — new code ===
+########################################################################
+$ (cd backend && ../venv/bin/python -m pytest -q)
+........................................................................ [ 36%]
+........................................................................ [ 73%]
+..............................................FF.....                    [100%]
+=================================== FAILURES ===================================
+___ test_generated_codes_are_validated_and_bad_checksum_is_not_an_identifier ___
+
+isolated_db = (<sqlalchemy.orm.session.Session object at 0x7ea1e86a2ff0>, '01a0abcc-496e-7fb2-a471-f93023f07edd', PosixPath('/tmp/pytest-of-andrei/pytest-11/test_generated_codes_are_valid0/storage'))
+
+    def test_generated_codes_are_validated_and_bad_checksum_is_not_an_identifier(isolated_db) -> None:  # type: ignore[no-untyped-def]
+        session, household_id, root = isolated_db
+        qr_value = "https://example.test/SG-013"
+        qr_image = qrcode.make(qr_value).convert("RGB")
+        qr = _evidence(session, household_id, root, _png(qr_image), "qr.png", "image/png")
+        ean_image, ean_value = _ean13_image("590123412345")
+        ean = _evidence(session, household_id, root, _png(ean_image), "ean.png", "image/png")
+        # Deliberately render a syntactically valid EAN with the wrong check digit.
+        bad_value = ean_value[:-1] + ("0" if ean_value[-1] != "0" else "1")
+        bad_image, _ = _ean13_image(ean_value[:-1], bad_value[-1])
+        bad = _evidence(session, household_id, root, _png(bad_image), "bad.png", "image/png")
+    
+        qr_rows = signals.extract_observations(qr.id, session)
+        ean_rows = signals.extract_observations(ean.id, session)
+        bad_rows = signals.extract_observations(bad.id, session)
+    
+        qr_values = [json.loads(row.value_json) for row in qr_rows if row.kind == "barcode_qr"]
+        ean_values = [json.loads(row.value_json) for row in ean_rows if row.kind == "barcode_qr"]
+        bad_values = [json.loads(row.value_json) for row in bad_rows if row.kind == "barcode_qr"]
+>       assert any(item.get("value") == qr_value and item["validated"] for item in qr_values)
+E       assert False
+E        +  where False = any(<generator object test_generated_codes_are_validated_and_bad_checksum_is_not_an_identifier.<locals>.<genexpr> at 0x7ea1e828f140>)
+
+tests/test_signals.py:136: AssertionError
+_________________ test_ocr_has_text_boxes_and_mean_confidence __________________
+
+isolated_db = (<sqlalchemy.orm.session.Session object at 0x7ea1e8242ea0>, '01a0abcc-49d1-7f40-a7bb-109960470314', PosixPath('/tmp/pytest-of-andrei/pytest-11/test_ocr_has_text_boxes_and_me0/storage'))
+
+    def test_ocr_has_text_boxes_and_mean_confidence(isolated_db) -> None:  # type: ignore[no-untyped-def]
+        session, household_id, root = isolated_db
+        evidence = _evidence(session, household_id, root, _png(_text_image()), "text.png", "image/png")
+        rows = signals.extract_observations(evidence.id, session)
+        ocr = [json.loads(row.value_json) for row in rows if row.kind == "ocr"]
+>       assert ocr
+E       assert []
+
+tests/test_signals.py:148: AssertionError
+=============================== warnings summary ===============================
+../venv/lib/python3.12/site-packages/fastapi/testclient.py:1
+  /home/andrei/StorageGenie/venv/lib/python3.12/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+tests/test_candidates.py: 3 warnings
+tests/test_foundations.py: 3 warnings
+tests/test_search.py: 3 warnings
+tests/test_sg048_name_optional.py: 6 warnings
+tests/test_signals.py: 3 warnings
+  /home/andrei/StorageGenie/venv/lib/python3.12/site-packages/alembic/config.py:604: DeprecationWarning: No path_separator found in configuration; falling back to legacy splitting on spaces, commas, and colons for prepend_sys_path.  Consider adding path_separator=os to Alembic config.
+    util.warn_deprecated(
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/test_signals.py::test_generated_codes_are_validated_and_bad_checksum_is_not_an_identifier
+FAILED tests/test_signals.py::test_ocr_has_text_boxes_and_mean_confidence - a...
+2 failed, 195 passed, 19 warnings in 13.41s
+PYTEST_EXIT=1
+$ (cd backend && ../venv/bin/python -m ruff check app tests alembic)
+All checks passed!
+RUFF_EXIT=0
+$ (cd frontend && npm test -- --run)
+
+> storagegenie-frontend@0.1.0 test
+> vitest run --run
+
+
+ RUN  v1.6.1 /home/andrei/StorageGenie/frontend
+
+ ✓ src/theme/theme.test.tsx  (10 tests) 119ms
+stderr | src/components/shell/import-modal.test.tsx > AssetImportModal staging > drop stages accepted files as Ready with a live count
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+stderr | src/components/shell/shell.test.tsx > Catalog shell > the header labels the LOADED item count, not a household total
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+stderr | src/components/catalog/catalog.test.tsx > ProductCard > renders the name, the category micro-pill and the primary-color dots
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+ ✓ src/components/shell/import-modal.test.tsx  (14 tests) 425ms
+ ✓ src/components/shell/drawer.test.tsx  (13 tests) 614ms
+ ✓ src/components/catalog/catalog.test.tsx  (31 tests) 623ms
+stderr | src/routes/ReviewPage.test.tsx > ReviewPage > posts every decision with the loaded candidate id and supports keyboard actions
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+ ✓ src/routes/ReviewPage.test.tsx  (4 tests) 239ms
+ ✓ src/components/shell/shell.test.tsx  (15 tests) 892ms
+ ✓ src/types/product.test.ts  (12 tests) 7ms
+ ✓ src/components/AssetForm.test.tsx  (7 tests) 299ms
+stderr | src/routes/InboxPage.test.tsx > InboxPage > renders failed loaded job detail and retries that loaded id
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+ ✓ src/routes/InboxPage.test.tsx  (4 tests) 266ms
+stderr | src/routes/AssetDetailPage.test.tsx > AssetDetailPage > editing quantity patches via PATCH and shows the superseded prior value in history
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+ ✓ src/routes/AssetDetailPage.test.tsx  (2 tests) 228ms
+ ✓ src/routes/ChatPage.test.tsx  (5 tests) 207ms
+ ✓ src/components/CandidateCard.test.tsx  (4 tests) 147ms
+ ✓ src/routes/PlanningPage.test.tsx  (4 tests) 300ms
+ ✓ src/routes/SettingsPage.test.tsx  (3 tests) 160ms
+ ✓ src/components/ExpiryEntryForm.test.tsx  (2 tests) 115ms
+ ✓ src/components/PlanningSuggestionCard.test.tsx  (2 tests) 91ms
+ ✓ src/components/AssetCard.test.tsx  (2 tests) 58ms
+stderr | src/components/AssetCard.test.tsx > AssetCard > renders display_name and type
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+ ✓ src/components/ChatTranscript.test.tsx  (2 tests) 95ms
+ ✓ src/components/JobCard.test.tsx  (1 test) 33ms
+ ✓ src/api/client.test.ts  (3 tests) 3ms
+ ✓ src/components/ProvenanceBadge.test.tsx  (3 tests) 33ms
+
+ Test Files  21 passed (21)
+      Tests  143 passed (143)
+   Start at  19:58:10
+   Duration  3.95s (transform 680ms, setup 706ms, collect 2.71s, tests 4.95s, environment 5.78s, prepare 1.49s)
+
+VITEST_EXIT=0
+$ (cd frontend && npm run lint)
+
+> storagegenie-frontend@0.1.0 lint
+> eslint src
+
+LINT_EXIT=0
+$ (cd frontend && npm run build)
+
+> storagegenie-frontend@0.1.0 build
+> tsc && vite build
+
+vite v5.4.21 building for production...
+transforming...
+✓ 1960 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                   0.94 kB │ gzip:  0.47 kB
+dist/assets/index-DxKo-z_g.css    2.65 kB │ gzip:  0.82 kB
+dist/assets/index-Dzu0xl8e.js   293.34 kB │ gzip: 87.27 kB
+✓ built in 1.67s
+BUILD_EXIT=0
+
+########################################################################
+=== G5 MUTATIONS — each caught singly (raw) ===
+########################################################################
+
+# M1 name-resolution branch: resolve_display_name 'if evidence_ids:' -> 'if False and evidence_ids:'
+$ (cd backend && ../venv/bin/python -m pytest -q tests/test_sg048_name_optional.py)
+...F.F...                                                                [100%]
+=================================== FAILURES ===================================
+_____ test_nameless_with_evidence_uses_photo_stem_deterministic_assertion ______
+
+asset_db = (<sqlalchemy.orm.session.Session object at 0x7a43a2ff9850>, '01a0abcc-7cff-7ff0-80c9-da2382b00d8c')
+
+    def test_nameless_with_evidence_uses_photo_stem_deterministic_assertion(asset_db) -> None:  # type: ignore[no-untyped-def]
+        session, household_id = asset_db
+        evidence = _evidence(session, household_id, "before-photo.jpg")
+    
+        asset = create_asset(
+            session,
+            household_id,
+            {"display_name": None, "asset_type": "unknown", "evidence_ids": [evidence.id]},
+        )
+    
+>       assert asset.display_name == "before-photo"
+E       AssertionError: assert None == 'before-photo'
+E        +  where None = <app.models.asset.Asset object at 0x7a43a30aa600>.display_name
+
+tests/test_sg048_name_optional.py:187: AssertionError
+_________________ test_blank_name_is_missing_in_both_branches __________________
+
+asset_db = (<sqlalchemy.orm.session.Session object at 0x7a43a31674d0>, '01a0abcc-7d9c-7ed3-bc42-f77f8275218f')
+
+    def test_blank_name_is_missing_in_both_branches(asset_db) -> None:  # type: ignore[no-untyped-def]
+        session, household_id = asset_db
+        evidence = _evidence(session, household_id, "pasted-shot.png")
+    
+        with_evidence = create_asset(
+            session,
+            household_id,
+            {"display_name": "   ", "evidence_ids": [evidence.id]},
+        )
+>       assert with_evidence.display_name == "pasted-shot"
+E       AssertionError: assert None == 'pasted-shot'
+E        +  where None = <app.models.asset.Asset object at 0x7a43a3167e90>.display_name
+
+tests/test_sg048_name_optional.py:225: AssertionError
+=============================== warnings summary ===============================
+tests/test_sg048_name_optional.py::test_sg048_migration_round_trip_restores_nullability
+tests/test_sg048_name_optional.py::test_sg048_migration_round_trip_restores_nullability
+tests/test_sg048_name_optional.py::test_sg048_migration_round_trip_restores_nullability
+tests/test_sg048_name_optional.py::test_sg048_nameless_row_survives_upgrade_and_blocks_downgrade
+tests/test_sg048_name_optional.py::test_sg048_nameless_row_survives_upgrade_and_blocks_downgrade
+tests/test_sg048_name_optional.py::test_nameless_create_through_full_migration_chain
+  /home/andrei/StorageGenie/venv/lib/python3.12/site-packages/alembic/config.py:604: DeprecationWarning: No path_separator found in configuration; falling back to legacy splitting on spaces, commas, and colons for prepend_sys_path.  Consider adding path_separator=os to Alembic config.
+    util.warn_deprecated(
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/test_sg048_name_optional.py::test_nameless_with_evidence_uses_photo_stem_deterministic_assertion
+FAILED tests/test_sg048_name_optional.py::test_blank_name_is_missing_in_both_branches
+2 failed, 7 passed, 6 warnings in 1.21s
+M1_EXIT=1
+
+# M2 fallback branch: product.ts '|| UNTITLED_ASSET_NAME' -> '&& UNTITLED_ASSET_NAME'
+$ (cd frontend && npm test -- --run src/types/product.test.ts src/components/AssetCard.test.tsx)
+
+> storagegenie-frontend@0.1.0 test
+> vitest run --run src/types/product.test.ts src/components/AssetCard.test.tsx
+
+
+ RUN  v1.6.1 /home/andrei/StorageGenie/frontend
+
+ ❯ src/types/product.test.ts  (12 tests | 2 failed) 9ms
+   ❯ src/types/product.test.ts > assetToProductItem > maps display_name to name and created_at to dateAdded
+     → expected 'Untitled asset' to be 'Oxford Shirt' // Object.is equality
+   ❯ src/types/product.test.ts > assetToProductItem > a null display_name falls back to the display-only Untitled asset constant
+     → expected null to be 'Untitled asset' // Object.is equality
+ ✓ src/components/AssetCard.test.tsx  (2 tests) 50ms
+stderr | src/components/AssetCard.test.tsx > AssetCard > renders display_name and type
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/types/product.test.ts > assetToProductItem > maps display_name to name and created_at to dateAdded
+AssertionError: expected 'Untitled asset' to be 'Oxford Shirt' // Object.is equality
+
+- Expected
++ Received
+
+- Oxford Shirt
++ Untitled asset
+
+ ❯ src/types/product.test.ts:75:23
+     73|     const item = assetToProductItem(asset);
+     74|     expect(item.id).toBe("a1");
+     75|     expect(item.name).toBe("Oxford Shirt");
+       |                       ^
+     76|     expect(item.category).toBe("Apparel & Textiles");
+     77|     expect(item.dateAdded).toBe("2026-09-16T10:00:00Z");
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  src/types/product.test.ts > assetToProductItem > a null display_name falls back to the display-only Untitled asset constant
+AssertionError: expected null to be 'Untitled asset' // Object.is equality
+
+- Expected: 
+"Untitled asset"
+
++ Received: 
+null
+
+ ❯ src/types/product.test.ts:92:23
+     90|   test("a null display_name falls back to the display-only Untitled as…
+     91|     const item = assetToProductItem({ ...asset, display_name: null });
+     92|     expect(item.name).toBe(UNTITLED_ASSET_NAME);
+       |                       ^
+     93|     expect(UNTITLED_ASSET_NAME).toBe("Untitled asset");
+     94|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+ Test Files  1 failed | 1 passed (2)
+      Tests  2 failed | 12 passed (14)
+   Start at  19:58:21
+   Duration  608ms (transform 67ms, setup 70ms, collect 114ms, tests 59ms, environment 479ms, prepare 98ms)
+
+M2_EXIT=1
+
+# M3 migration nullability: upgrade 'nullable=True' -> 'nullable=False'
+$ (cd backend && ../venv/bin/python -m pytest -q tests/test_sg048_name_optional.py)
+FFF......                                                                [100%]
+=================================== FAILURES ===================================
+_____________ test_sg048_migration_round_trip_restores_nullability _____________
+
+tmp_path = PosixPath('/tmp/pytest-of-andrei/pytest-13/test_sg048_migration_round_tri0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x736f352a6480>
+
+    def test_sg048_migration_round_trip_restores_nullability(tmp_path: Path, monkeypatch) -> None:
+        url = f"sqlite:///{tmp_path / 'roundtrip.db'}"
+        monkeypatch.setattr(settings, "database_url", url)
+        config = _alembic_config(url)
+    
+        command.upgrade(config, "head")
+>       assert _display_name_notnull(url) == 0
+E       AssertionError: assert 1 == 0
+E        +  where 1 = _display_name_notnull('sqlite:////tmp/pytest-of-andrei/pytest-13/test_sg048_migration_round_tri0/roundtrip.db')
+
+tests/test_sg048_name_optional.py:56: AssertionError
+----------------------------- Captured stderr call -----------------------------
+INFO  [alembic.runtime.migration] Context impl SQLiteImpl.
+INFO  [alembic.runtime.migration] Will assume non-transactional DDL.
+INFO  [alembic.runtime.migration] Running upgrade  -> 0201cf10c56c, 001 core foundation
+INFO  [alembic.runtime.migration] Running upgrade 0201cf10c56c -> 20260908_sg013_observation, deterministic signal observations
+INFO  [alembic.runtime.migration] Running upgrade 20260908_sg013_observation -> 20260908_sg014_candidate, deduplication candidates
+INFO  [alembic.runtime.migration] Running upgrade 20260908_sg014_candidate -> 20260908_sg017_fts, SQLite FTS5 index for asset catalog search.
+INFO  [alembic.runtime.migration] Running upgrade 20260908_sg017_fts -> 20260912_sg025_provider_call, provider call ledger (SG-025, blueprint §3.3)
+INFO  [alembic.runtime.migration] Running upgrade 20260912_sg025_provider_call -> 20260914_sg035_foundations, data foundations: source attribution, planning suggestions, guardrail log (SG-035, Phase 3 S2/S3)
+INFO  [alembic.runtime.migration] Running upgrade 20260914_sg035_foundations -> 20260916_sg048_name_optional, name-optional capture: asset.display_name becomes nullable (SG-048, S2)
+________ test_sg048_nameless_row_survives_upgrade_and_blocks_downgrade _________
+
+self = <sqlalchemy.engine.base.Connection object at 0x736f351e2b10>
+dialect = <sqlalchemy.dialects.sqlite.pysqlite.SQLiteDialect_pysqlite object at 0x736f351e1040>
+context = <sqlalchemy.dialects.sqlite.base.SQLiteExecutionContext object at 0x736f351c1b50>
+statement = <sqlalchemy.dialects.sqlite.base.SQLiteCompiler object at 0x736f351c3470>
+parameters = [('dbc31cd2527e4c22b58e0b980bf9c69b', 'cf1a880aed2744c99fb83372e4fbc1cb')]
+
+    def _exec_single_context(
+        self,
+        dialect: Dialect,
+        context: ExecutionContext,
+        statement: Union[str, Compiled],
+        parameters: Optional[_AnyMultiExecuteParams],
+    ) -> CursorResult[Any]:
+        """continue the _execute_context() method for a single DBAPI
+        cursor.execute() or cursor.executemany() call.
+    
+        """
+        if dialect.bind_typing is BindTyping.SETINPUTSIZES:
+            generic_setinputsizes = context._prepare_set_input_sizes()
+    
+            if generic_setinputsizes:
+                try:
+                    dialect.do_set_input_sizes(
+                        context.cursor, generic_setinputsizes, context
+                    )
+                except BaseException as e:
+                    self._handle_dbapi_exception(
+                        e, str(statement), parameters, None, context
+                    )
+    
+        cursor, str_statement, parameters = (
+            context.cursor,
+            context.statement,
+            context.parameters,
+        )
+    
+        effective_parameters: Optional[_AnyExecuteParams]
+    
+        if not context.executemany:
+            effective_parameters = parameters[0]
+        else:
+            effective_parameters = parameters
+    
+        if self._has_events or self.engine._has_events:
+            for fn in self.dispatch.before_cursor_execute:
+                str_statement, effective_parameters = fn(
+                    self,
+                    cursor,
+                    str_statement,
+                    effective_parameters,
+                    context,
+                    context.executemany,
+                )
+    
+        if self._echo:
+            self._log_info(str_statement)
+    
+            stats = context._get_cache_stats()
+    
+            if not self.engine.hide_parameters:
+                self._log_info(
+                    "[%s] %r",
+                    stats,
+                    sql_util._repr_params(
+                        effective_parameters,
+                        batches=10,
+                        ismulti=context.executemany,
+                    ),
+                )
+            else:
+                self._log_info(
+                    "[%s] [SQL parameters hidden due to hide_parameters=True]",
+                    stats,
+                )
+    
+        evt_handled: bool = False
+        try:
+            if context.execute_style is ExecuteStyle.EXECUTEMANY:
+                effective_parameters = cast(
+                    "_CoreMultiExecuteParams", effective_parameters
+                )
+                if self.dialect._has_events:
+                    for fn in self.dialect.dispatch.do_executemany:
+                        if fn(
+                            cursor,
+                            str_statement,
+                            effective_parameters,
+                            context,
+                        ):
+                            evt_handled = True
+                            break
+                if not evt_handled:
+                    self.dialect.do_executemany(
+                        cursor,
+                        str_statement,
+                        effective_parameters,
+                        context,
+                    )
+            elif not effective_parameters and context.no_parameters:
+                if self.dialect._has_events:
+                    for fn in self.dialect.dispatch.do_execute_no_params:
+                        if fn(cursor, str_statement, context):
+                            evt_handled = True
+                            break
+                if not evt_handled:
+                    self.dialect.do_execute_no_params(
+                        cursor, str_statement, context
+                    )
+            else:
+                effective_parameters = cast(
+                    "_CoreSingleExecuteParams", effective_parameters
+                )
+                if self.dialect._has_events:
+                    for fn in self.dialect.dispatch.do_execute:
+                        if fn(
+                            cursor,
+                            str_statement,
+                            effective_parameters,
+                            context,
+                        ):
+                            evt_handled = True
+                            break
+                if not evt_handled:
+>                   self.dialect.do_execute(
+                        cursor, str_statement, effective_parameters, context
+                    )
+
+../venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py:1969: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <sqlalchemy.dialects.sqlite.pysqlite.SQLiteDialect_pysqlite object at 0x736f351e1040>
+cursor = <sqlite3.Cursor object at 0x736f351b6440>
+statement = "INSERT INTO asset (id, household_id, display_name, asset_type, status, version) VALUES (?, ?, NULL, 'unknown', 'ACTIVE', 1)"
+parameters = ('dbc31cd2527e4c22b58e0b980bf9c69b', 'cf1a880aed2744c99fb83372e4fbc1cb')
+context = <sqlalchemy.dialects.sqlite.base.SQLiteExecutionContext object at 0x736f351c1b50>
+
+    def do_execute(self, cursor, statement, parameters, context=None):
+>       cursor.execute(statement, parameters)
+E       sqlite3.IntegrityError: NOT NULL constraint failed: asset.display_name
+
+../venv/lib/python3.12/site-packages/sqlalchemy/engine/default.py:952: IntegrityError
+
+The above exception was the direct cause of the following exception:
+
+tmp_path = PosixPath('/tmp/pytest-of-andrei/pytest-13/test_sg048_nameless_row_surviv0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x736f352cb500>
+
+    def test_sg048_nameless_row_survives_upgrade_and_blocks_downgrade(
+        tmp_path: Path, monkeypatch
+    ) -> None:
+        url = f"sqlite:///{tmp_path / 'nameless.db'}"
+        monkeypatch.setattr(settings, "database_url", url)
+        config = _alembic_config(url)
+        command.upgrade(config, "head")
+    
+        household_id = uuid.uuid4().hex
+        asset_id = uuid.uuid4().hex
+        engine = create_engine(url)
+        with engine.begin() as conn:
+            conn.execute(text("INSERT INTO household (id, name) VALUES (:id, 'H')"), {"id": household_id})
+>           conn.execute(
+                text(
+                    "INSERT INTO asset (id, household_id, display_name, asset_type, status, version) "
+                    "VALUES (:id, :h, NULL, 'unknown', 'ACTIVE', 1)"
+                ),
+                {"id": asset_id, "h": household_id},
+            )
+
+tests/test_sg048_name_optional.py:83: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py:1421: in execute
+    return meth(
+../venv/lib/python3.12/site-packages/sqlalchemy/sql/elements.py:526: in _execute_on_connection
+    return connection._execute_clauseelement(
+../venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py:1643: in _execute_clauseelement
+    ret = self._execute_context(
+../venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py:1848: in _execute_context
+    return self._exec_single_context(
+../venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py:1988: in _exec_single_context
+    self._handle_dbapi_exception(
+../venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py:2365: in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+../venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py:1969: in _exec_single_context
+    self.dialect.do_execute(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <sqlalchemy.dialects.sqlite.pysqlite.SQLiteDialect_pysqlite object at 0x736f351e1040>
+cursor = <sqlite3.Cursor object at 0x736f351b6440>
+statement = "INSERT INTO asset (id, household_id, display_name, asset_type, status, version) VALUES (?, ?, NULL, 'unknown', 'ACTIVE', 1)"
+parameters = ('dbc31cd2527e4c22b58e0b980bf9c69b', 'cf1a880aed2744c99fb83372e4fbc1cb')
+context = <sqlalchemy.dialects.sqlite.base.SQLiteExecutionContext object at 0x736f351c1b50>
+
+    def do_execute(self, cursor, statement, parameters, context=None):
+>       cursor.execute(statement, parameters)
+E       sqlalchemy.exc.IntegrityError: (sqlite3.IntegrityError) NOT NULL constraint failed: asset.display_name
+E       [SQL: INSERT INTO asset (id, household_id, display_name, asset_type, status, version) VALUES (?, ?, NULL, 'unknown', 'ACTIVE', 1)]
+E       [parameters: ('dbc31cd2527e4c22b58e0b980bf9c69b', 'cf1a880aed2744c99fb83372e4fbc1cb')]
+E       (Background on this error at: https://sqlalche.me/e/20/gkpj)
+
+../venv/lib/python3.12/site-packages/sqlalchemy/engine/default.py:952: IntegrityError
+----------------------------- Captured stderr call -----------------------------
+INFO  [alembic.runtime.migration] Context impl SQLiteImpl.
+INFO  [alembic.runtime.migration] Will assume non-transactional DDL.
+INFO  [alembic.runtime.migration] Running upgrade  -> 0201cf10c56c, 001 core foundation
+INFO  [alembic.runtime.migration] Running upgrade 0201cf10c56c -> 20260908_sg013_observation, deterministic signal observations
+INFO  [alembic.runtime.migration] Running upgrade 20260908_sg013_observation -> 20260908_sg014_candidate, deduplication candidates
+INFO  [alembic.runtime.migration] Running upgrade 20260908_sg014_candidate -> 20260908_sg017_fts, SQLite FTS5 index for asset catalog search.
+INFO  [alembic.runtime.migration] Running upgrade 20260908_sg017_fts -> 20260912_sg025_provider_call, provider call ledger (SG-025, blueprint §3.3)
+INFO  [alembic.runtime.migration] Running upgrade 20260912_sg025_provider_call -> 20260914_sg035_foundations, data foundations: source attribution, planning suggestions, guardrail log (SG-035, Phase 3 S2/S3)
+INFO  [alembic.runtime.migration] Running upgrade 20260914_sg035_foundations -> 20260916_sg048_name_optional, name-optional capture: asset.display_name becomes nullable (SG-048, S2)
+______________ test_nameless_create_through_full_migration_chain _______________
+
+self = <sqlalchemy.engine.base.Connection object at 0x736f35038d40>
+dialect = <sqlalchemy.dialects.sqlite.pysqlite.SQLiteDialect_pysqlite object at 0x736f3503aa50>
+context = <sqlalchemy.dialects.sqlite.base.SQLiteExecutionContext object at 0x736f385156a0>
+statement = <sqlalchemy.dialects.sqlite.base.SQLiteCompiler object at 0x736f35014a40>
+parameters = [('01a0abcc-8775-7aa3-a66c-4deba241899f', '01a0abcc-8773-7740-bced-968676e55cc8', None, 'unknown', 'ACTIVE', None, ...)]
+
+    def _exec_single_context(
+        self,
+        dialect: Dialect,
+        context: ExecutionContext,
+        statement: Union[str, Compiled],
+        parameters: Optional[_AnyMultiExecuteParams],
+    ) -> CursorResult[Any]:
+        """continue the _execute_context() method for a single DBAPI
+        cursor.execute() or cursor.executemany() call.
+    
+        """
+        if dialect.bind_typing is BindTyping.SETINPUTSIZES:
+            generic_setinputsizes = context._prepare_set_input_sizes()
+    
+            if generic_setinputsizes:
+                try:
+                    dialect.do_set_input_sizes(
+                        context.cursor, generic_setinputsizes, context
+                    )
+                except BaseException as e:
+                    self._handle_dbapi_exception(
+                        e, str(statement), parameters, None, context
+                    )
+    
+        cursor, str_statement, parameters = (
+            context.cursor,
+            context.statement,
+            context.parameters,
+        )
+    
+        effective_parameters: Optional[_AnyExecuteParams]
+    
+        if not context.executemany:
+            effective_parameters = parameters[0]
+        else:
+            effective_parameters = parameters
+    
+        if self._has_events or self.engine._has_events:
+            for fn in self.dispatch.before_cursor_execute:
+                str_statement, effective_parameters = fn(
+                    self,
+                    cursor,
+                    str_statement,
+                    effective_parameters,
+                    context,
+                    context.executemany,
+                )
+    
+        if self._echo:
+            self._log_info(str_statement)
+    
+            stats = context._get_cache_stats()
+    
+            if not self.engine.hide_parameters:
+                self._log_info(
+                    "[%s] %r",
+                    stats,
+                    sql_util._repr_params(
+                        effective_parameters,
+                        batches=10,
+                        ismulti=context.executemany,
+                    ),
+                )
+            else:
+                self._log_info(
+                    "[%s] [SQL parameters hidden due to hide_parameters=True]",
+                    stats,
+                )
+    
+        evt_handled: bool = False
+        try:
+            if context.execute_style is ExecuteStyle.EXECUTEMANY:
+                effective_parameters = cast(
+                    "_CoreMultiExecuteParams", effective_parameters
+                )
+                if self.dialect._has_events:
+                    for fn in self.dialect.dispatch.do_executemany:
+                        if fn(
+                            cursor,
+                            str_statement,
+                            effective_parameters,
+                            context,
+                        ):
+                            evt_handled = True
+                            break
+                if not evt_handled:
+                    self.dialect.do_executemany(
+                        cursor,
+                        str_statement,
+                        effective_parameters,
+                        context,
+                    )
+            elif not effective_parameters and context.no_parameters:
+                if self.dialect._has_events:
+                    for fn in self.dialect.dispatch.do_execute_no_params:
+                        if fn(cursor, str_statement, context):
+                            evt_handled = True
+                            break
+                if not evt_handled:
+                    self.dialect.do_execute_no_params(
+                        cursor, str_statement, context
+                    )
+            else:
+                effective_parameters = cast(
+                    "_CoreSingleExecuteParams", effective_parameters
+                )
+                if self.dialect._has_events:
+                    for fn in self.dialect.dispatch.do_execute:
+                        if fn(
+                            cursor,
+                            str_statement,
+                            effective_parameters,
+                            context,
+                        ):
+                            evt_handled = True
+                            break
+                if not evt_handled:
+>                   self.dialect.do_execute(
+                        cursor, str_statement, effective_parameters, context
+                    )
+
+../venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py:1969: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <sqlalchemy.dialects.sqlite.pysqlite.SQLiteDialect_pysqlite object at 0x736f3503aa50>
+cursor = <sqlite3.Cursor object at 0x736f34574440>
+statement = 'INSERT INTO asset (id, household_id, display_name, asset_type, status, quantity, unit, condition, version) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING created_at, updated_at'
+parameters = ('01a0abcc-8775-7aa3-a66c-4deba241899f', '01a0abcc-8773-7740-bced-968676e55cc8', None, 'unknown', 'ACTIVE', None, ...)
+context = <sqlalchemy.dialects.sqlite.base.SQLiteExecutionContext object at 0x736f385156a0>
+
+    def do_execute(self, cursor, statement, parameters, context=None):
+>       cursor.execute(statement, parameters)
+E       sqlite3.IntegrityError: NOT NULL constraint failed: asset.display_name
+
+../venv/lib/python3.12/site-packages/sqlalchemy/engine/default.py:952: IntegrityError
+
+The above exception was the direct cause of the following exception:
+
+tmp_path = PosixPath('/tmp/pytest-of-andrei/pytest-13/test_nameless_create_through_f0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x736f351155b0>
+
+    def test_nameless_create_through_full_migration_chain(tmp_path: Path, monkeypatch) -> None:
+        """The nameless-create path against the real schema, not a hand-built one.
+    
+        Mirrors production: a scratch SQLite upgraded from base through every
+        revision, then the API service writes a nameless row (NULL) and a named
+        row. No test rows ever touch the production database.
+        """
+        url = f"sqlite:///{tmp_path / 'fullchain.db'}"
+        monkeypatch.setattr(settings, "database_url", url)
+        storage_root = tmp_path / "storage"
+        storage_root.mkdir()
+        monkeypatch.setattr(settings, "storage_root", str(storage_root))
+        command.upgrade(_alembic_config(url), "head")
+    
+        engine = create_engine(url)
+        factory = sessionmaker(bind=engine, expire_on_commit=False)
+        session: Session = factory()
+        try:
+            household = Household(name="Full chain household")
+            session.add(household)
+            session.commit()
+    
+>           nameless = create_asset(session, household.id, {"status": "ACTIVE"})
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_sg048_name_optional.py:134: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+app/services/asset_service.py:52: in create_asset
+    db.flush()
+../venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py:4353: in flush
+    self._flush(objects)
+../venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py:4488: in _flush
+    with util.safe_reraise():
+../venv/lib/python3.12/site-packages/sqlalchemy/util/langhelpers.py:122: in __exit__
+    raise exc_value.with_traceback(exc_tb)
+../venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py:4449: in _flush
+    flush_context.execute()
+../venv/lib/python3.12/site-packages/sqlalchemy/orm/unitofwork.py:465: in execute
+    rec.execute(self)
+../venv/lib/python3.12/site-packages/sqlalchemy/orm/unitofwork.py:641: in execute
+    util.preloaded.orm_persistence.save_obj(
+../venv/lib/python3.12/site-packages/sqlalchemy/orm/persistence.py:94: in save_obj
+    _emit_insert_statements(
+../venv/lib/python3.12/site-packages/sqlalchemy/orm/persistence.py:1234: in _emit_insert_statements
+    result = connection.execute(
+../venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py:1421: in execute
+    return meth(
+../venv/lib/python3.12/site-packages/sqlalchemy/sql/elements.py:526: in _execute_on_connection
+    return connection._execute_clauseelement(
+../venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py:1643: in _execute_clauseelement
+    ret = self._execute_context(
+../venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py:1848: in _execute_context
+    return self._exec_single_context(
+../venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py:1988: in _exec_single_context
+    self._handle_dbapi_exception(
+../venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py:2365: in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+../venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py:1969: in _exec_single_context
+    self.dialect.do_execute(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <sqlalchemy.dialects.sqlite.pysqlite.SQLiteDialect_pysqlite object at 0x736f3503aa50>
+cursor = <sqlite3.Cursor object at 0x736f34574440>
+statement = 'INSERT INTO asset (id, household_id, display_name, asset_type, status, quantity, unit, condition, version) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING created_at, updated_at'
+parameters = ('01a0abcc-8775-7aa3-a66c-4deba241899f', '01a0abcc-8773-7740-bced-968676e55cc8', None, 'unknown', 'ACTIVE', None, ...)
+context = <sqlalchemy.dialects.sqlite.base.SQLiteExecutionContext object at 0x736f385156a0>
+
+    def do_execute(self, cursor, statement, parameters, context=None):
+>       cursor.execute(statement, parameters)
+E       sqlalchemy.exc.IntegrityError: (sqlite3.IntegrityError) NOT NULL constraint failed: asset.display_name
+E       [SQL: INSERT INTO asset (id, household_id, display_name, asset_type, status, quantity, unit, condition, version) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING created_at, updated_at]
+E       [parameters: ('01a0abcc-8775-7aa3-a66c-4deba241899f', '01a0abcc-8773-7740-bced-968676e55cc8', None, 'unknown', 'ACTIVE', None, None, None, 1)]
+E       (Background on this error at: https://sqlalche.me/e/20/gkpj)
+
+../venv/lib/python3.12/site-packages/sqlalchemy/engine/default.py:952: IntegrityError
+----------------------------- Captured stderr call -----------------------------
+INFO  [alembic.runtime.migration] Context impl SQLiteImpl.
+INFO  [alembic.runtime.migration] Will assume non-transactional DDL.
+INFO  [alembic.runtime.migration] Running upgrade  -> 0201cf10c56c, 001 core foundation
+INFO  [alembic.runtime.migration] Running upgrade 0201cf10c56c -> 20260908_sg013_observation, deterministic signal observations
+INFO  [alembic.runtime.migration] Running upgrade 20260908_sg013_observation -> 20260908_sg014_candidate, deduplication candidates
+INFO  [alembic.runtime.migration] Running upgrade 20260908_sg014_candidate -> 20260908_sg017_fts, SQLite FTS5 index for asset catalog search.
+INFO  [alembic.runtime.migration] Running upgrade 20260908_sg017_fts -> 20260912_sg025_provider_call, provider call ledger (SG-025, blueprint §3.3)
+INFO  [alembic.runtime.migration] Running upgrade 20260912_sg025_provider_call -> 20260914_sg035_foundations, data foundations: source attribution, planning suggestions, guardrail log (SG-035, Phase 3 S2/S3)
+INFO  [alembic.runtime.migration] Running upgrade 20260914_sg035_foundations -> 20260916_sg048_name_optional, name-optional capture: asset.display_name becomes nullable (SG-048, S2)
+=============================== warnings summary ===============================
+tests/test_sg048_name_optional.py::test_sg048_migration_round_trip_restores_nullability
+tests/test_sg048_name_optional.py::test_sg048_nameless_row_survives_upgrade_and_blocks_downgrade
+tests/test_sg048_name_optional.py::test_nameless_create_through_full_migration_chain
+  /home/andrei/StorageGenie/venv/lib/python3.12/site-packages/alembic/config.py:604: DeprecationWarning: No path_separator found in configuration; falling back to legacy splitting on spaces, commas, and colons for prepend_sys_path.  Consider adding path_separator=os to Alembic config.
+    util.warn_deprecated(
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/test_sg048_name_optional.py::test_sg048_migration_round_trip_restores_nullability
+FAILED tests/test_sg048_name_optional.py::test_sg048_nameless_row_survives_upgrade_and_blocks_downgrade
+FAILED tests/test_sg048_name_optional.py::test_nameless_create_through_full_migration_chain
+3 failed, 6 passed, 3 warnings in 1.37s
+M3_EXIT=1
+
+########################################################################
+=== G6 BEFORE (read-only) — pre-migration prod snapshot (/tmp/opencode/storagegenie-before-sg048.db) + live pre-deploy observations ===
+########################################################################
+$ python3 - <<PY  # read-only against the pre-migration prod DB copy
+alembic_version: [('20260914_sg035_foundations',)]
+pragma table_info(asset).display_name notnull: 1
+counts: {'household': 1, 'user': 2, 'asset': 1, 'evidence': 1, 'assertion': 3, 'audit_event': 3}
+assets (id,display_name,asset_type,status): [('01a0a467-eb0e-7b83-a227-af122dc9268b', 'Toothpaste', 'unknown', 'ACTIVE')]
+fts triggers: ['asset_fts_after_delete', 'asset_fts_after_insert', 'asset_fts_after_update']
+# pre-deploy live observations (captured before the rebuild):
+#   health   -> {"status":"ok","db":"ok","storage":"ok"}
+#   bundle   -> index-CuxlcH9v.js
+#   ports    -> 127.0.0.1:8003 only
+#   gate     -> http=301 redirect=https://storagegenie.dynv6.net/ ; https=401
+#   image    -> b619f62b5336 ; container dac0bf5c60a4 RestartCount=0
+
+########################################################################
+=== G6 MIGRATION + DEPLOY ===
+########################################################################
+$ cp data/db/storagegenie.db /tmp/opencode/storagegenie-before-sg048.db   # safety copy
+$ BUILDX_CONFIG=$XDG_RUNTIME_DIR/buildx docker compose build backend     # cached base layers, no pulls
+#   -> Image storagegenie-backend Built ; bundle index-GQSnPT8t.js
+$ docker compose stop backend
+$ docker compose run --rm --no-deps backend python -m alembic upgrade head
+#   -> Running upgrade 20260914_sg035_foundations -> 20260916_sg048_name_optional
+$ docker compose up -d
+#   -> Container storagegenie-backend-1 Recreated/Started
+
+=== G6 AFTER (read-only) — live prod DB (migrated) + live observations ===
+$ python3 - <<PY  # read-only against live /home/andrei/StorageGenie/data/db/storagegenie.db
+alembic_version: [('20260916_sg048_name_optional',)]
+pragma table_info(asset).display_name notnull: 0
+counts: {'household': 1, 'user': 2, 'asset': 1, 'evidence': 1, 'assertion': 3, 'audit_event': 3}
+assets (id,display_name,asset_type,status): [('01a0a467-eb0e-7b83-a227-af122dc9268b', 'Toothpaste', 'unknown', 'ACTIVE')]
+fts triggers: ['asset_fts_after_delete', 'asset_fts_after_insert', 'asset_fts_after_update']
+$ curl -s http://127.0.0.1:8003/v1/health
+{"status":"ok","db":"ok","storage":"ok"}
+
+$ curl -s http://127.0.0.1:8003/ | grep -o "index-[A-Za-z0-9_-]*\.js"
+index-GQSnPT8t.js
+$ curl -s -o /dev/null -w "http=%{http_code} redirect=%{redirect_url}\n" -H "Host: storagegenie.dynv6.net" http://127.0.0.1/
+http=301 redirect=https://storagegenie.dynv6.net/
+$ curl -s -k -o /dev/null -w "https=%{http_code}\n" -H "Host: storagegenie.dynv6.net" https://127.0.0.1/
+https=401
+$ ss -ltnp | grep 8003
+LISTEN 0      4096       127.0.0.1:8003       0.0.0.0:*    users:(("rootlesskit",pid=3814163,fd=32))    
+$ docker compose up -d   # idempotent re-up
+$ docker inspect storagegenie-backend-1 --format "Image={{.Image}} ID={{.Id}} RestartCount={{.RestartCount}}"
+ Container storagegenie-backend-1 Running 
+Image=sha256:4f338b356945f9a8f960ecd3f50a3890a7c2b6d536ea4312c4f66e25e2f78f5e ID=4b170d83c86234de78a2e3c7ffb98c5e410b696058b2fa2d25709771060c1cb1 RestartCount=0
+
+# G6 RESULT: version 20260914 -> 20260916 ; display_name notnull 1 -> 0 ; counts EQUAL (1/2/1/1/3/3) ;
+#            Toothpaste display_name == Toothpaste before and after ; zero new prod rows ;
+#            health exact ; bundle changed index-CuxlcH9v.js -> index-GQSnPT8t.js ; 8003 loopback-only ; gate 301/401 ;
+#            idempotent re-up left the same container running, RestartCount=0.

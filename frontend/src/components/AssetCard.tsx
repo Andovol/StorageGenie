@@ -1,9 +1,11 @@
 import { Link } from "react-router-dom";
 import type { Asset } from "../api/types";
+import { UNTITLED_ASSET_NAME } from "../types/product";
 import { ProvenanceBadge } from "./ProvenanceBadge";
 
 export function AssetCard({ asset, householdId }: { asset: Asset; householdId: string }) {
   const base = import.meta.env.VITE_API_BASE || "http://localhost:8000";
+  const displayName = asset.display_name || UNTITLED_ASSET_NAME;
   const thumbEvidence = (asset as unknown as { evidence?: { id: string }[] }).evidence?.[0];
   const thumbUrl = thumbEvidence
     ? `${base}/v1/evidence/${thumbEvidence.id}/thumb/256?household_id=${householdId}`
@@ -29,7 +31,7 @@ export function AssetCard({ asset, householdId }: { asset: Asset; householdId: s
       {thumbUrl ? (
         <img
           src={thumbUrl}
-          alt={asset.display_name}
+          alt={displayName}
           style={{ width: "100%", height: 120, objectFit: "cover", borderRadius: 6, marginBottom: 8, background: "#f3f4f6" }}
           onError={(e) => ((e.target as HTMLImageElement).style.display = "none")}
         />
@@ -52,7 +54,7 @@ export function AssetCard({ asset, householdId }: { asset: Asset; householdId: s
         </div>
       )}
       <div style={{ fontWeight: 600, fontSize: 14, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
-        {asset.display_name}
+        {displayName}
       </div>
       <div style={{ fontSize: 12, color: "#6b7280" }}>
         {asset.asset_type} · {asset.status}

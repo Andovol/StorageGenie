@@ -65,8 +65,8 @@ export function AssetForm({ householdId, onCreated }: Props) {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (!displayName.trim()) {
-      setError("Display name required");
+    if (!displayName.trim() && previewFiles.length === 0) {
+      setError("Add a photo or a display name");
       return;
     }
     if (!householdId) {
@@ -82,9 +82,10 @@ export function AssetForm({ householdId, onCreated }: Props) {
         evidenceIds.push(ev.id);
       }
       const payload: Record<string, unknown> = {
-        display_name: displayName.trim(),
         asset_type: assetType,
       };
+      const trimmedName = displayName.trim();
+      if (trimmedName) payload.display_name = trimmedName;
       if (quantity !== "") {
         const q = Number(quantity);
         if (!Number.isNaN(q)) payload.quantity = q;
@@ -110,14 +111,14 @@ export function AssetForm({ householdId, onCreated }: Props) {
   return (
     <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: 12, maxWidth: 520 }}>
       <label style={{ display: "flex", flexDirection: "column", gap: 4 }}>
-        <span>Display name *</span>
+        <span>Display name (optional)</span>
         <input
           value={displayName}
           onChange={(e) => setDisplayName(e.target.value)}
-          required
           style={{ width: "100%", padding: 8, border: "1px solid #d1d5db", borderRadius: 6 }}
           placeholder="e.g. Hammer"
         />
+        <span style={{ fontSize: 11, color: "#6b7280" }}>Left blank, we use the photo's filename</span>
       </label>
       <label style={{ display: "flex", flexDirection: "column", gap: 4 }}>
         <span>Asset type</span>

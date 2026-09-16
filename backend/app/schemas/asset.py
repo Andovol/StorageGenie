@@ -4,7 +4,7 @@ from pydantic import BaseModel
 
 
 class AssetCreate(BaseModel):
-    display_name: str
+    display_name: str | None = None
     asset_type: str = "unknown"
     status: str = "ACTIVE"
     quantity: float | None = None
@@ -36,7 +36,7 @@ class AssertionOut(BaseModel):
 class AssetOut(BaseModel):
     id: str
     household_id: str
-    display_name: str
+    display_name: str | None
     asset_type: str
     status: str
     quantity: float | None = None

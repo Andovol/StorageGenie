@@ -6,6 +6,7 @@ import { EvidenceGallery } from "../components/EvidenceGallery";
 import { ProvenanceBadge } from "../components/ProvenanceBadge";
 import { ExpiryEntryForm } from "../components/ExpiryEntryForm";
 import { apiPatch, apiPost, uploadEvidence } from "../api/client";
+import { UNTITLED_ASSET_NAME } from "../types/product";
 
 export function AssetDetailPage() {
   const { id } = useParams();
@@ -57,15 +58,16 @@ export function AssetDetailPage() {
   const assertions = asset.assertions || [];
   const expiryAssertion = assertions.find((item) => item.field_path.endsWith("expiry_date"));
   const audits = (asset as unknown as { audit_events: { id: string; action: string; actor: string; timestamp: string; before: unknown; after: unknown }[] }).audit_events || [];
+  const displayName = asset.display_name || UNTITLED_ASSET_NAME;
 
   return (
     <div style={{ padding: 24, maxWidth: 900 }}>
       <Link to={`/?household_id=${householdId}`} style={{ fontSize: 13, color: "#2563eb" }}>← Back to catalog</Link>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 8 }}>
-        <h1 style={{ margin: 0 }}>{asset.display_name}</h1>
+        <h1 style={{ margin: 0 }}>{displayName}</h1>
         <button
           onClick={() => {
-            setEditName(asset.display_name);
+            setEditName(asset.display_name ?? "");
             setEditQuantity(asset.quantity != null ? String(asset.quantity) : "");
             setEditUnit(asset.unit ?? "");
             setEditCondition(asset.condition ?? "");

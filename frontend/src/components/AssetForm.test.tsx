@@ -89,4 +89,48 @@ describe("AssetForm", () => {
     );
     expect(onCreated).toHaveBeenCalledWith("asset-1");
   });
+
+  test("the name field reads optional and explains the filename fallback", () => {
+    render(<AssetForm householdId="hh-1" onCreated={() => {}} />);
+
+    expect(screen.getByText("Display name (optional)")).toBeInTheDocument();
+    expect(screen.getByText(/we use the photo's filename/i)).toBeInTheDocument();
+    expect(screen.getByPlaceholderText("e.g. Hammer")).not.toBeRequired();
+  });
+
+  test("a nameless capture with a photo posts no display_name key", async () => {
+    api.uploadEvidence.mockResolvedValue({
+      id: "ev-2",
+      sha256: "sha",
+      storage_key: "key",
+      size_bytes: 4,
+    });
+    api.apiPost.mockResolvedValue({ id: "asset-2" });
+    const onCreated = vi.fn();
+
+    render(<AssetForm householdId="hh-1" onCreated={onCreated} />);
+
+    fireEvent.paste(screen.getByPlaceholderText("e.g. Hammer"), {
+      clipboardData: { files: [imageFile("nameless.png")] },
+    });
+    expect(await screen.findByText(/nameless\.png/)).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole("button", { name: "Create asset" }));
+
+    await waitFor(() => expect(api.apiPost).toHaveBeenCalledTimes(1));
+    const payload = api.apiPost.mock.calls[0][1] as Record<string, unknown>;
+    expect(payload).not.toHaveProperty("display_name");
+    expect(payload).toMatchObject({ asset_type: "unknown", evidence_ids: ["ev-2"] });
+    expect(onCreated).toHaveBeenCalledWith("asset-2");
+  });
+
+  test("a nameless photoless submit is refused with a named error and sends nothing", async () => {
+    render(<AssetForm householdId="hh-1" onCreated={() => {}} />);
+
+    fireEvent.click(screen.getByRole("button", { name: "Create asset" }));
+
+    expect(await screen.findByText("Add a photo or a display name")).toBeInTheDocument();
+    expect(api.uploadEvidence).not.toHaveBeenCalled();
+    expect(api.apiPost).not.toHaveBeenCalled();
+  });
 });

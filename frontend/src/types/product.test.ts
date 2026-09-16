@@ -3,6 +3,7 @@ import type { Asset, Evidence, Job } from "../api/types";
 import type { AssetMedia } from "./product";
 import {
   CANONICAL_CATEGORIES,
+  UNTITLED_ASSET_NAME,
   assetToProductItem,
   evidenceToAssetMedia,
   jobToRenderJob,
@@ -84,6 +85,12 @@ describe("assetToProductItem", () => {
 
   test("carries no rawResponse key", () => {
     expect(hasRawResponseKey(assetToProductItem(asset))).toBe(false);
+  });
+
+  test("a null display_name falls back to the display-only Untitled asset constant", () => {
+    const item = assetToProductItem({ ...asset, display_name: null });
+    expect(item.name).toBe(UNTITLED_ASSET_NAME);
+    expect(UNTITLED_ASSET_NAME).toBe("Untitled asset");
   });
 });
 

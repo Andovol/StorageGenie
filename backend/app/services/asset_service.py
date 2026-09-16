@@ -7,6 +7,28 @@ from app.models.asset import Asset
 from app.models.evidence import asset_evidence
 from app.services import audit_service
 from app.services.assertion_service import upsert_assertion
+from app.services.candidates import _deterministic_display_name
+
+
+def resolve_display_name(
+    db: Session,
+    payload: dict,
+    evidence_ids: list[str],
+) -> tuple[str | None, str | None]:
+    """Return ``(display_name, source_type)`` for a create payload.
+
+    A non-blank supplied name wins (``source_type="user"``). An absent or
+    whitespace-only name is server-resolved from the first attached evidence's
+    filename stem (``source_type="deterministic"``, the existing verbatim
+    namer). With neither name nor evidence the value is NULL and no
+    ``display_name`` assertion is written -- honest, never fabricated.
+    """
+    raw_name = payload.get("display_name")
+    if isinstance(raw_name, str) and raw_name.strip():
+        return raw_name, "user"
+    if evidence_ids:
+        return _deterministic_display_name(db, evidence_ids), "deterministic"
+    return None, None
 
 
 def create_asset(
@@ -15,9 +37,11 @@ def create_asset(
     payload: dict,
     actor: str = "api",
 ) -> Asset:
+    evidence_ids = payload.get("evidence_ids") or []
+    display_name, name_source = resolve_display_name(db, payload, evidence_ids)
     asset = Asset(
         household_id=household_id,
-        display_name=payload["display_name"],
+        display_name=display_name,
         asset_type=payload.get("asset_type", "unknown"),
         status=payload.get("status", "ACTIVE"),
         quantity=payload.get("quantity"),
@@ -27,7 +51,7 @@ def create_asset(
     db.add(asset)
     db.flush()
     # Create assertions for each supplied field
-    for field in ("display_name", "asset_type", "quantity", "unit", "condition", "status"):
+    for field in ("asset_type", "quantity", "unit", "condition", "status"):
         if field in payload and payload[field] is not None:
             a = Assertion(
                 asset_id=asset.id,
@@ -37,8 +61,17 @@ def create_asset(
                 review_state="accepted",
             )
             db.add(a)
+    if name_source is not None:
+        db.add(
+            Assertion(
+                asset_id=asset.id,
+                field_path="display_name",
+                value_json=json.dumps(display_name),
+                source_type=name_source,
+                review_state="accepted",
+            )
+        )
     # Link evidence
-    evidence_ids = payload.get("evidence_ids") or []
     for eid in evidence_ids:
         db.execute(asset_evidence.insert().values(asset_id=asset.id, evidence_id=eid))
     audit_service.record(

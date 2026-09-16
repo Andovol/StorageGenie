@@ -12,4 +12,13 @@ describe("AssetCard", () => {
     );
     expect(screen.getByText("Hammer")).toBeInTheDocument();
   });
+
+  test("a null display_name renders the Untitled asset fallback", () => {
+    render(
+      <MemoryRouter>
+        <AssetCard asset={{ id: "2", household_id: "h1", display_name: null, asset_type: "unknown", status: "ACTIVE", quantity: null, unit: null, condition: null, version: 1, created_at: new Date().toISOString(), updated_at: null } as never} householdId="h1" />
+      </MemoryRouter>
+    );
+    expect(screen.getByText("Untitled asset")).toBeInTheDocument();
+  });
 });
