@@ -1,0 +1,101 @@
+SG-052 verify log — raw before-state captures and gate-failure demonstration.
+All bytes below are the executed command output, unedited.
+
+================================================================================
+### 2026-09-16T17:01:06Z SG-052 G1 RAW CAPTURE (pre-state, read-only)
+================================================================================
+## git
+$ git rev-parse HEAD
+ef5f815fb56f1c9de8b8d800900a8008165f8368
+$ git rev-parse origin/automation
+ef5f815fb56f1c9de8b8d800900a8008165f8368
+$ git status --porcelain=v1 -b
+## automation...origin/automation
+$ git remote -v
+origin	git@github.com:Andovol/StorageGenie.git (fetch)
+origin	git@github.com:Andovol/StorageGenie.git (push)
+## stack
+$ docker compose ps
+NAME                     IMAGE                  COMMAND                  SERVICE   CREATED      STATUS                PORTS
+storagegenie-backend-1   storagegenie-backend   "uvicorn app.main:ap…"   backend   2 days ago   Up 2 days (healthy)   127.0.0.1:8003->8000/tcp
+$ docker compose images
+CONTAINER                 REPOSITORY              TAG                 PLATFORM            IMAGE ID            SIZE                CREATED
+storagegenie-backend-1    storagegenie-backend    latest              linux/amd64         56968d428c4c        201MB               2 days ago
+storagegenie-frontend-1   storagegenie-frontend   latest              linux/amd64         cbd3cbb8291b        123MB               5 days ago
+$ docker ps --format
+62b8cf6b0ce3 storagegenie-backend Up 2 days (healthy) 127.0.0.1:8003->8000/tcp storagegenie-backend-1
+## listeners 8000/8003/5173
+$ ss -ltnp | grep -E '8003|8000|5173'
+LISTEN 0      4096       127.0.0.1:8000       0.0.0.0:*
+LISTEN 0      4096       127.0.0.1:8003       0.0.0.0:*    users:(("rootlesskit",pid=3814163,fd=32))
+## health
+$ curl -s http://127.0.0.1:8003/v1/health
+{"status":"ok","db":"ok","storage":"ok"}
+## served index
+$ curl -s http://127.0.0.1:8003/ | grep -oE '/assets/[^"]+'
+/assets/index-khM4mS2k.js
+$ curl -s http://127.0.0.1:8003/ | grep -oE 'id="root"'
+id="root"
+## db
+$ docker exec storagegenie-backend-1 python -m alembic current
+INFO  [alembic.runtime.migration] Context impl SQLiteImpl.
+INFO  [alembic.runtime.migration] Will assume non-transactional DDL.
+20260914_sg035_foundations (head)
+$ docker exec storagegenie-backend-1 python -m alembic heads
+20260914_sg035_foundations (head)
+$ sqlite3 -readonly data/db/storagegenie.db 'SELECT * FROM alembic_version;'
+20260914_sg035_foundations
+## row counts
+alembic_version                  1
+assertion                        3
+asset                            1
+asset_evidence                   1
+asset_fts                        1
+asset_fts_config                 1
+asset_fts_data                   3
+asset_fts_docsize                1
+asset_fts_idx                    1
+audit_event                      3
+candidate                        0
+evidence                         1
+guardrail_event                  0
+household                        1
+idempotency_key                  1
+job                              0
+job_step                         0
+observation                      0
+planning_suggestion              0
+provider_call                    0
+review_task                      0
+source_attribution               0
+user                             2
+## household
+01a0a029-1477-7ca0-b200-bce78a96c679|Popescu Household|2026-09-14 13:44:01
+## beyond-seed rows (asset/evidence/assertion/audit_event)
+asset|01a0a467-eb0e-7b83-a227-af122dc9268b|Toothpaste|2026-09-15 09:31:08
+evidence|01a0a467-eacf-7e13-bbd0-078b1bc93860|pasta-de-dinti-colgate-50-ml-total-original-iN6RhsW3.jpg|2026-09-15 09:31:08
+audit|evidence.create|evidence|2026-09-15 09:31:08.880980
+audit|asset.create|asset|2026-09-15 09:31:08.943495
+audit|asset.accepted|asset|2026-09-15 09:31:08.943547
+
+================================================================================
+### 2026-09-16T17:01:12Z SG-052 PG-EV-01 gate-seen-failing (raw)
+================================================================================
+# GATE A — packet G1 expectation 'seed only, no real rows beyond seed' (PG-IC-08).
+$ expected asset rows=0 ; measured asset rows=1
+GATE A: FAIL -> STOP (real rows beyond seed: asset=1, evidence=1, assertion=3, audit_event=3)
+
+# GATE B — deliberately WRONG expectation on the served asset hash (SG-041 value inverted), same run.
+$ expected=/assets/index-WRONG.js
+$ measured=/assets/index-khM4mS2k.js
+GATE B: FAIL (as required by the wrong expectation)
+
+# GATE C — correct pre-state expectation (SG-041 packet value) for contrast.
+GATE C: PASS (served hash matches SG-041 baseline)
+
+================================================================================
+### 2026-09-16 (later) POST-STATE
+================================================================================
+NOT PRODUCED. The slice STOPPED at G1 before the D69 mutation (G2 build+up). No post-change
+health/asset-hash capture exists because no change was made. The before/after pair (PG-EV-09)
+is therefore only a before; the absent after is deliberate and is not a vacuous pass.

@@ -1,0 +1,120 @@
+SG-052 execution log (Coder, opencode, effort medium, contract 0.27.0).
+
+Role: Coder only. No dispatch verb run for any ID; no self-unit started or polled.
+Dispatch params read from the committed packet `docs/packets/SG-052-production-deploy.md`
+(`coder: opencode`, `effort: medium`).
+Process argv (process 741079): `opencode run --auto --dir /home/andrei/StorageGenie
+--variant medium <packet text>` -> effort = `medium`; NO `--model` flag in argv -> model = `unknown`
+(not read from any identity line; no provider metadata exposed a model id to the process).
+BASE REF `origin/automation` requested; resolved commit recorded in the report (two fields).
+
+## Timeline (UTC)
+
+- 16:55:45Z process start (`ps -o lstart= -p 741079`).
+- 16:58Z G1 starting-tree check.
+  - `git rev-parse HEAD` = `ef5f815fb56f1c9de8b8d800900a8008165f8368`.
+  - `git rev-parse origin/automation` = `ef5f815fb56f1c9de8b8d800900a8008165f8368` -> HEAD == origin/automation
+    (the pushed tip whose message is `L3 batch: SG-051 rating 98 + SG-052 deploy packet (D69)`).
+  - `git status --porcelain=v1 -b` = `## automation...origin/automation` only (worktree CLEAN, no dirt).
+  - `git remote -v` origin = `git@github.com:Andovol/StorageGenie.git`.
+- 16:59Z G1 stack/listener/health/index probes.
+  - `docker compose ps`: `storagegenie-backend-1` Up 2 days (healthy) `127.0.0.1:8003->8000/tcp`.
+  - `docker compose images`: backend image id `56968d428c4c` (201MB, created 2 days ago = 2026-09-14T13:43:40Z);
+    frontend `cbd3cbb8291b` (dev profile image, not part of the prod stack).
+  - `docker ps --format`: container `62b8cf6b0ce3` image `storagegenie-backend` `127.0.0.1:8003->8000/tcp`.
+  - `ss -ltnp | grep -E '8003|8000|5173'`: `127.0.0.1:8003` (rootlesskit) and `127.0.0.1:8000` only;
+    no 0.0.0.0/:: for 8003/8000/5173.
+  - `curl -s http://127.0.0.1:8003/v1/health` = `{"status":"ok","db":"ok","storage":"ok"}`.
+  - `curl -s http://127.0.0.1:8003/` asset ref = `/assets/index-khM4mS2k.js` (matches SG-041's recorded hash);
+    `id="root"` present.
+- 17:00Z G1 DB read-only probes.
+  - `docker exec storagegenie-backend-1 python -m alembic current` = `20260914_sg035_foundations (head)`.
+  - `docker exec ... alembic heads` = `20260914_sg035_foundations (head)` -> current == head, NO pending migration.
+  - `sqlite3 -readonly data/db/storagegenie.db "SELECT * FROM alembic_version;"` = `20260914_sg035_foundations`.
+  - Seed household present: `01a0a029-1477-7ca0-b200-bce78a96c679 | Popescu Household | 2026-09-14 13:44:01`.
+- 17:01:06Z G1 raw capture frozen (see `SG-052_verify.log`).
+- 17:01:12Z PG-EV-01 gate-seen-failing demonstration (see `SG-052_verify.log`).
+  - GATE A (packet G1 expectation "seed only, no real rows beyond seed", PG-IC-08):
+    expected asset rows = 0 ; measured asset rows = 1 -> **GATE A FAIL -> STOP**.
+  - GATE B (deliberately wrong expectation on the served asset hash): expected
+    `/assets/index-WRONG.js`, measured `/assets/index-khM4mS2k.js` -> FAIL (as required).
+  - GATE C (correct SG-041 baseline): measured == `/assets/index-khM4mS2k.js` -> PASS.
+- 17:03Z STOP decision recorded; G2/G3 NOT entered; worklogs written (this leg).
+
+## Decision: STOP at G1 (no D69 mutation performed)
+
+The packet states two things that bind here:
+- `docs/packets/SG-052-production-deploy.md:35`: "**If unexpected real rows beyond seed -> STOP (`PG-IC-08`).**"
+- `docs/packets/SG-052-production-deploy.md:60` (constraints): "Unexpected pre-existing real data -> STOP
+  (`PG-IC-08`, either direction)."
+- `docs/packets/SG-052-production-deploy.md:73` (acceptance): "Unexpected pre-existing real data -> STOP
+  (`PG-IC-08`, either direction)."
+
+Measured pre-state contains real rows beyond the SG-041 seed (`backend/app/seed.py:1` seeds only the
+household + 2 users):
+- `asset` = 1 row: `01a0a467-eb0e-7b83-a227-af122dc9268b | Toothpaste | 2026-09-15 09:31:08`
+- `evidence` = 1 row: `...pasta-de-dinti-colgate-50-ml-total-original-iN6RhsW3.jpg | 2026-09-15 09:31:08`
+- `assertion` = 3 rows (display_name / asset_type / status, all `source_type=user`, `review_state=accepted`)
+- `audit_event` = 3 rows (`evidence.create`, `asset.create`, `asset.accepted`, 2026-09-15 09:31:08)
+- `user` = 2 (seed), `household` = 1 (seed), all other data tables = 0.
+
+The literal trigger of the packet's stop gate is met, so the gate fires and `PG-IC-03` ("stops win,
+stated not assumed") applies. I did NOT run `docker compose up --build -d`, the idempotent re-`up`, or
+any G3 observable check. No DB write, no migrate, no seed.
+
+## Findings
+
+- **F-SG052-1 (the stop trigger, `PG-IC-08`/`PG-IC-09`).** The DB is NOT at seed-only state: one real
+  end-to-end import (1 asset + 1 evidence + 3 assertions + 3 audit events) created 2026-09-15 09:31:08,
+  ~20 h after the SG-041 seed (2026-09-14 13:44:01). This is undocumented in any worklog (grep for
+  `Toothpaste` / `pasta-de-dinti` across `docs/worklogs` = no hits) and no slice between SG-041 and SG-052
+  wrote it (SG-042..SG-051 are frontend/test work; SG-047 states its only real network was a no-write
+  health probe).
+- **F-SG052-2 (context that argues the rows are "expected", recorded so the Architect can resolve).**
+  `STATE.md:13`/`:171`/`:173` record the D49/D59 LIVE USE PASS: the public entry went LIVE 2026-09-15
+  (Launcher#34, "owner logged in once") and "D59 effectively UNDERWAY owner-side (owner drove the live
+  app ...)", with the remaining owner action stated as "consent on, import real photos, use the screens
+  with the two users". The row shape (a real consumer-goods photo, `source_kind=upload`, `source_type=user`,
+  accepted) is exactly what that live pass would produce. So a reading exists in which these rows are
+  *expected* owner live-pass data and the gate should not fire. I did not adopt that reading because the
+  packet's stated expectation is seed-household presence with real rows beyond seed as an explicit stop,
+  and the packet's own judgement call belongs to the Architect, not the Coder. The packet gives no
+  expected row count N (so `PG-IC-08`'s "expectation of N" is not numerically stated), which is itself the
+  ambiguity I am surfacing rather than silently resolving.
+- **F-SG052-3 (DB-neutrality, for completeness).** The D69 mutation is DB-neutral: `backend/Dockerfile`
+  CMD is a bare `uvicorn` startup with no entrypoint migrate/seed, and `backend/app/main.py` has no
+  lifespan/startup DB write. So no row could have been altered by the build+up. The stop is therefore a
+  pure expectation-bounds stop, not a data-risk stop.
+- **F-SG052-4 (premise verified, no defect).** "No slice since SG-041 added a migration" is TRUE:
+  `alembic current == heads == 20260914_sg035_foundations`, no pending revisions.
+- **F-SG052-5 (`PG-IC-08` strictness, raised as requested).** The packet asks for "per-table row counts"
+  but states no numeric expectation, then makes "unexpected real rows beyond seed" a stop. On a
+  production service that has been publicly live since 2026-09-15 and that the owner was directed to use,
+  *any* real row trips this gate, so the gate cannot distinguish expected owner data from rogue data.
+  A future revision of this gate should state the expected counts explicitly (including expected live-pass
+  rows) or drop the gate as non-binding.
+
+## Not done (explicit)
+
+- G2 (build + up + re-up), G3 (post-change health/asset-hash/markers/loopback/gate-401-301) were NOT run:
+  the slice stopped at G1. The external nginx gate (`https://.../v1/health` 401 / `http://` 301) was not
+  probed; no credentials used or needed.
+- No product-file diff. No DB write. No ignored file staged. Nothing pushed to `storagegenie-evidence`.
+- No suite re-run (none ordered; zero product delta; stated, not skipped-silently).
+- No vacuous pass is claimed; the slice did not pass - it stopped.
+
+## Budget (actual vs bound, per leg)
+
+- G1 probes (git/stack/listeners/health/index/DB): each command well under the 120 s ordinary-probe bound;
+  G1 leg wall ~330 s total across several probes (no single command near 120 s).
+- G2 build+up leg: 0 s (not entered); 1800 s bound unused.
+- G3 observables leg: 0 s (not entered).
+- Worklog/report leg: this leg.
+- Overall wall at capture: ~332 s of the 2700 s overall bound (early-close 2100 s not triggered).
+- Spend: `$0` metered; AI OFF, no provider calls.
+
+## Live-state ledger
+
+- Image id old -> new: `56968d428c4c` (SG-041, running, 2026-09-14) -> **unchanged** (no build ran).
+- DB writes: **zero** (read-only probes only: `alembic current/heads`, `sqlite3 -readonly`).
+- Network: read-only loopback API checks only; no registry pulls (no build); no external calls by the slice.
