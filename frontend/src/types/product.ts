@@ -5,12 +5,12 @@ import type { Asset, Evidence, Job } from "../api/types";
  * that is not one of these passes through `toProductCategory` unchanged.
  */
 export const CANONICAL_CATEGORIES = [
-  "Tops",
-  "Bottoms",
-  "Dresses",
-  "Outerwear",
-  "Footwear",
-  "Accessories",
+  "Hardware & Tools",
+  "Electronics & Gadgets",
+  "Apparel & Textiles",
+  "Home & Decor",
+  "Packaging & Materials",
+  "Uncategorized",
 ] as const;
 
 export type CanonicalCategory = (typeof CANONICAL_CATEGORIES)[number];
