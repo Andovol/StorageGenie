@@ -1,0 +1,362 @@
+SG-053_verify.log
+# SG-053 — production deploy with blessed row counts — RAW before/after captures
+# Host: andrei@87.106.66.242:2222   Work dir: /home/andrei/StorageGenie
+# BASE (start HEAD) = 0bd31efdc2b8985d461822ad672363bd9ba2c9ff  (== origin/automation)
+# Contract: 0.27.0   Coder: opencode   Effort: medium (argv --variant medium)   Model: unknown
+# Slice process start (run-coder SG-053): 2026-09-16T17:09:24Z
+# NOTE: `rtk` is the host's output-compacting CLI wrapper; lines shown are the
+#       wrapper's rendering of the real command. Where a command is shown without
+#       `rtk`, it ran directly. All timestamps UTC.
+
+########################################################################
+=== G1 BEFORE — tree, stack, listeners, health, index, image, DB ===
+########################################################################
+
+$ git status --porcelain=v1 -b
+## automation...origin/automation
+
+$ git rev-parse HEAD
+0bd31efdc2b8985d461822ad672363bd9ba2c9ff
+
+$ git rev-parse origin/automation
+0bd31efdc2b8985d461822ad672363bd9ba2c9ff
+
+$ git log --oneline -6
+0bd31ef L3 batch: SG-052 rating 96 + M25 + SG-053 packet (D70)
+450c850 BLOCKED: SG-052 real rows beyond seed in production DB (PG-IC-08 stop); no deploy
+ef5f815 L3 batch: SG-051 rating 98 + SG-052 deploy packet (D69)
+a8c3958 SG-051: worklog, report and verify log
+1baeb16 SG-051: rewrite stale CTA tests to assert the import dialog
+2df30a4 L3 batch: SG-047 rating 98 + SG-051 packet (D68)
+
+$ git remote -v
+origin	git@github.com:Andovol/StorageGenie.git (fetch)
+origin	git@github.com:Andovol/StorageGenie.git (push)
+
+$ rtk docker compose ps
+[compose] 1 services:
+  storagegenie-backend-1 (storagegenie-backend) Up 2 days (healthy) [8003]
+
+$ rtk curl -s http://127.0.0.1:8003/v1/health
+{"status":"ok","db":"ok","storage":"ok"}
+
+$ rtk curl -s http://127.0.0.1:8003/
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>StorageGenie</title>
+    <script type="module" crossorigin src="/assets/index-khM4mS2k.js"></script>
+  </head>
+  <body>
+    <div id="root"></div>
+  </body>
+</html>
+
+# Served asset hash BEFORE = /assets/index-khM4mS2k.js  (matches SG-052's record — re-verified, not inherited)
+
+$ docker inspect storagegenie-backend-1 --format '{{.Image}} {{.Config.Image}}'
+sha256:56968d428c4cf446a99b82481a0b6ce9e4c040c32e1094729fc6e150374d3e05 storagegenie-backend
+# Running image id BEFORE = sha256:56968d428c4cf446a99b82481a0b6ce9e4c040c32e1094729fc6e150374d3e05
+# Built 2026-09-14 13:43:40 UTC (the SG-041 image)
+
+$ ss -ltnp   (full host listener table, BEFORE)
+State  Recv-Q Send-Q Local Address:Port  Peer Address:PortProcess
+LISTEN 0      4096   127.0.0.53%lo:53         0.0.0.0:*
+LISTEN 0      2048         0.0.0.0:9119       0.0.0.0:*
+LISTEN 0      511          0.0.0.0:80         0.0.0.0:*
+LISTEN 0      4096       127.0.0.1:9881       0.0.0.0:*
+LISTEN 0      4096       127.0.0.1:9870       0.0.0.0:*
+LISTEN 0      511          0.0.0.0:443        0.0.0.0:*
+LISTEN 0      2048       127.0.0.1:8600       0.0.0.0:*    users:(("uvicorn",pid=734485,fd=9))
+LISTEN 0      2048       127.0.0.1:5000       0.0.0.0:*    users:(("uvicorn",pid=1540892,fd=7))
+LISTEN 0      4096         0.0.0.0:5433       0.0.0.0:*
+LISTEN 0      200          0.0.0.0:5432       0.0.0.0:*
+LISTEN 0      4096       127.0.0.1:9120       0.0.0.0:*
+LISTEN 0      4096      127.0.0.54:53         0.0.0.0:*
+LISTEN 0      4096       127.0.0.1:11434      0.0.0.0:*
+LISTEN 0      4096       127.0.0.1:3333       0.0.0.0:*
+LISTEN 0      4096       127.0.0.1:7474       0.0.0.0:*
+LISTEN 0      4096         0.0.0.0:2222       0.0.0.0:*
+LISTEN 0      4096       127.0.0.1:7681       0.0.0.0:*
+LISTEN 0      4096       127.0.0.1:7687       0.0.0.0:*
+LISTEN 0      4096         0.0.0.0:8000       0.0.0.0:*                                         <-- FOREIGN (see FINDING F-SG053-1)
+LISTEN 0      2048       127.0.0.1:8001       0.0.0.0:*    users:(("uvicorn",pid=730633,fd=7))
+LISTEN 0      4096       127.0.0.1:8003       0.0.0.0:*    users:(("rootlesskit",pid=3814163,fd=32))  <-- ours (loopback only)
+LISTEN 0      2048       127.0.0.1:8088       0.0.0.0:*    users:(("uvicorn",pid=1540911,fd=13))
+LISTEN 0      2048       127.0.0.1:8090       0.0.0.0:*    users:(("uvicorn",pid=1541019,fd=17))
+LISTEN 0      2048       127.0.0.1:8080       0.0.0.0:*    users:(("uvicorn",pid=1540923,fd=13))
+LISTEN 0      2048       127.0.0.1:8123       0.0.0.0:*    users:(("uvicorn",pid=1540908,fd=6))
+LISTEN 0      2048         0.0.0.0:8002       0.0.0.0:*    users:(("python",pid=1540917,fd=4))
+LISTEN 0      2048       127.0.0.1:3033       0.0.0.0:*    users:(("yourmemory_wrap",pid=1541177,fd=18))
+LISTEN 0      4096       127.0.0.1:3010       0.0.0.0:*
+LISTEN 0      4096       127.0.0.1:3003       0.0.0.0:*    users:(("conductor",pid=1540805,fd=19))
+LISTEN 0      511             [::]:80            [::]:*
+LISTEN 0      511             [::]:443           [::]:*
+LISTEN 0      4096            [::]:5433          [::]:*
+LISTEN 0      200             [::]:5432          [::]:*
+LISTEN 0      4096            [::]:2222          [::]:*
+
+# DB (read-only; `file:...?mode=ro` — never a writer)
+$ sqlite3 -readonly "file:/home/andrei/StorageGenie/data/db/storagegenie.db?mode=ro" \
+    "SELECT version_num FROM alembic_version;"
+20260914_sg035_foundations
+
+# Migration chain (grep of backend/alembic/versions):
+#   0201cf10c56c -> 20260908_sg013_observation -> 20260908_sg014_candidate
+#   -> 20260908_sg017_fts -> 20260912_sg025_provider_call -> 20260914_sg035_foundations
+# 20260914_sg035_foundations has no child => it IS head. DB == head. No pending migration.
+
+$ sqlite3 -readonly -header -column "file:...storagegenie.db?mode=ro" "<union counts>"
+'household'  n
+-----------  -
+household    1
+user         2
+asset        1
+evidence     1
+assertion    3
+audit_event  3
+
+$ sqlite3 -readonly -header -column ... "SELECT source_type, COUNT(*) FROM assertion GROUP BY source_type;"
+source_type  COUNT(*)
+----------   --------
+user         3
+
+$ sqlite3 -readonly -header -column ... "SELECT action, COUNT(*) FROM audit_event GROUP BY action;"
+action           COUNT(*)
+---------------  --------
+asset.accepted   1
+asset.create     1
+evidence.create  1
+
+# Blessed comparison (BEFORE): household=1 (>=1, Popescu Household seed) OK · user=2 OK ·
+# asset=1 (Toothpaste) OK · evidence=1 (upload) OK · assertion=3 (all source_type=user) OK ·
+# audit_event=3 {evidence.create, asset.create, asset.accepted} OK.  EXACT MATCH, proceed.
+
+$ docker images --no-trunc --format '{{.Repository}}:{{.Tag}} {{.ID}} {{.CreatedAt}}'
+storagegenie-backend:latest sha256:56968d428c4cf446a99b82481a0b6ce9e4c040c32e1094729fc6e150374d3e05 2026-09-14 13:43:40 +0000 UTC
+storagegenie-frontend:latest sha256:cbd3cbb8291bb9b6fd28e8ccab6f5540ea10df2567f39863b220c7d26f95dfb6 2026-09-11 14:27:13 +0000 UTC
+
+$ BUILDX_CONFIG=/home/andrei/StorageGenie/.cache docker buildx ls
+NAME/NODE      DRIVER/ENDPOINT   STATUS    BUILDKIT   PLATFORMS
+rootless*      docker
+ \_ rootless    \_ rootless      running   v0.31.2    linux/amd64 (+3)
+default                          error
+Cannot load builder default: permission denied while trying to connect to the docker API at unix:///var/run/docker.sock
+# rootless* is selected (expected); `default` permission denied is the known rootless shape.
+
+########################################################################
+=== G2 — build + up (D69+D70-authorised mutation) ===
+########################################################################
+
+# BUILDX_CONFIG=/home/andrei/StorageGenie/.cache exported for the invocation
+$ timeout 1750 docker compose up --build -d
+START 2026-09-16T17:10:43Z
+ Image storagegenie-backend Building
+#1 [internal] load local bake definitions
+#1 reading from stdin 607B done
+#1 DONE 0.0s
+#2 [internal] load build definition from Dockerfile
+#2 transferring dockerfile: 1.06kB done
+#2 DONE 0.0s
+#3 [internal] load metadata for docker.io/library/python:3.12.11-slim-bookworm@sha256:5195...
+#3 DONE 0.8s
+#4 [internal] load metadata for docker.io/library/node:20-alpine
+#4 DONE 0.8s
+#5 [internal] load .dockerignore
+#5 transferring context: 497B done
+#5 DONE 0.0s
+#7 [frontend-build 1/6] FROM docker.io/library/node:20-alpine@sha256:fb4cd12c...
+#7 DONE 0.0s
+#9 [frontend-build 2/6] WORKDIR /ui
+#9 CACHED
+#10 [frontend-build 3/6] COPY frontend/package.json frontend/package-lock.json ./
+#10 DONE 0.0s
+#11 [frontend-build 4/6] RUN npm ci
+#11 5.633 added 313 packages, and audited 314 packages in 5s
+#11 5.660 6 vulnerabilities (4 moderate, 1 high, 1 critical)
+#11 DONE 6.0s
+#12 [frontend-build 5/6] COPY frontend/ ./
+#12 DONE 0.1s
+#13 [frontend-build 6/6] RUN npm run build
+#13 4.275 vite v5.4.21 building for production...
+#13 6.411 ✓ 1960 modules transformed.
+#13 6.579 dist/index.html                   0.94 kB │ gzip:  0.47 kB
+#13 6.579 dist/assets/index-DxKo-z_g.css    2.65 kB │ gzip:  0.82 kB
+#13 6.580 dist/assets/index-CuxlcH9v.js   292.26 kB │ gzip: 86.96 kB
+#13 6.580 ✓ built in 2.28s
+#13 DONE 6.7s
+#14 [stage-1 3/9] RUN apt-get update && apt-get install -y --no-install-recommends curl tesseract-ocr libzbar0 ...
+#14 CACHED
+#15..#20 CACHED (pyproject+lock, pip install, COPY backend, hatchling/editables, editable install)
+#21 [stage-1 9/9] COPY --from=frontend-build /ui/dist ./static
+#21 DONE 0.0s
+#22 exporting to image
+#22 exporting manifest sha256:213f550c8935005a86ce69816c2db4848a63cb5f8ec4b1c6295b006fa8956187 done
+#22 naming to docker.io/library/storagegenie-backend:latest done
+#22 DONE 0.1s
+#23 resolving provenance for metadata file
+#23 DONE 0.0s
+ Image storagegenie-backend Built
+ Container storagegenie-backend-1 Recreate
+ Container storagegenie-backend-1 Recreated
+ Container storagegenie-backend-1 Starting
+ Container storagegenie-backend-1 Started
+EXIT=0
+END 2026-09-16T17:10:59Z
+# Build TEXT verdict = "Image storagegenie-backend Built" (exit code never used as verdict).
+
+$ rtk docker images --no-trunc --format '{{.Repository}} {{.ID}} {{.CreatedAt}}' storagegenie-backend
+storagegenie-backend sha256:86f7436d5a61ae35cf58ed470de17b0ae196f710e466d3d050099565601d9d92 2026-09-16 17:10:57 +0000 UTC
+# New running image id AFTER = sha256:86f7436d5a61ae35cf58ed470de17b0ae196f710e466d3d050099565601d9d92
+
+$ docker inspect storagegenie-backend-1 --format 'Id=... Image=... StartedAt=... RestartCount=... Status=...'   (BEFORE re-up)
+Id=244465492ac05809e0a088d60e15b1d4283fa5ef09d5fbe76ca2b0e7af806652 Image=sha256:86f7436d5a61ae35cf58ed470de17b0ae196f710e466d3d050099565601d9d92 StartedAt=2026-09-16T17:10:59.570727849Z RestartCount=0 Status=running
+
+$ timeout 120 docker compose up -d        # idempotent second up (no --build)
+ Container storagegenie-backend-1 Running
+UP_EXIT=0
+
+$ docker inspect storagegenie-backend-1 --format '...'   (AFTER re-up)
+Id=244465492ac05809e0a088d60e15b1d4283fa5ef09d5fbe76ca2b0e7af806652 Image=sha256:86f7436d5a61ae35cf58ed470de17b0ae196f710e466d3d050099565601d9d92 StartedAt=2026-09-16T17:10:59.570727849Z RestartCount=0 Status=running
+# Same container Id, same StartedAt, RestartCount=0 -> no recreate, no restart loop (PG-DP-04).
+
+$ rtk docker compose ps
+[compose] 1 services:
+  storagegenie-backend-1 (storagegenie-backend) Up 7 seconds (health: starting) [8003]
+
+$ timeout 30 docker stats --no-stream
+CONTAINER ID   NAME                     CPU %     MEM USAGE / LIMIT     MEM %     NET I/O         BLOCK I/O   PIDS
+244465492ac0   storagegenie-backend-1   0.14%     70.63MiB / 7.688GiB   0.90%     1.05kB / 126B   0B / 0B     5
+
+########################################################################
+=== G3 — the new tree proven live, by value ===
+########################################################################
+
+$ rtk docker compose ps
+[compose] 1 services:
+  storagegenie-backend-1 (storagegenie-backend) Up 24 seconds (healthy) [8003]
+
+$ rtk curl -s http://127.0.0.1:8003/v1/health
+{"status":"ok","db":"ok","storage":"ok"}
+
+$ rtk curl -s -i http://127.0.0.1:8003/
+HTTP/1.1 200 OK
+date: Wed, 16 Sep 2026 17:11:23 GMT
+server: uvicorn
+content-type: text/html; charset=utf-8
+accept-ranges: bytes
+content-length: 944
+last-modified: Wed, 16 Sep 2026 17:10:57 GMT
+etag: "b08ceb3635629b02ad652ebc5e01e6bf"
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>StorageGenie</title>
+    <script>
+      (function () {
+        try {
+          var stored = localStorage.getItem("sg-theme");
+          ...
+        } catch (error) { document.documentElement.classList.add("light"); }
+      })();
+    </script>
+    <script type="module" crossorigin src="/assets/index-CuxlcH9v.js"></script>
+    <link rel="stylesheet" crossorigin href="/assets/index-DxKo-z_g.css">
+  </head>
+  <body>
+    <div id="root"></div>
+  </body>
+</html>
+# Served asset hash AFTER = /assets/index-CuxlcH9v.js  !=  BEFORE /assets/index-khM4mS2k.js
+
+$ curl -s http://127.0.0.1:8003/ | grep -oE '/assets/index-[A-Za-z0-9_-]+\.js'
+/assets/index-CuxlcH9v.js
+
+# Wardrobe markers greppable in the SERVED bundle (/assets/index-CuxlcH9v.js, 292354 bytes):
+$ curl -s http://127.0.0.1:8003/assets/index-CuxlcH9v.js -o bundle.js && wc -c bundle.js
+292354
+$ grep -o ".\{0,40\}sg-theme.\{0,40\}" bundle.js | head -3
+oldId:n,onSelect:s},u.id))]})}const rp="sg-theme",ip=v.createContext(void 0);function y0
+$ grep -o ".\{0,40\}Product results.\{0,40\}" bundle.js | head -3
+sxs("table",{role:"table","aria-label":"Product results",style:{width:"100%",borderCollapse:"co
+jsxs("div",{role:"region","aria-label":"Product results","aria-busy":"true","data-testid":"cata
+jsxs("div",{role:"region","aria-label":"Product results","aria-busy":"false","data-testid":"cat
+$ grep -o ".\{0,40\}Import assets.\{0,40\}" bundle.js | head -3
+alog","aria-modal":"true","aria-label":"Import assets",className:"bg-card text-foreground bor
+{margin:0,fontSize:18,flex:1},children:"Import assets"}),o.jsx("button",{ref:r,type:"button",
+
+$ ss -ltn | awk '$4 ~ /:(8003|8000|5173)$/ {print}'
+LISTEN 0      4096       127.0.0.1:8000       0.0.0.0:*
+LISTEN 0      4096       127.0.0.1:8003       0.0.0.0:*
+# 8003 loopback-only. 8000 loopback-only. No 5173. No 0.0.0.0/:: on any of the three.
+$ ss -ltnp | grep ':8003'
+LISTEN 0      4096       127.0.0.1:8003       0.0.0.0:*    users:(("rootlesskit",pid=3814163,fd=32))
+
+# Gate intact, no credentials used. Public DNS does not resolve INSIDE the host
+# (getent rc=2; curl: (6) Could not resolve host) -> same nginx reached via loopback
+# with the Host header (the vhost's own server block). FINDING F-SG053-2.
+$ curl -i -H 'Host: storagegenie.dynv6.net' http://127.0.0.1/v1/health
+HTTP/1.1 301 Moved Permanently
+Server: nginx/1.24.0 (Ubuntu)
+Date: Wed, 16 Sep 2026 17:10:38 GMT
+Content-Type: text/html
+Content-Length: 178
+Connection: keep-alive
+Location: https://storagegenie.dynv6.net/v1/health
+<html>...301 Moved Permanently...</html>
+
+$ curl -i -k -H 'Host: storagegenie.dynv6.net' https://127.0.0.1/v1/health
+HTTP/2 401
+server: nginx/1.24.0 (Ubuntu)
+date: Wed, 16 Sep 2026 17:10:38 GMT
+content-type: text/html
+content-length: 188
+www-authenticate: Basic realm="StorageGenie Restricted"
+<html>...401 Authorization Required...</html>
+
+# PG-EV-01 — deliberately WRONG expectation, same run, shown failing:
+$ if grep -q 'index-khM4mS2k.js' <(curl -s http://127.0.0.1:8003/); then echo "PASS (unexpected)"; \
+  else echo "FAIL as expected: old hash index-khM4mS2k.js NOT present in served index (exit $?)"; fi
+FAIL as expected: old hash index-khM4mS2k.js NOT present in served index (exit 1)
+
+########################################################################
+=== G3b — DB re-read AFTER deploy (proves zero writes / DB-neutral rebuild) ===
+########################################################################
+
+$ sqlite3 -readonly -header -column "file:...storagegenie.db?mode=ro" "<union counts>"
+'household'  n
+-----------  -
+household    1
+user         2
+asset        1
+evidence     1
+assertion    3
+audit_event  3
+
+$ sqlite3 -readonly "file:...storagegenie.db?mode=ro" "SELECT version_num FROM alembic_version;"
+20260914_sg035_foundations
+# Identical to BEFORE -> rebuild touched no rows, no migration, no seed.
+
+$ git status --porcelain=v1 -b
+## automation...origin/automation
+$ git diff --stat
+(empty)
+# Only the three docs/worklogs/SG-053* files are added by this slice; zero product diff.
+
+########################################################################
+=== FINDINGS (raw basis) ===
+########################################################################
+# F-SG053-1  At the G1 probe (17:10:0x) ss showed a FOREIGN 0.0.0.0:8000 (uvicorn,
+#            HTTP 404 at /). By the G3 probe (17:11:23) the same port read
+#            127.0.0.1:8000. Foreign service on the shared VPS re-bound; NOT ours
+#            (our publish is 127.0.0.1:8003:8000 only, compose line 8). Pre-existing,
+#            out of slice scope, no action taken.
+# F-SG053-2  `storagegenie.dynv6.net` does not resolve from within the host
+#            (`getent hosts` rc=2). Every previous packet's `curl https://...` step
+#            is therefore unrunnable as written on-box; the equivalent Host-header
+#            loopback probe against the same nginx vhost is quoted above.

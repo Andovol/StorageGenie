@@ -1,0 +1,56 @@
+SG-053 — production deploy with blessed row counts (D70)
+
+Work dir: /home/andrei/StorageGenie
+Host: andrei@87.106.66.242:2222
+Coder: opencode | Effort: medium (argv `--variant medium`) | Model: unknown (argv omits it; no model env var — policy is CLI default)
+Contract: 0.27.0
+BASE (start HEAD): 0bd31efdc2b8985d461822ad672363bd9ba2c9ff  == origin/automation
+Slice process start (run-coder SG-053): 2026-09-16T17:09:24Z
+
+=== G1 — pre-state + blessed counts (elapsed ~68 s / 120 s probe budget) ===
+- Tree clean: `git status --porcelain=v1 -b` -> `## automation...origin/automation`;
+  HEAD == origin/automation == 0bd31ef (the pushed tip carrying SG-051/SG-052/SG-053 packet).
+- Stack BEFORE: `docker compose ps` -> `storagegenie-backend-1 ... Up 2 days (healthy) [8003]`.
+- Running image BEFORE: sha256:56968d428c4cf446a99b82481a0b6ce9e4c040c32e1094729fc6e150374d3e05 (SG-041 image).
+- Health BEFORE: {"status":"ok","db":"ok","storage":"ok"}.
+- Served index BEFORE: `/assets/index-khM4mS2k.js` (SG-052's recorded hash re-verified, not inherited).
+- Listeners: 8003 on 127.0.0.1 (rootlesskit) only. FINDING F-SG053-1: a FOREIGN 0.0.0.0:8000
+  uvicorn was present at this probe (it had moved to 127.0.0.1:8000 by G3).
+- DB (read-only URI `file:...?mode=ro`): alembic_version = 20260914_sg035_foundations = head,
+  no pending migration. Migration chain verified from the version files.
+- Blessed counts EXACT MATCH: household=1 (Popescu Household seed) · user=2 · asset=1 (Toothpaste) ·
+  evidence=1 (upload) · assertion=3 (all source_type=user) · audit_event=3
+  {asset.accepted, asset.create, evidence.create}. -> proceed.
+- Rationale restated: rebuild is DB-neutral (bind-mounted SQLite `./data/db:/data/db`, Dockerfile has
+  no entrypoint migrate/seed), so blessed rows are never at risk from the restart; the gate catches
+  rogue state, not owner use.
+
+=== G2 — build + up (elapsed 16 s build+up / 5 s re-up; budget 1800 s) ===
+- `BUILDX_CONFIG=/home/andrei/StorageGenie/.cache docker compose up --build -d`.
+  Build TEXT verdict = `Image storagegenie-backend Built` (exit code not used as verdict).
+  Frontend rebuilt: `dist/assets/index-CuxlcH9v.js` (292.26 kB).
+- New running image: sha256:86f7436d5a61ae35cf58ed470de17b0ae196f710e466d3d050099565601d9d92 (2026-09-16T17:10:57Z).
+- One idempotent `docker compose up -d` -> `Container storagegenie-backend-1 Running`;
+  container Id and StartedAt unchanged, RestartCount=0 -> no restart loop (PG-DP-04).
+- Memory sample: 70.63MiB / 7.688GiB (0.90%).
+
+=== G3 — new tree proven live (elapsed ~30 s / 120 s probe budget) ===
+- Health AFTER: exactly {"status":"ok","db":"ok","storage":"ok"}.
+- Index AFTER: HTTP 200 text/html, `<div id="root">`, asset `/assets/index-CuxlcH9v.js`
+  != BEFORE `/assets/index-khM4mS2k.js` (before/after pair raw-committed, PG-EV-09).
+- Wardrobe markers found in the SERVED bundle: `sg-theme`, `Product results`, `Import assets`.
+- Listeners AFTER: 8003 and 8000 both 127.0.0.1 only; no 5173; no 0.0.0.0/:: on any of the three.
+- Gate (nginx, untouched, no credentials): http -> 301 (Location https://...), https -> 401
+  (WWW-Authenticate: Basic realm="StorageGenie Restricted"). FINDING F-SG053-2: the public name
+  `storagegenie.dynv6.net` does not resolve from inside the host, so the probe used the same nginx
+  vhost via `Host:` header on the loopback address.
+- PG-EV-01: deliberately wrong assertion (old hash still served) run in the same command block ->
+  FAILED as expected (exit 1), proving the check can fail.
+- Post-deploy DB re-read: identical counts + same alembic head -> zero DB writes, DB-neutral.
+
+=== G4 — worklog + receipt (budget 2700 s overall) ===
+- Files: SG-053.log, SG-053_report.md, SG-053_verify.log. Zero product-file diff (`git diff --stat` empty).
+- Commit + push to automation; git-notes receipt on refs/notes/storagegenie-coder-reports; fetch+show pasted.
+
+Spend: $0 metered. Network: registry pulls for the build (node/python/bases) + app API checks (loopback).
+Live-state ledger: backend image sha256:56968d428c4c -> sha256:86f7436d5a61; zero DB writes.
