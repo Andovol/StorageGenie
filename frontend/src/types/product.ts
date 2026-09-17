@@ -71,13 +71,18 @@ export type RenderJob = {
   modelInfo?: RenderModelInfo;
 };
 
+// ⚡ Bolt Optimization: Map canonical categories to lower-case for O(1) hash map lookup
+// replacing O(N) array scan (.find()) per asset during rendering/filtering.
+const CANONICAL_CATEGORY_MAP = new Map<string, string>(
+  CANONICAL_CATEGORIES.map((category) => [category.toLowerCase(), category])
+);
+
 export function toProductCategory(assetType: string): string {
   const trimmed = (assetType ?? "").trim();
-  if (!trimmed || trimmed.toLowerCase() === "unknown") return "Uncategorized";
-  const canonical = CANONICAL_CATEGORIES.find(
-    (category) => category.toLowerCase() === trimmed.toLowerCase()
-  );
-  return canonical ?? trimmed;
+  if (!trimmed) return "Uncategorized";
+  const lower = trimmed.toLowerCase();
+  if (lower === "unknown") return "Uncategorized";
+  return CANONICAL_CATEGORY_MAP.get(lower) ?? trimmed;
 }
 
 export function assetToProductItem(asset: Asset): ProductItem {
