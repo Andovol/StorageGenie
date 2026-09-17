@@ -5,7 +5,7 @@
 - **Model:** `unknown` — no model id on argv; the lane sends no model id and the CLI default *is* the model (`AGENTS.md` Model policy). Not read from any identity line.
 - **BASE (requested ref):** `origin/automation`
 - **BASE (resolved commit):** `f2bcf5522e94ae44cff2bd0e06b2953851944ec9` (= start HEAD; worktree clean at start)
-- **WORK_HEAD:** `__WORK_HEAD__`
+- **WORK_HEAD:** `3ec1c35e56a0de2b4243aafe090ab235f625e663`
 - **Work dir:** `/home/andrei/StorageGenie`; origin `git@github.com:Andovol/StorageGenie.git`
 - **Spend (real $):** $0.000000 actual vs $0 bound (zero provider calls)
 - **Contract echo:** `0.28.2` — read from `AGENTS.md:4` and `STATE.md:5`. The host-side coder contract copy at `CONTRACT_DIR=/home/andrei/launcher` (`dispatch_coder.sh:11`) is **not readable by this account** (Permission denied); the wrapper's `contract_version()` echo is therefore **UNANSWERED** (not guessed). The `0.28.2` recorded in-repo is what was read.
@@ -53,8 +53,26 @@ Repo diff = `docs/worklogs/SG-061.log`, `SG-061_report.md`, `SG-061_verify.log` 
 
 ## Receipt note on the notes ref
 
+Note added on WORK_HEAD `3ec1c35…`, branch pushed (`f2bcf55..3ec1c35 automation -> automation`), notes ref pushed
+(`b797ec8..9a641c0 refs/notes/storagegenie-coder-reports -> refs/notes/storagegenie-coder-reports`). Verified
+against the **FETCHED** ref mapped to a local name (`refs/notes/storagegenie-coder-reports-verify`), then note
+bodies grepped (log `--grep` cannot match note bodies) and the note shown. Executed output, pasted verbatim:
+
 ```
-__NOTE_SHOW__
+$ git fetch origin refs/notes/storagegenie-coder-reports:refs/notes/storagegenie-coder-reports-verify
+ok fetched (1 new refs)
+fetch_exit=0
+
+$ git notes --ref=refs/notes/storagegenie-coder-reports-verify list | wc -l
+64
+
+$ git notes --ref=refs/notes/storagegenie-coder-reports-verify list | awk '{print $2}' | while read -r obj; do git notes --ref=refs/notes/storagegenie-coder-reports-verify show "$obj"; done | grep -n "SG-061"
+32:Dispatch-ID: SG-061 | Report: docs/worklogs/SG-061_report.md | Work-HEAD: 3ec1c35e56a0de2b4243aafe090ab235f625e663
+grep_exit=0
+
+$ git notes --ref=refs/notes/storagegenie-coder-reports-verify show 3ec1c35e56a0de2b4243aafe090ab235f625e663
+Dispatch-ID: SG-061 | Report: docs/worklogs/SG-061_report.md | Work-HEAD: 3ec1c35e56a0de2b4243aafe090ab235f625e663
+show_exit=0
 ```
 
 note=yes
