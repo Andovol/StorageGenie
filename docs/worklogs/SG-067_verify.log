@@ -1,0 +1,213 @@
+SG-067 verify log — raw curl / health / bundle / docker outputs (uncondensed)
+host: 87.106.66.242 (andrei) · work dir: /home/andrei/StorageGenie
+live clock at first read: 2026-09-17T19:15:49Z (process start, from `ps -o lstart= -p <opencode pid>`)
+contract: 0.28.2 · source path /home/andrei/storagegenie-contract/VERSION
+
+================================================================================
+SECTION 0 — STARTING TREE (BASE)
+================================================================================
+$ git status --porcelain=v1 -b
+## automation...origin/automation
+$ git rev-parse HEAD
+4245be8fff111aca55d108a62bed0401ecfb1344
+$ git rev-parse origin/automation
+4245be8fff111aca55d108a62bed0401ecfb1344
+$ git remote -v
+origin  git@github.com:Andovol/StorageGenie.git (fetch)
+origin  git@github.com:Andovol/StorageGenie.git (push)
+$ git branch --show-current
+automation
+
+NOTE (finding): the packet names the pre-change image as `fe509cf0`; `fe509cf0` is not a git object
+(`git cat-file -t fe509cf0` -> "fatal: Not a valid object name fe509cf0") and not a docker image on this
+box. The image actually serving before the change was `sha256:1b8308158602...` (tag
+storagegenie-backend:latest, created 2026-09-17T14:07:30Z); the served bundle matched the packet's
+`index-nugWvqun.js` exactly, which is the load-bearing discriminator. See report F-SG067-1.
+
+================================================================================
+SECTION 1 — PRE-CHANGE CAPTURES (failure legs, before the build)
+================================================================================
+=== PRE health (3 reads) ===
+{"status":"ok","db":"ok","storage":"ok"} [HTTP 200]
+{"status":"ok","db":"ok","storage":"ok"} [HTTP 200]
+{"status":"ok","db":"ok","storage":"ok"} [HTTP 200]
+
+=== PRE served index ===
+index-nugWvqun.js
+=== PRE bundle sha256 ===
+bundle=index-nugWvqun.js
+bundle HTTP 200 bytes=293712
+e5c99c023da00bad3f8a7379cec290f406f4bc8e0deae3b2f4e74b2f18997f22  pre_bundle.js
+
+=== PRE container/image ===
+container_id=3b1b97609507f7d4928f9cfb838ed180a0fe5745efb7398c2007246c78758d2a
+image=sha256:1b83081586024251b55db838ec46a991135fbbbcf6493f0ab3746486cab8a5de
+restartcount=0 health=healthy started=2026-09-17T14:15:13.627340384Z
+
+=== PRE facets (the endpoint does not exist yet — 404 failure leg) ===
+{"type":"about:blank","title":"Not Found","status":404,"detail":"Asset not found"}
+[HTTP 404]
+
+=== PRE assets rows (no evidence_ids field — failure leg) ===
+{"items":[{"id":"01a0a467-eb0e-7b83-a227-af122dc9268b","household_id":"01a0a029-1477-7ca0-b200-bce78a96c679","display_name":"Toothpaste","asset_type":"unknown","status":"ACTIVE","quantity":null,"unit":null,"condition":null,"version":1,"created_at":"2026-09-15T09:31:08"}],"next_cursor":null}
+[HTTP 200]
+
+=== PRE gate (loopback Host-header, unauthenticated) ===
+HTTP 401
+
+=== PRE ss (loopback-only binding) ===
+LISTEN 0      4096       127.0.0.1:8003       0.0.0.0:*    users:(("rootlesskit",pid=3814163,fd=32))
+
+=== PRE alembic head (in-container, read-only) ===
+$ docker exec storagegenie-backend-1 sh -lc 'cd /app && alembic current'
+INFO  [alembic.runtime.migration] Context impl SQLiteImpl.
+INFO  [alembic.runtime.migration] Will assume non-transactional DDL.
+20260916_sg048_name_optional (head)
+
+=== POST-change tree alembic head (pre-build tree, `git diff --name-only 5f95810..4245be8 -- backend/alembic`) ===
+(empty — SG-064 touched no migration)
+
+================================================================================
+SECTION 2 — G1 BUILD (finding: coder confinement blocks buildx default config dir)
+================================================================================
+Attempt 1 (FAILED — not hidden):
+
+$ docker compose build
+ Image storagegenie-backend Building
+failed to update builder last activity time: open /home/andrei/.docker/buildx/activity/.tmp-default1822294373: read-only file system
+
+=== BUILD END rc=1 elapsed=0s ===
+
+Root cause (quoted): the coder runs under the systemd confinement
+`dispatch-storagegenie@SG-067.service`, `ProtectHome=read-only` + `ProtectSystem=strict`, with
+ReadWritePaths=/home/andrei/StorageGenie /home/andrei/.codex /home/andrei/.grok
+/home/andrei/.local/share/opencode /home/andrei/storagegenie-contract /run/user/1000.
+`/home/andrei/.docker` is therefore read-only; `findmnt -T /home/andrei` -> `ro`; a direct write test
+`touch /home/andrei/.docker/buildx/activity/.wtest` -> "Read-only file system".
+`BUILDX_CONFIG` (the buildx config-dir env var, cf. `docker buildx version` -> v0.35.0) was relocated to
+the writable private /tmp so buildx's activity/cache bookkeeping lands inside the confinement's writable
+area. No privilege was used or escalated; the docker socket is the already-granted rootless socket
+(`/run/user/1000/docker.sock`, context `rootless`).
+
+Attempt 2 (relocated BUILDX_CONFIG — SUCCESS):
+
+=== BUILD START 2026-09-17T19:16:50Z (BUILDX_CONFIG relocated) ===
+#1 [internal] load local bake definitions
+#1 DONE 0.0s
+#3 [internal] load metadata for docker.io/library/node:20-alpine 0.8s
+#4 [internal] load metadata for docker.io/library/python:3.12.11-slim-bookworm@sha256:519591d... 0.8s
+#8 [internal] load build context 161.05MB 0.9s
+#10 [frontend-build 3/6] COPY frontend/package.json frontend/package-lock.json  CACHED
+#11 [stage-1 4/9] COPY backend/pyproject.toml backend/requirements.lock  CACHED
+#13 [stage-1 3/9] RUN apt-get ... tesseract-ocr libzbar0  CACHED
+#14 [frontend-build 4/6] RUN npm ci  CACHED
+#15 [stage-1 5/9] RUN pip install --no-cache-dir -r requirements.lock  CACHED
+#16 [stage-1 6/9] COPY backend/ ./  DONE 0.8s
+#17 [frontend-build 5/6] COPY frontend/ ./  DONE 0.3s
+#18 [frontend-build 6/6] RUN npm run build
+#18 6.384 dist/index.html                   0.94 kB
+#18 6.384 dist/assets/index-DxKo-z_g.css    2.65 kB
+#18 6.384 dist/assets/index-BHr__-9L.js   293.98 kB │ gzip: 87.58 kB
+#18 6.384 ✓ built in 2.11s
+#18 DONE 6.5s
+#19 [stage-1 7/9] RUN pip install "hatchling==1.32.0" "editables==0.6"  DONE 1.2s
+#20 [stage-1 8/9] RUN pip install --no-build-isolation --no-deps -e .  DONE 0.9s
+#21 [stage-1 9/9] COPY --from=frontend-build /ui/dist ./static  DONE 0.0s
+#22 exporting manifest sha256:35006e8f723f9e6c9e0645c5ad6fe3a340e0c69ff4206a9eee803ac00240d0fa done
+#22 exporting config sha256:d6bb81b355e586abccf4e0190ef00a4f05d860f0912ac9f899950096f82f2899 done
+#22 exporting manifest list sha256:74437f8d455378c3c2e5fad59def246de3dbdf56020b13d31a1921e92c5e0c41 done
+#22 naming to docker.io/library/storagegenie-backend:latest done
+ Image storagegenie-backend Built
+=== BUILD END rc=0 elapsed=16s ===
+
+================================================================================
+SECTION 3 — G1 UP (the authorized recreate) + HEALTH
+================================================================================
+=== UP START 2026-09-17T19:17:10Z ===
+ Container storagegenie-backend-1 Recreate
+ Container storagegenie-backend-1 Recreated
+ Container storagegenie-backend-1 Starting
+ Container storagegenie-backend-1 Started
+=== UP END rc=0 elapsed=1s ===
+
+=== HEALTH immediate read1 ===
+FAILED: curl [HTTP 000]
+=== HEALTH immediate read2 ===
+FAILED: curl [HTTP 000]
+=== HEALTH settled read3 (after 8s) ===
+{"status":"ok","db":"ok","storage":"ok"} [HTTP 200]
+
+=== container inspect post-up ===
+container_id=5af43e43de114fc9afb49ce1c3f7571eefedb3c4beb7fc5a996cc7aa11b1911c
+image=sha256:74437f8d455378c3c2e5fad59def246de3dbdf56020b13d31a1921e92c5e0c41
+restartcount=0 health=starting started=2026-09-17T19:17:11.391394369Z
+
+=== compose ps (8s after up) ===
+[compose] 1 services:
+  storagegenie-backend-1 (storagegenie-backend) Up 8 seconds (health: starting) [8003]
+
+=== ss post ===
+LISTEN 0      4096       127.0.0.1:8003       0.0.0.0:*    users:(("rootlesskit",pid=3814163,fd=32))
+
+Consecutive-healthy proof (PG-DP-04), see SECTION 4 readA+readB, both 200.
+
+================================================================================
+SECTION 4 — G2 POST-CHANGE (the new behavior is LIVE)
+================================================================================
+=== POST health consecutive readA ===
+{"status":"ok","db":"ok","storage":"ok"} [HTTP 200]
+=== POST health consecutive readB ===
+{"status":"ok","db":"ok","storage":"ok"} [HTTP 200]
+
+=== POST container inspect (settled) ===
+container_id=5af43e43de114fc9afb49ce1c3f7571eefedb3c4beb7fc5a996cc7aa11b1911c
+image=sha256:74437f8d455378c3c2e5fad59def246de3dbdf56020b13d31a1921e92c5e0c41
+restartcount=0 health=healthy started=2026-09-17T19:17:11.391394369Z
+[compose] 1 services:
+  storagegenie-backend-1 (storagegenie-backend) Up 13 seconds (healthy) [8003]
+
+=== POST served index (bundle DISCRIMINATOR) ===
+index-BHr__-9L.js
+index-DxKo-z_g.css
+bundle=index-BHr__-9L.js
+bundle HTTP 200 bytes=294066
+b1638c8059988d7e957db2b653bd3ab8ec3f775d830e859d143aa6400a2e8d42  post_bundle.js
+
+=== POST facets ===
+{"asset_type":{"unknown":1},"status":{"ACTIVE":1},"has_evidence":{"with":1,"without":0}}
+[HTTP 200]
+
+=== POST assets rows (evidence_ids present) ===
+{"items":[{"id":"01a0a467-eb0e-7b83-a227-af122dc9268b","household_id":"01a0a029-1477-7ca0-b200-bce78a96c679","display_name":"Toothpaste","asset_type":"unknown","status":"ACTIVE","quantity":null,"unit":null,"condition":null,"version":1,"created_at":"2026-09-15T09:31:08","evidence_ids":["01a0a467-eacf-7e13-bbd0-078b1bc93860"]}],"next_cursor":null}
+[HTTP 200]
+
+=== POST gate (loopback Host-header, unauthenticated) ===
+HTTP 401
+
+=== POST ss (loopback-only binding preserved) ===
+LISTEN 0      4096       127.0.0.1:8003       0.0.0.0:*    users:(("rootlesskit",pid=3814163,fd=32))
+
+================================================================================
+SECTION 5 — G2b WHAT MUST NOT CHANGE
+================================================================================
+=== POST alembic head (in-container, read-only) ===
+$ docker exec storagegenie-backend-1 sh -lc 'cd /app && alembic current'
+INFO  [alembic.runtime.migration] Context impl SQLiteImpl.
+INFO  [alembic.runtime.migration] Will assume non-transactional DDL.
+20260916_sg048_name_optional (head)
+
+PRE head == POST head == 20260916_sg048_name_optional. No migration ran.
+
+Rows created by this slice: NONE authorized (PG-EV-06). Every request this slice issued to the app is a
+GET: `/v1/health`, `/`, `/assets/<bundle>`, `/v1/assets/facets`, `/v1/assets`, and the nginx gate probe.
+No POST/PUT/PATCH/DELETE. Construction evidence: the asset list returned exactly ONE item both pre
+(SECTION 1) and post (SECTION 4), same id 01a0a467-eb0e-7b83-a227-af122dc9268b, same created_at,
+version still 1.
+
+================================================================================
+SECTION 6 — LIVE CLOCK / BUDGET MARKERS
+================================================================================
+process start (ps -o lstart=): 2026-09-17T19:15:49Z
+build start:                  2026-09-17T19:16:50Z
+up start:                     2026-09-17T19:17:10Z
+post reads:                   2026-09-17T19:17:31Z–19:17:38Z

@@ -1,0 +1,51 @@
+SG-067 worklog — deploy rider: SG-064 catalog facets + evidence_ids live on the public entry
+coder: opencode   effort: medium (process args: `opencode run --auto --dir /home/andrei/StorageGenie --variant medium ...`, pid 1670246)
+MODEL: unknown (no `--model` on argv; the CLI default is omitted per policy, never read from a system-prompt identity line)
+contract echo: 0.28.2
+  source path read: /home/andrei/storagegenie-contract/VERSION == 0.28.2 (repo `.rules-cache/` is absent on this box)
+
+Spend: real $0.000000 vs $0 bound (zero provider calls; only network use = docker registry metadata/layers for the authorized build).
+
+BASE ref requested: origin/automation
+BASE ref resolved: 4245be8fff111aca55d108a62bed0401ecfb1344 (== local HEAD at session start, the committed packet)
+WORK_HEAD: <pending — filled by the receipt commit> (docs-only work commit)
+
+Starting tree: clean (`git status --porcelain` empty before any edit). Dirt = STOP; none seen.
+
+Role guard honoured: never ran the dispatch verb, never started or polled this unit.
+
+Premise verification (quoted reads):
+- Pre-served bundle = index-nugWvqun.js (sha256 e5c99c02...) — matches the packet's expected pre-hash.
+- Pre facets endpoint: HTTP 404 "Asset not found" (route absent — failure leg).
+- Pre assets row: no `evidence_ids` key (failure leg).
+- Pre alembic head (in-container): 20260916_sg048_name_optional (head); in-tree `git diff --name-only
+  5f95810..4245be8 -- backend/alembic` empty. Matches the packet's expected head.
+- Seed household 01a0a029-1477-7ca0-b200-bce78a96c679 has 1 asset (Toothpaste, asset_type=unknown, ACTIVE).
+- Port map: backend bound 127.0.0.1:8003 (ss, owner rootlesskit); nginx 0.0.0.0:80/443.
+
+Corrections / findings (do not bend to the packet):
+- F-SG067-1: packet names the pre-change image `fe509cf0`; that is neither a git object nor a docker image
+  here. Actual pre image = sha256:1b8308158602... (storagegenie-backend:latest). Served bundle matched.
+- F-SG067-2: first `docker compose build` FAILED — buildx cannot write ~/.docker/buildx/activity because the
+  coder unit is ProtectHome=read-only with ReadWritePaths excluding ~/.docker
+  (`failed to update builder last activity time: ... read-only file system`). No privilege used; relocated
+  BUILDX_CONFIG to the writable private /tmp and rebuilt on the same granted rootless socket. Build then
+  succeeded (16s). Wrapper/confinement gap; out of scope to fix.
+- F-SG067-3: backend port owned by rootlesskit, loopback-only preserved post-recreate.
+
+Legs (actual / budget, units):
+- Premise verification + pre-captures: ~60s / 120s ordinary.
+- G1 build: 16s / 900s (after a 0s failed attempt — F-SG067-2). G1 up: 1s / 900s (Recreate->Recreated->Started).
+- Health: up-instant reads HTTP 000, settle read 200; consecutive pair readA+readB both 200.
+- RestartCount 0 -> 0; health starting -> healthy; no restart loop.
+- G2: bundle index-nugWvqun.js (e5c99c02, 293712B) -> index-BHr__-9L.js (b1638c80, 294066B);
+  facets 404 -> 200 {"asset_type":{"unknown":1},"status":{"ACTIVE":1},"has_evidence":{"with":1,"without":0}};
+  assets row gains evidence_ids ["01a0a467-eacf-7e13-bbd0-078b1bc93860"]; gate 401 before and after.
+- G2b: alembic head identical pre/post (20260916_sg048_name_optional); slice traffic = GETs only; list = 1 item
+  before and after (same id/created_at/version).
+- G4 worklog + receipt: ~60s / 120s ordinary.
+- Overall wall clock ~700s / 1800s. No command killed; none exceeded its bound.
+
+DB: none. Restart: one authorized `docker compose up -d` recreate. Deploy: yes (the rider). No migration,
+no seed, no data writes, no code edits (docs/worklogs only). Nothing pushed to `storagegenie-evidence`;
+no `{{RECEIPT_CMD}}` this slice.
