@@ -1,0 +1,45 @@
+SG-065 — plugin-contract taxonomy: Household chemicals pilot + served taxonomy + exit-proof
+Running log. First token SG-065. Authoring date: 2026-09-17 (metadata, never a gate).
+Contract: recorded 0.28.2 == published 0.28.2; source /home/andrei/storagegenie-contract/VERSION;
+RULES.md sha256 a66aa4313d62cebff8b44f10299928288e05dc4d7c45f4f4e83e0bbd954c131d.
+MODEL: unknown (no --model on argv); EFFORT: medium (--variant medium on argv).
+Spend: real $0.000000 (zero metered/provider calls).
+
+REcon (started ~19:52 local):
+- git status clean, branch automation at f999df9 (origin/automation).
+- registry.py 48 lines as recorded; expiry_tracker.py 526 lines; product.ts CANONICAL_CATEGORIES:7-14.
+- Chat gate found: backend/app/services/chat/service.py:53-56 SUPPORTED_CATEGORIES {food, medicine};
+  frontend ChatPage.tsx:9-12 CATEGORIES [food, medicine].
+- CANONICAL_CATEGORIES live consumers: only frontend/src/components/shell/ItemInspectorDrawer.tsx (datalist + save)
+  and product.ts's own toProductCategory map. CatalogToolbar pills already facet-driven (SG-064) — premise stale.
+- main.py already mounts assets_router (no prefix) at /v1 -> /v1/taxonomy needs no main.py edit.
+
+G1 backend:
+- new backend/app/plugins/descriptor.py: frozen BehaviorProfile/CategoryDescriptor/PluginTaxonomy (tuple fields),
+  CORE_ASSET_FIELDS, NOTIFICATION_MODES, CHAT_MODES, validate_taxonomy, EXPIRY_TRACKER_TAXONOMY.
+- registry.py: RegisteredPlugin.taxonomy, register_plugin(..., taxonomy=) validates before registration,
+  iter_plugins(); expiry registered with EXPIRY_TRACKER_TAXONOMY at import.
+- assets.py: GET /v1/taxonomy reads iter_plugins() (real registry) -> deterministic sorted plugin order.
+
+G2 frontend:
+- api/types.ts Taxonomy types; hooks/useAssets.ts useTaxonomy (staleTime Infinity).
+- ItemInspectorDrawer: datalist + save canonicalization from served names; CANONICAL_CATEGORIES import removed.
+- product.ts: doc note only (constant retained for display normalization + mocks; live dropdown source moved).
+
+G3 proof:
+- backend/tests/test_plugin_taxonomy.py: 7 tests (endpoint real HTTP path, live enum enumeration,
+  new-domain registration + EXPECTED_TABLES diff, empty map graceful, valid-beside-rejection,
+  core-field rejection, unknown mode/duplicate rejection).
+- FAIL-then-PASS raw x3 captured (enforcement active PASS, disabled FAIL, restored PASS).
+
+G4 gates:
+- backend pytest 271 passed / 2 base decoder reds; ruff clean; mypy 41 errors in 9 files (checked 72) = delta-0.
+- frontend vitest 160 passed / 21 files; tsc && vite build green; eslint clean.
+- derived backend 17 passed; derived frontend 27 passed.
+
+G5 docs + receipt: this log, report, verify log. Work pushed to automation; note on WORK_HEAD pushed and
+verified against the fetched mapped ref.
+
+INTEGRATION: origin/automation advanced mid-slice (Bolt PRs #3 DF184E5, #8 C849088); first push rejected.
+Rebased onto origin/automation (no force), re-ran backend gates. WORK_HEAD rebased to 3f2fd6b.
+END.

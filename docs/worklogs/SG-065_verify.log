@@ -1,0 +1,141 @@
+SG-065 verify log — plugin-contract taxonomy (Household chemicals pilot + served taxonomy + exit-proof)
+Authoring date: 2026-09-17 (metadata). Contract recorded 0.28.2 == published b495b59
+(source: /home/andrei/storagegenie-contract/VERSION = 0.28.2; RULES.md sha256
+a66aa4313d62cebff8b44f10299928288e05dc4d7c45f4f4e83e0bbd954c131d).
+BASE ref (packet): origin/automation. Resolved at start: f999df953da54b3df778f70d8cfc63cdee1f1381.
+Remote advanced mid-slice (Bolt PRs df184e5, c849088); the work was rebased (no force) onto c849088.
+WORK_HEAD: 3f2fd6bd95f8988316abca7ce7eafc3af1baa85d.
+Scratch temp SQLite only; production DB untouched; no migration; no deploy.
+
+-- [1] GET /v1/taxonomy — the descriptor served on the real HTTP path -------------------
+$ cd backend && venv/bin/python (TestClient(app))
+== GET /v1/taxonomy (expiry-tracker descriptor) ==
+{
+  "plugins": [
+    {
+      "plugin_id": "expiry-tracker",
+      "version": "1.0.0",
+      "categories": [
+        {"id": "food_beverages", "name": "Food & beverages", "active": true,
+         "notification": "tiered-30-7-1", "opened_date_tracking": false, "chat": "category"},
+        {"id": "medicine_pharma", "name": "Medicine/pharma", "active": true,
+         "notification": "tiered-short", "opened_date_tracking": false, "chat": "category"},
+        {"id": "cosmetics_personal_care", "name": "Cosmetics/personal care", "active": true,
+         "notification": "tiered-90-30-7", "opened_date_tracking": true, "chat": "none"},
+        {"id": "household_chemicals", "name": "Household chemicals", "active": false,
+         "notification": "basic-expiry", "opened_date_tracking": false, "chat": "fallback"},
+        {"id": "documents_other", "name": "Documents/other", "active": false,
+         "notification": "long-lead-60-30", "opened_date_tracking": false, "chat": "fallback"},
+        {"id": "non_perishable", "name": "Non-perishable", "active": true,
+         "notification": "none", "opened_date_tracking": false, "chat": "none"}
+      ],
+      "date_types": ["expiry_date","best_before","use_by","manufacture_date",
+                     "period_after_opening","batch_lot_code"],
+      "units": ["piece","unit","ml","l","g","kg","dose","tablet","application"]
+    }
+  ]
+}
+(the raw pretty-printed run is in full at the end of this section; Household chemicals =
+ basic-expiry / opened_date_tracking false / chat fallback per blueprint §9.1; Documents =
+ long-lead-60-30 / chat fallback.)
+
+-- [2] Exit property: new-domain registration vs the table registry (inspector diff) -----
+== TABLE REGISTRY ACROSS REGISTRATION EXERCISE ==
+EXPECTED_TABLES count: 18
+before            count: 18 == EXPECTED: True
+after             count: 18 == before: True
+new tables added by registration: []
+(register_plugin("verify-domain", "0.1.0", object(), taxonomy=<data-only descriptor>);
+ the same exercise is executed by tests/test_plugin_taxonomy.py::test_new_domain_registers_without_touching_core_tables,
+ and served back through GET /v1/taxonomy on the real HTTP path.)
+
+-- [3] FAIL-then-PASS raw (PG-EV-09) ----------------------------------------------------
+### RUN 1 (enforcement ACTIVE) — expect PASS
+1 passed, 2 warnings in 0.61s
+### RUN 2 (validation DISABLED — deliberately broken variant) — expect FAIL
+FAILED tests/test_plugin_taxonomy.py::test_descriptor_redefining_a_core_field_is_rejected
+1 failed, 2 warnings in 0.61s
+### RUN 3 (enforcement RESTORED) — expect PASS
+1 passed, 2 warnings in 0.70s
+Break applied inside registry.register_plugin (validate_taxonomy(taxonomy) -> `_ = validate_taxonomy  # TEMP`),
+reverted; grep "TEMP" app/plugins/registry.py rc=1 (no residue).
+
+-- [4] Gates ---------------------------------------------------------------------------
+$ cd backend && venv/bin/python -m pytest -q
+2 failed, 271 passed, 23 warnings in 16.93s
+  FAILED tests/test_signals.py::test_generated_codes_are_validated_and_bad_checksum_is_not_an_identifier
+  FAILED tests/test_signals.py::test_ocr_has_text_boxes_and_mean_confidence
+  (both are the two pre-existing base decoder-env reds; baseline 264 passed + 2 reds.)
+$ venv/bin/python -m ruff check .
+All checks passed!
+$ venv/bin/python -m mypy app
+Found 41 errors in 9 files (checked 72 source files)
+  (baseline: 41 errors in 9 files, checked 71; new app file descriptor.py adds 1 checked file, 0 errors.
+   The 9 error files are assets.py, audit_service.py, asset_service.py, schemas/asset.py, models/base.py,
+   main.py, review_tasks.py, households.py, evidence.py — none of them SG-065 plugin files. Delta-0.)
+$ cd frontend && node_modules/.bin/vitest run
+Test Files  21 passed (21)
+     Tests  160 passed (160)
+  (baseline 158 / 21; +2 = one served-taxonomy test and one empty-descriptor PG-SC-07 test.)
+$ npm run build          -> ✓ built (tsc + vite), exit 0
+$ npm run lint           -> eslint src, exit 0
+
+-- [5] Derived test set (0.28.2: a hit is a FILE) -------------------------------------
+grep -rln "iter_plugins|PluginTaxonomy|validate_taxonomy|DescriptorError|register_plugin|get_plugin|useTaxonomy|CANONICAL_CATEGORIES" backend/app backend/tests frontend/src
+  backend/app/api/v1/assets.py, backend/app/api/v1/plugins.py, backend/app/plugins/__init__.py,
+  backend/app/plugins/descriptor.py, backend/app/plugins/registry.py,
+  backend/tests/test_plugin_expiry.py, backend/tests/test_plugin_taxonomy.py,
+  frontend/src/components/shell/ItemInspectorDrawer.tsx, frontend/src/hooks/useAssets.ts,
+  frontend/src/types/product.test.ts, frontend/src/types/product.ts
+Derived backend run: tests/test_plugin_taxonomy.py + test_plugin_expiry.py + test_postgres_dialect.py
+  17 passed, 2 warnings in 1.34s
+Derived frontend run: src/types/product.test.ts + src/components/shell/drawer.test.tsx
+  2 passed files, 26 tests (27 after the PG-SC-07 UI test; full suite 160 confirms)
+test_postgres_dialect.py was READ (EXPECTED_TABLES import) but NOT edited: it names no descriptor, so
+per the packet it is skipped as an edit target.
+Intuition extra (not symbol hits): catalog.test.tsx renders CatalogPage — green in the full suite.
+
+-- [6] Receipt — notes ref (M20-corrected block) ---------------------------------------
+Work pushed to automation (c849088..3f2fd6b), worktree clean. No push to storagegenie-evidence,
+no {{RECEIPT_CMD}}.
+$ git notes --ref=refs/notes/storagegenie-coder-reports show 3f2fd6bd95f8988316abca7ce7eafc3af1baa85d
+error: no note found for object 3f2fd6bd95f8988316abca7ce7eafc3af1baa85d.   (pre-add refusal guard)
+$ git notes --ref=refs/notes/storagegenie-coder-reports add -m "Dispatch-ID: SG-065 | Report: docs/worklogs/SG-065_report.md | Work-HEAD: 3f2fd6bd95f8988316abca7ce7eafc3af1baa85d" 3f2fd6bd95f8988316abca7ce7eafc3af1baa85d
+notes add rc=0
+$ git push origin refs/notes/storagegenie-coder-reports
+   50041a8..214f8d8  refs/notes/storagegenie-coder-reports -> refs/notes/storagegenie-coder-reports
+notes push rc=0
+$ git fetch origin refs/notes/storagegenie-coder-reports:refs/notes/storagegenie-coder-reports-sg065-verify
+ * [new ref]         refs/notes/storagegenie-coder-reports -> refs/notes/storagegenie-coder-reports-sg065-verify
+fetch rc=0
+$ git rev-parse refs/notes/storagegenie-coder-reports-sg065-verify
+214f8d809e7ff2e606e851dcce3778363b6be545
+$ git notes --ref=refs/notes/storagegenie-coder-reports-sg065-verify list | grep 3f2fd6bd95f8988316abca7ce7eafc3af1baa85d
+fbc12d2ce8d6023d05493d620e7214a095fe9eb9 3f2fd6bd95f8988316abca7ce7eafc3af1baa85d
+list-grep rc=0
+$ git notes --ref=refs/notes/storagegenie-coder-reports-sg065-verify show 3f2fd6bd95f8988316abca7ce7eafc3af1baa85d
+Dispatch-ID: SG-065 | Report: docs/worklogs/SG-065_report.md | Work-HEAD: 3f2fd6bd95f8988316abca7ce7eafc3af1baa85d
+show rc=0
+$ git notes --ref=refs/notes/storagegenie-coder-reports-sg065-verify show 3f2fd6bd95f8988316abca7ce7eafc3af1baa85d | grep -c "Dispatch-ID: SG-065"
+1
+note=yes
+
+-- [7] Full raw taxonomy JSON (from [1]) ----------------------------------------------
+{
+  "plugins": [
+    {
+      "plugin_id": "expiry-tracker",
+      "version": "1.0.0",
+      "categories": [
+        {"id": "food_beverages","name": "Food & beverages","active": true,"notification": "tiered-30-7-1","opened_date_tracking": false,"chat": "category"},
+        {"id": "medicine_pharma","name": "Medicine/pharma","active": true,"notification": "tiered-short","opened_date_tracking": false,"chat": "category"},
+        {"id": "cosmetics_personal_care","name": "Cosmetics/personal care","active": true,"notification": "tiered-90-30-7","opened_date_tracking": true,"chat": "none"},
+        {"id": "household_chemicals","name": "Household chemicals","active": false,"notification": "basic-expiry","opened_date_tracking": false,"chat": "fallback"},
+        {"id": "documents_other","name": "Documents/other","active": false,"notification": "long-lead-60-30","opened_date_tracking": false,"chat": "fallback"},
+        {"id": "non_perishable","name": "Non-perishable","active": true,"notification": "none","opened_date_tracking": false,"chat": "none"}
+      ],
+      "date_types": ["expiry_date","best_before","use_by","manufacture_date","period_after_opening","batch_lot_code"],
+      "units": ["piece","unit","ml","l","g","kg","dose","tablet","application"]
+    }
+  ]
+}
