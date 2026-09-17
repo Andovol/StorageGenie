@@ -6,7 +6,7 @@
   metadata exposing the Coder model was observable. Not guessed.
 - **Work dir:** `/home/andrei/StorageGenie`; remote `origin git@github.com:Andovol/StorageGenie.git`
 - **BASE ref:** `origin/automation` → resolved commit `31ccc33a173f8c64a7d2201848868232abc0afae` (two fields)
-- **WORK_HEAD:** `<set at receipt>` (the note is added on this commit; a docs-only receipt append follows)
+- **WORK_HEAD:** `0f1965c5fbe336e8d2d8172b4fe71436535aebc7` (note added on this commit; this docs-only receipt append follows)
 - **Contract:** 0.27.0
 - **DB:** none — all tests use scratch temp SQLite; no live import/write; production SQLite untouched
 - **Verdict:** **GO** — band-aid removed (zero `as unknown`), 7 stale fallbacks fixed, 5 correct kept,
@@ -157,13 +157,37 @@
 
 ## Receipt note (`refs/notes/storagegenie-coder-reports`)
 
-WORK_HEAD = `<set at receipt>`. The raw `add` / `push` / mapped-`fetch` / note-list grep / `show`
-output is pasted below after the work commit; the note is added on WORK_HEAD and a docs-only append
-follows. Bounds: 120 s add, 300 s push.
+WORK_HEAD = `0f1965c5fbe336e8d2d8172b4fe71436535aebc7`. Commands executed (raw), bounds 120 s add /
+300 s push (completed in seconds):
 
 ```
-<pending — raw executed output appended in the following docs-only commit>
+$ git notes --ref=refs/notes/storagegenie-coder-reports add -m "Dispatch-ID: SG-059 | Report: docs/worklogs/SG-059_report.md | Work-HEAD: 0f1965c5fbe336e8d2d8172b4fe71436535aebc7" 0f1965c5fbe336e8d2d8172b4fe71436535aebc7
+add_exit=0
+$ git push origin refs/notes/storagegenie-coder-reports
+To github.com:Andovol/StorageGenie.git
+   14ab526..533f355  refs/notes/storagegenie-coder-reports -> refs/notes/storagegenie-coder-reports
+push_exit=0
+$ git fetch origin +refs/notes/storagegenie-coder-reports:refs/notes/storagegenie-coder-reports-verify
+From github.com:Andovol/StorageGenie
+   3da7331..533f355  refs/notes/storagegenie-coder-reports -> refs/notes/storagegenie-coder-reports-verify
+fetch_exit=0
+$ git notes --ref=refs/notes/storagegenie-coder-reports-verify list | while read -r note obj; do body=$(git cat-file -p "$note" | head -1); printf '%s -> %s\n' "$obj" "$body"; done
+... (full note list printed; the SG-059 row is:)
+0f1965c5fbe336e8d2d8172b4fe71436535aebc7 -> Dispatch-ID: SG-059 | Report: docs/worklogs/SG-059_report.md | Work-HEAD: 0f1965c5fbe336e8d2d8172b4fe71436535aebc7
+$ grep -n "SG-059" <note-contents-list>
+5:0f1965c5fbe336e8d2d8172b4fe71436535aebc7 -> Dispatch-ID: SG-059 | Report: docs/worklogs/SG-059_report.md | Work-HEAD: 0f1965c5fbe336e8d2d8172b4fe71436535aebc7
+grep_exit=0
+$ git notes --ref=refs/notes/storagegenie-coder-reports-verify show 0f1965c5fbe336e8d2d8172b4fe71436535aebc7
+Dispatch-ID: SG-059 | Report: docs/worklogs/SG-059_report.md | Work-HEAD: 0f1965c5fbe336e8d2d8172b4fe71436535aebc7
+show_exit=0
 ```
+
+Verified against the fetched, mapped ref (`+refs/notes/storagegenie-coder-reports:refs/notes/
+storagegenie-coder-reports-verify`, because a bare refspec fetch only rewrites `FETCH_HEAD`):
+`fetch_exit=0`; note bodies were dereferenced and listed (`log --grep` does not match note bodies);
+the grep hit carries BOTH `Dispatch-ID: SG-059` and `Report: docs/worklogs/SG-059_report.md` (`CO-97`);
+`show` printed that first line verbatim above. Fresh note, no existing note overwritten.
+**note=yes.**
 
 ## UNCLEAR
 
