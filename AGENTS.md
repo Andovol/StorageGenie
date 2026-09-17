@@ -1,7 +1,7 @@
 # StorageGenie — project configuration
 
 > **Canonical for this repo. `CLAUDE.md` is a one-line adapter `@AGENTS.md` — edit here, never there.**
-> Rule-set version this project records: **0.27.0** (D57 adoption 2026-09-16: tag `contract-v0.27.0` checkout; delta = `CODER.md` echo 0.27.0 + failed-check third-state rule, `ARCHITECT.md` G-L1 provisioning-pass deferral (`D190` pin), `DISPATCH.md` version-chain pin placement, `ONBOARDING.md` step-3 pin pointer, `PROPOSING.md` PR-06 filing inputs + `LAUNCHER-DESK-REPLY` marker; 0.25.1–0.26.2 = dispatch-engine/host side only, no project steps; installed global rules file `a66aa431…` = payload `RULES.sha256` — not forked; supersedes `0.25.0`).
+> Rule-set version this project records: **0.28.2** (D82 adoption 2026-09-17: tag `contract-v0.28.2` checkout `b495b59`; delta = `CODER.md` echo 0.28.2 + stop-rule hardening (never probe a privilege by doing it) + report-timing receipt rule, `PACKET.md` test-set-hit-is-a-FILE + `PG-SC-12` proof-must-run-against-the-real-thing, `PRODUCTION.md` `PG-PR-01` non-mutating enumeration only, `VPS.md` host re-measured 2026-09-17 (nginx 1 MB default body cap unless site sets `client_max_body_size`, certbot cron entry inert — timer does renewal, OpenCode CLI 1.18.31, DNS-lag note), `dispatch/dispatch` ISS-42 receipt path fix, `lang/python.md` migration ownership follows project `AGENTS.md`; 0.28.0–0.28.1 folded into this tag; installed global rules file `a66aa431…` = payload `RULES.sha256` at both 0.27.0 and 0.28.2 — not forked, was clean; supersedes `0.27.0`).
 
 ## Configuration table — the single source of every project value
 
