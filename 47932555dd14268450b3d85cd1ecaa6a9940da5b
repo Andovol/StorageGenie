@@ -1,0 +1,8 @@
+Negative-Receipt-ID: SG-064
+utc=2026-09-17T19:11:05Z
+DISPATCH_RESULT id=SG-064 coder=opencode exit=0 head=6e52a5665f548eff1b9ad2a06d726764036ce397 note=no moved=yes rewrite=no dirty=no elapsed=747s budget=2100s
+P1_moved=PASS count=4
+P2_rewrite=PASS behind=0
+P3_note=FAIL note=no
+P5_receipt=FAIL
+P6_dirty=PASS dirty=no
