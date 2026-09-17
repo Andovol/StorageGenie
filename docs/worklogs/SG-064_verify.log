@@ -3,7 +3,7 @@ SG-064 verify log — raw command outputs and gate artifacts
 contract echo: 0.28.2   source path read: /home/andrei/storagegenie-contract/VERSION
 BASE ref requested: origin/automation
 BASE resolved: 146b7b56098e70fdbb65fe184574015daea08278 (== local HEAD at session start)
-WORK_HEAD: (filled by the receipt commit)
+WORK_HEAD: 4060bb00fcb70a79b7c9db879112085d27834cf4 (branch head after D84 integration merge: 1e3603f)
 
 Backend venv: backend/venv (python 3.12.3). Frontend: node/npm with node_modules present.
 Every command ran under a timeout (120s ordinary / 600s suite+lint+build); none was killed.

@@ -8,7 +8,7 @@ Spend: real $0.000000 vs $0 bound (zero provider calls; every proof is a determi
 
 BASE ref requested: origin/automation
 BASE ref resolved: 146b7b56098e70fdbb65fe184574015daea08278 (== local HEAD at session start)
-WORK_HEAD: (filled by the work commit)
+WORK_HEAD: 4060bb00fcb70a79b7c9db879112085d27834cf4 (branch head after the D84 integration merge: 1e3603f)
 
 Starting tree: clean (`git status --porcelain` empty before any edit). Dirt = STOP; none seen.
 

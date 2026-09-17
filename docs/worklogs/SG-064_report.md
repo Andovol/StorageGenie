@@ -7,7 +7,9 @@ is absent on this box) · spend **real $0.000000** vs $0 bound (zero provider ca
 
 Work dir: `/home/andrei/StorageGenie` · origin: `git@github.com:Andovol/StorageGenie.git`
 `BASE` ref requested: `origin/automation` · `BASE` resolved: `146b7b56098e70fdbb65fe184574015daea08278`
-`WORK_HEAD`: (filled by the receipt commit)
+`WORK_HEAD`: `4060bb00fcb70a79b7c9db879112085d27834cf4`
+final branch head after integrating the Architect's `5f95810` (D84): merge `1e3603f` (no rebase — keeps
+`WORK_HEAD` and its receipt note reachable).
 
 Starting tree: clean (`git status --porcelain` empty) — dirt would have been a STOP; none.
 
@@ -126,10 +128,44 @@ function/endpoint and the new tests are seen failing before passing).
 - Design call: zero-population `has_evidence` is `{}` (not `{"with":0,"without":0}`) to satisfy the literal
   "empty maps" acceptance; flagged here in case the reviewer intended the fixed axis to persist.
 
-## Receipt
+## Receipt (executed; output pasted verbatim)
 
-Added in the docs-only receipt commit that follows the work commit (note added on `WORK_HEAD`, notes ref
-pushed, mapped-refspec fetch, `git notes show` output pasted there verbatim).
+Note added on `WORK_HEAD` (`refs/notes/storagegenie-coder-reports`), first line carries both `Dispatch-ID:`
+and `Report:` (`CO-97`):
+
+```
+$ git notes --ref=refs/notes/storagegenie-coder-reports add -m "Dispatch-ID: SG-064 | Report: docs/worklogs/SG-064_report.md | Work-HEAD: 4060bb00fcb70a79b7c9db879112085d27834cf4" 4060bb0
+$ git notes --ref=refs/notes/storagegenie-coder-reports show 4060bb0
+Dispatch-ID: SG-064 | Report: docs/worklogs/SG-064_report.md | Work-HEAD: 4060bb00fcb70a79b7c9db879112085d27834cf4
+```
+
+Pushed (300s bound) and fetched into the MAPPED local name (a bare refspec fetch only rewrites `FETCH_HEAD`):
+
+```
+$ git push origin refs/notes/storagegenie-coder-reports
+   362bf0d..8fbbc0b  refs/notes/storagegenie-coder-reports -> refs/notes/storagegenie-coder-reports
+$ git fetch origin refs/notes/storagegenie-coder-reports:refs/notes/storagegenie-coder-reports-verify
+   9a641c0..8fbbc0b  refs/notes/storagegenie-coder-reports -> refs/notes/storagegenie-coder-reports-verify
+```
+
+Content grep on the FETCHED ref (log `--grep` does not match note bodies; the list is `note-blob` then
+annotated-commit):
+
+```
+4060bb00fcb70a79b7c9db879112085d27834cf4 -> Dispatch-ID: SG-064 | Report: docs/worklogs/SG-064_report.md | Work-HEAD: 4060bb00fcb70a79b7c9db879112085d27834cf4
+```
+
+`git notes show` on `WORK_HEAD`, fetched ref:
+
+```
+$ git notes --ref=refs/notes/storagegenie-coder-reports-verify show 4060bb00fcb70a79b7c9db879112085d27834cf4
+Dispatch-ID: SG-064 | Report: docs/worklogs/SG-064_report.md | Work-HEAD: 4060bb00fcb70a79b7c9db879112085d27834cf4
+```
+
+`automation` push: `5f95810..1e3603f` (fast-forward of the integration merge). No push to
+`storagegenie-evidence`; no `{{RECEIPT_CMD}}` (out of scope this slice).
+
+**note=yes**
 
 ## UNCLEAR
 
