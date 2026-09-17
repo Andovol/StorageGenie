@@ -242,3 +242,42 @@ def test_asset_cursor_pagination_and_mixed_filters(db) -> None:  # type: ignore[
         assert filtered_ids(status="ACTIVE") == expected_status
         assert filtered_ids(has_evidence=True) == expected_evidence
         assert filtered_ids(has_evidence=False) == all_created_ids - expected_evidence
+
+
+def test_list_rows_carry_evidence_ids_for_the_card_thumbnail(db) -> None:  # type: ignore[no-untyped-def]
+    """SG-064 G3: the list serializer sends the evidence id the card reads.
+
+    Before this slice the list path sent no evidence field at all, so the
+    catalog card's thumbnail (its evidence surface) could never render from the
+    live API. This proves the real HTTP list row carries the first evidence id.
+    """
+    from app.main import app
+
+    session, household_id, _ = db
+    evidence = evidence_for(session, household_id, "purple")
+    with TestClient(app) as client:
+        with_evidence = post_asset(
+            client,
+            household_id,
+            display_name="With Evidence",
+            asset_type="tool",
+            status="ACTIVE",
+            evidence_ids=[evidence.id],
+        )
+        without_evidence = post_asset(
+            client,
+            household_id,
+            display_name="No Evidence",
+            asset_type="tool",
+            status="ACTIVE",
+        )
+        assert with_evidence.status_code == 201
+        assert without_evidence.status_code == 201
+        listing = client.get(
+            "/v1/assets", params={"household_id": household_id, "limit": 100}
+        )
+
+    assert listing.status_code == 200
+    rows = {row["id"]: row for row in listing.json()["items"]}
+    assert rows[with_evidence.json()["id"]]["evidence_ids"] == [evidence.id]
+    assert rows[without_evidence.json()["id"]]["evidence_ids"] == []

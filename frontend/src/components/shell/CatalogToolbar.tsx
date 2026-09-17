@@ -1,5 +1,4 @@
 import type { ProductItem } from "../../types/product";
-import { CANONICAL_CATEGORIES } from "../../types/product";
 import type { Household } from "../../api/types";
 
 export type SortOption = "recent" | "name" | "status";
@@ -16,24 +15,21 @@ export const DENSITY_LABELS: Record<Density, string> = {
   table: "Compact Table",
 };
 
-// DQ1: All + the five named categories + the Uncategorized fallback (the six
-// already carry Uncategorized, so it is not appended a second time).
-export const CATEGORY_PILLS: readonly string[] = ["All", ...CANONICAL_CATEGORIES];
+// The "All" pill's key; category pills are otherwise the raw `asset_type`
+// facet keys (SG-064 G2: the UI follows the data, not the static DQ1 labels).
+export const CATEGORY_ALL = "All";
 
-export function filterAndSortCatalog(
-  items: ProductItem[],
-  options: { q: string; category: string; sort: SortOption }
-): ProductItem[] {
-  const needle = options.q.trim().toLowerCase();
-  const filtered = items.filter((item) => {
-    if (options.category !== "All" && item.category !== options.category) return false;
-    if (needle && !item.name.toLowerCase().includes(needle)) return false;
-    return true;
-  });
-  const sorted = [...filtered];
+/**
+ * The loaded page is ordered client-side only. Filtering by `q` (server FTS
+ * MATCH on `display_name`) and by category (server `asset_type`) is owned by
+ * `GET /v1/assets`; the former client-side re-filters are gone so the server is
+ * the single authority (SG-064 G2).
+ */
+export function sortCatalog(items: ProductItem[], sort: SortOption): ProductItem[] {
+  const sorted = [...items];
   sorted.sort((a, b) => {
-    if (options.sort === "name") return a.name.localeCompare(b.name);
-    if (options.sort === "status") return a.status.localeCompare(b.status);
+    if (sort === "name") return a.name.localeCompare(b.name);
+    if (sort === "status") return a.status.localeCompare(b.status);
     return b.dateAdded.localeCompare(a.dateAdded);
   });
   return sorted;

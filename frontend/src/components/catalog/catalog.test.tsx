@@ -479,6 +479,13 @@ describe("CatalogPage drawer wiring", () => {
       if (path === "/v1/households") {
         return Promise.resolve([{ id: "h1", name: "Home", created_at: "2026-09-01T00:00:00Z" }]);
       }
+      if (path === "/v1/assets/facets") {
+        return Promise.resolve({
+          asset_type: { "Hardware & Tools": 1 },
+          status: { ACTIVE: 1 },
+          has_evidence: { with: 0, without: 1 },
+        });
+      }
       if (path === "/v1/assets") {
         return Promise.resolve({ items: [catalogAsset], next_cursor: null });
       }
@@ -518,5 +525,33 @@ describe("CatalogPage drawer wiring", () => {
 
     await waitFor(() => expect(spy).toHaveBeenCalledWith({ queryKey: ["assets"] }));
     expect(spy).toHaveBeenCalledWith({ queryKey: ["asset", "a-drill"] });
+  });
+
+  test("an asset with evidence_ids renders its evidence thumbnail (the badge is reachable)", async () => {
+    const withEvidence: Asset = { ...catalogAsset, evidence_ids: ["ev-thumb-1"] };
+    api.apiGet.mockImplementation((path: string) => {
+      if (path === "/v1/households") {
+        return Promise.resolve([{ id: "h1", name: "Home", created_at: "2026-09-01T00:00:00Z" }]);
+      }
+      if (path === "/v1/assets/facets") {
+        return Promise.resolve({
+          asset_type: { "Hardware & Tools": 1 },
+          status: { ACTIVE: 1 },
+          has_evidence: { with: 1, without: 0 },
+        });
+      }
+      if (path === "/v1/assets") {
+        return Promise.resolve({ items: [withEvidence], next_cursor: null });
+      }
+      return Promise.resolve(null);
+    });
+
+    renderCatalog(new QueryClient({ defaultOptions: { queries: { retry: false } } }));
+
+    const image = await screen.findByRole("img");
+    expect(image).toHaveAttribute(
+      "src",
+      expect.stringContaining("/v1/evidence/ev-thumb-1/thumb/256")
+    );
   });
 });

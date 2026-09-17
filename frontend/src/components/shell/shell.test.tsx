@@ -1,16 +1,12 @@
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
-import { fireEvent, render, screen } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { MemoryRouter, Route, Routes } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import App from "../../App";
 import { CatalogPage } from "../../routes/CatalogPage";
 import { ThemeProvider } from "../../theme/ThemeProvider";
-import {
-  CANONICAL_CATEGORIES,
-  assetToProductItem,
-  type ProductStatus,
-} from "../../types/product";
-import { CATEGORY_PILLS, filterAndSortCatalog } from "./CatalogToolbar";
+import { assetToProductItem, type ProductStatus } from "../../types/product";
+import { sortCatalog } from "./CatalogToolbar";
 import type { Asset } from "../../api/types";
 
 const api = vi.hoisted(() => ({ apiGet: vi.fn() }));
@@ -125,12 +121,33 @@ beforeEach(() => {
   document.documentElement.className = "";
   mockMatchMedia();
   api.apiGet.mockReset();
-  api.apiGet.mockImplementation((path: string) => {
+  const facets = {
+    asset_type: {
+      "Hardware & Tools": 1,
+      "Electronics & Gadgets": 1,
+      "Apparel & Textiles": 1,
+      unknown: 1,
+    },
+    status: { ACTIVE: 1, DRAFT: 1, PENDING_REVIEW: 1, ARCHIVED: 1 },
+    has_evidence: { with: 0, without: 4 },
+  };
+  api.apiGet.mockImplementation((path: string, params?: Record<string, string>) => {
     if (path === "/v1/households") {
       return Promise.resolve([{ id: "h1", name: "Home", created_at: "2026-09-01T00:00:00Z" }]);
     }
+    if (path === "/v1/assets/facets") {
+      return Promise.resolve(facets);
+    }
     if (path === "/v1/assets") {
-      return Promise.resolve({ items: assets, next_cursor: null });
+      let items = assets;
+      if (params?.asset_type) {
+        items = items.filter((asset) => asset.asset_type === params.asset_type);
+      }
+      if (params?.q) {
+        const needle = params.q.toLowerCase();
+        items = items.filter((asset) => (asset.display_name ?? "").toLowerCase().includes(needle));
+      }
+      return Promise.resolve({ items, next_cursor: null });
     }
     return Promise.resolve(null);
   });
@@ -140,32 +157,31 @@ afterEach(() => {
   vi.clearAllMocks();
 });
 
-describe("filterAndSortCatalog (real mapper data)", () => {
-  test("filters the loaded set by category pill and by the query text", () => {
-    expect(
-      filterAndSortCatalog(products, { q: "", category: "Electronics & Gadgets", sort: "recent" }).map((i) => i.name)
-    ).toEqual(["Zap"]);
-    expect(
-      filterAndSortCatalog(products, { q: "shi", category: "All", sort: "recent" }).map((i) => i.name)
-    ).toEqual(["Shirt"]);
-    expect(
-      filterAndSortCatalog(products, { q: "", category: "Uncategorized", sort: "recent" }).map((i) => i.name)
-    ).toEqual(["Mystery"]);
-  });
-
+describe("sortCatalog (real mapper data)", () => {
+  // Filtering (query + category) moved to the server (SG-064 G2); the client
+  // path only orders the loaded page now.
   test("orders by recently added, name, and processing status", () => {
-    expect(
-      filterAndSortCatalog(products, { q: "", category: "All", sort: "recent" }).map((i) => i.name)
-    ).toEqual(["Mystery", "Zap", "Shirt", "Drill"]);
-    expect(
-      filterAndSortCatalog(products, { q: "", category: "All", sort: "name" }).map((i) => i.name)
-    ).toEqual(["Drill", "Mystery", "Shirt", "Zap"]);
+    expect(sortCatalog(products, "recent").map((i) => i.name)).toEqual([
+      "Mystery",
+      "Zap",
+      "Shirt",
+      "Drill",
+    ]);
+    expect(sortCatalog(products, "name").map((i) => i.name)).toEqual([
+      "Drill",
+      "Mystery",
+      "Shirt",
+      "Zap",
+    ]);
 
     const statuses: ProductStatus[] = ["processed", "raw", "rendered", "raw"];
     const statusItems = products.map((item, index) => ({ ...item, status: statuses[index] }));
-    expect(
-      filterAndSortCatalog(statusItems, { q: "", category: "All", sort: "status" }).map((i) => i.status)
-    ).toEqual(["processed", "raw", "raw", "rendered"]);
+    expect(sortCatalog(statusItems, "status").map((i) => i.status)).toEqual([
+      "processed",
+      "raw",
+      "raw",
+      "rendered",
+    ]);
   });
 });
 
@@ -176,36 +192,48 @@ describe("Catalog shell", () => {
     expect(screen.getByLabelText(/total loaded items: 4/i)).toHaveTextContent("Total: 4 items");
   });
 
-  test("the toolbar renders All plus the DQ1 six, with All active by default", async () => {
+  test("the toolbar renders All plus one counted pill per real asset_type", async () => {
     renderCatalog();
     await screen.findByText("Drill");
-    expect(CATEGORY_PILLS).toEqual(["All", ...CANONICAL_CATEGORIES]);
-    for (const category of CANONICAL_CATEGORIES) {
-      expect(screen.getByRole("button", { name: category })).toBeInTheDocument();
+    const all = await screen.findByRole("button", { name: "All (4)" });
+    expect(all).toHaveAttribute("aria-pressed", "true");
+    const counts: Record<string, number> = {
+      "Hardware & Tools": 1,
+      "Electronics & Gadgets": 1,
+      "Apparel & Textiles": 1,
+      unknown: 1,
+    };
+    for (const [key, count] of Object.entries(counts)) {
+      expect(screen.getByRole("button", { name: `${key} (${count})` })).toBeInTheDocument();
     }
-    expect(screen.getByRole("button", { name: "All" })).toHaveAttribute("aria-pressed", "true");
   });
 
-  test("a category pill filters the loaded set and carries the primary style when active", async () => {
+  test("a category pill filters server-side and carries the primary style when active", async () => {
     renderCatalog();
     await screen.findByText("Drill");
-    fireEvent.click(screen.getByRole("button", { name: "Electronics & Gadgets" }));
+    const pill = await screen.findByRole("button", { name: "Electronics & Gadgets (1)" });
+    fireEvent.click(pill);
 
-    const pill = screen.getByRole("button", { name: "Electronics & Gadgets" });
     expect(pill).toHaveAttribute("aria-pressed", "true");
     expect(pill).toHaveClass("bg-primary");
-    expect(screen.getByText("Zap")).toBeInTheDocument();
+    await waitFor(() => expect(screen.getByText("Zap")).toBeInTheDocument());
     expect(screen.queryByText("Drill")).not.toBeInTheDocument();
+    const listCall = api.apiGet.mock.calls.find(
+      ([path, params]) =>
+        path === "/v1/assets" &&
+        (params as Record<string, string> | undefined)?.asset_type === "Electronics & Gadgets"
+    );
+    expect(listCall).toBeTruthy();
   });
 
-  test("typing in the header search narrows the loaded set", async () => {
+  test("typing in the header search narrows via the server-side query", async () => {
     renderCatalog();
     await screen.findByText("Drill");
     fireEvent.change(screen.getByLabelText("Search catalog"), { target: { value: "shi" } });
-
-    expect(screen.getByText("Shirt")).toBeInTheDocument();
-    expect(screen.queryByText("Zap")).not.toBeInTheDocument();
     expect(screen.getByText("Search: shi")).toBeInTheDocument();
+
+    await waitFor(() => expect(screen.getByText("Shirt")).toBeInTheDocument());
+    await waitFor(() => expect(screen.queryByText("Zap")).not.toBeInTheDocument());
   });
 
   test("the sort dropdown orders the loaded set client-side", async () => {
@@ -224,12 +252,12 @@ describe("Catalog shell", () => {
     renderCatalog();
     await screen.findByText("Drill");
     fireEvent.change(screen.getByLabelText("Search catalog"), { target: { value: "zap" } });
-    fireEvent.click(screen.getByRole("button", { name: "Electronics & Gadgets" }));
+    fireEvent.click(await screen.findByRole("button", { name: "Electronics & Gadgets (1)" }));
     fireEvent.change(screen.getByLabelText("Sort catalog"), { target: { value: "name" } });
     fireEvent.click(screen.getByRole("button", { name: /clear all/i }));
 
     expect(screen.getByLabelText("Search catalog")).toHaveValue("");
-    expect(screen.getByRole("button", { name: "All" })).toHaveAttribute("aria-pressed", "true");
+    expect(screen.getByRole("button", { name: "All (4)" })).toHaveAttribute("aria-pressed", "true");
     expect(screen.getByLabelText("Sort catalog")).toHaveValue("recent");
   });
 

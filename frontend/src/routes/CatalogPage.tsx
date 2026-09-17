@@ -1,12 +1,12 @@
 import { useEffect, useMemo, useState } from "react";
-import { useAssets, useHouseholds } from "../hooks/useAssets";
+import { useAssets, useFacets, useHouseholds } from "../hooks/useAssets";
 import { ProductGrid } from "../components/catalog/ProductGrid";
 import { AppShell } from "../components/shell/AppShell";
 import { ItemInspectorDrawer } from "../components/shell/ItemInspectorDrawer";
 import {
-  CATEGORY_PILLS,
+  CATEGORY_ALL,
   SORT_LABELS,
-  filterAndSortCatalog,
+  sortCatalog,
   type Density,
   type SortOption,
 } from "../components/shell/CatalogToolbar";
@@ -27,7 +27,7 @@ export function CatalogPage() {
   const [householdId, setHouseholdId] = useState(() => localStorage.getItem("household_id") || "");
   const [qRaw, setQRaw] = useState("");
   const q = useDebounced(qRaw, 200);
-  const [category, setCategory] = useState("All");
+  const [category, setCategory] = useState<string>(CATEGORY_ALL);
   const [sort, setSort] = useState<SortOption>("recent");
   const [density, setDensity] = useState<Density>("grid");
   const [cursor, setCursor] = useState<string | undefined>(undefined);
@@ -47,13 +47,49 @@ export function CatalogPage() {
     }
   }, [households, householdId]);
 
-  // reset accumulation when the server-side query changes
+  // Facet counts share the list base (household + debounced `q`). The active
+  // category is deliberately NOT sent, so every pill keeps showing the count
+  // reachable by selecting it (SG-064 G1: counts omit their own dimension).
+  const { data: facets } = useFacets(effectiveHousehold, q);
+  const categoryCounts = useMemo(() => facets?.asset_type ?? {}, [facets]);
+
+  // Pills come from the real `asset_type` population, not the static DQ1 list;
+  // each renders `Label (N)`. "All" shows the unfiltered-with-q total.
+  const categoryLabels = useMemo(() => {
+    const total = Object.values(categoryCounts).reduce((sum, count) => sum + count, 0);
+    const labels = new Map<string, string>();
+    labels.set(CATEGORY_ALL, `${CATEGORY_ALL} (${total})`);
+    for (const key of Object.keys(categoryCounts)) {
+      labels.set(key, `${key} (${categoryCounts[key]})`);
+    }
+    return labels;
+  }, [categoryCounts]);
+
+  const categories = useMemo(() => Array.from(categoryLabels.values()), [categoryLabels]);
+  const activeCategoryLabel = categoryLabels.get(category) ?? category;
+
+  const handleCategoryChange = (label: string) => {
+    for (const [key, value] of categoryLabels) {
+      if (value === label) {
+        setCategory(key);
+        return;
+      }
+    }
+    setCategory(label);
+  };
+
+  // reset accumulation when any server-side query dimension changes
   useEffect(() => {
     setAllItems([]);
     setCursor(undefined);
-  }, [effectiveHousehold, q]);
+  }, [effectiveHousehold, q, category]);
 
-  const { data, isLoading, isFetching } = useAssets(effectiveHousehold, q, cursor);
+  const { data, isLoading, isFetching } = useAssets(
+    effectiveHousehold,
+    q,
+    cursor,
+    category === CATEGORY_ALL ? undefined : category
+  );
 
   useEffect(() => {
     if (data?.items) {
@@ -75,28 +111,29 @@ export function CatalogPage() {
     [displayed, selectedAssetId]
   );
 
-  // Category/sort are client-side over the loaded page: the list API returns no
-  // per-category counts and there is no aggregation endpoint yet. See the report.
+  // Server owns `q` (FTS MATCH on `display_name`) and the category filter
+  // (`asset_type`); this only orders the loaded page. The evidence id the card
+  // thumbnail reads comes from the list serializer's `evidence_ids` (SG-064 G3).
   const visibleItems = useMemo(() => {
     const items = displayed.map((asset) => {
       const item = assetToProductItem(asset);
-      const firstEvidence = asset.evidence?.[0];
-      return firstEvidence ? { ...item, evidenceId: firstEvidence.id } : item;
+      const firstEvidenceId = asset.evidence_ids?.[0];
+      return firstEvidenceId ? { ...item, evidenceId: firstEvidenceId } : item;
     });
-    return filterAndSortCatalog(items, { q: qRaw, category, sort });
-  }, [displayed, qRaw, category, sort]);
+    return sortCatalog(items, sort);
+  }, [displayed, sort]);
 
   const activeFilters = useMemo(() => {
     const filters: string[] = [];
     if (qRaw.trim()) filters.push(`Search: ${qRaw.trim()}`);
-    if (category !== "All") filters.push(category);
+    if (category !== CATEGORY_ALL) filters.push(category);
     if (sort !== "recent") filters.push(SORT_LABELS[sort]);
     return filters;
   }, [qRaw, category, sort]);
 
   const clearAll = () => {
     setQRaw("");
-    setCategory("All");
+    setCategory(CATEGORY_ALL);
     setSort("recent");
   };
 
@@ -105,9 +142,9 @@ export function CatalogPage() {
       loadedCount={displayed.length}
       searchValue={qRaw}
       onSearchChange={setQRaw}
-      categories={CATEGORY_PILLS}
-      activeCategory={category}
-      onCategoryChange={setCategory}
+      categories={categories}
+      activeCategory={activeCategoryLabel}
+      onCategoryChange={handleCategoryChange}
       sort={sort}
       onSortChange={setSort}
       density={density}

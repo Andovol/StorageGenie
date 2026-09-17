@@ -39,6 +39,9 @@ export type Asset = {
   created_at: string;
   updated_at: string | null;
   evidence?: Evidence[];
+  // SG-064 G3: the list serializer sends the evidence ids (not the full
+  // evidence records), which is all the catalog card thumbnail reads.
+  evidence_ids?: string[];
   assertions?: Assertion[];
   audit_events?: AuditEvent[];
 };

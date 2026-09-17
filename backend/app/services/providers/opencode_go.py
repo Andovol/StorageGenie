@@ -89,11 +89,11 @@ def guard_usage(usage: dict[str, Any]) -> dict[str, Any]:
 
 
 def strip_single_think(text: str) -> str:
-    """Strip ONE leading ` thinking` block; a second block fails loudly."""
+    """Strip ONE leading `<think>` block; a second block fails loudly."""
     match = _THINK_RE.match(text)
     if match is None:
-        if " thinking" in text:
-            raise ProviderError("invalid_json", "unbalanced or stray  thinking block in content")
+        if "<think>" in text:
+            raise ProviderError("invalid_json", "unbalanced or stray <think> block in content")
         return text
     rest = text[match.end() :]
     if "<think" in rest:

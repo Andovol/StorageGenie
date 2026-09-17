@@ -1,8 +1,9 @@
 import json
+from typing import Any
 
 from fastapi import APIRouter, Depends, Header, HTTPException, Query
 from sqlalchemy import and_, func, or_, select, text
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Query as OrmQuery, Session
 
 from app.db import get_db
 from app.models.assertion import Assertion
@@ -116,22 +117,23 @@ def _asset_to_dict(asset: Asset, db: Session) -> dict:  # type: ignore[no-untype
     }
 
 
-@router.get("/assets")
-def list_assets(
-    household_id: str = Query(...),
-    q: str | None = Query(default=None),
-    asset_type: str | None = Query(default=None),
-    status: str | None = Query(default=None),
-    has_evidence: bool | None = Query(default=None),
-    cursor: str | None = Query(default=None),
-    limit: int = Query(default=20, ge=1, le=100),
-    db: Session = Depends(get_db),  # type: ignore[no-untyped-def]
-):  # type: ignore[no-untyped-def]
-    query = db.query(Asset).filter(Asset.household_id == household_id)
+def _apply_asset_filters(
+    query: OrmQuery[Asset],
+    db: Session,
+    *,
+    q: str | None,
+    asset_type: str | None,
+    status: str | None,
+    has_evidence: bool | None,
+) -> OrmQuery[Asset]:
+    """The ONE filter set shared by `list_assets` and `asset_facets`.
+
+    `asset_facets` calls it once per dimension with that dimension's own
+    argument set to `None`, so a pill always shows the counts reachable by
+    selecting it rather than only-the-selected-zero.
+    """
     if q:
-        # MATCH is deliberately narrowed before the existing filters are
-        # applied. The outer Asset query keeps the established serializer,
-        # ordering, and cursor envelope unchanged.
+        # MATCH is deliberately narrowed before the other filters are applied.
         ensure_asset_fts(db.connection())
         fts_ids = (
             select(text("asset_id"))
@@ -149,6 +151,66 @@ def list_assets(
             query = query.filter(Asset.id.in_(db.query(asset_evidence.c.asset_id)))
         else:
             query = query.filter(~Asset.id.in_(db.query(asset_evidence.c.asset_id)))
+    return query
+
+
+def _facet_queries(
+    db: Session,
+    household_id: str,
+    *,
+    q: str | None,
+    asset_type: str | None,
+    status: str | None,
+    has_evidence: bool | None,
+) -> dict[str, OrmQuery[Any]]:
+    """Build (never execute) the aggregate query for each analyzed dimension.
+
+    Each dimension omits its OWN filter: `asset_type` counts ignore the
+    `asset_type` argument, `status` counts ignore `status`, and the
+    `has_evidence` base ignores `has_evidence`. Kept separate from execution so
+    the SQL compiles under a PostgreSQL dialect in the test (dialect-neutral
+    `count(*)` + `group_by` / subquery; no SQLite-only function).
+    """
+    base: OrmQuery[Any] = db.query(Asset).filter(Asset.household_id == household_id)
+    return {
+        "asset_type": _apply_asset_filters(
+            base, db, q=q, asset_type=None, status=status, has_evidence=has_evidence
+        )
+        .with_entities(Asset.asset_type, func.count())
+        .group_by(Asset.asset_type),
+        "status": _apply_asset_filters(
+            base, db, q=q, asset_type=asset_type, status=None, has_evidence=has_evidence
+        )
+        .with_entities(Asset.status, func.count())
+        .group_by(Asset.status),
+        "has_evidence": _apply_asset_filters(
+            base, db, q=q, asset_type=asset_type, status=status, has_evidence=None
+        ),
+    }
+
+
+@router.get("/assets")
+def list_assets(
+    household_id: str = Query(...),
+    q: str | None = Query(default=None),
+    asset_type: str | None = Query(default=None),
+    status: str | None = Query(default=None),
+    has_evidence: bool | None = Query(default=None),
+    cursor: str | None = Query(default=None),
+    limit: int = Query(default=20, ge=1, le=100),
+    db: Session = Depends(get_db),  # type: ignore[no-untyped-def]
+):  # type: ignore[no-untyped-def]
+    query = db.query(Asset).filter(Asset.household_id == household_id)
+    # The outer Asset query keeps the established serializer, ordering, and
+    # cursor envelope unchanged. The same filter set backs `asset_facets`.
+    query = _apply_asset_filters(
+        query,
+        db,
+        q=q,
+        asset_type=asset_type,
+        status=status,
+        has_evidence=has_evidence,
+    )
     # Cursor pagination: (created_at, id) descending — use strftime to handle microsecond mismatch (stored without micros)
     if cursor:
         decoded = decode_cursor(cursor)
@@ -169,6 +231,16 @@ def list_assets(
         next_cursor = encode_cursor(last.created_at, last.id)
     else:
         next_cursor = None
+    # SG-064 G3: the catalog card reads the first evidence id to build its
+    # thumbnail; the list serializer previously sent no evidence field at all, so
+    # that thumbnail (the "evidence badge") could never render from the live API.
+    asset_ids = [a.id for a in items]
+    evidence_ids_by_asset: dict[str, list[str]] = {}
+    if asset_ids:
+        for row in db.execute(
+            asset_evidence.select().where(asset_evidence.c.asset_id.in_(asset_ids))
+        ).fetchall():
+            evidence_ids_by_asset.setdefault(row.asset_id, []).append(row.evidence_id)
     return {
         "items": [
             {
@@ -182,10 +254,54 @@ def list_assets(
                 "condition": a.condition,
                 "version": a.version,
                 "created_at": a.created_at.isoformat() if a.created_at else None,
+                "evidence_ids": evidence_ids_by_asset.get(a.id, []),
             }
             for a in items
         ],
         "next_cursor": next_cursor,
+    }
+
+
+@router.get("/assets/facets")
+def asset_facets(
+    household_id: str = Query(...),
+    q: str | None = Query(default=None),
+    asset_type: str | None = Query(default=None),
+    status: str | None = Query(default=None),
+    has_evidence: bool | None = Query(default=None),
+    db: Session = Depends(get_db),
+) -> dict[str, dict[str, int]]:
+    """Catalog facet counts per analyzed dimension (Phase 4 "advanced filters").
+
+    Declared before `/assets/{asset_id}` so the literal path is not captured as
+    an asset id. Same base filters as `list_assets`; each dimension's counts
+    omit that dimension's own filter. Keys are sorted; counts are integers.
+    """
+    queries = _facet_queries(
+        db, household_id, q=q, asset_type=asset_type, status=status, has_evidence=has_evidence
+    )
+    asset_type_counts = {str(key): int(count) for key, count in queries["asset_type"].all()}
+    status_counts = {str(key): int(count) for key, count in queries["status"].all()}
+    # Zero-population (PG-SC-07): an empty base yields empty maps, not an error.
+    # `has_evidence` carries its fixed `with`/`without` keys only when at least
+    # one row is reachable (otherwise there is no polarity to report).
+    has_evidence_counts: dict[str, int] = {}
+    if status_counts:
+        evidence_base = queries["has_evidence"]
+        with_evidence = evidence_base.filter(
+            Asset.id.in_(db.query(asset_evidence.c.asset_id))
+        ).count()
+        without_evidence = evidence_base.filter(
+            ~Asset.id.in_(db.query(asset_evidence.c.asset_id))
+        ).count()
+        has_evidence_counts = {
+            "with": int(with_evidence),
+            "without": int(without_evidence),
+        }
+    return {
+        "asset_type": dict(sorted(asset_type_counts.items())),
+        "status": dict(sorted(status_counts.items())),
+        "has_evidence": has_evidence_counts,
     }
 
 

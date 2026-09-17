@@ -102,6 +102,33 @@ def test_guard_think_strip_once_then_loud_fail():
     assert go.strip_single_think('{"items": []}') == '{"items": []}'
 
 
+def test_guard_stray_think_raises_and_single_block_strips_charcode_built():
+    """SG-064 G0 pin (mangler-immune): the unbalanced-guard restores its angle token.
+
+    The payload is CONSTRUCTED from character codes — never a typed escape — so
+    this test cannot be silently disabled by the same editing channel that
+    corrupted `strip_single_think` in SG-062. A stray unclosed think tag must hit
+    the `unbalanced` guard and raise; a balanced single block must strip once.
+    """
+    from app.services.providers import opencode_go as go
+    from app.services.providers.router import ProviderError
+
+    lt = chr(60)  # less-than
+    gt = chr(62)  # greater-than
+    open_tag = lt + "think" + gt
+    close_tag = lt + "/think" + gt
+
+    balanced = open_tag + "hmm" + close_tag + '{"items": []}'
+    assert go.strip_single_think(balanced) == '{"items": []}'
+
+    stray = "prefix text " + open_tag + " stray unclosed content"
+    with pytest.raises(ProviderError) as caught:
+        go.strip_single_think(stray)
+    assert "unbalanced" in str(caught.value)
+
+    assert go.strip_single_think('{"items": []}') == '{"items": []}'
+
+
 def test_guard_max_tokens_sized_past_truncation():
     from app.services.providers import opencode_go as go
 

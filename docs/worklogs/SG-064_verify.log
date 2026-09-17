@@ -1,0 +1,112 @@
+SG-064 verify log — raw command outputs and gate artifacts
+
+contract echo: 0.28.2   source path read: /home/andrei/storagegenie-contract/VERSION
+BASE ref requested: origin/automation
+BASE resolved: 146b7b56098e70fdbb65fe184574015daea08278 (== local HEAD at session start)
+WORK_HEAD: (filled by the receipt commit)
+
+Backend venv: backend/venv (python 3.12.3). Frontend: node/npm with node_modules present.
+Every command ran under a timeout (120s ordinary / 600s suite+lint+build); none was killed.
+
+
+========================================================================
+1) Facet-line table — `pytest tests/test_asset_facets.py -v` (real HTTP path, TestClient + temp SQLite)
+========================================================================
+tests/test_asset_facets.py::test_facets_counts_each_dimension_without_its_own_filter PASSED [ 25%]
+tests/test_asset_facets.py::test_facets_q_narrows_the_shared_base PASSED [ 50%]
+tests/test_asset_facets.py::test_facets_empty_household_is_empty_maps_not_error PASSED [ 75%]
+tests/test_asset_facets.py::test_facets_aggregate_statements_compile_for_postgresql PASSED [100%]
+======================== 4 passed, 2 warnings in 1.04s =========================
+
+========================================================================
+2) Char-code probes — after every edit (a `.py` file carrying a think-tag is re-probed by codes)
+========================================================================
+SOURCE app/services/providers/opencode_go.py lines 92/95/96:
+  line 92: 60_present=True 62_present=True :: '    """Strip ONE leading `<think>` block; a second block fails loudly."""'
+  line 95: 60_present=True 62_present=True :: '        if "<think>" in text:'
+  line 96: 60_present=True 62_present=True :: '            raise ProviderError("invalid_json", "unbalanced or stray <think> block in content")'
+TEST tests/test_opencode_go.py lines carrying code 60:
+  line 94: 60_present=True 62_present=True
+  line 97: 60_present=True 62_present=True
+  line 101: 60_present=True 62_present=True
+
+========================================================================
+3) G0 FAIL-then-PASS — `test_guard_stray_think_raises_and_single_block_strips_charcode_built`
+   RED (source reverted to BASE HEAD: mangled):
+========================================================================
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_____ test_guard_stray_think_raises_and_single_block_strips_charcode_built _____
+tests/test_opencode_go.py:125: in test_guard_stray_think_raises_and_single_block_strips_charcode_built
+    with pytest.raises(ProviderError) as caught:
+E   Failed: DID NOT RAISE ProviderError
+=========================== short test summary info ============================
+FAILED tests/test_opencode_go.py::test_guard_stray_think_raises_and_single_block_strips_charcode_built
+1 failed in 0.11s
+
+------------------------------------------------------------------------
+   GREEN (char-code repair applied):
+------------------------------------------------------------------------
+.                                                                        [100%]
+1 passed in 0.10s
+
+========================================================================
+4) G3 FAIL-then-PASS — `test_list_rows_carry_evidence_ids_for_the_card_thumbnail`
+   RED (BASE serializer, no evidence_ids):
+========================================================================
+E   KeyError: 'evidence_ids'
+/home/andrei/StorageGenie/backend/tests/test_assets_crud.py:282: KeyError: 'evidence_ids'
+FAILED tests/test_assets_crud.py::test_list_rows_carry_evidence_ids_for_the_card_thumbnail
+1 failed, 2 warnings in 0.62s
+
+------------------------------------------------------------------------
+   GREEN (evidence_ids added; shown with the facets tests):
+------------------------------------------------------------------------
+tests/test_assets_crud.py::test_list_rows_carry_evidence_ids_for_the_card_thumbnail PASSED [ 20%]
+tests/test_asset_facets.py::test_facets_counts_each_dimension_without_its_own_filter PASSED [ 40%]
+tests/test_asset_facets.py::test_facets_q_narrows_the_shared_base PASSED [ 60%]
+tests/test_asset_facets.py::test_facets_empty_household_is_empty_maps_not_error PASSED [ 80%]
+tests/test_asset_facets.py::test_facets_aggregate_statements_compile_for_postgresql PASSED [100%]
+======================== 5 passed, 2 warnings in 0.99s =========================
+
+========================================================================
+5) Baseline at BASE 146b7b5 (recorded before edits)
+========================================================================
+backend pytest : 2 failed, 248 passed, 20 warnings in 16.77s
+  FAILED tests/test_signals.py::test_generated_codes_are_validated_and_bad_checksum_is_not_an_identifier
+  FAILED tests/test_signals.py::test_ocr_has_text_boxes_and_mean_confidence
+ruff           : All checks passed!
+mypy app       : Found 41 errors in 9 files (checked 69 source files)
+frontend vitest: Test Files 21 passed (21) / Tests 152 passed (152)
+eslint         : clean
+vite build     : built (index-CY71ycwZ.js)
+
+
+========================================================================
+6) Final gates (work tree)
+========================================================================
+backend pytest:
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/test_signals.py::test_generated_codes_are_validated_and_bad_checksum_is_not_an_identifier
+FAILED tests/test_signals.py::test_ocr_has_text_boxes_and_mean_confidence - a...
+2 failed, 254 passed, 20 warnings in 16.88s
+
+ruff:
+All checks passed!
+
+mypy:
+Found 41 errors in 9 files (checked 69 source files)
+
+frontend vitest:
+ Test Files  21 passed (21)
+      Tests  152 passed (152)
+   Start at  19:08:33
+   Duration  4.52s (transform 773ms, setup 732ms, collect 3.15s, tests 5.48s, environment 6.44s, prepare 1.70s)
+
+eslint (empty = clean):
+
+
+vite build:
+✓ 1960 modules transformed.
+✓ built in 1.70s

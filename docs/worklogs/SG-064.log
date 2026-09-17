@@ -1,0 +1,71 @@
+SG-064 worklog — catalog facets + server-side category filter + evidence-badge truth (G0 think-tag repair)
+coder: opencode   effort: medium (process args: `opencode run --auto --dir /home/andrei/StorageGenie --variant medium ...`)
+MODEL: unknown (no `--model` on argv; the CLI default is omitted per policy, never read from a system-prompt identity line)
+contract echo: 0.28.2
+  source path read: /home/andrei/storagegenie-contract/VERSION == 0.28.2 (repo `.rules-cache/` is absent on this box)
+
+Spend: real $0.000000 vs $0 bound (zero provider calls; every proof is a deterministic TestClient/temp-SQLite gate or a mocked frontend test).
+
+BASE ref requested: origin/automation
+BASE ref resolved: 146b7b56098e70fdbb65fe184574015daea08278 (== local HEAD at session start)
+WORK_HEAD: (filled by the work commit)
+
+Starting tree: clean (`git status --porcelain` empty before any edit). Dirt = STOP; none seen.
+
+Role guard honoured: never ran the dispatch verb, never started or polled this unit.
+
+Premise verification (quoted reads):
+- `backend/app/api/v1/assets.py` `GET /assets` filters `q`/`asset_type`/`status`/`has_evidence` and the
+  cursor envelope confirmed at :119-189 (pre-edit); the list serializer sent NO evidence field.
+- `frontend/src/routes/CatalogPage.tsx` category state :30, debounced `q` :28-29, client
+  `filterAndSortCatalog` :80-87 (re-filtered by `qRaw` AND category on top of the server narrowing) confirmed.
+- `CatalogToolbar.tsx:21` pills `["All", ...CANONICAL_CATEGORIES]`; `types/product.ts:80-86`
+  `toProductCategory` passes non-canonical `asset_type` through UNCHANGED — static pills do not match the
+  real population.
+- `CatalogPage.tsx:81-84` reads `asset.evidence?.[0]` → `evidenceId` → `ProductCard.cardMedia` thumbnail.
+- think-tag corrupted lines 92/95/96 byte-probed: codes 60/62 absent in each.
+
+Corrections (do not bend to the packet):
+- F-SG064-1: `backend/tests/test_postgres_dialect.py` is metadata-DDL-only — it compiles every
+  `Base.metadata` table with the PostgreSQL offline dialect and never builds/executes endpoint SQL. The
+  packet's "dialect test file ... with the new endpoint asserted" cannot be met by that file as-is. I ran it
+  green (unchanged) and added a genuine compile assertion for the facet aggregate statements (the real
+  endpoint SQL) in the new `backend/tests/test_asset_facets.py`.
+- F-SG064-2: the seed household `01a0a029-1477-7ca0-b200-bce78a96c679`'s asset is `Toothpaste` with
+  `asset_type='unknown'` (recorded in `docs/worklogs/SG-048_verify.log:3407` and SG-053). The smallest real
+  population's type key is therefore the raw `unknown`, not a DQ1 label — confirming the pill set must be the
+  raw facet keys.
+- F-SG064-3: `docs/packets/SG-064-catalog-facets.md` line ~9 cites `assets.py:119-189` for the list
+  handler; live pre-edit list handler spanned :119-189 (filters :130-151, serializer :172-189) — match.
+
+Design decisions (packet delegates these):
+- Facets counts use MINUS-OWN-DIMENSION semantics; `has_evidence` keys are `with`/`without`. Zero-population
+  (empty base) returns empty maps for all three dimensions (200, no error) — literal acceptance reading.
+- `_apply_asset_filters` is the ONE shared filter path for `list_assets` and `asset_facets`; the facets
+  `q` uses the same `ensure_asset_fts` + `sanitize_fts_query` call.
+- FTS field list (from `app/services/fts.py` DDL): `asset_fts(asset_id UNINDEXED, display_name,
+  household_id UNINDEXED)` — `MATCH` searches `display_name` only. The client-side `q` re-filter touched
+  `item.name` (= `display_name`), the same field, so it was REMOVED.
+- Client category filter removed: the pill now passes the raw `asset_type` to the server; keeping the client
+  match would have dropped `asset_type='unknown'` rows (mapped to `Uncategorized` by `toProductCategory`),
+  so removal is correctness, not just redundancy.
+- Pills are `All (N)` plus one `key (N)` per real `asset_type` facet key; the `All` count is the sum of the
+  `asset_type` facet map (= unfiltered-with-`q` total). No `AppShell.tsx` change was needed: pill labels are
+  computed in `CatalogPage` and the existing `categories: readonly string[]` prop is reused.
+- G3 fix: list serializer now sends `evidence_ids` (the field the card reads), not the full `evidence`
+  records.
+
+Legs (actual / budget, units):
+- Premises + starting tree: ~150s / 120s ordinary (read-only; no single command exceeded its bound).
+- Baseline at BASE: backend pytest 16.77s (2 failed / 248 passed), ruff ~2s, mypy ~35s;
+  frontend vitest 3.99s (152 passed), eslint ~0s, build 1.73s (under 600s suite+lint+build).
+- G0 repair + pin FAIL(0.11s)→PASS(0.10s): ~120s.
+- G1 facets endpoint + 4 tests: ~90s.
+- G2/G3 wiring + tests: ~180s.
+- G4 final gates: backend pytest 16.88s (2 failed / 254 passed), ruff clean, mypy 41 (= BASE);
+  frontend vitest 4.52s (152 passed), eslint clean, build 1.70s (under 600s).
+- Total wall clock ~660s / 1800s overall.
+
+DB: none for proofs (scratch temp SQLite via `tmp_path`); production SQLite untouched.
+Restart: none. Deploy: none. No migration. No new dependencies. No prompt/template change.
+Nothing pushed to `storagegenie-evidence`; no ignored file staged.

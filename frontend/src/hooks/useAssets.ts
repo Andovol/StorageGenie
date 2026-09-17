@@ -24,6 +24,24 @@ export function useAssets(
   });
 }
 
+export type AssetFacets = {
+  asset_type: Record<string, number>;
+  status: Record<string, number>;
+  has_evidence: Record<string, number>;
+};
+
+export function useFacets(householdId: string, q: string) {
+  return useQuery<AssetFacets>({
+    queryKey: ["asset-facets", householdId, q],
+    queryFn: () =>
+      apiGet<AssetFacets>("/v1/assets/facets", {
+        household_id: householdId,
+        q,
+      }),
+    enabled: !!householdId,
+  });
+}
+
 export function useHouseholds() {
   return useQuery<Household[]>({
     queryKey: ["households"],
