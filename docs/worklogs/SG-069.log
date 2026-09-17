@@ -1,0 +1,36 @@
+SG-069 worklog — deploy rider: saved-searches UI live on the public entry
+=======================================================================
+coder: opencode · effort: medium (process argv `--variant medium`) · model: unknown (CLI default, no --model on argv)
+contract: 0.28.2 · source /home/andrei/storagegenie-contract/VERSION (RULES.md sha256 a66aa431… == payload)
+BASE (start HEAD == origin/automation): 37aaf881d0b3d0f27ce060121f61a061c653cd28
+spend: real $0.000000 (0 metered calls)
+authorized production mutation: exactly ONE `docker compose up -d` recreate (D87)
+
+Legs (actual vs bound):
+- Reconf (ordinary reads: git, docker inspect, pre curls, direct sqlite): ~25s vs 120s/leg
+- G1 build: 17s vs 900s bound   (BUILDX_CONFIG relocated to /tmp/opencode/buildx-sg069; F-SG067-2 precedent)
+- G1 up: 1s vs 900s bound        (one recreate)
+- G1/G2 health + discriminators + settle: ~30s vs 120s/leg
+- overall: ~90s vs 1800s bound
+
+What shipped:
+- Rebuilt storagegenie-backend:latest from BASE (HEAD carries SG-068 saved-searches code). Image
+  manifest list sha256:cc880df58b9e253b51c68adac207b8eda9ec45ed176eb2fd6ef31b0e261f28e6.
+- Recreated storagegenie-backend-1 once -> container 17b12061d3d919ebdd65e49fcde274878161af09e7b412f08bee214eb3fc250f.
+- Served bundle index-BHr__-9L.js (b1638c80…, 294066) -> index-CVg0y-4w.js (fcafabbf…, 296747): DIFFERENT.
+- GET /v1/saved-searches?household_id=<seed>: 404 (old image, route absent) -> 200 {"items":[]}.
+- Facets still 200; gate 401 both sides; loopback-only binding preserved; RestartCount 0 -> 0.
+- DB head unchanged: alembic_version = 20260917_sg068_saved_search (direct read-only sqlite both sides);
+  saved_search rows 0 both sides; assets rows 1 both sides. No migration; no writes.
+
+Findings:
+- F-SG069-1 (packet premise corrected): `alembic current` in the OLD container cannot read the head — it
+  fails with "Can't locate revision identified by '20260917_sg068_saved_search'" because the old image
+  predates the SG-068 revision file. The packet expected it to read the head BEFORE. Authoritative
+  before-read is the DB's alembic_version table (direct, read-only) = the head; `alembic current` reads
+  the head AFTER the rebuild. DB head identical before/after; no upgrade.
+- F-SG069-2: compose default profile has only the backend service; frontend is profile "dev". The served
+  bundle is baked into the backend image (multi-stage), so the backend recreate is the whole deploy.
+
+Constraints honored: scope = docs/worklogs (3 files); nothing else in repo. No provider calls, no
+migration, no seed, no data writes, no credential fetch, no evidence-ref push, no receipt script.
