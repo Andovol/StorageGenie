@@ -1,5 +1,5 @@
 import { describe, test, expect, vi, beforeEach, afterEach } from "vitest";
-import { buildUrl, apiGet, fetchAiSettings, fetchPlanningSuggestions } from "./client";
+import { buildUrl, apiGet, fetchAiSettings, updateAiModel, fetchPlanningSuggestions } from "./client";
 
 function mockResponse(partial: Partial<Response>): Response {
   return partial as Response;
@@ -133,6 +133,60 @@ describe("fetchAiSettings", () => {
     const res = await fetchAiSettings();
     expect(res).toEqual(mockSettings);
     expect(fetch).toHaveBeenCalledWith(buildUrl("/v1/settings/ai", {}));
+  });
+
+  test("throws error when fetching AI settings fails", async () => {
+    vi.mocked(fetch).mockResolvedValueOnce(
+      mockResponse({
+        ok: false,
+        status: 500,
+        statusText: "Internal Server Error",
+        json: async () => ({ detail: "Failed to load AI settings" }),
+      })
+    );
+
+    await expect(fetchAiSettings()).rejects.toThrow("Failed to load AI settings");
+  });
+});
+
+describe("updateAiModel", () => {
+  beforeEach(() => {
+    vi.stubGlobal("fetch", vi.fn());
+  });
+
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
+  test("updates AI model via PUT request", async () => {
+    const updatedSettings = { provider: "openai", model_id: "gpt-4o" };
+    vi.mocked(fetch).mockResolvedValueOnce(
+      mockResponse({
+        ok: true,
+        json: async () => updatedSettings,
+      })
+    );
+
+    const res = await updateAiModel("gpt-4o");
+    expect(res).toEqual(updatedSettings);
+    expect(fetch).toHaveBeenCalledWith(buildUrl("/v1/settings/ai", {}), {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ model_id: "gpt-4o" }),
+    });
+  });
+
+  test("throws error when updating AI model fails", async () => {
+    vi.mocked(fetch).mockResolvedValueOnce(
+      mockResponse({
+        ok: false,
+        status: 400,
+        statusText: "Bad Request",
+        json: async () => ({ detail: "Unsupported model_id" }),
+      })
+    );
+
+    await expect(updateAiModel("invalid-model")).rejects.toThrow("Unsupported model_id");
   });
 });
 
