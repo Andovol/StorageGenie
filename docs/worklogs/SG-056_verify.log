@@ -1,0 +1,264 @@
+SG-056 verify log — raw command output (G2 both runs, G3 gates, G4 smoke).
+Contract 0.27.0. Work dir /home/andrei/StorageGenie. Coder opencode. Effort medium (argv --variant medium). Model unknown (no model id on argv; per policy).
+Captured 2026-09-17T12:25:30Z by the SG-056 run. First token SG-056.
+
+=== [V1] G2 FAIL-first: NEW conformance rail on the PRE-HUNK tree ===
+$ cd /home/andrei/StorageGenie/backend && ./venv/bin/python -m pytest tests/test_provider_conformance.py -q -rf
+
+FFFFFF...                                                                [100%]
+=================================== FAILURES ===================================
+___________________ test_protocol_declares_the_3arg_surface ____________________
+
+    def test_protocol_declares_the_3arg_surface() -> None:
+        """The protocol is the stale contract this slice fixes; it must carry the surface."""
+>       _assert_vision_surface(VisionExtractionProvider.extract_items, "VisionExtractionProvider")
+
+tests/test_provider_conformance.py:65: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+func = <function VisionExtractionProvider.extract_items at 0x7d9043f3b060>
+label = 'VisionExtractionProvider'
+
+    def _assert_vision_surface(func: Callable[..., Any], label: str) -> None:
+        """The exact SG-027 surface: (image_bytes, prompt, *, estimated_cost=0.0)."""
+        params = list(inspect.signature(func).parameters.values())
+        if params and params[0].name == "self":
+            params = params[1:]
+        names = [p.name for p in params]
+>       assert names[:2] == ["image_bytes", "prompt"], f"{label} positional shape drifted: {names}"
+E       AssertionError: VisionExtractionProvider positional shape drifted: ['image_ref']
+E       assert ['image_ref'] == ['image_bytes', 'prompt']
+E         
+E         At index 0 diff: 'image_ref' != 'image_bytes'
+E         Right contains one more item: 'prompt'
+E         Use -v to get more diff
+
+tests/test_provider_conformance.py:40: AssertionError
+________ test_fake_provider_accepts_3arg_surface_through_router[valid] _________
+
+mode = 'valid'
+
+    @pytest.mark.parametrize("mode", VISION_MODES)
+    def test_fake_provider_accepts_3arg_surface_through_router(mode: str) -> None:
+        """Every fake mode survives the reader's exact call shape, through the router.
+    
+        `router.execute` is the real write path (`reader.py:309`); the provider is
+        never called directly here, so this is the passthrough under test. A
+        one-argument `FakeProvider` fails this with the live TypeError.
+        """
+        fake = FakeProvider(mode=mode, provider_id=f"fake-{mode}")
+        router = _router(fake)
+    
+        if mode in ("invalid_json_once", "outage_retryable"):
+            with pytest.raises(ProviderError):
+                router.execute("extract_items", b"img-bytes", "prompt", estimated_cost=0.0)
+            return
+    
+>       result = router.execute("extract_items", b"img-bytes", "prompt", estimated_cost=0.0)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_provider_conformance.py:84: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <app.services.providers.router.ProviderRouter object at 0x7d90430d6030>
+operation = 'extract_items', estimated_cost = 0.0
+args = (b'img-bytes', 'prompt'), kwargs = {}
+
+    def execute(self, operation: str, *args: Any, estimated_cost: float = 0.0, **kwargs: Any) -> Any:
+        """Run `operation` on the configured provider.
+    
+        Budget is enforced BEFORE any call: exceeding it raises
+        BudgetExceededError with zero provider invocations. On ProviderError
+        whose kind is in the retryable set (and a fallback is configured),
+        the fallback provider is tried once. Non-retryable errors surface
+        with no fallback.
+        """
+        if estimated_cost > self.config.cost_budget:
+            raise BudgetExceededError(
+                f"estimated cost {estimated_cost} exceeds budget {self.config.cost_budget}"
+            )
+        primary = self.resolve(self.config.provider_id)
+        try:
+>           return getattr(primary, operation)(*args, **kwargs)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           TypeError: FakeProvider.extract_items() takes 2 positional arguments but 3 were given
+
+app/services/providers/router.py:67: TypeError
+__ test_fake_provider_accepts_3arg_surface_through_router[invalid_json_once] ___
+
+mode = 'invalid_json_once'
+
+    @pytest.mark.parametrize("mode", VISION_MODES)
+    def test_fake_provider_accepts_3arg_surface_through_router(mode: str) -> None:
+        """Every fake mode survives the reader's exact call shape, through the router.
+    
+        `router.execute` is the real write path (`reader.py:309`); the provider is
+        never called directly here, so this is the passthrough under test. A
+        one-argument `FakeProvider` fails this with the live TypeError.
+        """
+        fake = FakeProvider(mode=mode, provider_id=f"fake-{mode}")
+        router = _router(fake)
+    
+        if mode in ("invalid_json_once", "outage_retryable"):
+            with pytest.raises(ProviderError):
+>               router.execute("extract_items", b"img-bytes", "prompt", estimated_cost=0.0)
+
+tests/test_provider_conformance.py:81: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <app.services.providers.router.ProviderRouter object at 0x7d90430d5c10>
+operation = 'extract_items', estimated_cost = 0.0
+args = (b'img-bytes', 'prompt'), kwargs = {}
+
+    def execute(self, operation: str, *args: Any, estimated_cost: float = 0.0, **kwargs: Any) -> Any:
+        """Run `operation` on the configured provider.
+    
+        Budget is enforced BEFORE any call: exceeding it raises
+        BudgetExceededError with zero provider invocations. On ProviderError
+        whose kind is in the retryable set (and a fallback is configured),
+        the fallback provider is tried once. Non-retryable errors surface
+        with no fallback.
+        """
+        if estimated_cost > self.config.cost_budget:
+            raise BudgetExceededError(
+                f"estimated cost {estimated_cost} exceeds budget {self.config.cost_budget}"
+            )
+        primary = self.resolve(self.config.provider_id)
+        try:
+>           return getattr(primary, operation)(*args, **kwargs)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           TypeError: FakeProvider.extract_items() takes 2 positional arguments but 3 were given
+
+app/services/providers/router.py:67: TypeError
+____ test_fake_provider_accepts_3arg_surface_through_router[needs_evidence] ____
+
+mode = 'needs_evidence'
+
+    @pytest.mark.parametrize("mode", VISION_MODES)
+    def test_fake_provider_accepts_3arg_surface_through_router(mode: str) -> None:
+        """Every fake mode survives the reader's exact call shape, through the router.
+    
+        `router.execute` is the real write path (`reader.py:309`); the provider is
+        never called directly here, so this is the passthrough under test. A
+        one-argument `FakeProvider` fails this with the live TypeError.
+        """
+        fake = FakeProvider(mode=mode, provider_id=f"fake-{mode}")
+        router = _router(fake)
+    
+        if mode in ("invalid_json_once", "outage_retryable"):
+            with pytest.raises(ProviderError):
+                router.execute("extract_items", b"img-bytes", "prompt", estimated_cost=0.0)
+            return
+    
+>       result = router.execute("extract_items", b"img-bytes", "prompt", estimated_cost=0.0)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_provider_conformance.py:84: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <app.services.providers.router.ProviderRouter object at 0x7d90430d63f0>
+operation = 'extract_items', estimated_cost = 0.0
+args = (b'img-bytes', 'prompt'), kwargs = {}
+
+    def execute(self, operation: str, *args: Any, estimated_cost: float = 0.0, **kwargs: Any) -> Any:
+        """Run `operation` on the configured provider.
+    
+        Budget is enforced BEFORE any call: exceeding it raises
+        BudgetExceededError with zero provider invocations. On ProviderError
+        whose kind is in the retryable set (and a fallback is configured),
+        the fallback provider is tried once. Non-retryable errors surface
+        with no fallback.
+        """
+        if estimated_cost > self.config.cost_budget:
+            raise BudgetExceededError(
+                f"estimated cost {estimated_cost} exceeds budget {self.config.cost_budget}"
+            )
+        primary = self.resolve(self.config.provider_id)
+        try:
+>           return getattr(primary, operation)(*args, **kwargs)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           TypeError: FakeProvider.extract_items() takes 2 positional arguments but 3 were given
+
+app/services/providers/router.py:67: TypeError
+___ test_fake_provider_accepts_3arg_surface_through_router[outage_retryable] ___
+
+mode = 'outage_retryable'
+
+    @pytest.mark.parametrize("mode", VISION_MODES)
+    def test_fake_provider_accepts_3arg_surface_through_router(mode: str) -> None:
+        """Every fake mode survives the reader's exact call shape, through the router.
+    
+        `router.execute` is the real write path (`reader.py:309`); the provider is
+        never called directly here, so this is the passthrough under test. A
+        one-argument `FakeProvider` fails this with the live TypeError.
+        """
+        fake = FakeProvider(mode=mode, provider_id=f"fake-{mode}")
+        router = _router(fake)
+    
+        if mode in ("invalid_json_once", "outage_retryable"):
+            with pytest.raises(ProviderError):
+>               router.execute("extract_items", b"img-bytes", "prompt", estimated_cost=0.0)
+
+tests/test_provider_conformance.py:81: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <app.services.providers.router.ProviderRouter object at 0x7d90441f8b00>
+operation = 'extract_items', estimated_cost = 0.0
+args = (b'img-bytes', 'prompt'), kwargs = {}
+
+    def execute(self, operation: str, *args: Any, estimated_cost: float = 0.0, **kwargs: Any) -> Any:
+        """Run `operation` on the configured provider.
+    
+        Budget is enforced BEFORE any call: exceeding it raises
+        BudgetExceededError with zero provider invocations. On ProviderError
+        whose kind is in the retryable set (and a fallback is configured),
+        the fallback provider is tried once. Non-retryable errors surface
+        with no fallback.
+        """
+        if estimated_cost > self.config.cost_budget:
+            raise BudgetExceededError(
+                f"estimated cost {estimated_cost} exceeds budget {self.config.cost_budget}"
+            )
+        primary = self.resolve(self.config.provider_id)
+        try:
+>           return getattr(primary, operation)(*args, **kwargs)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           TypeError: FakeProvider.extract_items() takes 2 positional arguments but 3 were given
+
+app/services/providers/router.py:67: TypeError
+_________ test_fake_provider_signature_accepts_keyword_estimated_cost __________
+
+    def test_fake_provider_signature_accepts_keyword_estimated_cost() -> None:
+        """Direct surface for a reader-less caller (the router strips the kwarg)."""
+>       _assert_vision_surface(FakeProvider.extract_items, "FakeProvider")
+
+tests/test_provider_conformance.py:95: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+func = <function FakeProvider.extract_items at 0x7d90430d0ea0>
+label = 'FakeProvider'
+
+    def _assert_vision_surface(func: Callable[..., Any], label: str) -> None:
+        """The exact SG-027 surface: (image_bytes, prompt, *, estimated_cost=0.0)."""
+        params = list(inspect.signature(func).parameters.values())
+        if params and params[0].name == "self":
+            params = params[1:]
+        names = [p.name for p in params]
+>       assert names[:2] == ["image_bytes", "prompt"], f"{label} positional shape drifted: {names}"
+E       AssertionError: FakeProvider positional shape drifted: ['image_ref']
+E       assert ['image_ref'] == ['image_bytes', 'prompt']
+E         
+E         At index 0 diff: 'image_ref' != 'image_bytes'
+E         Right contains one more item: 'prompt'
+E         Use -v to get more diff
+
+tests/test_provider_conformance.py:40: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_provider_conformance.py::test_protocol_declares_the_3arg_surface
+FAILED tests/test_provider_conformance.py::test_fake_provider_accepts_3arg_surface_through_router[valid]
+FAILED tests/test_provider_conformance.py::test_fake_provider_accepts_3arg_surface_through_router[invalid_json_once]
+FAILED tests/test_provider_conformance.py::test_fake_provider_accepts_3arg_surface_through_router[needs_evidence]
+FAILED tests/test_provider_conformance.py::test_fake_provider_accepts_3arg_surface_through_router[outage_retryable]
+FAILED tests/test_provider_conformance.py::test_fake_provider_signature_accepts_keyword_estimated_cost
+6 failed, 3 passed in 0.29s
+
