@@ -93,7 +93,22 @@ def _proposal(items: list[dict[str, object]], *, unknowns: list[str]) -> dict[st
                 items[0]["name"], source_type="extraction", confidence=0.9, provider="scripted"
             ),
             "asset_type": _provenance(
-                "unknown", source_type="deterministic", confidence=None, provider=None
+                items[0].get("asset_type"),
+                source_type="extraction",
+                confidence=0.9,
+                provider="scripted",
+            ),
+            "quantity": _provenance(
+                items[0].get("quantity"),
+                source_type="extraction",
+                confidence=0.9,
+                provider="scripted",
+            ),
+            "unit": _provenance(
+                items[0].get("unit"),
+                source_type="extraction",
+                confidence=0.9,
+                provider="scripted",
             ),
             "status": _provenance(
                 "ACTIVE", source_type="deterministic", confidence=None, provider=None
@@ -164,6 +179,9 @@ def _two_item_candidate(session: Session, household_id: str, evidence_id: str) -
                 "expiry_date": "2030-01-15",
                 "date_type": "expiry_date",
                 "lot": None,
+                "quantity": 2.0,
+                "unit": "L",
+                "asset_type": "food",
                 "confidence": 0.9,
                 "uncertainty_reasons": ["glare"],
             },
@@ -172,6 +190,9 @@ def _two_item_candidate(session: Session, household_id: str, evidence_id: str) -
                 "expiry_date": None,
                 "date_type": None,
                 "lot": "L-2",
+                "quantity": None,
+                "unit": "cup",
+                "asset_type": "cosmetics",
                 "confidence": 0.8,
                 "uncertainty_reasons": ["angle"],
             },
@@ -239,6 +260,15 @@ def test_split_yields_per_item_children_with_shared_evidence_and_provenance(spli
     assert first["fields"]["expiry_date"]["value"] == "2030-01-15"  # type: ignore[index]
     assert "expiry_date" not in second["fields"]  # no guessed value for the unknown expiry
     assert first["fields"]["identifier"]["value"] == "BARCODE-7"  # shared deterministic field kept
+    # SG-058 G2: quantity/unit/asset_type are per-ITEM, never the origin's shared value.
+    assert first["fields"]["quantity"]["value"] == 2.0  # type: ignore[index]
+    assert first["fields"]["quantity"]["source_type"] == "extraction"  # type: ignore[index]
+    assert first["fields"]["quantity"]["confidence"] == 0.9  # type: ignore[index]
+    assert first["fields"]["unit"]["value"] == "L"  # type: ignore[index]
+    assert first["fields"]["asset_type"]["value"] == "food"  # type: ignore[index]
+    assert "quantity" not in second["fields"]  # null item value omitted, never inherited
+    assert second["fields"]["unit"]["value"] == "cup"  # type: ignore[index]
+    assert second["fields"]["asset_type"]["value"] == "cosmetics"  # type: ignore[index]
     for child_proposal in (first, second):
         assert child_proposal["ai_provider"] == "scripted"
         assert child_proposal["ai_model"] == "scripted-model-1"

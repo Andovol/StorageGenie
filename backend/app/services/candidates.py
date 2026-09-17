@@ -536,20 +536,27 @@ def _split_child_fields(
 ) -> dict[str, object]:
     """Build one child's fields from the origin fields + ITS extraction item.
 
-    Item-derived fields (`display_name`, `expiry_date`, `lot`) are replaced by
-    this item's values; every other origin field (deterministic asset_type,
-    status, barcode identifier) is shared unchanged. A field with no item value
-    is omitted, never guessed.
+    Item-derived fields (`display_name`, `expiry_date`, `opened_date`, `lot`,
+    `quantity`, `unit`, `asset_type`) are replaced by this item's values; every
+    other origin field (status, barcode identifier) is shared unchanged. A field
+    with no item value is omitted, never guessed and never inherited.
     """
     name = item.get("name")
     if not isinstance(name, str) or not name:
         raise CandidateSplitError("candidate item is missing a name")
     raw_confidence = item.get("confidence")
     confidence = raw_confidence if isinstance(raw_confidence, (int, float)) else None
+    item_derived = {
+        "display_name",
+        "expiry_date",
+        "opened_date",
+        "lot",
+        "quantity",
+        "unit",
+        "asset_type",
+    }
     fields: dict[str, object] = {
-        key: raw
-        for key, raw in origin_fields.items()
-        if key not in {"display_name", "expiry_date", "opened_date", "lot"}
+        key: raw for key, raw in origin_fields.items() if key not in item_derived
     }
     fields["display_name"] = _provenance(
         name,
@@ -560,39 +567,18 @@ def _split_child_fields(
         template_version=version,
         provider_call_id=provider_call_id,
     )
-    expiry_date = item.get("expiry_date")
-    if expiry_date is not None:
-        fields["expiry_date"] = _provenance(
-            expiry_date,
-            source_type="extraction",
-            confidence=confidence,
-            provider=provider,
-            model=model,
-            template_version=version,
-            provider_call_id=provider_call_id,
-        )
-    opened_date = item.get("opened_date")
-    if opened_date is not None:
-        fields["opened_date"] = _provenance(
-            opened_date,
-            source_type="extraction",
-            confidence=confidence,
-            provider=provider,
-            model=model,
-            template_version=version,
-            provider_call_id=provider_call_id,
-        )
-    lot = item.get("lot")
-    if lot is not None:
-        fields["lot"] = _provenance(
-            lot,
-            source_type="extraction",
-            confidence=confidence,
-            provider=provider,
-            model=model,
-            template_version=version,
-            provider_call_id=provider_call_id,
-        )
+    for field_name in ("expiry_date", "opened_date", "lot", "quantity", "unit", "asset_type"):
+        value = item.get(field_name)
+        if value is not None:
+            fields[field_name] = _provenance(
+                value,
+                source_type="extraction",
+                confidence=confidence,
+                provider=provider,
+                model=model,
+                template_version=version,
+                provider_call_id=provider_call_id,
+            )
     return fields
 
 

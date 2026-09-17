@@ -1,0 +1,34 @@
+SG-058 run log — opencode / medium — work dir /home/andrei/StorageGenie
+
+2026-09-17T14:04Z  START. Process argv: `opencode run --auto --dir /home/andrei/StorageGenie
+                  --variant medium` -> effort=medium; no model id on argv -> model=unknown.
+2026-09-17T14:04Z  PRE-STATE: `git status --porcelain` empty; branch automation; HEAD =
+                  origin/automation = 412acc9952f4212cf2331bbe2774793730d39190 (BASE ref
+                  `origin/automation` -> that commit).
+2026-09-17T14:04Z  PREMISES re-read: asset.py:11 `UNTITLED_LABEL = "Untitled"`;
+                  product.ts:25 `UNTITLED_ASSET_NAME = "Untitled asset"`;
+                  candidates.py:528-596 `_split_child_fields`. All match packet.
+2026-09-17T14:04Z  `Untitled` enumeration: asset.py:11, test_sg049:14 (docstring),
+                  test_sg049:295 (assertion); frontend already "Untitled asset". Diff = NONE.
+2026-09-17T14:04Z  BASE suite: 2 failed / 235 passed (test_signals decoder ABIs absent) — the
+                  base-proven reds. Wall 16.02s / 600s budget.
+2026-09-17T14:05Z  G2 test hunks applied ONLY (test_review_split.py + test_ai_pipeline.py:305).
+2026-09-17T14:05Z  G2 RED run: both targeted tests FAIL; second child literally carries origin
+                  asset_type 'food' + unit 'L'. Wall 1.34s. Raw in SG-058_verify.log [4].
+2026-09-17T14:05Z  G1 label hunk + test_sg049 hunks + G2 source hunk applied.
+2026-09-17T14:05Z  G2 GREEN run: 4 passed (2 split + label + deterministic asset_type). Wall
+                  1.47s. Raw probe quotes per-item unit=cup, asset_type=cosmetics, quantity
+                  absent. Raw in SG-058_verify.log [5].
+2026-09-17T14:06Z  Post-change full backend suite: 2 failed / 235 passed — SAME 2 base reds.
+                  Wall 16.39s / 600s. ruff clean (0.07s).
+2026-09-17T14:07Z  Frontend: 152 tests pass (4.64s), eslint clean (1.51s), tsc && vite build
+                  OK (4.24s). No frontend file touched.
+2026-09-17T14:07Z  Deploy: `BUILDX_CONFIG=... docker compose up --build -d backend` exit 0,
+                  wall 11.73s / 900s. New container 694f56de..., RestartCount=0, healthy.
+2026-09-17T14:08Z  Deploy checks: health exact; `8000/tcp -> 127.0.0.1:8003` loopback-only;
+                  served bundle index-nugWvqun.js sha256 e5c99c02... UNCHANGED pre->post;
+                  idempotent re-up same container Id, RestartCount=0.
+2026-09-17T14:08Z  Worklogs written (this file, SG-058_report.md, SG-058_verify.log).
+2026-09-17T14:08Z  Spend: $0.000000 (zero provider calls; no metered route touched).
+2026-09-17T14:08Z  Overall wall since process start: ~217s / 2400s budget (early-close 1500s
+                  not reached). Proceeding to commit + push + notes-ref receipt.

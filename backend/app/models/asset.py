@@ -8,7 +8,7 @@ from app.models.base import TimestampMixin, new_id
 # grounding built by planning/service.py and chat/service.py. This module is the
 # safe home: it imports only `app.db` + `app.models.base`, so importing the
 # constant here can never create a cycle with the service layer that imports it.
-UNTITLED_LABEL = "Untitled"
+UNTITLED_LABEL = "Untitled asset"
 
 
 class Asset(TimestampMixin, Base):

@@ -1,0 +1,251 @@
+SG-058 raw verification log. Every block is executed output pasted verbatim; commands and
+working directory are stated with each. No plugin, no filter, no summarization.
+
+================================================================================
+[1] PRE-STATE / BASE (work dir /home/andrei/StorageGenie)
+================================================================================
+$ git fetch origin
+ok fetched (2 new refs)
+$ git rev-parse origin/automation        # BASE ref -> resolved commit
+412acc9952f4212cf2331bbe2774793730d39190
+$ git rev-parse HEAD
+412acc9952f4212cf2331bbe2774793730d39190
+$ git branch --show-current
+automation
+$ git status --porcelain
+(empty)
+
+Premises (quoted reads):
+backend/app/models/asset.py:11   -> UNTITLED_LABEL = "Untitled"
+frontend/src/types/product.ts:25 -> export const UNTITLED_ASSET_NAME = "Untitled asset";
+backend/app/services/candidates.py:528-596 -> _split_child_fields (see [2] before/after)
+frontend/src/api/types.ts:32     -> Asset.display_name: string | null
+backend/tests/test_sg049_v2_extraction.py:295 -> assert UNTITLED_LABEL == "Untitled"
+backend/tests/test_review_split.py:185 -> test_split_yields_per_item_children_with_shared_evidence_and_provenance
+backend/tests/test_ai_pipeline.py:305  -> test_split_children_keep_their_item_opened_date
+backend/tests/test_phase3_e2e.py:434   -> test_multi_item_split_full_coverage_and_partial_refused
+
+================================================================================
+[2] `Untitled` ENUMERATION (backend + frontend + target docstrings)
+================================================================================
+$ grep -rn "Untitled" --include=*.py --include=*.ts --include=*.tsx . | grep -v node_modules | grep -v .rules-cache
+backend/app/models/asset.py:11:UNTITLED_LABEL = "Untitled"
+backend/tests/test_sg049_v2_extraction.py:14:  asset labels as `Untitled` in BOTH AI catalog builders (F-SG048-2).
+backend/tests/test_sg049_v2_extraction.py:295:        assert UNTITLED_LABEL == "Untitled"
+frontend/src/components/AssetCard.test.tsx:16,22   "Untitled asset"
+frontend/src/components/shell/drawer.test.tsx:213,218 "Untitled asset"
+frontend/src/types/product.test.ts:90,93           "Untitled asset"
+frontend/src/types/product.ts:25:export const UNTITLED_ASSET_NAME = "Untitled asset";
+
+Diff vs packet expectation: NONE. Exactly the expected set: the constant (asset.py:11),
+the constant assertion (test_sg049:295), the one docstring line (test_sg049:14), and the
+fallback-behaviour assertions which read the constant (test_sg049:290,294). Frontend already
+says "Untitled asset" everywhere; NO frontend hunk.
+
+================================================================================
+[3] BASE-PROVEN PRE-EXISTING REDS (before any hunk, tree at 412acc9, clean)
+================================================================================
+$ cd backend && ../venv/bin/python -m pytest -q
+...
+FAILED tests/test_signals.py::test_generated_codes_are_validated_and_bad_checksum_is_not_an_identifier
+FAILED tests/test_signals.py::test_ocr_has_text_boxes_and_mean_confidence - a...
+2 failed, 235 passed, 19 warnings in 13.91s
+Command being timed: "../venv/bin/python -m pytest -q"
+Elapsed (wall clock) time (h:mm:ss or m:ss): 0:16.02
+Exit status: 1
+
+$ cd backend && ../venv/bin/python -m pytest -q tests/test_signals.py::test_generated_codes_are_validated_and_bad_checksum_is_not_an_identifier tests/test_signals.py::test_ocr_has_text_boxes_and_mean_confidence --tb=line
+============================= test session starts ==============================
+...
+E   assert False
+     +  where False = any(<generator object ...>)
+----------------------------- Captured log call -------------------------------
+WARNING  app.services.signals:signals.py:104 Barcode extraction unavailable: pyzbar/libzbar is not installed
+WARNING  app.services.signals:signals.py:210 OCR extraction unavailable: pytesseract is not installed
+/home/andrei/StorageGenie/backend/tests/test_signals.py:136: assert False
+E   assert []
+----------------------------- Captured log call -------------------------------
+WARNING  app.services.signals:signals.py:104 Barcode extraction unavailable: pyzbar/libzbar is not installed
+WARNING  app.services.signals:signals.py:210 OCR extraction unavailable: pytesseract is not installed
+/home/andrei/StorageGenie/backend/tests/test_signals.py:148: assert []
+FAILED tests/test_signals.py::test_generated_codes_are_validated_and_bad_checksum_is_not_an_identifier
+FAILED tests/test_signals.py::test_ocr_has_text_boxes_and_mean_confidence - a...
+2 failed in 0.52s
+# Cause: host venv lacks pyzbar/libzbar + tesseract OCR ABIs. Environmental, base-proven.
+
+================================================================================
+[4] G2 FAIL RUN — test hunks in place, SOURCE HUNK NOT YET APPLIED (RED)
+================================================================================
+$ cd backend && ../venv/bin/python -m pytest -q \
+    "tests/test_review_split.py::test_split_yields_per_item_children_with_shared_evidence_and_provenance" \
+    "tests/test_ai_pipeline.py::test_split_children_keep_their_item_opened_date" --tb=short
+exit=1 elapsed=1.342774787s
+FF                                                                       [100%]
+=================================== FAILURES ===================================
+___ test_split_yields_per_item_children_with_shared_evidence_and_provenance ____
+tests/test_review_split.py:269: in test_split_yields_per_item_children_with_shared_evidence_and_provenance
+    assert "quantity" not in second["fields"]  # null item value omitted, never inherited
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   AssertionError: assert 'quantity' not in {'asset_type': {'value': 'food', 'confidence': 0.9, 'source_type': 'extraction', 'provider': 'scripted', ...}, 'quanti...', ...}, 'status': {'value': 'ACTIVE', 'confidence': None, 'source_type': 'deterministic', 'provider': None, ...}, ...}
+_______________ test_split_children_keep_their_item_opened_date ________________
+tests/test_ai_pipeline.py:353: in test_split_children_keep_their_item_opened_date
+    assert "quantity" not in second, "a null item quantity adds no field (never inherited)"
+E   AssertionError: a null item quantity adds no field (never inherited)
+E   assert 'quantity' not in {'asset_type': {'value': 'food', 'confidence': 0.95, 'source_type': 'extraction', 'provider': 'scripted', ...}, 'statu...pted', ...}, 'unit': {'value': 'L', 'confidence': 0.95, 'source_type': 'extraction', 'provider': 'scripted', ...}, ...}
+=========================== short test summary info ============================
+FAILED tests/test_review_split.py::test_split_yields_per_item_children_with_shared_evidence_and_provenance
+FAILED tests/test_ai_pipeline.py::test_split_children_keep_their_item_opened_date
+2 failed, 1 warning in 0.88s
+# QUOTED INHERITANCE: the second child's fields dict literally shows the origin's
+# asset_type 'food' and unit 'L' (item 1 asked for 'cosmetics'/'cup').
+
+================================================================================
+[5] G2 PASS RUN — source hunk applied (GREEN) + raw value probe
+================================================================================
+$ cd backend && ../venv/bin/python -m pytest -q -v \
+    "tests/test_review_split.py::test_split_yields_per_item_children_with_shared_evidence_and_provenance" \
+    "tests/test_ai_pipeline.py::test_split_children_keep_their_item_opened_date" \
+    "tests/test_sg049_v2_extraction.py::test_nameless_labels_fall_back_in_both_ai_catalogs" \
+    "tests/test_sg049_v2_extraction.py::test_deterministic_asset_type_default_value_unchanged"
+exit=0 elapsed=1.467604125s
+collected 4 items
+tests/test_review_split.py .                                             [ 25%]
+tests/test_ai_pipeline.py .                                              [ 50%]
+tests/test_sg049_v2_extraction.py ..                                     [100%]
+========================= 4 passed, 1 warning in 1.01s =========================
+
+Raw probe (invokes _split_child_fields with origin quantity=2.0/unit=L/asset_type=food and
+item quantity=None/unit=cup/asset_type=cosmetics; /tmp/opencode/sg058_probe.py):
+$ cd backend && ../venv/bin/python /tmp/opencode/sg058_probe.py
+{
+  "status": {
+    "value": "ACTIVE",
+    "source_type": "deterministic"
+  },
+  "identifier": {
+    "value": "BARCODE-7",
+    "source_type": "deterministic"
+  },
+  "display_name": {
+    "value": "Yogurt",
+    "confidence": 0.8,
+    "source_type": "extraction",
+    "provider": "scripted",
+    "model": "scripted-model-1",
+    "prompt_template_version": "extract-food-v1",
+    "provider_call_id": "call-1"
+  },
+  "unit": {
+    "value": "cup",
+    "confidence": 0.8,
+    "source_type": "extraction",
+    "provider": "scripted",
+    "model": "scripted-model-1",
+    "prompt_template_version": "extract-food-v1",
+    "provider_call_id": "call-1"
+  },
+  "asset_type": {
+    "value": "cosmetics",
+    "confidence": 0.8,
+    "source_type": "extraction",
+    "provider": "scripted",
+    "model": "scripted-model-1",
+    "prompt_template_version": "extract-food-v1",
+    "provider_call_id": "call-1"
+  }
+}
+# `quantity` is ABSENT (null item value omitted); unit/asset_type carry the ITEM's
+# values + item confidence 0.8 + call provenance, not the origin's.
+
+================================================================================
+[6] FULL BACKEND SUITE AFTER ALL HUNKS + RUFF
+================================================================================
+$ cd backend && ../venv/bin/python -m pytest -q
+exit=1 elapsed=16.389426959s
+... (60,62) ...
+FAILED tests/test_signals.py::test_generated_codes_are_validated_and_bad_checksum_is_not_an_identifier
+FAILED tests/test_signals.py::test_ocr_has_text_boxes_and_mean_confidence - a...
+2 failed, 235 passed, 19 warnings in 14.28s
+# Identical set to [3]: only the 2 base-proven environmental reds. 235 passed == base 235.
+
+$ cd backend && ../venv/bin/python -m ruff check app tests
+exit=0 elapsed=0.071410834s
+All checks passed!
+
+================================================================================
+[7] FRONTEND SUITE + ESLINT + BUILD
+================================================================================
+$ cd frontend && npm test -- --run
+exit=0 elapsed=4.636020490s
+ Test Files  21 passed (21)
+      Tests  152 passed (152)
+   Duration  4.09s
+
+$ cd frontend && npm run lint
+exit=0 elapsed=1.512833949s
+> storagegenie-frontend@0.1.0 lint
+> eslint src
+(no diagnostics)
+
+$ cd frontend && npm run build
+exit=0 elapsed=4.242961449s
+> tsc && vite build
+vite v5.4.21 building for production...
+✓ 1960 modules transformed.
+dist/index.html                   0.94 kB │ gzip:  0.47 kB
+dist/assets/index-DxKo-z_g.css    2.65 kB │ gzip:  0.82 kB
+dist/assets/index-DgwxPRqe.js   293.57 kB │ gzip: 87.38 kB
+✓ built in 1.68s
+# NOTE: local build hash differs from the SERVED bundle because the local build omits the
+# Dockerfile's VITE_API_BASE=https://storagegenie.dynv6.net build arg (compose args line).
+# The deploy property is served-bundle pre vs post: see [9] -- unchanged.
+
+================================================================================
+[8] DEPLOY — rebuild + recreate (backend code changed, PG-PR-04)
+================================================================================
+$ BUILDX_CONFIG=/home/andrei/StorageGenie/.cache docker compose up --build -d backend
+deploy_exit=0 elapsed=11.725549434s
+...
+#18 [stage-1 6/9] COPY backend/ ./  DONE 1.6s
+#22 exporting manifest list sha256:8f83243374ae7395018b60e47f349bcfa75d8e05546a19261fbccf4ea7de9afd done
+ Image storagegenie-backend Built
+ Container storagegenie-backend-1 Recreate
+ Container storagegenie-backend-1 Recreated
+ Container storagegenie-backend-1 Starting
+ Container storagegenie-backend-1 Started
+
+================================================================================
+[9] DEPLOY TARGETED CHECKS (raw)
+================================================================================
+$ curl -s http://127.0.0.1:8003/ | grep -oE 'assets/index-[A-Za-z0-9_-]+\.js'   # PRE
+assets/index-nugWvqun.js
+$ curl -s http://127.0.0.1:8003/assets/index-nugWvqun.js | sha256sum           # PRE
+e5c99c023da00bad3f8a7379cec290f406f4bc8e0deae3b2f4e74b2f18997f22  -
+
+$ docker inspect storagegenie-backend-1 --format 'Id={{.Id}} Image={{.Image}} StartedAt={{.State.StartedAt}} RestartCount={{.RestartCount}} Health={{.State.Health.Status}}'
+Id=694f56de8d88c7e81a733f2e8a08bdb4eeb1059c8aab9c4186a7c8e88dd77b41 Image=sha256:8f83243374ae7395018b60e47f349bcfa75d8e05546a19261fbccf4ea7de9afd StartedAt=2026-09-17T14:07:37.510458814Z RestartCount=0 Health=healthy
+# PRE container was 9194c50e... / image sha256:d2f19cf5...; recreated to a new Id + new image.
+
+$ curl -s http://127.0.0.1:8003/v1/health
+{"status":"ok","db":"ok","storage":"ok"}
+
+$ docker port storagegenie-backend-1
+8000/tcp -> 127.0.0.1:8003          # loopback only; no 0.0.0.0, no 5173
+
+$ curl -s http://127.0.0.1:8003/ | grep -oE 'assets/index-[A-Za-z0-9_-]+\.js'   # POST
+assets/index-nugWvqun.js
+$ curl -s http://127.0.0.1:8003/assets/index-nugWvqun.js | sha256sum           # POST
+e5c99c023da00bad3f8a7379cec290f406f4bc8e0deae3b2f4e74b2f18997f22  -
+$ curl -s http://127.0.0.1:8003/assets/index-nugWvqun.js | grep -c "Untitled asset"
+1
+# SERVED BUNDLE UNCHANGED (same name + same sha256); bundle carries "Untitled asset".
+
+$ docker compose up -d backend          # idempotent re-up
+ Container storagegenie-backend-1 Running
+$ docker inspect storagegenie-backend-1 --format 'Id={{.Id}} StartedAt={{.State.StartedAt}} RestartCount={{.RestartCount}} Health={{.State.Health.Status}}'
+Id=694f56de8d88c7e81a733f2e8a08bdb4eeb1059c8aab9c4186a7c8e88dd77b41 StartedAt=2026-09-17T14:07:37.510458814Z RestartCount=0 Health=healthy
+# Same Id, same StartedAt, RestartCount=0 -> idempotent.
+
+Prod DB: no import route, no evidence upload, no write route was called this slice; only
+GET /v1/health (reads db) and GET / (static). No migration; no `alembic upgrade`; no
+`python -m app.seed`. No `{{RECEIPT_CMD}}`; no push to storagegenie-evidence.

@@ -11,7 +11,7 @@ the committed corpus only (no key, no network, no metered call — G0 found
   (`PG-EV-04`, shape-of-unsent).
 - G3: extraction-sourced new fields are ALWAYS `review_state="proposed"`
   (M11/F4 Stage 0), the committed asset carries the values, and a nameless
-  asset labels as `Untitled` in BOTH AI catalog builders (F-SG048-2).
+  asset labels as `Untitled asset` in BOTH AI catalog builders (F-SG048-2).
 - G4: v2 ground truth is scored from authored v2 fixtures, never from the
   frozen SG-029 v1 cache; the scorer discriminates.
 """
@@ -292,7 +292,7 @@ def test_nameless_labels_fall_back_in_both_ai_catalogs(tmp_path: Path) -> None:
         chat = build_chat_catalog(session, household_id, "food")
         chat_entry = next(item for item in chat if item["id"] == asset.id)
         assert chat_entry["label"] == UNTITLED_LABEL
-        assert UNTITLED_LABEL == "Untitled"
+        assert UNTITLED_LABEL == "Untitled asset"
     finally:
         session.close()
 

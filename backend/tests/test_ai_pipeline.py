@@ -303,12 +303,28 @@ def test_opened_date_none_writes_no_field_and_no_assertion(ai_env, monkeypatch: 
 
 
 def test_split_children_keep_their_item_opened_date(ai_env, monkeypatch: pytest.MonkeyPatch) -> None:  # type: ignore[no-untyped-def]
-    """SG-040 G1/G3: the split path replaces opened_date per item, like expiry/lot."""
+    """SG-040 G1/G3 + SG-058 G2: the split replaces per-item fields, never shares the origin's.
+
+    opened_date/expiry_date/lot are item-derived (SG-040); SG-058 extends the same
+    rule to quantity/unit/asset_type, with a null item value omitted (never inherited).
+    """
     session, household_id, evidence_id = ai_env
     payload = _payload(
         [
-            _valid_item(name="Milk", opened_date="2031-04-10"),
-            _valid_item(name="Yogurt", opened_date=None),
+            _valid_item(
+                name="Milk",
+                opened_date="2031-04-10",
+                quantity=2.0,
+                unit="L",
+                asset_type="food",
+            ),
+            _valid_item(
+                name="Yogurt",
+                opened_date=None,
+                quantity=None,
+                unit="cup",
+                asset_type="cosmetics",
+            ),
         ]
     )
     _enable(monkeypatch, payload)
@@ -329,6 +345,14 @@ def test_split_children_keep_their_item_opened_date(ai_env, monkeypatch: pytest.
     assert first["opened_date"]["source_type"] == "extraction"
     assert "opened_date" not in second, "an item with no opened date adds no field"
     assert second["expiry_date"]["value"] == "2030-01-15"
+    # SG-058 G2: per-item quantity/unit/asset_type, null omitted, never the origin's.
+    assert first["quantity"]["value"] == 2.0
+    assert first["quantity"]["source_type"] == "extraction"
+    assert first["unit"]["value"] == "L"
+    assert first["asset_type"]["value"] == "food"
+    assert "quantity" not in second, "a null item quantity adds no field (never inherited)"
+    assert second["unit"]["value"] == "cup"
+    assert second["asset_type"]["value"] == "cosmetics"
 
 
 def test_needs_evidence_opens_manual_entry_and_keeps_unknowns(ai_env, monkeypatch: pytest.MonkeyPatch) -> None:  # type: ignore[no-untyped-def]
