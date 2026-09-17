@@ -156,7 +156,7 @@ def test_all_four_fake_shapes_green() -> None:
     assert recovered.normalized_output["text"] == "fake-text"
 
     needs = FakeProvider(mode="needs_evidence", provider_id="fake-needs")
-    needs_result = needs.extract_items("img-1")
+    needs_result = needs.extract_items(b"img-1", "prompt")
     assert needs_result.normalized_output["needs_evidence"] is True
 
     outage = FakeProvider(mode="outage_retryable", provider_id="fake-outage")

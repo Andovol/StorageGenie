@@ -26,8 +26,14 @@ class ProviderResult:
 
 
 class VisionExtractionProvider(Protocol):
-    def extract_items(self, image_ref: str) -> ProviderResult:
-        """Extract structured catalog items from an image reference."""
+    def extract_items(
+        self,
+        image_bytes: bytes,
+        prompt: str,
+        *,
+        estimated_cost: float = 0.0,
+    ) -> ProviderResult:
+        """Extract structured catalog items from the image bytes and prompt."""
         ...
 
 

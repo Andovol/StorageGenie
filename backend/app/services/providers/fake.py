@@ -49,12 +49,18 @@ class FakeProvider:
             latency_ms=1.5,
         )
 
-    def extract_items(self, image_ref: str) -> ProviderResult:
+    def extract_items(
+        self,
+        image_bytes: bytes,
+        prompt: str,
+        *,
+        estimated_cost: float = 0.0,
+    ) -> ProviderResult:
         if self.mode == "needs_evidence":
             return self._behave(operation="extract_items", normalized={"needs_evidence": True, "items": []})
         return self._behave(
             operation="extract_items",
-            normalized={"needs_evidence": False, "items": [{"name": "fake-item", "source": image_ref}]},
+            normalized={"needs_evidence": False, "items": [{"name": "fake-item", "source": image_bytes}]},
         )
 
     def extract_text(

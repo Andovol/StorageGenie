@@ -155,7 +155,7 @@ def test_repair_retried_exactly_once_then_step_fails() -> None:
     fake = FakeProvider(mode="invalid_json_once", provider_id="fake-flaky")
 
     def supply() -> object:
-        result = fake.extract_items("img-1")
+        result = fake.extract_items(b"img-1", "prompt")
         norm = result.normalized_output
         assert isinstance(norm, dict)
         items = norm.get("items", [])

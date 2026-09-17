@@ -1,0 +1,47 @@
+SG-056 worklog — FakeProvider signature drift: conform to the (image_bytes, prompt) surface
+Work dir /home/andrei/StorageGenie  Host 87.106.66.242:2222  Coder opencode  Effort medium (argv `opencode run --auto --dir /home/andrei/StorageGenie --variant medium # SG-056 …`)  Model unknown (no model id on argv; CLI default per policy, not read from any identity line)
+BASE REF requested origin/automation; resolved commit 8f9847f4d5baa80a60c9a2c6a48dbad22e8b8f9c (`SG-056 packet (FakeProvider signature drift, defect, D78 chain)`).
+Contract 0.27.0 (recorded == published payload == SG-049 run-2 receipt echo; packet states it).  No `.rules-cache/` exists on this host (F-SG056-3).
+Slice wall-clock start 2026-09-17T12:23:55Z (coder process start); worklogs frozen 2026-09-17T12:3xZ.  Budget 120s ordinary · 600s suite+lint+build · 900s host build/up · 1500s early-close · 2400s overall.
+Spend (real $): $0.000000 actual vs $0 bound. Zero provider calls; fake only.
+DATABASE: none. Smoke is a bare `router.execute` with no Session (zero rows); tests use scratch temp SQLite; production SQLite untouched.
+
+[recon] Tree clean at BASE; HEAD == origin/automation == 8f9847f (no STOP). Premises re-read live (quoted in report §2):
+  router.py:52-72 execute(*args, estimated_cost=…, **kwargs) -> getattr(provider, op)(*args, **kwargs);
+  reader.py:308-310 router.execute("extract_items", image_bytes, call_prompt, estimated_cost=estimated_cost);
+  fake.py:52  FakeProvider.extract_items(image_ref) — STALE; fake.py:104-110 ScriptedProvider(image_bytes,prompt,*,estimated_cost) — matches;
+  opencode_go.py:235-241 OpenCodeGoProvider(image_bytes,prompt,*,estimated_cost) — matches; protocols.py:29 VisionExtractionProvider(image_ref) — STALE;
+  test doubles test_ai_pipeline.py:569/680/742, test_phase2_e2e.py:202, test_planning.py:60, test_phase3_e2e.py:278 all 3-arg.
+[enumerate] every `extract_items` def + call site (report §3): production defs 4 (protocols:29 + fake:52 STALE×2; fake:104 + opencode_go:235 conformant), planning/service.py:4 docstring-only;
+  direct call sites old-shape exactly 2 (test_extraction_contract.py:158, test_provider_gateway.py:159) + new-shape test_opencode_go.py:130. Diff vs packet expectation: only extras are the `PLANNING_OPERATION` string (planning/service.py:51) and test_opencode_go.py:130; no missing items.
+[G1] fake.py:52 -> (image_bytes, prompt, *, estimated_cost=0.0); payload semantics unchanged (`source` keys off the bytes handed, still schema-invalid by SG-028 design). protocols.py:29 -> same surface. reader.py/router.py/opencode_go.py: NO hunk (each verified conformant). Two call-site hunks (arg-only; every assertion kept).
+[G2] NEW backend/tests/test_provider_conformance.py: protocol + FakeProvider (all four modes THROUGH router.execute) + FakeProvider signature + ScriptedProvider direct + OpenCodeGoProvider signature-only (inspect, no instance/key/network/call) + planning/service excluded by assertion.
+  FAIL-then-PASS: pre-hunk 6 failed / 3 passed (TypeError quoted, verify.log V1); post-hunk 9 passed (V2). BOTH raw committed (V1 in commit of test, V2 in final commit).
+[G3] backend suite post-hunk 2 failed / 235 passed (15.15s). The 2 reds are BASE-proven pre-existing (verify.log V4): test_signals barcode/OCR fail identically at BASE worktree 8f9847f (`2 failed, 5 passed`); mypy `41 errors in 9 files` at BASE too, none in a changed file. ruff 0; frontend 152/152, eslint 0, tsc+vite build 0. Secret scan 0; deps unchanged; no migration; no ignored file staged.
+[G4] rebuilt backend (image fe509cf05199 -> d2f19cf51018), `up -d` recreated container 342513af7fcc -> 54d97025e74d, health exact {"status":"ok","db":"ok","storage":"ok"}, 8003 loopback-only, idempotent re-up same container RestartCount=0.
+  Smoke on the DEPLOYED container (no Session): `router.execute("extract_items", b"smoke", "smoke", estimated_cost=0.0)` with fake selected -> ProviderResult normalized_output={'needs_evidence': False, 'items': [{'name':'fake-item','source': b'smoke'}]}; downstream `parse_extraction_output` -> ValidationError (designed SG-028 rejection). NEVER TypeError. Full sweep WAIVED per PG-DP-02.
+[G5] this file + SG-056_report.md + SG-056_verify.log.
+
+Budgets (actual vs cap): conformance red 0.29s + green 0.25s vs 600s; backend suite 15.15s vs 600s; ruff 0s + mypy 2s vs 600s; frontend test 6s + lint 2s + build 4s vs 600s; BASE-proof ~3s; docker build 13s + up 2s + re-up 1s vs 900s; overall ~ (frozen at commit) vs 2400s (early-close 1500s). No command killed. $0.000000 metered.
+
+Findings:
+  F-SG056-1  `router.execute` is NOT a pure `*args` passthrough. `estimated_cost` is a KEYWORD-ONLY parameter of
+             `execute` (router.py:52) consumed by the pre-call budget check; it is NOT forwarded to the provider
+             (`router.py:67` passes only `*args, **kwargs`). Consequence: through the reader the provider sees only
+             `(image_bytes, prompt)`, so OpenCodeGoProvider's own per-job/monthly cap (opencode_go.py:242-253)
+             always compares 0.0 — the router's `cost_budget` is the only binding cap. Packet's "pure passthrough"
+             is imprecise; router untouched (out of ceiling); the fix is unaffected. Latent, worth the Architect's
+             awareness.
+  F-SG056-2  Pre-existing reds/mypy at BASE (verify.log V4): test_signals barcode+OCR (2) and mypy 41 errors in 9
+             files, none in a changed file. Not ours; destinations unchanged.
+  F-SG056-3  No `.rules-cache/` and no `CODER.md`/`VERSION`/`RULES.sha256` under /opt/storagegenie-dispatch on this
+             host (only the two dispatch scripts). The AGENTS.md G-L1 session-start ritual cannot run as written
+             here; the packet's contract-0.27.0 statement is the only version source available. Reported, not routed.
+  F-SG056-4  PG-SC-09 world (report §8): the rail enumerates today's providers; a NEW provider file added later,
+             or a 4th caller passing a different shape, would not be caught until added to the rail. Mitigated now
+             by the deployed-container smoke (container/image digest changed, so no stale pre-deploy code answered).
+
+UNCLEAR (full text in report): FIRST READ — router.execute treated as "pure *args passthrough" vs the keyword-only
+`estimated_cost` it actually consumes (F-SG056-1). DURING EXECUTION — none blocking; buildx cache relocated to the
+writable XDG_RUNTIME_DIR (same rootless daemon) exactly as SG-054 F-SG054-3. REMAINING — whether the router should
+forward `estimated_cost` to the provider so the adapter's own cap is reachable.
