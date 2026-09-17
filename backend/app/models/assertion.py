@@ -1,8 +1,13 @@
+from typing import TYPE_CHECKING
+
 from sqlalchemy import ForeignKey, String, Text
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db import Base
 from app.models.base import TimestampMixin, new_id
+
+if TYPE_CHECKING:
+    from app.models.asset import Asset
 
 
 class Assertion(TimestampMixin, Base):
@@ -19,3 +24,5 @@ class Assertion(TimestampMixin, Base):
     review_state: Mapped[str] = mapped_column(String(50), nullable=False, default="accepted")
     source_evidence_ids: Mapped[str | None] = mapped_column(Text, nullable=True)
     model_json: Mapped[str | None] = mapped_column(Text, nullable=True)
+
+    asset: Mapped["Asset"] = relationship("Asset", back_populates="assertions")
