@@ -1,0 +1,58 @@
+SG-057 — provision proof: backend-routed metered import E2E, one image
+
+Role: Coder (never Architect). No dispatch verb run; no self-dispatch/self-poll.
+L3 stage D80 (consistency batch) slice 1 of 4. Contract 0.27.0 (packet states
+recorded == published payload == SG-056 receipt echo).
+Coder: opencode · effort: medium (read from process argv `--variant medium`).
+Model: unknown — argv is `opencode run --auto --dir /home/andrei/StorageGenie
+--variant medium <prompt>` with NO model id (policy: CLI default IS model); no
+provider metadata exposing the coding model was observable (the served
+`model_id=deepseek-v4-flash-vision-exp` is the vision adapter's model, not the
+Coder's). Reported `unknown`, not guessed.
+Slice window: process start 2026-09-17T13:58:26Z; verdict captured ~14:00Z.
+
+LOCAL ENV FINDING (not a stop): the packet + AGENTS `{{HEALTH_CMD}}` name
+`http://localhost:8000/v1/health`, but the deployed backend publishes on
+`127.0.0.1:8003:8000` (docker-compose.yml:8). Port 8000 serves a non-backend
+app ("Not Found"). I probed and used **`http://localhost:8003`**, the real
+deployed endpoint. Two-field: ref requested = the 8000 probe; resolved = 8003.
+
+LEGS (actual vs budget)
+- G1 pre-state (read-only; no provider call): ~52 s wall (13:58:26→13:59:18).
+  Ordinary-command budget 120 s each; every command returned in <30 s. Under.
+- G2 import: 13:59:18→13:59:25, 6.9 s wall total.
+  · POST /v1/evidence     0.038 s
+  · POST /v1/imports      0.014 s
+  · POST run (metered leg) 4.501 s  (budget 900 s) — under
+- G3 report/verify/note: measured from 13:59:25Z; well under 1200 s early-close
+  and 1800 s overall. Overall slice elapsed ~100 s at verdict.
+
+SPEND (REAL metered $, F2 uncapped-but-ledgered)
+- This slice actual: **$0.00053505** (1 provider call; 1611 tokens).
+- Worst-case bound computed in-slice from the deployed estimator:
+  redacted 10581 B + prompt 2710 B → per-call ceiling **$0.0037227**;
+  with the one allowed repair, 2 calls = **$0.0074454**. Actual ≪ bound.
+- Cumulative household ledger (via job join): $0.00053505.
+- Caps: per_job_cap=null, monthly_cap=null → no pre-call refusal possible;
+  nothing was refused and nothing was routed around.
+
+VERDICT: GO. job=01a0afaa-235a-7fe3-8422-1be2b555c921 state=AWAITING_REVIEW;
+candidate=01a0afaa-3ff4-7da0-987a-87f29c73ee5b state=proposed with extraction
+provenance; provider_call=01a0afaa-3fed-7d43-8adc-5e2976e4544b cost=0.00053505;
+evidence=01a0afaa-145d-7f21-b647-703aaa693f5a sha=6c4cbf2e…; asset +0
+(Toothpaste unchanged); no decision-endpoint call (server-log grep `decision`=0).
+
+Delta note (reported, not hidden): beyond the literal G2 table, a single import
+also inherently writes job_step +8, observation +2, audit_event +4,
+idempotency_key +2 (fresh keys required by the packet). No asset / source_
+attribution / review_task / planning_suggestion / guardrail_event was created.
+Judged inherent machinery of the commanded job, not "anything else created";
+stated loudly for the Architect. See report "Delta interpretation".
+
+UNCLEAR — FIRST READ: whether "all other tables equal" in G2 was meant to
+forbid the job's own job_step/observation/audit/idempotency rows (impossible)
+or only un-commanded domain mutation. Read as the latter.
+UNCLEAR — DURING EXECUTION: why the packet's health probe says :8000 while the
+composition publishes :8003; resolved in-slice by probing, but the doc is stale.
+UNCLEAR — REMAINING: my coding model id is not observable from process args or
+provider metadata, so model=unknown rather than a plausible guess.

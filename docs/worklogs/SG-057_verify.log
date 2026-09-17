@@ -1,0 +1,179 @@
+SG-057 verify log — raw command output (live-clock timestamps UTC)
+captured_at=2026-09-17T14:00:15Z
+
+########## G1 PRE-STATE (read-only, FIRST) ##########
+--- git status --porcelain (empty=clean) ---
+?? docs/worklogs/SG-057_verify.log
+--- branch ---
+automation
+--- HEAD ---
+9db7f23b03902a6c5d7605fb92d0e89aa7230fb1
+--- origin/automation ---
+9db7f23b03902a6c5d7605fb92d0e89aa7230fb1
+--- health 8000 (packet default probe target) ---
+Not Found  <-- Not Found: backend is published on 8003 per docker-compose.yml
+--- health 8003 (deployed) ---
+{"status":"ok","db":"ok","storage":"ok"}
+--- GET /v1/settings/ai 8003 ---
+{"provider_id":"opencode-go","model_id":"deepseek-v4-flash-vision-exp","allowed_model_ids":["deepseek-v4-flash-vision-exp"],"consent":true,"per_job_cap":null,"monthly_cap":null,"prompt_category":"food"}
+--- docker ps ---
+storagegenie-backend-1 Up 25 minutes (healthy) 127.0.0.1:8003->8000/tcp
+--- ledger rows PRE (id) ---
+01a0af39-8d7e-7670-b30e-e456d6ec5cd9
+01a0af39-9a47-7613-b657-907808cdb9b0
+01a0af3a-5180-7a00-b165-e688d446e8ad
+01a0af3a-5c3d-76a3-94ba-74b356dac7fc
+01a0af3a-80cb-7bd0-9dab-3fc6bdc2856f
+01a0afaa-3fed-7d43-8adc-5e2976e4544b
+--- Toothpaste name PRE ---
+Toothpaste
+--- all-table counts PRE ---
+alembic_version=1
+assertion=3
+asset=1
+asset_evidence=1
+audit_event=6
+candidate=0
+evidence=1
+guardrail_event=0
+household=1
+idempotency_key=2
+job=1
+job_step=8
+observation=2
+planning_suggestion=0
+provider_call=5
+review_task=0
+source_attribution=0
+user=2
+
+########## G2 BOUND (estimator, deployed container) ##########
+orig_bytes 9709
+redacted_bytes 10581
+prompt_version extract-food-v2
+prompt_bytes 2710
+estimate_usd_per_call 0.0037227
+worst_case_1_call_usd=0.0037227  worst_case_2_calls_1_repair_usd=0.0074454
+
+########## G2 CALLS — RAW HTTP ##########
+--- picked image: backend/eval/corpus/sg029/images/sg029_01_clean_food.png (9709 B, smallest FOOD) ---
+6c4cbf2e7c3bc3ccdcbc63873fad85f87bacd8ceec533a5e3de2f478ab1f8279  backend/eval/corpus/sg029/images/sg029_01_clean_food.png
+evidence_idempotency_key=sg057-ev-f59ed209-675d-47b9-b7ee-627be1921595
+import_idempotency_key=sg057-imp-03c0dab8-37d7-452c-b6ba-54f6f6f29723
+--- POST /v1/evidence status/time ---
+HTTP_STATUS=201 (see earlier run) TIME=0.038272
+--- POST /v1/evidence body (raw) ---
+{"id":"01a0afaa-145d-7f21-b647-703aaa693f5a","sha256":"6c4cbf2e7c3bc3ccdcbc63873fad85f87bacd8ceec533a5e3de2f478ab1f8279","storage_key":"01a0a029-1477-7ca0-b200-bce78a96c679/6c/6c4cbf2e7c3bc3ccdcbc63873fad85f87bacd8ceec533a5e3de2f478ab1f8279.png","media_type":"image/png","size_bytes":9709,"original_filename":"sg029_01_clean_food.png"}
+--- POST /v1/imports status ---
+HTTP_STATUS=201 TIME=0.013864
+--- POST /v1/imports body (raw) ---
+{"id":"01a0afaa-235a-7fe3-8422-1be2b555c921","job_type":"import","state":"CREATED","household_id":"01a0a029-1477-7ca0-b200-bce78a96c679","created_at":"2026-09-17T13:59:18","updated_at":"2026-09-17T13:59:18","steps":[{"id":"01a0afaa-235c-76d1-bc24-a7717cf1d1dd","step_name":"VALIDATING_INPUT","state":"PENDING","attempts":0,"input":{"evidence_ids":["01a0afaa-145d-7f21-b647-703aaa693f5a"]},"output":null,"error":null},{"id":"01a0afaa-235c-76d1-bc24-a789bf7f991c","step_name":"NORMALIZING","state":"PENDING","attempts":0,"input":{"evidence_ids":["01a0afaa-145d-7f21-b647-703aaa693f5a"]},"output":null,"error":null},{"id":"01a0afaa-235c-76d1-bc24-a797ee541a07","step_name":"EXTRACTING_DETERMINISTIC_SIGNALS","state":"PENDING","attempts":0,"input":{"evidence_ids":["01a0afaa-145d-7f21-b647-703aaa693f5a"]},"output":null,"error":null},{"id":"01a0afaa-235c-76d1-bc24-a7a2ab9d8d7d","step_name":"ANALYZING_WITH_AI","state":"PENDING","attempts":0,"input":{"evidence_ids":["01a0afaa-145d-7f21-b647-703aaa693f5a"]},"output":null,"error":null},{"id":"01a0afaa-235c-76d1-bc24-a7b03090f819","step_name":"BUILDING_CANDIDATES","state":"PENDING","attempts":0,"input":{"evidence_ids":["01a0afaa-145d-7f21-b647-703aaa693f5a"]},"output":null,"error":null},{"id":"01a0afaa-235c-76d1-bc24-a7cf5164a097","step_name":"DEDUPLICATING","state":"PENDING","attempts":0,"input":{"evidence_ids":["01a0afaa-145d-7f21-b647-703aaa693f5a"]},"output":null,"error":null},{"id":"01a0afaa-235c-76d1-bc24-a7da0baef628","step_name":"AWAITING_REVIEW","state":"PENDING","attempts":0,"input":{"evidence_ids":["01a0afaa-145d-7f21-b647-703aaa693f5a"]},"output":null,"error":null},{"id":"01a0afaa-235c-76d1-bc24-a7ed565b0572","step_name":"COMMITTING","state":"PENDING","attempts":0,"input":{"evidence_ids":["01a0afaa-145d-7f21-b647-703aaa693f5a"]},"output":null,"error":null}],"progress":{"completed":0,"total":8,"failed":0,"pending":8},"errors":[]}
+--- POST /v1/imports/{id}/run status ---
+HTTP_STATUS=200 TIME=4.501415 (bound 900s)
+--- POST /v1/imports/{id}/run body (raw) ---
+{"id":"01a0afaa-235a-7fe3-8422-1be2b555c921","job_type":"import","state":"AWAITING_REVIEW","household_id":"01a0a029-1477-7ca0-b200-bce78a96c679","created_at":"2026-09-17T13:59:18","updated_at":"2026-09-17T13:59:25.439399+00:00","steps":[{"id":"01a0afaa-235c-76d1-bc24-a7717cf1d1dd","step_name":"VALIDATING_INPUT","state":"COMPLETED","attempts":1,"input":{"evidence_ids":["01a0afaa-145d-7f21-b647-703aaa693f5a"]},"output":{"status":"ok","step":"VALIDATING_INPUT","completed_at":"2026-09-17T13:59:20.948768+00:00"},"error":null},{"id":"01a0afaa-235c-76d1-bc24-a789bf7f991c","step_name":"NORMALIZING","state":"COMPLETED","attempts":1,"input":{"evidence_ids":["01a0afaa-145d-7f21-b647-703aaa693f5a"]},"output":{"status":"not_implemented","step":"NORMALIZING","completed_at":"2026-09-17T13:59:20.950416+00:00"},"error":null},{"id":"01a0afaa-235c-76d1-bc24-a797ee541a07","step_name":"EXTRACTING_DETERMINISTIC_SIGNALS","state":"COMPLETED","attempts":1,"input":{"evidence_ids":["01a0afaa-145d-7f21-b647-703aaa693f5a"]},"output":{"status":"ok","step":"EXTRACTING_DETERMINISTIC_SIGNALS","observation_ids":["01a0afaa-2f4f-7970-afd9-13e9759f3ebf","01a0afaa-2f4f-7970-afd9-13f76627a1a0"],"counts":{"ocr":1,"phash":1},"completed_at":"2026-09-17T13:59:21.168518+00:00"},"error":null},{"id":"01a0afaa-235c-76d1-bc24-a7a2ab9d8d7d","step_name":"ANALYZING_WITH_AI","state":"COMPLETED","attempts":1,"input":{"evidence_ids":["01a0afaa-145d-7f21-b647-703aaa693f5a"]},"output":{"status":"ok","step":"ANALYZING_WITH_AI","provider":"opencode-go","model":"deepseek-v4-flash-vision-exp","prompt_template_version":"extract-food-v2","provider_call_ids":["01a0afaa-3fed-7d43-8adc-5e2976e4544b"],"extraction":{"items":[{"name":"MILK","expiry_date":"2031-03-15","opened_date":null,"date_type":"best_before","lot":null,"quantity":1.0,"unit":"L","asset_type":"dairy","confidence":0.95,"uncertainty_reasons":["asset_type derived from the product name rather than an explicitly printed kind"]}],"unknowns":[],"needs_evidence":false},"completed_at":"2026-09-17T13:59:25.422532+00:00"},"error":null},{"id":"01a0afaa-235c-76d1-bc24-a7b03090f819","step_name":"BUILDING_CANDIDATES","state":"COMPLETED","attempts":1,"input":{"evidence_ids":["01a0afaa-145d-7f21-b647-703aaa693f5a"]},"output":{"status":"ok","step":"BUILDING_CANDIDATES","candidate_id":"01a0afaa-3ff4-7da0-987a-87f29c73ee5b","item_count":1,"review_task_ids":[],"completed_at":"2026-09-17T13:59:25.429383+00:00"},"error":null},{"id":"01a0afaa-235c-76d1-bc24-a7cf5164a097","step_name":"DEDUPLICATING","state":"COMPLETED","attempts":1,"input":{"evidence_ids":["01a0afaa-145d-7f21-b647-703aaa693f5a"]},"output":{"status":"ok","step":"DEDUPLICATING","candidate_id":"01a0afaa-3ff4-7da0-987a-87f29c73ee5b","kind":"new_asset","asset_id":null,"review_task_ids":[],"dedup_matches":[],"reused":true,"completed_at":"2026-09-17T13:59:25.437149+00:00"},"error":null},{"id":"01a0afaa-235c-76d1-bc24-a7da0baef628","step_name":"AWAITING_REVIEW","state":"AWAITING_REVIEW","attempts":1,"input":{"evidence_ids":["01a0afaa-145d-7f21-b647-703aaa693f5a"]},"output":{"status":"awaiting_review","step":"AWAITING_REVIEW","completed_at":"2026-09-17T13:59:25.438877+00:00"},"error":null},{"id":"01a0afaa-235c-76d1-bc24-a7ed565b0572","step_name":"COMMITTING","state":"PENDING","attempts":0,"input":{"evidence_ids":["01a0afaa-145d-7f21-b647-703aaa693f5a"]},"output":null,"error":null}],"progress":{"completed":6,"total":8,"failed":0,"pending":1},"errors":[]}
+
+########## SERVER LOG (since 13:59:00Z) ##########
+INFO:     127.0.0.1:35148 - "GET /v1/health HTTP/1.1" 200 OK
+INFO:     172.18.0.1:45448 - "POST /v1/evidence?household_id=01a0a029-1477-7ca0-b200-bce78a96c679 HTTP/1.1" 201 Created
+INFO:     127.0.0.1:52118 - "GET /v1/health HTTP/1.1" 200 OK
+INFO:     172.18.0.1:45450 - "POST /v1/imports?household_id=01a0a029-1477-7ca0-b200-bce78a96c679 HTTP/1.1" 201 Created
+INFO:     172.18.0.1:45462 - "POST /v1/imports/01a0afaa-235a-7fe3-8422-1be2b555c921/run?household_id=01a0a029-1477-7ca0-b200-bce78a96c679 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58862 - "GET /v1/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37124 - "GET /v1/health HTTP/1.1" 200 OK
+--- grep -c decision in server log ---
+0
+--- grep -nE 'Bearer|sk-[A-Za-z0-9]' in server log ---
+0 hits
+
+########## G2 POST-STATE ##########
+--- provider_call NEW row ---
+                     id = 01a0afaa-3fed-7d43-8adc-5e2976e4544b
+               provider = opencode-go
+                  model = deepseek-v4-flash-vision-exp
+prompt_template_version = extract-food-v2
+           input_hashes = {"image_sha256": "25a97165dd44f63bcbd579ba1a4cefdcf9e95ac8712c647cf8435e557658feaa"}
+         output_payload = {"id": "39f5805f-0a0f-4767-bbf4-ebe8a2bd689c", "object": "chat.completion", "created": 1789653561, "model": "deepseek-v4-flash-vision-exp", "choices": [{"index": 0, "finish_reason": "stop", "logprobs": null, "message": {"role": "assistant", "content": "{\"items\": [{\"name\": \"MILK\", \"expiry_date\": \"2031-03-15\", \"date_type\": \"best_before\", \"quantity\": \"1\", \"unit\": \"L\", \"asset_type\": \"dairy\", \"confidence\": 0.95, \"uncertainty_reasons\": [\"asset_type derived from the product name rather than an explicitly printed kind\"]}], \"unknowns\": [], \"needs_evidence\": false}", "reasoning_content": "The label shows MILK, BEST BEFORE 2031-03-15, LOT L4471, 1 L.\n\nItem: name \"MILK\", expiry_date \"2031-03-15\", date_type \"best_before\", quantity \"1\", unit \"L\", asset_type \"dairy\" (printed kind unclear — the kind isn't clearly printed; milk is a beverage/dairy. Rule 7 says printed product kind as short open-vocabulary slug, null when unclear. I'd say \"dairy\" is reasonable, or null. Hmm, open-vocabulary. I'll use \"dairy\" with confidence... Actually to be safe, \"dairy\" is fine.\n\nunknowns: empty (nothing unrecoverable). needs_evidence: false since date is known.\n\nConfidence: 0.95 maybe with uncertainty reasons? If below 1.0 must list reasons. Set 0.97 and list reasons? Let's just give 0.98 with reason \"tiny print\"? Better to avoid listing reasons if not needed. But honestly there's no issue. I'll use 1.0? Hmm, 1.0 requires no reasons. The image is clear. I'll use 0.98 with uncertainty_reasons [\"none — clear label\"]? That seems odd. Let me just set confidence 1.0 and empty uncertainty_reasons. Actually the asset_type \"dairy\" is inferred somewhat. Set asset_type null? The printed kind... \"MILK\" is the name; kind isn't printed. Rule 7: null when the kind is unclear. Milk's kind is arguably clear. I'll set \"dairy\" and confidence 0.95 with reason \"asset_type inferred from product name\".\n\nHmm, but \"never infer beyond visible evidence\". The type is derived from name \"MILK\" which is visible. I'd set asset_type \"dairy\" with note. Simpler: asset_type null and unknowns entry items.0.asset_type? Rule 9 says unknowns only for unrecoverable fields; asset_type null with unknowns entry is allowed (\"Null when the kind is unclear\"). But downstream mapping. I think giving \"dairy\" is reasonable, lower confidence.\n\nI'll output confidence 0.95, uncertainty_reasons [\"asset_type inferred from product name, not printed explicitly\"], unknowns [], needs_evidence false.\n\nQuantity \"1\" and unit \"L\" — as printed \"1 L\". quantity: \"1\", unit: \"L\".\n\ndate_type: printed words \"BEST BEFORE\" legible → \"best_before\".\n\nLOT L4471 — not in schema, ignore.\n\nJSON only."}}], "usage": {"prompt_tokens": 959, "completion_tokens": 652, "total_tokens": 1611, "prompt_cache_hit_tokens": 768, "prompt_cache_miss_tokens": 191, "prompt_tokens_details": {"cached_tokens": 768}, "completion_tokens_details": {"reasoning_tokens": 552}}, "cost": "0"}
+                   cost = 0.00053505
+             usage_json = {"prompt_tokens": 959, "completion_tokens": 652, "total_tokens": 1611, "prompt_cache_hit_tokens": 768, "prompt_cache_miss_tokens": 191, "prompt_tokens_details": {"cached_tokens": 768}, "completion_tokens_details": {"reasoning_tokens": 552}}
+             latency_ms = 4231.27126321197
+            error_state = 
+                 job_id = 01a0afaa-235a-7fe3-8422-1be2b555c921
+             created_at = 2026-09-17 13:59:25
+             updated_at = 2026-09-17 13:59:25
+--- candidate row ---
+                  id = 01a0afaa-3ff4-7da0-987a-87f29c73ee5b
+              job_id = 01a0afaa-235a-7fe3-8422-1be2b555c921
+   evidence_ids_json = ["01a0afaa-145d-7f21-b647-703aaa693f5a"]
+proposed_fields_json = {"kind": "new_asset", "asset_id": null, "fields": {"display_name": {"value": "MILK", "confidence": 0.95, "source_type": "extraction", "provider": "opencode-go", "model": "deepseek-v4-flash-vision-exp", "prompt_template_version": "extract-food-v2", "provider_call_id": "01a0afaa-3fed-7d43-8adc-5e2976e4544b"}, "asset_type": {"value": "dairy", "confidence": 0.95, "source_type": "extraction", "provider": "opencode-go", "model": "deepseek-v4-flash-vision-exp", "prompt_template_version": "extract-food-v2", "provider_call_id": "01a0afaa-3fed-7d43-8adc-5e2976e4544b"}, "status": {"value": "ACTIVE", "confidence": null, "source_type": "deterministic", "provider": null, "model": null, "prompt_template_version": null, "provider_call_id": null}, "expiry_date": {"value": "2031-03-15", "confidence": 0.95, "source_type": "extraction", "provider": "opencode-go", "model": "deepseek-v4-flash-vision-exp", "prompt_template_version": "extract-food-v2", "provider_call_id": "01a0afaa-3fed-7d43-8adc-5e2976e4544b"}, "quantity": {"value": 1.0, "confidence": 0.95, "source_type": "extraction", "provider": "opencode-go", "model": "deepseek-v4-flash-vision-exp", "prompt_template_version": "extract-food-v2", "provider_call_id": "01a0afaa-3fed-7d43-8adc-5e2976e4544b"}, "unit": {"value": "L", "confidence": 0.95, "source_type": "extraction", "provider": "opencode-go", "model": "deepseek-v4-flash-vision-exp", "prompt_template_version": "extract-food-v2", "provider_call_id": "01a0afaa-3fed-7d43-8adc-5e2976e4544b"}}, "dedup_matches": [], "review_task_ids": [], "ai_items": [{"name": "MILK", "expiry_date": "2031-03-15", "opened_date": null, "date_type": "best_before", "lot": null, "quantity": 1.0, "unit": "L", "asset_type": "dairy", "confidence": 0.95, "uncertainty_reasons": ["asset_type derived from the product name rather than an explicitly printed kind"]}], "ai_unknowns": [], "needs_evidence": false, "ai_provider": "opencode-go", "ai_model": "deepseek-v4-flash-vision-exp", "prompt_template_version": "extract-food-v2", "provider_call_ids": ["01a0afaa-3fed-7d43-8adc-5e2976e4544b"]}
+               state = proposed
+        household_id = 01a0a029-1477-7ca0-b200-bce78a96c679
+          created_at = 2026-09-17 13:59:25
+          updated_at = 2026-09-17 13:59:25
+--- evidence NEW row ---
+               id = 01a0afaa-145d-7f21-b647-703aaa693f5a
+     household_id = 01a0a029-1477-7ca0-b200-bce78a96c679
+           sha256 = 6c4cbf2e7c3bc3ccdcbc63873fad85f87bacd8ceec533a5e3de2f478ab1f8279
+       media_type = image/png
+      storage_key = 01a0a029-1477-7ca0-b200-bce78a96c679/6c/6c4cbf2e7c3bc3ccdcbc63873fad85f87bacd8ceec533a5e3de2f478ab1f8279.png
+original_filename = sg029_01_clean_food.png
+       size_bytes = 9709
+--- job NEW row ---
+             id = 01a0afaa-235a-7fe3-8422-1be2b555c921
+       job_type = import
+          state = AWAITING_REVIEW
+idempotency_key = sg057-imp-03c0dab8-37d7-452c-b6ba-54f6f6f29723
+     created_at = 2026-09-17 13:59:18
+     updated_at = 2026-09-17 13:59:25.439399
+--- all-table counts POST ---
+alembic_version=1
+assertion=3
+asset=1
+asset_evidence=1
+audit_event=10
+candidate=1
+evidence=2
+guardrail_event=0
+household=1
+idempotency_key=4
+job=2
+job_step=16
+observation=4
+planning_suggestion=0
+provider_call=6
+review_task=0
+source_attribution=0
+user=2
+--- delta ---
+alembic_version        1 -> 1
+assertion              3 -> 3
+asset                  1 -> 1
+asset_evidence         1 -> 1
+audit_event            6 -> 10
+candidate              0 -> 1
+evidence               1 -> 2
+guardrail_event        0 -> 0
+household              1 -> 1
+idempotency_key        2 -> 4
+job                    1 -> 2
+job_step               8 -> 16
+observation            2 -> 4
+planning_suggestion    0 -> 0
+provider_call          5 -> 6
+review_task            0 -> 0
+source_attribution     0 -> 0
+user                   2 -> 2
+--- Toothpaste name POST ---
+Toothpaste
+--- stored file sha/size ---
+6c4cbf2e7c3bc3ccdcbc63873fad85f87bacd8ceec533a5e3de2f478ab1f8279  /data/storage/01a0a029-1477-7ca0-b200-bce78a96c679/6c/6c4cbf2e7c3bc3ccdcbc63873fad85f87bacd8ceec533a5e3de2f478ab1f8279.png
+--- spend all provider_call ---
+0.00280110
+--- spend household via job join ---
+0.00053505
+--- END health 8003 ---
+{"status":"ok","db":"ok","storage":"ok"}
+--- END settings 8003 ---
+{"provider_id":"opencode-go","model_id":"deepseek-v4-flash-vision-exp","allowed_model_ids":["deepseek-v4-flash-vision-exp"],"consent":true,"per_job_cap":null,"monthly_cap":null,"prompt_category":"food"}
+--- candidate audit actions (decision absent) ---
+(empty = no candidate-level audit, no decision endpoint)
