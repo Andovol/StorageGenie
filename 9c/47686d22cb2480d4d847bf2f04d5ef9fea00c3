@@ -1,0 +1,8 @@
+Negative-Receipt-ID: SG-069
+utc=2026-09-17T19:46:21Z
+DISPATCH_RESULT id=SG-069 coder=opencode exit=0 head=c45af7bc3031578a4fd2c887c7fe54de558ab3a9 note=no moved=yes rewrite=no dirty=no elapsed=170s budget=2100s
+P1_moved=PASS count=2
+P2_rewrite=PASS behind=0
+P3_note=FAIL note=no
+P5_receipt=FAIL
+P6_dirty=PASS dirty=no
