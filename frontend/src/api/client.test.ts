@@ -1,5 +1,5 @@
 import { describe, test, expect, vi, beforeEach, afterEach } from "vitest";
-import { buildUrl, apiGet, fetchAiSettings, fetchPlanningSuggestions } from "./client";
+import { buildUrl, apiGet, apiPut, fetchAiSettings, updateAiModel, fetchPlanningSuggestions } from "./client";
 
 function mockResponse(partial: Partial<Response>): Response {
   return partial as Response;
@@ -109,6 +109,100 @@ describe("apiGet", () => {
     );
 
     await expect(apiGet("/v1/assets")).rejects.toThrow("GET /v1/assets failed: 500");
+  });
+});
+
+describe("apiPut", () => {
+  beforeEach(() => {
+    vi.stubGlobal("fetch", vi.fn());
+  });
+
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
+  test("returns JSON response on success and sends correct options", async () => {
+    const mockData = { id: "123", updated: true };
+    vi.mocked(fetch).mockResolvedValueOnce(
+      mockResponse({
+        ok: true,
+        json: async () => mockData,
+      })
+    );
+
+    const payload = { name: "Updated Item" };
+    const result = await apiPut<{ id: string; updated: boolean }>(
+      "/v1/items/123",
+      payload,
+      { lang: "en" },
+      { "X-Custom": "Value" }
+    );
+
+    expect(result).toEqual(mockData);
+    expect(fetch).toHaveBeenCalledWith(buildUrl("/v1/items/123", { lang: "en" }), {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        "X-Custom": "Value",
+      },
+      body: JSON.stringify(payload),
+    });
+  });
+
+  test("throws error with detail on failed request when detail string exists", async () => {
+    vi.mocked(fetch).mockResolvedValueOnce(
+      mockResponse({
+        ok: false,
+        status: 400,
+        statusText: "Bad Request",
+        json: async () => ({ detail: "Invalid field" }),
+      })
+    );
+
+    await expect(apiPut("/v1/items/123", {})).rejects.toThrow("Invalid field");
+  });
+
+  test("falls back to status error string when body parsing fails and statusText is empty", async () => {
+    vi.mocked(fetch).mockResolvedValueOnce(
+      mockResponse({
+        ok: false,
+        status: 500,
+        statusText: "",
+        json: async () => {
+          throw new Error("Invalid JSON");
+        },
+      })
+    );
+
+    await expect(apiPut("/v1/items/123", {})).rejects.toThrow("PUT /v1/items/123 failed: 500");
+  });
+});
+
+describe("updateAiModel", () => {
+  beforeEach(() => {
+    vi.stubGlobal("fetch", vi.fn());
+  });
+
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
+  test("updates AI model settings via apiPut", async () => {
+    const mockSettings = { provider: "openai", model_id: "gpt-4o" };
+    vi.mocked(fetch).mockResolvedValueOnce(
+      mockResponse({
+        ok: true,
+        json: async () => mockSettings,
+      })
+    );
+
+    const res = await updateAiModel("gpt-4o");
+    expect(res).toEqual(mockSettings);
+    expect(fetch).toHaveBeenCalledWith(buildUrl("/v1/settings/ai", {}), {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ model_id: "gpt-4o" }),
+    });
   });
 });
 
