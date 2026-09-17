@@ -1,0 +1,32 @@
+SG-061 coder log — read-only host check: nginx upload cap on the public entry
+Coder: opencode | effort: medium (from argv `--variant medium`) | model: unknown (no model id on argv; CLI default is the model per policy)
+Spend: $0.000000 real (zero provider calls) vs $0 bound.
+
+CONTRACT ECHO
+  - version string read: `0.28.2`
+  - source path read: /home/andrei/StorageGenie/AGENTS.md:4  and  /home/andrei/StorageGenie/STATE.md:5
+  - host-side coder contract copy at CONTRACT_DIR /home/andrei/launcher (dispatch_coder.sh:11) is
+    NOT READABLE by this account: `ls`/`cat /home/andrei/launcher/VERSION` -> Permission denied.
+    The wrapper's own contract_version() echo therefore could not be read -> reported UNANSWERED,
+    not guessed. The repo-recorded 0.28.2 is what this session read.
+
+BASE = start HEAD = f2bcf5522e94ae44cff2bd0e06b2953851944ec9  (== origin/automation after fetch)
+Starting tree: `git status --porcelain -uall` empty (clean).
+
+LEGS (live clock; each command bounded 120s, overall 900s)
+  leg 0  session/G1 recon (git + nginx listings + config.py read)   ~<10s
+  leg 1  G1 vhost identify + grep                                  ~<10s
+  leg 2  G2 cap read (nginx.conf + conf.d + include follow)        ~<10s
+  leg 3  G3 in-tree app cap + 413 mapping                          ~<10s
+  leg 4  contract echo probe (/home/andrei/launcher)               ~<5s
+  leg 5  report/verify write + commit + note/verify                (below)
+  Overall elapsed from session start (~18:17Z) to final verify (~18:2xZ): well under 900s.
+
+MEASUREMENT (authority = the on-box config, not the comment thread)
+  - Vhost: /etc/nginx/sites-available/storagegenie  (enabled via
+    /etc/nginx/sites-enabled/storagegenie -> /etc/nginx/sites-available/storagegenie)
+  - `client_max_body_size 25M;` at /etc/nginx/sites-available/storagegenie:3
+  - App cap: backend/app/config.py:20  max_upload_bytes = 20 * 1024 * 1024  (20 MiB)
+  => The desk 25M ask WAS APPLIED. Effective nginx cap 25M (26214400 B) >= app 20 MiB (20971520 B).
+
+RESULT: GREEN. See SG-061_report.md.

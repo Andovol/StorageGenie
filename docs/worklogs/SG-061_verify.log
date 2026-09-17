@@ -1,0 +1,89 @@
+SG-061 verify.log — raw quoted reads from the live host (all read-only)
+Command classes run: ls / cat / readlink / grep -rn / diff / find / ps / date / tr / nginx -v / git read-only
+(status, rev-parse, branch, remote, log, fetch, config). No sudo, no write, no nginx -t/reload,
+no service/container op, no upload request. `nginx -v` prints version and exits without parsing config.
+
+$ nginx -v
+nginx version: nginx/1.24.0 (Ubuntu)
+
+$ ls -la /etc/nginx/sites-available/   (selected)
+644 storagegenie 1.1K
+644 storagegenie.bak-20260917T101347Z 1.1K
+
+$ ls -la /etc/nginx/sites-enabled/
+777 storagegenie -> /etc/nginx/sites-available/storagegenie  39B
+$ readlink -f /etc/nginx/sites-enabled/storagegenie
+/etc/nginx/sites-available/storagegenie
+
+$ grep -rn "storagegenie.dynv6.net" /etc/nginx/sites-available/
+/etc/nginx/sites-available/storagegenie:2:    server_name storagegenie.dynv6.net;
+/etc/nginx/sites-available/storagegenie:17:    ssl_certificate /etc/letsencrypt/live/storagegenie.dynv6.net/fullchain.pem; # managed by Certbot
+/etc/nginx/sites-available/storagegenie:18:    ssl_certificate_key /etc/letsencrypt/live/storagegenie.dynv6.net/privkey.pem; # managed by Certbot
+/etc/nginx/sites-available/storagegenie:24:    if ($host = storagegenie.dynv6.net) {
+/etc/nginx/sites-available/storagegenie:31:    server_name storagegenie.dynv6.net;
+(backup also matches: storagegenie.bak-20260917T101347Z lines 2,16,17,23,30)
+
+$ grep -rn "127.0.0.1:8003" /etc/nginx/sites-available/
+/etc/nginx/sites-available/storagegenie:7:        proxy_pass http://127.0.0.1:8003;
+/etc/nginx/sites-available/storagegenie.bak-20260917T101347Z:6:        proxy_pass http://127.0.0.1:8003;
+
+$ cat -n /etc/nginx/sites-available/storagegenie
+     1  server {
+     2      server_name storagegenie.dynv6.net;
+     3      client_max_body_size 25M;
+     4      location / {
+     5          auth_basic "StorageGenie Restricted";
+     6          auth_basic_user_file /etc/nginx/htpasswd-storagegenie;
+     7          proxy_pass http://127.0.0.1:8003;
+...
+    19      include /etc/letsencrypt/options-ssl-nginx.conf; # managed by Certbot
+    20      ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem; # managed by Certbot
+
+$ grep -rn "client_max_body_size" /etc/nginx/
+/usr/bin/grep: /etc/nginx/conf.d/personalmemory-auth.conf: Permission denied
+/usr/bin/grep: /etc/nginx/htpasswd-storagegenie: Permission denied
+/etc/nginx/sites-available/storagegenie:3:    client_max_body_size 25M;
+[... other unrelated sites: dental-app* 1m, pintel 5m, shoperos 20M, brainos 50M ...]
+(no client_max_body_size in /etc/nginx/nginx.conf, /etc/nginx/conf.d/map_tuning.conf,
+ /etc/nginx/conf.d/personalmemory-rates.conf, or /etc/nginx/mime.types)
+
+$ grep -rn "default_server" /etc/nginx/sites-enabled/ /etc/nginx/sites-available/
+/etc/nginx/sites-available/default:22:	listen 80 default_server;
+/etc/nginx/sites-available/default:23:	listen [::]:80 default_server;
+(the one draft `default` file is NOT symlinked in sites-enabled; no 443 default_server anywhere)
+
+$ cat -n /etc/letsencrypt/options-ssl-nginx.conf   (site include, followed one level)
+  7  ssl_session_cache shared:le_nginx_SSL:10m;
+  8  ssl_session_timeout 1440m;
+ 11  ssl_protocols TLSv1.2 TLSv1.3;
+ 12  ssl_prefer_server_ciphers off;
+ 14  ssl_ciphers "ECDHE-...:...";
+(no client_max_body_size — SSL params only)
+
+$ diff /etc/nginx/sites-available/storagegenie.bak-20260917T101347Z /etc/nginx/sites-available/storagegenie
+< (backup, no cap)
+>     client_max_body_size 25M;
+(backup is dated 2026-09-17T10:13:47Z and LACKS the cap -> the cap was added after that backup)
+
+$ cat -n /etc/nginx/nginx.conf   (http block)
+    26  include /etc/nginx/mime.types;
+    61  include /etc/nginx/conf.d/*.conf;
+    62  include /etc/nginx/sites-enabled/*;
+(no client_max_body_size at http{} level)
+
+--- in-tree app reads ---
+backend/app/config.py:20:    max_upload_bytes: int = 20 * 1024 * 1024
+backend/app/services/evidence_service.py:142:    if len(file_bytes) > settings.max_upload_bytes:
+backend/app/services/evidence_service.py:143:        raise UploadTooLargeError(
+backend/app/api/v1/evidence.py:53:            raise HTTPException(status_code=413, detail=str(e))
+
+--- contract echo ---
+AGENTS.md:4  -> "Rule-set version this project records: **0.28.2** ..."
+STATE.md:5   -> "**Version:** `0.28.2` ..."
+cat /home/andrei/launcher/VERSION -> Permission denied (unanswered, not guessed)
+
+--- starting tree / refs ---
+$ git status --porcelain -uall   -> (empty)
+$ git rev-parse HEAD             -> f2bcf5522e94ae44cff2bd0e06b2953851944ec9
+$ git rev-parse origin/automation-> f2bcf5522e94ae44cff2bd0e06b2953851944ec9
+$ git remote -v                  -> origin git@github.com:Andovol/StorageGenie.git
