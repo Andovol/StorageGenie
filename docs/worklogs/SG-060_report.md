@@ -6,7 +6,7 @@
   metadata exposing the Coder model was observable. Not guessed.
 - **Work dir:** `/home/andrei/StorageGenie`; remote `origin git@github.com:Andovol/StorageGenie.git`
 - **BASE ref:** `origin/automation` → resolved commit `26149974869966774e41c3c8ced09c09671aca4d` (two fields)
-- **WORK_HEAD:** `__WORK_HEAD__` (note added on this commit; the docs-only receipt append follows)
+- **WORK_HEAD:** `91fac4dee921e66de7db11bae3fb82f6d496f805` (note added on this commit; the docs-only receipt append follows)
 - **Contract:** 0.27.0
 - **DB:** none — all tests use scratch temp SQLite; no live import/write; production SQLite untouched
 - **Verdict:** **GO** — one fallback string fixed, the enforcement split documented in two places and
@@ -111,7 +111,20 @@
 
 ## Receipt — notes ref
 
-(pending execution; raw output pasted on completion)
+Work pushed to `automation`: `2614997..91fac4d`. Note added on WORK_HEAD (fresh; existing-note
+pre-check printed `error: no note found`). Notes ref pushed `06d5527..6328418`; mapped fetch
+(`+refs/notes/storagegenie-coder-reports:refs/notes/sg060-remote-verify`) succeeded. Raw:
+
+```
+$ git notes --ref=refs/notes/sg060-remote-verify list 91fac4dee921e66de7db11bae3fb82f6d496f805
+0d83a206f5d40e23e688b4535bae64c443ca5c21
+$ git notes --ref=refs/notes/sg060-remote-verify show 91fac4dee921e66de7db11bae3fb82f6d496f805 | grep -n "SG-060"
+1:Dispatch-ID: SG-060 | Report: docs/worklogs/SG-060_report.md | Work-HEAD: 91fac4dee921e66de7db11bae3fb82f6d496f805
+$ git notes --ref=refs/notes/sg060-remote-verify show 91fac4dee921e66de7db11bae3fb82f6d496f805
+Dispatch-ID: SG-060 | Report: docs/worklogs/SG-060_report.md | Work-HEAD: 91fac4dee921e66de7db11bae3fb82f6d496f805
+```
+
+First line carries BOTH `Dispatch-ID:` and `Report:` (`CO-97`). **note=yes.**
 
 ## UNCLEAR
 

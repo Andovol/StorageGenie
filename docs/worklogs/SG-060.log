@@ -37,8 +37,10 @@ SG-060 run log — opencode / medium — work dir /home/andrei/StorageGenie
 2026-09-17T14:21Z  Spend: $0.000000 (zero provider calls; no metered route touched).
 2026-09-17T14:21Z  Overall wall since process start: ~140s / 1800s budget (early-close 1200s not
                    reached). No command was killed.
-2026-09-17T14:22Z  Committed WORK_HEAD __WORK_HEAD__; pushed automation 2614997..__WORK_HEAD__.
-                   Worktree clean.
-2026-09-17T14:22Z  Notes receipt: add_exit=0, push, mapped fetch (+refspec), note-list grep hit with
-                   BOTH Dispatch-ID: SG-060 and Report: docs/worklogs/SG-060_report.md, `show` printed
-                   the line. note=yes. Raw pasted into SG-060_report.md; docs-only append committed.
+2026-09-17T14:22Z  Committed WORK_HEAD 91fac4dee921e66de7db11bae3fb82f6d496f805; pushed automation
+                   2614997..91fac4d. Worktree clean.
+2026-09-17T14:22Z  Notes receipt: add_exit=0 (fresh hash on WORK_HEAD; pre-check `no note found`),
+                   notes push 06d5527..6328418, mapped fetch (+refspec) into refs/notes/sg060-remote-verify,
+                   note-list grep hit with BOTH Dispatch-ID: SG-060 and Report: docs/worklogs/SG-060_report.md,
+                   `show` printed the line. note=yes. Raw pasted into SG-060_report.md; docs-only append
+                   committed and pushed.
