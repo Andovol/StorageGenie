@@ -45,3 +45,5 @@ UNCLEAR (full text in report): FIRST READ — router.execute treated as "pure *a
 `estimated_cost` it actually consumes (F-SG056-1). DURING EXECUTION — none blocking; buildx cache relocated to the
 writable XDG_RUNTIME_DIR (same rootless daemon) exactly as SG-054 F-SG054-3. REMAINING — whether the router should
 forward `estimated_cost` to the provider so the adapter's own cap is reachable.
+
+[receipt] note verified against fetched mapped ref refs/notes/storagegenie-coder-reports-verify: grep hit + show output pasted verbatim in SG-056_report.md §11.1. WORK_HEAD(noted)=6456497788720941ba1f35becbe2a41ba4478729. note=yes.
