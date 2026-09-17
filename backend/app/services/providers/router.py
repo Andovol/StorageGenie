@@ -57,6 +57,16 @@ class ProviderRouter:
         whose kind is in the retryable set (and a fallback is configured),
         the fallback provider is tried once. Non-retryable errors surface
         with no fallback.
+
+        `estimated_cost` is consumed HERE for this pre-call refusal and is
+        NOT forwarded to the provider: only `*args, **kwargs` are passed on,
+        so a routed call always arrives at the adapter with the adapter's
+        `estimated_cost` default. That is deliberate — one enforcement point
+        per routed call (this router plus the reader's ledger-durable monthly
+        check), not a second refusal inside every adapter. The adapter's own
+        guard therefore protects DIRECT invocations only (tests, eval
+        harnesses) and is shadowed, harmlessly, on this path. See
+        `test_router_consumes_estimate_and_shadows_adapter_guard`.
         """
         if estimated_cost > self.config.cost_budget:
             raise BudgetExceededError(

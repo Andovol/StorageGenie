@@ -239,6 +239,16 @@ class OpenCodeGoProvider:
         *,
         estimated_cost: float = 0.0,
     ) -> ProviderResult:
+        """Vision turn on the real adapter, guarded for DIRECT invocations only.
+
+        The per-job + monthly pre-call refusal below fires for direct callers
+        (tests, eval harnesses). On the router-routed path it is shadowed but
+        harmless: `router.execute` consumes `estimated_cost` for its own
+        pre-call refusal and forwards only `*args, **kwargs`, so this method
+        always sees the `estimated_cost` default (0.0) there. Routed
+        enforcement is owned by the router (`cost_budget`) plus the reader's
+        ledger-durable monthly check. No logic change; documented per SG-060.
+        """
         if self._per_job_cap is not None and estimated_cost > self._per_job_cap:
             raise BudgetExceededError(
                 f"estimated cost {estimated_cost} exceeds per-job cap {self._per_job_cap}"
@@ -291,6 +301,14 @@ class OpenCodeGoProvider:
         `parse_extraction_output`: the normalized output is the answer text plus
         the response metadata (`model`, `finish_reason`) — decided here and
         reported.
+
+        The per-job + monthly pre-call refusal below fires for DIRECT
+        invocations only. On the router-routed path it is shadowed but
+        harmless: `router.execute` consumes `estimated_cost` for its own
+        pre-call refusal and forwards only `*args, **kwargs`, so this method
+        always sees the `estimated_cost` default (0.0) there. Routed
+        enforcement is owned by the router (`cost_budget`) plus the reader's
+        ledger-durable monthly check. No logic change; documented per SG-060.
         """
         if self._per_job_cap is not None and estimated_cost > self._per_job_cap:
             raise BudgetExceededError(

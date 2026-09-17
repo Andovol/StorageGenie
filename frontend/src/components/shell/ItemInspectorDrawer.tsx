@@ -126,7 +126,7 @@ export function ItemInspectorDrawer({ asset, householdId, onClose }: ItemInspect
 
   const firstEvidence: Evidence | undefined = evidence[0];
   const sourceUrl = firstEvidence
-    ? `${import.meta.env.VITE_API_BASE || "http://localhost:8000"}/v1/evidence/${firstEvidence.id}/file?household_id=${householdId}`
+    ? `${import.meta.env.VITE_API_BASE || "http://localhost:8003"}/v1/evidence/${firstEvidence.id}/file?household_id=${householdId}`
     : null;
 
   const colors = colorTags(assertions);
