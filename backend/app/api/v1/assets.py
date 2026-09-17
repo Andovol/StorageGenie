@@ -389,8 +389,10 @@ def post_asset_evidence(
     if not evidence_ids:
         raise HTTPException(status_code=422, detail="evidence_ids required")
     # Validate evidence belongs to household
+    evs = db.query(Evidence).filter(Evidence.id.in_(evidence_ids)).all()
+    ev_map = {ev.id: ev for ev in evs}
     for eid in evidence_ids:
-        ev = db.query(Evidence).filter_by(id=eid).first()
+        ev = ev_map.get(eid)
         if not ev:
             raise HTTPException(status_code=404, detail=f"Evidence {eid} not found")
         if ev.household_id != household_id:
