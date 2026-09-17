@@ -6,7 +6,8 @@
   = `a66aa4313d62cebff8b44f10299928288e05dc4d7c45f4f4e83e0bbd954c131d  RULES.md`; contract git `b495b59`
   ("Contract payload 0.28.2"). This matches the AGENTS.md recorded echo.
 - **BASE:** packet requested `origin/automation`; the ref resolved to `ee78d3072e0422ca6c8e613ce2bcf531745bd699`.
-- **WORK_HEAD:** `<WORK_HEAD>` (filled by the docs-only follow-up commit, per SG-056 precedent).
+- **WORK_HEAD:** `8747cd24abe59ecf60a46c6faa34f63ddc8c92e5` (the work commit; this report's
+  docs-only follow-up sits on top, so the final pushed `automation` tip is one commit later).
 - **Model:** `unknown` — no model id appears in the process argv (`opencode run --auto --dir
   /home/andrei/StorageGenie --variant medium …`); the CLI default is the model per `CODERS.md`.
   Effort `medium` is read from that same argv. Not read from any identity line.
@@ -175,8 +176,31 @@ All commands ran under timeouts (suite 600s class, build 450s, ordinary 120s); n
 
 ## 7. Receipt (notes ref `refs/notes/storagegenie-coder-reports`)
 
-The executed `git notes … show` output is pasted verbatim in the docs-only follow-up commit (see the
-"Receipt verification" section added there), per `CO-97`/M20. `note=yes`.
+Note added on `WORK_HEAD = 8747cd24abe59ecf60a46c6faa34f63ddc8c92e5`, pushed, then fetched into a MAPPED
+local ref and verified. Executed output pasted verbatim:
+
+```
+$ git notes --ref=refs/notes/storagegenie-coder-reports add -m "Dispatch-ID: SG-068 | Report: docs/worklogs/SG-068_report.md | Work-HEAD: 8747cd24abe59ecf60a46c6faa34f63ddc8c92e5" 8747cd24abe59ecf60a46c6faa34f63ddc8c92e5
+$ git push origin refs/notes/storagegenie-coder-reports
+To github.com:Andovol/StorageGenie.git
+   f3966ee..cd21654  refs/notes/storagegenie-coder-reports -> refs/notes/storagegenie-coder-reports
+
+$ git fetch origin refs/notes/storagegenie-coder-reports:refs/notes/storagegenie-coder-reports-verify
+From github.com:Andovol/StorageGenie
+   8fbbc0b..cd21654  refs/notes/storagegenie-coder-reports -> refs/notes/storagegenie-coder-reports-verify
+
+$ git notes --ref=refs/notes/storagegenie-coder-reports-verify list | grep 8747cd24abe59ecf60a46c6faa34f63ddc8c92e5
+621a11628e02b5a7d2e6f70e5c6deebf9ea64537 8747cd24abe59ecf60a46c6faa34f63ddc8c92e5
+
+$ git notes --ref=refs/notes/storagegenie-coder-reports-verify show 8747cd24abe59ecf60a46c6faa34f63ddc8c92e5
+Dispatch-ID: SG-068 | Report: docs/worklogs/SG-068_report.md | Work-HEAD: 8747cd24abe59ecf60a46c6faa34f63ddc8c92e5
+
+$ git notes --ref=refs/notes/storagegenie-coder-reports-verify show 8747cd24abe59ecf60a46c6faa34f63ddc8c92e5 | grep -c "Dispatch-ID: SG-068"
+1
+```
+
+The fetched ref (not the local write) is what proves the push landed; first line carries both
+`Dispatch-ID:` and `Report:`. `note=yes`.
 
 ## 8. UNCLEAR
 
