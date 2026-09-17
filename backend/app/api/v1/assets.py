@@ -54,25 +54,24 @@ def post_asset(
 
 
 def _asset_to_dict(asset: Asset, db: Session) -> dict:  # type: ignore[no-untyped-def]
-    # Evidence
-    rows = db.execute(
-        asset_evidence.select().where(asset_evidence.c.asset_id == asset.id)
-    ).fetchall()
-    evidence_ids = [r.evidence_id for r in rows]
-    evidence = []
-    if evidence_ids:
-        evs = db.query(Evidence).filter(Evidence.id.in_(evidence_ids)).all()
-        for e in evs:
-            evidence.append(
-                {
-                    "id": e.id,
-                    "sha256": e.sha256,
-                    "media_type": e.media_type,
-                    "storage_key": e.storage_key,
-                    "original_filename": e.original_filename,
-                    "size_bytes": e.size_bytes,
-                }
-            )
+    # Evidence: Join Evidence and asset_evidence to fetch linked evidence in a single query
+    evs = (
+        db.query(Evidence)
+        .join(asset_evidence, Evidence.id == asset_evidence.c.evidence_id)
+        .filter(asset_evidence.c.asset_id == asset.id)
+        .all()
+    )
+    evidence = [
+        {
+            "id": e.id,
+            "sha256": e.sha256,
+            "media_type": e.media_type,
+            "storage_key": e.storage_key,
+            "original_filename": e.original_filename,
+            "size_bytes": e.size_bytes,
+        }
+        for e in evs
+    ]
     # Assertions
     assertions = []
     for ass in db.query(Assertion).filter_by(asset_id=asset.id).order_by(Assertion.field_path).all():
