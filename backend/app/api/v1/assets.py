@@ -16,10 +16,46 @@ from app.schemas.asset import AssetCreate, AssetUpdate
 from app.schemas.common import decode_cursor, encode_cursor, loads_json
 from app.schemas.saved_search import SAVED_SEARCH_QUERY_MAX_BYTES, SavedSearchCreate
 from app.services import audit_service
+from app.plugins.registry import iter_plugins
 from app.services.asset_service import attach_evidence, create_asset, update_asset
 from app.services.fts import ensure_asset_fts, sanitize_fts_query
 
 router = APIRouter()
+
+
+@router.get("/taxonomy")
+def get_taxonomy() -> dict[str, object]:
+    """The registered plugins' taxonomy descriptors (SG-065, read-only).
+
+    Reflection over the REAL registry: defining a new domain is a registration,
+    not a migration. A plugin registered without a descriptor is skipped; a
+    descriptor with an empty category map serves ``categories: []`` (graceful).
+    """
+    plugins: list[dict[str, object]] = []
+    for registered in iter_plugins():
+        taxonomy = registered.taxonomy
+        if taxonomy is None:
+            continue
+        plugins.append(
+            {
+                "plugin_id": taxonomy.plugin_id,
+                "version": taxonomy.version,
+                "categories": [
+                    {
+                        "id": category.id,
+                        "name": category.name,
+                        "active": category.active,
+                        "notification": category.behavior.notification,
+                        "opened_date_tracking": category.behavior.opened_date_tracking,
+                        "chat": category.behavior.chat,
+                    }
+                    for category in taxonomy.categories
+                ],
+                "date_types": list(taxonomy.date_types),
+                "units": list(taxonomy.units),
+            }
+        )
+    return {"plugins": plugins}
 
 
 @router.post("/assets", status_code=201)

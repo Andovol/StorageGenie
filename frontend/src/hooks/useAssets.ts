@@ -7,6 +7,7 @@ import type {
   SavedSearch,
   SavedSearchListResponse,
   SavedSearchQuery,
+  TaxonomyResponse,
 } from "../api/types";
 
 export function useAssets(
@@ -53,6 +54,19 @@ export function useHouseholds() {
   return useQuery<Household[]>({
     queryKey: ["households"],
     queryFn: () => apiGet<Household[]>("/v1/households"),
+  });
+}
+
+/**
+ * The served plugin taxonomy (SG-065). Dropdown options come from the backend
+ * descriptor, never a hardcoded frontend list. Descriptors are immutable, so
+ * the query never needs to revalidate within a session.
+ */
+export function useTaxonomy() {
+  return useQuery<TaxonomyResponse>({
+    queryKey: ["taxonomy"],
+    queryFn: () => apiGet<TaxonomyResponse>("/v1/taxonomy"),
+    staleTime: Infinity,
   });
 }
 

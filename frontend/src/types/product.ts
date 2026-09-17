@@ -3,6 +3,11 @@ import type { Asset, Evidence, Job } from "../api/types";
 /**
  * The canonical DQ1 taxonomy. Custom categories are user-extensible: any string
  * that is not one of these passes through `toProductCategory` unchanged.
+ *
+ * Retained for display normalisation and grid mock shapes (SG-064 precedent).
+ * SG-065 moved the LIVE category-suggestion source to `GET /v1/taxonomy` (see
+ * `ItemInspectorDrawer` + `useTaxonomy`); this constant no longer feeds a
+ * dropdown.
  */
 export const CANONICAL_CATEGORIES = [
   "Hardware & Tools",

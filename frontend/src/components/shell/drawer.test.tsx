@@ -235,4 +235,69 @@ describe("ItemInspectorDrawer", () => {
     await waitFor(() => expect(spy).toHaveBeenCalledWith({ queryKey: ["assets"] }));
     expect(spy).toHaveBeenCalledWith({ queryKey: ["asset", "asset-1"] });
   });
+
+  test("category suggestions are served by /v1/taxonomy, not the hardcoded DQ1 list", async () => {
+    const taxonomy = {
+      plugins: [
+        {
+          plugin_id: "expiry-tracker",
+          version: "1.0.0",
+          categories: [
+            {
+              id: "household_chemicals",
+              name: "Household chemicals",
+              active: false,
+              notification: "basic-expiry",
+              opened_date_tracking: false,
+              chat: "fallback",
+            },
+          ],
+          date_types: ["expiry_date"],
+          units: ["piece"],
+        },
+      ],
+    };
+    api.apiGet.mockImplementation((path: string) =>
+      Promise.resolve(path === "/v1/taxonomy" ? taxonomy : baseAsset)
+    );
+    renderDrawer();
+    await screen.findByTestId("inspector-drawer");
+
+    await waitFor(() =>
+      expect(
+        document.querySelector('#drawer-category-options option[value="Household chemicals"]')
+      ).not.toBeNull()
+    );
+    expect(api.apiGet).toHaveBeenCalledWith("/v1/taxonomy");
+    // The live path no longer emits the retired DQ1 labels.
+    expect(
+      document.querySelector('#drawer-category-options option[value="Hardware & Tools"]')
+    ).toBeNull();
+  });
+
+  test("an empty served taxonomy leaves the category input as free text (PG-SC-07)", async () => {
+    const empty = {
+      plugins: [
+        { plugin_id: "empty-domain", version: "1.0.0", categories: [], date_types: [], units: [] },
+      ],
+    };
+    api.apiGet.mockImplementation((path: string) =>
+      Promise.resolve(path === "/v1/taxonomy" ? empty : baseAsset)
+    );
+    renderDrawer();
+    await screen.findByTestId("inspector-drawer");
+    await waitFor(() => expect(api.apiGet).toHaveBeenCalledWith("/v1/taxonomy"));
+
+    expect(document.querySelectorAll("#drawer-category-options option")).toHaveLength(0);
+    fireEvent.change(screen.getByLabelText("Category"), { target: { value: "Vintage Linens" } });
+    fireEvent.click(screen.getByRole("button", { name: "Save changes" }));
+    await waitFor(() =>
+      expect(api.apiPatch).toHaveBeenCalledWith(
+        "/v1/assets/asset-1",
+        expect.objectContaining({ asset_type: "Vintage Linens" }),
+        expect.anything(),
+        expect.anything()
+      )
+    );
+  });
 });

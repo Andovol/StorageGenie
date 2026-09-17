@@ -3,7 +3,8 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { ChevronDown, ChevronRight, ScanLine, Sparkles, X } from "lucide-react";
 import { apiGet, apiPatch } from "../../api/client";
 import type { Asset, Assertion, Evidence } from "../../api/types";
-import { CANONICAL_CATEGORIES, toProductCategory, UNTITLED_ASSET_NAME } from "../../types/product";
+import { useTaxonomy } from "../../hooks/useAssets";
+import { toProductCategory, UNTITLED_ASSET_NAME } from "../../types/product";
 
 type ViewerTab = "cutout" | "scene" | "source";
 
@@ -80,6 +81,15 @@ export function ItemInspectorDrawer({ asset, householdId, onClose }: ItemInspect
   const assertions = useMemo(() => current.assertions ?? [], [current.assertions]);
   const evidence = useMemo(() => current.evidence ?? [], [current.evidence]);
 
+  // SG-065: the category suggestions are served (GET /v1/taxonomy), not a
+  // hardcoded DQ1 list. A missing/empty response degrades to no suggestions —
+  // the input stays a free-text passthrough, never a crash.
+  const { data: taxonomy } = useTaxonomy();
+  const categoryOptions = useMemo(
+    () => taxonomy?.plugins?.flatMap((plugin) => plugin.categories.map((c) => c.name)) ?? [],
+    [taxonomy]
+  );
+
   // Reset the editable fields when the record changes underneath us (e.g. after
   // a successful PATCH or when a different asset is selected without unmount).
   useEffect(() => {
@@ -134,7 +144,7 @@ export function ItemInspectorDrawer({ asset, householdId, onClose }: ItemInspect
   const descriptionValue = description ? formatValue(description.value) : null;
 
   const save = () => {
-    const canonical = CANONICAL_CATEGORIES.find(
+    const canonical = categoryOptions.find(
       (value) => value.toLowerCase() === category.trim().toLowerCase()
     );
     const payload: Record<string, unknown> = {
@@ -286,7 +296,7 @@ export function ItemInspectorDrawer({ asset, householdId, onClose }: ItemInspect
               style={{ padding: 8, borderRadius: 6, borderStyle: "solid", borderWidth: 1 }}
             />
             <datalist id="drawer-category-options">
-              {CANONICAL_CATEGORIES.map((value) => (
+              {categoryOptions.map((value) => (
                 <option key={value} value={value} />
               ))}
             </datalist>

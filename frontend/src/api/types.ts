@@ -217,3 +217,26 @@ export type ChatCorrectionResponse = {
   message: string;
   created_at: string | null;
 };
+
+// SG-065: the served plugin taxonomy (GET /v1/taxonomy). Descriptors are
+// immutable server-side, so the frontend never re-derives the list.
+export type TaxonomyCategory = {
+  id: string;
+  name: string;
+  active: boolean;
+  notification: string;
+  opened_date_tracking: boolean;
+  chat: string;
+};
+
+export type TaxonomyPlugin = {
+  plugin_id: string;
+  version: string;
+  categories: TaxonomyCategory[];
+  date_types: string[];
+  units: string[];
+};
+
+export type TaxonomyResponse = {
+  plugins: TaxonomyPlugin[];
+};
