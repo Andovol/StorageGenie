@@ -1,5 +1,5 @@
 import { describe, test, expect, vi, beforeEach, afterEach } from "vitest";
-import { buildUrl, apiGet, fetchAiSettings, fetchPlanningSuggestions } from "./client";
+import { buildUrl, apiGet, apiPatch, fetchAiSettings, fetchPlanningSuggestions } from "./client";
 
 function mockResponse(partial: Partial<Response>): Response {
   return partial as Response;
@@ -109,6 +109,80 @@ describe("apiGet", () => {
     );
 
     await expect(apiGet("/v1/assets")).rejects.toThrow("GET /v1/assets failed: 500");
+  });
+});
+
+describe("apiPatch", () => {
+  beforeEach(() => {
+    vi.stubGlobal("fetch", vi.fn());
+  });
+
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
+  test("sends PATCH request with correct method, headers, body, and params, and returns JSON response", async () => {
+    const mockResponseBody = { id: "123", name: "Updated Asset" };
+    vi.mocked(fetch).mockResolvedValueOnce(
+      mockResponse({
+        ok: true,
+        json: async () => mockResponseBody,
+      })
+    );
+
+    const payload = { name: "Updated Asset" };
+    const customHeaders = { "X-Custom-Header": "custom-value" };
+    const result = await apiPatch<{ id: string; name: string }>(
+      "/v1/assets/123",
+      payload,
+      { household_id: "h1" },
+      customHeaders
+    );
+
+    expect(result).toEqual(mockResponseBody);
+    expect(fetch).toHaveBeenCalledWith(
+      buildUrl("/v1/assets/123", { household_id: "h1" }),
+      {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          "X-Custom-Header": "custom-value",
+        },
+        body: JSON.stringify(payload),
+      }
+    );
+  });
+
+  test("throws error with detail message on failed PATCH request", async () => {
+    vi.mocked(fetch).mockResolvedValueOnce(
+      mockResponse({
+        ok: false,
+        status: 400,
+        statusText: "Bad Request",
+        json: async () => ({ detail: "Cannot update asset" }),
+      })
+    );
+
+    await expect(apiPatch("/v1/assets/123", { name: "New Name" })).rejects.toThrow(
+      "Cannot update asset"
+    );
+  });
+
+  test("falls back to status error string when body JSON parsing fails", async () => {
+    vi.mocked(fetch).mockResolvedValueOnce(
+      mockResponse({
+        ok: false,
+        status: 500,
+        statusText: "",
+        json: async () => {
+          throw new Error("Invalid JSON");
+        },
+      })
+    );
+
+    await expect(apiPatch("/v1/assets/123", { name: "New Name" })).rejects.toThrow(
+      "PATCH /v1/assets/123 failed: 500"
+    );
   });
 });
 
