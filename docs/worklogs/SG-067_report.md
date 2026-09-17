@@ -5,7 +5,7 @@ contract echo: **0.28.2** · source path: `/home/andrei/storagegenie-contract/VE
 
 Work dir: `/home/andrei/StorageGenie` · origin: `git@github.com:Andovol/StorageGenie.git`
 `BASE` ref requested: `origin/automation` · `BASE` resolved: `4245be8fff111aca55d108a62bed0401ecfb1344` (== local HEAD at session start, the committed packet)
-`WORK_HEAD`: `<pending — filled by the receipt commit>` (docs-only work commit)
+`WORK_HEAD`: `73252307105208996dc50f929e6bcc70dd2cac74` (docs-only work commit; the receipt commit on top of it fills this line and pastes the verified note output)
 
 Starting tree: clean (`git status --porcelain` empty). Dirt would have been a STOP; none seen.
 Role guard honoured: never ran the dispatch verb, never started or polled this unit.
@@ -107,8 +107,47 @@ observation is environmental: the "two consecutive health reads" after `up` requ
 
 ## Receipt note on `refs/notes/storagegenie-coder-reports`
 
-<this subsection is filled by the receipt commit and MUST contain the pasted executed output; a
-receipt subsection with no pasted `show` output means the step was not executed>
+Work pushed to `automation` (no push to `storagegenie-evidence`, no `{{RECEIPT_CMD}}`):
+
+```
+$ git push origin automation
+To github.com:Andovol/StorageGenie.git
+   4245be8..7325230  automation -> automation
+```
+
+Note added on `WORK_HEAD` (120s bound) and the notes ref pushed (300s bound) — executed output pasted:
+
+```
+$ git notes --ref=refs/notes/storagegenie-coder-reports add -m "Dispatch-ID: SG-067 | Report: docs/worklogs/SG-067_report.md | Work-HEAD: 73252307105208996dc50f929e6bcc70dd2cac74" 73252307105208996dc50f929e6bcc70dd2cac74
+=== NOTES ADD END rc=0 elapsed=0s (120s bound) ===
+$ git notes --ref=refs/notes/storagegenie-coder-reports show 73252307105208996dc50f929e6bcc70dd2cac74
+Dispatch-ID: SG-067 | Report: docs/worklogs/SG-067_report.md | Work-HEAD: 73252307105208996dc50f929e6bcc70dd2cac74
+$ git push origin refs/notes/storagegenie-coder-reports
+To github.com:Andovol/StorageGenie.git
+   c295828..a72ed1b  refs/notes/storagegenie-coder-reports -> refs/notes/storagegenie-coder-reports
+=== NOTES PUSH END rc=0 elapsed=1s (300s bound) ===
+```
+
+Verified against the **FETCHED** ref, mapped into a local name (a default fetch never carries notes; a bare
+refspec fetch rewrites only `FETCH_HEAD`); list + grep (log `--grep` does not match note bodies) and `show`:
+
+```
+$ git fetch origin refs/notes/storagegenie-coder-reports:refs/notes/storagegenie-coder-reports-sg067-verify
+From github.com:Andovol/StorageGenie
+ * [new ref]         refs/notes/storagegenie-coder-reports -> refs/notes/storagegenie-coder-reports-sg067-verify
+$ git rev-parse refs/notes/storagegenie-coder-reports-sg067-verify
+a72ed1b041bc0931c592ea23903742785e88aae7
+$ git notes --ref=refs/notes/storagegenie-coder-reports-sg067-verify list   # piped per-object through `show`, then grep
+73252307105208996dc50f929e6bcc70dd2cac74 -> Dispatch-ID: SG-067 | Report: docs/worklogs/SG-067_report.md | Work-HEAD: 73252307105208996dc50f929e6bcc70dd2cac74
+$ git notes --ref=refs/notes/storagegenie-coder-reports-sg067-verify show 73252307105208996dc50f929e6bcc70dd2cac74
+Dispatch-ID: SG-067 | Report: docs/worklogs/SG-067_report.md | Work-HEAD: 73252307105208996dc50f929e6bcc70dd2cac74
+```
+
+No existing note on `WORK_HEAD` (checked before add). **note=yes**
+
+Side-observation (not a defect): the remote notes head before my push was `c295828`, a descendant of SG-064's
+`8fbbc0b` (it adds the `Negative-Receipt-ID: SG-064` anchor on top); SG-064's positive `Dispatch-ID: SG-064`
+note at `4060bb0` is present there. Nothing was lost.
 
 ## Disposition
 

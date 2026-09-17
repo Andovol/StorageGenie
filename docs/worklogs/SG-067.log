@@ -8,7 +8,7 @@ Spend: real $0.000000 vs $0 bound (zero provider calls; only network use = docke
 
 BASE ref requested: origin/automation
 BASE ref resolved: 4245be8fff111aca55d108a62bed0401ecfb1344 (== local HEAD at session start, the committed packet)
-WORK_HEAD: <pending — filled by the receipt commit> (docs-only work commit)
+WORK_HEAD: 73252307105208996dc50f929e6bcc70dd2cac74 (docs-only work commit; receipt commit follows)
 
 Starting tree: clean (`git status --porcelain` empty before any edit). Dirt = STOP; none seen.
 
