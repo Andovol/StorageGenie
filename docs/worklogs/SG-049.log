@@ -74,3 +74,51 @@ PROCESS WARNING (out of slice scope): adding asset_type to GATED_FIELDS also gat
 asset_type="unknown" assertion to review_state="proposed". The default VALUE stays "unknown" as the
 packet requires, but the deterministic placeholder now enters human review. No in-scope test breaks
 (test_phase2_e2e asserts all GATED_FIELDS rows are proposed). Flagged for the Architect.
+
+===== RUN-2 (2026-09-17, D77 live-leg re-dispatch) =====
+BASE (origin/automation at start): d0db281f24d237746761a99f9f0491aebcfc3f94 (D77 live-leg fire approval)
+MODEL: unknown (no model id on the dispatch argv; the CLI default IS the model, omitted per policy)
+EFFORT: medium (from argv `/proc/1392674: opencode run --auto --dir /home/andrei/StorageGenie --variant medium # SG-049 ...`)
+started: 2026-09-17T11:51:44Z   closed: 2026-09-17T12:01Z  (575 s / 1500 s early-close, 2400 s overall)
+
+OUTCOME: G0 GO (all three literal establishments true) -> G5 metered live leg RUN -> G6 DEPLOYED.
+The offline slice (G1-G4, G6-source) was already shipped at run-1 (1932f8a); this run's new artifacts
+are 5 committed prod provider_call ledger rows, the rebuilt+deployed image with the v2 code, and these
+worklogs. Two findings dominated: the deployed provider is `fake` (F-SG049-6) and the BASE build was
+red from a bot PR (F-SG049-5) blocking G6 until a minimal disclosed type-only test fix.
+
+LEG TIMINGS (live clock, actual vs budget):
+- G0 read-only + premise re-verify                     : ~180 s / 120 s ordinary (overran, reported)
+- G5 metered live leg (run-1 + corrective run-2)       : ~30 s  / G5 bound
+- G6 build+up (BUILDX_CONFIG route) + checks           : ~30 s  / 900 s host build/up
+- Suite + lint + build + v1 baseline pre/post          : ~35 s  / 600 s
+- G7 worklogs + commit/note + receipt verify           : ~180 s / 2400 s overall
+cumulative wall-clock: ~575 s / early-close 1500 s, overall 2400 s.
+
+SPEND: real metered $ = $0.003630 actual vs 3-image worst-case bound $0.014708 (24.7%).
+Committed prod ledger (5 rows) = $0.002266; two run-1 success rows rolled back unledgered = $0.001364
+(ISS-11 defect F-SG049-7, self-caught and fixed). Cumulative worst-case for the 6 image-calls actually
+made (3 + 3 corrective) = $0.029418 -- a disclosed overrun of the 3-image bound.
+
+STEPS:
+1. G0 read-only FIRST: settings/ai consent=true; key present len 67 (existence-only, zero key bytes);
+   ai_status=(True,'enabled'); StartedAt 2026-09-17T11:45:59Z; health ok. => GO.
+   Finding F-SG049-6: SG_PROVIDER_ID unset -> configured provider=fake (non-metered double, SG-028).
+2. Premises re-verified against the current tree (schemas v2, GATED_FIELDS, plumbing, reader, labels,
+   ChatPage, prompts, sg049/sg029 corpora). ALLOWED_MODEL_IDS path correction api/v1/settings.py:26.
+3. G4 pre: v1 baseline field_accuracy=0.833 / unknown_rate=4/7=0.571 / correction_rate=0/6=0.000.
+4. G6 build attempt 1 FAILED: pre-existing TS2352 x2 in frontend/src/api/client.test.ts (bot PR
+   573ff02), base-proven red. F-SG049-5. Minimal type-only fix `as Response` -> `as unknown as
+   Response`; local build green; rebuild+up OK (image fe509cf0, container 342513af, RestartCount=0).
+   Idempotent re-up: same container, RestartCount=0. Bundle index-GQSnPT8t.js -> index-nugWvqun.js.
+   v2 prompts now present in the image; health ok; loopback-only; gate 301/401 intact.
+5. G5 live leg via real opencode-go adapter through reader._extract_one against the PROD DB
+   (job_id=NULL), 3 named images, per-call guard against bound $0.014708. PARSE_OK=3/3; honest
+   null-valued unknown on cosmetics expiry; single repair fired on medicine attempt-1. Ledger rows
+   left in place. Non-ledger prod tables identical before/after (asset 1/Toothpaste .. audit 3).
+6. G4 post: v1 baseline diff vs pre = IDENTICAL. Targeted SG-049 tests = 38 passed.
+7. Suites/lint/build: backend 226 passed + 2 pre-existing test_signals env failures; frontend 152
+   passed; ruff green; eslint green; tsc+vite green. Secret scan 0. No migration; deps unchanged.
+
+F-SG049-5 (out-of-ceiling, disclosed): frontend/src/api/client.test.ts type-only fix so the mandated
+G6 rebuild could run. Base proof + destination in the report. F-SG049-6/7/8 also in the report.

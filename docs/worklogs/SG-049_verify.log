@@ -572,3 +572,157 @@ FAILED tests/test_signals.py::test_ocr_has_text_boxes_and_mean_confidence - a...
 
 ===== G5 — live metered leg: UNRUN =====
 No provider call was made. G0 STOP condition (consent=false). Zero live images, zero calls, zero ledger rows, real spend = $0.000000.
+
+################################################################################
+# RUN-2 (2026-09-17, D77 live-leg re-dispatch) -- raw
+# BASE resolved: d0db281f24d237746761a99f9f0491aebcfc3f94
+# process argv: /proc/1392674: opencode run --auto --dir /home/andrei/StorageGenie --variant medium # SG-049 ...
+# started 2026-09-17T11:51:44Z (live clock)
+################################################################################
+
+===== R2-STARTING-TREE =====
+$ git status --porcelain          # (empty)
+$ git branch --show-current       # automation
+$ git rev-parse HEAD ; git rev-parse origin/automation
+d0db281f24d237746761a99f9f0491aebcfc3f94
+d0db281f24d237746761a99f9f0491aebcfc3f94
+
+===== R2-G0 (read-only, FIRST; both outcomes handled) =====
+===== G0 (a) GET /v1/settings/ai =====
+{"provider_id":"fake","model_id":"deepseek-v4-flash-vision-exp","allowed_model_ids":["deepseek-v4-flash-vision-exp"],"consent":true,"per_job_cap":null,"monthly_cap":null,"prompt_category":"food"}
+===== G0 (a2) bare /settings/ai (SPA?) =====
+http=200 ctype=text/html; charset=utf-8
+===== G0 (b,c) key existence + ai_status (inside container) =====
+opencode_api_key_present= True
+key_len= 67
+consent= True
+provider_id= fake
+registry_ids= ['fake', 'opencode-go']
+ai_status= (True, 'enabled')
+===== G0 (d) container runtime =====
+StartedAt=2026-09-17T11:45:59.396847235Z Image=sha256:4f338b356945f9a8f960ecd3f50a3890a7c2b6d536ea4312c4f66e25e2f78f5e RestartCount=0
+===== G0 (e) health =====
+{"status":"ok","db":"ok","storage":"ok"}
+===== deployed backend prompts (v1 vs v2) -- F-SG049-8 =====
+chat-v1.md
+extract-cosmetics-v1.md
+extract-food-v1.md
+extract-medicine-v1.md
+planning-v1.md
+# => GO on all three literal establishments; but provider_id=fake (F-SG049-6) and the image predates SG-049.
+
+===== R2-G4-PRE (v1 baseline, frozen path) =====
+fixture sg029-01-clean-food: score=1.000 needs=1 unknowns=1 items=1.00
+fixture sg029-02-clean-medicine: score=1.000 needs=1 unknowns=1 items=1.00
+fixture sg029-03-glare-food: score=0.000 needs=0 unknowns=0 items=0.00
+fixture sg029-04-clutter-food: score=1.000 needs=1 unknowns=1 items=1.00
+fixture sg029-05-partial-label-food: score=0.667 needs=1 unknowns=0 items=1.00
+fixture sg029-06-partial-label-medicine: score=1.000 needs=1 unknowns=1 items=1.00
+fixture sg029-07-no-date-visible-medicine: score=0.667 needs=1 unknowns=0 items=1.00
+fixture sg029-08-clean-cosmetics: score=1.000 needs=1 unknowns=1 items=1.00
+fixture sg029-09-no-date-visible-cosmetics: score=1.000 needs=1 unknowns=1 items=1.00
+fixture sg029-10-partial-label-cosmetics: score=1.000 needs=1 unknowns=1 items=1.00
+field_accuracy=0.833 over 10 fixtures
+unknown_rate=4/7=0.571
+correction_rate=0/6=0.000 (audit_event plugin.assertion.write rows=6)
+targeted SG-049 suite (pre): 47 passed
+
+===== R2-G5-LIVE (run-1: harness showed the ISS-11 defect) =====
+WORST_CASE_BOUND_USD=0.014708 (3 x max per-call estimate 0.004903)
+CALL image=sg029_01_clean_food category=food ledger_id=01a0af39-8d7e-7670-b30e-e456d6ec5cd9 provider=opencode-go model=deepseek-v4-flash-vision-exp template=extract-food-v2 cost=$0.000303 usage={"prompt_tokens": 959, "completion_tokens": 265, "total_tokens": 1224, ...} latency_ms=2455.996979959309 error_state=None
+FIXTURE image=sg029_01_clean_food outcome=ok parsed={"items": [{"name": "MILK", "expiry_date": "2031-03-15", "opened_date": null, "date_type": "best_before", "lot": null, "quantity": 1.0, "unit": "L", "asset_type": "dairy", "confidence": 1.0, "uncertainty_reasons": []}], "unknowns": [], "needs_evidence": false}
+CALL image=sg029_02_clean_medicine ... ledger_id=01a0af39-9a47-7613-b657-907808cdb9b0 cost=$0.000000 usage=None error_state=invalid_json: adapter schema parse failed
+CALL image=sg029_02_clean_medicine ... ledger_id=01a0af39-a4ed-79c0-957d-f7b5ee047bef cost=$0.000329 usage={"prompt_tokens": 1032, "completion_tokens": 290, "total_tokens": 1322, ...} error_state=None
+FIXTURE image=sg029_02_clean_medicine outcome=ok parsed={... "quantity": 20.0, "unit": "tablets", "asset_type": "medicine", "confidence": 1.0 ...}
+CALL image=sg029_08_clean_cosmetics ... ledger_id=01a0af39-c280-7503-baa7-2e78b70c28bc cost=$0.001035 usage={"prompt_tokens": 1000, "completion_tokens": 1475, "total_tokens": 2475, ...} error_state=None
+FIXTURE image=sg029_08_clean_cosmetics outcome=ok parsed={... "quantity": 50.0, "unit": "ML", "asset_type": "moisturiser", "confidence": 1.0, "unknowns": ["items.0.expiry_date"] ...}
+PARSE_OK=3/3
+CUMULATIVE_ACTUAL_USD=0.001667 WORST_CASE_BOUND_USD=0.014708
+LEDGER_ROWS_ADDED=4 (job_id=NULL; left in place)
+# BUT only 2 of the 4 committed: session.close() rolled back the two success rows (F-SG049-7).
+
+===== R2-PROD-BEFORE =====
+asset 1
+candidate 0
+job 0
+evidence 1
+assertion 3
+audit_event 3
+provider_call 0
+asset_names [('Toothpaste',)]
+
+===== R2-G5-LIVE-RUN2 (authoritative; per-call commit fix) =====
+WORST_CASE_BOUND_USD=0.014708 (3 x max per-call estimate 0.004903)
+monthly_cap=None per_job_cap=None (uncapped per F2)
+CALL image=sg029_01_clean_food ledger_id=01a0af3a-5180-7a00-b165-e688d446e8ad cost=$0.000376 usage={"prompt_tokens": 959, "completion_tokens": 387, ...} error_state=None
+FIXTURE image=sg029_01_clean_food outcome=ok parsed={... "quantity": 1.0, "unit": "L", "asset_type": "dairy", "confidence": 1.0 ...}
+CALL image=sg029_02_clean_medicine ledger_id=01a0af3a-5c3d-76a3-94ba-74b356dac7fc cost=$0.000352 usage={"prompt_tokens": 973, "completion_tokens": 343, ...} error_state=None
+FIXTURE image=sg029_02_clean_medicine outcome=ok parsed={... "quantity": 20.0, "unit": "TABLETS", "asset_type": "medicine", "confidence": 1.0 ...}
+CALL image=sg029_08_clean_cosmetics ledger_id=01a0af3a-80cb-7bd0-9dab-3fc6bdc2856f cost=$0.001235 usage={"prompt_tokens": 1000, "completion_tokens": 1809, ...} error_state=None
+FIXTURE image=sg029_08_clean_cosmetics outcome=ok parsed={... "quantity": 50.0, "unit": "ML", "asset_type": "moisturiser", "confidence": 1.0, "unknowns": ["items.0.expiry_date"] ...}
+PARSE_OK=3/3
+CUMULATIVE_ACTUAL_USD=0.002266 WORST_CASE_BOUND_USD=0.014708
+LEDGER_ROWS_ADDED=3 (job_id=NULL; left in place)
+
+===== R2-PROD-AFTER (blast radius) =====
+asset 1            # Toothpaste, unchanged
+candidate 0
+job 0
+evidence 1
+assertion 3
+audit_event 3
+provider_call 5    # ledger only
+ledger_rows:
+  ('01a0af39-8d7e-7670-b30e-e456d6ec5cd9', 'opencode-go', 'extract-food-v2', 0.000303, None, None)
+  ('01a0af39-9a47-7613-b657-907808cdb9b0', 'opencode-go', 'extract-medicine-v2', 0.0, 'invalid_json: adapter schema parse failed', None)
+  ('01a0af3a-5180-7a00-b165-e688d446e8ad', 'opencode-go', 'extract-food-v2', 0.000376, None, None)
+  ('01a0af3a-5c3d-76a3-94ba-74b356dac7fc', 'opencode-go', 'extract-medicine-v2', 0.000352, None, None)
+  ('01a0af3a-80cb-7bd0-9dab-3fc6bdc2856f', 'opencode-go', 'extract-cosmetics-v2', 0.001235, None, None)
+ledger_total_usd 0.002266
+# total real metered spend incl. the 2 rolled-back run-1 calls = 0.002266 + 0.001364 = $0.003630
+
+===== R2-G6-BUILD-FAIL (pre-existing red, F-SG049-5) =====
+$ BUILDX_CONFIG=/home/andrei/StorageGenie/.cache docker compose up --build -d backend
+#18 [frontend-build 6/6] RUN npm run build
+#18 src/api/client.test.ts(73,44): error TS2352: Conversion of type '{ ok: false; ... }' to type 'Response' may be a mistake ...
+#18 src/api/client.test.ts(86,44): error TS2352: ...
+#18 ERROR: process "/bin/sh -c npm run build" did not complete successfully: exit code: 2
+$ cd frontend && npm run build     # base proof, clean tree at d0db281
+src/api/client.test.ts(73,44): error TS2352 ...
+src/api/client.test.ts(86,44): error TS2352 ...
+# introduced by bot PR 573ff02 (after run-1 base a969e18). Fix: as Response -> as unknown as Response (2 casts).
+$ npm run build
+dist/assets/index-DgwxPRqe.js   293.57 kB   ✓ built in 1.68s
+
+===== R2-G6-DEPLOY =====
+ Image storagegenie-backend Built
+ Container storagegenie-backend-1 Recreate / Recreated / Starting / Started
+Id=342513af7fcc9d5935e0f40f57b61bcedf4db3b0cee44e87a1979c3326a61cf9 Image=sha256:fe509cf0519909fca2a3256689988353466bcf20b3f2b9a61825436b92f5da54 StartedAt=2026-09-17T12:00:05.33814979Z RestartCount=0
+{"status":"ok","db":"ok","storage":"ok"}
+/assets/index-nugWvqun.js                # BEFORE /assets/index-GQSnPT8t.js -> CHANGED
+docker exec ... ls prompts/ -> chat-v1.md extract-cosmetics-v1.md extract-cosmetics-v2.md extract-food-v1.md extract-food-v2.md extract-medicine-v1.md extract-medicine-v2.md planning-v1.md
+ss -ltn: 127.0.0.1:8000 / 127.0.0.1:8003 (loopback-only)
+curl -i -H 'Host: storagegenie.dynv6.net' http://127.0.0.1/v1/health   -> HTTP/1.1 301 Moved Permanently
+curl -i -k -H 'Host: storagegenie.dynv6.net' https://127.0.0.1/v1/health -> HTTP/2 401
+idempotent re-up: Container storagegenie-backend-1 Running; Id same 342513af..., StartedAt same, RestartCount=0
+served bundle contains: Enable AI in Settings to use chat ; consent_disabled
+
+===== R2-G4-POST + SUITES =====
+field_accuracy=0.833 over 10 fixtures
+unknown_rate=4/7=0.571
+correction_rate=0/6=0.000 (audit_event plugin.assertion.write rows=6)
+PRE/POST diff -> IDENTICAL
+targeted SG-049 tests POST: 38 passed
+backend suite: 2 failed, 226 passed  (the 2 = pre-existing tests/test_signals.py pyzbar/pytesseract env)
+  FAILED tests/test_signals.py::test_generated_codes_are_validated_and_bad_checksum_is_not_an_identifier
+  FAILED tests/test_signals.py::test_ocr_has_text_boxes_and_mean_confidence
+  tests/test_signals.py unmodified vs origin/automation (git diff empty)
+ruff: All checks passed!
+frontend suite: 21 files / 152 passed
+eslint src: exit 0
+npm run build: exit 0 (index-DgwxPRqe.js)
+
+===== R2-WORKTREE =====
+$ git status --porcelain
+ M frontend/src/api/client.test.ts     # F-SG049-5 disclosed fix
+(plus docs/worklogs/SG-049.{log,report.md,verify.log} written after this capture)

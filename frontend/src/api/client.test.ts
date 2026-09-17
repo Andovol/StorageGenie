@@ -77,7 +77,7 @@ describe("apiGet", () => {
       json: async () => {
         throw new Error("Invalid JSON");
       },
-    } as Response);
+    } as unknown as Response);
 
     await expect(apiGet("/v1/assets")).rejects.toThrow("Internal Server Error");
   });
@@ -90,7 +90,7 @@ describe("apiGet", () => {
       json: async () => {
         throw new Error("Invalid JSON");
       },
-    } as Response);
+    } as unknown as Response);
 
     await expect(apiGet("/v1/assets")).rejects.toThrow("GET /v1/assets failed: 500");
   });
