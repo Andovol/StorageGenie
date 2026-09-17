@@ -10,8 +10,11 @@ from app.models.assertion import Assertion
 from app.models.audit_event import AuditEvent
 from app.models.asset import Asset
 from app.models.evidence import Evidence, asset_evidence
+from app.models.household import Household
+from app.models.saved_search import SavedSearch
 from app.schemas.asset import AssetCreate, AssetUpdate
 from app.schemas.common import decode_cursor, encode_cursor, loads_json
+from app.schemas.saved_search import SAVED_SEARCH_QUERY_MAX_BYTES, SavedSearchCreate
 from app.services import audit_service
 from app.services.asset_service import attach_evidence, create_asset, update_asset
 from app.services.fts import ensure_asset_fts, sanitize_fts_query
@@ -424,3 +427,86 @@ def post_asset_event(
     )
     db.commit()
     return {"asset_id": asset.id, "action": f"asset.lifecycle.{event_type}"}
+
+
+def _saved_search_to_dict(row: SavedSearch) -> dict[str, Any]:
+    """Read a saved search back as the exact filter dict the list endpoint takes."""
+    return {
+        "id": row.id,
+        "household_id": row.household_id,
+        "name": row.name,
+        "query": loads_json(row.query_json) or {},
+        "created_at": row.created_at.isoformat() if row.created_at else None,
+    }
+
+
+@router.post("/saved-searches", status_code=201)
+def create_saved_search(
+    payload: SavedSearchCreate,
+    household_id: str = Query(...),
+    db: Session = Depends(get_db),
+) -> dict[str, Any]:
+    """Persist a named filter set for one household (SG-068 G1).
+
+    The query is serialized with its ``None`` fields dropped, so a saved row
+    reads back as exactly the parameters the catalog would have sent. Unknown
+    keys, wrong value types, an oversize name and an oversize query are all
+    visible 422s (PG-SC-05 / PG-SC-06); a duplicate name is a 409.
+    """
+    if db.query(Household).filter_by(id=household_id).first() is None:
+        raise HTTPException(status_code=404, detail="Household not found")
+    serialized = json.dumps(
+        payload.query.model_dump(exclude_none=True), sort_keys=True, ensure_ascii=False
+    )
+    if len(serialized.encode("utf-8")) > SAVED_SEARCH_QUERY_MAX_BYTES:
+        raise HTTPException(
+            status_code=422,
+            detail=f"query exceeds the {SAVED_SEARCH_QUERY_MAX_BYTES} byte saved-search cap",
+        )
+    duplicate = (
+        db.query(SavedSearch)
+        .filter(SavedSearch.household_id == household_id)
+        .filter(func.lower(SavedSearch.name) == payload.name.lower())
+        .first()
+    )
+    if duplicate is not None:
+        raise HTTPException(
+            status_code=409,
+            detail="A saved search with that name already exists for this household",
+        )
+    row = SavedSearch(household_id=household_id, name=payload.name, query_json=serialized)
+    db.add(row)
+    db.commit()
+    db.refresh(row)
+    return _saved_search_to_dict(row)
+
+
+@router.get("/saved-searches")
+def list_saved_searches(
+    household_id: str = Query(...),
+    db: Session = Depends(get_db),
+) -> dict[str, Any]:
+    """Newest first; a household with none returns an empty list, never an error."""
+    rows = (
+        db.query(SavedSearch)
+        .filter(SavedSearch.household_id == household_id)
+        .order_by(SavedSearch.created_at.desc(), SavedSearch.id.desc())
+        .all()
+    )
+    return {"items": [_saved_search_to_dict(row) for row in rows]}
+
+
+@router.delete("/saved-searches/{saved_search_id}")
+def delete_saved_search(
+    saved_search_id: str,
+    household_id: str = Query(...),
+    db: Session = Depends(get_db),
+) -> dict[str, Any]:
+    row = db.query(SavedSearch).filter_by(id=saved_search_id).first()
+    if row is None:
+        raise HTTPException(status_code=404, detail="Saved search not found")
+    if row.household_id != household_id:
+        raise HTTPException(status_code=403, detail="Household mismatch")
+    db.delete(row)
+    db.commit()
+    return {"status": "deleted", "id": saved_search_id}

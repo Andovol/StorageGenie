@@ -10,6 +10,7 @@ from app.models.job import Job, JobStep
 from app.models.planning_suggestion import PlanningSuggestion
 from app.models.provider_call import ProviderCall
 from app.models.review_task import ReviewTask
+from app.models.saved_search import SavedSearch
 from app.models.source_attribution import SourceAttribution
 from app.models.user import User
 
@@ -27,6 +28,7 @@ __all__ = [
     "PlanningSuggestion",
     "ProviderCall",
     "ReviewTask",
+    "SavedSearch",
     "SourceAttribution",
     "User",
     "Base",

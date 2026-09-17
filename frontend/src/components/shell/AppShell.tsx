@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import type { Household } from "../../api/types";
+import type { Household, SavedSearch } from "../../api/types";
 import { AppHeader } from "./AppHeader";
 import { CatalogToolbar, type Density, type SortOption } from "./CatalogToolbar";
 
@@ -19,6 +19,11 @@ type AppShellProps = {
   householdId: string;
   households: Household[];
   onHouseholdChange: (householdId: string) => void;
+  savedSearches: SavedSearch[];
+  selectedSavedSearchId: string;
+  onSavedSearchSelect: (id: string) => void;
+  onSavedSearchDelete: (id: string) => void;
+  onSaveSearch: () => void;
   children: ReactNode;
 };
 
@@ -38,6 +43,11 @@ export function AppShell({
   householdId,
   households,
   onHouseholdChange,
+  savedSearches,
+  selectedSavedSearchId,
+  onSavedSearchSelect,
+  onSavedSearchDelete,
+  onSaveSearch,
   children,
 }: AppShellProps) {
   return (
@@ -57,6 +67,11 @@ export function AppShell({
           householdId={householdId}
           households={households}
           onHouseholdChange={onHouseholdChange}
+          savedSearches={savedSearches}
+          selectedSavedSearchId={selectedSavedSearchId}
+          onSavedSearchSelect={onSavedSearchSelect}
+          onSavedSearchDelete={onSavedSearchDelete}
+          onSaveSearch={onSaveSearch}
         />
       </div>
       <main style={{ padding: 24 }}>{children}</main>

@@ -1,5 +1,5 @@
 import type { ProductItem } from "../../types/product";
-import type { Household } from "../../api/types";
+import type { Household, SavedSearch } from "../../api/types";
 
 export type SortOption = "recent" | "name" | "status";
 export type Density = "grid" | "table";
@@ -48,6 +48,11 @@ type CatalogToolbarProps = {
   householdId: string;
   households: Household[];
   onHouseholdChange: (householdId: string) => void;
+  savedSearches: SavedSearch[];
+  selectedSavedSearchId: string;
+  onSavedSearchSelect: (id: string) => void;
+  onSavedSearchDelete: (id: string) => void;
+  onSaveSearch: () => void;
 };
 
 const controlStyle: React.CSSProperties = {
@@ -72,7 +77,29 @@ export function CatalogToolbar({
   householdId,
   households,
   onHouseholdChange,
+  savedSearches,
+  selectedSavedSearchId,
+  onSavedSearchSelect,
+  onSavedSearchDelete,
+  onSaveSearch,
 }: CatalogToolbarProps) {
+  const selectedSavedSearch = savedSearches.find((s) => s.id === selectedSavedSearchId);
+  const savedSearchLabels: string[] = [];
+  if (selectedSavedSearch) {
+    if (selectedSavedSearch.query.q) {
+      savedSearchLabels.push(`q: ${selectedSavedSearch.query.q}`);
+    }
+    if (selectedSavedSearch.query.asset_type) {
+      savedSearchLabels.push(`type: ${selectedSavedSearch.query.asset_type}`);
+    }
+    if (selectedSavedSearch.query.status) {
+      savedSearchLabels.push(`status: ${selectedSavedSearch.query.status}`);
+    }
+    if (selectedSavedSearch.query.has_evidence !== undefined) {
+      savedSearchLabels.push(selectedSavedSearch.query.has_evidence ? "evidence: yes" : "evidence: no");
+    }
+  }
+
   return (
     <div
       className="bg-card border-border"
@@ -150,6 +177,59 @@ export function CatalogToolbar({
       </div>
 
       <div style={{ flex: 1 }} />
+
+      <button
+        type="button"
+        onClick={onSaveSearch}
+        disabled={activeFilters.length === 0}
+        className="bg-card text-foreground border-border focus-ring"
+        style={{ ...controlStyle, opacity: activeFilters.length === 0 ? 0.5 : 1 }}
+      >
+        Save search
+      </button>
+
+      {savedSearches.length > 0 ? (
+        <select
+          aria-label="Saved searches"
+          value={selectedSavedSearchId}
+          onChange={(event) => onSavedSearchSelect(event.target.value)}
+          className="bg-background text-foreground border-border focus-ring"
+          style={controlStyle}
+        >
+          <option value="">Saved searches</option>
+          {savedSearches.map((saved) => (
+            <option key={saved.id} value={saved.id}>
+              {saved.name}
+            </option>
+          ))}
+        </select>
+      ) : (
+        <span className="text-muted-foreground" style={{ fontSize: 12 }}>
+          None yet
+        </span>
+      )}
+
+      {selectedSavedSearch && (
+        <button
+          type="button"
+          aria-label="Delete saved search"
+          onClick={() => onSavedSearchDelete(selectedSavedSearch.id)}
+          className="text-primary focus-ring"
+          style={{ ...controlStyle, color: "inherit" }}
+        >
+          Delete
+        </button>
+      )}
+
+      {savedSearchLabels.map((label) => (
+        <span
+          key={label}
+          className="bg-card-muted text-muted-foreground"
+          style={{ fontSize: 11, padding: "2px 8px", borderRadius: 999 }}
+        >
+          {label}
+        </span>
+      ))}
 
       {activeFilters.length > 0 && (
         <div style={{ display: "flex", alignItems: "center", gap: 6 }}>

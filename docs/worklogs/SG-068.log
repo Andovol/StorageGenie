@@ -1,0 +1,49 @@
+SG-068 — saved searches: named filter sets persisted per household (opencode, medium)
+Work dir /home/andrei/StorageGenie · branch automation · BASE ee78d3072e0422ca6c8e613ce2bcf531745bd699
+Contract recorded 0.28.2 == published b495b59, source /home/andrei/storagegenie-contract/ (VERSION + RULES.sha256 a66aa4313d62cebff8b44f10299928288e05dc4d7c45f4f4e83e0bbd954c131d)
+Model: unknown (no model id on process argv) · effort: medium (from `--variant medium` on the process argv) · spend real $0.000000
+
+NOTE: this log is reconstructed from the captured command outputs of this session; every command
+below was actually executed (raw evidence in SG-068_verify.log and the report's quoted reads).
+
+[recon]
+- git status clean; HEAD ee78d30; branch automation tracking origin/automation; remote git@github.com:Andovol/StorageGenie.git.
+- Toolchain: no `python` on PATH; backend/venv/bin/python (3.12.3) carries fastapi/sqlalchemy 2.0.52/pytest/alembic 1.19.1/ruff 0.16.5/mypy 2.3.1; frontend node v24.14.1, npm 11.11.0, node_modules present.
+- Contract copy readable at /home/andrei/storagegenie-contract (VERSION 0.28.2, git b495b59).
+- D85 present: state.md:214 "SG-068 production migration AUTHORISED"; packet:43 carries the same. Not absent -> migration GO.
+- Production DB /home/andrei/StorageGenie/data/db/storagegenie.db head 20260916_sg048_name_optional; live container storagegenie-backend-1 healthy.
+- Baseline gates: backend 254 passed + 2 base reds (test_signals decoder env); ruff clean; mypy 41 errors / 9 files (69 checked); frontend 152 passed / 21 files; build + eslint green.
+- Migration style read from 20260912_sg025 / 20260914_sg035 (op.create_table + op.f index + CURRENT_TIMESTAMP); exports.py ALEMBIC_HEAD is dynamic (no head constant to chase).
+
+[decisions]
+- New router appended to backend/app/api/v1/assets.py (not a new saved_searches.py): a new router would need backend/app/main.py (mount point), which is OUTSIDE the ceiling; assets.py is explicitly allowed.
+- Schemas split into backend/app/schemas/saved_search.py to carry the named caps (80 name / 2048 query bytes) without touching backend/app/config.py (off-ceiling).
+- Duplicate name: pre-check on lower(name) within household -> 409 (chosen over a functional unique index; race window only).
+- query whitelist via pydantic extra="forbid"; has_evidence bool|None mirrors list_assets' FastAPI bool parse; status is the free string list_assets already accepts.
+- Required plumbing outside the enumerated ceiling: backend/app/models/__init__.py (register model so Base.metadata/tests see it) and frontend/src/components/shell/AppShell.tsx (prop pass-through -- CatalogToolbar is rendered by AppShell). Both reported.
+
+[G1 backend]
+- backend/app/models/saved_search.py: saved_search(id, household_id FK indexed, name String(80), query_json Text, created_at/updated_at via TimestampMixin).
+- backend/alembic/versions/20260917_sg068_saved_search.py: revision 20260917_sg068_saved_search, down_revision 20260916_sg048_name_optional, idempotent-add (inspector.has_table guard), NO ownership statements.
+- assets.py: POST/GET/DELETE /v1/saved-searches (POST+DELETE take household_id query param); 404 household, 422 oversize, 409 duplicate, 403 cross-household delete; list ordered created_at desc, id desc; empty -> {"items": []}.
+- test_postgres_dialect.py: SavedSearch imported + "saved_search" in EXPECTED_TABLES (registry extended live; now 18 tables).
+
+[G1 tests] backend/tests/test_saved_searches.py -> 10 passed (CRUD round-trip, working-query round-trip, isolation, whitelist+type 422, caps, duplicate, empty, missing-delete, migration upgrade/downgrade/upgrade, stored JSON parsed).
+
+[G2 frontend]
+- types.ts: SavedSearchQuery / SavedSearch / SavedSearchListResponse.
+- useAssets.ts: useSavedSearches / useSaveSearch / useDeleteSavedSearch (DELETE via raw fetch + buildUrl because api/client.ts has no apiDelete and client.ts is off-ceiling).
+- CatalogToolbar.tsx: "Save search" (disabled until activeFilters non-empty), "Saved searches" dropdown, Delete button, selected-filter labels, muted "None yet".
+- CatalogPage.tsx: selection state, apply sets qRaw+category (reuses the existing reset effect -> single query path), household change clears selection, window.prompt for the name.
+- AppShell.tsx: 5 prop pass-throughs.
+
+[G2 tests] shell.test.tsx +6 (save gating/POST, dropdown apply, verbatim name as TEXT, None yet, DELETE, household reset); mock extended with apiPost/buildUrl + /v1/saved-searches branch.
+
+[G3 gates]
+- backend: 264 passed, 2 failed = the same base-proven decoder env reds (test_signals), ruff clean, mypy 41/9 files (71 checked) == base 41, all mypy lines in assets.py are the same pre-existing errors shifted by line offset; new files 0 errors. delta-0.
+- frontend: 158 passed / 21 files (base 152 + 6), `tsc && vite build` green, eslint green.
+- derived set (grep of touched symbols): backend test_saved_searches.py (10) + test_postgres_dialect.py (1); frontend shell.test.tsx (20). Intuition also ran catalog.test.tsx (CatalogPage render; 32) -- green, not a symbol hit.
+- scratch proof (SG-068_verify.log): pre-upgrade "no such table: saved_search"; upgrade head; downgrade sg048; re-upgrade; unknown-key 422 naming bogus_key; valid POST 201; read-back query; applied vs manual bodies identical; cross-household DELETE 403; owner DELETE 200; empty list.
+- production migration (D85): head 20260916_sg048 -> 20260917_sg068_saved_search; saved_search cols [id, household_id, name, query_json, created_at, updated_at], index ix_saved_search_household_id; row counts unchanged (household 1, asset 1, evidence 2, assertion 3, provider_call 6); health {"status":"ok","db":"ok","storage":"ok"}. No restart, no deploy.
+
+[G4] report + verify + this log; commit + push automation; notes-ref receipt (refs/notes/storagegenie-coder-reports).

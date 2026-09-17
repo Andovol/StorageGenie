@@ -23,6 +23,7 @@ from app.models import (  # noqa: F401
     PlanningSuggestion,
     ProviderCall,
     ReviewTask,
+    SavedSearch,
     SourceAttribution,
     User,
     asset_evidence,
@@ -47,6 +48,7 @@ EXPECTED_TABLES = {
     "planning_suggestion",
     "provider_call",
     "review_task",
+    "saved_search",
     "source_attribution",
     "user",
 }

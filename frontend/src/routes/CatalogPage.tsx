@@ -1,5 +1,12 @@
 import { useEffect, useMemo, useState } from "react";
-import { useAssets, useFacets, useHouseholds } from "../hooks/useAssets";
+import {
+  useAssets,
+  useDeleteSavedSearch,
+  useFacets,
+  useHouseholds,
+  useSaveSearch,
+  useSavedSearches,
+} from "../hooks/useAssets";
 import { ProductGrid } from "../components/catalog/ProductGrid";
 import { AppShell } from "../components/shell/AppShell";
 import { ItemInspectorDrawer } from "../components/shell/ItemInspectorDrawer";
@@ -11,7 +18,7 @@ import {
   type SortOption,
 } from "../components/shell/CatalogToolbar";
 import { assetToProductItem } from "../types/product";
-import type { Asset } from "../api/types";
+import type { Asset, SavedSearchQuery } from "../api/types";
 
 function useDebounced<T>(value: T, delayMs: number): T {
   const [debounced, setDebounced] = useState(value);
@@ -33,11 +40,23 @@ export function CatalogPage() {
   const [cursor, setCursor] = useState<string | undefined>(undefined);
   const [allItems, setAllItems] = useState<Asset[]>([]);
   const [selectedAssetId, setSelectedAssetId] = useState<string | null>(null);
+  const [selectedSavedSearchId, setSelectedSavedSearchId] = useState("");
 
   const effectiveHousehold = useMemo(
     () => householdId || households?.[0]?.id || "",
     [householdId, households]
   );
+
+  const { data: savedSearchesData } = useSavedSearches(effectiveHousehold);
+  const savedSearches = useMemo(() => savedSearchesData?.items ?? [], [savedSearchesData]);
+  const saveSearch = useSaveSearch(effectiveHousehold);
+  const deleteSavedSearch = useDeleteSavedSearch(effectiveHousehold);
+
+  // Saved searches are per-household: switching households drops the selection
+  // so the dropdown shows THAT household's set (SG-068 G2).
+  useEffect(() => {
+    setSelectedSavedSearchId("");
+  }, [effectiveHousehold]);
 
   useEffect(() => {
     if (households && households.length && !householdId) {
@@ -135,6 +154,32 @@ export function CatalogPage() {
     setQRaw("");
     setCategory(CATEGORY_ALL);
     setSort("recent");
+    setSelectedSavedSearchId("");
+  };
+
+  const handleSaveSearch = () => {
+    const name = window.prompt("Name this saved search");
+    if (!name || !name.trim()) return;
+    const query: SavedSearchQuery = {};
+    if (qRaw.trim()) query.q = qRaw.trim();
+    if (category !== CATEGORY_ALL) query.asset_type = category;
+    saveSearch.mutate({ name: name.trim(), query });
+  };
+
+  // Applying a saved search sets the SAME state the pills/search box use, so
+  // the existing reset effect (and the single `GET /v1/assets` path) re-queries
+  // -- no second query language.
+  const handleSavedSearchSelect = (id: string) => {
+    setSelectedSavedSearchId(id);
+    const selected = savedSearches.find((saved) => saved.id === id);
+    if (!selected) return;
+    setQRaw(selected.query.q ?? "");
+    setCategory(selected.query.asset_type ?? CATEGORY_ALL);
+  };
+
+  const handleSavedSearchDelete = (id: string) => {
+    deleteSavedSearch.mutate(id);
+    if (selectedSavedSearchId === id) setSelectedSavedSearchId("");
   };
 
   return (
@@ -157,6 +202,11 @@ export function CatalogPage() {
         setHouseholdId(id);
         localStorage.setItem("household_id", id);
       }}
+      savedSearches={savedSearches}
+      selectedSavedSearchId={selectedSavedSearchId}
+      onSavedSearchSelect={handleSavedSearchSelect}
+      onSavedSearchDelete={handleSavedSearchDelete}
+      onSaveSearch={handleSaveSearch}
     >
       {isLoading && !data ? (
         <ProductGrid

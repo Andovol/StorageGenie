@@ -9,7 +9,11 @@ import { assetToProductItem, type ProductStatus } from "../../types/product";
 import { sortCatalog } from "./CatalogToolbar";
 import type { Asset } from "../../api/types";
 
-const api = vi.hoisted(() => ({ apiGet: vi.fn() }));
+const api = vi.hoisted(() => ({
+  apiGet: vi.fn(),
+  apiPost: vi.fn(),
+  buildUrl: (path: string) => path,
+}));
 vi.mock("../../api/client", () => api);
 
 const assets: Asset[] = [
@@ -121,6 +125,8 @@ beforeEach(() => {
   document.documentElement.className = "";
   mockMatchMedia();
   api.apiGet.mockReset();
+  api.apiPost.mockReset();
+  api.apiPost.mockResolvedValue(undefined);
   const facets = {
     asset_type: {
       "Hardware & Tools": 1,
@@ -137,6 +143,9 @@ beforeEach(() => {
     }
     if (path === "/v1/assets/facets") {
       return Promise.resolve(facets);
+    }
+    if (path === "/v1/saved-searches") {
+      return Promise.resolve({ items: [] });
     }
     if (path === "/v1/assets") {
       let items = assets;
@@ -155,6 +164,7 @@ beforeEach(() => {
 
 afterEach(() => {
   vi.clearAllMocks();
+  vi.unstubAllGlobals();
 });
 
 describe("sortCatalog (real mapper data)", () => {
@@ -347,5 +357,155 @@ describe("Catalog shell", () => {
 
     expect(screen.getByText("Total: 1 item")).toBeInTheDocument();
     expect(screen.queryByText("Total: 1 items")).not.toBeInTheDocument();
+  });
+});
+
+describe("Saved searches (SG-068)", () => {
+  const saved = {
+    id: "s1",
+    household_id: "h1",
+    name: "Electronics",
+    query: { q: "zap", asset_type: "Electronics & Gadgets" },
+    created_at: "2026-09-17T00:00:00Z",
+  };
+
+  function mockSavedSearches(items: unknown[]) {
+    api.apiGet.mockImplementation((path: string, params?: Record<string, string>) => {
+      if (path === "/v1/households") {
+        return Promise.resolve([
+          { id: "h1", name: "Home", created_at: "2026-09-01T00:00:00Z" },
+          { id: "h2", name: "Cabin", created_at: "2026-09-01T00:00:00Z" },
+        ]);
+      }
+      if (path === "/v1/saved-searches") {
+        return Promise.resolve({ items });
+      }
+      if (path === "/v1/assets/facets") {
+        return Promise.resolve({
+          asset_type: {
+            "Hardware & Tools": 1,
+            "Electronics & Gadgets": 1,
+            "Apparel & Textiles": 1,
+            unknown: 1,
+          },
+          status: { ACTIVE: 1, DRAFT: 1, PENDING_REVIEW: 1, ARCHIVED: 1 },
+          has_evidence: { with: 0, without: 4 },
+        });
+      }
+      if (path === "/v1/assets") {
+        let listed = assets;
+        if (params?.asset_type) {
+          listed = listed.filter((asset) => asset.asset_type === params.asset_type);
+        }
+        if (params?.q) {
+          const needle = params.q.toLowerCase();
+          listed = listed.filter((asset) =>
+            (asset.display_name ?? "").toLowerCase().includes(needle)
+          );
+        }
+        return Promise.resolve({ items: listed, next_cursor: null });
+      }
+      return Promise.resolve(null);
+    });
+  }
+
+  test("Save search stays disabled until a filter is active, then POSTs the filter set", async () => {
+    renderCatalog();
+    await screen.findByText("Drill");
+    const saveButton = screen.getByRole("button", { name: "Save search" });
+    expect(saveButton).toBeDisabled();
+
+    fireEvent.change(screen.getByLabelText("Search catalog"), { target: { value: "shi" } });
+    await waitFor(() => expect(saveButton).not.toBeDisabled());
+
+    const promptSpy = vi.spyOn(window, "prompt").mockReturnValue("Shirt searches");
+    fireEvent.click(saveButton);
+
+    await waitFor(() =>
+      expect(api.apiPost).toHaveBeenCalledWith(
+        "/v1/saved-searches",
+        { name: "Shirt searches", query: { q: "shi" } },
+        { household_id: "h1" }
+      )
+    );
+    promptSpy.mockRestore();
+  });
+
+  test("the dropdown lists saved searches and applying one sets the same state and query", async () => {
+    mockSavedSearches([saved]);
+    renderCatalog();
+    await screen.findByText("Drill");
+
+    const select = await screen.findByLabelText("Saved searches");
+    expect(screen.getByText("Electronics")).toBeInTheDocument();
+    fireEvent.change(select, { target: { value: "s1" } });
+
+    await waitFor(() => expect(screen.getByLabelText("Search catalog")).toHaveValue("zap"));
+    expect(screen.getByRole("button", { name: "Electronics & Gadgets (1)" })).toHaveAttribute(
+      "aria-pressed",
+      "true"
+    );
+    await waitFor(() =>
+      expect(
+        api.apiGet.mock.calls.some(
+          ([path, params]) =>
+            path === "/v1/assets" &&
+            (params as Record<string, string>).q === "zap" &&
+            (params as Record<string, string>).asset_type === "Electronics & Gadgets"
+        )
+      ).toBe(true)
+    );
+    expect(screen.getByText("q: zap")).toBeInTheDocument();
+  });
+
+  test("a saved name round-trips and renders as TEXT, never as markup", async () => {
+    mockSavedSearches([{ ...saved, name: "O'Brien <derp>" }]);
+    renderCatalog();
+    await screen.findByText("Drill");
+
+    expect(await screen.findByText("O'Brien <derp>")).toBeInTheDocument();
+    expect(document.querySelector("derp")).toBeNull();
+  });
+
+  test("an empty saved-search list renders a muted None yet, not an error", async () => {
+    renderCatalog();
+    await screen.findByText("Drill");
+
+    const none = await screen.findByText("None yet");
+    expect(none).toHaveClass("text-muted-foreground");
+  });
+
+  test("deleting from the dropdown DELETEs the saved search's id", async () => {
+    mockSavedSearches([saved]);
+    const fetchMock = vi.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({ status: "deleted", id: "s1" }),
+    });
+    vi.stubGlobal("fetch", fetchMock);
+    renderCatalog();
+    await screen.findByText("Drill");
+
+    fireEvent.change(await screen.findByLabelText("Saved searches"), { target: { value: "s1" } });
+    await screen.findByText("q: zap");
+    fireEvent.click(screen.getByRole("button", { name: "Delete saved search" }));
+
+    await waitFor(() => expect(fetchMock).toHaveBeenCalled());
+    const [url, options] = fetchMock.mock.calls[0];
+    expect(url).toContain("/v1/saved-searches/s1");
+    expect(options).toEqual({ method: "DELETE" });
+  });
+
+  test("switching household clears the applied saved-search selection", async () => {
+    mockSavedSearches([saved]);
+    renderCatalog();
+    await screen.findByText("Drill");
+
+    fireEvent.change(await screen.findByLabelText("Saved searches"), { target: { value: "s1" } });
+    await screen.findByText("q: zap");
+
+    fireEvent.change(screen.getByLabelText("Household"), { target: { value: "h2" } });
+    await waitFor(() =>
+      expect((screen.getByLabelText("Saved searches") as HTMLSelectElement).value).toBe("")
+    );
   });
 });

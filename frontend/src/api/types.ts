@@ -50,6 +50,25 @@ export type AssetListResponse = {
   next_cursor: string | null;
 };
 
+// SG-068: a saved search stores EXACTLY the catalog filter surface the list
+// endpoint already takes — no separate query language.
+export type SavedSearchQuery = {
+  q?: string;
+  asset_type?: string;
+  status?: string;
+  has_evidence?: boolean;
+};
+
+export type SavedSearch = {
+  id: string;
+  household_id: string;
+  name: string;
+  query: SavedSearchQuery;
+  created_at: string | null;
+};
+
+export type SavedSearchListResponse = { items: SavedSearch[] };
+
 export type JobStep = {
   id: string;
   step_name: string;
