@@ -2,61 +2,62 @@ SG-055 — enablement probe worklog (key + consent + restart, read-only)
 
 - Dispatch-ID: SG-055
 - Coder: opencode (per packet `coder: opencode`)
-- Effort: `low` — read from process args `/proc/1375168: opencode run --auto --dir /home/andrei/StorageGenie --variant low …`
+- Effort: `low` — read from process args `/proc/1384941: opencode run --auto --dir /home/andrei/StorageGenie --variant low …`
 - Model: `unknown` — no model id on argv; the CLI default IS the model and is omitted per policy. Never read from an identity line.
 - Contract: 0.27.0 (recorded == published payload == SG-049 receipt echo; packet states it).
 - Work dir: /home/andrei/StorageGenie
 - Origin: git@github.com:Andovol/StorageGenie.git
-- BASE REF requested: origin/automation; resolved commit: 273321c0388e1a6507b6af149007759d2a84d514
-- Slice wall-clock: start 2026-09-17T11:35:06Z; close 2026-09-17T11:35:34Z (~28 s elapsed).
+- BASE REF requested: origin/automation; resolved commit: 3b41d88e82791cfdc67fa7e90afe92c8412ad849
+- Run identity: SG-055 run-2 (run-1 `1e0f5b3` STOP-as-SUCCESS, rated `79c831f`; this run measures post-M31).
+- Slice wall-clock: start ~2026-09-17T11:46:00Z (probe `date` 2026-09-17T11:46:48Z); close ~2026-09-17T11:47Z.
   Budget: 120s ordinary · 300s note push+verify · 600s early-close · 900s overall.
-  Actual vs budget: ~28s vs 900s overall — well under; no command was killed.
+  Actual vs budget: ~75s vs 900s overall — well under; no command was killed.
 - Spend (real $): $0.000000 actual vs $0 bound. Zero provider calls.
 - DATABASE: none. No DB touched, not even arithmetically. Read-only service/container probes only.
 
 ## Verdict
 
-**STOP-as-SUCCESS.** Gate leg (a) and (c) are FALSE; the SG-049 live leg must not be
-re-dispatched yet. This is the designed successful outcome for a STOP gate, not a failure.
+**GO.** All three establishments are true; the SG-049 live leg may be re-dispatched.
 
-- (a) `GET /v1/settings/ai` → `consent` = `false`.
+- (a) `GET /v1/settings/ai` → `consent` = `true`.
 - (b) provider key exists → `True`, len `67` (zero key bytes).
-- (c) `ai_status()` → `(False, 'consent_disabled')`.
-- (d) backend container `StartedAt=2026-09-16T19:55:23.663139387Z`, image
-  `sha256:4f338b356945f9a8f960ecd3f50a3890a7c2b6d536ea4312c4f66e25e2f78f5e`.
-
-Three establishments (a+b+c) are not all true → STOP; live-leg re-dispatch deferred.
+- (c) `ai_status()` → `(True, 'enabled')`.
+- (d) backend container `StartedAt=2026-09-17T11:45:59.396847235Z`, image
+  `sha256:4f338b356945f9a8f960ecd3f50a3890a7c2b6d536ea4312c4f66e25e2f78f5e`, `Up 46 seconds (healthy)`.
 
 ## Raw outputs
 
-All raw command output quoted in `docs/worklogs/SG-055_verify.log` (sections V0–V9).
+All raw command output quoted in `docs/worklogs/SG-055_verify.log` (sections V0–V6).
 Nothing was inferred from a bare exit code.
 
 ## Secrets gate
 
-`docs/worklogs/SG-055_verify.log` [V8], quoted. Gate (a) secret-shaped patterns
+`docs/worklogs/SG-055_verify.log` §V5, quoted. Gate (a) secret-shaped patterns
 (`sk-…`, `Bearer …`, `xox…`, `AIza…`, PRIVATE KEY blocks) → 0 hits. Gate (b)
-completeness cross-check over every ≥40-char token: a naive `[A-Za-z0-9_-]{40,}`
-grep matches benign git object IDs / sha256 image digests / notes-ref hex, so those
-classes are classified out — `suspicious_non_hex_long_tokens = 0`. The `key_len=`
-integer line is excluded. No key byte was printed, logged, quoted, or committed.
+completeness cross-check over every ≥40-char token: a naive `[A-Za-z0-9_+/-]{40,}`
+grep matches only benign hex git object IDs / sha256 image digests / notes-ref hex,
+classified out → `suspicious_non_hex_long_tokens = 0`. The `key_len=` integer line
+is excluded. No key byte was printed, logged, quoted, or committed.
 `docker compose config` was never run. No `.env` was read.
 
 ## Budget
 
-Ordinary commands ~28s total against a 120s-per-command bound; note push+verify still
-within its 300s bound; early-close 600s not reached; overall 900s not reached.
+Ordinary commands ~25s total against a 120s-per-command bound; note push+verify ~15s
+against its 300s bound; early-close 600s not reached; overall 900s not reached.
 Real metered spend: $0.000000 actual vs $0 bound (zero provider calls).
+
+## PG-SC-09 (name-the-world)
+
+GO here does not guarantee the live leg passes: the key could be present-but-invalid at
+call time, or the env rotated between this probe and the leg. This probe reads presence +
+length + consent, never validity. The live leg re-runs G0 itself and remains the authority;
+this probe only prices down the "env missing / no restart" failure mode that run-1 proved real.
 
 ## UNCLEAR
 
-- FIRST READ: the packet asserted the owner had placed `SG_CONSENT=true` and restarted;
-  the live service answered `consent=false` and the container process env had no
-  `SG_CONSENT` at all — so the asserted enablement pre-step is not visible in the
-  running backend. Not resolved in-slice (a `.env` read is out of scope by the ceiling).
-- DURING EXECUTION: the SG-049 report cites loopback port 8003 and the running container
-  confirms `127.0.0.1:8003->8000/tcp`; port 8000 returns `Not Found`. The canonical
-  `{{HEALTH_CMD}}`/packet text names 8000 — an apparent stale binding, reported.
-- REMAINING: whether the `.env` file on the host actually carries `SG_CONSENT=true`
-  (unreadable to me within scope) and, if it does, why the running process did not load
-  it; only the owner can reconcile the `.env` + restart step.
+- FIRST READ: whether run-2 should rewrite the worklogs (current state) or append to run-1's
+  STOP content. I rewrote to the current GO state; run-1 remains in git history + delivery note.
+- DURING EXECUTION: none blocking. `provider_id=fake` unchanged from SG-049 and explicitly not
+  stop-grounds; proceeded on consent + key + ai_status.
+- REMAINING: whether the SG-049 live leg is now re-dispatched and whether `provider_id=fake` is
+  itself a remaining provision step or intended.

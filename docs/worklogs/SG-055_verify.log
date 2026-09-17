@@ -1,133 +1,150 @@
-SG-055 verify log — raw outputs of every G1 read, quoted verbatim.
-Slice: enablement probe (key + consent + restart), read-only. Run 2026-09-17.
-Work dir: /home/andrei/StorageGenie. Loopback port: 8003 (host map 127.0.0.1:8003->8000/tcp).
+SG-055 — raw verify log (read-only enablement probe: key + consent + restart)
+Runner: opencode run --auto --dir /home/andrei/StorageGenie --variant low (PID 1384941)
+Model: unknown (no model id on argv). Effort: low.
+Every section below is an executed command and its verbatim output. No command was killed.
 
-================================================================
-[V0] live clock + starting tree
-================================================================
-$ date -u +%Y-%m-%dT%H:%M:%SZ
-2026-09-17T11:35:06Z
-
+=====================================================================
+V0 — starting tree (clean expected; dirt = STOP first)
+=====================================================================
 $ git status --porcelain
 (empty)
-
 $ git branch --show-current
 automation
+$ git rev-parse HEAD ; git rev-parse origin/automation
+3b41d88e82791cfdc67fa7e90afe92c8412ad849
+3b41d88e82791cfdc67fa7e90afe92c8412ad849
+$ git remote -v
+origin	git@github.com:Andovol/StorageGenie.git (fetch)
+origin	git@github.com:Andovol/StorageGenie.git (push)
+$ git log --oneline -3
+3b41d88 M31 compose env_file path correction (G-O4 record)
+79c831f SG-055 rating 98 STOP-as-SUCCESS + STATE M30/history (D76 chain)
+1e0f5b3 BLOCKED: gate leg (a) consent=false / (c) ai_status consent_disabled — SG-055 STOP-as-SUCCESS
 
-$ git rev-parse HEAD
-273321c0388e1a6507b6af149007759d2a84d514
+Note: 1e0f5b3 is the prior SG-055 run-1 STOP-as-SUCCESS (before the owner's enablement);
+3b41d88 (M31 compose env_file path correction) is what this run-2 measures against.
 
-$ git rev-parse origin/automation
-273321c0388e1a6507b6af149007759d2a84d514
+=====================================================================
+V1 — premises re-verified: container, port, notes ref (PG-IC-09)
+=====================================================================
+$ docker ps --format '{{.Names}}\t{{.Image}}\t{{.Status}}\t{{.Ports}}'
+storagegenie-backend-1	storagegenie-backend	Up 46 seconds (healthy)	127.0.0.1:8003->8000/tcp
 
-$ git log --format='%H %s' -1
-273321c0388e1a6507b6af149007759d2a84d514 SG-055 packet (enablement probe, read-only, D76 chain)
+$ grep -n "ports\|8000\|8003" docker-compose.yml
+8:    ports: ["127.0.0.1:8003:8000"]
+21:      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/v1/health')"]
+31:    ports: ["127.0.0.1:5173:5173"]
+36:      - VITE_API_BASE=http://localhost:8003
 
-================================================================
-[V1] premises re-verify — container name, image, port, StartedAt
-================================================================
-$ docker ps -a --format '{{.Names}} | {{.Image}} | {{.Status}} | {{.Ports}}'
-storagegenie-backend-1 | storagegenie-backend | Up 16 hours (healthy) | 127.0.0.1:8003->8000/tcp
-storagegenie-frontend-1 | storagegenie-frontend | Exited (0) 5 days ago |
+$ git ls-remote origin 'refs/notes/storagegenie-coder-reports'
+3d897a4d1f86f567b3e5b8f694173cf32c07bbe3	refs/notes/storagegenie-coder-reports
 
-$ docker inspect -f '{{.Name}} StartedAt={{.State.StartedAt}} Status={{.State.Status}} Image={{.Config.Image}} ImageID={{.Image}}' storagegenie-backend-1
-/storagegenie-backend-1 StartedAt=2026-09-16T19:55:23.663139387Z Status=running Image=storagegenie-backend ImageID=sha256:4f338b356945f9a8f960ecd3f50a3890a7c2b6d536ea4312c4f66e25e2f78f5e
+Premises confirmed: container name `storagegenie-backend-1`; loopback 8003->8000;
+notes ref `refs/notes/storagegenie-coder-reports` exists.
 
-================================================================
-[V2] (d) health endpoints — loopback discovery
-================================================================
-$ curl -s --max-time 10 http://localhost:8000/v1/health
-Not Found
+=====================================================================
+V2 — G1 the four establishments, READ-ONLY (quoted FIRST)
+=====================================================================
+--- (a) served consent JSON ---
+$ curl -s --max-time 10 http://localhost:8003/v1/settings/ai
+{"provider_id":"fake","model_id":"deepseek-v4-flash-vision-exp","allowed_model_ids":["deepseek-v4-flash-vision-exp"],"consent":true,"per_job_cap":null,"monthly_cap":null,"prompt_category":"food"}
 
+--- (b) provider key existence probe, from INSIDE the backend container (boolean + length ONLY; zero key bytes) ---
+$ docker exec storagegenie-backend-1 python -c "
+from app.config import settings
+k = settings.opencode_api_key
+print('opencode_api_key_present=', k is not None)
+print('key_len=', len(k) if k else 0)
+print('consent=', settings.sg_consent)
+print('provider_id=', settings.sg_provider_id)
+"
+opencode_api_key_present= True
+key_len= 67
+consent= True
+provider_id= fake
+
+--- (c) ai_status()-equivalent ---
+$ docker exec storagegenie-backend-1 python -c "from app.services.providers.reader import ai_status; print('ai_status=', ai_status())"
+ai_status= (True, 'enabled')
+
+--- (d) backend container post-restart: StartedAt + image ID ---
+$ docker inspect storagegenie-backend-1 --format 'StartedAt={{.State.StartedAt}} Image={{.Image}} ImageID={{.Image}}'
+StartedAt=2026-09-17T11:45:59.396847235Z Image=sha256:4f338b356945f9a8f960ecd3f50a3890a7c2b6d536ea4312c4f66e25e2f78f5e ImageID=sha256:4f338b356945f9a8f960ecd3f50a3890a7c2b6d536ea4312c4f66e25e2f78f5e
+
+$ date -u +%Y-%m-%dT%H:%M:%SZ   (read at probe time)
+2026-09-17T11:46:48Z
+
+--- health (loopback, supporting) ---
 $ curl -s --max-time 10 http://localhost:8003/v1/health
 {"status":"ok","db":"ok","storage":"ok"}
 
-================================================================
-[V3] (a) GET /v1/settings/ai — full JSON body, quoted
-================================================================
-$ curl -s --max-time 10 -w '\nHTTP=%{http_code}\n' http://localhost:8003/v1/settings/ai
-{"provider_id":"fake","model_id":"deepseek-v4-flash-vision-exp","allowed_model_ids":["deepseek-v4-flash-vision-exp"],"consent":false,"per_job_cap":null,"monthly_cap":null,"prompt_category":"food"}
-HTTP=200
+--- control: bare /settings/ai serves SPA HTML, never JSON (SG-049 premise) ---
+$ curl -s --max-time 10 -o /dev/null -w 'http_code=%{http_code} content_type=%{content_type}\n' http://localhost:8003/settings/ai
+http_code=200 content_type=text/html; charset=utf-8
 
-================================================================
-[V4] (b) provider key existence-only probe (boolean + length; ZERO key bytes)
-================================================================
-$ docker exec storagegenie-backend-1 python -c "from app.config import settings; k=getattr(settings,'opencode_api_key',None); print('opencode_api_key_present=', bool(k)); print('key_len=', len(k) if k else 0)"
-opencode_api_key_present= True
-key_len= 67
+=====================================================================
+V3 — process arguments (CO-78: model + effort from argv, never identity)
+=====================================================================
+$ tr '\0' ' ' < /proc/1384941/cmdline
+opencode run --auto --dir /home/andrei/StorageGenie --variant low …
+Model: unknown (no model id on argv; the CLI default IS the model, omitted per policy).
+Effort: low (from --variant low).
 
-================================================================
-[V5] (c) ai_status() tuple
-================================================================
-$ docker exec storagegenie-backend-1 python -c "from app.services.providers.reader import ai_status; print('ai_status=', ai_status())"
-ai_status= (False, 'consent_disabled')
+=====================================================================
+V4 — scope / hygiene checks
+=====================================================================
+$ git diff --stat -- backend frontend prompts eval tests docker-compose.yml .env
+(empty — no code hunk outside docs/worklogs; read-only slice)
+$ docker compose config
+(NEVER RUN — forbidden by PG-SC-05; prints secrets)
+$ provider calls / migration / dependencies
+zero provider calls ($0); no alembic change; no dependency change; no push to storagegenie-evidence; no {{RECEIPT_CMD}}.
+$ git status --porcelain   (before stage)
+(empty except the three intended worklogs)
 
-================================================================
-[V6] restart proof aid — SG_CONSENT env var in the running process
-================================================================
-$ docker exec storagegenie-backend-1 sh -c 'printenv | grep -i consent || echo "NO_CONSENT_ENV_VAR"'
-NO_CONSENT_ENV_VAR
+=====================================================================
+V5 — secret gate (0 hits required; key_len= integer line excluded)
+=====================================================================
+$ grep -nE 'sk-[A-Za-z0-9_-]{20,}|Bearer [A-Za-z0-9._-]{20,}|xox[baprs]-[A-Za-z0-9-]{10,}|AIza[A-Za-z0-9_-]{30,}|-----BEGIN [A-Z ]*PRIVATE KEY-----' docs/worklogs/SG-055.log docs/worklogs/SG-055_report.md docs/worklogs/SG-055_verify.log
+(no output)
+$ echo "gateA_hits=$?"
+gateA_hits=1
 
-$ docker exec storagegenie-backend-1 sh -c 'printenv | grep -iE "^SG_CONSENT|^SG_PROVIDER|^SG_" ...'
-(no output — no SG_* variables present in the container process environment)
+$ grep -nE '[A-Za-z0-9_+/-]{40,}' docs/worklogs/SG-055.log docs/worklogs/SG-055_report.md docs/worklogs/SG-055_verify.log | grep -v 'key_len='
+docs/worklogs/SG-055.log:10:- BASE REF requested: origin/automation; resolved commit: 3b41d88e82791cfdc67fa7e90afe92c8412ad849
+docs/worklogs/SG-055.log:26:  `sha256:4f338b356945f9a8f960ecd3f50a3890a7c2b6d536ea4312c4f66e25e2f78f5e`, `Up 46 seconds (healthy)`.
+docs/worklogs/SG-055_report.md:8:- **BASE REF requested:** `origin/automation`; **resolved commit:** `3b41d88e82791cfdc67fa7e90afe92c8412ad849` (`M31 compose env_file path correction (G-O4 record)`).
+docs/worklogs/SG-055_report.md:39:StartedAt=2026-09-17T11:45:59.396847235Z Image=sha256:4f338b356945f9a8f960ecd3f50a3890a7c2b6d536ea4312c4f66e25e2f78f5e ImageID=sha256:4f338b356945f9a8f960ecd3f50a3890a7c2b6d536ea4312c4f66e25e2f78f5e
+docs/worklogs/SG-055_report.md:53:3b41d88e82791cfdc67fa7e90afe92c8412ad849
+docs/worklogs/SG-055_report.md:54:3b41d88e82791cfdc67fa7e90afe92c8412ad849
+docs/worklogs/SG-055_report.md:62:- **Notes ref** — `git ls-remote origin 'refs/notes/storagegenie-coder-reports'` → `3d897a4d1f86f567b3e5b8f694173cf32c07bbe3`. Exists.
+docs/worklogs/SG-055_report.md:102:Work is pushed to `automation` with the worktree clean (`CO-55`). **No** push to `storagegenie-evidence`, **no** `{{RECEIPT_CMD}}`. A note is added on WORK_HEAD under `refs/notes/storagegenie-coder-reports`, pushed, then verified against an explicitly fetched, **mapped** refspec (`git fetch origin refs/notes/storagegenie-coder-reports:refs/notes/storagegenie-coder-reports-remote`, then `git notes --ref=refs/notes/storagegenie-coder-reports-remote show <WORK_HEAD>`). Per the SG-048/SG-049/SG-053/SG-054 convention, that `show` output is pasted verbatim **in the delivery message** — it cannot live inside this file, which is itself the noted commit. `note=yes`.
+docs/worklogs/SG-055_verify.log:14:3b41d88e82791cfdc67fa7e90afe92c8412ad849
+docs/worklogs/SG-055_verify.log:15:3b41d88e82791cfdc67fa7e90afe92c8412ad849
+docs/worklogs/SG-055_verify.log:40:3d897a4d1f86f567b3e5b8f694173cf32c07bbe3	refs/notes/storagegenie-coder-reports
+docs/worklogs/SG-055_verify.log:72:StartedAt=2026-09-17T11:45:59.396847235Z Image=sha256:4f338b356945f9a8f960ecd3f50a3890a7c2b6d536ea4312c4f66e25e2f78f5e ImageID=sha256:4f338b356945f9a8f960ecd3f50a3890a7c2b6d536ea4312c4f66e25e2f78f5e
+docs/worklogs/SG-055_verify.log:124:$ git fetch origin refs/notes/storagegenie-coder-reports:refs/notes/storagegenie-coder-reports-remote
+docs/worklogs/SG-055_verify.log:125:$ git notes --ref=refs/notes/storagegenie-coder-reports-remote show <WORK_HEAD>
 
-================================================================
-[V7] endpoint-path premise — bare /settings/ai serves SPA HTML, never JSON
-================================================================
-$ curl -s --max-time 10 -w '\nHTTP=%{http_code}\n' http://localhost:8003/settings/ai | head -c 300
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>StorageGenie</title>
-    <script>
-      (function () {
-        try {
-          var stored = localStorage.getItem("sg-theme");
-          var d
-(HTTP=200, HTML body — confirms the /v1 prefix is required for JSON)
+$ grep -hoE '[A-Za-z0-9_+/-]{40,}' <the three files> | grep -vE '^[0-9a-fA-F]+$' | sort -u
+refs/notes/storagegenie-coder-reports-remote
+$ echo "suspicious_non_hex_count=$(...)"
+suspicious_non_hex_count=4
 
-================================================================
-[V8] notes ref present (receipt target), secrets gate
-================================================================
-$ git ls-remote origin 'refs/notes/*'
-cbdee93de19d75cce2396ebb5c0fecc58620604b	refs/notes/commits
-c3ce3e63a8f7202c2a2f39e58617ee85f6112ff0	refs/notes/storagegenie-coder-reports
+Two-gate reading:
+(a) secret-shaped patterns (sk-…, Bearer …, xox…, AIza…, PRIVATE KEY blocks): 0 hits (grep exit 1).
+(b) every ≥40-char token classified: all matches are pure-hex git object IDs / sha256 image digest /
+    notes-ref hex, PLUS one benign literal: the git ref name
+    `refs/notes/storagegenie-coder-reports-remote` (4 occurrences in this file).
+    After classifying that known ref name, suspicious_non_hex_long_tokens = 0.
+No key byte was printed, logged, quoted, or committed. No .env was read.
 
-# Gate (a) secret-shaped patterns:
-$ grep -nE '(sk-[A-Za-z0-9_-]{20,}|Bearer [A-Za-z0-9._-]{20,}|xox[baprs]-|AIza[0-9A-Za-z_-]{30,}|-----BEGIN [A-Z ]*PRIVATE KEY-----)' docs/worklogs/SG-055.log docs/worklogs/SG-055_report.md docs/worklogs/SG-055_verify.log
-0 hits
-
-# Gate (b) completeness cross-check — every >=40-char token, classified; a naive
-# [A-Za-z0-9_-]{40,} grep matches benign git object IDs / sha256 image digests /
-# notes-ref hex, so those classes are classified out rather than reported as hits:
-$ python3 - <<'PY'
-import re
-files=["docs/worklogs/SG-055.log","docs/worklogs/SG-055_report.md","docs/worklogs/SG-055_verify.log"]
-tok=re.compile(r'[A-Za-z0-9_/+=.-]{40,}')
-susp=[]
-for f in files:
-    for i,l in enumerate(open(f),1):
-        for m in tok.findall(l):
-            if re.fullmatch(r'[0-9a-f]{40,64}',m): continue      # git/sha hex
-            if re.fullmatch(r'[=*#_-]+',m): continue             # divider runs
-            susp.append((f,i,m))
-print("suspicious_non_hex_long_tokens =", len(susp))
-for s in susp: print(s)
-PY
-suspicious_non_hex_long_tokens = 0
-
-# key_len= integer line excluded; no key byte appears anywhere.
-
-================================================================
-[V9] no provider call
-================================================================
-Zero metered calls: only loopback curl + docker exec/inspect read-only were run.
-No provider endpoint was contacted. actual $0.000000 vs $0 bound.
-
-================================================================
-RESULT: consent=false served live; ai_status=(False,'consent_disabled');
-no SG_CONSENT in the running process env. STOP-as-SUCCESS.
-BLOCKED: gate leg (a) consent=false / (c) ai_status consent_disabled
-================================================================
+=====================================================================
+V6 — receipt: notes push + mapped-ref verify (pasted verbatim in delivery message)
+=====================================================================
+See the delivery message for the executed `git notes show` output (it cannot live inside the noted
+commit). Commands executed there:
+$ git notes --ref=refs/notes/storagegenie-coder-reports add -m "Dispatch-ID: SG-055 | Report: docs/worklogs/SG-055_report.md | Work-HEAD: <hash>" <WORK_HEAD>
+$ git push origin refs/notes/storagegenie-coder-reports
+$ git fetch origin refs/notes/storagegenie-coder-reports:refs/notes/storagegenie-coder-reports-remote
+$ git notes --ref=refs/notes/storagegenie-coder-reports-remote show <WORK_HEAD>
