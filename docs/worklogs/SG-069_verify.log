@@ -239,4 +239,48 @@ overall at first-read->now: ~90s / 1800s bound
 ================================================================================
 SECTION 7 — NOTES-REF RECEIPT (raw)
 ================================================================================
-(TO BE PASTED by the docs-only receipt follow-up commit after WORK_HEAD exists)
+WORK_HEAD = e47327e162d4e01da927c1c142c63529b5d3f7f5 (docs-only work commit)
+
+$ git push origin automation
+To github.com:Andovol/StorageGenie.git
+   37aaf88..e47327e  automation -> automation
+push rc=0
+
+$ git notes --ref=refs/notes/storagegenie-coder-reports add -m "Dispatch-ID: SG-069 | Report: docs/worklogs/SG-069_report.md | Work-HEAD: e47327e162d4e01da927c1c142c63529b5d3f7f5" e47327e162d4e01da927c1c142c63529b5d3f7f5
+notes add rc=0  (120s bound; existing-note refusal did NOT occur)
+
+$ git notes --ref=refs/notes/storagegenie-coder-reports show e47327e162d4e01da927c1c142c63529b5d3f7f5
+Dispatch-ID: SG-069 | Report: docs/worklogs/SG-069_report.md | Work-HEAD: e47327e162d4e01da927c1c142c63529b5d3f7f5
+
+$ git push origin refs/notes/storagegenie-coder-reports
+To github.com:Andovol/StorageGenie.git
+   95678e2..7991b1c  refs/notes/storagegenie-coder-reports -> refs/notes/storagegenie-coder-reports
+notes push rc=0  (300s bound)
+
+$ git fetch origin refs/notes/storagegenie-coder-reports:refs/notes/storagegenie-coder-reports-sg069-verify
+From github.com:Andovol/StorageGenie
+ * [new ref]         refs/notes/storagegenie-coder-reports -> refs/notes/storagegenie-coder-reports-sg069-verify
+fetch rc=0
+$ git rev-parse refs/notes/storagegenie-coder-reports-sg069-verify
+7991b1c777ce8ae4686c69324a8b6914210967eb
+
+NOTE (instrument): `git notes --ref=<ref> list` prints `<note-blob-sha> <annotated-object-sha>` pairs only
+— it does NOT print note bodies, so `git notes list | grep SG-069` returns rc=1. Grepping note CONTENT
+requires `show` per object (or `git log --notes`). Both correct forms pasted below; both rc=0.
+
+$ git notes --ref=refs/notes/storagegenie-coder-reports-sg069-verify list | awk '{print $2}' | while read -r o; do git notes --ref=refs/notes/storagegenie-coder-reports-sg069-verify show "$o"; done | grep -n 'SG-069'
+177:Dispatch-ID: SG-069 | Report: docs/worklogs/SG-069_report.md | Work-HEAD: e47327e162d4e01da927c1c142c63529b5d3f7f5
+body-grep rc=0
+
+$ git log --notes=refs/notes/storagegenie-coder-reports-sg069-verify --format='%H%n%N' -5 | grep -n 'SG-069'
+2:Dispatch-ID: SG-069 | Report: docs/worklogs/SG-069_report.md | Work-HEAD: e47327e162d4e01da927c1c142c63529b5d3f7f5
+log-body-grep rc=0
+
+$ git notes --ref=refs/notes/storagegenie-coder-reports-sg069-verify show e47327e162d4e01da927c1c142c63529b5d3f7f5
+Dispatch-ID: SG-069 | Report: docs/worklogs/SG-069_report.md | Work-HEAD: e47327e162d4e01da927c1c142c63529b5d3f7f5
+show rc=0
+
+$ git status --porcelain=v1
+(clean)
+
+note=yes

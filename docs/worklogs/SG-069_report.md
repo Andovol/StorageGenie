@@ -5,7 +5,7 @@
 **Contract:** recorded `0.28.2` == published (`0.28.2`); source path `/home/andrei/storagegenie-contract/VERSION`; `RULES.md` sha256 `a66aa4313d62cebff8b44f10299928288e05dc4d7c45f4f4e83e0bbd954c131d` == payload `RULES.sha256`.
 **Work dir:** `/home/andrei/StorageGenie` · **origin:** `git@github.com:Andovol/StorageGenie.git`
 **BASE ref:** `origin/automation` · **resolved:** `37aaf881d0b3d0f27ce060121f61a061c653cd28`
-**WORK_HEAD:** see receipt follow-up (docs-only work commit hash).
+**WORK_HEAD:** `e47327e162d4e01da927c1c142c63529b5d3f7f5` (docs-only work commit).
 **Spend:** real **$0.000000** (zero metered calls).
 
 ---
@@ -74,7 +74,26 @@ Packet premise confirmed exactly: the pre bundle name, sha256 and byte size matc
 
 ## Receipt — notes ref (M20-corrected block)
 
-WORK_HEAD: `<filled by receipt follow-up>`. To be completed with pasted `git notes … show` output after `WORK_HEAD` exists. `note=yes` required; zero-exit with `note=no` is a FAIL.
+Work pushed to `automation` (`37aaf88..e47327e`), worktree clean. No push to `storagegenie-evidence`, no `{{RECEIPT_CMD}}`.
+
+```
+$ git notes --ref=refs/notes/storagegenie-coder-reports add -m "Dispatch-ID: SG-069 | Report: docs/worklogs/SG-069_report.md | Work-HEAD: e47327e162d4e01da927c1c142c63529b5d3f7f5" e47327e162d4e01da927c1c142c63529b5d3f7f5
+notes add rc=0
+$ git push origin refs/notes/storagegenie-coder-reports
+   95678e2..7991b1c  refs/notes/storagegenie-coder-reports -> refs/notes/storagegenie-coder-reports
+notes push rc=0
+$ git fetch origin refs/notes/storagegenie-coder-reports:refs/notes/storagegenie-coder-reports-sg069-verify
+ * [new ref]         refs/notes/storagegenie-coder-reports -> refs/notes/storagegenie-coder-reports-sg069-verify
+fetch rc=0
+$ git rev-parse refs/notes/storagegenie-coder-reports-sg069-verify
+7991b1c777ce8ae4686c69324a8b6914210967eb
+$ git notes --ref=refs/notes/storagegenie-coder-reports-sg069-verify show e47327e162d4e01da927c1c142c63529b5d3f7f5
+Dispatch-ID: SG-069 | Report: docs/worklogs/SG-069_report.md | Work-HEAD: e47327e162d4e01da927c1c142c63529b5d3f7f5
+show rc=0
+note=yes
+```
+
+Instrument finding: `git notes --ref=… list` prints only `<note-blob-sha> <object-sha>` pairs, not bodies, so a `list | grep SG-069` returns rc=1. Content grep requires `show` per object (or `git log --notes`). Both correct forms were run (rc=0) and are pasted in `SG-069_verify.log` SECTION 7.
 
 ## UNCLEAR
 
