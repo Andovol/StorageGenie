@@ -1,0 +1,192 @@
+SG-062 verify log — money-integrity error-ledger usage preservation
+First token: SG-062
+Spend: $0.000000 actual vs $0 bound (zero provider calls, no network; loopback + container-runtime not needed).
+
+==============================================================================
+§1 G1 — raise-leg table: `backend/app/services/providers/opencode_go.py`
+==============================================================================
+
+Leg (file:line at BASE, quoted)                                   | body bytes at raise? | usage available? | pre-change carries usage? | post-change
+------------------------------------------------------------------|----------------------|------------------|---------------------------|------------
+:67  guard_content -> raise ProviderError("invalid_json", "provider  | NO (content empty)   | no               | no                        | no (not-a-defect)
+     returned empty content (empty-200 reject)")                    |                      |                  |                           |
+:77  guard_usage   -> raise ProviderError("invalid_json", "provider  | NO (usage empty)     | no (zero tokens) | no                        | YES (attaches the body's raw usage dict; empty -> still absent fields)
+     returned zero or absent usage tokens")                         |                      |                  |                           |
+:86  strip_single_think -> raise ProviderError("invalid_json",      | NO (content shape)   | no               | no                        | no (not-a-defect)
+     "unbalanced or stray  thinking block in content")              |                      |                  |                           |
+:90  strip_single_think -> raise ProviderError("invalid_json",      | NO (content shape)   | no               | no                        | no (not-a-defect)
+     "multiple  thinking blocks: strip once, then fail loudly")     |                      |                  |                           |
+:209 _resolve_api_key -> raise ProviderError("missing_key", ...)    | NO (pre-network)     | no               | no                        | no (not-a-defect)
+:219 _post transport -> raise ProviderError("transport", ...)       | NO (no response)     | no               | no                        | no (not-a-defect)
+:223 _post http_status -> raise ProviderError("http_status", ...)   | partial (response.text[:300] only; no JSON parsed) | no | no              | no (not-a-defect)
+:230 _post invalid_json (non-JSON body) -> raise ProviderError      | YES (response body)  | parse failed     | no                        | no (not-a-defect: body is not JSON, no parseable usage)
+:232 _post invalid_json (non-object body) -> raise ProviderError    | YES (response body)  | non-dict         | no                        | no (not-a-defect: not an object, no usage key contract)
+:273 extract_items "provider 200 with no choices"                   | YES                  | YES (guard_usage at :270 parsed it) | NO (DROPPED) | YES — ATTACHED (DEFECT FIXED)
+:332 extract_text  "provider 200 with no choices"                   | YES                  | YES (guard_usage at :329 parsed it) | NO (DROPPED) | YES — ATTACHED (DEFECT FIXED)
+
+Note on :77 `guard_usage`: pre-change it raised with NO usage. Post-change it attaches
+the received raw usage dict (the zero/absent case), because guard_usage receives the
+`body.get("usage") or {}` dict the body carried. This is honest: it records what the
+body carried, not an invented value. Verified by `test_pre_body_legs_do_not_invent_usage_or_cost`
+which now pins the genuinely pre-body legs (non-JSON body raise, missing_key), not the
+zero-usage leg.
+
+`attach_body_accounting` (new, `opencode_go.py:104`) uses `setattr` so mypy delta stays 0
+(`ProviderError` lives in `router.py`, outside this slice's ceiling).
+
+==============================================================================
+§2 G1 — the three record-path writers, quoted (BASE)
+==============================================================================
+
+reader._write_error_ledger (base :251-282) — reads whatever the exception carries:
+    usage = getattr(exc, "usage", None)          # :265
+    cost = getattr(exc, "cost", None)            # :266
+    latency_ms = getattr(exc, "latency_ms", None)# :267
+    cost=float(cost) if cost is not None else 0.0,        # :274
+    usage_json=json.dumps(usage, ensure_ascii=False) if usage else None,  # :275
+    latency_ms=float(latency_ms) if latency_ms is not None else None,     # :276
+VERDICT: raised usage DOES survive into the committed row (no reader hunk needed —
+  attaching in the adapter is sufficient). This is the PG-SC-12 real path.
+
+reader._mark_calls_failed (base :227-248) — marks returned-body rows errored and COMMITS;
+  docstring: "Mark returned-body ledger rows as errored and COMMIT them (SG-030 ISS-11)."
+VERDICT: unchanged by this slice; already persists returned-body cost/usage + error_state.
+
+chat._write_error_ledger (base :242-267) — signature took only kind/message and
+  HARDCODED:
+    cost=0.0,            # :259
+    usage_json=None,     # :260
+    latency_ms=None,     # :261
+VERDICT: DEFECT — the caught exception's usage was dropped here even when carried.
+  Fixed by threading usage/cost/latency kwargs from the `except ProviderError` arm.
+
+planning._write_error_ledger (base :218-235) — the twin, identical shape:
+    cost=0.0,            # :227
+    usage_json=None,     # :228
+    latency_ms=None,     # :229
+VERDICT: DEFECT — same drop; twin mirrors chat EXACTLY before and after (verified
+  against the quoted chat writer; both now take `usage`/`cost`/`latency_ms` and use the
+  same `float(cost) if cost is not None else 0.0` / `json.dumps(usage) if usage else None`
+  split).
+
+==============================================================================
+§3 Corroborations (durable records, verified no changes made)
+==============================================================================
+- docs/worklogs/SG-039_verify.log:133-134:
+    call fixture=sg029-03-glare-food ... latency_ms=None usage=null cost=$0.000000 error_state=invalid_json: adapter schema parse failed
+  (both attempts) — this is the `no choices` leg pre-fix at the reader boundary.
+- SG-039_report.md:65-68 names the same residual, destination "adapter-touching slice".
+  RECORDED MISATTRIBUTION (correction, not agreement): the SG-039 report attributes the
+  glare cost=$0 to a failure that "precedes a completed 200 body". That premise is FALSE:
+  the glare fixture produced a VALID 200 with a real usage (backend/eval/corpus/sg029/
+  sg029_03_glare_food.json `provider_calls[0].usage.total_tokens=1095`,
+  `cost=0.0003177`), and the adapter parsed that usage at :270 before raising at :273.
+  So the value was DROPPED, not absent. This slice fixes exactly that drop.
+- tests/test_ai_pipeline.py:719ish `test_returned_body_failing_schema_is_ledgered_durably`
+  pins the returned-body schema_validation family; re-pinned unchanged post-change.
+
+==============================================================================
+§4 G2 — FAIL-then-PASS (pre-change RESPONSE = RED, post-change = GREEN)
+==============================================================================
+Derived test set (0.28.2 "a hit is a FILE"): files hit by
+  grep -l '_write_error_ledger|_mark_calls_failed|error_state|usage_json|invalid_json|schema_validation'
+  => test_ai_pipeline.py, test_chat.py, test_planning.py, test_opencode_go.py
+  plus test_provider_gateway.py / test_extraction_contract.py / test_phase2_e2e.py
+  (touched shapes; their nodes run in the full suite). Intuition vs derived: derived was
+  broader; I ran EVERY node in each changed-code-hit file in the full suite (§5).
+
+RED (app services stashed to BASE; tests at WORK): command and RAW output
+  $ cd backend && PYTHONDONTWRITEBYTECODE=1 ../venv/bin/python -m pytest -q --tb=line -p no:cacheprovider \
+      tests/test_opencode_go.py::test_raise_legs_carry_a_received_bodys_usage_and_cost \
+      tests/test_opencode_go.py::test_extract_text_raise_legs_carry_a_received_bodys_usage_and_cost \
+      tests/test_chat.py::test_chat_error_ledger_records_carried_usage \
+      tests/test_planning.py::test_planning_error_ledger_records_carried_usage \
+      tests/test_planning.py::test_planning_error_ledger_without_usage_stays_zero
+  FFFF.                                                                    [100%]
+  E   AttributeError: 'ProviderError' object has no attribute 'usage'
+  /home/andrei/StorageGenie/backend/tests/test_opencode_go.py:193: AttributeError
+  E   AttributeError: 'ProviderError' object has no attribute 'usage'
+  /home/andrei/StorageGenie/backend/tests/test_opencode_go.py:324: AttributeError
+  E   assert 0.0 == 2.37e-05
+       +  where 0.0 = <app.models.provider_call.ProviderCall object>.cost
+       +  and   2.37e-05 = <test_chat._FailingUsageChatProvider object>.cost
+  /home/andrei/StorageGenie/backend/tests/test_chat.py:555: assert 0.0 == 2.37e-05
+  E   assert 0.0 == 1.785e-05
+       +  where 0.0 = <app.models.provider_call.ProviderCall object>.cost
+       +  and   1.785e-05 = <test_planning.PlanningScriptedProvider object>.cost
+  /home/andrei/StorageGenie/backend/tests/test_planning.py:550: assert 0.0 == 1.785e-05
+  =========================== short test summary info ============================
+  FAILED tests/test_opencode_go.py::test_raise_legs_carry_a_received_bodys_usage_and_cost
+  FAILED tests/test_opencode_go.py::test_extract_text_raise_legs_carry_a_received_bodys_usage_and_cost
+  FAILED tests/test_chat.py::test_chat_error_ledger_records_carried_usage
+  FAILED tests/test_planning.py::test_planning_error_ledger_records_carried_usage
+  4 failed, 1 passed, 1 warning in 0.92s
+
+GREEN (app services restored): command and RAW output
+  $ cd backend && PYTHONDONTWRITEBYTECODE=1 ../venv/bin/python -m pytest -q --tb=short -p no:cacheprovider \
+      tests/test_opencode_go.py tests/test_chat.py tests/test_planning.py tests/test_ai_pipeline.py
+  .................................................................        [100%]
+  =========================== warnings summary ===============================
+  ... (one StarletteDeprecationWarning)
+  =========================== short test summary info ============================
+  65 passed, 1 warning in 6.81s
+
+Node-level GREEN of the 12 new/changed pins (second run, same command scoped):
+  tests/test_opencode_go.py::test_raise_legs_carry_a_received_bodys_usage_and_cost PASSED
+  tests/test_opencode_go.py::test_content_guard_leg_stays_usage_free PASSED
+  tests/test_opencode_go.py::test_pre_body_legs_do_not_invent_usage_or_cost PASSED
+  tests/test_opencode_go.py::test_transport_and_http_status_legs_carry_no_usage PASSED
+  tests/test_opencode_go.py::test_extract_text_raise_legs_carry_a_received_bodys_usage_and_cost PASSED
+  tests/test_ai_pipeline.py::test_failed_body_with_usage_is_ledgered_with_that_usage PASSED
+  tests/test_ai_pipeline.py::test_invalid_body_provider_post_change_is_ledgered_durably PASSED
+  tests/test_ai_pipeline.py::test_content_guard_leg_stays_usage_free PASSED
+  tests/test_chat.py::test_chat_error_ledger_records_carried_usage PASSED
+  tests/test_chat.py::test_chat_error_ledger_without_usage_stays_zero PASSED
+  tests/test_planning.py::test_planning_error_ledger_records_carried_usage PASSED
+  tests/test_planning.py::test_planning_error_ledger_without_usage_stays_zero PASSED
+  12 passed, 1 warning in 1.29s
+
+NOT-A-DEFECT pins (pass before AND after, by design):
+  - test_failed_body_with_usage_is_ledgered_with_that_usage (reader path already persists
+    whatever the exception carries — the reader needs NO hunk).
+  - test_planning_error_ledger_without_usage_stays_zero (honest 0.0/absent when nothing carried).
+  - test_content_guard_leg_stays_usage_free / test_pre_body_legs_do_not_invent_usage_or_cost.
+
+==============================================================================
+§5 G3 — suite + lint + build (NO deploy)
+==============================================================================
+Backend suite (full): `$ cd backend && timeout 600 ../venv/bin/python -m pytest -q`
+  2 failed, 248 passed, 19 warnings in 15.19s
+  FAILED tests/test_signals.py::test_generated_codes_are_validated_and_bad_checksum_is_not_an_identifier
+  FAILED tests/test_signals.py::test_ocr_has_text_boxes_and_mean_confidence
+  => the SAME 2 reds on BASE at 2c5c0f4 before any edit (recorded base run), i.e. the
+     known zbar/tesseract decoder env reds. Zero new reds.
+ruff: `../venv/bin/python -m ruff check .` -> "All checks passed!" (exit 0)
+mypy: `../venv/bin/python -m mypy app` -> "Found 41 errors in 9 files (checked 69 source files)"
+  BASE was ALSO 41 errors in the same 9 files; `diff` of the error sets is EMPTY => delta-0.
+Frontend tests: `npm test -- --run` -> Test Files 21 passed (21), Tests 152 passed (152).
+Frontend lint: `./node_modules/.bin/eslint src` -> exit 0.
+Frontend build: `npm run build` (tsc && vite build) -> built in 1.75s, dist/assets/index-CY71ycwZ.js.
+  (host `rtk lint` wrapper could not find eslint on PATH; invoked the repo-local binary directly.)
+
+NO DEPLOY (PG-PR-04 scoped): the changed behaviour is failure-path ledger content, observable
+in production only on a live failing provider call. Proving it live would bill a provider call
+solely to manufacture a failure — declined under the $0 posture. The next scheduled rebuild
+carries the change; no production-effect claim is made this slice beyond the tests.
+
+Hygiene: prod DB untouched (no DB commands run; tests use tmp_path SQLite); no migration;
+dep list unchanged; secret scan zero (no key material added; tests use sentinel-free doubles);
+no ignored file staged; nothing pushed to storagegenie-evidence. No vacuous pass: the RED run
+genuinely failed pre-change and the GREEN run genuinely passed post-change on the same nodes.
+
+==============================================================================
+§6 PG-SC-09 — the world where attaching usage is WRONG, and why the slice still ships
+==============================================================================
+World: the provider does NOT bill a parse-failed 200 (no-choices / zero-usage), so recording
+the body's usage would OVERSTATE spend and over-count toward the monthly cap. Disposition:
+the row records what the body CARRIED (the raw usage dict, unmodified) and the cost is computed
+by the file's OWN existing `compute_cost` line — the same arithmetic the success path uses, so
+the split is not invented. The reader and both service writers preserve the SG-030 contract
+("what the exception carries"), the `error_state` column labels the row as a failure, and the
+zero/absent case stays honestly `0.0`/absent. A later slice can decide billing semantics from
+the labelled rows; this slice only stops discarding data the wire delivered.

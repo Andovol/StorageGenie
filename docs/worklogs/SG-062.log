@@ -1,0 +1,28 @@
+SG-062 worklog — money-integrity: error ledger rows keep usage the body actually carried
+coder: opencode   effort: medium (from packet head; model is the CLI default, omitted per policy)
+MODEL + effort read from process arguments: model unknown (CLI default not echoed)
+  effort: medium (packet head `effort: medium`)
+contract version echo: 0.28.2
+  source path read: /home/andrei/storagegenie-contract/VERSION (readable; b495b59 == tag contract-v0.28.2)
+  installed global rules hash: a66aa4313d62cebff8b44f10299928288e05dc4d7c45f4f4e83e0bbd954c131d == RULES.sha256 payload
+  NOTE: /home/andrei/launcher was permission-denied (F-SG056-3) but /home/andrei/storagegenie-contract/ was readable this session.
+
+Spend: $0.000000 actual vs $0 bound (zero provider calls; every test is a scripted provider, no network).
+
+BASE ref requested: origin/automation
+BASE ref resolved: 2c5c0f46cffd17f0a98de5f26ecf31b08a20863e (== local HEAD at session start)
+WORK_HEAD: (filled at commit)
+
+Legs (actual / budget, units):
+- G1 read + mapping: ~4 min / 120s ordinary (over — establishment only, no command timeout).
+- Baseline suite+lint+build: 15.19s backend suite; ruff ~2s; mypy ~35s; frontend vitest 4.07s; eslint 0s; build 1.75s (all under 600s suite+lint+build).
+- RED capture (pre-change, 4 FAIL): 0.92s.
+- GREEN capture (post-change, 12 PASS): 1.29s.
+- Final full suite: 15.19s (2 base reds only).
+- Total wall clock well under 1800s overall.
+
+Starting tree: clean (git status --porcelain empty before edits). Dirt = STOP; none seen.
+
+DB: none. Tests use scratch temp SQLite via tmp_path; production SQLite untouched.
+Restart: none.
+No migration. No new dependencies. No UI behaviour change. No prompt/template change. Zero provider calls.

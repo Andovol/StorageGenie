@@ -27,6 +27,7 @@ from app.models import Assertion, Asset, GuardrailEvent, Household, SourceAttrib
 from app.models.provider_call import ProviderCall
 from app.services.providers import reader as reader_mod
 from app.services.providers.protocols import ProviderResult
+from app.services.providers.router import ProviderError
 
 CLASSIFICATION_FIELD = "plugin:expiry-tracker/classification"
 EXPIRY_FIELD = "plugin:expiry-tracker/expiry_date"
@@ -497,6 +498,85 @@ def test_injection_string_stays_inside_the_data_section() -> None:
     assert hostile not in prompt_text, "hostile catalogue text never reaches the instruction"
     assert "<<<CATALOGUE_DATA>>>" in prompt_text
     assert "never instruction content" in prompt_text
+
+
+class _FailingUsageChatProvider:
+    """A chat double whose call fails AFTER receiving a body's usage (SG-062).
+
+    Mirrors the real adapter's post-body raise legs: the `ProviderError` crosses
+    the service boundary carrying `usage`/`cost`/`latency_ms`, so the service must
+    persist what the exception carries rather than hardcoded `0.0`.
+    """
+
+    def __init__(
+        self,
+        *,
+        provider_id: str = "scripted-chat-failing",
+        model_id: str = "scripted-chat-failing-1",
+    ) -> None:
+        self.provider_id = provider_id
+        self.model_id = model_id
+        self.invocations = 0
+        self.usage = {"prompt_tokens": 30, "completion_tokens": 12, "total_tokens": 42}
+        self.cost = 0.0000237
+        self.latency_ms = 123.4
+
+    def estimate_cost(self, payload_bytes: bytes, prompt: str) -> float:
+        return 0.0
+
+    def extract_text(
+        self, text: str, prompt: str = "", *, estimated_cost: float = 0.0
+    ) -> ProviderResult:
+        self.invocations += 1
+        exc = ProviderError("invalid_json", "provider 200 with no choices")
+        exc.usage = dict(self.usage)
+        exc.cost = self.cost
+        exc.latency_ms = self.latency_ms
+        raise exc
+
+
+def test_chat_error_ledger_records_carried_usage(chat_fixture, monkeypatch: pytest.MonkeyPatch) -> None:  # type: ignore[no-untyped-def]
+    """SG-062: a failed chat call records the usage its exception carried."""
+    session, household_id, network_attempts = chat_fixture
+    _seed_asset(session, household_id, "Whole milk")
+    provider = _FailingUsageChatProvider()
+    _enable(monkeypatch, provider)  # type: ignore[arg-type]
+    client = TestClient(app)
+
+    response = _chat(client, household_id, "food", "When does the milk expire?")
+
+    assert response.status_code == 200, response.text
+    body = response.json()
+    assert body["status"] == "error"
+    assert provider.invocations == 1
+    assert network_attempts == []
+    call = session.query(ProviderCall).one()
+    assert call.error_state is not None and "invalid_json" in call.error_state
+    assert call.cost == provider.cost
+    assert json.loads(call.usage_json or "{}") == provider.usage
+    assert call.latency_ms == provider.latency_ms
+
+
+def test_chat_error_ledger_without_usage_stays_zero(chat_fixture, monkeypatch: pytest.MonkeyPatch) -> None:  # type: ignore[no-untyped-def]
+    """SG-062: an exception carrying no usage records honest 0.0/absent, never invented."""
+    session, household_id, _ = chat_fixture
+    _seed_asset(session, household_id, "Whole milk")
+    provider = ChatScriptedProvider(provider_id="scripted-chat-bare")
+    _enable(monkeypatch, provider)
+    client = TestClient(app)
+
+    def _fail(text: str, prompt: str = "", *, estimated_cost: float = 0.0):  # type: ignore[no-untyped-def]
+        raise ProviderError("transport", "provider transport failure: ConnectError")
+
+    monkeypatch.setattr(provider, "extract_text", _fail)
+    response = _chat(client, household_id, "food", "Hello?")
+
+    assert response.status_code == 200, response.text
+    assert response.json()["status"] == "error"
+    call = session.query(ProviderCall).one()
+    assert call.cost == 0.0
+    assert call.usage_json is None
+    assert call.latency_ms is None
 
 
 def test_no_key_material_in_any_written_row(

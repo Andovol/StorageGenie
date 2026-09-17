@@ -247,7 +247,17 @@ def _write_error_ledger(
     content: str,
     kind: str,
     message: str,
+    usage: dict[str, Any] | None = None,
+    cost: float | None = None,
+    latency_ms: float | None = None,
 ) -> ProviderCall:
+    """Persist a failed chat call, recording what the exception CARRIED (SG-062).
+
+    A call that reached the provider and returned a body carries real usage/cost
+    on its raised `ProviderError`; those are recorded verbatim. An exception with
+    none (`usage`/`cost`/`latency_ms` absent) stays honest `0.0`/`None` — never
+    invented. Same split as `reader._write_error_ledger`.
+    """
     row = ProviderCall(
         provider=provider_id,
         model=model_id,
@@ -256,9 +266,9 @@ def _write_error_ledger(
             {"content_sha256": hashlib.sha256(content.encode("utf-8")).hexdigest()}
         ),
         output_payload=None,
-        cost=0.0,
-        usage_json=None,
-        latency_ms=None,
+        cost=float(cost) if cost is not None else 0.0,
+        usage_json=json.dumps(usage, ensure_ascii=False) if usage else None,
+        latency_ms=float(latency_ms) if latency_ms is not None else None,
         error_state=f"{kind}: {message}"[:200],
         job_id=None,
     )
@@ -340,7 +350,16 @@ def respond(
         }
     except ProviderError as exc:
         _write_error_ledger(
-            db, provider_id, model_id, template_version, content, exc.kind, str(exc)
+            db,
+            provider_id,
+            model_id,
+            template_version,
+            content,
+            exc.kind,
+            str(exc),
+            usage=getattr(exc, "usage", None),
+            cost=getattr(exc, "cost", None),
+            latency_ms=getattr(exc, "latency_ms", None),
         )
         return {
             "status": "error",

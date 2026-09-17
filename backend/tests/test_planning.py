@@ -53,6 +53,13 @@ class PlanningScriptedProvider:
         self.invocations = 0
         self.images: list[bytes] = []
         self.prompts: list[str] = []
+        self.usage: dict[str, Any] = {
+            "prompt_tokens": 11,
+            "completion_tokens": 7,
+            "total_tokens": 18,
+        }
+        self.cost: float = 0.0
+        self.latency_ms: float = 1.0
 
     def estimate_cost(self, image_bytes: bytes, prompt: str) -> float:
         return self.estimate
@@ -64,15 +71,19 @@ class PlanningScriptedProvider:
         self.images.append(image_bytes)
         self.prompts.append(prompt)
         if self.invocations <= self.fail_times:
-            raise ProviderError("invalid_json", f"scripted fail {self.invocations}")
+            exc = ProviderError("invalid_json", f"scripted fail {self.invocations}")
+            exc.usage = dict(self.usage)
+            exc.cost = self.cost
+            exc.latency_ms = self.latency_ms
+            raise exc
         return ProviderResult(
             normalized_output=deepcopy(self.payload),
             raw_payload={"scripted": True, "provider_id": self.provider_id},
             request_id="req-scripted-037",
-            usage={"prompt_tokens": 11, "completion_tokens": 7, "total_tokens": 18},
-            cost=0.0,
+            usage=dict(self.usage),
+            cost=self.cost,
             model_id=self.model_id,
-            latency_ms=1.0,
+            latency_ms=self.latency_ms,
         )
 
 
@@ -508,6 +519,60 @@ def test_single_repair_turn_then_success(
     assert len(calls) == 2
     assert calls[0].error_state is not None
     assert calls[1].error_state is None
+
+
+def test_planning_error_ledger_records_carried_usage(
+    planning_fixture, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """SG-062: a failed planning call records the usage its exception carried.
+
+    Mirrors the chat pin: the scripted provider raises a `ProviderError` carrying
+    a real usage/cost/latency (the shape the adapter produces after a received
+    200 body), and the planning error writer must persist exactly that.
+    """
+    session, household_id, _ = planning_fixture
+    _seed_asset(session, household_id, "Milk")
+    provider = PlanningScriptedProvider(_payload(_item("x")), fail_times=2)
+    provider.usage = {"prompt_tokens": 21, "completion_tokens": 9, "total_tokens": 30}
+    provider.cost = 0.00001785
+    provider.latency_ms = 55.5
+    _enable(monkeypatch, provider)
+    client = TestClient(app)
+
+    result = _run(client, household_id)
+
+    assert result["status"] == "error"
+    assert provider.invocations == 2
+    calls = session.query(ProviderCall).order_by(ProviderCall.created_at).all()
+    assert len(calls) == 2
+    for call in calls:
+        assert call.error_state is not None
+        assert call.cost == provider.cost
+        assert json.loads(call.usage_json or "{}") == provider.usage
+        assert call.latency_ms == provider.latency_ms
+
+
+def test_planning_error_ledger_without_usage_stays_zero(
+    planning_fixture, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """SG-062: a bare failure records honest 0.0/absent, never an invented usage."""
+    session, household_id, _ = planning_fixture
+    _seed_asset(session, household_id, "Milk")
+    provider = PlanningScriptedProvider(_payload(_item("x")), fail_times=2)
+    provider.usage = {}
+    provider.cost = 0.0
+    provider.latency_ms = 0.0
+    _enable(monkeypatch, provider)
+    client = TestClient(app)
+
+    result = _run(client, household_id)
+
+    assert result["status"] == "error"
+    calls = session.query(ProviderCall).order_by(ProviderCall.created_at).all()
+    assert len(calls) == 2
+    for call in calls:
+        assert call.cost == 0.0
+        assert call.usage_json is None
 
 
 def test_budget_refusal_before_any_call(

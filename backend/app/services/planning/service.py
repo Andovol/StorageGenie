@@ -216,17 +216,31 @@ def _write_ledger(
 
 
 def _write_error_ledger(
-    db: Session, provider_id: str, model_id: str, prompt: str, kind: str, message: str
+    db: Session,
+    provider_id: str,
+    model_id: str,
+    prompt: str,
+    kind: str,
+    message: str,
+    usage: dict[str, Any] | None = None,
+    cost: float | None = None,
+    latency_ms: float | None = None,
 ) -> ProviderCall:
+    """Persist a failed planning call, recording what the exception CARRIED (SG-062).
+
+    Same split as the chat writer: a post-body failure carries real usage/cost on
+    the raised `ProviderError` and it is recorded verbatim; no carried accounting
+    stays honest `0.0`/`None`. Nothing is invented.
+    """
     row = ProviderCall(
         provider=provider_id,
         model=model_id,
         prompt_template_version="planning-v1",
         input_hashes=json.dumps({"prompt_sha256": hashlib.sha256(prompt.encode("utf-8")).hexdigest()}),
         output_payload=None,
-        cost=0.0,
-        usage_json=None,
-        latency_ms=None,
+        cost=float(cost) if cost is not None else 0.0,
+        usage_json=json.dumps(usage, ensure_ascii=False) if usage else None,
+        latency_ms=float(latency_ms) if latency_ms is not None else None,
         error_state=f"{kind}: {message}"[:200],
         job_id=None,
     )
@@ -261,7 +275,17 @@ def _run_provider(
         except BudgetExceededError:
             raise
         except ProviderError as exc:
-            row = _write_error_ledger(db, provider_id, model_id, call_prompt, exc.kind, str(exc))
+            row = _write_error_ledger(
+                db,
+                provider_id,
+                model_id,
+                call_prompt,
+                exc.kind,
+                str(exc),
+                usage=getattr(exc, "usage", None),
+                cost=getattr(exc, "cost", None),
+                latency_ms=getattr(exc, "latency_ms", None),
+            )
             call_ids.append(row.id)
             last_error = f"{exc.kind}: {exc}"
             continue

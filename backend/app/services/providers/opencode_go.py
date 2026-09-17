@@ -62,33 +62,68 @@ def response_format_for(model: str) -> dict[str, str]:
 
 
 def guard_content(content: str | None) -> str:
-    """Empty/blank 200 bodies are rejected before any parsing."""
+    """Empty/blank 200 bodies are rejected before any parsing.
+
+    A body-less / empty-200 leg raises with no usage attached: nothing was
+    billed that can be attributed (the pre-body legs stay honest `0.0`).
+    """
     if content is None or not content.strip():
         raise ProviderError("invalid_json", "provider returned empty content (empty-200 reject)")
     return content
 
 
 def guard_usage(usage: dict[str, Any]) -> dict[str, Any]:
-    """A 200 without non-zero usage proves nothing and is rejected."""
+    """A 200 without non-zero usage proves nothing and is rejected.
+
+    The raised error carries the body's usage exactly as received (`0` values
+    included) so the ledger records what crossed the wire rather than inventing.
+    """
     total = usage.get("total_tokens") or 0
     if not total:
         total = (usage.get("prompt_tokens") or 0) + (usage.get("completion_tokens") or 0)
     if not total:
-        raise ProviderError("invalid_json", "provider returned zero or absent usage tokens")
+        exc = ProviderError("invalid_json", "provider returned zero or absent usage tokens")
+        attach_body_accounting(exc, usage, latency_ms=None)
+        raise exc
     return usage
 
 
 def strip_single_think(text: str) -> str:
-    """Strip ONE leading `<think>` block; a second block fails loudly."""
+    """Strip ONE leading ` thinking` block; a second block fails loudly."""
     match = _THINK_RE.match(text)
     if match is None:
-        if "<think>" in text:
-            raise ProviderError("invalid_json", "unbalanced or stray <think> block in content")
+        if " thinking" in text:
+            raise ProviderError("invalid_json", "unbalanced or stray  thinking block in content")
         return text
     rest = text[match.end() :]
     if "<think" in rest:
         raise ProviderError("invalid_json", "multiple <think> blocks: strip once, then fail loudly")
     return rest
+
+
+def attach_body_accounting(
+    exc: ProviderError,
+    usage: dict[str, Any] | None,
+    *,
+    latency_ms: float | None,
+) -> None:
+    """Attach a RECEIVED body's usage/cost/latency to a raised error (SG-062).
+
+    The usage is carried EXACTLY as the body delivered it — never recomputed or
+    rounded here; the cost is the file's own `compute_cost` arithmetic, the same
+    line the success path uses. A leg with no received body attaches nothing, so
+    the reader records honest `0.0`/absent (the SG-030 `_write_error_ledger`
+    contract is unchanged: it persists whatever the exception carries).
+    """
+    if usage is None:
+        return
+    # `ProviderError` is defined in `router.py` (outside this slice's ceiling);
+    # its optional accounting carriers are attached dynamically so no second
+    # copy of the exception type exists and the reader's `getattr` contract holds.
+    setattr(exc, "usage", usage)
+    setattr(exc, "cost", compute_cost(usage))
+    if latency_ms is not None:
+        setattr(exc, "latency_ms", latency_ms)
 
 
 def compute_cost(usage: dict[str, Any]) -> float:
@@ -270,7 +305,9 @@ class OpenCodeGoProvider:
         usage = guard_usage(body.get("usage") or {})
         choices = body.get("choices") or []
         if not isinstance(choices, list) or not choices:
-            raise ProviderError("invalid_json", "provider 200 with no choices")
+            exc = ProviderError("invalid_json", "provider 200 with no choices")
+            attach_body_accounting(exc, usage, latency_ms=latency_ms)
+            raise exc
         message = choices[0].get("message") or {}
         content = strip_single_think(guard_content(message.get("content")))
         parsed = parse_extraction_output(content)
@@ -329,7 +366,9 @@ class OpenCodeGoProvider:
         usage = guard_usage(body.get("usage") or {})
         choices = body.get("choices") or []
         if not isinstance(choices, list) or not choices:
-            raise ProviderError("invalid_json", "provider 200 with no choices")
+            exc = ProviderError("invalid_json", "provider 200 with no choices")
+            attach_body_accounting(exc, usage, latency_ms=latency_ms)
+            raise exc
         choice = choices[0]
         message = choice.get("message") or {}
         content = strip_single_think(guard_content(message.get("content")))

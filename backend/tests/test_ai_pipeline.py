@@ -42,6 +42,7 @@ from app.services.asset_service import create_asset  # noqa: E402
 from app.services.candidates import Candidate  # noqa: E402
 from app.services.observations import Observation  # noqa: E402
 from app.services.providers.protocols import ProviderResult  # noqa: E402
+from app.services.providers.router import ProviderError  # noqa: E402
 
 
 def _gps_jpeg_bytes() -> bytes:
@@ -747,6 +748,137 @@ def test_returned_body_failing_schema_is_ledgered_durably(ai_env, monkeypatch: p
         assert row.cost == 0.0023
         assert row.output_payload is not None
         assert json.loads(row.usage_json or "{}")["total_tokens"] == 18
+
+
+class _DroppingBodyProvider:
+    """A provider whose FAILED call carries usage/cost on the raised exception (SG-062).
+
+    This is the shape the real adapter produces after SG-062: it received a 200
+    body, parsed a real usage, then the content failed — so the raised
+    `ProviderError` carries the body's usage/cost/latency. The reader must record
+    exactly what crosses that boundary (PG-SC-12).
+    """
+
+    provider_id = "dropping-body"
+    model_id = "dropping-body-model"
+
+    def __init__(self) -> None:
+        self.invocations = 0
+        self.usage = {"prompt_tokens": 754, "completion_tokens": 341, "total_tokens": 1095}
+        self.cost = 0.0003177
+
+    def extract_items(  # type: ignore[no-untyped-def]
+        self, image_bytes: bytes, prompt: str, *, estimated_cost: float = 0.0
+    ):
+        self.invocations += 1
+        exc = ProviderError("invalid_json", "provider 200 with no choices")
+        exc.usage = dict(self.usage)
+        exc.cost = self.cost
+        exc.latency_ms = 2881.4
+        raise exc
+
+
+def test_failed_body_with_usage_is_ledgered_with_that_usage(ai_env, monkeypatch: pytest.MonkeyPatch) -> None:  # type: ignore[no-untyped-def]
+    """SG-062: a failed call that carried a body's usage records it, not 0.0.
+
+    The reader writes whatever the exception carries; when the adapter attaches
+    usage/cost/latency at the raise leg, the committed error row mirrors the
+    body's own numbers exactly (never recomputed here).
+    """
+    session, household_id, evidence_id = ai_env
+    from app.services.providers import reader as reader_mod
+
+    provider = _DroppingBodyProvider()
+    monkeypatch.setattr(reader_mod, "provider_registry", lambda: {provider.provider_id: provider})
+    monkeypatch.setattr(settings, "sg_consent", True)
+    monkeypatch.setattr(settings, "sg_provider_id", provider.provider_id)
+    monkeypatch.setattr(settings, "sg_prompt_category", "food")
+    monkeypatch.setattr(settings, "sg_per_job_cap", None)
+    monkeypatch.setattr(settings, "sg_monthly_cap", None)
+
+    job = _run(session, household_id, evidence_id)
+
+    assert job.state == "FAILED"
+    assert provider.invocations == 2
+    rows = session.query(ProviderCall).filter_by(job_id=job.id).order_by(ProviderCall.created_at).all()
+    assert len(rows) == 2
+    for row in rows:
+        assert row.error_state is not None and "invalid_json" in row.error_state
+        assert row.cost == provider.cost
+        assert json.loads(row.usage_json or "{}") == provider.usage
+        assert row.latency_ms == 2881.4
+        assert row.output_payload is None
+
+
+def test_invalid_body_provider_post_change_is_ledgered_durably(ai_env, monkeypatch: pytest.MonkeyPatch) -> None:  # type: ignore[no-untyped-def]
+    """SG-062 regression guard for SG-030 ISS-11: returned-body rows unchanged."""
+    session, household_id, evidence_id = ai_env
+    from app.services.providers import reader as reader_mod
+
+    provider = _InvalidBodyProvider(cost=0.0023)
+    monkeypatch.setattr(reader_mod, "provider_registry", lambda: {provider.provider_id: provider})
+    monkeypatch.setattr(settings, "sg_consent", True)
+    monkeypatch.setattr(settings, "sg_provider_id", provider.provider_id)
+    monkeypatch.setattr(settings, "sg_prompt_category", "food")
+    monkeypatch.setattr(settings, "sg_per_job_cap", None)
+    monkeypatch.setattr(settings, "sg_monthly_cap", None)
+
+    job = _run(session, household_id, evidence_id)
+
+    assert job.state == "FAILED"
+    rows = session.query(ProviderCall).filter_by(job_id=job.id).order_by(ProviderCall.created_at).all()
+    assert len(rows) == 2
+    for row in rows:
+        assert row.error_state is not None
+        assert "schema_validation" in row.error_state
+        assert row.cost == 0.0023
+        assert row.output_payload is not None
+        assert json.loads(row.usage_json or "{}")["total_tokens"] == 18
+
+
+def test_content_guard_leg_stays_usage_free(ai_env, monkeypatch: pytest.MonkeyPatch) -> None:  # type: ignore[no-untyped-def]
+    """SG-062 not-a-defect (reader path): a content-guard raise records 0.0/absent.
+
+    The content-guard family (`empty-200`, stray-`think`) raises before usage is
+    threaded, so the committed error row is honest `0.0`/absent — the
+    `reader._write_error_ledger` contract is unchanged. Pins the reader side.
+    """
+    session, household_id, evidence_id = ai_env
+    from app.services.providers import reader as reader_mod
+    from app.services.providers.router import ProviderError
+
+    class _EmptyContentProvider:
+        provider_id = "empty-content"
+        model_id = "empty-content-model"
+
+        def __init__(self) -> None:
+            self.invocations = 0
+
+        def extract_items(  # type: ignore[no-untyped-def]
+            self, image_bytes: bytes, prompt: str, *, estimated_cost: float = 0.0
+        ):
+            self.invocations += 1
+            raise ProviderError("invalid_json", "provider returned empty content (empty-200 reject)")
+
+    provider = _EmptyContentProvider()
+    monkeypatch.setattr(reader_mod, "provider_registry", lambda: {provider.provider_id: provider})
+    monkeypatch.setattr(settings, "sg_consent", True)
+    monkeypatch.setattr(settings, "sg_provider_id", provider.provider_id)
+    monkeypatch.setattr(settings, "sg_prompt_category", "food")
+    monkeypatch.setattr(settings, "sg_per_job_cap", None)
+    monkeypatch.setattr(settings, "sg_monthly_cap", None)
+
+    job = _run(session, household_id, evidence_id)
+
+    assert job.state == "FAILED"
+    assert provider.invocations == 2
+    rows = session.query(ProviderCall).filter_by(job_id=job.id).all()
+    assert len(rows) == 2
+    for row in rows:
+        assert row.error_state is not None
+        assert row.cost == 0.0
+        assert row.usage_json is None
+        assert row.latency_ms is None
 
 
 class _MonthlyProbeProvider:

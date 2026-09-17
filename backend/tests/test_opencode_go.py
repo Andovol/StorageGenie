@@ -10,7 +10,15 @@ from __future__ import annotations
 
 import io
 
+import pytest
 from PIL import Image
+
+
+def _png_bytes() -> bytes:
+    """A tiny real PNG: the adapter redacts (decodes) the bytes before sending."""
+    buf = io.BytesIO()
+    Image.new("RGB", (4, 4), "white").save(buf, format="PNG")
+    return buf.getvalue()
 
 
 def _gps_jpeg_bytes() -> bytes:
@@ -148,6 +156,174 @@ def test_outgoing_payload_shape_no_key_material():
     assert payload["messages"][0]["content"][1]["image_url"]["url"].startswith("data:image/png;base64,")
     assert go.CHAT_PATH == "/chat/completions"
     assert go.BASE_URL == "https://opencode.ai/zen/go/v1"
+
+
+def test_raise_legs_carry_a_received_bodys_usage_and_cost():
+    """SG-062 G2: the post-usage raise leg attaches the body's usage/cost/latency.
+
+    `provider 200 with no choices` is the ONE leg in `extract_items` that raises
+    AFTER `guard_usage` parsed a real usage — the leg the SG-039 `glare` run hit
+    (both attempts recorded `$0.000000`). The exception must carry the FIELDS THE
+    READER READS — `exc.usage`, `exc.cost`, `exc.latency_ms` (PG-SC-12), so
+    `reader._write_error_ledger` records them with no reader hunk.
+    """
+    from app.services.providers import opencode_go as go
+    from app.services.providers.router import ProviderError
+
+    usage = {"prompt_tokens": 754, "completion_tokens": 341, "total_tokens": 1095}
+    expected_cost = go.compute_cost(usage)
+
+    class _BodyProvider(go.OpenCodeGoProvider):
+        def __init__(self, body: object) -> None:
+            super().__init__(session_id="sg062-raise-legs")
+            self._body = body
+
+        def _post(self, payload: dict) -> object:  # type: ignore[override]
+            return self._body
+
+    for name, body in {
+        "no_choices": {"id": "x", "model": "m", "usage": usage, "choices": []},
+        "non_list_choices": {"id": "x", "model": "m", "usage": usage, "choices": "nope"},
+    }.items():
+        provider = _BodyProvider(body)
+        with pytest.raises(ProviderError) as caught:
+            provider.extract_items(_png_bytes(), "prompt")
+        exc = caught.value
+        assert exc.kind == "invalid_json", name
+        assert exc.usage == usage, f"{name}: body usage must cross the boundary"
+        assert exc.cost == expected_cost, f"{name}: cost is the file's own compute_cost"
+        assert exc.latency_ms is not None and exc.latency_ms >= 0.0, name
+
+
+def test_content_guard_leg_stays_usage_free():
+    """SG-062 not-a-defect: the empty-200 leg raises before usage crosses.
+
+    `guard_content` is a content-shape guard reached after `guard_usage`, but it
+    is a module-level helper taking only the content; the body's usage is not
+    threaded to it and the reader records honest absent fields. This pin fixes
+    that current behavior so a later change is deliberate.
+    """
+    from app.services.providers import opencode_go as go
+    from app.services.providers.router import ProviderError
+
+    usage = {"prompt_tokens": 754, "completion_tokens": 341, "total_tokens": 1095}
+
+    class _BodyProvider(go.OpenCodeGoProvider):
+        def __init__(self, body: object) -> None:
+            super().__init__(session_id="sg062-content-legs")
+            self._body = body
+
+        def _post(self, payload: dict) -> object:  # type: ignore[override]
+            return self._body
+
+    provider = _BodyProvider(
+        {
+            "id": "x",
+            "model": "m",
+            "usage": usage,
+            "choices": [{"message": {"content": "   "}}],
+        }
+    )
+    with pytest.raises(ProviderError) as caught:
+        provider.extract_items(_png_bytes(), "prompt")
+    exc = caught.value
+    assert exc.kind == "invalid_json"
+    assert getattr(exc, "usage", None) is None
+    assert getattr(exc, "cost", None) is None
+    assert getattr(exc, "latency_ms", None) is None
+
+
+def test_pre_body_legs_do_not_invent_usage_or_cost():
+    """SG-062: a leg that raised before any completed 200 body stays honestly empty."""
+    from app.services.providers import opencode_go as go
+    from app.services.providers.router import ProviderError
+
+    class _NonJsonProvider(go.OpenCodeGoProvider):
+        def _post(self, payload: dict) -> dict:  # type: ignore[override]
+            raise ProviderError("invalid_json", "provider 200 with a non-JSON body")
+
+    provider = _NonJsonProvider(session_id="sg062-pre-body")
+    with pytest.raises(ProviderError) as caught:
+        provider.extract_items(_png_bytes(), "prompt")
+    exc = caught.value
+    assert exc.kind == "invalid_json"
+    assert getattr(exc, "usage", None) is None
+    assert getattr(exc, "cost", None) is None
+
+    bare = go.OpenCodeGoProvider(session_id="sg062-pre-body", api_key="")
+    import os
+
+    original = os.environ.pop("OPENCODE_API_KEY", None)
+    try:
+        with pytest.raises(ProviderError) as caught:
+            bare.extract_items(_png_bytes(), "prompt")
+    finally:
+        if original is not None:
+            os.environ["OPENCODE_API_KEY"] = original
+    assert caught.value.kind == "missing_key"
+    assert getattr(caught.value, "usage", None) is None
+    assert getattr(caught.value, "cost", None) is None
+
+
+def test_transport_and_http_status_legs_carry_no_usage():
+    """SG-062: transport and non-200 legs have no body of their own to account for."""
+    import httpx
+
+    from app.services.providers import opencode_go as go
+    from app.services.providers.router import ProviderError
+
+    class _TransportProvider(go.OpenCodeGoProvider):
+        def _post(self, payload: dict) -> dict:  # type: ignore[override]
+            raise ProviderError("transport", "provider transport failure: ConnectError")
+
+    with pytest.raises(ProviderError) as caught:
+        _TransportProvider(session_id="sg062-transport").extract_items(_png_bytes(), "p")
+    assert getattr(caught.value, "usage", None) is None
+
+    def _handler(request: httpx.Request) -> httpx.Response:
+        return httpx.Response(500, text="upstream exploded")
+
+    class _PatchedClient(httpx.Client):
+        def __init__(self, **kwargs: object) -> None:
+            kwargs["transport"] = httpx.MockTransport(_handler)
+            super().__init__(**kwargs)  # type: ignore[arg-type]
+
+    import app.services.providers.opencode_go as go_mod
+
+    go_mod.httpx.Client = _PatchedClient  # type: ignore[assignment,misc]
+    try:
+        with pytest.raises(ProviderError) as caught:
+            go.OpenCodeGoProvider(session_id="sg062-http", api_key="k").extract_items(
+                _png_bytes(), "p"
+            )
+    finally:
+        go_mod.httpx.Client = httpx.Client  # type: ignore[assignment,misc]
+    assert caught.value.kind == "http_status"
+    assert getattr(caught.value, "usage", None) is None
+
+
+def test_extract_text_raise_legs_carry_a_received_bodys_usage_and_cost():
+    """SG-062: the text op shares the shape; its post-body legs attach usage too."""
+    from app.services.providers import opencode_go as go
+    from app.services.providers.router import ProviderError
+
+    usage = {"prompt_tokens": 100, "completion_tokens": 50, "total_tokens": 150}
+    expected_cost = go.compute_cost(usage)
+
+    class _BodyProvider(go.OpenCodeGoProvider):
+        def __init__(self, body: dict) -> None:
+            super().__init__(session_id="sg062-text-legs")
+            self._body = body
+
+        def _post(self, payload: dict) -> dict:  # type: ignore[override]
+            return self._body
+
+    no_choices = _BodyProvider({"id": "x", "model": "m", "usage": usage, "choices": []})
+    with pytest.raises(ProviderError) as caught:
+        no_choices.extract_text("USER", "SYSTEM")
+    assert caught.value.usage == usage
+    assert caught.value.cost == expected_cost
+    assert caught.value.latency_ms is not None
 
 
 def test_config_readback_new_values():
