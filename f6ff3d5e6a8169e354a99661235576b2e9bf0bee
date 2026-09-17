@@ -1,0 +1,8 @@
+Negative-Receipt-ID: SG-060
+utc=2026-09-17T14:23:11Z
+DISPATCH_RESULT id=SG-060 coder=opencode exit=0 head=8eac3ace8fc4577608cbaaeebf58ec314f2d7b76 note=no moved=yes rewrite=no dirty=no elapsed=190s budget=2100s
+P1_moved=PASS count=2
+P2_rewrite=PASS behind=0
+P3_note=FAIL note=no
+P5_receipt=FAIL
+P6_dirty=PASS dirty=no
