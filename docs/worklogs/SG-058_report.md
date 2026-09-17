@@ -120,7 +120,33 @@
 
 ## Receipt note (`refs/notes/storagegenie-coder-reports`)
 
-<pasted verbatim after the note is added and verified; the docs-only append follows the WORK_HEAD commit>
+WORK_HEAD = `3cbe6ea420e57d33186f3b2d49a33139395acecd`. Commands executed (raw), bounds 120 s add /
+300 s push (completed in seconds):
+
+```
+$ git notes --ref=refs/notes/storagegenie-coder-reports add -m "Dispatch-ID: SG-058 | Report: docs/worklogs/SG-058_report.md | Work-HEAD: 3cbe6ea420e57d33186f3b2d49a33139395acecd" 3cbe6ea420e57d33186f3b2d49a33139395acecd
+add_exit=0
+$ git push origin refs/notes/storagegenie-coder-reports
+To github.com:Andovol/StorageGenie.git
+   66980a5..3da7331  refs/notes/storagegenie-coder-reports -> refs/notes/storagegenie-coder-reports
+push_exit=0
+$ git fetch origin refs/notes/storagegenie-coder-reports:refs/notes/storagegenie-coder-reports-verify
+From github.com:Andovol/StorageGenie
+   00dcc36..3da7331  refs/notes/storagegenie-coder-reports -> refs/notes/storagegenie-coder-reports-verify
+fetch_exit=0
+$ git notes --ref=refs/notes/storagegenie-coder-reports-verify list | while read -r note obj; do body=$(git cat-file -p "$note" | head -1); printf '%s -> %s\n' "$obj" "$body"; done
+$ grep -n "SG-058" <note-contents-list>
+16:3cbe6ea420e57d33186f3b2d49a33139395acecd -> Dispatch-ID: SG-058 | Report: docs/worklogs/SG-058_report.md | Work-HEAD: 3cbe6ea420e57d33186f3b2d49a33139395acecd
+grep_exit=0
+$ git notes --ref=refs/notes/storagegenie-coder-reports-verify show 3cbe6ea420e57d33186f3b2d49a33139395acecd
+Dispatch-ID: SG-058 | Report: docs/worklogs/SG-058_report.md | Work-HEAD: 3cbe6ea420e57d33186f3b2d49a33139395acecd
+show_exit=0
+```
+
+Verified against the fetched, mapped ref: `fetch_exit=0`; the note bodies were dereferenced and listed
+(`log --grep` does not match note bodies); the grep hit at line 16 carries BOTH `Dispatch-ID: SG-058`
+and `Report: docs/worklogs/SG-058_report.md` (`CO-97`); `show` printed that first line. Fresh hash, no
+existing note overwritten. **note=yes.**
 
 ## UNCLEAR
 
