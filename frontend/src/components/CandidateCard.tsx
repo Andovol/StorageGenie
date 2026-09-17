@@ -44,7 +44,7 @@ export function CandidateCard({
   });
   const blocked = candidate.review_task_ids.length > 0;
   const evidenceUrls = useMemo(() => {
-    const base = import.meta.env.VITE_API_BASE || "http://localhost:8000";
+    const base = import.meta.env.VITE_API_BASE || "http://localhost:8003";
     return candidate.evidence_ids.map((id) => ({ id, url: `${base}/v1/evidence/${id}/thumb/256?household_id=${householdId}` }));
   }, [candidate.evidence_ids, householdId]);
 

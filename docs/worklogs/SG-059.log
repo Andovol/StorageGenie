@@ -1,0 +1,42 @@
+SG-059 run log — opencode / medium — work dir /home/andrei/StorageGenie
+
+2026-09-17T14:11Z  START. Process argv: `opencode run --auto --dir /home/andrei/StorageGenie
+                   --variant medium` -> effort=medium; no model id on argv -> model=unknown.
+2026-09-17T14:11Z  PRE-STATE: `git status --porcelain` empty; branch automation; HEAD =
+                   origin/automation = 31ccc33a173f8c64a7d2201848868232abc0afae (BASE ref
+                   `origin/automation` -> that commit).
+2026-09-17T14:11Z  PREMISES re-read: client.test.ts:80,93 `as unknown as Response` (both present);
+                   the 8 audit-set lines all match; compose:8 `127.0.0.1:8003:8000`; compose:21
+                   healthcheck `localhost:8000/v1/health`. All match the packet.
+2026-09-17T14:12Z  :8000 enumeration over product files: 5 in-container/compose/docker/vite +
+                   7 host-stale frontend (the audit set) + a NINTH product occurrence the packet's
+                   eight-file set omits: ItemInspectorDrawer.tsx:129 (finding F-SG059-1). AGENTS.md:29
+                   off-limits (proposal only).
+2026-09-17T14:12Z  LIVE PROBES: `:8003/v1/health` = `{"status":"ok","db":"ok","storage":"ok"}`;
+                   `:8000/v1/health` = foreign uvicorn 404 `Not Found`; ss shows :8000 unowned,
+                   :8003 rootlesskit. Discrimination quoted in verify log [5].
+2026-09-17T14:12Z  G1: added typed `mockResponse(partial: Partial<Response>): Response` factory; both
+                   double-casts removed (zero `as unknown`), other six raw `as Response` routed through
+                   the same helper; every assertion kept; no FAIL-then-PASS leg exists (band-aid was
+                   green) — stated honestly, not manufactured.
+2026-09-17T14:13Z  G2: fixed the 7 HOST-STALE frontend fallbacks to `http://localhost:8003`; kept
+                   5 IN-CONTAINER-CORRECT occurrences with quoted reasons; ItemInspectorDrawer.tsx:129
+                   reported, not edited (ceiling).
+2026-09-17T14:14Z  G3 gates: frontend 152 passed (4.36s) + eslint clean; backend suite 2 failed / 235
+                   passed in 14.49s (SAME two base-proven environmental reds as SG-058, no new red);
+                   ruff `All checks passed!`; mypy 41 pre-existing advisory (no Python touched, delta 0);
+                   `tsc && vite build` OK (1.63s).
+2026-09-17T14:14Z  BUNDLE PROPERTY CHECK: pre-edit and post-edit prod-base builds are BYTE-IDENTICAL
+                   (js sha256 e5c99c02...), and the local prod build equals the served container bytes.
+                   The fallback literals are constant-folded away under the baked VITE_API_BASE
+                   (`localhost:8000` count in bundle = 0), so the required property "served bundle hash
+                   CHANGED" is unsatisfiable by these hunks — reported as F-SG059-2, not faked.
+2026-09-17T14:15Z  Deploy: bare `docker compose build` failed at the sandbox buildx cache (known
+                   F-SG054-3); sanctioned `BUILDX_CONFIG=/home/andrei/StorageGenie/.cache/buildx
+                   docker compose build backend` -> `Image storagegenie-backend Built` (10.23s / 900s).
+                   `up -d` recreated the container on image 1b830815...; idempotent re-up `Running`;
+                   RestartCount=0; health exact; `8000/tcp -> 127.0.0.1:8003` loopback-only.
+2026-09-17T14:16Z  Worklogs written (this file, SG-059_report.md, SG-059_verify.log).
+2026-09-17T14:16Z  Spend: $0.000000 (zero provider calls; no metered route touched).
+2026-09-17T14:16Z  Overall wall since process start: ~300s / 2400s budget (early-close 1500s not
+                   reached). No command was killed. Proceeding to commit + push + notes-ref receipt.

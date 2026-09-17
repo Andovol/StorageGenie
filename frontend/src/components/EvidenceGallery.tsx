@@ -1,7 +1,7 @@
 type Ev = { id: string; storage_key: string; sha256?: string; original_filename?: string };
 
 export function EvidenceGallery({ evidence, householdId }: { evidence: Ev[]; householdId: string }) {
-  const base = import.meta.env.VITE_API_BASE || "http://localhost:8000";
+  const base = import.meta.env.VITE_API_BASE || "http://localhost:8003";
   if (!evidence || evidence.length === 0) return <div style={{ color: "#9ca3af" }}>No evidence attached</div>;
   return (
     <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>

@@ -53,7 +53,7 @@ export function statusBadgeClass(status: ProductStatus): string {
  * `EvidenceGallery.tsx:17` (`/v1/evidence/{id}/thumb/{size}?household_id=`).
  */
 export function thumbUrl(evidenceId: string, householdId: string, size = 256): string {
-  const base = import.meta.env.VITE_API_BASE || "http://localhost:8000";
+  const base = import.meta.env.VITE_API_BASE || "http://localhost:8003";
   return `${base}/v1/evidence/${evidenceId}/thumb/${size}?household_id=${householdId}`;
 }
 

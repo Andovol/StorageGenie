@@ -14,7 +14,7 @@ export function SettingsPage() {
     <div style={{ padding: 24 }}>
       <h1>Settings</h1>
       <p style={{ color: "#6b7280", fontSize: 13 }}>
-        Phase 0 — household and connection settings. API base: {import.meta.env.VITE_API_BASE || "http://localhost:8000"}
+        Phase 0 — household and connection settings. API base: {import.meta.env.VITE_API_BASE || "http://localhost:8003"}
       </p>
 
       <section

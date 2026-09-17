@@ -1,0 +1,226 @@
+SG-059 verify log — raw probes, audit table, deploy — work dir /home/andrei/StorageGenie
+==========================================================================================
+
+[1] STARTING TREE
+$ git status --porcelain=v1
+(empty — clean)
+$ git branch --show-current
+automation
+$ git rev-parse HEAD
+31ccc33a173f8c64a7d2201848868232abc0afae
+$ git rev-parse origin/automation
+31ccc33a173f8c64a7d2201848868232abc0afae
+$ git remote -v
+origin	git@github.com:Andovol/StorageGenie.git (fetch)
+origin	git@github.com:Andovol/StorageGenie.git (push)
+
+[2] PREMISE RE-READS (quoted)
+frontend/src/api/client.test.ts:72-80 (band-aid #1) and :85-93 (band-aid #2):
+      json: async () => {
+        throw new Error("Invalid JSON");
+      },
+    } as unknown as Response);
+  ...:
+      json: async () => {
+        throw new Error("Invalid JSON");
+      },
+    } as unknown as Response);
+-> both double-casts present, exactly at 80/93 as the packet states. MATCH.
+
+Audit-set lines (pre-fix, quoted):
+frontend/src/api/client.ts:12:const BASE = import.meta.env.VITE_API_BASE || "http://localhost:8000";
+frontend/src/components/AssetCard.tsx:7:  const base = import.meta.env.VITE_API_BASE || "http://localhost:8000";
+frontend/src/components/catalog/ProductCard.tsx:56:  const base = import.meta.env.VITE_API_BASE || "http://localhost:8000";
+frontend/src/components/CandidateCard.tsx:47:    const base = import.meta.env.VITE_API_BASE || "http://localhost:8000";
+frontend/src/components/EvidenceGallery.tsx:4:  const base = import.meta.env.VITE_API_BASE || "http://localhost:8000";
+frontend/src/types/product.ts:109:    options.baseUrl ?? import.meta.env.VITE_API_BASE ?? "http://localhost:8000";
+frontend/src/routes/SettingsPage.tsx:17:        Phase 0 — household and connection settings. API base: {import.meta.env.VITE_API_BASE || "http://localhost:8000"}
+frontend/vite.config.ts:9:      "/v1": "http://localhost:8000",
+-> all eight MATCH the packet.
+
+compose publish line + healthcheck line (read-only premises, quoted):
+docker-compose.yml:8:    ports: ["127.0.0.1:8003:8000"]
+docker-compose.yml:21:      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/v1/health')"]
+-> MATCH packet.
+
+[3] PRODUCT-FILE :8000 ENUMERATION (criterion, not list)
+$ rg -n '8000' --glob '!docs/**' --glob '!node_modules/**' --glob '!*.log' .
+backend/Dockerfile:21:EXPOSE 8000
+backend/Dockerfile:22:CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+docker-compose.yml:21:      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/v1/health')"]
+docker-compose.yml:8:    ports: ["127.0.0.1:8003:8000"]
+frontend/src/api/client.ts:12:const BASE = import.meta.env.VITE_API_BASE || "http://localhost:8000";
+frontend/src/components/AssetCard.tsx:7:  const base = import.meta.env.VITE_API_BASE || "http://localhost:8000";
+frontend/src/components/CandidateCard.tsx:47:    const base = import.meta.env.VITE_API_BASE || "http://localhost:8000";
+frontend/src/components/EvidenceGallery.tsx:4:  const base = import.meta.env.VITE_API_BASE || "http://localhost:8000";
+frontend/src/components/catalog/ProductCard.tsx:56:  const base = import.meta.env.VITE_API_BASE || "http://localhost:8000";
+frontend/src/components/shell/ItemInspectorDrawer.tsx:129:    ? `${import.meta.env.VITE_API_BASE || "http://localhost:8000"}/v1/evidence/${firstEvidence.id}/file?household_id=${householdId}`
+frontend/src/routes/SettingsPage.tsx:17:        Phase 0 — household and connection settings. API base: {import.meta.env.VITE_API_BASE || "http://localhost:8000"}
+frontend/src/types/product.ts:109:    options.baseUrl ?? import.meta.env.VITE_API_BASE ?? "http://localhost:8000";
+frontend/vite.config.ts:9:      "/v1": "http://localhost:8000",
+plus AGENTS.md:29 (rule file — OFF-LIMITS; proposal below, NOT edited).
+(README.md:70,110 / STATE.md:* are the historical record — stay untouched.)
+
+[4] CLASSIFICATION TABLE + VERDICT
+| # | occurrence | verdict | action | quoted reason |
+|---|------------|---------|--------|---------------|
+| 1 | backend/Dockerfile:21 EXPOSE 8000 | IN-CONTAINER-CORRECT | keep | EXPOSE is container metadata; uvicorn listens on 8000 *inside* the image |
+| 2 | backend/Dockerfile:22 uvicorn --port 8000 | IN-CONTAINER-CORRECT | keep | uvicorn binds in the container netns (CMD) |
+| 3 | docker-compose.yml:8 `127.0.0.1:8003:8000` | IN-CONTAINER-CORRECT | keep | right side 8000 is the container port; left side is host 8003 (ours) |
+| 4 | docker-compose.yml:21 healthcheck localhost:8000 | IN-CONTAINER-CORRECT | keep | healthcheck execs *inside* the backend container where uvicorn listens on 8000 (health=healthy proves it) |
+| 5 | frontend/vite.config.ts:9 proxy /v1 -> localhost:8000 | IN-CONTAINER-CORRECT | keep | proxy is a server-side Node fetch; in the compose dev profile Vite runs in the frontend container, so localhost:8000 never leaves that netns to reach the host's foreign occupant; the dev browser uses absolute VITE_API_BASE=http://localhost:8003 and bypasses the proxy (see F-SG059-3 nuance) |
+| 6 | client.ts:12 | HOST-STALE | fixed -> :8003 | browser runtime fallback binds on the host |
+| 7 | AssetCard.tsx:7 | HOST-STALE | fixed -> :8003 | browser runtime fallback binds on the host |
+| 8 | ProductCard.tsx:56 | HOST-STALE | fixed -> :8003 | browser runtime fallback binds on the host |
+| 9 | CandidateCard.tsx:47 | HOST-STALE | fixed -> :8003 | browser runtime fallback binds on the host |
+| 10 | EvidenceGallery.tsx:4 | HOST-STALE | fixed -> :8003 | browser runtime fallback binds on the host |
+| 11 | product.ts:109 | HOST-STALE | fixed -> :8003 | browser runtime fallback binds on the host |
+| 12 | SettingsPage.tsx:17 | HOST-STALE | fixed -> :8003 | browser runtime fallback is *displayed* on the host (packet's own "Settings page display") |
+| 13 | ItemInspectorDrawer.tsx:129 | HOST-STALE | NOT EDITED — out of ceiling | same `VITE_API_BASE || "http://localhost:8000"` shape as #6-#11; packet's 8-file audit set omits this 9th product occurrence (finding F-SG059-1) |
+| 14 | AGENTS.md:29 {{HEALTH_CMD}} | OFF-LIMITS rule file | proposal only | see [11] |
+
+Diff vs packet expectation: the packet enumerated 8 files (7 host-stale frontend + vite proxy). The
+criterion found 13 product-code occurrences: 5 in-container/compose/docker/vite (kept) + 7 host-stale
+frontend (fixed) + 1 additional host-stale frontend **not in the eight** (ItemInspectorDrawer.tsx:129),
+plus the off-limits rule line. Two packet-side differences: (a) vite proxy was listed as an example of
+IN-CONTAINER-CORRECT and is kept, but with the nuance that its target is dead/wrong-target in-container
+(F-SG059-3); (b) the 8-file audit set is incomplete by one product occurrence (F-SG059-1).
+
+[5] LIVE PROBE DISCRIMINATION
+$ curl -s -m 10 http://127.0.0.1:8003/v1/health
+{"status":"ok","db":"ok","storage":"ok"}
+$ curl -s -m 10 -o /dev/null -w "http=%{http_code}\n" http://localhost:8000/v1/health
+http=404
+$ curl -s -m 10 -i http://localhost:8000/v1/health
+HTTP/1.1 404 Not Found
+date: Thu, 17 Sep 2026 14:12:35 GMT
+server: uvicorn
+content-length: 9
+content-type: text/plain; charset=utf-8
+
+Not Found
+$ ss -ltnp | rg ':(8000|8001|8002|8003|5173)\b'
+LISTEN 0      4096       127.0.0.1:8000       0.0.0.0:*                                                 
+LISTEN 0      2048       127.0.0.1:8001       0.0.0.0:*    users:(("uvicorn",pid=823460,fd=7))          
+LISTEN 0      4096       127.0.0.1:8003       0.0.0.0:*    users:(("rootlesskit",pid=3814163,fd=32))    
+LISTEN 0      2048         0.0.0.0:8002       0.0.0.0:*    users:(("python",pid=1540917,fd=4))          
+-> :8000 = foreign uvicorn 404 (no user shown); :8003 = ours (rootlesskit). Discrimination real, not grep.
+
+[6] G1 — band-aid removal
+$ rg -n 'as unknown' frontend/src/api/client.test.ts
+(no output) -> ZERO `as unknown` in the file.
+Added helper (typed factory):
+    function mockResponse(partial: Partial<Response>): Response {
+      return partial as Response;
+    }
+Both former `as unknown as Response` sites now `mockResolvedValueOnce(mockResponse({...}))`; the other
+six raw `as Response` casts were likewise routed through the same helper (one contained downcast,
+no scattered assertions). Every assertion retained; both throwing-`json` tests unchanged in behaviour.
+
+[7] SUITES / LINT / BUILD
+$ ../venv/bin/python -m pytest -q            (backend, post-change)
+2 failed, 235 passed, 19 warnings in 14.49s
+FAILED tests/test_signals.py::test_generated_codes_are_validated_and_bad_checksum_is_not_an_identifier
+FAILED tests/test_signals.py::test_ocr_has_text_boxes_and_mean_confidence
+-> SAME two base-proven environmental reds as SG-058 (pyzbar/libzbar + pytesseract ABIs absent in host
+   venv; base commit 31ccc33 / SG-058 base 412acc9 both show 2 failed / 235 passed). No new red.
+$ ../venv/bin/python -m ruff check app tests
+All checks passed!
+$ ../venv/bin/python -m mypy app
+Found 41 errors in 9 files  (advisory; pre-existing; backend untouched by this slice -> delta 0)
+$ npm --prefix frontend test -- --run
+Test Files  21 passed (21) ; Tests  152 passed (152) ; Duration 4.36s
+$ npm --prefix frontend run lint
+(clean, exit 0)
+$ VITE_API_BASE=https://storagegenie.dynv6.net npm --prefix frontend run build
+dist/index.html 0.94 kB; dist/assets/index-DxKo-z_g.css 2.65 kB; dist/assets/index-nugWvqun.js 293.62 kB
+built in 1.63s  (tsc green)
+
+[8] BUNDLE-HASH PROPERTY (baseline vs post-edit, prod base) — FINDING: UNCHANGED
+baseline (BEFORE any edit, VITE_API_BASE=https://storagegenie.dynv6.net):
+949df54f19f5b34c4207cd45da3ba2dd2f9db6ece8cec2e80fe36a8fe8ea6572  index.html
+e6bb17555af6266702cd22eb64457554f24732dadb4abad29def6fbc9563591c  index-DxKo-z_g.css
+e5c99c023da00bad3f8a7379cec290f406f4bc8e0deae3b2f4e74b2f18997f22  index-nugWvqun.js
+post-edit (same base):
+949df54f19f5b34c4207cd45da3ba2dd2f9db6ece8cec2e80fe36a8fe8ea6572  index.html
+e6bb17555af6266702cd22eb64457554f24732dadb4abad29def6fbc9563591c  index-DxKo-z_g.css
+e5c99c023da00bad3f8a7379cec290f406f4bc8e0deae3b2f4e74b2f18997f22  index-nugWvqun.js
+$ rg -c 'localhost:8000|localhost:8003' frontend/dist/assets/index-*.js
+(zero)  -> build constant-folds `"https://storagegenie.dynv6.net" || "http://localhost:8003"` away;
+           the fallback literal never reaches production bytes. Served-pre == served-post.
+The baseline local prod build also equals the served container bytes (all three hashes), proving the
+local build reproduces the image's frontend stage exactly.
+
+[9] DEPLOY RAW
+$ docker inspect storagegenie-backend-1 --format 'image={{.Image}}'      # BEFORE
+image=sha256:8f83243374ae7395018b60e47f349bcfa75d8e05546a19261fbccf4ea7de9afd
+$ docker compose build backend                                           # bare: fails (sandbox buildx cache)
+failed to update builder last activity time: open /home/andrei/.docker/buildx/activity/.tmp-default3508903050: read-only file system
+$ mkdir -p /home/andrei/StorageGenie/.cache/buildx
+$ BUILDX_CONFIG=/home/andrei/StorageGenie/.cache/buildx docker compose build backend
+...
+#21 [stage-1 9/9] COPY --from=frontend-build /ui/dist ./static
+#21 CACHED
+...
+ Image storagegenie-backend Built
+real 0m10.227s
+$ docker compose up -d
+ Container storagegenie-backend-1 Recreate
+ Container storagegenie-backend-1 Recreated
+ Container storagegenie-backend-1 Starting
+ Container storagegenie-backend-1 Started
+$ docker compose up -d        # idempotent re-up
+ Container storagegenie-backend-1 Running
+$ docker inspect storagegenie-backend-1 --format 'RestartCount={{.RestartCount}} Started={{.State.StartedAt}} Image={{.Image}}'
+RestartCount=0 Started=2026-09-17T14:15:13.627340384Z Image=sha256:1b83081586024251b55db838ec46a991135fbbbcf6493f0ab3746486cab8a5de
+$ curl -s -m 10 http://127.0.0.1:8003/v1/health
+{"status":"ok","db":"ok","storage":"ok"}
+$ docker exec storagegenie-backend-1 sh -lc 'sha256sum /app/static/index.html /app/static/assets/*'
+949df54f19f5b34c4207cd45da3ba2dd2f9db6ece8cec2e80fe36a8fe8ea6572  /app/static/index.html
+e6bb17555af6266702cd22eb64457554f24732dadb4abad29def6fbc9563591c  /app/static/assets/index-DxKo-z_g.css
+e5c99c023da00bad3f8a7379cec290f406f4bc8e0deae3b2f4e74b2f18997f22  /app/static/assets/index-nugWvqun.js
+$ docker exec storagegenie-backend-1 sh -lc "grep -c 'localhost:8000' /app/static/assets/*.js"
+0
+$ ss -ltnp | rg ':(8000|8003)\b'
+LISTEN 0      4096       127.0.0.1:8000       0.0.0.0:*
+LISTEN 0      4096       127.0.0.1:8003       0.0.0.0:*    users:(("rootlesskit",pid=3814163,fd=32))
+$ docker inspect ... --format 'Ports={{json .NetworkSettings.Ports}} Health={{.State.Health.Status}}'
+Ports={"8000/tcp":[{"HostIp":"127.0.0.1","HostPort":"8003"}]} Health=healthy
+$ docker ps --format '{{.Names}} {{.Status}} {{.Ports}}'
+storagegenie-backend-1 Up 20 seconds (healthy) 127.0.0.1:8003->8000/tcp
+-> container RECREATED on a new image (frontend-build layer differs), RestartCount=0, health exact,
+   loopback-only. But the served bundle bytes are identical to pre-deploy (property "CHANGED" FAILS —
+   F-SG059-2), because the changed fallback literals are dead-code-eliminated by the baked
+   VITE_API_BASE. The `#21 COPY ... CACHED` line is the build-side proof.
+
+[10] HYGIENE
+$ git status --porcelain=v1
+ M frontend/src/api/client.test.ts
+ M frontend/src/api/client.ts
+ M frontend/src/components/AssetCard.tsx
+ M frontend/src/components/CandidateCard.tsx
+ M frontend/src/components/EvidenceGallery.tsx
+ M frontend/src/components/catalog/ProductCard.tsx
+ M frontend/src/routes/SettingsPage.tsx
+ M frontend/src/types/product.ts
+$ git --no-pager diff --stat -- AGENTS.md
+(empty)  -> AGENTS.md untouched.
+$ git check-ignore -v frontend/dist .cache/buildx
+.gitignore:14:frontend/dist/	frontend/dist
+.gitignore:40:.cache/	.cache/buildx
+$ git --no-pager diff --cached --name-only
+(empty)  -> nothing staged, no ignored file staged.
+No migration / no `alembic upgrade` / no `app.seed`; only `docker compose build/up -d` + read probes.
+Prod DB untouched: no import route, no write route, no evidence upload; backend CMD is bare uvicorn
+(no startup migration). Dep files unchanged. Secret scan n/a (no secret-bearing file touched).
+No push to storagegenie-evidence; {{RECEIPT_CMD}} never run.
+
+[11] AGENTS.md:29 {{HEALTH_CMD}} AMENDMENT PROPOSAL (deliverable, NOT an edit)
+OLD:
+| `{{HEALTH_CMD}}` | `curl -s http://localhost:8000/v1/health` (fallback `python3 -c "from fastapi.testclient import TestClient; from app.main import app; print(TestClient(app).get('/v1/health').json())"`) | `ARCHITECT.md` health probe |
+NEW:
+| `{{HEALTH_CMD}}` | `curl -s http://127.0.0.1:8003/v1/health` (fallback `python3 -c "from fastapi.testclient import TestClient; from app.main import app; print(TestClient(app).get('/v1/health').json())"`) | `ARCHITECT.md` health probe |
+REASON: on this host :8000 is a FOREIGN uvicorn (live 404, server: uvicorn, "Not Found") — D20/SG-024
+record; ours is published at 127.0.0.1:8003 (docker-compose.yml:8) and answers
+{"status":"ok","db":"ok","storage":"ok"}. Binding the probe to :8000 makes every health leg read a
+foreign 404. Change only the host; keep the TestClient fallback.

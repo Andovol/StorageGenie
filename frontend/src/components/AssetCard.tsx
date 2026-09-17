@@ -4,7 +4,7 @@ import { UNTITLED_ASSET_NAME } from "../types/product";
 import { ProvenanceBadge } from "./ProvenanceBadge";
 
 export function AssetCard({ asset, householdId }: { asset: Asset; householdId: string }) {
-  const base = import.meta.env.VITE_API_BASE || "http://localhost:8000";
+  const base = import.meta.env.VITE_API_BASE || "http://localhost:8003";
   const displayName = asset.display_name || UNTITLED_ASSET_NAME;
   const thumbEvidence = (asset as unknown as { evidence?: { id: string }[] }).evidence?.[0];
   const thumbUrl = thumbEvidence

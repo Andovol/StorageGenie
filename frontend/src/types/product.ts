@@ -106,7 +106,7 @@ export function evidenceToAssetMedia(
   options: { householdId: string; baseUrl?: string }
 ): AssetMedia {
   const base =
-    options.baseUrl ?? import.meta.env.VITE_API_BASE ?? "http://localhost:8000";
+    options.baseUrl ?? import.meta.env.VITE_API_BASE ?? "http://localhost:8003";
   return {
     // Route mirrors EvidenceGallery.tsx:11 — original file stream, not the thumb.
     originalUrl: `${base}/v1/evidence/${evidence.id}/file?household_id=${options.householdId}`,

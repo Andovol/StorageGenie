@@ -9,7 +9,7 @@ import type {
   PlanningSuggestionListResponse,
 } from "./types";
 
-const BASE = import.meta.env.VITE_API_BASE || "http://localhost:8000";
+const BASE = import.meta.env.VITE_API_BASE || "http://localhost:8003";
 
 export function buildUrl(path: string, params: Record<string, string> = {}): string {
   const u = new URL(BASE + path);
