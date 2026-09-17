@@ -46,7 +46,7 @@ Coder reads read-only copy on host (`/opt/storagegenie-dispatch/` + global `CODE
 
 ## Project narrowings of global rules — may narrow, never contradict (`G-P2`)
 
-- **Budget:** `G-A8` — 20 MB upload cap (`backend/app/config.py:11`) is a security hard cap with visible `413` truncation, not a silent guideline.
+- **Budget:** `G-A8` — 20 MB upload cap (`backend/app/config.py:20`; corrected 2026-09-17 by SG-061 — was `:11`) is a security hard cap with visible `413` truncation, not a silent guideline.
 - **Duplicate:** `docs/decisions/2026-08-28-phase-0-approvals.md:33-41` Launcher block duplicates `G-O1`, `G-P2`, `G-C1` — keep global, project copy is a pointer not a second copy.
 - **Sensitive surfaces (`G-K3`) — declared per `PRODUCTION.md` trigger:** evidence store (`/data/storage` + `backend/data/storage`), SQLite DB (`/data/db/storagegenie.db`), dispatch host/credential. Every decision touching any goes to owner individually (`G-K2`) at every autonomy level. A surface not listed is "not declared", never "safe".
 - **Restart allowlist:** `docker-compose.yml:19,37` `restart: unless-stopped` both services — `PRODUCTION.md:restart` binding if declared.
