@@ -185,10 +185,13 @@ def _apply_asset_filters(
     if status:
         query = query.filter(Asset.status == status)
     if has_evidence is not None:
+        # Optimization: Use Core select() instead of ORM db.query() for subquery filters
+        # to avoid heavy ORM Session/Query overhead during query compilation.
+        evidence_subquery = select(asset_evidence.c.asset_id)
         if has_evidence:
-            query = query.filter(Asset.id.in_(db.query(asset_evidence.c.asset_id)))
+            query = query.filter(Asset.id.in_(evidence_subquery))
         else:
-            query = query.filter(~Asset.id.in_(db.query(asset_evidence.c.asset_id)))
+            query = query.filter(~Asset.id.in_(evidence_subquery))
     return query
 
 
@@ -326,11 +329,13 @@ def asset_facets(
     has_evidence_counts: dict[str, int] = {}
     if status_counts:
         evidence_base = queries["has_evidence"]
+        # Optimization: Use Core select() instead of ORM db.query() for subquery filters
+        evidence_subquery = select(asset_evidence.c.asset_id)
         with_evidence = evidence_base.filter(
-            Asset.id.in_(db.query(asset_evidence.c.asset_id))
+            Asset.id.in_(evidence_subquery)
         ).count()
         without_evidence = evidence_base.filter(
-            ~Asset.id.in_(db.query(asset_evidence.c.asset_id))
+            ~Asset.id.in_(evidence_subquery)
         ).count()
         has_evidence_counts = {
             "with": int(with_evidence),
