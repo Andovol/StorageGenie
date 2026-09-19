@@ -6,7 +6,6 @@ from sqlalchemy import and_, func, or_, select, text
 from sqlalchemy.orm import Query as OrmQuery, Session
 
 from app.db import get_db
-from app.models.assertion import Assertion
 from app.models.audit_event import AuditEvent
 from app.models.asset import Asset
 from app.models.evidence import Evidence, asset_evidence
@@ -109,20 +108,19 @@ def _asset_to_dict(asset: Asset, db: Session) -> dict:  # type: ignore[no-untype
         for e in evs
     ]
     # Assertions
-    assertions = []
-    for ass in db.query(Assertion).filter_by(asset_id=asset.id).order_by(Assertion.field_path).all():
-        assertions.append(
-            {
-                "id": ass.id,
-                "field_path": ass.field_path,
-                "value": loads_json(ass.value_json),
-                "source_type": ass.source_type,
-                "confidence": ass.confidence,
-                "review_state": ass.review_state,
-                "source_evidence_ids": loads_json(ass.source_evidence_ids),
-                "created_at": ass.created_at.isoformat() if ass.created_at else None,
-            }
-        )
+    assertions = [
+        {
+            "id": ass.id,
+            "field_path": ass.field_path,
+            "value": loads_json(ass.value_json),
+            "source_type": ass.source_type,
+            "confidence": ass.confidence,
+            "review_state": ass.review_state,
+            "source_evidence_ids": loads_json(ass.source_evidence_ids),
+            "created_at": ass.created_at.isoformat() if ass.created_at else None,
+        }
+        for ass in asset.assertions
+    ]
     audits = []
     for ae in (
         db.query(AuditEvent).filter_by(entity_type="asset", entity_id=asset.id).order_by(AuditEvent.timestamp).all()
