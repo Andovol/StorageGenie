@@ -102,11 +102,13 @@ def _active_assertion(db: Session, asset_id: str, field_path: str) -> Assertion 
     )
 
 
-def build_catalog(db: Session, household_id: str) -> list[dict[str, Any]]:
+def build_catalog(db: Session, household_id: str) -> list[dict[str, Any]]:  # noqa: C901
     """Label data for every ACTIVE asset: the ONLY input the prompt builder sees.
 
     Reads the existing asset + assertion tables as-is; returns no ids beyond the
     asset/assertion ids the suggestion must name, and no secrets.
+    Optimized: Batch queries assertions across all active assets to prevent
+    N+1 query overhead during LLM planning context construction.
     """
     assets = (
         db.query(Asset)
@@ -114,10 +116,34 @@ def build_catalog(db: Session, household_id: str) -> list[dict[str, Any]]:
         .order_by(Asset.display_name)
         .all()
     )
+    if not assets:
+        return []
+
+    asset_ids = [a.id for a in assets]
+
+    # Batch fetch all relevant non-superseded/non-rejected assertions for all active assets
+    assertions = (
+        db.query(Assertion)
+        .filter(
+            Assertion.asset_id.in_(asset_ids),
+            Assertion.field_path.in_((CLASSIFICATION_FIELD, EXPIRY_FIELD, OPENED_DATE_FIELD)),
+            Assertion.review_state.not_in(("superseded", "rejected")),
+        )
+        .order_by(Assertion.created_at.desc())
+        .all()
+    )
+
+    # Group active assertions by (asset_id, field_path), taking the newest (first due to created_at desc)
+    active_assertions: dict[tuple[str, str], Assertion] = {}
+    for ass in assertions:
+        key = (ass.asset_id, ass.field_path)
+        if key not in active_assertions:
+            active_assertions[key] = ass
+
     catalog: list[dict[str, Any]] = []
     for asset in assets:
         category: str | None = None
-        classification = _active_assertion(db, asset.id, CLASSIFICATION_FIELD)
+        classification = active_assertions.get((asset.id, CLASSIFICATION_FIELD))
         if classification is not None:
             try:
                 category = json.loads(classification.value_json).get("category")
@@ -128,7 +154,7 @@ def build_catalog(db: Session, household_id: str) -> list[dict[str, Any]]:
         date_type: str | None = None
         expiry_assertion_id: str | None = None
         opened_assertion_id: str | None = None
-        expiry = _active_assertion(db, asset.id, EXPIRY_FIELD)
+        expiry = active_assertions.get((asset.id, EXPIRY_FIELD))
         if expiry is not None:
             expiry_assertion_id = expiry.id
             try:
@@ -138,7 +164,7 @@ def build_catalog(db: Session, household_id: str) -> list[dict[str, Any]]:
             if isinstance(value, dict):
                 expiry_date = value.get("expiry_date")
                 date_type = value.get("date_type")
-        opened = _active_assertion(db, asset.id, OPENED_DATE_FIELD)
+        opened = active_assertions.get((asset.id, OPENED_DATE_FIELD))
         if opened is not None:
             opened_assertion_id = opened.id
             try:
