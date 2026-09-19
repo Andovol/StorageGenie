@@ -134,11 +134,13 @@ def _source_attributions(db: Session, asset_id: str) -> list[dict[str, Any]]:
     ]
 
 
-def build_catalog(db: Session, household_id: str, category: str) -> list[dict[str, Any]]:
+def build_catalog(db: Session, household_id: str, category: str) -> list[dict[str, Any]]:  # noqa: C901
     """Label data for one category's ACTIVE assets: the ONLY grounding input.
 
     Returns no secrets: asset label data, the classification/expiry assertions
     that already exist, and any source attributions attached to the asset.
+    Optimized: Batch queries assertions and attributions across all active assets
+    to prevent N+1 query overhead during LLM context construction.
     """
     slug = resolve_category(category)
     assets = (
@@ -147,9 +149,51 @@ def build_catalog(db: Session, household_id: str, category: str) -> list[dict[st
         .order_by(Asset.display_name)
         .all()
     )
+    if not assets:
+        return []
+
+    asset_ids = [a.id for a in assets]
+
+    # Batch fetch all relevant non-superseded/non-rejected assertions for all active assets
+    assertions = (
+        db.query(Assertion)
+        .filter(
+            Assertion.asset_id.in_(asset_ids),
+            Assertion.field_path.in_((CLASSIFICATION_FIELD, EXPIRY_FIELD, OPENED_DATE_FIELD)),
+            Assertion.review_state.not_in(("superseded", "rejected")),
+        )
+        .order_by(Assertion.created_at.desc())
+        .all()
+    )
+
+    # Group active assertions by (asset_id, field_path), taking the newest (first due to created_at desc)
+    active_assertions: dict[tuple[str, str], Assertion] = {}
+    for ass in assertions:
+        key = (ass.asset_id, ass.field_path)
+        if key not in active_assertions:
+            active_assertions[key] = ass
+
+    # Batch fetch all source attributions for all active assets
+    attributions = (
+        db.query(SourceAttribution)
+        .filter(SourceAttribution.asset_id.in_(asset_ids))
+        .order_by(SourceAttribution.retrieved_at.desc())
+        .all()
+    )
+    source_attr_map: dict[str, list[dict[str, Any]]] = {}
+    for sa in attributions:
+        source_attr_map.setdefault(sa.asset_id, []).append(
+            {
+                "uri": sa.uri,
+                "field_path": sa.field_path,
+                "retrieved_at": sa.retrieved_at.isoformat() if sa.retrieved_at else None,
+                "note": sa.note,
+            }
+        )
+
     catalog: list[dict[str, Any]] = []
     for asset in assets:
-        classification = _active_assertion(db, asset.id, CLASSIFICATION_FIELD)
+        classification = active_assertions.get((asset.id, CLASSIFICATION_FIELD))
         if classification is None:
             continue
         try:
@@ -162,7 +206,7 @@ def build_catalog(db: Session, household_id: str, category: str) -> list[dict[st
         opened_date: str | None = None
         date_type: str | None = None
         expiry_assertion_id: str | None = None
-        expiry = _active_assertion(db, asset.id, EXPIRY_FIELD)
+        expiry = active_assertions.get((asset.id, EXPIRY_FIELD))
         if expiry is not None:
             expiry_assertion_id = expiry.id
             try:
@@ -172,7 +216,14 @@ def build_catalog(db: Session, household_id: str, category: str) -> list[dict[st
             if isinstance(value, dict):
                 expiry_date = value.get("expiry_date")
                 date_type = value.get("date_type")
-        opened_date = _date_assertion_value(db, asset.id, OPENED_DATE_FIELD)
+        opened = active_assertions.get((asset.id, OPENED_DATE_FIELD))
+        if opened is not None:
+            try:
+                opened_value = json.loads(opened.value_json)
+            except json.JSONDecodeError:
+                opened_value = None
+            if isinstance(opened_value, str):
+                opened_date = opened_value
         catalog.append(
             {
                 "id": asset.id,
@@ -183,7 +234,7 @@ def build_catalog(db: Session, household_id: str, category: str) -> list[dict[st
                 "date_type": date_type,
                 "status": asset.status,
                 "expiry_assertion_id": expiry_assertion_id,
-                "source_attributions": _source_attributions(db, asset.id),
+                "source_attributions": source_attr_map.get(asset.id, []),
             }
         )
     return catalog
