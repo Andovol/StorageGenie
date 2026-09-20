@@ -102,11 +102,61 @@ def _active_assertion(db: Session, asset_id: str, field_path: str) -> Assertion 
     )
 
 
+def _parse_asset_assertions(
+    asset: Asset, assertions_map: dict[tuple[str, str], Assertion]
+) -> dict[str, Any]:
+    category: str | None = None
+    classification = assertions_map.get((asset.id, CLASSIFICATION_FIELD))
+    if classification is not None:
+        try:
+            category = json.loads(classification.value_json).get("category")
+        except (json.JSONDecodeError, AttributeError):
+            category = None
+    expiry_date: str | None = None
+    date_type: str | None = None
+    expiry_assertion_id: str | None = None
+    expiry = assertions_map.get((asset.id, EXPIRY_FIELD))
+    if expiry is not None:
+        expiry_assertion_id = expiry.id
+        try:
+            value = json.loads(expiry.value_json)
+        except json.JSONDecodeError:
+            value = {}
+        if isinstance(value, dict):
+            expiry_date = value.get("expiry_date")
+            date_type = value.get("date_type")
+    opened_date: str | None = None
+    opened_assertion_id: str | None = None
+    opened = assertions_map.get((asset.id, OPENED_DATE_FIELD))
+    if opened is not None:
+        opened_assertion_id = opened.id
+        try:
+            opened_value = json.loads(opened.value_json)
+        except json.JSONDecodeError:
+            opened_value = None
+        if isinstance(opened_value, str):
+            opened_date = opened_value
+    return {
+        "id": asset.id,
+        "label": asset.display_name or UNTITLED_LABEL,
+        "category": category,
+        "expiry_date": expiry_date,
+        "opened_date": opened_date,
+        "date_type": date_type,
+        "status": asset.status,
+        "expiry_assertion_id": expiry_assertion_id,
+        "opened_assertion_id": opened_assertion_id,
+    }
+
+
 def build_catalog(db: Session, household_id: str) -> list[dict[str, Any]]:
     """Label data for every ACTIVE asset: the ONLY input the prompt builder sees.
 
     Reads the existing asset + assertion tables as-is; returns no ids beyond the
     asset/assertion ids the suggestion must name, and no secrets.
+
+    Optimization: Assertions for all active assets in the household are batch-fetched
+    in a single query rather than making 3 DB calls per asset (3N + 1 -> 2 queries).
     """
     assets = (
         db.query(Asset)
@@ -114,53 +164,28 @@ def build_catalog(db: Session, household_id: str) -> list[dict[str, Any]]:
         .order_by(Asset.display_name)
         .all()
     )
-    catalog: list[dict[str, Any]] = []
-    for asset in assets:
-        category: str | None = None
-        classification = _active_assertion(db, asset.id, CLASSIFICATION_FIELD)
-        if classification is not None:
-            try:
-                category = json.loads(classification.value_json).get("category")
-            except (json.JSONDecodeError, AttributeError):
-                category = None
-        expiry_date: str | None = None
-        opened_date: str | None = None
-        date_type: str | None = None
-        expiry_assertion_id: str | None = None
-        opened_assertion_id: str | None = None
-        expiry = _active_assertion(db, asset.id, EXPIRY_FIELD)
-        if expiry is not None:
-            expiry_assertion_id = expiry.id
-            try:
-                value = json.loads(expiry.value_json)
-            except json.JSONDecodeError:
-                value = {}
-            if isinstance(value, dict):
-                expiry_date = value.get("expiry_date")
-                date_type = value.get("date_type")
-        opened = _active_assertion(db, asset.id, OPENED_DATE_FIELD)
-        if opened is not None:
-            opened_assertion_id = opened.id
-            try:
-                opened_value = json.loads(opened.value_json)
-            except json.JSONDecodeError:
-                opened_value = None
-            if isinstance(opened_value, str):
-                opened_date = opened_value
-        catalog.append(
-            {
-                "id": asset.id,
-                "label": asset.display_name or UNTITLED_LABEL,
-                "category": category,
-                "expiry_date": expiry_date,
-                "opened_date": opened_date,
-                "date_type": date_type,
-                "status": asset.status,
-                "expiry_assertion_id": expiry_assertion_id,
-                "opened_assertion_id": opened_assertion_id,
-            }
+    if not assets:
+        return []
+
+    asset_ids = [asset.id for asset in assets]
+    assertions = (
+        db.query(Assertion)
+        .filter(
+            Assertion.asset_id.in_(asset_ids),
+            Assertion.field_path.in_((CLASSIFICATION_FIELD, EXPIRY_FIELD, OPENED_DATE_FIELD)),
+            Assertion.review_state.not_in(("superseded", "rejected")),
         )
-    return catalog
+        .order_by(Assertion.created_at.desc())
+        .all()
+    )
+    # Map (asset_id, field_path) -> latest active assertion
+    assertions_map: dict[tuple[str, str], Assertion] = {}
+    for assertion in assertions:
+        key = (assertion.asset_id, assertion.field_path)
+        if key not in assertions_map:
+            assertions_map[key] = assertion
+
+    return [_parse_asset_assertions(asset, assertions_map) for asset in assets]
 
 
 def _carrier_png() -> bytes:
