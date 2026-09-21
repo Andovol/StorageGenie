@@ -115,10 +115,11 @@ export function AssetForm({ householdId, onCreated }: Props) {
         <input
           value={displayName}
           onChange={(e) => setDisplayName(e.target.value)}
-          style={{ width: "100%", padding: 8, border: "1px solid #d1d5db", borderRadius: 6 }}
+          className="bg-background text-foreground border-border focus-ring"
+          style={{ width: "100%", padding: 8, borderStyle: "solid", borderWidth: 1, borderRadius: 6 }}
           placeholder="e.g. Hammer"
         />
-        <span style={{ fontSize: 11, color: "#6b7280" }}>Left blank, we use the photo's filename</span>
+        <span className="text-muted-foreground" style={{ fontSize: 11 }}>Left blank, we use the photo's filename</span>
       </label>
       <label style={{ display: "flex", flexDirection: "column", gap: 4 }}>
         <span>Asset type</span>
@@ -136,15 +137,15 @@ export function AssetForm({ householdId, onCreated }: Props) {
       <div style={{ display: "flex", gap: 12 }}>
         <label style={{ flex: 1, display: "flex", flexDirection: "column", gap: 4 }}>
           <span>Quantity</span>
-          <input value={quantity} onChange={(e) => setQuantity(e.target.value)} type="number" step="any" style={{ padding: 8, border: "1px solid #d1d5db", borderRadius: 6 }} />
+          <input value={quantity} onChange={(e) => setQuantity(e.target.value)} type="number" step="any" className="bg-background text-foreground border-border focus-ring" style={{ padding: 8, borderStyle: "solid", borderWidth: 1, borderRadius: 6 }} />
         </label>
         <label style={{ flex: 1, display: "flex", flexDirection: "column", gap: 4 }}>
           <span>Unit</span>
-          <input value={unit} onChange={(e) => setUnit(e.target.value)} placeholder="pcs, kg…" style={{ padding: 8, border: "1px solid #d1d5db", borderRadius: 6 }} />
+          <input value={unit} onChange={(e) => setUnit(e.target.value)} placeholder="pcs, kg…" className="bg-background text-foreground border-border focus-ring" style={{ padding: 8, borderStyle: "solid", borderWidth: 1, borderRadius: 6 }} />
         </label>
         <label style={{ flex: 1, display: "flex", flexDirection: "column", gap: 4 }}>
           <span>Condition</span>
-          <input value={condition} onChange={(e) => setCondition(e.target.value)} placeholder="new, used…" style={{ padding: 8, border: "1px solid #d1d5db", borderRadius: 6 }} />
+          <input value={condition} onChange={(e) => setCondition(e.target.value)} placeholder="new, used…" className="bg-background text-foreground border-border focus-ring" style={{ padding: 8, borderStyle: "solid", borderWidth: 1, borderRadius: 6 }} />
         </label>
       </div>
 
@@ -155,15 +156,16 @@ export function AssetForm({ householdId, onCreated }: Props) {
         }}
         onDragLeave={() => setDragOver(false)}
         onDrop={onDrop}
+        className={dragOver ? "border-primary bg-accent" : "border-border bg-card-muted"}
         style={{
-          border: `2px dashed ${dragOver ? "#3b82f6" : "#d1d5db"}`,
+          borderStyle: "dashed",
+          borderWidth: 2,
           borderRadius: 8,
           padding: 16,
-          background: dragOver ? "#eff6ff" : "#f9fafb",
           textAlign: "center",
         }}
       >
-        <div style={{ fontSize: 13, color: "#6b7280", marginBottom: 8 }}>Drag & drop photos here, click to select, or paste</div>
+        <div className="text-muted-foreground" style={{ fontSize: 13, marginBottom: 8 }}>Drag &amp; drop photos here, click to select, or paste</div>
         <input
           type="file"
           multiple
@@ -172,7 +174,7 @@ export function AssetForm({ householdId, onCreated }: Props) {
             if (e.target.files?.length) await addFiles(e.target.files);
           }}
         />
-        <label style={{ display: "inline-flex", flexDirection: "column", gap: 4, marginTop: 12, fontSize: 13, color: "#6b7280" }}>
+        <label className="text-muted-foreground" style={{ display: "inline-flex", flexDirection: "column", gap: 4, marginTop: 12, fontSize: 13 }}>
           Take a photo
           <input
             type="file"
@@ -187,7 +189,7 @@ export function AssetForm({ householdId, onCreated }: Props) {
           <ul style={{ textAlign: "left", marginTop: 12, paddingLeft: 16 }}>
             {previewFiles.map((pf, i) => (
               <li key={i} style={{ fontSize: 12, marginBottom: 4 }}>
-                {pf.file.name} — {(pf.file.size / 1024).toFixed(1)} KB {pf.shaPreview && <span style={{ color: "#6b7280" }}>SHA {pf.shaPreview}</span>}
+                {pf.file.name} — {(pf.file.size / 1024).toFixed(1)} KB {pf.shaPreview && <span className="text-muted-foreground">SHA {pf.shaPreview}</span>}
                 <button type="button" onClick={() => setPreviewFiles((prev) => prev.filter((_, idx) => idx !== i))} style={{ marginLeft: 8, fontSize: 11 }}>
                   remove
                 </button>
@@ -197,8 +199,8 @@ export function AssetForm({ householdId, onCreated }: Props) {
         )}
       </div>
 
-      {error && <div style={{ color: "#dc2626", fontSize: 13 }}>{error}</div>}
-      <button type="submit" disabled={submitting} style={{ padding: "10px 16px", background: "#111827", color: "white", borderRadius: 6, border: "none", cursor: submitting ? "not-allowed" : "pointer" }}>
+      {error && <div className="text-danger" style={{ fontSize: 13 }}>{error}</div>}
+      <button type="submit" disabled={submitting} className="bg-primary text-primary-foreground focus-ring" style={{ padding: "10px 16px", borderRadius: 6, border: "none", cursor: submitting ? "not-allowed" : "pointer" }}>
         {submitting ? "Creating..." : "Create asset"}
       </button>
     </form>

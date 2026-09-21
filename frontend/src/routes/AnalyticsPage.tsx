@@ -58,9 +58,9 @@ export function AnalyticsPage() {
   const insightResult = insights.data;
 
   return (
-    <div style={{ padding: 24, maxWidth: 900 }}>
+    <div className="text-foreground" style={{ padding: 24, maxWidth: 900 }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-        <h1>Analytics</h1>
+        <h1 className="page-header text-foreground">Analytics</h1>
         <label>
           Household{" "}
           <select
@@ -80,7 +80,7 @@ export function AnalyticsPage() {
           </select>
         </label>
       </div>
-      <p style={{ color: "#6b7280", fontSize: 13 }}>
+      <p className="text-muted-foreground" style={{ fontSize: 13 }}>
         These numbers are computed from your own recorded items. The summary is prose only —
         it is grounded in the numbers shown, takes no action, and is never refreshed
         automatically.
@@ -158,7 +158,7 @@ export function AnalyticsPage() {
         </button>
       </div>
       {message && (
-        <div role="alert" style={{ marginTop: 12, color: "#374151" }}>
+        <div role="alert" className="text-foreground" style={{ marginTop: 12 }}>
           {message}
         </div>
       )}
@@ -169,7 +169,7 @@ export function AnalyticsPage() {
           <p>{insightResult.summary}</p>
           {insightResult.cited_stats && insightResult.cited_stats.length > 0 && (
             <div>
-              <h3 style={{ fontSize: 13, color: "#6b7280" }}>Grounded in</h3>
+              <h3 className="text-muted-foreground" style={{ fontSize: 13 }}>Grounded in</h3>
               <ul>
                 {insightResult.cited_stats.map((stat) => (
                   <li key={stat.id}>

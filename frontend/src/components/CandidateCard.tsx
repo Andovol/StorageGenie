@@ -49,13 +49,13 @@ export function CandidateCard({
   }, [candidate.evidence_ids, householdId]);
 
   return (
-    <article style={{ border: "1px solid #e5e7eb", borderRadius: 10, padding: 16, background: "white" }}>
+    <article className="bg-card border-border" style={{ borderStyle: "solid", borderWidth: 1, borderRadius: 10, padding: 16 }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: 12 }}>
-        <div><h2 style={{ margin: 0 }}>Candidate {candidate.id}</h2><div style={{ color: "#6b7280", fontSize: 12 }}>State: {candidate.state} · Job: {candidate.job_id}</div></div>
+        <div><h2 style={{ margin: 0 }}>Candidate {candidate.id}</h2><div className="text-muted-foreground" style={{ fontSize: 12 }}>State: {candidate.state} · Job: {candidate.job_id}</div></div>
         <span>Candidate review</span>
       </div>
       {candidate.dedup_matches.length > 0 && (
-        <div role="alert" style={{ marginTop: 14, padding: 10, background: "#fff7ed", border: "1px solid #fed7aa", borderRadius: 6 }}>
+        <div role="alert" className="bg-accent border-accent" style={{ marginTop: 14, padding: 10, borderStyle: "solid", borderWidth: 1, borderRadius: 6 }}>
           <strong>Possible duplicates or collisions</strong>
           {candidate.dedup_matches.map((match, index) => <div key={`${match.type}-${index}`}>{matchLabel(match)}</div>)}
           {blocked ? <div style={{ marginTop: 4 }}>Acceptance is blocked until the open review task(s) are resolved.</div> : <div style={{ marginTop: 4 }}>This match is advisory; review it before accepting.</div>}
@@ -66,10 +66,10 @@ export function CandidateCard({
           <h3 style={{ marginTop: 0 }}>Candidate fields</h3>
           {Object.entries(candidate.fields).map(([key, raw]) => {
             const info = fieldInfo(raw);
-            return <div key={key} style={{ padding: "8px 0", borderBottom: "1px solid #f3f4f6" }}>
+            return <div key={key} className="border-border" style={{ padding: "8px 0", borderBottomStyle: "solid", borderBottomWidth: 1 }}>
               <label htmlFor={`candidate-field-${key}`} style={{ display: "block", fontWeight: 600 }}>{key}</label>
-              <input id={`candidate-field-${key}`} aria-label={`${key} value`} value={String(values[key] ?? "")} placeholder="Unknown" onChange={(event) => setValues((previous) => ({ ...previous, [key]: event.target.value }))} style={{ width: "100%", boxSizing: "border-box", padding: 7, marginTop: 4, border: "1px solid #d1d5db", borderRadius: 5 }} />
-              <div style={{ fontSize: 11, color: "#6b7280", marginTop: 3 }}>Confidence: {info.confidence == null ? "Unknown" : String(info.confidence)} · Source: {String(info.source)}</div>
+              <input id={`candidate-field-${key}`} aria-label={`${key} value`} value={String(values[key] ?? "")} placeholder="Unknown" onChange={(event) => setValues((previous) => ({ ...previous, [key]: event.target.value }))} className="bg-background text-foreground border-border focus-ring" style={{ width: "100%", boxSizing: "border-box", padding: 7, marginTop: 4, borderStyle: "solid", borderWidth: 1, borderRadius: 5 }} />
+              <div className="text-muted-foreground" style={{ fontSize: 11, marginTop: 3 }}>Confidence: {info.confidence == null ? "Unknown" : String(info.confidence)} · Source: {String(info.source)}</div>
             </div>;
           })}
           {Object.keys(candidate.fields).length === 0 && <div>Unknown</div>}
@@ -77,7 +77,7 @@ export function CandidateCard({
         <section aria-label="Source evidence">
           <h3 style={{ marginTop: 0 }}>Source evidence</h3>
           <div style={{ display: "flex", flexWrap: "wrap", gap: 10 }}>
-            {evidenceUrls.map((evidence) => <figure key={evidence.id} style={{ margin: 0 }}><img src={evidence.url} alt={`Evidence ${evidence.id}`} style={{ width: 160, height: 120, objectFit: "contain", background: "#f3f4f6" }} /><figcaption style={{ fontSize: 11, color: "#6b7280" }}>{evidence.id}</figcaption></figure>)}
+            {evidenceUrls.map((evidence) => <figure key={evidence.id} style={{ margin: 0 }}><img src={evidence.url} alt={`Evidence ${evidence.id}`} className="bg-card-muted" style={{ width: 160, height: 120, objectFit: "contain" }} /><figcaption className="text-muted-foreground" style={{ fontSize: 11 }}>{evidence.id}</figcaption></figure>)}
           </div>
           {evidenceUrls.length === 0 && <div>No source evidence</div>}
         </section>

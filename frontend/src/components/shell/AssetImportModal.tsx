@@ -190,11 +190,10 @@ export function AssetImportModal({ householdId, onClose }: AssetImportModalProps
             setDragOver(false);
             if (event.dataTransfer.files?.length) addFiles(event.dataTransfer.files);
           }}
-          className="bg-card-muted"
+          className={`${dragOver ? "border-primary" : "border-border"} bg-card-muted`}
           style={{
             borderStyle: "dashed",
             borderWidth: 2,
-            borderColor: dragOver ? "hsl(var(--primary))" : "hsl(var(--border))",
             borderRadius: 8,
             padding: 16,
             textAlign: "center",
@@ -223,7 +222,8 @@ export function AssetImportModal({ householdId, onClose }: AssetImportModalProps
           <div
             role="alert"
             data-testid="rejected-files"
-            style={{ marginTop: 12, color: "hsl(var(--badge-failed-fg))", fontSize: 12 }}
+            className="text-danger"
+            style={{ marginTop: 12, fontSize: 12 }}
           >
             <strong>
               Skipped {rejected.length} file{rejected.length === 1 ? "" : "s"}:
@@ -280,17 +280,16 @@ export function AssetImportModal({ householdId, onClose }: AssetImportModalProps
                     {file.name}
                   </span>
                   <span className="text-muted-foreground font-mono">{formatKb(file.size)}</span>
-                  <span style={{ color: "hsl(var(--badge-processed-fg))", fontWeight: 600 }}>Ready</span>
+                  <span className="text-processed" style={{ fontWeight: 600 }}>Ready</span>
                   <button
                     type="button"
                     aria-label={`Remove ${file.name}`}
                     onClick={() => removeAt(index)}
-                    className="focus-ring"
+                    className="text-muted-foreground focus-ring"
                     style={{
                       background: "none",
                       border: "none",
                       cursor: "pointer",
-                      color: "hsl(var(--muted-foreground))",
                       fontSize: 12,
                     }}
                   >
@@ -303,7 +302,7 @@ export function AssetImportModal({ householdId, onClose }: AssetImportModalProps
         </section>
 
         {error && (
-          <div role="alert" style={{ marginTop: 12, color: "hsl(var(--badge-failed-fg))", fontSize: 13 }}>
+          <div role="alert" className="text-danger" style={{ marginTop: 12, fontSize: 13 }}>
             {error}
           </div>
         )}

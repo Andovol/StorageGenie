@@ -71,9 +71,9 @@ export function ChatPage() {
   });
 
   return (
-    <div style={{ padding: 24, maxWidth: 900 }}>
+    <div className="text-foreground" style={{ padding: 24, maxWidth: 900 }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-        <h1>Chat</h1>
+        <h1 className="page-header text-foreground">Chat</h1>
         <label>
           Household{" "}
           <select
@@ -93,7 +93,7 @@ export function ChatPage() {
         </label>
       </div>
 
-      <p style={{ color: "#6b7280", fontSize: 13 }}>
+      <p className="text-muted-foreground" style={{ fontSize: 13 }}>
         Answers are grounded in the selected category&apos;s catalogue only. Chat changes no
         asset, job or setting, and sends nothing on a schedule.
       </p>
@@ -114,11 +114,11 @@ export function ChatPage() {
         </label>
       </div>
       {notice && (
-        <div role="alert" style={{ marginTop: 12, color: "#374151" }}>
+        <div role="alert" className="text-foreground" style={{ marginTop: 12 }}>
           {notice}
           {aiDisabled && (
             <div style={{ marginTop: 4 }}>
-              <Link to="/settings">Enable AI in Settings to use chat</Link>
+              <Link to="/settings" className="text-primary focus-ring">Enable AI in Settings to use chat</Link>
             </div>
           )}
         </div>

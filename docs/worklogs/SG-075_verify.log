@@ -1,0 +1,194 @@
+SG-075_verify.log — raw verification outputs (site-wide Stone theme migration)
+
+Host: andrei@87.106.66.242:2222 /home/andrei/StorageGenie
+Coder: opencode  |  effort: medium (argv `--variant medium`)  |  model: deepseek-v4.1-flash (provider opencode-go; from opencode provider metadata /home/andrei/.local/state/opencode/model.json, NOT a system-prompt line)
+BASE origin/automation resolved: 798fcb0a8a5724297580388fbc769b4ecee1a7fb ("D96: SG-075 Stone theme migration packet")
+Contract: recorded 0.28.2 == published; source /home/andrei/storagegenie-contract/VERSION = 0.28.2; contract HEAD b495b59b3426af66772a87939473ac558f8f72d2
+Node v24.14.1 / npm 11.11.0. `npx` is not on PATH on this box; the equivalent local binary `./node_modules/.bin/vitest` is used for the `npx vitest run` step (stated, not hidden).
+
+
+================================================================================
+LEG 1a — PRE-CHANGE hardcoded-literal grep at BASE (git grep HEAD)
+================================================================================
+$ git grep -nE '#[0-9a-fA-F]{3,8}\b|rgba?\(|hsla?\(' HEAD -- frontend/src | rg -v 'frontend/src/theme/|\.test\.|mockProducts\.ts' | wc -l
+108
+$ git grep -lE '...' HEAD -- frontend/src | rg -v '...'     # unique files
+HEAD:frontend/src/App.tsx
+HEAD:frontend/src/components/AssetCard.tsx
+HEAD:frontend/src/components/AssetForm.tsx
+HEAD:frontend/src/components/CandidateCard.tsx
+HEAD:frontend/src/components/ChatTranscript.tsx
+HEAD:frontend/src/components/EvidenceGallery.tsx
+HEAD:frontend/src/components/ExpiryEntryForm.tsx
+HEAD:frontend/src/components/JobCard.tsx
+HEAD:frontend/src/components/PlanningSuggestionCard.tsx
+HEAD:frontend/src/components/ProvenanceBadge.tsx
+HEAD:frontend/src/components/catalog/ProductCard.tsx
+HEAD:frontend/src/components/catalog/ProductGrid.tsx
+HEAD:frontend/src/components/shell/AssetImportModal.tsx
+HEAD:frontend/src/components/shell/ItemInspectorDrawer.tsx
+HEAD:frontend/src/routes/AnalyticsPage.tsx
+HEAD:frontend/src/routes/AssetDetailPage.tsx
+HEAD:frontend/src/routes/CapturePage.tsx
+HEAD:frontend/src/routes/ChatPage.tsx
+HEAD:frontend/src/routes/InboxPage.tsx
+HEAD:frontend/src/routes/PlanningPage.tsx
+HEAD:frontend/src/routes/SettingsPage.tsx
+$ git grep -cE '...' HEAD -- frontend/src/App.tsx
+HEAD:frontend/src/App.tsx:6
+
+FINDING F-SG075-1: the packet premise "the ONLY hex literals outside theme/ sit in
+App.tsx — 6 hits" is FALSE. App.tsx does carry exactly 6 hits, but the total at BASE
+is 108 hits across 21 files. Every screen had hardcoded inline colours; that is the
+"plain html" the owner reported. This did not block the slice — it widened it.
+
+
+================================================================================
+LEG 1b — PRE-CHANGE faceplant: new per-screen landmark test against BASE source
+================================================================================
+$ ./node_modules/.bin/vitest run src/routes/theme-adoption.test.tsx
+
+ RUN  v1.6.1 /home/andrei/StorageGenie/frontend
+
+ ❯ src/routes/theme-adoption.test.tsx  (10 tests | 9 failed) 209ms
+   ❯ ... > App nav carries the card/border tokens and surfaces the theme toggle
+     → expect(element).toHaveClass("bg-card")
+   ❯ ... > analytics screen header is token-styled
+     → expect(element).toHaveClass("page-header")
+   ❯ ... > asset detail screen header is token-styled
+     → expect(element).toHaveClass("page-header")
+   ❯ ... > capture screen header is token-styled
+     → expect(element).toHaveClass("page-header")
+   ❯ ... > chat screen header is token-styled
+     → expect(element).toHaveClass("page-header")
+   ❯ ... > inbox screen header is token-styled
+     → expect(element).toHaveClass("page-header")
+   ❯ ... > planning screen header is token-styled
+     → expect(element).toHaveClass("page-header")
+   ❯ ... > review screen header is token-styled
+     → expect(element).toHaveClass("page-header")
+   ❯ ... > settings screen header is token-styled
+     → expect(element).toHaveClass("page-header")
+
+ Test Files  1 failed (1)
+      Tests  9 failed | 1 passed (10)
+   Start at  11:50:40
+   Duration  1.11s
+
+Raw failing assertion shape (verbatim):
+Expected the element to have class:
+  page-header
+Received:
+(empty)
+
+The 1 pre-change PASS is the toggle interaction test: ThemeToggle was ALREADY wired
+into AppHeader (packet premise "imported NOWHERE / unreachable" is FALSE — F-SG075-2),
+so the toggle already flipped the class before this slice. Adoption, not the toggle,
+was the missing half.
+
+
+================================================================================
+LEG 2 — POST-CHANGE hardcoded-literal grep (working tree)
+================================================================================
+$ /usr/bin/rg -nE '#[0-9a-fA-F]{3,8}\b|rgba?\(|hsla?\(' frontend/src --glob '!**/theme/**' --glob '!**/*.test.*' --glob '!**/mockProducts.ts' | wc -l
+0
+$ /usr/bin/rg -lE '...' frontend/src --glob '!**/theme/**' --glob '!**/*.test.*'
+frontend/src/components/catalog/mockProducts.ts
+$ /usr/bin/rg -lE '...' frontend/src | sort
+frontend/src/components/catalog/mockProducts.ts
+frontend/src/components/shell/drawer.test.tsx
+frontend/src/theme/theme.test.tsx
+frontend/src/theme/tokens.css
+$ /usr/bin/rg -nE '...' frontend/src/App.tsx | wc -l
+0
+
+PRE  : 108 hits / 21 files   (App.tsx 6)
+POST : 0 hits outside theme/ + tests (mockProducts.ts exempted — see F-SG075-3)
+App.tsx: 6 -> 0
+
+
+================================================================================
+LEG 3a — POST-CHANGE suite (fail->pass complete)
+================================================================================
+$ ./node_modules/.bin/vitest run
+ Test Files  23 passed (23)
+      Tests  174 passed (174)
+   Start at  11:55:22
+   Duration  4.57s (transform 710ms, setup 744ms, collect 3.10s, tests 5.97s, environment 6.64s, prepare 1.51s)
+SUITE_EXIT=0
+
+Baseline for comparison (before any edit): 22 files / 164 tests passed.
+Delta: +1 file (theme-adoption.test.tsx) / +10 tests (9 fail-pre -> pass-post + 1 toggle).
+No behavior test changed; all 164 baseline tests still green unchanged.
+
+
+================================================================================
+LEG 3b — build
+================================================================================
+$ npm run build
+> storagegenie-frontend@0.1.0 build
+> tsc && vite build
+vite v5.4.21 building for production...
+✓ 1961 modules transformed.
+dist/index.html                   0.94 kB │ gzip:  0.48 kB
+dist/assets/index-CoNI-1Zn.css    3.84 kB │ gzip:  1.04 kB     (was 2.65 kB pre-change, +1.19 kB additive tokens)
+dist/assets/index-B_67LUDe.js   303.82 kB │ gzip: 89.08 kB     (was 300.89 kB pre-change)
+✓ built in 1.73s
+BUILD_EXIT=0
+
+
+================================================================================
+LEG 3c — eslint + tsc
+================================================================================
+$ ./node_modules/.bin/eslint src
+LINT_EXIT=0
+$ ./node_modules/.bin/tsc --noEmit
+TSC_EXIT=0
+
+
+================================================================================
+LEG 4 — secret scan (0) and dependency/scope guards
+================================================================================
+$ for f in $(changed files); do rg -nE 'sk-...|ghp_...|AKIA...|BEGIN .*PRIVATE KEY|xox.-|AIza...|password[:=]"..."' "$f"; done
+(no matches)  SECRET_SCAN_EXIT=1  (ripgrep exit 1 = zero matches)
+
+$ git diff --name-only | rg -v '^frontend/src/'
+ALL CHANGES UNDER frontend/src
+Only modified files: 23 under frontend/src (22 source + tokens.css); 1 new file
+(frontend/src/routes/theme-adoption.test.tsx). No backend/, no main.tsx, no index.html,
+no ThemeProvider.tsx, no package.json/package-lock, no compose, no .env, no migrations.
+Dependency list unchanged (package.json untouched).
+
+
+================================================================================
+LEG 5 — network proof (unprivileged alternative to namespace isolation)
+================================================================================
+$ unshare -rn true
+unshare: write failed /proc/self/uid_map: Operation not permitted
+UNSHARE_UNAVAILABLE          <-- network-namespace isolation cannot be run on this box
+                                 without privilege; reported as unanswered, not routed around.
+
+Static substitute (real, quoted):
+$ git diff -U0 -- frontend/src | rg '^\+' | rg -v '^\+\+\+' | rg -i 'fetch\(|axios|XMLHttpRequest|websocket|sendBeacon|https?://|ws://'
+NONE
+$ rg -n 'https?://' frontend/src/routes/theme-adoption.test.tsx
+NONE
+No new network primitive and no new URL is introduced by the diff. No `npm install`,
+no package fetch, no curl, no provider call was run; `vitest` runs jsdom and `vite build`
+reads local files only. The one existing `http://localhost:8003` fallback is unchanged,
+loopback, and pre-existing. Real metered spend $0.000000.
+
+
+================================================================================
+LEG 6 — token-file additions (hunk by hunk; additive only)
+================================================================================
+tokens.css extends :root and .dark each with:
+  --badge-proposed-bg / --badge-proposed-fg   (amber "proposed" tone)
+  --accent / --accent-foreground              (soft surface for chat/drag/duplicate)
+and appends these utilities (each references a token; no literal):
+  .bg-accent .text-accent-foreground .border-accent
+  .text-danger .text-success .text-processed .border-danger
+  .dot-raw .dot-processed .dot-rendered .dot-failed
+  .badge-green .badge-amber .badge-grey        (ProvenanceBadge semantics)
+  .page-header                                 (consistent h1)
+All prior token values are unchanged; theme.test.tsx still matches without edit.

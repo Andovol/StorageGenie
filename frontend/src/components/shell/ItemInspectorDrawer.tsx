@@ -215,13 +215,12 @@ export function ItemInspectorDrawer({ asset, householdId, onClose }: ItemInspect
                 type="button"
                 aria-selected={active}
                 onClick={() => setTab(entry.id)}
-                className={`${active ? "bg-primary text-primary-foreground" : "bg-card-muted text-muted-foreground"} focus-ring`}
+                className={`${active ? "bg-primary text-primary-foreground" : "bg-card-muted text-muted-foreground"} border-border focus-ring`}
                 style={{
                   padding: "6px 10px",
                   borderRadius: 6,
                   borderStyle: "solid",
                   borderWidth: 1,
-                  borderColor: "hsl(var(--border))",
                   cursor: "pointer",
                   fontSize: 12,
                   fontWeight: active ? 600 : 400,
@@ -340,7 +339,7 @@ export function ItemInspectorDrawer({ asset, householdId, onClose }: ItemInspect
               Uses If-Match: {current.version} for optimistic concurrency
             </span>
           </div>
-          {error && <div style={{ color: "hsl(var(--badge-failed-fg))", fontSize: 13, marginTop: 8 }}>{error}</div>}
+          {error && <div className="text-danger" style={{ fontSize: 13, marginTop: 8 }}>{error}</div>}
         </section>
 
         <section aria-labelledby="drawer-observed-heading" style={{ marginBottom: 20 }}>

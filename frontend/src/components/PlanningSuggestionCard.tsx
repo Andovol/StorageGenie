@@ -16,17 +16,18 @@ export function PlanningSuggestionCard({ suggestion, busy, onConfirm, onDismiss 
   const rationale = suggestion.body?.rationale ?? [];
   return (
     <div
+      className="bg-card border-border"
       style={{
         padding: 12,
-        border: "1px solid #e5e7eb",
+        borderStyle: "solid",
+        borderWidth: 1,
         borderRadius: 8,
-        background: "#fff",
       }}
     >
       <div style={{ display: "flex", justifyContent: "space-between", gap: 12 }}>
         <div>
           <strong>{suggestion.title}</strong>
-          <div style={{ fontSize: 12, color: "#6b7280" }}>
+          <div className="text-muted-foreground" style={{ fontSize: 12 }}>
             {suggestion.kind} · {suggestion.status}
           </div>
         </div>
@@ -50,13 +51,13 @@ export function PlanningSuggestionCard({ suggestion, busy, onConfirm, onDismiss 
         )}
       </div>
       {rationale.length > 0 && (
-        <ul style={{ margin: "8px 0 0 16px", fontSize: 13, color: "#374151" }}>
+        <ul className="text-foreground" style={{ margin: "8px 0 0 16px", fontSize: 13 }}>
           {rationale.map((reason, index) => (
             <li key={index}>{reason}</li>
           ))}
         </ul>
       )}
-      <div style={{ marginTop: 8, fontSize: 12, color: "#6b7280" }}>
+      <div className="text-muted-foreground" style={{ marginTop: 8, fontSize: 12 }}>
         Backing evidence:{" "}
         {suggestion.backing_refs.length === 0
           ? "none"

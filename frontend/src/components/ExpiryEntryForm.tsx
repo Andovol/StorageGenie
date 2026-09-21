@@ -29,7 +29,7 @@ export function ExpiryEntryForm({ assetId, householdId, evidenceIds = [] }: { as
   }
 
   return (
-    <section aria-label="Manual expiry entry" style={{ marginTop: 18, padding: 14, border: "1px solid #e5e7eb", borderRadius: 8 }}>
+    <section aria-label="Manual expiry entry" className="bg-card border-border" style={{ marginTop: 18, padding: 14, borderStyle: "solid", borderWidth: 1, borderRadius: 8 }}>
       <h3 style={{ marginTop: 0 }}>Manual expiry entry</h3>
       <div>Expiry evidence state: <strong data-testid="expiry-state">{state}</strong></div>
       <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginTop: 10, alignItems: "end" }}>
@@ -37,8 +37,8 @@ export function ExpiryEntryForm({ assetId, householdId, evidenceIds = [] }: { as
         <label>Date type<select value={dateType} onChange={(event) => setDateType(event.target.value)} style={{ display: "block", padding: 7 }}><option value="expiry_date">Expiry date</option><option value="best_before">Best before</option><option value="use_by">Use by</option><option value="manufacture_date">Manufacture date</option><option value="period_after_opening">Period after opening</option><option value="batch_lot_code">Batch/lot code</option></select></label>
         <button type="button" onClick={submit} disabled={assetQuery.isLoading || !date}>Save expiry</button>
       </div>
-      {message && <div role="status" style={{ color: "#166534", marginTop: 8 }}>{message}</div>}
-      {error && <div role="alert" style={{ color: "#b91c1c", marginTop: 8 }}>{error}</div>}
+      {message && <div role="status" className="text-success" style={{ marginTop: 8 }}>{message}</div>}
+      {error && <div role="alert" className="text-danger" style={{ marginTop: 8 }}>{error}</div>}
     </section>
   );
 }

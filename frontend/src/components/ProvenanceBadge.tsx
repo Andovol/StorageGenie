@@ -1,32 +1,18 @@
 export function ProvenanceBadge({ state }: { state: string }) {
   const normalized = state?.toLowerCase() || "unknown";
-  const bg =
+  const tone =
     normalized === "accepted"
-      ? "#16a34a"
+      ? "badge-green"
       : normalized === "proposed"
-        ? "#f59e0b"
-        : normalized === "needs_evidence"
-          ? "#9ca3af"
-          : normalized === "superseded"
-            ? "#6b7280"
-            : normalized === "rejected"
-              ? "#dc2626"
-              : "#6b7280";
+        ? "badge-amber"
+        : "badge-grey";
   return (
     <span
-      className={
-        normalized === "accepted"
-          ? "badge-green"
-          : normalized === "proposed"
-            ? "badge-amber"
-            : "badge-grey"
-      }
+      className={tone}
       style={{
         padding: "2px 6px",
         borderRadius: 4,
         fontSize: 12,
-        background: bg,
-        color: "white",
         display: "inline-block",
       }}
     >

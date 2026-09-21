@@ -1,0 +1,24 @@
+SG-075 running log — site-wide Stone theme migration: every screen onto the token system
+
+[11:43:04Z] coder proc start (pid 11468): opencode run --auto --dir /home/andrei/StorageGenie --variant medium ; no --model on argv (CLI default, omitted per policy). effort=medium from argv. model deepseek-v4.1-flash (provider opencode-go) read from opencode provider metadata /home/andrei/.local/state/opencode/model.json (recent[0] + variant map), NOT a system-prompt line.
+[recon] pwd=/home/andrei/StorageGenie branch=automation ; remote git@github.com:Andovol/StorageGenie.git.
+[recon] BASE origin/automation = HEAD = 798fcb0a8a5724297580388fbc769b4ecee1a7fb ("D96: SG-075 Stone theme migration packet").
+[recon] contract /home/andrei/storagegenie-contract/VERSION = 0.28.2 ; contract HEAD b495b59b3426af66772a87939473ac558f8f72d2. Matches packet.
+[recon] frontend/package.json deps read: react 18, react-router-dom 6, @tanstack/react-query, lucide-react, vite/vitest. No new dep needed.
+[recon] theme/tokens.css read (154 lines, 10 colour tokens light+dark, badge-* 4, font stacks, focus-ring). ThemeProvider + ThemeToggle read.
+[recon] PRE-CHANGE grep at BASE: 108 hardcoded literals across 21 files outside theme/ (App.tsx 6). PACKET PREMISE WRONG ("only App.tsx, 6 hits") -> F-SG075-1. ThemeToggle is imported by AppHeader (packet premise "imported NOWHERE") -> F-SG075-2.
+[recon] baseline suite: 22 files / 164 tests pass; baseline build green (dist 2.65 kB css / 300.89 kB js). No base reds in the frontend suite.
+[G2 test] wrote new presentation test src/routes/theme-adoption.test.tsx (10 tests: 9 per-screen/nav landmarks + 1 toggle interaction+persist). First draft self-inflicted an infinite render (hooks mock returned fresh objects each render -> CatalogPage accumulation effect); fixed by stable `vi.hoisted` identities. Kept.
+[G2 test] FAIL-PRE captured against BASE source: 9 failed | 1 passed (the toggle already worked). Raw in SG-075_verify.log.
+[G1 tokens] tokens.css extended additively: --badge-proposed-* (light+dark), --accent/--accent-foreground (light+dark), and utilities .bg-accent/.text-accent-foreground/.border-accent/.text-danger/.text-success/.text-processed/.border-danger/.dot-*/.badge-green/.badge-amber/.badge-grey/.page-header. No prior value changed; theme.test.tsx untouched.
+[G1 App] App.tsx: nav -> bg-card border-border, active links bg-primary text-primary-foreground, brand/links text-foreground, footer text-muted-foreground; ThemeToggle surfaced in the App nav on non-catalog routes (catalog keeps AppHeader's toggle to avoid a duplicate and to keep shell.test's behavior test green unchanged).
+[G1 routes] 8 unstyled routes migrated (Analytics, AssetDetail, Capture, Chat, Inbox, Planning, Review, Settings): root text-foreground, h1 page-header text-foreground, muted/foreground/danger/success/primary text tokens, inputs bg-background text-foreground border-border focus-ring, cards bg-card/bg-card-muted border-border, font-mono, focus-ring. CatalogPage already tokenized (no change).
+[G1 components] ProvenanceBadge, AssetCard, AssetForm, CandidateCard, ChatTranscript, EvidenceGallery, ExpiryEntryForm, JobCard, PlanningSuggestionCard, ProductCard, ProductGrid, AssetImportModal, ItemInspectorDrawer migrated off literals onto token classes (incl. the inline hsl(var(--...)) in shell/catalog). AppHeader/AppShell/CatalogToolbar/ProductCardSkeleton already tokenized (no change).
+[G2 grep] POST-CHANGE: 0 literals outside theme/ + tests; App.tsx 6 -> 0. Only remaining file outside theme/tests is catalog/mockProducts.ts (test-only fixture; sole importer catalog.test.tsx) -> F-SG075-3.
+[G2 suite] 23 files / 174 tests pass (was 22/164). No behavior test edited; all 164 baseline tests green unchanged.
+[G2 build] npm run build green: tsc + vite, css 3.84 kB, js 303.82 kB. eslint clean (exit 0). tsc --noEmit clean (exit 0). Secret scan 0.
+[cost] zero provider calls, real spend $0.000000.
+[scope] changed = 23 files under frontend/src + 3 worklogs. No backend, no main.tsx/index.html/ThemeProvider.tsx, no package.json/deps, no compose/.env, no migration. Network-namespace probe (unshare -rn) denied without privilege -> reported unanswered; static diff proves no network primitive/URL added.
+[commit] 3 worklog files under docs/worklogs; work commit pushed to automation.
+[receipt] notes-ref add + push + mapped-fetch show recorded verbatim in SG-075_report.md.
+[end] worktree clean; overall elapsed well under 1800s; final $0.000000.

@@ -19,8 +19,8 @@ export function CapturePage() {
   const effective = householdId || households?.[0]?.id || "";
 
   return (
-    <div style={{ padding: 24 }}>
-      <h1>Capture — Manual Create</h1>
+    <div className="text-foreground" style={{ padding: 24 }}>
+      <h1 className="page-header text-foreground">Capture — Manual Create</h1>
       <div style={{ marginBottom: 16, display: "flex", gap: 12, alignItems: "center" }}>
         <label style={{ fontSize: 13 }}>
           Household{" "}
@@ -41,7 +41,7 @@ export function CapturePage() {
         </label>
       </div>
       {!effective ? (
-        <div style={{ color: "#6b7280" }}>No household available — seed the database first.</div>
+        <div className="text-muted-foreground">No household available — seed the database first.</div>
       ) : (
         <AssetForm
           householdId={effective}

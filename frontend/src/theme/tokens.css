@@ -17,6 +17,13 @@
   --badge-rendered-fg: 163 88.1% 19.8%;
   --badge-failed-bg: 356 100% 94.7%;
   --badge-failed-fg: 343.4 79.7% 34.7%;
+  /* SG-075 migration addition: amber "proposed" badge + soft accent surface,
+     needed by ProvenanceBadge and the chat/drag/duplicate surfaces that
+     previously carried hardcoded literals. Values stay on the Stone scale. */
+  --badge-proposed-bg: 48 96% 89%;
+  --badge-proposed-fg: 26 83% 14%;
+  --accent: 30 8% 92%;
+  --accent-foreground: 24 9.8% 10%;
 
   --font-sans: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
@@ -41,6 +48,11 @@
   --badge-rendered-fg: 156 71.6% 66.9%;
   --badge-failed-bg: 343 87.7% 15.9%;
   --badge-failed-fg: 353 95.7% 81.8%;
+  /* SG-075 migration addition: dark counterparts of the amber badge/accent. */
+  --badge-proposed-bg: 26 83% 14%;
+  --badge-proposed-fg: 48 96% 76%;
+  --accent: 30 8.6% 16.5%;
+  --accent-foreground: 60 4.8% 95.9%;
 }
 
 *,
@@ -151,4 +163,72 @@ body {
 .focus-ring:focus-visible {
   outline: 2px solid hsl(var(--primary));
   outline-offset: 2px;
+}
+
+/* SG-075 migration additions — semantic helpers for screens that previously
+   carried hardcoded colour literals. Each maps to a token above. */
+.bg-accent {
+  background-color: hsl(var(--accent));
+}
+
+.text-accent-foreground {
+  color: hsl(var(--accent-foreground));
+}
+
+.border-accent {
+  border-color: hsl(var(--accent));
+}
+
+.text-danger {
+  color: hsl(var(--badge-failed-fg));
+}
+
+.text-success {
+  color: hsl(var(--badge-rendered-fg));
+}
+
+.text-processed {
+  color: hsl(var(--badge-processed-fg));
+}
+
+.border-danger {
+  border-color: hsl(var(--badge-failed-fg));
+}
+
+.dot-raw {
+  background-color: hsl(var(--badge-raw-fg));
+}
+
+.dot-processed {
+  background-color: hsl(var(--badge-processed-fg));
+}
+
+.dot-rendered {
+  background-color: hsl(var(--badge-rendered-fg));
+}
+
+.dot-failed {
+  background-color: hsl(var(--badge-failed-fg));
+}
+
+.badge-green {
+  background-color: hsl(var(--badge-rendered-bg));
+  color: hsl(var(--badge-rendered-fg));
+}
+
+.badge-amber {
+  background-color: hsl(var(--badge-proposed-bg));
+  color: hsl(var(--badge-proposed-fg));
+}
+
+.badge-grey {
+  background-color: hsl(var(--badge-raw-bg));
+  color: hsl(var(--badge-raw-fg));
+}
+
+.page-header {
+  font-size: 1.5rem;
+  font-weight: 700;
+  line-height: 1.2;
+  margin: 0 0 12px;
 }

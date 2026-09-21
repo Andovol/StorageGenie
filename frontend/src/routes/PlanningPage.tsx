@@ -61,11 +61,11 @@ export function PlanningPage() {
   });
 
   return (
-    <div style={{ padding: 24, maxWidth: 900 }}>
+    <div className="text-foreground" style={{ padding: 24, maxWidth: 900 }}>
       <div
         style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}
       >
-        <h1>Planning</h1>
+        <h1 className="page-header text-foreground">Planning</h1>
         <label>
           Household{" "}
           <select
@@ -84,7 +84,7 @@ export function PlanningPage() {
           </select>
         </label>
       </div>
-      <p style={{ color: "#6b7280", fontSize: 13 }}>
+      <p className="text-muted-foreground" style={{ fontSize: 13 }}>
         Suggestions are proposals only. Confirming or dismissing one changes no asset, job
         or setting; nothing is ever executed automatically.
       </p>
@@ -109,7 +109,7 @@ export function PlanningPage() {
         </label>
       </div>
       {message && (
-        <div role="alert" style={{ marginTop: 12, color: "#374151" }}>
+        <div role="alert" className="text-foreground" style={{ marginTop: 12 }}>
           {message}
         </div>
       )}

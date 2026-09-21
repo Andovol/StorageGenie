@@ -115,7 +115,7 @@ export function ProductCard({
     >
       <div
         data-testid="product-card-well"
-        className={`bg-card-muted${failed ? " border border-rose-500/30" : ""}`}
+        className={`bg-card-muted${failed ? " border border-rose-500/30 border-danger" : ""}`}
         style={{
           position: "relative",
           aspectRatio: "1 / 1",
@@ -128,7 +128,6 @@ export function ProductCard({
             ? {
                 borderStyle: "solid",
                 borderWidth: 1,
-                borderColor: "hsl(var(--badge-failed-fg) / 0.3)",
               }
             : {}),
         }}
@@ -155,7 +154,7 @@ export function ProductCard({
             data-testid="failed-warning"
             aria-hidden="true"
             size={28}
-            style={{ color: "hsl(var(--badge-failed-fg))" }}
+            className="text-danger"
           />
         ) : null}
         <span
@@ -195,7 +194,8 @@ export function ProductCard({
               data-testid="title-error-icon"
               aria-hidden="true"
               size={14}
-              style={{ flexShrink: 0, color: "hsl(var(--badge-failed-fg))" }}
+              className="text-danger"
+              style={{ flexShrink: 0 }}
             />
           ) : null}
         </div>
@@ -216,6 +216,7 @@ export function ProductCard({
             {item.metadata.primaryColors.map((color) => (
               <span
                 key={color}
+                className="border-border"
                 style={{
                   width: 8,
                   height: 8,
@@ -223,7 +224,6 @@ export function ProductCard({
                   backgroundColor: color,
                   borderWidth: 1,
                   borderStyle: "solid",
-                  borderColor: "hsl(var(--border))",
                 }}
               />
             ))}

@@ -1,4 +1,4 @@
-import { Link, Routes, Route, NavLink } from "react-router-dom";
+import { Link, Routes, Route, NavLink, useLocation } from "react-router-dom";
 import { CatalogPage } from "./routes/CatalogPage";
 import { CapturePage } from "./routes/CapturePage";
 import { AssetDetailPage } from "./routes/AssetDetailPage";
@@ -8,51 +8,66 @@ import { ReviewPage } from "./routes/ReviewPage";
 import { PlanningPage } from "./routes/PlanningPage";
 import { ChatPage } from "./routes/ChatPage";
 import { AnalyticsPage } from "./routes/AnalyticsPage";
+import { ThemeToggle } from "./theme/ThemeToggle";
 
 function Nav() {
+  const { pathname } = useLocation();
+  // The catalog route renders its own header (AppHeader) which already carries
+  // the toggle; every other route gets it here so it is reachable everywhere.
+  const showToggle = pathname !== "/";
+  const linkClass = (active: boolean): string =>
+    `${active ? "bg-primary text-primary-foreground" : "text-foreground"} focus-ring`;
   const linkStyle = (active: boolean): React.CSSProperties => ({
     padding: "6px 10px",
     borderRadius: 6,
     textDecoration: "none",
-    color: active ? "white" : "#374151",
-    background: active ? "#111827" : "transparent",
     fontSize: 13,
     fontWeight: active ? 600 : 400,
   });
   return (
-    <nav style={{ display: "flex", gap: 8, padding: "12px 24px", borderBottom: "1px solid #e5e7eb", alignItems: "center", background: "#f9fafb" }}>
-      <Link to="/" style={{ fontWeight: 700, textDecoration: "none", color: "#111827", marginRight: 16 }}>
+    <nav
+      className="bg-card border-border"
+      style={{ display: "flex", gap: 8, padding: "12px 24px", borderBottomStyle: "solid", borderBottomWidth: 1, alignItems: "center" }}
+    >
+      <Link
+        to="/"
+        className="text-foreground focus-ring"
+        style={{ fontWeight: 700, textDecoration: "none", marginRight: 16 }}
+      >
         StorageGenie
       </Link>
-      <NavLink to="/" end style={({ isActive }) => linkStyle(isActive)}>
+      <NavLink to="/" end className={({ isActive }) => linkClass(isActive)} style={({ isActive }) => linkStyle(isActive)}>
         Catalog
       </NavLink>
-      <NavLink to="/capture" style={({ isActive }) => linkStyle(isActive)}>
+      <NavLink to="/capture" className={({ isActive }) => linkClass(isActive)} style={({ isActive }) => linkStyle(isActive)}>
         Capture
       </NavLink>
-      <NavLink to="/settings" style={({ isActive }) => linkStyle(isActive)}>
+      <NavLink to="/settings" className={({ isActive }) => linkClass(isActive)} style={({ isActive }) => linkStyle(isActive)}>
         Settings
       </NavLink>
-      <NavLink to="/inbox" style={({ isActive }) => linkStyle(isActive)}>
+      <NavLink to="/inbox" className={({ isActive }) => linkClass(isActive)} style={({ isActive }) => linkStyle(isActive)}>
         Inbox
       </NavLink>
-      <NavLink to="/planning" style={({ isActive }) => linkStyle(isActive)}>
+      <NavLink to="/planning" className={({ isActive }) => linkClass(isActive)} style={({ isActive }) => linkStyle(isActive)}>
         Planning
       </NavLink>
-      <NavLink to="/chat" style={({ isActive }) => linkStyle(isActive)}>
+      <NavLink to="/chat" className={({ isActive }) => linkClass(isActive)} style={({ isActive }) => linkStyle(isActive)}>
         Chat
       </NavLink>
-      <NavLink to="/analytics" style={({ isActive }) => linkStyle(isActive)}>
+      <NavLink to="/analytics" className={({ isActive }) => linkClass(isActive)} style={({ isActive }) => linkStyle(isActive)}>
         Analytics
       </NavLink>
-      <span style={{ marginLeft: "auto", fontSize: 11, color: "#9ca3af" }}>Phase 0 · local-first</span>
+      {showToggle ? <ThemeToggle /> : null}
+      <span className="text-muted-foreground" style={{ marginLeft: "auto", fontSize: 11 }}>
+        Phase 0 · local-first
+      </span>
     </nav>
   );
 }
 
 export default function App() {
   return (
-    <div style={{ minHeight: "100vh", background: "white", color: "#111827" }}>
+    <div className="bg-background text-foreground" style={{ minHeight: "100vh" }}>
       <Nav />
       <Routes>
         <Route path="/" element={<CatalogPage />} />

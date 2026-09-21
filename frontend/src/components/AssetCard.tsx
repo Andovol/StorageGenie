@@ -18,35 +18,36 @@ export function AssetCard({ asset, householdId }: { asset: Asset; householdId: s
   return (
     <Link
       to={`/assets/${asset.id}?household_id=${householdId}`}
+      className="bg-card border-border focus-ring"
       style={{
-        border: "1px solid #e5e7eb",
+        borderStyle: "solid",
+        borderWidth: 1,
         borderRadius: 8,
         padding: 12,
         display: "block",
         textDecoration: "none",
         color: "inherit",
-        background: "white",
       }}
     >
       {thumbUrl ? (
         <img
           src={thumbUrl}
           alt={displayName}
-          style={{ width: "100%", height: 120, objectFit: "cover", borderRadius: 6, marginBottom: 8, background: "#f3f4f6" }}
+          className="bg-card-muted"
+          style={{ width: "100%", height: 120, objectFit: "cover", borderRadius: 6, marginBottom: 8 }}
           onError={(e) => ((e.target as HTMLImageElement).style.display = "none")}
         />
       ) : (
         <div
+          className="bg-card-muted text-muted-foreground"
           style={{
             width: "100%",
             height: 120,
             borderRadius: 6,
             marginBottom: 8,
-            background: "#f3f4f6",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            color: "#9ca3af",
             fontSize: 12,
           }}
         >
@@ -56,17 +57,17 @@ export function AssetCard({ asset, householdId }: { asset: Asset; householdId: s
       <div style={{ fontWeight: 600, fontSize: 14, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
         {displayName}
       </div>
-      <div style={{ fontSize: 12, color: "#6b7280" }}>
+      <div className="text-muted-foreground" style={{ fontSize: 12 }}>
         {asset.asset_type} · {asset.status}
       </div>
       <div style={{ display: "flex", gap: 6, marginTop: 6, alignItems: "center", flexWrap: "wrap" }}>
-        <span style={{ fontSize: 11, color: "#6b7280" }}>{evidenceCount} evidence</span>
+        <span className="text-muted-foreground" style={{ fontSize: 11 }}>{evidenceCount} evidence</span>
         {acceptedCount !== undefined && (
           <span style={{ fontSize: 11 }}>
             <ProvenanceBadge state={`${acceptedCount} accepted`} />
           </span>
         )}
-        {asset.version ? <span style={{ fontSize: 11, color: "#9ca3af" }}>v{asset.version}</span> : null}
+        {asset.version ? <span className="text-muted-foreground" style={{ fontSize: 11 }}>v{asset.version}</span> : null}
       </div>
     </Link>
   );

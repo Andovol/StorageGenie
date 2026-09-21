@@ -21,7 +21,6 @@ const GRID_CSS = `
 const emptyStyle: CSSProperties = {
   borderStyle: "dashed",
   borderWidth: 1,
-  borderColor: "hsl(var(--border))",
   borderRadius: 12,
   padding: "56px 24px",
   display: "flex",
@@ -196,11 +195,11 @@ function TableView({
                   <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
                     <span
                       data-testid="status-dot"
+                      className={`dot-${item.status}`}
                       style={{
                         width: 8,
                         height: 8,
                         borderRadius: 999,
-                        backgroundColor: `hsl(var(--badge-${item.status}-fg))`,
                       }}
                     />
                     <span
@@ -300,6 +299,7 @@ export function ProductGrid({
         aria-label="Product results"
         aria-busy="false"
         data-testid="catalog-grid-empty"
+        className="border-border text-foreground"
         style={emptyStyle}
       >
         <p className="text-muted-foreground" style={{ margin: 0 }}>

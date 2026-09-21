@@ -11,23 +11,25 @@ export function SettingsPage() {
   });
 
   return (
-    <div style={{ padding: 24 }}>
-      <h1>Settings</h1>
-      <p style={{ color: "#6b7280", fontSize: 13 }}>
+    <div className="text-foreground" style={{ padding: 24 }}>
+      <h1 className="page-header text-foreground">Settings</h1>
+      <p className="text-muted-foreground" style={{ fontSize: 13 }}>
         Phase 0 — household and connection settings. API base: {import.meta.env.VITE_API_BASE || "http://localhost:8003"}
       </p>
 
       <section
+        className="bg-card border-border"
         style={{
           marginTop: 16,
           padding: 12,
-          border: "1px solid #e5e7eb",
+          borderStyle: "solid",
+          borderWidth: 1,
           borderRadius: 8,
           maxWidth: 520,
         }}
       >
         <h2 style={{ fontSize: 15, margin: 0 }}>AI model</h2>
-        <p style={{ color: "#6b7280", fontSize: 12, marginTop: 4 }}>
+        <p className="text-muted-foreground" style={{ fontSize: 12, marginTop: 4 }}>
           Effective model: {settings.data?.model_id ?? "loading…"}
         </p>
         {settings.isError && <div role="alert">{String(settings.error)}</div>}
@@ -48,7 +50,7 @@ export function SettingsPage() {
           </select>
         </label>
         {update.isError && (
-          <div role="alert" style={{ color: "#b91c1c", marginTop: 8 }}>
+          <div role="alert" className="text-danger" style={{ marginTop: 8 }}>
             {String(update.error)}
           </div>
         )}
@@ -60,7 +62,8 @@ export function SettingsPage() {
             localStorage.removeItem("household_id");
             window.location.reload();
           }}
-          style={{ padding: "6px 12px", borderRadius: 6, border: "1px solid #d1d5db" }}
+          className="bg-card text-foreground border-border focus-ring"
+          style={{ padding: "6px 12px", borderRadius: 6, borderStyle: "solid", borderWidth: 1, cursor: "pointer" }}
         >
           Clear household selection
         </button>
