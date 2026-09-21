@@ -2,7 +2,7 @@
 
 **Branch:** `automation` · **Remote:** `git@github.com:Andovol/StorageGenie.git` · **Work dir:** `/home/andrei/StorageGenie`
 **BASE (packet ref `origin/automation`):** `3bf9198339a0f92d1daf5e779c29160a6dbc47be` (`SG-079: photo-ingest schema v3 + frozen v3 prompts packet (D101 track)`)
-**WORK_HEAD:** `{{WORK_HEAD}}` (work commit; the post-note, docs-only receipt commit is HEAD after it)
+**WORK_HEAD:** `1730de5a44e71279c225497ea274be19e15aa627` (work commit; the post-note, docs-only receipt commit is HEAD after it)
 **Contract:** recorded `0.28.2` == published `0.28.2`; source `/home/andrei/storagegenie-contract/VERSION`, contract repo HEAD `b495b59b3426af66772a87939473ac558f8f72d2`
 **Model / effort (`CO-78`):** model `deepseek-v4.1-flash` (provider `opencode-go`, read from provider metadata `/home/andrei/.local/share/opencode/log/opencode.log` line `llm.provider=opencode-go llm.model=deepseek-v4.1-flash`, **not** a system-prompt identity line; argv carries no `--model`) · effort `medium` (process argv `/proc/459564/cmdline`: `opencode run --auto --dir /home/andrei/StorageGenie --variant medium`)
 **Spend (real $):** `$0.000000` actual vs `$0` bound — zero metered provider calls.
@@ -142,7 +142,14 @@ Work pushed to `automation`; worktree clean (`CO-55`). No push to `storagegenie-
 `{{RECEIPT_CMD}}`. Note added on `WORK_HEAD` and pushed, then fetched into a mapped local ref and shown:
 
 ```
-PASTE_SHOW_OUTPUT_PLACEHOLDER
+$ git fetch origin refs/notes/storagegenie-coder-reports:refs/notes/storagegenie-coder-reports
+ok fetched
+$ git rev-parse refs/notes/storagegenie-coder-reports
+ffacd0d5cbfec8c1f6ccf7896152f16ab5a1e756
+$ git ls-remote origin refs/notes/storagegenie-coder-reports
+ffacd0d5cbfec8c1f6ccf7896152f16ab5a1e756	refs/notes/storagegenie-coder-reports
+$ git notes --ref=refs/notes/storagegenie-coder-reports show 1730de5a44e71279c225497ea274be19e15aa627
+Dispatch-ID: SG-079 | Report: docs/worklogs/SG-079_report.md | Work-HEAD: 1730de5a44e71279c225497ea274be19e15aa627
 ```
 
 Final line: `note=yes`
