@@ -5,7 +5,7 @@
 **MODEL:** **unknown** — argv carries no `--model` and no provider metadata was surfaced to the Coder in-process; reported per `CO-78`/packet rather than guessed from a system-prompt identity line.
 **Host / workdir:** `/home/andrei/StorageGenie` · branch `automation` · remote `git@github.com:Andovol/StorageGenie.git`
 **BASE (start HEAD):** `07873cacd58de75c8dd5b0726b8ac8b95060d9b8` (packet requested `origin/automation`; this is the commit it resolved to — two fields, never one)
-**WORK_HEAD:** `<WORK_HEAD>` (slice tip; the follow-up docs-only commit carries the receipt paste)
+**WORK_HEAD:** `b9f90b92422b34ff772ba27e00fcacd500c5a68c` (slice tip; the follow-up docs-only commit carries the receipt paste)
 **Spend:** **$0.000000 actual** — zero provider calls; no metered call exists on any path in this slice (`PG-IC-04` stated as not firing)
 **Contract:** recorded `0.28.2` == published `0.28.2`; source path `/home/andrei/storagegenie-contract/VERSION`; checkout `b495b59b3426af66772a87939473ac558f8f72d2`; `RULES.md` sha256 `a66aa4313d62cebff8b44f10299928288e05dc4d7c45f4f4e83e0bbd954c131d` == installed payload
 **Authoring date metadata:** 2026-09-21 (not a gate)
@@ -62,7 +62,9 @@ Record values re-read on target: `sg049` `field_accuracy=1.000` (3 fixtures); `s
 - **`mypy`:** `Found 41 errors in 9 files (checked 75 source files)` — **delta 0** vs the base
   measured by SG-086/087/088 (41-in-9); this slice changes no `app/` file.
 - **Secret grep-gate over the diff** (`api_key|OPENCODE_API_KEY|Bearer|[Tt]oken`, SG-037 shape):
-  **0 real secret shapes** (only the literal grep pattern itself; raw in the verify log).
+  **1 hit, 0 real secret shapes** — the single hit is this report's own prose quoting the gate
+  pattern (`api_key|OPENCODE_API_KEY|Bearer|[Tt]oken`); no key value, `Bearer` token, or credential
+  literal appears. Raw in the verify log.
 - **`provider_call` rows:** fresh forced sandbox query → **0**.
 
 ### Stage artifacts read back (`PG-EV-02`)
@@ -206,13 +208,28 @@ fetched explicitly into a **mapped** local name and shown. No existing note was 
 Commands executed (raw):
 
 ```
-<RECEIPT_COMMANDS>
+$ git notes --ref=refs/notes/storagegenie-coder-reports show b9f90b92422b34ff772ba27e00fcacd500c5a68c   # existing-note check
+error: no note found for object b9f90b92422b34ff772ba27e00fcacd500c5a68c.
+show_before_exit=1
+$ git notes --ref=refs/notes/storagegenie-coder-reports add -m "Dispatch-ID: SG-089 | Report: docs/worklogs/SG-089_report.md | Work-HEAD: b9f90b92422b34ff772ba27e00fcacd500c5a68c" b9f90b92422b34ff772ba27e00fcacd500c5a68c
+add_exit=0
+$ git push origin refs/notes/storagegenie-coder-reports
+To github.com:Andovol/StorageGenie.git
+   352e806..59af9e7  refs/notes/storagegenie-coder-reports -> refs/notes/storagegenie-coder-reports
+notes_push_exit=0
+$ git fetch origin refs/notes/storagegenie-coder-reports:refs/notes/storagegenie-coder-reports-sg089-verify
+From github.com:Andovol/StorageGenie
+ * [new ref]         refs/notes/storagegenie-coder-reports -> refs/notes/storagegenie-coder-reports-sg089-verify
+fetch_exit=0
+$ git rev-parse refs/notes/storagegenie-coder-reports-sg089-verify
+59af9e79ce408ecb09db7981bf8ad672236a1420
+$ git notes --ref=refs/notes/storagegenie-coder-reports-sg089-verify show b9f90b92422b34ff772ba27e00fcacd500c5a68c
 ```
 
 Pasted `show` output (verbatim, from the FETCHED mapped ref):
 
 ```
-<RECEIPT_SHOW>
+Dispatch-ID: SG-089 | Report: docs/worklogs/SG-089_report.md | Work-HEAD: b9f90b92422b34ff772ba27e00fcacd500c5a68c
 ```
 
 note=yes

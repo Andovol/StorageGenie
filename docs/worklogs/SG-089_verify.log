@@ -240,3 +240,30 @@ $ git status --porcelain backend/app          → (empty, 0 lines)
 $ git status --porcelain backend/alembic      → (empty, 0 lines)
 $ git status --porcelain backend/app/services/providers/prompts → (empty, 0 lines)
 $ git grep -c "EXPECTED_TABLES" -- 'backend/**' '*.py' → 0 files matched (0 hits)
+
+######## Leg G4 — commit, push, receipt note on the notes ref ########
+
+$ git commit -m "SG-089 Phase 5 exit: re-prove bounded condition, carry verdicts unmodified, state limits (docs-only, $0)"
+[automation b9f90b9] 3 files changed, 543 insertions(+)
+WORK_HEAD=b9f90b92422b34ff772ba27e00fcacd500c5a68c
+$ git push origin automation
+   07873ca..b9f90b9  automation -> automation
+push_rc=0
+
+$ git notes --ref=refs/notes/storagegenie-coder-reports show b9f90b92422b34ff772ba27e00fcacd500c5a68c   # existing-note check
+error: no note found for object b9f90b92422b34ff772ba27e00fcacd500c5a68c.
+show_before_exit=1
+$ git notes --ref=refs/notes/storagegenie-coder-reports add -m "Dispatch-ID: SG-089 | Report: docs/worklogs/SG-089_report.md | Work-HEAD: b9f90b92422b34ff772ba27e00fcacd500c5a68c" b9f90b92422b34ff772ba27e00fcacd500c5a68c
+add_exit=0
+$ git push origin refs/notes/storagegenie-coder-reports
+   352e806..59af9e7  refs/notes/storagegenie-coder-reports -> refs/notes/storagegenie-coder-reports
+notes_push_exit=0
+$ git fetch origin refs/notes/storagegenie-coder-reports:refs/notes/storagegenie-coder-reports-sg089-verify
+ * [new ref]         refs/notes/storagegenie-coder-reports -> refs/notes/storagegenie-coder-reports-sg089-verify
+fetch_exit=0
+$ git rev-parse refs/notes/storagegenie-coder-reports-sg089-verify
+59af9e79ce408ecb09db7981bf8ad672236a1420
+$ git notes --ref=refs/notes/storagegenie-coder-reports-sg089-verify show b9f90b92422b34ff772ba27e00fcacd500c5a68c
+Dispatch-ID: SG-089 | Report: docs/worklogs/SG-089_report.md | Work-HEAD: b9f90b92422b34ff772ba27e00fcacd500c5a68c
+show_after_exit=0
+# first line carries both Dispatch-ID: and Report: (CO-97). No existing note refused. note=yes
