@@ -1,0 +1,282 @@
+SG-078 raw verification log (commands + verbatim outputs)
+Host /home/andrei/StorageGenie ; branch automation ; BASE 9f34dae73b736d286d41b374ef95f18a820aa462 ; live clock start 2026-09-21T13:06:46Z
+
+######## BEFORE ########
+# date: 2026-09-21T13:07:06Z
+# container id / image / restarts:
+pre_container_id=3952f6760e49bdcb060177b2e03a1bb0c0184e45fa546b7e484a490a735ef528 pre_image=sha256:c2bcb600b81701ae36988f72e2355623f831a694629d43ff5fe088a7659a1e48 pre_restarts=0
+# pre served assets:
+total 304
+-rw-r--r-- 1 root root 303974 Sep 21 12:18 index-BhyX-Hlp.js
+-rw-r--r-- 1 root root   3839 Sep 21 12:18 index-CoNI-1Zn.css
+# pre bundle size+sha256:
+256d728a34abc77dfde445ef466933751e08cc54ccc1174dfe92cf886057c744  /app/static/assets/index-BhyX-Hlp.js
+b18dbb336eef5c580bf0a2e6726d647c4f6c63edbc48373580d31e4508659ad3  /app/static/assets/index-CoNI-1Zn.css
+# pre index.html served:
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>StorageGenie</title>
+    <script>
+      (function () {
+        try {
+          var stored = localStorage.getItem("sg-theme");
+          var dark =
+            stored === "dark" ||
+            ((stored === null || stored === "system") &&
+              window.matchMedia("(prefers-color-scheme: dark)").matches);
+          document.documentElement.classList.toggle("dark", dark);
+          document.documentElement.classList.toggle("light", !dark);
+        } catch (error) {
+          document.documentElement.classList.add("light");
+        }
+      })();
+    </script>
+    <script type="module" crossorigin src="/assets/index-BhyX-Hlp.js"></script>
+    <link rel="stylesheet" crossorigin href="/assets/index-CoNI-1Zn.css">
+  </head>
+  <body>
+    <div id="root"></div>
+  </body>
+</html>
+# pre alembic current (in container):
+INFO  [alembic.runtime.migration] Context impl SQLiteImpl.
+INFO  [alembic.runtime.migration] Will assume non-transactional DDL.
+20260917_sg068_saved_search (head)
+# pre DB alembic_version + row counts (read-only file:...mode=ro):
+alembic_version=20260917_sg068_saved_search
+provider_call=7
+guardrail_event=1
+saved_search=0
+asset=1
+assertion=3
+household=1
+# pre health (HEALTH_CMD):
+{"status":"ok","db":"ok","storage":"ok"} [http 200]
+# pre health read2:
+{"status":"ok","db":"ok","storage":"ok"} [http 200]
+# pre analytics summary:
+[http 200 bytes=5022]
+# pre taxonomy:
+[http 200 bytes=1118]
+# pre saved-searches:
+{"items":[]} [http 200]
+# pre facets:
+{"asset_type":{"unknown":1},"status":{"ACTIVE":1},"has_evidence":{"with":1,"without":0}} [http 200]
+# pre public gate (unauth, loopback Host-header):
+[http 401]
+# pre listening sockets 8003:
+LISTEN 0      4096       127.0.0.1:8003       0.0.0.0:*    users:(("rootlesskit",pid=3814163,fd=32))    
+
+######## G1 BUILD ########
+# date: 2026-09-21T13:07:16Z
+# HOME=/home/andrei ; HOME/.docker exists=yes ; writable=no
+ Image storagegenie-backend Building 
+#1 [internal] load local bake definitions
+#1 reading from stdin 607B done
+#1 DONE 0.0s
+
+#2 [internal] load build definition from Dockerfile
+#2 transferring dockerfile: 1.06kB done
+#2 DONE 0.0s
+
+#3 [internal] load metadata for docker.io/library/node:20-alpine
+#3 ...
+
+#4 [internal] load metadata for docker.io/library/python:3.12.11-slim-bookworm@sha256:519591d6871b7bc437060736b9f7456b8731f1499a57e22e6c285135ae657bf7
+#4 DONE 0.7s
+
+#3 [internal] load metadata for docker.io/library/node:20-alpine
+#3 DONE 0.7s
+
+#5 [internal] load .dockerignore
+#5 transferring context: 497B done
+#5 DONE 0.0s
+
+#6 [frontend-build 1/6] FROM docker.io/library/node:20-alpine@sha256:fb4cd12c85ee03686f6af5362a0b0d56d50c58a04632e6c0fb8363f609372293
+#6 resolve docker.io/library/node:20-alpine@sha256:fb4cd12c85ee03686f6af5362a0b0d56d50c58a04632e6c0fb8363f609372293 0.0s done
+#6 DONE 0.0s
+
+#7 [stage-1 1/9] FROM docker.io/library/python:3.12.11-slim-bookworm@sha256:519591d6871b7bc437060736b9f7456b8731f1499a57e22e6c285135ae657bf7
+#7 resolve docker.io/library/python:3.12.11-slim-bookworm@sha256:519591d6871b7bc437060736b9f7456b8731f1499a57e22e6c285135ae657bf7 0.0s done
+#7 DONE 0.0s
+
+#8 [internal] load build context
+#8 transferring context: 161.18MB 0.9s done
+#8 DONE 1.0s
+
+#9 [frontend-build 2/6] WORKDIR /ui
+#9 CACHED
+
+#10 [frontend-build 3/6] COPY frontend/package.json frontend/package-lock.json ./
+#10 CACHED
+
+#11 [frontend-build 4/6] RUN npm ci
+#11 CACHED
+
+#12 [frontend-build 5/6] COPY frontend/ ./
+#12 DONE 0.3s
+
+#13 [frontend-build 6/6] RUN npm run build
+#13 0.375 
+#13 0.375 > storagegenie-frontend@0.1.0 build
+#13 0.375 > tsc && vite build
+#13 0.375 
+#13 4.826 vite v5.4.21 building for production...
+#13 4.870 transforming...
+#13 6.976 ✓ 1961 modules transformed.
+#13 7.131 rendering chunks...
+#13 7.138 computing gzip size...
+#13 7.148 dist/index.html                   0.94 kB │ gzip:  0.48 kB
+#13 7.148 dist/assets/index-CoNI-1Zn.css    3.84 kB │ gzip:  1.04 kB
+#13 7.148 dist/assets/index-fOM9Er4k.js   304.02 kB │ gzip: 89.14 kB
+#13 7.148 ✓ built in 2.30s
+#13 DONE 7.2s
+
+#14 [stage-1 7/9] RUN pip install --no-cache-dir "hatchling==1.32.0" "editables==0.6"
+#14 CACHED
+
+#15 [stage-1 2/9] WORKDIR /app
+#15 CACHED
+
+#16 [stage-1 3/9] RUN apt-get update && apt-get install -y --no-install-recommends curl tesseract-ocr libzbar0 && rm -rf /var/lib/apt/lists/*
+#16 CACHED
+
+#17 [stage-1 4/9] COPY backend/pyproject.toml backend/requirements.lock ./
+#17 CACHED
+
+#18 [stage-1 5/9] RUN pip install --no-cache-dir -r requirements.lock
+#18 CACHED
+
+#19 [stage-1 6/9] COPY backend/ ./
+#19 CACHED
+
+#20 [stage-1 8/9] RUN pip install --no-cache-dir --no-build-isolation --no-deps -e .
+#20 CACHED
+
+#21 [stage-1 9/9] COPY --from=frontend-build /ui/dist ./static
+#21 DONE 0.0s
+
+#22 exporting to image
+#22 exporting layers 0.0s done
+#22 exporting manifest sha256:ac19f6a5ca1bd1383c1b886c9c7e8863cd522bbb6eb7124c09d01a1b1b1c5078 done
+#22 exporting config sha256:e365d084713739da1bf38729f22b95e3ec66f4a1fe1f45720f640dff6aa0ce6f done
+#22 exporting attestation manifest sha256:846d2c1b0add1fcd0404051e489a0732584c1ab84eefdbff17bbb032bcf9c95d done
+#22 exporting manifest list sha256:e9ad06fb9f7ed17ee2a9c58d3b28a992c8d2f9ca92599f48d58d9b010c0c3856 done
+#22 naming to docker.io/library/storagegenie-backend:latest done
+#22 unpacking to docker.io/library/storagegenie-backend:latest 0.0s done
+#22 DONE 0.1s
+
+#23 resolving provenance for metadata file
+#23 DONE 0.0s
+ Image storagegenie-backend Built 
+# build rc=0 elapsed=10s (bound 900s)
+ Container storagegenie-backend-1 Recreate 
+ Container storagegenie-backend-1 Recreated 
+ Container storagegenie-backend-1 Starting 
+ Container storagegenie-backend-1 Started 
+# up rc=0 elapsed=1s
+# post date: 2026-09-21T13:07:30Z
+
+######## AFTER ########
+# post container id / image / restarts:
+post_container_id=f1e44f3b6bce991e6346333c6518596f9cee9185d2359d74c2519ee769c068a3 post_image=sha256:e9ad06fb9f7ed17ee2a9c58d3b28a992c8d2f9ca92599f48d58d9b010c0c3856 post_restarts=0
+# post health read1 (instant, settle may yield 000):
+{"status":"ok","db":"ok","storage":"ok"} [http 200]
+# post health read2:
+{"status":"ok","db":"ok","storage":"ok"} [http 200]
+# post health read3 (confirmation):
+{"status":"ok","db":"ok","storage":"ok"} [http 200]
+# post restartcount re-read:
+RestartCount=0 Status=running StartedAt=2026-09-21T13:07:30.007723995Z
+# post listening sockets 8003:
+LISTEN 0      4096       127.0.0.1:8003       0.0.0.0:*    users:(("rootlesskit",pid=3814163,fd=32))    
+# post served assets:
+total 304
+-rw-r--r-- 1 root root   3839 Sep 21 13:07 index-CoNI-1Zn.css
+-rw-r--r-- 1 root root 304117 Sep 21 13:07 index-fOM9Er4k.js
+# post bundle size+sha256:
+b18dbb336eef5c580bf0a2e6726d647c4f6c63edbc48373580d31e4508659ad3  /app/static/assets/index-CoNI-1Zn.css
+91b53c1c7eb377353d7d9e8863d91f1e913fc6c517f327099b6f46dce49b6c1c  /app/static/assets/index-fOM9Er4k.js
+# post index.html served:
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>StorageGenie</title>
+    <script>
+      (function () {
+        try {
+          var stored = localStorage.getItem("sg-theme");
+          var dark =
+            stored === "dark" ||
+            ((stored === null || stored === "system") &&
+              window.matchMedia("(prefers-color-scheme: dark)").matches);
+          document.documentElement.classList.toggle("dark", dark);
+          document.documentElement.classList.toggle("light", !dark);
+        } catch (error) {
+          document.documentElement.classList.add("light");
+        }
+      })();
+    </script>
+    <script type="module" crossorigin src="/assets/index-fOM9Er4k.js"></script>
+    <link rel="stylesheet" crossorigin href="/assets/index-CoNI-1Zn.css">
+  </head>
+  <body>
+    <div id="root"></div>
+  </body>
+</html>
+# post alembic current (in container):
+INFO  [alembic.runtime.migration] Context impl SQLiteImpl.
+INFO  [alembic.runtime.migration] Will assume non-transactional DDL.
+20260917_sg068_saved_search (head)
+# post DB alembic_version + row counts (read-only file:...mode=ro):
+alembic_version=20260917_sg068_saved_search
+provider_call=7
+guardrail_event=1
+saved_search=0
+asset=1
+assertion=3
+household=1
+# post analytics summary:
+[http 200 bytes=5022]
+# post taxonomy:
+[http 200 bytes=1118]
+# post saved-searches:
+{"items":[]} [http 200]
+# post facets:
+{"asset_type":{"unknown":1},"status":{"ACTIVE":1},"has_evidence":{"with":1,"without":0}} [http 200]
+# post public gate (unauth, loopback Host-header):
+[http 401]
+# analytics body byte-identical BEFORE vs AFTER: no
+# taxonomy body byte-identical BEFORE vs AFTER: yes
+# DB file stat (mounted, read-only checks):
+/home/andrei/StorageGenie/data/db/storagegenie.db size=339968 mtime=2026-09-21 10:19:45.510824996 +0000
+# final date: 2026-09-21T13:07:38Z
+# analytics BEFORE vs AFTER diff (same 5022 bytes, content delta explained):
+4c4
+<     "generated_at": "2026-09-21T13:07:11.060022+00:00",
+---
+>     "generated_at": "2026-09-21T13:07:38.528536+00:00",
+
+######## SUPPORT: SG-077 committed test + source (HEAD tree) ########
+# test grep (drawer.test.tsx):
+308:describe("SG-077 panel containment (presentation only)", () => {
+314:    const panelMax = Number.parseFloat(panel.style.maxWidth);
+317:    expect(panelMax).toBeLessThanOrEqual(640);
+320:    const wellMax = Number.parseFloat(well.style.maxWidth || well.style.maxHeight);
+# source grep (ItemInspectorDrawer.tsx):
+22:const EMPTY_PANEL = "border-border bg-card";
+23:const PANEL_MAX_WIDTH = 440;
+24:const VIEWER_MAX_SIZE = 260;
+189:        className={EMPTY_PANEL}
+196:          maxWidth: PANEL_MAX_WIDTH,
+260:            maxWidth: VIEWER_MAX_SIZE,
+261:            maxHeight: VIEWER_MAX_SIZE,
+# optional structural probe: served AFTER bundle token counts
+1
+12
+# optional structural probe: served BEFORE bundle token counts (from git-tracked old? n/a post-recreate); comparing claim not required

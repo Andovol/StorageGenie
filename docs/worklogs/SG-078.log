@@ -1,0 +1,21 @@
+SG-078 process log
+Work dir /home/andrei/StorageGenie ; branch automation ; remote git@github.com:Andovol/StorageGenie.git
+BASE ref origin/automation resolved to 9f34dae73b736d286d41b374ef95f18a820aa462
+Start clock 2026-09-21T13:06:46Z
+
+1. Recon: branch/HEAD/status clean, SG-077 diff scope (frontend-only, 5 files: 2 frontend src + 3 worklogs,
+   no migration), contract VERSION 0.28.2, model/effort from /proc/182941/cmdline + opencode provider log.
+2. BEFORE: container 3952f6760e49 / image c2bcb600b817 / restarts 0; served index-BhyX-Hlp.js 303974 B
+   sha256 256d728a… (matches SG-076 quoted record exactly); alembic 20260917_sg068_saved_search (head);
+   provider_call=7 guardrail_event=1; health 200 x2; regressions 200; public gate 401; loopback 8003 only.
+3. G1 build: BUILDX_CONFIG=/tmp/opencode/buildx (HOME/.docker exists but not writable — F-SG067-2).
+   rc=0 in 10 s. In-image vite build emitted index-fOM9Er4k.js (304.02 kB) + unchanged index-CoNI-1Zn.css.
+4. G1 up: docker compose up -d rc=0 in 1 s; exactly one Recreate; container f1e44f3b6bce / image e9ad06fb9f7e.
+5. AFTER: health 200 x3 (no settle 000); restarts 0; loopback preserved; served index-fOM9Er4k.js
+   304117 B sha256 91b53c1c… (DIFFERENT hash); token CSS unchanged; alembic head identical;
+   row counts unchanged; regressions 200; gate 401.
+6. Worklogs written: SG-078.log, SG-078_report.md, SG-078_verify.log (raw in verify log).
+7. Commit docs-only, push automation, notes-ref receipt + mapped-ref verify.
+
+No command hit its bound; nothing killed. Spend $0.000000 real (zero metered provider calls).
+Consumed by: docs/worklogs/SG-078_report.md, docs/worklogs/SG-078_verify.log.
