@@ -5,7 +5,7 @@
 **Contract:** recorded `0.28.2` == published (`0.28.2`); source path `/home/andrei/storagegenie-contract/VERSION`; contract repo HEAD `b495b59b3426af66772a87939473ac558f8f72d2` (`contract-v0.28.2`).
 **Work dir:** `/home/andrei/StorageGenie` · **origin:** `git@github.com:Andovol/StorageGenie.git`
 **BASE ref:** `origin/automation` · **resolved:** `cd51ba7e13943da930feb9d1060fb598a170899b`
-**WORK_HEAD:** see receipt follow-up (docs-only work commit hash).
+**WORK_HEAD:** `0cd854fdf91390f9134556be4b4839cc57f40d92` (docs-only work commit).
 **Spend:** real **$0.000000** (zero metered calls).
 
 ---
@@ -92,7 +92,29 @@ The pass is **not vacuous**: the before/after bundles differ in name, size and h
 
 ## Receipt — notes ref (M20-corrected block)
 
-Filled in the follow-up docs-only commit (see `SG-070_verify.log` for the raw transcript once pasted).
+Work pushed to `automation` (`cd51ba7..0cd854f`), worktree clean. No push to `storagegenie-evidence`, no `{{RECEIPT_CMD}}`.
+
+```
+$ git notes --ref=refs/notes/storagegenie-coder-reports add -m "Dispatch-ID: SG-070 | Report: docs/worklogs/SG-070_report.md | Work-HEAD: 0cd854fdf91390f9134556be4b4839cc57f40d92" 0cd854fdf91390f9134556be4b4839cc57f40d92
+notes add rc=0
+$ git push origin refs/notes/storagegenie-coder-reports
+   4df2932..a646c2f  refs/notes/storagegenie-coder-reports -> refs/notes/storagegenie-coder-reports
+notes push rc=0
+$ git fetch origin refs/notes/storagegenie-coder-reports:refs/notes/storagegenie-coder-reports-sg070-verify
+ * [new ref]         refs/notes/storagegenie-coder-reports -> refs/notes/storagegenie-coder-reports-sg070-verify
+fetch rc=0
+$ git rev-parse refs/notes/storagegenie-coder-reports-sg070-verify
+a646c2f3b5274c487c8efae767840baddfd52add
+$ git notes --ref=refs/notes/storagegenie-coder-reports-sg070-verify show 0cd854fdf91390f9134556be4b4839cc57f40d92
+Dispatch-ID: SG-070 | Report: docs/worklogs/SG-070_report.md | Work-HEAD: 0cd854fdf91390f9134556be4b4839cc57f40d92
+show rc=0
+$ git notes --ref=refs/notes/storagegenie-coder-reports-sg070-verify show 0cd854fdf91390f9134556be4b4839cc57f40d92 | grep -c SG-070
+1
+grep rc=0
+note=yes
+```
+
+Instrument finding: `git notes --ref=… list` prints only `<note-blob-sha> <object-sha>` pairs, not bodies, so a `list | grep SG-070` cannot match the body; content grep requires `show` per object (or `git log --notes`). `show` was run against the fetched mapped ref and is pasted above.
 
 ## UNCLEAR
 
