@@ -2,7 +2,7 @@
 
 **Branch:** `automation` · **Remote:** `git@github.com:Andovol/StorageGenie.git` · **Work dir:** `/home/andrei/StorageGenie`
 **BASE (packet ref `origin/automation`):** `9a90c5bc2cbba49b681a58a096749c894715d017` (`SG-090 packet: read-only probe of SG-085 129s exit-1 (D107 L3, D104 pattern)`)
-**WORK_HEAD:** `TBD` → filled by the docs commit carrying this report (see receipt subsection; pre-note docs commit).
+**WORK_HEAD:** `4260c5faa16c40daee46114f0b66cbbca970bb96` (docs commit carrying this report; the post-note, docs-only receipt commit is HEAD after it).
 **Contract:** recorded `0.28.2` == published `0.28.2`; source `/home/andrei/storagegenie-contract/VERSION` (host checkout state).
 **Model / effort (`CO-78`):** model `deepseek-v4.1-flash` (provider `opencode-go`; read from provider metadata — SG-090 dispatch log header `> build · deepseek-v4.1-flash`; **argv carries no `--model`**, model is the CLI default) · effort `medium` (process argv `/proc/560765/cmdline`: `opencode run --auto --dir /home/andrei/StorageGenie --variant medium`).
 **Spend (real $):** `$0.000000` actual — zero metered provider calls. Containment per `PG-PR-04`: nothing live exists to contain; no pipeline, no unit, no provider was started by this slice.
@@ -167,9 +167,22 @@ CLI on this host starts and runs.)
 
 ## Receipt note on the notes ref
 
-**Zero-commit projection:** this probe DOES commit (the report + log below), so the positive-receipt path is taken; the
-negative path is not needed. The steps, executed output and pasted `git notes show` are recorded in the final section
-appended after the commit (see `SG-090.log` for the full transcript). `note=yes`.
+**Zero-commit projection:** this probe DOES commit (the report + log), so the positive-receipt path is taken; the negative
+path is not needed.
+
+Work was pushed to `automation` (`9a90c5b..4260c5f`). Note added on WORK_HEAD `4260c5f` (bound 120s, exit 0) and the
+notes ref pushed (`372e770..b3f6273`, bound 300s, exit 0). Verification fetched the refspec explicitly into a MAPPED local
+name `refs/notes/storagegenie-coder-reports-sg090-verify` (`* [new ref]`, exit 0) and ran `show` on the mapped ref:
+
+```
+$ git notes --ref=refs/notes/storagegenie-coder-reports-sg090-verify show 4260c5faa16c40daee46114f0b66cbbca970bb96
+Dispatch-ID: SG-090 | Report: docs/worklogs/SG-090_report.md | Work-HEAD: 4260c5faa16c40daee46114f0b66cbbca970bb96
+show_exit=0
+```
+
+No push to `storagegenie-evidence`; no `{{RECEIPT_CMD}}`.
+
+note=yes
 
 ## UNCLEAR
 
