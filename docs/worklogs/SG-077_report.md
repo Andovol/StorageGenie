@@ -2,7 +2,7 @@
 
 **Branch:** `automation` · **Remote:** `git@github.com:Andovol/StorageGenie.git` · **Work dir:** `/home/andrei/StorageGenie`
 **BASE (packet ref `origin/automation`):** `29134a66604b99d28f54eb199660d599fd2a70fb` (`D99: SG-077 drawer width repair packet`)
-**WORK_HEAD:** `{{WORK_HEAD}}` (work commit; the post-note receipt commit is HEAD after it)
+**WORK_HEAD:** `6417e53102a570092d4a67eb203a439fb8d3680a` (work commit; the post-note receipt commit is HEAD after it)
 **Contract:** recorded `0.28.2` == published; source `/home/andrei/storagegenie-contract/VERSION`, contract repo HEAD `b495b59b3426af66772a87939473ac558f8f72d2`
 **Model / effort (`CO-78`):** model `deepseek-v4.1-flash` (provider `opencode-go`, read from provider metadata `/home/andrei/.local/share/opencode/log/opencode.log` line `run=eae3fc6e … llm.provider=opencode-go llm.model=deepseek-v4.1-flash`, **not** a system-prompt identity line; argv carries no `--model`) · effort `medium` (process argv `/proc/80676/cmdline`: `opencode run --auto --dir /home/andrei/StorageGenie --variant medium`)
 **Spend (real $):** `$0.000000` actual vs `$0` bound — zero metered provider calls.
@@ -197,7 +197,10 @@ EXIT=0
 ### Receipt note verification (pasted `show` output)
 
 ```
-{{NOTE_SHOW}}
+$ git fetch origin refs/notes/storagegenie-coder-reports:refs/notes/storagegenie-coder-reports
+(no output; remote-tracking ref 0de5106..9f35158 -> refs/notes/storagegenie-coder-reports)
+$ git notes --ref=refs/notes/storagegenie-coder-reports show 6417e53102a570092d4a67eb203a439fb8d3680a
+Dispatch-ID: SG-077 | Report: docs/worklogs/SG-077_report.md | Work-HEAD: 6417e53102a570092d4a67eb203a439fb8d3680a
 ```
 
 Final line: `note=yes`

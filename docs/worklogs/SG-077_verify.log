@@ -128,3 +128,15 @@ $ git diff | grep -inE "password|secret|api[_-]?key|token|BEGIN [A-Z ]*PRIVATE K
 86:+    const tokens = screen.getByRole("dialog").className.split(/\s+/);
 88:+      expect(tokens).not.toContain(dead);
 (the only hit is the identifier `tokens` in the new test — not a secret)
+
+
+## LEG8 — receipt: note add + push + mapped fetch + show (verbatim)
+$ git notes --ref=refs/notes/storagegenie-coder-reports add -m "Dispatch-ID: SG-077 | Report: docs/worklogs/SG-077_report.md | Work-HEAD: 6417e53102a570092d4a67eb203a439fb8d3680a" 6417e53102a570092d4a67eb203a439fb8d3680a
+$ git push origin refs/notes/storagegenie-coder-reports
+To github.com:Andovol/StorageGenie.git
+   0de5106..9f35158  refs/notes/storagegenie-coder-reports -> refs/notes/storagegenie-coder-reports
+$ git fetch origin refs/notes/storagegenie-coder-reports:refs/notes/storagegenie-coder-reports
+(no output; mapped local ref updated)
+$ git notes --ref=refs/notes/storagegenie-coder-reports show 6417e53102a570092d4a67eb203a439fb8d3680a
+Dispatch-ID: SG-077 | Report: docs/worklogs/SG-077_report.md | Work-HEAD: 6417e53102a570092d4a67eb203a439fb8d3680a
+note=yes
