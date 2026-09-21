@@ -2,7 +2,7 @@
 
 **Branch:** `automation` · **Remote:** `git@github.com:Andovol/StorageGenie.git` · **Work dir:** `/home/andrei/StorageGenie`
 **BASE (packet ref `origin/automation`):** `9f34dae73b736d286d41b374ef95f18a820aa462` (`D100: SG-078 drawer deploy rider packet`)
-**WORK_HEAD:** `{{WORK_HEAD}}` (work commit; the post-note receipt commit is HEAD after it)
+**WORK_HEAD:** `29fd8f909273c9eb34a32ecb66571aff259559b9` (work commit; the post-note receipt commit is HEAD after it)
 **Contract:** recorded `0.28.2` == published `0.28.2`; source `/home/andrei/storagegenie-contract/VERSION`, contract repo HEAD `b495b59b3426af66772a87939473ac558f8f72d2`
 **Model / effort (`CO-78`):** model `deepseek-v4.1-flash` (provider `opencode-go`, read from provider metadata `/home/andrei/.local/share/opencode/log/opencode.log` line `llm.provider=opencode-go llm.model=deepseek-v4.1-flash`, **not** a system-prompt identity line; argv carries no `--model`) · effort `medium` (process argv `/proc/182941/cmdline`: `opencode run --auto --dir /home/andrei/StorageGenie --variant medium`)
 **Spend (real $):** `$0.000000` actual vs `$0` bound — zero metered provider calls.
@@ -132,7 +132,13 @@ fail-pre→pass-post. **The drawer's appearance is not among them** — deferred
 
 ```
 $ git fetch origin refs/notes/storagegenie-coder-reports:refs/notes/storagegenie-coder-reports
-PASTE_SHOW_OUTPUT_PLACEHOLDER
+(no output; silent create/update of the mapped local ref refs/notes/storagegenie-coder-reports)
+$ git rev-parse refs/notes/storagegenie-coder-reports
+3df8963bfb47d88b8704f4e4b3226c832f167e5f
+$ git ls-remote origin refs/notes/storagegenie-coder-reports
+3df8963bfb47d88b8704f4e4b3226c832f167e5f	refs/notes/storagegenie-coder-reports
+$ git notes --ref=refs/notes/storagegenie-coder-reports show 29fd8f909273c9eb34a32ecb66571aff259559b9
+Dispatch-ID: SG-078 | Report: docs/worklogs/SG-078_report.md | Work-HEAD: 29fd8f909273c9eb34a32ecb66571aff259559b9
 ```
 
 Final line: `note=yes`
