@@ -1,0 +1,30 @@
+SG-080 — photo-ingest pipeline on v3: reader flip + transcript evidence + category proposed (opencode, medium)
+
+role guard: Coder only. No dispatch verb run; no unit for any ID started, polled or retried.
+scope: reader.py (PROMPT_FILES flip + transcript/evidence wiring), candidates.py (gating/whitelist/proposal),
+  evidence_service.py (transcript writer hunk), ONE new test file + surgical v2-pin edits + 3 worklog files.
+  No migration, no deploy, no restart, no secrets printed, production never touched.
+
+MODEL / EFFORT (CO-78): model `deepseek-v4.1-flash` (provider `opencode-go`; read from provider metadata
+  `/home/andrei/.local/state/opencode/model.json` recent[0] = {providerID: opencode-go, modelID:
+  deepseek-v4.1-flash}; argv carries no `--model`), effort `medium` (process argv /proc/488842/cmdline:
+  `opencode run --auto --dir /home/andrei/StorageGenie --variant medium # SG-080 ...`).
+CONTRACT: recorded `0.28.2` == published `0.28.2`; source `/home/andrei/storagegenie-contract/VERSION`,
+  contract repo HEAD `b495b59b3426af66772a87939473ac558f8f72d2` (`.rules-cache/` is absent in this worktree).
+SPEND (real $): `$0.000919` actual vs `$0.015` bound — ONE metered 200 body (cost $0.000919) + one HTTP 503
+  error leg (cost 0.0); both ledgered. $0 outside G5.
+BASE REF: `origin/automation` -> `45727cf4244384b33858e6bf23dd6a8468872c12` (start HEAD == origin/automation).
+
+LEG TIMINGS (elapsed vs budget, wall clock):
+- recon + baseline suite/lint/mypy ........ ~3 min vs 600s (PASS; suite 18s)
+- G1 flip + v2-pin updates + fail/pass ..... ~2 min vs 120s/leg (PASS)
+- G2/G3 writer + gating + tests ............ ~4 min vs 120s/leg (PASS)
+- G4 suite/ruff/mypy/vacuity ............... ~1 min vs 600s (PASS)
+- G5 G0 + live leg ......................... ~1 min vs 600s (provider 503; see report)
+- G6 worklog + commit + receipt ............ see receipt commit
+- overall .................................. under 1800s overall bound at time of writing.
+
+RESULT: slice ships. G1-G4 green (356 passed, 2 stash-reproved base reds; ruff clean; mypy 41/9 delta 0;
+  secret scan 0). G5 ran once, bounded; provider-side HTTP 503 on image 2 aborted the job after a billable
+  image-1 call ($0.000919). Reported as a FINDING, not a slice failure (G4 green). G5 also exposed an
+  unlinked-transcript-on-partial-failure ordering issue, fixed offline + regression-tested.

@@ -1,0 +1,146 @@
+SG-080 verify log — raw command outputs (fail-then-pass runs + gates)
+=============================================================================
+
+## R-BASE-1 — baseline suite BEFORE any edit (b2f: origin/automation clean tree)
+$ (cd backend && ../venv/bin/python -m pytest -q)
+...
+2 failed, 344 passed, 22 warnings in 18.04s
+FAILED tests/test_signals.py::test_generated_codes_are_validated_and_bad_checksum_is_not_an_identifier
+FAILED tests/test_signals.py::test_ocr_has_text_boxes_and_mean_confidence - a...
+
+## R-BASE-2 — baseline ruff + mypy
+$ ../venv/bin/python -m ruff check .
+All checks passed!
+$ ../venv/bin/python -m mypy app
+...
+Found 41 errors in 9 files (checked 75 source files)
+
+## R-G1-FAILPRE — pin test updated to v3 expectation, reader STILL v2
+$ ../venv/bin/python -m pytest -q tests/test_sg079_v3_schema.py::test_live_prompt_map_points_at_v3
+    def test_live_prompt_map_points_at_v3() -> None:
+        # SG-080 flipped the live reader to v3: this is the freshness pin whose
+        # failure under the old v2 map proved the flip (PG-SC-09 inverse).
+>       assert reader.PROMPT_FILES == {
+            "food": "extract-food-v3.md",
+            "medicine": "extract-medicine-v3.md",
+            "cosmetics": "extract-cosmetics-v3.md",
+        }
+E       AssertionError: assert {'food': 'ext...metics-v2.md'} == {'food': 'ext...metics-v3.md'}
+E         Differing items:
+E         {'cosmetics': 'extract-cosmetics-v2.md'} != {'cosmetics': 'extract-cosmetics-v3.md'}
+E         {'food': 'extract-food-v2.md'} != {'food': 'extract-food-v3.md'}
+E         {'medicine': 'extract-medicine-v2.md'} != {'medicine': 'extract-medicine-v3.md'}
+tests/test_sg079_v3_schema.py:196: AssertionError
+1 failed in 0.35s
+
+## R-G1-PASSPOST — same pin after the reader flip
+$ ../venv/bin/python -m pytest -q tests/test_sg079_v3_schema.py::test_live_prompt_map_points_at_v3
+1 passed in 0.28s
+
+$ ../venv/bin/python -m pytest -q tests/test_sg079_v3_schema.py tests/test_sg049_v2_extraction.py \
+    tests/test_ai_pipeline.py tests/test_phase2_e2e.py tests/test_extraction_contract.py
+121 passed, 1 warning in 4.50s
+
+## R-G1-ENUM — full-tree v2-pin enumeration (criterion: extract-.*-v2 | PROMPT_FILES | template_version.*v2)
+$ rg -n 'extract-.*-v2|template_version.*v2|prompt_template_version.*v2|version == .*v2' backend/tests/
+backend/tests/test_sg049_v2_extraction.py:204:                "prompt_template_version": "extract-food-v2",
+backend/tests/test_sg049_v2_extraction.py:213:            assert envelope["prompt_template_version"] == "extract-food-v2"
+# ^ intentionally v1/v2-locked: these are an INJECTED scripted fixture value and its
+#   self-consistency assertion (provenance plumbing), not the live PROMPT_FILES map.
+# Every other live v2 pin was updated to v3:
+#   test_sg079_v3_schema.py (map + runtime version), test_ai_pipeline.py (:207,:505,:518),
+#   test_phase2_e2e.py (:254,:279), test_extraction_contract.py (:303), test_sg049_v2_extraction.py (:137).
+
+## R-G1-PROMPTS — v1/v2 prompt files byte-untouched
+$ git diff --stat -- 'backend/app/services/providers/prompts/*-v1.md' 'backend/app/services/providers/prompts/*-v2.md'
+(empty)
+exit=0
+
+## R-G4-VACUITY — source changes stashed, new SG-080 tests re-run (must fail)
+$ git stash push -- backend/app/services/providers/reader.py backend/app/services/candidates.py backend/app/services/evidence_service.py
+$ ../venv/bin/python -m pytest -q tests/test_sg080_ingest_pipeline.py
+6 failed, 5 passed, 1 warning in 1.79s
+FAILED test_reader_loads_v3_for_all_categories_at_runtime
+FAILED test_pipeline_ledger_rows_carry_v3_template_version
+FAILED test_transcript_persisted_as_evidence_linked_and_readable
+FAILED test_category_proposed_visible_gated_and_never_auto_accepted
+FAILED test_multi_item_v3_splits_first_with_per_item_quantity
+FAILED test_v3_request_wire_shape_carries_prompt_and_json_object_flag
+$ git stash pop
+ok restored
+
+## R-G4-SUITE — full suite AFTER all changes (2 base reds unchanged)
+$ ../venv/bin/python -m pytest -q
+2 failed, 356 passed, 22 warnings in 18.45s
+FAILED tests/test_signals.py::test_generated_codes_are_validated_and_bad_checksum_is_not_an_identifier
+FAILED tests/test_signals.py::test_ocr_has_text_boxes_and_mean_confidence - a...
+# 344 (base pass) + 12 new SG-080 tests = 356; the 2 reds are the same base reds as R-BASE-1.
+
+## R-G4-RUFF-MYPY
+$ ../venv/bin/python -m ruff check .
+All checks passed!
+$ ../venv/bin/python -m mypy app
+...
+Found 41 errors in 9 files (checked 75 source files)   # == baseline R-BASE-2: delta 0
+
+## R-G4-SECRET-SCAN (diff + new untracked test file)
+$ { git diff; echo "--- new file ---"; cat backend/tests/test_sg080_ingest_pipeline.py; } \
+    | grep -nE "sk-|api[_-]?key|secret|password|token|BEGIN .*PRIVATE"
+SECRET_SCAN: 0 matches
+
+## R-G4-SCOPE — tracked diff stat
+$ git diff --stat
+ backend/app/services/candidates.py        | 20 ++++++++-
+ backend/app/services/evidence_service.py  | 70 +++++++++++++++++++++++++++++++
+ backend/app/services/providers/reader.py  | 57 ++++++++++++++++++++++++++--
+ backend/tests/test_ai_pipeline.py         |  6 +--
+ backend/tests/test_extraction_contract.py |  2 +-
+ backend/tests/test_phase2_e2e.py          |  4 +--
+ backend/tests/test_sg049_v2_extraction.py |  6 +--
+ backend/tests/test_sg079_v3_schema.py     | 16 ++++----
+# plus ONE untracked new file: backend/tests/test_sg080_ingest_pipeline.py
+# job_service.py: NOT touched (the AI-step call needed no change). models/alembic/compose/.env/eval/run.py: untouched.
+
+## R-G0 — enablement re-gate (key NEVER printed: presence + length only)
+$ PYTHONPATH=backend DATABASE_URL=sqlite:////tmp/opencode/sg080/g0.db STORAGE_ROOT=/tmp/opencode/sg080/storage \
+    venv/bin/python - <<'PY'
+opencode_api_key_present= True
+key_len= 67
+consent= True
+provider_id= opencode-go
+registry_ids= ['fake', 'opencode-go']
+selected_model_id= deepseek-v4-flash-vision-exp
+ai_status= (True, 'enabled')
+route_fn= ProviderRouter.execute
+route_module= app.services.providers.router
+PY
+
+## R-G5 — bounded live leg (TEMP db, real metered adapter, 3 committed sg029 PNGs)
+TEMP_DB= sqlite:////tmp/opencode/sg080/live.db
+TEMP_STORAGE= /tmp/opencode/sg080/live-storage
+category= food template_version= extract-food-v3
+source=sg029_09_no_date_visible_cosmetics.png bytes=9643 redacted=10423 est=$0.004044 evidence_id=01a0c467-84c3-7dc0-a3e1-9b3cc5600ffa
+source=sg029_01_clean_food.png bytes=9709 redacted=10581 est=$0.004076 evidence_id=01a0c467-84e0-7823-b034-4d47859118d2
+source=sg029_10_partial_label_cosmetics.png bytes=10001 redacted=10885 est=$0.004137 evidence_id=01a0c467-84fc-7dc2-982b-aa69ad21b91c
+worst_case_estimate_sum=$0.012257 bound=$0.015 within_bound= True
+job_id= 01a0c467-84ff-74e1-9c57-5a6a8c2f0588
+job_state= FAILED
+selected_provider= opencode-go registry_has= True model= deepseek-v4-flash-vision-exp
+provider_call: {"id": "01a0c467-9d1e-7013-b335-90212c9d47de", "provider": "opencode-go", "model": "deepseek-v4-flash-vision-exp", "template_version": "extract-food-v3", "cost": 0.0009190499999999999, "usage": {"prompt_tokens": 1571, "completion_tokens": 1139, "total_tokens": 2710, "prompt_cache_hit_tokens": 0, "prompt_cache_miss_tokens": 1571, "prompt_tokens_details": {"cached_tokens": 0}, "completion_tokens_details": {"reasoning_tokens": 885}}, "latency_ms": 6109.990053810179, "error_state": null}
+provider_call: {"id": "01a0c467-ab52-7f33-9503-bf59d3e94aea", "provider": "opencode-go", "model": "deepseek-v4-flash-vision-exp", "template_version": "extract-food-v3", "cost": 0.0, "usage": null, "latency_ms": null, "error_state": "http_status: provider returned HTTP 503: ''"}
+actual_metered_cost=$0.000919
+provider_calls= 2 actual_vs_bound_ratio=0.0613
+evidence: 01a0c467-84c3-7dc0-a3e1-9b3cc5600ffa upload image/png sg029_09_no_date_visible_cosmetics.png 9643
+evidence: 01a0c467-84e0-7823-b034-4d47859118d2 upload image/png sg029_01_clean_food.png 9709
+evidence: 01a0c467-84fc-7dc2-982b-aa69ad21b91c upload image/png sg029_10_partial_label_cosmetics.png 10001
+evidence: 01a0c467-9d20-7322-bde4-dea976bc3708 transcript text/plain transcript.txt 27
+steps= {'VALIDATING_INPUT': 'COMPLETED', 'NORMALIZING': 'COMPLETED', 'EXTRACTING_DETERMINISTIC_SIGNALS': 'COMPLETED', 'ANALYZING_WITH_AI': 'FAILED', 'BUILDING_CANDIDATES': 'PENDING', 'DEDUPLICATING': 'PENDING', 'AWAITING_REVIEW': 'PENDING', 'COMMITTING': 'PENDING'}
+# NOTE: that lone `transcript` evidence row is the PRE-FIX orphan (F-SG080-2): image 1's
+# transcript was flushed before image 2's HTTP 503, and the error-ledger COMMIT persisted
+# it unlinked. Fixed after the live leg (transcripts now persisted only after all images
+# extract) and covered offline by test_partial_job_failure_leaves_no_unlinked_transcript.
+# No second metered leg was run (one bounded live leg per packet).
+
+## R-G5-TEMP-LEFTOVER — rows reported and LEFT in the temp db (PG-EV-06, authority NONE)
+$ ls -l /tmp/opencode/sg080/live.db /tmp/opencode/sg080/live-storage
+(live.db + live-storage/ retained under /tmp/opencode/sg080; production DB never opened)

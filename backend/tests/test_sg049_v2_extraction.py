@@ -6,7 +6,7 @@ the committed corpus only (no key, no network, no metered call — G0 found
 
 - G1: `quantity`/`unit`/`asset_type` parse; each invalid shape fails; the
   generic `unknowns` rule holds for the new field paths.
-- G2: the three configured prompts are v2 and ask for the new fields; the
+- G2: the three configured prompts are v3 and ask for the new fields; the
   outgoing payload shape carries the json_object response-format flag
   (`PG-EV-04`, shape-of-unsent).
 - G3: extraction-sourced new fields are ALWAYS `review_state="proposed"`
@@ -132,9 +132,9 @@ def test_v2_unknowns_rule_holds_for_new_field_paths() -> None:
 # G2 — prompts v2 + outgoing shape (PG-EV-04)
 # --------------------------------------------------------------------------- #
 @pytest.mark.parametrize("category", ["food", "medicine", "cosmetics"])
-def test_configured_prompts_are_v2_and_ask_for_new_fields(category: str) -> None:
+def test_configured_prompts_are_v3_and_ask_for_new_fields(category: str) -> None:
     text, version = reader.load_prompt(category)
-    assert version == f"extract-{category}-v2"
+    assert version == f"extract-{category}-v3"
     for field in NEW_FIELDS:
         assert field in text, f"{category} v2 prompt never names {field}"
     assert "never infer beyond visible evidence" in text

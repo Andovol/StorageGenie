@@ -217,3 +217,73 @@ def store_evidence(  # noqa: C901
         raise
     db.refresh(ev)
     return ev
+
+
+def store_text_evidence(
+    db: Session,
+    *,
+    household_id: str,
+    source_evidence_id: str,
+    item_index: int,
+    text: str,
+    kind: str = "transcript",
+    actor: str = "import-runner",
+) -> Evidence:
+    """Persist verbatim provider text (a label transcript) as retrievable evidence.
+
+    SG-080 G2: the extraction `transcript` is evidence, never an asserted fact.
+    It gets its own `Evidence` row so it is retrievable through the EXISTING
+    evidence read path (`GET /v1/evidence/{id}` and `/file`) and is linked to the
+    job through the job's `evidence_ids` (the tree's only job↔evidence link).
+
+    The row's `sha256` is the ARTIFACT identity (household + source evidence +
+    item index + text), not a bare content hash: bare content addressing would
+    collide across households on generic label text and violate the global
+    unique constraint on `evidence.sha256`. The stored file content is the
+    transcript verbatim, `text/plain`.
+
+    Flushes but does not commit: the caller's step owns the transaction, so a
+    failed extraction step leaves no half-linked rows (the written file is a
+    harmless orphan, cleaned with the temp DB).
+    """
+    artifact = f"{household_id}\x00{source_evidence_id}\x00{item_index}\x00{text}"
+    digest = hashlib.sha256(artifact.encode("utf-8")).hexdigest()
+    existing = db.query(Evidence).filter_by(sha256=digest).first()
+    if existing is not None:
+        return existing
+
+    content = text.encode("utf-8")
+    full = storage_path_for(digest, ".txt", household_id)
+    rel = full.relative_to(Path(settings.storage_root)).as_posix()
+    full.parent.mkdir(parents=True, exist_ok=True)
+    tmp = full.with_suffix(full.suffix + ".tmp")
+    try:
+        tmp.write_bytes(content)
+        tmp.replace(full)
+    finally:
+        if tmp.exists():
+            tmp.unlink()
+
+    ev = Evidence(
+        household_id=household_id,
+        sha256=digest,
+        media_type="text/plain",
+        storage_key=rel,
+        original_filename=f"{kind}.txt",
+        source_kind=kind,
+        size_bytes=len(content),
+    )
+    db.add(ev)
+    db.flush()
+    audit_service.record(
+        db,
+        actor=actor,
+        action="evidence.create",
+        entity_type="evidence",
+        entity_id=ev.id,
+        before=None,
+        after={"sha256": digest, "original_filename": ev.original_filename, "size_bytes": len(content)},
+        household_id=household_id,
+    )
+    db.flush()
+    return ev

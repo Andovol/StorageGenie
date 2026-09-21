@@ -30,6 +30,7 @@ from app.config import settings
 from app.models.evidence import Evidence
 from app.models.job import Job
 from app.models.provider_call import ProviderCall
+from app.services.evidence_service import store_text_evidence
 from app.services.providers.fake import FakeProvider
 from app.services.providers.opencode_go import OpenCodeGoProvider
 from app.services.providers.redaction import redact_image
@@ -48,10 +49,12 @@ from app.services.signals import SUPPORTED_IMAGE_TYPES
 from app.storage.local_store import storage_path
 
 PROMPTS_DIR = Path(__file__).resolve().parent / "prompts"
+# SG-080: the live reader loads the frozen v3 prompts (SG-079). v1/v2 files
+# remain on disk, byte-untouched, as the rollback reference and prior-slice pins.
 PROMPT_FILES = {
-    "food": "extract-food-v2.md",
-    "medicine": "extract-medicine-v2.md",
-    "cosmetics": "extract-cosmetics-v2.md",
+    "food": "extract-food-v3.md",
+    "medicine": "extract-medicine-v3.md",
+    "cosmetics": "extract-cosmetics-v3.md",
 }
 RETRYABLE_ERRORS = frozenset(
     {"outage", "timeout", "rate_limited", "transport", "http_status", "invalid_json"}
@@ -145,6 +148,30 @@ def _job_evidence_ids(job: Job) -> list[str]:
     if not isinstance(value, list):
         raise ValueError("invalid evidence_ids in job config")
     return [str(item) for item in value]
+
+
+def _link_evidence_to_job(job: Job, new_ids: list[str]) -> None:
+    """Append transcript evidence ids to the job's evidence_ids (order kept, deduped).
+
+    SG-080 G2: `job.config_snapshot["evidence_ids"]` is the tree's only
+    job↔evidence link, so storing the transcript as its own `Evidence` row and
+    appending its id here is what "linked to the same job" means on this tree.
+    The source image stays first, so the deterministic display name is unchanged.
+    """
+    if not new_ids:
+        return
+    config = json.loads(job.config_snapshot or "{}")
+    current = config.get("evidence_ids", [])
+    if not isinstance(current, list):
+        raise ValueError("invalid evidence_ids in job config")
+    merged = [str(item) for item in current]
+    seen = set(merged)
+    for evidence_id in new_ids:
+        if evidence_id not in seen:
+            merged.append(evidence_id)
+            seen.add(evidence_id)
+    config["evidence_ids"] = merged
+    job.config_snapshot = json.dumps(config, ensure_ascii=False)
 
 
 def analyzable_evidence(db: Session, job: Job) -> list[Evidence]:
@@ -391,8 +418,9 @@ def run_ai_extraction(db: Session, job: Job) -> dict[str, object]:
     items: list[dict[str, object]] = []
     unknowns: list[str] = []
     call_ids: list[str] = []
+    pending_transcripts: list[tuple[str, int, str]] = []
     needs_evidence = False
-    for _, redacted, estimate in prepared:
+    for evidence, redacted, estimate in prepared:
         output, evidence_call_ids = _extract_one(
             db,
             job,
@@ -409,10 +437,30 @@ def run_ai_extraction(db: Session, job: Job) -> dict[str, object]:
         unknowns.extend(_reindex_unknown(entry, offset) for entry in output.unknowns)
         needs_evidence = needs_evidence or output.needs_evidence
         call_ids.extend(evidence_call_ids)
+        for index, item in enumerate(output.items):
+            if item.transcript is not None:
+                pending_transcripts.append((evidence.id, index, item.transcript))
+
+    # SG-080 G2: persist transcripts only AFTER every image extracted. A
+    # mid-job failure commits its error-ledger row, so writing transcripts
+    # inside the loop could leave an unlinked transcript evidence row behind;
+    # deferring guarantees "transcript evidence exists iff the job extracted".
+    transcript_evidence_ids: list[str] = []
+    for source_evidence_id, index, text in pending_transcripts:
+        row = store_text_evidence(
+            db,
+            household_id=job.household_id or "",
+            source_evidence_id=source_evidence_id,
+            item_index=index,
+            text=text,
+        )
+        transcript_evidence_ids.append(row.id)
 
     aggregated = ExtractionOutput.model_validate(
         {"items": items, "unknowns": unknowns, "needs_evidence": needs_evidence}
     )
+    _link_evidence_to_job(job, transcript_evidence_ids)
+    db.flush()
     return {
         "status": "ok",
         "step": "ANALYZING_WITH_AI",
@@ -420,5 +468,6 @@ def run_ai_extraction(db: Session, job: Job) -> dict[str, object]:
         "model": model_id,
         "prompt_template_version": template_version,
         "provider_call_ids": call_ids,
+        "transcript_evidence_ids": transcript_evidence_ids,
         "extraction": aggregated.model_dump(),
     }

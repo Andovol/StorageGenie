@@ -35,6 +35,9 @@ GATED_FIELDS = frozenset(
         "quantity",
         "unit",
         "asset_type",
+        # SG-080 G3: the extraction-proposed category is always a proposal,
+        # never threshold-auto-accepted at any confidence.
+        "category_proposed",
     }
 )
 ALLOWED_CANDIDATE_FIELDS = frozenset(
@@ -50,6 +53,9 @@ ALLOWED_CANDIDATE_FIELDS = frozenset(
         "expiry_date",
         "opened_date",
         "lot",
+        # SG-080 G3: category_proposed is the ONE promoted v3 field, whitelisted
+        # so the gated proposal can reach the committed assertion.
+        "category_proposed",
     }
 )
 
@@ -294,6 +300,9 @@ def build_candidate_from_extraction(
             ("quantity", item.quantity),
             ("unit", item.unit),
             ("asset_type", item.asset_type),
+            # SG-080 G3: category_proposed rides the candidate as a gated
+            # proposal (always review_state="proposed" at commit).
+            ("category_proposed", item.category_proposed),
         ):
             _extraction_value_field(
                 fields,
@@ -554,6 +563,7 @@ def _split_child_fields(
         "quantity",
         "unit",
         "asset_type",
+        "category_proposed",
     }
     fields: dict[str, object] = {
         key: raw for key, raw in origin_fields.items() if key not in item_derived
@@ -567,7 +577,15 @@ def _split_child_fields(
         template_version=version,
         provider_call_id=provider_call_id,
     )
-    for field_name in ("expiry_date", "opened_date", "lot", "quantity", "unit", "asset_type"):
+    for field_name in (
+        "expiry_date",
+        "opened_date",
+        "lot",
+        "quantity",
+        "unit",
+        "asset_type",
+        "category_proposed",
+    ):
         value = item.get(field_name)
         if value is not None:
             fields[field_name] = _provenance(

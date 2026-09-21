@@ -251,7 +251,7 @@ def test_ai_proposes_expiry_candidates_for_food_and_medicine(phase2_fixture, mon
         assert food_expiry["source_type"] == "extraction"
         assert food_expiry["provider"] == provider.provider_id
         assert food_expiry["model"] == provider.model_id
-        assert food_expiry["prompt_template_version"] == "extract-food-v2"
+        assert food_expiry["prompt_template_version"] == "extract-food-v3"
         assert food_expiry["provider_call_id"]
 
         # PG-EV-04: the bytes handed to the provider are a redacted PNG and the
@@ -276,7 +276,7 @@ def test_ai_proposes_expiry_candidates_for_food_and_medicine(phase2_fixture, mon
         ]
         assert medicine_expiry["value"] == "2029-11-30"
         assert medicine_expiry["source_type"] == "extraction"
-        assert medicine_expiry["prompt_template_version"] == "extract-medicine-v2"
+        assert medicine_expiry["prompt_template_version"] == "extract-medicine-v3"
 
         food_asset = _accept(client, household_id, food_candidate.id)
         medicine_asset = _accept(client, household_id, medicine_candidate.id)
