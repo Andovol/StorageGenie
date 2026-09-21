@@ -1,0 +1,42 @@
+SG-086 worklog — backup/restore drill: read-only production copy, restore-to-temp proof, runbook (offline, $0)
+Host /home/andrei/StorageGenie ; branch automation ; remote git@github.com:Andovol/StorageGenie.git
+BASE (packet ref origin/automation) start HEAD: 60d9a70044a57233c40e1bda984f4acbf4111194
+Contract: recorded 0.28.2 == published 0.28.2 ; source /home/andrei/storagegenie-contract/VERSION ; checkout b495b59b3426af66772a87939473ac558f8f72d2
+MODEL / effort: model deepseek-v4.1-flash (opencode-go CLI default; argv carries no --model) · effort medium (argv: opencode run --auto --dir /home/andrei/StorageGenie --variant medium)
+Live clock: recon 2026-09-21T16:5xZ ; final capture 2026-09-21T17:18:42Z
+Budget: 120s ordinary · 600s suite/copy · 1800s overall ; $0.00 — no metered call exists on any path.
+
+Legs (elapsed vs budget):
+- Recon + premise verification: ~4 min (1800s overall)
+- G0 capability enumeration: <1s (120s)
+- G1 consistent copy: DB `.backup` 0.006s (492K) + storage `cp -a` 0.011s (5.9M / 29 files) (600s)
+- G2 restore + byte-equality + corruption gate: <1s (600s)
+- G3 fail-pre: 0.07s (collection error, exit 2); pass-post: 0.03s (3 passed)
+- G3 full suite: 18.68s (600s bound); ruff clean; mypy 41-in-9 delta 0
+- G4 logs + notes: ~4 min
+
+Premise verification (packet hypotheses vs disk, raw):
+- Live DB /home/andrei/StorageGenie/data/db/storagegenie.db: CONFIRMED readable (`test -r`), WAL mode (`PRAGMA journal_mode` -> wal; -wal 2084752 B / -shm 32768 B present). Container path /data/db is the same bind mount.
+- Storage volume: CORRECTED — real name `storagegenie_storage_data` (Compose project prefix); `docker volume inspect storage_data` -> "no such volume". Mountpoint /home/andrei/.local/share/docker/volumes/storagegenie_storage_data/_data, READABLE, 29 files / 6035868 B (F-SG086-1).
+- sqlite3 3.45.1 present; `mktemp -d` writable: CONFIRMED.
+- `backend/scripts/` absent at BASE: CONFIRMED (created by this slice).
+- Host `data/storage` is an EMPTY directory (0 files); the live storage lives only in the named volume (F-SG086-1).
+- `.rules-cache/` absent in this worktree: CONFIRMED (contract source = /home/andrei/storagegenie-contract/, per SG-062/SG-078).
+- 2 decoder env reds base-proved on bare BASE (stash not needed — tree clean at BASE): 2 failed, 362 passed.
+
+Changes (within ceiling):
+- backend/scripts/backup_restore_drill.py: NEW operator tooling. Read-only by construction (`mode=ro` + SQLite native backup API), parameterized by --prod-db/--prod-storage/--work-dir, inline path guards, script-created temp work-dir removed after proof. Directory `backend/scripts/` created; PG-SC-10 ignore-check `git check-ignore -v` exit 1 (not ignored).
+- backend/tests/test_backup_drill.py: NEW (3 tests) — fixture-DB consistent-backup restore byte-equality + counts + named rows; storage copy byte-equality; corrupted-copy seen-to-fail. Temp fixtures only.
+- README.md: +22-line "Backup and restore drill" runbook hunk after the Data-locations section.
+- docs/worklogs/SG-086.log, SG-086_report.md, SG-086_verify.log: NEW.
+
+Results:
+- G0 green: all four legs quoted; only stop-ground is a red leg (none red).
+- BEFORE per-table counts (24 tables) + integrity ok quoted; AFTER identical; DB mtime unchanged (reads only) — disclosed, not counted as a write.
+- Backup sha256 150a39919620f2ad0176334d833e8ffbbfa22cf4e4437e882e46e521acad3d5c; backup == restored identical; restored integrity ok; counts + named rows match; storage 29 files / 6035868 B hash-identical source==backup==restored.
+- Corrupted-copy equality gate seen-to-fail (quoted); work-dir-inside-production path guard seen-to-fail (quoted).
+- Fail-pre (collection FileNotFoundError, exit 2) -> pass-post (3 passed).
+- Suite 2 failed, 365 passed (2 reds base-proved env); ruff clean; mypy 41-in-9 delta 0; secret grep 0 real shapes.
+- Spend $0.000000 (zero provider calls; no live artifact exists to contain — PG-PR-04 stated).
+
+No command hit its bound; nothing killed. Consumed by: docs/worklogs/SG-086_report.md, docs/worklogs/SG-086_verify.log.

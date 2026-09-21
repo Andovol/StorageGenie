@@ -114,6 +114,28 @@ interface until authentication and deployment controls are implemented.
 The Phase 0 test is backend API E2E, not browser automation; frontend behavior
 remains covered by its unit/component suite.
 
+### Backup and restore drill
+
+The live data is the Compose SQLite file (bind-mounted from `./data/db`) and the
+`storagegenie_storage_data` volume. Copy both read-only: the database through
+SQLite's native backup API (a raw `cp` of a WAL database is not a backup) and the
+evidence directory through a recursive read. `backend/scripts/backup_restore_drill.py`
+does both into a fresh temporary directory and never writes to the live paths.
+Resolve the volume's host path with
+`docker volume inspect storagegenie_storage_data --format '{{.Mountpoint}}'`, then:
+
+```sh
+backend/venv/bin/python backend/scripts/backup_restore_drill.py \
+  --prod-db data/db/storagegenie.db \
+  --prod-storage "$(docker volume inspect storagegenie_storage_data --format '{{.Mountpoint}}')/_data"
+```
+
+The script proves the restore by `sha256sum` equality of the backup and the
+restored database, `PRAGMA integrity_check=ok`, identical per-table counts and
+named rows, and byte-equal storage hashes; it then removes its temporary
+directory, leaving the hashes on stdout. **Restoring production from backup is an
+incident, never silent cleanup** (`CO-42`).
+
 ## Phase 1 runbook
 
 Phase 1 imports a mixed folder through the deterministic job engine. It remains

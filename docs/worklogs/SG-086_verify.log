@@ -1,0 +1,391 @@
+SG-086 raw verification log (commands + verbatim outputs)
+Host /home/andrei/StorageGenie ; branch automation ; remote git@github.com:Andovol/StorageGenie.git
+BASE ref origin/automation resolved to 60d9a70044a57233c40e1bda984f4acbf4111194
+Contract: recorded 0.28.2 == published 0.28.2 ; source /home/andrei/storagegenie-contract/VERSION ; checkout b495b59b3426af66772a87939473ac558f8f72d2
+MODEL / effort: model deepseek-v4.1-flash (opencode-go CLI default; argv carries no --model) ; effort medium (argv: opencode run --auto --dir /home/andrei/StorageGenie --variant medium)
+Live clock (final capture): 2026-09-21T17:18:38Z
+Budget: 120s ordinary ; 600s suite/copy ; 1800s overall ; $0.00.
+
+Reading order: sections are appended as executed. G3 FAIL-PRE precedes the script
+because the test was authored first (TDD). Section index is inline as "########" lines.
+
+Premise corrections (packet hypothesis -> measured on target):
+  1. Named volume is `storagegenie_storage_data` (Compose project prefix), not `storage_data`;
+     `docker volume inspect storage_data` -> "no such volume". Host-visible path
+     /home/andrei/.local/share/docker/volumes/storagegenie_storage_data/_data (readable).
+  2. `.rules-cache/` does not exist in this worktree (gitignored, Launcher-only); the contract
+     source path is /home/andrei/storagegenie-contract/ (VERSION + git HEAD).
+  3. `data/storage` on the host is an EMPTY directory; the live storage is inside the named
+     volume only. `backend/scripts/` did not exist on automation (created by this slice).
+  4. Production DB is WAL mode (db.py listener + live PRAGMA), so the copy uses the SQLite
+     native backup API, never a raw cp.
+
+######## G3 FAIL-PRE — test_backup_drill.py with backend/scripts/backup_restore_drill.py ABSENT ########
+$ ls backend/scripts/backup_restore_drill.py
+ls: cannot access 'scripts/backup_restore_drill.py': No such file or directory
+$ venv/bin/python -m pytest -q tests/test_backup_drill.py
+
+==================================== ERRORS ====================================
+_________________ ERROR collecting tests/test_backup_drill.py __________________
+tests/test_backup_drill.py:33: in <module>
+    DRILL = _load_drill()
+            ^^^^^^^^^^^^^
+tests/test_backup_drill.py:29: in _load_drill
+    spec.loader.exec_module(module)
+<frozen importlib._bootstrap_external>:991: in exec_module
+    ???
+<frozen importlib._bootstrap_external>:1128: in get_code
+    ???
+<frozen importlib._bootstrap_external>:1186: in get_data
+    ???
+E   FileNotFoundError: [Errno 2] No such file or directory: '/home/andrei/StorageGenie/backend/scripts/backup_restore_drill.py'
+=========================== short test summary info ============================
+ERROR tests/test_backup_drill.py - FileNotFoundError: [Errno 2] No such file ...
+!!!!!!!!!!!!!!!!!!!! Interrupted: 1 error during collection !!!!!!!!!!!!!!!!!!!!
+1 error in 0.07s
+exit=2
+
+######## G3 PASS-POST — script present ########
+$ venv/bin/python -m pytest -q tests/test_backup_drill.py
+...                                                                      [100%]
+3 passed in 0.03s
+exit=0
+
+######## G0 — capability enumeration (non-mutating) ########
+$ test -r /home/andrei/StorageGenie/data/db/storagegenie.db && ls -l /home/andrei/StorageGenie/data/db/storagegenie.db
+-rw------- 1 andrei andrei 372736 Sep 21 14:49 /home/andrei/StorageGenie/data/db/storagegenie.db
+$ sqlite3 -readonly /home/andrei/StorageGenie/data/db/storagegenie.db 'PRAGMA journal_mode;'
+wal
+$ command -v sqlite3; sqlite3 --version
+/usr/bin/sqlite3
+3.45.1 2024-01-30 16:01:20 e876e51a0ed5c5b3126f52e532044363a014bc594cfefa87ffb5b82257ccalt1 (64-bit)
+$ docker volume inspect storagegenie_storage_data --format '{{.Mountpoint}}'
+/home/andrei/.local/share/docker/volumes/storagegenie_storage_data/_data
+$ test -r <mountpoint> && echo READABLE
+READABLE
+$ mktemp -d
+/tmp/tmp.BkQXTGkBY4
+
+######## G1/G2 — committed drill script against the live host (read-only) ########
+$ backend/venv/bin/python backend/scripts/backup_restore_drill.py --prod-db /home/andrei/StorageGenie/data/db/storagegenie.db --prod-storage /home/andrei/.local/share/docker/volumes/storagegenie_storage_data/_data
+work-dir    = /tmp/sg086-drill-tw7griqu
+backup-dir  = /tmp/sg086-drill-tw7griqu/backup
+restore-dir = /tmp/sg086-drill-tw7griqu/restore
+[G1.1] BEFORE per-table counts + integrity (read-only, live)
+  live alembic_version	1
+  live assertion	28
+  live asset	6
+  live asset_evidence	12
+  live asset_fts	6
+  live asset_fts_config	1
+  live asset_fts_data	8
+  live asset_fts_docsize	6
+  live asset_fts_idx	6
+  live audit_event	68
+  live candidate	6
+  live evidence	13
+  live guardrail_event	1
+  live household	1
+  live idempotency_key	9
+  live job	7
+  live job_step	56
+  live observation	16
+  live planning_suggestion	0
+  live provider_call	14
+  live review_task	6
+  live saved_search	0
+  live source_attribution	0
+  live user	2
+  live integrity_check=ok
+[G1.2] consistent copy via SQLite native backup API (read-only source)
+  backup sha256=150a39919620f2ad0176334d833e8ffbbfa22cf4e4437e882e46e521acad3d5c bytes=503808
+  backup integrity_check=ok
+[G1.3] storage recursive copy (read-only source)
+  source files=29 bytes=6035868
+  backup files=29 bytes=6035868
+  sample 01a0a029-1477-7ca0-b200-bce78a96c679/05/052a5f7b47d0556aace108ea32fbd67f8641c9e940f4a7ef69e1cc92e75a1a45.png 052a5f7b47d0556aace108ea32fbd67f8641c9e940f4a7ef69e1cc92e75a1a45
+  sample 01a0a029-1477-7ca0-b200-bce78a96c679/05/052a5f7b47d0556aace108ea32fbd67f8641c9e940f4a7ef69e1cc92e75a1a45_thumb256.png 6519125a21d49c4801e8af235a151851844926e2da15b0562d749470ec159358
+  sample 01a0a029-1477-7ca0-b200-bce78a96c679/05/052a5f7b47d0556aace108ea32fbd67f8641c9e940f4a7ef69e1cc92e75a1a45_thumb512.png 650961957ddf58777af343179af695b3beab023f89a85629a9b958776445c64f
+[G2.1] restore into a fresh temp dir (never the live paths)
+  backup == restored sha256=150a39919620f2ad0176334d833e8ffbbfa22cf4e4437e882e46e521acad3d5c
+  restored integrity_check=ok
+  restored evidence: ('01a0a467-eacf-7e13-bbd0-078b1bc93860', '01a0a029-1477-7ca0-b200-bce78a96c679', '01a0a029-1477-7ca0-b200-bce78a96c679/60/6050ed6f7f83bf90722057f1a376b1adcfc8099de4f8995e5cb85ee0ae100630.jpg')
+  restored evidence: ('01a0afaa-145d-7f21-b647-703aaa693f5a', '01a0a029-1477-7ca0-b200-bce78a96c679', '01a0a029-1477-7ca0-b200-bce78a96c679/6c/6c4cbf2e7c3bc3ccdcbc63873fad85f87bacd8ceec533a5e3de2f478ab1f8279.png')
+  restored evidence: ('01a0c445-35b0-7a53-9b8d-22fa3d6523de', '01a0a029-1477-7ca0-b200-bce78a96c679', '01a0a029-1477-7ca0-b200-bce78a96c679/b6/b64034e5c91212098f9895535b5ba45e752bfdf70c24c4cd296b2007823f06bd.png')
+  restored asset: ('01a0a467-eb0e-7b83-a227-af122dc9268b', '01a0a029-1477-7ca0-b200-bce78a96c679', 'Toothpaste')
+  restored asset: ('01a0c446-44c9-7b82-9d1c-2b51fa518191', '01a0a029-1477-7ca0-b200-bce78a96c679', 'CEAFĂ DE PORC')
+  restored asset: ('01a0c47f-fbb3-7db1-b6f3-aa52d20aa6a0', '01a0a029-1477-7ca0-b200-bce78a96c679', 'UHT Lapte 3,5% grăsime')
+  storage backup == restored: file hashes identical
+[G2.2] seen-to-fail: a deliberately corrupted temp copy must fail the equality gate
+  equality gate FAILED as expected: byte inequality: /tmp/sg086-drill-tw7griqu/backup/storagegenie.db=150a39919620f2ad0176334d833e8ffbbfa22cf4e4437e882e46e521acad3d5c vs /tmp/sg086-drill-tw7griqu/restore/corrupted.db=5fdffd6dfff542c622233c4c83134fc83afbef8b78f61be38f5386e9a3e376d7
+  corrupted artifact discarded
+[G1.4] AFTER per-table counts + integrity (read-only, live)
+  live alembic_version	1
+  live assertion	28
+  live asset	6
+  live asset_evidence	12
+  live asset_fts	6
+  live asset_fts_config	1
+  live asset_fts_data	8
+  live asset_fts_docsize	6
+  live asset_fts_idx	6
+  live audit_event	68
+  live candidate	6
+  live evidence	13
+  live guardrail_event	1
+  live household	1
+  live idempotency_key	9
+  live job	7
+  live job_step	56
+  live observation	16
+  live planning_suggestion	0
+  live provider_call	14
+  live review_task	6
+  live saved_search	0
+  live source_attribution	0
+  live user	2
+  live integrity_check=ok
+  production-untouched: BEFORE == AFTER (counts identical)
+work-dir removed: /tmp/sg086-drill-tw7griqu
+exit=0
+
+######## G1/G2 guard seen-to-fail: work-dir inside production must STOP ########
+$ backend/venv/bin/python backend/scripts/backup_restore_drill.py --prod-db /home/andrei/StorageGenie/data/db/storagegenie.db --prod-storage /home/andrei/.local/share/docker/volumes/storagegenie_storage_data/_data --work-dir data/db
+STOP: work-dir /home/andrei/StorageGenie/data/db is inside production DB /home/andrei/StorageGenie/data/db/storagegenie.db
+exit=1
+
+######## G3 full suite / ruff / mypy / secrets / ignore-check / PG-SC-11 ########
+$ git check-ignore -v backend/scripts/backup_restore_drill.py ; echo exit=$?
+exit=1
+$ venv/bin/python -m pytest -q   (from backend/)
+........................................................................ [ 19%]
+........................................................................ [ 39%]
+........................................................................ [ 58%]
+........................................................................ [ 78%]
+........................................................................ [ 98%]
+FF.....                                                                  [100%]
+=================================== FAILURES ===================================
+___ test_generated_codes_are_validated_and_bad_checksum_is_not_an_identifier ___
+
+isolated_db = (<sqlalchemy.orm.session.Session object at 0x7c5245d7dee0>, '01a0c4f9-a16a-7c03-91b1-71edd35d8d5d', PosixPath('/tmp/pytest-of-andrei/pytest-2/test_generated_codes_are_valid0/storage'))
+
+    def test_generated_codes_are_validated_and_bad_checksum_is_not_an_identifier(isolated_db) -> None:  # type: ignore[no-untyped-def]
+        session, household_id, root = isolated_db
+        qr_value = "https://example.test/SG-013"
+        qr_image = qrcode.make(qr_value).convert("RGB")
+        qr = _evidence(session, household_id, root, _png(qr_image), "qr.png", "image/png")
+        ean_image, ean_value = _ean13_image("590123412345")
+        ean = _evidence(session, household_id, root, _png(ean_image), "ean.png", "image/png")
+        # Deliberately render a syntactically valid EAN with the wrong check digit.
+        bad_value = ean_value[:-1] + ("0" if ean_value[-1] != "0" else "1")
+        bad_image, _ = _ean13_image(ean_value[:-1], bad_value[-1])
+        bad = _evidence(session, household_id, root, _png(bad_image), "bad.png", "image/png")
+    
+        qr_rows = signals.extract_observations(qr.id, session)
+        ean_rows = signals.extract_observations(ean.id, session)
+        bad_rows = signals.extract_observations(bad.id, session)
+    
+        qr_values = [json.loads(row.value_json) for row in qr_rows if row.kind == "barcode_qr"]
+        ean_values = [json.loads(row.value_json) for row in ean_rows if row.kind == "barcode_qr"]
+        bad_values = [json.loads(row.value_json) for row in bad_rows if row.kind == "barcode_qr"]
+>       assert any(item.get("value") == qr_value and item["validated"] for item in qr_values)
+E       assert False
+E        +  where False = any(<generator object test_generated_codes_are_validated_and_bad_checksum_is_not_an_identifier.<locals>.<genexpr> at 0x7c523ee65c40>)
+
+tests/test_signals.py:136: AssertionError
+_________________ test_ocr_has_text_boxes_and_mean_confidence __________________
+
+isolated_db = (<sqlalchemy.orm.session.Session object at 0x7c523ee81880>, '01a0c4f9-a1f8-7d63-9993-c47c63a77cd8', PosixPath('/tmp/pytest-of-andrei/pytest-2/test_ocr_has_text_boxes_and_me0/storage'))
+
+    def test_ocr_has_text_boxes_and_mean_confidence(isolated_db) -> None:  # type: ignore[no-untyped-def]
+        session, household_id, root = isolated_db
+        evidence = _evidence(session, household_id, root, _png(_text_image()), "text.png", "image/png")
+        rows = signals.extract_observations(evidence.id, session)
+        ocr = [json.loads(row.value_json) for row in rows if row.kind == "ocr"]
+>       assert ocr
+E       assert []
+
+tests/test_signals.py:148: AssertionError
+=============================== warnings summary ===============================
+venv/lib/python3.12/site-packages/fastapi/testclient.py:1
+  /home/andrei/StorageGenie/backend/venv/lib/python3.12/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+venv/lib/python3.12/site-packages/starlette/testclient.py:53
+  /home/andrei/StorageGenie/backend/venv/lib/python3.12/site-packages/starlette/testclient.py:53: DeprecationWarning: The anyio.abc.BlockingPortal alias is deprecated, use anyio.from_thread.BlockingPortal instead.
+    _PortalFactoryType = Callable[[], AbstractContextManager[anyio.abc.BlockingPortal]]
+
+tests/test_candidates.py: 3 warnings
+tests/test_foundations.py: 3 warnings
+tests/test_saved_searches.py: 3 warnings
+tests/test_search.py: 3 warnings
+tests/test_sg048_name_optional.py: 6 warnings
+tests/test_signals.py: 3 warnings
+  /home/andrei/StorageGenie/backend/venv/lib/python3.12/site-packages/alembic/config.py:604: DeprecationWarning: No path_separator found in configuration; falling back to legacy splitting on spaces, commas, and colons for prepend_sys_path.  Consider adding path_separator=os to Alembic config.
+    util.warn_deprecated(
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/test_signals.py::test_generated_codes_are_validated_and_bad_checksum_is_not_an_identifier
+FAILED tests/test_signals.py::test_ocr_has_text_boxes_and_mean_confidence - a...
+2 failed, 365 passed, 23 warnings in 18.68s
+$ venv/bin/python -m ruff check .   (from backend/)
+All checks passed!
+$ venv/bin/python -m mypy app
+app/schemas/asset.py:53: error: Missing type arguments for generic type "dict"  [type-arg]
+app/schemas/asset.py:55: error: Missing type arguments for generic type "dict"  [type-arg]
+app/models/base.py:8: error: Unused "type: ignore" comment  [unused-ignore]
+app/services/audit_service.py:16: error: Missing type arguments for generic type "dict"  [type-arg]
+app/services/audit_service.py:17: error: Missing type arguments for generic type "dict"  [type-arg]
+app/services/asset_service.py:15: error: Missing type arguments for generic type "dict"  [type-arg]
+app/services/asset_service.py:37: error: Missing type arguments for generic type "dict"  [type-arg]
+app/services/asset_service.py:105: error: Missing type arguments for generic type "dict"  [type-arg]
+app/api/v1/review_tasks.py:17: error: Function is missing a return type annotation  [no-untyped-def]
+app/api/v1/review_tasks.py:21: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/review_tasks.py:22: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/review_tasks.py:62: error: Function is missing a return type annotation  [no-untyped-def]
+app/api/v1/review_tasks.py:66: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/review_tasks.py:67: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/households.py:18: error: Function is missing a return type annotation  [no-untyped-def]
+app/api/v1/households.py:20: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/households.py:22: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/households.py:58: error: Function is missing a return type annotation  [no-untyped-def]
+app/api/v1/households.py:59: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/households.py:60: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/evidence.py:19: error: Function is missing a return type annotation  [no-untyped-def]
+app/api/v1/evidence.py:20: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/evidence.py:22: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/evidence.py:24: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/assets.py:62: error: Function is missing a return type annotation  [no-untyped-def]
+app/api/v1/assets.py:65: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/assets.py:67: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/assets.py:92: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/assets.py:92: error: Missing type arguments for generic type "dict"  [type-arg]
+app/api/v1/assets.py:92: note: Error code "type-arg" not covered by "type: ignore[no-untyped-def]" comment
+app/api/v1/assets.py:231: error: Function is missing a return type annotation  [no-untyped-def]
+app/api/v1/assets.py:239: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/assets.py:240: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/assets.py:357: error: Function is missing a return type annotation  [no-untyped-def]
+app/api/v1/assets.py:361: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/assets.py:363: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/assets.py:413: error: Function is missing a return type annotation  [no-untyped-def]
+app/api/v1/assets.py:415: error: Missing type arguments for generic type "dict"  [type-arg]
+app/api/v1/assets.py:417: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/assets.py:418: error: Unused "type: ignore" comment  [unused-ignore]
+app/main.py:47: error: Unused "type: ignore" comment  [unused-ignore]
+app/main.py:53: error: Unused "type: ignore" comment  [unused-ignore]
+Found 41 errors in 9 files (checked 75 source files)
+
+######## secret grep-gate over the slice diff (SG-037 shape) ########
+pattern: api_key|OPENCODE_API_KEY|Bearer|[Tt]oken
+-- README diff --
+diff --git a/README.md b/README.md
+index abb968a..48c8705 100644
+--- a/README.md
++++ b/README.md
+@@ -114,6 +114,28 @@ interface until authentication and deployment controls are implemented.
+ The Phase 0 test is backend API E2E, not browser automation; frontend behavior
+ remains covered by its unit/component suite.
+ 
++### Backup and restore drill
++
++The live data is the Compose SQLite file (bind-mounted from `./data/db`) and the
++`storagegenie_storage_data` volume. Copy both read-only: the database through
++SQLite's native backup API (a raw `cp` of a WAL database is not a backup) and the
++evidence directory through a recursive read. `backend/scripts/backup_restore_drill.py`
++does both into a fresh temporary directory and never writes to the live paths.
++Resolve the volume's host path with
++`docker volume inspect storagegenie_storage_data --format '{{.Mountpoint}}'`, then:
++
++```sh
++backend/venv/bin/python backend/scripts/backup_restore_drill.py \
++  --prod-db data/db/storagegenie.db \
++  --prod-storage "$(docker volume inspect storagegenie_storage_data --format '{{.Mountpoint}}')/_data"
++```
++
++The script proves the restore by `sha256sum` equality of the backup and the
++restored database, `PRAGMA integrity_check=ok`, identical per-table counts and
++named rows, and byte-equal storage hashes; it then removes its temporary
++directory, leaving the hashes on stdout. **Restoring production from backup is an
++incident, never silent cleanup** (`CO-42`).
++
+ ## Phase 1 runbook
+ 
+ Phase 1 imports a mixed folder through the deterministic job engine. It remains
+secret-grep exit=0 (1 = no match)
+
+######## PG-SC-11 — grep test tree for end-relative assertions over README/scripts/drill paths ########
+$ grep -rnE 'README|scripts|drill' backend/tests/*.py
+backend/tests/test_backup_drill.py:1:"""SG-086 G3: backup/restore drill, proven on temporary fixtures only.
+backend/tests/test_backup_drill.py:6:same method against fixtures so the drill outlives the slice. The helpers under
+backend/tests/test_backup_drill.py:7:test are loaded from ``backend/scripts/backup_restore_drill.py``, the operator
+backend/tests/test_backup_drill.py:8:tooling the README runbook invokes.
+backend/tests/test_backup_drill.py:22:DRILL_PATH = BACKEND_DIR / "scripts" / "backup_restore_drill.py"
+backend/tests/test_backup_drill.py:25:def _load_drill() -> ModuleType:
+backend/tests/test_backup_drill.py:26:    spec = importlib.util.spec_from_file_location("sg086_backup_restore_drill", DRILL_PATH)
+backend/tests/test_backup_drill.py:33:DRILL = _load_drill()
+backend/tests/test_phase0_e2e.py:87:            files={"file": ("orange-drill.jpg", jpeg_bytes(), "image/jpeg")},
+backend/tests/test_plugin_expiry.py:351:    asset = make_asset(session, household_id, "Cordless drill", "tool")
+grep exit=0
+$ grep -rnE '\[-1\]|HEAD~1|HEAD\^|latest|last-|tail -' backend/tests/*.py
+backend/tests/test_chat.py:454:    document_content = provider.texts[-1]
+backend/tests/test_signals.py:125:    bad_value = ean_value[:-1] + ("0" if ean_value[-1] != "0" else "1")
+backend/tests/test_signals.py:126:    bad_image, _ = _ean13_image(ean_value[:-1], bad_value[-1])
+tail-relative grep exit=0 (1 = none)
+
+######## git status / diffstat ########
+ M README.md
+?? backend/scripts/
+?? backend/tests/test_backup_drill.py
+ README.md | 22 ++++++++++++++++++++++
+ 1 file changed, 22 insertions(+)
+
+######## RECON / PREMISES / LIVE CLOCK ########
+$ date -u +%Y-%m-%dT%H:%M:%SZ
+2026-09-21T17:18:25Z
+$ git rev-parse HEAD
+60d9a70044a57233c40e1bda984f4acbf4111194
+$ git rev-parse origin/automation
+60d9a70044a57233c40e1bda984f4acbf4111194
+$ git branch --show-current
+automation
+$ git remote -v
+origin	git@github.com:Andovol/StorageGenie.git (fetch)
+origin	git@github.com:Andovol/StorageGenie.git (push)
+$ cat /home/andrei/storagegenie-contract/VERSION
+0.28.2
+$ git -C /home/andrei/storagegenie-contract rev-parse HEAD
+b495b59b3426af66772a87939473ac558f8f72d2
+$ ls -la .rules-cache   # packet premise: none on this worktree
+ls: cannot access '.rules-cache': No such file or directory
+$ pgrep -af 'opencode run' | head -3
+573962 opencode run --auto --dir /home/andrei/StorageGenie --variant medium # SG-086 — backup/restore drill: read-only production copy, restore-to-temp proof, runbook (opencode, medium)  **Dispatch params for the runner (read from this committed packet; model is the CLI default and is omitted per policy):** coder: opencode effort: medium  **Context and standing lines.** D107-approved slice 2 of the Phase 5 hardening stage (plan `docs/superpowers/plans/2026-09-21-phase-5-hardening.md` Slice 2). THIS slice proves the backup story: consistent read-only copy of the live SQLite + storage, restore-to-temp with byte-equality, runbook in README. **Authority (G-K2, D107 owner quote "D107 approved."): production READ authority ONLY — read-only DB + storage copy, restore lands on TEMP paths only, never the live paths; no `UPDATE/DELETE/INSERT` against production in any form.** Restoring production from backup is an incident, never silent cleanup (`CO-42` — quote it verbatim in the report). **Authoring date (metadata, never a gate):** 2026-09-21. Transport: the standard job_spawn lane. Contract: recorded `0.28.2` == published (`b495b59`); echo verbatim + source path. **Role guard (owner standard line):** you are the Coder, never the Architect — **never run the dispatch verb for any ID, never start or poll your own unit**. If you believe a dispatch is needed, STOP and report it. **Standing lines:** drill ONLY (enumerated ceiling below). No migration, no schema change, no secrets in logs, no deploy, no restart (`PG-PR-04` — no code becomes live; the drill script is operator tooling, proof is scoped to this host run). No provider calls, $0. **Money posture:** $0.00 by construction — no metered call exists on any path. No bound to multiply out (`PG-IC-04` stated as not firing). **Guards invoked (0.28.2 — Architect copies these to the rating row):** `PG-EV-01` · `PG-EV-02` · `PG-EV-05` · `PG-EV-06` (temp rows/files ONLY — reported, temp dir removed post-proof, hashes stay in logs) · `PG-EV-09` · `PG-SC-03` (G0 stop) · `PG-SC-05` · `PG-SC-09` · `PG-SC-11` (grep + verdict, see G3) · `PG-SC-12` · `PG-IC-01` · `PG-IC-03` (precedence: read-only-violation STOP wins over continue — stated) · `PG-IC-07` · `PG-IC-09` · `PG-PR-01` (G0 enumeration) · `PG-PR-03` · `PG-PR-04` (NOTHING live stated) · `PG-PR-10` (database cited + D107 grant quoted above).  > My premises are hypotheses about the tree carrying this packet. **Verify each before building on it; a > difference is a finding, not an obstacle.** Where your numbers, paths or quotes differ from mine, > investigate and explain — **do not bend yours to match. Correcting me is worth more than agreeing.**  > A denied privileged operation is never a signal to route around it. **A step you cannot complete > without privilege is reported as unanswered, and the rest of the slice still ships.**  > If any acceptance criterion could pass **vacuously** — an empty diff, an empty set, a skipped gate, a > test that never invokes the function, a grep scoped so narrowly it could not have matched — say so > loudly rather than reporting a pass.  > Report the model and reasoning effort by reading them from your process arguments or provider metadata, > never from a system-prompt identity line. **Write `unknown` rather than a plausible guess.**  > **DO NOT HANG.** Every command runs under a stated timeout — 120s ordinary, 600s suite/copy, 1800s overall. A command producing no observable progress within its bound is killed and reported. Never run an interactive command. A command you had to kill is a finding worth reporting, not a failure to hide.  > Design calls inside these constraints are yours: decide and report, do not ask. A constraint you find > wrong or impossible is a STOP. **If you stop for any reason**, commit what you have with > `BLOCKED: <reason>` as the first line, push, publish the receipt, and leave the worktree clean. > Report every issue and disagreement, including ones outside this slice's scope. End with the three > UNCLEAR lines — FIRST READ, DURING EXECUTION, REMAINING. "STOP and report" is satisfied ONLY by the > `BLOCKED:` commit path, never by disclosure alone (`PG-EV-03`).  **BASE REF: `origin/automation`.** The ref is what the packet requests; the commit it resolved to is what the report states back — two fields, never one.  **DATABASE: the host's live SQLite (READ-ONLY under the D107 grant above) + temp copies; production is never written. Restart: none. Deploy: none.**  ## G0 — capability enumeration, non-mutating only (stopping here is SUCCESS)  - Establish BEFORE any copy, using forms that change nothing if they succeed (`PG-PR-01`): (1) resolve the live DB file — I hold the host path `/home/andrei/StorageGenie/data/db/storagegenie.db` (SG-001 measured; container path `/data/db/storagegenie.db` is NOT directly readable under `ProtectSystem=strict` — re-verify with `test -r` + `ls -l`, never assume); (2) resolve the storage volume — I hold named volume `storage_data` mounted at `/data/storage` in-container (`docker-compose.yml:10,43`; resolve the host-visible path with `docker volume inspect`, read-only); (3) `sqlite3` present; (4) temp space writable (`mktemp -d`). - A red leg (unreadable file, unresolvable volume, missing sqlite3, no temp space) is the ONLY ground to stop — slowness or size is never grounds (`PG-SC-03` negative case stated). Stopping here reports `unanswered` for G1–G3 and still ships the enumeration raw. - Load-bearing fact for every choice below: the DB runs in WAL mode (`db.py` FK + WAL listener — verify on target), so a naive file copy of the live DB can capture an inconsistent snapshot. Consistent copies use SQLite-native means (`.backup` or `VACUUM INTO` — decided and reported); raw `cp` of the live DB files is NOT an acceptable backup (stated, not silent).  ## G1 — consistent read-only copy (production untouched, proved)  - BEFORE state first (`PG-SC-12` BEFORE leg): per-table row counts via a read-only query path + `PRAGMA integrity_check` on a consistent copy + `sha256sum` of what you copied. AFTER the drill, re-take the counts: identical is the production-untouched proof. Compare LOGICAL state (counts + integrity), never mtime/size alone — a WAL checkpoint can move bytes with identical logic (F-SG072-1 family; a mtime move with identical counts is disclosed, not a failure). - Copy: DB via the G0-chosen SQLite-native consistent copy to temp; storage via recursive copy to temp (measure with `du -sh` first, report size; if the copy cannot complete in-bound, STOP with sizes quoted — a sizing finding, not a drill failure). Quote `sha256sum` for the DB artifact + file-count/byte-total + sampled hashes for storage. - The ONLY writes this slice ever makes to production-adjacent state are none: no `UPDATE/DELETE/INSERT`, no WAL checkpoint forcing, no container restart. A denied read is a STOP (`PG-PR-03`), never a workaround.  ## G2 — restore-to-temp proof (byte-equality on real artifacts)  - Restore the G1 copies into a FRESH temp dir (never the live paths — name both temp paths). Prove: `sha256sum` backup-vs-restored identical for the DB file; open the restored copy (`PRAGMA integrity_check=ok`); per-table counts equal the G1 BEFORE counts; read back named rows (table + id quoted); storage file-count/bytes/sampled-hashes equal. - Seen-to-fail (`PG-EV-01`): a deliberately corrupted temp copy MUST fail the equality gate — quote the failure, then discard it. A gate never fed a bad input is decoration. - Temp rows/files: REPORTED with identifiers, temp dir REMOVED post-proof; hashes/counts stay in the committed logs (`PG-EV-06` — temp-only, stated).  ## G3 — committed test + runbook (the drill outlives the slice)  - ONE new test file (`backend/tests/test_backup_drill.py`): fixture-DB restore-to-temp byte-equality (temp fixtures only — never the production paths; the production proof stays in G1/G2 logs, asserted by existence of the quoted hashes, not re-run). FAIL-then-PASS raw, both runs committed to `SG-086_verify.log` (`PG-EV-09`). - Drill script: new `backend/scripts/` entry (the dir does NOT exist on `automation` — verify; check the path against ignore rules BEFORE committing anything under it, `PG-SC-10`, quote the check). Script = the exact G1/G2 command sequence, parameterized by paths, with the read-only guards inline. - README runbook: SURGICAL section (quote the hunk) beside the existing data-location notes (`README.md:99-102,189-192` — re-verify on target): what to copy, where temp lands, how equality is proved, and the incident line (restore-to-production is never silent, `CO-42` quoted). - `PG-SC-11`: grep the test tree for end-relative assertions over README/scripts/drill paths; list hits with verdicts (expectation: none — state the empty result raw). - Suite green modulo the 2 known decoder env reds (base-proved premise — re-verify on bare BASE with stash, do not inherit); `ruff` clean; `mypy` delta 0 quoted; secret grep-gate over the diff (`api_key|OPENCODE_API_KEY|Bearer|[Tt]oken` identifiers, SG-037 shape) with 0 real secret shapes.  ## G4 — worklog and report (unconditional per `CO-57`)  `{{WORKLOG_DIR}}/SG-086.log`, `SG-086_report.md`, `SG-086_verify.log` (raw outputs + BOTH fail-then-pass runs + every hash/count quoted). First token `SG-086`; elapsed-versus-budget per leg with units; MODEL + effort from process arguments; spend **$0.000000 actual**; `CO-42` quoted verbatim; contract echo + source path; three UNCLEAR lines.  ## Constraints  - **Scope ceiling:** NEW `backend/scripts/*` (ignore-checked, quoted) · ONE new test file · SURGICAL README hunk (quoted) · `docs/worklogs` (3 files). **Anything else is a STOP** — app code, prompts, migrations/models, compose/`.env`, STATE/AGENTS/packet dirs, any production write path. - Cross-product (`PG-IC-01`): no criterion writes to production, restarts anything, or touches the network beyond pushes; reads include suite + sqlite3 + docker-inspect (read-only) — no container exec into the backend, no image pull/run; G4's suite run is covered by the same offline rule. - A count or absence premise carries the RAW command output, never a paraphrase. - No fixed dates except this header's authoring-date metadata; time reads the live clock (`PG-IC-07`). No commit named, no `HEAD ==` precondition — reachability form only. - Simplicity (`G-A7`): enumerate → copy → restore → prove → record; no scheduling, no off-box copies, no encryption changes, no Enrich.  ## Acceptance criteria  - G0 green (all four legs quoted) or honest STOP with the exact red leg (G1–G3 `unanswered`, still shipped). - BEFORE counts + integrity quoted; AFTER counts identical; mtime-only moves disclosed per the WAL rule, never counted as writes. - Restored-temp `sha256` identical, `integrity_check=ok`, counts + named rows match; corrupted-copy gate seen-to-fail (quoted). - New test FAIL-then-PASS raw both committed; script + README hunk committed; ignore-check quoted; suite/ruff/mypy/secrets per G3; $0.000000; no vacuous pass. - Question each criterion answers (`PG-SC-09`): G0 — CAN this identity copy without changing anything? G1 — is the copy consistent and production untouched? G2 — does the backup actually restore, byte-equal? G3 — is the drill repeatable from the repo? G4 — is the evidence committed, not merely reported?  ## Report  - Work dir `/home/andrei/StorageGenie`, origin remote as on host, `BASE` = start HEAD, `WORK_HEAD` = work hash. Model/effort per `CO-78` from process arguments. Spend **$0.000000 actual** (zero provider calls; temp state quoted — containment per `PG-PR-04` stated: nothing live exists to contain). - **Receipt note on the notes ref (M20-corrected block):** push the work to `automation`, worktree clean (`CO-55`). No push to `storagegenie-evidence`, no `{{RECEIPT_CMD}}`. Add the note on the work HEAD (120s bound): `git notes --ref=refs/notes/storagegenie-coder-reports add -m "Dispatch-ID: SG-086 | Report: docs/worklogs/SG-086_report.md | Work-HEAD: <hash>" <WORK_HEAD>` — first line carries BOTH `Dispatch-ID:` and `Report:` (`CO-97`). Then PUSH the notes ref (300s bound): `git push origin refs/notes/storagegenie-coder-reports`. Then verify against the FETCHED ref: fetch the refspec explicitly into a MAPPED local name (a default fetch never carries notes; a bare refspec fetch rewrites only FETCH_HEAD — map it), `git notes --ref=… show <WORK_HEAD>`, and PASTE the executed output verbatim — **a receipt subsection with no pasted `show` output means the step was not executed: say so loudly instead of writing it as done.** Existing-note refusal is a STOP; final line `note=yes`; zero-exit with `note=no` is a FAIL. - End with the three UNCLEAR lines — FIRST READ, DURING EXECUTION, REMAINING.  ## Budget  120s ordinary · 600s suite/copy · 1800s overall; **$0.00** — no metered call exists on any path in this slice.
+577992 /bin/bash -c cd /home/andrei/StorageGenie LOG=/tmp/SG-086-drill/raw.log { echo "" echo "######## RECON / PREMISES / LIVE CLOCK ########" echo "\$ date -u +%Y-%m-%dT%H:%M:%SZ"; date -u +%Y-%m-%dT%H:%M:%SZ echo "\$ git rev-parse HEAD"; git rev-parse HEAD echo "\$ git rev-parse origin/automation"; git rev-parse origin/automation echo "\$ git branch --show-current"; git branch --show-current echo "\$ git remote -v"; git remote -v echo "\$ cat /home/andrei/storagegenie-contract/VERSION"; cat /home/andrei/storagegenie-contract/VERSION echo "\$ git -C /home/andrei/storagegenie-contract rev-parse HEAD"; git -C /home/andrei/storagegenie-contract rev-parse HEAD echo "\$ ls -la .rules-cache   # packet premise: none on this worktree"; ls -la .rules-cache 2>&1 echo "\$ pgrep -af 'opencode run' | head -3"; pgrep -af 'opencode run' | head -3 echo "\$ rtk ls data/  ; find data/storage -type f | wc -l"; ls data/; find data/storage -type f | wc -l echo "\$ docker volume ls"; docker volume ls echo "\$ docker inspect storagegenie-backend-1 --format '{{range .Mounts}}{{.Type}} {{.Name}} -> {{.Destination}}{{println}}{{end}}'"; docker inspect storagegenie-backend-1 --format '{{range .Mounts}}{{.Type}} {{.Name}} -> {{.Destination}}{{println}}{{end}}' echo "" echo "######## secret grep-gate (re-run, clean exit) ########" } >> "$LOG" git diff -- README.md backend/scripts/backup_restore_drill.py backend/tests/test_backup_drill.py >/dev/null 2>&1 { git diff -- README.md; cat backend/scripts/backup_restore_drill.py backend/tests/test_backup_drill.py; } > /tmp/SG-086-drill/diff_for_secret.txt grep -nEi 'api_key|OPENCODE_API_KEY|Bearer|[Tt]oken' /tmp/SG-086-drill/diff_for_secret.txt > /tmp/SG-086-drill/secret_hits.txt echo "secret grep hits:" | tee -a "$LOG" cat /tmp/SG-086-drill/secret_hits.txt | tee -a "$LOG" echo "secret grep lines=$(wc -l < /tmp/SG-086-drill/secret_hits.txt) (0 = no real secret shapes)" | tee -a "$LOG" echo "--- gitleaks-style bearer/key literal scan ---" | tee -a "$LOG" grep -nE 'sk-[A-Za-z0-9]{10,}|ghp_[A-Za-z0-9]{20,}|-----BEGIN' /tmp/SG-086-drill/diff_for_secret.txt | tee -a "$LOG"; echo "literal-secret scan exit=${PIPESTATUS[0]} (1=none)" | tee -a "$LOG"
+$ rtk ls data/  ; find data/storage -type f | wc -l
+db
+storage
+0
+$ docker volume ls
+DRIVER    VOLUME NAME
+local     a523523233986ed18b293cb28afce8b363548a4e7def00863aaa92d52bd1ec0c
+local     storagegenie_storage_data
+$ docker inspect storagegenie-backend-1 --format '{{range .Mounts}}{{.Type}} {{.Name}} -> {{.Destination}}{{println}}{{end}}'
+bind  -> /data/db
+volume storagegenie_storage_data -> /data/storage
+
+
+######## secret grep-gate (re-run, clean exit) ########
+secret grep hits:
+secret grep lines=0 (0 = no real secret shapes)
+--- gitleaks-style bearer/key literal scan ---
+literal-secret scan exit=1 (1=none)
+
+######## CLOSING NOTES ########
+$ ls -l data/db/storagegenie.db data/db/storagegenie.db-wal data/db/storagegenie.db-shm
+-rw------- 1 andrei andrei  372736 Sep 21 14:49 data/db/storagegenie.db
+-rw------- 1 andrei andrei   32768 Sep 21 15:52 data/db/storagegenie.db-shm
+-rw------- 1 andrei andrei 2084752 Sep 21 15:52 data/db/storagegenie.db-wal
+$ ls -d /tmp/sg086-drill-* 2>&1   # script-created temp dirs must be gone
+ls: cannot access '/tmp/sg086-drill-*': No such file or directory
+No temp artifact remains. Cost: $0.000000 (zero provider calls).
+CO-42 (verbatim): "Restoring production from backup is an incident, never silent cleanup."
