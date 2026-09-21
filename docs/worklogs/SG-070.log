@@ -1,0 +1,24 @@
+SG-070 running log — deploy rider: taxonomy endpoint + inspector swap live
+
+[09:11:28Z] coder proc start: opencode run --auto --dir /home/andrei/StorageGenie --variant medium ; model not on argv (CLI default, omitted per policy).
+[recon] pwd=/home/andrei/StorageGenie branch=automation ; git status clean ; remote git@github.com:Andovol/StorageGenie.git.
+[recon] BASE origin/automation resolved cd51ba7e13943da930feb9d1060fb598a170899b == HEAD.
+[recon] contract /home/andrei/storagegenie-contract/VERSION = 0.28.2 ; contract repo HEAD b495b59 (grafted, contract). matches packet.
+[recon] container before: 17b12061d3d9 image cc880df58b9e restarts=0 health=healthy.
+[recon] bundle before: index-CVg0y-4w.js 296747 B sha256 fcafabbf…de07ab179 == SG-069 record exactly.
+[recon] taxonomy before: 404 "Not Found: /v1/taxonomy".
+[recon] saved-searches before: 200 {"items":[]} (with household_id) ; bare GET 422 (param required).
+[recon] facets before: 200 {"asset_type":{"unknown":1},...}.
+[recon] gate before: 401 (nginx auth_basic, unauthenticated Host-header loopback).
+[recon] alembic current before: 20260917_sg068_saved_search (head) ; DB alembic_version same.
+[recon] ss before: 127.0.0.1:8003 loopback only.
+[G1 build] ~/.docker not writable -> BUILDX_CONFIG=/tmp/opencode/buildx (F-SG067-2 precedent). docker compose build rc=0, wall 16.340s. New image 1b2de06ad96a. New frontend bundle index-CZqbqy4J.js 296.89 kB.
+[G1 up] docker compose up -d rc=0, wall 1.332s, exactly one Recreate -> Recreated -> Started. New container 56ffb19533d3 image 1b2de06ad96a restarts=0.
+[G1 health] attempt 1 healthy immediately; two consecutive 200 {"status":"ok","db":"ok","storage":"ok"}.
+[G2] bundle after: index-CZqbqy4J.js 296980 B sha256 5bf83861…1cf1598 (DIFFERENT). served index.html references it.
+[G2] taxonomy after: 200, plugins[0] expiry-tracker 1.0.0 with 6 categories (opened_date_tracking + chat per category); household_chemicals active:false == descriptor.py placeholder (F-SG065-2).
+[G2] saved-searches after: 200 {"items":[]}. facets after: 200 unchanged. gate after: 401.
+[G2] new bundle grep: "v1/taxonomy" present (count=1).
+[G2b] alembic current after: 20260917_sg068_saved_search (head) identical. row counts identical. DB mtime unchanged 2026-09-17 19:44:28.
+[cost] zero metered calls, real spend $0.000000.
+[commit] 3 docs-only worklog files written under docs/worklogs.

@@ -1,0 +1,148 @@
+SG-070 verify log — raw outputs (deploy rider: taxonomy endpoint + inspector swap live)
+Legend: before = SG-069-era image cc880df58b9e ; after = rebuilt image 1b2de06ad96a
+All commands read-only GET/inspect except the single authorized `docker compose build` + `up -d`.
+
+== BASE / refs ==
+$ git rev-parse origin/automation
+cd51ba7e13943da930feb9d1060fb598a170899b
+$ git rev-parse HEAD
+cd51ba7e13943da930feb9d1060fb598a170899b
+$ git status --porcelain
+(empty)
+
+== CONTRACT ECHO (source: /home/andrei/storagegenie-contract/VERSION ; repo HEAD b495b59) ==
+0.28.2
+$ git -C /home/andrei/storagegenie-contract show -s --format='%H %d'
+b495b59b3426af66772a87939473ac558f8f72d2  (grafted, HEAD -> contract, origin/contract)
+
+== CONTAINER BEFORE ==
+$ docker ps --format '{{.ID}} {{.Image}} {{.Names}} {{.Status}}'
+17b12061d3d9 storagegenie-backend storagegenie-backend-1 Up 3 days (healthy)
+$ docker inspect storagegenie-backend-1 --format ...
+id=17b12061d3d919ebdd65e49fcde274878161af09e7b412f08bee214eb3fc250f
+image=sha256:cc880df58b9e253b51c68adac207b8eda9ec45ed176eb2fd6ef31b0e261f28e6
+restarts=0 started=2026-09-17T19:44:28.881707468Z health=healthy
+
+== BUNDLE BEFORE (container file) ==
+fcafabbfef694bdc8488156484ca1ac0e8dba16d51f1338cc1f0d02de07ab179  /app/static/assets/index-CVg0y-4w.js
+296747 /app/static/assets/index-CVg0y-4w.js
+# matches SG-069 measured record exactly (name, size, sha256).
+
+== HEALTH BEFORE (2 consecutive) ==
+read1: {"status":"ok","db":"ok","storage":"ok"} [http 200]
+read2: {"status":"ok","db":"ok","storage":"ok"} [http 200]
+
+== TAXONOMY BEFORE (discriminator) ==
+$ curl -s -m 10 -w '\n [http %{http_code}]\n' http://127.0.0.1:8003/v1/taxonomy
+{"type":"about:blank","title":"Not Found","status":404,"detail":"Not Found: /v1/taxonomy"}
+ [http 404]
+
+== SAVED-SEARCHES BEFORE ==
+$ curl ... "http://127.0.0.1:8003/v1/saved-searches?household_id=01a0a029-1477-7ca0-b200-bce78a96c679"
+[http 200 bytes=12]
+{"items":[]}
+($ curl ... "/v1/saved-searches" without household_id -> [http 422] "Field required" household_id — param is required, see report F-SG070-1)
+
+== FACETS BEFORE ==
+$ curl ... "http://127.0.0.1:8003/v1/assets/facets?household_id=01a0a029-1477-7ca0-b200-bce78a96c679"
+[http 200 bytes=88]
+{"asset_type":{"unknown":1},"status":{"ACTIVE":1},"has_evidence":{"with":1,"without":0}}
+
+== GATE BEFORE (nginx, unauthenticated) ==
+$ curl -sk -H "Host: storagegenie.dynv6.net" https://127.0.0.1/ -o /dev/null -w '[http %{http_code}]'
+[http 401]
+
+== ALEMBIC BEFORE (in container) ==
+20260917_sg068_saved_search (head)
+$ alembic heads
+20260917_sg068_saved_search (head)
+# DB file read-only: alembic_version = [('20260917_sg068_saved_search',)]
+
+== SS BEFORE ==
+LISTEN 0 4096 127.0.0.1:8003 0.0.0.0:*   (backend loopback only)
+
+== BUILD (authorized) ==
+BUILDX: ~/.docker NOT writable, relocating BUILDX_CONFIG to /tmp/opencode/buildx   [F-SG067-2/F-SG069-2 precedent]
+$ time docker compose build
+...
+#18 [frontend-build 6/6] RUN npm run build
+#18 6.926 dist/assets/index-CZqbqy4J.js   296.89 kB │ gzip: 88.32 kB
+#18 6.926 ✓ built in 2.15s
+#22 naming to docker.io/library/storagegenie-backend:latest done
+ Image storagegenie-backend Built
+real 0m16.340s
+IMAGE BEFORE cc880df58b9e 2026-09-17 19:44:17 +0000 UTC
+IMAGE AFTER  1b2de06ad96a 2026-09-21 09:12:07 +0000 UTC
+
+== UP (single authorized recreate) ==
+$ time docker compose up -d
+ Container storagegenie-backend-1 Recreate
+ Container storagegenie-backend-1 Recreated
+ Container storagegenie-backend-1 Started
+real 0m1.332s
+
+== CONTAINER AFTER ==
+$ docker ps ...
+56ffb19533d3 storagegenie-backend storagegenie-backend-1 Up 3 seconds (health: starting)
+id=56ffb19533d30c84831e5cc13e19a87022ee6957186ef6b40efd1d5d31a73b97
+image=sha256:1b2de06ad96a6c84014120a82fbe1ee5e62147d6b3c1aa61471642e44d9d5431
+restarts=0 health=healthy (final)
+
+== HEALTH AFTER (2 consecutive) ==
+read1: {"status":"ok","db":"ok","storage":"ok"} [http 200]
+read2: {"status":"ok","db":"ok","storage":"ok"} [http 200]
+
+== BUNDLE AFTER ==
+$ docker exec storagegenie-backend-1 sha256sum /app/static/assets/index-CZqbqy4J.js
+5bf83861197eb73b1b54c94bc12e7215fa734a77329329a6d480a53051cf1598  /app/static/assets/index-CZqbqy4J.js
+296980 /app/static/assets/index-CZqbqy4J.js
+$ curl -s http://127.0.0.1:8003/ | grep index-
+<script type="module" crossorigin src="/assets/index-CZqbqy4J.js"></script>
+# served index.html references the new bundle; hash differs from before (fcafabbf... -> 5bf83861...)
+
+== TAXONOMY AFTER (discriminator) ==
+[http 200 bytes=1120]
+{"plugins":[{"plugin_id":"expiry-tracker","version":"1.0.0","categories":[
+ {"id":"food_beverages","name":"Food & beverages","active":true,"notification":"tiered-30-7-1","opened_date_tracking":false,"chat":"category"},
+ {"id":"medicine_pharma","name":"Medicine/pharma","active":true,"notification":"tiered-short","opened_date_tracking":false,"chat":"category"},
+ {"id":"cosmetics_personal_care","name":"Cosmetics/personal care","active":true,"notification":"tiered-90-30-7","opened_date_tracking":true,"chat":"none"},
+ {"id":"household_chemicals","name":"Household chemicals","active":false,"notification":"basic-expiry","opened_date_tracking":false,"chat":"fallback"},
+ {"id":"documents_other","name":"Documents/other","active":false,"notification":"long-lead-60-30","opened_date_tracking":false,"chat":"fallback"},
+ {"id":"non_perishable","name":"Non-perishable","active":true,"notification":"none","opened_date_tracking":false,"chat":"none"}],
+ "date_types":["expiry_date","best_before","use_by","manufacture_date","period_after_opening","batch_lot_code"],
+ "units":["piece","unit","ml","l","g","kg","dose","tablet","application"]}]}
+
+== NEW BUNDLE CARRIES THE TAXONOMY CALL ==
+$ docker exec storagegenie-backend-1 grep -o "v1/taxonomy" /app/static/assets/index-CZqbqy4J.js
+v1/taxonomy      (count in bundle = 1)
+# (old image cc880df58b9e is no longer present locally after the rebuild retag, so the
+#  same grep could not be run against the old bundle; before-evidence stands on the
+#  container file hash fcafabbf... + the live 404.)
+
+== SAVED-SEARCHES AFTER ==
+[http 200 bytes=12]
+{"items":[]}
+
+== FACETS AFTER ==
+[http 200 bytes=88]
+{"asset_type":{"unknown":1},"status":{"ACTIVE":1},"has_evidence":{"with":1,"without":0}}
+
+== GATE AFTER ==
+[http 401]
+
+== ALEMBIC AFTER ==
+20260917_sg068_saved_search (head)   (identical to before)
+
+== SS AFTER ==
+LISTEN 0 4096 127.0.0.1:8003 0.0.0.0:*   (loopback preserved)
+
+== ROW COUNTS (read-only) BEFORE == AFTER ==
+alembic_version 1 | assertion 3 | asset 1 | asset_evidence 1 | asset_fts 1 | asset_fts_config 1 |
+asset_fts_data 3 | asset_fts_docsize 1 | asset_fts_idx 1 | audit_event 10 | candidate 1 | evidence 2 |
+guardrail_event 0 | household 1 | idempotency_key 4 | job 2 | job_step 16 | observation 4 |
+planning_suggestion 0 | provider_call 6 | review_task 0 | saved_search 0 | source_attribution 0 | user 2
+# DB file mtime unchanged: 2026-09-17 19:44:28 (no write occurred).
+
+== NO-WRITE CONSTRUCTION ==
+Every request issued this slice was HTTP GET (health, taxonomy, saved-searches, facets, index.html, gate 401)
+or a read-only sqlite open (`file:...?mode=ro`) / docker inspect. Zero POST/PUT/PATCH/DELETE issued.
