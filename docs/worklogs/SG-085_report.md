@@ -2,7 +2,7 @@
 
 **Branch:** `automation` · **Remote:** `git@github.com:Andovol/StorageGenie.git` · **Work dir:** `/home/andrei/StorageGenie`
 **BASE (packet ref `origin/automation`):** `983e6d8c604f065a5c5450a6f9cdca11c444f4db` (`SG-090 receipt: verified notes-ref show output (docs-only)`)
-**WORK_HEAD:** `0a71ba7e47d79b84b4bb827994e1e8336ae20c41`
+**WORK_HEAD:** `8d90070803e876e51d1292f3254e3148857f4d77` (the receipt note lives on this commit; this docs-only block is a descendant)
 **Contract:** recorded `0.28.2` == published `0.28.2`; source `/home/andrei/storagegenie-contract/VERSION` (checkout `b495b59`).
 **Model / effort (`CO-78`):** model `deepseek-v4.1-flash` (provider `opencode-go`; **argv carries no `--model`** — the CLI default is the model) · effort `medium` (process argv `/proc/562912/cmdline`: `opencode run --auto --dir /home/andrei/StorageGenie --variant medium`).
 **Spend (real $):** `$0.000000` actual — zero metered provider calls. Sandbox state quoted below. Containment per `PG-PR-04`: nothing live exists to contain — no pipeline, no unit, no provider was started by this slice.
@@ -117,10 +117,15 @@ Work pushed to `automation`; worktree clean (full `git status` in the verify log
 **fetched** refspec mapped to a local name:
 
 ```
-__NOTE_SHOW__
+$ git fetch origin refs/notes/storagegenie-coder-reports:refs/notes/storagegenie-coder-reports-sg085-verify
+From github.com:Andovol/StorageGenie
+ * [new ref]         refs/notes/storagegenie-coder-reports -> refs/notes/storagegenie-coder-reports-sg085-verify
+$ git notes --ref=refs/notes/storagegenie-coder-reports-sg085-verify show 8d90070803e876e51d1292f3254e3148857f4d77
+Dispatch-ID: SG-085 | Report: docs/worklogs/SG-085_report.md | Work-HEAD: 8d90070803e876e51d1292f3254e3148857f4d77
+show_exit=0
 ```
 
-note=__NOTE_YES__
+note=yes
 
 ## UNCLEAR
 
