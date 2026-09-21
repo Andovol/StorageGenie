@@ -1,0 +1,33 @@
+SG-076 log — deploy rider: Stone theme live on the public entry
+
+TIMELINE (live clock, UTC; PG-IC-07)
+- 12:18:14Z  LEG1 BEFORE capture start; BASE=8bc896c; container 3a2b60da38cd / image eac2b2aede3a;
+             bundle index-3DyyAB0n.js 301041 B sha 79daad04…; page-header=0; #111827=7;
+             health 200x2; gate 401; alembic 20260917_sg068_saved_search; rows 7/1; ss loopback.
+- 12:18:18Z  LEG1 end (~7 s / 120 s budget).
+- 12:18:21Z  LEG2 start; $HOME/.docker NOT writable -> BUILDX_CONFIG=/tmp/opencode/buildx (F-SG067-2);
+             docker compose build rc=0.
+- 12:18:31Z  LEG2 build end (10 s / 900 s budget); new image c2bcb600b817; built JS
+             index-BhyX-Hlp.js 303.88 kB + CSS index-CoNI-1Zn.css 3.84 kB.
+- 12:18:38Z  LEG2b up start; docker compose up -d once (Recreate/Recreated/Starting/Started), rc=0.
+- 12:18:39Z  container 3952f6760e49 / image c2bcb600b817 Up; restarts=0.
+- 12:18:40Z  LEG3 AFTER health: read1 [http 000] settle, then 200,200 (two consecutive).
+- 12:18:41Z  bundle index-BhyX-Hlp.js 303974 sha 256d728a…; css index-CoNI-1Zn.css 3839 sha b18dbb33…;
+             page-header=8; #111827=0.
+- 12:18:41Z  regression: analytics 200/5022; taxonomy 200/1118; saved-searches 200 {items:[]};
+             facets 200 identical; gate 401; alembic head unchanged; rows 7/1 unchanged; ss loopback.
+- 12:18:50Z  LEG3 end (~12 s / 120 s budget). Overall < 60 s / 1800 s.
+- (receipt)  work commit + push automation; note on WORK_HEAD; push notes ref; mapped fetch + show.
+
+DECISIONS (mine, reported)
+- BUILDX_CONFIG relocated to /tmp/opencode/buildx (no privilege probed).
+- Discriminator greps run on the SERVED in-container bundle bytes, occurrence counts (grep -o | wc -l)
+  both before and after, so neither "0" nor "≥1" could be vacuous.
+- BEAUTY not claimed; owner eyeball is final authority (D96 / PG-PR-04).
+
+SPEND
+- $0.000000 real metered (zero provider calls). No provider/chat call issued.
+- Mutations: exactly one `docker compose build` + one `docker compose up -d` (D98 authorized).
+
+FILES
+- docs/worklogs/SG-076.log, SG-076_report.md, SG-076_verify.log (3 files; scope ceiling docs/worklogs).

@@ -1,0 +1,307 @@
+SG-076 verify log — raw curl / health / bundle / docker / alembic / grep outputs (uncondensed)
+
+Host: andrei@87.106.66.242:2222 /home/andrei/StorageGenie
+Coder: opencode  |  effort: medium (process argv `--variant medium`, no `--model` -> CLI default)
+Model: deepseek-v4.1-flash (provider opencode-go, read from opencode provider metadata
+/home/andrei/.local/share/opencode/log/opencode.log `llm.provider=opencode-go llm.model=deepseek-v4.1-flash`;
+NOT a system-prompt identity line).
+Contract: recorded 0.28.2 == published; source /home/andrei/storagegenie-contract/VERSION = 0.28.2;
+contract repo HEAD b495b59b3426af66772a87939473ac558f8f72d2.
+Legend: before = running SG-074-era image eac2b2aede3a / container 3a2b60da38cd (bundle index-3DyyAB0n.js);
+after = rebuilt image c2bcb600b817 / container 3952f6760e49 (bundle index-BhyX-Hlp.js).
+All commands read-only GET/inspect except the single authorized `docker compose build` + one `docker compose up -d`.
+
+================================================================================
+LEG 1 — BEFORE (pre-build; every premise re-verified against the live box)
+================================================================================
+=== BEFORE CAPTURE 2026-09-21T12:18:14Z ===
+== BASE / refs ==
+$ git rev-parse origin/automation
+8bc896c145483a06821bff03c96cf56a4f34e4c0
+$ git rev-parse HEAD
+8bc896c145483a06821bff03c96cf56a4f34e4c0
+$ git branch --show-current
+automation
+$ git status --porcelain
+== CONTRACT ==
+$ cat /home/andrei/storagegenie-contract/VERSION
+0.28.2
+$ git -C /home/andrei/storagegenie-contract show -s --format='%H %d' HEAD
+b495b59b3426af66772a87939473ac558f8f72d2  (grafted, HEAD -> contract, origin/contract)
+== SG-075 DIFF SCOPE (re-verify frontend-only) ==
+d209ecc10bce37784316b957f2258a7881ac4cd7 SG-075: site-wide Stone theme migration — all screens onto the token system
+
+ docs/worklogs/SG-075.log                           |  24 +++
+ docs/worklogs/SG-075_report.md                     | 152 ++++++++++++++
+ docs/worklogs/SG-075_verify.log                    | 194 ++++++++++++++++++
+ frontend/src/App.tsx                               |  43 ++--
+ frontend/src/components/AssetCard.tsx              |  17 +-
+ frontend/src/components/AssetForm.tsx              |  26 +--
+ frontend/src/components/CandidateCard.tsx          |  14 +-
+ frontend/src/components/ChatTranscript.tsx         |   9 +-
+ frontend/src/components/EvidenceGallery.tsx        |   5 +-
+ frontend/src/components/ExpiryEntryForm.tsx        |   6 +-
+ frontend/src/components/JobCard.tsx                |   5 +-
+ frontend/src/components/PlanningSuggestionCard.tsx |  11 +-
+ frontend/src/components/ProvenanceBadge.tsx        |  24 +--
+ frontend/src/components/catalog/ProductCard.tsx    |  10 +-
+ frontend/src/components/catalog/ProductGrid.tsx    |   4 +-
+ frontend/src/components/shell/AssetImportModal.tsx |  13 +-
+ .../src/components/shell/ItemInspectorDrawer.tsx   |   5 +-
+ frontend/src/routes/AnalyticsPage.tsx              |  10 +-
+ frontend/src/routes/AssetDetailPage.tsx            |  61 +++---
+ frontend/src/routes/CapturePage.tsx                |   6 +-
+ frontend/src/routes/ChatPage.tsx                   |  10 +-
+ frontend/src/routes/InboxPage.tsx                  |   8 +-
+ frontend/src/routes/PlanningPage.tsx               |   8 +-
+ frontend/src/routes/ReviewPage.tsx                 |   2 +-
+ frontend/src/routes/SettingsPage.tsx               |  17 +-
+ frontend/src/routes/theme-adoption.test.tsx        | 227 +++++++++++++++++++++
+ frontend/src/theme/tokens.css                      |  80 ++++++++
+ 27 files changed, 840 insertions(+), 151 deletions(-)
+== CONTAINER BEFORE ==
+$ docker ps --format '{{.ID}} {{.Image}} {{.Names}} {{.Status}}'
+3a2b60da38cd storagegenie-backend storagegenie-backend-1 Up About an hour (healthy)
+$ docker inspect -f ... storagegenie-backend-1
+id=3a2b60da38cda7fe1d030373d2bf42bd757c6ac5d8458105432b17c5cf81ae66 image=sha256:eac2b2aede3a69beaa8409b5199f5faf3d405abbaa53652e3a45c997a4654de5 image_name=storagegenie-backend restarts=0 started=2026-09-21T11:05:17.358815961Z health=healthy
+== BUNDLE BEFORE (container file) ==
+$ docker exec storagegenie-backend-1 sh -lc 'ls -la /app/static/assets/'
+total 308
+drwxr-xr-x 2 root root   4096 Sep 21 11:05 .
+drwxr-xr-x 3 root root   4096 Sep 21 11:05 ..
+-rw-r--r-- 1 root root 301041 Sep 21 11:05 index-3DyyAB0n.js
+-rw-r--r-- 1 root root   2652 Sep 21 11:05 index-DxKo-z_g.css
+$ docker exec storagegenie-backend-1 sh -lc 'sha256sum /app/static/assets/index-*.js /app/static/assets/index-*.css'
+79daad044b3da00c5ce540b6a2ec2dbba97222d40c36450fd48cf885cd8dc378  /app/static/assets/index-3DyyAB0n.js
+e6bb17555af6266702cd22eb64457554f24732dadb4abad29def6fbc9563591c  /app/static/assets/index-DxKo-z_g.css
+$ docker exec storagegenie-backend-1 sh -lc 'wc -c /app/static/assets/index-*.js /app/static/assets/index-*.css'
+301041 /app/static/assets/index-3DyyAB0n.js
+  2652 /app/static/assets/index-DxKo-z_g.css
+303693 total
+== SERVED INDEX BEFORE (loopback) ==
+$ curl -s -m 10 http://127.0.0.1:8003/ | grep -o 'assets/index-[^"]*'
+assets/index-3DyyAB0n.js
+assets/index-DxKo-z_g.css
+== THEME DISCRIMINATOR GREPS ON SERVED BUNDLE (BEFORE) ==
+served_js=/app/static/assets/index-3DyyAB0n.js
+$ docker exec storagegenie-backend-1 grep -o 'page-header' /app/static/assets/index-3DyyAB0n.js | wc -l
+0
+$ docker exec storagegenie-backend-1 grep -o -- '#111827' /app/static/assets/index-3DyyAB0n.js | wc -l
+7
+== HEALTH BEFORE (2 consecutive) ==
+$ curl -s -m 10 -w ' [http %{http_code}]' http://127.0.0.1:8003/v1/health
+{"status":"ok","db":"ok","storage":"ok"} [http 200]
+$ curl -s -m 10 -w ' [http %{http_code}]' http://127.0.0.1:8003/v1/health
+{"status":"ok","db":"ok","storage":"ok"} [http 200]
+== ANALYTICS SUMMARY BEFORE ==
+[http 200 bytes=5022]
+== TAXONOMY BEFORE ==
+{"plugins":[{"plugin_id":"expiry-tracker","version":"1.0.0","categories":[{"id":"food_beverages","name":"Food & beverages","active":true,"notification":"tiered-30-7-1","opened_date_tracking":false,"chat":"category"},{"id":"medicine_pharma","name":"Medicine/pharma","active":true,"notification":"tiered-short","opened_date_tracking":false,"chat":"category"},{"id":"cosmetics_personal_care","name":"Cosmetics/personal care","active":true,"notification":"tiered-90-30-7","opened_date_tracking":true,"chat":"none"},{"id":"household_chemicals","name":"Household chemicals","active":true,"notification":"basic-expiry","opened_date_tracking":false,"chat":"fallback"},{"id":"documents_other","name":"Documents/other","active":true,"notification":"long-lead-60-30","opened_date_tracking":false,"chat":"fallback"},{"id":"non_perishable","name":"Non-perishable","active":true,"notification":"none","opened_date_tracking":false,"chat":"none"}],"date_types":["expiry_date","best_before","use_by","manufacture_date","period_after_opening","batch_lot_code"],"units":["piece","unit","ml","l","g","kg","dose","tablet","application"]}]}
+[http 200]
+== SAVED-SEARCHES BEFORE ==
+{"items":[]}
+[http 200]
+== FACETS BEFORE ==
+{"asset_type":{"unknown":1},"status":{"ACTIVE":1},"has_evidence":{"with":1,"without":0}}
+[http 200]
+== GATE BEFORE (nginx unauthenticated) ==
+[http 401]
+== ALEMBIC BEFORE (in container) ==
+$ docker exec storagegenie-backend-1 sh -lc 'cd /app && alembic current'
+INFO  [alembic.runtime.migration] Context impl SQLiteImpl.
+INFO  [alembic.runtime.migration] Will assume non-transactional DDL.
+20260917_sg068_saved_search (head)
+rc=0
+== ROW COUNTS BEFORE (read-only sqlite mode=ro) ==
+alembic_version= [('20260917_sg068_saved_search',)]
+provider_call = 7
+guardrail_event = 1
+saved_search = 0
+asset = 1
+assertion = 3
+household = 1
+== SS BEFORE ==
+LISTEN 0      4096       127.0.0.1:8003       0.0.0.0:*    users:(("rootlesskit",pid=3814163,fd=32))    
+== DB FILE BEFORE ==
+-rw------- andrei andrei 339968 2026-09-21 10:19:45.510824996 +0000 /home/andrei/StorageGenie/data/db/storagegenie.db
+=== END BEFORE ===
+
+================================================================================
+LEG 2 — BUILD (authorized) + UP (single authorized recreate)
+================================================================================
+=== BUILD 2026-09-21T12:18:21Z ===
+HOME/.docker NOT writable -> BUILDX_CONFIG=/tmp/opencode/buildx [F-SG067-2]
+$ docker inspect -f '{{.Image}}' storagegenie-backend-1 (pre-build image)
+sha256:eac2b2aede3a69beaa8409b5199f5faf3d405abbaa53652e3a45c997a4654de5
+$ time docker compose build
+ Image storagegenie-backend Building 
+#1 [internal] load local bake definitions
+#1 reading from stdin 607B done
+#1 DONE 0.0s
+
+#2 [internal] load build definition from Dockerfile
+#2 transferring dockerfile: 1.06kB done
+#2 DONE 0.0s
+
+#3 [internal] load metadata for docker.io/library/python:3.12.11-slim-bookworm@sha256:519591d6871b7bc437060736b9f7456b8731f1499a57e22e6c285135ae657bf7
+#3 ...
+
+#4 [internal] load metadata for docker.io/library/node:20-alpine
+#4 DONE 0.7s
+
+#3 [internal] load metadata for docker.io/library/python:3.12.11-slim-bookworm@sha256:519591d6871b7bc437060736b9f7456b8731f1499a57e22e6c285135ae657bf7
+#3 DONE 0.8s
+
+#5 [internal] load .dockerignore
+#5 transferring context: 497B done
+#5 DONE 0.0s
+
+#6 [stage-1 1/9] FROM docker.io/library/python:3.12.11-slim-bookworm@sha256:519591d6871b7bc437060736b9f7456b8731f1499a57e22e6c285135ae657bf7
+#6 resolve docker.io/library/python:3.12.11-slim-bookworm@sha256:519591d6871b7bc437060736b9f7456b8731f1499a57e22e6c285135ae657bf7 0.0s done
+#6 DONE 0.0s
+
+#7 [frontend-build 1/6] FROM docker.io/library/node:20-alpine@sha256:fb4cd12c85ee03686f6af5362a0b0d56d50c58a04632e6c0fb8363f609372293
+#7 resolve docker.io/library/node:20-alpine@sha256:fb4cd12c85ee03686f6af5362a0b0d56d50c58a04632e6c0fb8363f609372293 0.0s done
+#7 DONE 0.0s
+
+#8 [internal] load build context
+#8 transferring context: 161.18MB 1.0s done
+#8 DONE 1.0s
+
+#9 [frontend-build 2/6] WORKDIR /ui
+#9 CACHED
+
+#10 [frontend-build 3/6] COPY frontend/package.json frontend/package-lock.json ./
+#10 CACHED
+
+#11 [frontend-build 4/6] RUN npm ci
+#11 CACHED
+
+#12 [frontend-build 5/6] COPY frontend/ ./
+#12 DONE 0.3s
+
+#13 [frontend-build 6/6] RUN npm run build
+#13 0.476 
+#13 0.476 > storagegenie-frontend@0.1.0 build
+#13 0.476 > tsc && vite build
+#13 0.476 
+#13 4.826 vite v5.4.21 building for production...
+#13 4.872 transforming...
+#13 7.156 ✓ 1961 modules transformed.
+#13 7.310 rendering chunks...
+#13 7.317 computing gzip size...
+#13 7.328 dist/index.html                   0.94 kB │ gzip:  0.47 kB
+#13 7.328 dist/assets/index-CoNI-1Zn.css    3.84 kB │ gzip:  1.04 kB
+#13 7.328 dist/assets/index-BhyX-Hlp.js   303.88 kB │ gzip: 89.10 kB
+#13 7.328 ✓ built in 2.48s
+#13 DONE 7.4s
+
+#14 [stage-1 5/9] RUN pip install --no-cache-dir -r requirements.lock
+#14 CACHED
+
+#15 [stage-1 6/9] COPY backend/ ./
+#15 CACHED
+
+#16 [stage-1 7/9] RUN pip install --no-cache-dir "hatchling==1.32.0" "editables==0.6"
+#16 CACHED
+
+#17 [stage-1 2/9] WORKDIR /app
+#17 CACHED
+
+#18 [stage-1 3/9] RUN apt-get update && apt-get install -y --no-install-recommends curl tesseract-ocr libzbar0 && rm -rf /var/lib/apt/lists/*
+#18 CACHED
+
+#19 [stage-1 4/9] COPY backend/pyproject.toml backend/requirements.lock ./
+#19 CACHED
+
+#20 [stage-1 8/9] RUN pip install --no-cache-dir --no-build-isolation --no-deps -e .
+#20 CACHED
+
+#21 [stage-1 9/9] COPY --from=frontend-build /ui/dist ./static
+#21 DONE 0.0s
+
+#22 exporting to image
+#22 exporting layers 0.0s done
+#22 exporting manifest sha256:a5c59786f6c91faddd857ecdcc4b176caed26c2bad0e4de040a4930291ed499d done
+#22 exporting config sha256:2dabcd93d892efed80ade602abd01202f9e315cccd8a6b9e47b6debd21400682 done
+#22 exporting attestation manifest sha256:633a068c2697c0931caab4d573bb114bd1ec9a7c0fc6c57ce5187711c3d969ff done
+#22 exporting manifest list sha256:c2bcb600b81701ae36988f72e2355623f831a694629d43ff5fe088a7659a1e48 done
+#22 naming to docker.io/library/storagegenie-backend:latest done
+#22 unpacking to docker.io/library/storagegenie-backend:latest 0.0s done
+#22 DONE 0.1s
+
+#23 resolving provenance for metadata file
+#23 DONE 0.0s
+ Image storagegenie-backend Built 
+build_rc=0 elapsed=10s
+$ docker images storagegenie-backend --format ...
+storagegenie-backend latest c2bcb600b817 2026-09-21 12:18:31 +0000 UTC
+=== END BUILD ===
+
+================================================================================
+LEG 3 — AFTER (post-recreate; discriminators + regression + invariance)
+================================================================================
+=== UP + AFTER CAPTURE 2026-09-21T12:18:38Z ===
+$ time docker compose up -d
+ Container storagegenie-backend-1 Recreate 
+ Container storagegenie-backend-1 Recreated 
+ Container storagegenie-backend-1 Starting 
+ Container storagegenie-backend-1 Started 
+up_rc=0 elapsed=1s
+== CONTAINER AFTER ==
+3952f6760e49 storagegenie-backend storagegenie-backend-1 Up Less than a second (health: starting)
+id=3952f6760e49bdcb060177b2e03a1bb0c0184e45fa546b7e484a490a735ef528 image=sha256:c2bcb600b81701ae36988f72e2355623f831a694629d43ff5fe088a7659a1e48 image_name=storagegenie-backend restarts=0 started=2026-09-21T12:18:39.322826629Z health=starting
+== HEALTH AFTER (settle loop, then 2 consecutive 200) ==
+read1:  [http 000]
+read2: {"status":"ok","db":"ok","storage":"ok"} [http 200]
+read3: {"status":"ok","db":"ok","storage":"ok"} [http 200]
+== AGAIN 2 CONSECUTIVE (explicit) ==
+{"status":"ok","db":"ok","storage":"ok"} [http 200]
+{"status":"ok","db":"ok","storage":"ok"} [http 200]
+== BUNDLE AFTER (container file) ==
+total 312
+drwxr-xr-x 2 root root   4096 Sep 21 12:18 .
+drwxr-xr-x 3 root root   4096 Sep 21 12:18 ..
+-rw-r--r-- 1 root root 303974 Sep 21 12:18 index-BhyX-Hlp.js
+-rw-r--r-- 1 root root   3839 Sep 21 12:18 index-CoNI-1Zn.css
+256d728a34abc77dfde445ef466933751e08cc54ccc1174dfe92cf886057c744  /app/static/assets/index-BhyX-Hlp.js
+b18dbb336eef5c580bf0a2e6726d647c4f6c63edbc48373580d31e4508659ad3  /app/static/assets/index-CoNI-1Zn.css
+303974 /app/static/assets/index-BhyX-Hlp.js
+  3839 /app/static/assets/index-CoNI-1Zn.css
+307813 total
+== SERVED INDEX AFTER (loopback) ==
+assets/index-BhyX-Hlp.js
+assets/index-CoNI-1Zn.css
+== THEME DISCRIMINATOR GREPS ON SERVED BUNDLE (AFTER) ==
+served_js=/app/static/assets/index-BhyX-Hlp.js
+$ grep -o 'page-header' $JSA | wc -l
+8
+$ grep -o -- '#111827' $JSA | wc -l
+0
+== REGRESSION AFTER ==
+analytics: [http 200 bytes=5022]
+saved-searches: {"items":[]}
+[http 200]
+facets: {"asset_type":{"unknown":1},"status":{"ACTIVE":1},"has_evidence":{"with":1,"without":0}}
+[http 200]
+taxonomy: [http 200 bytes=1118]
+== GATE AFTER ==
+[http 401]
+== ALEMBIC AFTER ==
+INFO  [alembic.runtime.migration] Context impl SQLiteImpl.
+INFO  [alembic.runtime.migration] Will assume non-transactional DDL.
+20260917_sg068_saved_search (head)
+rc=0
+== ROW COUNTS AFTER ==
+alembic_version= [('20260917_sg068_saved_search',)]
+provider_call = 7
+guardrail_event = 1
+saved_search = 0
+asset = 1
+assertion = 3
+household = 1
+== SS AFTER ==
+LISTEN 0      4096       127.0.0.1:8003       0.0.0.0:*    users:(("rootlesskit",pid=3814163,fd=32))    
+== DB FILE AFTER ==
+-rw------- andrei andrei 339968 2026-09-21 10:19:45.510824996 +0000 /home/andrei/StorageGenie/data/db/storagegenie.db
+=== END AFTER ===
