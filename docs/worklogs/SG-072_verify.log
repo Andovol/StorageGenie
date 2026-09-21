@@ -1,0 +1,280 @@
+SG-072 verify log — raw outputs (deploy rider: analytics routes + screen live on the public entry)
+Legend: before = SG-070-era running image 1b2de06ad96a / container 56ffb19533d3 ; after = rebuilt image 56277bc0c5f7 / container 9abefa97b534
+All commands read-only GET/inspect except the single authorized `docker compose build` + `up -d`.
+Model discovery and no-write construction included at the end.
+
+== BASE / refs ==
+$ git rev-parse origin/automation
+408e8cd0fb86f53562d3985e9ddaaba118005bb0
+$ git rev-parse HEAD
+408e8cd0fb86f53562d3985e9ddaaba118005bb0
+$ git branch --show-current
+automation
+$ git status --porcelain
+(empty)
+
+== CONTRACT ECHO (source: /home/andrei/storagegenie-contract/VERSION) ==
+0.28.2
+$ git -C /home/andrei/storagegenie-contract show -s --format='%H %d'
+b495b59b3426af66772a87939473ac558f8f72d2  (grafted, HEAD -> contract, origin/contract)
+
+== CONTAINER BEFORE ==
+$ docker ps --format '{{.ID}} {{.Image}} {{.Names}} {{.Status}}'
+56ffb19533d3 storagegenie-backend storagegenie-backend-1 Up About an hour (healthy)
+id=56ffb19533d30c84831e5cc13e19a87022ee6957186ef6b40efd1d5d31a73b97
+image=sha256:1b2de06ad96a6c84014120a82fbe1ee5e62147d6b3c1aa61471642e44d9d5431
+image_name=storagegenie-backend
+restarts=0
+started=2026-09-21T09:12:17.724973336Z
+health=healthy
+
+== BUNDLE BEFORE (container file) ==
+-rw-r--r-- 1 root root 296980 Sep 21 09:12 index-CZqbqy4J.js
+-rw-r--r-- 1 root root   2652 Sep 21 09:12 index-DxKo-z_g.css
+5bf83861197eb73b1b54c94bc12e7215fa734a77329329a6d480a53051cf1598  /app/static/assets/index-CZqbqy4J.js
+296980 /app/static/assets/index-CZqbqy4J.js
+# matches the packet's quoted SG-070 measured record exactly (name, size, sha256).
+
+== SERVED INDEX BEFORE ==
+index-CZqbqy4J.js
+
+== HEALTH BEFORE (2 consecutive) ==
+{"status":"ok","db":"ok","storage":"ok"} [http 200]
+{"status":"ok","db":"ok","storage":"ok"} [http 200]
+
+== ANALYTICS SUMMARY BEFORE (discriminator) ==
+$ curl -s -m 10 -w '\n[http %{http_code}]\n' "http://127.0.0.1:8003/v1/analytics/summary?household_id=01a0a029-1477-7ca0-b200-bce78a96c679"
+{"type":"about:blank","title":"Not Found","status":404,"detail":"Not Found: /v1/analytics/summary"}
+[http 404]
+# explicit framework 404 for the exact path — route genuinely absent in the old image (no fall-through answer).
+
+== TAXONOMY BEFORE ==
+[http 200 bytes=1120]
+
+== SAVED-SEARCHES BEFORE ==
+{"items":[]}
+[http 200]
+
+== FACETS BEFORE ==
+{"asset_type":{"unknown":1},"status":{"ACTIVE":1},"has_evidence":{"with":1,"without":0}}
+[http 200]
+
+== GATE BEFORE (nginx, unauthenticated) ==
+$ curl -sk -m 10 -H "Host: storagegenie.dynv6.net" https://127.0.0.1/ -o /dev/null -w '[http %{http_code}]\n'
+[http 401]
+
+== ALEMBIC BEFORE (in container) ==
+INFO  [alembic.runtime.migration] Context impl SQLiteImpl.
+INFO  [alembic.runtime.migration] Will assume non-transactional DDL.
+20260917_sg068_saved_search (head)
+20260917_sg068_saved_search (head)
+# DB file read-only: alembic_version = 20260917_sg068_saved_search
+
+== SS BEFORE ==
+LISTEN 0      4096       127.0.0.1:8003       0.0.0.0:*    users:(("rootlesskit",pid=3814163,fd=32))
+# loopback only; no 0.0.0.0 bind.
+
+== DB FILE BEFORE ==
+2026-09-17 19:44:28.461471206 +0000 335872 /home/andrei/StorageGenie/data/db/storagegenie.db
+
+== ROW COUNTS BEFORE (read-only) ==
+provider_call=7
+guardrail_event=1
+saved_search=0
+asset=1
+assertion=3
+
+== BUILD (authorized) ==
+$ test -w "$HOME/.docker" -> NOT writable -> BUILDX_CONFIG=/tmp/opencode/buildx   [F-SG067-2 / F-SG069-2 precedent]
+$ time docker compose build
+#19 [frontend-build] dist/assets/index-BKFq1uFR.js  300.98 kB │ gzip: 89.20 kB
+#19 ✓ built in 2.37s
+#22 naming to docker.io/library/storagegenie-backend:latest done
+ Image storagegenie-backend Built
+real	0m16.590s
+build rc=0
+IMAGE BEFORE sha256:1b2de06ad96a  storagegenie-backend:latest  2026-09-21 09:12:07 +0000 UTC
+IMAGE AFTER  sha256:56277bc0c5f75f3c72fabd3f759db4c63c4f3034a5936b7dc89a897dd755651c  storagegenie-backend:latest  2026-09-21 10:19:38 +0000 UTC
+
+== UP (single authorized recreate) ==
+$ time docker compose up -d
+ Container storagegenie-backend-1 Recreate
+ Container storagegenie-backend-1 Recreated
+ Container storagegenie-backend-1 Starting
+ Container storagegenie-backend-1 Started
+real	0m1.098s
+up rc=0
+
+== CONTAINER AFTER ==
+$ docker ps --format ...
+9abefa97b534 storagegenie-backend storagegenie-backend-1 Up Less than a second (health: starting)
+id=9abefa97b534b2b2d1ba8cde4e84d866c6366e54ed7bcf8e106da5ce97e8f1a6
+image=sha256:56277bc0c5f75f3c72fabd3f759db4c63c4f3034a5936b7dc89a897dd755651c
+restarts=0
+started=2026-09-21T10:19:45.935819253Z
+health=starting (then healthy)
+
+== HEALTH AFTER ==
+read1: [http 200] {"status":"ok","db":"ok","storage":"ok"}   # no settle window observed (instant read already 200)
+{"status":"ok","db":"ok","storage":"ok"} [http 200]         # two consecutive 200 reads
+{"status":"ok","db":"ok","storage":"ok"} [http 200]
+restarts=0 (unchanged; no restart loop)
+
+== BUNDLE AFTER ==
+-rw-r--r-- 1 root root 301077 Sep 21 10:19 index-BKFq1uFR.js
+-rw-r--r-- 1 root root   2652 Sep 21 10:19 index-DxKo-z_g.css
+36456c0194061600f9b483773e13493fd51a4e8886dd3f34fcebd50c2aafe2ae  /app/static/assets/index-BKFq1uFR.js
+301077 /app/static/assets/index-BKFq1uFR.js
+
+== SERVED INDEX AFTER ==
+index-BKFq1uFR.js
+# name AND size AND sha256 all differ from before (index-CZqbqy4J.js / 296980 / 5bf83861...) — bundle discriminator HIT.
+
+== ANALYTICS SUMMARY AFTER (discriminator) ==
+$ curl -s -m 10 "http://127.0.0.1:8003/v1/analytics/summary?household_id=01a0a029-1477-7ca0-b200-bce78a96c679"
+[http 200 bytes=5022]
+{
+    "household_id": "01a0a029-1477-7ca0-b200-bce78a96c679",
+    "as_of_date": "2026-09-21",
+    "generated_at": "2026-09-21T10:19:53.429883+00:00",
+    "assets": {
+        "total": 1,
+        "active": 1,
+        "by_status": { "ACTIVE": 1 }
+    },
+    "categories": {
+        "taxonomy": [
+            { "id": "food_beverages", "name": "Food & beverages" },
+            { "id": "medicine_pharma", "name": "Medicine/pharma" },
+            { "id": "cosmetics_personal_care", "name": "Cosmetics/personal care" },
+            { "id": "household_chemicals", "name": "Household chemicals" },
+            { "id": "documents_other", "name": "Documents/other" },
+            { "id": "non_perishable", "name": "Non-perishable" }
+        ],
+        "counts": {
+            "food_beverages": 0, "medicine_pharma": 0, "cosmetics_personal_care": 0,
+            "household_chemicals": 0, "documents_other": 0, "non_perishable": 0
+        },
+        "uncategorized": 1
+    },
+    "expiry": {
+        "expired": 0, "within_7_days": 0, "within_30_days": 0, "safe": 0, "unknown": 1
+    },
+    "waste": { "expired_untouched": 0 },
+    "adherence": {
+        "suggestions": { "pending": 0, "confirmed": 0, "dismissed": 0 },
+        "review_tasks": { "open": 0, "resolved": 0 }
+    },
+    "stats": [
+        { "id": "assets.total", "label": "Total assets", "value": 1, "source": "asset: count(*) WHERE household_id = :h" },
+        { "id": "assets.active", "label": "Active assets", "value": 1, "source": "asset: count(*) WHERE household_id = :h AND status = 'ACTIVE'" },
+        { "id": "assets.by_status", "label": "Assets by status", "value": { "ACTIVE": 1 }, "source": "asset: group by status WHERE household_id = :h" },
+        { "id": "category.food_beverages", "label": "Active assets in Food & beverages", "value": 0, "source": "asset JOIN active assertion field_path = 'plugin:expiry-tracker/classification' WHERE value_json.category = 'food_beverages' AND asset.status = 'ACTIVE'" },
+        { "id": "category.medicine_pharma", "label": "Active assets in Medicine/pharma", "value": 0, "source": "asset JOIN active assertion field_path = 'plugin:expiry-tracker/classification' WHERE value_json.category = 'medicine_pharma' AND asset.status = 'ACTIVE'" },
+        { "id": "category.cosmetics_personal_care", "label": "Active assets in Cosmetics/personal care", "value": 0, "source": "asset JOIN active assertion field_path = 'plugin:expiry-tracker/classification' WHERE value_json.category = 'cosmetics_personal_care' AND asset.status = 'ACTIVE'" },
+        { "id": "category.household_chemicals", "label": "Active assets in Household chemicals", "value": 0, "source": "asset JOIN active assertion field_path = 'plugin:expiry-tracker/classification' WHERE value_json.category = 'household_chemicals' AND asset.status = 'ACTIVE'" },
+        { "id": "category.documents_other", "label": "Active assets in Documents/other", "value": 0, "source": "asset JOIN active assertion field_path = 'plugin:expiry-tracker/classification' WHERE value_json.category = 'documents_other' AND asset.status = 'ACTIVE'" },
+        { "id": "category.non_perishable", "label": "Active assets in Non-perishable", "value": 0, "source": "asset JOIN active assertion field_path = 'plugin:expiry-tracker/classification' WHERE value_json.category = 'non_perishable' AND asset.status = 'ACTIVE'" },
+        { "id": "category.uncategorized", "label": "Active assets with no served category", "value": 1, "source": "ACTIVE asset with no active classification assertion carrying a served category id" },
+        { "id": "expiry.expired", "label": "Expired", "value": 0, "source": "ACTIVE asset JOIN active assertion field_path = 'plugin:expiry-tracker/expiry_date' WHERE expiry_date < as_of" },
+        { "id": "expiry.within_7_days", "label": "Expiring within 7 days", "value": 0, "source": "ACTIVE asset JOIN active assertion field_path = 'plugin:expiry-tracker/expiry_date' WHERE expiry_date BETWEEN as_of AND as_of + 7d" },
+        { "id": "expiry.within_30_days", "label": "Expiring within 30 days", "value": 0, "source": "ACTIVE asset JOIN active assertion field_path = 'plugin:expiry-tracker/expiry_date' WHERE expiry_date BETWEEN as_of + 7d AND as_of + 30d" },
+        { "id": "expiry.safe", "label": "Safe (beyond 30 days)", "value": 0, "source": "ACTIVE asset JOIN active assertion field_path = 'plugin:expiry-tracker/expiry_date' WHERE expiry_date > as_of + 30d" },
+        { "id": "expiry.unknown", "label": "No active expiry date", "value": 1, "source": "ACTIVE asset JOIN active assertion field_path = 'plugin:expiry-tracker/expiry_date' WHERE expiry_date is null or unparseable" },
+        { "id": "waste.expired_untouched", "label": "Expired assets still active", "value": 0, "source": "ACTIVE asset whose active expiry_date < as_of" },
+        { "id": "adherence.suggestions.pending", "label": "Planning suggestions pending", "value": 0, "source": "planning_suggestion: count(*) WHERE household_id = :h AND status = 'pending'" },
+        { "id": "adherence.suggestions.confirmed", "label": "Planning suggestions confirmed", "value": 0, "source": "planning_suggestion: count(*) WHERE household_id = :h AND status = 'confirmed'" },
+        { "id": "adherence.suggestions.dismissed", "label": "Planning suggestions dismissed", "value": 0, "source": "planning_suggestion: count(*) WHERE household_id = :h AND status = 'dismissed'" },
+        { "id": "adherence.review_tasks.open", "label": "Review tasks open", "value": 0, "source": "review_task: count(*) WHERE household_id = :h AND status = 'open'" },
+        { "id": "adherence.review_tasks.resolved", "label": "Review tasks resolved", "value": 0, "source": "review_task: count(*) WHERE household_id = :h AND status = 'resolved'" }
+    ]
+}
+# totals (assets.total=1, active=1) + category counts (6 slices + uncategorized=1) + expiry buckets (5) + adherence
+# signals (suggestions x3, review_tasks x2) all present. 404-before -> 200-after pair is the discriminator.
+
+== INSIGHTS POST — STRUCTURAL PROOF ONLY (never called) ==
+$ docker exec storagegenie-backend-1 grep -o "analytics/insights" /app/static/assets/index-BKFq1uFR.js | wc -l
+1
+$ docker exec storagegenie-backend-1 grep -o "analytics/summary" /app/static/assets/index-BKFq1uFR.js | wc -l
+1
+# served bundle carries the client call to POST /v1/analytics/insights (count=1) — the insights button is wired.
+$ docker exec storagegenie-backend-1 grep -rn "analytics/summary\|analytics/insights" /app/app/api/v1/analytics.py
+3:`GET /v1/analytics/summary` returns computed-from-tables stats only (no
+4:provider, $0). `POST /v1/analytics/insights` runs the Analytics Insight Agent on
+29:@router.get("/analytics/summary")
+38:@router.post("/analytics/insights")
+# built tree carries BOTH route decorators. No POST was ever issued against the live route.
+
+== TAXONOMY AFTER ==
+[http 200 bytes=1120]   # identical size to before
+
+== SAVED-SEARCHES AFTER ==
+{"items":[]}
+[http 200]
+
+== FACETS AFTER ==
+{"asset_type":{"unknown":1},"status":{"ACTIVE":1},"has_evidence":{"with":1,"without":0}}
+[http 200]
+
+== GATE AFTER ==
+[http 401]
+
+== ALEMBIC AFTER (in container) ==
+20260917_sg068_saved_search (head)
+20260917_sg068_saved_search (head)
+# identical to before. No `alembic upgrade` was run.
+
+== SS AFTER ==
+LISTEN 0      4096       127.0.0.1:8003       0.0.0.0:*    users:(("rootlesskit",pid=3814163,fd=32))
+# loopback preserved.
+
+== ROW COUNTS AFTER (read-only; full table list) ==
+alembic_version=1
+assertion=3
+asset=1
+asset_evidence=1
+asset_fts=1
+asset_fts_config=1
+asset_fts_data=3
+asset_fts_docsize=1
+asset_fts_idx=1
+audit_event=10
+candidate=1
+evidence=2
+guardrail_event=1
+household=1
+idempotency_key=4
+job=2
+job_step=16
+observation=4
+planning_suggestion=0
+provider_call=7
+review_task=0
+saved_search=0
+source_attribution=0
+user=2
+# provider_call 7 -> 7 and guardrail_event 1 -> 1 unchanged across the slice.
+# (provider_call=7 / guardrail_event=1 already include SG-066's one authorized live run; SG-070 saw 6/0.)
+# 24 tables; `asset_fts_content` is a VIEW (created by the SG-017 FTS migration, DROP VIEW), not a new table.
+
+== DB FILE AFTER ==
+2026-09-21 10:19:45.510824996 +0000 339968 /home/andrei/StorageGenie/data/db/storagegenie.db
+# mtime moved to container-start time (10:19:45.935) and size +4096; the pre-existing WAL (36.2K, containing
+# already-committed pages) was checkpointed into the main DB on the authorized container stop/start
+# (WAL now 0B). Logical state is unchanged: every row count and the alembic head are identical.
+# No write command was issued (see no-write construction).
+
+== MODEL / EFFORT DISCOVERY ==
+$ tr '\0' ' ' < /proc/4115690/cmdline | cut -c1-90
+opencode run --auto --dir /home/andrei/StorageGenie --variant medium
+# effort=medium read from process argv (`--variant medium`); no `--model` on argv (CLI default, omitted per policy).
+# provider metadata (~/.local/share/opencode/log/opencode.log) run=b32e46b4: llm.provider=opencode-go llm.model=deepseek-v4.1-flash
+
+== NO-WRITE CONSTRUCTION ==
+Every HTTP request issued this slice was GET: `/v1/health` (x4), `/` (index.html, x2), `/v1/analytics/summary?household_id=<seed>`
+(before + after), `/v1/taxonomy`, `/v1/saved-searches?household_id=<seed>`, `/v1/assets/facets?household_id=<seed>`, and the
+unauthenticated nginx gate. Zero POST/PUT/PATCH/DELETE was issued against any live route. DB access was a read-only SQLite
+open (`file:...?mode=ro`) plus `alembic current`/`heads` (read-only). No credential file was fetched. The only mutating
+command was the authorized `docker compose build` + single `docker compose up -d` recreate.
+$ grep -c "POST|PUT|PATCH|DELETE" on the raw before/after capture -> before 0; after 1 (the `@router.post` line inside the
+  built-tree source grep, not an HTTP request).

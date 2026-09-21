@@ -1,0 +1,28 @@
+SG-072 running log — deploy rider: analytics routes + screen live on the public entry
+
+[10:18:46Z] coder proc start (pid 4115690): opencode run --auto --dir /home/andrei/StorageGenie --variant medium ; no --model on argv (CLI default).
+[recon] pwd=/home/andrei/StorageGenie branch=automation ; git status clean ; remote git@github.com:Andovol/StorageGenie.git.
+[recon] BASE origin/automation resolved 408e8cd0fb86f53562d3985e9ddaaba118005bb0 == HEAD.
+[recon] contract /home/andrei/storagegenie-contract/VERSION = 0.28.2 ; contract repo HEAD b495b59 (grafted, contract). matches packet.
+[recon] migrations: backend/alembic/versions/ top revision 20260917_sg068_saved_search.py (SG-066 shipped none) — no migration to ship.
+[recon] container before: 56ffb19533d3 image 1b2de06ad96a restarts=0 health=healthy (SG-070-era image).
+[recon] bundle before: index-CZqbqy4J.js 296980 B sha256 5bf83861…1cf1598 == packet/SG-070 record exactly.
+[recon] analytics summary before: 404 "Not Found: /v1/analytics/summary" (with seed household_id).
+[recon] taxonomy before 200 (1120 B) ; saved-searches before 200 {"items":[]} ; facets before 200.
+[recon] gate before: 401 (nginx auth_basic, unauthenticated Host-header loopback).
+[recon] alembic current before: 20260917_sg068_saved_search (head) ; DB alembic_version same.
+[recon] ss before: 127.0.0.1:8003 loopback only. row counts before: provider_call=7 guardrail_event=1 asset=1 assertion=3 saved_search=0.
+[G1 build] ~/.docker not writable -> BUILDX_CONFIG=/tmp/opencode/buildx (F-SG067-2 precedent). docker compose build rc=0, wall 16.590s. New image 56277bc0c5f7. New frontend bundle index-BKFq1uFR.js 300.98 kB.
+[G1 up] docker compose up -d rc=0, wall 1.098s, exactly one Recreate -> Recreated -> Started. New container 9abefa97b534 image 56277bc0c5f7 restarts=0.
+[G1 health] attempt 1 already 200 {"status":"ok","db":"ok","storage":"ok"}; two consecutive 200 reads; final health healthy. ss loopback preserved.
+[G2] bundle after: index-BKFq1uFR.js 301077 B sha256 36456c01…aafe2ae (DIFFERENT). served index.html references it.
+[G2] analytics summary after: 200 (5022 B) — totals + 6 category counts + uncategorized + 5 expiry buckets + adherence + 21 source-carrying stats. discriminator 404->200 HIT.
+[G2] insights POST NEVER called. structural proof: bundle grep "analytics/insights" count=1 ; built tree grep @router.get("/analytics/summary") + @router.post("/analytics/insights").
+[G2] taxonomy after 200 (1120 B, same size) ; saved-searches after 200 ; facets after 200 ; gate after 401.
+[G2b] alembic current after: 20260917_sg068_saved_search (head) identical. row counts identical (provider_call=7 guardrail_event=1). 24 tables + asset_fts_content view.
+[G2b][finding] DB file mtime/size moved on restart (335872->339968 B, WAL 36.2K->0) = SQLite WAL checkpoint on authorized container stop/start; logical state unchanged.
+[cost] zero metered calls, real spend $0.000000.
+[commit] 3 docs-only worklog files written under docs/worklogs.
+[commit] work commit WORK_HEAD=<recorded in report receipt section> pushed on automation.
+[receipt] note added on WORK_HEAD, notes ref pushed, fetched mapped ref, show pasted verbatim, note=yes.
+[end] worktree clean; final $0.000000; overall well under 1800s.
