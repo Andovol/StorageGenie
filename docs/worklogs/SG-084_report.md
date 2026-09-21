@@ -2,7 +2,7 @@
 
 **Branch:** `automation` · **Remote:** `git@github.com:Andovol/StorageGenie.git` · **Work dir:** `/home/andrei/StorageGenie`
 **BASE (packet ref `origin/automation`):** `3c84ec2a92fc280b798b3cb16025a10f1804de86` (`D104 recorded (SG-080 failure probe + conditional re-fire)`)
-**WORK_HEAD:** `__WORK_HEAD__` (docs commit carrying this report; the post-note, docs-only receipt commit is HEAD after it)
+**WORK_HEAD:** `f2f974f4f5e995d45a9a5367c1565a8d9667ecab` (docs commit carrying this report; the post-note, docs-only receipt commit is HEAD after it)
 **Contract:** recorded `0.28.2` == published `0.28.2`; source `/home/andrei/storagegenie-contract/VERSION`
 **Model / effort (`CO-78`):** model `deepseek-v4.1-flash` (provider `opencode-go` — read from provider metadata: SG-084 dispatch log header `> build · deepseek-v4.1-flash` and `.local/state/opencode/model.json` `recent[0]`; **argv carries no `--model`**, model is the CLI default) · effort `medium` (process argv `/proc/483139/cmdline`: `opencode run --auto --dir /home/andrei/StorageGenie --variant medium`)
 **Spend (real $):** `$0.000000` actual vs `$0` bound — zero metered provider calls.
@@ -135,7 +135,21 @@ performed.**
 
 ## Receipt note (M20-corrected block)
 
-__RECEIPT__
+Work pushed to `automation` (`3c84ec2..f2f974f  automation -> automation`), worktree clean at commit
+time. No push to `storagegenie-evidence`; no `{{RECEIPT_CMD}}`.
+
+Added the note on work HEAD `f2f974f4f5e995d45a9a5367c1565a8d9667ecab` (120s bound), pushed the notes ref
+(300s bound): `e93d7b4..fa22ef2  refs/notes/storagegenie-coder-reports -> refs/notes/storagegenie-coder-reports`.
+Verified against a **mapped** fetch (`refs/notes/storagegenie-coder-reports:refs/notes/sg084-verify`), then
+`git notes --ref=refs/notes/sg084-verify show f2f974f...` — executed output pasted verbatim:
+
+```
+$ git notes --ref=refs/notes/sg084-verify show f2f974f4f5e995d45a9a5367c1565a8d9667ecab
+Dispatch-ID: SG-084 | Report: docs/worklogs/SG-084_report.md | Work-HEAD: f2f974f4f5e995d45a9a5367c1565a8d9667ecab
+```
+
+A pre-add existence check returned `error: no note found for object f2f974f...` (no existing-note
+refusal). Final line: `note=yes`.
 
 ## UNCLEAR
 
