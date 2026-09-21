@@ -1,0 +1,69 @@
+SG-089 — Phase 5 exit: re-prove the bounded condition, carry verdicts unmodified, state limits
+=============================================================================================
+
+Coder: opencode · effort medium (process argv, /proc/610498/cmdline:
+  `opencode run --auto --dir /home/andrei/StorageGenie --variant medium # SG-089 …`)
+Model: unknown (argv carries no --model; no provider metadata surfaced in-process) — CO-78, not guessed.
+Host / work dir: /home/andrei/StorageGenie · branch automation · origin git@github.com:Andovol/StorageGenie.git
+BASE ref: origin/automation → resolved 07873cacd58de75c8dd5b0726b8ac8b95060d9b8 (two fields, never one)
+Authoring date (metadata, not a gate): 2026-09-21
+Live clock: open 2026-09-21T18:12:27Z · final capture 2026-09-21T18:14:39Z
+Spend: $0.000000 actual — zero provider calls (offline only; no metered call exists on any path).
+Containment (PG-PR-04): nothing live exists to contain — no pipeline, no unit, no deploy, no restart.
+
+Role guard: Coder, never Architect — no dispatch verb run, no unit started or polled.
+
+-------------------------------------------------------------------------------
+Leg timings (elapsed vs budget)
+-------------------------------------------------------------------------------
+Leg 0  recon + contract echo            ~0m17s  (budget 120s ordinary)   OK
+Leg G1 corpora re-run (3 corpora)      ~0m20s  (budget 120s ordinary)   OK
+Leg G1 suite                           ~0m21s  (budget 600s suite)      OK
+Leg G1 ruff / mypy                     ~0m40s  (budget 300s mypy)       OK
+Leg G1 read-backs (artifacts/greps)    ~0m50s  (budget 120s ordinary)   OK
+Leg G2 verdicts + limits + ratings     ~0m40s  (budget 120s ordinary)   OK
+Leg G3 README decision + greps         ~0m10s  (budget 120s ordinary)   OK
+Leg G4 worklogs + receipt              in progress
+Overall wall to final capture: ~2m12s (budget 1800s) — no command killed, none hung.
+
+-------------------------------------------------------------------------------
+Narrative
+-------------------------------------------------------------------------------
+Recon confirmed a clean worktree on automation with HEAD == origin/automation
+(07873ca, the SG-089 packet commit). Contract source `/home/andrei/storagegenie-contract/`
+reads VERSION 0.28.2, git HEAD b495b59, RULES.md sha256 a66aa431… — matching the
+installed payload hash. `.rules-cache/` is absent in this worktree (gitignored, Launcher-only),
+same as SG-062/078/086/087 precedent.
+
+G1 re-ran the three frozen corpora on this tree. sg029 through the REAL selector
+(`eval/run.py --corpus sg029`) reproduces its record exactly: field_accuracy=0.833,
+unknown_rate=4/7=0.571, correction_rate=0/6=0.000. sg049/sg079 are scoring-only corpora
+(no images), so `main --corpus <c>` correctly refuses them at the integrity gate with
+`missing key 'image'` (exit 1) — this is documented in their own frozen records as a
+finding, not drift. Their frozen numbers reproduce through the runner's own
+`score_fixture` + `run_bridge_sandbox` path, asserted by
+`tests/test_eval_corpus.py::test_frozen_baseline_reproduces_every_selected_corpus[sg049|sg079]`
+(13 passed). No drift on any corpus.
+
+G1 gates: full suite `2 failed, 376 passed` — the two known decoder env reds
+(`test_signals.py` barcode/OCR, pyzbar/pytesseract not installed), re-verified on bare BASE
+(worktree clean, HEAD==origin/automation, so the run IS bare BASE). ruff `All checks passed!`.
+mypy `Found 41 errors in 9 files` — delta 0 (no app/ hunk; same as the SG-086/087/088 base).
+Fresh forced sandbox `provider_call` rows = 0.
+
+G1 read-backs all PRESENT: three `baseline_*_frozen.md`, `backup_restore_drill.py` +
+`test_backup_drill.py`, `test_privacy_audit.py`, README runbook hunk (`### Backup and restore
+drill`, CO-42 verbatim at README.md:136-137), and `EXPECTED_TABLES` 0 hits in the backend
+tree / any .py file.
+
+G2 carried the per-slice verdict lines verbatim from their report paths (SG-085 numbers,
+SG-086 hashes, SG-087 no-hole, SG-088 derivation) and stated the eight limits in one line each.
+Ratings read-back: all six rows (SG-085, SG-086, SG-087, SG-088, SG-090, SG-091) present with
+scores/flags.
+
+G3: README does not state Phase 5 status at all (no Phase 4/5 runbook section, no Phase 5
+string), so there is no misstatement to correct → **no delta owed**, no README diff.
+PG-SC-11 grep over the test tree: hits are position-independent; none end-relative over
+anything this slice reads. Exclusion gates all clean.
+
+No red leg; no STOP. Slice ships docs-only.

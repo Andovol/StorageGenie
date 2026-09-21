@@ -1,0 +1,242 @@
+SG-089_verify.log — raw outputs, every re-run, every read-back
+================================================================
+All commands run from /home/andrei/StorageGenie (backend commands from /home/andrei/StorageGenie/backend).
+Live clock open 2026-09-21T18:12:27Z · final capture 2026-09-21T18:14:39Z.
+
+######## Leg 0 — contract echo + tree state ########
+
+$ git branch --show-current
+automation
+$ git rev-parse HEAD
+07873cacd58de75c8dd5b0726b8ac8b95060d9b8
+$ git rev-parse origin/automation
+07873cacd58de75c8dd5b0726b8ac8b95060d9b8
+$ git rev-list --left-right --count origin/automation...HEAD
+0	0
+$ git status --porcelain
+(empty — clean worktree at BASE)
+
+$ cat /home/andrei/storagegenie-contract/VERSION
+0.28.2
+$ git -C /home/andrei/storagegenie-contract rev-parse HEAD
+b495b59b3426af66772a87939473ac558f8f72d2
+$ cat /home/andrei/storagegenie-contract/RULES.sha256
+a66aa4313d62cebff8b44f10299928288e05dc4d7c45f4f4e83e0bbd954c131d  RULES.md
+$ sha256sum /home/andrei/storagegenie-contract/RULES.md
+a66aa4313d62cebff8b44f10299928288e05dc4d7c45f4f4e83e0bbd954c131d  /home/andrei/storagegenie-contract/RULES.md
+# recorded 0.28.2 == published 0.28.2; RULES.md hash == installed payload. `.rules-cache/` absent (gitignored).
+
+$ opencode --version
+1.17.19
+# recorded 1.18.31 (AGENTS.md:4 / VPS.md) → CLI drift still open (limit 7, verified).
+
+$ pgrep -af "opencode run"   # process arguments (CO-78)
+610498 opencode run --auto --dir /home/andrei/StorageGenie --variant medium # SG-089 …
+# effort=medium from argv; no --model → MODEL=unknown.
+
+######## Leg G1 — corpora re-run through the REAL selector ########
+
+$ ../venv/bin/python eval/run.py --corpus sg029
+fixture sg029-01-clean-food: score=1.000 needs=1 unknowns=1 items=1.00
+fixture sg029-02-clean-medicine: score=1.000 needs=1 unknowns=1 items=1.00
+fixture sg029-03-glare-food: score=0.000 needs=0 unknowns=0 items=0.00
+fixture sg029-04-clutter-food: score=1.000 needs=1 unknowns=1 items=1.00
+fixture sg029-05-partial-label-food: score=0.667 needs=1 unknowns=0 items=1.00
+fixture sg029-06-partial-label-medicine: score=1.000 needs=1 unknowns=1 items=1.00
+fixture sg029-07-no-date-visible-medicine: score=0.667 needs=1 unknowns=0 items=1.00
+fixture sg029-08-clean-cosmetics: score=1.000 needs=1 unknowns=1 items=1.00
+fixture sg029-09-no-date-visible-cosmetics: score=1.000 needs=1 unknowns=1 items=1.00
+fixture sg029-10-partial-label-cosmetics: score=1.000 needs=1 unknowns=1 items=1.00
+field_accuracy=0.833 over 10 fixtures
+unknown_rate=4/7=0.571
+correction_rate=0/6=0.000 (audit_event plugin.assertion.write rows=6)
+rc=0
+# == backend/eval/baseline_sg029_frozen.md (0.833 / 0.571 / 0.000, 10 fixtures, audit rows 6). No drift.
+
+$ ../venv/bin/python eval/run.py --corpus sg079
+CORPUS INTEGRITY FAILURE
+  - sg079_01_clean_food.json: missing key 'image'
+  - sg079_01_clean_food.json: image reference missing
+  - sg079_02_partial_food.json: missing key 'image'
+  - sg079_02_partial_food.json: image reference missing
+  - sg079_03_glare_medicine.json: missing key 'image'
+  - sg079_03_glare_medicine.json: image reference missing
+  - sg079_04_partial_medicine.json: missing key 'image'
+  - sg079_04_partial_medicine.json: image reference missing
+  - sg079_05_clean_cosmetics.json: missing key 'image'
+  - sg079_05_clean_cosmetics.json: image reference missing
+  - sg079_06_glare_cosmetics.json: missing key 'image'
+  - sg079_06_glare_cosmetics.json: image reference missing
+rc=1
+
+$ ../venv/bin/python eval/run.py --corpus sg049
+CORPUS INTEGRITY FAILURE
+  - sg049_v2_01_clean_food.json: missing key 'image'
+  - sg049_v2_01_clean_food.json: image reference missing
+  - sg049_v2_02_partial_medicine.json: missing key 'image'
+  - sg049_v2_02_partial_medicine.json: image reference missing
+  - sg049_v2_03_clean_cosmetics.json: missing key 'image'
+  - sg049_v2_03_clean_cosmetics.json: image reference missing
+rc=1
+# sg049/sg079 are scoring-only corpora (no images). Their own frozen records document this gate
+# refusal (F-SG085-2). Their frozen numbers reproduce through the runner's own score_fixture +
+# run_bridge_sandbox path — the committed reproduction test below.
+
+$ ../venv/bin/python -m pytest tests/test_eval_corpus.py -v
+collected 13 items
+tests/test_eval_corpus.py::test_manifest_counts_match_committed_fixtures PASSED
+tests/test_eval_corpus.py::test_every_fixture_has_image_truth_class_and_category PASSED
+tests/test_eval_corpus.py::test_categories_and_all_case_shapes_present PASSED
+tests/test_eval_corpus.py::test_cosmetics_fixtures_carry_opened_date_truth PASSED
+tests/test_eval_corpus.py::test_provider_output_cache_parses_strictly PASSED
+tests/test_eval_corpus.py::test_images_are_synthetic_pngs_with_no_exif PASSED
+tests/test_eval_corpus.py::test_scorer_discriminates_below_one_for_a_recorded_reason PASSED
+tests/test_eval_corpus.py::test_selector_lists_every_manifest_corpus_and_defaults_to_sg029 PASSED
+tests/test_eval_corpus.py::test_selector_rejects_unknown_corpus_loudly PASSED
+tests/test_eval_corpus.py::test_default_invocation_scores_sg029_like_the_frozen_baseline PASSED
+tests/test_eval_corpus.py::test_frozen_baseline_reproduces_every_selected_corpus[sg029] PASSED
+tests/test_eval_corpus.py::test_frozen_baseline_reproduces_every_selected_corpus[sg049] PASSED
+tests/test_eval_corpus.py::test_frozen_baseline_reproduces_every_selected_corpus[sg079] PASSED
+13 passed in 0.79s
+# sg049 frozen record value field_accuracy=1.000 (3 fixtures); sg079 = 1.000 (6 fixtures). Both reproduced.
+
+######## Leg G1 — suite / ruff / mypy / secrets / provider rows ########
+
+$ ../venv/bin/python -m pytest -q
+FAILED tests/test_signals.py::test_generated_codes_are_validated_and_bad_checksum_is_not_an_identifier
+FAILED tests/test_signals.py::test_ocr_has_text_boxes_and_mean_confidence
+2 failed, 376 passed, 22 warnings in 19.31s
+# 2 known decoder env reds (pyzbar/libzbar not installed; pytesseract not installed). The worktree was
+# clean and HEAD == origin/automation at run time → this IS bare BASE; re-measured, not inherited.
+
+$ ../venv/bin/python -m ruff check .
+All checks passed!
+ruff rc=0
+
+$ ../venv/bin/python -m mypy app
+app/schemas/asset.py:53: error: Missing type arguments for generic type "dict"  [type-arg]
+... (41 lines, same set as base) ...
+Found 41 errors in 9 files (checked 75 source files)
+mypy rc=1   (delta 0 vs base 41-in-9; no app/ hunk in this slice)
+
+$ ../venv/bin/python - <<'PY'   # forced fresh sandbox ProviderCall query
+provider_call rows after forced fresh sandbox = 0
+PY
+
+######## Leg G1 — stage artifact read-back (PG-EV-02) ########
+
+$ for f in backend/eval/baseline_sg029_frozen.md backend/eval/baseline_sg049_frozen.md \
+           backend/eval/baseline_sg079_frozen.md backend/scripts/backup_restore_drill.py \
+           backend/tests/test_backup_drill.py backend/tests/test_privacy_audit.py; do
+    [ -f "$f" ] && echo "PRESENT $f $(wc -c < "$f")B" || echo "MISSING $f"; done
+PRESENT backend/eval/baseline_sg029_frozen.md 3737B
+PRESENT backend/eval/baseline_sg049_frozen.md 2991B
+PRESENT backend/eval/baseline_sg079_frozen.md 2826B
+PRESENT backend/scripts/backup_restore_drill.py 9754B
+PRESENT backend/tests/test_backup_drill.py 4323B
+PRESENT backend/tests/test_privacy_audit.py 18995B
+
+$ git grep -n "Backup and restore drill\|CO-42\|backup_restore_drill\|Restoring production from backup" README.md
+README.md:117:### Backup and restore drill
+README.md:122:evidence directory through a recursive read. `backend/scripts/backup_restore_drill.py`
+README.md:128:backend/venv/bin/python backend/scripts/backup_restore_drill.py \
+README.md:136:directory, leaving the hashes on stdout. **Restoring production from backup is an
+README.md:137:incident, never silent cleanup** (`CO-42`).
+
+$ git grep -n "EXPECTED_TABLES" -- 'backend/**'
+(empty)
+$ git grep -n "EXPECTED_TABLES" -- '*.py'
+(empty)
+# 0 hits in the backend tree and in any Python file. (Docs/history/worklogs mention the removed name; code does not.)
+
+######## Leg G2 — ratings completeness read-back ########
+
+$ grep -n "SG-085\|SG-086\|SG-087\|SG-088\|SG-090\|SG-091" docs/ratings.md   # located rows
+docs/ratings.md:283:### SG-090 (2026-09-21 - SG-085 failure probe, GO)
+docs/ratings.md:287:| SG-090 | … | medium | 98 |  | GREEN - GO for SG-085 --force … | … | packet |
+docs/ratings.md:289:### SG-085 (2026-09-21 - Phase 5 slice 1, eval selector + frozen baselines, one transient retry)
+docs/ratings.md:293:| SG-085 | … | medium | 98 |  | GREEN - … | … | coder |
+docs/ratings.md:295:### SG-086 (2026-09-21 - Phase 5 slice 2, backup/restore drill, production READ)
+docs/ratings.md:299:| SG-086 | … | medium | 97 |  | GREEN - … | … | coder |
+docs/ratings.md:301:### SG-087 (2026-09-21 - Phase 5 slice 3, privacy-controls audit, no hole)
+docs/ratings.md:305:| SG-087 | … | medium | 98 |  | GREEN - … | … |  |
+docs/ratings.md:307:### SG-091 (2026-09-21 - SG-088 failure probe, GO with stated caveat)
+docs/ratings.md:311:| SG-091 | … | medium | 98 |  | GREEN - GO for SG-088 --force … | … |  |
+docs/ratings.md:313:### SG-088 (2026-09-21 - Phase 5 slice 4, derived registry, one transient retry)
+docs/ratings.md:317:| SG-088 | … | medium | 98 |  | GREEN - … | … |  |
+# Present: SG-085 98 / SG-086 97 / SG-087 98 / SG-088 98 / SG-090 98 / SG-091 98 — all six, all no flag.
+
+######## Leg G2 — limits verification (raw greps) ########
+
+$ git grep -n "D108" -- '*.md'
+STATE.md:7:  … Enrich OFF→Jina D108 (Jina key placed, live on next recreate; Vision deferred) …
+STATE.md:26:- `D108` … Enrich stage APPROVED as OFF → Jina only … Vision Web Detection DEFERRED …
+$ git grep -n "D109" -- '*.md'
+STATE.md:27:- `D109` … Jina key provision APPROVED and owner-PLACED in host backend `.env`.
+$ git grep -n "D118" -- '*.md'
+STATE.md:45:- `D118` … backup cadence + off-box copies DEFERRED — runbook stays manual …
+$ sed -n '30,36p' docs/adr/ADR-007-provider-privacy.md
+… Retention policy for ledger rows is decided no later than the production-datastore slice.
+$ ls backend/eval/corpus/
+sg029/  sg049/  sg079/  sg026_01_clean.json … sg026_05_no_date_visible.json
+# sg026 loose files at corpus root; corpus/manifest.json absent → not selectable (limit 4).
+$ git grep -ni "pilot tier" -- '*.md'
+STATE.md:8:**Open threads:** pilot tiers uncalibrated (usage owed) …
+# limits 1,2,3,5,6,8 verified in plan/STATE/ADR as quoted in the report.
+
+######## Leg G3 — README decision + PG-SC-11 + exclusions ########
+
+$ git grep -niE "phase [0-9]|hardening|exit condition|roadmap" README.md
+README.md:3:StorageGenie is a Phase 0 local-first asset catalog …
+README.md:7:## Phase 0 runbook
+README.md:139:## Phase 1 runbook
+README.md:228:## Phase 2 runbook — AI extraction (Food + Medicine)
+README.md:298:## Phase 3 runbook — usability block, planning, chat, Cosmetics
+# No Phase 4/5 status statement exists → no misstatement → NO README DELTA OWED.
+
+$ git grep -nE "latest|\[-1\]|HEAD~1|glob\(" -- 'backend/tests/**'
+backend/tests/test_chat.py:454:    document_content = provider.texts[-1]
+backend/tests/test_eval_corpus.py:59:    on_disk = sorted(p.name for p in SG029_DIR.glob("*.json") if p.name != MANIFEST.name)
+backend/tests/test_evidence_upload.py:256:    assert not list(TEST_STORAGE_ROOT.rglob("*.tmp"))
+backend/tests/test_extraction_contract.py:377:    fixtures = sorted(CORPUS_DIR.glob("*.json"))
+backend/tests/test_privacy_audit.py:197:    for path in sorted(APP_DIR.rglob("*.py")):
+backend/tests/test_privacy_audit.py:207:    for path in sorted(APP_DIR.rglob("*.py")):
+backend/tests/test_privacy_audit.py:230:    for path in sorted(APP_DIR.rglob("*.py")):
+backend/tests/test_privacy_audit.py:452:    for path in sorted(APP_DIR.rglob("*.py")):
+backend/tests/test_signals.py:125:    bad_value = ean_value[:-1] + ("0" if ean_value[-1] != "0" else "1")
+backend/tests/test_signals.py:126:    bad_image, _ = _ean13_image(ean_value[:-1], bad_value[-1])
+# Verdicts: all position-independent. test_chat texts[-1] = last provider text; test_signals[:-1]/[-1]
+# = EAN checksum string ops; glob/rglob = content/corpus/scan enumerations. None end-relative over a
+# baseline/manifest/README/artifact this slice reads. `latest`/`HEAD~1`/tail-glob: 0 hits.
+
+$ git status --porcelain backend/app
+(empty)
+$ git status --porcelain backend/alembic
+(empty)
+$ git status --porcelain backend/app/services/providers/prompts
+(empty)
+$ git grep -n "EXPECTED_TABLES" -- 'backend/**' '*.py'
+(empty)
+
+######## Leg G4 — final gates over the slice diff (after staging the 3 worklog files) ########
+
+$ git add docs/worklogs/SG-089.log docs/worklogs/SG-089_report.md docs/worklogs/SG-089_verify.log
+$ git status --porcelain
+A  docs/worklogs/SG-089.log
+A  docs/worklogs/SG-089_report.md
+A  docs/worklogs/SG-089_verify.log
+$ git diff --cached --stat
+ docs/worklogs/SG-089.log        |  69 ++++++++++++
+ docs/worklogs/SG-089_report.md  | 232 ++++++++++++++++++++++++++++++++++++++++
+ docs/worklogs/SG-089_verify.log | 219 +++++++++++++++++++++++++++++++++++++
+ 3 files changed, 520 insertions(+)
+
+$ git diff --cached | grep -nE "api_key|OPENCODE_API_KEY|Bearer|[Tt]oken"
+146:  +- **Secret grep-gate over the diff** (`api_key|OPENCODE_API_KEY|Bearer|[Tt]oken`, SG-037 shape):
+# 1 hit — the literal gate PATTERN quoted in this report's own prose, not a secret shape.
+# 0 real secret shapes (no key value, no Bearer token, no credential literal).
+
+$ git status --porcelain backend/app          → (empty, 0 lines)
+$ git status --porcelain backend/alembic      → (empty, 0 lines)
+$ git status --porcelain backend/app/services/providers/prompts → (empty, 0 lines)
+$ git grep -c "EXPECTED_TABLES" -- 'backend/**' '*.py' → 0 files matched (0 hits)
