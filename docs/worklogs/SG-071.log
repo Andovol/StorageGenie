@@ -1,0 +1,22 @@
+SG-071 running log — dispatch probe: why did the SG-066 unit fail at launch
+
+[09:59:59Z] coder proc start (unit dispatch-storagegenie@SG-071): opencode run --auto --dir /home/andrei/StorageGenie --variant medium ; no --model on argv (CLI default, omitted per policy).
+[recon] branch=automation ; git status --porcelain EMPTY ; remote git@github.com:Andovol/StorageGenie.git.
+[recon] HEAD cc4a5315… == origin/automation cc4a5315… ; log -3: cc4a531 D91 (SG-071 packet), 65536de D90 (SG-066 packet), c8b11e1 D89.
+[recon] SG-066 packet present, 12938 B, blob b3af8c09…, byte-identical to 65536de blob (git diff empty).
+[recon] contract /home/andrei/storagegenie-contract/VERSION = 0.28.2 ; contract repo HEAD b495b59 (grafted, contract/v0.28.2).
+[G2] disk /home/andrei/StorageGenie + /tmp: /dev/vda1 232G, 124G avail, 47% used.
+[G2] docker info ServerVersion=29.6.2 Containers=2 Images=2 ; docker images -q = 2. No build/pull/run/exec/inspect.
+[G2] residue criterion: per-ID durable state left readable for a launch-failed ID. Expectation (legacy wrapper STATE dir /run/user/1000/storagegenie-dispatch): none -> confirmed ABSENT.
+[G2] actual residue: output/dispatch/SG-066.launcher.sh+SG-066.log (gitignored) ; unit @SG-066 failed/retained ; refs/quarantine/SG-066-20260921T095958Z=ae29ca4 ; Negative-Receipt note 852f055 ; .git/dispatch_last_id=SG-071 ; .git/dispatch.lock held.
+[G2] live engine identified: forced cmd `DISPATCH_CONF=/etc/dispatch/storagegenie.conf /usr/local/bin/dispatch` (NOT /opt/.../dispatch_coder.sh, whose coder whitelist is grok|codex).
+[ROOT] packet premise "failed BEFORE any Coder work" is FALSE: launcher ran opencode 299s; 11 files/+1776 lines; tests 15 passed/2 failed; CLI aborted at output/dispatch/SG-066.log:2612 `Error: Upstream request failed: [server_error] Upstream response was not valid JSON`; exit=1, no commit, no receipt.
+[ROOT] terminal cause = transient upstream provider fault (invalid JSON), not a launch precondition. Debris preserved by engine dirty-tree quarantine (ae29ca4, 09:59:58Z).
+[ROOT] secondary: opencode EROFS mkdir /home/andrei/.local/state/opencode/locks (ReadWritePaths lacks ~/.local/state/opencode); non-fatal here; Architect-fixable follow-up.
+[ROOT] premise nuance: notes ref has a note, but it is a Negative-Receipt (`Negative-Receipt-ID:`, not `Dispatch-ID:`), so the replay guard correctly sees no receipt.
+[G3] GO to re-fire SG-066 --force: tree clean, tip==origin/automation==cc4a531, SG-066 packet present+identical, disk 124G free, docker reachable.
+[cost] zero metered calls; real spend $0.000000.
+[commit] 3 docs-only worklog files under docs/worklogs.
+[end] worktree clean; overall well under 300s.
+
+(End of file)

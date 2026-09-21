@@ -1,0 +1,147 @@
+SG-071 verify log — raw outputs (dispatch probe: why did the SG-066 unit fail at launch)
+All commands read-only; no writes outside docs/worklogs; no unit started/polled/retried; $0 metered.
+
+== G1 / refs ==
+$ git branch --show-current
+automation
+$ git status --porcelain
+(empty)
+$ git rev-parse HEAD
+cc4a53151ae364d4615d7c2532a7132f773ecf55
+$ git rev-parse origin/automation
+cc4a53151ae364d4615d7c2532a7132f773ecf55
+$ git log --oneline -3
+cc4a531 D91: SG-071 dispatch probe packet (SG-066 launch failure)
+65536de D90: SG-066 analytics Insight Agent packet (split scope)
+c8b11e1 D89 bot branch policy + opencode.json gitignore + SG-066 priority
+
+== PACKET PRESENCE (docs/packets/SG-066-analytics-insight-agent.md) ==
+$ ls -la docs/packets/SG-066-analytics-insight-agent.md
+-rw-r--r-- 1 andrei andrei 12938 ... docs/packets/SG-066-analytics-insight-agent.md
+$ git diff 65536de HEAD -- docs/packets/SG-066-analytics-insight-agent.md
+(empty)
+$ git rev-parse HEAD:docs/packets/SG-066-analytics-insight-agent.md
+b3af8c09f2864963726714cafb70847f732f5596
+$ git rev-parse 65536de:docs/packets/SG-066-analytics-insight-agent.md
+b3af8c09f2864963726714cafb70847f732f5596
+$ git log --oneline -- docs/packets/SG-066-analytics-insight-agent.md
+65536de D90: SG-066 analytics Insight Agent packet (split scope)
+
+== G2 / disk ==
+$ df -h /home/andrei/StorageGenie
+Filesystem      Size  Used Avail Use% Mounted on
+/dev/vda1       232G  109G  124G  47% /home/andrei/StorageGenie
+$ df -h /tmp
+Filesystem      Size  Used Avail Use% Mounted on
+/dev/vda1       232G  109G  124G  47% /tmp
+
+== G2 / docker (read-only) ==
+$ docker info --format '{{.ServerVersion}} {{.Containers}} {{.Images}}'
+29.6.2 2 2
+$ docker images -q | wc -l
+2
+(No build/pull/run/exec/container-inspect performed.)
+
+== G2 / residue enumeration ==
+Criterion: per-ID durable state the engine leaves readable for an ID whose unit failed at launch.
+Expectation stated: NONE under the legacy wrapper STATE dir (/run/user/1000/storagegenie-dispatch).
+$ ls -la /run/user/1000/storagegenie-dispatch/
+ls: cannot access '/run/user/1000/storagegenie-dispatch/': No such file or directory
+Actual (live engine = /usr/local/bin/dispatch + run-coder):
+$ ls -la /home/andrei/StorageGenie/output/dispatch/ | grep -E 'SG-066|SG-071'
+-rwx------ SG-066.launcher.sh 224B ; -rw-r--r-- SG-066.log 130.9K
+-rwx------ SG-071.launcher.sh 215B ; -rw-r--r-- SG-071.log 119.0K
+$ git check-ignore -v output/dispatch/SG-066.log
+output/dispatch/.gitignore:1:*	output/dispatch/SG-066.log
+$ systemctl list-units --all 'dispatch-storagegenie*' --no-pager
+● dispatch-storagegenie@SG-066.service loaded failed     failed   Confined Coder slice SG-066
+  dispatch-storagegenie@SG-071.service loaded activating start  start Confined Coder slice SG-071
+$ cat /home/andrei/StorageGenie/.git/dispatch_last_id
+SG-071
+$ ls -la /home/andrei/StorageGenie/.git/ | grep -iE 'dispatch|lock'
+-rw-rw-r-- dispatch.lock (0B) ; -rw-r--r-- dispatch_known_hosts (978B) ; -rw-rw-r-- dispatch_last_id (6B)
+$ git for-each-ref --format='%(refname) %(objectname)' refs/quarantine/
+refs/quarantine/SG-025-20260912T164340Z b6f17d5b9902932c550df26843df02ceec50ba7b
+refs/quarantine/SG-066-20260921T095958Z ae29ca495209d4e278ea4d5b1569d32b58cd663a
+refs/quarantine/preserve-20260907T083833Z 6d968569104fe0168ce96c02971dfd8a9687aa22
+
+== NEGATIVE-RECEIPT NOTE (local notes ref) ==
+$ git notes --ref=refs/notes/storagegenie-coder-reports show 852f055f4488ddd43f29f6e51fb40ecf321de1ae
+Negative-Receipt-ID: SG-066
+utc=2026-09-21T09:53:57Z
+DISPATCH_RESULT id=SG-066 coder=opencode exit=1 head=65536de076a8d8cf04007632a86b226afed17cb2 note=no moved=no rewrite=no dirty=yes elapsed=299s budget=2100s
+P1_moved=FAIL count=0
+P2_rewrite=PASS behind=0
+P3_note=FAIL note=no
+P5_receipt=FAIL
+P6_dirty=FAIL dirty=yes
+
+== QUARANTINE COMMIT (debris) ==
+$ git show --stat ae29ca495209d4e278ea4d5b1569d32b58cd663a
+commit ae29ca495209d4e278ea4d5b1569d32b58cd663a
+Author: Andrei P <popescu.m.andrei@gmail.com>
+Date:   Mon Sep 21 09:59:58 2026 +0000
+    quarantine: debris from SG-066 (no receipt)
+ 11 files changed, 1776 insertions(+)
+
+== LIVE ENGINE (forced command: DISPATCH_CONF=/etc/dispatch/storagegenie.conf /usr/local/bin/dispatch) ==
+$ grep -o 'command="[^"]*"' /home/andrei/.ssh/authorized_keys
+command="DISPATCH_CONF=/etc/dispatch/storagegenie.conf /usr/local/bin/dispatch"
+(/opt/storagegenie-dispatch/dispatch_coder.sh is NOT the storagegenie forced command; its whitelist is grok|codex.)
+$ cat /etc/dispatch/storagegenie.conf   (no secrets)
+PROJECT=storagegenie ROOT=/home/andrei/StorageGenie BRANCH=automation
+NOTES_REF=refs/notes/storagegenie-coder-reports CODER=codex
+CODER_STATE_DIR='/home/andrei/.codex /home/andrei/.grok /home/andrei/.local/share/opencode'
+XDG_RUNTIME_DIR=/run/user/1000
+$ cat /etc/systemd/system/dispatch-storagegenie@.service.d/10-project.conf
+ReadWritePaths=/home/andrei/StorageGenie /home/andrei/.codex /home/andrei/.grok /home/andrei/.local/share/opencode /home/andrei/storagegenie-contract /run/user/1000
+
+== UNIT RESULT SG-066 ==
+$ systemctl show 'dispatch-storagegenie@SG-066.service' -p Result,ExecMainStatus,ExecMainStartTimestamp,TimeoutStartUSec,ActiveState,SubState --no-pager
+ExecMainStartTimestamp=Mon 2026-09-21 09:48:58 UTC ; ExecMainStatus=1 ; Result=exit-code ; TimeoutStartUSec=35min ; ActiveState=failed ; SubState=failed
+
+== JOURNAL SG-066 (run-coder) ==
+$ journalctl -u 'dispatch-storagegenie@SG-066.service' --no-pager -q
+Sep 21 09:49:00 ubuntu run-coder[4085667]: contract_sync=refresh version=0.28.2
+Sep 21 09:53:57 ubuntu run-coder[4085667]: DISPATCH_RESULT id=SG-066 coder=opencode exit=1 head=65536de076a8d8cf04007632a86b226afed17cb2 note=no moved=no rewrite=no dirty=yes elapsed=299s budget=2100s
+Sep 21 09:54:00 ubuntu run-coder[4085667]: model=cli-default
+Sep 21 09:54:00 ubuntu run-coder[4085667]: effort=medium
+Sep 21 09:54:00 ubuntu run-coder[4085667]: P1_moved=FAIL count=0
+Sep 21 09:54:00 ubuntu run-coder[4085667]: P2_rewrite=PASS behind=0
+Sep 21 09:54:00 ubuntu run-coder[4085667]: P3_note=FAIL note=no
+Sep 21 09:54:00 ubuntu run-coder[4085667]: P5_receipt=FAIL
+Sep 21 09:54:00 ubuntu run-coder[4085667]: P6_dirty=FAIL dirty=yes
+Sep 21 09:54:00 ubuntu run-coder[4085667]: negative_receipt=published
+Sep 21 09:54:00 ubuntu run-coder[4085667]: restart_marker_committed=PASS
+Sep 21 09:54:00 ubuntu run-coder[4085667]: advisory_failed=P1_moved,P3_note,P6_dirty
+
+== CODER LOG TAIL (output/dispatch/SG-066.log; the actual launch evidence) ==
+$ cat output/dispatch/SG-066.launcher.sh
+#!/usr/bin/env bash
+set -euo pipefail
+cd /home/andrei/StorageGenie
+PROMPT_FILE=docs/packets/SG-066-analytics-insight-agent.md
+exec opencode run --auto --dir /home/andrei/StorageGenie --variant medium "$(cat "$PROMPT_FILE")"
+$ sed -n '2612p' output/dispatch/SG-066.log
+Error: Upstream request failed: [server_error] Upstream response was not valid JSON
+$ sed -n '2544p;2569p' output/dispatch/SG-066.log
+E       AssertionError: assert 'category.food_beverages' in '---\ntemplate_version: analytics-v1...'
+E       AssertionError: assert 'expiry.no_expiry_date' in '---\ntemplate_version: analytics-v1...'
+(2 failed, 15 passed, 2 warnings in 2.29s — coder was mid-edit on backend/tests/test_analytics.py when the CLI aborted)
+
+== SECONDARY ENV FINDING (opencode EROFS; non-fatal) ==
+$ grep EROFS /home/andrei/.local/share/opencode/log/opencode.log
+timestamp=2026-09-21T09:49:01.208Z level=ERROR run=50165eb6 message="Failed to fetch models.dev" cause="Cause([Die(Error: EROFS: read-only file system, mkdir '/home/andrei/.local/state/opencode/locks/5943c4b6fc191a877811edc8c426a7c075682356.lock')])"
+(ReadWritePaths grants ~/.local/share/opencode but NOT ~/.local/state/opencode; the opencode run continued 299s after this.)
+
+== SG-071 SELF (model/effort provenance) ==
+$ grep 'llm.model' opencode.log | grep run=d497a8d9 | head -1
+llm.provider=opencode-go llm.model=deepseek-v4.1-flash
+$ systemctl show 'dispatch-storagegenie@SG-071.service' -p ExecMainStartTimestamp
+ExecMainStartTimestamp=Mon 2026-09-21 09:59:59 UTC
+
+== CONTRACT ECHO (source: /home/andrei/storagegenie-contract/VERSION) ==
+$ cat /home/andrei/storagegenie-contract/VERSION
+0.28.2
+$ git -C /home/andrei/storagegenie-contract show -s --format='%H %d'
+b495b59b3426af66772a87939473ac558f8f72d2  (grafted, HEAD -> contract, origin/contract)
