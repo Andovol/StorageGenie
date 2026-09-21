@@ -39,16 +39,23 @@ def _existing_asset_for_evidence(db: Session, household_id: str, evidence_id: st
     )
 
 
-def _similar_matches(db: Session, household_id: str, evidence_id: str, phash: str) -> list[dict[str, object]]:
-    rows = (
-        db.query(Observation, Asset)
-        .join(asset_evidence, asset_evidence.c.evidence_id == Observation.evidence_id)
-        .join(Asset, Asset.id == asset_evidence.c.asset_id)
-        .filter(Asset.household_id == household_id, Observation.kind == "phash")
-        .all()
-    )
+def _similar_matches(
+    db: Session,
+    household_id: str,
+    evidence_id: str,
+    phash: str,
+    phash_rows: list[tuple[Observation, Asset]] | None = None,
+) -> list[dict[str, object]]:
+    if phash_rows is None:
+        phash_rows = (
+            db.query(Observation, Asset)
+            .join(asset_evidence, asset_evidence.c.evidence_id == Observation.evidence_id)
+            .join(Asset, Asset.id == asset_evidence.c.asset_id)
+            .filter(Asset.household_id == household_id, Observation.kind == "phash")
+            .all()
+        )
     matches: list[dict[str, object]] = []
-    for row, asset in rows:
+    for row, asset in phash_rows:
         value = _observation_value(row).get("hash")
         if not isinstance(value, str) or row.evidence_id == evidence_id:
             continue
@@ -58,21 +65,27 @@ def _similar_matches(db: Session, household_id: str, evidence_id: str, phash: st
     return matches
 
 
-def _identifier_collisions(db: Session, household_id: str, evidence_id: str) -> list[dict[str, object]]:
+def _identifier_collisions(
+    db: Session,
+    household_id: str,
+    evidence_id: str,
+    existing_identifiers: dict[str, str] | None = None,
+) -> list[dict[str, object]]:
     rows = db.query(Observation).filter(Observation.evidence_id == evidence_id, Observation.kind == "barcode_qr").all()
-    assertions = (
-        db.query(Assertion, Asset)
-        .join(Asset, Asset.id == Assertion.asset_id)
-        .filter(Asset.household_id == household_id, Assertion.field_path == "identifier")
-        .all()
-    )
-    existing: dict[str, str] = {}
-    for assertion, asset in assertions:
-        try:
-            value = json.loads(assertion.value_json)
-        except json.JSONDecodeError:
-            value = assertion.value_json
-        existing[str(value)] = asset.id
+    if existing_identifiers is None:
+        assertions = (
+            db.query(Assertion, Asset)
+            .join(Asset, Asset.id == Assertion.asset_id)
+            .filter(Asset.household_id == household_id, Assertion.field_path == "identifier")
+            .all()
+        )
+        existing_identifiers = {}
+        for assertion, asset in assertions:
+            try:
+                value = json.loads(assertion.value_json)
+            except json.JSONDecodeError:
+                value = assertion.value_json
+            existing_identifiers[str(value)] = asset.id
 
     collisions: list[dict[str, object]] = []
     for row in rows:
@@ -80,12 +93,12 @@ def _identifier_collisions(db: Session, household_id: str, evidence_id: str) -> 
         if value.get("validated") is not True or not value.get("value"):
             continue
         identifier = str(value["value"])
-        if identifier in existing:
+        if identifier in existing_identifiers:
             collisions.append(
                 {
                     "type": "identifier_collision",
                     "identifier": identifier,
-                    "asset_id": existing[identifier],
+                    "asset_id": existing_identifiers[identifier],
                     "evidence_id": evidence_id,
                 }
             )
@@ -105,6 +118,30 @@ def deduplicate_job(db: Session, job: Job) -> dict[str, object]:  # noqa: C901
     if len(by_id) != len(set(evidence_ids)) or any(row.household_id != job.household_id for row in evidence_rows):
         raise ValueError("job evidence does not belong to its household")
 
+    # Bolt performance optimization: pre-fetch household-level phash observations
+    # and identifier assertions once before iterating over evidence items to eliminate N+1 queries.
+    household_phash_rows = (
+        db.query(Observation, Asset)
+        .join(asset_evidence, asset_evidence.c.evidence_id == Observation.evidence_id)
+        .join(Asset, Asset.id == asset_evidence.c.asset_id)
+        .filter(Asset.household_id == job.household_id, Observation.kind == "phash")
+        .all()
+    ) if job.household_id else []
+
+    identifier_assertions = (
+        db.query(Assertion, Asset)
+        .join(Asset, Asset.id == Assertion.asset_id)
+        .filter(Asset.household_id == job.household_id, Assertion.field_path == "identifier")
+        .all()
+    ) if job.household_id else []
+    existing_identifiers: dict[str, str] = {}
+    for assertion, asset in identifier_assertions:
+        try:
+            val = json.loads(assertion.value_json)
+        except json.JSONDecodeError:
+            val = assertion.value_json
+        existing_identifiers[str(val)] = asset.id
+
     matches: list[dict[str, object]] = []
     exact_assets: list[str] = []
     collisions: list[dict[str, object]] = []
@@ -118,8 +155,8 @@ def deduplicate_job(db: Session, job: Job) -> dict[str, object]:  # noqa: C901
         for observation in db.query(Observation).filter_by(evidence_id=evidence_id, kind="phash").all():
             value = _observation_value(observation).get("hash")
             if isinstance(value, str):
-                matches.extend(_similar_matches(db, job.household_id or "", evidence_id, value))
-        collisions.extend(_identifier_collisions(db, job.household_id or "", evidence_id))
+                matches.extend(_similar_matches(db, job.household_id or "", evidence_id, value, phash_rows=household_phash_rows))
+        collisions.extend(_identifier_collisions(db, job.household_id or "", evidence_id, existing_identifiers=existing_identifiers))
 
     for row in db.query(Observation).filter(Observation.evidence_id.in_(evidence_ids), Observation.kind == "barcode_qr").all():
         value = _observation_value(row)
