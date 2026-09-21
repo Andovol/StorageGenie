@@ -20,11 +20,11 @@ Rebuilt `storagegenie-backend:latest` from BASE and recreated the single backend
 
 | Leg | Actual | Bound | Margin |
 |---|---|---|---|
-| Reconf (git/docker/pre curls/sqlite) | ~22 s | 120 s | under |
+| Reconf (git/docker/pre curls/sqlite) | ~29 s | 120 s | under |
 | G1 `docker compose build` | **16.340 s** | 900 s | under |
 | G1 `docker compose up -d` (one recreate) | **1.332 s** | 900 s | under |
 | G1/G2 health + discriminators + G2b | ~15 s | 120 s | under |
-| **Overall (proc 09:11:28Z → work commit)** | **~9 min** | 1800 s | under |
+| **Overall (proc 09:11:28Z → final commit 09:14:06Z)** | **158 s (2 min 38 s)** | 1800 s | under |
 
 No command was killed; no interactive command was run.
 
