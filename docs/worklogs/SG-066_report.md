@@ -207,3 +207,21 @@ Work pushed to `automation`, worktree clean (`CO-55`). No push to `storagegenie-
 `{{RECEIPT_CMD}}`. Note added on the work HEAD, the notes ref pushed, then fetched into a **mapped**
 local name and verified with `show`; the executed output is pasted in the appended
 "Receipt verification" section of this file. Final line: `note=yes`.
+
+<!-- ===== appended docs-only receipt commit (SG-071 precedent) ===== -->
+
+## Receipt verification (appended commit; pasted executed output)
+
+Work HEAD `0c9fc1bac2420d4239bdfe483b7c1d0b49827108`; note added on it; notes ref pushed
+`e018da7..7150feb  refs/notes/storagegenie-coder-reports -> refs/notes/storagegenie-coder-reports`;
+then fetched into a MAPPED local name `refs/notes/sg066-fetched` and shown from that fetched ref:
+
+```
+$ git fetch origin refs/notes/storagegenie-coder-reports:refs/notes/sg066-fetched
+ok fetched (1 new refs)
+
+$ git notes --ref=refs/notes/sg066-fetched show 0c9fc1bac2420d4239bdfe483b7c1d0b49827108
+Dispatch-ID: SG-066 | Report: docs/worklogs/SG-066_report.md | Work-HEAD: 0c9fc1bac2420d4239bdfe483b7c1d0b49827108
+```
+
+`note=yes`
