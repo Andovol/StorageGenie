@@ -1,0 +1,8 @@
+Negative-Receipt-ID: SG-073
+utc=2026-09-21T10:38:50Z
+DISPATCH_RESULT id=SG-073 coder=opencode exit=0 head=fafc53d67451efbd01d42f1d534f3c6c529f98fb note=no moved=yes rewrite=no dirty=no elapsed=439s budget=2100s
+P1_moved=PASS count=2
+P2_rewrite=PASS behind=0
+P3_note=FAIL note=no
+P5_receipt=FAIL
+P6_dirty=PASS dirty=no
