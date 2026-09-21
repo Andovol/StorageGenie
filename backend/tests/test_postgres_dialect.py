@@ -4,63 +4,27 @@ The SQLite-only FTS5 objects in
 ``backend/alembic/versions/20260908_sg017_fts.py`` are excluded by rule:
 SQLite FTS5 has no PostgreSQL equivalent. ADR-008 records the deliberate
 FTS5-first choice and the later PostgreSQL/semantic-search divergence.
+
+The table set is derived from the REAL ``Base.metadata`` the app registers via
+its composition root; this test never re-lists table names, so a table-adding
+slice cannot trip it.
 """
 
 from sqlalchemy.schema import CreateTable
 from sqlalchemy.dialects.postgresql import dialect
 
+import app.main  # noqa: F401
+
 from app.db import Base
-from app.models import (  # noqa: F401
-    Asset,
-    Assertion,
-    AuditEvent,
-    Evidence,
-    GuardrailEvent,
-    Household,
-    IdempotencyKey,
-    Job,
-    JobStep,
-    PlanningSuggestion,
-    ProviderCall,
-    ReviewTask,
-    SavedSearch,
-    SourceAttribution,
-    User,
-    asset_evidence,
-)
-from app.services.candidates import Candidate  # noqa: F401
-from app.services.observations import Observation  # noqa: F401
-
-
-EXPECTED_TABLES = {
-    "asset",
-    "asset_evidence",
-    "assertion",
-    "audit_event",
-    "candidate",
-    "evidence",
-    "guardrail_event",
-    "household",
-    "idempotency_key",
-    "job",
-    "job_step",
-    "observation",
-    "planning_suggestion",
-    "provider_call",
-    "review_task",
-    "saved_search",
-    "source_attribution",
-    "user",
-}
 
 
 def test_all_application_tables_compile_for_postgresql() -> None:
-    metadata_tables = set(Base.metadata.tables)
-    assert metadata_tables == EXPECTED_TABLES
+    metadata_tables = Base.metadata.tables
+    assert metadata_tables, "no tables registered — the app import did not run"
     postgres = dialect()
     ddl = {
-        table_name: str(CreateTable(Base.metadata.tables[table_name]).compile(dialect=postgres))
-        for table_name in sorted(EXPECTED_TABLES)
+        table_name: str(CreateTable(table).compile(dialect=postgres))
+        for table_name, table in sorted(metadata_tables.items())
     }
-    assert set(ddl) == EXPECTED_TABLES
+    assert set(ddl) == set(metadata_tables)
     assert all("CREATE TABLE" in statement for statement in ddl.values())

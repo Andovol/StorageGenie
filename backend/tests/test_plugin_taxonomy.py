@@ -22,7 +22,6 @@ from app.plugins.descriptor import (
 )
 from app.plugins.expiry_tracker import DateType, Unit
 from app.plugins.registry import PluginError, get_plugin, register_plugin
-from tests.test_postgres_dialect import EXPECTED_TABLES
 
 
 def _served(client: TestClient) -> dict[str, dict[str, object]]:
@@ -59,7 +58,7 @@ def test_descriptor_enumerates_the_shipped_enums_not_a_second_copy() -> None:
 def test_new_domain_registers_without_touching_core_tables() -> None:
     """The exit property: registration, not migration."""
     before = set(Base.metadata.tables)
-    assert before == EXPECTED_TABLES
+    assert before, "no core tables registered — the app import did not run"
 
     taxonomy = PluginTaxonomy(
         plugin_id="documents-domain",
@@ -80,7 +79,7 @@ def test_new_domain_registers_without_touching_core_tables() -> None:
     assert get_plugin("documents-domain", "0.1.0").taxonomy is taxonomy
 
     after = set(Base.metadata.tables)
-    assert after == before == EXPECTED_TABLES
+    assert after == before, f"registration changed the table set: {after ^ before}"
 
     with TestClient(app) as client:
         served = _served(client)

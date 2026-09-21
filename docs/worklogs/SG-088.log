@@ -1,0 +1,46 @@
+SG-088 worklog — derived table registry: remove the EXPECTED_TABLES static copy
+================================================================================
+
+Dispatch-ID: SG-088
+Coder / effort: opencode / medium
+  source: process argv (NOT a system-prompt identity line)
+  `pgrep -af "opencode run"` -> `opencode run --auto --dir /home/andrei/StorageGenie --variant medium # SG-088 ...`
+  model = unknown (argv carries no `--model`; the CLI default is the model, per policy)
+  effort = medium (argv `--variant medium`)
+Authoring date (metadata): 2026-09-21
+Work dir: /home/andrei/StorageGenie
+Origin: git@github.com:Andovol/StorageGenie.git (fetch+push)
+BASE (start HEAD == origin/automation): 2d6c6b1bd9ec86bfb3ea33d884ff21a901cccbae
+Contract: recorded `0.28.2` == published `b495b59`; source `/home/andrei/storagegenie-contract/VERSION`;
+  `git -C /home/andrei/storagegenie-contract rev-parse HEAD` = b495b59b3426af66772a87939473ac558f8f72d2
+Spend: $0.000000 actual — zero provider calls; no metered call exists on any path.
+  Containment per PG-PR-04 stated: nothing live exists to contain (no migration, no schema change,
+  no deploy, no restart, no provider).
+Live clock: recon 2026-09-21T17:53:59Z ; final capture 2026-09-21T17:54:29Z
+
+Leg timings (bound vs observed, units = seconds)
+  recon + premise verification (git/ast/python probes)   bound 120s  observed < 1s
+  G1 edits + target tests (8 passed)                     bound 120s  observed ~2s
+  trap probe base phase (4 failed)                       bound 120s  observed 0.66s
+  trap probe post phase (4 passed)                       bound 120s  observed 0.60s
+  tripwire plants (3 failed, 1 passed)                   bound 120s  observed 1.12s
+  bare-BASE full suite                                   bound 600s  observed 19.02s
+  POST full suite                                        bound 600s  observed 19.50s
+  ruff (app tests)                                       bound 120s  observed ~1s
+  mypy app + changed test files (base & post)            bound 120s  observed seconds
+  greps (PG-SC-05, PG-SC-11, secrets)                    bound 120s  observed < 1s
+  overall lane                                           bound 1800s wall clock ~600s
+
+What was done
+  G1: removed the static 18-name `EXPECTED_TABLES` set and its cross-file import. The dialect test now
+      derives its table set from the REAL `Base.metadata` that the app composition root registers
+      (`import app.main`); the taxonomy exit test now asserts `after == before` (registration adds no
+      table) with a non-empty `before` guard. FTS5 stays excluded by RULE (docstring unchanged in
+      substance; the FTS objects are raw SQL, never in Base.metadata). Product code untouched.
+  G2: FAIL-then-PASS demonstrated on the SAME planted table: OLD static pins fail (trap), DERIVED pins
+      pass. Both tripwires fed bad input: a table-adding registration trips the exit pin; a NullType
+      column fails the dialect compile. Bare-BASE and POST suites identical (2 decoder env reds,
+      376 passed). ruff clean; mypy app 41-in-9 both sides; changed-test mypy 4-in-1 both sides.
+  G3: this log + SG-088_report.md + SG-088_verify.log (raw outputs + both fail-then-pass runs).
+
+Raw evidence: docs/worklogs/SG-088_verify.log (all commands verbatim).
