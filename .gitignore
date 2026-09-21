@@ -38,3 +38,6 @@ Thumbs.db
 
 # Buildx builder-state (SG-023 desk #18 route — project-local, never committed per PG-SC-10)
 .cache/
+
+# Harness permission config (owner word 2026-09-21 — local-only, never committed)
+opencode.json
