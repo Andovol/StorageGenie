@@ -6,6 +6,7 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, JSONResponse
 
+from app.api.v1.analytics import router as analytics_router
 from app.api.v1.assets import router as assets_router
 from app.api.v1.candidates import router as candidates_router
 from app.api.v1.chat import router as chat_router
@@ -64,6 +65,7 @@ app.include_router(candidates_router, prefix="/v1")
 app.include_router(chat_router, prefix="/v1")
 app.include_router(plugins_router, prefix="/v1")
 app.include_router(planning_router, prefix="/v1")
+app.include_router(analytics_router, prefix="/v1")
 app.include_router(settings_router, prefix="/v1")
 
 

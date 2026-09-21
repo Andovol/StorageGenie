@@ -1,0 +1,48 @@
+SG-066 — Analytics Insight Agent: household stats + one metered NL summary
+Coder: opencode | effort: medium (--variant medium, read from process argv)
+Model: unknown (CLI default; no model id is sent per policy, none appears on argv)
+Work dir: /home/andrei/StorageGenie | branch automation | origin git@github.com:Andovol/StorageGenie.git
+
+TIMELINE (live clock; UTC unless stated)
+- G0 consent + seam gate: live 127.0.0.1:8003 answers; consent=true, provider=opencode-go,
+  key present (len 67, boolean only). Seam = one vision op extract_items(image_bytes, prompt),
+  prompts dir read. Gate PASS -> proceed.
+- G1 stats service + route + tests built; fail-then-pass captured at base 1f84d68 (GET 404,
+  POST 405, module absent) and after (13/13 pass).
+- G2 insights service + route + frozen prompt analytics-insights-v1.md.
+- G3 Analytics screen + api types/client + App.tsx registration + focused test (4 tests).
+- Suites: backend 284 passed / 2 base-proved decoder reds; ruff clean; mypy 41 == base 41;
+  frontend tsc clean, build green, vitest 164 passed, eslint clean.
+- G2 live: exactly ONE metered call, $0.00059235, rows left in place.
+
+ELAPSED VERSUS BUDGET (per leg, units)
+- G0 live probes: < 30 s wall / 120 s ordinary                               -> within
+- Backend new tests (pre + post): 1.60 s + 1.50 s / 600 s suite class        -> within
+- Full backend suite: 17.34 s / 600 s                                        -> within
+- Frontend build + tsc: ~ (tsc no errors) + 1.75 s vite / 600 s              -> within
+- Full vitest: 4.64 s / 600 s                                                -> within
+- Live leg: 2.865 s provider latency (one call) / 300 s single live-call     -> within
+- Overall session: well under the 1800 s overall bound.
+
+SPEND (real $)
+- Offline gates: $0 (scripted provider; adapter `_post` patched to raise; network_attempts == []).
+- Live leg: $0.00059235 for 1 call, vs worst-case bound $0.010 for at most 2 calls.
+  80% warning line ($0.008, uncalibrated G-A9) NOT crossed. No second call was made.
+- Metered calls this slice: 1 (ceiling 2).
+
+CONTRACT ECHO
+- recorded 0.28.2 == published /home/andrei/storagegenie-contract/VERSION = 0.28.2
+  (source path: /home/andrei/storagegenie-contract/VERSION; SG-070 receipt echo link 0.28.2).
+
+DECISIONS / DESIGN (inside constraints; reported, not asked)
+- Reused the SG-037 planning shape: one vision op `extract_items`, 1x1 white carrier PNG,
+  frozen prompt with front-matter template_version, at most one repair turn.
+- Grounding encoding: each ExtractionOutput item is one summary sentence; `item.lot` is the
+  cited stat id. A response with zero citations, or one citing an id absent from the supplied
+  stats, is a loud 502 (never trimmed). This makes the grounding check total (no vacuity).
+- Household existence is a 404 at the route; collection isolation is by household_id query
+  (a collection endpoint has no foreign resource id, so 403 does not apply; disjoint data proved).
+- Live-run mechanism under "no deploy/restart" (PG-PR-04): the one authorized run executes the
+  SAME service function in a host process against the live SQLite file the backend mounts
+  (/home/andrei/StorageGenie/data/db/storagegenie.db -> container /data/db/storagegenie.db) with
+  the live .env key/consent. The running server process is untouched. Tension flagged in report.

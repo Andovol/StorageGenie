@@ -1,5 +1,7 @@
 import type {
   AiSettings,
+  AnalyticsInsightResult,
+  AnalyticsSummary,
   Assertion,
   CandidateSplitResponse,
   ChatCorrectionResponse,
@@ -199,6 +201,20 @@ export function sendChat(category: string, householdId: string, message: string)
   return apiPost<ChatResponse>(
     `/v1/chat/${category}`,
     { message },
+    { household_id: householdId }
+  );
+}
+
+export function fetchAnalyticsSummary(householdId: string) {
+  return apiGet<AnalyticsSummary>("/v1/analytics/summary", {
+    household_id: householdId,
+  });
+}
+
+export function generateAnalyticsInsights(householdId: string) {
+  return apiPost<AnalyticsInsightResult>(
+    "/v1/analytics/insights",
+    {},
     { household_id: householdId }
   );
 }

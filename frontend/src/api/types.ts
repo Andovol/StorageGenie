@@ -218,6 +218,53 @@ export type ChatCorrectionResponse = {
   created_at: string | null;
 };
 
+// SG-066: deterministic household stats (GET /v1/analytics/summary). Every
+// stat carries the table+query string it was read through.
+export type AnalyticsStat = {
+  id: string;
+  label: string;
+  value: unknown;
+  source: string;
+};
+
+export type AnalyticsCategoryInfo = { id: string; name: string };
+
+export type AnalyticsSummary = {
+  household_id: string;
+  as_of_date: string;
+  generated_at: string;
+  assets: { total: number; active: number; by_status: Record<string, number> };
+  categories: {
+    taxonomy: AnalyticsCategoryInfo[];
+    counts: Record<string, number>;
+    uncategorized: number;
+  };
+  expiry: Record<string, number>;
+  waste: { expired_untouched: number };
+  adherence: {
+    suggestions: Record<string, number>;
+    review_tasks: Record<string, number>;
+  };
+  stats: AnalyticsStat[];
+};
+
+export type AnalyticsInsightResult = {
+  status: string;
+  reason?: string | null;
+  summary?: string | null;
+  sentences: string[];
+  cited_stat_ids: string[];
+  cited_stats?: AnalyticsStat[];
+  unresolved_stat_ids?: string[];
+  provider?: string | null;
+  model?: string | null;
+  provider_call_ids?: string[];
+  guardrail_event_id?: string;
+  usage?: Record<string, unknown>;
+  cost?: number;
+  latency_ms?: number;
+};
+
 // SG-065: the served plugin taxonomy (GET /v1/taxonomy). Descriptors are
 // immutable server-side, so the frontend never re-derives the list.
 export type TaxonomyCategory = {

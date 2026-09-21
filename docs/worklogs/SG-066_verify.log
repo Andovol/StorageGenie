@@ -1,0 +1,186 @@
+SG-066 VERIFY LOG — raw command outputs (host /home/andrei/StorageGenie, 2026-09-21)
+
+All commands run with the repo venv (`/home/andrei/StorageGenie/venv/bin/python`).
+Ordinary commands 120 s, suite/build 600 s, single live call 300 s.
+
+============================================================
+[G0-1] LIVE CONSENT SURFACE (GET /v1/settings/ai on 127.0.0.1:8003)
+============================================================
+$ curl -s -m 10 http://127.0.0.1:8003/v1/settings/ai
+{"provider_id":"opencode-go","model_id":"deepseek-v4-flash-vision-exp","allowed_model_ids":["deepseek-v4-flash-vision-exp"],"consent":true,"per_job_cap":null,"monthly_cap":null,"prompt_category":"food"}
+
+$ curl -s -m 10 http://127.0.0.1:8003/v1/health
+{"status":"ok","db":"ok","storage":"ok"}
+
+============================================================
+[G0-2] SEAM ENUMERATION (quoted reads)
+============================================================
+$ venv/bin/python -c "import inspect; from app.services.providers import reader as rd;
+  from app.services.providers import opencode_go as og; print('reader.PROMPTS_DIR =', rd.PROMPTS_DIR);
+  print('extract_items sig =', str(inspect.signature(og.OpenCodeGoProvider.extract_items)));
+  print('ai_status =', rd.ai_status()); print('registry ids =', sorted(rd.provider_registry().keys()))"
+reader.PROMPTS_DIR = /home/andrei/StorageGenie/backend/app/services/providers/prompts
+extract_items sig = (self, image_bytes: 'bytes', prompt: 'str', *, estimated_cost: 'float' = 0.0) -> 'ProviderResult'
+registry ids = ['fake', 'opencode-go']   # with repo-root .env loaded
+
+$ ls backend/app/services/providers/prompts/
+chat-v1.md  extract-cosmetics-v1.md  extract-cosmetics-v2.md  extract-food-v1.md
+extract-food-v2.md  extract-medicine-v1.md  extract-medicine-v2.md  planning-v1.md
+analytics-insights-v1.md   # NEW (this slice)
+
+Router config shape (app/services/providers/router.py:30-36): RouterConfig(provider_id,
+fallback_id, json_strict, cost_budget, retryable_errors). Budget refusal happens in
+ProviderRouter.execute BEFORE any provider call (router.py:71-74).
+
+============================================================
+[G1-PRE] PRE-CHANGE HTTP PROBE (base 1f84d68, worktree /tmp/opencode/sg066-base)
+============================================================
+$ ../venv/bin/python -c "from fastapi.testclient import TestClient; from app.main import app; ..."
+GET /v1/analytics/summary?household_id=x -> 404 {"type":"about:blank","title":"Not Found","status":404,"detail":"Not Found: /v1/analytics/summary"}
+POST /v1/analytics/insights?household_id=x -> 405 {"detail":"Method Not Allowed"}
+
+============================================================
+[G1-PRE] NEW TESTS AGAINST PRE-CHANGE CODE (fail-then-pass, before)
+============================================================
+$ cp backend/tests/test_analytics.py /tmp/opencode/sg066-base/backend/tests/
+$ cd /tmp/opencode/sg066-base/backend && /home/andrei/StorageGenie/venv/bin/python -m pytest -q tests/test_analytics.py
+...
+E       AssertionError: {"type":"about:blank","title":"Not Found","status":404,"detail":"Not Found: /v1/analytics/summary"}
+E       assert 404 == 200
+tests/test_analytics.py:203: AssertionError
+...
+E       AssertionError: {"detail":"Method Not Allowed"}
+E       assert 405 == 404
+tests/test_analytics.py:291: AssertionError
+...
+E       ModuleNotFoundError: No module named 'app.services.analytics'
+FAILED tests/test_analytics.py::test_summary_stats_have_buckets_and_sources
+FAILED tests/test_analytics.py::test_empty_household_returns_zero_maps
+FAILED tests/test_analytics.py::test_unknown_household_is_404
+FAILED tests/test_analytics.py::test_household_isolation
+FAILED tests/test_analytics.py::test_insights_grounded_run_writes_ledger_only
+FAILED tests/test_analytics.py::test_insights_consent_disabled_zero_rows
+FAILED tests/test_analytics.py::test_insights_ungrounded_citation_is_loud_502
+FAILED tests/test_analytics.py::test_insights_without_any_citation_is_ungrounded
+FAILED tests/test_analytics.py::test_insights_empty_household_calls_nothing
+FAILED tests/test_analytics.py::test_insights_budget_refusal_before_any_call
+FAILED tests/test_analytics.py::test_insights_single_repair_turn_then_success
+FAILED tests/test_analytics.py::test_insights_prompt_is_versioned_and_carries_stats
+FAILED tests/test_analytics.py::test_no_key_material_in_any_written_row
+13 failed, 1 warning in 1.60s
+
+============================================================
+[G1-POST] NEW TESTS AGAINST CHANGED CODE (fail-then-pass, after)
+============================================================
+$ cd backend && ../venv/bin/python -m pytest -q tests/test_analytics.py
+13 passed, 1 warning in 1.50s
+
+============================================================
+[SUITE] FULL BACKEND SUITE (from backend/)
+============================================================
+$ ../venv/bin/python -m pytest -q
+FAILED tests/test_signals.py::test_generated_codes_are_validated_and_bad_checksum_is_not_an_identifier
+FAILED tests/test_signals.py::test_ocr_has_text_boxes_and_mean_confidence
+2 failed, 284 passed, 22 warnings in 17.34s
+
+# the 2 reds are base-proved decoder-environment reds (pyzbar/libzbar + pytesseract absent):
+$ cd /tmp/opencode/sg066-base/backend && /home/andrei/StorageGenie/venv/bin/python -m pytest -q <the two nodes>
+WARNING  app.services.signals:signals.py:104 Barcode extraction unavailable: pyzbar/libzbar is not installed
+WARNING  app.services.signals:signals.py:210 OCR extraction unavailable: pytesseract is not installed
+FAILED tests/test_signals.py::test_generated_codes_are_validated_and_bad_checksum_is_not_an_identifier
+FAILED tests/test_signals.py::test_ocr_has_text_boxes_and_mean_confidence
+2 failed in 0.68s
+
+============================================================
+[LINT] RUFF + MYPY (delta-0)
+============================================================
+$ ../venv/bin/ruff check .
+All checks passed!
+
+$ ../venv/bin/python -m mypy app            # POST-change
+Found 41 errors in 9 files (checked 75 source files)
+$ (base 1f84d68) /home/andrei/StorageGenie/venv/bin/python -m mypy app
+Found 41 errors in 9 files (checked 72 source files)
+# delta = 0. No error names app/services/analytics or app/api/v1/analytics.py.
+# The 41 pre-existing errors are all in files this slice did not change except
+# main.py line-number shift (its two unused-ignore lines move 46/52 -> 47/53).
+
+============================================================
+[FRONTEND] tsc + build + vitest + eslint
+============================================================
+$ rtk npx tsc --noEmit
+TypeScript: No errors found
+
+$ rtk npm run build
+> tsc && vite build
+✓ 1961 modules transformed.
+dist/index.html                   0.94 kB │ gzip:  0.47 kB
+dist/assets/index-DxKo-z_g.css    2.65 kB │ gzip:  0.82 kB
+dist/assets/index-CebFruqr.js   300.93 kB │ gzip: 89.19 kB
+✓ built in 1.75s
+
+$ ./node_modules/.bin/vitest run
+Test Files  22 passed (22)
+      Tests  164 passed (164)
+   Duration  4.64s
+
+$ ./node_modules/.bin/eslint src
+(no output)
+
+============================================================
+[G2-LIVE] THE ONE AUTHORIZED METERED RUN (live DB + live provider key)
+============================================================
+$ DATABASE_URL=sqlite:////home/andrei/StorageGenie/data/db/storagegenie.db \
+  STORAGE_ROOT=/home/andrei/StorageGenie/data/storage \
+  /home/andrei/StorageGenie/venv/bin/python /tmp/opencode/sg066/live_run.py
+database = sqlite:////home/andrei/StorageGenie/data/db/storagegenie.db
+storage_root = /home/andrei/StorageGenie/data/storage
+provider = opencode-go | model = deepseek-v4-flash-vision-exp
+consent = True
+key_present = True | key_len = 67
+ai_status = (True, 'enabled')
+prompt_version = analytics-insights-v1 | stat_count = 21
+worst_case_estimate(1 call) = $0.002199 | ceiling(2 calls) = $0.010000
+ceiling_check = PASS
+--- RESULT ---
+status = ok
+reason = None
+summary = Your household has 1 asset recorded in total. 1 of those assets is active. 1 active asset has no active expiry date recorded. 1 active asset has no served category.
+sentences = ["Your household has 1 asset recorded in total.", "1 of those assets is active.", "1 active asset has no active expiry date recorded.", "1 active asset has no served category."]
+cited_stat_ids = ['assets.total', 'assets.active', 'expiry.unknown', 'category.uncategorized']
+cited_stats = [{"id": "assets.total", "label": "Total assets", "value": 1}, {"id": "assets.active", "label": "Active assets", "value": 1}, {"id": "category.uncategorized", "label": "Active assets with no served category", "value": 1}, {"id": "expiry.unknown", "label": "No active expiry date", "value": 1}]
+provider = opencode-go | model = deepseek-v4-flash-vision-exp
+provider_call_ids = ['01a0c372-e0d5-7810-9727-29a2e7fb67d9']
+guardrail_event_id = 01a0c372-e0d7-7fd1-9ddd-509ba606e29a
+usage = {"prompt_tokens": 1997, "completion_tokens": 488, "total_tokens": 2485, "prompt_cache_hit_tokens": 0, "prompt_cache_miss_tokens": 1997, "prompt_tokens_details": {"cached_tokens": 0}, "completion_tokens_details": {"reasoning_tokens": 238}}
+cost = $0.00059235
+latency_ms = 2865.0559317320585
+budget_line = $0.00059235 / ceiling $0.01000000
+
+============================================================
+[G2-LIVE] LIVE DB AFTER THE ONE RUN (read-only)
+============================================================
+asset rows: 1
+assertion rows: 3
+provider_call rows: 7          # was 6 before the run: +1 exactly
+guardrail_event rows: 1        # was 0 before the run: +1 exactly
+new provider_call: ('01a0c372-e0d5-7810-9727-29a2e7fb67d9', 'opencode-go',
+  'deepseek-v4-flash-vision-exp', 'analytics-insights-v1', 0.00059235, None, None)
+new guardrail_event: 01a0c372-e0d7-7fd1-9ddd-509ba606e29a insight
+  {'outcome': 'ok', 'sentence_count': 4, 'cited_stat_ids': ['assets.total', 'assets.active',
+   'expiry.unknown', 'category.uncategorized'], 'provider': 'opencode-go',
+   'model': 'deepseek-v4-flash-vision-exp', 'prompt_template_version': 'analytics-insights-v1',
+   'stat_count': 21}
+
+============================================================
+[HYGIENE] secret scan + angle-token probe + ignore check
+============================================================
+$ grep -rnE "OPENCODE_API_KEY|Bearer |password" <new backend files>
+(no matches; the only "secret" hit is the prose word "secrets" in the prompt's
+ data-handling sentence)
+$ grep -rn "sk-[A-Za-z0-9]" <new backend files>
+(no matches)
+$ grep -rnE "<[^ <>=]*>" <new backend files>
+(no matches; the 8 `<` chars in service.py are comparison operators)
+$ git check-ignore -v <all new/changed paths>
+(no output, exit 1 -> nothing is ignored)

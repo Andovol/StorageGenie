@@ -7,6 +7,7 @@ import { InboxPage } from "./routes/InboxPage";
 import { ReviewPage } from "./routes/ReviewPage";
 import { PlanningPage } from "./routes/PlanningPage";
 import { ChatPage } from "./routes/ChatPage";
+import { AnalyticsPage } from "./routes/AnalyticsPage";
 
 function Nav() {
   const linkStyle = (active: boolean): React.CSSProperties => ({
@@ -41,6 +42,9 @@ function Nav() {
       <NavLink to="/chat" style={({ isActive }) => linkStyle(isActive)}>
         Chat
       </NavLink>
+      <NavLink to="/analytics" style={({ isActive }) => linkStyle(isActive)}>
+        Analytics
+      </NavLink>
       <span style={{ marginLeft: "auto", fontSize: 11, color: "#9ca3af" }}>Phase 0 · local-first</span>
     </nav>
   );
@@ -59,6 +63,7 @@ export default function App() {
         <Route path="/inbox" element={<InboxPage />} />
         <Route path="/planning" element={<PlanningPage />} />
         <Route path="/chat" element={<ChatPage />} />
+        <Route path="/analytics" element={<AnalyticsPage />} />
         <Route path="/review/:candidateId" element={<ReviewPage />} />
       </Routes>
     </div>
