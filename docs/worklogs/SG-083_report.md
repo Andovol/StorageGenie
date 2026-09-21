@@ -2,7 +2,7 @@
 
 **Branch:** `automation` · **Remote:** `git@github.com:Andovol/StorageGenie.git` · **Work dir:** `/home/andrei/StorageGenie`
 **BASE (packet ref `origin/automation`):** `164234585cce0b7c32996902bc4fbe20003b5470` (`D105+D106: rider approval + L3 recorded; SG-083 v3 deploy rider packet`)
-**WORK_HEAD:** `WORK_HEAD_PLACEHOLDER` (work commit; the post-note receipt commit is HEAD after it)
+**WORK_HEAD:** `e6f35a5b3eb534abde130ef4ac8d47139316bfe0` (work commit; the post-note receipt commit is HEAD after it)
 **Contract:** recorded `0.28.2` == published `0.28.2`; source `/home/andrei/storagegenie-contract/VERSION`, contract repo HEAD `b495b59b3426af66772a87939473ac558f8f72d2`
 **Model / effort (`CO-78`):** model `deepseek-v4.1-flash` (provider `opencode-go`, read from provider metadata `/home/andrei/.local/share/opencode/log/opencode.log` line `llm.provider=opencode-go llm.model=deepseek-v4.1-flash`, **not** a system-prompt identity line; argv carries no `--model`) · effort `medium` (process argv `/proc/499275/cmdline`: `opencode run --auto --dir /home/andrei/StorageGenie --variant medium`)
 **Spend (real $):** `$0.000000` actual vs `$0` bound — zero metered provider calls.
@@ -127,7 +127,21 @@ returned 5022 B both sides with a body diff whose **only** change is `generated_
 
 ### Receipt note verification (pasted `show` output)
 
-RECEIPT_PLACEHOLDER
+```
+$ git notes --ref=refs/notes/storagegenie-coder-reports add -m "Dispatch-ID: SG-083 | Report: docs/worklogs/SG-083_report.md | Work-HEAD: e6f35a5b3eb534abde130ef4ac8d47139316bfe0" e6f35a5b3eb534abde130ef4ac8d47139316bfe0
+(add_rc=0)
+$ git push origin refs/notes/storagegenie-coder-reports
+To github.com:Andovol/StorageGenie.git
+   3e20615..b18973d  refs/notes/storagegenie-coder-reports -> refs/notes/storagegenie-coder-reports
+$ git fetch origin refs/notes/storagegenie-coder-reports:refs/notes/storagegenie-coder-reports
+(fetch_rc=0)
+$ git rev-parse refs/notes/storagegenie-coder-reports
+b18973deb178c77bea32489fa0c1ab146ced9b48
+$ git ls-remote origin refs/notes/storagegenie-coder-reports
+b18973deb178c77bea32489fa0c1ab146ced9b48	refs/notes/storagegenie-coder-reports
+$ git notes --ref=refs/notes/storagegenie-coder-reports show e6f35a5b3eb534abde130ef4ac8d47139316bfe0
+Dispatch-ID: SG-083 | Report: docs/worklogs/SG-083_report.md | Work-HEAD: e6f35a5b3eb534abde130ef4ac8d47139316bfe0
+```
 
 ## Findings
 
