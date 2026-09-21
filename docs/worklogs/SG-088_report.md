@@ -4,7 +4,7 @@
 **Work dir:** `/home/andrei/StorageGenie`
 **Origin remote (as on host):** `git@github.com:Andovol/StorageGenie.git` (fetch+push)
 **BASE (packet ref `origin/automation` resolved):** `2d6c6b1bd9ec86bfb3ea33d884ff21a901cccbae` (`SG-091 receipt: paste verified notes-ref show output (docs-only)`)
-**WORK_HEAD:** `TBD` — recorded by the follow-up docs-only commit carrying the receipt paste (the note lives on the slice tip).
+**WORK_HEAD:** `e710a80c0e9168f4db49308cbd50997e838decc9` (the slice tip; the receipt note lives on this commit and this docs-only descendant carries the paste).
 **Contract:** recorded `0.28.2` == published `b495b59` — source path `/home/andrei/storagegenie-contract/VERSION`; `git -C /home/andrei/storagegenie-contract rev-parse HEAD` = `b495b59b3426af66772a87939473ac558f8f72d2`.
 **Model / effort (`CO-78`, from process arguments):** model `unknown` (argv carries no `--model`; the CLI default is the model per policy); effort `medium` (argv `--variant medium`). Source: `/proc/598312/cmdline` via `pgrep -af "opencode run"` → `opencode run --auto --dir /home/andrei/StorageGenie --variant medium # SG-088 …`.
 **Spend:** **$0.000000 actual** — zero provider calls; containment per `PG-PR-04` stated: nothing live exists to contain.
@@ -120,9 +120,38 @@ contract echo + source path above; three UNCLEAR lines below.
 ## Receipt
 
 Work pushed to `automation`, worktree clean (`CO-55`). No push to `storagegenie-evidence`, no
-`{{RECEIPT_CMD}}`. The note is added on the slice-tip WORK_HEAD and the notes ref pushed, then verified
-against the **fetched** ref mapped to a local name. The executed `show` output is pasted verbatim in the
-follow-up docs-only commit (this header's `WORK_HEAD` is recorded there).
+`{{RECEIPT_CMD}}`. The note was added on the slice-tip WORK_HEAD, the notes ref pushed (300s bound),
+then fetched explicitly into a **mapped** local name and shown. No existing note was refused
+(`show_before_exit=1`, "no note found").
+
+Commands executed (raw):
+
+```
+$ git notes --ref=refs/notes/storagegenie-coder-reports show e710a80c0e9168f4db49308cbd50997e838decc9   # existing-note check
+error: no note found for object e710a80c0e9168f4db49308cbd50997e838decc9.
+show_before_exit=1
+$ git notes --ref=refs/notes/storagegenie-coder-reports add -m "Dispatch-ID: SG-088 | Report: docs/worklogs/SG-088_report.md | Work-HEAD: e710a80c0e9168f4db49308cbd50997e838decc9" e710a80c0e9168f4db49308cbd50997e838decc9
+add_exit=0
+$ git push origin refs/notes/storagegenie-coder-reports
+To github.com:Andovol/StorageGenie.git
+   ab0aa59..3391108  refs/notes/storagegenie-coder-reports -> refs/notes/storagegenie-coder-reports
+notes_push_exit=0
+$ git fetch origin refs/notes/storagegenie-coder-reports:refs/notes/storagegenie-coder-reports-sg088-verify
+From github.com:Andovol/StorageGenie
+ * [new ref]         refs/notes/storagegenie-coder-reports -> refs/notes/storagegenie-coder-reports-sg088-verify
+fetch_exit=0
+$ git rev-parse refs/notes/storagegenie-coder-reports-sg088-verify
+339110833ee01a25f837178667783af5eae5abc9
+$ git notes --ref=refs/notes/storagegenie-coder-reports-sg088-verify show e710a80c0e9168f4db49308cbd50997e838decc9
+```
+
+Pasted `show` output (verbatim, from the FETCHED mapped ref):
+
+```
+Dispatch-ID: SG-088 | Report: docs/worklogs/SG-088_report.md | Work-HEAD: e710a80c0e9168f4db49308cbd50997e838decc9
+```
+
+note=yes
 
 ## Acceptance criteria → question each answers (`PG-SC-09`)
 

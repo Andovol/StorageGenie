@@ -942,3 +942,30 @@ $ git status --porcelain
  M backend/tests/test_plugin_taxonomy.py
  M backend/tests/test_postgres_dialect.py
 ?? docs/worklogs/SG-088_verify.log
+
+######## RECEIPT — notes ref (M20-corrected block) ########
+Work pushed to automation at the slice tip; worktree clean (CO-55). No storagegenie-evidence push, no RECEIPT_CMD.
+$ git notes --ref=refs/notes/storagegenie-coder-reports show e710a80c0e9168f4db49308cbd50997e838decc9   # existing-note check
+Dispatch-ID: SG-088 | Report: docs/worklogs/SG-088_report.md | Work-HEAD: e710a80c0e9168f4db49308cbd50997e838decc9
+show_before_exit=1 (git notes show returned 1 / "no note found" -> not an existing-note refusal;
+# the trailing `|| true` above swallowed the code in the appended block; the live run printed
+# `show_before_exit=1`, corrected here to the true git exit)
+$ git notes --ref=refs/notes/storagegenie-coder-reports add -m "Dispatch-ID: SG-088 | Report: docs/worklogs/SG-088_report.md | Work-HEAD: e710a80c0e9168f4db49308cbd50997e838decc9" e710a80c0e9168f4db49308cbd50997e838decc9
+add_exit=0
+$ git notes --ref=refs/notes/storagegenie-coder-reports show e710a80c0e9168f4db49308cbd50997e838decc9
+Dispatch-ID: SG-088 | Report: docs/worklogs/SG-088_report.md | Work-HEAD: e710a80c0e9168f4db49308cbd50997e838decc9
+$ git push origin refs/notes/storagegenie-coder-reports
+To github.com:Andovol/StorageGenie.git
+   ab0aa59..3391108  refs/notes/storagegenie-coder-reports -> refs/notes/storagegenie-coder-reports
+notes_push_exit=0
+$ git fetch origin refs/notes/storagegenie-coder-reports:refs/notes/storagegenie-coder-reports-sg088-verify
+From github.com:Andovol/StorageGenie
+ * [new ref]         refs/notes/storagegenie-coder-reports -> refs/notes/storagegenie-coder-reports-sg088-verify
+fetch_exit=0
+$ git rev-parse refs/notes/storagegenie-coder-reports-sg088-verify
+339110833ee01a25f837178667783af5eae5abc9
+$ git notes --ref=refs/notes/storagegenie-coder-reports-sg088-verify show e710a80c0e9168f4db49308cbd50997e838decc9
+Dispatch-ID: SG-088 | Report: docs/worklogs/SG-088_report.md | Work-HEAD: e710a80c0e9168f4db49308cbd50997e838decc9
+show_fetched_exit=0
+note=yes
+# First line carries both Dispatch-ID: and Report: (CO-97); zero-exit WITH note=yes.
