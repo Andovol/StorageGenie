@@ -1,0 +1,321 @@
+SG-083 raw verification log (commands + verbatim outputs)
+Host /home/andrei/StorageGenie ; branch automation ; BASE 164234585cce0b7c32996902bc4fbe20003b5470 ; live clock start 2026-09-21T14:48:13Z
+
+######## CONTRACT ECHO ########
+# source path: /home/andrei/storagegenie-contract/VERSION
+$ cat /home/andrei/storagegenie-contract/VERSION
+0.28.2
+$ git -C /home/andrei/storagegenie-contract rev-parse HEAD
+b495b59b3426af66772a87939473ac558f8f72d2
+# recorded 0.28.2 == published 0.28.2 ; contract HEAD b495b59
+
+######## MODEL / EFFORT ########
+$ tr '\0' ' ' < /proc/499275/cmdline | head -c 120
+opencode run --auto --dir /home/andrei/StorageGenie --variant medium
+$ grep -oE 'llm.provider=[^ ]+ llm.model=[^ ]+' /home/andrei/.local/share/opencode/log/opencode.log | tail -1
+llm.provider=opencode-go llm.model=deepseek-v4.1-flash
+# model deepseek-v4.1-flash (provider metadata, not a system-prompt identity line; argv carries no --model) ; effort medium (argv --variant medium)
+
+######## PREMISE: NO frontend diff since SG-078 work 29fd8f9 ########
+$ git diff --stat 29fd8f9..HEAD -- frontend/
+(empty)
+$ git diff --name-status 29fd8f9..HEAD
+M	STATE.md
+M	backend/app/services/candidates.py
+M	backend/app/services/evidence_service.py
+A	backend/app/services/providers/prompts/extract-cosmetics-v3.md
+A	backend/app/services/providers/prompts/extract-food-v3.md
+A	backend/app/services/providers/prompts/extract-medicine-v3.md
+M	backend/app/services/providers/reader.py
+M	backend/app/services/providers/schemas.py
+A	backend/eval/corpus/sg079/manifest.json
+A	backend/eval/corpus/sg079/sg079_01_clean_food.json
+A	backend/eval/corpus/sg079/sg079_02_partial_food.json
+A	backend/eval/corpus/sg079/sg079_03_glare_medicine.json
+A	backend/eval/corpus/sg079/sg079_04_partial_medicine.json
+A	backend/eval/corpus/sg079/sg079_05_clean_cosmetics.json
+A	backend/eval/corpus/sg079/sg079_06_glare_cosmetics.json
+M	backend/tests/test_ai_pipeline.py
+M	backend/tests/test_extraction_contract.py
+M	backend/tests/test_phase2_e2e.py
+M	backend/tests/test_sg049_v2_extraction.py
+A	backend/tests/test_sg079_v3_schema.py
+A	backend/tests/test_sg080_ingest_pipeline.py
+A	docs/packets/SG-079-photo-schema-v3.md
+A	docs/packets/SG-080-ingest-pipeline-v3.md
+A	docs/packets/SG-083-deploy-v3-rider.md
+A	docs/packets/SG-084-sg080-failure-probe.md
+M	docs/ratings.md
+A	docs/superpowers/plans/2026-09-21-ai-ingestion-enrichment.md
+M	docs/worklogs/SG-078_report.md
+A	docs/worklogs/SG-079.log
+A	docs/worklogs/SG-079_report.md
+A	docs/worklogs/SG-079_verify.log
+A	docs/worklogs/SG-080.log
+A	docs/worklogs/SG-080_report.md
+A	docs/worklogs/SG-080_verify.log
+A	docs/worklogs/SG-084.log
+A	docs/worklogs/SG-084_report.md
+A	docs/worklogs/SG-084_verify.log
+
+######## COMMITTED v3 BLOBS + READER MAPPING (quote from committed files) ########
+$ git show HEAD:backend/app/services/providers/prompts/extract-food-v3.md | sed -n '1,8p'
+---
+template_version: extract-food-v3
+category: food_beverages
+output_schema: ExtractionOutput
+repair_policy: single-retry-then-fail
+---
+
+# Extract food & beverage items (prompt v3)
+$ git show HEAD:backend/app/services/providers/reader.py | sed -n '51,58p'
+PROMPTS_DIR = Path(__file__).resolve().parent / "prompts"
+# SG-080: the live reader loads the frozen v3 prompts (SG-079). v1/v2 files
+# remain on disk, byte-untouched, as the rollback reference and prior-slice pins.
+PROMPT_FILES = {
+    "food": "extract-food-v3.md",
+    "medicine": "extract-medicine-v3.md",
+    "cosmetics": "extract-cosmetics-v3.md",
+}
+# committed blob sha256 (git show HEAD:<f> | sha256sum):
+3767253f9aae238a3f6b79cd2db4c65de95afa72a1c2ed2c8637161f650567b8  extract-food-v3.md
+d68dc7e98bb21df47285bb7827c795de44d557747293a3e5cee681bbcebae0d4  extract-medicine-v3.md
+e9a940d34fdda893119f03f4423280674a87e160e208abee2763a81d46a5d2e4  extract-cosmetics-v3.md
+
+######## BEFORE ########
+===== G1 BEFORE 2026-09-21T14:48:13Z =====
+--- git HEAD/status ---
+164234585cce0b7c32996902bc4fbe20003b5470
+(empty porcelain)
+--- docker ps -a ---
+storagegenie-backend-1	storagegenie-backend	Up 2 hours (healthy)	127.0.0.1:8003->8000/tcp
+storagegenie-frontend-1	storagegenie-frontend	Exited (0) 10 days ago	
+--- backend inspect Image/RestartCount/Created ---
+Image=sha256:e9ad06fb9f7ed17ee2a9c58d3b28a992c8d2f9ca92599f48d58d9b010c0c3856 RestartCount=0 Created=2026-09-21T13:07:29.49219387Z ContainerID=f1e44f3b6bce991e6346333c6518596f9cee9185d2359d74c2519ee769c068a3
+--- docker images storagegenie-backend ---
+storagegenie-backend:latest ID=sha256:e9ad06fb9f7ed17ee2a9c58d3b28a992c8d2f9ca92599f48d58d9b010c0c3856 Created=2026-09-21 13:07:26 +0000 UTC
+--- served index.html (loopback) ---
+http=200 bytes=944
+/assets/index-CoNI-1Zn.css
+/assets/index-fOM9Er4k.js
+asset=/assets/index-CoNI-1Zn.css http=200 bytes=3839
+b18dbb336eef5c580bf0a2e6726d647c4f6c63edbc48373580d31e4508659ad3  /assets/index-CoNI-1Zn.css
+asset=/assets/index-fOM9Er4k.js http=200 bytes=304117
+91b53c1c7eb377353d7d9e8863d91f1e913fc6c517f327099b6f46dce49b6c1c  /assets/index-fOM9Er4k.js
+--- alembic current / heads / history tail ---
+INFO  [alembic.runtime.migration] Context impl SQLiteImpl.
+INFO  [alembic.runtime.migration] Will assume non-transactional DDL.
+20260917_sg068_saved_search (head)
+20260917_sg068_saved_search (head)
+20260908_sg017_fts -> 20260912_sg025_provider_call, provider call ledger (SG-025, blueprint §3.3)
+20260908_sg014_candidate -> 20260908_sg017_fts, SQLite FTS5 index for asset catalog search.
+20260908_sg013_observation -> 20260908_sg014_candidate, deduplication candidates
+0201cf10c56c -> 20260908_sg013_observation, deterministic signal observations
+<base> -> 0201cf10c56c, 001 core foundation
+--- DB stat ---
+size=339968 mtime=2026-09-21 10:19:45.510824996 +0000
+--- DB table row counts ---
+HID=01a0a029-1477-7ca0-b200-bce78a96c679
+alembic_version = 1
+assertion = 6
+asset = 2
+asset_evidence = 2
+asset_fts = 2
+asset_fts_config = 1
+asset_fts_data = 4
+asset_fts_docsize = 2
+asset_fts_idx = 2
+audit_event = 20
+candidate = 2
+evidence = 3
+guardrail_event = 1
+household = 1
+idempotency_key = 5
+job = 3
+job_step = 24
+observation = 6
+planning_suggestion = 0
+provider_call = 8
+review_task = 1
+saved_search = 0
+source_attribution = 0
+user = 2
+--- gate http 301 ---
+http=301
+--- gate https 401 ---
+https=401
+--- regressions ---
+GET /v1/taxonomy?household_id=... http=200 bytes=1118
+60a7a8571ffe79a5688145f10817fa7141fd304da694c01b9136e0613fe5a99e  /tmp/opencode/sg083_reg_before.json
+GET /v1/saved-searches?household_id=... http=200 bytes=12
+eef46741adfc3a9f76294d3b78f37a45f113092ac9d44ee77c7a038a88ff09a1  /tmp/opencode/sg083_reg_before.json
+GET /v1/assets/facets?household_id=... http=200 bytes=97
+cc752eaa702482805e892b2c3627b13b1ef46442c10a5826beca2ab193bbb57f  /tmp/opencode/sg083_reg_before.json
+GET /v1/analytics/summary?household_id=... http=200 bytes=5022
+954e670bfe9c996fa80a4f5b78674300114f0608286164bf3bc919236c7cd260  /tmp/opencode/sg083_reg_before.json
+--- ss loopback ---
+LISTEN 0      4096       127.0.0.1:8003       0.0.0.0:*    users:(("rootlesskit",pid=3814163,fd=32))
+
+######## BEFORE (supporting: WAL / pre-existing owner import) ########
+$ ls -la --time-style=full-iso /home/andrei/StorageGenie/data/db/
+-rw------- 1 andrei andrei 339968 2026-09-21 10:19:45.510824996 +0000 storagegenie.db
+-rw------- 1 andrei andrei  32768 2026-09-21 14:02:14.606117470 +0000 storagegenie.db-shm
+-rw------- 1 andrei andrei 444992 2026-09-21 14:02:14.605117475 +0000 storagegenie.db-wal
+$ sqlite3 -readonly "$DB" "PRAGMA journal_mode;"
+wal
+$ sqlite3 -readonly -header -column "$DB" "SELECT id, asset_type, status, created_at FROM asset ORDER BY created_at;"
+id                                    asset_type  status  created_at
+------------------------------------  ----------  ------  -------------------
+01a0a467-eb0e-7b83-a227-af122dc9268b  unknown     ACTIVE  2026-09-15 09:31:08
+01a0c446-44c9-7b82-9d1c-2b51fa518191  meat        ACTIVE  2026-09-21 14:02:14
+# pre-existing owner use of the live (pre-v3) public entry at 14:02:14, before this slice began; not a slice write.
+
+######## BUILD (G2) ########
+$ export BUILDX_CONFIG=/tmp/opencode/buildx ; docker compose build backend
+$ ls -ld "$HOME/.docker"
+drwx------ 4 andrei andrei 4096 Sep  8 20:16 /home/andrei/.docker
+build_rc=0 elapsed_s=11
+# build log tail:
+#21 [stage-1 9/9] COPY --from=frontend-build /ui/dist ./static
+#21 DONE 0.0s
+#22 exporting to image
+#22 exporting layers 4.4s done
+#22 exporting manifest sha256:626c6797a35073e86c2311f3f3142e6ce377e143c9f022be9d7a9d690659aa9b done
+#22 exporting config sha256:a2c53a2f46de662502b6043bd6b8796a0cf139e9338565c91c653a0aae0efe56 done
+#22 exporting attestation manifest sha256:e9d652ccb0282993f9467f1ee927a280c236f37f5a15ff941b57ce98bde58dd5 done
+#22 exporting manifest list sha256:65eb3d6433b70bd09f85faf9d902064a0e9ca8c6afcc38d5980ad88c6b60c016 done
+#22 naming to docker.io/library/storagegenie-backend:latest done
+#22 unpacking to docker.io/library/storagegenie-backend:latest 1.6s done
+#23 resolving provenance for metadata file
+#23 DONE 0.0s
+# Image storagegenie-backend Built
+$ docker images --no-trunc --format '{{.Repository}}:{{.Tag}} ID={{.ID}} Created={{.CreatedAt}}' storagegenie-backend
+storagegenie-backend:latest ID=sha256:65eb3d6433b70bd09f85faf9d902064a0e9ca8c6afcc38d5980ad88c6b60c016 Created=2026-09-21 14:49:23 +0000 UTC
+# NOTE: buildkit does not enumerate COPY context files in the log; the v3-file-enters-image proof is the
+# in-image sha256 below (PG-SC-12), which matches the committed blob hashes exactly.
+
+######## UP (G2 — one recreate) ########
+$ docker compose up -d backend
+up_rc=0 elapsed_s=2
+ Container storagegenie-backend-1 Recreate 
+ Container storagegenie-backend-1 Recreated 
+ Container storagegenie-backend-1 Starting 
+ Container storagegenie-backend-1 Started 
+$ docker inspect -f 'Image={{.Image}} RestartCount={{.RestartCount}} Created={{.Created}} ContainerID={{.Id}}' storagegenie-backend-1
+Image=sha256:65eb3d6433b70bd09f85faf9d902064a0e9ca8c6afcc38d5980ad88c6b60c016 RestartCount=0 Created=2026-09-21T14:49:49.97909329Z ContainerID=f6539f65094e069d448921686099bb27e79a5bfbf487fd31eddae8ba527a017d
+
+######## AFTER (G3) ########
+===== G3 AFTER 2026-09-21T14:50:11Z =====
+--- settle: health reads 1..6 ---
+read1 http=200 body={"status":"ok","db":"ok","storage":"ok"}
+read2 http=200 body={"status":"ok","db":"ok","storage":"ok"}
+read3 http=200 body={"status":"ok","db":"ok","storage":"ok"}
+read4 http=200 body={"status":"ok","db":"ok","storage":"ok"}
+read5 http=200 body={"status":"ok","db":"ok","storage":"ok"}
+read6 http=200 body={"status":"ok","db":"ok","storage":"ok"}
+--- docker ps -a ---
+storagegenie-backend-1	storagegenie-backend	Up 32 seconds (healthy)	127.0.0.1:8003->8000/tcp
+storagegenie-frontend-1	storagegenie-frontend	Exited (0) 10 days ago	
+--- backend inspect ---
+Image=sha256:65eb3d6433b70bd09f85faf9d902064a0e9ca8c6afcc38d5980ad88c6b60c016 RestartCount=0 Created=2026-09-21T14:49:49.97909329Z ContainerID=f6539f65094e069d448921686099bb27e79a5bfbf487fd31eddae8ba527a017d
+--- docker images ---
+storagegenie-backend:latest ID=sha256:65eb3d6433b70bd09f85faf9d902064a0e9ca8c6afcc38d5980ad88c6b60c016 Created=2026-09-21 14:49:23 +0000 UTC
+--- served index.html (loopback) ---
+http=200 bytes=944
+/assets/index-CoNI-1Zn.css
+/assets/index-fOM9Er4k.js
+asset=/assets/index-CoNI-1Zn.css http=200 bytes=3839
+b18dbb336eef5c580bf0a2e6726d647c4f6c63edbc48373580d31e4508659ad3  /assets/index-CoNI-1Zn.css
+asset=/assets/index-fOM9Er4k.js http=200 bytes=304117
+91b53c1c7eb377353d7d9e8863d91f1e913fc6c517f327099b6f46dce49b6c1c  /assets/index-fOM9Er4k.js
+--- index.html before/after cmp ---
+index.html IDENTICAL
+--- in-image v3 prompt files (PG-SC-12: what the consumer runs) ---
+-rw-r--r-- 1 root root 5145 Sep 21 14:17 /app/app/services/providers/prompts/extract-cosmetics-v3.md
+-rw-r--r-- 1 root root 5063 Sep 21 14:17 /app/app/services/providers/prompts/extract-food-v3.md
+-rw-r--r-- 1 root root 5126 Sep 21 14:17 /app/app/services/providers/prompts/extract-medicine-v3.md
+--- sha256 ---
+3767253f9aae238a3f6b79cd2db4c65de95afa72a1c2ed2c8637161f650567b8  /app/app/services/providers/prompts/extract-food-v3.md
+d68dc7e98bb21df47285bb7827c795de44d557747293a3e5cee681bbcebae0d4  /app/app/services/providers/prompts/extract-medicine-v3.md
+e9a940d34fdda893119f03f4423280674a87e160e208abee2763a81d46a5d2e4  /app/app/services/providers/prompts/extract-cosmetics-v3.md
+--- in-image PROMPT_FILES + live load_prompt version ---
+PROMPT_FILES= {'food': 'extract-food-v3.md', 'medicine': 'extract-medicine-v3.md', 'cosmetics': 'extract-cosmetics-v3.md'}
+food extract-food-v3
+medicine extract-medicine-v3
+cosmetics extract-cosmetics-v3
+--- alembic current / heads ---
+INFO  [alembic.runtime.migration] Context impl SQLiteImpl.
+INFO  [alembic.runtime.migration] Will assume non-transactional DDL.
+20260917_sg068_saved_search (head)
+20260917_sg068_saved_search (head)
+--- DB stat (main + wal + shm) ---
+total 408
+drwxr-xr-x 2 andrei andrei   4096 2026-09-21 14:50:01.200565899 +0000 .
+drwxr-xr-x 4 andrei andrei   4096 2026-09-02 12:00:36.025276422 +0000 ..
+-rw------- 1 andrei andrei 372736 2026-09-21 14:49:50.292620182 +0000 storagegenie.db
+-rw------- 1 andrei andrei  32768 2026-09-21 14:50:01.200565899 +0000 storagegenie.db-shm
+-rw------- 1 andrei andrei      0 2026-09-21 14:50:01.200565899 +0000 storagegenie.db-wal
+main size=372736 mtime=2026-09-21 14:49:50.292620182 +0000
+--- DB row counts ---
+HID=01a0a029-1477-7ca0-b200-bce78a96c679
+alembic_version = 1
+assertion = 6
+asset = 2
+asset_evidence = 2
+asset_fts = 2
+asset_fts_config = 1
+asset_fts_data = 4
+asset_fts_docsize = 2
+asset_fts_idx = 2
+audit_event = 20
+candidate = 2
+evidence = 3
+guardrail_event = 1
+household = 1
+idempotency_key = 5
+job = 3
+job_step = 24
+observation = 6
+planning_suggestion = 0
+provider_call = 8
+review_task = 1
+saved_search = 0
+source_attribution = 0
+user = 2
+--- gate http 301 ---
+http=301
+--- gate https 401 ---
+https=401
+--- regressions ---
+GET /v1/taxonomy?household_id=... http=200 bytes=1118
+60a7a8571ffe79a5688145f10817fa7141fd304da694c01b9136e0613fe5a99e  /tmp/opencode/sg083_reg_after.json
+GET /v1/saved-searches?household_id=... http=200 bytes=12
+eef46741adfc3a9f76294d3b78f37a45f113092ac9d44ee77c7a038a88ff09a1  /tmp/opencode/sg083_reg_after.json
+GET /v1/assets/facets?household_id=... http=200 bytes=97
+cc752eaa702482805e892b2c3627b13b1ef46442c10a5826beca2ab193bbb57f  /tmp/opencode/sg083_reg_after.json
+GET /v1/analytics/summary?household_id=... http=200 bytes=5022
+bc3e68c1a323de67dea4ae0613d712a554d2c5b24f23af4c7dccb6960ec526a2  /tmp/opencode/sg083_reg_after.json
+--- ss loopback ---
+LISTEN 0      4096       127.0.0.1:8003       0.0.0.0:*
+
+######## REGRESSION DIFF (analytics) ########
+$ diff <(jq -S . /tmp/opencode/sg083_reg_before.json) <(jq -S . /tmp/opencode/sg083_reg_after.json)
+65c65
+<   "generated_at": "2026-09-21T14:48:15.669005+00:00",
+---
+>   "generated_at": "2026-09-21T14:50:25.074326+00:00",
+diff_rc=1
+# only generated_at differs; taxonomy/saved-searches/facets sha256 identical both sides.
+
+######## BEFORE/AFTER SUMMARY ########
+image:      e9ad06fb9f7e  ->  65eb3d6433b7   (DIFFERS)
+container:  f1e44f3b6bce  ->  f6539f65094e   (DIFFERS)
+restarts:   0 -> 0   (new container; recreate resets RestartCount — packet "+1" does not apply)
+bundle:     index-fOM9Er4k.js 304117 B 91b53c1c…  ->  IDENTICAL
+css:        index-CoNI-1Zn.css 3839 B b18dbb33…  ->  IDENTICAL
+index.html: IDENTICAL
+alembic:    20260917_sg068_saved_search (head)  ->  IDENTICAL
+rows:       24 tables IDENTICAL
+db main:    339968 B @10:19:45  ->  372736 B @14:49:50  (WAL 444992 -> 0; physical checkpoint)
+gate:       http 301 / https 401  ->  http 301 / https 401
+health:     ok/ok/ok x6 consecutive

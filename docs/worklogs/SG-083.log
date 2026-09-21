@@ -1,0 +1,33 @@
+SG-083 process log
+Work dir /home/andrei/StorageGenie ; branch automation ; remote git@github.com:Andovol/StorageGenie.git
+BASE ref origin/automation resolved to 164234585cce0b7c32996902bc4fbe20003b5470
+Start clock 2026-09-21T14:48:13Z (first capture)
+
+1. Recon: branch/HEAD/status clean; HEAD == origin/automation == 1642345; contract VERSION 0.28.2 at
+   /home/andrei/storagegenie-contract/VERSION, repo HEAD b495b59b3426af66772a87939473ac558f8f72d2;
+   model/effort from /proc/499275/cmdline + opencode provider log. No .rules-cache/ in this worktree
+   (contract copy lives at /home/andrei/storagegenie-contract/, per SG-062/SG-078).
+2. Premise check: `git diff --name-status 29fd8f9..HEAD` touches NO frontend/ file (bundle expected
+   byte-identical); backend reader/schemas/candidates/evidence + 3 v3 prompt files + tests changed.
+   Committed v3 blobs + reader PROMPT_FILES quoted.
+3. BEFORE (G1): container f1e44f3b6bce / image e9ad06fb9f7e / RestartCount 0; served index.html refs
+   index-fOM9Er4k.js 304117 B sha256 91b53c1c… + index-CoNI-1Zn.css 3839 B b18dbb33… (matches SG-078
+   quoted record exactly); alembic current/heads 20260917_sg068_saved_search (head); 24-table counts +
+   DB stat captured; gate http 301 / https 401; regressions taxonomy/saved-searches/facets/analytics 200;
+   loopback 127.0.0.1:8003 only. Pre-existing owner import disclosed (asset "meat" created 14:02:14 in WAL).
+4. G2 build: BUILDX_CONFIG=/tmp/opencode/buildx (HOME/.docker exists but not writable — F-SG067-2).
+   `docker compose build backend` rc=0 in 11 s (bound 600 s). New image 65eb3d6433b7.
+5. G2 up: `docker compose up -d backend` rc=0 in 2 s (bound 600 s); exactly one Recreate
+   (Recreate/Recreated/Starting/Started); container f6539f65094e / image 65eb3d6433b7.
+6. AFTER (G3): health 200 x6 consecutive {"status":"ok","db":"ok","storage":"ok"}; RestartCount 0
+   (new container — recreate resets the counter; packet's "+1" premise does not apply, see F-SG083-1);
+   loopback preserved; served bundle name+size+sha256 IDENTICAL to before (index.html cmp IDENTICAL);
+   in-image v3 prompt files sha256 == committed blobs, PROMPT_FILES v3, load_prompt returns v3; alembic
+   head identical; 24-table row counts identical; DB main file grew 339968→372736 B (WAL 444992→0) —
+   physical WAL checkpoint on old-container stop, logical content unchanged (F-SG083-2, F-SG072-1
+   precedent); gate 301/401; regressions 200 (analytics differs only in generated_at).
+7. Worklogs written: SG-083.log, SG-083_report.md, SG-083_verify.log (raw in verify log).
+8. Commit docs-only, push automation, notes-ref receipt + mapped-ref verify.
+
+No command hit its bound; nothing killed. Spend $0.000000 real (zero metered provider calls).
+Consumed by: docs/worklogs/SG-083_report.md, docs/worklogs/SG-083_verify.log.
