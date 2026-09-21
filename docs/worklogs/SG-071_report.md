@@ -101,7 +101,32 @@ One-line reason: every packet-stated GO condition holds (tree clean; `HEAD == or
 
 ## Receipt — notes-ref note on WORK_HEAD (executed; output pasted verbatim)
 
-<!--RECEIPT-->
+**Work HEAD (note target):** `015d63214bf6d6ec9fffa0006ad4ef316bf79cdc`
+
+Executed commands and their verbatim output:
+
+```
+$ git notes --ref=refs/notes/storagegenie-coder-reports add \
+    -m "Dispatch-ID: SG-071 | Report: docs/worklogs/SG-071_report.md | Work-HEAD: 015d63214bf6d6ec9fffa0006ad4ef316bf79cdc" \
+    015d63214bf6d6ec9fffa0006ad4ef316bf79cdc
+rc=0
+
+$ git push origin refs/notes/storagegenie-coder-reports
+To github.com:Andovol/StorageGenie.git
+   350bf8e..eaf2bc6  refs/notes/storagegenie-coder-reports -> refs/notes/storagegenie-coder-reports
+ok refs/notes/storagegenie-coder-reports
+
+$ git fetch origin refs/notes/storagegenie-coder-reports:refs/notes/storagegenie-coder-reports-sg071-verify
+ok fetched (1 new refs)
+
+$ git notes --ref=refs/notes/storagegenie-coder-reports-sg071-verify show 015d63214bf6d6ec9fffa0006ad4ef316bf79cdc
+Dispatch-ID: SG-071 | Report: docs/worklogs/SG-071_report.md | Work-HEAD: 015d63214bf6d6ec9fffa0006ad4ef316bf79cdc
+rc=0
+```
+
+Fetched ref tip: `refs/notes/storagegenie-coder-reports-sg071-verify` = `eaf2bc6d12de638da102538962ca7c3d58b401db`; `grep -c "Dispatch-ID: SG-071"` = 1; first line carries both `Dispatch-ID:` and `Report:` (`CO-97`).
+
+**note=yes**
 
 ---
 
