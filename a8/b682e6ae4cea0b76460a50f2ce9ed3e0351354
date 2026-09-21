@@ -1,0 +1,8 @@
+Negative-Receipt-ID: SG-090
+utc=2026-09-21T16:55:05Z
+DISPATCH_RESULT id=SG-090 coder=opencode exit=0 head=983e6d8c604f065a5c5450a6f9cdca11c444f4db note=no moved=yes rewrite=no dirty=no elapsed=99s budget=2100s
+P1_moved=PASS count=2
+P2_rewrite=PASS behind=0
+P3_note=FAIL note=no
+P5_receipt=FAIL
+P6_dirty=PASS dirty=no
