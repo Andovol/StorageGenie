@@ -325,12 +325,15 @@ describe("Catalog shell", () => {
     expect(screen.getByText("Drill")).toBeInTheDocument();
   });
 
-  test("the catalog route renders ONE StorageGenie wordmark (legacy nav gone)", async () => {
+  test("the landing route renders the App nav with the Analytics link (D95)", async () => {
     renderApp(["/"]);
     await screen.findByText("Drill");
 
-    expect(screen.getAllByText("StorageGenie")).toHaveLength(1);
-    expect(screen.queryByText("Phase 0 · local-first")).not.toBeInTheDocument();
+    // SG-073 D95: <Nav /> now renders unconditionally, so the landing route
+    // carries the Analytics link and the legacy nav footer line.
+    expect(await screen.findByRole("link", { name: "Analytics" })).toBeInTheDocument();
+    expect(screen.getByText("Phase 0 · local-first")).toBeInTheDocument();
+    expect(screen.getAllByText("StorageGenie")).toHaveLength(2);
   });
 
   test("a non-catalog route keeps the byte-identical legacy nav", async () => {

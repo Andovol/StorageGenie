@@ -50,9 +50,15 @@ DATA_CLOSE = "<<<END_CATALOGUE_DATA>>>"
 
 # The user-facing category values this service accepts, mapped to the catalogue
 # category slugs. An unsupported value is an enforced 422 at the route.
+# Food/medicine are the dedicated category-chat classes; household/documents ride
+# the SAME shared generic prompt below (descriptor `chat: "fallback"`, SG-073) —
+# no per-category prompt fork. Cosmetics stays gated out here on purpose
+# (`chat: "none"`): a dedicated cosmetics agent is a separate decision.
 SUPPORTED_CATEGORIES: dict[str, str] = {
     "food": "food_beverages",
     "medicine": "medicine_pharma",
+    "household": "household_chemicals",
+    "documents": "documents_other",
 }
 
 EMPTY_ANSWER = (

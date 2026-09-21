@@ -1,0 +1,194 @@
+SG-073 verify log — raw outputs (remaining categories: chat fallback + classify activation + nav on landing)
+All tests: temp SQLite, scripted provider, real HTTP routes. Zero network, zero provider calls.
+Commands run from /home/andrei/StorageGenie/backend with ../venv/bin/python, and from frontend/.
+
+== BASE / refs ==
+$ git rev-parse origin/automation
+47c2f68e1dd0b94bcfb430d1cc5c111c197bcf87
+$ git rev-parse HEAD
+47c2f68e1dd0b94bcfb430d1cc5c111c197bcf87
+$ git branch --show-current
+automation
+$ git remote -v
+origin  git@github.com:Andovol/StorageGenie.git (fetch)
+origin  git@github.com:Andovol/StorageGenie.git (push)
+$ git status --porcelain
+(empty at start)
+
+== CONTRACT ECHO (source: /home/andrei/storagegenie-contract/VERSION) ==
+0.28.2
+$ git -C /home/andrei/storagegenie-contract show -s --format='%H %d'
+b495b59b3426af66772a87939473ac558f8f72d2  (grafted, HEAD -> contract, origin/contract)
+
+== MODEL / EFFORT PROVENANCE (process args + provider metadata) ==
+$ tr '\0' '\n' < /proc/<coder-pid>/cmdline | head -8
+opencode
+run
+--auto
+--dir
+/home/andrei/StorageGenie
+--variant
+medium
+# SG-073 — remaining categories: Household/Documents chat fallback + classify activation + nav on landing (opencode, medium)
+# effort=medium from argv; no --model on argv -> CLI default (omitted per policy).
+$ grep 'llm.runtime\|llm.model' ~/.local/share/opencode/log/opencode.log | tail -1
+... message="llm runtime selected" llm.runtime=ai-sdk llm.provider=opencode-go llm.model=deepseek-v4.1-flash
+# model reported from provider metadata, never from a system-prompt identity line.
+
+== PREMISE READS ==
+$ sed -n '50,56p' backend/app/services/chat/service.py
+# The user-facing category values this service accepts, mapped to the catalogue
+# category slugs. An unsupported value is an enforced 422 at the route.
+SUPPORTED_CATEGORIES: dict[str, str] = {
+    "food": "food_beverages",
+    "medicine": "medicine_pharma",
+}
+$ sed -n '110,134p' backend/app/plugins/expiry_tracker.py   # BEFORE
+    "household_chemicals": Category(
+        "household_chemicals", "Household chemicals", False, True, {}, "", "Phase 3"
+    ),
+    "documents_other": Category(
+        "documents_other", "Documents/other", False, False, {}, "", "Phase 3"
+    ),
+$ sed -n '155,167p' backend/app/plugins/descriptor.py       # BEFORE
+        CategoryDescriptor(
+            "household_chemicals", "Household chemicals", False,
+            BehaviorProfile("basic-expiry", False, "fallback"),
+        ),
+        CategoryDescriptor(
+            "documents_other", "Documents/other", False,
+            BehaviorProfile("long-lead-60-30", False, "fallback"),
+        ),
+$ sed -n '53,58p' frontend/src/App.tsx                       # BEFORE
+export default function App() {
+  const { pathname } = useLocation();
+  return (
+    <div style={{ minHeight: "100vh", background: "white", color: "#111827" }}>
+      {pathname === "/" ? null : <Nav />}
+
+== BASELINE (original tests, source unchanged) ==
+$ ../venv/bin/python -m pytest tests/test_plugin_expiry.py tests/test_chat.py tests/test_plugin_taxonomy.py -q
+..............................                                           [100%]
+30 passed, 1 warning in 2.15s
+# The original `test_classification_profiles_round_trip_and_inactive_phase` is green here,
+# asserting the two pilot categories return 422 + "Phase 3".
+
+== FAIL-THEN-PASS RUN A: NEW TESTS AGAINST UNCHANGED SOURCE ==
+$ ../venv/bin/python -m pytest tests/test_chat.py tests/test_plugin_expiry.py -q
+...
+>       assert household_response.status_code == 200
+E       assert 422 == 200
+E        +  where 422 = <Response [422 Unprocessable Entity]>.status_code
+tests/test_plugin_expiry.py:139: AssertionError
+...
+>       assert response.status_code == 200, response.text
+E       AssertionError: {"type":"about:blank","title":"Unprocessable Entity","status":422,"detail":"unknown chat category: household"}
+E       assert 422 == 200
+tests/test_chat.py:526: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_chat.py::test_household_and_documents_share_the_generic_fallback_prompt
+FAILED tests/test_chat.py::test_chat_unknown_household_answers_empty_catalogue_not_404
+FAILED tests/test_plugin_expiry.py::test_classification_profiles_round_trip_and_activated_phase
+3 failed, 24 passed, 1 warning in 2.16s
+# RAW pre-change discriminator: POST /v1/chat/household -> 422 {"detail":"unknown chat category: household"}.
+
+$ ./node_modules/.bin/vitest run src/components/shell/shell.test.tsx     # frontend, source unchanged
+ ❯ src/components/shell/shell.test.tsx:334:25
+    334|     expect(await screen.findByRole("link", { name: "Analytics" })).to…
+ Test Files  1 failed (1)
+      Tests  1 failed | 19 passed (20)
+# RAW pre-change discriminator: the Analytics link is ABSENT on "/".
+
+== FAIL-THEN-PASS RUN B: NEW TESTS AGAINST CHANGED SOURCE ==
+$ ../venv/bin/python -m pytest tests/test_chat.py tests/test_plugin_expiry.py tests/test_plugin_taxonomy.py -q
+..................................                                       [100%]
+34 passed, 1 warning in 2.48s
+
+$ ./node_modules/.bin/vitest run src/components/shell/shell.test.tsx
+ ✓ src/components/shell/shell.test.tsx  (20 tests) 1389ms
+ Test Files  1 passed (1)
+      Tests  20 passed (20)
+
+== FULL BACKEND SUITE ==
+$ ../venv/bin/python -m pytest -q
+=========================== short test summary info ============================
+FAILED tests/test_signals.py::test_generated_codes_are_validated_and_bad_checksum_is_not_an_identifier
+FAILED tests/test_signals.py::test_ocr_has_text_boxes_and_mean_confidence - a...
+2 failed, 288 passed, 22 warnings in 17.05s
+
+== THE 2 REDS ARE BASE-PROVED (changes stashed) ==
+$ git stash push -m sg073-base-proof ; (cd backend && ../venv/bin/python -m pytest tests/test_signals.py -q) ; git stash pop
+WARNING  app.services.signals:signals.py:104 Barcode extraction unavailable: pyzbar/libzbar is not installed
+WARNING  app.services.signals:signals.py:210 OCR extraction unavailable: pytesseract is not installed
+FAILED tests/test_signals.py::test_generated_codes_are_validated_and_bad_checksum_is_not_an_identifier
+FAILED tests/test_signals.py::test_ocr_has_text_boxes_and_mean_confidence - a...
+2 failed, 5 passed, 3 warnings in 1.11s
+# Same two reds at BASE -> environment (missing libzbar/pytesseract), not this slice.
+
+== RUFF / MYPY ==
+$ ../venv/bin/python -m ruff check .
+All checks passed!
+ruff rc=0
+$ ../venv/bin/python -m mypy app
+Found 41 errors in 9 files (checked 75 source files)
+# by file: assets.py 15, review_tasks.py 6, households.py 6, evidence.py 4,
+#          asset_service.py 3, audit_service.py 2, schemas/asset.py 2, main.py 2, models/base.py 1
+# none of the 3 touched app files (services/chat/service.py, plugins/expiry_tracker.py,
+# plugins/descriptor.py) appears -> delta 0.
+$ git stash push -m sg073-mypy-base ; (cd backend && ../venv/bin/python -m mypy app | grep -c 'error:') ; git stash pop
+base total: 41
+current total: 41
+
+== FRONTEND BUILD + FULL VITEST ==
+$ npm run build
+dist/index.html                   0.94 kB │ gzip:  0.48 kB
+dist/assets/index-DxKo-z_g.css    2.65 kB │ gzip:  0.82 kB
+dist/assets/index-C1p5-32z.js   300.89 kB │ gzip: 89.18 kB
+✓ built in 1.68s
+build rc=0
+$ vitest run
+ Test Files  22 passed (22)
+      Tests  164 passed (164)
+
+== SECRET SCAN ==
+$ git diff | grep -niE "sk-|api[_-]?key|secret|password|token|BEGIN .*PRIVATE" | grep -v SENTINEL
+no matches in diff
+$ grep -rn "sk-SENTINEL-DO-NOT-WRITE" backend frontend docs   # pre-existing deliberate fixtures only
+backend/tests/test_planning.py:33:SENTINEL_KEY = "sk-SENTINEL-DO-NOT-WRITE-037"
+backend/tests/test_analytics.py:35:SENTINEL_KEY = "sk-SENTINEL-DO-NOT-WRITE-066"
+backend/tests/test_phase3_e2e.py:64:SENTINEL_KEY = "sk-SENTINEL-DO-NOT-WRITE-039"
+backend/tests/test_chat.py:34:SENTINEL_KEY = "sk-SENTINEL-DO-NOT-WRITE-038"
+# (test_chat.py line 34 is the SG-038 SENTINEL fixture; it is not written to any row — SG-038's
+#  `test_no_key_material_in_any_written_row` still green in the 288-passed suite.)
+
+== NO MIGRATION ==
+$ git diff --name-only
+backend/app/plugins/descriptor.py
+backend/app/plugins/expiry_tracker.py
+backend/app/services/chat/service.py
+backend/tests/test_chat.py
+backend/tests/test_plugin_expiry.py
+frontend/src/App.tsx
+frontend/src/components/shell/shell.test.tsx
+# no backend/alembic path touched.
+
+== SERVED TAXONOMY active (real HTTP path) ==
+$ ../venv/bin/python - <<'PY' ... TestClient(app).get('/v1/taxonomy') ...
+food_beverages active= True notification= tiered-30-7-1
+medicine_pharma active= True notification= tiered-short
+cosmetics_personal_care active= True notification= tiered-90-30-7
+household_chemicals active= True notification= basic-expiry
+documents_other active= True notification= long-lead-60-30
+non_perishable active= True notification= none
+
+== RAW CHAT PROBE (real route + real service, scripted provider, cost 0.0) ==
+$ ../venv/bin/python /tmp/opencode/sg073/probe_chat.py
+POST /v1/chat/household -> 200 {"status":"ok","reason":null,"answer":"probe answer","grounded":true,"empty_catalogue":false,"category":"household","catalogue_size":1,"provider":"probe","model":"probe-1","provider_call_id":"01a0c38a-3ea3-7743-ac7a-a6a2cbcbe6c2","usage":{"total_tokens":1},"cost":0.0,"latency_ms":1.0}
+POST /v1/chat/documents -> 200 {"status":"ok","reason":null,"answer":"probe answer","grounded":true,"empty_catalogue":false,"category":"documents","catalogue_size":1,"provider":"probe","model":"probe-1","provider_call_id":"01a0c38a-3eac-71d2-a860-61b59d5eeacd","usage":{"total_tokens":1},"cost":0.0,"latency_ms":1.0}
+POST /v1/chat/cosmetics -> 422 {"type":"about:blank","title":"Unprocessable Entity","status":422,"detail":"unknown chat category: cosmetics"}
+
+== ANGLE-TOKEN RE-PROBE (char codes 60/62) AFTER EDIT ==
+backend/app/services/chat/service.py: '<' count=6 '>' count=20
+    1766 'EN = "<<<CATAL' [60, 60, 60]
+    1802 'SE = "<<<END_C' [60, 60, 60]
+# delimiters intact: chr(60)*3 ... chr(62)*3. New tests build the delimiter from chr(60)/chr(62).

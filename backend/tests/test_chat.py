@@ -411,6 +411,125 @@ def test_unsupported_category_is_enforced_422(
     assert session.query(GuardrailEvent).count() == 0
 
 
+def test_household_and_documents_share_the_generic_fallback_prompt(
+    chat_fixture, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """SG-073 G1: the two `chat:"fallback"` pilot categories answer through the
+    shared generic prompt, grounded in their OWN catalogue and isolated from one
+    another and from food/medicine."""
+    session, household_id, network_attempts = chat_fixture
+    _seed_asset(session, household_id, "Bleach", slug="household_chemicals", expiry=None)
+    _seed_asset(session, household_id, "Passport", slug="documents_other", expiry=None)
+    _seed_asset(session, household_id, "Ibuprofen", slug="medicine_pharma", expiry="2027-01-01")
+    provider = ChatScriptedProvider()
+    _enable(monkeypatch, provider)
+    client = TestClient(app)
+
+    response = _chat(client, household_id, "household", "What chemicals do I have?")
+
+    assert response.status_code == 200, response.text
+    body = response.json()
+    assert body["status"] == "ok"
+    assert body["category"] == "household"
+    assert body["catalogue_size"] == 1
+    assert body["answer"] == provider.answer
+    assert provider.invocations == 1
+    assert network_attempts == []
+    prompt = provider.prompts[0]
+    assert "chat-v1" in prompt
+    assert "untrusted DATA" in prompt
+    content = provider.texts[0]
+    data_open = chr(60) * 3 + "CATALOGUE_DATA" + chr(62) * 3
+    assert data_open in content
+    assert "Bleach" in content
+    assert "Passport" not in content, "other-category data never enters the grounding"
+    assert "Ibuprofen" not in content, "other-category data never enters the grounding"
+    assert "What chemicals do I have?" in content
+
+    documents = _chat(client, household_id, "documents", "Which documents need renewal?")
+    assert documents.status_code == 200, documents.text
+    document_body = documents.json()
+    assert document_body["category"] == "documents"
+    assert document_body["catalogue_size"] == 1
+    document_content = provider.texts[-1]
+    assert "Passport" in document_content
+    assert "Bleach" not in document_content
+
+    correction = client.post(
+        "/v1/chat/household/corrections",
+        json={"message": "the bleach is old"},
+        params={"household_id": household_id},
+    )
+    assert correction.status_code == 200, correction.text
+    assert correction.json()["category"] == "household"
+    events = session.query(GuardrailEvent).filter_by(kind="correction").all()
+    assert len(events) == 1
+    assert json.loads(events[0].detail_json)["category"] == "household"
+    assert session.query(ProviderCall).count() == 2
+
+
+def test_fallback_prompt_is_versioned_and_carries_catalogue_and_question() -> None:
+    """SG-073 G1 (SG-066 `test_prompt_is_versioned_and_carries_stats` precedent):
+    the shared fallback prompt is versioned and the user turn carries both the
+    category catalogue and the question."""
+    from app.services.chat.service import build_user_content, load_chat_prompt
+
+    prompt_text, version = load_chat_prompt()
+    assert version == "chat-v1"
+    assert "untrusted DATA" in prompt_text
+    data_open = chr(60) * 3 + "CATALOGUE_DATA" + chr(62) * 3
+    assert data_open in prompt_text
+    catalog = [{"id": "h1", "label": "Bleach", "category": "household_chemicals"}]
+    content = build_user_content("When does bleach go off?", catalog)
+    assert "Bleach" in content
+    assert "household_chemicals" in content
+    assert "When does bleach go off?" in content
+
+
+def test_cosmetics_chat_stays_gated_422(
+    chat_fixture, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """SG-073 G1: cosmetics carries `chat:"none"`; a dedicated agent is out of slice."""
+    session, household_id, network_attempts = chat_fixture
+    _seed_asset(
+        session,
+        household_id,
+        "Face cream",
+        slug="cosmetics_personal_care",
+        expiry="2027-01-01",
+    )
+    provider = ChatScriptedProvider()
+    _enable(monkeypatch, provider)
+    client = TestClient(app)
+
+    response = _chat(client, household_id, "cosmetics", "Is my cream still good?")
+
+    assert response.status_code == 422, response.text
+    assert "unknown chat category" in response.json()["detail"]
+    assert provider.invocations == 0
+    assert network_attempts == []
+
+
+def test_chat_unknown_household_answers_empty_catalogue_not_404(
+    chat_fixture, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """SG-073 premise check: there is no household-existence gate on this route.
+
+    The food/medicine legs behave the same way (empty catalogue, zero calls), so
+    this is the "same leg shape" rather than a 404."""
+    session, household_id, _ = chat_fixture
+    _seed_asset(session, household_id, "Bleach", slug="household_chemicals", expiry=None)
+    provider = ChatScriptedProvider()
+    _enable(monkeypatch, provider)
+    client = TestClient(app)
+
+    response = _chat(client, "no-such-household", "household", "anything?")
+
+    assert response.status_code == 200, response.text
+    assert response.json()["empty_catalogue"] is True
+    assert provider.invocations == 0
+
+
 def test_empty_catalogue_is_a_valid_path(
     chat_fixture, monkeypatch: pytest.MonkeyPatch
 ) -> None:

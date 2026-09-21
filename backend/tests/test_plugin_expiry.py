@@ -65,11 +65,16 @@ def test_registry_rejects_unknown_and_version_mismatch() -> None:
         get_plugin("expiry-tracker", "2.0.0")
 
 
-def test_classification_profiles_round_trip_and_inactive_phase(plugin_db) -> None:  # type: ignore[no-untyped-def]
+def test_classification_profiles_round_trip_and_activated_phase(plugin_db) -> None:  # type: ignore[no-untyped-def]
+    """SG-073 G2: Household/Documents are activated (were 422 `Phase 3`), ride the
+    EXISTING classify + manual-entry + extension path, and the food/medicine/
+    cosmetics legs are byte-unchanged."""
     session, household_id = plugin_db
     food = make_asset(session, household_id, "Canned beans")
     medicine = make_asset(session, household_id, "Medicine")
     cosmetics = make_asset(session, household_id, "Moisturiser")
+    household = make_asset(session, household_id, "Bleach")
+    documents = make_asset(session, household_id, "Passport")
     with TestClient(app) as client:
         food_response = classify(client, food.id, household_id, "Food & beverages")
         medicine_response = classify(client, medicine.id, household_id, "Medicine/pharma")
@@ -78,10 +83,36 @@ def test_classification_profiles_round_trip_and_inactive_phase(plugin_db) -> Non
             f"/v1/plugins/expiry-tracker/assets/{food.id}/classification",
             params={"household_id": household_id},
         )
-        inactive = [
-            classify(client, food.id, household_id, category)
-            for category in ("Household chemicals", "Documents/other")
-        ]
+        household_response = classify(client, household.id, household_id, "Household chemicals")
+        documents_response = classify(client, documents.id, household_id, "Documents/other")
+        household_readback = client.get(
+            f"/v1/plugins/expiry-tracker/assets/{household.id}/classification",
+            params={"household_id": household_id},
+        )
+        documents_readback = client.get(
+            f"/v1/plugins/expiry-tracker/assets/{documents.id}/classification",
+            params={"household_id": household_id},
+        )
+        household_entry = client.post(
+            f"/v1/plugins/expiry-tracker/assets/{household.id}/expiry",
+            params={"household_id": household_id},
+            json={"expiry_date": "2030-05-06", "date_type": "use_by"},
+        )
+        household_extensions = client.post(
+            f"/v1/plugins/expiry-tracker/assets/{household.id}/extensions",
+            params={"household_id": household_id},
+            json={"attributes": {"storage_location": "garage_utility"}},
+        )
+        documents_extensions = client.post(
+            f"/v1/plugins/expiry-tracker/assets/{documents.id}/extensions",
+            params={"household_id": household_id},
+            json={"attributes": {"storage_location": "pantry"}},
+        )
+        documents_entry = client.post(
+            f"/v1/plugins/expiry-tracker/assets/{documents.id}/expiry",
+            params={"household_id": household_id},
+            json={"expiry_date": "2030-05-06"},
+        )
     assert food_response.status_code == 200
     assert food_response.json()["classification"]["profile"]["tier_defaults"] == {
         "critical": 1,
@@ -105,7 +136,27 @@ def test_classification_profiles_round_trip_and_inactive_phase(plugin_db) -> Non
     assert readback.json()["classification"]["category"] == "food_beverages"
     stored = session.query(Assertion).filter_by(asset_id=food.id, field_path="plugin:expiry-tracker/classification").one()
     assert json.loads(stored.value_json)["category"] == readback.json()["classification"]["category"]
-    assert all(response.status_code == 422 and "Phase 3" in response.json()["detail"] for response in inactive)
+    assert household_response.status_code == 200
+    household_profile = household_response.json()["classification"]["profile"]
+    assert household_profile["tier_defaults"] == {"upcoming": 30}
+    assert household_profile["opened_date_tracking"] is False
+    assert household_response.json()["classification"]["category"] == "household_chemicals"
+    assert household_response.json()["expiry_assertion"]["review_state"] == "needs_evidence"
+    assert household_readback.status_code == 200
+    assert household_readback.json()["classification"]["category"] == "household_chemicals"
+    assert documents_response.status_code == 200
+    documents_profile = documents_response.json()["classification"]["profile"]
+    assert documents_profile["tier_defaults"] == {"long_lead": 60, "upcoming": 30}
+    assert documents_profile["opened_date_tracking"] is False
+    assert documents_response.json()["classification"]["category"] == "documents_other"
+    assert documents_response.json()["expiry_assertion"] is None
+    assert documents_readback.status_code == 200
+    assert documents_readback.json()["classification"]["category"] == "documents_other"
+    assert household_entry.status_code == 200
+    assert household_entry.json()["assertion"]["value"]["expiry_date"] == "2030-05-06"
+    assert household_extensions.status_code == 200
+    assert documents_extensions.status_code == 200
+    assert documents_entry.status_code == 422 and "non-perishable" in documents_entry.json()["detail"]
 
 
 def test_cosmetics_classifies_without_a_new_task_type(plugin_db) -> None:  # type: ignore[no-untyped-def]

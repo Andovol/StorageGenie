@@ -1,0 +1,28 @@
+SG-073 running log — remaining categories: Household/Documents chat fallback + classify activation + nav on landing
+
+[10:29Z] coder proc argv (/proc/4136270/cmdline): opencode run --auto --dir /home/andrei/StorageGenie --variant medium ; no --model on argv (CLI default, omitted per policy). effort=medium from argv.
+[recon] pwd=/home/andrei/StorageGenie branch=automation ; worktree clean ; remote git@github.com:Andovol/StorageGenie.git.
+[recon] BASE origin/automation resolved 47c2f68e1dd0b94bcfb430d1cc5c111c197bcf87 == HEAD (packet commit "D94+D95: SG-073 remaining-categories packet").
+[recon] contract /home/andrei/storagegenie-contract/VERSION = 0.28.2 ; contract repo HEAD b495b59b3426af66772a87939473ac558f8f72d2 (contract). matches packet.
+[recon] chat gate confirmed: SUPPORTED_CATEGORIES = {food, medicine} at backend/app/services/chat/service.py:53-56 ; resolve_category raises UnsupportedCategoryError -> route 422.
+[recon] fallback prompt decision: chat-v1.md is already the ONE generic grounded prompt; reusing it is the "shared generic template" the packet prefers. No new prompt file (scope ceiling bars "other prompts").
+[recon] CATEGORIES rows for household_chemicals/documents_other = active False, phase "Phase 3", tier_defaults {} — F-SG065-2 confirmed.
+[recon] descriptor active flags False/False for the two pilots; behaviour profiles already basic-expiry / long-lead-60-30, opened_date_tracking False, chat fallback.
+[recon] Landing nav: frontend/src/App.tsx:57 `{pathname === "/" ? null : <Nav />}` confirmed; shell.test.tsx asserted the old "ONE wordmark / no Phase 0" behaviour (must invert).
+[recon] PINNING PREMISE GAP: packet says "tier values read from the shipped rows/descriptor". Shipped rows carry `{}`; descriptor carries only mode NAMES. No numbers exist in-tree. Values declared UNCALIBRATED (G-A9, SG-036 precedent).
+[baseline] pytest tests/test_plugin_expiry.py tests/test_chat.py tests/test_plugin_taxonomy.py -> 30 passed (original pinning test green, asserting 422 Phase 3).
+[step-1 tests] added chat fallback/isolation/corrections/cosmetics-422/unknown-household tests; inverted the pinning test to activation + manual-entry + extensions; inverted the shell landing-nav test.
+[pre-change] pytest tests/test_chat.py tests/test_plugin_expiry.py -> 3 failed, 24 passed (household 422 not 200; pinning 422 not 200; unknown-household gated). Raw 422 body: {"status":422,"detail":"unknown chat category: household"}.
+[pre-change] vitest shell.test.tsx -> 1 failed, 19 passed (Analytics link absent on "/").
+[step-2 source] service.py SUPPORTED_CATEGORIES += household/documents ; expiry_tracker.py HOUSEHOLD_TIERS={upcoming:30}, DOCUMENTS_TIERS={long_lead:60,upcoming:30} + rows active ; descriptor.py active True/True ; App.tsx renders <Nav/> unconditionally.
+[post-change] pytest tests/test_chat.py tests/test_plugin_expiry.py tests/test_plugin_taxonomy.py -> 34 passed.
+[post-change] vitest shell.test.tsx -> 20 passed.
+[gates] full backend suite -> 2 failed, 288 passed ; the 2 are base-proved env reds (pyzbar/libzbar + pytesseract not installed), reproduced with changes stashed.
+[gates] ruff -> All checks passed! ; mypy base=41 current=41 (delta 0; none of the 3 touched app files in the error set) ; npm run build green (index-C1p5-32z.js 300.89 kB) ; full vitest 22 files / 164 passed.
+[gates] secret scan diff 0 ; no migration (backend/alembic diff empty) ; no deploy, no restart.
+[evidence] served GET /v1/taxonomy: household_chemicals active=True / documents_other active=True (all six categories active).
+[evidence] raw POST probe (real route, scripted provider): /v1/chat/household -> 200 grounded, /v1/chat/documents -> 200 grounded, /v1/chat/cosmetics -> 422.
+[cost] zero metered calls, real spend $0.000000.
+[commit] work commit WORK_HEAD=<pending> pushed on automation.
+[receipt] note + mapped-fetch verify output recorded in SG-073_report.md.
+[end] worktree clean; final $0.000000; overall well under 1800s.

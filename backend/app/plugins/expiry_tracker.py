@@ -108,6 +108,19 @@ COSMETICS_TIERS = {
     NotificationTier.UPCOMING.value: 90,
 }
 
+# SG-073 pilot profiles. The descriptor carries only the mode NAMES
+# (`basic-expiry`, `long-lead-60-30`), not numbers, so these values are
+# DECLARED UNCALIBRATED (`G-A9`), not read from a shipped row: Household =
+# blueprint §9.1 "Basic expiry only — Minimal special logic" (one basic window);
+# Documents = "Long-lead windows (60/30 day)" — the mode name's own 60/30 pair.
+HOUSEHOLD_TIERS = {
+    NotificationTier.UPCOMING.value: 30,
+}
+DOCUMENTS_TIERS = {
+    NotificationTier.UPCOMING.value: 30,
+    NotificationTier.LONG_LEAD.value: 60,
+}
+
 CATEGORIES: dict[str, Category] = {
     "food_beverages": Category(
         "food_beverages", "Food & beverages", True, True, FOOD_TIERS, NotificationTier.UPCOMING.value
@@ -125,10 +138,20 @@ CATEGORIES: dict[str, Category] = {
         opened_date_tracking=True,
     ),
     "household_chemicals": Category(
-        "household_chemicals", "Household chemicals", False, True, {}, "", "Phase 3"
+        "household_chemicals",
+        "Household chemicals",
+        True,
+        True,
+        HOUSEHOLD_TIERS,
+        NotificationTier.UPCOMING.value,
     ),
     "documents_other": Category(
-        "documents_other", "Documents/other", False, False, {}, "", "Phase 3"
+        "documents_other",
+        "Documents/other",
+        True,
+        False,
+        DOCUMENTS_TIERS,
+        NotificationTier.LONG_LEAD.value,
     ),
     "non_perishable": Category("non_perishable", "Non-perishable", True, False, {}, ""),
 }

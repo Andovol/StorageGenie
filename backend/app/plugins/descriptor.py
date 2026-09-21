@@ -123,11 +123,11 @@ def validate_taxonomy(taxonomy: PluginTaxonomy) -> PluginTaxonomy:
     return taxonomy
 
 
-# The shipped Expiry Tracker taxonomy. Food/Medicine/Cosmetics/Non-perishable
-# mirror what ``expiry_tracker.CATEGORIES`` already enforces; Household
-# chemicals and Documents/other carry the blueprint §9.1 pilot profiles (their
-# shipped ``CATEGORIES`` rows are inactive Phase-3 placeholders — see
-# F-SG065-2). ``date_types``/``units`` are enumerated from the shipped enums,
+# The shipped Expiry Tracker taxonomy. Every category mirrors what
+# ``expiry_tracker.CATEGORIES`` enforces; Household chemicals and Documents/other
+# carry the blueprint §9.1 pilot profiles and are active since SG-073 (their
+# ``CATEGORIES`` rows carry the pilot tiers — the F-SG065-2 Phase-3 placeholders
+# are gone). ``date_types``/``units`` are enumerated from the shipped enums,
 # never re-typed.
 from app.plugins.expiry_tracker import DateType, Unit  # noqa: E402
 
@@ -156,13 +156,13 @@ EXPIRY_TRACKER_TAXONOMY = PluginTaxonomy(
         CategoryDescriptor(
             "household_chemicals",
             "Household chemicals",
-            False,
+            True,
             BehaviorProfile("basic-expiry", False, "fallback"),
         ),
         CategoryDescriptor(
             "documents_other",
             "Documents/other",
-            False,
+            True,
             BehaviorProfile("long-lead-60-30", False, "fallback"),
         ),
         CategoryDescriptor(
