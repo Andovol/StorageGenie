@@ -1,0 +1,127 @@
+SG-090 — SG-085 failure probe — command transcript (UTC 2026-09-21)
+Work dir /home/andrei/StorageGenie · branch automation · remote git@github.com:Andovol/StorageGenie.git
+
+$ date -u +%Y-%m-%dT%H:%M:%SZ
+2026-09-21T16:53:54Z
+
+$ git branch --show-current
+automation
+
+$ git rev-parse HEAD
+9a90c5bc2cbba49b681a58a096749c894715d017
+
+$ git status --porcelain
+(empty)
+
+$ git log --oneline -5
+9a90c5b SG-090 packet: read-only probe of SG-085 129s exit-1 (D107 L3, D104 pattern)
+ef029d0 SG-085 packet: eval-runner selector + frozen baselines (offline $0, D107 slice 1); taxonomy spec+plan filed, ...
+6531599 Close 2026-09-21: 4 slices rated 98; Phase 4 shut, Phase 5 + Enrich staged; STATE trimmed 124606->~12KB (cons...
+d549397 D108+D109 recorded (Enrich OFF-Jina approved, key placed, Vision deferred)
+6366f8b D107 recorded; owner enrich source research filed (D102 gate satisfied)
+
+$ ls -1 docs/packets/SG-085-*.md | wc -l
+1
+docs/packets/SG-085-eval-hardening.md  11.4K
+
+$ git merge-base --is-ancestor ef029d0 HEAD && echo "ef029d0 IS ancestor of HEAD" || echo "ef029d0 NOT ancestor of HEAD"
+ef029d0 IS ancestor of HEAD
+
+$ timeout 120 journalctl --no-pager -u dispatch-storagegenie@SG-085.service 2>&1
+Hint: You are currently not seeing messages from other users and the system.
+      Users in groups 'adm', 'systemd-journal' can see all messages.
+      Pass -q to turn off this notice.
+Sep 21 16:46:34 ubuntu run-coder[556291]: contract_sync=refresh version=0.28.2
+Sep 21 16:48:42 ubuntu run-coder[556291]: DISPATCH_RESULT id=SG-085 coder=opencode exit=1 head=ef029d0ec1e0f8eae60cf85e464469612a2478c6 note=no moved=no rewrite=no dirty=no elapsed=129s budget=2100s
+Sep 21 16:48:46 ubuntu run-coder[556291]: restart_request=none
+Sep 21 16:48:46 ubuntu run-coder[556291]: AUDIT id=SG-085
+Sep 21 16:48:46 ubuntu run-coder[556291]: START=ef029d0ec1e0f8eae60cf85e464469612a2478c6
+Sep 21 16:48:46 ubuntu run-coder[556291]: END=ef029d0ec1e0f8eae60cf85e464469612a2478c6
+Sep 21 16:48:46 ubuntu run-coder[556291]: contract=0.28.2
+Sep 21 16:48:46 ubuntu run-coder[556291]: model=cli-default
+Sep 21 16:48:46 ubuntu run-coder[556291]: effort=medium
+Sep 21 16:48:46 ubuntu run-coder[556291]: tokens_total=unknown
+Sep 21 16:48:46 ubuntu run-coder[556291]: P1_moved=FAIL count=0
+Sep 21 16:48:46 ubuntu run-coder[556291]: P2_rewrite=PASS behind=0
+Sep 21 16:48:46 ubuntu run-coder[556291]: P3_note=FAIL note=no
+Sep 21 16:48:46 ubuntu run-coder[556291]: P5_receipt=FAIL
+Sep 21 16:48:46 ubuntu run-coder[556291]: P6_dirty=PASS dirty=no
+Sep 21 16:48:46 ubuntu run-coder[556291]: negative_receipt=published
+Sep 21 16:48:46 ubuntu run-coder[556291]: restart_marker_committed=PASS
+Sep 21 16:48:46 ubuntu run-coder[556291]: report_cited_missing=SKIPPED reason=p5_not_pass
+Sep 21 16:48:46 ubuntu run-coder[556291]: advisory_failed=P1_moved,P3_note
+Sep 21 16:48:46 ubuntu run-coder[556291]: sql_touched=no
+Sep 21 16:48:46 ubuntu run-coder[556291]: product_touch=no
+Sep 21 16:48:46 ubuntu run-coder[556291]: files: count=0
+Sep 21 16:48:46 ubuntu run-coder[556291]: log_tail:
+Sep 21 16:48:46 ubuntu run-coder[556291]:   fixture sg029-09-no-date-visible-cosmetics: score=1.000 needs=1 unknowns=1 items=1.00
+Sep 21 16:48:46 ubuntu run-coder[556291]:   fixture sg029-10-partial-label-cosmetics: score=1.000 needs=1 unknowns=1 items=1.00
+Sep 21 16:48:46 ubuntu run-coder[556291]:   field_accuracy=0.833 over 10 fixtures
+Sep 21 16:48:46 ubuntu run-coder[556291]:   unknown_rate=4/7=0.571
+Sep 21 16:48:46 ubuntu run-coder[556291]:   correction_rate=0/6=0.000 (audit_event plugin.assertion.write rows=6)
+Sep 21 16:48:46 ubuntu run-coder[556291]:
+Sep 21 16:48:46 ubuntu run-coder[556291]:   $ cd /home/andrei/StorageGenie/backend && echo "=== ruff BASE ==="; timeout 120 venv/bin/python -m ruff check . 2>&1 | tail -5; echo "RUFF_EXIT=${PIPESTATUS[0]}"; echo "=== mypy BASE ==="; timeout 300 venv/bin/python -m mypy app eval tests 2>&1 | tail -15; echo "MYPY_EXIT=${PIPESTATUS[0]}"
+Sep 21 16:48:46 ubuntu run-coder[556291]:   === ruff BASE ===
+Sep 21 16:48:46 ubuntu run-coder[556291]:   All checks passed!
+Sep 21 16:48:46 ubuntu run-coder[556291]:   RUFF_EXIT=0
+Sep 21 16:48:46 ubuntu run-coder[556291]:   === mypy BASE ===
+Sep 21 16:48:46 ubuntu run-coder[556291]:   tests/test_postgres_dialect.py: error: Source file found twice under different module names: "test_postgres_dialect" and "tests.test_postgres_dialect"
+Sep 21 16:48:46 ubuntu run-coder[556291]:   tests/test_postgres_dialect.py: note: See https://mypy.readthedocs.io/en/stable/running_mypy.html#mapping-file-paths-to-modules for more info
+Sep 21 16:48:46 ubuntu run-coder[556291]:   tests/test_postgres_dialect.py: note: Common resolutions include:
+Sep 21 16:48:46 ubuntu run-coder[556291]:   tests/test_postgres_dialect.py: note:     a) adding `__init__.py` somewhere,
+Sep 21 16:48:46 ubuntu run-coder[556291]:   tests/test_postgres_dialect.py: note:     b) using `--explicit-package-bases` or adjusting `MYPYPATH`
+Sep 21 16:48:46 ubuntu run-coder[556291]:   Found 1 error in 1 file (errors prevented further checking)
+Sep 21 16:48:46 ubuntu run-coder[556291]:   MYPY_EXIT=2
+Sep 21 16:48:46 ubuntu run-coder[556291]:
+Sep 21 16:48:46 ubuntu run-coder[556291]:   $ cd /home/andrei/StorageGenie && rtk grep -rn "mypy" docs/worklogs/SG-080_verify.log docs/worklogs/SG-080_report.md docs/worklogs/SG-079_report.md 2>/dev/null | head -30
+Sep 21 16:48:46 ubuntu run-coder[556291]:   docs/worklogs/SG-080_verify.log:11:## R-BASE-2 — baseline ruff + mypy
+Sep 21 16:48:46 ubuntu run-coder[556291]:   docs/worklogs/SG-080_verify.log:14:$ ../venv/bin/python -m mypy app
+Sep 21 16:48:46 ubuntu run-coder[556291]:   docs/worklogs/SG-080_verify.log:82:$ ../venv/bin/python -m mypy app
+Sep 21 16:48:46 ubuntu run-coder[556291]:   docs/worklogs/SG-080_report.md:77:- **Suite / lint / type / secrets:** full backend suite **2 failed, 356 passed** — the **same 2 base decoder reds** as the clean-BASE baseline (2 failed, 344 passed); ruff `All checks passed!`; mypy **41 errors in 9 files** == baseline (delta 0); secret scan 0. Raw in `SG-080_verify.log`.
+Sep 21 16:48:46 ubuntu run-coder[556291]:   docs/worklogs/SG-079_report.md:107:- **`mypy` delta 0:** pre-change `Found 41 errors in 9 files` == post-change `Found 41 errors in 9 files`;
+Sep 21 16:48:46 ubuntu run-coder[556291]:   docs/worklogs/SG-079_report.md:108:  `mypy app` reports **0** errors in `schemas.py`. Delta 0, quoted.
+Sep 21 16:48:46 ubuntu run-coder[556291]:   docs/worklogs/SG-079_report.md:137:  stash-reproved base reds, ruff clean, mypy delta 0, secret scan 0.
+Sep 21 16:48:46 ubuntu run-coder[556291]:   docs/worklogs/SG-079_report.md:181:mypy "delta 0" compares two real full runs (41/9 both). The scope-diff and secret-scan checks were run
+Sep 21 16:48:46 ubuntu run-coder[556291]:
+Sep 21 16:48:46 ubuntu run-coder[556291]:   Error: Upstream request failed: [server_error] Upstream response was not valid JSON
+
+$ timeout 120 journalctl --no-pager -u dispatch-storagegenie@SG-085.service 2>&1 | grep -c "run_coder=fail"
+0
+
+$ timeout 120 journalctl --no-pager -u dispatch-storagegenie@SG-085.service 2>&1 | grep -n "reason="
+21:Sep 21 16:48:46 ubuntu run-coder[556291]: report_cited_missing=SKIPPED reason=p5_not_pass
+
+$ timeout 120 journalctl --no-pager -u dispatch-storagegenie@SG-085.service 2>&1 | wc -l
+56
+
+$ timeout 120 opencode --version
+1.17.19
+exit=0
+
+$ which opencode; ls -l /usr/local/bin/opencode
+/usr/local/bin/opencode
+-rwxr-xr-x 1 root root 189245568 Jul 13 19:06 /usr/local/bin/opencode
+
+$ cat output/dispatch/SG-085.launcher.sh
+#!/usr/bin/env bash
+set -euo pipefail
+cd /home/andrei/StorageGenie
+PROMPT_FILE=docs/packets/SG-085-eval-hardening.md
+exec opencode run --auto --dir /home/andrei/StorageGenie --variant medium "$(cat "$PROMPT_FILE")"
+
+$ head -3 output/dispatch/SG-085.log
+> build · deepseek-v4.1-flash
+$ ... (recon: git status/log/rev-parse, packet read)
+$ ... (work: pytest 2 failed, 356 passed; eval/run.py baseline; ruff All checks passed!; mypy EXIT=2)
+
+$ tail -1 output/dispatch/SG-085.log
+Error: Upstream request failed: [server_error] Upstream response was not valid JSON
+
+$ cat /proc/560765/cmdline | tr '\0' ' '
+opencode run --auto --dir /home/andrei/StorageGenie --variant medium # SG-090 ...
+
+$ git remote -v
+origin  git@github.com:Andovol/StorageGenie.git (fetch)
+origin  git@github.com:Andovol/StorageGenie.git (push)
+
+No dispatch verb was run. No unit started/polled/retried. No provider call. No --force. No restart. No deploy.
