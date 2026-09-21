@@ -1,0 +1,189 @@
+SG-091 raw probe log
+====================
+live_clock(open)=2026-09-21T17:48:41Z
+work_dir=/home/andrei/StorageGenie
+origin=git@github.com:Andovol/StorageGenie.git (fetch+push)
+BASE_HEAD=339bf4e9eaf22b6938b71bb8522708f9a40c9cfb
+origin/automation=339bf4e9eaf22b6938b71bb8522708f9a40c9cfb
+
+=== G0a: packet resolution (exactly-one) ===
+$ ls -la docs/packets/ | grep -i 'SG-088'
+664  SG-088-derived-registry.md  10.2K
+$ (glob docs/packets/SG-088-*.md)
+docs/packets/SG-088-derived-registry.md   (1 match, exactly-one)
+
+$ sed -n '3,5p' docs/packets/SG-088-derived-registry.md
+**Dispatch params for the runner (read from this committed packet; model is the CLI default and is omitted per policy):**
+coder: opencode
+effort: medium
+
+=== G0b: dd2bb9c reachability (ancestor form, PG-IC-07) ===
+$ git merge-base --is-ancestor dd2bb9c origin/automation; echo ancestor_exit=$?
+ancestor_exit=0
+$ git cat-file -t dd2bb9c
+commit
+$ git log --oneline -1 dd2bb9c
+dd2bb9c SG-088 packet: derived table registry, remove EXPECTED_TABLES static copy (tests-only, D107 slice 4)
+
+=== G1: unit journal (bound 120s) ===
+$ timeout 120 journalctl --no-pager -u dispatch-storagegenie@SG-088.service -n 200
+(note from journalctl, first lines:)
+Hint: You are currently not seeing messages from other users and the system.
+      Users in groups 'adm', 'systemd-journal' can see all messages.
+      Pass -q to turn off this notice.
+Sep 21 17:43:09 ubuntu run-coder[591863]: contract_sync=refresh version=0.28.2
+Sep 21 17:46:49 ubuntu run-coder[591863]: DISPATCH_RESULT id=SG-088 coder=opencode exit=1 head=dd2bb9c1a179513b50c5772a19befa24214f5dd8 note=no moved=no rewrite=no dirty=yes elapsed=221s budget=2100s
+Sep 21 17:46:52 ubuntu run-coder[591863]: restart_request=none
+Sep 21 17:46:52 ubuntu run-coder[591863]: AUDIT id=SG-088
+Sep 21 17:46:52 ubuntu run-coder[591863]: START=dd2bb9c1a179513b50c5772a19befa24214f5dd8
+Sep 21 17:46:52 ubuntu run-coder[591863]: END=dd2bb9c1a179513b50c5772a19befa24214f5dd8
+Sep 21 17:46:52 ubuntu run-coder[591863]: contract=0.28.2
+Sep 21 17:46:52 ubuntu run-coder[591863]: model=cli-default
+Sep 21 17:46:52 ubuntu run-coder[591863]: effort=medium
+Sep 21 17:46:52 ubuntu run-coder[591863]: tokens_total=unknown
+Sep 21 17:46:52 ubuntu run-coder[591863]: P1_moved=FAIL count=0
+Sep 21 17:46:52 ubuntu run-coder[591863]: P2_rewrite=PASS behind=0
+Sep 21 17:46:52 ubuntu run-coder[591863]: P3_note=FAIL note=no
+Sep 21 17:46:52 ubuntu run-coder[591863]: P5_receipt=FAIL
+Sep 21 17:46:52 ubuntu run-coder[591863]: P6_dirty=FAIL dirty=yes
+Sep 21 17:46:52 ubuntu run-coder[591863]: negative_receipt=published
+Sep 21 17:46:52 ubuntu run-coder[591863]: restart_marker_committed=PASS
+Sep 21 17:46:52 ubuntu run-coder[591863]: report_cited_missing=SKIPPED reason=p5_not_pass
+Sep 21 17:46:52 ubuntu run-coder[591863]: advisory_failed=P1_moved,P3_note,P6_dirty
+Sep 21 17:46:52 ubuntu run-coder[591863]: sql_touched=no
+Sep 21 17:46:52 ubuntu run-coder[591863]: product_touch=no
+Sep 21 17:46:52 ubuntu run-coder[591863]: files: count=0
+Sep 21 17:46:52 ubuntu run-coder[591863]: DIRTY
+Sep 21 17:46:52 ubuntu run-coder[591863]: status:
+Sep 21 17:46:52 ubuntu run-coder[591863]:    M backend/tests/test_plugin_taxonomy.py
+Sep 21 17:46:52 ubuntu run-coder[591863]:    M backend/tests/test_postgres_dialect.py
+Sep 21 17:46:52 ubuntu run-coder[591863]:   ?? docs/worklogs/SG-088.log
+Sep 21 17:46:52 ubuntu run-coder[591863]:   ?? docs/worklogs/SG-088_verify.log
+Sep 21 17:46:52 ubuntu run-coder[591863]: log_tail:
+Sep 21 17:46:52 ubuntu run-coder[591863]:   2026-09-21T17:46:30Z
+Sep 21 17:46:52 ubuntu run-coder[591863]:   
+Sep 21 17:46:52 ubuntu run-coder[591863]:   <- Write docs/worklogs/SG-088.log
+Sep 21 17:46:52 ubuntu run-coder[591863]:   Wrote file successfully.
+Sep 21 17:46:52 ubuntu run-coder[591863]:   
+Sep 21 17:46:52 ubuntu run-coder[591863]:   $ cd /home/andrei/StorageGenie && echo "=== log 12 ==="; rtk git log --oneline -12; echo "=== SG-090 commit stat ==="; rtk git show --stat --oneline 4260c5f 2>/dev/null | head -20; echo "=== does 4260c5f report contain its own hash? ==="; rtk git show 4260c5f:docs/worklogs/SG-090_report.md 2>/dev/null | rtk grep -n "WORK_HEAD" | head -3; echo "=== note on 4260c5f ==="; git notes --ref=refs/notes/storagegenie-coder-reports show 4260c5f 2>&1 | head -3
+Sep 21 17:46:52 ubuntu run-coder[591863]:   === log 12 ===
+Sep 21 17:46:52 ubuntu run-coder[591863]:   dd2bb9c SG-088 packet: derived table registry, remove EXPECTED_TABLES static copy (tests-only, D107 slice 4)
+Sep 21 17:46:52 ubuntu run-coder[591863]:   256bf0d SG-087 report: paste verified notes-ref show output (docs-only)
+Sep 21 17:46:52 ubuntu run-coder[591863]:   10ddc48 SG-087 privacy audit: redaction + identifiers-only on every provider path, retention stated (offline $0)
+Sep 21 17:46:52 ubuntu run-coder[591863]:   1dceafb SG-087 packet: privacy-controls audit, redaction + identifiers-only (offline $0, D107 slice 3); D118 deferred
+Sep 21 17:46:52 ubuntu run-coder[591863]:   3db4511 SG-086 report: paste verified notes-ref show output (docs-only)
+Sep 21 17:46:52 ubuntu run-coder[591863]:   6eb805b SG-086 drill: read-only backup/restore proof + runbook (production untouched, offline $0)
+Sep 21 17:46:52 ubuntu run-coder[591863]:   60d9a70 SG-086 packet: backup/restore drill, production-READ under D107 (L3 slice 2); SG-085/SG-090 ledgered
+Sep 21 17:46:52 ubuntu run-coder[591863]:   f205a03 SG-085 report: paste verified notes-ref show output (docs-only)
+Sep 21 17:46:52 ubuntu run-coder[591863]:   8d90070 SG-085 report: record WORK_HEAD hash
+Sep 21 17:46:52 ubuntu run-coder[591863]:   0a71ba7 SG-085 eval runner: manifest selector + frozen baselines (offline, $0)
+Sep 21 17:46:52 ubuntu run-coder[591863]:   983e6d8 SG-090 receipt: verified notes-ref show output (docs-only)
+Sep 21 17:46:52 ubuntu run-coder[591863]:   4260c5f SG-090 report: SG-085 failure probe — GO (transient upstream server_error), + log
+Sep 21 17:46:52 ubuntu run-coder[591863]:   === SG-090 commit stat ===
+Sep 21 17:46:52 ubuntu run-coder[591863]:   4260c5f SG-090 report: SG-085 failure probe — GO (transient upstream server_error), + log
+Sep 21 17:46:52 ubuntu run-coder[591863]:    docs/worklogs/SG-090.log       | 127 +++++++++++++++++++++++++++++         |
+Sep 21 17:46:52 ubuntu run-coder[591863]:    docs/worklogs/SG-090_report.md | 184 +++++++++++++++++++++++++++++++++++++++++
+Sep 21 17:46:52 ubuntu run-coder[591863]:    2 files changed, 311 insertions(+)
+Sep 21 17:46:52 ubuntu run-coder[591863]:   === does 4260c5f report contain its own hash? ===
+Sep 21 17:46:52 ubuntu run-coder[591863]:   5:**WORK_HEAD:** `TBD` -> filled by the docs commit carrying this report (see receipt subsection; pre-note docs commit).
+Sep 21 17:46:52 ubuntu run-coder[591863]:   === note on 4260c5f ===
+Sep 21 17:46:52 ubuntu run-coder[591863]:   Dispatch-ID: SG-090 | Report: docs/worklogs/SG-090_report.md | Work-HEAD: 4260c5faa16c40daee46114f0b66cbbca970bb96
+Sep 21 17:46:52 ubuntu run-coder[591863]:   
+Sep 21 17:46:52 ubuntu run-coder[591863]:   Error: Upstream request failed: [server_error] Upstream response was not valid JSON
+
+$ timeout 120 journalctl --no-pager -u dispatch-storagegenie@SG-088.service | grep -c 'run_coder=fail'
+0
+(exit=1, i.e. ZERO matching lines)
+
+$ timeout 120 journalctl --no-pager -u dispatch-storagegenie@SG-088.service | grep 'run_coder='
+(no output; exit=1)
+=> NO `run_coder=fail reason=` line exists for the SG-088 invocation. raw count = 0.
+
+$ timeout 120 journalctl --no-pager -u dispatch-storagegenie@SG-088.service | grep -c 'DISPATCH_RESULT id=SG-088'
+1
+$ ... | grep -n 'negative_receipt\|contract_sync'
+4:... contract_sync=refresh version=0.28.2
+19:... negative_receipt=published
+
+=== G2a: CLI smoke (bound 120s) ===
+$ timeout 120 opencode --version
+1.17.19
+cli_exit=0
+
+=== G2b: debris inventory (current tree, raw) ===
+$ git status --porcelain
+(empty)
+status_exit=0
+
+$ git status --porcelain --ignored
+!! .cache/
+!! .env
+!! .mypy_cache/
+!! .pytest_cache/
+!! .ruff_cache/
+!! backend/... (all __pycache__, venv, data/, frontend/dist, frontend/node_modules, output/, venv/)
+=> NO tracked modification and NO untracked file at probe time.
+
+=== G2c: where the SG-088 debris went (reflog, raw) ===
+$ git reflog -20
+339bf4e HEAD@{0}: reset: moving to origin/automation
+dd2bb9c HEAD@{1}: reset: moving to HEAD~1
+dd13458 HEAD@{2}: commit: quarantine: debris from SG-088 (no receipt)
+dd2bb9c HEAD@{3}: reset: moving to origin/automation
+256bf0d HEAD@{4}: commit: SG-087 report: paste verified notes-ref show output (docs-only)
+...
+$ git show --stat --oneline dd13458
+dd13458 quarantine: debris from SG-088 (no receipt)
+ backend/tests/test_plugin_taxonomy.py  |   5 +-
+ backend/tests/test_postgres_dialect.py |  34 +---
+ docs/worklogs/SG-088.log               |  46 ++++++
+ docs/worklogs/SG-088_verify.log        | 282 +++++++++++++++++++++++++++++++++
+ 4 files changed, 338 insertions(+), 29 deletions(-)
+$ git branch --contains dd13458
+(no output; not on any branch - dangling quarantine commit)
+
+=== G2d: base state proves debris reverted (EXPECTED_TABLES still present at HEAD) ===
+$ grep -n 'EXPECTED_TABLES' backend/tests/test_postgres_dialect.py backend/tests/test_plugin_taxonomy.py
+backend/tests/test_postgres_dialect.py:35:EXPECTED_TABLES = {
+backend/tests/test_postgres_dialect.py:59:    assert metadata_tables == EXPECTED_TABLES
+backend/tests/test_postgres_dialect.py:63:        for table_name in sorted(EXPECTED_TABLES)
+backend/tests/test_postgres_dialect.py:65:    assert set(ddl) == EXPECTED_TABLES
+backend/tests/test_plugin_taxonomy.py:25:from tests.test_postgres_dialect import EXPECTED_TABLES
+backend/tests/test_plugin_taxonomy.py:62:    assert before == EXPECTED_TABLES
+backend/tests/test_plugin_taxonomy.py:83:    assert after == before == EXPECTED_TABLES
+
+=== G3: launcher artifact + lane log ===
+$ cat output/dispatch/SG-088.launcher.sh
+#!/usr/bin/env bash
+set -euo pipefail
+cd /home/andrei/StorageGenie
+PROMPT_FILE=docs/packets/SG-088-derived-registry.md
+exec opencode run --auto --dir /home/andrei/StorageGenie --variant medium "$(cat "$PROMPT_FILE")"
+
+$ grep -n 'build .\|server_error' output/dispatch/SG-088.log
+2:> build . deepseek-v4.1-flash
+1026:Error: Upstream request failed: [server_error] Upstream response was not valid JSON
+$ tail -c 300 output/dispatch/SG-088.log | cat -v
+... (preceding) ...
+Dispatch-ID: SG-090 | Report: docs/worklogs/SG-090_report.md | Work-HEAD: 4260c5faa16c40daee46114f0b66cbbca970bb96
+^[[0m
+^[[91m^[[1mError: ^[[0mUpstream request failed: [server_error] Upstream response was not valid JSON
+$ wc -l output/dispatch/SG-088.log
+1026 output/dispatch/SG-088.log
+
+=== G4 supporting: contract echo + source ===
+$ cat /home/andrei/storagegenie-contract/VERSION
+0.28.2
+$ git -C /home/andrei/storagegenie-contract rev-parse HEAD
+b495b59b3426af66772a87939473ac558f8f72d2
+=> recorded 0.28.2 == published b495b59; source path /home/andrei/storagegenie-contract/VERSION
+
+=== process args (CO-78 model/effort source) ===
+$ ps: ancestor 596314 = `opencode run --auto --dir /home/andrei/StorageGenie --variant medium <this packet text>`
+=> effort=medium (argv --variant medium); model=unknown (argv carries no --model; CLI default)
+
+=== final status re-list (must equal opening status) ===
+$ git status --porcelain
+(empty)
+final_status_exit=0
+=> identical to opening: tree clean, nothing moved, nothing deleted by this probe.
