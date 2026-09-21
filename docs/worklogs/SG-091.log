@@ -187,3 +187,16 @@ $ git status --porcelain
 (empty)
 final_status_exit=0
 => identical to opening: tree clean, nothing moved, nothing deleted by this probe.
+
+=== commit / receipt ===
+WORK_HEAD=8dc6563b7cc28e393d009fdfa2d247c75c569208
+commit_msg=SG-091 report: SG-088 failure probe — GO (transient upstream server_error), + log
+push=339bf4e..8dc6563 automation -> automation
+notes_add_exit=0 (no pre-existing note; existing_exit=1)
+notes_push=1a57d02..3821327 refs/notes/storagegenie-coder-reports
+notes_fetch_mapped=cd21654..3821327 refs/notes/storagegenie-coder-reports -> refs/notes/storagegenie-coder-reports-verify
+mapped_ref=3821327891365036b5ac04f9c9da2b531f10cee2
+$ git notes --ref=refs/notes/storagegenie-coder-reports-verify show 8dc6563b7cc28e393d009fdfa2d247c75c569208
+Dispatch-ID: SG-091 | Report: docs/worklogs/SG-091_report.md | Work-HEAD: 8dc6563b7cc28e393d009fdfa2d247c75c569208
+note=yes
+

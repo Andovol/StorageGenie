@@ -4,7 +4,7 @@
 **Work dir:** `/home/andrei/StorageGenie`
 **Origin remote (as on host):** `git@github.com:Andovol/StorageGenie.git` (fetch+push)
 **BASE (start HEAD):** `339bf4e9eaf22b6938b71bb8522708f9a40c9cfb` = `origin/automation`
-**WORK_HEAD:** `TBD` → filled by the docs commit carrying this report (see Receipt subsection; pre-note docs commit).
+**WORK_HEAD:** `8dc6563b7cc28e393d009fdfa2d247c75c569208` (the pre-note docs commit carrying this report; the Receipt paste is a later docs-only commit).
 **Contract:** recorded `0.28.2` == published `b495b59` — source path `/home/andrei/storagegenie-contract/VERSION`; `git -C /home/andrei/storagegenie-contract rev-parse HEAD` = `b495b59b3426af66772a87939473ac558f8f72d2`.
 **Model / effort (CO-78, from process arguments):** model `unknown` (argv carries no `--model`; CLI default); effort `medium` (argv `--variant medium`). Source: ancestor process `opencode run --auto --dir /home/andrei/StorageGenie --variant medium …`. The SG-088 lane's own provider banner (raw, from `output/dispatch/SG-088.log:2`) is `> build · deepseek-v4.1-flash` — quoted as observed metadata, not used as the identity of this process.
 **Spend:** **$0.000000 actual** — zero provider calls; containment per `PG-PR-04` stated: nothing live exists to contain.
@@ -241,9 +241,31 @@ Push work to `automation`; worktree clean. No push to `storagegenie-evidence`; n
 Note added on the work HEAD, pushed to `refs/notes/storagegenie-coder-reports`, then fetched into a
 mapped local ref and shown verbatim:
 
-<!-- RECEIPT-SHOW-BEGIN -->
-_(filled after commit+push+note; pasted `git notes show` output goes here)_
-<!-- RECEIPT-SHOW-END -->
+Commands executed (raw):
+
+```
+$ git notes --ref=refs/notes/storagegenie-coder-reports add -m "Dispatch-ID: SG-091 | Report: docs/worklogs/SG-091_report.md | Work-HEAD: 8dc6563b7cc28e393d009fdfa2d247c75c569208" 8dc6563b7cc28e393d009fdfa2d247c75c569208
+add_exit=0
+$ git push origin refs/notes/storagegenie-coder-reports
+To github.com:Andovol/StorageGenie.git
+   1a57d02..3821327  refs/notes/storagegenie-coder-reports -> refs/notes/storagegenie-coder-reports
+$ git fetch origin refs/notes/storagegenie-coder-reports:refs/notes/storagegenie-coder-reports-verify
+From github.com:Andovol/StorageGenie
+   cd21654..3821327  refs/notes/storagegenie-coder-reports -> refs/notes/storagegenie-coder-reports-verify
+$ git rev-parse refs/notes/storagegenie-coder-reports-verify
+3821327891365036b5ac04f9c9da2b531f10cee2
+$ git notes --ref=refs/notes/storagegenie-coder-reports-verify show 8dc6563b7cc28e393d009fdfa2d247c75c569208
+```
+
+Pasted `show` output (verbatim, from the FETCHED mapped ref):
+
+```
+Dispatch-ID: SG-091 | Report: docs/worklogs/SG-091_report.md | Work-HEAD: 8dc6563b7cc28e393d009fdfa2d247c75c569208
+```
+
+No existing note was found before adding (`existing_exit=1`), so this was not an existing-note refusal.
+
+note=yes
 
 ## Acceptance criteria → question answered (`PG-SC-09`)
 
