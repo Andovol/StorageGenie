@@ -5,7 +5,7 @@
 **MODEL:** **unknown** — argv carries no `--model` and no provider metadata was surfaced to the Coder in-process; reported per `CO-78`/packet rather than guessed from a system-prompt identity line
 **Host / workdir:** `/home/andrei/StorageGenie` · branch `automation` · remote `git@github.com:Andovol/StorageGenie.git`
 **BASE (start HEAD):** `1dceafbb613b6f80d4a5e9082ac4998b7975ca05` (packet requested `origin/automation`; this is the commit it resolved to — two fields, never one)
-**WORK_HEAD:** recorded in the notes-ref receipt below (slice tip before the docs-only paste commit)
+**WORK_HEAD:** `10ddc482b4762095d70a4bed3f5b2ef5a08cd27a` (slice tip; the follow-up docs-only commit carries this paste)
 **Spend:** **$0.000000 actual** — zero provider calls; no metered call exists on any path in this slice (`PG-IC-04` not firing)
 **Contract:** recorded `0.28.2` == published `0.28.2`; source path `/home/andrei/storagegenie-contract/VERSION`; checkout `b495b59b3426af66772a87939473ac558f8f72d2`
 **Authoring date metadata:** 2026-09-21 (not a gate)
@@ -78,7 +78,24 @@ git fetch origin refs/notes/storagegenie-coder-reports:refs/notes/storagegenie-c
 git notes --ref=refs/notes/storagegenie-coder-reports-remote show <WORK_HEAD>
 ```
 
-The verbatim executed `show` output is pasted in the follow-up docs-only commit (M20-corrected block pattern, as SG-085/SG-086 did); the final committed report carries the paste.
+Verbatim executed output against the fetched mapped ref (exit 0):
+
+```
+$ git notes --ref=refs/notes/storagegenie-coder-reports add -m "Dispatch-ID: SG-087 | Report: docs/worklogs/SG-087_report.md | Work-HEAD: 10ddc482b4762095d70a4bed3f5b2ef5a08cd27a" 10ddc482b4762095d70a4bed3f5b2ef5a08cd27a
+add exit=0
+$ git notes --ref=refs/notes/storagegenie-coder-reports show 10ddc482b4762095d70a4bed3f5b2ef5a08cd27a
+Dispatch-ID: SG-087 | Report: docs/worklogs/SG-087_report.md | Work-HEAD: 10ddc482b4762095d70a4bed3f5b2ef5a08cd27a
+$ git push origin refs/notes/storagegenie-coder-reports
+   0effb77..b5f4c92  refs/notes/storagegenie-coder-reports -> refs/notes/storagegenie-coder-reports
+notes push exit=0
+$ git fetch origin refs/notes/storagegenie-coder-reports:refs/notes/storagegenie-coder-reports-sg087-verify
+ * [new ref]         refs/notes/storagegenie-coder-reports -> refs/notes/storagegenie-coder-reports-sg087-verify
+fetch exit=0
+$ git notes --ref=refs/notes/storagegenie-coder-reports-sg087-verify show 10ddc482b4762095d70a4bed3f5b2ef5a08cd27a
+Dispatch-ID: SG-087 | Report: docs/worklogs/SG-087_report.md | Work-HEAD: 10ddc482b4762095d70a4bed3f5b2ef5a08cd27a
+```
+
+First line carries both `Dispatch-ID:` and `Report:` (`CO-97`). No existing note refused (`show_before_exit=1`, "no note found"); final line `note=yes`.
 
 ## UNCLEAR
 

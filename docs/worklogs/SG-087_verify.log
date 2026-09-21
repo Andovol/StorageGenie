@@ -218,4 +218,22 @@ F-SG087-3: mypy is 41-in-9 now, not the 40-in-9 SG-028 recorded — pre-existing
 
 ######## RECEIPT — notes ref (M20-corrected block) ########
 Work pushed to automation at the slice tip; worktree clean (CO-55). No push to storagegenie-evidence, no RECEIPT_CMD.
-The verbatim executed `show` output is pasted in the follow-up docs-only commit (M20-corrected block pattern, as SG-085/SG-086 did).
+$ git notes --ref=refs/notes/storagegenie-coder-reports show 10ddc482b4762095d70a4bed3f5b2ef5a08cd27a   # existing-note check
+error: no note found for object 10ddc482b4762095d70a4bed3f5b2ef5a08cd27a.
+show_before_exit=1
+$ git notes --ref=refs/notes/storagegenie-coder-reports add -m "Dispatch-ID: SG-087 | Report: docs/worklogs/SG-087_report.md | Work-HEAD: 10ddc482b4762095d70a4bed3f5b2ef5a08cd27a" 10ddc482b4762095d70a4bed3f5b2ef5a08cd27a
+add exit=0
+$ git notes --ref=refs/notes/storagegenie-coder-reports show 10ddc482b4762095d70a4bed3f5b2ef5a08cd27a
+Dispatch-ID: SG-087 | Report: docs/worklogs/SG-087_report.md | Work-HEAD: 10ddc482b4762095d70a4bed3f5b2ef5a08cd27a
+$ git push origin refs/notes/storagegenie-coder-reports
+   0effb77..b5f4c92  refs/notes/storagegenie-coder-reports -> refs/notes/storagegenie-coder-reports
+notes push exit=0
+$ git fetch origin refs/notes/storagegenie-coder-reports:refs/notes/storagegenie-coder-reports-sg087-verify
+From github.com:Andovol/StorageGenie
+ * [new ref]         refs/notes/storagegenie-coder-reports -> refs/notes/storagegenie-coder-reports-sg087-verify
+fetch exit=0
+$ git notes --ref=refs/notes/storagegenie-coder-reports-sg087-verify show 10ddc482b4762095d70a4bed3f5b2ef5a08cd27a
+Dispatch-ID: SG-087 | Report: docs/worklogs/SG-087_report.md | Work-HEAD: 10ddc482b4762095d70a4bed3f5b2ef5a08cd27a
+show_fetched_exit=0
+note=yes
+# First line carries both `Dispatch-ID:` and `Report:` (CO-97). No existing note refused; zero-exit WITH `note=yes`.
