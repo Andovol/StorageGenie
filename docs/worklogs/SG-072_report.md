@@ -5,7 +5,7 @@
 **Contract:** recorded `0.28.2` == published (`0.28.2`); source path `/home/andrei/storagegenie-contract/VERSION`; contract repo HEAD `b495b59b3426af66772a87939473ac558f8f72d2` (`contract-v0.28.2`).
 **Work dir:** `/home/andrei/StorageGenie` · **origin:** `git@github.com:Andovol/StorageGenie.git`
 **BASE ref:** `origin/automation` · **resolved:** `408e8cd0fb86f53562d3985e9ddaaba118005bb0`
-**WORK_HEAD:** recorded in the appended Receipt section (`docs-only` work commit).
+**WORK_HEAD:** `0be2063d7f5a55524f8d287eb7b3b97f9d5f46fe` (docs-only work commit; note target).
 **Spend:** real **$0.000000** (zero metered calls; the insights POST was never issued).
 
 ---
@@ -82,9 +82,42 @@ Packet premise confirmed exactly: the pre bundle name, sha256 and byte size matc
 
 The pass is **not vacuous**: the before/after bundles differ in name, size and hash; `404` before and `200` after are distinct served responses from the exact same URL; the new bundle contains `analytics/insights` (count 1); the built tree contains both route decorators; the DB counts and `alembic current` were read on both sides from the mounted DB. No gate was skipped; no test was stubbed; the insights POST is proven live **structurally** precisely because calling it is forbidden at $0.
 
-## Receipt — notes ref (M20-corrected block)
+## Receipt — notes ref (M20-corrected block; executed output pasted verbatim)
 
-See the appended "Receipt verification" section: work pushed to `automation`, worktree clean (`CO-55`); note added on WORK_HEAD, notes ref pushed, then fetched into a **mapped** local name and verified with `show` (output pasted verbatim). No push to `storagegenie-evidence`, no `{{RECEIPT_CMD}}`. Final line `note=yes`.
+Work pushed to `automation` (`408e8cd..0be2063`), worktree clean (`CO-55`). No push to `storagegenie-evidence`, no `{{RECEIPT_CMD}}`. Note added on WORK_HEAD `0be2063d7f5a55524f8d287eb7b3b97f9d5f46fe`, notes ref pushed, then fetched into a **mapped** local name and verified with `show`:
+
+```
+$ git push origin automation
+To github.com:Andovol/StorageGenie.git
+   408e8cd..0be2063  automation -> automation
+push rc=0
+
+$ git notes --ref=refs/notes/storagegenie-coder-reports add -m "Dispatch-ID: SG-072 | Report: docs/worklogs/SG-072_report.md | Work-HEAD: 0be2063d7f5a55524f8d287eb7b3b97f9d5f46fe" 0be2063d7f5a55524f8d287eb7b3b97f9d5f46fe
+note add rc=0
+
+$ git push origin refs/notes/storagegenie-coder-reports
+To github.com:Andovol/StorageGenie.git
+   862168b..3543ef1  refs/notes/storagegenie-coder-reports -> refs/notes/storagegenie-coder-reports
+notes push rc=0
+
+$ git fetch origin refs/notes/storagegenie-coder-reports:refs/notes/storagegenie-coder-reports-sg072-verify
+From github.com:Andovol/StorageGenie
+ * [new ref]         refs/notes/storagegenie-coder-reports -> refs/notes/storagegenie-coder-reports-sg072-verify
+fetch rc=0
+
+$ git rev-parse refs/notes/storagegenie-coder-reports-sg072-verify
+3543ef1d387a5e34a74d9fb6bea87fe8a1178ce2
+
+$ git notes --ref=refs/notes/storagegenie-coder-reports-sg072-verify show 0be2063d7f5a55524f8d287eb7b3b97f9d5f46fe
+Dispatch-ID: SG-072 | Report: docs/worklogs/SG-072_report.md | Work-HEAD: 0be2063d7f5a55524f8d287eb7b3b97f9d5f46fe
+show rc=0
+
+$ git notes --ref=refs/notes/storagegenie-coder-reports-sg072-verify show 0be2063d7f5a55524f8d287eb7b3b97f9d5f46fe | grep -c "Dispatch-ID: SG-072"
+1
+grep rc=0
+```
+
+First line carries both `Dispatch-ID:` and `Report:` (`CO-97`). Final line `note=yes`.
 
 ## UNCLEAR
 

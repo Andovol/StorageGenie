@@ -23,6 +23,6 @@ SG-072 running log — deploy rider: analytics routes + screen live on the publi
 [G2b][finding] DB file mtime/size moved on restart (335872->339968 B, WAL 36.2K->0) = SQLite WAL checkpoint on authorized container stop/start; logical state unchanged.
 [cost] zero metered calls, real spend $0.000000.
 [commit] 3 docs-only worklog files written under docs/worklogs.
-[commit] work commit WORK_HEAD=<recorded in report receipt section> pushed on automation.
-[receipt] note added on WORK_HEAD, notes ref pushed, fetched mapped ref, show pasted verbatim, note=yes.
+[commit] work commit WORK_HEAD=0be2063d7f5a55524f8d287eb7b3b97f9d5f46fe pushed 408e8cd..0be2063 on automation.
+[receipt] note added on WORK_HEAD; notes ref pushed 862168b..3543ef1; fetched mapped ref 3543ef1d387a5e34a74d9fb6bea87fe8a1178ce2; show rc=0; grep "Dispatch-ID: SG-072" count=1; note=yes.
 [end] worktree clean; final $0.000000; overall well under 1800s.
