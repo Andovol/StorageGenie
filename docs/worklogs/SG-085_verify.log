@@ -1,0 +1,229 @@
+SG-085 raw verification log (commands + verbatim outputs)
+Host /home/andrei/StorageGenie ; branch automation ; remote git@github.com:Andovol/StorageGenie.git
+BASE ref origin/automation resolved to 983e6d8c604f065a5c5450a6f9cdca11c444f4db
+Live clock: recon 2026-09-21T16:5xZ ; final capture 2026-09-21T17:00Z
+
+######## RECON / PREMISES ########
+$ git rev-parse HEAD
+983e6d8c604f065a5c5450a6f9cdca11c444f4db
+$ git rev-parse origin/automation
+983e6d8c604f065a5c5450a6f9cdca11c444f4db
+$ git branch --show-current
+automation
+$ git remote -v
+origin	git@github.com:Andovol/StorageGenie.git (fetch)
+origin	git@github.com:Andovol/StorageGenie.git (push)
+$ cat /home/andrei/storagegenie-contract/VERSION
+0.28.2
+$ git -C /home/andrei/storagegenie-contract rev-parse HEAD
+b495b59b3426af66772a87939473ac558f8f72d2
+# model/effort source: process argv (NOT a system-prompt identity line)
+$ ps -o args= -p 562912
+opencode run --auto --dir /home/andrei/StorageGenie --variant medium # SG-085 — eval runner outgrows ...
+# F-SG079-1 premise (BASE, run.py:50):
+$ sed -n '50p' backend/eval/run.py   # (via Read at BASE)
+MANIFEST_PATH = CORPUS_DIR / "sg029" / "manifest.json"
+# corpus counts (raw):
+$ find backend/eval/corpus -maxdepth 2 -type f | sort
+...
+./sg026_01_clean.json ... ./sg026_05_no_date_visible.json
+./sg029/manifest.json ./sg029/generate.py ./sg029/sg029_01..10 (10 fixtures) ./sg029/images/*.png (10)
+./sg049/manifest.json ./sg049/sg049_v2_01..03 (3 fixtures)
+./sg079/manifest.json ./sg079/sg079_01..06 (6 fixtures)
+$ ls backend/eval/corpus/manifest.json
+ls: cannot access 'backend/eval/corpus/manifest.json': No such file or directory
+# manifests: sg029 count=10, sg049 count=3, sg079 count=6  (all CONFIRMED)
+
+######## F-SG085-1 — two constant diff-canary quotes in the harness ########
+# The packet shows TWO mutually-contradictory requirements for the same file:
+#   (a) G1: "I hold MANIFEST_PATH hardwired to sg029"  -> implies line 50 text
+#   (b) SG-090 stale line: alternative MANIFEST_PATH text (different corpus dir)
+# Both quotes render to the identical byte length (120) -> harness-injected
+# (two different source lines cannot each be the file's content). Target's real
+# line 50 is recorded above. No product impact; reported as a finding.
+
+######## BEFORE run — code loaded: BASE run.py (sha256 e8b5a184...) ########
+$ sha256sum backend/eval/run.py    # AT BASE
+e8b5a184bbb2e9aa4ebb56373bc84968d4eae4907c827fa1d8ffc0e4163013c7  backend/eval/run.py
+$ cd backend && ../venv/bin/python eval/run.py
+fixture sg029-01-clean-food: score=1.000 needs=1 unknowns=1 items=1.00
+fixture sg029-02-clean-medicine: score=1.000 needs=1 unknowns=1 items=1.00
+fixture sg029-03-glare-food: score=0.000 needs=0 unknowns=0 items=0.00
+fixture sg029-04-clutter-food: score=1.000 needs=1 unknowns=1 items=1.00
+fixture sg029-05-partial-label-food: score=0.667 needs=1 unknowns=0 items=1.00
+fixture sg029-06-partial-label-medicine: score=1.000 needs=1 unknowns=1 items=1.00
+fixture sg029-07-no-date-visible-medicine: score=0.667 needs=1 unknowns=0 items=1.00
+fixture sg029-08-clean-cosmetics: score=1.000 needs=1 unknowns=1 items=1.00
+fixture sg029-09-no-date-visible-cosmetics: score=1.000 needs=1 unknowns=1 items=1.00
+fixture sg029-10-partial-label-cosmetics: score=1.000 needs=1 unknowns=1 items=1.00
+field_accuracy=0.833 over 10 fixtures
+unknown_rate=4/7=0.571
+correction_rate=0/6=0.000 (audit_event plugin.assertion.write rows=6)
+BEFORE_EXIT=0
+
+######## G1 — diff (selector + path plumbing ONLY) ########
+$ git diff backend/eval/run.py
+@@ -47,7 +47,7 @@
+-MANIFEST_PATH = CORPUS_DIR / "sg029" / "manifest.json"
++DEFAULT_CORPUS = "sg029"
+@@ -57,8 +57,23 @@
+-def load_manifest() -> dict[str, Any]:
+-    manifest = json.loads(MANIFEST_PATH.read_text(encoding="utf-8"))
++def available_corpora() -> list[str]:
++    return sorted(path.parent.name for path in CORPUS_DIR.glob("*/manifest.json"))
++def manifest_path(corpus: str) -> Path:
++    return CORPUS_DIR / corpus / "manifest.json"
++def load_manifest(corpus: str = DEFAULT_CORPUS) -> dict[str, Any]:
++    path = manifest_path(corpus)
++    if not path.is_file():
++        raise ValueError(f"unknown corpus {corpus!r}: no manifest at {path}; ...")
++    manifest = json.loads(path.read_text(encoding="utf-8"))
+@@ -101,7 +116,7 @@
+-def check_manifest(manifest: dict[str, Any]) -> list[str]:
++def check_manifest(manifest: dict[str, Any], manifest_name: str = "manifest.json") -> list[str]:
+@@ -118,7 +133,7 @@
+-    on_disk = {p.name for p in base.glob("*.json") if p.name != MANIFEST_PATH.name}
++    on_disk = {p.name for p in base.glob("*.json") if p.name != manifest_name}
+@@ -379,16 +394,23 @@
++    parser.add_argument("--corpus", choices=available_corpora(), default=DEFAULT_CORPUS, ...)
+     parser.add_argument("--live", ...)
+     parser.add_argument("--check-only", ...)
+-    manifest = load_manifest()
++    manifest_path_ = manifest_path(args.corpus)
++    manifest = load_manifest(args.corpus)
+-    problems.extend(check_manifest(manifest))
++    problems.extend(check_manifest(manifest, manifest_path_.name))
+# Scoring functions (score_fixture, run_bridge_sandbox, _report_scores, _run_live_fixture,
+# run_live, run_offline) have NO hunks.
+
+######## G1 — unknown name fails LOUDLY ########
+$ ../venv/bin/python eval/run.py --corpus sg999-bogus --check-only
+usage: run.py [-h] [--corpus {sg029,sg049,sg079}] [--live] [--check-only]
+run.py: error: argument --corpus: invalid choice: 'sg999-bogus' (choose from 'sg029', 'sg049', 'sg079')
+UNKNOWN_EXIT=2
+
+######## G1 — AFTER default (code loaded: WORK run.py sha256 069d0002...) ########
+$ sha256sum backend/eval/run.py    # AFTER
+069d0002c050ed9350e6208a2a5be9f0017834999c0f092f321b5e99b1c48a78  backend/eval/run.py
+$ ../venv/bin/python eval/run.py    # no flag
+$(identical body to BEFORE)
+AFTER_EXIT=0
+$ diff <BEFORE> <AFTER>
+(empty — byte-identical output)
+
+######## G1 — address proof per corpus ########
+$ ../venv/bin/python eval/run.py --corpus sg029 --check-only
+corpus integrity OK: 10 fixtures (manifest count 10)
+$ ../venv/bin/python eval/run.py --corpus sg049 --check-only
+CORPUS INTEGRITY FAILURE
+  - sg049_v2_01_clean_food.json: missing key 'image'
+  - ... (all 3 fixtures: missing key 'image' / image reference missing)
+exit=1
+$ ../venv/bin/python eval/run.py --corpus sg079 --check-only
+CORPUS INTEGRITY FAILURE
+  - sg079_01_clean_food.json: missing key 'image'
+  - ... (all 6 fixtures: missing key 'image' / image reference missing)
+exit=1
+# sg049/sg079 are scoring-only corpora (manifest notes: "No images and no metered provider_calls");
+# the address succeeds and the integrity gate correctly refuses them as image corpora.
+
+######## G2 — offline frozen scores (committed caches) ########
+sg029: field_accuracy=0.833 over 10 ; unknown_rate=4/7=0.571 ; correction_rate=0/6=0.000 ; audit=6 ; $0.000000
+sg049: field_accuracy=1.000 over 3  ; unknown_rate=1/1=1.000 ; correction_rate=0/0=0.000 ; audit=0 ; $0.000000
+sg079: field_accuracy=1.000 over 6  ; unknown_rate=4/4=1.000 ; correction_rate=0/3=0.000 ; audit=3 ; $0.000000
+# recorded to baseline_sg029_frozen.md / baseline_sg049_frozen.md / baseline_sg079_frozen.md (```json blocks)
+
+######## G2 — existing baselines byte-untouched ########
+$ sha256sum backend/eval/baseline_sg029.md backend/eval/baseline_sg026.md
+3006ddf01c6f934677f1248a02149500df65e9ca4928aa46232d009c8fbc69e4  backend/eval/baseline_sg029.md
+b2ffb391c45ed2ac5e5cffad9073ed5f4153434e14e2283516aa4cb3db087dd1  backend/eval/baseline_sg026.md
+$ git diff --stat backend/eval/baseline_sg029.md backend/eval/baseline_sg026.md
+(empty — byte-identical to BASE)
+
+######## G2 — 7-vs-10 drift reconciliation ########
+baseline_sg029.md: 7 fixtures (metered Food/Medicine). corpus/sg029: 10.
+Extra three named: sg029-08-clean-cosmetics, sg029-09-no-date-visible-cosmetics, sg029-10-partial-label-cosmetics.
+Covered by baseline_sg029_frozen.md (all 10); the metered 7 remain covered by baseline_sg029.md only.
+No averaging across the drift.
+
+######## G3 — FAIL-PRE (run.py at BASE, frozen records absent) ########
+$ ../venv/bin/python -m pytest -q tests/test_eval_corpus.py
+.......FFFFFF                                                            [100%]
+FAILED test_selector_lists_every_manifest_corpus_and_defaults_to_sg029  (AttributeError: no attribute 'available_corpora')
+FAILED test_selector_rejects_unknown_corpus_loudly  ("unrecognized arguments: --corpus sg999-does-not-exist")
+FAILED test_default_invocation_scores_sg029_like_the_frozen_baseline  (FileNotFoundError baseline_sg029_frozen.md)
+FAILED test_frozen_baseline_reproduces_every_selected_corpus[sg029]  (FileNotFoundError baseline_sg029_frozen.md)
+FAILED test_frozen_baseline_reproduces_every_selected_corpus[sg049]  (FileNotFoundError baseline_sg049_frozen.md)
+FAILED test_frozen_baseline_reproduces_every_selected_corpus[sg079]  (FileNotFoundError baseline_sg079_frozen.md)
+6 failed, 7 passed in 0.43s
+rc=1
+
+######## G3 — PASS-POST (selector + records present) ########
+$ ../venv/bin/python -m pytest -q tests/test_eval_corpus.py
+.............                                                            [100%]
+13 passed in 0.69s
+rc=0
+
+######## G2 — drift gate SEEN-TO-FAIL (doctored sg029-01 overall 1.0 -> 0.999) ########
+$ sed -i 's/"overall": 1.0, "needs": 1.0, "unknowns": 1.0, "items": 1.0}/"overall": 0.999,/...' eval/baseline_sg029_frozen.md
+$ grep -n 'sg029-01-clean-food' eval/baseline_sg029_frozen.md
+29:    {"id": "sg029-01-clean-food", "overall": 0.999, "needs": 1.0, "unknowns": 1.0, "items": 1.0},
+$ ../venv/bin/python -m pytest -q tests/test_eval_corpus.py::test_frozen_baseline_reproduces_every_selected_corpus
+F..                                                                      [100%]
+FAILED test_frozen_baseline_reproduces_every_selected_corpus[sg029]
+E   AssertionError: sg029: frozen baseline drift
+E   Differing items: {'fixtures': [... 'overall': 1.0 ...]} != {[... 'overall': 0.999 ...]}
+1 failed, 2 passed in 0.53s
+$ cp <backup> eval/baseline_sg029_frozen.md   # revert
+$ ../venv/bin/python -m pytest -q tests/test_eval_corpus.py
+13 passed in 0.66s
+
+######## G3 — full suite / ruff / mypy / secrets / provider rows ########
+$ ../venv/bin/python -m pytest -q
+FAILED tests/test_signals.py::test_generated_codes_are_validated_and_bad_checksum_is_not_an_identifier
+FAILED tests/test_signals.py::test_ocr_has_text_boxes_and_mean_confidence
+2 failed, 362 passed, 22 warnings in 19.12s
+# 2 reds base-proved on BASE via stash of the two modified files:
+$ ../venv/bin/python -m pytest -q tests/test_signals.py::test_generated_codes... tests/test_signals.py::test_ocr_has_text_boxes...
+2 failed in 0.57s
+# (env: pyzbar/libzbar not installed; pytesseract not installed)
+$ ../venv/bin/python -m ruff check app tests
+All checks passed!
+ruff rc=0
+$ ../venv/bin/python -m mypy app
+Found 41 errors in 9 files (checked 75 source files)
+mypy rc=1   (delta 0 vs BASE 41-in-9)
+$ git diff | grep -nE "api_key|OPENCODE_API_KEY|Bearer|[Tt]oken"
+(no output — 0 real secret shapes)
+$ python -c "query ProviderCall in forced fresh sandbox"
+provider_call rows after forced sandbox = 0
+
+######## G3 — PG-SC-11 end-relative assertion grep over the test tree ########
+$ grep -rn "latest|\[-1\]|HEAD~1|\.glob\(" tests/ --include=*.py
+tests/test_extraction_contract.py:377:  fixtures = sorted(CORPUS_DIR.glob("*.json"))
+tests/test_eval_corpus.py:56:          on_disk = sorted(p.name for p in SG029_DIR.glob("*.json") if p.name != MANIFEST.name)
+tests/test_signals.py:125:            bad_value = ean_value[:-1] + ...
+tests/test_signals.py:126:            bad_image, _ = _ean13_image(ean_value[:-1], bad_value[-1])
+tests/test_chat.py:454:           document_content = provider.texts[-1]
+Verdicts:
+- test_extraction_contract.py:377 glob("*.json") over corpus root — content-scoped, not end-relative; reported position-independent.
+- test_eval_corpus.py:56 glob over sg029 dir excluding the manifest by name — position-independent (I used the same pattern for the new selector); reported.
+- test_signals.py:125/126 strip/index a checksum string — position-independent.
+- test_chat.py:454 provider.texts[-1] — last chat text, position-independent (not a corpus/manifest/baseline assertion).
+No `latest` / `HEAD~1` / tail-glob hits over corpora, manifests, or baselines.
+
+######## G3 — exclusions by RULE with literal grep-gates (PG-SC-05) ########
+RULE: scoring functions untouched.  GATE: git diff for score_fixture/run_bridge_sandbox/_report_scores -> 0 hunks.
+      $ git diff backend/eval/run.py | grep -cE "score_fixture|run_bridge_sandbox|_report_scores|_run_live_fixture"
+      0
+RULE: fixture/manifest/prompt contents untouched.  GATE: git status --porcelain backend/eval/corpus -> empty.
+      $ git status --porcelain backend/eval/corpus
+      (empty)
+RULE: existing baseline history untouched.  GATE: diff over baseline_sg029.md + baseline_sg026.md -> empty (above).
+RULE: no --live / no provider call.  GATE: ProviderCall rows = 0 (above).
+
+######## G4 — live clock / spend ########
+date -u +%Y-%m-%dT%H:%M:%SZ
+2026-09-21T17:00:18Z
+Spend: $0.000000 actual. Zero provider_call rows. Containment (PG-PR-04): nothing live exists to contain —
+no pipeline started, no unit, no deploy, no restart, no --live.

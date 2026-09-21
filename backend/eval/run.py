@@ -47,7 +47,7 @@ from app.services.providers.opencode_go import estimate_call_cost  # noqa: E402
 from app.services.providers.schemas import parse_extraction_output  # noqa: E402
 
 CORPUS_DIR = Path(__file__).resolve().parent / "corpus"
-MANIFEST_PATH = CORPUS_DIR / "sg029" / "manifest.json"
+DEFAULT_CORPUS = "sg029"
 EXPECTATION_CLASSES = frozenset({"exact", "unknown-expected", "needs-evidence"})
 CASE_CLASSES = frozenset({"clean", "glare", "clutter", "partial-label", "no-date-visible"})
 CATEGORIES = frozenset({"food", "medicine", "cosmetics"})
@@ -57,8 +57,23 @@ SPEND_CEILING_USD = 0.05
 # --------------------------------------------------------------------------- #
 # Manifest + integrity
 # --------------------------------------------------------------------------- #
-def load_manifest() -> dict[str, Any]:
-    manifest = json.loads(MANIFEST_PATH.read_text(encoding="utf-8"))
+def available_corpora() -> list[str]:
+    """Names of every corpus that carries a manifest (the selector's authority)."""
+    return sorted(path.parent.name for path in CORPUS_DIR.glob("*/manifest.json"))
+
+
+def manifest_path(corpus: str) -> Path:
+    return CORPUS_DIR / corpus / "manifest.json"
+
+
+def load_manifest(corpus: str = DEFAULT_CORPUS) -> dict[str, Any]:
+    path = manifest_path(corpus)
+    if not path.is_file():
+        raise ValueError(
+            f"unknown corpus {corpus!r}: no manifest at {path}; "
+            f"choose one of {available_corpora()}"
+        )
+    manifest = json.loads(path.read_text(encoding="utf-8"))
     if not isinstance(manifest, dict):
         raise ValueError("manifest must be a JSON object")
     return manifest
@@ -101,7 +116,7 @@ def check_integrity(raw: dict[str, Any], path: Path) -> list[str]:  # noqa: C901
     return problems
 
 
-def check_manifest(manifest: dict[str, Any]) -> list[str]:
+def check_manifest(manifest: dict[str, Any], manifest_name: str = "manifest.json") -> list[str]:
     problems: list[str] = []
     listed = [str(name) for name in manifest.get("fixtures", [])]
     if manifest.get("count") != len(listed):
@@ -118,7 +133,7 @@ def check_manifest(manifest: dict[str, Any]) -> list[str]:
         ids.append(str(json.loads(listed_path.read_text(encoding="utf-8"))["id"]))
     if len(set(ids)) != len(ids):
         problems.append("fixture ids are not unique")
-    on_disk = {p.name for p in base.glob("*.json") if p.name != MANIFEST_PATH.name}
+    on_disk = {p.name for p in base.glob("*.json") if p.name != manifest_name}
     if on_disk != set(listed):
         problems.append(
             f"fixtures on disk {sorted(on_disk)} != manifest {sorted(listed)}"
@@ -379,16 +394,23 @@ def run_live(paths: list[Path]) -> int:
 # --------------------------------------------------------------------------- #
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="SG-029 Food/Medicine eval runner")
+    parser.add_argument(
+        "--corpus",
+        choices=available_corpora(),
+        default=DEFAULT_CORPUS,
+        help=f"corpus to address (default: {DEFAULT_CORPUS})",
+    )
     parser.add_argument("--live", action="store_true", help="run the ONE metered corpus run")
     parser.add_argument("--check-only", action="store_true", help="integrity checks only")
     args = parser.parse_args(argv)
 
-    manifest = load_manifest()
+    manifest_path_ = manifest_path(args.corpus)
+    manifest = load_manifest(args.corpus)
     paths = manifest_fixture_paths(manifest)
     problems: list[str] = []
     if len(paths) != manifest["count"]:
         problems.append(f"expected {manifest['count']} fixtures, resolved {len(paths)}")
-    problems.extend(check_manifest(manifest))
+    problems.extend(check_manifest(manifest, manifest_path_.name))
     rows = _load_rows(paths)
     for raw, path in zip(rows, paths, strict=True):
         problems.extend(check_integrity(raw, path))

@@ -1,0 +1,41 @@
+SG-085 worklog — eval runner manifest selector + frozen baselines (offline, $0)
+Host /home/andrei/StorageGenie ; branch automation ; remote git@github.com:Andovol/StorageGenie.git
+BASE (packet ref origin/automation) start HEAD: 983e6d8c604f065a5c5450a6f9cdca11c444f4db
+Contract: recorded 0.28.2 == published 0.28.2 ; source /home/andrei/storagegenie-contract/VERSION ; checkout b495b59b3426af66772a87939473ac558f8f72d2
+MODEL / effort: model deepseek-v4.1-flash (opencode-go CLI default; argv carries no --model) · effort medium (argv: opencode run --auto --dir /home/andrei/StorageGenie --variant medium)
+Live clock: recon 2026-09-21T16:5xZ ; final capture 2026-09-21T17:00Z
+Budget: 120s ordinary · 600s suite · 1800s overall ; $0.00.
+
+Legs (elapsed vs budget):
+- Recon + premise verification: ~4 min cpu (within 1800s overall)
+- BEFORE run at BASE (v1-identical guard): <1s (120s)
+- G1 selector implementation + diff: ~3 min
+- G2 offline scoring + 3 frozen records written: ~2 min
+- Drift gate seen-to-fail + revert: <1s
+- G3 fail-pre (6 failed, 7 passed) + pass-post (13 passed): ~1s each
+- G3 full suite: 19.12s (600s bound); ruff 0; mypy 41-in-9 delta 0
+- G4 logs: ~3 min
+
+Premise verification (packet hypotheses vs disk, raw):
+- MANIFEST_PATH hardwired to sg029 at BASE: CONFIRMED (run.py:50 `MANIFEST_PATH = CORPUS_DIR / "sg029" / "manifest.json"`).
+- corpus/sg029 = 10 fixtures + manifest + 10 PNGs + generate.py: CONFIRMED (manifest count=10; 11 json incl manifest; images/ 10 PNGs).
+- corpus/sg049 = 3 fixtures + manifest: CONFIRMED (count=3).
+- corpus/sg079 = 6 fixtures + manifest: CONFIRMED (count=6).
+- corpus/sg026_*.json = 5 loose files, NO manifest: CONFIRMED (5 files, no corpus/manifest.json).
+- test_eval_corpus.py 168 lines at BASE: CONFIRMED.
+- TWO diff-canary quotes in the packet are held constant by the harness: the F-SG079-1 `MANIFEST_PATH` line and the earlier SG-090 stale-`MANIFEST_PATH` line. Verified with a byte-count on each: both return the identical value (120). This is harness-injected text (two contradictory quotes cannot both be the file's byte content); the target's real line 50 is recorded in the verify log. Reported as finding F-SG085-1.
+- F3 (outgoing deps pyzbar/pytesseract env reds) base-proved on BASE via stash of my two modified files: 2 failed, base exit 1.
+
+Changes (within ceiling):
+- backend/eval/run.py: DEFAULT_CORPUS const; available_corpora(); manifest_path(corpus); load_manifest(corpus) guard; check_manifest(manifest, manifest_name); --corpus selector (choices=available_corpora()) plumbed through main(). Scoring functions (score_fixture, run_bridge_sandbox, _report_scores, _run_live_fixture, run_live, run_offline) have ZERO hunks.
+- backend/eval/baseline_sg029_frozen.md, baseline_sg049_frozen.md, baseline_sg079_frozen.md: NEW frozen records (additive).
+- backend/tests/test_eval_corpus.py: 5 new test bodies (6 nodes with parametrize).
+- Existing backend/eval/baseline_sg029.md + baseline_sg026.md: byte-untouched (empty diff).
+
+Results:
+- Selector: known names listed; unknown fails loudly (`invalid choice: 'sg999-bogus'`, exit 2); default == sg029.
+- Default AFTER run output diff vs BEFORE == empty (identical per fixture + aggregates).
+- Frozen baselines reproduce exactly; doctored-expectation gate seen-to-fail then green.
+- Fail-pre 6 failed / 7 passed → pass-post 13 passed.
+- Suite 2 failed, 362 passed (2 reds base-proved env); ruff clean; mypy 41-in-9 delta 0; secret grep 0 hits; provider_call rows 0.
+- Spend $0.000000 (zero provider calls).
