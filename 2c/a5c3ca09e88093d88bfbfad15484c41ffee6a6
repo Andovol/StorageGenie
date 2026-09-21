@@ -1,0 +1,8 @@
+Negative-Receipt-ID: SG-080
+utc=2026-09-21T14:42:21Z
+DISPATCH_RESULT id=SG-080 coder=opencode exit=0 head=453c1e9682a78d5ed680af329f7b1a1740953398 note=no moved=yes rewrite=no dirty=no elapsed=629s budget=2100s
+P1_moved=PASS count=2
+P2_rewrite=PASS behind=0
+P3_note=FAIL note=no
+P5_receipt=FAIL
+P6_dirty=PASS dirty=no
