@@ -5,7 +5,7 @@
 **Contract:** recorded `0.28.2` == published (`0.28.2`); source path `/home/andrei/storagegenie-contract/VERSION`; contract repo HEAD `b495b59b3426af66772a87939473ac558f8f72d2` (`contract-v0.28.2`).
 **Work dir:** `/home/andrei/StorageGenie` · **origin:** `git@github.com:Andovol/StorageGenie.git`
 **BASE ref:** `origin/automation` · **resolved:** `47c2f68e1dd0b94bcfb430d1cc5c111c197bcf87`
-**WORK_HEAD:** `<WORK_HEAD>` (work commit; note target. The post-note receipt commit is HEAD after it.)
+**WORK_HEAD:** `e673db6d36fc0338bae568b2b38d315d43c3cdf1` (work commit; note target. The post-note receipt commit is HEAD after it.)
 **Spend:** real **$0.000000** (zero metered calls; scripted provider through the real route only).
 
 ---
@@ -89,10 +89,38 @@ The pass is **not vacuous**: the pre-change runs are red with the exact raw 422 
 Work pushed to `automation`, worktree clean (`CO-55`). No push to `storagegenie-evidence`, no `{{RECEIPT_CMD}}`. Note added on WORK_HEAD, notes ref pushed, then fetched into a **mapped** local name and verified with `show`:
 
 ```
-<RECEIPT_OUTPUT>
+$ git push origin automation
+To github.com:Andovol/StorageGenie.git
+   47c2f68..e673db6  automation -> automation
+ok automation
+push rc=0
+
+$ git notes --ref=refs/notes/storagegenie-coder-reports add -m "Dispatch-ID: SG-073 | Report: docs/worklogs/SG-073_report.md | Work-HEAD: e673db6d36fc0338bae568b2b38d315d43c3cdf1" e673db6d36fc0338bae568b2b38d315d43c3cdf1
+note add rc=0
+
+$ git push origin refs/notes/storagegenie-coder-reports
+To github.com:Andovol/StorageGenie.git
+   909034b..396ceeb  refs/notes/storagegenie-coder-reports -> refs/notes/storagegenie-coder-reports
+ok refs/notes/storagegenie-coder-reports
+notes push rc=0
+
+$ git fetch origin refs/notes/storagegenie-coder-reports:refs/notes/storagegenie-coder-reports-sg073-verify
+ok fetched (1 new refs)
+fetch rc=0
+
+$ git rev-parse refs/notes/storagegenie-coder-reports-sg073-verify
+396ceeba39e0bcc60386aa76acd810843a00052b
+
+$ git notes --ref=refs/notes/storagegenie-coder-reports-sg073-verify show e673db6d36fc0338bae568b2b38d315d43c3cdf1
+Dispatch-ID: SG-073 | Report: docs/worklogs/SG-073_report.md | Work-HEAD: e673db6d36fc0338bae568b2b38d315d43c3cdf1
+show rc=0
+
+$ git notes --ref=refs/notes/storagegenie-coder-reports-sg073-verify show e673db6d36fc0338bae568b2b38d315d43c3cdf1 | grep -c "Dispatch-ID: SG-073"
+1
+grep rc=0
 ```
 
-First line carries both `Dispatch-ID:` and `Report:` (`CO-97`). Final line `<note=yes>`.
+First line carries both `Dispatch-ID:` and `Report:` (`CO-97`). Final line `note=yes`.
 
 ## UNCLEAR
 

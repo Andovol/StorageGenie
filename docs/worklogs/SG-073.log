@@ -23,6 +23,7 @@ SG-073 running log — remaining categories: Household/Documents chat fallback +
 [evidence] served GET /v1/taxonomy: household_chemicals active=True / documents_other active=True (all six categories active).
 [evidence] raw POST probe (real route, scripted provider): /v1/chat/household -> 200 grounded, /v1/chat/documents -> 200 grounded, /v1/chat/cosmetics -> 422.
 [cost] zero metered calls, real spend $0.000000.
-[commit] work commit WORK_HEAD=<pending> pushed on automation.
+[commit] work commit WORK_HEAD=e673db6d36fc0338bae568b2b38d315d43c3cdf1 pushed 47c2f68..e673db6 on automation.
+[receipt] note added (rc=0); notes ref pushed 909034b..396ceeb; fetched mapped ref refs/notes/storagegenie-coder-reports-sg073-verify = 396ceeba39e0bcc60386aa76acd810843a00052b; show rc=0; grep "Dispatch-ID: SG-073" count=1; note=yes.
 [receipt] note + mapped-fetch verify output recorded in SG-073_report.md.
 [end] worktree clean; final $0.000000; overall well under 1800s.
