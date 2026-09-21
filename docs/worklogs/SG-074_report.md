@@ -2,7 +2,7 @@
 
 **Branch:** `automation` · **Remote:** `git@github.com:Andovol/StorageGenie.git` · **Work dir:** `/home/andrei/StorageGenie`
 **BASE (packet ref `origin/automation`):** `2a03eae1ae04bc2a01f77f8dd4898fb4ab98fcb8` (`D97: SG-074 deploy rider packet`)
-**WORK_HEAD:** (the work commit; note target — recorded in the receipt follow-up commit that is HEAD after it)
+**WORK_HEAD:** `3942d3b9bb697374f9523b19366ba448ef526c44` (work commit; note target. The post-note receipt commit is HEAD after it.)
 **Contract:** recorded `0.28.2` == published; source `/home/andrei/storagegenie-contract/VERSION`, contract repo HEAD `b495b59b3426af66772a87939473ac558f8f72d2`
 **Model / effort (`CO-78`):** model `deepseek-v4.1-flash` (provider metadata `run=1a1eaf30 llm.provider=opencode-go`; no `--model` on argv, CLI default omitted per policy) · effort `medium` (process argv `/proc/4165439/cmdline`: `opencode run --auto --dir /home/andrei/StorageGenie --variant medium`)
 **Spend (real $):** `$0.000000` actual vs `$0` bound — zero metered provider calls (the only POST was the spend-free gate 422 before the rebuild).
@@ -60,9 +60,33 @@ A **stale image** (the SG-072-era `56277bc0c5f7`, old bundle) passes health: it 
 
 Every HTTP request was a GET except **one spend-free POST** (`/v1/chat/household`, old image, gate 422 before any provider). No post-change POST was issued. DB access was a read-only SQLite open plus `alembic current`. No credential file was fetched. The only mutating commands were the authorized `docker compose build` + single `docker compose up -d`. Network: loopback + container runtime only.
 
-## `{{RECEIPT_CMD}}` / receipt
+## Receipt — notes ref (M20-corrected block; executed output pasted verbatim)
 
-No `{{RECEIPT_CMD}}` run (packet instruction). Notes-ref receipt (note on WORK_HEAD, mapped-ref fetch, verbatim `show` output) is appended in the receipt follow-up commit — see `SG-074_report.md` at that HEAD and `SG-074_verify.log`.
+Work pushed to `automation` (`2a03eae..3942d3b`), worktree clean (`CO-55`). No push to `storagegenie-evidence`, no `{{RECEIPT_CMD}}`. Existing-note refusal guard checked, note added on WORK_HEAD `3942d3b9bb697374f9523b19366ba448ef526c44`, notes ref pushed, then fetched into a **mapped** local name and verified with `show`:
+
+```
+$ git notes --ref=refs/notes/storagegenie-coder-reports show 3942d3b9bb697374f9523b19366ba448ef526c44   # pre-check: existing-note refusal guard
+(no existing note: exit non-zero — proceeding)
+$ git notes --ref=refs/notes/storagegenie-coder-reports add -m "Dispatch-ID: SG-074 | Report: docs/worklogs/SG-074_report.md | Work-HEAD: 3942d3b9bb697374f9523b19366ba448ef526c44" 3942d3b9bb697374f9523b19366ba448ef526c44
+add rc=0
+$ git push origin refs/notes/storagegenie-coder-reports
+To github.com:Andovol/StorageGenie.git
+   16713d5..574fc6f  refs/notes/storagegenie-coder-reports -> refs/notes/storagegenie-coder-reports
+notes push rc=0
+$ git fetch origin refs/notes/storagegenie-coder-reports:refs/notes/storagegenie-coder-reports-sg074-verify
+From github.com:Andovol/StorageGenie
+ * [new ref]         refs/notes/storagegenie-coder-reports -> refs/notes/storagegenie-coder-reports-sg074-verify
+fetch rc=0
+$ git rev-parse refs/notes/storagegenie-coder-reports-sg074-verify
+574fc6fa4a1d0eddf7aa5fb18b715e02b6c8874d
+$ git notes --ref=refs/notes/storagegenie-coder-reports-sg074-verify show 3942d3b9bb697374f9523b19366ba448ef526c44
+Dispatch-ID: SG-074 | Report: docs/worklogs/SG-074_report.md | Work-HEAD: 3942d3b9bb697374f9523b19366ba448ef526c44
+show rc=0
+$ git notes --ref=refs/notes/storagegenie-coder-reports-sg074-verify show 3942d3b9bb697374f9523b19366ba448ef526c44 | grep -c "Dispatch-ID: SG-074"
+1
+```
+
+First line carries both `Dispatch-ID:` and `Report:` (`CO-97`). Mapped-ref SHA `574fc6fa4a1d0eddf7aa5fb18b715e02b6c8874d`. Final line `note=yes`.
 
 ## Acceptance criteria
 

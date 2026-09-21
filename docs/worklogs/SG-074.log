@@ -25,5 +25,7 @@ SG-074 running log — deploy rider: remaining-categories + landing nav live on 
 [G2b] alembic current after: 20260917_sg068_saved_search (head) identical. No upgrade run. row counts identical (provider_call=7 guardrail_event=1 saved_search=0 asset=1 assertion=3 household=1). prod DB otherwise untouched; DB file mtime/size unchanged (339968 B, 10:19:45Z).
 [cost] zero metered calls, real spend $0.000000. The only POST was the one spend-free 422 before the rebuild.
 [commit] 3 docs-only worklog files written under docs/worklogs.
-[receipt] receipt follow-up (see report): note on WORK_HEAD, notes ref pushed, fetched mapped ref, show output pasted verbatim.
+[commit] work commit WORK_HEAD=3942d3b9bb697374f9523b19366ba448ef526c44 pushed 2a03eae..3942d3b on automation.
+[receipt] existing-note guard: none. note added (rc=0); notes ref pushed 16713d5..574fc6f; fetched mapped ref refs/notes/storagegenie-coder-reports-sg074-verify = 574fc6fa4a1d0eddf7aa5fb18b715e02b6c8874d; show rc=0; grep "Dispatch-ID: SG-074" count=1; note=yes.
+[receipt] note + mapped-fetch verify output recorded in SG-074_report.md and SG-074_verify.log.
 [end] worktree clean; final $0.000000; overall well under 1800s.
