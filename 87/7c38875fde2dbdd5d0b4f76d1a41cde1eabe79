@@ -1,0 +1,8 @@
+Negative-Receipt-ID: SG-075
+utc=2026-09-21T11:58:12Z
+DISPATCH_RESULT id=SG-075 coder=opencode exit=0 head=746ad9f6215d15b30d1edf19a266a160ae9863dc note=no moved=yes rewrite=no dirty=no elapsed=909s budget=2100s
+P1_moved=PASS count=2
+P2_rewrite=PASS behind=0
+P3_note=FAIL note=no
+P5_receipt=FAIL
+P6_dirty=PASS dirty=no
