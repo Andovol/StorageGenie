@@ -1,0 +1,73 @@
+{
+  "id": "sg079-03-glare-medicine",
+  "class": "glare",
+  "category": "medicine",
+  "note": "SG-079 v3 scoring fixture, authored offline (no live call). Foil-glare medicine pack: expiry/lot/size legible, brand/variant/barcode/allergens unreadable and reported as unknowns.",
+  "ground_truth": {
+    "items": [
+      {
+        "name": "Amoxicillin",
+        "expiry_date": "2027-08-31",
+        "opened_date": null,
+        "date_type": "expiry_date",
+        "lot": "L2345",
+        "quantity": 20,
+        "unit": "tablets",
+        "asset_type": "medicine",
+        "brand": null,
+        "variant": null,
+        "size_text": "20 tablets",
+        "barcode": null,
+        "category_proposed": "antibiotic",
+        "transcript": "Amoxicillin 500 mg 20 tablets EXP 2027-08-31 L2345",
+        "storage": "Store below 25 C",
+        "warnings": ["Keep out of reach of children"],
+        "allergens": null,
+        "nutrition_per100g": null,
+        "nutrition_serving": null
+      }
+    ],
+    "unknowns": [
+      "items.0.brand",
+      "items.0.variant",
+      "items.0.barcode",
+      "items.0.allergens"
+    ],
+    "needs_evidence": false,
+    "expectation_class": "unknown-expected"
+  },
+  "provider_output": {
+    "items": [
+      {
+        "name": "Amoxicillin",
+        "expiry_date": "2027-08-31",
+        "opened_date": null,
+        "date_type": "expiry_date",
+        "lot": "L2345",
+        "quantity": 20,
+        "unit": "tablets",
+        "asset_type": "medicine",
+        "brand": null,
+        "variant": null,
+        "size_text": "20 tablets",
+        "barcode": null,
+        "category_proposed": "antibiotic",
+        "transcript": "Amoxicillin 500 mg 20 tablets EXP 2027-08-31 L2345",
+        "storage": "Store below 25 C",
+        "warnings": ["Keep out of reach of children"],
+        "allergens": null,
+        "nutrition_per100g": null,
+        "nutrition_serving": null,
+        "confidence": 0.75,
+        "uncertainty_reasons": ["foil reflection", "glare across barcode"]
+      }
+    ],
+    "unknowns": [
+      "items.0.brand",
+      "items.0.variant",
+      "items.0.barcode",
+      "items.0.allergens"
+    ],
+    "needs_evidence": false
+  }
+}

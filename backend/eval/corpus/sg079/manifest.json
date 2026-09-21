@@ -1,0 +1,14 @@
+{
+  "corpus": "sg079",
+  "description": "SG-079 extraction-v3 (transcribed-only enrichment fields) SCORING-ONLY fixtures. These carry v3 ground truth plus an offline-authored provider_output reference (no live call, no key, no network: --live is forbidden this slice). No images and no metered provider_calls: the fixtures exist so the extended schema and the unknowns-honesty property are measured through the real `schemas` module, never through a live provider. The default `eval/run.py` manifest stays sg029; these are scored by `tests/test_sg079_v3_schema.py`.",
+  "base_dir": "sg079",
+  "count": 6,
+  "fixtures": [
+    "sg079_01_clean_food.json",
+    "sg079_02_partial_food.json",
+    "sg079_03_glare_medicine.json",
+    "sg079_04_partial_medicine.json",
+    "sg079_05_clean_cosmetics.json",
+    "sg079_06_glare_cosmetics.json"
+  ]
+}

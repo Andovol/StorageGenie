@@ -1,0 +1,250 @@
+SG-079 raw verification log (commands + verbatim outputs)
+Host /home/andrei/StorageGenie ; branch automation ; remote git@github.com:Andovol/StorageGenie.git
+BASE ref origin/automation resolved to 3bf9198339a0f92d1daf5e779c29160a6dbc47be
+Live clock: recon 2026-09-21T14:13:54Z ; final capture 2026-09-21T14:17:50Z
+
+######## RECON / PREMISES ########
+$ git rev-parse HEAD
+3bf9198339a0f92d1daf5e779c29160a6dbc47be
+$ git rev-parse origin/automation
+3bf9198339a0f92d1daf5e779c29160a6dbc47be
+$ git branch --show-current
+automation
+$ git remote -v
+origin	git@github.com:Andovol/StorageGenie.git (fetch)
+origin	git@github.com:Andovol/StorageGenie.git (push)
+$ cat /home/andrei/storagegenie-contract/VERSION
+0.28.2
+$ git -C /home/andrei/storagegenie-contract rev-parse HEAD
+b495b59b3426af66772a87939473ac558f8f72d2
+# model/effort source: process argv (pid 459564) + provider log, NOT a system-prompt identity line
+$ ps -o args= -p 459564
+opencode run --auto --dir /home/andrei/StorageGenie --variant medium # SG-079 — photo-ingest schema v3 + froz...
+$ ps -o args= -p 459519
+bash /usr/local/lib/dispatch/run-coder SG-079
+$ grep -oE "llm\.provider=... llm\.model=..." opencode.log | tail -1
+llm.provider=opencode-go llm.model=deepseek-v4.1-flash
+
+# premise: schemas.py ExtractionItem fields (read in full): name, expiry_date, opened_date, date_type,
+# lot, quantity, unit, asset_type, confidence, uncertainty_reasons  -> CONFIRMED
+# premise: _unknowns_are_absent_fields uses ExtractionItem.model_fields -> CONFIRMED
+# premise: reader.py PROMPT_FILES maps v2 -> CONFIRMED (runtime read below)
+$ python -c "from app.services.providers import reader; print(reader.PROMPT_FILES); [print(c, '->', reader.load_prompt(c)[1]) for c in ('food','medicine','cosmetics')]"
+PROMPT_FILES = {'food': 'extract-food-v2.md', 'medicine': 'extract-medicine-v2.md', 'cosmetics': 'extract-cosmetics-v2.md'}
+food -> extract-food-v2
+medicine -> extract-medicine-v2
+cosmetics -> extract-cosmetics-v2
+# premise DIFFERENCE: eval/run.py MANIFEST_PATH is hardwired to sg029 (finding F-SG079-1):
+$ grep -n "MANIFEST_PATH" backend/eval/run.py
+50:MANIFEST_PATH = CORPUS_DIR / "sg029" / "manifest.json"
+
+######## BASELINE (pre-change, tree at BASE) ########
+$ cd backend && ../venv/bin/python -m pytest -q
+...
+FAILED tests/test_signals.py::test_generated_codes_are_validated_and_bad_checksum_is_not_an_identifier
+FAILED tests/test_signals.py::test_ocr_has_text_boxes_and_mean_confidence - a...
+2 failed, 288 passed, 22 warnings in 18.53s
+$ ../venv/bin/python -m ruff check app tests
+All checks passed!
+ruff rc=0
+$ ../venv/bin/python -m mypy app
+...
+Found 41 errors in 9 files (checked 75 source files)
+mypy rc=1
+$ ../venv/bin/python eval/run.py --check-only
+corpus integrity OK: 10 fixtures (manifest count 10)
+rc=0
+$ ../venv/bin/python eval/run.py
+fixture sg029-01-clean-food: score=1.000 needs=1 unknowns=1 items=1.00
+fixture sg029-02-clean-medicine: score=1.000 needs=1 unknowns=1 items=1.00
+fixture sg029-03-glare-food: score=0.000 needs=0 unknowns=0 items=0.00
+fixture sg029-04-clutter-food: score=1.000 needs=1 unknowns=1 items=1.00
+fixture sg029-05-partial-label-food: score=0.667 needs=1 unknowns=0 items=1.00
+fixture sg029-06-partial-label-medicine: score=1.000 needs=1 unknowns=1 items=1.00
+fixture sg029-07-no-date-visible-medicine: score=0.667 needs=1 unknowns=0 items=1.00
+fixture sg029-08-clean-cosmetics: score=1.000 needs=1 unknowns=1 items=1.00
+fixture sg029-09-no-date-visible-cosmetics: score=1.000 needs=1 unknowns=1 items=1.00
+fixture sg029-10-partial-label-cosmetics: score=1.000 needs=1 unknowns=1 items=1.00
+field_accuracy=0.833 over 10 fixtures
+unknown_rate=4/7=0.571
+correction_rate=0/6=0.000 (audit_event plugin.assertion.write rows=6)
+rc=0
+
+######## G1 — FAIL-PRE (FIRST RUN: before schema change AND before v3 prompts existed) ########
+# date: 2026-09-21T14:16:03Z
+$ ../venv/bin/python -m pytest -q tests/test_sg079_v3_schema.py
+...
+E       items.0.nutrition_serving
+E         Extra inputs are not permitted [type=extra_forbidden, input_value='Per 250 ml: Energy 150 kcal', input_type=str]
+...
+FAILED tests/test_sg079_v3_schema.py::test_v3_schema_declares_all_new_fields
+FAILED tests/test_sg079_v3_schema.py::test_v3_transcribed_fields_parse_verbatim
+FAILED tests/test_sg079_v3_schema.py::test_v3_null_new_fields_are_legal - pyd...
+FAILED tests/test_sg079_v3_schema.py::test_v3_unknowns_rule_rejects_fabricated_string_field[brand]
+FAILED tests/test_sg079_v3_schema.py::test_v3_unknowns_rule_rejects_fabricated_string_field[variant]
+FAILED tests/test_sg079_v3_schema.py::test_v3_unknowns_rule_rejects_fabricated_string_field[size_text]
+FAILED tests/test_sg079_v3_schema.py::test_v3_unknowns_rule_rejects_fabricated_string_field[barcode]
+FAILED tests/test_sg079_v3_schema.py::test_v3_unknowns_rule_rejects_fabricated_string_field[category_proposed]
+FAILED tests/test_sg079_v3_schema.py::test_v3_unknowns_rule_rejects_fabricated_string_field[transcript]
+FAILED tests/test_sg079_v3_schema.py::test_v3_unknowns_rule_rejects_fabricated_string_field[storage]
+FAILED tests/test_sg079_v3_schema.py::test_v3_unknowns_rule_rejects_fabricated_string_field[nutrition_per100g]
+FAILED tests/test_sg079_v3_schema.py::test_v3_unknowns_rule_rejects_fabricated_string_field[nutrition_serving]
+FAILED tests/test_sg079_v3_schema.py::test_v3_unknowns_rule_rejects_fabricated_list_field[warnings]
+FAILED tests/test_sg079_v3_schema.py::test_v3_unknowns_rule_rejects_fabricated_list_field[allergens]
+FAILED tests/test_sg079_v3_schema.py::test_v3_prompt_file_frozen_with_exact_front_matter[food]
+FAILED tests/test_sg079_v3_schema.py::test_v3_prompt_file_frozen_with_exact_front_matter[medicine]
+FAILED tests/test_sg079_v3_schema.py::test_v3_prompt_file_frozen_with_exact_front_matter[cosmetics]
+FAILED tests/test_sg079_v3_schema.py::test_sg079_fixtures_score_and_unknowns_are_honest
+FAILED tests/test_sg079_v3_schema.py::test_sg079_fixture_miss_scores_below_perfect
+19 failed, 37 passed in 0.45s
+rc=1
+
+######## G1 — FAIL-PRE (reproducible: only schemas.py reverted; v3 prompts/tests present) ########
+$ git stash push -- backend/app/services/providers/schemas.py
+ok stashed
+$ (cd backend && ../venv/bin/python -m pytest -q tests/test_sg079_v3_schema.py)
+...
+FAILED tests/test_sg079_v3_schema.py::test_v3_unknowns_rule_rejects_fabricated_string_field[nutrition_serving]
+FAILED tests/test_sg079_v3_schema.py::test_v3_unknowns_rule_rejects_fabricated_list_field[warnings]
+FAILED tests/test_sg079_v3_schema.py::test_v3_unknowns_rule_rejects_fabricated_list_field[allergens]
+FAILED tests/test_sg079_v3_schema.py::test_sg079_fixtures_score_and_unknowns_are_honest
+FAILED tests/test_sg079_v3_schema.py::test_sg079_fixture_miss_scores_below_perfect
+16 failed, 40 passed in 0.38s
+$ git stash pop
+ok stash pop
+
+######## G1 — PASS-POST (schema extended) ########
+# date: 2026-09-21T14:16:40Z
+$ ../venv/bin/python -m pytest -q tests/test_sg079_v3_schema.py
+........................................................                 [100%]
+56 passed in 0.32s
+rc=0
+
+######## G2 — PROMPTS: v1/v2 BYTE-IDENTICAL + v3 FROZEN ########
+$ git diff --stat -- backend/app/services/providers/prompts/extract-food-v1.md backend/app/services/providers/prompts/extract-food-v2.md backend/app/services/providers/prompts/extract-medicine-v1.md backend/app/services/providers/prompts/extract-medicine-v2.md backend/app/services/providers/prompts/extract-cosmetics-v1.md backend/app/services/providers/prompts/extract-cosmetics-v2.md
+(no output — six v1/v2 files byte-identical)
+$ ls backend/app/services/providers/prompts/
+analytics-insights-v1.md  2.2K
+chat-v1.md  1.5K
+extract-cosmetics-v1.md  2.1K
+extract-cosmetics-v2.md  2.8K
+extract-cosmetics-v3.md  5.0K
+extract-food-v1.md  1.9K
+extract-food-v2.md  2.6K
+extract-food-v3.md  4.9K
+extract-medicine-v1.md  2.0K
+extract-medicine-v2.md  2.7K
+extract-medicine-v3.md  5.0K
+planning-v1.md  2.1K
+$ sha256sum <the three v3 prompt files + test + sg079 corpus>
+3767253f9aae238a3f6b79cd2db4c65de95afa72a1c2ed2c8637161f650567b8  extract-food-v3.md
+d68dc7e98bb21df47285bb7827c795de44d557747293a3e5cee681bbcebae0d4  extract-medicine-v3.md
+e9a940d34fdda893119f03f4423280674a87e160e208abee2763a81d46a5d2e4  extract-cosmetics-v3.md
+f470b4f5f6a2fdc7ecaec857712d5f6e657c2463f5eed805b6df111a994cb6aa  backend/tests/test_sg079_v3_schema.py
+d6640bc2ccb45bb4cb9ed7efb207a2e1d2126b53c19e48fd0c5f5a943fb30168  backend/eval/corpus/sg079/manifest.json
+6bea592d2ce590cebf13ff7318639afb7b8c1f7ec917bc902af2cedb117e931d  backend/eval/corpus/sg079/sg079_01_clean_food.json
+ee0b3bfe1fbe7fa154bf7c595e1843f909e59c01f3629a5ca8b04e53ec1b5445  backend/eval/corpus/sg079/sg079_02_partial_food.json
+b1ba8a1e227ac5748714f27554743bbcf923bb66f2976c04d3c55f2c7b9bee1f  backend/eval/corpus/sg079/sg079_03_glare_medicine.json
+ffffc0f99fe99ec8acbe41307a2e998ffcf88399f0462e229a19e73682373589  backend/eval/corpus/sg079/sg079_04_partial_medicine.json
+06929b59043c037b0d6909d9396dd15567c9860cb304229734bac274d183bdf3  backend/eval/corpus/sg079/sg079_05_clean_cosmetics.json
+412ea9553679d9f741a5682ba5934a0406d7b7f96d02120613b4e74d6f270d1c  backend/eval/corpus/sg079/sg079_06_glare_cosmetics.json
+
+# ANGLE-TOKEN re-probe by char codes (v3 files carry "items.<index>.<field>")
+$ python <char-code probe>
+extract-food-v3.md: found=True angle_codepoints=[60, 62, 60, 62] lookalike_codepoints=[] nonascii_angle_count=0
+extract-medicine-v3.md: found=True angle_codepoints=[60, 62, 60, 62] lookalike_codepoints=[] nonascii_angle_count=0
+extract-cosmetics-v3.md: found=True angle_codepoints=[60, 62, 60, 62] lookalike_codepoints=[] nonascii_angle_count=0
+expected '<'=60 '>'=62
+# (tests build the path from f"items.0.{field}", never a literal angle token)
+
+######## G2 — FIXTURES SCORED THROUGH THE REAL SCHEMA MODULE ########
+$ cat sg079/manifest.json -> count 6, fixtures 6
+$ python <parse all sg079 fixtures>
+manifest count 6 listed 6
+sg079-01-clean-food: items=1 unknowns=0 honest=True needs=False
+sg079-02-partial-food: items=1 unknowns=8 honest=True needs=True
+sg079-03-glare-medicine: items=1 unknowns=4 honest=True needs=False
+sg079-04-partial-medicine: items=1 unknowns=4 honest=True needs=True
+sg079-05-clean-cosmetics: items=1 unknowns=0 honest=True needs=False
+sg079-06-glare-cosmetics: items=1 unknowns=6 honest=True needs=True
+# (test_sg079_v3_schema.py scores every new field vs ground truth == 1.0 and a mutated value < 1.0)
+# real eval/run.py offline path run UNMODIFIED (sg029 corpus) after the schema change:
+$ ../venv/bin/python eval/run.py --check-only
+corpus integrity OK: 10 fixtures (manifest count 10)
+$ ../venv/bin/python eval/run.py | tail
+field_accuracy=0.833 over 10 fixtures
+unknown_rate=4/7=0.571
+correction_rate=0/6=0.000 (audit_event plugin.assertion.write rows=6)
+eval rc=0
+# --live NOT run (forbidden this slice); no corpus file rewritten.
+
+######## G3 — SCOPE / SUITE / LINT / MYPY / SECRET / NETWORK ########
+$ git status --porcelain
+ M backend/app/services/providers/schemas.py
+?? backend/app/services/providers/prompts/extract-cosmetics-v3.md
+?? backend/app/services/providers/prompts/extract-food-v3.md
+?? backend/app/services/providers/prompts/extract-medicine-v3.md
+?? backend/eval/corpus/sg079/
+?? backend/tests/test_sg079_v3_schema.py
+$ git diff --stat
+backend/app/services/providers/schemas.py | 43 ++++++++++++++++++++++++++++++-
+1 file changed, 42 insertions(+), 1 deletion(-)
+$ git diff --stat -- <reader.py router.py candidates.py app/api frontend alembic docker-compose.yml .env app/models>
+(no output — scope untouched)
+$ (cd backend && ../venv/bin/python -m pytest -q)
+FAILED tests/test_signals.py::test_generated_codes_are_validated_and_bad_checksum_is_not_an_identifier
+FAILED tests/test_signals.py::test_ocr_has_text_boxes_and_mean_confidence - a...
+2 failed, 344 passed, 22 warnings in 16.50s
+$ ../venv/bin/python -m ruff check app tests
+All checks passed!
+$ ../venv/bin/python -m mypy app
+Found 41 errors in 9 files (checked 75 source files)
+$ ../venv/bin/python -m mypy app | grep -c "schemas.py"
+0
+# table registry test (static tables unchanged): tests/test_postgres_dialect.py:35 EXPECTED_TABLES
+#   asserts set(Base.metadata.tables) == EXPECTED_TABLES -> among the 344 passing
+# SECRET SCAN
+$ git diff | grep -niE "sk-|api[_-]?key|secret|password|token|BEGIN .*PRIVATE" | grep -v SENTINEL
+(no matches)
+$ grep -rniE "sk-|api[_-]?key|secret|password|token|BEGIN .*PRIVATE" <new v3 prompts, sg079 corpus, new test> | grep -v SENTINEL
+(no matches)
+$ grep -rn "sk-SENTINEL-DO-NOT-WRITE" backend
+backend/tests/test_planning.py:33:SENTINEL_KEY = "sk-SENTINEL-DO-NOT-WRITE-037"
+backend/tests/test_analytics.py:35:SENTINEL_KEY = "sk-SENTINEL-DO-NOT-WRITE-066"
+backend/tests/test_phase3_e2e.py:64:SENTINEL_KEY = "sk-SENTINEL-DO-NOT-WRITE-039"
+backend/tests/test_chat.py:34:SENTINEL_KEY = "sk-SENTINEL-DO-NOT-WRITE-038"
+# NETWORK PROOF: no new socket/http import in the schemas.py diff
+$ git diff -- schemas.py | grep -iE "^[+-].*(import|socket|http|requests|urllib|network)"
+(no import/network lines changed)
+# new test imports: json, copy.deepcopy, pathlib.Path, pytest, pydantic.ValidationError, app...reader, app...schemas
+
+######## G3 — BASE REDS STASH-REPROVED ########
+$ git stash push -u -m "sg079-temp-basered-reprove"
+ok stashed
+$ git status --porcelain
+(clean)
+$ (cd backend && ../venv/bin/python -m pytest -q tests/test_signals.py::test_generated_codes_are_validated_and_bad_checksum_is_not_an_identifier tests/test_signals.py::test_ocr_has_text_boxes_and_mean_confidence)
+WARNING  app.services.signals:signals.py:210 OCR extraction unavailable: pytesseract is not installed
+FAILED tests/test_signals.py::test_generated_codes_are_validated_and_bad_checksum_is_not_an_identifier
+FAILED tests/test_signals.py::test_ocr_has_text_boxes_and_mean_confidence - a...
+2 failed in 0.56s
+$ git stash pop
+ok stash pop
+$ git status --porcelain
+ M backend/app/services/providers/schemas.py
+?? backend/app/services/providers/prompts/extract-cosmetics-v3.md
+?? backend/app/services/providers/prompts/extract-food-v3.md
+?? backend/app/services/providers/prompts/extract-medicine-v3.md
+?? backend/eval/corpus/sg079/
+?? backend/tests/test_sg079_v3_schema.py
+
+######## RECEIPT (added after this log was first written) ########
+$ git add -A && git commit -m "SG-079: schema v3 fields + frozen v3 prompts + fixtures + tests"
+$ git rev-parse HEAD   # == WORK_HEAD, reported in SG-079_report.md
+$ git notes --ref=refs/notes/storagegenie-coder-reports add -m "Dispatch-ID: SG-079 | Report: docs/worklogs/SG-079_report.md | Work-HEAD: <WORK_HEAD>" <WORK_HEAD>
+$ git push origin automation
+$ git push origin refs/notes/storagegenie-coder-reports
+$ git fetch origin refs/notes/storagegenie-coder-reports:refs/notes/storagegenie-coder-reports
+$ git notes --ref=refs/notes/storagegenie-coder-reports show <WORK_HEAD>
+Dispatch-ID: SG-079 | Report: docs/worklogs/SG-079_report.md | Work-HEAD: <WORK_HEAD>
+# (exact executed output pasted in SG-079_report.md receipt subsection)

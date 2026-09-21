@@ -43,6 +43,23 @@ class ExtractionItem(BaseModel):
     quantity: float | None = None
     unit: str | None = Field(default=None, max_length=50)
     asset_type: str | None = Field(default=None, max_length=50)
+    # SG-079 v3: transcribed-only enrichment fields. Every one is null when
+    # absent/illegible (plus a matching `unknowns` entry), never inferred.
+    # Container types: verbatim text (identity/codes/care/nutrition) as `str`;
+    # the multi-valued care panels as `list[str]`. `category_proposed` is an
+    # open-vocabulary slug — the canonical mapping happens downstream (SG-080),
+    # never here; `transcript` is verbatim label text, evidence only, never a fact.
+    brand: str | None = None
+    variant: str | None = None
+    size_text: str | None = None
+    barcode: str | None = None
+    category_proposed: str | None = None
+    transcript: str | None = None
+    storage: str | None = None
+    warnings: list[str] | None = None
+    allergens: list[str] | None = None
+    nutrition_per100g: str | None = None
+    nutrition_serving: str | None = None
     confidence: float = Field(ge=0.0, le=1.0)
     uncertainty_reasons: list[str] = Field(default_factory=list)
 
@@ -55,11 +72,35 @@ class ExtractionItem(BaseModel):
             raise ValueError("quantity must be a finite number >= 0")
         return value
 
-    @field_validator("unit", "asset_type")
+    @field_validator(
+        "unit",
+        "asset_type",
+        "brand",
+        "variant",
+        "size_text",
+        "barcode",
+        "category_proposed",
+        "transcript",
+        "storage",
+        "nutrition_per100g",
+        "nutrition_serving",
+    )
     @classmethod
     def _non_blank_when_present(cls, value: str | None, info: ValidationInfo) -> str | None:
         if value is not None and not value.strip():
             raise ValueError(f"{info.field_name} must be non-blank when present")
+        return value
+
+    @field_validator("warnings", "allergens")
+    @classmethod
+    def _list_entries_non_blank_when_present(
+        cls, value: list[str] | None, info: ValidationInfo
+    ) -> list[str] | None:
+        if value is None:
+            return None
+        for entry in value:
+            if not entry.strip():
+                raise ValueError(f"{info.field_name} entries must be non-blank")
         return value
 
     @field_validator("expiry_date", "opened_date")

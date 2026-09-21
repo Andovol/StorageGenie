@@ -1,0 +1,63 @@
+{
+  "id": "sg079-01-clean-food",
+  "class": "clean",
+  "category": "food",
+  "note": "SG-079 v3 scoring fixture, authored offline (no live call). Clean milk label: every v3 identity/care/nutrition field printed and transcribed verbatim.",
+  "ground_truth": {
+    "items": [
+      {
+        "name": "Milk",
+        "expiry_date": "2031-03-15",
+        "opened_date": null,
+        "date_type": "best_before",
+        "lot": null,
+        "quantity": 2,
+        "unit": "bottles",
+        "asset_type": "beverage",
+        "brand": "DairyGold",
+        "variant": "Semi-skimmed",
+        "size_text": "1 L",
+        "barcode": "5012345678900",
+        "category_proposed": "dairy",
+        "transcript": "DairyGold Semi-skimmed Milk 1 L Best before 2031-03-15",
+        "storage": "Keep refrigerated below 5 C",
+        "warnings": ["Not suitable for freezing"],
+        "allergens": ["milk"],
+        "nutrition_per100g": "Energy 250 kJ / 60 kcal; Fat 3.2 g; Protein 3.4 g",
+        "nutrition_serving": "Per 250 ml: Energy 150 kcal"
+      }
+    ],
+    "unknowns": [],
+    "needs_evidence": false,
+    "expectation_class": "exact"
+  },
+  "provider_output": {
+    "items": [
+      {
+        "name": "MILK",
+        "expiry_date": "2031-03-15",
+        "opened_date": null,
+        "date_type": "best_before",
+        "lot": null,
+        "quantity": 2,
+        "unit": "bottles",
+        "asset_type": "beverage",
+        "brand": "DairyGold",
+        "variant": "Semi-skimmed",
+        "size_text": "1 L",
+        "barcode": "5012345678900",
+        "category_proposed": "dairy",
+        "transcript": "DairyGold Semi-skimmed Milk 1 L Best before 2031-03-15",
+        "storage": "Keep refrigerated below 5 C",
+        "warnings": ["Not suitable for freezing"],
+        "allergens": ["milk"],
+        "nutrition_per100g": "Energy 250 kJ / 60 kcal; Fat 3.2 g; Protein 3.4 g",
+        "nutrition_serving": "Per 250 ml: Energy 150 kcal",
+        "confidence": 1.0,
+        "uncertainty_reasons": []
+      }
+    ],
+    "unknowns": [],
+    "needs_evidence": false
+  }
+}

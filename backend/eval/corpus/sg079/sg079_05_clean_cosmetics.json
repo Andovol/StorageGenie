@@ -1,0 +1,63 @@
+{
+  "id": "sg079-05-clean-cosmetics",
+  "class": "clean",
+  "category": "cosmetics",
+  "note": "SG-079 v3 scoring fixture, authored offline (no live call). Clean cream jar: opened date, identity, care and allergen panel all legible and transcribed verbatim.",
+  "ground_truth": {
+    "items": [
+      {
+        "name": "Moisturising Cream",
+        "expiry_date": null,
+        "opened_date": "2030-01-01",
+        "date_type": "period_after_opening",
+        "lot": null,
+        "quantity": 50,
+        "unit": "ml",
+        "asset_type": "cream",
+        "brand": "Nivea",
+        "variant": "Soft",
+        "size_text": "50 ml",
+        "barcode": "4005900123456",
+        "category_proposed": "skincare",
+        "transcript": "Nivea Soft Moisturising Cream 50 ml 12M",
+        "storage": "Store away from direct sunlight",
+        "warnings": [],
+        "allergens": ["linalool"],
+        "nutrition_per100g": null,
+        "nutrition_serving": null
+      }
+    ],
+    "unknowns": [],
+    "needs_evidence": false,
+    "expectation_class": "exact"
+  },
+  "provider_output": {
+    "items": [
+      {
+        "name": "Moisturising Cream",
+        "expiry_date": null,
+        "opened_date": "2030-01-01",
+        "date_type": "period_after_opening",
+        "lot": null,
+        "quantity": 50,
+        "unit": "ml",
+        "asset_type": "cream",
+        "brand": "Nivea",
+        "variant": "Soft",
+        "size_text": "50 ml",
+        "barcode": "4005900123456",
+        "category_proposed": "skincare",
+        "transcript": "Nivea Soft Moisturising Cream 50 ml 12M",
+        "storage": "Store away from direct sunlight",
+        "warnings": [],
+        "allergens": ["linalool"],
+        "nutrition_per100g": null,
+        "nutrition_serving": null,
+        "confidence": 1.0,
+        "uncertainty_reasons": []
+      }
+    ],
+    "unknowns": [],
+    "needs_evidence": false
+  }
+}

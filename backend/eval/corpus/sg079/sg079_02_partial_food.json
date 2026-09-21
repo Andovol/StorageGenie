@@ -1,0 +1,81 @@
+{
+  "id": "sg079-02-partial-food",
+  "class": "partial-label",
+  "category": "food",
+  "note": "SG-079 v3 scoring fixture, authored offline (no live call). Torn/glared food label: identity partial, expiry and several v3 fields illegible and reported as unknowns (null beside unknown).",
+  "ground_truth": {
+    "items": [
+      {
+        "name": "Milk",
+        "expiry_date": null,
+        "opened_date": null,
+        "date_type": null,
+        "lot": null,
+        "quantity": 1,
+        "unit": "bottle",
+        "asset_type": "beverage",
+        "brand": null,
+        "variant": "Whole",
+        "size_text": "1 L",
+        "barcode": null,
+        "category_proposed": "dairy",
+        "transcript": "Whole Milk 1 L",
+        "storage": "Keep refrigerated",
+        "warnings": null,
+        "allergens": null,
+        "nutrition_per100g": null,
+        "nutrition_serving": null
+      }
+    ],
+    "unknowns": [
+      "items.0.expiry_date",
+      "items.0.date_type",
+      "items.0.brand",
+      "items.0.barcode",
+      "items.0.warnings",
+      "items.0.allergens",
+      "items.0.nutrition_per100g",
+      "items.0.nutrition_serving"
+    ],
+    "needs_evidence": true,
+    "expectation_class": "needs-evidence"
+  },
+  "provider_output": {
+    "items": [
+      {
+        "name": "Milk",
+        "expiry_date": null,
+        "opened_date": null,
+        "date_type": null,
+        "lot": null,
+        "quantity": 1,
+        "unit": "bottle",
+        "asset_type": "beverage",
+        "brand": null,
+        "variant": "Whole",
+        "size_text": "1 L",
+        "barcode": null,
+        "category_proposed": "dairy",
+        "transcript": "Whole Milk 1 L",
+        "storage": "Keep refrigerated",
+        "warnings": null,
+        "allergens": null,
+        "nutrition_per100g": null,
+        "nutrition_serving": null,
+        "confidence": 0.8,
+        "uncertainty_reasons": ["glare on lower label", "torn corner"]
+      }
+    ],
+    "unknowns": [
+      "items.0.expiry_date",
+      "items.0.date_type",
+      "items.0.brand",
+      "items.0.barcode",
+      "items.0.warnings",
+      "items.0.allergens",
+      "items.0.nutrition_per100g",
+      "items.0.nutrition_serving"
+    ],
+    "needs_evidence": true
+  }
+}

@@ -1,0 +1,73 @@
+{
+  "id": "sg079-04-partial-medicine",
+  "class": "partial-label",
+  "category": "medicine",
+  "note": "SG-079 v3 scoring fixture, authored offline (no live call). Creased medicine pack: identity/barcode legible, expiry panel and storage unreadable and reported as unknowns.",
+  "ground_truth": {
+    "items": [
+      {
+        "name": "Ibuprofen",
+        "expiry_date": null,
+        "opened_date": null,
+        "date_type": null,
+        "lot": null,
+        "quantity": 24,
+        "unit": "tablets",
+        "asset_type": "medicine",
+        "brand": "Nurofen",
+        "variant": null,
+        "size_text": "24 tablets",
+        "barcode": "5000166025115",
+        "category_proposed": "analgesic",
+        "transcript": "Nurofen Ibuprofen 200 mg 24 tablets",
+        "storage": null,
+        "warnings": ["Do not exceed stated dose"],
+        "allergens": [],
+        "nutrition_per100g": null,
+        "nutrition_serving": null
+      }
+    ],
+    "unknowns": [
+      "items.0.expiry_date",
+      "items.0.date_type",
+      "items.0.variant",
+      "items.0.storage"
+    ],
+    "needs_evidence": true,
+    "expectation_class": "needs-evidence"
+  },
+  "provider_output": {
+    "items": [
+      {
+        "name": "Ibuprofen",
+        "expiry_date": null,
+        "opened_date": null,
+        "date_type": null,
+        "lot": null,
+        "quantity": 24,
+        "unit": "tablets",
+        "asset_type": "medicine",
+        "brand": "Nurofen",
+        "variant": null,
+        "size_text": "24 tablets",
+        "barcode": "5000166025115",
+        "category_proposed": "analgesic",
+        "transcript": "Nurofen Ibuprofen 200 mg 24 tablets",
+        "storage": null,
+        "warnings": ["Do not exceed stated dose"],
+        "allergens": [],
+        "nutrition_per100g": null,
+        "nutrition_serving": null,
+        "confidence": 0.7,
+        "uncertainty_reasons": ["expiry panel creased", "low light"]
+      }
+    ],
+    "unknowns": [
+      "items.0.expiry_date",
+      "items.0.date_type",
+      "items.0.variant",
+      "items.0.storage"
+    ],
+    "needs_evidence": true
+  }
+}

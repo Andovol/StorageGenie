@@ -1,0 +1,77 @@
+{
+  "id": "sg079-06-glare-cosmetics",
+  "class": "glare",
+  "category": "cosmetics",
+  "note": "SG-079 v3 scoring fixture, authored offline (no live call). Curved glared shampoo bottle: brand/size/warnings legible, dates/variant/barcode/storage unreadable and reported as unknowns.",
+  "ground_truth": {
+    "items": [
+      {
+        "name": "Shampoo",
+        "expiry_date": null,
+        "opened_date": null,
+        "date_type": null,
+        "lot": null,
+        "quantity": 400,
+        "unit": "ml",
+        "asset_type": "shampoo",
+        "brand": "Herbal",
+        "variant": null,
+        "size_text": "400 ml",
+        "barcode": null,
+        "category_proposed": "haircare",
+        "transcript": "Herbal Shampoo 400 ml",
+        "storage": null,
+        "warnings": ["Avoid contact with eyes"],
+        "allergens": [],
+        "nutrition_per100g": null,
+        "nutrition_serving": null
+      }
+    ],
+    "unknowns": [
+      "items.0.opened_date",
+      "items.0.expiry_date",
+      "items.0.date_type",
+      "items.0.variant",
+      "items.0.barcode",
+      "items.0.storage"
+    ],
+    "needs_evidence": true,
+    "expectation_class": "needs-evidence"
+  },
+  "provider_output": {
+    "items": [
+      {
+        "name": "Shampoo",
+        "expiry_date": null,
+        "opened_date": null,
+        "date_type": null,
+        "lot": null,
+        "quantity": 400,
+        "unit": "ml",
+        "asset_type": "shampoo",
+        "brand": "Herbal",
+        "variant": null,
+        "size_text": "400 ml",
+        "barcode": null,
+        "category_proposed": "haircare",
+        "transcript": "Herbal Shampoo 400 ml",
+        "storage": null,
+        "warnings": ["Avoid contact with eyes"],
+        "allergens": [],
+        "nutrition_per100g": null,
+        "nutrition_serving": null,
+        "confidence": 0.65,
+        "uncertainty_reasons": ["curved bottle", "smudged print"]
+      }
+    ],
+    "unknowns": [
+      "items.0.opened_date",
+      "items.0.expiry_date",
+      "items.0.date_type",
+      "items.0.variant",
+      "items.0.barcode",
+      "items.0.storage"
+    ],
+    "needs_evidence": true
+  }
+}

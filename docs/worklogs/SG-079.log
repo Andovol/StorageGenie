@@ -1,0 +1,32 @@
+SG-079 process log
+Work dir /home/andrei/StorageGenie ; branch automation ; remote git@github.com:Andovol/StorageGenie.git
+BASE ref origin/automation resolved to 3bf9198339a0f92d1daf5e779c29160a6dbc47be
+Start clock 2026-09-21T14:13:54Z
+
+1. Recon: branch automation; HEAD == origin/automation == 3bf9198; worktree clean. Re-read
+   backend/app/services/providers/schemas.py (ExtractionItem + ExtractionOutput exactly as the packet
+   holds). Re-read backend/eval/run.py (MANIFEST_PATH hardwired to corpus/sg029 — no sg079 loader;
+   runner left untouched, the packet's stated default). Re-read the three v2 prompts + reader.py
+   PROMPT_FILES (all v2). Contract VERSION 0.28.2, contract HEAD b495b59. Model deepseek-v4.1-flash /
+   effort medium from /proc/459564/cmdline + opencode provider log (never a system-prompt identity line).
+2. BASELINE pre-change: pytest -q -> 2 failed, 288 passed (the 2 base decoder reds, pytesseract/pyzbar
+   absent on the box); ruff clean rc=0; mypy "Found 41 errors in 9 files" rc=1; eval/run.py --check-only
+   integrity OK 10 fixtures; eval/run.py offline field_accuracy=0.833.
+3. G1: authored backend/tests/test_sg079_v3_schema.py (new-field parse/honest-unknowns/fabrication/
+   blank/prose/prompt-map/fixture-scoring). Ran it BEFORE any change to schemas.py or the v3 prompts ->
+   19 failed, 37 passed (raw in SG-079_verify.log). Then extended ExtractionItem with the 11 nullable
+   transcribed-only fields (9 str + warnings/allergens list[str]); extended the non-blank validator to
+   the 9 new string fields and added a non-blank list-entry validator. Re-ran -> 56 passed.
+4. G2: created extract-{food,medicine,cosmetics}-v3.md (front matter template_version extract-<cat>-v3,
+   same envelope; transcribe-only rules extended to every new field; category as proposed slug;
+   transcript verbatim; JSON-only + Repair preserved). v1/v2 byte-identical: six-file git diff --stat
+   empty. Six sg079 scoring fixtures + manifest authored offline (no images, no provider_calls).
+5. G3: full suite post -> 2 failed, 344 passed (same 2 base reds; +56 new tests). Base reds stash-reproved
+   on the bare tree (2 failed). ruff clean. mypy delta 0 (41/9 before == 41/9 after; schemas.py 0 errors).
+   Secret scan 0 new. Scope diff empty (reader/router/candidates/api/frontend/alembic/compose/.env/models).
+   No migration, no deploy, no restart, $0, no network (no new socket/http import; offline runner only).
+6. Worklogs written: SG-079.log, SG-079_report.md, SG-079_verify.log (raw in verify log).
+7. Commit docs+code, push automation, notes-ref receipt + mapped-ref verify, docs-only receipt commit.
+
+No command hit its bound; nothing killed. Spend $0.000000 real (zero metered provider calls).
+Consumed by: docs/worklogs/SG-079_report.md, docs/worklogs/SG-079_verify.log.
