@@ -1,0 +1,185 @@
+# SG-084 verify log — raw command outputs (read-only probe, 2026-09-21)
+
+## G1 — tree state
+
+$ git status --porcelain
+(empty)
+
+$ git rev-parse HEAD
+3c84ec2a92fc280b798b3cb16025a10f1804de86
+
+$ git rev-parse origin/automation
+3c84ec2a92fc280b798b3cb16025a10f1804de86
+
+$ git log --oneline -3
+3c84ec2 D104 recorded (SG-080 failure probe + conditional re-fire)
+e06dc0b D104: SG-084 probe packet (SG-080 unit failure, conditional re-fire on GO)
+15f7dd4 SG-080: ingest pipeline on v3 packet (D101 track slice 2)
+
+$ git branch --show-current
+automation
+
+$ git remote -v
+origin	git@github.com:Andovol/StorageGenie.git (fetch)
+origin	git@github.com:Andovol/StorageGenie.git (push)
+
+$ ls -la docs/packets/SG-080-ingest-pipeline-v3.md
+-rw-r--r-- 1 andrei andrei 14336 ... docs/packets/SG-080-ingest-pipeline-v3.md
+
+$ sha256sum docs/packets/SG-080-ingest-pipeline-v3.md
+d5e537eaa0baf0ef07a857d097cd400601d1f5edabfeaabb15e3f40efaa30afd  docs/packets/SG-080-ingest-pipeline-v3.md
+
+$ git log --oneline -1 -- docs/packets/SG-080-ingest-pipeline-v3.md
+15f7dd4 SG-080: ingest pipeline on v3 packet (D101 track slice 2)
+
+$ git diff --stat 15f7dd4..HEAD -- docs/packets/SG-080-ingest-pipeline-v3.md
+(empty — packet byte-identical to dispatched content)
+
+$ git log --oneline 15f7dd4..HEAD
+3c84ec2 D104 recorded (SG-080 failure probe + conditional re-fire)
+e06dc0b D104: SG-084 probe packet (SG-080 unit failure, conditional re-fire on GO)
+
+$ git diff --stat 15f7dd4..HEAD
+STATE.md                                   |  3 +-
+docs/packets/SG-084-sg080-failure-probe.md | 83 ++++++++++++++++++++++++++++++
+2 files changed, 85 insertions(+), 1 deletion(-)
+
+## G2 — disk / daemon
+
+$ df -h / /tmp /home
+Filesystem      Size  Used Avail Use% Mounted on
+/dev/vda1       232G  110G  122G  48% /
+/dev/vda1       232G  110G  122G  48% /tmp
+/dev/vda1       232G  110G  122G  48% /
+
+$ docker info --format '{{.ServerVersion}} containers={{.Containers}} images={{.Images}}'
+29.6.2 containers=2 images=2
+exit=0
+
+$ docker images -q | wc -l
+2
+
+## G2 — unit status / journal
+
+$ systemctl status dispatch-storagegenie@SG-080.service --no-pager -l
+× dispatch-storagegenie@SG-080.service - Confined Coder slice SG-080
+     Loaded: loaded (/etc/systemd/system/dispatch-storagegenie@.service; static)
+    Drop-In: /etc/systemd/system/dispatch-storagegenie@.service.d
+             └─10-project.conf
+     Active: failed (Result: exit-code) since Mon 2026-09-21 14:24:59 UTC; 3min 31s ago
+    Process: 480953 ExecStart=/usr/local/lib/dispatch/run-coder SG-080 (code=exited, status=1/FAILURE)
+   Main PID: 480953 (code=exited, status=1/FAILURE)
+        CPU: 13.150s
+
+$ journalctl -xeu dispatch-storagegenie@SG-080.service --no-pager   (first functional lines + tail)
+Sep 21 14:24:36 ubuntu run-coder[480953]: contract_sync=refresh version=0.28.2
+...
+Sep 21 14:24:56 ubuntu run-coder[480953]: DISPATCH_RESULT id=SG-080 coder=opencode exit=1 head=15f7dd466794b2476c0c8240af2a38aafe5f099e note=no moved=no rewrite=no dirty=no elapsed=21s budget=2100s
+Sep 21 14:24:59 ubuntu run-coder[480953]: restart_request=none
+Sep 21 14:24:59 ubuntu run-coder[480953]: AUDIT id=SG-080
+Sep 21 14:24:59 ubuntu run-coder[480953]: START=15f7dd466794b2476c0c8240af2a38aafe5f099e
+Sep 21 14:24:59 ubuntu run-coder[480953]: END=15f7dd466794b2476c0c8240af2a38aafe5f099e
+Sep 21 14:24:59 ubuntu run-coder[480953]: contract=0.28.2
+Sep 21 14:24:59 ubuntu run-coder[480953]: model=cli-default
+Sep 21 14:24:59 ubuntu run-coder[480953]: effort=medium
+Sep 21 14:24:59 ubuntu run-coder[480953]: tokens_total=unknown
+Sep 21 14:24:59 ubuntu run-coder[480953]: P1_moved=FAIL count=0
+Sep 21 14:24:59 ubuntu run-coder[480953]: P2_rewrite=PASS behind=0
+Sep 21 14:24:59 ubuntu run-coder[480953]: P3_note=FAIL note=no
+Sep 21 14:24:59 ubuntu run-coder[480953]: P5_receipt=FAIL
+Sep 21 14:24:59 ubuntu run-coder[480953]: P6_dirty=PASS dirty=no
+Sep 21 14:24:59 ubuntu run-coder[480953]: negative_receipt=published
+Sep 21 14:24:59 ubuntu run-coder[480953]: restart_marker_committed=PASS
+Sep 21 14:24:59 ubuntu run-coder[480953]: report_cited_missing=SKIPPED reason=p5_not_pass
+Sep 21 14:24:59 ubuntu run-coder[480953]: advisory_failed=P1_moved,P3_note
+Sep 21 14:24:59 ubuntu run-coder[480953]: sql_touched=no
+Sep 21 14:24:59 ubuntu run-coder[480953]: product_touch=no
+Sep 21 14:24:59 ubuntu run-coder[480953]: files: count=0
+Sep 21 14:24:59 ubuntu run-coder[480953]: log_tail:
+Sep 21 14:24:59 ubuntu run-coder[480953]:   → Read backend/app/services/providers/schemas.py
+Sep 21 14:24:59 ubuntu run-coder[480953]:   → Read backend/app/services/candidates.py
+Sep 21 14:24:59 ubuntu run-coder[480953]:   → Read backend/app/services/evidence_service.py
+Sep 21 14:24:59 ubuntu run-coder[480953]:   → Read backend/app/services/job_service.py
+Sep 21 14:24:59 ubuntu run-coder[480953]:   → Read backend/app/models/evidence.py
+Sep 21 14:24:59 ubuntu run-coder[480953]:   → Read backend/tests/test_sg079_v3_schema.py
+Sep 21 14:24:59 ubuntu run-coder[480953]:   ✱ Grep "extract-.*-v2|PROMPT_FILES|template_version.*v2|prompt_template_version.*v2|_v2" in backend · 34 matches
+Sep 21 14:24:59 ubuntu run-coder[480953]:   → Read backend/eval/run.py
+Sep 21 14:24:59 ubuntu run-coder[480953]:   → Read backend/app/services/providers/fake.py
+Sep 21 14:24:59 ubuntu run-coder[480953]:   → Read backend/app/config.py
+Sep 21 14:24:59 ubuntu run-coder[480953]:   Error: Upstream request failed: [server_error] Upstream response was not valid JSON
+
+$ journalctl ... | grep -inE 'error|fail|token|refresh|denied|permission'
+4:Sep 21 14:24:36 ... contract_sync=refresh version=0.28.2
+13:Sep 21 14:24:59 ... tokens_total=unknown
+14:Sep 21 14:24:59 ... P1_moved=FAIL count=0
+16:Sep 21 14:24:59 ... P3_note=FAIL note=no
+17:Sep 21 14:24:59 ... P5_receipt=FAIL
+22:Sep 21 14:24:59 ... advisory_failed=P1_moved,P3_note
+56:Sep 21 14:24:59 ...   Error: Upstream request failed: [server_error] Upstream response was not valid JSON
+
+## G2 — negative receipt (present, remote-verified)
+
+$ git notes --ref=refs/notes/storagegenie-coder-reports show 15f7dd4
+error: no note found for object 15f7dd466794b2476c0c8240af2a38aafe5f099e.   (no POSITIVE receipt)
+
+$ (sweep) grep internal notes for SG-080 -> object 97dec23030d0419570cd8d23752e2753bd43f96f
+Negative-Receipt-ID: SG-080
+utc=2026-09-21T14:24:56Z
+DISPATCH_RESULT id=SG-080 coder=opencode exit=1 head=15f7dd466794b2476c0c8240af2a38aafe5f099e note=no moved=no rewrite=no dirty=no elapsed=21s budget=2100s
+P1_moved=FAIL count=0
+P2_rewrite=PASS behind=0
+P3_note=FAIL note=no
+P5_receipt=FAIL
+P6_dirty=PASS dirty=no
+
+$ git fetch origin refs/notes/storagegenie-coder-reports:refs/notes/sg084-notes-check
+From github.com:Andovol/StorageGenie
+ * [new ref]         refs/notes/storagegenie-coder-reports -> refs/notes/sg084-notes-check
+$ git notes --ref=refs/notes/sg084-notes-check show 97dec23030d0419570cd8d23752e2753bd43f96f
+(same Negative-Receipt-ID: SG-080 block — so it IS on the remote)
+$ git notes --ref=refs/notes/sg084-notes-check list | wc -l
+100
+
+## G2 — residue enumeration
+
+criterion: paths matching *SG-080*/*sg-080* under /home/andrei /run /tmp /var/tmp /var/lib /var/lock
+           (maxdepth 5; excluding /home/andrei/StorageGenie/.git)
+$ find ... 
+/home/andrei/StorageGenie/output/dispatch/SG-080.launcher.sh
+/home/andrei/StorageGenie/output/dispatch/SG-080.log
+/home/andrei/StorageGenie/docs/packets/SG-080-ingest-pipeline-v3.md
+
+$ ls -la /run/dispatch /var/lib/dispatch
+/usr/bin/ls: cannot access '/run/dispatch': No such file or directory
+/usr/bin/ls: cannot access '/var/lib/dispatch': No such file or directory
+
+$ git check-ignore -v output/dispatch/SG-080.log output/dispatch/SG-080.launcher.sh
+output/dispatch/.gitignore:1:*	output/dispatch/SG-080.log
+output/dispatch/.gitignore:1:*	output/dispatch/SG-080.launcher.sh
+
+## G2 — unit inventory (read-only)
+
+$ systemctl list-units 'dispatch-storagegenie@*' --all --no-pager
+● dispatch-storagegenie@SG-080.service loaded failed     failed       Confined Coder slice SG-080
+  dispatch-storagegenie@SG-084.service loaded activating start  start Confined Coder slice SG-084
+
+$ systemctl list-units --state=failed --no-pager
+● dispatch-launcher@LNR-047.service    loaded failed failed Confined Coder slice LNR-047
+● dispatch-launcher@LNR-047r2.service  loaded failed failed Confined Coder slice LNR-047r2
+● dispatch-storagegenie@SG-080.service loaded failed failed Confined Coder slice SG-080
+
+## Model / effort provenance
+
+$ head -2 output/dispatch/SG-080.log
+> build · deepseek-v4.1-flash
+$ cat output/dispatch/SG-084.launcher.sh
+exec opencode run --auto --dir /home/andrei/StorageGenie --variant medium "$(cat "$PROMPT_FILE")"
+$ tr '\0' ' ' < /proc/483139/cmdline
+opencode run --auto --dir /home/andrei/StorageGenie --variant medium <SG-084 packet>
+$ cat .local/state/opencode/model.json
+{"recent":[{"providerID":"opencode-go","modelID":"deepseek-v4.1-flash"}, ...], "variant":{... "opencode-go/deepseek-v4.1-flash":"medium"}}
+
+## Contract
+
+$ cat /home/andrei/storagegenie-contract/VERSION
+0.28.2

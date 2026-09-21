@@ -1,0 +1,32 @@
+SG-084 — read-only probe: why SG-080 unit exited code with no receipt.
+
+role guard: Coder only. No dispatch verb run; no unit for any ID started, polled or retried.
+scope: reads (work tree, packet dir, disk, daemon, unit/journal, runtime residue) + 3 worklog writes.
+
+MODEL / EFFORT (CO-78): model `deepseek-v4.1-flash` (provider `opencode-go`; from provider metadata — SG-084
+  dispatch log header `> build · deepseek-v4.1-flash` + `.local/state/opencode/model.json` recent[0];
+  argv carries no `--model`), effort `medium` (process argv `/proc/483139/cmdline`:
+  `opencode run --auto --dir /home/andrei/StorageGenie --variant medium <packet>`).
+CONTRACT: recorded `0.28.2` == published `0.28.2`; source `/home/andrei/storagegenie-contract/VERSION`.
+SPEND (real $): `$0.000000` actual vs `$0` bound — zero metered provider calls.
+BASE REF: `origin/automation` -> `3c84ec2a92fc280b798b3cb16025a10f1804de86`.
+
+LEG TIMINGS (elapsed vs budget, wall clock):
+- G1 host tree + packet presence ....... ~2s vs 60s   (PASS)
+- G2 preconditions + unit evidence .... ~5s vs 60s   (PASS)
+- residue / notes / negative receipt ... ~40s vs 60s  (PASS; one broad `find` + notes sweep)
+- G4 worklog + commit + push ........... see receipt commit
+- overall ............................ under 300s overall bound at time of writing.
+
+RESULT: GO for re-firing `SG-080 --force`. Root = external/transient upstream provider error
+(`Upstream request failed: [server_error] Upstream response was not valid JSON`), not packet fetch, not
+worktree dirt, not lane tooling. No fix implemented (G-A7). No auto-retry.
+
+CORRECTIONS TO PACKET PREMISES (findings, not obstacles):
+- F1: "died BEFORE any Coder work" is imprecise — SG-080.log shows the Coder ran reconnaissance (9 file
+  reads + 1 grep) before the provider error; it died before any write/commit (files: count=0).
+- F2: "notes ref has no SG-080 note" is imprecise — there is no *positive* receipt on the work head, but a
+  *negative* receipt `Negative-Receipt-ID: SG-080` IS on refs/notes/storagegenie-coder-reports (remote
+  verified).
+- F3: current tip is 2 commits ahead of the packet commit `15f7dd4` (the probe's own D104 commits
+  `e06dc0b`, `3c84ec2`); the SG-080 packet file is byte-identical to the dispatched content.
