@@ -2,7 +2,7 @@
 
 **Branch:** `automation` · **Remote:** `git@github.com:Andovol/StorageGenie.git` · **Work dir:** `/home/andrei/StorageGenie`
 **BASE REF (packet ref `origin/automation`):** `45727cf4244384b33858e6bf23dd6a8468872c12` (start HEAD == `origin/automation`; the packet requested `origin/automation` and it resolved here — two fields, not one)
-**WORK_HEAD:** `PENDING` (filled after the work commit; the receipt note rides this hash)
+**WORK_HEAD:** `20fbbde6494b4e9a0817172ca3334f964ffd50f5` (`SG-080: ingest pipeline on v3 …`; the receipt note rides this hash; the docs-only receipt commit is HEAD after it)
 **Contract:** recorded `0.28.2` == published `0.28.2`; source `/home/andrei/storagegenie-contract/VERSION` (contract repo HEAD `b495b59b3426af66772a87939473ac558f8f72d2`). Note: `.rules-cache/` is absent from this worktree; the source read is the contract repo path.
 **Model / effort (`CO-78`):** model `deepseek-v4.1-flash` (provider `opencode-go`; read from provider metadata `/home/andrei/.local/state/opencode/model.json` `recent[0] = {"providerID":"opencode-go","modelID":"deepseek-v4.1-flash"}` — **not** a system-prompt identity line; argv carries no `--model`) · effort `medium` (process argv `/proc/488842/cmdline`: `opencode run --auto --dir /home/andrei/StorageGenie --variant medium # SG-080 …`)
 **Spend (real $):** `$0.000919` actual vs a `$0.015` bound (units USD) — ONE metered 200 body ($0.000919) plus one HTTP 503 error leg ($0.0, no body); both ledgered in the temp DB. `$0` outside G5.
@@ -114,7 +114,20 @@ No acceptance criterion passed vacuously. The G1–G3 feature tests genuinely fa
 
 ## Receipt note
 
-`RECEIPT_PENDING`
+Work pushed to `automation` (`45727cf..20fbbde`); worktree clean (`CO-55`). No push to `storagegenie-evidence`, no `{{RECEIPT_CMD}}`. Note added on `WORK_HEAD`, pushed, then fetched into a MAPPED local ref and shown (executed output pasted verbatim):
+
+```
+$ git notes --ref=refs/notes/storagegenie-coder-reports add -m "Dispatch-ID: SG-080 | Report: docs/worklogs/SG-080_report.md | Work-HEAD: 20fbbde6494b4e9a0817172ca3334f964ffd50f5" 20fbbde6494b4e9a0817172ca3334f964ffd50f5
+(note added)
+$ git push origin refs/notes/storagegenie-coder-reports
+   847944c..1cbf192  refs/notes/storagegenie-coder-reports -> refs/notes/storagegenie-coder-reports
+$ git fetch origin refs/notes/storagegenie-coder-reports:refs/notes/sg080-coder-reports-verify
+ * [new ref]         refs/notes/storagegenie-coder-reports -> refs/notes/sg080-coder-reports-verify
+$ git notes --ref=refs/notes/sg080-coder-reports-verify show 20fbbde6494b4e9a0817172ca3334f964ffd50f5
+Dispatch-ID: SG-080 | Report: docs/worklogs/SG-080_report.md | Work-HEAD: 20fbbde6494b4e9a0817172ca3334f964ffd50f5
+```
+
+Final line: `note=yes`
 
 ## UNCLEAR
 
