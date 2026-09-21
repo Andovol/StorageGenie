@@ -305,3 +305,33 @@ LISTEN 0      4096       127.0.0.1:8003       0.0.0.0:*    users:(("rootlesskit"
 == DB FILE AFTER ==
 -rw------- andrei andrei 339968 2026-09-21 10:19:45.510824996 +0000 /home/andrei/StorageGenie/data/db/storagegenie.db
 === END AFTER ===
+
+================================================================================
+LEG 4 — RECEIPT (notes ref; executed output pasted verbatim)
+================================================================================
+$ git push origin HEAD:automation
+To github.com:Andovol/StorageGenie.git
+   8bc896c..13a5f65  HEAD -> automation
+work_push_rc=0
+$ git status --porcelain (CO-55 clean)
+$ git notes --ref=refs/notes/storagegenie-coder-reports show 13a5f65adfcc97ad6fb533b393eea6c47e35f060   # pre-check: existing-note refusal guard
+error: no note found for object 13a5f65adfcc97ad6fb533b393eea6c47e35f060.
+precheck_rc=1
+$ git notes --ref=refs/notes/storagegenie-coder-reports add -m "Dispatch-ID: SG-076 | Report: docs/worklogs/SG-076_report.md | Work-HEAD: 13a5f65adfcc97ad6fb533b393eea6c47e35f060" 13a5f65adfcc97ad6fb533b393eea6c47e35f060
+add_rc=0
+$ git push origin refs/notes/storagegenie-coder-reports
+To github.com:Andovol/StorageGenie.git
+   064aa18..d9315f2  refs/notes/storagegenie-coder-reports -> refs/notes/storagegenie-coder-reports
+notes_push_rc=0
+$ git fetch origin refs/notes/storagegenie-coder-reports:refs/notes/storagegenie-coder-reports-sg076-verify
+From github.com:Andovol/StorageGenie
+ * [new ref]         refs/notes/storagegenie-coder-reports -> refs/notes/storagegenie-coder-reports-sg076-verify
+fetch_rc=0
+$ git rev-parse refs/notes/storagegenie-coder-reports-sg076-verify
+d9315f2f1d81e2ae6defd17170fbacd7a3b01fc5
+$ git notes --ref=refs/notes/storagegenie-coder-reports-sg076-verify show 13a5f65adfcc97ad6fb533b393eea6c47e35f060
+Dispatch-ID: SG-076 | Report: docs/worklogs/SG-076_report.md | Work-HEAD: 13a5f65adfcc97ad6fb533b393eea6c47e35f060
+show_rc=0
+$ git notes --ref=refs/notes/storagegenie-coder-reports-sg076-verify show 13a5f65adfcc97ad6fb533b393eea6c47e35f060 | grep -c 'Dispatch-ID: SG-076'
+1
+note=yes
