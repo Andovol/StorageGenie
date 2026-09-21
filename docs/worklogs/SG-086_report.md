@@ -2,7 +2,7 @@
 
 **Dispatch:** SG-086 · Phase 5 hardening slice 2 (plan `docs/superpowers/plans/2026-09-21-phase-5-hardening.md` §Slice 2) · **Coder:** opencode / effort medium (argv, not identity line) · **Autonomy:** L3 per D107 grant
 **BASE ref:** `origin/automation` → resolved `60d9a70044a57233c40e1bda984f4acbf4111194` (two fields, never one)
-**WORK_HEAD:** recorded in the notes-ref receipt below (slice tip before the docs-only paste commit)
+**WORK_HEAD:** `6eb805b24909431b67ab1ad8426c291523198bae` (slice tip; the follow-up docs-only commit carries this paste)
 **Spend:** **$0.000000 actual** — zero provider calls; no metered call exists on any path in this slice
 **Authoring date metadata:** 2026-09-21 (not a gate)
 
@@ -106,7 +106,24 @@ git fetch origin refs/notes/storagegenie-coder-reports:refs/notes/storagegenie-c
 git notes --ref=refs/notes/storagegenie-coder-reports show <WORK_HEAD>
 ```
 
-The verbatim executed `show` output is pasted in the follow-up docs-only commit (M20-corrected block pattern, as SG-085 did); the final committed report carries the paste.
+Verbatim executed output against the fetched mapped ref (exit 0):
+
+```
+$ git notes --ref=refs/notes/storagegenie-coder-reports add -m "Dispatch-ID: SG-086 | Report: docs/worklogs/SG-086_report.md | Work-HEAD: 6eb805b24909431b67ab1ad8426c291523198bae" 6eb805b24909431b67ab1ad8426c291523198bae
+add exit=0
+$ git notes --ref=refs/notes/storagegenie-coder-reports show 6eb805b24909431b67ab1ad8426c291523198bae
+Dispatch-ID: SG-086 | Report: docs/worklogs/SG-086_report.md | Work-HEAD: 6eb805b24909431b67ab1ad8426c291523198bae
+$ git push origin refs/notes/storagegenie-coder-reports
+   e5b6821..04d5500  refs/notes/storagegenie-coder-reports -> refs/notes/storagegenie-coder-reports
+notes push exit=0
+$ git fetch origin refs/notes/storagegenie-coder-reports:refs/notes/storagegenie-coder-reports-remote
+   372e770..04d5500  refs/notes/storagegenie-coder-reports -> refs/notes/storagegenie-coder-reports-remote
+fetch exit=0
+$ git notes --ref=refs/notes/storagegenie-coder-reports-remote show 6eb805b24909431b67ab1ad8426c291523198bae
+Dispatch-ID: SG-086 | Report: docs/worklogs/SG-086_report.md | Work-HEAD: 6eb805b24909431b67ab1ad8426c291523198bae
+```
+
+First line carries both `Dispatch-ID:` and `Report:` (`CO-97`). No existing note refused; final line `note=yes`.
 
 ## UNCLEAR
 

@@ -389,3 +389,18 @@ $ ls -d /tmp/sg086-drill-* 2>&1   # script-created temp dirs must be gone
 ls: cannot access '/tmp/sg086-drill-*': No such file or directory
 No temp artifact remains. Cost: $0.000000 (zero provider calls).
 CO-42 (verbatim): "Restoring production from backup is an incident, never silent cleanup."
+
+######## RECEIPT — notes ref (M20-corrected block) ########
+$ git notes --ref=refs/notes/storagegenie-coder-reports add -m "Dispatch-ID: SG-086 | Report: docs/worklogs/SG-086_report.md | Work-HEAD: 6eb805b24909431b67ab1ad8426c291523198bae" 6eb805b24909431b67ab1ad8426c291523198bae
+add exit=0
+$ git notes --ref=refs/notes/storagegenie-coder-reports show 6eb805b24909431b67ab1ad8426c291523198bae
+Dispatch-ID: SG-086 | Report: docs/worklogs/SG-086_report.md | Work-HEAD: 6eb805b24909431b67ab1ad8426c291523198bae
+$ git push origin refs/notes/storagegenie-coder-reports
+   e5b6821..04d5500  refs/notes/storagegenie-coder-reports -> refs/notes/storagegenie-coder-reports
+notes push exit=0
+$ git fetch origin refs/notes/storagegenie-coder-reports:refs/notes/storagegenie-coder-reports-remote
+   372e770..04d5500  refs/notes/storagegenie-coder-reports -> refs/notes/storagegenie-coder-reports-remote
+fetch exit=0
+$ git notes --ref=refs/notes/storagegenie-coder-reports-remote show 6eb805b24909431b67ab1ad8426c291523198bae
+Dispatch-ID: SG-086 | Report: docs/worklogs/SG-086_report.md | Work-HEAD: 6eb805b24909431b67ab1ad8426c291523198bae
+note=yes
