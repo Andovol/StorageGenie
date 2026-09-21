@@ -1,0 +1,35 @@
+SG-087 — privacy-controls audit: redaction + identifiers-only on every provider path, retention stated
+
+Dispatch-ID: SG-087
+Coder/effort: coder opencode ; effort medium (read from process argv: `opencode run --auto --dir /home/andrei/StorageGenie --variant medium`)
+MODEL: unknown — argv carries no `--model` and no provider metadata was surfaced to the Coder in-process (reported per `CO-78`/packet: never guess from a system-prompt identity line).
+Host / workdir: /home/andrei/StorageGenie ; branch automation ; remote git@github.com:Andovol/StorageGenie.git
+BASE ref origin/automation resolved to 1dceafbb613b6f80d4a5e9082ac4998b7975ca05 (packet requests the ref; this is the commit it resolved to — two fields)
+Contract: recorded 0.28.2 == published 0.28.2 ; source path /home/andrei/storagegenie-contract/VERSION ; checkout b495b59b3426af66772a87939473ac558f8f72d2
+Spend: $0.000000 actual — zero provider calls; no metered call exists on any path in this slice (PG-IC-04 not firing)
+Authoring date metadata: 2026-09-21 (not a gate)
+Live clock: recon 2026-09-21T17:2xZ ; final capture 2026-09-21T17:35Z
+
+Scope executed (audit only; ceiling honored): ONE new test file `backend/tests/test_privacy_audit.py` + `docs/worklogs` (3 files).
+No redaction-code change, no consent-flow change, no prompt/app/migration/compose/.env/README/STATE/AGENTS change. Nothing live (`PG-PR-04`).
+
+Legs (elapsed vs budget):
+  G0/G1/G2/G3 recon + static enumeration ......... ~6 min  / budget 120s ordinary per command (each under bound)
+  New test authoring + iterate ................... ~4 min  / budget 600s suite
+  Suite/ruff/mypy baselines (bare BASE then slice) ~3 min  / budget 600s suite
+  FAIL-PRE + PASS-POST runs ...................... <1 min  / budget 600s
+  Logs + commit + receipt ........................ ~5 min  / budget 1800s overall
+  Overall: under the 1800s ceiling; no command killed; no interactive command.
+
+Verdict (NO HOLE FOUND — enumeration is the witness):
+  G0 — one HTTP sender in `app/`: `opencode_go.py:252 client.post`; two `redact_image` call sites: `reader.py:402` (pipeline) and `opencode_go.py:299` (direct adapter); analytics/planning send a generated 1x1 blank carrier through the vision op; chat is the only text-only path. Every sender cleared.
+  G1 — REAL `redact_image` strips all parsed EXIF + the GPS IFD; pixels preserved (32x32 RGB); both seams hand the redacted PNG; reader ledger `image_sha256` equals the very bytes received; `signals.py` EXIF values appear in no provider payload. Seen-to-fail quoted (raw input fails the same assertion).
+  G2 — `.env` key probed presence/count only (count=1, mode 600, value never printed); wire builders accept/emit no key material; Enrich/Jina unbuilt (no web sender); consent=false binds zero calls on all four service paths (exploding probe).
+  G3 — retention measured (no TTL/cleanup/scheduler): retained indefinitely, deletion manual; ADR-007 deferral quoted. Suite 2 failed/376 passed (the 2 base-proved decoder env reds), ruff clean, mypy 41-in-9 delta 0, secret grep 0 real shapes. Home: worklog-only (stated).
+
+Receipt: pushed to automation, worktree clean (CO-55); note on the work HEAD (refs/notes/storagegenie-coder-reports) pushed and verified against the fetched mapped ref; verbatim `show` output pasted in the follow-up docs-only commit (M20-corrected block). Final line `note=yes`.
+
+UNCLEAR:
+  FIRST READ — whether the analytics/planning "text-only" premise meant no image part at all; measured: they still send a generated 1x1 blank carrier through `extract_items` (the vision surface requires image bytes), only the prompt content is text.
+  DURING EXECUTION — whether "FAIL-then-PASS" required a committed failing state; since this slice changes no code, the FAIL-PRE is the unredacted input against the committed assertion (G1 seen-to-fail doubles as the pre-run), and the committed negative-control test captures it permanently.
+  REMAINING — ledger-row retention for the eventual production datastore (ADR-007 defers it there); no TTL exists today, so the statement recorded here is measured, not invented.

@@ -1,0 +1,221 @@
+SG-087 raw verification log (commands + verbatim outputs)
+Host /home/andrei/StorageGenie ; branch automation ; remote git@github.com:Andovol/StorageGenie.git
+BASE ref origin/automation resolved to 1dceafbb613b6f80d4a5e9082ac4998b7975ca05
+Contract: recorded 0.28.2 == published 0.28.2 ; source /home/andrei/storagegenie-contract/VERSION ; checkout b495b59b3426af66772a87939473ac558f8f72d2
+MODEL: unknown (argv carries no --model; no provider metadata surfaced in-process) ; effort medium (argv `--variant medium`)
+Live clock (final capture): 2026-09-21T17:35Z
+Budget: 120s ordinary ; 600s suite ; 1800s overall ; $0.00.
+Reading order: sections appended as executed. Section index inline as "########" lines.
+This slice changes NO product code: the only tracked change is the new test file, so the
+"pre-change run" is the unredacted input against the committed assertion (G1 seen-to-fail).
+
+######## RECON ########
+$ git rev-parse HEAD
+1dceafbb613b6f80d4a5e9082ac4998b7975ca05
+$ git rev-parse origin/automation
+1dceafbb613b6f80d4a5e9082ac4998b7975ca05
+$ git branch --show-current
+automation
+$ git remote -v
+origin	git@github.com:Andovol/StorageGenie.git (fetch)
+origin	git@github.com:Andovol/StorageGenie.git (push)
+$ cat /home/andrei/storagegenie-contract/VERSION
+0.28.2
+$ git -C /home/andrei/storagegenie-contract rev-parse HEAD
+b495b59b3426af66772a87939473ac558f8f72d2
+$ ls -la .rules-cache    # packet/AGENTS hypothesis; absent on this worktree (finding F-SG087-2)
+ls: cannot access '.rules-cache': No such file or directory
+# model/effort source: process argv (NOT a system-prompt identity line)
+$ pgrep -af 'opencode run' | head -3
+582627 opencode run --auto --dir /home/andrei/StorageGenie --variant medium # SG-087 — privacy-controls audit: ...
+
+######## G0 — outbound carrier enumeration ########
+# criterion: every call site that hands BYTES to a provider seam or an HTTP sender
+$ grep -rn --include='*.py' 'redact_image' backend/app
+backend/app/services/providers/redaction.py:16:def redact_image(raw: bytes) -> bytes:
+backend/app/services/providers/opencode_go.py:26:from app.services.providers.redaction import redact_image
+backend/app/services/providers/opencode_go.py:299:        redacted = redact_image(image_bytes)
+backend/app/services/providers/reader.py:8:`redact_image` (GPS never leaves), calls through the SG-025 router (budget
+backend/app/services/providers/reader.py:36:from app.services.providers.redaction import redact_image
+backend/app/services/providers/reader.py:402:        redacted = redact_image(raw)
+
+$ grep -rn --include='*.py' -E 'httpx|requests\.|urllib|urlopen|http\.client|aiohttp|socket\.|\.post\(|\.put\(' backend/app
+backend/app/services/providers/opencode_go.py:23:import httpx
+backend/app/services/providers/opencode_go.py:251:            with httpx.Client(timeout=httpx.Timeout(self._timeout_s)) as client:
+backend/app/services/providers/opencode_go.py:252:                response = client.post(self._base_url + CHAT_PATH, json=payload, headers=headers)
+backend/app/services/providers/opencode_go.py:253:        except httpx.HTTPError as exc:
+... (all other `.post(` hits are FastAPI `@router.post` decorators, e.g. backend/app/api/v1/*.py)
+
+# static full-scan assertions in the committed test (exhaustive over backend/app, not a narrow grep):
+$ ../venv/bin/python -m pytest -q -p no:cacheprovider tests/test_privacy_audit.py::test_g0_single_http_client_and_send_site_full_scan tests/test_privacy_audit.py::test_g0_redact_call_sites_are_reader_and_direct_adapter tests/test_privacy_audit.py::test_g0_text_services_ship_blank_carriers_not_photos
+...
+3 passed
+# _http_client_files() == {"services/providers/opencode_go.py": ["import httpx"]}
+# _send_sites() == ["services/providers/opencode_go.py:252"]
+# redact call sites == ["services/providers/opencode_go.py:299", "services/providers/reader.py:402"]
+# analytics INSIGHTS_OPERATION == "extract_items" ; planning PLANNING_OPERATION == "extract_items" ;
+# chat CHAT_OPERATION == "extract_text" ; both carriers == 1x1 PNG.
+
+# bytes->provider seams:
+$ grep -rn --include='*.py' -E 'resolve_original_bytes|storage_path|read_bytes|b64encode|image_bytes|carrier' backend/app
+backend/app/services/providers/reader.py:189:def resolve_original_bytes(db: Session, evidence_id: str) -> bytes:
+backend/app/services/providers/reader.py:194:    path = storage_path(evidence.storage_key)
+backend/app/services/providers/reader.py:197:    return path.read_bytes()
+backend/app/services/providers/reader.py:402:        redacted = redact_image(raw)
+backend/app/services/providers/opencode_go.py:299:        redacted = redact_image(image_bytes)
+backend/app/services/providers/opencode_go.py:300:        image_b64 = base64.b64encode(redacted).decode("ascii")
+backend/app/services/analytics/service.py:536:    carrier = _carrier_png()
+backend/app/services/planning/service.py:423:    carrier = _carrier_png()
+
+######## G1 — EXIF/GPS probe on the REAL redactor ########
+$ ../venv/bin/python - <<'PY'  (imports app.services.providers.redaction.redact_image; Pillow 12.3.0)
+raw len 805 magic b'\xff\xd8\xff'
+raw dict(exif) keys: ['0x8825', '0x10f']
+raw GPS IFD: {1: 'N', 2: (51.0, 30.0, 0.0), 3: 'E', 4: (0.0, 7.0, 0.0)}
+raw 0x010F: TestMake
+has GPSInfo key 0x8825: True
+red magic b'\x89PNG\r\n\x1a\n'
+red dict(exif): {}
+red get_ifd(0x8825): {}
+red size/mode: (32, 32) RGB
+raw size/mode: (32, 32) RGB
+
+######## G3 FAIL-PRE — unredacted input vs the committed assertion (throwaway probe) ########
+# Throwaway `tests/_sg087_precheck.py` (NEVER committed; deleted after this run) imports the
+# committed test's own `_gps_jpeg_bytes` and `_assert_tag_free`, applies them to RAW bytes.
+$ ../venv/bin/python -m pytest -q -p no:cacheprovider tests/_sg087_precheck.py
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_______________ test_pre_redaction_unredacted_bytes_are_tag_free _______________
+    def test_pre_redaction_unredacted_bytes_are_tag_free() -> None:
+>       _assert_tag_free(_gps_jpeg_bytes())
+tests/_sg087_precheck.py:14:
+    def _assert_tag_free(data: bytes) -> None:
+        image = Image.open(io.BytesIO(data))
+        exif = image.getexif()
+        parsed = dict(exif)
+>       assert parsed == {}, f"EXIF survives redaction: {parsed}"
+E       AssertionError: EXIF survives redaction: {34853: 48, 271: 'TestMake'}
+E       assert {34853: 48, 271: 'TestMake'} == {}
+tests/test_privacy_audit.py:110: AssertionError
+1 failed in 0.29s
+PRE_EXIT=1
+# (34853 == 0x8825 GPS, 271 == 0x010F Make — the same assertion PASSES on the redacted bytes below.)
+$ rm -f tests/_sg087_precheck.py   # removed; worktree carries only test_privacy_audit.py
+
+######## G3 PASS-POST — committed test file ########
+$ ../venv/bin/python -m pytest -q -p no:cacheprovider tests/test_privacy_audit.py
+...........                                                              [100%]
+11 passed in 0.60s
+TEST_EXIT=0
+# the 11: G0x3, G1 (seen-to-fail control, real-redaction pixels, reader seam+ledger, direct adapter, signals trace), G2x3
+
+######## G3 FULL SUITE — bare BASE first, then BASE+slice ########
+# BARE BASE (before the slice existed), 600s bound:
+$ ../venv/bin/python -m pytest -q -p no:cacheprovider
+FAILED tests/test_signals.py::test_generated_codes_are_validated_and_bad_checksum_is_not_an_identifier
+FAILED tests/test_signals.py::test_ocr_has_text_boxes_and_mean_confidence - a...
+2 failed, 365 passed, 22 warnings in 18.55s
+# BASE + slice (the 2 known decoder env reds unchanged; +11 new tests, no regressions):
+$ ../venv/bin/python -m pytest -q -p no:cacheprovider
+FAILED tests/test_signals.py::test_generated_codes_are_validated_and_bad_checksum_is_not_an_identifier
+FAILED tests/test_signals.py::test_ocr_has_text_boxes_and_mean_confidence - a...
+2 failed, 376 passed, 22 warnings in 18.57s
+SUITE_EXIT=1
+
+######## G3 lint / types ########
+$ ../venv/bin/python -m ruff check .
+All checks passed!
+RUFF_EXIT=0
+$ ../venv/bin/python -m mypy app
+app/schemas/asset.py:53: error: Missing type arguments for generic type "dict"  [type-arg]
+app/schemas/asset.py:55: error: Missing type arguments for generic type "dict"  [type-arg]
+app/models/base.py:8: error: Unused "type: ignore" comment  [unused-ignore]
+app/services/audit_service.py:16: error: Missing type arguments for generic type "dict"  [type-arg]
+... (pre-existing app/ errors, unchanged by this slice; full list on file)
+Found 41 errors in 9 files (checked 75 source files)
+MYPY_EXIT=1
+# mypy checks app/ only; this slice changes NO app/ file -> delta 0 (base 41-in-9 == post 41-in-9).
+# NOTE: SG-028 recorded 40-in-9; the count is now 41-in-9 (pre-existing drift, NOT from this slice).
+
+######## G2 — key custody / Enrich absence / consent ########
+$ grep -c '^OPENCODE_API_KEY=' .env
+1
+$ ls -l .env
+-rw------- 1 andrei andrei 410B .env
+# value never printed, logged, or committed (ADR-007 probe shape). .env.example carries the NAME only.
+$ grep -rn --include='*.py' -E 'OPENCODE_API_KEY|opencode_api_key|api_key|Authorization|Bearer' backend/app
+backend/app/services/providers/opencode_go.py:47:    The caller adds `Authorization` at send time; the key never enters this
+backend/app/services/providers/opencode_go.py:242:        key = self._api_key or os.environ.get("OPENCODE_API_KEY", "")
+backend/app/services/providers/opencode_go.py:244:            raise ProviderError("missing_key", "OPENCODE_API_KEY not present in backend env")
+backend/app/services/providers/opencode_go.py:249:        headers["Authorization"] = f"Bearer {self._resolve_api_key()}"
+backend/app/services/providers/reader.py:89:    if settings.opencode_api_key:
+backend/app/config.py:29:    opencode_api_key: str | None = None
+# test_g2_payload_builders_accept_no_key_and_emit_no_secret: PASS (builders take no key param; no secret rendered)
+
+$ grep -rniE 'jina|websearch|web_search' backend/app   # Enrich/OFF/Jina unbuilt
+(no output)
+# test_g2_enrich_absence_no_web_sender_exists: PASS (and the single sender is opencode_go.py:252)
+
+# consent=false binds zero calls on every service path (exploding probe: any call raises)
+# test_g2_consent_false_binds_zero_calls_on_every_service_path: PASS
+# reader run_job -> skipped/consent_disabled, probe.calls==[]; analytics run_insights -> skipped; planning run_planning -> skipped;
+# chat respond -> skipped; ProviderCall.count()==0
+
+######## G3 — retention measurement (measured, not invented) ########
+$ grep -rniE 'retention|ttl|cleanup|purge|prune|older_than|expires_at' backend/app backend/scripts backend/alembic
+backend/app/services/providers/prompts/extract-food-v3.md:31:   `"bottles"`). Never infer a unit ... Null   # word hit only, not retention code
+backend/app/services/fts.py:69:            VALUES ('delete', old.rowid, ...)   # FTS maintenance on manual asset delete
+backend/app/api/v1/assets.py:384:def delete_asset(...)   # manual API delete
+# NO TTL / expiry / cleanup / purge / prune mechanism anywhere in app/scripts/alembic.
+$ grep -rniE 'apscheduler|schedule|cron|background_task|celery' backend/app
+backend/app/services/analytics/service.py:3:Two operations, no scheduler and no new table:   # docstring: explicitly no scheduler
+# -> no scheduler exists; retained indefinitely; deletion is manual.
+
+ADR-007 (re-read on target), docs/adr/ADR-007-provider-privacy.md
+  :14 "Provider inputs are hashed into the ledger (`input_hashes`); the full output payload is retained per §3.3
+       alongside provider, model, prompt-template version, cost/usage, latency, and error state."
+  :33 "Retention policy for ledger rows is decided no later than the production-datastore slice."
+
+Retention statement (measured):
+  Kept — evidence originals (immutable, under settings.storage_root = local `data/storage`); `provider_call` ledger rows
+         (full output_payload, input_hashes=sha256 of the REDACTED bytes, cost/usage/latency/error_state); observations,
+         assertions, guardrail events. Where — local filesystem + local SQLite (`data/db/storagegenie.db`).
+  Redacted transients — `redact_image` output lives in memory only; never persisted (only its sha256 reaches the ledger).
+  How long — NO TTL: no expiry/cleanup/purge/prune/scheduler in code -> retained indefinitely; deletion is manual.
+  Home decision — WORKLOG-ONLY. ADR-007 is already the policy home and explicitly defers ledger-row retention to the
+  production-datastore slice; `{{PROD_DB}}` is "not applicable" (Phase 0 local SQLite). No docs note needed; no new policy invented.
+
+######## G3 — PG-SC-11 (end-relative assertions over privacy/redaction paths) ########
+$ grep -rn --include='*.py' -E '\.endswith\(|\[-[0-9]|\[:-[0-9]' backend/tests | grep -iE 'exif|redact|privacy|gps|payload|provider|seam'
+backend/tests/test_chat.py:454:    document_content = provider.texts[-1]
+# verdict: chat provider text list (not EXIF/GPS/redaction); NOT a privacy/redaction end-relative assertion.
+$ grep -rn --include='*.py' -E '\.endswith\(|\[-[0-9]' backend/tests
+backend/tests/test_signals.py:125:    bad_value = ean_value[:-1] + ...
+backend/tests/test_signals.py:126:    bad_image, _ = _ean13_image(ean_value[:-1], ...)
+backend/tests/test_sg049_v2_extraction.py:85:@pytest.mark.parametrize("bad", [-1, -0.5, float("nan"), float("inf"), "two"])
+backend/tests/test_chat.py:454:    document_content = provider.texts[-1]
+# verdict: NONE over a privacy/redaction path. Empty result stated raw (expectation met).
+
+######## G3 — secret grep-gate over the diff (SG-037 shape) ########
+$ grep -nE 'api_key|OPENCODE_API_KEY|Bearer|[Tt]oken' backend/tests/test_privacy_audit.py
+199:        found = [token for token in HTTP_CLIENT_TOKENS if token in text]
+318:                "usage": {"prompt_tokens": 10, "completion_tokens": 5, "total_tokens": 15},
+340:    for forbidden in ("OPENCODE_API_KEY", "Bearer", "sk-", "TestMake"):
+383:        assert not names & {"api_key", "key", "authorization", "token"}, (
+389:    for forbidden in ("OPENCODE_API_KEY", "Bearer", "sk-", "Authorization"):
+# verdict: all hits are IDENTIFIERS used as forbidden-substring assertions / param-name checks / usage field names.
+# 0 real secret shapes; no literal key material anywhere in the diff or logs.
+
+######## PREMISE CORRECTIONS / FINDINGS ########
+F-SG087-1: packet says analytics/planning "prompts text-only". Measured: their prompt CONTENT is text, but they still
+           send a generated 1x1 blank PNG through the vision op `extract_items` (analytics/service.py:536,
+           planning/service.py:423) because the adapter surface requires image bytes. Only chat is truly image-free
+           (`extract_text`, chat/service.py:344). Not a hole (carrier is blank, redacted at the adapter); reported.
+F-SG087-2: `.rules-cache/` absent in this worktree; contract source path is /home/andrei/storagegenie-contract/
+           (same as SG-086 F-SG086-2). Contract echo still verified recorded==published.
+F-SG087-3: mypy is 41-in-9 now, not the 40-in-9 SG-028 recorded — pre-existing drift, delta 0 for this slice.
+
+######## RECEIPT — notes ref (M20-corrected block) ########
+Work pushed to automation at the slice tip; worktree clean (CO-55). No push to storagegenie-evidence, no RECEIPT_CMD.
+The verbatim executed `show` output is pasted in the follow-up docs-only commit (M20-corrected block pattern, as SG-085/SG-086 did).
