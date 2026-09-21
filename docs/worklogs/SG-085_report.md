@@ -2,7 +2,7 @@
 
 **Branch:** `automation` · **Remote:** `git@github.com:Andovol/StorageGenie.git` · **Work dir:** `/home/andrei/StorageGenie`
 **BASE (packet ref `origin/automation`):** `983e6d8c604f065a5c5450a6f9cdca11c444f4db` (`SG-090 receipt: verified notes-ref show output (docs-only)`)
-**WORK_HEAD:** `3a3e157cf1a3eda09c6389dbfcec993f894ab069`
+**WORK_HEAD:** `0a71ba7e47d79b84b4bb827994e1e8336ae20c41`
 **Contract:** recorded `0.28.2` == published `0.28.2`; source `/home/andrei/storagegenie-contract/VERSION` (checkout `b495b59`).
 **Model / effort (`CO-78`):** model `deepseek-v4.1-flash` (provider `opencode-go`; **argv carries no `--model`** — the CLI default is the model) · effort `medium` (process argv `/proc/562912/cmdline`: `opencode run --auto --dir /home/andrei/StorageGenie --variant medium`).
 **Spend (real $):** `$0.000000` actual — zero metered provider calls. Sandbox state quoted below. Containment per `PG-PR-04`: nothing live exists to contain — no pipeline, no unit, no provider was started by this slice.
