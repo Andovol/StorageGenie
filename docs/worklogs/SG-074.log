@@ -1,0 +1,29 @@
+SG-074 running log — deploy rider: remaining-categories + landing nav live on the public entry
+
+[11:04:22Z] coder proc start (pid 4165439): opencode run --auto --dir /home/andrei/StorageGenie --variant medium ; no --model on argv (CLI default, omitted per policy). effort=medium from argv. provider metadata run=1a1eaf30 llm.provider=opencode-go llm.model=deepseek-v4.1-flash.
+[recon] pwd=/home/andrei/StorageGenie branch=automation ; git status clean ; remote git@github.com:Andovol/StorageGenie.git.
+[recon] BASE origin/automation resolved 2a03eae1ae04bc2a01f77f8dd4898fb4ab98fcb8 == HEAD (packet commit "D97: SG-074 deploy rider packet").
+[recon] e673db6 (SG-073 code) IS an ancestor of HEAD; diff e673db6..HEAD is docs-only (STATE/ratings/packet/SG-073 worklogs). SG-073 code is in the build tree.
+[recon] contract /home/andrei/storagegenie-contract/VERSION = 0.28.2 ; contract repo HEAD b495b59b3426af66772a87939473ac558f8f72d2 (grafted, contract). matches packet.
+[recon] migrations: backend/alembic/versions/ top revision 20260917_sg068_saved_search.py (no SG-073 revision) — no migration to ship.
+[recon] container before: 9abefa97b534 image 56277bc0c5f7 restarts=0 health=healthy (SG-072-era image, as packet premises).
+[recon] bundle before: index-BKFq1uFR.js 301077 B sha256 36456c0194061600f9b483773e13493fd51a4e8886dd3f34fcebd50c2aafe2ae == packet/SG-072 measured record exactly.
+[recon] taxonomy before: household_chemicals active=false / documents_other active=false (both chat="fallback") ; other four active=true.
+[recon] chat household before: POST 422 {"status":422,"detail":"unknown chat category: household"} — gate refuses BEFORE any provider call (spend-free).
+[recon] analytics summary before 200 (5022 B) ; saved-searches before 200 {"items":[]} ; facets before 200.
+[recon] gate before: 401 (nginx auth_basic, unauthenticated Host-header loopback). no credential file fetched.
+[recon] alembic current before: 20260917_sg068_saved_search (head) — resolves fine (stale image still carries the SG-068 revision); DB alembic_version same.
+[recon] ss before: 127.0.0.1:8003 loopback only. row counts before: provider_call=7 guardrail_event=1 saved_search=0 asset=1 assertion=3 household=1.
+[G1 build] ~/.docker not writable -> BUILDX_CONFIG=/tmp/opencode/buildx (F-SG067-2 precedent). docker compose build rc=0, wall 16.082s. New image eac2b2aede3a69beaa8409b5199f5faf3d405abbaa53652e3a45c997a4654de5. New frontend bundle index-3DyyAB0n.js 300.95 kB.
+[G1 up] docker compose up -d rc=0, wall 1.045s, exactly one Recreate -> Recreated -> Starting -> Started. New container 3a2b60da38cd image eac2b2aede3a restarts=0.
+[G1 health] first 3 reads after up returned [http 000] during uvicorn/health settle, then two consecutive 200 {"status":"ok","db":"ok","storage":"ok"} (SG-067 precedent, disclosed). final health healthy. ss loopback preserved (127.0.0.1:8003).
+[G2] bundle after: index-3DyyAB0n.js 301041 B sha256 79daad044b3da00c5ce540b6a2ec2dbba97222d40c36450fd48cf885cd8dc378 (DIFFERENT name AND size AND hash). served index.html references it.
+[G2] taxonomy after: household_chemicals active=true / documents_other active=true (all six active). discriminator false->true HIT (quoted before+after).
+[G2] chat gate AFTER half is structural only (no second POST — any post-change POST would run the metered provider): built tree SUPPORTED_CATEGORIES = {food, medicine, household, documents} (grep + live import quoted); served bundle grep "chat/" count=2 (client call present, NOT itself a discriminator — generic category path param predates SG-073; stated).
+[G2] landing-nav proof: served bundle hash change proves the SG-073 frontend shipped; SG-073's jsdom test frontend/src/components/shell/shell.test.tsx:328 "the landing route renders the App nav with the Analytics link (D95)" proves it renders the nav; App.tsx:56 renders <Nav/> unconditionally. bundle-shipped HERE, renders THERE (composition stated; no headless browser on the box; owner eyeball final authority).
+[G2] analytics summary after 200 (5022 B, same) ; saved-searches after 200 ; facets after 200 ; gate after 401.
+[G2b] alembic current after: 20260917_sg068_saved_search (head) identical. No upgrade run. row counts identical (provider_call=7 guardrail_event=1 saved_search=0 asset=1 assertion=3 household=1). prod DB otherwise untouched; DB file mtime/size unchanged (339968 B, 10:19:45Z).
+[cost] zero metered calls, real spend $0.000000. The only POST was the one spend-free 422 before the rebuild.
+[commit] 3 docs-only worklog files written under docs/worklogs.
+[receipt] receipt follow-up (see report): note on WORK_HEAD, notes ref pushed, fetched mapped ref, show output pasted verbatim.
+[end] worktree clean; final $0.000000; overall well under 1800s.

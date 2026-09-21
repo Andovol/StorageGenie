@@ -1,0 +1,247 @@
+SG-074 verify log — raw curl / health / bundle / docker / alembic / grep outputs (uncondensed)
+Legend: before = SG-072-era running image 56277bc0c5f7 / container 9abefa97b534 ; after = rebuilt image eac2b2aede3a / container 3a2b60da38cd
+All commands read-only GET/inspect except the single authorized `docker compose build` + `up -d`.
+Model discovery and no-write construction included at the end.
+
+== BASE / refs ==
+$ git rev-parse origin/automation
+2a03eae1ae04bc2a01f77f8dd4898fb4ab98fcb8
+$ git rev-parse HEAD
+2a03eae1ae04bc2a01f77f8dd4898fb4ab98fcb8
+$ git branch --show-current
+automation
+$ git status --porcelain
+(empty)
+
+== CONTRACT ECHO (source: /home/andrei/storagegenie-contract/VERSION) ==
+0.28.2
+$ git -C /home/andrei/storagegenie-contract show -s --format='%H %d'
+b495b59b3426af66772a87939473ac558f8f72d2  (grafted, HEAD -> contract, origin/contract)
+
+== CONTAINER BEFORE ==
+$ docker ps --format '{{.ID}} {{.Image}} {{.Names}} {{.Status}}'
+9abefa97b534 storagegenie-backend storagegenie-backend-1 Up 45 minutes (healthy)
+id=9abefa97b534b2b2d1ba8cde4e84d866c6366e54ed7bcf8e106da5ce97e8f1a6
+image=sha256:56277bc0c5f75f3c72fabd3f759db4c63c4f3034a5936b7dc89a897dd755651c
+image_name=storagegenie-backend
+restarts=0
+started=2026-09-21T10:19:45.935819253Z
+health=healthy
+
+== BUNDLE BEFORE (container file) ==
+total 308
+drwxr-xr-x 2 root root   4096 Sep 21 10:19 .
+drwxr-xr-x 3 root root   4096 Sep 21 10:19 ..
+-rw-r--r-- 1 root root 301077 Sep 21 10:19 index-BKFq1uFR.js
+-rw-r--r-- 1 root root   2652 Sep 21 10:19 index-DxKo-z_g.css
+36456c0194061600f9b483773e13493fd51a4e8886dd3f34fcebd50c2aafe2ae  /app/static/assets/index-BKFq1uFR.js
+301077 /app/static/assets/index-BKFq1uFR.js
+# matches the packet's quoted SG-072 measured record exactly (name, size, sha256).
+
+== SERVED INDEX BEFORE ==
+assets/index-BKFq1uFR.js
+assets/index-BKFq1uFR.js
+
+== HEALTH BEFORE (2 consecutive) ==
+{"status":"ok","db":"ok","storage":"ok"} [http 200]
+{"status":"ok","db":"ok","storage":"ok"} [http 200]
+
+== TAXONOMY BEFORE ==
+{"plugins":[{"plugin_id":"expiry-tracker","version":"1.0.0","categories":[{"id":"food_beverages","name":"Food & beverages","active":true,"notification":"tiered-30-7-1","opened_date_tracking":false,"chat":"category"},{"id":"medicine_pharma","name":"Medicine/pharma","active":true,"notification":"tiered-short","opened_date_tracking":false,"chat":"category"},{"id":"cosmetics_personal_care","name":"Cosmetics/personal care","active":true,"notification":"tiered-90-30-7","opened_date_tracking":true,"chat":"none"},{"id":"household_chemicals","name":"Household chemicals","active":false,"notification":"basic-expiry","opened_date_tracking":false,"chat":"fallback"},{"id":"documents_other","name":"Documents/other","active":false,"notification":"long-lead-60-30","opened_date_tracking":false,"chat":"fallback"},{"id":"non_perishable","name":"Non-perishable","active":true,"notification":"none","opened_date_tracking":false,"chat":"none"}],"date_types":["expiry_date","best_before","use_by","manufacture_date","period_after_opening","batch_lot_code"],"units":["piece","unit","ml","l","g","kg","dose","tablet","application"]}]}
+[http 200]
+# household_chemicals / documents_other carry active:false -> discriminator baseline.
+
+== CHAT HOUSEHOLD BEFORE (spend-free 422 expected) ==
+$ curl -s -m 10 -w '\n[http %{http_code}]\n' -X POST "http://127.0.0.1:8003/v1/chat/household?household_id=01a0a029-1477-7ca0-b200-bce78a96c679" -H 'Content-Type: application/json' -d '{"message":"hi"}'
+{"type":"about:blank","title":"Unprocessable Entity","status":422,"detail":"unknown chat category: household"}
+[http 422]
+# gate refuses BEFORE any provider call: SUPPORTED_CATEGORIES has no "household" key -> UnsupportedCategoryError -> 422. Zero spend.
+
+== ANALYTICS SUMMARY BEFORE (regression baseline) ==
+[http 200 bytes=5022]
+== SAVED-SEARCHES BEFORE ==
+{"items":[]}
+[http 200]
+== FACETS BEFORE ==
+{"asset_type":{"unknown":1},"status":{"ACTIVE":1},"has_evidence":{"with":1,"without":0}}
+[http 200]
+
+== GATE BEFORE (nginx, unauthenticated) ==
+$ curl -sk -m 10 -H "Host: storagegenie.dynv6.net" https://127.0.0.1/ -o /dev/null -w '[http %{http_code}]\n'
+[http 401]
+
+== ALEMBIC BEFORE (in container) ==
+$ docker exec storagegenie-backend-1 sh -lc 'cd /app && alembic current'
+INFO  [alembic.runtime.migration] Context impl SQLiteImpl.
+INFO  [alembic.runtime.migration] Will assume non-transactional DDL.
+20260917_sg068_saved_search (head)
+rc=0
+# resolves fine (the SG-072-era image already carries the SG-068 revision); F-SG069-1 substitution NOT needed.
+
+== ROW COUNTS BEFORE (read-only direct sqlite, mode=ro) ==
+$ docker exec storagegenie-backend-1 python -c "import sqlite3;c=sqlite3.connect('file:/data/db/storagegenie.db?mode=ro',uri=True);print('alembic_version=',c.execute('select version_num from alembic_version').fetchall());[print(t,'=',c.execute('select count(*) from '+t).fetchone()[0]) for t in ('provider_call','guardrail_event','saved_search','asset','assertion','household')]"
+alembic_version= [('20260917_sg068_saved_search',)]
+provider_call = 7
+guardrail_event = 1
+saved_search = 0
+asset = 1
+assertion = 3
+household = 1
+
+== SS BEFORE ==
+LISTEN 0      4096       127.0.0.1:8003       0.0.0.0:*    users:(("rootlesskit",pid=3814163,fd=32))
+# loopback only; no 0.0.0.0 bind.
+
+== DB FILE BEFORE ==
+-rw------- 1 andrei andrei 339968 2026-09-21 10:19:45.510824996 +0000 /home/andrei/StorageGenie/data/db/storagegenie.db
+
+== BUILD (authorized) ==
+$ test -w "$HOME/.docker" -> NOT writable -> BUILDX_CONFIG=/tmp/opencode/buildx   [F-SG067-2 / F-SG069-2 precedent]
+$ time docker compose build
+#18 [frontend-build 6/6] RUN npm run build
+#18 7.291 dist/assets/index-3DyyAB0n.js   300.95 kB │ gzip: 89.19 kB
+#18 7.291 ✓ built in 2.35s
+#22 naming to docker.io/library/storagegenie-backend:latest done
+
+ Image storagegenie-backend Built 
+
+real	0m16.082s
+user	0m1.042s
+sys	0m0.886s
+build rc=0
+IMAGE BEFORE (true, from CONTAINER BEFORE)  sha256:56277bc0c5f75f3c72fabd3f759db4c63c4f3034a5936b7dc89a897dd755651c  storagegenie-backend:latest  2026-09-21T10:19:38Z
+IMAGE AFTER  sha256:eac2b2aede3a69beaa8409b5199f5faf3d405abbaa53652e3a45c997a4654de5  storagegenie-backend:latest  2026-09-21T11:05:07Z
+# NOTE (self-correction): the build capture printed its "IMAGE BEFORE" line after the build completed, so the
+# id it showed (eac2b2ae) is the AFTER image. The true pre-build image is the one quoted from CONTAINER BEFORE
+# above (56277bc0c5f7). No ambiguity: the running container's image digest is authoritative.
+
+== UP (single authorized recreate) ==
+$ time docker compose up -d
+ Container storagegenie-backend-1 Recreate 
+ Container storagegenie-backend-1 Recreated 
+ Container storagegenie-backend-1 Starting 
+ Container storagegenie-backend-1 Started 
+
+real	0m1.045s
+up rc=0
+
+== CONTAINER AFTER ==
+$ docker ps --format ...
+3a2b60da38cd storagegenie-backend storagegenie-backend-1 Up Less than a second (health: starting)
+id=3a2b60da38cda7fe1d030373d2bf42bd757c6ac5d8458105432b17c5cf81ae66
+image=sha256:eac2b2aede3a69beaa8409b5199f5faf3d405abbaa53652e3a45c997a4654de5
+image_name=storagegenie-backend
+restarts=0
+started=2026-09-21T11:05:17.358815961Z
+health=starting (then healthy)
+
+== HEALTH AFTER (settle then two consecutive 200 reads) ==
+ [http 000]
+ [http 000]
+ [http 000]
+{"status":"ok","db":"ok","storage":"ok"} [http 200]
+{"status":"ok","db":"ok","storage":"ok"} [http 200]
+# first 3 reads returned 000 during uvicorn/health settle (SG-067 precedent, disclosed not hidden);
+# then two consecutive 200 reads. restarts=0 (unchanged; no restart loop).
+
+== BUNDLE AFTER (container file) ==
+total 308
+drwxr-xr-x 2 root root   4096 Sep 21 11:05 .
+drwxr-xr-x 3 root root   4096 Sep 21 11:05 ..
+-rw-r--r-- 1 root root 301041 Sep 21 11:05 index-3DyyAB0n.js
+-rw-r--r-- 1 root root   2652 Sep 21 11:05 index-DxKo-z_g.css
+79daad044b3da00c5ce540b6a2ec2dbba97222d40c36450fd48cf885cd8dc378  /app/static/assets/index-3DyyAB0n.js
+301041 /app/static/assets/index-3DyyAB0n.js
+
+== SERVED INDEX AFTER ==
+assets/index-3DyyAB0n.js
+assets/index-3DyyAB0n.js
+# name AND size AND sha256 all differ from before (index-BKFq1uFR.js / 301077 / 36456c01...) — bundle discriminator HIT.
+
+== TAXONOMY AFTER ==
+{"plugins":[{"plugin_id":"expiry-tracker","version":"1.0.0","categories":[{"id":"food_beverages","name":"Food & beverages","active":true,"notification":"tiered-30-7-1","opened_date_tracking":false,"chat":"category"},{"id":"medicine_pharma","name":"Medicine/pharma","active":true,"notification":"tiered-short","opened_date_tracking":false,"chat":"category"},{"id":"cosmetics_personal_care","name":"Cosmetics/personal care","active":true,"notification":"tiered-90-30-7","opened_date_tracking":true,"chat":"none"},{"id":"household_chemicals","name":"Household chemicals","active":true,"notification":"basic-expiry","opened_date_tracking":false,"chat":"fallback"},{"id":"documents_other","name":"Documents/other","active":true,"notification":"long-lead-60-30","opened_date_tracking":false,"chat":"fallback"},{"id":"non_perishable","name":"Non-perishable","active":true,"notification":"none","opened_date_tracking":false,"chat":"none"}],"date_types":["expiry_date","best_before","use_by","manufacture_date","period_after_opening","batch_lot_code"],"units":["piece","unit","ml","l","g","kg","dose","tablet","application"]}]}
+[http 200]
+# activation discriminator HIT: household_chemicals active:false -> true ; documents_other active:false -> true.
+
+== STRUCTURAL: SUPPORTED_CATEGORIES in the BUILT TREE (container source) ==
+$ docker exec storagegenie-backend-1 grep -n -A12 "SUPPORTED_CATEGORIES" /app/app/services/chat/service.py
+57:SUPPORTED_CATEGORIES: dict[str, str] = {
+58-    "food": "food_beverages",
+59-    "medicine": "medicine_pharma",
+60-    "household": "household_chemicals",
+61-    "documents": "documents_other",
+62-}
+-- live import (authoritative) --
+$ docker exec storagegenie-backend-1 python -c "from app.services.chat import service; print(service.SUPPORTED_CATEGORIES)"
+{'food': 'food_beverages', 'medicine': 'medicine_pharma', 'household': 'household_chemicals', 'documents': 'documents_other'}
+# AFTER half of the chat-gate discriminator: the built tree accepts "household" + "documents". No post-change POST was issued.
+
+== STRUCTURAL: chat client call present in the NEW served bundle ==
+$ docker exec storagegenie-backend-1 sh -lc 'grep -o "chat/[a-z_]*" /app/static/assets/index-3DyyAB0n.js | sort | uniq -c'
+      2 chat/
+$ docker exec storagegenie-backend-1 sh -lc 'grep -o "chat/" /app/static/assets/index-3DyyAB0n.js | wc -l'
+2
+$ docker exec storagegenie-backend-1 sh -lc "grep -o '.\{60\}chat/.\{12\}' /app/static/assets/index-3DyyAB0n.js | head -5"
+n:null},{household_id:t})}function Bv(e,t,n){return Te(`/v1/chat/${e}`,{messa
+hts",{},{household_id:e})}function Hv(e,t,n){return Te(`/v1/chat/${e}/correct
+# source: frontend/src/api/client.ts:202 `/v1/chat/${category}` + :224 `/v1/chat/${category}/corrections`.
+# HONEST SCOPING: this client call is generic (category is a path param) and predates SG-073 — it is a
+# non-vacuity check that the client call is present, NOT itself the SG-073 discriminator. The live
+# discriminators are the served-bundle hash change (frontend) + taxonomy false->true (server gate).
+
+== ANALYTICS SUMMARY AFTER (regression) ==
+[http 200 bytes=5022]
+== SAVED-SEARCHES AFTER ==
+{"items":[]}
+[http 200]
+== FACETS AFTER ==
+{"asset_type":{"unknown":1},"status":{"ACTIVE":1},"has_evidence":{"with":1,"without":0}}
+[http 200]
+
+== GATE AFTER ==
+[http 401]
+
+== ALEMBIC AFTER (in container) ==
+$ docker exec storagegenie-backend-1 sh -lc 'cd /app && alembic current'
+INFO  [alembic.runtime.migration] Context impl SQLiteImpl.
+INFO  [alembic.runtime.migration] Will assume non-transactional DDL.
+20260917_sg068_saved_search (head)
+rc=0
+# identical to before. No `alembic upgrade` was run.
+
+== ROW COUNTS AFTER (read-only direct sqlite, mode=ro) ==
+$ docker exec storagegenie-backend-1 python -c "import sqlite3;c=sqlite3.connect('file:/data/db/storagegenie.db?mode=ro',uri=True);print('alembic_version=',c.execute('select version_num from alembic_version').fetchall());[print(t,'=',c.execute('select count(*) from '+t).fetchone()[0]) for t in ('provider_call','guardrail_event','saved_search','asset','assertion','household')]"
+alembic_version= [('20260917_sg068_saved_search',)]
+provider_call = 7
+guardrail_event = 1
+saved_search = 0
+asset = 1
+assertion = 3
+household = 1
+# provider_call 7 -> 7 and guardrail_event 1 -> 1 unchanged across the slice (PG-EV-06 authority NONE).
+# (provider_call=7 / guardrail_event=1 already include SG-066's one authorized live run; SG-070 saw 6/0.)
+
+== SS AFTER ==
+LISTEN 0      4096       127.0.0.1:8003       0.0.0.0:*    users:(("rootlesskit",pid=3814163,fd=32))
+# loopback preserved.
+
+== DB FILE AFTER ==
+-rw------- 1 andrei andrei 339968 2026-09-21 10:19:45.510824996 +0000 /home/andrei/StorageGenie/data/db/storagegenie.db
+# unchanged mtime AND size vs before (unlike SG-072, no WAL checkpoint this recreate — SQLite had nothing
+# to checkpoint). Logical state unchanged: every row count and the alembic head are identical.
+
+== MODEL / EFFORT DISCOVERY ==
+$ tr '\0' ' ' < /proc/4165439/cmdline | cut -c1-95
+opencode run --auto --dir /home/andrei/StorageGenie --variant medium
+# effort=medium read from process argv (`--variant medium`); no `--model` on argv (CLI default, omitted per policy).
+# provider metadata (~/.local/share/opencode/log/opencode.log) run=1a1eaf30: llm.provider=opencode-go llm.model=deepseek-v4.1-flash
+
+== NO-WRITE CONSTRUCTION ==
+Every HTTP request issued this slice was GET except ONE spend-free POST: `/v1/health` (before x2, settle x3 + after x2),
+`/` (index.html, before x1 + after x1), `/v1/taxonomy` (before + after), `/v1/analytics/summary?household_id=<seed>`
+(before + after), `/v1/saved-searches?household_id=<seed>` (before + after), `/v1/assets/facets?household_id=<seed>`
+(before + after), and the unauthenticated nginx gate (before + after). The one POST was
+`POST /v1/chat/household?household_id=<seed>` on the OLD image, which returned the gate's 422 BEFORE reaching any
+provider (zero spend). No post-change POST was issued. DB access was a read-only SQLite open (`file:...?mode=ro`) plus
+`alembic current` (read-only). No credential file was fetched. The only mutating commands were the authorized
+`docker compose build` + a single `docker compose up -d` recreate.
