@@ -1,0 +1,130 @@
+SG-077 verify log — raw outputs (no edits except section headers)
+================================================================
+
+## LEG0a — premise: no tailwind dependency / dead classes absent from stylesheets
+$ grep -rn "tailwind" frontend/src frontend/*.json  ->  (no output)
+$ selector set of frontend/src/theme/tokens.css  ->  (no max-w-2xl, w-full, z-50, p-6, border-l, overflow-y-auto)
+
+## LEG0b — dead-class enumeration (post-fix scanner)
+USED: EMPTY_PANEL bg-background bg-card bg-card-muted bg-primary border-border focus-ring font-mono font-sans text-danger text-foreground text-muted-foreground text-primary-foreground
+DEAD: EMPTY_PANEL
+NOTE: "EMPTY_PANEL" is the className={EMPTY_PANEL} variable identifier echoed by the parser, not a CSS class.
+      Every real class token above has a project selector; the repaired constant value "border-border bg-card" is defined.
+
+
+## LEG1 — baseline existing drawer+shell suites (pre-change)
+$ node_modules/.bin/vitest run src/components/shell/drawer.test.tsx src/components/shell/shell.test.tsx
+(baseline captured earlier: drawer 15 + shell 20 = 35 passed, EXIT=0)
+
+
+## LEG2 — FAIL-PRE run (new SG-077 presentation tests against dead-class component)
+$ node_modules/.bin/vitest run src/components/shell/drawer.test.tsx -t SG-077
+
+ RUN  v1.6.1 /home/andrei/StorageGenie/frontend
+
+ ❯ src/components/shell/drawer.test.tsx  (17 tests | 2 failed | 15 skipped) 90ms
+   ❯ src/components/shell/drawer.test.tsx > SG-077 panel containment (presentation only) > the drawer panel carries a bounded width and the viewer well is capped to it
+     → expected false to be true // Object.is equality
+   ❯ src/components/shell/drawer.test.tsx > SG-077 panel containment (presentation only) > no dead framework class survives on the drawer panel
+     → expected [ 'max-w-2xl', 'w-full', …(6) ] to not include 'max-w-2xl'
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/components/shell/drawer.test.tsx > SG-077 panel containment (presentation only) > the drawer panel carries a bounded width and the viewer well is capped to it
+AssertionError: expected false to be true // Object.is equality
+
+- Expected
++ Received
+
+- true
++ false
+
+ ❯ src/components/shell/drawer.test.tsx:315:39
+    313|     const panel = screen.getByRole("dialog");
+    314|     const panelMax = Number.parseFloat(panel.style.maxWidth);
+    315|     expect(Number.isFinite(panelMax)).toBe(true);
+       |                                       ^
+    316|     expect(panelMax).toBeGreaterThan(0);
+    317|     expect(panelMax).toBeLessThanOrEqual(640);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  src/components/shell/drawer.test.tsx > SG-077 panel containment (presentation only) > no dead framework class survives on the drawer panel
+AssertionError: expected [ 'max-w-2xl', 'w-full', …(6) ] to not include 'max-w-2xl'
+ ❯ src/components/shell/drawer.test.tsx:331:26
+    329|     const tokens = screen.getByRole("dialog").className.split(/\s+/);
+    330|     for (const dead of ["max-w-2xl", "w-full", "border-l", "p-6", "ove…
+    331|       expect(tokens).not.toContain(dead);
+       |                          ^
+    332|     }
+    333|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+ Test Files  1 failed (1)
+      Tests  2 failed | 15 skipped (17)
+   Start at  12:35:53
+   Duration  801ms (transform 100ms, setup 39ms, collect 221ms, tests 90ms, environment 229ms, prepare 57ms)
+
+
+
+## LEG3 — PASS-POST run (after repair)
+$ node_modules/.bin/vitest run src/components/shell/drawer.test.tsx -t SG-077
+
+ RUN  v1.6.1 /home/andrei/StorageGenie/frontend
+
+ ✓ src/components/shell/drawer.test.tsx  (17 tests | 15 skipped) 121ms
+
+ Test Files  1 passed (1)
+      Tests  2 passed | 15 skipped (17)
+   Start at  12:36:01
+   Duration  954ms (transform 109ms, setup 41ms, collect 239ms, tests 121ms, environment 263ms, prepare 60ms)
+
+
+
+## LEG4 — full drawer + shell suites (post-change, unchanged behavior)
+$ node_modules/.bin/vitest run src/components/shell/drawer.test.tsx src/components/shell/shell.test.tsx
+
+ RUN  v1.6.1 /home/andrei/StorageGenie/frontend
+
+stderr | src/components/shell/shell.test.tsx > Catalog shell > the header labels the LOADED item count, not a household total
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+ ✓ src/components/shell/drawer.test.tsx  (17 tests) 593ms
+ ✓ src/components/shell/shell.test.tsx  (20 tests) 1337ms
+
+ Test Files  2 passed (2)
+      Tests  37 passed (37)
+   Start at  12:36:01
+   Duration  2.31s (transform 311ms, setup 83ms, collect 692ms, tests 1.93s, environment 497ms, prepare 114ms)
+
+
+
+## LEG5 — build
+$ npm run build
+
+> storagegenie-frontend@0.1.0 build
+> tsc && vite build
+
+vite v5.4.21 building for production...
+transforming...
+✓ 1961 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                   0.94 kB │ gzip:  0.47 kB
+dist/assets/index-CoNI-1Zn.css    3.84 kB │ gzip:  1.04 kB
+dist/assets/index-pbMtNPuG.js   303.97 kB │ gzip: 89.12 kB
+✓ built in 1.71s
+
+
+## LEG6 — lint
+$ node_modules/.bin/eslint src/components/shell/ItemInspectorDrawer.tsx src/components/shell/drawer.test.tsx
+(no output)
+
+
+## LEG7 — secret scan on diff
+$ git diff | grep -inE "password|secret|api[_-]?key|token|BEGIN [A-Z ]*PRIVATE KEY|ssh-rsa|sk-[A-Za-z0-9]"
+86:+    const tokens = screen.getByRole("dialog").className.split(/\s+/);
+88:+      expect(tokens).not.toContain(dead);
+(the only hit is the identifier `tokens` in the new test — not a secret)

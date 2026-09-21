@@ -301,3 +301,34 @@ describe("ItemInspectorDrawer", () => {
     );
   });
 });
+
+// SG-077 — presentation-only asserts. The panel must carry a bounded width the
+// project's own CSS honors (there is no Tailwind here) and the 1/1 viewer well
+// must stay contained inside it. Behavior asserts above are untouched.
+describe("SG-077 panel containment (presentation only)", () => {
+  test("the drawer panel carries a bounded width and the viewer well is capped to it", async () => {
+    renderDrawer();
+    await screen.findByTestId("inspector-drawer");
+
+    const panel = screen.getByRole("dialog");
+    const panelMax = Number.parseFloat(panel.style.maxWidth);
+    expect(Number.isFinite(panelMax)).toBe(true);
+    expect(panelMax).toBeGreaterThan(0);
+    expect(panelMax).toBeLessThanOrEqual(640);
+
+    const well = screen.getByTestId("viewer-well");
+    const wellMax = Number.parseFloat(well.style.maxWidth || well.style.maxHeight);
+    expect(Number.isFinite(wellMax)).toBe(true);
+    expect(wellMax).toBeGreaterThan(0);
+    expect(wellMax).toBeLessThanOrEqual(panelMax);
+  });
+
+  test("no dead framework class survives on the drawer panel", async () => {
+    renderDrawer();
+    await screen.findByTestId("inspector-drawer");
+    const tokens = screen.getByRole("dialog").className.split(/\s+/);
+    for (const dead of ["max-w-2xl", "w-full", "border-l", "p-6", "overflow-y-auto", "z-50"]) {
+      expect(tokens).not.toContain(dead);
+    }
+  });
+});

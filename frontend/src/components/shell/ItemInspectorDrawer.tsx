@@ -14,7 +14,14 @@ const TABS: readonly { id: ViewerTab; label: string }[] = [
   { id: "source", label: "Source Photo" },
 ];
 
-const EMPTY_PANEL = "max-w-2xl w-full border-l border-border bg-card p-6 overflow-y-auto z-50";
+// SG-077: the panel's width/padding/scroll/stacking used to come from Tailwind
+// utility names this project never defines (no Tailwind anywhere), so the
+// fixed-position aside had no width and the 1/1 viewer well blew up to viewport
+// scale, pushing every field below the fold. Width is now an explicit pixel
+// cap the project's own CSS honors; the well is capped to stay inside it.
+const EMPTY_PANEL = "border-border bg-card";
+const PANEL_MAX_WIDTH = 440;
+const VIEWER_MAX_SIZE = 260;
 
 function formatValue(value: unknown): string {
   if (value === null || value === undefined) return "—";
@@ -180,7 +187,18 @@ export function ItemInspectorDrawer({ asset, householdId, onClose }: ItemInspect
         aria-modal="true"
         aria-label={`Inspector: ${displayName}`}
         className={EMPTY_PANEL}
-        style={{ position: "fixed", top: 0, right: 0, height: "100vh" }}
+        style={{
+          position: "fixed",
+          top: 0,
+          right: 0,
+          height: "100vh",
+          width: "100%",
+          maxWidth: PANEL_MAX_WIDTH,
+          padding: 24,
+          overflowY: "auto",
+          zIndex: 50,
+          borderLeft: "1px solid hsl(var(--border))",
+        }}
       >
         <header style={{ display: "flex", alignItems: "flex-start", gap: 8, marginBottom: 16 }}>
           <div style={{ flex: 1, minWidth: 0 }}>
@@ -238,6 +256,11 @@ export function ItemInspectorDrawer({ asset, householdId, onClose }: ItemInspect
           style={{
             position: "relative",
             aspectRatio: "1 / 1",
+            width: "100%",
+            maxWidth: VIEWER_MAX_SIZE,
+            maxHeight: VIEWER_MAX_SIZE,
+            marginLeft: "auto",
+            marginRight: "auto",
             borderRadius: 8,
             overflow: "hidden",
             display: "flex",

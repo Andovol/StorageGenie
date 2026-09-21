@@ -1,0 +1,41 @@
+SG-077 log — inspector drawer panel width repair (frontend-only)
+
+TIMELINE (live clock, UTC; PG-IC-07)
+- 12:35:14Z  LEG0 premise verify; BASE=origin/automation=29134a6; no tailwind in package.json
+             (dep list: react/react-dom/react-router-dom/@tanstack/react-query/lucide-react);
+             tokens.css defines no max-w-2xl/w-full/z-50/p-6/overflow-y-auto/border-l;
+             contract source /home/andrei/storagegenie-contract/VERSION=0.28.2 @ b495b59.
+- 12:35:31Z  LEG0 baseline drawer+shell suites green: 35 passed (drawer 15 + shell 20), EXIT=0.
+- 12:35:53Z  LEG1 fail-pre: 2 presentation tests appended to drawer.test.tsx
+             ("SG-077 panel containment"); run `vitest run drawer.test.tsx -t SG-077`
+             => 2 failed | 15 skipped, EXIT=1 (raw in SG-077_verify.log).
+- 12:36:00Z  LEG2 repair ItemInspectorDrawer.tsx: EMPTY_PANEL dead Tailwind removed;
+             inline maxWidth 440 / padding 24 / overflowY auto / zIndex 50 / borderLeft;
+             viewer well width 100% + maxWidth/maxHeight 260, centered.
+- 12:36:01Z  LEG2b pass-post: `vitest run drawer.test.tsx -t SG-077` => 2 passed | 15 skipped,
+             EXIT=0; full drawer+shell => 37 passed (35 unchanged + 2 new), EXIT=0.
+- 12:36:25Z  LEG3 `npm run build` (tsc && vite build) EXIT=0 in 1.71s; eslint EXIT=0;
+             secret scan on diff = 0 real (only the identifier `tokens` matched a scan token).
+- (receipt) work commit + push automation; note on WORK_HEAD; push notes ref;
+             explicit mapped fetch + `git notes show` pasted verbatim.
+
+DECISIONS (mine, reported)
+- Inline CSS chosen over a tokens.css utility: the file already styles through inline
+  objects, the cap is a single numeric value, and no new selector was needed. tokens.css
+  untouched (additive-utility allowance not exercised).
+- Panel cap 440 px, viewer cap 260 px — both well under any viewport, so the 1/1 well can
+  never exceed the panel and metadata/tabs/fields stay above the fold.
+- The 6 dead tokens (max-w-2xl, w-full, border-l, p-6, overflow-y-auto, z-50) were each
+  replaced with a working inline equivalent; no token was left intentionally dead.
+- Angle-token line: neither in-scope file carries a literal `<...>` placeholder string;
+  the lone regex hit is JSX (`<ChevronDown .../>`), not a text literal. No char-code
+  construction needed.
+- No behavior edit: only the panel/well style objects and the class constant changed;
+  all 35 pre-existing tests pass unchanged.
+
+SPEND
+- $0.000000 real metered (zero provider calls; no network, no deploy, no restart).
+
+BUDGET
+- LEG0 ~17 s / 120 s; LEG1 ~7 s / 600 s (suite bound); LEG2/leg2b ~2 s / 600 s;
+  LEG3 build ~2 s / 600 s; overall well under 1800 s.
