@@ -2,7 +2,7 @@
 
 **Branch:** `automation` · **Remote:** `git@github.com:Andovol/StorageGenie.git` · **Work dir:** `/home/andrei/StorageGenie`
 **BASE (packet ref `origin/automation`):** `798fcb0a8a5724297580388fbc769b4ecee1a7fb` (`D96: SG-075 Stone theme migration packet (site-wide design)`)
-**WORK_HEAD:** `PENDING` (work commit; the post-note receipt commit is HEAD after it)
+**WORK_HEAD:** `d209ecc10bce37784316b957f2258a7881ac4cd7` (work commit; the post-note receipt commit is HEAD after it)
 **Contract:** recorded `0.28.2` == published; source `/home/andrei/storagegenie-contract/VERSION`, contract repo HEAD `b495b59b3426af66772a87939473ac558f8f72d2`
 **Model / effort (`CO-78`):** model `deepseek-v4.1-flash` (provider `opencode-go`, read from opencode provider metadata `/home/andrei/.local/state/opencode/model.json` `recent[0]` + `variant` map — **not** a system-prompt identity line; argv carries no `--model`) · effort `medium` (process argv `/proc/11468/cmdline`: `opencode run --auto --dir /home/andrei/StorageGenie --variant medium`)
 **Spend (real $):** `$0.000000` actual vs `$0` bound — zero metered provider calls.
@@ -134,9 +134,36 @@ No HTTP request, no DB open, no provider call, no `docker`, no restart, no deplo
 were local reads (`git`, `rg`), the frontend test runner (jsdom), the local `vite`/`tsc`/`eslint` binaries,
 and the notes-ref git pushes required by the receipt. No `npm install`, no network fetch. Real spend `$0.000000`.
 
-## Receipt — notes ref (M20-corrected block)
+## Receipt — notes ref (M20-corrected block; executed output pasted verbatim)
 
-_PENDING — filled in the receipt commit after the push; executed `show` output pasted there._
+Work pushed to `automation` (`798fcb0..d209ecc`), worktree clean (`CO-55`). No push to
+`storagegenie-evidence`, no `{{RECEIPT_CMD}}`. Existing-note refusal guard checked, note added on WORK_HEAD
+`d209ecc10bce37784316b957f2258a7881ac4cd7`, notes ref pushed, then fetched into a **mapped** local name and
+verified with `show`:
+
+```
+$ git notes --ref=refs/notes/storagegenie-coder-reports show d209ecc10bce37784316b957f2258a7881ac4cd7   # pre-check: existing-note refusal guard
+error: no note found for object d209ecc10bce37784316b957f2258a7881ac4cd7.
+precheck_rc=1   (no existing note -> proceeding)
+$ git notes --ref=refs/notes/storagegenie-coder-reports add -m "Dispatch-ID: SG-075 | Report: docs/worklogs/SG-075_report.md | Work-HEAD: d209ecc10bce37784316b957f2258a7881ac4cd7" d209ecc10bce37784316b957f2258a7881ac4cd7
+add_rc=0
+$ git push origin refs/notes/storagegenie-coder-reports
+To github.com:Andovol/StorageGenie.git
+   4fcd24d..a9929ec  refs/notes/storagegenie-coder-reports -> refs/notes/storagegenie-coder-reports
+notes_push_rc=0
+$ git fetch origin refs/notes/storagegenie-coder-reports:refs/notes/storagegenie-coder-reports-sg075-verify
+ok fetched (1 new refs)
+fetch_rc=0
+$ git rev-parse refs/notes/storagegenie-coder-reports-sg075-verify
+a9929ec4991fcc44b51237c2587511ab97c0aa34
+$ git notes --ref=refs/notes/storagegenie-coder-reports-sg075-verify show d209ecc10bce37784316b957f2258a7881ac4cd7
+Dispatch-ID: SG-075 | Report: docs/worklogs/SG-075_report.md | Work-HEAD: d209ecc10bce37784316b957f2258a7881ac4cd7
+show_rc=0
+$ git notes --ref=refs/notes/storagegenie-coder-reports-sg075-verify show d209ecc10bce37784316b957f2258a7881ac4cd7 | grep -c "Dispatch-ID: SG-075"
+1
+```
+
+First line carries both `Dispatch-ID:` and `Report:` (`CO-97`). Mapped-ref SHA `a9929ec4991fcc44b51237c2587511ab97c0aa34`. Final line `note=yes`.
 
 ## Acceptance criteria
 

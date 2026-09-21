@@ -192,3 +192,26 @@ and appends these utilities (each references a token; no literal):
   .badge-green .badge-amber .badge-grey        (ProvenanceBadge semantics)
   .page-header                                 (consistent h1)
 All prior token values are unchanged; theme.test.tsx still matches without edit.
+
+
+================================================================================
+LEG 7 — notes-ref receipt (executed output, verbatim)
+================================================================================
+$ git notes --ref=refs/notes/storagegenie-coder-reports show d209ecc10bce37784316b957f2258a7881ac4cd7   # pre-check
+error: no note found for object d209ecc10bce37784316b957f2258a7881ac4cd7.
+precheck_rc=1
+$ git notes --ref=refs/notes/storagegenie-coder-reports add -m "Dispatch-ID: SG-075 | Report: docs/worklogs/SG-075_report.md | Work-HEAD: d209ecc10bce37784316b957f2258a7881ac4cd7" d209ecc10bce37784316b957f2258a7881ac4cd7
+add_rc=0
+$ git push origin refs/notes/storagegenie-coder-reports
+To github.com:Andovol/StorageGenie.git
+   4fcd24d..a9929ec  refs/notes/storagegenie-coder-reports -> refs/notes/storagegenie-coder-reports
+notes_push_rc=0
+$ git fetch origin refs/notes/storagegenie-coder-reports:refs/notes/storagegenie-coder-reports-sg075-verify
+ok fetched (1 new refs)
+fetch_rc=0
+$ git rev-parse refs/notes/storagegenie-coder-reports-sg075-verify
+a9929ec4991fcc44b51237c2587511ab97c0aa34
+$ git notes --ref=refs/notes/storagegenie-coder-reports-sg075-verify show d209ecc10bce37784316b957f2258a7881ac4cd7
+Dispatch-ID: SG-075 | Report: docs/worklogs/SG-075_report.md | Work-HEAD: d209ecc10bce37784316b957f2258a7881ac4cd7
+show_rc=0
+note=yes

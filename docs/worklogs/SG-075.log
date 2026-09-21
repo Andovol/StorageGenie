@@ -19,6 +19,7 @@ SG-075 running log — site-wide Stone theme migration: every screen onto the to
 [G2 build] npm run build green: tsc + vite, css 3.84 kB, js 303.82 kB. eslint clean (exit 0). tsc --noEmit clean (exit 0). Secret scan 0.
 [cost] zero provider calls, real spend $0.000000.
 [scope] changed = 23 files under frontend/src + 3 worklogs. No backend, no main.tsx/index.html/ThemeProvider.tsx, no package.json/deps, no compose/.env, no migration. Network-namespace probe (unshare -rn) denied without privilege -> reported unanswered; static diff proves no network primitive/URL added.
-[commit] 3 worklog files under docs/worklogs; work commit pushed to automation.
-[receipt] notes-ref add + push + mapped-fetch show recorded verbatim in SG-075_report.md.
+[commit] 3 worklog files under docs/worklogs; work commit WORK_HEAD=d209ecc10bce37784316b957f2258a7881ac4cd7 pushed 798fcb0..d209ecc on automation.
+[receipt] existing-note guard: none. note added (rc=0); notes ref pushed 4fcd24d..a9929ec; fetched mapped ref refs/notes/storagegenie-coder-reports-sg075-verify = a9929ec4991fcc44b51237c2587511ab97c0aa34; show rc=0; grep "Dispatch-ID: SG-075" count=1; note=yes.
+[receipt] note + mapped-fetch verify output recorded in SG-075_report.md and SG-075_verify.log.
 [end] worktree clean; overall elapsed well under 1800s; final $0.000000.
