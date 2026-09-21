@@ -1,0 +1,8 @@
+Negative-Receipt-ID: SG-087
+utc=2026-09-21T17:32:57Z
+DISPATCH_RESULT id=SG-087 coder=opencode exit=0 head=256bf0d1e4d4e491fc9a77cc7e1a511583633459 note=no moved=yes rewrite=no dirty=no elapsed=336s budget=2100s
+P1_moved=PASS count=2
+P2_rewrite=PASS behind=0
+P3_note=FAIL note=no
+P5_receipt=FAIL
+P6_dirty=PASS dirty=no
