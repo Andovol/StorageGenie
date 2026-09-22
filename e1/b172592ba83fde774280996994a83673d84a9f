@@ -1,0 +1,25 @@
+Dispatch-ID: SG-081.dbg | Report: note
+Debug-Report-Begin
+STAGE: Coder or provider
+CAUSE: The retained SG-081 execution reached opencode with the packet's high effort, but the upstream provider returned a response that was not valid JSON and opencode exited 1; an earlier start was separately rejected before the Coder because it received unsupported opencode_medium.
+EVIDENCE:
+- "DISPATCH_EVIDENCE instance=SG-081.dbg failed_id=SG-081 utc=2026-09-22T12:51:56Z" — evidence file
+- "Result=exit-code" and "ExecMainExitTimestamp=Tue 2026-09-22 12:51:22 UTC" — evidence file
+- "run_coder=fail reason=effort_unsupported_value_opencode_medium id=SG-081" — journal
+- "DISPATCH_RESULT id=SG-081 coder=opencode exit=1 head=f4cb8681812010000e17614129526b6e3bb090bf note=no moved=no rewrite=no dirty=no elapsed=4s budget=2100s" — journal
+- "effort=high" and "effort_source=packet" — journal
+- "Error: Upstream request failed: [server_error] Upstream response was not valid JSON" — journal
+- "coder: opencode" and "effort: high" — packet `docs/packets/SG-081-off-fetch.md`
+- "> build · deepseek-v4.1-flash" and "Error: Upstream request failed: [server_error] Upstream response was not valid JSON" — log `output/dispatch/SG-081.log`
+- "P5_receipt=FAIL", "negative_receipt=published", "partial_receipt=none", "product_touch=no", and "files: count=0" — evidence file
+- "Negative-Receipt-ID: SG-081" and "DISPATCH_RESULT id=SG-081 coder=opencode exit=1" — ref `refs/notes/storagegenie-coder-reports`
+STRANDED WORK:
+- `refs/quarantine/SG-025-20260912T164340Z` — quarantined SG-025 debris: provider-call migration/model/router/fake/protocol changes, tests, ADRs, and SG-025 worklogs; no receipt.
+- `refs/quarantine/SG-066-20260921T095958Z` — quarantined SG-066 debris: analytics API/service/prompt, frontend analytics route/client/types, and tests; no receipt.
+- `refs/quarantine/SG-088-20260921T174803Z` — quarantined SG-088 debris: plugin-taxonomy/postgres test changes and SG-088 worklogs; no receipt.
+- `refs/quarantine/preserve-20260907T083833Z` — preserved commit ahead of origin, `receipt(SG-008)`, containing `docs/worklogs/SG-008_report.md`.
+NEXT ACTION: needs the desk
+CONFIDENCE: high
+
+Debug-Report-End
+moved=no
