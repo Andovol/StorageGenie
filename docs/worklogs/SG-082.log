@@ -1,0 +1,42 @@
+SG-082 worklog — Enrich Jina fallback + review mapping + one capped synthesis pass
+
+First token: SG-082
+Branch: automation · Remote: git@github.com:Andovol/StorageGenie.git · Work dir: /home/andrei/StorageGenie
+BASE (origin/automation at start): ac39dd493a7d1358be4ffb17bca2a18289ebd808
+Contract echo: 0.30.0 (source path /home/andrei/storagegenie-contract/VERSION; repo HEAD c9c9ba3 = "Contract payload 0.30.0")
+Model / effort (CO-78, from provider metadata + process argv): model deepseek-v4.1-flash
+  (providerID opencode-go; /home/andrei/.local/state/opencode/model.json recent[0]); effort high
+  (/proc/1713787/cmdline: `opencode run --auto --dir /home/andrei/StorageGenie --variant high ...`).
+Spend (real $): Jina 1 successful API search (global diagnostic) + 2 EU attempts that failed DNS
+  before any HTTP request → $0 metered Jina charge observed (Jina search is key-metered, not
+  per-call billed to us in this account posture). Synthesis: $0.000000 (NOT RUN — see report G3).
+  Total metered spend this slice: $0.000000 actual.
+
+Legs (elapsed vs budget, uncalibrated per G-A9)
+  G0 recon + key/consent gate + baseline suite ....... ~300 s / 600 s suite bound (19.4 s suite)
+  G1 Jina client build + tests ....................... ~120 s / 120 s ordinary
+  G1 live smoke (3 attempts, 1 real search) .......... ~9 s network / 60 s per call bound
+  G2 mapping + frontend button/tests ................. ~240 s / 120 s ordinary (frontend suite 4.5 s)
+  G3 synthesis seam decision (non-run) .............. ~30 s / 60 s per live call bound, $0
+  G3 gates (ruff/mypy/secret/PG-SC-11/suite) ......... ~120 s / 600 s suite bound
+  G4 worklog + report + receipt ...................... ~180 s / 2400 s overall
+  Overall: ~900 s / 2400 s overall budget. No command hit its bound; nothing was killed.
+
+Files (diff is the evidence)
+  NEW  backend/app/services/enrich/jina.py                Jina client + fallback order + decision record
+  MOD  backend/app/services/candidates.py                 web:<source> mapping + label-wins merge + gated web assertions
+  NEW  backend/tests/test_sg082_enrich_jina.py            (27 tests) scripted Jina + fallback + mapping + commit gate
+  MOD  backend/tests/test_privacy_audit.py                M45 repair: inventory + web-sender name scan
+  NEW  backend/tests/fixtures/enrich/jina_hit.json        scripted Jina list result
+  NEW  backend/tests/fixtures/enrich/jina_empty.json      scripted legit miss
+  MOD  frontend/src/routes/AssetDetailPage.tsx            Enrich button + spend display + per-press cap
+  MOD  frontend/src/routes/AssetDetailPage.test.tsx       (3 tests) cap refusal seen-to-fail + render
+
+Live smoke (real Jina; key never printed) — full raw in SG-082_verify.log R-SMOKE
+  EU base eu.s.jina.ai: DNS NXDOMAIN → transport ConnectError (both attempts), 0 HTTP requests sent.
+  Global base s.jina.ai (diagnostic only, NOT a code switch): HTTP 200, 5 results.
+  Decision: client default stays EU; the EU unreachability is reported as finding F-SG082-1.
+
+Outcome: suite 2 failed / 428 passed (the 2 known test_signals decoder env reds); ruff clean;
+mypy 41 errors in 9 files == baseline (delta 0); frontend 179 passed; eslint exit 0;
+secret value-shape scan 0; PG-SC-11 end-relative grep 0; detection-source gate 0 over SG-082 source.

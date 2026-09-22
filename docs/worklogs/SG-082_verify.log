@@ -1,0 +1,133 @@
+SG-082 verify log — raw command outputs (UTC)
+Tue Sep 22 16:52:18 UTC 2026
+
+===== R-CONTRACT =====
+0.30.0
+c9c9ba3ee3715d102b55c740f4f2107344e7de3a
+c9c9ba3 Contract payload 0.30.0
+
+===== R-MODEL (from provider metadata + process argv, CO-78) =====
+recent[0]= {'providerID': 'opencode-go', 'modelID': 'deepseek-v4.1-flash'}
+argv (parent opencode run):
+1738793 opencode run --auto --dir /home/andrei/StorageGenie --variant high # SG-082 — Enrich Jina fallback + review mapping + one capped synthesis pass (openc
+
+===== R-BASELINE (pre-slice, recorded in SG-081) =====
+2 failed, 401 passed  (test_signals.py barcode/OCR decoder env reds)
+
+===== R-FAILPRE: new test file with jina.py absent =====
+/usr/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_sg082_enrich_jina.py:39: in <module>
+    from app.services import candidates
+app/services/candidates.py:21: in <module>
+    from app.services.enrich.jina import SOURCE_NAME as JINA_SOURCE_NAME
+E   ModuleNotFoundError: No module named 'app.services.enrich.jina'
+=========================== short test summary info ============================
+ERROR tests/test_sg082_enrich_jina.py
+!!!!!!!!!!!!!!!!!!!! Interrupted: 1 error during collection !!!!!!!!!!!!!!!!!!!!
+1 error in 0.34s
+
+===== R-PASSPOST: same file with jina.py restored =====
+...........................                                              [100%]
+27 passed in 0.37s
+
+===== R-SUITE (full backend) =====
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/test_signals.py::test_generated_codes_are_validated_and_bad_checksum_is_not_an_identifier
+FAILED tests/test_signals.py::test_ocr_has_text_boxes_and_mean_confidence - a...
+2 failed, 428 passed, 23 warnings in 19.42s
+
+===== R-RUFF =====
+All checks passed!
+
+===== R-MYPY (baseline: Found 41 errors in 9 files) =====
+app/main.py:47: error: Unused "type: ignore" comment  [unused-ignore]
+app/main.py:53: error: Unused "type: ignore" comment  [unused-ignore]
+Found 41 errors in 9 files (checked 79 source files)
+
+===== R-FRONTEND-TEST =====
+
+ Test Files  23 passed (23)
+      Tests  179 passed (179)
+   Start at  16:52:41
+   Duration  4.53s (transform 722ms, setup 791ms, collect 3.13s, tests 6.06s, environment 6.75s, prepare 1.62s)
+
+
+===== R-FRONTEND-LINT (eslint) =====
+eslint exit=0
+
+===== R-GATES: key NAMES only (.env) =====
+DATABASE_URL
+STORAGE_ROOT
+HOUSEHOLD_DEFAULT_NAME
+CORS_ORIGINS
+OPENCODE_API_KEY
+SG_CONSENT
+SG_PROVIDER_ID
+JINA_API_KEY
+--- SG_CONSENT value ---
+SG_CONSENT=true
+
+===== R-GATES: excluded detection source over the SG-082 new/changed source =====
+0 hits over new/changed SG-082 source
+--- pre-existing literal in the touched privacy audit (NOT this slice) ---
+324:                "model": "deepseek-v4-flash-vision-exp",
+
+===== R-GATES: secret-shape grep (identifiers/names only; no value) =====
+42
+hits above are code identifiers / .get names / the fake 'unit-test' literal; no key VALUE appears (see next: value-shape scan)
+--- real-looking key value scan (expect 0) ---
+0 real-looking key values
+
+===== R-GATES: PG-SC-11 end-relative grep over touched test files =====
+0 hits (exit 1)
+
+===== R-SMOKE: live Jina smoke (<=3 searches; key never printed) =====
+$ timeout 60 backend/venv/bin/python /tmp/opencode/sg082_smoke.py
+--- EU food ---
+request_url: https://eu.s.jina.ai/Jacobs+Cronat+Gold+food
+status_code: None
+retrieved_at: 2026-09-22T16:51:00.961128+00:00
+result_count: 0
+no_result_reason: transport: ConnectError: [Errno -2] Name or service not known
+--- EU non-food ---
+request_url: https://eu.s.jina.ai/Farmacia+Tei+Paracetamol+500+mg+comprimate+medicine
+status_code: None
+retrieved_at: 2026-09-22T16:51:00.974898+00:00
+result_count: 0
+no_result_reason: transport: ConnectError: [Errno -2] Name or service not known
+--- GLOBAL diagnostic (EU unreachable) ---
+request_url: https://s.jina.ai/Jacobs+Cronat+Gold+food?site=mega-image.ro&site=emag.ro&site=farmaciatei.ro&num=5&type=web&gl=ro
+status_code: 200
+retrieved_at: 2026-09-22T16:51:09.454966+00:00
+result_count: 5
+no_result_reason: None
+first_title: eMAG Captcha
+first_url: https://www.emag.ro/cafea-jacobs-cronat-gold-cafea-instant-75-g-fara-alergeni-8711000520659/pd/D6BD7Z3BM/
+searches_issued: 3
+EXIT=0
+$ getent hosts eu.s.jina.ai
+eu.s.jina.ai: NXDOMAIN/unresolved
+$ getent hosts s.jina.ai
+2606:4700:20::681a:bf2 s.jina.ai
+2606:4700:20::ac43:4636 s.jina.ai
+2606:4700:20::681a:af2 s.jina.ai
+
+===== R-DIFFSTAT =====
+ M backend/app/services/candidates.py
+ M backend/tests/test_privacy_audit.py
+ M frontend/src/routes/AssetDetailPage.test.tsx
+ M frontend/src/routes/AssetDetailPage.tsx
+?? backend/app/services/enrich/jina.py
+?? backend/tests/fixtures/enrich/jina_empty.json
+?? backend/tests/fixtures/enrich/jina_hit.json
+?? backend/tests/test_sg082_enrich_jina.py
+?? docs/worklogs/SG-082_verify.log
+ backend/app/services/candidates.py           | 333 +++++++++++++++++++++++++--
+ backend/tests/test_privacy_audit.py          |  40 +++-
+ frontend/src/routes/AssetDetailPage.test.tsx |  35 ++-
+ frontend/src/routes/AssetDetailPage.tsx      |  64 +++++
+ 4 files changed, 444 insertions(+), 28 deletions(-)
