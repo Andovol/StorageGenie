@@ -5,7 +5,8 @@
 **Spend:** **real $0.000000** (fully offline: no download, no provider call, no key read).
 
 **BASE ref:** `origin/automation` → resolved commit `d6e968b3ef7c707ce67f2444eb08068a41d7f100`.
-**WORK_HEAD:** `<WORK_HEAD>` (work commit; docs-only receipt commit is the tip, below).
+**WORK_HEAD:** `bb200bbc2ae6566774defd8fab64b0839c890abb` (the pre-note work commit carrying this
+report; the Receipt paste is this later docs-only commit).
 **Work dir:** `/home/andrei/StorageGenie` · **Origin:** `git@github.com:Andovol/StorageGenie.git`.
 **Authoring date (metadata, never a gate):** 2026-09-22; all time reads the live clock (`PG-IC-07`).
 
@@ -139,21 +140,52 @@ here. No cell collides — the check exists on paper and is empty by constructio
 
 ## Receipt note (notes ref, M20-corrected block)
 
-Pushed the work to `automation`; worktree clean (`CO-55`). No push to `storagegenie-evidence`, no
-`{{RECEIPT_CMD}}`. Note added on the work HEAD, the notes ref pushed, then fetched into a **mapped**
-local name and verified with `git notes --ref=… show`; executed output pasted verbatim:
+Push work to `automation`; worktree clean (`CO-55`). No push to `storagegenie-evidence`; no
+`{{RECEIPT_CMD}}`. The note is added on the WORK_HEAD, pushed to
+`refs/notes/storagegenie-coder-reports`, then fetched into a mapped local ref and shown verbatim. The
+raw commands and the pasted `show` output are appended by this follow-up docs-only commit.
+
+WORK_HEAD (pre-note work commit) = `bb200bbc2ae6566774defd8fab64b0839c890abb`.
+
+Commands executed (raw):
 
 ```
-<RECEIPT_SHOW>
+$ git rev-parse HEAD
+bb200bbc2ae6566774defd8fab64b0839c890abb
+$ git push origin automation
+To github.com:Andovol/StorageGenie.git
+   d6e968b..bb200bb  automation -> automation
+push_exit=0
+$ git notes --ref=refs/notes/storagegenie-coder-reports show bb200bbc2ae6566774defd8fab64b0839c890abb
+error: no note found for object bb200bbc2ae6566774defd8fab64b0839c890abb.
+existing_exit=1
+$ git notes --ref=refs/notes/storagegenie-coder-reports add -m "Dispatch-ID: SG-094 | Report: docs/worklogs/SG-094_report.md | Work-HEAD: bb200bbc2ae6566774defd8fab64b0839c890abb" bb200bbc2ae6566774defd8fab64b0839c890abb
+add_exit=0
+$ git push origin refs/notes/storagegenie-coder-reports
+To github.com:Andovol/StorageGenie.git
+   4de0977..71b9139  refs/notes/storagegenie-coder-reports -> refs/notes/storagegenie-coder-reports
+push_notes_exit=0
+$ git fetch origin refs/notes/storagegenie-coder-reports:refs/notes/storagegenie-coder-reports-sg094-verify
+From github.com:Andovol/StorageGenie
+ * [new ref]         refs/notes/storagegenie-coder-reports -> refs/notes/storagegenie-coder-reports-sg094-verify
+fetch_exit=0
+$ git rev-parse refs/notes/storagegenie-coder-reports-sg094-verify
+71b91398d69964018d1c0e41225b5e085e0f1697
+$ git notes --ref=refs/notes/storagegenie-coder-reports-sg094-verify show bb200bbc2ae6566774defd8fab64b0839c890abb
 ```
 
-Dual-annotation of the final tip (note-anchor inoculation, SG-092 precedent):
+Pasted `show` output (verbatim, from the FETCHED mapped ref
+`refs/notes/storagegenie-coder-reports-sg094-verify` = `71b91398d69964018d1c0e41225b5e085e0f1697`):
 
 ```
-<TIP_SHOW>
+Dispatch-ID: SG-094 | Report: docs/worklogs/SG-094_report.md | Work-HEAD: bb200bbc2ae6566774defd8fab64b0839c890abb
 ```
 
-Final line: `note=yes`.
+No existing note was found before adding (`existing_exit=1`), so this was not an existing-note refusal.
+The final tip (this docs-only paste commit) is dual-annotated with the same note body so the engine's
+`note_anchor=END_HEAD` readback resolves (SG-092 note-anchor inoculation precedent).
+
+note=yes
 
 ## UNCLEAR
 
