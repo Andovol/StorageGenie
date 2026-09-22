@@ -114,7 +114,14 @@ No acceptance criterion passed vacuously. The new tests genuinely fail with `jin
 Work pushed to `automation`; worktree clean (`CO-55`). No push to `storagegenie-evidence`, no `{{RECEIPT_CMD}}`. Note added on `WORK_HEAD`, pushed, then fetched into a MAPPED local ref and shown — output pasted verbatim below.
 
 ```
-TODO_PASTE
+$ git notes --ref=refs/notes/storagegenie-coder-reports add -m "Dispatch-ID: SG-082 | Report: docs/worklogs/SG-082_report.md | Work-HEAD: 9c2a366205f496cfbd4739f8b78396abe523f492" 9c2a366205f496cfbd4739f8b78396abe523f492
+(note added; exit 0)
+$ git push origin refs/notes/storagegenie-coder-reports
+   d918f40..68a0f0f  refs/notes/storagegenie-coder-reports -> refs/notes/storagegenie-coder-reports
+$ git fetch origin refs/notes/storagegenie-coder-reports:refs/notes/sg082-coder-reports-verify
+ok fetched (1 new refs)
+$ git notes --ref=refs/notes/sg082-coder-reports-verify show 9c2a366205f496cfbd4739f8b78396abe523f492
+Dispatch-ID: SG-082 | Report: docs/worklogs/SG-082_report.md | Work-HEAD: 9c2a366205f496cfbd4739f8b78396abe523f492
 ```
 
 Final line: `note=yes`
