@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import datetime
 import json
+from collections.abc import Mapping
 from pathlib import Path
 
 from sqlalchemy import ForeignKey, String, Text
@@ -16,8 +17,44 @@ from app.models.job import Job, JobStep
 from app.models.review_task import ReviewTask
 from app.models.base import TimestampMixin, new_id
 from app.services import audit_service
+from app.services.enrich import scoring as enrich_scoring
+from app.services.enrich.jina import SOURCE_NAME as JINA_SOURCE_NAME
+from app.services.enrich.jina import EnrichDecisionRecord
 from app.services.observations import Observation
 from app.services.providers.schemas import ExtractionOutput
+
+# SG-082: web-sourced candidate fields. `source_type` is `web:<source>` per the
+# spec §1/§3; web data is ALWAYS a gated proposal, never auto-accepted.
+WEB_SOURCE_PREFIX = "web:"
+OFF_WEB_SOURCE = f"{WEB_SOURCE_PREFIX}OpenFoodFacts"
+JINA_WEB_SOURCE = f"{WEB_SOURCE_PREFIX}{JINA_SOURCE_NAME}"
+
+# Label-visible fields: a label photo (extraction) or deterministic value WINS;
+# web fills the gap. When both exist the web value is preserved as a visible
+# alternate with its source, never silently dropped (spec §4).
+LABEL_VISIBLE_FIELDS = frozenset(
+    {
+        "display_name",
+        "asset_type",
+        "quantity",
+        "unit",
+        "condition",
+        "identifier",
+        "expiry",
+        "expiry_date",
+        "opened_date",
+        "lot",
+    }
+)
+
+# SG-082 category activation: a Jina result's retailer domain maps to a
+# category slug. Reported and uncalibrated (`G-A9`); the agreement rule reuses
+# `enrich_scoring.category_score` (exact/contains) against the caller category.
+JINA_DOMAIN_CATEGORIES: dict[str, str] = {
+    "farmaciatei.ro": "medicine_pharma",
+    "mega-image.ro": "food_beverages",
+    "emag.ro": "household_chemicals",
+}
 
 # SG-028 §5.2-7: safety-critical/serialized fields always route to review,
 # whatever the confidence. Every other field auto-accepts at/above the single
@@ -123,6 +160,221 @@ def _review_state_for(field_path: str, confidence: float | None) -> str:
     if confidence is not None and confidence < settings.sg_confidence_threshold:
         return "proposed"
     return "accepted"
+
+
+# --------------------------------------------------------------------------- #
+# SG-082 — web-source mapping (OFF decision + Jina results -> candidate fields)
+# --------------------------------------------------------------------------- #
+def _web_provenance(
+    value: object,
+    *,
+    source_type: str,
+    source_url: str,
+    retrieved_at: str,
+) -> dict[str, object]:
+    """A web-sourced field envelope: value + `web:<source>` + URL + retrieval date."""
+    provenance = _provenance(value, source_type=source_type)
+    provenance["source_url"] = source_url
+    provenance["retrieved_at"] = retrieved_at
+    return provenance
+
+
+def jina_result_category(result: Mapping[str, object]) -> str | None:
+    """The category slug a Jina result's retailer domain supplies, else None."""
+    url = str(result.get("url") or "")
+    for domain, category in JINA_DOMAIN_CATEGORIES.items():
+        if domain in url:
+            return category
+    return None
+
+
+def map_off_decision_fields(
+    decision: enrich_scoring.MatchDecision,
+    *,
+    source_url: str,
+    retrieved_at: str,
+    category: str | None = None,
+) -> dict[str, object]:
+    """Map an accepted OFF `MatchDecision` into existing candidate fields.
+
+    Only safe identity fields are mapped (`display_name`, accepted exact
+    `identifier`, an agreeing `category_proposed`); every value is
+    `web:OpenFoodFacts` with its URL + retrieval date. A non-accepted decision
+    maps to nothing (no nearest guess).
+    """
+    if not decision.accepted or decision.best is None:
+        return {}
+    product = decision.best
+    fields: dict[str, object] = {}
+    name = product.get("product_name")
+    if isinstance(name, str) and name:
+        fields["display_name"] = _web_provenance(
+            name,
+            source_type=OFF_WEB_SOURCE,
+            source_url=source_url,
+            retrieved_at=retrieved_at,
+        )
+    code = product.get("code")
+    if isinstance(code, str) and code:
+        fields["identifier"] = _web_provenance(
+            code,
+            source_type=OFF_WEB_SOURCE,
+            source_url=source_url,
+            retrieved_at=retrieved_at,
+        )
+    if category and enrich_scoring.category_score(
+        category, product.get("categories_tags_en")
+    ) > 0:
+        fields["category_proposed"] = _web_provenance(
+            category,
+            source_type=OFF_WEB_SOURCE,
+            source_url=source_url,
+            retrieved_at=retrieved_at,
+        )
+    return fields
+
+
+def map_jina_result_fields(
+    result: Mapping[str, object],
+    *,
+    source_url: str,
+    retrieved_at: str,
+    category: str | None = None,
+) -> dict[str, object]:
+    """Map one Jina web result into existing candidate fields.
+
+    `title` becomes a proposed `display_name`; a retailer-derived category
+    becomes `category_proposed` only when it agrees with the caller's category
+    through `category_score` (the activation this slice adds).
+    """
+    fields: dict[str, object] = {}
+    title = result.get("title")
+    if isinstance(title, str) and title:
+        fields["display_name"] = _web_provenance(
+            title,
+            source_type=JINA_WEB_SOURCE,
+            source_url=source_url,
+            retrieved_at=retrieved_at,
+        )
+    derived = jina_result_category(result)
+    if derived and category and enrich_scoring.category_score(category, [derived]) > 0:
+        fields["category_proposed"] = _web_provenance(
+            derived,
+            source_type=JINA_WEB_SOURCE,
+            source_url=source_url,
+            retrieved_at=retrieved_at,
+        )
+    return fields
+
+
+def merge_web_fields(
+    existing_fields: dict[str, object], web_fields: dict[str, object]
+) -> tuple[dict[str, object], list[dict[str, object]]]:
+    """Merge web fields into existing fields under the label-wins conflict rule.
+
+    A label-visible field that already has a non-null value keeps it; the web
+    value is returned as an alternate with its source (both visible). Every
+    other web field fills the gap. Returns `(merged_fields, web_alternates)`.
+    """
+    merged = dict(existing_fields)
+    alternates: list[dict[str, object]] = []
+    for field_name, raw in web_fields.items():
+        existing_value: object = None
+        if field_name in merged:
+            existing_value, _ = _field_parts(merged[field_name])
+        if (
+            field_name in merged
+            and field_name in LABEL_VISIBLE_FIELDS
+            and existing_value is not None
+        ):
+            web_value, provenance = _field_parts(raw)
+            provenance = provenance or {}
+            alternates.append(
+                {
+                    "field": field_name,
+                    "value": web_value,
+                    "source_type": provenance.get("source_type"),
+                    "source_url": provenance.get("source_url"),
+                    "retrieved_at": provenance.get("retrieved_at"),
+                }
+            )
+            continue
+        merged[field_name] = raw
+    return merged, alternates
+
+
+def build_enrich_fields(
+    record: EnrichDecisionRecord, *, category: str | None = None
+) -> dict[str, object]:
+    """The web-sourced field set + source list for one decision record.
+
+    OFF first; Jina's top result fills only fields OFF did not provide. Both
+    snapshots' sources are listed with URL + retrieval date. Nothing is
+    persisted (`PG-SC-02`).
+    """
+    fields: dict[str, object] = {}
+    sources: list[dict[str, object]] = []
+    if record.off_decision.accepted:
+        fields.update(
+            map_off_decision_fields(
+                record.off_decision,
+                source_url=record.primary.request_url,
+                retrieved_at=record.primary.retrieved_at,
+                category=category,
+            )
+        )
+        sources.append(
+            {
+                "source": OFF_WEB_SOURCE,
+                "url": record.primary.request_url,
+                "retrieved_at": record.primary.retrieved_at,
+            }
+        )
+    fallback = record.fallback
+    if fallback is not None and fallback.results:
+        jina_fields: dict[str, object] = {}
+        for result in fallback.results[:1]:
+            jina_fields.update(
+                map_jina_result_fields(
+                    result,
+                    source_url=fallback.request_url,
+                    retrieved_at=fallback.retrieved_at,
+                    category=category,
+                )
+            )
+        for field_name, raw in jina_fields.items():
+            if field_name not in fields:
+                fields[field_name] = raw
+        sources.append(
+            {
+                "source": JINA_WEB_SOURCE,
+                "url": fallback.request_url,
+                "retrieved_at": fallback.retrieved_at,
+            }
+        )
+    return {"fields": fields, "sources": sources}
+
+
+def apply_web_fields_to_proposal(
+    proposal: dict[str, object], record: EnrichDecisionRecord, *, category: str | None = None
+) -> dict[str, object]:
+    """Merge web fields into a candidate proposal's `fields` (in-memory only).
+
+    The web alternates are attached under `web_alternates` so a label-wins
+    conflict keeps BOTH values visible with sources. The proposal stays
+    JSON-serialisable; no datastore field is written.
+    """
+    web = build_enrich_fields(record, category=category)
+    web_fields = web["fields"]
+    if not isinstance(web_fields, dict):
+        return proposal
+    existing = _asset_fields(proposal)
+    merged, alternates = merge_web_fields(existing, web_fields)
+    updated = dict(proposal)
+    updated["fields"] = merged
+    updated["web_alternates"] = alternates
+    updated["web_sources"] = web["sources"]
+    return updated
 
 
 class Candidate(TimestampMixin, Base):
@@ -393,6 +645,60 @@ def build_candidates_step(db: Session, job: Job) -> dict[str, object]:
     }
 
 
+def _assertion_source(
+    field_path: str,
+    provenance: dict[str, object] | None,
+    *,
+    evidence_ids: list[str],
+    observation_ids: list[str],
+) -> tuple[str, float | None, str | None, str]:
+    """Resolve `(source_type, confidence, model_json, review_state)` for a field.
+
+    SG-082 adds the `web:<source>` branch: web data is ALWAYS a proposal at
+    every confidence (no threshold can promote it); attribution rides
+    `model_json`. Extraction keeps its SG-028 behaviour; deterministic fields
+    keep the plain-threshold rule.
+    """
+    confidence: float | None = None
+    source_type = "deterministic"
+    model_json: str | None = None
+    if provenance is not None:
+        raw_confidence = provenance.get("confidence")
+        confidence = float(raw_confidence) if isinstance(raw_confidence, (int, float)) else None
+        raw_source = provenance.get("source_type")
+        if raw_source == "extraction":
+            source_type = "extraction"
+            model_json = json.dumps(
+                {
+                    "provider": provenance.get("provider"),
+                    "model": provenance.get("model"),
+                    "prompt_template_version": provenance.get("prompt_template_version"),
+                    "provider_call_id": provenance.get("provider_call_id"),
+                    "evidence_ids": evidence_ids,
+                    "observation_ids": observation_ids,
+                },
+                ensure_ascii=False,
+            )
+        elif isinstance(raw_source, str) and raw_source.startswith(WEB_SOURCE_PREFIX):
+            source_type = raw_source
+            confidence = None
+            model_json = json.dumps(
+                {
+                    "web_source": raw_source,
+                    "source_url": provenance.get("source_url"),
+                    "retrieved_at": provenance.get("retrieved_at"),
+                },
+                ensure_ascii=False,
+            )
+    if source_type.startswith(WEB_SOURCE_PREFIX):
+        review_state = "proposed"
+    else:
+        review_state = _review_state_for(
+            field_path, confidence if source_type == "extraction" else None
+        )
+    return source_type, confidence, model_json, review_state
+
+
 def _create_asset_for_candidate(db: Session, candidate: Candidate) -> Asset:
     proposal = load_proposal(candidate)
     fields = _asset_fields(proposal)
@@ -431,25 +737,12 @@ def _create_asset_for_candidate(db: Session, candidate: Candidate) -> Asset:
             continue
         if field_path not in ALLOWED_CANDIDATE_FIELDS:
             raise ValueError(f"unsupported candidate field: {field_path}")
-        confidence: float | None = None
-        source_type = "deterministic"
-        model_json: str | None = None
-        if provenance is not None:
-            raw_confidence = provenance.get("confidence")
-            confidence = float(raw_confidence) if isinstance(raw_confidence, (int, float)) else None
-            if provenance.get("source_type") == "extraction":
-                source_type = "extraction"
-                model_json = json.dumps(
-                    {
-                        "provider": provenance.get("provider"),
-                        "model": provenance.get("model"),
-                        "prompt_template_version": provenance.get("prompt_template_version"),
-                        "provider_call_id": provenance.get("provider_call_id"),
-                        "evidence_ids": evidence_ids,
-                        "observation_ids": observation_ids,
-                    },
-                    ensure_ascii=False,
-                )
+        source_type, confidence, model_json, review_state = _assertion_source(
+            field_path,
+            provenance,
+            evidence_ids=evidence_ids,
+            observation_ids=observation_ids,
+        )
         db.add(
             Assertion(
                 asset_id=asset.id,
@@ -457,7 +750,7 @@ def _create_asset_for_candidate(db: Session, candidate: Candidate) -> Asset:
                 value_json=json.dumps(value, ensure_ascii=False),
                 source_type=source_type,
                 confidence=confidence,
-                review_state=_review_state_for(field_path, confidence if source_type == "extraction" else None),
+                review_state=review_state,
                 source_evidence_ids=json.dumps(evidence_ids),
                 model_json=model_json,
             )

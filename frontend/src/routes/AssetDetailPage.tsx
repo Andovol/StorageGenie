@@ -8,6 +8,66 @@ import { ExpiryEntryForm } from "../components/ExpiryEntryForm";
 import { apiPatch, apiPost, uploadEvidence } from "../api/client";
 import { UNTITLED_ASSET_NAME } from "../types/product";
 
+// SG-082: per-press Enrich cap. UNCALIBRATED on purpose (`G-A9`): the value is
+// a stated ceiling, not a measured cost. The button shows the last measured
+// spend and refuses a press above the cap with a named reason.
+export const ENRICH_PER_PRESS_CAP_USD = 0.05;
+
+export function enrichCapRefusal(
+  projectedSpendUsd: number,
+  capUsd: number = ENRICH_PER_PRESS_CAP_USD
+): string | null {
+  if (!Number.isFinite(projectedSpendUsd)) {
+    return "per_press_cap_unknown: spend is not a finite number — refusing to press";
+  }
+  if (projectedSpendUsd > capUsd) {
+    return `per_press_cap_exceeded: last press cost $${projectedSpendUsd.toFixed(6)} exceeds cap $${capUsd.toFixed(2)}`;
+  }
+  return null;
+}
+
+export function EnrichButton({
+  lastSpendUsd,
+  onRun,
+  capUsd = ENRICH_PER_PRESS_CAP_USD,
+}: {
+  lastSpendUsd: number | null;
+  onRun?: () => void;
+  capUsd?: number;
+}) {
+  const [refusal, setRefusal] = useState<string | null>(null);
+  const spendLabel = lastSpendUsd != null ? `$${lastSpendUsd.toFixed(6)}` : "$0.00";
+  function handleClick() {
+    const reason = enrichCapRefusal(lastSpendUsd ?? 0, capUsd);
+    if (reason) {
+      setRefusal(reason);
+      return;
+    }
+    setRefusal(null);
+    onRun?.();
+  }
+  return (
+    <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
+      <button
+        type="button"
+        onClick={handleClick}
+        className="bg-primary text-primary-foreground focus-ring"
+        style={{ padding: "6px 12px", borderRadius: 6, border: "none", cursor: "pointer" }}
+      >
+        Enrich
+      </button>
+      <span className="text-muted-foreground" style={{ fontSize: 12 }}>
+        Last measured spend: {spendLabel} · per-press cap ${capUsd.toFixed(2)}
+      </span>
+      {refusal && (
+        <span role="alert" className="text-danger" style={{ fontSize: 12 }}>
+          {refusal}
+        </span>
+      )}
+    </div>
+  );
+}
+
 export function AssetDetailPage() {
   const { id } = useParams();
   const [search] = useSearchParams();
@@ -83,6 +143,10 @@ export function AssetDetailPage() {
         {asset.asset_type} · {asset.status} · v{asset.version} · {asset.household_id.slice(0, 8)}
         {asset.quantity != null && <> · qty {asset.quantity} {asset.unit || ""}</>}
         {asset.condition && <> · {asset.condition}</>}
+      </div>
+
+      <div style={{ marginBottom: 16 }}>
+        <EnrichButton lastSpendUsd={null} />
       </div>
 
       {editing && (

@@ -2,7 +2,7 @@ import { afterEach, describe, expect, test, vi } from "vitest";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { MemoryRouter, Route, Routes } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { AssetDetailPage } from "./AssetDetailPage";
+import { AssetDetailPage, EnrichButton, enrichCapRefusal, ENRICH_PER_PRESS_CAP_USD } from "./AssetDetailPage";
 
 const api = vi.hoisted(() => ({
   apiGet: vi.fn(),
@@ -116,5 +116,38 @@ describe("AssetDetailPage", () => {
         expect.objectContaining({ expiry_date: "2030-05-06", source_evidence_ids: ["ev-1"] })
       )
     );
+  });
+});
+
+describe("EnrichButton per-press cap (SG-082)", () => {
+  test("the page renders the Enrich button with the last measured spend and cap", async () => {
+    api.apiGet.mockResolvedValue(before);
+    renderPage();
+
+    expect(await screen.findByRole("button", { name: "Enrich" })).toBeInTheDocument();
+    expect(screen.getByText(`Last measured spend: $0.00 · per-press cap $${ENRICH_PER_PRESS_CAP_USD.toFixed(2)}`)).toBeInTheDocument();
+  });
+
+  test("cap helper refuses above the cap with a named reason (seen-to-fail) and allows below", () => {
+    expect(enrichCapRefusal(0.01)).toBeNull();
+    expect(enrichCapRefusal(0.06)).toBe(
+      "per_press_cap_exceeded: last press cost $0.060000 exceeds cap $0.05"
+    );
+  });
+
+  test("a press above the cap is refused and never runs; below the cap it runs", () => {
+    const run = vi.fn();
+    const { rerender } = render(<EnrichButton lastSpendUsd={0.06} onRun={run} />);
+
+    expect(screen.getByText("Last measured spend: $0.060000 · per-press cap $0.05")).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "Enrich" }));
+    expect(run).not.toHaveBeenCalled();
+    expect(screen.getByRole("alert")).toHaveTextContent(
+      "per_press_cap_exceeded: last press cost $0.060000 exceeds cap $0.05"
+    );
+
+    rerender(<EnrichButton lastSpendUsd={0.01} onRun={run} />);
+    fireEvent.click(screen.getByRole("button", { name: "Enrich" }));
+    expect(run).toHaveBeenCalledTimes(1);
   });
 });
