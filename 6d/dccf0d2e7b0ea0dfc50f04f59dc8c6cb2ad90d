@@ -1,0 +1,22 @@
+Dispatch-ID: SG-095.dbg | Report: note
+Debug-Report-Begin
+STAGE: Coder or provider
+CAUSE: The opencode provider failed before slice work began because the upstream response was not valid JSON.
+EVIDENCE:
+- "ExecMainCode=1" and "ExecMainStatus=1" — evidence file, failed-unit-status.
+- "DISPATCH_RESULT id=SG-095 coder=opencode exit=1 head=f223ab2411a2b83cc7be8b3fb444b315ce9d9bf2 note=no moved=no rewrite=no dirty=no elapsed=5s budget=2100s" — evidence file, failed-unit-journal.
+- "Error: Upstream request failed: [server_error] Upstream response was not valid JSON" — evidence file, failed-unit-journal.
+- "coder: opencode" and "effort: high" — packet `docs/packets/SG-095-taxonomy-wiring.md`.
+- "Error: Upstream request failed: [server_error] Upstream response was not valid JSON" — log `output/dispatch/SG-095.log`.
+- "P1_moved=FAIL count=0", "P5_receipt=FAIL", "negative_receipt=published", and "files: count=0" — evidence file, failed-unit-journal.
+- "no SG-095 note found in local notes refs" and "no SG-095 note found on fetched origin notes ref" — ref, read-only notes search.
+STRANDED WORK:
+- `refs/quarantine/SG-025-20260912T164340Z` → commit `b6f17d5b9902932c550df26843df02ceec50ba7b`, quarantined SG-025 debris with provider abstraction/migration/tests and SG-025 worklogs; subject: "quarantine: debris from SG-025 (no receipt)".
+- `refs/quarantine/SG-066-20260921T095958Z` → commit `ae29ca495209d4e278ea4d5b1569d32b58cd663a`, quarantined SG-066 analytics implementation/tests and worklogs; subject: "quarantine: debris from SG-066 (no receipt)".
+- `refs/quarantine/SG-088-20260921T174803Z` → commit `dd1345823d2b801edce594a6d5f1b8fc450a39c9`, quarantined SG-088 test changes and verification worklogs; subject: "quarantine: debris from SG-088 (no receipt)".
+- `refs/quarantine/preserve-20260907T083833Z` → commit `6d968569104fe0168ce96c02971dfd8a9687aa22`, preserved commit ahead of origin containing `docs/worklogs/SG-008_report.md`; subject: "receipt(SG-008)".
+NEXT ACTION: retry as is
+CONFIDENCE: high
+
+Debug-Report-End
+moved=no
