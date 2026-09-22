@@ -152,6 +152,26 @@ No existing note was found before adding (`existing_exit=1`), so this was not an
 
 note=yes
 
+## Finding — the engine reads the receipt at the branch tip, not at WORK_HEAD (desk-side)
+
+`run-coder`'s `publish_receipt` anchors its readback on `note_anchor=END_HEAD` (the branch tip when the
+engine runs, i.e. after this Coder exits): `git notes --ref="$NOTES_REF" show "$note_anchor"`. The
+Coder convention here writes the receipt on the pre-paste `WORK_HEAD`, and the paste commit then moves
+the tip — so a naive two-commit receipt reads `note=no` and, because `P3 != PASS`,
+`publish_negative_receipt` publishes a spurious `Negative-Receipt-ID` note. Measured on the host:
+
+- SG-091: `DISPATCH_RESULT id=SG-091 … head=2d6c6b1 … note=no`, `P3_note=FAIL note=no`,
+  `negative_receipt=published`; its Coder note read `Dispatch-ID: SG-091 … Work-HEAD: 8dc6563` and
+  `note=yes`.
+- SG-089: `DISPATCH_RESULT id=SG-089 … head=76833a8 … note=no`, `P3_note=FAIL note=no`,
+  `negative_receipt=published`.
+
+Both slices were accepted. This is **desk-side** (runner/notes-anchor machinery), pre-existing, and
+affects every Coder-note slice; it is **not** a Coder failure and **not** an Architect-packet defect.
+For SG-092 the Coder additionally annotates the FINAL work tip with the same note body, so
+`note_anchor=END_HEAD` resolves (`note=yes`) and the engine does not publish a spurious negative
+receipt; the `WORK_HEAD` note required by the packet remains the verified one.
+
 ## Acceptance criteria (`PG-SC-09`)
 
 - Tree status + HEAD-vs-origin + both packet sightings quoted; last-3 log quoted — G1: **clean, equal,
