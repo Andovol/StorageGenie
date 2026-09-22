@@ -1,0 +1,55 @@
+SG-093 worklog — Taxonomy T1: vendored Google data + pure resolver + bucket map.
+
+ROLE: Coder (never Architect). No dispatch verb run for any ID; no unit started or polled by me.
+LANE: this slice WAS dispatched to me on the standard job_spawn lane; I am the launched Coder.
+
+MODEL + EFFORT (from process arguments, per packet / CO-78):
+- own argv (read from /proc/<ppid>/cmdline; ppid 1780906 is the opencode CLI process):
+  opencode run --auto --dir /home/andrei/StorageGenie --variant high <packet text on argv>
+  => effort = high (the `--variant high` token).
+- No `--model` token in argv => model is the CLI default (omitted per policy). Not determinable from
+  process arguments alone => reported as `unknown` (CLI default), never guessed. Source: own argv.
+
+CONTRACT ECHO + SOURCE PATH (no drift):
+- Packet-recorded, source docs/packets/SG-093-taxonomy-data-resolver.md:7:
+  "Contract: recorded `0.30.0` == published (`c9c9ba3`; D125 adoption); echo verbatim + source path."
+- Live contract line verbatim, source /home/andrei/storagegenie-contract/CODER.md:3:
+  "**Contract version: 0.30.0** — **echo this line verbatim in your receipt.** It is the only proof that you"
+- Live VERSION = 0.30.0; contract repo HEAD = c9c9ba3ee3715d102b55c740f4f2107344e7de3a
+  "Contract payload 0.30.0". RULES.sha256 = 18de7fd7b3546bd7624b3a7b59a78bd629752816cd7fa8f1af6113d1bafc8d46
+  (matches the AGENTS.md header payload hash). Recorded == published == live. No drift.
+
+SPEND: REAL metered $0.000000 (one free, unmetered taxonomy download GET; no provider call, no key read).
+
+ELAPSED-VS-BUDGET PER LEG (budget 120s ordinary / 600s suite; uncalibrated G-A9):
+- Recon (tree + packet + spec/plan + contract): ~145 s vs 120 s ordinary (mild over; one large packet
+  + spec/plan reads, no command killed).
+- G1 download + three-way verification: ~10 s vs 120 s ordinary (curl 200, 482896 B in).
+- G2 module + tests build; pre-run fail, post-run 15 green, non-vacuity pins added, final 17 green: ~45 s
+  vs 120 s ordinary.
+- Gates: full suite 19.9 s (<=600 s), ruff <1 s, mypy ~ x2 ~8 s, secret gate <1 s: ~30 s vs 120 s/600 s.
+- G3 worklog + report + receipt-paste + notes push + fetched verify: ~40 s vs 120 s ordinary.
+- TOTAL to report writing: process elapsed 03:49 (229 s) vs 600 s suite/overall bound. Within.
+- No command hit its timeout; nothing killed; no interactive command run.
+
+FINDINGS:
+1. Plan test 4 uses id "414" with path "Food, Beverages & Tobacco > Beverages". In the vendored file
+   id 414 is "... > Beverages > Alcoholic Beverages > Beer"; the "Beverages" node is id 413. The row's
+   id and path disagree (plan typo). bucket_for is path-first, so the pin still passes and is meaningful;
+   reported, never bent. Plan line: docs/superpowers/plans/2026-09-21-google-taxonomy.md:53.
+2. Health & Beauty pharma exception: the only pharma row under Health & Beauty is the single leaf
+   `518 - Health & Beauty > Health Care > Medicine & Drugs` (verified: no descendants). Enumerated as the
+   one pharma prefix; the remainder of Health & Beauty defaults to cosmetics_personal_care. Quoted from
+   the vendored file (M19).
+3. `.gitignore` ignores `backend/data/`, not `backend/app/data/` — the vendored path is trackable
+   (`git check-ignore` exit 1 = not ignored). No scratch copy committed anywhere.
+4. Non-vacuity: two extra pins prove the accept gates and the pharma prefix are load-bearing (monkeypatch
+   the gate to 0 / drop the pharma prefix and the pin flips). No test passes vacuously.
+
+UNCLEAR (FIRST READ): whether the plan's Task 1 id "414" typos are meant to be corrected by the Coder or
+  carried as-is; I carried the file's id 414 = the Beer path and kept the plan's literal test call.
+UNCLEAR (DURING EXECUTION): whether scoring should be Jaccard (chosen) or a containment/coverage score;
+  the spec fixes the gates, not the exact token-set formula, so Jaccard with an exact-path short-circuit
+  was the design call.
+UNCLEAR (REMAINING): whether the vendored data file must later be added to the Docker build context /
+  packaging (hatch package data) for T2/T3 to see it at runtime; not in T1's ceiling, not touched.

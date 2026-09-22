@@ -1,0 +1,358 @@
+=== SG-093 verify log ===
+=== PRE-RUN: python -m pytest tests/test_google_taxonomy.py -v (module absent) ===
+============================= test session starts ==============================
+platform linux -- Python 3.12.3, pytest-9.1.1, pluggy-1.6.0 -- /home/andrei/StorageGenie/backend/../venv/bin/python
+cachedir: .pytest_cache
+rootdir: /home/andrei/StorageGenie/backend
+configfile: pyproject.toml
+plugins: anyio-4.14.2, asyncio-1.4.0
+asyncio: mode=Mode.AUTO, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collecting ... collected 0 items / 1 error
+
+==================================== ERRORS ====================================
+________________ ERROR collecting tests/test_google_taxonomy.py ________________
+ImportError while importing test module '/home/andrei/StorageGenie/backend/tests/test_google_taxonomy.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+/usr/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_google_taxonomy.py:13: in <module>
+    from app.services import google_taxonomy
+E   ImportError: cannot import name 'google_taxonomy' from 'app.services' (/home/andrei/StorageGenie/backend/app/services/__init__.py)
+=========================== short test summary info ============================
+ERROR tests/test_google_taxonomy.py
+!!!!!!!!!!!!!!!!!!!! Interrupted: 1 error during collection !!!!!!!!!!!!!!!!!!!!
+=============================== 1 error in 0.07s ===============================
+
+=== POST-RUN: python -m pytest tests/test_google_taxonomy.py -v (module present) ===
+============================= test session starts ==============================
+platform linux -- Python 3.12.3, pytest-9.1.1, pluggy-1.6.0 -- /home/andrei/StorageGenie/backend/../venv/bin/python
+cachedir: .pytest_cache
+rootdir: /home/andrei/StorageGenie/backend
+configfile: pyproject.toml
+plugins: anyio-4.14.2, asyncio-1.4.0
+asyncio: mode=Mode.AUTO, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collecting ... collected 15 items
+
+tests/test_google_taxonomy.py::test_exact_path_resolves_with_id_and_version PASSED [  6%]
+tests/test_google_taxonomy.py::test_exact_match_is_whitespace_and_case_insensitive PASSED [ 13%]
+tests/test_google_taxonomy.py::test_below_threshold_is_unclear_never_mapped PASSED [ 20%]
+tests/test_google_taxonomy.py::test_unclear_still_stamps_taxonomy_version PASSED [ 26%]
+tests/test_google_taxonomy.py::test_none_proposal_is_uncategorized PASSED [ 33%]
+tests/test_google_taxonomy.py::test_blank_proposal_is_uncategorized PASSED [ 40%]
+tests/test_google_taxonomy.py::test_food_subtree_maps_to_food_bucket PASSED [ 46%]
+tests/test_google_taxonomy.py::test_out_of_scope_retains_type_with_non_perishable PASSED [ 53%]
+tests/test_google_taxonomy.py::test_pharma_exception_beats_health_beauty_default PASSED [ 60%]
+tests/test_google_taxonomy.py::test_health_beauty_default_is_cosmetics PASSED [ 66%]
+tests/test_google_taxonomy.py::test_unknown_top_level_is_uncategorized PASSED [ 73%]
+tests/test_google_taxonomy.py::test_bucket_for_resolves_path_from_id_when_path_absent PASSED [ 80%]
+tests/test_google_taxonomy.py::test_bucket_for_nothing_is_uncategorized PASSED [ 86%]
+tests/test_google_taxonomy.py::test_accept_thresholds_are_the_designed_constants PASSED [ 93%]
+tests/test_google_taxonomy.py::test_resolver_source_has_no_network_imports PASSED [100%]
+
+============================== 15 passed in 0.07s ==============================
+
+=== FULL SUITE: python -m pytest -q ===
+........................................................................ [ 16%]
+........................................................................ [ 32%]
+........................................................................ [ 48%]
+........................................................................ [ 64%]
+........................................................................ [ 80%]
+........................................................................ [ 97%]
+......FF.....                                                            [100%]
+=================================== FAILURES ===================================
+___ test_generated_codes_are_validated_and_bad_checksum_is_not_an_identifier ___
+
+isolated_db = (<sqlalchemy.orm.session.Session object at 0x773d1f8f6e10>, '01a0ca45-5ec9-78d3-971b-70ee632559d9', PosixPath('/tmp/pytest-of-andrei/pytest-0/test_generated_codes_are_valid0/storage'))
+
+    def test_generated_codes_are_validated_and_bad_checksum_is_not_an_identifier(isolated_db) -> None:  # type: ignore[no-untyped-def]
+        session, household_id, root = isolated_db
+        qr_value = "https://example.test/SG-013"
+        qr_image = qrcode.make(qr_value).convert("RGB")
+        qr = _evidence(session, household_id, root, _png(qr_image), "qr.png", "image/png")
+        ean_image, ean_value = _ean13_image("590123412345")
+        ean = _evidence(session, household_id, root, _png(ean_image), "ean.png", "image/png")
+        # Deliberately render a syntactically valid EAN with the wrong check digit.
+        bad_value = ean_value[:-1] + ("0" if ean_value[-1] != "0" else "1")
+        bad_image, _ = _ean13_image(ean_value[:-1], bad_value[-1])
+        bad = _evidence(session, household_id, root, _png(bad_image), "bad.png", "image/png")
+    
+        qr_rows = signals.extract_observations(qr.id, session)
+        ean_rows = signals.extract_observations(ean.id, session)
+        bad_rows = signals.extract_observations(bad.id, session)
+    
+        qr_values = [json.loads(row.value_json) for row in qr_rows if row.kind == "barcode_qr"]
+        ean_values = [json.loads(row.value_json) for row in ean_rows if row.kind == "barcode_qr"]
+        bad_values = [json.loads(row.value_json) for row in bad_rows if row.kind == "barcode_qr"]
+>       assert any(item.get("value") == qr_value and item["validated"] for item in qr_values)
+E       assert False
+E        +  where False = any(<generator object test_generated_codes_are_validated_and_bad_checksum_is_not_an_identifier.<locals>.<genexpr> at 0x773d1fbefae0>)
+
+tests/test_signals.py:136: AssertionError
+_________________ test_ocr_has_text_boxes_and_mean_confidence __________________
+
+isolated_db = (<sqlalchemy.orm.session.Session object at 0x773d1f06df40>, '01a0ca45-5f3e-7842-b821-1f00a74c0c3a', PosixPath('/tmp/pytest-of-andrei/pytest-0/test_ocr_has_text_boxes_and_me0/storage'))
+
+    def test_ocr_has_text_boxes_and_mean_confidence(isolated_db) -> None:  # type: ignore[no-untyped-def]
+        session, household_id, root = isolated_db
+        evidence = _evidence(session, household_id, root, _png(_text_image()), "text.png", "image/png")
+        rows = signals.extract_observations(evidence.id, session)
+        ocr = [json.loads(row.value_json) for row in rows if row.kind == "ocr"]
+>       assert ocr
+E       assert []
+
+tests/test_signals.py:148: AssertionError
+=============================== warnings summary ===============================
+../venv/lib/python3.12/site-packages/fastapi/testclient.py:1
+  /home/andrei/StorageGenie/venv/lib/python3.12/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+tests/test_candidates.py: 3 warnings
+tests/test_foundations.py: 3 warnings
+tests/test_saved_searches.py: 3 warnings
+tests/test_search.py: 3 warnings
+tests/test_sg048_name_optional.py: 6 warnings
+tests/test_signals.py: 3 warnings
+  /home/andrei/StorageGenie/venv/lib/python3.12/site-packages/alembic/config.py:604: DeprecationWarning: No path_separator found in configuration; falling back to legacy splitting on spaces, commas, and colons for prepend_sys_path.  Consider adding path_separator=os to Alembic config.
+    util.warn_deprecated(
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/test_signals.py::test_generated_codes_are_validated_and_bad_checksum_is_not_an_identifier
+FAILED tests/test_signals.py::test_ocr_has_text_boxes_and_mean_confidence - a...
+2 failed, 443 passed, 22 warnings in 19.61s
+
+=== RUFF: python -m ruff check . ===
+All checks passed!
+
+=== MYPY: python -m mypy app ===
+app/schemas/asset.py:53: error: Missing type arguments for generic type "dict"  [type-arg]
+app/schemas/asset.py:55: error: Missing type arguments for generic type "dict"  [type-arg]
+app/models/base.py:8: error: Unused "type: ignore" comment  [unused-ignore]
+app/services/audit_service.py:16: error: Missing type arguments for generic type "dict"  [type-arg]
+app/services/audit_service.py:17: error: Missing type arguments for generic type "dict"  [type-arg]
+app/services/asset_service.py:15: error: Missing type arguments for generic type "dict"  [type-arg]
+app/services/asset_service.py:37: error: Missing type arguments for generic type "dict"  [type-arg]
+app/services/asset_service.py:105: error: Missing type arguments for generic type "dict"  [type-arg]
+app/api/v1/review_tasks.py:17: error: Function is missing a return type annotation  [no-untyped-def]
+app/api/v1/review_tasks.py:21: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/review_tasks.py:22: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/review_tasks.py:62: error: Function is missing a return type annotation  [no-untyped-def]
+app/api/v1/review_tasks.py:66: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/review_tasks.py:67: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/households.py:18: error: Function is missing a return type annotation  [no-untyped-def]
+app/api/v1/households.py:20: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/households.py:22: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/households.py:58: error: Function is missing a return type annotation  [no-untyped-def]
+app/api/v1/households.py:59: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/households.py:60: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/evidence.py:19: error: Function is missing a return type annotation  [no-untyped-def]
+app/api/v1/evidence.py:20: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/evidence.py:22: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/evidence.py:24: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/assets.py:62: error: Function is missing a return type annotation  [no-untyped-def]
+app/api/v1/assets.py:65: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/assets.py:67: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/assets.py:92: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/assets.py:92: error: Missing type arguments for generic type "dict"  [type-arg]
+app/api/v1/assets.py:92: note: Error code "type-arg" not covered by "type: ignore[no-untyped-def]" comment
+app/api/v1/assets.py:231: error: Function is missing a return type annotation  [no-untyped-def]
+app/api/v1/assets.py:239: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/assets.py:240: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/assets.py:357: error: Function is missing a return type annotation  [no-untyped-def]
+app/api/v1/assets.py:361: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/assets.py:363: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/assets.py:413: error: Function is missing a return type annotation  [no-untyped-def]
+app/api/v1/assets.py:415: error: Missing type arguments for generic type "dict"  [type-arg]
+app/api/v1/assets.py:417: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/assets.py:418: error: Unused "type: ignore" comment  [unused-ignore]
+app/main.py:47: error: Unused "type: ignore" comment  [unused-ignore]
+app/main.py:53: error: Unused "type: ignore" comment  [unused-ignore]
+Found 41 errors in 9 files (checked 80 source files)
+
+=== G1 VENDOR VERIFICATION (three ways) ===
+$ head -n1 backend/app/data/google_taxonomy/2021-09-21.txt
+# Google_Product_Taxonomy_Version: 2021-09-21
+$ wc -c backend/app/data/google_taxonomy/2021-09-21.txt
+482896 backend/app/data/google_taxonomy/2021-09-21.txt
+$ wc -l backend/app/data/google_taxonomy/2021-09-21.txt
+5596 backend/app/data/google_taxonomy/2021-09-21.txt
+$ sha256sum backend/app/data/google_taxonomy/2021-09-21.txt
+30039729880ec5ac4851de088ad228a6898aa253f0de5d5ebea5bb1437478fce  backend/app/data/google_taxonomy/2021-09-21.txt
+
+=== SECRET GATE (identifiers api_key|OPENCODE_API_KEY|Bearer|token + key markers) ===
+$ rg -n -i 'api[_-]?key|OPENCODE_API_KEY|Bearer|private key|BEGIN .*PRIVATE' backend/app/services/google_taxonomy.py backend/tests/test_google_taxonomy.py backend/app/data/google_taxonomy/2021-09-21.txt
+secret gate rc=1 (1 = no matches)
+
+=== scratch-copy check: only one taxonomy file tracked/untracked on disk ===
+./backend/app/data/google_taxonomy/2021-09-21.txt
+
+=== POST-RUN (final): python -m pytest tests/test_google_taxonomy.py -v ===
+============================= test session starts ==============================
+platform linux -- Python 3.12.3, pytest-9.1.1, pluggy-1.6.0 -- /home/andrei/StorageGenie/backend/../venv/bin/python
+cachedir: .pytest_cache
+rootdir: /home/andrei/StorageGenie/backend
+configfile: pyproject.toml
+plugins: anyio-4.14.2, asyncio-1.4.0
+asyncio: mode=Mode.AUTO, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collecting ... collected 17 items
+
+tests/test_google_taxonomy.py::test_exact_path_resolves_with_id_and_version PASSED [  5%]
+tests/test_google_taxonomy.py::test_exact_match_is_whitespace_and_case_insensitive PASSED [ 11%]
+tests/test_google_taxonomy.py::test_below_threshold_is_unclear_never_mapped PASSED [ 17%]
+tests/test_google_taxonomy.py::test_unclear_still_stamps_taxonomy_version PASSED [ 23%]
+tests/test_google_taxonomy.py::test_none_proposal_is_uncategorized PASSED [ 29%]
+tests/test_google_taxonomy.py::test_blank_proposal_is_uncategorized PASSED [ 35%]
+tests/test_google_taxonomy.py::test_food_subtree_maps_to_food_bucket PASSED [ 41%]
+tests/test_google_taxonomy.py::test_out_of_scope_retains_type_with_non_perishable PASSED [ 47%]
+tests/test_google_taxonomy.py::test_pharma_exception_beats_health_beauty_default PASSED [ 52%]
+tests/test_google_taxonomy.py::test_health_beauty_default_is_cosmetics PASSED [ 58%]
+tests/test_google_taxonomy.py::test_unknown_top_level_is_uncategorized PASSED [ 64%]
+tests/test_google_taxonomy.py::test_bucket_for_resolves_path_from_id_when_path_absent PASSED [ 70%]
+tests/test_google_taxonomy.py::test_bucket_for_nothing_is_uncategorized PASSED [ 76%]
+tests/test_google_taxonomy.py::test_accept_thresholds_are_the_designed_constants PASSED [ 82%]
+tests/test_google_taxonomy.py::test_resolver_source_has_no_network_imports PASSED [ 88%]
+tests/test_google_taxonomy.py::test_accept_gate_is_load_bearing PASSED   [ 94%]
+tests/test_google_taxonomy.py::test_pharma_prefix_is_load_bearing PASSED [100%]
+
+============================== 17 passed in 0.12s ==============================
+
+=== BASE-RED STASH PROOF (module + tests + data stashed; clean origin/automation tree) ===
+$ git stash push -u -m 'SG-093 baseline proof'
+$ ../venv/bin/python -m pytest -q tests/test_signals.py::test_generated_codes_are_validated_and_bad_checksum_is_not_an_identifier tests/test_signals.py::test_ocr_has_text_boxes_and_mean_confidence
+FF                                                                       [100%]
+=================================== FAILURES ===================================
+___ test_generated_codes_are_validated_and_bad_checksum_is_not_an_identifier ___
+
+isolated_db = (<sqlalchemy.orm.session.Session object at 0x723470319940>, '01a0ca46-0a5a-7f01-908e-2b502a4cc44d', PosixPath('/tmp/pytest-of-andrei/pytest-2/test_generated_codes_are_valid0/storage'))
+
+    def test_generated_codes_are_validated_and_bad_checksum_is_not_an_identifier(isolated_db) -> None:  # type: ignore[no-untyped-def]
+        session, household_id, root = isolated_db
+        qr_value = "https://example.test/SG-013"
+        qr_image = qrcode.make(qr_value).convert("RGB")
+        qr = _evidence(session, household_id, root, _png(qr_image), "qr.png", "image/png")
+        ean_image, ean_value = _ean13_image("590123412345")
+        ean = _evidence(session, household_id, root, _png(ean_image), "ean.png", "image/png")
+        # Deliberately render a syntactically valid EAN with the wrong check digit.
+        bad_value = ean_value[:-1] + ("0" if ean_value[-1] != "0" else "1")
+        bad_image, _ = _ean13_image(ean_value[:-1], bad_value[-1])
+        bad = _evidence(session, household_id, root, _png(bad_image), "bad.png", "image/png")
+    
+        qr_rows = signals.extract_observations(qr.id, session)
+        ean_rows = signals.extract_observations(ean.id, session)
+        bad_rows = signals.extract_observations(bad.id, session)
+    
+        qr_values = [json.loads(row.value_json) for row in qr_rows if row.kind == "barcode_qr"]
+        ean_values = [json.loads(row.value_json) for row in ean_rows if row.kind == "barcode_qr"]
+        bad_values = [json.loads(row.value_json) for row in bad_rows if row.kind == "barcode_qr"]
+>       assert any(item.get("value") == qr_value and item["validated"] for item in qr_values)
+E       assert False
+E        +  where False = any(<generator object test_generated_codes_are_validated_and_bad_checksum_is_not_an_identifier.<locals>.<genexpr> at 0x72347009be60>)
+
+tests/test_signals.py:136: AssertionError
+------------------------------ Captured log call -------------------------------
+WARNING  app.services.signals:signals.py:104 Barcode extraction unavailable: pyzbar/libzbar is not installed
+WARNING  app.services.signals:signals.py:210 OCR extraction unavailable: pytesseract is not installed
+WARNING  app.services.signals:signals.py:104 Barcode extraction unavailable: pyzbar/libzbar is not installed
+WARNING  app.services.signals:signals.py:210 OCR extraction unavailable: pytesseract is not installed
+WARNING  app.services.signals:signals.py:104 Barcode extraction unavailable: pyzbar/libzbar is not installed
+WARNING  app.services.signals:signals.py:210 OCR extraction unavailable: pytesseract is not installed
+_________________ test_ocr_has_text_boxes_and_mean_confidence __________________
+
+isolated_db = (<sqlalchemy.orm.session.Session object at 0x7234701b14c0>, '01a0ca46-0ac6-7af2-82e6-be8096be826f', PosixPath('/tmp/pytest-of-andrei/pytest-2/test_ocr_has_text_boxes_and_me0/storage'))
+
+    def test_ocr_has_text_boxes_and_mean_confidence(isolated_db) -> None:  # type: ignore[no-untyped-def]
+        session, household_id, root = isolated_db
+        evidence = _evidence(session, household_id, root, _png(_text_image()), "text.png", "image/png")
+        rows = signals.extract_observations(evidence.id, session)
+        ocr = [json.loads(row.value_json) for row in rows if row.kind == "ocr"]
+>       assert ocr
+E       assert []
+
+tests/test_signals.py:148: AssertionError
+------------------------------ Captured log call -------------------------------
+WARNING  app.services.signals:signals.py:104 Barcode extraction unavailable: pyzbar/libzbar is not installed
+WARNING  app.services.signals:signals.py:210 OCR extraction unavailable: pytesseract is not installed
+=========================== short test summary info ============================
+FAILED tests/test_signals.py::test_generated_codes_are_validated_and_bad_checksum_is_not_an_identifier
+FAILED tests/test_signals.py::test_ocr_has_text_boxes_and_mean_confidence - a...
+2 failed in 0.53s
+$ git stash pop   # worktree restored
+
+=== MYPY DELTA PROOF ===
+$ python -m mypy app   # with new module: error count
+41
+$ mv app/services/google_taxonomy.py aside; python -m mypy app   # baseline: error count
+41
+$ diff <(grep error: with) <(grep error: baseline)  -> identical (0 new errors; google_taxonomy.py has none)
+
+=== FULL SUITE (final): python -m pytest -q ===
+........................................................................ [ 16%]
+........................................................................ [ 32%]
+........................................................................ [ 48%]
+........................................................................ [ 64%]
+........................................................................ [ 80%]
+........................................................................ [ 96%]
+........FF.....                                                          [100%]
+=================================== FAILURES ===================================
+___ test_generated_codes_are_validated_and_bad_checksum_is_not_an_identifier ___
+
+isolated_db = (<sqlalchemy.orm.session.Session object at 0x7df7a43f3dd0>, '01a0ca46-638d-71d2-ab0f-5b01f00260af', PosixPath('/tmp/pytest-of-andrei/pytest-3/test_generated_codes_are_valid0/storage'))
+
+    def test_generated_codes_are_validated_and_bad_checksum_is_not_an_identifier(isolated_db) -> None:  # type: ignore[no-untyped-def]
+        session, household_id, root = isolated_db
+        qr_value = "https://example.test/SG-013"
+        qr_image = qrcode.make(qr_value).convert("RGB")
+        qr = _evidence(session, household_id, root, _png(qr_image), "qr.png", "image/png")
+        ean_image, ean_value = _ean13_image("590123412345")
+        ean = _evidence(session, household_id, root, _png(ean_image), "ean.png", "image/png")
+        # Deliberately render a syntactically valid EAN with the wrong check digit.
+        bad_value = ean_value[:-1] + ("0" if ean_value[-1] != "0" else "1")
+        bad_image, _ = _ean13_image(ean_value[:-1], bad_value[-1])
+        bad = _evidence(session, household_id, root, _png(bad_image), "bad.png", "image/png")
+    
+        qr_rows = signals.extract_observations(qr.id, session)
+        ean_rows = signals.extract_observations(ean.id, session)
+        bad_rows = signals.extract_observations(bad.id, session)
+    
+        qr_values = [json.loads(row.value_json) for row in qr_rows if row.kind == "barcode_qr"]
+        ean_values = [json.loads(row.value_json) for row in ean_rows if row.kind == "barcode_qr"]
+        bad_values = [json.loads(row.value_json) for row in bad_rows if row.kind == "barcode_qr"]
+>       assert any(item.get("value") == qr_value and item["validated"] for item in qr_values)
+E       assert False
+E        +  where False = any(<generator object test_generated_codes_are_validated_and_bad_checksum_is_not_an_identifier.<locals>.<genexpr> at 0x7df7a7614740>)
+
+tests/test_signals.py:136: AssertionError
+_________________ test_ocr_has_text_boxes_and_mean_confidence __________________
+
+isolated_db = (<sqlalchemy.orm.session.Session object at 0x7df7a4254bc0>, '01a0ca46-6401-7030-8916-61b96dabac0b', PosixPath('/tmp/pytest-of-andrei/pytest-3/test_ocr_has_text_boxes_and_me0/storage'))
+
+    def test_ocr_has_text_boxes_and_mean_confidence(isolated_db) -> None:  # type: ignore[no-untyped-def]
+        session, household_id, root = isolated_db
+        evidence = _evidence(session, household_id, root, _png(_text_image()), "text.png", "image/png")
+        rows = signals.extract_observations(evidence.id, session)
+        ocr = [json.loads(row.value_json) for row in rows if row.kind == "ocr"]
+>       assert ocr
+E       assert []
+
+tests/test_signals.py:148: AssertionError
+=============================== warnings summary ===============================
+../venv/lib/python3.12/site-packages/fastapi/testclient.py:1
+  /home/andrei/StorageGenie/venv/lib/python3.12/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+tests/test_candidates.py: 3 warnings
+tests/test_foundations.py: 3 warnings
+tests/test_saved_searches.py: 3 warnings
+tests/test_search.py: 3 warnings
+tests/test_sg048_name_optional.py: 6 warnings
+tests/test_signals.py: 3 warnings
+  /home/andrei/StorageGenie/venv/lib/python3.12/site-packages/alembic/config.py:604: DeprecationWarning: No path_separator found in configuration; falling back to legacy splitting on spaces, commas, and colons for prepend_sys_path.  Consider adding path_separator=os to Alembic config.
+    util.warn_deprecated(
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/test_signals.py::test_generated_codes_are_validated_and_bad_checksum_is_not_an_identifier
+FAILED tests/test_signals.py::test_ocr_has_text_boxes_and_mean_confidence - a...
+2 failed, 445 passed, 22 warnings in 19.94s
