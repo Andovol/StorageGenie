@@ -2,7 +2,7 @@
 
 **Branch:** `automation` · **Remote:** `git@github.com:Andovol/StorageGenie.git` · **Work dir:** `/home/andrei/StorageGenie`
 **BASE REF (packet ref `origin/automation`):** resolved `1d06c340bf119efd070456ad68cc0c3f964b4c8d` (start HEAD == `origin/automation`; the packet requested the ref, it resolved here — two fields, not one)
-**WORK_HEAD:** `<WORK_HEAD>` (the code/test/fixture commit; the receipt note rides this hash; the report + pasted `show` ride the docs-only receipt commit after it)
+**WORK_HEAD:** `897894d0d96da13702ec776acc8c0a9cfda15d09` (the code/test/fixture commit; the receipt note rides this hash; the report + pasted `show` ride the docs-only receipt commit after it)
 **Contract:** recorded `0.30.0` == published `0.30.0`; source path `/home/andrei/storagegenie-contract/VERSION` (contract repo HEAD `c9c9ba3` = "Contract payload 0.30.0"). `.rules-cache/` is absent from this worktree (gitignored; SG-080 precedent) — the source read is the contract repo path. **Echo verbatim: `0.30.0`.**
 **Model / effort (`CO-78`):** model `deepseek-v4.1-flash` (provider `opencode-go`; from provider metadata `/home/andrei/.local/state/opencode/model.json` `recent[0] = {"providerID":"opencode-go","modelID":"deepseek-v4.1-flash"}` — **not** a system-prompt identity line; argv carries no `--model`) · effort `high` (process argv `/proc/1713787/cmdline`: `opencode run --auto --dir /home/andrei/StorageGenie --variant high # SG-081 …`).
 **Spend (real $):** `$0.000000` actual. OFF is free and unauthenticated; no key, no header, no metered resource exists (`PG-IC-04` stated as not firing).
@@ -123,7 +123,14 @@ No acceptance criterion passed vacuously. The G1–G2 tests genuinely fail with 
 Work pushed to `automation`; worktree clean (`CO-55`). No push to `storagegenie-evidence`, no `{{RECEIPT_CMD}}`. Note added on `WORK_HEAD`, pushed, then fetched into a MAPPED local ref and shown — output pasted verbatim below.
 
 ```
-<RECEIPT_PASTE>
+$ git notes --ref=refs/notes/storagegenie-coder-reports add -m "Dispatch-ID: SG-081 | Report: docs/worklogs/SG-081_report.md | Work-HEAD: 897894d0d96da13702ec776acc8c0a9cfda15d09" 897894d0d96da13702ec776acc8c0a9cfda15d09
+(note added; exit 0)
+$ git push origin refs/notes/storagegenie-coder-reports
+   5f563df..c26f4dd  refs/notes/storagegenie-coder-reports -> refs/notes/storagegenie-coder-reports
+$ git fetch origin refs/notes/storagegenie-coder-reports:refs/notes/sg081-coder-reports-verify
+ok fetched (1 new refs)
+$ git notes --ref=refs/notes/sg081-coder-reports-verify show 897894d0d96da13702ec776acc8c0a9cfda15d09
+Dispatch-ID: SG-081 | Report: docs/worklogs/SG-081_report.md | Work-HEAD: 897894d0d96da13702ec776acc8c0a9cfda15d09
 ```
 
 Final line: `note=yes`
