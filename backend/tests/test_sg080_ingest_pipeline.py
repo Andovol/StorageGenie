@@ -1,21 +1,21 @@
-"""SG-080 photo-ingest pipeline on v3 (offline, scripted provider only — $0).
+"""SG-080 photo-ingest pipeline on the live prompts (offline, scripted provider — $0).
 
 Proves the properties this slice adds, measured through the REAL pipeline and
 the ONE named injection seam (`app.services.providers.reader.provider_registry`),
-with a scripted schema-valid provider and committed v3 prompts. No key, no SDK,
-no network, no metered call:
+with a scripted schema-valid provider and the committed v4 prompts (SG-095
+flipped the reader from v3). No key, no SDK, no network, no metered call:
 
-- G1: the live reader loads v3 for all three categories at runtime; the ledger
-  row written across the real boundary carries the v3 template version.
+- G1: the live reader loads v4 for all three categories at runtime; the ledger
+  row written across the real boundary carries the v4 template version.
 - G2: every verbatim `transcript` is persisted as its own `Evidence` row, linked
   to the job's `evidence_ids`, readable through the existing evidence API, and
   NEVER present in any assertion `value_json`.
 - G3: `category_proposed` is a visible, gated proposal (never auto-accepted at
   any confidence); every other v3 field crosses byte-equal into `ai_items` and
   is explicitly deferred from accept-writable promotion.
-- G4: split-first on v3 multi-item output with per-item quantity; consent gate
+- G4: split-first on multi-item output with per-item quantity; consent gate
   and monthly-ledger refusal both fire BEFORE any provider call; the outgoing
-  request shape (v3 prompt + redacted PNG bytes) is asserted, not mocked away.
+  request shape (v4 prompt + redacted PNG bytes) is asserted, not mocked away.
 """
 
 from __future__ import annotations
@@ -205,22 +205,22 @@ TRANSCRIPT = "DairyGold Semi-skimmed Milk 1 L Best before 2031-03-15"
 # --------------------------------------------------------------------------- #
 # G1 — live reader loads v3
 # --------------------------------------------------------------------------- #
-def test_reader_loads_v3_for_all_categories_at_runtime() -> None:
+def test_reader_loads_v4_for_all_categories_at_runtime() -> None:
     assert reader.PROMPT_FILES == {
-        "food": "extract-food-v3.md",
-        "medicine": "extract-medicine-v3.md",
-        "cosmetics": "extract-cosmetics-v3.md",
+        "food": "extract-food-v4.md",
+        "medicine": "extract-medicine-v4.md",
+        "cosmetics": "extract-cosmetics-v4.md",
     }
     for category in CATEGORIES:
         text, version = reader.load_prompt(category)
-        assert version == f"extract-{category}-v3"
-        # The loaded text is the REAL v3 content, not a copy: it names the new
+        assert version == f"extract-{category}-v4"
+        # The loaded text is the REAL v4 content, not a copy: it names the new
         # evidence-only transcript and the proposed category.
         assert "transcript" in text, category
         assert "category_proposed" in text, category
 
 
-def test_pipeline_ledger_rows_carry_v3_template_version(sg080_env, monkeypatch: pytest.MonkeyPatch) -> None:  # type: ignore[no-untyped-def]
+def test_pipeline_ledger_rows_carry_v4_template_version(sg080_env, monkeypatch: pytest.MonkeyPatch) -> None:  # type: ignore[no-untyped-def]
     session, household_id, evidence_id, network = sg080_env
     provider = _enable(monkeypatch, _payload([_v3_item(transcript=TRANSCRIPT)]))
     job = _run(session, household_id, evidence_id)
@@ -228,10 +228,10 @@ def test_pipeline_ledger_rows_carry_v3_template_version(sg080_env, monkeypatch: 
     assert job.state == "AWAITING_REVIEW"
     rows = session.query(ProviderCall).filter_by(job_id=job.id).all()
     assert len(rows) == 1
-    assert rows[0].prompt_template_version == "extract-food-v3"
+    assert rows[0].prompt_template_version == "extract-food-v4"
     # PG-EV-04: the exact bytes + prompt handed to the seam, not a mock.
     prompt_text, prompt_version = reader.load_prompt("food")
-    assert prompt_version == "extract-food-v3"
+    assert prompt_version == "extract-food-v4"
     assert provider.prompts == [prompt_text]
     assert provider.images[0][:8] == b"\x89PNG\r\n\x1a\n"
     assert dict(Image.open(io.BytesIO(provider.images[0])).getexif()) == {}
@@ -590,7 +590,7 @@ def test_monthly_ledger_refuses_before_any_call(sg080_env, monkeypatch: pytest.M
     assert "monthly" in error["error"]
 
 
-def test_v3_request_wire_shape_carries_prompt_and_json_object_flag(sg080_env, monkeypatch: pytest.MonkeyPatch) -> None:  # type: ignore[no-untyped-def]
+def test_v4_request_wire_shape_carries_prompt_and_json_object_flag(sg080_env, monkeypatch: pytest.MonkeyPatch) -> None:  # type: ignore[no-untyped-def]
     """PG-EV-04: the shape of what would have been sent, not the mock."""
     from app.services.providers.opencode_go import build_chat_payload
 
@@ -599,7 +599,7 @@ def test_v3_request_wire_shape_carries_prompt_and_json_object_flag(sg080_env, mo
     _run(session, household_id, evidence_id)
 
     prompt, version = reader.load_prompt("food")
-    assert version == "extract-food-v3"
+    assert version == "extract-food-v4"
     wire = build_chat_payload("deepseek-v4-flash-vision-exp", prompt, "AAAA")
     assert wire["response_format"] == {"type": "json_object"}
     assert wire["stream"] is False

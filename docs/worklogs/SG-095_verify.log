@@ -1,0 +1,289 @@
+=== SG-095 verify log (raw command outputs; fail-then-pass BOTH runs; every gate) ===
+
+=== LIVE CLOCK ===
+$ date -u +%Y-%m-%dT%H:%M:%SZ
+2026-09-22T18:35:39Z
+
+=== BASE / ORIGIN ===
+$ git rev-parse HEAD
+2700876ff69de33ded3ee87493d9e70863905220
+$ git rev-parse origin/automation
+2700876ff69de33ded3ee87493d9e70863905220
+$ git branch --show-current
+automation
+$ git remote -v
+origin	git@github.com:Andovol/StorageGenie.git (fetch)
+origin	git@github.com:Andovol/StorageGenie.git (push)
+
+=== CONTRACT ECHO (live) ===
+$ cat /home/andrei/storagegenie-contract/VERSION
+0.30.0
+$ cat /home/andrei/storagegenie-contract/RULES.sha256
+18de7fd7b3546bd7624b3a7b59a78bd629752816cd7fa8f1af6113d1bafc8d46 RULES.md
+$ git -C /home/andrei/storagegenie-contract rev-parse HEAD
+c9c9ba3ee3715d102b55c740f4f2107344e7de3a
+$ sed -n '3p' /home/andrei/storagegenie-contract/CODER.md
+**Contract version: 0.30.0** — **echo this line verbatim in your receipt.** It is the only proof that you
+
+=== G1 FAILPRE — pin updated to v4 expectation, reader STILL v3 ===
+$ git stash push -- backend/app/services/providers/reader.py
+$ ../venv/bin/python -m pytest -q tests/test_sg079_v3_schema.py::test_live_prompt_map_points_at_v4
+F                                                                        [100%]
+    def test_live_prompt_map_points_at_v4() -> None:
+>       assert reader.PROMPT_FILES == {
+            "food": "extract-food-v4.md",
+            "medicine": "extract-medicine-v4.md",
+            "cosmetics": "extract-cosmetics-v4.md",
+        }
+E       AssertionError: assert {'food': 'ext...metics-v3.md'} == {'food': 'ext...metics-v4.md'}
+E         Differing items:
+E         {'cosmetics': 'extract-cosmetics-v3.md'} != {'cosmetics': 'extract-cosmetics-v4.md'}
+E         {'food': 'extract-food-v3.md'} != {'food': 'extract-food-v4.md'}
+E         {'medicine': 'extract-medicine-v3.md'} != {'medicine': 'extract-medicine-v4.md'}
+tests/test_sg079_v3_schema.py:196: AssertionError
+1 failed in 0.35s
+$ git stash pop
+
+=== G1 PASSPOST — same pin after the reader flip ===
+$ ../venv/bin/python -m pytest -q tests/test_sg079_v3_schema.py::test_live_prompt_map_points_at_v4
+1 passed in 0.30s
+
+=== G1 ENUMERATION — full-tree v1/v2/v3 pin grep ===
+$ rg -n 'extract-.*-v[0-9]|PROMPT_FILES|prompt_template_version.*v[0-9]|template_version.*v[0-9]|version == .*v[0-9]' backend/
+backend/app/services/planning/service.py:204:        prompt_template_version="planning-v1",
+backend/app/services/planning/service.py:238:        prompt_template_version="planning-v1",
+backend/app/services/planning/service.py:460:                "prompt_template_version": "planning-v1",
+backend/app/services/providers/reader.py:54:PROMPT_FILES = {
+backend/app/services/providers/reader.py:55:    "food": "extract-food-v4.md",
+backend/app/services/providers/reader.py:56:    "medicine": "extract-medicine-v4.md",
+backend/app/services/providers/reader.py:57:    "cosmetics": "extract-cosmetics-v4.md",
+backend/app/services/providers/prompts/extract-food-v4.md:2:template_version: extract-food-v4
+backend/app/services/providers/prompts/extract-food-v1.md:2:template_version: extract-food-v1
+backend/app/services/providers/prompts/extract-food-v2.md:2:template_version: extract-food-v2
+backend/app/services/providers/prompts/extract-food-v3.md:2:template_version: extract-food-v3
+backend/app/services/providers/prompts/extract-medicine-v1.md:2:template_version: extract-medicine-v1
+backend/app/services/providers/prompts/extract-medicine-v2.md:2:template_version: extract-medicine-v2
+backend/app/services/providers/prompts/extract-medicine-v3.md:2:template_version: extract-medicine-v3
+backend/app/services/providers/prompts/extract-medicine-v4.md:2:template_version: extract-medicine-v4
+backend/app/services/providers/prompts/extract-cosmetics-v1.md:2:template_version: extract-cosmetics-v1
+backend/app/services/providers/prompts/extract-cosmetics-v2.md:2:template_version: extract-cosmetics-v2
+backend/app/services/providers/prompts/extract-cosmetics-v3.md:2:template_version: extract-cosmetics-v3
+backend/app/services/providers/prompts/extract-cosmetics-v4.md:2:template_version: extract-cosmetics-v4
+backend/app/services/providers/prompts/analytics-insights-v1.md:2:template_version: analytics-insights-v1
+backend/app/services/providers/prompts/planning-v1.md:2:template_version: planning-v1
+backend/app/services/providers/prompts/chat-v1.md:2:template_version: chat-v1
+backend/tests/test_chat.py:336:    assert call.prompt_template_version == "chat-v1"
+backend/tests/test_chat.py:478:    assert version == "chat-v1"
+backend/tests/test_chat.py:616:    assert version == "chat-v1"
+backend/tests/test_analytics.py:347:    assert call.prompt_template_version == "analytics-insights-v1"
+backend/tests/test_analytics.py:493:    assert version == "analytics-insights-v1"
+backend/tests/test_planning.py:270:    assert call.prompt_template_version == "planning-v1"
+backend/tests/test_planning.py:608:    assert version == "planning-v1"
+backend/tests/test_phase3_e2e.py:645:    assert call.prompt_template_version == "planning-v1"
+backend/tests/test_provider_gateway.py:103:        prompt_template_version="fake-prompt-v1",
+backend/tests/test_provider_gateway.py:117:    assert read_back.prompt_template_version == "fake-prompt-v1"
+# --- live-map pins FLIPPED v3->v4 (this flip invalidates them) ---
+backend/tests/test_extraction_contract.py:303:    assert version == "extract-cosmetics-v4"
+backend/tests/test_phase2_e2e.py:254:        assert food_expiry["prompt_template_version"] == "extract-food-v4"
+backend/tests/test_phase2_e2e.py:279:        assert medicine_expiry["prompt_template_version"] == "extract-medicine-v4"
+backend/tests/test_ai_pipeline.py:207:    assert envelope["prompt_template_version"] == "extract-food-v4"
+backend/tests/test_ai_pipeline.py:505:    assert row.prompt_template_version == "extract-food-v4"
+backend/tests/test_ai_pipeline.py:518:    assert prompt_version == "extract-food-v4"
+backend/tests/test_sg049_v2_extraction.py:137:    assert version == f"extract-{category}-v4"
+backend/tests/test_sg079_v3_schema.py:196:    assert reader.PROMPT_FILES == {  # -> v4 (test renamed test_live_prompt_map_points_at_v4)
+backend/tests/test_sg079_v3_schema.py:197:        "food": "extract-food-v4.md",
+backend/tests/test_sg079_v3_schema.py:198:        "medicine": "extract-medicine-v4.md",
+backend/tests/test_sg079_v3_schema.py:199:        "cosmetics": "extract-cosmetics-v4.md",
+backend/tests/test_sg079_v3_schema.py:203:        assert version == f"extract-{category}-v4"
+backend/tests/test_sg080_ingest_pipeline.py:209:    assert reader.PROMPT_FILES == {  # -> v4 (test renamed test_reader_loads_v4...)
+backend/tests/test_sg080_ingest_pipeline.py:210:        "food": "extract-food-v4.md",
+backend/tests/test_sg080_ingest_pipeline.py:211:        "medicine": "extract-medicine-v4.md",
+backend/tests/test_sg080_ingest_pipeline.py:212:        "cosmetics": "extract-cosmetics-v4.md",
+backend/tests/test_sg080_ingest_pipeline.py:216:        assert version == f"extract-{category}-v4"
+backend/tests/test_sg080_ingest_pipeline.py:231:    assert rows[0].prompt_template_version == "extract-food-v4"
+backend/tests/test_sg080_ingest_pipeline.py:234:    assert prompt_version == "extract-food-v4"
+backend/tests/test_sg080_ingest_pipeline.py:602:    assert version == "extract-food-v4"
+# --- injected-version self-consistency pairs KEPT (not the live map) ---
+backend/tests/test_sg049_v2_extraction.py:204:                "prompt_template_version": "extract-food-v2",   # injected scripted analyzing dict
+backend/tests/test_sg049_v2_extraction.py:213:            assert envelope["prompt_template_version"] == "extract-food-v2"  # its self-consistency assertion
+backend/tests/test_review_split.py:82:        "prompt_template_version": "extract-food-v1" if provider else None,  # seeded proposal literal
+backend/tests/test_review_split.py:130:        "prompt_template_version": "extract-food-v1",  # seeded proposal literal
+backend/tests/test_review_split.py:275:        assert child_proposal["prompt_template_version"] == "extract-food-v1"  # split provenance round-trip
+backend/tests/test_sg080_ingest_pipeline.py:373:            "prompt_template_version": "extract-food-v3",  # hand-built analyzing dict (not the live map)
+backend/tests/test_sg080_ingest_pipeline.py:569:            prompt_template_version="extract-food-v3",  # seeded ProviderCall row for the monthly-cap test
+# --- frozen-file pins KEPT (v1/v2/v3 files remain on disk as rollback) ---
+backend/tests/test_extraction_contract.py:389:    for name in ("extract-food-v1", "extract-medicine-v1", "extract-cosmetics-v1"):
+backend/tests/test_sg049_v2_extraction.py:49:V1_PROMPTS = ("extract-food-v1.md", "extract-medicine-v1.md", "extract-cosmetics-v1.md")
+backend/tests/test_sg079_v3_schema.py:47:V1_PROMPTS = ("extract-food-v1.md", "extract-medicine-v1.md", "extract-cosmetics-v1.md")
+backend/tests/test_sg079_v3_schema.py:170:    path = PROMPTS_DIR / f"extract-{category}-v3.md"
+backend/tests/test_sg079_v3_schema.py:175:    assert f"template_version: extract-{category}-v3" in header
+backend/tests/test_google_taxonomy.py:235:    monkeypatch.setitem(reader.PROMPT_FILES, category, f"extract-{category}-v3.md")
+
+# Injected pair exists and is kept: test_sg049_v2_extraction.py (v2) and
+# test_review_split.py (v1) are injected/seed literals plus their own
+# self-consistency assertions -- provenance plumbing, not the live PROMPT_FILES
+# map, so the flip does not invalidate them.
+
+=== G1 PROMPTS/DATA — v1/v2/v3 prompt files + vendored data byte-untouched ===
+$ git diff --stat -- 'backend/app/services/providers/prompts/*-v1.md' 'backend/app/services/providers/prompts/*-v2.md' 'backend/app/services/providers/prompts/*-v3.md' 'backend/app/data/google_taxonomy/2021-09-21.txt'
+(empty)
+exit=0
+
+=== G4 FAILPRE — source changes stashed, new SG-095 tests re-run (must fail) ===
+$ git stash push -- backend/app/services/candidates.py backend/app/services/providers/reader.py
+$ ../venv/bin/python -m pytest -q tests/test_google_taxonomy.py
+........................FFFF                                             [100%]
+_______ test_live_reader_serves_v4_for_all_categories_at_runtime _______
+E       AssertionError: assert {'food': 'ext...metics-v3.md'} == {'food': 'ext...metics-v4.md'}
+tests/test_google_taxonomy.py:391: AssertionError
+_______ test_resolved_item_carries_triple_gated_through_route_and_commit _______
+>       for field_name in candidates.GOOGLE_TYPE_FIELDS:
+E       AttributeError: module 'app.services.candidates' has no attribute 'GOOGLE_TYPE_FIELDS'
+tests/test_google_taxonomy.py:412: AttributeError
+_______ test_unclear_item_surfaces_alternatives_and_maps_nothing ___________
+>       resolution = proposal["google_type_resolution"]
+E       KeyError: 'google_type_resolution'
+tests/test_google_taxonomy.py:462: KeyError
+_______ test_multi_item_split_promotes_each_items_own_triple _____________
+>       assert proposal["ai_items"][0]["google_type_resolution"]["google_type_id"] == "414"
+E       KeyError: 'google_type_resolution'
+tests/test_google_taxonomy.py:509: KeyError
+FAILED tests/test_google_taxonomy.py::test_live_reader_serves_v4_for_all_categories_at_runtime
+FAILED tests/test_google_taxonomy.py::test_resolved_item_carries_triple_gated_through_route_and_commit
+FAILED tests/test_google_taxonomy.py::test_unclear_item_surfaces_alternatives_and_maps_nothing
+FAILED tests/test_google_taxonomy.py::test_multi_item_split_promotes_each_items_own_triple
+4 failed, 24 passed, 1 warning in 0.99s
+$ git stash pop
+
+=== G4 PASSPOST — same file after the implementation ===
+$ ../venv/bin/python -m pytest tests/test_google_taxonomy.py -q
+28 passed, 1 warning in 1.18s
+
+=== G4 AFFECTED FILES — flipped pins + T2/T3 tests ===
+$ ../venv/bin/python -m pytest tests/test_google_taxonomy.py tests/test_sg079_v3_schema.py \
+    tests/test_sg080_ingest_pipeline.py tests/test_ai_pipeline.py tests/test_phase2_e2e.py \
+    tests/test_extraction_contract.py tests/test_sg049_v2_extraction.py tests/test_review_split.py \
+    tests/test_candidates.py tests/test_candidate_read.py -q
+170 passed, 4 warnings in 7.26s
+
+=== FULL SUITE (post) ===
+$ timeout 600 ../venv/bin/python -m pytest -q
+2 failed, 456 passed, 22 warnings in 19.54s
+FAILED tests/test_signals.py::test_generated_codes_are_validated_and_bad_checksum_is_not_an_identifier
+FAILED tests/test_signals.py::test_ocr_has_text_boxes_and_mean_confidence - a...
+
+=== BASE REDS STASH-PROOF — same two on bare BASE (all changes stashed) ===
+$ git stash push -u
+$ ../venv/bin/python -m pytest tests/test_signals.py::test_generated_codes_are_validated_and_bad_checksum_is_not_an_identifier \
+    tests/test_signals.py::test_ocr_has_text_boxes_and_mean_confidence -q
+WARNING  app.services.signals:signals.py:104 Barcode extraction unavailable: pyzbar/libzbar is not installed
+WARNING  app.services.signals:signals.py:210 OCR extraction unavailable: pytesseract is not installed
+FAILED tests/test_signals.py::test_generated_codes_are_validated_and_bad_checksum_is_not_an_identifier
+FAILED tests/test_signals.py::test_ocr_has_text_boxes_and_mean_confidence - a...
+2 failed in 0.69s
+$ git stash pop
+# The two reds are pre-existing environment reds (pyzbar/pytesseract absent), not this slice.
+
+=== RUFF / MYPY (post) ===
+$ ../venv/bin/python -m ruff check .
+All checks passed!                       # ruff_exit=0
+$ ../venv/bin/python -m mypy app
+Found 41 errors in 9 files (checked 80 source files)   # mypy_exit=1
+
+=== RUFF / MYPY (bare BASE, all changes stashed) ===
+$ git stash push -u
+$ ../venv/bin/python -m mypy app
+Found 41 errors in 9 files (checked 80 source files)   # base_mypy_exit=1
+$ ../venv/bin/python -m ruff check .
+All checks passed!                       # base_ruff_exit=0
+$ git stash pop
+# mypy delta = 0 (41/9 == 41/9); ruff clean both sides.
+
+=== SECRET GATE (SG-037 precedent) ===
+$ git diff > /tmp/opencode/sg095.diff ; wc -l
+758 /tmp/opencode/sg095.diff
+$ rg -n 'api_key|OPENCODE_API_KEY|Bearer|token|secret|password' /tmp/opencode/sg095.diff
+id_exit=1                                 # 0 matches
+$ rg -n 'sk-[A-Za-z0-9]{16,}|eyJ[A-Za-z0-9_-]{20,}|AKIA[0-9A-Z]{16}|ghp_[A-Za-z0-9]{20,}' /tmp/opencode/sg095.diff
+tight_exit=1                              # 0 real-looking key values
+
+=== PG-SC-11 END-RELATIVE GREP over touched test files ===
+$ rg -n 'HEAD~|HEAD\^|\[-1\]|\.last\b|last\(|newest|latest|tail\(|reversed\(' \
+    backend/tests/test_ai_pipeline.py backend/tests/test_extraction_contract.py \
+    backend/tests/test_google_taxonomy.py backend/tests/test_phase2_e2e.py \
+    backend/tests/test_sg049_v2_extraction.py backend/tests/test_sg079_v3_schema.py \
+    backend/tests/test_sg080_ingest_pipeline.py
+grep_exit=1                               # 0 hits
+
+=== G3 RUNTIME-VISIBILITY — in-tree loader proof (from the repo root) ===
+$ PYTHONPATH=backend venv/bin/python -c "... load real resolver + reader ..."
+vendored rows: 5595 version: 2021-09-21
+resolved: resolved 414 2021-09-21
+food -> extract-food-v4 block: True
+medicine -> extract-medicine-v4 block: True
+cosmetics -> extract-cosmetics-v4 block: True
+PROMPT_FILES: {'food': 'extract-food-v4.md', 'medicine': 'extract-medicine-v4.md', 'cosmetics': 'extract-cosmetics-v4.md'}
+
+=== G3 MECHANISM (1): backend/Dockerfile:17 `COPY backend/ ./` ===
+$ rg -n 'COPY backend/' backend/Dockerfile
+17:COPY backend/ ./
+# The stage copies the WHOLE backend/ tree into /app (data + prompts included),
+# then `pip install -e .` (line 19) points the package at that copied source.
+
+=== G3 MECHANISM (2): .dockerignore `data` + `backend/data` vs backend/app/data ===
+$ rg -n 'data' .dockerignore
+19:data
+20:backend/data
+# Docker docs (docs.docker.com/build/building/context): "Leading and trailing
+# slashes in ignore patterns are disregarded"; matching uses Go filepath.Match;
+# a pattern with no slash matches only that name at the CONTEXT ROOT (the docs'
+# `temp?` row: "in the root directory"). So `data` == root /data only, and
+# `backend/data` == /backend/data only. Neither matches /backend/app/data.
+# No `**/data` or `app/data` pattern exists. -> the vendored taxonomy survives.
+
+=== G3 MECHANISM (3): backend/pyproject.toml:48 hatch `packages = ["app"]` ===
+$ rg -n 'packages = ' backend/pyproject.toml
+48:packages = ["app"]
+$ ../backend/venv/bin/hatchling build -t wheel -d /tmp/opencode/sg095wheel
+/tmp/opencode/sg095wheel/storagegenie_backend-0.1.0-py3-none-any.whl   (218.9K)
+$ unzip -l ...whl | rg 'google_taxonomy|extract-.*-v4'
+   482896  app/data/google_taxonomy/2021-09-21.txt
+     7463  app/services/google_taxonomy.py
+     5418  app/services/providers/prompts/extract-cosmetics-v4.md
+     5336  app/services/providers/prompts/extract-food-v4.md
+     5399  app/services/providers/prompts/extract-medicine-v4.md
+# Non-.py data files DO ride the wheel; the taxonomy + v4 prompts are present.
+# The IN-IMAGE byte proof (built image) is explicitly T4's (SG-083 precedent).
+
+=== G2 NO-MIGRATION PROOF ===
+$ rg -n 'google_type|taxonomy_version' backend/alembic/ backend/app/models/
+exit=1                                    # 0 references: no column, no migration
+$ rg -n 'proposed_fields_json|value_json' backend/app/services/candidates.py backend/app/models/assertion.py
+candidates.py:465:    proposed_fields_json: Mapped[str] = mapped_column(Text, nullable=False)
+assertion.py:16:    value_json: Mapped[str] = mapped_column(Text, nullable=False)
+# The triple persists inside the existing `candidate.proposed_fields_json` (Text)
+# and, once committed, `assertion.value_json` (Text). Existing storage; no schema
+# change, no alembic revision, no DB write of a new shape.
+
+=== DIFFSTAT (work diff) ===
+$ git diff --stat
+ backend/app/services/candidates.py          | 113 ++++++++++-
+ backend/app/services/providers/reader.py    |  10 +-
+ backend/tests/test_ai_pipeline.py           |   6 +-
+ backend/tests/test_extraction_contract.py   |   2 +-
+ backend/tests/test_google_taxonomy.py       | 298 +++++++++++++++++++++++++++-
+ backend/tests/test_phase2_e2e.py            |   4 +-
+ backend/tests/test_sg049_v2_extraction.py   |   6 +-
+ backend/tests/test_sg079_v3_schema.py       |  18 +-
+ backend/tests/test_sg080_ingest_pipeline.py |  36 ++--
+ 9 files changed, 448 insertions(+), 45 deletions(-)
+
+=== COLLISION REPAIR (suite-green binds) ===
+$ ../venv/bin/python -m pytest tests/test_privacy_audit.py::test_g0_redact_call_sites_are_reader_and_direct_adapter -q
+E       AssertionError: unexpected redact_image call sites: ['services/providers/opencode_go.py:299', 'services/providers/reader.py:403']
+# Root cause: the SG-095 reader comment added a 3rd line, shifting the redact_image
+# call from reader.py:402 to :403 (the audit pins absolute line numbers).
+# Minimal repair: keep the comment at its original 2-line count (no out-of-ceiling
+# edit to test_privacy_audit.py). Re-run:
+$ ../venv/bin/python -m pytest tests/test_privacy_audit.py::test_g0_redact_call_sites_are_reader_and_direct_adapter -q
+1 passed

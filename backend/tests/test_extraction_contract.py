@@ -300,7 +300,7 @@ def test_unknowns_may_name_opened_date() -> None:
 
 def test_load_prompt_cosmetics_versioned_and_unknown_category_raises() -> None:
     text, version = load_prompt("cosmetics")
-    assert version == "extract-cosmetics-v3"
+    assert version == "extract-cosmetics-v4"
     assert "never infer beyond visible evidence" in text
     assert "opened_date" in text
     with pytest.raises(ValueError):

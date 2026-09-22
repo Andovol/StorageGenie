@@ -20,6 +20,7 @@ from app.services import audit_service
 from app.services.enrich import scoring as enrich_scoring
 from app.services.enrich.jina import SOURCE_NAME as JINA_SOURCE_NAME
 from app.services.enrich.jina import EnrichDecisionRecord
+from app.services.google_taxonomy import RESOLVED, bucket_for, resolve_google_type
 from app.services.observations import Observation
 from app.services.providers.schemas import ExtractionOutput
 
@@ -75,6 +76,11 @@ GATED_FIELDS = frozenset(
         # SG-080 G3: the extraction-proposed category is always a proposal,
         # never threshold-auto-accepted at any confidence.
         "category_proposed",
+        # SG-095: the resolved Google-taxonomy kind rides beside the category as
+        # gated proposals (spec S2/D111); never threshold-auto-accepted.
+        "google_type_id",
+        "google_type_path",
+        "taxonomy_version",
     }
 )
 ALLOWED_CANDIDATE_FIELDS = frozenset(
@@ -93,8 +99,18 @@ ALLOWED_CANDIDATE_FIELDS = frozenset(
         # SG-080 G3: category_proposed is the ONE promoted v3 field, whitelisted
         # so the gated proposal can reach the committed assertion.
         "category_proposed",
+        # SG-095: the Google-taxonomy triple, promoted so the gated kind reaches
+        # the committed assertion; the triple is stored together, nullable together.
+        "google_type_id",
+        "google_type_path",
+        "taxonomy_version",
     }
 )
+
+# SG-095: the version-stamped Google kind triple. When the resolver returns
+# `resolved` all three ride together; `unclear`/`uncategorized` produce none
+# (the alternatives stay on `google_type_resolution` for the reviewer).
+GOOGLE_TYPE_FIELDS = ("google_type_id", "google_type_path", "taxonomy_version")
 
 
 def _field_parts(raw: object) -> tuple[object, dict[str, object] | None]:
@@ -160,6 +176,67 @@ def _review_state_for(field_path: str, confidence: float | None) -> str:
     if confidence is not None and confidence < settings.sg_confidence_threshold:
         return "proposed"
     return "accepted"
+
+
+# --------------------------------------------------------------------------- #
+# SG-095 — Google-taxonomy resolution (one item's free-text path -> triple)
+# --------------------------------------------------------------------------- #
+def _google_type_resolution(item: object) -> dict[str, object]:
+    """Resolve one item's proposal into the version-stamped Google kind (SG-095).
+
+    A pure resolver call (offline, deterministic, no threshold of its own). When
+    the status is `resolved` the triple is stored together; `unclear` keeps the
+    resolver's top-k `alternatives` for the reviewer and maps none of them. The
+    `bucket` is the map's SUGGESTION only -- the six expiry buckets remain the
+    behaviour authority (D111).
+    """
+    resolution = resolve_google_type(getattr(item, "google_type_proposed", None))
+    return {
+        "status": resolution.status,
+        "google_type_id": resolution.google_type_id,
+        "google_type_path": resolution.google_type_path,
+        "taxonomy_version": resolution.taxonomy_version,
+        "score": resolution.score,
+        "margin": resolution.margin,
+        "alternatives": [list(pair) for pair in resolution.alternatives],
+        "bucket": bucket_for(resolution.google_type_id, resolution.google_type_path),
+    }
+
+
+def _apply_google_type_fields(
+    fields: dict[str, object],
+    item: object,
+    *,
+    provider: object,
+    model: object,
+    template_version: object,
+    provider_call_id: object,
+) -> dict[str, object]:
+    """Add the resolved triple to `fields` (all three, or none) and return the resolution."""
+    resolution = _google_type_resolution(item)
+    if resolution["status"] == RESOLVED:
+        for field_name in GOOGLE_TYPE_FIELDS:
+            _extraction_value_field(
+                fields,
+                field_name,
+                resolution[field_name],
+                item=item,
+                provider=provider,
+                model=model,
+                template_version=template_version,
+                provider_call_id=provider_call_id,
+            )
+    return resolution
+
+
+def _ai_items_with_resolution(extraction: ExtractionOutput) -> list[dict[str, object]]:
+    """Each item's own dump plus its resolution, so a split child keeps its own triple."""
+    items: list[dict[str, object]] = []
+    for extracted in extraction.items:
+        dumped = extracted.model_dump()
+        dumped["google_type_resolution"] = _google_type_resolution(extracted)
+        items.append(dumped)
+    return items
 
 
 # --------------------------------------------------------------------------- #
@@ -507,6 +584,7 @@ def build_candidate_from_extraction(
     identifier = _barcode_identifier(db, evidence_ids)
     if identifier is not None:
         fields["identifier"] = _provenance(identifier, source_type="deterministic")
+    primary_resolution: dict[str, object] | None = None
     if extraction.items:
         item = extraction.items[0]
         fields["display_name"] = _provenance(
@@ -566,6 +644,20 @@ def build_candidate_from_extraction(
                 template_version=version,
                 provider_call_id=primary_call,
             )
+        # SG-095: the primary item's Google path resolves to the version-stamped
+        # triple, which rides as gated fields (all three, or none at all).
+        primary_resolution = _apply_google_type_fields(
+            fields,
+            item,
+            provider=provider,
+            model=model,
+            template_version=version,
+            provider_call_id=primary_call,
+        )
+
+    # SG-095: every item's own resolution travels with it, so a split child can
+    # promote its own triple without inheriting the primary's.
+    ai_items = _ai_items_with_resolution(extraction)
 
     proposal: dict[str, object] = {
         "kind": "new_asset",
@@ -573,7 +665,8 @@ def build_candidate_from_extraction(
         "fields": fields,
         "dedup_matches": [],
         "review_task_ids": [],
-        "ai_items": [item.model_dump() for item in extraction.items],
+        "google_type_resolution": primary_resolution,
+        "ai_items": ai_items,
         "ai_unknowns": list(extraction.unknowns),
         "needs_evidence": extraction.needs_evidence,
         "ai_provider": provider,
@@ -857,6 +950,9 @@ def _split_child_fields(
         "unit",
         "asset_type",
         "category_proposed",
+        "google_type_id",
+        "google_type_path",
+        "taxonomy_version",
     }
     fields: dict[str, object] = {
         key: raw for key, raw in origin_fields.items() if key not in item_derived
@@ -890,6 +986,21 @@ def _split_child_fields(
                 template_version=version,
                 provider_call_id=provider_call_id,
             )
+    # SG-095: promote THIS item's own resolved Google triple, never the origin's.
+    resolution = item.get("google_type_resolution")
+    if isinstance(resolution, dict) and resolution.get("status") == RESOLVED:
+        for field_name in GOOGLE_TYPE_FIELDS:
+            value = resolution.get(field_name)
+            if value is not None:
+                fields[field_name] = _provenance(
+                    value,
+                    source_type="extraction",
+                    confidence=confidence,
+                    provider=provider,
+                    model=model,
+                    template_version=version,
+                    provider_call_id=provider_call_id,
+                )
     return fields
 
 

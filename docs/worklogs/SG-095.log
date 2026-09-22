@@ -1,0 +1,30 @@
+SG-095 — Taxonomy T3: reader flip to v4 + triple wiring + gated candidates
+Coder: opencode · effort: high (--variant high, from own argv) · MODEL: unknown (CLI default, no --model on argv)
+Spend: real $0.000000 (fully offline: no download, no provider call, no key read)
+
+BASE ref origin/automation -> resolved 2700876ff69de33ded3ee87493d9e70863905220
+Work dir /home/andrei/StorageGenie · origin git@github.com:Andovol/StorageGenie.git
+
+18:26  Recon: read spec S1-S5, plan Task 3, reader.py, candidates.py, google_taxonomy.py,
+       test_google_taxonomy.py, sg080 precedent test/verify, Dockerfile/.dockerignore/pyproject.
+       Verified premises: reader.py:54 v3 for all three; candidates fields via proposed_fields_json;
+       route GET /v1/candidates/{id}; no google_type column anywhere.
+18:28  G1: reader PROMPT_FILES v3->v4 (2-line comment kept, line-count preserved).
+18:29  Enumerated v1/v2/v3 pins tree-wide; flipped the live-map ones (5 test files + 2 T2/T3
+       test files); kept the injected-version self-consistency pairs (v2 in test_sg049, v1 in
+       test_review_split, v3 injected/seeded literals in test_sg080).
+18:30  G2: candidates.py — GOOGLE_TYPE_FIELDS + GATED/ALLOWED entries; _google_type_resolution,
+       _apply_google_type_fields, _ai_items_with_resolution; primary triple -> gated fields;
+       per-item resolution on ai_items; split promotes each item's own triple.
+18:32  G4: extended test_google_taxonomy.py (+4 T3 tests, local sg095_env fixture); updated the
+       T2 v4-prompt test to load the v3 baseline explicitly (live loader is now v4).
+18:33  ruff C901 on build_candidate_from_extraction (12>10) -> extracted two helpers; ruff clean.
+18:34  FAILPRE: source stashed -> 4 failed, 24 passed. PASSPOST: 28 passed. Reader pin fail/pass pair.
+18:35  Full suite 2 failed, 456 passed (2 known decoder env reds, stash-proved on bare BASE).
+       ruff clean; mypy 41/9 == bare-BASE 41/9 (delta 0). Secret gate 0. PG-SC-11 grep 0.
+18:36  G3: in-tree loader proof green (5595 rows, v4 all three); wheel built (hatch packages=["app"])
+       contains app/data/google_taxonomy/2021-09-21.txt + v4 prompts; .dockerignore `data`/`backend/data`
+       do not match backend/app/data (filepath.Match, bare pattern = context root only).
+18:37  Collision repair: privacy-audit test pins reader.py:402 for redact_image; kept reader.py
+       comment at 2 lines so the call stays at :402 (disclosed; no out-of-ceiling edit).
+18:38  Wrote worklogs, committed work, pushed automation, added + pushed + verified the notes-ref note.

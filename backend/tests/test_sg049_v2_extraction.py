@@ -132,11 +132,11 @@ def test_v2_unknowns_rule_holds_for_new_field_paths() -> None:
 # G2 — prompts v2 + outgoing shape (PG-EV-04)
 # --------------------------------------------------------------------------- #
 @pytest.mark.parametrize("category", ["food", "medicine", "cosmetics"])
-def test_configured_prompts_are_v3_and_ask_for_new_fields(category: str) -> None:
+def test_configured_prompts_are_v4_and_ask_for_new_fields(category: str) -> None:
     text, version = reader.load_prompt(category)
-    assert version == f"extract-{category}-v3"
+    assert version == f"extract-{category}-v4"
     for field in NEW_FIELDS:
-        assert field in text, f"{category} v2 prompt never names {field}"
+        assert field in text, f"{category} v4 prompt never names {field}"
     assert "never infer beyond visible evidence" in text
 
 

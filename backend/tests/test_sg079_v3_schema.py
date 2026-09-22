@@ -8,8 +8,8 @@ and the committed corpus files (no key, no network, no metered call — $0):
   `unknowns` entry, reject blank string fields / blank list entries, and still
   never parse prose.
 - G2: the three frozen v3 prompt files exist with the exact envelope front
-  matter and name every new field; the live `PROMPT_FILES` map points at v3
-  (SG-080 flipped the reader from v2); v1/v2 files remain on disk. The
+  matter and name every new field; the live `PROMPT_FILES` map points at v4
+  (SG-095 flipped the reader from v3); v1/v2/v3 files remain on disk. The
   sgo79 fixtures score through the real schema module and a wrong transcription
   scores below perfect (non-vacuous).
 """
@@ -190,17 +190,17 @@ def test_v1_and_v2_prompt_files_still_ship() -> None:
             assert (PROMPTS_DIR / f"extract-{category}-{version}.md").is_file()
 
 
-def test_live_prompt_map_points_at_v3() -> None:
-    # SG-080 flipped the live reader to v3: this is the freshness pin whose
-    # failure under the old v2 map proved the flip (PG-SC-09 inverse).
+def test_live_prompt_map_points_at_v4() -> None:
+    # SG-095 flipped the live reader to v4: this is the freshness pin whose
+    # failure under the old v3 map proved the flip (PG-SC-09 inverse).
     assert reader.PROMPT_FILES == {
-        "food": "extract-food-v3.md",
-        "medicine": "extract-medicine-v3.md",
-        "cosmetics": "extract-cosmetics-v3.md",
+        "food": "extract-food-v4.md",
+        "medicine": "extract-medicine-v4.md",
+        "cosmetics": "extract-cosmetics-v4.md",
     }
     for category in CATEGORIES:
         _text, version = reader.load_prompt(category)
-        assert version == f"extract-{category}-v3"
+        assert version == f"extract-{category}-v4"
 
 
 # --------------------------------------------------------------------------- #

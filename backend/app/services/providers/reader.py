@@ -49,12 +49,12 @@ from app.services.signals import SUPPORTED_IMAGE_TYPES
 from app.storage.local_store import storage_path
 
 PROMPTS_DIR = Path(__file__).resolve().parent / "prompts"
-# SG-080: the live reader loads the frozen v3 prompts (SG-079). v1/v2 files
-# remain on disk, byte-untouched, as the rollback reference and prior-slice pins.
+# SG-095: the live reader loads the frozen v4 prompts (SG-094 flip precedent).
+# v1/v2/v3 files remain on disk, byte-untouched, as the rollback reference.
 PROMPT_FILES = {
-    "food": "extract-food-v3.md",
-    "medicine": "extract-medicine-v3.md",
-    "cosmetics": "extract-cosmetics-v3.md",
+    "food": "extract-food-v4.md",
+    "medicine": "extract-medicine-v4.md",
+    "cosmetics": "extract-cosmetics-v4.md",
 }
 RETRYABLE_ERRORS = frozenset(
     {"outage", "timeout", "rate_limited", "transport", "http_status", "invalid_json"}
