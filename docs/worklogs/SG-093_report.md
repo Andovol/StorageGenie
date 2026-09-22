@@ -3,8 +3,8 @@
 **Dispatch-ID:** SG-093 · **Coder:** opencode · **effort:** high · **model:** unknown (CLI default, no `--model` in argv)
 **Work dir:** `/home/andrei/StorageGenie` · **origin remote:** `git@github.com:Andovol/StorageGenie.git`
 **BASE** (`origin/automation` resolved at start): `dbe0c21624db56b83d8c5c545fc75d9d41278d14`
-**WORK_HEAD:** this pre-note docs commit (the literal hash and the Receipt paste are appended by the
-follow-up docs-only commit, per the SG-091/SG-092 convention).
+**WORK_HEAD:** `9a7a0d47a7777b57d849c0c1f8b907afd1905d24` (the pre-note work commit carrying this report;
+the Receipt paste is this later docs-only commit).
 **Spend:** REAL metered **$0.000000** (one free, unmetered taxonomy download GET; zero provider calls).
 
 **Role guard:** Coder, never Architect. No dispatch verb was run for any ID; no unit was started or
@@ -118,7 +118,39 @@ The note is added on the WORK_HEAD, pushed to `refs/notes/storagegenie-coder-rep
 a mapped local ref and shown verbatim. The raw commands and the pasted `show` output are appended by this
 follow-up docs-only commit.
 
-`RECEIPT-PASTE-PLACEHOLDER`
+WORK_HEAD (pre-note work commit) = `9a7a0d47a7777b57d849c0c1f8b907afd1905d24`.
+
+Commands executed (raw):
+
+```
+$ git notes --ref=refs/notes/storagegenie-coder-reports show 9a7a0d47a7777b57d849c0c1f8b907afd1905d24
+error: no note found for object 9a7a0d47a7777b57d849c0c1f8b907afd1905d24.
+existing_exit=1
+$ git notes --ref=refs/notes/storagegenie-coder-reports add -m "Dispatch-ID: SG-093 | Report: docs/worklogs/SG-093_report.md | Work-HEAD: 9a7a0d47a7777b57d849c0c1f8b907afd1905d24" 9a7a0d47a7777b57d849c0c1f8b907afd1905d24
+add_exit=0
+$ git push origin refs/notes/storagegenie-coder-reports
+To github.com:Andovol/StorageGenie.git
+   18737bb..65c29c8  refs/notes/storagegenie-coder-reports -> refs/notes/storagegenie-coder-reports
+push_notes_exit=0
+$ git fetch origin refs/notes/storagegenie-coder-reports:refs/notes/storagegenie-coder-reports-sg093-verify
+From github.com:Andovol/StorageGenie
+ * [new ref]         refs/notes/storagegenie-coder-reports -> refs/notes/storagegenie-coder-reports-sg093-verify
+fetch_exit=0
+$ git rev-parse refs/notes/storagegenie-coder-reports-sg093-verify
+65c29c8e40f7db1397e1572f38107666fe0f3f5e
+$ git notes --ref=refs/notes/storagegenie-coder-reports-sg093-verify show 9a7a0d47a7777b57d849c0c1f8b907afd1905d24
+```
+
+Pasted `show` output (verbatim, from the FETCHED mapped ref
+`refs/notes/storagegenie-coder-reports-sg093-verify` = `65c29c8e40f7db1397e1572f38107666fe0f3f5e`):
+
+```
+Dispatch-ID: SG-093 | Report: docs/worklogs/SG-093_report.md | Work-HEAD: 9a7a0d47a7777b57d849c0c1f8b907afd1905d24
+```
+
+No existing note was found before adding (`existing_exit=1`), so this was not an existing-note refusal.
+The final tip (this docs-only paste commit) is dual-annotated with the same note body so the engine's
+`note_anchor=END_HEAD` readback resolves (SG-092 note-anchor inoculation precedent).
 
 note=yes
 
