@@ -1,8 +1,8 @@
-# SG-081 — Enrich OFF fetch service: v2 search + deterministic scoring + snapshots (opencode, medium)
+# SG-081 — Enrich OFF fetch service: v2 search + deterministic scoring + snapshots (opencode, high)
 
 **Dispatch params for the runner (read from this committed packet; model is the CLI default and is omitted per policy):**
 coder: opencode
-effort: medium
+effort: high
 
 **Context and standing lines.** D108-approved Enrich slice 1 (research `docs/research/2026-09-21-enrich-source-research.md` — the D102 gate; spec §7; plan `docs/superpowers/plans/2026-09-21-ai-ingestion-enrichment.md` Enrich tasks). Scope is OFF ONLY: v2 search + deterministic scoring + snapshots. Jina is SG-082 (do not read the Jina key, do not call it); Vision Web Detection is DEFERRED and never touched (D108 — second cloud provider declined for this deployment by D83). No review mapping, no pipeline wiring, no LLM synthesis in this slice (SG-082 owns them). **Authoring date (metadata, never a gate):** 2026-09-21. Transport: the standard job_spawn lane. Contract: recorded `0.29.1` == published (`454589c`; D119 adoption from `0.28.2`/`b495b59`); echo verbatim + source path.
 **Role guard (owner standard line):** you are the Coder, never the Architect — **never run the dispatch verb for any ID, never start or poll your own unit**. If you believe a dispatch is needed, STOP and report it.
