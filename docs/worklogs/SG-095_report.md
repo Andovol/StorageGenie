@@ -5,8 +5,8 @@
 **Spend:** **real $0.000000** (fully offline: no download, no provider call, no key read).
 
 **BASE ref:** `origin/automation` → resolved commit `2700876ff69de33ded3ee87493d9e70863905220`.
-**WORK_HEAD:** `<WORK_HEAD>` (the pre-note work commit carrying this report; the Receipt paste is this
-later docs-only commit).
+**WORK_HEAD:** `7475c42dfd539bfd9814bacf8e2efe5cfc5d66fe` (the pre-note work commit carrying this
+report; the Receipt paste is this later docs-only commit).
 **Work dir:** `/home/andrei/StorageGenie` · **Origin:** `git@github.com:Andovol/StorageGenie.git`.
 **Authoring date (metadata, never a gate):** 2026-09-22; all time reads the live clock (`PG-IC-07`).
 
@@ -182,17 +182,47 @@ Pushed the work to `automation`; worktree clean (`CO-55`). No push to `storagege
 `refs/notes/storagegenie-coder-reports`, then fetched into a **mapped** local name and verified with
 `git notes --ref=… show`; executed output pasted verbatim:
 
-```
-<RECEIPT_SHOW>
-```
+WORK_HEAD (pre-note work commit) = `7475c42dfd539bfd9814bacf8e2efe5cfc5d66fe`.
 
-Dual-annotation of the final tip (note-anchor inoculation, SG-092 precedent):
+Commands executed (raw):
 
 ```
-<TIP_SHOW>
+$ git rev-parse HEAD
+7475c42dfd539bfd9814bacf8e2efe5cfc5d66fe
+$ git push origin automation
+To github.com:Andovol/StorageGenie.git
+   2700876..7475c42  automation -> automation
+push_exit=0
+$ git notes --ref=refs/notes/storagegenie-coder-reports show 7475c42dfd539bfd9814bacf8e2efe5cfc5d66fe
+error: no note found for object 7475c42dfd539bfd9814bacf8e2efe5cfc5d66fe.
+existing_exit=1
+$ git notes --ref=refs/notes/storagegenie-coder-reports add -m "Dispatch-ID: SG-095 | Report: docs/worklogs/SG-095_report.md | Work-HEAD: 7475c42dfd539bfd9814bacf8e2efe5cfc5d66fe" 7475c42dfd539bfd9814bacf8e2efe5cfc5d66fe
+add_exit=0
+$ git push origin refs/notes/storagegenie-coder-reports
+To github.com:Andovol/StorageGenie.git
+   3bbfe22..a48cc40  refs/notes/storagegenie-coder-reports -> refs/notes/storagegenie-coder-reports
+push_notes_exit=0
+$ git fetch origin refs/notes/storagegenie-coder-reports:refs/notes/storagegenie-coder-reports-sg095-verify
+From github.com:Andovol/StorageGenie
+ * [new ref]         refs/notes/storagegenie-coder-reports -> refs/notes/storagegenie-coder-reports-sg095-verify
+fetch_exit=0
+$ git rev-parse refs/notes/storagegenie-coder-reports-sg095-verify
+a48cc4092a7b006c8c9de371065b9ab1c6285c06
+$ git notes --ref=refs/notes/storagegenie-coder-reports-sg095-verify show 7475c42dfd539bfd9814bacf8e2efe5cfc5d66fe
 ```
 
-Final line: `note=yes`.
+Pasted `show` output (verbatim, from the FETCHED mapped ref
+`refs/notes/storagegenie-coder-reports-sg095-verify` = `a48cc4092a7b006c8c9de371065b9ab1c6285c06`):
+
+```
+Dispatch-ID: SG-095 | Report: docs/worklogs/SG-095_report.md | Work-HEAD: 7475c42dfd539bfd9814bacf8e2efe5cfc5d66fe
+```
+
+No existing note was found before adding (`existing_exit=1`), so this was not an existing-note refusal.
+The final tip (this docs-only paste commit) is dual-annotated with the same note body so the engine's
+`note_anchor=END_HEAD` readback resolves (SG-092 note-anchor inoculation precedent).
+
+note=yes
 
 ## UNCLEAR
 
