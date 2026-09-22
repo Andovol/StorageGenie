@@ -1,7 +1,7 @@
 # StorageGenie — project configuration
 
 > **Canonical for this repo. `CLAUDE.md` is a one-line adapter `@AGENTS.md` — edit here, never there.**
-> Rule-set version this project records: **0.28.2** (D82 adoption 2026-09-17: tag `contract-v0.28.2` checkout `b495b59`; delta = `CODER.md` echo 0.28.2 + stop-rule hardening (never probe a privilege by doing it) + report-timing receipt rule, `PACKET.md` test-set-hit-is-a-FILE + `PG-SC-12` proof-must-run-against-the-real-thing, `PRODUCTION.md` `PG-PR-01` non-mutating enumeration only, `VPS.md` host re-measured 2026-09-17 (nginx 1 MB default body cap unless site sets `client_max_body_size`, certbot cron entry inert — timer does renewal, OpenCode CLI 1.18.31, DNS-lag note), `dispatch/dispatch` ISS-42 receipt path fix, `lang/python.md` migration ownership follows project `AGENTS.md`; 0.28.0–0.28.1 folded into this tag; installed global rules file `a66aa431…` = payload `RULES.sha256` at both 0.27.0 and 0.28.2 — not forked, was clean; supersedes `0.27.0`).
+> Rule-set version this project records: **0.29.1** (D119 adoption 2026-09-22: tags `contract-v0.29.0` checkout `549864c` + `contract-v0.29.1` checkout `454589c` oldest-first; delta = 0.29.0 partial-receipt on kill + 900s idle kill + effort-per-Coder + debug-run-no-packet + `G-T4` never-watcher + `G-A7` design-table, 0.29.1 stop-reads-partial + STAGE-names-idle/manual; installed `18de7fd7…` = payload `RULES.sha256` at 0.29.0 and 0.29.1 — clean, was behind; supersedes `0.28.2`).
 
 ## Configuration table — the single source of every project value
 
