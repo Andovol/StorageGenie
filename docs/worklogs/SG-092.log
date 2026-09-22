@@ -1,0 +1,49 @@
+SG-092 worklog — lane proof: opencode/high full-loop (read-only), Coder-side.
+
+ROLE: Coder (never Architect). No dispatch verb run for any ID; no unit started or polled by me.
+LANE: this slice WAS dispatched to me on the standard job_spawn lane; I am the launched Coder.
+
+MODEL + EFFORT (from process arguments / provider banner, per packet):
+- own argv (read from /proc/<ppid>/cmdline; ppid is the opencode CLI process):
+  opencode run --auto --dir /home/andrei/StorageGenie --variant high <packet text on argv>
+  => effort = high (the `--variant high` token). No `--model` token in argv => model is the CLI default.
+- launcher artifact output/dispatch/SG-092.launcher.sh:
+  exec opencode run --auto --dir /home/andrei/StorageGenie --variant high "$(cat "$PROMPT_FILE")"
+- CLI startup banner output/dispatch/SG-092.log: `> build · deepseek-v4.1-flash`
+  (engine audit field will read model=cli-default; reported as banner not as a --model flag).
+- effort_source: NOT named in the coder log. run-coder emits `effort_source=<src>` only in its AUDIT
+  block at run END (after this Coder exits), so it is not yet readable for SG-092. Packet head has
+  `effort: high`, so the engine value will be `packet` (prior SG-081.dbg evidence shows the same engine
+  emitting `effort=high effort_source=packet`). Stated as expectation, not as read.
+
+CONTRACT ECHO + SOURCE PATH (drift found — reported loudly, not bent):
+- Packet-recorded (source docs/packets/SG-092-lane-proof.md:7):
+  "Contract: recorded `0.29.1` == published (`454589c`; D119 adoption); echo verbatim + source path."
+- Live contract line verbatim (source /home/andrei/storagegenie-contract/CODER.md:1):
+  "**Contract version: 0.29.2** — **echo this line verbatim in your receipt.** It is the only proof that you"
+- FINDING: live == 0.29.2, packet premise == 0.29.1. contract repo HEAD 6fb544a "Contract payload 0.29.2";
+  0.29.1 == 454589c (ancestor). Journal of THIS unit: `contract_sync=refresh version=0.29.2`.
+  Diff 0.29.1->0.29.2 = AUDIT.md, CLOSE.md, CODER.md, RATIONALE.md, VERSION (editorial: retired-ID
+  tombstones moved to RATIONALE.md, CO-97/CO-98 reworded). RULES.sha256 UNCHANGED (18de7fd7...).
+  Receipt format (CO-97) is not functionally changed. Not a lane blocker; a bookkeeping mismatch.
+
+SPEND: REAL metered $0.000000 (zero provider calls made by me; read-only local commands only).
+
+ELAPSED-VS-BUDGET PER LEG (budget 60s ordinary / 300s overall; uncalibrated G-A9):
+- G1 host tree + packet presence: ~20 s vs 60 s ordinary.
+- G2 disk + docker + own-launch argv + residue: ~70 s vs 60 s ordinary (find over RUN_DIR/evidence, one
+  contract read; no command killed).
+- Contract-drift probe: ~20 s vs 60 s ordinary.
+- G3 verdict + G4 write/commit/note/verify: ~90 s vs 60 s ordinary.
+- OVERALL: ~200 s vs 300 s overall (within).
+- No command hit its timeout; nothing killed; no interactive command run.
+
+READ-ONLY HONORED: no builds, no container actions (only `docker info`, read-only), no migrations, no
+provider calls. Writes only to docs/worklogs (scope ceiling, 3 files) + git metadata (commit/notes push).
+
+UNCLEAR (FIRST READ): whether the SG-081 `--force` re-fire should run under the packet's recorded 0.29.1
+  or the host's live 0.29.2, since the packet echo and the project's recorded version are now stale.
+UNCLEAR (DURING EXECUTION): the engine's `effort_source`/`model` AUDIT row for SG-092 is written only
+  after this Coder exits, so those two fields are expectations here, not reads.
+UNCLEAR (REMAINING): whether the two 0.29.2 hits (CODER.md receipt-echo line and CLOSE.md state-file
+  bytes) change what a valid SG-081 receipt must echo.

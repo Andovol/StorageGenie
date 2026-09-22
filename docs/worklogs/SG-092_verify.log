@@ -1,0 +1,152 @@
+SG-092_verify.log — raw command outputs (read-only), captured 2026-09-22 ~13:27 UTC.
+
+## G1 — tree, HEAD vs origin, packets, log
+$ git status --porcelain --untracked-files=all
+(empty — no output)
+
+$ git rev-parse HEAD
+08e7082a90c2a876931efd5d9fcb36f1c8a38791
+$ git rev-parse origin/automation
+08e7082a90c2a876931efd5d9fcb36f1c8a38791
+$ git branch --show-current
+automation
+$ git remote -v
+origin	git@github.com:Andovol/StorageGenie.git (fetch)
+origin	git@github.com:Andovol/StorageGenie.git (push)
+
+$ git log --oneline -3
+08e7082 Close 2026-09-22: session record (D119-D124, SG-081 diagnosis, desk 53-54, lane test queued)
+a5286fd D124: SG-092 lane-proof packet (opencode/high, read-only, 0.29.1)
+f4cb868 D120: SG-081 effort high + opencode default high (lane refuses medium)
+
+$ ls -la docs/packets/SG-092-lane-proof.md docs/packets/SG-081-off-fetch.md
+664  docs/packets/SG-081-off-fetch.md  12.2K
+664  docs/packets/SG-092-lane-proof.md  9.2K
+
+SG-092 packet selection lines (grep -nE '^(coder|effort):|Contract: recorded|BASE REF'):
+4:coder: opencode
+5:effort: high
+7:...Contract: recorded `0.29.1` == published (`454589c`; D119 adoption); echo verbatim + source path.
+36:**BASE REF: `origin/automation`.**
+
+SG-081 packet selection lines (grep -nE '^(coder|effort):|Contract: recorded'):
+4:coder: opencode
+5:effort: high
+7:...Contract: recorded `0.29.1` == published (`454589c`; D119 adoption from `0.28.2`/`b495b59`); echo verbatim + source path.
+
+## G2 — disk, docker, own-launch argv, residue
+$ df -h /home/andrei/StorageGenie
+Filesystem      Size  Used Avail Use% Mounted on
+/dev/vda1       232G  111G  121G  48% /home/andrei/StorageGenie
+$ df -h /tmp
+Filesystem      Size  Used Avail Use% Mounted on
+/dev/vda1       232G  111G  121G  48% /tmp
+
+$ timeout 20 docker info --format '{{.ServerVersion}} containers={{.Containers}} images={{.Images}}'
+29.6.2 containers=2 images=2
+exit=0
+
+$ ps -eo pid,ppid,etimes,args | grep -E 'opencode|dispatch'   (SG-092 lines only)
+1489072     1      13 bash /usr/local/lib/dispatch/run-coder SG-092
+1489114 1489072      11 bash /usr/local/lib/dispatch/run-coder SG-092
+(parent chain up to /proc/<ppid>/cmdline:)
+opencode run --auto --dir /home/andrei/StorageGenie --variant high <packet text>
+
+$ cat output/dispatch/SG-092.launcher.sh
+#!/usr/bin/env bash
+set -euo pipefail
+cd /home/andrei/StorageGenie
+PROMPT_FILE=docs/packets/SG-092-lane-proof.md
+exec opencode run --auto --dir /home/andrei/StorageGenie --variant high "$(cat "$PROMPT_FILE")"
+
+$ head output/dispatch/SG-092.log
+> build · deepseek-v4.1-flash
+
+$ journalctl -u dispatch-storagegenie@SG-092 -q --no-pager -n 200
+Sep 22 13:26:56 ubuntu run-coder[1489072]: contract_sync=refresh version=0.29.2
+(no refusal line; no `run_coder=fail`)
+
+RUN_DIR criterion: run-coder:85 `RUN_DIR="$ROOT/output/dispatch"`; launcher name `${ID}.launcher.sh`.
+EVIDENCE criterion: run-coder:118 `EVIDENCE_OUT_DIR=${EVIDENCE_OUT_DIR:-/var/lib/dispatch-debug-evidence}`.
+
+$ find <RUN_DIR / evidence / lock paths> -name 'SG-092*' -o -name 'SG-081*' -o -name '*.stop_trap' -o -name '*.idle_kill'
+/home/andrei/StorageGenie/.git/dispatch.lock
+/home/andrei/StorageGenie/output/dispatch/SG-081.dbg.debug-report.md
+/home/andrei/StorageGenie/output/dispatch/SG-081.dbg.launcher.sh
+/home/andrei/StorageGenie/output/dispatch/SG-081.dbg.log
+/home/andrei/StorageGenie/output/dispatch/SG-081.launcher.sh
+/home/andrei/StorageGenie/output/dispatch/SG-081.log
+/home/andrei/StorageGenie/output/dispatch/SG-092.launcher.sh
+/home/andrei/StorageGenie/output/dispatch/SG-092.log
+/var/lib/dispatch-debug-evidence/storagegenie/SG-081.dbg.txt
+/run/user/1000/launcher-dispatch/dispatch.lock
+
+$ stat -c '%y %s %n' output/dispatch/SG-081.launcher.sh output/dispatch/SG-081.log \
+      output/dispatch/SG-081.dbg.launcher.sh output/dispatch/SG-081.dbg.log \
+      output/dispatch/SG-092.launcher.sh output/dispatch/SG-092.log
+2026-09-22 12:51:16 208 output/dispatch/SG-081.launcher.sh
+2026-09-22 12:51:18 138 output/dispatch/SG-081.log
+2026-09-22 12:51:58 210 output/dispatch/SG-081.dbg.launcher.sh
+2026-09-22 12:54:34 50512 output/dispatch/SG-081.dbg.log
+2026-09-22 13:26:56 209 output/dispatch/SG-092.launcher.sh
+2026-09-22 13:27:49 111279 output/dispatch/SG-092.log
+
+No `.stop_trap`, `.idle_kill`, `.restart_units`, `.neg.*`, `.partial.*` markers exist for SG-081/SG-092.
+Only historical marker: output/dispatch/SG-027.publish_window (104B, unrelated, 2026-09-21).
+Locks: /home/andrei/StorageGenie/.git/dispatch.lock (0B) and
+       /run/user/1000/launcher-dispatch/dispatch.lock (0B) — both live/held by this dispatch.
+
+$ cat output/dispatch/SG-081.launcher.sh
+PROMPT_FILE=docs/packets/SG-081-off-fetch.md
+exec opencode run --auto --dir /home/andrei/StorageGenie --variant high "$(cat "$PROMPT_FILE")"
+$ cat output/dispatch/SG-081.log
+> build · deepseek-v4.1-flash
+Error: Upstream request failed: [server_error] Upstream response was not valid JSON
+$ cat output/dispatch/SG-081.dbg.launcher.sh
+PROMPT_FILE=/usr/local/lib/dispatch/debug-packet.md
+exec codex exec --sandbox danger-full-access -C /home/andrei/StorageGenie < "$PROMPT_FILE"
+
+$ cat /var/lib/dispatch-debug-evidence/storagegenie/SG-081.dbg.txt
+DISPATCH_EVIDENCE instance=SG-081.dbg failed_id=SG-081 utc=2026-09-22T12:51:56Z
+[failed-unit-journal]
+2026-09-22T12:48:15 ... run-coder[...]: contract_sync=refresh version=0.29.1
+2026-09-22T12:48:15 ... run-coder[...]: run_coder=fail reason=effort_unsupported_value_opencode_medium id=SG-081
+2026-09-22T12:51:16 ... run-coder[...]: contract_sync=refresh version=0.29.1
+2026-09-22T12:51:18 ... DISPATCH_RESULT id=SG-081 coder=opencode exit=1 head=f4cb8681... note=no moved=no
+2026-09-22T12:51:22 ... effort=high / effort_source=packet / P5_receipt=FAIL / negative_receipt=published
+
+## Contract drift probe
+$ git -C /home/andrei/storagegenie-contract log --oneline -5
+6fb544a Contract payload 0.29.2
+$ git -C /home/andrei/storagegenie-contract rev-parse HEAD
+6fb544afb4f9bf4f449c0a5d1040db789802f0ba
+$ cat /home/andrei/storagegenie-contract/VERSION
+0.29.2
+$ git -C /home/andrei/storagegenie-contract cat-file -t 454589c ; git log -1 --oneline 454589c
+commit
+454589c Contract payload 0.29.1
+$ git -C /home/andrei/storagegenie-contract diff --stat 454589c..HEAD
+ AUDIT.md     |  5 +++--
+ CLOSE.md     |  3 +++
+ CODER.md     | 29 +++++++++--------------------
+ RATIONALE.md | 26 ++++++++++++++++++++++++++
+ VERSION      |  2 +-
+ 5 files changed, 42 insertions(+), 23 deletions(-)
+$ git -C /home/andrei/storagegenie-contract diff 454589c..HEAD -- RULES.sha256
+(empty — RULES.sha256 unchanged)
+$ cat /home/andrei/storagegenie-contract/RULES.sha256
+18de7fd7b3546bd7624b3a7b59a78bd629752816cd7fa8f1af6113d1bafc8d46 RULES.md
+$ sed -n '3p' /home/andrei/storagegenie-contract/CODER.md
+**Contract version: 0.29.2** — **echo this line verbatim in your receipt.** It is the only proof that you
+
+## Notes ref (pre-note state)
+$ git rev-parse --verify refs/notes/storagegenie-coder-reports
+e978ce1049b15d8d4cab3326dc3c83c73e24ff18
+$ git notes --ref=refs/notes/storagegenie-coder-reports list | wc -l
+(>1; existing per-slice receipts present — SG-092's target object does not exist yet)
+
+## Clock
+$ date -u +%Y-%m-%dT%H:%M:%SZ
+2026-09-22T13:27:59Z
+$ uptime
+13:27:59 up 56 days, 5:51, 3 users, load average: 0.86, 0.45, 0.30
