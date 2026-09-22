@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import io
 import json
+import shutil
 from pathlib import Path
 from typing import cast
 
@@ -140,6 +141,7 @@ def test_generated_codes_are_validated_and_bad_checksum_is_not_an_identifier(iso
     assert any(row.confidence is not None and row.confidence < 0.5 for row in bad_rows)
 
 
+@pytest.mark.skipif(shutil.which("tesseract") is None, reason="tesseract binary not installed")
 def test_ocr_has_text_boxes_and_mean_confidence(isolated_db) -> None:  # type: ignore[no-untyped-def]
     session, household_id, root = isolated_db
     evidence = _evidence(session, household_id, root, _png(_text_image()), "text.png", "image/png")
