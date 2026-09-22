@@ -1,0 +1,23 @@
+{
+  "count": 1,
+  "page": 1,
+  "page_size": 10,
+  "skip": 0,
+  "products": [
+    {
+      "code": "3274080005003",
+      "product_name": "Jacobs Cronat Gold instant coffee",
+      "brands": "Jacobs",
+      "ingredients_text": "Coffee",
+      "nutriments": {
+        "energy-kcal_100g": 0,
+        "fat_100g": 0.1,
+        "carbohydrates_100g": 0.3,
+        "proteins_100g": 0.1,
+        "salt_100g": 0.01
+      },
+      "packaging": "Jar",
+      "countries_tags_en": ["en:romania", "en:germany"]
+    }
+  ]
+}

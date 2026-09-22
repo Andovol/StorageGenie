@@ -1,0 +1,17 @@
+{
+  "count": 1,
+  "page": 1,
+  "page_size": 10,
+  "skip": 0,
+  "products": [
+    {
+      "code": "3000000000003",
+      "product_name": "Nescafe Gold",
+      "brands": "Nescafe",
+      "ingredients_text": "Instant coffee",
+      "nutriments": {"energy-kcal_100g": 3},
+      "packaging": "Jar",
+      "countries_tags_en": ["en:romania"]
+    }
+  ]
+}

@@ -1,0 +1,38 @@
+SG-081 coder log — OFF v2 fetch client + deterministic scoring + snapshots.
+BASE=1d06c340bf119efd070456ad68cc0c3f964b4c8d (origin/automation == start HEAD)
+Contract: recorded 0.30.0 == published 0.30.0; source /home/andrei/storagegenie-contract/VERSION
+(contract repo HEAD c9c9ba3 "Contract payload 0.30.0"). `.rules-cache/` is absent from this worktree
+(gitignored, per SG-080 precedent); the source read is the contract repo path.
+Model: providerID=opencode-go modelID=deepseek-v4.1-flash (/home/andrei/.local/state/opencode/model.json
+recent[0]) — NOT a system-prompt identity line. Effort: high (process argv: `opencode run --auto --dir
+/home/andrei/StorageGenie --variant high # SG-081 ...`). Argv carries no --model (per policy).
+Spend: $0.000000 actual (OFF is free + unauthenticated; nothing metered exists).
+Autonomy: L2 slice (1 retry available; not used).
+
+Timeline (UTC, live clock; per-leg elapsed vs bound, units seconds):
+- 16:13:36  dispatch start (process etimes=459s at 16:21:16; overall 459s / 1800s bound).
+- 16:14-16:16  Recon: read packet, research §1-§2, plan, AGENTS/contract; measured tree (httpx present,
+  no services/enrich dir), BASE == origin/automation, contract 0.30.0. Baseline suite on clean BASE:
+  2 failed / 376 passed (the 2 base test_signals decoder reds) in 19.93s (600s bound).
+- 16:16-16:17  Wrote fixtures (4 JSON) + ONE test file; ran it pre-implementation: collection ERROR
+  ModuleNotFoundError app.services.enrich (fail-then-pass run 1). 0.13s.
+- 16:17-16:18  Wrote backend/app/services/enrich/{__init__,client,scoring}.py. New tests: 25 passed 0.05s
+  (fail-then-pass run 2).
+- 16:18-16:19  Gates: full suite 2 failed / 401 passed (19.70s, 600s bound); ruff clean; mypy 41/9 delta 0;
+  exclusion + secret + PG-SC-11 greps captured.
+- 16:19:29  G4 live smoke: 3 real free OFF GETs in ~0.5s; 2x HTTP 503 (degraded, quoted) + 1x HTTP 200
+  empty/miss (real envelope). See SG-081_verify.log §R-G4.
+- 16:19-16:21  G5: worklog + report + verify log; commit/push/receipt note.
+Gates found 2 pre-existing test-tree issues exposed by the new legitimate HTTP client (not caused by the
+slice's feature code): test_privacy_audit.py hard-codes the single-HTTP-client inventory, and
+test_opencode_go.py leaks a global `httpx.Client` patch (restore reads the already-patched attribute).
+Both repaired minimally (required by the suite-green acceptance); see report findings F-SG081-1.
+
+Decisions (mine, reported):
+- Split: enrich/client.py (sync httpx OFF v2, snapshots, loud degradation) + enrich/scoring.py (pure).
+- Sync client (tree is sync; opencode_go uses httpx.Client). Injection seam: http_client=; clock seam: now=.
+- UA = "StorageGenie/0.1 (https://github.com/Andovol/StorageGenie; openfoodfacts API client)" (placeholder-free).
+- Accept rule: top >= 0.6 AND margin-to-second >= 0.15; never a nearest guess. Single candidate margin = top score.
+- Category term kept whole (0.25) though the OFF `fields` set omits categories_tags_en -> inert on this path.
+- No-result form: OffSearchSnapshot with no_result_reason set (http_status | transport | invalid_json |
+  malformed_payload); a 200 empty products list is a legit miss (no_result_reason None).

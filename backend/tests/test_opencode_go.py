@@ -317,6 +317,7 @@ def test_transport_and_http_status_legs_carry_no_usage():
 
     import app.services.providers.opencode_go as go_mod
 
+    real_client = httpx.Client
     go_mod.httpx.Client = _PatchedClient  # type: ignore[assignment,misc]
     try:
         with pytest.raises(ProviderError) as caught:
@@ -324,7 +325,7 @@ def test_transport_and_http_status_legs_carry_no_usage():
                 _png_bytes(), "p"
             )
     finally:
-        go_mod.httpx.Client = httpx.Client  # type: ignore[assignment,misc]
+        go_mod.httpx.Client = real_client  # type: ignore[assignment,misc]
     assert caught.value.kind == "http_status"
     assert getattr(caught.value, "usage", None) is None
 

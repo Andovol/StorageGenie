@@ -1,0 +1,26 @@
+{
+  "count": 2,
+  "page": 1,
+  "page_size": 10,
+  "skip": 0,
+  "products": [
+    {
+      "code": "1000000000001",
+      "product_name": "Jacobs Cronat Gold instant coffee",
+      "brands": "Jacobs",
+      "ingredients_text": "Coffee",
+      "nutriments": {"energy-kcal_100g": 1},
+      "packaging": "Jar",
+      "countries_tags_en": ["en:romania"]
+    },
+    {
+      "code": "1000000000002",
+      "product_name": "Jacobs Cronat Gold Classic instant coffee",
+      "brands": "Jacobs",
+      "ingredients_text": "Coffee, roasted",
+      "nutriments": {"energy-kcal_100g": 2},
+      "packaging": "Sachet",
+      "countries_tags_en": ["en:romania"]
+    }
+  ]
+}

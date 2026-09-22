@@ -217,7 +217,8 @@ def _send_sites() -> list[str]:
 def test_g0_single_http_client_and_send_site_full_scan() -> None:
     """Scan every app source file: exactly one HTTP client, one send site."""
     assert _http_client_files() == {
-        "services/providers/opencode_go.py": ["import httpx"]
+        "services/enrich/client.py": ["import httpx"],
+        "services/providers/opencode_go.py": ["import httpx"],
     }, f"unexpected HTTP clients: {_http_client_files()}"
     assert _send_sites() == ["services/providers/opencode_go.py:252"], (
         f"unexpected provider send sites: {_send_sites()}"
@@ -447,7 +448,7 @@ def test_g2_consent_false_binds_zero_calls_on_every_service_path(
 
 
 def test_g2_enrich_absence_no_web_sender_exists() -> None:
-    """No Jina/web/enrich implementation: only the protocol stub names it."""
+    """No web-search sender exists (SG-081 enabled the OFF-only client, not this)."""
     matches: list[str] = []
     for path in sorted(APP_DIR.rglob("*.py")):
         for number, line in enumerate(path.read_text(encoding="utf-8").splitlines(), start=1):

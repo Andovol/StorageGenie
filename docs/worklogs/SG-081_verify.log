@@ -1,0 +1,263 @@
+SG-081 verify log — raw command outputs (SG-081 OFF v2 fetch + scoring).
+Work dir: /home/andrei/StorageGenie · BASE=1d06c340bf119efd070456ad68cc0c3f964b4c8d
+Every block below is captured command output, not prose. Bounds: 120 s ordinary,
+600 s suite, 1800 s overall. `venv/bin/python` = backend virtualenv Python 3.12.3.
+
+
+════════════════════════════════════════════════════════════════════
+§R-BASELINE — full backend suite on bare BASE (all slice files stashed)
+$ git stash push -u -m sg081-baseline ; venv/bin/python -m pytest -q ; git stash pop
+........................................................................ [ 19%]
+........................................................................ [ 38%]
+........................................................................ [ 57%]
+........................................................................ [ 76%]
+........................................................................ [ 95%]
+...........FF.....                                                       [100%]
+=================================== FAILURES ===================================
+___ test_generated_codes_are_validated_and_bad_checksum_is_not_an_identifier ___
+
+isolated_db = (<sqlalchemy.orm.session.Session object at 0x7f8553b44aa0>, '01a0c9ea-d167-7742-b914-258c9fa49861', PosixPath('/tmp/pytest-of-andrei/pytest-5/test_generated_codes_are_valid0/storage'))
+
+    def test_generated_codes_are_validated_and_bad_checksum_is_not_an_identifier(isolated_db) -> None:  # type: ignore[no-untyped-def]
+        session, household_id, root = isolated_db
+        qr_value = "https://example.test/SG-013"
+        qr_image = qrcode.make(qr_value).convert("RGB")
+        qr = _evidence(session, household_id, root, _png(qr_image), "qr.png", "image/png")
+        ean_image, ean_value = _ean13_image("590123412345")
+        ean = _evidence(session, household_id, root, _png(ean_image), "ean.png", "image/png")
+        # Deliberately render a syntactically valid EAN with the wrong check digit.
+        bad_value = ean_value[:-1] + ("0" if ean_value[-1] != "0" else "1")
+        bad_image, _ = _ean13_image(ean_value[:-1], bad_value[-1])
+        bad = _evidence(session, household_id, root, _png(bad_image), "bad.png", "image/png")
+    
+        qr_rows = signals.extract_observations(qr.id, session)
+        ean_rows = signals.extract_observations(ean.id, session)
+        bad_rows = signals.extract_observations(bad.id, session)
+    
+        qr_values = [json.loads(row.value_json) for row in qr_rows if row.kind == "barcode_qr"]
+        ean_values = [json.loads(row.value_json) for row in ean_rows if row.kind == "barcode_qr"]
+        bad_values = [json.loads(row.value_json) for row in bad_rows if row.kind == "barcode_qr"]
+>       assert any(item.get("value") == qr_value and item["validated"] for item in qr_values)
+E       assert False
+E        +  where False = any(<generator object test_generated_codes_are_validated_and_bad_checksum_is_not_an_identifier.<locals>.<genexpr> at 0x7f8553174660>)
+
+tests/test_signals.py:136: AssertionError
+_________________ test_ocr_has_text_boxes_and_mean_confidence __________________
+
+isolated_db = (<sqlalchemy.orm.session.Session object at 0x7f85581340e0>, '01a0c9ea-d1f8-7453-9dad-ae248e3324fb', PosixPath('/tmp/pytest-of-andrei/pytest-5/test_ocr_has_text_boxes_and_me0/storage'))
+
+    def test_ocr_has_text_boxes_and_mean_confidence(isolated_db) -> None:  # type: ignore[no-untyped-def]
+        session, household_id, root = isolated_db
+        evidence = _evidence(session, household_id, root, _png(_text_image()), "text.png", "image/png")
+        rows = signals.extract_observations(evidence.id, session)
+        ocr = [json.loads(row.value_json) for row in rows if row.kind == "ocr"]
+>       assert ocr
+E       assert []
+
+tests/test_signals.py:148: AssertionError
+=============================== warnings summary ===============================
+venv/lib/python3.12/site-packages/fastapi/testclient.py:1
+  /home/andrei/StorageGenie/backend/venv/lib/python3.12/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+venv/lib/python3.12/site-packages/starlette/testclient.py:53
+  /home/andrei/StorageGenie/backend/venv/lib/python3.12/site-packages/starlette/testclient.py:53: DeprecationWarning: The anyio.abc.BlockingPortal alias is deprecated, use anyio.from_thread.BlockingPortal instead.
+    _PortalFactoryType = Callable[[], AbstractContextManager[anyio.abc.BlockingPortal]]
+
+tests/test_candidates.py: 3 warnings
+tests/test_foundations.py: 3 warnings
+tests/test_saved_searches.py: 3 warnings
+tests/test_search.py: 3 warnings
+tests/test_sg048_name_optional.py: 6 warnings
+tests/test_signals.py: 3 warnings
+  /home/andrei/StorageGenie/backend/venv/lib/python3.12/site-packages/alembic/config.py:604: DeprecationWarning: No path_separator found in configuration; falling back to legacy splitting on spaces, commas, and colons for prepend_sys_path.  Consider adding path_separator=os to Alembic config.
+    util.warn_deprecated(
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/test_signals.py::test_generated_codes_are_validated_and_bad_checksum_is_not_an_identifier
+FAILED tests/test_signals.py::test_ocr_has_text_boxes_and_mean_confidence - a...
+2 failed, 376 passed, 23 warnings in 19.93s
+
+════════════════════════════════════════════════════════════════════
+§R-FAILPRE — new test file with the enrich module ABSENT (fail-then-pass, run 1)
+$ mv app/services/enrich /tmp/sg081_enrich_mod ; venv/bin/python -m pytest tests/test_sg081_enrich_fetch.py -q
+FAILPRE_EXIT=2
+
+==================================== ERRORS ====================================
+______________ ERROR collecting tests/test_sg081_enrich_fetch.py _______________
+ImportError while importing test module '/home/andrei/StorageGenie/backend/tests/test_sg081_enrich_fetch.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+/usr/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_sg081_enrich_fetch.py:29: in <module>
+    from app.services.enrich import client as off_client
+E   ModuleNotFoundError: No module named 'app.services.enrich'
+=========================== short test summary info ============================
+ERROR tests/test_sg081_enrich_fetch.py
+!!!!!!!!!!!!!!!!!!!! Interrupted: 1 error during collection !!!!!!!!!!!!!!!!!!!!
+1 error in 0.13s
+
+════════════════════════════════════════════════════════════════════
+§R-PASSPOST — same test file with the module PRESENT (fail-then-pass, run 2)
+$ venv/bin/python -m pytest tests/test_sg081_enrich_fetch.py -q
+PASSPOST_EXIT=0
+.........................                                                [100%]
+25 passed in 0.05s
+
+════════════════════════════════════════════════════════════════════
+§R-SUITE — full backend suite on the slice tree (baseline 2/376; expect 2/401)
+$ venv/bin/python -m pytest -q
+SUITE_EXIT=1
+=========================== short test summary info ============================
+FAILED tests/test_signals.py::test_generated_codes_are_validated_and_bad_checksum_is_not_an_identifier
+FAILED tests/test_signals.py::test_ocr_has_text_boxes_and_mean_confidence - a...
+2 failed, 401 passed, 23 warnings in 19.70s
+
+════════════════════════════════════════════════════════════════════
+§R-RUFF — venv/bin/python -m ruff check .
+RUFF_EXIT=0
+All checks passed!
+
+════════════════════════════════════════════════════════════════════
+§R-MYPY — venv/bin/python -m mypy app (baseline 41 errors in 9 files)
+MYPY_EXIT=1
+app/main.py:53: error: Unused "type: ignore" comment  [unused-ignore]
+Found 41 errors in 9 files (checked 78 source files)
+
+════════════════════════════════════════════════════════════════════
+§R-GATES — rule-based exclusions (PG-SC-05) + secret gate + PG-SC-11
+
+[G-A] no jina|vision|WEB_DETECTION in new module (expect 0 hits)
+$ grep -rniE "jina|vision|WEB_DETECTION" backend/app/services/enrich/
+--- output ---
+exit=1 (1 = no hits)
+
+[G-B] JINA never read (expect 0 hits)
+$ grep -rn "JINA" backend/app/services/enrich/
+--- output ---
+exit=1 (1 = no hits)
+
+[G-C] no pipeline/API wiring (run_ai_extraction|router|register) in new module
+$ grep -rnE "run_ai_extraction|router|register" backend/app/services/enrich/
+--- output ---
+exit=1 (1 = no hits)
+
+[G-D] secret-shape gate over new + modified files (expect 0 real secret shapes)
+$ grep -rnE "api_key|OPENCODE_API_KEY|Bearer|[Tt]oken" backend/app/services/enrich/ backend/tests/test_sg081_enrich_fetch.py backend/tests/fixtures/enrich/ backend/tests/test_opencode_go.py
+--- output ---
+grep: backend/app/services/enrich/__pycache__/scoring.cpython-312.pyc: binary file matches
+backend/app/services/enrich/scoring.py:56:def _tokens(value: Any) -> list[str]:
+backend/app/services/enrich/scoring.py:81:    edit-distance-similar brand token is present; 0.0 otherwise."""
+backend/app/services/enrich/scoring.py:92:        for token in _tokens(candidate):
+backend/app/services/enrich/scoring.py:93:            if len(token) < MIN_TOKEN_LENGTH_FOR_SIMILARITY:
+backend/app/services/enrich/scoring.py:95:            if _levenshtein(query, token) <= MAX_BRAND_EDIT_DISTANCE:
+backend/app/services/enrich/scoring.py:101:    """Token Jaccard overlap between the query name and the product name."""
+backend/app/services/enrich/scoring.py:102:    query_tokens = set(_tokens(q_name))
+backend/app/services/enrich/scoring.py:103:    if not query_tokens:
+backend/app/services/enrich/scoring.py:105:    product_tokens = set(_tokens(p_name))
+backend/app/services/enrich/scoring.py:106:    if not product_tokens:
+backend/app/services/enrich/scoring.py:108:    union = query_tokens | product_tokens
+backend/app/services/enrich/scoring.py:109:    return len(query_tokens & product_tokens) / len(union)
+backend/tests/test_sg081_enrich_fetch.py:109:    assert not any("key" in name or "token" in name for name in header_names)
+backend/tests/test_sg081_enrich_fetch.py:188:    for forbidden in ("image", "photo", "lat", "lon", "gps", "key", "token"):
+backend/tests/test_sg081_enrich_fetch.py:274:def test_name_score_is_token_jaccard() -> None:
+backend/tests/test_opencode_go.py:80:    for usage in ({}, {"prompt_tokens": 0, "completion_tokens": 0}, {"total_tokens": 0}):
+backend/tests/test_opencode_go.py:87:    go.guard_usage({"prompt_tokens": 10, "completion_tokens": 5, "total_tokens": 15})
+backend/tests/test_opencode_go.py:106:    """SG-064 G0 pin (mangler-immune): the unbalanced-guard restores its angle token.
+backend/tests/test_opencode_go.py:132:def test_guard_max_tokens_sized_past_truncation():
+backend/tests/test_opencode_go.py:135:    assert go.DEFAULT_MAX_TOKENS >= 1500, "max_tokens must size past truncation"
+backend/tests/test_opencode_go.py:137:    assert payload["max_tokens"] >= 1500
+backend/tests/test_opencode_go.py:182:    assert "OPENCODE_API_KEY" not in blob and "sk-" not in blob
+backend/tests/test_opencode_go.py:200:    usage = {"prompt_tokens": 754, "completion_tokens": 341, "total_tokens": 1095}
+backend/tests/test_opencode_go.py:236:    usage = {"prompt_tokens": 754, "completion_tokens": 341, "total_tokens": 1095}
+backend/tests/test_opencode_go.py:280:    bare = go.OpenCodeGoProvider(session_id="sg062-pre-body", api_key="")
+backend/tests/test_opencode_go.py:283:    original = os.environ.pop("OPENCODE_API_KEY", None)
+backend/tests/test_opencode_go.py:289:            os.environ["OPENCODE_API_KEY"] = original
+backend/tests/test_opencode_go.py:324:            go.OpenCodeGoProvider(session_id="sg062-http", api_key="k").extract_items(
+backend/tests/test_opencode_go.py:338:    usage = {"prompt_tokens": 100, "completion_tokens": 50, "total_tokens": 150}
+backend/tests/test_opencode_go.py:377:        assert hasattr(s, "opencode_api_key")
+exit=0
+
+[G-E] PG-SC-11 end-relative assertions over the new enrich/OFF test paths (expect 0)
+$ grep -rnE "\[-1\]|HEAD~|\.endswith|tail|latest" backend/tests/test_sg081_enrich_fetch.py backend/tests/fixtures/enrich/
+--- output ---
+exit=1 (1 = no hits)
+
+[G-F] scope inventory: changed/added vs BASE (expect only enrich/*, 1 test file, fixtures, 2 required test repairs, worklogs)
+$ git status --porcelain
+--- output ---
+ M backend/tests/test_opencode_go.py
+ M backend/tests/test_privacy_audit.py
+?? backend/app/services/enrich/
+?? backend/tests/fixtures/
+?? backend/tests/test_sg081_enrich_fetch.py
+?? docs/worklogs/SG-081_verify.log
+
+[G-G] no prompt/migration/compose/.env/README/STATE/AGENTS/packet touched
+$ git diff --name-only HEAD ; git diff --name-only HEAD --cached
+--- output ---
+backend/tests/test_opencode_go.py
+backend/tests/test_privacy_audit.py
+
+════════════════════════════════════════════════════════════════════
+§R-G4 — exactly one bounded live smoke: <=3 real free GETs to world.openfoodfacts.org
+Script: /tmp/opencode/sg081_smoke.py  ·  $0.00 (OFF is free + unauthenticated, no key, no header)
+$ PYTHONPATH=backend venv/bin/python /tmp/opencode/sg081_smoke.py
+Exact stdout (per query: request URL, outcome class, snapshot fields). The two HTTP 503
+bodies are OFF's HTML "Page temporarily unavailable" degradation page; the client bounds
+`no_result_reason`/`raw_text` to MAX_QUOTED_BODY_CHARS=2000, so the quoted body below is
+shown to its identifying prefix and the same body was captured in `raw_text`.
+
+QUERY 1 (expected-hit food: Jacobs Cronat Gold):
+  REQUEST_URL=https://world.openfoodfacts.org/api/v2/search?search_terms=Jacobs+Cronat+Gold&brands_tags=Jacobs&countries_tags_en=romania&page=1&page_size=10&fields=code%2Cproduct_name%2Cbrands%2Cingredients_text%2Cnutriments%2Cpackaging%2Ccountries_tags_en
+  STATUS=503
+  OUTCOME=degraded / loud no-result (provider-side)
+  NO_RESULT_REASON=http_status: OFF returned HTTP 503: '<!DOCTYPE html>\n<html lang="en">\n\n<head>\n    <meta charset="UTF-8">\n    <meta name="viewport" content="width=device-width, initial-scale=1.0">\n    <title>Page temporarily unavailable - Open Food Facts</title>\n    <style>...[body continues; client bounded to 2000 chars]...
+  N_PRODUCTS=0
+  SNAPSHOT: source_name=OpenFoodFacts · retrieved_at=2026-09-22T16:19:29.420071+00:00 · status_code=503 · raw=null · products=[] · raw_text=<the same bounded HTML body>
+
+QUERY 2 (ambiguous: Cronat Gold / Jacobs):
+  REQUEST_URL=https://world.openfoodfacts.org/api/v2/search?search_terms=Cronat+Gold&brands_tags=Jacobs&countries_tags_en=romania&page=1&page_size=10&fields=code%2Cproduct_name%2Cbrands%2Cingredients_text%2Cnutriments%2Cpackaging%2Ccountries_tags_en
+  STATUS=503
+  OUTCOME=degraded / loud no-result (provider-side)
+  NO_RESULT_REASON=http_status: OFF returned HTTP 503: '<!DOCTYPE html>\n<html lang="en">\n\n<head>\n    <meta charset="UTF-8">\n    <meta name="viewport" content="width=device-width, initial-scale=1.0">\n    <title>Page temporarily unavailable - Open Food Facts</title>\n    <style>...[body continues; client bounded to 2000 chars]...
+  N_PRODUCTS=0
+  SNAPSHOT: source_name=OpenFoodFacts · retrieved_at=2026-09-22T16:19:29.527104+00:00 · status_code=503 · raw=null · products=[] · raw_text=<the same bounded HTML body>
+
+QUERY 3 (expected-miss: Zzz Nonexistent Product 9999 / Zzz Brand):
+  REQUEST_URL=https://world.openfoodfacts.org/api/v2/search?search_terms=Zzz+Nonexistent+Product+9999&brands_tags=Zzz+Brand&countries_tags_en=romania&page=1&page_size=10&fields=code%2Cproduct_name%2Cbrands%2Cingredients_text%2Cnutriments%2Cpackaging%2Ccountries_tags_en
+  STATUS=200
+  OUTCOME=miss/empty (real API answered; legit empty, NOT a degradation)
+  NO_RESULT_REASON=None
+  N_PRODUCTS=0
+  SNAPSHOT_JSON_BEGIN
+  {
+    "source_name": "OpenFoodFacts",
+    "request_url": "https://world.openfoodfacts.org/api/v2/search?search_terms=Zzz+Nonexistent+Product+9999&brands_tags=Zzz+Brand&countries_tags_en=romania&page=1&page_size=10&fields=code%2Cproduct_name%2Cbrands%2Cingredients_text%2Cnutriments%2Cpackaging%2Ccountries_tags_en",
+    "retrieved_at": "2026-09-22T16:19:29.893325+00:00",
+    "status_code": 200,
+    "no_result_reason": null,
+    "raw": {
+      "count": 0,
+      "page": 1,
+      "page_count": 0,
+      "page_size": 10,
+      "products": [],
+      "skip": 0
+    },
+    "raw_text": null,
+    "products": []
+  }
+  SNAPSHOT_JSON_END
+
+SMOKE VERDICT: 1 of 3 real GETs returned a live HTTP 200 (empty/miss) whose body is the real
+OFF v2 envelope (`count,page,page_count,page_size,products,skip`) — proving the exact request
+shape is accepted by the live API. The other 2 returned OFF-side HTTP 503 — a provider
+degradation FINDING (quoted), not a slice failure (G1-G3 green). No retry was issued
+(the packet bounds the smoke to <=3 real searches). $0.000000.
+
+Recon note (before the slice, superseded by the smoke): two manual `curl` probes also returned
+HTTP 503 for OFF during this session — the degradation was already live before any code existed.
