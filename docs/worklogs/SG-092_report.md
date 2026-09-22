@@ -3,8 +3,8 @@
 **Dispatch-ID:** SG-092 · **Coder:** opencode · **effort:** high · **model:** CLI default
 **Work dir:** `/home/andrei/StorageGenie` · **origin remote:** `git@github.com:Andovol/StorageGenie.git`
 **BASE** (`origin/automation` resolved at start): `08e7082a90c2a876931efd5d9fcb36f1c8a38791`
-**WORK_HEAD:** this pre-note docs commit (the literal hash and the Receipt paste are appended by the
-follow-up docs-only commit, per the SG-091 convention).
+**WORK_HEAD:** `7c287cc05660af993000f8f821d03f37cf678f75` (the pre-note docs commit carrying this report;
+the Receipt paste is this later docs-only commit).
 **Spend:** REAL metered **$0.000000** (zero provider calls; read-only local commands only).
 
 **Role guard:** Coder, never Architect. No dispatch verb was run for any ID; no unit was started or
@@ -117,8 +117,40 @@ per-leg elapsed-vs-budget in the worklog; MODEL + effort from process arguments;
 Push work to `automation`; worktree clean. No push to `storagegenie-evidence`; no `{{RECEIPT_CMD}}`.
 The note is added on the WORK_HEAD (this pre-note docs commit), pushed to
 `refs/notes/storagegenie-coder-reports`, then fetched into a mapped local ref and shown verbatim. The
-raw commands and the pasted `show` output are appended by the follow-up docs-only commit
-(`RECEIPT-PASTE-PLACEHOLDER`).
+raw commands and the pasted `show` output are appended by this follow-up docs-only commit.
+
+WORK_HEAD (pre-note docs commit) = `7c287cc05660af993000f8f821d03f37cf678f75`.
+
+Commands executed (raw):
+
+```
+$ git notes --ref=refs/notes/storagegenie-coder-reports show 7c287cc05660af993000f8f821d03f37cf678f75
+error: no note found for object 7c287cc05660af993000f8f821d03f37cf678f75.
+existing_exit=1
+$ git notes --ref=refs/notes/storagegenie-coder-reports add -m "Dispatch-ID: SG-092 | Report: docs/worklogs/SG-092_report.md | Work-HEAD: 7c287cc05660af993000f8f821d03f37cf678f75" 7c287cc05660af993000f8f821d03f37cf678f75
+add_exit=0
+$ git push origin refs/notes/storagegenie-coder-reports
+To github.com:Andovol/StorageGenie.git
+   e978ce1..04d83e7  refs/notes/storagegenie-coder-reports -> refs/notes/storagegenie-coder-reports
+push_notes_exit=0
+$ git fetch origin refs/notes/storagegenie-coder-reports:refs/notes/storagegenie-coder-reports-verify
+From github.com:Andovol/StorageGenie
+   3821327..04d83e7  refs/notes/storagegenie-coder-reports -> refs/notes/storagegenie-coder-reports-verify
+fetch_exit=0
+$ git rev-parse refs/notes/storagegenie-coder-reports-verify
+04d83e70455b4d8f96c98e92ec39deb2a0bbc6fb
+$ git notes --ref=refs/notes/storagegenie-coder-reports-verify show 7c287cc05660af993000f8f821d03f37cf678f75
+```
+
+Pasted `show` output (verbatim, from the FETCHED mapped ref):
+
+```
+Dispatch-ID: SG-092 | Report: docs/worklogs/SG-092_report.md | Work-HEAD: 7c287cc05660af993000f8f821d03f37cf678f75
+```
+
+No existing note was found before adding (`existing_exit=1`), so this was not an existing-note refusal.
+
+note=yes
 
 ## Acceptance criteria (`PG-SC-09`)
 
