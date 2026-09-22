@@ -1,7 +1,7 @@
 # StorageGenie — project configuration
 
 > **Canonical for this repo. `CLAUDE.md` is a one-line adapter `@AGENTS.md` — edit here, never there.**
-> Rule-set version this project records: **0.29.1** (D119 adoption 2026-09-22: tags `contract-v0.29.0` checkout `549864c` + `contract-v0.29.1` checkout `454589c` oldest-first; delta = 0.29.0 partial-receipt on kill + 900s idle kill + effort-per-Coder + debug-run-no-packet + `G-T4` never-watcher + `G-A7` design-table, 0.29.1 stop-reads-partial + STAGE-names-idle/manual; installed `18de7fd7…` = payload `RULES.sha256` at 0.29.0 and 0.29.1 — clean, was behind; supersedes `0.28.2`).
+> Rule-set version this project records: **0.30.0** (D125 adoption 2026-09-22: tags `contract-v0.29.2` checkout `6fb544a` + `contract-v0.30.0` checkout `c9c9ba3` oldest-first; delta = 0.29.2 AUDIT disposition-needs-state-row + CLOSE state-file-hygiene box + CODER echo 0.29.2 with retired-ID/incident records moved to RATIONALE.md, 0.30.0 CODER echo 0.30.0 + per-slice Coder via packet `coder:` with conf MODEL/EFFORT scoped to own CODER + engine lane-defaults (CODER_STATE_DIR/XDG_RUNTIME_DIR/DISPATCH_PATH, source-only per LNR-065/066) + ShoperOS host lane (unrelated project); installed `18de7fd7…` = payload `RULES.sha256` at 0.29.1, 0.29.2 and 0.30.0 — clean, was behind; supersedes `0.29.1`).
 
 ## Configuration table — the single source of every project value
 
