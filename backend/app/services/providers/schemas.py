@@ -54,6 +54,11 @@ class ExtractionItem(BaseModel):
     size_text: str | None = None
     barcode: str | None = None
     category_proposed: str | None = None
+    # SG-094 v4: verbatim Google Product Taxonomy path, transcribed-only. Null
+    # when absent/illegible plus the matching `unknowns` entry. The resolved
+    # id/path/version triple is produced downstream (T3); this slice records it
+    # nowhere (PG-SC-02) — no writer fills it, no reader shows it.
+    google_type_proposed: str | None = None
     transcript: str | None = None
     storage: str | None = None
     warnings: list[str] | None = None
@@ -80,6 +85,7 @@ class ExtractionItem(BaseModel):
         "size_text",
         "barcode",
         "category_proposed",
+        "google_type_proposed",
         "transcript",
         "storage",
         "nutrition_per100g",

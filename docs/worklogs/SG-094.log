@@ -1,0 +1,62 @@
+SG-094 worklog — Taxonomy T2: `google_type_proposed` schema field + three frozen v4 prompts (transcribe-only).
+
+ROLE: Coder (never Architect). No dispatch verb was run for any ID; no unit was started or polled by me.
+LANE: this slice was dispatched to me on the standard job_spawn lane; I am the launched Coder.
+
+MODEL + EFFORT (from process arguments, per packet / `CO-78`; never from a system-prompt identity line):
+- own argv, read from /proc/<opencode-pid>/cmdline (the opencode CLI process that launched me):
+  `opencode run --auto --dir /home/andrei/StorageGenie --variant high <packet text on argv>`
+  => effort = `high` (the `--variant high` token).
+- No `--model` token in argv => model is the CLI default, omitted per policy; not determinable from
+  process arguments => reported as `unknown` (CLI default), never guessed.
+
+CONTRACT ECHO + SOURCE PATH (no drift):
+- Packet-recorded, source `docs/packets/SG-094-taxonomy-schema-prompts.md:7`:
+  "Contract: recorded `0.30.0` == published (`c9c9ba3`; D125 adoption); echo verbatim + source path."
+- Live contract line, source `/home/andrei/storagegenie-contract/CODER.md:3`:
+  "**Contract version: 0.30.0** — **echo this line verbatim in your receipt.** It is the only proof that you"
+- Live VERSION = `0.30.0`; contract repo HEAD = `c9c9ba3ee3715d102b55c740f4f2107344e7de3a` ("Contract
+  payload 0.30.0"); `RULES.sha256` = `18de7fd7b3546bd7624b3a7b59a78bd629752816cd7fa8f1af6113d1bafc8d46`
+  (matches the AGENTS.md header payload hash). Recorded == published == live. No drift.
+
+SPEND: REAL $0.000000 — fully offline: no download, no provider call, no key read.
+
+ELAPSED-VS-BUDGET PER LEG (budget 120s ordinary / 600s suite; uncalibrated per `G-A9`):
+- Recon / premise verification (packet + tree + schemas + v3 prompts + T1 tests + spec/plan + contract):
+  interactive, ~110 s wall of tool calls, no single command over its bound; nothing killed.
+- Pre-run `pytest tests/test_google_taxonomy.py -v`: 0.50 s vs 120 s. 7 failed / 17 passed (expected).
+- G1 schemas edit (field + one validator-list entry): <1 s.
+- G2 v4 generation + diffs + v3 clean check: <1 s.
+- Post-run `pytest tests/test_google_taxonomy.py -v`: 0.34 s vs 120 s. 24 passed.
+- Gates: full suite 19.84 s (<=600 s, 2 known decoder env reds). ruff <1 s. mypy two full runs
+  (with change / bare BASE) within their 300 s bounds. secret grep <1 s.
+- G4 docs + receipt + notes push + mapped-fetch verify: interactive.
+- TOTAL process elapsed at report writing: see `SG-094_report.md` (from `ps -o etimes`); within 600 s.
+- No command hit its timeout; nothing killed; no interactive command was run.
+
+FINDINGS:
+1. `.rules-cache/` does not exist on this worktree (AGENTS.md / packet call the contract `.rules-cache/`).
+   The adopted contract lives at `/home/andrei/storagegenie-contract/` (git repo, HEAD `c9c9ba3`,
+   VERSION `0.30.0`). Premise difference, no impact — echo sourced from the real path.
+2. v3-to-v4 H1 title: the SG-079 v2-to-v3 precedent bumped the `# ... (prompt vN)` title too. SG-094's
+   explicit formula is "v3 file's exact content + the spec's verbatim block + front-matter
+   `template_version` bumped v3->v4", so I followed it literally and left the H1 reading "(prompt v3)".
+   The v4 files are otherwise byte-exact v3 + the block. Design call disclosed; trivially reversible.
+3. `rtk` (local wrapper) swallowed `git diff` stdout (exit 1, no output); I used `/usr/bin/git` directly.
+   Environment finding, no impact on the slice.
+4. `PG-SC-12` non-circularity: the prompt block is extracted from the spec file itself and the v3 base
+   text is read through the real `reader.load_prompt`, so no re-typed copy is asserted against.
+5. Blank-field non-vacuity: the blank pin asserts the specific validator message
+   (`google_type_proposed must be non-blank when present`); a bare `pytest.raises(ValidationError)`
+   would pass vacuously because `extra="forbid"` rejects an undeclared key anyway. It fails pre-impl.
+6. No migration: `ExtractionItem` is a pydantic validation model with no SQLAlchemy column and no
+   writer/reader this slice; `google_type_proposed` is nullable and unpersisted (`PG-SC-02`), so a
+   nullable model field needs no DB migration.
+
+UNCLEAR (FIRST READ): whether the v4 H1 title should also bump v3->v4 (precedent says yes; SG-094's
+  explicit content formula says no); I followed the packet formula and left the title, disclosed above.
+UNCLEAR (DURING EXECUTION): whether the packet's "v3 byte-identical" is best proven by the empty tracked
+  `git diff` (chosen, quoted in the verify log) or additionally by a committed content hash; the suite
+  cannot compare against a git base, so the empty diff is the byte-identity proof.
+UNCLEAR (REMAINING): whether T3 will register these v4 files in the Docker build context / package data
+  so the running service can load them at flip time; out of this slice's ceiling, not touched.

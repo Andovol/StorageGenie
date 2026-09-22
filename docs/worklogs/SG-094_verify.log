@@ -1,0 +1,599 @@
+=== SG-094 verify log (raw command outputs; both fail-then-pass runs) ===
+
+=== LIVE CLOCK ===
+$ date -u +%Y-%m-%dT%H:%M:%SZ
+2026-09-22T18:16:40Z
+
+=== BASE / ORIGIN ===
+$ git rev-parse HEAD
+d6e968b3ef7c707ce67f2444eb08068a41d7f100
+$ git rev-parse origin/automation
+d6e968b3ef7c707ce67f2444eb08068a41d7f100
+$ git branch --show-current
+automation
+$ git remote -v
+origin	git@github.com:Andovol/StorageGenie.git (fetch)
+origin	git@github.com:Andovol/StorageGenie.git (push)
+
+=== CONTRACT ECHO (live) ===
+$ cat /home/andrei/storagegenie-contract/VERSION
+0.30.0
+$ cat /home/andrei/storagegenie-contract/RULES.sha256
+18de7fd7b3546bd7624b3a7b59a78bd629752816cd7fa8f1af6113d1bafc8d46 RULES.md
+$ git -C /home/andrei/storagegenie-contract rev-parse HEAD
+c9c9ba3ee3715d102b55c740f4f2107344e7de3a
+$ sed -n '3p' /home/andrei/storagegenie-contract/CODER.md
+**Contract version: 0.30.0** — **echo this line verbatim in your receipt.** It is the only proof that you
+
+=== PRE-RUN: pytest tests/test_google_taxonomy.py -v (tests added; field + v4 absent) ===
+============================= test session starts ==============================
+platform linux -- Python 3.12.3, pytest-9.1.1, pluggy-1.6.0 -- /home/andrei/StorageGenie/backend/../venv/bin/python
+cachedir: .pytest_cache
+rootdir: /home/andrei/StorageGenie/backend
+configfile: pyproject.toml
+plugins: anyio-4.14.2, asyncio-1.4.0
+asyncio: mode=Mode.AUTO, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collecting ... collected 24 items
+
+tests/test_google_taxonomy.py::test_exact_path_resolves_with_id_and_version PASSED [  4%]
+tests/test_google_taxonomy.py::test_exact_match_is_whitespace_and_case_insensitive PASSED [  8%]
+tests/test_google_taxonomy.py::test_below_threshold_is_unclear_never_mapped PASSED [ 12%]
+tests/test_google_taxonomy.py::test_unclear_still_stamps_taxonomy_version PASSED [ 16%]
+tests/test_google_taxonomy.py::test_none_proposal_is_uncategorized PASSED [ 20%]
+tests/test_google_taxonomy.py::test_blank_proposal_is_uncategorized PASSED [ 25%]
+tests/test_google_taxonomy.py::test_food_subtree_maps_to_food_bucket PASSED [ 29%]
+tests/test_google_taxonomy.py::test_out_of_scope_retains_type_with_non_perishable PASSED [ 33%]
+tests/test_google_taxonomy.py::test_pharma_exception_beats_health_beauty_default PASSED [ 37%]
+tests/test_google_taxonomy.py::test_health_beauty_default_is_cosmetics PASSED [ 41%]
+tests/test_google_taxonomy.py::test_unknown_top_level_is_uncategorized PASSED [ 45%]
+tests/test_google_taxonomy.py::test_bucket_for_resolves_path_from_id_when_path_absent PASSED [ 50%]
+tests/test_google_taxonomy.py::test_bucket_for_nothing_is_uncategorized PASSED [ 54%]
+tests/test_google_taxonomy.py::test_accept_thresholds_are_the_designed_constants PASSED [ 58%]
+tests/test_google_taxonomy.py::test_resolver_source_has_no_network_imports PASSED [ 62%]
+tests/test_google_taxonomy.py::test_accept_gate_is_load_bearing PASSED   [ 66%]
+tests/test_google_taxonomy.py::test_pharma_prefix_is_load_bearing PASSED [ 70%]
+tests/test_google_taxonomy.py::test_google_type_proposed_declared_nullable_beside_v3_fields FAILED [ 75%]
+tests/test_google_taxonomy.py::test_google_type_proposed_parses_verbatim_when_present FAILED [ 79%]
+tests/test_google_taxonomy.py::test_blank_google_type_proposed_is_rejected FAILED [ 83%]
+tests/test_google_taxonomy.py::test_unknowns_entry_for_google_type_proposed_validates_with_null FAILED [ 87%]
+tests/test_google_taxonomy.py::test_v4_prompt_loads_through_real_loader_as_v3_plus_block[food] FAILED [ 91%]
+tests/test_google_taxonomy.py::test_v4_prompt_loads_through_real_loader_as_v3_plus_block[medicine] FAILED [ 95%]
+tests/test_google_taxonomy.py::test_v4_prompt_loads_through_real_loader_as_v3_plus_block[cosmetics] FAILED [100%]
+
+=================================== FAILURES ===================================
+_________ test_google_type_proposed_declared_nullable_beside_v3_fields _________
+
+    def test_google_type_proposed_declared_nullable_beside_v3_fields() -> None:
+>       assert V4_FIELD in ExtractionItem.model_fields
+E       AssertionError: assert 'google_type_proposed' in {'name': FieldInfo(annotation=str, required=True, metadata=[MinLen(min_length=1)]), 'expiry_date': FieldInfo(annotation=Union[str, NoneType], required=False, default=None), 'opened_date': FieldInfo(annotation=Union[str, NoneType], required=False, default=None), 'date_type': FieldInfo(annotation=Union[str, NoneType], required=False, default=None), ...}
+E        +  where {'name': FieldInfo(annotation=str, required=True, metadata=[MinLen(min_length=1)]), 'expiry_date': FieldInfo(annotation=Union[str, NoneType], required=False, default=None), 'opened_date': FieldInfo(annotation=Union[str, NoneType], required=False, default=None), 'date_type': FieldInfo(annotation=Union[str, NoneType], required=False, default=None), ...} = ExtractionItem.model_fields
+
+tests/test_google_taxonomy.py:178: AssertionError
+____________ test_google_type_proposed_parses_verbatim_when_present ____________
+
+    def test_google_type_proposed_parses_verbatim_when_present() -> None:
+        path = "Food, Beverages & Tobacco > Beverages"
+>       parsed = parse_extraction_output(_base_payload(_base_item(**{V4_FIELD: path})))
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_google_taxonomy.py:186: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+raw = {'items': [{'name': 'Milk', 'expiry_date': '2031-03-15', 'date_type': 'best_before', 'confidence': 1.0, ...}], 'unknowns': [], 'needs_evidence': False}
+
+    def parse_extraction_output(raw: Any) -> ExtractionOutput:
+        """Strictly parse a raw provider payload.
+    
+        Dicts validate directly. Strings must be JSON objects; anything else —
+        prose, wrong types, non-object JSON — fails as a pydantic ValidationError
+        (unparsable strings are validated against a bogus key so the single
+        exception type is preserved and no prose is ever parsed).
+        """
+        if isinstance(raw, dict):
+            data = raw
+        elif isinstance(raw, str):
+            try:
+                decoded = json.loads(raw)
+            except json.JSONDecodeError:
+                decoded = {"prose": raw}
+            data = decoded if isinstance(decoded, dict) else {"prose": raw}
+        else:
+            data = {"prose": raw}
+>       return ExtractionOutput.model_validate(data)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       pydantic_core._pydantic_core.ValidationError: 1 validation error for ExtractionOutput
+E       items.0.google_type_proposed
+E         Extra inputs are not permitted [type=extra_forbidden, input_value='Food, Beverages & Tobacco > Beverages', input_type=str]
+E           For further information visit https://errors.pydantic.dev/2.13/v/extra_forbidden
+
+app/services/providers/schemas.py:174: ValidationError
+_________________ test_blank_google_type_proposed_is_rejected __________________
+
+    def test_blank_google_type_proposed_is_rejected() -> None:
+        with pytest.raises(ValidationError) as exc:
+            parse_extraction_output(_base_payload(_base_item(**{V4_FIELD: "  "})))
+>       assert f"{V4_FIELD} must be non-blank when present" in str(exc.value)
+E       assert 'google_type_proposed must be non-blank when present' in "1 validation error for ExtractionOutput\nitems.0.google_type_proposed\n  Extra inputs are not permitted [type=extra_forbidden, input_value='  ', input_type=str]\n    For further information visit https://errors.pydantic.dev/2.13/v/extra_forbidden"
+E        +  where "1 validation error for ExtractionOutput\nitems.0.google_type_proposed\n  Extra inputs are not permitted [type=extra_forbidden, input_value='  ', input_type=str]\n    For further information visit https://errors.pydantic.dev/2.13/v/extra_forbidden" = str(1 validation error for ExtractionOutput\nitems.0.google_type_proposed\n  Extra inputs are not permitted [type=extra_forbidden, input_value='  ', input_type=str]\n    For further information visit https://errors.pydantic.dev/2.13/v/extra_forbidden)
+E        +    where 1 validation error for ExtractionOutput\nitems.0.google_type_proposed\n  Extra inputs are not permitted [type=extra_forbidden, input_value='  ', input_type=str]\n    For further information visit https://errors.pydantic.dev/2.13/v/extra_forbidden = <ExceptionInfo 1 validation error for ExtractionOutput\nitems.0.google_type_proposed\n  Extra inputs are not permitted [type=extra_forb... input_value='  ', input_type=str]\n    For further information visit https://errors.pydantic.dev/2.13/v/extra_forbidden tblen=3>.value
+
+tests/test_google_taxonomy.py:193: AssertionError
+_______ test_unknowns_entry_for_google_type_proposed_validates_with_null _______
+
+    def test_unknowns_entry_for_google_type_proposed_validates_with_null() -> None:
+        honest = _base_payload(_base_item(**{V4_FIELD: None}), unknowns=[f"items.0.{V4_FIELD}"])
+>       parsed = parse_extraction_output(honest)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_google_taxonomy.py:198: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+raw = {'items': [{'name': 'Milk', 'expiry_date': '2031-03-15', 'date_type': 'best_before', 'confidence': 1.0, ...}], 'unknowns': ['items.0.google_type_proposed'], 'needs_evidence': False}
+
+    def parse_extraction_output(raw: Any) -> ExtractionOutput:
+        """Strictly parse a raw provider payload.
+    
+        Dicts validate directly. Strings must be JSON objects; anything else —
+        prose, wrong types, non-object JSON — fails as a pydantic ValidationError
+        (unparsable strings are validated against a bogus key so the single
+        exception type is preserved and no prose is ever parsed).
+        """
+        if isinstance(raw, dict):
+            data = raw
+        elif isinstance(raw, str):
+            try:
+                decoded = json.loads(raw)
+            except json.JSONDecodeError:
+                decoded = {"prose": raw}
+            data = decoded if isinstance(decoded, dict) else {"prose": raw}
+        else:
+            data = {"prose": raw}
+>       return ExtractionOutput.model_validate(data)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       pydantic_core._pydantic_core.ValidationError: 1 validation error for ExtractionOutput
+E       items.0.google_type_proposed
+E         Extra inputs are not permitted [type=extra_forbidden, input_value=None, input_type=NoneType]
+E           For further information visit https://errors.pydantic.dev/2.13/v/extra_forbidden
+
+app/services/providers/schemas.py:174: ValidationError
+_______ test_v4_prompt_loads_through_real_loader_as_v3_plus_block[food] ________
+
+category = 'food'
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x76d2ddc1f4d0>
+
+    @pytest.mark.parametrize("category", V4_CATEGORIES)
+    def test_v4_prompt_loads_through_real_loader_as_v3_plus_block(
+        category: str, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """v4 = live v3 loader output + spec block + front-matter bump; v3 untouched."""
+        block = _spec_block()
+        v3_text, v3_version = reader.load_prompt(category)
+        assert v3_version == f"extract-{category}-v3"
+        assert block not in v3_text
+        assert V4_FIELD not in v3_text
+    
+        monkeypatch.setitem(reader.PROMPT_FILES, category, f"extract-{category}-v4.md")
+>       v4_text, v4_version = reader.load_prompt(category)
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_google_taxonomy.py:223: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+app/services/providers/reader.py:114: in load_prompt
+    text = (PROMPTS_DIR / filename).read_text(encoding="utf-8")
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.12/pathlib.py:1029: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/home/andrei/StorageGenie/backend/app/services/providers/prompts/extract-food-v4.md')
+mode = 'r', buffering = -1, encoding = 'utf-8', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/home/andrei/StorageGenie/backend/app/services/providers/prompts/extract-food-v4.md'
+
+/usr/lib/python3.12/pathlib.py:1015: FileNotFoundError
+_____ test_v4_prompt_loads_through_real_loader_as_v3_plus_block[medicine] ______
+
+category = 'medicine'
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x76d2ddc1fad0>
+
+    @pytest.mark.parametrize("category", V4_CATEGORIES)
+    def test_v4_prompt_loads_through_real_loader_as_v3_plus_block(
+        category: str, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """v4 = live v3 loader output + spec block + front-matter bump; v3 untouched."""
+        block = _spec_block()
+        v3_text, v3_version = reader.load_prompt(category)
+        assert v3_version == f"extract-{category}-v3"
+        assert block not in v3_text
+        assert V4_FIELD not in v3_text
+    
+        monkeypatch.setitem(reader.PROMPT_FILES, category, f"extract-{category}-v4.md")
+>       v4_text, v4_version = reader.load_prompt(category)
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_google_taxonomy.py:223: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+app/services/providers/reader.py:114: in load_prompt
+    text = (PROMPTS_DIR / filename).read_text(encoding="utf-8")
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.12/pathlib.py:1029: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/home/andrei/StorageGenie/backend/app/services/providers/prompts/extract-medicine-v4.md')
+mode = 'r', buffering = -1, encoding = 'utf-8', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/home/andrei/StorageGenie/backend/app/services/providers/prompts/extract-medicine-v4.md'
+
+/usr/lib/python3.12/pathlib.py:1015: FileNotFoundError
+_____ test_v4_prompt_loads_through_real_loader_as_v3_plus_block[cosmetics] _____
+
+category = 'cosmetics'
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x76d2e094b530>
+
+    @pytest.mark.parametrize("category", V4_CATEGORIES)
+    def test_v4_prompt_loads_through_real_loader_as_v3_plus_block(
+        category: str, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """v4 = live v3 loader output + spec block + front-matter bump; v3 untouched."""
+        block = _spec_block()
+        v3_text, v3_version = reader.load_prompt(category)
+        assert v3_version == f"extract-{category}-v3"
+        assert block not in v3_text
+        assert V4_FIELD not in v3_text
+    
+        monkeypatch.setitem(reader.PROMPT_FILES, category, f"extract-{category}-v4.md")
+>       v4_text, v4_version = reader.load_prompt(category)
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_google_taxonomy.py:223: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+app/services/providers/reader.py:114: in load_prompt
+    text = (PROMPTS_DIR / filename).read_text(encoding="utf-8")
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.12/pathlib.py:1029: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/home/andrei/StorageGenie/backend/app/services/providers/prompts/extract-cosmetics-v4.md')
+mode = 'r', buffering = -1, encoding = 'utf-8', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/home/andrei/StorageGenie/backend/app/services/providers/prompts/extract-cosmetics-v4.md'
+
+/usr/lib/python3.12/pathlib.py:1015: FileNotFoundError
+=========================== short test summary info ============================
+FAILED tests/test_google_taxonomy.py::test_google_type_proposed_declared_nullable_beside_v3_fields
+FAILED tests/test_google_taxonomy.py::test_google_type_proposed_parses_verbatim_when_present
+FAILED tests/test_google_taxonomy.py::test_blank_google_type_proposed_is_rejected
+FAILED tests/test_google_taxonomy.py::test_unknowns_entry_for_google_type_proposed_validates_with_null
+FAILED tests/test_google_taxonomy.py::test_v4_prompt_loads_through_real_loader_as_v3_plus_block[food]
+FAILED tests/test_google_taxonomy.py::test_v4_prompt_loads_through_real_loader_as_v3_plus_block[medicine]
+FAILED tests/test_google_taxonomy.py::test_v4_prompt_loads_through_real_loader_as_v3_plus_block[cosmetics]
+========================= 7 failed, 17 passed in 0.50s =========================
+
+=== POST-RUN: pytest tests/test_google_taxonomy.py -v (field + v4 present) ===
+============================= test session starts ==============================
+platform linux -- Python 3.12.3, pytest-9.1.1, pluggy-1.6.0 -- /home/andrei/StorageGenie/backend/../venv/bin/python
+cachedir: .pytest_cache
+rootdir: /home/andrei/StorageGenie/backend
+configfile: pyproject.toml
+plugins: anyio-4.14.2, asyncio-1.4.0
+asyncio: mode=Mode.AUTO, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collecting ... collected 24 items
+
+tests/test_google_taxonomy.py::test_exact_path_resolves_with_id_and_version PASSED [  4%]
+tests/test_google_taxonomy.py::test_exact_match_is_whitespace_and_case_insensitive PASSED [  8%]
+tests/test_google_taxonomy.py::test_below_threshold_is_unclear_never_mapped PASSED [ 12%]
+tests/test_google_taxonomy.py::test_unclear_still_stamps_taxonomy_version PASSED [ 16%]
+tests/test_google_taxonomy.py::test_none_proposal_is_uncategorized PASSED [ 20%]
+tests/test_google_taxonomy.py::test_blank_proposal_is_uncategorized PASSED [ 25%]
+tests/test_google_taxonomy.py::test_food_subtree_maps_to_food_bucket PASSED [ 29%]
+tests/test_google_taxonomy.py::test_out_of_scope_retains_type_with_non_perishable PASSED [ 33%]
+tests/test_google_taxonomy.py::test_pharma_exception_beats_health_beauty_default PASSED [ 37%]
+tests/test_google_taxonomy.py::test_health_beauty_default_is_cosmetics PASSED [ 41%]
+tests/test_google_taxonomy.py::test_unknown_top_level_is_uncategorized PASSED [ 45%]
+tests/test_google_taxonomy.py::test_bucket_for_resolves_path_from_id_when_path_absent PASSED [ 50%]
+tests/test_google_taxonomy.py::test_bucket_for_nothing_is_uncategorized PASSED [ 54%]
+tests/test_google_taxonomy.py::test_accept_thresholds_are_the_designed_constants PASSED [ 58%]
+tests/test_google_taxonomy.py::test_resolver_source_has_no_network_imports PASSED [ 62%]
+tests/test_google_taxonomy.py::test_accept_gate_is_load_bearing PASSED   [ 66%]
+tests/test_google_taxonomy.py::test_pharma_prefix_is_load_bearing PASSED [ 70%]
+tests/test_google_taxonomy.py::test_google_type_proposed_declared_nullable_beside_v3_fields PASSED [ 75%]
+tests/test_google_taxonomy.py::test_google_type_proposed_parses_verbatim_when_present PASSED [ 79%]
+tests/test_google_taxonomy.py::test_blank_google_type_proposed_is_rejected PASSED [ 83%]
+tests/test_google_taxonomy.py::test_unknowns_entry_for_google_type_proposed_validates_with_null PASSED [ 87%]
+tests/test_google_taxonomy.py::test_v4_prompt_loads_through_real_loader_as_v3_plus_block[food] PASSED [ 91%]
+tests/test_google_taxonomy.py::test_v4_prompt_loads_through_real_loader_as_v3_plus_block[medicine] PASSED [ 95%]
+tests/test_google_taxonomy.py::test_v4_prompt_loads_through_real_loader_as_v3_plus_block[cosmetics] PASSED [100%]
+
+============================== 24 passed in 0.34s ==============================
+
+=== FULL SUITE: pytest -q ===
+........................................................................ [ 15%]
+........................................................................ [ 31%]
+........................................................................ [ 47%]
+........................................................................ [ 63%]
+........................................................................ [ 79%]
+........................................................................ [ 95%]
+...............FF.....                                                   [100%]
+=================================== FAILURES ===================================
+___ test_generated_codes_are_validated_and_bad_checksum_is_not_an_identifier ___
+
+isolated_db = (<sqlalchemy.orm.session.Session object at 0x723a3304d4c0>, '01a0ca54-ea1b-70f0-a1c3-96288a553f9c', PosixPath('/tmp/pytest-of-andrei/pytest-0/test_generated_codes_are_valid0/storage'))
+
+    def test_generated_codes_are_validated_and_bad_checksum_is_not_an_identifier(isolated_db) -> None:  # type: ignore[no-untyped-def]
+        session, household_id, root = isolated_db
+        qr_value = "https://example.test/SG-013"
+        qr_image = qrcode.make(qr_value).convert("RGB")
+        qr = _evidence(session, household_id, root, _png(qr_image), "qr.png", "image/png")
+        ean_image, ean_value = _ean13_image("590123412345")
+        ean = _evidence(session, household_id, root, _png(ean_image), "ean.png", "image/png")
+        # Deliberately render a syntactically valid EAN with the wrong check digit.
+        bad_value = ean_value[:-1] + ("0" if ean_value[-1] != "0" else "1")
+        bad_image, _ = _ean13_image(ean_value[:-1], bad_value[-1])
+        bad = _evidence(session, household_id, root, _png(bad_image), "bad.png", "image/png")
+    
+        qr_rows = signals.extract_observations(qr.id, session)
+        ean_rows = signals.extract_observations(ean.id, session)
+        bad_rows = signals.extract_observations(bad.id, session)
+    
+        qr_values = [json.loads(row.value_json) for row in qr_rows if row.kind == "barcode_qr"]
+        ean_values = [json.loads(row.value_json) for row in ean_rows if row.kind == "barcode_qr"]
+        bad_values = [json.loads(row.value_json) for row in bad_rows if row.kind == "barcode_qr"]
+>       assert any(item.get("value") == qr_value and item["validated"] for item in qr_values)
+E       assert False
+E        +  where False = any(<generator object test_generated_codes_are_validated_and_bad_checksum_is_not_an_identifier.<locals>.<genexpr> at 0x723a3308a960>)
+
+tests/test_signals.py:136: AssertionError
+_________________ test_ocr_has_text_boxes_and_mean_confidence __________________
+
+isolated_db = (<sqlalchemy.orm.session.Session object at 0x723a3c5081a0>, '01a0ca54-ea97-7ec1-8ce0-3efc6a49e618', PosixPath('/tmp/pytest-of-andrei/pytest-0/test_ocr_has_text_boxes_and_me0/storage'))
+
+    def test_ocr_has_text_boxes_and_mean_confidence(isolated_db) -> None:  # type: ignore[no-untyped-def]
+        session, household_id, root = isolated_db
+        evidence = _evidence(session, household_id, root, _png(_text_image()), "text.png", "image/png")
+        rows = signals.extract_observations(evidence.id, session)
+        ocr = [json.loads(row.value_json) for row in rows if row.kind == "ocr"]
+>       assert ocr
+E       assert []
+
+tests/test_signals.py:148: AssertionError
+=============================== warnings summary ===============================
+../venv/lib/python3.12/site-packages/fastapi/testclient.py:1
+  /home/andrei/StorageGenie/venv/lib/python3.12/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+tests/test_candidates.py: 3 warnings
+tests/test_foundations.py: 3 warnings
+tests/test_saved_searches.py: 3 warnings
+tests/test_search.py: 3 warnings
+tests/test_sg048_name_optional.py: 6 warnings
+tests/test_signals.py: 3 warnings
+  /home/andrei/StorageGenie/venv/lib/python3.12/site-packages/alembic/config.py:604: DeprecationWarning: No path_separator found in configuration; falling back to legacy splitting on spaces, commas, and colons for prepend_sys_path.  Consider adding path_separator=os to Alembic config.
+    util.warn_deprecated(
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/test_signals.py::test_generated_codes_are_validated_and_bad_checksum_is_not_an_identifier
+FAILED tests/test_signals.py::test_ocr_has_text_boxes_and_mean_confidence - a...
+2 failed, 452 passed, 22 warnings in 19.84s
+
+=== BASE REDS STASH PROOF (bare BASE) ===
+Saved working directory and index state On automation: SG-094-mypybase
+=== BASE REDS (bare BASE via stash) ===
+FF                                                                       [100%]
+=================================== FAILURES ===================================
+___ test_generated_codes_are_validated_and_bad_checksum_is_not_an_identifier ___
+
+isolated_db = (<sqlalchemy.orm.session.Session object at 0x7be4434bb680>, '01a0ca55-7b74-7fa0-ba46-cf8799c9b354', PosixPath('/tmp/pytest-of-andrei/pytest-3/test_generated_codes_are_valid0/storage'))
+
+    def test_generated_codes_are_validated_and_bad_checksum_is_not_an_identifier(isolated_db) -> None:  # type: ignore[no-untyped-def]
+        session, household_id, root = isolated_db
+        qr_value = "https://example.test/SG-013"
+        qr_image = qrcode.make(qr_value).convert("RGB")
+        qr = _evidence(session, household_id, root, _png(qr_image), "qr.png", "image/png")
+        ean_image, ean_value = _ean13_image("590123412345")
+        ean = _evidence(session, household_id, root, _png(ean_image), "ean.png", "image/png")
+        # Deliberately render a syntactically valid EAN with the wrong check digit.
+        bad_value = ean_value[:-1] + ("0" if ean_value[-1] != "0" else "1")
+        bad_image, _ = _ean13_image(ean_value[:-1], bad_value[-1])
+        bad = _evidence(session, household_id, root, _png(bad_image), "bad.png", "image/png")
+    
+        qr_rows = signals.extract_observations(qr.id, session)
+        ean_rows = signals.extract_observations(ean.id, session)
+        bad_rows = signals.extract_observations(bad.id, session)
+    
+        qr_values = [json.loads(row.value_json) for row in qr_rows if row.kind == "barcode_qr"]
+        ean_values = [json.loads(row.value_json) for row in ean_rows if row.kind == "barcode_qr"]
+        bad_values = [json.loads(row.value_json) for row in bad_rows if row.kind == "barcode_qr"]
+>       assert any(item.get("value") == qr_value and item["validated"] for item in qr_values)
+E       assert False
+E        +  where False = any(<generator object test_generated_codes_are_validated_and_bad_checksum_is_not_an_identifier.<locals>.<genexpr> at 0x7be442f973e0>)
+
+tests/test_signals.py:136: AssertionError
+------------------------------ Captured log call -------------------------------
+WARNING  app.services.signals:signals.py:104 Barcode extraction unavailable: pyzbar/libzbar is not installed
+WARNING  app.services.signals:signals.py:210 OCR extraction unavailable: pytesseract is not installed
+WARNING  app.services.signals:signals.py:104 Barcode extraction unavailable: pyzbar/libzbar is not installed
+WARNING  app.services.signals:signals.py:210 OCR extraction unavailable: pytesseract is not installed
+WARNING  app.services.signals:signals.py:104 Barcode extraction unavailable: pyzbar/libzbar is not installed
+WARNING  app.services.signals:signals.py:210 OCR extraction unavailable: pytesseract is not installed
+_________________ test_ocr_has_text_boxes_and_mean_confidence __________________
+
+isolated_db = (<sqlalchemy.orm.session.Session object at 0x7be4430ad160>, '01a0ca55-7be0-77f0-8f10-13a70fa8faf3', PosixPath('/tmp/pytest-of-andrei/pytest-3/test_ocr_has_text_boxes_and_me0/storage'))
+
+    def test_ocr_has_text_boxes_and_mean_confidence(isolated_db) -> None:  # type: ignore[no-untyped-def]
+        session, household_id, root = isolated_db
+        evidence = _evidence(session, household_id, root, _png(_text_image()), "text.png", "image/png")
+        rows = signals.extract_observations(evidence.id, session)
+        ocr = [json.loads(row.value_json) for row in rows if row.kind == "ocr"]
+>       assert ocr
+E       assert []
+
+tests/test_signals.py:148: AssertionError
+------------------------------ Captured log call -------------------------------
+WARNING  app.services.signals:signals.py:104 Barcode extraction unavailable: pyzbar/libzbar is not installed
+WARNING  app.services.signals:signals.py:210 OCR extraction unavailable: pytesseract is not installed
+=========================== short test summary info ============================
+FAILED tests/test_signals.py::test_generated_codes_are_validated_and_bad_checksum_is_not_an_identifier
+FAILED tests/test_signals.py::test_ocr_has_text_boxes_and_mean_confidence - a...
+2 failed in 0.60s
+On branch automation
+Your branch is up to date with 'origin/automation'.
+
+Changes not staged for commit:
+  (use "git add <file>..." to update what will be committed)
+  (use "git restore <file>..." to discard changes in working directory)
+	modified:   app/services/providers/schemas.py
+	modified:   tests/test_google_taxonomy.py
+
+Untracked files:
+  (use "git add <file>..." to include in what will be committed)
+	app/services/providers/prompts/extract-cosmetics-v4.md
+	app/services/providers/prompts/extract-food-v4.md
+	app/services/providers/prompts/extract-medicine-v4.md
+
+no changes added to commit (use "git add" and/or "git commit -a")
+Dropped refs/stash@{0} (d1c4f0c3192beb530e18571b4fd4d9a10f636a65)
+
+=== RUFF ===
+All checks passed!
+
+=== MYPY DELTA (with change) ===
+=== mypy WITH change ===
+app/schemas/asset.py:53: error: Missing type arguments for generic type "dict"  [type-arg]
+app/schemas/asset.py:55: error: Missing type arguments for generic type "dict"  [type-arg]
+app/models/base.py:8: error: Unused "type: ignore" comment  [unused-ignore]
+app/services/audit_service.py:16: error: Missing type arguments for generic type "dict"  [type-arg]
+app/services/audit_service.py:17: error: Missing type arguments for generic type "dict"  [type-arg]
+app/api/v1/review_tasks.py:17: error: Function is missing a return type annotation  [no-untyped-def]
+app/api/v1/review_tasks.py:21: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/review_tasks.py:22: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/review_tasks.py:62: error: Function is missing a return type annotation  [no-untyped-def]
+app/api/v1/review_tasks.py:66: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/review_tasks.py:67: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/households.py:18: error: Function is missing a return type annotation  [no-untyped-def]
+app/api/v1/households.py:20: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/households.py:22: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/households.py:58: error: Function is missing a return type annotation  [no-untyped-def]
+app/api/v1/households.py:59: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/households.py:60: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/evidence.py:19: error: Function is missing a return type annotation  [no-untyped-def]
+app/api/v1/evidence.py:20: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/evidence.py:22: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/evidence.py:24: error: Unused "type: ignore" comment  [unused-ignore]
+app/services/asset_service.py:15: error: Missing type arguments for generic type "dict"  [type-arg]
+app/services/asset_service.py:37: error: Missing type arguments for generic type "dict"  [type-arg]
+app/services/asset_service.py:105: error: Missing type arguments for generic type "dict"  [type-arg]
+app/api/v1/assets.py:62: error: Function is missing a return type annotation  [no-untyped-def]
+app/api/v1/assets.py:65: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/assets.py:67: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/assets.py:92: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/assets.py:92: error: Missing type arguments for generic type "dict"  [type-arg]
+app/api/v1/assets.py:92: note: Error code "type-arg" not covered by "type: ignore[no-untyped-def]" comment
+app/api/v1/assets.py:231: error: Function is missing a return type annotation  [no-untyped-def]
+app/api/v1/assets.py:239: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/assets.py:240: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/assets.py:357: error: Function is missing a return type annotation  [no-untyped-def]
+app/api/v1/assets.py:361: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/assets.py:363: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/assets.py:413: error: Function is missing a return type annotation  [no-untyped-def]
+app/api/v1/assets.py:415: error: Missing type arguments for generic type "dict"  [type-arg]
+app/api/v1/assets.py:417: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/assets.py:418: error: Unused "type: ignore" comment  [unused-ignore]
+app/main.py:47: error: Unused "type: ignore" comment  [unused-ignore]
+app/main.py:53: error: Unused "type: ignore" comment  [unused-ignore]
+Found 41 errors in 9 files (checked 80 source files)
+=== MYPY DELTA (bare BASE) ===
+=== mypy BASELINE (bare BASE) ===
+app/schemas/asset.py:53: error: Missing type arguments for generic type "dict"  [type-arg]
+app/schemas/asset.py:55: error: Missing type arguments for generic type "dict"  [type-arg]
+app/models/base.py:8: error: Unused "type: ignore" comment  [unused-ignore]
+app/services/audit_service.py:16: error: Missing type arguments for generic type "dict"  [type-arg]
+app/services/audit_service.py:17: error: Missing type arguments for generic type "dict"  [type-arg]
+app/api/v1/review_tasks.py:17: error: Function is missing a return type annotation  [no-untyped-def]
+app/api/v1/review_tasks.py:21: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/review_tasks.py:22: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/review_tasks.py:62: error: Function is missing a return type annotation  [no-untyped-def]
+app/api/v1/review_tasks.py:66: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/review_tasks.py:67: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/households.py:18: error: Function is missing a return type annotation  [no-untyped-def]
+app/api/v1/households.py:20: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/households.py:22: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/households.py:58: error: Function is missing a return type annotation  [no-untyped-def]
+app/api/v1/households.py:59: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/households.py:60: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/evidence.py:19: error: Function is missing a return type annotation  [no-untyped-def]
+app/api/v1/evidence.py:20: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/evidence.py:22: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/evidence.py:24: error: Unused "type: ignore" comment  [unused-ignore]
+app/services/asset_service.py:15: error: Missing type arguments for generic type "dict"  [type-arg]
+app/services/asset_service.py:37: error: Missing type arguments for generic type "dict"  [type-arg]
+app/services/asset_service.py:105: error: Missing type arguments for generic type "dict"  [type-arg]
+app/api/v1/assets.py:62: error: Function is missing a return type annotation  [no-untyped-def]
+app/api/v1/assets.py:65: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/assets.py:67: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/assets.py:92: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/assets.py:92: error: Missing type arguments for generic type "dict"  [type-arg]
+app/api/v1/assets.py:92: note: Error code "type-arg" not covered by "type: ignore[no-untyped-def]" comment
+app/api/v1/assets.py:231: error: Function is missing a return type annotation  [no-untyped-def]
+app/api/v1/assets.py:239: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/assets.py:240: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/assets.py:357: error: Function is missing a return type annotation  [no-untyped-def]
+app/api/v1/assets.py:361: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/assets.py:363: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/assets.py:413: error: Function is missing a return type annotation  [no-untyped-def]
+app/api/v1/assets.py:415: error: Missing type arguments for generic type "dict"  [type-arg]
+app/api/v1/assets.py:417: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/assets.py:418: error: Unused "type: ignore" comment  [unused-ignore]
+app/main.py:47: error: Unused "type: ignore" comment  [unused-ignore]
+app/main.py:53: error: Unused "type: ignore" comment  [unused-ignore]
+Found 41 errors in 9 files (checked 80 source files)
+
+=== v3 TRACKED DIFF (expect empty) ===
+$ git diff -- backend/app/services/providers/prompts/extract-{food,medicine,cosmetics}-v3.md
+(empty above = v3 byte-identical)
+
+=== SECRET SCAN (diff + new v4 files) ===
+$ grep -nEi 'api_key|OPENCODE_API_KEY|Bearer|[Tt]oken|sk-[A-Za-z0-9]{10,}|ghp_[A-Za-z0-9]{20,}|-----BEGIN' diff_for_secret.txt
+secret grep exit=1 (1 = no match = 0 secrets)
+
+=== LIVE PROMPT MAP PINS ===
+$ pytest test_sg079_v3_schema.py::test_live_prompt_map_points_at_v3 test_sg080_ingest_pipeline.py -k prompt -q
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+2 passed, 11 deselected, 1 warning in 0.71s

@@ -8,7 +8,12 @@ file, which the source-level pin below asserts.
 
 from __future__ import annotations
 
+import re
+from copy import deepcopy
 from pathlib import Path
+
+import pytest
+from pydantic import ValidationError
 
 from app.services import google_taxonomy
 from app.services.google_taxonomy import (
@@ -19,8 +24,17 @@ from app.services.google_taxonomy import (
     bucket_for,
     resolve_google_type,
 )
+from app.services.providers import reader
+from app.services.providers.schemas import ExtractionItem, parse_extraction_output
 
 BEER_PATH = "Food, Beverages & Tobacco > Beverages > Alcoholic Beverages > Beer"
+BACKEND_DIR = Path(__file__).resolve().parent.parent
+REPO_ROOT = BACKEND_DIR.parent
+SPEC_PATH = (
+    REPO_ROOT / "docs" / "superpowers" / "specs" / "2026-09-21-google-taxonomy-design.md"
+)
+V4_FIELD = "google_type_proposed"
+V4_CATEGORIES = ("food", "medicine", "cosmetics")
 
 
 def test_exact_path_resolves_with_id_and_version() -> None:
@@ -125,3 +139,94 @@ def test_pharma_prefix_is_load_bearing(monkeypatch) -> None:  # type: ignore[no-
         lambda: (("health & beauty", "cosmetics_personal_care"),),
     )
     assert bucket_for("518", path) == "cosmetics_personal_care"
+
+
+# --------------------------------------------------------------------------- #
+# SG-094 T2 — `google_type_proposed` schema field (transcribe-only, nullable)
+# --------------------------------------------------------------------------- #
+def _base_item(**overrides: object) -> dict[str, object]:
+    item: dict[str, object] = {
+        "name": "Milk",
+        "expiry_date": "2031-03-15",
+        "date_type": "best_before",
+        "confidence": 1.0,
+        "uncertainty_reasons": [],
+    }
+    item.update(overrides)
+    return item
+
+
+def _base_payload(item: dict[str, object], **overrides: object) -> dict[str, object]:
+    payload: dict[str, object] = {"items": [item], "unknowns": [], "needs_evidence": False}
+    payload.update(overrides)
+    return payload
+
+
+def _spec_block() -> str:
+    """The v4 prompt block exactly as the spec (the authority) quotes it."""
+    text = SPEC_PATH.read_text(encoding="utf-8")
+    match = re.search(
+        r"Added block \(packets quote this file, never chat\):\n\n```\n(.*?)\n```",
+        text,
+        re.DOTALL,
+    )
+    assert match is not None, "spec S2 v4 prompt block not found"
+    return match.group(1)
+
+
+def test_google_type_proposed_declared_nullable_beside_v3_fields() -> None:
+    assert V4_FIELD in ExtractionItem.model_fields
+    assert ExtractionItem.model_fields[V4_FIELD].default is None
+    parsed = parse_extraction_output(_base_payload(_base_item()))
+    assert getattr(parsed.items[0], V4_FIELD) is None
+
+
+def test_google_type_proposed_parses_verbatim_when_present() -> None:
+    path = "Food, Beverages & Tobacco > Beverages"
+    parsed = parse_extraction_output(_base_payload(_base_item(**{V4_FIELD: path})))
+    assert getattr(parsed.items[0], V4_FIELD) == path
+
+
+def test_blank_google_type_proposed_is_rejected() -> None:
+    with pytest.raises(ValidationError) as exc:
+        parse_extraction_output(_base_payload(_base_item(**{V4_FIELD: "  "})))
+    assert f"{V4_FIELD} must be non-blank when present" in str(exc.value)
+
+
+def test_unknowns_entry_for_google_type_proposed_validates_with_null() -> None:
+    honest = _base_payload(_base_item(**{V4_FIELD: None}), unknowns=[f"items.0.{V4_FIELD}"])
+    parsed = parse_extraction_output(honest)
+    assert parsed.unknowns == [f"items.0.{V4_FIELD}"]
+    assert getattr(parsed.items[0], V4_FIELD) is None
+
+    fabricated = deepcopy(honest)
+    fabricated["items"][0][V4_FIELD] = "Food, Beverages & Tobacco"  # type: ignore[index]
+    with pytest.raises(ValidationError):
+        parse_extraction_output(fabricated)
+
+
+# --------------------------------------------------------------------------- #
+# SG-094 T2 — frozen v4 prompts load through the REAL loader (PG-SC-12)
+# --------------------------------------------------------------------------- #
+@pytest.mark.parametrize("category", V4_CATEGORIES)
+def test_v4_prompt_loads_through_real_loader_as_v3_plus_block(
+    category: str, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """v4 = live v3 loader output + spec block + front-matter bump; v3 untouched."""
+    block = _spec_block()
+    v3_text, v3_version = reader.load_prompt(category)
+    assert v3_version == f"extract-{category}-v3"
+    assert block not in v3_text
+    assert V4_FIELD not in v3_text
+
+    monkeypatch.setitem(reader.PROMPT_FILES, category, f"extract-{category}-v4.md")
+    v4_text, v4_version = reader.load_prompt(category)
+    assert v4_version == f"extract-{category}-v4"
+    assert block in v4_text
+
+    expected = v3_text.replace(
+        f"template_version: extract-{category}-v3",
+        f"template_version: extract-{category}-v4",
+    ).replace("\n## Repair\n", f"\n{block}\n\n## Repair\n", 1)
+    assert v4_text == expected
+    assert v4_text != v3_text
