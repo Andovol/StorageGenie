@@ -1,0 +1,71 @@
+SG-100 worklog — Enrich snapshot persistence: model + migration + append-only writer (opencode, high)
+
+Dispatch-ID: SG-100
+Coder: opencode | effort: high | model: cli-default (no model id sent; omitted per policy)
+  (read from process arguments: `opencode run --auto --dir /home/andrei/StorageGenie --variant high <packet>`)
+Work dir: /home/andrei/StorageGenie
+Remote: origin = git@github.com:Andovol/StorageGenie.git
+BASE (origin/automation resolved): 4504d454d654f629861b25b6966dcd602c6eba26
+WORK_HEAD: f5b460314c69c8ed6db64a5ad619c66c17612f70
+Authoring date (metadata): 2026-09-23
+
+CONTRACT ECHO (verbatim): 0.33.0
+  source path: STATE.md:4 and AGENTS.md:4 (recorded). Published-side re-hash UNEXECUTED:
+  `.rules-cache/` absent on this host and `origin` carries no `contract*` ref. Finding F-SG100-3.
+
+BUDGET: 120s ordinary | 600s suite+lint | 1500s early-close | 2100s overall. REAL metered $0.000000.
+
+-------------------------------------------------------------------------------
+[recon] verified packet premises against the tree
+  - provider_call.py pattern: TimestampMixin + Base, String(36) PK default=new_id -> CONFIRMED
+  - current alembic head 20260917_sg068_saved_search (packet's "last verified" premise) -> CONFIRMED
+  - OFF shape client.py:49-59 OffSearchSnapshot(source_name, request_url, retrieved_at,
+    status_code, raw, raw_text, products, no_result_reason) -> CONFIRMED
+  - Jina shape jina.py:62-90 JinaSearchSnapshot(... raw, raw_text, results ...) -> CONFIRMED
+  - committed fixtures off_hit.json / jina_hit.json -> CONFIRMED
+  - FINDING F-SG100-1: neither snapshot value object carries the QUERY text, so the
+    writer takes `query` as an explicit keyword arg (packet's signature shows only the
+    snapshot). Reported, not bent.
+  - FINDING F-SG100-2: two new files name "jina" -> M45 privacy-audit collision (below).
+  elapsed: recon within ordinary 120s bound.
+
+[G1] snapshot model + migration
+  backend/app/models/enrich_snapshot.py  (table `enrich_snapshot`; source, query,
+    request_url, retrieved_at, status_code, raw_body, raw_text, no_result_reason, version)
+  backend/app/models/__init__.py         (import + __all__ export)
+  backend/alembic/versions/20260923_sg100_enrich_snapshot.py
+    down_revision = 20260917_sg068_saved_search (chained from live head); upgrade creates,
+    downgrade drops; index ix_enrich_snapshot_source. Migration file ONLY — never applied
+    to production; tests run it on temp SQLite (PG-PR-04).
+
+[G2] append-only writer
+  backend/app/services/enrich/snapshots.py
+    record_off_snapshot(db, snapshot, *, query) / record_jina_snapshot(db, snapshot, *, query)
+    serialize_raw_body() canonical JSON, lossless; degraded rows keep no_result_reason + raw_text;
+    get_snapshot() / get_snapshots_by_source() loaders; NO update/merge/delete path.
+    Unwired: endpoint still reads memory (PG-SC-02).
+
+[G3] fail-then-pass + gates (offline, temp DBs)
+  fail-pre : collection ModuleNotFoundError (model absent) exit=2       [R-FAILPRE]
+  pass-post: 12 passed in 0.96s                                         [R-PASSPOST]
+  suite    : 2 failed, 498 passed in 23.97s (2 known decoder env reds, stash-proved)
+  ruff clean; mypy 41 -> 41 (delta 0; 84 files checked); secret grep 0 real.
+  M45 collision self-caught: privacy-audit allow-set extended for models/enrich_snapshot.py
+  and services/enrich/snapshots.py (failing-test proof, minimal, root-caused, disclosed F-SG100-2).
+  elapsed: suite 23.97s vs 600s bound; ordinary commands under 120s.
+
+[G4] worklogs written: SG-100.log, SG-100_report.md, SG-100_verify.log.
+
+SPEND (real $): $0.000000 — no metered call exists on any path (scripted MockTransport
+  transports only; no live call attempted, no image pulled/run).
+
+-------------------------------------------------------------------------------
+RECEIPT (notes ref refs/notes/storagegenie-coder-reports)
+  WORK_HEAD: f5b460314c69c8ed6db64a5ad619c66c17612f70
+  note add  : git notes --ref=refs/notes/storagegenie-coder-reports add -m "Dispatch-ID: SG-100 | Report: docs/worklogs/SG-100_report.md | Work-HEAD: f5b460314c69c8ed6db64a5ad619c66c17612f70" f5b460314c69c8ed6db64a5ad619c66c17612f70   -> exit 0
+  note push : git push origin refs/notes/storagegenie-coder-reports  -> 0d1baad..75a70e9
+  verify    : git fetch origin refs/notes/storagegenie-coder-reports:refs/notes/storagegenie-coder-reports-fetched
+              git notes --ref=refs/notes/storagegenie-coder-reports-fetched show f5b460314c69c8ed6db64a5ad619c66c17612f70
+  output    : Dispatch-ID: SG-100 | Report: docs/worklogs/SG-100_report.md | Work-HEAD: f5b460314c69c8ed6db64a5ad619c66c17612f70
+  final tip dual-annotated (SG-092 precedent).
+  note=yes
