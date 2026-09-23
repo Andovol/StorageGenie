@@ -1,0 +1,766 @@
+SG-098 — verify log (raw outputs, no paraphrase)
+work dir: /home/andrei/StorageGenie
+UTC: 2026-09-23T14:33:06Z
+contract echo: 0.33.0
+contract source: /home/andrei/storagegenie-contract/VERSION -> 0.33.0
+contract HEAD: b232b84 Contract payload 0.33.0
+BASE ref origin/automation resolved: 267386e20aae8397899ba916aa96a14a944fd864
+
+===== S1. BACKEND FAIL-PRE (before slice: app.api.v1.enrich absent) =====
+
+==================================== ERRORS ====================================
+_____________ ERROR collecting tests/test_sg098_enrich_endpoint.py _____________
+ImportError while importing test module '/home/andrei/StorageGenie/backend/tests/test_sg098_enrich_endpoint.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+/usr/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_sg098_enrich_endpoint.py:33: in <module>
+    from app.api.v1.enrich import (
+E   ModuleNotFoundError: No module named 'app.api.v1.enrich'
+=============================== warnings summary ===============================
+venv/lib/python3.12/site-packages/fastapi/testclient.py:1
+  /home/andrei/StorageGenie/backend/venv/lib/python3.12/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+venv/lib/python3.12/site-packages/starlette/testclient.py:53
+  /home/andrei/StorageGenie/backend/venv/lib/python3.12/site-packages/starlette/testclient.py:53: DeprecationWarning: The anyio.abc.BlockingPortal alias is deprecated, use anyio.from_thread.BlockingPortal instead.
+    _PortalFactoryType = Callable[[], AbstractContextManager[anyio.abc.BlockingPortal]]
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+ERROR tests/test_sg098_enrich_endpoint.py
+!!!!!!!!!!!!!!!!!!!! Interrupted: 1 error during collection !!!!!!!!!!!!!!!!!!!!
+2 warnings, 1 error in 0.40s
+
+===== S2. FRONTEND FAIL-PRE (before slice: onRun unwired) =====
+
+ RUN  v1.6.1 /home/andrei/StorageGenie/frontend
+
+stderr | src/routes/AssetDetailPage.test.tsx > AssetDetailPage > editing quantity patches via PATCH and shows the superseded prior value in history
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+ ❯ src/routes/AssetDetailPage.test.tsx  (6 tests | 1 failed) 1197ms
+   ❯ src/routes/AssetDetailPage.test.tsx > EnrichButton per-press cap (SG-082) > the page's wired Enrich handler POSTs the enrich endpoint under the cap (SG-098)
+     → expected "spy" to be called with arguments: [ '/v1/enrich/asset-1', {}, { …(1) } ]
+
+Received: 
+
+
+
+Number of calls: 0
+
+
+Ignored nodes: comments, script, style
+[36m<html>[39m
+  [36m<head />[39m
+  [36m<body>[39m
+    [36m<div>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"text-foreground"[39m
+        [33mstyle[39m=[32m"padding: 24px; max-width: 900px;"[39m
+      [36m>[39m
+        [36m<a[39m
+          [33mclass[39m=[32m"text-primary focus-ring"[39m
+          [33mhref[39m=[32m"/?household_id=hh"[39m
+          [33mstyle[39m=[32m"font-size: 13px;"[39m
+        [36m>[39m
+          [0m← Back to catalog[0m
+        [36m</a>[39m
+        [36m<div[39m
+          [33mstyle[39m=[32m"display: flex; justify-content: space-between; align-items: center; margin-top: 8px;"[39m
+        [36m>[39m
+          [36m<h1[39m
+            [33mclass[39m=[32m"page-header text-foreground"[39m
+            [33mstyle[39m=[32m"margin: 0px;"[39m
+          [36m>[39m
+            [0mMilk[0m
+          [36m</h1>[39m
+          [36m<button[39m
+            [33mclass[39m=[32m"bg-card text-foreground border-border focus-ring"[39m
+            [33mstyle[39m=[32m"padding: 6px 12px; border-radius: 6px; border-style: solid; border-width: 1px; cursor: pointer;"[39m
+          [36m>[39m
+            [0mEdit[0m
+          [36m</button>[39m
+        [36m</div>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"text-muted-foreground"[39m
+          [33mstyle[39m=[32m"margin-bottom: 12px; font-size: 13px;"[39m
+        [36m>[39m
+          [0mproduct[0m
+          [0m · [0m
+          [0mACTIVE[0m
+          [0m · v[0m
+          [0m1[0m
+          [0m · [0m
+          [0mhh[0m
+          [0m · qty [0m
+          [0m2[0m
+          [0m [0m
+          [0mpiece[0m
+        [36m</div>[39m
+        [36m<div[39m
+          [33mstyle[39m=[32m"margin-bottom: 16px;"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mstyle[39m=[32m"display: flex; gap: 8px; align-items: center; flex-wrap: wrap;"[39m
+          [36m>[39m
+            [36m<button[39m
+              [33mclass[39m=[32m"bg-primary text-primary-foreground focus-ring"[39m
+              [33mstyle[39m=[32m"padding: 6px 12px; border-radius: 6px; cursor: pointer;"[39m
+              [33mtype[39m=[32m"button"[39m
+            [36m>[39m
+              [0mEnrich[0m
+            [36m</button>[39m
+            [36m<span[39m
+              [33mclass[39m=[32m"text-muted-foreground"[39m
+              [33mstyle[39m=[32m"font-size: 12px;"[39m
+            [36m>[39m
+              [0mLast measured spend: [0m
+              [0m$0.00[0m
+              [0m · per-press cap $[0m
+              [0m0.05[0m
+            [36m</span>[39m
+          [36m</div>[39m
+        [36m</div>[39m
+        [36m<h3>[39m
+          [0mEvidence[0m
+        [36m</h3>[39m
+        [36m<div[39m
+          [33mstyle[39m=[32m"display: flex; gap: 8px; flex-wrap: wrap;"[39m
+        [36m>[39m
+          [36m<a[39m
+            [33mhref[39m=[32m"http://localhost:8003/v1/evidence/ev-1/file?household_id=hh"[39m
+            [33mrel[39m=[32m"noreferrer"[39m
+            [33mtarget[39m=[32m"_blank"[39m
+            [33mtitle[39m=[32m"SHA256: sha"[39m
+          [36m>[39m
+            [36m<img[39m
+              [33malt[39m=[32m"photo.jpg"[39m
+              [33mclass[39m=[32m"border-border"[39m
+              [33msrc[39m=[32m"http://localhost:8003/v1/evidence/ev-1/thumb/256?household_id=hh"[39m
+              [33mstyle[39m=[32m"width: 120px; height: 120px; object-fit: cover; border-radius: 6px; border-style: solid; border-width: 1px;"[39m
+            [36m/>[39m
+          [36m</a>[39m
+        [36m</div>[39m
+        [36m<div[39m
+          [33mstyle[39m=[32m"margin-top: 12px; display: flex; gap: 8px; align-items: center;"[39m
+        [36m>[39m
+          [36m<input[39m
+            [33maccept[39m=[32m"image/*,.pdf"[39m
+            [33mid[39m=[32m"attach-input"[39m
+            [33mmultiple[39m=[32m""[39m
+            [33mtype[39m=[32m"file"[39m
+          [36m/>[39m
+          [36m<button[39m
+            [33mclass[39m=[32m"bg-muted text-muted-foreground border-border focus-ring"[39m
+            [33mdisabled[39m=[32m""[39m
+            [33mstyle[39m=[32m"padding: 6px 12px; border-radius: 6px; border-style: solid; border-width: 1px; cursor: pointer;"[39m
+          [36m>[39m
+            [0mAttach evidence[0m
+          [36m</button>[39m
+        [36m</div>[39m
+        [36m<h3[39m
+          [33mstyle[39m=[32m"margin-top: 24px;"[39m
+        [36m>[39m
+          [0mAssertions (provenance)[0m
+        [36m</h3>[39m
+        [36m<table[39m
+          [33mstyle[39m=[32m"width: 100%; border-collapse: collapse; font-size: 13px;"[39m
+        [36m>[39m
+          [36m<thead>[39m
+            [36m<tr>[39m
+              [36m<th[39m
+                [33mclass[39m=[32m"border-border"[39m
+                [33mstyle[39m=[32m"text-align: left; border-bottom-style: solid; border-bottom-width: 1px; padding: 6px;"[39m
+              [36m>[39m
+                [0mField[0m
+              [36m</th>[39m
+              [36m<th[39m
+                [33mclass[39m=[32m"border-border"[39m
+                [33mstyle[39m=[32m"text-align: left; border-bottom-style: solid; border-bottom-width: 1px; padding: 6px;"[39m
+              [36m>[39m
+                [0mValue[0m
+              [36m</th>[39m
+              [36m<th[39m
+                [33mclass[39m=[32m"border-border"[39m
+                [33mstyle[39m=[32m"text-align: left; border-bottom-style: solid; border-bottom-width: 1px; padding: 6px;"[39m
+              [36m>[39m
+                [0mSource[0m
+              [36m</th>[39m
+              [36m<th[39m
+                [33mclass[39m=[32m"border-border"[39m
+                [33mstyle[39m=[32m"text-align: left; border-bottom-style: solid; border-bottom-width: 1px; padding: 6px;"[39m
+              [36m>[39m
+                [0mState[0m
+              [36m</th>[39m
+              [36m<th[39m
+                [33mclass[39m=[32m"border-border"[39m
+                [33mstyle[39m=[32m"text-align: left; border-bottom-style: solid; border-bottom-width: 1px; padding: 6px;"[39m
+              [36m>[39m
+                [0mConfidence[0m
+              [36m</th>[39m
+              [36m<th[39m
+                [33mclass[39m=[32m"border-border"[39m
+                [33mstyle[39m=[32m"text-align: left; border-bottom-style: solid; border-bottom-width: 1px; padding: 6px;"[39m
+              [36m>[39m
+                [0mEvidence[0m
+              [36m</th>[39m
+            [36m</tr>[39m
+          [36m</thead>[39m
+          [36m<tbody>[39m
+            [36m<tr>[39m
+              [36m<td[39m
+                [33mclass[39m=[32m"border-border font-mono"[39m
+                [33mstyle[39m=[32m"padding: 6px; border-bottom-style: solid; border-bottom-width: 1px; font-size: 12px;"[39m
+              [36m>[39m
+                [0mdisplay_name[0m
+              [36m</td>[39m
+              [36m<td[39m
+                [33mclass[39m=[32m"border-border"[39m
+                [33mstyle[39m=[32m"padding: 6px; border-bottom-style: solid; border-bottom-width: 1px;"[39m
+              [36m>[39m
+                [0mMilk[0m
+              [36m</td>[39m
+              [36m<td[39m
+                [33mclass[39m=[32m"border-border"[39m
+                [33mstyle[39m=[32m"padding: 6px; border-bottom-style: solid; border-bottom-width: 1px;"[39m
+              [36m>[39m
+                [0muser[0m
+              [36m</td>[39m
+              [36m<td[39m
+                [33mclass[39m=[32m"border-border"[39m
+                [33mstyle[39m=[32m"padding: 6px; border-bottom-style: solid; border-bottom-width: 1px;"[39m
+              [36m>[39m
+                [36m<span[39m
+                  [33mclass[39m=[32m"badge-green"[39m
+                  [33mstyle[39m=[32m"padding: 2px 6px; border-radius: 4px; font-size: 12px; display: inline-block;"[39m
+                [36m>[39m
+                  [0maccepted[0m
+                [36m</span>[39m
+              [36m</td>[39m
+              [36m<td[39m
+                [33mclass[39m=[32m"border-border"[39m
+                [33mstyle[39m=[32m"padding: 6px; border-bottom-style: solid; border-bottom-width: 1px;"[39m
+              [36m>[39m
+                [0m—[0m
+              [36m</td>[39m
+              [36m<td[39m
+                [33mclass[39m=[32m"border-border text-muted-foreground"[39m
+                [33mstyle[39m=[32m"padding: 6px; border-bottom-style: solid; border-bottom-width: 1px; font-size: 11px;"[39m
+              [36m>[39m
+                [0m—[0m
+              [36m</td>[39m
+            [36m</tr>[39m
+            [36m<tr>[39m
+              [36m<td[39m
+                [33mclass[39m=[32m"border-border font-mono"[39m
+                [33mstyle[39m=[32m"padding: 6px; border-bottom-style: solid; border-bottom-width: 1px; font-size: 12px;"[39m
+              [36m>[39m
+                [0mquantity[0m
+              [36m</td>[39m
+              [36m<td[39m
+                [33mclass[39m=[32m"border-border"[39m
+                [33mstyle[39m=[32m"padding: 6px; border-bottom-style: solid; border-bottom-width: 1px;"[39m
+              [36m>[39m
+                [0m2[0m
+              [36m</td>[39m
+              [36m<td[39m
+                [33mclass[39m=[32m"border-border"[39m
+                [33mstyle[39m=[32m"padding: 6px; border-bottom-style: solid; border-bottom-width: 1px;"[39m
+              [36m>[39m
+                [0muser[0m
+              [36m</td>[39m
+              [36m<td[39m
+                [33mclass[39m=[32m"border-border"[39m
+                [33mstyle[39m=[32m"padding: 6px; border-bottom-style: solid; border-bottom-width: 1px;"[39m
+              [36m>[39m
+                [36m<span[39m
+                  [33mclass[39m=[32m"badge-green"[39m
+                  [33mstyle[39m=[32m"padding: 2px 6px; border-radius: 4px; font-size: 12px; display: inline-block;"[39m
+                [36m>[39m
+                  [0maccepted[0m
+                [36m</span>[39m
+              [36m</td>[39m
+              [36m<td[39m
+                [33mclass[39m=[32m"border-border"[39m
+                [33mstyle[39m=[32m"padding: 6px; border-bottom-style: solid; border-bottom-width: 1px;"[39m
+              [36m>[39m
+                [0m—[0m
+              [36m</td>[39m
+              [36m<td[39m
+                [33mclass[39m=[32m"border-border text-muted-foreground"[39m
+                [33mstyle[39m=[32m"padding: 6px; border-bottom-style: solid; border-bottom-width: 1px; font-size: 11px;"[39m
+              [36m>[39m
+                [0m—[0m
+              [36m</td>[39m
+            [36m</tr>[39m
+          [36m</tbody>[39m
+        [36m</table>[39m
+        [36m<h3[39m
+          [33mstyle[39m=[32m"margin-top: 24px;"[39m
+        [36m>[39m
+          [0mAudit history[0m
+        [36m</h3>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"text-muted-foreground"[39m
+          [33mstyle[39m=[32m"font-size: 13px;"[39m
+        [36m>[39m
+          [0mNo audit events[0m
+        [36m</div>[39m
+      [36m</div>[39m
+    [36m</div>[39m
+  [36m</body>[39m
+[36m</html>[39m
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/routes/AssetDetailPage.test.tsx > EnrichButton per-press cap (SG-082) > the page's wired Enrich handler POSTs the enrich endpoint under the cap (SG-098)
+AssertionError: expected "spy" to be called with arguments: [ '/v1/enrich/asset-1', {}, { …(1) } ]
+
+Received: 
+
+
+
+Number of calls: 0
+
+
+Ignored nodes: comments, script, style
+[36m<html>[39m
+  [36m<head />[39m
+  [36m<body>[39m
+    [36m<div>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"text-foreground"[39m
+        [33mstyle[39m=[32m"padding: 24px; max-width: 900px;"[39m
+      [36m>[39m
+        [36m<a[39m
+          [33mclass[39m=[32m"text-primary focus-ring"[39m
+          [33mhref[39m=[32m"/?household_id=hh"[39m
+          [33mstyle[39m=[32m"font-size: 13px;"[39m
+        [36m>[39m
+          [0m← Back to catalog[0m
+        [36m</a>[39m
+        [36m<div[39m
+          [33mstyle[39m=[32m"display: flex; justify-content: space-between; align-items: center; margin-top: 8px;"[39m
+        [36m>[39m
+          [36m<h1[39m
+            [33mclass[39m=[32m"page-header text-foreground"[39m
+            [33mstyle[39m=[32m"margin: 0px;"[39m
+          [36m>[39m
+            [0mMilk[0m
+          [36m</h1>[39m
+          [36m<button[39m
+            [33mclass[39m=[32m"bg-card text-foreground border-border focus-ring"[39m
+            [33mstyle[39m=[32m"padding: 6px 12px; border-radius: 6px; border-style: solid; border-width: 1px; cursor: pointer;"[39m
+          [36m>[39m
+            [0mEdit[0m
+          [36m</button>[39m
+        [36m</div>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"text-muted-foreground"[39m
+          [33mstyle[39m=[32m"margin-bottom: 12px; font-size: 13px;"[39m
+        [36m>[39m
+          [0mproduct[0m
+          [0m · [0m
+          [0mACTIVE[0m
+          [0m · v[0m
+          [0m1[0m
+          [0m · [0m
+          [0mhh[0m
+          [0m · qty [0m
+          [0m2[0m
+          [0m [0m
+          [0mpiece[0m
+        [36m</div>[39m
+        [36m<div[39m
+          [33mstyle[39m=[32m"margin-bottom: 16px;"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mstyle[39m=[32m"display: flex; gap: 8px; align-items: center; flex-wrap: wrap;"[39m
+          [36m>[39m
+            [36m<button[39m
+              [33mclass[39m=[32m"bg-primary text-primary-foreground focus-ring"[39m
+              [33mstyle[39m=[32m"padding: 6px 12px; border-radius: 6px; cursor: pointer;"[39m
+              [33mtype[39m=[32m"button"[39m
+            [36m>[39m
+              [0mEnrich[0m
+            [36m</button>[39m
+            [36m<span[39m
+              [33mclass[39m=[32m"text-muted-foreground"[39m
+              [33mstyle[39m=[32m"font-size: 12px;"[39m
+            [36m>[39m
+              [0mLast measured spend: [0m
+              [0m$0.00[0m
+              [0m · per-press cap $[0m
+              [0m0.05[0m
+            [36m</span>[39m
+          [36m</div>[39m
+        [36m</div>[39m
+        [36m<h3>[39m
+          [0mEvidence[0m
+        [36m</h3>[39m
+        [36m<div[39m
+          [33mstyle[39m=[32m"display: flex; gap: 8px; flex-wrap: wrap;"[39m
+        [36m>[39m
+          [36m<a[39m
+            [33mhref[39m=[32m"http://localhost:8003/v1/evidence/ev-1/file?household_id=hh"[39m
+            [33mrel[39m=[32m"noreferrer"[39m
+            [33mtarget[39m=[32m"_blank"[39m
+            [33mtitle[39m=[32m"SHA256: sha"[39m
+          [36m>[39m
+            [36m<img[39m
+              [33malt[39m=[32m"photo.jpg"[39m
+              [33mclass[39m=[32m"border-border"[39m
+              [33msrc[39m=[32m"http://localhost:8003/v1/evidence/ev-1/thumb/256?household_id=hh"[39m
+              [33mstyle[39m=[32m"width: 120px; height: 120px; object-fit: cover; border-radius: 6px; border-style: solid; border-width: 1px;"[39m
+            [36m/>[39m
+          [36m</a>[39m
+        [36m</div>[39m
+        [36m<div[39m
+          [33mstyle[39m=[32m"margin-top: 12px; display: flex; gap: 8px; align-items: center;"[39m
+        [36m>[39m
+          [36m<input[39m
+            [33maccept[39m=[32m"image/*,.pdf"[39m
+            [33mid[39m=[32m"attach-input"[39m
+            [33mmultiple[39m=[32m""[39m
+            [33mtype[39m=[32m"file"[39m
+          [36m/>[39m
+          [36m<button[39m
+            [33mclass[39m=[32m"bg-muted text-muted-foreground border-border focus-ring"[39m
+            [33mdisabled[39m=[32m""[39m
+            [33mstyle[39m=[32m"padding: 6px 12px; border-radius: 6px; border-style: solid; border-width: 1px; cursor: pointer;"[39m
+          [36m>[39m
+            [0mAttach evidence[0m
+          [36m</button>[39m
+        [36m</div>[39m
+        [36m<h3[39m
+          [33mstyle[39m=[32m"margin-top: 24px;"[39m
+        [36m>[39m
+          [0mAssertions (provenance)[0m
+        [36m</h3>[39m
+        [36m<table[39m
+          [33mstyle[39m=[32m"width: 100%; border-collapse: collapse; font-size: 13px;"[39m
+        [36m>[39m
+          [36m<thead>[39m
+            [36m<tr>[39m
+              [36m<th[39m
+                [33mclass[39m=[32m"border-border"[39m
+                [33mstyle[39m=[32m"text-align: left; border-bottom-style: solid; border-bottom-width: 1px; padding: 6px;"[39m
+              [36m>[39m
+                [0mField[0m
+              [36m</th>[39m
+              [36m<th[39m
+                [33mclass[39m=[32m"border-border"[39m
+                [33mstyle[39m=[32m"text-align: left; border-bottom-style: solid; border-bottom-width: 1px; padding: 6px;"[39m
+              [36m>[39m
+                [0mValue[0m
+              [36m</th>[39m
+              [36m<th[39m
+                [33mclass[39m=[32m"border-border"[39m
+                [33mstyle[39m=[32m"text-align: left; border-bottom-style: solid; border-bottom-width: 1px; padding: 6px;"[39m
+              [36m>[39m
+                [0mSource[0m
+              [36m</th>[39m
+              [36m<th[39m
+                [33mclass[39m=[32m"border-border"[39m
+                [33mstyle[39m=[32m"text-align: left; border-bottom-style: solid; border-bottom-width: 1px; padding: 6px;"[39m
+              [36m>[39m
+                [0mState[0m
+              [36m</th>[39m
+              [36m<th[39m
+                [33mclass[39m=[32m"border-border"[39m
+                [33mstyle[39m=[32m"text-align: left; border-bottom-style: solid; border-bottom-width: 1px; padding: 6px;"[39m
+              [36m>[39m
+                [0mConfidence[0m
+              [36m</th>[39m
+              [36m<th[39m
+                [33mclass[39m=[32m"border-border"[39m
+                [33mstyle[39m=[32m"text-align: left; border-bottom-style: solid; border-bottom-width: 1px; padding: 6px;"[39m
+              [36m>[39m
+                [0mEvidence[0m
+              [36m</th>[39m
+            [36m</tr>[39m
+          [36m</thead>[39m
+          [36m<tbody>[39m
+            [36m<tr>[39m
+              [36m<td[39m
+                [33mclass[39m=[32m"border-border font-mono"[39m
+                [33mstyle[39m=[32m"padding: 6px; border-bottom-style: solid; border-bottom-width: 1px; font-size: 12px;"[39m
+              [36m>[39m
+                [0mdisplay_name[0m
+              [36m</td>[39m
+              [36m<td[39m
+                [33mclass[39m=[32m"border-border"[39m
+                [33mstyle[39m=[32m"padding: 6px; border-bottom-style: solid; border-bottom-width: 1px;"[39m
+              [36m>[39m
+                [0mMilk[0m
+              [36m</td>[39m
+              [36m<td[39m
+                [33mclass[39m=[32m"border-border"[39m
+                [33mstyle[39m=[32m"padding: 6px; border-bottom-style: solid; border-bottom-width: 1px;"[39m
+              [36m>[39m
+                [0muser[0m
+              [36m</td>[39m
+              [36m<td[39m
+                [33mclass[39m=[32m"border-border"[39m
+                [33mstyle[39m=[32m"padding: 6px; border-bottom-style: solid; border-bottom-width: 1px;"[39m
+              [36m>[39m
+                [36m<span[39m
+                  [33mclass[39m=[32m"badge-green"[39m
+                  [33mstyle[39m=[32m"padding: 2px 6px; border-radius: 4px; font-size: 12px; display: inline-block;"[39m
+                [36m>[39m
+                  [0maccepted[0m
+                [36m</span>[39m
+              [36m</td>[39m
+              [36m<td[39m
+                [33mclass[39m=[32m"border-border"[39m
+                [33mstyle[39m=[32m"padding: 6px; border-bottom-style: solid; border-bottom-width: 1px;"[39m
+              [36m>[39m
+                [0m—[0m
+              [36m</td>[39m
+              [36m<td[39m
+                [33mclass[39m=[32m"border-border text-muted-foreground"[39m
+                [33mstyle[39m=[32m"padding: 6px; border-bottom-style: solid; border-bottom-width: 1px; font-size: 11px;"[39m
+              [36m>[39m
+                [0m—[0m
+              [36m</td>[39m
+            [36m</tr>[39m
+            [36m<tr>[39m
+              [36m<td[39m
+                [33mclass[39m=[32m"border-border font-mono"[39m
+                [33mstyle[39m=[32m"padding: 6px; border-bottom-style: solid; border-bottom-width: 1px; font-size: 12px;"[39m
+              [36m>[39m
+                [0mquantity[0m
+              [36m</td>[39m
+              [36m<td[39m
+                [33mclass[39m=[32m"border-border"[39m
+                [33mstyle[39m=[32m"padding: 6px; border-bottom-style: solid; border-bottom-width: 1px;"[39m
+              [36m>[39m
+                [0m2[0m
+              [36m</td>[39m
+              [36m<td[39m
+                [33mclass[39m=[32m"border-border"[39m
+                [33mstyle[39m=[32m"padding: 6px; border-bottom-style: solid; border-bottom-width: 1px;"[39m
+              [36m>[39m
+                [0muser[0m
+              [36m</td>[39m
+              [36m<td[39m
+                [33mclass[39m=[32m"border-border"[39m
+                [33mstyle[39m=[32m"padding: 6px; border-bottom-style: solid; border-bottom-width: 1px;"[39m
+              [36m>[39m
+                [36m<span[39m
+                  [33mclass[39m=[32m"badge-green"[39m
+                  [33mstyle[39m=[32m"padding: 2px 6px; border-radius: 4px; font-size: 12px; display: inline-block;"[39m
+                [36m>[39m
+                  [0maccepted[0m
+                [36m</span>[39m
+              [36m</td>[39m
+              [36m<td[39m
+                [33mclass[39m=[32m"border-border"[39m
+                [33mstyle[39m=[32m"padding: 6px; border-bottom-style: solid; border-bottom-width: 1px;"[39m
+              [36m>[39m
+                [0m—[0m
+              [36m</td>[39m
+              [36m<td[39m
+                [33mclass[39m=[32m"border-border text-muted-foreground"[39m
+                [33mstyle[39m=[32m"padding: 6px; border-bottom-style: solid; border-bottom-width: 1px; font-size: 11px;"[39m
+              [36m>[39m
+                [0m—[0m
+              [36m</td>[39m
+            [36m</tr>[39m
+          [36m</tbody>[39m
+        [36m</table>[39m
+        [36m<h3[39m
+          [33mstyle[39m=[32m"margin-top: 24px;"[39m
+        [36m>[39m
+          [0mAudit history[0m
+        [36m</h3>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"text-muted-foreground"[39m
+          [33mstyle[39m=[32m"font-size: 13px;"[39m
+        [36m>[39m
+          [0mNo audit events[0m
+        [36m</div>[39m
+      [36m</div>[39m
+    [36m</div>[39m
+  [36m</body>[39m
+[36m</html>[39m
+ ❯ src/routes/AssetDetailPage.test.tsx:162:27
+    160| 
+    161|     await waitFor(() =>
+    162|       expect(api.apiPost).toHaveBeenCalledWith("/v1/enrich/asset-1", {…
+       |                           ^
+    163|     );
+    164|   });
+ ❯ runWithExpensiveErrorDiagnosticsDisabled node_modules/@testing-library/dom/dist/config.js:47:12
+ ❯ checkCallback node_modules/@testing-library/dom/dist/wait-for.js:124:77
+ ❯ Timeout.checkRealTimersCallback node_modules/@testing-library/dom/dist/wait-for.js:118:16
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 5 passed (6)
+   Start at  14:29:49
+   Duration  1.81s (transform 97ms, setup 38ms, collect 149ms, tests 1.20s, environment 235ms, prepare 48ms)
+
+
+===== S3. M45 COLLISION RAW (privacy audit before allow-set repair) =====
+FF                                                                       [100%]
+=================================== FAILURES ===================================
+______________ test_g0_single_http_client_and_send_site_full_scan ______________
+
+    def test_g0_single_http_client_and_send_site_full_scan() -> None:
+        """Scan every app source file: exactly two named HTTP clients, one send site.
+    
+        SG-082 repair (M45): the Jina fallback client is a second legitimate httpx
+        carrier inside the enrich package; the inventory now names both. The single
+        POST send site is unchanged (both enrich clients are read-only GETs).
+        """
+>       assert _http_client_files() == {
+            "services/enrich/client.py": ["import httpx"],
+            "services/enrich/jina.py": ["import httpx", "import urllib"],
+            "services/providers/opencode_go.py": ["import httpx"],
+        }, f"unexpected HTTP clients: {_http_client_files()}"
+E       AssertionError: unexpected HTTP clients: {'api/v1/enrich.py': ['import httpx'], 'services/enrich/client.py': ['import httpx'], 'services/enrich/jina.py': ['import httpx', 'import urllib'], 'services/providers/opencode_go.py': ['import httpx']}
+E       assert {'api/v1/enri...mport httpx']} == {'services/en...mport httpx']}
+E         
+E         Omitting 3 identical items, use -vv to show
+E         Left contains 1 more item:
+E         {'api/v1/enrich.py': ['import httpx']}
+E         Use -v to get more diff
+
+tests/test_privacy_audit.py:224: AssertionError
+______________ test_g2_web_senders_are_the_two_researched_sources ______________
+
+    def test_g2_web_senders_are_the_two_researched_sources() -> None:
+        """SG-082 repair (M45): the Jina fallback is now the ONE web-search sender.
+    
+        The name-only scan allows the enrich package's Jina module (+ the mapping
+        import in `candidates.py`) and keeps every other web sender absent. SG-097
+        adds `config.py` to the allow-set: it declares the `jina_api_key` settings
+        field (a name, not a sender). The excluded detection source is checked over
+        the touched web-source files only (the rule's literal gate covers
+        new/modified files, not the whole tree).
+        """
+        jina_files: set[str] = set()
+        for path in sorted(APP_DIR.rglob("*.py")):
+            rel = str(path.relative_to(APP_DIR))
+            for number, line in enumerate(path.read_text(encoding="utf-8").splitlines(), start=1):
+                lowered = line.lower()
+                assert "web_search" not in lowered and "websearch" not in lowered, (
+                    f"unexpected web-search implementation: {rel}:{number}: {line.strip()}"
+                )
+                if "jina" in lowered:
+                    jina_files.add(rel)
+>       assert jina_files == {
+            "config.py",
+            "services/candidates.py",
+            "services/enrich/jina.py",
+        }, jina_files
+E       AssertionError: {'api/v1/enrich.py', 'config.py', 'services/candidates.py', 'services/enrich/jina.py'}
+E       assert {'api/v1/enri...rich/jina.py'} == {'config.py',...rich/jina.py'}
+E         
+E         Extra items in the left set:
+E         'api/v1/enrich.py'
+E         Use -v to get more diff
+
+tests/test_privacy_audit.py:476: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_privacy_audit.py::test_g0_single_http_client_and_send_site_full_scan
+FAILED tests/test_privacy_audit.py::test_g2_web_senders_are_the_two_researched_sources
+2 failed in 0.39s
+
+===== S4. BACKEND POST-PASS (SG-098 file) =====
+.........                                                                [100%]
+=============================== warnings summary ===============================
+venv/lib/python3.12/site-packages/fastapi/testclient.py:1
+  /home/andrei/StorageGenie/backend/venv/lib/python3.12/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+venv/lib/python3.12/site-packages/starlette/testclient.py:53
+  /home/andrei/StorageGenie/backend/venv/lib/python3.12/site-packages/starlette/testclient.py:53: DeprecationWarning: The anyio.abc.BlockingPortal alias is deprecated, use anyio.from_thread.BlockingPortal instead.
+    _PortalFactoryType = Callable[[], AbstractContextManager[anyio.abc.BlockingPortal]]
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+9 passed, 2 warnings in 1.19s
+
+===== S5. BACKEND FULL SUITE (2 known decoder reds) =====
+  /home/andrei/StorageGenie/backend/venv/lib/python3.12/site-packages/alembic/config.py:604: DeprecationWarning: No path_separator found in configuration; falling back to legacy splitting on spaces, commas, and colons for prepend_sys_path.  Consider adding path_separator=os to Alembic config.
+    util.warn_deprecated(
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/test_signals.py::test_generated_codes_are_validated_and_bad_checksum_is_not_an_identifier
+FAILED tests/test_signals.py::test_ocr_has_text_boxes_and_mean_confidence - a...
+2 failed, 470 passed, 23 warnings in 20.02s
+
+===== S6. RUFF =====
+All checks passed!
+
+===== S7. MYPY (41 errors in 9 files == baseline, delta 0) =====
+app/api/v1/assets.py:418: error: Unused "type: ignore" comment  [unused-ignore]
+app/main.py:48: error: Unused "type: ignore" comment  [unused-ignore]
+app/main.py:54: error: Unused "type: ignore" comment  [unused-ignore]
+Found 41 errors in 9 files (checked 81 source files)
+
+===== S8. FRONTEND POST (vitest) =====
+
+ Test Files  23 passed (23)
+      Tests  180 passed (180)
+   Start at  14:32:47
+   Duration  4.26s (transform 759ms, setup 760ms, collect 3.24s, tests 5.53s, environment 6.38s, prepare 1.56s)
+
+
+===== S9. ESLINT =====
+exit 0, no output:
+
+===== S10. MODELS/ALEMBIC DIFF (empty = untouched) =====
+
+===== S11. PG-SC-11 END-RELATIVE GREP over touched files (exit 1 = 0 hits) =====
+grep exit: 1
+
+===== S12. SECRET GATE: added-diff key-value-shape scan (exit 1 = 0 real) =====
+scan exit: 1
+JINA_API_KEY name-only hits in new/changed source: 0
+(0 = the endpoint itself names no key; tests use the dummy sentinel test-sg098-sentinel)
+
+===== S13. JINA.PY DIFF (prose-only, 0 logic hunks) =====
+diff --git a/backend/app/services/enrich/jina.py b/backend/app/services/enrich/jina.py
+index 3a1b84a..9c210b7 100644
+--- a/backend/app/services/enrich/jina.py
++++ b/backend/app/services/enrich/jina.py
+@@ -17,11 +17,10 @@ Decisions recorded here (reported, not hidden):
+   the settings/env seam. The key VALUE is never returned by a builder, never
+   stored in a snapshot and never logged.
+ 
+-`resolve_api_key` reads `settings.jina_api_key` when such a field exists and
+-otherwise the `JINA_API_KEY` process environment. The installed settings module
+-(`app.config.Settings`) declares neither field (extra fields are ignored), so
+-on this tree the environment is the carrier; that is a disclosed finding, not a
+-silent fallback (`F-SG082-2`).
++`resolve_api_key` reads the declared `settings.jina_api_key` field (SG-097)
++first and otherwise the `JINA_API_KEY` process environment. The settings field
++is the declared carrier; the environment remains the fallback, never a silent
++one.
+ """
+ 
+ from __future__ import annotations
+
+===== S14. SCOPE DIFFSTAT =====
+ M backend/app/main.py
+ M backend/app/services/enrich/jina.py
+ M backend/tests/test_privacy_audit.py
+ M frontend/src/routes/AssetDetailPage.test.tsx
+ M frontend/src/routes/AssetDetailPage.tsx
+?? backend/app/api/v1/enrich.py
+?? backend/tests/test_sg098_enrich_endpoint.py
+?? docs/worklogs/SG-098_verify.log
+ backend/app/main.py                          |  2 ++
+ backend/app/services/enrich/jina.py          |  9 ++++-----
+ backend/tests/test_privacy_audit.py          | 18 ++++++++++++------
+ frontend/src/routes/AssetDetailPage.test.tsx | 12 ++++++++++++
+ frontend/src/routes/AssetDetailPage.tsx      |  9 ++++++++-
+ 5 files changed, 38 insertions(+), 12 deletions(-)

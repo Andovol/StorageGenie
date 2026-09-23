@@ -1,0 +1,16 @@
+SG-098 — running log (UTC, live clock)
+
+2026-09-23T14:24Z  recon: read AGENTS/STATE/packet; contract VERSION 0.33.0 at /home/andrei/storagegenie-contract (HEAD b232b84); BASE origin/automation resolved 267386e; tree clean at start. Read main.py, candidates route+service, enrich client/jina/scoring, config, asset/assertion/job models, AssetDetailPage + its test, SG-081/082 tests.
+2026-09-23T14:26:51Z  G1: wrote backend/app/api/v1/enrich.py (endpoint + cap mirror + identifier reader + DI seams).
+2026-09-23T14:27Z  G1: registered router at BOTH main.py sites (import :13, include :67).
+2026-09-23T14:27Z  G2: corrected jina.py docstring prose (F-SG097-2, 0 logic hunks).
+2026-09-23T14:28Z  G2: wired AssetDetailPage EnrichButton onRun -> POST /v1/enrich/{id}.
+2026-09-23T14:29:07Z  G3: wrote backend/tests/test_sg098_enrich_endpoint.py; first run 3 failed (route introspection, Jina key, snapshot assertion) -> fixed; 9 passed.
+2026-09-23T14:29Z  G3: extended frontend AssetDetailPage.test.tsx (page-wired handler test); 6 passed.
+2026-09-23T14:29Z  G3 FAIL-PRE backend: source stashed, enrich.py moved aside -> collection ImportError (module absent).
+2026-09-23T14:29Z  G3 FAIL-PRE frontend: AssetDetailPage.tsx stashed -> new test fails at its own assertion (apiPost not called).
+2026-09-23T14:30Z  G3 M45 collision: test_privacy_audit.py G0/G2 fail on new api/v1/enrich.py carrier -> minimal allow-set repair + docstrings.
+2026-09-23T14:31Z  G3 post: backend 2 failed/470 passed (known decoder reds); ruff clean; mypy 41/9 delta 0; frontend 180 passed; eslint clean; models/alembic diff empty; end-relative grep 0; secret scan 0 real.
+2026-09-23T14:33:19Z  WORK_HEAD c159d4d (source+tests). Pushed origin automation 267386e..c159d4d.
+2026-09-23T14:33Z  receipt note on c159d4d; pushed refs/notes/storagegenie-coder-reports 9f17725..2d2de7b; fetched mapped refs/notes/sg098-coder-reports-fetched; show pasted in report.
+2026-09-23T14:34Z  G4: docs-only receipt commit (this log + report + verify), push, dual-annotate final tip.
