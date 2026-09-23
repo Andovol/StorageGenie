@@ -528,3 +528,20 @@ fetch_exit=0
 ===== R-RECEIPT: show against FETCHED mapped ref =====
 Dispatch-ID: SG-097 | Report: docs/worklogs/SG-097_report.md | Work-HEAD: 4397d7f73fe558e3c4f80380d78b582e7405b1d2
 show_exit=0
+===== R-RECEIPT-FINALTIP: dual-annotate the final tip (D1) =====
+$ git notes --ref=refs/notes/storagegenie-coder-reports show e0ba05f4e9abf1983724115df8063ac8dc76909f   # post-add readback (the add ran in the prior command; D1 had no prior note)
+Dispatch-ID: SG-097 | Report: docs/worklogs/SG-097_report.md | Work-HEAD: 4397d7f73fe558e3c4f80380d78b582e7405b1d2
+existing_tip_exit=0
+$ git notes --ref=refs/notes/storagegenie-coder-reports add -m "..." e0ba05f4e9abf1983724115df8063ac8dc76909f
+add_tip_exit=0 (executed above)
+$ git push origin refs/notes/storagegenie-coder-reports
+push_notes_exit=0 (executed above; 6d7a3b7..c4f5fbc)
+$ git fetch origin refs/notes/storagegenie-coder-reports:refs/notes/storagegenie-coder-reports-sg097-verify
+From github.com:Andovol/StorageGenie
+   6d7a3b7..c4f5fbc  refs/notes/storagegenie-coder-reports -> refs/notes/storagegenie-coder-reports-sg097-verify
+fetch_exit=0
+$ git rev-parse refs/notes/storagegenie-coder-reports-sg097-verify
+c4f5fbcedf38428dc73d4b882583dec8e41e0e93
+$ git notes --ref=refs/notes/storagegenie-coder-reports-sg097-verify show e0ba05f4e9abf1983724115df8063ac8dc76909f
+Dispatch-ID: SG-097 | Report: docs/worklogs/SG-097_report.md | Work-HEAD: 4397d7f73fe558e3c4f80380d78b582e7405b1d2
+show_tip_exit=0

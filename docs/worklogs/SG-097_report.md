@@ -108,6 +108,22 @@ show_exit=0
 
 No existing note was found before adding (`existing_exit=1`), so this was not an existing-note refusal. The final tip (the docs-only receipt commit) is dual-annotated with the same note body (SG-092 note-anchor inoculation precedent).
 
+Final tip D1 = `e0ba05f4e9abf1983724115df8063ac8dc76909f` (worklogs/report/verify). Its note was added, pushed, fetched into a mapped ref (`c4f5fbcedf38428dc73d4b882583dec8e41e0e93`), and read back:
+
+```
+$ git notes --ref=refs/notes/storagegenie-coder-reports add -m "Dispatch-ID: SG-097 | Report: docs/worklogs/SG-097_report.md | Work-HEAD: 4397d7f73fe558e3c4f80380d78b582e7405b1d2" e0ba05f4e9abf1983724115df8063ac8dc76909f
+add_tip_exit=0
+$ git push origin refs/notes/storagegenie-coder-reports
+   6d7a3b7..c4f5fbc  refs/notes/storagegenie-coder-reports -> refs/notes/storagegenie-coder-reports
+push_notes_exit=0
+$ git fetch origin refs/notes/storagegenie-coder-reports:refs/notes/storagegenie-coder-reports-sg097-verify
+   6d7a3b7..c4f5fbc  refs/notes/storagegenie-coder-reports -> refs/notes/storagegenie-coder-reports-sg097-verify
+fetch_exit=0
+$ git notes --ref=refs/notes/storagegenie-coder-reports-sg097-verify show e0ba05f4e9abf1983724115df8063ac8dc76909f
+Dispatch-ID: SG-097 | Report: docs/worklogs/SG-097_report.md | Work-HEAD: 4397d7f73fe558e3c4f80380d78b582e7405b1d2
+show_tip_exit=0
+```
+
 Final line: `note=yes`
 
 ## UNCLEAR
