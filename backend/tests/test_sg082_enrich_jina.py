@@ -22,6 +22,7 @@ from __future__ import annotations
 
 import inspect
 import json
+import urllib.parse
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
@@ -522,6 +523,72 @@ def test_committed_web_field_is_proposed_never_auto_accepted(
     assert json.loads(rows["category_proposed"].model_json or "{}")["source_url"] == "https://eu.s.jina.ai/q"
     # A non-gated deterministic field is still accepted at 0.0 (contrast).
     assert rows["status"].review_state == "accepted"
+
+
+# --------------------------------------------------------------------------- #
+# SG-097 — the settings-field seam: explicit > Settings.jina_api_key > environment
+# --------------------------------------------------------------------------- #
+def test_settings_field_beats_the_environment(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Both the field and the env var are set: the declared field wins."""
+    monkeypatch.setenv(jina_mod.JINA_API_KEY_ENV, "test-env-key")
+    monkeypatch.setattr(settings, "jina_api_key", "test-field-key")
+    assert jina_mod.resolve_api_key() == "test-field-key"
+
+
+def test_explicit_argument_beats_the_settings_field(monkeypatch: pytest.MonkeyPatch) -> None:
+    """The explicit argument (test/DI seam) wins over the declared field."""
+    monkeypatch.setenv(jina_mod.JINA_API_KEY_ENV, "test-env-key")
+    monkeypatch.setattr(settings, "jina_api_key", "test-field-key")
+    assert jina_mod.resolve_api_key("test-explicit-key") == "test-explicit-key"
+
+
+def test_absent_field_falls_through_to_the_environment(monkeypatch: pytest.MonkeyPatch) -> None:
+    """The field is declared but unset: resolution falls through to the env var."""
+    monkeypatch.setattr(settings, "jina_api_key", None)
+    monkeypatch.setenv(jina_mod.JINA_API_KEY_ENV, "test-env-key")
+    assert jina_mod.resolve_api_key() == "test-env-key"
+
+
+def test_no_field_no_env_resolves_to_none(monkeypatch: pytest.MonkeyPatch) -> None:
+    """No key at any layer resolves to None (the caller then degrades loudly)."""
+    monkeypatch.setattr(settings, "jina_api_key", None)
+    monkeypatch.delenv(jina_mod.JINA_API_KEY_ENV, raising=False)
+    assert jina_mod.resolve_api_key() is None
+
+
+WORKED_EXAMPLE = (
+    Path(__file__).resolve().parents[2] / "docs" / "enrich-jina-request-example.md"
+)
+
+
+def test_worked_example_artifact_matches_the_real_driver() -> None:
+    """SG-097: the committed worked example IS the request the REAL driver builds.
+
+    The expected URL/params are derived from the real module constants
+    (`PG-SC-12`), never a re-typed copy; the artifact is names-only (the key is
+    added at send time and never appears in the example).
+    """
+    example = jina_mod.build_jina_request("Jacobs Cronat Gold", "Jacobs")
+    expected_params = tuple(
+        [("site", site) for site in jina_mod.SITE_FILTERS]
+        + [
+            ("num", jina_mod.JINA_NUM),
+            ("type", jina_mod.JINA_TYPE),
+            ("gl", jina_mod.JINA_GL),
+        ]
+    )
+    assert example.params == expected_params
+    assert example.url == f"{jina_mod.JINA_EU_BASE_URL}Jacobs+Jacobs+Cronat+Gold"
+    full_request = example.url + "?" + urllib.parse.urlencode(example.params)
+    artifact = WORKED_EXAMPLE.read_text(encoding="utf-8")
+    assert full_request in artifact
+    assert set(example.headers) == {
+        "Accept",
+        "X-Token-Budget",
+        "X-Timeout",
+        "X-Respond-With",
+    }
+    assert "Authorization" not in example.headers
 
 
 # --------------------------------------------------------------------------- #

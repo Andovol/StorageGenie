@@ -383,3 +383,42 @@ committed ledger across jobs).
 
 Phase 3 is proved by `backend/tests/test_phase3_e2e.py` (six gate groups on the real
 HTTP path, zero network) plus the per-slice suites, and closes on blueprint:531.
+
+## Enrich runbook — Jina fallback key (`JINA_API_KEY`)
+
+The Enrich lookup is a committed, **unwired** library
+(`backend/app/services/enrich/`): OpenFoodFacts first, Jina Search as the
+fallback for OFF misses/degradation and non-food input. It is not served by any
+route yet. When its endpoint lands, the Jina leg authenticates with
+`JINA_API_KEY`.
+
+### Rotate the key
+
+1. Put the key in the host `.env` as `JINA_API_KEY` (see `.env.example`). `.env`
+   is gitignored (`.gitignore:6`); the value is never printed, logged, or
+   committed.
+2. The backend reads it through `Settings.jina_api_key` (declared in
+   `backend/app/config.py`). A `JINA_API_KEY` process environment variable is the
+   fallback when the field is unset.
+
+### How the key is resolved (precedence)
+
+`resolve_api_key(explicit)` in `backend/app/services/enrich/jina.py` resolves in
+this order:
+
+1. **explicit argument** — the test / dependency-injection seam;
+2. **`Settings.jina_api_key`** — the declared settings field (host `.env`);
+3. **`JINA_API_KEY`** process environment.
+
+No key at any layer degrades loudly (`missing_key:`) and sends **nothing** — the
+client never sends an unauthenticated request. The `Authorization: Bearer <key>`
+header is added at **send time only** (`authorize()`); builders, snapshots and
+log lines carry header **names only**, and the key value is never returned,
+stored, or logged.
+
+A worked example of the exact request the driver builds (EU-default base, header
+names, repeated `site:` query) is committed at
+`docs/enrich-jina-request-example.md`; its shape is asserted against the real
+driver constants by
+`backend/tests/test_sg082_enrich_jina.py::test_worked_example_artifact_matches_the_real_driver`.
+

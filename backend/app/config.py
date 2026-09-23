@@ -27,6 +27,9 @@ class Settings(BaseSettings):
     sg_provider_id: str = "fake"
     sg_model_id: str = "deepseek-v4-flash-vision-exp"
     opencode_api_key: str | None = None
+    # SG-097: Jina Search fallback key (Enrich). Declared so the settings seam
+    # reads it; the JINA_API_KEY process environment remains the fallback.
+    jina_api_key: str | None = None
     sg_per_job_cap: float | None = None
     sg_monthly_cap: float | None = None
     sg_consent: bool = False

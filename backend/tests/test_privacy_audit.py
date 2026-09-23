@@ -457,9 +457,11 @@ def test_g2_web_senders_are_the_two_researched_sources() -> None:
     """SG-082 repair (M45): the Jina fallback is now the ONE web-search sender.
 
     The name-only scan allows the enrich package's Jina module (+ the mapping
-    import in `candidates.py`) and keeps every other web sender absent. The
-    excluded detection source is checked over the touched web-source files only
-    (the rule's literal gate covers new/modified files, not the whole tree).
+    import in `candidates.py`) and keeps every other web sender absent. SG-097
+    adds `config.py` to the allow-set: it declares the `jina_api_key` settings
+    field (a name, not a sender). The excluded detection source is checked over
+    the touched web-source files only (the rule's literal gate covers
+    new/modified files, not the whole tree).
     """
     jina_files: set[str] = set()
     for path in sorted(APP_DIR.rglob("*.py")):
@@ -471,7 +473,11 @@ def test_g2_web_senders_are_the_two_researched_sources() -> None:
             )
             if "jina" in lowered:
                 jina_files.add(rel)
-    assert jina_files == {"services/candidates.py", "services/enrich/jina.py"}, jina_files
+    assert jina_files == {
+        "config.py",
+        "services/candidates.py",
+        "services/enrich/jina.py",
+    }, jina_files
 
     excluded_hits: list[str] = []
     for rel in ("services/candidates.py", "services/enrich/jina.py"):
