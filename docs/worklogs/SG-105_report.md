@@ -5,7 +5,7 @@
 - **Model:** `unknown` — no model id is sent; the CLI default is the model (per policy). Not guessed.
 - **Contract:** recorded **`0.33.0`** == published (`b232b84`; D129 adoption). **Source path:** `STATE.md:3` (recorded `0.33.0`, FETCH_HEAD `b232b84`) + `AGENTS.md` rule-set version. **`.rules-cache/` is ABSENT on this checkout** — the contract is echoed from the checkout, not from a fetched cache (same as SG-104).
 - **BASE:** `origin/automation` = `66c7e78de8140e266a609bea6781321ee356b983` (the packet-requested ref, and the commit it resolved to — two fields).
-- **WORK_HEAD:** `<WORK_HEAD_PENDING>`
+- **WORK_HEAD:** `3b18e93806eb668cb30676c25984bff41b14b0b4`
 - **DATABASE:** none · **Restart:** none · **Deploy:** none · **Container actions:** none
 - **Spend (real $):** **$0.000000** — zero provider calls, no network.
 
@@ -110,7 +110,31 @@
 Work pushed to `automation`, worktree clean (`CO-55`). No push to `storagegenie-evidence`; no `{{RECEIPT_CMD}}`. Note added on `WORK_HEAD`; notes ref pushed; verified against the **fetched, mapped** ref. Executed, verbatim:
 
 ```
-<RECEIPT_PENDING>
+$ git push origin automation
+To github.com:Andovol/StorageGenie.git
+   66c7e78..3b18e93  automation -> automation
+push_automation_exit=0
+
+$ git notes --ref=refs/notes/storagegenie-coder-reports show 3b18e93806eb668cb30676c25984bff41b14b0b4   # pre-check
+error: no note found for object 3b18e93806eb668cb30676c25984bff41b14b0b4.
+precheck_exit=1
+
+$ git notes --ref=refs/notes/storagegenie-coder-reports add -m "Dispatch-ID: SG-105 | Report: docs/worklogs/SG-105_report.md | Work-HEAD: 3b18e93806eb668cb30676c25984bff41b14b0b4" 3b18e93806eb668cb30676c25984bff41b14b0b4
+note_add_exit=0
+
+$ git push origin refs/notes/storagegenie-coder-reports
+To github.com:Andovol/StorageGenie.git
+   97ddaec..14d01de  refs/notes/storagegenie-coder-reports -> refs/notes/storagegenie-coder-reports
+push_notes_exit=0
+
+$ git fetch origin refs/notes/storagegenie-coder-reports:refs/notes/storagegenie-coder-reports-sg105-verify
+From github.com:Andovol/StorageGenie
+ * [new ref]         refs/notes/storagegenie-coder-reports -> refs/notes/storagegenie-coder-reports-sg105-verify
+fetch_exit=0
+
+$ git notes --ref=refs/notes/storagegenie-coder-reports-sg105-verify show 3b18e93806eb668cb30676c25984bff41b14b0b4
+Dispatch-ID: SG-105 | Report: docs/worklogs/SG-105_report.md | Work-HEAD: 3b18e93806eb668cb30676c25984bff41b14b0b4
+show_exit=0
 ```
 
 The final tip (the docs-only receipt commit) is dual-annotated too (note-anchor inoculation, SG-092 precedent). `note=yes`.
