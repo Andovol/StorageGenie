@@ -1,0 +1,2655 @@
+SG-105 verify log — raw outputs (ANSI stripped)
+Generated: 2026-09-23T19:19:31Z
+Contract: 0.33.0 (source: STATE.md:3 recorded + AGENTS.md rule-set version; .rules-cache/ ABSENT on this checkout) == published b232b84 (D129 adoption)
+BASE (origin/automation, packet-requested ref): 66c7e78de8140e266a609bea6781321ee356b983
+WORK_HEAD: <pending>
+model: unknown (CLI default, omitted per policy) | effort: high (process args: --variant high)
+DATABASE: none | Restart: none | Deploy: none | Container actions: none
+
+============================================================
+FAIL-PRE RUN (tests present, source unchanged) — raw
+============================================================
+
+> storagegenie-frontend@0.1.0 test
+> vitest run
+
+
+ RUN  v1.6.1 /home/andrei/StorageGenie/frontend
+
+stderr | src/components/shell/shell.test.tsx > Catalog shell > the header labels the LOADED item count, not a household total
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+stderr | src/components/shell/import-modal.test.tsx > AssetImportModal staging > drop stages accepted files as Ready with a live count
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+stderr | src/components/catalog/catalog.test.tsx > ProductCard > renders the name, the category micro-pill and the primary-color dots
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+ ✓ src/components/shell/import-modal.test.tsx  (14 tests) 392ms
+stderr | src/routes/theme-adoption.test.tsx > SG-075 screen adoption > App nav carries the card/border tokens and surfaces the theme toggle
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+ ❯ src/routes/theme-adoption.test.tsx  (11 tests | 1 failed) 256ms
+   ❯ src/routes/theme-adoption.test.tsx > SG-075 screen adoption > capture screen rides the shared centered container and themed household select (SG-105 G1/G2)
+     → expected null not to be null
+ ✓ src/components/shell/drawer.test.tsx  (17 tests) 683ms
+ ❯ src/components/catalog/catalog.test.tsx  (33 tests | 1 failed) 666ms
+   ❯ src/components/catalog/catalog.test.tsx > ProductCard > cards size to their content: no fixed 3:4 dead space, the media well stays 1:1 (SG-105 G4)
+     → expected '3 / 4' to be '' // Object.is equality
+stderr | src/routes/InboxPage.test.tsx > InboxPage > renders failed loaded job detail and retries that loaded id
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+ ✓ src/theme/theme.test.tsx  (10 tests) 85ms
+stderr | src/routes/AssetDetailPage.test.tsx > AssetDetailPage > editing quantity patches via PATCH and shows the superseded prior value in history
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+ ❯ src/components/AssetForm.test.tsx  (9 tests | 2 failed) 215ms
+   ❯ src/components/AssetForm.test.tsx > AssetForm > the asset-type select carries the themed control treatment (SG-105 G2)
+     → expect(element).toHaveClass("bg-background text-foreground border-border")
+
+Expected the element to have class:
+  bg-background text-foreground border-border
+Received:
+
+   ❯ src/components/AssetForm.test.tsx > AssetForm > the file pickers are real file inputs hidden behind themed labels (SG-105 G2)
+     → Unable to find a label with the text of: Choose files
+
+Ignored nodes: comments, script, style
+<body>
+  <div>
+    <form
+      style="display: flex; flex-direction: column; gap: 12px; max-width: 520px;"
+    >
+      <label
+        style="display: flex; flex-direction: column; gap: 4px;"
+      >
+        <span>
+          Display name (optional)
+        </span>
+        <input
+          class="bg-background text-foreground border-border focus-ring"
+          placeholder="e.g. Hammer"
+          style="width: 100%; padding: 8px; border-style: solid; border-width: 1px; border-radius: 6px;"
+          value=""
+        />
+        <span
+          class="text-muted-foreground"
+          style="font-size: 11px;"
+        >
+          Left blank, we use the photo's filename
+        </span>
+      </label>
+      <label
+        style="display: flex; flex-direction: column; gap: 4px;"
+      >
+        <span>
+          Asset type
+        </span>
+        <select
+          style="width: 100%; padding: 8px; border-radius: 6px;"
+        >
+          <option
+            value="unknown"
+          >
+            unknown
+          </option>
+          <option
+            value="equipment"
+          >
+            equipment
+          </option>
+          <option
+            value="product"
+          >
+            product
+          </option>
+          <option
+            value="component"
+          >
+            component
+          </option>
+          <option
+            value="consumable"
+          >
+            consumable
+          </option>
+          <option
+            value="container"
+          >
+            container
+          </option>
+          <option
+            value="document"
+          >
+            document
+          </option>
+          <option
+            value="collection"
+          >
+            collection
+          </option>
+        </select>
+      </label>
+      <div
+        style="display: flex; gap: 12px;"
+      >
+        <label
+          style="flex: 1 1 0%; display: flex; flex-direction: column; gap: 4px;"
+        >
+          <span>
+            Quantity
+          </span>
+          <input
+            class="bg-background text-foreground border-border focus-ring"
+            step="any"
+            style="padding: 8px; border-style: solid; border-width: 1px; border-radius: 6px;"
+            type="number"
+            value=""
+          />
+        </label>
+        <label
+          style="flex: 1 1 0%; display: flex; flex-direction: column; gap: 4px;"
+        >
+          <span>
+            Unit
+          </span>
+          <input
+            class="bg-background text-foreground border-border focus-ring"
+            placeholder="pcs, kg…"
+            style="padding: 8px; border-style: solid; border-width: 1px; border-radius: 6px;"
+            value=""
+          />
+        </label>
+        <label
+          style="flex: 1 1 0%; display: flex; flex-direction: column; gap: 4px;"
+        >
+          <span>
+            Condition
+          </span>
+          <input
+            class="bg-background text-foreground border-border focus-ring"
+            placeholder="new, used…"
+            style="padding: 8px; border-style: solid; border-width: 1px; border-radius: 6px;"
+            value=""
+          />
+        </label>
+      </div>
+      <div
+        class="border-border bg-card-muted"
+        style="border-style: dashed; border-width: 2px; border-radius: 8px; padding: 16px; text-align: center;"
+      >
+        <div
+          class="text-muted-foreground"
+          style="font-size: 13px; margin-bottom: 8px;"
+        >
+          Drag & drop photos here, click to select, or paste
+        </div>
+        <input
+          accept="image/*,.pdf"
+          multiple=""
+          type="file"
+        />
+        <label
+          class="text-muted-foreground"
+          style="display: inline-flex; flex-direction: column; gap: 4px; margin-top: 12px; font-size: 13px;"
+        >
+          Take a photo
+          <input
+            accept="image/*"
+            capture="environment"
+            type="file"
+          />
+        </label>
+      </div>
+      <button
+        class="bg-primary text-primary-foreground focus-ring"
+        style="padding: 10px 16px; border-radius: 6px; cursor: pointer;"
+        type="submit"
+      >
+        Create asset
+      </button>
+    </form>
+  </div>
+</body>
+ ✓ src/routes/AssetDetailPage.test.tsx  (6 tests) 288ms
+stderr | src/routes/ReviewPage.test.tsx > ReviewPage > posts every decision with the loaded candidate id and supports keyboard actions
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+ ✓ src/routes/ReviewPage.test.tsx  (4 tests) 201ms
+ ✓ src/api/client.test.ts  (11 tests) 9ms
+stderr | src/routes/ChatPage.test.tsx > ChatPage > sending a question posts and renders the grounded reply
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+ ✓ src/routes/ChatPage.test.tsx  (6 tests) 273ms
+ ❯ src/routes/InboxPage.test.tsx  (8 tests | 4 failed) 1284ms
+   ❯ src/routes/InboxPage.test.tsx > InboxPage > the page rides the shared centered container (SG-105 G1)
+     → expected null not to be null
+   ❯ src/routes/InboxPage.test.tsx > InboxPage > the household select carries the themed control treatment (SG-105 G2)
+     → expect(element).toHaveClass("bg-background text-foreground border-border")
+
+Expected the element to have class:
+  bg-background text-foreground border-border
+Received:
+
+   ❯ src/routes/InboxPage.test.tsx > InboxPage > the review link carries the theme link treatment, not default purple (SG-105 G3)
+     → expect(element).toHaveClass("text-primary")
+
+Expected the element to have class:
+  text-primary
+Received:
+
+   ❯ src/routes/InboxPage.test.tsx > InboxPage > resolved review tasks are hidden by default and revealed by the status filter (SG-105 G3)
+     → Found multiple elements with the text: identifier_collision
+
+Here are the matching elements:
+
+Ignored nodes: comments, script, style
+<strong>
+  identifier_collision
+</strong>
+
+Ignored nodes: comments, script, style
+<strong>
+  identifier_collision
+</strong>
+
+(If this is intentional, then use the `*AllBy*` variant of the query (like `queryAllByText`, `getAllByText`, or `findAllByText`)).
+
+Ignored nodes: comments, script, style
+<body>
+  <div>
+    <div
+      class="text-foreground"
+      style="padding: 24px; max-width: 1100px;"
+    >
+      <div
+        style="display: flex; justify-content: space-between; align-items: center;"
+      >
+        <h1
+          class="page-header text-foreground"
+        >
+          Inbox
+        </h1>
+        <label>
+          Household 
+          <select>
+            <option
+              value=""
+            >
+              Select household
+            </option>
+            <option
+              value="household-loaded"
+            >
+              Loaded home
+            </option>
+          </select>
+        </label>
+      </div>
+      <div
+        style="display: grid; grid-template-columns: minmax(260px, .8fr) minmax(320px, 1.2fr); gap: 20px;"
+      >
+        <section>
+          <h2>
+            Import jobs
+          </h2>
+          <div
+            role="status"
+          >
+            No import jobs yet.
+          </div>
+          <div
+            style="display: grid; gap: 8px;"
+          />
+        </section>
+        <section>
+          <h2>
+            Selected job
+          </h2>
+          <div>
+            Select a job to see progress and errors.
+          </div>
+        </section>
+      </div>
+      <section
+        style="margin-top: 28px;"
+      >
+        <h2>
+          Review queue
+        </h2>
+        <div
+          style="display: grid; gap: 8px;"
+        >
+          <div
+            class="bg-card border-border"
+            style="display: flex; justify-content: space-between; gap: 12px; padding: 12px; border-style: solid; border-width: 1px; border-radius: 8px;"
+          >
+            <div>
+              <strong>
+                identifier_collision
+              </strong>
+               · 
+              high
+               · 
+              open
+              <div
+                class="text-muted-foreground"
+                style="font-size: 12px;"
+              >
+                Task 
+                task-open-2
+                 · candidate 
+                candidate-open-2
+              </div>
+            </div>
+            <div
+              style="display: flex; gap: 8px;"
+            >
+              <a
+                href="/review/candidate-open-2?household_id=household-loaded"
+              >
+                Review
+              </a>
+              <button
+                type="button"
+              >
+                Resolve
+              </button>
+            </div>
+          </div>
+          <div
+            class="bg-card border-border"
+            style="display: flex; justify-content: space-between; gap: 12px; padding: 12px; border-style: solid; border-width: 1px; border-radius: 8px;"
+          >
+            <div>
+              <strong>
+                identifier_collision
+              </strong>
+               · 
+              low
+               · 
+              resolved
+              <div
+                class="text-muted-foreground"
+                style="font-size: 12px;"
+              >
+                Task 
+                task-resolved-2
+                 · candidate 
+                candidate-resolved-2
+              </div>
+            </div>
+            <div
+              style="display: flex; gap: 8px;"
+            >
+              <a
+                href="/review/candidate-resolved-2?household_id=household-loaded"
+              >
+                Review
+              </a>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
+</body>
+
+Ignored nodes: comments, script, style
+<body>
+  <div>
+    <div
+      class="text-foreground"
+      style="padding: 24px; max-width: 1100px;"
+    >
+      <div
+        style="display: flex; justify-content: space-between; align-items: center;"
+      >
+        <h1
+          class="page-header text-foreground"
+        >
+          Inbox
+        </h1>
+        <label>
+          Household 
+          <select>
+            <option
+              value=""
+            >
+              Select household
+            </option>
+            <option
+              value="household-loaded"
+            >
+              Loaded home
+            </option>
+          </select>
+        </label>
+      </div>
+      <div
+        style="display: grid; grid-template-columns: minmax(260px, .8fr) minmax(320px, 1.2fr); gap: 20px;"
+      >
+        <section>
+          <h2>
+            Import jobs
+          </h2>
+          <div
+            role="status"
+          >
+            No import jobs yet.
+          </div>
+          <div
+            style="display: grid; gap: 8px;"
+          />
+        </section>
+        <section>
+          <h2>
+            Selected job
+          </h2>
+          <div>
+            Select a job to see progress and errors.
+          </div>
+        </section>
+      </div>
+      <section
+        style="margin-top: 28px;"
+      >
+        <h2>
+          Review queue
+        </h2>
+        <div
+          style="display: grid; gap: 8px;"
+        >
+          <div
+            class="bg-card border-border"
+            style="display: flex; justify-content: space-between; gap: 12px; padding: 12px; border-style: solid; border-width: 1px; border-radius: 8px;"
+          >
+            <div>
+              <strong>
+                identifier_collision
+              </strong>
+               · 
+              high
+               · 
+              open
+              <div
+                class="text-muted-foreground"
+                style="font-size: 12px;"
+              >
+                Task 
+                task-open-2
+                 · candidate 
+                candidate-open-2
+              </div>
+            </div>
+            <div
+              style="display: flex; gap: 8px;"
+            >
+              <a
+                href="/review/candidate-open-2?household_id=household-loaded"
+              >
+                Review
+              </a>
+              <button
+                type="button"
+              >
+                Resolve
+              </button>
+            </div>
+          </div>
+          <div
+            class="bg-card border-border"
+            style="display: flex; justify-content: space-between; gap: 12px; padding: 12px; border-style: solid; border-width: 1px; border-radius: 8px;"
+          >
+            <div>
+              <strong>
+                identifier_collision
+              </strong>
+               · 
+              low
+               · 
+              resolved
+              <div
+                class="text-muted-foreground"
+                style="font-size: 12px;"
+              >
+                Task 
+                task-resolved-2
+                 · candidate 
+                candidate-resolved-2
+              </div>
+            </div>
+            <div
+              style="display: flex; gap: 8px;"
+            >
+              <a
+                href="/review/candidate-resolved-2?household_id=household-loaded"
+              >
+                Review
+              </a>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
+</body>
+ ✓ src/types/product.test.ts  (12 tests) 6ms
+ ✓ src/routes/AnalyticsPage.test.tsx  (4 tests) 139ms
+ ❯ src/components/shell/shell.test.tsx  (22 tests | 4 failed) 2829ms
+   ❯ src/components/shell/shell.test.tsx > Catalog shell > the toolbar renders All plus one counted pill per real asset_type vocabulary
+     → Unable to find an accessible element with the role "button" and name "Uncategorized (1)"
+
+Here are the accessible roles:
+
+  link:
+
+  Name "StorageGenie":
+  <a
+    class="text-foreground focus-ring"
+    href="/"
+    style="font-weight: 700; text-decoration: none; margin-right: 4px;"
+  />
+
+  Name "Import Asset":
+  <a
+    class="bg-primary text-primary-foreground focus-ring"
+    href="/capture"
+    style="padding: 6px 12px; border-radius: 6px; text-decoration: none; font-weight: 600; font-size: 13px; display: inline-flex; align-items: center; gap: 6px;"
+  />
+
+  Name "Source Only Mystery Uncategorized":
+  <a
+    class="product-card bg-card border-border focus-ring"
+    data-testid="product-card"
+    href="/assets/a-mystery?household_id=h1"
+    style="display: flex; flex-direction: column; gap: 10px; border-style: solid; border-width: 1px; border-radius: 12px; padding: 10px; text-decoration: none; color: inherit; aspect-ratio: 3 / 4;"
+  />
+
+  Name "Source Only Zap Electronics & Gadgets":
+  <a
+    class="product-card bg-card border-border focus-ring"
+    data-testid="product-card"
+    href="/assets/a-zap?household_id=h1"
+    style="display: flex; flex-direction: column; gap: 10px; border-style: solid; border-width: 1px; border-radius: 12px; padding: 10px; text-decoration: none; color: inherit; aspect-ratio: 3 / 4;"
+  />
+
+  Name "Source Only Shirt Apparel & Textiles":
+  <a
+    class="product-card bg-card border-border focus-ring"
+    data-testid="product-card"
+    href="/assets/a-shirt?household_id=h1"
+    style="display: flex; flex-direction: column; gap: 10px; border-style: solid; border-width: 1px; border-radius: 12px; padding: 10px; text-decoration: none; color: inherit; aspect-ratio: 3 / 4;"
+  />
+
+  Name "Source Only Drill Hardware & Tools":
+  <a
+    class="product-card bg-card border-border focus-ring"
+    data-testid="product-card"
+    href="/assets/a-drill?household_id=h1"
+    style="display: flex; flex-direction: column; gap: 10px; border-style: solid; border-width: 1px; border-radius: 12px; padding: 10px; text-decoration: none; color: inherit; aspect-ratio: 3 / 4;"
+  />
+
+  --------------------------------------------------
+  searchbox:
+
+  Name "Search catalog":
+  <input
+    aria-label="Search catalog"
+    class="bg-background text-foreground border-border focus-ring"
+    placeholder="Search…"
+    style="padding: 6px 10px; border-radius: 6px; border-style: solid; border-width: 1px; min-width: 200px; font-size: 13px;"
+    type="search"
+    value=""
+  />
+
+  --------------------------------------------------
+  button:
+
+  Name "Switch to dark theme":
+  <button
+    aria-label="Switch to dark theme"
+    class="bg-card text-foreground border-border focus-ring"
+    style="display: inline-flex; align-items: center; justify-content: center; padding: 6px; border-radius: 6px; border-style: solid; border-width: 1px; cursor: pointer;"
+    title="Switch to dark theme"
+    type="button"
+  />
+
+  Name "All (4)":
+  <button
+    aria-pressed="true"
+    class="bg-primary text-primary-foreground focus-ring"
+    style="padding: 4px 10px; border-radius: 6px; border-style: solid; border-width: 1px; font-size: 13px; cursor: pointer; font-weight: 600;"
+    type="button"
+  />
+
+  Name "Hardware & Tools (1)":
+  <button
+    aria-pressed="false"
+    class="bg-card-muted text-muted-foreground focus-ring"
+    style="padding: 4px 10px; border-radius: 6px; border-style: solid; border-width: 1px; font-size: 13px; cursor: pointer; font-weight: 400;"
+    type="button"
+  />
+
+  Name "Electronics & Gadgets (1)":
+  <button
+    aria-pressed="false"
+    class="bg-card-muted text-muted-foreground focus-ring"
+    style="padding: 4px 10px; border-radius: 6px; border-style: solid; border-width: 1px; font-size: 13px; cursor: pointer; font-weight: 400;"
+    type="button"
+  />
+
+  Name "Apparel & Textiles (1)":
+  <button
+    aria-pressed="false"
+    class="bg-card-muted text-muted-foreground focus-ring"
+    style="padding: 4px 10px; border-radius: 6px; border-style: solid; border-width: 1px; font-size: 13px; cursor: pointer; font-weight: 400;"
+    type="button"
+  />
+
+  Name "unknown (1)":
+  <button
+    aria-pressed="false"
+    class="bg-card-muted text-muted-foreground focus-ring"
+    style="padding: 4px 10px; border-radius: 6px; border-style: solid; border-width: 1px; font-size: 13px; cursor: pointer; font-weight: 400;"
+    type="button"
+  />
+
+  Name "Standard Grid":
+  <button
+    aria-pressed="true"
+    class="bg-primary text-primary-foreground focus-ring"
+    style="padding: 4px 10px; border-radius: 6px; border-style: solid; border-width: 1px; font-size: 13px; cursor: pointer; font-weight: 600;"
+    type="button"
+  />
+
+  Name "Compact Table":
+  <button
+    aria-pressed="false"
+    class="bg-card-muted text-muted-foreground focus-ring"
+    style="padding: 4px 10px; border-radius: 6px; border-style: solid; border-width: 1px; font-size: 13px; cursor: pointer; font-weight: 400;"
+    type="button"
+  />
+
+  Name "Save search":
+  <button
+    class="bg-card text-foreground border-border focus-ring"
+    disabled=""
+    style="padding: 4px 10px; border-radius: 6px; border-style: solid; border-width: 1px; font-size: 13px; cursor: pointer; opacity: 0.5;"
+    type="button"
+  />
+
+  --------------------------------------------------
+  combobox:
+
+  Name "Household":
+  <select
+    aria-label="Household"
+    class="bg-background text-foreground border-border focus-ring"
+    style="padding: 4px 10px; border-radius: 6px; border-style: solid; border-width: 1px; font-size: 13px; cursor: pointer;"
+  />
+
+  Name "Sort catalog":
+  <select
+    aria-label="Sort catalog"
+    class="bg-background text-foreground border-border focus-ring"
+    style="padding: 4px 10px; border-radius: 6px; border-style: solid; border-width: 1px; font-size: 13px; cursor: pointer;"
+  />
+
+  --------------------------------------------------
+  option:
+
+  Name "Home":
+  <option
+    value="h1"
+  />
+
+  Name "Recently Added":
+  <option
+    value="recent"
+  />
+
+  Name "Name (A-Z)":
+  <option
+    value="name"
+  />
+
+  Name "Processing Status":
+  <option
+    value="status"
+  />
+
+  --------------------------------------------------
+  group:
+
+  Name "Density":
+  <div
+    aria-label="Density"
+    role="group"
+    style="display: inline-flex; gap: 4px;"
+  />
+
+  --------------------------------------------------
+  main:
+
+  Name "":
+  <main
+    style="padding: 24px;"
+  />
+
+  --------------------------------------------------
+  region:
+
+  Name "Product results":
+  <div
+    aria-busy="false"
+    aria-label="Product results"
+    class="catalog-grid"
+    data-testid="catalog-grid"
+    role="region"
+    style=""
+  />
+
+  --------------------------------------------------
+
+Ignored nodes: comments, script, style
+<body>
+  <div>
+    <div
+      class="bg-background text-foreground"
+      style="min-height: 100vh;"
+    >
+      <div
+        class="bg-background"
+        style="position: sticky; top: 0px; z-index: 10;"
+      >
+        <div
+          class="bg-card border-border"
+          style="display: flex; align-items: center; gap: 12px; padding: 10px 24px; border-bottom-style: solid; border-bottom-width: 1px;"
+        >
+          <a
+            class="text-foreground focus-ring"
+            href="/"
+            style="font-weight: 700; text-decoration: none; margin-right: 4px;"
+          >
+            StorageGenie
+          </a>
+          <span
+            aria-label="Total loaded items: 4"
+            class="bg-card-muted text-muted-foreground"
+            style="font-size: 12px; padding: 2px 8px; border-radius: 999px;"
+            title="Items loaded on this page, not the household total"
+          >
+            Total: 
+            4
+             
+            items
+          </span>
+          <div
+            aria-hidden="true"
+            style="flex: 1 1 0%;"
+          />
+          <input
+            aria-label="Search catalog"
+            class="bg-background text-foreground border-border focus-ring"
+            placeholder="Search…"
+            style="padding: 6px 10px; border-radius: 6px; border-style: solid; border-width: 1px; min-width: 200px; font-size: 13px;"
+            type="search"
+            value=""
+          />
+          <button
+            aria-label="Switch to dark theme"
+            class="bg-card text-foreground border-border focus-ring"
+            style="display: inline-flex; align-items: center; justify-content: center; padding: 6px; border-radius: 6px; border-style: solid; border-width: 1px; cursor: pointer;"
+            title="Switch to dark theme"
+            type="button"
+          >
+            <svg
+              aria-hidden="true"
+              class="lucide lucide-moon"
+              fill="none"
+              height="18"
+              stroke="currentColor"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              viewBox="0 0 24 24"
+              width="18"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M20.985 12.486a9 9 0 1 1-9.473-9.472c.405-.022.617.46.402.803a6 6 0 0 0 8.268 8.268c.344-.215.825-.004.803.401"
+              />
+            </svg>
+          </button>
+          <a
+            class="bg-primary text-primary-foreground focus-ring"
+            href="/capture"
+            style="padding: 6px 12px; border-radius: 6px; text-decoration: none; font-weight: 600; font-size: 13px; display: inline-flex; align-items: center; gap: 6px;"
+          >
+            <svg
+              aria-hidden="true"
+              class="lucide lucide-upload"
+              fill="none"
+              height="16"
+              stroke="currentColor"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              viewBox="0 0 24 24"
+              width="16"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M12 3v12"
+              />
+              <path
+                d="m17 8-5-5-5 5"
+              />
+              <path
+                d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"
+              />
+            </svg>
+            Import Asset
+          </a>
+        </div>
+        <div
+          class="bg-card border-border"
+          style="display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 8px 24px; border-bottom-style: solid; border-bottom-width: 1px;"
+        >
+          <select
+            aria-label="Household"
+            class="bg-background text-foreground border-border focus-ring"
+            style="padding: 4px 10px; border-radius: 6px; border-style: solid; border-width: 1px; font-size: 13px; cursor: pointer;"
+          >
+            <option
+              value="h1"
+            >
+              Home
+            </option>
+          </select>
+          <button
+            aria-pressed="true"
+            class="bg-primary text-primary-foreground focus-ring"
+            style="padding: 4px 10px; border-radius: 6px; border-style: solid; border-width: 1px; font-size: 13px; cursor: pointer; font-weight: 600;"
+            type="button"
+          >
+            All (4)
+          </button>
+          <button
+            aria-pressed="false"
+            class="bg-card-muted text-muted-foreground focus-ring"
+            style="padding: 4px 10px; border-radius: 6px; border-style: solid; border-width: 1px; font-size: 13px; cursor: pointer; font-weight: 400;"
+            type="button"
+          >
+            Hardware & Tools (1)
+          </button>
+          <button
+            aria-pressed="false"
+            class="bg-card-muted text-muted-foreground focus-ring"
+            style="padding: 4px 10px; border-radius: 6px; borde...
+   ❯ src/components/shell/shell.test.tsx > Catalog shell > category pills and cards share one vocabulary through the real server filter (SG-105 G4)
+     → Unable to find role="button" and name "Uncategorized (1)"
+
+Ignored nodes: comments, script, style
+<body>
+  <div>
+    <div
+      class="bg-background text-foreground"
+      style="min-height: 100vh;"
+    >
+      <div
+        class="bg-background"
+        style="position: sticky; top: 0px; z-index: 10;"
+      >
+        <div
+          class="bg-card border-border"
+          style="display: flex; align-items: center; gap: 12px; padding: 10px 24px; border-bottom-style: solid; border-bottom-width: 1px;"
+        >
+          <a
+            class="text-foreground focus-ring"
+            href="/"
+            style="font-weight: 700; text-decoration: none; margin-right: 4px;"
+          >
+            StorageGenie
+          </a>
+          <span
+            aria-label="Total loaded items: 4"
+            class="bg-card-muted text-muted-foreground"
+            style="font-size: 12px; padding: 2px 8px; border-radius: 999px;"
+            title="Items loaded on this page, not the household total"
+          >
+            Total: 
+            4
+             
+            items
+          </span>
+          <div
+            aria-hidden="true"
+            style="flex: 1 1 0%;"
+          />
+          <input
+            aria-label="Search catalog"
+            class="bg-background text-foreground border-border focus-ring"
+            placeholder="Search…"
+            style="padding: 6px 10px; border-radius: 6px; border-style: solid; border-width: 1px; min-width: 200px; font-size: 13px;"
+            type="search"
+            value=""
+          />
+          <button
+            aria-label="Switch to dark theme"
+            class="bg-card text-foreground border-border focus-ring"
+            style="display: inline-flex; align-items: center; justify-content: center; padding: 6px; border-radius: 6px; border-style: solid; border-width: 1px; cursor: pointer;"
+            title="Switch to dark theme"
+            type="button"
+          >
+            <svg
+              aria-hidden="true"
+              class="lucide lucide-moon"
+              fill="none"
+              height="18"
+              stroke="currentColor"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              viewBox="0 0 24 24"
+              width="18"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M20.985 12.486a9 9 0 1 1-9.473-9.472c.405-.022.617.46.402.803a6 6 0 0 0 8.268 8.268c.344-.215.825-.004.803.401"
+              />
+            </svg>
+          </button>
+          <a
+            class="bg-primary text-primary-foreground focus-ring"
+            href="/capture"
+            style="padding: 6px 12px; border-radius: 6px; text-decoration: none; font-weight: 600; font-size: 13px; display: inline-flex; align-items: center; gap: 6px;"
+          >
+            <svg
+              aria-hidden="true"
+              class="lucide lucide-upload"
+              fill="none"
+              height="16"
+              stroke="currentColor"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              viewBox="0 0 24 24"
+              width="16"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M12 3v12"
+              />
+              <path
+                d="m17 8-5-5-5 5"
+              />
+              <path
+                d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"
+              />
+            </svg>
+            Import Asset
+          </a>
+        </div>
+        <div
+          class="bg-card border-border"
+          style="display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 8px 24px; border-bottom-style: solid; border-bottom-width: 1px;"
+        >
+          <select
+            aria-label="Household"
+            class="bg-background text-foreground border-border focus-ring"
+            style="padding: 4px 10px; border-radius: 6px; border-style: solid; border-width: 1px; font-size: 13px; cursor: pointer;"
+          >
+            <option
+              value="h1"
+            >
+              Home
+            </option>
+          </select>
+          <button
+            aria-pressed="true"
+            class="bg-primary text-primary-foreground focus-ring"
+            style="padding: 4px 10px; border-radius: 6px; border-style: solid; border-width: 1px; font-size: 13px; cursor: pointer; font-weight: 600;"
+            type="button"
+          >
+            All (4)
+          </button>
+          <button
+            aria-pressed="false"
+            class="bg-card-muted text-muted-foreground focus-ring"
+            style="padding: 4px 10px; border-radius: 6px; border-style: solid; border-width: 1px; font-size: 13px; cursor: pointer; font-weight: 400;"
+            type="button"
+          >
+            Hardware & Tools (1)
+          </button>
+          <button
+            aria-pressed="false"
+            class="bg-card-muted text-muted-foreground focus-ring"
+            style="padding: 4px 10px; border-radius: 6px; borde...
+
+Ignored nodes: comments, script, style
+<body>
+  <div>
+    <div
+      class="bg-background text-foreground"
+      style="min-height: 100vh;"
+    >
+      <div
+        class="bg-background"
+        style="position: sticky; top: 0px; z-index: 10;"
+      >
+        <div
+          class="bg-card border-border"
+          style="display: flex; align-items: center; gap: 12px; padding: 10px 24px; border-bottom-style: solid; border-bottom-width: 1px;"
+        >
+          <a
+            class="text-foreground focus-ring"
+            href="/"
+            style="font-weight: 700; text-decoration: none; margin-right: 4px;"
+          >
+            StorageGenie
+          </a>
+          <span
+            aria-label="Total loaded items: 4"
+            class="bg-card-muted text-muted-foreground"
+            style="font-size: 12px; padding: 2px 8px; border-radius: 999px;"
+            title="Items loaded on this page, not the household total"
+          >
+            Total: 
+            4
+             
+            items
+          </span>
+          <div
+            aria-hidden="true"
+            style="flex: 1 1 0%;"
+          />
+          <input
+            aria-label="Search catalog"
+            class="bg-background text-foreground border-border focus-ring"
+            placeholder="Search…"
+            style="padding: 6px 10px; border-radius: 6px; border-style: solid; border-width: 1px; min-width: 200px; font-size: 13px;"
+            type="search"
+            value=""
+          />
+          <button
+            aria-label="Switch to dark theme"
+            class="bg-card text-foreground border-border focus-ring"
+            style="display: inline-flex; align-items: center; justify-content: center; padding: 6px; border-radius: 6px; border-style: solid; border-width: 1px; cursor: pointer;"
+            title="Switch to dark theme"
+            type="button"
+          >
+            <svg
+              aria-hidden="true"
+              class="lucide lucide-moon"
+              fill="none"
+              height="18"
+              stroke="currentColor"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              viewBox="0 0 24 24"
+              width="18"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M20.985 12.486a9 9 0 1 1-9.473-9.472c.405-.022.617.46.402.803a6 6 0 0 0 8.268 8.268c.344-.215.825-.004.803.401"
+              />
+            </svg>
+          </button>
+          <a
+            class="bg-primary text-primary-foreground focus-ring"
+            href="/capture"
+            style="padding: 6px 12px; border-radius: 6px; text-decoration: none; font-weight: 600; font-size: 13px; display: inline-flex; align-items: center; gap: 6px;"
+          >
+            <svg
+              aria-hidden="true"
+              class="lucide lucide-upload"
+              fill="none"
+              height="16"
+              stroke="currentColor"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              viewBox="0 0 24 24"
+              width="16"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M12 3v12"
+              />
+              <path
+                d="m17 8-5-5-5 5"
+              />
+              <path
+                d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"
+              />
+            </svg>
+            Import Asset
+          </a>
+        </div>
+        <div
+          class="bg-card border-border"
+          style="display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 8px 24px; border-bottom-style: solid; border-bottom-width: 1px;"
+        >
+          <select
+            aria-label="Household"
+            class="bg-background text-foreground border-border focus-ring"
+            style="padding: 4px 10px; border-radius: 6px; border-style: solid; border-width: 1px; font-size: 13px; cursor: pointer;"
+          >
+            <option
+              value="h1"
+            >
+              Home
+            </option>
+          </select>
+          <button
+            aria-pressed="true"
+            class="bg-primary text-primary-foreground focus-ring"
+            style="padding: 4px 10px; border-radius: 6px; border-style: solid; border-width: 1px; font-size: 13px; cursor: pointer; font-weight: 600;"
+            type="button"
+          >
+            All (4)
+          </button>
+          <button
+            aria-pressed="false"
+            class="bg-card-muted text-muted-foreground focus-ring"
+            style="padding: 4px 10px; border-radius: 6px; border-style: solid; border-width: 1px; font-size: 13px; cursor: pointer; font-weight: 400;"
+            type="button"
+          >
+            Hardware & Tools (1)
+          </button>
+          <button
+            aria-pressed="false"
+            class="bg-card-muted text-muted-foreground focus-ring"
+            style="padding: 4px 10px; border-radius: 6px; borde...
+   ❯ src/components/shell/shell.test.tsx > Catalog shell > the catalog main rides the shared centered container (SG-105 G1)
+     → expected null not to be null
+   ❯ src/components/shell/shell.test.tsx > Catalog shell > the landing route renders the App nav with the Analytics link (D95)
+     → expected [ <a …(3)></a>, <a …(3)></a> ] to have a length of 1 but got 2
+ ✓ src/components/CandidateCard.test.tsx  (4 tests) 128ms
+ ✓ src/routes/PlanningPage.test.tsx  (4 tests) 305ms
+ ✓ src/routes/SettingsPage.test.tsx  (3 tests) 195ms
+ ✓ src/components/ExpiryEntryForm.test.tsx  (2 tests) 118ms
+ ❯ src/components/JobCard.test.tsx  (2 tests | 1 failed) 65ms
+   ❯ src/components/JobCard.test.tsx > JobCard > title and status carry theme text classes with the state tone (SG-105 G3)
+     → expect(element).toHaveClass("text-foreground")
+
+Expected the element to have class:
+  text-foreground
+Received:
+  bg-card border-border focus-ring
+ ✓ src/components/PlanningSuggestionCard.test.tsx  (2 tests) 80ms
+ ✓ src/components/ChatTranscript.test.tsx  (2 tests) 73ms
+stderr | src/components/AssetCard.test.tsx > AssetCard > renders display_name and type
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+ ✓ src/components/AssetCard.test.tsx  (2 tests) 99ms
+ ✓ src/components/ProvenanceBadge.test.tsx  (3 tests) 20ms
+
+⎯⎯⎯⎯⎯⎯ Failed Tests 13 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/components/AssetForm.test.tsx > AssetForm > the asset-type select carries the themed control treatment (SG-105 G2)
+Error: expect(element).toHaveClass("bg-background text-foreground border-border")
+
+Expected the element to have class:
+  bg-background text-foreground border-border
+Received:
+
+ ❯ src/components/AssetForm.test.tsx:141:20
+    139| 
+    140|     const select = screen.getByLabelText("Asset type");
+    141|     expect(select).toHaveClass("bg-background", "text-foreground", "bo…
+       |                    ^
+    142|   });
+    143| 
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/13]⎯
+
+ FAIL  src/components/AssetForm.test.tsx > AssetForm > the file pickers are real file inputs hidden behind themed labels (SG-105 G2)
+TestingLibraryElementError: Unable to find a label with the text of: Choose files
+
+Ignored nodes: comments, script, style
+<body>
+  <div>
+    <form
+      style="display: flex; flex-direction: column; gap: 12px; max-width: 520px;"
+    >
+      <label
+        style="display: flex; flex-direction: column; gap: 4px;"
+      >
+        <span>
+          Display name (optional)
+        </span>
+        <input
+          class="bg-background text-foreground border-border focus-ring"
+          placeholder="e.g. Hammer"
+          style="width: 100%; padding: 8px; border-style: solid; border-width: 1px; border-radius: 6px;"
+          value=""
+        />
+        <span
+          class="text-muted-foreground"
+          style="font-size: 11px;"
+        >
+          Left blank, we use the photo's filename
+        </span>
+      </label>
+      <label
+        style="display: flex; flex-direction: column; gap: 4px;"
+      >
+        <span>
+          Asset type
+        </span>
+        <select
+          style="width: 100%; padding: 8px; border-radius: 6px;"
+        >
+          <option
+            value="unknown"
+          >
+            unknown
+          </option>
+          <option
+            value="equipment"
+          >
+            equipment
+          </option>
+          <option
+            value="product"
+          >
+            product
+          </option>
+          <option
+            value="component"
+          >
+            component
+          </option>
+          <option
+            value="consumable"
+          >
+            consumable
+          </option>
+          <option
+            value="container"
+          >
+            container
+          </option>
+          <option
+            value="document"
+          >
+            document
+          </option>
+          <option
+            value="collection"
+          >
+            collection
+          </option>
+        </select>
+      </label>
+      <div
+        style="display: flex; gap: 12px;"
+      >
+        <label
+          style="flex: 1 1 0%; display: flex; flex-direction: column; gap: 4px;"
+        >
+          <span>
+            Quantity
+          </span>
+          <input
+            class="bg-background text-foreground border-border focus-ring"
+            step="any"
+            style="padding: 8px; border-style: solid; border-width: 1px; border-radius: 6px;"
+            type="number"
+            value=""
+          />
+        </label>
+        <label
+          style="flex: 1 1 0%; display: flex; flex-direction: column; gap: 4px;"
+        >
+          <span>
+            Unit
+          </span>
+          <input
+            class="bg-background text-foreground border-border focus-ring"
+            placeholder="pcs, kg…"
+            style="padding: 8px; border-style: solid; border-width: 1px; border-radius: 6px;"
+            value=""
+          />
+        </label>
+        <label
+          style="flex: 1 1 0%; display: flex; flex-direction: column; gap: 4px;"
+        >
+          <span>
+            Condition
+          </span>
+          <input
+            class="bg-background text-foreground border-border focus-ring"
+            placeholder="new, used…"
+            style="padding: 8px; border-style: solid; border-width: 1px; border-radius: 6px;"
+            value=""
+          />
+        </label>
+      </div>
+      <div
+        class="border-border bg-card-muted"
+        style="border-style: dashed; border-width: 2px; border-radius: 8px; padding: 16px; text-align: center;"
+      >
+        <div
+          class="text-muted-foreground"
+          style="font-size: 13px; margin-bottom: 8px;"
+        >
+          Drag & drop photos here, click to select, or paste
+        </div>
+        <input
+          accept="image/*,.pdf"
+          multiple=""
+          type="file"
+        />
+        <label
+          class="text-muted-foreground"
+          style="display: inline-flex; flex-direction: column; gap: 4px; margin-top: 12px; font-size: 13px;"
+        >
+          Take a photo
+          <input
+            accept="image/*"
+            capture="environment"
+            type="file"
+          />
+        </label>
+      </div>
+      <button
+        class="bg-primary text-primary-foreground focus-ring"
+        style="padding: 10px 16px; border-radius: 6px; cursor: pointer;"
+        type="submit"
+      >
+        Create asset
+      </button>
+    </form>
+  </div>
+</body>
+ ❯ Object.getElementError node_modules/@testing-library/dom/dist/config.js:37:19
+ ❯ getAllByLabelText node_modules/@testing-library/dom/dist/queries/label-text.js:111:38
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:52:17
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:95:19
+ ❯ src/components/AssetForm.test.tsx:147:27
+    145|     render(<AssetForm householdId="hh-1" onCreated={() => {}} />);
+    146| 
+    147|     const choose = screen.getByLabelText("Choose files");
+       |                           ^
+    148|     expect(choose).toHaveAttribute("type", "file");
+    149|     expect(choose).toHaveAttribute("multiple");
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/13]⎯
+
+ FAIL  src/components/JobCard.test.tsx > JobCard > title and status carry theme text classes with the state tone (SG-105 G3)
+Error: expect(element).toHaveClass("text-foreground")
+
+Expected the element to have class:
+  text-foreground
+Received:
+  bg-card border-border focus-ring
+ ❯ src/components/JobCard.test.tsx:19:40
+     17|     // The whole card is a button: without a theme text colour it rend…
+     18|     // browser-default black on the dark card.
+     19|     expect(screen.getByRole("button")).toHaveClass("text-foreground");
+       |                                        ^
+     20|     expect(screen.getByTestId("job-state-job-loaded-42")).toHaveClass(…
+     21| 
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/13]⎯
+
+ FAIL  src/routes/InboxPage.test.tsx > InboxPage > the page rides the shared centered container (SG-105 G1)
+AssertionError: expected null not to be null
+ ❯ src/routes/InboxPage.test.tsx:71:22
+     69| 
+     70|     const page = container.querySelector(".page-container") as HTMLEle…
+     71|     expect(page).not.toBeNull();
+       |                      ^
+     72|     expect(page).toHaveStyle({ maxWidth: "1100px", marginLeft: "auto",…
+     73|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/13]⎯
+
+ FAIL  src/routes/InboxPage.test.tsx > InboxPage > the household select carries the themed control treatment (SG-105 G2)
+Error: expect(element).toHaveClass("bg-background text-foreground border-border")
+
+Expected the element to have class:
+  bg-background text-foreground border-border
+Received:
+
+ ❯ src/routes/InboxPage.test.tsx:80:20
+     78| 
+     79|     const select = screen.getByRole("combobox", { name: /household/i }…
+     80|     expect(select).toHaveClass("bg-background", "text-foreground", "bo…
+       |                    ^
+     81|   });
+     82| 
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/13]⎯
+
+ FAIL  src/routes/InboxPage.test.tsx > InboxPage > the review link carries the theme link treatment, not default purple (SG-105 G3)
+Error: expect(element).toHaveClass("text-primary")
+
+Expected the element to have class:
+  text-primary
+Received:
+
+ ❯ src/routes/InboxPage.test.tsx:89:18
+     87| 
+     88|     const link = await screen.findByRole("link", { name: "Review" });
+     89|     expect(link).toHaveClass("text-primary");
+       |                  ^
+     90|   });
+     91| 
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/13]⎯
+
+ FAIL  src/routes/InboxPage.test.tsx > InboxPage > resolved review tasks are hidden by default and revealed by the status filter (SG-105 G3)
+TestingLibraryElementError: Found multiple elements with the text: identifier_collision
+
+Here are the matching elements:
+
+Ignored nodes: comments, script, style
+<strong>
+  identifier_collision
+</strong>
+
+Ignored nodes: comments, script, style
+<strong>
+  identifier_collision
+</strong>
+
+(If this is intentional, then use the `*AllBy*` variant of the query (like `queryAllByText`, `getAllByText`, or `findAllByText`)).
+
+Ignored nodes: comments, script, style
+<body>
+  <div>
+    <div
+      class="text-foreground"
+      style="padding: 24px; max-width: 1100px;"
+    >
+      <div
+        style="display: flex; justify-content: space-between; align-items: center;"
+      >
+        <h1
+          class="page-header text-foreground"
+        >
+          Inbox
+        </h1>
+        <label>
+          Household 
+          <select>
+            <option
+              value=""
+            >
+              Select household
+            </option>
+            <option
+              value="household-loaded"
+            >
+              Loaded home
+            </option>
+          </select>
+        </label>
+      </div>
+      <div
+        style="display: grid; grid-template-columns: minmax(260px, .8fr) minmax(320px, 1.2fr); gap: 20px;"
+      >
+        <section>
+          <h2>
+            Import jobs
+          </h2>
+          <div
+            role="status"
+          >
+            No import jobs yet.
+          </div>
+          <div
+            style="display: grid; gap: 8px;"
+          />
+        </section>
+        <section>
+          <h2>
+            Selected job
+          </h2>
+          <div>
+            Select a job to see progress and errors.
+          </div>
+        </section>
+      </div>
+      <section
+        style="margin-top: 28px;"
+      >
+        <h2>
+          Review queue
+        </h2>
+        <div
+          style="display: grid; gap: 8px;"
+        >
+          <div
+            class="bg-card border-border"
+            style="display: flex; justify-content: space-between; gap: 12px; padding: 12px; border-style: solid; border-width: 1px; border-radius: 8px;"
+          >
+            <div>
+              <strong>
+                identifier_collision
+              </strong>
+               · 
+              high
+               · 
+              open
+              <div
+                class="text-muted-foreground"
+                style="font-size: 12px;"
+              >
+                Task 
+                task-open-2
+                 · candidate 
+                candidate-open-2
+              </div>
+            </div>
+            <div
+              style="display: flex; gap: 8px;"
+            >
+              <a
+                href="/review/candidate-open-2?household_id=household-loaded"
+              >
+                Review
+              </a>
+              <button
+                type="button"
+              >
+                Resolve
+              </button>
+            </div>
+          </div>
+          <div
+            class="bg-card border-border"
+            style="display: flex; justify-content: space-between; gap: 12px; padding: 12px; border-style: solid; border-width: 1px; border-radius: 8px;"
+          >
+            <div>
+              <strong>
+                identifier_collision
+              </strong>
+               · 
+              low
+               · 
+              resolved
+              <div
+                class="text-muted-foreground"
+                style="font-size: 12px;"
+              >
+                Task 
+                task-resolved-2
+                 · candidate 
+                candidate-resolved-2
+              </div>
+            </div>
+            <div
+              style="display: flex; gap: 8px;"
+            >
+              <a
+                href="/review/candidate-resolved-2?household_id=household-loaded"
+              >
+                Review
+              </a>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
+</body>
+
+Ignored nodes: comments, script, style
+<body>
+  <div>
+    <div
+      class="text-foreground"
+      style="padding: 24px; max-width: 1100px;"
+    >
+      <div
+        style="display: flex; justify-content: space-between; align-items: center;"
+      >
+        <h1
+          class="page-header text-foreground"
+        >
+          Inbox
+        </h1>
+        <label>
+          Household 
+          <select>
+            <option
+              value=""
+            >
+              Select household
+            </option>
+            <option
+              value="household-loaded"
+            >
+              Loaded home
+            </option>
+          </select>
+        </label>
+      </div>
+      <div
+        style="display: grid; grid-template-columns: minmax(260px, .8fr) minmax(320px, 1.2fr); gap: 20px;"
+      >
+        <section>
+          <h2>
+            Import jobs
+          </h2>
+          <div
+            role="status"
+          >
+            No import jobs yet.
+          </div>
+          <div
+            style="display: grid; gap: 8px;"
+          />
+        </section>
+        <section>
+          <h2>
+            Selected job
+          </h2>
+          <div>
+            Select a job to see progress and errors.
+          </div>
+        </section>
+      </div>
+      <section
+        style="margin-top: 28px;"
+      >
+        <h2>
+          Review queue
+        </h2>
+        <div
+          style="display: grid; gap: 8px;"
+        >
+          <div
+            class="bg-card border-border"
+            style="display: flex; justify-content: space-between; gap: 12px; padding: 12px; border-style: solid; border-width: 1px; border-radius: 8px;"
+          >
+            <div>
+              <strong>
+                identifier_collision
+              </strong>
+               · 
+              high
+               · 
+              open
+              <div
+                class="text-muted-foreground"
+                style="font-size: 12px;"
+              >
+                Task 
+                task-open-2
+                 · candidate 
+                candidate-open-2
+              </div>
+            </div>
+            <div
+              style="display: flex; gap: 8px;"
+            >
+              <a
+                href="/review/candidate-open-2?household_id=household-loaded"
+              >
+                Review
+              </a>
+              <button
+                type="button"
+              >
+                Resolve
+              </button>
+            </div>
+          </div>
+          <div
+            class="bg-card border-border"
+            style="display: flex; justify-content: space-between; gap: 12px; padding: 12px; border-style: solid; border-width: 1px; border-radius: 8px;"
+          >
+            <div>
+              <strong>
+                identifier_collision
+              </strong>
+               · 
+              low
+               · 
+              resolved
+              <div
+                class="text-muted-foreground"
+                style="font-size: 12px;"
+              >
+                Task 
+                task-resolved-2
+                 · candidate 
+                candidate-resolved-2
+              </div>
+            </div>
+            <div
+              style="display: flex; gap: 8px;"
+            >
+              <a
+                href="/review/candidate-resolved-2?household_id=household-loaded"
+              >
+                Review
+              </a>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
+</body>
+ ❯ waitForWrapper node_modules/@testing-library/dom/dist/wait-for.js:163:27
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:86:33
+ ❯ src/routes/InboxPage.test.tsx:98:25
+     96|     renderPage();
+     97| 
+     98|     expect(await screen.findByText("identifier_collision")).toBeInTheD…
+       |                         ^
+     99|     expect(screen.queryByText(/candidate-resolved-2/)).not.toBeInTheDo…
+    100| 
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/13]⎯
+
+ FAIL  src/routes/theme-adoption.test.tsx > SG-075 screen adoption > capture screen rides the shared centered container and themed household select (SG-105 G1/G2)
+AssertionError: expected null not to be null
+ ❯ src/routes/theme-adoption.test.tsx:223:22
+    221| 
+    222|     const page = container.querySelector(".page-container") as HTMLEle…
+    223|     expect(page).not.toBeNull();
+       |                      ^
+    224|     expect(page).toHaveStyle({ maxWidth: "1100px", marginLeft: "auto",…
+    225| 
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[8/13]⎯
+
+ FAIL  src/components/catalog/catalog.test.tsx > ProductCard > cards size to their content: no fixed 3:4 dead space, the media well stays 1:1 (SG-105 G4)
+AssertionError: expected '3 / 4' to be '' // Object.is equality
+
+- Expected
++ Received
+
++ 3 / 4
+
+ ❯ src/components/catalog/catalog.test.tsx:139:66
+    137|     renderWithRouter(<ProductCard item={MOCK_PRODUCTS[0]} householdId=…
+    138| 
+    139|     expect(screen.getByTestId("product-card").style.aspectRatio).toBe(…
+       |                                                                  ^
+    140|     expect(screen.getByTestId("product-card-well").style.aspectRatio).…
+    141|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[9/13]⎯
+
+ FAIL  src/components/shell/shell.test.tsx > Catalog shell > the toolbar renders All plus one counted pill per real asset_type vocabulary
+TestingLibraryElementError: Unable to find an accessible element with the role "button" and name "Uncategorized (1)"
+
+Here are the accessible roles:
+
+  link:
+
+  Name "StorageGenie":
+  <a
+    class="text-foreground focus-ring"
+    href="/"
+    style="font-weight: 700; text-decoration: none; margin-right: 4px;"
+  />
+
+  Name "Import Asset":
+  <a
+    class="bg-primary text-primary-foreground focus-ring"
+    href="/capture"
+    style="padding: 6px 12px; border-radius: 6px; text-decoration: none; font-weight: 600; font-size: 13px; display: inline-flex; align-items: center; gap: 6px;"
+  />
+
+  Name "Source Only Mystery Uncategorized":
+  <a
+    class="product-card bg-card border-border focus-ring"
+    data-testid="product-card"
+    href="/assets/a-mystery?household_id=h1"
+    style="display: flex; flex-direction: column; gap: 10px; border-style: solid; border-width: 1px; border-radius: 12px; padding: 10px; text-decoration: none; color: inherit; aspect-ratio: 3 / 4;"
+  />
+
+  Name "Source Only Zap Electronics & Gadgets":
+  <a
+    class="product-card bg-card border-border focus-ring"
+    data-testid="product-card"
+    href="/assets/a-zap?household_id=h1"
+    style="display: flex; flex-direction: column; gap: 10px; border-style: solid; border-width: 1px; border-radius: 12px; padding: 10px; text-decoration: none; color: inherit; aspect-ratio: 3 / 4;"
+  />
+
+  Name "Source Only Shirt Apparel & Textiles":
+  <a
+    class="product-card bg-card border-border focus-ring"
+    data-testid="product-card"
+    href="/assets/a-shirt?household_id=h1"
+    style="display: flex; flex-direction: column; gap: 10px; border-style: solid; border-width: 1px; border-radius: 12px; padding: 10px; text-decoration: none; color: inherit; aspect-ratio: 3 / 4;"
+  />
+
+  Name "Source Only Drill Hardware & Tools":
+  <a
+    class="product-card bg-card border-border focus-ring"
+    data-testid="product-card"
+    href="/assets/a-drill?household_id=h1"
+    style="display: flex; flex-direction: column; gap: 10px; border-style: solid; border-width: 1px; border-radius: 12px; padding: 10px; text-decoration: none; color: inherit; aspect-ratio: 3 / 4;"
+  />
+
+  --------------------------------------------------
+  searchbox:
+
+  Name "Search catalog":
+  <input
+    aria-label="Search catalog"
+    class="bg-background text-foreground border-border focus-ring"
+    placeholder="Search…"
+    style="padding: 6px 10px; border-radius: 6px; border-style: solid; border-width: 1px; min-width: 200px; font-size: 13px;"
+    type="search"
+    value=""
+  />
+
+  --------------------------------------------------
+  button:
+
+  Name "Switch to dark theme":
+  <button
+    aria-label="Switch to dark theme"
+    class="bg-card text-foreground border-border focus-ring"
+    style="display: inline-flex; align-items: center; justify-content: center; padding: 6px; border-radius: 6px; border-style: solid; border-width: 1px; cursor: pointer;"
+    title="Switch to dark theme"
+    type="button"
+  />
+
+  Name "All (4)":
+  <button
+    aria-pressed="true"
+    class="bg-primary text-primary-foreground focus-ring"
+    style="padding: 4px 10px; border-radius: 6px; border-style: solid; border-width: 1px; font-size: 13px; cursor: pointer; font-weight: 600;"
+    type="button"
+  />
+
+  Name "Hardware & Tools (1)":
+  <button
+    aria-pressed="false"
+    class="bg-card-muted text-muted-foreground focus-ring"
+    style="padding: 4px 10px; border-radius: 6px; border-style: solid; border-width: 1px; font-size: 13px; cursor: pointer; font-weight: 400;"
+    type="button"
+  />
+
+  Name "Electronics & Gadgets (1)":
+  <button
+    aria-pressed="false"
+    class="bg-card-muted text-muted-foreground focus-ring"
+    style="padding: 4px 10px; border-radius: 6px; border-style: solid; border-width: 1px; font-size: 13px; cursor: pointer; font-weight: 400;"
+    type="button"
+  />
+
+  Name "Apparel & Textiles (1)":
+  <button
+    aria-pressed="false"
+    class="bg-card-muted text-muted-foreground focus-ring"
+    style="padding: 4px 10px; border-radius: 6px; border-style: solid; border-width: 1px; font-size: 13px; cursor: pointer; font-weight: 400;"
+    type="button"
+  />
+
+  Name "unknown (1)":
+  <button
+    aria-pressed="false"
+    class="bg-card-muted text-muted-foreground focus-ring"
+    style="padding: 4px 10px; border-radius: 6px; border-style: solid; border-width: 1px; font-size: 13px; cursor: pointer; font-weight: 400;"
+    type="button"
+  />
+
+  Name "Standard Grid":
+  <button
+    aria-pressed="true"
+    class="bg-primary text-primary-foreground focus-ring"
+    style="padding: 4px 10px; border-radius: 6px; border-style: solid; border-width: 1px; font-size: 13px; cursor: pointer; font-weight: 600;"
+    type="button"
+  />
+
+  Name "Compact Table":
+  <button
+    aria-pressed="false"
+    class="bg-card-muted text-muted-foreground focus-ring"
+    style="padding: 4px 10px; border-radius: 6px; border-style: solid; border-width: 1px; font-size: 13px; cursor: pointer; font-weight: 400;"
+    type="button"
+  />
+
+  Name "Save search":
+  <button
+    class="bg-card text-foreground border-border focus-ring"
+    disabled=""
+    style="padding: 4px 10px; border-radius: 6px; border-style: solid; border-width: 1px; font-size: 13px; cursor: pointer; opacity: 0.5;"
+    type="button"
+  />
+
+  --------------------------------------------------
+  combobox:
+
+  Name "Household":
+  <select
+    aria-label="Household"
+    class="bg-background text-foreground border-border focus-ring"
+    style="padding: 4px 10px; border-radius: 6px; border-style: solid; border-width: 1px; font-size: 13px; cursor: pointer;"
+  />
+
+  Name "Sort catalog":
+  <select
+    aria-label="Sort catalog"
+    class="bg-background text-foreground border-border focus-ring"
+    style="padding: 4px 10px; border-radius: 6px; border-style: solid; border-width: 1px; font-size: 13px; cursor: pointer;"
+  />
+
+  --------------------------------------------------
+  option:
+
+  Name "Home":
+  <option
+    value="h1"
+  />
+
+  Name "Recently Added":
+  <option
+    value="recent"
+  />
+
+  Name "Name (A-Z)":
+  <option
+    value="name"
+  />
+
+  Name "Processing Status":
+  <option
+    value="status"
+  />
+
+  --------------------------------------------------
+  group:
+
+  Name "Density":
+  <div
+    aria-label="Density"
+    role="group"
+    style="display: inline-flex; gap: 4px;"
+  />
+
+  --------------------------------------------------
+  main:
+
+  Name "":
+  <main
+    style="padding: 24px;"
+  />
+
+  --------------------------------------------------
+  region:
+
+  Name "Product results":
+  <div
+    aria-busy="false"
+    aria-label="Product results"
+    class="catalog-grid"
+    data-testid="catalog-grid"
+    role="region"
+    style=""
+  />
+
+  --------------------------------------------------
+
+Ignored nodes: comments, script, style
+<body>
+  <div>
+    <div
+      class="bg-background text-foreground"
+      style="min-height: 100vh;"
+    >
+      <div
+        class="bg-background"
+        style="position: sticky; top: 0px; z-index: 10;"
+      >
+        <div
+          class="bg-card border-border"
+          style="display: flex; align-items: center; gap: 12px; padding: 10px 24px; border-bottom-style: solid; border-bottom-width: 1px;"
+        >
+          <a
+            class="text-foreground focus-ring"
+            href="/"
+            style="font-weight: 700; text-decoration: none; margin-right: 4px;"
+          >
+            StorageGenie
+          </a>
+          <span
+            aria-label="Total loaded items: 4"
+            class="bg-card-muted text-muted-foreground"
+            style="font-size: 12px; padding: 2px 8px; border-radius: 999px;"
+            title="Items loaded on this page, not the household total"
+          >
+            Total: 
+            4
+             
+            items
+          </span>
+          <div
+            aria-hidden="true"
+            style="flex: 1 1 0%;"
+          />
+          <input
+            aria-label="Search catalog"
+            class="bg-background text-foreground border-border focus-ring"
+            placeholder="Search…"
+            style="padding: 6px 10px; border-radius: 6px; border-style: solid; border-width: 1px; min-width: 200px; font-size: 13px;"
+            type="search"
+            value=""
+          />
+          <button
+            aria-label="Switch to dark theme"
+            class="bg-card text-foreground border-border focus-ring"
+            style="display: inline-flex; align-items: center; justify-content: center; padding: 6px; border-radius: 6px; border-style: solid; border-width: 1px; cursor: pointer;"
+            title="Switch to dark theme"
+            type="button"
+          >
+            <svg
+              aria-hidden="true"
+              class="lucide lucide-moon"
+              fill="none"
+              height="18"
+              stroke="currentColor"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              viewBox="0 0 24 24"
+              width="18"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M20.985 12.486a9 9 0 1 1-9.473-9.472c.405-.022.617.46.402.803a6 6 0 0 0 8.268 8.268c.344-.215.825-.004.803.401"
+              />
+            </svg>
+          </button>
+          <a
+            class="bg-primary text-primary-foreground focus-ring"
+            href="/capture"
+            style="padding: 6px 12px; border-radius: 6px; text-decoration: none; font-weight: 600; font-size: 13px; display: inline-flex; align-items: center; gap: 6px;"
+          >
+            <svg
+              aria-hidden="true"
+              class="lucide lucide-upload"
+              fill="none"
+              height="16"
+              stroke="currentColor"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              viewBox="0 0 24 24"
+              width="16"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M12 3v12"
+              />
+              <path
+                d="m17 8-5-5-5 5"
+              />
+              <path
+                d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"
+              />
+            </svg>
+            Import Asset
+          </a>
+        </div>
+        <div
+          class="bg-card border-border"
+          style="display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 8px 24px; border-bottom-style: solid; border-bottom-width: 1px;"
+        >
+          <select
+            aria-label="Household"
+            class="bg-background text-foreground border-border focus-ring"
+            style="padding: 4px 10px; border-radius: 6px; border-style: solid; border-width: 1px; font-size: 13px; cursor: pointer;"
+          >
+            <option
+              value="h1"
+            >
+              Home
+            </option>
+          </select>
+          <button
+            aria-pressed="true"
+            class="bg-primary text-primary-foreground focus-ring"
+            style="padding: 4px 10px; border-radius: 6px; border-style: solid; border-width: 1px; font-size: 13px; cursor: pointer; font-weight: 600;"
+            type="button"
+          >
+            All (4)
+          </button>
+          <button
+            aria-pressed="false"
+            class="bg-card-muted text-muted-foreground focus-ring"
+            style="padding: 4px 10px; border-radius: 6px; border-style: solid; border-width: 1px; font-size: 13px; cursor: pointer; font-weight: 400;"
+            type="button"
+          >
+            Hardware & Tools (1)
+          </button>
+          <button
+            aria-pressed="false"
+            class="bg-card-muted text-muted-foreground focus-ring"
+            style="padding: 4px 10px; border-radius: 6px; borde...
+ ❯ Object.getElementError node_modules/@testing-library/dom/dist/config.js:37:19
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:76:38
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:52:17
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:95:19
+ ❯ src/components/shell/shell.test.tsx:217:21
+    215|     };
+    216|     for (const [key, count] of Object.entries(counts)) {
+    217|       expect(screen.getByRole("button", { name: `${key} (${count})` })…
+       |                     ^
+    218|     }
+    219|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[10/13]⎯
+
+ FAIL  src/components/shell/shell.test.tsx > Catalog shell > category pills and cards share one vocabulary through the real server filter (SG-105 G4)
+TestingLibraryElementError: Unable to find role="button" and name "Uncategorized (1)"
+
+Ignored nodes: comments, script, style
+<body>
+  <div>
+    <div
+      class="bg-background text-foreground"
+      style="min-height: 100vh;"
+    >
+      <div
+        class="bg-background"
+        style="position: sticky; top: 0px; z-index: 10;"
+      >
+        <div
+          class="bg-card border-border"
+          style="display: flex; align-items: center; gap: 12px; padding: 10px 24px; border-bottom-style: solid; border-bottom-width: 1px;"
+        >
+          <a
+            class="text-foreground focus-ring"
+            href="/"
+            style="font-weight: 700; text-decoration: none; margin-right: 4px;"
+          >
+            StorageGenie
+          </a>
+          <span
+            aria-label="Total loaded items: 4"
+            class="bg-card-muted text-muted-foreground"
+            style="font-size: 12px; padding: 2px 8px; border-radius: 999px;"
+            title="Items loaded on this page, not the household total"
+          >
+            Total: 
+            4
+             
+            items
+          </span>
+          <div
+            aria-hidden="true"
+            style="flex: 1 1 0%;"
+          />
+          <input
+            aria-label="Search catalog"
+            class="bg-background text-foreground border-border focus-ring"
+            placeholder="Search…"
+            style="padding: 6px 10px; border-radius: 6px; border-style: solid; border-width: 1px; min-width: 200px; font-size: 13px;"
+            type="search"
+            value=""
+          />
+          <button
+            aria-label="Switch to dark theme"
+            class="bg-card text-foreground border-border focus-ring"
+            style="display: inline-flex; align-items: center; justify-content: center; padding: 6px; border-radius: 6px; border-style: solid; border-width: 1px; cursor: pointer;"
+            title="Switch to dark theme"
+            type="button"
+          >
+            <svg
+              aria-hidden="true"
+              class="lucide lucide-moon"
+              fill="none"
+              height="18"
+              stroke="currentColor"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              viewBox="0 0 24 24"
+              width="18"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M20.985 12.486a9 9 0 1 1-9.473-9.472c.405-.022.617.46.402.803a6 6 0 0 0 8.268 8.268c.344-.215.825-.004.803.401"
+              />
+            </svg>
+          </button>
+          <a
+            class="bg-primary text-primary-foreground focus-ring"
+            href="/capture"
+            style="padding: 6px 12px; border-radius: 6px; text-decoration: none; font-weight: 600; font-size: 13px; display: inline-flex; align-items: center; gap: 6px;"
+          >
+            <svg
+              aria-hidden="true"
+              class="lucide lucide-upload"
+              fill="none"
+              height="16"
+              stroke="currentColor"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              viewBox="0 0 24 24"
+              width="16"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M12 3v12"
+              />
+              <path
+                d="m17 8-5-5-5 5"
+              />
+              <path
+                d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"
+              />
+            </svg>
+            Import Asset
+          </a>
+        </div>
+        <div
+          class="bg-card border-border"
+          style="display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 8px 24px; border-bottom-style: solid; border-bottom-width: 1px;"
+        >
+          <select
+            aria-label="Household"
+            class="bg-background text-foreground border-border focus-ring"
+            style="padding: 4px 10px; border-radius: 6px; border-style: solid; border-width: 1px; font-size: 13px; cursor: pointer;"
+          >
+            <option
+              value="h1"
+            >
+              Home
+            </option>
+          </select>
+          <button
+            aria-pressed="true"
+            class="bg-primary text-primary-foreground focus-ring"
+            style="padding: 4px 10px; border-radius: 6px; border-style: solid; border-width: 1px; font-size: 13px; cursor: pointer; font-weight: 600;"
+            type="button"
+          >
+            All (4)
+          </button>
+          <button
+            aria-pressed="false"
+            class="bg-card-muted text-muted-foreground focus-ring"
+            style="padding: 4px 10px; border-radius: 6px; border-style: solid; border-width: 1px; font-size: 13px; cursor: pointer; font-weight: 400;"
+            type="button"
+          >
+            Hardware & Tools (1)
+          </button>
+          <button
+            aria-pressed="false"
+            class="bg-card-muted text-muted-foreground focus-ring"
+            style="padding: 4px 10px; border-radius: 6px; borde...
+
+Ignored nodes: comments, script, style
+<body>
+  <div>
+    <div
+      class="bg-background text-foreground"
+      style="min-height: 100vh;"
+    >
+      <div
+        class="bg-background"
+        style="position: sticky; top: 0px; z-index: 10;"
+      >
+        <div
+          class="bg-card border-border"
+          style="display: flex; align-items: center; gap: 12px; padding: 10px 24px; border-bottom-style: solid; border-bottom-width: 1px;"
+        >
+          <a
+            class="text-foreground focus-ring"
+            href="/"
+            style="font-weight: 700; text-decoration: none; margin-right: 4px;"
+          >
+            StorageGenie
+          </a>
+          <span
+            aria-label="Total loaded items: 4"
+            class="bg-card-muted text-muted-foreground"
+            style="font-size: 12px; padding: 2px 8px; border-radius: 999px;"
+            title="Items loaded on this page, not the household total"
+          >
+            Total: 
+            4
+             
+            items
+          </span>
+          <div
+            aria-hidden="true"
+            style="flex: 1 1 0%;"
+          />
+          <input
+            aria-label="Search catalog"
+            class="bg-background text-foreground border-border focus-ring"
+            placeholder="Search…"
+            style="padding: 6px 10px; border-radius: 6px; border-style: solid; border-width: 1px; min-width: 200px; font-size: 13px;"
+            type="search"
+            value=""
+          />
+          <button
+            aria-label="Switch to dark theme"
+            class="bg-card text-foreground border-border focus-ring"
+            style="display: inline-flex; align-items: center; justify-content: center; padding: 6px; border-radius: 6px; border-style: solid; border-width: 1px; cursor: pointer;"
+            title="Switch to dark theme"
+            type="button"
+          >
+            <svg
+              aria-hidden="true"
+              class="lucide lucide-moon"
+              fill="none"
+              height="18"
+              stroke="currentColor"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              viewBox="0 0 24 24"
+              width="18"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M20.985 12.486a9 9 0 1 1-9.473-9.472c.405-.022.617.46.402.803a6 6 0 0 0 8.268 8.268c.344-.215.825-.004.803.401"
+              />
+            </svg>
+          </button>
+          <a
+            class="bg-primary text-primary-foreground focus-ring"
+            href="/capture"
+            style="padding: 6px 12px; border-radius: 6px; text-decoration: none; font-weight: 600; font-size: 13px; display: inline-flex; align-items: center; gap: 6px;"
+          >
+            <svg
+              aria-hidden="true"
+              class="lucide lucide-upload"
+              fill="none"
+              height="16"
+              stroke="currentColor"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              viewBox="0 0 24 24"
+              width="16"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M12 3v12"
+              />
+              <path
+                d="m17 8-5-5-5 5"
+              />
+              <path
+                d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"
+              />
+            </svg>
+            Import Asset
+          </a>
+        </div>
+        <div
+          class="bg-card border-border"
+          style="display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 8px 24px; border-bottom-style: solid; border-bottom-width: 1px;"
+        >
+          <select
+            aria-label="Household"
+            class="bg-background text-foreground border-border focus-ring"
+            style="padding: 4px 10px; border-radius: 6px; border-style: solid; border-width: 1px; font-size: 13px; cursor: pointer;"
+          >
+            <option
+              value="h1"
+            >
+              Home
+            </option>
+          </select>
+          <button
+            aria-pressed="true"
+            class="bg-primary text-primary-foreground focus-ring"
+            style="padding: 4px 10px; border-radius: 6px; border-style: solid; border-width: 1px; font-size: 13px; cursor: pointer; font-weight: 600;"
+            type="button"
+          >
+            All (4)
+          </button>
+          <button
+            aria-pressed="false"
+            class="bg-card-muted text-muted-foreground focus-ring"
+            style="padding: 4px 10px; border-radius: 6px; border-style: solid; border-width: 1px; font-size: 13px; cursor: pointer; font-weight: 400;"
+            type="button"
+          >
+            Hardware & Tools (1)
+          </button>
+          <button
+            aria-pressed="false"
+            class="bg-card-muted text-muted-foreground focus-ring"
+            style="padding: 4px 10px; border-radius: 6px; borde...
+ ❯ waitForWrapper node_modules/@testing-library/dom/dist/wait-for.js:163:27
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:86:33
+ ❯ src/components/shell/shell.test.tsx:227:31
+    225|     // The raw facet key is `unknown`; the pill must speak the same wo…
+    226|     // card's `toProductCategory` mapping shows.
+    227|     const pill = await screen.findByRole("button", { name: "Uncategori…
+       |                               ^
+    228|     expect(screen.getByText("Uncategorized")).toBeInTheDocument();
+    229| 
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[11/13]⎯
+
+ FAIL  src/components/shell/shell.test.tsx > Catalog shell > the catalog main rides the shared centered container (SG-105 G1)
+AssertionError: expected null not to be null
+ ❯ src/components/shell/shell.test.tsx:249:22
+    247| 
+    248|     const main = document.querySelector("main.page-container") as HTML…
+    249|     expect(main).not.toBeNull();
+       |                      ^
+    250|     expect(main).toHaveStyle({ maxWidth: "1100px", marginLeft: "auto",…
+    251|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[12/13]⎯
+
+ FAIL  src/components/shell/shell.test.tsx > Catalog shell > the landing route renders the App nav with the Analytics link (D95)
+AssertionError: expected [ <a …(3)></a>, <a …(3)></a> ] to have a length of 1 but got 2
+
+- Expected
++ Received
+
+- 1
++ 2
+
+ ❯ src/components/shell/shell.test.tsx:370:49
+    368|     expect(await screen.findByRole("link", { name: "Analytics" })).toB…
+    369|     expect(screen.getByText("Phase 0 · local-first")).toBeInTheDocumen…
+    370|     expect(screen.getAllByText("StorageGenie")).toHaveLength(1);
+       |                                                 ^
+    371|   });
+    372| 
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[13/13]⎯
+
+ Test Files  6 failed | 17 passed (23)
+      Tests  13 failed | 178 passed (191)
+   Start at  19:16:20
+   Duration  4.93s (transform 720ms, setup 788ms, collect 3.03s, tests 8.41s, environment 6.42s, prepare 1.53s)
+
+
+
+============================================================
+PASS-POST RUN (source applied) — raw
+============================================================
+
+> storagegenie-frontend@0.1.0 test
+> vitest run
+
+
+ RUN  v1.6.1 /home/andrei/StorageGenie/frontend
+
+stderr | src/components/shell/shell.test.tsx > Catalog shell > the header labels the LOADED item count, not a household total
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+stderr | src/components/shell/import-modal.test.tsx > AssetImportModal staging > drop stages accepted files as Ready with a live count
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+stderr | src/components/catalog/catalog.test.tsx > ProductCard > renders the name, the category micro-pill and the primary-color dots
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+ ✓ src/components/shell/import-modal.test.tsx  (14 tests) 412ms
+ ✓ src/routes/theme-adoption.test.tsx  (11 tests) 364ms
+stderr | src/routes/theme-adoption.test.tsx > SG-075 screen adoption > App nav carries the card/border tokens and surfaces the theme toggle
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+ ✓ src/components/shell/drawer.test.tsx  (17 tests) 691ms
+ ✓ src/components/catalog/catalog.test.tsx  (33 tests) 644ms
+stderr | src/routes/InboxPage.test.tsx > InboxPage > renders failed loaded job detail and retries that loaded id
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+stderr | src/routes/AssetDetailPage.test.tsx > AssetDetailPage > editing quantity patches via PATCH and shows the superseded prior value in history
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+ ✓ src/theme/theme.test.tsx  (10 tests) 121ms
+ ✓ src/routes/InboxPage.test.tsx  (8 tests) 359ms
+ ✓ src/components/AssetForm.test.tsx  (9 tests) 253ms
+ ✓ src/routes/AssetDetailPage.test.tsx  (6 tests) 290ms
+stderr | src/routes/ReviewPage.test.tsx > ReviewPage > posts every decision with the loaded candidate id and supports keyboard actions
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+ ✓ src/components/shell/shell.test.tsx  (22 tests) 1713ms
+ ✓ src/api/client.test.ts  (11 tests) 31ms
+ ✓ src/types/product.test.ts  (12 tests) 4ms
+ ✓ src/routes/ReviewPage.test.tsx  (4 tests) 349ms
+stderr | src/routes/ChatPage.test.tsx > ChatPage > sending a question posts and renders the grounded reply
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+ ✓ src/routes/ChatPage.test.tsx  (6 tests) 338ms
+ ✓ src/routes/AnalyticsPage.test.tsx  (4 tests) 192ms
+ ✓ src/components/CandidateCard.test.tsx  (4 tests) 122ms
+ ✓ src/routes/SettingsPage.test.tsx  (3 tests) 163ms
+ ✓ src/routes/PlanningPage.test.tsx  (4 tests) 303ms
+ ✓ src/components/ExpiryEntryForm.test.tsx  (2 tests) 113ms
+ ✓ src/components/PlanningSuggestionCard.test.tsx  (2 tests) 71ms
+ ✓ src/components/JobCard.test.tsx  (2 tests) 63ms
+ ✓ src/components/AssetCard.test.tsx  (2 tests) 37ms
+stderr | src/components/AssetCard.test.tsx > AssetCard > renders display_name and type
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+ ✓ src/components/ChatTranscript.test.tsx  (2 tests) 73ms
+ ✓ src/components/ProvenanceBadge.test.tsx  (3 tests) 25ms
+
+ Test Files  23 passed (23)
+      Tests  191 passed (191)
+   Start at  19:18:22
+   Duration  4.54s (transform 722ms, setup 670ms, collect 3.21s, tests 6.73s, environment 6.53s, prepare 1.54s)
+
+
+
+============================================================
+GATES (frontend)
+============================================================
+
+--- build (tsc && vite build) doubles as the type gate ---
+> tsc && vite build
+vite v5.4.21 building for production...
+transforming...
+✓ 1962 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                   0.94 kB │ gzip:  0.47 kB
+dist/assets/index-CoNI-1Zn.css    3.84 kB │ gzip:  1.04 kB
+dist/assets/index-DxlQQyIS.js   306.86 kB │ gzip: 90.07 kB
+✓ built in 1.62s
+BUILD_EXIT=0
+
+--- eslint src ---
+LINT_EXIT=0
+
+--- backend diff (must be empty; no backend file in ceiling) ---
+
+BACKEND_DIFF_EMPTY=yes (no output above)
+
+--- changed files ---
+ M frontend/src/components/AssetForm.test.tsx
+ M frontend/src/components/AssetForm.tsx
+ M frontend/src/components/JobCard.test.tsx
+ M frontend/src/components/JobCard.tsx
+ M frontend/src/components/catalog/ProductCard.tsx
+ M frontend/src/components/catalog/catalog.test.tsx
+ M frontend/src/components/shell/AppHeader.tsx
+ M frontend/src/components/shell/AppShell.tsx
+ M frontend/src/components/shell/CatalogToolbar.tsx
+ M frontend/src/components/shell/shell.test.tsx
+ M frontend/src/routes/CapturePage.tsx
+ M frontend/src/routes/CatalogPage.tsx
+ M frontend/src/routes/InboxPage.test.tsx
+ M frontend/src/routes/InboxPage.tsx
+ M frontend/src/routes/theme-adoption.test.tsx
+?? docs/worklogs/SG-105_verify.log
+?? frontend/src/components/shell/PageContainer.tsx
+--- diffstat ---
+frontend/src/components/AssetForm.test.tsx       | 24 ++++++++
+ frontend/src/components/AssetForm.tsx            | 75 +++++++++++++++++-------
+ frontend/src/components/JobCard.test.tsx         | 19 ++++++
+ frontend/src/components/JobCard.tsx              | 26 +++++++-
+ frontend/src/components/catalog/ProductCard.tsx  |  1 -
+ frontend/src/components/catalog/catalog.test.tsx |  7 +++
+ frontend/src/components/shell/AppHeader.tsx      |  9 +--
+ frontend/src/components/shell/AppShell.tsx       |  3 +-
+ frontend/src/components/shell/CatalogToolbar.tsx | 29 +++++----
+ frontend/src/components/shell/shell.test.tsx     | 42 +++++++++++--
+ frontend/src/routes/CapturePage.tsx              | 19 +++---
+ frontend/src/routes/CatalogPage.tsx              | 45 ++++++++------
+ frontend/src/routes/InboxPage.test.tsx           | 39 ++++++++++++
+ frontend/src/routes/InboxPage.tsx                | 26 ++++++--
+ frontend/src/routes/theme-adoption.test.tsx      | 11 ++++
+ 15 files changed, 298 insertions(+), 77 deletions(-)
+
+
+============================================================
+GUARD GREPS
+============================================================
+
+--- PG-SC-11 end-relative grep over touched test files (expect 0 hits / exit 1) ---
+command: grep -rnE "downgrade|latest|HEAD|expected_head" <6 touched test files>
+SC11_EXIT=1 (1 = zero hits)
+
+--- secret gate: value-shape scan over added diff (expect exit 1) ---
+command: git diff -U0 -- frontend/src | grep "^+" | grep -nE "(sk-...|AKIA...|-----BEGIN|xox[baprs]-|ghp_...|eyJ...)"
+VALUESHAPE_EXIT=1 (1 = zero hits)
+
+--- secret gate: literal secret-assignment grep over touched src (expect exit 1) ---
+command: grep -rnE "(secret|password|passwd|api[_-]?key|private[_-]?key)[[:space:]]*[:=]" <10 touched src files>
+SECRET_ASSIGN_EXIT=1 (1 = zero hits)
+
+--- G1: hand-rolled page maxWidth in Inbox/Capture/AppShell/AssetForm (expect exit 1) ---
+MAXW_EXIT=1 (1 = zero hits)
+
+--- G4: grid breakpoints + minmax(0,...) (no overflow) ---
+15:.catalog-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+16:@media (min-width: 768px) { .catalog-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; } }
+17:@media (min-width: 1024px) { .catalog-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+18:@media (min-width: 1536px) { .catalog-grid { grid-template-columns: repeat(5, minmax(0, 1fr)); } }
+
+--- G4: DQ3 badge utility strings untouched (BADGE_CLASS intact) ---
+24:  raw: "bg-stone-100 text-stone-700 border-stone-200 dark:bg-stone-800/50 dark:text-stone-400 dark:border-stone-700/50",
+26:    "bg-sky-50 text-sky-800 border-sky-200 dark:bg-sky-950/40 dark:text-sky-400 dark:border-sky-800/50",
+28:    "bg-emerald-50 text-emerald-800 border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-400 dark:border-emerald-800/50",
+30:    "bg-rose-50 text-rose-800 border-rose-200 dark:bg-rose-950/40 dark:text-rose-400 dark:border-rose-800/50",
+
+--- new shared file ---
+frontend/src/components/shell/PageContainer.tsx

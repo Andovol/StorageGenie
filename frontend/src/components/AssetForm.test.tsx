@@ -133,4 +133,28 @@ describe("AssetForm", () => {
     expect(api.uploadEvidence).not.toHaveBeenCalled();
     expect(api.apiPost).not.toHaveBeenCalled();
   });
+
+  test("the asset-type select carries the themed control treatment (SG-105 G2)", () => {
+    render(<AssetForm householdId="hh-1" onCreated={() => {}} />);
+
+    const select = screen.getByLabelText("Asset type");
+    expect(select).toHaveClass("bg-background", "text-foreground", "border-border");
+  });
+
+  test("the file pickers are real file inputs hidden behind themed labels (SG-105 G2)", () => {
+    render(<AssetForm householdId="hh-1" onCreated={() => {}} />);
+
+    const choose = screen.getByLabelText("Choose files");
+    expect(choose).toHaveAttribute("type", "file");
+    expect(choose).toHaveAttribute("multiple");
+    expect(choose).toHaveAttribute("accept", "image/*,.pdf");
+    expect(choose.style.position).toBe("absolute");
+    expect(choose.closest("label")).toHaveClass("bg-background", "text-foreground", "border-border");
+
+    const camera = screen.getByLabelText("Take a photo");
+    expect(camera).toHaveAttribute("type", "file");
+    expect(camera).toHaveAttribute("capture", "environment");
+    expect(camera.style.position).toBe("absolute");
+    expect(camera.closest("label")).toHaveClass("bg-background", "text-foreground", "border-border");
+  });
 });

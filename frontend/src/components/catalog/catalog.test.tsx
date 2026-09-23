@@ -132,6 +132,13 @@ describe("ProductCard", () => {
     renderWithRouter(<ProductCard item={sourceless} householdId="h1" />);
     expect(screen.getByTestId("product-fallback-icon")).toBeInTheDocument();
   });
+
+  test("cards size to their content: no fixed 3:4 dead space, the media well stays 1:1 (SG-105 G4)", () => {
+    renderWithRouter(<ProductCard item={MOCK_PRODUCTS[0]} householdId="h1" />);
+
+    expect(screen.getByTestId("product-card").style.aspectRatio).toBe("");
+    expect(screen.getByTestId("product-card-well").style.aspectRatio).toBe("1 / 1");
+  });
 });
 
 describe("ProductCardSkeleton", () => {

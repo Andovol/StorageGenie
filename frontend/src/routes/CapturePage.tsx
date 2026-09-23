@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useHouseholds } from "../hooks/useAssets";
 import { AssetForm } from "../components/AssetForm";
+import { CONTROL_STYLE, THEMED_CONTROL_CLASS } from "../components/shell/CatalogToolbar";
+import { PageContainer } from "../components/shell/PageContainer";
 
 export function CapturePage() {
   const { data: households } = useHouseholds();
@@ -19,18 +21,19 @@ export function CapturePage() {
   const effective = householdId || households?.[0]?.id || "";
 
   return (
-    <div className="text-foreground" style={{ padding: 24 }}>
+    <PageContainer className="text-foreground">
       <h1 className="page-header text-foreground">Capture — Manual Create</h1>
       <div style={{ marginBottom: 16, display: "flex", gap: 12, alignItems: "center" }}>
         <label style={{ fontSize: 13 }}>
           Household{" "}
           <select
+            className={THEMED_CONTROL_CLASS}
             value={effective}
             onChange={(e) => {
               setHouseholdId(e.target.value);
               localStorage.setItem("household_id", e.target.value);
             }}
-            style={{ padding: 6, borderRadius: 6, marginLeft: 6 }}
+            style={{ ...CONTROL_STYLE, marginLeft: 6 }}
           >
             {(households || []).map((h) => (
               <option key={h.id} value={h.id}>
@@ -43,11 +46,13 @@ export function CapturePage() {
       {!effective ? (
         <div className="text-muted-foreground">No household available — seed the database first.</div>
       ) : (
-        <AssetForm
-          householdId={effective}
-          onCreated={(id) => navigate(`/assets/${id}?household_id=${effective}`)}
-        />
+        <PageContainer variant="form">
+          <AssetForm
+            householdId={effective}
+            onCreated={(id) => navigate(`/assets/${id}?household_id=${effective}`)}
+          />
+        </PageContainer>
       )}
-    </div>
+    </PageContainer>
   );
 }

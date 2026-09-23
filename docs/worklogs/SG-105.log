@@ -1,0 +1,36 @@
+SG-105 — UI centering + control consistency repair, Inbox/Capture/Catalog
+coder: opencode | effort: high (process args: `opencode run --auto --dir /home/andrei/StorageGenie --variant high`)
+model: unknown (CLI default; no model id sent per policy)
+contract: 0.33.0 (source STATE.md:3 recorded + AGENTS.md; .rules-cache/ ABSENT on this checkout) == published b232b84 (D129)
+BASE (origin/automation): 66c7e78de8140e266a609bea6781321ee356b983
+DATABASE: none | Restart: none | Deploy: none | Container actions: none | $0.000000 real
+
+Legs (elapsed vs budget, wall clock):
+- L0 recon + premise verification (read tree, contract, worklogs) ........ ~3.5 min (210 s) / 1200 s overall
+- L1 baseline suite + build + lint (clean tree) .......................... suite 4.77 s, build 1.66 s, lint 0 s / 600 s suite, 120 s ordinary
+- L2 write tests, FAIL-pre capture ....................................... suite 4.93 s (13 failed / 178 passed) / 600 s
+- L3 implement G1-G4 source .............................................. ~2 min (120 s) / 1200 s
+- L4 PASS-post capture + build + lint + gates ............................ suite 4.54 s (191 passed), build 1.62 s, lint 0 s / 600 s
+- L5 worklog/report/verify + receipt note + push ......................... ~4 min (240 s) / 1200 s overall
+
+Premise deviations found (a difference is a finding):
+- Packet paths are hypotheses: real tree is `frontend/src/routes/*` (not `src/pages/`) and
+  `frontend/src/components/shell/*` (not `src/components/`). Every quoted line number was
+  re-verified against the actual files before editing.
+- `.rules-cache/` is absent on this host; contract echoed from `STATE.md:3` + `AGENTS.md`.
+
+Work done:
+- G1: new `frontend/src/components/shell/PageContainer.tsx` (single max-width 1100 + centering;
+  `form` variant 520). Applied to InboxPage, CapturePage (form variant wraps AssetForm), AppShell `<main>`.
+- G2: shared `THEMED_CONTROL_CLASS`/`CONTROL_STYLE` exported from `CatalogToolbar.tsx`; applied to
+  Inbox household select, Capture household select, AssetForm asset-type select; AssetForm file
+  pickers became real `<input type=file>` visually hidden behind themed labels.
+- G3: JobCard `text-foreground` + `jobStateTone` status classes; review `Link`s themed; resolved
+  tasks hidden by default via a Review-status filter (open/resolved/all).
+- G4: dropped the duplicate AppHeader brand (global nav kept); ProductCard content-sized (no 3:4);
+  pills speak `toProductCategory` vocabulary while still sending the real `asset_type` filter.
+
+Gates: frontend 191 passed / 23 files; build clean; eslint src clean; backend diff empty; PG-SC-11
+0 hits; secret gates 0; no visual claim anywhere (DOM/token assertions only).
+
+Receipt: note added on WORK_HEAD, notes ref pushed, verified from the fetched mapped ref — see report.

@@ -55,7 +55,14 @@ type CatalogToolbarProps = {
   onSaveSearch: () => void;
 };
 
-const controlStyle: React.CSSProperties = {
+/**
+ * SG-105 G2: one themed control treatment. The class pair is the one the
+ * toolbar's selects already carried; every other select/file picker reuses it
+ * so no native white control leaks through the dark theme.
+ */
+export const THEMED_CONTROL_CLASS = "bg-background text-foreground border-border focus-ring";
+
+export const CONTROL_STYLE: React.CSSProperties = {
   padding: "4px 10px",
   borderRadius: 6,
   borderStyle: "solid",
@@ -117,8 +124,8 @@ export function CatalogToolbar({
         aria-label="Household"
         value={householdId}
         onChange={(event) => onHouseholdChange(event.target.value)}
-        className="bg-background text-foreground border-border focus-ring"
-        style={controlStyle}
+        className={THEMED_CONTROL_CLASS}
+        style={CONTROL_STYLE}
       >
         {households.map((household) => (
           <option key={household.id} value={household.id}>
@@ -137,7 +144,7 @@ export function CatalogToolbar({
             aria-pressed={active}
             onClick={() => onCategoryChange(category)}
             className={`${active ? "bg-primary text-primary-foreground" : "bg-card-muted text-muted-foreground"} focus-ring`}
-            style={{ ...controlStyle, fontWeight: active ? 600 : 400 }}
+            style={{ ...CONTROL_STYLE, fontWeight: active ? 600 : 400 }}
           >
             {category}
           </button>
@@ -148,8 +155,8 @@ export function CatalogToolbar({
         aria-label="Sort catalog"
         value={sort}
         onChange={(event) => onSortChange(event.target.value as SortOption)}
-        className="bg-background text-foreground border-border focus-ring"
-        style={controlStyle}
+        className={THEMED_CONTROL_CLASS}
+        style={CONTROL_STYLE}
       >
         {(Object.keys(SORT_LABELS) as SortOption[]).map((option) => (
           <option key={option} value={option}>
@@ -168,7 +175,7 @@ export function CatalogToolbar({
               aria-pressed={active}
               onClick={() => onDensityChange(option)}
               className={`${active ? "bg-primary text-primary-foreground" : "bg-card-muted text-muted-foreground"} focus-ring`}
-              style={{ ...controlStyle, fontWeight: active ? 600 : 400 }}
+              style={{ ...CONTROL_STYLE, fontWeight: active ? 600 : 400 }}
             >
               {DENSITY_LABELS[option]}
             </button>
@@ -183,7 +190,7 @@ export function CatalogToolbar({
         onClick={onSaveSearch}
         disabled={activeFilters.length === 0}
         className="bg-card text-foreground border-border focus-ring"
-        style={{ ...controlStyle, opacity: activeFilters.length === 0 ? 0.5 : 1 }}
+        style={{ ...CONTROL_STYLE, opacity: activeFilters.length === 0 ? 0.5 : 1 }}
       >
         Save search
       </button>
@@ -193,8 +200,8 @@ export function CatalogToolbar({
           aria-label="Saved searches"
           value={selectedSavedSearchId}
           onChange={(event) => onSavedSearchSelect(event.target.value)}
-          className="bg-background text-foreground border-border focus-ring"
-          style={controlStyle}
+          className={THEMED_CONTROL_CLASS}
+          style={CONTROL_STYLE}
         >
           <option value="">Saved searches</option>
           {savedSearches.map((saved) => (
@@ -215,7 +222,7 @@ export function CatalogToolbar({
           aria-label="Delete saved search"
           onClick={() => onSavedSearchDelete(selectedSavedSearch.id)}
           className="text-primary focus-ring"
-          style={{ ...controlStyle, color: "inherit" }}
+          style={{ ...CONTROL_STYLE, color: "inherit" }}
         >
           Delete
         </button>

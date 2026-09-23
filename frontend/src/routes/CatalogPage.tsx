@@ -17,7 +17,7 @@ import {
   type Density,
   type SortOption,
 } from "../components/shell/CatalogToolbar";
-import { assetToProductItem } from "../types/product";
+import { assetToProductItem, toProductCategory } from "../types/product";
 import type { Asset, SavedSearchQuery } from "../api/types";
 
 function useDebounced<T>(value: T, delayMs: number): T {
@@ -72,29 +72,36 @@ export function CatalogPage() {
   const { data: facets } = useFacets(effectiveHousehold, q);
   const categoryCounts = useMemo(() => facets?.asset_type ?? {}, [facets]);
 
-  // Pills come from the real `asset_type` population, not the static DQ1 list;
-  // each renders `Label (N)`. "All" shows the unfiltered-with-q total.
-  const categoryLabels = useMemo(() => {
+  // Pills come from the real `asset_type` population and speak the same
+  // vocabulary the cards show (`toProductCategory`): the raw `unknown` facet key
+  // renders as `Uncategorized`, while selecting that pill still sends the REAL
+  // server filter `asset_type=unknown`. Counts aggregate per display name so the
+  // pill set stays collision-free.
+  const categoryOptions = useMemo(() => {
     const total = Object.values(categoryCounts).reduce((sum, count) => sum + count, 0);
-    const labels = new Map<string, string>();
-    labels.set(CATEGORY_ALL, `${CATEGORY_ALL} (${total})`);
-    for (const key of Object.keys(categoryCounts)) {
-      labels.set(key, `${key} (${categoryCounts[key]})`);
+    const byDisplay = new Map<string, { key: string; count: number }>();
+    for (const [key, count] of Object.entries(categoryCounts)) {
+      const display = toProductCategory(key);
+      const existing = byDisplay.get(display);
+      if (existing) existing.count += count;
+      else byDisplay.set(display, { key, count });
     }
-    return labels;
+    const options: { display: string; key: string; label: string }[] = [
+      { display: CATEGORY_ALL, key: CATEGORY_ALL, label: `${CATEGORY_ALL} (${total})` },
+    ];
+    for (const [display, entry] of byDisplay) {
+      options.push({ display, key: entry.key, label: `${display} (${entry.count})` });
+    }
+    return options;
   }, [categoryCounts]);
 
-  const categories = useMemo(() => Array.from(categoryLabels.values()), [categoryLabels]);
-  const activeCategoryLabel = categoryLabels.get(category) ?? category;
+  const categories = useMemo(() => categoryOptions.map((option) => option.label), [categoryOptions]);
+  const activeCategoryLabel =
+    categoryOptions.find((option) => option.key === category)?.label ?? category;
 
   const handleCategoryChange = (label: string) => {
-    for (const [key, value] of categoryLabels) {
-      if (value === label) {
-        setCategory(key);
-        return;
-      }
-    }
-    setCategory(label);
+    const option = categoryOptions.find((entry) => entry.label === label);
+    setCategory(option ? option.key : label);
   };
 
   // reset accumulation when any server-side query dimension changes
@@ -145,7 +152,7 @@ export function CatalogPage() {
   const activeFilters = useMemo(() => {
     const filters: string[] = [];
     if (qRaw.trim()) filters.push(`Search: ${qRaw.trim()}`);
-    if (category !== CATEGORY_ALL) filters.push(category);
+    if (category !== CATEGORY_ALL) filters.push(toProductCategory(category));
     if (sort !== "recent") filters.push(SORT_LABELS[sort]);
     return filters;
   }, [qRaw, category, sort]);

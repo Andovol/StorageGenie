@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { apiPost, uploadEvidence } from "../api/client";
+import { CONTROL_STYLE, THEMED_CONTROL_CLASS } from "./shell/CatalogToolbar";
 
 type Props = {
   householdId: string;
@@ -7,6 +8,23 @@ type Props = {
 };
 
 type PreviewFile = { file: File; shaPreview: string | null };
+
+/**
+ * SG-105 G2: the real `<input type="file">` stays in the DOM (and stays
+ * focusable/announced), but is visually hidden behind its label so no native
+ * white picker button leaks through the dark theme.
+ */
+const VISUALLY_HIDDEN: React.CSSProperties = {
+  position: "absolute",
+  width: 1,
+  height: 1,
+  padding: 0,
+  margin: -1,
+  overflow: "hidden",
+  clip: "rect(0 0 0 0)",
+  whiteSpace: "nowrap",
+  borderWidth: 0,
+};
 
 async function sha256Hex(file: File): Promise<string> {
   const buf = await file.arrayBuffer();
@@ -109,7 +127,7 @@ export function AssetForm({ householdId, onCreated }: Props) {
   }
 
   return (
-    <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: 12, maxWidth: 520 }}>
+    <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: 12 }}>
       <label style={{ display: "flex", flexDirection: "column", gap: 4 }}>
         <span>Display name (optional)</span>
         <input
@@ -123,7 +141,7 @@ export function AssetForm({ householdId, onCreated }: Props) {
       </label>
       <label style={{ display: "flex", flexDirection: "column", gap: 4 }}>
         <span>Asset type</span>
-        <select value={assetType} onChange={(e) => setAssetType(e.target.value)} style={{ width: "100%", padding: 8, borderRadius: 6 }}>
+        <select className={THEMED_CONTROL_CLASS} value={assetType} onChange={(e) => setAssetType(e.target.value)} style={{ ...CONTROL_STYLE, width: "100%", padding: 8 }}>
           <option value="unknown">unknown</option>
           <option value="equipment">equipment</option>
           <option value="product">product</option>
@@ -166,25 +184,40 @@ export function AssetForm({ householdId, onCreated }: Props) {
         }}
       >
         <div className="text-muted-foreground" style={{ fontSize: 13, marginBottom: 8 }}>Drag &amp; drop photos here, click to select, or paste</div>
-        <input
-          type="file"
-          multiple
-          accept="image/*,.pdf"
-          onChange={async (e) => {
-            if (e.target.files?.length) await addFiles(e.target.files);
-          }}
-        />
-        <label className="text-muted-foreground" style={{ display: "inline-flex", flexDirection: "column", gap: 4, marginTop: 12, fontSize: 13 }}>
-          Take a photo
-          <input
-            type="file"
-            accept="image/*"
-            capture="environment"
-            onChange={async (e) => {
-              if (e.target.files?.length) await addFiles(e.target.files);
-            }}
-          />
-        </label>
+        <div style={{ display: "inline-flex", gap: 8, flexWrap: "wrap", justifyContent: "center" }}>
+          <label
+            className={THEMED_CONTROL_CLASS}
+            style={{ ...CONTROL_STYLE, display: "inline-flex", alignItems: "center" }}
+          >
+            Choose files
+            <input
+              type="file"
+              multiple
+              accept="image/*,.pdf"
+              className={THEMED_CONTROL_CLASS}
+              style={VISUALLY_HIDDEN}
+              onChange={async (e) => {
+                if (e.target.files?.length) await addFiles(e.target.files);
+              }}
+            />
+          </label>
+          <label
+            className={THEMED_CONTROL_CLASS}
+            style={{ ...CONTROL_STYLE, display: "inline-flex", alignItems: "center" }}
+          >
+            Take a photo
+            <input
+              type="file"
+              accept="image/*"
+              capture="environment"
+              className={THEMED_CONTROL_CLASS}
+              style={VISUALLY_HIDDEN}
+              onChange={async (e) => {
+                if (e.target.files?.length) await addFiles(e.target.files);
+              }}
+            />
+          </label>
+        </div>
         {previewFiles.length > 0 && (
           <ul style={{ textAlign: "left", marginTop: 12, paddingLeft: 16 }}>
             {previewFiles.map((pf, i) => (

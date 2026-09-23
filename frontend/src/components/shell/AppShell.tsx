@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import type { Household, SavedSearch } from "../../api/types";
 import { AppHeader } from "./AppHeader";
 import { CatalogToolbar, type Density, type SortOption } from "./CatalogToolbar";
+import { PageContainer } from "./PageContainer";
 
 type AppShellProps = {
   loadedCount: number;
@@ -74,7 +75,7 @@ export function AppShell({
           onSaveSearch={onSaveSearch}
         />
       </div>
-      <main style={{ padding: 24 }}>{children}</main>
+      <PageContainer as="main">{children}</PageContainer>
     </div>
   );
 }

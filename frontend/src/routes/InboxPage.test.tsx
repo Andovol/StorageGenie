@@ -62,4 +62,43 @@ describe("InboxPage", () => {
     fireEvent.click(await screen.findByText("Import job-load"));
     await waitFor(() => expect(() => expect(screen.getByRole("alert")).toHaveTextContent("decoder failed on loaded image")).toThrow());
   });
+
+  test("the page rides the shared centered container (SG-105 G1)", async () => {
+    api.apiGet.mockResolvedValue({ items: [], next_cursor: null, total: 0 });
+    const { container } = renderPage();
+
+    const page = container.querySelector(".page-container") as HTMLElement;
+    expect(page).not.toBeNull();
+    expect(page).toHaveStyle({ maxWidth: "1100px", marginLeft: "auto", marginRight: "auto" });
+  });
+
+  test("the household select carries the themed control treatment (SG-105 G2)", async () => {
+    api.apiGet.mockResolvedValue({ items: [], next_cursor: null, total: 0 });
+    renderPage();
+
+    const select = screen.getByRole("combobox", { name: /household/i });
+    expect(select).toHaveClass("bg-background", "text-foreground", "border-border");
+  });
+
+  test("the review link carries the theme link treatment, not default purple (SG-105 G3)", async () => {
+    const task = { id: "task-open-1", task_type: "identifier_collision", priority: "high", subject_ref: "candidate-open-1", proposed_change: null, status: "open", household_id: household.id, created_at: null, updated_at: null };
+    api.apiGet.mockImplementation((path: string) => path === "/v1/jobs" ? Promise.resolve({ items: [], next_cursor: null, total: 0 }) : Promise.resolve({ items: [task], next_cursor: null, total: 1 }));
+    renderPage();
+
+    const link = await screen.findByRole("link", { name: "Review" });
+    expect(link).toHaveClass("text-primary");
+  });
+
+  test("resolved review tasks are hidden by default and revealed by the status filter (SG-105 G3)", async () => {
+    const open = { id: "task-open-2", task_type: "identifier_collision", priority: "high", subject_ref: "candidate-open-2", proposed_change: null, status: "open", household_id: household.id, created_at: null, updated_at: null };
+    const resolved = { id: "task-resolved-2", task_type: "identifier_collision", priority: "low", subject_ref: "candidate-resolved-2", proposed_change: null, status: "resolved", household_id: household.id, created_at: null, updated_at: null };
+    api.apiGet.mockImplementation((path: string) => path === "/v1/jobs" ? Promise.resolve({ items: [], next_cursor: null, total: 0 }) : Promise.resolve({ items: [open, resolved], next_cursor: null, total: 2 }));
+    renderPage();
+
+    expect(await screen.findByText("identifier_collision")).toBeInTheDocument();
+    expect(screen.queryByText(/candidate-resolved-2/)).not.toBeInTheDocument();
+
+    fireEvent.change(screen.getByRole("combobox", { name: /review status/i }), { target: { value: "all" } });
+    expect(await screen.findByText(/candidate-resolved-2/)).toBeInTheDocument();
+  });
 });

@@ -46,13 +46,8 @@ export function AppHeader({ loadedCount, searchValue, onSearchChange }: AppHeade
         borderBottomWidth: 1,
       }}
     >
-      <Link
-        to="/"
-        className="text-foreground focus-ring"
-        style={{ fontWeight: 700, textDecoration: "none", marginRight: 4 }}
-      >
-        StorageGenie
-      </Link>
+      {/* SG-105 G4: the global nav already carries the brand on this route;
+          the Catalog header does not repeat it. */}
       <span
         className="bg-card-muted text-muted-foreground"
         aria-label={`Total loaded items: ${loadedCount}`}

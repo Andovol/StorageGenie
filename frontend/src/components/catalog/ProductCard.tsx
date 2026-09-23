@@ -110,7 +110,6 @@ export function ProductCard({
         padding: 10,
         textDecoration: "none",
         color: "inherit",
-        aspectRatio: "3 / 4",
       }}
     >
       <div

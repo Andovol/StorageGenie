@@ -202,7 +202,7 @@ describe("Catalog shell", () => {
     expect(screen.getByLabelText(/total loaded items: 4/i)).toHaveTextContent("Total: 4 items");
   });
 
-  test("the toolbar renders All plus one counted pill per real asset_type", async () => {
+  test("the toolbar renders All plus one counted pill per real asset_type vocabulary", async () => {
     renderCatalog();
     await screen.findByText("Drill");
     const all = await screen.findByRole("button", { name: "All (4)" });
@@ -211,11 +211,43 @@ describe("Catalog shell", () => {
       "Hardware & Tools": 1,
       "Electronics & Gadgets": 1,
       "Apparel & Textiles": 1,
-      unknown: 1,
+      Uncategorized: 1,
     };
     for (const [key, count] of Object.entries(counts)) {
       expect(screen.getByRole("button", { name: `${key} (${count})` })).toBeInTheDocument();
     }
+  });
+
+  test("category pills and cards share one vocabulary through the real server filter (SG-105 G4)", async () => {
+    renderCatalog();
+    await screen.findByText("Drill");
+
+    // The raw facet key is `unknown`; the pill must speak the same word the
+    // card's `toProductCategory` mapping shows.
+    const pill = await screen.findByRole("button", { name: "Uncategorized (1)" });
+    expect(screen.getByText("Uncategorized")).toBeInTheDocument();
+
+    fireEvent.click(pill);
+
+    await waitFor(() =>
+      expect(
+        api.apiGet.mock.calls.some(
+          ([path, params]) =>
+            path === "/v1/assets" &&
+            (params as Record<string, string> | undefined)?.asset_type === "unknown"
+        )
+      ).toBe(true)
+    );
+    expect(pill).toHaveAttribute("aria-pressed", "true");
+  });
+
+  test("the catalog main rides the shared centered container (SG-105 G1)", async () => {
+    renderCatalog();
+    await screen.findByText("Drill");
+
+    const main = document.querySelector("main.page-container") as HTMLElement;
+    expect(main).not.toBeNull();
+    expect(main).toHaveStyle({ maxWidth: "1100px", marginLeft: "auto", marginRight: "auto" });
   });
 
   test("a category pill filters server-side and carries the primary style when active", async () => {
@@ -330,10 +362,12 @@ describe("Catalog shell", () => {
     await screen.findByText("Drill");
 
     // SG-073 D95: <Nav /> now renders unconditionally, so the landing route
-    // carries the Analytics link and the legacy nav footer line.
+    // carries the Analytics link and the legacy nav footer line. SG-105 G4:
+    // the Catalog's own AppHeader no longer repeats the brand, so exactly one
+    // brand row remains on the route.
     expect(await screen.findByRole("link", { name: "Analytics" })).toBeInTheDocument();
     expect(screen.getByText("Phase 0 · local-first")).toBeInTheDocument();
-    expect(screen.getAllByText("StorageGenie")).toHaveLength(2);
+    expect(screen.getAllByText("StorageGenie")).toHaveLength(1);
   });
 
   test("a non-catalog route keeps the byte-identical legacy nav", async () => {
