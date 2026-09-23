@@ -1,0 +1,530 @@
+SG-097_verify.log — raw outputs (first token SG-097)
+Generated 2026-09-23T14:09:43Z (live clock)
+BASE ref origin/automation resolved: ff2f3c09edf657e6cc4f540e61e47ff24f30d8aa
+WORK_HEAD: 4397d7f73fe558e3c4f80380d78b582e7405b1d2
+
+===================== R-DIFF: work commit 4397d7f73fe558e3c4f80380d78b582e7405b1d2 =====================
+4397d7f73fe558e3c4f80380d78b582e7405b1d2 SG-097: Jina settings field + .env.example + seam docs + worked example
+
+ .env.example                            |  1 +
+ README.md                               | 39 +++++++++++++++++++
+ backend/app/config.py                   |  3 ++
+ backend/tests/test_privacy_audit.py     | 14 +++++--
+ backend/tests/test_sg082_enrich_jina.py | 67 +++++++++++++++++++++++++++++++++
+ docs/enrich-jina-request-example.md     | 43 +++++++++++++++++++++
+ 6 files changed, 163 insertions(+), 4 deletions(-)
+
+--- tracked diff ff2f3c0..4397d7f73fe558e3c4f80380d78b582e7405b1d2 ---
+diff --git a/.env.example b/.env.example
+index 498b979..0eff93a 100644
+--- a/.env.example
++++ b/.env.example
+@@ -1,6 +1,7 @@
+ # StorageGenie environment template — NAMES only; copy to `.env` and fill in.
+ # `.env` is gitignored; never commit key values.
+ OPENCODE_API_KEY=
++JINA_API_KEY=
+ SG_PROVIDER_ID=
+ SG_MODEL_ID=
+ SG_CONFIDENCE_THRESHOLD=
+diff --git a/README.md b/README.md
+index 48c8705..51065ae 100644
+--- a/README.md
++++ b/README.md
+@@ -383,3 +383,42 @@ committed ledger across jobs).
+ 
+ Phase 3 is proved by `backend/tests/test_phase3_e2e.py` (six gate groups on the real
+ HTTP path, zero network) plus the per-slice suites, and closes on blueprint:531.
++
++## Enrich runbook — Jina fallback key (`JINA_API_KEY`)
++
++The Enrich lookup is a committed, **unwired** library
++(`backend/app/services/enrich/`): OpenFoodFacts first, Jina Search as the
++fallback for OFF misses/degradation and non-food input. It is not served by any
++route yet. When its endpoint lands, the Jina leg authenticates with
++`JINA_API_KEY`.
++
++### Rotate the key
++
++1. Put the key in the host `.env` as `JINA_API_KEY` (see `.env.example`). `.env`
++   is gitignored (`.gitignore:6`); the value is never printed, logged, or
++   committed.
++2. The backend reads it through `Settings.jina_api_key` (declared in
++   `backend/app/config.py`). A `JINA_API_KEY` process environment variable is the
++   fallback when the field is unset.
++
++### How the key is resolved (precedence)
++
++`resolve_api_key(explicit)` in `backend/app/services/enrich/jina.py` resolves in
++this order:
++
++1. **explicit argument** — the test / dependency-injection seam;
++2. **`Settings.jina_api_key`** — the declared settings field (host `.env`);
++3. **`JINA_API_KEY`** process environment.
++
++No key at any layer degrades loudly (`missing_key:`) and sends **nothing** — the
++client never sends an unauthenticated request. The `Authorization: Bearer <key>`
++header is added at **send time only** (`authorize()`); builders, snapshots and
++log lines carry header **names only**, and the key value is never returned,
++stored, or logged.
++
++A worked example of the exact request the driver builds (EU-default base, header
++names, repeated `site:` query) is committed at
++`docs/enrich-jina-request-example.md`; its shape is asserted against the real
++driver constants by
++`backend/tests/test_sg082_enrich_jina.py::test_worked_example_artifact_matches_the_real_driver`.
++
+diff --git a/backend/app/config.py b/backend/app/config.py
+index e8d6e5f..f667c63 100644
+--- a/backend/app/config.py
++++ b/backend/app/config.py
+@@ -27,6 +27,9 @@ class Settings(BaseSettings):
+     sg_provider_id: str = "fake"
+     sg_model_id: str = "deepseek-v4-flash-vision-exp"
+     opencode_api_key: str | None = None
++    # SG-097: Jina Search fallback key (Enrich). Declared so the settings seam
++    # reads it; the JINA_API_KEY process environment remains the fallback.
++    jina_api_key: str | None = None
+     sg_per_job_cap: float | None = None
+     sg_monthly_cap: float | None = None
+     sg_consent: bool = False
+diff --git a/backend/tests/test_privacy_audit.py b/backend/tests/test_privacy_audit.py
+index e61f2e6..61cc46b 100644
+--- a/backend/tests/test_privacy_audit.py
++++ b/backend/tests/test_privacy_audit.py
+@@ -457,9 +457,11 @@ def test_g2_web_senders_are_the_two_researched_sources() -> None:
+     """SG-082 repair (M45): the Jina fallback is now the ONE web-search sender.
+ 
+     The name-only scan allows the enrich package's Jina module (+ the mapping
+-    import in `candidates.py`) and keeps every other web sender absent. The
+-    excluded detection source is checked over the touched web-source files only
+-    (the rule's literal gate covers new/modified files, not the whole tree).
++    import in `candidates.py`) and keeps every other web sender absent. SG-097
++    adds `config.py` to the allow-set: it declares the `jina_api_key` settings
++    field (a name, not a sender). The excluded detection source is checked over
++    the touched web-source files only (the rule's literal gate covers
++    new/modified files, not the whole tree).
+     """
+     jina_files: set[str] = set()
+     for path in sorted(APP_DIR.rglob("*.py")):
+@@ -471,7 +473,11 @@ def test_g2_web_senders_are_the_two_researched_sources() -> None:
+             )
+             if "jina" in lowered:
+                 jina_files.add(rel)
+-    assert jina_files == {"services/candidates.py", "services/enrich/jina.py"}, jina_files
++    assert jina_files == {
++        "config.py",
++        "services/candidates.py",
++        "services/enrich/jina.py",
++    }, jina_files
+ 
+     excluded_hits: list[str] = []
+     for rel in ("services/candidates.py", "services/enrich/jina.py"):
+diff --git a/backend/tests/test_sg082_enrich_jina.py b/backend/tests/test_sg082_enrich_jina.py
+index f132480..1aee61f 100644
+--- a/backend/tests/test_sg082_enrich_jina.py
++++ b/backend/tests/test_sg082_enrich_jina.py
+@@ -22,6 +22,7 @@ from __future__ import annotations
+ 
+ import inspect
+ import json
++import urllib.parse
+ from datetime import datetime, timezone
+ from pathlib import Path
+ from typing import Any
+@@ -524,6 +525,72 @@ def test_committed_web_field_is_proposed_never_auto_accepted(
+     assert rows["status"].review_state == "accepted"
+ 
+ 
++# --------------------------------------------------------------------------- #
++# SG-097 — the settings-field seam: explicit > Settings.jina_api_key > environment
++# --------------------------------------------------------------------------- #
++def test_settings_field_beats_the_environment(monkeypatch: pytest.MonkeyPatch) -> None:
++    """Both the field and the env var are set: the declared field wins."""
++    monkeypatch.setenv(jina_mod.JINA_API_KEY_ENV, "test-env-key")
++    monkeypatch.setattr(settings, "jina_api_key", "test-field-key")
++    assert jina_mod.resolve_api_key() == "test-field-key"
++
++
++def test_explicit_argument_beats_the_settings_field(monkeypatch: pytest.MonkeyPatch) -> None:
++    """The explicit argument (test/DI seam) wins over the declared field."""
++    monkeypatch.setenv(jina_mod.JINA_API_KEY_ENV, "test-env-key")
++    monkeypatch.setattr(settings, "jina_api_key", "test-field-key")
++    assert jina_mod.resolve_api_key("test-explicit-key") == "test-explicit-key"
++
++
++def test_absent_field_falls_through_to_the_environment(monkeypatch: pytest.MonkeyPatch) -> None:
++    """The field is declared but unset: resolution falls through to the env var."""
++    monkeypatch.setattr(settings, "jina_api_key", None)
++    monkeypatch.setenv(jina_mod.JINA_API_KEY_ENV, "test-env-key")
++    assert jina_mod.resolve_api_key() == "test-env-key"
++
++
++def test_no_field_no_env_resolves_to_none(monkeypatch: pytest.MonkeyPatch) -> None:
++    """No key at any layer resolves to None (the caller then degrades loudly)."""
++    monkeypatch.setattr(settings, "jina_api_key", None)
++    monkeypatch.delenv(jina_mod.JINA_API_KEY_ENV, raising=False)
++    assert jina_mod.resolve_api_key() is None
++
++
++WORKED_EXAMPLE = (
++    Path(__file__).resolve().parents[2] / "docs" / "enrich-jina-request-example.md"
++)
++
++
++def test_worked_example_artifact_matches_the_real_driver() -> None:
++    """SG-097: the committed worked example IS the request the REAL driver builds.
++
++    The expected URL/params are derived from the real module constants
++    (`PG-SC-12`), never a re-typed copy; the artifact is names-only (the key is
++    added at send time and never appears in the example).
++    """
++    example = jina_mod.build_jina_request("Jacobs Cronat Gold", "Jacobs")
++    expected_params = tuple(
++        [("site", site) for site in jina_mod.SITE_FILTERS]
++        + [
++            ("num", jina_mod.JINA_NUM),
++            ("type", jina_mod.JINA_TYPE),
++            ("gl", jina_mod.JINA_GL),
++        ]
++    )
++    assert example.params == expected_params
++    assert example.url == f"{jina_mod.JINA_EU_BASE_URL}Jacobs+Jacobs+Cronat+Gold"
++    full_request = example.url + "?" + urllib.parse.urlencode(example.params)
++    artifact = WORKED_EXAMPLE.read_text(encoding="utf-8")
++    assert full_request in artifact
++    assert set(example.headers) == {
++        "Accept",
++        "X-Token-Budget",
++        "X-Timeout",
++        "X-Respond-With",
++    }
++    assert "Authorization" not in example.headers
++
++
+ # --------------------------------------------------------------------------- #
+ # Purity guards
+ # --------------------------------------------------------------------------- #
+diff --git a/docs/enrich-jina-request-example.md b/docs/enrich-jina-request-example.md
+new file mode 100644
+index 0000000..3ae0378
+--- /dev/null
++++ b/docs/enrich-jina-request-example.md
+@@ -0,0 +1,43 @@
++# Enrich — worked Jina request example (SG-097)
++
++Names only. This example carries **no key value**: the `Authorization` header is
++added at send time by `authorize()` and is never part of the builder's output,
++a snapshot, a log line, or this file.
++
++The request below is exactly what
++`backend/app/services/enrich/jina.py:build_jina_request(name, brand)` builds for
++brand `Jacobs` and name `Jacobs Cronat Gold`. The EU base is the default
++(`JINA_EU_BASE_URL`); the global base (`JINA_GLOBAL_BASE_URL`) is a named
++constant only and is never switched to silently.
++
++```
++GET https://eu.s.jina.ai/Jacobs+Jacobs+Cronat+Gold?site=mega-image.ro&site=emag.ro&site=farmaciatei.ro&num=5&type=web&gl=ro
++```
++
++Query (`site` is repeated; the values are the three researched Romanian retail
++domains in `SITE_FILTERS`):
++
++| Parameter | Value(s) |
++|---|---|
++| `site` | `mega-image.ro`, `emag.ro`, `farmaciatei.ro` |
++| `num` | `5` (`JINA_NUM`) |
++| `type` | `web` (`JINA_TYPE`) |
++| `gl` | `ro` (`JINA_GL`) |
++
++Headers (names and values as built; the key is not one of them):
++
++| Header | Value |
++|---|---|
++| `Accept` | `application/json` |
++| `X-Token-Budget` | `6000` (`TOKEN_BUDGET`) |
++| `X-Timeout` | `15` (`PAGE_TIMEOUT`) |
++| `X-Respond-With` | `content` (`RESPOND_WITH`) |
++
++At send time the client resolves the key (explicit argument → `Settings.jina_api_key`
++→ `JINA_API_KEY` environment) and calls `authorize(headers, key)`, which adds
++`Authorization: Bearer <key>`. A missing key degrades to a loud `missing_key:`
++snapshot with **zero sends**; the request is never sent unauthenticated.
++
++`backend/tests/test_sg082_enrich_jina.py::test_worked_example_artifact_matches_the_real_driver`
++asserts that the URL line above equals the request the real driver builds, derived
++from the real module constants (`PG-SC-12`).
+
+--- untracked-then-committed example artifact (full) ---
+# Enrich — worked Jina request example (SG-097)
+
+Names only. This example carries **no key value**: the `Authorization` header is
+added at send time by `authorize()` and is never part of the builder's output,
+a snapshot, a log line, or this file.
+
+The request below is exactly what
+`backend/app/services/enrich/jina.py:build_jina_request(name, brand)` builds for
+brand `Jacobs` and name `Jacobs Cronat Gold`. The EU base is the default
+(`JINA_EU_BASE_URL`); the global base (`JINA_GLOBAL_BASE_URL`) is a named
+constant only and is never switched to silently.
+
+```
+GET https://eu.s.jina.ai/Jacobs+Jacobs+Cronat+Gold?site=mega-image.ro&site=emag.ro&site=farmaciatei.ro&num=5&type=web&gl=ro
+```
+
+Query (`site` is repeated; the values are the three researched Romanian retail
+domains in `SITE_FILTERS`):
+
+| Parameter | Value(s) |
+|---|---|
+| `site` | `mega-image.ro`, `emag.ro`, `farmaciatei.ro` |
+| `num` | `5` (`JINA_NUM`) |
+| `type` | `web` (`JINA_TYPE`) |
+| `gl` | `ro` (`JINA_GL`) |
+
+Headers (names and values as built; the key is not one of them):
+
+| Header | Value |
+|---|---|
+| `Accept` | `application/json` |
+| `X-Token-Budget` | `6000` (`TOKEN_BUDGET`) |
+| `X-Timeout` | `15` (`PAGE_TIMEOUT`) |
+| `X-Respond-With` | `content` (`RESPOND_WITH`) |
+
+At send time the client resolves the key (explicit argument → `Settings.jina_api_key`
+→ `JINA_API_KEY` environment) and calls `authorize(headers, key)`, which adds
+`Authorization: Bearer <key>`. A missing key degrades to a loud `missing_key:`
+snapshot with **zero sends**; the request is never sent unauthenticated.
+
+`backend/tests/test_sg082_enrich_jina.py::test_worked_example_artifact_matches_the_real_driver`
+asserts that the URL line above equals the request the real driver builds, derived
+from the real module constants (`PG-SC-12`).
+
+===================== R-MODELS-ALEMBIC: byte-untouched claim =====================
+$ git diff --stat ff2f3c0 4397d7f73fe558e3c4f80380d78b582e7405b1d2 -- backend/app/models backend/alembic
+(exit 0; empty = untouched)
+
+===================== R-ENV-EXAMPLE: names-only line (numbered) =====================
+1:# StorageGenie environment template — NAMES only; copy to `.env` and fill in.
+2:# `.env` is gitignored; never commit key values.
+3:OPENCODE_API_KEY=
+4:JINA_API_KEY=
+5:SG_PROVIDER_ID=
+6:SG_MODEL_ID=
+7:SG_CONFIDENCE_THRESHOLD=
+8:SG_PROMPT_CATEGORY=
+9:SG_PER_JOB_CAP=
+10:SG_MONTHLY_CAP=
+11:SG_CONSENT=
+
+===== R-FAILPRE: new SG-097 tests against the PRE-change tree (config.py has no jina_api_key) =====
+$ ./venv/bin/python -m pytest -q tests/test_sg082_enrich_jina.py
+..........................FFFF..                                         [100%]
+=================================== FAILURES ===================================
+__________________ test_settings_field_beats_the_environment ___________________
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x70073c545ac0>
+
+    def test_settings_field_beats_the_environment(monkeypatch: pytest.MonkeyPatch) -> None:
+        """Both the field and the env var are set: the declared field wins."""
+        monkeypatch.setenv(jina_mod.JINA_API_KEY_ENV, "test-env-key")
+>       monkeypatch.setattr(settings, "jina_api_key", "test-field-key")
+E       AttributeError: Settings(database_url='sqlite:///./data/db/storagegenie.db', storage_root='./data/storage', api_prefix='/v1', idempotency_header='Idempotency-Key', household_default_name='Popescu Household', cors_origins='http://localhost:5173', max_upload_bytes=20971520, max_image_pixels=None, exif_timestamps_enabled=False, dhash_near_threshold=10, thumbnail_sizes=[256, 512], allowed_mime_types=['image/jpeg', 'image/png', 'image/webp', 'image/tiff', 'application/pdf'], sg_provider_id='fake', sg_model_id='deepseek-v4-flash-vision-exp', opencode_api_key=None, sg_per_job_cap=None, sg_monthly_cap=None, sg_consent=False, sg_confidence_threshold=0.9, sg_prompt_category='food') has no attribute 'jina_api_key'
+
+tests/test_sg082_enrich_jina.py:534: AttributeError
+_______________ test_explicit_argument_beats_the_settings_field ________________
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x70073c5068d0>
+
+    def test_explicit_argument_beats_the_settings_field(monkeypatch: pytest.MonkeyPatch) -> None:
+        """The explicit argument (test/DI seam) wins over the declared field."""
+        monkeypatch.setenv(jina_mod.JINA_API_KEY_ENV, "test-env-key")
+>       monkeypatch.setattr(settings, "jina_api_key", "test-field-key")
+E       AttributeError: Settings(database_url='sqlite:///./data/db/storagegenie.db', storage_root='./data/storage', api_prefix='/v1', idempotency_header='Idempotency-Key', household_default_name='Popescu Household', cors_origins='http://localhost:5173', max_upload_bytes=20971520, max_image_pixels=None, exif_timestamps_enabled=False, dhash_near_threshold=10, thumbnail_sizes=[256, 512], allowed_mime_types=['image/jpeg', 'image/png', 'image/webp', 'image/tiff', 'application/pdf'], sg_provider_id='fake', sg_model_id='deepseek-v4-flash-vision-exp', opencode_api_key=None, sg_per_job_cap=None, sg_monthly_cap=None, sg_consent=False, sg_confidence_threshold=0.9, sg_prompt_category='food') has no attribute 'jina_api_key'
+
+tests/test_sg082_enrich_jina.py:541: AttributeError
+______________ test_absent_field_falls_through_to_the_environment ______________
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x70073c417740>
+
+    def test_absent_field_falls_through_to_the_environment(monkeypatch: pytest.MonkeyPatch) -> None:
+        """The field is declared but unset: resolution falls through to the env var."""
+>       monkeypatch.setattr(settings, "jina_api_key", None)
+E       AttributeError: Settings(database_url='sqlite:///./data/db/storagegenie.db', storage_root='./data/storage', api_prefix='/v1', idempotency_header='Idempotency-Key', household_default_name='Popescu Household', cors_origins='http://localhost:5173', max_upload_bytes=20971520, max_image_pixels=None, exif_timestamps_enabled=False, dhash_near_threshold=10, thumbnail_sizes=[256, 512], allowed_mime_types=['image/jpeg', 'image/png', 'image/webp', 'image/tiff', 'application/pdf'], sg_provider_id='fake', sg_model_id='deepseek-v4-flash-vision-exp', opencode_api_key=None, sg_per_job_cap=None, sg_monthly_cap=None, sg_consent=False, sg_confidence_threshold=0.9, sg_prompt_category='food') has no attribute 'jina_api_key'
+
+tests/test_sg082_enrich_jina.py:547: AttributeError
+____________________ test_no_field_no_env_resolves_to_none _____________________
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x70073c417920>
+
+    def test_no_field_no_env_resolves_to_none(monkeypatch: pytest.MonkeyPatch) -> None:
+        """No key at any layer resolves to None (the caller then degrades loudly)."""
+>       monkeypatch.setattr(settings, "jina_api_key", None)
+E       AttributeError: Settings(database_url='sqlite:///./data/db/storagegenie.db', storage_root='./data/storage', api_prefix='/v1', idempotency_header='Idempotency-Key', household_default_name='Popescu Household', cors_origins='http://localhost:5173', max_upload_bytes=20971520, max_image_pixels=None, exif_timestamps_enabled=False, dhash_near_threshold=10, thumbnail_sizes=[256, 512], allowed_mime_types=['image/jpeg', 'image/png', 'image/webp', 'image/tiff', 'application/pdf'], sg_provider_id='fake', sg_model_id='deepseek-v4-flash-vision-exp', opencode_api_key=None, sg_per_job_cap=None, sg_monthly_cap=None, sg_consent=False, sg_confidence_threshold=0.9, sg_prompt_category='food') has no attribute 'jina_api_key'
+
+tests/test_sg082_enrich_jina.py:554: AttributeError
+=========================== short test summary info ============================
+FAILED tests/test_sg082_enrich_jina.py::test_settings_field_beats_the_environment
+FAILED tests/test_sg082_enrich_jina.py::test_explicit_argument_beats_the_settings_field
+FAILED tests/test_sg082_enrich_jina.py::test_absent_field_falls_through_to_the_environment
+FAILED tests/test_sg082_enrich_jina.py::test_no_field_no_env_resolves_to_none
+4 failed, 28 passed in 0.41s
+===== R-PASSPOST: SG-097 tests against the POST-change tree =====
+$ ./venv/bin/python -m pytest -q tests/test_sg082_enrich_jina.py tests/test_privacy_audit.py
+...........................................                              [100%]
+43 passed in 0.86s
+===== R-SUITE: full backend suite (600s bound) =====
+
+tests/test_signals.py:148: AssertionError
+=============================== warnings summary ===============================
+venv/lib/python3.12/site-packages/fastapi/testclient.py:1
+  /home/andrei/StorageGenie/backend/venv/lib/python3.12/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+venv/lib/python3.12/site-packages/starlette/testclient.py:53
+  /home/andrei/StorageGenie/backend/venv/lib/python3.12/site-packages/starlette/testclient.py:53: DeprecationWarning: The anyio.abc.BlockingPortal alias is deprecated, use anyio.from_thread.BlockingPortal instead.
+    _PortalFactoryType = Callable[[], AbstractContextManager[anyio.abc.BlockingPortal]]
+
+tests/test_candidates.py: 3 warnings
+tests/test_foundations.py: 3 warnings
+tests/test_saved_searches.py: 3 warnings
+tests/test_search.py: 3 warnings
+tests/test_sg048_name_optional.py: 6 warnings
+tests/test_signals.py: 3 warnings
+  /home/andrei/StorageGenie/backend/venv/lib/python3.12/site-packages/alembic/config.py:604: DeprecationWarning: No path_separator found in configuration; falling back to legacy splitting on spaces, commas, and colons for prepend_sys_path.  Consider adding path_separator=os to Alembic config.
+    util.warn_deprecated(
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/test_signals.py::test_generated_codes_are_validated_and_bad_checksum_is_not_an_identifier
+FAILED tests/test_signals.py::test_ocr_has_text_boxes_and_mean_confidence - a...
+2 failed, 461 passed, 23 warnings in 20.36s
+
+===== R-RUFF: ruff check . (120s bound) =====
+All checks passed!
+
+===== R-MYPY: mypy app (300s bound) =====
+app/api/v1/assets.py:415: error: Missing type arguments for generic type "dict"  [type-arg]
+app/api/v1/assets.py:417: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/assets.py:418: error: Unused "type: ignore" comment  [unused-ignore]
+app/main.py:47: error: Unused "type: ignore" comment  [unused-ignore]
+app/main.py:53: error: Unused "type: ignore" comment  [unused-ignore]
+Found 41 errors in 9 files (checked 80 source files)
+===== R-REDS-PROOF: stash tracked changes, run the 2 reds on bare BASE =====
+ok stashed
+--- stashed; running the 2 reds on BASE ---
+tests/test_signals.py:148: AssertionError
+------------------------------ Captured log call -------------------------------
+WARNING  app.services.signals:signals.py:104 Barcode extraction unavailable: pyzbar/libzbar is not installed
+WARNING  app.services.signals:signals.py:215 OCR extraction unavailable: tesseract is not installed or it's not in your PATH. See README file for more information.
+=========================== short test summary info ============================
+FAILED tests/test_signals.py::test_generated_codes_are_validated_and_bad_checksum_is_not_an_identifier
+FAILED tests/test_signals.py::test_ocr_has_text_boxes_and_mean_confidence - a...
+2 failed in 0.64s
+--- restoring ---
+ok stash pop
+===== R-GATES: JINA_API_KEY literal gate over the SG-097 diff (names-only contexts) =====
+--- .env.example ---
+4:JINA_API_KEY=
+--- README.md ---
+387:## Enrich runbook — Jina fallback key (`JINA_API_KEY`)
+393:`JINA_API_KEY`.
+397:1. Put the key in the host `.env` as `JINA_API_KEY` (see `.env.example`). `.env`
+400:2. The backend reads it through `Settings.jina_api_key` (declared in
+401:   `backend/app/config.py`). A `JINA_API_KEY` process environment variable is the
+410:2. **`Settings.jina_api_key`** — the declared settings field (host `.env`);
+411:3. **`JINA_API_KEY`** process environment.
+--- backend/app/config.py ---
+31:    # reads it; the JINA_API_KEY process environment remains the fallback.
+32:    jina_api_key: str | None = None
+--- backend/tests/test_sg082_enrich_jina.py ---
+161:    monkeypatch.delenv("JINA_API_KEY", raising=False)
+529:# SG-097 — the settings-field seam: explicit > Settings.jina_api_key > environment
+533:    monkeypatch.setenv(jina_mod.JINA_API_KEY_ENV, "test-env-key")
+534:    monkeypatch.setattr(settings, "jina_api_key", "test-field-key")
+540:    monkeypatch.setenv(jina_mod.JINA_API_KEY_ENV, "test-env-key")
+541:    monkeypatch.setattr(settings, "jina_api_key", "test-field-key")
+547:    monkeypatch.setattr(settings, "jina_api_key", None)
+548:    monkeypatch.setenv(jina_mod.JINA_API_KEY_ENV, "test-env-key")
+554:    monkeypatch.setattr(settings, "jina_api_key", None)
+555:    monkeypatch.delenv(jina_mod.JINA_API_KEY_ENV, raising=False)
+--- docs/enrich-jina-request-example.md ---
+36:At send time the client resolves the key (explicit argument → `Settings.jina_api_key`
+37:→ `JINA_API_KEY` environment) and calls `authorize(headers, key)`, which adds
+
+===== R-GATES: key-like literal in the touched test file (expect only test- dummies) =====
+(no long literals)
+
+===== R-GATES: real-looking key value scan over the diff (expect 0) =====
+57:  +`backend/tests/test_sg082_enrich_jina.py::test_worked_example_artifact_matches_the_real_driver`.
+72:  @@ -457,9 +457,11 @@ def test_g2_web_senders_are_the_two_researched_sources() -> None:
+84:  @@ -471,7 +473,11 @@ def test_g2_web_senders_are_the_two_researched_sources() -> None:
+102:  @@ -524,6 +525,72 @@ def test_committed_web_field_is_proposed_never_auto_accepted(
+103:  +# --------------------------------------------------------------------------- #
+105:  +# --------------------------------------------------------------------------- #
+106:  +def test_settings_field_beats_the_environment(monkeypatch: pytest.MonkeyPatch) -> None:
+113:  +def test_explicit_argument_beats_the_settings_field(monkeypatch: pytest.MonkeyPatch) -> None:
+120:  +def test_absent_field_falls_through_to_the_environment(monkeypatch: pytest.MonkeyPatch) -> None:
+139:  +def test_worked_example_artifact_matches_the_real_driver() -> None:
+169:   # --------------------------------------------------------------------------- #
+171:   # --------------------------------------------------------------------------- #
+
+===== R-GATES: PG-SC-11 end-relative grep over touched files =====
+(exit 1)
+
+===== R-GATES: .env.example numbered (append position) =====
+1:# StorageGenie environment template — NAMES only; copy to `.env` and fill in.
+2:# `.env` is gitignored; never commit key values.
+3:OPENCODE_API_KEY=
+4:JINA_API_KEY=
+5:SG_PROVIDER_ID=
+6:SG_MODEL_ID=
+7:SG_CONFIDENCE_THRESHOLD=
+8:SG_PROMPT_CATEGORY=
+9:SG_PER_JOB_CAP=
+10:SG_MONTHLY_CAP=
+11:SG_CONSENT=
+===== R-GATES: refined secret value-shape scan over ADDED diff lines =====
+--- (a) jina_-prefixed tokens >=16 chars (expect 0) ---
+0
+--- (b) unbroken alnum tokens >=40 chars, no underscore/slash (expect 0; identifiers/prose carry _ or spaces) ---
+0
+--- (c) any quoted literal >= 24 chars in added lines (expect 0) ---
+0
+--- (d) the untracked example artifact: quoted literals >= 24 chars (expect 0) ---
+0
+
+===== R-GATES: the only key literals in the new tests are test- dummies =====
+533:    monkeypatch.setenv(jina_mod.JINA_API_KEY_ENV, "test-env-key")
+534:    monkeypatch.setattr(settings, "jina_api_key", "test-field-key")
+535:    assert jina_mod.resolve_api_key() == "test-field-key"
+540:    monkeypatch.setenv(jina_mod.JINA_API_KEY_ENV, "test-env-key")
+541:    monkeypatch.setattr(settings, "jina_api_key", "test-field-key")
+542:    assert jina_mod.resolve_api_key("test-explicit-key") == "test-explicit-key"
+548:    monkeypatch.setenv(jina_mod.JINA_API_KEY_ENV, "test-env-key")
+549:    assert jina_mod.resolve_api_key() == "test-env-key"
+===== R-RECEIPT: push work to automation =====
+To github.com:Andovol/StorageGenie.git
+   ff2f3c0..4397d7f  automation -> automation
+push_exit=0
+
+===== R-RECEIPT: pre-check existing note on WORK_HEAD =====
+error: no note found for object 4397d7f73fe558e3c4f80380d78b582e7405b1d2.
+existing_exit=1
+
+===== R-RECEIPT: add note on WORK_HEAD =====
+add_exit=0
+
+===== R-RECEIPT: push notes ref =====
+To github.com:Andovol/StorageGenie.git
+   0ff745c..6d7a3b7  refs/notes/storagegenie-coder-reports -> refs/notes/storagegenie-coder-reports
+push_notes_exit=0
+
+===== R-RECEIPT: fetch notes ref into MAPPED local name =====
+From github.com:Andovol/StorageGenie
+ * [new ref]         refs/notes/storagegenie-coder-reports -> refs/notes/storagegenie-coder-reports-sg097-verify
+fetch_exit=0
+
+===== R-RECEIPT: show against FETCHED mapped ref =====
+Dispatch-ID: SG-097 | Report: docs/worklogs/SG-097_report.md | Work-HEAD: 4397d7f73fe558e3c4f80380d78b582e7405b1d2
+show_exit=0

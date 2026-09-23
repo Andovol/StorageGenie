@@ -1,0 +1,42 @@
+SG-097 worklog — Parked Enrich remainder: Jina settings field + .env.example + docs + example
+
+First token: SG-097
+Branch: automation · Remote: git@github.com:Andovol/StorageGenie.git · Work dir: /home/andrei/StorageGenie
+BASE (origin/automation at start): ff2f3c09edf657e6cc4f540e61e47ff24f30d8aa
+WORK_HEAD: 4397d7f73fe558e3c4f80380d78b582e7405b1d2 (work commit; worklogs ride the docs-only receipt commit after it)
+Contract echo: 0.33.0 (source path /home/andrei/storagegenie-contract/VERSION; repo HEAD b232b84 = "Contract payload 0.33.0"; RULES.sha256 18de7fd7…)
+Model / effort (CO-78, from provider metadata + process argv): model deepseek-v4.1-flash
+  (providerID opencode-go; /home/andrei/.local/state/opencode/model.json recent[0]); effort high
+  (/proc/2751227/cmdline: `opencode run --auto --dir /home/andrei/StorageGenie --variant high ...`).
+Spend (real $): $0.000000 actual. Zero network calls (no live Jina call, no provider call).
+Autonomy: L2 (slice autonomy, 1 retry). No retry needed.
+DATABASE: none · Restart: none · Deploy: none · Container actions: none (PG-PR-04).
+
+Legs (elapsed vs budget, live clock from process start 2026-09-23T14:03:33Z)
+  Recon + premise verification ....................... ~60 s / 120 s ordinary
+  G1 field + G2 tests (fail-pre, field, M45 repair) .. ~90 s / 120 s ordinary
+  G2 pass-post + gates (suite 20.36 s, ruff, mypy) ... ~100 s / 600 s suite bound
+  G3 .env.example + README seam + worked example ..... ~110 s / 120 s ordinary
+  G4 worklog + report + receipt ...................... ~90 s / 2400 s overall
+  Overall: ~450 s / 1200 s overall budget. No command hit its bound; nothing was killed.
+
+Files (diff is the evidence)
+  MOD  backend/app/config.py                              + jina_api_key: str | None = None beside opencode_api_key
+  MOD  backend/tests/test_sg082_enrich_jina.py            5 new tests: 4 precedence through the real seam + 1 worked-example assertion
+  MOD  .env.example                                       + JINA_API_KEY= (names-only, line 4)
+  MOD  README.md                                          + "Enrich runbook — Jina fallback key (JINA_API_KEY)" seam section
+  NEW  docs/enrich-jina-request-example.md                worked request (EU base, repeated site, header names); names only
+  MOD  backend/tests/test_privacy_audit.py                M45 repair: config.py added to the "jina" allow-set (a name, not a sender)
+  NEW  docs/worklogs/SG-097.log / _report.md / _verify.log
+
+G1/G2 evidence
+  FAIL-pre: 4 new precedence tests fail on the pre-change tree — AttributeError: Settings(...) has no
+  attribute 'jina_api_key' at each test's own monkeypatch.setattr line (534/541/547/554). 4 failed, 28 passed.
+  PASS-post: test_sg082_enrich_jina.py 32 passed (43 with test_privacy_audit.py). Live REPL precedence:
+  env < field < explicit; nothing set → None.
+  Seam: jina.py:resolve_api_key (explicit → settings.jina_api_key → JINA_API_KEY env); matched the premise,
+  so jina.py was NOT modified (its now-stale docstring is F-SG097-2).
+
+Outcome: suite 2 failed / 461 passed (the 2 known test_signals decoder env reds, stash-proved on bare BASE);
+ruff All checks passed; mypy 41 errors in 9 files == baseline (delta 0); secret value-shape scan 0 real;
+PG-SC-11 end-relative grep 0; models/ + alembic/ diff empty; $0.
