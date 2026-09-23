@@ -4,7 +4,7 @@
 **Coder / effort:** `opencode` / `high` — effort read from the process arguments (`opencode run --auto --dir /home/andrei/StorageGenie --variant high …`); **model: `unknown`** (no model id is sent per policy, and no process argument or provider metadata exposed one — reported `unknown`, never guessed from a system-prompt identity line).
 **Work dir:** `/home/andrei/StorageGenie` · **Remote:** `origin` = `git@github.com:Andovol/StorageGenie.git`
 **BASE (requested ref `origin/automation` resolved):** `59d4bf17daf12faaa3ff9cb04f9169beccc167d8` (== start HEAD)
-**WORK_HEAD:** `WORK_HEAD_PLACEHOLDER` · **Report:** `docs/worklogs/SG-104_report.md`
+**WORK_HEAD:** `8ea84d63722320990e6d1bbed84a5c64bb531c41` · **Report:** `docs/worklogs/SG-104_report.md`
 **Contract echo (verbatim):** `0.33.0` — recorded in `STATE.md:4` and `AGENTS.md:4`; **source path** `/home/andrei/storagegenie-contract/VERSION` → `0.33.0`, `FETCH_HEAD` `b232b845d74e89cb346c60fa4b9a40ec401c42dd` "branch 'contract' of github.com:Andovol/Launcher". `.rules-cache/` is **ABSENT** on this host (no in-repo cache); the contract checkout named by `/etc/dispatch/storagegenie.conf` (`CONTRACT_DIR=/home/andrei/storagegenie-contract`) is the source path. Recorded == published == `0.33.0`.
 **DATABASE: the live SQLite** (`sqlite:////data/db/storagegenie.db`, compose bind `./data/db`) for (a–c) under **D142**; read-only otherwise. **Restart: ONE backend recreate (D142). Deploy: THIS slice.**
 **Spend (real $):** **$0.000000** — build/recreate are $0; the ONE Jina fallback attempt failed at DNS resolution **before any request left the host** (`ConnectError: Name or service not known` for `eu.s.jina.ai`), so **no metered Jina byte was sent**. Under the `$0.05` per-press cap (`ENRICH_PER_PRESS_CAP_USD`, `enrich.py:46`); the request's own `X-Token-Budget: 6000` was the only configured bound.
@@ -112,7 +112,32 @@ The deploy itself is the point of this slice, so the new build **is** live and w
 
 ## Report note on the notes ref (receipt)
 
-RECEIPT_PLACEHOLDER
+Work pushed to `automation` (`59d4bf1..8ea84d6`), worktree clean (`CO-55`). Note added on `WORK_HEAD`, notes ref pushed, and verified against the **fetched, mapped** ref. Executed, verbatim:
+
+```
+$ git notes --ref=refs/notes/storagegenie-coder-reports show 8ea84d63722320990e6d1bbed84a5c64bb531c41   # pre-check
+error: no note found for object 8ea84d63722320990e6d1bbed84a5c64bb531c41.
+precheck_exit=1
+
+$ git notes --ref=refs/notes/storagegenie-coder-reports add -m "Dispatch-ID: SG-104 | Report: docs/worklogs/SG-104_report.md | Work-HEAD: 8ea84d63722320990e6d1bbed84a5c64bb531c41" 8ea84d63722320990e6d1bbed84a5c64bb531c41
+note_add_exit=0
+
+$ git push origin refs/notes/storagegenie-coder-reports
+To github.com:Andovol/StorageGenie.git
+   21bf16a..99b009a  refs/notes/storagegenie-coder-reports -> refs/notes/storagegenie-coder-reports
+push_exit=0
+
+$ git fetch origin refs/notes/storagegenie-coder-reports:refs/notes/storagegenie-coder-reports-fetched
+From github.com:Andovol/StorageGenie
+   21bf16a..99b009a  refs/notes/storagegenie-coder-reports -> refs/notes/storagegenie-coder-reports-fetched
+fetch_exit=0
+
+$ git notes --ref=refs/notes/storagegenie-coder-reports-fetched show 8ea84d63722320990e6d1bbed84a5c64bb531c41
+Dispatch-ID: SG-104 | Report: docs/worklogs/SG-104_report.md | Work-HEAD: 8ea84d63722320990e6d1bbed84a5c64bb531c41
+show_exit=0
+```
+
+No push to `storagegenie-evidence`; no `{{RECEIPT_CMD}}`. The final tip is dual-annotated too (note-anchor inoculation, SG-092 precedent). `note=yes`.
 
 ---
 
