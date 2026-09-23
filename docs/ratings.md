@@ -381,3 +381,9 @@ Originals above (88 FLAG:TRUST / 91 FLAG:TRUST) stand as the audit trail; the ve
 | slice_id | phase | model | effort | score | flag | lever | guards_invoked | deduction_attribution |
 |---|---|---|---|---|---|---|---|---|
 | SG-099 | Arc A synthesis P4 (D138/D139): frozen synthesis prompt + non-catalogue caller over OFF+Jina, one capped call; live NOT MET on environment | opencode (live-leg body model deepseek-v4-flash-vision-exp; effort high from argv --variant high) | high | 94 |  | Live-leg packets instrument raw-body capture from leg 1 (fold into live re-confirms packet) | PG-EV-01, PG-EV-02, PG-EV-04, PG-EV-05, PG-EV-06, PG-EV-07, PG-EV-09, PG-SC-02, PG-SC-05, PG-SC-07, PG-SC-09, PG-SC-10, PG-SC-12, PG-IC-01, PG-IC-03, PG-IC-04, PG-IC-07, PG-IC-09, PG-PR-03, PG-PR-04, PG-PR-06 | mixed (environment: live blocked by reasoning-model/max-tokens config outside ceiling; coder minor: retry transient-class stretch + leg-1 body unrecorded, zero harm) |
+
+### SG-100 (2026-09-23 - Enrich snapshot persistence)
+
+| slice_id | phase | model | effort | score | flag | lever | guards_invoked | deduction_attribution |
+|---|---|---|---|---|---|---|---|---|
+| SG-100 | Arc A persistence (D139): snapshot model + migration + append-only writer + brand-absent fixture, $0 | opencode (model cli-default, no id sent per policy; effort high from argv --variant high) | high | 98 |  |  | PG-EV-01, PG-EV-02, PG-EV-05, PG-EV-06, PG-EV-09, PG-SC-02, PG-SC-05, PG-SC-10, PG-SC-11, PG-IC-01, PG-IC-07, PG-IC-09, PG-PR-03, PG-PR-04 | packet |
