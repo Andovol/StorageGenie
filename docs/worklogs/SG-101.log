@@ -69,10 +69,11 @@ SPEND (real $): $0.00140655 actual for the ONE live call, vs the $0.0053241 in-s
 
 -------------------------------------------------------------------------------
 RECEIPT (notes ref refs/notes/storagegenie-coder-reports)
-  WORK_HEAD: <filled after commit>
-  note add  : git notes --ref=refs/notes/storagegenie-coder-reports add -m "Dispatch-ID: SG-101 | Report: docs/worklogs/SG-101_report.md | Work-HEAD: <hash>" <WORK_HEAD>   -> exit 0
-  note push : git push origin refs/notes/storagegenie-coder-reports
+  WORK_HEAD: 95c41b1d8df1798007fdb5177a67aa129c77580d
+  note add  : git notes --ref=refs/notes/storagegenie-coder-reports add -m "Dispatch-ID: SG-101 | Report: docs/worklogs/SG-101_report.md | Work-HEAD: 95c41b1d8df1798007fdb5177a67aa129c77580d" 95c41b1d8df1798007fdb5177a67aa129c77580d   -> exit 0
+  note push : git push origin refs/notes/storagegenie-coder-reports  -> e2a309f..bc2e494
   verify    : git fetch origin refs/notes/storagegenie-coder-reports:refs/notes/storagegenie-coder-reports-fetched
-              git notes --ref=refs/notes/storagegenie-coder-reports-fetched show <WORK_HEAD>
+              git notes --ref=refs/notes/storagegenie-coder-reports-fetched show 95c41b1d8df1798007fdb5177a67aa129c77580d
+  output    : Dispatch-ID: SG-101 | Report: docs/worklogs/SG-101_report.md | Work-HEAD: 95c41b1d8df1798007fdb5177a67aa129c77580d
   final tip dual-annotated (SG-092 precedent).
   note=yes

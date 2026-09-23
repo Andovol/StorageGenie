@@ -4,7 +4,7 @@
 **Coder / effort:** `opencode` / `high` (read from process arguments: `opencode run --auto --dir /home/andrei/StorageGenie --variant high <packet>`) — **model: cli-default** (no model id sent; omitted per policy; read from process args, never the system-prompt identity line).
 **Work dir:** `/home/andrei/StorageGenie` · **Remote:** `origin` = `git@github.com:Andovol/StorageGenie.git`
 **BASE (requested ref `origin/automation` resolved):** `f02daebc0b6d67d5ba9941d1150974c527909100`
-**WORK_HEAD:** `<filled after commit>` · **Report:** `docs/worklogs/SG-101_report.md`
+**WORK_HEAD:** `95c41b1d8df1798007fdb5177a67aa129c77580d` · **Report:** `docs/worklogs/SG-101_report.md`
 **Contract echo (verbatim):** `0.33.0` — recorded in `STATE.md:4` (`**Version:** \`0.33.0\` (D129 adoption 2026-09-23: checkouts \`e8f8113\` + \`999e94c\` + \`b232b84\` oldest-first, installed \`18de7fd7…\` = payload at all versions — clean)`) and `AGENTS.md:4` (`Rule-set version this project records: **0.33.0**`). Published-side re-hash **UNEXECUTED**: `.rules-cache/` is absent on this host (gitignored, launcher-populated) and `origin` carries no `contract*` ref — F-SG099-3 carries forward.
 **DATABASE: none. Restart: none. Deploy: none. Container actions: none** (`PG-PR-04`). No migration: `models/` + `alembic/` diff empty.
 **Spend (real $):** **$0.00140655 actual** for the ONE live call, versus the **$0.0053241** in-slice worst-case estimate and the **$0.05** per-call cap (`PG-IC-04`). The call completed and wrote **one** `ProviderCall` ledger row. No other metered resource touched; all offline work $0.
@@ -94,7 +94,23 @@ No criterion demanded persistence, endpoint wiring, deploy, restart, container a
 Work pushed to `automation`; worktree clean. Note added on `WORK_HEAD`, notes ref pushed, and verified against the **fetched, mapped** ref. Executed, verbatim:
 
 ```
-<pasted after execution>
+$ git push origin automation
+To github.com:Andovol/StorageGenie.git
+   f02daeb..95c41b1  automation -> automation
+
+$ git notes --ref=refs/notes/storagegenie-coder-reports add -m "Dispatch-ID: SG-101 | Report: docs/worklogs/SG-101_report.md | Work-HEAD: 95c41b1d8df1798007fdb5177a67aa129c77580d" 95c41b1d8df1798007fdb5177a67aa129c77580d
+note add exit=0
+
+$ git push origin refs/notes/storagegenie-coder-reports
+To github.com:Andovol/StorageGenie.git
+   e2a309f..bc2e494  refs/notes/storagegenie-coder-reports -> refs/notes/storagegenie-coder-reports
+
+$ git fetch origin refs/notes/storagegenie-coder-reports:refs/notes/storagegenie-coder-reports-fetched
+From github.com:Andovol/StorageGenie
+   e2a309f..bc2e494  refs/notes/storagegenie-coder-reports -> refs/notes/storagegenie-coder-reports-fetched
+
+$ git notes --ref=refs/notes/storagegenie-coder-reports-fetched show 95c41b1d8df1798007fdb5177a67aa129c77580d
+Dispatch-ID: SG-101 | Report: docs/worklogs/SG-101_report.md | Work-HEAD: 95c41b1d8df1798007fdb5177a67aa129c77580d
 ```
 
 No push to `storagegenie-evidence`; no `{{RECEIPT_CMD}}`. The final tip (the docs-only receipt commit) is dual-annotated too (note-anchor inoculation, SG-092 precedent). `note=yes`.
