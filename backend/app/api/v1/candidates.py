@@ -142,6 +142,9 @@ def get_candidate(
     fields = proposal.get("fields", {})
     if not isinstance(fields, dict):
         fields = {}
+    web_alternates = proposal.get("web_alternates", [])
+    if not isinstance(web_alternates, list):
+        web_alternates = []
     asset_id = proposal.get("asset_id")
     return {
         "id": candidate.id,
@@ -152,4 +155,5 @@ def get_candidate(
         "review_task_ids": review_task_ids,
         "evidence_ids": [str(item) for item in evidence_ids],
         "asset_id": asset_id if isinstance(asset_id, str) else None,
+        "web_alternates": web_alternates,
     }

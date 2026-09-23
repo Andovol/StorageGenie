@@ -97,6 +97,38 @@ def read_asset_identifiers(db: Session, asset: Asset) -> dict[str, str | None]:
     return {"name": name, "brand": brand, "barcode": barcode}
 
 
+def label_existing_fields(db: Session, asset: Asset) -> dict[str, object]:
+    """The asset's label-side facts, keyed by `merge_web_fields`' own field names.
+
+    SG-103: the label-wins merge needs the asset's LABEL side as the `existing`
+    half — merging web fields against the proposal's own web fields can never
+    conflict (same source both sides). The asset's label facts live as its
+    `Assertion` rows (the commit paths write a `display_name` assertion beside
+    the denormalised column), so this reads those rows and keeps only the
+    `field_path`s in the frozen SG-082 `LABEL_VISIBLE_FIELDS` vocabulary. Each
+    value is a provenance envelope (`{"value", "source_type"}`) so the REAL
+    `merge_web_fields` reads it through `_field_parts`.
+
+    `brand` is NOT in that vocabulary and no web path emits a brand, so a brand
+    assertion never maps to a merge field or an alternate (`PG-SC-07`). A
+    non-string/unparsable or blank value is skipped, never guessed.
+    """
+    existing: dict[str, object] = {}
+    for row in db.query(Assertion).filter(Assertion.asset_id == asset.id).all():
+        if row.field_path not in candidates.LABEL_VISIBLE_FIELDS:
+            continue
+        if row.field_path in existing:
+            continue
+        try:
+            value = json.loads(row.value_json)
+        except (TypeError, ValueError):
+            continue
+        if value is None or (isinstance(value, str) and not value.strip()):
+            continue
+        existing[row.field_path] = {"value": value, "source_type": row.source_type}
+    return existing
+
+
 def get_off_http_client() -> httpx.Client | None:
     """Injection seam for the OFF transport (tests override; production None)."""
     return None
@@ -171,8 +203,17 @@ def trigger_enrich(
         snapshots_mod.record_jina_snapshot(db, record.fallback, query=query_text)
 
     web = candidates.build_enrich_fields(record, category=None)
-    fields = web["fields"]
+    web_fields = web["fields"]
     sources = web["sources"]
+    if not isinstance(web_fields, dict):
+        web_fields = {}
+
+    # SG-103 label-wins-visible (spec §4): the asset's own label-visible facts
+    # are the `existing` half, so a label/web conflict keeps the label value in
+    # the proposal and surfaces the web value as an alternate with its source.
+    # The REAL merge rule runs; it is never re-implemented here.
+    label_existing = label_existing_fields(db, asset)
+    fields, alternates = candidates.merge_web_fields(label_existing, web_fields)
 
     proposal: dict[str, object] = {
         "kind": "new_asset",
@@ -182,7 +223,7 @@ def trigger_enrich(
         "dedup_matches": [],
         "review_task_ids": [],
         "web_sources": sources,
-        "web_alternates": [],
+        "web_alternates": alternates,
     }
     job = Job(
         household_id=asset.household_id,
@@ -208,6 +249,7 @@ def trigger_enrich(
         "state": candidate.state,
         "fields": fields,
         "web_sources": sources,
+        "web_alternates": alternates,
         "off_accepted": record.off_decision.accepted,
         "off_reason": record.off_decision.reason,
         "fallback_fired": record.fallback_fired,

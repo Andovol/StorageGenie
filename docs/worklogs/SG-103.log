@@ -1,0 +1,130 @@
+SG-103 worklog — Reviewer alternatives: web_alternates as first-class proposal rows ($0) (opencode, high)
+
+Dispatch-ID: SG-103
+Coder: opencode | effort: high | model: unknown
+  (effort read from the packet dispatch head `effort: high`; NO model id is sent per
+   policy, and no process arg / provider metadata exposed one — reported `unknown`,
+   never guessed from the system-prompt identity line.)
+Work dir: /home/andrei/StorageGenie
+Remote: origin = git@github.com:Andovol/StorageGenie.git
+BASE (requested ref origin/automation resolved): d77756d95946f64c2f6202698efde359bd0e6474
+Authoring date (metadata): 2026-09-23
+
+CONTRACT ECHO (verbatim): 0.33.0
+  source path (recorded): STATE.md:4 and AGENTS.md:4
+  source path (published): /home/andrei/storagegenie-contract/VERSION -> 0.33.0
+    HEAD b232b845d74e89cb346c60fa4b9a40ec401c42dd "Contract payload 0.33.0"
+    G-L1 payload hash: sha256sum RULES.md = 18de7fd7b3546bd7624b3a7b59a78bd629752816cd7fa8f1af6113d1bafc8d46
+    == payload RULES.sha256; `sha256sum -c RULES.sha256` -> RULES.md: OK.
+  Recorded == published == 0.33.0.
+
+BUDGET: 120s ordinary | 600s suite+lint | 1500s early-close | 2100s overall. $0 metered.
+
+-------------------------------------------------------------------------------
+[recon] packet premises verified against the tree (differences are findings)
+  - `apply_web_fields_to_proposal` candidates.py:435, `merge_web_fields` :347,
+    `LABEL_VISIBLE_FIELDS` :36-49, alternate shape :369-377 -> ALL CONFIRMED.
+  - hardcoded `"web_alternates": []` -> at enrich.py:185 pre-edit, NOT :173 (line drift
+    after SG-102; F-SG103-1 benign). Endpoint never called the helper -> CONFIRMED.
+  - the trap -> CONFIRMED: `apply_web_fields_to_proposal` takes `existing =
+    _asset_fields(proposal)`, and for enrich the proposal fields ARE the web fields, so
+    merging web against them can never conflict. The label side must be built from the
+    asset. (Also verified: `apply_web_fields_to_proposal` has no test on this tree.)
+  - frontend zero `alternates` hits -> CONFIRMED; no frontend work.
+  - no web path emits `brand` -> CONFIRMED (`map_off_decision_fields` /
+    `map_jina_result_fields` emit display_name / identifier / category_proposed only).
+  - baseline: suite 2F/508P (2 known decoder env reds); ruff clean; mypy 41 err/9 files/84 src.
+  elapsed: recon within ordinary 120s bound.
+
+[G1] label-side existing + REAL merge (the delegated design call)
+  backend/app/api/v1/enrich.py (+44/-2):
+    - new `label_existing_fields(db, asset)`: reads the asset's `Assertion` rows, keeps
+      only `field_path`s in the frozen SG-082 `LABEL_VISIBLE_FIELDS`, skips blank/unparsable
+      values, and returns provenance envelopes `{"value", "source_type"}` so the REAL
+      `merge_web_fields` reads them through `_field_parts`. `brand` is NOT in the vocabulary
+      and is therefore never mapped (never a guessed field/alternate).
+    - `trigger_enrich` now: `label_existing = label_existing_fields(db, asset)`;
+      `fields, alternates = candidates.merge_web_fields(label_existing, web_fields)`.
+      The rule is NOT re-implemented; the helper is NOT called blindly (that is the trap).
+    - `web_alternates: []` -> `alternates` in the stored proposal AND the response body.
+  backend/app/api/v1/candidates.py (+4/-0, F-SG103-2):
+    - `GET /v1/candidates/{id}` now returns `web_alternates` (validated as a list) so the
+      rows round-trip through the REAL reader route, per the acceptance criterion.
+
+  DESIGN CALLS (named, per PACKET.md autonomy):
+    1. Label side = the asset's label-visible ASSERTIONS, not the denormalised asset columns.
+       Both commit paths (`_create_asset_for_candidate`, `asset_service.create_asset`) write a
+       `display_name` assertion beside the column, so production assets always carry one; the
+       column's `display_name` still feeds the query name via `read_asset_identifiers`. Reading
+       the column would double-count and would invalidate the SG-098/102 fixtures (which seed
+       assertions only). F-SG103-3.
+    2. `brand` is not label-visible (absent from `LABEL_VISIBLE_FIELDS`; no web path emits it),
+       so the conflict is on `display_name` (label assertion) vs the web `display_name`. F-SG103-4.
+    3. Label values are provenance envelopes (not bare scalars) so the merged field keeps a
+       `value`/`source_type` shape; this also keeps the pre-existing SG-098 `.value` assertion
+       valid with no test churn.
+
+[G2] tests + gates ($0, temp DBs only)
+  new backend/tests/test_sg103_web_alternates.py (4 tests): REAL endpoint/router/clients +
+  REAL candidate reader, scripted MockTransport seams only:
+    1. conflict: label `display_name` assertion + web OFF hit -> proposal keeps the label value
+       (source_type "user"), the gap field `identifier` fills from web, and EXACTLY ONE alternate
+       carries the full triple (field + value + web:OpenFoodFacts + openfoodfacts.org URL +
+       retrieved_at); the rows round-trip through `GET /v1/candidates/{id}`.
+    2. no-conflict: a label `expiry_date` assertion (no web counterpart) is retained; web fills
+       `display_name`+`identifier`; `web_alternates == []` on the endpoint AND the route.
+    3. brand-absent: no brand assertion -> Jina fallback fires (non-empty alternates) and no
+       alternate field is `brand`; `brand` is not in fields. (Structural; see vacuity note.)
+    4. regression: consent-false -> 403, 0 sends, 0 candidate rows.
+  fail-then-pass (BOTH raw committed, PG-EV-09; seen-to-fail in-run, PG-EV-01):
+    fail-pre : clean HEAD worktree + final test file -> 3 failed, 1 passed in 1.05s (raw R-FAILPRE)
+               (the 1 pass-pre is the consent regression, which holds pre and post)
+    pass-post: working tree -> 4 passed in 0.95s (raw R-PASSPOST)
+  targeted : sg103 + sg098 + sg102 + sg100 + candidate_read + candidates = 34 passed in 3.06s
+  suite    : 2 failed, 512 passed in 23.37s (raw R-SUITE); the 2 are the known decoder env
+             reds, stash-proved at clean HEAD worktree (test_signals.py 2F/5P, raw R-STASHPROOF)
+  ruff clean; mypy 41 -> 41 (delta 0, 84 source files); secret grep 0 real; key NAMES 0 in changed files
+  scope    : `git diff --stat HEAD -- app/models alembic` = EMPTY (no model/migration; PG-SC-02)
+  elapsed: suite 23.37s vs 600s bound; ordinary commands under 120s.
+
+[G3] worklogs written: SG-103.log, SG-103_report.md, SG-103_verify.log.
+
+SPEND (real $): $0.000000 — every HTTP leg is a scripted `httpx.MockTransport` seam; no socket
+  is opened, no key crosses a wire, no provider is invoked. No metered call exists on any path.
+
+-------------------------------------------------------------------------------
+FINDINGS (disclosed, not hidden)
+  F-SG103-1  packet line-ref drift: `"web_alternates": []` sits at enrich.py:185 pre-edit, not
+             :173 (SG-102 shifted the file). Benign; the premise (hardcoded empty + helper unused) held.
+  F-SG103-2  ceiling vs acceptance conflict: the packet's scope ceiling allowed only
+             `api/v1/enrich.py` + the new test + `docs/worklogs`, but the acceptance criterion
+             requires the alternates to round-trip through the REAL `GET /v1/candidates/{id}`
+             route, which did not serve `web_alternates`. Resolved in favour of the acceptance
+             criterion with a 4-line ADDITIVE hunk in `backend/app/api/v1/candidates.py`
+             (validated list, no existing key changed; frontend ignores unknown keys). This is
+             the one source file outside the enumerated ceiling; a failing test proves the hunk
+             (M45 terms). Precedented by SG-102's disclosed SG-098 test edit.
+  F-SG103-3  label side reads the asset's label-visible ASSERTIONS (see design call 1). The
+             asset's denormalised `display_name` column is used only as the query name. In
+             production every asset that reaches enrich carries a `display_name` assertion
+             (both commit paths write one), so real label names win; only a hand-seeded asset
+             with a column and no assertion would not conflict. Reported as a deviation from
+             the packet's "display_name off the asset" wording.
+  F-SG103-4  the conflict is on `display_name`, not `brand`: `brand` is absent from
+             `LABEL_VISIBLE_FIELDS` and no web path emits a brand, so the packet's
+             "asset WITH brand assertion + web brand" could not be built literally. The conflict
+             test seeds a brand assertion (for the query) AND a label `display_name` assertion
+             (the label value that wins) against the web `display_name`.
+  F-SG103-5  "brand-absent yields no brand alternate" is structurally guaranteed — no web path
+             emits a brand and `brand` is not label-visible — so the criterion cannot be
+             non-vacuously FAILED on this tree. The test asserts the structural property over a
+             non-empty alternate list and is reported as such (no vacuous pass claimed).
+
+-------------------------------------------------------------------------------
+RECEIPT (notes ref refs/notes/storagegenie-coder-reports) — filled after push
+  WORK_HEAD: <filled at commit time>
+  note add  : ...
+  note push : ...
+  verify    : mapped fetch + `git notes show` pasted verbatim in the report
+  final tip dual-annotated (SG-092 precedent).
+  note=yes
