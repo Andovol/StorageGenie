@@ -4,7 +4,7 @@
 **Coder / effort:** `opencode` / `high` (read from process arguments: `opencode run --auto --dir /home/andrei/StorageGenie --variant high <packet>`) — **model: cli-default** (no model id sent; omitted per policy; read from process args, never the system-prompt identity line).
 **Work dir:** `/home/andrei/StorageGenie` · **Remote:** `origin` = `git@github.com:Andovol/StorageGenie.git`
 **BASE (requested ref `origin/automation` resolved):** `75ee1fc410740ce069f648e1aa1445f42f18c0f1`
-**WORK_HEAD:** `<filled at commit>` · **Report:** `docs/worklogs/SG-099_report.md`
+**WORK_HEAD:** `0edcb89d545d265617a6546f3a3f950dcea6edf7` · **Report:** `docs/worklogs/SG-099_report.md`
 **Contract echo (verbatim):** `0.33.0` — recorded in `STATE.md:4` (`**Version:** \`0.33.0\` (D129 adoption 2026-09-23: checkouts \`e8f8113\` + \`999e94c\` + \`b232b84\` oldest-first, installed \`18de7fd7…\` = payload at all versions — clean)`) and `AGENTS.md:4` (`Rule-set version this project records: **0.33.0**`). Published-side re-hash **UNEXECUTED**: `.rules-cache/` is absent on this host (gitignored, launcher-populated) and `origin` carries no `contract*` ref — see F-SG099-3.
 **DATABASE: none. Restart: none. Deploy: none. Container actions: none** (`PG-PR-04`). No migration: `models/` + `alembic/` diff empty.
 **Spend (real $):** **$0.00135585 quoted** for the captured live leg (leg 2) + **one unquantified billed leg** (leg 1, usage present but body not retained) ≈ **$0.0027 worst-case actual**, versus the **$0.05** per-call bound and the **$0.05** one-call bound (`PG-IC-04`). Both legs were rejected by the adapter's empty-content guard and wrote **no** `ProviderCall` row. No other metered resource touched.
@@ -107,9 +107,31 @@ The diagnostic `_post` recorder was added only for the retry, so leg 1's body (a
 
 No criterion demands persistence, endpoint wiring, deploy, restart, container acts, or a second metered call beyond the authorized retry. Only TestClient + host commands were run; no image pulled/run. Fixture TEXT only; key NAMES only; `docker compose config` never run. No fixed dates in code — the live leg read the clock; test attribution strings are sample data.
 
-## Report note on the notes ref
+## Report note on the notes ref (receipt)
 
-Work pushed to `automation`, worktree clean. Note added on `WORK_HEAD`, notes ref pushed, and verified against the **fetched, mapped** ref with pasted `show` output (see the receipt block in `SG-099.log` / this report's tail). No push to `storagegenie-evidence`; no `{{RECEIPT_CMD}}`.
+Work pushed to `automation` (`75ee1fc..0edcb89`), worktree clean. Note added on `WORK_HEAD`, notes ref pushed, and verified against the **fetched, mapped** ref. Executed, verbatim:
+
+```
+$ git push origin automation
+To github.com:Andovol/StorageGenie.git
+   75ee1fc..0edcb89  automation -> automation
+
+$ git notes --ref=refs/notes/storagegenie-coder-reports add -m "Dispatch-ID: SG-099 | Report: docs/worklogs/SG-099_report.md | Work-HEAD: 0edcb89d545d265617a6546f3a3f950dcea6edf7" 0edcb89d545d265617a6546f3a3f950dcea6edf7
+note added exit=0
+
+$ git push origin refs/notes/storagegenie-coder-reports
+To github.com:Andovol/StorageGenie.git
+   1f14dd5..a8aec13  refs/notes/storagegenie-coder-reports -> refs/notes/storagegenie-coder-reports
+
+$ git fetch origin refs/notes/storagegenie-coder-reports:refs/notes/storagegenie-coder-reports-fetched
+From github.com:Andovol/StorageGenie
+ * [new ref]         refs/notes/storagegenie-coder-reports -> refs/notes/storagegenie-coder-reports-fetched
+
+$ git notes --ref=refs/notes/storagegenie-coder-reports-fetched show 0edcb89d545d265617a6546f3a3f950dcea6edf7
+Dispatch-ID: SG-099 | Report: docs/worklogs/SG-099_report.md | Work-HEAD: 0edcb89d545d265617a6546f3a3f950dcea6edf7
+```
+
+No push to `storagegenie-evidence`; no `{{RECEIPT_CMD}}`. The final tip (the docs-only receipt commit) is dual-annotated too (note-anchor inoculation, SG-092 precedent). `note=yes`.
 
 ---
 
