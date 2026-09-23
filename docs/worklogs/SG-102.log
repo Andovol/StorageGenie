@@ -1,0 +1,118 @@
+SG-102 worklog — Persisted-snapshot wiring + live re-confirms (EU base, OFF accept) (opencode, high)
+
+Dispatch-ID: SG-102
+Coder: opencode | effort: high | model: unknown
+  (effort read from the packet dispatch head `effort: high`; NO model id is sent per
+   policy, and no process arg / provider metadata exposed one — reported `unknown`,
+   never guessed from the system-prompt identity line.)
+Work dir: /home/andrei/StorageGenie
+Remote: origin = git@github.com:Andovol/StorageGenie.git
+BASE (requested ref origin/automation resolved): f1d3aeb4f63d10ed9ded2294af7b8cd0ca4deef6
+Authoring date (metadata): 2026-09-23
+
+CONTRACT ECHO (verbatim): 0.33.0
+  source path (recorded): STATE.md:4 and AGENTS.md:4
+  source path (published): /home/andrei/storagegenie-contract/VERSION -> 0.33.0
+    HEAD b232b845d74e89cb346c60fa4b9a40ec401c42dd "Contract payload 0.33.0"
+    G-L1 payload hash: sha256sum RULES.md = 18de7fd7b3546bd7624b3a7b59a78bd629752816cd7fa8f1af6113d1bafc8d46
+    == payload RULES.sha256; `sha256sum -c RULES.sha256` -> RULES.md: OK.
+  Recorded == published == 0.33.0. (SG-101 reported the published re-hash UNEXECUTED because
+  `.rules-cache/` is absent; the contract checkout at /home/andrei/storagegenie-contract IS
+  present here, so the published side was executed and verified this time. `.rules-cache/`
+  remains absent — F-SG099-3 narrowed, not fully closed.)
+
+BUDGET: 120s ordinary | 600s suite | 60s per live call | 1500s early-close | 2100s overall.
+
+-------------------------------------------------------------------------------
+[recon] verified packet premises against the tree (all held unless noted)
+  - endpoint returns "snapshots_recorded": False at enrich.py:209 CONFIRMED (now :220 after hunks).
+  - `record` in hand: record.primary OFF + record.fallback Jina|None CONFIRMED
+    (jina.EnrichDecisionRecord).
+  - SG-100 writer + table present: services/enrich/snapshots.py, models/enrich_snapshot.py,
+    alembic/versions/20260923_sg100_enrich_snapshot.py; migration unapplied in production.
+  - writers take `query` as an explicit kwarg (brand+name TEXT only) CONFIRMED.
+  - ai_status() = (True, 'enabled'); JINA_API_KEY NAME present in .env.
+  - eu.s.jina.ai is NXDOMAIN on this host (getent exit=2 / gaierror); s.jina.ai resolves.
+  - baseline: suite 2F/503P (2 known decoder env reds); ruff clean; mypy 41 err/9 files/84 src;
+    prod counts 17/7/6/28/6.
+  - git status clean at BASE; origin/automation == BASE.
+  elapsed: recon within ordinary 120s bound.
+
+[G1] recording wired into trigger_enrich (PG-SC-02 closure)
+  backend/app/api/v1/enrich.py (+17/-5):
+    - import snapshots as snapshots_mod;
+    - after the fetch record resolves, BEFORE the candidate commit:
+        query_text = jina_mod.build_jina_query(brand, query_name)
+        snapshots_mod.record_off_snapshot(db, record.primary, query=query_text)
+        if record.fallback is not None:
+            snapshots_mod.record_jina_snapshot(db, record.fallback, query=query_text)
+    - "snapshots_recorded": False -> True;
+    - module docstring updated (snapshots now recorded, PG-SC-02 closed in-slice).
+  snapshots.py byte-untouched (no failing test proved a hunk; M45 not triggered there).
+  Query is the exact brand+name TEXT the Jina client searches (build_jina_query), never a
+  photo/coordinate/key.
+
+[G1-tests] new offline file backend/tests/test_sg102_enrich_wiring.py (5 tests)
+  REAL endpoint via TestClient + REAL router + REAL OFF/Jina clients (scripted MockTransport
+  seams) + REAL SG-100 writer/loader:
+    1. OFF hit -> 1 OFF row, 0 Jina rows, snapshots_recorded True, loader reads by id/source;
+    2. OFF miss -> exactly 1 OFF + 1 Jina row (no double-write), Jina body has mega-image;
+    3. degraded 503 both sources -> named reason recorded, raw_body None, raw_text quoted;
+    4. consent false -> 403, 0 sends, 0 snapshot rows (gate precedes recording);
+    5. over-cap -> 402, 0 sends, 0 snapshot rows.
+  M45 collision self-caught: test_sg098_enrich_endpoint.py pinned `snapshots_recorded is False`
+  (:194) + the UNRECORDED docstring/prose. Updated minimally (6+/5-), disclosed F-SG102-1.
+
+[G3-offline] fail-then-pass (BOTH raw committed)
+  fail-pre : clean HEAD worktree + new test file -> 3 failed, 2 passed in 1.14s (raw R-FAILPRE)
+             (the 2 pass-pre are the "records nothing" gate tests, which hold pre and post)
+  pass-post: working tree -> 5 passed in 1.02s (raw R-PASSPOST)
+  targeted : test_sg102 + test_sg098 + test_sg100 = 26 passed in 2.09s (raw R-TARGETED)
+  suite    : 2 failed, 508 passed in 22.51s (raw R-SUITE); the 2 are the known decoder env reds,
+             stash-proved at clean HEAD worktree (test_signals.py 2F/5P, raw R-STASHPROOF)
+  ruff clean; mypy 41 -> 41 (delta 0, 84 source files); secret grep 0 real
+  scope    : git status --porcelain -- app/models alembic = EMPTY (no model/migration diff)
+  elapsed: suite 22.51s vs 600s bound; ordinary commands under 120s.
+
+[G2-live] in-process, temp DB /tmp/opencode/sg102/live.db (60s per live call)
+  LEG A (OFF, free) — ACCEPTED
+    request shape: GET https://world.openfoodfacts.org/api/v2/search
+      params search_terms/brands_tags/countries_tags_en=romania/page/page_size/fields.
+    status 200, products 10, first code 8711000517604, elapsed 0.26s.
+    recorded row source=off query="Jacobs Jacobs Cronat Gold instant coffee".
+  LEG B (EU base, diagnostic, free) — EU STANDS
+    getent hosts eu.s.jina.ai -> exit 2, no output (NXDOMAIN);
+    socket.getaddrinfo -> gaierror [Errno -2] Name or service not known.
+    Retrieval attempt through the REAL client at JINA_EU_BASE_URL degraded:
+      status None, reason "transport: ConnectError: [Errno -2] Name or service not known".
+    No code switch; global stays diagnostic-only (SG-082).
+  LEG C (Jina global, metered) — 200
+    GET https://s.jina.ai/... status 200, results 5, elapsed 8.165s, raw_body 3646 bytes,
+    no_result_reason None. Recorded via the SAME record_jina_snapshot the endpoint calls
+    (source=jina, query="Jacobs Jacobs Cronat Gold instant coffee").
+  loader read-back: off count=1, jina count=1, temp total=2.
+  production counts identical before/after: provider_call 17 / job 7 / candidate 6 /
+    assertion 28 / asset 6 (read-only mode=ro). No production write.
+  Jina searches: 2 attempts (Leg B EU DNS-fail + Leg C global success) = 1 successful metered
+    search; OFF searches: 2 (Leg A + the recorder fix-check). Within the stated bounds.
+  F-SG102-2 (recorder lever): the response event-hook recorder captured
+    "<err ResponseNotRead: Attempted to access streaming response content...>" (95 bytes) on the
+    real network because the hook fires before the body is read. Fixed with resp.read() before
+    resp.text and verified free on OFF (captured 5627 bytes). No metered re-run.
+
+[G4] worklogs written: SG-102.log, SG-102_report.md, SG-102_verify.log.
+
+SPEND (real $): Jina 1 successful metered search (2 attempts). The Jina snapshot/response
+  exposes NO cost or usage field, so actual $ is NOT measurable from the client — reported as
+  units, bounded by the packet's <=2 searches <=$0.01 worst-case (uncalibrated G-A9). OFF $0.
+  Synthesis ZERO calls ($0). All offline work $0.
+
+-------------------------------------------------------------------------------
+RECEIPT (notes ref refs/notes/storagegenie-coder-reports)
+  WORK_HEAD: <filled after commit>
+  note add  : git notes --ref=refs/notes/storagegenie-coder-reports add -m "Dispatch-ID: SG-102 | Report: docs/worklogs/SG-102_report.md | Work-HEAD: <hash>" <hash>
+  note push : git push origin refs/notes/storagegenie-coder-reports
+  verify    : git fetch origin refs/notes/storagegenie-coder-reports:refs/notes/storagegenie-coder-reports-fetched
+              git notes --ref=refs/notes/storagegenie-coder-reports-fetched show <hash>
+  final tip dual-annotated (SG-092 precedent).
+  note=yes

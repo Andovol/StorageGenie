@@ -1,0 +1,203 @@
+SG-102 verify log — raw outputs (first token SG-102)
+
+Work dir: /home/andrei/StorageGenie
+Coder: opencode | effort: high (packet dispatch head) | model: unknown (no model id sent; no process arg/provider metadata exposed one)
+BASE (origin/automation resolved): f1d3aeb4f63d10ed9ded2294af7b8cd0ca4deef6
+Authoring date (metadata): 2026-09-23
+Contract echo (verbatim): 0.33.0 (recorded STATE.md:4 + AGENTS.md:4; published /home/andrei/storagegenie-contract/VERSION)
+
+===============================================================================
+R-CONTRACT — recorded == published (G-L1 executed this time)
+===============================================================================
+$ cat /home/andrei/storagegenie-contract/VERSION
+0.33.0
+$ git -C /home/andrei/storagegenie-contract log --oneline -1
+b232b84 Contract payload 0.33.0
+$ git -C /home/andrei/storagegenie-contract rev-parse HEAD
+b232b845d74e89cb346c60fa4b9a40ec401c42dd
+$ sha256sum RULES.md
+18de7fd7b3546bd7624b3a7b59a78bd629752816cd7fa8f1af6113d1bafc8d46  RULES.md
+$ cat RULES.sha256
+18de7fd7b3546bd7624b3a7b59a78bd629752816cd7fa8f1af6113d1bafc8d46 RULES.md
+$ sha256sum -c RULES.sha256
+RULES.md: OK
+recorded STATE.md:4 -> 0.33.0 ; AGENTS.md:4 -> 0.33.0
+
+===============================================================================
+R-RECON — baseline (before edits)
+===============================================================================
+$ git branch --show-current
+automation
+$ git rev-parse HEAD
+f1d3aeb4f63d10ed9ded2294af7b8cd0ca4deef6
+$ git rev-parse origin/automation
+f1d3aeb4f63d10ed9ded2294af7b8cd0ca4deef6
+$ git status --porcelain
+(empty)
+$ python -c "from app.services.providers import reader; print(reader.ai_status())"
+(True, 'enabled')
+$ python -c "from app.services.enrich.jina import resolve_api_key; print(resolve_api_key() is not None)"
+True   (NAME only; value never printed)
+$ getent hosts eu.s.jina.ai   -> exit 2, no output (NXDOMAIN)
+$ getent hosts s.jina.ai      -> 2606:4700:20::681a:bf2 s.jina.ai (resolves)
+Baseline production counts (read-only mode=ro):
+provider_call 17 / job 7 / candidate 6 / assertion 28 / asset 6
+Baseline gates: suite 2F/503P (2 known decoder env reds); ruff clean; mypy 41 err/9 files/84 src.
+
+===============================================================================
+R-FAILPRE — clean HEAD worktree + new SG-102 test file (fail)
+===============================================================================
+$ git worktree add -q /tmp/opencode/sg102/base HEAD
+$ cp backend/tests/test_sg102_enrich_wiring.py /tmp/opencode/sg102/base/backend/tests/
+$ (cd /tmp/opencode/sg102/base/backend && python -m pytest -q tests/test_sg102_enrich_wiring.py)
+FFF..                                                                    [100%]
+=================================== FAILURES ===================================
+_______________ test_off_hit_records_one_off_row_and_no_jina_row _______________
+    def test_off_hit_records_one_off_row_and_no_jina_row(enrich_env, monkeypatch) -> None:
+        ...
+>       assert body["snapshots_recorded"] is True
+E       assert False is True
+tests/test_sg102_enrich_wiring.py:156: AssertionError
+______________ test_off_miss_records_off_and_jina_rows_once_each _______________
+>       assert body["snapshots_recorded"] is True
+E       assert False is True
+tests/test_sg102_enrich_wiring.py:192: AssertionError
+___________________ test_degraded_fetch_records_named_reason ___________________
+>       assert body["snapshots_recorded"] is True
+E       assert False is True
+tests/test_sg102_enrich_wiring.py:227: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_sg102_enrich_wiring.py::test_off_hit_records_one_off_row_and_no_jina_row
+FAILED tests/test_sg102_enrich_wiring.py::test_off_miss_records_off_and_jina_rows_once_each
+FAILED tests/test_sg102_enrich_wiring.py::test_degraded_fetch_records_named_reason
+3 failed, 2 passed, 2 warnings in 1.14s
+(worktree removed after)
+
+===============================================================================
+R-PASSPOST — working tree (pass)
+===============================================================================
+$ pytest -q tests/test_sg102_enrich_wiring.py
+5 passed, 2 warnings in 1.02s
+
+===============================================================================
+R-TARGETED — new + existing endpoint/persistence tests together
+===============================================================================
+$ pytest -q tests/test_sg102_enrich_wiring.py tests/test_sg098_enrich_endpoint.py tests/test_sg100_snapshot_persistence.py
+26 passed, 5 warnings in 2.09s
+
+===============================================================================
+R-SUITE / R-RUFF / R-MYPY / R-STASHPROOF — post-change gates
+===============================================================================
+$ pytest -q
+2 failed, 508 passed, 26 warnings in 22.51s
+FAILED tests/test_signals.py::test_generated_codes_are_validated_and_bad_checksum_is_not_an_identifier
+FAILED tests/test_signals.py::test_ocr_has_text_boxes_and_mean_confidence - a...
+  (the 2 known decoder env reds)
+
+$ git worktree add -q /tmp/opencode/sg102/base2 HEAD
+$ (cd /tmp/opencode/sg102/base2/backend && python -m pytest -q tests/test_signals.py)
+2 failed, 5 passed, 3 warnings in 1.31s
+  (stash-proof of the 2 reds at clean HEAD; worktree removed after)
+
+$ ruff check .
+All checks passed!
+$ mypy app
+Found 41 errors in 9 files (checked 84 source files)   (delta 0 vs baseline 41)
+
+===============================================================================
+R-SECRET — secret-pattern gate over changed/new files
+===============================================================================
+$ rg -n -e 'sk-[A-Za-z0-9]' -e 'Bearer ' -e 'AKIA' -e '_API_KEY=' -e 'api_key *=' \
+     backend/app/api/v1/enrich.py backend/tests/test_sg102_enrich_wiring.py \
+     backend/tests/test_sg098_enrich_endpoint.py
+backend/tests/test_sg098_enrich_endpoint.py:344:    # The Bearer header NAME is added at send time; its VALUE is never asserted.
+  (one code comment naming the header; no literal key, no `sk-`, no value) -> 0 real secrets.
+$ rg -n 'JINA_API_KEY|OPENCODE_API_KEY' backend/app/api/v1/enrich.py backend/tests/test_sg102_enrich_wiring.py
+(no matches; exit 1)  -> NAME only, and not even the name in the changed files.
+
+===============================================================================
+R-SCOPE / R-DIFF — changed/new files
+===============================================================================
+$ git status --porcelain -- backend/app/models backend/alembic
+(empty = no model/migration diff)
+$ git status --porcelain
+ M backend/app/api/v1/enrich.py
+ M backend/tests/test_sg098_enrich_endpoint.py
+?? backend/tests/test_sg102_enrich_wiring.py
+$ git diff --stat
+ backend/app/api/v1/enrich.py                | 22 +++++++++++++++++-----
+ backend/tests/test_sg098_enrich_endpoint.py | 11 ++++++-----
+ 2 files changed, 23 insertions(+), 10 deletions(-)
+$ snapshots.py byte-untouched: git diff -- backend/app/services/enrich/snapshots.py -> (empty)
+
+===============================================================================
+R-LIVE — legs A/B/C (temp DB /tmp/opencode/sg102/live.db; 60s per call)
+===============================================================================
+=== SG-102 LIVE (temp DB) ===
+database_url: sqlite:////tmp/opencode/sg102/live.db
+ai_status: (True, 'enabled')
+jina_key_present: True (NAME only; value never printed)
+prod_counts_before: {"provider_call": 17, "job": 7, "candidate": 6, "assertion": 28, "asset": 6}
+
+--- LEG A (OFF, free) ---
+request_shape: {"url": "https://world.openfoodfacts.org/api/v2/search", "params": {"search_terms": "Jacobs Cronat Gold instant coffee", "brands_tags": "Jacobs", "countries_tags_en": "romania", "page": "1", "page_size": "10", "fields": "code,product_name,brands,ingredients_text,nutriments,packaging,countries_tags_en"}}
+leg_a_verdict: ACCEPTED
+leg_a_status_code: 200
+leg_a_product_count: 10
+leg_a_first_code: 8711000517604
+leg_a_no_result_reason: None
+leg_a_request_url: https://world.openfoodfacts.org/api/v2/search?search_terms=Jacobs+Cronat+Gold+instant+coffee&brands_tags=Jacobs&countries_tags_en=romania&page=1&page_size=10&fields=code%2Cproduct_name%2Cbrands%2Cingredients_text%2Cnutriments%2Cpackaging%2Ccountries_tags_en
+leg_a_elapsed_s: 0.26
+leg_a_row_id: 01a0cf53-550d-7020-bed4-11929ab3ddfa source: off query: Jacobs Jacobs Cronat Gold instant coffee
+leg_a_raw_capture_bytes: 95   (see F-SG102-2: event-hook fired pre-body)
+
+--- LEG B (EU base, diagnostic, free) ---
+getent_hosts[eu.s.jina.ai] exit=2 out=''
+getaddrinfo[eu.s.jina.ai] NXDOMAIN/error=gaierror: [Errno -2] Name or service not known
+getent_hosts[s.jina.ai] exit=0 out='2606:4700:20::681a:bf2 s.jina.ai\n2606:4700:20::ac43:4636 s.jina.ai\n2606:4700:20::681a:af2 s.jina.ai'
+getaddrinfo[s.jina.ai] resolved=['104.26.10.242', '104.26.11.242', '172.67.70.54', '2606:4700:20::681a:af2', '2606:4700:20::681a:bf2', '2606:4700:20::ac43:4636']
+leg_b_status_code: None
+leg_b_no_result_reason: transport: ConnectError: [Errno -2] Name or service not known
+leg_b_request_url: https://eu.s.jina.ai/Jacobs+Jacobs+Cronat+Gold+instant+coffee
+leg_b_elapsed_s: 0.015
+leg_b_eu_default_stands: True (no code switch; global stays diagnostic-only)
+
+--- LEG C (Jina global, metered) ---
+leg_c_status_code: 200
+leg_c_result_count: 5
+leg_c_no_result_reason: None
+leg_c_request_url: https://s.jina.ai/Jacobs+Jacobs+Cronat+Gold+instant+coffee?site=mega-image.ro&site=emag.ro&site=farmaciatei.ro&num=5&type=web&gl=ro
+leg_c_elapsed_s: 8.165
+leg_c_row_id: 01a0cf53-750d-74c2-98b7-3c4e187725ac source: jina query: Jacobs Jacobs Cronat Gold instant coffee
+leg_c_raw_body_bytes: 3646
+leg_c_raw_capture_bytes: 95   (see F-SG102-2)
+
+--- LOADER READ-BACK ---
+loader[off] count=1 ids=['01a0cf53-550d-7020-bed4-11929ab3ddfa']
+loader[jina] count=1 ids=['01a0cf53-750d-74c2-98b7-3c4e187725ac']
+temp_db_enrich_snapshot_total: 2
+
+prod_counts_after: {"provider_call": 17, "job": 7, "candidate": 6, "assertion": 28, "asset": 6}
+jina_searches_used: 2 (leg B EU attempt + leg C global search)
+off_searches_used: 1 (leg A)
+
+===============================================================================
+R-RECORDER — fixed raw-body recorder, free OFF re-check (F-SG102-2)
+===============================================================================
+$ python - <<'PY'   (OFF only; free)
+def hook(resp):
+    resp.read()            # materialize BEFORE the client reads (fix)
+    cap[str(resp.request.url)] = resp.text
+...
+fixed_recorder_capture_bytes: 5627
+status: 200 products: 10
+first_code: 8711000517604
+captured_starts: {"count":18,"page":1,"page_count":10,"page_size":10,"products":[{"brands":"Jacobs","code":"8711000517604","countries_tag
+  (the snapshot's own raw/raw_text was always authoritative and unaffected; no metered re-run)
+
+===============================================================================
+R-COUNTS — production counts before/after (read-only mode=ro)
+===============================================================================
+BEFORE: provider_call 17 / job 7 / candidate 6 / assertion 28 / asset 6
+AFTER : provider_call 17 / job 7 / candidate 6 / assertion 28 / asset 6   (identical)
+Temp live DB /tmp/opencode/sg102/live.db: enrich_snapshot = 2 (1 off + 1 jina)

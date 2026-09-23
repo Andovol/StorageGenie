@@ -15,7 +15,8 @@ What this file proves (`PG-SC-12`: no re-implemented seam):
 - the identifier query is TEXT only (no image bytes, no GPS, no key value);
 - the proposals persist as a gated candidate row readable via the REAL
   candidates route, and web fields commit as `review_state="proposed"` through
-  the REAL commit path; the snapshots themselves are UNRECORDED (`PG-SC-02`).
+  the REAL commit path; SG-102 records the snapshots to the SG-100
+  `enrich_snapshot` table, and the candidate row itself carries no raw body.
 """
 
 from __future__ import annotations
@@ -191,7 +192,7 @@ def test_off_hit_never_fires_jina_and_candidate_reads_back(enrich_env, monkeypat
     assert body["off_accepted"] is True
     assert body["fallback_fired"] is False
     assert body["fallback_reason"] is None
-    assert body["snapshots_recorded"] is False
+    assert body["snapshots_recorded"] is True  # SG-102: recorded via the writer
     assert order == ["off"]
     assert len(off_seen) == 1
     assert jina_seen == []
@@ -201,9 +202,9 @@ def test_off_hit_never_fires_jina_and_candidate_reads_back(enrich_env, monkeypat
     assert candidate["state"] == "proposed"
     assert candidate["fields"]["display_name"]["source_type"] == "web:OpenFoodFacts"
     assert candidate["fields"]["identifier"]["value"] == "3274080005003"
-    # Snapshots are UNRECORDED (`PG-SC-02`): no raw provider body on the row.
-    # The snapshot rides the RESPONSE body but is UNRECORDED on the row
-    # (`PG-SC-02`): the contrast is the non-vacuous proof.
+    # SG-102 records the snapshots to the `enrich_snapshot` table, but the
+    # CANDIDATE row itself carries no raw provider body: the snapshot rides the
+    # RESPONSE body and the snapshot table, never `proposed_fields_json`.
     assert body["primary"]["raw"] is not None
     stored = session.query(Candidate).filter_by(id=body["candidate_id"]).one()
     assert '"raw"' not in stored.proposed_fields_json

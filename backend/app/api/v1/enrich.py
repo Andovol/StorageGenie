@@ -6,10 +6,11 @@ through the REAL SG-081/082 clients, and persists the web-sourced proposals as
 a gated candidate row readable through the REAL `GET /v1/candidates/{id}` route.
 
 Standing lines (packet SG-098):
-- No synthesis prompt/caller and no persistence model/migration ride here. The
-  snapshots (OFF/Jina raw bodies) are UNRECORDED (`PG-SC-02`): they live only in
-  the in-memory decision record and the response body. The candidate proposal
-  rides the EXISTING candidate table (no new table, no migration).
+- No synthesis prompt/caller and no persistence model/migration ride here. As of
+  SG-102 the OFF/Jina snapshots ARE recorded to the SG-100 `enrich_snapshot`
+  table through its append-only writer (`PG-SC-02` closed in-slice); they also
+  still ride the in-memory decision record and the response body. The candidate
+  proposal rides the EXISTING candidate table (no new table, no migration).
 - Consent gates BEFORE any client touch: with `settings.sg_consent` false the
   request refuses with a named reason and ZERO invocations.
 - The per-press cap is enforced server-side as a mirror of the frontend
@@ -36,6 +37,7 @@ from app.services import candidates
 from app.services.candidates import Candidate
 from app.services.enrich import client as off_client
 from app.services.enrich import jina as jina_mod
+from app.services.enrich import snapshots as snapshots_mod
 
 router = APIRouter()
 
@@ -158,6 +160,16 @@ def trigger_enrich(
         http_client=off_http_client,
         jina_http_client=jina_http_client,
     )
+
+    # SG-102: persist the raw snapshots through the SG-100 append-only writer
+    # BEFORE the candidate commit. OFF is always recorded; Jina is recorded iff
+    # the fallback fired. The query is the exact brand+name TEXT the Jina client
+    # searched (`build_jina_query`) — never a photo, a coordinate or a key.
+    query_text = jina_mod.build_jina_query(brand, query_name)
+    snapshots_mod.record_off_snapshot(db, record.primary, query=query_text)
+    if record.fallback is not None:
+        snapshots_mod.record_jina_snapshot(db, record.fallback, query=query_text)
+
     web = candidates.build_enrich_fields(record, category=None)
     fields = web["fields"]
     sources = web["sources"]
@@ -206,5 +218,5 @@ def trigger_enrich(
             if record.fallback is not None
             else None
         ),
-        "snapshots_recorded": False,
+        "snapshots_recorded": True,
     }
