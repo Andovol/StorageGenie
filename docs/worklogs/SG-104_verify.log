@@ -1,0 +1,748 @@
+SG-104 verify log — raw outputs (live clock; all commands bounded)
+Work dir /home/andrei/StorageGenie · contract /home/andrei/storagegenie-contract VERSION 0.33.0
+NOTE: .rules-cache/ is ABSENT on this host; contract source path is /home/andrei/storagegenie-contract
+
+################## G0 BACKUP ##################
+[backup dir] /home/andrei/.local/share/opencode/storagegenie-backups/SG-104-20260923T181120Z
+[bytes] storagegenie.db=512000 storagegenie.db-shm=32768 storagegenie.db-wal=0
+[sha256 copy] 8342093029abf7456a7a59257c57a9a48cec20e1c1c444b2762e2b710dccbc30
+[PRAGMA integrity_check ON COPY] ok
+[copy alembic_version] 20260917_sg068_saved_search
+
+################## G1 BEFORE ##################
+===== G1 BEFORE CAPTURE 2026-09-23T18:11:32Z =====
+--- BASE / WORK HEAD ---
+BASE_REF=origin/automation BASE_RESOLVED=59d4bf17daf12faaa3ff9cb04f9169beccc167d8
+HEAD=59d4bf17daf12faaa3ff9cb04f9169beccc167d8
+--- IMAGE ID ---
+image_id=sha256:24224bc5dcc098f59b4211981ebd7f67fcedfc2b0621024266c00c67b89bcbc8 created=2026-09-23T13:50:57.309733996Z
+--- CONTAINER / RESTARTCOUNT / PORTS / HEALTH ---
+324f1cc4fbac68d7db89b49dc3cd58a00eb054df6a19422707d457ea15a11239 storagegenie-backend storagegenie-backend-1 Up 4 hours (healthy) 127.0.0.1:8003->8000/tcp
+container_image=sha256:24224bc5dcc098f59b4211981ebd7f67fcedfc2b0621024266c00c67b89bcbc8 RestartCount=0 Started=2026-09-23T13:51:33.623303874Z Health=healthy NetworkMode=storagegenie_default PortBindings={"8000/tcp":[{"HostIp":"127.0.0.1","HostPort":"8003"}]}
+--- SERVED BUNDLE (name+size+sha256) ---
+total 304
+-rw-r--r-- 1 root root   3839 Sep 23 13:50 index-CoNI-1Zn.css
+-rw-r--r-- 1 root root 305133 Sep 23 13:50 index-D4-L2yOb.js
+---
+f9a28f5ff507e5a48ecce324a43e134b927a7387d37ac7ce2b1e2106a5da542c  /app/static/assets/index-D4-L2yOb.js
+b18dbb336eef5c580bf0a2e6726d647c4f6c63edbc48373580d31e4508659ad3  /app/static/assets/index-CoNI-1Zn.css
+--- served index.html ---
+    <script type="module" crossorigin src="/assets/index-D4-L2yOb.js"></script>
+    <link rel="stylesheet" crossorigin href="/assets/index-CoNI-1Zn.css">
+--- ALEMBIC CURRENT (live DB) ---
+20260917_sg068_saved_search
+--- DB BYTES ---
+/home/andrei/StorageGenie/data/db/storagegenie.db 512000
+/home/andrei/StorageGenie/data/db/storagegenie.db-wal 0
+/home/andrei/StorageGenie/data/db/storagegenie.db-shm 32768
+--- TABLE COUNT (sqlite_master tables) ---
+24
+--- 24-TABLE COUNTS ---
+alembic_version=1
+assertion=28
+asset=6
+asset_evidence=12
+asset_fts=6
+asset_fts_config=1
+asset_fts_data=8
+asset_fts_docsize=6
+asset_fts_idx=6
+audit_event=68
+candidate=6
+evidence=13
+guardrail_event=2
+household=1
+idempotency_key=9
+job=7
+job_step=56
+observation=16
+planning_suggestion=0
+provider_call=17
+review_task=6
+saved_search=0
+source_attribution=0
+user=2
+--- HEALTH EXACT ---
+{"status":"ok","db":"ok","storage":"ok"}
+--- GATE http (port 80, Host storagegenie.dynv6.net) ---
+code=301 redirect=https://storagegenie.dynv6.net/
+--- GATE https (port 443) ---
+code=401
+--- ENRICH ROUTE SHAPE PROBE (in-process, no press) ---
+/usr/local/lib/python3.12/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+  from starlette.testclient import TestClient as TestClient  # noqa
+enrich_routes= []
+missing_asset_status= 405 body= {'detail': 'Method Not Allowed'}
+--- QUALIFYING ASSETS (identifier TEXT in Popescu Household) ---
+id                                    display_name                                            household_id                        
+------------------------------------  ------------------------------------------------------  ------------------------------------
+01a0a467-eb0e-7b83-a227-af122dc9268b  Toothpaste                                              01a0a029-1477-7ca0-b200-bce78a96c679
+01a0c446-44c9-7b82-9d1c-2b51fa518191  CEAFĂ DE PORC                                           01a0a029-1477-7ca0-b200-bce78a96c679
+01a0c47f-fbb3-7db1-b6f3-aa52d20aa6a0  UHT Lapte 3,5% grăsime                                  01a0a029-1477-7ca0-b200-bce78a96c679
+01a0c481-720e-7923-ad6c-bee45caba30f  Milbona Parmigiano Reggiano Italian hard cheese flakes  01a0a029-1477-7ca0-b200-bce78a96c679
+01a0c4aa-8b62-7360-b11e-a476ddaea0f6  Miso Soup                                               01a0a029-1477-7ca0-b200-bce78a96c679
+01a0c4ab-3765-7e10-8d0a-705390c6560d  Costiță de porc                                         01a0a029-1477-7ca0-b200-bce78a96c679
+===== END BEFORE =====
+
+################## G2 BUILD CONTEXT ##################
+===== G2 BUILD CONTEXT GREP 2026-09-23T18:11:43Z =====
+--- git status (must be clean) ---
+status_exit=0
+--- Arc A files present in build context ---
+backend/app/services/enrich/synthesize.py: PRESENT sha256=f3af958dfb158f8c2514a297d7f74ff75788b622a4f60a60ae174c964976fa1e
+backend/app/services/enrich/snapshots.py: PRESENT sha256=7b455cf7559d49d9bacdc265e2dfad74f784ea2a515b15df0365fe9050fd55a0
+backend/app/models/enrich_snapshot.py: PRESENT sha256=3549e1ed8f1b532809990585cd01e0fca74c0c5e000656b99d64cd74bc0df8e6
+backend/alembic/versions/20260923_sg100_enrich_snapshot.py: PRESENT sha256=a1ff8aebbe5f3d4a05d754a9c9e0616611e68f3e454e93655cd53fbb6abb7b11
+backend/app/services/providers/prompts/enrich-synthesis-v1.md: PRESENT sha256=cb6b6890737f6dc9ad07af5a2b38381091bdb3317027a8656c8bf6ef79ba320d
+--- SG-101 adapter hunk (text-turn token bound) ---
+42:TEXT_MAX_TOKENS = 8000
+152:    image_bytes: bytes, prompt: str, *, max_tokens: int = DEFAULT_MAX_TOKENS
+157:    the base64 body of the image); output is bounded by `max_tokens`. This
+164:    return (input_tokens * INPUT_USD_PER_1M + max_tokens * OUTPUT_USD_PER_1M) / 1_000_000
+172:        "max_tokens": DEFAULT_MAX_TOKENS,
+195:    never any key material. `max_tokens` is `TEXT_MAX_TOKENS`, the text-turn
+201:        "max_tokens": TEXT_MAX_TOKENS,
+--- SG-102/103 endpoint hunks ---
+40:from app.services.enrich import snapshots as snapshots_mod
+100:def label_existing_fields(db: Session, asset: Asset) -> dict[str, object]:
+101:    """The asset's label-side facts, keyed by `merge_web_fields`' own field names.
+110:    `merge_web_fields` reads it through `_field_parts`.
+201:    snapshots_mod.record_off_snapshot(db, record.primary, query=query_text)
+203:        snapshots_mod.record_jina_snapshot(db, record.fallback, query=query_text)
+215:    label_existing = label_existing_fields(db, asset)
+216:    fields, alternates = candidates.merge_web_fields(label_existing, web_fields)
+226:        "web_alternates": alternates,
+252:        "web_alternates": alternates,
+145:    web_alternates = proposal.get("web_alternates", [])
+146:    if not isinstance(web_alternates, list):
+147:        web_alternates = []
+158:        "web_alternates": web_alternates,
+--- synthesize.py wiring refs ---
+4:metered TEXT seam ``OpenCodeGoProvider.extract_text`` DIRECTLY — never through
+7:``ProviderCall`` ledger row is written to the caller-supplied session; the
+13:attribution slots, loads the frozen ``enrich-synthesis-v1`` prompt, and parses
+30:from app.models.provider_call import ProviderCall
+40:SYNTHESIS_PROMPT_FILE = "enrich-synthesis-v1.md"
+99:def load_synthesis_prompt() -> tuple[str, str]:
+159:    """Assemble the EXACT user turn handed to ``extract_text`` (``PG-EV-04``).
+253:    refuses before any invocation. The call goes DIRECTLY to ``extract_text``
+254:    (never the catalogue-bound ``respond``); exactly one ``ProviderCall`` row is
+261:    prompt_text, template_version = load_synthesis_prompt()
+===== END CONTEXT =====
+
+################## G2 BUILD (BUILDX_CONFIG relocated) ##################
+[first attempt denied] failed to update builder last activity time: open /home/andrei/.docker/buildx/activity/.tmp-default26338887: read-only file system
+===== G2 BUILD START (BUILDX_CONFIG=/tmp/sg104/buildx) 2026-09-23T18:11:52Z =====
+ Image storagegenie-backend Building 
+#1 [internal] load local bake definitions
+#1 reading from stdin 607B done
+#1 DONE 0.0s
+
+#2 [internal] load build definition from Dockerfile
+#2 transferring dockerfile: 1.06kB done
+#2 DONE 0.0s
+
+#3 [internal] load metadata for docker.io/library/node:20-alpine
+#3 ...
+
+#4 [internal] load metadata for docker.io/library/python:3.12.11-slim-bookworm@sha256:519591d6871b7bc437060736b9f7456b8731f1499a57e22e6c285135ae657bf7
+#4 DONE 0.8s
+
+#3 [internal] load metadata for docker.io/library/node:20-alpine
+#3 DONE 0.8s
+
+#5 [internal] load .dockerignore
+#5 transferring context: 497B done
+#5 DONE 0.0s
+
+#6 [frontend-build 1/6] FROM docker.io/library/node:20-alpine@sha256:fb4cd12c85ee03686f6af5362a0b0d56d50c58a04632e6c0fb8363f609372293
+#6 resolve docker.io/library/node:20-alpine@sha256:fb4cd12c85ee03686f6af5362a0b0d56d50c58a04632e6c0fb8363f609372293 0.0s done
+#6 DONE 0.0s
+
+#7 [stage-1 1/9] FROM docker.io/library/python:3.12.11-slim-bookworm@sha256:519591d6871b7bc437060736b9f7456b8731f1499a57e22e6c285135ae657bf7
+#7 resolve docker.io/library/python:3.12.11-slim-bookworm@sha256:519591d6871b7bc437060736b9f7456b8731f1499a57e22e6c285135ae657bf7 0.0s done
+#7 DONE 0.0s
+
+#8 [internal] load build context
+#8 transferring context: 162.03MB 0.8s done
+#8 DONE 0.8s
+
+#9 [stage-1 4/9] COPY backend/pyproject.toml backend/requirements.lock ./
+#9 CACHED
+
+#10 [stage-1 2/9] WORKDIR /app
+#10 CACHED
+
+#11 [stage-1 3/9] RUN apt-get update && apt-get install -y --no-install-recommends curl tesseract-ocr libzbar0 && rm -rf /var/lib/apt/lists/*
+#11 CACHED
+
+#12 [frontend-build 2/6] WORKDIR /ui
+#12 CACHED
+
+#13 [frontend-build 3/6] COPY frontend/package.json frontend/package-lock.json ./
+#13 CACHED
+
+#14 [stage-1 5/9] RUN pip install --no-cache-dir -r requirements.lock
+#14 CACHED
+
+#15 [frontend-build 4/6] RUN npm ci
+#15 CACHED
+
+#16 [frontend-build 5/6] COPY frontend/ ./
+#16 DONE 0.4s
+
+#17 [stage-1 6/9] COPY backend/ ./
+#17 DONE 0.7s
+
+#18 [frontend-build 6/6] RUN npm run build
+#18 0.821 
+#18 0.821 > storagegenie-frontend@0.1.0 build
+#18 0.821 > tsc && vite build
+#18 0.821 
+#18 ...
+
+#19 [stage-1 7/9] RUN pip install --no-cache-dir "hatchling==1.32.0" "editables==0.6"
+#19 0.633 Collecting hatchling==1.32.0
+#19 0.655   Downloading hatchling-1.32.0-py3-none-any.whl.metadata (3.9 kB)
+#19 0.660 Collecting editables==0.6
+#19 0.663   Downloading editables-0.6-py3-none-any.whl.metadata (3.1 kB)
+#19 0.664 Requirement already satisfied: packaging>=24.2 in /usr/local/lib/python3.12/site-packages (from hatchling==1.32.0) (26.3)
+#19 0.665 Requirement already satisfied: pathspec>=0.10.1 in /usr/local/lib/python3.12/site-packages (from hatchling==1.32.0) (1.1.1)
+#19 0.665 Requirement already satisfied: pluggy>=1.0.0 in /usr/local/lib/python3.12/site-packages (from hatchling==1.32.0) (1.6.0)
+#19 0.672 Collecting tomlkit>=0.11.1 (from hatchling==1.32.0)
+#19 0.674   Downloading tomlkit-0.15.1-py3-none-any.whl.metadata (3.3 kB)
+#19 0.688 Collecting trove-classifiers (from hatchling==1.32.0)
+#19 0.690   Downloading trove_classifiers-2026.9.21.13-py3-none-any.whl.metadata (2.4 kB)
+#19 0.696 Downloading hatchling-1.32.0-py3-none-any.whl (78 kB)
+#19 0.703 Downloading editables-0.6-py3-none-any.whl (5.4 kB)
+#19 0.705 Downloading tomlkit-0.15.1-py3-none-any.whl (49 kB)
+#19 0.707 Downloading trove_classifiers-2026.9.21.13-py3-none-any.whl (14 kB)
+#19 0.749 Installing collected packages: trove-classifiers, tomlkit, editables, hatchling
+#19 0.873 WARNING: Running pip as the 'root' user can result in broken permissions and conflicting behaviour with the system package manager, possibly rendering your system unusable. It is recommended to use a virtual environment instead: https://pip.pypa.io/warnings/venv. Use the --root-user-action option if you know what you are doing and want to suppress this warning.
+#19 0.873 Successfully installed editables-0.6 hatchling-1.32.0 tomlkit-0.15.1 trove-classifiers-2026.9.21.13
+#19 0.973 
+#19 0.973 [notice] A new release of pip is available: 25.0.1 -> 26.2.1
+#19 0.973 [notice] To update, run: pip install --upgrade pip
+#19 DONE 1.1s
+
+#20 [stage-1 8/9] RUN pip install --no-cache-dir --no-build-isolation --no-deps -e .
+#20 0.458 Obtaining file:///app
+#20 0.460   Checking if build backend supports build_editable: started
+#20 0.487   Checking if build backend supports build_editable: finished with status 'done'
+#20 0.488   Preparing editable metadata (pyproject.toml): started
+#20 0.614   Preparing editable metadata (pyproject.toml): finished with status 'done'
+#20 0.619 Building wheels for collected packages: storagegenie-backend
+#20 0.620   Building editable for storagegenie-backend (pyproject.toml): started
+#20 0.647   Building editable for storagegenie-backend (pyproject.toml): finished with status 'done'
+#20 0.648   Created wheel for storagegenie-backend: filename=storagegenie_backend-0.1.0-py3-none-any.whl size=1312 sha256=f4166b49f2f07a3bd74e74020395150b5181fe8d995a32e9cf51cdea546bdf4c
+#20 0.648   Stored in directory: /tmp/pip-ephem-wheel-cache-fdc5sxic/wheels/54/1b/b7/aa63e25c8f14f4f2ae7b04e6097bdecb770e455c5c1ee0a600
+#20 0.651 Successfully built storagegenie-backend
+#20 0.651 Installing collected packages: storagegenie-backend
+#20 0.659 Successfully installed storagegenie-backend-0.1.0
+#20 0.659 WARNING: Running pip as the 'root' user can result in broken permissions and conflicting behaviour with the system package manager, possibly rendering your system unusable. It is recommended to use a virtual environment instead: https://pip.pypa.io/warnings/venv. Use the --root-user-action option if you know what you are doing and want to suppress this warning.
+#20 0.730 
+#20 0.730 [notice] A new release of pip is available: 25.0.1 -> 26.2.1
+#20 0.730 [notice] To update, run: pip install --upgrade pip
+#20 DONE 0.8s
+
+#18 [frontend-build 6/6] RUN npm run build
+#18 5.231 vite v5.4.21 building for production...
+#18 5.277 transforming...
+#18 7.351 ✓ 1961 modules transformed.
+#18 7.511 rendering chunks...
+#18 7.518 computing gzip size...
+#18 7.528 dist/index.html                   0.94 kB │ gzip:  0.48 kB
+#18 7.528 dist/assets/index-CoNI-1Zn.css    3.84 kB │ gzip:  1.04 kB
+#18 7.528 dist/assets/index-Cj3z97gk.js   305.18 kB │ gzip: 89.48 kB
+#18 7.528 ✓ built in 2.27s
+#18 7.579 npm notice
+#18 7.579 npm notice New major version of npm available! 10.8.2 -> 12.1.0
+#18 7.579 npm notice Changelog: https://github.com/npm/cli/releases/tag/v12.1.0
+#18 7.579 npm notice To update run: npm install -g npm@12.1.0
+#18 7.579 npm notice
+#18 DONE 7.6s
+
+#21 [stage-1 9/9] COPY --from=frontend-build /ui/dist ./static
+#21 DONE 0.0s
+
+#22 exporting to image
+#22 exporting layers
+#22 exporting layers 4.1s done
+#22 exporting manifest sha256:a2a29d5edbd0181f86cfa91ad883aee2f3cd702c07629bd8837a2f0308914596 done
+#22 exporting config sha256:5eabf6a05acd1e33b93b71ec7d66c1737ce56de3101eecd7d92f2ada2c3d04b5 done
+#22 exporting attestation manifest sha256:0c7af1530d720a700f12640438027acdf0d1913b4e3eb6d82197d329b1784215 done
+#22 exporting manifest list sha256:a76f145592656da45d5fa3bab7efffd1d89cf42565f1236d65f2d1898b4c12e6 done
+#22 naming to docker.io/library/storagegenie-backend:latest done
+#22 unpacking to docker.io/library/storagegenie-backend:latest
+#22 unpacking to docker.io/library/storagegenie-backend:latest 1.6s done
+#22 DONE 5.8s
+
+#23 resolving provenance for metadata file
+#23 DONE 0.0s
+ Image storagegenie-backend Built 
+	Command being timed: "docker compose build backend"
+	User time (seconds): 0.97
+	System time (seconds): 0.73
+	Percent of CPU this job got: 10%
+	Elapsed (wall clock) time (h:mm:ss or m:ss): 0:16.32
+	Average shared text size (kbytes): 0
+	Average unshared data size (kbytes): 0
+	Average stack size (kbytes): 0
+	Average total size (kbytes): 0
+	Maximum resident set size (kbytes): 75776
+	Average resident set size (kbytes): 0
+	Major (requiring I/O) page faults: 58
+	Minor (reclaiming a frame) page faults: 24224
+	Voluntary context switches: 28104
+	Involuntary context switches: 872
+	Swaps: 0
+	File system inputs: 136872
+	File system outputs: 144
+	Socket messages sent: 0
+	Socket messages received: 0
+	Signals delivered: 0
+	Page size (bytes): 4096
+	Exit status: 0
+build_exit=0
+===== G2 BUILD END 2026-09-23T18:12:08Z =====
+
+################## G2 NEW IMAGE + Arc A BYTES IN-IMAGE ##################
+===== NEW IMAGE 2026-09-23T18:12:18Z =====
+REPOSITORY             TAG       IMAGE ID                                                                  CREATED          SIZE
+storagegenie-backend   latest    sha256:a76f145592656da45d5fa3bab7efffd1d89cf42565f1236d65f2d1898b4c12e6   16 seconds ago   826MB
+image_id=sha256:a76f145592656da45d5fa3bab7efffd1d89cf42565f1236d65f2d1898b4c12e6 created=2026-09-23T18:12:02.528869567Z
+--- Arc A bytes INSIDE the new image (docker run --rm inspection, no DB mount) ---
+[files]
+-rw-r--r-- 1 root root  1976 Sep 23 16:49 /app/alembic/versions/20260923_sg100_enrich_snapshot.py
+-rw-r--r-- 1 root root  1398 Sep 23 16:49 /app/app/models/enrich_snapshot.py
+-rw-r--r-- 1 root root  3154 Sep 23 16:49 /app/app/services/enrich/snapshots.py
+-rw-r--r-- 1 root root 11822 Sep 23 17:15 /app/app/services/enrich/synthesize.py
+-rw-r--r-- 1 root root  2368 Sep 23 16:28 /app/app/services/providers/prompts/enrich-synthesis-v1.md
+[sha256]
+f3af958dfb158f8c2514a297d7f74ff75788b622a4f60a60ae174c964976fa1e  /app/app/services/enrich/synthesize.py
+7b455cf7559d49d9bacdc265e2dfad74f784ea2a515b15df0365fe9050fd55a0  /app/app/services/enrich/snapshots.py
+3549e1ed8f1b532809990585cd01e0fca74c0c5e000656b99d64cd74bc0df8e6  /app/app/models/enrich_snapshot.py
+a1ff8aebbe5f3d4a05d754a9c9e0616611e68f3e454e93655cd53fbb6abb7b11  /app/alembic/versions/20260923_sg100_enrich_snapshot.py
+cb6b6890737f6dc9ad07af5a2b38381091bdb3317027a8656c8bf6ef79ba320d  /app/app/services/providers/prompts/enrich-synthesis-v1.md
+[sg101 TEXT_MAX_TOKENS]
+42:TEXT_MAX_TOKENS = 8000
+[sg102/103 endpoint hunks]
+/app/app/api/v1/enrich.py:100:def label_existing_fields(db: Session, asset: Asset) -> dict[str, object]:
+/app/app/api/v1/enrich.py:201:    snapshots_mod.record_off_snapshot(db, record.primary, query=query_text)
+/app/app/api/v1/enrich.py:203:        snapshots_mod.record_jina_snapshot(db, record.fallback, query=query_text)
+/app/app/api/v1/enrich.py:215:    label_existing = label_existing_fields(db, asset)
+/app/app/api/v1/enrich.py:226:        "web_alternates": alternates,
+/app/app/api/v1/enrich.py:252:        "web_alternates": alternates,
+/app/app/api/v1/candidates.py:145:    web_alternates = proposal.get("web_alternates", [])
+/app/app/api/v1/candidates.py:146:    if not isinstance(web_alternates, list):
+/app/app/api/v1/candidates.py:147:        web_alternates = []
+/app/app/api/v1/candidates.py:158:        "web_alternates": web_alternates,
+===== END IMAGE =====
+
+################## G2 MIGRATION PRE-CHECK ##################
+===== MIGRATION PRE-CHECK 2026-09-23T18:12:26Z =====
+--- live DB alembic current (host sqlite3) ---
+20260917_sg068_saved_search
+--- one-off NEW image: alembic current + heads + history ---
+ Container storagegenie-backend-run-1102319df2f2 Creating 
+ Container storagegenie-backend-run-1102319df2f2 Created 
+[alembic current]
+INFO  [alembic.runtime.migration] Context impl SQLiteImpl.
+INFO  [alembic.runtime.migration] Will assume non-transactional DDL.
+20260917_sg068_saved_search
+[alembic heads]
+20260923_sg100_enrich_snapshot (head)
+[alembic history]
+20260917_sg068_saved_search -> 20260923_sg100_enrich_snapshot (head), enrichment snapshot store (SG-100, Arc A)
+20260916_sg048_name_optional -> 20260917_sg068_saved_search, saved searches: named per-household filter sets (SG-068, Phase 4)
+20260914_sg035_foundations -> 20260916_sg048_name_optional, name-optional capture: asset.display_name becomes nullable (SG-048, S2)
+20260912_sg025_provider_call -> 20260914_sg035_foundations, data foundations: source attribution, planning suggestions, guardrail log (SG-035, Phase 3 S2/S3)
+20260908_sg017_fts -> 20260912_sg025_provider_call, provider call ledger (SG-025, blueprint §3.3)
+20260908_sg014_candidate -> 20260908_sg017_fts, SQLite FTS5 index for asset catalog search.
+20260908_sg013_observation -> 20260908_sg014_candidate, deduplication candidates
+0201cf10c56c -> 20260908_sg013_observation, deterministic signal observations
+<base> -> 0201cf10c56c, 001 core foundation
+oneoff_exit=0
+===== END PRE-CHECK =====
+
+################## G2 MIGRATION RUN (one-off NEW image) ##################
+===== MIGRATION RUN 2026-09-23T18:12:32Z =====
+--- BEFORE: alembic current (live) ---
+20260917_sg068_saved_search
+--- one-off NEW image: alembic upgrade head (the migration vehicle; NOT a recreate) ---
+ Container storagegenie-backend-run-39c219aeface Creating 
+ Container storagegenie-backend-run-39c219aeface Created 
+INFO  [alembic.runtime.migration] Context impl SQLiteImpl.
+INFO  [alembic.runtime.migration] Will assume non-transactional DDL.
+INFO  [alembic.runtime.migration] Running upgrade 20260917_sg068_saved_search -> 20260923_sg100_enrich_snapshot, enrichment snapshot store (SG-100, Arc A)
+upgrade_exit=0
+--- AFTER: alembic current (one-off container) ---
+ Container storagegenie-backend-run-5cc96aa76c09 Creating 
+ Container storagegenie-backend-run-5cc96aa76c09 Created 
+INFO  [alembic.runtime.migration] Context impl SQLiteImpl.
+INFO  [alembic.runtime.migration] Will assume non-transactional DDL.
+20260923_sg100_enrich_snapshot (head)
+--- AFTER: alembic current (host sqlite3 on live DB) ---
+20260923_sg100_enrich_snapshot
+--- new table present + 0 rows ---
+enrich_snapshot
+0
+--- schema of new table ---
+CREATE TABLE enrich_snapshot (
+	id VARCHAR(36) NOT NULL, 
+	source VARCHAR(16) NOT NULL, 
+	"query" TEXT NOT NULL, 
+	request_url TEXT NOT NULL, 
+	retrieved_at VARCHAR(64) NOT NULL, 
+	status_code INTEGER, 
+	raw_body TEXT, 
+	raw_text TEXT, 
+	no_result_reason TEXT, 
+	version VARCHAR(64) NOT NULL, 
+	created_at DATETIME DEFAULT (CURRENT_TIMESTAMP) NOT NULL, 
+	updated_at DATETIME DEFAULT (CURRENT_TIMESTAMP) NOT NULL, 
+	PRIMARY KEY (id)
+);
+CREATE INDEX ix_enrich_snapshot_source ON enrich_snapshot (source);
+--- table count now ---
+25
+--- DB bytes after migration ---
+/home/andrei/StorageGenie/data/db/storagegenie.db 512000
+/home/andrei/StorageGenie/data/db/storagegenie.db-wal 49472
+/home/andrei/StorageGenie/data/db/storagegenie.db-shm 32768
+===== END MIGRATION =====
+
+################## G2 RECREATE (ONE up -d backend) ##################
+===== RECREATE (ONE up -d backend) 2026-09-23T18:12:46Z =====
+--- before: container ---
+324f1cc4fbac68d7db89b49dc3cd58a00eb054df6a19422707d457ea15a11239 sha256:24224bc5dcc098f59b4211981ebd7f67fcedfc2b0621024266c00c67b89bcbc8 storagegenie-backend-1 Up 4 hours (healthy)
+ Container storagegenie-backend-1 Recreate 
+ Container storagegenie-backend-1 Recreated 
+ Container storagegenie-backend-1 Starting 
+ Container storagegenie-backend-1 Started 
+up_exit=0
+--- after: docker ps ---
+40bcc32160be6f0c4cf43a09fd7992c9ae58eccd0f91a5dbb1f82de588aedce8 storagegenie-backend storagegenie-backend-1 Up Less than a second (health: starting) 127.0.0.1:8003->8000/tcp
+--- wait for health (up to 60s) ---
+t=2s health=starting
+t=4s health=starting
+t=6s health=starting
+t=8s health=starting
+t=10s health=starting
+t=12s health=healthy
+--- after: inspect ---
+container_id=40bcc32160be6f0c4cf43a09fd7992c9ae58eccd0f91a5dbb1f82de588aedce8 image=sha256:a76f145592656da45d5fa3bab7efffd1d89cf42565f1236d65f2d1898b4c12e6 RestartCount=0 Started=2026-09-23T18:12:48.490444512Z Health=healthy PortBindings={"8000/tcp":[{"HostIp":"127.0.0.1","HostPort":"8003"}]}
+===== END RECREATE =====
+
+################## G3 AFTER (pre-press) + IN-IMAGE REAL-LOADER PROOF ##################
+===== G3 AFTER (pre-press) 2026-09-23T18:13:21Z =====
+--- docker ps / images ---
+40bcc32160be6f0c4cf43a09fd7992c9ae58eccd0f91a5dbb1f82de588aedce8 storagegenie-backend storagegenie-backend-1 Up 33 seconds (healthy) 127.0.0.1:8003->8000/tcp
+REPOSITORY             TAG       IMAGE ID                                                                  CREATED              SIZE
+storagegenie-backend   latest    sha256:a76f145592656da45d5fa3bab7efffd1d89cf42565f1236d65f2d1898b4c12e6   About a minute ago   826MB
+--- inspect ---
+container_id=40bcc32160be6f0c4cf43a09fd7992c9ae58eccd0f91a5dbb1f82de588aedce8 image=sha256:a76f145592656da45d5fa3bab7efffd1d89cf42565f1236d65f2d1898b4c12e6 RestartCount=0 Started=2026-09-23T18:12:48.490444512Z Health=healthy PortBindings={"8000/tcp":[{"HostIp":"127.0.0.1","HostPort":"8003"}]}
+--- bundle sha256 (must equal BEFORE) ---
+total 304
+-rw-r--r-- 1 root root 305281 Sep 23 18:12 index-Cj3z97gk.js
+-rw-r--r-- 1 root root   3839 Sep 23 18:12 index-CoNI-1Zn.css
+sha256sum: /app/static/assets/index-D4-L2yOb.js: No such file or directory
+b18dbb336eef5c580bf0a2e6726d647c4f6c63edbc48373580d31e4508659ad3  /app/static/assets/index-CoNI-1Zn.css
+--- alembic current (live) ---
+20260923_sg100_enrich_snapshot
+--- health exact ---
+{"status":"ok","db":"ok","storage":"ok"}
+--- gate http 301 / https 401 ---
+http_code=301 redirect=https://storagegenie.dynv6.net/
+https_code=401
+--- table counts (pre-press) + DB bytes ---
+alembic_version=1
+assertion=28
+asset=6
+asset_evidence=12
+asset_fts=6
+asset_fts_config=1
+asset_fts_data=8
+asset_fts_docsize=6
+asset_fts_idx=6
+audit_event=68
+candidate=6
+enrich_snapshot=0
+evidence=13
+guardrail_event=2
+household=1
+idempotency_key=9
+job=7
+job_step=56
+observation=16
+planning_suggestion=0
+provider_call=17
+review_task=6
+saved_search=0
+source_attribution=0
+user=2
+/home/andrei/StorageGenie/data/db/storagegenie.db 528384
+/home/andrei/StorageGenie/data/db/storagegenie.db-wal 0
+/home/andrei/StorageGenie/data/db/storagegenie.db-shm 32768
+--- enrich route now present (in-process, no press: missing asset -> 404) ---
+/usr/local/lib/python3.12/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+  from starlette.testclient import TestClient as TestClient  # noqa
+enrich_routes= []
+missing_asset_status= 404 body= {'type': 'about:blank', 'title': 'Not Found', 'status': 404, 'detail': 'Asset not found'}
+===== IN-IMAGE REAL-LOADER PROOF (PG-SC-12) =====
+prompt_file= /app/app/services/providers/prompts/enrich-synthesis-v1.md
+template_version= enrich-synthesis-v1 prompt_bytes= 2368
+snapshots_module= /app/app/services/enrich/snapshots.py SNAPSHOT_SCHEMA_VERSION= enrich-snapshot-v1
+serialize_raw_body_roundtrip= {"a":2,"b":1}
+model_table= enrich_snapshot model_file= app.models.enrich_snapshot
+off_client_file= /app/app/services/enrich/client.py jina_file= /app/app/services/enrich/jina.py
+synthesize_file= /app/app/services/enrich/synthesize.py
+build_jina_query= Toothpaste
+===== END AFTER (pre-press) =====
+
+################## G3 THE ONE PRESS ##################
+===== THE ONE PRESS 2026-09-23T18:14:10Z =====
+--- criterion: assets in Popescu Household with identifier TEXT (display_name) ---
+id                                    display_name                                          
+------------------------------------  ------------------------------------------------------
+01a0a467-eb0e-7b83-a227-af122dc9268b  Toothpaste                                            
+01a0c446-44c9-7b82-9d1c-2b51fa518191  CEAFĂ DE PORC                                         
+01a0c47f-fbb3-7db1-b6f3-aa52d20aa6a0  UHT Lapte 3,5% grăsime                                
+01a0c481-720e-7923-ad6c-bee45caba30f  Milbona Parmigiano Reggiano Italian hard cheese flakes
+01a0c4aa-8b62-7360-b11e-a476ddaea0f6  Miso Soup                                             
+01a0c4ab-3765-7e10-8d0a-705390c6560d  Costiță de porc                                       
+--- chosen: 01a0a467-eb0e-7b83-a227-af122dc9268b (Toothpaste) ---
+--- counts before press ---
+job|7
+candidate|6
+enrich_snapshot|0
+provider_call|17
+--- POST /v1/enrich/01a0a467-eb0e-7b83-a227-af122dc9268b?household_id=01a0a029-1477-7ca0-b200-bce78a96c679&last_spend_usd=0.0 (loopback, no login) ---
+{"asset_id":"01a0a467-eb0e-7b83-a227-af122dc9268b","candidate_id":"01a0cf79-a42a-7612-8f74-8e413dd8ee69","state":"proposed","fields":{"display_name":{"value":"Toothpaste","source_type":"user"},"asset_type":{"value":"unknown","source_type":"user"}},"web_sources":[],"web_alternates":[],"off_accepted":false,"off_reason":"below_threshold","fallback_fired":true,"fallback_reason":"off_no_confident_match","primary":{"source_name":"OpenFoodFacts","request_url":"https://world.openfoodfacts.org/api/v2/search?search_terms=Toothpaste&brands_tags=&countries_tags_en=romania&page=1&page_size=10&fields=code%2Cproduct_name%2Cbrands%2Cingredients_text%2Cnutriments%2Cpackaging%2Ccountries_tags_en","retrieved_at":"2026-09-23T18:14:10.683775+00:00","status_code":200,"no_result_reason":null,"raw":{"count":46927,"page":1,"page_count":10,"page_size":10,"products":[{"brands":"Borsec","code":"5942219115845","countries_tags_en":["Romania"],"ingredients_text":"apa","nutriments":{"added-sugars":0,"added-sugars_100g":0,"added-sugars_modifier":"~","added-sugars_unit":"g","added-sugars_value":0,"carbohydrates":0,"carbohydrates_100g":0,"carbohydrates_unit":"g","carbohydrates_value":0,"energy":0,"energy-kcal":0,"energy-kcal_100g":0,"energy-kcal_unit":"kcal","energy-kcal_value":0,"energy-kj":0,"energy-kj_100g":0,"energy-kj_unit":"kJ","energy-kj_value":0,"energy_100g":0,"energy_unit":"kJ","energy_value":0,"fat":0,"fat_100g":0,"fat_unit":"g","fat_value":0,"fiber":0,"fiber_100g":0,"fiber_unit":"g","fiber_value":0,"fruits-vegetables-legumes-estimate-from-ingredients_100g":0,"fruits-vegetables-nuts-estimate-from-ingredients_100g":0,"magnesium":0.109,"magnesium_100g":0.109,"magnesium_unit":"g","magnesium_value":0.109,"nova-group":1,"nova-group_100g":1,"nova-group_serving":1,"nova-group_unit":"","nova-group_value":1,"proteins":0,"proteins_100g":0,"proteins_unit":"g","proteins_value":0,"salt":0,"salt_100g":0,"salt_unit":"g","salt_value":0,"saturated-fat":0,"saturated-fat_100g":0,"saturated-fat_unit":"g","saturated-fat_value":0,"sodium":0,"sodium_100g":0,"sodium_unit":"g","sodium_value":0,"sugars":0,"sugars_100g":0,"sugars_unit":"g","sugars_value":0},"nutriments_estimated":{"alcohol_100g":0,"alpha-linolenic-acid_100g":0,"arachidonic-acid_100g":0,"beta-carotene_100g":0,"butyric-acid_100g":0,"calcium_100g":0.00713,"capric-acid_100g":0,"caproic-acid_100g":0,"caprylic-acid_100g":0,"cholesterol_100g":0,"copper_100g":0.000017,"crude-ash_100g":0.1,"docosahexaenoic-acid_100g":0,"eicosapentaenoic-acid_100g":0,"fructose_100g":0,"galactose_100g":0,"glucose_100g":0,"iodine_100g":0,"iron_100g":0.00003,"lactose_100g":0,"lauric-acid_100g":0,"linoleic-acid_100g":0,"maltose_100g":0,"manganese_100g":8.2e-7,"monounsaturated-fat_100g":0,"myristic-acid_100g":0,"oleic-acid_100g":0,"palmitic-acid_100g":0,"pantothenic-acid_100g":0,"phosphorus_100g":0,"phylloquinone_100g":0,"polyols_100g":0,"polyunsaturated-fat_100g":0,"potassium_100g":0.00073,"selenium_100g":5e-7,"starch_100g":0,"stearic-acid_100g":0,"sucrose_100g":0,"vitamin-a_100g":0,"vitamin-b12_100g":0,"vitamin-b1_100g":0,"vitamin-b2_100g":0,"vitamin-b6_100g":0,"vitamin-b9_100g":0,"vitamin-c_100g":0,"vitamin-d_100g":0,"vitamin-e_100g":0,"vitamin-pp_100g":0,"water_100g":100,"zinc_100g":0.000011},"nutrition_data":"on","nutrition_data_per":"100ml","nutrition_data_prepared_per":"100g","product_name":"Apă minerală naturală, natural carbogazoasă"},{"brands":"Tomi","code":"5941486000434","countries_tags_en":["Romania"],"ingredients_text":"tomato purée (63%), sugar, water, vinegar, wine, modified starch corn, salt, acidifier (citric acid), spices, preservatives (potassium sorbate, sodium benzoate), flavor of the tomatoes","nutriments":{"added-sugars":14.93,"added-sugars_100g":14.93,"added-sugars_modifier":"~","added-sugars_serving":14.9,"added-sugars_unit":"g","added-sugars_value":14.93,"carbohydrates":21,"carbohydrates_100g":21,"carbohydrates_serving":21,"carbohydrates_unit":"g","carbohydrates_value":21,"energy":374,"energy-kcal":88,"energy-kcal_100g":88,"energy-kcal_serving":88,"energy-kcal_unit":"kcal","energy-kcal_value":88,"energy-kj":374,"energy-kj_100g":374,"energy-kj_serving":374,"energy-kj_unit":"kJ","energy-kj_value":374,"energy_100g":374,"energy_serving":374,"energy_unit":"kJ","energy_value":374,"fat":0,"fat_100g":0,"fat_serving":0,"fat_unit":"g","fat_value":0,"fruits-vegetables-legumes-estimate-from-ingredients_100g":63,"fruits-vegetables-nuts-estimate-from-ingredients_100g":63,"nova-group":4,"nova-group_100g":4,"nova-group_serving":4,"nova-group_unit":"","nova-group_value":4,"proteins":1,"proteins_100g":1,"proteins_serving":1,"proteins_unit":"g","proteins_value":1,"salt":2.2,"salt_100g":2.2,"salt_serving":2.2,"salt_unit":"g","salt_value":2.2,"saturated-fat":0,"saturated-fat_100g":0,"saturated-fat_serving":0,"saturated-fat_unit":"g","saturated-fat_value":0,"sodium":0.88,"sodium_100g":0.88,"sodium_serving":0.88,"sodium_unit":"g","sodium_value":0.88,"sugars":17,"sugars_100g":17,"sugars_serving":17,"sugars_unit":"g","sugars_value":17},"nutriments_estimated":{"alcohol_100g":1.5876,"alpha-linolenic-acid_100g":0.0222286,"arachidonic-acid_100g":0.00006076,"beta-carotene_100g":0.0001378766,"butyric-acid_100g":0.00630208,"calcium_100g":0.020362281,"capric-acid_100g":0.0066592,"caproic-acid_100g":0.00631324,"caprylic-acid_100g":0.00630456,"chloride_100g":1.20287668,"cholesterol_100g":0,"copper_100g":0.00011438675,"crude-ash_100g":2.8340352,"docosahexaenoic-acid_100g":0.00629836,"eicosapentaenoic-acid_100g":0.00004836,"fiber_100g":1.90442,"fructose_100g":1.0698776,"galactose_100g":0.00186,"glucose_100g":1.17104,"iodine_100g":0.00003283069,"iron_100g":0.0006652881,"lactose_100g":0.00084,"lauric-acid_100g":0.00873,"linoleic-acid_100g":0.17446,"magnesium_100g":0.023383257,"maltose_100g":0.096168,"manganese_100g":0.000281442526,"monounsaturated-fat_100g":0.065137,"myristic-acid_100g":0.03544376,"oleic-acid_100g":0.062389,"palmitic-acid_100g":0.070968,"pantothenic-acid_100g":0.000188278,"phosphorus_100g":0.0333155,"phylloquinone_100g":4.39969e-6,"polyols_100g":0.006875,"polyunsaturated-fat_100g":0.16979,"potassium_100g":0.525154614,"selenium_100g":1.383884e-6,"starch_100g":1.31834,"stearic-acid_100g":0.0141666,"sucrose_100g":14.9856732,"vitamin-a_100g":0,"vitamin-b12_100g":0,"vitamin-b1_100g":0.00007108,"vitamin-b2_100g":0.0000372323,"vitamin-b6_100g":0.0001245128,"vitamin-b9_100g":0.00004730648,"vitamin-c_100g":0.005665764,"vitamin-d_100g":1.1904e-9,"vitamin-e_100g":0.001503136,"vitamin-pp_100g":0.0008608,"water_100g":65.9048986,"zinc_100g":0.0001806452},"nutrition_data":"on","nutrition_data_prepared_per":"100g","packaging":"5 PP","product_name":"Tomi Ketchup Dulce"},{"brands":"Borsec","code":"5942219115890","countries_tags_en":["Romania"],"ingredients_text":"borsec queen of mineral waters still natural mineral water chemical composition mg/l hydrogen carbonate (hco3) 292 calcium (ca) 54,6 magnesium (mg) 27,9 sodium (na) 2,13 dry residue at 180°c 304 ph 7,48 woa assty sterreica farz joseph koenig von bookmer etc, apost koeng you gar awarded in 1873 at the vienna international fair with the db gold medal and the title queen of mineral waters redrom a quality product ron no group borsec after wessling analysis romania srl, 2301309/1/01,02,2023 best before: see on packaging,","nutriments":{"added-sugars":0,"added-sugars_100g":0,"added-sugars_modifier":"~","added-sugars_unit":"g","added-sugars_value":0,"fruits-vegetables-legumes-estimate-from-ingredients_100g":0,"fruits-vegetables-nuts-estimate-from-ingredients_100g":0},"nutrition_data":"on","nutrition_data_per":"100g","nutrition_data_prepared_per":"100g","product_name":"Apă minerală naturală plată"},{"brands":"Aqua Carpatica","code":"59493518","countries_tags_en":["France","Romania"],"ingredients_text":"Apă Plată\nCalciu 46,60 mg\nMagneziu 15,10 mg\nSodiu 0,70 mg\nBicarbonați 232,30 mg\npH 8,10","nutriments":{"added-sugars":0,"added-sugars_100g":0,"added-sugars_modifier":"~","added-sugars_unit":"g","added-sugars_value":0,"alcohol":0,"alcohol_100g":0,"alcohol_serving":0,"alcohol_unit":"% vol","alcohol_value":0,"bicarbonate":0,"bicarbonate_100g":0,"bicarbonate_unit":"g","bicarbonate_value":0,"calcium":0,"calcium_100g":0,"calcium_unit":"g","calcium_value":0,"carbohydrates":0,"carbohydrates_100g":0,"carbohydrates_unit":"g","carbohydrates_value":0,"energy":0,"energy-kcal":0,"energy-kcal_100g":0,"energy-kcal_unit":"kcal","energy-kcal_value":0,"energy-kj":0,"energy-kj_100g":0,"energy-kj_unit":"kJ","energy-kj_value":0,"energy_100g":0,"energy_unit":"kJ","energy_value":0,"fat":0,"fat_100g":0,"fat_unit":"g","fat_value":0,"fiber":0,"fiber_100g":0,"fiber_unit":"g","fiber_value":0,"fruits-vegetables-legumes-estimate-from-ingredients_100g":0,"fruits-vegetables-nuts-estimate-from-ingredients_100g":0,"magnesium":0,"magnesium_100g":0,"magnesium_unit":"g","magnesium_value":0,"ph":0,"ph_100g":0,"ph_serving":0,"ph_unit":"","ph_value":0,"proteins":0,"proteins_100g":0,"proteins_unit":"g","proteins_value":0,"salt":0.00178,"salt_100g":0.00178,"salt_unit":"g","salt_value":0.00178,"saturated-fat":0,"saturated-fat_100g":0,"saturated-fat_unit":"g","saturated-fat_value":0,"sodium":0.000712,"sodium_100g":0.000712,"sodium_unit":"g","sodium_value":0.000712,"sugars":0,"sugars_100g":0,"sugars_unit":"g","sugars_value":0},"nutrition_data":"on","nutrition_data_per":"100g","nutrition_data_prepared_per":"100g","packaging":"Plastic","product_name":"Apa"},{"brands":"Coca-Cola","code":"5942321000060","countries_tags_en":["Romania"],"ingredients_text":"Water, sugar, carbon dioxide, colorant E 150d, phosphoric acid (acidulant), natural flavors, caffeine flavor. Best before: see on packaging.","nutriments":{"added-sugars":10.6,"added-sugars_100g":10.6,"added-sugars_modifier":"~","added-sugars_unit":"g","added-sugars_value":10.6,"carbohydrates":10.6,"carbohydrates_100g":10.6,"carbohydrates_unit":"g","carbohydrates_value":10.6,"energy":180,"energy-kcal":42,"energy-kcal_100g":42,"energy-kcal_unit":"kcal","energy-kcal_value":42,"energy-kj":180,"energy-kj_100g":180,"energy-kj_unit":"kJ","energy-kj_value":180,"energy_100g":180,"energy_unit":"kJ","energy_value":180,"fat":0,"fat_100g":0,"fat_unit":"g","fat_value":0,"fiber":0,"fiber_100g":0,"fiber_unit":"g","fiber_value":0,"fruits-vegetables-legumes-estimate-from-ingredients_100g":0,"fruits-vegetables-nuts-estimate-from-ingredients_100g":0,"nova-group":4,"nova-group_100g":4,"nova-group_serving":4,"nova-group_unit":"","nova-group_value":4,"proteins":0,"proteins_100g":0,"proteins_unit":"g","proteins_value":0,"salt":0,"salt_100g":0,"salt_unit":"g","salt_value":0,"saturated-fat":0,"saturated-fat_100g":0,"saturated-fat_unit":"g","saturated-fat_value":0,"sodium":0,"sodium_100g":0,"sodium_unit":"g","sodium_value":0,"sugars":10.6,"sugars_100g":10.6,"sugars_unit":"g","sugars_value":10.6},"nutrition_data":"on","nutrition_data_per":"100ml","nutrition_data_prepared_per":"100g","product_name":"Coca-Cola Gust Original"},{"brands":"Milbona","code":"4056489143833","countries_tags_en":["Bulgaria","Romania"],"ingredients_text":"99,5% сирене (пастьоризирано краве мляко, сметана, млечнокисели култури, сирищни ензими с микробиален произход), трапезна сол.","nutriments":{"added-sugars":0,"added-sugars_100g":0,"added-sugars_modifier":"~","added-sugars_serving":0,"added-sugars_unit":"g","added-sugars_value":0,"carbohydrates":2.8,"carbohydrates_100g":2.8,"carbohydrates_serving":2.8,"carbohydrates_unit":"g","carbohydrates_value":2.8,"energy":1005.7,"energy-kcal":243,"energy-kcal_100g":243,"energy-kcal_serving":243,"energy-kcal_unit":"kcal","energy-kcal_value":243,"energy-kj":1005.7,"energy-kj_100g":1005.7,"energy-kj_modifier":"~","energy-kj_serving":1010,"energy-kj_unit":"kJ","energy-kj_value":1005.7,"energy_100g":1005.7,"energy_modifier":"~","energy_serving":1010,"energy_unit":"kJ","energy_value":1005.7,"fat":23,"fat_100g":23,"fat_serving":23,"fat_unit":"g","fat_value":23,"fiber":0,"fiber_100g":0,"fiber_serving":0,"fiber_unit":"g","fiber_value":0,"fruits-vegetables-legumes-estimate-from-ingredients_100g":0,"fruits-vegetables-nuts-estimate-from-ingredients_100g":0,"nova-group":3,"nova-group_100g":3,"nova-group_serving":3,"nova-group_unit":"","nova-group_value":3,"proteins":6.3,"proteins_100g":6.3,"proteins_serving":6.3,"proteins_unit":"g","proteins_value":6.3,"salt":0.64,"salt_100g":0.64,"salt_modifier":"~","salt_serving":0.64,"salt_unit":"g","salt_value":0.64,"saturated-fat":16.1,"saturated-fat_100g":16.1,"saturated-fat_serving":16.1,"saturated-fat_unit":"g","saturated-fat_value":16.1,"sodium":0.256,"sodium_100g":0.256,"sodium_serving":0.256,"sodium_unit":"g","sodium_value":0.256,"sugars":2.7,"sugars_100g":2.7,"sugars_serving":2.7,"sugars_unit":"g","sugars_value":2.7},"nutriments_estimated":{"alcohol_100g":0,"alpha-linolenic-acid_100g":0.129168,"arachidonic-acid_100g":0.0208656,"beta-carotene_100g":0.0000775008,"butyric-acid_100g":0.89424,"calcium_100g":0.62207872,"capric-acid_100g":0.854496,"caproic-acid_100g":0.59616,"caprylic-acid_100g":0.407376,"chloride_100g":1.198904,"cholesterol_100g":0.08922528,"copper_100g":0.000130128,"crude-ash_100g":3.828816,"docosahexaenoic-acid_100g":0.0059616,"eicosapentaenoic-acid_100g":0.00784944,"fructose_100g":0.0705456,"galactose_100g":0.0715392,"glucose_100g":0.0705456,"iodine_100g":0.00003485616,"iron_100g":0.000270128,"lactose_100g":0.317952,"lauric-acid_100g":0.914112,"linoleic-acid_100g":0.407376,"magnesium_100g":0.02903328,"maltose_100g":0.0715392,"manganese_100g":0.0000285888,"monounsaturated-fat_100g":6.368976,"myristic-acid_100g":3,"oleic-acid_100g":4.987872,"palmitic-acid_100g":7.928928,"pantothenic-acid_100g":0.000506736,"phosphorus_100g":0.4511456,"phylloquinone_100g":1.718928e-6,"polyols_100g":0,"polyunsaturated-fat_100g":0.79488,"potassium_100g":0.12132736,"selenium_100g":7.7036e-6,"starch_100g":0.007452,"stearic-acid_100g":2.503872,"sucrose_100g":0.07452,"vitamin-a_100g":0.0002245536,"vitamin-b12_100g":1.351296e-6,"vitamin-b1_100g":0.000034776,"vitamin-b2_100g":0.000407376,"vitamin-b6_100g":0.000109296,"vitamin-b9_100g":0.00003417984,"vitamin-c_100g":0.0000566352,"vitamin-d_100g":2.88144e-7,"vitamin-e_100g":0.00054648,"vitamin-pp_100g":0.0009936,"water_100g":45.9044928,"zinc_100g":0.0028521952},"nutrition_data":"on","nutrition_data_prepared_per":"100g","product_name":"Крема сирене"},{"brands":"Coca-Cola","code":"59492573","countries_tags_en":["Romania"],"ingredients_text":"Apă, zahăr, dioxid de carbon, colorant E 150d, acidifiant acid fosforic, arome naturale, aromă cafeină.","nutriments":{"added-sugars":10.6,"added-sugars_100g":10.6,"added-sugars_modifier":"~","added-sugars_unit":"g","added-sugars_value":10.6,"alcohol":0,"alcohol_100g":0,"alcohol_serving":0,"alcohol_unit":"% vol","alcohol_value":0,"carbohydrates":10.6,"carbohydrates_100g":10.6,"carbohydrates_unit":"g","carbohydrates_value":10.6,"energy":180,"energy-kcal":42,"energy-kcal_100g":42,"energy-kcal_unit":"kcal","energy-kcal_value":42,"energy-kj":180,"energy-kj_100g":180,"energy-kj_unit":"kJ","energy-kj_value":180,"energy_100g":180,"energy_unit":"kJ","energy_value":180,"fat":0,"fat_100g":0,"fat_unit":"g","fat_value":0,"fiber":0,"fiber_100g":0,"fiber_unit":"g","fiber_value":0,"fruits-vegetables-legumes-estimate-from-ingredients_100g":0,"fruits-vegetables-nuts-estimate-from-ingredients_100g":0,"nova-group":4,"nova-group_100g":4,"nova-group_serving":4,"nova-group_unit":"","nova-group_value":4,"proteins":0,"proteins_100g":0,"proteins_unit":"g","proteins_value":0,"salt":0,"salt_100g":0,"salt_unit":"g","salt_value":0,"saturated-fat":0,"saturated-fat_100g":0,"saturated-fat_unit":"g","saturated-fat_value":0,"sodium":0,"sodium_100g":0,"sodium_unit":"g","sodium_value":0,"sugars":10.6,"sugars_100g":10.6,"sugars_unit":"g","sugars_value":10.6},"nutrition_data":"on","nutrition_data_per":"100ml","nutrition_data_prepared_per":"100g","product_name":"Coca-Cola Original 0.5"},{"brands":"Pilos","code":"20790981","countries_tags_en":["Romania"],"ingredients_text":"pasteurized cow's milk, cream, milk proteins, lactic cultures,","nutriments":{"added-sugars":0,"added-sugars_100g":0,"added-sugars_serving":0,"added-sugars_unit":"g","added-sugars_value":0,"caffeine":0,"caffeine_100g":0,"caffeine_serving":0,"caffeine_unit":"g","caffeine_value":0,"carbohydrates":4.5,"carbohydrates_100g":4.5,"carbohydrates_serving":6.3,"carbohydrates_unit":"g","carbohydrates_value":4.5,"choline":0,"choline_100g":0,"choline_serving":0,"choline_unit":"g","choline_value":0,"copper":0,"copper_100g":0,"copper_serving":0,"copper_unit":"g","copper_value":0,"energy":509,"energy-kcal":123,"energy-kcal_100g":123,"energy-kcal_serving":172,"energy-kcal_unit":"kcal","energy-kcal_value":123,"energy-kj":509,"energy-kj_100g":509,"energy-kj_serving":713,"energy-kj_unit":"kJ","energy-kj_value":509,"energy_100g":509,"energy_serving":713,"energy_unit":"kJ","energy_value":509,"fat":10,"fat_100g":10,"fat_serving":14,"fat_unit":"g","fat_value":10,"fruits-vegetables-legumes-estimate-from-ingredients_100g":0,"fruits-vegetables-nuts-estimate-from-ingredients_100g":0,"iron":0,"iron_100g":0,"iron_serving":0,"iron_unit":"g","iron_value":0,"magnesium":0,"magnesium_100g":0,"magnesium_serving":0,"magnesium_unit":"g","magnesium_value":0,"manganese":0,"manganese_100g":0,"manganese_serving":0,"manganese_unit":"g","manganese_value":0,"nova-group":4,"nova-group_100g":4,"nova-group_serving":4,"nova-group_unit":"","nova-group_value":4,"phosphorus":0,"phosphorus_100g":0,"phosphorus_serving":0,"phosphorus_unit":"g","phosphorus_value":0,"proteins":3.7,"proteins_100g":3.7,"proteins_serving":5.18,"proteins_unit":"g","proteins_value":3.7,"salt":0.1,"salt_100g":0.1,"salt_serving":0.14,"salt_unit":"g","salt_value":0.1,"saturated-fat":6.7,"saturated-fat_100g":6.7,"saturated-fat_serving":9.38,"saturated-fat_unit":"g","saturated-fat_value":6.7,"selenium":0,"selenium_100g":0,"selenium_serving":0,"selenium_unit":"g","selenium_value":0,"sodium":0.04,"sodium_100g":0.04,"sodium_serving":0.056,"sodium_unit":"g","sodium_value":0.04,"starch":0,"starch_100g":0,"starch_serving":0,"starch_unit":"g","starch_value":0,"sugars":4.5,"sugars_100g":4.5,"sugars_serving":6.3,"sugars_unit":"g","sugars_value":4.5,"vitamin-a":0,"vitamin-a_100g":0,"vitamin-a_serving":0,"vitamin-a_unit":"g","vitamin-a_value":0,"vitamin-c":0,"vitamin-c_100g":0,"vitamin-c_serving":0,"vitamin-c_unit":"g","vitamin-c_value":0,"vitamin-e":0,"vitamin-e_100g":0,"vitamin-e_serving":0,"vitamin-e_unit":"g","vitamin-e_value":0,"vitamin-k":0,"vitamin-k_100g":0,"vitamin-k_serving":0,"vitamin-k_unit":"g","vitamin-k_value":0,"zinc":0,"zinc_100g":0,"zinc_serving":0,"zinc_unit":"g","zinc_value":0},"nutrition_data":"on","nutrition_data_per":"100g","nutrition_data_prepared_per":"100g","packaging":"en:Pahar plastic","product_name":"IAURT CREMOS în stil GRECESC"},{"code":"5942326402272","countries_tags_en":["Romania"],"ingredients_text":"Calcium (Ca++), Magnesium (Mg++), Sodium (Na+), Bicarbonates (HCO3-)","nutriments":{"added-sugars":0,"added-sugars_100g":0,"added-sugars_modifier":"~","added-sugars_unit":"g","added-sugars_value":0,"carbohydrates":0,"carbohydrates_100g":0,"carbohydrates_unit":"g","carbohydrates_value":0,"energy":0,"energy-kcal":0,"energy-kcal_100g":0,"energy-kcal_modifier":"~","energy-kcal_unit":"kcal","energy-kcal_value":0,"energy-kj":0,"energy-kj_100g":0,"energy-kj_unit":"kJ","energy-kj_value":0,"energy_100g":0,"energy_unit":"kJ","energy_value":0,"fat":0,"fat_100g":0,"fat_unit":"g","fat_value":0,"fiber":0,"fiber_100g":0,"fiber_unit":"g","fiber_value":0,"fruits-vegetables-legumes-estimate-from-ingredients_100g":0,"fruits-vegetables-nuts-estimate-from-ingredients_100g":0,"nova-group":1,"nova-group_100g":1,"nova-group_serving":1,"nova-group_unit":"","nova-group_value":1,"proteins":0,"proteins_100g":0,"proteins_unit":"g","proteins_value":0,"salt":0.007,"salt_100g":0.007,"salt_unit":"g","salt_value":0.007,"saturated-fat":0,"saturated-fat_100g":0,"saturated-fat_unit":"g","saturated-fat_value":0,"sodium":0.0028,"sodium_100g":0.0028,"sodium_unit":"g","sodium_value":0.0028,"sugars":0,"sugars_100g":0,"sugars_unit":"g","sugars_value":0},"nutrition_data":"on","nutrition_data_per":"100ml","nutrition_data_prepared_per":"100g","product_name":"AQUA CARPATICA"},{"brands":"Phoenix","code":"5941868200087","countries_tags_en":["Austria","Germany","Romania","Switzerland"],"ingredients_text":"eri/ din care 1,8g 0,5g zaharuri toho cüod tega siedkorj dont sucres, g ballaststoffe/ fibres/ f fibral fibre/ viknina/ prehransk 0,69 9g fibres alimentaires, g elweiß/ proteins/ protein/teherjal profeiner bilkoviny/ beljakovine/ protéines, g 8,10 1,8g sala/ salt/ tuz/ só/ sale/ savez en 0,75 0220 referenzmenge für einen durchschnittliches erwachsenen (k packung enthalt ca, 3 portionen/ reference intake of an average ad 2000kcal) the package contains ca 3 portions,/  re - referans emme-c yetişkinin vték egy átlagos felba) paket ca, 3 por referencia 3 adagot tartalmaz,/ ar assunzioni di riferimento di un adulto med kcal), il pacchetto contiene ca, 3 porzione,/ cr - consumul de referinta obisnuit (84000kcal), pauletul conun ona, 3 port refere při uu promereplé osoby (8 400 kj/ 000 kcal),lentsahu pv priporočeni vnosi za povprečno odraslo osebo (840000 kc vsebuje ca,  3 porcije, 1 porcija 30 g/ ara de référence pour v (8400 kj/2000 kcal), le paquet contient ca, portions,1 portion , 30 g, 51941868 200087 05 pp","nutriments":{"added-sugars":0,"added-sugars_100g":0,"added-sugars_modifier":"~","added-sugars_serving":0,"added-sugars_unit":"g","added-sugars_value":0,"carbohydrates":67,"carbohydrates_100g":67,"carbohydrates_serving":67,"carbohydrates_unit":"g","carbohydrates_value":67,"energy":1999.4,"energy-kcal":426.666666666667,"energy-kcal_100g":426.666666666667,"energy-kcal_serving":427,"energy-kcal_unit":"kcal","energy-kcal_value":426.666666666667,"energy-kj":1999.4,"energy-kj_100g":1999.4,"energy-kj_modifier":"~","energy-kj_serving":2000,"energy-kj_unit":"kJ","energy-kj_value":1999.4,"energy_100g":1999.4,"energy_modifier":"~","energy_serving":2000,"energy_unit":"kJ","energy_value":1999.4,"fat":20,"fat_100g":20,"fat_serving":20,"fat_unit":"g","fat_value":20,"fiber":2.3,"fiber_100g":2.3,"fiber_serving":2.3,"fiber_unit":"g","fiber_value":2.3,"fruits-vegetables-legumes-estimate-from-ingredients_100g":0,"fruits-vegetables-nuts-estimate-from-ingredients_100g":0,"proteins":6,"proteins_100g":6,"proteins_serving":6,"proteins_unit":"g","proteins_value":6,"salt":0.6,"salt_100g":0.6,"salt_serving":0.6,"salt_unit":"g","salt_value":0.6,"saturated-fat":4.5,"saturated-fat_100g":4.5,"saturated-fat_serving":4.5,"saturated-fat_unit":"g","saturated-fat_value":4.5,"sodium":0.24,"sodium_100g":0.24,"sodium_serving":0.24,"sodium_unit":"g","sodium_value":0.24,"sugars":1,"sugars_100g":1,"sugars_serving":1,"sugars_unit":"g","sugars_value":1},"nutrition_data":"on","nutrition_data_prepared_per":"100g","packaging":"en:Punga plastic, Produkt, Stück","product_name":"pufuleti"}],"skip":0},"raw_text":null,"products":[{"brands":"Borsec","code":"5942219115845","countries_tags_en":["Romania"],"ingredients_text":"apa","nutriments":{"added-sugars":0,"added-sugars_100g":0,"added-sugars_modifier":"~","added-sugars_unit":"g","added-sugars_value":0,"carbohydrates":0,"carbohydrates_100g":0,"carbohydrates_unit":"g","carbohydrates_value":0,"energy":0,"energy-kcal":0,"energy-kcal_100g":0,"energy-kcal_unit":"kcal","energy-kcal_value":0,"energy-kj":0,"energy-kj_100g":0,"energy-kj_unit":"kJ","energy-kj_value":0,"energy_100g":0,"energy_unit":"kJ","energy_value":0,"fat":0,"fat_100g":0,"fat_unit":"g","fat_value":0,"fiber":0,"fiber_100g":0,"fiber_unit":"g","fiber_value":0,"fruits-vegetables-legumes-estimate-from-ingredients_100g":0,"fruits-vegetables-nuts-estimate-from-ingredients_100g":0,"magnesium":0.109,"magnesium_100g":0.109,"magnesium_unit":"g","magnesium_value":0.109,"nova-group":1,"nova-group_100g":1,"nova-group_serving":1,"nova-group_unit":"","nova-group_value":1,"proteins":0,"proteins_100g":0,"proteins_unit":"g","proteins_value":0,"salt":0,"salt_100g":0,"salt_unit":"g","salt_value":0,"saturated-fat":0,"saturated-fat_100g":0,"saturated-fat_unit":"g","saturated-fat_value":0,"sodium":0,"sodium_100g":0,"sodium_unit":"g","sodium_value":0,"sugars":0,"sugars_100g":0,"sugars_unit":"g","sugars_value":0},"nutriments_estimated":{"alcohol_100g":0,"alpha-linolenic-acid_100g":0,"arachidonic-acid_100g":0,"beta-carotene_100g":0,"butyric-acid_100g":0,"calcium_100g":0.00713,"capric-acid_100g":0,"caproic-acid_100g":0,"caprylic-acid_100g":0,"cholesterol_100g":0,"copper_100g":0.000017,"crude-ash_100g":0.1,"docosahexaenoic-acid_100g":0,"eicosapentaenoic-acid_100g":0,"fructose_100g":0,"galactose_100g":0,"glucose_100g":0,"iodine_100g":0,"iron_100g":0.00003,"lactose_100g":0,"lauric-acid_100g":0,"linoleic-acid_100g":0,"maltose_100g":0,"manganese_100g":8.2e-7,"monounsaturated-fat_100g":0,"myristic-acid_100g":0,"oleic-acid_100g":0,"palmitic-acid_100g":0,"pantothenic-acid_100g":0,"phosphorus_100g":0,"phylloquinone_100g":0,"polyols_100g":0,"polyunsaturated-fat_100g":0,"potassium_100g":0.00073,"selenium_100g":5e-7,"starch_100g":0,"stearic-acid_100g":0,"sucrose_100g":0,"vitamin-a_100g":0,"vitamin-b12_100g":0,"vitamin-b1_100g":0,"vitamin-b2_100g":0,"vitamin-b6_100g":0,"vitamin-b9_100g":0,"vitamin-c_100g":0,"vitamin-d_100g":0,"vitamin-e_100g":0,"vitamin-pp_100g":0,"water_100g":100,"zinc_100g":0.000011},"nutrition_data":"on","nutrition_data_per":"100ml","nutrition_data_prepared_per":"100g","product_name":"Apă minerală naturală, natural carbogazoasă"},{"brands":"Tomi","code":"5941486000434","countries_tags_en":["Romania"],"ingredients_text":"tomato purée (63%), sugar, water, vinegar, wine, modified starch corn, salt, acidifier (citric acid), spices, preservatives (potassium sorbate, sodium benzoate), flavor of the tomatoes","nutriments":{"added-sugars":14.93,"added-sugars_100g":14.93,"added-sugars_modifier":"~","added-sugars_serving":14.9,"added-sugars_unit":"g","added-sugars_value":14.93,"carbohydrates":21,"carbohydrates_100g":21,"carbohydrates_serving":21,"carbohydrates_unit":"g","carbohydrates_value":21,"energy":374,"energy-kcal":88,"energy-kcal_100g":88,"energy-kcal_serving":88,"energy-kcal_unit":"kcal","energy-kcal_value":88,"energy-kj":374,"energy-kj_100g":374,"energy-kj_serving":374,"energy-kj_unit":"kJ","energy-kj_value":374,"energy_100g":374,"energy_serving":374,"energy_unit":"kJ","energy_value":374,"fat":0,"fat_100g":0,"fat_serving":0,"fat_unit":"g","fat_value":0,"fruits-vegetables-legumes-estimate-from-ingredients_100g":63,"fruits-vegetables-nuts-estimate-from-ingredients_100g":63,"nova-group":4,"nova-group_100g":4,"nova-group_serving":4,"nova-group_unit":"","nova-group_value":4,"proteins":1,"proteins_100g":1,"proteins_serving":1,"proteins_unit":"g","proteins_value":1,"salt":2.2,"salt_100g":2.2,"salt_serving":2.2,"salt_unit":"g","salt_value":2.2,"saturated-fat":0,"saturated-fat_100g":0,"saturated-fat_serving":0,"saturated-fat_unit":"g","saturated-fat_value":0,"sodium":0.88,"sodium_100g":0.88,"sodium_serving":0.88,"sodium_unit":"g","sodium_value":0.88,"sugars":17,"sugars_100g":17,"sugars_serving":17,"sugars_unit":"g","sugars_value":17},"nutriments_estimated":{"alcohol_100g":1.5876,"alpha-linolenic-acid_100g":0.0222286,"arachidonic-acid_100g":0.00006076,"beta-carotene_100g":0.0001378766,"butyric-acid_100g":0.00630208,"calcium_100g":0.020362281,"capric-acid_100g":0.0066592,"caproic-acid_100g":0.00631324,"caprylic-acid_100g":0.00630456,"chloride_100g":1.20287668,"cholesterol_100g":0,"copper_100g":0.00011438675,"crude-ash_100g":2.8340352,"docosahexaenoic-acid_100g":0.00629836,"eicosapentaenoic-acid_100g":0.00004836,"fiber_100g":1.90442,"fructose_100g":1.0698776,"galactose_100g":0.00186,"glucose_100g":1.17104,"iodine_100g":0.00003283069,"iron_100g":0.0006652881,"lactose_100g":0.00084,"lauric-acid_100g":0.00873,"linoleic-acid_100g":0.17446,"magnesium_100g":0.023383257,"maltose_100g":0.096168,"manganese_100g":0.000281442526,"monounsaturated-fat_100g":0.065137,"myristic-acid_100g":0.03544376,"oleic-acid_100g":0.062389,"palmitic-acid_100g":0.070968,"pantothenic-acid_100g":0.000188278,"phosphorus_100g":0.0333155,"phylloquinone_100g":4.39969e-6,"polyols_100g":0.006875,"polyunsaturated-fat_100g":0.16979,"potassium_100g":0.525154614,"selenium_100g":1.383884e-6,"starch_100g":1.31834,"stearic-acid_100g":0.0141666,"sucrose_100g":14.9856732,"vitamin-a_100g":0,"vitamin-b12_100g":0,"vitamin-b1_100g":0.00007108,"vitamin-b2_100g":0.0000372323,"vitamin-b6_100g":0.0001245128,"vitamin-b9_100g":0.00004730648,"vitamin-c_100g":0.005665764,"vitamin-d_100g":1.1904e-9,"vitamin-e_100g":0.001503136,"vitamin-pp_100g":0.0008608,"water_100g":65.9048986,"zinc_100g":0.0001806452},"nutrition_data":"on","nutrition_data_prepared_per":"100g","packaging":"5 PP","product_name":"Tomi Ketchup Dulce"},{"brands":"Borsec","code":"5942219115890","countries_tags_en":["Romania"],"ingredients_text":"borsec queen of mineral waters still natural mineral water chemical composition mg/l hydrogen carbonate (hco3) 292 calcium (ca) 54,6 magnesium (mg) 27,9 sodium (na) 2,13 dry residue at 180°c 304 ph 7,48 woa assty sterreica farz joseph koenig von bookmer etc, apost koeng you gar awarded in 1873 at the vienna international fair with the db gold medal and the title queen of mineral waters redrom a quality product ron no group borsec after wessling analysis romania srl, 2301309/1/01,02,2023 best before: see on packaging,","nutriments":{"added-sugars":0,"added-sugars_100g":0,"added-sugars_modifier":"~","added-sugars_unit":"g","added-sugars_value":0,"fruits-vegetables-legumes-estimate-from-ingredients_100g":0,"fruits-vegetables-nuts-estimate-from-ingredients_100g":0},"nutrition_data":"on","nutrition_data_per":"100g","nutrition_data_prepared_per":"100g","product_name":"Apă minerală naturală plată"},{"brands":"Aqua Carpatica","code":"59493518","countries_tags_en":["France","Romania"],"ingredients_text":"Apă Plată\nCalciu 46,60 mg\nMagneziu 15,10 mg\nSodiu 0,70 mg\nBicarbonați 232,30 mg\npH 8,10","nutriments":{"added-sugars":0,"added-sugars_100g":0,"added-sugars_modifier":"~","added-sugars_unit":"g","added-sugars_value":0,"alcohol":0,"alcohol_100g":0,"alcohol_serving":0,"alcohol_unit":"% vol","alcohol_value":0,"bicarbonate":0,"bicarbonate_100g":0,"bicarbonate_unit":"g","bicarbonate_value":0,"calcium":0,"calcium_100g":0,"calcium_unit":"g","calcium_value":0,"carbohydrates":0,"carbohydrates_100g":0,"carbohydrates_unit":"g","carbohydrates_value":0,"energy":0,"energy-kcal":0,"energy-kcal_100g":0,"energy-kcal_unit":"kcal","energy-kcal_value":0,"energy-kj":0,"energy-kj_100g":0,"energy-kj_unit":"kJ","energy-kj_value":0,"energy_100g":0,"energy_unit":"kJ","energy_value":0,"fat":0,"fat_100g":0,"fat_unit":"g","fat_value":0,"fiber":0,"fiber_100g":0,"fiber_unit":"g","fiber_value":0,"fruits-vegetables-legumes-estimate-from-ingredients_100g":0,"fruits-vegetables-nuts-estimate-from-ingredients_100g":0,"magnesium":0,"magnesium_100g":0,"magnesium_unit":"g","magnesium_value":0,"ph":0,"ph_100g":0,"ph_serving":0,"ph_unit":"","ph_value":0,"proteins":0,"proteins_100g":0,"proteins_unit":"g","proteins_value":0,"salt":0.00178,"salt_100g":0.00178,"salt_unit":"g","salt_value":0.00178,"saturated-fat":0,"saturated-fat_100g":0,"saturated-fat_unit":"g","saturated-fat_value":0,"sodium":0.000712,"sodium_100g":0.000712,"sodium_unit":"g","sodium_value":0.000712,"sugars":0,"sugars_100g":0,"sugars_unit":"g","sugars_value":0},"nutrition_data":"on","nutrition_data_per":"100g","nutrition_data_prepared_per":"100g","packaging":"Plastic","product_name":"Apa"},{"brands":"Coca-Cola","code":"5942321000060","countries_tags_en":["Romania"],"ingredients_text":"Water, sugar, carbon dioxide, colorant E 150d, phosphoric acid (acidulant), natural flavors, caffeine flavor. Best before: see on packaging.","nutriments":{"added-sugars":10.6,"added-sugars_100g":10.6,"added-sugars_modifier":"~","added-sugars_unit":"g","added-sugars_value":10.6,"carbohydrates":10.6,"carbohydrates_100g":10.6,"carbohydrates_unit":"g","carbohydrates_value":10.6,"energy":180,"energy-kcal":42,"energy-kcal_100g":42,"energy-kcal_unit":"kcal","energy-kcal_value":42,"energy-kj":180,"energy-kj_100g":180,"energy-kj_unit":"kJ","energy-kj_value":180,"energy_100g":180,"energy_unit":"kJ","energy_value":180,"fat":0,"fat_100g":0,"fat_unit":"g","fat_value":0,"fiber":0,"fiber_100g":0,"fiber_unit":"g","fiber_value":0,"fruits-vegetables-legumes-estimate-from-ingredients_100g":0,"fruits-vegetables-nuts-estimate-from-ingredients_100g":0,"nova-group":4,"nova-group_100g":4,"nova-group_serving":4,"nova-group_unit":"","nova-group_value":4,"proteins":0,"proteins_100g":0,"proteins_unit":"g","proteins_value":0,"salt":0,"salt_100g":0,"salt_unit":"g","salt_value":0,"saturated-fat":0,"saturated-fat_100g":0,"saturated-fat_unit":"g","saturated-fat_value":0,"sodium":0,"sodium_100g":0,"sodium_unit":"g","sodium_value":0,"sugars":10.6,"sugars_100g":10.6,"sugars_unit":"g","sugars_value":10.6},"nutrition_data":"on","nutrition_data_per":"100ml","nutrition_data_prepared_per":"100g","product_name":"Coca-Cola Gust Original"},{"brands":"Milbona","code":"4056489143833","countries_tags_en":["Bulgaria","Romania"],"ingredients_text":"99,5% сирене (пастьоризирано краве мляко, сметана, млечнокисели култури, сирищни ензими с микробиален произход), трапезна сол.","nutriments":{"added-sugars":0,"added-sugars_100g":0,"added-sugars_modifier":"~","added-sugars_serving":0,"added-sugars_unit":"g","added-sugars_value":0,"carbohydrates":2.8,"carbohydrates_100g":2.8,"carbohydrates_serving":2.8,"carbohydrates_unit":"g","carbohydrates_value":2.8,"energy":1005.7,"energy-kcal":243,"energy-kcal_100g":243,"energy-kcal_serving":243,"energy-kcal_unit":"kcal","energy-kcal_value":243,"energy-kj":1005.7,"energy-kj_100g":1005.7,"energy-kj_modifier":"~","energy-kj_serving":1010,"energy-kj_unit":"kJ","energy-kj_value":1005.7,"energy_100g":1005.7,"energy_modifier":"~","energy_serving":1010,"energy_unit":"kJ","energy_value":1005.7,"fat":23,"fat_100g":23,"fat_serving":23,"fat_unit":"g","fat_value":23,"fiber":0,"fiber_100g":0,"fiber_serving":0,"fiber_unit":"g","fiber_value":0,"fruits-vegetables-legumes-estimate-from-ingredients_100g":0,"fruits-vegetables-nuts-estimate-from-ingredients_100g":0,"nova-group":3,"nova-group_100g":3,"nova-group_serving":3,"nova-group_unit":"","nova-group_value":3,"proteins":6.3,"proteins_100g":6.3,"proteins_serving":6.3,"proteins_unit":"g","proteins_value":6.3,"salt":0.64,"salt_100g":0.64,"salt_modifier":"~","salt_serving":0.64,"salt_unit":"g","salt_value":0.64,"saturated-fat":16.1,"saturated-fat_100g":16.1,"saturated-fat_serving":16.1,"saturated-fat_unit":"g","saturated-fat_value":16.1,"sodium":0.256,"sodium_100g":0.256,"sodium_serving":0.256,"sodium_unit":"g","sodium_value":0.256,"sugars":2.7,"sugars_100g":2.7,"sugars_serving":2.7,"sugars_unit":"g","sugars_value":2.7},"nutriments_estimated":{"alcohol_100g":0,"alpha-linolenic-acid_100g":0.129168,"arachidonic-acid_100g":0.0208656,"beta-carotene_100g":0.0000775008,"butyric-acid_100g":0.89424,"calcium_100g":0.62207872,"capric-acid_100g":0.854496,"caproic-acid_100g":0.59616,"caprylic-acid_100g":0.407376,"chloride_100g":1.198904,"cholesterol_100g":0.08922528,"copper_100g":0.000130128,"crude-ash_100g":3.828816,"docosahexaenoic-acid_100g":0.0059616,"eicosapentaenoic-acid_100g":0.00784944,"fructose_100g":0.0705456,"galactose_100g":0.0715392,"glucose_100g":0.0705456,"iodine_100g":0.00003485616,"iron_100g":0.000270128,"lactose_100g":0.317952,"lauric-acid_100g":0.914112,"linoleic-acid_100g":0.407376,"magnesium_100g":0.02903328,"maltose_100g":0.0715392,"manganese_100g":0.0000285888,"monounsaturated-fat_100g":6.368976,"myristic-acid_100g":3,"oleic-acid_100g":4.987872,"palmitic-acid_100g":7.928928,"pantothenic-acid_100g":0.000506736,"phosphorus_100g":0.4511456,"phylloquinone_100g":1.718928e-6,"polyols_100g":0,"polyunsaturated-fat_100g":0.79488,"potassium_100g":0.12132736,"selenium_100g":7.7036e-6,"starch_100g":0.007452,"stearic-acid_100g":2.503872,"sucrose_100g":0.07452,"vitamin-a_100g":0.0002245536,"vitamin-b12_100g":1.351296e-6,"vitamin-b1_100g":0.000034776,"vitamin-b2_100g":0.000407376,"vitamin-b6_100g":0.000109296,"vitamin-b9_100g":0.00003417984,"vitamin-c_100g":0.0000566352,"vitamin-d_100g":2.88144e-7,"vitamin-e_100g":0.00054648,"vitamin-pp_100g":0.0009936,"water_100g":45.9044928,"zinc_100g":0.0028521952},"nutrition_data":"on","nutrition_data_prepared_per":"100g","product_name":"Крема сирене"},{"brands":"Coca-Cola","code":"59492573","countries_tags_en":["Romania"],"ingredients_text":"Apă, zahăr, dioxid de carbon, colorant E 150d, acidifiant acid fosforic, arome naturale, aromă cafeină.","nutriments":{"added-sugars":10.6,"added-sugars_100g":10.6,"added-sugars_modifier":"~","added-sugars_unit":"g","added-sugars_value":10.6,"alcohol":0,"alcohol_100g":0,"alcohol_serving":0,"alcohol_unit":"% vol","alcohol_value":0,"carbohydrates":10.6,"carbohydrates_100g":10.6,"carbohydrates_unit":"g","carbohydrates_value":10.6,"energy":180,"energy-kcal":42,"energy-kcal_100g":42,"energy-kcal_unit":"kcal","energy-kcal_value":42,"energy-kj":180,"energy-kj_100g":180,"energy-kj_unit":"kJ","energy-kj_value":180,"energy_100g":180,"energy_unit":"kJ","energy_value":180,"fat":0,"fat_100g":0,"fat_unit":"g","fat_value":0,"fiber":0,"fiber_100g":0,"fiber_unit":"g","fiber_value":0,"fruits-vegetables-legumes-estimate-from-ingredients_100g":0,"fruits-vegetables-nuts-estimate-from-ingredients_100g":0,"nova-group":4,"nova-group_100g":4,"nova-group_serving":4,"nova-group_unit":"","nova-group_value":4,"proteins":0,"proteins_100g":0,"proteins_unit":"g","proteins_value":0,"salt":0,"salt_100g":0,"salt_unit":"g","salt_value":0,"saturated-fat":0,"saturated-fat_100g":0,"saturated-fat_unit":"g","saturated-fat_value":0,"sodium":0,"sodium_100g":0,"sodium_unit":"g","sodium_value":0,"sugars":10.6,"sugars_100g":10.6,"sugars_unit":"g","sugars_value":10.6},"nutrition_data":"on","nutrition_data_per":"100ml","nutrition_data_prepared_per":"100g","product_name":"Coca-Cola Original 0.5"},{"brands":"Pilos","code":"20790981","countries_tags_en":["Romania"],"ingredients_text":"pasteurized cow's milk, cream, milk proteins, lactic cultures,","nutriments":{"added-sugars":0,"added-sugars_100g":0,"added-sugars_serving":0,"added-sugars_unit":"g","added-sugars_value":0,"caffeine":0,"caffeine_100g":0,"caffeine_serving":0,"caffeine_unit":"g","caffeine_value":0,"carbohydrates":4.5,"carbohydrates_100g":4.5,"carbohydrates_serving":6.3,"carbohydrates_unit":"g","carbohydrates_value":4.5,"choline":0,"choline_100g":0,"choline_serving":0,"choline_unit":"g","choline_value":0,"copper":0,"copper_100g":0,"copper_serving":0,"copper_unit":"g","copper_value":0,"energy":509,"energy-kcal":123,"energy-kcal_100g":123,"energy-kcal_serving":172,"energy-kcal_unit":"kcal","energy-kcal_value":123,"energy-kj":509,"energy-kj_100g":509,"energy-kj_serving":713,"energy-kj_unit":"kJ","energy-kj_value":509,"energy_100g":509,"energy_serving":713,"energy_unit":"kJ","energy_value":509,"fat":10,"fat_100g":10,"fat_serving":14,"fat_unit":"g","fat_value":10,"fruits-vegetables-legumes-estimate-from-ingredients_100g":0,"fruits-vegetables-nuts-estimate-from-ingredients_100g":0,"iron":0,"iron_100g":0,"iron_serving":0,"iron_unit":"g","iron_value":0,"magnesium":0,"magnesium_100g":0,"magnesium_serving":0,"magnesium_unit":"g","magnesium_value":0,"manganese":0,"manganese_100g":0,"manganese_serving":0,"manganese_unit":"g","manganese_value":0,"nova-group":4,"nova-group_100g":4,"nova-group_serving":4,"nova-group_unit":"","nova-group_value":4,"phosphorus":0,"phosphorus_100g":0,"phosphorus_serving":0,"phosphorus_unit":"g","phosphorus_value":0,"proteins":3.7,"proteins_100g":3.7,"proteins_serving":5.18,"proteins_unit":"g","proteins_value":3.7,"salt":0.1,"salt_100g":0.1,"salt_serving":0.14,"salt_unit":"g","salt_value":0.1,"saturated-fat":6.7,"saturated-fat_100g":6.7,"saturated-fat_serving":9.38,"saturated-fat_unit":"g","saturated-fat_value":6.7,"selenium":0,"selenium_100g":0,"selenium_serving":0,"selenium_unit":"g","selenium_value":0,"sodium":0.04,"sodium_100g":0.04,"sodium_serving":0.056,"sodium_unit":"g","sodium_value":0.04,"starch":0,"starch_100g":0,"starch_serving":0,"starch_unit":"g","starch_value":0,"sugars":4.5,"sugars_100g":4.5,"sugars_serving":6.3,"sugars_unit":"g","sugars_value":4.5,"vitamin-a":0,"vitamin-a_100g":0,"vitamin-a_serving":0,"vitamin-a_unit":"g","vitamin-a_value":0,"vitamin-c":0,"vitamin-c_100g":0,"vitamin-c_serving":0,"vitamin-c_unit":"g","vitamin-c_value":0,"vitamin-e":0,"vitamin-e_100g":0,"vitamin-e_serving":0,"vitamin-e_unit":"g","vitamin-e_value":0,"vitamin-k":0,"vitamin-k_100g":0,"vitamin-k_serving":0,"vitamin-k_unit":"g","vitamin-k_value":0,"zinc":0,"zinc_100g":0,"zinc_serving":0,"zinc_unit":"g","zinc_value":0},"nutrition_data":"on","nutrition_data_per":"100g","nutrition_data_prepared_per":"100g","packaging":"en:Pahar plastic","product_name":"IAURT CREMOS în stil GRECESC"},{"code":"5942326402272","countries_tags_en":["Romania"],"ingredients_text":"Calcium (Ca++), Magnesium (Mg++), Sodium (Na+), Bicarbonates (HCO3-)","nutriments":{"added-sugars":0,"added-sugars_100g":0,"added-sugars_modifier":"~","added-sugars_unit":"g","added-sugars_value":0,"carbohydrates":0,"carbohydrates_100g":0,"carbohydrates_unit":"g","carbohydrates_value":0,"energy":0,"energy-kcal":0,"energy-kcal_100g":0,"energy-kcal_modifier":"~","energy-kcal_unit":"kcal","energy-kcal_value":0,"energy-kj":0,"energy-kj_100g":0,"energy-kj_unit":"kJ","energy-kj_value":0,"energy_100g":0,"energy_unit":"kJ","energy_value":0,"fat":0,"fat_100g":0,"fat_unit":"g","fat_value":0,"fiber":0,"fiber_100g":0,"fiber_unit":"g","fiber_value":0,"fruits-vegetables-legumes-estimate-from-ingredients_100g":0,"fruits-vegetables-nuts-estimate-from-ingredients_100g":0,"nova-group":1,"nova-group_100g":1,"nova-group_serving":1,"nova-group_unit":"","nova-group_value":1,"proteins":0,"proteins_100g":0,"proteins_unit":"g","proteins_value":0,"salt":0.007,"salt_100g":0.007,"salt_unit":"g","salt_value":0.007,"saturated-fat":0,"saturated-fat_100g":0,"saturated-fat_unit":"g","saturated-fat_value":0,"sodium":0.0028,"sodium_100g":0.0028,"sodium_unit":"g","sodium_value":0.0028,"sugars":0,"sugars_100g":0,"sugars_unit":"g","sugars_value":0},"nutrition_data":"on","nutrition_data_per":"100ml","nutrition_data_prepared_per":"100g","product_name":"AQUA CARPATICA"},{"brands":"Phoenix","code":"5941868200087","countries_tags_en":["Austria","Germany","Romania","Switzerland"],"ingredients_text":"eri/ din care 1,8g 0,5g zaharuri toho cüod tega siedkorj dont sucres, g ballaststoffe/ fibres/ f fibral fibre/ viknina/ prehransk 0,69 9g fibres alimentaires, g elweiß/ proteins/ protein/teherjal profeiner bilkoviny/ beljakovine/ protéines, g 8,10 1,8g sala/ salt/ tuz/ só/ sale/ savez en 0,75 0220 referenzmenge für einen durchschnittliches erwachsenen (k packung enthalt ca, 3 portionen/ reference intake of an average ad 2000kcal) the package contains ca 3 portions,/  re - referans emme-c yetişkinin vték egy átlagos felba) paket ca, 3 por referencia 3 adagot tartalmaz,/ ar assunzioni di riferimento di un adulto med kcal), il pacchetto contiene ca, 3 porzione,/ cr - consumul de referinta obisnuit (84000kcal), pauletul conun ona, 3 port refere při uu promereplé osoby (8 400 kj/ 000 kcal),lentsahu pv priporočeni vnosi za povprečno odraslo osebo (840000 kc vsebuje ca,  3 porcije, 1 porcija 30 g/ ara de référence pour v (8400 kj/2000 kcal), le paquet contient ca, portions,1 portion , 30 g, 51941868 200087 05 pp","nutriments":{"added-sugars":0,"added-sugars_100g":0,"added-sugars_modifier":"~","added-sugars_serving":0,"added-sugars_unit":"g","added-sugars_value":0,"carbohydrates":67,"carbohydrates_100g":67,"carbohydrates_serving":67,"carbohydrates_unit":"g","carbohydrates_value":67,"energy":1999.4,"energy-kcal":426.666666666667,"energy-kcal_100g":426.666666666667,"energy-kcal_serving":427,"energy-kcal_unit":"kcal","energy-kcal_value":426.666666666667,"energy-kj":1999.4,"energy-kj_100g":1999.4,"energy-kj_modifier":"~","energy-kj_serving":2000,"energy-kj_unit":"kJ","energy-kj_value":1999.4,"energy_100g":1999.4,"energy_modifier":"~","energy_serving":2000,"energy_unit":"kJ","energy_value":1999.4,"fat":20,"fat_100g":20,"fat_serving":20,"fat_unit":"g","fat_value":20,"fiber":2.3,"fiber_100g":2.3,"fiber_serving":2.3,"fiber_unit":"g","fiber_value":2.3,"fruits-vegetables-legumes-estimate-from-ingredients_100g":0,"fruits-vegetables-nuts-estimate-from-ingredients_100g":0,"proteins":6,"proteins_100g":6,"proteins_serving":6,"proteins_unit":"g","proteins_value":6,"salt":0.6,"salt_100g":0.6,"salt_serving":0.6,"salt_unit":"g","salt_value":0.6,"saturated-fat":4.5,"saturated-fat_100g":4.5,"saturated-fat_serving":4.5,"saturated-fat_unit":"g","saturated-fat_value":4.5,"sodium":0.24,"sodium_100g":0.24,"sodium_serving":0.24,"sodium_unit":"g","sodium_value":0.24,"sugars":1,"sugars_100g":1,"sugars_serving":1,"sugars_unit":"g","sugars_value":1},"nutrition_data":"on","nutrition_data_prepared_per":"100g","packaging":"en:Punga plastic, Produkt, Stück","product_name":"pufuleti"}]},"fallback":{"source_name":"JinaSearch","request_url":"https://eu.s.jina.ai/Toothpaste","retrieved_at":"2026-09-23T18:14:10.719341+00:00","status_code":null,"no_result_reason":"transport: ConnectError: [Errno -2] Name or service not known","raw":null,"raw_text":null,"results":[]},"snapshots_recorded":true}
+HTTP_CODE=200
+curl_exit=0
+===== END PRESS =====
+
+################## G3 PRESS ROWS + POST STATE ##################
+===== PRESS ROWS + POST STATE 2026-09-23T18:14:23Z =====
+--- the Job row (enrich, asset 01a0a467...) ---
+             id = 01a0cf79-a429-7220-b466-534d6dca94ab
+   household_id = 01a0a029-1477-7ca0-b200-bce78a96c679
+       job_type = enrich
+          state = COMPLETED
+config_snapshot = {"asset_id": "01a0a467-eb0e-7b83-a227-af122dc9268b"}
+     created_at = 2026-09-23 18:14:10
+--- the Candidate row ---
+          id = 01a0cf79-a42a-7612-8f74-8e413dd8ee69
+      job_id = 01a0cf79-a429-7220-b466-534d6dca94ab
+       state = proposed
+household_id = 01a0a029-1477-7ca0-b200-bce78a96c679
+  created_at = 2026-09-23 18:14:10
+--- proposed_fields_json (web_alternates etc.) ---
+{"kind": "new_asset", "asset_id": null, "enrich_asset_id": "01a0a467-eb0e-7b83-a227-af122dc9268b", "fields": {"display_name": {"value": "Toothpaste", "source_type": "user"}, "asset_type": {"value": "unknown", "source_type": "user"}}, "dedup_matches": [], "review_task_ids": [], "web_sources": [], "web_alternates": []}
+--- the snapshot rows (LEFT in place) ---
+              id = 01a0cf79-a425-77c3-8769-e20d2cca1b08
+          source = off
+           query = Toothpaste
+     request_url = https://world.openfoodfacts.org/api/v2/search?search_terms=Toothpaste&brands_tags=&countries_tags_en=romania&page=1&page_size=10&fields=code%2Cproduct_name%2Cbrands%2Cingredients_text%2Cnutriments%2Cpackaging%2Ccountries_tags_en
+    retrieved_at = 2026-09-23T18:14:10.683775+00:00
+     status_code = 200
+no_result_reason = 
+         version = enrich-snapshot-v1
+      created_at = 2026-09-23 18:14:10
+
+              id = 01a0cf79-a427-7893-8c25-abdfee99b2bd
+          source = jina
+           query = Toothpaste
+     request_url = https://eu.s.jina.ai/Toothpaste
+    retrieved_at = 2026-09-23T18:14:10.719341+00:00
+     status_code = 
+no_result_reason = transport: ConnectError: [Errno -2] Name or service not known
+         version = enrich-snapshot-v1
+      created_at = 2026-09-23 18:14:10
+--- snapshot row count ---
+2
+--- post-press counts ---
+job|8
+candidate|7
+enrich_snapshot|2
+provider_call|17
+--- post-press DB bytes ---
+/home/andrei/StorageGenie/data/db/storagegenie.db 528384
+/home/andrei/StorageGenie/data/db/storagegenie.db-wal 90672
+/home/andrei/StorageGenie/data/db/storagegenie.db-shm 32768
+--- GET /v1/candidates/{candidate_id} shape live ---
+{"type":"about:blank","title":"Unprocessable Entity","status":422,"detail":"1 validation error:\n  {'type': 'missing', 'loc': ('query', 'household_id'), 'msg': 'Field required', 'input': None}\n\n  File \"/app/app/api/v1/candidates.py\", line 120, in get_candidate\n    GET /v1/candidates/{candidate_id}"}
+HTTP_CODE=422
+--- DNS characterization: eu.s.jina.ai vs s.jina.ai vs OFF ---
+[host getent eu.s.jina.ai]
+host: NXDOMAIN/empty
+[host getent s.jina.ai]
+2606:4700:20::ac43:4636 s.jina.ai
+2606:4700:20::681a:af2 s.jina.ai
+2606:4700:20::681a:bf2 s.jina.ai
+[container socket.gethostbyname]
+eu.s.jina.ai -> ERR gaierror [Errno -2] Name or service not known
+s.jina.ai -> 104.26.11.242
+world.openfoodfacts.org -> 151.115.132.10
+===== END PRESS ROWS =====
+
+################## G3 AFTER (post-press) ##################
+===== G3 AFTER (post-press) 2026-09-23T18:15:24Z =====
+--- full table counts ---
+alembic_version=1
+assertion=28
+asset=6
+asset_evidence=12
+asset_fts=6
+asset_fts_config=1
+asset_fts_data=8
+asset_fts_docsize=6
+asset_fts_idx=6
+audit_event=68
+candidate=7
+enrich_snapshot=2
+evidence=13
+guardrail_event=2
+household=1
+idempotency_key=9
+job=8
+job_step=56
+observation=16
+planning_suggestion=0
+provider_call=17
+review_task=6
+saved_search=0
+source_attribution=0
+user=2
+--- table count ---
+25
+--- DB bytes ---
+/home/andrei/StorageGenie/data/db/storagegenie.db 528384
+/home/andrei/StorageGenie/data/db/storagegenie.db-wal 90672
+/home/andrei/StorageGenie/data/db/storagegenie.db-shm 32768
+--- alembic current ---
+20260923_sg100_enrich_snapshot
+--- health exact ---
+{"status":"ok","db":"ok","storage":"ok"}
+--- gate ---
+http_code=301 redirect=https://storagegenie.dynv6.net/
+https_code=401
+--- bundle (post-press, unchanged by press) ---
+d68479443243f59d272265f8b3f8ba4002ec4c027a18b8f3c7ad2f9c79b56fd0  /app/static/assets/index-Cj3z97gk.js
+b18dbb336eef5c580bf0a2e6726d647c4f6c63edbc48373580d31e4508659ad3  /app/static/assets/index-CoNI-1Zn.css
+--- loopback-only preserved ---
+PortBindings={"8000/tcp":[{"HostIp":"127.0.0.1","HostPort":"8003"}]}
+===== END AFTER (post-press) =====
+
+################## G3 WAIVED-SWEEP SUBSTITUTE (in-container, new build) ##################
+===== WAIVED-SWEEP SUBSTITUTE: targeted enrich legs, in-process, NEW build 2026-09-23T18:14:48Z =====
+authority: this post-restart run inside the fresh container image a76f1455...
+..............................F........................F................ [ 66%]
+....................................                                     [100%]
+=================================== FAILURES ===================================
+_______________ test_missing_key_degrades_loudly_with_zero_sends _______________
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x772798e13c50>
+
+    def test_missing_key_degrades_loudly_with_zero_sends(monkeypatch: pytest.MonkeyPatch) -> None:
+        monkeypatch.delenv("JINA_API_KEY", raising=False)
+        http_client, seen = _scripted_client(_load("jina_hit.json"))
+        snapshot = jina_mod.fetch_jina_search(
+            Q_NAME, Q_BRAND, http_client=http_client, api_key=None
+        )
+>       assert seen == []
+E       AssertionError: assert [<Request('GE...=web&gl=ro')>] == []
+E         
+E         Left contains one more item: <Request('GET', 'https://eu.s.jina.ai/Jacobs+Jacobs+Cronat+Gold?site=mega-image.ro&site=emag.ro&site=farmaciatei.ro&num=5&type=web&gl=ro')>
+E         Use -v to get more diff
+
+tests/test_sg082_enrich_jina.py:166: AssertionError
+_____________ test_worked_example_artifact_matches_the_real_driver _____________
+
+    def test_worked_example_artifact_matches_the_real_driver() -> None:
+        """SG-097: the committed worked example IS the request the REAL driver builds.
+    
+        The expected URL/params are derived from the real module constants
+        (`PG-SC-12`), never a re-typed copy; the artifact is names-only (the key is
+        added at send time and never appears in the example).
+        """
+        example = jina_mod.build_jina_request("Jacobs Cronat Gold", "Jacobs")
+        expected_params = tuple(
+            [("site", site) for site in jina_mod.SITE_FILTERS]
+            + [
+                ("num", jina_mod.JINA_NUM),
+                ("type", jina_mod.JINA_TYPE),
+                ("gl", jina_mod.JINA_GL),
+            ]
+        )
+        assert example.params == expected_params
+        assert example.url == f"{jina_mod.JINA_EU_BASE_URL}Jacobs+Jacobs+Cronat+Gold"
+        full_request = example.url + "?" + urllib.parse.urlencode(example.params)
+>       artifact = WORKED_EXAMPLE.read_text(encoding="utf-8")
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_sg082_enrich_jina.py:583: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/local/lib/python3.12/pathlib.py:1027: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/docs/enrich-jina-request-example.md'), mode = 'r'
+buffering = -1, encoding = 'utf-8', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed to by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/docs/enrich-jina-request-example.md'
+
+/usr/local/lib/python3.12/pathlib.py:1013: FileNotFoundError
+=============================== warnings summary ===============================
+../usr/local/lib/python3.12/site-packages/fastapi/testclient.py:1
+  /usr/local/lib/python3.12/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+../usr/local/lib/python3.12/site-packages/starlette/testclient.py:53
+  /usr/local/lib/python3.12/site-packages/starlette/testclient.py:53: DeprecationWarning: The anyio.abc.BlockingPortal alias is deprecated, use anyio.from_thread.BlockingPortal instead.
+    _PortalFactoryType = Callable[[], AbstractContextManager[anyio.abc.BlockingPortal]]
+
+tests/test_sg100_snapshot_persistence.py::test_sg100_migration_upgrade_downgrade_upgrade
+tests/test_sg100_snapshot_persistence.py::test_sg100_migration_upgrade_downgrade_upgrade
+tests/test_sg100_snapshot_persistence.py::test_sg100_migration_upgrade_downgrade_upgrade
+  /usr/local/lib/python3.12/site-packages/alembic/config.py:604: DeprecationWarning: No path_separator found in configuration; falling back to legacy splitting on spaces, commas, and colons for prepend_sys_path.  Consider adding path_separator=os to Alembic config.
+    util.warn_deprecated(
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/test_sg082_enrich_jina.py::test_missing_key_degrades_loudly_with_zero_sends
+FAILED tests/test_sg082_enrich_jina.py::test_worked_example_artifact_matches_the_real_driver
+2 failed, 106 passed, 5 warnings in 3.63s
+pytest_exit=1
+===== END TESTS =====
+
+################## G3 CORROBORATION (host venv, committed tree) ##################
+===== CORROBORATION: same 8 enrich legs on host venv (committed tree) 2026-09-23T18:15:03Z =====
+........................................................................ [ 66%]
+....................................                                     [100%]
+=============================== warnings summary ===============================
+../venv/lib/python3.12/site-packages/fastapi/testclient.py:1
+  /home/andrei/StorageGenie/venv/lib/python3.12/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+tests/test_sg100_snapshot_persistence.py::test_sg100_migration_upgrade_downgrade_upgrade
+tests/test_sg100_snapshot_persistence.py::test_sg100_migration_upgrade_downgrade_upgrade
+tests/test_sg100_snapshot_persistence.py::test_sg100_migration_upgrade_downgrade_upgrade
+  /home/andrei/StorageGenie/venv/lib/python3.12/site-packages/alembic/config.py:604: DeprecationWarning: No path_separator found in configuration; falling back to legacy splitting on spaces, commas, and colons for prepend_sys_path.  Consider adding path_separator=os to Alembic config.
+    util.warn_deprecated(
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+108 passed, 4 warnings in 3.43s
+===== END HOST TESTS =====

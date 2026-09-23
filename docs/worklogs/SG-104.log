@@ -1,0 +1,54 @@
+SG-104 — Arc A deploy rider: rebuild + migrate + one recreate + verify, one live press
+
+Coder: opencode · effort: high (process args: `opencode run --auto --dir /home/andrei/StorageGenie --variant high ...`) · model: unknown (no model id sent; CLI default; no process arg/provider metadata exposed one)
+Work dir: /home/andrei/StorageGenie · origin: git@github.com:Andovol/StorageGenie.git
+BASE ref requested: origin/automation → resolved 59d4bf17daf12faaa3ff9cb04f9169beccc167d8 (== start HEAD)
+Contract: recorded 0.33.0 == published; source path /home/andrei/storagegenie-contract/VERSION = 0.33.0, FETCH_HEAD b232b845d74e89cb346c60fa4b9a40ec401c42dd (.rules-cache/ ABSENT on host)
+DATABASE: live SQLite under D142 · Restart: ONE backend recreate · Deploy: THIS slice
+
+T0 = 2026-09-23T18:10:37Z (recon). All commands bounded; no interactive command; nothing killed.
+
+G0 backup — DONE
+  18:11:20Z  dir /home/andrei/.local/share/opencode/storagegenie-backups/SG-104-20260923T181120Z
+  copy storagegenie.db 512000 B + -shm 32768 B + -wal 0 B; sha256 83420930…; PRAGMA integrity_check on COPY = ok
+  FINDING: ~/storagegenie-backups and /var/backups are read-only under the unit (ProtectSystem=strict/ProtectHome=read-only; ReadWritePaths=/home/andrei/StorageGenie …). Backup placed in a writable, non-VCS, non-live-DB path.
+
+G1 BEFORE — DONE (18:11:32Z)
+  image sha256:24224bc5… (SG-096) · container 324f1cc4… · RestartCount=0 · health ok · gate 301/401
+  bundle index-D4-L2yOb.js 305133 B f9a28f5f… · css index-CoNI-1Zn.css 3839 B b18dbb33…
+  alembic 20260917_sg068_saved_search · 24 tables · db 512000 B
+  enrich route ABSENT in the running SG-096 image (in-process probe: 405 on POST /v1/enrich/…)
+
+G2 rebuild — DONE
+  context grep: synthesize.py, snapshots.py, enrich_snapshot.py, sg100 migration, enrich-synthesis-v1.md all PRESENT
+  build: BUILDX_CONFIG relocation to /tmp/sg104/buildx (first attempt denied read-only) → exit 0, 16.32 s
+  new image sha256:a76f1455… (differs) · in-image sha256 equal committed blobs
+
+G2 migrate — DONE (one-off NEW image, NOT a recreate)
+  alembic current before sg068 → after sg100 (head) · enrich_snapshot present, 0 rows · table count 24→25
+
+G2 recreate — DONE (exactly ONE `up -d backend`)
+  new container 40bcc321… from a76f1455… · loopback-only preserved · healthy · RestartCount 0→0 (recreate = new container; F-SG104-2)
+
+G3 verify AFTER — DONE
+  health ok · gate 301/401 · alembic sg100 · bundle index-Cj3z97gk.js 305281 B (DIFFERS — F-SG104-1, SG-098 button)
+  in-image real loaders: load_synthesis_prompt → enrich-synthesis-v1 (2368 B), snapshots writer, model, clients all import
+  GET /v1/candidates/{id} live 200
+
+G3 THE ONE PRESS — DONE (18:14:10Z, loopback)
+  asset 01a0a467-eb0e-7b83-a227-af122dc9268b "Toothpaste" (Popescu Household; display_name TEXT)
+  HTTP 200 · candidate 01a0cf79-a42a-7612-8f74-8e413dd8ee69 · snapshots_recorded true
+  Job 01a0cf79-a429-7220-b466-534d6dca94ab (enrich/COMPLETED) · snapshots off 01a0cf79-a425… (200) + jina 01a0cf79-a427… (DNS-degraded)
+  no synthesis call (provider_call 17→17) · rows LEFT in place
+  FINDING F-SG104-3: eu.s.jina.ai is NXDOMAIN from host AND container (s.jina.ai resolves) → Jina fallback always degrades
+  spend: Jina $0.000000 (no request reached Jina; DNS failure before send) — under the $0.05 per-press cap
+
+G3 waived-sweep substitute — DONE
+  in-container (new build) 8 enrich legs: 106 passed, 2 failed (both container-env artifacts: no docs/, JINA_API_KEY injected)
+  host corroboration (same tree): 108 passed
+
+G4 worklog — DONE
+  SG-104.log · SG-104_report.md · SG-104_verify.log (raw)
+  counts: candidate 6→7, job 7→8, enrich_snapshot 0→2; all else identical; db 512000→528384 B, wal 0→90672 B
+
+Overall elapsed ≈ 5 min wall vs 1800 s budget. Legs: backup <1 s, build 16.32 s (bound 600 s), migrate+recreate+verify ≈ 2 min (bound 600 s).
