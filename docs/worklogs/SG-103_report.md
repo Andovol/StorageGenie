@@ -4,7 +4,7 @@
 **Coder / effort:** `opencode` / `high` — effort read from the packet dispatch head (`effort: high`); **model: `unknown`** (no model id is sent per policy, and no process argument or provider metadata exposed one — reported `unknown` rather than guessed from the system-prompt identity line).
 **Work dir:** `/home/andrei/StorageGenie` · **Remote:** `origin` = `git@github.com:Andovol/StorageGenie.git`
 **BASE (requested ref `origin/automation` resolved):** `d77756d95946f64c2f6202698efde359bd0e6474`
-**WORK_HEAD:** `<filled at commit time>` · **Report:** `docs/worklogs/SG-103_report.md`
+**WORK_HEAD:** `bb438057cba939e93867bc31cbd72f4389fb0965` · **Report:** `docs/worklogs/SG-103_report.md`
 **Contract echo (verbatim):** `0.33.0` — recorded in `STATE.md:4` and `AGENTS.md:4`; published side `/home/andrei/storagegenie-contract/VERSION` → `0.33.0`, HEAD `b232b845d74e89cb346c60fa4b9a40ec401c42dd` "Contract payload 0.33.0", **G-L1 payload hash executed**: `sha256sum RULES.md` = `18de7fd7b3546bd7624b3a7b59a78bd629752816cd7fa8f1af6113d1bafc8d46` == `RULES.sha256`, `sha256sum -c` → `RULES.md: OK`. Recorded == published == `0.33.0`.
 **DATABASE: none** (existing candidate table only; tests on temp DBs; no production writes). **Restart: none. Deploy: none. Container actions: none** (`PG-PR-04`). No model/migration: `app/models` + `alembic` diff **empty**.
 **Spend (real $):** **$0.000000** — every HTTP leg is a scripted `httpx.MockTransport` seam; no socket opened, no key crosses a wire, no provider invoked. No metered call exists on any path.
@@ -81,7 +81,23 @@ The production service is **old code**; the endpoint's new alternates behaviour 
 Work pushed to `automation`; worktree clean. Note added on `WORK_HEAD`, notes ref pushed, and verified against the **fetched, mapped** ref. Executed, verbatim:
 
 ```
-<filled in the docs-only receipt commit with the pasted `git notes show` output>
+$ git notes --ref=refs/notes/storagegenie-coder-reports show bb438057cba939e93867bc31cbd72f4389fb0965   # pre-check
+error: no note found for object bb438057cba939e93867bc31cbd72f4389fb0965.   (exit 1 -> no existing note, add proceeds)
+
+$ git notes --ref=refs/notes/storagegenie-coder-reports add -m "Dispatch-ID: SG-103 | Report: docs/worklogs/SG-103_report.md | Work-HEAD: bb438057cba939e93867bc31cbd72f4389fb0965" bb438057cba939e93867bc31cbd72f4389fb0965
+note add exit=0
+
+$ git push origin refs/notes/storagegenie-coder-reports
+To github.com:Andovol/StorageGenie.git
+   c668336..0e7006c  refs/notes/storagegenie-coder-reports -> refs/notes/storagegenie-coder-reports
+
+$ git fetch origin refs/notes/storagegenie-coder-reports:refs/notes/storagegenie-coder-reports-fetched
+From github.com:Andovol/StorageGenie
+   c668336..0e7006c  refs/notes/storagegenie-coder-reports -> refs/notes/storagegenie-coder-reports-fetched
+
+$ git notes --ref=refs/notes/storagegenie-coder-reports-fetched show bb438057cba939e93867bc31cbd72f4389fb0965
+Dispatch-ID: SG-103 | Report: docs/worklogs/SG-103_report.md | Work-HEAD: bb438057cba939e93867bc31cbd72f4389fb0965
+show exit=0
 ```
 
 No push to `storagegenie-evidence`; no `{{RECEIPT_CMD}}`. The final tip is dual-annotated too (note-anchor inoculation, SG-092 precedent). `note=yes`.
