@@ -34,6 +34,12 @@ CHAT_PATH = "/chat/completions"
 DEFAULT_MODEL_ID = "deepseek-v4-flash-vision-exp"
 USER_AGENT = "StorageGenie/0.1 (opencode-go vision adapter)"
 DEFAULT_MAX_TOKENS = 2000
+# SG-101: the TEXT turn gets its own bound. The default model is a reasoning
+# model, so `reasoning_content` consumes completion budget before any answer;
+# SG-099's live leg burned the full 2000 on reasoning and returned empty
+# `content`. 4x headroom for reasoning+content; uncalibrated (G-A9). The VISION
+# path keeps `DEFAULT_MAX_TOKENS` byte-untouched.
+TEXT_MAX_TOKENS = 8000
 CALL_TIMEOUT_S = 300.0
 INPUT_USD_PER_1M = 0.15
 OUTPUT_USD_PER_1M = 0.60
@@ -64,8 +70,12 @@ def response_format_for(model: str) -> dict[str, str]:
 def guard_content(content: str | None) -> str:
     """Empty/blank 200 bodies are rejected before any parsing.
 
-    A body-less / empty-200 leg raises with no usage attached: nothing was
-    billed that can be attributed (the pre-body legs stay honest `0.0`).
+    This helper never sees the response body, so it attaches no accounting
+    itself. The TEXT caller (`extract_text`) catches this raise and attaches the
+    received body's usage/cost/latency (SG-101), so a billed empty-200 (SG-099:
+    reasoning tokens consumed the completion budget, `content` arrived empty)
+    can land a ledger row. A leg that raised before any completed 200 body has
+    no usage to attach and stays honest `0.0`.
     """
     if content is None or not content.strip():
         raise ProviderError("invalid_json", "provider returned empty content (empty-200 reject)")
@@ -182,12 +192,13 @@ def build_text_payload(model: str, prompt: str, text: str) -> dict[str, Any]:
     `prompt` is the system instruction (the versioned chat prompt); `text` is
     the user turn (the delimited catalogue data plus the question). Plain text
     content: no image part, no `response_format` (the answer is free text), and
-    never any key material.
+    never any key material. `max_tokens` is `TEXT_MAX_TOKENS`, the text-turn
+    bound (SG-101), never the vision `DEFAULT_MAX_TOKENS`.
     """
     return {
         "model": model,
         "stream": False,
-        "max_tokens": DEFAULT_MAX_TOKENS,
+        "max_tokens": TEXT_MAX_TOKENS,
         "messages": [
             {"role": "system", "content": prompt},
             {"role": "user", "content": text},
@@ -371,7 +382,15 @@ class OpenCodeGoProvider:
             raise exc
         choice = choices[0]
         message = choice.get("message") or {}
-        content = strip_single_think(guard_content(message.get("content")))
+        try:
+            content = strip_single_think(guard_content(message.get("content")))
+        except ProviderError as exc:
+            # SG-101: a content-shape rejection AFTER a completed 200 body is a
+            # billed leg (SG-099's empty-200 spent reasoning tokens, `content`
+            # empty). Attach what crossed the wire, exactly like the no-choices
+            # leg above, so `reader._write_error_ledger` records it.
+            attach_body_accounting(exc, usage, latency_ms=latency_ms)
+            raise
         model_id = str(body.get("model") or self._model_id)
         cost = compute_cost(usage)
         self._monthly_spent += cost

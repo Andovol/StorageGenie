@@ -1,0 +1,196 @@
+SG-101 verify log — raw outputs (first token SG-101)
+
+Work dir: /home/andrei/StorageGenie
+Coder: opencode | effort: high | model: cli-default (process args: `opencode run --auto --dir /home/andrei/StorageGenie --variant high <packet>`)
+BASE (origin/automation resolved): f02daebc0b6d67d5ba9941d1150974c527909100
+Authoring date (metadata): 2026-09-23
+Contract echo (verbatim): 0.33.0 (STATE.md:4 + AGENTS.md:4; `.rules-cache/` absent -> published-side re-hash unexecuted)
+
+===============================================================================
+R-RECON — baseline (before edits)
+===============================================================================
+$ git branch --show-current
+automation
+$ git rev-parse HEAD
+f02daebc0b6d67d5ba9941d1150974c527909100
+$ git rev-parse origin/automation
+f02daebc0b6d67d5ba9941d1150974c527909100
+
+$ git worktree add -q /tmp/opencode/sg101/base HEAD
+$ /home/andrei/StorageGenie/venv/bin/python -m pytest -q tests/test_signals.py
+2 failed, 5 passed, 3 warnings in 1.17s
+  (stash-proof of the 2 known decoder env reds at clean HEAD; worktree removed after)
+
+Baseline production counts (read-only mode=ro):
+provider_call 17 / job 7 / candidate 6 / assertion 28 / asset 6
+
+$ ruff check .        -> All checks passed!
+$ mypy app            -> Found 41 errors in 9 files (checked 84 source files)
+
+===============================================================================
+R-FAILPRE — clean HEAD + new test file (fail)
+===============================================================================
+=== FAIL-PRE (clean HEAD + new test file) ===
+FF.FF                                                                    [100%]
+=================================== FAILURES ===================================
+______ test_text_payload_carries_new_bound_and_vision_constant_untouched _______
+
+    def test_text_payload_carries_new_bound_and_vision_constant_untouched() -> None:
+        """The text builder moves to `TEXT_MAX_TOKENS`; the vision constant does not."""
+        assert go.DEFAULT_MAX_TOKENS == VISION_MAX_TOKENS, "vision constant byte-untouched"
+>       assert go.TEXT_MAX_TOKENS == TEXT_BOUND
+               ^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'app.services.providers.opencode_go' has no attribute 'TEXT_MAX_TOKENS'. Did you mean: 'DEFAULT_MAX_TOKENS'?
+
+tests/test_sg101_text_path.py:68: AttributeError
+_______ test_text_extract_empty_content_carries_received_body_accounting _______
+
+    def test_text_extract_empty_content_carries_received_body_accounting() -> None:
+        """SG-101: the SG-099 empty-200 leg (reasoning burn) is billed, so account it.
+
+        Shape is the `:333` raise-legs test extended to the content leg: a 200 body
+        with non-zero usage and empty `content` must raise carrying `usage`/`cost`/
+        `latency_ms` so `reader._write_error_ledger` records what crossed the wire.
+        """
+        usage = {"prompt_tokens": 1039, "completion_tokens": 2000, "total_tokens": 3039}
+        expected_cost = go.compute_cost(usage)
+
+        class _BodyProvider(go.OpenCodeGoProvider):
+            def __init__(self, body: dict[str, Any]) -> None:
+                super().__init__(session_id="sg101-content-leg")
+                self._body = body
+
+            def _post(self, payload: dict[str, Any]) -> dict[str, Any]:
+                return self._body
+
+        body = {
+            "id": "x",
+            "model": "deepseek-v4-flash-vision-exp",
+            "choices": [
+                {
+                    "finish_reason": "length",
+                    "message": {"content": "", "reasoning_content": "We need output JSON only. ..."},
+                }
+            ],
+            "usage": usage,
+        }
+        provider = _BodyProvider(body)
+        with pytest.raises(ProviderError) as caught:
+            provider.extract_text("USER", "SYSTEM")
+        exc = caught.value
+        assert exc.kind == "invalid_json"
+>       assert exc.usage == usage, "body usage must cross the boundary"
+               ^^^^^^^^^
+E       AttributeError: 'ProviderError' object has no attribute 'usage'
+
+tests/test_sg101_text_path.py:117: AttributeError
+_________ test_text_estimate_covers_new_bound_old_default_understates __________
+
+    def test_text_estimate_covers_new_bound_old_default_understates() -> None:
+        """A text-turn estimate at the new bound is strictly above the old default."""
+        text = "u" * 1200
+        prompt = "s" * 400
+        old = syn.estimate_text_cost(text, prompt, max_tokens=go.DEFAULT_MAX_TOKENS)
+        new = syn.estimate_text_cost(text, prompt)  # default must be the TEXT bound
+>       assert new > old, "the old DEFAULT_MAX_TOKENS understates a text-turn worst case"
+E       AssertionError: the old DEFAULT_MAX_TOKENS understates a text-turn worst case
+E       assert 0.00144 > 0.00144
+
+tests/test_sg101_text_path.py:160: AssertionError
+_________________ test_cap_comparison_uses_the_new_text_bound __________________
+
+        old_est = syn.estimate_text_cost(user_text, prompt_text, max_tokens=go.DEFAULT_MAX_TOKENS)
+        new_est = syn.estimate_text_cost(user_text, prompt_text)
+>       assert old_est < new_est
+E       assert 0.0017241 < 0.0017241
+
+tests/test_sg101_text_path.py:248: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_sg101_text_path.py::test_text_payload_carries_new_bound_and_vision_constant_untouched
+FAILED tests/test_sg101_text_path.py::test_text_extract_empty_content_carries_received_body_accounting
+FAILED tests/test_sg101_text_path.py::test_text_estimate_covers_new_bound_old_default_understates
+FAILED tests/test_sg101_text_path.py::test_cap_comparison_uses_the_new_text_bound
+4 failed, 1 passed in 0.45s
+
+===============================================================================
+R-PASSPOST — working tree (pass)
+===============================================================================
+=== PASS-POST (working tree) ===
+.....                                                                    [100%]
+5 passed in 0.43s
+
+===============================================================================
+R-TARGETED — new + existing vision tests together
+===============================================================================
+$ pytest -q tests/test_sg101_text_path.py tests/test_opencode_go.py tests/test_chat.py tests/test_sg099_synthesis.py
+55 passed, 1 warning in 2.28s
+
+$ git diff --name-only -- backend/tests/test_opencode_go.py backend/tests/test_chat.py
+(empty = unmodified)
+
+===============================================================================
+R-SUITE / R-RUFF / R-MYPY — post-change gates
+===============================================================================
+$ pytest -q
+2 failed, 503 passed, 25 warnings in 23.11s
+FAILED tests/test_signals.py::test_generated_codes_are_validated_and_bad_checksum_is_not_an_identifier
+FAILED tests/test_signals.py::test_ocr_has_text_boxes_and_mean_confidence - a...
+  (the 2 known decoder env reds; stash-proved at clean HEAD in R-RECON)
+
+$ ruff check .        -> All checks passed!
+$ mypy app            -> Found 41 errors in 9 files (checked 84 source files)   (delta 0)
+
+===============================================================================
+R-SECRET — secret-pattern gate over changed/new files
+===============================================================================
+$ rg -n -e 'sk-[A-Za-z0-9]' -e 'Bearer ' -e 'AKIA' -e '_API_KEY=' -e 'api_key *=' \
+     backend/app/services/providers/opencode_go.py backend/app/services/enrich/synthesize.py \
+     backend/tests/test_sg101_text_path.py backend/tests/test_privacy_audit.py
+backend/app/services/providers/opencode_go.py:231:        self._api_key = api_key
+backend/app/services/providers/opencode_go.py:260:        headers["Authorization"] = f"Bearer {self._resolve_api_key()}"
+  (both are pre-existing CODE references; no literal key, no `sk-` match anywhere)
+0 real secrets.
+
+$ rg -n 'OPENCODE_API_KEY|JINA_API_KEY' <changed files>
+backend/app/services/providers/opencode_go.py:253:        key = self._api_key or os.environ.get("OPENCODE_API_KEY", "")
+backend/app/services/providers/opencode_go.py:255:            raise ProviderError("missing_key", "OPENCODE_API_KEY not present in backend env")
+  (NAME only)
+
+===============================================================================
+R-LIVE — the ONE metered TEXT call (60s bound) — raw stdout
+===============================================================================
+{"ai_status": {"enabled": true, "reason": "enabled"}}
+{"bounds": {"DEFAULT_MAX_TOKENS": 2000, "TEXT_MAX_TOKENS": 8000}}
+RESULT={"status": "ok", "model": "deepseek-v4-flash-vision-exp", "cost": 0.00140655, "usage": {"prompt_tokens": 1037, "completion_tokens": 2085, "total_tokens": 3122, "prompt_cache_hit_tokens": 512, "prompt_cache_miss_tokens": 525, "prompt_tokens_details": {"cached_tokens": 512}, "completion_tokens_details": {"reasoning_tokens": 1269}}, "latency_ms": 8005.555764771998, "facts": 13, "provider_call_id": "01a0cf45-e960-79d3-9b67-f44873dfd4f1", "elapsed_s": 8.014, "sent_max_tokens": 8000}
+RAW_BODY={"id": "c7645bee-f967-4bce-902e-3ec7186e1525", "object": "chat.completion", "created": 1790183853, "model": "deepseek-v4-flash-vision-exp", "choices": [{"index": 0, "finish_reason": "stop", "logprobs": null, "message": {"role": "assistant", "content": "{\"facts\": [{\"field\": \"brand\", \"value\": \"Jacobs\", \"source_url\": \"https://world.openfoodfacts.org/api/v2/search?x=1\", \"retrieved_at\": \"2026-09-22T00:00:00+00:00\"}, {\"field\": \"product_name\", \"value\": \"Jacobs Cronat Gold instant coffee\", \"source_url\": \"https://world.openfoodfacts.org/api/v2/search?x=1\", \"retrieved_at\": \"2026-09-22T00:00:00+00:00\"}, {\"field\": \"code\", \"value\": \"3274080005003\", \"source_url\": \"https://world.openfoodfacts.org/api/v2/search?x=1\", \"retrieved_at\": \"2026-09-22T00:00:00+00:00\"}, {\"field\": \"ingredients_text\", \"value\": \"Coffee\", \"source_url\": \"https://world.openfoodfacts.org/api/v2/search?x=1\", \"retrieved_at\": \"2026-09-22T00:00:00+00:00\"}, {\"field\": \"packaging\", \"value\": \"Jar\", \"source_url\": \"https://world.openfoodfacts.org/api/v2/search?x=1\", \"retrieved_at\": \"2026-09-22T00:00:00+00:00\"}, {\"field\": \"countries_tags_en\", \"value\": \"en:romania, en:germany\", \"source_url\": \"https://world.openfoodfacts.org/api/v2/search?x=1\", \"retrieved_at\": \"2026-09-22T00:00:00+00:00\"}, {\"field\": \"energy_kcal_100g\", \"value\": \"0\", \"source_url\": \"https://world.openfoodfacts.org/api/v2/search?x=1\", \"retrieved_at\": \"2026-09-22T00:00:00+00:00\"}, {\"field\": \"fat_100g\", \"value\": \"0.1\", \"source_url\": \"https://world.openfoodfacts.org/api/v2/search?x=1\", \"retrieved_at\": \"2026-09-22T00:00:00+00:00\"}, {\"field\": \"carbohydrates_100g\", \"value\": \"0.3\", \"source_url\": \"https://world.openfoodfacts.org/api/v2/search?x=1\", \"retrieved_at\": \"2026-09-22T00:00:00+00:00\"}, {\"field\": \"proteins_100g\", \"value\": \"0.1\", \"source_url\": \"https://world.openfoodfacts.org/api/v2/search?x=1\", \"retrieved_at\": \"2026-09-22T00:00:00+00:00\"}, {\"field\": \"salt_100g\", \"value\": \"0.01\", \"source_url\": \"https://world.openfoodfacts.org/api/v2/search?x=1\", \"retrieved_at\": \"2026-09-22T00:00:00+00:00\"}, {\"field\": \"product_name\", \"value\": \"Jacobs Cronat Gold cafea macinata 100g\", \"source_url\": \"https://eu.s.jina.ai/Jacobs+Jacobs+Cronat+Gold\", \"retrieved_at\": \"2026-09-22T00:00:00+00:00\"}, {\"field\": \"ingredients_text\", \"value\": \"cafea 100%\", \"source_url\": \"https://eu.s.jina.ai/Jacobs+Jacobs+Cronat+Gold\", \"retrieved_at\": \"2026-09-22T00:00:00+00:00\"}]}", "reasoning_content": "<1269 reasoning tokens; truncated in capture>"}}], "usage": {"prompt_tokens": 1037, "completion_tokens": 2085, "total_tokens": 3122, "prompt_cache_hit_tokens": 512, "prompt_cache_miss_tokens": 525, "prompt_tokens_details": {"cached_tokens": 512}, "completion_tokens_details": {"reasoning_tokens": 1269}}}
+LEDGER_ROWS=1
+LEDGER={"provider": "opencode-go", "model": "deepseek-v4-flash-vision-exp", "cost": 0.00140655, "usage_json": "{\"prompt_tokens\": 1037, \"completion_tokens\": 2085, \"total_tokens\": 3122, \"prompt_cache_hit_tokens\": 512, \"prompt_cache_miss_tokens\": 525, \"prompt_tokens_details\": {\"cached_tokens\": 512}, \"completion_tokens_details\": {\"reasoning_tokens\": 1269}}", "latency_ms": 8005.555764771998, "error_state": null, "job_id": null}
+EXIT=0
+
+In-slice worst-case recompute from the real compute_cost arithmetic:
+  input_bytes_upper 3494
+  old_estimate_2000 0.0017241
+  new_estimate_8000 0.0053241
+  live_compute_cost 0.00140655
+  ratio_new_to_cap 0.106482
+  ratio_live_to_cap 0.028131
+  ratio_live_to_new_est 0.264185
+  old_default_would_truncate (2085 > 2000) True
+
+===============================================================================
+R-COUNTS — production counts before/after (read-only mode=ro)
+===============================================================================
+BEFORE: provider_call 17 / job 7 / candidate 6 / assertion 28 / asset 6
+AFTER : provider_call 17 / job 7 / candidate 6 / assertion 28 / asset 6
+Temp live DB /tmp/opencode/sg101/live.db: provider_call = 1 (the one live call)
+
+===============================================================================
+R-DIFF — changed/new files
+===============================================================================
+ M backend/app/services/enrich/synthesize.py
+ M backend/app/services/providers/opencode_go.py
+ M backend/tests/test_privacy_audit.py   (M45 line-pin update, F-SG101-1)
+?? backend/tests/test_sg101_text_path.py
+?? docs/worklogs/SG-101.log
+?? docs/worklogs/SG-101_report.md
+?? docs/worklogs/SG-101_verify.log

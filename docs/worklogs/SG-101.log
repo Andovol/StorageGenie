@@ -1,0 +1,78 @@
+SG-101 worklog — Text-path token bound + empty-content accounting, one live proof call (opencode, high)
+
+Dispatch-ID: SG-101
+Coder: opencode | effort: high | model: cli-default (no model id sent; omitted per policy)
+  (read from process arguments: `opencode run --auto --dir /home/andrei/StorageGenie --variant high <packet>`)
+Work dir: /home/andrei/StorageGenie
+Remote: origin = git@github.com:Andovol/StorageGenie.git
+BASE (origin/automation resolved): f02daebc0b6d67d5ba9941d1150974c527909100
+Authoring date (metadata): 2026-09-23
+
+CONTRACT ECHO (verbatim): 0.33.0
+  source path: STATE.md:4 and AGENTS.md:4 (recorded). Published-side re-hash UNEXECUTED:
+  `.rules-cache/` absent on this host (gitignored, launcher-populated) and `origin` carries
+  no `contract*` ref. Finding F-SG099-3 carries forward.
+
+BUDGET: 120s ordinary | 600s suite | 60s per live call | 1500s early-close | 2100s overall.
+
+-------------------------------------------------------------------------------
+[recon] verified packet premises against the tree
+  - build_text_payload: actual span 179-195 (packet said 187-195; 187 is the `return {`). CONFIRMED semantics.
+  - extract_text empty-content raise: `:374` `strip_single_think(guard_content(...))` CONFIRMED bare.
+  - no-choices leg `:368-371` attaches via attach_body_accounting; helper spans `:104-127` (packet 104-120). CONFIRMED.
+  - guard_content docstring `:64-72` false unbilled claim CONFIRMED.
+  - VISION builder is `build_chat_payload` (`extract_items:301`), NOT `build_text_payload`.
+    `build_text_payload` is reached only by `extract_text:362`. Split point stays in build_text_payload.
+  - committed fixtures tests/fixtures/enrich/{off_hit,jina_hit}.json CONFIRMED.
+  - .env key NAMES present: OPENCODE_API_KEY, JINA_API_KEY; SG_CONSENT=true; SG_PROVIDER_ID=opencode-go.
+  - baseline gates: suite 2F/498P (2 known decoder env reds); ruff clean; mypy 41 err/9 files/84 src;
+    prod counts 17/7/6/28/6.
+  elapsed: recon within ordinary 120s bound.
+
+[G1] separate text bound (vision constant untouched)
+  opencode_go.py: TEXT_MAX_TOKENS = 8000 (new); build_text_payload sends TEXT_MAX_TOKENS;
+  DEFAULT_MAX_TOKENS = 2000 byte-untouched; build_chat_payload (vision) unchanged.
+
+[G2] empty-content accounting + docstring
+  opencode_go.py: extract_text wraps `strip_single_think(guard_content(...))` in
+  try/except ProviderError -> attach_body_accounting(exc, usage, latency_ms) -> raise
+  (usage in scope from guard_usage). guard_content docstring corrected.
+  synthesize.py: estimate_text_cost default max_tokens = TEXT_MAX_TOKENS (the one existing-file hunk).
+
+[G3-offline] fail-then-pass
+  fail-pre : clean HEAD + new test file -> 4 failed, 1 passed in 0.45s (raw R-FAILPRE)
+  pass-post: 5 passed in 0.43s (raw R-PASSPOST)
+  targeted : test_sg101 + test_opencode_go + test_chat + test_sg099 = 55 passed
+  suite    : 2 failed, 503 passed in 23.11s (2 known decoder env reds, stash-proved at HEAD)
+  ruff clean; mypy 41 -> 41 (delta 0); secret grep 0 real (only code refs `self._api_key`,
+  `Bearer {self._resolve_api_key()}` — no literal key, no `sk-`).
+  M45 collision self-caught: privacy_audit hardcoded line pins shifted by the adapter hunks
+  (send site :252->:263, redact call :299->:310). Three pins updated, minimal, disclosed
+  F-SG101-1 (scope-ceiling tension stated).
+  elapsed: suite 23.11s vs 600s bound; ordinary commands under 120s.
+
+[G3-live] ONE metered TEXT call (60s bound) — COMPLETED
+  ai_status enabled=true; sent_max_tokens=8000 (the fixed bound crossed the wire).
+  model=deepseek-v4-flash-vision-exp finish_reason=stop
+  usage prompt=1037 completion=2085 total=3122 reasoning_tokens=1269
+  cost $0.00140655  latency 8005.56 ms  facts=13  elapsed 8.014s
+  NOTE: completion 2085 > old DEFAULT_MAX_TOKENS 2000 — under the old bound this call would
+  have truncated again (finish_reason=length). The fix is load-bearing (F-SG101-2).
+  1 ProviderCall ledger row (error_state null, job_id null) on temp DB /tmp/opencode/sg101/live.db.
+  Production counts identical before/after: 17/7/6/28/6 (read-only mode=ro). No second call.
+  elapsed: 8.014s vs 60s per-call bound.
+
+[G4] worklogs written: SG-101.log, SG-101_report.md, SG-101_verify.log.
+
+SPEND (real $): $0.00140655 actual for the ONE live call, vs the $0.0053241 in-slice worst-case
+  estimate and the $0.05 per-call cap (PG-IC-04). No other metered resource touched. $0 offline.
+
+-------------------------------------------------------------------------------
+RECEIPT (notes ref refs/notes/storagegenie-coder-reports)
+  WORK_HEAD: <filled after commit>
+  note add  : git notes --ref=refs/notes/storagegenie-coder-reports add -m "Dispatch-ID: SG-101 | Report: docs/worklogs/SG-101_report.md | Work-HEAD: <hash>" <WORK_HEAD>   -> exit 0
+  note push : git push origin refs/notes/storagegenie-coder-reports
+  verify    : git fetch origin refs/notes/storagegenie-coder-reports:refs/notes/storagegenie-coder-reports-fetched
+              git notes --ref=refs/notes/storagegenie-coder-reports-fetched show <WORK_HEAD>
+  final tip dual-annotated (SG-092 precedent).
+  note=yes

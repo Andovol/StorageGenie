@@ -222,6 +222,8 @@ def test_g0_single_http_client_and_send_site_full_scan() -> None:
     `api/v1/enrich.py`: it imports `httpx` only for the injection-seam type
     annotation and makes no send of its own (it delegates to the enrich clients).
     The single POST send site is unchanged (all enrich carriers are read-only GETs).
+    SG-101 shifts the adapter's send-site line by its text-path hunks; the pin
+    below tracks the line, not the count (M45).
     """
     assert _http_client_files() == {
         "api/v1/enrich.py": ["import httpx"],
@@ -229,20 +231,24 @@ def test_g0_single_http_client_and_send_site_full_scan() -> None:
         "services/enrich/jina.py": ["import httpx", "import urllib"],
         "services/providers/opencode_go.py": ["import httpx"],
     }, f"unexpected HTTP clients: {_http_client_files()}"
-    assert _send_sites() == ["services/providers/opencode_go.py:252"], (
+    assert _send_sites() == ["services/providers/opencode_go.py:263"], (
         f"unexpected provider send sites: {_send_sites()}"
     )
 
 
 def test_g0_redact_call_sites_are_reader_and_direct_adapter() -> None:
-    """The only two callers of the shared redactor are the two image paths."""
+    """The only two callers of the shared redactor are the two image paths.
+
+    SG-101 shifts the adapter's call-site line by its text-path hunks; the pin
+    below tracks the line, not the caller set (M45).
+    """
     callers: list[str] = []
     for path in sorted(APP_DIR.rglob("*.py")):
         for number, line in enumerate(path.read_text(encoding="utf-8").splitlines(), start=1):
             if "redact_image(" in line and "def redact_image" not in line:
                 callers.append(f"{path.relative_to(APP_DIR)}:{number}")
     assert callers == [
-        "services/providers/opencode_go.py:299",
+        "services/providers/opencode_go.py:310",
         "services/providers/reader.py:402",
     ], f"unexpected redact_image call sites: {callers}"
 
@@ -501,4 +507,4 @@ def test_g2_web_senders_are_the_two_researched_sources() -> None:
             if ("web_" + "detection") in lowered or ("visi" + "on") in lowered:
                 excluded_hits.append(f"{rel}:{number}: {line.strip()}")
     assert excluded_hits == [], f"excluded detection source must stay absent: {excluded_hits}"
-    assert _send_sites() == ["services/providers/opencode_go.py:252"]
+    assert _send_sites() == ["services/providers/opencode_go.py:263"]

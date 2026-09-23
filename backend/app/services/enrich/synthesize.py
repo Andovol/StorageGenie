@@ -30,9 +30,9 @@ from app.config import settings
 from app.models.provider_call import ProviderCall
 from app.services.providers import reader as reader_mod
 from app.services.providers.opencode_go import (
-    DEFAULT_MAX_TOKENS,
     INPUT_USD_PER_1M,
     OUTPUT_USD_PER_1M,
+    TEXT_MAX_TOKENS,
 )
 from app.services.providers.router import BudgetExceededError
 
@@ -116,13 +116,16 @@ def load_synthesis_prompt() -> tuple[str, str]:
 
 
 def estimate_text_cost(
-    text: str, prompt: str, *, max_tokens: int = DEFAULT_MAX_TOKENS
+    text: str, prompt: str, *, max_tokens: int = TEXT_MAX_TOKENS
 ) -> float:
     """Bounded worst-case USD for ONE text call from the vendor rate table.
 
     Input tokens are bounded above by one token per source byte (prompt plus
-    user text); output is bounded by ``max_tokens``. Deliberately an upper bound,
-    so a cap compared against it can never be surprised. No clock, no network.
+    user text); output is bounded by ``max_tokens``, which defaults to the
+    text-turn bound ``TEXT_MAX_TOKENS`` (SG-101) — the same bound
+    ``build_text_payload`` sends — so the cap this estimate guards is not blind
+    to the text-turn output budget. Deliberately an upper bound, so a cap
+    compared against it can never be surprised. No clock, no network.
     """
     input_tokens = len(prompt.encode("utf-8")) + len(text.encode("utf-8"))
     return (input_tokens * INPUT_USD_PER_1M + max_tokens * OUTPUT_USD_PER_1M) / 1_000_000
