@@ -1,0 +1,69 @@
+SG-099 worklog — Enrich synthesis prompt + non-catalogue caller (opencode, high)
+
+Dispatch-ID: SG-099
+Coder: opencode | effort: high | model: cli-default (no model id sent; omitted per policy)
+  (read from process arguments: `opencode run --auto --dir /home/andrei/StorageGenie --variant high <packet>`)
+Work dir: /home/andrei/StorageGenie
+Remote: origin = git@github.com:Andovol/StorageGenie.git
+BASE (origin/automation resolved): 75ee1fc410740ce069f648e1aa1445f42f18c0f1
+Authoring date (metadata): 2026-09-23
+
+CONTRACT ECHO (verbatim): 0.33.0
+  source path: STATE.md:4 and AGENTS.md:4 (recorded). Published-side re-hash UNEXECUTED:
+  `.rules-cache/` absent on this host (gitignored, launcher-populated) and `origin` carries
+  no `contract*` ref. Finding F-SG099-3.
+
+BUDGET: 120s ordinary | 600s suite | 60s per live call | 1500s early-close | 2100s overall.
+
+-------------------------------------------------------------------------------
+[recon] verified packet premises against the tree
+  - opencode_go.py:326 extract_text(text, prompt, *, estimated_cost=0.0)  -> CONFIRMED
+  - chat/service.py:286 respond / :310 build_catalog / :325 chat-v1.md     -> CONFIRMED
+  - providers/reader.py:100 ai_status / :82 provider_registry              -> CONFIRMED
+  - committed fixtures tests/fixtures/enrich/{off_hit,jina_hit}.json       -> CONFIRMED
+  - .env key NAMES present: OPENCODE_API_KEY, JINA_API_KEY; SG_CONSENT=true; SG_PROVIDER_ID=opencode-go
+  - baseline gates: ruff clean; mypy 41 errors/9 files; prod counts 17/7/6/28/6
+  elapsed: recon within ordinary 120s bound.
+
+[G1] frozen prompt written
+  backend/app/services/providers/prompts/enrich-synthesis-v1.md
+  sha256 cb6b6890737f6dc9ad07af5a2b38381091bdb3317027a8656c8bf6ef79ba320d
+  extract-*-v1..v4 byte-identical: `git diff --stat` over prompts dir EMPTY.
+
+[G2] non-catalogue caller written
+  backend/app/services/enrich/synthesize.py
+  consent + per-call-cap refusals; direct extract_text; one ProviderCall row; returned-not-stored.
+
+[G3-offline] fail-then-pass
+  fail-pre : collection ImportError (synthesize absent) exit=2   [raw R-FAILPRE]
+  pass-post: 16 passed in 0.91s                                   [raw R-PASSPOST]
+  suite    : 2 failed, 486 passed in 20.67s (2 known decoder env reds, stash-proved)
+  ruff clean; mypy 41 -> 41 (delta 0); secret grep 0 real.
+  M45 collision self-caught: privacy-audit allow-set extended for the new Jina-naming file
+  (failing-test proof, minimal, root-caused, disclosed F-SG099-4).
+  elapsed: suite 20.67s vs 600s bound; ordinary commands under 120s.
+
+[G3-live] ONE metered TEXT call + the one L3 retry (60s bound each)
+  leg 1: HTTP 200, usage present (billed) then guard_content -> empty-200 reject; 0 commits.
+  leg 2 (retry): same; raw body captured:
+    model=deepseek-v4-flash-vision-exp finish_reason=length content="" reasoning_tokens=2000
+    usage prompt=1039 completion=2000 total=3039 -> cost $0.00135585
+  No third call (deterministic, not transient). Production counts identical before/after
+  (17/7/6/28/6). Temp DB /tmp/opencode/sg099/live.db only; DATABASE_URL overridden pre-import.
+  FINDING F-SG099-1: configured metered TEXT path unusable at DEFAULT_MAX_TOKENS=2000 with the
+  reasoning model; empty-200 is billed but unledgered. Live acceptance NOT MET.
+  elapsed: each live leg a few seconds, well under the 60s per-call bound.
+
+[G4] worklogs written: SG-099.log, SG-099_report.md, SG-099_verify.log.
+
+SPEND (real $): $0.00135585 quoted (leg 2) + one unquantified billed leg (leg 1) ~= $0.0027 worst
+  actual, vs the $0.05 one-call bound (PG-IC-04). No other metered resource touched. $0 offline.
+
+-------------------------------------------------------------------------------
+RECEIPT (notes ref refs/notes/storagegenie-coder-reports)
+  WORK_HEAD: <filled after commit A>
+  note add  : git notes --ref=refs/notes/storagegenie-coder-reports add -m "Dispatch-ID: SG-099 | Report: docs/worklogs/SG-099_report.md | Work-HEAD: <hash>" <WORK_HEAD>
+  note push : git push origin refs/notes/storagegenie-coder-reports
+  verify    : mapped fetch + `git notes --ref=... show <WORK_HEAD>` (pasted below)
+  <filled after verification>
+  note=yes

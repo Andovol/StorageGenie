@@ -1,0 +1,191 @@
+SG-099 verify log — raw outputs (generated 2026-09-23T16:30:31Z)
+work dir: /home/andrei/StorageGenie
+BASE (origin/automation): 75ee1fc410740ce069f648e1aa1445f42f18c0f1
+HEAD at recon: 75ee1fc410740ce069f648e1aa1445f42f18c0f1
+process args: opencode run --auto --dir /home/andrei/StorageGenie --variant high <packet>
+effort: high (from --variant in process args) | model: cli-default (no model id sent; omitted per policy)
+
+================ R-CONTRACT ================
+$ grep contract tags origin (recorded 0.33.0 == published per packet)
+STATE.md:4  **Version:** `0.33.0` (D129 adoption 2026-09-23: checkouts `e8f8113` + `999e94c` + `b232b84` oldest-first, installed `18de7fd7…` = payload at all versions — clean) · **Branch:** `automation` (tip `6dabbcf` at close time)
+AGENTS.md:4 > Rule-set version this project records: **0.33.0** (D129 adoption 2026-09-23: tags `contract-v0.31.0` checkout `e8f8113` + `contract-v0.32.0` checkout `999e94c` + `contract-v0.33.0` checkout `b232b84` oldest-first; delta = 0.31.0 G-L5 desk-check + trigger-hang note + `coder_models.tsv` catalogue + 0.32.0 strict model×effort check + conf-effort-drop + engine relaunch-on-transient (not a retry; needs `DATABASE: none` + `Restart: none`) + 0.33.0 covering-cap rule + `--status` trailing `ends_by` tokens; installed `18de7fd7…` = payload `RULES.sha256` at all versions — clean, was behind; supersedes `0.30.0`).
+published tag check: git ls-remote --tags origin | grep contract-v0.3x -> (none; no contract ref on origin)
+G-L1 fetch/hash: .rules-cache/ absent on this host (gitignored; launcher-populated) -> published-side hash UNEXECUTED
+
+================ R-FAILPRE (module absent -> collection error) ================
+
+==================================== ERRORS ====================================
+________________ ERROR collecting tests/test_sg099_synthesis.py ________________
+ImportError while importing test module '/home/andrei/StorageGenie/backend/tests/test_sg099_synthesis.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+/usr/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_sg099_synthesis.py:39: in <module>
+    from app.services.enrich import synthesize as syn
+E   ImportError: cannot import name 'synthesize' from 'app.services.enrich' (/home/andrei/StorageGenie/backend/app/services/enrich/__init__.py)
+=========================== short test summary info ============================
+ERROR tests/test_sg099_synthesis.py
+!!!!!!!!!!!!!!!!!!!! Interrupted: 1 error during collection !!!!!!!!!!!!!!!!!!!!
+1 error in 0.34s
+
+================ R-PASSPOST (all files present) ================
+................                                                         [100%]
+16 passed in 0.91s
+
+================ R-SUITE (full, final; 2 known decoder env reds) ================
+  /home/andrei/StorageGenie/backend/venv/lib/python3.12/site-packages/alembic/config.py:604: DeprecationWarning: No path_separator found in configuration; falling back to legacy splitting on spaces, commas, and colons for prepend_sys_path.  Consider adding path_separator=os to Alembic config.
+    util.warn_deprecated(
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/test_signals.py::test_generated_codes_are_validated_and_bad_checksum_is_not_an_identifier
+FAILED tests/test_signals.py::test_ocr_has_text_boxes_and_mean_confidence - a...
+2 failed, 486 passed, 23 warnings in 20.67s
+
+================ R-STASHPROOF (2 signal reds at clean HEAD, pyzbar/tesseract absent) ================
+FF                                                                       [100%]
+=================================== FAILURES ===================================
+___ test_generated_codes_are_validated_and_bad_checksum_is_not_an_identifier ___
+
+isolated_db = (<sqlalchemy.orm.session.Session object at 0x7ef2a34fd940>, '01a0cf19-3d4e-7a01-b83f-28330653c6cb', PosixPath('/tmp/pytest-of-andrei/pytest-2/test_generated_codes_are_valid0/storage'))
+
+    def test_generated_codes_are_validated_and_bad_checksum_is_not_an_identifier(isolated_db) -> None:  # type: ignore[no-untyped-def]
+        session, household_id, root = isolated_db
+        qr_value = "https://example.test/SG-013"
+        qr_image = qrcode.make(qr_value).convert("RGB")
+        qr = _evidence(session, household_id, root, _png(qr_image), "qr.png", "image/png")
+        ean_image, ean_value = _ean13_image("590123412345")
+        ean = _evidence(session, household_id, root, _png(ean_image), "ean.png", "image/png")
+        # Deliberately render a syntactically valid EAN with the wrong check digit.
+        bad_value = ean_value[:-1] + ("0" if ean_value[-1] != "0" else "1")
+        bad_image, _ = _ean13_image(ean_value[:-1], bad_value[-1])
+        bad = _evidence(session, household_id, root, _png(bad_image), "bad.png", "image/png")
+    
+        qr_rows = signals.extract_observations(qr.id, session)
+        ean_rows = signals.extract_observations(ean.id, session)
+        bad_rows = signals.extract_observations(bad.id, session)
+    
+        qr_values = [json.loads(row.value_json) for row in qr_rows if row.kind == "barcode_qr"]
+        ean_values = [json.loads(row.value_json) for row in ean_rows if row.kind == "barcode_qr"]
+        bad_values = [json.loads(row.value_json) for row in bad_rows if row.kind == "barcode_qr"]
+>       assert any(item.get("value") == qr_value and item["validated"] for item in qr_values)
+E       assert False
+E        +  where False = any(<generator object test_generated_codes_are_validated_and_bad_checksum_is_not_an_identifier.<locals>.<genexpr> at 0x7ef2a31cd9a0>)
+
+tests/test_signals.py:136: AssertionError
+------------------------------ Captured log call -------------------------------
+WARNING  app.services.signals:signals.py:104 Barcode extraction unavailable: pyzbar/libzbar is not installed
+WARNING  app.services.signals:signals.py:215 OCR extraction unavailable: tesseract is not installed or it's not in your PATH. See README file for more information.
+WARNING  app.services.signals:signals.py:104 Barcode extraction unavailable: pyzbar/libzbar is not installed
+WARNING  app.services.signals:signals.py:215 OCR extraction unavailable: tesseract is not installed or it's not in your PATH. See README file for more information.
+WARNING  app.services.signals:signals.py:104 Barcode extraction unavailable: pyzbar/libzbar is not installed
+WARNING  app.services.signals:signals.py:215 OCR extraction unavailable: tesseract is not installed or it's not in your PATH. See README file for more information.
+_________________ test_ocr_has_text_boxes_and_mean_confidence __________________
+
+isolated_db = (<sqlalchemy.orm.session.Session object at 0x7ef2a3423fb0>, '01a0cf19-3de2-7902-976c-0522fa7510a4', PosixPath('/tmp/pytest-of-andrei/pytest-2/test_ocr_has_text_boxes_and_me0/storage'))
+
+    def test_ocr_has_text_boxes_and_mean_confidence(isolated_db) -> None:  # type: ignore[no-untyped-def]
+        session, household_id, root = isolated_db
+        evidence = _evidence(session, household_id, root, _png(_text_image()), "text.png", "image/png")
+        rows = signals.extract_observations(evidence.id, session)
+        ocr = [json.loads(row.value_json) for row in rows if row.kind == "ocr"]
+>       assert ocr
+E       assert []
+
+tests/test_signals.py:148: AssertionError
+------------------------------ Captured log call -------------------------------
+WARNING  app.services.signals:signals.py:104 Barcode extraction unavailable: pyzbar/libzbar is not installed
+WARNING  app.services.signals:signals.py:215 OCR extraction unavailable: tesseract is not installed or it's not in your PATH. See README file for more information.
+=========================== short test summary info ============================
+FAILED tests/test_signals.py::test_generated_codes_are_validated_and_bad_checksum_is_not_an_identifier
+FAILED tests/test_signals.py::test_ocr_has_text_boxes_and_mean_confidence - a...
+2 failed in 0.62s
+
+================ R-GATES ================
+$ cd backend && venv/bin/python -m ruff check app/services/enrich/synthesize.py tests/test_sg099_synthesis.py
+All checks passed!
+$ cd backend && venv/bin/python -m mypy app   (baseline 41 -> after 41, delta 0)
+Found 41 errors in 9 files (checked 81 source files)
+Found 41 errors in 9 files (checked 82 source files)
+$ secret-pattern grep over changed files (sk-/Bearer/AKIA/_API_KEY=): 0 matches
+$ git diff --stat -- backend/app/services/providers/prompts/  (v1-v4 byte-identical: empty)
+$ cd backend && venv/bin/python -m pytest -q tests/test_privacy_audit.py
+11 passed in 0.73s
+
+================ R-SCOPE ================
+$ git status --porcelain -- backend/app/models backend/alembic  (empty)
+$ git status --porcelain (work files)
+ M backend/tests/test_privacy_audit.py
+?? backend/app/services/enrich/synthesize.py
+?? backend/app/services/providers/prompts/enrich-synthesis-v1.md
+?? backend/tests/test_sg099_synthesis.py
+?? docs/worklogs/SG-099_verify.log
+new prompt sha256: cb6b6890737f6dc9ad07af5a2b38381091bdb3317027a8656c8bf6ef79ba320d  backend/app/services/providers/prompts/enrich-synthesis-v1.md
+
+================ R-LIVE (temp DB, REAL extract_text) ================
+/bin/bash: line 40: printf: --: invalid option
+printf: usage: printf [-v var] format [arguments]
+database_url: sqlite:////tmp/opencode/sg099/live.db
+ai_status: (True, 'enabled')
+off_source_url: https://world.openfoodfacts.org/api/v2/search
+jina_source_url: https://eu.s.jina.ai/Jacobs+Jacobs+Cronat+Gold
+retrieved_at: 2026-09-23T16:26:27.810614+00:00
+SYNTHESIS_ERROR: ProviderError provider returned empty content (empty-200 reject)
+Traceback (most recent call last):
+  File "/tmp/opencode/sg099/live.py", line 53, in <module>
+    result = syn.synthesize(
+             ^^^^^^^^^^^^^^^
+  File "/home/andrei/StorageGenie/backend/app/services/enrich/synthesize.py", line 281, in synthesize
+    result = provider.extract_text(user_text, prompt_text, estimated_cost=estimated_cost)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/andrei/StorageGenie/backend/app/services/providers/opencode_go.py", line 374, in extract_text
+    content = strip_single_think(guard_content(message.get("content")))
+                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/andrei/StorageGenie/backend/app/services/providers/opencode_go.py", line 71, in guard_content
+    raise ProviderError("invalid_json", "provider returned empty content (empty-200 reject)")
+app.services.providers.router.ProviderError: provider returned empty content (empty-200 reject)
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/tmp/opencode/sg099/live.py", line 65, in <module>
+    row = db.query(ProviderCall).one()
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/andrei/StorageGenie/venv/lib/python3.12/site-packages/sqlalchemy/orm/query.py", line 2815, in one
+    return self._iter().one()  # type: ignore
+           ^^^^^^^^^^^^^^^^^^
+  File "/home/andrei/StorageGenie/venv/lib/python3.12/site-packages/sqlalchemy/engine/result.py", line 1867, in one
+    return self._only_one_row(
+           ^^^^^^^^^^^^^^^^^^^
+  File "/home/andrei/StorageGenie/venv/lib/python3.12/site-packages/sqlalchemy/engine/result.py", line 799, in _only_one_row
+    raise exc.NoResultFound(
+sqlalchemy.exc.NoResultFound: No row was found when one was required
+
+--- leg 2 (the one L3 retry; raw body captured via _post wrapper) ---
+database_url: sqlite:////tmp/opencode/sg099/live.db
+ai_status: (True, 'enabled')
+off_source_url: https://world.openfoodfacts.org/api/v2/search
+jina_source_url: https://eu.s.jina.ai/Jacobs+Jacobs+Cronat+Gold
+retrieved_at: 2026-09-23T16:27:10.894409+00:00
+SYNTHESIS_ERROR: ProviderError provider returned empty content (empty-200 reject)
+RAW_BODY: {"id": "391bafc8-c207-4201-8212-42c95ae94f26", "object": "chat.completion", "created": 1790180831, "model": "deepseek-v4-flash-vision-exp", "choices": [{"index": 0, "finish_reason": "length", "logprobs": null, "message": {"role": "assistant", "content": "", "reasoning_content": "We need output JSON only. Need extract facts from source blocks. Brand declared Jacobs, so can emit brand fact? Rules: brand: line declares the only brand the input carries. When brand: ABSENT, do not emit. Here brand: Jacobs. So brand fact allowed. But must attribute to source? Brand appears in sources (OpenFoodFacts brands \"Jacobs\", Jina title). We can emit brand \"Jacobs\" from OpenFoodFacts source_url/retrieved_at maybe. Need transcribe only.\n\nWe have two sources:\n\nOpenFoodFacts payload product:\n- brands: \"Jacobs\" -> brand\n- code: \"3274080005003\" -> maybe gtin? field name? likely \"barcode\" or \"code\"? We need choose field names. The task says field proposals for product fields. We can use field names like brand, product_name, ingredients_text, packaging, countries, etc. Need not infer. We can transcribe fields present.\n- countries_tags_en: [\"en:romania\",\"en:germany\"] -> maybe \"countries\" value? Could transcribe \"en:romania, en:germany\"? Hmm. Field maybe \"countries_tags_en\".\n- ingredients_text: \"Coffee\" -> ingredient? \n- nutriments: carbs, energy-kcal, fat, proteins, salt -> nutrition fields.\n- packaging: \"Jar\"\n- product_name: \"Jacobs Cronat Gold instant coffee\"\n\nJinaSearch payload:\n- content: \"Cafea macinata Jacobs Cronat Gold 100g. Ingrediente: cafea 100%.\"\n- title: \"Jacobs Cronat Gold cafea macinata 100g\"\n- url: https://www.mega-image.ro/p/jacobs-cronat-gold-100g\nBut source_url is https://eu.s.jina.ai/Jacobs+Jacobs+Cronat+Gold, retrieved_at same. Facts must cite source_url and retrieved_at of source block. So for Jina, source_url = https://eu.s.jina.ai/Jacobs+Jacobs+Cronat+Gold, retrieved_at = 2026-09-23T16:27:10.894409+00:00. Even though payload contains url to mega-image. We should not use payload url as source_url? Rule 6: Never invent a source URL or retrieval date; copy them verbatim from source block that carried the fact. Source block source_url is Jina URL. So use that.\n\nNeed determine facts. We can emit one fact per distinct field. Could emit multiple facts for same field if conflict? Here product name differs: OFF \"Jacobs Cronat Gold instant coffee\"; Jina title \"Jacobs Cronat Gold cafea macinata 100g\" and content mentions \"Cafea macinata Jacobs Cronat Gold 100g\". These are conflicting product_name maybe. Rule 5 conflicts keep both with attribution. So emit two product_name facts.\n\nBrand: Both sources have Jacobs. Could emit one brand fact with source attribution? Maybe one fact per source? Since both agree, one fact is enough? But each fact must carry source_url. We can emit one brand fact from OpenFoodFacts. The brand line declares Jacobs, but maybe source for brand? We can use OpenFoodFacts brands field. Or from Jina title contains Jacobs. To be safe, emit brand with OFF attribution. Also maybe another brand fact from Jina? Rule one fact per distinct field; duplicates not needed. But if field appears in both sources, one fact is fine. However attribution? The fact value \"Jacobs\" is stated in OFF brands explicitly; Jina title also. I'd emit one brand fact using OFF source_url. Could also emit a brand fact from Jina title? But no explicit brand field in Jina payload except title includes Jacobs. \"brand: Jacobs\" declared, but source attribution? The brand line is not a source. Better to attribute to OFF which has brands field. But if source_name JinaSearch, title includes \"Jacobs Cronat Gold...\" Could extract brand? The prompt says transcribe only; brand line declares brand. I think emit brand \"Jacobs\" with OFF source_url. Maybe also Jina? Hmm.\n\nFields:\n- brand: Jacobs\n- barcode? code: \"3274080005003\"\n- product_name: \"Jacobs Cronat Gold instant coffee\" (OFF)\n- product_name: \"Jacobs Cronat Gold cafea macinata 100g\" (Jina title) or content maybe? The title is likely product name. But content says \"Cafea macinata Jacobs Cronat Gold 100g.\" Could be product name too. We can emit product_name from Jina title. Be precise: value from title.\n- ingredients_text: \"Coffee\" (OFF)\n- ingredients_text: \"cafea 100%\" (Jina content includes \"Ingrediente: cafea 100%.\") This conflicts with OFF \"Coffee\". Keep both.\n- packaging: \"Jar\" (OFF)\n- quantity? Jina content/title has 100g. Could emit quantity \"100g\"? Is quantity stated? Yes \"100g\" in title and content. Field maybe \"quantity\". Transcribe \"100g\".\n- countries: \"en:romania, en:germany\" from OFF. Field maybe \"countries_tags_en\". Could emit value as JSON? Maybe \"en:romania, en:germany\". Hmm.\n- nutrition energy-kcal_100g: 0\n- fat_100g: 0.1\n- carbohydrates_100g: 0.3\n- proteins_100g: 0.1\n- salt_100g: 0.01\n\nShould we include all nutriments? They are distinct fields. Use field names as in payload? \"energy-kcal_100g\", etc. That might be valid.\n\nNeed output only JSON. Ensure valid JSON, no trailing commas.\n\nPotential field names:\nbrand\ncode\nproduct_name\ningredients_text\npackaging\ncountries_tags_en\nenergy-kcal_100g\nfat_100g\ncarbohydrates_100g\nproteins_100g\nsalt_100g\nquantity\n\nBut source payload fields are \"nutriments\": nested. We can flatten. Is that okay? Likely yes. We transcribe.\n\nNeed maybe include \"source_url\" for each fact. For OFF source_url: https://world.openfoodfacts.org/api/v2/search, retrieved_at: 2026-09-23T16:27:10.894409+00:00.\nFor Jina source_url: https://eu.s.jina.ai/Jacobs+Jacobs+Cronat+Gold, retrieved_at: 2026-09-23T16:27:10.894409+00:00.\n\nPotential issue: source_url for Jina is a search URL, while payload item has url to product page. But instruction says copy source_url verbatim from source block. So use Jina URL.\n\nWhat about brand from Jina? Could emit brand fact with source_url Jina and value \"Jacobs\" because title starts \"Jacobs Cronat Gold...\"? But not explicit brand field. However brand line says Jacobs. I think one brand fact sufficient. But maybe to satisfy attribution, brand fact could cite OpenFoodFacts brands field. Good.\n\nShould we include \"product_name\" from Jina content as well? Maybe title and content both. The title is field. Content is text. Could emit only one product_name per source? Rule one fact per distinct field. If same field from same source with conflicting values? Here title and content both could be product name but title is more field-like. I will emit product_name from Jina title: \"Jacobs Cronat Gold cafea macinata 100g\". Also maybe ingredients_text from content: \"cafea 100%\" (or \"Ingrediente: cafea 100%\"? Extract \"cafea 100%\"). And quantity \"100g\" from title/content. Could conflict with OFF no quantity. That's fine.\n\nCould also emit \"quantity\" from Jina content \"100g\". Field name \"quantity\" not explicitly in payload but value stated.\n\nShould we include \"product_name\" from OFF and Jina as separate facts. Yes.\n\nShould we include \"ingredients_text\" from OFF \"Coffee\" and Jina \"cafea 100%\"? Yes. These conflict? OFF says ingredients Coffee; Jina says cafea 100%. Actually same meaning but different language. Keep both? Rule 5 conflicts label wins visible, keep both. But they are not necessarily conflicting, just different language. But Jina content says \"Ingrediente: cafea 100%.\" OFF ingredients_text \"Coffee\". Could be seen as same. But we can include both because different source fields. However rule 1 one fact per distinct field. If same field with different values, keep both due to conflicts. I'd include both.\n\nPackaging \"Jar\" only OFF.\n\nCountries: maybe field \"countries_tags_en\" value \"en:romania, en:germany\". Could emit.\n\nMaybe also \"code\" field. Value \"3274080005003\". Is that a barcode? The field is \"code\". Transcribe \"code\". Good.\n\nNutriments: maybe field names \"energy-kcal_100g\", etc. Values as numbers. In JSON output, values must be strings? Fact has value \"<text>\". The template shows value as string. So convert numbers to strings?"}}], "usage": {"prompt_tokens": 1039, "completion_tokens": 2000, "total_tokens": 3039, "prompt_cache_hit_tokens": 512, "prompt_cache_miss_tokens": 527, "prompt_tokens_details": {"cached_tokens": 512}, "completion_tokens_details": {"reasoning_tokens": 2000}}}
+LEDGER_ROWS: 0
+Traceback (most recent call last):
+  File "/tmp/opencode/sg099/live.py", line 68, in <module>
+    result = syn.synthesize(
+             ^^^^^^^^^^^^^^^
+  File "/home/andrei/StorageGenie/backend/app/services/enrich/synthesize.py", line 281, in synthesize
+    result = provider.extract_text(user_text, prompt_text, estimated_cost=estimated_cost)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/andrei/StorageGenie/backend/app/services/providers/opencode_go.py", line 374, in extract_text
+    content = strip_single_think(guard_content(message.get("content")))
+                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/andrei/StorageGenie/backend/app/services/providers/opencode_go.py", line 71, in guard_content
+    raise ProviderError("invalid_json", "provider returned empty content (empty-200 reject)")
+app.services.providers.router.ProviderError: provider returned empty content (empty-200 reject)
+
+cost arithmetic from leg-2 usage: prompt=1039 completion=2000 -> $0.00135585; two-call worst-if-similar $0.00271170
+production counts before: provider_call 17 job 7 candidate 6 assertion 28 asset 6
+production counts after:  provider_call 17 job 7 candidate 6 assertion 28 asset 6 (identical)

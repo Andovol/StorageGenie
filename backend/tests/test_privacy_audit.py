@@ -462,9 +462,11 @@ def test_g2_web_senders_are_the_two_researched_sources() -> None:
     The name-only scan allows the enrich package's Jina module (+ the mapping
     import in `candidates.py`) and keeps every other web sender absent. SG-097
     adds `config.py` to the allow-set: it declares the `jina_api_key` settings
-    field (a name, not a sender). SG-098 adds `api/v1/enrich.py` to the allow-set:
+    field (a name, not a sender).     SG-098 adds `api/v1/enrich.py` to the allow-set:
     it imports the real Jina module as the endpoint's client seam (a name, not a
-    sender of its own). The excluded detection source is checked over the touched
+    sender of its own). SG-099 adds `services/enrich/synthesize.py` to the
+    allow-set: it consumes the Jina payload as synthesis input (a name, not a
+    sender). The excluded detection source is checked over the touched
     web-source files only (the rule's literal gate covers new/modified files, not
     the whole tree).
     """
@@ -483,6 +485,7 @@ def test_g2_web_senders_are_the_two_researched_sources() -> None:
         "config.py",
         "services/candidates.py",
         "services/enrich/jina.py",
+        "services/enrich/synthesize.py",
     }, jina_files
 
     excluded_hits: list[str] = []
