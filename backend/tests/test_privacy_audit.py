@@ -218,10 +218,13 @@ def test_g0_single_http_client_and_send_site_full_scan() -> None:
     """Scan every app source file: exactly two named HTTP clients, one send site.
 
     SG-082 repair (M45): the Jina fallback client is a second legitimate httpx
-    carrier inside the enrich package; the inventory now names both. The single
-    POST send site is unchanged (both enrich clients are read-only GETs).
+    carrier inside the enrich package; the inventory now names both. SG-098 adds
+    `api/v1/enrich.py`: it imports `httpx` only for the injection-seam type
+    annotation and makes no send of its own (it delegates to the enrich clients).
+    The single POST send site is unchanged (all enrich carriers are read-only GETs).
     """
     assert _http_client_files() == {
+        "api/v1/enrich.py": ["import httpx"],
         "services/enrich/client.py": ["import httpx"],
         "services/enrich/jina.py": ["import httpx", "import urllib"],
         "services/providers/opencode_go.py": ["import httpx"],
@@ -459,9 +462,11 @@ def test_g2_web_senders_are_the_two_researched_sources() -> None:
     The name-only scan allows the enrich package's Jina module (+ the mapping
     import in `candidates.py`) and keeps every other web sender absent. SG-097
     adds `config.py` to the allow-set: it declares the `jina_api_key` settings
-    field (a name, not a sender). The excluded detection source is checked over
-    the touched web-source files only (the rule's literal gate covers
-    new/modified files, not the whole tree).
+    field (a name, not a sender). SG-098 adds `api/v1/enrich.py` to the allow-set:
+    it imports the real Jina module as the endpoint's client seam (a name, not a
+    sender of its own). The excluded detection source is checked over the touched
+    web-source files only (the rule's literal gate covers new/modified files, not
+    the whole tree).
     """
     jina_files: set[str] = set()
     for path in sorted(APP_DIR.rglob("*.py")):
@@ -474,13 +479,14 @@ def test_g2_web_senders_are_the_two_researched_sources() -> None:
             if "jina" in lowered:
                 jina_files.add(rel)
     assert jina_files == {
+        "api/v1/enrich.py",
         "config.py",
         "services/candidates.py",
         "services/enrich/jina.py",
     }, jina_files
 
     excluded_hits: list[str] = []
-    for rel in ("services/candidates.py", "services/enrich/jina.py"):
+    for rel in ("api/v1/enrich.py", "services/candidates.py", "services/enrich/jina.py"):
         for number, line in enumerate(
             (APP_DIR / rel).read_text(encoding="utf-8").splitlines(), start=1
         ):

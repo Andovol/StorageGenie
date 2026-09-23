@@ -111,6 +111,13 @@ export function AssetDetailPage() {
     onError: (e: unknown) => setError(e instanceof Error ? e.message : String(e)),
   });
 
+  // SG-098: the manual Enrich trigger. The button itself already gates the
+  // press through `enrichCapRefusal`; this handler only runs under the cap.
+  const enrichMut = useMutation({
+    mutationFn: () => apiPost(`/v1/enrich/${id}`, {}, { household_id: householdId }),
+    onError: (e: unknown) => setError(e instanceof Error ? e.message : String(e)),
+  });
+
   if (isLoading) return <div style={{ padding: 24 }}>Loading...</div>;
   if (!asset) return <div style={{ padding: 24 }}>Asset not found — <Link to="/">back to catalog</Link></div>;
 
@@ -146,7 +153,7 @@ export function AssetDetailPage() {
       </div>
 
       <div style={{ marginBottom: 16 }}>
-        <EnrichButton lastSpendUsd={null} />
+        <EnrichButton lastSpendUsd={null} onRun={() => enrichMut.mutate()} />
       </div>
 
       {editing && (

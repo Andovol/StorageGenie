@@ -150,4 +150,16 @@ describe("EnrichButton per-press cap (SG-082)", () => {
     fireEvent.click(screen.getByRole("button", { name: "Enrich" }));
     expect(run).toHaveBeenCalledTimes(1);
   });
+
+  test("the page's wired Enrich handler POSTs the enrich endpoint under the cap (SG-098)", async () => {
+    api.apiGet.mockResolvedValue(before);
+    api.apiPost.mockResolvedValue({ candidate_id: "cand-1", state: "proposed" });
+    renderPage();
+
+    fireEvent.click(await screen.findByRole("button", { name: "Enrich" }));
+
+    await waitFor(() =>
+      expect(api.apiPost).toHaveBeenCalledWith("/v1/enrich/asset-1", {}, { household_id: "hh" })
+    );
+  });
 });

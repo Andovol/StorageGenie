@@ -10,6 +10,7 @@ from app.api.v1.analytics import router as analytics_router
 from app.api.v1.assets import router as assets_router
 from app.api.v1.candidates import router as candidates_router
 from app.api.v1.chat import router as chat_router
+from app.api.v1.enrich import router as enrich_router
 from app.api.v1.evidence import router as evidence_router
 from app.api.v1.exports import router as export_router
 from app.api.v1.health import router as health_router
@@ -63,6 +64,7 @@ app.include_router(jobs_router, prefix="/v1")
 app.include_router(review_tasks_router, prefix="/v1")
 app.include_router(candidates_router, prefix="/v1")
 app.include_router(chat_router, prefix="/v1")
+app.include_router(enrich_router, prefix="/v1")
 app.include_router(plugins_router, prefix="/v1")
 app.include_router(planning_router, prefix="/v1")
 app.include_router(analytics_router, prefix="/v1")

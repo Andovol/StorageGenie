@@ -17,11 +17,10 @@ Decisions recorded here (reported, not hidden):
   the settings/env seam. The key VALUE is never returned by a builder, never
   stored in a snapshot and never logged.
 
-`resolve_api_key` reads `settings.jina_api_key` when such a field exists and
-otherwise the `JINA_API_KEY` process environment. The installed settings module
-(`app.config.Settings`) declares neither field (extra fields are ignored), so
-on this tree the environment is the carrier; that is a disclosed finding, not a
-silent fallback (`F-SG082-2`).
+`resolve_api_key` reads the declared `settings.jina_api_key` field (SG-097)
+first and otherwise the `JINA_API_KEY` process environment. The settings field
+is the declared carrier; the environment remains the fallback, never a silent
+one.
 """
 
 from __future__ import annotations
