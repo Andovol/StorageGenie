@@ -466,9 +466,11 @@ def test_g2_web_senders_are_the_two_researched_sources() -> None:
     it imports the real Jina module as the endpoint's client seam (a name, not a
     sender of its own). SG-099 adds `services/enrich/synthesize.py` to the
     allow-set: it consumes the Jina payload as synthesis input (a name, not a
-    sender). The excluded detection source is checked over the touched
-    web-source files only (the rule's literal gate covers new/modified files, not
-    the whole tree).
+    sender). SG-100 adds `services/enrich/snapshots.py` (it persists a Jina
+    snapshot) and `models/enrich_snapshot.py` (its `source` value is `"jina"`)
+    to the allow-set: names, not senders. The excluded detection source is
+    checked over the touched web-source files only (the rule's literal gate
+    covers new/modified files, not the whole tree).
     """
     jina_files: set[str] = set()
     for path in sorted(APP_DIR.rglob("*.py")):
@@ -483,8 +485,10 @@ def test_g2_web_senders_are_the_two_researched_sources() -> None:
     assert jina_files == {
         "api/v1/enrich.py",
         "config.py",
+        "models/enrich_snapshot.py",
         "services/candidates.py",
         "services/enrich/jina.py",
+        "services/enrich/snapshots.py",
         "services/enrich/synthesize.py",
     }, jina_files
 

@@ -2,6 +2,7 @@ from app.db import Base
 from app.models.asset import Asset
 from app.models.assertion import Assertion
 from app.models.audit_event import AuditEvent
+from app.models.enrich_snapshot import EnrichSnapshot
 from app.models.evidence import Evidence, asset_evidence
 from app.models.guardrail_event import GuardrailEvent
 from app.models.household import Household
@@ -18,6 +19,7 @@ __all__ = [
     "Asset",
     "Assertion",
     "AuditEvent",
+    "EnrichSnapshot",
     "Evidence",
     "asset_evidence",
     "GuardrailEvent",
