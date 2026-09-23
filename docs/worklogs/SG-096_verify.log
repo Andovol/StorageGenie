@@ -459,3 +459,25 @@ $ git rev-parse refs/notes/storagegenie-coder-reports-sg096-verify
 $ git notes --ref=refs/notes/storagegenie-coder-reports-sg096-verify show a4e25eeba0342024c70f8067d920dcefb19015d7
 Dispatch-ID: SG-096 | Report: docs/worklogs/SG-096_report.md | Work-HEAD: a4e25eeba0342024c70f8067d920dcefb19015d7
 show_exit=0
+
+######## FINAL TIP DUAL-ANNOTATION + PUSH (raw) ########
+$ git notes --ref=refs/notes/storagegenie-coder-reports add -m "..." c85e2de0332d3260a6f4a3d76f20803056a520a4   # dual-annotate final tip
+add_tip_exit=0
+$ git push origin automation
+To github.com:Andovol/StorageGenie.git
+   a4e25ee..c85e2de  automation -> automation
+push_exit=0
+$ git push origin refs/notes/storagegenie-coder-reports
+To github.com:Andovol/StorageGenie.git
+   70ff570..5972581  refs/notes/storagegenie-coder-reports -> refs/notes/storagegenie-coder-reports
+push_notes_exit=0
+$ git fetch origin refs/notes/storagegenie-coder-reports:refs/notes/storagegenie-coder-reports-sg096-final
+From github.com:Andovol/StorageGenie
+ * [new ref]         refs/notes/storagegenie-coder-reports -> refs/notes/storagegenie-coder-reports-sg096-final
+fetch_exit=0
+$ git rev-parse refs/notes/storagegenie-coder-reports-sg096-final
+59725813fcd61461c23a76a13de0708b7395b399
+$ git notes --ref=refs/notes/storagegenie-coder-reports-sg096-final show a4e25eeba0342024c70f8067d920dcefb19015d7   # WORK_HEAD
+Dispatch-ID: SG-096 | Report: docs/worklogs/SG-096_report.md | Work-HEAD: a4e25eeba0342024c70f8067d920dcefb19015d7
+$ git notes --ref=refs/notes/storagegenie-coder-reports-sg096-final show c85e2de0332d3260a6f4a3d76f20803056a520a4   # final tip (END_HEAD)
+Dispatch-ID: SG-096 | Report: docs/worklogs/SG-096_report.md | Work-HEAD: a4e25eeba0342024c70f8067d920dcefb19015d7
