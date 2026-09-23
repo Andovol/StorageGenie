@@ -4,7 +4,7 @@
 **Coder / effort:** `opencode` / `high` — effort read from the process arguments (`opencode run --auto --dir /home/andrei/StorageGenie --variant high …`); **model: `unknown`** (no model id is sent per policy, and no process argument or provider metadata exposed one — reported `unknown`, never guessed from a system-prompt identity line).
 **Work dir:** `/home/andrei/StorageGenie` · **Remote:** `origin` = `git@github.com:Andovol/StorageGenie.git`
 **BASE (requested ref `origin/automation` resolved):** `59f731f83e47e63549c79d736c64995ae20e65e5` (== start HEAD)
-**WORK_HEAD:** `<filled below>` · **Report:** `docs/worklogs/SG-106_report.md`
+**WORK_HEAD:** `463740ce40bde1db2e15de11e1e016dffcea763c` · **Report:** `docs/worklogs/SG-106_report.md`
 **Contract echo (verbatim):** `0.33.0` — recorded in `STATE.md:3` and `AGENTS.md:4`; **source path** `/home/andrei/storagegenie-contract/VERSION` → `0.33.0`, `FETCH_HEAD` `b232b845d74e89cb346c60fa4b9a40ec401c42dd` "branch 'contract' of github.com:Andovol/Launcher". `.rules-cache/` is **ABSENT** on this host (no in-repo cache); the contract checkout named by `/etc/dispatch/storagegenie.conf` (`CONTRACT_DIR=/home/andrei/storagegenie-contract`) is the source path. Recorded == published == `0.33.0`.
 **DATABASE: none live** (read-only counts/health probes only; no write of any kind). **Restart: ONE backend recreate (D146). Deploy: THIS slice.**
 **Spend (real $):** **$0.000000** — build/recreate are $0; every probe was loopback-only; no external service, no synthesis call, no Jina request, no metered byte.
@@ -135,7 +135,32 @@ Commands producing no progress were never killed; no interactive command was run
 
 ## Report note on the notes ref (receipt)
 
-<filled after execution>
+Work pushed to `automation` (`59f731f..463740c`), worktree clean (`CO-55`). Note added on `WORK_HEAD`, notes ref pushed, and verified against the **fetched, mapped** ref. Executed, verbatim:
+
+```
+$ git notes --ref=refs/notes/storagegenie-coder-reports show 463740ce40bde1db2e15de11e1e016dffcea763c   # pre-check
+error: no note found for object 463740ce40bde1db2e15de11e1e016dffcea763c.
+precheck_exit=1
+
+$ git notes --ref=refs/notes/storagegenie-coder-reports add -m "Dispatch-ID: SG-106 | Report: docs/worklogs/SG-106_report.md | Work-HEAD: 463740ce40bde1db2e15de11e1e016dffcea763c" 463740ce40bde1db2e15de11e1e016dffcea763c
+note_add_exit=0
+
+$ git push origin refs/notes/storagegenie-coder-reports
+To github.com:Andovol/StorageGenie.git
+   ee5c316..bcc6660  refs/notes/storagegenie-coder-reports -> refs/notes/storagegenie-coder-reports
+push_exit=0
+
+$ git fetch origin refs/notes/storagegenie-coder-reports:refs/notes/storagegenie-coder-reports-fetched
+From github.com:Andovol/StorageGenie
+   97ddaec..bcc6660  refs/notes/storagegenie-coder-reports -> refs/notes/storagegenie-coder-reports-fetched
+fetch_exit=0
+
+$ git notes --ref=refs/notes/storagegenie-coder-reports-fetched show 463740ce40bde1db2e15de11e1e016dffcea763c
+Dispatch-ID: SG-106 | Report: docs/worklogs/SG-106_report.md | Work-HEAD: 463740ce40bde1db2e15de11e1e016dffcea763c
+show_exit=0
+```
+
+No push to `storagegenie-evidence`; no `{{RECEIPT_CMD}}`. The final tip is dual-annotated too (note-anchor inoculation, SG-092 precedent). `note=yes`.
 
 ---
 
