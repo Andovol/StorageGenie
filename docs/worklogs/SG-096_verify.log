@@ -1,0 +1,437 @@
+SG-096 raw verification log (commands + verbatim outputs)
+Host /home/andrei/StorageGenie ; branch automation ; BASE origin/automation = 4a605a24f8a57e37fb7a842bcde820a5ae9d6bf0 ; live clock start 2026-09-23T13:50:11Z
+
+######## CONTRACT ECHO ########
+# source path: /home/andrei/storagegenie-contract/{VERSION,CODER.md}
+# NOTE (finding): the packet records contract 0.30.0 (published c9c9ba3, D125). The live contract
+# clone the lane reads (CONTRACT_DIR=/home/andrei/storagegenie-contract per /etc/dispatch/storagegenie.conf)
+# has advanced to 0.33.0. Both quoted raw below; the LIVE line is echoed verbatim per CODER.md's own rule.
+$ cat /home/andrei/storagegenie-contract/VERSION
+0.33.0
+$ git -C /home/andrei/storagegenie-contract rev-parse HEAD
+b232b845d74e89cb346c60fa4b9a40ec401c42dd
+$ git -C /home/andrei/storagegenie-contract log --oneline -1
+b232b84 Contract payload 0.33.0
+$ git -C /home/andrei/storagegenie-contract cat-file -t c9c9ba3 ; git -C /home/andrei/storagegenie-contract log --oneline c9c9ba3 -1
+commit
+c9c9ba3 Contract payload 0.30.0
+$ sha256sum /home/andrei/storagegenie-contract/RULES.md
+18de7fd7b3546bd7624b3a7b59a78bd629752816cd7fa8f1af6113d1bafc8d46  /home/andrei/storagegenie-contract/RULES.md
+$ cat /home/andrei/storagegenie-contract/RULES.sha256
+18de7fd7b3546bd7624b3a7b59a78bd629752816cd7fa8f1af6113d1bafc8d46 RULES.md
+# live CODER.md line 3 (echoed verbatim):
+$ sed -n '3p' /home/andrei/storagegenie-contract/CODER.md
+**Contract version: 0.33.0** — **echo this line verbatim in your receipt.** It is the only proof that you
+# payload hash 18de7fd7... unchanged across 0.29.1/0.29.2/0.30.0/0.33.0 (AGENTS.md header); VERSION text drifted
+# 0.30.0 -> 0.33.0 since the packet was authored. Reported, not bent.
+
+######## MODEL / EFFORT ########
+$ for p in $(pgrep -f opencode); do tr '\0' ' ' < /proc/$p/cmdline | head -c 200; echo; done
+opencode run --auto --dir /home/andrei/StorageGenie --variant high # SG-096 ...
+$ grep -oE 'llm.provider=[^ ]+ llm.model=[^ ]+' /home/andrei/.local/share/opencode/log/opencode.log | tail -1
+llm.provider=opencode-go llm.model=deepseek-v4.1-flash
+# model deepseek-v4.1-flash (provider metadata, not a system-prompt identity line; argv carries no --model) ; effort high (argv --variant high)
+
+######## PREMISE VERIFICATION (PG-IC-09) ########
+$ git rev-parse HEAD ; git status --porcelain
+4a605a24f8a57e37fb7a842bcde820a5ae9d6bf0
+?? docs/worklogs/SG-096_verify.log
+$ reader.py PROMPT_FILES slice
+# SG-095: the live reader loads the frozen v4 prompts (SG-094 flip precedent).
+# v1/v2/v3 files remain on disk, byte-untouched, as the rollback reference.
+PROMPT_FILES = {
+    "food": "extract-food-v4.md",
+    "medicine": "extract-medicine-v4.md",
+    "cosmetics": "extract-cosmetics-v4.md",
+}
+RETRYABLE_ERRORS = frozenset(
+    {"outage", "timeout", "rate_limited", "transport", "http_status", "invalid_json"}
+$ Dockerfile:17 COPY backend/ ./
+COPY backend/ ./
+$ .dockerignore data/backend-data lines
+19:data
+20:backend/data
+21:docs
+22:.env
+$ pyproject.toml packages
+48:packages = ["app"]
+$ v4 prompts on disk (git ls-files + sha256)
+backend/app/services/providers/prompts/extract-cosmetics-v4.md
+backend/app/services/providers/prompts/extract-food-v4.md
+backend/app/services/providers/prompts/extract-medicine-v4.md
+401edc469b010a18853ba4305cd816c702845d09956bb8759568515c685aa397  backend/app/services/providers/prompts/extract-food-v4.md (committed blob)
+f8f80ca7fe54630c509b32e587d2ba6489095419e282242d215a1e111f81574b  backend/app/services/providers/prompts/extract-medicine-v4.md (committed blob)
+ba81d59b070564990c4f8bb3da7cde1ec5f28f198a5ce847629c789708501059  backend/app/services/providers/prompts/extract-cosmetics-v4.md (committed blob)
+$ taxonomy file on disk
+-rw-r--r-- 1 andrei andrei 482896 Sep 22 17:59 /home/andrei/StorageGenie/backend/app/data/google_taxonomy/2021-09-21.txt
+30039729880ec5ac4851de088ad228a6898aa253f0de5d5ebea5bb1437478fce  backend/app/data/google_taxonomy/2021-09-21.txt (committed blob)
+$ alembic versions files (count + tail)
+9
+0201cf10c56c_001_core_foundation.py
+20260908_sg013_observation.py
+20260908_sg014_candidate.py
+20260908_sg017_fts.py
+20260912_sg025_provider_call.py
+20260914_sg035_foundations.py
+20260916_sg048_name_optional.py
+20260917_sg068_saved_search.py
+__pycache__
+$ frontend last touched
+9c2a366 SG-082: Jina fallback client + OFF->Jina order + web review mapping + Enrich cap (0.30.0)
+
+########===== G1 BEFORE 2026-09-23T13:50:29Z =====########
+--- docker ps -a ---
+storagegenie-backend-1	storagegenie-backend	Up 47 hours (healthy)	127.0.0.1:8003->8000/tcp
+storagegenie-frontend-1	storagegenie-frontend	Exited (0) 11 days ago	
+--- backend inspect Image/RestartCount/Created/ContainerID ---
+Image=sha256:65eb3d6433b70bd09f85faf9d902064a0e9ca8c6afcc38d5980ad88c6b60c016 RestartCount=0 Created=2026-09-21T14:49:49.97909329Z ContainerID=f6539f65094e069d448921686099bb27e79a5bfbf487fd31eddae8ba527a017d ConfigImage=storagegenie-backend
+--- docker images storagegenie-backend ---
+storagegenie-backend:latest ID=sha256:65eb3d6433b70bd09f85faf9d902064a0e9ca8c6afcc38d5980ad88c6b60c016 Created=2026-09-21 14:49:23 +0000 UTC Size=825MB
+--- served index.html (loopback 8003) ---
+http=200 bytes=944
+/assets/index-CoNI-1Zn.css
+/assets/index-fOM9Er4k.js
+asset=/assets/index-CoNI-1Zn.css http=200 bytes=3839
+b18dbb336eef5c580bf0a2e6726d647c4f6c63edbc48373580d31e4508659ad3  /tmp/opencode/sg096/before_asset
+asset=/assets/index-fOM9Er4k.js http=200 bytes=304117
+91b53c1c7eb377353d7d9e8863d91f1e913fc6c517f327099b6f46dce49b6c1c  /tmp/opencode/sg096/before_asset
+--- alembic current / heads / history ---
+INFO  [alembic.runtime.migration] Context impl SQLiteImpl.
+INFO  [alembic.runtime.migration] Will assume non-transactional DDL.
+20260917_sg068_saved_search (head)
+20260917_sg068_saved_search (head)
+20260916_sg048_name_optional -> 20260917_sg068_saved_search (head), saved searches: named per-household filter sets (SG-068, Phase 4)
+20260914_sg035_foundations -> 20260916_sg048_name_optional, name-optional capture: asset.display_name becomes nullable (SG-048, S2)
+20260912_sg025_provider_call -> 20260914_sg035_foundations, data foundations: source attribution, planning suggestions, guardrail log (SG-035, Phase 3 S2/S3)
+20260908_sg017_fts -> 20260912_sg025_provider_call, provider call ledger (SG-025, blueprint §3.3)
+20260908_sg014_candidate -> 20260908_sg017_fts, SQLite FTS5 index for asset catalog search.
+20260908_sg013_observation -> 20260908_sg014_candidate, deduplication candidates
+0201cf10c56c -> 20260908_sg013_observation, deterministic signal observations
+<base> -> 0201cf10c56c, 001 core foundation
+--- DB stat (main + wal + shm) ---
+total 2524
+drwxr-xr-x 2 andrei andrei    4096 2026-09-21 14:50:01.200565899 +0000 .
+drwxr-xr-x 4 andrei andrei    4096 2026-09-02 12:00:36.025276422 +0000 ..
+-rw------- 1 andrei andrei  372736 2026-09-21 14:49:50.292620182 +0000 storagegenie.db
+-rw------- 1 andrei andrei   32768 2026-09-21 20:14:41.407937188 +0000 storagegenie.db-shm
+-rw------- 1 andrei andrei 2158912 2026-09-21 20:14:34.679979572 +0000 storagegenie.db-wal
+--- DB table row counts ---
+alembic_version = 1
+assertion = 28
+asset = 6
+asset_evidence = 12
+asset_fts = 6
+asset_fts_config = 1
+asset_fts_data = 8
+asset_fts_docsize = 6
+asset_fts_idx = 6
+audit_event = 68
+candidate = 6
+evidence = 13
+guardrail_event = 2
+household = 1
+idempotency_key = 9
+job = 7
+job_step = 56
+observation = 16
+planning_suggestion = 0
+provider_call = 17
+review_task = 6
+saved_search = 0
+source_attribution = 0
+user = 2
+table_count= 24
+--- gate http 301 / https 401 (unauthenticated, Host storagegenie.dynv6.net) ---
+http=301
+https=401
+--- health ---
+health_http=200 body={"status":"ok","db":"ok","storage":"ok"}
+
+--- regressions ---
+GET taxonomy http=200 bytes=1118
+60a7a8571ffe79a5688145f10817fa7141fd304da694c01b9136e0613fe5a99e  /tmp/opencode/sg096/before_taxonomy.json
+GET saved-searches http=200 bytes=12
+eef46741adfc3a9f76294d3b78f37a45f113092ac9d44ee77c7a038a88ff09a1  /tmp/opencode/sg096/before_saved-searches.json
+GET facets http=200 bytes=116
+9cc9b78ffe1001fb54b843f3c922934aa9232371e44cdb805521b2fff30aaf72  /tmp/opencode/sg096/before_facets.json
+GET analytics-summary http=200 bytes=5022
+4825f346d8770cbdcffcf010a6cee8bb6a861938796f905970748643be0ddf4e  /tmp/opencode/sg096/before_analytics-summary.json
+--- ss loopback ---
+LISTEN 0      4096   127.0.0.53%lo:53         0.0.0.0:*          
+LISTEN 0      2048         0.0.0.0:9119       0.0.0.0:*          
+LISTEN 0      511          0.0.0.0:80         0.0.0.0:*          
+LISTEN 0      4096       127.0.0.1:9881       0.0.0.0:*          
+LISTEN 0      4096       127.0.0.1:9870       0.0.0.0:*          
+LISTEN 0      511          0.0.0.0:443        0.0.0.0:*          
+LISTEN 0      2048       127.0.0.1:8600       0.0.0.0:*          
+LISTEN 0      2048       127.0.0.1:5000       0.0.0.0:*          
+LISTEN 0      4096         0.0.0.0:5433       0.0.0.0:*          
+LISTEN 0      200          0.0.0.0:5432       0.0.0.0:*          
+--- taxonomy BEFORE: live load_prompt versions through running container (expected v3) ---
+PROMPT_FILES= {'food': 'extract-food-v3.md', 'medicine': 'extract-medicine-v3.md', 'cosmetics': 'extract-cosmetics-v3.md'}
+food extract-food-v3
+medicine extract-medicine-v3
+cosmetics extract-cosmetics-v3
+--- candidates BEFORE: triple absent-or-null on fresh read ---
+candidate_count= 6
+01a0afaa-3ff4-7da0-987a-87f29c73ee5b state= proposed triple_present_keys= [] google_type_resolution= None
+01a0c445-51a8-7921-b6cc-681d23b10f1b state= edited triple_present_keys= [] google_type_resolution= None
+01a0c47f-246a-7263-a1af-490b313855af state= edited triple_present_keys= [] google_type_resolution= None
+01a0c481-1e4b-7db1-a6d3-63452fe8a26c state= edited triple_present_keys= [] google_type_resolution= None
+01a0c4a0-d574-75f0-87aa-a9a6abbd6a06 state= edited triple_present_keys= [] google_type_resolution= None
+01a0c4a2-2a46-7d53-a4b2-de34d54ce993 state= edited triple_present_keys= [] google_type_resolution= None
+--- ss loopback 8003 (BEFORE, exact) ---
+LISTEN 0      4096       127.0.0.1:8003       0.0.0.0:*          
+
+######## G2 BUILD ########
+$ export BUILDX_CONFIG=/tmp/opencode/buildx  # $HOME/.docker not writable (SG-067/SG-083 precedent)
+drwx------ 4 andrei andrei 4096 Sep  8 20:16 /home/andrei/.docker
+$ docker compose build backend   (timeout 600s)
+build_rc=0 elapsed_s=17
+--- build log tail (raw) ---
+#18 [frontend-build 6/6] RUN npm run build
+#18 4.781 vite v5.4.21 building for production...
+#18 4.827 transforming...
+#18 6.813 ✓ 1961 modules transformed.
+#18 6.959 rendering chunks...
+#18 6.965 computing gzip size...
+#18 6.975 dist/index.html                   0.94 kB │ gzip:  0.48 kB
+#18 6.975 dist/assets/index-CoNI-1Zn.css    3.84 kB │ gzip:  1.04 kB
+#18 6.975 dist/assets/index-D4-L2yOb.js   305.03 kB │ gzip: 89.44 kB
+#18 6.976 ✓ built in 2.17s
+#18 DONE 7.1s
+
+#21 [stage-1 9/9] COPY --from=frontend-build /ui/dist ./static
+#21 DONE 0.0s
+
+#22 exporting to image
+#22 exporting layers
+#22 exporting layers 4.4s done
+#22 exporting manifest sha256:3e1fafb44dbf7b805d4e6b6d1052f7f17077f8c88c781da693e570806c853816 done
+#22 exporting config sha256:af7b1c3e1a5c56479c389f9a6881404d2ed1df7c8ae0c0f409c53d486febc18f done
+#22 exporting attestation manifest sha256:c115aaceb098916ed7f95cf1a3569f2acc9517b1d1bdc306d0b72adad2fee2cb done
+#22 exporting manifest list sha256:24224bc5dcc098f59b4211981ebd7f67fcedfc2b0621024266c00c67b89bcbc8 done
+#22 naming to docker.io/library/storagegenie-backend:latest done
+#22 unpacking to docker.io/library/storagegenie-backend:latest
+#22 unpacking to docker.io/library/storagegenie-backend:latest 1.6s done
+#22 DONE 6.1s
+
+#23 resolving provenance for metadata file
+#23 DONE 0.0s
+ Image storagegenie-backend Built 
+--- docker images after build ---
+storagegenie-backend:latest ID=sha256:24224bc5dcc098f59b4211981ebd7f67fcedfc2b0621024266c00c67b89bcbc8 Created=2026-09-23 13:50:57 +0000 UTC
+--- build log: bundle + COPY backend steps (raw grep) ---
+41:#11 [stage-1 4/9] COPY backend/pyproject.toml backend/requirements.lock ./
+44:#12 [stage-1 5/9] RUN pip install --no-cache-dir -r requirements.lock
+50:#14 [frontend-build 3/6] COPY frontend/package.json frontend/package-lock.json ./
+56:#16 [frontend-build 5/6] COPY frontend/ ./
+59:#17 [stage-1 6/9] COPY backend/ ./
+69:#19 [stage-1 7/9] RUN pip install --no-cache-dir "hatchling==1.32.0" "editables==0.6"
+74:#19 0.717 Requirement already satisfied: packaging>=24.2 in /usr/local/lib/python3.12/site-packages (from hatchling==1.32.0) (26.3)
+75:#19 0.717 Requirement already satisfied: pathspec>=0.10.1 in /usr/local/lib/python3.12/site-packages (from hatchling==1.32.0) (1.1.1)
+76:#19 0.717 Requirement already satisfied: pluggy>=1.0.0 in /usr/local/lib/python3.12/site-packages (from hatchling==1.32.0) (1.6.0)
+85:#19 0.806 Installing collected packages: trove-classifiers, tomlkit, editables, hatchling
+90:#19 0.993 [notice] To update, run: pip install --upgrade pip
+93:#20 [stage-1 8/9] RUN pip install --no-cache-dir --no-build-isolation --no-deps -e .
+99:#20 0.744 Building wheels for collected packages: storagegenie-backend
+105:#20 0.777 Installing collected packages: storagegenie-backend
+110:#20 0.854 [notice] To update, run: pip install --upgrade pip
+120:#18 6.975 dist/assets/index-CoNI-1Zn.css    3.84 kB │ gzip:  1.04 kB
+121:#18 6.975 dist/assets/index-D4-L2yOb.js   305.03 kB │ gzip: 89.44 kB
+125:#21 [stage-1 9/9] COPY --from=frontend-build /ui/dist ./static
+135:#22 naming to docker.io/library/storagegenie-backend:latest done
+
+######## G2 RECREATE (ONE backend service) ########
+$ docker compose up -d backend   (timeout 600s)
+up_rc=0 elapsed_s=2
+ Container storagegenie-backend-1 Recreate 
+ Container storagegenie-backend-1 Recreated 
+ Container storagegenie-backend-1 Starting 
+ Container storagegenie-backend-1 Started 
+--- inspect after recreate ---
+Image=sha256:24224bc5dcc098f59b4211981ebd7f67fcedfc2b0621024266c00c67b89bcbc8 RestartCount=0 Created=2026-09-23T13:51:31.540138408Z ContainerID=324f1cc4fbac68d7db89b49dc3cd58a00eb054df6a19422707d457ea15a11239
+
+########===== G3 AFTER 2026-09-23T13:51:45Z =====########
+--- health reads 1..6 ---
+{"status":"ok","db":"ok","storage":"ok"} read1 http=200 body=
+{"status":"ok","db":"ok","storage":"ok"} read2 http=200 body=
+{"status":"ok","db":"ok","storage":"ok"} read3 http=200 body=
+{"status":"ok","db":"ok","storage":"ok"} read4 http=200 body=
+{"status":"ok","db":"ok","storage":"ok"} read5 http=200 body=
+{"status":"ok","db":"ok","storage":"ok"} read6 http=200 body=
+--- docker ps -a ---
+storagegenie-backend-1	storagegenie-backend	Up 11 seconds (healthy)	127.0.0.1:8003->8000/tcp
+storagegenie-frontend-1	storagegenie-frontend	Exited (0) 11 days ago	
+--- backend inspect ---
+Image=sha256:24224bc5dcc098f59b4211981ebd7f67fcedfc2b0621024266c00c67b89bcbc8 RestartCount=0 Created=2026-09-23T13:51:31.540138408Z ContainerID=324f1cc4fbac68d7db89b49dc3cd58a00eb054df6a19422707d457ea15a11239
+--- docker images ---
+storagegenie-backend:latest ID=sha256:24224bc5dcc098f59b4211981ebd7f67fcedfc2b0621024266c00c67b89bcbc8 Created=2026-09-23 13:50:57 +0000 UTC
+--- served index.html (loopback) ---
+http=200 bytes=944
+/assets/index-CoNI-1Zn.css
+/assets/index-D4-L2yOb.js
+asset=/assets/index-CoNI-1Zn.css http=200 bytes=3839
+b18dbb336eef5c580bf0a2e6726d647c4f6c63edbc48373580d31e4508659ad3  /tmp/opencode/sg096/after_asset
+asset=/assets/index-D4-L2yOb.js http=200 bytes=305133
+f9a28f5ff507e5a48ecce324a43e134b927a7387d37ac7ce2b1e2106a5da542c  /tmp/opencode/sg096/after_asset
+--- index.html before/after cmp ---
+index.html DIFFERS
+--- in-image files: taxonomy data + three v4 prompts (docker exec, running container) ---
+-rw-r--r-- 1 root root 482896 Sep 22 17:59 /app/app/data/google_taxonomy/2021-09-21.txt
+-rw-r--r-- 1 root root   5418 Sep 22 18:16 /app/app/services/providers/prompts/extract-cosmetics-v4.md
+-rw-r--r-- 1 root root   5336 Sep 22 18:16 /app/app/services/providers/prompts/extract-food-v4.md
+-rw-r--r-- 1 root root   5399 Sep 22 18:16 /app/app/services/providers/prompts/extract-medicine-v4.md
+--- in-image sha256 (exec) ---
+30039729880ec5ac4851de088ad228a6898aa253f0de5d5ebea5bb1437478fce  /app/app/data/google_taxonomy/2021-09-21.txt
+401edc469b010a18853ba4305cd816c702845d09956bb8759568515c685aa397  /app/app/services/providers/prompts/extract-food-v4.md
+f8f80ca7fe54630c509b32e587d2ba6489095419e282242d215a1e111f81574b  /app/app/services/providers/prompts/extract-medicine-v4.md
+ba81d59b070564990c4f8bb3da7cde1ec5f28f198a5ce847629c789708501059  /app/app/services/providers/prompts/extract-cosmetics-v4.md
+--- in-image PROMPT_FILES + live load_prompt version (REAL loader) ---
+PROMPT_FILES= {'food': 'extract-food-v4.md', 'medicine': 'extract-medicine-v4.md', 'cosmetics': 'extract-cosmetics-v4.md'}
+food extract-food-v4
+medicine extract-medicine-v4
+cosmetics extract-cosmetics-v4
+--- in-image resolver: rows + version (REAL loader) ---
+resolver_rows= 5595
+first_row= ('1', 'Animals & Pet Supplies')
+module_file= /app/app/services/google_taxonomy.py
+--- in-image resolver behavior sample (real resolve_google_type) ---
+Food & Drink -> Resolution(status='unclear', google_type_id=None, google_type_path=None, taxonomy_version='2021-09-21', score=0.25, margin=0.0, alternatives=[('412', 'Food, Beverages & Tobacco'), ('413', 'Food, Beverages & Tobacco > Beverages'), ('4520', 'Home & Garden > Kitchen & Dining > Food & Beverage Carriers > Drink Sleeves'), ('505316', 'Home & Garden > Kitchen & Dining > Kitchen Tools & Utensils > Food & Drink Stencils'), ('135', 'Business & Industrial > Food Service')])
+Beverages -> Resolution(status='unclear', google_type_id=None, google_type_path=None, taxonomy_version='2021-09-21', score=0.3333333333333333, margin=0.0, alternatives=[('412', 'Food, Beverages & Tobacco'), ('413', 'Food, Beverages & Tobacco > Beverages'), ('1868', 'Food, Beverages & Tobacco > Beverages > Coffee'), ('2628', 'Food, Beverages & Tobacco > Beverages > Soda'), ('2887', 'Food, Beverages & Tobacco > Beverages > Juice')])
+Health -> Resolution(status='unclear', google_type_id=None, google_type_path=None, taxonomy_version='2021-09-21', score=0.5, margin=0.16666666666666669, alternatives=[('469', 'Health & Beauty'), ('491', 'Health & Beauty > Health Care'), ('5252', 'Baby & Toddler > Baby Health'), ('2915', 'Health & Beauty > Personal Care'), ('3777', 'Health & Beauty > Health Care > Pillboxes')])
+--- alembic current / heads (AFTER) ---
+INFO  [alembic.runtime.migration] Context impl SQLiteImpl.
+INFO  [alembic.runtime.migration] Will assume non-transactional DDL.
+20260917_sg068_saved_search (head)
+20260917_sg068_saved_search (head)
+--- DB stat (AFTER) ---
+total 544
+drwxr-xr-x 2 andrei andrei   4096 2026-09-23 13:51:43.975896195 +0000 .
+drwxr-xr-x 4 andrei andrei   4096 2026-09-02 12:00:36.025276422 +0000 ..
+-rw------- 1 andrei andrei 512000 2026-09-23 13:51:33.048971189 +0000 storagegenie.db
+-rw------- 1 andrei andrei  32768 2026-09-23 13:51:43.975896195 +0000 storagegenie.db-shm
+-rw------- 1 andrei andrei      0 2026-09-23 13:51:43.975896195 +0000 storagegenie.db-wal
+--- DB table row counts (AFTER) ---
+alembic_version = 1
+assertion = 28
+asset = 6
+asset_evidence = 12
+asset_fts = 6
+asset_fts_config = 1
+asset_fts_data = 8
+asset_fts_docsize = 6
+asset_fts_idx = 6
+audit_event = 68
+candidate = 6
+evidence = 13
+guardrail_event = 2
+household = 1
+idempotency_key = 9
+job = 7
+job_step = 56
+observation = 16
+planning_suggestion = 0
+provider_call = 17
+review_task = 6
+saved_search = 0
+source_attribution = 0
+user = 2
+table_count= 24
+--- gate (AFTER) ---
+http=301
+https=401
+--- ss loopback 8003 (AFTER) ---
+LISTEN 0      4096       127.0.0.1:8003       0.0.0.0:*          
+--- regressions (AFTER) ---
+GET taxonomy http=200 bytes=1118
+60a7a8571ffe79a5688145f10817fa7141fd304da694c01b9136e0613fe5a99e  /tmp/opencode/sg096/after_taxonomy.json
+GET saved-searches http=200 bytes=12
+eef46741adfc3a9f76294d3b78f37a45f113092ac9d44ee77c7a038a88ff09a1  /tmp/opencode/sg096/after_saved-searches.json
+GET facets http=200 bytes=116
+9cc9b78ffe1001fb54b843f3c922934aa9232371e44cdb805521b2fff30aaf72  /tmp/opencode/sg096/after_facets.json
+GET analytics-summary http=200 bytes=5022
+09bd6c2044b191eb568905041bf3e8b2472945c2c975feaf5df2dafb89ac4833  /tmp/opencode/sg096/after_analytics-summary.json
+--- regression sha compare (BEFORE vs AFTER) ---
+taxonomy IDENTICAL
+saved-searches IDENTICAL
+facets IDENTICAL
+analytics-summary DIFFERS
+--- analytics diff (expect generated_at only) ---
+65c65
+<   "generated_at": "2026-09-23T13:50:36.448207+00:00",
+---
+>   "generated_at": "2026-09-23T13:52:01.106423+00:00",
+diff_rc=1
+--- live gating: GET /v1/candidates/{candidate_id} (live HTTP service, new build) ---
+http=200 bytes=1596
+top_keys= ['asset_id', 'dedup_matches', 'evidence_ids', 'fields', 'id', 'job_id', 'review_task_ids', 'state']
+fields_is_dict= True
+field_keys= ['asset_type', 'display_name', 'expiry_date', 'quantity', 'status', 'unit']
+triple_present= []
+google_type_resolution_present= False
+--- docker run --rm image inspection (new image, independent of running container) ---
+-rw-r--r-- 1 root root 482896 Sep 22 17:59 /app/app/data/google_taxonomy/2021-09-21.txt
+30039729880ec5ac4851de088ad228a6898aa253f0de5d5ebea5bb1437478fce  /app/app/data/google_taxonomy/2021-09-21.txt
+ba81d59b070564990c4f8bb3da7cde1ec5f28f198a5ce847629c789708501059  /app/app/services/providers/prompts/extract-cosmetics-v4.md
+401edc469b010a18853ba4305cd816c702845d09956bb8759568515c685aa397  /app/app/services/providers/prompts/extract-food-v4.md
+f8f80ca7fe54630c509b32e587d2ba6489095419e282242d215a1e111f81574b  /app/app/services/providers/prompts/extract-medicine-v4.md
+{'food': 'extract-food-v4.md', 'medicine': 'extract-medicine-v4.md', 'cosmetics': 'extract-cosmetics-v4.md'}
+--- pytest available in image? ---
+pytest 9.1.1
+
+######## G3 TARGETED TAXONOMY LEGS — inside the NEW build (docker exec, post-restart authority) ########
+$ docker exec -w /app storagegenie-backend-1 python -m pytest <3 node IDs> -p no:cacheprovider -q
+...                                                                      [100%]
+=============================== warnings summary ===============================
+../usr/local/lib/python3.12/site-packages/fastapi/testclient.py:1
+  /usr/local/lib/python3.12/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+../usr/local/lib/python3.12/site-packages/starlette/testclient.py:53
+  /usr/local/lib/python3.12/site-packages/starlette/testclient.py:53: DeprecationWarning: The anyio.abc.BlockingPortal alias is deprecated, use anyio.from_thread.BlockingPortal instead.
+    _PortalFactoryType = Callable[[], AbstractContextManager[anyio.abc.BlockingPortal]]
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+3 passed, 2 warnings in 1.11s
+pytest_rc=0
+--- .env key NAMES only (values never read) ---
+DATABASE_URL=
+STORAGE_ROOT=
+HOUSEHOLD_DEFAULT_NAME=
+CORS_ORIGINS=
+OPENCODE_API_KEY=
+SG_CONSENT=
+SG_PROVIDER_ID=
+JINA_API_KEY=
+--- provider_call count post-tests (no extraction POST; expect 17) ---
+provider_call= 17
+--- DB stat post-tests (proves targeted tests did not touch prod DB) ---
+total 544
+drwxr-xr-x 2 andrei andrei   4096 2026-09-23 13:51:43.975896195 +0000 .
+drwxr-xr-x 4 andrei andrei   4096 2026-09-02 12:00:36.025276422 +0000 ..
+-rw------- 1 andrei andrei 512000 2026-09-23 13:51:33.048971189 +0000 storagegenie.db
+-rw------- 1 andrei andrei  32768 2026-09-23 13:51:43.975896195 +0000 storagegenie.db-shm
+-rw------- 1 andrei andrei      0 2026-09-23 13:51:43.975896195 +0000 storagegenie.db-wal
+--- git status (writes must be docs/worklogs only) ---
+?? docs/worklogs/SG-096_verify.log
+--- tracked diff vs HEAD (must be empty: no code changes) ---
+tracked_diff_rc=0
+
+######## BEFORE/AFTER SUMMARY ########
+clock end: 2026-09-23T13:52:54Z
+image:      sha256:24224bc5dcc098f59b4211981ebd7f67fcedfc2b0621024266c00c67b89bcbc8  (new)
+BEFORE image sha256:65eb3d6433b70bd09f85faf9d902064a0e9ca8c6afcc38d5980ad88c6b60c016
+AFTER  image sha256:24224bc5dcc098f59b4211981ebd7f67fcedfc2b0621024266c00c67b89bcbc8
+container:  f6539f65094e -> 324f1cc4fbac  (DIFFERS)
+restarts:   0 -> 0  (recreate replaces container; RestartCount resets -- F-SG083-1)
+bundle JS:  index-fOM9Er4k.js 304117 B 91b53c1c..  ->  index-D4-L2yOb.js 305133 B f9a28f5f..  (DIFFERS -- F-SG096-1)
+bundle CSS: index-CoNI-1Zn.css 3839 B b18dbb33..  ->  IDENTICAL
+index.html: DIFFERS only in the <script src> asset name (F-SG096-1)
+alembic:    20260917_sg068_saved_search (head)  ->  IDENTICAL
+rows:       24 tables IDENTICAL
+db main:    372736 B @2026-09-21 14:49:50  ->  512000 B @2026-09-23 13:51:33  (WAL 2158912 -> 0; physical checkpoint, F-SG083-2)
+gate:       http 301 / https 401  ->  301 / 401
+health:     ok/ok/ok x6
+taxonomy:   loader v3 (live)  ->  loader v4 (live)  (FAILPRE/PASSPOST pair)
+provider_call: 17 -> 17 (no extraction POST)

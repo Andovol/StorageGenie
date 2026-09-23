@@ -1,0 +1,49 @@
+SG-096 running log (narrative; raw evidence in SG-096_verify.log)
+Dispatch: SG-096 | Coder: opencode | effort: high (argv --variant high) | model: deepseek-v4.1-flash (provider metadata)
+Authoring date (metadata): 2026-09-23 | live clock start 2026-09-23T13:50:11Z | end 2026-09-23T13:52:54Z
+
+T+00s  Read packet + SG-083 (direct rider precedent) + SG-095 report. BASE origin/automation = 4a605a2.
+T+05s  Contract check: recorded 0.30.0 (c9c9ba3) but LIVE /home/andrei/storagegenie-contract = 0.33.0 (b232b84);
+       payload hash 18de7fd7.. unchanged. Drift = finding; live line echoed verbatim per CODER.md:3.
+T+10s  Premise verification: reader PROMPT_FILES = v4 (55-59); Dockerfile:17 COPY backend/ ./; .dockerignore
+       data:19 / backend/data:20 (matches packet); pyproject:48 packages=["app"]; 3 v4 prompts tracked;
+       taxonomy 2021-09-21.txt 482896 B; alembic 8 revision files (packet said "5" -> finding), head
+       20260917_sg068_saved_search; frontend last commit SG-082 (9c2a366).
+T+25s  G1 BEFORE captured: running container f6539f65094e from image 65eb3d6433b7 (SG-083 build, 2026-09-21
+       14:49, up 47h), RestartCount 0; served JS index-fOM9Er4k.js 304117 B; alembic head confirmed;
+       24-table counts; DB main 372736 B @2026-09-21 14:49:50 + WAL 2158912; gate 301/401; regressions 200;
+       taxonomy live loader = v3 (FAILPRE); candidates triple absent (6 candidates, pre-v4).
+T+30s  G2 BUILD: BUILDX_CONFIG=/tmp/opencode/buildx (HOME/.docker not writable), rc=0 in 17s.
+       Build log shows frontend build emitted index-D4-L2yOb.js -- DIFFERENT from the served BEFORE bundle;
+       investigated: SG-082 (9c2a366, 2026-09-22 16:53) is NOT an ancestor of the SG-083 build (e6f35a5b,
+       2026-09-21 14:53); the running image predates SG-082's frontend. New image 24224bc5dcc0.
+T+35s  G2 RECREATE: docker compose up -d backend, rc=0 in 2s, exactly one recreate;
+       container 324f1cc4fbac, image 24224bc5dcc0, RestartCount 0 (reset on recreate).
+T+40s  G3 AFTER: health ok/ok/ok x6; bundle now index-D4-L2yOb.js 305133 B f9a28f5f (CHANGED - F-SG096-1);
+       CSS identical; index.html differs only in script src; alembic identical; 24 counts identical;
+       DB main 512000 @13:51:33, WAL drained 2158912->0 (physical checkpoint - F-SG096-2); gate 301/401;
+       regressions taxonomy/saved-searches/facets byte-identical, analytics differs only in generated_at.
+T+55s  New-image proof: in-image taxonomy sha256 30039729880e.. == committed blob; 3 v4 prompt sha256 ==
+       committed blobs; REAL load_prompt returns v4 all three; resolver 5595 rows, version 2021-09-21;
+       docker run --rm confirms same. Live GET /v1/candidates/{id} -> 200, fields dict shape (no triple on
+       pre-v4 candidates). provider_call 17->17 (no POST).
+T+70s  Targeted taxonomy legs inside the NEW build (docker exec): 3 passed in 1.11s
+       (v4-reader + triple-through-route-and-commit + unclear-alternatives).
+T+80s  .env key NAMES (values never read): JINA_API_KEY present (name only disclosed). No code diff vs HEAD;
+       only docs/worklogs written.
+T+90s  Wrote report; receipt note + push + fetched-ref show; dual-annotation.
+
+Budget (PG-PR-06): recon+BEFORE ~25s/120s | build 17s/600s | recreate 2s/600s | AFTER+tests ~30s/120s |
+overall ~163s/1800s. No command hit its bound; nothing killed.
+
+Findings:
+- F-SG096-1  Frontend bundle changed (BEFORE fOM9Er4k.js -> AFTER D4-L2yOb.js). This is the packet's
+             "bundle IDENTICAL" criterion FAILING, and it is fully explained: the SG-083 image predates
+             SG-082's committed frontend. Any honest rebuild bakes it in. Proceeded (packet: premise
+             differences are findings, not obstacles), disclosed loudly.
+- F-SG096-2  DB main file grew 372736 -> 512000 B and WAL drained 2158912 -> 0: physical WAL checkpoint
+             on the old container's connection close at recreate (F-SG083-2 precedent). Logical counts identical.
+- F-SG096-3  RestartCount 0 -> 0 (recreate replaces the container; packet "+1" cannot apply - F-SG083-1).
+- F-SG096-4  Contract drift: packet recorded 0.30.0 (c9c9ba3), live clone is 0.33.0 (b232b84).
+- F-SG096-5  Packet says "alembic 5 files"; actual 8 revision files (head unchanged).
+- F-SG096-6  BuildKit does not enumerate COPY context files (F-SG083-4); in-image hashes used instead.
