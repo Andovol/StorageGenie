@@ -387,3 +387,9 @@ Originals above (88 FLAG:TRUST / 91 FLAG:TRUST) stand as the audit trail; the ve
 | slice_id | phase | model | effort | score | flag | lever | guards_invoked | deduction_attribution |
 |---|---|---|---|---|---|---|---|---|
 | SG-100 | Arc A persistence (D139): snapshot model + migration + append-only writer + brand-absent fixture, $0 | opencode (model cli-default, no id sent per policy; effort high from argv --variant high) | high | 98 |  |  | PG-EV-01, PG-EV-02, PG-EV-05, PG-EV-06, PG-EV-09, PG-SC-02, PG-SC-05, PG-SC-10, PG-SC-11, PG-IC-01, PG-IC-07, PG-IC-09, PG-PR-03, PG-PR-04 | packet |
+
+### SG-101 (2026-09-23 - Text-path token bound + empty-content accounting)
+
+| slice_id | phase | model | effort | score | flag | lever | guards_invoked | deduction_attribution |
+|---|---|---|---|---|---|---|---|---|
+| SG-101 | Arc A fix (D140): separate text-turn bound + empty-content accounting + one live proof call (closes SG-099 live) | opencode (live model deepseek-v4-flash-vision-exp from call body; effort high from argv --variant high) | high | 98 |  |  | PG-EV-01, PG-EV-02, PG-EV-05, PG-EV-06, PG-EV-09, PG-SC-05, PG-SC-06, PG-SC-10, PG-IC-01, PG-IC-03, PG-IC-04, PG-IC-07, PG-IC-09, PG-PR-03, PG-PR-04, PG-PR-06 | packet |
