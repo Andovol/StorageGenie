@@ -399,3 +399,9 @@ Originals above (88 FLAG:TRUST / 91 FLAG:TRUST) stand as the audit trail; the ve
 | slice_id | phase | model | effort | score | flag | lever | guards_invoked | deduction_attribution |
 |---|---|---|---|---|---|---|---|---|
 | SG-102 | Arc A re-confirms (D139/D141): snapshot recording wired + OFF accept + EU stands + Jina recorded via real writer | opencode (model unknown per identity line — no arg/metadata exposed one; effort high from packet dispatch head) | high | 98 |  |  | PG-EV-01, PG-EV-02, PG-EV-05, PG-EV-06, PG-EV-09, PG-SC-02, PG-SC-05, PG-SC-10, PG-IC-01, PG-IC-03, PG-IC-04, PG-IC-07, PG-IC-09, PG-PR-03, PG-PR-04, PG-PR-05, PG-PR-06 | packet |
+
+### SG-103 (2026-09-23 - Reviewer alternatives as first-class rows)
+
+| slice_id | phase | model | effort | score | flag | lever | guards_invoked | deduction_attribution |
+|---|---|---|---|---|---|---|---|---|
+| SG-103 | Arc A alternatives (D139/D141): label-side merge + web_alternates stored + served via real route, $0 | opencode (model unknown per identity line — no arg/metadata exposed one; effort high from packet dispatch head) | high | 98 |  |  | PG-EV-01, PG-EV-02, PG-EV-05, PG-EV-09, PG-SC-02, PG-SC-05, PG-SC-07, PG-SC-09, PG-SC-10, PG-IC-01, PG-IC-07, PG-IC-09, PG-PR-03, PG-PR-04 | packet |
