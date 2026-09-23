@@ -1,0 +1,43 @@
+SG-106 — presentation rider: rebuild + one recreate + verify, serves the SG-105 UI
+
+Coder: opencode · effort: high (process args: `opencode run --auto --dir /home/andrei/StorageGenie --variant high ...`) · model: unknown (no model id sent per policy; no process arg/provider metadata exposed one)
+Work dir: /home/andrei/StorageGenie · origin: git@github.com:Andovol/StorageGenie.git
+BASE ref requested: origin/automation → resolved 59f731f83e47e63549c79d736c64995ae20e65e5 (== start HEAD)
+Contract: recorded 0.33.0 == published; source path /home/andrei/storagegenie-contract/VERSION = 0.33.0, FETCH_HEAD b232b845d74e89cb346c60fa4b9a40ec401c42dd (.rules-cache/ ABSENT on host)
+DATABASE: none live (read-only probes only) · Restart: ONE backend recreate (D146) · Deploy: THIS slice
+
+T0 = 2026-09-23T19:34:44Z (recon). All commands bounded; no interactive command; nothing killed.
+
+G1 BEFORE — DONE (19:35:43Z)
+  image sha256:a76f1455… · container 40bcc321… · RestartCount=0 · loopback 127.0.0.1:8003->8000
+  served JS index-Cj3z97gk.js 305281 B sha256 d6847944… · served CSS index-CoNI-1Zn.css 3839 B b18dbb33… (loopback == in-image)
+  SG-105 markers ABSENT in served JS: page-container=0, THEMED_CONTROL_CLASS=0, Uncategorized (=0
+  alembic current 20260923_sg100_enrich_snapshot (head) · 25 tables · db 528384 B (wal 90672, shm 32768)
+  gate HTTP :80 → 301 → https://storagegenie.dynv6.net/ · HTTPS :443 → 401 (no login)
+  health exact {"status":"ok","db":"ok","storage":"ok"}
+  no-migration proof: git diff 59d4bf1..HEAD -- backend/app/models backend/alembic backend/app/db = 0 lines
+
+G2 rebuild — DONE
+  context: PageContainer.tsx + 7 SG-105-edited screens present in tree (timestamps 19:16–19:18)
+  build attempt 1 (default BUILDX_CONFIG) DENIED — read-only …/.docker/buildx/activity/.tmp-default… ; exit 1
+  build attempt 2 (BUILDX_CONFIG=/tmp/sg106/buildx; SG-067 precedent) exit 0, 11 s; frontend-build `npm run build` DONE 7.1 s (not cached)
+  attempt 3 = log-capture re-invocation (--progress=plain), all layers CACHED; same config digest 40059cac…, manifest id moved only by attestation timestamp
+  new image sha256:dc6a4382… (config 40059cac…); no dangling images
+
+G2 recreate — DONE (exactly ONE `up -d --no-deps backend`)
+  new container f2ca0be9… from dc6a4382… · loopback-only preserved · healthy at t=12 s · RestartCount 0
+
+G3 verify AFTER — DONE (19:38:06Z)
+  image DIFFERS a76f1455→dc6a4382 · container DIFFERS 40bcc321→f2ca0be9 · health ok · gate 301/401
+  served JS index-DlD86cZ6.js 307014 B sha256 6e0a3af7… DIFFERS (loopback == in-image) · CSS IDENTICAL
+  SG-105 markers in served JS: page-container=1 (0→1) · page-container--form=1 (0→1) · form-container=1 (0→1)
+    THEMED_CONTROL_CLASS=0 and `Uncategorized (`=0 — both impossible to match post-build (identifier minified / template compiled); see F-SG106-1
+  catalog-list probe GET /v1/assets?household_id=…&limit=2 → 200, keys {items,next_cursor}, 2 items, shape intact
+  alembic current still 20260923_sg100_enrich_snapshot · counts IDENTICAL to BEFORE (25 tables) · provider_call 17→17
+  DB bytes MOVED db 528384→552960, wal 90672→0 — WAL checkpoint at the recreate's connection close, not an application write (F-SG106-2)
+
+G4 worklog — DONE
+  SG-106.log · SG-106_report.md · SG-106_verify.log (raw: G1 + build + recreate + G3 + final)
+
+Overall elapsed ≈ 4 min wall vs 1800 s budget. Legs: build 11 s (bound 600 s), recreate+verify ≈ 40 s (bound 600 s).
+Spend: real $0.000000 (no external call; loopback probes only).
