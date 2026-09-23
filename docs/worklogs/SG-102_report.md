@@ -4,7 +4,7 @@
 **Coder / effort:** `opencode` / `high` — effort read from the packet dispatch head (`effort: high`); **model: `unknown`** (no model id is sent per policy, and no process argument or provider metadata exposed one — reported `unknown` rather than guessed from the system-prompt identity line).
 **Work dir:** `/home/andrei/StorageGenie` · **Remote:** `origin` = `git@github.com:Andovol/StorageGenie.git`
 **BASE (requested ref `origin/automation` resolved):** `f1d3aeb4f63d10ed9ded2294af7b8cd0ca4deef6`
-**WORK_HEAD:** `<filled after commit>` · **Report:** `docs/worklogs/SG-102_report.md`
+**WORK_HEAD:** `ed704c79b43e58138458be19ede52f48866c06dc` · **Report:** `docs/worklogs/SG-102_report.md`
 **Contract echo (verbatim):** `0.33.0` — recorded in `STATE.md:4` (`**Version:** \`0.33.0\` …`) and `AGENTS.md:4`; published side `/home/andrei/storagegenie-contract/VERSION` → `0.33.0`, HEAD `b232b845d74e89cb346c60fa4b9a40ec401c42dd` "Contract payload 0.33.0", and the **G-L1 payload hash was executed this time**: `sha256sum RULES.md` = `18de7fd7b3546bd7624b3a7b59a78bd629752816cd7fa8f1af6113d1bafc8d46` == `RULES.sha256`, `sha256sum -c` → `RULES.md: OK`. Recorded == published == `0.33.0`.
 **DATABASE: none live** (no migration; all live legs ran in-process on temp DBs). **Restart: none. Deploy: none. Container actions: none** (`PG-PR-04`). No model/migration: `app/models` + `alembic` diff **empty**.
 **Spend (real $):** **Jina 1 successful metered search (2 attempts)** — the Jina snapshot/response exposes **no cost or usage field**, so actual `$` is not measurable from the client and is reported in **units**, bounded by the packet's **≤2 searches ≤$0.01 worst-case** (uncalibrated `G-A9`). OFF `$0`; synthesis `$0`; all offline work `$0`.
@@ -95,7 +95,23 @@ The production DB **lacks** the `enrich_snapshot` table until a later owner-gate
 Work pushed to `automation`; worktree clean. Note added on `WORK_HEAD`, notes ref pushed, and verified against the **fetched, mapped** ref. Executed, verbatim:
 
 ```
-<paste filled after commit>
+$ git push origin automation
+To github.com:Andovol/StorageGenie.git
+   f1d3aeb..ed704c7  automation -> automation
+
+$ git notes --ref=refs/notes/storagegenie-coder-reports add -m "Dispatch-ID: SG-102 | Report: docs/worklogs/SG-102_report.md | Work-HEAD: ed704c79b43e58138458be19ede52f48866c06dc" ed704c79b43e58138458be19ede52f48866c06dc
+note add exit=0
+
+$ git push origin refs/notes/storagegenie-coder-reports
+To github.com:Andovol/StorageGenie.git
+   ff3d8e9..aa78bca  refs/notes/storagegenie-coder-reports -> refs/notes/storagegenie-coder-reports
+
+$ git fetch origin refs/notes/storagegenie-coder-reports:refs/notes/storagegenie-coder-reports-fetched
+From github.com:Andovol/StorageGenie
+   ff3d8e9..aa78bca  refs/notes/storagegenie-coder-reports -> refs/notes/storagegenie-coder-reports-fetched
+
+$ git notes --ref=refs/notes/storagegenie-coder-reports-fetched show ed704c79b43e58138458be19ede52f48866c06dc
+Dispatch-ID: SG-102 | Report: docs/worklogs/SG-102_report.md | Work-HEAD: ed704c79b43e58138458be19ede52f48866c06dc
 ```
 
 No push to `storagegenie-evidence`; no `{{RECEIPT_CMD}}`. The final tip (the docs-only receipt commit) is dual-annotated too (note-anchor inoculation, SG-092 precedent). `note=yes`.
