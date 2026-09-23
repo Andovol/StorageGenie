@@ -435,3 +435,27 @@ gate:       http 301 / https 401  ->  301 / 401
 health:     ok/ok/ok x6
 taxonomy:   loader v3 (live)  ->  loader v4 (live)  (FAILPRE/PASSPOST pair)
 provider_call: 17 -> 17 (no extraction POST)
+
+######## RECEIPT NOTE (raw) ########
+$ git push origin automation
+To github.com:Andovol/StorageGenie.git
+   4a605a2..a4e25ee  automation -> automation
+push_exit=0
+$ git notes --ref=refs/notes/storagegenie-coder-reports show a4e25eeba0342024c70f8067d920dcefb19015d7   # pre-check
+error: no note found for object a4e25eeba0342024c70f8067d920dcefb19015d7.
+existing_exit=1
+$ git notes --ref=refs/notes/storagegenie-coder-reports add -m "Dispatch-ID: SG-096 | Report: docs/worklogs/SG-096_report.md | Work-HEAD: a4e25eeba0342024c70f8067d920dcefb19015d7" a4e25eeba0342024c70f8067d920dcefb19015d7
+add_exit=0
+$ git push origin refs/notes/storagegenie-coder-reports
+To github.com:Andovol/StorageGenie.git
+   7c02361..70ff570  refs/notes/storagegenie-coder-reports -> refs/notes/storagegenie-coder-reports
+push_notes_exit=0
+$ git fetch origin refs/notes/storagegenie-coder-reports:refs/notes/storagegenie-coder-reports-sg096-verify
+From github.com:Andovol/StorageGenie
+ * [new ref]         refs/notes/storagegenie-coder-reports -> refs/notes/storagegenie-coder-reports-sg096-verify
+fetch_exit=0
+$ git rev-parse refs/notes/storagegenie-coder-reports-sg096-verify
+70ff5703998544244a5302a4ef1e00f8feb94c9e
+$ git notes --ref=refs/notes/storagegenie-coder-reports-sg096-verify show a4e25eeba0342024c70f8067d920dcefb19015d7
+Dispatch-ID: SG-096 | Report: docs/worklogs/SG-096_report.md | Work-HEAD: a4e25eeba0342024c70f8067d920dcefb19015d7
+show_exit=0

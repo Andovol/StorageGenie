@@ -6,7 +6,7 @@ line `llm.provider=opencode-go llm.model=deepseek-v4.1-flash`; argv carries no `
 **Spend (real $):** `$0.000000` actual vs `$0` bound — zero metered provider calls.
 
 **BASE ref:** `origin/automation` → resolved commit `4a605a24f8a57e37fb7a842bcde820a5ae9d6bf0` (SG-096 packet).
-**WORK_HEAD:** `__WORK_HEAD__` (the pre-note work commit carrying this report).
+**WORK_HEAD:** `a4e25eeba0342024c70f8067d920dcefb19015d7` (the pre-note work commit carrying this report).
 **Work dir:** `/home/andrei/StorageGenie` · **Origin:** `git@github.com:Andovol/StorageGenie.git`.
 **Authoring date (metadata, never a gate):** 2026-09-23; all time reads the live clock (`PG-IC-07`).
 
@@ -269,12 +269,33 @@ Pushed the work to `automation`; worktree clean (`CO-55`). No push to `storagege
 fetched into a **mapped** local name and verified with `git notes --ref=… show`; executed output pasted
 verbatim below.
 
-WORK_HEAD (pre-note work commit) = `__WORK_HEAD__`.
+WORK_HEAD (pre-note work commit) = `a4e25eeba0342024c70f8067d920dcefb19015d7`.
 
 Commands executed (raw) + pasted `show` output from the FETCHED mapped ref:
 
 ```
-__RECEIPT_PASTE__
+$ git push origin automation
+To github.com:Andovol/StorageGenie.git
+   4a605a2..a4e25ee  automation -> automation
+push_exit=0
+$ git notes --ref=refs/notes/storagegenie-coder-reports show a4e25eeba0342024c70f8067d920dcefb19015d7   # pre-check
+error: no note found for object a4e25eeba0342024c70f8067d920dcefb19015d7.
+existing_exit=1
+$ git notes --ref=refs/notes/storagegenie-coder-reports add -m "Dispatch-ID: SG-096 | Report: docs/worklogs/SG-096_report.md | Work-HEAD: a4e25eeba0342024c70f8067d920dcefb19015d7" a4e25eeba0342024c70f8067d920dcefb19015d7
+add_exit=0
+$ git push origin refs/notes/storagegenie-coder-reports
+To github.com:Andovol/StorageGenie.git
+   7c02361..70ff570  refs/notes/storagegenie-coder-reports -> refs/notes/storagegenie-coder-reports
+push_notes_exit=0
+$ git fetch origin refs/notes/storagegenie-coder-reports:refs/notes/storagegenie-coder-reports-sg096-verify
+From github.com:Andovol/StorageGenie
+ * [new ref]         refs/notes/storagegenie-coder-reports -> refs/notes/storagegenie-coder-reports-sg096-verify
+fetch_exit=0
+$ git rev-parse refs/notes/storagegenie-coder-reports-sg096-verify
+70ff5703998544244a5302a4ef1e00f8feb94c9e
+$ git notes --ref=refs/notes/storagegenie-coder-reports-sg096-verify show a4e25eeba0342024c70f8067d920dcefb19015d7
+Dispatch-ID: SG-096 | Report: docs/worklogs/SG-096_report.md | Work-HEAD: a4e25eeba0342024c70f8067d920dcefb19015d7
+show_exit=0
 ```
 
 No existing note was found before adding (see `existing_exit`), so this was not an existing-note refusal. The
