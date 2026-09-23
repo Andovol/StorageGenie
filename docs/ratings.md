@@ -417,3 +417,9 @@ Originals above (88 FLAG:TRUST / 91 FLAG:TRUST) stand as the audit trail; the ve
 | slice_id | phase | model | effort | score | flag | lever | guards_invoked | deduction_attribution |
 |---|---|---|---|---|---|---|---|---|
 | SG-105 | UI repair (D1): centered container + themed controls + inbox readability + catalog coherence | opencode (model unknown per identity line - CLI default per policy; effort high from argv --variant high) | high | 98 |  |  | PG-EV-01, PG-EV-02, PG-EV-05, PG-EV-09, PG-SC-02, PG-SC-05, PG-SC-07, PG-SC-09, PG-SC-11, PG-SC-12, PG-IC-01, PG-IC-03, PG-IC-07, PG-IC-09, PG-PR-01, PG-PR-03, PG-PR-04 | packet |
+
+### SG-106 (2026-09-23 - presentation rider)
+
+| slice_id | phase | model | effort | score | flag | lever | guards_invoked | deduction_attribution |
+|---|---|---|---|---|---|---|---|---|
+| SG-106 | Presentation rider (D146): rebuild + one recreate + verify, SG-105 UI served | opencode (model unknown per identity line - CLI default per policy; effort high from argv --variant high) | high | 98 |  |  | PG-EV-01, PG-EV-02, PG-EV-05, PG-EV-08, PG-SC-09, PG-SC-12, PG-DP-01, PG-DP-02, PG-IC-01, PG-IC-07, PG-IC-09, PG-PR-01, PG-PR-03, PG-PR-04, PG-PR-06 | packet |
