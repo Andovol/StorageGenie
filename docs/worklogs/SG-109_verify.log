@@ -78,3 +78,30 @@ untracked_backend_count=0
 $ git status --porcelain
 ?? docs/worklogs/SG-109.log
 ?? docs/worklogs/SG-109_calibration.md
+
+################## RECEIPT NOTE VERIFY (raw; post work-HEAD) ##################
+===== RECEIPT NOTE + PUSH 2026-09-24T09:28:04Z =====
+WORK_HEAD=dab94df5fc65d3f483f6b6179db4424598b4b025
+--- precheck existing note ---
+error: no note found for object dab94df5fc65d3f483f6b6179db4424598b4b025.
+precheck_exit=1
+--- push automation ---
+To github.com:Andovol/StorageGenie.git
+   effd7d1..dab94df  automation -> automation
+push_automation_exit=0
+--- add note on WORK_HEAD ---
+note_add_exit=0
+--- push notes ref ---
+To github.com:Andovol/StorageGenie.git
+   0b22546..174b4a9  refs/notes/storagegenie-coder-reports -> refs/notes/storagegenie-coder-reports
+push_notes_exit=0
+--- fetch mapped local ref ---
+From github.com:Andovol/StorageGenie
+ * [new ref]         refs/notes/storagegenie-coder-reports -> refs/notes/storagegenie-coder-reports-sg109-fetched
+fetch_exit=0
+--- mapped ref points at ---
+174b4a93cc7b4b233c8253210d1440efca130a67
+--- git notes show (fetched mapped ref) ---
+Dispatch-ID: SG-109 | Report: docs/worklogs/SG-109_report.md | Work-HEAD: dab94df5fc65d3f483f6b6179db4424598b4b025
+show_exit=0
+===== END RECEIPT NOTE + PUSH =====
