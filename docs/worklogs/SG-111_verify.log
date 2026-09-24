@@ -664,3 +664,32 @@ No criterion demands migration, merge-map, creation reroute, frontend, sender, s
 - build + recreate + health + AFTER capture: ~85 s (incl. one failed buildkit attempt + retry) / 600 s build+recreate+verify
 - overall: well under 2100 s
 REAL metered spend: $0.000000 (zero provider calls).
+
+################## RECEIPT NOTE VERIFY (raw; post work-HEAD) ##################
+===== RECEIPT NOTE + PUSH 2026-09-24T10:52:39Z =====
+WORK_HEAD=391338170f7ffc8ae833620160565f06961d17d2
+--- push automation ---
+To github.com:Andovol/StorageGenie.git
+   046ce7f..3913381  automation -> automation
+push_automation_exit=0
+--- remote head after push ---
+391338170f7ffc8ae833620160565f06961d17d2	refs/heads/automation
+--- precheck existing note ---
+error: no note found for object 391338170f7ffc8ae833620160565f06961d17d2.
+precheck_exit=1 (1 = no note, expected)
+--- add note on WORK_HEAD ---
+note_add_exit=0
+--- push notes ref ---
+To github.com:Andovol/StorageGenie.git
+   ad03653..b5fc35a  refs/notes/storagegenie-coder-reports -> refs/notes/storagegenie-coder-reports
+push_notes_exit=0
+--- fetch mapped local ref ---
+From github.com:Andovol/StorageGenie
+ * [new ref]         refs/notes/storagegenie-coder-reports -> refs/notes/storagegenie-coder-reports-sg111-fetched
+fetch_exit=0
+--- mapped ref points at ---
+b5fc35a3823c5d2dd8cded9416304f3f7cdb3a4e
+--- git notes show (fetched mapped ref) ---
+Dispatch-ID: SG-111 | Report: docs/worklogs/SG-111_report.md | Work-HEAD: 391338170f7ffc8ae833620160565f06961d17d2
+show_exit=0
+===== END RECEIPT =====

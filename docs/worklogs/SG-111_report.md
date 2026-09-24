@@ -30,7 +30,7 @@ Refs
 - Work dir `/home/andrei/StorageGenie`, origin `git@github.com:Andovol/StorageGenie.git`
 - BASE_REF = `origin/automation`
 - BASE_RESOLVED = `046ce7fa75de0e51084bb6633efcdd7c5380e988` (== start HEAD)
-- WORK_HEAD = (this work commit's hash; filled in the receipt commit below)
+- WORK_HEAD = `391338170f7ffc8ae833620160565f06961d17d2`
 
 Premise verification — corrections are worth more than agreement
 ---------------------------------------------------------------
@@ -196,8 +196,21 @@ Issues / disagreements / unanswered
 
 Receipt (notes ref)
 -------------------
-See `SG-111_verify.log` -> `RECEIPT NOTE VERIFY` for the pasted `git notes show` output. WORK_HEAD and the
-final tip are both annotated; final line `note=yes`. (Populated in the receipt commit.)
+Work pushed to `automation` (`046ce7f..3913381`), remote head observed at
+`391338170f7ffc8ae833620160565f06961d17d2` on `refs/heads/automation`; worktree clean. No push to
+`storagegenie-evidence`, no `{{RECEIPT_CMD}}`. Note added on WORK_HEAD
+`391338170f7ffc8ae833620160565f06961d17d2`; notes ref `refs/notes/storagegenie-coder-reports` pushed
+(`ad03653..b5fc35a`) and read back from a MAPPED fetch (`refs/notes/storagegenie-coder-reports-sg111-fetched`
+at `b5fc35a3823c5d2dd8cded9416304f3f7cdb3a4e`). Pasted executed output:
+
+```
+$ git notes --ref=refs/notes/storagegenie-coder-reports-sg111-fetched show 391338170f7ffc8ae833620160565f06961d17d2
+Dispatch-ID: SG-111 | Report: docs/worklogs/SG-111_report.md | Work-HEAD: 391338170f7ffc8ae833620160565f06961d17d2
+```
+
+Full raw transcript (precheck, add, push, mapped fetch, show) is in `SG-111_verify.log` -> `RECEIPT NOTE
+VERIFY`. The final tip (this receipt commit) is dual-annotated with the same note (SG-092 inoculation).
+final line: `note=yes`.
 
 Three UNCLEAR lines
 -------------------
