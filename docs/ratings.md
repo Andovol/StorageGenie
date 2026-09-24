@@ -465,3 +465,9 @@ Originals above (88 FLAG:TRUST / 91 FLAG:TRUST) stand as the audit trail; the ve
 | slice_id | phase | model | effort | score | flag | lever | guards_invoked | deduction_attribution |
 |---|---|---|---|---|---|---|---|---|
 | SG-113 | G3 locations (D154 L3-build): tree + temp-only migration + dormant API + asset-detail UI | opencode (model unknown per identity line - CLI default per policy; effort high from argv --variant high) | high | 98 |  |  | PG-EV-01, PG-EV-02, PG-EV-05, PG-EV-08, PG-EV-09, PG-SC-02, PG-SC-05, PG-SC-07, PG-SC-09, PG-SC-11, PG-SC-12, PG-DP-02, PG-IC-01, PG-IC-07, PG-IC-09, PG-PR-03, PG-PR-04, PG-PR-05, PG-PR-06, PG-PR-10 |  |
+
+### SG-114 (2026-09-24 - G4 asset relations)
+
+| slice_id | phase | model | effort | score | flag | lever | guards_invoked | deduction_attribution |
+|---|---|---|---|---|---|---|---|---|
+| SG-114 | G4 relations (D154 L3-build): typed links + temp-only migration + dormant API + detail UI | opencode (model unknown per identity line - CLI default per policy; effort high from argv --variant high) | high | 98 |  |  | PG-EV-01, PG-EV-02, PG-EV-05, PG-EV-08, PG-EV-09, PG-SC-02, PG-SC-05, PG-SC-07, PG-SC-09, PG-SC-11, PG-SC-12, PG-DP-02, PG-IC-01, PG-IC-07, PG-IC-09, PG-PR-03, PG-PR-04, PG-PR-05, PG-PR-06, PG-PR-10 |  |
