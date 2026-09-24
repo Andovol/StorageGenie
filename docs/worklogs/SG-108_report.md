@@ -4,7 +4,7 @@
 **Work dir:** `/home/andrei/StorageGenie` · **origin:** `git@github.com:Andovol/StorageGenie.git`
 **Branch:** `automation`
 **BASE_REF:** `origin/automation` → **BASE_RESOLVED:** `faf828e949ca3c6d655aecfdab4b75f395619411` (== start HEAD)
-**WORK_HEAD:** `__WORK_HEAD__`
+**WORK_HEAD:** `d7fd0fe778afd925240a4e1b81c3cc6faa662850`
 **Model / effort (CO-78, from process arguments):** argv = `opencode run --auto --dir /home/andrei/StorageGenie --variant high <packet>` → **model = CLI default** (no `--model` flag on argv; omitted per policy), **effort = `high`** (from `--variant high`).
 **Spend (real $):** **$0.000000** — no metered call exists on any path (zero provider calls).
 **Contract echo (verbatim):** `recorded 0.33.0 == published (b232b84; D129 adoption, G-L1 clean 2026-09-24)` — source path `/home/andrei/storagegenie-contract/VERSION` = `0.33.0`, `git -C /home/andrei/storagegenie-contract rev-parse HEAD` = `b232b845d74e89cb346c60fa4b9a40ec401c42dd` ("Contract payload 0.33.0"), `sha256sum RULES.md` = `18de7fd7b3546bd7624b3a7b59a78bd629752816cd7fa8f1af6113d1bafc8d46` == payload `RULES.sha256`.
@@ -67,10 +67,36 @@ Nothing else: `backend/` shows an **empty diff** (0 tracked lines; no untracked 
 ## Receipt note (M20-corrected block)
 
 No push to `storagegenie-evidence`, no `{{RECEIPT_CMD}}`. Work pushed to `automation`; worktree clean.
-Commands executed (verbatim), on `WORK_HEAD=__WORK_HEAD__`:
+Commands executed (verbatim), on `WORK_HEAD=d7fd0fe778afd925240a4e1b81c3cc6faa662850`:
 
 ```
-__RECEIPT_BLOCK__
+$ git notes --ref=refs/notes/storagegenie-coder-reports show d7fd0fe778afd925240a4e1b81c3cc6faa662850
+error: no note found for object d7fd0fe778afd925240a4e1b81c3cc6faa662850.
+precheck_exit=1
+
+$ git push origin automation
+   faf828e..d7fd0fe  automation -> automation
+push_automation_exit=0
+
+$ git notes --ref=refs/notes/storagegenie-coder-reports add \
+    -m "Dispatch-ID: SG-108 | Report: docs/worklogs/SG-108_report.md | Work-HEAD: d7fd0fe778afd925240a4e1b81c3cc6faa662850" \
+    d7fd0fe778afd925240a4e1b81c3cc6faa662850
+note_add_exit=0
+
+$ git push origin refs/notes/storagegenie-coder-reports
+   df6fb84..8806346  refs/notes/storagegenie-coder-reports -> refs/notes/storagegenie-coder-reports
+push_notes_exit=0
+
+$ git fetch origin refs/notes/storagegenie-coder-reports:refs/notes/storagegenie-coder-reports-sg108-fetched
+ * [new ref]         refs/notes/storagegenie-coder-reports -> refs/notes/storagegenie-coder-reports-sg108-fetched
+fetch_exit=0
+
+$ git rev-parse refs/notes/storagegenie-coder-reports-sg108-fetched
+88063469e0d0cb8882103f0d53d638c1ad4224a0
+
+$ git notes --ref=refs/notes/storagegenie-coder-reports-sg108-fetched show d7fd0fe778afd925240a4e1b81c3cc6faa662850
+Dispatch-ID: SG-108 | Report: docs/worklogs/SG-108_report.md | Work-HEAD: d7fd0fe778afd925240a4e1b81c3cc6faa662850
+show_exit=0
 ```
 
 First line carries BOTH `Dispatch-ID:` and `Report:` (`CO-97`). Existing-note refusal would have been a STOP; the precheck showed no existing note. Final line **note=yes**.

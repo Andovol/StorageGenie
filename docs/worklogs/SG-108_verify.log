@@ -384,3 +384,30 @@ code=401 redirect=
 
 ################## POST-RESTART SWEEP (waived) ##################
 Waived per PG-DP-02 (restart-gated). Substitute: in-process vitest pre-restart (24 files / 199 tests passed) + the post-restart live probes above as authority. No browser-driven tests exist on this path — the derived set differed nowise.
+
+################## RECEIPT NOTE VERIFY (raw; post work-HEAD) ##################
+===== RECEIPT NOTE + PUSH 2026-09-24T09:21:58Z =====
+WORK_HEAD=d7fd0fe778afd925240a4e1b81c3cc6faa662850
+--- precheck existing note ---
+error: no note found for object d7fd0fe778afd925240a4e1b81c3cc6faa662850.
+precheck_exit=1
+--- push automation ---
+To github.com:Andovol/StorageGenie.git
+   faf828e..d7fd0fe  automation -> automation
+push_automation_exit=0
+--- add note on WORK_HEAD ---
+note_add_exit=0
+--- push notes ref ---
+To github.com:Andovol/StorageGenie.git
+   df6fb84..8806346  refs/notes/storagegenie-coder-reports -> refs/notes/storagegenie-coder-reports
+push_notes_exit=0
+--- fetch mapped local ref ---
+From github.com:Andovol/StorageGenie
+ * [new ref]         refs/notes/storagegenie-coder-reports -> refs/notes/storagegenie-coder-reports-sg108-fetched
+fetch_exit=0
+--- mapped ref points at ---
+88063469e0d0cb8882103f0d53d638c1ad4224a0
+--- git notes show (fetched mapped ref) ---
+Dispatch-ID: SG-108 | Report: docs/worklogs/SG-108_report.md | Work-HEAD: d7fd0fe778afd925240a4e1b81c3cc6faa662850
+show_exit=0
+===== END RECEIPT NOTE VERIFY =====
