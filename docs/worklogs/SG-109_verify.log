@@ -105,3 +105,29 @@ fetch_exit=0
 Dispatch-ID: SG-109 | Report: docs/worklogs/SG-109_report.md | Work-HEAD: dab94df5fc65d3f483f6b6179db4424598b4b025
 show_exit=0
 ===== END RECEIPT NOTE + PUSH =====
+
+################## FINAL TIP PUSH + DUAL-ANNOTATE (raw) ##################
+===== FINAL TIP PUSH + DUAL-ANNOTATE 2026-09-24T09:28:28Z =====
+FINAL_TIP=3fd7c64a2e0099c33d049ec997f77040839f67d0
+--- precheck final tip note ---
+error: no note found for object 3fd7c64a2e0099c33d049ec997f77040839f67d0.
+precheck_exit=1
+--- dual-annotate final tip ---
+note_add_exit=0
+--- push notes ref ---
+To github.com:Andovol/StorageGenie.git
+   174b4a9..69aee88  refs/notes/storagegenie-coder-reports -> refs/notes/storagegenie-coder-reports
+push_notes_exit=0
+--- fetch mapped ---
+From github.com:Andovol/StorageGenie
+   174b4a9..69aee88  refs/notes/storagegenie-coder-reports -> refs/notes/storagegenie-coder-reports-sg109-fetched
+fetch_exit=0
+--- show WORK_HEAD ---
+Dispatch-ID: SG-109 | Report: docs/worklogs/SG-109_report.md | Work-HEAD: dab94df5fc65d3f483f6b6179db4424598b4b025
+show_workhead_exit=0
+--- show FINAL_TIP (dual) ---
+Dispatch-ID: SG-109 | Report: docs/worklogs/SG-109_report.md | Work-HEAD: dab94df5fc65d3f483f6b6179db4424598b4b025
+show_tip_exit=0
+--- worktree ---
+(end porcelain)
+===== END DUAL-ANNOTATE =====
