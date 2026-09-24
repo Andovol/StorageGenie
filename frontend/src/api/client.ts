@@ -6,6 +6,7 @@ import type {
   CandidateSplitResponse,
   ChatCorrectionResponse,
   ChatResponse,
+  ExpiryStatusResponse,
   PlanningRunResult,
   PlanningSuggestion,
   PlanningSuggestionListResponse,
@@ -208,6 +209,16 @@ export function sendChat(category: string, householdId: string, message: string)
 export function fetchAnalyticsSummary(householdId: string) {
   return apiGet<AnalyticsSummary>("/v1/analytics/summary", {
     household_id: householdId,
+  });
+}
+
+// SG-108: reader for the SG-107 urgency engine. An unset category is dropped
+// by `buildUrl` (empty-string params never reach the URL), so the default
+// request carries only the household scope.
+export function fetchExpiryStatus(householdId: string, category?: string) {
+  return apiGet<ExpiryStatusResponse>("/v1/plugins/expiry-tracker/status", {
+    household_id: householdId,
+    category: category ?? "",
   });
 }
 

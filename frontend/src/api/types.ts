@@ -287,3 +287,43 @@ export type TaxonomyPlugin = {
 export type TaxonomyResponse = {
   plugins: TaxonomyPlugin[];
 };
+
+// SG-108: the expiry dashboard reads the SG-107 engine route
+// (GET /v1/plugins/expiry-tracker/status). Keys mirror that response exactly.
+export type ExpiryBucket = "expired" | "this-week" | "this-month" | "safe";
+export type ExpiryTier = "critical" | "urgent" | "upcoming" | "long_lead" | "safe";
+export type ExpiryUnresolvedReason =
+  | "proposed"
+  | "needs_evidence"
+  | "unparseable"
+  | "dateless";
+
+export type ExpiryStatusRow = {
+  asset_id: string;
+  display_name: string | null;
+  category: string;
+  expiry_date: string;
+  date_type: string | null;
+  days_remaining: number;
+  tier: ExpiryTier | null;
+  bucket: ExpiryBucket;
+};
+
+export type ExpiryUnresolvedRow = {
+  asset_id: string;
+  reason: ExpiryUnresolvedReason;
+};
+
+export type ExpiryStatusResponse = {
+  household_id: string;
+  as_of: string;
+  category: string | null;
+  rows: ExpiryStatusRow[];
+  summary: {
+    by_tier: Record<string, number>;
+    by_bucket: Record<string, number>;
+    unresolved: number;
+    total: number;
+  };
+  unresolved_rows: ExpiryUnresolvedRow[];
+};

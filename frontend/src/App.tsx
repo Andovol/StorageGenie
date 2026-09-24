@@ -8,6 +8,7 @@ import { ReviewPage } from "./routes/ReviewPage";
 import { PlanningPage } from "./routes/PlanningPage";
 import { ChatPage } from "./routes/ChatPage";
 import { AnalyticsPage } from "./routes/AnalyticsPage";
+import { ExpiryPage } from "./routes/ExpiryPage";
 import { ThemeToggle } from "./theme/ThemeToggle";
 
 function Nav() {
@@ -57,6 +58,9 @@ function Nav() {
       <NavLink to="/analytics" className={({ isActive }) => linkClass(isActive)} style={({ isActive }) => linkStyle(isActive)}>
         Analytics
       </NavLink>
+      <NavLink to="/expiry" className={({ isActive }) => linkClass(isActive)} style={({ isActive }) => linkStyle(isActive)}>
+        Expiry
+      </NavLink>
       {showToggle ? <ThemeToggle /> : null}
       <span className="text-muted-foreground" style={{ marginLeft: "auto", fontSize: 11 }}>
         Phase 0 · local-first
@@ -78,6 +82,7 @@ export default function App() {
         <Route path="/planning" element={<PlanningPage />} />
         <Route path="/chat" element={<ChatPage />} />
         <Route path="/analytics" element={<AnalyticsPage />} />
+        <Route path="/expiry" element={<ExpiryPage />} />
         <Route path="/review/:candidateId" element={<ReviewPage />} />
       </Routes>
     </div>

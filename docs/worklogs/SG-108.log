@@ -1,0 +1,29 @@
+SG-108 worklog — Expiry dashboard: /expiry route + nav reading the SG-107 engine, owns its refresh
+Work dir /home/andrei/StorageGenie · branch automation · remote git@github.com:Andovol/StorageGenie.git
+Contract 0.33.0 (source /home/andrei/storagegenie-contract/VERSION = 0.33.0; HEAD b232b84 = "Contract payload 0.33.0"; RULES.sha256 = 18de7fd7b3546bd7624b3a7b59a78bd629752816cd7fa8f1af6113d1bafc8d46 RULES.md)
+Model/effort from process arguments: argv = 'opencode run --auto --dir /home/andrei/StorageGenie --variant high <packet>' (no --model flag → model is the CLI default); effort=high (from --variant high).
+Spend real $ = $0.000000 (zero provider calls).
+
+BASE_REF=origin/automation BASE_RESOLVED=faf828e949ca3c6d655aecfdab4b75f395619411 (== start HEAD)
+
+01. Recon — re-verified every packet premise: AnalyticsPage shape, PageContainer import, THEMED_CONTROL_CLASS export, useTaxonomy, shell.test.tsx:373 nav test, SG-107 route shape (as_of/household_id/category/rows/summary/unresolved_rows), bucket_for/tier_for/reason maps, live taxonomy slugs == engine slugs.
+02. G1 BEFORE captured (raw): image 8dce9eb2; bundle index-DlD86cZ6.js 307014 B 6e0a3af7; alembic 20260923_sg100_enrich_snapshot; 25 tables; health ok; gate 301/401; Expiry literal 5 (NOT 0 — premise correction); route-path literal 0.
+03. FAIL run — final ExpiryPage.test.tsx against an absent implementation: "Failed to resolve import \"../ExpiryPage\"" (1 file failed, 0 tests).
+04. Implemented api/types.ts (ExpiryStatusResponse), api/client.ts (fetchExpiryStatus), routes/ExpiryPage.tsx (PageContainer, buckets in order, tier pills incl "No tier", unresolved labels, category filter, uncategorized line).
+05. PASS run — 8 passed.
+06. App.tsx NavLink + Route; shell.test.tsx legacy-nav test updated to assert the Expiry link (diff quoted).
+07. Gates: tsc clean; vite build ok (index-DiBJBQbJ.js 312.25 kB); eslint clean; full vitest 24 files / 199 tests passed; backend empty diff (0 lines); secret grep 0 real matches.
+08. G4 refresh — first build failed on read-only / (buildx activity path); relocated buildx state to /tmp (BUILDX_CONFIG), build exit 0; exactly ONE recreate; new image 6a555108, container 234b04b0, bundle index-DAsiAK51.js 312408 B 77c60463; route-path literal 0→1; `No tier` 0→1; Expiry 5→7; counts delta 0; health ×6; gate 301/401; /expiry 200.
+09. Worklog + report + verify log written; receipt note added on WORK_HEAD, notes ref pushed and verified on a mapped fetch; final tip dual-annotated.
+
+Actual-versus-budget per leg (units):
+- G1 BEFORE capture: ~5 s / 120 s ordinary
+- FAIL run: 0.47 s / 120 s ordinary
+- PASS run: 0.82 s / 120 s ordinary
+- suite + lint (tsc + vite + eslint + vitest): ~15 s / 600 s
+- build: 1 s (cached layers) / 600 s build+recreate+verify
+- recreate + health: 12 s to healthy (same 600 s)
+- G4 AFTER verify: ~15 s (same 600 s)
+- overall: ~5 min / 2100 s
+
+REAL metered spend: $0.000000 (zero calls).

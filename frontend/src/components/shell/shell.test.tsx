@@ -370,12 +370,14 @@ describe("Catalog shell", () => {
     expect(screen.getAllByText("StorageGenie")).toHaveLength(1);
   });
 
-  test("a non-catalog route keeps the byte-identical legacy nav", async () => {
+  test("a non-catalog route keeps the shared legacy nav (now carrying Expiry)", async () => {
     renderApp(["/capture"]);
 
     expect(await screen.findByText("Phase 0 · local-first")).toBeInTheDocument();
     expect(screen.getByText("Capture — Manual Create")).toBeInTheDocument();
     expect(screen.getAllByText("StorageGenie")).toHaveLength(1);
+    // SG-108: the /expiry route adds its nav entry; every other link is unchanged.
+    expect(screen.getByRole("link", { name: "Expiry" })).toHaveAttribute("href", "/expiry");
   });
 
   test("the header count uses the singular only for one loaded item", async () => {

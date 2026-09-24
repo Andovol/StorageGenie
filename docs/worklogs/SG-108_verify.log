@@ -1,0 +1,386 @@
+SG-108 verify log — raw outputs (live clock; all commands bounded, none interactive, nothing killed)
+Work dir /home/andrei/StorageGenie · remote git@github.com:Andovol/StorageGenie.git
+Contract 0.33.0 (source path /home/andrei/storagegenie-contract/VERSION = 0.33.0; HEAD b232b845d74e89cb346c60fa4b9a40ec401c42dd = 'Contract payload 0.33.0'; RULES.sha256 = 18de7fd7b3546bd7624b3a7b59a78bd629752816cd7fa8f1af6113d1bafc8d46 RULES.md)
+BASE_REF=origin/automation BASE_RESOLVED=faf828e949ca3c6d655aecfdab4b75f395619411 (== start HEAD)
+DATABASE: none live (read-only counts/health/status GETs only) · Restart: ONE backend recreate (D145/D143) · Deploy: THIS slice (frontend-served; bundle EXPECTED to differ)
+Model/effort from process arguments: argv = 'opencode run --auto --dir /home/andrei/StorageGenie --variant high <packet text>' (no --model flag → model is the CLI default); effort=high (from --variant high).
+Legend: G1 BEFORE / FAIL RUN / PASS RUN / FRONTEND GATES / SCOPE+SECRET / G4 BUILD+RECREATE+AFTER / RECEIPT.
+
+################## G1 BEFORE (raw) ##################
+===== G1 BEFORE CAPTURE 2026-09-24T09:16:36Z =====
+--- BASE / HEAD ---
+BASE_REF=origin/automation BASE_RESOLVED=faf828e949ca3c6d655aecfdab4b75f395619411
+HEAD=faf828e949ca3c6d655aecfdab4b75f395619411
+branch=automation worktree_porcelain=
+--- IMAGE ID (storagegenie-backend:latest) ---
+image_id=sha256:8dce9eb2cec50309d858b9eb13259a77cb597ede1b9ec35762141f86d11f0781 created=2026-09-24T09:05:25.737576576Z
+--- CONTAINER ---
+container_id=171e3d7ec196d7cbaa2d4f0b6f8c79457d5a0ee4b7a787140b20dc7efcdda9b8 image=sha256:8dce9eb2cec50309d858b9eb13259a77cb597ede1b9ec35762141f86d11f0781 RestartCount=0 Started=2026-09-24T09:05:39.231093171Z Health=healthy
+--- docker ps ---
+171e3d7ec196 storagegenie-backend storagegenie-backend-1 Up 10 minutes (healthy) 127.0.0.1:8003->8000/tcp
+--- SERVED index.html (loopback) ---
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>StorageGenie</title>
+    <script>
+      (function () {
+        try {
+          var stored = localStorage.getItem("sg-theme");
+          var dark =
+            stored === "dark" ||
+            ((stored === null || stored === "system") &&
+              window.matchMedia("(prefers-color-scheme: dark)").matches);
+          document.documentElement.classList.toggle("dark", dark);
+          document.documentElement.classList.toggle("light", !dark);
+        } catch (error) {
+          document.documentElement.classList.add("light");
+        }
+      })();
+    </script>
+    <script type="module" crossorigin src="/assets/index-DlD86cZ6.js"></script>
+    <link rel="stylesheet" crossorigin href="/assets/index-CoNI-1Zn.css">
+  </head>
+  <body>
+    <div id="root"></div>
+  </body>
+</html>
+JS_NAME=assets/index-DlD86cZ6.js CSS_NAME=assets/index-CoNI-1Zn.css
+--- SERVED BUNDLE fetched over loopback ---
+307014 /tmp/opencode/sg108/before.js
+  3839 /tmp/opencode/sg108/before.css
+310853 total
+6e0a3af711f3dc822721deb53dde2d2f7775bab3d259dd0cb966a3af413af7c1  /tmp/opencode/sg108/before.js
+b18dbb336eef5c580bf0a2e6726d647c4f6c63edbc48373580d31e4508659ad3  /tmp/opencode/sg108/before.css
+JS_IN_LOOPBACK_BYTES=307014
+--- IN-IMAGE asset list + sha256 ---
+total 312
+drwxr-xr-x 2 root root   4096 Sep 23 19:36 .
+drwxr-xr-x 3 root root   4096 Sep 23 19:36 ..
+-rw-r--r-- 1 root root   3839 Sep 23 19:36 index-CoNI-1Zn.css
+-rw-r--r-- 1 root root 307014 Sep 23 19:36 index-DlD86cZ6.js
+b18dbb336eef5c580bf0a2e6726d647c4f6c63edbc48373580d31e4508659ad3  /app/static/assets/index-CoNI-1Zn.css
+6e0a3af711f3dc822721deb53dde2d2f7775bab3d259dd0cb966a3af413af7c1  /app/static/assets/index-DlD86cZ6.js
+--- "Expiry" literal count in served bundle ---
+EXPIRY_LITERAL_COUNT=5
+--- ALEMBIC CURRENT (live DB, host sqlite3 read-only) ---
+20260923_sg100_enrich_snapshot
+--- TABLE COUNT ---
+25
+--- TABLE COUNTS (all tables, read-only) ---
+alembic_version=1
+assertion=28
+asset=6
+asset_evidence=12
+asset_fts=6
+asset_fts_config=1
+asset_fts_data=8
+asset_fts_docsize=6
+asset_fts_idx=6
+audit_event=68
+candidate=7
+enrich_snapshot=2
+evidence=13
+guardrail_event=2
+household=1
+idempotency_key=9
+job=8
+job_step=56
+observation=16
+planning_suggestion=0
+provider_call=17
+review_task=6
+saved_search=0
+source_attribution=0
+user=2
+--- HEALTH EXACT (loopback) ---
+{"status":"ok","db":"ok","storage":"ok"}
+--- HOUSEHOLD IDS (read-only) ---
+01a0a029-1477-7ca0-b200-bce78a96c679
+--- GATE http :80 ---
+code=000 redirect=
+--- GATE https :443 ---
+code=000 redirect=
+===== END G1 BEFORE =====
+--- GATE re-check + resolve (public DNS failed at G1; deterministic via --resolve) ---
+getent hosts storagegenie.dynv6.net -> exit 2
+http :80 via --resolve localhost:
+code=301 redirect=https://storagegenie.dynv6.net/
+https :443 via --resolve localhost:
+code=401 redirect=
+--- DB BYTES (host file) ---
+-rw------- 1 andrei andrei 552960 Sep 23 19:37 /home/andrei/StorageGenie/data/db/storagegenie.db
+-rw------- 1 andrei andrei  32768 Sep 24 09:20 /home/andrei/StorageGenie/data/db/storagegenie.db-shm
+-rw------- 1 andrei andrei      0 Sep 24 09:20 /home/andrei/StorageGenie/data/db/storagegenie.db-wal
+
+################## FAIL RUN (final test file, implementation absent; raw) ##################
+
+ RUN  v1.6.1 /home/andrei/StorageGenie/frontend
+
+ ❯ src/routes/ExpiryPage.test.tsx  (0 test)
+
+⎯⎯⎯⎯⎯⎯ Failed Suites 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/routes/ExpiryPage.test.tsx [ src/routes/ExpiryPage.test.tsx ]
+Error: Failed to resolve import "./ExpiryPage" from "src/routes/ExpiryPage.test.tsx". Does the file exist?
+ ❯ TransformPluginContext._formatError node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:49258:41
+ ❯ TransformPluginContext.error node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:49253:16
+ ❯ normalizeUrl node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:64307:23
+ ❯ async file:/home/andrei/StorageGenie/frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:64439:39
+ ❯ TransformPluginContext.transform node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:64366:7
+ ❯ PluginContainer.transform node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:49099:18
+ ❯ loadAndTransform node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:51978:27
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+ Test Files  1 failed (1)
+      Tests  no tests
+   Start at  09:19:39
+   Duration  474ms (transform 21ms, setup 36ms, collect 0ms, tests 0ms, environment 222ms, prepare 46ms)
+
+
+################## PASS RUN (raw) ##################
+
+ RUN  v1.6.1 /home/andrei/StorageGenie/frontend
+
+stderr | src/routes/ExpiryPage.test.tsx > ExpiryPage > reads the SG-107 engine route with the household (and no category by default)
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+ ✓ src/routes/ExpiryPage.test.tsx  (8 tests) 219ms
+
+ Test Files  1 passed (1)
+      Tests  8 passed (8)
+   Start at  09:19:33
+   Duration  823ms (transform 85ms, setup 39ms, collect 138ms, tests 219ms, environment 231ms, prepare 45ms)
+
+
+################## FRONTEND BUILD (tsc + vite build; raw) ##################
+vite v5.4.21 building for production...
+transforming...
+✓ 1963 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                   0.94 kB │ gzip:  0.47 kB
+dist/assets/index-CoNI-1Zn.css    3.84 kB │ gzip:  1.04 kB
+dist/assets/index-DiBJBQbJ.js   312.25 kB │ gzip: 91.20 kB
+✓ built in 1.70s
+
+################## ESLINT (raw) ##################
+eslint exit was 0 (no output)
+
+################## VITEST FULL SUITE (raw) ##################
+
+ Test Files  24 passed (24)
+      Tests  199 passed (199)
+   Start at  09:19:45
+   Duration  4.76s (transform 709ms, setup 780ms, collect 3.08s, tests 6.80s, environment 7.30s, prepare 1.52s)
+
+
+################## SCOPE + BACKEND EMPTY DIFF + SECRET GATE (raw) ##################
+--- git status --porcelain ---
+ M frontend/src/App.tsx
+ M frontend/src/api/client.ts
+ M frontend/src/api/types.ts
+ M frontend/src/components/shell/shell.test.tsx
+?? docs/worklogs/SG-108.log
+?? docs/worklogs/SG-108_report.md
+?? docs/worklogs/SG-108_verify.log
+?? frontend/src/routes/ExpiryPage.test.tsx
+?? frontend/src/routes/ExpiryPage.tsx
+--- git diff --stat origin/automation ---
+ frontend/src/App.tsx                         |  5 ++++
+ frontend/src/api/client.ts                   | 11 ++++++++
+ frontend/src/api/types.ts                    | 40 ++++++++++++++++++++++++++++
+ frontend/src/components/shell/shell.test.tsx |  4 ++-
+ 4 files changed, 59 insertions(+), 1 deletion(-)
+--- backend tracked diff line count ---
+0
+--- backend untracked files ---
+(end backend untracked)
+--- shell.test diff hunk ---
+diff --git a/frontend/src/components/shell/shell.test.tsx b/frontend/src/components/shell/shell.test.tsx
+index ce52824..4de6458 100644
+--- a/frontend/src/components/shell/shell.test.tsx
++++ b/frontend/src/components/shell/shell.test.tsx
+@@ -370,12 +370,14 @@ describe("Catalog shell", () => {
+     expect(screen.getAllByText("StorageGenie")).toHaveLength(1);
+   });
+ 
+-  test("a non-catalog route keeps the byte-identical legacy nav", async () => {
++  test("a non-catalog route keeps the shared legacy nav (now carrying Expiry)", async () => {
+     renderApp(["/capture"]);
+ 
+     expect(await screen.findByText("Phase 0 · local-first")).toBeInTheDocument();
+     expect(screen.getByText("Capture — Manual Create")).toBeInTheDocument();
+     expect(screen.getAllByText("StorageGenie")).toHaveLength(1);
++    // SG-108: the /expiry route adds its nav entry; every other link is unchanged.
++    expect(screen.getByRole("link", { name: "Expiry" })).toHaveAttribute("href", "/expiry");
+   });
+ 
+   test("the header count uses the singular only for one loaded item", async () => {
+--- secret grep over changed/new files ---
+secret_grep_exit=1 (1 = 0 matches)
+
+################## G4 BUILD + RECREATE + AFTER (raw) ##################
+NOTE: first build attempt failed: / is mounted read-only (ro,errors=remount-ro) so buildx could not write /home/andrei/.docker/buildx/activity; relocated client state with BUILDX_CONFIG=/tmp/opencode/buildx. Verbatim failure line retained below.
+failed to update builder last activity time: open /home/andrei/.docker/buildx/activity/.tmp-default1958013932: read-only file system
+/dev/vda1 on / type ext4 (ro,nosuid,relatime,discard,errors=remount-ro,commit=30)
+/dev/vda1 on /home/andrei/StorageGenie type ext4 (rw,nosuid,relatime,discard,errors=remount-ro,commit=30)
+/dev/vda1 on /tmp type ext4 (rw,nosuid,relatime,discard,errors=remount-ro,commit=30)
+/dev/vda1 on /var/tmp type ext4 (rw,nosuid,relatime,discard,errors=remount-ro,commit=30)
+===== G4 BUILD 2026-09-24T09:20:41Z =====
+
+#20 [frontend-build 3/6] COPY frontend/package.json frontend/package-lock.json ./
+#20 CACHED
+
+#21 [stage-1 9/9] COPY --from=frontend-build /ui/dist ./static
+#21 CACHED
+
+#22 exporting to image
+#22 exporting layers done
+#22 exporting manifest sha256:c65d05b00f93ab013f4d732c409e5f5dbb4e4035a6ae336ecd74e2ed011eb0bb done
+#22 exporting config sha256:7d55a6b0faf884b056edb94aed3cef9bc63b41b9c6ec87b8452f332c5d6173a6 done
+#22 exporting attestation manifest sha256:45ebc58f56fc58bf859931bc6a9aa77e4ce77d1e1ee24321d42dc89791298655 done
+#22 exporting manifest list sha256:6a555108f9a47a828db328162950e451f9c67aaae4d700ceb47e973a47e858ed done
+#22 naming to docker.io/library/storagegenie-backend:latest done
+#22 unpacking to docker.io/library/storagegenie-backend:latest done
+#22 DONE 0.0s
+
+#23 resolving provenance for metadata file
+#23 DONE 0.0s
+ Image storagegenie-backend Built 
+build_exit=0 build_elapsed=1s
+--- image AFTER build ---
+image_id=sha256:6a555108f9a47a828db328162950e451f9c67aaae4d700ceb47e973a47e858ed created=2026-09-24T09:20:37.456745876Z
+===== G4 RECREATE (exactly ONE up -d --no-deps backend) 2026-09-24T09:20:42Z =====
+--- before ---
+171e3d7ec196 8dce9eb2cec5 storagegenie-backend-1 Up 15 minutes (healthy)
+before_container=171e3d7ec196d7cbaa2d4f0b6f8c79457d5a0ee4b7a787140b20dc7efcdda9b8
+ Container storagegenie-backend-1 Recreate 
+ Container storagegenie-backend-1 Recreated 
+ Container storagegenie-backend-1 Starting 
+ Container storagegenie-backend-1 Started 
+up_exit=0 recreate_cmd_elapsed=1s
+--- wait for health ---
+t=2s health=starting
+t=4s health=starting
+t=6s health=starting
+t=8s health=starting
+t=10s health=starting
+t=12s health=healthy
+after_container=234b04b0f1e2c553439ce00b7fbcff30cecea1ab9e612a92702e22534f397d97
+after_image=sha256:6a555108f9a47a828db328162950e451f9c67aaae4d700ceb47e973a47e858ed
+234b04b0f1e2 storagegenie-backend storagegenie-backend-1 Up 10 seconds (healthy) 127.0.0.1:8003->8000/tcp
+===== G4 AFTER CAPTURE 2026-09-24T09:20:53Z =====
+--- SERVED index.html (loopback through fresh container) ---
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>StorageGenie</title>
+    <script>
+      (function () {
+        try {
+          var stored = localStorage.getItem("sg-theme");
+          var dark =
+            stored === "dark" ||
+            ((stored === null || stored === "system") &&
+              window.matchMedia("(prefers-color-scheme: dark)").matches);
+          document.documentElement.classList.toggle("dark", dark);
+          document.documentElement.classList.toggle("light", !dark);
+        } catch (error) {
+          document.documentElement.classList.add("light");
+        }
+      })();
+    </script>
+    <script type="module" crossorigin src="/assets/index-DAsiAK51.js"></script>
+    <link rel="stylesheet" crossorigin href="/assets/index-CoNI-1Zn.css">
+  </head>
+  <body>
+    <div id="root"></div>
+  </body>
+</html>
+JS_NAME=assets/index-DAsiAK51.js CSS_NAME=assets/index-CoNI-1Zn.css
+312408 /tmp/opencode/sg108/after.js
+  3839 /tmp/opencode/sg108/after.css
+316247 total
+77c604630e12a67b228b1bb52ccbdc93f972eb3d6a9f5ebbffae50df28890a9e  /tmp/opencode/sg108/after.js
+b18dbb336eef5c580bf0a2e6726d647c4f6c63edbc48373580d31e4508659ad3  /tmp/opencode/sg108/after.css
+--- BUNDLE BEFORE vs AFTER ---
+6e0a3af711f3dc822721deb53dde2d2f7775bab3d259dd0cb966a3af413af7c1  /tmp/opencode/sg108/before.js
+77c604630e12a67b228b1bb52ccbdc93f972eb3d6a9f5ebbffae50df28890a9e  /tmp/opencode/sg108/after.js
+b18dbb336eef5c580bf0a2e6726d647c4f6c63edbc48373580d31e4508659ad3  /tmp/opencode/sg108/before.css
+b18dbb336eef5c580bf0a2e6726d647c4f6c63edbc48373580d31e4508659ad3  /tmp/opencode/sg108/after.css
+JS byte-identical=NO
+CSS byte-identical=YES
+--- "Expiry" literal count loopback-served bytes BEFORE -> AFTER ---
+BEFORE=5 AFTER=7
+--- consumer-decode marker: /v1/plugins/expiry-tracker/status literal BEFORE -> AFTER ---
+BEFORE=0 AFTER=1
+--- "No tier" literal BEFORE -> AFTER ---
+BEFORE=0 AFTER=1
+--- in-image asset list + sha256 ---
+total 320
+drwxr-xr-x 2 root root   4096 Sep 24 09:20 .
+drwxr-xr-x 3 root root   4096 Sep 24 09:20 ..
+-rw-r--r-- 1 root root   3839 Sep 24 09:20 index-CoNI-1Zn.css
+-rw-r--r-- 1 root root 312408 Sep 24 09:20 index-DAsiAK51.js
+b18dbb336eef5c580bf0a2e6726d647c4f6c63edbc48373580d31e4508659ad3  /app/static/assets/index-CoNI-1Zn.css
+77c604630e12a67b228b1bb52ccbdc93f972eb3d6a9f5ebbffae50df28890a9e  /app/static/assets/index-DAsiAK51.js
+--- ALEMBIC CURRENT (live DB, read-only) ---
+20260923_sg100_enrich_snapshot
+--- TABLE COUNT ---
+25
+--- TABLE COUNTS ---
+alembic_version=1
+assertion=28
+asset=6
+asset_evidence=12
+asset_fts=6
+asset_fts_config=1
+asset_fts_data=8
+asset_fts_docsize=6
+asset_fts_idx=6
+audit_event=68
+candidate=7
+enrich_snapshot=2
+evidence=13
+guardrail_event=2
+household=1
+idempotency_key=9
+job=8
+job_step=56
+observation=16
+planning_suggestion=0
+provider_call=17
+review_task=6
+saved_search=0
+source_attribution=0
+user=2
+--- HEALTH EXACT x6 ---
+health[1]={"status":"ok","db":"ok","storage":"ok"}
+health[2]={"status":"ok","db":"ok","storage":"ok"}
+health[3]={"status":"ok","db":"ok","storage":"ok"}
+health[4]={"status":"ok","db":"ok","storage":"ok"}
+health[5]={"status":"ok","db":"ok","storage":"ok"}
+health[6]={"status":"ok","db":"ok","storage":"ok"}
+--- APP PAGE /expiry (loopback) ---
+expiry_route_code=200
+expiry_route_has_root_div=1
+--- ENGINE STATUS LIVE (read-only) ---
+{"household_id":"01a0a029-1477-7ca0-b200-bce78a96c679","as_of":"2026-09-24","category":null,"rows":[],"summary":{"by_tier":{},"by_bucket":{},"unresolved":0,"total":0},"unresolved_rows":[]}
+status_http=200
+--- GATE http :80 public (DNS) ---
+code=301
+--- GATE http :80 via --resolve localhost ---
+code=301 redirect=https://storagegenie.dynv6.net/
+--- GATE https :443 via --resolve localhost ---
+code=401 redirect=
+===== END G4 AFTER =====
+
+################## POST-RESTART SWEEP (waived) ##################
+Waived per PG-DP-02 (restart-gated). Substitute: in-process vitest pre-restart (24 files / 199 tests passed) + the post-restart live probes above as authority. No browser-driven tests exist on this path — the derived set differed nowise.
