@@ -47,6 +47,9 @@ export type Asset = {
   // SG-113: present only when the backend dormancy flag is ON; absent (not
   // empty) when the location tree is dormant, so the section hides cleanly.
   locations?: Location[];
+  // SG-114: present only when the relations dormancy flag is ON; absent (not
+  // empty) when the relation surface is dormant.
+  relations?: AssetRelation[];
 };
 export type AssetListResponse = {
   items: Asset[];
@@ -63,6 +66,20 @@ export type Location = {
   updated_at: string | null;
 };
 export type LocationListResponse = { items: Location[] };
+
+// SG-114: a typed, directed link between two assets. `direction` is derived by
+// the backend from the perspective of the asset being read.
+export type AssetRelation = {
+  id: string;
+  household_id: string;
+  from_asset_id: string;
+  to_asset_id: string;
+  relation_type: string;
+  direction: "outgoing" | "incoming";
+  created_at: string | null;
+  updated_at: string | null;
+};
+export type RelationListResponse = { items: AssetRelation[] };
 
 // SG-068: a saved search stores EXACTLY the catalog filter surface the list
 // endpoint already takes — no separate query language.

@@ -51,6 +51,11 @@ class Settings(BaseSettings):
     # `locations[]` read are inert until the production migration lands. The
     # flag flips ONLY with the owner's migrate + flip + recreate word.
     sg_locations_enabled: bool = False
+    # SG-114 dormancy gate: the asset-relation routes and the asset-detail
+    # `relations[]` read are inert until their own production migration lands.
+    # Deliberately SEPARATE from the locations flag so each batched migration
+    # word flips only its own surface. Defaults OFF; never flipped in a slice.
+    sg_relations_enabled: bool = False
 
     model_config = {"env_file": ".env", "extra": "ignore"}
 

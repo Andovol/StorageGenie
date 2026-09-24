@@ -19,6 +19,7 @@ from app.api.v1.jobs import router as jobs_router
 from app.api.v1.locations import router as locations_router
 from app.api.v1.planning import router as planning_router
 from app.api.v1.plugins import router as plugins_router
+from app.api.v1.relations import router as relations_router
 from app.api.v1.review_tasks import router as review_tasks_router
 from app.api.v1.settings import router as settings_router
 from app.api.v1.users import router as users_router
@@ -61,6 +62,7 @@ app.include_router(users_router, prefix="/v1")
 app.include_router(evidence_router, prefix="/v1")
 app.include_router(assets_router, prefix="/v1")
 app.include_router(locations_router, prefix="/v1")
+app.include_router(relations_router, prefix="/v1")
 app.include_router(export_router, prefix="/v1")
 app.include_router(jobs_router, prefix="/v1")
 app.include_router(review_tasks_router, prefix="/v1")

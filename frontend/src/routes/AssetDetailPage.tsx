@@ -9,11 +9,21 @@ import {
   apiPatch,
   apiPost,
   assignAssetLocation,
+  createRelation,
+  deleteRelation,
+  fetchHouseholdAssets,
   fetchLocations,
+  fetchRelations,
   unassignAssetLocation,
   uploadEvidence,
 } from "../api/client";
-import type { Asset, LocationListResponse } from "../api/types";
+import type {
+  Asset,
+  AssetListResponse,
+  AssetRelation,
+  LocationListResponse,
+  RelationListResponse,
+} from "../api/types";
 import { UNTITLED_ASSET_NAME } from "../types/product";
 
 // SG-082: per-press Enrich cap. UNCALIBRATED on purpose (`G-A9`): the value is
@@ -145,6 +155,116 @@ export function LocationsSection({
   );
 }
 
+// SG-114: the asset-detail relation section. It reads the flag-gated list
+// route: when the backend is dormant the route answers 404, the query errors,
+// and the WHOLE section is hidden (no error, no fallback list). When enabled it
+// lists BOTH directions (each row labelled from this asset), creates a typed
+// link, and deletes one. The target picker reads the always-on catalog list.
+export function RelationsSection({
+  asset,
+  householdId,
+}: {
+  asset: Asset;
+  householdId: string;
+}) {
+  const qc = useQueryClient();
+  const { data: rels, isError } = useQuery<RelationListResponse>({
+    queryKey: ["relations", asset.id, householdId],
+    queryFn: () => fetchRelations(asset.id, householdId),
+    retry: false,
+  });
+  const { data: assets } = useQuery<AssetListResponse>({
+    queryKey: ["household-assets", householdId],
+    queryFn: () => fetchHouseholdAssets(householdId),
+    retry: false,
+    enabled: !!rels,
+  });
+  const createMut = useMutation({
+    mutationFn: (vars: { toAssetId: string; relationType: string }) =>
+      createRelation(asset.id, vars.toAssetId, vars.relationType, householdId),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["relations", asset.id, householdId] }),
+  });
+  const deleteMut = useMutation({
+    mutationFn: (relationId: string) => deleteRelation(asset.id, relationId, householdId),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["relations", asset.id, householdId] }),
+  });
+  const [toAssetId, setToAssetId] = useState("");
+  const [relationType, setRelationType] = useState("related_to");
+  if (isError || !rels) return null;
+  const items = rels.items;
+  const nameById = new Map((assets?.items ?? []).map((a) => [a.id, a.display_name || a.id]));
+  const otherId = (rel: AssetRelation) =>
+    rel.direction === "outgoing" ? rel.to_asset_id : rel.from_asset_id;
+  const options = (assets?.items ?? []).filter((a) => a.id !== asset.id);
+  const selectStyle = {
+    padding: 6,
+    borderRadius: 6,
+    borderStyle: "solid" as const,
+    borderWidth: 1,
+    fontSize: 13,
+  };
+  return (
+    <section style={{ marginBottom: 16 }}>
+      <h3>Related assets</h3>
+      {items.length === 0 ? (
+        <div className="text-muted-foreground" style={{ fontSize: 13 }}>No related assets</div>
+      ) : (
+        <ul style={{ fontSize: 13, paddingLeft: 18 }}>
+          {items.map((rel) => (
+            <li key={rel.id} style={{ marginBottom: 4 }}>
+              {nameById.get(otherId(rel)) ?? otherId(rel)}{" "}
+              <span className="text-muted-foreground">
+                ({rel.relation_type}, {rel.direction})
+              </span>{" "}
+              <button
+                type="button"
+                onClick={() => deleteMut.mutate(rel.id)}
+                className="bg-card text-foreground border-border focus-ring"
+                style={{ padding: "2px 8px", borderRadius: 6, borderStyle: "solid", borderWidth: 1, cursor: "pointer", fontSize: 12 }}
+              >
+                Remove
+              </button>
+            </li>
+          ))}
+        </ul>
+      )}
+      <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
+        <select
+          aria-label="Related asset"
+          value={toAssetId}
+          onChange={(e) => setToAssetId(e.target.value)}
+          className="bg-background text-foreground border-border focus-ring"
+          style={selectStyle}
+        >
+          <option value="">Select asset…</option>
+          {options.map((a) => (
+            <option key={a.id} value={a.id}>{a.display_name || a.id}</option>
+          ))}
+        </select>
+        <select
+          aria-label="Relation type"
+          value={relationType}
+          onChange={(e) => setRelationType(e.target.value)}
+          className="bg-background text-foreground border-border focus-ring"
+          style={selectStyle}
+        >
+          <option value="related_to">related_to</option>
+          <option value="contains">contains</option>
+        </select>
+        <button
+          type="button"
+          disabled={!toAssetId || createMut.isPending}
+          onClick={() => createMut.mutate({ toAssetId, relationType })}
+          className={`${toAssetId ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"} border-border focus-ring`}
+          style={{ padding: "6px 12px", borderRadius: 6, borderStyle: "solid", borderWidth: 1, cursor: "pointer" }}
+        >
+          {createMut.isPending ? "Linking..." : "Link"}
+        </button>
+      </div>
+    </section>
+  );
+}
+
 export function AssetDetailPage() {
   const { id } = useParams();
   const [search] = useSearchParams();
@@ -234,6 +354,8 @@ export function AssetDetailPage() {
       </div>
 
       <LocationsSection asset={asset} householdId={householdId} />
+
+      <RelationsSection asset={asset} householdId={householdId} />
 
       {editing && (
         <div className="bg-card-muted border-border" style={{ borderRadius: 8, padding: 12, marginBottom: 16, borderStyle: "solid", borderWidth: 1 }}>

@@ -13,6 +13,10 @@ const api = vi.hoisted(() => ({
   fetchLocations: vi.fn(),
   assignAssetLocation: vi.fn(),
   unassignAssetLocation: vi.fn(),
+  fetchRelations: vi.fn(),
+  createRelation: vi.fn(),
+  deleteRelation: vi.fn(),
+  fetchHouseholdAssets: vi.fn(),
 }));
 vi.mock("../api/client", () => api);
 
@@ -81,6 +85,8 @@ beforeEach(() => {
   // Default: the location tree route is dormant (backend flag OFF -> 404), so
   // the section hides unless a test opts in with a resolved value.
   api.fetchLocations.mockRejectedValue(new Error("locations disabled"));
+  // Default: the relation surface is dormant too (flag OFF -> 404).
+  api.fetchRelations.mockRejectedValue(new Error("relations disabled"));
 });
 
 describe("AssetDetailPage", () => {
@@ -214,6 +220,75 @@ describe("LocationsSection (SG-113)", () => {
     fireEvent.click(screen.getByRole("button", { name: "Remove" }));
     await waitFor(() =>
       expect(api.unassignAssetLocation).toHaveBeenCalledWith("asset-1", "loc-1", "hh")
+    );
+  });
+});
+
+describe("RelationsSection (SG-114)", () => {
+  const screwdriver = {
+    id: "asset-2",
+    household_id: "hh",
+    display_name: "Screwdriver",
+    asset_type: "product",
+    status: "ACTIVE",
+    quantity: null,
+    unit: null,
+    condition: null,
+    version: 1,
+    created_at: "2026-09-14T00:00:00+00:00",
+    updated_at: null,
+  };
+  const relation = {
+    id: "rel-1",
+    household_id: "hh",
+    from_asset_id: "asset-1",
+    to_asset_id: "asset-2",
+    relation_type: "contains",
+    direction: "outgoing" as const,
+    created_at: null,
+    updated_at: null,
+  };
+
+  test("hides the whole section when the backend reports relations disabled", async () => {
+    api.apiGet.mockResolvedValue(before);
+    renderPage();
+
+    await screen.findByRole("heading", { name: "Milk" });
+    await waitFor(() => expect(screen.queryByText("Related assets")).not.toBeInTheDocument());
+  });
+
+  test("shows the empty state for an unlinked asset (never an error)", async () => {
+    api.apiGet.mockResolvedValue(before);
+    api.fetchRelations.mockResolvedValueOnce({ items: [] });
+    api.fetchHouseholdAssets.mockResolvedValueOnce({ items: [before, screwdriver], next_cursor: null });
+    renderPage();
+
+    expect(await screen.findByText("Related assets")).toBeInTheDocument();
+    expect(await screen.findByText("No related assets")).toBeInTheDocument();
+  });
+
+  test("lists both directions, creates a link and deletes one", async () => {
+    api.apiGet.mockResolvedValue({ ...before, relations: [relation] });
+    api.fetchRelations.mockResolvedValue({ items: [relation] });
+    api.fetchHouseholdAssets.mockResolvedValue({ items: [before, screwdriver], next_cursor: null });
+    api.createRelation.mockResolvedValue(relation);
+    api.deleteRelation.mockResolvedValue({ status: "deleted", id: "rel-1" });
+    renderPage();
+
+    // The linked asset is named and its direction is labelled from this asset.
+    expect(await screen.findByText("(contains, outgoing)")).toBeInTheDocument();
+    expect(await screen.findByRole("option", { name: "Screwdriver" })).toBeInTheDocument();
+
+    fireEvent.change(screen.getByLabelText("Related asset"), { target: { value: "asset-2" } });
+    fireEvent.change(screen.getByLabelText("Relation type"), { target: { value: "contains" } });
+    fireEvent.click(screen.getByRole("button", { name: "Link" }));
+    await waitFor(() =>
+      expect(api.createRelation).toHaveBeenCalledWith("asset-1", "asset-2", "contains", "hh")
+    );
+
+    fireEvent.click(screen.getByRole("button", { name: "Remove" }));
+    await waitFor(() =>
+      expect(api.deleteRelation).toHaveBeenCalledWith("asset-1", "rel-1", "hh")
     );
   });
 });

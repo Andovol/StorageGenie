@@ -1,0 +1,346 @@
+SG-114 verify log — raw outputs (asset relations: schema + dormant API + asset-detail UI)
+Generated 2026-09-24T11:28:57Z on host ubuntu in /home/andrei/StorageGenie
+BASE_REF=origin/automation BASE_RESOLVED=8bed3f0bb8652ea3712980182accddd88ff8f8d1 HEAD=8bed3f0bb8652ea3712980182accddd88ff8f8d1
+
+================ G1 BEFORE ================
+=== G1 BEFORE 2026-09-24T11:28:57Z ===
+--- image id ---
+sha256:67c62b86806eea38f2446791f41137049a1d07fca8606fcdb968121639729f8e created=2026-09-24T11:19:06.575838136Z
+--- container id / restartcount / state ---
+2fceee17df2ed511470dfbe6334447cf995ae93a24760fb2b82e8dfbc68f3685 restart=0 state=running health=healthy
+--- alembic current (in container) ---
+INFO  [alembic.runtime.migration] Context impl SQLiteImpl.
+INFO  [alembic.runtime.migration] Will assume non-transactional DDL.
+20260923_sg100_enrich_snapshot
+--- health ---
+{"status":"ok","db":"ok","storage":"ok"}
+--- table count ---
+25
+--- per-table counts (sorted) ---
+alembic_version|1
+assertion|28
+asset|6
+asset_evidence|12
+asset_fts|6
+asset_fts_config|1
+asset_fts_data|8
+asset_fts_docsize|6
+asset_fts_idx|6
+audit_event|68
+candidate|7
+enrich_snapshot|2
+evidence|13
+guardrail_event|2
+household|1
+idempotency_key|9
+job|8
+job_step|56
+observation|16
+planning_suggestion|0
+provider_call|17
+review_task|6
+saved_search|0
+source_attribution|0
+user|2
+--- asset status census ---
+ACTIVE|6
+--- bundle assets served ---
+assets/index-CoNI-1Zn.css
+assets/index-t_5eG484.js
+--- bundle sha256 (in image) ---
+9989a43289655af0f7c3b3e0d7a6b96edf5758cf6c3d1221c3230d78bc890e76  /app/static/assets/index-t_5eG484.js
+b18dbb336eef5c580bf0a2e6726d647c4f6c63edbc48373580d31e4508659ad3  /app/static/assets/index-CoNI-1Zn.css
+--- gate canonical vhost (Host=storagegenie.dynv6.net) ---
+http:80 => code=301 redirect=https://storagegenie.dynv6.net/
+https:443 => code=401
+--- working-tree grep (ran AFTER the slice was written — this is NOT the absence proof) ---
+$ grep -rn 'relation' backend/app/models backend/app/api backend/app/services   # finds only the NEW slice files
+backend/app/models/__init__.py:14:from app.models.relation import AssetRelation
+backend/app/models/relation.py:14:    relation: a materialized duplicate is redirected through the lifecycle
+backend/app/models/relation.py:16:    relation type. The composite uniqueness rule
+backend/app/models/relation.py:17:    ``(from_asset_id, to_asset_id, relation_type)`` means the same typed link
+backend/app/models/relation.py:22:    __tablename__ = "asset_relation"
+backend/app/models/relation.py:27:            "relation_type",
+backend/app/models/relation.py:28:            name="uq_asset_relation_from_to_type",
+backend/app/models/relation.py:42:    relation_type: Mapped[str] = mapped_column(String(50), nullable=False)
+grep: backend/app/models/__pycache__/__init__.cpython-312.pyc: binary file matches
+grep: backend/app/models/__pycache__/relation.cpython-312.pyc: binary file matches
+backend/app/api/v1/relations.py:1:"""SG-114 asset-relation API — DORMANT behind `settings.sg_relations_enabled`.
+backend/app/api/v1/relations.py:6:schema can never be exercised. The relation vocabulary is EXACTLY two types —
+backend/app/api/v1/relations.py:8:invention here. Duplicate ownership is not a relation: SG-112 already redirects
+backend/app/api/v1/relations.py:10:ownership is never a relation type on this surface.
+backend/app/api/v1/relations.py:23:from app.models.relation import AssetRelation
+backend/app/api/v1/relations.py:25:# The exact relation vocabulary. `related_to` expresses symmetric intent but is
+backend/app/api/v1/relations.py:32:def _require_relations_enabled() -> None:
+backend/app/api/v1/relations.py:33:    if not settings.sg_relations_enabled:
+backend/app/api/v1/relations.py:37:router = APIRouter(dependencies=[Depends(_require_relations_enabled)])
+backend/app/api/v1/relations.py:42:    relation_type: str
+backend/app/api/v1/relations.py:44:    @field_validator("relation_type")
+backend/app/api/v1/relations.py:48:            raise ValueError("relation_type must be one of: contains, related_to")
+backend/app/api/v1/relations.py:61:def _relation_to_dict(row: AssetRelation, perspective_asset_id: str) -> dict[str, object]:
+backend/app/api/v1/relations.py:72:        "relation_type": row.relation_type,
+backend/app/api/v1/relations.py:79:def relations_for_asset(
+backend/app/api/v1/relations.py:84:    Shared by the list route and the asset-detail `relations[]` reader
+backend/app/api/v1/relations.py:99:    return [_relation_to_dict(row, asset_id) for row in rows]
+backend/app/api/v1/relations.py:102:@router.get("/assets/{asset_id}/relations")
+backend/app/api/v1/relations.py:103:def list_relations(
+backend/app/api/v1/relations.py:110:    return {"items": relations_for_asset(db, asset_id, household_id)}
+backend/app/api/v1/relations.py:113:@router.post("/assets/{asset_id}/relations", status_code=201)
+backend/app/api/v1/relations.py:114:def create_relation(
+backend/app/api/v1/relations.py:135:            relation_type=payload.relation_type,
+backend/app/api/v1/relations.py:140:        raise HTTPException(status_code=409, detail="relation already exists")
+backend/app/api/v1/relations.py:145:        relation_type=payload.relation_type,
+backend/app/api/v1/relations.py:150:    return _relation_to_dict(row, asset_id)
+backend/app/api/v1/relations.py:153:@router.delete("/assets/{asset_id}/relations/{relation_id}")
+backend/app/api/v1/relations.py:154:def delete_relation(
+backend/app/api/v1/relations.py:156:    relation_id: str,
+backend/app/api/v1/relations.py:164:    row = db.query(AssetRelation).filter_by(id=relation_id).first()
+backend/app/api/v1/relations.py:166:        return {"status": "deleted", "id": relation_id}
+backend/app/api/v1/relations.py:173:    return {"status": "deleted", "id": relation_id}
+backend/app/api/v1/assets.py:9:from app.api.v1.relations import relations_for_asset
+backend/app/api/v1/assets.py:180:    # SG-114: the reader half of the relation write path (`PG-SC-02`). Added only
+backend/app/api/v1/assets.py:181:    # when the relations flag is ON, so the flag-OFF response stays byte-for-byte
+backend/app/api/v1/assets.py:184:    if settings.sg_relations_enabled:
+backend/app/api/v1/assets.py:185:        out["relations"] = relations_for_asset(db, asset.id, asset.household_id)
+grep: backend/app/api/v1/__pycache__/relations.cpython-312.pyc: binary file matches
+grep: backend/app/api/v1/__pycache__/assets.cpython-312.pyc: binary file matches
+
+================ PREMISE — relation absence vs BASE archive (8bed3f0) ================
+$ grep -rni 'relation' /tmp/opencode/sg114_base/backend/app/{models,api,services}
+(no hits)
+
+================ G2 FAIL RUN (candidate test file vs BASE archive 8bed3f0; PYTHONPATH forced to base app) ================
+$ PYTHONPATH=/tmp/opencode/sg114_base/backend /home/andrei/StorageGenie/backend/venv/bin/python -c 'import app; print(app.__file__)'
+import app -> /tmp/opencode/sg114_base/backend/app/__init__.py
+$ cd /tmp/opencode/sg114_base/backend && PYTHONPATH=/tmp/opencode/sg114_base/backend /home/andrei/StorageGenie/backend/venv/bin/python -m pytest tests/test_sg114_relations.py -q -p no:cacheprovider
+../../../../home/andrei/StorageGenie/backend/venv/lib/python3.12/site-packages/starlette/testclient.py:53
+  /home/andrei/StorageGenie/backend/venv/lib/python3.12/site-packages/starlette/testclient.py:53: DeprecationWarning: The anyio.abc.BlockingPortal alias is deprecated, use anyio.from_thread.BlockingPortal instead.
+    _PortalFactoryType = Callable[[], AbstractContextManager[anyio.abc.BlockingPortal]]
+
+tests/test_sg114_relations.py::test_sg114_migration_upgrade_downgrade_upgrade
+  /home/andrei/StorageGenie/backend/venv/lib/python3.12/site-packages/alembic/config.py:604: DeprecationWarning: No path_separator found in configuration; falling back to legacy splitting on spaces, commas, and colons for prepend_sys_path.  Consider adding path_separator=os to Alembic config.
+    util.warn_deprecated(
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/test_sg114_relations.py::test_sg114_migration_upgrade_downgrade_upgrade
+FAILED tests/test_sg114_relations.py::test_vocabulary_is_exactly_two_types - ...
+FAILED tests/test_sg114_relations.py::test_relation_surface_has_no_duplicate_of_type
+FAILED tests/test_sg114_relations.py::test_flag_off_every_new_route_is_404 - ...
+FAILED tests/test_sg114_relations.py::test_empty_relations_when_on - assert 4...
+FAILED tests/test_sg114_relations.py::test_create_read_both_directions_delete_idempotent
+FAILED tests/test_sg114_relations.py::test_refusals_write_nothing - ModuleNot...
+FAILED tests/test_sg114_relations.py::test_delete_refuses_foreign_and_unrelated_links
+FAILED tests/test_sg114_relations.py::test_asset_detail_relations_reader_when_on
+9 failed, 3 warnings in 1.31s
+
+================ G2 PASS RUN (candidate tree) ================
+$ cd backend && /home/andrei/StorageGenie/backend/venv/bin/python -m pytest tests/test_sg114_relations.py -q -p no:cacheprovider
+    util.warn_deprecated(
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+9 passed, 5 warnings in 1.21s
+
+================ G2 FULL SUITE (candidate) ================
+  /home/andrei/StorageGenie/backend/venv/lib/python3.12/site-packages/alembic/config.py:604: DeprecationWarning: No path_separator found in configuration; falling back to legacy splitting on spaces, commas, and colons for prepend_sys_path.  Consider adding path_separator=os to Alembic config.
+    util.warn_deprecated(
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/test_signals.py::test_generated_codes_are_validated_and_bad_checksum_is_not_an_identifier
+FAILED tests/test_signals.py::test_ocr_has_text_boxes_and_mean_confidence - a...
+2 failed, 581 passed, 32 warnings in 28.69s
+
+================ G2 STASH-PROOF: 2 known decoder reds on BASE ================
+WARNING  app.services.signals:signals.py:104 Barcode extraction unavailable: pyzbar/libzbar is not installed
+WARNING  app.services.signals:signals.py:215 OCR extraction unavailable: tesseract is not installed or it's not in your PATH. See README file for more information.
+=========================== short test summary info ============================
+FAILED tests/test_signals.py::test_generated_codes_are_validated_and_bad_checksum_is_not_an_identifier
+FAILED tests/test_signals.py::test_ocr_has_text_boxes_and_mean_confidence - a...
+2 failed in 0.67s
+
+================ G2 GATES ================
+### RUFF (whole backend)
+All checks passed!
+### MYPY candidate (whole app)
+app/main.py:50: error: Unused "type: ignore" comment  [unused-ignore]
+app/main.py:56: error: Unused "type: ignore" comment  [unused-ignore]
+Found 41 errors in 9 files (checked 90 source files)
+### MYPY base (whole app)
+app/main.py:49: error: Unused "type: ignore" comment  [unused-ignore]
+app/main.py:55: error: Unused "type: ignore" comment  [unused-ignore]
+Found 41 errors in 9 files (checked 88 source files)
+
+================ G2 SCOPE / SECRET / GITIGNORE / PG-SC-11 ================
+### CHANGED FILES vs origin/automation
+ M backend/app/api/v1/assets.py
+ M backend/app/config.py
+ M backend/app/main.py
+ M backend/app/models/__init__.py
+ M frontend/src/api/client.ts
+ M frontend/src/api/types.ts
+ M frontend/src/routes/AssetDetailPage.test.tsx
+ M frontend/src/routes/AssetDetailPage.tsx
+?? backend/alembic/versions/20260924_sg114_relation.py
+?? backend/app/api/v1/relations.py
+?? backend/app/models/relation.py
+?? backend/tests/test_sg114_relations.py
+?? docs/worklogs/SG-114_verify.log
+
+### SECRET GATE (pattern over changed/new tracked source files)
+backend/app/config.py:37:    opencode_api_key: str | None = None
+backend/app/config.py:40:    jina_api_key: str | None = None
+
+### .gitignore re-verify (committable paths; empty = none ignored)
+(none ignored)
+
+### PG-SC-11 end-relative assertions over touched Python source
+backend/app/api/v1/assets.py:299:        last = items[-1]
+
+### no-duplicate_of grep-gate (relation surface)
+(0 hits in relation surface; pre-existing dedup 'duplicate_of_asset' kind is out of scope)
+--- pre-existing duplicate_of hits (out of scope, quoted) ---
+backend/app/services/dedup.py:117:            matches.append({"type": "duplicate_of_asset", "asset_id": exact_asset.id, "evidence_id": evidence_id})
+backend/app/services/dedup.py:133:        kind = "duplicate_of_asset"
+backend/app/services/candidates.py:920:    if proposal.get("kind") == "duplicate_of_asset":
+
+================ CONTRACT ECHO (G-L1) ================
+--- VERSION ---
+0.33.0
+--- contract HEAD ---
+b232b845d74e89cb346c60fa4b9a40ec401c42dd
+b232b84 Contract payload 0.33.0
+--- fetch origin contract + FETCH_HEAD:VERSION ---
+b232b845d74e89cb346c60fa4b9a40ec401c42dd
+0.33.0
+--- installed rules sha256 vs payload ---
+18de7fd7b3546bd7624b3a7b59a78bd629752816cd7fa8f1af6113d1bafc8d46  /home/andrei/storagegenie-contract/RULES.md
+18de7fd7b3546bd7624b3a7b59a78bd629752816cd7fa8f1af6113d1bafc8d46 RULES.md
+--- FRONTEND GATES ---
+### FRONTEND tsc+vite build
+transforming...
+✓ 1963 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                   0.94 kB │ gzip:  0.47 kB
+dist/assets/index-CoNI-1Zn.css    3.84 kB │ gzip:  1.04 kB
+dist/assets/index-DyQr8w8_.js   317.03 kB │ gzip: 92.03 kB
+✓ built in 1.78s
+### FRONTEND eslint
+eslint: clean (exit 0)
+### FRONTEND vitest
+ Test Files  24 passed (24)
+      Tests  205 passed (205)
+   Start at  11:30:11
+   Duration  4.66s (transform 854ms, setup 731ms, collect 3.24s, tests 7.00s, environment 6.60s, prepare 1.61s)
+
+================ G4 BUILD + ONE RECREATE + VERIFY ================
+$ DOCKER_BUILDKIT=0 docker compose build backend
+Successfully installed storagegenie-backend-0.1.0
+[91mWARNING: Running pip as the 'root' user can result in broken permissions and conflicting behaviour with the system package manager, possibly rendering your system unusable. It is recommended to use a virtual environment instead: https://pip.pypa.io/warnings/venv. Use the --root-user-action option if you know what you are doing and want to suppress this warning.
+[0m[91m
+[notice] A new release of pip is available: 25.0.1 -> 26.2.1
+[notice] To update, run: pip install --upgrade pip
+[0m ---> Removed intermediate container 50ee7d72aa5c
+ ---> cd73c530d76c
+Step 17/20 : COPY --from=frontend-build /ui/dist ./static
+ ---> cfd29358e6d7
+Step 18/20 : EXPOSE 8000
+ ---> Running in d2ad8830a8ec
+ ---> Removed intermediate container d2ad8830a8ec
+ ---> b3926d8f35ab
+Step 19/20 : CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+ ---> Running in 0e359873559a
+ ---> Removed intermediate container 0e359873559a
+ ---> a829ce4f9a31
+Step 20/20 : LABEL com.docker.compose.image.builder=classic
+ ---> Running in bb808911e10e
+ ---> Removed intermediate container bb808911e10e
+ ---> b4bec08d9bcb
+Successfully built b4bec08d9bcb
+Successfully tagged storagegenie-backend:latest
+ Image storagegenie-backend Built 
+ Image storagegenie-backend Built 
+$ docker compose up -d --no-deps backend   # exactly ONE recreate
+ Container storagegenie-backend-1 Recreate 
+ Container storagegenie-backend-1 Recreated 
+ Container storagegenie-backend-1 Starting 
+ Container storagegenie-backend-1 Started 
+--- waiting for health ---
+t=1s health=starting
+t=2s health=starting
+t=3s health=starting
+t=4s health=starting
+t=5s health=starting
+t=6s health=healthy
+
+================ G4 AFTER (dormant code live, zero behavior change) ================
+=== AFTER image/container ===
+image=sha256:b4bec08d9bcb2a0b920a5a30d22da25a1f77354cd7890ae1d6587efc31199e52 created=2026-09-24T11:31:02.065176071Z
+container=1a0588c7d94424914d0c4a789e0e90a211c23a66c66a8a8c234e1a14f92efc08 restart=0 state=running health=healthy
+=== AFTER alembic current (in container) ===
+20260923_sg100_enrich_snapshot
+=== AFTER table count ===
+25
+=== AFTER per-table counts (sorted) ===
+alembic_version|1
+assertion|28
+asset|6
+asset_evidence|12
+asset_fts|6
+asset_fts_config|1
+asset_fts_data|8
+asset_fts_docsize|6
+asset_fts_idx|6
+audit_event|68
+candidate|7
+enrich_snapshot|2
+evidence|13
+guardrail_event|2
+household|1
+idempotency_key|9
+job|8
+job_step|56
+observation|16
+planning_suggestion|0
+provider_call|17
+review_task|6
+saved_search|0
+source_attribution|0
+user|2
+=== AFTER asset status census ===
+ACTIVE|6
+=== health x6 ===
+{"status":"ok","db":"ok","storage":"ok"}
+{"status":"ok","db":"ok","storage":"ok"}
+{"status":"ok","db":"ok","storage":"ok"}
+{"status":"ok","db":"ok","storage":"ok"}
+{"status":"ok","db":"ok","storage":"ok"}
+{"status":"ok","db":"ok","storage":"ok"}
+=== gate canonical vhost ===
+http:80 => code=301 redirect=https://storagegenie.dynv6.net/
+https:443 => code=401
+=== AFTER bundle assets served (name differs from BEFORE index-t_5eG484.js = EXPECTED, frontend changed) ===
+assets/index-CoNI-1Zn.css
+assets/index-XGj8xV3t.js
+--- bundle sha256 (in image, AFTER) ---
+65736eecf1a7b3c7040358088462062a6d23dee3cb9b0e49d7f2d9b3266cdb67  /app/static/assets/index-XGj8xV3t.js
+b18dbb336eef5c580bf0a2e6726d647c4f6c63edbc48373580d31e4508659ad3  /app/static/assets/index-CoNI-1Zn.css
+=== flag-off probes through the FRESH server (dormancy proven live) ===
+household=01a0a029-1477-7ca0-b200-bce78a96c679 asset=01a0a467-eb0e-7b83-a227-af122dc9268b
+GET /v1/assets/01a0a467-eb0e-7b83-a227-af122dc9268b/relations -> 404
+POST /v1/assets/01a0a467-eb0e-7b83-a227-af122dc9268b/relations -> 404
+DELETE /v1/assets/01a0a467-eb0e-7b83-a227-af122dc9268b/relations/missing -> 404
+=== asset detail has NO relations key (dormant) ===
+relations key present: False
+=== pre-existing route unchanged: catalog-list ===
+GET /v1/assets -> 200
+=== in-image new code present (migration file shipped but NOT applied) ===
+20260924_sg114_relation.py
+migration-files=12
+11
+=== served file sha256 vs host ===
+4ef350eaf372a1cf35f9ce936a400702b97ef0a5c74bc1ffe36d12c74f365c0e  /app/app/api/v1/relations.py
+a910610d9c5c5a9d8abc76cae8998dc405b8c59c13f9a2bf0bba31b1df679fb2  /app/app/models/relation.py
+4ef350eaf372a1cf35f9ce936a400702b97ef0a5c74bc1ffe36d12c74f365c0e  backend/app/api/v1/relations.py
+a910610d9c5c5a9d8abc76cae8998dc405b8c59c13f9a2bf0bba31b1df679fb2  backend/app/models/relation.py

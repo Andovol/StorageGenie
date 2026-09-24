@@ -2,6 +2,8 @@ import type {
   AiSettings,
   AnalyticsInsightResult,
   AnalyticsSummary,
+  AssetListResponse,
+  AssetRelation,
   Assertion,
   CandidateSplitResponse,
   ChatCorrectionResponse,
@@ -11,6 +13,7 @@ import type {
   PlanningRunResult,
   PlanningSuggestion,
   PlanningSuggestionListResponse,
+  RelationListResponse,
 } from "./types";
 
 const BASE = import.meta.env.VITE_API_BASE || "http://localhost:8003";
@@ -126,6 +129,40 @@ export function unassignAssetLocation(assetId: string, locationId: string, house
     `/v1/assets/${assetId}/locations/${locationId}`,
     { household_id: householdId }
   );
+}
+
+// SG-114: asset-relation reads/writes. Every relation route answers 404 while
+// the backend dormancy flag is OFF; the UI treats that as "section hidden".
+export function fetchRelations(assetId: string, householdId: string) {
+  return apiGet<RelationListResponse>(`/v1/assets/${assetId}/relations`, {
+    household_id: householdId,
+  });
+}
+
+export function createRelation(
+  assetId: string,
+  toAssetId: string,
+  relationType: string,
+  householdId: string
+) {
+  return apiPost<AssetRelation>(
+    `/v1/assets/${assetId}/relations`,
+    { to_asset_id: toAssetId, relation_type: relationType },
+    { household_id: householdId }
+  );
+}
+
+export function deleteRelation(assetId: string, relationId: string, householdId: string) {
+  return apiDelete<{ status: string; id: string }>(
+    `/v1/assets/${assetId}/relations/${relationId}`,
+    { household_id: householdId }
+  );
+}
+
+// SG-114: the household asset list backs the relation target picker and the
+// id -> display-name map. Read-only; the catalog list route is never dormant.
+export function fetchHouseholdAssets(householdId: string) {
+  return apiGet<AssetListResponse>("/v1/assets", { household_id: householdId });
 }
 
 export function fetchAiSettings() {

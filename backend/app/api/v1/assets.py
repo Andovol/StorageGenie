@@ -6,6 +6,7 @@ from pydantic import BaseModel
 from sqlalchemy import and_, func, or_, select, text
 from sqlalchemy.orm import Query as OrmQuery, Session
 
+from app.api.v1.relations import relations_for_asset
 from app.config import settings
 from app.db import get_db
 from app.models.assertion import Assertion
@@ -176,6 +177,12 @@ def _asset_to_dict(asset: Asset, db: Session) -> dict:  # type: ignore[no-untype
         out["locations"] = [
             {"id": loc.id, "name": loc.name, "parent_id": loc.parent_id} for loc in assigned
         ]
+    # SG-114: the reader half of the relation write path (`PG-SC-02`). Added only
+    # when the relations flag is ON, so the flag-OFF response stays byte-for-byte
+    # identical (no new key) to the pre-slice shape. Both directions are served,
+    # each row labelled with its direction from THIS asset's perspective.
+    if settings.sg_relations_enabled:
+        out["relations"] = relations_for_asset(db, asset.id, asset.household_id)
     return out
 
 
