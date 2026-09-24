@@ -366,3 +366,18 @@ mapped ref -> 605187f87fb37120dfeca46f444ee8de7f32a62c
 
 $ git notes --ref=refs/notes/storagegenie-coder-reports-sg114-fetched show 7c16635e85197c436119121d409f6f86974855ed
 Dispatch-ID: SG-114 | Report: docs/worklogs/SG-114_report.md | Work-HEAD: 7c16635e85197c436119121d409f6f86974855ed
+
+--- DUAL-ANNOTATE FINAL TIP (SG-092 inoculation) ---
+$ git notes --ref=refs/notes/storagegenie-coder-reports add -m "Dispatch-ID: SG-114 | Report: docs/worklogs/SG-114_report.md | Work-HEAD: 7c16635e85197c436119121d409f6f86974855ed" 1c0e76d0116f12c4a52f3118854752fffe50c6bf
+add exit=0
+$ git push origin refs/notes/storagegenie-coder-reports
+To github.com:Andovol/StorageGenie.git
+   605187f..95c59b5  refs/notes/storagegenie-coder-reports -> refs/notes/storagegenie-coder-reports
+push exit=0
+$ git fetch origin refs/notes/storagegenie-coder-reports:refs/notes/storagegenie-coder-reports-sg114-tip-fetched
+From github.com:Andovol/StorageGenie
+ * [new ref]         refs/notes/storagegenie-coder-reports -> refs/notes/storagegenie-coder-reports-sg114-tip-fetched
+fetch exit=0
+mapped ref -> 95c59b53321b9451b756c8b14d55ebfb0b1b40b0
+$ git notes --ref=refs/notes/storagegenie-coder-reports-sg114-tip-fetched show 1c0e76d0116f12c4a52f3118854752fffe50c6bf
+Dispatch-ID: SG-114 | Report: docs/worklogs/SG-114_report.md | Work-HEAD: 7c16635e85197c436119121d409f6f86974855ed
