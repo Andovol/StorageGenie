@@ -47,6 +47,10 @@ class Settings(BaseSettings):
     sg_confidence_threshold: float = 0.9
     # SG-028: selectable extraction prompt category ("food" default; "medicine").
     sg_prompt_category: str = "food"
+    # SG-113 dormancy gate: the location-tree routes and the asset-detail
+    # `locations[]` read are inert until the production migration lands. The
+    # flag flips ONLY with the owner's migrate + flip + recreate word.
+    sg_locations_enabled: bool = False
 
     model_config = {"env_file": ".env", "extra": "ignore"}
 

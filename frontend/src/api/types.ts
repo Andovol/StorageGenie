@@ -44,11 +44,25 @@ export type Asset = {
   evidence_ids?: string[];
   assertions?: Assertion[];
   audit_events?: AuditEvent[];
+  // SG-113: present only when the backend dormancy flag is ON; absent (not
+  // empty) when the location tree is dormant, so the section hides cleanly.
+  locations?: Location[];
 };
 export type AssetListResponse = {
   items: Asset[];
   next_cursor: string | null;
 };
+
+// SG-113: a node of one household's location tree.
+export type Location = {
+  id: string;
+  household_id: string;
+  name: string;
+  parent_id: string | null;
+  created_at: string | null;
+  updated_at: string | null;
+};
+export type LocationListResponse = { items: Location[] };
 
 // SG-068: a saved search stores EXACTLY the catalog filter surface the list
 // endpoint already takes — no separate query language.

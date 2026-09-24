@@ -1,0 +1,240 @@
+SG-113 verify log — raw outputs (location tree: schema + dormant API + asset-detail UI)
+Generated 2026-09-24T11:10:53Z on host ubuntu in /home/andrei/StorageGenie
+BASE_REF=origin/automation BASE_RESOLVED=2ed06a976bc142887adf9d6c7a469adcce6d6a63
+
+================ G1 BEFORE ================
+=== G1 BEFORE 2026-09-24T11:10:53Z ===
+--- image id ---
+sha256:f1d9f99affd1b7efbb55b72c31008a99b6aeed8799ce18fcedddb8a0a3656b90 created=2026-09-24T11:03:01.043535393Z
+--- container id / restartcount / state ---
+d184fbc0becd193080e4cab9b948f0e0081e9c013a7cd3c061e8bed8c771ddd3 restart=0 state=running health=healthy
+--- alembic current (in container) ---
+20260923_sg100_enrich_snapshot (head)
+--- health ---
+{"status":"ok","db":"ok","storage":"ok"}
+--- table count ---
+25
+--- per-table counts (sorted) ---
+alembic_version|1
+assertion|28
+asset|6
+asset_evidence|12
+asset_fts|6
+asset_fts_config|1
+asset_fts_data|8
+asset_fts_docsize|6
+asset_fts_idx|6
+audit_event|68
+candidate|7
+enrich_snapshot|2
+evidence|13
+guardrail_event|2
+household|1
+idempotency_key|9
+job|8
+job_step|56
+observation|16
+planning_suggestion|0
+provider_call|17
+review_task|6
+saved_search|0
+source_attribution|0
+user|2
+--- asset status census ---
+ACTIVE|6
+--- bundle assets served ---
+index-CoNI-1Zn.css
+index-DAsiAK51.js
+--- gate canonical vhost (Host=storagegenie.dynv6.net) ---
+http:80 => code=301 redirect=https://storagegenie.dynv6.net/
+https:443 => code=401
+--- location-absence grep ---
+$ grep -rni "location" backend/app/models/ backend/app/api/ backend/app/services/
+(no hits)
+
+================ G2 FAIL RUN (candidate test file vs BASE archive 2ed06a9; PYTHONPATH forced to base app) ================
+$ cd /tmp/opencode/sg113_base/backend && PYTHONPATH=/tmp/opencode/sg113_base/backend <venv>/python -m pytest tests/test_sg113_locations.py -q -p no:cacheprovider
+    util.warn_deprecated(
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/test_sg113_locations.py::test_sg113_migration_upgrade_downgrade_upgrade
+FAILED tests/test_sg113_locations.py::test_flag_off_every_new_route_is_404 - ...
+FAILED tests/test_sg113_locations.py::test_seed_names_are_not_precreated - as...
+FAILED tests/test_sg113_locations.py::test_tree_create_child_reparent_and_cycle_refusal
+FAILED tests/test_sg113_locations.py::test_name_validation - AssertionError: ...
+FAILED tests/test_sg113_locations.py::test_delete_with_assignments_409_and_empty_delete_200
+FAILED tests/test_sg113_locations.py::test_delete_with_children_409 - KeyErro...
+FAILED tests/test_sg113_locations.py::test_assign_unassign_idempotent_and_asset_detail_roundtrip
+FAILED tests/test_sg113_locations.py::test_cross_household_refusals - KeyErro...
+9 failed, 3 warnings in 1.25s
+
+--- import app proof (base path) ---
+import app -> /tmp/opencode/sg113_base/backend/app/__init__.py
+
+================ G2 FAIL RUN (candidate test file vs BASE archive 2ed06a9; PYTHONPATH forced to base app) ================
+$ cd /tmp/opencode/sg113_base/backend && PYTHONPATH=/tmp/opencode/sg113_base/backend <venv>/python -m pytest tests/test_sg113_locations.py -q -p no:cacheprovider
+    util.warn_deprecated(
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/test_sg113_locations.py::test_sg113_migration_upgrade_downgrade_upgrade
+FAILED tests/test_sg113_locations.py::test_flag_off_every_new_route_is_404 - ...
+FAILED tests/test_sg113_locations.py::test_seed_names_are_not_precreated - as...
+FAILED tests/test_sg113_locations.py::test_tree_create_child_reparent_and_cycle_refusal
+FAILED tests/test_sg113_locations.py::test_name_validation - AssertionError: ...
+FAILED tests/test_sg113_locations.py::test_delete_with_assignments_409_and_empty_delete_200
+FAILED tests/test_sg113_locations.py::test_delete_with_children_409 - KeyErro...
+FAILED tests/test_sg113_locations.py::test_assign_unassign_idempotent_and_asset_detail_roundtrip
+FAILED tests/test_sg113_locations.py::test_cross_household_refusals - KeyErro...
+9 failed, 3 warnings in 1.19s
+
+--- import app proof (base path) ---
+import app -> /tmp/opencode/sg113_base/backend/app/__init__.py
+
+================ G2 PASS RUN (candidate tree) ================
+$ cd /home/andrei/StorageGenie/backend && <venv>/python -m pytest tests/test_sg113_locations.py -q -p no:cacheprovider
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+9 passed, 5 warnings in 1.48s
+
+================ G2 GATES ================
+### RUFF (whole backend)
+All checks passed!
+### MYPY candidate (whole app)
+Found 41 errors in 9 files (checked 88 source files)
+### MYPY base (whole app)
+Found 41 errors in 9 files (checked 86 source files)
+### FRONTEND tsc+vite build
+rendering chunks...
+computing gzip size...
+dist/index.html                   0.94 kB │ gzip:  0.48 kB
+dist/assets/index-CoNI-1Zn.css    3.84 kB │ gzip:  1.04 kB
+dist/assets/index-BXZ7OS4d.js   314.13 kB │ gzip: 91.57 kB
+✓ built in 1.65s
+### FRONTEND eslint
+> storagegenie-frontend@0.1.0 lint
+> eslint src
+
+### FRONTEND vitest
+      Tests  202 passed (202)
+   Start at  11:17:30
+   Duration  4.62s (transform 922ms, setup 803ms, collect 3.29s, tests 6.83s, environment 6.69s, prepare 1.64s)
+
+
+================ G2 FULL SUITE (candidate) ================
+=========================== short test summary info ============================
+FAILED tests/test_signals.py::test_generated_codes_are_validated_and_bad_checksum_is_not_an_identifier
+FAILED tests/test_signals.py::test_ocr_has_text_boxes_and_mean_confidence - a...
+2 failed, 572 passed, 29 warnings in 27.21s
+
+================ G2 STASH-PROOF: 2 known decoder reds on BASE ================
+$ cd /tmp/opencode/sg113_base/backend && PYTHONPATH=... <venv>/python -m pytest -q tests/test_signals.py::test_generated_codes_are_validated_and_bad_checksum_is_not_an_identifier tests/test_signals.py::test_ocr_has_text_boxes_and_mean_confidence
+FAILED tests/test_signals.py::test_generated_codes_are_validated_and_bad_checksum_is_not_an_identifier
+FAILED tests/test_signals.py::test_ocr_has_text_boxes_and_mean_confidence - a...
+2 failed in 0.74s
+
+================ G2 SCOPE / SECRET / GITIGNORE ================
+### CHANGED FILES vs origin/automation
+backend/app/api/v1/assets.py
+backend/app/config.py
+backend/app/main.py
+backend/app/models/__init__.py
+frontend/src/api/client.ts
+frontend/src/api/types.ts
+frontend/src/routes/AssetDetailPage.test.tsx
+frontend/src/routes/AssetDetailPage.tsx
+backend/alembic/versions/20260924_sg113_location.py
+backend/app/api/v1/locations.py
+backend/app/models/location.py
+backend/tests/test_sg113_locations.py
+docs/worklogs/SG-113_verify.log
+
+### SECRET GATE (pattern over changed files; only config.py names, no values)
+backend/app/config.py:37:    opencode_api_key: str | None = None
+backend/app/config.py:39:    # reads it; the JINA_API_KEY process environment remains the fallback.
+backend/app/config.py:40:    jina_api_key: str | None = None
+
+### .gitignore re-verify (committable paths)
+(none ignored)
+
+### PG-SC-11 end-relative assertions over touched files
+backend/app/api/v1/assets.py:292:        last = items[-1]
+
+================ CONTRACT ECHO ================
+=== contract ===
+0.33.0
+b232b845d74e89cb346c60fa4b9a40ec401c42dd
+b232b84 Contract payload 0.33.0
+18de7fd7b3546bd7624b3a7b59a78bd629752816cd7fa8f1af6113d1bafc8d46  /home/andrei/storagegenie-contract/RULES.md
+18de7fd7b3546bd7624b3a7b59a78bd629752816cd7fa8f1af6113d1bafc8d46 RULES.md
+
+================ G4 AFTER (dormant code live, zero behavior change) ================
+=== AFTER image/container ===
+image=sha256:67c62b86806eea38f2446791f41137049a1d07fca8606fcdb968121639729f8e created=2026-09-24T11:19:06.575838136Z
+container=2fceee17df2ed511470dfbe6334447cf995ae93a24760fb2b82e8dfbc68f3685 restart=0 state=running health=healthy
+=== AFTER alembic current (in container) ===
+20260923_sg100_enrich_snapshot
+=== AFTER table count ===
+25
+=== AFTER per-table counts (sorted) ===
+alembic_version|1
+assertion|28
+asset|6
+asset_evidence|12
+asset_fts|6
+asset_fts_config|1
+asset_fts_data|8
+asset_fts_docsize|6
+asset_fts_idx|6
+audit_event|68
+candidate|7
+enrich_snapshot|2
+evidence|13
+guardrail_event|2
+household|1
+idempotency_key|9
+job|8
+job_step|56
+observation|16
+planning_suggestion|0
+provider_call|17
+review_task|6
+saved_search|0
+source_attribution|0
+user|2
+=== AFTER asset status census ===
+ACTIVE|6
+=== AFTER bundle assets served (name differs from BEFORE index-DAsiAK51.js = EXPECTED, frontend changed) ===
+index-CoNI-1Zn.css
+index-t_5eG484.js
+=== health x6 ===
+{"status":"ok","db":"ok","storage":"ok"}
+{"status":"ok","db":"ok","storage":"ok"}
+{"status":"ok","db":"ok","storage":"ok"}
+{"status":"ok","db":"ok","storage":"ok"}
+{"status":"ok","db":"ok","storage":"ok"}
+{"status":"ok","db":"ok","storage":"ok"}
+=== gate canonical vhost ===
+http:80 => code=301 redirect=https://storagegenie.dynv6.net/
+https:443 => code=401
+=== flag-off probes through the FRESH server (dormancy proven live) ===
+household=01a0a029-1477-7ca0-b200-bce78a96c679 asset=01a0a467-eb0e-7b83-a227-af122dc9268b
+GET  /v1/locations                 -> 404
+POST /v1/locations                 -> 404
+PATCH /v1/locations/missing        -> 404
+DELETE /v1/locations/missing       -> 404
+POST /v1/assets/$id/locations      -> 404
+DELETE /v1/assets/$id/locations/m  -> 404
+=== asset detail has NO locations key (dormant) ===
+locations key present: False
+=== pre-existing route unchanged: catalog-list ===
+GET /v1/assets -> 200
+=== in-image new code present ===
+13
+/app/app/api/v1/locations.py
+=== served file sha256 vs host ===
+a7c0fbc0a63ba507c6ab96d1a8b72c08c32da3b7b6c3dae963cd1d749bc830e2  /app/app/api/v1/locations.py
+a56ba1628b7a7ea661d93f67cedd54bc237f9afd9d42fb5850ba518d231fe719  /app/app/models/location.py
+a7c0fbc0a63ba507c6ab96d1a8b72c08c32da3b7b6c3dae963cd1d749bc830e2  backend/app/api/v1/locations.py
+a56ba1628b7a7ea661d93f67cedd54bc237f9afd9d42fb5850ba518d231fe719  backend/app/models/location.py

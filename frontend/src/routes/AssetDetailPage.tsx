@@ -1,11 +1,19 @@
 import { useState } from "react";
 import { useParams, useSearchParams, Link } from "react-router-dom";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useAsset } from "../hooks/useAssets";
 import { EvidenceGallery } from "../components/EvidenceGallery";
 import { ProvenanceBadge } from "../components/ProvenanceBadge";
 import { ExpiryEntryForm } from "../components/ExpiryEntryForm";
-import { apiPatch, apiPost, uploadEvidence } from "../api/client";
+import {
+  apiPatch,
+  apiPost,
+  assignAssetLocation,
+  fetchLocations,
+  unassignAssetLocation,
+  uploadEvidence,
+} from "../api/client";
+import type { Asset, LocationListResponse } from "../api/types";
 import { UNTITLED_ASSET_NAME } from "../types/product";
 
 // SG-082: per-press Enrich cap. UNCALIBRATED on purpose (`G-A9`): the value is
@@ -65,6 +73,75 @@ export function EnrichButton({
         </span>
       )}
     </div>
+  );
+}
+
+// SG-113: the asset-detail location section. It reads the tree from the
+// flag-gated list route: when the backend is dormant the route answers 404,
+// the query errors, and the WHOLE section is hidden (no error, no fallback
+// list). When enabled it shows the assigned locations and an assign select.
+export function LocationsSection({
+  asset,
+  householdId,
+}: {
+  asset: Asset;
+  householdId: string;
+}) {
+  const qc = useQueryClient();
+  const { data: all, isError } = useQuery<LocationListResponse>({
+    queryKey: ["locations", householdId],
+    queryFn: () => fetchLocations(householdId),
+    retry: false,
+  });
+  const assignMut = useMutation({
+    mutationFn: (locationId: string) => assignAssetLocation(asset.id, locationId, householdId),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["asset", asset.id] }),
+  });
+  const unassignMut = useMutation({
+    mutationFn: (locationId: string) => unassignAssetLocation(asset.id, locationId, householdId),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["asset", asset.id] }),
+  });
+  if (isError || !all) return null;
+  const assigned = asset.locations || [];
+  const assignedIds = new Set(assigned.map((l) => l.id));
+  const available = all.items.filter((l) => !assignedIds.has(l.id));
+  return (
+    <section style={{ marginBottom: 16 }}>
+      <h3>Locations</h3>
+      {assigned.length === 0 ? (
+        <div className="text-muted-foreground" style={{ fontSize: 13 }}>No locations assigned</div>
+      ) : (
+        <ul style={{ fontSize: 13, paddingLeft: 18 }}>
+          {assigned.map((l) => (
+            <li key={l.id} style={{ marginBottom: 4 }}>
+              {l.name}{" "}
+              <button
+                type="button"
+                onClick={() => unassignMut.mutate(l.id)}
+                className="bg-card text-foreground border-border focus-ring"
+                style={{ padding: "2px 8px", borderRadius: 6, borderStyle: "solid", borderWidth: 1, cursor: "pointer", fontSize: 12 }}
+              >
+                Remove
+              </button>
+            </li>
+          ))}
+        </ul>
+      )}
+      <select
+        aria-label="Assign location"
+        value=""
+        onChange={(e) => {
+          if (e.target.value) assignMut.mutate(e.target.value);
+        }}
+        className="bg-background text-foreground border-border focus-ring"
+        style={{ padding: 6, borderRadius: 6, borderStyle: "solid", borderWidth: 1, fontSize: 13 }}
+      >
+        <option value="">Assign to location…</option>
+        {available.map((l) => (
+          <option key={l.id} value={l.id}>{l.name}</option>
+        ))}
+      </select>
+    </section>
   );
 }
 
@@ -155,6 +232,8 @@ export function AssetDetailPage() {
       <div style={{ marginBottom: 16 }}>
         <EnrichButton lastSpendUsd={null} onRun={() => enrichMut.mutate()} />
       </div>
+
+      <LocationsSection asset={asset} householdId={householdId} />
 
       {editing && (
         <div className="bg-card-muted border-border" style={{ borderRadius: 8, padding: 12, marginBottom: 16, borderStyle: "solid", borderWidth: 1 }}>

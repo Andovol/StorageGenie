@@ -8,6 +8,7 @@ from app.models.guardrail_event import GuardrailEvent
 from app.models.household import Household
 from app.models.idempotency import IdempotencyKey
 from app.models.job import Job, JobStep
+from app.models.location import Location, asset_location
 from app.models.planning_suggestion import PlanningSuggestion
 from app.models.provider_call import ProviderCall
 from app.models.review_task import ReviewTask
@@ -27,6 +28,8 @@ __all__ = [
     "IdempotencyKey",
     "Job",
     "JobStep",
+    "Location",
+    "asset_location",
     "PlanningSuggestion",
     "ProviderCall",
     "ReviewTask",

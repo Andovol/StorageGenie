@@ -7,6 +7,7 @@ import type {
   ChatCorrectionResponse,
   ChatResponse,
   ExpiryStatusResponse,
+  LocationListResponse,
   PlanningRunResult,
   PlanningSuggestion,
   PlanningSuggestionListResponse,
@@ -95,6 +96,36 @@ export async function apiPut<T>(
     throw new Error(parseRfc9457(b, `PUT ${path} failed: ${r.status}`));
   }
   return r.json() as Promise<T>;
+}
+
+export async function apiDelete<T>(path: string, params: Record<string, string> = {}): Promise<T> {
+  const r = await fetch(buildUrl(path, params), { method: "DELETE" });
+  if (!r.ok) {
+    const b = await r.json().catch(() => ({ detail: r.statusText }));
+    throw new Error(parseRfc9457(b, `DELETE ${path} failed: ${r.status}`));
+  }
+  return r.json() as Promise<T>;
+}
+
+// SG-113: location tree reads/writes. Every route answers 404 while the
+// backend dormancy flag is OFF; the UI treats that as "section hidden".
+export function fetchLocations(householdId: string) {
+  return apiGet<LocationListResponse>("/v1/locations", { household_id: householdId });
+}
+
+export function assignAssetLocation(assetId: string, locationId: string, householdId: string) {
+  return apiPost<{ status: string; asset_id: string; location_id: string }>(
+    `/v1/assets/${assetId}/locations`,
+    { location_id: locationId },
+    { household_id: householdId }
+  );
+}
+
+export function unassignAssetLocation(assetId: string, locationId: string, householdId: string) {
+  return apiDelete<{ status: string; asset_id: string; location_id: string }>(
+    `/v1/assets/${assetId}/locations/${locationId}`,
+    { household_id: householdId }
+  );
 }
 
 export function fetchAiSettings() {

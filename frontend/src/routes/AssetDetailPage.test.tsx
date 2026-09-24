@@ -1,4 +1,4 @@
-import { afterEach, describe, expect, test, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { MemoryRouter, Route, Routes } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -10,6 +10,9 @@ const api = vi.hoisted(() => ({
   apiPost: vi.fn(),
   uploadEvidence: vi.fn(),
   enterManualExpiry: vi.fn(),
+  fetchLocations: vi.fn(),
+  assignAssetLocation: vi.fn(),
+  unassignAssetLocation: vi.fn(),
 }));
 vi.mock("../api/client", () => api);
 
@@ -72,6 +75,12 @@ function renderPage() {
 
 afterEach(() => {
   vi.clearAllMocks();
+});
+
+beforeEach(() => {
+  // Default: the location tree route is dormant (backend flag OFF -> 404), so
+  // the section hides unless a test opts in with a resolved value.
+  api.fetchLocations.mockRejectedValue(new Error("locations disabled"));
 });
 
 describe("AssetDetailPage", () => {
@@ -160,6 +169,51 @@ describe("EnrichButton per-press cap (SG-082)", () => {
 
     await waitFor(() =>
       expect(api.apiPost).toHaveBeenCalledWith("/v1/enrich/asset-1", {}, { household_id: "hh" })
+    );
+  });
+});
+
+describe("LocationsSection (SG-113)", () => {
+  const fridge = { id: "loc-1", household_id: "hh", name: "Fridge", parent_id: null, created_at: null, updated_at: null };
+  const freezer = { id: "loc-2", household_id: "hh", name: "Freezer", parent_id: null, created_at: null, updated_at: null };
+
+  test("hides the whole section when the backend reports the tree disabled", async () => {
+    api.apiGet.mockResolvedValue(before);
+    renderPage();
+
+    await screen.findByRole("heading", { name: "Milk" });
+    await waitFor(() => expect(screen.queryByText("Locations")).not.toBeInTheDocument());
+  });
+
+  test("shows the empty state for an asset with no assignments (never an error)", async () => {
+    api.apiGet.mockResolvedValue(before);
+    api.fetchLocations.mockResolvedValueOnce({ items: [fridge] });
+    renderPage();
+
+    expect(await screen.findByText("Locations")).toBeInTheDocument();
+    expect(await screen.findByText("No locations assigned")).toBeInTheDocument();
+  });
+
+  test("lists assigned locations, assigns from the select and unassigns", async () => {
+    api.apiGet.mockResolvedValue({ ...before, locations: [fridge] });
+    api.fetchLocations.mockResolvedValueOnce({ items: [fridge, freezer] });
+    api.assignAssetLocation.mockResolvedValue({ status: "assigned", asset_id: "asset-1", location_id: "loc-2" });
+    api.unassignAssetLocation.mockResolvedValue({ status: "unassigned", asset_id: "asset-1", location_id: "loc-1" });
+    renderPage();
+
+    expect(await screen.findByText("Fridge")).toBeInTheDocument();
+    // The already-assigned location is not offered again in the select.
+    const select = screen.getByLabelText("Assign location");
+    expect(screen.queryByRole("option", { name: "Fridge" })).not.toBeInTheDocument();
+
+    fireEvent.change(select, { target: { value: "loc-2" } });
+    await waitFor(() =>
+      expect(api.assignAssetLocation).toHaveBeenCalledWith("asset-1", "loc-2", "hh")
+    );
+
+    fireEvent.click(screen.getByRole("button", { name: "Remove" }));
+    await waitFor(() =>
+      expect(api.unassignAssetLocation).toHaveBeenCalledWith("asset-1", "loc-1", "hh")
     );
   });
 });

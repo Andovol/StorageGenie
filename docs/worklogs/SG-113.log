@@ -1,0 +1,51 @@
+SG-113 Coder log — location tree: schema + dormant API + asset-detail UI
+=======================================================================
+
+Running log (first token SG-113). Host /home/andrei/StorageGenie, branch automation.
+BASE_REF=origin/automation, BASE_RESOLVED=2ed06a976bc142887adf9d6c7a469adcce6d6a63.
+MODEL=unknown (no --model in argv; CLI default per policy). effort=high (--variant high).
+
+- t0 read: contract 0.33.0 == published b232b84; RULES.md sha256 18de7fd7… matches payload (G-L1 clean).
+- Premises re-verified: no location model/table/route anywhere (grep over models/api/services -> 0 hits);
+  head 20260923_sg100_enrich_snapshot; seed vocabulary only in expiry_tracker.py EXTENSION_SCHEMA
+  (free-text hint, never the set). All held.
+- G1 BEFORE captured raw (image f1d9f99affd1…, container d184fbc0…, alembic 20260923_sg100_enrich_snapshot,
+  25 tables, health exact, gate 301/401, bundle index-DAsiAK51.js, location-absence grep 0 hits).
+- G2 implemented:
+  * backend/app/models/location.py — `Location` (id/household_id FK+cascade+index/name String(200)/
+    parent_id self-FK nullable+index) + `asset_location` association (composite PK asset_id+location_id =
+    the uniqueness rule; created_at).
+  * backend/app/models/__init__.py — export Location + asset_location (name + __all__).
+  * backend/app/config.py — `sg_locations_enabled: bool = False` (dormancy gate).
+  * backend/alembic/versions/20260924_sg113_location.py — ONE migration chaining from
+    20260923_sg100_enrich_snapshot; upgrade creates both + indexes; downgrade drops both.
+  * backend/app/api/v1/locations.py — router-level `Depends(_require_locations_enabled)` (flag OFF ->
+    404 on every route): list/create/rename-reparent/delete + assign/unassign. Cycle guard walks the
+    proposed parent's ancestor chain (self + descendant -> 422); delete refuses 409 when assigned OR when
+    it has children (empty-only delete); assign/unassign idempotent; household scoping 403/404.
+  * backend/app/api/v1/assets.py — `_asset_to_dict` adds `locations[]` ONLY when the flag is ON (off-mode
+    response byte-identical: no new key).
+  * backend/app/main.py — register locations_router.
+  * frontend/src/api/types.ts + client.ts — Location/LocationListResponse types, apiDelete,
+    fetchLocations/assignAssetLocation/unassignAssetLocation.
+  * frontend/src/routes/AssetDetailPage.tsx — `LocationsSection`: list route 404 -> hide whole section;
+    else empty state / assigned list + assign select + Remove. Create-inline NOT shipped (stated).
+- Tests backend/tests/test_sg113_locations.py (9 tests): migration upgrade->downgrade->upgrade + indexes +
+  composite PK; flag-off 404s on all six routes + no locations key on detail; seed names not pre-created;
+  tree create/child/reparent + self-parent 422 + descendant-cycle 422 + missing/foreign parent 404/403;
+  name validation; delete-with-assignments 409 vs empty delete 200; delete-with-children 409; assign/
+  unassign idempotent + detail round-trip; cross-household 403s. FAIL on BASE 9 failed (8 behavioural
+  route/schema absence + 1 artifact-absence lazy model import), PASS on candidate 9 passed. Both raw runs
+  in SG-113_verify.log.
+- Tests frontend AssetDetailPage.test.tsx +4 (9 total): hides when disabled; empty state; list/assign/
+  unassign. Full frontend 202 passed / 24 files.
+- Gates: full backend suite 2 failed, 572 passed (the 2 known decoder env reds, stash-proved on BASE);
+  ruff `All checks passed!`; mypy delta 0 (41/9 vs 41/9); secret gate 0 real (only pre-existing
+  config.py key NAMES); frontend tsc + vite build ok, eslint clean, vitest 202 passed.
+- G4: backend rebuilt (image f1d9f99a -> 67c62b86), exactly ONE recreate (container d184fbc0 ->
+  2fceee17, RestartCount 0, healthy). AFTER: alembic UNCHANGED (20260923_sg100_enrich_snapshot — new
+  migration present in image but NOT applied), 25-table counts delta zero, health exact x6, gate 301/401,
+  bundle index-t_5eG484.js (differs — frontend changed), flag-off probes all 404 through the fresh
+  server, detail has no locations key, catalog-list 200, served file sha256 match host.
+- Production migration + activation word-shape recorded in SG-113_report.md (batched with SG-114).
+- G5: report + verify log written; receipt note on WORK_HEAD and the final tip; worktree clean.

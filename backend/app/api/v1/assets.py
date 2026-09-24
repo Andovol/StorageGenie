@@ -6,12 +6,14 @@ from pydantic import BaseModel
 from sqlalchemy import and_, func, or_, select, text
 from sqlalchemy.orm import Query as OrmQuery, Session
 
+from app.config import settings
 from app.db import get_db
 from app.models.assertion import Assertion
 from app.models.audit_event import AuditEvent
 from app.models.asset import Asset
 from app.models.evidence import Evidence, asset_evidence
 from app.models.household import Household
+from app.models.location import Location, asset_location
 from app.models.saved_search import SavedSearch
 from app.schemas.asset import AssetCreate, AssetUpdate
 from app.schemas.common import decode_cursor, encode_cursor, loads_json
@@ -144,7 +146,7 @@ def _asset_to_dict(asset: Asset, db: Session) -> dict:  # type: ignore[no-untype
                 "timestamp": ae.timestamp.isoformat() if ae.timestamp else None,
             }
         )
-    return {
+    out: dict[str, Any] = {
         "id": asset.id,
         "household_id": asset.household_id,
         "display_name": asset.display_name,
@@ -160,6 +162,21 @@ def _asset_to_dict(asset: Asset, db: Session) -> dict:  # type: ignore[no-untype
         "assertions": assertions,
         "audit_events": audits,
     }
+    # SG-113: the reader half of the location write path (`PG-SC-02`). Only
+    # added when the dormancy flag is ON, so the flag-OFF response stays
+    # byte-identical to the pre-slice shape (no new key).
+    if settings.sg_locations_enabled:
+        assigned = (
+            db.query(Location)
+            .join(asset_location, Location.id == asset_location.c.location_id)
+            .filter(asset_location.c.asset_id == asset.id)
+            .order_by(Location.name, Location.id)
+            .all()
+        )
+        out["locations"] = [
+            {"id": loc.id, "name": loc.name, "parent_id": loc.parent_id} for loc in assigned
+        ]
+    return out
 
 
 def _apply_asset_filters(
