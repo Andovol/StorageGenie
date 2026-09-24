@@ -259,3 +259,11 @@ mapped ref -> 8f605e7e3ed2861c0de7f8fc4adc5aaf2de5a840
 
 $ git notes --ref=refs/notes/storagegenie-coder-reports-sg113-fetched show 0f1634cb982cb9f3b26a96cf811d08f54cbd0f2c
 Dispatch-ID: SG-113 | Report: docs/worklogs/SG-113_report.md | Work-HEAD: 0f1634cb982cb9f3b26a96cf811d08f54cbd0f2c
+
+--- DUAL-ANNOTATE FINAL TIP (SG-092 inoculation) ---
+$ git fetch origin refs/notes/storagegenie-coder-reports:refs/notes/storagegenie-coder-reports-sg113-tip-fetched
+From github.com:Andovol/StorageGenie
+ * [new ref]         refs/notes/storagegenie-coder-reports -> refs/notes/storagegenie-coder-reports-sg113-tip-fetched
+mapped ref -> f5be05fe00fba62c29d8d15437b08af06cdcfce7
+$ git notes --ref=refs/notes/storagegenie-coder-reports-sg113-tip-fetched show 57a6267505c07dccf94d87a9c60670f5c3619b41
+Dispatch-ID: SG-113 | Report: docs/worklogs/SG-113_report.md | Work-HEAD: 0f1634cb982cb9f3b26a96cf811d08f54cbd0f2c
