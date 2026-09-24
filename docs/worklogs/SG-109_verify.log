@@ -1,0 +1,80 @@
+SG-109 verify log — raw outputs, gates, live captures, numbered G2 skip
+Contract 0.33.0 (source /home/andrei/storagegenie-contract/VERSION = 0.33.0; HEAD b232b845d74e89cb346c60fa4b9a40ec401c42dd; RULES.md sha256 18de7fd7b3546bd7624b3a7b59a78bd629752816cd7fa8f1af6113d1bafc8d46 == payload RULES.sha256)
+BASE_REF=origin/automation BASE_RESOLVED=effd7d17461b4774ae509e64330e199f63f7f1cd (== start HEAD)
+
+################## G1 LIVE MEASUREMENT (read-only GETs) ##################
+
+--- GET /v1/households (raw) ---
+[{"id":"01a0a029-1477-7ca0-b200-bce78a96c679","name":"Popescu Household","created_at":"2026-09-14T13:44:01","updated_at":"2026-09-14T13:44:01"}]
+
+--- GET /v1/plugins/expiry-tracker/status?household_id=01a0a029-1477-7ca0-b200-bce78a96c679 (raw) ---
+{"household_id":"01a0a029-1477-7ca0-b200-bce78a96c679","as_of":"2026-09-24","category":null,"rows":[],"summary":{"by_tier":{},"by_bucket":{},"unresolved":0,"total":0},"unresolved_rows":[]}
+status_http=200
+
+--- GET /v1/analytics/summary?household_id=01a0a029-1477-7ca0-b200-bce78a96c679 (raw, categories + expiry blocks) ---
+{"household_id":"01a0a029-1477-7ca0-b200-bce78a96c679","as_of_date":"2026-09-24","generated_at":"2026-09-24T09:26:07.202481+00:00","assets":{"total":6,"active":6,"by_status":{"ACTIVE":6}},"categories":{"taxonomy":[{"id":"food_beverages","name":"Food & beverages"},{"id":"medicine_pharma","name":"Medicine/pharma"},{"id":"cosmetics_personal_care","name":"Cosmetics/personal care"},{"id":"household_chemicals","name":"Household chemicals"},{"id":"documents_other","name":"Documents/other"},{"id":"non_perishable","name":"Non-perishable"}],"counts":{"food_beverages":0,"medicine_pharma":0,"cosmetics_personal_care":0,"household_chemicals":0,"documents_other":0,"non_perishable":0},"uncategorized":6},"expiry":{"expired":0,"within_7_days":0,"within_30_days":0,"safe":0,"unknown":6}, ...}
+summary_http=200
+(Premise CONFIRMED: 6 assets, 0 accepted-expiry rows, uncategorized=6. The 6 "unknown" are the same unclassified assets — the engine admits only classified assets, so resolved rows = 0.)
+
+--- live CATEGORIES windows (read from app.plugins.expiry_tracker) ---
+food_beverages {'critical': 1, 'urgent': 7, 'upcoming': 30} default=upcoming
+medicine_pharma {'critical': 1, 'urgent': 3, 'upcoming': 14} default=upcoming
+cosmetics_personal_care {'critical': 7, 'urgent': 30, 'upcoming': 90} default=upcoming
+household_chemicals {'upcoming': 30} default=upcoming
+documents_other {'upcoming': 30, 'long_lead': 60} default=long_lead
+non_perishable {} default=None
+
+--- SG-107 pin test PASS (quoted; not re-proved) ---
+$ venv/bin/python -m pytest backend/tests/test_sg107_expiry_engine.py::test_category_windows_are_the_declared_uncalibrated_data backend/tests/test_sg107_expiry_engine.py::test_boundary_table_reproduces_every_category_window -q
+..                                                                       [100%]
+2 passed, 1 warning in 0.80s
+
+--- RECOMPUTE QUERY (resolved rows per category across all households) ---
+$ curl -s http://127.0.0.1:8003/v1/households | jq -r '.[].id' \
+  | while read -r hid; do curl -s "http://127.0.0.1:8003/v1/plugins/expiry-tracker/status?household_id=$hid"; echo; done \
+  | jq -s '{households: length, resolved_total: ([.[].rows[]] | length), per_category: ([.[].rows[].category] | group_by(.) | map({category: .[0], resolved: length}))}'
+{
+  "households": 1,
+  "resolved_total": 0,
+  "per_category": []
+}
+recompute_exit=0
+
+################## G2 — NUMBERED SKIP (change path NOT executed) ##################
+
+SKIP 1 — No G1 verdict is CHANGE. Every category has 0 resolved live rows (measured above):
+         food_beverages 0 · medicine_pharma 0 · cosmetics_personal_care 0 ·
+         household_chemicals 0 · documents_other 0 · non_perishable 0.
+SKIP 2 — With zero measured rows contradicting any window, editing a window would be tuning
+         against nothing (PG-SC-09 inverse = the defect). No plugin window value edited.
+SKIP 3 — No served code changed, so D145 triggers no rebuild/recreate; deploy is change-path only
+         (PG-PR-04). No image built, no container recreated, production untouched.
+
+################## CROSS-PRODUCT CHECK (PG-IC-01) ##################
+No criterion demands engine-shape changes, new routes, dashboard hunks, migration, press, sender,
+or any metered call. Reads executed: pytest/TestClient (pin test) + host read-only GETs (households,
+status, analytics summary) + local module read (CATEGORIES). No image build, no recreate, no
+unnamed runtime launched. No cell collides.
+
+################## PRIVACY GATE (PG-SC-05) ##################
+Identifiers are TEXT only. Host `.env` never printed, never read into any artifact.
+$ grep -nE 'api[_-]?key|secret|passwd|password|bearer|private key|BEGIN [A-Z ]*PRIVATE KEY|sk-[A-Za-z0-9]|ghp_|AKIA|jina_' docs/worklogs/SG-109_calibration.md docs/worklogs/SG-109.log
+grep_exit=1 (1 = 0 real matches)
+$ git status --porcelain | grep -c '\.env'
+0 (0 = .env absent from status)
+
+################## SCOPE / WORKTREE GATES ##################
+--- .gitignore re-verify (PG-SC-10) ---
+$ git check-ignore -v docs/worklogs/SG-109_calibration.md docs/worklogs/SG-109.log docs/worklogs/SG-109_report.md docs/worklogs/SG-109_verify.log
+check-ignore_exit=1 (1 = none ignored; all committable)
+
+--- backend diff must be empty (no code change) ---
+$ git diff --stat origin/automation -- backend/
+backend_diff_lines=0
+$ git ls-files --others --exclude-standard backend/
+untracked_backend_count=0
+
+--- worktree porcelain (before commit) ---
+$ git status --porcelain
+?? docs/worklogs/SG-109.log
+?? docs/worklogs/SG-109_calibration.md
