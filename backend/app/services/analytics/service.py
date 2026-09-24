@@ -46,6 +46,7 @@ from app.models.planning_suggestion import PlanningSuggestion
 from app.models.provider_call import ProviderCall
 from app.models.review_task import ReviewTask
 from app.plugins.registry import iter_plugins
+from app.services import lifecycle
 from app.services.providers import reader as reader_mod
 from app.services.providers.router import (
     BudgetExceededError,
@@ -185,7 +186,7 @@ def compute_stats(db: Session, household_id: str, as_of: date | None = None) -> 
     """Deterministic household stats; zero-maps for an empty household (200)."""
     as_of = as_of or datetime.now(timezone.utc).date()
     assets = db.query(Asset).filter(Asset.household_id == household_id).all()
-    active = [asset for asset in assets if asset.status == "ACTIVE"]
+    active = [asset for asset in assets if lifecycle.is_active(asset)]
     by_status = dict(sorted(Counter(asset.status for asset in assets).items()))
 
     taxonomy = taxonomy_categories()

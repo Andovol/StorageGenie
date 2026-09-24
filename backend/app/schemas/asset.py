@@ -2,11 +2,13 @@ from datetime import datetime
 
 from pydantic import BaseModel
 
+from app.services.lifecycle import ACTIVE
+
 
 class AssetCreate(BaseModel):
     display_name: str | None = None
     asset_type: str = "unknown"
-    status: str = "ACTIVE"
+    status: str = ACTIVE
     quantity: float | None = None
     unit: str | None = None
     condition: str | None = None

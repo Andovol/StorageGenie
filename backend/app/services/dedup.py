@@ -11,6 +11,7 @@ from app.models.assertion import Assertion
 from app.models.evidence import Evidence, asset_evidence
 from app.models.job import Job
 from app.models.review_task import ReviewTask
+from app.services import lifecycle
 from app.services.candidates import Candidate, load_proposal
 from app.services.observations import Observation
 from app.services.signals import hamming_distance
@@ -148,7 +149,7 @@ def deduplicate_job(db: Session, job: Job) -> dict[str, object]:  # noqa: C901
         fields: dict[str, object] = {
             "display_name": _display_name(evidence_rows[0] if evidence_rows else None),
             "asset_type": "unknown",
-            "status": "ACTIVE",
+            "status": lifecycle.ACTIVE,
         }
         if identifier is not None:
             fields["identifier"] = identifier

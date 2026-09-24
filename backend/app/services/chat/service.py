@@ -30,6 +30,7 @@ from app.models.asset import UNTITLED_LABEL, Asset
 from app.models.guardrail_event import GuardrailEvent
 from app.models.provider_call import ProviderCall
 from app.models.source_attribution import SourceAttribution
+from app.services import lifecycle
 from app.services.providers import reader as reader_mod
 from app.services.providers.router import (
     BudgetExceededError,
@@ -149,7 +150,7 @@ def build_catalog(db: Session, household_id: str, category: str) -> list[dict[st
     slug = resolve_category(category)
     assets = (
         db.query(Asset)
-        .filter(Asset.household_id == household_id, Asset.status == "ACTIVE")
+        .filter(Asset.household_id == household_id, lifecycle.active_clause())
         .order_by(Asset.display_name)
         .all()
     )

@@ -37,6 +37,7 @@ from app.models.asset import UNTITLED_LABEL, Asset
 from app.models.guardrail_event import GuardrailEvent
 from app.models.planning_suggestion import PlanningSuggestion
 from app.models.provider_call import ProviderCall
+from app.services import lifecycle
 from app.services.providers import reader as reader_mod
 from app.services.providers.router import (
     BudgetExceededError,
@@ -110,7 +111,7 @@ def build_catalog(db: Session, household_id: str) -> list[dict[str, Any]]:
     """
     assets = (
         db.query(Asset)
-        .filter(Asset.household_id == household_id, Asset.status == "ACTIVE")
+        .filter(Asset.household_id == household_id, lifecycle.active_clause())
         .order_by(Asset.display_name)
         .all()
     )

@@ -15,7 +15,7 @@ from app.models.saved_search import SavedSearch
 from app.schemas.asset import AssetCreate, AssetUpdate
 from app.schemas.common import decode_cursor, encode_cursor, loads_json
 from app.schemas.saved_search import SAVED_SEARCH_QUERY_MAX_BYTES, SavedSearchCreate
-from app.services import audit_service
+from app.services import audit_service, lifecycle
 from app.plugins.registry import iter_plugins
 from app.services.asset_service import attach_evidence, create_asset, update_asset
 from app.services.fts import ensure_asset_fts, sanitize_fts_query
@@ -376,6 +376,13 @@ def patch_asset(
     data = {k: v for k, v in payload.model_dump().items() if v is not None}
     if not data:
         raise HTTPException(status_code=422, detail="No fields to update")
+    if "status" in data:
+        # SG-111: a status write is a lifecycle transition and is validated
+        # through the single table, never written as free text.
+        try:
+            lifecycle.validate_transition(a.status, data["status"])
+        except lifecycle.LifecycleTransitionError as exc:
+            raise HTTPException(status_code=422, detail=str(exc)) from None
     a = update_asset(db, a, data)
     return _asset_to_dict(a, db)
 
@@ -387,11 +394,18 @@ def delete_asset(asset_id: str, household_id: str = Query(...), db: Session = De
         raise HTTPException(status_code=404, detail="Asset not found")
     if a.household_id != household_id:
         raise HTTPException(status_code=403, detail="Household mismatch")
-    a.status = "ARCHIVED"
+    # SG-111: delete means ACTIVE -> ARCHIVED, validated through the SAME
+    # transition table as PATCH (never around it). Re-archiving an already
+    # ARCHIVED asset is a same-status no-op and stays green.
+    try:
+        lifecycle.validate_transition(a.status, lifecycle.ARCHIVED)
+    except lifecycle.LifecycleTransitionError as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from None
+    a.status = lifecycle.ARCHIVED
     # Assertion for status
     from app.services.assertion_service import upsert_assertion
 
-    upsert_assertion(db, a.id, "status", "ARCHIVED", household_id=a.household_id)
+    upsert_assertion(db, a.id, "status", lifecycle.ARCHIVED, household_id=a.household_id)
     a.version = (a.version or 1) + 1
     from app.services import audit_service
 
@@ -402,7 +416,7 @@ def delete_asset(asset_id: str, household_id: str = Query(...), db: Session = De
         entity_type="asset",
         entity_id=a.id,
         before=None,
-        after={"status": "ARCHIVED"},
+        after={"status": lifecycle.ARCHIVED},
         household_id=a.household_id,
     )
     db.commit()

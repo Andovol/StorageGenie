@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session
 from app.models.assertion import Assertion
 from app.models.asset import Asset
 from app.models.evidence import asset_evidence
-from app.services import audit_service
+from app.services import audit_service, lifecycle
 from app.services.assertion_service import upsert_assertion
 from app.services.candidates import _deterministic_display_name
 
@@ -43,7 +43,7 @@ def create_asset(
         household_id=household_id,
         display_name=display_name,
         asset_type=payload.get("asset_type", "unknown"),
-        status=payload.get("status", "ACTIVE"),
+        status=payload.get("status", lifecycle.ACTIVE),
         quantity=payload.get("quantity"),
         unit=payload.get("unit"),
         condition=payload.get("condition"),

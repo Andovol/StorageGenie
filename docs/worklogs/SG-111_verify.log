@@ -1,0 +1,666 @@
+SG-111 verify log — raw outputs, gates, live captures, BOTH fail-then-pass runs, BEFORE/AFTER pairs, reader inventory
+Work dir /home/andrei/StorageGenie · branch automation · remote git@github.com:Andovol/StorageGenie.git
+Contract 0.33.0 (source /home/andrei/storagegenie-contract/VERSION = 0.33.0; HEAD b232b845d74e89cb346c60fa4b9a40ec401c42dd = 'Contract payload 0.33.0'; RULES.md sha256 18de7fd7b3546bd7624b3a7b59a78bd629752816cd7fa8f1af6113d1bafc8d46 == payload RULES.sha256)
+Model/effort from process arguments: /proc/3800821/cmdline = 'opencode run --auto --dir /home/andrei/StorageGenie --variant high <packet>' (no --model flag -> model is CLI default; no provider metadata readable) -> effort=high; model=unknown (refusing to guess)
+DATABASE: none live (tests on temp DBs; post-restart probes read-only) · Restart: ONE backend recreate (D145/D154) · Deploy: THIS slice
+
+################## G1 BEFORE (raw) ##################
+===== G1 BEFORE CAPTURE 2026-09-24T10:39:49Z =====
+--- BASE / HEAD ---
+BASE_REF=origin/automation BASE_RESOLVED=046ce7fa75de0e51084bb6633efcdd7c5380e988
+HEAD=046ce7fa75de0e51084bb6633efcdd7c5380e988
+branch=automation worktree_porcelain=[?? docs/worklogs/SG-111_verify.log]
+--- IMAGE ID (storagegenie-backend:latest) ---
+image_id=sha256:147a2651fb4823929bb42dfcf102111c439a6006c50be5b94697abede142aedb created=2026-09-24T10:29:20.143218217Z
+--- CONTAINER ---
+container_id=6a2b9ea6972dc58c46e469270cbf5ea3f6426e74a7e6a544a1b44783e79bb0fc image=sha256:147a2651fb4823929bb42dfcf102111c439a6006c50be5b94697abede142aedb RestartCount=0 Started=2026-09-24T10:29:31.619352658Z Health=healthy
+--- docker ps ---
+6a2b9ea6972d storagegenie-backend storagegenie-backend-1 Up 10 minutes (healthy) 127.0.0.1:8003->8000/tcp
+--- ALEMBIC CURRENT (live DB, host sqlite3 read-only) ---
+20260923_sg100_enrich_snapshot
+--- TABLE COUNT ---
+25
+--- TABLE COUNTS (all tables, read-only) ---
+alembic_version=1
+assertion=28
+asset=6
+asset_evidence=12
+asset_fts=6
+asset_fts_config=1
+asset_fts_data=8
+asset_fts_docsize=6
+asset_fts_idx=6
+audit_event=68
+candidate=7
+enrich_snapshot=2
+evidence=13
+guardrail_event=2
+household=1
+idempotency_key=9
+job=8
+job_step=56
+observation=16
+planning_suggestion=0
+provider_call=17
+review_task=6
+saved_search=0
+source_attribution=0
+user=2
+--- HEALTH EXACT (loopback) ---
+{"status":"ok","db":"ok","storage":"ok"}
+--- HOUSEHOLD IDS (read-only) ---
+01a0a029-1477-7ca0-b200-bce78a96c679
+--- LIVE STATUS CENSUS (read-only SELECT status, COUNT(*) GROUP BY status) ---
+ACTIVE|6
+--- GATE http :80 via --resolve localhost ---
+code=404 redirect=
+--- GATE https :443 via --resolve localhost ---
+code=303 redirect=https://localhost/login
+===== END G1 BEFORE =====
+
+--- G1 BEFORE GATE CORRECTION: the gate is Host-header dependent; canonical vhost is storagegenie.dynv6.net ---
+http  Host=localhost             : code=404 redirect=
+https Host=localhost             : code=303 redirect=https://localhost/login
+http  Host=storagegenie.dynv6.net: code=301 redirect=https://storagegenie.dynv6.net/
+https Host=storagegenie.dynv6.net: code=401 redirect=
+(SG-110 BEFORE/AFTER used the dynv6 form -> 301/401; canonical BEFORE = 301/401. Host=localhost routes to a different vhost.)
+
+################## G1 READER INVENTORY (grep -rn '.status' backend/app) ##################
+$ grep -rn '\.status' backend/app --include='*.py'  (filtered to Asset lifecycle relevance)
+backend/app/services/analytics/service.py:188:    active = [asset for asset in assets if asset.status == "ACTIVE"]
+backend/app/services/analytics/service.py:189:    by_status = dict(sorted(Counter(asset.status for asset in assets).items()))
+backend/app/services/analytics/service.py:238:            "AND asset.status = 'ACTIVE'",
+backend/app/services/candidates.py:195:        "status": resolution.status,
+backend/app/services/planning/service.py:113:        .filter(Asset.household_id == household_id, Asset.status == "ACTIVE")
+backend/app/services/planning/service.py:158:                "status": asset.status,
+backend/app/services/planning/service.py:501:    if suggestion.status != "pending":
+backend/app/services/planning/service.py:503:            f"cannot confirm a suggestion in status {suggestion.status!r}"
+backend/app/services/planning/service.py:505:    suggestion.status = "confirmed"
+backend/app/services/planning/service.py:516:    if suggestion.status != "pending":
+backend/app/services/planning/service.py:518:            f"cannot dismiss a suggestion in status {suggestion.status!r}"
+backend/app/services/planning/service.py:520:    suggestion.status = "dismissed"
+backend/app/services/chat/service.py:152:        .filter(Asset.household_id == household_id, Asset.status == "ACTIVE")
+backend/app/services/chat/service.py:190:                "status": asset.status,
+backend/app/api/v1/review_tasks.py:48:                "status": item.status,
+backend/app/api/v1/exports.py:64:                    "status": a.status,
+backend/app/api/v1/planning.py:39:        "status": suggestion.status,
+backend/app/api/v1/assets.py:145:        "status": asset.status,
+backend/app/api/v1/assets.py:186:        query = query.filter(Asset.status == status)
+backend/app/api/v1/assets.py:222:        .with_entities(Asset.status, func.count())
+backend/app/api/v1/assets.py:223:        .group_by(Asset.status),
+backend/app/api/v1/assets.py:289:                "status": a.status,
+backend/app/api/v1/assets.py:390:    a.status = "ARCHIVED"
+
+--- Asset.status literal "ACTIVE" (double-quoted) across backend/app BEFORE ---
+backend/app/services/dedup.py:151:            "status": "ACTIVE",
+backend/app/services/asset_service.py:46:        status=payload.get("status", "ACTIVE"),
+backend/app/services/analytics/service.py:188:    active = [asset for asset in assets if asset.status == "ACTIVE"]
+backend/app/services/candidates.py:582:        "status": _provenance("ACTIVE", source_type="deterministic"),
+backend/app/services/candidates.py:818:        status=str(status or "ACTIVE"),
+backend/app/services/planning/service.py:113:        .filter(Asset.household_id == household_id, Asset.status == "ACTIVE")
+backend/app/services/chat/service.py:152:        .filter(Asset.household_id == household_id, Asset.status == "ACTIVE")
+backend/app/schemas/asset.py:9:    status: str = "ACTIVE"
+backend/app/models/asset.py:23:    status: Mapped[str] = mapped_column(String(30), nullable=False, default="ACTIVE")
+
+--- Asset.status literal "ARCHIVED" (double-quoted) across backend/app BEFORE ---
+backend/app/api/v1/assets.py:390:    a.status = "ARCHIVED"
+backend/app/api/v1/assets.py:394:    upsert_assertion(db, a.id, "status", "ARCHIVED", household_id=a.household_id)
+backend/app/api/v1/assets.py:405:        after={"status": "ARCHIVED"},
+
+--- status query params / FTS / saved-search predicates referencing Asset.status ---
+backend/app/models/saved_search.py:12:    already accepts (``q`` / ``asset_type`` / ``status`` / ``has_evidence``),
+backend/app/schemas/saved_search.py:4:already sends — ``q`` (FTS MATCH), ``asset_type``, ``status``,
+backend/app/schemas/saved_search.py:16:SAVED_SEARCH_QUERY_KEYS = ("q", "asset_type", "status", "has_evidence")
+backend/app/schemas/saved_search.py:24:    status: str | None = None
+===== END G1 READER INVENTORY =====
+
+################## FAIL RUN (candidate test file against BASE 046ce7f, isolated archive; implementation absent) ##################
+method: git archive 046ce7f -> /tmp/opencode/sg111-base; candidate test file copied in; PYTHONPATH forces the base app package (verified: import app -> /tmp/opencode/sg111-base/backend/app/__init__.py)
+$ PYTHONPATH=/tmp/opencode/sg111-base/backend venv/bin/python -m pytest tests/test_sg111_lifecycle.py -q
+FFFFFFFFF..FF                                                            [100%]
+=================================== FAILURES ===================================
+______________________ test_vocabulary_literals_are_exact ______________________
+
+    def test_vocabulary_literals_are_exact() -> None:
+>       from app.services import lifecycle
+E       ImportError: cannot import name 'lifecycle' from 'app.services' (/tmp/opencode/sg111-base/backend/app/services/__init__.py)
+
+tests/test_sg111_lifecycle.py:133: ImportError
+______________ test_transition_table_matches_the_blueprint_oracle ______________
+
+    def test_transition_table_matches_the_blueprint_oracle() -> None:
+>       from app.services import lifecycle
+E       ImportError: cannot import name 'lifecycle' from 'app.services' (/tmp/opencode/sg111-base/backend/app/services/__init__.py)
+
+tests/test_sg111_lifecycle.py:140: ImportError
+__________________ test_every_ordered_pair_legal_or_rejected ___________________
+
+    def test_every_ordered_pair_legal_or_rejected() -> None:
+>       from app.services import lifecycle
+E       ImportError: cannot import name 'lifecycle' from 'app.services' (/tmp/opencode/sg111-base/backend/app/services/__init__.py)
+
+tests/test_sg111_lifecycle.py:146: ImportError
+__________ test_legal_chain_walks_end_to_end_and_terminals_are_closed __________
+
+    def test_legal_chain_walks_end_to_end_and_terminals_are_closed() -> None:
+>       from app.services import lifecycle
+E       ImportError: cannot import name 'lifecycle' from 'app.services' (/tmp/opencode/sg111-base/backend/app/services/__init__.py)
+
+tests/test_sg111_lifecycle.py:159: ImportError
+_______________ test_patch_transition_matrix_through_real_route ________________
+
+lifecycle_db = (<sqlalchemy.orm.session.Session object at 0x7fabb0790c80>, '01a0d304-c06e-7f11-aa44-df2bec3286b6', '01a0d304-c06e-7f11-aa44-df3e80e257ad')
+
+    def test_patch_transition_matrix_through_real_route(lifecycle_db) -> None:  # type: ignore[no-untyped-def]
+        session, household_id, _ = lifecycle_db
+        with TestClient(app) as client:
+            for current in VOCABULARY:
+                for requested in VOCABULARY:
+                    asset = make_asset(session, household_id, current, f"{current}->{requested}")
+                    response = _patch_status(client, asset.id, household_id, requested)
+                    legal = requested == current or requested in LEGAL[current]
+>                   assert response.status_code == (200 if legal else 422), (
+                        current,
+                        requested,
+                        response.status_code,
+                    )
+E                   AssertionError: ('DRAFT', 'ACTIVE', 200)
+E                   assert 200 == 422
+E                    +  where 200 = <Response [200 OK]>.status_code
+
+tests/test_sg111_lifecycle.py:183: AssertionError
+_______________________ test_patch_unknown_status_is_422 _______________________
+
+lifecycle_db = (<sqlalchemy.orm.session.Session object at 0x7fabb055d3d0>, '01a0d304-c0db-7cb2-8270-527be22551ff', '01a0d304-c0db-7cb2-8270-5281b14226db')
+
+    def test_patch_unknown_status_is_422(lifecycle_db) -> None:  # type: ignore[no-untyped-def]
+        session, household_id, _ = lifecycle_db
+        asset = make_asset(session, household_id, "ACTIVE")
+        with TestClient(app) as client:
+            response = _patch_status(client, asset.id, household_id, "BOGUS")
+>       assert response.status_code == 422
+E       assert 200 == 422
+E        +  where 200 = <Response [200 OK]>.status_code
+
+tests/test_sg111_lifecycle.py:200: AssertionError
+__________________ test_patch_legal_chain_through_real_route ___________________
+
+lifecycle_db = (<sqlalchemy.orm.session.Session object at 0x7fabb06f2ae0>, '01a0d304-c123-7540-998f-333aefc82b86', '01a0d304-c123-7540-998f-334b403b6b65')
+
+    def test_patch_legal_chain_through_real_route(lifecycle_db) -> None:  # type: ignore[no-untyped-def]
+        session, household_id, _ = lifecycle_db
+        asset = make_asset(session, household_id, "DRAFT")
+        with TestClient(app) as client:
+            for nxt in CHAIN[1:]:
+                assert _patch_status(client, asset.id, household_id, nxt).status_code == 200
+            detail = client.get(
+                f"/v1/assets/{asset.id}", params={"household_id": household_id}
+            ).json()
+        assert detail["status"] == "DISPOSED"
+        with TestClient(app) as client:
+            backward = _patch_status(client, asset.id, household_id, "ARCHIVED")
+>       assert backward.status_code == 422
+E       assert 200 == 422
+E        +  where 200 = <Response [200 OK]>.status_code
+
+tests/test_sg111_lifecycle.py:216: AssertionError
+_____________________ test_delete_archives_through_the_map _____________________
+
+lifecycle_db = (<sqlalchemy.orm.session.Session object at 0x7fabaf520350>, '01a0d304-c17e-7663-b2db-48e355b6720c', '01a0d304-c17e-7663-b2db-48fe42321dfb')
+
+    def test_delete_archives_through_the_map(lifecycle_db) -> None:  # type: ignore[no-untyped-def]
+        session, household_id, _ = lifecycle_db
+        active = make_asset(session, household_id, "ACTIVE", "Deletable")
+        draft = make_asset(session, household_id, "DRAFT", "Draft")
+        with TestClient(app) as client:
+            first = client.delete(f"/v1/assets/{active.id}", params={"household_id": household_id})
+            assert first.status_code == 200
+            read_back = client.get(
+                f"/v1/assets/{active.id}", params={"household_id": household_id}
+            ).json()
+            assert read_back["status"] == "ARCHIVED"
+            # Re-archiving an already ARCHIVED asset is a same-status no-op.
+            second = client.delete(f"/v1/assets/{active.id}", params={"household_id": household_id})
+            assert second.status_code == 200
+            blocked = client.delete(f"/v1/assets/{draft.id}", params={"household_id": household_id})
+>       assert blocked.status_code == 422
+E       assert 200 == 422
+E        +  where 200 = <Response [200 OK]>.status_code
+
+tests/test_sg111_lifecycle.py:235: AssertionError
+___________ test_engine_excludes_non_active_from_rows_and_unresolved ___________
+
+lifecycle_db = (<sqlalchemy.orm.session.Session object at 0x7fabb0624a10>, '01a0d304-c1cc-7a90-adfb-92c83dd201c0', '01a0d304-c1cc-7a90-adfb-92d408a4af44')
+
+    def test_engine_excludes_non_active_from_rows_and_unresolved(lifecycle_db) -> None:  # type: ignore[no-untyped-def]
+        session, household_id, _ = lifecycle_db
+        as_of = _today()
+        active = make_asset(session, household_id, "ACTIVE", "Active")
+        add_classification(session, active, "food_beverages")
+        add_expiry(session, active, {"expiry_date": (as_of + timedelta(days=2)).isoformat()})
+        archived = make_asset(session, household_id, "ARCHIVED", "Archived")
+        add_classification(session, archived, "food_beverages")
+        add_expiry(session, archived, {"expiry_date": (as_of + timedelta(days=2)).isoformat()})
+        archived_proposed = make_asset(session, household_id, "ARCHIVED", "Archived proposed")
+        add_classification(session, archived_proposed, "food_beverages")
+        add_expiry(
+            session,
+            archived_proposed,
+            {"expiry_date": (as_of + timedelta(days=1)).isoformat()},
+            review_state="proposed",
+        )
+    
+        result = expiry_engine.compute_status(session, household_id, as_of)
+        row_ids = {row["asset_id"] for row in result["rows"]}
+        unresolved_ids = {row["asset_id"] for row in result["unresolved_rows"]}
+>       assert row_ids == {active.id}
+E       AssertionError: assert {'01a0d304-c1...f04647bbae55'} == {'01a0d304-c1...fff155d54136'}
+E         
+E         Extra items in the left set:
+E         '01a0d304-c1d1-7121-b6d1-f04647bbae55'
+E         Use -v to get more diff
+
+tests/test_sg111_lifecycle.py:263: AssertionError
+___________________ test_backfill_dry_run_then_apply_on_temp ___________________
+
+tmp_path = PosixPath('/tmp/pytest-of-andrei/pytest-2/test_backfill_dry_run_then_app0')
+
+    def test_backfill_dry_run_then_apply_on_temp(tmp_path: Path) -> None:
+>       backfill = _load_backfill()
+                   ^^^^^^^^^^^^^^^^
+
+tests/test_sg111_lifecycle.py:310: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_sg111_lifecycle.py:125: in _load_backfill
+    spec.loader.exec_module(module)
+<frozen importlib._bootstrap_external>:991: in exec_module
+    ???
+<frozen importlib._bootstrap_external>:1128: in get_code
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <_frozen_importlib_external.SourceFileLoader object at 0x7fabaf365370>
+path = '/tmp/opencode/sg111-base/backend/scripts/backfill_asset_lifecycle.py'
+
+>   ???
+E   FileNotFoundError: [Errno 2] No such file or directory: '/tmp/opencode/sg111-base/backend/scripts/backfill_asset_lifecycle.py'
+
+<frozen importlib._bootstrap_external>:1186: FileNotFoundError
+______________ test_backfill_is_idempotent_on_a_clean_vocabulary _______________
+
+tmp_path = PosixPath('/tmp/pytest-of-andrei/pytest-2/test_backfill_is_idempotent_on0')
+
+    def test_backfill_is_idempotent_on_a_clean_vocabulary(tmp_path: Path) -> None:
+>       backfill = _load_backfill()
+                   ^^^^^^^^^^^^^^^^
+
+tests/test_sg111_lifecycle.py:344: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_sg111_lifecycle.py:125: in _load_backfill
+    spec.loader.exec_module(module)
+<frozen importlib._bootstrap_external>:991: in exec_module
+    ???
+<frozen importlib._bootstrap_external>:1128: in get_code
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <_frozen_importlib_external.SourceFileLoader object at 0x7fabaf3653a0>
+path = '/tmp/opencode/sg111-base/backend/scripts/backfill_asset_lifecycle.py'
+
+>   ???
+E   FileNotFoundError: [Errno 2] No such file or directory: '/tmp/opencode/sg111-base/backend/scripts/backfill_asset_lifecycle.py'
+
+<frozen importlib._bootstrap_external>:1186: FileNotFoundError
+=============================== warnings summary ===============================
+../../../../home/andrei/StorageGenie/backend/venv/lib/python3.12/site-packages/fastapi/testclient.py:1
+  /home/andrei/StorageGenie/backend/venv/lib/python3.12/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+../../../../home/andrei/StorageGenie/backend/venv/lib/python3.12/site-packages/starlette/testclient.py:53
+  /home/andrei/StorageGenie/backend/venv/lib/python3.12/site-packages/starlette/testclient.py:53: DeprecationWarning: The anyio.abc.BlockingPortal alias is deprecated, use anyio.from_thread.BlockingPortal instead.
+    _PortalFactoryType = Callable[[], AbstractContextManager[anyio.abc.BlockingPortal]]
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/test_sg111_lifecycle.py::test_vocabulary_literals_are_exact - Im...
+FAILED tests/test_sg111_lifecycle.py::test_transition_table_matches_the_blueprint_oracle
+FAILED tests/test_sg111_lifecycle.py::test_every_ordered_pair_legal_or_rejected
+FAILED tests/test_sg111_lifecycle.py::test_legal_chain_walks_end_to_end_and_terminals_are_closed
+FAILED tests/test_sg111_lifecycle.py::test_patch_transition_matrix_through_real_route
+FAILED tests/test_sg111_lifecycle.py::test_patch_unknown_status_is_422 - asse...
+FAILED tests/test_sg111_lifecycle.py::test_patch_legal_chain_through_real_route
+FAILED tests/test_sg111_lifecycle.py::test_delete_archives_through_the_map - ...
+FAILED tests/test_sg111_lifecycle.py::test_engine_excludes_non_active_from_rows_and_unresolved
+FAILED tests/test_sg111_lifecycle.py::test_backfill_dry_run_then_apply_on_temp
+FAILED tests/test_sg111_lifecycle.py::test_backfill_is_idempotent_on_a_clean_vocabulary
+11 failed, 2 passed, 2 warnings in 1.26s
+exit=1
+
+FAIL-RUN CLASSIFICATION (11 failed / 2 passed):
+  genuine BEHAVIOURAL fails (base code answers 200 where the candidate answers 422, or tiers a non-ACTIVE row):
+    test_patch_transition_matrix_through_real_route (base: no validation)
+    test_patch_unknown_status_is_422 (base: free-text accepted)
+    test_patch_legal_chain_through_real_route (base: backward ARCHIVED accepted)
+    test_delete_archives_through_the_map (base: DRAFT delete accepted)
+    test_engine_excludes_non_active_from_rows_and_unresolved (base: archived row tiered)
+  module-absence fails (the new module does not exist on base) -- explicitly NOT counted as the baseline (lang/python.md:
+  'A ModuleNotFoundError from an absent module is not a failing baseline'):
+    test_vocabulary_literals_are_exact / test_transition_table_matches_the_blueprint_oracle /
+    test_every_ordered_pair_legal_or_rejected / test_legal_chain_walks_end_to_end_and_terminals_are_closed /
+    test_backfill_dry_run_then_apply_on_temp / test_backfill_is_idempotent_on_a_clean_vocabulary
+  passing on base (regression guards, unchanged semantics): test_assets_list_status_filter,
+  test_analytics_chat_planning_active_semantics_unchanged
+
+################## PASS RUN (candidate tree, same test file) ##################
+$ venv/bin/python -m pytest tests/test_sg111_lifecycle.py -q
+.............                                                            [100%]
+=============================== warnings summary ===============================
+venv/lib/python3.12/site-packages/fastapi/testclient.py:1
+  /home/andrei/StorageGenie/backend/venv/lib/python3.12/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+venv/lib/python3.12/site-packages/starlette/testclient.py:53
+  /home/andrei/StorageGenie/backend/venv/lib/python3.12/site-packages/starlette/testclient.py:53: DeprecationWarning: The anyio.abc.BlockingPortal alias is deprecated, use anyio.from_thread.BlockingPortal instead.
+    _PortalFactoryType = Callable[[], AbstractContextManager[anyio.abc.BlockingPortal]]
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+13 passed, 2 warnings in 1.33s
+pass_exit=0
+
+################## BACKFILL PROOF ON A TEMP COPY OF THE LIVE SHAPE ##################
+===== BACKFILL TEMP PROOF 2026-09-24T10:45:21Z =====
+--- consistent temp copy of live DB (read-only source, SQLite backup API) ---
+temp copy written: /tmp/opencode/sg111-backfill/temp.db
+--- LIVE census (read-only) ---
+ACTIVE|6
+--- TEMP copy census before synthetic seed ---
+ACTIVE|6
+--- seed the TEMP copy with out-of-vocabulary values (proves the conversion non-vacuously; never the live DB) ---
+ACTIVE|6
+DELETED|1
+active|1
+--- DRY RUN (writes nothing) ---
+Traceback (most recent call last):
+  File "/home/andrei/StorageGenie/backend/scripts/backfill_asset_lifecycle.py", line 29, in <module>
+    from app.services.lifecycle import ARCHIVED, LIFECYCLE_STATUSES
+ModuleNotFoundError: No module named 'app'
+--- census AFTER dry-run (must equal the seeded census) ---
+ACTIVE|6
+DELETED|1
+active|1
+--- APPLY (temp copy only) ---
+Traceback (most recent call last):
+  File "/home/andrei/StorageGenie/backend/scripts/backfill_asset_lifecycle.py", line 29, in <module>
+    from app.services.lifecycle import ARCHIVED, LIFECYCLE_STATUSES
+ModuleNotFoundError: No module named 'app'
+--- census AFTER apply ---
+ACTIVE|6
+DELETED|1
+active|1
+--- production command for the owner word ---
+Traceback (most recent call last):
+  File "/home/andrei/StorageGenie/backend/scripts/backfill_asset_lifecycle.py", line 29, in <module>
+    from app.services.lifecycle import ARCHIVED, LIFECYCLE_STATUSES
+ModuleNotFoundError: No module named 'app'
+===== END BACKFILL TEMP PROOF =====
+
+CORRECTION: a standalone script puts its own dir on sys.path[0], so 'import app' failed above. Re-run with PYTHONPATH=backend.
+In the production image this is moot: the Dockerfile does 'pip install -e .', so 'import app' resolves from anywhere.
+--- DRY RUN (PYTHONPATH=backend; writes nothing) ---
+db=/tmp/opencode/sg111-backfill/temp.db
+BEFORE census={'ACTIVE': 6, 'DELETED': 1, 'active': 1}
+planned conversions=[('DELETED', 'ARCHIVED', 1), ('active', 'ACTIVE', 1)]
+DRY-RUN projected AFTER census={'ACTIVE': 7, 'ARCHIVED': 1}
+dry-run: nothing written (pass --apply to write)
+production command (owner word required): docker exec storagegenie-backend-1 python /app/scripts/backfill_asset_lifecycle.py --db /data/db/storagegenie.db --apply
+--- census AFTER dry-run (must equal the seeded census: no write) ---
+ACTIVE|6
+DELETED|1
+active|1
+--- APPLY (temp copy only) ---
+db=/tmp/opencode/sg111-backfill/temp.db
+BEFORE census={'ACTIVE': 6, 'DELETED': 1, 'active': 1}
+planned conversions=[('DELETED', 'ARCHIVED', 1), ('active', 'ACTIVE', 1)]
+APPLIED rows_changed=2
+AFTER census={'ACTIVE': 7, 'ARCHIVED': 1}
+production command (owner word required): docker exec storagegenie-backend-1 python /app/scripts/backfill_asset_lifecycle.py --db /data/db/storagegenie.db --apply
+--- census AFTER apply ---
+ACTIVE|7
+ARCHIVED|1
+--- production command for the owner word (owner-word required; NOT run live here) ---
+docker exec storagegenie-backend-1 python /app/scripts/backfill_asset_lifecycle.py --db /data/db/storagegenie.db --apply
+===== END BACKFILL TEMP PROOF =====
+
+FAIL-RUN CLASSIFICATION CORRECTION: the two backfill tests failed on base with FileNotFoundError (the new script file does not exist in the base archive), not ModuleNotFoundError. Both are artifact-absence fails, not the behavioural baseline. The behavioural baseline is the five API/engine fails above.
+
+################## G3 BUILD + RECREATE (raw) ##################
+===== G3 BUILD 2026-09-24T10:47:39Z =====
+--- image BEFORE build ---
+image_id=sha256:147a2651fb4823929bb42dfcf102111c439a6006c50be5b94697abede142aedb created=2026-09-24T10:29:20.143218217Z
+--- build (docker compose build backend) ---
+ Image storagegenie-backend Building 
+failed to update builder last activity time: open /home/andrei/.docker/buildx/activity/.tmp-default2811747182: read-only file system
+
+build_exit=1
+--- image AFTER build ---
+image_id=sha256:147a2651fb4823929bb42dfcf102111c439a6006c50be5b94697abede142aedb created=2026-09-24T10:29:20.143218217Z
+===== G3 RECREATE (exactly ONE up -d --no-deps backend) 2026-09-24T10:47:39Z =====
+before_container=6a2b9ea6972dc58c46e469270cbf5ea3f6426e74a7e6a544a1b44783e79bb0fc
+ Container storagegenie-backend-1 Running 
+up_exit=0
+--- wait for health ---
+t=2s health=healthy
+after_container=6a2b9ea6972dc58c46e469270cbf5ea3f6426e74a7e6a544a1b44783e79bb0fc
+after_image=sha256:147a2651fb4823929bb42dfcf102111c439a6006c50be5b94697abede142aedb
+6a2b9ea6972d storagegenie-backend storagegenie-backend-1 Up 18 minutes (healthy) 127.0.0.1:8003->8000/tcp
+===== END G3 BUILD + RECREATE =====
+
+G3 BUILD RETRY — the buildkit path failed with EROFS on ~/.docker/buildx/activity (root / is mounted ro; host condition, not this slice):
+  failed to update builder last activity time: open /home/andrei/.docker/buildx/activity/.tmp-default2811747182: read-only file system
+  mount: /dev/vda1 on / type ext4 (ro,...) ; touch /home/andrei/.docker/buildx/activity/.tmp-test -> Read-only file system
+  resolution: DOCKER_BUILDKIT=0 (classic builder) does not write buildx activity. Build succeeds. No privileged operation denied.
+--- build (DOCKER_BUILDKIT=0 docker compose build backend) ---
+ Image storagegenie-backend Building 
+ Image storagegenie-backend Building 
+Sending build context to Docker daemon  524.4kBSending build context to Docker daemon  2.098MBSending build context to Docker daemon  3.146MBSending build context to Docker daemon  4.195MBSending build context to Docker daemon  5.244MBSending build context to Docker daemon  6.293MBSending build context to Docker daemon  7.866MBSending build context to Docker daemon  9.439MBSending build context to Docker daemon  10.49MBSending build context to Docker daemon  11.54MBSending build context to Docker daemon  12.59MBSending build context to Docker daemon  13.63MBSending build context to Docker daemon  14.68MBSending build context to Docker daemon  15.73MBSending build context to Docker daemon  16.78MBSending build context to Docker daemon  17.83MBSending build context to Docker daemon  18.88MBSending build context to Docker daemon  19.93MBSending build context to Docker daemon  20.98MBSending build context to Docker daemon  22.02MBSending build context to Docker daemon  23.07MBSending build context to Docker daemon  24.12MBSending build context to Docker daemon  25.17MBSending build context to Docker daemon  26.22MBSending build context to Docker daemon  27.27MBSending build context to Docker daemon  28.32MBSending build context to Docker daemon  29.37MBSending build context to Docker daemon  30.42MBSending build context to Docker daemon  30.94MBSending build context to Docker daemon  31.46MBSending build context to Docker daemon  32.51MBSending build context to Docker daemon  34.09MBSending build context to Docker daemon  35.13MBSending build context to Docker daemon  36.18MBSending build context to Docker daemon  37.23MBSending build context to Docker daemon  38.28MBSending build context to Docker daemon  39.33MBSending build context to Docker daemon  40.38MBSending build context to Docker daemon  41.95MBSending build context to Docker daemon     43MBSending build context to Docker daemon  44.05MBSending build context to Docker daemon  45.62MBSending build context to Docker daemon  46.67MBSending build context to Docker daemon  47.72MBSending build context to Docker daemon  48.77MBSending build context to Docker daemon  49.82MBSending build context to Docker daemon  50.87MBSending build context to Docker daemon  51.92MBSending build context to Docker daemon  52.96MBSending build context to Docker daemon  54.01MBSending build context to Docker daemon  55.06MBSending build context to Docker daemon  56.11MBSending build context to Docker daemon  57.16MBSending build context to Docker daemon  58.21MBSending build context to Docker daemon  59.26MBSending build context to Docker daemon  60.31MBSending build context to Docker daemon  61.35MBSending build context to Docker daemon   62.4MBSending build context to Docker daemon  63.45MBSending build context to Docker daemon  63.76MB
+Step 1/20 : FROM node:20-alpine AS frontend-build
+ ---> fb4cd12c85ee
+Step 2/20 : WORKDIR /ui
+ ---> Using cache
+ ---> 8c909c020926
+Step 3/20 : COPY frontend/package.json frontend/package-lock.json ./
+ ---> Using cache
+ ---> 094e1843d3ae
+Step 4/20 : RUN npm ci
+ ---> Using cache
+ ---> 3fdc2d5a1c0b
+Step 5/20 : COPY frontend/ ./
+ ---> Using cache
+ ---> 0145e2f63794
+Step 6/20 : ARG VITE_API_BASE=https://storagegenie.dynv6.net
+ ---> Using cache
+ ---> 6057b6b90de7
+Step 7/20 : ENV VITE_API_BASE=${VITE_API_BASE}
+ ---> Using cache
+ ---> 04dddd6cb4b4
+Step 8/20 : RUN npm run build
+ ---> Using cache
+ ---> a691626afbea
+Step 9/20 : FROM python:3.12.11-slim-bookworm@sha256:519591d6871b7bc437060736b9f7456b8731f1499a57e22e6c285135ae657bf7
+ ---> 519591d6871b
+Step 10/20 : WORKDIR /app
+ ---> Using cache
+ ---> 4d6ec735932c
+Step 11/20 : RUN apt-get update && apt-get install -y --no-install-recommends curl tesseract-ocr libzbar0 && rm -rf /var/lib/apt/lists/*
+ ---> Using cache
+ ---> 9b3622c8c88d
+Step 12/20 : COPY backend/pyproject.toml backend/requirements.lock ./
+ ---> Using cache
+ ---> ae875bb360a4
+Step 13/20 : RUN pip install --no-cache-dir -r requirements.lock
+ ---> Using cache
+ ---> 99ec99b6c736
+Step 14/20 : COPY backend/ ./
+ ---> Using cache
+ ---> 42d13280bc3b
+Step 15/20 : RUN pip install --no-cache-dir "hatchling==1.32.0" "editables==0.6"
+ ---> Using cache
+ ---> e3610e23e4cd
+Step 16/20 : RUN pip install --no-cache-dir --no-build-isolation --no-deps -e .
+ ---> Using cache
+ ---> e437e8e42bde
+Step 17/20 : COPY --from=frontend-build /ui/dist ./static
+ ---> Using cache
+ ---> 9d37235cc644
+Step 18/20 : EXPOSE 8000
+ ---> Using cache
+ ---> 97f67795db05
+Step 19/20 : CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+ ---> Using cache
+ ---> 5acafc751b47
+Step 20/20 : LABEL com.docker.compose.image.builder=classic
+ ---> Using cache
+ ---> ace2b17a5e85
+Successfully built ace2b17a5e85
+Successfully tagged storagegenie-backend:latest
+ Image storagegenie-backend Built 
+ Image storagegenie-backend Built 
+build_exit=0
+--- image AFTER build ---
+image_id=sha256:ace2b17a5e851f5c524a47958639fef5b5fae4cc4be81e71dba494b79d4662a2 created=2026-09-24T10:49:29.268540239Z
+===== G3 RECREATE (exactly ONE up -d --no-deps backend) 2026-09-24T10:49:45Z =====
+before_container=6a2b9ea6972dc58c46e469270cbf5ea3f6426e74a7e6a544a1b44783e79bb0fc
+ Container storagegenie-backend-1 Recreate 
+ Container storagegenie-backend-1 Recreated 
+ Container storagegenie-backend-1 Starting 
+ Container storagegenie-backend-1 Started 
+up_exit=0
+--- wait for health ---
+t=2s health=starting
+t=4s health=starting
+t=6s health=starting
+t=8s health=starting
+t=10s health=starting
+t=12s health=healthy
+after_container=91fab66e675a07a295a8da488582decbd8d712dceaba4e4b2ba06e1799d313ac
+after_image=sha256:ace2b17a5e851f5c524a47958639fef5b5fae4cc4be81e71dba494b79d4662a2
+91fab66e675a storagegenie-backend storagegenie-backend-1 Up 10 seconds (healthy) 127.0.0.1:8003->8000/tcp
+===== END G3 BUILD + RECREATE =====
+
+################## G4 AFTER (raw) ##################
+===== G4 AFTER CAPTURE 2026-09-24T10:50:21Z =====
+--- IMAGE ID ---
+image_id=sha256:ace2b17a5e851f5c524a47958639fef5b5fae4cc4be81e71dba494b79d4662a2 created=2026-09-24T10:49:29.268540239Z
+--- CONTAINER ---
+container_id=91fab66e675a07a295a8da488582decbd8d712dceaba4e4b2ba06e1799d313ac image=sha256:ace2b17a5e851f5c524a47958639fef5b5fae4cc4be81e71dba494b79d4662a2 RestartCount=0 Started=2026-09-24T10:49:46.474627689Z Health=healthy
+--- ALEMBIC CURRENT (live DB, read-only) ---
+20260923_sg100_enrich_snapshot
+--- TABLE COUNT ---
+25
+--- TABLE COUNTS ---
+alembic_version=1
+assertion=28
+asset=6
+asset_evidence=12
+asset_fts=6
+asset_fts_config=1
+asset_fts_data=8
+asset_fts_docsize=6
+asset_fts_idx=6
+audit_event=68
+candidate=7
+enrich_snapshot=2
+evidence=13
+guardrail_event=2
+household=1
+idempotency_key=9
+job=8
+job_step=56
+observation=16
+planning_suggestion=0
+provider_call=17
+review_task=6
+saved_search=0
+source_attribution=0
+user=2
+--- LIVE STATUS CENSUS AFTER ---
+ACTIVE|6
+--- HEALTH EXACT x6 ---
+health[1]={"status":"ok","db":"ok","storage":"ok"}
+health[2]={"status":"ok","db":"ok","storage":"ok"}
+health[3]={"status":"ok","db":"ok","storage":"ok"}
+health[4]={"status":"ok","db":"ok","storage":"ok"}
+health[5]={"status":"ok","db":"ok","storage":"ok"}
+health[6]={"status":"ok","db":"ok","storage":"ok"}
+--- GATE http/https (canonical dynv6 host) ---
+http :80 code=301 redirect=https://storagegenie.dynv6.net/
+https :443 code=401
+--- FRESH-SERVER lifecycle code present in image + behavioural 422 proof (temp DB inside the recreated container; no live writes) ---
+-rw-r--r-- 1 root root 3298 Sep 24 10:41 /app/app/services/lifecycle.py
+96093c94ed9ac9582ee101db510857aba1f533d2abd072ab322c3203366bb0fc  /app/app/services/lifecycle.py
+fresh_exec_exit=0
+--- cleanup temp verify dir inside container ---
+cleanup_exit=0
+--- live DB unchanged check (asset census still only ACTIVE, count 6) ---
+ACTIVE|6
+===== END G4 AFTER =====
+
+FRESH-SERVER PROOF CORRECTION: the first exec omitted -i, so stdin (the heredoc) was not attached and python read an empty program (exit 0, no output). Re-run with docker exec -i.
+/usr/local/lib/python3.12/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+  from starlette.testclient import TestClient as TestClient  # noqa
+fresh_server legal ACTIVE->ARCHIVED = 200
+fresh_server illegal ARCHIVED->ACTIVE = 422 illegal status transition 'ARCHIVED' -> 'ACTIVE'; legal from 'ARCHIVED': ['DISPOSED']
+fresh_server unknown BOGUS = 422 illegal status transition 'ARCHIVED' -> 'BOGUS'; legal from 'ARCHIVED': ['DISPOSED']
+fresh_exec_exit=0
+cleanup2_exit=0
+--- live DB unchanged check (asset census still only ACTIVE, count 6) ---
+ACTIVE|6
+===== END G4 AFTER =====
+
+################## READER INVENTORY DISPOSITION (keep-ACTIVE-only / widen / untouched) ##################
+CHANGED -> shared predicate (ACTIVE-only reader):
+  app/services/analytics/service.py:188  asset.status == 'ACTIVE' list-comp -> lifecycle.is_active(asset)
+  app/services/chat/service.py:152      Asset.status == 'ACTIVE' filter  -> lifecycle.active_clause()
+  app/services/planning/service.py:113  Asset.status == 'ACTIVE' filter  -> lifecycle.active_clause()
+  app/services/expiry_engine.py:172     (no predicate)                   -> + lifecycle.active_clause()  [WIDEN: ISS-2 fixed]
+CHANGED -> vocabulary constant (creation default; bypasses the transition map by decision G1, stated in code):
+  app/services/asset_service.py:46  payload.get('status', 'ACTIVE')      -> payload.get('status', lifecycle.ACTIVE)
+  app/services/candidates.py:582    _provenance('ACTIVE', ...)           -> _provenance(lifecycle.ACTIVE, ...)
+  app/services/candidates.py:818    str(status or 'ACTIVE')             -> str(status or lifecycle.ACTIVE)
+  app/services/dedup.py:151         'status': 'ACTIVE'                  -> 'status': lifecycle.ACTIVE
+  app/schemas/asset.py:9            status: str = 'ACTIVE'              -> status: str = ACTIVE
+CHANGED -> validated through the map (writer):
+  app/api/v1/assets.py:390-409 delete: 'ARCHIVED' -> lifecycle.ARCHIVED, validated ACTIVE->ARCHIVED through validate_transition
+  app/api/v1/assets.py:379     PATCH status: validate_transition before update_asset
+UNTOUCHED (and why):
+  analytics/service.py:189  by_status census over ALL statuses -- not ACTIVE-only
+  analytics/service.py:223,238  human-readable stat 'source' description strings (single-quoted, not predicates)
+  planning/service.py:158 / chat/service.py:190 / assets.py:145,289 / exports.py:64  serializers that echo asset.status
+  assets.py:186  ?status= caller-supplied generic filter (not ACTIVE-only)
+  assets.py:222-223  facet status census over ALL statuses
+  candidates.py:195 / review_tasks.py / planning.py  status of Candidate/ReviewTask/PlanningSuggestion (a DIFFERENT model)
+  models/asset.py:23  column default 'ACTIVE' -- models/ is forbidden by the scope ceiling (empty diff); the one remaining literal, reported
+  saved_search model/schema  'status' is a stored filter key, no Asset.status predicate
+
+################## POST-RESTART SWEEP (waived per PG-DP-02) ##################
+Waived: restart-gated. Substitute authority = in-process suite pre-restart (556 passed + 2 known decoder env reds, stash-proved on BASE) + post-restart live probes (health x6, gate 301/401, alembic, 25-table counts, status census) and the fresh-container behavioural 422/200 proof above. No browser-driven tests exist on this path -- the derived set is empty and differed nowise.
+
+################## CROSS-PRODUCT CHECK (PG-IC-01) ##################
+No criterion demands migration, merge-map, creation reroute, frontend, sender, second recreate, live backfill, press, or any metered call. Reads executed: pytest/TestClient on temp DBs + host read-only sqlite3/curl + the authorized image build + exactly ONE recreate + one fresh-container python exec on a temp DB. No other image pulled/run, no unnamed runtime launched. No cell collides.
+
+################## VACUITY CHECK (PG-EV-01 / the vacuous-pass warning) ##################
+- Transition matrix: 36 ordered pairs driven through the REAL PATCH route; 5 genuine behavioural base-fails (base answers 200) prove non-vacuity.
+- Engine leg: the archived fixture IS tiered on base (FAIL run shows the extra row) and excluded on candidate -- seen-to-fail in the committed FAIL run.
+- Backfill: the live census has only ACTIVE, so the proof seeds the TEMP copy with 'active' and 'DELETED' and shows dry-run (no write) then apply (2 rows changed). Without the seed the conversion would be vacuous; the seed is disclosed.
+- Grep-gate for "ACTIVE": only lifecycle.py (the vocabulary) and models/asset.py:23 (forbidden to touch). The literal 'ARCHIVED' now appears only in lifecycle.py.
+- Empty-diff claims (models/, alembic/, frontend/) are backed by git diff --stat output; count deltas are compared BEFORE->AFTER, not asserted from memory.
+
+################## ACTUAL vs BUDGET (units) ##################
+- G1 BEFORE capture + reader inventory: ~1 s / 120 s ordinary
+- FAIL run: 1.26 s / 120 s ordinary
+- PASS run: 1.33 s / 120 s ordinary
+- full suite + ruff + mypy(x2): 23.67 s + ~1 s + ~2x13 s, within 600 s suite+lint
+- backfill temp proof: ~2 s / 120 s ordinary
+- build + recreate + health + AFTER capture: ~85 s (incl. one failed buildkit attempt + retry) / 600 s build+recreate+verify
+- overall: well under 2100 s
+REAL metered spend: $0.000000 (zero provider calls).

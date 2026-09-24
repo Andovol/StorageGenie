@@ -1,0 +1,29 @@
+SG-111 worklog — lifecycle vocabulary + transitions + readers, backfill proven on temp
+Append-only. Material commands, decisions, results. All times UTC.
+
+2026-09-24 ~10:39  Recon: contract 0.33.0 (VERSION 0.33.0, RULES.md sha256 18de7fd7… == payload). BASE
+                   origin/automation resolved 046ce7fa75de0e51084bb6633efcdd7c5380e988 == start HEAD.
+                   Process argv /proc/3800821/cmdline = opencode run --auto --dir … --variant high -> effort=high, model=unknown.
+10:39  G1 BEFORE captured raw (image 147a2651…, container 6a2b9ea6…, alembic 20260923_sg100_enrich_snapshot,
+       25 tables, health ok, gate via dynv6 301/401, status census ACTIVE|6). FINDING: census ACTIVE-only,
+       no ARCHIVED as hypothesised; gate 404/303 under Host:localhost (different vhost), 301/401 under dynv6.
+10:40  Reader inventory grep captured. Decision: new module app/services/lifecycle.py (readers + API import it;
+       asset_service would drag the write-side graph).
+10:41-10:44  Implemented lifecycle.py (6 literals, TRANSITIONS, validate_transition, is_active/active_clause),
+       assets.py PATCH+delete validation, creation defaults via constant (asset_service, candidates, dedup,
+       schemas/asset), readers via shared predicate (analytics, chat, planning), engine gains active_clause.
+       Import smoke ok. ruff clean. grep '"ACTIVE"' -> only lifecycle.py + models/asset.py:23 (forbidden file).
+10:44  Tests written (test_sg111_lifecycle.py, independent oracle). FAIL run on base archive 046ce7f:
+       11 failed, 2 passed (5 genuine behavioural, 6 artifact-absence). PASS run candidate: 13 passed.
+10:45  Backfill script + temp proof. First standalone run failed import app (script dir on sys.path[0]);
+       re-ran PYTHONPATH=. Dry-run no write; apply on temp seed converted active->ACTIVE, DELETED->ARCHIVED.
+       Live DB untouched (ACTIVE|6). Production command recorded.
+10:46  Gates: suite 556 passed + 2 known decoder reds (stash-proved identical on base). ruff clean.
+       mypy 41/86 vs base 41/85, identical multiset -> delta 0. Secret gate 0 real. Scope empty on
+       models/ + alembic/ + frontend/.
+10:47  G3 build: buildkit failed EROFS on ~/.docker/buildx/activity (host / mounted ro). Retry with
+       DOCKER_BUILDKIT=0 succeeded. ONE recreate 6a2b9ea6… -> 91fab66e…; image 147a2651… -> ace2b17a….
+10:50  G4 AFTER: alembic unchanged, 25 counts identical, census ACTIVE|6, health x6 ok, gate 301/401.
+       Fresh-server proof (temp DB in container): legal 200, illegal ARCHIVED->ACTIVE 422 with legal set,
+       unknown BOGUS 422. First exec omitted -i (stdin unattached) -> corrected with -i.
+10:52  Report + verify log written. Commit work, push, receipt note.

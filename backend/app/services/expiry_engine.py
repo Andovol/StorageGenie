@@ -39,6 +39,7 @@ from sqlalchemy.orm import Session
 from app.models.assertion import Assertion
 from app.models.asset import Asset
 from app.plugins.expiry_tracker import CATEGORIES, CLASSIFICATION_FIELD, EXPIRY_FIELD
+from app.services import lifecycle
 
 # The fixed blueprint §11.2 buckets. These are NOT calibration windows: they are
 # the dashboard's coarse urgency buckets and carry no per-category numbers.
@@ -169,9 +170,12 @@ def compute_status(
     """
     rows: list[dict[str, Any]] = []
     unresolved_rows: list[dict[str, Any]] = []
+    # SG-111 ISS-2: the engine admits ACTIVE assets only. A non-ACTIVE asset is
+    # lifecycle-terminal, not date-missing, so it is excluded from BOTH the
+    # tiered rows and the unresolved rows (the dashboard needs no change).
     assets = (
         db.query(Asset)
-        .filter(Asset.household_id == household_id)
+        .filter(Asset.household_id == household_id, lifecycle.active_clause())
         .order_by(Asset.id)
         .all()
     )

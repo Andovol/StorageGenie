@@ -16,7 +16,7 @@ from app.models.evidence import Evidence, asset_evidence
 from app.models.job import Job, JobStep
 from app.models.review_task import ReviewTask
 from app.models.base import TimestampMixin, new_id
-from app.services import audit_service
+from app.services import audit_service, lifecycle
 from app.services.enrich import scoring as enrich_scoring
 from app.services.enrich.jina import SOURCE_NAME as JINA_SOURCE_NAME
 from app.services.enrich.jina import EnrichDecisionRecord
@@ -579,7 +579,7 @@ def build_candidate_from_extraction(
             _deterministic_display_name(db, evidence_ids), source_type="deterministic"
         ),
         "asset_type": _provenance("unknown", source_type="deterministic"),
-        "status": _provenance("ACTIVE", source_type="deterministic"),
+        "status": _provenance(lifecycle.ACTIVE, source_type="deterministic"),
     }
     identifier = _barcode_identifier(db, evidence_ids)
     if identifier is not None:
@@ -815,7 +815,7 @@ def _create_asset_for_candidate(db: Session, candidate: Candidate) -> Asset:
         household_id=candidate.household_id,
         display_name=str(display or "Imported item"),
         asset_type=str(asset_type or "unknown"),
-        status=str(status or "ACTIVE"),
+        status=str(status or lifecycle.ACTIVE),
         quantity=quantity,
         unit=unit,
         condition=condition,
