@@ -423,3 +423,9 @@ Originals above (88 FLAG:TRUST / 91 FLAG:TRUST) stand as the audit trail; the ve
 | slice_id | phase | model | effort | score | flag | lever | guards_invoked | deduction_attribution |
 |---|---|---|---|---|---|---|---|---|
 | SG-106 | Presentation rider (D146): rebuild + one recreate + verify, SG-105 UI served | opencode (model unknown per identity line - CLI default per policy; effort high from argv --variant high) | high | 98 |  |  | PG-EV-01, PG-EV-02, PG-EV-05, PG-EV-08, PG-SC-09, PG-SC-12, PG-DP-01, PG-DP-02, PG-IC-01, PG-IC-07, PG-IC-09, PG-PR-01, PG-PR-03, PG-PR-04, PG-PR-06 | packet |
+
+### SG-107 (2026-09-24 - Arc B engine)
+
+| slice_id | phase | model | effort | score | flag | lever | guards_invoked | deduction_attribution |
+|---|---|---|---|---|---|---|---|---|
+| SG-107 | Arc B engine (D143 L3): pure tier+bucket compute + read route + owned refresh | opencode (model CLI default per policy - no --model on argv; effort high from argv --variant high) | high | 98 |  |  | PG-EV-01, PG-EV-02, PG-EV-05, PG-EV-08, PG-EV-09, PG-SC-07, PG-SC-09, PG-SC-12, PG-DP-02, PG-IC-01, PG-IC-07, PG-IC-09, PG-PR-03, PG-PR-04, PG-PR-06 | mixed |
