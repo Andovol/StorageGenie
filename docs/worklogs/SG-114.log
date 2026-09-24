@@ -1,0 +1,67 @@
+SG-114 Coder log — asset relations: typed links + dormant API + asset-detail UI
+=================================================================================
+
+Running log (first token SG-114). Host /home/andrei/StorageGenie, branch automation.
+BASE_REF=origin/automation, BASE_RESOLVED=8bed3f0bb8652ea3712980182accddd88ff8f8d1 (start HEAD).
+MODEL=unknown (no `--model` in argv; CLI default per policy). effort=high (`--variant high`, read from
+/proc/3874953/cmdline). Spend real $ = $0.000000 (zero provider calls; no metered call exists on any path).
+
+- t0 read: contract 0.33.0 == published b232b84 (G-L1 clean); RULES.md sha256 18de7fd7… == payload
+  RULES.sha256 (installed-vs-payload, never checkout-vs-stamp).
+- Premises re-verified before building:
+  * NO relation model/table/route anywhere on BASE — grep over backend/app/{models,api,services} against
+    the BASE archive (8bed3f0) -> 0 hits (quoted in SG-114_verify.log PREMISE). The working-tree grep runs
+    after implementation and finds only the new slice files; labelled as such.
+  * Migration file head is 20260924_sg113_location — verified by reading every revision/down_revision in
+    backend/alembic/versions/ (10 files); my new migration chains from that exact head, not from the packet.
+  * merge/duplicate links already exist as `merged_into` (SG-112); no duplicate relation type was added.
+- G1 BEFORE captured raw (image 67c62b86806e…, container 2fceee17…, alembic 20260923_sg100_enrich_snapshot,
+  25 tables, health exact, gate 301/401, bundle index-t_5eG484.js sha 9989a432…, catalog baseline).
+- G1 implemented:
+  * backend/app/models/relation.py — `AssetRelation` (id/household_id FK+cascade+index/from_asset_id &
+    to_asset_id FK asset CASCADE+index/relation_type String(50)) + UniqueConstraint(from,to,type)
+    (the "same typed link twice is one row" rule) via __table_args__.
+  * backend/app/models/__init__.py — export AssetRelation (import + __all__).
+  * backend/app/config.py — `sg_relations_enabled: bool = False` (deliberately SEPARATE from the locations
+    flag so each batched migration word flips only its own surface).
+  * backend/alembic/versions/20260924_sg114_relation.py — ONE migration, revision
+    20260924_sg114_relation, down_revision 20260924_sg113_location; upgrade creates the table + three
+    indexes + the unique constraint; downgrade drops them. `_has_table` guard mirrored from SG-113.
+- G2 implemented:
+  * backend/app/api/v1/relations.py — router-level `Depends(_require_relations_enabled)` (flag OFF -> 404):
+    GET list-for-asset (BOTH directions, `direction` derived per perspective), POST create,
+    DELETE (idempotent no-op on missing, 403 foreign household, 404 not-touching-this-asset).
+    RELATION_TYPES = frozenset({"related_to","contains"}); an out-of-vocabulary type is 422 by the model.
+  * backend/app/api/v1/assets.py — `_asset_to_dict` adds `relations[]` ONLY when the flag is ON (OFF
+    response byte-identical: no new key). Shared `relations_for_asset` helper, so list route and reader
+    cannot drift (PG-SC-02).
+  * backend/app/main.py — register relations_router.
+  * frontend/src/api/types.ts + client.ts — AssetRelation/RelationListResponse types, Asset.relations?,
+    fetchRelations/createRelation/deleteRelation/fetchHouseholdAssets.
+  * frontend/src/routes/AssetDetailPage.tsx — `RelationsSection`: list route 404 -> hide whole section;
+    else empty state / both-direction list (named + `(type, direction)`) + target/type selects + Link +
+    Remove. Target picker reads the always-on catalog list.
+- Tests backend/tests/test_sg114_relations.py (9 tests): migration upgrade->downgrade->upgrade + indexes +
+  unique constraint columns; vocabulary pin (exactly two types, no duplicate type in the constant);
+  no-duplicate_of source scan over the relation surface; flag-off 404s on every route + no relations key;
+  empty `relations: []` when ON; create/read-both-directions/delete incl repeat delete 200 and 409 exact
+  duplicate; refusals write nothing (self 422, illegal type 422, foreign 403 x2, missing 404, cross-hh
+  list/detail 403; table count before==after==0); delete refuses unrelated 404 / foreign 403 without
+  removing rows; asset-detail reader both directions. FAIL on BASE 9 failed (schema/route/API absence),
+  PASS on candidate 9 passed. Both raw runs in SG-114_verify.log.
+- Tests frontend AssetDetailPage.test.tsx +3 (12 total): hides when disabled; empty state; lists both
+  directions + creates + deletes. Full frontend 205 passed / 24 files.
+- Gates: full backend suite 2 failed, 581 passed (the 2 known decoder env reds, stash-proved on BASE
+  2 failed in 0.67s); ruff `All checks passed!`; mypy 41/9 (checked 90) vs base 41/9 (checked 88) delta 0;
+  secret gate 0 real (only pre-existing config.py key NAMES); frontend tsc + vite build ok
+  (index-DyQr8w8_.js), eslint clean (exit 0), vitest 205 passed.
+- G4: backend rebuilt (image 67c62b86 -> b4bec08d), exactly ONE recreate (container 2fceee17 -> 1a0588c7,
+  restart 0, healthy). AFTER: alembic UNCHANGED (20260923_sg100_enrich_snapshot — new migration present in
+  image but NOT applied; 12 migration files), 25-table counts delta exactly zero, asset status ACTIVE|6,
+  health exact x6, gate 301/401, bundle index-XGj8xV3t.js sha 65736eec… (differs — frontend changed),
+  flag-off probes all 404 through the fresh server, detail has no relations key, catalog-list 200,
+  served relations.py/relation.py sha256 match host.
+- Production migration + activation word-shape (BOTH SG-113 + SG-114 migrations + both flags + one
+  recreate) recorded in SG-114_report.md; NOT run here.
+- G5: report + verify log written; receipt note on WORK_HEAD 7c16635… and dual-annotated on the final tip;
+  worktree clean.

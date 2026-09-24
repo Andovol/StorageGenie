@@ -344,3 +344,25 @@ migration-files=12
 a910610d9c5c5a9d8abc76cae8998dc405b8c59c13f9a2bf0bba31b1df679fb2  /app/app/models/relation.py
 4ef350eaf372a1cf35f9ce936a400702b97ef0a5c74bc1ffe36d12c74f365c0e  backend/app/api/v1/relations.py
 a910610d9c5c5a9d8abc76cae8998dc405b8c59c13f9a2bf0bba31b1df679fb2  backend/app/models/relation.py
+
+================ RECEIPT NOTE VERIFY ================
+$ git notes --ref=refs/notes/storagegenie-coder-reports show 7c16635e85197c436119121d409f6f86974855ed  # precheck (expect: no note)
+error: no note found for object 7c16635e85197c436119121d409f6f86974855ed.
+precheck exit=1
+
+$ git notes --ref=refs/notes/storagegenie-coder-reports add -m "Dispatch-ID: SG-114 | Report: docs/worklogs/SG-114_report.md | Work-HEAD: 7c16635e85197c436119121d409f6f86974855ed" 7c16635e85197c436119121d409f6f86974855ed
+add exit=0
+
+$ git push origin refs/notes/storagegenie-coder-reports
+To github.com:Andovol/StorageGenie.git
+   04ff645..605187f  refs/notes/storagegenie-coder-reports -> refs/notes/storagegenie-coder-reports
+push exit=0
+
+$ git fetch origin refs/notes/storagegenie-coder-reports:refs/notes/storagegenie-coder-reports-sg114-fetched
+From github.com:Andovol/StorageGenie
+ * [new ref]         refs/notes/storagegenie-coder-reports -> refs/notes/storagegenie-coder-reports-sg114-fetched
+fetch exit=0
+mapped ref -> 605187f87fb37120dfeca46f444ee8de7f32a62c
+
+$ git notes --ref=refs/notes/storagegenie-coder-reports-sg114-fetched show 7c16635e85197c436119121d409f6f86974855ed
+Dispatch-ID: SG-114 | Report: docs/worklogs/SG-114_report.md | Work-HEAD: 7c16635e85197c436119121d409f6f86974855ed
