@@ -1,0 +1,8 @@
+Negative-Receipt-ID: SG-108
+utc=2026-09-24T09:22:42Z
+DISPATCH_RESULT id=SG-108 coder=opencode exit=0 head=ed94cb7e9b5e949c779820a2ced0753db913d61d note=no moved=yes rewrite=no dirty=no elapsed=421s budget=2100s
+P1_moved=PASS count=3
+P2_rewrite=PASS behind=0
+P3_note=FAIL note=no
+P5_receipt=FAIL
+P6_dirty=PASS dirty=no
