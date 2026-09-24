@@ -447,3 +447,9 @@ Originals above (88 FLAG:TRUST / 91 FLAG:TRUST) stand as the audit trail; the ve
 | slice_id | phase | model | effort | score | flag | lever | guards_invoked | deduction_attribution |
 |---|---|---|---|---|---|---|---|---|
 | SG-110 | G7 HEIC/HEIF (D154 L3-build): ftyp branch + pillow-heif decode + thumbnails + owned refresh | opencode (model unknown per identity line - CLI default per policy; effort high from argv --variant high) | high | 98 |  |  | PG-EV-01, PG-EV-02, PG-EV-05, PG-EV-08, PG-EV-09, PG-SC-05, PG-SC-07, PG-SC-09, PG-SC-12, PG-DP-02, PG-IC-01, PG-IC-07, PG-IC-09, PG-PR-03, PG-PR-04, PG-PR-06 | packet |
+
+### SG-111 (2026-09-24 - G5 lifecycle states)
+
+| slice_id | phase | model | effort | score | flag | lever | guards_invoked | deduction_attribution |
+|---|---|---|---|---|---|---|---|---|
+| SG-111 | G5 lifecycle (D154 L3-build): vocabulary + transition map + shared ACTIVE readers + temp-proven backfill | opencode (model unknown per identity line - CLI default per policy; effort high from argv --variant high) | high | 98 |  |  | PG-EV-01, PG-EV-02, PG-EV-05, PG-EV-08, PG-EV-09, PG-SC-05, PG-SC-07, PG-SC-09, PG-SC-12, PG-DP-02, PG-IC-01, PG-IC-07, PG-IC-09, PG-PR-03, PG-PR-04, PG-PR-06 | packet |
