@@ -259,3 +259,26 @@ CHANGED []
 ADDED_EXACT_EXPECTED True
 OLD_COUNTS_EQUAL True
 ================ END G3 ================
+
+================ RECEIPT NOTE VERIFY ================
+$ git notes --ref=refs/notes/storagegenie-coder-reports show 7b4ca92baa435bcb81311ab78e7b621a1a1d5434  # precheck (expect: no note)
+error: no note found for object 7b4ca92baa435bcb81311ab78e7b621a1a1d5434.
+precheck exit=1
+
+$ git notes --ref=refs/notes/storagegenie-coder-reports add -m "Dispatch-ID: SG-115 | Report: docs/worklogs/SG-115_report.md | Work-HEAD: 7b4ca92baa435bcb81311ab78e7b621a1a1d5434" 7b4ca92baa435bcb81311ab78e7b621a1a1d5434
+add exit=0
+
+$ git push origin refs/notes/storagegenie-coder-reports
+To github.com:Andovol/StorageGenie.git
+   568b8d1..0642505  refs/notes/storagegenie-coder-reports -> refs/notes/storagegenie-coder-reports
+push exit=0
+
+$ git fetch origin refs/notes/storagegenie-coder-reports:refs/notes/storagegenie-coder-reports-sg115-fetched
+From github.com:Andovol/StorageGenie
+ * [new ref]         refs/notes/storagegenie-coder-reports -> refs/notes/storagegenie-coder-reports-sg115-fetched
+fetch exit=0
+mapped ref -> 06425050928da504c4cdb3bfbe1efa9564d2a75f
+
+$ git notes --ref=refs/notes/storagegenie-coder-reports-sg115-fetched show 7b4ca92baa435bcb81311ab78e7b621a1a1d5434
+Dispatch-ID: SG-115 | Report: docs/worklogs/SG-115_report.md | Work-HEAD: 7b4ca92baa435bcb81311ab78e7b621a1a1d5434
+note-exit=0

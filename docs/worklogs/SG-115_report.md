@@ -35,7 +35,7 @@ Refs
 - Work dir `/home/andrei/StorageGenie`, origin `git@github.com:Andovol/StorageGenie.git`
 - BASE_REF = `origin/automation`
 - BASE_RESOLVED = `05451c3b364e4f63463959e45b9f5cf0a7bf5896` (== start HEAD; the packet commit)
-- WORK_HEAD = `<WORK_HEAD>`
+- WORK_HEAD = `7b4ca92baa435bcb81311ab78e7b621a1a1d5434`
 
 Premise verification — corrections are worth more than agreement
 ----------------------------------------------------------------
@@ -152,9 +152,21 @@ Actual-versus-budget per leg (`PG-PR-06`; units = wall seconds)
 
 Receipt (notes ref)
 -------------------
-RECEIPT PENDING in this commit — the note is added on WORK_HEAD (`<WORK_HEAD>`) after this commit is
-created, then read back from a MAPPED fetch and pasted here in the receipt-paste commit (the hash cannot be
-written into the commit that defines it). No push to `storagegenie-evidence`, no `{{RECEIPT_CMD}}`.
+Work pushed to `automation`, worktree clean (`CO-55`). No push to `storagegenie-evidence`, no
+`{{RECEIPT_CMD}}`. Note added on WORK_HEAD
+`7b4ca92baa435bcb81311ab78e7b621a1a1d5434`; notes ref `refs/notes/storagegenie-coder-reports` pushed
+(`568b8d1..0642505`) and read back from a MAPPED fetch
+(`refs/notes/storagegenie-coder-reports-sg115-fetched` at `06425050928da504c4cdb3bfbe1efa9564d2a75f`).
+Pasted executed output:
+
+```
+$ git notes --ref=refs/notes/storagegenie-coder-reports-sg115-fetched show 7b4ca92baa435bcb81311ab78e7b621a1a1d5434
+Dispatch-ID: SG-115 | Report: docs/worklogs/SG-115_report.md | Work-HEAD: 7b4ca92baa435bcb81311ab78e7b621a1a1d5434
+```
+
+Full raw transcript (precheck, add, push, mapped fetch, show) is in `SG-115_verify.log` -> `RECEIPT NOTE
+VERIFY`. The final tip (this receipt commit) is dual-annotated with the same note (SG-092 inoculation).
+final line: `note=yes`.
 
 Three UNCLEAR lines
 -------------------
