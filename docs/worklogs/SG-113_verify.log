@@ -238,3 +238,24 @@ a7c0fbc0a63ba507c6ab96d1a8b72c08c32da3b7b6c3dae963cd1d749bc830e2  /app/app/api/v
 a56ba1628b7a7ea661d93f67cedd54bc237f9afd9d42fb5850ba518d231fe719  /app/app/models/location.py
 a7c0fbc0a63ba507c6ab96d1a8b72c08c32da3b7b6c3dae963cd1d749bc830e2  backend/app/api/v1/locations.py
 a56ba1628b7a7ea661d93f67cedd54bc237f9afd9d42fb5850ba518d231fe719  backend/app/models/location.py
+================ RECEIPT NOTE VERIFY ================
+$ git notes --ref=refs/notes/storagegenie-coder-reports show 0f1634cb982cb9f3b26a96cf811d08f54cbd0f2c  # precheck (expect: no note)
+error: no note found for object 0f1634cb982cb9f3b26a96cf811d08f54cbd0f2c.
+precheck exit=1
+
+$ git notes --ref=refs/notes/storagegenie-coder-reports add -m "Dispatch-ID: SG-113 | Report: docs/worklogs/SG-113_report.md | Work-HEAD: 0f1634cb982cb9f3b26a96cf811d08f54cbd0f2c" 0f1634cb982cb9f3b26a96cf811d08f54cbd0f2c
+add exit=0
+
+$ git push origin refs/notes/storagegenie-coder-reports
+To github.com:Andovol/StorageGenie.git
+   8e97e54..8f605e7  refs/notes/storagegenie-coder-reports -> refs/notes/storagegenie-coder-reports
+push exit=0
+
+$ git fetch origin refs/notes/storagegenie-coder-reports:refs/notes/storagegenie-coder-reports-sg113-fetched
+From github.com:Andovol/StorageGenie
+ * [new ref]         refs/notes/storagegenie-coder-reports -> refs/notes/storagegenie-coder-reports-sg113-fetched
+fetch exit=0
+mapped ref -> 8f605e7e3ed2861c0de7f8fc4adc5aaf2de5a840
+
+$ git notes --ref=refs/notes/storagegenie-coder-reports-sg113-fetched show 0f1634cb982cb9f3b26a96cf811d08f54cbd0f2c
+Dispatch-ID: SG-113 | Report: docs/worklogs/SG-113_report.md | Work-HEAD: 0f1634cb982cb9f3b26a96cf811d08f54cbd0f2c

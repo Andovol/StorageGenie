@@ -35,7 +35,7 @@ Refs
 - Work dir `/home/andrei/StorageGenie`, origin `git@github.com:Andovol/StorageGenie.git`
 - BASE_REF = `origin/automation`
 - BASE_RESOLVED = `2ed06a976bc142887adf9d6c7a469adcce6d6a63` (== start HEAD; the packet commit)
-- WORK_HEAD = `<WORK_HEAD>`
+- WORK_HEAD = `0f1634cb982cb9f3b26a96cf811d08f54cbd0f2c`
 
 Premise verification — corrections are worth more than agreement
 ----------------------------------------------------------------
@@ -227,12 +227,13 @@ Work pushed to `automation`, worktree clean (`CO-55`). No push to `storagegenie-
 executed output:
 
 ```
-<RECEIPT_SHOW_OUTPUT>
+$ git notes --ref=refs/notes/storagegenie-coder-reports-sg113-fetched show 0f1634cb982cb9f3b26a96cf811d08f54cbd0f2c
+Dispatch-ID: SG-113 | Report: docs/worklogs/SG-113_report.md | Work-HEAD: 0f1634cb982cb9f3b26a96cf811d08f54cbd0f2c
 ```
 
 Full raw transcript (precheck, add, push, mapped fetch, show) is in `SG-113_verify.log` -> `RECEIPT
 NOTE VERIFY`. The final tip (this report/receipt commit) is dual-annotated with the same note (SG-092
-inoculation). final line: `<NOTE_YES>`.
+inoculation). final line: `note=yes`.
 
 Three UNCLEAR lines
 -------------------
