@@ -1,0 +1,41 @@
+SG-115 Coder log — production maintenance: live backfill + batched G3+G4 migrations + activation
+=================================================================================================
+
+Running log (first token SG-115). Host /home/andrei/StorageGenie, branch automation.
+BASE_REF=origin/automation, BASE_RESOLVED=05451c3b364e4f63463959e45b9f5cf0a7bf5896 (start HEAD).
+MODEL=unknown (no `--model` in argv; CLI default per policy). effort=high (`--variant high`, read from
+/proc/3892551/cmdline). Spend real $ = $0.000000 (zero provider calls; no metered call exists on any path).
+Ops slice: no product code change; no tests; no migration FILE change. Authorized mutations = FIVE only:
+backfill apply (G1), alembic upgrade head (G2), two .env appends (G3), one backend recreate (G3).
+
+- t0 read: contract 0.33.0 == published b232b84 (G-L1 clean); RULES.md sha256 18de7fd7… == payload
+  RULES.sha256 (installed-vs-payload, never checkout-vs-stamp).
+- G0 BEFORE captured raw (SG-115_verify.log): backend-1 Up healthy, container 1a0588c7d944… restart 0;
+  alembic current 20260923_sg100_enrich_snapshot; table_count 25 with NO location/asset_location/
+  asset_relation; status census ACTIVE|6; .env SG_LOCATIONS_ENABLED count=0 / SG_RELATIONS_ENABLED count=0;
+  health `{"status":"ok","db":"ok","storage":"ok"}`; gate canonical vhost http:80 301 / https:443 401;
+  backfill script present in image (sha256 5cda7cc1… == host); both migration files present in image;
+  product diff over backend/+frontend/+alembic/ empty.
+- G1 backfill (D155): ran EXACTLY `docker exec storagegenie-backend-1 python
+  /app/scripts/backfill_asset_lifecycle.py --db /data/db/storagegenie.db --apply`; exit 0;
+  `BEFORE census={'ACTIVE': 6}` / `planned conversions=[]` / `APPLIED rows_changed=0` / `AFTER
+  census={'ACTIVE': 6}`. After: version_num 20260923_sg100_enrich_snapshot, table_count 25, ACTIVE|6.
+  Zero converted rows, nothing to report with an id.
+- G2 migrations (D156 part 1): `docker exec storagegenie-backend-1 python -m alembic upgrade head`; exit 0;
+  head path exactly `20260923_sg100_enrich_snapshot -> 20260924_sg113_location (SG-113, G3)` then
+  `20260924_sg113_location -> 20260924_sg114_relation (SG-114, G4)`. After: version_num
+  20260924_sg114_relation; table_count 28; DELTA ADDED=['asset_location','asset_relation','location'],
+  REMOVED=[], CHANGED=[]; status ACTIVE|6. Exactly the three expected new tables, every old count equal.
+- G3 flags + recreate + probes (D156 part 2): pre-append counts 0/0; append-only two lines; post-append
+  counts 1/1 (content never printed). Exactly ONE recreate: `DOCKER_BUILDKIT=0 docker compose up -d
+  --no-deps backend`; container 1a0588c7d944… -> c9d780738b68…; restart 0; healthy at t=11s (<60s).
+  Flags visible in container env count=1 each. AFTER: health exact ×6; gate 301/401;
+  GET /v1/locations?household_id=… -> 200 `{"items":[]}`; GET /v1/assets/<id>/relations?household_id=… ->
+  200 `{"items":[]}`; asset detail has_locations_key True + has_relations_key True; catalog-list 200;
+  version 20260924_sg114_relation; 28 tables, ADDED exactly the three, REMOVED/CHANGED none; ACTIVE|6.
+- Vacuous-pass check: the empty `{"items":[]}` bodies are NOT a vacuous pass — the routes moved 404 (flag
+  OFF, proven live by SG-113/114) to 200 (flag ON), and the detail read gained the two keys only when the
+  flag is ON. The 6-asset household has zero rows in each new table, so empty lists are the correct answer.
+- G4: report + verify log + worklog; receipt note on WORK_HEAD and dual-annotated on the final tip;
+  worktree clean. No product diff to prove — the proof is before==after measurements with exactly three
+  expected deltas (backfill zero, +3 tables, 404->200); no fourth delta exists.

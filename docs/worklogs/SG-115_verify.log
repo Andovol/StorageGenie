@@ -1,0 +1,261 @@
+SG-115 verify log — raw outputs (production maintenance: live backfill + batched migrations + activation)
+Generated 2026-09-24T11:41:45Z on host ubuntu in /home/andrei/StorageGenie
+BASE_REF=origin/automation BASE_RESOLVED=05451c3b364e4f63463959e45b9f5cf0a7bf5896
+
+================ G0 CAPABILITY + CENSUS BEFORE ================
+=== EPOCH 2026-09-24T11:41:45Z ===
+--- process args (model/effort) ---
+opencode run --auto --dir /home/andrei/StorageGenie --variant high (note: the argv carries the full packet prompt text; only the three run flags are shown here)
+
+--- git HEAD ---
+05451c3b364e4f63463959e45b9f5cf0a7bf5896
+automation
+
+--- docker ps ---
+NAMES                    STATUS                    IMAGE                  PORTS
+storagegenie-backend-1   Up 10 minutes (healthy)   storagegenie-backend   127.0.0.1:8003->8000/tcp
+
+--- backend container/image/restart/health ---
+container=1a0588c7d94424914d0c4a789e0e90a211c23a66c66a8a8c234e1a14f92efc08 image=sha256:b4bec08d9bcb2a0b920a5a30d22da25a1f77354cd7890ae1d6587efc31199e52 restart=0 state=running health=healthy
+image_created=2026-09-24T11:31:02.065176071Z
+
+--- alembic current (in container) ---
+INFO  [alembic.runtime.migration] Context impl SQLiteImpl.
+INFO  [alembic.runtime.migration] Will assume non-transactional DDL.
+20260923_sg100_enrich_snapshot
+
+--- DB census (read-only): version, table set+counts, asset status, ids ---
+version_num 20260923_sg100_enrich_snapshot
+table_count 25
+COUNT alembic_version|1
+COUNT assertion|28
+COUNT asset|6
+COUNT asset_evidence|12
+COUNT asset_fts|6
+COUNT asset_fts_config|1
+COUNT asset_fts_data|8
+COUNT asset_fts_docsize|6
+COUNT asset_fts_idx|6
+COUNT audit_event|68
+COUNT candidate|7
+COUNT enrich_snapshot|2
+COUNT evidence|13
+COUNT guardrail_event|2
+COUNT household|1
+COUNT idempotency_key|9
+COUNT job|8
+COUNT job_step|56
+COUNT observation|16
+COUNT planning_suggestion|0
+COUNT provider_call|17
+COUNT review_task|6
+COUNT saved_search|0
+COUNT source_attribution|0
+COUNT user|2
+STATUS ACTIVE|6
+HOUSEHOLDS ['01a0a029-1477-7ca0-b200-bce78a96c679']
+ASSETS ['01a0a467-eb0e-7b83-a227-af122dc9268b', '01a0c446-44c9-7b82-9d1c-2b51fa518191', '01a0c47f-fbb3-7db1-b6f3-aa52d20aa6a0', '01a0c481-720e-7923-ad6c-bee45caba30f', '01a0c4aa-8b62-7360-b11e-a476ddaea0f6', '01a0c4ab-3765-7e10-8d0a-705390c6560d']
+
+--- .env flag presence counts (counts only; content NEVER printed) ---
+SG_LOCATIONS_ENABLED count=0
+SG_RELATIONS_ENABLED count=0
+
+--- health exact ---
+{"status":"ok","db":"ok","storage":"ok"}
+HTTP 200
+
+--- gate canonical vhost ---
+http:80 => code=301 redirect=https://storagegenie.dynv6.net/
+https:443 => code=401
+
+--- backfill script present in served image (path + sha) ---
+-rw-r--r-- 1 root root 4763 Sep 24 10:43 /app/scripts/backfill_asset_lifecycle.py
+image sha: 5cda7cc1757d9c80772de58df77ea61047c7c71bafc50404082a8288e607a63c  /app/scripts/backfill_asset_lifecycle.py
+host  sha: 5cda7cc1757d9c80772de58df77ea61047c7c71bafc50404082a8288e607a63c  backend/scripts/backfill_asset_lifecycle.py
+
+--- migration files present in served image ---
+-rw-r--r-- 1 root root  2804 Sep 24 11:11 20260924_sg113_location.py
+-rw-r--r-- 1 root root  2549 Sep 24 11:25 20260924_sg114_relation.py
+
+--- contract echo + source path ---
+0.33.0
+b232b845d74e89cb346c60fa4b9a40ec401c42dd
+18de7fd7b3546bd7624b3a7b59a78bd629752816cd7fa8f1af6113d1bafc8d46  /home/andrei/storagegenie-contract/RULES.md
+18de7fd7b3546bd7624b3a7b59a78bd629752816cd7fa8f1af6113d1bafc8d46 RULES.md
+
+--- worktree status (expect clean) ---
+?? docs/worklogs/SG-115_verify.log
+--- product diff over backend/ frontend/ alembic/ vs BASE (expect empty) ---
+================ END G0 ================
+
+================ G1 LIVE BACKFILL (D155 word) ================
+=== EPOCH 2026-09-24T11:41:55Z ===
+$ docker exec storagegenie-backend-1 python /app/scripts/backfill_asset_lifecycle.py --db /data/db/storagegenie.db --apply
+db=/data/db/storagegenie.db
+BEFORE census={'ACTIVE': 6}
+planned conversions=[]
+no out-of-vocabulary status value exists; nothing to backfill
+APPLIED rows_changed=0
+AFTER census={'ACTIVE': 6}
+production command (owner word required): docker exec storagegenie-backend-1 python /app/scripts/backfill_asset_lifecycle.py --db /data/db/storagegenie.db --apply
+backfill exit=0
+
+--- AFTER backfill: status census (read-only) + version + table_count ---
+version_num 20260923_sg100_enrich_snapshot
+table_count 25
+STATUS ACTIVE|6
+asset_total 6
+================ END G1 ================
+
+================ G2 BATCHED MIGRATIONS (D156 word, part 1) ================
+=== EPOCH 2026-09-24T11:42:05Z ===
+$ docker exec storagegenie-backend-1 python -m alembic upgrade head
+INFO  [alembic.runtime.migration] Context impl SQLiteImpl.
+INFO  [alembic.runtime.migration] Will assume non-transactional DDL.
+INFO  [alembic.runtime.migration] Running upgrade 20260923_sg100_enrich_snapshot -> 20260924_sg113_location, location tree + asset location assignment (SG-113, G3)
+INFO  [alembic.runtime.migration] Running upgrade 20260924_sg113_location -> 20260924_sg114_relation, asset relations: typed links (SG-114, G4)
+alembic upgrade exit=0
+
+--- AFTER migration: version + full table set+counts + status ---
+version_num 20260924_sg114_relation
+table_count 28
+COUNT alembic_version|1
+COUNT assertion|28
+COUNT asset|6
+COUNT asset_evidence|12
+COUNT asset_fts|6
+COUNT asset_fts_config|1
+COUNT asset_fts_data|8
+COUNT asset_fts_docsize|6
+COUNT asset_fts_idx|6
+COUNT asset_location|0
+COUNT asset_relation|0
+COUNT audit_event|68
+COUNT candidate|7
+COUNT enrich_snapshot|2
+COUNT evidence|13
+COUNT guardrail_event|2
+COUNT household|1
+COUNT idempotency_key|9
+COUNT job|8
+COUNT job_step|56
+COUNT location|0
+COUNT observation|16
+COUNT planning_suggestion|0
+COUNT provider_call|17
+COUNT review_task|6
+COUNT saved_search|0
+COUNT source_attribution|0
+COUNT user|2
+STATUS ACTIVE|6
+
+--- DELTA vs G0 baseline (expect added={location,asset_location,asset_relation}, no removed, no changed) ---
+ADDED   ['asset_location', 'asset_relation', 'location']
+REMOVED []
+CHANGED []
+ADDED_EXACT_EXPECTED True
+OLD_COUNTS_EQUAL True
+================ END G2 ================
+
+================ G3 FLAGS + RECREATE + ACTIVATION PROBES (D156 word, part 2) ================
+=== EPOCH 2026-09-24T11:42:30Z ===
+--- pre-append flag counts (expect 0 each; content NEVER printed) ---
+SG_LOCATIONS_ENABLED count=0
+SG_RELATIONS_ENABLED count=0
+--- append-only: two flag lines (append-only, never rewrite) ---
+append exit=0
+--- post-append flag counts (expect 1 each) ---
+SG_LOCATIONS_ENABLED count=1
+SG_RELATIONS_ENABLED count=1
+
+--- container BEFORE recreate ---
+container=1a0588c7d94424914d0c4a789e0e90a211c23a66c66a8a8c234e1a14f92efc08 restart=0 health=healthy
+--- exactly ONE recreate: DOCKER_BUILDKIT=0 docker compose up -d --no-deps backend ---
+ Container storagegenie-backend-1 Recreate 
+ Container storagegenie-backend-1 Recreated 
+ Container storagegenie-backend-1 Starting 
+ Container storagegenie-backend-1 Started 
+compose exit=0
+--- wait for healthy (<=60s) ---
+t=1s health=starting
+t=2s health=starting
+t=3s health=starting
+t=4s health=starting
+t=5s health=starting
+t=6s health=starting
+t=7s health=starting
+t=8s health=starting
+t=9s health=starting
+t=10s health=starting
+t=11s health=healthy
+--- container AFTER recreate ---
+container=c9d780738b68d12719108f32935ccf59adfe3c8cd5ae10fe779160451523e78e restart=0 health=healthy started=2026-09-24T11:42:31.571452208Z
+--- flags visible inside recreated container (counts only) ---
+env SG_LOCATIONS_ENABLED count=1
+env SG_RELATIONS_ENABLED count=1
+
+--- health exact x6 ---
+{"status":"ok","db":"ok","storage":"ok"}
+{"status":"ok","db":"ok","storage":"ok"}
+{"status":"ok","db":"ok","storage":"ok"}
+{"status":"ok","db":"ok","storage":"ok"}
+{"status":"ok","db":"ok","storage":"ok"}
+{"status":"ok","db":"ok","storage":"ok"}
+--- gate canonical vhost ---
+http:80 => code=301 redirect=https://storagegenie.dynv6.net/
+https:443 => code=401
+
+--- activation: GET /v1/locations?household_id=<live-id> (expect 200, not 404) ---
+{"items":[]}
+HTTP 200
+--- activation: GET /v1/assets/<live-asset>/relations?household_id=<live-id> (expect 200, not 404) ---
+{"items":[]}
+HTTP 200
+--- activation: asset detail carries locations + relations keys ---
+HTTP 200
+has_locations_key True
+has_relations_key True
+locations_value []
+relations_value []
+--- pre-existing route unchanged: catalog-list (expect 200) ---
+GET /v1/assets -> HTTP 200
+
+--- AFTER: version + table set+counts + status ---
+version_num 20260924_sg114_relation
+table_count 28
+COUNT alembic_version|1
+COUNT assertion|28
+COUNT asset|6
+COUNT asset_evidence|12
+COUNT asset_fts|6
+COUNT asset_fts_config|1
+COUNT asset_fts_data|8
+COUNT asset_fts_docsize|6
+COUNT asset_fts_idx|6
+COUNT asset_location|0
+COUNT asset_relation|0
+COUNT audit_event|68
+COUNT candidate|7
+COUNT enrich_snapshot|2
+COUNT evidence|13
+COUNT guardrail_event|2
+COUNT household|1
+COUNT idempotency_key|9
+COUNT job|8
+COUNT job_step|56
+COUNT location|0
+COUNT observation|16
+COUNT planning_suggestion|0
+COUNT provider_call|17
+COUNT review_task|6
+COUNT saved_search|0
+COUNT source_attribution|0
+COUNT user|2
+STATUS ACTIVE|6
+--- DELTA vs G0 baseline (expect added={location,asset_location,asset_relation}, no removed, no changed) ---
+ADDED   ['asset_location', 'asset_relation', 'location']
+REMOVED []
+CHANGED []
+ADDED_EXACT_EXPECTED True
+OLD_COUNTS_EQUAL True
+================ END G3 ================
