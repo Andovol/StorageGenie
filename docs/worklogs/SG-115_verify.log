@@ -282,3 +282,37 @@ mapped ref -> 06425050928da504c4cdb3bfbe1efa9564d2a75f
 $ git notes --ref=refs/notes/storagegenie-coder-reports-sg115-fetched show 7b4ca92baa435bcb81311ab78e7b621a1a1d5434
 Dispatch-ID: SG-115 | Report: docs/worklogs/SG-115_report.md | Work-HEAD: 7b4ca92baa435bcb81311ab78e7b621a1a1d5434
 note-exit=0
+
+--- DUAL-ANNOTATE FINAL TIP (SG-092 inoculation) ---
+$ git notes --ref=refs/notes/storagegenie-coder-reports add -m "Dispatch-ID: SG-115 | Report: docs/worklogs/SG-115_report.md | Work-HEAD: 7b4ca92baa435bcb81311ab78e7b621a1a1d5434" 860a19f1276b14dd5f301fa727b53bd368751fe5
+add exit=0
+$ git push origin refs/notes/storagegenie-coder-reports
+To github.com:Andovol/StorageGenie.git
+   0642505..33316b7  refs/notes/storagegenie-coder-reports -> refs/notes/storagegenie-coder-reports
+push exit=0
+$ git fetch origin refs/notes/storagegenie-coder-reports:refs/notes/storagegenie-coder-reports-sg115-tip-fetched
+From github.com:Andovol/StorageGenie
+ * [new ref]         refs/notes/storagegenie-coder-reports -> refs/notes/storagegenie-coder-reports-sg115-tip-fetched
+fetch exit=0
+mapped ref -> 33316b7c09ee862b228e66732200faa6dbfcb0dc
+$ git notes --ref=refs/notes/storagegenie-coder-reports-sg115-tip-fetched show 860a19f1276b14dd5f301fa727b53bd368751fe5
+Dispatch-ID: SG-115 | Report: docs/worklogs/SG-115_report.md | Work-HEAD: 7b4ca92baa435bcb81311ab78e7b621a1a1d5434
+dual-note-exit=0
+
+--- push work to automation ---
+$ git push origin automation
+To github.com:Andovol/StorageGenie.git
+   05451c3..860a19f  automation -> automation
+push-automation exit=0
+$ git rev-parse origin/automation
+860a19f1276b14dd5f301fa727b53bd368751fe5
+$ git status --porcelain   # expect empty
+ M docs/worklogs/SG-115_verify.log
+
+--- notes present on the PUSHED ref (mapped tip-fetched 33316b7) for both WORK_HEAD and final tip ---
+$ git notes --ref=refs/notes/storagegenie-coder-reports-sg115-tip-fetched show 7b4ca92baa435bcb81311ab78e7b621a1a1d5434
+Dispatch-ID: SG-115 | Report: docs/worklogs/SG-115_report.md | Work-HEAD: 7b4ca92baa435bcb81311ab78e7b621a1a1d5434
+workhead-note-exit=0
+$ git notes --ref=refs/notes/storagegenie-coder-reports-sg115-tip-fetched show 860a19f1276b14dd5f301fa727b53bd368751fe5
+Dispatch-ID: SG-115 | Report: docs/worklogs/SG-115_report.md | Work-HEAD: 7b4ca92baa435bcb81311ab78e7b621a1a1d5434
+tip-note-exit=0
