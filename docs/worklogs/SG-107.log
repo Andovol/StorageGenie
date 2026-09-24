@@ -1,0 +1,44 @@
+SG-107 worklog — expiry urgency engine (pure tier+bucket compute + read route, owns its refresh)
+
+Work dir /home/andrei/StorageGenie · branch automation · remote git@github.com:Andovol/StorageGenie.git
+Contract 0.33.0 (source /home/andrei/storagegenie-contract/VERSION; RULES.sha256 18de7fd7b3546bd7624b3a7b59a78bd629752816cd7fa8f1af6113d1bafc8d46) — recorded == published b232b84, G-L1 clean.
+BASE_REF=origin/automation → BASE_RESOLVED=107181644b54cc3f3dc2b3662ee511fe4ce1beaa (== start HEAD).
+Model/effort: argv `opencode run --auto --dir /home/andrei/StorageGenie --variant high …` → model = CLI default (no --model), effort = high.
+
+Role: Coder. Never ran the dispatch verb, never started/polled a unit. No STOP condition encountered.
+
+Plan executed:
+1. G-L1 + recon: contract version/sha; packet read; plugins.py:20 prefix + main.py:68 /v1 mount re-verified; expiry_tracker.py writers re-verified (classify_asset :414-419 accepted; store_manual_expiry :498-509 accepted; CATEGORIES windows :95-156). Live image dc6a4382 / bundle index-DlD86cZ6 / alembic sg100.
+2. G1 BEFORE captured (image, served bundle name/size/sha256 + in-image sha, DB bytes, alembic, 25 table counts, health, gate 301/401).
+3. Wrote backend/tests/test_sg107_expiry_engine.py; captured the seen-to-fail run (ImportError: cannot import name 'expiry_engine').
+4. Implemented backend/app/services/expiry_engine.py (days_remaining, tier_for, bucket_for, compute_status) + one plugins.py route hunk (GET /status).
+5. PASS run 17/17; full suite 2 failed / 529 passed (the 2 known test_signals.py decoder env reds, reproduced on unmodified BASE before any edit — 2/512); ruff clean; mypy 41 errors in 9 files (baseline 41 in 9; delta 0); secret grep on changed files = 0 matches.
+6. G2 build (new image 8dce9eb2, 11s) + exactly ONE recreate (171e3d7e, healthy t=12s).
+7. G4 AFTER: image differs; bundle index-DlD86cZ6.js 307014 B 6e0a3af7… byte-identical (JS+CSS cmp equal); alembic sg100 unchanged; all 25 counts identical (delta 0); health ×6 exact; gate 301/401; GET /status 200 (empty zeroed for the live household — no fixture data), 404 unknown household, 422 bad as_of; in-image engine + route present.
+8. Scope: only plugins.py modified (37+/1-) + 2 new files; models/alembic/frontend/analytics/expiry_tracker.py/main.py all empty diff; .gitignore check-ignore exit 1 (all committable).
+
+Design calls (mine, reported):
+- Accepted-only for BOTH the expiry predicate (mandated) and the classification predicate (writer always writes accepted; strictest consistent reading).
+- `tier_for` returns `"safe"` beyond the widest window (packet rule) and `None` for d<0 and for `{}` windows.
+- `summary.by_tier` uses key `"none"` for a null tier so `sum(by_tier) == sum(by_bucket) == len(rows)` reconciles exactly; `total = len(rows) + len(unresolved_rows)`.
+- Assets with no accepted classification are not part of the expiry stream (skipped); the four unresolved reasons are all expiry-assertion states.
+- Unknown/invalid category slug → empty zeroed 200 (matches nothing), never 404 and never unfiltered fallback.
+
+Elapsed vs budget (leg / elapsed / bound):
+- G1 BEFORE: ~5s / 120s ordinary
+- fail run: 0.69s / 120s
+- pass run: 1.6s / 120s
+- suite+lint: 23.4s pytest (+ruff+mypy ~15s) / 600s
+- build: 11s / 600s build+recreate+verify
+- recreate+health: 13s / (same 600s)
+- G4 AFTER: ~30s / (same 600s)
+- overall: ~6 min / 2100s
+Spend: real $0.000000 (no metered call on any path).
+
+Issues / corrections to the packet (none blocking):
+- None of the packet premises were wrong. All re-verified lines matched (plugins.py:20, main.py:68, expiry_tracker writers/values).
+- The live household has zero accepted-expiry classified assets, so the live GET /status returns an empty zeroed body; behavior is proven in-process (17 tests) and the live probe proves the served route/shape/status codes.
+
+UNCLEAR FIRST READ: whether the live status probe with an empty household was acceptable as "200 read-only shape only"; decided yes (shape + codes proven; no fixture data created live, per constraint).
+UNCLEAR DURING EXECUTION: whether an invalid category slug should be 422 or empty 200; decided empty 200 per PG-SC-07 ("matching nothing … never 404, never a silent fallback").
+UNCLEAR REMAINING: whether `by_tier` should expose a `"none"` key or omit untiered rows; chose the reconciling `"none"` key and documented it for the dashboard slice.

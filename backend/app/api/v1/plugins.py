@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+from datetime import date, datetime, timezone
 
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
@@ -11,11 +12,12 @@ from app.db import get_db
 from app.models.asset import Asset
 from app.models.assertion import Assertion
 from app.models.evidence import Evidence
+from app.models.household import Household
 from app.models.review_task import ReviewTask
 from app.plugins import expiry_tracker
 from app.plugins.expiry_tracker import ExpiryValidationError
 from app.plugins.registry import PluginError, get_plugin
-from app.services import audit_service
+from app.services import audit_service, expiry_engine
 
 router = APIRouter(prefix="/plugins/expiry-tracker")
 
@@ -57,6 +59,40 @@ def _assertion_view(assertion: Assertion | None) -> dict[str, object] | None:
 
 def _error(exc: ExpiryValidationError) -> HTTPException:
     return HTTPException(status_code=422, detail=str(exc))
+
+
+@router.get("/status")
+def read_status(
+    household_id: str = Query(...),
+    category: str | None = Query(None),
+    as_of: str | None = Query(None),
+    db: Session = Depends(get_db),
+) -> dict[str, object]:
+    """Read-only urgency status for a household (SG-107 Arc B engine).
+
+    `as_of` defaults to today UTC; a category that matches nothing returns an
+    empty zeroed result (200), never a fallback to the unfiltered set.
+    """
+    if db.query(Household).filter_by(id=household_id).first() is None:
+        raise HTTPException(status_code=404, detail="Household not found")
+    if as_of is None:
+        parsed_as_of = datetime.now(timezone.utc).date()
+    else:
+        try:
+            parsed_as_of = date.fromisoformat(as_of)
+        except ValueError as exc:
+            raise _error(
+                ExpiryValidationError("as_of must be a valid YYYY-MM-DD date")
+            ) from exc
+        if parsed_as_of.isoformat() != as_of:
+            raise _error(ExpiryValidationError("as_of must use YYYY-MM-DD format"))
+    canonical: str | None = None
+    if category is not None:
+        try:
+            canonical = expiry_tracker.canonical_category(category).slug
+        except ExpiryValidationError:
+            canonical = category
+    return expiry_engine.compute_status(db, household_id, parsed_as_of, category=canonical)
 
 
 @router.post("/assets/{asset_id}/classification")

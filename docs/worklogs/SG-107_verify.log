@@ -1,0 +1,465 @@
+SG-107 verify log — raw outputs (live clock; all commands bounded, none interactive, nothing killed)
+Work dir /home/andrei/StorageGenie · remote git@github.com:Andovol/StorageGenie.git
+Contract 0.33.0 (source path /home/andrei/storagegenie-contract/VERSION = 0.33.0; RULES.sha256 = 18de7fd7b3546bd7624b3a7b59a78bd629752816cd7fa8f1af6113d1bafc8d46 RULES.md)
+BASE_REF=origin/automation BASE_RESOLVED=107181644b54cc3f3dc2b3662ee511fe4ce1beaa (== start HEAD 107181644b54cc3f3dc2b3662ee511fe4ce1beaa)
+DATABASE: none live (read-only counts/health/status GETs only) · Restart: ONE backend recreate (D145/D143) · Deploy: THIS slice (backend-only)
+Model/effort from process arguments: argv = 'opencode run --auto --dir /home/andrei/StorageGenie --variant high <packet text>' (no --model flag → model is the CLI default); effort=high (from --variant high).
+Legend: G1 BEFORE / FAIL RUN / PASS RUN / SCOPE / SUITE+LINT / G2 BUILD / G2 RECREATE / G4 AFTER.
+
+################## G1 BEFORE (raw) ##################
+===== G1 BEFORE CAPTURE 2026-09-24T09:01:58Z =====
+--- BASE / HEAD ---
+BASE_REF=origin/automation BASE_RESOLVED=107181644b54cc3f3dc2b3662ee511fe4ce1beaa
+HEAD=107181644b54cc3f3dc2b3662ee511fe4ce1beaa
+branch=automation worktree_porcelain=
+--- IMAGE ID (storagegenie-backend:latest) ---
+image_id=sha256:dc6a4382c99d247ef51dc7f3742c52cf195d3d563adccb5fbc690a8c158086cb created=2026-09-23T19:36:42.876546404Z
+--- CONTAINER (storagegenie-backend-1) ---
+container_id=f2ca0be90eb0f982af332d3199b2cd7d0f333f248ca685a21f98425003f5a070 image=sha256:dc6a4382c99d247ef51dc7f3742c52cf195d3d563adccb5fbc690a8c158086cb RestartCount=0 Started=2026-09-23T19:37:30.381530703Z Health=healthy Ports={"8000/tcp":[{"HostIp":"127.0.0.1","HostPort":"8003"}]}
+--- docker ps ---
+f2ca0be90eb0 storagegenie-backend storagegenie-backend-1 Up 13 hours (healthy) 127.0.0.1:8003->8000/tcp
+--- SERVED index.html (loopback) ---
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>StorageGenie</title>
+    <script>
+      (function () {
+        try {
+          var stored = localStorage.getItem("sg-theme");
+          var dark =
+            stored === "dark" ||
+            ((stored === null || stored === "system") &&
+              window.matchMedia("(prefers-color-scheme: dark)").matches);
+          document.documentElement.classList.toggle("dark", dark);
+          document.documentElement.classList.toggle("light", !dark);
+        } catch (error) {
+          document.documentElement.classList.add("light");
+        }
+      })();
+    </script>
+    <script type="module" crossorigin src="/assets/index-DlD86cZ6.js"></script>
+    <link rel="stylesheet" crossorigin href="/assets/index-CoNI-1Zn.css">
+  </head>
+  <body>
+    <div id="root"></div>
+  </body>
+</html>
+JS_NAME=assets/index-DlD86cZ6.js CSS_NAME=assets/index-CoNI-1Zn.css
+--- SERVED BUNDLE fetched over loopback (what the consumer runs) ---
+307014 /tmp/sg107/before.js
+  3839 /tmp/sg107/before.css
+310853 total
+6e0a3af711f3dc822721deb53dde2d2f7775bab3d259dd0cb966a3af413af7c1  /tmp/sg107/before.js
+b18dbb336eef5c580bf0a2e6726d647c4f6c63edbc48373580d31e4508659ad3  /tmp/sg107/before.css
+--- IN-IMAGE asset list + sha256 (server-side identity) ---
+total 304
+-rw-r--r-- 1 root root   3839 Sep 23 19:36 index-CoNI-1Zn.css
+-rw-r--r-- 1 root root 307014 Sep 23 19:36 index-DlD86cZ6.js
+b18dbb336eef5c580bf0a2e6726d647c4f6c63edbc48373580d31e4508659ad3  /app/static/assets/index-CoNI-1Zn.css
+6e0a3af711f3dc822721deb53dde2d2f7775bab3d259dd0cb966a3af413af7c1  /app/static/assets/index-DlD86cZ6.js
+--- DB BYTES (host file) ---
+-rw------- 1 andrei andrei 552960 Sep 23 19:37 /home/andrei/StorageGenie/data/db/storagegenie.db
+-rw------- 1 andrei andrei  32768 Sep 23 19:37 /home/andrei/StorageGenie/data/db/storagegenie.db-shm
+-rw------- 1 andrei andrei      0 Sep 23 19:37 /home/andrei/StorageGenie/data/db/storagegenie.db-wal
+/home/andrei/StorageGenie/data/db/storagegenie.db 552960
+/home/andrei/StorageGenie/data/db/storagegenie.db-wal 0
+/home/andrei/StorageGenie/data/db/storagegenie.db-shm 32768
+--- ALEMBIC CURRENT (live DB, host sqlite3 read-only) ---
+20260923_sg100_enrich_snapshot
+--- TABLE COUNT ---
+25
+--- TABLE COUNTS (all tables, read-only) ---
+alembic_version=1
+assertion=28
+asset=6
+asset_evidence=12
+asset_fts=6
+asset_fts_config=1
+asset_fts_data=8
+asset_fts_docsize=6
+asset_fts_idx=6
+audit_event=68
+candidate=7
+enrich_snapshot=2
+evidence=13
+guardrail_event=2
+household=1
+idempotency_key=9
+job=8
+job_step=56
+observation=16
+planning_suggestion=0
+provider_call=17
+review_task=6
+saved_search=0
+source_attribution=0
+user=2
+--- HEALTH EXACT (loopback) ---
+{"status":"ok","db":"ok","storage":"ok"}
+--- GATE http :80 (Host storagegenie.dynv6.net) ---
+code=301 redirect=https://storagegenie.dynv6.net/
+--- GATE https :443 (Host+SNI storagegenie.dynv6.net) ---
+code=401 redirect=
+--- DB BYTES AFTER READS (must equal before) ---
+/home/andrei/StorageGenie/data/db/storagegenie.db 552960
+/home/andrei/StorageGenie/data/db/storagegenie.db-wal 0
+/home/andrei/StorageGenie/data/db/storagegenie.db-shm 32768
+===== END G1 BEFORE =====
+
+################## FAIL RUN (pre-implementation; raw) ##################
+===== SG-107 FAIL RUN (pre-implementation) 2026-09-24T09:03:52Z =====
+
+==================================== ERRORS ====================================
+______________ ERROR collecting tests/test_sg107_expiry_engine.py ______________
+ImportError while importing test module '/home/andrei/StorageGenie/backend/tests/test_sg107_expiry_engine.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+/usr/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_sg107_expiry_engine.py:27: in <module>
+    from app.services import expiry_engine
+E   ImportError: cannot import name 'expiry_engine' from 'app.services' (/home/andrei/StorageGenie/backend/app/services/__init__.py)
+=============================== warnings summary ===============================
+venv/lib/python3.12/site-packages/fastapi/testclient.py:1
+  /home/andrei/StorageGenie/backend/venv/lib/python3.12/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+venv/lib/python3.12/site-packages/starlette/testclient.py:53
+  /home/andrei/StorageGenie/backend/venv/lib/python3.12/site-packages/starlette/testclient.py:53: DeprecationWarning: The anyio.abc.BlockingPortal alias is deprecated, use anyio.from_thread.BlockingPortal instead.
+    _PortalFactoryType = Callable[[], AbstractContextManager[anyio.abc.BlockingPortal]]
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+ERROR tests/test_sg107_expiry_engine.py
+!!!!!!!!!!!!!!!!!!!! Interrupted: 1 error during collection !!!!!!!!!!!!!!!!!!!!
+2 warnings, 1 error in 0.69s
+fail_run_exit=2
+
+################## PASS RUN (post-implementation; raw) ##################
+===== SG-107 PASS RUN (post-implementation) 2026-09-24T09:04:26Z =====
+.................                                                        [100%]
+=============================== warnings summary ===============================
+venv/lib/python3.12/site-packages/fastapi/testclient.py:1
+  /home/andrei/StorageGenie/backend/venv/lib/python3.12/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+venv/lib/python3.12/site-packages/starlette/testclient.py:53
+  /home/andrei/StorageGenie/backend/venv/lib/python3.12/site-packages/starlette/testclient.py:53: DeprecationWarning: The anyio.abc.BlockingPortal alias is deprecated, use anyio.from_thread.BlockingPortal instead.
+    _PortalFactoryType = Callable[[], AbstractContextManager[anyio.abc.BlockingPortal]]
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+17 passed, 2 warnings in 1.59s
+pass_run_exit=0
+
+################## PASS RUN verbose (raw) ##################
+tests/test_sg107_expiry_engine.py::test_category_windows_are_the_declared_uncalibrated_data PASSED [  5%]
+tests/test_sg107_expiry_engine.py::test_boundary_table_reproduces_every_category_window PASSED [ 11%]
+tests/test_sg107_expiry_engine.py::test_non_perishable_tier_is_null_and_bucket_still_computed PASSED [ 17%]
+tests/test_sg107_expiry_engine.py::test_bucket_boundaries PASSED         [ 23%]
+tests/test_sg107_expiry_engine.py::test_days_remaining_is_calendar_difference PASSED [ 29%]
+tests/test_sg107_expiry_engine.py::test_discrimination_proposed_near_date_never_tiers PASSED [ 35%]
+tests/test_sg107_expiry_engine.py::test_unresolved_reasons_cover_all_four PASSED [ 41%]
+tests/test_sg107_expiry_engine.py::test_household_isolation PASSED       [ 47%]
+tests/test_sg107_expiry_engine.py::test_as_of_shifts_days_exactly PASSED [ 52%]
+tests/test_sg107_expiry_engine.py::test_urgency_sort_is_expired_first_then_days_ascending PASSED [ 58%]
+tests/test_sg107_expiry_engine.py::test_compute_status_writes_nothing PASSED [ 64%]
+tests/test_sg107_expiry_engine.py::test_route_shape_summary_reconciles_and_writes_nothing PASSED [ 70%]
+tests/test_sg107_expiry_engine.py::test_route_empty_sets_are_200_and_zeroed PASSED [ 76%]
+tests/test_sg107_expiry_engine.py::test_route_category_filter_narrows_without_fallback PASSED [ 82%]
+tests/test_sg107_expiry_engine.py::test_route_unknown_household_404 PASSED [ 88%]
+tests/test_sg107_expiry_engine.py::test_route_unparseable_as_of_422 PASSED [ 94%]
+tests/test_sg107_expiry_engine.py::test_route_default_as_of_is_live_today PASSED [100%]
+======================== 17 passed, 2 warnings in 1.46s ========================
+
+################## SCOPE PROOF (raw) ##################
+===== SCOPE PROOF 2026-09-24T09:06:19Z =====
+--- git status --porcelain ---
+ M backend/app/api/v1/plugins.py
+?? backend/app/services/expiry_engine.py
+?? backend/tests/test_sg107_expiry_engine.py
+--- tracked diff --stat ---
+ backend/app/api/v1/plugins.py | 38 +++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 37 insertions(+), 1 deletion(-)
+--- empty-diff gates (must be empty) ---
+models: 0
+alembic: 0
+frontend: 0
+analytics: 0
+expiry_tracker.py: 0
+main.py: 0
+--- plugins.py route hunk (raw) ---
+diff --git a/backend/app/api/v1/plugins.py b/backend/app/api/v1/plugins.py
+index b42af67..e70b1d4 100644
+--- a/backend/app/api/v1/plugins.py
++++ b/backend/app/api/v1/plugins.py
+@@ -3,6 +3,7 @@
+ from __future__ import annotations
+ 
+ import json
++from datetime import date, datetime, timezone
+ 
+ from fastapi import APIRouter, Depends, HTTPException, Query
+ from sqlalchemy.orm import Session
+@@ -11,11 +12,12 @@ from app.db import get_db
+ from app.models.asset import Asset
+ from app.models.assertion import Assertion
+ from app.models.evidence import Evidence
++from app.models.household import Household
+ from app.models.review_task import ReviewTask
+ from app.plugins import expiry_tracker
+ from app.plugins.expiry_tracker import ExpiryValidationError
+ from app.plugins.registry import PluginError, get_plugin
+-from app.services import audit_service
++from app.services import audit_service, expiry_engine
+ 
+ router = APIRouter(prefix="/plugins/expiry-tracker")
+ 
+@@ -59,6 +61,40 @@ def _error(exc: ExpiryValidationError) -> HTTPException:
+     return HTTPException(status_code=422, detail=str(exc))
+ 
+ 
++@router.get("/status")
++def read_status(
++    household_id: str = Query(...),
++    category: str | None = Query(None),
++    as_of: str | None = Query(None),
++    db: Session = Depends(get_db),
++) -> dict[str, object]:
++    """Read-only urgency status for a household (SG-107 Arc B engine).
++
++    `as_of` defaults to today UTC; a category that matches nothing returns an
++    empty zeroed result (200), never a fallback to the unfiltered set.
++    """
++    if db.query(Household).filter_by(id=household_id).first() is None:
++        raise HTTPException(status_code=404, detail="Household not found")
++    if as_of is None:
++        parsed_as_of = datetime.now(timezone.utc).date()
++    else:
++        try:
++            parsed_as_of = date.fromisoformat(as_of)
++        except ValueError as exc:
++            raise _error(
++                ExpiryValidationError("as_of must be a valid YYYY-MM-DD date")
++            ) from exc
++        if parsed_as_of.isoformat() != as_of:
++            raise _error(ExpiryValidationError("as_of must use YYYY-MM-DD format"))
++    canonical: str | None = None
++    if category is not None:
++        try:
++            canonical = expiry_tracker.canonical_category(category).slug
++        except ExpiryValidationError:
++            canonical = category
++    return expiry_engine.compute_status(db, household_id, parsed_as_of, category=canonical)
++
++
+ @router.post("/assets/{asset_id}/classification")
+ def classify(
+     asset_id: str,
+--- .gitignore re-verify (PG-SC-10) ---
+check_ignore_exit=1
+===== END SCOPE =====
+
+################## SUITE+LINT (final; raw) ##################
+===== SG-107 SUITE+LINT (final, post ruff-fix) 2026-09-24T09:06:28Z =====
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/test_signals.py::test_generated_codes_are_validated_and_bad_checksum_is_not_an_identifier
+FAILED tests/test_signals.py::test_ocr_has_text_boxes_and_mean_confidence - a...
+2 failed, 529 passed, 26 warnings in 23.39s
+pytest_exit=1
+===== RUFF =====
+All checks passed!
+ruff_exit=0
+===== MYPY (delta vs baseline 41) =====
+app/main.py:54: error: Unused "type: ignore" comment  [unused-ignore]
+Found 41 errors in 9 files (checked 85 source files)
+===== END =====
+
+################## G2 BUILD (raw) ##################
+===== G2 BUILD 2026-09-24T09:05:20Z =====
+--- image BEFORE build ---
+image_id=sha256:dc6a4382c99d247ef51dc7f3742c52cf195d3d563adccb5fbc690a8c158086cb created=2026-09-23T19:36:42.876546404Z
+--- BUILD (BUILDX_CONFIG=/tmp/sg107/buildx) ---
+#20 0.629   Building editable for storagegenie-backend (pyproject.toml): finished with status 'done'
+#20 0.630   Created wheel for storagegenie-backend: filename=storagegenie_backend-0.1.0-py3-none-any.whl size=1312 sha256=f4166b49f2f07a3bd74e74020395150b5181fe8d995a32e9cf51cdea546bdf4c
+#20 0.630   Stored in directory: /tmp/pip-ephem-wheel-cache-myjbrugk/wheels/54/1b/b7/aa63e25c8f14f4f2ae7b04e6097bdecb770e455c5c1ee0a600
+#20 0.633 Successfully built storagegenie-backend
+#20 0.633 Installing collected packages: storagegenie-backend
+#20 0.641 Successfully installed storagegenie-backend-0.1.0
+#20 0.641 WARNING: Running pip as the 'root' user can result in broken permissions and conflicting behaviour with the system package manager, possibly rendering your system unusable. It is recommended to use a virtual environment instead: https://pip.pypa.io/warnings/venv. Use the --root-user-action option if you know what you are doing and want to suppress this warning.
+#20 0.700 
+#20 0.700 [notice] A new release of pip is available: 25.0.1 -> 26.2.1
+#20 0.700 [notice] To update, run: pip install --upgrade pip
+#20 DONE 0.8s
+
+#21 [stage-1 9/9] COPY --from=frontend-build /ui/dist ./static
+#21 DONE 0.0s
+
+#22 exporting to image
+#22 exporting layers
+#22 exporting layers 4.3s done
+#22 exporting manifest sha256:90cb3f100e4101811123737b2e2eacfce71335986544692a761e0bf27dbb3d8f done
+#22 exporting config sha256:98db393f39fb6e362b010332bd5a914dfeee7c8988e0cc64adcb8c0b9c0967db done
+#22 exporting attestation manifest sha256:f74787ca6deca80524a316e12fe466aa61e10dc8f7a53b7b130d11c966713fe9 done
+#22 exporting manifest list sha256:8dce9eb2cec50309d858b9eb13259a77cb597ede1b9ec35762141f86d11f0781 done
+#22 naming to docker.io/library/storagegenie-backend:latest done
+#22 unpacking to docker.io/library/storagegenie-backend:latest
+#22 unpacking to docker.io/library/storagegenie-backend:latest 1.6s done
+#22 DONE 5.9s
+
+#23 resolving provenance for metadata file
+#23 DONE 0.0s
+ Image storagegenie-backend Built 
+build_exit=0
+build_elapsed=11s
+--- image AFTER build ---
+image_id=sha256:8dce9eb2cec50309d858b9eb13259a77cb597ede1b9ec35762141f86d11f0781 created=2026-09-24T09:05:25.737576576Z
+===== END BUILD =====
+
+################## G2 RECREATE (raw) ##################
+===== G2 RECREATE (exactly ONE up -d --no-deps backend) 2026-09-24T09:05:38Z =====
+--- before: docker ps ---
+f2ca0be90eb0 dc6a4382c99d storagegenie-backend-1 Up 13 hours (healthy)
+before_container=f2ca0be90eb0f982af332d3199b2cd7d0f333f248ca685a21f98425003f5a070 image=sha256:dc6a4382c99d247ef51dc7f3742c52cf195d3d563adccb5fbc690a8c158086cb RestartCount=0
+ Container storagegenie-backend-1 Recreate 
+ Container storagegenie-backend-1 Recreated 
+ Container storagegenie-backend-1 Starting 
+ Container storagegenie-backend-1 Started 
+up_exit=0
+recreate_cmd_elapsed=1s
+--- wait for health (up to 60s) ---
+t=2s health=starting
+t=4s health=starting
+t=6s health=starting
+t=8s health=starting
+t=10s health=starting
+t=12s health=healthy
+--- after: docker ps ---
+171e3d7ec196 storagegenie-backend storagegenie-backend-1 Up 12 seconds (healthy) 127.0.0.1:8003->8000/tcp
+after_container=171e3d7ec196d7cbaa2d4f0b6f8c79457d5a0ee4b7a787140b20dc7efcdda9b8 image=sha256:8dce9eb2cec50309d858b9eb13259a77cb597ede1b9ec35762141f86d11f0781 RestartCount=0 Started=2026-09-24T09:05:39.231093171Z Health=healthy Ports={"8000/tcp":[{"HostIp":"127.0.0.1","HostPort":"8003"}]}
+===== END RECREATE =====
+
+################## G4 AFTER (raw) ##################
+===== G4 AFTER CAPTURE 2026-09-24T09:06:06Z =====
+--- docker ps ---
+171e3d7ec196 storagegenie-backend storagegenie-backend-1 Up 27 seconds (healthy) 127.0.0.1:8003->8000/tcp
+--- docker images (storagegenie) ---
+storagegenie-backend latest 8dce9eb2cec5 826MB 41 seconds ago
+storagegenie-frontend latest cbd3cbb8291b 579MB 12 days ago
+--- inspect fresh container ---
+container_id=171e3d7ec196d7cbaa2d4f0b6f8c79457d5a0ee4b7a787140b20dc7efcdda9b8 image=sha256:8dce9eb2cec50309d858b9eb13259a77cb597ede1b9ec35762141f86d11f0781 RestartCount=0 Started=2026-09-24T09:05:39.231093171Z Health=healthy Ports={"8000/tcp":[{"HostIp":"127.0.0.1","HostPort":"8003"}]}
+--- SERVED index.html (loopback through fresh container) ---
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>StorageGenie</title>
+    <script>
+      (function () {
+        try {
+          var stored = localStorage.getItem("sg-theme");
+          var dark =
+            stored === "dark" ||
+            ((stored === null || stored === "system") &&
+              window.matchMedia("(prefers-color-scheme: dark)").matches);
+          document.documentElement.classList.toggle("dark", dark);
+          document.documentElement.classList.toggle("light", !dark);
+        } catch (error) {
+          document.documentElement.classList.add("light");
+        }
+      })();
+    </script>
+    <script type="module" crossorigin src="/assets/index-DlD86cZ6.js"></script>
+    <link rel="stylesheet" crossorigin href="/assets/index-CoNI-1Zn.css">
+  </head>
+  <body>
+    <div id="root"></div>
+  </body>
+</html>
+JS_NAME=assets/index-DlD86cZ6.js CSS_NAME=assets/index-CoNI-1Zn.css
+--- SERVED BUNDLE fetched over loopback (AFTER) ---
+307014 /tmp/sg107/after.js
+  3839 /tmp/sg107/after.css
+310853 total
+6e0a3af711f3dc822721deb53dde2d2f7775bab3d259dd0cb966a3af413af7c1  /tmp/sg107/after.js
+b18dbb336eef5c580bf0a2e6726d647c4f6c63edbc48373580d31e4508659ad3  /tmp/sg107/after.css
+--- BUNDLE BEFORE vs AFTER ---
+6e0a3af711f3dc822721deb53dde2d2f7775bab3d259dd0cb966a3af413af7c1  /tmp/sg107/before.js
+6e0a3af711f3dc822721deb53dde2d2f7775bab3d259dd0cb966a3af413af7c1  /tmp/sg107/after.js
+b18dbb336eef5c580bf0a2e6726d647c4f6c63edbc48373580d31e4508659ad3  /tmp/sg107/before.css
+b18dbb336eef5c580bf0a2e6726d647c4f6c63edbc48373580d31e4508659ad3  /tmp/sg107/after.css
+JS byte-identical=YES
+CSS byte-identical=YES
+--- IN-IMAGE asset list + sha256 ---
+total 304
+-rw-r--r-- 1 root root   3839 Sep 23 19:36 index-CoNI-1Zn.css
+-rw-r--r-- 1 root root 307014 Sep 23 19:36 index-DlD86cZ6.js
+b18dbb336eef5c580bf0a2e6726d647c4f6c63edbc48373580d31e4508659ad3  /app/static/assets/index-CoNI-1Zn.css
+6e0a3af711f3dc822721deb53dde2d2f7775bab3d259dd0cb966a3af413af7c1  /app/static/assets/index-DlD86cZ6.js
+--- IN-IMAGE engine + route presence proof (fresh image) ---
+-rw-r--r-- 1 root root 7933 Sep 24 09:04 /app/app/services/expiry_engine.py
+162:def compute_status(
+64:@router.get("/status")
+--- ALEMBIC CURRENT (live DB, host sqlite3 read-only) ---
+20260923_sg100_enrich_snapshot
+--- TABLE COUNT ---
+25
+--- TABLE COUNTS (all tables, read-only) ---
+alembic_version=1
+assertion=28
+asset=6
+asset_evidence=12
+asset_fts=6
+asset_fts_config=1
+asset_fts_data=8
+asset_fts_docsize=6
+asset_fts_idx=6
+audit_event=68
+candidate=7
+enrich_snapshot=2
+evidence=13
+guardrail_event=2
+household=1
+idempotency_key=9
+job=8
+job_step=56
+observation=16
+planning_suggestion=0
+provider_call=17
+review_task=6
+saved_search=0
+source_attribution=0
+user=2
+--- HEALTH EXACT x6 (fresh container, loopback) ---
+health[1]={"status":"ok","db":"ok","storage":"ok"}
+health[2]={"status":"ok","db":"ok","storage":"ok"}
+health[3]={"status":"ok","db":"ok","storage":"ok"}
+health[4]={"status":"ok","db":"ok","storage":"ok"}
+health[5]={"status":"ok","db":"ok","storage":"ok"}
+health[6]={"status":"ok","db":"ok","storage":"ok"}
+--- STATUS ROUTE PROBE (read-only; shape only) ---
+household_id=01a0a029-1477-7ca0-b200-bce78a96c679
+code_and_body:
+{"household_id":"01a0a029-1477-7ca0-b200-bce78a96c679","as_of":"2026-09-24","category":null,"rows":[],"summary":{"by_tier":{},"by_bucket":{},"unresolved":0,"total":0},"unresolved_rows":[]}
+http_code=200
+--- STATUS ROUTE 404 (unknown household, read-only) ---
+{"type":"about:blank","title":"Not Found","status":404,"detail":"Household not found"}
+http_code=404
+--- STATUS ROUTE 422 (bad as_of, read-only) ---
+{"type":"about:blank","title":"Unprocessable Entity","status":422,"detail":"as_of must be a valid YYYY-MM-DD date"}
+http_code=422
+--- GATE http :80 (Host storagegenie.dynv6.net) ---
+code=301 redirect=https://storagegenie.dynv6.net/
+--- GATE https :443 (Host+SNI storagegenie.dynv6.net) ---
+code=401 redirect=
+--- DB BYTES (host file) ---
+/home/andrei/StorageGenie/data/db/storagegenie.db 552960
+/home/andrei/StorageGenie/data/db/storagegenie.db-wal 0
+/home/andrei/StorageGenie/data/db/storagegenie.db-shm 32768
+===== END G4 AFTER =====
