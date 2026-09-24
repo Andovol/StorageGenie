@@ -6,6 +6,7 @@ import tempfile
 import zlib
 from pathlib import Path
 
+import pillow_heif
 import pytest
 
 TEST_ROOT = Path(tempfile.mkdtemp(prefix="storagegenie-evidence-tests-"))
@@ -127,6 +128,17 @@ def classic_tiff_bytes(byteorder: str) -> bytes:
     return output.getvalue()
 
 
+def heif_bytes(major_brand: bytes = b"heic", color: str = "red") -> bytes:
+    # SG-110: encode with pillow-heif directly (no Pillow opener registration at
+    # module scope) so the route leg proves the SERVER's registration, not ours.
+    image = Image.new("RGB", (64, 48), color)
+    output = io.BytesIO()
+    pillow_heif.from_pillow(image).save(output, quality=50)
+    data = bytearray(output.getvalue())
+    data[8:12] = major_brand
+    return bytes(data)
+
+
 @pytest.mark.parametrize(
     ("file_bytes", "claimed", "expected"),
     [
@@ -136,6 +148,16 @@ def classic_tiff_bytes(byteorder: str) -> bytes:
         (b"RIFF\x00\x00\x00\x00WEBP", "image/webp", "image/webp"),
         (b"II*\x00fixture", "image/tiff", "image/tiff"),
         (b"MM\x00*fixture", "image/tiff", "image/tiff"),
+        (b"\x00\x00\x00\x10ftypheic\x00\x00\x00\x00", "image/heic", "image/heic"),
+        (b"\x00\x00\x00\x10ftypheix\x00\x00\x00\x00", "image/heic", "image/heic"),
+        (b"\x00\x00\x00\x10ftypheim\x00\x00\x00\x00", "image/heic", "image/heic"),
+        (b"\x00\x00\x00\x10ftypheis\x00\x00\x00\x00", "image/heic", "image/heic"),
+        (b"\x00\x00\x00\x10ftyphevc\x00\x00\x00\x00", "image/heic", "image/heic"),
+        (b"\x00\x00\x00\x10ftyphevx\x00\x00\x00\x00", "image/heic", "image/heic"),
+        (b"\x00\x00\x00\x10ftyphevm\x00\x00\x00\x00", "image/heic", "image/heic"),
+        (b"\x00\x00\x00\x10ftyphevs\x00\x00\x00\x00", "image/heic", "image/heic"),
+        (b"\x00\x00\x00\x10ftypmif1\x00\x00\x00\x00", "image/heif", "image/heif"),
+        (b"\x00\x00\x00\x10ftypmsf1\x00\x00\x00\x00", "image/heif", "image/heif"),
     ],
 )
 def test_detect_media_type_accepts_every_supported_signature(file_bytes, claimed, expected) -> None:  # type: ignore[no-untyped-def]
@@ -145,6 +167,20 @@ def test_detect_media_type_accepts_every_supported_signature(file_bytes, claimed
 def test_detect_media_type_rejects_unknown_signature() -> None:
     with pytest.raises(evidence_service.EvidenceValidationError) as exc_info:
         evidence_service._detect_media_type(b"not-an-image", "application/octet-stream")
+
+    assert str(exc_info.value) == "media_type_mismatch: unsupported media signature"
+
+
+@pytest.mark.parametrize(
+    ("file_bytes", "claimed"),
+    [
+        (b"\x00\x00\x00\x10ftypavif\x00\x00\x00\x00", "image/heic"),
+        (b"\x00\x00\x00\x10ftypheia\x00\x00\x00\x00", "image/heic"),
+    ],
+)
+def test_detect_media_type_rejects_ftyp_variants_outside_the_table(file_bytes, claimed) -> None:  # type: ignore[no-untyped-def]
+    with pytest.raises(evidence_service.EvidenceValidationError) as exc_info:
+        evidence_service._detect_media_type(file_bytes, claimed)
 
     assert str(exc_info.value) == "media_type_mismatch: unsupported media signature"
 
@@ -166,6 +202,34 @@ def test_endpoint_accepts_classic_tiff_in_both_byte_orders(db) -> None:  # type:
         with Image.open(TEST_STORAGE_ROOT / payload["storage_key"]) as decoded:
             assert decoded.size == (17, 11)
             decoded.load()
+
+
+@pytest.mark.parametrize(
+    ("major_brand", "claimed"),
+    [(b"heic", "image/heic"), (b"mif1", "image/heif")],
+)
+def test_endpoint_accepts_generated_heif_with_thumbnail(db, major_brand, claimed) -> None:  # type: ignore[no-untyped-def]
+    _, household_id = db
+    image_bytes = heif_bytes(major_brand=major_brand)
+    with TestClient(app) as client:
+        response = client.post(
+            "/v1/evidence",
+            params={"household_id": household_id},
+            files={"file": (f"fixture-{major_brand.decode()}.heic", image_bytes, claimed)},
+        )
+
+    assert response.status_code == 201
+    payload = response.json()
+    assert payload["media_type"] == claimed
+    with Image.open(TEST_STORAGE_ROOT / payload["storage_key"]) as decoded:
+        assert decoded.size == (64, 48)
+        decoded.load()
+    thumbnail = thumbnail_path(payload["storage_key"], settings.thumbnail_sizes[0])
+    assert thumbnail.exists()
+    with Image.open(thumbnail) as thumb:
+        thumb.load()
+        assert thumb.format == "JPEG"
+        assert max(thumb.size) <= settings.thumbnail_sizes[0]
 
 
 def test_store_is_idempotent_audited_and_writes_thumbnail(db) -> None:  # type: ignore[no-untyped-def]

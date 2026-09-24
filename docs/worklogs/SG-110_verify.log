@@ -1,0 +1,1134 @@
+SG-110 verify log — raw outputs, gates, live captures, BOTH fail-then-pass runs, BEFORE/AFTER pairs
+Work dir /home/andrei/StorageGenie · branch automation · remote git@github.com:Andovol/StorageGenie.git
+Contract 0.33.0 (source /home/andrei/storagegenie-contract/VERSION = 0.33.0; HEAD b232b845d74e89cb346c60fa4b9a40ec401c42dd = 'Contract payload 0.33.0'; RULES.md sha256 18de7fd7b3546bd7624b3a7b59a78bd629752816cd7fa8f1af6113d1bafc8d46 == payload RULES.sha256)
+BASE_REF=origin/automation BASE_RESOLVED=89d30ccdc49aec04ee0f0b5ae4aca5cd7e469a79 (== start HEAD)
+DATABASE: none live (tests on temp DBs; post-restart probes read-only) · Restart: ONE backend recreate (D145/D154) · Deploy: THIS slice
+Model/effort from process arguments: /proc/3782928/cmdline = 'opencode run --auto --dir /home/andrei/StorageGenie --variant high <packet>' (no --model flag → model is the CLI default; no provider metadata readable) → effort=high (from --variant high); model=unknown (not named in argv, not read from provider metadata — refusing to guess)
+Legend: G1 BEFORE / FAIL RUN / PASS RUN / SUITE+LINT+SECRET GATES / G3 BUILD+RECREATE / G4 AFTER / CROSS-PRODUCT / RECEIPT.
+
+################## G1 BEFORE (raw) ##################
+===== G1 BEFORE CAPTURE 2026-09-24T10:25:57Z =====
+--- BASE / HEAD ---
+BASE_REF=origin/automation BASE_RESOLVED=89d30ccdc49aec04ee0f0b5ae4aca5cd7e469a79
+HEAD=89d30ccdc49aec04ee0f0b5ae4aca5cd7e469a79
+branch=automation worktree_porcelain=
+--- IMAGE ID (storagegenie-backend:latest) ---
+image_id=sha256:6a555108f9a47a828db328162950e451f9c67aaae4d700ceb47e973a47e858ed created=2026-09-24T09:20:37.456745876Z
+--- CONTAINER ---
+container_id=234b04b0f1e2c553439ce00b7fbcff30cecea1ab9e612a92702e22534f397d97 image=sha256:6a555108f9a47a828db328162950e451f9c67aaae4d700ceb47e973a47e858ed RestartCount=0 Started=2026-09-24T09:20:43.210516402Z Health=healthy
+--- docker ps ---
+234b04b0f1e2 storagegenie-backend storagegenie-backend-1 Up About an hour (healthy) 127.0.0.1:8003->8000/tcp
+--- ALEMBIC CURRENT (live DB, host sqlite3 read-only) ---
+20260923_sg100_enrich_snapshot
+--- TABLE COUNT ---
+25
+--- TABLE COUNTS (all tables, read-only) ---
+alembic_version=1
+assertion=28
+asset=6
+asset_evidence=12
+asset_fts=6
+asset_fts_config=1
+asset_fts_data=8
+asset_fts_docsize=6
+asset_fts_idx=6
+audit_event=68
+candidate=7
+enrich_snapshot=2
+evidence=13
+guardrail_event=2
+household=1
+idempotency_key=9
+job=8
+job_step=56
+observation=16
+planning_suggestion=0
+provider_call=17
+review_task=6
+saved_search=0
+source_attribution=0
+user=2
+--- HEALTH EXACT (loopback) ---
+{"status":"ok","db":"ok","storage":"ok"}
+--- HOUSEHOLD IDS (read-only) ---
+01a0a029-1477-7ca0-b200-bce78a96c679
+--- GATE http :80 via --resolve localhost ---
+code=301 redirect=https://storagegenie.dynv6.net/
+--- GATE https :443 via --resolve localhost ---
+code=401 redirect=
+--- HEIC PROBE (crafted ftypheic bytes -> POST /v1/evidence image/heic) ---
+crafted_ftypheic_bytes=24 major_brand=b'heic'
+probe_http=422
+probe_body={"type":"about:blank","title":"Unprocessable Entity","status":422,"detail":"media_type_mismatch: unsupported media signature"}
+===== END G1 BEFORE =====
+
+
+################## FAIL RUN (final test file, implementation absent; raw) ##################
+
+......FFFFFFFFFF...FF.                                                   [100%]
+=================================== FAILURES ===================================
+_ test_detect_media_type_accepts_every_supported_signature[\x00\x00\x00\x10ftypheic\x00\x00\x00\x00-image/heic-image/heic] _
+
+file_bytes = b'\x00\x00\x00\x10ftypheic\x00\x00\x00\x00', claimed = 'image/heic'
+expected = 'image/heic'
+
+    @pytest.mark.parametrize(
+        ("file_bytes", "claimed", "expected"),
+        [
+            (b"\xff\xd8\xfffixture", "image/jpeg", "image/jpeg"),
+            (b"\x89PNG\r\n\x1afixture", "image/png", "image/png"),
+            (b"%PDF-1.7 fixture", "application/pdf", "application/pdf"),
+            (b"RIFF\x00\x00\x00\x00WEBP", "image/webp", "image/webp"),
+            (b"II*\x00fixture", "image/tiff", "image/tiff"),
+            (b"MM\x00*fixture", "image/tiff", "image/tiff"),
+            (b"\x00\x00\x00\x10ftypheic\x00\x00\x00\x00", "image/heic", "image/heic"),
+            (b"\x00\x00\x00\x10ftypheix\x00\x00\x00\x00", "image/heic", "image/heic"),
+            (b"\x00\x00\x00\x10ftypheim\x00\x00\x00\x00", "image/heic", "image/heic"),
+            (b"\x00\x00\x00\x10ftypheis\x00\x00\x00\x00", "image/heic", "image/heic"),
+            (b"\x00\x00\x00\x10ftyphevc\x00\x00\x00\x00", "image/heic", "image/heic"),
+            (b"\x00\x00\x00\x10ftyphevx\x00\x00\x00\x00", "image/heic", "image/heic"),
+            (b"\x00\x00\x00\x10ftyphevm\x00\x00\x00\x00", "image/heic", "image/heic"),
+            (b"\x00\x00\x00\x10ftyphevs\x00\x00\x00\x00", "image/heic", "image/heic"),
+            (b"\x00\x00\x00\x10ftypmif1\x00\x00\x00\x00", "image/heif", "image/heif"),
+            (b"\x00\x00\x00\x10ftypmsf1\x00\x00\x00\x00", "image/heif", "image/heif"),
+        ],
+    )
+    def test_detect_media_type_accepts_every_supported_signature(file_bytes, claimed, expected) -> None:  # type: ignore[no-untyped-def]
+>       assert evidence_service._detect_media_type(file_bytes, claimed) == expected
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_evidence_upload.py:164: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+file_bytes = b'\x00\x00\x00\x10ftypheic\x00\x00\x00\x00', claimed = 'image/heic'
+
+    def _detect_media_type(file_bytes: bytes, claimed: str) -> str:
+        detected: str | None = None
+        if file_bytes.startswith(b"\xff\xd8\xff"):
+            detected = "image/jpeg"
+        elif file_bytes.startswith(b"\x89PNG"):
+            detected = "image/png"
+        elif file_bytes.startswith(b"%PDF"):
+            detected = "application/pdf"
+        elif file_bytes.startswith(b"RIFF") and len(file_bytes) >= 12 and file_bytes[8:12] == b"WEBP":
+            detected = "image/webp"
+        elif file_bytes.startswith((b"II*\x00", b"MM\x00*")):
+            detected = "image/tiff"
+    
+        if detected is None:
+>           raise EvidenceValidationError("media_type_mismatch: unsupported media signature")
+E           app.services.evidence_service.EvidenceValidationError: media_type_mismatch: unsupported media signature
+
+app/services/evidence_service.py:70: EvidenceValidationError
+_ test_detect_media_type_accepts_every_supported_signature[\x00\x00\x00\x10ftypheix\x00\x00\x00\x00-image/heic-image/heic] _
+
+file_bytes = b'\x00\x00\x00\x10ftypheix\x00\x00\x00\x00', claimed = 'image/heic'
+expected = 'image/heic'
+
+    @pytest.mark.parametrize(
+        ("file_bytes", "claimed", "expected"),
+        [
+            (b"\xff\xd8\xfffixture", "image/jpeg", "image/jpeg"),
+            (b"\x89PNG\r\n\x1afixture", "image/png", "image/png"),
+            (b"%PDF-1.7 fixture", "application/pdf", "application/pdf"),
+            (b"RIFF\x00\x00\x00\x00WEBP", "image/webp", "image/webp"),
+            (b"II*\x00fixture", "image/tiff", "image/tiff"),
+            (b"MM\x00*fixture", "image/tiff", "image/tiff"),
+            (b"\x00\x00\x00\x10ftypheic\x00\x00\x00\x00", "image/heic", "image/heic"),
+            (b"\x00\x00\x00\x10ftypheix\x00\x00\x00\x00", "image/heic", "image/heic"),
+            (b"\x00\x00\x00\x10ftypheim\x00\x00\x00\x00", "image/heic", "image/heic"),
+            (b"\x00\x00\x00\x10ftypheis\x00\x00\x00\x00", "image/heic", "image/heic"),
+            (b"\x00\x00\x00\x10ftyphevc\x00\x00\x00\x00", "image/heic", "image/heic"),
+            (b"\x00\x00\x00\x10ftyphevx\x00\x00\x00\x00", "image/heic", "image/heic"),
+            (b"\x00\x00\x00\x10ftyphevm\x00\x00\x00\x00", "image/heic", "image/heic"),
+            (b"\x00\x00\x00\x10ftyphevs\x00\x00\x00\x00", "image/heic", "image/heic"),
+            (b"\x00\x00\x00\x10ftypmif1\x00\x00\x00\x00", "image/heif", "image/heif"),
+            (b"\x00\x00\x00\x10ftypmsf1\x00\x00\x00\x00", "image/heif", "image/heif"),
+        ],
+    )
+    def test_detect_media_type_accepts_every_supported_signature(file_bytes, claimed, expected) -> None:  # type: ignore[no-untyped-def]
+>       assert evidence_service._detect_media_type(file_bytes, claimed) == expected
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_evidence_upload.py:164: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+file_bytes = b'\x00\x00\x00\x10ftypheix\x00\x00\x00\x00', claimed = 'image/heic'
+
+    def _detect_media_type(file_bytes: bytes, claimed: str) -> str:
+        detected: str | None = None
+        if file_bytes.startswith(b"\xff\xd8\xff"):
+            detected = "image/jpeg"
+        elif file_bytes.startswith(b"\x89PNG"):
+            detected = "image/png"
+        elif file_bytes.startswith(b"%PDF"):
+            detected = "application/pdf"
+        elif file_bytes.startswith(b"RIFF") and len(file_bytes) >= 12 and file_bytes[8:12] == b"WEBP":
+            detected = "image/webp"
+        elif file_bytes.startswith((b"II*\x00", b"MM\x00*")):
+            detected = "image/tiff"
+    
+        if detected is None:
+>           raise EvidenceValidationError("media_type_mismatch: unsupported media signature")
+E           app.services.evidence_service.EvidenceValidationError: media_type_mismatch: unsupported media signature
+
+app/services/evidence_service.py:70: EvidenceValidationError
+_ test_detect_media_type_accepts_every_supported_signature[\x00\x00\x00\x10ftypheim\x00\x00\x00\x00-image/heic-image/heic] _
+
+file_bytes = b'\x00\x00\x00\x10ftypheim\x00\x00\x00\x00', claimed = 'image/heic'
+expected = 'image/heic'
+
+    @pytest.mark.parametrize(
+        ("file_bytes", "claimed", "expected"),
+        [
+            (b"\xff\xd8\xfffixture", "image/jpeg", "image/jpeg"),
+            (b"\x89PNG\r\n\x1afixture", "image/png", "image/png"),
+            (b"%PDF-1.7 fixture", "application/pdf", "application/pdf"),
+            (b"RIFF\x00\x00\x00\x00WEBP", "image/webp", "image/webp"),
+            (b"II*\x00fixture", "image/tiff", "image/tiff"),
+            (b"MM\x00*fixture", "image/tiff", "image/tiff"),
+            (b"\x00\x00\x00\x10ftypheic\x00\x00\x00\x00", "image/heic", "image/heic"),
+            (b"\x00\x00\x00\x10ftypheix\x00\x00\x00\x00", "image/heic", "image/heic"),
+            (b"\x00\x00\x00\x10ftypheim\x00\x00\x00\x00", "image/heic", "image/heic"),
+            (b"\x00\x00\x00\x10ftypheis\x00\x00\x00\x00", "image/heic", "image/heic"),
+            (b"\x00\x00\x00\x10ftyphevc\x00\x00\x00\x00", "image/heic", "image/heic"),
+            (b"\x00\x00\x00\x10ftyphevx\x00\x00\x00\x00", "image/heic", "image/heic"),
+            (b"\x00\x00\x00\x10ftyphevm\x00\x00\x00\x00", "image/heic", "image/heic"),
+            (b"\x00\x00\x00\x10ftyphevs\x00\x00\x00\x00", "image/heic", "image/heic"),
+            (b"\x00\x00\x00\x10ftypmif1\x00\x00\x00\x00", "image/heif", "image/heif"),
+            (b"\x00\x00\x00\x10ftypmsf1\x00\x00\x00\x00", "image/heif", "image/heif"),
+        ],
+    )
+    def test_detect_media_type_accepts_every_supported_signature(file_bytes, claimed, expected) -> None:  # type: ignore[no-untyped-def]
+>       assert evidence_service._detect_media_type(file_bytes, claimed) == expected
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_evidence_upload.py:164: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+file_bytes = b'\x00\x00\x00\x10ftypheim\x00\x00\x00\x00', claimed = 'image/heic'
+
+    def _detect_media_type(file_bytes: bytes, claimed: str) -> str:
+        detected: str | None = None
+        if file_bytes.startswith(b"\xff\xd8\xff"):
+            detected = "image/jpeg"
+        elif file_bytes.startswith(b"\x89PNG"):
+            detected = "image/png"
+        elif file_bytes.startswith(b"%PDF"):
+            detected = "application/pdf"
+        elif file_bytes.startswith(b"RIFF") and len(file_bytes) >= 12 and file_bytes[8:12] == b"WEBP":
+            detected = "image/webp"
+        elif file_bytes.startswith((b"II*\x00", b"MM\x00*")):
+            detected = "image/tiff"
+    
+        if detected is None:
+>           raise EvidenceValidationError("media_type_mismatch: unsupported media signature")
+E           app.services.evidence_service.EvidenceValidationError: media_type_mismatch: unsupported media signature
+
+app/services/evidence_service.py:70: EvidenceValidationError
+_ test_detect_media_type_accepts_every_supported_signature[\x00\x00\x00\x10ftypheis\x00\x00\x00\x00-image/heic-image/heic] _
+
+file_bytes = b'\x00\x00\x00\x10ftypheis\x00\x00\x00\x00', claimed = 'image/heic'
+expected = 'image/heic'
+
+    @pytest.mark.parametrize(
+        ("file_bytes", "claimed", "expected"),
+        [
+            (b"\xff\xd8\xfffixture", "image/jpeg", "image/jpeg"),
+            (b"\x89PNG\r\n\x1afixture", "image/png", "image/png"),
+            (b"%PDF-1.7 fixture", "application/pdf", "application/pdf"),
+            (b"RIFF\x00\x00\x00\x00WEBP", "image/webp", "image/webp"),
+            (b"II*\x00fixture", "image/tiff", "image/tiff"),
+            (b"MM\x00*fixture", "image/tiff", "image/tiff"),
+            (b"\x00\x00\x00\x10ftypheic\x00\x00\x00\x00", "image/heic", "image/heic"),
+            (b"\x00\x00\x00\x10ftypheix\x00\x00\x00\x00", "image/heic", "image/heic"),
+            (b"\x00\x00\x00\x10ftypheim\x00\x00\x00\x00", "image/heic", "image/heic"),
+            (b"\x00\x00\x00\x10ftypheis\x00\x00\x00\x00", "image/heic", "image/heic"),
+            (b"\x00\x00\x00\x10ftyphevc\x00\x00\x00\x00", "image/heic", "image/heic"),
+            (b"\x00\x00\x00\x10ftyphevx\x00\x00\x00\x00", "image/heic", "image/heic"),
+            (b"\x00\x00\x00\x10ftyphevm\x00\x00\x00\x00", "image/heic", "image/heic"),
+            (b"\x00\x00\x00\x10ftyphevs\x00\x00\x00\x00", "image/heic", "image/heic"),
+            (b"\x00\x00\x00\x10ftypmif1\x00\x00\x00\x00", "image/heif", "image/heif"),
+            (b"\x00\x00\x00\x10ftypmsf1\x00\x00\x00\x00", "image/heif", "image/heif"),
+        ],
+    )
+    def test_detect_media_type_accepts_every_supported_signature(file_bytes, claimed, expected) -> None:  # type: ignore[no-untyped-def]
+>       assert evidence_service._detect_media_type(file_bytes, claimed) == expected
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_evidence_upload.py:164: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+file_bytes = b'\x00\x00\x00\x10ftypheis\x00\x00\x00\x00', claimed = 'image/heic'
+
+    def _detect_media_type(file_bytes: bytes, claimed: str) -> str:
+        detected: str | None = None
+        if file_bytes.startswith(b"\xff\xd8\xff"):
+            detected = "image/jpeg"
+        elif file_bytes.startswith(b"\x89PNG"):
+            detected = "image/png"
+        elif file_bytes.startswith(b"%PDF"):
+            detected = "application/pdf"
+        elif file_bytes.startswith(b"RIFF") and len(file_bytes) >= 12 and file_bytes[8:12] == b"WEBP":
+            detected = "image/webp"
+        elif file_bytes.startswith((b"II*\x00", b"MM\x00*")):
+            detected = "image/tiff"
+    
+        if detected is None:
+>           raise EvidenceValidationError("media_type_mismatch: unsupported media signature")
+E           app.services.evidence_service.EvidenceValidationError: media_type_mismatch: unsupported media signature
+
+app/services/evidence_service.py:70: EvidenceValidationError
+_ test_detect_media_type_accepts_every_supported_signature[\x00\x00\x00\x10ftyphevc\x00\x00\x00\x00-image/heic-image/heic] _
+
+file_bytes = b'\x00\x00\x00\x10ftyphevc\x00\x00\x00\x00', claimed = 'image/heic'
+expected = 'image/heic'
+
+    @pytest.mark.parametrize(
+        ("file_bytes", "claimed", "expected"),
+        [
+            (b"\xff\xd8\xfffixture", "image/jpeg", "image/jpeg"),
+            (b"\x89PNG\r\n\x1afixture", "image/png", "image/png"),
+            (b"%PDF-1.7 fixture", "application/pdf", "application/pdf"),
+            (b"RIFF\x00\x00\x00\x00WEBP", "image/webp", "image/webp"),
+            (b"II*\x00fixture", "image/tiff", "image/tiff"),
+            (b"MM\x00*fixture", "image/tiff", "image/tiff"),
+            (b"\x00\x00\x00\x10ftypheic\x00\x00\x00\x00", "image/heic", "image/heic"),
+            (b"\x00\x00\x00\x10ftypheix\x00\x00\x00\x00", "image/heic", "image/heic"),
+            (b"\x00\x00\x00\x10ftypheim\x00\x00\x00\x00", "image/heic", "image/heic"),
+            (b"\x00\x00\x00\x10ftypheis\x00\x00\x00\x00", "image/heic", "image/heic"),
+            (b"\x00\x00\x00\x10ftyphevc\x00\x00\x00\x00", "image/heic", "image/heic"),
+            (b"\x00\x00\x00\x10ftyphevx\x00\x00\x00\x00", "image/heic", "image/heic"),
+            (b"\x00\x00\x00\x10ftyphevm\x00\x00\x00\x00", "image/heic", "image/heic"),
+            (b"\x00\x00\x00\x10ftyphevs\x00\x00\x00\x00", "image/heic", "image/heic"),
+            (b"\x00\x00\x00\x10ftypmif1\x00\x00\x00\x00", "image/heif", "image/heif"),
+            (b"\x00\x00\x00\x10ftypmsf1\x00\x00\x00\x00", "image/heif", "image/heif"),
+        ],
+    )
+    def test_detect_media_type_accepts_every_supported_signature(file_bytes, claimed, expected) -> None:  # type: ignore[no-untyped-def]
+>       assert evidence_service._detect_media_type(file_bytes, claimed) == expected
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_evidence_upload.py:164: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+file_bytes = b'\x00\x00\x00\x10ftyphevc\x00\x00\x00\x00', claimed = 'image/heic'
+
+    def _detect_media_type(file_bytes: bytes, claimed: str) -> str:
+        detected: str | None = None
+        if file_bytes.startswith(b"\xff\xd8\xff"):
+            detected = "image/jpeg"
+        elif file_bytes.startswith(b"\x89PNG"):
+            detected = "image/png"
+        elif file_bytes.startswith(b"%PDF"):
+            detected = "application/pdf"
+        elif file_bytes.startswith(b"RIFF") and len(file_bytes) >= 12 and file_bytes[8:12] == b"WEBP":
+            detected = "image/webp"
+        elif file_bytes.startswith((b"II*\x00", b"MM\x00*")):
+            detected = "image/tiff"
+    
+        if detected is None:
+>           raise EvidenceValidationError("media_type_mismatch: unsupported media signature")
+E           app.services.evidence_service.EvidenceValidationError: media_type_mismatch: unsupported media signature
+
+app/services/evidence_service.py:70: EvidenceValidationError
+_ test_detect_media_type_accepts_every_supported_signature[\x00\x00\x00\x10ftyphevx\x00\x00\x00\x00-image/heic-image/heic] _
+
+file_bytes = b'\x00\x00\x00\x10ftyphevx\x00\x00\x00\x00', claimed = 'image/heic'
+expected = 'image/heic'
+
+    @pytest.mark.parametrize(
+        ("file_bytes", "claimed", "expected"),
+        [
+            (b"\xff\xd8\xfffixture", "image/jpeg", "image/jpeg"),
+            (b"\x89PNG\r\n\x1afixture", "image/png", "image/png"),
+            (b"%PDF-1.7 fixture", "application/pdf", "application/pdf"),
+            (b"RIFF\x00\x00\x00\x00WEBP", "image/webp", "image/webp"),
+            (b"II*\x00fixture", "image/tiff", "image/tiff"),
+            (b"MM\x00*fixture", "image/tiff", "image/tiff"),
+            (b"\x00\x00\x00\x10ftypheic\x00\x00\x00\x00", "image/heic", "image/heic"),
+            (b"\x00\x00\x00\x10ftypheix\x00\x00\x00\x00", "image/heic", "image/heic"),
+            (b"\x00\x00\x00\x10ftypheim\x00\x00\x00\x00", "image/heic", "image/heic"),
+            (b"\x00\x00\x00\x10ftypheis\x00\x00\x00\x00", "image/heic", "image/heic"),
+            (b"\x00\x00\x00\x10ftyphevc\x00\x00\x00\x00", "image/heic", "image/heic"),
+            (b"\x00\x00\x00\x10ftyphevx\x00\x00\x00\x00", "image/heic", "image/heic"),
+            (b"\x00\x00\x00\x10ftyphevm\x00\x00\x00\x00", "image/heic", "image/heic"),
+            (b"\x00\x00\x00\x10ftyphevs\x00\x00\x00\x00", "image/heic", "image/heic"),
+            (b"\x00\x00\x00\x10ftypmif1\x00\x00\x00\x00", "image/heif", "image/heif"),
+            (b"\x00\x00\x00\x10ftypmsf1\x00\x00\x00\x00", "image/heif", "image/heif"),
+        ],
+    )
+    def test_detect_media_type_accepts_every_supported_signature(file_bytes, claimed, expected) -> None:  # type: ignore[no-untyped-def]
+>       assert evidence_service._detect_media_type(file_bytes, claimed) == expected
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_evidence_upload.py:164: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+file_bytes = b'\x00\x00\x00\x10ftyphevx\x00\x00\x00\x00', claimed = 'image/heic'
+
+    def _detect_media_type(file_bytes: bytes, claimed: str) -> str:
+        detected: str | None = None
+        if file_bytes.startswith(b"\xff\xd8\xff"):
+            detected = "image/jpeg"
+        elif file_bytes.startswith(b"\x89PNG"):
+            detected = "image/png"
+        elif file_bytes.startswith(b"%PDF"):
+            detected = "application/pdf"
+        elif file_bytes.startswith(b"RIFF") and len(file_bytes) >= 12 and file_bytes[8:12] == b"WEBP":
+            detected = "image/webp"
+        elif file_bytes.startswith((b"II*\x00", b"MM\x00*")):
+            detected = "image/tiff"
+    
+        if detected is None:
+>           raise EvidenceValidationError("media_type_mismatch: unsupported media signature")
+E           app.services.evidence_service.EvidenceValidationError: media_type_mismatch: unsupported media signature
+
+app/services/evidence_service.py:70: EvidenceValidationError
+_ test_detect_media_type_accepts_every_supported_signature[\x00\x00\x00\x10ftyphevm\x00\x00\x00\x00-image/heic-image/heic] _
+
+file_bytes = b'\x00\x00\x00\x10ftyphevm\x00\x00\x00\x00', claimed = 'image/heic'
+expected = 'image/heic'
+
+    @pytest.mark.parametrize(
+        ("file_bytes", "claimed", "expected"),
+        [
+            (b"\xff\xd8\xfffixture", "image/jpeg", "image/jpeg"),
+            (b"\x89PNG\r\n\x1afixture", "image/png", "image/png"),
+            (b"%PDF-1.7 fixture", "application/pdf", "application/pdf"),
+            (b"RIFF\x00\x00\x00\x00WEBP", "image/webp", "image/webp"),
+            (b"II*\x00fixture", "image/tiff", "image/tiff"),
+            (b"MM\x00*fixture", "image/tiff", "image/tiff"),
+            (b"\x00\x00\x00\x10ftypheic\x00\x00\x00\x00", "image/heic", "image/heic"),
+            (b"\x00\x00\x00\x10ftypheix\x00\x00\x00\x00", "image/heic", "image/heic"),
+            (b"\x00\x00\x00\x10ftypheim\x00\x00\x00\x00", "image/heic", "image/heic"),
+            (b"\x00\x00\x00\x10ftypheis\x00\x00\x00\x00", "image/heic", "image/heic"),
+            (b"\x00\x00\x00\x10ftyphevc\x00\x00\x00\x00", "image/heic", "image/heic"),
+            (b"\x00\x00\x00\x10ftyphevx\x00\x00\x00\x00", "image/heic", "image/heic"),
+            (b"\x00\x00\x00\x10ftyphevm\x00\x00\x00\x00", "image/heic", "image/heic"),
+            (b"\x00\x00\x00\x10ftyphevs\x00\x00\x00\x00", "image/heic", "image/heic"),
+            (b"\x00\x00\x00\x10ftypmif1\x00\x00\x00\x00", "image/heif", "image/heif"),
+            (b"\x00\x00\x00\x10ftypmsf1\x00\x00\x00\x00", "image/heif", "image/heif"),
+        ],
+    )
+    def test_detect_media_type_accepts_every_supported_signature(file_bytes, claimed, expected) -> None:  # type: ignore[no-untyped-def]
+>       assert evidence_service._detect_media_type(file_bytes, claimed) == expected
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_evidence_upload.py:164: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+file_bytes = b'\x00\x00\x00\x10ftyphevm\x00\x00\x00\x00', claimed = 'image/heic'
+
+    def _detect_media_type(file_bytes: bytes, claimed: str) -> str:
+        detected: str | None = None
+        if file_bytes.startswith(b"\xff\xd8\xff"):
+            detected = "image/jpeg"
+        elif file_bytes.startswith(b"\x89PNG"):
+            detected = "image/png"
+        elif file_bytes.startswith(b"%PDF"):
+            detected = "application/pdf"
+        elif file_bytes.startswith(b"RIFF") and len(file_bytes) >= 12 and file_bytes[8:12] == b"WEBP":
+            detected = "image/webp"
+        elif file_bytes.startswith((b"II*\x00", b"MM\x00*")):
+            detected = "image/tiff"
+    
+        if detected is None:
+>           raise EvidenceValidationError("media_type_mismatch: unsupported media signature")
+E           app.services.evidence_service.EvidenceValidationError: media_type_mismatch: unsupported media signature
+
+app/services/evidence_service.py:70: EvidenceValidationError
+_ test_detect_media_type_accepts_every_supported_signature[\x00\x00\x00\x10ftyphevs\x00\x00\x00\x00-image/heic-image/heic] _
+
+file_bytes = b'\x00\x00\x00\x10ftyphevs\x00\x00\x00\x00', claimed = 'image/heic'
+expected = 'image/heic'
+
+    @pytest.mark.parametrize(
+        ("file_bytes", "claimed", "expected"),
+        [
+            (b"\xff\xd8\xfffixture", "image/jpeg", "image/jpeg"),
+            (b"\x89PNG\r\n\x1afixture", "image/png", "image/png"),
+            (b"%PDF-1.7 fixture", "application/pdf", "application/pdf"),
+            (b"RIFF\x00\x00\x00\x00WEBP", "image/webp", "image/webp"),
+            (b"II*\x00fixture", "image/tiff", "image/tiff"),
+            (b"MM\x00*fixture", "image/tiff", "image/tiff"),
+            (b"\x00\x00\x00\x10ftypheic\x00\x00\x00\x00", "image/heic", "image/heic"),
+            (b"\x00\x00\x00\x10ftypheix\x00\x00\x00\x00", "image/heic", "image/heic"),
+            (b"\x00\x00\x00\x10ftypheim\x00\x00\x00\x00", "image/heic", "image/heic"),
+            (b"\x00\x00\x00\x10ftypheis\x00\x00\x00\x00", "image/heic", "image/heic"),
+            (b"\x00\x00\x00\x10ftyphevc\x00\x00\x00\x00", "image/heic", "image/heic"),
+            (b"\x00\x00\x00\x10ftyphevx\x00\x00\x00\x00", "image/heic", "image/heic"),
+            (b"\x00\x00\x00\x10ftyphevm\x00\x00\x00\x00", "image/heic", "image/heic"),
+            (b"\x00\x00\x00\x10ftyphevs\x00\x00\x00\x00", "image/heic", "image/heic"),
+            (b"\x00\x00\x00\x10ftypmif1\x00\x00\x00\x00", "image/heif", "image/heif"),
+            (b"\x00\x00\x00\x10ftypmsf1\x00\x00\x00\x00", "image/heif", "image/heif"),
+        ],
+    )
+    def test_detect_media_type_accepts_every_supported_signature(file_bytes, claimed, expected) -> None:  # type: ignore[no-untyped-def]
+>       assert evidence_service._detect_media_type(file_bytes, claimed) == expected
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_evidence_upload.py:164: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+file_bytes = b'\x00\x00\x00\x10ftyphevs\x00\x00\x00\x00', claimed = 'image/heic'
+
+    def _detect_media_type(file_bytes: bytes, claimed: str) -> str:
+        detected: str | None = None
+        if file_bytes.startswith(b"\xff\xd8\xff"):
+            detected = "image/jpeg"
+        elif file_bytes.startswith(b"\x89PNG"):
+            detected = "image/png"
+        elif file_bytes.startswith(b"%PDF"):
+            detected = "application/pdf"
+        elif file_bytes.startswith(b"RIFF") and len(file_bytes) >= 12 and file_bytes[8:12] == b"WEBP":
+            detected = "image/webp"
+        elif file_bytes.startswith((b"II*\x00", b"MM\x00*")):
+            detected = "image/tiff"
+    
+        if detected is None:
+>           raise EvidenceValidationError("media_type_mismatch: unsupported media signature")
+E           app.services.evidence_service.EvidenceValidationError: media_type_mismatch: unsupported media signature
+
+app/services/evidence_service.py:70: EvidenceValidationError
+_ test_detect_media_type_accepts_every_supported_signature[\x00\x00\x00\x10ftypmif1\x00\x00\x00\x00-image/heif-image/heif] _
+
+file_bytes = b'\x00\x00\x00\x10ftypmif1\x00\x00\x00\x00', claimed = 'image/heif'
+expected = 'image/heif'
+
+    @pytest.mark.parametrize(
+        ("file_bytes", "claimed", "expected"),
+        [
+            (b"\xff\xd8\xfffixture", "image/jpeg", "image/jpeg"),
+            (b"\x89PNG\r\n\x1afixture", "image/png", "image/png"),
+            (b"%PDF-1.7 fixture", "application/pdf", "application/pdf"),
+            (b"RIFF\x00\x00\x00\x00WEBP", "image/webp", "image/webp"),
+            (b"II*\x00fixture", "image/tiff", "image/tiff"),
+            (b"MM\x00*fixture", "image/tiff", "image/tiff"),
+            (b"\x00\x00\x00\x10ftypheic\x00\x00\x00\x00", "image/heic", "image/heic"),
+            (b"\x00\x00\x00\x10ftypheix\x00\x00\x00\x00", "image/heic", "image/heic"),
+            (b"\x00\x00\x00\x10ftypheim\x00\x00\x00\x00", "image/heic", "image/heic"),
+            (b"\x00\x00\x00\x10ftypheis\x00\x00\x00\x00", "image/heic", "image/heic"),
+            (b"\x00\x00\x00\x10ftyphevc\x00\x00\x00\x00", "image/heic", "image/heic"),
+            (b"\x00\x00\x00\x10ftyphevx\x00\x00\x00\x00", "image/heic", "image/heic"),
+            (b"\x00\x00\x00\x10ftyphevm\x00\x00\x00\x00", "image/heic", "image/heic"),
+            (b"\x00\x00\x00\x10ftyphevs\x00\x00\x00\x00", "image/heic", "image/heic"),
+            (b"\x00\x00\x00\x10ftypmif1\x00\x00\x00\x00", "image/heif", "image/heif"),
+            (b"\x00\x00\x00\x10ftypmsf1\x00\x00\x00\x00", "image/heif", "image/heif"),
+        ],
+    )
+    def test_detect_media_type_accepts_every_supported_signature(file_bytes, claimed, expected) -> None:  # type: ignore[no-untyped-def]
+>       assert evidence_service._detect_media_type(file_bytes, claimed) == expected
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_evidence_upload.py:164: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+file_bytes = b'\x00\x00\x00\x10ftypmif1\x00\x00\x00\x00', claimed = 'image/heif'
+
+    def _detect_media_type(file_bytes: bytes, claimed: str) -> str:
+        detected: str | None = None
+        if file_bytes.startswith(b"\xff\xd8\xff"):
+            detected = "image/jpeg"
+        elif file_bytes.startswith(b"\x89PNG"):
+            detected = "image/png"
+        elif file_bytes.startswith(b"%PDF"):
+            detected = "application/pdf"
+        elif file_bytes.startswith(b"RIFF") and len(file_bytes) >= 12 and file_bytes[8:12] == b"WEBP":
+            detected = "image/webp"
+        elif file_bytes.startswith((b"II*\x00", b"MM\x00*")):
+            detected = "image/tiff"
+    
+        if detected is None:
+>           raise EvidenceValidationError("media_type_mismatch: unsupported media signature")
+E           app.services.evidence_service.EvidenceValidationError: media_type_mismatch: unsupported media signature
+
+app/services/evidence_service.py:70: EvidenceValidationError
+_ test_detect_media_type_accepts_every_supported_signature[\x00\x00\x00\x10ftypmsf1\x00\x00\x00\x00-image/heif-image/heif] _
+
+file_bytes = b'\x00\x00\x00\x10ftypmsf1\x00\x00\x00\x00', claimed = 'image/heif'
+expected = 'image/heif'
+
+    @pytest.mark.parametrize(
+        ("file_bytes", "claimed", "expected"),
+        [
+            (b"\xff\xd8\xfffixture", "image/jpeg", "image/jpeg"),
+            (b"\x89PNG\r\n\x1afixture", "image/png", "image/png"),
+            (b"%PDF-1.7 fixture", "application/pdf", "application/pdf"),
+            (b"RIFF\x00\x00\x00\x00WEBP", "image/webp", "image/webp"),
+            (b"II*\x00fixture", "image/tiff", "image/tiff"),
+            (b"MM\x00*fixture", "image/tiff", "image/tiff"),
+            (b"\x00\x00\x00\x10ftypheic\x00\x00\x00\x00", "image/heic", "image/heic"),
+            (b"\x00\x00\x00\x10ftypheix\x00\x00\x00\x00", "image/heic", "image/heic"),
+            (b"\x00\x00\x00\x10ftypheim\x00\x00\x00\x00", "image/heic", "image/heic"),
+            (b"\x00\x00\x00\x10ftypheis\x00\x00\x00\x00", "image/heic", "image/heic"),
+            (b"\x00\x00\x00\x10ftyphevc\x00\x00\x00\x00", "image/heic", "image/heic"),
+            (b"\x00\x00\x00\x10ftyphevx\x00\x00\x00\x00", "image/heic", "image/heic"),
+            (b"\x00\x00\x00\x10ftyphevm\x00\x00\x00\x00", "image/heic", "image/heic"),
+            (b"\x00\x00\x00\x10ftyphevs\x00\x00\x00\x00", "image/heic", "image/heic"),
+            (b"\x00\x00\x00\x10ftypmif1\x00\x00\x00\x00", "image/heif", "image/heif"),
+            (b"\x00\x00\x00\x10ftypmsf1\x00\x00\x00\x00", "image/heif", "image/heif"),
+        ],
+    )
+    def test_detect_media_type_accepts_every_supported_signature(file_bytes, claimed, expected) -> None:  # type: ignore[no-untyped-def]
+>       assert evidence_service._detect_media_type(file_bytes, claimed) == expected
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_evidence_upload.py:164: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+file_bytes = b'\x00\x00\x00\x10ftypmsf1\x00\x00\x00\x00', claimed = 'image/heif'
+
+    def _detect_media_type(file_bytes: bytes, claimed: str) -> str:
+        detected: str | None = None
+        if file_bytes.startswith(b"\xff\xd8\xff"):
+            detected = "image/jpeg"
+        elif file_bytes.startswith(b"\x89PNG"):
+            detected = "image/png"
+        elif file_bytes.startswith(b"%PDF"):
+            detected = "application/pdf"
+        elif file_bytes.startswith(b"RIFF") and len(file_bytes) >= 12 and file_bytes[8:12] == b"WEBP":
+            detected = "image/webp"
+        elif file_bytes.startswith((b"II*\x00", b"MM\x00*")):
+            detected = "image/tiff"
+    
+        if detected is None:
+>           raise EvidenceValidationError("media_type_mismatch: unsupported media signature")
+E           app.services.evidence_service.EvidenceValidationError: media_type_mismatch: unsupported media signature
+
+app/services/evidence_service.py:70: EvidenceValidationError
+_____ test_endpoint_accepts_generated_heif_with_thumbnail[heic-image/heic] _____
+
+db = (<sqlalchemy.orm.session.Session object at 0x7d27385eae40>, '01a0d2f3-e27c-7680-b973-913bbbd4a0dc')
+major_brand = b'heic', claimed = 'image/heic'
+
+    @pytest.mark.parametrize(
+        ("major_brand", "claimed"),
+        [(b"heic", "image/heic"), (b"mif1", "image/heif")],
+    )
+    def test_endpoint_accepts_generated_heif_with_thumbnail(db, major_brand, claimed) -> None:  # type: ignore[no-untyped-def]
+        _, household_id = db
+        image_bytes = heif_bytes(major_brand=major_brand)
+        with TestClient(app) as client:
+            response = client.post(
+                "/v1/evidence",
+                params={"household_id": household_id},
+                files={"file": (f"fixture-{major_brand.decode()}.heic", image_bytes, claimed)},
+            )
+    
+>       assert response.status_code == 201
+E       assert 422 == 201
+E        +  where 422 = <Response [422 Unprocessable Entity]>.status_code
+
+tests/test_evidence_upload.py:221: AssertionError
+_____ test_endpoint_accepts_generated_heif_with_thumbnail[mif1-image/heif] _____
+
+db = (<sqlalchemy.orm.session.Session object at 0x7d2733c105c0>, '01a0d2f3-e2a0-78c2-9797-8c3697d5f1f9')
+major_brand = b'mif1', claimed = 'image/heif'
+
+    @pytest.mark.parametrize(
+        ("major_brand", "claimed"),
+        [(b"heic", "image/heic"), (b"mif1", "image/heif")],
+    )
+    def test_endpoint_accepts_generated_heif_with_thumbnail(db, major_brand, claimed) -> None:  # type: ignore[no-untyped-def]
+        _, household_id = db
+        image_bytes = heif_bytes(major_brand=major_brand)
+        with TestClient(app) as client:
+            response = client.post(
+                "/v1/evidence",
+                params={"household_id": household_id},
+                files={"file": (f"fixture-{major_brand.decode()}.heic", image_bytes, claimed)},
+            )
+    
+>       assert response.status_code == 201
+E       assert 422 == 201
+E        +  where 422 = <Response [422 Unprocessable Entity]>.status_code
+
+tests/test_evidence_upload.py:221: AssertionError
+=============================== warnings summary ===============================
+venv/lib/python3.12/site-packages/fastapi/testclient.py:1
+  /home/andrei/StorageGenie/backend/venv/lib/python3.12/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+venv/lib/python3.12/site-packages/starlette/testclient.py:53
+  /home/andrei/StorageGenie/backend/venv/lib/python3.12/site-packages/starlette/testclient.py:53: DeprecationWarning: The anyio.abc.BlockingPortal alias is deprecated, use anyio.from_thread.BlockingPortal instead.
+    _PortalFactoryType = Callable[[], AbstractContextManager[anyio.abc.BlockingPortal]]
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/test_evidence_upload.py::test_detect_media_type_accepts_every_supported_signature[\x00\x00\x00\x10ftypheic\x00\x00\x00\x00-image/heic-image/heic]
+FAILED tests/test_evidence_upload.py::test_detect_media_type_accepts_every_supported_signature[\x00\x00\x00\x10ftypheix\x00\x00\x00\x00-image/heic-image/heic]
+FAILED tests/test_evidence_upload.py::test_detect_media_type_accepts_every_supported_signature[\x00\x00\x00\x10ftypheim\x00\x00\x00\x00-image/heic-image/heic]
+FAILED tests/test_evidence_upload.py::test_detect_media_type_accepts_every_supported_signature[\x00\x00\x00\x10ftypheis\x00\x00\x00\x00-image/heic-image/heic]
+FAILED tests/test_evidence_upload.py::test_detect_media_type_accepts_every_supported_signature[\x00\x00\x00\x10ftyphevc\x00\x00\x00\x00-image/heic-image/heic]
+FAILED tests/test_evidence_upload.py::test_detect_media_type_accepts_every_supported_signature[\x00\x00\x00\x10ftyphevx\x00\x00\x00\x00-image/heic-image/heic]
+FAILED tests/test_evidence_upload.py::test_detect_media_type_accepts_every_supported_signature[\x00\x00\x00\x10ftyphevm\x00\x00\x00\x00-image/heic-image/heic]
+FAILED tests/test_evidence_upload.py::test_detect_media_type_accepts_every_supported_signature[\x00\x00\x00\x10ftyphevs\x00\x00\x00\x00-image/heic-image/heic]
+FAILED tests/test_evidence_upload.py::test_detect_media_type_accepts_every_supported_signature[\x00\x00\x00\x10ftypmif1\x00\x00\x00\x00-image/heif-image/heif]
+FAILED tests/test_evidence_upload.py::test_detect_media_type_accepts_every_supported_signature[\x00\x00\x00\x10ftypmsf1\x00\x00\x00\x00-image/heif-image/heif]
+FAILED tests/test_evidence_upload.py::test_endpoint_accepts_generated_heif_with_thumbnail[heic-image/heic]
+FAILED tests/test_evidence_upload.py::test_endpoint_accepts_generated_heif_with_thumbnail[mif1-image/heif]
+12 failed, 10 passed, 8 deselected, 2 warnings in 0.91s
+
+
+################## PASS RUN (implementation present; raw) ##################
+
+......................                                                   [100%]
+=============================== warnings summary ===============================
+venv/lib/python3.12/site-packages/fastapi/testclient.py:1
+  /home/andrei/StorageGenie/backend/venv/lib/python3.12/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+venv/lib/python3.12/site-packages/starlette/testclient.py:53
+  /home/andrei/StorageGenie/backend/venv/lib/python3.12/site-packages/starlette/testclient.py:53: DeprecationWarning: The anyio.abc.BlockingPortal alias is deprecated, use anyio.from_thread.BlockingPortal instead.
+    _PortalFactoryType = Callable[[], AbstractContextManager[anyio.abc.BlockingPortal]]
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+22 passed, 8 deselected, 2 warnings in 0.72s
+
+
+################## FULL BACKEND SUITE (raw) ##################
+
+........................................................................ [ 13%]
+........................................................................ [ 26%]
+........................................................................ [ 39%]
+........................................................................ [ 52%]
+........................................................................ [ 66%]
+........................................................................ [ 79%]
+........................................................................ [ 92%]
+..................................FF.....                                [100%]
+=================================== FAILURES ===================================
+___ test_generated_codes_are_validated_and_bad_checksum_is_not_an_identifier ___
+
+isolated_db = (<sqlalchemy.orm.session.Session object at 0x75cf0677fdd0>, '01a0d2f5-0902-7582-8c8e-852cb099aa2f', PosixPath('/tmp/pytest-of-andrei/pytest-0/test_generated_codes_are_valid0/storage'))
+
+    def test_generated_codes_are_validated_and_bad_checksum_is_not_an_identifier(isolated_db) -> None:  # type: ignore[no-untyped-def]
+        session, household_id, root = isolated_db
+        qr_value = "https://example.test/SG-013"
+        qr_image = qrcode.make(qr_value).convert("RGB")
+        qr = _evidence(session, household_id, root, _png(qr_image), "qr.png", "image/png")
+        ean_image, ean_value = _ean13_image("590123412345")
+        ean = _evidence(session, household_id, root, _png(ean_image), "ean.png", "image/png")
+        # Deliberately render a syntactically valid EAN with the wrong check digit.
+        bad_value = ean_value[:-1] + ("0" if ean_value[-1] != "0" else "1")
+        bad_image, _ = _ean13_image(ean_value[:-1], bad_value[-1])
+        bad = _evidence(session, household_id, root, _png(bad_image), "bad.png", "image/png")
+    
+        qr_rows = signals.extract_observations(qr.id, session)
+        ean_rows = signals.extract_observations(ean.id, session)
+        bad_rows = signals.extract_observations(bad.id, session)
+    
+        qr_values = [json.loads(row.value_json) for row in qr_rows if row.kind == "barcode_qr"]
+        ean_values = [json.loads(row.value_json) for row in ean_rows if row.kind == "barcode_qr"]
+        bad_values = [json.loads(row.value_json) for row in bad_rows if row.kind == "barcode_qr"]
+>       assert any(item.get("value") == qr_value and item["validated"] for item in qr_values)
+E       assert False
+E        +  where False = any(<generator object test_generated_codes_are_validated_and_bad_checksum_is_not_an_identifier.<locals>.<genexpr> at 0x75cf0665d9a0>)
+
+tests/test_signals.py:136: AssertionError
+_________________ test_ocr_has_text_boxes_and_mean_confidence __________________
+
+isolated_db = (<sqlalchemy.orm.session.Session object at 0x75cf067fa7b0>, '01a0d2f5-09a7-72b2-b913-ca02b722317e', PosixPath('/tmp/pytest-of-andrei/pytest-0/test_ocr_has_text_boxes_and_me0/storage'))
+
+    def test_ocr_has_text_boxes_and_mean_confidence(isolated_db) -> None:  # type: ignore[no-untyped-def]
+        session, household_id, root = isolated_db
+        evidence = _evidence(session, household_id, root, _png(_text_image()), "text.png", "image/png")
+        rows = signals.extract_observations(evidence.id, session)
+        ocr = [json.loads(row.value_json) for row in rows if row.kind == "ocr"]
+>       assert ocr
+E       assert []
+
+tests/test_signals.py:148: AssertionError
+=============================== warnings summary ===============================
+venv/lib/python3.12/site-packages/fastapi/testclient.py:1
+  /home/andrei/StorageGenie/backend/venv/lib/python3.12/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+venv/lib/python3.12/site-packages/starlette/testclient.py:53
+  /home/andrei/StorageGenie/backend/venv/lib/python3.12/site-packages/starlette/testclient.py:53: DeprecationWarning: The anyio.abc.BlockingPortal alias is deprecated, use anyio.from_thread.BlockingPortal instead.
+    _PortalFactoryType = Callable[[], AbstractContextManager[anyio.abc.BlockingPortal]]
+
+tests/test_candidates.py: 3 warnings
+tests/test_foundations.py: 3 warnings
+tests/test_saved_searches.py: 3 warnings
+tests/test_search.py: 3 warnings
+tests/test_sg048_name_optional.py: 6 warnings
+tests/test_sg100_snapshot_persistence.py: 3 warnings
+tests/test_signals.py: 3 warnings
+  /home/andrei/StorageGenie/backend/venv/lib/python3.12/site-packages/alembic/config.py:604: DeprecationWarning: No path_separator found in configuration; falling back to legacy splitting on spaces, commas, and colons for prepend_sys_path.  Consider adding path_separator=os to Alembic config.
+    util.warn_deprecated(
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/test_signals.py::test_generated_codes_are_validated_and_bad_checksum_is_not_an_identifier
+FAILED tests/test_signals.py::test_ocr_has_text_boxes_and_mean_confidence - a...
+2 failed, 543 passed, 26 warnings in 23.39s
+
+
+################## RUFF + MYPY (raw) ##################
+
+$ ruff check app tests
+All checks passed!
+
+$ mypy app (current)
+app/schemas/asset.py:53: error: Missing type arguments for generic type "dict"  [type-arg]
+app/schemas/asset.py:55: error: Missing type arguments for generic type "dict"  [type-arg]
+app/models/base.py:8: error: Unused "type: ignore" comment  [unused-ignore]
+app/services/audit_service.py:16: error: Missing type arguments for generic type "dict"  [type-arg]
+app/services/audit_service.py:17: error: Missing type arguments for generic type "dict"  [type-arg]
+app/services/asset_service.py:15: error: Missing type arguments for generic type "dict"  [type-arg]
+app/services/asset_service.py:37: error: Missing type arguments for generic type "dict"  [type-arg]
+app/services/asset_service.py:105: error: Missing type arguments for generic type "dict"  [type-arg]
+app/api/v1/review_tasks.py:17: error: Function is missing a return type annotation  [no-untyped-def]
+app/api/v1/review_tasks.py:21: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/review_tasks.py:22: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/review_tasks.py:62: error: Function is missing a return type annotation  [no-untyped-def]
+app/api/v1/review_tasks.py:66: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/review_tasks.py:67: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/households.py:18: error: Function is missing a return type annotation  [no-untyped-def]
+app/api/v1/households.py:20: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/households.py:22: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/households.py:58: error: Function is missing a return type annotation  [no-untyped-def]
+app/api/v1/households.py:59: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/households.py:60: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/assets.py:62: error: Function is missing a return type annotation  [no-untyped-def]
+app/api/v1/assets.py:65: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/assets.py:67: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/assets.py:92: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/assets.py:92: error: Missing type arguments for generic type "dict"  [type-arg]
+app/api/v1/assets.py:92: note: Error code "type-arg" not covered by "type: ignore[no-untyped-def]" comment
+app/api/v1/assets.py:231: error: Function is missing a return type annotation  [no-untyped-def]
+app/api/v1/assets.py:239: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/assets.py:240: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/assets.py:357: error: Function is missing a return type annotation  [no-untyped-def]
+app/api/v1/assets.py:361: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/assets.py:363: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/assets.py:413: error: Function is missing a return type annotation  [no-untyped-def]
+app/api/v1/assets.py:415: error: Missing type arguments for generic type "dict"  [type-arg]
+app/api/v1/assets.py:417: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/assets.py:418: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/evidence.py:19: error: Function is missing a return type annotation  [no-untyped-def]
+app/api/v1/evidence.py:20: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/evidence.py:22: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/evidence.py:24: error: Unused "type: ignore" comment  [unused-ignore]
+app/main.py:48: error: Unused "type: ignore" comment  [unused-ignore]
+app/main.py:54: error: Unused "type: ignore" comment  [unused-ignore]
+Found 41 errors in 9 files (checked 85 source files)
+
+$ mypy app (BASE, stashed work)
+app/schemas/asset.py:53: error: Missing type arguments for generic type "dict"  [type-arg]
+app/schemas/asset.py:55: error: Missing type arguments for generic type "dict"  [type-arg]
+app/models/base.py:8: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/households.py:18: error: Function is missing a return type annotation  [no-untyped-def]
+app/api/v1/households.py:20: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/households.py:22: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/households.py:58: error: Function is missing a return type annotation  [no-untyped-def]
+app/api/v1/households.py:59: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/households.py:60: error: Unused "type: ignore" comment  [unused-ignore]
+app/services/audit_service.py:16: error: Missing type arguments for generic type "dict"  [type-arg]
+app/services/audit_service.py:17: error: Missing type arguments for generic type "dict"  [type-arg]
+app/api/v1/review_tasks.py:17: error: Function is missing a return type annotation  [no-untyped-def]
+app/api/v1/review_tasks.py:21: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/review_tasks.py:22: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/review_tasks.py:62: error: Function is missing a return type annotation  [no-untyped-def]
+app/api/v1/review_tasks.py:66: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/review_tasks.py:67: error: Unused "type: ignore" comment  [unused-ignore]
+app/services/asset_service.py:15: error: Missing type arguments for generic type "dict"  [type-arg]
+app/services/asset_service.py:37: error: Missing type arguments for generic type "dict"  [type-arg]
+app/services/asset_service.py:105: error: Missing type arguments for generic type "dict"  [type-arg]
+app/api/v1/assets.py:62: error: Function is missing a return type annotation  [no-untyped-def]
+app/api/v1/assets.py:65: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/assets.py:67: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/assets.py:92: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/assets.py:92: error: Missing type arguments for generic type "dict"  [type-arg]
+app/api/v1/assets.py:92: note: Error code "type-arg" not covered by "type: ignore[no-untyped-def]" comment
+app/api/v1/assets.py:231: error: Function is missing a return type annotation  [no-untyped-def]
+app/api/v1/assets.py:239: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/assets.py:240: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/assets.py:357: error: Function is missing a return type annotation  [no-untyped-def]
+app/api/v1/assets.py:361: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/assets.py:363: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/assets.py:413: error: Function is missing a return type annotation  [no-untyped-def]
+app/api/v1/assets.py:415: error: Missing type arguments for generic type "dict"  [type-arg]
+app/api/v1/assets.py:417: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/assets.py:418: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/evidence.py:19: error: Function is missing a return type annotation  [no-untyped-def]
+app/api/v1/evidence.py:20: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/evidence.py:22: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/evidence.py:24: error: Unused "type: ignore" comment  [unused-ignore]
+app/main.py:48: error: Unused "type: ignore" comment  [unused-ignore]
+app/main.py:54: error: Unused "type: ignore" comment  [unused-ignore]
+Found 41 errors in 9 files (checked 85 source files)
+
+
+################## STASH PROOF of the 2 decoder env reds ##################
+
+$ # WITH changes:
+=========================== short test summary info ============================
+FAILED tests/test_signals.py::test_generated_codes_are_validated_and_bad_checksum_is_not_an_identifier
+FAILED tests/test_signals.py::test_ocr_has_text_boxes_and_mean_confidence - a...
+2 failed in 0.75s
+
+$ git stash push -- backend/  (work reverted to BASE 89d30cc)
+ok stashed
+
+$ # ON BASE (stashed):
+=========================== short test summary info ============================
+FAILED tests/test_signals.py::test_generated_codes_are_validated_and_bad_checksum_is_not_an_identifier
+FAILED tests/test_signals.py::test_ocr_has_text_boxes_and_mean_confidence - a...
+2 failed in 0.62s
+
+$ git stash pop
+ok stash pop
+
+
+################## GATES: SECRET / LITERALS / CONFIGURED==DETECTED / SCOPE (raw) ##################
+
+===== SECRET GATE (PG-SC-05) over changed/new files =====
+$ grep -nE 'api[_-]?key|secret|passwd|password|bearer|private key|BEGIN [A-Z ]*PRIVATE KEY|sk-[A-Za-z0-9]|ghp_|AKIA|jina_' <changed files>
+app/config.py:37:    opencode_api_key: str | None = None
+app/config.py:40:    jina_api_key: str | None = None
+secret_grep_exit=0 (matches above are PRE-EXISTING field-name declarations, not values)
+--- base HEAD versions of those lines (pre-change, same field names) ---
+29:    opencode_api_key: str | None = None
+32:    jina_api_key: str | None = None
+--- value-assignment-only secret grep (must be empty) ---
+value_grep_exit=1 (1 = 0)
+--- host .env in status ---
+0
+
+===== MIME LITERAL GATE (only the two allowlisted literals; no third) =====
+$ grep -rn 'image/heic|image/heif' app tests
+app/services/signals.py:20:SUPPORTED_IMAGE_TYPES = {"image/jpeg", "image/png", "image/webp", "image/tiff", "image/heic", "image/heif"}
+app/services/evidence_service.py:30:# HEVC-coded brands serve "image/heic"; the generic HEIF brands serve "image/heif".
+app/services/evidence_service.py:32:    b"heic": "image/heic",
+app/services/evidence_service.py:33:    b"heix": "image/heic",
+app/services/evidence_service.py:34:    b"heim": "image/heic",
+app/services/evidence_service.py:35:    b"heis": "image/heic",
+app/services/evidence_service.py:36:    b"hevc": "image/heic",
+app/services/evidence_service.py:37:    b"hevx": "image/heic",
+app/services/evidence_service.py:38:    b"hevm": "image/heic",
+app/services/evidence_service.py:39:    b"hevs": "image/heic",
+app/services/evidence_service.py:40:    b"mif1": "image/heif",
+app/services/evidence_service.py:41:    b"msf1": "image/heif",
+app/services/evidence_service.py:143:    if media_type in ("image/jpeg", "image/heic", "image/heif"):
+grep: app/services/__pycache__/evidence_service.cpython-312.pyc: binary file matches
+grep: app/services/__pycache__/signals.cpython-312.pyc: binary file matches
+app/config.py:30:        "image/heic",
+app/config.py:31:        "image/heif",
+grep: app/__pycache__/config.cpython-312.pyc: binary file matches
+tests/test_evidence_upload.py:151:        (b"\x00\x00\x00\x10ftypheic\x00\x00\x00\x00", "image/heic", "image/heic"),
+tests/test_evidence_upload.py:152:        (b"\x00\x00\x00\x10ftypheix\x00\x00\x00\x00", "image/heic", "image/heic"),
+tests/test_evidence_upload.py:153:        (b"\x00\x00\x00\x10ftypheim\x00\x00\x00\x00", "image/heic", "image/heic"),
+tests/test_evidence_upload.py:154:        (b"\x00\x00\x00\x10ftypheis\x00\x00\x00\x00", "image/heic", "image/heic"),
+tests/test_evidence_upload.py:155:        (b"\x00\x00\x00\x10ftyphevc\x00\x00\x00\x00", "image/heic", "image/heic"),
+tests/test_evidence_upload.py:156:        (b"\x00\x00\x00\x10ftyphevx\x00\x00\x00\x00", "image/heic", "image/heic"),
+tests/test_evidence_upload.py:157:        (b"\x00\x00\x00\x10ftyphevm\x00\x00\x00\x00", "image/heic", "image/heic"),
+tests/test_evidence_upload.py:158:        (b"\x00\x00\x00\x10ftyphevs\x00\x00\x00\x00", "image/heic", "image/heic"),
+tests/test_evidence_upload.py:159:        (b"\x00\x00\x00\x10ftypmif1\x00\x00\x00\x00", "image/heif", "image/heif"),
+tests/test_evidence_upload.py:160:        (b"\x00\x00\x00\x10ftypmsf1\x00\x00\x00\x00", "image/heif", "image/heif"),
+tests/test_evidence_upload.py:177:        (b"\x00\x00\x00\x10ftypavif\x00\x00\x00\x00", "image/heic"),
+tests/test_evidence_upload.py:178:        (b"\x00\x00\x00\x10ftypheia\x00\x00\x00\x00", "image/heic"),
+tests/test_evidence_upload.py:209:    [(b"heic", "image/heic"), (b"mif1", "image/heif")],
+grep: tests/__pycache__/test_evidence_upload.cpython-312-pytest-9.1.1.pyc: binary file matches
+$ grep -rn 'heic-sequence|heif-sequence|image/avif' app tests
+third_literal_exit=1 (1 = none)
+--- distinct literal set (app+tests, .py only) ---
+image/heic
+image/heif
+
+===== CONFIGURED == DETECTED (SG-019 near-miss rule) =====
+configured (config.py allowed_mime_types):
+30:        "image/heic",
+31:        "image/heif",
+configured (signals.py SUPPORTED_IMAGE_TYPES):
+20:SUPPORTED_IMAGE_TYPES = {"image/jpeg", "image/png", "image/webp", "image/tiff", "image/heic", "image/heif"}
+detected (detector table + opener) vs decoder's own accepted brands:
+configured brand->MIME table:
+  heic -> image/heic
+  heix -> image/heic
+  heim -> image/heic
+  heis -> image/heic
+  hevc -> image/heic
+  hevx -> image/heic
+  hevm -> image/heic
+  hevs -> image/heic
+  mif1 -> image/heif
+  msf1 -> image/heif
+decoder accepted (pillow_heif.as_plugin._is_supported_heif): ['heic', 'heim', 'heis', 'heix', 'hevc', 'hevm', 'hevs', 'hevx', 'mif1', 'msf1']
+MATCH configured-keys == decoder-accepted: True
+PACKET LIST (9) omitted hevx; tree list (10) includes it -> premise correction
+
+===== MYPY DELTA =====
+base_count=41 current_count=41
+errors touching changed files (must be none):
+  NONE
+delta (identical error sets?):
+  IDENTICAL_ERROR_SETS delta=0
+
+===== SCOPE GATES =====
+--- models/ + alembic/ + frontend/ empty diff ---
+(empty above = no change)
+--- changed-path list ---
+ M backend/app/config.py
+ M backend/app/services/evidence_service.py
+ M backend/app/services/signals.py
+ M backend/pyproject.toml
+ M backend/requirements.lock
+ M backend/tests/test_evidence_upload.py
+--- .gitignore re-verify (PG-SC-10) ---
+check_ignore_exit=1 (1 = all committable)
+
+
+################## G3 BUILD + RECREATE (raw) ##################
+
+===== G3 BUILD 2026-09-24T10:29:06Z =====
+--- image BEFORE build ---
+image_id=sha256:6a555108f9a47a828db328162950e451f9c67aaae4d700ceb47e973a47e858ed created=2026-09-24T09:20:37.456745876Z
+--- before container ---
+1:234b04b0f1e2 storagegenie-backend storagegenie-backend-1 Up About an hour (healthy)
+--- build (docker compose build backend) ---
+#20 0.638 Successfully installed storagegenie-backend-0.1.0
+#20 0.638 WARNING: Running pip as the 'root' user can result in broken permissions and conflicting behaviour with the system package manager, possibly rendering your system unusable. It is recommended to use a virtual environment instead: https://pip.pypa.io/warnings/venv. Use the --root-user-action option if you know what you are doing and want to suppress this warning.
+#20 0.715 
+#20 0.715 [notice] A new release of pip is available: 25.0.1 -> 26.2.1
+#20 0.715 [notice] To update, run: pip install --upgrade pip
+#20 DONE 0.8s
+
+#21 [stage-1 9/9] COPY --from=frontend-build /ui/dist ./static
+#21 DONE 0.0s
+
+#22 exporting to image
+#22 exporting layers
+#22 exporting layers 6.0s done
+#22 exporting manifest sha256:9037d59dc8ef15d840470e049986ee816d122d30e22fb061c3a7754323b66b22 done
+#22 exporting config sha256:1b75e7a13e74df4b3723f7acb3407bdf2aa26f2a8e52617c35455c563237b74e done
+#22 exporting attestation manifest sha256:36a317d04f107ca2b3ed16a78f489b9287b1c6ae139560d983316030ef9c14c4 done
+#22 exporting manifest list sha256:147a2651fb4823929bb42dfcf102111c439a6006c50be5b94697abede142aedb done
+#22 naming to docker.io/library/storagegenie-backend:latest done
+#22 unpacking to docker.io/library/storagegenie-backend:latest
+#22 unpacking to docker.io/library/storagegenie-backend:latest 3.9s done
+#22 DONE 9.9s
+
+#23 resolving provenance for metadata file
+#23 DONE 0.0s
+ Image storagegenie-backend Built 
+build_exit=0
+--- image AFTER build ---
+image_id=sha256:147a2651fb4823929bb42dfcf102111c439a6006c50be5b94697abede142aedb created=2026-09-24T10:29:20.143218217Z
+--- decoder version resolved inside new image ---
+pillow_heif 1.8.0 | pillow 12.3.0 | libheif 1.23.4
+===== G3 RECREATE (exactly ONE up -d --no-deps backend) 2026-09-24T10:29:30Z =====
+before_container=234b04b0f1e2c553439ce00b7fbcff30cecea1ab9e612a92702e22534f397d97
+ Container storagegenie-backend-1 Recreate 
+ Container storagegenie-backend-1 Recreated 
+ Container storagegenie-backend-1 Starting 
+ Container storagegenie-backend-1 Started 
+up_exit=0
+--- wait for health ---
+t=2s health=starting
+t=4s health=starting
+t=6s health=starting
+t=8s health=starting
+t=10s health=starting
+t=12s health=starting
+t=14s health=healthy
+after_container=6a2b9ea6972dc58c46e469270cbf5ea3f6426e74a7e6a544a1b44783e79bb0fc
+after_image=sha256:147a2651fb4823929bb42dfcf102111c439a6006c50be5b94697abede142aedb
+1:6a2b9ea6972d storagegenie-backend storagegenie-backend-1 Up 12 seconds (healthy) 127.0.0.1:8003->8000/tcp
+===== END G3 BUILD + RECREATE =====
+
+
+################## G4 AFTER (raw) ##################
+
+===== G4 AFTER CAPTURE 2026-09-24T10:30:11Z =====
+--- IMAGE ID ---
+image_id=sha256:147a2651fb4823929bb42dfcf102111c439a6006c50be5b94697abede142aedb created=2026-09-24T10:29:20.143218217Z
+--- CONTAINER ---
+container_id=6a2b9ea6972dc58c46e469270cbf5ea3f6426e74a7e6a544a1b44783e79bb0fc image=sha256:147a2651fb4823929bb42dfcf102111c439a6006c50be5b94697abede142aedb RestartCount=0 Started=2026-09-24T10:29:31.619352658Z Health=healthy
+--- ALEMBIC CURRENT (live DB, read-only) ---
+20260923_sg100_enrich_snapshot
+--- TABLE COUNT ---
+25
+--- TABLE COUNTS ---
+alembic_version=1
+assertion=28
+asset=6
+asset_evidence=12
+asset_fts=6
+asset_fts_config=1
+asset_fts_data=8
+asset_fts_docsize=6
+asset_fts_idx=6
+audit_event=68
+candidate=7
+enrich_snapshot=2
+evidence=13
+guardrail_event=2
+household=1
+idempotency_key=9
+job=8
+job_step=56
+observation=16
+planning_suggestion=0
+provider_call=17
+review_task=6
+saved_search=0
+source_attribution=0
+user=2
+--- HEALTH EXACT x6 ---
+health[1]={"status":"ok","db":"ok","storage":"ok"}
+health[2]={"status":"ok","db":"ok","storage":"ok"}
+health[3]={"status":"ok","db":"ok","storage":"ok"}
+health[4]={"status":"ok","db":"ok","storage":"ok"}
+health[5]={"status":"ok","db":"ok","storage":"ok"}
+health[6]={"status":"ok","db":"ok","storage":"ok"}
+--- GATE http :80 via --resolve localhost ---
+code=301 redirect=https://storagegenie.dynv6.net/
+--- GATE https :443 via --resolve localhost ---
+code=401 redirect=
+--- FRESH-SERVER HEIC/HEIF 201 PROOF (temp DB inside the recreated container; no live writes) ---
+/usr/local/lib/python3.12/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+  from starlette.testclient import TestClient as TestClient  # noqa
+temp_household_id=01a0d2f7-3727-7c43-a5e3-75e0e9e19d8b
+temp_database_url=sqlite:////tmp/sg110verify/db.sqlite
+temp_storage_root=/tmp/sg110verify/storage
+-- brand=heic claimed=image/heic bytes=464
+post_http=201
+post_body={"id":"01a0d2f7-3753-7140-9ebf-0f73d28fd24c","sha256":"61366506a89a87823141ee7dca577cb2f417ada61c348753c527cb98228a32d7","storage_key":"01a0d2f7-3727-7c43-a5e3-75e0e9e19d8b/61/61366506a89a87823141ee7dca577cb2f417ada61c348753c527cb98228a32d7.heic","media_type":"image/heic","size_bytes":464,"original_filename":"probe-heic.heic"}
+decoded_size=37x29
+thumbnail_exists=True thumbnail_path=/tmp/sg110verify/storage/01a0d2f7-3727-7c43-a5e3-75e0e9e19d8b/61/61366506a89a87823141ee7dca577cb2f417ada61c348753c527cb98228a32d7_thumb256.heic
+-- brand=mif1 claimed=image/heif bytes=464
+post_http=201
+post_body={"id":"01a0d2f7-376a-7e62-8c5b-73e1126a52a0","sha256":"1fc0caade9f5d45d1db3d957ffaa8858bc226a2a5d12bf02004c307008762973","storage_key":"01a0d2f7-3727-7c43-a5e3-75e0e9e19d8b/1f/1fc0caade9f5d45d1db3d957ffaa8858bc226a2a5d12bf02004c307008762973.heic","media_type":"image/heif","size_bytes":464,"original_filename":"probe-mif1.heic"}
+decoded_size=37x29
+thumbnail_exists=True thumbnail_path=/tmp/sg110verify/storage/01a0d2f7-3727-7c43-a5e3-75e0e9e19d8b/1f/1fc0caade9f5d45d1db3d957ffaa8858bc226a2a5d12bf02004c307008762973_thumb256.heic
+exec_exit=0
+--- cleanup temp verify dir inside container ---
+cleanup_exit=0
+--- live DB unchanged check (evidence count still 13, household count still 1) ---
+evidence=13 household=1
+===== END G4 AFTER =====
+
+
+################## POST-RESTART SWEEP (waived per PG-DP-02) ##################
+Waived: restart-gated. Substitute authority = in-process suite pre-restart (tests/test_evidence_upload.py: 30 passed; full backend suite: 543 passed + the 2 known decoder env reds, stash-proved) + post-restart live probes (health x6, gate 301/401, alembic, 25-table counts) and the fresh-container HEIC/HEIF 201 proof above. No browser-driven tests exist on this path — the derived set is empty and differed nowise.
+
+################## CROSS-PRODUCT CHECK (PG-IC-01) ##################
+No criterion demands migration, frontend, sender, second recreate, press, or any metered call. Reads executed: pytest/TestClient on temp DBs + host read-only sqlite3/curl + the authorized image build + exactly ONE recreate + one fresh-container python exec on a temp DB. No other image pulled/run, no unnamed runtime launched. No cell collides.
+
+################## VACUITY CHECK (PG-EV-01 / the vacuous-pass warning) ##################
+- Detector legs invoke evidence_service._detect_media_type directly and assert the return; the 10 heic/heif params FAILED pre-change (seen-to-fail in the committed FAIL run).
+- Route legs invoke POST /v1/evidence through TestClient and assert 201 + decoded dimensions + thumbnail.exists(); both FAILED pre-change with 422.
+- Regression/negative legs are non-empty (2 ftyp-outside-table params + 1 unknown-signature).
+- The empty-diff claims (models/, alembic/, frontend/) are backed by command output above; count deltas are compared BEFORE->AFTER, not asserted from memory.
+- The opener registration is proven end-to-end (route decode + fresh-container upload), never by import assertion alone.
+
+################## ACTUAL vs BUDGET (units) ##################
+- G1 BEFORE capture: ~0.5 s / 120 s ordinary
+- FAIL run: 0.91 s / 120 s ordinary
+- PASS run: 0.72 s / 120 s ordinary
+- full suite + ruff + mypy: 23.39 s + ~1 s + ~13 s, within 600 s suite+lint
+- build + recreate + health + AFTER capture: ~35 s / 600 s build+recreate+verify
+- overall: well under 2100 s
+REAL metered spend: $0.000000 (zero provider calls).

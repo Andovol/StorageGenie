@@ -58,7 +58,10 @@ pathspec==1.1.1
 pillow==12.3.0
     # via
     #   storagegenie-backend (backend/pyproject.toml)
+    #   pillow-heif
     #   pytesseract
+pillow-heif==1.8.0
+    # via storagegenie-backend (backend/pyproject.toml)
 pluggy==1.6.0
     # via pytest
 pydantic==2.13.5

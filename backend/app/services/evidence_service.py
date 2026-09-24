@@ -8,6 +8,7 @@ import struct
 import warnings
 
 from PIL import Image, ImageOps, UnidentifiedImageError
+from pillow_heif import register_heif_opener
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
@@ -17,6 +18,28 @@ from app.services import audit_service
 from app.storage.local_store import storage_path_for, thumbnail_path
 
 logger = logging.getLogger(__name__)
+
+# SG-110: HEIC/HEIF decode support. Pillow cannot decode HEIC natively (verified:
+# PIL.features.check("heif") is False on Pillow 12.3.0); pillow-heif registers the
+# opener/encoder on the shared Image class at import time. Registering in this,
+# the module the evidence decode path always executes, makes it live for every
+# caller (including signals) without a per-call hook. The route test proves it.
+register_heif_opener()
+
+# Major brands accepted by pillow-heif's own opener (as_plugin.py:229, v1.8.0).
+# HEVC-coded brands serve "image/heic"; the generic HEIF brands serve "image/heif".
+_FTYP_BRAND_MEDIA = {
+    b"heic": "image/heic",
+    b"heix": "image/heic",
+    b"heim": "image/heic",
+    b"heis": "image/heic",
+    b"hevc": "image/heic",
+    b"hevx": "image/heic",
+    b"hevm": "image/heic",
+    b"hevs": "image/heic",
+    b"mif1": "image/heif",
+    b"msf1": "image/heif",
+}
 
 ALLOWED_MEDIA = {
     "image/jpeg": b"\xff\xd8\xff",
@@ -65,6 +88,8 @@ def _detect_media_type(file_bytes: bytes, claimed: str) -> str:
         detected = "image/webp"
     elif file_bytes.startswith((b"II*\x00", b"MM\x00*")):
         detected = "image/tiff"
+    elif len(file_bytes) >= 12 and file_bytes[4:8] == b"ftyp":
+        detected = _FTYP_BRAND_MEDIA.get(file_bytes[8:12])
 
     if detected is None:
         raise EvidenceValidationError("media_type_mismatch: unsupported media signature")
@@ -115,7 +140,7 @@ def _thumbnail_bytes(image: Image.Image, media_type: str, size: int) -> bytes:
     thumb = image.copy()
     thumb.thumbnail((size, size))
     output = io.BytesIO()
-    if media_type == "image/jpeg":
+    if media_type in ("image/jpeg", "image/heic", "image/heif"):
         if thumb.mode in ("RGBA", "LA"):
             background = Image.new("RGB", thumb.size, (255, 255, 255))
             background.paste(thumb, mask=thumb.split()[-1] if thumb.mode == "RGBA" else None)

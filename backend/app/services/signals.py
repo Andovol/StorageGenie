@@ -17,7 +17,7 @@ from app.storage.local_store import storage_path
 
 logger = logging.getLogger(__name__)
 
-SUPPORTED_IMAGE_TYPES = {"image/jpeg", "image/png", "image/webp", "image/tiff"}
+SUPPORTED_IMAGE_TYPES = {"image/jpeg", "image/png", "image/webp", "image/tiff", "image/heic", "image/heif"}
 OCR_KIND = "ocr"
 BARCODE_KIND = "barcode_qr"
 EXIF_KIND = "exif"

@@ -22,7 +22,15 @@ class Settings(BaseSettings):
     exif_timestamps_enabled: bool = False
     dhash_near_threshold: int = 10
     thumbnail_sizes: list[int] = [256, 512]
-    allowed_mime_types: list[str] = ["image/jpeg", "image/png", "image/webp", "image/tiff", "application/pdf"]
+    allowed_mime_types: list[str] = [
+        "image/jpeg",
+        "image/png",
+        "image/webp",
+        "image/tiff",
+        "image/heic",
+        "image/heif",
+        "application/pdf",
+    ]
 
     sg_provider_id: str = "fake"
     sg_model_id: str = "deepseek-v4-flash-vision-exp"

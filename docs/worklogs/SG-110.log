@@ -1,0 +1,31 @@
+SG-110 worklog — HEIC/HEIF ingest: signature branch + decode support + thumbnails, owns its refresh
+Work dir /home/andrei/StorageGenie · branch automation · remote git@github.com:Andovol/StorageGenie.git
+Contract 0.33.0 (source /home/andrei/storagegenie-contract/VERSION = 0.33.0; HEAD b232b84 = "Contract payload 0.33.0"; RULES.md sha256 18de7fd7b3546bd7624b3a7b59a78bd629752816cd7fa8f1af6113d1bafc8d46 == payload RULES.sha256)
+Model/effort from process arguments: /proc/3782928/cmdline = 'opencode run --auto --dir /home/andrei/StorageGenie --variant high <packet>' (no --model flag → model is the CLI default; no provider metadata readable) → effort=high (from --variant high); model=unknown (not named in argv; refused to guess).
+Spend real $ = $0.000000 (zero provider calls).
+
+BASE_REF=origin/automation BASE_RESOLVED=89d30ccdc49aec04ee0f0b5ae4aca5cd7e469a79 (== start HEAD)
+
+01. Recon — re-verified every packet premise: detector `_detect_media_type` at evidence_service.py:56-75 (now 88-93 after edits) with jpeg/png/pdf/webp/tiff branches + `unsupported media signature`; `allowed_mime_types` config.py:25; `SUPPORTED_IMAGE_TYPES` signals.py:20; `_thumbnail_bytes` png/webp dict-key at :129 (dead-key trap); `pillow>=10` in pyproject; grep `heif|HEIF` over backend/ = empty in app code. Corrections found: (a) the ACTUAL install path is `requirements.lock` (Dockerfile:16 `pip install -r requirements.lock`), not pyproject alone; (b) Pillow 12.3.0 has native AVIF but `features.check("heif")` is False — a decoder dependency is genuinely required; (c) `allowed_mime_types` is declared but NOT enforced anywhere in app code (dead list; still updated per packet); (d) the packet's 9-brand list OMITS `hevx`, which pillow-heif's own opener accepts (as_plugin.py:229) — tree list is 10.
+02. Dependency chosen: `pillow-heif==1.8.0` (requires pillow>=11.1.0; bundles libheif 1.23.4). Declared in pyproject `dependencies` and added to requirements.lock by re-running the documented `uv pip compile` in place (preserves every existing pin; only the pillow-heif block appears in the diff).
+03. G1 BEFORE captured (raw): image sha256:6a555108; container 234b04b0; alembic single head 20260923_sg100_enrich_snapshot; 25 tables; health {"status":"ok","db":"ok","storage":"ok"}; gate 301/401; crafted ftypheic 24-byte probe -> POST /v1/evidence image/heic => HTTP 422 {"detail":"media_type_mismatch: unsupported media signature"}.
+04. Tests written first (final form): extended tests/test_evidence_upload.py — 10 ftyp detector legs (heic/heix/heim/heis/hevc/hevx/hevm/hevs/mif1/msf1), 2 ftyp-outside-table negative legs (avif, heia), route legs for generated HEIC and HEIF asserting 201 + decoded dims + thumbnail.exists() + thumb JPEG.
+05. FAIL run (raw committed) — implementation absent: 12 failed, 10 passed (the 10 heic/heif detector params + 2 route legs failed; the 6 legacy signatures + 3 negatives passed) in 0.91s.
+06. Implemented: evidence_service.py import-time `register_heif_opener()` + data-driven `_FTYP_BRAND_MEDIA` table + ftyp detector branch + thumbnail rule `media_type in ("image/jpeg","image/heic","image/heif")`; config.py allowlist; signals.py set.
+07. PASS run (raw committed): 22 passed in 0.72s (focused -k set); whole tests/test_evidence_upload.py 30 passed.
+08. Suite + gates: full backend suite 543 passed + 2 known decoder env reds (test_signals barcode/OCR), STASH-PROVED identical on BASE 89d30cc; ruff "All checks passed!"; mypy 41 errors base == 41 current, IDENTICAL error set, none touching changed files (delta 0); secret gate 0 real (2 hits are PRE-EXISTING field-name declarations in config.py); third-literal grep none; configured-keys == decoder-accepted brands (10/10), MIMEs exactly {image/heic, image/heif}.
+09. G3 refresh: one build (`docker compose build backend`, BUILDX_CONFIG relocated to /tmp; build exit 0) -> new image sha256:147a2651; decoder resolved inside image pillow_heif 1.8.0 / pillow 12.3.0 / libheif 1.23.4; exactly ONE recreate (234b04b0 -> 6a2b9ea6); healthy after 14s.
+10. G4 AFTER (raw): image id differs; alembic unchanged; 25-table counts delta exactly 0; health exact x6; gate 301/401; fresh-container HEIC 201 (37x29, thumbnail_exists=True) AND HEIF 201 (37x29, thumbnail_exists=True) on a TEMP DB — live DB evidence=13 household=1 unchanged, temp dir removed.
+11. Worklog + report + verify log written; receipt note added on WORK_HEAD, notes ref pushed and verified on a mapped fetch; final tip dual-annotated.
+
+Actual-versus-budget per leg (units):
+- G1 BEFORE capture: ~0.5 s / 120 s ordinary
+- FAIL run: 0.91 s / 120 s ordinary
+- PASS run: 0.72 s / 120 s ordinary
+- suite + lint (pytest 23.39 s + ruff + mypy): <= 600 s suite+lint
+- build: ~14 s / 600 s build+recreate+verify
+- recreate + health: 14 s to healthy (same 600 s)
+- G4 AFTER verify: ~12 s (same 600 s)
+- overall: ~10 min / 2100 s
+
+REAL metered spend: $0.000000 (zero calls).
