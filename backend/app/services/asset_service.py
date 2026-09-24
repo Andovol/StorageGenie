@@ -146,3 +146,71 @@ def attach_evidence(db: Session, asset: Asset, evidence_ids: list[str], actor: s
         household_id=asset.household_id,
     )
     db.commit()
+
+
+# SG-112: the one redirect assertion a MERGED duplicate carries. It lives in the
+# `merge.*` namespace so a reader can name the winner with NO new table; the
+# value object carries `merged_into` (the winning asset id). A MERGED asset with
+# no redirect yet reads terminal, never dangling (`PG-SC-07`).
+MERGE_REDIRECT_FIELD = "merge.merged_into"
+
+
+class AssetMergeError(RuntimeError):
+    """An asset merge the operation refuses; `status_code` is the HTTP mapping."""
+
+    def __init__(self, message: str, status_code: int = 422) -> None:
+        super().__init__(message)
+        self.status_code = status_code
+
+
+def merge_asset_redirect(
+    db: Session,
+    asset: Asset,
+    winner_id: str,
+    actor: str = "api",
+) -> Asset:
+    """Redirect a materialized duplicate asset to its winner (`ACTIVE -> MERGED`).
+
+    Validate-first-then-write: the winner must exist, share the household and not
+    itself be MERGED (no redirect chains), and the source transition is checked
+    through the single lifecycle table -- never written as free text. The source
+    then carries status `MERGED` plus a `merge.merged_into` assertion naming the
+    winner, and an audit row. The caller commits.
+    """
+    winner = db.query(Asset).filter_by(id=winner_id).first()
+    if winner is None:
+        raise AssetMergeError("Merge target asset not found", status_code=404)
+    if winner.household_id != asset.household_id:
+        raise AssetMergeError("Merge target household mismatch", status_code=403)
+    if winner.id == asset.id:
+        raise AssetMergeError("an asset cannot merge into itself", status_code=422)
+    if winner.status == lifecycle.MERGED:
+        raise AssetMergeError("merge target is itself MERGED", status_code=422)
+    if asset.status == lifecycle.MERGED:
+        raise AssetMergeError("asset is already MERGED", status_code=409)
+    lifecycle.validate_transition(asset.status, lifecycle.MERGED)
+
+    before = {"status": asset.status, "version": asset.version}
+    asset.status = lifecycle.MERGED
+    upsert_assertion(db, asset.id, "status", lifecycle.MERGED, household_id=asset.household_id)
+    upsert_assertion(
+        db,
+        asset.id,
+        MERGE_REDIRECT_FIELD,
+        {"merged_into": winner_id},
+        household_id=asset.household_id,
+    )
+    asset.version = (asset.version or 1) + 1
+    audit_service.record(
+        db,
+        actor=actor,
+        action="asset.merge",
+        entity_type="asset",
+        entity_id=asset.id,
+        before=before,
+        after={"status": lifecycle.MERGED, "merged_into": winner_id},
+        household_id=asset.household_id,
+    )
+    db.commit()
+    db.refresh(asset)
+    return asset

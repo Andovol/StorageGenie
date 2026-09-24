@@ -22,6 +22,11 @@ class CandidateSplitRequest(BaseModel):
     item_indexes: list[int] = Field(default_factory=list)
 
 
+class CandidateMergeRequest(BaseModel):
+    winner_id: str
+    loser_ids: list[str] = Field(default_factory=list)
+
+
 @router.post("/candidates/{candidate_id}/decision")
 def decide_candidate(
     candidate_id: str,
@@ -34,7 +39,7 @@ def decide_candidate(
         raise HTTPException(status_code=404, detail="Candidate not found")
     if candidate.household_id != household_id:
         raise HTTPException(status_code=403, detail="Household mismatch")
-    if candidate.state in {"rejected", "split"}:
+    if candidate.state in {"rejected", "split", "merged"}:
         raise HTTPException(status_code=409, detail=f"Candidate is {candidate.state}")
 
     if payload.action in {"hold", "reject"}:
@@ -117,6 +122,29 @@ def split_candidate(
     }
 
 
+@router.post("/candidates/merge")
+def merge_candidates(
+    payload: CandidateMergeRequest,
+    household_id: str = Query(...),
+    db: Session = Depends(get_db),
+) -> dict[str, object]:
+    try:
+        winner, losers, resolved_task_ids = candidates.merge_candidates(
+            db, payload.winner_id, payload.loser_ids, household_id
+        )
+    except candidates.CandidateMergeError as exc:
+        db.rollback()
+        raise HTTPException(status_code=exc.status_code, detail=str(exc)) from exc
+    db.commit()
+    return {
+        "winner_id": winner.id,
+        "state": winner.state,
+        "evidence_ids": [str(item) for item in json.loads(winner.evidence_ids_json)],
+        "merged_loser_ids": [loser.id for loser in losers],
+        "resolved_task_ids": resolved_task_ids,
+    }
+
+
 @router.get("/candidates/{candidate_id}")
 def get_candidate(
     candidate_id: str,
@@ -146,6 +174,7 @@ def get_candidate(
     if not isinstance(web_alternates, list):
         web_alternates = []
     asset_id = proposal.get("asset_id")
+    merged_into = proposal.get("merged_into")
     return {
         "id": candidate.id,
         "state": candidate.state,
@@ -156,4 +185,5 @@ def get_candidate(
         "evidence_ids": [str(item) for item in evidence_ids],
         "asset_id": asset_id if isinstance(asset_id, str) else None,
         "web_alternates": web_alternates,
+        "merged_into": merged_into if isinstance(merged_into, str) else None,
     }

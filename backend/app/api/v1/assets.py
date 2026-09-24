@@ -2,6 +2,7 @@ import json
 from typing import Any
 
 from fastapi import APIRouter, Depends, Header, HTTPException, Query
+from pydantic import BaseModel
 from sqlalchemy import and_, func, or_, select, text
 from sqlalchemy.orm import Query as OrmQuery, Session
 
@@ -17,7 +18,13 @@ from app.schemas.common import decode_cursor, encode_cursor, loads_json
 from app.schemas.saved_search import SAVED_SEARCH_QUERY_MAX_BYTES, SavedSearchCreate
 from app.services import audit_service, lifecycle
 from app.plugins.registry import iter_plugins
-from app.services.asset_service import attach_evidence, create_asset, update_asset
+from app.services.asset_service import (
+    AssetMergeError,
+    attach_evidence,
+    create_asset,
+    merge_asset_redirect,
+    update_asset,
+)
 from app.services.fts import ensure_asset_fts, sanitize_fts_query
 
 router = APIRouter()
@@ -421,6 +428,40 @@ def delete_asset(asset_id: str, household_id: str = Query(...), db: Session = De
     )
     db.commit()
     return {"status": "archived", "id": a.id}
+
+
+class AssetMergeRequest(BaseModel):
+    merged_into: str
+
+
+@router.post("/assets/{asset_id}/merge")
+def merge_asset(
+    asset_id: str,
+    payload: AssetMergeRequest,
+    household_id: str = Query(...),
+    db: Session = Depends(get_db),
+) -> dict[str, Any]:
+    """SG-112: redirect a materialized duplicate asset to its winner.
+
+    The source must be `ACTIVE` (the transition is validated through the single
+    lifecycle table); the winner must exist in the same household. The write is
+    the status `MERGED` plus a `merge.merged_into` assertion naming the winner,
+    so the existing asset read path names the winner with no new table.
+    """
+    a = db.query(Asset).filter_by(id=asset_id).first()
+    if not a:
+        raise HTTPException(status_code=404, detail="Asset not found")
+    if a.household_id != household_id:
+        raise HTTPException(status_code=403, detail="Household mismatch")
+    try:
+        a = merge_asset_redirect(db, a, payload.merged_into)
+    except lifecycle.LifecycleTransitionError as exc:
+        db.rollback()
+        raise HTTPException(status_code=422, detail=str(exc)) from None
+    except AssetMergeError as exc:
+        db.rollback()
+        raise HTTPException(status_code=exc.status_code, detail=str(exc)) from exc
+    return _asset_to_dict(a, db)
 
 
 @router.post("/assets/{asset_id}/evidence")

@@ -481,7 +481,23 @@ class CandidateSplitError(RuntimeError):
         self.status_code = status_code
 
 
+class CandidateMergeError(RuntimeError):
+    """A merge request the operation refuses; `status_code` is the HTTP mapping."""
+
+    def __init__(self, message: str, status_code: int = 422) -> None:
+        super().__init__(message)
+        self.status_code = status_code
+
+
 SPLIT_ORIGIN_STATE = "split"
+MERGED_STATE = "merged"
+
+# SG-112: the review-task types a merge RESOLVES on a losing candidate. Every
+# other open task type blocks a merge so an unrelated pending decision is never
+# silently dropped; the duplicate-identifier collision task IS the duplicate
+# question a merge answers, so it resolves with an audit row (the split
+# precedent's `candidate.multi_item` shape, `candidates.py:1096`).
+MERGE_RESOLVED_TASK_TYPES: tuple[str, ...] = ("identifier_collision",)
 
 
 def load_proposal(candidate: Candidate) -> dict[str, object]:
@@ -1135,3 +1151,143 @@ def split_candidate(
     )
     db.flush()
     return children, resolved_task_ids
+
+
+def merge_candidates(  # noqa: C901
+    db: Session,
+    winner_id: str,
+    loser_ids: list[str],
+    household_id: str,
+) -> tuple[Candidate, list[Candidate], list[str]]:
+    """Merge one `proposed` survivor with one-or-more `proposed` duplicates.
+
+    Validate-first-then-write (the `split_candidate` shape): every participant is
+    checked before anything changes, so a refused merge writes NOTHING. The
+    winner KEEPS its fields and stays `proposed` -- a merge never auto-accepts,
+    the review still decides. The winner's evidence becomes the exact union of
+    every participant's evidence; each loser ends terminal (`merged`) carrying
+    `merged_into`, and its open duplicate task(s) resolve with audit rows. The
+    request's explicit ids are the merge set; the candidate proposals'
+    `dedup_matches` are evidence for the reviewer, never trusted as the set. The
+    caller commits, the route rolls back on error.
+    """
+    winner = db.query(Candidate).filter_by(id=winner_id).first()
+    if winner is None:
+        raise CandidateMergeError("Winner candidate not found", status_code=404)
+    if winner.household_id != household_id:
+        raise CandidateMergeError("Household mismatch", status_code=403)
+    if not isinstance(loser_ids, list) or any(
+        not isinstance(item, str) for item in loser_ids
+    ):
+        raise CandidateMergeError("loser_ids must be a list of candidate ids", status_code=422)
+    if not loser_ids:
+        raise CandidateMergeError("merge requires at least one loser", status_code=422)
+    if len(set(loser_ids)) != len(loser_ids):
+        raise CandidateMergeError("loser_ids must be unique", status_code=422)
+    if winner.id in loser_ids:
+        raise CandidateMergeError("the winner cannot also be a loser", status_code=422)
+    if winner.state != "proposed":
+        raise CandidateMergeError(
+            f"winner state {winner.state} is not mergeable", status_code=409
+        )
+
+    losers: list[Candidate] = []
+    for loser_id in loser_ids:
+        loser = db.query(Candidate).filter_by(id=loser_id).first()
+        if loser is None:
+            raise CandidateMergeError(f"Loser candidate {loser_id} not found", status_code=404)
+        if loser.household_id != household_id:
+            raise CandidateMergeError("Household mismatch", status_code=403)
+        if loser.state != "proposed":
+            raise CandidateMergeError(
+                f"loser state {loser.state} is not mergeable", status_code=409
+            )
+        blocking = (
+            db.query(ReviewTask)
+            .filter(
+                ReviewTask.subject_ref == loser.id,
+                ReviewTask.household_id == household_id,
+                ReviewTask.status == "open",
+                ReviewTask.task_type.notin_(list(MERGE_RESOLVED_TASK_TYPES)),
+            )
+            .count()
+        )
+        if blocking:
+            raise CandidateMergeError("loser has unresolved review tasks", status_code=409)
+        losers.append(loser)
+
+    # Every participant validated; only now does anything change.
+    raw_winner_evidence = json.loads(winner.evidence_ids_json)
+    if not isinstance(raw_winner_evidence, list):
+        raise CandidateMergeError("winner evidence is invalid", status_code=500)
+    winner_evidence = [str(item) for item in raw_winner_evidence]
+    union = list(winner_evidence)
+    for loser in losers:
+        raw_loser_evidence = json.loads(loser.evidence_ids_json)
+        if not isinstance(raw_loser_evidence, list):
+            raise CandidateMergeError("loser evidence is invalid", status_code=500)
+        for item in raw_loser_evidence:
+            evidence_id = str(item)
+            if evidence_id not in union:
+                union.append(evidence_id)
+
+    # Invariant: the survivor stays `proposed` after a merge -- merge never
+    # auto-accepts; the review still decides (asserted in the tests).
+    winner.evidence_ids_json = json.dumps(union, ensure_ascii=False)
+
+    resolved_task_ids: list[str] = []
+    now = datetime.datetime.now(datetime.timezone.utc)
+    for loser in losers:
+        proposal = load_proposal(loser)
+        proposal["merged_into"] = winner.id
+        loser.proposed_fields_json = json.dumps(proposal, ensure_ascii=False)
+        loser.state = MERGED_STATE
+
+    open_tasks = (
+        db.query(ReviewTask)
+        .filter(
+            ReviewTask.subject_ref.in_([loser.id for loser in losers]),
+            ReviewTask.household_id == household_id,
+            ReviewTask.task_type.in_(list(MERGE_RESOLVED_TASK_TYPES)),
+            ReviewTask.status == "open",
+        )
+        .all()
+    )
+    for task in open_tasks:
+        before = {"status": task.status}
+        task.status = "resolved"
+        task.updated_at = now
+        audit_service.record(
+            db,
+            actor="api",
+            action="review_task.resolve",
+            entity_type="review_task",
+            entity_id=task.id,
+            before=before,
+            after={"status": task.status, "resolution": {"merge": winner.id}},
+            household_id=task.household_id,
+        )
+        resolved_task_ids.append(task.id)
+
+    audit_service.record(
+        db,
+        actor="api",
+        action="candidate.merge",
+        entity_type="candidate",
+        entity_id=winner.id,
+        before={
+            "state": "proposed",
+            "evidence_ids": winner_evidence,
+            "loser_ids": loser_ids,
+        },
+        after={
+            "state": winner.state,
+            "evidence_ids": union,
+            "loser_ids": [loser.id for loser in losers],
+            "merged_into": winner.id,
+            "resolved_task_ids": resolved_task_ids,
+        },
+        household_id=household_id,
+    )
+    db.flush()
+    return winner, losers, resolved_task_ids

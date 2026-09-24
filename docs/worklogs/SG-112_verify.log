@@ -1,0 +1,401 @@
+SG-112 verify log — raw outputs (candidate merge + MERGED redirect)
+Generated 2026-09-24T11:04:04Z on host ubuntu in /home/andrei/StorageGenie
+BASE_REF=origin/automation BASE_RESOLVED=7043285f079966afb5c6e511d9a0f5e78cc79df4
+
+================ G1 BEFORE ================
+=== G1 BEFORE 2026-09-24T10:57:05Z ===
+--- image id ---
+sha256:ace2b17a5e851f5c524a47958639fef5b5fae4cc4be81e71dba494b79d4662a2 2026-09-24T10:49:45.958789846Z
+sha256:ace2b17a5e851f5c524a47958639fef5b5fae4cc4be81e71dba494b79d4662a2 created=2026-09-24T10:49:29.268540239Z
+--- container id / restartcount ---
+91fab66e675a07a295a8da488582decbd8d712dceaba4e4b2ba06e1799d313ac restart=0 state=running
+--- alembic current (in container) ---
+INFO  [alembic.runtime.migration] Context impl SQLiteImpl.
+INFO  [alembic.runtime.migration] Will assume non-transactional DDL.
+20260923_sg100_enrich_snapshot (head)
+--- health ---
+{"status":"ok","db":"ok","storage":"ok"}
+
+--- table count ---
+25
+--- per-table counts (sorted) ---
+alembic_version|1
+assertion|28
+asset|6
+asset_evidence|12
+asset_fts|6
+asset_fts_config|1
+asset_fts_data|8
+asset_fts_docsize|6
+asset_fts_idx|6
+audit_event|68
+candidate|7
+enrich_snapshot|2
+evidence|13
+guardrail_event|2
+household|1
+idempotency_key|9
+job|8
+job_step|56
+observation|16
+planning_suggestion|0
+provider_call|17
+review_task|6
+saved_search|0
+source_attribution|0
+user|2
+--- asset status census ---
+ACTIVE|6
+--- gate canonical vhost ---
+http:80 => code=301 redirect=https://storagegenie.dynv6.net/
+https:443 => code=401
+--- merge-absence grep (raw) ---
+$ grep -rni "merge" backend/app/api/v1/candidates.py backend/app/services/candidates.py
+backend/app/services/candidates.py:347:def merge_web_fields(
+backend/app/services/candidates.py:350:    """Merge web fields into existing fields under the label-wins conflict rule.
+backend/app/services/candidates.py:354:    other web field fills the gap. Returns `(merged_fields, web_alternates)`.
+backend/app/services/candidates.py:356:    merged = dict(existing_fields)
+backend/app/services/candidates.py:360:        if field_name in merged:
+backend/app/services/candidates.py:361:            existing_value, _ = _field_parts(merged[field_name])
+backend/app/services/candidates.py:363:            field_name in merged
+backend/app/services/candidates.py:379:        merged[field_name] = raw
+backend/app/services/candidates.py:380:    return merged, alternates
+backend/app/services/candidates.py:438:    """Merge web fields into a candidate proposal's `fields` (in-memory only).
+backend/app/services/candidates.py:449:    merged, alternates = merge_web_fields(existing, web_fields)
+backend/app/services/candidates.py:451:    updated["fields"] = merged
+
+$ grep -rn "merge" backend/app/api/v1/*.py backend/app/services/*.py
+backend/app/api/v1/enrich.py:101:    """The asset's label-side facts, keyed by `merge_web_fields`' own field names.
+backend/app/api/v1/enrich.py:103:    SG-103: the label-wins merge needs the asset's LABEL side as the `existing`
+backend/app/api/v1/enrich.py:110:    `merge_web_fields` reads it through `_field_parts`.
+backend/app/api/v1/enrich.py:113:    assertion never maps to a merge field or an alternate (`PG-SC-07`). A
+backend/app/api/v1/enrich.py:214:    # The REAL merge rule runs; it is never re-implemented here.
+backend/app/api/v1/enrich.py:216:    fields, alternates = candidates.merge_web_fields(label_existing, web_fields)
+backend/app/services/candidates.py:347:def merge_web_fields(
+backend/app/services/candidates.py:354:    other web field fills the gap. Returns `(merged_fields, web_alternates)`.
+backend/app/services/candidates.py:356:    merged = dict(existing_fields)
+backend/app/services/candidates.py:360:        if field_name in merged:
+backend/app/services/candidates.py:361:            existing_value, _ = _field_parts(merged[field_name])
+backend/app/services/candidates.py:363:            field_name in merged
+backend/app/services/candidates.py:379:        merged[field_name] = raw
+backend/app/services/candidates.py:380:    return merged, alternates
+backend/app/services/candidates.py:449:    merged, alternates = merge_web_fields(existing, web_fields)
+backend/app/services/candidates.py:451:    updated["fields"] = merged
+
+$ grep -rn "MERGED" backend/app
+backend/app/services/lifecycle.py:4:ARCHIVED, DISPOSED, MERGED`) and the single transition table, so no reader or
+backend/app/services/lifecycle.py:13:DISPOSED`, plus the reserved `ACTIVE -> MERGED` redirect target. A `MERGED`
+backend/app/services/lifecycle.py:30:MERGED = "MERGED"
+backend/app/services/lifecycle.py:38:    MERGED,
+backend/app/services/lifecycle.py:41:# The single transition table. Terminal states (`DISPOSED`, `MERGED`) map to an
+backend/app/services/lifecycle.py:46:    ACTIVE: frozenset({ARCHIVED, MERGED}),
+backend/app/services/lifecycle.py:49:    MERGED: frozenset(),
+
+================ G2 FAIL RUN (candidate test file vs BASE archive) ================
+$ cd /tmp/opencode/sg112_base/backend && PYTHONPATH=/tmp/opencode/sg112_base/backend <venv>/python -m pytest tests/test_sg112_merge.py -q -p no:cacheprovider
+FFFFF.F                                                                  [100%]
+=================================== FAILURES ===================================
+_______________ test_merge_unions_evidence_and_terminates_losers _______________
+
+merge_db = (<sqlalchemy.orm.session.Session object at 0x731412b524e0>, '01a0d313-cd26-7452-83b9-dbb299820437', '01a0d313-cd27-7ea2-8afd-8f7b3af9ca1c')
+
+    def test_merge_unions_evidence_and_terminates_losers(merge_db) -> None:  # type: ignore[no-untyped-def]
+        session, household_id, _ = merge_db
+        winner = _seed_candidate(session, household_id, evidence(session, household_id, "a").id, "W")
+        loser_one = _seed_candidate(
+            session, household_id, evidence(session, household_id, "b").id, "L1"
+        )
+        loser_two = _seed_candidate(
+            session, household_id, evidence(session, household_id, "c").id, "L2"
+        )
+        winner_evidence = json.loads(winner.evidence_ids_json)
+        loser_one_evidence = json.loads(loser_one.evidence_ids_json)
+        loser_two_evidence = json.loads(loser_two.evidence_ids_json)
+    
+        with TestClient(app) as client:
+            response = client.post(
+                "/v1/candidates/merge",
+                params={"household_id": household_id},
+                json={"winner_id": winner.id, "loser_ids": [loser_one.id, loser_two.id]},
+            )
+>           assert response.status_code == 200, response.text
+E           AssertionError: {"detail":"Method Not Allowed"}
+E           assert 405 == 200
+E            +  where 405 = <Response [405 Method Not Allowed]>.status_code
+
+tests/test_sg112_merge.py:171: AssertionError
+_____________ test_merge_resolves_duplicate_tasks_with_audit_rows ______________
+
+merge_db = (<sqlalchemy.orm.session.Session object at 0x7314124178c0>, '01a0d313-cdb7-7942-b2b4-1af96e565601', '01a0d313-cdb7-7942-b2b4-1b0b04ffa7ef')
+
+    def test_merge_resolves_duplicate_tasks_with_audit_rows(merge_db) -> None:  # type: ignore[no-untyped-def]
+        session, household_id, _ = merge_db
+        winner = _seed_candidate(session, household_id, evidence(session, household_id, "d").id, "W")
+        loser = _seed_candidate(session, household_id, evidence(session, household_id, "e").id, "L")
+        collision = _seed_task(session, household_id, loser.id, next(iter(RESOLVED_TASK_TYPES)))
+    
+        with TestClient(app) as client:
+            response = client.post(
+                "/v1/candidates/merge",
+                params={"household_id": household_id},
+                json={"winner_id": winner.id, "loser_ids": [loser.id]},
+            )
+>           assert response.status_code == 200, response.text
+E           AssertionError: {"detail":"Method Not Allowed"}
+E           assert 405 == 200
+E            +  where 405 = <Response [405 Method Not Allowed]>.status_code
+
+tests/test_sg112_merge.py:223: AssertionError
+_____________ test_merge_refuses_illegal_shapes_and_writes_nothing _____________
+
+merge_db = (<sqlalchemy.orm.session.Session object at 0x7314122e8980>, '01a0d313-ce00-7241-9154-4ec2bec7cf38', '01a0d313-ce00-7241-9154-4edaa6d6d51c')
+
+    def test_merge_refuses_illegal_shapes_and_writes_nothing(merge_db) -> None:  # type: ignore[no-untyped-def]
+        session, household_id, other_id = merge_db
+        winner = _seed_candidate(session, household_id, evidence(session, household_id, "f").id, "W")
+        proposed = _seed_candidate(session, household_id, evidence(session, household_id, "g").id, "P")
+        decided = _seed_candidate(
+            session, household_id, evidence(session, household_id, "h").id, "D", state="accepted"
+        )
+        foreign = _seed_candidate(session, other_id, evidence(session, other_id, "i").id, "F")
+        blocked = _seed_candidate(session, household_id, evidence(session, household_id, "j").id, "B")
+        _seed_task(session, household_id, blocked.id, BLOCKING_TASK_TYPES[0])
+    
+        cases = [
+            ({"winner_id": winner.id, "loser_ids": [decided.id]}, 409),  # decided loser
+            ({"winner_id": winner.id, "loser_ids": [foreign.id]}, 403),  # cross-household loser
+            ({"winner_id": winner.id, "loser_ids": [winner.id]}, 422),  # winner == loser
+            ({"winner_id": winner.id, "loser_ids": []}, 422),  # empty losers
+            ({"winner_id": winner.id, "loser_ids": [blocked.id]}, 409),  # loser with open task
+            ({"winner_id": "missing-winner", "loser_ids": [proposed.id]}, 404),
+            ({"winner_id": decided.id, "loser_ids": [proposed.id]}, 409),  # decided winner
+        ]
+    
+        with TestClient(app) as client:
+            for payload, expected in cases:
+                before = _counts(session)
+                response = client.post(
+                    "/v1/candidates/merge",
+                    params={"household_id": household_id},
+                    json=payload,
+                )
+>               assert response.status_code == expected, (payload, response.text)
+E               AssertionError: ({'winner_id': '01a0d313-ce08-7f41-89bf-37bce6618fb2', 'loser_ids': ['01a0d313-ce10-79f3-aed5-1df669928961']}, '{"detail":"Method Not Allowed"}')
+E               assert 405 == 409
+E                +  where 405 = <Response [405 Method Not Allowed]>.status_code
+
+tests/test_sg112_merge.py:265: AssertionError
+_____________________ test_merged_loser_redecision_is_409 ______________________
+
+merge_db = (<sqlalchemy.orm.session.Session object at 0x73141197e360>, '01a0d313-ce57-72b3-89af-495e814f0634', '01a0d313-ce57-72b3-89af-496ba0f77876')
+
+    def test_merged_loser_redecision_is_409(merge_db) -> None:  # type: ignore[no-untyped-def]
+        session, household_id, _ = merge_db
+        winner = _seed_candidate(session, household_id, evidence(session, household_id, "k").id, "W")
+        loser = _seed_candidate(session, household_id, evidence(session, household_id, "l").id, "L")
+    
+        with TestClient(app) as client:
+            merged = client.post(
+                "/v1/candidates/merge",
+                params={"household_id": household_id},
+                json={"winner_id": winner.id, "loser_ids": [loser.id]},
+            )
+>           assert merged.status_code == 200, merged.text
+E           AssertionError: {"detail":"Method Not Allowed"}
+E           assert 405 == 200
+E            +  where 405 = <Response [405 Method Not Allowed]>.status_code
+
+tests/test_sg112_merge.py:296: AssertionError
+_______________ test_asset_merge_redirect_round_trips_read_path ________________
+
+merge_db = (<sqlalchemy.orm.session.Session object at 0x7314119f0770>, '01a0d313-ce98-7380-926a-847d674e8f28', '01a0d313-ce98-7380-926a-8485f9617275')
+
+    def test_asset_merge_redirect_round_trips_read_path(merge_db) -> None:  # type: ignore[no-untyped-def]
+        session, household_id, _ = merge_db
+        winner = make_asset(session, household_id, "ACTIVE", "Winner")
+        duplicate = make_asset(session, household_id, "ACTIVE", "Duplicate")
+    
+        with TestClient(app) as client:
+            response = client.post(
+                f"/v1/assets/{duplicate.id}/merge",
+                params={"household_id": household_id},
+                json={"merged_into": winner.id},
+            )
+>           assert response.status_code == 200, response.text
+E           AssertionError: {"detail":"Method Not Allowed"}
+E           assert 405 == 200
+E            +  where 405 = <Response [405 Method Not Allowed]>.status_code
+
+tests/test_sg112_merge.py:323: AssertionError
+___________________ test_asset_merge_refusals_write_nothing ____________________
+
+merge_db = (<sqlalchemy.orm.session.Session object at 0x7314119f2330>, '01a0d313-cf13-7211-a189-26a85e356e20', '01a0d313-cf13-7211-a189-26b2efc6f999')
+
+    def test_asset_merge_refusals_write_nothing(merge_db) -> None:  # type: ignore[no-untyped-def]
+        session, household_id, other_id = merge_db
+        winner = make_asset(session, household_id, "ACTIVE", "Winner")
+        duplicate = make_asset(session, household_id, "ACTIVE", "Duplicate")
+        draft = make_asset(session, household_id, "DRAFT", "Draft")
+        foreign = make_asset(session, other_id, "ACTIVE", "Foreign")
+        already = make_asset(session, household_id, "MERGED", "Already")
+    
+        cases = [
+            (duplicate.id, winner.id, 200),  # legal control
+        ]
+        with TestClient(app) as client:
+            # legal control first (proves the route works, then the refusals)
+>           assert client.post(
+                f"/v1/assets/{cases[0][0]}/merge",
+                params={"household_id": household_id},
+                json={"merged_into": cases[0][1]},
+            ).status_code == 200
+E           AssertionError: assert 405 == 200
+E            +  where 405 = <Response [405 Method Not Allowed]>.status_code
+E            +    where <Response [405 Method Not Allowed]> = post('/v1/assets/01a0d313-cf17-7261-bfcd-fccf3066c6d8/merge', params={'household_id': '01a0d313-cf13-7211-a189-26a85e356e20'}, json={'merged_into': '01a0d313-cf16-76b3-b32f-ddc228fac4da'})
+E            +      where post = <starlette.testclient.TestClient object at 0x7314118487d0>.post
+
+tests/test_sg112_merge.py:375: AssertionError
+=============================== warnings summary ===============================
+../../../../home/andrei/StorageGenie/backend/venv/lib/python3.12/site-packages/fastapi/testclient.py:1
+  /home/andrei/StorageGenie/backend/venv/lib/python3.12/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+../../../../home/andrei/StorageGenie/backend/venv/lib/python3.12/site-packages/starlette/testclient.py:53
+  /home/andrei/StorageGenie/backend/venv/lib/python3.12/site-packages/starlette/testclient.py:53: DeprecationWarning: The anyio.abc.BlockingPortal alias is deprecated, use anyio.from_thread.BlockingPortal instead.
+    _PortalFactoryType = Callable[[], AbstractContextManager[anyio.abc.BlockingPortal]]
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/test_sg112_merge.py::test_merge_unions_evidence_and_terminates_losers
+FAILED tests/test_sg112_merge.py::test_merge_resolves_duplicate_tasks_with_audit_rows
+FAILED tests/test_sg112_merge.py::test_merge_refuses_illegal_shapes_and_writes_nothing
+FAILED tests/test_sg112_merge.py::test_merged_loser_redecision_is_409 - Asser...
+FAILED tests/test_sg112_merge.py::test_asset_merge_redirect_round_trips_read_path
+FAILED tests/test_sg112_merge.py::test_asset_merge_refusals_write_nothing - A...
+6 failed, 1 passed, 2 warnings in 1.15s
+
+================ G2 PASS RUN (candidate tree) ================
+$ cd /home/andrei/StorageGenie/backend && <venv>/python -m pytest tests/test_sg112_merge.py -q -p no:cacheprovider
+.......                                                                  [100%]
+=============================== warnings summary ===============================
+venv/lib/python3.12/site-packages/fastapi/testclient.py:1
+  /home/andrei/StorageGenie/backend/venv/lib/python3.12/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+venv/lib/python3.12/site-packages/starlette/testclient.py:53
+  /home/andrei/StorageGenie/backend/venv/lib/python3.12/site-packages/starlette/testclient.py:53: DeprecationWarning: The anyio.abc.BlockingPortal alias is deprecated, use anyio.from_thread.BlockingPortal instead.
+    _PortalFactoryType = Callable[[], AbstractContextManager[anyio.abc.BlockingPortal]]
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+7 passed, 2 warnings in 1.26s
+
+================ G2 GATES ================
+### RUFF (whole backend)
+All checks passed!
+
+### MYPY candidate (whole app)
+Found 41 errors in 9 files (checked 86 source files)
+
+### MYPY base (whole app)
+Found 41 errors in 9 files (checked 86 source files)
+
+================ G2 FULL SUITE (candidate) ================
+=========================== short test summary info ============================
+FAILED tests/test_signals.py::test_generated_codes_are_validated_and_bad_checksum_is_not_an_identifier
+FAILED tests/test_signals.py::test_ocr_has_text_boxes_and_mean_confidence - a...
+2 failed, 563 passed, 26 warnings in 24.96s
+
+================ G2 STASH-PROOF: 2 known decoder reds on BASE ================
+$ cd /tmp/opencode/sg112_base/backend && PYTHONPATH=/tmp/opencode/sg112_base/backend <venv>/python -m pytest -q tests/test_signals.py::test_generated_codes_are_validated_and_bad_checksum_is_not_an_identifier tests/test_signals.py::test_ocr_has_text_boxes_and_mean_confidence
+2 failed in 0.70s  (pyzbar/libzbar + tesseract absent on host — identical to candidate)
+
+================ G2 SCOPE / SECRET / GITIGNORE ================
+### SCOPE: models/alembic/frontend diff vs origin/automation
+(empty above = no scope change)
+
+### CHANGED FILES vs origin/automation
+backend/app/api/v1/assets.py
+backend/app/api/v1/candidates.py
+backend/app/services/asset_service.py
+backend/app/services/candidates.py
+
+### SECRET GATE (pattern over changed files; untracked test included)
+(no lines above = 0 real secrets)
+
+### .gitignore re-verify (committable paths)
+(none ignored)
+
+================ CONTRACT ECHO ================
+=== contract ===
+0.33.0
+b232b845d74e89cb346c60fa4b9a40ec401c42dd
+b232b845d74e89cb346c60fa4b9a40ec401c42dd Contract payload 0.33.0
+18de7fd7b3546bd7624b3a7b59a78bd629752816cd7fa8f1af6113d1bafc8d46  /home/andrei/storagegenie-contract/RULES.md
+18de7fd7b3546bd7624b3a7b59a78bd629752816cd7fa8f1af6113d1bafc8d46 RULES.md
+
+================ G3 BEFORE/AFTER ================
+--- BEFORE image ---
+sha256:ace2b17a5e851f5c524a47958639fef5b5fae4cc4be81e71dba494b79d4662a2 created=2026-09-24T10:49:29Z (container 91fab66e675a...)
+Successfully built f1d9f99affd1
+Successfully tagged storagegenie-backend:latest
+ Image storagegenie-backend Built 
+ Image storagegenie-backend Built 
+ Container storagegenie-backend-1 Recreate 
+ Container storagegenie-backend-1 Recreated 
+ Container storagegenie-backend-1 Starting 
+ Container storagegenie-backend-1 Started 
+--- AFTER image/container ---
+image=sha256:f1d9f99affd1b7efbb55b72c31008a99b6aeed8799ce18fcedddb8a0a3656b90 created=2026-09-24T11:03:01Z
+container=d184fbc0becd193080e4cab9b948f0e0081e9c013a7cd3c061e8bed8c771ddd3 restart=0 healthy
+=== AFTER alembic current ===
+20260923_sg100_enrich_snapshot (head)
+=== AFTER table count ===
+25
+=== AFTER per-table counts ===
+alembic_version|1
+assertion|28
+asset|6
+asset_evidence|12
+asset_fts|6
+asset_fts_config|1
+asset_fts_data|8
+asset_fts_docsize|6
+asset_fts_idx|6
+audit_event|68
+candidate|7
+enrich_snapshot|2
+evidence|13
+guardrail_event|2
+household|1
+idempotency_key|9
+job|8
+job_step|56
+observation|16
+planning_suggestion|0
+provider_call|17
+review_task|6
+saved_search|0
+source_attribution|0
+user|2
+=== AFTER asset status census ===
+ACTIVE|6
+=== health x6 ===
+{"status":"ok","db":"ok","storage":"ok"}
+{"status":"ok","db":"ok","storage":"ok"}
+{"status":"ok","db":"ok","storage":"ok"}
+{"status":"ok","db":"ok","storage":"ok"}
+{"status":"ok","db":"ok","storage":"ok"}
+{"status":"ok","db":"ok","storage":"ok"}
+=== gate ===
+http:80 => code=301 redirect=https://storagegenie.dynv6.net/
+https:443 => code=401
+
+================ G3 FRESH SERVER BEHAVIOURAL PROBE (temp DB) ================
+=== FRESH SERVER BEHAVIOURAL PROBE (temp DB, no live write) ===
+/usr/local/lib/python3.12/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+  from starlette.testclient import TestClient as TestClient  # noqa
+legal merge: 200 {'winner_id': '01a0d315-d837-73e0-8503-10403936a2b9', 'state': 'proposed', 'evidence_ids': [], 'merged_loser_ids': ['01a0d315-d83b-7381-9c83-e88e46b9fbe4'], 'resolved_task_ids': []}
+illegal merge (winner==loser): 422 {'type': 'about:blank', 'title': 'Unprocessable Entity', 'status': 422, 'detail': 'the winner cannot also be a loser'}
+asset redirect missing winner: 404 {'type': 'about:blank', 'title': 'Not Found', 'status': 404, 'detail': 'Asset not found'}
+winner still proposed: proposed
+loser state: merged

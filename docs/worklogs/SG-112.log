@@ -1,0 +1,32 @@
+SG-112 Coder log — candidate merge + asset MERGED redirect
+=========================================================
+
+Running log (first token SG-112). Host /home/andrei/StorageGenie, branch automation.
+BASE_REF=origin/automation, BASE_RESOLVED=7043285f079966afb5c6e511d9a0f5e78cc79df4.
+
+- t0 read: contract 0.33.0 == published b232b84; RULES.md sha256 matches payload (G-L1).
+- G1 BEFORE captured raw (image ace2b17a…, alembic 20260923_sg100_enrich_snapshot, 25 tables,
+  health exact, gate 301/401, merge-absence grep). See SG-112_verify.log.
+- Premises re-verified; one nuance reported: the string "merge" already lives in the candidates
+  service as `merge_web_fields` (web-field conflict rule), unrelated to candidate merge; no merge
+  route and no `merge_candidates` def exist. The decision Literal has no merge.
+- G2 implemented:
+  * `backend/app/services/candidates.py` — `CandidateMergeError`, `MERGED_STATE`,
+    `MERGE_RESOLVED_TASK_TYPES=("identifier_collision",)`, `merge_candidates(...)`
+    (validate-first-then-write; winner stays proposed; evidence union; losers merge with
+    `merged_into`; duplicate tasks resolved with audit rows; `candidate.merge` audit).
+  * `backend/app/api/v1/candidates.py` — `CandidateMergeRequest`, `POST /candidates/merge`,
+    decision guard learns "merged", GET read path exposes `merged_into`.
+  * `backend/app/services/asset_service.py` — `MERGE_REDIRECT_FIELD="merge.merged_into"`,
+    `AssetMergeError`, `merge_asset_redirect(...)` (ACTIVE->MERGED via the lifecycle table).
+  * `backend/app/api/v1/assets.py` — `AssetMergeRequest`, `POST /assets/{id}/merge`.
+- Tests `backend/tests/test_sg112_merge.py` (7 tests): FAIL on BASE 6 failed/1 passed; PASS on
+  candidate 7 passed. Both raw runs in SG-112_verify.log.
+- Gates: full suite 2 failed, 563 passed (the 2 known decoder env reds, stash-proved on BASE);
+  ruff `All checks passed!`; mypy delta 0 (41/9 vs 41/9); secret gate 0 real; scope diff over
+  models/alembic/frontend empty.
+- G3: backend rebuilt (image ace2b17a -> f1d9f99a), exactly ONE recreate (container
+  91fab66e -> d184fbc0, RestartCount 0, healthy). AFTER: alembic unchanged, 25-table counts delta
+  zero, health exact x6, gate 301/401, served code hashes match host, fresh-server temp-DB
+  behavioural probe (legal merge 200, illegal winner==loser 422, no live write).
+- G4: report + verify log written; receipt note on WORK_HEAD and the final tip; worktree clean.
