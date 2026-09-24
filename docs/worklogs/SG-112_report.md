@@ -33,7 +33,7 @@ Refs
 - Work dir `/home/andrei/StorageGenie`, origin `git@github.com:Andovol/StorageGenie.git`
 - BASE_REF = `origin/automation`
 - BASE_RESOLVED = `7043285f079966afb5c6e511d9a0f5e78cc79df4` (== start HEAD; the packet commit)
-- WORK_HEAD = `WORK_HEAD_PLACEHOLDER`
+- WORK_HEAD = `31e58f82558e649fc0fdf9ad19ac2274cb746747`
 
 Premise verification — corrections are worth more than agreement
 ----------------------------------------------------------------
@@ -196,7 +196,8 @@ Work pushed to `automation`, worktree clean (`CO-55`). No push to `storagegenie-
 executed output:
 
 ```
-RECEIPT_PASTE_PLACEHOLDER
+$ git notes --ref=refs/notes/storagegenie-coder-reports-sg112-fetched show 31e58f82558e649fc0fdf9ad19ac2274cb746747
+Dispatch-ID: SG-112 | Report: docs/worklogs/SG-112_report.md | Work-HEAD: 31e58f82558e649fc0fdf9ad19ac2274cb746747
 ```
 
 Full raw transcript (precheck, add, push, mapped fetch, show) is in `SG-112_verify.log` -> `RECEIPT

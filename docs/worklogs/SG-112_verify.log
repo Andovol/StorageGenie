@@ -399,3 +399,24 @@ illegal merge (winner==loser): 422 {'type': 'about:blank', 'title': 'Unprocessab
 asset redirect missing winner: 404 {'type': 'about:blank', 'title': 'Not Found', 'status': 404, 'detail': 'Asset not found'}
 winner still proposed: proposed
 loser state: merged
+================ RECEIPT NOTE VERIFY ================
+$ git notes --ref=refs/notes/storagegenie-coder-reports show 31e58f82558e649fc0fdf9ad19ac2274cb746747  # precheck (expect: no note)
+error: no note found for object 31e58f82558e649fc0fdf9ad19ac2274cb746747.
+precheck exit=1
+
+$ git notes --ref=refs/notes/storagegenie-coder-reports add -m "Dispatch-ID: SG-112 | Report: docs/worklogs/SG-112_report.md | Work-HEAD: 31e58f82558e649fc0fdf9ad19ac2274cb746747" 31e58f82558e649fc0fdf9ad19ac2274cb746747
+add exit=0
+
+$ git push origin refs/notes/storagegenie-coder-reports
+To github.com:Andovol/StorageGenie.git
+   488da0c..99768f0  refs/notes/storagegenie-coder-reports -> refs/notes/storagegenie-coder-reports
+push exit=0
+
+$ git fetch origin refs/notes/storagegenie-coder-reports:refs/notes/storagegenie-coder-reports-sg112-fetched
+From github.com:Andovol/StorageGenie
+ * [new ref]         refs/notes/storagegenie-coder-reports -> refs/notes/storagegenie-coder-reports-sg112-fetched
+fetch exit=0
+mapped ref -> 99768f00006c9086fa77611f1c12059be4e3fc1b
+
+$ git notes --ref=refs/notes/storagegenie-coder-reports-sg112-fetched show 31e58f82558e649fc0fdf9ad19ac2274cb746747
+Dispatch-ID: SG-112 | Report: docs/worklogs/SG-112_report.md | Work-HEAD: 31e58f82558e649fc0fdf9ad19ac2274cb746747
