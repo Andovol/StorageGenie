@@ -100,21 +100,7 @@ def taxonomy_categories() -> list[dict[str, str]]:
     return [{"id": cid, "name": name} for cid, name in categories.items()]
 
 
-def _active_assertion(db: Session, asset_id: str, field_path: str) -> Assertion | None:
-    return (
-        db.query(Assertion)
-        .filter(
-            Assertion.asset_id == asset_id,
-            Assertion.field_path == field_path,
-            Assertion.review_state.not_in(("superseded", "rejected")),
-        )
-        .order_by(Assertion.created_at.desc())
-        .first()
-    )
-
-
-def _classification_slug(db: Session, asset_id: str) -> str | None:
-    assertion = _active_assertion(db, asset_id, CLASSIFICATION_FIELD)
+def _classification_slug_from_assertion(assertion: Assertion | None) -> str | None:
     if assertion is None:
         return None
     try:
@@ -127,8 +113,7 @@ def _classification_slug(db: Session, asset_id: str) -> str | None:
     return slug if isinstance(slug, str) and slug else None
 
 
-def _active_expiry_date(db: Session, asset_id: str) -> date | None:
-    assertion = _active_assertion(db, asset_id, EXPIRY_FIELD)
+def _active_expiry_date_from_assertion(assertion: Assertion | None) -> date | None:
     if assertion is None:
         return None
     try:
@@ -159,18 +144,43 @@ def _bucket_for(expiry: date, as_of: date) -> str:
 def _aggregate_assets(
     db: Session, active: list[Asset], taxonomy_ids: list[str], as_of: date
 ) -> tuple[dict[str, int], int, dict[str, int], int]:
-    """Bucket the ACTIVE assets by served category and expiry urgency."""
+    """Bucket the ACTIVE assets by served category and expiry urgency.
+
+    Performance optimization: Batch load active assertions for all active assets
+    in a single database query to prevent N+1 queries during statistics computation.
+    """
     category_counts = {category_id: 0 for category_id in taxonomy_ids}
     uncategorized = 0
     expiry = {bucket: 0 for bucket in EXPIRY_BUCKETS}
     expired_untouched = 0
+
+    active_asset_ids = [asset.id for asset in active]
+    # Map (asset_id, field_path) -> latest active Assertion
+    active_assertions: dict[tuple[str, str], Assertion] = {}
+    if active_asset_ids:
+        rows = (
+            db.query(Assertion)
+            .filter(
+                Assertion.asset_id.in_(active_asset_ids),
+                Assertion.field_path.in_((CLASSIFICATION_FIELD, EXPIRY_FIELD)),
+                Assertion.review_state.not_in(("superseded", "rejected")),
+            )
+            .order_by(Assertion.created_at.asc())
+            .all()
+        )
+        for row in rows:
+            active_assertions[(row.asset_id, row.field_path)] = row
+
     for asset in active:
-        slug = _classification_slug(db, asset.id)
+        class_assertion = active_assertions.get((asset.id, CLASSIFICATION_FIELD))
+        slug = _classification_slug_from_assertion(class_assertion)
         if slug is not None and slug in category_counts:
             category_counts[slug] += 1
         else:
             uncategorized += 1
-        expiry_date = _active_expiry_date(db, asset.id)
+
+        exp_assertion = active_assertions.get((asset.id, EXPIRY_FIELD))
+        expiry_date = _active_expiry_date_from_assertion(exp_assertion)
         if expiry_date is None:
             expiry["unknown"] += 1
             continue
