@@ -463,3 +463,16 @@ code=401 redirect=
 /home/andrei/StorageGenie/data/db/storagegenie.db-wal 0
 /home/andrei/StorageGenie/data/db/storagegenie.db-shm 32768
 ===== END G4 AFTER =====
+
+################## RECEIPT NOTE VERIFY (raw; post work-HEAD) ##################
+===== RECEIPT NOTE VERIFY 2026-09-24T09:08:05Z =====
+--- fetch mapped local ref ---
+From github.com:Andovol/StorageGenie
+ * [new ref]         refs/notes/storagegenie-coder-reports -> refs/notes/storagegenie-coder-reports-sg107-fetched
+fetch_exit=0
+--- mapped ref points at ---
+e15271c23825404f65b8720c24ec488abe8d9b84
+--- git notes show (fetched mapped ref) ---
+Dispatch-ID: SG-107 | Report: docs/worklogs/SG-107_report.md | Work-HEAD: 762e471b41a110fa5dd3599fdedc42b3bc63c1b2
+show_exit=0
+===== END =====

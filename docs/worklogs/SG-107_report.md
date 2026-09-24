@@ -4,7 +4,7 @@
 **Work dir:** `/home/andrei/StorageGenie` · **origin:** `git@github.com:Andovol/StorageGenie.git`
 **Branch:** `automation`
 **BASE_REF:** `origin/automation` → **BASE_RESOLVED:** `107181644b54cc3f3dc2b3662ee511fe4ce1beaa` (== start HEAD)
-**WORK_HEAD:** `<filled in the receipt-paste commit>`
+**WORK_HEAD:** `762e471b41a110fa5dd3599fdedc42b3bc63c1b2`
 **Model / effort (CO-78, from process arguments):** argv = `opencode run --auto --dir /home/andrei/StorageGenie --variant high <packet>` → **model = CLI default** (no `--model` flag on argv; omitted per policy), **effort = `high`** (from `--variant high`).
 **Spend (real $):** **$0.000000** — no metered call exists on any path.
 **Contract echo (verbatim):** `recorded 0.33.0 == published (b232b84; D129 adoption, G-L1 clean 2026-09-24)` — source path `/home/andrei/storagegenie-contract/VERSION` = `0.33.0`, `RULES.sha256` = `18de7fd7b3546bd7624b3a7b59a78bd629752816cd7fa8f1af6113d1bafc8d46`.
@@ -80,7 +80,35 @@ REAL metered spend: **$0.000000** (zero calls).
 
 No push to `storagegenie-evidence`, no `{{RECEIPT_CMD}}`. Work pushed to `automation`; worktree clean.
 
-Commands executed and their verbatim output are pasted in the receipt-paste commit and the verify log; final line **note=yes**.
+Commands executed (verbatim), on `WORK_HEAD=762e471b41a110fa5dd3599fdedc42b3bc63c1b2`:
+
+```
+$ git notes --ref=refs/notes/storagegenie-coder-reports add \
+    -m "Dispatch-ID: SG-107 | Report: docs/worklogs/SG-107_report.md | Work-HEAD: 762e471b41a110fa5dd3599fdedc42b3bc63c1b2" \
+    762e471b41a110fa5dd3599fdedc42b3bc63c1b2
+note_add_exit=0
+
+$ git push origin automation
+   1071816..762e471  automation -> automation
+push_automation_exit=0
+
+$ git push origin refs/notes/storagegenie-coder-reports
+   20b4c46..e15271c  refs/notes/storagegenie-coder-reports -> refs/notes/storagegenie-coder-reports
+push_notes_exit=0
+
+$ git fetch origin refs/notes/storagegenie-coder-reports:refs/notes/storagegenie-coder-reports-sg107-fetched
+ * [new ref]         refs/notes/storagegenie-coder-reports -> refs/notes/storagegenie-coder-reports-sg107-fetched
+fetch_exit=0
+
+$ git rev-parse refs/notes/storagegenie-coder-reports-sg107-fetched
+e15271c23825404f65b8720c24ec488abe8d9b84
+
+$ git notes --ref=refs/notes/storagegenie-coder-reports-sg107-fetched show 762e471b41a110fa5dd3599fdedc42b3bc63c1b2
+Dispatch-ID: SG-107 | Report: docs/worklogs/SG-107_report.md | Work-HEAD: 762e471b41a110fa5dd3599fdedc42b3bc63c1b2
+show_exit=0
+```
+
+First line carries BOTH `Dispatch-ID:` and `Report:` (`CO-97`). Existing-note refusal would have been a STOP; the precheck showed no existing note. Final line **note=yes**.
 
 ## Three UNCLEAR lines
 
