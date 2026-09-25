@@ -1,0 +1,57 @@
+SG-124 — Jina price foundation: rate constant + estimator + tests (offline, no wiring)
+Contract: 0.37.0 (source /home/andrei/storagegenie-contract/VERSION; checkout HEAD 1acd7730e5fa6de5b7403aacce71207e9946461d; RULES.md sha256 18de7fd7b3546bd7624b3a7b59a78bd629752816cd7fa8f1af6113d1bafc8d46 == payload RULES.sha256)
+BASE: b041ee98858dd5b6280aac2c490a83e649240a87 (origin/automation; worktree clean at start, git status --porcelain empty)
+WORK_HEAD: the commit carrying this worklog + report + verify log (resolved hash published in the receipt note)
+Coder: opencode · Effort: high (trigger --variant high per D302/D120) · Model: deepseek-v4.1-flash (provider metadata banner "> build · deepseek-v4.1-flash" in output/dispatch/SG-124.log; no --model on argv = contract-legal omitted-model subset)
+Spend: $0.000000 real vs $0 bound (no metered call exists on any path; no Jina search call; no key read)
+
+Legs (live clock UTC; early legs approximate, stamped legs marked; bounds per packet):
+- G0 vendor pricing sourcing + capture: ~13:15:00 -> 13:18:00 (~180s; bound 120s ordinary) — OVER budget; the page had moved and its SPA loads pack prices from a JSON API, so discovery cost extra keyless GETs. Reported.
+- G0 in-tree grep + G1 constant/estimator + adversarial: ~13:18:00 -> ~13:18:40 (~40s; bound 120s)
+- G2 FAIL-pre (base worktree) + PASS-post + candidate suite + ruff + mypy + base suite: ~13:18:40 -> 13:20:52 (~132s; suites 31.43s / 31.39s of a 600s bound)
+- G2 authoritative targeted run + commit: 13:21:22 -> 13:21:50 (~28s)
+- G3 files + receipt: from ~13:21:50 (bound 600s overall)
+No command was killed or timed out. Every command carried a bounded timeout.
+
+VERDICT: CHANGED — rate constant + pure estimator + offline tests added in backend/app/services/enrich/jina.py and the new
+tests/test_sg124_jina_price.py. No served path, snapshot model, migration, cap or provider_call writer hunk (empty diffs quoted).
+Suite: candidate 2 failed/598 passed = base 2 failed/593 passed + 5 new passes; the 2 reds are base-proved (tests/test_signals.py
+OCR/barcode environment). ruff clean; mypy 41/90 unchanged from base and jina.py is not among the 9 error files.
+
+G0 capture (authority = vendor page, read at execution; PG-SC-03):
+- URL: https://jina.ai/api-dashboard/pricing/ (HTTP 200, title "API Pricing - Jina AI"); reached after
+  https://jina.ai/pricing/ returned HTTP 404 (page moved) and the vendor sitemap listed the current path.
+- Search API (endpoint https://s.jina.ai) bills PER REQUEST in tokens: "Every request costs a fixed number of tokens,
+  starting from 10,000 tokens".
+- Credit -> USD: the page's top-up source https://dash.jina.ai/api/v1/product (keyless, HTTP 200) quotes the base offered
+  pack "1B tokens" price 50.0 USD,EUR, token_quantity 1000000000 -> $0.05/1M tokens (other offered pack 11B/$500 = $0.0455/1M;
+  chosen $0.05 = conservative upper bound). All 17 packs span $0.0169-$1.00/1M.
+- Constants: JINA_SEARCH_TOKENS_PER_REQUEST = 10_000; JINA_TOKEN_USD_PER_1M = 0.05.
+- estimate_jina_search_cost(tokens=10_000) -> $0.0005; negative tokens raise ValueError("negative_token_count: ...").
+
+External effects (CO-85) — all keyless GETs, no auth header, no metered/search call, no key read:
+1. GET https://jina.ai/pricing/ -> 404 (moved).
+2. GET https://html.duckduckgo.com/html/?q=Jina+AI+Search+API+pricing+s.jina.ai -> 202 anomaly page, zero results (site-search retry; failed).
+3. GET https://jina.ai/sitemap.xml -> 200 (found /api-dashboard/pricing/).
+4. GET https://jina.ai/api-dashboard/pricing/ -> 200 (the pricing page).
+5. GET https://jina.ai/assets/index-Cp9zCyOd.js -> 200 (page bundle; located the product API + the two offered price ids).
+6. GET https://jina.ai/assets/PricingComponent-CESdVN7o.js -> 200 (1.2KB shim).
+7. GET https://dash.jina.ai/api/v1/product -> 200 (pack prices).
+No outcome is UNKNOWN.
+
+Findings:
+- F-SG124-1: packet premise "enrich/ has no cost symbol" is FALSE as written (synthesize.py carries INPUT_USD_PER_1M /
+  OUTPUT_USD_PER_1M / estimate_text_cost / SYNTHESIS_PER_CALL_CAP_USD). The narrower premise about jina.py is TRUE. Resolved by
+  extension: the Jina rate is a distinct vendor/unit added beside the Jina client, never a duplicate of estimate_text_cost.
+- F-SG124-2: the vendor pricing page moved (/pricing -> /api-dashboard/pricing/) and is an SPA whose pack prices come from
+  dash.jina.ai/api/v1/product. Extra keyless egress beyond the packet's "single GET" is a deviation, justified by the packet's
+  own "page moved" clause; no auth, no metered call.
+- F-SG124-3: no single official token->USD price is stated; pack prices span $0.0169-$1.00/1M. The constant uses the base
+  currently-offered pack ($0.05/1M, the higher of the two offered) as a conservative upper bound.
+- F-SG124-4: "starting from 10,000 tokens" is a minimum, not a ceiling. The estimator default is the vendor minimum and accepts a
+  larger caller-supplied token bound; it does not claim to be a proven ceiling on tokens.
+- F-SG124-5 (minor, CO-08/CO-83): AGENTS.md binds no {{VENV}}, {{VTEST}}, {{EVIDENCE_DIR}} (they ride lang/python.md). I used the
+  real interpreter path backend/venv/bin/python and the packet-named commands; no value was invented.
+- F-SG124-6 (carried, outside scope): STATE.md:2 still reads contract 0.36.0 while AGENTS/packet/checkout read 0.37.0.
+- F-SG124-7 (minor): the vendor's rate table labels the s.jina.ai row "Reader API" in its Product column; the row's description
+  ("Search the web and convert results to LLM-friendly text") and endpoint identify it as the Search API. No ambiguity for costing.

@@ -58,6 +58,26 @@ JINA_TYPE = "web"
 JINA_GL = "ro"
 TOKEN_BUDGET = "6000"
 PAGE_TIMEOUT = "15"
+
+# Vendor rate captured live 2026-09-25T13:16:42Z (UTC) from Jina AI's API
+# pricing page <https://jina.ai/api-dashboard/pricing/> (HTTP 200, title
+# "API Pricing - Jina AI"; the former <https://jina.ai/pricing/> now 404s and
+# the page was found through the vendor's own sitemap). The Search API
+# (`https://s.jina.ai`) bills per request: the page's rate table reads
+# "Every request costs a fixed number of tokens, starting from 10,000 tokens".
+# The vendor bills in its token credit unit, so USD needs the quoted credit
+# price: the same page's top-up section is fed by
+# <https://dash.jina.ai/api/v1/product>, where the base pack is
+# `"product_name":"1B tokens"`, `"price":50.0`, `"currency":"USD,EUR"`,
+# `"token_quantity":1000000000` -> $0.05 per 1M tokens. That is the highest of
+# the two packs the page currently offers (the other is 11B for $500.0, i.e.
+# $0.0455/1M), so the choice is the conservative upper bound. No single
+# official token price is stated; the pack-price spread is a finding in the
+# SG-124 report. `JINA_SEARCH_TOKENS_PER_REQUEST` is the vendor's stated
+# *minimum* ("starting from"), so it bounds the request cost from below.
+JINA_SEARCH_TOKENS_PER_REQUEST = 10_000
+JINA_TOKEN_USD_PER_1M = 0.05
+
 RESPOND_WITH = "content"
 DEFAULT_TIMEOUT_S = 15.0
 MAX_QUOTED_BODY_CHARS = 2000
@@ -117,6 +137,23 @@ def build_jina_query(brand: str, name: str, category: str | None = None) -> str:
     """Brand + name (+ category) TEXT only; no identifier beyond the words."""
     parts = [part for part in (brand, name, category) if part]
     return " ".join(parts)
+
+
+def estimate_jina_search_cost(
+    tokens: int = JINA_SEARCH_TOKENS_PER_REQUEST,
+) -> float:
+    """Bounded USD for ONE Jina Search request from the vendor rate constant.
+
+    The vendor bills Search per request at a fixed token count
+    (`JINA_SEARCH_TOKENS_PER_REQUEST`, whose default is the vendor's stated
+    minimum) and prices tokens at `JINA_TOKEN_USD_PER_1M`; a caller with a
+    larger token bound passes it here. Pure function: no clock, no network, no
+    key. A negative token count is refused rather than priced as zero, so an
+    unset or unknown count can never read as free.
+    """
+    if tokens < 0:
+        raise ValueError(f"negative_token_count: {tokens} tokens cannot be priced")
+    return tokens * JINA_TOKEN_USD_PER_1M / 1_000_000
 
 
 def build_jina_request(
