@@ -22,9 +22,11 @@ import type {
   Asset,
   AssetListResponse,
   AssetRelation,
+  EnrichResponse,
   LocationListResponse,
   RelationListResponse,
 } from "../api/types";
+import { WebAlternates } from "../components/WebAlternates";
 import { UNTITLED_ASSET_NAME } from "../types/product";
 
 // SG-082: per-press Enrich cap. UNCALIBRATED on purpose (`G-A9`): the value is
@@ -311,8 +313,11 @@ export function AssetDetailPage() {
 
   // SG-098: the manual Enrich trigger. The button itself already gates the
   // press through `enrichCapRefusal`; this handler only runs under the cap.
+  // SG-119: the press response carries the web alternates. They are rendered
+  // beside the button (the asset-detail brand surface); a press is still the
+  // only way this page can see them until a GET job->candidate path exists.
   const enrichMut = useMutation({
-    mutationFn: () => apiPost(`/v1/enrich/${id}`, {}, { household_id: householdId }),
+    mutationFn: () => apiPost<EnrichResponse>(`/v1/enrich/${id}`, {}, { household_id: householdId }),
     onError: (e: unknown) => setError(e instanceof Error ? e.message : String(e)),
   });
 
@@ -353,6 +358,8 @@ export function AssetDetailPage() {
       <div style={{ marginBottom: 16 }}>
         <EnrichButton lastSpendUsd={null} onRun={() => enrichMut.mutate()} />
       </div>
+
+      <WebAlternates alternates={enrichMut.data?.web_alternates ?? []} />
 
       <LocationsSection asset={asset} householdId={householdId} />
 

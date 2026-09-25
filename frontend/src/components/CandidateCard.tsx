@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
 import type { Candidate, CandidateField, DedupMatch } from "../api/types";
+import { WebAlternates } from "./WebAlternates";
 
 function fieldInfo(raw: CandidateField) {
   if (raw && typeof raw === "object" && !Array.isArray(raw)) {
@@ -82,6 +83,7 @@ export function CandidateCard({
           {evidenceUrls.length === 0 && <div>No source evidence</div>}
         </section>
       </div>
+      <WebAlternates alternates={candidate.web_alternates ?? []} />
       <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginTop: 18 }}>
         <button type="button" onClick={() => onDecision("accept", values)} disabled={busy || blocked}>Accept</button>
         <button type="button" onClick={() => onDecision("edit", values)} disabled={busy}>Save edits</button>

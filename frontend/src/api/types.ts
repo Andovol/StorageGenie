@@ -139,6 +139,15 @@ export type ReviewTaskListResponse = { items: ReviewTask[]; next_cursor: string 
 
 export type CandidateField = unknown | { value?: unknown; confidence?: number | null; source_type?: string; source?: string };
 export type DedupMatch = { type: string; asset_id?: string; evidence_id?: string; identifier?: string; distance?: number };
+// SG-119: one label/web conflict row. The label value stays a candidate field;
+// the web value rides here with its full source triple, never silently dropped.
+export type WebAlternate = {
+  field: string;
+  value: unknown;
+  source_type: string | null;
+  source_url: string | null;
+  retrieved_at: string | null;
+};
 export type Candidate = {
   id: string;
   state: string;
@@ -148,6 +157,19 @@ export type Candidate = {
   review_task_ids: string[];
   evidence_ids: string[];
   asset_id?: string | null;
+  // SG-119: served by GET /v1/candidates/{id}; absent on older payloads.
+  web_alternates?: WebAlternate[];
+};
+
+// SG-119: the POST /v1/enrich/{asset_id} response carries the same alternates
+// the candidate read route serves, so asset detail can show them after a press.
+export type EnrichResponse = {
+  asset_id?: string;
+  candidate_id?: string;
+  state?: string;
+  fields?: Record<string, CandidateField>;
+  web_sources?: unknown[];
+  web_alternates?: WebAlternate[];
 };
 
 export type CandidateSplitChild = {

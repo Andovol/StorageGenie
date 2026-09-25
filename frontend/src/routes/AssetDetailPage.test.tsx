@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
-import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { MemoryRouter, Route, Routes } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { AssetDetailPage, EnrichButton, enrichCapRefusal, ENRICH_PER_PRESS_CAP_USD } from "./AssetDetailPage";
@@ -176,6 +176,31 @@ describe("EnrichButton per-press cap (SG-082)", () => {
     await waitFor(() =>
       expect(api.apiPost).toHaveBeenCalledWith("/v1/enrich/asset-1", {}, { household_id: "hh" })
     );
+  });
+
+  test("an enrich press renders the returned brand alternate with its source (SG-119 G2)", async () => {
+    api.apiGet.mockResolvedValue(before);
+    api.apiPost.mockResolvedValue({
+      candidate_id: "cand-1",
+      state: "proposed",
+      web_alternates: [
+        {
+          field: "brand",
+          value: "Jacobs Cronat Gold",
+          source_type: "web:OpenFoodFacts",
+          source_url: "https://world.openfoodfacts.org/api/v2/search?search_terms=Jacobs",
+          retrieved_at: "2026-09-25T00:00:00+00:00",
+        },
+      ],
+    });
+    renderPage();
+
+    fireEvent.click(await screen.findByRole("button", { name: "Enrich" }));
+
+    const section = await screen.findByRole("region", { name: "Web alternates" });
+    expect(within(section).getByText("brand")).toBeInTheDocument();
+    expect(within(section).getByText("Jacobs Cronat Gold")).toBeInTheDocument();
+    expect(within(section).getByText("web:OpenFoodFacts")).toBeInTheDocument();
   });
 });
 

@@ -1,0 +1,126 @@
+SG-119 VERIFY LOG — raw runs (first token SG-119)
+=================================================
+All values are raw command output captured this session; nothing paraphrased.
+
+1. CONTRACT ECHO + ARGV
+-----------------------
+$ cat /home/andrei/storagegenie-contract/VERSION
+0.36.0
+$ git -C /home/andrei/storagegenie-contract rev-parse HEAD
+a9324d5e1782384c036c1411ec8adac6bb2acaa1
+$ sha256sum /home/andrei/storagegenie-contract/RULES.md
+18de7fd7b3546bd7624b3a7b59a78bd629752816cd7fa8f1af6113d1bafc8d46  /home/andrei/storagegenie-contract/RULES.md
+$ cat /home/andrei/storagegenie-contract/RULES.sha256
+18de7fd7b3546bd7624b3a7b59a78bd629752816cd7fa8f1af6113d1bafc8d46 RULES.md
+$ tr '\0' ' ' < /proc/1134702/cmdline
+opencode run --auto --dir /home/andrei/StorageGenie --variant high # SG-119 — ...
+  => effort = high (--variant high); model = unknown (no --model flag); spend real $ = $0.000000.
+$ git rev-parse origin/automation   => 114876888e0e817d2f73472107854ea9181c7fd9 (BASE_RESOLVED == start HEAD)
+
+2. BASELINE SUITES (BEFORE any edit)
+------------------------------------
+# Backend full (./venv/bin/python -m pytest -q):
+ 2 failed, 581 passed, 32 warnings in 29.99s
+  FAILED tests/test_signals.py::test_generated_codes_are_validated_and_bad_checksum_is_not_an_identifier
+  FAILED tests/test_signals.py::test_ocr_has_text_boxes_and_mean_confidence
+  (barcode/OCR decoder environment reds — the SAME pair on BASE, i.e. before this slice)
+# Frontend full (npm test -- --run):
+ Test Files  24 passed (24)
+      Tests  209 passed (209)
+   Duration  4.54s
+
+3. G1 FAIL-PRE (tests present, SOURCE candidates.py stashed) vs PASS-POST
+------------------------------------------------------------------------
+# Backend focused FAIL-pre (`git stash push -- backend/app/services/candidates.py` then pytest):
+  FAILED tests/test_sg119_brand_alternates.py::test_mapper_maps_brands_with_web_provenance
+  FAILED tests/test_sg119_brand_alternates.py::test_mapper_joins_list_brands_verbatim
+  FAILED tests/test_sg119_brand_alternates.py::test_label_brand_present_makes_web_brand_an_alternate
+  FAILED tests/test_sg119_brand_alternates.py::test_brand_absent_asset_gap_fills_from_web
+  FAILED tests/test_sg119_brand_alternates.py::test_endpoint_brand_present_surfaces_and_roundtrips_brand_alternate
+  FAILED tests/test_sg119_brand_alternates.py::test_endpoint_off_miss_emits_no_brand_alternate
+  FAILED tests/test_sg119_brand_alternates.py::test_brand_field_commits_through_the_real_commit_path
+  FAILED tests/test_sg119_brand_alternates.py::test_brand_is_in_both_candidate_vocabularies
+  FAILED tests/test_sg103_web_alternates.py::test_conflict_keeps_label_values_and_surfaces_alternates_including_brand
+  FAILED tests/test_sg103_web_alternates.py::test_gap_fields_fill_from_web_and_label_brand_surfaces_one_alternate
+  10 failed, 15 passed, 2 warnings in 2.04s
+  sample BEFORE quote (OFF-brand-holding fixture `off_hit.json`, no brand field/alternate):
+   E       AssertionError: assert [] == ['brand']
+   tests/test_sg103_web_alternates.py:239: AssertionError
+
+# Backend focused PASS-post (source restored):
+  25 passed, 2 warnings in 1.87s
+
+# Backend full PASS-post:
+ 2 failed, 593 passed, 32 warnings in 29.60s
+  FAILED tests/test_signals.py::test_generated_codes_are_validated_and_bad_checksum_is_not_an_identifier
+  FAILED tests/test_signals.py::test_ocr_has_text_boxes_and_mean_confidence
+  (identical pair to the BASE run above; no new red)
+
+4. G2 FRONTEND FAIL-PRE vs PASS-POST
+------------------------------------
+# FAIL-pre (new tests present, component render absent):
+ Test Files  2 failed (2)
+      Tests  2 failed | 16 passed (18)
+  (both new SG-119 render tests: region "Web alternates" not found)
+
+# PASS-post (after WebAlternates.tsx + CandidateCard + AssetDetailPage render):
+ Test Files  2 passed (2)
+      Tests  18 passed (18)
+
+# Frontend full (npm test -- --run):
+ Test Files  24 passed (24)
+      Tests  211 passed (211)
+   Duration  4.96s
+
+5. BUILD + LINT (frontend) + ruff/mypy (backend)
+------------------------------------------------
+# npm run build (`tsc && vite build`):
+ dist/assets/index-DWUdQ31x.js   318.25 kB │ gzip: 92.34 kB
+ ✓ built in 1.68s   (BUILD_EXIT=0)
+# npm run lint (`eslint src`): exit 0, no output
+# ./venv/bin/python -m ruff check .  => All checks passed!
+# ./venv/bin/python -m mypy app      => Found 41 errors in 9 files (baseline 41/9; delta 0)
+
+6. G4 SERVED PROOF (before -> after) — exactly ONE recreate
+-----------------------------------------------------------
+BEFORE 2026-09-25T10:47Z (live container, pre-change)
+ image     sha256:b92210feb12043f01ac30842a525df11e0818a6d74e6793bf2788fb84f73c2b3
+ container 16a07ae1af2597af18ecc4062da39251ba7e7fde69365d3115c1f01fce2c4115 RestartCount=0
+ bundle    index-CYlI1-ao.js 317045 B sha256 f15d01cc25dba1c6548053f544f6facbd71fd2fab69d9324dcd08174143c0841
+ markers   web_alternates=0  "Web alternates"=0
+ alembic   20260924_sg114_relation
+ counts    28 tables sha256 3c7cd88dd1ae4c7fd3f0e9735fd85da9a641fded6e6f115449a155e0a4f000a7
+ health    {"status":"ok","db":"ok","storage":"ok"} x6 exact
+ gate      http=301 https=401
+
+$ BUILDX_CONFIG=/tmp/opencode/buildx docker compose build backend   => BUILD_EXIT=0 (10:48:44Z -> 10:49:01Z)
+$ BUILDX_CONFIG=/tmp/opencode/buildx docker compose up -d backend
+ Container storagegenie-backend-1 Recreate
+ Container storagegenie-backend-1 Recreated
+ Container storagegenie-backend-1 Starting
+ Container storagegenie-backend-1 Started
+
+AFTER 2026-09-25T10:49Z
+ image     sha256:b5a71b8bc20a6add584084fd1e5aae66952be780560f2692e77170d8fd7eb1dd  (DIFFERS)
+ container e9b999e2f6585db95c74fb1159f2faf00c72fdbbfb9705ff961ddf9314bce253  (ONE recreate)  RestartCount=0 (M42: +1 never asserted)
+ bundle    index-DXSEg7CT.js 318414 B sha256 f435cbc177ba15e0f381317464668e9d507437dc9cd5a963c617a15a39e5045d (DIFFERS)
+ markers   web_alternates=2  "Web alternates"=2   (route/code markers 0 -> 2 / 0 -> 2)
+ loopback  GET /assets/index-DXSEg7CT.js -> http=200 bytes=318414; sha256 f435cbc1… == in-image sha f435cbc1…
+ alembic   20260924_sg114_relation (unchanged)
+ counts    28 tables sha256 3c7cd88dd1ae4c7fd3f0e9735fd85da9a641fded6e6f115449a155e0a4f000a7 (DELTA 0, identical)
+ provider_call 17 -> 17 (no press ran)
+ health    {"status":"ok","db":"ok","storage":"ok"} x6 exact
+ gate      http=301 https=401 (first two tries returned 000 — transient DNS; third answered)
+
+# GET-only served reads (narrowest live read; NO POST, no rows created)
+$ curl -s http://127.0.0.1:8003/openapi.json | python3 -c ...
+ candidates_route True   enrich_route True      (unchanged contract still exposed)
+$ curl -s "http://127.0.0.1:8003/v1/candidates/01a0afaa-…?household_id=01a0a029-…"
+ keys ['asset_id','dedup_matches','evidence_ids','fields','id','job_id','merged_into','review_task_ids','state','web_alternates']
+ has_web_alternates True value []                (existing pre-change row, read-only)
+
+7. OTHER GATES
+--------------
+ secret scan over added diff lines (api_key|secret|passwd|password|bearer|private key|sk-|ghp_|AKIA|jina_): 0 real matches
+ docker compose config: NEVER RUN (PG-SC-05)
+ live OFF/Jina search: NONE (all HTTP legs scripted MockTransport) — $0.000000

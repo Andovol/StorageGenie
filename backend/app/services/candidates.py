@@ -35,6 +35,11 @@ JINA_WEB_SOURCE = f"{WEB_SOURCE_PREFIX}{JINA_SOURCE_NAME}"
 # alternate with its source, never silently dropped (spec §4).
 LABEL_VISIBLE_FIELDS = frozenset(
     {
+        # SG-119: OFF `brands` joins the label-wins vocabulary so a label brand
+        # and a web brand stay BOTH visible (the label wins the proposal, the web
+        # value becomes its alternate). Brand-absent assets still gap-fill per the
+        # standing rule; see `map_off_decision_fields` for the decision.
+        "brand",
         "display_name",
         "asset_type",
         "quantity",
@@ -85,6 +90,9 @@ GATED_FIELDS = frozenset(
 )
 ALLOWED_CANDIDATE_FIELDS = frozenset(
     {
+        # SG-119: the label-wins brand (and a brand-absent gap-fill) can reach the
+        # committed assertion; a web-sourced brand always commits `proposed`.
+        "brand",
         "display_name",
         "asset_type",
         "status",
@@ -275,9 +283,17 @@ def map_off_decision_fields(
     """Map an accepted OFF `MatchDecision` into existing candidate fields.
 
     Only safe identity fields are mapped (`display_name`, accepted exact
-    `identifier`, an agreeing `category_proposed`); every value is
-    `web:OpenFoodFacts` with its URL + retrieval date. A non-accepted decision
-    maps to nothing (no nearest guess).
+    `identifier`, the product `brands`, an agreeing `category_proposed`); every
+    value is `web:OpenFoodFacts` with its URL + retrieval date. A non-accepted
+    decision maps to nothing (no nearest guess).
+
+    SG-119 brand decision (stated): `brands` is mapped ONLY when the payload
+    carries it. An OFF-miss/empty `brands` emits nothing, so the gap stays and no
+    brand alternate is fabricated. A brand-absent ASSET is indistinguishable at
+    this mapper (it never reads asset state) and gap-fills under `merge_web_fields`;
+    `synthesize.py`'s `brand_absent` refusal governs LLM-emitted facts with no
+    payload grounding (`parse_synthesis`), and it is not on this deterministic
+    mapping path — the OFF snapshot IS the grounding here, so gap-fill wins.
     """
     if not decision.accepted or decision.best is None:
         return {}
@@ -295,6 +311,24 @@ def map_off_decision_fields(
     if isinstance(code, str) and code:
         fields["identifier"] = _web_provenance(
             code,
+            source_type=OFF_WEB_SOURCE,
+            source_url=source_url,
+            retrieved_at=retrieved_at,
+        )
+    # SG-119: the OFF payload's `brands` (a string, or a list whose items are
+    # joined verbatim) rides the same `web:OpenFoodFacts` envelope. Absent/empty
+    # brands emit NO field — never an invented or substituted value.
+    brands = product.get("brands")
+    brand_value: str | None = None
+    if isinstance(brands, str) and brands:
+        brand_value = brands
+    elif isinstance(brands, (list, tuple)):
+        parts = [item for item in brands if isinstance(item, str) and item]
+        if parts:
+            brand_value = ", ".join(parts)
+    if brand_value is not None:
+        fields["brand"] = _web_provenance(
+            brand_value,
             source_type=OFF_WEB_SOURCE,
             source_url=source_url,
             retrieved_at=retrieved_at,

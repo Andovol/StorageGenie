@@ -1,0 +1,41 @@
+SG-119 — Brand alternates: OFF `brands` into the merge vocabulary + visible render
+==================================================================================
+
+First token: SG-119
+Branch: automation · BASE_REF origin/automation · BASE_RESOLVED 114876888e0e817d2f73472107854ea9181c7fd9
+Coder: opencode · effort: high (from argv `--variant high`) · model: unknown (no --model on argv; CLI default per policy)
+Spend (real $): $0.000000 — zero provider calls, no metered path.
+Contract: recorded 0.36.0 == published (a9324d5e1782384c036c1411ec8adac6bb2acaa1);
+  RULES.md sha256 18de7fd7b3546bd7624b3a7b59a78bd629752816cd7fa8f1af6113d1bafc8d46 == RULES.sha256.
+  Source path: /home/andrei/storagegenie-contract (repo `.rules-cache/` is absent on this VPS copy).
+
+Legs (wall clock, live clock only)
+----------------------------------
+- Recon + G1 mapper/vocab edit + G1 backend pins: ~10:33Z → 10:44Z (~660 s, budget 1200 s).
+- G2 frontend types/component/render + pins: ~10:44Z → 10:48Z (~240 s).
+- G3 suites + build + lint: frontend 211 passed; backend focused 25; backend full 593/2-known-env-reds; tsc+vite clean; eslint clean; ruff clean; mypy 41/9 delta 0.
+- G4 build + one recreate + serve: 10:48:44Z → 10:50:34Z (~110 s, budget 1200 s).
+- Overall ~1000 s wall clock (budget 1200 s). No command killed; none hung; no command hit its timeout.
+
+What changed (ceiling: backend/app/services/candidates.py + backend enrich/candidate tests + frontend brand surfaces/tests + docs/worklogs)
+----------------------------------------------------------------------------------------------------------------------------------------
+- G1 mapper: `map_off_decision_fields` now maps `product["brands"]` (str, or list joined verbatim) with the same `web:OpenFoodFacts` envelope; absent/empty emits nothing.
+- G1 vocabulary: `brand` added to `LABEL_VISIBLE_FIELDS` (merge vocabulary) AND `ALLOWED_CANDIDATE_FIELDS` (committable). `merge_web_fields` code UNTOUCHED.
+- G1 populations: label brand present → web brand = ONE alternate; brand-absent asset → gap-fill; OFF-miss/empty brands → no field, gap stays, no alternate.
+- G2 render: new `WebAlternates.tsx`; rendered in CandidateCard (review) and beside the asset-detail Enrich press response; source URL in href/title only.
+- G3 tests: new `test_sg119_brand_alternates.py` (10 tests); SG-103 expectations updated for brand; SG-080 whitelist pin updated (brand whitelisted for the web path only).
+- G4 rebuilt image b5a71b8b…, one recreate (container 16a07ae1… → e9b999e2…), counts delta 0, health 6× exact, gate 301/401, bundle differs with markers.
+
+Decision (G1 brand-absent) — stated
+------------------------------------
+Gap-fill WINS. `synthesize.py`'s `brand_absent` refusal governs LLM-emitted facts that lack payload grounding (`parse_synthesis`); this slice runs no synthesis, and the OFF snapshot IS the grounding, so mapping the payload's own `brands` is not "invention". The `isinstance` guard drops absent/empty `brands`, so population 3 emits no brand. (An empty query brand caps OFF's score at 0.55 < the 0.60 accept bar, so the brand-absent-asset population is unreachable through the endpoint — proven by direct mapper/merge unit tests instead.)
+
+Gates
+-----
+frontend: 24 files / 211 tests passed; `tsc` + `vite build` clean (index-DWUdQ31x.js); `eslint src` clean (exit 0).
+backend: focused SG-119/SG-103/SG-098 25 passed; full suite 593 passed / 2 failed (test_signals decoder env reds, same pair on BASE).
+ruff clean; mypy 41 errors in 9 files (baseline 41/9, delta 0). secret scan over added lines: 0 real matches. `docker compose config` never run (PG-SC-05).
+
+Receipt
+-------
+Work pushed to automation, worktree clean. Note added on WORK_HEAD; notes ref pushed, fetched mapped, `show` pasted in the report. note=yes.

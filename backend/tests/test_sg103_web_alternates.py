@@ -13,7 +13,9 @@ What this file proves:
 - a non-conflicting enrichment fills the proposal from web and yields `[]`;
 - the alternates round-trip through the REAL `GET /v1/candidates/{id}` route
   (writer = the endpoint's own commit, reader = the candidates route);
-- a brand-absent asset yields NO brand alternate (no web path emits a brand);
+- a brand-absent asset yields NO brand alternate (OFF is rejected — the empty
+  query brand caps its score below the accept bar — and the Jina mapper emits no
+  brand; SG-119's OFF mapper is not reached);
 - the consent gate still refuses before any candidate row is written.
 """
 
@@ -149,7 +151,7 @@ def _post(asset_id: str, household_id: str) -> tuple[int, dict[str, Any]]:
 # --------------------------------------------------------------------------- #
 # G1/G2 — conflict: label value kept, web value one alternate with its triple
 # --------------------------------------------------------------------------- #
-def test_conflict_keeps_label_value_and_surfaces_one_alternate(make_env, monkeypatch) -> None:  # type: ignore[no-untyped-def]
+def test_conflict_keeps_label_values_and_surfaces_alternates_including_brand(make_env, monkeypatch) -> None:  # type: ignore[no-untyped-def]
     _session, household_id, asset_id = make_env(
         name="sg103-conflict",
         display_name=LABEL_NAME,
@@ -174,18 +176,26 @@ def test_conflict_keeps_label_value_and_surfaces_one_alternate(make_env, monkeyp
     # The label value wins the proposal; the web value is NOT collapsed away.
     assert body["fields"]["display_name"]["value"] == LABEL_NAME
     assert body["fields"]["display_name"]["source_type"] == "user"
+    # SG-119: the seeded label brand wins the field too.
+    assert body["fields"]["brand"]["value"] == "Jacobs"
+    assert body["fields"]["brand"]["source_type"] == "user"
     # A gap field the label lacks is filled from web (no alternate).
     assert body["fields"]["identifier"]["value"] == EXPECTED_CODE
 
     alternates = body["web_alternates"]
-    assert len(alternates) == 1
-    alternate = alternates[0]
-    assert alternate["field"] == "display_name"
+    assert len(alternates) == 2
+    by_field = {alternate["field"]: alternate for alternate in alternates}
+    assert set(by_field) == {"display_name", "brand"}
+    alternate = by_field["display_name"]
     assert alternate["value"] == WEB_NAME
     assert alternate["source_type"] == "web:OpenFoodFacts"
     assert isinstance(alternate["source_url"], str)
     assert "openfoodfacts.org" in alternate["source_url"]
     assert isinstance(alternate["retrieved_at"], str) and alternate["retrieved_at"]
+    brand_alternate = by_field["brand"]
+    assert brand_alternate["value"] == "Jacobs"
+    assert brand_alternate["source_type"] == "web:OpenFoodFacts"
+    assert "openfoodfacts.org" in brand_alternate["source_url"]
 
     # Round-trip through the REAL candidates route (writer=endpoint, reader=route).
     assert read.status_code == 200
@@ -197,7 +207,7 @@ def test_conflict_keeps_label_value_and_surfaces_one_alternate(make_env, monkeyp
 # --------------------------------------------------------------------------- #
 # G1/G2 — no conflict: web fills the proposal, alternates stay empty
 # --------------------------------------------------------------------------- #
-def test_no_conflict_fills_from_web_and_alternates_empty(make_env, monkeypatch) -> None:  # type: ignore[no-untyped-def]
+def test_gap_fields_fill_from_web_and_label_brand_surfaces_one_alternate(make_env, monkeypatch) -> None:  # type: ignore[no-untyped-def]
     _session, household_id, asset_id = make_env(
         name="sg103-noconflict",
         display_name=LABEL_NAME,
@@ -223,9 +233,14 @@ def test_no_conflict_fills_from_web_and_alternates_empty(make_env, monkeypatch) 
     assert body["fields"]["identifier"]["value"] == EXPECTED_CODE
     # A label-visible assertion with no web counterpart is retained, not dropped.
     assert body["fields"]["expiry_date"]["value"] == "2030-01-01"
-    assert body["web_alternates"] == []
+    # SG-119: the seeded label brand now conflicts with the OFF brand, so exactly
+    # one alternate carries the web value + its source (the other fields gap-fill,
+    # no separate alternate). Before this slice brand produced none at all.
+    assert [alternate["field"] for alternate in body["web_alternates"]] == ["brand"]
+    assert body["web_alternates"][0]["value"] == "Jacobs"
+    assert body["web_alternates"][0]["source_type"] == "web:OpenFoodFacts"
     assert read.status_code == 200
-    assert read.json()["web_alternates"] == []
+    assert read.json()["web_alternates"] == body["web_alternates"]
 
 
 # --------------------------------------------------------------------------- #
@@ -238,8 +253,9 @@ def test_brand_absent_asset_yields_no_brand_alternate(make_env, monkeypatch) -> 
         assertions=[("display_name", LABEL_NAME)],
     )
     monkeypatch.setattr(settings, "sg_consent", True)
-    # No brand assertion lowers the OFF score below the accept bar, so the Jina
-    # fallback fires (a key is required); it still yields no brand.
+    # No brand assertion means the OFF query brand is empty, which caps the score
+    # below the accept bar, so OFF is rejected and the Jina fallback fires (a key
+    # is required). SG-119's OFF brand mapper is never reached; Jina emits none.
     monkeypatch.setattr(settings, "jina_api_key", "test-sg103-sentinel")
     off, _off_seen = _scripted(_load("off_hit"))
     jina, _jina_seen = _scripted(_load("jina_hit"))

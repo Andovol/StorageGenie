@@ -1,5 +1,5 @@
 import { describe, expect, test, vi } from "vitest";
-import { fireEvent, render, screen } from "@testing-library/react";
+import { fireEvent, render, screen, within } from "@testing-library/react";
 import { CandidateCard } from "./CandidateCard";
 import type { Candidate } from "../api/types";
 
@@ -33,6 +33,38 @@ describe("CandidateCard", () => {
   test("wrong loaded candidate is discriminated by the evidence identity assertion", () => {
     render(<CandidateCard candidate={{ ...candidate, evidence_ids: ["wrong-evidence"] }} householdId="h" onDecision={vi.fn()} />);
     expect(() => expect(screen.getByRole("article").querySelector("img")).toHaveAttribute("src", expect.stringContaining("evidence-loaded-7"))).toThrow();
+  });
+
+  test("renders a brand web alternate with its source, and never the source URL as visible text (SG-119 G2)", () => {
+    const sourceUrl = "https://world.openfoodfacts.org/api/v2/search?search_terms=Jacobs";
+    const withBrand: Candidate = {
+      ...candidate,
+      review_task_ids: [],
+      dedup_matches: [],
+      fields: {
+        brand: { value: "Jacobs", source_type: "user" },
+        display_name: { value: "Coffee", source_type: "user" },
+      },
+      web_alternates: [
+        {
+          field: "brand",
+          value: "Jacobs Cronat Gold",
+          source_type: "web:OpenFoodFacts",
+          source_url: sourceUrl,
+          retrieved_at: "2026-09-25T00:00:00+00:00",
+        },
+      ],
+    };
+    render(<CandidateCard candidate={withBrand} householdId="h" onDecision={vi.fn()} />);
+
+    const section = screen.getByRole("region", { name: "Web alternates" });
+    expect(within(section).getByText("brand")).toBeInTheDocument();
+    expect(within(section).getByText("Jacobs Cronat Gold")).toBeInTheDocument();
+    expect(within(section).getByText("web:OpenFoodFacts")).toBeInTheDocument();
+    const link = within(section).getByRole("link", { name: "source" });
+    expect(link).toHaveAttribute("href", sourceUrl);
+    // The full URL lives in the href/title, never as visible text (SG-118 discipline).
+    expect(section.textContent ?? "").not.toContain("world.openfoodfacts.org");
   });
 
   test("split action appears only when a multi-item count is supplied and fires once", () => {
