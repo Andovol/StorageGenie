@@ -1,0 +1,8 @@
+Negative-Receipt-ID: SG-119
+utc=2026-09-25T10:53:41Z
+DISPATCH_RESULT id=SG-119 coder=opencode exit=0 head=78aaadd0f56cdfe4c2480a68b103c1589fb30158 note=no moved=yes rewrite=no dirty=no elapsed=1391s budget=2100s
+P1_moved=PASS count=2
+P2_rewrite=PASS behind=0
+P3_note=FAIL note=no
+P5_receipt=FAIL
+P6_dirty=PASS dirty=no
