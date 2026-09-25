@@ -1,0 +1,47 @@
+SG-121 running log — non-empty activation probe (G3 locations + G4 relations), read-only
+
+Coder: opencode · effort high (argv `opencode run --auto --dir /home/andrei/StorageGenie --variant high`)
+Model: deepseek-v4.1-flash (provider opencode-go; provider metadata
+       /home/andrei/.local/state/opencode/model.json recent[0]; argv carries no --model)
+Work dir: /home/andrei/StorageGenie · remote git@github.com:Andovol/StorageGenie.git
+Coder process start: 2026-09-25T12:37:04Z (shell clock; see report)
+BASE REF: origin/automation · BASE_RESOLVED = START_HEAD = cc0a27c32fac557412a0ffb15b8aad797f55310e
+
+[recon / contract]
+- git status clean; branch automation; HEAD == origin/automation == cc0a27c.
+- Contract authority (host checkout): /home/andrei/storagegenie-contract/VERSION = 0.37.0;
+  HEAD 1acd7730e5fa6de5b7403aacce71207e9946461d (== packet's 1acd773, tag resolution off);
+  RULES.md sha256 18de7fd7... == payload RULES.sha256. Recorded 0.37.0 == published 0.37.0.
+- `.rules-cache/` ABSENT on this host (`ls -a` + `find` empty) — same standing observation as
+  SG-062/SG-078/SG-099/SG-104..120. Contract echo source path is the host checkout above.
+
+[G0 capability + census]
+- `docker ps`: storagegenie-backend-1 Up (healthy) 127.0.0.1:8003->8000/tcp.
+- health exact: {"status":"ok","db":"ok","storage":"ok"}.
+- gate probe: `GET /v1/locations` (no household_id) -> HTTP 422 missing household_id; with the
+  live id -> HTTP 200. The flag dependency is the gate and it passed (not 404). No 301/401
+  auth/redirect gate exists on these routes (packet's "gate 301/401" hypothesis NOT observed).
+- `alembic current` -> 20260924_sg114_relation (head) — matches packet hypothesis.
+- table set present: location, asset_location, asset_relation (plus 25 others; 28 total) — matches.
+- counts: location=0, asset_location=0, asset_relation=0. ALL ZERO.
+- live household: 1 row, id 01a0a029-1477-7ca0-b200-bce78a96c679 (queries + counts in verify log).
+- live assets: 6 rows, all under that household; probe asset 01a0a467-eb0e-7b83-a227-af122dc9268b.
+
+[G1 locations legs]
+- GET /v1/locations?household_id=01a0a029-... -> HTTP 200 {"items":[]} (no rows; by-id GET N/A).
+- GET /v1/assets/01a0a467-...?household_id=01a0a029-... -> HTTP 200; key `locations` present = [].
+
+[G2 relations legs]
+- GET /v1/assets/01a0a467-.../relations?household_id=01a0a029-... -> HTTP 200 {"items":[]}.
+- asset detail (same body) -> key `relations` present = [].
+
+[verdict] ACTIVATED-EMPTY — 200s everywhere, zero rows everywhere counted; seeding follow-up owed.
+
+[scope] writes: docs/worklogs/SG-121.{log,report.md,verify.log} only. Reads: docker ps, health,
+  4 route GETs, read-only `docker exec` SELECTs. No write of any kind; no seeding; no flag; no
+  recreate; no build; no compose; no .env; no STATE/AGENTS. $0.000000 (zero metered calls).
+
+[commit + receipt]
+- Commit 1 (work) = WORK_HEAD (hash filled in the docs commit): the worklog set.
+- Note anchored on WORK_HEAD on refs/notes/storagegenie-coder-reports, pushed; verified from the
+  fetched mapped ref; second docs-only commit dual-annotated (paste in report + verify log).

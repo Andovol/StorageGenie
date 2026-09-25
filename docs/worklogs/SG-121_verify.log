@@ -1,0 +1,108 @@
+SG-121 verify log — raw statuses + raw bodies (read-only; no key bytes touched)
+
+BASE REF: origin/automation
+BASE_RESOLVED: cc0a27c32fac557412a0ffb15b8aad797f55310e
+START_HEAD:    cc0a27c32fac557412a0ffb15b8aad797f55310e
+WORK_HEAD:     WORK_HEAD_PENDING
+
+=== CONTRACT ECHO / SOURCE PATH ===
+$ cat /home/andrei/storagegenie-contract/VERSION
+0.37.0
+$ git -C /home/andrei/storagegenie-contract rev-parse HEAD
+1acd7730e5fa6de5b7403aacce71207e9946461d
+$ sha256sum /home/andrei/storagegenie-contract/RULES.md
+18de7fd7b3546bd7624b3a7b59a78bd629752816cd7fa8f1af6113d1bafc8d46  RULES.md
+$ cat /home/andrei/storagegenie-contract/RULES.sha256
+18de7fd7b3546bd7624b3a7b59a78bd629752816cd7fa8f1af6113d1bafc8d46  RULES.md
+$ git -C /home/andrei/storagegenie-contract describe --tags
+fatal: No tags can describe '1acd7730e5fa6de5b7403aacce71207e9946461d'.   (tag not present locally; HEAD matches the packet)
+(.rules-cache/ is ABSENT on this host — `ls -a /home/andrei/StorageGenie` shows no .rules-cache,
+ `find ... -iname '*rules*cache*'` empty; same standing observation as SG-062/078/099/104..120.)
+
+=== G0 CAPABILITY ===
+$ docker ps --format '{{.Names}}\t{{.Status}}\t{{.Ports}}'
+storagegenie-backend-1	Up 2 hours (healthy)	127.0.0.1:8003->8000/tcp
+
+$ curl -s http://127.0.0.1:8003/v1/health
+{"status":"ok","db":"ok","storage":"ok"}
+
+$ curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:8003/v1/locations
+422                                  # missing required household_id -> handler reached; flag gate passed (not 404)
+$ curl -s -w '\n[HTTP %{http_code}]' 'http://127.0.0.1:8003/v1/locations'
+{"type":"about:blank","title":"Unprocessable Entity","status":422,"detail":"1 validation error:\n  {'type': 'missing', 'loc': ('query', 'household_id'), 'msg': 'Field required', 'input': None}\n\n  File \"/app/app/api/v1/locations.py\", line 125, in list_locations\n    GET /v1/locations"}
+[HTTP 422]
+
+$ docker exec storagegenie-backend-1 alembic current
+INFO  [alembic.runtime.migration] Context impl SQLiteImpl.
+INFO  [alembic.runtime.migration] Will assume non-transactional DDL.
+20260924_sg114_relation (head)        # matches packet hypothesis
+
+$ docker exec storagegenie-backend-1 python3 -c "select name from sqlite_master where type='table'"
+['alembic_version','assertion','asset','asset_evidence','asset_fts','asset_fts_config',
+ 'asset_fts_data','asset_fts_docsize','asset_fts_idx','asset_location','asset_relation',
+ 'audit_event','candidate','enrich_snapshot','evidence','guardrail_event','household',
+ 'idempotency_key','job','job_step','location','observation','planning_suggestion',
+ 'provider_call','review_task','saved_search','source_attribution','user']
+# 28 tables; location + asset_location + asset_relation present (matches packet hypothesis; SG-115)
+
+=== G0 CENSUS (queries + counts) ===
+$ docker exec storagegenie-backend-1 python3 -c "
+import sqlite3; c=sqlite3.connect('/data/db/storagegenie.db')
+for t in ('location','asset_location','asset_relation'):
+    print(t, c.execute(f'select count(*) from {t}').fetchone()[0])"
+location 0
+asset_location 0
+asset_relation 0
+
+$ SELECT id,name FROM household LIMIT 5
+('01a0a029-1477-7ca0-b200-bce78a96c679', 'Popescu Household')     # COUNT household = 1
+
+$ SELECT id,household_id FROM asset LIMIT 10
+('01a0a467-eb0e-7b83-a227-af122dc9268b', '01a0a029-1477-7ca0-b200-bce78a96c679')
+('01a0c446-44c9-7b82-9d1c-2b51fa518191', '01a0a029-1477-7ca0-b200-bce78a96c679')
+('01a0c47f-fbb3-7db1-b6f3-aa52d20aa6a0', '01a0a029-1477-7ca0-b200-bce78a96c679')
+('01a0c481-720e-7923-ad6c-bee45caba30f', '01a0a029-1477-7ca0-b200-bce78a96c679')
+('01a0c4aa-8b62-7360-b11e-a476ddaea0f6', '01a0a029-1477-7ca0-b200-bce78a96c679')
+('01a0c4ab-3765-7e10-8d0a-705390c6560d', '01a0a029-1477-7ca0-b200-bce78a96c679')
+# COUNT asset = 6; all six belong to the single live household. Probe asset = first row above.
+
+=== G1a GET /v1/locations?household_id=01a0a029-1477-7ca0-b200-bce78a96c679 ===
+{"items":[]}
+[HTTP 200]
+# zero rows -> the conditional "GET one location by id" leg has no id to fetch (N/A, not skipped-in-error)
+
+=== G1b GET /v1/assets/01a0a467-eb0e-7b83-a227-af122dc9268b?household_id=01a0a029-1477-7ca0-b200-bce78a96c679 ===
+{"id":"01a0a467-eb0e-7b83-a227-af122dc9268b","household_id":"01a0a029-1477-7ca0-b200-bce78a96c679",
+ "display_name":"Toothpaste","asset_type":"unknown","status":"ACTIVE","quantity":null,"unit":null,
+ "condition":null,"version":1,"created_at":"2026-09-15T09:31:08","updated_at":"2026-09-15T09:31:08",
+ "evidence":[...],"assertions":[...],"audit_events":[...],
+ "locations":[],"relations":[]}
+[HTTP 200]
+# `locations` key PRESENT and = [] (flag ON); `relations` key PRESENT and = [] (flag ON).
+# (evidence/assertions/audit_events elided here to keep the household body narrow; the keys
+#  quoted above are the exact bytes at the tail of the body.)
+
+=== G2a GET /v1/assets/01a0a467-eb0e-7b83-a227-af122dc9268b/relations?household_id=01a0a029-1477-7ca0-b200-bce78a96c679 ===
+{"items":[]}
+[HTTP 200]
+# zero rows -> the "narrowest row-bearing fragment" leg has no row (N/A, not skipped-in-error)
+
+=== ROUTE-DISCOVERY (packet path hypotheses VERIFIED in source) ===
+backend/app/api/v1/locations.py:125  @router.get("/locations")           -> /v1/locations
+backend/app/api/v1/relations.py:102  @router.get("/assets/{asset_id}/relations") -> /v1/assets/{id}/relations
+backend/app/api/v1/assets.py:377     @router.get("/assets/{asset_id}")   -> /v1/assets/{id}
+backend/app/api/v1/assets.py:169-185  detail adds `locations` iff sg_locations_enabled,
+                                      `relations` iff sg_relations_enabled (SG-113/SG-114 reader halves)
+
+=== VERDICT ===
+ACTIVATED-EMPTY — every leg HTTP 200, zero rows everywhere counted (3/3 tables COUNT 0);
+non-empty activation proof is still owed; recommend the seeding follow-up (implemented nowhere here).
+
+=== SCOPE CEILING ===
+writes: docs/worklogs/SG-121.{log,report.md,verify.log}
+reads: docker ps, health GET, 4 route GETs, read-only docker exec SELECT/COUNT.
+No route POST/PATCH/DELETE/PUT; no DB INSERT/UPDATE/DELETE/DDL; no build; no compose; no .env;
+no migration; no STATE/AGENTS; no seeding; no flag; no recreate. $0.000000 (zero metered calls).
+
+=== RECEIPT — note add / push / mapped fetch / show (pasted verbatim) ===
+RECEIPT_PASTE_PENDING
