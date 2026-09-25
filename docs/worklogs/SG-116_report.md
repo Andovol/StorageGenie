@@ -46,7 +46,7 @@ Refs
 - Work dir `/home/andrei/StorageGenie`, origin remote `git@github.com:Andovol/StorageGenie.git` (as on host)
 - BASE_REF = `origin/automation`
 - BASE_RESOLVED = `de3ac037c267e4e28b0a476606684934c5afea4d` (== start HEAD)
-- WORK_HEAD = `PENDING-RECEIPT-COMMIT`
+- WORK_HEAD = `060cb2616d1d1103a0c3a92503947f16fccb14e1`
 
 G1 — premises (verify each; corrections worth more than agreement)
 ------------------------------------------------------------------
@@ -109,7 +109,26 @@ Guards invoked (0.36.0)
 
 Receipt note on refs/notes/storagegenie-coder-reports
 -----------------------------------------------------
-PENDING-RECEIPT-PASTE
+Note added on WORK_HEAD `060cb2616d1d1103a0c3a92503947f16fccb14e1` and verified against the FETCHED
+ref (mapped local name `refs/notes/verify/sg116-reports`). Executed output pasted verbatim:
+
+```
+$ git notes --ref=refs/notes/storagegenie-coder-reports add -m "Dispatch-ID: SG-116 | Report: docs/worklogs/SG-116_report.md | Work-HEAD: 060cb2616d1d1103a0c3a92503947f16fccb14e1" 060cb2616d1d1103a0c3a92503947f16fccb14e1
+note_add_exit=0
+$ git push origin refs/notes/storagegenie-coder-reports
+To github.com:Andovol/StorageGenie.git
+   df8602f..143934d  refs/notes/storagegenie-coder-reports -> refs/notes/storagegenie-coder-reports
+note_push_exit=0
+$ git fetch origin refs/notes/storagegenie-coder-reports:refs/notes/verify/sg116-reports
+From github.com:Andovol/StorageGenie
+ * [new ref]         refs/notes/storagegenie-coder-reports -> refs/notes/verify/sg116-reports
+fetch_exit=0
+$ git notes --ref=refs/notes/verify/sg116-reports show 060cb2616d1d1103a0c3a92503947f16fccb14e1
+Dispatch-ID: SG-116 | Report: docs/worklogs/SG-116_report.md | Work-HEAD: 060cb2616d1d1103a0c3a92503947f16fccb14e1
+show_exit=0
+```
+
+note=yes
 
 UNCLEAR
 -------
