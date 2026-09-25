@@ -2,7 +2,7 @@
 
 **Dispatch-ID:** SG-129 · **Verdict:** COMPLETE — G0 re-verified (identical to SG-128) + writability probe PASS; G1 deleted 14/14 exact paths through `docker exec`; G2 BEFORE == AFTER (non-vacuous); G3 this report + worklogs + notes receipt.
 **First token:** `SG-129`. **Work dir:** `/home/andrei/StorageGenie`. **Origin remote (as on host):** `git@github.com:Andovol/StorageGenie.git`.
-**BASE** (`origin/automation` resolved at start): `0cc8d35c59b2db3fe3aa41f6f43e76f80eeeee06` · **WORK_HEAD:** `<filled in receipt follow-up>` (the work commit holding these 3 worklogs).
+**BASE** (`origin/automation` resolved at start): `0cc8d35c59b2db3fe3aa41f6f43e76f80eeeee06` · **WORK_HEAD:** `db6f4e67ee39fc112ea8a7860795a602cb173188` (the work commit holding these 3 worklogs).
 **Settings (CO-78, from process arguments / provider metadata — never the identity line):** coder `opencode`; **effort `high`** from process argv `opencode run --auto --dir /home/andrei/StorageGenie --variant high` (pid 1357930 `/proc/1357930/cmdline`); **model `opencode-go/deepseek-v4.1-flash`** from provider metadata (`~/.local/share/opencode/log/opencode.log`: `providerID=opencode-go`, `modelID=deepseek-v4.1-flash`). **Spend: real $0.000000** (zero metered calls).
 **Contract echo (verbatim):** `> Rule-set version this project records: **0.37.0** (D15 adoption 2026-09-25: checkout `1acd773` tag `contract-v0.37.0` published …)`. **Source path:** `AGENTS.md:4`. Recorded `0.37.0` == published (`1acd773`, D15). **Finding F-SG129-1:** `.rules-cache/` is **ABSENT** at `/home/andrei/StorageGenie/.rules-cache` (persists F-SG128-1) — the echo is grounded on `AGENTS.md`, not a live fetch. Not load-bearing.
 **Grant invoked:** `PG-PR-10` — volume `storagegenie_storage_data` at in-container `/data/storage`, D17, delete of the enumerated set only. Container actions: `exec` for delete + probe only; no restart, no pull, no recreate.
@@ -49,9 +49,27 @@ G0 needs exec listing + reader read + probe; G1 needs exact-path exec deletes; G
 
 ## Receipt (notes ref)
 
-Commands are executed **after** the work commit; the `show` output is pasted in the receipt follow-up commit (SG-128 precedent). **Status: PENDING — see the follow-up tip for the pasted executed output.** If this subsection reaches the final tip without pasted `show` output, the receipt was not executed and must be reported as such.
+Executed, in order (all within bound). The `show` output below is the **executed** output against the **fetched** notes ref:
 
-<!-- RECEIPT-PASTE-ANCHOR -->
+```
+$ git notes --ref=refs/notes/storagegenie-coder-reports add -m "Dispatch-ID: SG-129 | Report: docs/worklogs/SG-129_report.md | Work-HEAD: db6f4e67ee39fc112ea8a7860795a602cb173188" db6f4e67ee39fc112ea8a7860795a602cb173188
+note-add-exit=0
+$ git push origin refs/notes/storagegenie-coder-reports
+To github.com:Andovol/StorageGenie.git
+   f8f7792..2005459  refs/notes/storagegenie-coder-reports -> refs/notes/storagegenie-coder-reports
+note-push-exit=0
+$ git fetch origin refs/notes/storagegenie-coder-reports:refs/notes/sg129-verify
+From github.com:Andovol/StorageGenie
+ * [new ref]         refs/notes/storagegenie-coder-reports -> refs/notes/sg129-verify
+fetch-exit=0
+$ git rev-parse refs/notes/sg129-verify
+2005459dab77562f260c934da6a46555bedd9414
+$ git notes --ref=refs/notes/sg129-verify show db6f4e67ee39fc112ea8a7860795a602cb173188
+Dispatch-ID: SG-129 | Report: docs/worklogs/SG-129_report.md | Work-HEAD: db6f4e67ee39fc112ea8a7860795a602cb173188
+show-exit=0
+```
+
+The work was pushed to `automation`; no push to `storagegenie-evidence`, no `{{RECEIPT_CMD}}`. The final tip is **dual-annotated** with the same message (note-anchor inoculation, SG-092 precedent); the fetched-ref `show` above is the executed proof for the work HEAD. Final line: `note=yes`.
 
 ## UNCLEAR
 
