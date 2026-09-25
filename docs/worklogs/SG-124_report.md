@@ -2,7 +2,7 @@
 
 **Dispatch-ID:** SG-124 · **Coder:** opencode · **Effort:** high · **Model:** opencode-go/deepseek-v4.1-flash
 **Work dir:** `/home/andrei/StorageGenie` · **Remote:** `origin` = `git@github.com:Andovol/StorageGenie.git`
-**BASE REF:** `origin/automation` · **BASE_RESOLVED:** `b041ee98858dd5b6280aac2c490a83e649240a87` · **START_HEAD:** `b041ee98858dd5b6280aac2c490a83e649240a87` · **WORK_HEAD:** the commit carrying this report + worklog + verify log (resolved hash published in the receipt note below).
+**BASE REF:** `origin/automation` · **BASE_RESOLVED:** `b041ee98858dd5b6280aac2c490a83e649240a87` · **START_HEAD:** `b041ee98858dd5b6280aac2c490a83e649240a87` · **WORK_HEAD:** `8c2ef4a5f8afc7279c1e3a2613cd806edcff0e2f` (the commit carrying this report + worklog + verify log).
 **Spend (real $):** $0.000000 — zero metered calls on any path; no Jina search call; no key read.
 **Contract:** recorded `0.37.0` == published `1acd7730e5fa6de5b7403aacce71207e9946461d`; source path `/home/andrei/storagegenie-contract/{VERSION, HEAD}`; `RULES.md` sha256 `18de7fd7…` == payload `RULES.sha256`.
 
@@ -60,7 +60,31 @@
 No command was killed or timed out. The G0 leg exceeded the 120s ordinary bound because the named page had moved and its SPA sources pack prices from a second URL; reported as a deviation.
 
 ## Receipt (note on `refs/notes/storagegenie-coder-reports`) — pasted verbatim
-<!--RECEIPT-SHOW-->
+Work committed and pushed to `automation` (worktree clean, `CO-55`). No push to `storagegenie-evidence`; no `{{RECEIPT_CMD}}` (packet's M20-corrected block). WORK_HEAD = `8c2ef4a5f8afc7279c1e3a2613cd806edcff0e2f` (product + tests + all three worklog files). The note was added on WORK_HEAD, the notes ref pushed, the refspec fetched into a mapped local name, and `git notes --ref=… show <WORK_HEAD>` pasted verbatim below. The pre-show returned "no note found" (exit 1), so the existing-note refusal did not fire.
+
+```text
+$ git notes --ref=refs/notes/storagegenie-coder-reports show 8c2ef4a5f8afc7279c1e3a2613cd806edcff0e2f
+error: no note found for object 8c2ef4a5f8afc7279c1e3a2613cd806edcff0e2f.
+pre_show_exit=1
+
+$ git notes --ref=refs/notes/storagegenie-coder-reports add -m "Dispatch-ID: SG-124 | Report: docs/worklogs/SG-124_report.md | Work-HEAD: 8c2ef4a5f8afc7279c1e3a2613cd806edcff0e2f" 8c2ef4a5f8afc7279c1e3a2613cd806edcff0e2f
+add_exit=0
+
+$ git push origin refs/notes/storagegenie-coder-reports
+To github.com:Andovol/StorageGenie.git
+   398a376..e6c80e5  refs/notes/storagegenie-coder-reports -> refs/notes/storagegenie-coder-reports
+push_exit=0
+
+$ git fetch origin refs/notes/storagegenie-coder-reports:refs/notes/sg124-verify
+From github.com:Andovol/StorageGenie
+ * [new ref]         refs/notes/storagegenie-coder-reports -> refs/notes/sg124-verify
+fetch_exit=0
+
+$ git notes --ref=refs/notes/sg124-verify show 8c2ef4a5f8afc7279c1e3a2613cd806edcff0e2f
+Dispatch-ID: SG-124 | Report: docs/worklogs/SG-124_report.md | Work-HEAD: 8c2ef4a5f8afc7279c1e3a2613cd806edcff0e2f
+show_exit=0
+```
+
 note=yes
 
 ## UNCLEAR
