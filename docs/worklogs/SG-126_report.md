@@ -2,7 +2,7 @@ SG-126 — Backup re-drill: prove the manual runbook still holds (read-only, res
 
 **Work dir:** `/home/andrei/StorageGenie` · **remote:** `git@github.com:Andovol/StorageGenie.git`
 **BASE** (packet ref `origin/automation`, resolved commit): `e9b2ffd49962bbd1d09eb79185fc15ff90170875`
-**WORK_HEAD:** _(filled in the receipt-fill commit)_
+**WORK_HEAD:** `e1b38a7121c5f807b151da447e8c73d53d89e0ba`
 **Contract:** recorded `0.37.0` == published `0.37.0` · source `/home/andrei/storagegenie-contract/VERSION`;
 installed `RULES.md` sha256 `18de7fd7b3546bd7624b3a7b59a78bd629752816cd7fa8f1af6113d1bafc8d46` == payload `RULES.sha256`.
 **MODEL / effort (CO-78, from process args + provider metadata, never the system-prompt identity):**
@@ -88,9 +88,19 @@ No script/test change; both remain unchanged SG-086 artifacts. `git diff -- READ
 
 ## Receipt
 - Work pushed to `automation`; worktree clean (`CO-55`). No `storagegenie-evidence` push; no `{{RECEIPT_CMD}}`.
-- Note added on WORK_HEAD then `refs/notes/storagegenie-coder-reports` pushed and verified from a **mapped** fetch;
-  executed `show` output pasted below in the receipt-fill commit. Final tip dual-annotated (SG-092 precedent).
-- `note=yes` (final line below, in the receipt-fill commit).
+- Note added on WORK_HEAD (`e1b38a7`), then `refs/notes/storagegenie-coder-reports` pushed and verified from a
+  **mapped** fetch (`refs/notes/sg126-verify`); executed output, verbatim:
+
+```
+$ git fetch origin refs/notes/storagegenie-coder-reports:refs/notes/sg126-verify
+From github.com:Andovol/StorageGenie
+ * [new ref]         refs/notes/storagegenie-coder-reports -> refs/notes/sg126-verify
+$ git notes --ref=refs/notes/sg126-verify show e1b38a7121c5f807b151da447e8c73d53d89e0ba
+Dispatch-ID: SG-126 | Report: docs/worklogs/SG-126_report.md | Work-HEAD: e1b38a7121c5f807b151da447e8c73d53d89e0ba
+```
+
+- Final tip dual-annotated (SG-092 precedent, note-anchor inoculation).
+- `note=yes`
 
 ## UNCLEAR
 - **FIRST READ:** whether the README path actually resolved — it did not; the doubled `/_data` was caught only by
