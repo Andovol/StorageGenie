@@ -137,22 +137,25 @@ def _decode_image(file_bytes: bytes, sha: str) -> Image.Image:
 
 
 def _thumbnail_bytes(image: Image.Image, media_type: str, size: int) -> bytes:
+    # SG-127 G1: every thumbnail is served as `image/jpeg` under a `.jpg` artifact
+    # name (`storage/local_store.py:thumbnail_path`, `api/v1/evidence.py` reader),
+    # so the writer flattens EVERY decodable source -- jpeg/png/webp/heic/heif --
+    # to JPEG here. SG-118 G5 covered jpeg/heic/heif only, so png/webp emitted
+    # native PNG/WEBP bytes under a `.jpg` name and the served bytes did not match
+    # the served name (F-SG118-2). `media_type` is retained for call-site
+    # compatibility; the served type is now source-independent.
     thumb = image.copy()
     thumb.thumbnail((size, size))
+    if thumb.mode in ("RGBA", "LA"):
+        background = Image.new("RGB", thumb.size, (255, 255, 255))
+        background.paste(thumb, mask=thumb.split()[-1] if thumb.mode == "RGBA" else None)
+        thumb = background
+    elif thumb.mode == "P":
+        thumb = thumb.convert("RGB")
+    elif thumb.mode not in ("RGB", "L"):
+        thumb = thumb.convert("RGB")
     output = io.BytesIO()
-    if media_type in ("image/jpeg", "image/heic", "image/heif"):
-        if thumb.mode in ("RGBA", "LA"):
-            background = Image.new("RGB", thumb.size, (255, 255, 255))
-            background.paste(thumb, mask=thumb.split()[-1] if thumb.mode == "RGBA" else None)
-            thumb = background
-        elif thumb.mode == "P":
-            thumb = thumb.convert("RGB")
-        elif thumb.mode not in ("RGB", "L"):
-            thumb = thumb.convert("RGB")
-        thumb.save(output, format="JPEG", exif=b"")
-    else:
-        format_name = {"image/png": "PNG", "image/webp": "WEBP"}[media_type]
-        thumb.save(output, format=format_name, exif=b"")
+    thumb.save(output, format="JPEG", exif=b"")
     return output.getvalue()
 
 

@@ -677,6 +677,11 @@ def build_candidate_from_extraction(
                 provider_call_id=primary_call,
             )
         for field_name, value in (
+            # SG-127 G2: the v3 extraction `brand` is a label-visible identity
+            # field (SG-119 vocabulary) and is promoted here; its label assertion
+            # is written by the existing `_create_asset_for_candidate` path once
+            # `brand` is in `fields`. Null stays null (`_extraction_value_field`).
+            ("brand", item.brand),
             ("quantity", item.quantity),
             ("unit", item.unit),
             ("asset_type", item.asset_type),
@@ -993,6 +998,9 @@ def _split_child_fields(
     confidence = raw_confidence if isinstance(raw_confidence, (int, float)) else None
     item_derived = {
         "display_name",
+        # SG-127 G2: the promoted extraction brand is item-derived; a split child
+        # takes ITS item's brand (or none), never the origin's -- no substitution.
+        "brand",
         "expiry_date",
         "opened_date",
         "lot",
@@ -1017,6 +1025,7 @@ def _split_child_fields(
         provider_call_id=provider_call_id,
     )
     for field_name in (
+        "brand",
         "expiry_date",
         "opened_date",
         "lot",

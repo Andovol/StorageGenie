@@ -1,0 +1,146 @@
+SG-127 verify log — both test runs, served proofs, counts (raw, verbatim)
+
+# ---------------------------------------------------------------------------
+# Contract echo (source path /home/andrei/storagegenie-contract)
+# ---------------------------------------------------------------------------
+$ cat VERSION                                    -> 0.37.0
+$ git rev-parse HEAD                             -> 1acd7730e5fa6de5b7403aacce71207e9946461d
+$ sha256sum RULES.md                             -> 18de7fd7b3546bd7624b3a7b59a78bd629752816cd7fa8f1af6113d1bafc8d46
+$ cat RULES.sha256                               -> 18de7fd7b3546bd7624b3a7b59a78bd629752816cd7fa8f1af6113d1bafc8d46 RULES.md
+$ git tag -l | wc -l                             -> 14   (max tag contract-v0.33.0; no local contract-v0.37.0)
+.rules-cache/ absent on host (standing, SG-121 F-SG121-1).
+
+# ---------------------------------------------------------------------------
+# Baseline (BEFORE any edit): full suite
+# ---------------------------------------------------------------------------
+$ cd backend && venv/bin/python -m pytest -q -p no:cacheprovider
+2 failed, 603 passed, 32 warnings in 29.98s
+FAILED tests/test_signals.py::test_generated_codes_are_validated_and_bad_checksum_is_not_an_identifier
+FAILED tests/test_signals.py::test_ocr_has_text_boxes_and_mean_confidence
+$ venv/bin/python -m ruff check .                -> All checks passed!
+$ venv/bin/python -m mypy app                    -> Found 41 errors in 9 files (checked 90 source files)
+
+# ---------------------------------------------------------------------------
+# G1/G2/G3 — FAIL run (tests written, code NOT yet changed)  [PG-EV-09]
+# ---------------------------------------------------------------------------
+$ venv/bin/python -m pytest -q tests/test_sg127_followup_batch.py
+FAILED tests/test_sg127_followup_batch.py::test_served_thumbnail_bytes_match_served_name[png]
+FAILED tests/test_sg127_followup_batch.py::test_served_thumbnail_bytes_match_served_name[webp]
+FAILED tests/test_sg127_followup_batch.py::test_extraction_brand_reaches_served_candidate_and_committed_assertion
+FAILED tests/test_sg127_followup_batch.py::test_split_child_keeps_its_own_brand_or_none
+FAILED tests/test_sg127_followup_batch.py::test_job_candidates_route_lists_and_gates
+5 failed, 4 passed, 2 warnings in 1.50s
+(fail modes: png/webp served body magic \x89PNG/RIFF vs image/jpeg; brand absent from fields; route
+ 404 "Not Found: /v1/jobs/<id>/candidates". jpeg/heic thumbs + null-brand already passed.)
+
+# ---------------------------------------------------------------------------
+# PASS run (after fixes) — focused, and full suite
+# ---------------------------------------------------------------------------
+$ venv/bin/python -m pytest -q tests/test_sg127_followup_batch.py tests/test_sg080_ingest_pipeline.py \
+    tests/test_evidence_upload.py tests/test_candidate_read.py tests/test_review_split.py \
+    tests/test_sg119_brand_alternates.py
+69 passed, 2 warnings in 3.92s
+
+$ venv/bin/python -m pytest -q -p no:cacheprovider          # full
+2 failed, 612 passed, 32 warnings in 31.99s
+FAILED tests/test_signals.py::test_generated_codes_are_validated_and_bad_checksum_is_not_an_identifier
+FAILED tests/test_signals.py::test_ocr_has_text_boxes_and_mean_confidence
+$ venv/bin/python -m ruff check .                -> All checks passed!
+$ venv/bin/python -m mypy app                    -> Found 41 errors in 9 files (checked 90 source files)
+
+# --- base-reds stash reproduction (never inherited) ---
+$ git stash push -u -m sg127-base-red-repro      -> Saved working directory and index state
+$ venv/bin/python -m pytest -q tests/test_signals.py
+2 failed, 5 passed, 3 warnings in 1.35s
+FAILED tests/test_signals.py::test_generated_codes_are_validated_and_bad_checksum_is_not_an_identifier
+FAILED tests/test_signals.py::test_ocr_has_text_boxes_and_mean_confidence
+$ git stash pop                                  -> Dropped refs/stash@{0}; worktree restored
+
+# ---------------------------------------------------------------------------
+# Ceiling / gates
+# ---------------------------------------------------------------------------
+$ git diff --stat                                -> 4 files changed, 74 insertions(+), 22 deletions(-)
+    backend/app/api/v1/jobs.py            | 41 +++++++++++++++++++++++++++++++-
+    backend/app/services/candidates.py    |  9 +++++++
+    backend/app/services/evidence_service.py | 29 ++++++++++---------
+    backend/tests/test_sg080_ingest_pipeline.py | 17 +++++------
+  (+ untracked backend/tests/test_sg127_followup_batch.py)
+$ git diff --stat -- backend/app/models backend/alembic   -> (empty)
+$ git diff -- backend/app/models backend/alembic | wc -l  -> 0
+$ secret gate (diff grep for api_key/secret/password/token literal >=16) -> 0 matches
+mypy delta = 41 (final) - 41 (base) = 0.
+
+# ---------------------------------------------------------------------------
+# G4 — BEFORE state
+# ---------------------------------------------------------------------------
+container id=e9b999e2f6585db95c74fb1159f2faf00c72fdbbfb9705ff961ddf9314bce253
+            image=sha256:b5a71b8bc20a6add584084fd1e5aae66952be780560f2692e77170d8fd7eb1dd
+            started=2026-09-25T10:49:10Z status=running restart=0
+health:    {"status":"ok","db":"ok","storage":"ok"}
+alembic_version= [('20260924_sg114_relation',)]   table_count= 28   sum_rows= 284
+seed: household [('01a0a029-1477-7ca0-b200-bce78a96c679', 'Popescu Household')]
+      evidence 13 (image/jpeg,image/png,text/plain) · jobs 8 · candidates 7 · assets 6 · assertions 28
+
+# ---------------------------------------------------------------------------
+# G4 — rebuild + exactly ONE recreate + AFTER state
+# ---------------------------------------------------------------------------
+$ BUILDX_CONFIG=/tmp/opencode/buildx docker compose build backend
+2026-09-25T14:02:36Z ... Image storagegenie-backend Built ... 2026-09-25T14:02:48Z  (exit 0, 12s)
+exporting config sha256:f30c98fca927bd182551c014cc22e16822a13e42ee80171d54134550c276067f
+exporting manifest list sha256:665d200ba18387b030fb67e77f4880652aad825e0e1c22ae6420149dbc89d2c4
+
+$ docker compose up -d backend                    # 2026-09-25T14:02:56Z
+ Container storagegenie-backend-1 Recreate
+ Container storagegenie-backend-1 Recreated
+ Container storagegenie-backend-1 Starting
+ Container storagegenie-backend-1 Started
+health after 2x2s: 200 {"status":"ok","db":"ok","storage":"ok"}   (2026-09-25T14:03:00Z)
+
+container id=6b606c6a61e9de5d767d91afcbca9f1c9b014dc261414013af88e86c597294b3
+            image=sha256:665d200ba18387b030fb67e77f4880652aad825e0e1c22ae6420149dbc89d2c4
+            started=2026-09-25T14:02:57Z status=running restart=0
+health x3: {"status":"ok","db":"ok","storage":"ok"} (x3)
+alembic_version= [('20260924_sg114_relation',)]   table_count= 28   sum_rows= 284
+evidence 13 · jobs 8 · candidates 7 · assets 6 · assertions 28      -> delta 0
+
+# ---------------------------------------------------------------------------
+# G4 — served proofs (live :8003, GET only)
+# ---------------------------------------------------------------------------
+### GATE: /v1/jobs WITHOUT household_id -> HTTP 422 (missing household_id)
+### GATE: /v1/jobs/{id}/candidates WITHOUT household_id -> HTTP 422
+    {"detail":"1 validation error: ... 'loc': ('query', 'household_id') ...", "status":422}
+### ROUTE known job -> HTTP 200
+{"items":[{"id":"01a0afaa-3ff4-7da0-987a-87f29c73ee5b","state":"proposed",
+"job_id":"01a0afaa-235a-7fe3-8422-1be2b555c921","fields":{"display_name":{"value":"MILK",...
+"source_type":"extraction",...},"evidence_ids":["01a0afaa-145d-..."] ,"review_task_ids":[]}],"total":1}
+### ROUTE unknown job -> HTTP 404 {"status":404,"detail":"Job not found"}
+### ROUTE foreign household -> HTTP 403 {"status":403,"detail":"Household mismatch"}
+### CANDIDATE read GET /v1/candidates/01a0afaa-... -> HTTP 200 (fields shape present)
+### THUMBNAIL GET /v1/evidence/01a0a467-eacf-7e13-bbd0-078b1bc93860/thumb/256
+    HTTP/1.1 200 OK · content-type: image/jpeg · body magic = ffd8ff
+
+# ---------------------------------------------------------------------------
+# G4 — deployed-image in-memory proof (no production write)
+# ---------------------------------------------------------------------------
+$ docker exec -i storagegenie-backend-1 python - < sg127_container_probe.py
+candidates.py contains promoted brand loop: True
+evidence_service.py always-JPEG: True
+G1 image/png: bytes_magic=ffd8ff
+G1 image/webp: bytes_magic=ffd8ff
+G1 image/jpeg: bytes_magic=ffd8ff
+G2 fields.brand= {'value': 'DairyGold', 'confidence': 1.0, 'source_type': 'extraction',
+'provider': 'probe', 'model': 'm', 'prompt_template_version': 'extract-food-v4', 'provider_call_id': 'c'}
+
+# ---------------------------------------------------------------------------
+# Live-data findings (see report F-SG127-1/2)
+# ---------------------------------------------------------------------------
+live candidates: 7, all `fields.brand` absent; 4 carry ai_items brands (Pilos, Milbona, VITASIA,
+BARONI/PIKOK). No `brand` assertion live.
+live image evidence served `.jpg` thumb: only image/jpeg source; all image/png evidence has legacy
+`_thumb*.png` artifacts (pre-SG-118 naming), not served by the `.jpg` reader (SG-128 owns deletion).
+
+# ---------------------------------------------------------------------------
+# Receipt (pushed to refs/notes/storagegenie-coder-reports; shown from mapped ref)
+# ---------------------------------------------------------------------------
+«filled in the receipt follow-up commit — pasted verbatim there and in the report»
+note=«pending follow-up commit»

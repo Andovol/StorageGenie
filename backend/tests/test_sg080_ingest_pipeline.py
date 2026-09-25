@@ -379,17 +379,18 @@ def test_other_v3_fields_preserved_byte_equal_in_ai_items_and_deferred(sg080_env
     for field in OTHER_V3_FIELDS + ("transcript",):
         assert ai_item[field] == item[field], field
 
-    # Accept-writable promotion is explicitly deferred: none of these fields
-    # rides `fields`. SG-119 whitelists `brand` for the WEB path only (an OFF
-    # `brands` value can commit as a gated proposal), but the EXTRACTION builder
-    # below still never promotes it, so the SG-080 deferral is intact for this
-    # pipeline. Every OTHER v3 field stays out of the whitelist.
+    # SG-127 G2 promotes the v3 extraction `brand` (label-visible per the SG-119
+    # vocabulary) into `fields`; every OTHER v3 field stays deferred out of the
+    # accept-writable set. `brand` is in BOTH vocabularies, so the promoted value
+    # can reach the committed label assertion. The promotion carries extraction
+    # provenance -- never a guessed or substituted value (null stays null).
     for field in OTHER_V3_FIELDS + ("transcript",):
         if field != "brand":
             assert field not in ALLOWED_CANDIDATE_FIELDS, field
-        assert field not in proposal["fields"], field
-    assert "brand" in ALLOWED_CANDIDATE_FIELDS  # SG-119 web-path whitelist
-    assert "brand" not in proposal["fields"]  # SG-080 extraction deferral intact
+            assert field not in proposal["fields"], field
+    assert "brand" in ALLOWED_CANDIDATE_FIELDS
+    assert proposal["fields"]["brand"]["value"] == "DairyGold"
+    assert proposal["fields"]["brand"]["source_type"] == "extraction"
 
 
 def test_null_heavy_v3_items_are_handled(sg080_env, monkeypatch: pytest.MonkeyPatch) -> None:  # type: ignore[no-untyped-def]

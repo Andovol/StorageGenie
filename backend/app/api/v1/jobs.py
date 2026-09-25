@@ -10,7 +10,7 @@ from app.models.evidence import Evidence
 from app.models.idempotency import IdempotencyKey
 from app.models.job import Job
 from app.schemas.common import decode_cursor, encode_cursor
-from app.services import job_service
+from app.services import candidates, job_service
 
 router = APIRouter()
 
@@ -148,3 +148,42 @@ def get_job(
     if j.household_id != household_id:
         raise HTTPException(status_code=403, detail="Household mismatch")
     return {"id": j.id, "job_type": j.job_type, "state": j.state, "household_id": j.household_id}
+
+
+def _candidate_list_item(candidate: candidates.Candidate) -> dict[str, object]:
+    proposal = candidates.load_proposal(candidate)
+    fields = proposal.get("fields", {})
+    raw_evidence = json.loads(candidate.evidence_ids_json)
+    evidence_ids = [str(item) for item in raw_evidence] if isinstance(raw_evidence, list) else []
+    review_task_ids = proposal.get("review_task_ids", [])
+    if not isinstance(review_task_ids, list):
+        review_task_ids = []
+    return {
+        "id": candidate.id,
+        "state": candidate.state,
+        "job_id": candidate.job_id,
+        "fields": fields if isinstance(fields, dict) else {},
+        "evidence_ids": evidence_ids,
+        "review_task_ids": review_task_ids,
+    }
+
+
+@router.get("/jobs/{job_id}/candidates")
+def list_job_candidates(
+    job_id: str,
+    household_id: str = Query(...),
+    db: Session = Depends(get_db),
+) -> dict[str, object]:
+    # SG-127 G3: the review flow's missing read -- list one job's candidates.
+    # The gate is the neighboring jobs read's exact shape (`_owned_job`).
+    job = _owned_job(db, job_id, household_id)
+    rows = (
+        db.query(candidates.Candidate)
+        .filter(
+            candidates.Candidate.job_id == job.id,
+            candidates.Candidate.household_id == household_id,
+        )
+        .order_by(candidates.Candidate.created_at, candidates.Candidate.id)
+        .all()
+    )
+    return {"items": [_candidate_list_item(row) for row in rows], "total": len(rows)}

@@ -1,0 +1,52 @@
+SG-127 log — follow-up batch: thumbnail bytes, extraction brand promotion, job->candidates route (serve it)
+Coder: opencode · effort `high` (`--variant high` on argv) · model `deepseek-v4.1-flash` (provider
+metadata banner `> build · deepseek-v4.1-flash` in `output/dispatch/SG-127.log`; no `--model` on argv =
+contract-legal omitted-model subset) · Contract recorded `0.37.0` == published.
+BASE = 29391674433b4e4cbeed1410dd286bbb4374b5a4 (start HEAD == `origin/automation`); worktree clean.
+`.rules-cache/` absent on this host (standing, SG-121 F-SG121-1); contract source
+`/home/andrei/storagegenie-contract` (VERSION `0.37.0`, HEAD `1acd7730e5fa6de5b7403aacce71207e9946461d`,
+`RULES.sha256` `18de7fd7…`).
+
+[~13:35Z] Orientation. Premises verified before building:
+- F-SG118-2: `_thumbnail_bytes` (evidence_service.py:139) emits PNG/WEBP for png/webp sources while
+  `thumbnail_path` (local_store.py:10) always names `.jpg` and the reader (api/v1/evidence.py:107-120)
+  hardcodes `image/jpeg` -> CONFIRMED (for jpeg/heic/heif the JPEG branch already matches).
+- F-SG119-3: `build_candidate_from_extraction` (candidates.py:607) promotes quantity/unit/asset_type/
+  category_proposed but NOT `brand`; `brand` is in LABEL_VISIBLE_FIELDS:42 and ALLOWED_CANDIDATE_FIELDS:95
+  -> CONFIRMED.
+- Route gap: jobs.py has `/jobs`, `/jobs/{job_id}`, `/imports/{job_id}` and no job->candidates listing;
+  `candidates.Candidate.job_id` exists -> CONFIRMED.
+Baseline: full suite `2 failed, 603 passed` in 30s (both reds are the env OCR/barcode tests in
+test_signals.py); ruff clean; mypy 41 errors in 9 files. Correct venv = `backend/venv`.
+
+[~13:55Z] Wrote tests/test_sg127_followup_batch.py (G1 per-type real fixtures, G2 promotion/read/commit,
+G2 split-child brand, G3 route+gate). FAIL run (unfixed code): `5 failed, 4 passed` — png/webp thumbnail
+magic, brand promotion, split-child brand, route 404. jpeg/heic thumbnail + null-brand already passed.
+
+[~14:00Z] Fixes:
+- evidence_service.py `_thumbnail_bytes` flattens EVERY source to JPEG; removed the PNG/WEBP branch.
+- candidates.py: `("brand", item.brand)` added to the extraction promotion loop; `brand` added to
+  `_split_child_fields` item-derived set + per-item loop (child takes ITS item's brand, never origin's).
+- jobs.py: `GET /jobs/{job_id}/candidates` via `_owned_job` (404 unknown / 403 foreign) + `_candidate_list_item`.
+- test_sg080 deferral pin updated: brand now promoted; every OTHER v3 field stays deferred (SG-119 precedent).
+
+PASS run (focused, 6 files): `69 passed` in 3.92s. Full suite: `2 failed, 612 passed` in 31.99s (the same
+2 base test_signals reds, stash-reproved: on the stashed BASE tree test_signals.py alone = `2 failed,
+5 passed`). ruff `All checks passed!`; mypy `41 errors in 9 files` == base (delta 0). Secret gate on the
+diff = 0. `models/` + `alembic/` diff lines = 0.
+
+[14:02:36Z -> 14:02:48Z] Rebuild: `docker compose build backend` exit 0 (12s). Image
+`b5a71b8bc20a…` -> `665d200ba183…`.
+[14:02:56Z] exactly ONE recreate: `docker compose up -d backend` (Recreate/Recreated/Starting/Started).
+Container id `e9b999e2f658…` -> `6b606c6a61e9…`; health exact `{"status":"ok","db":"ok","storage":"ok"}`
+at 14:03:00Z (~3s, bound 60s). Alembic `20260924_sg114_relation` unchanged; 28 tables; sum_rows 284 ->
+284 (delta 0); seed household `01a0a029-1477-7ca0-b200-bce78a96c679` "Popescu Household", evidence 13,
+jobs 8, candidates 7, assets 6, assertions 28 — all unchanged.
+
+[~14:04Z] Served probes (live :8003, GET only): gate missing `household_id` -> 422 (both `/v1/jobs` and
+the new route); new route known job -> 200 `total=1`; unknown job -> 404; foreign household -> 403;
+`GET /v1/candidates/{id}` -> 200; `GET /v1/evidence/01a0a467…/thumb/256` -> 200 `image/jpeg`,
+body magic `ffd8ff`. Deployed-image in-memory proof (no production write): all of png/webp/jpeg ->
+`ffd8ff`; `fields.brand` -> `{'value':'DairyGold','source_type':'extraction',…}`.
+
+$0.000000 real spend; no metered call, no key, no provider call; no production writes; no migration.
