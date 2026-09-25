@@ -86,7 +86,7 @@ describe("InboxPage", () => {
     renderPage();
 
     const link = await screen.findByRole("link", { name: "Review" });
-    expect(link).toHaveClass("text-primary");
+    expect(link).toHaveClass("text-link");
   });
 
   test("resolved review tasks are hidden by default and revealed by the status filter (SG-105 G3)", async () => {

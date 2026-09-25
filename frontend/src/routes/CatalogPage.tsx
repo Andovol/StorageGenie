@@ -75,22 +75,26 @@ export function CatalogPage() {
   // Pills come from the real `asset_type` population and speak the same
   // vocabulary the cards show (`toProductCategory`): the raw `unknown` facet key
   // renders as `Uncategorized`, while selecting that pill still sends the REAL
-  // server filter `asset_type=unknown`. Counts aggregate per display name so the
-  // pill set stays collision-free.
+  // server filter `asset_type=unknown`.
+  //
+  // SG-118 G3: one pill per RAW facet key, never merged across keys. The server
+  // filter is single-valued (`asset_type=<key>`), so a pill that merged two raw
+  // keys would show a count it could not filter — a lie. Keys are sorted for a
+  // deterministic pill order; if two raw keys render the same display label
+  // (e.g. the `unknown` alias and a literal `Uncategorized`), the later one is
+  // disambiguated with its raw key so every label maps to exactly one filter.
   const categoryOptions = useMemo(() => {
     const total = Object.values(categoryCounts).reduce((sum, count) => sum + count, 0);
-    const byDisplay = new Map<string, { key: string; count: number }>();
-    for (const [key, count] of Object.entries(categoryCounts)) {
-      const display = toProductCategory(key);
-      const existing = byDisplay.get(display);
-      if (existing) existing.count += count;
-      else byDisplay.set(display, { key, count });
-    }
     const options: { display: string; key: string; label: string }[] = [
       { display: CATEGORY_ALL, key: CATEGORY_ALL, label: `${CATEGORY_ALL} (${total})` },
     ];
-    for (const [display, entry] of byDisplay) {
-      options.push({ display, key: entry.key, label: `${display} (${entry.count})` });
+    const usedLabels = new Set<string>([options[0].label]);
+    for (const key of Object.keys(categoryCounts).sort()) {
+      const display = toProductCategory(key);
+      let label = `${display} (${categoryCounts[key]})`;
+      if (usedLabels.has(label)) label = `${display} · ${key} (${categoryCounts[key]})`;
+      usedLabels.add(label);
+      options.push({ display, key, label });
     }
     return options;
   }, [categoryCounts]);

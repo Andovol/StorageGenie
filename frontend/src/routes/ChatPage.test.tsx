@@ -128,6 +128,7 @@ describe("ChatPage", () => {
 
     const link = await screen.findByRole("link", { name: "Enable AI in Settings to use chat" });
     expect(link.getAttribute("href") || "").toContain("/settings");
+    expect(link).toHaveClass("text-link");
     unmount();
 
     api.sendChat.mockResolvedValue({

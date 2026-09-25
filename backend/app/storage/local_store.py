@@ -8,8 +8,12 @@ def storage_path_for(sha256: str, ext: str, household_id: str) -> Path:
 
 
 def thumbnail_path(storage_key: str, size: int) -> Path:
+    # SG-118 G5: every thumbnail is served as `image/jpeg` (see
+    # `api/v1/evidence.py` get_thumbnail) and the writer emits JPEG bytes for
+    # JPEG/HEIC/HEIF sources, so the artifact path must carry the JPEG suffix
+    # rather than the SOURCE suffix (`…_thumb256.heic` held JPEG bytes before).
     p = Path(settings.storage_root) / storage_key
-    return p.with_name(f"{p.stem}_thumb{size}{p.suffix}")
+    return p.with_name(f"{p.stem}_thumb{size}.jpg")
 
 
 def get_path(storage_key: str) -> Path:

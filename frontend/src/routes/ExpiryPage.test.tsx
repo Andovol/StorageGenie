@@ -178,7 +178,7 @@ describe("ExpiryPage", () => {
 
     const unresolved = screen.getByRole("region", { name: "Unresolved" });
     for (const label of ["Proposed", "Needs evidence", "Unparseable date", "No date"]) {
-      expect(within(unresolved).getByText(label)).toBeInTheDocument();
+      expect(within(unresolved).getByText(label, { exact: false })).toBeInTheDocument();
     }
   });
 
@@ -186,9 +186,26 @@ describe("ExpiryPage", () => {
     renderPage();
     await screen.findByText("Milk");
 
-    expect(screen.getByRole("link", { name: "Milk" })).toHaveAttribute(
+    const link = screen.getByRole("link", { name: "Milk" });
+    expect(link).toHaveAttribute("href", "/assets/a1?household_id=hh-expiry");
+    expect(link).toHaveClass("text-link");
+  });
+
+  test("unresolved rows show a human label + short id, never the raw asset_id as text (SG-118 G4)", async () => {
+    statusBody = {
+      ...statusFixture,
+      unresolved_rows: [{ asset_id: "asset-1234567890abcdef", reason: "dateless" }],
+    };
+    renderPage();
+    await screen.findByText("Milk");
+
+    const link = within(screen.getByRole("region", { name: "Unresolved" })).getByRole("link");
+    expect(link).toHaveTextContent("No date");
+    expect(link).toHaveTextContent("#abcdef");
+    expect(link.textContent ?? "").not.toContain("asset-1234567890abcdef");
+    expect(link).toHaveAttribute(
       "href",
-      "/assets/a1?household_id=hh-expiry"
+      "/assets/asset-1234567890abcdef?household_id=hh-expiry"
     );
   });
 

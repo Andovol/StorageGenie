@@ -241,6 +241,61 @@ describe("Catalog shell", () => {
     expect(pill).toHaveAttribute("aria-pressed", "true");
   });
 
+  test("colliding asset_type keys stay separate pills with exact server filters (SG-118 G3)", async () => {
+    api.apiGet.mockImplementation((path: string) => {
+      if (path === "/v1/households") {
+        return Promise.resolve([{ id: "h1", name: "Home", created_at: "2026-09-01T00:00:00Z" }]);
+      }
+      if (path === "/v1/assets/facets") {
+        // `unknown` and the literal `Uncategorized` both normalize to
+        // "Uncategorized" and carry the SAME count, which is the old
+        // first-key-wins / label-collision edge.
+        return Promise.resolve({
+          asset_type: { unknown: 2, Uncategorized: 2 },
+          status: {},
+          has_evidence: {},
+        });
+      }
+      if (path === "/v1/saved-searches") {
+        return Promise.resolve({ items: [] });
+      }
+      if (path === "/v1/assets") {
+        return Promise.resolve({ items: assets, next_cursor: null });
+      }
+      return Promise.resolve(null);
+    });
+
+    renderCatalog();
+    await screen.findByText("Drill");
+
+    const literal = await screen.findByRole("button", { name: "Uncategorized (2)" });
+    const alias = await screen.findByRole("button", { name: "Uncategorized · unknown (2)" });
+    expect(literal).toBeInTheDocument();
+    expect(alias).toBeInTheDocument();
+
+    fireEvent.click(alias);
+    await waitFor(() =>
+      expect(
+        api.apiGet.mock.calls.some(
+          ([p, params]) =>
+            p === "/v1/assets" &&
+            (params as Record<string, string> | undefined)?.asset_type === "unknown"
+        )
+      ).toBe(true)
+    );
+
+    fireEvent.click(literal);
+    await waitFor(() =>
+      expect(
+        api.apiGet.mock.calls.some(
+          ([p, params]) =>
+            p === "/v1/assets" &&
+            (params as Record<string, string> | undefined)?.asset_type === "Uncategorized"
+        )
+      ).toBe(true)
+    );
+  });
+
   test("the catalog main rides the shared centered container (SG-105 G1)", async () => {
     renderCatalog();
     await screen.findByText("Drill");
@@ -296,7 +351,9 @@ describe("Catalog shell", () => {
     fireEvent.change(screen.getByLabelText("Search catalog"), { target: { value: "zap" } });
     fireEvent.click(await screen.findByRole("button", { name: "Electronics & Gadgets (1)" }));
     fireEvent.change(screen.getByLabelText("Sort catalog"), { target: { value: "name" } });
-    fireEvent.click(screen.getByRole("button", { name: /clear all/i }));
+    const clearAll = screen.getByRole("button", { name: /clear all/i });
+    expect(clearAll).toHaveClass("text-link");
+    fireEvent.click(clearAll);
 
     expect(screen.getByLabelText("Search catalog")).toHaveValue("");
     expect(screen.getByRole("button", { name: "All (4)" })).toHaveAttribute("aria-pressed", "true");

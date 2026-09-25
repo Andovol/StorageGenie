@@ -5,6 +5,7 @@ import { useAsset } from "../hooks/useAssets";
 import { EvidenceGallery } from "../components/EvidenceGallery";
 import { ProvenanceBadge } from "../components/ProvenanceBadge";
 import { ExpiryEntryForm } from "../components/ExpiryEntryForm";
+import { PageContainer } from "../components/shell/PageContainer";
 import {
   apiPatch,
   apiPost,
@@ -325,8 +326,8 @@ export function AssetDetailPage() {
   const displayName = asset.display_name || UNTITLED_ASSET_NAME;
 
   return (
-    <div className="text-foreground" style={{ padding: 24, maxWidth: 900 }}>
-      <Link to={`/?household_id=${householdId}`} className="text-primary focus-ring" style={{ fontSize: 13 }}>← Back to catalog</Link>
+    <PageContainer className="text-foreground">
+      <Link to={`/?household_id=${householdId}`} className="text-link focus-ring" style={{ fontSize: 13 }}>← Back to catalog</Link>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 8 }}>
         <h1 className="page-header text-foreground" style={{ margin: 0 }}>{displayName}</h1>
         <button
@@ -455,6 +456,6 @@ export function AssetDetailPage() {
           ))}
         </ul>
       )}
-    </div>
+    </PageContainer>
   );
 }

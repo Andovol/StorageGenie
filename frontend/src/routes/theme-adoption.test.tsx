@@ -226,6 +226,38 @@ describe("SG-075 screen adoption", () => {
     const select = screen.getByRole("combobox", { name: /household/i });
     expect(select).toHaveClass("bg-background", "text-foreground", "border-border");
   });
+
+  test("every swept route rides the shared centered PageContainer (SG-118 G2)", () => {
+    const renders: Array<[string, ReactElement, string[]]> = [
+      ["analytics", <AnalyticsPage />, ["/"]],
+      ["chat", <ChatPage />, ["/"]],
+      ["settings", <SettingsPage />, ["/"]],
+      ["planning", <PlanningPage />, ["/"]],
+      ["inbox", <InboxPage />, ["/"]],
+      [
+        "review",
+        <Routes>
+          <Route path="/review/:candidateId" element={<ReviewPage />} />
+        </Routes>,
+        ["/review/cand-theme?household_id=hh-theme"],
+      ],
+      [
+        "asset detail",
+        <Routes>
+          <Route path="/assets/:id" element={<AssetDetailPage />} />
+        </Routes>,
+        ["/assets/asset-theme?household_id=hh-theme"],
+      ],
+    ];
+
+    for (const [name, ui, entries] of renders) {
+      const { container, unmount } = renderWithProviders(ui, entries);
+      const page = container.querySelector(".page-container") as HTMLElement;
+      expect(page, `${name} should ride .page-container`).not.toBeNull();
+      expect(page).toHaveStyle({ maxWidth: "1100px", marginLeft: "auto", marginRight: "auto" });
+      unmount();
+    }
+  });
 });
 
 describe("SG-075 theme toggle interaction", () => {

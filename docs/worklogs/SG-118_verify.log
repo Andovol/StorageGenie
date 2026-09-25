@@ -1,0 +1,118 @@
+SG-118 VERIFY LOG — raw runs (first token SG-118)
+=================================================
+All values are raw command output captured this session; nothing paraphrased.
+
+1. CONTRACT ECHO + ARGV
+-----------------------
+$ cat /home/andrei/storagegenie-contract/VERSION
+0.36.0
+$ git -C /home/andrei/storagegenie-contract rev-parse HEAD
+a9324d5e1782384c036c1411ec8adac6bb2acaa1
+$ sha256sum /home/andrei/storagegenie-contract/RULES.md
+18de7fd7b3546bd7624b3a7b59a78bd629752816cd7fa8f1af6113d1bafc8d46  /home/andrei/storagegenie-contract/RULES.md
+$ cat /home/andrei/storagegenie-contract/RULES.sha256
+18de7fd7b3546bd7624b3a7b59a78bd629752816cd7fa8f1af6113d1bafc8d46 RULES.md
+$ tr '\0' ' ' < /proc/1111886/cmdline
+opencode run --auto --dir /home/andrei/StorageGenie --variant high # SG-118 — ...
+  => effort = high (--variant high); model = unknown (no --model flag); spend real $ = $0.000000.
+
+2. FAIL-PRE (tests present, SOURCE stashed) vs PASS-POST
+--------------------------------------------------------
+# Frontend FAIL-pre (`git stash push -- <12 source files>` then `npm test`):
+ FAIL  src/routes/ChatPage.test.tsx > ChatPage > the disabled state links to Settings; the enabled path does not
+ FAIL  src/routes/ExpiryPage.test.tsx > ExpiryPage > links each row to the asset route with the household scoping
+ FAIL  src/routes/ExpiryPage.test.tsx > ExpiryPage > unresolved rows show a human label + short id, never the raw asset_id as text (SG-118 G4)
+ FAIL  src/routes/InboxPage.test.tsx > InboxPage > the review link carries the theme link treatment, not default purple (SG-105 G3)
+ FAIL  src/routes/theme-adoption.test.tsx > SG-075 screen adoption > every swept route rides the shared centered PageContainer (SG-118 G2)
+ FAIL  src/theme/theme.test.tsx > tokens.css > the link token clears WCAG AA on its real surfaces in both themes (SG-118 G1)
+ FAIL  src/components/catalog/catalog.test.tsx > ProductCardSkeleton > is aria-hidden, sizes to content like the loaded card, and pulses (SG-118 G0)
+ FAIL  src/components/shell/shell.test.tsx > Catalog shell > colliding asset_type keys stay separate pills with exact server filters (SG-118 G3)
+ FAIL  src/components/shell/shell.test.tsx > Catalog shell > Clear all empties all three filters: query, pill and sort
+ Test Files  7 failed | 17 passed (24)
+      Tests  9 failed | 200 passed (209)
+
+# Frontend PASS-post (source restored, `npm test`):
+ Test Files  24 passed (24)
+      Tests  209 passed (209)
+
+# Backend FAIL-pre (`git stash push -- backend/app/storage/local_store.py` then focused pytest):
+ FAILED tests/test_evidence_upload.py::test_endpoint_accepts_generated_heif_with_thumbnail[heic-image/heic]
+ FAILED tests/test_evidence_upload.py::test_endpoint_accepts_generated_heif_with_thumbnail[mif1-image/heif]
+ 2 failed, 28 passed, 2 warnings in 0.97s
+
+# Backend PASS-post (source restored, focused pytest):
+ 30 passed, 2 warnings in 1.01s
+
+# Backend full suite (source applied):
+ 2 failed, 581 passed, 32 warnings in 29.31s
+ FAILED tests/test_signals.py::test_generated_codes_are_validated_and_bad_checksum_is_not_an_identifier
+ FAILED tests/test_signals.py::test_ocr_has_text_boxes_and_mean_confidence
+ (known decoder environment reds; identical pair SG-110 stash-proved against BASE)
+
+3. G1 CONTRAST MEASUREMENT (computed from tokens.css values)
+------------------------------------------------------------
+light link/card    9.87
+light link/bg      9.44
+dark  link/card    7.49
+dark  link/bg      8.33
+dark  primary/card 1.76   <- the measurement that forced a dedicated --link token
+Assertion in src/theme/theme.test.tsx: every surface >= 4.5, and dark primary < 4.5.
+
+4. G2 WIDTHS BEFORE -> AFTER
+----------------------------
+# BEFORE: hand-rolled route page wrappers (grep `maxWidth` over frontend/src before edit):
+ frontend/src/routes/ReviewPage.tsx:55    padding: 24, maxWidth: 1100
+ frontend/src/routes/AnalyticsPage.tsx:61 padding: 24, maxWidth: 900
+ frontend/src/routes/ChatPage.tsx:74      padding: 24, maxWidth: 900
+ frontend/src/routes/PlanningPage.tsx:64  padding: 24, maxWidth: 900
+ frontend/src/routes/AssetDetailPage.tsx:328 padding: 24, maxWidth: 900
+ frontend/src/routes/SettingsPage.tsx:14  padding: 24 (card-level maxWidth 520 at :29 stays)
+ # Already shared before this slice: InboxPage/CapturePage (SG-105), ExpiryPage (SG-108), Catalog via AppShell.
+# AFTER (`grep` remaining page maxWidth):
+ frontend/src/routes/SettingsPage.tsx:29  maxWidth: 520   (inner card, not a page wrapper — intentional)
+ frontend/src/routes/AssetDetailPage.tsx:319/320 padding only (loading / not-found transient states)
+ route page wrappers hand-rolling width: 6 -> 0; PageContainer importers: 9 route files.
+
+5. G5 READER CALL SITES (post-change, shared function)
+------------------------------------------------------
+ evidence_service.py:202  tp = thumbnail_path(rel, size)            (writer)
+ api/v1/evidence.py:117   tp = thumbnail_path(ev.storage_key, size) (reader, serves image/jpeg)
+ local_store.py:10-15       return p.with_name(f"{p.stem}_thumb{size}.jpg")
+
+6. G6 SERVED PROOF (before -> after)
+------------------------------------
+BEFORE 2026-09-25T10:16:51Z
+ image     sha256:3905a75aed708f15af272d0f4952bb293d539d72d91dcf560ac21c1e159249ed
+ container 1acbe40836d0728f0130400cf4504b68553eb9148191263a07ac516706e6645b RestartCount=0
+ bundle    index-XGj8xV3t.js 317188 B sha256 65736eecf1a7b3c7040358088462062a6d23dee3cb9b0e49d7f2d9b3266cdb67
+ markers   text-link(js)=0   --link(css)=0
+ alembic   20260924_sg114_relation
+ health    {"status":"ok","db":"ok","storage":"ok"}
+ gate      http=301 https=401
+ counts    28 tables sha256 a6ab0e07b8f1faed152f929bfb0c955ca286962f2fb239ec1447c66f3fd54461
+
+$ BUILDX_CONFIG=/tmp/opencode/buildx docker compose build backend   => BUILD_EXIT=0 (10:17:10Z -> 10:17:28Z)
+$ BUILDX_CONFIG=/tmp/opencode/buildx docker compose up -d backend
+ Container storagegenie-backend-1 Recreate
+ Container storagegenie-backend-1 Recreated
+ Container storagegenie-backend-1 Starting
+ Container storagegenie-backend-1 Started
+
+AFTER 2026-09-25T10:18:03Z
+ image     sha256:b92210feb12043f01ac30842a525df11e0818a6d74e6793bf2788fb84f73c2b3  (DIFFERS)
+ container 16a07ae1af2597af18ecc4062da39251ba7e7fde69365d3115c1f01fce2c4115  (ONE recreate)
+ bundle    index-CYlI1-ao.js 317045 B sha256 f15d01cc25dba1c6548053f544f6facbd71fd2fab69d9324dcd08174143c0841 (DIFFERS)
+ loopback  assets/index-CYlI1-ao.js fetched sha == in-image sha (f15d01cc…)
+ markers   text-link(js)=9   --link(css)=3   (route/code markers 0 -> 9 / 0 -> 3)
+ alembic   20260924_sg114_relation (unchanged)
+ counts    28 tables sha256 a6ab0e07b8f1faed152f929bfb0c955ca286962f2fb239ec1447c66f3fd54461 (DELTA 0, identical)
+ health    {"status":"ok","db":"ok","storage":"ok"} x6 exact
+ gate      http=301 https=401
+ /expiry   200   /v1/assets?household_id=01a0a029-… 200  (fresh server, GET only)
+
+7. OTHER GATES
+--------------
+ frontend build: `tsc && vite build` -> built in 1.62 s, dist/assets/index-CYlI1-ao.js 316.88 kB
+ eslint: node_modules/.bin/eslint src -> exit 0, no output
+ secret scan over added diff lines (api_key|secret|passwd|password|bearer|private key|sk-|ghp_|AKIA|jina_): 0 real matches
+ docker compose config: NEVER RUN (PG-SC-05)

@@ -12,6 +12,7 @@ import type {
   PlanningSuggestionListResponse,
 } from "../api/types";
 import { PlanningSuggestionCard } from "../components/PlanningSuggestionCard";
+import { PageContainer } from "../components/shell/PageContainer";
 import { useHouseholds } from "../hooks/useAssets";
 
 const STATUS_OPTIONS = ["", "pending", "confirmed", "dismissed"] as const;
@@ -61,7 +62,7 @@ export function PlanningPage() {
   });
 
   return (
-    <div className="text-foreground" style={{ padding: 24, maxWidth: 900 }}>
+    <PageContainer className="text-foreground">
       <div
         style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}
       >
@@ -129,6 +130,6 @@ export function PlanningPage() {
           />
         ))}
       </section>
-    </div>
+    </PageContainer>
   );
 }

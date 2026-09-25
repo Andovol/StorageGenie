@@ -14,7 +14,6 @@ export function ProductCardSkeleton() {
         borderWidth: 1,
         borderRadius: 12,
         padding: 10,
-        aspectRatio: "3 / 4",
       }}
     >
       <div className={PULSE} style={{ aspectRatio: "1 / 1", borderRadius: 8 }} />

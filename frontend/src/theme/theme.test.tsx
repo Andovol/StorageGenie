@@ -83,6 +83,40 @@ function hslToHex(hsl: string): string {
   return `#${to(r)}${to(g)}${to(b)}`;
 }
 
+function hslChannels(hsl: string): [number, number, number] {
+  const match = hsl.match(/(-?[\d.]+)\s+([\d.]+)%\s+([\d.]+)%/);
+  if (!match) throw new Error(`unparsable hsl triplet: ${hsl}`);
+  const h = parseFloat(match[1]) / 360;
+  const s = parseFloat(match[2]) / 100;
+  const l = parseFloat(match[3]) / 100;
+  if (s === 0) return [l, l, l];
+  const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+  const p = 2 * l - q;
+  const hue2rgb = (t: number) => {
+    if (t < 0) t += 1;
+    if (t > 1) t -= 1;
+    if (t < 1 / 6) return p + (q - p) * 6 * t;
+    if (t < 1 / 2) return q;
+    if (t < 2 / 3) return p + (q - p) * (2 / 3 - t) * 6;
+    return p;
+  };
+  return [hue2rgb(h + 1 / 3), hue2rgb(h), hue2rgb(h - 1 / 3)];
+}
+
+function relativeLuminance(hsl: string): number {
+  const linear = hslChannels(hsl).map((c) =>
+    c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4)
+  );
+  return 0.2126 * linear[0] + 0.7152 * linear[1] + 0.0722 * linear[2];
+}
+
+function contrastRatio(a: string, b: string): number {
+  const la = relativeLuminance(a);
+  const lb = relativeLuminance(b);
+  const [hi, lo] = la > lb ? [la, lb] : [lb, la];
+  return (hi + 0.05) / (lo + 0.05);
+}
+
 describe("ThemeProvider", () => {
   beforeEach(() => {
     window.localStorage.clear();
@@ -205,5 +239,27 @@ describe("tokens.css", () => {
     ]) {
       expect(tokensCss).toContain(`hsl(var(--${token}))`);
     }
+  });
+
+  test("the link token clears WCAG AA on its real surfaces in both themes (SG-118 G1)", () => {
+    const dark = darkBlock(tokensCss);
+    const surfaces = {
+      "light card": [tokenValue(tokensCss, "link"), tokenValue(tokensCss, "card")],
+      "light background": [tokenValue(tokensCss, "link"), tokenValue(tokensCss, "background")],
+      "dark card": [tokenValue(dark, "link"), tokenValue(dark, "card")],
+      "dark background": [tokenValue(dark, "link"), tokenValue(dark, "background")],
+    } as const;
+    for (const [name, [link, surface]] of Object.entries(surfaces)) {
+      const ratio = contrastRatio(link, surface);
+      expect(ratio, `${name} link contrast ${ratio.toFixed(2)}:1`).toBeGreaterThanOrEqual(4.5);
+    }
+
+    // The measurement that forced a dedicated token: the shared dark `--primary`
+    // is unreadable as link text on the dark card.
+    const primaryOnDarkCard = contrastRatio(tokenValue(dark, "primary"), tokenValue(dark, "card"));
+    expect(primaryOnDarkCard).toBeLessThan(4.5);
+
+    expect(tokensCss).toContain(".text-link {");
+    expect(tokensCss).toContain("color: hsl(var(--link));");
   });
 });

@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { fetchAiSettings, updateAiModel } from "../api/client";
 import type { AiSettings } from "../api/types";
+import { PageContainer } from "../components/shell/PageContainer";
 
 export function SettingsPage() {
   const qc = useQueryClient();
@@ -11,7 +12,7 @@ export function SettingsPage() {
   });
 
   return (
-    <div className="text-foreground" style={{ padding: 24 }}>
+    <PageContainer className="text-foreground">
       <h1 className="page-header text-foreground">Settings</h1>
       <p className="text-muted-foreground" style={{ fontSize: 13 }}>
         Phase 0 — household and connection settings. API base: {import.meta.env.VITE_API_BASE || "http://localhost:8003"}
@@ -68,6 +69,6 @@ export function SettingsPage() {
           Clear household selection
         </button>
       </div>
-    </div>
+    </PageContainer>
   );
 }

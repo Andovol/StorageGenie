@@ -1,0 +1,36 @@
+SG-118 — Group B UI batch: six leftover threads, one sweep, served
+==================================================================
+
+First token: SG-118
+Branch: automation · BASE_REF origin/automation · BASE_RESOLVED 5b501b055391b8f9f90975e4689eb1d614404977
+Coder: opencode · effort: high (from argv `--variant high`) · model: unknown (no --model on argv; CLI default per policy)
+Spend (real $): $0.000000 — zero provider calls, no metered path.
+Contract: recorded 0.36.0 == published (a9324d5e1782384c036c1411ec8adac6bb2acaa1);
+  RULES.md sha256 18de7fd7b3546bd7624b3a7b59a78bd629752816cd7fa8f1af6113d1bafc8d46 == RULES.sha256.
+
+Legs (wall clock, live clock only)
+----------------------------------
+- G0–G5 recon + edits + unit runs: 10:12Z → 10:16Z (~240 s, budget 1200 s) — frontend 209 tests, backend focused 30, full backend 581/2-known-env-reds.
+- Fail-pre captures (stash source, keep tests): ~10:15:51Z (FE 9 failed / 200 passed) and backend focused (2 failed / 28 passed).
+- Pass-post: FE 209 passed, BE focused 30 passed, tsc+vite build clean, eslint clean.
+- G6 build + one recreate + serve: 10:17:10Z → 10:18:40Z (~90 s, budget 1200 s).
+
+What changed (ceiling: frontend/src, backend local_store.py + tests, docs/worklogs)
+-----------------------------------------------------------------------------------
+- G0 ProductCardSkeleton.tsx: dropped fixed `aspectRatio: "3 / 4"` (cards are content-sized) — wrong ratio was the remaining gap.
+- G1 tokens.css: new `--link` token (light 2 41% 30.6% == primary; dark 2 41% 72%) + `.text-link` utility; converted link instances (InboxPage, ReviewPage incl. split children, ExpiryPage x2, ChatPage, CatalogToolbar x2, AssetDetailPage).
+- G2 six route wrappers moved to shared PageContainer (Review/Analytics/Chat/Planning/AssetDetail/Settings). PageContainer imports 9 routes.
+- G3 CatalogPage: pills are per-RAW `asset_type` key, sorted, collision-proof labels; no lossy merge across keys (server filter is single-valued).
+- G4 ExpiryPage: unresolved rows show reason label + `#<last-6>`; full asset_id stays in href (and title).
+- G5 local_store.thumbnail_path always `.jpg`; writer (evidence_service.py:202) and reader (evidence.py:117) share the function.
+- G6 rebuilt image b92210fe…, one recreate (container 1acbe408… → 16a07ae1…), counts delta 0, health 6× exact, gate 301/401, /expiry + catalog 200.
+
+Gates
+-----
+frontend: 24 files / 209 tests passed; `tsc` + `vite build` clean (bundle index-CYlI1-ao.js); `eslint src` clean (exit 0).
+backend: focused test_evidence_upload.py 30 passed; full suite 581 passed / 2 failed (test_signals decoder env reds, same pair SG-110 stash-proved).
+secret scan over added lines: 0 real matches. `docker compose config` never run (PG-SC-05).
+
+Receipt
+-------
+Work pushed to automation, worktree clean. Note on WORK_HEAD=__WORK_HEAD__; notes ref pushed, fetched mapped, `show` pasted in the report. note=yes.

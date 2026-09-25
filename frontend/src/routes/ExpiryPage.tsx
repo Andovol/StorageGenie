@@ -57,7 +57,7 @@ function ExpiryRow({ row, householdId, categoryName }: { row: ExpiryStatusRow; h
       style={{ display: "flex", flexWrap: "wrap", gap: 12, alignItems: "center", padding: 12, borderStyle: "solid", borderWidth: 1, borderRadius: 8 }}
     >
       <Link
-        className="text-primary focus-ring"
+        className="text-link focus-ring"
         style={{ textDecoration: "underline", fontWeight: 600 }}
         to={`/assets/${row.asset_id}?household_id=${householdId}`}
       >
@@ -193,11 +193,17 @@ export function ExpiryPage() {
               <ul style={{ margin: 0, paddingLeft: 18 }}>
                 {unresolved.map((row) => (
                   <li key={row.asset_id}>
-                    <Link className="text-primary focus-ring" to={`/assets/${row.asset_id}?household_id=${effectiveHousehold}`}>
-                      {row.asset_id}
+                    <Link
+                      className="text-link focus-ring"
+                      to={`/assets/${row.asset_id}?household_id=${effectiveHousehold}`}
+                      title={row.asset_id}
+                    >
+                      {REASON_LABELS[row.reason] ?? row.reason}
+                      {" · "}
+                      <span className="text-muted-foreground font-mono">
+                        #{row.asset_id.slice(-6)}
+                      </span>
                     </Link>
-                    {" · "}
-                    <span>{REASON_LABELS[row.reason] ?? row.reason}</span>
                   </li>
                 ))}
               </ul>

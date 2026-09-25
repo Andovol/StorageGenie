@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { fetchAnalyticsSummary, generateAnalyticsInsights } from "../api/client";
 import type { AnalyticsInsightResult, AnalyticsSummary, Household } from "../api/types";
+import { PageContainer } from "../components/shell/PageContainer";
 import { useHouseholds } from "../hooks/useAssets";
 
 const EXPIRY_LABELS: Record<string, string> = {
@@ -58,7 +59,7 @@ export function AnalyticsPage() {
   const insightResult = insights.data;
 
   return (
-    <div className="text-foreground" style={{ padding: 24, maxWidth: 900 }}>
+    <PageContainer className="text-foreground">
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
         <h1 className="page-header text-foreground">Analytics</h1>
         <label>
@@ -181,6 +182,6 @@ export function AnalyticsPage() {
           )}
         </section>
       )}
-    </div>
+    </PageContainer>
   );
 }

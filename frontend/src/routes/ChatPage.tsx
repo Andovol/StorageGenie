@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import { logChatCorrection, sendChat } from "../api/client";
 import type { ChatMessage, ChatResponse, Household } from "../api/types";
 import { ChatTranscript } from "../components/ChatTranscript";
+import { PageContainer } from "../components/shell/PageContainer";
 import { useHouseholds } from "../hooks/useAssets";
 
 const CATEGORIES = [
@@ -71,7 +72,7 @@ export function ChatPage() {
   });
 
   return (
-    <div className="text-foreground" style={{ padding: 24, maxWidth: 900 }}>
+    <PageContainer className="text-foreground">
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
         <h1 className="page-header text-foreground">Chat</h1>
         <label>
@@ -118,7 +119,7 @@ export function ChatPage() {
           {notice}
           {aiDisabled && (
             <div style={{ marginTop: 4 }}>
-              <Link to="/settings" className="text-primary focus-ring">Enable AI in Settings to use chat</Link>
+              <Link to="/settings" className="text-link focus-ring">Enable AI in Settings to use chat</Link>
             </div>
           )}
         </div>
@@ -161,6 +162,6 @@ export function ChatPage() {
           Log correction
         </button>
       </div>
-    </div>
+    </PageContainer>
   );
 }

@@ -221,7 +221,7 @@ export function CatalogToolbar({
           type="button"
           aria-label="Delete saved search"
           onClick={() => onSavedSearchDelete(selectedSavedSearch.id)}
-          className="text-primary focus-ring"
+          className="text-link focus-ring"
           style={{ ...CONTROL_STYLE, color: "inherit" }}
         >
           Delete
@@ -252,7 +252,7 @@ export function CatalogToolbar({
           <button
             type="button"
             onClick={onClearAll}
-            className="text-primary focus-ring"
+            className="text-link focus-ring"
             style={{ background: "none", border: "none", fontSize: 12, cursor: "pointer", textDecoration: "underline" }}
           >
             Clear all

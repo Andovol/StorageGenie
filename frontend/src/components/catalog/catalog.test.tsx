@@ -142,12 +142,12 @@ describe("ProductCard", () => {
 });
 
 describe("ProductCardSkeleton", () => {
-  test("is aria-hidden, keeps the 3:4 shape and pulses", () => {
+  test("is aria-hidden, sizes to content like the loaded card, and pulses (SG-118 G0)", () => {
     render(<ProductCardSkeleton />);
     const skeleton = screen.getByTestId("product-skeleton");
 
     expect(skeleton).toHaveAttribute("aria-hidden", "true");
-    expect(skeleton.style.aspectRatio).toBe("3 / 4");
+    expect(skeleton.style.aspectRatio).toBe("");
     expect(skeleton.querySelectorAll(".animate-pulse").length).toBe(3);
   });
 });

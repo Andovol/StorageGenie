@@ -226,6 +226,10 @@ def test_endpoint_accepts_generated_heif_with_thumbnail(db, major_brand, claimed
         decoded.load()
     thumbnail = thumbnail_path(payload["storage_key"], settings.thumbnail_sizes[0])
     assert thumbnail.exists()
+    # SG-118 G5: the writer emits JPEG bytes and the reader serves image/jpeg,
+    # so the artifact must carry the JPEG suffix even for a HEIC/HEIF source.
+    assert thumbnail.suffix == ".jpg"
+    assert thumbnail.read_bytes()[:3] == b"\xff\xd8\xff"
     with Image.open(thumbnail) as thumb:
         thumb.load()
         assert thumb.format == "JPEG"

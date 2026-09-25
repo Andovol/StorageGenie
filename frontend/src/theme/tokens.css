@@ -8,6 +8,10 @@
   --muted-foreground: 25 5.3% 44.7%;
   --primary: 2 41% 30.6%;
   --primary-foreground: 60 9.1% 97.8%;
+  /* SG-118 G1: link text is its own token. In light the brand primary already
+     clears WCAG AA (~9.8:1 on card); in dark the same 30.6% primary sits at
+     ~1.8:1 on the dark card, so links take a lighter tint of the same hue. */
+  --link: 2 41% 30.6%;
 
   --badge-raw-bg: 60 4.8% 95.9%;
   --badge-raw-fg: 30 6.3% 25.1%;
@@ -39,6 +43,8 @@
   --muted-foreground: 24 5.7% 82.9%;
   --primary: 2 41% 30.6%;
   --primary-foreground: 60 9.1% 97.8%;
+  /* SG-118 G1: dark-theme link tint (~7.5:1 on card, ~8.3:1 on background). */
+  --link: 2 41% 72%;
 
   --badge-raw-bg: 30 8.6% 13.7%;
   --badge-raw-fg: 24 5.7% 82.9%;
@@ -118,6 +124,10 @@ body {
 
 .text-primary {
   color: hsl(var(--primary));
+}
+
+.text-link {
+  color: hsl(var(--link));
 }
 
 .text-primary-foreground {
