@@ -355,3 +355,13 @@ candidate_id= 01a0da39-6e4d-7210-b28d-380d8bd2ed92 job_id= 01a0da39-6e42-7193-b4
 ============================================================
 $ curl -s http://127.0.0.1:8003/v1/health
 {"status":"ok","db":"ok","storage":"ok"} HTTP 200   -> HEALTH: unchanged, OK
+
+============================================================
+## 12. G2 MONTHLY REFUSAL QUOTED (offline, production writer + reader, no live burn)
+============================================================
+$ PYTHONPATH=. venv/bin/python <throwaway seed via snapshots.record_jina_search_call + reader._recorded_spend + enrich.monthly_cap_refusal>
+pre_seed_spend= 0.0
+row_cost= 0.0005 job_id= 01a0da3c-5c97-7fd2-9910-211ec847f67a
+post_seed_spend= 0.0005
+REFUSAL= monthly_cap_exceeded: estimated monthly cost 0.001000 exceeds monthly cap 0.0007 (0.000500 already recorded for this household)
+=> one Jina row (cost 0.0005) moves the real month-boxed total 0.0 -> 0.0005; with sg_monthly_cap=0.0007 the enrichment press refuses by name, zero live searches.
