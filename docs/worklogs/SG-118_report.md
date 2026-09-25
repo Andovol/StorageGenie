@@ -6,7 +6,7 @@
 - **Model:** `unknown` — no `--model` flag is present on argv and no provider metadata is readable; the CLI default is the model (per policy). Not guessed.
 - **Contract (verbatim echo + source path):** `recorded 0.36.0 == published (a9324d5)` — source `/home/andrei/storagegenie-contract/VERSION` = `0.36.0`; `git -C /home/andrei/storagegenie-contract rev-parse HEAD` = `a9324d5e1782384c036c1411ec8adac6bb2acaa1`; `sha256sum RULES.md` = `18de7fd7b3546bd7624b3a7b59a78bd629752816cd7fa8f1af6113d1bafc8d46` == payload `RULES.sha256`.
 - **BASE_REF:** `origin/automation` → **BASE_RESOLVED:** `5b501b055391b8f9f90975e4689eb1d614404977` (== start HEAD; two fields, never one).
-- **WORK_HEAD:** `__WORK_HEAD__` (set by the docs-only receipt commit below).
+- **WORK_HEAD:** `eb2d862a9f93b9cf4216861b1614bc9497179fe6` (the docs-only receipt commit is a later tip; the note anchors this work HEAD).
 - **DATABASE:** none touched (behavioural proofs on temp DBs / read-only live reads) · **Restart:** exactly ONE recreate (D12-authorized) · **Deploy:** rebuild + recreate + verify, this slice.
 - **Spend (real $):** **$0.000000** — zero provider calls; no metered path.
 
@@ -89,7 +89,40 @@ One rebuild (`BUILDX_CONFIG=/tmp/opencode/buildx docker compose build backend`, 
 
 ## Receipt note on the notes ref (M20-corrected block)
 
-Work pushed to `automation`, worktree clean (`CO-55`). No push to `storagegenie-evidence`, no `{{RECEIPT_CMD}}`. Note added on the work HEAD; notes ref pushed; verified against the explicitly fetched, MAPPED ref. Existing-note refusal is a STOP; precheck showed no existing note. Executed output is pasted by the docs-only receipt commit (section to be filled verbatim).
+Work pushed to `automation`, worktree clean (`CO-55`). No push to `storagegenie-evidence`, no `{{RECEIPT_CMD}}`. Note added on the work HEAD; notes ref pushed; verified against the explicitly fetched, MAPPED ref (`refs/notes/storagegenie-coder-reports-sg118-verify`). Existing-note refusal is a STOP; the precheck showed no existing note. Executed, verbatim:
+
+```
+$ git notes --ref=refs/notes/storagegenie-coder-reports show eb2d862a9f93b9cf4216861b1614bc9497179fe6   # precheck
+error: no note found for object eb2d862a9f93b9cf4216861b1614bc9497179fe6.
+precheck_exit=1
+
+$ git push origin automation
+To github.com:Andovol/StorageGenie.git
+   5b501b0..eb2d862  automation -> automation
+push_automation_exit=0
+
+$ git notes --ref=refs/notes/storagegenie-coder-reports add -m "Dispatch-ID: SG-118 | Report: docs/worklogs/SG-118_report.md | Work-HEAD: eb2d862a9f93b9cf4216861b1614bc9497179fe6" eb2d862a9f93b9cf4216861b1614bc9497179fe6
+note_add_exit=0
+
+$ git push origin refs/notes/storagegenie-coder-reports
+To github.com:Andovol/StorageGenie.git
+   aff18c6..2aaf3e5  refs/notes/storagegenie-coder-reports -> refs/notes/storagegenie-coder-reports
+push_notes_exit=0
+
+$ git fetch origin refs/notes/storagegenie-coder-reports:refs/notes/storagegenie-coder-reports-sg118-verify
+From github.com:Andovol/StorageGenie
+ * [new ref]         refs/notes/storagegenie-coder-reports -> refs/notes/storagegenie-coder-reports-sg118-verify
+fetch_exit=0
+
+$ git rev-parse refs/notes/storagegenie-coder-reports-sg118-verify
+2aaf3e5bfadee2fb7ffa04f46613f6a74241d097
+
+$ git notes --ref=refs/notes/storagegenie-coder-reports-sg118-verify show eb2d862a9f93b9cf4216861b1614bc9497179fe6
+Dispatch-ID: SG-118 | Report: docs/worklogs/SG-118_report.md | Work-HEAD: eb2d862a9f93b9cf4216861b1614bc9497179fe6
+show_exit=0
+```
+
+First line carries BOTH `Dispatch-ID:` and `Report:` (`CO-97`). The final tip (this docs-only receipt commit) is dual-annotated with the same note (SG-092 inoculation).
 
 ## Three UNCLEAR lines
 
