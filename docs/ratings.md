@@ -477,3 +477,4 @@ Originals above (88 FLAG:TRUST / 91 FLAG:TRUST) stand as the audit trail; the ve
 | slice_id | phase | model | effort | score | flag | lever | guards_invoked | deduction_attribution |
 |---|---|---|---|---|---|---|---|---|
 | SG-115 | G-stage maintenance (D155+D156 words): live backfill + batched migrations + activation | opencode (model unknown per identity line - CLI default per policy; effort high from argv --variant high) | high | 98 |  |  | PG-EV-02, PG-EV-05, PG-EV-08, PG-IC-01, PG-IC-03, PG-IC-07, PG-IC-09, PG-PR-01, PG-PR-03, PG-PR-06, PG-PR-10 |  |
+| SG-116 | backlog sweep probe (D9 L2): Jina EU reachability — EU-DEAD verdict, raw DNS both bases, 1 real global 200/3 via the real client, $0.000000 tokens-caveat stated | opencode (model unknown per identity line - CLI default per policy; effort high from argv --variant high) | high | 98 |  |  | PG-EV-02, PG-EV-05, PG-EV-09, PG-SC-03, PG-SC-09, PG-IC-01, PG-IC-07, PG-IC-09, PG-PR-01, PG-PR-03 |  |
