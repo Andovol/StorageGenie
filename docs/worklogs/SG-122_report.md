@@ -2,7 +2,7 @@
 
 **Dispatch-ID:** SG-122 · **Coder:** opencode · **Effort:** high · **Model:** opencode-go/deepseek-v4.1-flash
 **Work dir:** `/home/andrei/StorageGenie` · **Remote:** `origin` = `git@github.com:Andovol/StorageGenie.git`
-**BASE REF:** `origin/automation` · **BASE_RESOLVED:** `a1616dd4e28a66f7df1ff25be65019958b5acb4e` · **START_HEAD:** `a1616dd4e28a66f7df1ff25be65019958b5acb4e` · **WORK_HEAD:** `__WORK_HEAD__`
+**BASE REF:** `origin/automation` · **BASE_RESOLVED:** `a1616dd4e28a66f7df1ff25be65019958b5acb4e` · **START_HEAD:** `a1616dd4e28a66f7df1ff25be65019958b5acb4e` · **WORK_HEAD:** `9108c44308d2cf5992a02cfb8ea5cd7375e83d4f`
 **Spend (real $):** $0.000000 — zero metered calls on any path.
 **Contract:** recorded `0.37.0` == published `1acd7730e5fa6de5b7403aacce71207e9946461d` (D15 adoption); source path `/home/andrei/storagegenie-contract/{VERSION,HEAD}`.
 
@@ -57,7 +57,30 @@ Post-census (read): `location 1`, `asset_location 1`, `asset_relation 1`.
 No command was killed or timed out; every command carried a 60s bound.
 
 ## Receipt — note on `refs/notes/storagegenie-coder-reports` (pasted verbatim)
-__RECEIPT__
+$ git notes --ref=refs/notes/storagegenie-coder-reports show 9108c44308d2cf5992a02cfb8ea5cd7375e83d4f
+error: no note found for object 9108c44308d2cf5992a02cfb8ea5cd7375e83d4f.
+pre_show_exit=1                                   # no existing note -> refusal guard did not fire
+
+$ git notes --ref=refs/notes/storagegenie-coder-reports add -m \
+    "Dispatch-ID: SG-122 | Report: docs/worklogs/SG-122_report.md | Work-HEAD: 9108c44308d2cf5992a02cfb8ea5cd7375e83d4f" \
+    9108c44308d2cf5992a02cfb8ea5cd7375e83d4f
+add_exit=0
+
+$ git push origin refs/notes/storagegenie-coder-reports
+To github.com:Andovol/StorageGenie.git
+   2e59d2e..10e9638  refs/notes/storagegenie-coder-reports -> refs/notes/storagegenie-coder-reports
+push_exit=0
+
+$ git fetch origin refs/notes/storagegenie-coder-reports:refs/notes/sg122-verify
+From github.com:Andovol/StorageGenie
+ * [new ref]         refs/notes/storagegenie-coder-reports -> refs/notes/sg122-verify
+fetch_exit=0
+
+$ git notes --ref=refs/notes/sg122-verify show 9108c44308d2cf5992a02cfb8ea5cd7375e83d4f
+Dispatch-ID: SG-122 | Report: docs/worklogs/SG-122_report.md | Work-HEAD: 9108c44308d2cf5992a02cfb8ea5cd7375e83d4f
+show_exit=0
+
+note=yes
 
 ## UNCLEAR
 - **FIRST READ:** the packet's G2 says "≤4 GETs" but lists three; I ran the three listed (locations, relations, asset-detail) — the fourth slot unused. No ambiguity affected execution.

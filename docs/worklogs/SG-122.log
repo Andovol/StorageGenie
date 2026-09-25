@@ -3,7 +3,7 @@ SG-122 worklog — seed G3+G4 surfaces via the real write routes, prove non-empt
 BASE REF:      origin/automation
 BASE_RESOLVED: a1616dd4e28a66f7df1ff25be65019958b5acb4e
 START_HEAD:    a1616dd4e28a66f7df1ff25be65019958b5acb4e
-WORK_HEAD:     __WORK_HEAD__
+WORK_HEAD:     9108c44308d2cf5992a02cfb8ea5cd7375e83d4f
 MODEL:         opencode-go/deepseek-v4.1-flash  (provider metadata: providerID=opencode-go, model=deepseek-v4.1-flash)
 EFFORT:        high  (process args: `opencode run --auto --dir /home/andrei/StorageGenie --variant high`)
 SPEND:         real $0.000000 (zero metered calls)
