@@ -39,7 +39,7 @@ Refs
 - Work dir `/home/andrei/StorageGenie`, origin remote `git@github.com:Andovol/StorageGenie.git` (as on host)
 - BASE_REF = `origin/automation`
 - BASE_RESOLVED = `8732769b4a5012f82a47ea26bec7af33ab9dff9e` (== start HEAD)
-- WORK_HEAD = `__WORK_HEAD__`
+- WORK_HEAD = `5f8c3e09eea96141be687b8b133218f799977888`
 
 G1 — the switch
 ---------------
@@ -162,7 +162,26 @@ Ceiling / integrity
 
 Receipt note on refs/notes/storagegenie-coder-reports
 -----------------------------------------------------
-__RECEIPT__
+Note added on WORK_HEAD `5f8c3e09eea96141be687b8b133218f799977888` and verified against the FETCHED
+ref (mapped local name `refs/notes/verify/sg117-reports`). Executed output pasted verbatim:
+
+```
+$ git notes --ref=refs/notes/storagegenie-coder-reports add -m "Dispatch-ID: SG-117 | Report: docs/worklogs/SG-117_report.md | Work-HEAD: 5f8c3e09eea96141be687b8b133218f799977888" 5f8c3e09eea96141be687b8b133218f799977888
+note_add_exit=0
+$ git push origin refs/notes/storagegenie-coder-reports
+To github.com:Andovol/StorageGenie.git
+   c861a14..ca093ab  refs/notes/storagegenie-coder-reports -> refs/notes/storagegenie-coder-reports
+note_push_exit=0
+$ git fetch origin refs/notes/storagegenie-coder-reports:refs/notes/verify/sg117-reports
+From github.com:Andovol/StorageGenie
+ * [new ref]         refs/notes/storagegenie-coder-reports -> refs/notes/verify/sg117-reports
+fetch_exit=0
+$ git notes --ref=refs/notes/verify/sg117-reports show 5f8c3e09eea96141be687b8b133218f799977888
+Dispatch-ID: SG-117 | Report: docs/worklogs/SG-117_report.md | Work-HEAD: 5f8c3e09eea96141be687b8b133218f799977888
+show_exit=0
+```
+
+note=yes
 
 UNCLEAR
 -------
