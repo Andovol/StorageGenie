@@ -15,6 +15,11 @@ Standing lines (packet SG-098):
   request refuses with a named reason and ZERO invocations.
 - The per-press cap is enforced server-side as a mirror of the frontend
   `enrichCapRefusal`; the ceiling is stated and uncalibrated (`G-A9`).
+- SG-132: every Jina search that actually left the machine also appends ONE
+  `provider_call` cost row (`snapshots.record_jina_search_call`) carrying
+  `jina.estimate_jina_search_cost`, and the household's month-boxed recorded
+  spend gates the press through `monthly_cap_refusal` — so Jina spend is covered
+  by the same monthly cap as every other provider call.
 - No photo bytes, no GPS, no key value ever leaves here. The key is resolved by
   the real client through the settings/env seam and is added at send time only.
 """
@@ -38,6 +43,7 @@ from app.services.candidates import Candidate
 from app.services.enrich import client as off_client
 from app.services.enrich import jina as jina_mod
 from app.services.enrich import snapshots as snapshots_mod
+from app.services.providers import reader as reader_mod
 
 router = APIRouter()
 
@@ -67,6 +73,29 @@ def enrich_cap_refusal(
         return (
             f"per_press_cap_exceeded: last press cost ${projected_spend_usd:.6f} "
             f"exceeds cap ${cap_usd:.2f}"
+        )
+    return None
+
+
+def monthly_cap_refusal(db: Session, household_id: str) -> str | None:
+    """Named refusal when this press would cross the household MONTHLY cap.
+
+    SG-132: mirrors `reader.run_ai_extraction`'s durable month-boxed check on the
+    enrich path — the already-recorded spend for the household (Jina rows
+    included, because they join the same `provider_call -> job -> household_id`
+    route) plus this press's worst-case Jina estimate. `None` cap means uncapped
+    (the live default), so the gate is inert until a cap is configured. The
+    per-press cap above is a separate, caller-fed gate and is unchanged.
+    """
+    cap = settings.sg_monthly_cap
+    if cap is None:
+        return None
+    already_spent = reader_mod._recorded_spend(db, household_id)
+    projected = already_spent + jina_mod.estimate_jina_search_cost()
+    if projected > cap:
+        return (
+            f"monthly_cap_exceeded: estimated monthly cost {projected:.6f} exceeds "
+            f"monthly cap {cap} ({already_spent:.6f} already recorded for this household)"
         )
     return None
 
@@ -176,6 +205,10 @@ def trigger_enrich(
     if refusal is not None:
         raise HTTPException(status_code=402, detail=refusal)
 
+    monthly_refusal = monthly_cap_refusal(db, asset.household_id)
+    if monthly_refusal is not None:
+        raise HTTPException(status_code=402, detail=monthly_refusal)
+
     identifiers = read_asset_identifiers(db, asset)
     query_name = identifiers["name"] or identifiers["barcode"]
     if not query_name:
@@ -200,10 +233,26 @@ def trigger_enrich(
     # BEFORE the candidate commit. OFF is always recorded; Jina is recorded iff
     # the fallback fired. The query is the exact brand+name TEXT the Jina client
     # searched (`build_jina_query`) — never a photo, a coordinate or a key.
+    #
+    # SG-132: the enrichment job is created FIRST so the Jina cost ledger row can
+    # join it (`provider_call -> job -> household_id`) — that join is what makes
+    # the month-boxed spend reader count the search. Only a Jina request that
+    # actually left the machine is charged (`request_was_sent`): a missing-key
+    # refusal spent nothing and records no row.
     query_text = jina_mod.build_jina_query(brand, query_name)
+    job = Job(
+        household_id=asset.household_id,
+        job_type=ENRICH_JOB_TYPE,
+        state="COMPLETED",
+        config_snapshot=json.dumps({"asset_id": asset.id}),
+    )
+    db.add(job)
+    db.flush()
     snapshots_mod.record_off_snapshot(db, record.primary, query=query_text)
     if record.fallback is not None:
         snapshots_mod.record_jina_snapshot(db, record.fallback, query=query_text)
+        if jina_mod.request_was_sent(record.fallback):
+            snapshots_mod.record_jina_search_call(db, job, record.fallback, query=query_text)
 
     web = candidates.build_enrich_fields(record, category=None)
     web_fields = web["fields"]
@@ -228,14 +277,6 @@ def trigger_enrich(
         "web_sources": sources,
         "web_alternates": alternates,
     }
-    job = Job(
-        household_id=asset.household_id,
-        job_type=ENRICH_JOB_TYPE,
-        state="COMPLETED",
-        config_snapshot=json.dumps({"asset_id": asset.id}),
-    )
-    db.add(job)
-    db.flush()
     candidate = Candidate(
         job_id=job.id,
         evidence_ids_json=json.dumps([]),

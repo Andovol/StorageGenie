@@ -329,6 +329,19 @@ def fetch_jina_search(
     return _interpret(response, clock().isoformat())
 
 
+def request_was_sent(snapshot: JinaSearchSnapshot) -> bool:
+    """True iff the client actually attempted the HTTP request that spends tokens.
+
+    ``fetch_jina_search`` returns a ``missing_key`` degradation BEFORE it touches
+    the transport, so that snapshot is the only one that spent nothing; every
+    other snapshot (200, non-200, malformed body, transport failure) followed a
+    real attempt. SG-132 uses this to keep the cost ledger from charging a
+    request that never left the machine.
+    """
+    reason = snapshot.no_result_reason
+    return reason is None or not reason.startswith("missing_key")
+
+
 @dataclass(frozen=True)
 class EnrichDecisionRecord:
     """The in-memory decision record: BOTH sources' snapshots side by side.
