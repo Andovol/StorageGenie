@@ -1,0 +1,40 @@
+SG-116 Coder log — Jina EU reachability probe (read-only; verdict EU-DEAD)
+=======================================================================
+
+Running log (first token SG-116). Host /home/andrei/StorageGenie, branch automation.
+Host dispatch start 2026-09-25T09:39:40Z (from `ps -o lstart -p 937345`, the run-coder unit).
+BASE_REF=origin/automation, BASE_RESOLVED=de3ac037c267e4e28b0a476606684934c5afea4d (start HEAD).
+MODEL=unknown (no `--model` in argv; CLI default per policy, read from process args).
+effort=high (`--variant high`, read from /proc/938464/cmdline — the opencode run argv).
+Spend real $ = $0.000000 (EU leg sent no HTTP request; global leg 1 request, tokens not dollars,
+    no repo/contract price constant exists; caveat stated in the report).
+Read-only slice: no product/code/test/prompt/compose/.env/migration write. Writes = the 3 files here only.
+
+- t0 tree: `git status --porcelain` EMPTY; HEAD=de3ac037c267e4e28b0a476606684934c5afea4d ==
+  origin/automation; branch automation. G1 premises matched exactly: `jina.py:42` JINA_EU_BASE_URL =
+  "https://eu.s.jina.ai/", `jina.py:43` JINA_GLOBAL_BASE_URL = "https://s.jina.ai/";
+  `config.py:38-40` declares `jina_api_key`; `jina.py:59` JINA_API_KEY_ENV = "JINA_API_KEY". No difference.
+- Contract echo source `/home/andrei/storagegenie-contract/VERSION` = `0.36.0`; contract HEAD
+  `a9324d5e1782384c036c1411ec8adac6bb2acaa1` (== published `a9324d5`); `sha256sum RULES.md` =
+  `18de7fd7b3546bd7624b3a7b59a78bd629752816cd7fa8f1af6113d1bafc8d46` == payload `RULES.sha256` -> match
+  (installed-vs-payload, never checkout-vs-stamp, M3). Recorded `0.36.0` == published `a9324d5`. Clean.
+- G2 DNS (raw in SG-116_verify.log): `getent hosts eu.s.jina.ai` exit 2, NO output (NXDOMAIN);
+  `getent hosts s.jina.ai` exit 0 -> 3 IPv6 AAAA lines (2606:4700:20::ac43:4636, …681a:af2, …681a:bf2);
+  cross-check `socket.getaddrinfo`: eu -> `gaierror [Errno -2] Name or service not known`;
+  s -> 3×A + 3×AAAA incl. `104.26.11.242`. Reproduces F-SG104-3 today. Legacy leg bounded ~1s each
+  (ordinary 60s).
+- G2 key presence names-only: `settings.jina_api_key_present=True`; `env_JINA_API_KEY_present=False`;
+  `resolve_api_key_present=yes`. No key byte printed. Key seam (settings via root `.env`) is the
+  declared carrier; STOP-as-SUCCESS path NOT taken (key present).
+- G3 EU search, REAL `fetch_jina_search` path, base JINA_EU_BASE_URL, query `Jacobs Cronat Gold`
+  (name 'Cronat Gold', brand 'Jacobs', category food), num=5/type=web/gl=ro:
+  status=None, no_result_reason='transport: ConnectError: [Errno -2] Name or service not known',
+  results=0, body_bytes=0, elapsed=0.040s (client timeout 15s; did not bind). Transport-dead.
+- G3 global diagnostic (ran IFF EU transport-degraded, exactly once): base JINA_GLOBAL_BASE_URL,
+  same query. status=200, no_result_reason=None, results=3, body_bytes=2223, elapsed=8.193s (client
+  timeout 15s). Total metered searches = 1 of the allowed ≤2 (EU sent no HTTP request).
+- Verdict line: EU-DEAD.
+- Vacuous-pass check: the transport failure is the *evidence of the reachability verdict* (EU DNS dead,
+  global live) — it is NOT and cannot be read as "search works". The global 200 (3 results) carries the
+  liveness half; it is not a product success claim. No criterion passed on an empty set.
+- G4: report + verify log + this log; receipt note on WORK_HEAD; pushed; worktree clean.

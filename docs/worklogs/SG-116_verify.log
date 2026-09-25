@@ -1,0 +1,129 @@
+SG-116 verify log — raw DNS outputs + raw snapshot bodies (key bytes never)
+=========================================================================
+All commands time-bounded (ordinary 60s). Live clock, no fixed dates (PG-IC-07).
+
+== G1 tree state (2026-09-25T09:39–09:40Z) ==
+$ git status --porcelain
+(empty)
+$ git rev-parse HEAD
+de3ac037c267e4e28b0a476606684934c5afea4d
+$ git rev-parse origin/automation
+de3ac037c267e4e28b0a476606684934c5afea4d
+$ git branch --show-current
+automation
+
+== G2 DNS leg A — EU ==
+$ getent hosts eu.s.jina.ai
+(no output)
+$ echo $?
+2
+
+== G2 DNS leg B — GLOBAL ==
+$ getent hosts s.jina.ai
+2606:4700:20::ac43:4636 s.jina.ai
+2606:4700:20::681a:af2 s.jina.ai
+2606:4700:20::681a:bf2 s.jina.ai
+$ echo $?
+0
+
+== G2 resolver cross-check (python3 socket.getaddrinfo, port 443/TCP) ==
+eu.s.jina.ai -> ERR gaierror [Errno -2] Name or service not known
+s.jina.ai -> [
+  (AF_INET, SOCK_STREAM, 6, '', ('104.26.11.242', 443)),
+  (AF_INET, SOCK_STREAM, 6, '', ('172.67.70.54', 443)),
+  (AF_INET, SOCK_STREAM, 6, '', ('104.26.10.242', 443)),
+  (AF_INET6, SOCK_STREAM, 6, '', ('2606:4700:20::681a:af2', 443, 0, 0)),
+  (AF_INET6, SOCK_STREAM, 6, '', ('2606:4700:20::ac43:4636', 443, 0, 0)),
+  (AF_INET6, SOCK_STREAM, 6, '', ('2606:4700:20::681a:bf2', 443, 0, 0)),
+]
+
+== G2 key presence (names-only; no key byte printed) ==
+settings.jina_api_key_present=True
+env_JINA_API_KEY_present=False
+resolve_api_key_present=yes
+
+== G3 EU snapshot (base https://eu.s.jina.ai/) ==
+EU elapsed_s=0.040
+EU status=None
+EU no_result_reason='transport: ConnectError: [Errno -2] Name or service not known'
+EU results=0
+EU body_bytes=0
+EU snapshot_json={
+  "source_name": "JinaSearch",
+  "request_url": "https://eu.s.jina.ai/Jacobs+Cronat+Gold+food",
+  "retrieved_at": "2026-09-25T09:40:16.489050+00:00",
+  "status_code": null,
+  "no_result_reason": "transport: ConnectError: [Errno -2] Name or service not known",
+  "raw": null,
+  "raw_text": null,
+  "results": []
+}
+
+== G3 GLOBAL diagnostic snapshot (base https://s.jina.ai/) ==
+GLOBAL elapsed_s=8.193
+GLOBAL status=200
+GLOBAL no_result_reason=None
+GLOBAL results=3
+GLOBAL body_bytes=2223
+GLOBAL snapshot_json (captured excerpt, first 1500 chars; see note at end):
+{
+  "source_name": "JinaSearch",
+  "request_url": "https://s.jina.ai/Jacobs+Cronat+Gold+food?site=mega-image.ro&site=emag.ro&site=farmaciatei.ro&num=5&type=web&gl=ro",
+  "retrieved_at": "2026-09-25T09:40:24.681596+00:00",
+  "status_code": 200,
+  "no_result_reason": null,
+  "raw": {
+    "code": 200,
+    "status": 20000,
+    "data": [
+      {
+        "title": "eMAG Captcha",
+        "url": "https://www.emag.ro/cafea/brand/oem/c",
+        "description": "",
+        "content": "![Image 1: eMAG](https://s13emagst.akamaized.net/as/l.svg)\n\nAm detectat trafic neobișnuit de mare  \n din rețeaua de internet în care te afli.",
+        "warning": "Target URL returned error 511: Network Authentication Required\nThis page contains shadow DOM that are currently hidden, consider enabling shadow DOM processing.\nThis page maybe requiring CAPTCHA, please make sure you are authorized to access this page.",
+        "metadata": {
+          "lang": "ro",
+          "viewport": "width=device-width,initial-scale=1"
+        },
+        "external": {},
+        "httpStatus": 511,
+        "httpStatusText": "",
+        "usage": {
+          "tokens": 3334
+        }
+      },
+      {
+        "title": "eMAG Captcha",
+        "url": "https://www.emag.ro/bio-cacao-chilli-ciocolata-calda-200g-5903933644417/pd/DZRPRTYBM/",
+        "description": "",
+        "content": "![Image 1: eMAG](https://s13emagst.akamaized.net/as/l.svg)\n\nAm detectat trafic neobișnuit de mare  \n din rețeaua de internet în care te afli."
+[truncated by the probe's own 1500-char print slice]
+
+== Note on the global body (limitation, stated loudly) ==
+The probe printed the global snapshot only up to 1500 chars, so the full 2223-byte body was NOT
+persisted. Re-fetching it would be a THIRD metered Jina call, forbidden by the ≤2 cap, so it was not
+re-run. The excerpt above is exactly what was captured. The EU snapshot has no body (NXDOMAIN — no
+HTTP request was ever sent), so it is complete.
+
+== G1 constants as found (verbatim) ==
+backend/app/services/enrich/jina.py:42: JINA_EU_BASE_URL = "https://eu.s.jina.ai/"
+backend/app/services/enrich/jina.py:43: JINA_GLOBAL_BASE_URL = "https://s.jina.ai/"
+backend/app/services/enrich/jina.py:59: JINA_API_KEY_ENV = "JINA_API_KEY"
+backend/app/config.py:40: jina_api_key: str | None = None   (comment lines 38-39 declare the seam)
+
+== Contract echo source raw ==
+$ cat /home/andrei/storagegenie-contract/VERSION
+0.36.0
+$ cat /home/andrei/storagegenie-contract/RULES.sha256
+18de7fd7b3546bd7624b3a7b59a78bd629752816cd7fa8f1af6113d1bafc8d46 RULES.md
+$ sha256sum /home/andrei/storagegenie-contract/RULES.md
+18de7fd7b3546bd7624b3a7b59a78bd629752816cd7fa8f1af6113d1bafc8d46  /home/andrei/storagegenie-contract/RULES.md
+$ git -C /home/andrei/storagegenie-contract rev-parse HEAD
+a9324d5e1782384c036c1411ec8adac6bb2acaa1
+
+== Process arguments (model/effort) ==
+$ tr '\0' ' ' < /proc/938464/cmdline
+opencode run --auto --dir /home/andrei/StorageGenie --variant high # SG-116 — Jina EU reachability probe ...
+(no `--model`; effort=high from `--variant high`; model=unknown — CLI default per policy)
+$ git -C ... (origin) git@github.com:Andovol/StorageGenie.git
