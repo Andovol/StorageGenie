@@ -1,0 +1,50 @@
+SG-120 running log — Group C docs sweep (D10 chain)
+
+Coder: opencode · effort high (argv `opencode run --auto --dir /home/andrei/StorageGenie --variant high`)
+Model: deepseek-v4.1-flash (provider opencode-go; provider metadata
+       /home/andrei/.local/state/opencode/model.json recent[0]; argv carries no --model)
+Work dir: /home/andrei/StorageGenie · remote git@github.com:Andovol/StorageGenie.git
+Coder process start: 2026-09-25T10:55:48Z
+
+[recon]
+- git status clean; branch automation; HEAD == origin/automation == b62c7e2.
+- Contract: /home/andrei/storagegenie-contract/VERSION = 0.36.0; HEAD a9324d5;
+  RULES.md sha256 == RULES.sha256 payload (18de7fd7...). `.rules-cache/` absent on host (F-SG120-1).
+- Premise 1 confirmed: AGENTS.md:61 carried `contract-v0.25.0` (stale vs adopted 0.36.0).
+- Premise 2 confirmed: enrich.py:112-114 claimed brand not in the vocabulary + no web path emits it.
+- Premise 3 confirmed: README stopped at the Enrich runbook; no Phase 4/5 sections.
+- Finding F-SG120-2: packet says Phase 4 photo-ingest v3 served; committed reader.py:54-58 now maps
+  v4 (SG-095). README states the v3 delivery and notes the live map moved to v4.
+- Finding F-SG120-3: root `venv/` lacks pillow_heif (import chain fails); `backend/venv/` is the
+  working env used by prior slices (SG-119). Baseline tests run with backend/venv.
+
+[pre-change captures]
+- AGENTS.md:61 and enrich.py:100-115 quoted (see SG-120_verify.log).
+- Baseline enrich test set (9 files): 120 passed in 3.76s.
+
+[edits]
+- G1: AGENTS.md:61 `contract-v0.25.0` -> `contract-v0.36.0`.
+- G2: enrich.py docstring block 107-115 corrected for F-SG119-2 (brand IS in the vocabulary;
+  OFF emits it under web:OpenFoodFacts; Jina emits none; OFF-miss maps to nothing).
+- G3: README.md +118 lines: "Phase 4 runbook — photo-ingest v3, 20 MB uploads, plugin domains"
+  and "Phase 5 runbook — hardening".
+
+[post-change checks]
+- `grep -n contract-v0.25.0 AGENTS.md` -> 0 hits (exit 1).
+- `grep -rn "NOT in that vocabulary|no web path emits a brand" backend/app` -> 0 hits (exit 1).
+- enrich test set post: 120 passed in 3.57s (identical to pre).
+- py_compile enrich.py OK; ruff on enrich.py: All checks passed.
+- Full backend suite: 2 failed, 593 passed (the two known decoder env reds: pyzbar/libzbar and
+  tesseract not installed; same class as SG-119 baseline).
+- git status --porcelain before commit: only AGENTS.md, README.md, backend/app/api/v1/enrich.py.
+
+[commit + receipt]
+- Commit 1 (work) WORK_HEAD = 44e867e9a9889042907917a235ec0e17341d7e78; pushed b62c7e2..44e867e.
+- git notes add + push refs/notes/storagegenie-coder-reports (1b54aad..1518799); mapped fetch into
+  refs/notes/sg120-verify; `git notes --ref=refs/notes/sg120-verify show <WORK_HEAD>` pasted in the
+  report. Note pre-add: no note existed (refusal guard did not fire).
+- Commit 2 (docs-only): this worklog set.
+
+[budget]
+- Coder process elapsed at close: ~390s vs the packet's ~300s expected (overrun disclosed, recon-heavy).
+- Per-command bounds honoured (<=60s ordinary; suite leg ~30s under its bound). $0.000000 metered.

@@ -1,0 +1,189 @@
+SG-120 verify log — raw captures (pre/post quotes, absence greps, tests, receipt)
+
+BASE REF: origin/automation
+BASE_RESOLVED: b62c7e207785f21e2a92ed7554c8e8b8802bf50f
+START_HEAD:   b62c7e207785f21e2a92ed7554c8e8b8802bf50f
+WORK_HEAD:   44e867e9a9889042907917a235ec0e17341d7e78
+
+=== CONTRACT ECHO / SOURCE PATH ===
+$ cat /home/andrei/storagegenie-contract/VERSION
+0.36.0
+$ git -C /home/andrei/storagegenie-contract rev-parse HEAD
+a9324d5e1782384c036c1411ec8adac6bb2acaa1
+$ sha256sum /home/andrei/storagegenie-contract/RULES.md
+18de7fd7b3546bd7624b3a7b59a78bd629752816cd7fa8f1af6113d1bafc8d46
+$ cat /home/andrei/storagegenie-contract/RULES.sha256
+18de7fd7b3546bd7624b3a7b59a78bd629752816cd7fa8f1af6113d1bafc8d46  RULES.md
+(.rules-cache/ is ABSENT on this host — same standing observation as SG-062/SG-078/SG-099/
+ SG-104..119; the contract authority read is the host checkout above.)
+
+=== G1 PRE (AGENTS.md:61) ===
+- Session start: `G-L1` version check FIRST (fetch `origin contract` in `.rules-cache/`, read `FETCH_HEAD:VERSION`, and hash the installed global rules file against the payload `RULES.sha256` — never checkout-vs-stamp, M3), then this file + `.rules-cache/` (contract `contract-v0.25.0`) + `STATE.md:1` RESUME.
+
+=== G1 POST (AGENTS.md:61) ===
+- Session start: `G-L1` version check FIRST (fetch `origin contract` in `.rules-cache/`, read `FETCH_HEAD:VERSION`, and hash the installed global rules file against the payload `RULES.sha256` — never checkout-vs-stamp, M3), then this file + `.rules-cache/` (contract `contract-v0.36.0`) + `STATE.md:1` RESUME.
+
+=== G1 ABSENCE GREP — source file ===
+$ git grep -n "contract-v0.25.0" -- AGENTS.md
+(no output; exit 1)
+$ grep -n "contract-v0.25.0" README.md backend/  -> (no output; exit 1)
+
+=== G1 ABSENCE GREP — tree-wide (raw; historical carriers only) ===
+$ grep -rn "contract-v0.25.0" . --exclude-dir=.git --exclude-dir=venv --exclude-dir=node_modules \
+    --exclude-dir=.mypy_cache --exclude-dir=.pytest_cache
+20 hits, all historical (no live source/pointer):
+  ./STATE.md:8            (open thread "AGENTS.md:61 stale ... pointer (ISS-5)" — now resolved by this slice;
+                           STATE is the Architect's file, not writable here)
+  ./docs/packets/SG-120-docs-sweep.md:7,42  (this packet, quoting the old string)
+  ./docs/history/*, ./docs/worklogs/*, ./output/dispatch/*  (prior logs/reports)
+The only live carrier was AGENTS.md:61; it now reads 0 hits.
+
+=== G2 PRE (enrich.py:100-115) ===
+def label_existing_fields(db: Session, asset: Asset) -> dict[str, object]:
+    """The asset's label-side facts, keyed by `merge_web_fields`' own field names.
+
+    SG-103: the label-wins merge needs the asset's LABEL side as the `existing`
+    half — merging web fields against the proposal's own web fields can never
+    conflict (same source both sides). The asset's label facts live as its
+    `Assertion` rows (the commit paths write a `display_name` assertion beside
+    the denormalised column), so this reads those rows and keeps only the
+    `field_path`s in the frozen SG-082 `LABEL_VISIBLE_FIELDS` vocabulary. Each
+    value is a provenance envelope (`{"value", "source_type"}`) so the REAL
+    `merge_web_fields` reads it through `_field_parts`.
+
+    `brand` is NOT in that vocabulary and no web path emits a brand, so a brand
+    assertion never maps to a merge field or an alternate (`PG-SC-07`). A
+    non-string/unparsable or blank value is skipped, never guessed.
+    """
+
+=== G2 POST (enrich.py:100-118) ===
+def label_existing_fields(db: Session, asset: Asset) -> dict[str, object]:
+    """The asset's label-side facts, keyed by `merge_web_fields`' own field names.
+
+    SG-103: the label-wins merge needs the asset's LABEL side as the `existing`
+    half — merging web fields against the proposal's own web fields can never
+    conflict (same source both sides). The asset's label facts live as its
+    `Assertion` rows (the commit paths write a `display_name` assertion beside
+    the denormalised column), so this reads those rows and keeps only the
+    `field_path`s in the `LABEL_VISIBLE_FIELDS` vocabulary (SG-082, extended by
+    SG-119). Each value is a provenance envelope (`{"value", "source_type"}`)
+    so the REAL `merge_web_fields` reads it through `_field_parts`.
+
+    SG-119: `brand` IS in that vocabulary and the OFF path emits one under the
+    `web:OpenFoodFacts` provenance, so a label brand and a web brand both stay
+    visible (the label wins the proposal, the web value becomes its alternate).
+    Jina still emits no brand, and the OFF-miss population (`PG-SC-07`) still
+    maps to nothing. A non-string/unparsable or blank value is skipped, never
+    guessed.
+    """
+
+=== G2 DIFF (docstring-only) ===
+$ git diff -U1 -- backend/app/api/v1/enrich.py
+@@ -107,9 +107,12 @@ def label_existing_fields(db: Session, asset: Asset) -> dict[str, object]:
+     the denormalised column), so this reads those rows and keeps only the
+-    `field_path`s in the frozen SG-082 `LABEL_VISIBLE_FIELDS` vocabulary. Each
+-    value is a provenance envelope (`{"value", "source_type"}`) so the REAL
+-    `merge_web_fields` reads it through `_field_parts`.
+-
+-    `brand` is NOT in that vocabulary and no web path emits a brand, so a brand
+-    assertion never maps to a merge field or an alternate (`PG-SC-07`). A
+-    non-string/unparsable or blank value is skipped, never guessed.
++    `field_path`s in the `LABEL_VISIBLE_FIELDS` vocabulary (SG-082, extended by
++    SG-119). Each value is a provenance envelope (`{"value", "source_type"}`)
++    so the REAL `merge_web_fields` reads it through `_field_parts`.
++
++    SG-119: `brand` IS in that vocabulary and the OFF path emits one under the
++    `web:OpenFoodFacts` provenance, so a label brand and a web brand both stay
++    visible (the label wins the proposal, the web value becomes its alternate).
++    Jina still emits no brand, and the OFF-miss population (`PG-SC-07`) still
++    maps to nothing. A non-string/unparsable or blank value is skipped, never
++    guessed.
+(10 insertions, 7 deletions — docstring text only; no code line changed)
+
+=== G2 ABSENCE GREP ===
+$ grep -rn "NOT in that vocabulary\|no web path emits a brand" backend/app
+(no output; exit 1)
+Tree-wide raw hits are historical only:
+  ./docs/worklogs/SG-103_report.md:30,53 · SG-103.log:114 · SG-119_report.md:21,101
+  ./docs/packets/SG-120-docs-sweep.md:7 · ./output/dispatch/SG-{103,104,119,120}.log
+
+=== G2 BEHAVIOUR-IDENTICAL PROOF ===
+$ (backend/venv) python -m py_compile app/api/v1/enrich.py
+COMPILE_OK
+$ (backend/venv) python -m pytest -q tests/test_sg081_enrich_fetch.py tests/test_sg082_enrich_jina.py \
+    tests/test_sg098_enrich_endpoint.py tests/test_sg099_synthesis.py tests/test_sg100_snapshot_persistence.py \
+    tests/test_sg101_text_path.py tests/test_sg102_enrich_wiring.py tests/test_sg103_web_alternates.py \
+    tests/test_sg119_brand_alternates.py
+PRE : 120 passed, 5 warnings in 3.76s
+POST: 120 passed, 5 warnings in 3.57s     (identical selection)
+$ (backend/venv) python -m ruff check app/api/v1/enrich.py
+All checks passed!
+$ (backend/venv) python -m pytest -q            # full suite
+2 failed, 593 passed, 32 warnings in 29.70s
+both reds are the known decoder environment class:
+  WARNING app.services.signals:signals.py:104 Barcode extraction unavailable: pyzbar/libzbar is not installed
+  WARNING app.services.signals:signals.py:215 OCR extraction unavailable: tesseract is not installed ...
+  FAILED tests/test_signals.py::test_generated_codes_are_validated_and_bad_checksum_is_not_an_identifier
+  FAILED tests/test_signals.py::test_ocr_has_text_boxes_and_mean_confidence
+(env-only; docstring cannot affect them, same class as the SG-119 baseline)
+
+=== G3 README — sections present ===
+$ grep -n "^## " README.md
+425:## Phase 4 runbook — photo-ingest v3, 20 MB uploads, plugin domains
+488:## Phase 5 runbook — hardening
+(each claim grounded; file paths below all verified present on this tree)
+
+=== G3 GROUNDING ARTIFACTS — existence check ===
+OK backend/tests/test_sg079_v3_schema.py
+OK backend/tests/test_sg080_ingest_pipeline.py
+OK backend/tests/test_plugin_taxonomy.py
+OK backend/tests/test_eval_corpus.py
+OK backend/tests/test_backup_drill.py
+OK backend/tests/test_privacy_audit.py
+OK backend/tests/test_postgres_dialect.py
+OK backend/scripts/backup_restore_drill.py
+OK backend/eval/run.py
+OK backend/eval/baseline_sg029_frozen.md / baseline_sg049_frozen.md / baseline_sg079_frozen.md
+OK backend/app/services/providers/prompts/extract-{food,medicine,cosmetics}-v3.md
+OK docs/superpowers/plans/2026-09-21-ai-ingestion-enrichment.md
+OK docs/superpowers/plans/2026-09-21-phase-5-hardening.md
+OK docs/worklogs/SG-061_report.md / SG-087_report.md / SG-088_report.md
+
+=== SCOPE CEILING — diff proves no file outside the ceiling ===
+$ git status --porcelain     (before commit 1)
+ M AGENTS.md
+ M README.md
+ M backend/app/api/v1/enrich.py
+$ git diff --stat
+ AGENTS.md                    |   2 +-
+ README.md                    | 118 +++++++++++++++++++++++++++++++++++++++++++
+ backend/app/api/v1/enrich.py |  17 ++++---
+ 3 files changed, 129 insertions(+), 8 deletions(-)
+No app behaviour, test, prompt, compose, .env, migration or STATE file written.
+No build, no container action, no DB touch (DATABASE: none; Restart: none; Deploy: none).
+
+=== RECEIPT — note add / push / mapped fetch / show (pasted verbatim) ===
+$ git notes --ref=refs/notes/storagegenie-coder-reports show 44e867e9a9889042907917a235ec0e17341d7e78
+error: no note found for object 44e867e9a9889042907917a235ec0e17341d7e78.
+pre_show_exit=1                                   # no existing note -> refusal guard did not fire
+
+$ git notes --ref=refs/notes/storagegenie-coder-reports add -m \
+    "Dispatch-ID: SG-120 | Report: docs/worklogs/SG-120_report.md | Work-HEAD: 44e867e9a9889042907917a235ec0e17341d7e78" \
+    44e867e9a9889042907917a235ec0e17341d7e78
+add_exit=0
+
+$ git push origin refs/notes/storagegenie-coder-reports
+To github.com:Andovol/StorageGenie.git
+   1b54aad..1518799  refs/notes/storagegenie-coder-reports -> refs/notes/storagegenie-coder-reports
+notes_push_exit=0
+
+$ git fetch origin refs/notes/storagegenie-coder-reports:refs/notes/sg120-verify
+From github.com:Andovol/StorageGenie
+ * [new ref]         refs/notes/storagegenie-coder-reports -> refs/notes/sg120-verify
+fetch_exit=0
+
+$ git notes --ref=refs/notes/sg120-verify show 44e867e9a9889042907917a235ec0e17341d7e78
+Dispatch-ID: SG-120 | Report: docs/worklogs/SG-120_report.md | Work-HEAD: 44e867e9a9889042907917a235ec0e17341d7e78
+show_exit=0
+
+note=yes
