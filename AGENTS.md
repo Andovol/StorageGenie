@@ -1,7 +1,7 @@
 # StorageGenie — project configuration
 
 > **Canonical for this repo. `CLAUDE.md` is a one-line adapter `@AGENTS.md` — edit here, never there.**
-> Rule-set version this project records: **0.33.0** (D129 adoption 2026-09-23: tags `contract-v0.31.0` checkout `e8f8113` + `contract-v0.32.0` checkout `999e94c` + `contract-v0.33.0` checkout `b232b84` oldest-first; delta = 0.31.0 G-L5 desk-check + trigger-hang note + `coder_models.tsv` catalogue + 0.32.0 strict model×effort check + conf-effort-drop + engine relaunch-on-transient (not a retry; needs `DATABASE: none` + `Restart: none`) + 0.33.0 covering-cap rule + `--status` trailing `ends_by` tokens; installed `18de7fd7…` = payload `RULES.sha256` at all versions — clean, was behind; supersedes `0.30.0`).
+> Rule-set version this project records: **0.36.0** (D1 adoption 2026-09-25: checkouts `55a4aa6` (0.34.0) + `308af92` (0.35.0) + `a9324d5` (0.36.0) oldest-first, no tags published; delta = 0.34.0 G-L6 session start/end reports (D287) + 0.35.0 transcript removal post-Coder-exit (D289, codex `--ephemeral`, grok `--session-id`) + 0.36.0 D290 command-settings (`coder=`/`model=`/`effort=` on the dispatch command, precedence command>packet>conf>default, packet carries task only, lane `RUN_BUDGET_S`); installed `18de7fd7…` = payload `RULES.sha256` at all versions — clean, was behind; supersedes `0.33.0`).
 
 ## Configuration table — the single source of every project value
 
