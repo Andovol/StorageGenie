@@ -2,7 +2,7 @@
 
 **Dispatch-ID:** SG-128 · **Verdict:** BLOCKED — G0 (enumerate) COMPLETE and non-vacuous; G1 (delete) DENIED as an unanswered privileged step; G2 (serve) is a non-result; G3 (this report) shipped.
 **First token:** `SG-128`. **Work dir:** `/home/andrei/StorageGenie`. **Origin remote (as on host):** `git@github.com:Andovol/StorageGenie.git`.
-**BASE** (`origin/automation` resolved at start): `eb3d4fa5900a243de32db821161a7785eb013f46` `.md` **WORK_HEAD:** `__WORK_HEAD__` (folded into the receipt subsection below).
+**BASE** (`origin/automation` resolved at start): `eb3d4fa5900a243de32db821161a7785eb013f46` · **WORK_HEAD:** `5524e9f93e91a0fb195317f63aebfffc6da27002` (the BLOCKED work commit holding these 3 worklogs). A docs follow-up tip carries the pasted receipt (noted in the receipt subsection).
 **Settings (CO-78, from process arguments / provider metadata — never the identity line):** coder `opencode`; **effort `high`** from process argv `opencode run --auto --dir /home/andrei/StorageGenie --variant high` (pid 1350401 `/proc/<pid>/cmdline`); **model `opencode-go/deepseek-v4.1-flash`** from provider metadata (`~/.local/share/opencode/log/opencode.log`: `providerID=opencode-go`, `modelID=deepseek-v4.1-flash`). **Spend: real $0.000000** (zero metered calls).
 **Contract echo (verbatim):** recorded `0.37.0` == published (`1acd773`, D15 adoption). **Source path:** `AGENTS.md` line 3 — "Rule-set version this project records: **0.37.0**". **Finding F-SG128-1:** the contract cache `.rules-cache/` named by `AGENTS.md` Loading is **ABSENT** at `/home/andrei/StorageGenie/.rules-cache` (verified) — the echo is grounded on `AGENTS.md`, not on a live fetch. Not load-bearing for this slice.
 
@@ -41,7 +41,7 @@ GET `/v1/evidence/{id}/thumb/{size}?household_id=…` for all 8 image evidence �
 | G0 enumerate + reader read | ~129 s | 120 s ordinary | first recon batch slightly over the ordinary bound; no hang |
 | G1 delete attempt | <1 s | 120 s | denied immediately (EROFS) |
 | G2 served GETs (16) | ~3 s | 120 s | — |
-| G3 docs + commit + receipt | __DOCS_DURATION__ | 600 s overall | — |
+| G3 docs + commit + receipt | ~75 s | 600 s overall | — |
 
 Overall 600 s budget not approached. **Real metered spend $0.000000** (zero calls; no path constructs a metered call).
 
@@ -54,7 +54,27 @@ Overall 600 s budget not approached. **Real metered spend $0.000000** (zero call
 
 ## Receipt (notes ref)
 
-__RECEIPT__
+Executed, in order (all within bound):
+
+```
+$ git notes --ref=refs/notes/storagegenie-coder-reports add -m "Dispatch-ID: SG-128 | Report: docs/worklogs/SG-128_report.md | Work-HEAD: 5524e9f93e91a0fb195317f63aebfffc6da27002" 5524e9f93e91a0fb195317f63aebfffc6da27002
+note-add-exit=0
+$ git push origin refs/notes/storagegenie-coder-reports
+To github.com:Andovol/StorageGenie.git
+   34ccfa1..4737f96  refs/notes/storagegenie-coder-reports -> refs/notes/storagegenie-coder-reports
+note-push-exit=0
+$ git fetch origin refs/notes/storagegenie-coder-reports:refs/notes/sg128-verify
+From github.com:Andovol/StorageGenie
+ * [new ref]         refs/notes/storagegenie-coder-reports -> refs/notes/sg128-verify
+fetch-exit=0
+$ git rev-parse refs/notes/sg128-verify
+4737f96a493d21c0804fd420628ad107f78f00f6
+$ git notes --ref=refs/notes/sg128-verify show 5524e9f93e91a0fb195317f63aebfffc6da27002
+Dispatch-ID: SG-128 | Report: docs/worklogs/SG-128_report.md | Work-HEAD: 5524e9f93e91a0fb195317f63aebfffc6da27002
+show-exit=0
+```
+
+`note=yes`. Work pushed to `automation` (worktree clean); no push to `storagegenie-evidence`; no `{{RECEIPT_CMD}}`. The final docs tip was **dual-annotated** (same message) and its note pushed on the same ref; the fetched-ref `show` above is the executed proof for the work HEAD.
 
 ## UNCLEAR
 
