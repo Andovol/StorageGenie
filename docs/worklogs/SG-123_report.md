@@ -129,15 +129,39 @@ Nothing is reported as a pass. The selector flip genuinely failed-then-passed (b
 but the FROZEN verdict is **not** claimable: the suite is not green under the move, and the `run.py`
 integrity proof is impossible for this fixture shape. No hunk was shipped.
 
-## Receipt (note on `refs/notes/storagegenie-coder-reports`)
+## Receipt (note on `refs/notes/storagegenie-coder-reports`) — pasted verbatim
 
 Work committed and pushed to `automation`, worktree clean (`CO-55`). No push to
-`storagegenie-evidence`; no `{{RECEIPT_CMD}}` (per this packet's M20-corrected block). The note was
-added on WORK_HEAD, the notes ref pushed, the refspec fetched into a MAPPED local name, and the
-`git notes --ref=… show <WORK_HEAD>` output is pasted verbatim in the follow-up docs commit
-(`SG-123 docs: paste receipt show from mapped ref`) and in the delivery message — a receipt subsection
-with no pasted `show` output means the step was not executed. Existing-note refusal is a STOP. Final
-line: `note=yes`.
+`storagegenie-evidence`; no `{{RECEIPT_CMD}}` (per this packet's M20-corrected block). WORK_HEAD =
+`d7cafcd21d4d9bf337ce3666c31c1c91ed4e362d`. The note was added on WORK_HEAD, the notes ref pushed,
+the refspec fetched into a MAPPED local name, and `git notes --ref=… show <WORK_HEAD>` output pasted
+below. Existing-note refusal is a STOP; the pre-show returned "no note found" (exit 1), so it did not
+fire. Final line: `note=yes`.
+
+```text
+$ git notes --ref=refs/notes/storagegenie-coder-reports show d7cafcd21d4d9bf337ce3666c31c1c91ed4e362d
+error: no note found for object d7cafcd21d4d9bf337ce3666c31c1c91ed4e362d.
+pre_show_exit=1
+
+$ git notes --ref=refs/notes/storagegenie-coder-reports add -m ... d7cafcd21d4d9bf337ce3666c31c1c91ed4e362d
+add_exit=0
+
+$ git push origin refs/notes/storagegenie-coder-reports
+To github.com:Andovol/StorageGenie.git
+   d2118a5..52f3774  refs/notes/storagegenie-coder-reports -> refs/notes/storagegenie-coder-reports
+push_exit=0
+
+$ git fetch origin refs/notes/storagegenie-coder-reports:refs/notes/sg123-verify
+From github.com:Andovol/StorageGenie
+ * [new ref]         refs/notes/storagegenie-coder-reports -> refs/notes/sg123-verify
+fetch_exit=0
+
+$ git notes --ref=refs/notes/sg123-verify show d7cafcd21d4d9bf337ce3666c31c1c91ed4e362d
+Dispatch-ID: SG-123 | Report: docs/worklogs/SG-123_report.md | Work-HEAD: d7cafcd21d4d9bf337ce3666c31c1c91ed4e362d
+show_exit=0
+
+note=yes
+```
 
 ## UNCLEAR
 
