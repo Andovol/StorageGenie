@@ -1,0 +1,415 @@
+SG-123 verify log — raw evidence (verdict BLOCKED). Generated 2026-09-25T13:01:23Z UTC.
+BASE 0b183d52c6cad353b608141f1c7a0912f71e3a93 (origin/automation). All outputs below are verbatim.
+
+============================================================
+## 1. G0 — real integrity gate vs the 5 LOOSE sg026 fixtures
+============================================================
+### G0: real integrity gate vs the 5 loose sg026 fixtures (read-only probe)
+available_corpora (pre-move): ['sg029', 'sg049', 'sg079']
+sg026_01_clean.json -> ["sg026_01_clean.json: missing key 'category'", "sg026_01_clean.json: missing key 'image'", "sg026_01_clean.json: category None not one of ['cosmetics', 'food', 'medicine']", 'sg026_01_clean.json: image reference missing']
+sg026_02_glare.json -> ["sg026_02_glare.json: missing key 'category'", "sg026_02_glare.json: missing key 'image'", "sg026_02_glare.json: category None not one of ['cosmetics', 'food', 'medicine']", 'sg026_02_glare.json: image reference missing']
+sg026_03_clutter.json -> ["sg026_03_clutter.json: missing key 'category'", "sg026_03_clutter.json: missing key 'image'", "sg026_03_clutter.json: category None not one of ['cosmetics', 'food', 'medicine']", 'sg026_03_clutter.json: image reference missing']
+sg026_04_partial_label.json -> ["sg026_04_partial_label.json: missing key 'category'", "sg026_04_partial_label.json: missing key 'image'", "sg026_04_partial_label.json: category None not one of ['cosmetics', 'food', 'medicine']", 'sg026_04_partial_label.json: image reference missing']
+sg026_05_no_date_visible.json -> ["sg026_05_no_date_visible.json: missing key 'category'", "sg026_05_no_date_visible.json: missing key 'image'", "sg026_05_no_date_visible.json: category None not one of ['cosmetics', 'food', 'medicine']", 'sg026_05_no_date_visible.json: image reference missing']
+probe_exit=0
+
+============================================================
+## 2. FAIL-pre — updated selector test BEFORE the move
+============================================================
+.......F.....F                                                           [100%]
+=================================== FAILURES ===================================
+_______ test_selector_lists_every_manifest_corpus_and_defaults_to_sg029 ________
+
+    def test_selector_lists_every_manifest_corpus_and_defaults_to_sg029() -> None:
+        known = RUNNER.available_corpora()
+        for corpus in SELECTED_CORPORA:
+>           assert corpus in known, f"{corpus} must be selectable (its manifest exists)"
+E           AssertionError: sg026 must be selectable (its manifest exists)
+E           assert 'sg026' in ['sg029', 'sg049', 'sg079']
+
+tests/test_eval_corpus.py:232: AssertionError
+_________ test_frozen_baseline_reproduces_every_selected_corpus[sg026] _________
+
+corpus = 'sg026'
+
+    @pytest.mark.parametrize("corpus", SELECTED_CORPORA)
+    def test_frozen_baseline_reproduces_every_selected_corpus(corpus: str) -> None:
+>       expected = _baseline_payload(corpus)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_eval_corpus.py:264: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_eval_corpus.py:182: in _baseline_payload
+    text = path.read_text(encoding="utf-8")
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.12/pathlib.py:1029: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/home/andrei/StorageGenie/backend/eval/baseline_sg026_frozen.md')
+mode = 'r', buffering = -1, encoding = 'utf-8', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/home/andrei/StorageGenie/backend/eval/baseline_sg026_frozen.md'
+
+/usr/lib/python3.12/pathlib.py:1015: FileNotFoundError
+=========================== short test summary info ============================
+FAILED tests/test_eval_corpus.py::test_selector_lists_every_manifest_corpus_and_defaults_to_sg029
+FAILED tests/test_eval_corpus.py::test_frozen_baseline_reproduces_every_selected_corpus[sg026]
+2 failed, 12 passed in 0.94s
+
+============================================================
+## 3. (session excerpt) git status after git mv — 5 renames, state since reverted
+============================================================
+R  backend/eval/corpus/sg026_01_clean.json -> backend/eval/corpus/sg026/sg026_01_clean.json
+R  backend/eval/corpus/sg026_02_glare.json -> backend/eval/corpus/sg026/sg026_02_glare.json
+R  backend/eval/corpus/sg026_03_clutter.json -> backend/eval/corpus/sg026/sg026_03_clutter.json
+R  backend/eval/corpus/sg026_04_partial_label.json -> backend/eval/corpus/sg026/sg026_04_partial_label.json
+R  backend/eval/corpus/sg026_05_no_date_visible.json -> backend/eval/corpus/sg026/sg026_05_no_date_visible.json
+ M backend/tests/test_eval_corpus.py
+
+============================================================
+## 4. Frozen numbers computed for sg026 (same score_fixture/run_bridge_sandbox path), pre-revert
+============================================================
+{
+  "corpus": "sg026",
+  "fixtures": [
+    {
+      "id": "sg026-01-clean",
+      "overall": 1.0,
+      "needs": 1.0,
+      "unknowns": 1.0,
+      "items": 1.0
+    },
+    {
+      "id": "sg026-02-glare",
+      "overall": 1.0,
+      "needs": 1.0,
+      "unknowns": 1.0,
+      "items": 1.0
+    },
+    {
+      "id": "sg026-03-clutter",
+      "overall": 0.16666666666666666,
+      "needs": 0.0,
+      "unknowns": 0.0,
+      "items": 0.5
+    },
+    {
+      "id": "sg026-04-partial-label",
+      "overall": 1.0,
+      "needs": 1.0,
+      "unknowns": 1.0,
+      "items": 1.0
+    },
+    {
+      "id": "sg026-05-no-date-visible",
+      "overall": 1.0,
+      "needs": 1.0,
+      "unknowns": 1.0,
+      "items": 1.0
+    }
+  ],
+  "field_accuracy": 0.833,
+  "unknown_pass": 3,
+  "unknown_cases": 4,
+  "unknown_rate": 0.75,
+  "correction_resolved": 0,
+  "correction_created": 3,
+  "correction_rate": 0.0,
+  "audit_writes": 3
+}
+
+============================================================
+## 5. PASS-post — updated selector test AFTER move+manifest+frozen record
+============================================================
+..............                                                           [100%]
+14 passed in 0.81s
+
+============================================================
+## 6. Real run.py proofs (post-move): integrity FAILS; selector lists sg026; default sg029
+============================================================
+### real run.py --corpus sg026 --check-only
+CORPUS INTEGRITY FAILURE
+  - sg026_01_clean.json: missing key 'category'
+  - sg026_01_clean.json: missing key 'image'
+  - sg026_01_clean.json: category None not one of ['cosmetics', 'food', 'medicine']
+  - sg026_01_clean.json: image reference missing
+  - sg026_02_glare.json: missing key 'category'
+  - sg026_02_glare.json: missing key 'image'
+  - sg026_02_glare.json: category None not one of ['cosmetics', 'food', 'medicine']
+  - sg026_02_glare.json: image reference missing
+  - sg026_03_clutter.json: missing key 'category'
+  - sg026_03_clutter.json: missing key 'image'
+  - sg026_03_clutter.json: category None not one of ['cosmetics', 'food', 'medicine']
+  - sg026_03_clutter.json: image reference missing
+  - sg026_04_partial_label.json: missing key 'category'
+  - sg026_04_partial_label.json: missing key 'image'
+  - sg026_04_partial_label.json: category None not one of ['cosmetics', 'food', 'medicine']
+  - sg026_04_partial_label.json: image reference missing
+  - sg026_05_no_date_visible.json: missing key 'category'
+  - sg026_05_no_date_visible.json: missing key 'image'
+  - sg026_05_no_date_visible.json: category None not one of ['cosmetics', 'food', 'medicine']
+  - sg026_05_no_date_visible.json: image reference missing
+run_py_exit=1
+
+### available_corpora() + default
+available_corpora= ['sg026', 'sg029', 'sg049', 'sg079']
+DEFAULT_CORPUS= sg029
+load_manifest()corpus= sg029
+load_manifest()base_dir= sg029
+probe_exit=0
+
+### manifest-level check_manifest(sg026)
+count= 5
+check_manifest= []
+listed= ['sg026_01_clean.json', 'sg026_02_glare.json', 'sg026_03_clutter.json', 'sg026_04_partial_label.json', 'sg026_05_no_date_visible.json']
+chk_exit=0
+
+============================================================
+## 7. Suite + ruff + mypy WITH the move (suite 3 failed / 593 passed)
+============================================================
+### SUITE (bound 600s)
+........................................................................ [ 12%]
+..............................................................F......... [ 24%]
+........................................................................ [ 36%]
+........................................................................ [ 48%]
+........................................................................ [ 60%]
+........................................................................ [ 72%]
+........................................................................ [ 84%]
+........................................................................ [ 96%]
+.............FF.....                                                     [100%]
+=================================== FAILURES ===================================
+____________________________ test_corpus_integrity _____________________________
+
+    def test_corpus_integrity() -> None:
+        fixtures = sorted(CORPUS_DIR.glob("*.json"))
+>       assert len(fixtures) == 5
+E       assert 0 == 5
+E        +  where 0 = len([])
+
+tests/test_extraction_contract.py:378: AssertionError
+___ test_generated_codes_are_validated_and_bad_checksum_is_not_an_identifier ___
+
+isolated_db = (<sqlalchemy.orm.session.Session object at 0x7364d21cb9e0>, '01a0d8a5-145f-7750-b4bf-1fbf0abecaa5', PosixPath('/tmp/pytest-of-andrei/pytest-0/test_generated_codes_are_valid0/storage'))
+
+    def test_generated_codes_are_validated_and_bad_checksum_is_not_an_identifier(isolated_db) -> None:  # type: ignore[no-untyped-def]
+        session, household_id, root = isolated_db
+        qr_value = "https://example.test/SG-013"
+        qr_image = qrcode.make(qr_value).convert("RGB")
+        qr = _evidence(session, household_id, root, _png(qr_image), "qr.png", "image/png")
+        ean_image, ean_value = _ean13_image("590123412345")
+        ean = _evidence(session, household_id, root, _png(ean_image), "ean.png", "image/png")
+        # Deliberately render a syntactically valid EAN with the wrong check digit.
+        bad_value = ean_value[:-1] + ("0" if ean_value[-1] != "0" else "1")
+        bad_image, _ = _ean13_image(ean_value[:-1], bad_value[-1])
+        bad = _evidence(session, household_id, root, _png(bad_image), "bad.png", "image/png")
+    
+        qr_rows = signals.extract_observations(qr.id, session)
+        ean_rows = signals.extract_observations(ean.id, session)
+        bad_rows = signals.extract_observations(bad.id, session)
+    
+        qr_values = [json.loads(row.value_json) for row in qr_rows if row.kind == "barcode_qr"]
+        ean_values = [json.loads(row.value_json) for row in ean_rows if row.kind == "barcode_qr"]
+        bad_values = [json.loads(row.value_json) for row in bad_rows if row.kind == "barcode_qr"]
+>       assert any(item.get("value") == qr_value and item["validated"] for item in qr_values)
+E       assert False
+E        +  where False = any(<generator object test_generated_codes_are_validated_and_bad_checksum_is_not_an_identifier.<locals>.<genexpr> at 0x7364d158eea0>)
+
+tests/test_signals.py:136: AssertionError
+_________________ test_ocr_has_text_boxes_and_mean_confidence __________________
+
+isolated_db = (<sqlalchemy.orm.session.Session object at 0x7364c86b9a30>, '01a0d8a5-14d6-7a83-b163-7e4357e717a6', PosixPath('/tmp/pytest-of-andrei/pytest-0/test_ocr_has_text_boxes_and_me0/storage'))
+
+    def test_ocr_has_text_boxes_and_mean_confidence(isolated_db) -> None:  # type: ignore[no-untyped-def]
+        session, household_id, root = isolated_db
+        evidence = _evidence(session, household_id, root, _png(_text_image()), "text.png", "image/png")
+        rows = signals.extract_observations(evidence.id, session)
+        ocr = [json.loads(row.value_json) for row in rows if row.kind == "ocr"]
+>       assert ocr
+E       assert []
+
+tests/test_signals.py:148: AssertionError
+=============================== warnings summary ===============================
+venv/lib/python3.12/site-packages/fastapi/testclient.py:1
+  /home/andrei/StorageGenie/backend/venv/lib/python3.12/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+venv/lib/python3.12/site-packages/starlette/testclient.py:53
+  /home/andrei/StorageGenie/backend/venv/lib/python3.12/site-packages/starlette/testclient.py:53: DeprecationWarning: The anyio.abc.BlockingPortal alias is deprecated, use anyio.from_thread.BlockingPortal instead.
+    _PortalFactoryType = Callable[[], AbstractContextManager[anyio.abc.BlockingPortal]]
+
+tests/test_candidates.py: 3 warnings
+tests/test_foundations.py: 3 warnings
+tests/test_saved_searches.py: 3 warnings
+tests/test_search.py: 3 warnings
+tests/test_sg048_name_optional.py: 6 warnings
+tests/test_sg100_snapshot_persistence.py: 3 warnings
+tests/test_sg113_locations.py: 3 warnings
+tests/test_sg114_relations.py: 3 warnings
+tests/test_signals.py: 3 warnings
+  /home/andrei/StorageGenie/backend/venv/lib/python3.12/site-packages/alembic/config.py:604: DeprecationWarning: No path_separator found in configuration; falling back to legacy splitting on spaces, commas, and colons for prepend_sys_path.  Consider adding path_separator=os to Alembic config.
+    util.warn_deprecated(
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/test_extraction_contract.py::test_corpus_integrity - assert 0 == 5
+FAILED tests/test_signals.py::test_generated_codes_are_validated_and_bad_checksum_is_not_an_identifier
+FAILED tests/test_signals.py::test_ocr_has_text_boxes_and_mean_confidence - a...
+3 failed, 593 passed, 32 warnings in 32.09s
+suite_exit=1
+
+### RUFF (bound 120s)
+All checks passed!
+ruff_exit=0
+
+### MYPY app (bound 300s)
+app/models/base.py:8: error: Unused "type: ignore" comment  [unused-ignore]
+app/services/audit_service.py:16: error: Missing type arguments for generic type "dict"  [type-arg]
+app/services/audit_service.py:17: error: Missing type arguments for generic type "dict"  [type-arg]
+app/schemas/asset.py:55: error: Missing type arguments for generic type "dict"  [type-arg]
+app/schemas/asset.py:57: error: Missing type arguments for generic type "dict"  [type-arg]
+app/services/asset_service.py:15: error: Missing type arguments for generic type "dict"  [type-arg]
+app/services/asset_service.py:37: error: Missing type arguments for generic type "dict"  [type-arg]
+app/services/asset_service.py:105: error: Missing type arguments for generic type "dict"  [type-arg]
+app/api/v1/review_tasks.py:17: error: Function is missing a return type annotation  [no-untyped-def]
+app/api/v1/review_tasks.py:21: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/review_tasks.py:22: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/review_tasks.py:62: error: Function is missing a return type annotation  [no-untyped-def]
+app/api/v1/review_tasks.py:66: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/review_tasks.py:67: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/households.py:18: error: Function is missing a return type annotation  [no-untyped-def]
+app/api/v1/households.py:20: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/households.py:22: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/households.py:58: error: Function is missing a return type annotation  [no-untyped-def]
+app/api/v1/households.py:59: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/households.py:60: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/evidence.py:19: error: Function is missing a return type annotation  [no-untyped-def]
+app/api/v1/evidence.py:20: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/evidence.py:22: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/evidence.py:24: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/assets.py:72: error: Function is missing a return type annotation  [no-untyped-def]
+app/api/v1/assets.py:75: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/assets.py:77: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/assets.py:102: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/assets.py:102: error: Missing type arguments for generic type "dict"  [type-arg]
+app/api/v1/assets.py:102: note: Error code "type-arg" not covered by "type: ignore[no-untyped-def]" comment
+app/api/v1/assets.py:262: error: Function is missing a return type annotation  [no-untyped-def]
+app/api/v1/assets.py:270: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/assets.py:271: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/assets.py:388: error: Function is missing a return type annotation  [no-untyped-def]
+app/api/v1/assets.py:392: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/assets.py:394: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/assets.py:492: error: Function is missing a return type annotation  [no-untyped-def]
+app/api/v1/assets.py:494: error: Missing type arguments for generic type "dict"  [type-arg]
+app/api/v1/assets.py:496: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/assets.py:497: error: Unused "type: ignore" comment  [unused-ignore]
+app/main.py:50: error: Unused "type: ignore" comment  [unused-ignore]
+app/main.py:56: error: Unused "type: ignore" comment  [unused-ignore]
+Found 41 errors in 9 files (checked 90 source files)
+mypy_exit=1
+
+============================================================
+## 8. Base suite on the clean (reverted) tree: 2 failed / 593 passed — base reds only
+============================================================
+........................................................................ [ 12%]
+........................................................................ [ 24%]
+........................................................................ [ 36%]
+........................................................................ [ 48%]
+........................................................................ [ 60%]
+........................................................................ [ 72%]
+........................................................................ [ 84%]
+........................................................................ [ 96%]
+............FF.....                                                      [100%]
+=================================== FAILURES ===================================
+___ test_generated_codes_are_validated_and_bad_checksum_is_not_an_identifier ___
+
+isolated_db = (<sqlalchemy.orm.session.Session object at 0x7b9258b2afc0>, '01a0d8a6-6213-7a51-ae58-6c6f01b1aace', PosixPath('/tmp/pytest-of-andrei/pytest-1/test_generated_codes_are_valid0/storage'))
+
+    def test_generated_codes_are_validated_and_bad_checksum_is_not_an_identifier(isolated_db) -> None:  # type: ignore[no-untyped-def]
+        session, household_id, root = isolated_db
+        qr_value = "https://example.test/SG-013"
+        qr_image = qrcode.make(qr_value).convert("RGB")
+        qr = _evidence(session, household_id, root, _png(qr_image), "qr.png", "image/png")
+        ean_image, ean_value = _ean13_image("590123412345")
+        ean = _evidence(session, household_id, root, _png(ean_image), "ean.png", "image/png")
+        # Deliberately render a syntactically valid EAN with the wrong check digit.
+        bad_value = ean_value[:-1] + ("0" if ean_value[-1] != "0" else "1")
+        bad_image, _ = _ean13_image(ean_value[:-1], bad_value[-1])
+        bad = _evidence(session, household_id, root, _png(bad_image), "bad.png", "image/png")
+    
+        qr_rows = signals.extract_observations(qr.id, session)
+        ean_rows = signals.extract_observations(ean.id, session)
+        bad_rows = signals.extract_observations(bad.id, session)
+    
+        qr_values = [json.loads(row.value_json) for row in qr_rows if row.kind == "barcode_qr"]
+        ean_values = [json.loads(row.value_json) for row in ean_rows if row.kind == "barcode_qr"]
+        bad_values = [json.loads(row.value_json) for row in bad_rows if row.kind == "barcode_qr"]
+>       assert any(item.get("value") == qr_value and item["validated"] for item in qr_values)
+E       assert False
+E        +  where False = any(<generator object test_generated_codes_are_validated_and_bad_checksum_is_not_an_identifier.<locals>.<genexpr> at 0x7b92533b1000>)
+
+tests/test_signals.py:136: AssertionError
+_________________ test_ocr_has_text_boxes_and_mean_confidence __________________
+
+isolated_db = (<sqlalchemy.orm.session.Session object at 0x7b9252f4d6d0>, '01a0d8a6-62c6-7472-be01-59ff8918cfaa', PosixPath('/tmp/pytest-of-andrei/pytest-1/test_ocr_has_text_boxes_and_me0/storage'))
+
+    def test_ocr_has_text_boxes_and_mean_confidence(isolated_db) -> None:  # type: ignore[no-untyped-def]
+        session, household_id, root = isolated_db
+        evidence = _evidence(session, household_id, root, _png(_text_image()), "text.png", "image/png")
+        rows = signals.extract_observations(evidence.id, session)
+        ocr = [json.loads(row.value_json) for row in rows if row.kind == "ocr"]
+>       assert ocr
+E       assert []
+
+tests/test_signals.py:148: AssertionError
+=============================== warnings summary ===============================
+venv/lib/python3.12/site-packages/fastapi/testclient.py:1
+  /home/andrei/StorageGenie/backend/venv/lib/python3.12/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+venv/lib/python3.12/site-packages/starlette/testclient.py:53
+  /home/andrei/StorageGenie/backend/venv/lib/python3.12/site-packages/starlette/testclient.py:53: DeprecationWarning: The anyio.abc.BlockingPortal alias is deprecated, use anyio.from_thread.BlockingPortal instead.
+    _PortalFactoryType = Callable[[], AbstractContextManager[anyio.abc.BlockingPortal]]
+
+tests/test_candidates.py: 3 warnings
+tests/test_foundations.py: 3 warnings
+tests/test_saved_searches.py: 3 warnings
+tests/test_search.py: 3 warnings
+tests/test_sg048_name_optional.py: 6 warnings
+tests/test_sg100_snapshot_persistence.py: 3 warnings
+tests/test_sg113_locations.py: 3 warnings
+tests/test_sg114_relations.py: 3 warnings
+tests/test_signals.py: 3 warnings
+  /home/andrei/StorageGenie/backend/venv/lib/python3.12/site-packages/alembic/config.py:604: DeprecationWarning: No path_separator found in configuration; falling back to legacy splitting on spaces, commas, and colons for prepend_sys_path.  Consider adding path_separator=os to Alembic config.
+    util.warn_deprecated(
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/test_signals.py::test_generated_codes_are_validated_and_bad_checksum_is_not_an_identifier
+FAILED tests/test_signals.py::test_ocr_has_text_boxes_and_mean_confidence - a...
+2 failed, 593 passed, 32 warnings in 30.27s
+
+============================================================
+## 9. Empty-diff proofs on the reverted tree (run.py, scorer, history baselines, corpus)
+============================================================
+### git status --porcelain (post-revert, pre-worklog)
+status_exit=0
+
+### git diff --stat BASE for run.py + scorer + eval dir
+
+diff_exit=0
+
+### diff corpus dir
+
+corpus_diff_exit=0

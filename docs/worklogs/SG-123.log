@@ -1,0 +1,25 @@
+SG-123 — freeze sg026 via manifest (BLOCKED)
+Contract: 0.37.0 (source /home/andrei/storagegenie-contract/VERSION; checkout HEAD 1acd7730e5fa6de5b7403aacce71207e9946461d; RULES.md sha256 18de7fd7b3546bd7624b3a7b59a78bd629752816cd7fa8f1af6113d1bafc8d46 == payload RULES.sha256)
+BASE: 0b183d52c6cad353b608141f1c7a0912f71e3a93 (origin/automation; worktree clean at start, git status --porcelain empty)
+Coder: opencode · Effort: high (trigger --variant high, per D302/D120) · Model: deepseek-v4.1-flash (provider metadata banner in output/dispatch/SG-123.log; omitted on argv = contract-legal subset)
+Spend: $0.000000 real vs $0 bound (no metered call exists on any path)
+
+Legs (live clock UTC; bounds per packet):
+- G0 premises + selector-shape + fixture-shape read: 12:55:50 -> 12:56:55 (~65s; bound 120s ordinary)
+- G1 move (git mv x5) + manifest write [mechanics]: ~12:56:55 -> 12:57:20 (~25s)
+- G2 selector test FAIL-pre then PASS-post + real run.py integrity proof: ~12:57:20 -> 12:58:20 (~60s)
+- Suite + ruff + mypy (WITH move): ~12:58:20 -> 12:59:05 (~45s; suite 32.09s of a 600s bound)
+- Base suite on clean tree (proves base reds): ~12:59:05 -> 12:59:37 (~32s)
+- Revert + empty-diff capture: ~12:59:37 -> 12:59:58 (~21s)
+- G3 worklog/report/receipt: from 12:59:58
+No command was killed or timed out.
+
+VERDICT: BLOCKED — two independent shape mismatches make the packet's FROZEN unreachable in-ceiling:
+ 1. The 5 sg026 fixtures are pre-manifest v1 smoke shape (no `category`, no `image`). The real
+    `run.py --corpus sg026 --check-only` prints CORPUS INTEGRITY FAILURE (missing key 'category',
+    missing key 'image') and exits 1; the packet's G1/acceptance "integrity OK" cannot be produced.
+ 2. Moving the 5 files out of the corpus ROOT breaks `tests/test_extraction_contract.py::test_corpus_integrity`
+    (CORPUS_DIR.glob("*.json") == 5). That suite file is outside the write ceiling ("suite files beyond
+    the two lines is a STOP"), so it cannot be repaired here.
+All move/manifest/frozen-record/test edits were reverted; tree is clean. Full finding + raw evidence in
+SG-123_report.md and SG-123_verify.log. No hunk shipped.
