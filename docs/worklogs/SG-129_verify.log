@@ -1,0 +1,166 @@
+SG-129 verify log — orphan thumbnail delete via container exec (probe-then-delete)
+Contract: 0.37.0 (recorded AGENTS.md:4; .rules-cache/ ABSENT — F-SG129-1)
+BASE (origin/automation resolved): 0cc8d35c59b2db3fe3aa41f6f43e76f80eeeee06
+Model/effort: opencode-go/deepseek-v4.1-flash (provider metadata opencode.log providerID=opencode-go modelID=deepseek-v4.1-flash); effort high from process argv `opencode run --auto --dir /home/andrei/StorageGenie --variant high` (pid 1357930 /proc/1357930/cmdline)
+Spend: $0.000000 (real; zero metered calls)
+Clock (UTC): 2026-09-25T14:20:47Z
+
+=== G0 — CONTAINER + VOLUME MAPPING ===
+$ docker ps --format '{{.Names}} | {{.Image}} | {{.Status}}'
+storagegenie-backend-1 | storagegenie-backend | Up 15 minutes (healthy)
+$ docker inspect storagegenie-backend-1 --format '{{range .Mounts}}{{.Type}} {{.Name}} -> {{.Destination}} RW={{.RW}}{{"\n"}}{{end}}'
+volume storagegenie_storage_data -> /data/storage RW=true
+bind  -> /data/db RW=true
+$ docker volume inspect storagegenie_storage_data --format '{{.Mountpoint}}'
+/home/andrei/.local/share/docker/volumes/storagegenie_storage_data/_data
+HOST -> CONTAINER: /home/andrei/.local/share/docker/volumes/storagegenie_storage_data/_data  ==  /data/storage  (volume storagegenie_storage_data, RW)
+$ docker exec storagegenie-backend-1 ls -la /data/storage
+drwxr-xr-x 14 root root 4096 Sep 21 15:42 01a0a029-1477-7ca0-b200-bce78a96c679
+
+=== G0 — *_thumb* ENUMERATION THROUGH THE CONTAINER (rule: *_thumb<digits>.* ; suffix .jpg => LIVE, else ORPHAN) ===
+$ docker exec storagegenie-backend-1 find /data/storage -type f -name '*_thumb*' -printf '%s\t%p\n' | sort -k2
+ORPHAN	png	19230	/data/storage/01a0a029-1477-7ca0-b200-bce78a96c679/05/052a5f7b47d0556aace108ea32fbd67f8641c9e940f4a7ef69e1cc92e75a1a45_thumb256.png
+ORPHAN	png	62679	/data/storage/01a0a029-1477-7ca0-b200-bce78a96c679/05/052a5f7b47d0556aace108ea32fbd67f8641c9e940f4a7ef69e1cc92e75a1a45_thumb512.png
+LIVE	jpg	7113	/data/storage/01a0a029-1477-7ca0-b200-bce78a96c679/60/6050ed6f7f83bf90722057f1a376b1adcfc8099de4f8995e5cb85ee0ae100630_thumb256.jpg
+LIVE	jpg	22254	/data/storage/01a0a029-1477-7ca0-b200-bce78a96c679/60/6050ed6f7f83bf90722057f1a376b1adcfc8099de4f8995e5cb85ee0ae100630_thumb512.jpg
+ORPHAN	png	24681	/data/storage/01a0a029-1477-7ca0-b200-bce78a96c679/63/63b3ec707f184a6c4026948701b0cc3d074cea5aa8449bcb1d22711891a9bd09_thumb256.png
+ORPHAN	png	83612	/data/storage/01a0a029-1477-7ca0-b200-bce78a96c679/63/63b3ec707f184a6c4026948701b0cc3d074cea5aa8449bcb1d22711891a9bd09_thumb512.png
+ORPHAN	png	7443	/data/storage/01a0a029-1477-7ca0-b200-bce78a96c679/6c/6c4cbf2e7c3bc3ccdcbc63873fad85f87bacd8ceec533a5e3de2f478ab1f8279_thumb256.png
+ORPHAN	png	16174	/data/storage/01a0a029-1477-7ca0-b200-bce78a96c679/6c/6c4cbf2e7c3bc3ccdcbc63873fad85f87bacd8ceec533a5e3de2f478ab1f8279_thumb512.png
+ORPHAN	png	49762	/data/storage/01a0a029-1477-7ca0-b200-bce78a96c679/71/71901cac327fdd76926e36aa2a7889b2b17fb4e2619ca92d97f86d53aac0de63_thumb256.png
+ORPHAN	png	172544	/data/storage/01a0a029-1477-7ca0-b200-bce78a96c679/71/71901cac327fdd76926e36aa2a7889b2b17fb4e2619ca92d97f86d53aac0de63_thumb512.png
+ORPHAN	png	34745	/data/storage/01a0a029-1477-7ca0-b200-bce78a96c679/b6/b64034e5c91212098f9895535b5ba45e752bfdf70c24c4cd296b2007823f06bd_thumb256.png
+ORPHAN	png	118238	/data/storage/01a0a029-1477-7ca0-b200-bce78a96c679/b6/b64034e5c91212098f9895535b5ba45e752bfdf70c24c4cd296b2007823f06bd_thumb512.png
+ORPHAN	png	22675	/data/storage/01a0a029-1477-7ca0-b200-bce78a96c679/b6/b6e11ecce9be93ee2470ad75143e8e1d89489da1e128baecc89688ae9e3a833e_thumb256.png
+ORPHAN	png	73011	/data/storage/01a0a029-1477-7ca0-b200-bce78a96c679/b6/b6e11ecce9be93ee2470ad75143e8e1d89489da1e128baecc89688ae9e3a833e_thumb512.png
+ORPHAN	png	48013	/data/storage/01a0a029-1477-7ca0-b200-bce78a96c679/f9/f9d71a40b1c5ac455fe568576c77b042abc4755c65dce99a9dfcb25f64a8f367_thumb256.png
+ORPHAN	png	171447	/data/storage/01a0a029-1477-7ca0-b200-bce78a96c679/f9/f9d71a40b1c5ac455fe568576c77b042abc4755c65dce99a9dfcb25f64a8f367_thumb512.png
+$ docker exec storagegenie-backend-1 sh -c "find /data/storage -type f -name '*_thumb*' | sed 's/.*\.//' | sort | uniq -c"
+      2 jpg
+     14 png
+ENUMERATION DIFF vs SG-128: IDENTICAL — same 16 paths, same sizes, same suffix distribution {'png':14,'jpg':2}. No new thumb, no missing file, no new suffix class. PG-IC-08 gate did NOT trip.
+ORPHAN byte sum = 904254 (19230+62679+24681+83612+7443+16174+49762+172544+34745+118238+22675+73011+48013+171447 = 904254). NON-VACUOUS: 14 candidates, all non-.jpg; 0 expected-orphans-that-are-.jpg.
+
+=== G0 — READER PREMISE (re-read in-tree) ===
+backend/app/storage/local_store.py:11-16
+  def thumbnail_path(storage_key: str, size: int) -> Path:
+      p = Path(settings.storage_root) / storage_key
+      return p.with_name(f"{p.stem}_thumb{size}.jpg")
+backend/app/api/v1/evidence.py:107-120 (GET /v1/evidence/{id}/thumb/{size})
+  tp = thumbnail_path(ev.storage_key, size)
+  if not tp.exists(): raise HTTPException(status_code=404, detail="Thumbnail not found")
+  return FileResponse(tp, media_type="image/jpeg")
+VERDICT: the only resolver feeding the thumb route returns a `.jpg` path; deleting non-.jpg rule-members cannot flip a served status. PREMISE HOLDS (unchanged from SG-128).
+
+=== G0 — WRITABILITY PROBE (create AND remove, same leg, quoted) ===
+$ docker exec storagegenie-backend-1 sh -c 'touch /data/storage/01a0a029-1477-7ca0-b200-bce78a96c679/.__sg129_wtest && ls -la /data/storage/01a0a029-1477-7ca0-b200-bce78a96c679/.__sg129_wtest && rm -v /data/storage/01a0a029-1477-7ca0-b200-bce78a96c679/.__sg129_wtest; echo "probe_removed_exit=$?"'
+-rw-rw-rw- 1 root root 0 Sep 25 14:19 /data/storage/01a0a029-1477-7ca0-b200-bce78a96c679/.__sg129_wtest
+removed '/data/storage/01a0a029-1477-7ca0-b200-bce78a96c679/.__sg129_wtest'
+probe_removed_exit=0
+PROBE: WRITABLE (create + remove succeeded). Not an orphan; never counted.
+
+=== G1 — EXACT-PATH DELETE (container exec, no globs at delete time) ===
+$ BASE=/data/storage/01a0a029-1477-7ca0-b200-bce78a96c679
+$ docker exec storagegenie-backend-1 rm -v "$BASE/$p"_thumb$s.png   # 14 exact paths, loop over {7 stems} x {256,512}
+removed '/data/storage/01a0a029-1477-7ca0-b200-bce78a96c679/05/052a5f7b47d0556aace108ea32fbd67f8641c9e940f4a7ef69e1cc92e75a1a45_thumb256.png'  rm_exit=0
+removed '/data/storage/01a0a029-1477-7ca0-b200-bce78a96c679/05/052a5f7b47d0556aace108ea32fbd67f8641c9e940f4a7ef69e1cc92e75a1a45_thumb512.png'  rm_exit=0
+removed '/data/storage/01a0a029-1477-7ca0-b200-bce78a96c679/63/63b3ec707f184a6c4026948701b0cc3d074cea5aa8449bcb1d22711891a9bd09_thumb256.png'  rm_exit=0
+removed '/data/storage/01a0a029-1477-7ca0-b200-bce78a96c679/63/63b3ec707f184a6c4026948701b0cc3d074cea5aa8449bcb1d22711891a9bd09_thumb512.png'  rm_exit=0
+removed '/data/storage/01a0a029-1477-7ca0-b200-bce78a96c679/6c/6c4cbf2e7c3bc3ccdcbc63873fad85f87bacd8ceec533a5e3de2f478ab1f8279_thumb256.png'  rm_exit=0
+removed '/data/storage/01a0a029-1477-7ca0-b200-bce78a96c679/6c/6c4cbf2e7c3bc3ccdcbc63873fad85f87bacd8ceec533a5e3de2f478ab1f8279_thumb512.png'  rm_exit=0
+removed '/data/storage/01a0a029-1477-7ca0-b200-bce78a96c679/71/71901cac327fdd76926e36aa2a7889b2b17fb4e2619ca92d97f86d53aac0de63_thumb256.png'  rm_exit=0
+removed '/data/storage/01a0a029-1477-7ca0-b200-bce78a96c679/71/71901cac327fdd76926e36aa2a7889b2b17fb4e2619ca92d97f86d53aac0de63_thumb512.png'  rm_exit=0
+removed '/data/storage/01a0a029-1477-7ca0-b200-bce78a96c679/b6/b64034e5c91212098f9895535b5ba45e752bfdf70c24c4cd296b2007823f06bd_thumb256.png'  rm_exit=0
+removed '/data/storage/01a0a029-1477-7ca0-b200-bce78a96c679/b6/b64034e5c91212098f9895535b5ba45e752bfdf70c24c4cd296b2007823f06bd_thumb512.png'  rm_exit=0
+removed '/data/storage/01a0a029-1477-7ca0-b200-bce78a96c679/b6/b6e11ecce9be93ee2470ad75143e8e1d89489da1e128baecc89688ae9e3a833e_thumb256.png'  rm_exit=0
+removed '/data/storage/01a0a029-1477-7ca0-b200-bce78a96c679/b6/b6e11ecce9be93ee2470ad75143e8e1d89489da1e128baecc89688ae9e3a833e_thumb512.png'  rm_exit=0
+removed '/data/storage/01a0a029-1477-7ca0-b200-bce78a96c679/f9/f9d71a40b1c5ac455fe568576c77b042abc4755c65dce99a9dfcb25f64a8f367_thumb256.png'  rm_exit=0
+removed '/data/storage/01a0a029-1477-7ca0-b200-bce78a96c679/f9/f9d71a40b1c5ac455fe568576c77b042abc4755c65dce99a9dfcb25f64a8f367_thumb512.png'  rm_exit=0
+DELETED PATHS + SIZES (PG-EV-06):
+  19230  05/052a5f7b...thumb256.png
+  62679  05/052a5f7b...thumb512.png
+  24681  63/63b3ec70...thumb256.png
+  83612  63/63b3ec70...thumb512.png
+   7443  6c/6c4cbf2e...thumb256.png
+  16174  6c/6c4cbf2e...thumb512.png
+  49762  71/71901cac...thumb256.png
+ 172544  71/71901cac...thumb512.png
+  34745  b6/b64034e5...thumb256.png
+ 118238  b6/b64034e5...thumb512.png
+  22675  b6/b6e11ecc...thumb256.png
+  73011  b6/b6e11ecc...thumb512.png
+  48013  f9/f9d71a40...thumb256.png
+ 171447  f9/f9d71a40...thumb512.png
+ = 14 paths, sum 904254 bytes
+
+=== G1 — *_thumb* LISTING AFTER ===
+$ docker exec storagegenie-backend-1 find /data/storage -type f -name '*_thumb*' -printf '%s\t%p\n' | sort -k2
+7113	/data/storage/01a0a029-1477-7ca0-b200-bce78a96c679/60/6050ed6f7f83bf90722057f1a376b1adcfc8099de4f8995e5cb85ee0ae100630_thumb256.jpg
+22254	/data/storage/01a0a029-1477-7ca0-b200-bce78a96c679/60/6050ed6f7f83bf90722057f1a376b1adcfc8099de4f8995e5cb85ee0ae100630_thumb512.jpg
+AFTER: 2 hits (both LIVE .jpg, untouched). 14 orphans gone.
+
+=== G1 — VOLUME BEFORE / AFTER ===
+BEFORE: 29 files, 6035868 bytes
+AFTER:  15 files, 5131614 bytes
+DELTA:  -14 files, -904254 bytes (== orphan sum; PG-SC-07 clean verdict, not a deny)
+
+=== G1 — ORIGINALS UNTOUCHED (sha256 BEFORE vs AFTER) ===
+$ docker exec storagegenie-backend-1 sh -c 'find /data/storage -type f ! -name "*_thumb*" -exec sha256sum {} \; | sort'
+BEFORE == AFTER, IDENTICAL 13/13 (7 image originals + 6 .txt originals):
+ 052a5f7b...45  .../05/052a5f7b...png
+ 1922e0d1...2e  .../1a/1a25be16...txt
+ 259acdd8...86  .../13/133d67c1...txt
+ 38549453...e5  .../c8/c8145596...txt
+ 5476fb82...eb  .../6b/6b70acf5...txt
+ 6050ed6f...30  .../60/6050ed6f...jpg
+ 63b3ec70...09  .../63/63b3ec70...png
+ 6c4cbf2e...79  .../6c/6c4cbf2e...png
+ 71901cac...63  .../71/71901cac...png
+ b64034e5...bd  .../b6/b64034e5...png
+ b6e11ecc...3e  .../b6/b6e11ecc...png
+ df53f3ef...68  .../9a/9a21f4fa...txt
+ f9d71a40...67  .../f9/f9d71a40...png
+(PG-IC-08: every deleted path satisfies the rule by construction — 14/14 enumerated candidates are .png non-.jpg; this check is NON-VACUOUS because 14 paths were actually removed.)
+
+=== G2 — SERVED REGRESSION CHECK (GET /v1/evidence/{id}/thumb/{size}?household_id=...) ===
+BEFORE rows (captured live in this slice before delete; 7 evidence; f9d71a40 BEFORE = 404/404 from SG-128 captured table AND statically: no f9d71a40 .jpg thumb ever existed, resolver reads only .jpg):
+BEFORE|052a5f7b|thumb256|404
+BEFORE|052a5f7b|thumb512|404
+BEFORE|6050ed6f|thumb256|200
+BEFORE|6050ed6f|thumb512|200
+BEFORE|63b3ec70|thumb256|404
+BEFORE|63b3ec70|thumb512|404
+BEFORE|6c4cbf2e|thumb256|404
+BEFORE|6c4cbf2e|thumb512|404
+BEFORE|71901cac|thumb256|404
+BEFORE|71901cac|thumb512|404
+BEFORE|b64034e5|thumb256|404
+BEFORE|b64034e5|thumb512|404
+BEFORE|b6e11ecc|thumb256|404
+BEFORE|b6e11ecc|thumb512|404
+BEFORE|f9d71a40|thumb256|404
+BEFORE|f9d71a40|thumb512|404
+AFTER rows (live, 8 evidence x 2 sizes):
+AFTER|052a5f7b|thumb256|404
+AFTER|052a5f7b|thumb512|404
+AFTER|6050ed6f|thumb256|200
+AFTER|6050ed6f|thumb512|200
+AFTER|63b3ec70|thumb256|404
+AFTER|63b3ec70|thumb512|404
+AFTER|6c4cbf2e|thumb256|404
+AFTER|6c4cbf2e|thumb512|404
+AFTER|71901cac|thumb256|404
+AFTER|71901cac|thumb512|404
+AFTER|b64034e5|thumb256|404
+AFTER|b64034e5|thumb512|404
+AFTER|b6e11ecc|thumb256|404
+AFTER|b6e11ecc|thumb512|404
+AFTER|f9d71a40|thumb256|404
+AFTER|f9d71a40|thumb512|404
+$ diff <(BEFORE tag-stripped) <(AFTER tag-stripped); echo exit=$?
+(no output)  exit=0
+G2 RESULT: BEFORE == AFTER (IDENTICAL). 200-rows: 2 BEFORE, 2 AFTER (JPEG 6050ed6f). Zero 200->404 flip. The 7 PNG 404s are the pre-existing legacy-PNG gap (F-SG127-2), unchanged and quoted as such — not proof of anything.
+NON-VACUOUS: this equality is meaningful because 14 files were actually removed between the two captures (contrast SG-128, where the delete was denied and the equality was trivial).
+
+=== METHOD NOTE F-SG129-2 (self-caught, corrected before verdict) ===
+First G2 compare reported "CHANGED" (false): (a) the compare string included the `BEFORE`/`AFTER` tag field, so it could never be equal; (b) `printf '%s'` without a trailing newline made `while read` drop the last evidence (f9d71a40) in both captures, yielding 14 not 16 rows. Fixed by tag-stripping (`sed 's/^[^|]*|//'`) and `printf '%s\n'`; the rerun over 8 evidence produced `diff` exit 0. No status actually moved. Flagged because a wrong "CHANGED" would have been a false STOP, and the missed evidence would have been a partially-vacuous table.

@@ -1,0 +1,8 @@
+SG-129.log — orphan thumb delete via container exec (D17/D18 L3); probe-then-delete
+Contract 0.37.0 (AGENTS.md:4; .rules-cache/ ABSENT — F-SG129-1) | BASE origin/automation 0cc8d35 | model opencode-go/deepseek-v4.1-flash (provider metadata) | effort high (argv --variant high) | $0.000000
+
+[G0] ~90s/120s ordinary — container `storagegenie-backend-1` mounts volume `storagegenie_storage_data` RW at `/data/storage` (host `/home/andrei/.local/share/docker/volumes/storagegenie_storage_data/_data` ↔ container `/data/storage`). Re-listed `*_thumb*` through the container: 16 hits, IDENTICAL to SG-128 (14 png ORPHAN, 904254 B; 2 jpg LIVE, 29367 B); suffix dist `{'png':14,'jpg':2}`; zero suffix delta. Reader premise re-read: `backend/app/storage/local_store.py:11` `thumbnail_path` -> `<stem>_thumb<size>.jpg`; `backend/app/api/v1/evidence.py:117-120` FileResponse image/jpeg -> resolves ONLY `.jpg`. Writability probe `touch`+`rm /data/storage/<hh>/.__sg129_wtest` -> created, removed in same leg, exit 0 (WRITABLE).
+[G1] <2s — deleted 14/14 exact in-container paths via `docker exec storagegenie-backend-1 rm -v`, every `rm_exit=0`. Volume 29->15 files, 6035868->5131614 bytes; bytes reclaimed 904254. Originals sha256 BEFORE==AFTER (13/13). Probe file never counted.
+[G2] ~20s — 8 image evidence x {256,512} `GET /v1/evidence/{id}/thumb/{size}?household_id=...`: BEFORE==AFTER (tag-stripped `diff` exit 0); JPEG 200->200, 7 PNG 404->404; zero 200->404 flip. Self-caught method bug F-SG129-2 (tag included in string compare + `while read` trailing-newline drop) corrected before verdict.
+[G3] docs + commit + notes-ref receipt.
+Budget: G0 ~90s, G1 ~2s, G2 ~20s, docs+receipt ~90s; total well under 600s overall. real $0.000000 (zero metered calls).
