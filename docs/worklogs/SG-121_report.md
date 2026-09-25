@@ -9,7 +9,7 @@ the argv carries no `--model`, so the CLI default is the model. Not taken from a
 **Work dir:** `/home/andrei/StorageGenie` · **branch** `automation` · **remote** `git@github.com:Andovol/StorageGenie.git`.
 **BASE REF:** `origin/automation` → **BASE_RESOLVED:** `cc0a27c32fac557412a0ffb15b8aad797f55310e`
 (== start HEAD; two fields, never one).
-**WORK_HEAD:** `WORK_HEAD_PENDING` (the work commit that carries this worklog set).
+**WORK_HEAD:** `f1c8b67512e2a265bef701028a8415416d8e0e36` (the work commit that carries this worklog set).
 **DATABASE:** live, READ-ONLY · **Restart:** none · **Deploy:** none · **Container actions:** none
 (read-only `docker exec` probes only).
 **Autonomy:** L2 slice (packet); 1 retry available, not used.
@@ -94,9 +94,31 @@ container action beyond read-only `docker exec`. Nothing pushed to `storagegenie
 
 ## Receipt (notes ref)
 
-Commit 1 (work) = `WORK_HEAD_PENDING`, pushed to `automation`. Note anchored on `WORK_HEAD`; worktree clean.
+Commit 1 (work) = `f1c8b67512e2a265bef701028a8415416d8e0e36`, pushed to `automation` (`cc0a27c..f1c8b67`).
+Note anchored on `WORK_HEAD`; worktree clean. Pasted verbatim from the **fetched mapped ref**
+(`git fetch origin refs/notes/storagegenie-coder-reports:refs/notes/sg121-verify`):
 
-RECEIPT_PASTE_PENDING
+```
+$ git notes --ref=refs/notes/storagegenie-coder-reports show f1c8b67512e2a265bef701028a8415416d8e0e36
+error: no note found for object f1c8b67512e2a265bef701028a8415416d8e0e36.
+pre_show_exit=1                                   # no existing note -> refusal guard did not fire
+
+$ git notes --ref=refs/notes/storagegenie-coder-reports add -m "Dispatch-ID: SG-121 | Report: docs/worklogs/SG-121_report.md | Work-HEAD: f1c8b67512e2a265bef701028a8415416d8e0e36" f1c8b67512e2a265bef701028a8415416d8e0e36
+add_exit=0
+
+$ git push origin refs/notes/storagegenie-coder-reports
+To github.com:Andovol/StorageGenie.git
+   9e5056a..c717e11  refs/notes/storagegenie-coder-reports -> refs/notes/storagegenie-coder-reports
+push_exit=0
+
+$ git fetch origin refs/notes/storagegenie-coder-reports:refs/notes/sg121-verify
+ok fetched (1 new refs)
+fetch_exit=0
+
+$ git notes --ref=refs/notes/sg121-verify show f1c8b67512e2a265bef701028a8415416d8e0e36
+Dispatch-ID: SG-121 | Report: docs/worklogs/SG-121_report.md | Work-HEAD: f1c8b67512e2a265bef701028a8415416d8e0e36
+show_exit=0
+```
 
 note=yes
 

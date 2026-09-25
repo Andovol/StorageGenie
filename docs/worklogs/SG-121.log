@@ -42,6 +42,8 @@ BASE REF: origin/automation · BASE_RESOLVED = START_HEAD = cc0a27c32fac557412a0
   recreate; no build; no compose; no .env; no STATE/AGENTS. $0.000000 (zero metered calls).
 
 [commit + receipt]
-- Commit 1 (work) = WORK_HEAD (hash filled in the docs commit): the worklog set.
-- Note anchored on WORK_HEAD on refs/notes/storagegenie-coder-reports, pushed; verified from the
-  fetched mapped ref; second docs-only commit dual-annotated (paste in report + verify log).
+- Commit 1 (work) WORK_HEAD = f1c8b67512e2a265bef701028a8415416d8e0e36; pushed cc0a27c..f1c8b67.
+- Note anchored on WORK_HEAD on refs/notes/storagegenie-coder-reports (9e5056a..c717e11), pushed;
+  verified from the fetched mapped ref refs/notes/sg121-verify (`show` pasted, exit 0).
+- Commit 2 (docs-only, this file + receipt paste into report/verify log) pushed; final tip
+  dual-annotated (note-anchor inoculation, SG-092 precedent). Worktree clean at close.

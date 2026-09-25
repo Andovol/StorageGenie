@@ -3,7 +3,7 @@ SG-121 verify log — raw statuses + raw bodies (read-only; no key bytes touched
 BASE REF: origin/automation
 BASE_RESOLVED: cc0a27c32fac557412a0ffb15b8aad797f55310e
 START_HEAD:    cc0a27c32fac557412a0ffb15b8aad797f55310e
-WORK_HEAD:     WORK_HEAD_PENDING
+WORK_HEAD:     f1c8b67512e2a265bef701028a8415416d8e0e36
 
 === CONTRACT ECHO / SOURCE PATH ===
 $ cat /home/andrei/storagegenie-contract/VERSION
@@ -105,4 +105,26 @@ No route POST/PATCH/DELETE/PUT; no DB INSERT/UPDATE/DELETE/DDL; no build; no com
 no migration; no STATE/AGENTS; no seeding; no flag; no recreate. $0.000000 (zero metered calls).
 
 === RECEIPT — note add / push / mapped fetch / show (pasted verbatim) ===
-RECEIPT_PASTE_PENDING
+$ git notes --ref=refs/notes/storagegenie-coder-reports show f1c8b67512e2a265bef701028a8415416d8e0e36
+error: no note found for object f1c8b67512e2a265bef701028a8415416d8e0e36.
+pre_show_exit=1                                   # no existing note -> refusal guard did not fire
+
+$ git notes --ref=refs/notes/storagegenie-coder-reports add -m \
+    "Dispatch-ID: SG-121 | Report: docs/worklogs/SG-121_report.md | Work-HEAD: f1c8b67512e2a265bef701028a8415416d8e0e36" \
+    f1c8b67512e2a265bef701028a8415416d8e0e36
+add_exit=0
+
+$ git push origin refs/notes/storagegenie-coder-reports
+To github.com:Andovol/StorageGenie.git
+   9e5056a..c717e11  refs/notes/storagegenie-coder-reports -> refs/notes/storagegenie-coder-reports
+push_exit=0
+
+$ git fetch origin refs/notes/storagegenie-coder-reports:refs/notes/sg121-verify
+ok fetched (1 new refs)
+fetch_exit=0
+
+$ git notes --ref=refs/notes/sg121-verify show f1c8b67512e2a265bef701028a8415416d8e0e36
+Dispatch-ID: SG-121 | Report: docs/worklogs/SG-121_report.md | Work-HEAD: f1c8b67512e2a265bef701028a8415416d8e0e36
+show_exit=0
+
+note=yes
