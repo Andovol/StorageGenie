@@ -2,7 +2,7 @@
 
 **Dispatch-ID:** SG-125 · **Coder:** opencode · **Effort:** high · **Model:** opencode-go/deepseek-v4.1-flash
 **Work dir:** `/home/andrei/StorageGenie` · **Remote:** `origin` = `git@github.com:Andovol/StorageGenie.git`
-**BASE REF:** `origin/automation` · **BASE_RESOLVED:** `7bbf082d52260518bf6676006d9f70ba64182951` · **START_HEAD:** `7bbf082d52260518bf6676006d9f70ba64182951` · **WORK_HEAD:** `<WORK_HEAD>` (the work commit carrying product + tests + worklog; receipt note below).
+**BASE REF:** `origin/automation` · **BASE_RESOLVED:** `7bbf082d52260518bf6676006d9f70ba64182951` · **START_HEAD:** `7bbf082d52260518bf6676006d9f70ba64182951` · **WORK_HEAD:** `5e61ae58de3a7ac073f9add8841e822c62e8f0ab` (the work commit carrying product + tests + worklog; receipt note below).
 **Spend (real $):** $0.000000 — zero metered calls on any path; no provider call; no key read; no network.
 **Contract:** recorded `0.37.0` == published `1acd7730e5fa6de5b7403aacce71207e9946461d`; source path `/home/andrei/storagegenie-contract/{VERSION, HEAD}`; `RULES.md` sha256 `18de7fd7…` == payload `RULES.sha256`.
 
@@ -60,10 +60,28 @@
 No command was killed or timed out. The two ordinary legs exceeded 120s (recon breadth and the test rewrite); reported, not hidden.
 
 ## Receipt (note on `refs/notes/storagegenie-coder-reports`) — pasted verbatim
-Work committed and pushed to `automation` (worktree clean, `CO-55`). No push to `storagegenie-evidence`; no `{{RECEIPT_CMD}}`. WORK_HEAD = `<WORK_HEAD>`. The note was added on WORK_HEAD, the notes ref pushed, the refspec fetched into a mapped local name, and `git notes --ref=… show <WORK_HEAD>` pasted verbatim below. **Paste executed after the work commit; see `SG-125_verify.log` §9.**
+Work committed and pushed to `automation` (worktree clean, `CO-55`). No push to `storagegenie-evidence`; no `{{RECEIPT_CMD}}`. WORK_HEAD = `5e61ae58de3a7ac073f9add8841e822c62e8f0ab`. The note was added on WORK_HEAD, the notes ref pushed, the refspec fetched into a mapped local name, and `git notes --ref=refs/notes/sg125-verify show 5e61ae58de3a7ac073f9add8841e822c62e8f0ab` pasted verbatim below. **Paste executed after the work commit; see `SG-125_verify.log` §9.**
 
 ```text
-<RECEIPT_SHOW>
+$ git notes --ref=refs/notes/storagegenie-coder-reports show 5e61ae58de3a7ac073f9add8841e822c62e8f0ab
+error: no note found for object 5e61ae58de3a7ac073f9add8841e822c62e8f0ab.
+pre_show_exit=1
+
+$ git notes --ref=refs/notes/storagegenie-coder-reports add -m "Dispatch-ID: SG-125 | Report: docs/worklogs/SG-125_report.md | Work-HEAD: 5e61ae58de3a7ac073f9add8841e822c62e8f0ab" 5e61ae58de3a7ac073f9add8841e822c62e8f0ab
+add_exit=0
+$ git push origin refs/notes/storagegenie-coder-reports
+To github.com:Andovol/StorageGenie.git
+   e8e7626..2e8e22a  refs/notes/storagegenie-coder-reports -> refs/notes/storagegenie-coder-reports
+push_exit=0
+
+$ git fetch origin refs/notes/storagegenie-coder-reports:refs/notes/sg125-verify
+From github.com:Andovol/StorageGenie
+ * [new ref]         refs/notes/storagegenie-coder-reports -> refs/notes/sg125-verify
+fetch_exit=0
+
+$ git notes --ref=refs/notes/sg125-verify show 5e61ae58de3a7ac073f9add8841e822c62e8f0ab
+Dispatch-ID: SG-125 | Report: docs/worklogs/SG-125_report.md | Work-HEAD: 5e61ae58de3a7ac073f9add8841e822c62e8f0ab
+show_exit=0
 ```
 
 note=yes

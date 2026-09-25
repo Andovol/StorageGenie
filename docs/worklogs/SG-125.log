@@ -1,7 +1,7 @@
 SG-125 — Ledger retention instrument: month-boxed spend + purge vehicle (temp-proven, live NOT run)
 Contract: 0.37.0 (source /home/andrei/storagegenie-contract/VERSION; checkout HEAD 1acd7730e5fa6de5b7403aacce71207e9946461d; RULES.md sha256 18de7fd7b3546bd7624b3a7b59a78bd629752816cd7fa8f1af6113d1bafc8d46 == payload RULES.sha256)
 BASE: 7bbf082d52260518bf6676006d9f70ba64182951 (origin/automation; worktree clean at start)
-WORK_HEAD: <WORK_HEAD> (the work commit carrying product + tests + these three worklog files; hash fixed in the receipt note)
+WORK_HEAD: 5e61ae58de3a7ac073f9add8841e822c62e8f0ab (the work commit carrying product + tests + these three worklog files; hash fixed in the receipt note)
 Coder: opencode · Effort: high (trigger --variant high per D302/D120) · Model: deepseek-v4.1-flash
   (provider metadata banner "> build · deepseek-v4.1-flash" in output/dispatch/SG-125.log; no --model on argv = contract-legal omitted-model subset)
 Spend: $0.000000 real vs $0 bound (no metered call exists on any path; no provider call; no key read; no network)

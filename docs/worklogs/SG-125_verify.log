@@ -1,5 +1,5 @@
 SG-125 verify log — raw evidence (verdict INSTRUMENTED). Generated 2026-09-25 UTC.
-BASE 7bbf082d52260518bf6676006d9f70ba64182951 (origin/automation). WORK_HEAD <WORK_HEAD>.
+BASE 7bbf082d52260518bf6676006d9f70ba64182951 (origin/automation). WORK_HEAD 5e61ae58de3a7ac073f9add8841e822c62e8f0ab.
 All outputs below are verbatim, pasted from the runs (no reformatting). Temp-DB only; production never opened.
 
 ============================================================
@@ -302,4 +302,22 @@ docker compose exec -T backend python -c "from sqlalchemy import func; from app.
 ============================================================
 ## 9. Receipt — pasted verbatim from the FETCHED mapped ref
 ============================================================
-<RECEIPT_SHOW>
+$ git notes --ref=refs/notes/storagegenie-coder-reports show 5e61ae58de3a7ac073f9add8841e822c62e8f0ab
+error: no note found for object 5e61ae58de3a7ac073f9add8841e822c62e8f0ab.
+pre_show_exit=1
+
+$ git notes --ref=refs/notes/storagegenie-coder-reports add -m "Dispatch-ID: SG-125 | Report: docs/worklogs/SG-125_report.md | Work-HEAD: 5e61ae58de3a7ac073f9add8841e822c62e8f0ab" 5e61ae58de3a7ac073f9add8841e822c62e8f0ab
+add_exit=0
+$ git push origin refs/notes/storagegenie-coder-reports
+To github.com:Andovol/StorageGenie.git
+   e8e7626..2e8e22a  refs/notes/storagegenie-coder-reports -> refs/notes/storagegenie-coder-reports
+push_exit=0
+
+$ git fetch origin refs/notes/storagegenie-coder-reports:refs/notes/sg125-verify
+From github.com:Andovol/StorageGenie
+ * [new ref]         refs/notes/storagegenie-coder-reports -> refs/notes/sg125-verify
+fetch_exit=0
+
+$ git notes --ref=refs/notes/sg125-verify show 5e61ae58de3a7ac073f9add8841e822c62e8f0ab
+Dispatch-ID: SG-125 | Report: docs/worklogs/SG-125_report.md | Work-HEAD: 5e61ae58de3a7ac073f9add8841e822c62e8f0ab
+show_exit=0
