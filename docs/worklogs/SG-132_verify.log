@@ -1,0 +1,357 @@
+SG-132 verify log — raw captures (vendor re-check, tests, suites, build, recreate, live search)
+captured on host /home/andrei/StorageGenie; times are live UTC
+
+============================================================
+## 1. G0 VENDOR RE-CHECK (keyless GETs; figure + URL + capture time)
+============================================================
+capture_time=2026-09-25T20:07:36Z
+$ curl -sS -m 30 -A "Mozilla/5.0" -o sg132_pricing.html -w "HTTP_CODE=%{http_code} SIZE=%{size_download}" https://jina.ai/api-dashboard/pricing/
+HTTP_CODE=200 SIZE=83428
+$ grep -o "<title>...</title>" sg132_pricing.html ; grep -o "starting from 10,000 tokens"
+<title>API Pricing - Jina AI</title>
+starting from 10,000 tokens
+
+$ curl -sS -H "Accept: application/json" https://dash.jina.ai/api/v1/product  (17 active packs; parsed $/1M)
+  0.016949 USD/1M  price=1000.0 qty=59000000000 cur=USD name=59B tokens
+  0.018182 USD/1M  price=100.0 qty=5500000000 cur=USD name=5.5B tokens
+  0.018182 USD/1M  price=200.0 qty=11000000000 cur=USD name=11B tokens
+  0.018182 USD/1M  price=200.0 qty=11000000000 cur=USD,EUR name=11B tokens
+  0.020000 USD/1M  price=10.0 qty=500000000 cur=USD name=500M tokens
+  0.020000 USD/1M  price=20.0 qty=1000000000 cur=USD name=1B tokens
+  0.020000 USD/1M  price=20.0 qty=1000000000 cur=USD,EUR name=1B tokens
+  0.020000 USD/1M  price=50.0 qty=2500000000 cur=USD name=2.5B tokens
+  0.020000 USD/1M  price=1000.0 qty=50000000000 cur=USD name=50B tokens
+  0.045455 USD/1M  price=500.0 qty=11000000000 cur=USD,EUR name=11B tokens
+  0.045455 USD/1M  price=5000.0 qty=110000000000 cur=USD,EUR name=110B tokens
+  0.050000 USD/1M  price=50.0 qty=1000000000 cur=USD,EUR name=1B tokens
+  0.050000 USD/1M  price=200.0 qty=4000000000 cur=USD name=4B tokens
+  0.080000 USD/1M  price=100.0 qty=1250000000 cur=USD name=1.25B tokens
+  0.100000 USD/1M  price=50.0 qty=500000000 cur=USD name=500M tokens
+  0.400000 USD/1M  price=20.0 qty=50000000 cur=USD name=50M tokens
+  1.000000 USD/1M  price=10.0 qty=10000000 cur=USD name=10M tokens
+  MIN=0.01694915254237288 MAX=1.0
+=> spread 0.016949-1.00 USD/1M, identical to SG-124 F-SG124-3; 0.05 is still offered.
+   The constant did NOT move against the live table => NOT BLOCKED.
+
+============================================================
+## 2. G0 CALL-SITE ENUMERATION + CAPS + READ-BACK TRACE
+============================================================
+$ grep -rn "fetch_jina_search|fetch_with_fallback|build_jina_request|s.jina.ai" backend/app --include=*.py
+app/api/v1/enrich.py:191:        record = jina_mod.fetch_with_fallback(
+app/services/enrich/jina.py:159:def build_jina_request(
+app/services/enrich/jina.py:277:def fetch_jina_search(
+app/services/enrich/jina.py:392:            fallback = fetch_jina_search(
+=> exactly ONE production Jina call site (api/v1/enrich.py:191). build_jina_request does not
+   send. Tests call fetch_jina_search directly but are not production paths. All enumerated.
+
+caps on the enrich path (PG-SC-06):
+  1. per-press ENRICH_PER_PRESS_CAP_USD=0.05 (enrich_cap_refusal, caller-fed last_spend_usd)
+  2. monthly settings.sg_monthly_cap (None in live .env; inert)
+  3. estimator floor estimate_jina_search_cost() = 0.0005 USD/request
+  JOINT: each sent Jina request adds 0.0005 to the household month total; the monthly gate
+  refuses when already_recorded + 0.0005 > cap. The per-press gate is unchanged.
+
+read-back trace (PG-SC-02): writer snapshots.record_jina_search_call -> provider_call;
+reader providers.reader._recorded_spend (joins provider_call -> job -> household_id,
+month-boxed); display = api/v1/enrich.py 402 monthly_cap_exceeded.
+
+============================================================
+## 3. FAIL-pre — candidate test vs immutable BASE (worktree /tmp/opencode/sg132-base @ af36fa2)
+============================================================
+$ cp backend/tests/test_sg132_jina_ledger_wiring.py <base>/backend/tests/
+$ (cd /tmp/opencode/sg132-base/backend && /home/andrei/StorageGenie/backend/venv/bin/python -m pytest -q tests/test_sg132_jina_ledger_wiring.py)
+F..FFFF                                                                  [100%]
+=================================== FAILURES ===================================
+___________ test_jina_search_ledgers_estimate_and_moves_month_spend ____________
+
+enrich_env = (<sqlalchemy.orm.session.Session object at 0x73233fe21160>, '01a0da32-2eb2-76e1-b987-dcbbe6d8824f', '01a0da32-2eb4-7253-9b01-4169bce4ba10')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x73233fef76e0>
+
+    def test_jina_search_ledgers_estimate_and_moves_month_spend(enrich_env, monkeypatch) -> None:  # type: ignore[no-untyped-def]
+        session, household_id, asset_id = enrich_env
+        monkeypatch.setattr(settings, "sg_consent", True)
+        monkeypatch.setattr(settings, "jina_api_key", "test-sg132-sentinel")
+        off, off_seen = _scripted(_load("off_empty"))
+        jina, jina_seen = _scripted(_load("jina_hit"))
+        _install(off, jina)
+    
+        before = reader_mod._recorded_spend(session, household_id)
+        assert before == 0.0  # empty-household world: no search yet, spend 0.0
+    
+        response = _post(asset_id, household_id)
+    
+        assert response.status_code == 200
+        body = response.json()
+        assert body["fallback_fired"] is True
+        assert len(off_seen) == 1 and len(jina_seen) == 1
+    
+        rows = session.query(ProviderCall).all()
+>       assert len(rows) == EXPECTED_ROWS_ONE_SEARCH
+E       assert 0 == 1
+E        +  where 0 = len([])
+
+tests/test_sg132_jina_ledger_wiring.py:177: AssertionError
+____________ test_degraded_jina_http_status_still_records_estimate _____________
+
+enrich_env = (<sqlalchemy.orm.session.Session object at 0x73233e39d760>, '01a0da32-303c-77b2-96cf-e4fd59d66269', '01a0da32-303e-7112-98da-99b9fa90a773')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x73233f568140>
+
+    def test_degraded_jina_http_status_still_records_estimate(enrich_env, monkeypatch) -> None:  # type: ignore[no-untyped-def]
+        session, household_id, asset_id = enrich_env
+        monkeypatch.setattr(settings, "sg_consent", True)
+        monkeypatch.setattr(settings, "jina_api_key", "test-sg132-sentinel")
+        off, _off_seen = _scripted(_load("off_empty"))
+        jina, jina_seen = _scripted(status=503, body_text="jina unavailable")
+        _install(off, jina)
+    
+        response = _post(asset_id, household_id)
+    
+        assert response.status_code == 200
+        assert len(jina_seen) == 1
+        rows = session.query(ProviderCall).all()
+>       assert len(rows) == EXPECTED_ROWS_ONE_SEARCH
+E       assert 0 == 1
+E        +  where 0 = len([])
+
+tests/test_sg132_jina_ledger_wiring.py:258: AssertionError
+_________________ test_jina_spend_trips_enrich_monthly_refusal _________________
+
+enrich_env = (<sqlalchemy.orm.session.Session object at 0x73233e3ceae0>, '01a0da32-3099-7000-b733-c1071e7c441c', '01a0da32-309b-7af0-80ef-fdfb036373f4')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x73233e39cfe0>
+
+    def test_jina_spend_trips_enrich_monthly_refusal(enrich_env, monkeypatch) -> None:  # type: ignore[no-untyped-def]
+        session, household_id, asset_id = enrich_env
+        monkeypatch.setattr(settings, "sg_consent", True)
+        monkeypatch.setattr(settings, "jina_api_key", "test-sg132-sentinel")
+        monkeypatch.setattr(settings, "sg_monthly_cap", MONTHLY_TEST_CAP_USD)
+        off, off_seen = _scripted(_load("off_empty"))
+        jina, jina_seen = _scripted(_load("jina_hit"))
+        _install(off, jina)
+    
+        first = _post(asset_id, household_id)
+        assert first.status_code == 200
+        assert len(jina_seen) == 1
+>       assert reader_mod._recorded_spend(session, household_id) == pytest.approx(
+            EXPECTED_JINA_COST_USD
+        )
+E       assert 0.0 == 0.0005 ± 5.0e-10
+E         
+E         comparison failed
+E         Obtained: 0.0
+E         Expected: 0.0005 ± 5.0e-10
+
+tests/test_sg132_jina_ledger_wiring.py:282: AssertionError
+_____________ test_two_jina_searches_are_two_rows_and_double_spend _____________
+
+enrich_env = (<sqlalchemy.orm.session.Session object at 0x73233f727da0>, '01a0da32-30fb-7ec0-8088-1ebde544af73', '01a0da32-30fd-77c2-aeff-201f549ac1f5')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x73233e423fe0>
+
+    def test_two_jina_searches_are_two_rows_and_double_spend(enrich_env, monkeypatch) -> None:  # type: ignore[no-untyped-def]
+        session, household_id, asset_id = enrich_env
+        monkeypatch.setattr(settings, "sg_consent", True)
+        monkeypatch.setattr(settings, "jina_api_key", "test-sg132-sentinel")
+        off, _off_seen = _scripted(_load("off_empty"))
+        jina, _jina_seen = _scripted(_load("jina_hit"))
+        _install(off, jina)
+    
+        assert _post(asset_id, household_id).status_code == 200
+        assert _post(asset_id, household_id).status_code == 200
+    
+>       assert session.query(ProviderCall).count() == EXPECTED_ROWS_TWO_SEARCHES
+E       assert 0 == 2
+E        +  where 0 = count()
+E        +    where count = <sqlalchemy.orm.query.Query object at 0x73233e2d4350>.count
+E        +      where <sqlalchemy.orm.query.Query object at 0x73233e2d4350> = query(ProviderCall)
+E        +        where query = <sqlalchemy.orm.session.Session object at 0x73233f727da0>.query
+
+tests/test_sg132_jina_ledger_wiring.py:313: AssertionError
+_____________ test_production_writer_prices_the_caller_token_bound _____________
+
+enrich_env = (<sqlalchemy.orm.session.Session object at 0x73233f4ca6f0>, '01a0da32-3165-7813-98ed-621c9ad1d0a7', '01a0da32-3168-76c3-b17c-c58afef18be5')
+
+    def test_production_writer_prices_the_caller_token_bound(enrich_env) -> None:  # type: ignore[no-untyped-def]
+>       from app.services.enrich.snapshots import record_jina_search_call
+E       ImportError: cannot import name 'record_jina_search_call' from 'app.services.enrich.snapshots' (/tmp/opencode/sg132-base/backend/app/services/enrich/snapshots.py)
+
+tests/test_sg132_jina_ledger_wiring.py:323: ImportError
+=============================== warnings summary ===============================
+../../../../home/andrei/StorageGenie/backend/venv/lib/python3.12/site-packages/fastapi/testclient.py:1
+  /home/andrei/StorageGenie/backend/venv/lib/python3.12/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+../../../../home/andrei/StorageGenie/backend/venv/lib/python3.12/site-packages/starlette/testclient.py:53
+  /home/andrei/StorageGenie/backend/venv/lib/python3.12/site-packages/starlette/testclient.py:53: DeprecationWarning: The anyio.abc.BlockingPortal alias is deprecated, use anyio.from_thread.BlockingPortal instead.
+    _PortalFactoryType = Callable[[], AbstractContextManager[anyio.abc.BlockingPortal]]
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/test_sg132_jina_ledger_wiring.py::test_jina_search_ledgers_estimate_and_moves_month_spend
+FAILED tests/test_sg132_jina_ledger_wiring.py::test_degraded_jina_http_status_still_records_estimate
+FAILED tests/test_sg132_jina_ledger_wiring.py::test_jina_spend_trips_enrich_monthly_refusal
+FAILED tests/test_sg132_jina_ledger_wiring.py::test_two_jina_searches_are_two_rows_and_double_spend
+FAILED tests/test_sg132_jina_ledger_wiring.py::test_production_writer_prices_the_caller_token_bound
+5 failed, 2 passed, 2 warnings in 1.35s
+
+============================================================
+## 4. PASS-post — same test file, candidate H1 4fde90c
+============================================================
+$ (cd /home/andrei/StorageGenie/backend && venv/bin/python -m pytest -q tests/test_sg132_jina_ledger_wiring.py)
+    _PortalFactoryType = Callable[[], AbstractContextManager[anyio.abc.BlockingPortal]]
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+7 passed, 2 warnings in 1.27s
+
+============================================================
+## 5. TARGETED — every test file referencing jina + the new file
+============================================================
+$ venv/bin/python -m pytest -q tests/test_sg082_enrich_jina.py tests/test_sg098_enrich_endpoint.py \
+    tests/test_sg099_synthesis.py tests/test_sg100_snapshot_persistence.py tests/test_sg101_text_path.py \
+    tests/test_sg102_enrich_wiring.py tests/test_sg103_web_alternates.py tests/test_sg119_brand_alternates.py \
+    tests/test_sg124_jina_price.py tests/test_privacy_audit.py tests/test_sg132_jina_ledger_wiring.py
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+118 passed, 5 warnings in 4.68s
+
+============================================================
+## 6a. FULL SUITE — candidate H1
+============================================================
+$ venv/bin/python -m pytest -q   (33.99s of 600s)
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/test_signals.py::test_generated_codes_are_validated_and_bad_checksum_is_not_an_identifier
+FAILED tests/test_signals.py::test_ocr_has_text_boxes_and_mean_confidence - a...
+2 failed, 624 passed, 32 warnings in 30.87s
+
+============================================================
+## 6b. FULL SUITE — BASE base worktree, candidate test removed (proves the 2 reds pre-exist)
+============================================================
+$ rm <base>/backend/tests/test_sg132_jina_ledger_wiring.py
+$ (cd /tmp/opencode/sg132-base/backend && venv/bin/python -m pytest -q)   (36.24s of 600s)
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/test_signals.py::test_generated_codes_are_validated_and_bad_checksum_is_not_an_identifier
+FAILED tests/test_signals.py::test_ocr_has_text_boxes_and_mean_confidence - a...
+2 failed, 617 passed, 32 warnings in 33.08s
+=> same 2 reds (test_signals OCR/barcode decoder env); candidate delta = +7 passed (new file).
+
+============================================================
+## 7. RUFF + MYPY (base vs candidate)
+============================================================
+$ venv/bin/python -m ruff check .
+All checks passed!
+$ venv/bin/python -m mypy app   (candidate)
+Found 41 errors in 9 files (checked 90 source files)
+$ (cd /tmp/opencode/sg132-base/backend && venv/bin/python -m mypy app)   (base)
+Found 41 errors in 9 files (checked 90 source files)
+files carrying the 41 errors (neither touched file present):
+  app/api/v1/assets.py
+  app/api/v1/evidence.py
+  app/api/v1/households.py
+  app/api/v1/review_tasks.py
+  app/main.py
+  app/models/base.py
+  app/schemas/asset.py
+  app/services/asset_service.py
+  app/services/audit_service.py
+
+============================================================
+## 8. EMPTY DIFFS (models/ + alembic/; synthesize.py)
+============================================================
+$ git diff af36fa2..4fde90c -- backend/app/models backend/alembic | wc -l
+0
+$ git diff af36fa2..4fde90c -- backend/app/services/enrich/synthesize.py | wc -l
+0
+$ git diff --name-only af36fa2..4fde90c
+backend/app/api/v1/enrich.py
+backend/app/services/enrich/jina.py
+backend/app/services/enrich/snapshots.py
+backend/tests/test_sg132_jina_ledger_wiring.py
+
+============================================================
+## 9. G3 BEFORE / BUILD / RECREATE / VERIFY
+============================================================
+=== BEFORE RECREATE 2026-09-25T20:16:59Z ===
+container=6b606c6a61e9de5d767d91afcbca9f1c9b014dc261414013af88e86c597294b3
+image=sha256:665d200ba18387b030fb67e77f4880652aad825e0e1c22ae6420149dbc89d2c4
+hostimage=665d200ba183 storagegenie-backend:latest
+count_provider_call= 17
+count_job= 8
+count_enrich_snapshot= 2
+count_candidate= 7
+count_evidence= 13
+count_guardrail_event= 2
+count_audit_event= 68
+recorded_spend= 0.006700500000000001
+20260924_sg114_relation (head)
+$ BUILDX_CONFIG=/tmp/opencode/buildx docker compose build backend
+#23 resolving provenance for metadata file
+#23 DONE 0.0s
+ Image storagegenie-backend Built 
+$ docker compose up -d --no-deps --force-recreate backend
+ Container storagegenie-backend-1 Recreate 
+ Container storagegenie-backend-1 Recreated 
+ Container storagegenie-backend-1 Starting 
+ Container storagegenie-backend-1 Started 
+NEW container id/image:
+  40a117eaff0c54f7275a419ad39d417e962aaa6b89ccc274759888d31f60039d
+  sha256:ca29a3dc9a07822d663e4f15044ff53ec6504fb336d0dd9885bb4ad9c1304184  (image 665d200ba183 -> ca29a3dc9a07)
+=== HEALTH x6 2026-09-25T20:18:50Z ===
+health_1 {"status":"ok","db":"ok","storage":"ok"} HTTP_CODE=200
+health_2 {"status":"ok","db":"ok","storage":"ok"} HTTP_CODE=200
+health_3 {"status":"ok","db":"ok","storage":"ok"} HTTP_CODE=200
+health_4 {"status":"ok","db":"ok","storage":"ok"} HTTP_CODE=200
+health_5 {"status":"ok","db":"ok","storage":"ok"} HTTP_CODE=200
+health_6 {"status":"ok","db":"ok","storage":"ok"} HTTP_CODE=200
+(first attempt hit the wrong vhost -- Host=localhost/default returns 200; the canonical gate is
+ the Host-header check on storagegenie.dynv6.net, captured in §GATE below)
+=== alembic ===
+20260924_sg114_relation (head)
+=== GATE 2026-09-25T20:19:15Z ===
+http:80  Host=storagegenie.dynv6.net => code=301 redirect=https://storagegenie.dynv6.net/
+https:443 Host=storagegenie.dynv6.net => code=401 redirect=
+=== NEW BUILD SYMBOLS IN CONTAINER 2026-09-25T20:19:25Z ===
+record_jina_search_call= True
+request_was_sent= True
+monthly_cap_refusal= True
+JINA_LEDGER_PROVIDER= JinaSearch
+=== COUNTS AFTER RECREATE (pre-press) ===
+count_provider_call= 17
+count_job= 8
+count_enrich_snapshot= 2
+count_candidate= 7
+recorded_spend= 0.006700500000000001
+
+============================================================
+## 10. G3 LIVE JINA SEARCH (1 of <=2) — request shape + rows + figures
+============================================================
+$ POST /v1/enrich/01a0a467-eb0e-7b83-a227-af122dc9268b?household_id=01a0a029-1477-7ca0-b200-bce78a96c679
+HTTP_CODE=200
+fallback_fired=true; fallback_reason="off_degraded: OFF 503"; Jina request_url=https://s.jina.ai/Toothpaste
+fallback.no_result_reason="transport: ReadTimeout: The read operation timed out" (sent attempt)
+=== LIVE POST-PRESS DB PROOF 2026-09-25T20:20:12Z ===
+BEFORE recorded_spend= 0.006700500000000001 (captured 2026-09-25T20:16:59Z)
+AFTER  recorded_spend= 0.0072005
+delta= 0.0004999999999999996
+count_provider_call= 18
+count_job= 9
+count_enrich_snapshot= 4
+count_candidate= 8
+--- new Jina ledger row(s) ---
+id= 01a0da39-6e4a-7b10-bbb4-b915d4dd4b75 provider= JinaSearch model= jina-search cost= 0.0005 error_state= transport: ReadTimeout: The read operation timed out job_id= 01a0da39-6e42-7193-b477-50a0043e58e4 created_at= 2026-09-25 20:19:52
+usage_json= {"requests": 1, "tokens": 10000}
+output_payload= {"request_url": "https://s.jina.ai/Toothpaste", "status_code": null, "no_result_reason": "transport: ReadTimeout: The read operation timed out", "result_count": 0}
+input_hashes= {"query_sha256": "6fd4a497a2fb8ec2cc47b7150f40c9f7ace0aa9e3393456898073637e0f3673f"}
+--- new snapshot rows (all) ---
+snap id= 01a0cf79-a425-77c3-8769-e20d2cca1b08 source= off query= Toothpaste status= 200 reason=  retrieved_at= 2026-09-23T18:14:10.683775+00:00
+snap id= 01a0cf79-a427-7893-8c25-abdfee99b2bd source= jina query= Toothpaste status= None reason= transport: ConnectError: [Errno -2] Name or service not known retrieved_at= 2026-09-23T18:14:10.719341+00:00
+snap id= 01a0da39-6e44-7302-8830-70ac0d4827e3 source= off query= Toothpaste status= 503 reason= http_status: OFF returned HTTP 503: '<!DOCTYPE html>\n<html lang="en">\n\n<head> retrieved_at= 2026-09-25T20:19:36.960629+00:00
+snap id= 01a0da39-6e49-72d2-8a7a-7f28961d2072 source= jina query= Toothpaste status= None reason= transport: ReadTimeout: The read operation timed out retrieved_at= 2026-09-25T20:19:52.000599+00:00
+--- press job + candidate ---
+job_id= 01a0da39-6e42-7193-b477-50a0043e58e4 household_id= 01a0a029-1477-7ca0-b200-bce78a96c679 job_type= enrich created_at= 2026-09-25 20:19:52
+candidate_id= 01a0da39-6e4d-7210-b28d-380d8bd2ed92 job_id= 01a0da39-6e42-7193-b477-50a0043e58e4 state= proposed
+
+============================================================
+## 11. END HEALTH ({{HEALTH_CMD}})
+============================================================
+$ curl -s http://127.0.0.1:8003/v1/health
+{"status":"ok","db":"ok","storage":"ok"} HTTP 200   -> HEALTH: unchanged, OK

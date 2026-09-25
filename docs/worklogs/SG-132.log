@@ -1,0 +1,95 @@
+SG-132 — Jina cost-ledger wiring: running log (append-only)
+
+2026-09-25T20:07Z — orientation (reads only)
+- Work dir /home/andrei/StorageGenie; branch automation; BASE (origin/automation requested) resolved at
+  start = af36fa25e0ff42224428c7be131fdb3012fa5c53 (START_HEAD == BASE; clean tree).
+- Contract read in full: CODER.md + CODER_PRODUCTION.md + PACKET.md guards + PRODUCTION.md +
+  lang/python.md; recorded VERSION 0.37.0 == published checkout 1acd773. Equation:
+  recorded 0.37.0 == published 1acd7730e5fa6de5b7403aacce71207e9946461d; source path
+  /home/andrei/storagegenie-contract/{VERSION,HEAD}; RULES.sha256 matches installed rules.
+- Packet SG-132 read; settings travelled on the trigger (no packet coder:/model:/effort: line;
+  first 40 lines contain none -> no packet_settings_retired refusal).
+- Start health ({{HEALTH_CMD}}) BEFORE any change: {"status":"ok","db":"ok","storage":"ok"} HTTP 200.
+
+2026-09-25T20:07Z — G0 vendor re-check (keyless GETs only, $0)
+- Capture time 2026-09-25T20:07:36Z.
+- https://jina.ai/api-dashboard/pricing/ -> HTTP 200, <title>API Pricing - Jina AI</title>;
+  the Search row reads "starting from 10,000 tokens".
+- https://dash.jina.ai/api/v1/product -> HTTP 200, 17 active token packs. Parsed $/1M:
+  min 0.016949 (59B/$1000), max 1.00 (10M/$10); 4 packs at 0.02, one at 0.045455, one at
+  0.05 (1B/$50 USD,EUR), 0.08, 0.10, 0.40. This is the SAME spread SG-124 recorded (F-SG124-3:
+  "$0.0169-$1.00"), so the rate did NOT move against JINA_TOKEN_USD_PER_1M = 0.05. NOT BLOCKED.
+  The pre-existing caveat (0.05 is not the max pack rate) is carried from F-SG124-3, not new.
+
+2026-09-25T20:08Z — G0 call-site enumeration (criterion: any code path that can emit s.jina.ai)
+- Handed list verified by a whole-tree grep, not trusted. Production send path:
+  api/v1/enrich.py:191 -> fetch_with_fallback -> (jina.py:392) fetch_jina_search -> httpx GET.
+  build_jina_request only BUILDS the URL (no send). No other production module imports the Jina
+  client. Tests call fetch_jina_search directly but are not production paths.
+- Exactly one production Jina call site; wired there. Nothing to change left un-wired.
+
+2026-09-25T20:09Z — G0 caps inventory (PG-SC-06) + read-back trace (PG-SC-02)
+- Caps on the enrich path: (1) per-press ENRICH_PER_PRESS_CAP_USD=0.05 via enrich_cap_refusal
+  (caller-fed `last_spend_usd`); (2) monthly settings.sg_monthly_cap (None in live .env);
+  (3) estimator floor estimate_jina_search_cost() = $0.0005/request.
+- Joint outcome after wiring: each Jina request adds $0.0005 to the household month-boxed total;
+  the monthly gate refuses a press when already_recorded + $0.0005 > cap. Per-press gate unchanged.
+- Read-back trace: writer = snapshots.record_jina_search_call (new, production) -> provider_call;
+  reader = providers.reader._recorded_spend (month-boxed, joins provider_call -> job ->
+  household_id); display = the enrich endpoint's 402 monthly_cap_exceeded refusal.
+
+2026-09-25T20:10Z — design decisions (reported, not asked)
+- Ledger writer placed in services/enrich/snapshots.py (the enrichment persistence module, already
+  in the privacy allow-set) using jina.estimate_jina_search_cost; synthesize.py byte-untouched.
+- The enrich JOB is created before the ledger row so the row joins the household (job_id not None);
+  the reader joins through job, so a None-job row would be invisible to the cap.
+- Only a Jina request that actually left the machine is charged (`jina.request_was_sent`):
+  a missing-key refusal returns before the transport and records no cost row.
+- Added a monthly-cap gate to api/v1/enrich.py mirroring run_ai_extraction's durable month check
+  (the packet's success-delta demands the enrich trigger refuse on household spend at cap).
+  No cap VALUE changed; the gate is inert while sg_monthly_cap is None (the live default).
+
+2026-09-25T20:12Z — implementation
+- backend/app/services/enrich/snapshots.py: +record_jina_search_call (+ ledger constants).
+- backend/app/services/enrich/jina.py: +request_was_sent (pure predicate).
+- backend/api/v1/enrich.py: +monthly_cap_refusal; monthly gate after the per-press gate; job-first
+  reorder; ledger call on the sent Jina path.
+- backend/tests/test_sg132_jina_ledger_wiring.py: 7 offline tests (no live search).
+- ruff clean (touched files); candidate mypy 41 errors / 9 files (identical to BASE).
+
+2026-09-25T20:13Z — commit H1 (product + tests)
+- H1 = 4fde90ce49118c898f238c1c128d3b04bffb5e26. models/ + alembic/ diff vs BASE = 0 lines;
+  synthesize.py diff = 0 lines.
+
+2026-09-25T20:14Z — verification (raw in SG-132_verify.log)
+- FAIL-pre at BASE worktree /tmp/opencode/sg132-base (5 failed, 2 passed); PASS-post candidate
+  7 passed; targeted 118 passed; candidate suite 2 failed/624 passed; base suite 2 failed/617
+  passed (same 2 pre-existing decoder reds); base mypy == candidate mypy (41/9); ruff full clean.
+
+2026-09-25T20:17Z — G3 BEFORE
+- container 6b606c6a61e9; image 665d200ba183; provider_call=17 job=8 enrich_snapshot=2 candidate=7
+  evidence=13 guardrail_event=2 audit_event=68; recorded_spend=0.006700500000000001;
+  alembic 20260924_sg114_relation (head).
+
+2026-09-25T20:18Z — G3 rebuild + ONE recreate
+- BUILDX_CONFIG=/tmp/opencode/buildx docker compose build backend -> exit 0.
+- docker compose up -d --no-deps --force-recreate backend -> Recreated/Started once.
+- NEW container 40a117eaff0c54f7275a419ad39d417e962aaa6b89ccc274759888d31f60039d;
+  NEW image ca29a3dc9a07; RestartCount=0. In-container symbols record_jina_search_call /
+  request_was_sent / monthly_cap_refusal all present.
+- health exact-shape x6 200; gate http:80 Host=storagegenie.dynv6.net -> 301,
+  https:443 -> 401; alembic head unchanged; counts unchanged (no press yet).
+
+2026-09-25T20:19Z — G3 live Jina search (1 of <=2; $0 USD, token credit)
+- POST /v1/enrich/01a0a467-eb0e-7b83-a227-af122dc9268b?household_id=01a0a029-1477-7ca0-b200-
+  bce78a96c679 -> HTTP 200; OFF degraded 503 -> fallback fired; Jina REQUEST
+  https://s.jina.ai/Toothpaste sent and read-timed-out after 15s (transport degradation).
+- Ledger row 01a0da39-6e4a-7b10-bbb4-b915d4dd4b75 provider=JinaSearch model=jina-search
+  cost=0.0005 error_state="transport: ReadTimeout..." job_id=01a0da39-6e42-7193-b477-50a0043e58e4.
+- BEFORE recorded_spend 0.006700500000000001 -> AFTER 0.0072005 (delta ~0.0005); snapshot
+  01a0da39-6e49-72d2-8a7a-7f28961d2072 recorded. Press rows reported + left in place (PG-EV-06).
+- A second live search was NOT run: the first is conclusive (row + estimate + month delta +
+  snapshot all observed). Jina searches used = 1 of <=2.
+
+2026-09-25T20:20Z — end health ({{HEALTH_CMD}}) after the press: {"status":"ok","db":"ok",
+  "storage":"ok"} HTTP 200; HEALTH unchanged, OK. No command timed out or was killed.
