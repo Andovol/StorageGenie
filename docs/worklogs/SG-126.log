@@ -1,0 +1,55 @@
+SG-126 — Backup re-drill: prove the manual runbook still holds (read-only, restore-to-temp)
+Host /home/andrei/StorageGenie ; branch automation ; remote git@github.com:Andovol/StorageGenie.git
+BASE (packet ref origin/automation) start HEAD: e9b2ffd49962bbd1d09eb79185fc15ff90170875
+Contract: recorded 0.37.0 == published 0.37.0 ; source /home/andrei/storagegenie-contract/VERSION ;
+  installed RULES.md sha256 18de7fd7b3546bd7624b3a7b59a78bd629752816cd7fa8f1af6113d1bafc8d46 == payload RULES.sha256
+MODEL / effort: model deepseek-v4.1-flash (provider metadata banner "> build · deepseek-v4.1-flash" in
+  output/dispatch/SG-126.log; argv carries no --model = contract-legal omitted-model subset) ·
+  effort high (argv: opencode run --auto --dir /home/andrei/StorageGenie --variant high)
+Live clock: start 2026-09-25T13:46:39Z ; receipt fill ~2026-09-25T13:5xZ
+Budget: 120s ordinary · 600s suite/copy · 1800s overall (lane RUN_BUDGET_S=2100) ; expected ~900s ;
+  $0.000000 real metered (zero provider calls; no metered call exists on any path).
+
+Legs (elapsed vs budget):
+- G0 capability enumeration (DB readable, WAL, volume, sqlite3, temp, runbook freshness): ~45s (120s) — UNDER.
+- G1 consistent copy + BEFORE/AFTER counts + integrity + hashes: first attempt STOPed on README drift (F-SG126-1);
+  re-run green; ~30s incl. the drift discovery (600s) — UNDER.
+- G2 restore-to-temp + byte-equality + corrupted-copy seen-to-fail: <1s (inside the same script run; 600s) — UNDER.
+- G3 drill test re-run: 0.03s (600s) — UNDER (3 passed).
+- G3 files + receipt: from ~13:48Z (1800s overall).
+No command hit its bound; nothing killed; no interactive command.
+
+Premise verification (packet hypotheses vs disk, raw in __verify.log):
+- Live DB /home/andrei/StorageGenie/data/db/storagegenie.db: CONFIRMED readable (mode -rw-------, andrei),
+  WAL mode (`PRAGMA journal_mode` -> wal; -shm 32K / -wal 52.3K present), `PRAGMA integrity_check` -> ok.
+- Container path /data/db/storagegenie.db: the bind mount of ./data/db (docker inspect Mounts, RW). No
+  `ProtectSystem=strict` directive exists in docker-compose.yml or a systemd unit — the packet's premise does
+  NOT reproduce on this host; no container exec was performed (constraint), host readability is the operative leg.
+- Storage volume: `docker volume inspect storagegenie_storage_data` -> Mountpoint
+  /home/andrei/.local/share/docker/volumes/storagegenie_storage_data/_data, local driver, READABLE, 29 files /
+  6035868 B. Host `data/storage` is an EMPTY directory (live storage is the named volume only).
+- sqlite3 3.45.1 present; docker 29.6.2 present; temp writable (/tmp, 122G avail).
+- Runbook freshness: script `--help` exit 0; test file present; README paths exist (`backend/venv/` present).
+  DRIFT FOUND: README command appended `/_data` to `{{.Mountpoint}}` (already `_data`) -> nonexistent path
+  (F-SG126-1). Repaired surgically (one line, quoted in report).
+- `.rules-cache/` absent in this worktree: CONFIRMED (contract source = /home/andrei/storagegenie-contract/).
+
+Changes (within ceiling):
+- README.md: 1-line surgical drift repair (F-SG126-1) — remove the doubled `/_data` suffix in the
+  backup/restore runbook command. Quoted in the report.
+- docs/worklogs/SG-126.log, SG-126_report.md, SG-126_verify.log: NEW.
+No app code / script / test changes; drill script and test are unchanged SG-086 artifacts.
+
+Results:
+- G0 green: all legs quoted; only stop-ground is a red leg (none red).
+- BEFORE per-table counts (28 tables) + integrity ok quoted; AFTER identical; live DB size/mtime unchanged
+  (606208 B, mtime 2026-09-24 11:42:31Z) — reads only, disclosed not a write.
+- Backup sha256 8a20713603f645be1d7cccfcbaa2fee1f8356f72b0e9f38166afa9ad8c7bac46 (606208 B); backup ==
+  restored identical; restored integrity ok; counts + named rows match BEFORE; storage 29 files / 6035868 B
+  hash-identical source==backup==restored.
+- Corrupted-copy equality gate seen-to-fail (b36300ad... vs 8a207136..., quoted); temp work-dir removed.
+- Runbook verdict: DRIFT-REPAIRED (F-SG126-1, surgical 1-line README hunk quoted).
+- Spend $0.000000 real (zero provider calls; no live artifact to contain — PG-PR-04 stated).
+
+No command hit its bound; nothing killed. Consumed by: docs/worklogs/SG-126_report.md,
+docs/worklogs/SG-126_verify.log.

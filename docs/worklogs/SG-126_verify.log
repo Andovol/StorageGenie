@@ -1,0 +1,194 @@
+SG-126 verify log — raw outputs, hashes, counts (live clock; no fixed dates except packet authoring metadata)
+Contract echo: 0.37.0 ; source /home/andrei/storagegenie-contract/VERSION
+Contract integrity: sha256sum /home/andrei/storagegenie-contract/RULES.md
+  18de7fd7b3546bd7624b3a7b59a78bd629752816cd7fa8f1af6113d1bafc8d46  RULES.md
+  payload RULES.sha256: 18de7fd7b3546bd7624b3a7b59a78bd629752816cd7fa8f1af6113d1bafc8d46 RULES.md  == MATCH
+
+CO-42 verbatim (host contract source /home/andrei/storagegenie-contract/CODER_PRODUCTION.md:26):
+  "- `CO-42` **Restoring production from backup is an incident, never silent cleanup.**"
+
+================================================================================
+[G0] capability enumeration (non-mutating)
+================================================================================
+$ stat -c '%n size=%s mode=%A mtime=%y' data/db/storagegenie.db
+data/db/storagegenie.db size=606208 mode=-rw------- mtime=2026-09-24 11:42:31.325981792 +0000
+
+$ sqlite3 "file:/home/andrei/StorageGenie/data/db/storagegenie.db?mode=ro" "PRAGMA journal_mode;"
+wal
+$ sqlite3 "file:/home/andrei/StorageGenie/data/db/storagegenie.db?mode=ro" "PRAGMA integrity_check;"
+ok
+
+$ docker volume inspect storagegenie_storage_data --format '{{.Name}} {{.Mountpoint}} {{.Driver}}'
+storagegenie_storage_data /home/andrei/.local/share/docker/volumes/storagegenie_storage_data/_data local
+
+$ docker inspect storagegenie-backend-1 --format '{{json .HostConfig.ReadonlyRootfs}} {{json .Mounts}}'
+false [{"Type":"volume","Name":"storagegenie_storage_data","Source":"/home/andrei/.local/share/docker/volumes/storagegenie_storage_data/_data","Destination":"/data/storage","Driver":"local","Mode":"rw","RW":true,"Propagation":""},{"Type":"bind","Source":"/home/andrei/StorageGenie/data/db","Destination":"/data/db","Mode":"rw","RW":true,"Propagation":"rprivate"}]
+
+$ sqlite3 --version
+3.45.1 2024-01-30 16:01:20 e876e51a0ed5c5b3126f52e532044363a014bc594cfefa87ffb5b82257ccalt1 (64-bit)
+$ docker --version
+Docker version 29.6.2, build dfc4efb
+$ df -h /tmp
+/dev/vda1       232G  110G  122G  48% /tmp
+
+Runbook freshness:
+$ backend/venv/bin/... (python3) backend/scripts/backup_restore_drill.py --help   # exit 0, --prod-db/--prod-storage/--work-dir
+$ ls -d /home/andrei/StorageGenie/venv /home/andrei/StorageGenie/backend/venv
+/home/andrei/StorageGenie/venv/
+/home/andrei/StorageGenie/backend/venv/
+$ ls backend/scripts/backup_restore_drill.py backend/tests/test_backup_drill.py
+present (644)
+
+================================================================================
+[G0/G1] FEATURE FINDING F-SG126-1 — README runbook drift (first attempt STOP)
+================================================================================
+$ VOL=$(docker volume inspect storagegenie_storage_data --format '{{.Mountpoint}}')/_data
+  # exactly the README command (README.md:130 at BASE)
+$ du -sh "$VOL"
+du: cannot access '/home/andrei/.local/share/docker/volumes/storagegenie_storage_data/_data/_data': No such file or directory
+$ backend/venv/bin/python backend/scripts/backup_restore_drill.py --prod-db data/db/storagegenie.db --prod-storage "$VOL"
+STOP: production storage not found: /home/andrei/.local/share/docker/volumes/storagegenie_storage_data/_data/_data
+drill_exit=1
+Proven cause: docker `{{.Mountpoint}}` already ends in `/_data`; README appended a second `/_data`.
+SG-086's own verify log ran the drill with the undoubled path and green; the README hunk (commit 6eb805b)
+diverged. Repair = remove the trailing `/_data` (one line). Re-run below.
+
+================================================================================
+[G1/G2] drill re-run with the corrected (undoubled) path — RAW
+================================================================================
+$ VOL=$(docker volume inspect storagegenie_storage_data --format '{{.Mountpoint}}')
+$ du -sh "$VOL"
+5.9M	/home/andrei/.local/share/docker/volumes/storagegenie_storage_data/_data
+
+$ sqlite3 "file:data/db/storagegenie.db?mode=ro" "SELECT id, household_id, storage_key FROM evidence ORDER BY id LIMIT 3;"
+01a0a467-eacf-7e13-bbd0-078b1bc93860|01a0a029-1477-7ca0-b200-bce78a96c679|01a0a029-1477-7ca0-b200-bce78a96c679/60/6050ed6f7f83bf90722057f1a376b1adcfc8099de4f8995e5cb85ee0ae100630.jpg
+01a0afaa-145d-7f21-b647-703aaa693f5a|01a0a029-1477-7ca0-b200-bce78a96c679|01a0a029-1477-7ca0-b200-bce78a96c679/6c/6c4cbf2e7c3bc3ccdcbc63873fad85f87bacd8ceec533a5e3de2f478ab1f8279.png
+01a0c445-35b0-7a53-9b8d-22fa3d6523de|01a0a029-1477-7ca0-b200-bce78a96c679|01a0a029-1477-7ca0-b200-bce78a96c679/b6/b64034e5c91212098f9895535b5ba45e752bfdf70c24c4cd296b2007823f06bd.png
+-- asset --
+01a0a467-eb0e-7b83-a227-af122dc9268b|01a0a029-1477-7ca0-b200-bce78a96c679|Toothpaste
+01a0c446-44c9-7b82-9d1c-2b51fa518191|01a0a029-1477-7ca0-b200-bce78a96c679|CEAFĂ DE PORC
+01a0c47f-fbb3-7db1-b6f3-aa52d20aa6a0|01a0a029-1477-7ca0-b200-bce78a96c679|UHT Lapte 3,5% grăsime
+
+$ backend/venv/bin/python backend/scripts/backup_restore_drill.py --prod-db data/db/storagegenie.db --prod-storage "$VOL"
+work-dir    = /tmp/sg086-drill-6w7lc7cl
+backup-dir  = /tmp/sg086-drill-6w7lc7cl/backup
+restore-dir = /tmp/sg086-drill-6w7lc7cl/restore
+[G1.1] BEFORE per-table counts + integrity (read-only, live)
+  live alembic_version	1
+  live assertion	28
+  live asset	6
+  live asset_evidence	12
+  live asset_fts	6
+  live asset_fts_config	1
+  live asset_fts_data	8
+  live asset_fts_docsize	6
+  live asset_fts_idx	6
+  live asset_location	1
+  live asset_relation	1
+  live audit_event	68
+  live candidate	7
+  live enrich_snapshot	2
+  live evidence	13
+  live guardrail_event	2
+  live household	1
+  live idempotency_key	9
+  live job	8
+  live job_step	56
+  live location	1
+  live observation	16
+  live planning_suggestion	0
+  live provider_call	17
+  live review_task	6
+  live saved_search	0
+  live source_attribution	0
+  live user	2
+  live integrity_check=ok
+[G1.2] consistent copy via SQLite native backup API (read-only source)
+  backup sha256=8a20713603f645be1d7cccfcbaa2fee1f8356f72b0e9f38166afa9ad8c7bac46 bytes=606208
+  backup integrity_check=ok
+[G1.3] storage recursive copy (read-only source)
+  source files=29 bytes=6035868
+  backup files=29 bytes=6035868
+  sample 01a0a029-1477-7ca0-b200-bce78a96c679/05/052a5f7b47d0556aace108ea32fbd67f8641c9e940f4a7ef69e1cc92e75a1a45.png 052a5f7b47d0556aace108ea32fbd67f8641c9e940f4a7ef69e1cc92e75a1a45
+  sample 01a0a029-1477-7ca0-b200-bce78a96c679/05/052a5f7b47d0556aace108ea32fbd67f8641c9e940f4a7ef69e1cc92e75a1a45_thumb256.png 6519125a21d49c4801e8af235a151851844926e2da15b0562d749470ec159358
+  sample 01a0a029-1477-7ca0-b200-bce78a96c679/05/052a5f7b47d0556aace108ea32fbd67f8641c9e940f4a7ef69e1cc92e75a1a45_thumb512.png 650961957ddf58777af343179af695b3beab023f89a85629a9b958776445c64f
+[G2.1] restore into a fresh temp dir (never the live paths)
+  backup == restored sha256=8a20713603f645be1d7cccfcbaa2fee1f8356f72b0e9f38166afa9ad8c7bac46
+  restored integrity_check=ok
+  restored evidence: ('01a0a467-eacf-7e13-bbd0-078b1bc93860', '01a0a029-1477-7ca0-b200-bce78a96c679', '01a0a029-1477-7ca0-b200-bce78a96c679/60/6050ed6f7f83bf90722057f1a376b1adcfc8099de4f8995e5cb85ee0ae100630.jpg')
+  restored evidence: ('01a0afaa-145d-7f21-b647-703aaa693f5a', '01a0a029-1477-7ca0-b200-bce78a96c679', '01a0a029-1477-7ca0-b200-bce78a96c679/6c/6c4cbf2e7c3bc3ccdcbc63873fad85f87bacd8ceec533a5e3de2f478ab1f8279.png')
+  restored evidence: ('01a0c445-35b0-7a53-9b8d-22fa3d6523de', '01a0a029-1477-7ca0-b200-bce78a96c679', '01a0a029-1477-7ca0-b200-bce78a96c679/b6/b64034e5c91212098f9895535b5ba45e752bfdf70c24c4cd296b2007823f06bd.png')
+  restored asset: ('01a0a467-eb0e-7b83-a227-af122dc9268b', '01a0a029-1477-7ca0-b200-bce78a96c679', 'Toothpaste')
+  restored asset: ('01a0c446-44c9-7b82-9d1c-2b51fa518191', '01a0a029-1477-7ca0-b200-bce78a96c679', 'CEAFĂ DE PORC')
+  restored asset: ('01a0c47f-fbb3-7db1-b6f3-aa52d20aa6a0', '01a0a029-1477-7ca0-b200-bce78a96c679', 'UHT Lapte 3,5% grăsime')
+  storage backup == restored: file hashes identical
+[G2.2] seen-to-fail: a deliberately corrupted temp copy must fail the equality gate
+  equality gate FAILED as expected: byte inequality: /tmp/sg086-drill-6w7lc7cl/backup/storagegenie.db=8a20713603f645be1d7cccfcbaa2fee1f8356f72b0e9f38166afa9ad8c7bac46 vs /tmp/sg086-drill-6w7lc7cl/restore/corrupted.db=b36300ada1cfaa3c3fdefed8bde55968cf44c682c20ab04513bd07575b8eef70
+  corrupted artifact discarded
+[G1.4] AFTER per-table counts + integrity (read-only, live)
+  live alembic_version	1
+  live assertion	28
+  live asset	6
+  live asset_evidence	12
+  live asset_fts	6
+  live asset_fts_config	1
+  live asset_fts_data	8
+  live asset_fts_docsize	6
+  live asset_fts_idx	6
+  live asset_location	1
+  live asset_relation	1
+  live audit_event	68
+  live candidate	7
+  live enrich_snapshot	2
+  live evidence	13
+  live guardrail_event	2
+  live household	1
+  live idempotency_key	9
+  live job	8
+  live job_step	56
+  live location	1
+  live observation	16
+  live planning_suggestion	0
+  live provider_call	17
+  live review_task	6
+  live saved_search	0
+  live source_attribution	0
+  live user	2
+  live integrity_check=ok
+  production-untouched: BEFORE == AFTER (counts identical)
+work-dir removed: /tmp/sg086-drill-6w7lc7cl
+drill_exit=0
+
+$ sqlite3 "file:data/db/storagegenie.db?mode=ro" "SELECT ... evidence ORDER BY id LIMIT 3;"   # AFTER
+(identical to BEFORE rows quoted above; asset rows identical incl. Toothpaste)
+$ stat -c '%n size=%s mode=%A mtime=%y' data/db/storagegenie.db    # AFTER (mtime disclosure)
+data/db/storagegenie.db size=606208 mode=-rw------- mtime=2026-09-24 11:42:31.325981792 +0000
+  -> logical counts + integrity identical; file size + mtime unmoved (no WAL checkpoint forced).
+
+================================================================================
+[G3] drill test re-run (temp fixtures only; no production path touched)
+================================================================================
+$ backend/venv/bin/python -m pytest backend/tests/test_backup_drill.py -q
+...                                                                      [100%]
+3 passed in 0.03s
+pytest_exit=0
+
+================================================================================
+[G3] PG-SC-11 — grep the test tree for end-relative assertions over drill/README paths
+================================================================================
+$ grep -rn "backup_restore_drill|test_backup_drill|Backup and restore drill|storagegenie_storage_data" backend/tests/
+backend/tests/test_backup_drill.py:4:production proof (the live SQLite file and the ``storagegenie_storage_data``
+backend/tests/test_backup_drill.py:7:test are loaded from ``backend/scripts/backup_restore_drill.py``, the operator
+backend/tests/test_backup_drill.py:22:DRILL_PATH = BACKEND_DIR / "scripts" / "backup_restore_drill.py"
+backend/tests/test_backup_drill.py:26:    spec = importlib.util.spec_from_file_location("sg086_backup_restore_drill", DRILL_PATH)
+(plus backend/tests/__pycache__/test_backup_drill.cpython-312-pytest-9.1.1.pyc — compiled artifact, not source)
+Verdicts: :4 and :7 are docstrings (no assertion); :22 is DRILL_PATH anchored to BACKEND_DIR = Path(__file__).resolve().parent.parent
+(robust, not an end-relative README/url pin); :26 consumes DRILL_PATH. NO assertion over the README path or
+the runbook command exists — no hit can fail on README drift (which is exactly why F-SG126-1 was invisible to CI).
+
+================================================================================
+[G3] contract echo
+================================================================================
+VERSION          -> 0.37.0
+installed rules  -> /home/andrei/storagegenie-contract/RULES.md sha256 matches payload RULES.sha256
+recorded == published: 0.37.0 == 0.37.0 (packet states published checkout 1acd773, D15 adoption)

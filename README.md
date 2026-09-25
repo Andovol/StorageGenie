@@ -127,7 +127,7 @@ Resolve the volume's host path with
 ```sh
 backend/venv/bin/python backend/scripts/backup_restore_drill.py \
   --prod-db data/db/storagegenie.db \
-  --prod-storage "$(docker volume inspect storagegenie_storage_data --format '{{.Mountpoint}}')/_data"
+  --prod-storage "$(docker volume inspect storagegenie_storage_data --format '{{.Mountpoint}}')"
 ```
 
 The script proves the restore by `sha256sum` equality of the backup and the
