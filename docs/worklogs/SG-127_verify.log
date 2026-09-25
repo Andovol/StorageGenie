@@ -142,5 +142,30 @@ live image evidence served `.jpg` thumb: only image/jpeg source; all image/png e
 # ---------------------------------------------------------------------------
 # Receipt (pushed to refs/notes/storagegenie-coder-reports; shown from mapped ref)
 # ---------------------------------------------------------------------------
-«filled in the receipt follow-up commit — pasted verbatim there and in the report»
-note=«pending follow-up commit»
+$ git push origin automation
+To github.com:Andovol/StorageGenie.git
+   2939167..1902c44  automation -> automation
+push_automation_exit=0
+
+$ git notes --ref=refs/notes/storagegenie-coder-reports show 1902c4460bccb2aba9eb370fa358202c1c61dfbd   # precheck
+error: no note found for object 1902c4460bccb2aba9eb370fa358202c1c61dfbd.
+precheck_exit=1
+
+$ git notes --ref=refs/notes/storagegenie-coder-reports add -m "Dispatch-ID: SG-127 | Report: docs/worklogs/SG-127_report.md | Work-HEAD: 1902c4460bccb2aba9eb370fa358202c1c61dfbd" 1902c4460bccb2aba9eb370fa358202c1c61dfbd
+note_add_exit=0
+
+$ git push origin refs/notes/storagegenie-coder-reports
+To github.com:Andovol/StorageGenie.git
+   0003b55..6945140  refs/notes/storagegenie-coder-reports -> refs/notes/storagegenie-coder-reports
+push_notes_exit=0
+
+$ git fetch origin refs/notes/storagegenie-coder-reports:refs/notes/sg127-verify
+From github.com:Andovol/StorageGenie
+ * [new ref]         refs/notes/storagegenie-coder-reports -> refs/notes/sg127-verify
+fetch_exit=0
+
+$ git notes --ref=refs/notes/sg127-verify show 1902c4460bccb2aba9eb370fa358202c1c61dfbd
+Dispatch-ID: SG-127 | Report: docs/worklogs/SG-127_report.md | Work-HEAD: 1902c4460bccb2aba9eb370fa358202c1c61dfbd
+show_exit=0
+
+note=yes

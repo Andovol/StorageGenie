@@ -13,8 +13,7 @@ Source `/home/andrei/storagegenie-contract/VERSION` reads `0.37.0`; checkout HEA
 source path used.
 **BASE REF:** `origin/automation` — **BASE COMMIT (resolved):** `29391674433b4e4cbeed1410dd286bbb4374b5a4`
 (start HEAD; worktree clean).
-**WORK_HEAD:** `«filled in the receipt follow-up commit»` (the commit carrying this report + log + verify log;
-hash pasted in the receipt block below after the add/show).
+**WORK_HEAD:** `1902c4460bccb2aba9eb370fa358202c1c61dfbd` (the commit carrying this report + log + verify log).
 **Work dir:** `/home/andrei/StorageGenie` · **Remote:** `git@github.com:Andovol/StorageGenie.git` (as on host).
 **Spend:** real `$0.000000` vs `$0` bound — zero provider calls, no metered call exists on any path.
 **Network:** none (no fetch, no foreign image, no named runtime). **DB:** no feature writes; live reads only
@@ -120,13 +119,37 @@ the pristine BASE tree (`2 failed, 5 passed`), so they are environment reds, nev
 ## Receipt note on the notes ref (M20-corrected block)
 
 Work pushed to `automation`, worktree clean (`CO-55`). No push to `storagegenie-evidence`; no
-`{{RECEIPT_CMD}}`. Note added on WORK_HEAD (`«WORK_HEAD»`); notes ref pushed; verified against the
+`{{RECEIPT_CMD}}`. Note added on WORK_HEAD (`1902c4460bccb2aba9eb370fa358202c1c61dfbd`); notes ref pushed; verified against the
 explicitly fetched **mapped** ref (`refs/notes/sg127-verify`); executed output pasted verbatim below
 (`SG-127_verify.log` also carries it). Existing-note refusal is a STOP; the precheck showed no existing note.
 Final tip dual-annotated (SG-092 precedent, note-anchor inoculation). Final line `note=yes`.
 
 ```text
-«pasted note add / push / mapped-fetch / show output — filled in the receipt follow-up commit»
+$ git push origin automation
+To github.com:Andovol/StorageGenie.git
+   2939167..1902c44  automation -> automation
+push_automation_exit=0
+
+$ git notes --ref=refs/notes/storagegenie-coder-reports show 1902c4460bccb2aba9eb370fa358202c1c61dfbd   # precheck
+error: no note found for object 1902c4460bccb2aba9eb370fa358202c1c61dfbd.
+precheck_exit=1
+
+$ git notes --ref=refs/notes/storagegenie-coder-reports add -m "Dispatch-ID: SG-127 | Report: docs/worklogs/SG-127_report.md | Work-HEAD: 1902c4460bccb2aba9eb370fa358202c1c61dfbd" 1902c4460bccb2aba9eb370fa358202c1c61dfbd
+note_add_exit=0
+
+$ git push origin refs/notes/storagegenie-coder-reports
+To github.com:Andovol/StorageGenie.git
+   0003b55..6945140  refs/notes/storagegenie-coder-reports -> refs/notes/storagegenie-coder-reports
+push_notes_exit=0
+
+$ git fetch origin refs/notes/storagegenie-coder-reports:refs/notes/sg127-verify
+From github.com:Andovol/StorageGenie
+ * [new ref]         refs/notes/storagegenie-coder-reports -> refs/notes/sg127-verify
+fetch_exit=0
+
+$ git notes --ref=refs/notes/sg127-verify show 1902c4460bccb2aba9eb370fa358202c1c61dfbd
+Dispatch-ID: SG-127 | Report: docs/worklogs/SG-127_report.md | Work-HEAD: 1902c4460bccb2aba9eb370fa358202c1c61dfbd
+show_exit=0
 ```
 
 ## Budget — actual vs bound (units; live clock, `PG-PR-06`)
