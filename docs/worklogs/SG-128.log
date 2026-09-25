@@ -1,0 +1,8 @@
+SG-128.log — orphan thumbnail cleanup (D17/D18 L3); enumerate-then-delete
+Contract 0.37.0 (recorded AGENTS.md) | BASE origin/automation eb3d4fa | model opencode-go/deepseek-v4.1-flash (provider metadata) | effort high (argv --variant high) | $0.000000
+
+[G0 14:05Z] 129s/120s ordinary (incl. recon) — volume storagegenie_storage_data resolved read-only to /home/andrei/.local/share/docker/volumes/storagegenie_storage_data/_data; 16 *_thumb* hits (14 png ORPHAN, 2 jpg LIVE); suffix dist {'png':14,'jpg':2}; reader premise re-verified (thumbnail_path -> <stem>_thumb<size>.jpg; evidence.py:120 FileResponse image/jpeg).
+[G1 14:11Z] <1s — attempted exact-path rm; DENIED: "Read-only file system" (EROFS). Root cause: agent sandbox mounts `/` ro, only /home/andrei/StorageGenie rw (findmnt/touch proof in verify log). Unanswered per standing line; NOT routed around (no docker exec, no sudo). Deleted paths: 0. Bytes reclaimed: 0.
+[G2 14:12Z] ~3s — BEFORE==AFTER status table (8 image evidence x 2 sizes): PNG thumbs 404->404 (pre-existing legacy gap), JPG thumbs 200->200. No 200->404 flip, but TRIVIALLY so (nothing deleted) -> reported as non-result, not a pass.
+[G3 14:13Z] — originals sha256 before==after (13/13 identical); 3 worklog files written; BLOCKED commit + notes-ref receipt.
+Budget: G0 ~129s, G1 <1s (denied), G2 ~3s, docs ~0s; total well under 600s overall.

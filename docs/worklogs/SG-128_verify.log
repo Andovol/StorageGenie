@@ -1,0 +1,188 @@
+SG-128 verify log — orphan thumbnail cleanup (enumerate-then-delete)
+Contract: 0.37.0 (recorded AGENTS.md; .rules-cache/ ABSENT — see report F-SG128-1)
+BASE (origin/automation resolved): eb3d4fa5900a243de32db821161a7785eb013f46
+Model/effort: opencode-go/deepseek-v4.1-flash from provider metadata (opencode.log modelID=deepseek-v4.1-flash, providerID=opencode-go); effort high from process argv `--variant high`
+Spend: $0.000000 (real; zero metered calls)
+Clock (UTC): 2026-09-25T14:12:57Z
+
+=== G0 — VOLUME RESOLUTION (read-only) ===
+$ docker volume inspect storagegenie_storage_data
+[
+    {
+        "CreatedAt": "2026-09-11T14:26:29Z",
+        "Driver": "local",
+        "Labels": {
+            "com.docker.compose.config-hash": "af101bdfa57e5487aed65996a9db0617f4998d7a920b134b9c5a544b6687a31b",
+            "com.docker.compose.project": "storagegenie",
+            "com.docker.compose.version": "5.3.1",
+            "com.docker.compose.volume": "storage_data"
+        },
+        "Mountpoint": "/home/andrei/.local/share/docker/volumes/storagegenie_storage_data/_data",
+        "Name": "storagegenie_storage_data",
+        "Options": null,
+        "Scope": "local"
+    }
+]
+
+=== G0 — FULL *_thumb* ENUMERATION (rule: *_thumb<digits>.* ; suffix .jpg => LIVE, else ORPHAN) ===
+ORPHAN	png	19230	/home/andrei/.local/share/docker/volumes/storagegenie_storage_data/_data/01a0a029-1477-7ca0-b200-bce78a96c679/05/052a5f7b47d0556aace108ea32fbd67f8641c9e940f4a7ef69e1cc92e75a1a45_thumb256.png
+ORPHAN	png	62679	/home/andrei/.local/share/docker/volumes/storagegenie_storage_data/_data/01a0a029-1477-7ca0-b200-bce78a96c679/05/052a5f7b47d0556aace108ea32fbd67f8641c9e940f4a7ef69e1cc92e75a1a45_thumb512.png
+LIVE	jpg	7113	/home/andrei/.local/share/docker/volumes/storagegenie_storage_data/_data/01a0a029-1477-7ca0-b200-bce78a96c679/60/6050ed6f7f83bf90722057f1a376b1adcfc8099de4f8995e5cb85ee0ae100630_thumb256.jpg
+LIVE	jpg	22254	/home/andrei/.local/share/docker/volumes/storagegenie_storage_data/_data/01a0a029-1477-7ca0-b200-bce78a96c679/60/6050ed6f7f83bf90722057f1a376b1adcfc8099de4f8995e5cb85ee0ae100630_thumb512.jpg
+ORPHAN	png	24681	/home/andrei/.local/share/docker/volumes/storagegenie_storage_data/_data/01a0a029-1477-7ca0-b200-bce78a96c679/63/63b3ec707f184a6c4026948701b0cc3d074cea5aa8449bcb1d22711891a9bd09_thumb256.png
+ORPHAN	png	83612	/home/andrei/.local/share/docker/volumes/storagegenie_storage_data/_data/01a0a029-1477-7ca0-b200-bce78a96c679/63/63b3ec707f184a6c4026948701b0cc3d074cea5aa8449bcb1d22711891a9bd09_thumb512.png
+ORPHAN	png	7443	/home/andrei/.local/share/docker/volumes/storagegenie_storage_data/_data/01a0a029-1477-7ca0-b200-bce78a96c679/6c/6c4cbf2e7c3bc3ccdcbc63873fad85f87bacd8ceec533a5e3de2f478ab1f8279_thumb256.png
+ORPHAN	png	16174	/home/andrei/.local/share/docker/volumes/storagegenie_storage_data/_data/01a0a029-1477-7ca0-b200-bce78a96c679/6c/6c4cbf2e7c3bc3ccdcbc63873fad85f87bacd8ceec533a5e3de2f478ab1f8279_thumb512.png
+ORPHAN	png	49762	/home/andrei/.local/share/docker/volumes/storagegenie_storage_data/_data/01a0a029-1477-7ca0-b200-bce78a96c679/71/71901cac327fdd76926e36aa2a7889b2b17fb4e2619ca92d97f86d53aac0de63_thumb256.png
+ORPHAN	png	172544	/home/andrei/.local/share/docker/volumes/storagegenie_storage_data/_data/01a0a029-1477-7ca0-b200-bce78a96c679/71/71901cac327fdd76926e36aa2a7889b2b17fb4e2619ca92d97f86d53aac0de63_thumb512.png
+ORPHAN	png	34745	/home/andrei/.local/share/docker/volumes/storagegenie_storage_data/_data/01a0a029-1477-7ca0-b200-bce78a96c679/b6/b64034e5c91212098f9895535b5ba45e752bfdf70c24c4cd296b2007823f06bd_thumb256.png
+ORPHAN	png	118238	/home/andrei/.local/share/docker/volumes/storagegenie_storage_data/_data/01a0a029-1477-7ca0-b200-bce78a96c679/b6/b64034e5c91212098f9895535b5ba45e752bfdf70c24c4cd296b2007823f06bd_thumb512.png
+ORPHAN	png	22675	/home/andrei/.local/share/docker/volumes/storagegenie_storage_data/_data/01a0a029-1477-7ca0-b200-bce78a96c679/b6/b6e11ecce9be93ee2470ad75143e8e1d89489da1e128baecc89688ae9e3a833e_thumb256.png
+ORPHAN	png	73011	/home/andrei/.local/share/docker/volumes/storagegenie_storage_data/_data/01a0a029-1477-7ca0-b200-bce78a96c679/b6/b6e11ecce9be93ee2470ad75143e8e1d89489da1e128baecc89688ae9e3a833e_thumb512.png
+ORPHAN	png	48013	/home/andrei/.local/share/docker/volumes/storagegenie_storage_data/_data/01a0a029-1477-7ca0-b200-bce78a96c679/f9/f9d71a40b1c5ac455fe568576c77b042abc4755c65dce99a9dfcb25f64a8f367_thumb256.png
+ORPHAN	png	171447	/home/andrei/.local/share/docker/volumes/storagegenie_storage_data/_data/01a0a029-1477-7ca0-b200-bce78a96c679/f9/f9d71a40b1c5ac455fe568576c77b042abc4755c65dce99a9dfcb25f64a8f367_thumb512.png
+suffix distribution of *_thumb* hits: {'png': 14, 'jpg': 2}
+total *thumb* hits: 16  orphans: 14  live: 2
+(ORPHAN bytes sum = 904254; no other suffix class exists among *_thumb* hits; no expected orphan is actually .jpg — rule holds for every candidate)
+
+=== G0 — READER PREMISE (re-verified in-tree) ===
+backend/app/storage/local_store.py:10-16
+  def thumbnail_path(storage_key: str, size: int) -> Path:
+      p = Path(settings.storage_root) / storage_key
+      return p.with_name(f"{p.stem}_thumb{size}.jpg")
+backend/app/api/v1/evidence.py:107-120 (GET /v1/evidence/{id}/thumb/{size})
+  tp = thumbnail_path(ev.storage_key, size)
+  if not tp.exists(): raise HTTPException(status_code=404, detail="Thumbnail not found")
+  return FileResponse(tp, media_type="image/jpeg")
+backend/app/api/v1/evidence.py:117 -> only `thumbnail_path` resolver feeds the thumb route -> resolves ONLY .jpg.
+backend/app/main.py: only file-serving besides routes is _static_file() over SG_STATIC_DIR=/app/static (UI bundle); it never touches /data/storage.
+VERDICT: reader resolves ONLY the `.jpg` path -> deleting non-.jpg rule-members cannot flip a served status. Premise HOLDS.
+
+=== G1 — EXACT-PATH DELETE LIST (no globs at delete time) ===
+rm -v <DATA>/01a0a029-1477-7ca0-b200-bce78a96c679/05/052a5f7b47d0556aace108ea32fbd67f8641c9e940f4a7ef69e1cc92e75a1a45_thumb256.png
+rm -v <DATA>/01a0a029-1477-7ca0-b200-bce78a96c679/05/052a5f7b47d0556aace108ea32fbd67f8641c9e940f4a7ef69e1cc92e75a1a45_thumb512.png
+rm -v <DATA>/01a0a029-1477-7ca0-b200-bce78a96c679/63/63b3ec707f184a6c4026948701b0cc3d074cea5aa8449bcb1d22711891a9bd09_thumb256.png
+rm -v <DATA>/01a0a029-1477-7ca0-b200-bce78a96c679/63/63b3ec707f184a6c4026948701b0cc3d074cea5aa8449bcb1d22711891a9bd09_thumb512.png
+rm -v <DATA>/01a0a029-1477-7ca0-b200-bce78a96c679/6c/6c4cbf2e7c3bc3ccdcbc63873fad85f87bacd8ceec533a5e3de2f478ab1f8279_thumb256.png
+rm -v <DATA>/01a0a029-1477-7ca0-b200-bce78a96c679/6c/6c4cbf2e7c3bc3ccdcbc63873fad85f87bacd8ceec533a5e3de2f478ab1f8279_thumb512.png
+rm -v <DATA>/01a0a029-1477-7ca0-b200-bce78a96c679/71/71901cac327fdd76926e36aa2a7889b2b17fb4e2619ca92d97f86d53aac0de63_thumb256.png
+rm -v <DATA>/01a0a029-1477-7ca0-b200-bce78a96c679/71/71901cac327fdd76926e36aa2a7889b2b17fb4e2619ca92d97f86d53aac0de63_thumb512.png
+rm -v <DATA>/01a0a029-1477-7ca0-b200-bce78a96c679/b6/b64034e5c91212098f9895535b5ba45e752bfdf70c24c4cd296b2007823f06bd_thumb256.png
+rm -v <DATA>/01a0a029-1477-7ca0-b200-bce78a96c679/b6/b64034e5c91212098f9895535b5ba45e752bfdf70c24c4cd296b2007823f06bd_thumb512.png
+rm -v <DATA>/01a0a029-1477-7ca0-b200-bce78a96c679/b6/b6e11ecce9be93ee2470ad75143e8e1d89489da1e128baecc89688ae9e3a833e_thumb256.png
+rm -v <DATA>/01a0a029-1477-7ca0-b200-bce78a96c679/b6/b6e11ecce9be93ee2470ad75143e8e1d89489da1e128baecc89688ae9e3a833e_thumb512.png
+rm -v <DATA>/01a0a029-1477-7ca0-b200-bce78a96c679/f9/f9d71a40b1c5ac455fe568576c77b042abc4755c65dce99a9dfcb25f64a8f367_thumb256.png
+rm -v <DATA>/01a0a029-1477-7ca0-b200-bce78a96c679/f9/f9d71a40b1c5ac455fe568576c77b042abc4755c65dce99a9dfcb25f64a8f367_thumb512.png
+where <DATA> = /home/andrei/.local/share/docker/volumes/storagegenie_storage_data/_data
+
+EXECUTED (first path; run aborted on the same EROFS for all):
+$ rm -v <DATA>/01a0a029-1477-7ca0-b200-bce78a96c679/05/052a5f7b47d0556aace108ea32fbd67f8641c9e940f4a7ef69e1cc92e75a1a45_thumb256.png
+rm: cannot remove '.../052a5f..._thumb256.png': Read-only file system
+
+ROOT CAUSE (unanswered step, NOT routed around):
+$ findmnt -T <DATA>
+TARGET SOURCE    FSTYPE OPTIONS
+/      /dev/vda1 ext4   ro,nosuid,relatime,discard,errors=remount-ro,commit=30
+$ findmnt -T /home/andrei/StorageGenie
+TARGET                    SOURCE   FSTYPE OPTIONS
+/home/andrei/StorageGenie /dev/vda1[/home/andrei/StorageGenie] ext4 rw,...   <- only the worktree is rw
+$ touch <DATA>/__wtest
+touch: cannot touch '<DATA>/__wtest': Read-only file system   (touch-exit=1)
+$ rm /home/andrei/StorageGenie/__wtest  (repo write OK)
+=> The agent execution sandbox mounts `/` read-only and binds only /home/andrei/StorageGenie rw.
+   The live volume path is EROFS to this process. This is a denied privileged operation; per the
+   packet's standing line it is reported unanswered and NOT routed around (no `docker exec`, no sudo).
+
+=== G1 — VOLUME LISTING BEFORE (29 files, 6035868 bytes) ===
+406377	01a0a029-1477-7ca0-b200-bce78a96c679/05/052a5f7b47d0556aace108ea32fbd67f8641c9e940f4a7ef69e1cc92e75a1a45.png
+19230	01a0a029-1477-7ca0-b200-bce78a96c679/05/052a5f7b47d0556aace108ea32fbd67f8641c9e940f4a7ef69e1cc92e75a1a45_thumb256.png
+62679	01a0a029-1477-7ca0-b200-bce78a96c679/05/052a5f7b47d0556aace108ea32fbd67f8641c9e940f4a7ef69e1cc92e75a1a45_thumb512.png
+82	01a0a029-1477-7ca0-b200-bce78a96c679/13/133d67c1d8dc01dbbdc7cb8d9140e0c8ae5e5e1c600872ee5f8ea81dfb10ce36.txt
+181	01a0a029-1477-7ca0-b200-bce78a96c679/1a/1a25be1618ec558a879a626ef6332790cee0d3510a1cd0c79442d82a1adc1e18.txt
+239596	01a0a029-1477-7ca0-b200-bce78a96c679/60/6050ed6f7f83bf90722057f1a376b1adcfc8099de4f8995e5cb85ee0ae100630.jpg
+7113	01a0a029-1477-7ca0-b200-bce78a96c679/60/6050ed6f7f83bf90722057f1a376b1adcfc8099de4f8995e5cb85ee0ae100630_thumb256.jpg
+22254	01a0a029-1477-7ca0-b200-bce78a96c679/60/6050ed6f7f83bf90722057f1a376b1adcfc8099de4f8995e5cb85ee0ae100630_thumb512.jpg
+565806	01a0a029-1477-7ca0-b200-bce78a96c679/63/63b3ec707f184a6c4026948701b0cc3d074cea5aa8449bcb1d22711891a9bd09.png
+24681	01a0a029-1477-7ca0-b200-bce78a96c679/63/63b3ec707f184a6c4026948701b0cc3d074cea5aa8449bcb1d22711891a9bd09_thumb256.png
+83612	01a0a029-1477-7ca0-b200-bce78a96c679/63/63b3ec707f184a6c4026948701b0cc3d074cea5aa8449bcb1d22711891a9bd09_thumb512.png
+873	01a0a029-1477-7ca0-b200-bce78a96c679/6b/6b70acf5391c3aef732feff1813d9f94b997f7721bcc49d90e118490763b5595.txt
+9709	01a0a029-1477-7ca0-b200-bce78a96c679/6c/6c4cbf2e7c3bc3ccdcbc63873fad85f87bacd8ceec533a5e3de2f478ab1f8279.png
+7443	01a0a029-1477-7ca0-b200-bce78a96c679/6c/6c4cbf2e7c3bc3ccdcbc63873fad85f87bacd8ceec533a5e3de2f478ab1f8279_thumb256.png
+16174	01a0a029-1477-7ca0-b200-bce78a96c679/6c/6c4cbf2e7c3bc3ccdcbc63873fad85f87bacd8ceec533a5e3de2f478ab1f8279_thumb512.png
+1280694	01a0a029-1477-7ca0-b200-bce78a96c679/71/71901cac327fdd76926e36aa2a7889b2b17fb4e2619ca92d97f86d53aac0de63.png
+49762	01a0a029-1477-7ca0-b200-bce78a96c679/71/71901cac327fdd76926e36aa2a7889b2b17fb4e2619ca92d97f86d53aac0de63_thumb256.png
+172544	01a0a029-1477-7ca0-b200-bce78a96c679/71/71901cac327fdd76926e36aa2a7889b2b17fb4e2619ca92d97f86d53aac0de63_thumb512.png
+104	01a0a029-1477-7ca0-b200-bce78a96c679/9a/9a21f4fa07f52268b5b215b802462571ca873133cfc814278f6c2fe120901971.txt
+861026	01a0a029-1477-7ca0-b200-bce78a96c679/b6/b64034e5c91212098f9895535b5ba45e752bfdf70c24c4cd296b2007823f06bd.png
+34745	01a0a029-1477-7ca0-b200-bce78a96c679/b6/b64034e5c91212098f9895535b5ba45e752bfdf70c24c4cd296b2007823f06bd_thumb256.png
+118238	01a0a029-1477-7ca0-b200-bce78a96c679/b6/b64034e5c91212098f9895535b5ba45e752bfdf70c24c4cd296b2007823f06bd_thumb512.png
+478195	01a0a029-1477-7ca0-b200-bce78a96c679/b6/b6e11ecce9be93ee2470ad75143e8e1d89489da1e128baecc89688ae9e3a833e.png
+22675	01a0a029-1477-7ca0-b200-bce78a96c679/b6/b6e11ecce9be93ee2470ad75143e8e1d89489da1e128baecc89688ae9e3a833e_thumb256.png
+73011	01a0a029-1477-7ca0-b200-bce78a96c679/b6/b6e11ecce9be93ee2470ad75143e8e1d89489da1e128baecc89688ae9e3a833e_thumb512.png
+99	01a0a029-1477-7ca0-b200-bce78a96c679/c8/c81455960e46c0db5c95966718d5905ce6eb42b2ca0e15ee5476dfd93b2989be.txt
+1259505	01a0a029-1477-7ca0-b200-bce78a96c679/f9/f9d71a40b1c5ac455fe568576c77b042abc4755c65dce99a9dfcb25f64a8f367.png
+48013	01a0a029-1477-7ca0-b200-bce78a96c679/f9/f9d71a40b1c5ac455fe568576c77b042abc4755c65dce99a9dfcb25f64a8f367_thumb256.png
+171447	01a0a029-1477-7ca0-b200-bce78a96c679/f9/f9d71a40b1c5ac455fe568576c77b042abc4755c65dce99a9dfcb25f64a8f367_thumb512.png
+(BEFORE captured in G0 phase; 29 files, 6035868 bytes)
+
+=== G1 — VOLUME LISTING AFTER ===
+(identical to BEFORE — the delete was denied by EROFS, so nothing was removed)
+AFTER file count: 29  total bytes: 6035868  orphans remaining: 14 (904254 bytes)
+Bytes reclaimed: 0. Deleted paths: 0.
+PG-IC-08 note: zero paths were deleted, so "every deleted path satisfies the rule" is vacuously true;
+the load-bearing check is that every ENUMERATED candidate satisfies it (14/14 ORPHAN), which is non-vacuous.
+
+=== G1 — ORIGINAL FILES UNTOUCHED (sha256 before == after) ===
+$ diff <(original sha256 BEFORE) <(original sha256 AFTER)
+IDENTICAL (originals untouched)  [13 original (non-thumb) files; hashes listed in this log]
+406377	052a5f7b47d0556aace108ea32fbd67f8641c9e940f4a7ef69e1cc92e75a1a45	.../05/052a5f...png
+239596	6050ed6f7f83bf90722057f1a376b1adcfc8099de4f8995e5cb85ee0ae100630	.../60/6050ed...jpg
+565806	63b3ec707f184a6c4026948701b0cc3d074cea5aa8449bcb1d22711891a9bd09	.../63/63b3ec...png
+9709	6c4cbf2e7c3bc3ccdcbc63873fad85f87bacd8ceec533a5e3de2f478ab1f8279	.../6c/6c4cbf...png
+1280694	71901cac327fdd76926e36aa2a7889b2b17fb4e2619ca92d97f86d53aac0de63	.../71/71901c...png
+861026	b64034e5c91212098f9895535b5ba45e752bfdf70c24c4cd296b2007823f06bd	.../b6/b64034...png
+478195	b6e11ecce9be93ee2470ad75143e8e1d89489da1e128baecc89688ae9e3a833e	.../b6/b6e11e...png
+1259505	f9d71a40b1c5ac455fe568576c77b042abc4755c65dce99a9dfcb25f64a8f367	.../f9/f9d71a...png
+82	259acdd80407309ae0705667e920764dd7c1195fba1249104e1a22e544bb2c86	.../13/133d67...txt
+181	1922e0d1f2146bc70cc548dd865b510036ce07a663c803fde4b7bc51b342b82e	.../1a/1a25be...txt
+873	5476fb828549aa4355ea6d57e6933f7d1674ca54da942d4a4af0ddb580eb32eb	.../6b/6b70ac...txt
+104	df53f3efc576c27f8aff9dce557d134fe0693ab39d2f49e31c02f4d038ce4f68	.../9a/9a21f4...txt
+99	38549453f2010db9feb9b41b8dbbb19b54ad226d936c51cde693492e0bf9b8e5	.../c8/c81455...txt
+
+=== G2 — SERVED REGRESSION CHECK (GET /v1/evidence/{id}/thumb/{size}?household_id=...) ===
+BEFORE|png|052a5f7b47d0556aace108ea32fbd67f8641c9e940f4a7ef69e1cc92e75a1a45|thumb256|404
+BEFORE|png|052a5f7b47d0556aace108ea32fbd67f8641c9e940f4a7ef69e1cc92e75a1a45|thumb512|404
+BEFORE|png|63b3ec707f184a6c4026948701b0cc3d074cea5aa8449bcb1d22711891a9bd09|thumb256|404
+BEFORE|png|63b3ec707f184a6c4026948701b0cc3d074cea5aa8449bcb1d22711891a9bd09|thumb512|404
+BEFORE|png|6c4cbf2e7c3bc3ccdcbc63873fad85f87bacd8ceec533a5e3de2f478ab1f8279|thumb256|404
+BEFORE|png|6c4cbf2e7c3bc3ccdcbc63873fad85f87bacd8ceec533a5e3de2f478ab1f8279|thumb512|404
+BEFORE|png|71901cac327fdd76926e36aa2a7889b2b17fb4e2619ca92d97f86d53aac0de63|thumb256|404
+BEFORE|png|71901cac327fdd76926e36aa2a7889b2b17fb4e2619ca92d97f86d53aac0de63|thumb512|404
+BEFORE|png|b64034e5c91212098f9895535b5ba45e752bfdf70c24c4cd296b2007823f06bd|thumb256|404
+BEFORE|png|b64034e5c91212098f9895535b5ba45e752bfdf70c24c4cd296b2007823f06bd|thumb512|404
+BEFORE|png|b6e11ecce9be93ee2470ad75143e8e1d89489da1e128baecc89688ae9e3a833e|thumb256|404
+BEFORE|png|b6e11ecce9be93ee2470ad75143e8e1d89489da1e128baecc89688ae9e3a833e|thumb512|404
+BEFORE|png|f9d71a40b1c5ac455fe568576c77b042abc4755c65dce99a9dfcb25f64a8f367|thumb256|404
+BEFORE|png|f9d71a40b1c5ac455fe568576c77b042abc4755c65dce99a9dfcb25f64a8f367|thumb512|404
+BEFORE|jpg|6050ed6f7f83bf90722057f1a376b1adcfc8099de4f8995e5cb85ee0ae100630|thumb256|200
+BEFORE|jpg|6050ed6f7f83bf90722057f1a376b1adcfc8099de4f8995e5cb85ee0ae100630|thumb512|200
+AFTER|png|052a5f7b47d0556aace108ea32fbd67f8641c9e940f4a7ef69e1cc92e75a1a45|thumb256|404
+AFTER|png|052a5f7b47d0556aace108ea32fbd67f8641c9e940f4a7ef69e1cc92e75a1a45|thumb512|404
+AFTER|png|63b3ec707f184a6c4026948701b0cc3d074cea5aa8449bcb1d22711891a9bd09|thumb256|404
+AFTER|png|63b3ec707f184a6c4026948701b0cc3d074cea5aa8449bcb1d22711891a9bd09|thumb512|404
+AFTER|png|6c4cbf2e7c3bc3ccdcbc63873fad85f87bacd8ceec533a5e3de2f478ab1f8279|thumb256|404
+AFTER|png|6c4cbf2e7c3bc3ccdcbc63873fad85f87bacd8ceec533a5e3de2f478ab1f8279|thumb512|404
+AFTER|png|71901cac327fdd76926e36aa2a7889b2b17fb4e2619ca92d97f86d53aac0de63|thumb256|404
+AFTER|png|71901cac327fdd76926e36aa2a7889b2b17fb4e2619ca92d97f86d53aac0de63|thumb512|404
+AFTER|png|b64034e5c91212098f9895535b5ba45e752bfdf70c24c4cd296b2007823f06bd|thumb256|404
+AFTER|png|b64034e5c91212098f9895535b5ba45e752bfdf70c24c4cd296b2007823f06bd|thumb512|404
+AFTER|png|b6e11ecce9be93ee2470ad75143e8e1d89489da1e128baecc89688ae9e3a833e|thumb256|404
+AFTER|png|b6e11ecce9be93ee2470ad75143e8e1d89489da1e128baecc89688ae9e3a833e|thumb512|404
+AFTER|png|f9d71a40b1c5ac455fe568576c77b042abc4755c65dce99a9dfcb25f64a8f367|thumb256|404
+AFTER|png|f9d71a40b1c5ac455fe568576c77b042abc4755c65dce99a9dfcb25f64a8f367|thumb512|404
+AFTER|jpg|6050ed6f7f83bf90722057f1a376b1adcfc8099de4f8995e5cb85ee0ae100630|thumb256|200
+AFTER|jpg|6050ed6f7f83bf90722057f1a376b1adcfc8099de4f8995e5cb85ee0ae100630|thumb512|200
+BEFORE == AFTER: no 200->404 flip. PNG evidence thumbs are pre-existing 404 (legacy-PNG gap F-SG127-2),
+kept 404 (quoted as unchanged, NOT proof of anything). LIVE .jpg thumbs 200 both sides.
+*** ANTI-VACUITY: this "no flip" is TRIVIALLY true because the delete was DENIED and nothing changed.
+*** G2 therefore does NOT prove the safety case of the rule. It is reported as a non-result, not a pass.
