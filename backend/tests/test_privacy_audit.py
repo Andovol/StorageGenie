@@ -239,8 +239,9 @@ def test_g0_single_http_client_and_send_site_full_scan() -> None:
 def test_g0_redact_call_sites_are_reader_and_direct_adapter() -> None:
     """The only two callers of the shared redactor are the two image paths.
 
-    SG-101 shifts the adapter's call-site line by its text-path hunks; the pin
-    below tracks the line, not the caller set (M45).
+    SG-101 shifts the adapter's call-site line by its text-path hunks; SG-125
+    shifts the reader call site by its ledger-retention hunks. The pin below
+    tracks the line, not the caller set (M45).
     """
     callers: list[str] = []
     for path in sorted(APP_DIR.rglob("*.py")):
@@ -249,7 +250,7 @@ def test_g0_redact_call_sites_are_reader_and_direct_adapter() -> None:
                 callers.append(f"{path.relative_to(APP_DIR)}:{number}")
     assert callers == [
         "services/providers/opencode_go.py:310",
-        "services/providers/reader.py:402",
+        "services/providers/reader.py:465",
     ], f"unexpected redact_image call sites: {callers}"
 
 

@@ -1,0 +1,68 @@
+SG-125 — Ledger retention instrument: month-boxed spend + purge vehicle (temp-proven, live NOT run)
+Contract: 0.37.0 (source /home/andrei/storagegenie-contract/VERSION; checkout HEAD 1acd7730e5fa6de5b7403aacce71207e9946461d; RULES.md sha256 18de7fd7b3546bd7624b3a7b59a78bd629752816cd7fa8f1af6113d1bafc8d46 == payload RULES.sha256)
+BASE: 7bbf082d52260518bf6676006d9f70ba64182951 (origin/automation; worktree clean at start)
+WORK_HEAD: <WORK_HEAD> (the work commit carrying product + tests + these three worklog files; hash fixed in the receipt note)
+Coder: opencode · Effort: high (trigger --variant high per D302/D120) · Model: deepseek-v4.1-flash
+  (provider metadata banner "> build · deepseek-v4.1-flash" in output/dispatch/SG-125.log; no --model on argv = contract-legal omitted-model subset)
+Spend: $0.000000 real vs $0 bound (no metered call exists on any path; no provider call; no key read; no network)
+DATABASE: temp-only (fresh SQLite under /tmp; scratch dir removed). Production reads NEVER, writes NEVER. Restart/deploy/container: none.
+
+Legs (live clock UTC; early legs approximate, stamped legs marked; bounds per packet):
+- G0 read path (reader._recorded_spend / _write_ledger / base.py / ProviderCall / non-spend tables): ~13:31:00 -> ~13:33:30 (~150s; bound 120s ordinary) — OVER; recon breadth (mirror census + scheduler census) not budgeted. Reported.
+- G1 month-box query + temp-DB fail-pre/pass-post tests: ~13:33:30 -> ~13:36:30 (~180s; bound 120s ordinary) — OVER; the first boundary test was clock-flaky and was rewritten (see verify log). Reported.
+- G2 purge vehicle + constant + temp purge capture + cap tests + suite/ruff/mypy: ~13:36:30 -> ~13:39:00 (~150s; suites 31.14s candidate / 32.92s base of a 600s bound)
+- G3 files + receipt: from ~13:39:00 (bound 600s overall)
+No command was killed or timed out. Every command carried a bounded timeout (ordinary 120s, suite 600s).
+
+VERDICT: INSTRUMENTED — `_recorded_spend` now sums the current calendar month only; `LEDGER_RETENTION_MONTHS = 12`
+(UNCALIBRATED) + `purge_old_provider_calls` (temp-proven, never scheduled/auto-run). No schema change (empty diff over
+backend/app/models + backend/alembic), no endpoint, no scheduler, no cap-value change (empty diff config.py), no live leg.
+Suite: candidate 2 failed/603 passed = base 2 failed/598 passed + 5 new passes; the 2 reds are base-proved
+(tests/test_signals.py OCR/barcode environment). ruff clean; mypy 41/9 both base and candidate, reader.py not among the 9.
+
+G0 read-path findings (PG-SC-01: stated, not solved):
+- WRITE: `_write_ledger` (reader.py:208-222 at BASE; the packet's :200-222 matched BASE exactly) appends one
+  `provider_call` row per completed call, unbounded, `created_at` via `TimestampMixin` (models/base.py:21-22, verified).
+- The packet's "plus chat/planning/analytics mirrors" are ledger WRITERS, not spend READERS: `_write_ledger` /
+  `_write_error_ledger` also live in services/{chat,planning,analytics}/service.py and enrich/synthesize.py. There is NO
+  spend reader anywhere but `reader._recorded_spend` (grep `_recorded_spend` = one def + one call site, reader.py). So G1
+  is a single-site change and the one sum already covers every writer's rows (it joins ProviderCall->Job->household).
+- READ: `_recorded_spend` (reader.py:237-251 at BASE; packet's :237-251 matched) summed ALL-TIME, no month filter, yet it
+  feeds `sg_monthly_cap` ("estimated monthly cost", reader.py:405-416 at BASE; matched). Confirmed: no month filter existed
+  anywhere on the spend path. Consequence confirmed: purging old rows would have silently LOOSENED the cap (fail-open).
+- Purge predicate: `provider_call.created_at` (server_default CURRENT_TIMESTAMP = UTC on SQLite). The month-box and the
+  cutoff convert the server-local boundary to naive UTC for comparison (host clock is UTC; code is correct for any tz).
+- Non-spend tables: `_recorded_spend` reads ONLY ProviderCall.cost joined to Job. The purge deletes ONLY `provider_call`
+  rows. It never touches guardrail_event, audit_event, job, job_step, evidence, household or any other table.
+- No scheduler exists (grep scheduler/apscheduler/cron/celery in backend/app = only docstring negatives). Nothing calls
+  `purge_old_provider_calls`; it is an explicit function only.
+
+Findings:
+- F-SG125-1 (M45 suite collision — privacy line pin): adding the helpers shifted the reader redact_image call site
+  402 -> 465 and `test_privacy_audit.py::test_g0_redact_call_sites_are_reader_and_direct_adapter` hardcodes it. Per M45
+  (suite-green binds on collision with the scope ceiling) and the SG-101/F-SG101-1 precedent, the pin was updated (minimal
+  + docstring note, no weakening: caller set unchanged, still exactly the two image paths). This is the only file touched
+  outside the packet's enumerated ceiling. Disclosed, not silent.
+- F-SG125-2 (premise corrected): the packet's "chat/planning/analytics spend readers" do not exist. Those modules are
+  ledger WRITERS; the only reader is reader._recorded_spend. Corrected in G0 above; G1 is single-site.
+- F-SG125-3 (premise confirmed): every packet line reference matched BASE exactly (reader.py:200-222, :237-251, :405-416,
+  models/base.py:21-22). After this slice the same symbols sit at reader.py:208-223, :269-285, :477-488 (line drift is
+  the F-SG125-1 collision).
+- F-SG125-4 (carried, outside scope): STATE.md open-threads already lists "brittle reader line-pin (accepted risk)"; this
+  slice hit exactly that risk (F-SG125-1). Suggest retiring the pin in favour of a caller-set assertion when next touched.
+
+Live command (RECORDED word-for-word, NEVER executed here; executing it is a STOP):
+  # 1) backup-first (SG-086 runbook)
+  backend/venv/bin/python backend/scripts/backup_restore_drill.py \
+    --prod-db data/db/storagegenie.db \
+    --prod-storage "$(docker volume inspect storagegenie_storage_data --format '{{.Mountpoint}}')/_data"
+  # 2) before count
+  docker compose exec -T backend python -c "from sqlalchemy import func; from app.db import SessionLocal; from app.models.provider_call import ProviderCall; s=SessionLocal(); print('provider_call_before=', s.query(func.count(ProviderCall.id)).scalar())"
+  # 3) the vehicle
+  docker compose exec -T backend python -c "from app.db import SessionLocal; from app.services.providers.reader import purge_old_provider_calls; s=SessionLocal(); ids=purge_old_provider_calls(s); print('deleted=', len(ids), ids)"
+  # 4) after count
+  docker compose exec -T backend python -c "from sqlalchemy import func; from app.db import SessionLocal; from app.models.provider_call import ProviderCall; s=SessionLocal(); print('provider_call_after=', s.query(func.count(ProviderCall.id)).scalar())"
+
+Live-safety check used: `grep -n "purge_old_provider_calls" ~/.bash_history` -> exit 1 (no match); no
+`docker compose exec`/vehicle invocation appears in this session. Production `data/db/storagegenie.db` mtime
+2026-09-24 11:42Z predates this session (13:31Z start); no command in this slice opened it.

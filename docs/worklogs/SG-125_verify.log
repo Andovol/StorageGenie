@@ -1,0 +1,305 @@
+SG-125 verify log — raw evidence (verdict INSTRUMENTED). Generated 2026-09-25 UTC.
+BASE 7bbf082d52260518bf6676006d9f70ba64182951 (origin/automation). WORK_HEAD <WORK_HEAD>.
+All outputs below are verbatim, pasted from the runs (no reformatting). Temp-DB only; production never opened.
+
+============================================================
+## 0. Contract + provenance + base
+============================================================
+$ cat /home/andrei/storagegenie-contract/VERSION
+0.37.0
+$ git -C /home/andrei/storagegenie-contract rev-parse HEAD
+1acd7730e5fa6de5b7403aacce71207e9946461d
+$ sha256sum /home/andrei/storagegenie-contract/RULES.md
+18de7fd7b3546bd7624b3a7b59a78bd629752816cd7fa8f1af6113d1bafc8d46  /home/andrei/storagegenie-contract/RULES.md
+$ cat /home/andrei/storagegenie-contract/RULES.sha256
+18de7fd7b3546bd7624b3a7b59a78bd629752816cd7fa8f1af6113d1bafc8d46 RULES.md
+$ git rev-parse origin/automation
+7bbf082d52260518bf6676006d9f70ba64182951
+$ cat output/dispatch/SG-125.launcher.sh   # effort=high on argv
+exec opencode run --auto --dir /home/andrei/StorageGenie --variant high "$(cat "$PROMPT_FILE")"
+$ grep -a "build ·" output/dispatch/SG-125.log | head -1   # model from provider metadata
+> build · deepseek-v4.1-flash
+
+============================================================
+## 1. G0 — read path + census (reads only)
+============================================================
+# Only ONE spend reader exists; the chat/planning/analytics "mirrors" are WRITERS:
+$ grep -rnE "_recorded_spend" backend/app --include="*.py"
+backend/app/services/providers/reader.py:237:def _recorded_spend(db: Session, household_id: str) -> float:
+backend/app/services/providers/reader.py:409:        already_spent = _recorded_spend(db, job.household_id or "")
+
+# provider_call writers (all feed the one sum through job_id -> household):
+$ grep -rn "ProviderCall(" backend/app --include="*.py"
+backend/app/services/providers/reader.py:216:    row = ProviderCall(
+backend/app/services/providers/reader.py:358:    row = ProviderCall(
+backend/app/services/enrich/synthesize.py:293:    row = ProviderCall(
+backend/app/services/analytics/service.py:358:    row = ProviderCall(
+backend/app/services/analytics/service.py:393:    row = ProviderCall(
+backend/app/services/planning/service.py:202:    row = ProviderCall(
+backend/app/services/planning/service.py:236:    row = ProviderCall(
+backend/app/services/chat/service.py:230:    row = ProviderCall(
+backend/app/services/chat/service.py:268:    row = ProviderCall(
+
+# no scheduler anywhere:
+$ grep -rniE "scheduler|apscheduler|crontab|celery|background task" backend/app --include="*.py"
+backend/app/services/expiry_engine.py:3:Pure computation over existing rows — no scheduler, no sender, no table, no
+backend/app/services/analytics/service.py:3:Two operations, no scheduler and no new table:
+
+# packet premises verified at BASE (line refs matched): reader.py:200-222 _write_ledger,
+# :237-251 _recorded_spend, :405-416 cap call site, models/base.py:21-22 TimestampMixin.
+
+============================================================
+## 2. G1 FAIL-PRE — new test file against immutable BASE worktree
+##    (git worktree add --detach /tmp/opencode/sg125-base <BASE>; reader.py has no new symbols)
+============================================================
+$ grep -c "purge_old_provider_calls\|LEDGER_RETENTION_MONTHS\|_current_month_start_utc" \
+      /tmp/opencode/sg125-base/backend/app/services/providers/reader.py
+0
+$ cd /tmp/opencode/sg125-base/backend && /home/andrei/StorageGenie/backend/venv/bin/python -m pytest -q tests/test_sg125_ledger_retention.py
+FFFFF                                                                    [100%]
+=================================== FAILURES ===================================
+___________________ test_retention_constant_is_twelve_months ___________________
+
+    def test_retention_constant_is_twelve_months() -> None:
+        # UNCALIBRATED (G-A9): a year of audit trail on local disk; never auto-run.
+>       assert reader_mod.LEDGER_RETENTION_MONTHS == 12
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'app.services.providers.reader' has no attribute 'LEDGER_RETENTION_MONTHS'
+
+tests/test_sg125_ledger_retention.py:108: AttributeError
+__________________ test_recorded_spend_boxes_to_current_month __________________
+
+ledger = <sqlalchemy.orm.session.Session object at 0x725cf072c350>
+
+    def test_recorded_spend_boxes_to_current_month(ledger: Session) -> None:
+        """OLD returns the lifetime total; NEW returns this-month-only (both quoted)."""
+        household_id = _household(ledger)
+        job = _job(ledger, household_id)
+    
+        now = _now_utc_naive()
+        last_month = now - datetime.timedelta(days=40)  # >31 days back => never this month
+    
+        _call(ledger, job, cost=5.0, created_at=last_month)
+        _call(ledger, job, cost=2.0, created_at=now)
+        _call(ledger, job, cost=3.0, created_at=now)
+    
+        # A different household's rows must never enter this household's figure.
+        other_household_id = _household(ledger, "Other Household")
+        other_job = _job(ledger, other_household_id)
+        _call(ledger, other_job, cost=100.0, created_at=now)
+        ledger.commit()
+    
+        assert _lifetime_spend(ledger, household_id) == pytest.approx(10.0)
+>       assert reader_mod._recorded_spend(ledger, household_id) == pytest.approx(5.0)
+E       assert 10.0 == 5.0 ± 5.0e-06
+E         
+E         comparison failed
+E         Obtained: 10.0
+E         Expected: 5.0 ± 5.0e-06
+
+tests/test_sg125_ledger_retention.py:130: AssertionError
+_____________ test_empty_household_spends_zero_and_purges_nothing ______________
+
+ledger = <sqlalchemy.orm.session.Session object at 0x725cf06b9580>
+
+    def test_empty_household_spends_zero_and_purges_nothing(ledger: Session) -> None:
+        household_id = _household(ledger, "Empty Household")
+        ledger.commit()
+    
+        assert reader_mod._recorded_spend(ledger, household_id) == pytest.approx(0.0)
+>       assert reader_mod.purge_old_provider_calls(ledger) == []
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'app.services.providers.reader' has no attribute 'purge_old_provider_calls'
+
+tests/test_sg125_ledger_retention.py:139: AttributeError
+_____ test_purge_vehicle_deletes_only_old_rows_and_spares_non_spend_tables _____
+
+ledger = <sqlalchemy.orm.session.Session object at 0x725cf07e50a0>
+
+    def test_purge_vehicle_deletes_only_old_rows_and_spares_non_spend_tables(
+        ledger: Session,
+    ) -> None:
+        household_id = _household(ledger)
+        job = _job(ledger, household_id)
+    
+        now = _now_utc_naive()
+        old_marker = now - datetime.timedelta(days=400)  # ~13 months old
+        recent_marker = now
+    
+        old_ids = {
+            _call(ledger, job, cost=1.0, created_at=old_marker).id for _ in range(3)
+        }
+        recent_ids = {
+            _call(ledger, job, cost=1.0, created_at=recent_marker).id for _ in range(2)
+        }
+        ledger.add(
+            GuardrailEvent(
+                household_id=household_id, kind="spend", ref_ids_json="[]", detail_json="{}"
+            )
+        )
+        ledger.add(
+            AuditEvent(
+                actor="system",
+                action="test",
+                entity_type="job",
+                entity_id=job.id,
+                household_id=household_id,
+            )
+        )
+        ledger.commit()
+    
+        lifetime_before = _lifetime_spend(ledger, household_id)
+        month_before = reader_mod._recorded_spend(ledger, household_id)
+        calls_before = ledger.query(ProviderCall).count()
+        guardrail_before = ledger.query(GuardrailEvent).count()
+        audit_before = ledger.query(AuditEvent).count()
+        assert calls_before == 5
+        assert lifetime_before == pytest.approx(5.0)
+>       assert month_before == pytest.approx(2.0)
+E       assert 5.0 == 2.0 ± 2.0e-06
+E         
+E         comparison failed
+E         Obtained: 5.0
+E         Expected: 2.0 ± 2.0e-06
+
+tests/test_sg125_ledger_retention.py:182: AssertionError
+______________ test_purge_keeps_rows_inside_the_retention_window _______________
+
+ledger = <sqlalchemy.orm.session.Session object at 0x725cf068c320>
+
+    def test_purge_keeps_rows_inside_the_retention_window(ledger: Session) -> None:
+        """A ~11-month row is kept; a ~13-month row is deleted (strictly-older predicate)."""
+        household_id = _household(ledger)
+        job = _job(ledger, household_id)
+        now = _now_utc_naive()
+        outside = _call(ledger, job, cost=1.0, created_at=now - datetime.timedelta(days=400))
+        inside = _call(ledger, job, cost=1.0, created_at=now - datetime.timedelta(days=350))
+        ledger.commit()
+    
+>       assert reader_mod.purge_old_provider_calls(ledger) == [outside.id]
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'app.services.providers.reader' has no attribute 'purge_old_provider_calls'
+
+tests/test_sg125_ledger_retention.py:207: AttributeError
+=========================== short test summary info ============================
+FAILED tests/test_sg125_ledger_retention.py::test_retention_constant_is_twelve_months
+FAILED tests/test_sg125_ledger_retention.py::test_recorded_spend_boxes_to_current_month
+FAILED tests/test_sg125_ledger_retention.py::test_empty_household_spends_zero_and_purges_nothing
+FAILED tests/test_sg125_ledger_retention.py::test_purge_vehicle_deletes_only_old_rows_and_spares_non_spend_tables
+FAILED tests/test_sg125_ledger_retention.py::test_purge_keeps_rows_inside_the_retention_window
+5 failed in 0.59s
+exit=1
+
+# OLD-vs-NEW numeric proof from the fail-pre: OLD _recorded_spend returned 10.0 (lifetime);
+# the purge-test month baseline on OLD returned 5.0 (lifetime) where NEW requires 2.0 (this month).
+
+============================================================
+## 3. G1 PASS-POST — candidate
+============================================================
+$ cd backend && ./venv/bin/python -m pytest -q tests/test_sg125_ledger_retention.py
+.....                                                                    [100%]
+5 passed in 0.56s
+exit=0
+
+============================================================
+## 4. G2 — temp-DB purge capture (scratch SQLite removed after; production never opened)
+============================================================
+$ cd backend && PYTHONPATH=/home/andrei/StorageGenie/backend ./venv/bin/python /tmp/opencode/sg125-purge-proof.py
+scratch_root: /tmp/sg125-scratch-ntsmg6rl
+month_before: 2.0
+lifetime_before: 5.0
+before provider_call/guardrail_event/audit_event: (5, 1, 1)
+deleted_ids: ['01a0d8c9-f648-7d91-b4c8-b9612212ea1b', '01a0d8c9-f648-7d91-b4c8-b975208e6c5c', '01a0d8c9-f648-7d91-b4c8-b98fc0d7ffb7']
+after provider_call/guardrail_event/audit_event: (2, 1, 1)
+month_after: 2.0
+lifetime_after: 2.0
+scratch_removed: True
+exit=0
+
+============================================================
+## 5. Existing durable-cap tests (PG-IC-08 blast radius: still green)
+============================================================
+$ ./venv/bin/python -m pytest -q "tests/test_ai_pipeline.py::test_monthly_cap_binds_across_jobs_from_durable_ledger"
+1 passed, 2 warnings in 0.94s
+$ ./venv/bin/python -m pytest -q "tests/test_sg080_ingest_pipeline.py::test_monthly_ledger_refuses_before_any_call"
+1 passed, 2 warnings in 1.00s
+
+============================================================
+## 6. Suite / ruff / mypy
+============================================================
+$ ./venv/bin/python -m pytest -q        # candidate (with the 5 new tests)
+FAILED tests/test_signals.py::test_generated_codes_are_validated_and_bad_checksum_is_not_an_identifier
+FAILED tests/test_signals.py::test_ocr_has_text_boxes_and_mean_confidence - a...
+2 failed, 603 passed, 32 warnings in 31.14s
+exit=1
+
+$ cd /tmp/opencode/sg125-base/backend && /home/andrei/StorageGenie/backend/venv/bin/python -m pytest -q   # true BASE
+FAILED tests/test_signals.py::test_generated_codes_are_validated_and_bad_checksum_is_not_an_identifier
+FAILED tests/test_signals.py::test_ocr_has_text_boxes_and_mean_confidence - a...
+2 failed, 598 passed, 32 warnings in 32.92s
+exit=1
+# Same 2 reds both sides (OCR/barcode environment, base-proved); +5 new passes candidate.
+
+$ ./venv/bin/python -m ruff check .         # candidate
+All checks passed!
+exit=0
+$ (base worktree) /home/andrei/StorageGenie/backend/venv/bin/python -m ruff check .
+All checks passed!
+exit=0
+
+$ ./venv/bin/python -m mypy app             # candidate
+app/main.py:56: error: Unused "type: ignore" comment  [unused-ignore]
+Found 41 errors in 9 files (checked 90 source files)
+exit=1
+$ (base worktree) /home/andrei/StorageGenie/backend/venv/bin/python -m mypy app
+app/main.py:56: error: Unused "type: ignore" comment  [unused-ignore]
+Found 41 errors in 9 files (checked 90 source files)
+exit=1
+# Delta 0; the 9 files are assets.py/evidence.py/households.py/review_tasks.py/main.py/base.py/
+# asset.py/asset_service.py/audit_service.py — reader.py is NOT among them.
+
+============================================================
+## 7. Scope diffs + changed files + live-safety
+============================================================
+$ git status --porcelain
+ M backend/app/services/providers/reader.py
+ M backend/tests/test_privacy_audit.py
+?? backend/tests/test_sg125_ledger_retention.py
+
+$ git diff --stat 7bbf082d52260518bf6676006d9f70ba64182951
+ backend/app/services/providers/reader.py | 67 +++++++++++++++++++++++++++++++-
+ backend/tests/test_privacy_audit.py      |  7 ++--
+ 2 files changed, 69 insertions(+), 5 deletions(-)
+
+$ git diff 7bbf082d52260518bf6676006d9f70ba64182951 -- backend/app/models backend/alembic
+(empty)
+empty_models_alembic_exit=0
+$ git diff 7bbf082d52260518bf6676006d9f70ba64182951 -- backend/app/config.py
+(empty)
+empty_config_exit=0
+
+# live command never executed:
+$ grep -n "purge_old_provider_calls" ~/.bash_history
+bash_history_grep_exit=1        # no match
+# production DB mtime predates the session (13:31Z start): storagegenie.db 2026-09-24 11:42:31Z
+# no docker/sqlite/db command in this slice touched /home/andrei/StorageGenie/data/db.
+
+============================================================
+## 8. LIVE command — RECORDED word-for-word, NEVER executed here
+##    (executing it is a STOP; it needs its own owner word + this tooling)
+============================================================
+# 1) backup-first (SG-086 runbook)
+backend/venv/bin/python backend/scripts/backup_restore_drill.py \
+  --prod-db data/db/storagegenie.db \
+  --prod-storage "$(docker volume inspect storagegenie_storage_data --format '{{.Mountpoint}}')/_data"
+# 2) before count
+docker compose exec -T backend python -c "from sqlalchemy import func; from app.db import SessionLocal; from app.models.provider_call import ProviderCall; s=SessionLocal(); print('provider_call_before=', s.query(func.count(ProviderCall.id)).scalar())"
+# 3) the vehicle
+docker compose exec -T backend python -c "from app.db import SessionLocal; from app.services.providers.reader import purge_old_provider_calls; s=SessionLocal(); ids=purge_old_provider_calls(s); print('deleted=', len(ids), ids)"
+# 4) after count
+docker compose exec -T backend python -c "from sqlalchemy import func; from app.db import SessionLocal; from app.models.provider_call import ProviderCall; s=SessionLocal(); print('provider_call_after=', s.query(func.count(ProviderCall.id)).scalar())"
+
+============================================================
+## 9. Receipt — pasted verbatim from the FETCHED mapped ref
+============================================================
+<RECEIPT_SHOW>

@@ -16,6 +16,8 @@ ever read or logged here — the real adapter owns its own key handling.
 
 from __future__ import annotations
 
+import calendar
+import datetime
 import hashlib
 import json
 import math
@@ -59,6 +61,12 @@ PROMPT_FILES = {
 RETRYABLE_ERRORS = frozenset(
     {"outage", "timeout", "rate_limited", "transport", "http_status", "invalid_json"}
 )
+
+# SG-125: ledger retention window, UNCALIBRATED (G-A9) — a year of audit trail on
+# local disk; the project never set a retention window. The only consumer is the
+# explicit `purge_old_provider_calls` vehicle below; nothing schedules or
+# auto-runs it, and no other module imports the constant as an enforcement bound.
+LEDGER_RETENTION_MONTHS = 12
 
 # SG-031: process-side runtime model override. Settings are env-loaded pydantic
 # with no runtime write path and the backend is one process, so the override
@@ -234,21 +242,76 @@ def _estimate_call(provider: Any, image_bytes: bytes, prompt: str) -> float:
     return 0.0
 
 
+def _current_month_start_utc() -> datetime.datetime:
+    """Start of the current calendar month (server-local clock), as naive UTC.
+
+    SG-125 month definition: a row counts toward the calendar month its
+    `created_at` falls in, in the server's timezone at execution (`PG-IC-07`).
+    `provider_call.created_at` defaults to SQLite `CURRENT_TIMESTAMP` (UTC), so
+    the local month boundary is converted to UTC and made naive for comparison.
+    """
+    local_start = datetime.datetime.now().astimezone().replace(
+        day=1, hour=0, minute=0, second=0, microsecond=0
+    )
+    return local_start.astimezone(datetime.timezone.utc).replace(tzinfo=None)
+
+
+def _retention_cutoff_utc(retention_months: int) -> datetime.datetime:
+    """The live clock shifted back `retention_months` calendar months, as naive UTC."""
+    local_now = datetime.datetime.now().astimezone()
+    total = local_now.year * 12 + (local_now.month - 1) - retention_months
+    year, month_index = divmod(total, 12)
+    month = month_index + 1
+    day = min(local_now.day, calendar.monthrange(year, month)[1])
+    cutoff_local = local_now.replace(year=year, month=month, day=day)
+    return cutoff_local.astimezone(datetime.timezone.utc).replace(tzinfo=None)
+
+
 def _recorded_spend(db: Session, household_id: str) -> float:
-    """Durable spend for one household, derived from the committed ledger (SG-030 ISS-10).
+    """Durable spend for one household in the CURRENT calendar month (SG-030 ISS-10, SG-125).
 
     The provider instance is rebuilt every step, so an in-process counter resets
     and a monthly cap built on it can never bind across jobs. Summing the
     committed `provider_call` cost rows through their jobs survives that rebuild
-    and is the same figure the audit trail already carries.
+    and is the same figure the audit trail already carries. SG-125 boxes the sum
+    to the current calendar month (server-local, live clock) so the cap matches
+    its "monthly" name: deleting old ledger rows can no longer silently loosen
+    the cap (a purge must never be fail-open).
     """
     total = (
         db.query(func.coalesce(func.sum(ProviderCall.cost), 0.0))
         .join(Job, ProviderCall.job_id == Job.id)
         .filter(Job.household_id == household_id)
+        .filter(ProviderCall.created_at >= _current_month_start_utc())
         .scalar()
     )
     return float(total or 0.0)
+
+
+def purge_old_provider_calls(
+    db: Session, *, retention_months: int = LEDGER_RETENTION_MONTHS
+) -> list[str]:
+    """Delete `provider_call` rows older than the retention window; return their ids.
+
+    SG-125: the explicit retention vehicle. It deletes ONLY `provider_call` rows
+    whose `created_at` predates the cutoff — `guardrail_event`, `audit_event`,
+    `job` and every other table are read-scoped or untouched. It is never
+    scheduled, exposed or auto-run; the standalone live invocation is an
+    explicit owner-approved command (recorded in the SG-125 worklog, not run by
+    the slice). A row is deleted iff its `created_at` is strictly before the
+    cutoff, so the boundary month is retained.
+    """
+    cutoff = _retention_cutoff_utc(retention_months)
+    ids = [
+        row_id
+        for (row_id,) in db.query(ProviderCall.id)
+        .filter(ProviderCall.created_at < cutoff)
+        .all()
+    ]
+    if ids:
+        db.query(ProviderCall).filter(ProviderCall.id.in_(ids)).delete(synchronize_session=False)
+        db.commit()
+    return ids
 
 
 def _mark_calls_failed(db: Session, call_ids: list[str], reason: str) -> None:
