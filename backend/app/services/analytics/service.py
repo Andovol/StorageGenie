@@ -157,21 +157,87 @@ def _bucket_for(expiry: date, as_of: date) -> str:
     return "safe"
 
 
+def _parse_category_slug(value_json: str) -> str | None:
+    try:
+        val = json.loads(value_json)
+        if isinstance(val, dict):
+            slug = val.get("category")
+            return slug if isinstance(slug, str) and slug else None
+    except json.JSONDecodeError:
+        pass
+    return None
+
+
+def _parse_expiry_date(value_json: str) -> date | None:
+    try:
+        val = json.loads(value_json)
+        if isinstance(val, dict):
+            raw = val.get("expiry_date")
+            if isinstance(raw, str):
+                return date.fromisoformat(raw)
+    except (json.JSONDecodeError, ValueError):
+        pass
+    return None
+
+
+def _fetch_active_assertion_maps(
+    db: Session, active_ids: list[str]
+) -> tuple[dict[str, str], dict[str, date]]:
+    """Batch-fetch active classification and expiry assertions for active asset IDs."""
+    classification_map: dict[str, str] = {}
+    expiry_map: dict[str, date] = {}
+    if not active_ids:
+        return classification_map, expiry_map
+
+    assertions = (
+        db.query(Assertion)
+        .filter(
+            Assertion.asset_id.in_(active_ids),
+            Assertion.field_path.in_([CLASSIFICATION_FIELD, EXPIRY_FIELD]),
+            Assertion.review_state.not_in(("superseded", "rejected")),
+        )
+        .order_by(Assertion.created_at.desc())
+        .all()
+    )
+
+    for assertion in assertions:
+        if assertion.field_path == CLASSIFICATION_FIELD and assertion.asset_id not in classification_map:
+            slug = _parse_category_slug(assertion.value_json)
+            if slug:
+                classification_map[assertion.asset_id] = slug
+        elif assertion.field_path == EXPIRY_FIELD and assertion.asset_id not in expiry_map:
+            exp = _parse_expiry_date(assertion.value_json)
+            if exp:
+                expiry_map[assertion.asset_id] = exp
+
+    return classification_map, expiry_map
+
+
 def _aggregate_assets(
     db: Session, active: list[Asset], taxonomy_ids: list[str], as_of: date
 ) -> tuple[dict[str, int], int, dict[str, int], int]:
-    """Bucket the ACTIVE assets by served category and expiry urgency."""
+    """Bucket the ACTIVE assets by served category and expiry urgency.
+
+    Performance optimization (N+1 query elimination):
+    Instead of running 2 per-asset queries for active classification and expiry
+    assertions (2N queries), batch-fetch all active assertions for all active assets
+    in a single query.
+    """
     category_counts = {category_id: 0 for category_id in taxonomy_ids}
     uncategorized = 0
     expiry = {bucket: 0 for bucket in EXPIRY_BUCKETS}
     expired_untouched = 0
+
+    active_ids = [asset.id for asset in active]
+    classification_map, expiry_map = _fetch_active_assertion_maps(db, active_ids)
+
     for asset in active:
-        slug = _classification_slug(db, asset.id)
+        slug = classification_map.get(asset.id)
         if slug is not None and slug in category_counts:
             category_counts[slug] += 1
         else:
             uncategorized += 1
-        expiry_date = _active_expiry_date(db, asset.id)
+        expiry_date = expiry_map.get(asset.id)
         if expiry_date is None:
             expiry["unknown"] += 1
             continue
