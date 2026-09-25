@@ -5,7 +5,7 @@ leg is a scripted `httpx.MockTransport`: no real key crosses the wire here. The
 live leg is the bounded smoke recorded in the worklog, not this suite.
 
 What this file proves:
-- G1: the Jina client speaks the EXACT researched request (EU base, urlencoded
+- G1: the Jina client speaks the EXACT researched request (global base, urlencoded
   query, repeated `site`, `num`/`type`/`gl`, the four token-budget headers) and
   adds `Authorization` at SEND time only. The request-shape test reads the
   request the real httpx driver received (`PG-EV-04` / `PG-SC-12`); the Bearer
@@ -92,7 +92,7 @@ def _scripted_client(
 def test_jina_request_shape_exact_url_params_and_header_names() -> None:
     request = jina_mod.build_jina_request(Q_NAME, Q_BRAND)
     assert request.method == "GET"
-    assert request.url == "https://eu.s.jina.ai/Jacobs+Jacobs+Cronat+Gold"
+    assert request.url == "https://s.jina.ai/Jacobs+Jacobs+Cronat+Gold"
     assert request.params == EXPECTED_PARAMS
     assert set(request.headers) == {
         "Accept",
@@ -116,12 +116,12 @@ def test_jina_authorize_adds_only_the_authorization_name() -> None:
     assert "Authorization" not in request.headers
 
 
-def test_jina_default_base_is_eu_and_global_is_named_not_default() -> None:
+def test_jina_default_base_is_global_and_eu_is_named_not_default() -> None:
     assert jina_mod.JINA_EU_BASE_URL == "https://eu.s.jina.ai/"
     assert jina_mod.JINA_GLOBAL_BASE_URL == "https://s.jina.ai/"
-    assert jina_mod.build_jina_request(Q_NAME, Q_BRAND).url.startswith(
-        jina_mod.JINA_EU_BASE_URL
-    )
+    default_url = jina_mod.build_jina_request(Q_NAME, Q_BRAND).url
+    assert default_url.startswith(jina_mod.JINA_GLOBAL_BASE_URL)
+    assert not default_url.startswith(jina_mod.JINA_EU_BASE_URL)
 
 
 def test_driver_receives_the_exact_jina_query_and_headers() -> None:
@@ -133,7 +133,7 @@ def test_driver_receives_the_exact_jina_query_and_headers() -> None:
     assert len(seen) == 1
     request = seen[0]
     assert request.method == "GET"
-    assert str(request.url).startswith("https://eu.s.jina.ai/Jacobs+Jacobs+Cronat+Gold?")
+    assert str(request.url).startswith("https://s.jina.ai/Jacobs+Jacobs+Cronat+Gold?")
     assert tuple(request.url.params.multi_items()) == EXPECTED_PARAMS
     header_names = {name.lower() for name in request.headers}
     assert {"accept", "x-token-budget", "x-timeout", "x-respond-with", "authorization"} <= header_names
@@ -204,7 +204,7 @@ def test_snapshot_records_url_timestamp_and_raw_body() -> None:
         Q_NAME, Q_BRAND, http_client=http_client, api_key="unit-test"
     )
     assert snapshot.source_name == "JinaSearch"
-    assert snapshot.request_url.startswith("https://eu.s.jina.ai/")
+    assert snapshot.request_url.startswith("https://s.jina.ai/")
     assert snapshot.status_code == 200
     assert snapshot.raw == payload
     assert snapshot.no_result_reason is None
@@ -296,7 +296,7 @@ def test_snapshot_json_helper_is_serialisable_and_attributed() -> None:
         Q_NAME, Q_BRAND, http_client=http_client, api_key="unit-test"
     )
     rendered = jina_mod.snapshot_to_json(snapshot)
-    assert "eu.s.jina.ai" in rendered
+    assert "https://s.jina.ai/" in rendered
     assert snapshot.retrieved_at in rendered
     assert '"no_result_reason": null' in rendered
 
@@ -578,7 +578,7 @@ def test_worked_example_artifact_matches_the_real_driver() -> None:
         ]
     )
     assert example.params == expected_params
-    assert example.url == f"{jina_mod.JINA_EU_BASE_URL}Jacobs+Jacobs+Cronat+Gold"
+    assert example.url == f"{jina_mod.JINA_GLOBAL_BASE_URL}Jacobs+Jacobs+Cronat+Gold"
     full_request = example.url + "?" + urllib.parse.urlencode(example.params)
     artifact = WORKED_EXAMPLE.read_text(encoding="utf-8")
     assert full_request in artifact

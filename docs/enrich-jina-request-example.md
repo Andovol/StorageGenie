@@ -6,12 +6,12 @@ a snapshot, a log line, or this file.
 
 The request below is exactly what
 `backend/app/services/enrich/jina.py:build_jina_request(name, brand)` builds for
-brand `Jacobs` and name `Jacobs Cronat Gold`. The EU base is the default
-(`JINA_EU_BASE_URL`); the global base (`JINA_GLOBAL_BASE_URL`) is a named
-constant only and is never switched to silently.
+brand `Jacobs` and name `Jacobs Cronat Gold`. The global base is the default
+(`JINA_GLOBAL_BASE_URL`, D11); the EU base (`JINA_EU_BASE_URL`) stays a named
+non-default constant until the EU endpoint resolves again.
 
 ```
-GET https://eu.s.jina.ai/Jacobs+Jacobs+Cronat+Gold?site=mega-image.ro&site=emag.ro&site=farmaciatei.ro&num=5&type=web&gl=ro
+GET https://s.jina.ai/Jacobs+Jacobs+Cronat+Gold?site=mega-image.ro&site=emag.ro&site=farmaciatei.ro&num=5&type=web&gl=ro
 ```
 
 Query (`site` is repeated; the values are the three researched Romanian retail

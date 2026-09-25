@@ -1,0 +1,48 @@
+SG-117 Coder log — Jina default base EU->global: switch + pins + serve (D11)
+===========================================================================
+
+Running log (first token SG-117). Host /home/andrei/StorageGenie, branch automation.
+Dispatch process start 2026-09-25T09:53:27Z (`ps -o lstart -p 1004186`).
+BASE_REF=origin/automation, BASE_RESOLVED=8732769b4a5012f82a47ea26bec7af33ab9dff9e (start HEAD).
+MODEL=unknown (no `--model` in argv; CLI default per policy, read from process args).
+effort=high (`--variant high`, read from /proc/1004186/cmdline — the opencode run argv).
+Spend real $ = $0.000000 (no metered call on any path; a live Jina search is a STOP).
+Served-code slice: rebuild + exactly ONE recreate + verify (D11-authorized, G-K2).
+Writes = jina.py + test_sg082_enrich_jina.py + docs/enrich-jina-request-example.md (reported ceiling
+deviation) + the 3 docs/worklogs files only. No DB write, no enrich press, no secret bytes.
+
+- t0 tree: `git status --porcelain` EMPTY; HEAD == origin/automation == BASE_RESOLVED; branch automation.
+  G1 premises matched: `jina.py:42` JINA_EU_BASE_URL="https://eu.s.jina.ai/", `jina.py:43`
+  JINA_GLOBAL_BASE_URL="https://s.jina.ai/". No difference.
+- Contract echo source `/home/andrei/storagegenie-contract/VERSION` = `0.36.0`; contract HEAD
+  `a9324d5e1782384c036c1411ec8adac6bb2acaa1` (== published `a9324d5`); `sha256sum RULES.md` =
+  `18de7fd7b3546bd7624b3a7b59a78bd629752816cd7fa8f1af6113d1bafc8d46` == payload `RULES.sha256` -> match.
+- G1 BEFORE (`PG-EV-08`): build default URL `https://eu.s.jina.ai/Jacobs+Jacobs+Cronat+Gold`; both
+  `build_jina_request` and `fetch_jina_search` default `base_url = "https://eu.s.jina.ai/"`.
+- G1 caller enumeration: `enrich.py:188` fetch_with_fallback no base; internal fallback->fetch_jina_search
+  no base; build_jina_request only from fetch_jina_search with propagated base. No explicit EU base
+  anywhere on the live path. Switch surface = the two default params. Shape chosen: (a) repoint both at
+  JINA_GLOBAL_BASE_URL; EU constant stays named non-default.
+- G1 edits: constants comment + module docstring carry the D11 trade-off; build docstring global; both
+  defaults -> JINA_GLOBAL_BASE_URL.
+- G1 pin-surface re-enumeration: test_sg082 :95/:119-123/:136/:207/:299/:581 updated; explicit
+  `source_url="https://eu.s.jina.ai/q"` at :401-523 UNCHANGED (explicit, not default-driving);
+  test_sg101:44 + test_sg099:48 JINA_URL passed explicitly -> UNCHANGED.
+- G1 ceiling deviation REPORTED: `docs/enrich-jina-request-example.md` is pinned by the allowed test
+  (`test_worked_example_artifact…` line 584), so it was updated (URL line + 2-line prose); not in the
+  packet's write list. `.dockerignore` excludes `docs`, so no image impact.
+- G2 base run (clean tree): 2 failed, 581 passed (the 2 pre-existing decoder reds in test_signals.py).
+- G2 fail-first (switched code, OLD EU pins): 6 failed, 26 passed (raw quoted in SG-117_verify.log).
+- G2 pass-post (updated pins): 32 passed.
+- G2 after suite: 2 failed, 581 passed — SAME 2 decoder reds as base (proven pre-existing, not assumed).
+  ruff `All checks passed!`; mypy 41 pre-existing errors in 9 files, zero in jina/enrich.
+- G2 frontend diff over `frontend/` EMPTY -> frontend suite waived by stated ceiling (no behaviour change).
+- G3 build: `DOCKER_BUILDKIT=0 docker compose build backend` (classic builder; buildkit EROFS) 0m33.526s.
+- G3 recreate: `docker compose up -d backend` -> exactly ONE Recreate/Recreated/Started. container
+  `c9d780738b68…` -> `1acbe40836d0…`; image `sha256:b4bec08d…` -> `sha256:3905a75a…`.
+- G3 verify: health 6x exact ok; gate `301` / `401`; alembic head `20260924_sg114_relation` unchanged;
+  28-table counts byte-identical (delta 0); asset census `ACTIVE|6` -> `ACTIVE|6`.
+- G3 served read (read-only import inside running container): BEFORE EU -> AFTER
+  `https://s.jina.ai/Jacobs+Jacobs+Cronat+Gold` (global); EU+GLOBAL constants still named.
+- Budget: process start 09:53:27Z -> report ~09:59:35Z = ~367s actual vs 1200s bound; lane RUN_BUDGET_S=2100.
+- G4: report + verify log + this log; receipt note on WORK_HEAD; pushed; worktree clean.

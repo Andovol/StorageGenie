@@ -7,9 +7,13 @@ the live retrieval timestamp and the verbatim raw body, and every provider
 failure degrades to a loud `no_result_reason` — it NEVER raises into a caller.
 
 Decisions recorded here (reported, not hidden):
-- EU base `https://eu.s.jina.ai/` is used for EU data residency (Romania scope).
-  The global base is a named constant only; it is never switched to silently.
-  A live smoke that finds EU unreachable while global answers is a finding.
+- DEFAULT base is the GLOBAL endpoint `https://s.jina.ai/` (D11, 2026-09-25).
+  The SG-082 EU data-residency posture for the Romania scope is superseded by
+  reachability: SG-116 found the EU base `https://eu.s.jina.ai/` NXDOMAIN on the
+  host (transport-dead, zero HTTP bytes) while the global base answers HTTP 200,
+  so queries go to the global endpoint until the EU base resolves again. No
+  geography is claimed for the global endpoint beyond its URL. The EU base stays
+  a named non-default constant so the direction can be reversed cleanly.
 - The query is brand + name (+ category when supplied) TEXT only: no image, no
   coordinate, no key byte ever enters the query. The `site` filters are the
   three researched Romanian retail domains.
@@ -39,6 +43,12 @@ from app.config import settings
 from app.services.enrich import scoring
 from app.services.enrich.client import OffSearchSnapshot, fetch_off_search
 
+# D11 (2026-09-25): reachability over EU data residency for the Romania scope.
+# SG-116 found the EU base NXDOMAIN on the host while the global base answers
+# HTTP 200, so the global endpoint is the default until the EU base resolves
+# again. No geography is claimed for the global endpoint beyond its URL; the EU
+# constant stays named and non-default (the SG-082 discipline, direction
+# reversed).
 JINA_EU_BASE_URL = "https://eu.s.jina.ai/"
 JINA_GLOBAL_BASE_URL = "https://s.jina.ai/"
 SOURCE_NAME = "JinaSearch"
@@ -114,9 +124,9 @@ def build_jina_request(
     brand: str,
     *,
     category: str | None = None,
-    base_url: str = JINA_EU_BASE_URL,
+    base_url: str = JINA_GLOBAL_BASE_URL,
 ) -> JinaRequest:
-    """The exact search request: EU base, urlencoded query, repeated site."""
+    """The exact search request: global base (D11), urlencoded query, repeated site."""
     query = build_jina_query(brand, name, category)
     encoded = urllib.parse.quote_plus(query)
     params: tuple[tuple[str, str], ...] = tuple(
@@ -236,7 +246,7 @@ def fetch_jina_search(
     timeout_s: float = DEFAULT_TIMEOUT_S,
     now: Callable[[], datetime] | None = None,
     api_key: str | None = None,
-    base_url: str = JINA_EU_BASE_URL,
+    base_url: str = JINA_GLOBAL_BASE_URL,
 ) -> JinaSearchSnapshot:
     """One sync Jina search, always returned as a snapshot.
 

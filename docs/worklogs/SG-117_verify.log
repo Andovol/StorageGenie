@@ -1,0 +1,488 @@
+SG-117 verify log — raw outputs (Jina default base EU->global switch + pins + serve, D11)
+Generated 2026-09-25T09:59:25Z on host ubuntu in /home/andrei/StorageGenie
+BASE_REF=origin/automation BASE_RESOLVED=8732769b4a5012f82a47ea26bec7af33ab9dff9e
+
+================ SCOPE / DIFF ================
+=== git status --porcelain ===
+ M backend/app/services/enrich/jina.py
+ M backend/tests/test_sg082_enrich_jina.py
+ M docs/enrich-jina-request-example.md=== git diff --stat ===
+backend/app/services/enrich/jina.py     | 22 ++++++++++++++++------
+ backend/tests/test_sg082_enrich_jina.py | 20 ++++++++++----------
+ docs/enrich-jina-request-example.md     |  8 ++++----
+ 3 files changed, 30 insertions(+), 20 deletions(-)
+=== changed files (names) ===
+backend/app/services/enrich/jina.py
+backend/tests/test_sg082_enrich_jina.py
+docs/enrich-jina-request-example.md
+
+Changes:
+
+=== frontend diff (expect empty) ===
+
+(end)
+=== SECRET GATE over changed files (names only) ===
+(no secret-shaped values)
+
+================ G2 BASE SUITE (clean tree, before any edit) ================
+........................................................................ [ 12%]
+........................................................................ [ 24%]
+........................................................................ [ 37%]
+........................................................................ [ 49%]
+........................................................................ [ 61%]
+........................................................................ [ 74%]
+........................................................................ [ 86%]
+........................................................................ [ 98%]
+FF.....                                                                  [100%]
+=================================== FAILURES ===================================
+___ test_generated_codes_are_validated_and_bad_checksum_is_not_an_identifier ___
+
+isolated_db = (<sqlalchemy.orm.session.Session object at 0x7697cbc4c6e0>, '01a0d7fd-30ed-7bc1-a46c-0b2e9731fff9', PosixPath('/tmp/pytest-of-andrei/pytest-0/test_generated_codes_are_valid0/storage'))
+
+    def test_generated_codes_are_validated_and_bad_checksum_is_not_an_identifier(isolated_db) -> None:  # type: ignore[no-untyped-def]
+        session, household_id, root = isolated_db
+        qr_value = "https://example.test/SG-013"
+        qr_image = qrcode.make(qr_value).convert("RGB")
+        qr = _evidence(session, household_id, root, _png(qr_image), "qr.png", "image/png")
+        ean_image, ean_value = _ean13_image("590123412345")
+        ean = _evidence(session, household_id, root, _png(ean_image), "ean.png", "image/png")
+        # Deliberately render a syntactically valid EAN with the wrong check digit.
+        bad_value = ean_value[:-1] + ("0" if ean_value[-1] != "0" else "1")
+        bad_image, _ = _ean13_image(ean_value[:-1], bad_value[-1])
+        bad = _evidence(session, household_id, root, _png(bad_image), "bad.png", "image/png")
+    
+        qr_rows = signals.extract_observations(qr.id, session)
+        ean_rows = signals.extract_observations(ean.id, session)
+        bad_rows = signals.extract_observations(bad.id, session)
+    
+        qr_values = [json.loads(row.value_json) for row in qr_rows if row.kind == "barcode_qr"]
+        ean_values = [json.loads(row.value_json) for row in ean_rows if row.kind == "barcode_qr"]
+        bad_values = [json.loads(row.value_json) for row in bad_rows if row.kind == "barcode_qr"]
+>       assert any(item.get("value") == qr_value and item["validated"] for item in qr_values)
+E       assert False
+E        +  where False = any(<generator object test_generated_codes_are_validated_and_bad_checksum_is_not_an_identifier.<locals>.<genexpr> at 0x7697cac2be60>)
+
+tests/test_signals.py:136: AssertionError
+_________________ test_ocr_has_text_boxes_and_mean_confidence __________________
+
+isolated_db = (<sqlalchemy.orm.session.Session object at 0x7697cb8b4ad0>, '01a0d7fd-3185-71f0-b2e0-7fc96c8dff97', PosixPath('/tmp/pytest-of-andrei/pytest-0/test_ocr_has_text_boxes_and_me0/storage'))
+
+    def test_ocr_has_text_boxes_and_mean_confidence(isolated_db) -> None:  # type: ignore[no-untyped-def]
+        session, household_id, root = isolated_db
+        evidence = _evidence(session, household_id, root, _png(_text_image()), "text.png", "image/png")
+        rows = signals.extract_observations(evidence.id, session)
+        ocr = [json.loads(row.value_json) for row in rows if row.kind == "ocr"]
+>       assert ocr
+E       assert []
+
+tests/test_signals.py:148: AssertionError
+=============================== warnings summary ===============================
+venv/lib/python3.12/site-packages/fastapi/testclient.py:1
+  /home/andrei/StorageGenie/backend/venv/lib/python3.12/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+venv/lib/python3.12/site-packages/starlette/testclient.py:53
+  /home/andrei/StorageGenie/backend/venv/lib/python3.12/site-packages/starlette/testclient.py:53: DeprecationWarning: The anyio.abc.BlockingPortal alias is deprecated, use anyio.from_thread.BlockingPortal instead.
+    _PortalFactoryType = Callable[[], AbstractContextManager[anyio.abc.BlockingPortal]]
+
+tests/test_candidates.py: 3 warnings
+tests/test_foundations.py: 3 warnings
+tests/test_saved_searches.py: 3 warnings
+tests/test_search.py: 3 warnings
+tests/test_sg048_name_optional.py: 6 warnings
+tests/test_sg100_snapshot_persistence.py: 3 warnings
+tests/test_sg113_locations.py: 3 warnings
+tests/test_sg114_relations.py: 3 warnings
+tests/test_signals.py: 3 warnings
+  /home/andrei/StorageGenie/backend/venv/lib/python3.12/site-packages/alembic/config.py:604: DeprecationWarning: No path_separator found in configuration; falling back to legacy splitting on spaces, commas, and colons for prepend_sys_path.  Consider adding path_separator=os to Alembic config.
+    util.warn_deprecated(
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/test_signals.py::test_generated_codes_are_validated_and_bad_checksum_is_not_an_identifier
+FAILED tests/test_signals.py::test_ocr_has_text_boxes_and_mean_confidence - a...
+2 failed, 581 passed, 32 warnings in 29.91s
+
+================ G2 FAIL-PRE (switched code, OLD EU pins) ================
+F.FF...F........F.............F.                                         [100%]
+=================================== FAILURES ===================================
+__________ test_jina_request_shape_exact_url_params_and_header_names ___________
+
+    def test_jina_request_shape_exact_url_params_and_header_names() -> None:
+        request = jina_mod.build_jina_request(Q_NAME, Q_BRAND)
+        assert request.method == "GET"
+>       assert request.url == "https://eu.s.jina.ai/Jacobs+Jacobs+Cronat+Gold"
+E       AssertionError: assert 'https://s.ji...s+Cronat+Gold' == 'https://eu.s...s+Cronat+Gold'
+E         
+E         - https://eu.s.jina.ai/Jacobs+Jacobs+Cronat+Gold
+E         ?         ---
+E         + https://s.jina.ai/Jacobs+Jacobs+Cronat+Gold
+
+tests/test_sg082_enrich_jina.py:95: AssertionError
+_________ test_jina_default_base_is_eu_and_global_is_named_not_default _________
+
+    def test_jina_default_base_is_eu_and_global_is_named_not_default() -> None:
+        assert jina_mod.JINA_EU_BASE_URL == "https://eu.s.jina.ai/"
+        assert jina_mod.JINA_GLOBAL_BASE_URL == "https://s.jina.ai/"
+>       assert jina_mod.build_jina_request(Q_NAME, Q_BRAND).url.startswith(
+            jina_mod.JINA_EU_BASE_URL
+        )
+E       AssertionError: assert False
+E        +  where False = <built-in method startswith of str object at 0x7ee542afe550>('https://eu.s.jina.ai/')
+E        +    where <built-in method startswith of str object at 0x7ee542afe550> = 'https://s.jina.ai/Jacobs+Jacobs+Cronat+Gold'.startswith
+E        +      where 'https://s.jina.ai/Jacobs+Jacobs+Cronat+Gold' = JinaRequest(method='GET', url='https://s.jina.ai/Jacobs+Jacobs+Cronat+Gold', params=(('site', 'mega-image.ro'), ('site...o')), headers={'Accept': 'application/json', 'X-Token-Budget': '6000', 'X-Timeout': '15', 'X-Respond-With': 'content'}).url
+E        +        where JinaRequest(method='GET', url='https://s.jina.ai/Jacobs+Jacobs+Cronat+Gold', params=(('site', 'mega-image.ro'), ('site...o')), headers={'Accept': 'application/json', 'X-Token-Budget': '6000', 'X-Timeout': '15', 'X-Respond-With': 'content'}) = <function build_jina_request at 0x7ee542a6aca0>('Jacobs Cronat Gold', 'Jacobs')
+E        +          where <function build_jina_request at 0x7ee542a6aca0> = jina_mod.build_jina_request
+E        +    and   'https://eu.s.jina.ai/' = jina_mod.JINA_EU_BASE_URL
+
+tests/test_sg082_enrich_jina.py:122: AssertionError
+____________ test_driver_receives_the_exact_jina_query_and_headers _____________
+
+    def test_driver_receives_the_exact_jina_query_and_headers() -> None:
+        http_client, seen = _scripted_client(_load("jina_hit.json"))
+        snapshot = jina_mod.fetch_jina_search(
+            Q_NAME, Q_BRAND, http_client=http_client, api_key="unit-test"
+        )
+    
+        assert len(seen) == 1
+        request = seen[0]
+        assert request.method == "GET"
+>       assert str(request.url).startswith("https://eu.s.jina.ai/Jacobs+Jacobs+Cronat+Gold?")
+E       AssertionError: assert False
+E        +  where False = <built-in method startswith of str object at 0x7ee542970030>('https://eu.s.jina.ai/Jacobs+Jacobs+Cronat+Gold?')
+E        +    where <built-in method startswith of str object at 0x7ee542970030> = 'https://s.jina.ai/Jacobs+Jacobs+Cronat+Gold?site=mega-image.ro&site=emag.ro&site=farmaciatei.ro&num=5&type=web&gl=ro'.startswith
+E        +      where 'https://s.jina.ai/Jacobs+Jacobs+Cronat+Gold?site=mega-image.ro&site=emag.ro&site=farmaciatei.ro&num=5&type=web&gl=ro' = str(URL('https://s.jina.ai/Jacobs+Jacobs+Cronat+Gold?site=mega-image.ro&site=emag.ro&site=farmaciatei.ro&num=5&type=web&gl=ro'))
+E        +        where URL('https://s.jina.ai/Jacobs+Jacobs+Cronat+Gold?site=mega-image.ro&site=emag.ro&site=farmaciatei.ro&num=5&type=web&gl=ro') = <Request('GET', 'https://s.jina.ai/Jacobs+Jacobs+Cronat+Gold?site=mega-image.ro&site=emag.ro&site=farmaciatei.ro&num=5&type=web&gl=ro')>.url
+
+tests/test_sg082_enrich_jina.py:136: AssertionError
+_______________ test_snapshot_records_url_timestamp_and_raw_body _______________
+
+    def test_snapshot_records_url_timestamp_and_raw_body() -> None:
+        payload = _load("jina_hit.json")
+        http_client, _seen = _scripted_client(payload)
+        snapshot = jina_mod.fetch_jina_search(
+            Q_NAME, Q_BRAND, http_client=http_client, api_key="unit-test"
+        )
+        assert snapshot.source_name == "JinaSearch"
+>       assert snapshot.request_url.startswith("https://eu.s.jina.ai/")
+E       AssertionError: assert False
+E        +  where False = <built-in method startswith of str object at 0x7ee542970ad0>('https://eu.s.jina.ai/')
+E        +    where <built-in method startswith of str object at 0x7ee542970ad0> = 'https://s.jina.ai/Jacobs+Jacobs+Cronat+Gold?site=mega-image.ro&site=emag.ro&site=farmaciatei.ro&num=5&type=web&gl=ro'.startswith
+E        +      where 'https://s.jina.ai/Jacobs+Jacobs+Cronat+Gold?site=mega-image.ro&site=emag.ro&site=farmaciatei.ro&num=5&type=web&gl=ro' = JinaSearchSnapshot(source_name='JinaSearch', request_url='https://s.jina.ai/Jacobs+Jacobs+Cronat+Gold?site=mega-image....nata Jacobs Cronat Gold 100g. Ingrediente: cafea 100%.', 'timestamp': '2026-09-20T00:00:00Z'},), no_result_reason=None).request_url
+
+tests/test_sg082_enrich_jina.py:207: AssertionError
+___________ test_snapshot_json_helper_is_serialisable_and_attributed ___________
+
+    def test_snapshot_json_helper_is_serialisable_and_attributed() -> None:
+        http_client, _seen = _scripted_client(_load("jina_hit.json"))
+        snapshot = jina_mod.fetch_jina_search(
+            Q_NAME, Q_BRAND, http_client=http_client, api_key="unit-test"
+        )
+        rendered = jina_mod.snapshot_to_json(snapshot)
+>       assert "eu.s.jina.ai" in rendered
+E       assert 'eu.s.jina.ai' in '{\n  "source_name": "JinaSearch",\n  "request_url": "https://s.jina.ai/Jacobs+Jacobs+Cronat+Gold?site=mega-image.ro&s...macinata Jacobs Cronat Gold 100g. Ingrediente: cafea 100%.",\n      "timestamp": "2026-09-20T00:00:00Z"\n    }\n  ]\n}'
+
+tests/test_sg082_enrich_jina.py:299: AssertionError
+_____________ test_worked_example_artifact_matches_the_real_driver _____________
+
+    def test_worked_example_artifact_matches_the_real_driver() -> None:
+        """SG-097: the committed worked example IS the request the REAL driver builds.
+    
+        The expected URL/params are derived from the real module constants
+        (`PG-SC-12`), never a re-typed copy; the artifact is names-only (the key is
+        added at send time and never appears in the example).
+        """
+        example = jina_mod.build_jina_request("Jacobs Cronat Gold", "Jacobs")
+        expected_params = tuple(
+            [("site", site) for site in jina_mod.SITE_FILTERS]
+            + [
+                ("num", jina_mod.JINA_NUM),
+                ("type", jina_mod.JINA_TYPE),
+                ("gl", jina_mod.JINA_GL),
+            ]
+        )
+        assert example.params == expected_params
+>       assert example.url == f"{jina_mod.JINA_EU_BASE_URL}Jacobs+Jacobs+Cronat+Gold"
+E       AssertionError: assert 'https://s.ji...s+Cronat+Gold' == 'https://eu.s...s+Cronat+Gold'
+E         
+E         - https://eu.s.jina.ai/Jacobs+Jacobs+Cronat+Gold
+E         ?         ---
+E         + https://s.jina.ai/Jacobs+Jacobs+Cronat+Gold
+
+tests/test_sg082_enrich_jina.py:581: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_sg082_enrich_jina.py::test_jina_request_shape_exact_url_params_and_header_names
+FAILED tests/test_sg082_enrich_jina.py::test_jina_default_base_is_eu_and_global_is_named_not_default
+FAILED tests/test_sg082_enrich_jina.py::test_driver_receives_the_exact_jina_query_and_headers
+FAILED tests/test_sg082_enrich_jina.py::test_snapshot_records_url_timestamp_and_raw_body
+FAILED tests/test_sg082_enrich_jina.py::test_snapshot_json_helper_is_serialisable_and_attributed
+FAILED tests/test_sg082_enrich_jina.py::test_worked_example_artifact_matches_the_real_driver
+6 failed, 26 passed in 0.44s
+
+================ G2 PASS-POST (updated pins, switched code) ================
+................................                                         [100%]
+32 passed in 0.41s
+
+================ G2 AFTER SUITE (switched code + updated pins) ================
+........................................................................ [ 12%]
+........................................................................ [ 24%]
+........................................................................ [ 37%]
+........................................................................ [ 49%]
+........................................................................ [ 61%]
+........................................................................ [ 74%]
+........................................................................ [ 86%]
+........................................................................ [ 98%]
+FF.....                                                                  [100%]
+=================================== FAILURES ===================================
+___ test_generated_codes_are_validated_and_bad_checksum_is_not_an_identifier ___
+
+isolated_db = (<sqlalchemy.orm.session.Session object at 0x79aba48545f0>, '01a0d7fe-e7f8-7a20-8ae7-f27a7bed3354', PosixPath('/tmp/pytest-of-andrei/pytest-3/test_generated_codes_are_valid0/storage'))
+
+    def test_generated_codes_are_validated_and_bad_checksum_is_not_an_identifier(isolated_db) -> None:  # type: ignore[no-untyped-def]
+        session, household_id, root = isolated_db
+        qr_value = "https://example.test/SG-013"
+        qr_image = qrcode.make(qr_value).convert("RGB")
+        qr = _evidence(session, household_id, root, _png(qr_image), "qr.png", "image/png")
+        ean_image, ean_value = _ean13_image("590123412345")
+        ean = _evidence(session, household_id, root, _png(ean_image), "ean.png", "image/png")
+        # Deliberately render a syntactically valid EAN with the wrong check digit.
+        bad_value = ean_value[:-1] + ("0" if ean_value[-1] != "0" else "1")
+        bad_image, _ = _ean13_image(ean_value[:-1], bad_value[-1])
+        bad = _evidence(session, household_id, root, _png(bad_image), "bad.png", "image/png")
+    
+        qr_rows = signals.extract_observations(qr.id, session)
+        ean_rows = signals.extract_observations(ean.id, session)
+        bad_rows = signals.extract_observations(bad.id, session)
+    
+        qr_values = [json.loads(row.value_json) for row in qr_rows if row.kind == "barcode_qr"]
+        ean_values = [json.loads(row.value_json) for row in ean_rows if row.kind == "barcode_qr"]
+        bad_values = [json.loads(row.value_json) for row in bad_rows if row.kind == "barcode_qr"]
+>       assert any(item.get("value") == qr_value and item["validated"] for item in qr_values)
+E       assert False
+E        +  where False = any(<generator object test_generated_codes_are_validated_and_bad_checksum_is_not_an_identifier.<locals>.<genexpr> at 0x79abac8ad620>)
+
+tests/test_signals.py:136: AssertionError
+_________________ test_ocr_has_text_boxes_and_mean_confidence __________________
+
+isolated_db = (<sqlalchemy.orm.session.Session object at 0x79abad971fa0>, '01a0d7fe-e889-7773-9681-aada4bdc54ac', PosixPath('/tmp/pytest-of-andrei/pytest-3/test_ocr_has_text_boxes_and_me0/storage'))
+
+    def test_ocr_has_text_boxes_and_mean_confidence(isolated_db) -> None:  # type: ignore[no-untyped-def]
+        session, household_id, root = isolated_db
+        evidence = _evidence(session, household_id, root, _png(_text_image()), "text.png", "image/png")
+        rows = signals.extract_observations(evidence.id, session)
+        ocr = [json.loads(row.value_json) for row in rows if row.kind == "ocr"]
+>       assert ocr
+E       assert []
+
+tests/test_signals.py:148: AssertionError
+=============================== warnings summary ===============================
+venv/lib/python3.12/site-packages/fastapi/testclient.py:1
+  /home/andrei/StorageGenie/backend/venv/lib/python3.12/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+venv/lib/python3.12/site-packages/starlette/testclient.py:53
+  /home/andrei/StorageGenie/backend/venv/lib/python3.12/site-packages/starlette/testclient.py:53: DeprecationWarning: The anyio.abc.BlockingPortal alias is deprecated, use anyio.from_thread.BlockingPortal instead.
+    _PortalFactoryType = Callable[[], AbstractContextManager[anyio.abc.BlockingPortal]]
+
+tests/test_candidates.py: 3 warnings
+tests/test_foundations.py: 3 warnings
+tests/test_saved_searches.py: 3 warnings
+tests/test_search.py: 3 warnings
+tests/test_sg048_name_optional.py: 6 warnings
+tests/test_sg100_snapshot_persistence.py: 3 warnings
+tests/test_sg113_locations.py: 3 warnings
+tests/test_sg114_relations.py: 3 warnings
+tests/test_signals.py: 3 warnings
+  /home/andrei/StorageGenie/backend/venv/lib/python3.12/site-packages/alembic/config.py:604: DeprecationWarning: No path_separator found in configuration; falling back to legacy splitting on spaces, commas, and colons for prepend_sys_path.  Consider adding path_separator=os to Alembic config.
+    util.warn_deprecated(
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/test_signals.py::test_generated_codes_are_validated_and_bad_checksum_is_not_an_identifier
+FAILED tests/test_signals.py::test_ocr_has_text_boxes_and_mean_confidence - a...
+2 failed, 581 passed, 32 warnings in 29.43s
+
+================ G1 BEFORE/AFTER default observable (host module) ================
+AFTER default build URL: https://s.jina.ai/Jacobs+Jacobs+Cronat+Gold
+AFTER build sig default: https://s.jina.ai/
+AFTER fetch sig default: https://s.jina.ai/
+EU named: https://eu.s.jina.ai/ GLOBAL: https://s.jina.ai/
+
+================ G3 BEFORE (pre-recreate) ================
+=== BEFORE 2026-09-25T09:57:41Z ===
+--- image ---
+image=sha256:b4bec08d9bcb2a0b920a5a30d22da25a1f77354cd7890ae1d6587efc31199e52 created=2026-09-24T11:42:30.968042852Z
+--- container ---
+container=c9d780738b68d12719108f32935ccf59adfe3c8cd5ae10fe779160451523e78e restart=0 state=running health=healthy
+--- alembic current (in container) ---
+INFO  [alembic.runtime.migration] Context impl SQLiteImpl.
+INFO  [alembic.runtime.migration] Will assume non-transactional DDL.
+20260924_sg114_relation (head)
+--- health ---
+{"status":"ok","db":"ok","storage":"ok"}
+--- served default (BEFORE, inside container) ---
+default build: https://eu.s.jina.ai/Jacobs+Jacobs+Cronat+Gold
+EU: https://eu.s.jina.ai/
+GLOBAL: https://s.jina.ai/
+--- per-table counts ---
+table count: 28
+alembic_version|1
+assertion|28
+asset|6
+asset_evidence|12
+asset_fts|6
+asset_fts_config|1
+asset_fts_data|8
+asset_fts_docsize|6
+asset_fts_idx|6
+asset_location|0
+asset_relation|0
+audit_event|68
+candidate|7
+enrich_snapshot|2
+evidence|13
+guardrail_event|2
+household|1
+idempotency_key|9
+job|8
+job_step|56
+location|0
+observation|16
+planning_suggestion|0
+provider_call|17
+review_task|6
+saved_search|0
+source_attribution|0
+user|2
+--- asset status census ---
+ACTIVE|6
+--- gate canonical vhost ---
+http:80 => code=301
+Location: https://storagegenie.dynv6.net/
+https:443 => code=401
+
+================ G3 BUILD (classic builder, image sha tail) ================
+ ---> Removed intermediate container 3e15d4c0ee4c
+ ---> 3905a75aed70
+Successfully built 3905a75aed70
+Successfully tagged storagegenie-backend:latest
+ Image storagegenie-backend Built 
+ Image storagegenie-backend Built 
+
+================ G3 RECREATE (exactly ONE) ================
+ Container storagegenie-backend-1 Recreate 
+ Container storagegenie-backend-1 Recreated 
+ Container storagegenie-backend-1 Starting 
+ Container storagegenie-backend-1 Started 
+
+================ G3 AFTER (post-recreate) ================
+=== AFTER 2026-09-25T09:58:45Z ===
+--- image ---
+image=sha256:3905a75aed708f15af272d0f4952bb293d539d72d91dcf560ac21c1e159249ed created=2026-09-25T09:58:26.386315237Z
+--- container ---
+container=1acbe40836d0728f0130400cf4504b68553eb9148191263a07ac516706e6645b restart=0 state=running health=healthy
+--- alembic current (in container) ---
+INFO  [alembic.runtime.migration] Context impl SQLiteImpl.
+INFO  [alembic.runtime.migration] Will assume non-transactional DDL.
+20260924_sg114_relation (head)
+--- served default (AFTER, inside container) ---
+default build: https://s.jina.ai/Jacobs+Jacobs+Cronat+Gold
+EU: https://eu.s.jina.ai/
+GLOBAL: https://s.jina.ai/
+--- per-table counts ---
+table count: 28
+alembic_version|1
+assertion|28
+asset|6
+asset_evidence|12
+asset_fts|6
+asset_fts_config|1
+asset_fts_data|8
+asset_fts_docsize|6
+asset_fts_idx|6
+asset_location|0
+asset_relation|0
+audit_event|68
+candidate|7
+enrich_snapshot|2
+evidence|13
+guardrail_event|2
+household|1
+idempotency_key|9
+job|8
+job_step|56
+location|0
+observation|16
+planning_suggestion|0
+provider_call|17
+review_task|6
+saved_search|0
+source_attribution|0
+user|2
+--- asset status census ---
+ACTIVE|6
+--- gate canonical vhost ---
+http:80 => code=301
+Location: https://storagegenie.dynv6.net/
+https:443 => code=401
+--- health x6 ---
+{"status":"ok","db":"ok","storage":"ok"}
+{"status":"ok","db":"ok","storage":"ok"}
+{"status":"ok","db":"ok","storage":"ok"}
+{"status":"ok","db":"ok","storage":"ok"}
+{"status":"ok","db":"ok","storage":"ok"}
+{"status":"ok","db":"ok","storage":"ok"}
+
+================ LINT / TYPECHECK ================
+=== ruff check backend ===
+All checks passed!
+ruff_exit=0
+
+=== mypy app ===
+app/models/base.py:8: error: Unused "type: ignore" comment  [unused-ignore]
+app/services/audit_service.py:16: error: Missing type arguments for generic type "dict"  [type-arg]
+app/services/audit_service.py:17: error: Missing type arguments for generic type "dict"  [type-arg]
+app/schemas/asset.py:55: error: Missing type arguments for generic type "dict"  [type-arg]
+app/schemas/asset.py:57: error: Missing type arguments for generic type "dict"  [type-arg]
+app/services/asset_service.py:15: error: Missing type arguments for generic type "dict"  [type-arg]
+app/services/asset_service.py:37: error: Missing type arguments for generic type "dict"  [type-arg]
+app/services/asset_service.py:105: error: Missing type arguments for generic type "dict"  [type-arg]
+app/api/v1/review_tasks.py:17: error: Function is missing a return type annotation  [no-untyped-def]
+app/api/v1/review_tasks.py:21: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/review_tasks.py:22: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/review_tasks.py:62: error: Function is missing a return type annotation  [no-untyped-def]
+app/api/v1/review_tasks.py:66: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/review_tasks.py:67: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/households.py:18: error: Function is missing a return type annotation  [no-untyped-def]
+app/api/v1/households.py:20: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/households.py:22: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/households.py:58: error: Function is missing a return type annotation  [no-untyped-def]
+app/api/v1/households.py:59: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/households.py:60: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/evidence.py:19: error: Function is missing a return type annotation  [no-untyped-def]
+app/api/v1/evidence.py:20: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/evidence.py:22: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/evidence.py:24: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/assets.py:72: error: Function is missing a return type annotation  [no-untyped-def]
+app/api/v1/assets.py:75: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/assets.py:77: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/assets.py:102: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/assets.py:102: error: Missing type arguments for generic type "dict"  [type-arg]
+app/api/v1/assets.py:102: note: Error code "type-arg" not covered by "type: ignore[no-untyped-def]" comment
+app/api/v1/assets.py:262: error: Function is missing a return type annotation  [no-untyped-def]
+app/api/v1/assets.py:270: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/assets.py:271: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/assets.py:388: error: Function is missing a return type annotation  [no-untyped-def]
+app/api/v1/assets.py:392: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/assets.py:394: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/assets.py:492: error: Function is missing a return type annotation  [no-untyped-def]
+app/api/v1/assets.py:494: error: Missing type arguments for generic type "dict"  [type-arg]
+app/api/v1/assets.py:496: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/assets.py:497: error: Unused "type: ignore" comment  [unused-ignore]
+app/main.py:50: error: Unused "type: ignore" comment  [unused-ignore]
+app/main.py:56: error: Unused "type: ignore" comment  [unused-ignore]
+Found 41 errors in 9 files (checked 90 source files)
+mypy_exit=1
+
+================ RECEIPT NOTE VERIFY ================
+See SG-117_report.md (filled in the follow-up docs commit after WORK_HEAD was known).
