@@ -1,0 +1,27 @@
+SG-130 — Legacy PNG thumb backfill: write the missing `.jpg` thumbs through the writer, prove 200s
+Contract: 0.37.0 (recorded AGENTS.md:4; .rules-cache/ ABSENT — F-SG129-1 persists)
+BASE REF: origin/automation (requested); resolved at start b70237847452d83175e0ccdfa12c2f9277f6d9d7 (== HEAD)
+Model/effort: opencode-go/deepseek-v4.1-flash (provider metadata opencode.log providerID=opencode-go modelID=deepseek-v4.1-flash); effort high from process argv pid=1633509 /proc/1633509/cmdline `opencode run --auto --dir /home/andrei/StorageGenie --variant high`
+Spend: $0.000000 (real; zero metered calls)
+Clock (UTC): 2026-09-25T19:20:41Z
+
+G0 — enumerate + entry check (before any write)
+- Container storagegenie-backend-1 healthy; volume storagegenie_storage_data RW at /data/storage.
+- Writer entry importable in-image: `_decode_image`, `_thumbnail_bytes`, `thumbnail_path`, settings — IMPORT_OK /data/storage [256, 512]. Script itself absent from the running image (built before SG-130) → run piped over stdin; no rebuild, no docker cp.
+- read-only sqlite: 13 evidence rows = 7 image/png + 1 image/jpeg + 5 text/plain; household 01a0a029-1477-7ca0-b200-bce78a96c679.
+- BEFORE thumb set: exactly 2 `.jpg` (the JPEG evidence 6050ed6f), so the 7 PNG evidences have no thumb — identical to the SG-129 AFTER set. PG-IC-08 did not trip. 7 x [256,512] = 14 exact artifacts.
+- BEFORE 404 table captured live (14 PNG legs 404, 2 JPEG legs 200).
+
+G1 — script + fixture proof (fail-then-pass, both runs committed)
+- Test written first; pytest FAILS on the absent script (FileNotFoundError at collection, exit 2).
+- `backend/scripts/backfill_legacy_png_thumbs.py` added: driver only, calls production `_decode_image` + `_thumbnail_bytes` + `thumbnail_path` with atomic `.tmp`-then-replace; skip-existing idempotent by default, `--overwrite` rewrites; explicit `--storage-key` targets.
+- pytest PASS: 5 passed (RGB + RGBA artifact magic/boundedness per size, skip idempotency, overwrite replacement, real-route 200 jpeg).
+- ruff clean on both files; mypy app baseline 41/9 unchanged; `git diff --stat -- backend/app/models backend/alembic` empty.
+
+G2 — live run once, then 200s
+- One `docker exec -i … python - --storage-key <7> < script` run: BACKFILLED artifacts_written=14 evidences=7 sizes=[256, 512], run_exit=0, elapsed_s=1.
+- AFTER listing: 16 thumb `.jpg` (2 pre-existing + 14 new), no `.tmp`, no non-`.jpg` thumb, no 15th artifact. Volume 15→29 files, 5131614→5296705 bytes (+165091 == written byte sum). Originals 13/13 sha-identical.
+- 200-after table: all 14 PNG legs flipped 404→200 `image/jpeg` `ffd8ff`; 2 JPEG legs stayed 200; served sizes == disk sizes.
+- Full suite 2 failed / 617 passed; both reds in test_signals.py (known decode/OCR environment class), untouched by this slice.
+
+Verdict: BACKFILLED — 14 artifacts written, all served 200 with ffd8ff magic.

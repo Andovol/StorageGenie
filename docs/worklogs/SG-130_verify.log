@@ -1,0 +1,176 @@
+SG-130 verify log — legacy PNG thumb backfill through the real writer, prove 200s
+Contract: 0.37.0 (recorded AGENTS.md:4; .rules-cache/ ABSENT — F-SG129-1 persists)
+BASE REF: origin/automation (requested); resolved at start b70237847452d83175e0ccdfa12c2f9277f6d9d7
+Model/effort: opencode-go/deepseek-v4.1-flash (provider metadata opencode.log providerID=opencode-go modelID=deepseek-v4.1-flash); effort high from process argv pid=1633509 /proc/1633509/cmdline `opencode run --auto --dir /home/andrei/StorageGenie --variant high`
+Spend: $0.000000 (real; zero metered calls; no path constructs one)
+Clock (UTC): 2026-09-25T19:20:41Z
+
+=== G0 — CONTAINER + VOLUME MAPPING ===
+$ docker ps --format '{{.Names}} | {{.Image}} | {{.Status}}'
+storagegenie-backend-1 | storagegenie-backend | Up 5 hours (healthy)
+$ docker inspect storagegenie-backend-1 --format '{{range .Mounts}}{{.Type}} {{.Name}} -> {{.Destination}} RW={{.RW}}{{"\n"}}{{end}}'
+volume storagegenie_storage_data -> /data/storage RW=true
+bind  -> /data/db RW=true
+
+=== G0 — WRITER ENTRY IN THE SERVED IMAGE ===
+$ docker exec storagegenie-backend-1 python -c "from app.services.evidence_service import _decode_image, _thumbnail_bytes; from app.storage.local_store import thumbnail_path; from app.config import settings; print('IMPORT_OK', settings.storage_root, settings.thumbnail_sizes)"
+IMPORT_OK /data/storage [256, 512]
+VERDICT: decode+thumb entry importable in-image; thumbnail_sizes == [256, 512] (matches the packet expectation); 7 x 2 = 14 exact artifacts. The script itself is NOT in the running image (built before SG-130), so the live run pipes it over stdin — no rebuild, no `docker cp`.
+
+=== G0 — EVIDENCE ROWS (read-only sqlite, mode=ro) + ORIGINALS (container) ===
+$ docker exec storagegenie-backend-1 python -c "import sqlite3; c=sqlite3.connect('file:/data/db/storagegenie.db?mode=ro', uri=True); [print('|'.join(str(x) for x in r)) for r in c.execute('SELECT id, household_id, media_type, storage_key, size_bytes, original_filename FROM evidence ORDER BY media_type, storage_key')]; print('TOTAL', c.execute('SELECT COUNT(*) FROM evidence').fetchone()[0])"
+01a0a467-eacf-7e13-bbd0-078b1bc93860|01a0a029-1477-7ca0-b200-bce78a96c679|image/jpeg|01a0a029-1477-7ca0-b200-bce78a96c679/60/6050ed6f7f83bf90722057f1a376b1adcfc8099de4f8995e5cb85ee0ae100630.jpg|239596|pasta-de-dinti-colgate-50-ml-total-original-iN6RhsW3.jpg
+01a0c481-08b8-72b2-ab22-8ad28fed8fda|01a0a029-1477-7ca0-b200-bce78a96c679|image/png|.../05/052a5f7b47d0556aace108ea32fbd67f8641c9e940f4a7ef69e1cc92e75a1a45.png|406377|image.png
+01a0c4a1-acbd-7541-83b7-ce9d04730716|...|image/png|.../63/63b3ec707f184a6c4026948701b0cc3d074cea5aa8449bcb1d22711891a9bd09.png|565806|image.png
+01a0afaa-145d-7f21-b647-703aaa693f5a|...|image/png|.../6c/6c4cbf2e7c3bc3ccdcbc63873fad85f87bacd8ceec533a5e3de2f478ab1f8279.png|9709|sg029_01_clean_food.png
+01a0c4a0-af88-7903-a070-a44e7b120712|...|image/png|.../71/71901cac327fdd76926e36aa2a7889b2b17fb4e2619ca92d97f86d53aac0de63.png|1280694|image.png
+01a0c445-35b0-7a53-9b8d-22fa3d6523de|...|image/png|.../b6/b64034e5c91212098f9895535b5ba45e752bfdf70c24c4cd296b2007823f06bd.png|861026|image.png
+01a0c47f-0830-75f0-a027-9e8bde8eae48|...|image/png|.../b6/b6e11ecce9be93ee2470ad75143e8e1d89489da1e128baecc89688ae9e3a833e.png|478195|image.png
+01a0c4a1-ad90-78e1-9c17-10d92260fd0e|...|image/png|.../f9/f9d71a40b1c5ac455fe568576c77b042abc4755c65dce99a9dfcb25f64a8f367.png|1259505|image.png
+(5 text/plain rows omitted here; full set 13 rows: 7 PNG + 1 JPEG + 5 TXT)
+TOTAL 13
+$ docker exec storagegenie-backend-1 find /data/storage -type f -name '*_thumb*' -printf '%s\t%p\n' | sort -k2
+7113	.../60/6050ed6f..._thumb256.jpg
+22254	.../60/6050ed6f..._thumb512.jpg
+BEFORE thumb set: 2 hits, both `.jpg`, both belonging to the JPEG evidence 6050ed6f. The 7 PNG originals have NO thumb. This is exactly the SG-129 AFTER set (7 PNG originals + 2 live JPEG thumbs); suffix distribution {'jpg': 2}. PG-IC-08 gate did NOT trip, either direction.
+VOLUME BEFORE: 15 files, 5131614 bytes.
+
+=== G1 — FAIL-THEN-PASS (both runs committed) ===
+$ ls backend/scripts/backfill_legacy_png_thumbs.py
+ls: cannot access 'backend/scripts/backfill_legacy_png_thumbs.py': No such file or directory
+$ venv/bin/python -m pytest tests/test_sg130_png_thumb_backfill.py -q   # FAIL run (script absent)
+tests/test_sg130_png_thumb_backfill.py:45: in _load_backfill
+    spec.loader.exec_module(module)
+E   FileNotFoundError: [Errno 2] No such file or directory: '/home/andrei/StorageGenie/backend/scripts/backfill_legacy_png_thumbs.py'
+ERROR tests/test_sg130_png_thumb_backfill.py - FileNotFoundError
+!!!!!!!!!!!!!!!!!!!! Interrupted: 1 error during collection !!!!!!!!!!!!!!!!!!!!
+exit=2
+$ venv/bin/python -m pytest tests/test_sg130_png_thumb_backfill.py -q   # PASS run (script present)
+.....                                                                    [100%]
+5 passed, 2 warnings in 0.81s
+exit=0
+The test invokes the real functions (non-vacuous): it asserts the returned artifact list, the `.jpg` suffix, `ffd8ff` magic, decoded JPEG format and bounded size per configured size; the skip/overwrite idempotency; and a 200 `image/jpeg` response from the real thumb route on the backfilled artifact.
+
+=== G1 — LINT / TYPE / SCOPE DIFFS ===
+$ venv/bin/python -m ruff check scripts/backfill_legacy_png_thumbs.py tests/test_sg130_png_thumb_backfill.py
+All checks passed!
+$ venv/bin/python -m mypy app        # no app change expected
+Found 41 errors in 9 files (checked 90 source files)   # baseline 41/9 unchanged (STATE.md)
+$ git diff --stat -- backend/app/models backend/alembic
+(empty)
+
+=== G2 — LIVE RUN (one exec, once) ===
+$ docker exec -i storagegenie-backend-1 python - --storage-key <7 keys> < backend/scripts/backfill_legacy_png_thumbs.py
+EVIDENCE storage_key=.../05/052a5f7b...png
+WROTE size=256 bytes=4387 magic=ffd8ff sha256=1ea5eac490f648c9e7ef221fd7801cb241802046a58e3d48df66b3c2e5541d4c path=/data/storage/.../05/052a5f7b..._thumb256.jpg
+WROTE size=512 bytes=12474 magic=ffd8ff sha256=94268d1b703e900daf46dfa830af8f62b9d55a36f06b96916bb978b6f37f0421 path=/data/storage/.../05/052a5f7b..._thumb512.jpg
+EVIDENCE storage_key=.../63/63b3ec70...png
+WROTE size=256 bytes=4450 magic=ffd8ff sha256=b9efdfc2c78bec3ebd94e2506619c00ff92ec13ccb2bb9b2e4a5874378628a9d path=/data/storage/.../63/63b3ec70..._thumb256.jpg
+WROTE size=512 bytes=13231 magic=ffd8ff sha256=8a9f1b319be81be03986dc471081e81fff39f8587d2d0fb467e7f8c618167d50 path=/data/storage/.../63/63b3ec70..._thumb512.jpg
+EVIDENCE storage_key=.../6c/6c4cbf2e...png
+WROTE size=256 bytes=4554 magic=ffd8ff sha256=95e918922bce4363e1a4561ef6610fcc34b56b4d9a2c81dabadcd8aa9af90e10 path=/data/storage/.../6c/6c4cbf2e..._thumb256.jpg
+WROTE size=512 bytes=11067 magic=ffd8ff sha256=79b51fcb694c526eff1c78885176cf1034beb14e93bbdc0984d7f052824792b5 path=/data/storage/.../6c/6c4cbf2e..._thumb512.jpg
+EVIDENCE storage_key=.../71/71901cac...png
+WROTE size=256 bytes=8658 magic=ffd8ff sha256=35047e00107ac675dc2e7231695a00d17d33ac124684f4478872e467577cae25 path=/data/storage/.../71/71901cac..._thumb256.jpg
+WROTE size=512 bytes=26390 magic=ffd8ff sha256=c9a752d5b3564d73e9c23079b904e76b054eeac3aef4ffc3ff050af8a1a274ad path=/data/storage/.../71/71901cac..._thumb512.jpg
+EVIDENCE storage_key=.../b6/b64034e5...png
+WROTE size=256 bytes=5979 magic=ffd8ff sha256=fd5981bcb29a110e737e2dc89b5c1a815a438ad95c06780420012cf84399c9d3 path=/data/storage/.../b6/b64034e5..._thumb256.jpg
+WROTE size=512 bytes=17721 magic=ffd8ff sha256=8b3b9c50a3b86a2c36a503984055309d5f074f98ec39909ed4af2af726517182 path=/data/storage/.../b6/b64034e5..._thumb512.jpg
+EVIDENCE storage_key=.../b6/b6e11ecc...png
+WROTE size=256 bytes=4793 magic=ffd8ff sha256=6a6e172b1e29779f5850657f93240078f4ae5d575622670877e098b9a40fa242 path=/data/storage/.../b6/b6e11ecc..._thumb256.jpg
+WROTE size=512 bytes=13422 magic=ffd8ff sha256=03e5f4ae421cdb3a35caf1fe0d411bdb91b0d4dc1027821b71b8a3d2160ba8ec path=/data/storage/.../b6/b6e11ecc..._thumb512.jpg
+EVIDENCE storage_key=.../f9/f9d71a40...png
+WROTE size=256 bytes=9334 magic=ffd8ff sha256=a7b47da7e81a3b8a90a473323ecf68a44af6cf6b4027b17f35a7b5877224aaa3 path=/data/storage/.../f9/f9d71a40..._thumb256.jpg
+WROTE size=512 bytes=28631 magic=ffd8ff sha256=3bc7b59d7335711df297945b69cb3c91c0c5c9c7cfe226549df144846f173bc6 path=/data/storage/.../f9/f9d71a40..._thumb512.jpg
+BACKFILLED artifacts_written=14 evidences=7 sizes=[256, 512]
+run_exit=0
+elapsed_s=1
+
+=== G2 — AFTER LISTING / EXACTNESS ===
+$ docker exec storagegenie-backend-1 find /data/storage -type f -name '*_thumb*' -printf '%s\t%p\n' | sort -k2
+4387	.../05/052a5f7b..._thumb256.jpg
+12474	.../05/052a5f7b..._thumb512.jpg
+7113	.../60/6050ed6f..._thumb256.jpg
+22254	.../60/6050ed6f..._thumb512.jpg
+4450	.../63/63b3ec70..._thumb256.jpg
+13231	.../63/63b3ec70..._thumb512.jpg
+4554	.../6c/6c4cbf2e..._thumb256.jpg
+11067	.../6c/6c4cbf2e..._thumb512.jpg
+8658	.../71/71901cac..._thumb256.jpg
+26390	.../71/71901cac..._thumb512.jpg
+5979	.../b6/b64034e5..._thumb256.jpg
+17721	.../b6/b64034e5..._thumb512.jpg
+4793	.../b6/b6e11ecc..._thumb256.jpg
+13422	.../b6/b6e11ecc..._thumb512.jpg
+9334	.../f9/f9d71a40..._thumb256.jpg
+28631	.../f9/f9d71a40..._thumb512.jpg
+$ docker exec storagegenie-backend-1 sh -c "find /data/storage -type f -name '*_thumb*' | sed 's/.*\.//' | sort | uniq -c"
+     16 jpg
+$ docker exec storagegenie-backend-1 sh -c 'find /data/storage -name "*.tmp" -o -name "*_thumb*" ! -name "*.jpg" | sort; echo "(empty above = none)"'
+(empty above = none)
+AFTER: 16 thumb hits = 2 pre-existing JPEG thumbs + exactly 14 new `.jpg` artifacts. No 15th artifact, no `.tmp`, no non-`.jpg` thumb.
+$ docker exec storagegenie-backend-1 sh -c 'find /data/storage -type f | wc -l; find /data/storage -type f -printf "%s\n" | awk "{s+=\$1} END {print s}"'
+29
+5296705
+VOLUME AFTER: 29 files, 5296705 bytes (delta +14 files, +165091 bytes == the 14 written artifacts' byte sum).
+
+=== G2 — ORIGINALS UNTOUCHED (sha256 BEFORE vs AFTER, both captured live) ===
+13/13 IDENTICAL:
+052a5f7b47d0556aace108ea32fbd67f8641c9e940f4a7ef69e1cc92e75a1a45  .../05/052a5f7b...png
+1922e0d1f2146bc70cc548dd865b510036ce07a663c803fde4b7bc51b342b82e  .../1a/1a25be16...txt
+259acdd80407309ae0705667e920764dd7c1195fba1249104e1a22e544bb2c86  .../13/133d67c1...txt
+38549453f2010db9feb9b41b8dbbb19b54ad226d936c51cde693492e0bf9b8e5  .../c8/c8145596...txt
+5476fb828549aa4355ea6d57e6933f7d1674ca54da942d4a4af0ddb580eb32eb  .../6b/6b70acf5...txt
+6050ed6f7f83bf90722057f1a376b1adcfc8099de4f8995e5cb85ee0ae100630  .../60/6050ed6f...jpg
+63b3ec707f184a6c4026948701b0cc3d074cea5aa8449bcb1d22711891a9bd09  .../63/63b3ec70...png
+6c4cbf2e7c3bc3ccdcbc63873fad85f87bacd8ceec533a5e3de2f478ab1f8279  .../6c/6c4cbf2e...png
+71901cac327fdd76926e36aa2a7889b2b17fb4e2619ca92d97f86d53aac0de63  .../71/71901cac...png
+b64034e5c91212098f9895535b5ba45e752bfdf70c24c4cd296b2007823f06bd  .../b6/b64034e5...png
+b6e11ecce9be93ee2470ad75143e8e1d89489da1e128baecc89688ae9e3a833e  .../b6/b6e11ecc...png
+df53f3efc576c27f8aff9dce557d134fe0693ab39d2f49e31c02f4d038ce4f68  .../9a/9a21f4fa...txt
+f9d71a40b1c5ac455fe568576c77b042abc4755c65dce99a9dfcb25f64a8f367  .../f9/f9d71a40...png
+
+=== G1/G2 — 404-BEFORE TABLE (live, PG-EV-08) ===
+BEFORE|052a5f7b|thumb256|404|application/problem+json
+BEFORE|052a5f7b|thumb512|404|application/problem+json
+BEFORE|63b3ec70|thumb256|404|application/problem+json
+BEFORE|63b3ec70|thumb512|404|application/problem+json
+BEFORE|6c4cbf2e|thumb256|404|application/problem+json
+BEFORE|6c4cbf2e|thumb512|404|application/problem+json
+BEFORE|71901cac|thumb256|404|application/problem+json
+BEFORE|71901cac|thumb512|404|application/problem+json
+BEFORE|b64034e5|thumb256|404|application/problem+json
+BEFORE|b64034e5|thumb512|404|application/problem+json
+BEFORE|b6e11ecc|thumb256|404|application/problem+json
+BEFORE|b6e11ecc|thumb512|404|application/problem+json
+BEFORE|f9d71a40|thumb256|404|application/problem+json
+BEFORE|f9d71a40|thumb512|404|application/problem+json
+BEFORE|6050ed6f|thumb256|200|image/jpeg
+BEFORE|6050ed6f|thumb512|200|image/jpeg
+(14 PNG legs 404; 2 JPEG legs 200. Identical to the SG-129 AFTER table.)
+
+=== G2 — 200-AFTER TABLE (live GET /v1/evidence/{id}/thumb/{size}?household_id=...; magic per leg) ===
+AFTER|052a5f7b|thumb256|200 image/jpeg 4387|ffd8ff
+AFTER|052a5f7b|thumb512|200 image/jpeg 12474|ffd8ff
+AFTER|63b3ec70|thumb256|200 image/jpeg 4450|ffd8ff
+AFTER|63b3ec70|thumb512|200 image/jpeg 13231|ffd8ff
+AFTER|6c4cbf2e|thumb256|200 image/jpeg 4554|ffd8ff
+AFTER|6c4cbf2e|thumb512|200 image/jpeg 11067|ffd8ff
+AFTER|71901cac|thumb256|200 image/jpeg 8658|ffd8ff
+AFTER|71901cac|thumb512|200 image/jpeg 26390|ffd8ff
+AFTER|b64034e5|thumb256|200 image/jpeg 5979|ffd8ff
+AFTER|b64034e5|thumb512|200 image/jpeg 17721|ffd8ff
+AFTER|b6e11ecc|thumb256|200 image/jpeg 4793|ffd8ff
+AFTER|b6e11ecc|thumb512|200 image/jpeg 13422|ffd8ff
+AFTER|f9d71a40|thumb256|200 image/jpeg 9334|ffd8ff
+AFTER|f9d71a40|thumb512|200 image/jpeg 28631|ffd8ff
+AFTER|6050ed6f|thumb256|200 image/jpeg 7113|ffd8ff
+AFTER|6050ed6f|thumb512|200 image/jpeg 22254|ffd8ff
+ALL 16 legs 200 `image/jpeg` with `ffd8ff` magic. The 14 PNG legs flipped 404 -> 200; the 2 JPEG legs stayed 200. Served byte sizes equal the on-disk artifact sizes exactly (writer path == reader path).
+
+=== SUITE (unrelated to this slice) ===
+$ venv/bin/python -m pytest -q
+2 failed, 617 passed, 32 warnings in 31.83s
+FAILED tests/test_signals.py::test_generated_codes_are_validated_and_bad_checksum_is_not_an_identifier
+FAILED tests/test_signals.py::test_ocr_has_text_boxes_and_mean_confidence
+Both reds are in `test_signals.py` (decode/OCR environment class, the known 2-suite reds per STATE.md); this slice adds two files that do not touch signals, so the reds cannot be caused by it and were not re-proven on bare BASE (no app change: `git diff --stat -- backend/app` empty apart from the two new files below).
