@@ -1,0 +1,128 @@
+SG-122 verify log — raw statuses + raw bodies (three real-route POSTs; read-only probes otherwise)
+
+BASE REF:      origin/automation
+BASE_RESOLVED: a1616dd4e28a66f7df1ff25be65019958b5acb4e
+START_HEAD:    a1616dd4e28a66f7df1ff25be65019958b5acb4e
+WORK_HEAD:     __WORK_HEAD__
+
+=== CONTRACT ECHO / SOURCE PATH ===
+$ cat /home/andrei/storagegenie-contract/VERSION
+0.37.0
+$ git -C /home/andrei/storagegenie-contract rev-parse HEAD
+1acd7730e5fa6de5b7403aacce71207e9946461d
+# recorded 0.37.0 == published (1acd773) — D15 adoption match.
+
+=== G0 CAPABILITY (non-mutating) ===
+$ docker ps --format '{{.Names}}\t{{.Status}}\t{{.Image}}'
+storagegenie-backend-1	Up 2 hours (healthy)	storagegenie-backend
+
+$ curl -s -w '\nHTTP %{http_code}\n' http://127.0.0.1:8003/v1/health
+{"status":"ok","db":"ok","storage":"ok"}
+HTTP 200
+
+$ docker exec storagegenie-backend-1 alembic current
+INFO  [alembic.runtime.migration] Context impl SQLiteImpl.
+INFO  [alembic.runtime.migration] Will assume non-transactional DDL.
+20260924_sg114_relation (head)        # matches packet hypothesis
+
+=== G0 BEFORE-CENSUS (must read 0/0/0) ===
+$ docker exec storagegenie-backend-1 python -c "
+import sqlite3; c=sqlite3.connect('/data/db/storagegenie.db')
+for t in ('location','asset_location','asset_relation'):
+    print(t, c.execute('SELECT COUNT(*) FROM '+t).fetchone()[0])"
+location 0
+asset_location 0
+asset_relation 0
+
+$ SELECT id,name FROM household ORDER BY id
+('01a0a029-1477-7ca0-b200-bce78a96c679', 'Popescu Household')     # live household_id
+
+$ SELECT id,household_id,display_name FROM asset ORDER BY id
+('01a0a467-eb0e-7b83-a227-af122dc9268b', '01a0a029-1477-7ca0-b200-bce78a96c679', 'Toothpaste')                 # asset A
+('01a0c446-44c9-7b82-9d1c-2b51fa518191', '01a0a029-1477-7ca0-b200-bce78a96c679', 'CEAFĂ DE PORC')              # asset B
+('01a0c47f-fbb3-7db1-b6f3-aa52d20aa6a0', '01a0a029-1477-7ca0-b200-bce78a96c679', 'UHT Lapte 3,5% grăsime')
+('01a0c481-720e-7923-ad6c-bee45caba30f', '01a0a029-1477-7ca0-b200-bce78a96c679', 'Milbona Parmigiano Reggiano Italian hard cheese flakes')
+('01a0c4aa-8b62-7360-b11e-a476ddaea0f6', '01a0a029-1477-7ca0-b200-bce78a96c679', 'Miso Soup')
+('01a0c4ab-3765-7e10-8d0a-705390c6560d', '01a0a029-1477-7ca0-b200-bce78a96c679', 'Costiță de porc')
+# live ids re-discovered read-only (not inherited); match SG-121's expected ids.
+
+=== G0 SHAPE VERIFICATION (request schemas as the CODE defines them) ===
+$ read backend/app/api/v1/locations.py
+:140  @router.post("/locations", status_code=201)
+:141  def create_location(payload: LocationCreate, household_id: str = Query(...), ...)
+:31-43  class LocationCreate(BaseModel):
+          name: str                                  # REQUIRED (non-blank, <=200, stripped)
+          parent_id: str | None = None               # optional
+          # missing household -> 422 by Query(...) (expected gate, not a stop)
+
+:217  @router.post("/assets/{asset_id}/locations")   # 200
+:63-64  class AssignLocationRequest(BaseModel):
+          location_id: str                           # REQUIRED
+
+$ read backend/app/api/v1/relations.py
+:113  @router.post("/assets/{asset_id}/relations", status_code=201)
+:29   RELATION_TYPES = frozenset({"related_to", "contains"})
+:40-49  class RelationCreate(BaseModel):
+          to_asset_id: str                           # REQUIRED
+          relation_type: str                         # REQUIRED, must be in RELATION_TYPES
+# Body fields match the packet's expectation exactly: {"name"} / {"location_id"} /
+# {"to_asset_id","relation_type":"related_to"}. No mismatch -> no STOP.
+
+=== G1 — THE THREE POSTs (in order) ===
+$ curl -s -w '\n[HTTP %{http_code}]' -X POST -H 'Content-Type: application/json' \
+    -d '{"name":"Kitchen"}' \
+    'http://127.0.0.1:8003/v1/locations?household_id=01a0a029-1477-7ca0-b200-bce78a96c679'
+{"id":"01a0d89a-19c3-7460-b187-ecb7d0c0733f","household_id":"01a0a029-1477-7ca0-b200-bce78a96c679","name":"Kitchen","parent_id":null,"created_at":"2026-09-25T12:46:12","updated_at":"2026-09-25T12:46:12"}
+[HTTP 201]
+# P1 created location id = 01a0d89a-19c3-7460-b187-ecb7d0c0733f
+
+$ curl -s -w '\n[HTTP %{http_code}]' -X POST -H 'Content-Type: application/json' \
+    -d '{"location_id":"01a0d89a-19c3-7460-b187-ecb7d0c0733f"}' \
+    'http://127.0.0.1:8003/v1/assets/01a0a467-eb0e-7b83-a227-af122dc9268b/locations?household_id=01a0a029-1477-7ca0-b200-bce78a96c679'
+{"status":"assigned","asset_id":"01a0a467-eb0e-7b83-a227-af122dc9268b","location_id":"01a0d89a-19c3-7460-b187-ecb7d0c0733f"}
+[HTTP 200]
+# P2 bound location 01a0d89a-19c3-7460-b187-ecb7d0c0733f to asset A 01a0a467-eb0e-7b83-a227-af122dc9268b
+
+$ curl -s -w '\n[HTTP %{http_code}]' -X POST -H 'Content-Type: application/json' \
+    -d '{"to_asset_id":"01a0c446-44c9-7b82-9d1c-2b51fa518191","relation_type":"related_to"}' \
+    'http://127.0.0.1:8003/v1/assets/01a0a467-eb0e-7b83-a227-af122dc9268b/relations?household_id=01a0a029-1477-7ca0-b200-bce78a96c679'
+{"id":"01a0d89a-5aa3-78c1-8eb3-7424c1d99e72","household_id":"01a0a029-1477-7ca0-b200-bce78a96c679","from_asset_id":"01a0a467-eb0e-7b83-a227-af122dc9268b","to_asset_id":"01a0c446-44c9-7b82-9d1c-2b51fa518191","relation_type":"related_to","direction":"outgoing","created_at":"2026-09-25T12:46:29","updated_at":"2026-09-25T12:46:29"}
+[HTTP 201]
+# P3 created relation id = 01a0d89a-5aa3-78c1-8eb3-7424c1d99e72 (from A -> B, related_to)
+
+=== G2 — RE-RUN SG-121 GETs (row-bearing) ===
+$ curl -s -w '\n[HTTP %{http_code}]' \
+    'http://127.0.0.1:8003/v1/locations?household_id=01a0a029-1477-7ca0-b200-bce78a96c679'
+{"items":[{"id":"01a0d89a-19c3-7460-b187-ecb7d0c0733f","household_id":"01a0a029-1477-7ca0-b200-bce78a96c679","name":"Kitchen","parent_id":null,"created_at":"2026-09-25T12:46:12","updated_at":"2026-09-25T12:46:12"}]}
+[HTTP 200]
+
+$ curl -s -w '\n[HTTP %{http_code}]' \
+    'http://127.0.0.1:8003/v1/assets/01a0a467-eb0e-7b83-a227-af122dc9268b/relations?household_id=01a0a029-1477-7ca0-b200-bce78a96c679'
+{"items":[{"id":"01a0d89a-5aa3-78c1-8eb3-7424c1d99e72","household_id":"01a0a029-1477-7ca0-b200-bce78a96c679","from_asset_id":"01a0a467-eb0e-7b83-a227-af122dc9268b","to_asset_id":"01a0c446-44c9-7b82-9d1c-2b51fa518191","relation_type":"related_to","direction":"outgoing","created_at":"2026-09-25T12:46:29","updated_at":"2026-09-25T12:46:29"}]}
+[HTTP 200]
+
+$ curl -s -w '\n[HTTP %{http_code}]' \
+    'http://127.0.0.1:8003/v1/assets/01a0a467-eb0e-7b83-a227-af122dc9268b?household_id=01a0a029-1477-7ca0-b200-bce78a96c679'
+{"id":"01a0a467-eb0e-7b83-a227-af122dc9268b","household_id":"01a0a029-1477-7ca0-b200-bce78a96c679","display_name":"Toothpaste","asset_type":"unknown","status":"ACTIVE","quantity":null,"unit":null,"condition":null,"version":1,"created_at":"2026-09-15T09:31:08","updated_at":"2026-09-15T09:31:08","evidence":[{"id":"01a0a467-eacf-7e13-bbd0-078b1bc93860","sha256":"6050ed6f7f83bf90722057f1a376b1adcfc8099de4f8995e5cb85ee0ae100630","media_type":"image/jpeg","storage_key":"01a0a029-1477-7ca0-b200-bce78a96c679/60/6050ed6f7f83bf90722057f1a376b1adcfc8099de4f8995e5cb85ee0ae100630.jpg","original_filename":"pasta-de-dinti-colgate-50-ml-total-original-iN6RhsW3.jpg","size_bytes":239596}],"assertions":[{"id":"01a0a467-eb10-71a0-bbab-f2e802c89ef9","field_path":"asset_type","value":"unknown","source_type":"user","confidence":null,"review_state":"accepted","source_evidence_ids":null,"created_at":"2026-09-15T09:31:08"},{"id":"01a0a467-eb10-71a0-bbab-f2df4b858645","field_path":"display_name","value":"Toothpaste","source_type":"user","confidence":null,"review_state":"accepted","source_evidence_ids":null,"created_at":"2026-09-15T09:31:08"},{"id":"01a0a467-eb10-71a0-bbab-f2f259c4d0f1","field_path":"status","value":"ACTIVE","source_type":"user","confidence":null,"review_state":"accepted","source_evidence_ids":null,"created_at":"2026-09-15T09:31:08"}],"audit_events":[{"id":"01a0a467-eb11-7821-8fbb-69a82d0ba9ea","actor":"api","action":"asset.create","before":null,"after":{"display_name":"Toothpaste","asset_type":"unknown","status":"ACTIVE","quantity":null,"unit":null,"condition":null,"evidence_ids":["01a0a467-eacf-7e13-bbd0-078b1bc93860"]},"timestamp":"2026-09-15T09:31:08.943495"},{"id":"01a0a467-eb11-7821-8fbb-69b63e9f5fcb","actor":"api","action":"asset.accepted","before":null,"after":{"review_state":"accepted"},"timestamp":"2026-09-15T09:31:08.943547"}],"locations":[{"id":"01a0d89a-19c3-7460-b187-ecb7d0c0733f","name":"Kitchen","parent_id":null}],"relations":[{"id":"01a0d89a-5aa3-78c1-8eb3-7424c1d99e72","household_id":"01a0a029-1477-7ca0-b200-bce78a96c679","from_asset_id":"01a0a467-eb0e-7b83-a227-af122dc9268b","to_asset_id":"01a0c446-44c9-7b82-9d1c-2b51fa518191","relation_type":"related_to","direction":"outgoing","created_at":"2026-09-25T12:46:29","updated_at":"2026-09-25T12:46:29"}]}
+[HTTP 200]
+# detail keys `locations` and `relations` both PRESENT and ROW-BEARING (1 each).
+
+=== POST-CENSUS (read) ===
+$ docker exec storagegenie-backend-1 python -c "... COUNT ..."
+location 1
+asset_location 1
+asset_relation 1
+
+=== VERDICT ===
+SEEDED — three rows created through the real write routes (location 01a0d89a-19c3-7460-b187-ecb7d0c0733f,
+asset_location binding A->Kitchen, relation 01a0d89a-5aa3-78c1-8eb3-7424c1d99e72 A->B related_to);
+all three re-run reads row-bearing -> SG-121's REMAINING closes.
+
+=== SCOPE CEILING ===
+writes: docs/worklogs/SG-122.{log,report.md,verify.log} (3 files) + exactly THREE route POSTs.
+No PUT/PATCH/DELETE; no SQL write; no build; no compose; no .env; no migration; no STATE/AGENTS;
+no flag; no recreate. Reads: docker ps/exec SELECT+COUNT, health GET, 3 route GETs, in-tree handler reads.
+$0.000000 (zero metered calls).
+
+=== RECEIPT — note add / push / mapped fetch / show (pasted verbatim) ===
+__RECEIPT__
