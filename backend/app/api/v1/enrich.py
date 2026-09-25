@@ -105,13 +105,16 @@ def label_existing_fields(db: Session, asset: Asset) -> dict[str, object]:
     conflict (same source both sides). The asset's label facts live as its
     `Assertion` rows (the commit paths write a `display_name` assertion beside
     the denormalised column), so this reads those rows and keeps only the
-    `field_path`s in the frozen SG-082 `LABEL_VISIBLE_FIELDS` vocabulary. Each
-    value is a provenance envelope (`{"value", "source_type"}`) so the REAL
-    `merge_web_fields` reads it through `_field_parts`.
+    `field_path`s in the `LABEL_VISIBLE_FIELDS` vocabulary (SG-082, extended by
+    SG-119). Each value is a provenance envelope (`{"value", "source_type"}`)
+    so the REAL `merge_web_fields` reads it through `_field_parts`.
 
-    `brand` is NOT in that vocabulary and no web path emits a brand, so a brand
-    assertion never maps to a merge field or an alternate (`PG-SC-07`). A
-    non-string/unparsable or blank value is skipped, never guessed.
+    SG-119: `brand` IS in that vocabulary and the OFF path emits one under the
+    `web:OpenFoodFacts` provenance, so a label brand and a web brand both stay
+    visible (the label wins the proposal, the web value becomes its alternate).
+    Jina still emits no brand, and the OFF-miss population (`PG-SC-07`) still
+    maps to nothing. A non-string/unparsable or blank value is skipped, never
+    guessed.
     """
     existing: dict[str, object] = {}
     for row in db.query(Assertion).filter(Assertion.asset_id == asset.id).all():

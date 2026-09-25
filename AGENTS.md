@@ -58,6 +58,6 @@ Pinned pre-conversion state `26e9e8b` (local `automation` head `26e9e8b→9f1cc0
 
 ## Loading
 
-- Session start: `G-L1` version check FIRST (fetch `origin contract` in `.rules-cache/`, read `FETCH_HEAD:VERSION`, and hash the installed global rules file against the payload `RULES.sha256` — never checkout-vs-stamp, M3), then this file + `.rules-cache/` (contract `contract-v0.25.0`) + `STATE.md:1` RESUME.
+- Session start: `G-L1` version check FIRST (fetch `origin contract` in `.rules-cache/`, read `FETCH_HEAD:VERSION`, and hash the installed global rules file against the payload `RULES.sha256` — never checkout-vs-stamp, M3), then this file + `.rules-cache/` (contract `contract-v0.36.0`) + `STATE.md:1` RESUME.
 - Before packet: `PACKET.md`; before dispatch: `DISPATCH.md` (+ `PRODUCTION.md:1` because host + SQLite are live).
 - Never copy shared contract into repo — project holds only values and narrowings.

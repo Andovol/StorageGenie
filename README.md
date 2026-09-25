@@ -422,3 +422,121 @@ names, repeated `site:` query) is committed at
 driver constants by
 `backend/tests/test_sg082_enrich_jina.py::test_worked_example_artifact_matches_the_real_driver`.
 
+## Phase 4 runbook — photo-ingest v3, 20 MB uploads, plugin domains
+
+Phase 4 stays LAN-only, single-household, and unauthenticated like the earlier
+phases. The stage closed on three exit halves: the provider-config half (one
+config-selected provider, no second provider — the D83 fork), the plugin-domain
+half (a new domain registers without changing core tables), and photo-ingest v3
+live on the public entry.
+
+### Photo-ingest v3 (schema -> pipeline -> served)
+
+The track shipped in three slices (plan
+`docs/superpowers/plans/2026-09-21-ai-ingestion-enrichment.md`, Tasks 1-2):
+
+- **Schema + prompts (SG-079):** `backend/app/services/providers/schemas.py:44-67`
+  extends `ExtractionItem` with eleven nullable, transcribed-only fields
+  (`brand, variant, size_text, barcode, category_proposed, transcript, storage,
+  warnings, allergens, nutrition_per100g, nutrition_serving`); the strict
+  `unknowns` null-beside-unknown rule is reused unchanged. Three frozen prompt
+  files ship under `backend/app/services/providers/prompts/`:
+  `extract-food-v3.md`, `extract-medicine-v3.md`, `extract-cosmetics-v3.md`. The
+  v1/v2 prompt bytes are untouched.
+- **Pipeline (SG-080):** `backend/app/services/providers/reader.py` maps each
+  category to its v3 prompt, persists the label transcript as its own
+  `text/plain` evidence row after the images extract, and carries
+  `category_proposed` as a visible gated proposal. Split-first multi-item
+  handling, the consent gate, the ledger and the candidate flow are unchanged;
+  nothing auto-accepts.
+- **Served (SG-083):** a rebuild plus exactly one recreate brought the v3
+  pipeline live on the public entry; the in-image prompt files hash to the
+  committed blobs and the live `load_prompt` returns v3 for all three
+  categories.
+
+The committed reader now loads the later **v4** prompt files
+(`extract-{food,medicine,cosmetics}-v4.md`, SG-095); `reader.py:52-58` keeps the
+v3 files on disk byte-untouched as the rollback reference.
+
+The slice suites are `backend/tests/test_sg079_v3_schema.py` and
+`backend/tests/test_sg080_ingest_pipeline.py`; SG-083 was the owner-gated deploy
+rider. Phase 4 has no separate `test_phase4_e2e.py`; it is proved by these
+per-slice suites plus the taxonomy/plugin tests below.
+
+### 20 MB upload cap and the visible 413
+
+The app accepts uploads up to 20 MiB (`backend/app/config.py:20`
+`max_upload_bytes = 20 * 1024 * 1024`). A larger body raises `UploadTooLargeError`
+(`backend/app/services/evidence_service.py:142`) and is mapped to a visible
+`HTTP 413` at `backend/app/api/v1/evidence.py:53`. On the public entry the nginx
+site file sets `client_max_body_size 25M` (measured on-box by SG-061,
+`docs/worklogs/SG-061_report.md`): bodies up to 20 MiB are accepted, 20-25 MiB
+are rejected by the app with 413, and bodies over 25 MiB die at the nginx gate
+with 413 before the app sees them.
+
+### Plugin domains and the taxonomy exit proof
+
+`GET /v1/taxonomy` reflects the registered plugin descriptors, never a hardcoded
+list (`backend/app/api/v1/assets.py:36`). The Phase 4 plugin-domain exit proof is
+`backend/tests/test_plugin_taxonomy.py::test_new_domain_registers_without_touching_core_tables`
+(line 58): a new domain registers through the real `register_plugin`
+(`backend/app/plugins/registry.py:34`) and the taxonomy path with a before/after
+table diff of zero new core tables. The static `EXPECTED_TABLES` copy was later
+removed by the Phase 5 derived-registry slice, so the pin now derives from
+`Base.metadata` directly.
+
+## Phase 5 runbook — hardening
+
+Phase 5 is the bounded hardening stage (plan
+`docs/superpowers/plans/2026-09-21-phase-5-hardening.md`). Its exit condition: the
+eval runner scores every frozen corpus with recorded baselines; the backup
+restores to temp byte-equal with a runbook; the privacy audit proves redaction
+and identifiers-only on every provider path; and the table registry is derived,
+not listed.
+
+### Regression-eval hardening
+
+`backend/eval/run.py` selects a corpus by manifest: `available_corpora()` derives
+the addressable set from `corpus/*/manifest.json`, and `--corpus
+{sg029,sg049,sg079}` scores it offline. The frozen records are
+`backend/eval/baseline_sg029_frozen.md`, `baseline_sg049_frozen.md` and
+`baseline_sg079_frozen.md`; `backend/tests/test_eval_corpus.py` pins the selector,
+the manifest counts and that each frozen baseline reproduces exactly. A baseline
+drift fails loudly. These runs are offline and $0; `--live` remains the only
+metered mode and is not part of this stage.
+
+### Backup and restore drill
+
+The drill is `backend/scripts/backup_restore_drill.py` with
+`backend/tests/test_backup_drill.py`: it copies the Compose SQLite through
+SQLite's native backup API and the evidence volume through a recursive read,
+restores to a fresh temporary directory, and proves byte-equality without writing
+the live paths. Run it with the commands in "Backup and restore drill" above;
+**restoring production from backup is an incident, never silent cleanup**
+(`CO-42`).
+
+### Privacy audit
+
+`backend/tests/test_privacy_audit.py` is the audit: exactly one HTTP sender
+exists in `app/` (`backend/app/services/providers/opencode_go.py`), every
+image-bearing path redacts through the shared `redact_image`, provider payloads
+and the ledger carry hashes/ids only, `consent=false` binds zero calls on every
+provider service path, and EXIF/GPS values never reach a provider payload. The
+audit found no hole (`docs/worklogs/SG-087_report.md`).
+
+### Derived table registry
+
+`backend/tests/test_postgres_dialect.py` derives its table set from the real
+`Base.metadata.tables` rather than a static `EXPECTED_TABLES` list; a planted
+extra table fails the derived pin (seen-to-fail). `backend/tests/test_plugin_taxonomy.py`
+uses the same live metadata. No product code changed for the derivation
+(`docs/worklogs/SG-088_report.md`).
+
+### Exit
+
+Phase 5 closed on its bounded condition. Limits carried unmodified: Enrich was
+never part of this stage (its own stage followed), the PG/S3 deployment profile
+is declined until scale demands it, the per-field accept UI and chat persistence
+remain queued UX tracks, and backups are manual. The exit record is in
+`STATE.md`.
+
