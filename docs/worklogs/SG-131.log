@@ -1,0 +1,50 @@
+SG-131 — Live ledger purge: backup, census, run the SG-125 vehicle, prove counts
+Contract: 0.37.0 (recorded AGENTS.md:4; source /home/andrei/storagegenie-contract/VERSION; HEAD 1acd7730e5fa6de5b7403aacce71207e9946461d; RULES.sha256 18de7fd7b3546bd7624b3a7b59a78bd629752816cd7fa8f1af6113d1bafc8d46)
+BASE REF: origin/automation (requested); resolved at start 777c293edf80a5a575cd7a2aa95a1ff7f266d6df (== HEAD)
+Model/effort: opencode-go/deepseek-v4.1-flash (provider metadata output/dispatch/SG-131.log `> build · deepseek-v4.1-flash`; opencode.log providerID=opencode-go modelID=deepseek-v4.1-flash); effort high from process argv pid=1686971 `/proc/1686971/cmdline` = `opencode run --auto --dir /home/andrei/StorageGenie --variant high`
+Spend: $0.000000 (real; zero metered calls; no metered path exists in this slice)
+Clock (UTC) start: 2026-09-25T19:57:50Z
+
+VERDICT: NO-OP PURGE (vehicle ran LIVE, deleted 0). The SG-125 instrument is in the served image; the
+G0 zero-precondition held (old-row set EMPTY); the vehicle ran word-for-word and returned `deleted= 0 []`;
+before/after census identical; current-month total unmoved; non-spend tables untouched; health 200/ok;
+product diff empty. Not BLOCKED — the month-box is live and the pre-count was zero.
+
+G0 — live-readiness + backup + before-census (nothing written until all three quoted)
+- Readiness: `LEDGER_RETENTION_MONTHS= 12`, `purge_old_provider_calls_callable= True`,
+  `_recorded_spend_month_boxed= True`, predicate `ProviderCall.created_at < cutoff` — all from the SERVED
+  image's python (not inherited from repo; PG-IC-09).
+- Capability: container exec identity = uid=0(root), /data/db root-owned writable; host `andrei` (mode 600,
+  owner) can read the bind copy. Only read-only census SELECTs + the one gated vehicle DELETE were in play.
+- Backup-first (SG-086 runbook, /tmp/opencode/sg131-backup kept): DB consistent copy sha256
+  8a20713603f645be1d7cccfcbaa2fee1f8356f72b0e9f38166afa9ad8c7bac46 bytes=606208, integrity ok, backup ==
+  restored byte-equal, corrupted-copy gate seen-to-fail, production BEFORE == AFTER. Storage copied read-only
+  (29 files byte-identical). Reversal path named.
+- Before-census: clock 2026-09-25T19:58:03Z; cutoff 2025-09-25 19:58:03.032702; provider_call total 17;
+  histogram 2026-09 only (17 / 0.010368); old_rows_count = 0 (EMPTY, G0 HOLDS). Non-spend: guardrail_event
+  2, audit_event 68, job 8, evidence 13 (+ asset 6, job_step 56, observation 16, candidate 7, enrich 2).
+
+G1 — live run + after-census
+- Vehicle run word-for-word from SG-125_verify.log:298: `... purge_old_provider_calls(s); print('deleted=',
+  len(ids), ids)` → `deleted= 0 []`, exit 0.
+- After-census: total 17, histogram 2026-09 17 / 0.010368, old 0, current-month 17 / 0.010368, non-spend
+  identical (2/68/8/13...). deleted == 0; BEFORE == AFTER exactly; month total unmoved; cutoff advanced
+  with the live clock (19:58:03 → 19:58:13) per PG-IC-07.
+- PG-EV-06: no rows deleted. Proof is the before/after SELECTs + quoted cutoff, not the return value.
+
+G2 — served sanity + empty product diff
+- `curl -s http://127.0.0.1:8003/v1/health` → `{"status":"ok","db":"ok","storage":"ok"}` HTTP 200.
+- `git status --porcelain` product files clean; `git diff --stat` empty; `git diff -- . ':(exclude)docs/worklogs'`
+  empty. Zero product hunks.
+
+Findings: F-SG131-1 the SG-125 recorded backup command appends a spurious `/_data` to the already-`_data`
+volume mountpoint (would STOP); the SG-086 runbook form was used. F-SG131-2 live ledger has drifted 14→17
+since SG-086 (all 2026-09; no premise broken). F-SG131-3 backup-first writes a read-only copy under
+/tmp/opencode (outside worktree), disclosed as the named reversal path.
+
+Budget: 120s ordinary / 600s overall; expected ~600s. Actual per leg (wall, s): readiness ~1, capability ~1,
+backup drill ~8, before-census ~3, vehicle ~1, after-census ~2, health+diff ~1. Well under bound; no command
+killed; nothing hung. Real metered spend $0.000000.
+
+Receipt: work pushed to automation; note on WORK_HEAD (see SG-131_report.md, pasted executed `show`);
+final tip dual-annotated; note=yes.

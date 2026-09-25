@@ -1,0 +1,252 @@
+SG-131 verify log — raw evidence (verdict NO-OP PURGE: vehicle ran live, deleted 0, month-math unmoved). Generated 2026-09-25 UTC.
+Contract: 0.37.0 (recorded AGENTS.md:4; source /home/andrei/storagegenie-contract/VERSION; HEAD 1acd7730e5fa6de5b7403aacce71207e9946461d; RULES.sha256 18de7fd7b3546bd7624b3a7b59a78bd629752816cd7fa8f1af6113d1bafc8d46)
+BASE REF: origin/automation (requested); resolved at start 777c293edf80a5a575cd7a2aa95a1ff7f266d6df (== HEAD)
+Model/effort: opencode-go/deepseek-v4.1-flash (provider metadata output/dispatch/SG-131.log line `> build · deepseek-v4.1-flash`; opencode.log providerID=opencode-go modelID=deepseek-v4.1-flash); effort high from process argv pid=1686971 /proc/1686971/cmdline `opencode run --auto --dir /home/andrei/StorageGenie --variant high`
+Spend: $0.000000 (real; zero metered calls; no metered path exists in this slice)
+Clock (UTC) at start: 2026-09-25T19:57:50Z
+
+============================================================
+## 0. G0 — READINESS (is the SG-125 instrument the code actually serving?)
+============================================================
+$ docker compose exec -T backend python -c "from app.services.providers import reader; import inspect; print('LEDGER_RETENTION_MONTHS=', reader.LEDGER_RETENTION_MONTHS); print('purge_old_provider_calls_callable=', callable(reader.purge_old_provider_calls)); print('_recorded_spend_month_boxed=', '_current_month_start_utc' in inspect.getsource(reader._recorded_spend)); print('purge_predicate=', [l.strip() for l in inspect.getsource(reader.purge_old_provider_calls).splitlines() if 'created_at < cutoff' in l])"
+LEDGER_RETENTION_MONTHS= 12
+purge_old_provider_calls_callable= True
+_recorded_spend_month_boxed= True
+purge_predicate= ['.filter(ProviderCall.created_at < cutoff)']
+readiness_exit=0
+VERDICT: all three SG-125 symbols are importable from the SERVED image; month-box is live;
+the vehicle predicate is exactly `.filter(ProviderCall.created_at < cutoff)`. PG-IC-09 satisfied
+(verified in-image, not inherited).
+
+============================================================
+## 0b. G0 — CAPABILITY CENSUS (what the exec identity can touch)
+============================================================
+$ docker compose exec -T backend sh -c 'id; echo "cwd=$(pwd)"; ls -la /data/db; stat -c "%A %U:%G %s %n" /data/db/storagegenie.db'
+uid=0(root) gid=0(root) groups=0(root)
+cwd=/app
+total 636
+drwxr-xr-x 2 root root   4096 Sep 25 14:03 .
+drwxr-xr-x 4 root root   4096 Sep 25 14:02 ..
+-rw------- 1 root root 606208 Sep 25 14:02 storagegenie.db
+-rw------- 1 root root 32768 Sep 25 14:03 storagegenie.db-shm
+-rw------- 1 root root      0 Sep 25 14:03 storagegenie.db-wal
+-rw------- root:root 606208 /data/db/storagegenie.db
+$ stat -c '%A %U:%G %s %n' /home/andrei/StorageGenie/data/db/storagegenie.db
+-rw------- andrei:andrei 606208 /home/andrei/StorageGenie/data/db/storagegenie.db
+$ test -r /home/andrei/StorageGenie/data/db/storagegenie.db && echo HOST_READABLE=yes
+HOST_READABLE=yes
+$ id
+uid=1000(andrei) gid=1000(andrei) groups=1000(andrei),27(sudo),988(docker)
+VERDICT: the container exec identity is root and CAN write /data/db (it would have run the one
+predicated DELETE). Host `andrei` owns and can read the bind-mounted DB, so the SG-086 backup runs
+out-of-band on the host. Only read-only SELECTs were issued by the census; the only potential write
+was the single G1-gated vehicle DELETE, which fired on an EMPTY old-row set (0 rows).
+
+============================================================
+## 1. G0 — BACKUP-FIRST (SG-086 runbook; read-only copy + byte-equality)
+============================================================
+# SG-086 runbook form (SG-086_verify.log:70): --prod-storage is the volume MOUNTPOINT itself.
+# NOTE: this differs from the SG-125 recorded command #1, which appends an extra `/_data` to the
+# mountpoint (see Finding F-SG131-1). `{{.Mountpoint}}` already ends in `_data`; the runbook form is used.
+$ backend/venv/bin/python backend/scripts/backup_restore_drill.py --prod-db /home/andrei/StorageGenie/data/db/storagegenie.db --prod-storage /home/andrei/.local/share/docker/volumes/storagegenie_storage_data/_data --work-dir /tmp/opencode/sg131-backup
+work-dir    = /tmp/opencode/sg131-backup
+backup-dir  = /tmp/opencode/sg131-backup/backup
+restore-dir = /tmp/opencode/sg131-backup/restore
+[G1.1] BEFORE per-table counts + integrity (read-only, live)
+  live alembic_version	1
+  live assertion	28
+  live asset	6
+  live asset_evidence	12
+  live asset_fts	6
+  live asset_fts_config	1
+  live asset_fts_data	8
+  live asset_fts_docsize	6
+  live asset_fts_idx	6
+  live asset_location	1
+  live asset_relation	1
+  live audit_event	68
+  live candidate	7
+  live enrich_snapshot	2
+  live evidence	13
+  live guardrail_event	2
+  live household	1
+  live idempotency_key	9
+  live job	8
+  live job_step	56
+  live location	1
+  live observation	16
+  live planning_suggestion	0
+  live provider_call	17
+  live review_task	6
+  live saved_search	0
+  live source_attribution	0
+  live user	2
+  live integrity_check=ok
+[G1.2] consistent copy via SQLite native backup API (read-only source)
+  backup sha256=8a20713603f645be1d7cccfcbaa2fee1f8356f72b0e9f38166afa9ad8c7bac46 bytes=606208
+  backup integrity_check=ok
+[G1.3] storage recursive copy (read-only source)
+  source files=29 bytes=5296705
+  backup files=29 bytes=5296705
+  sample 01a0a029-1477-7ca0-b200-bce78a96c679/05/052a5f7b47d0556aace108ea32fbd67f8641c9e940f4a7ef69e1cc92e75a1a45.png 052a5f7b47d0556aace108ea32fbd67f8641c9e940f4a7ef69e1cc92e75a1a45
+  sample 01a0a029-1477-7ca0-b200-bce78a96c679/05/052a5f7b47d0556aace108ea32fbd67f8641c9e940f4a7ef69e1cc92e75a1a45_thumb256.jpg 1ea5eac490f648c9e7ef221fd7801cb241802046a58e3d48df66b3c2e5541d4c
+  sample 01a0a029-1477-7ca0-b200-bce78a96c679/05/052a5f7b47d0556aace108ea32fbd67f8641c9e940f4a7ef69e1cc92e75a1a45_thumb512.jpg 94268d1b703e900daf46dfa830af8f62b9d55a36f06b96916bb978b6f37f0421
+[G2.1] restore into a fresh temp dir (never the live paths)
+  backup == restored sha256=8a20713603f645be1d7cccfcbaa2fee1f8356f72b0e9f38166afa9ad8c7bac46
+  restored integrity_check=ok
+  restored evidence: ('01a0a467-eacf-7e13-bbd0-078b1bc93860', '01a0a029-1477-7ca0-b200-bce78a96c679', '01a0a029-1477-7ca0-b200-bce78a96c679/60/6050ed6f7f83bf90722057f1a376b1adcfc8099de4f8995e5cb85ee0ae100630.jpg')
+  restored evidence: ('01a0afaa-145d-7f21-b647-703aaa693f5a', '01a0a029-1477-7ca0-b200-bce78a96c679', '01a0a029-1477-7ca0-b200-bce78a96c679/6c/6c4cbf2e7c3bc3ccdcbc63873fad85f87bacd8ceec533a5e3de2f478ab1f8279.png')
+  restored evidence: ('01a0c445-35b0-7a53-9b8d-22fa3d6523de', '01a0a029-1477-7ca0-b200-bce78a96c679', '01a0a029-1477-7ca0-b200-bce78a96c679/b6/b64034e5c91212098f9895535b5ba45e752bfdf70c24c4cd296b2007823f06bd.png')
+  restored asset: ('01a0a467-eb0e-7b83-a227-af122dc9268b', '01a0a029-1477-7ca0-b200-bce78a96c679', 'Toothpaste')
+  restored asset: ('01a0c446-44c9-7b82-9d1c-2b51fa518191', '01a0a029-1477-7ca0-b200-bce78a96c679', 'CEAFĂ DE PORC')
+  restored asset: ('01a0c47f-fbb3-7db1-b6f3-aa52d20aa6a0', '01a0a029-1477-7ca0-b200-bce78a96c679', 'UHT Lapte 3,5% grăsime')
+  storage backup == restored: file hashes identical
+[G2.2] seen-to-fail: a deliberately corrupted temp copy must fail the equality gate
+  equality gate FAILED as expected: byte inequality: /tmp/opencode/sg131-backup/backup/storagegenie.db=8a20713603f645be1d7cccfcbaa2fee1f8356f72b0e9f38166afa9ad8c7bac46 vs /tmp/opencode/sg131-backup/restore/corrupted.db=b36300ada1cfaa3c3fdefed8bde55968cf44c682c20ab04513bd07575b8eef70
+  corrupted artifact discarded
+[G1.4] AFTER per-table counts + integrity (read-only, live)
+  live provider_call	17
+  live guardrail_event	2
+  live audit_event	68
+  live job	8
+  live evidence	13
+  live integrity_check=ok
+  production-untouched: BEFORE == AFTER (counts identical)
+work-dir kept: /tmp/opencode/sg131-backup
+backup_exit=0
+
+REVERSAL PATH (named per G1/PG-EV-06): the consistent copy is
+/tmp/opencode/sg131-backup/backup/storagegenie.db (sha256 8a20713603f645be1d7cccfcbaa2fee1f8356f72b0e9f38166afa9ad8c7bac46,
+bytes 606208). Restore-by-reversal would copy that file back over
+/home/andrei/StorageGenie/data/db/storagegenie.db; the restored copy was already proven byte-equal
+and integrity_check=ok. (Storage was also copied read-only to /tmp/opencode/sg131-backup/backup/storage,
+29 files byte-identical — precaution only; the vehicle cannot touch storage.)
+
+============================================================
+## 2. G0 — BEFORE-CENSUS
+============================================================
+$ docker compose exec -T backend python - <<'PY'
+import datetime
+from sqlalchemy import func, text
+from app.db import SessionLocal
+from app.services.providers import reader
+from app.models.provider_call import ProviderCall
+s = SessionLocal()
+now_local = datetime.datetime.now().astimezone()
+cutoff = reader._retention_cutoff_utc(reader.LEDGER_RETENTION_MONTHS)
+month_start = reader._current_month_start_utc()
+...
+PY
+clock_local       = 2026-09-25T19:58:03.032685+00:00
+clock_zulu        = 2026-09-25T19:58:03.032685+00:00
+retention_months  = 12
+cutoff_naive_utc  = 2025-09-25 19:58:03.032702
+month_start_utc   = 2026-09-01 00:00:00
+provider_call_total = 17
+--- per-month histogram (month | count | sum_cost) ---
+  2026-09	17	0.010368
+old_rows_count    = 0
+current_month_count = 17
+current_month_sum   = 0.010368
+--- non-spend table counts ---
+  guardrail_event	2
+  audit_event	68
+  job	8
+  evidence	13
+  asset	6
+  job_step	56
+  observation	16
+  candidate	7
+  enrich_snapshot	2
+census_exit=0
+VERDICT: old_rows_count = 0. The G0 zero-precondition HOLDS. The whole ledger (17 rows) sits in
+2026-09, weeks old, nowhere near the 2025-09-25 cutoff. Nothing may be deleted (any nonzero
+pre-count would have been a STOP per PG-IC-08).
+
+============================================================
+## 3. G1 — THE LIVE RUN (SG-125 recorded vehicle, word-for-word)
+============================================================
+# Source command quoted verbatim from docs/worklogs/SG-125_verify.log:298
+$ docker compose exec -T backend python -c "from app.db import SessionLocal; from app.services.providers.reader import purge_old_provider_calls; s=SessionLocal(); ids=purge_old_provider_calls(s); print('deleted=', len(ids), ids)"
+deleted= 0 []
+vehicle_exit=0
+clock_utc around run: 2026-09-25T19:58:07Z
+The command differs from the SG-125 record in NO character it can differ in (same one-liner, same
+module path, same arguments). Returned ids: the empty list. Nothing deleted.
+
+============================================================
+## 4. G1 — AFTER-CENSUS
+============================================================
+clock_zulu        = 2026-09-25T19:58:13.287139+00:00
+cutoff_naive_utc  = 2025-09-25 19:58:13.287155
+month_start_utc   = 2026-09-01 00:00:00
+provider_call_total = 17
+--- per-month histogram (month | count | sum_cost) ---
+  2026-09	17	0.010368
+old_rows_count    = 0
+current_month_count = 17
+current_month_sum   = 0.010368
+--- non-spend table counts ---
+  guardrail_event	2
+  audit_event	68
+  job	8
+  evidence	13
+  asset	6
+  job_step	56
+  observation	16
+  candidate	7
+  enrich_snapshot	2
+after_census_exit=0
+VERDICT: BEFORE == AFTER exactly. deleted == 0; provider_call 17 == 17; per-month histogram
+2026-09 17 / 0.010368 unmoved; current-month total 0.010368 unmoved; guardrail_event 2, audit_event
+68, job 8, evidence 13 all untouched (PG-IC-08 did not trip, either direction). The cutoff advanced
+with the live clock (19:58:03 -> 19:58:13) as required (PG-IC-07).
+
+PG-EV-06 — rows the run deleted: NONE (empty set). Identifiers: none. The run's own return value is
+NOT the proof; the BEFORE/AFTER SELECTs over a non-empty 17-row table plus the quoted cutoff are
+(PG-EV-02, PG-EV-08). The empty deleted set is non-vacuous because the table is not empty.
+
+============================================================
+## 5. G2 — SERVED SANITY (GET-only) + EMPTY PRODUCT DIFF
+============================================================
+$ curl -s -w '\nHTTP_CODE=%{http_code}\n' http://127.0.0.1:8003/v1/health
+{"status":"ok","db":"ok","storage":"ok"}
+HTTP_CODE=200
+GATE PROBE: GET /v1/health returns the exact shape {"status":"ok","db":"ok","storage":"ok"} with 200 —
+DB and storage both reported ok post-run. (GET-only; no state change.)
+
+$ git status --porcelain
+(product files unmodified; only docs/worklogs/*.log untracked at this point)
+$ git diff --stat
+(empty)
+$ git diff -- . ':(exclude)docs/worklogs'
+(empty)
+product_diff_exit=0
+VERDICT: zero product hunks. This slice shipped no product code change of any kind.
+
+============================================================
+## 6. FINDINGS / DISAGREEMENTS
+============================================================
+F-SG131-1 (packet-adjacent, in the SG-125 record): SG-125_verify.log:292-294 records the backup
+command as `--prod-storage "$(docker volume inspect storagegenie_storage_data --format '{{.Mountpoint}}')/_data"`.
+`docker volume inspect --format '{{.Mountpoint}}'` already returns the `_data` directory
+(measured here: /home/andrei/.local/share/docker/volumes/storagegenie_storage_data/_data), so the
+recorded form resolves to `.../_data/_data` and would STOP with "production storage not found".
+The executed SG-086 runbook form (SG-086_verify.log:70) passes the mountpoint alone; that correct
+form was used. The DB half of the recorded command is correct. This is a defect in the recorded
+command only, not in the shipped drill script.
+
+F-SG131-2 (data drift vs SG-125, informational): live provider_call is now 17 (SG-125's proof used a
+temp DB; SG-086 on 2026-09-21 recorded 14). guardrail_event 2, job 8, evidence 13, candidate 7,
+enrich_snapshot 2. All rows are in 2026-09; the project's oldest ledger data is weeks old, nothing
+approaches the 12-month cutoff. No premise broken.
+
+F-SG131-3 (write-scope note, disclosed): the packet's write ceiling is the vehicle run + three
+`docs/worklogs` files. Backup-first per the SG-086 runbook necessarily writes a read-only copy to
+/tmp/opencode/sg131-backup (outside the worktree, not a product/repo write). It is the named
+reversal path required by G1, so it is reported here rather than hidden.
+
+============================================================
+## 7. RECEIPT (pasted verbatim from the FETCHED mapped ref)
+============================================================
+(see SG-131_report.md — the report carries the executed `show` output and final `note=yes`)
