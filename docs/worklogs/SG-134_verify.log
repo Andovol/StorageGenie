@@ -74,6 +74,14 @@ $ git diff --stat            # over the rest of the tree
 ================================================================================
 Receipt proof (pasted verbatim at receipt time)
 ================================================================================
-<filled in the receipt-paste commit>
+$ git notes --ref=refs/notes/storagegenie-coder-reports add -m "Dispatch-ID: SG-134 | Report: docs/worklogs/SG-134_report.md | Work-HEAD: e0b80f8d37246b8a046754cd0ac43e2001a9de68" e0b80f8d37246b8a046754cd0ac43e2001a9de68
+  (existing-note probe: "error: no note found" -> add succeeded)
+$ git push origin refs/notes/storagegenie-coder-reports
+  46552cd..2729d13  refs/notes/storagegenie-coder-reports -> refs/notes/storagegenie-coder-reports
+$ git fetch origin refs/notes/storagegenie-coder-reports:refs/notes/sg134-verify
+From github.com:Andovol/StorageGenie
+ * [new ref]         refs/notes/storagegenie-coder-reports -> refs/notes/sg134-verify
+$ git notes --ref=refs/notes/sg134-verify show e0b80f8d37246b8a046754cd0ac43e2001a9de68
+Dispatch-ID: SG-134 | Report: docs/worklogs/SG-134_report.md | Work-HEAD: e0b80f8d37246b8a046754cd0ac43e2001a9de68
 
 note=yes

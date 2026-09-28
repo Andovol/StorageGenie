@@ -5,7 +5,7 @@ Work dir:   /home/andrei/StorageGenie
 origin:     git@github.com:Andovol/StorageGenie.git
 BASE ref:   origin/automation
 BASE commit: d8077b3c7925be44ae5c8e8f561dc0196b324de6 (start HEAD; tree clean at start)
-WORK_HEAD:  <filled in the receipt-paste commit> (work commit; receipt note target)
+WORK_HEAD:  e0b80f8d37246b8a046754cd0ac43e2001a9de68 (work commit; receipt note target)
 Model:      opencode-go/deepseek-v4.1-flash   (per process arguments /proc/21363/cmdline `--model`)
 Effort:     high                              (per process arguments /proc/21363/cmdline `--variant`)
 Coder:      opencode  (env CODER=opencode; OPENCODE_PID=21363)
@@ -227,7 +227,14 @@ zero metered calls.
 - Final tip dual-annotated with the same note (note-anchor inoculation, SG-092 precedent).
 - `note=yes`
 
-<!-- RECEIPT-PASTE -->
+Executed output, pasted verbatim:
+```
+$ git fetch origin refs/notes/storagegenie-coder-reports:refs/notes/sg134-verify
+From github.com:Andovol/StorageGenie
+ * [new ref]         refs/notes/storagegenie-coder-reports -> refs/notes/sg134-verify
+$ git notes --ref=refs/notes/sg134-verify show e0b80f8d37246b8a046754cd0ac43e2001a9de68
+Dispatch-ID: SG-134 | Report: docs/worklogs/SG-134_report.md | Work-HEAD: e0b80f8d37246b8a046754cd0ac43e2001a9de68
+```
 
 ## UNCLEAR
 
