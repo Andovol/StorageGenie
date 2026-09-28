@@ -10,6 +10,7 @@ export interface HouseholdSelectorProps {
   selectStyle?: CSSProperties;
   emptyOptionLabel?: string;
   id?: string;
+  className?: string;
 }
 
 export function HouseholdSelector({
@@ -21,6 +22,7 @@ export function HouseholdSelector({
   selectStyle,
   emptyOptionLabel = "Select household",
   id,
+  className,
 }: HouseholdSelectorProps) {
   const selectElement = (
     <select
@@ -28,6 +30,7 @@ export function HouseholdSelector({
       value={value}
       onChange={(event) => onChange(event.target.value)}
       style={selectStyle}
+      className={className}
     >
       {emptyOptionLabel ? <option value="">{emptyOptionLabel}</option> : null}
       {households?.map((household) => (

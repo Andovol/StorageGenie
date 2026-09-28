@@ -56,4 +56,18 @@ describe("HouseholdSelector", () => {
     expect(screen.getByRole("combobox")).toBeInTheDocument();
     expect(screen.getByText("No selection")).toBeInTheDocument();
   });
+
+  it("passes className through to select element", () => {
+    const handleChange = vi.fn();
+    render(
+      <HouseholdSelector
+        value="hh-1"
+        onChange={handleChange}
+        households={mockHouseholds}
+        className="custom-select-class"
+      />
+    );
+
+    expect(screen.getByRole("combobox")).toHaveClass("custom-select-class");
+  });
 });
