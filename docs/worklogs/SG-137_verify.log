@@ -1,0 +1,91 @@
+SG-137 verify captures — raw, verbatim (live clock PG-IC-07)
+
+== ref resolution (G0) ==
+$ git rev-parse origin/automation
+251cca5e1d38d965bd648531fd9529cc759a6388
+$ git log -1 --format='%H %s' origin/automation
+251cca5e1d38d965bd648531fd9529cc759a6388 SG-137 packet: client.test.ts fold of #11-14 (D8)
+$ for n in 11 12 13 14; do git rev-parse refs/pull/$n/head; done
+c59338250fa478e46d2e24b9bd44f318a367e676
+03487ee2476e873ad9f985bde3d512d280ca20dc
+08baa1db6d68c18bb6f2bbddf610afcdd8240d7d
+7356f9d7cbfbf9ee3b2303c6551895c91e772871
+$ git merge-base origin/automation refs/pull/11/head   # (same for 12,13,14)
+c8490886f2cdac0688c37c42080417168fedb1e2
+
+== per-PR file scope and block counts (G0) ==
+$ for n in 11 12 13 14; do echo PR#$n; git diff --stat <base>...refs/pull/$n/head; done
+PR#11  frontend/src/api/client.test.ts | 76 ++++++++++-   (1 file changed, 75 insertions(+), 1 deletion(-))
+PR#12  frontend/src/api/client.test.ts | 96 ++++++++++-   (1 file changed, 95 insertions(+), 1 deletion(-))
+PR#13  frontend/src/api/client.test.ts | 56 ++++++++-     (1 file changed, 55 insertions(+), 1 deletion(-))
+PR#14  frontend/src/api/client.test.ts | 211 ++++++++++-  (1 file changed, 210 insertions(+), 1 deletion(-))
+$ git diff --stat c849088 origin/automation -- frontend/src/api/client.test.ts
+(empty — BASE file byte-identical to the PR base)
+
+== updateAiModel keeper comparison (G0) ==
+#12 block: describe("updateAiModel") -> 1 test "updates AI model settings via apiPut".
+  asserts res toEqual {provider:"openai", model_id:"gpt-4o"}; fetch called with
+  buildUrl("/v1/settings/ai", {}) and {method:"PUT", headers:{"Content-Type":"application/json"},
+  body: JSON.stringify({model_id:"gpt-4o"})}.
+#13 block: describe("updateAiModel") -> 2 tests "updates AI model via PUT request" (same
+  assertions as #12's success test) + "throws error when updating AI model fails" ->
+  rejects.toThrow("Unsupported model_id").
+KEEPER = #13 (stronger: success + failure). Dropped #12 delta = 0 unique assertions.
+
+== union exported-symbol placebo read (G1) ==
+$ grep -nE '^export (async )?function' frontend/src/api/client.ts
+21:export function buildUrl  41:export async function apiGet  50:export async function apiPost
+68:export async function apiPatch  86:export async function apiPut  104:apiDelete
+168:export function fetchAiSettings  172:export function updateAiModel
+193:export function candidateDecision  218:export function resolveReviewTask
+238:export function runPlanning  242:export function fetchPlanningSuggestions
+269:export function sendChat
+All 12 symbols imported by the union exist; each ported test calls the real export.
+
+== union file content check (G1) ==
+$ grep -nE 'describe\("' frontend/src/api/client.test.ts
+buildUrl / apiGet / apiPatch / apiPut / updateAiModel / apiPost / fetchAiSettings /
+fetchPlanningSuggestions / apiPost helpers   (9 describes; exactly ONE updateAiModel)
+
+== file-level vitest (600s bound) ==
+$ node_modules/.bin/vitest run src/api/client.test.ts
+ RUN  v1.6.1 /home/andrei/StorageGenie/frontend
+ ✓ src/api/client.test.ts  (30 tests) 21ms
+ Test Files  1 passed (1)
+      Tests  30 passed (30)
+   Duration  683ms
+EXIT=0
+
+== full frontend suite (600s bound, completed in-bound) ==
+$ node_modules/.bin/vitest run
+ RUN  v1.6.1 /home/andrei/StorageGenie/frontend
+ ✓ src/api/client.test.ts  (30 tests)
+ ... (all 26 test files passed) ...
+ Test Files  26 passed (26)
+      Tests  240 passed (240)
+   Duration  5.43s
+EXIT=0
+(No red; no stash-repro required. React Router future-flag stderr warnings only.)
+
+== lint / typecheck ==
+$ node_modules/.bin/eslint src/api/client.test.ts   -> ESLINT=0
+$ node_modules/.bin/tsc --noEmit
+src/components/WebAlternates.test.tsx(59,7): error TS2739 ...
+src/components/WebAlternates.test.tsx(74,7): error TS2739 ...
+src/components/WebAlternates.test.tsx(79,7): error TS2739 ...
+TSC=2  (pre-existing, untouched file -> base-resident; not a gate)
+
+== secret scan CO-100 (union file) ==
+$ grep -nEi 'api[_-]?key|secret|token|password|bearer|sk-[a-z0-9]' frontend/src/api/client.test.ts
+NO_SECRET_MATCHES
+
+== diff --stat ceiling proof ==
+$ git diff --stat
+ frontend/src/api/client.test.ts | 408 +++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 407 insertions(+), 1 deletion(-)
+$ git status --porcelain
+ M frontend/src/api/client.test.ts
+(plus the 3 untracked worklog files, committed with the union)
+
+== receipt (verbatim; see report §Receipt) ==
+push automation / notes add on WORK_HEAD / notes push / mapped fetch / show.

@@ -1,0 +1,88 @@
+SG-137 run log — fold #11–#14 into one client.test.ts coverage slice, dedupe updateAiModel
+
+started_utc  2026-09-28T18:15:14Z  (live clock, PG-IC-07)
+workdir       /home/andrei/StorageGenie
+origin        git@github.com:Andovol/StorageGenie.git
+BASE ref      origin/automation
+BASE commit   251cca5e1d38d965bd648531fd9529cc759a6388  (start HEAD, tree clean)
+WORK_HEAD     WORK_HEAD_PENDING  (worklog commit; receipt note target)
+model         opencode-go/deepseek-v4.1-flash   (read from process args /proc/107947/cmdline `--model`)
+effort        high                              (read from process args /proc/107947/cmdline `--variant high`)
+coder         opencode (env CODER=opencode; OPENCODE_PID=107947; RUN_BUDGET_S=2100)
+contract      echo=0.40.0 source=/home/andrei/storagegenie-contract/VERSION (published tip f26dbd3)
+
+role guard    Coder only — no dispatch verb run, own unit never started/polled. `gh` never touched.
+
+G0 — PREMISE VERIFICATION (verbatim tree facts)
+-----------------------------------------------
+  BASE ref origin/automation resolved to 251cca5e1d38d965bd648531fd9529cc759a6388
+  ("SG-137 packet: client.test.ts fold of #11-14 (D8)") — two fields, stated back.
+  All four heads fetched and re-hashed; every one matches the packet:
+    #11 c59338250fa478e46d2e24b9bd44f318a367e676
+    #12 03487ee2476e873ad9f985bde3d512d280ca20dc
+    #13 08baa1db6d68c18bb6f2bbddf610afcdd8240d7d
+    #14 7356f9d7cbfbf9ee3b2303c6551895c91e772871
+  Merge-base of every head vs origin/automation = c8490886f2cdac0688c37c42080417168fedb1e2
+  (== packet's stated base). Each of the four diffs touches EXACTLY ONE file,
+  frontend/src/api/client.test.ts. client.test.ts at BASE is byte-identical to the
+  PR base c849088 (git diff --stat c849088 origin/automation -- <file> = empty).
+
+  Per-PR blocks added (git diff <merge-base>...<head>):
+    #11 describe("apiPatch")  — 3 tests: success (PATCH method/headers/body/params +
+        JSON result), detail-message failure, empty-statusText JSON-parse fallback.
+        Import +apiPatch.
+    #12 describe("apiPut")  — 3 tests: success (PUT method/headers/body/params + JSON
+        result), detail failure, empty-statusText fallback. describe("updateAiModel")
+        — 1 test: success via PUT. Import +apiPut, +updateAiModel.
+    #13 inner test added to the EXISTING describe("fetchAiSettings") — failure path;
+        describe("updateAiModel") — 2 tests: success via PUT + failure
+        ("Unsupported model_id"). Import +updateAiModel.
+    #14 describe("apiPost") — 6 tests (success + detail + RFC-9457 title/detail + title
+        only + statusText fallback + empty-statusText fallback); describe("apiPost
+        helpers") — 4 tests: candidateDecision / sendChat / runPlanning /
+        resolveReviewTask. Import +apiPost, +candidateDecision, +sendChat,
+        +runPlanning, +resolveReviewTask.
+
+  Union named: apiPatch(#11) · apiPut(#12) · updateAiModel ONE(#12 vs #13) ·
+  fetchAiSettings failure(#13) · apiPost(#14) · apiPost helpers(#14). Matches the
+  packet's expectation exactly; no missing block.
+
+  updateAiModel KEEPER: #13. It carries BOTH the success test and a failure test
+  ("throws error when updating AI model fails" -> "Unsupported model_id"); #12 carries
+  only the success test. Comparing assertions: #12's success test asserts exactly the
+  same things as #13's (res toEqual {provider:"openai", model_id:"gpt-4o"}; fetch called
+  with buildUrl("/v1/settings/ai", {}) and {method:"PUT",
+  headers:{"Content-Type":"application/json"}, body: JSON.stringify({model_id:"gpt-4o"})}).
+  Dropped #12 block delta = ZERO assertions: nothing unique is lost. #13 taken verbatim.
+
+  Placebo read (AUDIT.md lens): all 12 imported symbols are real exports of
+  frontend/src/api/client.ts (buildUrl:21, apiGet:41, apiPost:50, apiPatch:68, apiPut:86,
+  fetchAiSettings:168, updateAiModel:172, candidateDecision:193, resolveReviewTask:218,
+  runPlanning:238, fetchPlanningSuggestions:242, sendChat:269). Each ported describe calls
+  its real exported function and asserts on the returned value; none asserts on a mock echo.
+  No block needed to be left out.
+
+G1 — UNION EDIT + VERIFICATION (details + raw captures in SG-137_verify.log)
+---------------------------------------------------------------------------
+  ONE write to frontend/src/api/client.test.ts: union import (12 symbols, multiline)
+  + the six describes (apiPatch, apiPut, updateAiModel, apiPost, apiPost helpers new;
+  fetchAiSettings modified in place with the failure test). 11 pre-existing tests + 19
+  ported = 30. No product file touched; no other test file touched.
+  PG-EV-07: client.test.ts tests the module it lives beside — ./client (client.ts) —
+  imported on line 16 of the file.
+
+  file-level vitest (600s bound): 1 file passed, 30 tests passed (30). Green, quoted.
+  full frontend suite (600s bound, in-bound): 26 files passed, 240 tests passed (240).
+  No red → no stash-repro needed; the suite is green, not green-except-reds.
+  eslint src/api/client.test.ts: exit 0.
+  tsc --noEmit: 3 pre-existing errors, ALL in src/components/WebAlternates.test.tsx
+  (untouched file, identical to BASE per diff --stat — base-resident, not introduced).
+  secret scan (CO-100) on the union file: no api-key/secret/token/password/bearer/sk- match.
+  git diff --stat vs BASE: frontend/src/api/client.test.ts only, 407 insertions(+), 1
+  deletion(-). Exactly 1 test file; the 3 worklog files are this commit's other members.
+
+G2 — WORKLOG + REPORT + RECEIPT
+-------------------------------
+  Three worklog files written; receipt note added on WORK_HEAD and pushed; show output
+  pasted verbatim in SG-137_report.md. WORK_HEAD bound in the receipt-paste child commit;
+  final tip dual-annotated (note-anchor inoculation, SG-092 precedent). note=yes.
