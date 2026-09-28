@@ -1,0 +1,33 @@
+SG-133 run log — outside-PR audit, perf family (READ-ONLY; writes = 3 worklog files only)
+
+started_utc  2026-09-28T17:05:36Z
+workdir      /home/andrei/StorageGenie
+origin       git@github.com:Andovol/StorageGenie.git
+BASE         origin/automation = 3ce5ba1218d7254726eb9077908746adaa4528ff  (start HEAD, clean tree)
+model        opencode-go/deepseek-v4.1-flash   (read from process argv: /proc/2028/cmdline)
+effort       high                              (read from process argv: --variant high)
+coder        opencode (env CODER=opencode; wrapper /usr/local/lib/dispatch/run-coder SG-133)
+contract     echo=0.40.0 source=/home/andrei/storagegenie-contract/VERSION (published f26dbd3);
+             RULES.md sha256=5b65629377bbac9e40bfa7e2f4d4e42a5667b3a08ec786beb47c6a677d9ac33c
+             == RULES.sha256 payload (clean). `.rules-cache/` absent on host (standing).
+
+role guard   Coder only — no dispatch verb run, own unit never started/polled.
+
+17:05:36Z G0 open: git status clean; refs fetched.
+17:06Z    gh unauth (GH_TOKEN unset, no ~/.config/gh/hosts.yml) -> FINDING F1; substituted
+          git ls-remote origin 'refs/pull/*' + refs/pull/N/head mapped to refs/audit/pr/N.
+17:07Z    #15 diff read (first in work order).
+17:08Z    #26,#17,#16,#25,#5 references mapped + diffs read.
+17:09Z    contract hash verified; blob-identity probes for overlap clusters.
+17:10Z    #22,#23,#27,#21,#24,#20,#19,#18 diffs read (all 14 now read).
+17:11Z    git apply --check all 14 vs current automation: only #5 (bolt.md add/add)
+          and #16 (import hunk) conflict; tests/suites NOT run (forbidden).
+17:12Z    elapsed ~395s. ORDER-OF-WORK all 14 completed (packet order cheapest-first).
+          Budget remaining ample (2400s cap). Writing G2 worklogs.
+
+SPEND        real $0.000000 USD, zero metered calls, zero suite runs, zero live calls,
+             zero container execs, zero merges, zero closes, zero product-file writes.
+
+note         All 14 measured diffstats == packet table exactly (no difference to report).
+             Branch names measured differ for #15/#16 (perf/*) and #27 (jules-*) — packet
+             did not name branches for all; both measured and quoted in the report.

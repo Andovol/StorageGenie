@@ -1,0 +1,114 @@
+SG-133 verification log — commands executed and their raw output (read-only audit)
+
+## Contract echo (verbatim) and source path
+$ cat /home/andrei/storagegenie-contract/VERSION
+0.40.0
+$ git -C /home/andrei/storagegenie-contract log --oneline -1
+f26dbd3 Contract payload 0.40.0
+$ cat /home/andrei/storagegenie-contract/RULES.sha256
+5b65629377bbac9e40bfa7e2f4d4e42a5667b3a08ec786beb47c6a677d9ac33c RULES.md
+$ sha256sum /home/andrei/storagegenie-contract/RULES.md
+5b65629377bbac9e40bfa7e2f4d4e42a5667b3a08ec786beb47c6a677d9ac33c  RULES.md
+-> recorded 0.40.0 == published; installed hash == payload (clean). NOT an echo-diff finding.
+
+## Model / effort from process arguments (CO-78), not the system prompt
+$ tr '\0' ' ' < /proc/2028/cmdline
+opencode run --auto --dir /home/andrei/StorageGenie --model opencode-go/deepseek-v4.1-flash --variant high ...
+-> model = opencode-go/deepseek-v4.1-flash ; effort = high
+
+## gh auth probe (F1)
+$ if [ -n "$GH_TOKEN" ]; then echo set; else echo unset; fi
+unset
+$ cat ~/.config/gh/hosts.yml
+(empty/absent)
+$ gh pr list ...
+To get started with GitHub CLI, please run:  gh auth login
+-> FINDING F1; substituted git refs/pull/* reads (still bytes).
+
+## BASE / head identity
+$ git rev-parse HEAD   -> 3ce5ba1218d7254726eb9077908746adaa4528ff
+$ git branch --show-current -> automation
+$ git status  (start) -> nothing to commit, working tree clean
+$ git remote -v -> origin git@github.com:Andovol/StorageGenie.git
+
+## 14 PR heads fetched and measured (refs/pull/N/head -> refs/audit/pr/N)
+$ for p in 5 15 16 17 18 19 20 21 22 23 24 25 26 27; do h=$(git rev-parse refs/audit/pr/$p); mb=$(git merge-base origin/automation $h); echo "$p $h $mb"; git diff --stat $mb...$h | tail -1; done
+#5  2a32bea mb=33460cd  2 files changed, 21 insertions(+), 19 deletions(-)
+#15 84dc691 mb=c849088  1 file changed, 3 insertions(+), 1 deletion(-)
+#16 f6a467a mb=c849088  3 files changed, 31 insertions(+), 17 deletions(-)
+#17 3269107 mb=9baba79  1 file changed, 9 insertions(+), 4 deletions(-)
+#18 6e624c2 mb=9baba79  3 files changed, 90 insertions(+), 9 deletions(-)
+#19 204898e mb=9baba79  1 file changed, 71 insertions(+), 46 deletions(-)
+#20 aea591d mb=9baba79  2 files changed, 68 insertions(+), 27 deletions(-)
+#21 f621469 mb=1d8e9a9  3 files changed, 43 insertions(+), 6 deletions(-)
+#22 e01e06b mb=fe7d31f  2 files changed, 30 insertions(+), 1 deletion(-)
+#23 130b646 mb=3cdf563  2 files changed, 34 insertions(+), 20 deletions(-)
+#24 0211c8a mb=43cd544  2 files changed, 73 insertions(+), 3 deletions(-)
+#25 044a11b mb=7d207bf  2 files changed, 20 insertions(+), 7 deletions(-)
+#26 3dc8349 mb=7d207bf  1 file changed, 9 insertions(+), 3 deletions(-)
+#27 9b86ce3 mb=7d207bf  2 files changed, 46 insertions(+), 7 deletions(-)
+-> all 14 diffstats == packet table exactly.
+
+## Branch mapping (ls-remote; packet named branches only partly)
+#5  bolt-optimize-asset-evidence-query-8373180077199252319
+#15 perf/optimize-evidence-id-validation-4026608314611835728
+#16 perf/asset-assertions-relationship-13770567831920213516
+#17 bolt-optimize-asset-subqueries-13542091513951877465
+#18 bolt/batch-catalog-context-queries-14803786461694813844
+#19 bolt-batch-planning-catalog-assertions-7675598486104915559
+#20 bolt/optimize-dedup-queries-75216830359788930
+#21 bolt/batch-analytics-assertions-16194283105033862914
+#22 bolt/optimize-google-taxonomy-inverted-index-14097243351672316017
+#23 bolt/analytics-batch-assertions-10419505610984377970
+#24 bolt/batch-analytics-assertions-15609253117918485373
+#25 bolt-taxonomy-lru-cache-14439831709962882905
+#26 bolt/memoize-product-card-7303002050292754265
+#27 jules-12599582609388419957-f869741f
+
+## Blob-identity probes for overlap clusters (proof of staleness vs current automation)
+current analytics blob   = 94e3c8566d65cbf92ebe889fd4829c9bcde31391
+current planning blob    = d8fb76d6243f9311fc9ef17f0aa4d532dd28a1a5
+current assets blob      = de6a4d9c4cda5c98972fba2201ed8b0268e54d1c
+current chat blob        = 06e906ba8999c4181a70aa8a066df94273c6fa7b
+current taxonomy blob    = 31d78bb968e3d0da4e2e85dab2daecf501aa5728
+PR21 base analytics=1c0c550  head=877f273   (stale vs 94e3c85)
+PR23 base analytics=1c0c550  head=c2252e5   (stale vs 94e3c85)
+PR24 base analytics=94e3c85  head=4081810   (== current automation)
+PR18 base planning=9d04359   head=562ae81
+PR19 base planning=9d04359   head=680b90a
+PR22 base taxonomy=31d78bb  head=32b38c3   (== current)
+PR25 base taxonomy=31d78bb  head=7b880c9   (== current)
+PR27 base taxonomy=31d78bb  head=9936254   (== current)
+$ grep -rn "_classification_slug|_active_expiry_date|_active_assertion" backend --include=*.py | grep -v def
+-> only analytics internal; no external importer of the helpers #23 deletes. (#23 removal is harmless churn.)
+
+## Diff apply-ability onto current automation (git apply --check; NO modification)
+#5   CONFLICT: .jules/bolt.md already exists in working directory (product hunk already merged)
+#15  CLEAN
+#16  CONFLICT: patch failed: backend/app/api/v1/assets.py:6 (stale import block)
+#17  CLEAN
+#18  CLEAN
+#19  CLEAN
+#20  CLEAN
+#21  CLEAN
+#22  CLEAN
+#23  CLEAN
+#24  CLEAN
+#25  CLEAN
+#26  CLEAN
+#27  CLEAN
+
+## Read-only proof: only the 3 worklog paths differ
+$ git status --porcelain
+?? docs/worklogs/SG-133.log
+?? docs/worklogs/SG-133_report.md
+?? docs/worklogs/SG-133_verify.log
+$ git diff --stat
+(empty)
+
+## Receipt verification (pasted verbatim after execution)
+$ git notes --ref=refs/notes/storagegenie-coder-reports add -m "Dispatch-ID: SG-133 | Report: docs/worklogs/SG-133_report.md | Work-HEAD: <WORK_HEAD>" <WORK_HEAD>
+$ git push origin refs/notes/storagegenie-coder-reports
+$ git fetch origin refs/notes/storagegenie-coder-reports:refs/notes/sg133-verify
+$ git notes --ref=refs/notes/sg133-verify show <WORK_HEAD>
+<PASTED BELOW>
