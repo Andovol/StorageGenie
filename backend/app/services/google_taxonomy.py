@@ -117,6 +117,21 @@ def _norm_bucket_prefixes() -> tuple[tuple[str, str], ...]:
     return tuple((_norm_path(prefix), bucket) for prefix, bucket in _BUCKET_PREFIXES)
 
 
+@lru_cache(maxsize=1)
+def _token_index() -> dict[str, tuple[int, ...]]:
+    """Inverted index mapping each token to tuple of row indices in _load().
+
+    Optimization (Bolt ⚡): Avoids evaluating Jaccard similarity across thousands
+    of unrelated taxonomy entries by filtering candidate rows to those sharing at
+    least one token with the query.
+    """
+    index: dict[str, list[int]] = {}
+    for idx, (_, _, tokens) in enumerate(_load()):
+        for token in tokens:
+            index.setdefault(token, []).append(idx)
+    return {token: tuple(indices) for token, indices in index.items()}
+
+
 def _jaccard(a: frozenset[str], b: frozenset[str]) -> float:
     if not a or not b:
         return 0.0
@@ -124,6 +139,29 @@ def _jaccard(a: frozenset[str], b: frozenset[str]) -> float:
     if union == 0:
         return 0.0
     return len(a & b) / union
+
+
+@lru_cache(maxsize=1024)
+def _score_candidates(proposal_tokens: frozenset[str]) -> tuple[tuple[float, str, str], ...]:
+    """Score candidate taxonomy entries against proposal tokens.
+
+    Optimization (Bolt ⚡): Uses inverted token index and LRU caching to quickly
+    return the top candidate matches without rescanning 5,500 entries.
+    """
+    token_index = _token_index()
+    candidate_indices: set[int] = set()
+    for token in proposal_tokens:
+        if token in token_index:
+            candidate_indices.update(token_index[token])
+
+    rows = _load()
+    scored = [
+        (_jaccard(proposal_tokens, rows[idx][2]), rows[idx][0], rows[idx][1])
+        for idx in candidate_indices
+    ]
+    scored = [row for row in scored if row[0] > 0.0]
+    scored.sort(key=lambda row: (-row[0], row[1]))
+    return tuple(scored[:TOP_K])
 
 
 def resolve_google_type(proposal: str | None) -> Resolution:
@@ -145,13 +183,10 @@ def resolve_google_type(proposal: str | None) -> Resolution:
         return Resolution(RESOLVED, exact[0], exact[1], TAXONOMY_VERSION, 1.0, 1.0, [])
 
     proposal_tokens = _tokens(normalized)
-    scored = [
-        (_jaccard(proposal_tokens, tokens), node_id, path)
-        for node_id, path, tokens in _load()
-    ]
-    scored = [row for row in scored if row[0] > 0.0]
-    scored.sort(key=lambda row: (-row[0], row[1]))
-    top = scored[:TOP_K]
+    if not proposal_tokens:
+        return Resolution(UNCLEAR, None, None, TAXONOMY_VERSION, 0.0, 0.0, [])
+
+    top = list(_score_candidates(proposal_tokens))
     if not top:
         return Resolution(UNCLEAR, None, None, TAXONOMY_VERSION, 0.0, 0.0, [])
 
