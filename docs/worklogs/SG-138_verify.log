@@ -1,0 +1,184 @@
+SG-138 verify log — raw captures (all commands run from /home/andrei/StorageGenie, frontend cmds from frontend/)
+Contract 0.40.0 · BASE=756a53b059466eb29985ac26794c8dfa04cb455c (=origin/automation, start HEAD, tree clean)
+Bounds: 120s ordinary / 600s suite / 2400s overall. Live clock.
+
+========================================================================================
+[1] G0 — PR head / base resolution and 8-file set
+========================================================================================
+$ git merge-base 33460cd e6a4f25
+33460cdcd64107f406bf5cb87620fecb6417da01
+$ git diff --name-status 33460cd e6a4f25
+A	frontend/preview.log
+A	frontend/src/components/HouseholdSelector.test.tsx
+A	frontend/src/components/HouseholdSelector.tsx
+M	frontend/src/routes/CapturePage.tsx
+M	frontend/src/routes/CatalogPage.tsx
+M	frontend/src/routes/ChatPage.tsx
+M	frontend/src/routes/InboxPage.tsx
+M	frontend/src/routes/PlanningPage.tsx
+$ git diff --stat 33460cd e6a4f25 | tail -1
+ 8 files changed, 167 insertions(+), 66 deletions(-)
+
+PR head date: 2026-09-14 14:54:21 +0000 e6a4f25 google-labs-jules[bot] refactor: extract HouseholdSelector component
+Base   date: 2026-09-14 17:05:23 +0300 33460cd Close: SG-041 ...
+Commits base..HEAD: 477.
+
+========================================================================================
+[2] G0 — divergence since PR base (premise check; VERIFY never inherit)
+========================================================================================
+base(33460cd)..HEAD per file (git diff --stat):
+  frontend/src/routes/CapturePage.tsx  | 14 insertions(+), 9 deletions(-)
+  frontend/src/routes/CatalogPage.tsx  | 194 insertions(+), 62 deletions(-)
+  frontend/src/routes/ChatPage.tsx     | 16 insertions(+), 5 deletions(-)
+  frontend/src/routes/InboxPage.tsx    | 23 insertions(+), 5 deletions(-)
+  frontend/src/routes/PlanningPage.tsx | 6 insertions(+), 5 deletions(-)
+(new files HouseholdSelector.{tsx,test.tsx} absent at base, so diff empty → not listed)
+
+F-2 proof — CatalogPage no longer owns the household <select>; it passes props to AppShell:
+$ grep -n "household" frontend/src/components/shell/AppShell.tsx
+20:  householdId: string;
+21:  households: Household[];
+22:  onHouseholdChange: (householdId: string) => void;
+68:          householdId={householdId}
+69:          households={households}
+70:          onHouseholdChange={onHouseholdChange}
+$ grep -n "Household" frontend/src/components/shell/CatalogToolbar.tsx
+48:  householdId: string;
+49:  households: Household[];
+50:  onHouseholdChange: (householdId: string) => void;
+123:      <select
+124:        aria-label="Household"
+125:        value={householdId}
+126:        onChange={(event) => onHouseholdChange(event.target.value)}
+127:        className={THEMED_CONTROL_CLASS}
+128:        style={CONTROL_STYLE}
+130:        {households.map((household) => (
+135:        {households.length === 0 && <option value="">No households</option>}
+136:      </select>
+CatalogToolbar is NOT in the write ceiling.
+
+F-3 proof — themed contract on Capture/Inbox selects + tests that assert it:
+$ grep -n "THEMED_CONTROL_CLASS" frontend/src/routes/CapturePage.tsx frontend/src/routes/InboxPage.tsx
+frontend/src/routes/CapturePage.tsx:30:            className={THEMED_CONTROL_CLASS}
+frontend/src/routes/InboxPage.tsx:33:<div ...><h1 ...>Inbox</h1><label>Household <select className={THEMED_CONTROL_CLASS} style={CONTROL_STYLE} ...
+$ sed -n '219,228p' frontend/src/routes/theme-adoption.test.tsx   (Capture)
+    const select = screen.getByRole("combobox", { name: /household/i });
+    expect(select).toHaveClass("bg-background", "text-foreground", "border-border");
+$ sed -n '75,81p' frontend/src/routes/InboxPage.test.tsx          (Inbox)
+    const select = screen.getByRole("combobox", { name: /household/i });
+    expect(select).toHaveClass("bg-background", "text-foreground", "border-border");
+The PR hunk passes only labelStyle/selectStyle and drops className → those two tests would fail.
+
+========================================================================================
+[3] G1 — port table (shipped files byte/hunk checked)
+========================================================================================
+$ for f in frontend/src/components/HouseholdSelector.tsx frontend/src/components/HouseholdSelector.test.tsx; do
+    sha256sum "$f"; git show e6a4f25:$f | sha256sum; done
+699258fc095105391115f8663c90edba4d0159984be44f49b2cf0f7334e6db25  frontend/src/components/HouseholdSelector.tsx
+699258fc095105391115f8663c90edba4d0159984be44f49b2cf0f7334e6db25  -                              (PR head)
+827752e3c1dfe4ccced3ee2c1e6c2c0c376025068760eacc93d50d4cac6bc4ef  frontend/src/components/HouseholdSelector.test.tsx
+827752e3c1dfe4ccced3ee2c1e6c2c0c376025068760eacc93d50d4cac6bc4ef  -                              (PR head)
+
+$ git diff --name-status HEAD        (work vs BASE)
+M	.gitignore
+M	frontend/src/routes/ChatPage.tsx
+M	frontend/src/routes/PlanningPage.tsx
+$ git status --porcelain
+ M .gitignore
+ M frontend/src/routes/ChatPage.tsx
+ M frontend/src/routes/PlanningPage.tsx
+?? frontend/src/components/HouseholdSelector.test.tsx
+?? frontend/src/components/HouseholdSelector.tsx
+
+Ported (4 of the 7 PR source files):
+  HouseholdSelector.tsx        NEW     verbatim (sha equal)
+  HouseholdSelector.test.tsx   NEW     verbatim (sha equal, 59 lines)
+  ChatPage.tsx                 MODIFIED  PR hunk applied (pre-change block byte-identical to PR base)
+  PlanningPage.tsx             MODIFIED  PR hunk applied (pre-change block byte-identical to PR base)
+NOT ported (3), all BLOCKED in-ceiling:
+  CapturePage.tsx   — themed select class (SG-105 test) would regress
+  InboxPage.tsx     — themed select class (SG-105 test) would regress
+  CatalogPage.tsx   — no inline select remains (moved to CatalogToolbar, out of ceiling)
+
+========================================================================================
+[4] G1 — .gitignore ignore proof + no .log file (PG-SC-10)
+========================================================================================
+$ git diff -- .gitignore
+@@ -13,6 +13,7 @@ venv/
+ node_modules/
+ frontend/dist/
+ frontend/.vite/
++frontend/*.log
+$ git check-ignore -v frontend/preview.log
+.gitignore:16:frontend/*.log	frontend/preview.log
+$ echo $?                                     # 0 = the path IS ignored
+0
+$ find . -name 'preview.log' -not -path './.git/*'      # empty
+$ ls frontend/*.log
+ls: cannot access 'frontend/*.log': No such file or directory
+$ git status --porcelain | grep -i '\.log'
+(no output — no .log file in status)
+
+========================================================================================
+[5] G1 — eslint (touched files) exit 0
+========================================================================================
+$ timeout 120 node_modules/.bin/eslint src/components/HouseholdSelector.tsx \
+    src/components/HouseholdSelector.test.tsx src/routes/ChatPage.tsx src/routes/PlanningPage.tsx
+eslint_exit=0
+
+========================================================================================
+[6] G1 — targeted vitest (component + the five route tests) — executed 18:26:58Z
+========================================================================================
+$ timeout 600 node_modules/.bin/vitest run \
+    src/components/HouseholdSelector.test.tsx src/routes/ChatPage.test.tsx \
+    src/routes/PlanningPage.test.tsx src/routes/InboxPage.test.tsx src/routes/theme-adoption.test.tsx
+ ✓ src/components/HouseholdSelector.test.tsx  (3 tests) 64ms
+ ✓ src/routes/ChatPage.test.tsx  (6 tests) 231ms
+ ✓ src/routes/PlanningPage.test.tsx  (4 tests) 302ms
+ ✓ src/routes/InboxPage.test.tsx  (8 tests) 372ms
+ ✓ src/routes/theme-adoption.test.tsx  (12 tests) 269ms
+ Test Files  5 passed (5)
+      Tests  33 passed (33)
+
+========================================================================================
+[7] G1 — FULL frontend suite — executed 18:27:04Z, exit 0
+========================================================================================
+$ timeout 600 node_modules/.bin/vitest run   (saved /tmp/opencode/sg138-fullsuite.txt)
+per-file results for the touched/related routes (full log lines):
+ ✓ src/routes/theme-adoption.test.tsx  (12 tests) 292ms
+ ✓ src/routes/InboxPage.test.tsx  (8 tests) 391ms
+ ✓ src/routes/ChatPage.test.tsx  (6 tests) 264ms
+ ✓ src/routes/PlanningPage.test.tsx  (4 tests) 323ms
+ ✓ src/components/HouseholdSelector.test.tsx  (3 tests) 98ms
+summary:
+ Test Files  27 passed (27)
+      Tests  243 passed (243)
+   Duration  5.13s
+No reds, hence no BASE stash-repro was needed.
+
+========================================================================================
+[8] G1 — CO-100 secret scan of the new fixture/test and component
+========================================================================================
+$ grep -nEi 'password|passwd|secret|token|api[_-]?key|BEGIN .*PRIVATE|aws_|bearer ' \
+    frontend/src/components/HouseholdSelector.tsx frontend/src/components/HouseholdSelector.test.tsx
+NO secret-like token
+Fixture is `{ id: "hh-1", name: "Main Home", created_at: "2026-01-01" }` style mock data only.
+
+========================================================================================
+[9] Process args (model + effort, CO-78)
+========================================================================================
+$ tr '\0' ' ' < /proc/117150/cmdline | cut -c1-150
+opencode run --auto --dir /home/andrei/StorageGenie --model opencode-go/deepseek-v4.1-flash --variant high # SG-138 ...
+→ MODEL = opencode-go/deepseek-v4.1-flash (argv)   EFFORT = high (--variant)
+$ env | grep -E 'CODER|RUN_BUDGET'
+CODER=opencode
+RUN_BUDGET_S=2100
+
+========================================================================================
+[10] Contract echo source
+========================================================================================
+$ cat /home/andrei/storagegenie-contract/VERSION
+0.40.0
+$ sha256sum /home/andrei/storagegenie-contract/RULES.md
+5b65629377bbac9e40bfa7e2f4d4e42a5667b3a08ec786beb47c6a677d9ac33c  /home/andrei/storagegenie-contract/RULES.md
+(matches the AGENTS.md-recorded installed payload hash for 0.39.0+0.40.0)

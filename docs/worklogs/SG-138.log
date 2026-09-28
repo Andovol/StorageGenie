@@ -1,0 +1,27 @@
+SG-138 coder log — opencode / deepseek-v4.1-flash / effort=high (per process args)
+Work dir /home/andrei/StorageGenie · BASE=756a53b (origin/automation) · started 2026-09-28T18:22:29Z
+All timestamps UTC, live clock. Bounds: 120s ordinary / 600s suite / 2400s overall.
+
+18:22:29  process start (dispatch run-coder SG-138 → `opencode run --auto --model opencode-go/deepseek-v4.1-flash --variant high`, /proc/117150/cmdline).
+18:23     G0 reads: git status clean; HEAD=756a53b==origin/automation; PR #4 head e6a4f25 (2026-09-14 14:54Z, google-labs-jules[bot]), base 33460cd (2026-09-14 17:05+03:00).
+18:23     PR diff name-status = 8 files (7 sources + frontend/preview.log). preview.log NOT tracked and NOT on disk.
+18:24     DIVERGENCE FOUND: base..HEAD = 477 commits. Page files changed since base:
+           CatalogPage +194/-62, InboxPage +23/-5, ChatPage +16/-5, CapturePage +14/-9, PlanningPage +6/-5.
+           All five page files were refactored by SG-045/064/068/075/105/118 (theming / shell / control consistency).
+18:25     Read current page files + AppShell/CatalogToolbar + SG-105 tests (theme-adoption.test.tsx, InboxPage.test.tsx).
+           FINDINGS:
+             F-2 CatalogPage.tsx no longer renders an inline <select>; the household select moved to
+                 CatalogToolbar.tsx:123-136 (out of write ceiling). PR CatalogPage hunk cannot apply.
+             F-3 CapturePage.tsx + InboxPage.tsx carry className={THEMED_CONTROL_CLASS} + CONTROL_STYLE on the
+                 household select; the PR hunk drops the class. Existing tests assert the class:
+                 theme-adoption.test.tsx:219-228 (Capture) and InboxPage.test.tsx:75-81 (Inbox) → regression.
+             → per §3 / packet scope-ceiling, those 3 page hunks are BLOCKED; the rest ships.
+18:25     Ported verbatim: HouseholdSelector.tsx + HouseholdSelector.test.tsx (git show e6a4f25:… > dest; sha256 equal).
+18:26     Ported ChatPage.tsx + PlanningPage.tsx (their pre-change blocks were byte-identical to the PR base → hunks applied cleanly).
+18:26     Added ONE .gitignore line: `frontend/*.log` (line 16).
+18:26:58  Targeted vitest: HouseholdSelector(3) + ChatPage(6) + PlanningPage(4) + InboxPage(8) + theme-adoption(12) = 5 files / 33 tests passed.
+18:27:04  Full suite: 27 files / 243 tests passed (exit 0). eslint touched files exit 0.
+18:27     check-ignore: `.gitignore:16:frontend/*.log  frontend/preview.log` exit 0 (IGNORED). No preview.log on disk.
+18:27     Secret scan of the two new files: no secret-like token (CO-100).
+18:28     Worklogs written; BLOCKED commit; push automation; notes ref.
+18:29     BLOCKED commit push + notes.
