@@ -8,13 +8,13 @@ of kind `correction` ONLY when a user explicitly logs one. It executes nothing.
 """
 
 from app.services.chat.service import (
-    SUPPORTED_CATEGORIES,
-    UnsupportedCategoryError,
-    build_catalog,
-    build_user_content,
-    load_chat_prompt,
-    log_correction,
-    respond,
+    SUPPORTED_CATEGORIES as SUPPORTED_CATEGORIES,
+    UnsupportedCategoryError as UnsupportedCategoryError,
+    build_catalog as build_catalog,
+    build_user_content as build_user_content,
+    load_chat_prompt as load_chat_prompt,
+    log_correction as log_correction,
+    respond as respond,
 )
 
 __all__ = [
