@@ -1,0 +1,92 @@
+SG-139 verify log — fail-pre (G0) + fail-post (G1) captures
+
+Dispatch-ID: SG-139
+Work dir:    /home/andrei/StorageGenie
+origin:      git@github.com:Andovol/StorageGenie.git
+BASE ref:    origin/automation
+BASE commit: 0b1e05af3a73d41bc322fce4cda90e1688de2a58  (start HEAD, tree clean)
+captured:    2026-09-28T17:52:32Z (live clock)
+toolchain:   backend/venv/bin/python 3.12.3 · pytest 9.1.1 · mypy 2.3.1 · ruff 0.16.5
+
+================================================================
+G0 — FAIL-PRE, unmodified BASE (committed BEFORE any edit)
+================================================================
+
+$ (cd backend && venv/bin/python -m pytest -q --tb=short -p no:cacheprovider)
+=================================== FAILURES ===================================
+_____________________ test_health_reports_database_failure _____________________
+tests/test_health.py:52: in test_health_reports_database_failure
+    assert "Database health check probe failed" in caplog.text
+E   AssertionError: assert 'Database health check probe failed' in ''
+E    +  where '' = <_pytest.logging.LogCaptureFixture object at 0x736f239457f0>.text
+___ test_generated_codes_are_validated_and_bad_checksum_is_not_an_identifier ___
+tests/test_signals.py:136: in test_generated_codes_are_validated_and_bad_checksum_is_not_an_identifier
+    assert any(item.get("value") == qr_value and item["validated"] for item in qr_values)
+E   assert False
+E    +  where False = any(<generator object test_generated_codes_are_validated_and_bad_checksum_is_not_an_identifier.<locals>.<genexpr> at 0x736f22c0e260>)
+_________________ test_ocr_has_text_boxes_and_mean_confidence __________________
+tests/test_signals.py:148: in test_ocr_has_text_boxes_and_mean_confidence
+    assert ocr
+E   assert []
+=============================== warnings summary ===============================
+venv/lib/python3.12/site-packages/fastapi/testclient.py:1
+  /home/andrei/StorageGenie/backend/venv/lib/python3.12/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+venv/lib/python3.12/site-packages/starlette/testclient.py:53
+  /home/andrei/StorageGenie/backend/venv/lib/python3.12/site-packages/starlette/testclient.py:53: DeprecationWarning: The anyio.abc.BlockingPortal alias is deprecated, use anyio.from_thread.BlockingPortal instead.
+    _PortalFactoryType = Callable[[], AbstractContextManager[anyio.abc.BlockingPortal]]
+
+tests/test_candidates.py: 3 warnings
+tests/test_foundations.py: 3 warnings
+tests/test_saved_searches.py: 3 warnings
+tests/test_search.py: 3 warnings
+tests/test_sg048_name_optional.py: 6 warnings
+tests/test_sg100_snapshot_persistence.py: 3 warnings
+tests/test_sg113_locations.py: 3 warnings
+tests/test_sg114_relations.py: 3 warnings
+tests/test_signals.py: 3 warnings
+  /home/andrei/StorageGenie/backend/venv/lib/python3.12/site-packages/alembic/config.py:604: DeprecationWarning: No path_separator found in configuration; falling back to legacy splitting on spaces, commas, and colons for prepend_sys_path.  Consider adding path_separator=os to Alembic config.
+    util.warn_deprecated(
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/test_health.py::test_health_reports_database_failure - Assertion...
+FAILED tests/test_signals.py::test_generated_codes_are_validated_and_bad_checksum_is_not_an_identifier
+FAILED tests/test_signals.py::test_ocr_has_text_boxes_and_mean_confidence - a...
+3 failed, 623 passed, 32 warnings in 30.22s
+
+PG-IC-08 blast radius: failing set is EXACTLY the expected
+{test_health_reports_database_failure + the 2 test_signals env reds} — no fourth red.
+The 2 test_signals reds are base-proved environment reds (derived AT the base commit):
+  $ ldconfig -p | grep -i zbar          -> libzbar: NOT FOUND
+  $ venv/bin/python -c "from pyzbar.pyzbar import decode"
+    ImportError: Unable to find zbar shared library
+  $ command -v tesseract                -> tesseract: NOT FOUND
+
+$ (cd backend && venv/bin/mypy app)
+Found 44 errors in 10 files (checked 90 source files)
+per-file error counts (BASE):
+  16 app/api/v1/assets.py
+   6 app/api/v1/review_tasks.py
+   6 app/api/v1/households.py
+   4 app/api/v1/evidence.py
+   3 app/services/dedup.py          <-- the 3 #20 defects (F-SG135-2)
+   3 app/services/asset_service.py
+   2 app/services/audit_service.py
+   2 app/schemas/asset.py
+   2 app/main.py
+   1 app/models/base.py
+the 3 dedup.py errors (the target of G1):
+  app/services/dedup.py:52: error: Incompatible types in assignment (expression has type "list[Row[tuple[Observation, Asset]]]", variable has type "list[tuple[Observation, Asset]] | None")  [assignment]
+  app/services/dedup.py:59: error: Item "None" of "list[tuple[Observation, Asset]] | None" has no attribute "__iter__" (not iterable)  [union-attr]
+  app/services/dedup.py:159: error: Argument "phash_rows" to "_similar_matches" has incompatible type "list[Row[tuple[Observation, Asset]]]"; expected "list[tuple[Observation, Asset]] | None"  [arg-type]
+
+$ (cd backend && venv/bin/ruff check app)
+All checks passed!
+
+$ git diff --stat HEAD -- backend/alembic/versions/
+(empty — no migration version change on BASE)
+
+G0 conclusion: both defects reproduced on unmodified BASE. 44 errors / 10 files
+matches the packet expectation exactly. caplog red quoted (caplog.text == '').
