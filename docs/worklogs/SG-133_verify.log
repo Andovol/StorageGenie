@@ -100,15 +100,21 @@ $ grep -rn "_classification_slug|_active_expiry_date|_active_assertion" backend 
 
 ## Read-only proof: only the 3 worklog paths differ
 $ git status --porcelain
-?? docs/worklogs/SG-133.log
-?? docs/worklogs/SG-133_report.md
-?? docs/worklogs/SG-133_verify.log
-$ git diff --stat
+M  docs/worklogs/SG-133.log
+M  docs/worklogs/SG-133_report.md
+M  docs/worklogs/SG-133_verify.log
+$ git diff --stat            # (no unstaged product hunks; staged == only these 3 paths)
 (empty)
 
-## Receipt verification (pasted verbatim after execution)
-$ git notes --ref=refs/notes/storagegenie-coder-reports add -m "Dispatch-ID: SG-133 | Report: docs/worklogs/SG-133_report.md | Work-HEAD: <WORK_HEAD>" <WORK_HEAD>
+## Receipt verification (raw executed output)
+$ git push origin automation
+   3ce5ba1..69d9826  automation -> automation
+$ git notes --ref=refs/notes/storagegenie-coder-reports add -m "Dispatch-ID: SG-133 | Report: docs/worklogs/SG-133_report.md | Work-HEAD: 69d98266c28492dbc5a7b298d0b69bc2892cc87e" 69d98266c28492dbc5a7b298d0b69bc2892cc87e
 $ git push origin refs/notes/storagegenie-coder-reports
+   cb1e170..6c940df  refs/notes/storagegenie-coder-reports -> refs/notes/storagegenie-coder-reports
 $ git fetch origin refs/notes/storagegenie-coder-reports:refs/notes/sg133-verify
-$ git notes --ref=refs/notes/sg133-verify show <WORK_HEAD>
-<PASTED BELOW>
+From github.com:Andovol/StorageGenie
+ * [new ref]         refs/notes/storagegenie-coder-reports -> refs/notes/sg133-verify
+$ git notes --ref=refs/notes/sg133-verify show 69d98266c28492dbc5a7b298d0b69bc2892cc87e
+Dispatch-ID: SG-133 | Report: docs/worklogs/SG-133_report.md | Work-HEAD: 69d98266c28492dbc5a7b298d0b69bc2892cc87e
+-> note=yes (first line carries both Dispatch-ID: and Report:; fetched-ref show pasted).

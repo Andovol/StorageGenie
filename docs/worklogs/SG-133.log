@@ -31,3 +31,9 @@ SPEND        real $0.000000 USD, zero metered calls, zero suite runs, zero live 
 note         All 14 measured diffstats == packet table exactly (no difference to report).
              Branch names measured differ for #15/#16 (perf/*) and #27 (jules-*) — packet
              did not name branches for all; both measured and quoted in the report.
+
+17:20Z    WORK_HEAD 69d98266c28492dbc5a7b298d0b69bc2892cc87e committed + pushed (3ce5ba1..69d9826).
+          Note added on WORK_HEAD, notes ref pushed (cb1e170..6c940df), re-fetched into mapped
+          refs/notes/sg133-verify, `show` pasted verbatim -> note=yes.
+          G2 receipt-paste commit + final-tip dual-annotate follows this line.
+END SG-133 (all 14 audited, no merges/closes, read-only held).

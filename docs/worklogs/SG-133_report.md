@@ -5,7 +5,7 @@ Work dir:   /home/andrei/StorageGenie
 origin:     git@github.com:Andovol/StorageGenie.git
 BASE ref:   origin/automation
 BASE commit: 3ce5ba1218d7254726eb9077908746adaa4528ff (start HEAD; tree clean at start)
-WORK_HEAD:  <filled by receipt-paste commit; also carried in the git note on the work commit>
+WORK_HEAD:  69d98266c28492dbc5a7b298d0b69bc2892cc87e (work commit; receipt note target)
 Model:      opencode-go/deepseek-v4.1-flash   (per process arguments /proc/2028/cmdline `--model`)
 Effort:     high                              (per process arguments /proc/2028/cmdline `--variant`)
 Coder:      opencode  (env CODER=opencode; wrapper /usr/local/lib/dispatch/run-coder SG-133)
@@ -161,11 +161,19 @@ $0.000000 USD, zero metered calls.
 
 ## 7. Receipt
 
-- Work commit (WORK_HEAD) and the git note on it are recorded in §7.1 below (filled by the receipt-paste
-  commit, since a commit cannot contain its own hash).
-- Notes ref: `refs/notes/storagegenie-coder-reports`; note added on WORK_HEAD, pushed, then re-fetched into
-  a mapped local ref and the `show` output pasted verbatim (see `SG-133_verify.log`). Final tip
-  dual-annotated.
+- Work commit `WORK_HEAD = 69d98266c28492dbc5a7b298d0b69bc2892cc87e`, pushed `3ce5ba1..69d9826`.
+- Notes ref `refs/notes/storagegenie-coder-reports` advanced `cb1e170..6c940df`; note added on WORK_HEAD,
+  pushed, then re-fetched into the **mapped** local ref `refs/notes/sg133-verify` (a default fetch carries
+  no notes; a bare refspec rewrites only FETCH_HEAD — mapped per `M20`). `show` output pasted verbatim:
+
+```
+$ git fetch origin refs/notes/storagegenie-coder-reports:refs/notes/sg133-verify
+From github.com:Andovol/StorageGenie
+ * [new ref]         refs/notes/storagegenie-coder-reports -> refs/notes/sg133-verify
+$ git notes --ref=refs/notes/sg133-verify show 69d98266c28492dbc5a7b298d0b69bc2892cc87e
+Dispatch-ID: SG-133 | Report: docs/worklogs/SG-133_report.md | Work-HEAD: 69d98266c28492dbc5a7b298d0b69bc2892cc87e
+```
+- Final tip dual-annotated with the same note (note-anchor inoculation, SG-092 precedent).
 - `note=yes`
 
 ## UNCLEAR
