@@ -35,3 +35,35 @@ Role: Coder only. No dispatch verb run, no unit started or polled.
   Post-failure safety: container/image unchanged, RestartCount=0, health still x2 ok, worktree clean.
 
 [18:36] G2 worklogs written; BLOCKED commit + notes receipt.
+
+=== RECEIPT (M20-corrected block; executed output pasted verbatim) ===
+$ git push origin automation
+To github.com:Andovol/StorageGenie.git
+   133c252..6494164  automation -> automation
+$ git notes --ref=refs/notes/storagegenie-coder-reports add \
+    -m "Dispatch-ID: SG-140 | Report: docs/worklogs/SG-140_report.md | Work-HEAD: 649416469fb2fddb63e95fec4890313cbb127e3c" \
+    649416469fb2fddb63e95fec4890313cbb127e3c
+$ git push origin refs/notes/storagegenie-coder-reports
+To github.com:Andovol/StorageGenie.git
+   d31d645..a39494b  refs/notes/storagegenie-coder-reports -> refs/notes/storagegenie-coder-reports
+$ git fetch origin refs/notes/storagegenie-coder-reports:refs/notes/sg140-fetched
+From github.com:Andovol/StorageGenie
+ * [new ref]         refs/notes/storagegenie-coder-reports -> refs/notes/sg140-fetched
+$ git notes --ref=refs/notes/sg140-fetched show 649416469fb2fddb63e95fec4890313cbb127e3c
+Dispatch-ID: SG-140 | Report: docs/worklogs/SG-140_report.md | Work-HEAD: 649416469fb2fddb63e95fec4890313cbb127e3c
+
+--- dual-annotate the final tip (63b37a0, at annotation time) ---
+$ git notes --ref=refs/notes/storagegenie-coder-reports add \
+    -m "Dispatch-ID: SG-140 | Report: docs/worklogs/SG-140_report.md | Work-HEAD: 63b37a03d01256128fee3df5fd611914aebf1aaa" \
+    63b37a03d01256128fee3df5fd611914aebf1aaa
+$ git push origin refs/notes/storagegenie-coder-reports
+To github.com:Andovol/StorageGenie.git
+   a39494b..0641b53  refs/notes/storagegenie-coder-reports -> refs/notes/storagegenie-coder-reports
+$ git fetch origin refs/notes/storagegenie-coder-reports:refs/notes/sg140-fetched
+From github.com:Andovol/StorageGenie
+   a39494b..0641b53  refs/notes/storagegenie-coder-reports -> refs/notes/sg140-fetched
+$ git notes --ref=refs/notes/sg140-fetched show 63b37a03d01256128fee3df5fd611914aebf1aaa
+Dispatch-ID: SG-140 | Report: docs/worklogs/SG-140_report.md | Work-HEAD: 63b37a03d01256128fee3df5fd611914aebf1aaa
+$ git notes --ref=refs/notes/sg140-fetched show 649416469fb2fddb63e95fec4890313cbb127e3c
+Dispatch-ID: SG-140 | Report: docs/worklogs/SG-140_report.md | Work-HEAD: 649416469fb2fddb63e95fec4890313cbb127e3c
+note=yes
