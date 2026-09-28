@@ -5,7 +5,8 @@ Work dir:   /home/andrei/StorageGenie
 origin:     git@github.com:Andovol/StorageGenie.git
 BASE ref:   origin/automation
 BASE commit: fc7bf02a3af54300c703a15a724f10f344387835  (start HEAD; tree clean at start)
-WORK_HEAD:  973009cc6560ff4da0d908ae623591eb04e9c61f  (work commit; receipt note target)
+WORK_HEAD:  7b2395d4042fd35b1b5f4631c5d1c94a9c03471f  (worklog commit; receipt note target)
+merge tip:  973009cc6560ff4da0d908ae623591eb04e9c61f  (last merge commit #18, before worklogs)
 Model:      opencode-go/deepseek-v4.1-flash   (per process arguments /proc/self/cmdline `--model`)
 Effort:     high                              (per process arguments /proc/self/cmdline `--variant high`)
 Coder:      opencode  (env CODER=opencode; OPENCODE_PID=38785)
@@ -130,8 +131,8 @@ bound (120s ordinary / 600s suite). Real metered spend **$0.000000 USD**, zero m
 
 ## 5. Receipt
 
-- Work commit `WORK_HEAD = 973009cc6560ff4da0d908ae623591eb04e9c61f`, pushed to `origin/automation`
-  (`fc7bf02..973009c`), worktree clean.
+- Work commit `WORK_HEAD = 7b2395d4042fd35b1b5f4631c5d1c94a9c03471f` (the 11 merges + these 3
+  worklog files), pushed to `origin/automation` (`fc7bf02..7b2395d`), worktree clean.
 - No push to `storagegenie-evidence`; `{{RECEIPT_CMD}}` not run.
 - Note added on WORK_HEAD on `refs/notes/storagegenie-coder-reports`, pushed, then re-fetched into the
   **mapped** local ref `refs/notes/sg135-verify` (a default fetch carries no notes; a bare refspec
@@ -141,7 +142,20 @@ bound (120s ordinary / 600s suite). Real metered spend **$0.000000 USD**, zero m
 
 Executed output, pasted verbatim:
 ```
-(pasted in the receipt-paste commit)
+$ git push origin automation
+To github.com:Andovol/StorageGenie.git
+   fc7bf02..7b2395d  automation -> automation
+$ git notes --ref=refs/notes/storagegenie-coder-reports add \
+    -m "Dispatch-ID: SG-135 | Report: docs/worklogs/SG-135_report.md | Work-HEAD: 7b2395d4042fd35b1b5f4631c5d1c94a9c03471f" \
+    7b2395d4042fd35b1b5f4631c5d1c94a9c03471f
+$ git push origin refs/notes/storagegenie-coder-reports
+To github.com:Andovol/StorageGenie.git
+   71cc492..77e36a1  refs/notes/storagegenie-coder-reports -> refs/notes/storagegenie-coder-reports
+$ git fetch origin refs/notes/storagegenie-coder-reports:refs/notes/sg135-verify
+From github.com:Andovol/StorageGenie
+ * [new ref]         refs/notes/storagegenie-coder-reports -> refs/notes/sg135-verify
+$ git notes --ref=refs/notes/sg135-verify show 7b2395d4042fd35b1b5f4631c5d1c94a9c03471f
+Dispatch-ID: SG-135 | Report: docs/worklogs/SG-135_report.md | Work-HEAD: 7b2395d4042fd35b1b5f4631c5d1c94a9c03471f
 ```
 
 ## UNCLEAR

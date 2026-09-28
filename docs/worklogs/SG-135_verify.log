@@ -2,7 +2,8 @@ SG-135 verify log — 11 audited winners landed (ordered merges, journal union, 
 
 Dispatch-ID: SG-135
 BASE        origin/automation = fc7bf02a3af54300c703a15a724f10f344387835  (start HEAD, tree clean)
-WORK_HEAD   973009cc6560ff4da0d908ae623591eb04e9c61f
+WORK_HEAD   7b2395d4042fd35b1b5f4631c5d1c94a9c03471f  (worklog commit; receipt note target)
+merge tip   973009cc6560ff4da0d908ae623591eb04e9c61f  (last merge commit #18, before worklogs)
 Model       opencode-go/deepseek-v4.1-flash   (process argv: /proc/self/cmdline `--model`)
 Effort      high                              (process argv: `--variant high`)
 Coder       opencode (env CODER=opencode; OPENCODE_PID=38785)

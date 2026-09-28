@@ -5,7 +5,8 @@ workdir      /home/andrei/StorageGenie
 origin       git@github.com:Andovol/StorageGenie.git
 BASE ref     origin/automation
 BASE commit  fc7bf02a3af54300c703a15a724f10f344387835  (start HEAD, tree clean)
-WORK_HEAD    973009cc6560ff4da0d908ae623591eb04e9c61f
+WORK_HEAD    7b2395d4042fd35b1b5f4631c5d1c94a9c03471f  (worklog commit; receipt note target)
+merge tip    973009cc6560ff4da0d908ae623591eb04e9c61f  (last merge commit #18, before worklogs)
 model        opencode-go/deepseek-v4.1-flash   (read from process argv: /proc/self/cmdline `--model`)
 effort       high                              (read from process argv: `--variant high`)
 coder        opencode (env CODER=opencode; OPENCODE_PID=38785)
@@ -26,7 +27,7 @@ role guard   Coder only — no dispatch verb run, own unit never started/polled.
 17:29Z    #27 landed clean (prepends journal after title, no overlap yet).
 17:29Z    #24 CONFLICT: .jules/bolt.md only -> resolved by UNION (both entries kept). committed.
 17:29Z    #18 CONFLICT: .jules/bolt.md only -> resolved by UNION (both entries kept). committed.
-          NO third conflict region anywhere. 11/11 merges landed; WORK_HEAD=973009c; elapsed ~43s.
+          NO third conflict region anywhere. 11/11 merges landed; merge tip=973009c; elapsed ~43s.
 17:30Z    G1: 11/11 signature greps present in merged tree (PG-SC-12).
 17:30Z    targeted backend 10 files -> 133 passed; test_health alone -> 3 passed;
           #2 import -> import-ok; frontend vitest 3 files -> 43 passed.
