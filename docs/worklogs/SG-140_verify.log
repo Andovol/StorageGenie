@@ -1,0 +1,141 @@
+SG-140 VERIFY LOG — captured proofs (verbatim)
+Work dir: /home/andrei/StorageGenie
+origin: git@github.com:Andovol/StorageGenie.git
+BASE ref requested: origin/automation
+BASE resolved: 133c25205491e109b72310b04fa49b4a1f7bc6f2
+Contract echo: 0.40.0    source path: /home/andrei/storagegenie-contract/VERSION
+Model: opencode-go/deepseek-v4.1-flash   Effort: high
+  source: /proc/140779/cmdline =
+  opencode run --auto --dir /home/andrei/StorageGenie --model opencode-go/deepseek-v4.1-flash --variant high
+Spend: real $0.000000 USD; zero metered calls.
+
+============================================================
+## G0.1 — EMPTY PRODUCT DIFF vs BASE (start)
+============================================================
+$ git rev-parse HEAD
+133c25205491e109b72310b04fa49b4a1f7bc6f2
+$ git rev-parse origin/automation
+133c25205491e109b72310b04fa49b4a1f7bc6f2
+$ git diff --stat origin/automation...HEAD
+(empty)
+$ git diff --name-only origin/automation...HEAD
+(empty)
+$ git status --porcelain
+(empty)
+
+============================================================
+## G0.2 — ALEMBIC HEAD (before)
+============================================================
+$ docker exec storagegenie-backend-1 alembic current
+INFO  [alembic.runtime.migration] Context impl SQLiteImpl.
+INFO  [alembic.runtime.migration] Will assume non-transactional DDL.
+20260924_sg114_relation (head)
+EXIT=0
+(expectation 20260924_sg114_relation == observed; versions/ dir newest file = 20260924_sg114_relation.py)
+
+============================================================
+## G0.3 — PRE-RIDER BASELINE
+============================================================
+$ docker inspect --format 'container={{.Id}} image={{.Image}} restarts={{.RestartCount}} created={{.Created}}' storagegenie-backend-1
+container=40a117eaff0c54f7275a419ad39d417e962aaa6b89ccc274759888d31f60039d image=sha256:ca29a3dc9a07822d663e4f15044ff53ec6504fb336d0dd9885bb4ad9c1304184 restarts=0 created=2026-09-25T20:18:34.634243339Z
+$ docker images --no-trunc --format '{{.Repository}}:{{.Tag}} id={{.ID}} created={{.CreatedAt}}' storagegenie-backend:latest
+storagegenie-backend:latest id=sha256:ca29a3dc9a07822d663e4f15044ff53ec6504fb336d0dd9885bb4ad9c1304184 created=2026-09-25 20:18:19 +0000 UTC
+$ docker ps -a --format '{{.ID}} {{.Names}} {{.Image}} {{.Status}}'
+40a117eaff0c storagegenie-backend-1 storagegenie-backend Up 2 days (healthy)
+1aabf2905704 storagegenie-frontend-1 storagegenie-frontend Exited (0) 2 weeks ago
+$ docker compose ps
+NAME                     IMAGE                  COMMAND                  SERVICE   CREATED      STATUS
+storagegenie-backend-1   storagegenie-backend   "uvicorn app.main:ap…"   backend   2 days ago   Up 2 days (healthy)
+(frontend service is profile "dev"; production UI is baked into the backend image,
+ backend/Dockerfile:20 COPY --from=frontend-build /ui/dist ./static — one served service)
+
+health x2:
+attempt 1: {"status":"ok","db":"ok","storage":"ok"} [http=200]
+attempt 2: {"status":"ok","db":"ok","storage":"ok"} [http=200]
+
+served UI entry (GET / -> 200, etag 67e80638e5f6fb7ad47f30aac775ee22):
+  <script type="module" crossorigin src="/assets/index-DXSEg7CT.js"></script>
+  <link rel="stylesheet" crossorigin href="/assets/index-DO0gjGV6.css">
+$ sha256sum /tmp/sg140/pre_index-DXSEg7CT.js
+f435cbc177ba15e0f381317464668e9d507437dc9cd5a963c617a15a39e5045d  pre_index-DXSEg7CT.js   (318414 bytes)
+$ sha256sum /tmp/sg140_index.html
+89c1f99364d32ef1ced8c9ab923106f6715690e55f9bb09be78b0dc9be6c1efd
+
+GATE:
+$ curl -s -o /dev/null -w 'http=%{http_code} redirect=%{redirect_url}\n' -H 'Host: storagegenie.dynv6.net' http://127.0.0.1/
+http=301 redirect=https://storagegenie.dynv6.net/
+$ curl -sk -o /dev/null -w 'https=%{http_code}\n' -H 'Host: storagegenie.dynv6.net' https://127.0.0.1/
+https=401
+
+LIVE COUNTS (read-only; sqlite3 mode=ro) before:
+count_provider_call= 18
+count_job= 9
+count_enrich_snapshot= 4
+count_candidate= 8
+count_evidence= 13
+count_guardrail_event= 2
+count_audit_event= 68
+
+SMOKE through the real seam (baseline):
+$ curl -s -w '\n[http=%{http_code}]\n' 'http://127.0.0.1:8003/v1/assets?household_id=01a0a029-1477-7ca0-b200-bce78a96c679'
+{"items":[ ... 6 items ... ],"next_cursor":null} [http=200]
+$ curl -s -w '\n[http=%{http_code}]\n' http://127.0.0.1:8003/
+[http=200] (944-byte index.html as above)
+
+============================================================
+## G1 — REBUILD (FAILED) / RECREATE (NOT PERFORMED)
+============================================================
+$ BUILDX_CONFIG=/tmp/opencode/buildx docker compose build backend
+START_BUILD=2026-09-28T18:34:25Z END_BUILD=2026-09-28T18:34:33Z
+#18 5.044 src/components/WebAlternates.test.tsx(59,7): error TS2739: Type '{ field: string; value: string; }' is missing the following properties from type 'WebAlternate': source_type, source_url, retrieved_at
+#18 5.044 src/components/WebAlternates.test.tsx(74,7): error TS2739: Type '{ field: string; value: string; source_type: string; }' is missing the following properties from type 'WebAlternate': source_url, retrieved_at
+#18 5.044 src/components/WebAlternates.test.tsx(79,7): error TS2739: Type '{ field: string; value: string; source_type: string; }' is missing the following properties from type 'WebAlternate': source_url, retrieved_at
+#18 ERROR: process "/bin/sh -c npm run build" did not complete successfully: exit code: 2
+------
+ > [frontend-build 6/6] RUN npm run build:
+0.753 > tsc && vite build
+------
+Dockerfile:10
+  10 | >>> RUN npm run build
+--------------------
+failed to solve: process "/bin/sh -c npm run build" did not complete successfully: exit code: 2
+BUILD_EXIT=1
+$ docker images --no-trunc --format '{{.Repository}}:{{.Tag}} id={{.ID}}' storagegenie-backend:latest
+storagegenie-backend:latest id=sha256:ca29a3dc9a07822d663e4f15044ff53ec6504fb336d0dd9885bb4ad9c1304184  (UNCHANGED)
+
+No recreate issued. POST-FAIL state:
+$ docker inspect --format 'container={{.Id}} image={{.Image}} restarts={{.RestartCount}}' storagegenie-backend-1
+container=40a117eaff0c54f7275a419ad39d417e962aaa6b89ccc274759888d31f60039d image=sha256:ca29a3dc9a07822d663e4f15044ff53ec6504fb336d0dd9885bb4ad9c1304184 restarts=0
+$ curl health x2 => {"status":"ok","db":"ok","storage":"ok"} [http=200] / [http=200]
+$ git status --porcelain => (empty)
+$ alembic current (unchanged) => 20260924_sg114_relation (head)
+LIVE COUNTS after (unchanged): provider_call=18 job=9 enrich_snapshot=4 candidate=8 evidence=13
+
+============================================================
+## ROOT CAUSE — rendering nothing vacuously
+============================================================
+$ git log -1 --format='%H%n%ci%n%s' -- frontend/src/components/WebAlternates.test.tsx
+0cd1c35484791394c5f47f2d5ffd52a744ddf9cb
+2026-09-28 13:53:55 +0000
+test: add unit tests for WebAlternates component
+$ git log --oneline --merges --ancestry-path 0cd1c35^..HEAD
+973009c Merge PR #18 into automation   (one of SG-135's 11 merges)
+$ git merge-base --is-ancestor 0cd1c35 HEAD && echo YES
+YES
+$ grep -n -A6 'export type WebAlternate' frontend/src/api/types.ts
+144:export type WebAlternate = {
+145-  field: string;
+146-  value: unknown;
+147-  source_type: string | null;
+148-  source_url: string | null;
+149-  retrieved_at: string | null;
+150-};
+$ sed -n '55,84p' frontend/src/components/WebAlternates.test.tsx   (the offending literals)
+  { field: "model", value: "Model X" }                       # misses source_type/source_url/retrieved_at
+  { field: "brand", value: "Brand A", source_type: "web:source1" }   # misses source_url/retrieved_at
+  { field: "category", value: "Electronics", source_type: "web:source2" }
+frontend/tsconfig.json: "include": ["src"]  -> *.test.tsx typechecked
+frontend/package.json: "build": "tsc && vite build"  -> typecheck is part of the served build
+
+CO-100 secret scan of committed artifacts: no DSN/key/token/credential literal present in this
+log, SG-140.log, or SG-140_report.md (health bodies carry status strings only).

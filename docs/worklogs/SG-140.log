@@ -1,0 +1,37 @@
+SG-140 coder log — close-out deploy rider (rebuild + one recreate + verify)
+Started: 2026-09-28T18:33Z (live clock)
+Role: Coder only. No dispatch verb run, no unit started or polled.
+
+[18:33] G0 reads
+  BASE = origin/automation -> 133c25205491e109b72310b04fa49b4a1f7bc6f2
+  HEAD = 133c25205491e109b72310b04fa49b4a1f7bc6f2 (worktree clean)
+  product diff origin/automation...HEAD: empty
+  alembic current = 20260924_sg114_relation (head)  [expected == observed]
+  image storagegenie-backend:latest = sha256:ca29a3dc9a07822d663e4f15044ff53ec6504fb336d0dd9885bb4ad9c1304184
+  container storagegenie-backend-1 = 40a117eaff0c54f7275a419ad39d417e962aaa6b89ccc274759888d31f60039d (Up 2 days, healthy)
+  health x2 = {"status":"ok","db":"ok","storage":"ok"} HTTP 200
+  served entry references /assets/index-DXSEg7CT.js (sha256 f435cbc1... 318414 bytes)
+  gate: http:80 Host=storagegenie.dynv6.net -> 301 ; https:443 -> 401
+  read-only counts (mode=ro): provider_call=18 job=9 enrich_snapshot=4 candidate=8 evidence=13
+
+[18:34] G1 rebuild
+  command: BUILDX_CONFIG=/tmp/opencode/buildx docker compose build backend
+  START_BUILD=2026-09-28T18:34:25Z END_BUILD=2026-09-28T18:34:33Z
+  BUILD_EXIT=1  -> frontend-build stage `RUN npm run build` (`tsc && vite build`) exit 2
+  TS2739 x3 in src/components/WebAlternates.test.tsx (lines 59,74,79): object literals missing
+  required WebAlternate props source_type/source_url/retrieved_at.
+  image unchanged (still ca29a3dc9a07). NO recreate performed (packet orders rebuild THEN recreate;
+  recreating the stale image would serve nothing and burn the single authorized recreate).
+
+[18:35] ROOT CAUSE
+  commit 0cd1c35 (google-labs-jules[bot], 2026-09-28T13:53:55Z) "test: add unit tests for
+  WebAlternates component" added frontend/src/components/WebAlternates.test.tsx (93 lines),
+  merged via 973009c "Merge PR #18 into automation" — one of SG-135's 11 merges.
+  frontend/tsconfig.json `include: ["src"]` covers *.test.tsx; package.json build = `tsc && vite build`
+  typechecks the tests. WebAlternate (types.ts:144-150) types all three props required (`string|null`).
+  A production rebuild therefore CANNOT succeed at BASE without a product-file edit.
+
+[18:35] G1 STOPPED. This rider forbids product writes (scope ceiling). Deploy not performed.
+  Post-failure safety: container/image unchanged, RestartCount=0, health still x2 ok, worktree clean.
+
+[18:36] G2 worklogs written; BLOCKED commit + notes receipt.
