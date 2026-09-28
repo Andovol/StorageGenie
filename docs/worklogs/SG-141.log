@@ -1,0 +1,41 @@
+SG-141 — Fix the 3 TS2739 literals blocking the production build (test-only, then green tsc)
+
+Work dir: /home/andrei/StorageGenie
+origin: git@github.com:Andovol/StorageGenie.git
+BASE (requested origin/automation; resolved): b4fec8bebcde3ef33fa6c2c1f765047091df6646
+WORK_HEAD (product fix commit): bb30209802ab6f53e862b59b2b1f1285f9363130
+Settings (CO-78, from process argv /proc/162575/cmdline):
+  coder opencode | model opencode-go/deepseek-v4.1-flash | effort high
+  argv: opencode run --auto --dir /home/andrei/StorageGenie --model opencode-go/deepseek-v4.1-flash --variant high
+Contract echo: 0.40.0   source path: /home/andrei/storagegenie-contract/VERSION
+Spend: real $0.000000 USD; zero metered calls.
+
+## Chronology
+- 2026-09-28T19:07Z G0: verified base clean, reproduced tsc red (3× TS2739 at WebAlternates.test.tsx:59,74,79), committed capture 0b57b12 BEFORE any edit.
+- 2026-09-28T19:08Z G1: read WebAlternates.tsx (null-handling) -> chose explicit `null`; edited only the 3 literals (7 keys); fail-post tsc exit 0, file vitest 4/4, full suite 27 files/243 tests exit 0, eslint file exit 0.
+- 2026-09-28T19:09Z G1 commit bb30209 (fix + verify log).
+- 2026-09-28T19:1xZ G2: log + report + notes receipt.
+
+## Diff ceiling
+Product diff = exactly 7 inserted keys in frontend/src/components/WebAlternates.test.tsx.
+types.ts byte-identical (git diff --exit-code exit 0). No other product/config/build write.
+
+## No secrets (CO-100)
+No DSN/key/token/credential literal in the edited literals, this log, the report, or the verify log.
+The three new values are the null literal only.
+
+=== RECEIPT (M20-corrected block; executed output pasted verbatim) ===
+$ git push origin automation
+To github.com:Andovol/StorageGenie.git
+   b4fec8b..bb30209  automation -> automation
+$ git notes --ref=refs/notes/storagegenie-coder-reports add \
+    -m "Dispatch-ID: SG-141 | Report: docs/worklogs/SG-141_report.md | Work-HEAD: bb30209802ab6f53e862b59b2b1f1285f9363130" \
+    bb30209802ab6f53e862b59b2b1f1285f9363130
+$ git push origin refs/notes/storagegenie-coder-reports
+To github.com:Andovol/StorageGenie.git
+   700df76..dc37ad9  refs/notes/storagegenie-coder-reports -> refs/notes/storagegenie-coder-reports
+$ git fetch origin refs/notes/storagegenie-coder-reports:refs/notes/sg141-fetched
+From github.com:Andovol/StorageGenie
+ * [new ref]         refs/notes/storagegenie-coder-reports -> refs/notes/sg141-fetched
+$ git notes --ref=refs/notes/sg141-fetched show bb30209802ab6f53e862b59b2b1f1285f9363130
+Dispatch-ID: SG-141 | Report: docs/worklogs/SG-141_report.md | Work-HEAD: bb30209802ab6f53e862b59b2b1f1285f9363130
