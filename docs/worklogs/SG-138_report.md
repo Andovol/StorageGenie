@@ -138,6 +138,41 @@ Land the shipped subset as the useful part of PR #4. Re-spec the three blocked p
 change — or move the Catalog select out of `CatalogToolbar`). The `frontend/*.log` ignore plus the
 component are independently valuable. PR #4 can then be closed by the workstation (not done here).
 
+## (h) Receipt (executed output, pasted verbatim; M20-corrected notes pattern)
+
+- Work commits `WORK_HEAD = 6d5d53a6c09bbc95a0ffe9d08c0a57b7e81942e3` (port) and its worklog commit
+  pushed to `origin/automation`; worktree clean (`CO-55`). No push to `storagegenie-evidence`;
+  `{{RECEIPT_CMD}}` not run.
+- Note added on WORK_HEAD on `refs/notes/storagegenie-coder-reports`, pushed, then re-fetched into the
+  **mapped** local ref `refs/notes/sg138-fetched` (`M20`; a default fetch carries no notes). Final tip
+  dual-annotated (note-anchor inoculation, SG-092 precedent). `note=yes`.
+
+```
+$ git push origin automation
+To github.com:Andovol/StorageGenie.git
+   756a53b..081820a  automation -> automation
+$ git notes --ref=refs/notes/storagegenie-coder-reports add \
+    -m "Dispatch-ID: SG-138 | Report: docs/worklogs/SG-138_report.md | Work-HEAD: 6d5d53a6c09bbc95a0ffe9d08c0a57b7e81942e3" \
+    6d5d53a6c09bbc95a0ffe9d08c0a57b7e81942e3
+$ git notes --ref=refs/notes/storagegenie-coder-reports add \
+    -m "Dispatch-ID: SG-138 | Report: docs/worklogs/SG-138_report.md | Work-HEAD: 081820ae252df5b15e2d39b5f642c3ea7548beaa" \
+    081820ae252df5b15e2d39b5f642c3ea7548beaa
+$ git push origin refs/notes/storagegenie-coder-reports
+To github.com:Andovol/StorageGenie.git
+   4014a74..e17621c  refs/notes/storagegenie-coder-reports -> refs/notes/storagegenie-coder-reports
+$ git fetch origin refs/notes/storagegenie-coder-reports:refs/notes/sg138-fetched
+From github.com:Andovol/StorageGenie
+ * [new ref]         refs/notes/storagegenie-coder-reports -> refs/notes/sg138-fetched
+$ git notes --ref=refs/notes/sg138-fetched show 6d5d53a6c09bbc95a0ffe9d08c0a57b7e81942e3
+Dispatch-ID: SG-138 | Report: docs/worklogs/SG-138_report.md | Work-HEAD: 6d5d53a6c09bbc95a0ffe9d08c0a57b7e81942e3
+$ git notes --ref=refs/notes/sg138-fetched show 081820ae252df5b15e2d39b5f642c3ea7548beaa
+Dispatch-ID: SG-138 | Report: docs/worklogs/SG-138_report.md | Work-HEAD: 081820ae252df5b15e2d39b5f642c3ea7548beaa
+```
+
+The commit carrying this receipt section is dual-annotated with the same note (note-anchor
+inoculation, SG-092 precedent); its `show` output is executed and recorded in the final log line.
+`note=yes`.
+
 ## UNCLEAR
 
 - **FIRST READ** — Was this "port the 7 files" or "land the extraction"? I read it as the latter, so when
