@@ -39,3 +39,19 @@ From github.com:Andovol/StorageGenie
  * [new ref]         refs/notes/storagegenie-coder-reports -> refs/notes/sg141-fetched
 $ git notes --ref=refs/notes/sg141-fetched show bb30209802ab6f53e862b59b2b1f1285f9363130
 Dispatch-ID: SG-141 | Report: docs/worklogs/SG-141_report.md | Work-HEAD: bb30209802ab6f53e862b59b2b1f1285f9363130
+
+--- dual-annotate the final tip (1b5716d, at annotation time) ---
+$ git notes --ref=refs/notes/storagegenie-coder-reports add \
+    -m "Dispatch-ID: SG-141 | Report: docs/worklogs/SG-141_report.md | Work-HEAD: 1b5716d52bef706c351a61594fd015f78d6300d4" \
+    1b5716d52bef706c351a61594fd015f78d6300d4
+$ git push origin refs/notes/storagegenie-coder-reports
+To github.com:Andovol/StorageGenie.git
+   dc37ad9..5d41b30  refs/notes/storagegenie-coder-reports -> refs/notes/storagegenie-coder-reports
+$ git fetch origin refs/notes/storagegenie-coder-reports:refs/notes/sg141-fetched
+From github.com:Andovol/StorageGenie
+   dc37ad9..5d41b30  refs/notes/storagegenie-coder-reports -> refs/notes/sg141-fetched
+$ git notes --ref=refs/notes/sg141-fetched show 1b5716d52bef706c351a61594fd015f78d6300d4
+Dispatch-ID: SG-141 | Report: docs/worklogs/SG-141_report.md | Work-HEAD: 1b5716d52bef706c351a61594fd015f78d6300d4
+$ git notes --ref=refs/notes/sg141-fetched show bb30209802ab6f53e862b59b2b1f1285f9363130
+Dispatch-ID: SG-141 | Report: docs/worklogs/SG-141_report.md | Work-HEAD: bb30209802ab6f53e862b59b2b1f1285f9363130
+note=yes
