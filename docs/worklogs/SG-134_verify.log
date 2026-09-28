@@ -1,0 +1,79 @@
+SG-134 verify log — raw evidence for the 10-PR tests + cleanup audit (READ-ONLY)
+
+================================================================================
+G0 — measured on the target (origin/automation = d8077b3), `git ls-remote` + refs/audit
+================================================================================
+$ git ls-remote origin 'refs/pull/*'   # head SHAs used; PRs resolved:
+  2/head  217ee062178a9a5f62b081571fa6fb79f3475fa1
+  4/head  e6a4f259abfb7c865c5f95947e351538a646dba5
+  11/head c59338250fa478e46d2e24b9bd44f318a367e676
+  12/head 03487ee2476e873ad9f985bde3d512d280ca20dc
+  13/head 08baa1db6d68c18bb6f2bbddf610afcdd8240d7d
+  14/head 7356f9d7cbfbf9ee3b2303c6551895c91e772871
+  28/head 0cd1c35484791394c5f47f2d5ffd52a744ddf9cb
+  29/head 431d323fb3c93565147d347d36dce88c20b47b3e
+  30/head 7a2ad05bdfe650376af9631cd679a7d08c5d4ef7
+  31/head 38725958aa624846838a91e4413a559034d8321c
+  (all 10 resolved; none closed/retargeted)
+
+Measure table (branch | merge-base | head | numstat) — re-measured from the commit:
+#2  code-health/chat-init-imports-43131338201651046        | 33460cd | 217ee06 | +7/-7   f1
+#4  refactor/household-selector-7969942473370878659        | 33460cd | e6a4f25 | +167/-66 f8
+#11 test/api-patch-unit-tests-9040774963283596966          | c849088 | c593382 | +75/-1  f1
+#12 test/add-api-put-tests-5989383413136137443             | c849088 | 03487ee | +95/-1  f1
+#13 test/add-fetch-ai-settings-tests-3203092785360383794   | c849088 | 08baa1d | +55/-1  f1
+#14 test/add-api-post-tests-10427039796881282869           | c849088 | 7356f9d | +210/-1 f1
+#28 add-web-alternates-unit-tests-8021906607013009028      | 7d207bf | 0cd1c35 | +93/-0  f1   <- packet said -1 (F1)
+#29 test/add-page-container-style-unit-tests-7012541858369455202 | 7d207bf | 431d323 | +90/-0 f1 <- packet said -1 (F1)
+#30 code-health/planning-exports-4909125834173332214       | 7d207bf | 7a2ad05 | +0/-0   f0
+#31 fix/health-check-logger-3533530181709914815            | 7d207bf | 3872595 | +8/-3   f2
+
+================================================================================
+#30 — empty-diff CLOSE proof (verbatim)
+================================================================================
+$ git diff --numstat 7d207bf...refs/audit/pr/30
+  (no output)
+$ git diff 7d207bf...refs/audit/pr/30 | wc -c
+  0
+$ git rev-parse refs/audit/pr/30^{tree}
+  2ddb1f7737c67c0033b4b95b4cdd8b1303f6c59e
+$ git rev-parse 7d207bf^{tree}
+  2ddb1f7737c67c0033b4b95b4cdd8b1303f6c59e
+$ git show --stat refs/audit/pr/30 | head
+  commit 7a2ad05bdfe650376af9631cd679a7d08c5d4ef7
+  Author: google-labs-jules[bot] ...
+  Date:   Mon Sep 28 13:55:11 2026 +0000
+      Ensure __all__ re-exports in planning module
+  (no file changes)
+
+================================================================================
+Test PRs — target export surface exists (no placebo)
+================================================================================
+#11/#12/#13/#14 target: frontend/src/api/client.ts exports apiPatch/apiPut/apiPost/
+  updateAiModel/candidateDecision/sendChat/runPlanning/resolveReviewTask — all present.
+#28 target: frontend/src/components/WebAlternates.tsx exports WebAlternates; type WebAlternate
+  in frontend/src/api/types.ts:144 — present.
+#29 target: frontend/src/components/shell/PageContainer.tsx exports PAGE_MAX_WIDTH,
+  FORM_MAX_WIDTH, PAGE_CONTAINER_CLASS, pageContainerStyle, PageContainer — all present.
+matcher support: frontend/vite.config.ts test.setupFiles=["./src/test-setup.ts"];
+  frontend/src/test-setup.ts = import "@testing-library/jest-dom/vitest"; (toBeInTheDocument ok)
+
+#4 artifact check:
+$ git check-ignore -v frontend/preview.log
+  (no output) -> NOT ignored (F4)
+
+================================================================================
+Read-only proof (at commit time)
+================================================================================
+$ git status --porcelain
+  only docs/worklogs/SG-134.log, docs/worklogs/SG-134_report.md,
+       docs/worklogs/SG-134_verify.log
+$ git diff --stat            # over the rest of the tree
+  (empty)
+
+================================================================================
+Receipt proof (pasted verbatim at receipt time)
+================================================================================
+<filled in the receipt-paste commit>
+
+note=yes

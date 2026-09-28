@@ -1,0 +1,43 @@
+SG-134 run log — outside-PR audit, tests + cleanup family (READ-ONLY; writes = 3 worklog files only)
+
+started_utc  2026-09-28T17:16:54Z  (process start; live clock)
+workdir      /home/andrei/StorageGenie
+origin       git@github.com:Andovol/StorageGenie.git
+BASE         origin/automation = d8077b3c7925be44ae5c8e8f561dc0196b324de6  (start HEAD, tree clean)
+model        opencode-go/deepseek-v4.1-flash   (read from process argv: /proc/21363/cmdline `--model`)
+effort       high                              (read from process argv: --variant high)
+coder        opencode (env CODER=opencode; OPENCODE_PID=21363)
+contract     echo=0.40.0 source=/home/andrei/storagegenie-contract/VERSION (published f26dbd3);
+             RULES.md sha256=5b65629377bbac9e40bfa7e2f4d4e42a5667b3a08ec786beb47c6a677d9ac33c
+             == RULES.sha256 payload (clean). `.rules-cache/` absent on host (standing).
+
+role guard   Coder only — no dispatch verb run, own unit never started/polled.
+
+17:16:54Z process start.
+17:17Z    git status clean; BASE=d8077b3; contract VERSION + sha256 verified.
+17:17Z    G0 open: gh unauth confirmed (SG-133 F1, not retried); git-native path used.
+          `git ls-remote origin 'refs/pull/*'` -> refs/pull/N/head mapped to refs/audit/pr/N
+          (+ origin/automation). All 10 target heads resolved (none closed/retargeted).
+17:18Z    branch names recovered via `git ls-remote origin 'refs/heads/*'` SHA match.
+          merge-base + numstat measured for all 10. #28/#29 measured -0 (packet said -1)
+          -> FINDING F1. #30 numstat empty -> candidate CLOSE; tree-identity probe.
+17:18Z    #30 diff bytes = 0; head tree 2ddb1f77… == merge-base tree 2ddb1f77… -> EMPTY.
+17:18Z    #2 + #31 diffs read (bytes). health route shape + secret scan.
+17:19Z    #13,#11,#29,#28 diffs read; PageContainer/WebAlternates sources + test-setup verified.
+          jest-dom setup @testing-library/jest-dom/vitest present -> toBeInTheDocument valid.
+17:19Z    #12,#14 diffs read; found #11-#14 all edit client.test.ts import line + same insert
+          region -> FINDING F2 (overlap premise false); #12/#13 duplicate updateAiModel (F5).
+17:19Z    #4 diff read (8 files): extraction equivalent across 5 pages, but commits
+          frontend/preview.log (vite preview artifact, not gitignored) -> FINDING F4.
+17:20Z    elapsed ~190s. ORDER-OF-WORK all 10 completed. Writing G2 worklogs.
+
+SPEND        real $0.000000 USD, zero metered calls, zero suite runs, zero live calls,
+             zero container execs, zero merges, zero closes, zero product-file writes.
+
+note         Measured diffstats vs packet: 8/10 equal exactly; #28 measured +93/-0 (packet
+             +93/-1) and #29 measured +90/-0 (packet +90/-1) -> FINDING F1 (both new files,
+             0 deletions; packet off by one). All merge-bases quoted in the report.
+
+17:2xZ    WORK_HEAD committed + pushed; note added + pushed; re-fetched mapped, `show` pasted
+          verbatim -> note=yes (receipt-paste commit + final-tip dual-annotate follows).
+END SG-134 (all 10 audited, no merges/closes, read-only held).
