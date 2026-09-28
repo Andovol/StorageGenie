@@ -14,7 +14,7 @@ Created at the 2026-09-25 D2 close (discharges the long-owed "backlog-file creat
 | Pilot tiers · per-field accept UI · chat persistence · `D61` prompts · beauty verdict | Individual scoping words |
 | `F-SG098-3` brand unpopulated | Verify whether `SG-119` closed it; if open, needs a slice word |
 | Relation-audit-trail + symmetric-edge futures · rename/reorder-audit question | Future sweep words |
-| `M45`/`M46`/`M47` local method notes (suite-green binds; allow-set re-scope; no prefix-splice) | Desk-worthiness review at a boundary, or keep local |
+| `M45`/`M46`/`M47`/`M48` local method notes (suite-green binds; allow-set re-scope; no prefix-splice; `M48`: ratings-row edits assert the edited ROW's bytes post-edit, never file `--stat` alone — a prefix-match `oldString` fused a headless duplicate tail, caught by row read) | Desk-worthiness review at a boundary, or keep local |
 | Brittle reader line-pin (accepted risk; caller-set assertion retires it when next touched) | Next slice touching the pin |
 
 Retired here, never reopened without a new shape: `sg026`-freeze (`D18`, `NOT FIXABLE`).
