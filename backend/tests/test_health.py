@@ -33,7 +33,7 @@ def test_health_reports_storage_failure(monkeypatch) -> None:  # type: ignore[no
     assert response.json() == {"status": "error", "db": "ok", "storage": "error"}
 
 
-def test_health_reports_database_failure(monkeypatch) -> None:  # type: ignore[no-untyped-def]
+def test_health_reports_database_failure(monkeypatch, caplog) -> None:  # type: ignore[no-untyped-def]
     class BrokenSession:
         def execute(self, statement):  # type: ignore[no-untyped-def]
             raise RuntimeError("database probe failed")
@@ -49,3 +49,5 @@ def test_health_reports_database_failure(monkeypatch) -> None:  # type: ignore[n
 
     assert response.status_code == 503
     assert response.json() == {"status": "error", "db": "error", "storage": "ok"}
+    assert "Database health check probe failed" in caplog.text
+    assert "database probe failed" in caplog.text
