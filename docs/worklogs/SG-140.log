@@ -42,8 +42,22 @@ rider then serves. Prior artifacts are reachable in history; the notes-ref note 
   product diff re-checked at end: empty (see report).
 
 === RECEIPT (M20-corrected block; executed output pasted verbatim) ===
-(receipt executes immediately after this commit; the executed paste appears in the
- receipt-paste commit that follows, and in SG-140_report.md.)
+WORK_HEAD = fb72d8362735617376d485ef33f40cfc50517471
+$ git push origin automation
+To github.com:Andovol/StorageGenie.git
+   486d0b4..fb72d83  automation -> automation
+$ git notes --ref=refs/notes/storagegenie-coder-reports add \
+    -m "Dispatch-ID: SG-140 | Report: docs/worklogs/SG-140_report.md | Work-HEAD: fb72d8362735617376d485ef33f40cfc50517471" \
+    fb72d8362735617376d485ef33f40cfc50517471
+$ git push origin refs/notes/storagegenie-coder-reports
+To github.com:Andovol/StorageGenie.git
+   ad6afbe..4b73661  refs/notes/storagegenie-coder-reports -> refs/notes/storagegenie-coder-reports
+$ git fetch origin refs/notes/storagegenie-coder-reports:refs/notes/sg140-r2-fetched
+From github.com:Andovol/StorageGenie
+ * [new ref]         refs/notes/storagegenie-coder-reports -> refs/notes/sg140-r2-fetched
+$ git notes --ref=refs/notes/sg140-r2-fetched show fb72d8362735617376d485ef33f40cfc50517471
+Dispatch-ID: SG-140 | Report: docs/worklogs/SG-140_report.md | Work-HEAD: fb72d8362735617376d485ef33f40cfc50517471
+note=yes
 
 === PRIOR-ATTEMPT SUPERSESSION (PRE-1) ===
 First SG-140 ride: 6494164 "BLOCKED: SG-140 close-out deploy rider — rebuild fails at BASE …",

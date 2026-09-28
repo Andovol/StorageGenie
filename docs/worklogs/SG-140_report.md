@@ -11,7 +11,8 @@ Settings (CO-78, from process arguments / provider metadata — never the identi
 opencode-go/deepseek-v4.1-flash --variant high`. **Spend: real $0.000000 USD** (zero metered calls).
 Work dir `/home/andrei/StorageGenie`; origin `git@github.com:Andovol/StorageGenie.git`.
 **BASE** (`origin/automation` requested; resolved): `486d0b4754c15fcdf41ba86bd7e04ef269d596cf` ·
-**WORK_HEAD:** `<WORK_HEAD_PLACEHOLDER>`.
+**WORK_HEAD:** `fb72d8362735617376d485ef33f40cfc50517471` (the worklogs commit; this report lives in
+the following receipt-paste commit, so it does not carry its own hash — CO-55b).
 Gates: **DATABASE** read-only (`alembic current` + mode=ro counts; no write) · **Restart** exactly
 ONE `docker compose up -d --force-recreate backend` (the standing close-out grant, `PG-PR-10`;
 production restart named plainly per `G-K2`) · **Deploy** that recreate only.
@@ -88,8 +89,24 @@ non-product writes are the three `docs/worklogs/SG-140_*` files only.
 
 ### Receipt note (M20-corrected block; executed output pasted verbatim)
 ```
-<RECEIPT_PASTE_PLACEHOLDER>
+$ git push origin automation
+To github.com:Andovol/StorageGenie.git
+   486d0b4..fb72d83  automation -> automation
+$ git notes --ref=refs/notes/storagegenie-coder-reports add \
+    -m "Dispatch-ID: SG-140 | Report: docs/worklogs/SG-140_report.md | Work-HEAD: fb72d8362735617376d485ef33f40cfc50517471" \
+    fb72d8362735617376d485ef33f40cfc50517471
+$ git push origin refs/notes/storagegenie-coder-reports
+To github.com:Andovol/StorageGenie.git
+   ad6afbe..4b73661  refs/notes/storagegenie-coder-reports -> refs/notes/storagegenie-coder-reports
+$ git fetch origin refs/notes/storagegenie-coder-reports:refs/notes/sg140-r2-fetched
+From github.com:Andovol/StorageGenie
+ * [new ref]         refs/notes/storagegenie-coder-reports -> refs/notes/sg140-r2-fetched
+$ git notes --ref=refs/notes/sg140-r2-fetched show fb72d8362735617376d485ef33f40cfc50517471
+Dispatch-ID: SG-140 | Report: docs/worklogs/SG-140_report.md | Work-HEAD: fb72d8362735617376d485ef33f40cfc50517471
 ```
+Verified against the FETCHED mapped ref (`refs/notes/sg140-r2-fetched`), not the local notes ref.
+note=yes (the executed `show` output above is pasted verbatim). The final-tip dual-annotation and
+its fetched `show` output are pasted in `SG-140.log`.
 
 ### Issues / disagreements (including outside this slice's scope)
 - **PRE-1 / F-SG140-1 (resolved):** the first SG-140 ride (6494164, rated 98) stopped on
