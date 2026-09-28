@@ -105,8 +105,22 @@ $ git notes --ref=refs/notes/sg140-r2-fetched show fb72d8362735617376d485ef33f40
 Dispatch-ID: SG-140 | Report: docs/worklogs/SG-140_report.md | Work-HEAD: fb72d8362735617376d485ef33f40cfc50517471
 ```
 Verified against the FETCHED mapped ref (`refs/notes/sg140-r2-fetched`), not the local notes ref.
-note=yes (the executed `show` output above is pasted verbatim). The final-tip dual-annotation and
-its fetched `show` output are pasted in `SG-140.log`.
+Final-tip dual-annotation (SG-092 precedent), also verified on the fetched ref:
+```
+$ git notes --ref=refs/notes/storagegenie-coder-reports add \
+    -m "Dispatch-ID: SG-140 | Report: docs/worklogs/SG-140_report.md | Work-HEAD: 0f23ed89224b07def77a0553515c09510a55dfd3" \
+    0f23ed89224b07def77a0553515c09510a55dfd3
+$ git push origin refs/notes/storagegenie-coder-reports
+To github.com:Andovol/StorageGenie.git
+   4b73661..04a4d12  refs/notes/storagegenie-coder-reports -> refs/notes/storagegenie-coder-reports
+$ git fetch origin refs/notes/storagegenie-coder-reports:refs/notes/sg140-r2-fetched
+   4b73661..04a4d12  refs/notes/storagegenie-coder-reports -> refs/notes/sg140-r2-fetched
+$ git notes --ref=refs/notes/sg140-r2-fetched show 0f23ed89224b07def77a0553515c09510a55dfd3
+Dispatch-ID: SG-140 | Report: docs/worklogs/SG-140_report.md | Work-HEAD: 0f23ed89224b07def77a0553515c09510a55dfd3
+$ git notes --ref=refs/notes/sg140-r2-fetched show fb72d8362735617376d485ef33f40cfc50517471
+Dispatch-ID: SG-140 | Report: docs/worklogs/SG-140_report.md | Work-HEAD: fb72d8362735617376d485ef33f40cfc50517471
+```
+note=yes (both executed `show` outputs pasted verbatim). Full transcript in `SG-140.log`.
 
 ### Issues / disagreements (including outside this slice's scope)
 - **PRE-1 / F-SG140-1 (resolved):** the first SG-140 ride (6494164, rated 98) stopped on

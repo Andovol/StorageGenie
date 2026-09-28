@@ -59,6 +59,22 @@ $ git notes --ref=refs/notes/sg140-r2-fetched show fb72d8362735617376d485ef33f40
 Dispatch-ID: SG-140 | Report: docs/worklogs/SG-140_report.md | Work-HEAD: fb72d8362735617376d485ef33f40cfc50517471
 note=yes
 
+--- dual-annotate the final tip (0f23ed8, at annotation time; SG-092 inoculation) ---
+$ git notes --ref=refs/notes/storagegenie-coder-reports add \
+    -m "Dispatch-ID: SG-140 | Report: docs/worklogs/SG-140_report.md | Work-HEAD: 0f23ed89224b07def77a0553515c09510a55dfd3" \
+    0f23ed89224b07def77a0553515c09510a55dfd3
+$ git push origin refs/notes/storagegenie-coder-reports
+To github.com:Andovol/StorageGenie.git
+   4b73661..04a4d12  refs/notes/storagegenie-coder-reports -> refs/notes/storagegenie-coder-reports
+$ git fetch origin refs/notes/storagegenie-coder-reports:refs/notes/sg140-r2-fetched
+From github.com:Andovol/StorageGenie
+   4b73661..04a4d12  refs/notes/storagegenie-coder-reports -> refs/notes/sg140-r2-fetched
+$ git notes --ref=refs/notes/sg140-r2-fetched show 0f23ed89224b07def77a0553515c09510a55dfd3
+Dispatch-ID: SG-140 | Report: docs/worklogs/SG-140_report.md | Work-HEAD: 0f23ed89224b07def77a0553515c09510a55dfd3
+$ git notes --ref=refs/notes/sg140-r2-fetched show fb72d8362735617376d485ef33f40cfc50517471
+Dispatch-ID: SG-140 | Report: docs/worklogs/SG-140_report.md | Work-HEAD: fb72d8362735617376d485ef33f40cfc50517471
+note=yes
+
 === PRIOR-ATTEMPT SUPERSESSION (PRE-1) ===
 First SG-140 ride: 6494164 "BLOCKED: SG-140 close-out deploy rider — rebuild fails at BASE …",
 report in 63b37a0, note on 6494164 (notes ref), rated 98. This re-ride does not delete that
