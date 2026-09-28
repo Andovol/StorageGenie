@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import { logChatCorrection, sendChat } from "../api/client";
 import type { ChatMessage, ChatResponse, Household } from "../api/types";
 import { ChatTranscript } from "../components/ChatTranscript";
+import { HouseholdSelector } from "../components/HouseholdSelector";
 import { PageContainer } from "../components/shell/PageContainer";
 import { useHouseholds } from "../hooks/useAssets";
 
@@ -75,23 +76,14 @@ export function ChatPage() {
     <PageContainer className="text-foreground">
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
         <h1 className="page-header text-foreground">Chat</h1>
-        <label>
-          Household{" "}
-          <select
-            value={effectiveHousehold}
-            onChange={(event) => {
-              setHouseholdId(event.target.value);
-              localStorage.setItem("household_id", event.target.value);
-            }}
-          >
-            <option value="">Select household</option>
-            {(households as Household[] | undefined)?.map((household) => (
-              <option key={household.id} value={household.id}>
-                {household.name}
-              </option>
-            ))}
-          </select>
-        </label>
+        <HouseholdSelector
+          value={effectiveHousehold}
+          onChange={(id) => {
+            setHouseholdId(id);
+            localStorage.setItem("household_id", id);
+          }}
+          households={households as Household[] | undefined}
+        />
       </div>
 
       <p className="text-muted-foreground" style={{ fontSize: 13 }}>
