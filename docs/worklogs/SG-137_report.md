@@ -5,7 +5,7 @@ Work dir:    /home/andrei/StorageGenie
 origin:      git@github.com:Andovol/StorageGenie.git
 BASE ref:    origin/automation
 BASE commit: 251cca5e1d38d965bd648531fd9529cc759a6388  (start HEAD; tree clean at start)
-WORK_HEAD:   WORK_HEAD_PENDING  (fold commit; receipt note target)
+WORK_HEAD:   9b585fddf5c0eb19e4324da101700085d279ca3f  (fold commit; receipt note target)
 Model:       opencode-go/deepseek-v4.1-flash   (per process args /proc/107947/cmdline `--model`)
 Effort:      high                              (per process args /proc/107947/cmdline `--variant high`)
 Coder:       opencode  (env CODER=opencode; OPENCODE_PID=107947; RUN_BUDGET_S=2100)
@@ -119,15 +119,33 @@ its class bound (120s ordinary / 600s suite / 2400s overall).
 
 ## 5. Receipt
 
-- Work commit `WORK_HEAD = WORK_HEAD_PENDING` (the union edit + the 3 worklog files), pushed to
-  `origin/automation`; worktree clean (`CO-55`).
+- Work commit `WORK_HEAD = 9b585fddf5c0eb19e4324da101700085d279ca3f` (the union edit + the 3 worklog
+  files), pushed to `origin/automation`; worktree clean (`CO-55`).
 - No push to `storagegenie-evidence`; `{{RECEIPT_CMD}}` not run.
 - Note added on WORK_HEAD on `refs/notes/storagegenie-coder-reports`, pushed, then re-fetched into
   the **mapped** local ref `refs/notes/sg137-verify` (`M20`; a default fetch carries no notes).
 - Final tip dual-annotated (note-anchor inoculation, SG-092 precedent).
 - `note=yes`
 
-Executed output is pasted verbatim in the binding commit's update of this section.
+Executed output, pasted verbatim:
+```
+$ git push origin automation
+To github.com:Andovol/StorageGenie.git
+   251cca5..9b585fd  automation -> automation
+$ git notes --ref=refs/notes/storagegenie-coder-reports add \
+    -m "Dispatch-ID: SG-137 | Report: docs/worklogs/SG-137_report.md | Work-HEAD: 9b585fddf5c0eb19e4324da101700085d279ca3f" \
+    9b585fddf5c0eb19e4324da101700085d279ca3f
+$ git push origin refs/notes/storagegenie-coder-reports
+To github.com:Andovol/StorageGenie.git
+   4984a27..35f883d  refs/notes/storagegenie-coder-reports -> refs/notes/storagegenie-coder-reports
+$ git fetch origin refs/notes/storagegenie-coder-reports:refs/notes/sg137-verify
+From github.com:Andovol/StorageGenie
+ * [new ref]         refs/notes/storagegenie-coder-reports -> refs/notes/sg137-verify
+$ git notes --ref=refs/notes/sg137-verify show 9b585fddf5c0eb19e4324da101700085d279ca3f
+Dispatch-ID: SG-137 | Report: docs/worklogs/SG-137_report.md | Work-HEAD: 9b585fddf5c0eb19e4324da101700085d279ca3f
+```
+The final tip is dual-annotated with the same note (note-anchor inoculation, SG-092 precedent);
+its `show` is executed and pasted in the final log line. `note=yes`.
 
 ## UNCLEAR
 

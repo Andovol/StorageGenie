@@ -5,7 +5,7 @@ workdir       /home/andrei/StorageGenie
 origin        git@github.com:Andovol/StorageGenie.git
 BASE ref      origin/automation
 BASE commit   251cca5e1d38d965bd648531fd9529cc759a6388  (start HEAD, tree clean)
-WORK_HEAD     WORK_HEAD_PENDING  (worklog commit; receipt note target)
+WORK_HEAD     9b585fddf5c0eb19e4324da101700085d279ca3f  (fold commit; receipt note target)
 model         opencode-go/deepseek-v4.1-flash   (read from process args /proc/107947/cmdline `--model`)
 effort        high                              (read from process args /proc/107947/cmdline `--variant high`)
 coder         opencode (env CODER=opencode; OPENCODE_PID=107947; RUN_BUDGET_S=2100)
