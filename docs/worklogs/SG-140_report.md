@@ -4,7 +4,7 @@ SG-140 — Close-out deploy rider: serve everything landed (rebuild + one recrea
 
 Settings (CO-78, from process arguments / provider metadata — never the identity line): coder `opencode`; **model `opencode-go/deepseek-v4.1-flash`** and **effort `high`** from process argv `/proc/140779/cmdline`: `opencode run --auto --dir /home/andrei/StorageGenie --model opencode-go/deepseek-v4.1-flash --variant high`. **Spend: real $0.000000 USD** (zero metered calls).
 Work dir `/home/andrei/StorageGenie`; origin `git@github.com:Andovol/StorageGenie.git`.
-**BASE** (`origin/automation` requested; resolved): `133c25205491e109b72310b04fa49b4a1f7bc6f2` · **WORK_HEAD:** pending (bound in the follow-up worklog commit).
+**BASE** (`origin/automation` requested; resolved): `133c25205491e109b72310b04fa49b4a1f7bc6f2` · **WORK_HEAD:** `649416469fb2fddb63e95fec4890313cbb127e3c` (the BLOCKED worklogs commit; receipt-note target; this report lives in the following worklog commit, so it does not carry its own hash — CO-55b).
 Gates: **DATABASE** read-only (`alembic current` + mode=ro row counts; no write) · **Restart** none (zero recreates) · **Deploy** none (build failed first). Role guard held (Coder only; no dispatch verb, no unit started/polled).
 Contract echo `0.40.0` verbatim; source path `/home/andrei/storagegenie-contract/VERSION` (host link echoed by SG-138).
 
@@ -44,8 +44,23 @@ Contract echo `0.40.0` verbatim; source path `/home/andrei/storagegenie-contract
 `PG-EV-01` · `PG-EV-02` · `PG-EV-05` · `PG-EV-08` · `PG-PR-03` · `PG-PR-04` · `PG-PR-06` · `PG-PR-10` · `PG-IC-01` · `PG-IC-07` · `PG-IC-09`.
 
 ### Receipt note (M20-corrected block)
-To be filled with the executed `show` output after commit + notes push (see `SG-140.log`).
-If this subsection lacks pasted output, the step was NOT executed.
+```
+$ git push origin automation
+To github.com:Andovol/StorageGenie.git
+   133c252..6494164  automation -> automation
+$ git notes --ref=refs/notes/storagegenie-coder-reports add \
+    -m "Dispatch-ID: SG-140 | Report: docs/worklogs/SG-140_report.md | Work-HEAD: 649416469fb2fddb63e95fec4890313cbb127e3c" \
+    649416469fb2fddb63e95fec4890313cbb127e3c
+$ git push origin refs/notes/storagegenie-coder-reports
+To github.com:Andovol/StorageGenie.git
+   d31d645..a39494b  refs/notes/storagegenie-coder-reports -> refs/notes/storagegenie-coder-reports
+$ git fetch origin refs/notes/storagegenie-coder-reports:refs/notes/sg140-fetched
+From github.com:Andovol/StorageGenie
+ * [new ref]         refs/notes/storagegenie-coder-reports -> refs/notes/sg140-fetched
+$ git notes --ref=refs/notes/sg140-fetched show 649416469fb2fddb63e95fec4890313cbb127e3c
+Dispatch-ID: SG-140 | Report: docs/worklogs/SG-140_report.md | Work-HEAD: 649416469fb2fddb63e95fec4890313cbb127e3c
+```
+The final-tip dual-annotation (note-anchor inoculation, SG-092 precedent) and its fetched `show` output are pasted in `SG-140.log` (`note=yes`).
 
 ### No vacuous pass — stated loudly
 - No recreate happened, so no container-id change, health ×6, moved bundle hash, or post-recreate smoke can be reported. Those criteria are **UNMET, not passed** (a recreate counted by `RestartCount` would evidence nothing anyway, M42).
