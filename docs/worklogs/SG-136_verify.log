@@ -1,0 +1,107 @@
+SG-136 verify log — fail-pre, fail-post, equality, suite/mypy/ruff, empty versions
+(captures below are executed output; every command ran under its class bound)
+
+================================================================================
+G0 FAIL-PRE — committed before any edit (commit ff9f5d3, PG-EV-09)
+================================================================================
+
+--- temp-DB statement seam, pre-slice code (backend/venv, engine before_cursor_execute,
+    filter `FROM assertion`; K assets each with 4 assertions across 3 field paths incl.
+    a `condition` tie) ---
+naive {"assertion_selects_after_serialize": 3, "assertion_selects_at_load": 0, "batched": false, "k": 3}
+naive {"assertion_selects_after_serialize": 6, "assertion_selects_at_load": 0, "batched": false, "k": 6}
+batched_ERROR AttributeError type object 'Asset' has no attribute 'assertions'
+=> N+1 quoted: assertion SELECTs == K (3 at K=3, 6 at K=6).
+
+--- committed fail-pre test (red), pre-slice tree ---
+$ backend/venv/bin/python -m pytest backend/tests/test_sg136_assertion_batch.py -q
+FAILED tests/test_sg136_assertion_batch.py::test_assertion_select_count_constant_in_k
+FAILED tests/test_sg136_assertion_batch.py::test_output_is_byte_identical_to_prechange_baseline
+FAILED tests/test_sg136_assertion_batch.py::test_empty_asset_world_issues_no_assertion_select
+PASSED tests/test_sg136_assertion_batch.py::test_lazy_per_asset_access_is_the_n_plus_one
+3 failed, 1 passed, 2 warnings in 0.77s
+
+--- baseline output per asset (pre-slice `_asset_to_dict`), deterministic temp DB ---
+written to backend/tests/fixtures/sg136_asset_dict_baseline.json (3 assets, JSON, sorted keys)
+household_id=hh-1; assets ast-0..ast-2 with created_at fixed; assertions as-<i>-0..3.
+
+================================================================================
+G1 FAIL-POST — committed in the WORK_HEAD commit
+================================================================================
+
+--- batch seam after the fix (same script, post-slice) ---
+naive  K=3 -> assertion_selects_after_serialize = 3   (lazy relationship: still N+1)
+batched K=3 -> assertion_selects_at_load = 1, after_serialize = 1, EQUAL True
+naive  K=6 -> assertion_selects_after_serialize = 6   (lazy relationship: still N+1)
+batched K=6 -> assertion_selects_at_load = 1, after_serialize = 1, EQUAL True
+=> assertion SELECT count CONSTANT in K (1) when serialized with the shipped
+   `selectinload(Asset.assertions)`; naive per-asset access remains K (the N+1 the
+   option removes). `EQUAL True` = batched output == naive output on the same rows.
+
+--- committed SG-136 test, post-slice (verbose) ---
+$ backend/venv/bin/python -m pytest backend/tests/test_sg136_assertion_batch.py -v
+tests/test_sg136_assertion_batch.py::test_assertion_select_count_constant_in_k PASSED [ 25%]
+tests/test_sg136_assertion_batch.py::test_lazy_per_asset_access_is_the_n_plus_one PASSED [ 50%]
+tests/test_sg136_assertion_batch.py::test_output_is_byte_identical_to_prechange_baseline PASSED [ 75%]
+tests/test_sg136_assertion_batch.py::test_empty_asset_world_issues_no_assertion_select PASSED [100%]
+4 passed, 2 warnings in 0.69s
+=> `test_output_is_byte_identical_to_prechange_baseline` compares, per asset, BOTH the
+   direct `_asset_to_dict` output AND the served `GET /v1/assets/{id}` response body to
+   the committed fail-pre fixture — so the equality rail is the G0 baseline, not a
+   re-derivation. `test_empty_asset_world...` = zero assets -> no assertion SELECT (PG-SC-07).
+
+--- served-route assertion-SELECT counts, BASE vs WORK_HEAD (temp DB + TestClient) ---
+route    BASE  WORK_HEAD
+POST /v1/assets          1     1
+GET  /v1/assets/{id}     1     1
+PATCH /v1/assets/{id}    2     2
+GET  /v1/assets          0     0     (list route does NOT serialize assertions — see report F1)
+POST .../{id}/merge      3     3
+=> no served route gained or lost an assertion SELECT (PG-IC-08). selectinload was
+   deliberately NOT added at the PATCH/MERGE query sites because their services
+   `db.refresh()` after commit, which would add one wasted SELECT (measured 3 at PATCH
+   with the option, 2 without) — reported as F3.
+
+--- full backend suite, WORK_HEAD (600s bound) ---
+$ backend/venv/bin/python -m pytest -q
+FAILED tests/test_signals.py::test_generated_codes_are_validated_and_bad_checksum_is_not_an_identifier
+FAILED tests/test_signals.py::test_ocr_has_text_boxes_and_mean_confidence - a...
+2 failed, 628 passed, 32 warnings in 30.20s
+
+--- full backend suite, bare BASE (stash-reproved) ---
+$ git stash push -- backend/app/models/asset.py backend/app/models/assertion.py backend/app/api/v1/assets.py backend/tests/test_sg136_assertion_batch.py
+$ backend/venv/bin/python -m pytest -q
+FAILED tests/test_sg136_assertion_batch.py::test_output_is_byte_identical_to_prechange_baseline
+FAILED tests/test_sg136_assertion_batch.py::test_empty_asset_world_issues_no_assertion_select
+FAILED tests/test_sg136_assertion_batch.py::test_generated_codes_are_validated_and_bad_checksum_is_not_an_identifier  [test_signals]
+FAILED tests/test_signals.py::test_ocr_has_text_boxes_and_mean_confidence - a...
+5 failed, 625 passed, 32 warnings in 30.77s
+=> BASE reds, excluding the 3 committed fail-pre SG-136 reds, are EXACTLY the 2
+   `test_signals` environment reds (libzbar shared library absent; tesseract binary
+   absent — established by SG-139 on bare BASE). No other red is introduced by this slice.
+
+--- mypy delta (file list) ---
+BASE:  Found 41 errors in 9 files (checked 90 source files)
+        16 app/api/v1/assets.py · 6 review_tasks.py · 6 households.py · 4 evidence.py
+         3 asset_service.py · 2 audit_service.py · 2 schemas/asset.py · 2 main.py
+         1 models/base.py
+WORK:  Found 41 errors in 9 files (checked 90 source files)   <-- identical list, delta 0
+=> no new mypy error file; assets.py count unchanged at 16. No ignore widened.
+
+--- ruff ---
+$ backend/venv/bin/ruff check app tests/test_sg136_assertion_batch.py
+All checks passed!
+
+--- migration surface ---
+$ git diff --stat origin/automation -- backend/alembic/versions/
+(empty)
+=> relationships create no tables; empty versions/ diff. No migration needed.
+
+--- model delete path regression caught and fixed in-slice ---
+The relationship first broke tests/test_search.py::test_fts_triggers_follow_asset_insert_update_delete
+(stash-proved: FAILED on WORK_HEAD, PASSED on BASE): on `session.delete(asset)` the ORM
+nulled `assertion.asset_id` (NOT NULL) instead of letting the FK cascade. Fixed by declaring
+`cascade="all, delete-orphan"` on `Asset.assertions`, matching the schema's
+`ondelete="CASCADE"`. Re-run:
+$ backend/venv/bin/python -m pytest tests/test_search.py::test_fts_triggers_follow_asset_insert_update_delete -q
+1 passed, 2 warnings in 0.81s

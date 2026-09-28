@@ -36,7 +36,7 @@ from sqlalchemy.orm import selectinload  # noqa: E402
 
 from app.models import Asset, Assertion, Household  # noqa: E402
 
-HOUSEHOLD_ID = "sg136-hh"
+HOUSEHOLD_ID = "hh-1"
 EMPTY_HOUSEHOLD_ID = "sg136-empty-hh"
 _T0 = datetime.datetime(2026, 1, 1, 0, 0, 0)
 FIXTURE = Path(__file__).parent / "fixtures" / "sg136_asset_dict_baseline.json"

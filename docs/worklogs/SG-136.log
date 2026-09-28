@@ -50,4 +50,44 @@ G0 — FAIL-PRE (committed BEFORE any edit; PG-EV-09)
       FAILED test_empty_asset_world_issues_no_assertion_select
       PASSED test_lazy_per_asset_access_is_the_n_plus_one      (6 assets -> 6 assertion SELECTs)
 
-G0 commit: pending below.
+G0 commit: ff9f5d3  (test + fixture + this G0 log; PG-EV-09 satisfied — committed before any edit)
+
+G1 — DESIGN CALL AND HUNKS
+--------------------------
+  Decided shape: KEEP the relationship (matches #16's modelling intent and pins
+  `field_path` ordering at the mapping) and eager-load it with
+  `selectinload(Asset.assertions)` at the `_asset_to_dict`-feeding query sites where the
+  eager load survives to serialization. `_asset_to_dict` now iterates `asset.assertions`.
+  A K-asset serialization therefore costs ONE assertion SELECT (constant in K).
+  `selectinload` NOT added at PATCH (:399) / MERGE (:483): their services commit and
+  `db.refresh()` the instance, which discards a preloaded collection; measured PATCH = 3
+  with the option vs 2 without (pre-slice also 2), so omitting it preserves the count.
+  This is a finding against the packet's flat "selectinload at every site" hint (F3).
+  Cascade: relationship needs `cascade="all, delete-orphan"` (schema FK is
+  `ondelete="CASCADE"`); without it the ORM nulled `assertion.asset_id` on
+  `session.delete(asset)` and broke test_search (F4, fixed in-slice).
+
+  Hunks (CO-100: verified no secret-like token within the app diff):
+    backend/app/models/asset.py     + relationship assertions (order_by, cascade)
+    backend/app/models/assertion.py + relationship asset (back_populates)
+    backend/app/api/v1/assets.py    selectinload import; 3 query sites get the option;
+                                    `_asset_to_dict` iterates asset.assertions; stale
+                                    `Assertion` import dropped; 2 explanatory comments
+    backend/tests/test_sg136_assertion_batch.py  + fixture baseline (from G0)
+
+G1 — VERIFICATION (details + raw captures in SG-136_verify.log)
+---------------------------------------------------------------
+  fail-post batch seam: naive K=3 -> 3, K=6 -> 6 (N+1 unchanged on the lazy path);
+      batched K=3 -> 1, K=6 -> 1 (constant); EQUAL True per K.
+  committed test (post): 4 passed.
+  served routes BASE vs WORK (assertion SELECTs): POST 1/1, GET detail 1/1,
+      PATCH 2/2, GET list 0/0, MERGE 3/3 -> no regression.
+  full suite WORK: 2 failed, 628 passed (only the 2 base-proved test_signals env reds).
+  full suite bare BASE (stash): 2 env reds + the 3 committed fail-pre SG-136 reds.
+  mypy: BASE 41 errors/9 files == WORK 41 errors/9 files (delta 0, same list).
+  ruff: All checks passed.  versions/ diff: empty (no migration).
+
+G2 — WORKLOG + REPORT + RECEIPT
+-------------------------------
+  Three worklog files written; receipt note added on WORK_HEAD and pushed; show output
+  pasted verbatim in SG-136_report.md. WORK_HEAD = WORK_HEAD_PENDING.

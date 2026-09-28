@@ -4,12 +4,11 @@ from typing import Any
 from fastapi import APIRouter, Depends, Header, HTTPException, Query
 from pydantic import BaseModel
 from sqlalchemy import and_, func, or_, select, text
-from sqlalchemy.orm import Query as OrmQuery, Session
+from sqlalchemy.orm import Query as OrmQuery, Session, selectinload
 
 from app.api.v1.relations import relations_for_asset
 from app.config import settings
 from app.db import get_db
-from app.models.assertion import Assertion
 from app.models.audit_event import AuditEvent
 from app.models.asset import Asset
 from app.models.evidence import Evidence, asset_evidence
@@ -83,7 +82,7 @@ def post_asset(
         existing = db.query(IdempotencyKey).filter_by(key=idempotency_key).first()
         if existing and existing.response_json:
             data = json.loads(existing.response_json)
-            a = db.query(Asset).filter_by(id=data["id"]).first()
+            a = db.query(Asset).options(selectinload(Asset.assertions)).filter_by(id=data["id"]).first()
             if a:
                 return _asset_to_dict(a, db)
     a = create_asset(db, household_id, payload.model_dump())
@@ -118,9 +117,12 @@ def _asset_to_dict(asset: Asset, db: Session) -> dict:  # type: ignore[no-untype
         }
         for e in evs
     ]
-    # Assertions
+    # Assertions — SG-136: read the `Asset.assertions` relationship (ordered by
+    # `field_path` at the mapping) instead of one SELECT per asset. Callers that
+    # serialize a collection eager-load it with `selectinload(Asset.assertions)`,
+    # so a K-asset batch costs one assertion SELECT rather than K.
     assertions = []
-    for ass in db.query(Assertion).filter_by(asset_id=asset.id).order_by(Assertion.field_path).all():
+    for ass in asset.assertions:
         assertions.append(
             {
                 "id": ass.id,
@@ -381,7 +383,7 @@ def asset_facets(
 
 @router.get("/assets/{asset_id}")
 def get_asset(asset_id: str, household_id: str = Query(...), db: Session = Depends(get_db)):  # type: ignore[no-untyped-def]
-    a = db.query(Asset).filter_by(id=asset_id).first()
+    a = db.query(Asset).options(selectinload(Asset.assertions)).filter_by(id=asset_id).first()
     if not a:
         raise HTTPException(status_code=404, detail="Asset not found")
     if a.household_id != household_id:
@@ -397,6 +399,10 @@ def patch_asset(
     db: Session = Depends(get_db),  # type: ignore[no-untyped-def]
     if_match: str | None = Header(default=None, alias="If-Match"),
 ):  # type: ignore[no-untyped-def]
+    # No selectinload here: `update_asset` commits and `db.refresh()`es the
+    # instance, which drops a preloaded collection and re-fetches it once anyway
+    # -- eager-loading would add a SELECT for no gain. The lazy load costs the
+    # same single SELECT the pre-slice explicit query did.
     a = db.query(Asset).filter_by(id=asset_id).first()
     if not a:
         raise HTTPException(status_code=404, detail="Asset not found")
@@ -477,6 +483,8 @@ def merge_asset(
     the status `MERGED` plus a `merge.merged_into` assertion naming the winner,
     so the existing asset read path names the winner with no new table.
     """
+    # Same as PATCH: `merge_asset_redirect` commits + `db.refresh()`es, so a
+    # preloaded collection here would be discarded and re-fetched.
     a = db.query(Asset).filter_by(id=asset_id).first()
     if not a:
         raise HTTPException(status_code=404, detail="Asset not found")
@@ -500,7 +508,7 @@ def post_asset_evidence(
     household_id: str = Query(...),
     db: Session = Depends(get_db),  # type: ignore[no-untyped-def]
 ):  # type: ignore[no-untyped-def]
-    a = db.query(Asset).filter_by(id=asset_id).first()
+    a = db.query(Asset).options(selectinload(Asset.assertions)).filter_by(id=asset_id).first()
     if not a:
         raise HTTPException(status_code=404, detail="Asset not found")
     if a.household_id != household_id:
