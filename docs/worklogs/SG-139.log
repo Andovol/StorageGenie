@@ -1,0 +1,67 @@
+SG-139 run log — green the suite: non-disabling fileConfig + dedup Row types (fail-then-pass)
+
+started_utc  2026-09-28T17:50:23Z  (live clock; process start Mon Sep 28 17:50:23 2026)
+workdir      /home/andrei/StorageGenie
+origin       git@github.com:Andovol/StorageGenie.git
+BASE ref     origin/automation
+BASE commit  0b1e05af3a73d41bc322fce4cda90e1688de2a58  (start HEAD, tree clean)
+WORK_HEAD    WORK_HEAD_PENDING  (worklog commit; receipt note target)
+model        opencode-go/deepseek-v4.1-flash   (read from process args /proc/76241/cmdline `--model`)
+effort       high                              (read from process args /proc/76241/cmdline `--variant high`)
+coder        opencode (env CODER=opencode; OPENCODE_PID=76241; RUN_BUDGET_S=2100)
+contract     echo=0.40.0 source=/home/andrei/storagegenie-contract/VERSION (published tip f26dbd3);
+             RULES.md sha256=5b65629377bbac9e40bfa7e2f4d4e42a5667b3a08ec786beb47c6a677d9ac33c
+             == RULES.sha256 payload (clean). `.rules-cache/` absent on host (standing).
+
+role guard   Coder only — no dispatch verb run, own unit never started/polled. `gh` never touched.
+
+17:50:23Z process start. tree clean; BASE=0b1e05a; contract VERSION + sha256 verified.
+17:50Z    G0 open: read packet + both target files + test_health.py + alembic.ini + health.py.
+          Confirmed both premises: env.py:20 fileConfig default-disables existing loggers;
+          dedup.py:48 annotation is `list[tuple[Observation, Asset]]` while the value is
+          `list[Row[tuple[Observation, Asset]]]` (mypy: assignment/union-attr/arg-type).
+17:51Z    full backend suite on unmodified BASE (backend/venv/bin/python -m pytest) ->
+          3 failed, 623 passed in 30.22s. Failing set EXACTLY the expected
+          {test_health_reports_database_failure (caplog.text=='') + 2 test_signals env reds};
+          no fourth red (PG-IC-08 holds). Env causes base-derived: libzbar shared lib absent
+          + tesseract binary absent (both proven on bare BASE).
+17:52Z    mypy app BASE -> 44 errors in 10 files (packet expectation matched), 3 of them in
+          dedup.py; ruff app clean; versions/ diff empty. G0 capture written to
+          SG-139_verify.log and COMMITTED FIRST (054f689) before any edit (PG-EV-09).
+17:52:51Z G0 commit 054f689. elapsed ~148s.
+17:53Z    G1: two hunks applied.
+          A) env.py:20 -> fileConfig(config.config_file_name, disable_existing_loggers=False)
+             (one-line shape, as expected).
+          B) dedup.py -> `from sqlalchemy import Row` + annotation
+             `list[Row[tuple[Observation, Asset]]] | None` (true type; unexpected None branch
+             kept as-is).
+17:53Z    mypy app -> 41 errors in 9 files (back to pre-#20 count; dedup.py zero errors; no
+          new error file); ruff clean. delta -3.
+17:54Z    full backend suite post -> 2 failed, 624 passed in 31.49s; only the 2 base-proved
+          test_signals env reds remain. `--tb=short` shows test_health_reports_database_failure
+          is NOT among failures.
+17:54Z    verbose full suite re-run -> tests/test_health.py::test_health_reports_database_failure
+          PASSED in-suite (caplog green under full-suite ordering, test file untouched).
+          targeted test_health.py + test_dedup.py -> 7 passed (runtime behaviour unchanged).
+17:55Z    migration proofs: `alembic current` -> `20260924_sg114_relation (head)` (quoted);
+          online `upgrade head` on a temp DB applies all 12 and emits INFO migration logging.
+          offline `upgrade head --sql` stops at app/services/fts.py:35
+          (MockConnection.exec_driver_sql) — proven PRE-EXISTING by stashing the two hunks
+          back to BASE and reproducing the identical exit-1/8-upgrades/AttributeError.
+          `current` is the working migration proof.
+17:55Z    diff --name-only 0b1e05a = {backend/alembic/env.py, backend/app/services/dedup.py,
+          docs/worklogs/SG-139_verify.log}; versions/ empty; no credential token within 10
+          lines of either hunk (CO-100).
+17:56Z    G2: SG-139.log + SG-139_report.md + SG-139_verify.log finalized. elapsed ~185s.
+
+SPEND        real $0.000000 USD, zero metered calls, zero container execs, no serving,
+             no rebuild/recreate, no migration, no close, no rebase.
+
+elapsed      G0 ~148s · G1 ~185s · G2 (this write) · overall ~360s (budget 2400s packet /
+             2100s env RUN_BUDGET_S). No command killed; each ran under its class bound.
+
+note         WORK_HEAD committed + pushed; note added + pushed; re-fetched into a MAPPED local
+             ref and `show` pasted verbatim -> note=yes (receipt-paste commit + final-tip
+             dual-annotate follows).
+
+END SG-139 (suite: 3 red -> 2 base-proved env reds; mypy 44/10 -> 41/9 with dedup clean).

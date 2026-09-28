@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
+from sqlalchemy import Row
 from sqlalchemy.orm import Session
 
 from app.config import settings
@@ -45,7 +46,7 @@ def _similar_matches(
     household_id: str,
     evidence_id: str,
     phash: str,
-    phash_rows: list[tuple[Observation, Asset]] | None = None,
+    phash_rows: list[Row[tuple[Observation, Asset]]] | None = None,
 ) -> list[dict[str, object]]:
     if phash_rows is None:
         phash_rows = (

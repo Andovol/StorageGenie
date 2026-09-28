@@ -90,3 +90,100 @@ $ git diff --stat HEAD -- backend/alembic/versions/
 
 G0 conclusion: both defects reproduced on unmodified BASE. 44 errors / 10 files
 matches the packet expectation exactly. caplog red quoted (caplog.text == '').
+
+================================================================
+G1 — FIX (two hunks) + FAIL-POST captures
+================================================================
+
+Hunk A — backend/alembic/env.py:20 (one-line shape as the packet expected):
+    -    fileConfig(config.config_file_name)
+    +    fileConfig(config.config_file_name, disable_existing_loggers=False)
+  A1 truth (1 world, no branching): prior behaviour `fileConfig(ini)` used the
+  logging.config default `disable_existing_loggers=True`, which on every alembic
+  config load set `app.api.v1.health.disabled = True` process-wide; under
+  full-suite ordering a migration test ran first, so the health logger was dead
+  by the time test_health_reports_database_failure ran -> caplog.text == ''.
+  `disable_existing_loggers=False` keeps the ini's own config while not
+  disabling unrelated existing loggers.
+
+Hunk B — backend/app/services/dedup.py (annotation + import only; no statement
+  change): `from sqlalchemy import Row` added; parameter annotation changed
+  from `list[tuple[Observation, Asset]] | None` to
+  `list[Row[tuple[Observation, Asset]]] | None`, which is the true type of
+  `db.query(Observation, Asset).all()`. `for row, asset in phash_rows` already
+  unpacked a Row at runtime; only the annotation now tells the truth.
+
+$ (cd backend && venv/bin/python -m pytest -q --tb=short -p no:cacheprovider)
+FAILED tests/test_signals.py::test_generated_codes_are_validated_and_bad_checksum_is_not_an_identifier
+FAILED tests/test_signals.py::test_ocr_has_text_boxes_and_mean_confidence - a...
+2 failed, 624 passed, 32 warnings in 31.49s
+=> total reds == the 2 base-proved test_signals environment reds; zero others.
+=> test_health_reports_database_failure is NOT in the failing set (green in-suite).
+
+$ (cd backend && venv/bin/python -m pytest -v -p no:cacheprovider)  [grep health]
+tests/test_health.py::test_health_reports_healthy_status PASSED          [ 27%]
+tests/test_health.py::test_health_reports_storage_failure PASSED         [ 27%]
+tests/test_health.py::test_health_reports_database_failure PASSED        [ 27%]
+================= 2 failed, 624 passed, 32 warnings in 31.45s ==================
+=> caplog test green UNDER FULL-SUITE ORDERING, test file untouched.
+
+$ (cd backend && venv/bin/python -m pytest -q tests/test_health.py tests/test_dedup.py)
+7 passed, 2 warnings in 1.09s
+=> _similar_matches callers exercise test_dedup.py green (runtime behaviour unchanged).
+
+$ (cd backend && venv/bin/mypy app)
+Found 41 errors in 9 files (checked 90 source files)
+per-file error counts (post):
+  16 app/api/v1/assets.py
+   6 app/api/v1/review_tasks.py
+   6 app/api/v1/households.py
+   4 app/api/v1/evidence.py
+   3 app/services/asset_service.py
+   2 app/services/audit_service.py
+   2 app/schemas/asset.py
+   2 app/main.py
+   1 app/models/base.py
+=> back to the pre-#20 count (44 -> 41; delta -3), dedup.py has ZERO errors,
+   and the 9-file list is exactly the base list minus dedup.py (no new error file).
+
+$ (cd backend && venv/bin/ruff check app)
+All checks passed!
+
+$ git diff --stat 0b1e05a -- backend/alembic/versions/
+(empty — ZERO migration version change)
+
+$ (cd backend && DATABASE_URL=sqlite:////tmp/opencode/sg139/alp.db venv/bin/alembic upgrade head)
+INFO  [alembic.runtime.migration] Context impl SQLiteImpl.
+INFO  [alembic.runtime.migration] Will assume non-transactional DDL.
+INFO  [alembic.runtime.migration] Running upgrade 20260924_sg113_location -> 20260924_sg114_relation, asset relations: typed links (SG-114, G4)
+=> all 12 migrations applied; alembic migration logging still EMITS after the fix.
+
+$ (cd backend && DATABASE_URL=sqlite:////tmp/opencode/sg139/alp.db venv/bin/alembic current)
+INFO  [alembic.runtime.migration] Context impl SQLiteImpl.
+INFO  [alembic.runtime.migration] Will assume non-transactional DDL.
+20260924_sg114_relation (head)
+=> `alembic current` quoted; head reached, migration output intact.
+
+$ (cd backend && venv/bin/alembic upgrade head --sql)   [offline SQL]
+INFO  [alembic.runtime.migration] Context impl SQLiteImpl.
+INFO  [alembic.runtime.migration] Generating static SQL
+INFO  [alembic.runtime.migration] Will assume non-transactional DDL.
+... 8 "Running upgrade" lines + SQL ...
+AttributeError: 'MockConnection' object has no attribute 'exec_driver_sql'
+=> offline `--sql` stops at app/services/fts.py:35 on an online-only API. Verified
+   PRE-EXISTING: with hunks temporarily stashed back to BASE the same run exits 1
+   with the same 8 upgrades and the same AttributeError. NOT caused by this slice;
+   `alembic current` (online) is the working migration proof.
+
+$ git diff --name-only 0b1e05a
+backend/alembic/env.py
+backend/app/services/dedup.py
+docs/worklogs/SG-139_verify.log
+=> no served-route file (app/api/, app/main.py) in the changed set — routes untouched.
+
+$ git diff -U10 0b1e05a -- backend/alembic/env.py backend/app/services/dedup.py | grep -inE 'key|secret|token|password|credential'
+(no credential token within ten lines of either hunk — CO-100 asserted)
+
+G1 conclusion: fail-pre red (054f689) -> fail-post green; only the 2 base-proved
+env reds remain; mypy back to 41/9 with dedup.py clean; ruff clean; versions empty;
+migration output intact.
