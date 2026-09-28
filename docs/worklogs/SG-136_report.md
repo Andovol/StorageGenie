@@ -5,7 +5,7 @@ Work dir:    /home/andrei/StorageGenie
 origin:      git@github.com:Andovol/StorageGenie.git
 BASE ref:    origin/automation
 BASE commit: b828b4009643ab9e054c2ff146b2ca2d30b54745  (start HEAD; tree clean at start)
-WORK_HEAD:   WORK_HEAD_PENDING  (worklog commit; receipt note target)
+WORK_HEAD:   8166e79994a732a6a7fa176eb4b305f56fb0512d  (worklog commit; receipt note target)
 Model:       opencode-go/deepseek-v4.1-flash   (per process args /proc/90023/cmdline `--model`)
 Effort:      high                              (per process args /proc/90023/cmdline `--variant high`)
 Coder:       opencode  (env CODER=opencode; OPENCODE_PID=90023; RUN_BUDGET_S=2100)
@@ -138,17 +138,32 @@ every command ran under its class bound (120s ordinary / 600s suite / 2400s over
 
 ## 5. Receipt
 
-- Work commit `WORK_HEAD = WORK_HEAD_PENDING` (the two source hunks + the test + the 3 worklog
-  files), pushed to `origin/automation`; worktree clean (`CO-55`).
+- Work commit `WORK_HEAD = 8166e79994a732a6a7fa176eb4b305f56fb0512d` (the two source hunks + the
+  test + the 3 worklog files), pushed to `origin/automation`; worktree clean (`CO-55`).
 - No push to `storagegenie-evidence`; `{{RECEIPT_CMD}}` not run.
 - Note added on WORK_HEAD on `refs/notes/storagegenie-coder-reports`, pushed, then re-fetched into
-  the **mapped** local ref `refs/notes/sg136-verify`, and `show` output pasted verbatim in the
-  receipt-paste commit (a default fetch carries no notes; a bare refspec rewrites only FETCH_HEAD —
-  mapped per `M20`).
+  the **mapped** local ref `refs/notes/sg136-verify` (a default fetch carries no notes; a bare
+  refspec rewrites only FETCH_HEAD — mapped per `M20`). `show` output pasted verbatim below.
 - Final tip dual-annotated with the same note (note-anchor inoculation, SG-092 precedent).
 - `note=yes`
 
-Executed output is pasted verbatim in the `SG-136 receipt-paste` commit (see below where quoted).
+Executed output, pasted verbatim:
+```
+$ git push origin automation
+To github.com:Andovol/StorageGenie.git
+   b828b40..8166e79  automation -> automation
+$ git notes --ref=refs/notes/storagegenie-coder-reports add \
+    -m "Dispatch-ID: SG-136 | Report: docs/worklogs/SG-136_report.md | Work-HEAD: 8166e79994a732a6a7fa176eb4b305f56fb0512d" \
+    8166e79994a732a6a7fa176eb4b305f56fb0512d
+$ git push origin refs/notes/storagegenie-coder-reports
+To github.com:Andovol/StorageGenie.git
+   9928245..d6c1456  refs/notes/storagegenie-coder-reports -> refs/notes/storagegenie-coder-reports
+$ git fetch origin refs/notes/storagegenie-coder-reports:refs/notes/sg136-verify
+From github.com:Andovol/StorageGenie
+ * [new ref]         refs/notes/storagegenie-coder-reports -> refs/notes/sg136-verify
+$ git notes --ref=refs/notes/sg136-verify show 8166e79994a732a6a7fa176eb4b305f56fb0512d
+Dispatch-ID: SG-136 | Report: docs/worklogs/SG-136_report.md | Work-HEAD: 8166e79994a732a6a7fa176eb4b305f56fb0512d
+```
 
 ## UNCLEAR
 
