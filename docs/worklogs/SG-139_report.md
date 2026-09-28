@@ -5,7 +5,7 @@ Work dir:    /home/andrei/StorageGenie
 origin:      git@github.com:Andovol/StorageGenie.git
 BASE ref:    origin/automation
 BASE commit: 0b1e05af3a73d41bc322fce4cda90e1688de2a58  (start HEAD; tree clean at start)
-WORK_HEAD:   WORK_HEAD_PENDING  (worklog commit; receipt note target)
+WORK_HEAD:   04fe4f544733cdf50bdaeb266d286404b2d99831  (worklog commit; receipt note target)
 Model:       opencode-go/deepseek-v4.1-flash   (per process args /proc/76241/cmdline `--model`)
 Effort:      high                              (per process args /proc/76241/cmdline `--variant high`)
 Coder:       opencode  (env CODER=opencode; OPENCODE_PID=76241; RUN_BUDGET_S=2100)
@@ -152,7 +152,7 @@ Real metered spend **$0.000000 USD**, zero metered calls, zero container execs. 
 
 ## 5. Receipt
 
-- Work commit `WORK_HEAD = WORK_HEAD_PENDING` (source fixes + the 3 worklog files), pushed to
+- Work commit `WORK_HEAD = 04fe4f544733cdf50bdaeb266d286404b2d99831` (source fixes + the 3 worklog files), pushed to
   `origin/automation`; worktree clean (`CO-55`).
 - No push to `storagegenie-evidence`; `{{RECEIPT_CMD}}` not run.
 - Note added on WORK_HEAD on `refs/notes/storagegenie-coder-reports`, pushed, then re-fetched into
@@ -163,7 +163,20 @@ Real metered spend **$0.000000 USD**, zero metered calls, zero container execs. 
 
 Executed output, pasted verbatim:
 ```
-PENDING — pasted in the receipt-paste commit after the note is pushed and re-fetched.
+$ git push origin automation
+To github.com:Andovol/StorageGenie.git
+   0b1e05a..04fe4f5  automation -> automation
+$ git notes --ref=refs/notes/storagegenie-coder-reports add \
+    -m "Dispatch-ID: SG-139 | Report: docs/worklogs/SG-139_report.md | Work-HEAD: 04fe4f544733cdf50bdaeb266d286404b2d99831" \
+    04fe4f544733cdf50bdaeb266d286404b2d99831
+$ git push origin refs/notes/storagegenie-coder-reports
+To github.com:Andovol/StorageGenie.git
+   9bafea1..4bfe2a1  refs/notes/storagegenie-coder-reports -> refs/notes/storagegenie-coder-reports
+$ git fetch origin refs/notes/storagegenie-coder-reports:refs/notes/sg139-verify
+From github.com:Andovol/StorageGenie
+ * [new ref]         refs/notes/storagegenie-coder-reports -> refs/notes/sg139-verify
+$ git notes --ref=refs/notes/sg139-verify show 04fe4f544733cdf50bdaeb266d286404b2d99831
+Dispatch-ID: SG-139 | Report: docs/worklogs/SG-139_report.md | Work-HEAD: 04fe4f544733cdf50bdaeb266d286404b2d99831
 ```
 
 ## UNCLEAR
