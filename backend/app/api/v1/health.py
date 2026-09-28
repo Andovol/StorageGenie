@@ -1,3 +1,4 @@
+import logging
 import os
 from pathlib import Path
 
@@ -9,6 +10,8 @@ from sqlalchemy.orm import Session
 from app.config import settings
 from app.db import get_db
 
+logger = logging.getLogger(__name__)
+
 router = APIRouter()
 
 
@@ -17,8 +20,8 @@ def health(db: Session = Depends(get_db)):  # type: ignore[no-untyped-def]
     db_status = "error"
     try:
         db.execute(text("SELECT 1"))
-    except Exception:
-        pass
+    except Exception as exc:
+        logger.warning("Database health check probe failed: %s", exc, exc_info=True)
     else:
         db_status = "ok"
 
