@@ -1,69 +1,51 @@
-SG-140 coder log — close-out deploy rider (rebuild + one recreate + verify)
-Started: 2026-09-28T18:33Z (live clock)
-Role: Coder only. No dispatch verb run, no unit started or polled.
+SG-140 coder log — close-out deploy rider (rebuild + ONE recreate + verify) — RE-RIDE
+Started: 2026-09-28T19:12Z (live clock, PG-IC-07). Ended: 2026-09-28T19:15Z.
+Role: Coder only. No dispatch verb run for any ID, no unit started or polled (role guard held).
+Context: this is the re-dispatch of SG-140 after the first attempt was correctly BLOCKED
+(commit 6494164; report in 63b37a0) because `tsc && vite build` was red at BASE (TS2739 x3 in
+WebAlternates.test.tsx, landed by SG-135 PR #18). SG-141 (bb30209, rated 99) repaired it; this
+rider then serves. Prior artifacts are reachable in history; the notes-ref note on 6494164 stands.
 
-[18:33] G0 reads
-  BASE = origin/automation -> 133c25205491e109b72310b04fa49b4a1f7bc6f2
-  HEAD = 133c25205491e109b72310b04fa49b4a1f7bc6f2 (worktree clean)
-  product diff origin/automation...HEAD: empty
-  alembic current = 20260924_sg114_relation (head)  [expected == observed]
+[19:12] G0 reads
+  BASE (ref requested origin/automation) -> 486d0b4754c15fcdf41ba86bd7e04ef269d596cf (== HEAD, worktree clean)
+  product diff origin/automation...HEAD: empty (start)
+  alembic current = 20260924_sg114_relation (head)  [expected == observed; no upgrade run]
   image storagegenie-backend:latest = sha256:ca29a3dc9a07822d663e4f15044ff53ec6504fb336d0dd9885bb4ad9c1304184
   container storagegenie-backend-1 = 40a117eaff0c54f7275a419ad39d417e962aaa6b89ccc274759888d31f60039d (Up 2 days, healthy)
   health x2 = {"status":"ok","db":"ok","storage":"ok"} HTTP 200
-  served entry references /assets/index-DXSEg7CT.js (sha256 f435cbc1... 318414 bytes)
+  served entry = /assets/index-DXSEg7CT.js (sha256 f435cbc1… 318414 bytes); index.html sha256 89c1f993…
   gate: http:80 Host=storagegenie.dynv6.net -> 301 ; https:443 -> 401
   read-only counts (mode=ro): provider_call=18 job=9 enrich_snapshot=4 candidate=8 evidence=13
+    guardrail_event=2 audit_event=68 asset=6 household=1
 
-[18:34] G1 rebuild
+[19:13] G1 rebuild
   command: BUILDX_CONFIG=/tmp/opencode/buildx docker compose build backend
-  START_BUILD=2026-09-28T18:34:25Z END_BUILD=2026-09-28T18:34:33Z
-  BUILD_EXIT=1  -> frontend-build stage `RUN npm run build` (`tsc && vite build`) exit 2
-  TS2739 x3 in src/components/WebAlternates.test.tsx (lines 59,74,79): object literals missing
-  required WebAlternate props source_type/source_url/retrieved_at.
-  image unchanged (still ca29a3dc9a07). NO recreate performed (packet orders rebuild THEN recreate;
-  recreating the stale image would serve nothing and burn the single authorized recreate).
+  START_BUILD=2026-09-28T19:13:25Z END_BUILD=2026-09-28T19:13:43Z BUILD_EXIT=0
+  frontend `tsc && vite build` DONE; new image id sha256:995b20df6b705c82bfe5c21c745a7a10d61d0aa8e59b1b7a54c5862ef796a43a
+  (the SG-141 fix is why this build is green — the same command failed 8s in on the first ride)
 
-[18:35] ROOT CAUSE
-  commit 0cd1c35 (google-labs-jules[bot], 2026-09-28T13:53:55Z) "test: add unit tests for
-  WebAlternates component" added frontend/src/components/WebAlternates.test.tsx (93 lines),
-  merged via 973009c "Merge PR #18 into automation" — one of SG-135's 11 merges.
-  frontend/tsconfig.json `include: ["src"]` covers *.test.tsx; package.json build = `tsc && vite build`
-  typechecks the tests. WebAlternate (types.ts:144-150) types all three props required (`string|null`).
-  A production rebuild therefore CANNOT succeed at BASE without a product-file edit.
+[19:13] G1 recreate — exactly ONE
+  command: BUILDX_CONFIG=/tmp/opencode/buildx docker compose up -d --force-recreate backend
+  START_REC=2026-09-28T19:13:48Z END_REC=2026-09-28T19:13:49Z REC_EXIT=0
+  container id 40a117eaff0c… -> 2e623765ce22… (M42: container-id change is the proof, not RestartCount)
+  no second recreate, no restart-loop, no down -v.
 
-[18:35] G1 STOPPED. This rider forbids product writes (scope ceiling). Deploy not performed.
-  Post-failure safety: container/image unchanged, RestartCount=0, health still x2 ok, worktree clean.
+[19:14] G1 verify
+  health x6 = {"status":"ok","db":"ok","storage":"ok"} HTTP 200 each
+  alembic current after = 20260924_sg114_relation (head)  -> UNCHANGED
+  gate after: http 301 / https 401
+  bundle hash MOVED: f435cbc1… (318414 B) -> fc696d21… (318415 B); index.html sha256 89c1f993… -> 63731edd…
+  live counts delta = 0 on all 9 tables
+  smoke: GET /v1/assets -> 200 items=6 ; GET / -> 200 944 bytes
 
-[18:36] G2 worklogs written; BLOCKED commit + notes receipt.
+[19:15] G2 worklogs written (this file, SG-140_report.md, SG-140_verify.log); receipt below.
+  product diff re-checked at end: empty (see report).
 
 === RECEIPT (M20-corrected block; executed output pasted verbatim) ===
-$ git push origin automation
-To github.com:Andovol/StorageGenie.git
-   133c252..6494164  automation -> automation
-$ git notes --ref=refs/notes/storagegenie-coder-reports add \
-    -m "Dispatch-ID: SG-140 | Report: docs/worklogs/SG-140_report.md | Work-HEAD: 649416469fb2fddb63e95fec4890313cbb127e3c" \
-    649416469fb2fddb63e95fec4890313cbb127e3c
-$ git push origin refs/notes/storagegenie-coder-reports
-To github.com:Andovol/StorageGenie.git
-   d31d645..a39494b  refs/notes/storagegenie-coder-reports -> refs/notes/storagegenie-coder-reports
-$ git fetch origin refs/notes/storagegenie-coder-reports:refs/notes/sg140-fetched
-From github.com:Andovol/StorageGenie
- * [new ref]         refs/notes/storagegenie-coder-reports -> refs/notes/sg140-fetched
-$ git notes --ref=refs/notes/sg140-fetched show 649416469fb2fddb63e95fec4890313cbb127e3c
-Dispatch-ID: SG-140 | Report: docs/worklogs/SG-140_report.md | Work-HEAD: 649416469fb2fddb63e95fec4890313cbb127e3c
+(receipt executes immediately after this commit; the executed paste appears in the
+ receipt-paste commit that follows, and in SG-140_report.md.)
 
---- dual-annotate the final tip (63b37a0, at annotation time) ---
-$ git notes --ref=refs/notes/storagegenie-coder-reports add \
-    -m "Dispatch-ID: SG-140 | Report: docs/worklogs/SG-140_report.md | Work-HEAD: 63b37a03d01256128fee3df5fd611914aebf1aaa" \
-    63b37a03d01256128fee3df5fd611914aebf1aaa
-$ git push origin refs/notes/storagegenie-coder-reports
-To github.com:Andovol/StorageGenie.git
-   a39494b..0641b53  refs/notes/storagegenie-coder-reports -> refs/notes/storagegenie-coder-reports
-$ git fetch origin refs/notes/storagegenie-coder-reports:refs/notes/sg140-fetched
-From github.com:Andovol/StorageGenie
-   a39494b..0641b53  refs/notes/storagegenie-coder-reports -> refs/notes/sg140-fetched
-$ git notes --ref=refs/notes/sg140-fetched show 63b37a03d01256128fee3df5fd611914aebf1aaa
-Dispatch-ID: SG-140 | Report: docs/worklogs/SG-140_report.md | Work-HEAD: 63b37a03d01256128fee3df5fd611914aebf1aaa
-$ git notes --ref=refs/notes/sg140-fetched show 649416469fb2fddb63e95fec4890313cbb127e3c
-Dispatch-ID: SG-140 | Report: docs/worklogs/SG-140_report.md | Work-HEAD: 649416469fb2fddb63e95fec4890313cbb127e3c
-note=yes
+=== PRIOR-ATTEMPT SUPERSESSION (PRE-1) ===
+First SG-140 ride: 6494164 "BLOCKED: SG-140 close-out deploy rider — rebuild fails at BASE …",
+report in 63b37a0, note on 6494164 (notes ref), rated 98. This re-ride does not delete that
+history; it supersedes it in the working tree only, as the packet's re-dispatch directs.
