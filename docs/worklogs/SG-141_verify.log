@@ -1,0 +1,52 @@
+SG-141 VERIFY LOG — captured proofs (verbatim)
+Work dir: /home/andrei/StorageGenie
+origin: git@github.com:Andovol/StorageGenie.git
+BASE ref requested: origin/automation
+BASE resolved: b4fec8bebcde3ef33fa6c2c1f765047091df6646
+Contract echo: 0.40.0    source path: /home/andrei/storagegenie-contract/VERSION
+Model: opencode-go/deepseek-v4.1-flash   Effort: high
+  source: /proc/162575/cmdline =
+  opencode run --auto --dir /home/andrei/StorageGenie --model opencode-go/deepseek-v4.1-flash --variant high
+Spend: real $0.000000 USD; zero metered calls.
+
+============================================================
+## G0 — FAIL-PRE: tsc red on UNMODIFIED BASE (committed before any edit)
+============================================================
+$ git rev-parse HEAD
+b4fec8bebcde3ef33fa6c2c1f765047091df6646
+$ git rev-parse origin/automation
+b4fec8bebcde3ef33fa6c2c1f765047091df6646
+$ git status --porcelain
+(empty)
+
+Toolchain (repo-local, the SAME binary `npm run build` uses — `tsc`):
+$ ls frontend/node_modules/.bin/tsc
+frontend/node_modules/.bin/tsc
+$ cat frontend/package.json | grep '"build"'
+"build": "tsc && vite build",
+
+$ cd frontend && ./node_modules/.bin/tsc --noEmit
+src/components/WebAlternates.test.tsx(59,7): error TS2739: Type '{ field: string; value: string; }' is missing the following properties from type 'WebAlternate': source_type, source_url, retrieved_at
+src/components/WebAlternates.test.tsx(74,7): error TS2739: Type '{ field: string; value: string; source_type: string; }' is missing the following properties from type 'WebAlternate': source_url, retrieved_at
+src/components/WebAlternates.test.tsx(79,7): error TS2739: Type '{ field: string; value: string; source_type: string; }' is missing the following properties from type 'WebAlternate': source_url, retrieved_at
+EXIT=2
+
+PG-IC-08 blast radius: the error set is EXACTLY the 3 errors above, all in
+frontend/src/components/WebAlternates.test.tsx (lines 59/74/79). No error in any
+other file. Packet expectation `:59,74,79` == observed. Blast radius clean.
+
+Type source under test (frontend/src/api/types.ts:144-150) — REQUIRED triple:
+144:export type WebAlternate = {
+145:  field: string;
+146:  value: unknown;
+147:  source_type: string | null;
+148:  source_url: string | null;
+149:  retrieved_at: string | null;
+150:};
+
+Component null-handling read BEFORE deciding shape (frontend/src/components/WebAlternates.tsx):
+  31: {alternate.source_type ?? "unknown source"}   -> explicit null === omitted (both falsy -> fallback)
+  32/46: alternate.source_url ? ... : null           -> explicit null === omitted (both render nothing)
+  therefore explicit `null` is observationally identical to the omitted key in the
+  component under test. Shape decision: add the three missing keys as `null`.
+  `types.ts` left byte-identical (requirement stands).
