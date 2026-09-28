@@ -50,3 +50,75 @@ Component null-handling read BEFORE deciding shape (frontend/src/components/WebA
   therefore explicit `null` is observationally identical to the omitted key in the
   component under test. Shape decision: add the three missing keys as `null`.
   `types.ts` left byte-identical (requirement stands).
+
+============================================================
+## G1 — FAIL-POST: complete the literals + prove green (same repo toolchain)
+============================================================
+EDIT (exactly the 3 literals; 7 inserted keys — 3 + 2 + 2):
+$ git diff -- frontend/src/components/WebAlternates.test.tsx
+@@ -59,6 +59,9 @@ describe("WebAlternates", () => {
+         field: "model",
+         value: "Model X",
++        source_type: null,
++        source_url: null,
++        retrieved_at: null,
+@@ -75,11 +78,15 @@ describe("WebAlternates", () => {
+         field: "brand",
+         value: "Brand A",
+         source_type: "web:source1",
++        source_url: null,
++        retrieved_at: null,
+       },
+       {
+         field: "category",
+         value: "Electronics",
+         source_type: "web:source2",
++        source_url: null,
++        retrieved_at: null,
+       },
+
+--- FAIL-POST tsc --noEmit (FULL output; zero lines is the complete output) ---
+$ cd frontend && ./node_modules/.bin/tsc --noEmit
+TSC_EXIT=0
+(no diagnostics emitted; exit 0 — quoted as the full output, not a grep-for-absence)
+
+--- FAIL-POST file vitest (real repo config) ---
+$ cd frontend && ./node_modules/.bin/vitest run src/components/WebAlternates.test.tsx
+ RUN  v1.6.1 /home/andrei/StorageGenie/frontend
+ ✓ src/components/WebAlternates.test.tsx  (4 tests) 63ms
+ Test Files  1 passed (1)
+      Tests  4 passed (4)
+ FILE_VITEST_EXIT=0
+
+--- FAIL-POST eslint on the edited file ---
+$ cd frontend && ./node_modules/.bin/eslint src/components/WebAlternates.test.tsx
+ESLINT_EXIT=0
+
+--- FAIL-POST FULL frontend suite (repo's own `npm test` = `vitest run`) ---
+$ cd frontend && npm test
+ Test Files  27 passed (27)
+      Tests  243 passed (243)
+   Duration  5.11s
+ FULL_SUITE_EXIT=0
+(no reds; base-proved-reds not applicable — base red was a tsc typecheck only,
+ vitest never typechecks, so the suite was green at BASE too. The defect this
+ slice fixes was never visible to vitest.)
+
+============================================================
+## DIFF CEILING PROOF — exactly the 3 literals + worklogs
+============================================================
+$ git diff --stat -- frontend/            (product diff, working tree)
+ frontend/src/components/WebAlternates.test.tsx | 7 +++++++
+ 1 file changed, 7 insertions(+)
+$ git diff --name-only                    (working tree, product)
+frontend/src/components/WebAlternates.test.tsx
+$ git diff --exit-code -- frontend/src/api/types.ts
+types.ts_unchanged_exit=0                 (types.ts byte-identical — requirement stands)
+$ git status --porcelain                  (at capture time)
+ M frontend/src/components/WebAlternates.test.tsx
+
+Non-product writes: docs/worklogs/SG-141_verify.log (this file), plus the two
+other SG-141 worklog files committed in G2. No config, build file, other test,
+component, or type touched.
+
+

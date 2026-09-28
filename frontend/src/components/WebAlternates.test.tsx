@@ -59,6 +59,9 @@ describe("WebAlternates", () => {
       {
         field: "model",
         value: "Model X",
+        source_type: null,
+        source_url: null,
+        retrieved_at: null,
       },
     ];
 
@@ -75,11 +78,15 @@ describe("WebAlternates", () => {
         field: "brand",
         value: "Brand A",
         source_type: "web:source1",
+        source_url: null,
+        retrieved_at: null,
       },
       {
         field: "category",
         value: "Electronics",
         source_type: "web:source2",
+        source_url: null,
+        retrieved_at: null,
       },
     ];
 
