@@ -1,0 +1,182 @@
+SG-135 verify log — 11 audited winners landed (ordered merges, journal union, tests, no serve)
+
+Dispatch-ID: SG-135
+BASE        origin/automation = fc7bf02a3af54300c703a15a724f10f344387835  (start HEAD, tree clean)
+WORK_HEAD   973009cc6560ff4da0d908ae623591eb04e9c61f
+Model       opencode-go/deepseek-v4.1-flash   (process argv: /proc/self/cmdline `--model`)
+Effort      high                              (process argv: `--variant high`)
+Coder       opencode (env CODER=opencode; OPENCODE_PID=38785)
+Contract    echo 0.40.0 — source `/home/andrei/storagegenie-contract/VERSION` (published tip f26dbd3);
+            RULES.md sha256 5b65629377bbac9e40bfa7e2f4d4e42a5667b3a08ec786beb47c6a677d9ac33c == RULES.sha256 payload.
+
+================================================================================
+G0 — head re-verification (refs/pull/N/head fetched to refs/audit/pr/N)
+================================================================================
+$ for n in 15 17 20 26 2 28 29 31 27 24 18; do git fetch --no-tags origin "refs/pull/$n/head:refs/audit/pr/$n"; done
+$ # expected vs measured (short=7)
+PR expected actual
+#15 84dc691 84dc691 OK
+#17 3269107 3269107 OK
+#20 aea591d aea591d OK
+#26 3dc8349 3dc8349 OK
+#2  217ee06 217ee06 OK
+#28 0cd1c35 0cd1c35 OK
+#29 431d323 431d323 OK
+#31 3872595 3872595 OK
+#27 9b86ce3 9b86ce3 OK
+#24 0211c8a 0211c8a OK
+#18 6e624c2 6e624c2 OK
+=> all 11 heads matched the packet; none moved, so no PR was dropped.
+
+================================================================================
+G0 — merge table + landed-content signature greps (PG-SC-12)
+================================================================================
+$ git log --oneline --merges origin/automation..HEAD
+973009c Merge PR #18 into automation
+d1ae3b7 Merge PR #24 into automation
+5dfab2b Merge PR #27 into automation
+84ef9ce Merge PR #31 into automation
+e1d034b Merge PR #29 into automation
+23d9456 Merge PR #28 into automation
+6064822 Merge PR #2 into automation
+750cd0b Merge PR #26 into automation
+a334a0b Merge PR #20 into automation
+02e661e Merge PR #17 into automation
+0e2dee1 Merge PR #15 into automation
+
+second-parent check (merge^2 == audited head):
+#15 head=84dc691 merge=0e2dee1 second_parent=84dc691 OK
+#17 head=3269107 merge=02e661e second_parent=3269107 OK
+#20 head=aea591d merge=a334a0b second_parent=aea591d OK
+#26 head=3dc8349 merge=750cd0b second_parent=3dc8349 OK
+#2  head=217ee06 merge=6064822 second_parent=217ee06 OK
+#28 head=0cd1c35 merge=23d9456 second_parent=0cd1c35 OK
+#29 head=431d323 merge=e1d034b second_parent=431d323 OK
+#31 head=3872595 merge=84ef9ce second_parent=3872595 OK
+#27 head=9b86ce3 merge=5dfab2b second_parent=9b86ce3 OK
+#24 head=0211c8a merge=d1ae3b7 second_parent=0211c8a OK
+#18 head=6e624c2 merge=973009c second_parent=6e624c2 OK
+
+Post-merge signature greps on WORK_HEAD (derived from each head diff, not memory):
+[#15] backend/app/api/v1/assets.py:515:        ev = ev_map.get(eid)
+[#17] backend/app/api/v1/assets.py:221:        evidence_subquery = select(asset_evidence.c.asset_id)
+[#17] backend/app/api/v1/assets.py:364:        evidence_subquery = select(asset_evidence.c.asset_id)
+[#20] backend/app/services/dedup.py:43:def _similar_matches(
+[#26] frontend/src/components/catalog/ProductCard.tsx:73:export const ProductCard = memo(function ProductCard({
+[#2 ] backend/app/services/chat/__init__.py:11:    SUPPORTED_CATEGORIES as SUPPORTED_CATEGORIES,
+[#28] frontend/src/components/WebAlternates.test.tsx:6:describe("WebAlternates", () => {
+[#29] frontend/src/components/shell/PageContainer.test.tsx:11:describe("pageContainerStyle", () => {
+[#31] backend/app/api/v1/health.py:24:        logger.warning("Database health check probe failed: %s", exc, exc_info=True)
+[#31] backend/tests/test_health.py:36:def test_health_reports_database_failure(monkeypatch, caplog) -> None:
+[#27] backend/app/services/google_taxonomy.py:121:def _token_index() -> dict[str, tuple[int, ...]]:
+[#27] backend/app/services/google_taxonomy.py:145:def _score_candidates(proposal_tokens: frozenset[str]) -> tuple[tuple[float, str, str], ...]:
+[#24] backend/app/services/analytics/service.py:160:def _parse_category_slug(value_json: str) -> str | None:
+[#18] backend/app/services/chat/service.py:144:def build_catalog(db: Session, household_id: str, category: str) -> list[dict[str, Any]]:  # noqa: C901
+=> all 11 heads' hunks present in the merged tree.
+
+Conflicts: exactly two conflict regions, both `.jules/bolt.md`, resolved by UNION
+(every line kept, duplicates dropped once). No third conflict region anywhere.
+#24 conflict: ours=2026-09-28 taxonomy entry vs theirs=2026-09-24 analytics entry -> both kept.
+#18 conflict: ours=2026-09-17 dedup entry  vs theirs=2026-09-17 context entry  -> both kept.
+Final journal entry count: 5 (2026-09-28, 2026-09-24, 2026-09-14, 2026-09-17, 2026-09-17).
+
+================================================================================
+G1 — targeted tests (CO-101)
+================================================================================
+$ cd backend && venv/bin/python -m pytest tests/test_assets_crud.py tests/test_evidence_upload.py \
+    tests/test_asset_facets.py tests/test_search.py tests/test_dedup.py tests/test_google_taxonomy.py \
+    tests/test_plugin_taxonomy.py tests/test_analytics.py tests/test_chat.py tests/test_planning.py -q
+133 passed, 5 warnings in 7.22s
+
+$ venv/bin/python -m pytest tests/test_health.py -v
+tests/test_health.py::test_health_reports_healthy_status PASSED
+tests/test_health.py::test_health_reports_storage_failure PASSED
+tests/test_health.py::test_health_reports_database_failure PASSED
+3 passed, 2 warnings in 0.64s
+
+$ venv/bin/python -c "from app.services.chat import SUPPORTED_CATEGORIES, UnsupportedCategoryError, \
+    build_catalog, build_user_content, load_chat_prompt, log_correction, respond; print(...)"
+import-ok {'food': 'food_beverages', 'medicine': 'medicine_pharma', 'household': 'household_chemicals', 'documents': 'documents_other'} respond build_catalog
+
+$ cd frontend && ./node_modules/.bin/vitest run src/components/catalog/catalog.test.tsx \
+    src/components/WebAlternates.test.tsx src/components/shell/PageContainer.test.tsx
+ ✓ src/components/shell/PageContainer.test.tsx  (6 tests) 52ms
+ ✓ src/components/WebAlternates.test.tsx  (4 tests) 66ms
+ ✓ src/components/catalog/catalog.test.tsx  (33 tests) 425ms
+ Test Files  3 passed (3)
+      Tests  43 passed (43)
+(`npx` absent on host; vitest invoked via `node_modules/.bin/vitest`.)
+
+================================================================================
+G1 — full backend suite, ruff, mypy, migration surface
+================================================================================
+$ cd backend && venv/bin/python -m pytest -q          # WORK_HEAD
+3 failed, 623 passed, 32 warnings in 30.61s
+FAILED tests/test_health.py::test_health_reports_database_failure - Assertion...
+FAILED tests/test_signals.py::test_generated_codes_are_validated_and_bad_checksum_is_not_an_identifier
+FAILED tests/test_signals.py::test_ocr_has_text_boxes_and_mean_confidence - a...
+
+$ git worktree add --detach /tmp/opencode/sg-base fc7bf02
+$ cd /tmp/opencode/sg-base/backend && /home/andrei/StorageGenie/backend/venv/bin/python -m pytest -q   # BASE
+2 failed, 624 passed, 32 warnings in 33.59s
+FAILED tests/test_signals.py::test_generated_codes_are_validated_and_bad_checksum_is_not_an_identifier
+FAILED tests/test_signals.py::test_ocr_has_text_boxes_and_mean_confidence - a...
+
+BASE-PROVED REDS (2): both test_signals failures are environment reds on bare BASE —
+  WARNING app.services.signals:signals.py:104 Barcode extraction unavailable: pyzbar/libzbar is not installed
+  WARNING app.services.signals:signals.py:215 OCR extraction unavailable: tesseract is not installed or it's not in your PATH.
+NOT BASE-PROVED (1): tests/test_health.py::test_health_reports_database_failure — the test is NEW
+  (added by #31; does not exist on BASE), so it cannot be stash-reproduced. It PASSES in isolation
+  (`pytest tests/test_health.py`) and FAILS under full-suite ordering with caplog.text == ''. Root cause
+  is pre-existing base code, not the merge mechanism:
+    $ venv/bin/python -c "from logging.config import fileConfig; from alembic.config import Config; \
+        import logging; l=logging.getLogger('app.api.v1.health'); print('before', l.disabled); \
+        fileConfig(Config('alembic.ini').config_file_name); print('after', l.disabled)"
+    before disabled= False level= 0 propagate= True
+    after  disabled= True level= 0 propagate= True
+  alembic/env.py:20 calls fileConfig(...) with default disable_existing_loggers=True, which globally
+  disables `app.api.v1.health`; migration tests run earlier in the suite, so the new test's caplog sees
+  nothing. Reported as a finding, not a pass and not a hidden failure.
+
+$ cd backend && venv/bin/python -m ruff check .          # WORK_HEAD
+All checks passed!
+$ cd /tmp/opencode/sg-base/backend && .../venv/bin/python -m ruff check .   # BASE
+All checks passed!
+
+$ cd backend && venv/bin/python -m mypy app              # WORK_HEAD
+Found 44 errors in 10 files (checked 90 source files)
+$ cd /tmp/opencode/sg-base/backend && .../venv/bin/python -m mypy app       # BASE
+Found 41 errors in 9 files (checked 90 source files)
+delta vs BASE (comm -13 over file:error sets, line numbers normalised):
+  app/services/dedup.py: error: Argument "phash_rows" to "_similar_matches" has incompatible type
+    "list[Row[tuple[Observation, Asset]]]"; expected "list[tuple[Observation, Asset]] | None"  [arg-type]
+  app/services/dedup.py: error: Incompatible types in assignment (expression has type
+    "list[Row[tuple[Observation, Asset]]]", variable has type "list[tuple[Observation, Asset]] | None")  [assignment]
+  app/services/dedup.py: error: Item "None" of "list[tuple[Observation, Asset]] | None" has no attribute
+    "__iter__" (not iterable)  [union-attr]
+=> mypy delta = +3, all from #20 (dedup.py); NOT zero, stated rather than assumed.
+
+$ git diff --stat fc7bf02 HEAD -- backend/app/models backend/alembic
+(no output)   # empty migration surface, exit 0
+$ git diff --name-status fc7bf02 HEAD
+M .jules/bolt.md
+M backend/app/api/v1/assets.py
+M backend/app/api/v1/health.py
+M backend/app/services/analytics/service.py
+M backend/app/services/chat/__init__.py
+M backend/app/services/chat/service.py
+M backend/app/services/dedup.py
+M backend/app/services/google_taxonomy.py
+M backend/app/services/planning/service.py
+M backend/tests/test_health.py
+A frontend/src/components/WebAlternates.test.tsx
+M frontend/src/components/catalog/ProductCard.tsx
+A frontend/src/components/shell/PageContainer.test.tsx
+=> exactly the 11 PRs' file surfaces; no out-of-scope write; no migration.
+
+================================================================================
+SPEND / VACUITY
+================================================================================
+real $0.000000 USD · zero metered calls · zero container execs · no serving · no rebuild/recreate.
+No vacuous pass: every merge carries its signature grep; suites ran (not skipped); the one unproven red is
+reported as a red, not read as green.

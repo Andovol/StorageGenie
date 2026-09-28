@@ -1,0 +1,50 @@
+SG-135 run log — land the 11 audited winners (ordered merges, journal union, tests, no serve)
+
+started_utc  2026-09-28T17:28:14Z  (process start; live clock)
+workdir      /home/andrei/StorageGenie
+origin       git@github.com:Andovol/StorageGenie.git
+BASE ref     origin/automation
+BASE commit  fc7bf02a3af54300c703a15a724f10f344387835  (start HEAD, tree clean)
+WORK_HEAD    973009cc6560ff4da0d908ae623591eb04e9c61f
+model        opencode-go/deepseek-v4.1-flash   (read from process argv: /proc/self/cmdline `--model`)
+effort       high                              (read from process argv: `--variant high`)
+coder        opencode (env CODER=opencode; OPENCODE_PID=38785)
+contract     echo=0.40.0 source=/home/andrei/storagegenie-contract/VERSION (published f26dbd3);
+             RULES.md sha256=5b65629377bbac9e40bfa7e2f4d4e42a5667b3a08ec786beb47c6a677d9ac33c
+             == RULES.sha256 payload (clean). `.rules-cache/` absent on host (standing).
+
+role guard   Coder only — no dispatch verb run, own unit never started/polled. `gh` never touched.
+
+17:28:14Z process start. tree clean; BASE=fc7bf02; contract VERSION + sha256 verified.
+17:28Z    G0 open: fetched all 11 refs/pull/N/head -> refs/audit/pr/N; all 11 head SHAs
+          matched the packet (none moved) -> nothing dropped.
+17:28Z    surveyed each head diff (merge-base, diffstat, added lines) -> derived signature
+          lines; confirmed only .jules/bolt.md is a shared file (4 appenders among the 11:
+          #20,#27,#24,#18); #15/#17 share assets.py at disjoint regions.
+17:29Z    merges #15 #17 #20 #26 #2 #28 #29 #31 landed clean (8/8, --no-ff, second parent
+          == audited head each). elapsed ~10s.
+17:29Z    #27 landed clean (prepends journal after title, no overlap yet).
+17:29Z    #24 CONFLICT: .jules/bolt.md only -> resolved by UNION (both entries kept). committed.
+17:29Z    #18 CONFLICT: .jules/bolt.md only -> resolved by UNION (both entries kept). committed.
+          NO third conflict region anywhere. 11/11 merges landed; WORK_HEAD=973009c; elapsed ~43s.
+17:30Z    G1: 11/11 signature greps present in merged tree (PG-SC-12).
+17:30Z    targeted backend 10 files -> 133 passed; test_health alone -> 3 passed;
+          #2 import -> import-ok; frontend vitest 3 files -> 43 passed.
+17:31Z    full backend suite WORK_HEAD -> 3 failed, 623 passed.
+17:32Z    BASE worktree suite -> 2 failed, 624 passed. 2 base-proved reds (test_signals:
+          pyzbar/libzbar + tesseract absent). 1 red NOT base-proved: new #31 test
+          test_health_reports_database_failure (caplog.text='' under full-suite ordering;
+          passes in isolation). root cause: alembic/env.py:20 fileConfig disables the
+          app.api.v1.health logger (disable_existing_loggers=True) — pre-existing base code.
+17:33Z    ruff clean WORK_HEAD + BASE. mypy WORK_HEAD 44 vs BASE 41 -> delta +3 all in
+          dedup.py (#20). empty diff over backend/app/models + backend/alembic.
+17:33Z    BASE worktree removed. changed-file set == the 11 PRs' surfaces exactly.
+
+SPEND        real $0.000000 USD, zero metered calls, zero container execs, no serving,
+             no rebuild/recreate, no migration, no closes, no rebases of unlanded branches.
+
+note         WORK_HEAD committed + pushed; note added + pushed; re-fetched into a MAPPED local
+             ref and `show` pasted verbatim -> note=yes (receipt-paste commit + final-tip
+             dual-annotate follows).
+
+END SG-135 (11/11 landed; 2 journal-union conflicts only; suite delta = 1 unproven red reported).
