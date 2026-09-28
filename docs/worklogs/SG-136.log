@@ -1,0 +1,53 @@
+SG-136 run log — batch-load asset assertions, prove the N+1 gone (fail-then-pass)
+
+started_utc  2026-09-28T18:00:44Z  (live clock, PG-IC-07)
+workdir       /home/andrei/StorageGenie
+origin        git@github.com:Andovol/StorageGenie.git
+BASE ref      origin/automation
+BASE commit   b828b4009643ab9e054c2ff146b2ca2d30b54745  (start HEAD, tree clean)
+WORK_HEAD     WORK_HEAD_PENDING  (worklog commit; receipt note target)
+model         opencode-go/deepseek-v4.1-flash   (read from process args /proc/90023/cmdline `--model`)
+effort        high                              (read from process args /proc/90023/cmdline `--variant high`)
+coder         opencode (env CODER=opencode; OPENCODE_PID=90023; RUN_BUDGET_S=2100)
+contract      echo=0.40.0 source=/home/andrei/storagegenie-contract/VERSION (published tip f26dbd3)
+
+role guard    Coder only — no dispatch verb run, own unit never started/polled. `gh` never touched.
+
+G0 — PREMISE VERIFICATION (verbatim tree facts)
+------------------------------------------------
+  1. `_asset_to_dict` is defined assets.py:102 and called at exactly 6 sites in assets.py:
+     :88 (post_asset idempotent replay), :99 (post_asset), :389 (get_asset detail),
+     :423 (patch_asset), :493 (merge_asset), :521 (post_asset_evidence).
+     **PACKET PREMISE DIFFERS**: the committed `list_assets` route (:264-334) does NOT call
+     `_asset_to_dict` at all — it builds a minimal inline row dict (id/display_name/... plus a
+     batched `evidence_ids`) and never serializes assertions. So there is NO "asset list route"
+     caller today, and the served `/v1/assets` list path issues ZERO assertion SELECTs before and
+     after. The "1 + K on the list path" premise is not present in this tree. Reported, not bent.
+  2. PR #16 (f6a467a, base c849088, local objects; unmerged) = 3-file diff: `Asset.assertions`
+     lazy relationship + `Assertion.asset` back-populate + `_asset_to_dict` iterating
+     `asset.assertions`. Confirmed locally via `git diff c849088 f6a467a`. Its relationship uses
+     the default lazy strategy, so a K-asset serialization loop would issue K assertion SELECTs.
+  3. assets.py imports at HEAD already carry relations/location/lifecycle (SG-113/SG-114) and do
+     NOT carry the PR's stale `Assertion` removal. #16's import hunk is indeed stale.
+  4. `_asset_to_dict(asset, db)` keeps `db` (used for evidence/audit/location/relations); callers
+     unchanged.
+
+G0 — FAIL-PRE (committed BEFORE any edit; PG-EV-09)
+---------------------------------------------------
+  Temp-DB capture script (backend/venv, real `app.db.engine` statement listener on
+  `before_cursor_execute`, filter `FROM assertion`, PG-SC-12): K assets each carrying 4
+  assertions across 3 field paths incl. a `condition` tie (superseded + accepted).
+    K=3  naive (no batch option): 3 assertion SELECTs  -> N+1 (K)
+    K=6  naive (no batch option): 6 assertion SELECTs  -> N+1 (K)
+    batched attempt pre-slice:    AttributeError: type object 'Asset' has no attribute 'assertions'
+  Baseline `_asset_to_dict` output per asset (ids/timestamps fixed -> deterministic) written to
+  `backend/tests/fixtures/sg136_asset_dict_baseline.json` (3 assets) and COMMITTED FIRST.
+
+  Fail-pre committed test file `backend/tests/test_sg136_assertion_batch.py` (red):
+    3 failed, 1 passed  (0.77s)
+      FAILED test_assertion_select_count_constant_in_k        (no Asset.assertions)
+      FAILED test_output_is_byte_identical_to_prechange_baseline
+      FAILED test_empty_asset_world_issues_no_assertion_select
+      PASSED test_lazy_per_asset_access_is_the_n_plus_one      (6 assets -> 6 assertion SELECTs)
+
+G0 commit: pending below.
