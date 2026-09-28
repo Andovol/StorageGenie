@@ -19,6 +19,7 @@
 | **Model policy** | No model id sent on the trigger (contract-legal subset, D302); an omitted model resolves via lane conf, then the Coder default `opencode-go/deepseek-v4.1-flash` (proven live SG-120) | Effort named explicitly per slice because the Coder default `max` differs from calibrated `high` (D120/D15); model omitted because the default already resolves to what runs |
 | **Packet directory** | `docs/packets` (committed, pushed) | `DISPATCH.md:29` — unpushed packet fails as `packet_missing` |
 | **Autonomy** | `L2` (slice autonomy, 1 retry, per `ARCHITECT.md:78-88`) — escalates to `L3` only after clean stage | State the level in approval message |
+| **Close-out** | Live deploy (rebuild + one recreate + verify) before every session close | Standing owner directive 2026-09-28 ("Always do a live deploy before session close", `G-O4` record) — the rider runs as a dispatched slice and is reported; unrated or blocked work stops the deploy, never ships silently |
 | **Values bindings** | See Values table below — every `{{NAME}}` the contract uses is bound there | `CO-08` stop if unbound |
 
 ## Values table — every `{{NAME}}` the Coder contract reads
