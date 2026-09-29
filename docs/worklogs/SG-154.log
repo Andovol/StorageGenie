@@ -1,0 +1,57 @@
+SG-154 coder log — close-out deploy rider (standing directive: live deploy before session close)
+Coder opencode · model opencode-go/deepseek-v4.1-flash · effort high (from process arguments /proc/1191616/cmdline:
+`opencode run --auto --dir /home/andrei/StorageGenie --model opencode-go/deepseek-v4.1-flash --variant high`;
+dispatch wrapper `bash /usr/local/lib/dispatch/run-coder SG-154`).
+Work dir /home/andrei/StorageGenie · BASE=origin/automation resolved b16d0670db5f1803bc385256e23801a4f71ac311.
+Contract 0.40.0 · source /home/andrei/storagegenie-contract/VERSION · HEAD f26dbd32e3c4bd7cf878333fba719a6ca1d10c3c ·
+RULES.md sha256 5b656293… (installed payload). All timestamps UTC, live clock. Bounds 120s ordinary / 600s rebuild class / 2400s overall.
+
+Role guard: Coder, never Architect. No dispatch verb run for any ID; no unit started or polled.
+
+2026-09-29 session.
+T+00  Recon (parallel reads): branch automation, HEAD == origin/automation == b16d067, worktree clean.
+      Contract echo 0.40.0 == recorded (D4), payload hash matches AGENTS.md. `.rules-cache/` ABSENT on host
+      (SG-145 F-SG145-1); live checkout is the contract path.
+T+01  Premises re-verified at runtime (PG-IC-09):
+        - compose services: backend (127.0.0.1:8003->8000) + frontend dev profile (not running) — compose quote.
+        - live image storagegenie-backend:latest ID sha256:76917528…; container storagegenie-backend-1
+          55d398ed7625… RestartCount=0 Created=2026-09-29T09:49:22Z (SG-143 generation).
+        - health shape {{HEALTH_CMD}} -> {"status":"ok","db":"ok","storage":"ok"}.
+        - gate http:80 301 (redirect https://storagegenie.dynv6.net/) / https:443 401.
+        - alembic current 20260924_sg114_relation (head).
+        - counts source re-read: packet says "24 counts"; live schema has 28 user tables + 1 view.
+          FINDING F-SG154-1 (stale count premise; counted all 28, never inherited).
+        - frontend/ diff since SG-143 build commit 66497c6 is EMPTY -> bundle predicted UNCHANGED
+          (contradicts packet's "backend changed -> bundle moves"; F-SG154-2), to be measured not assumed.
+T+02  G0 BEFORE (read-only) captured 15:13:06Z: IDs, health x6, gate, alembic, 28 counts, bundle hashes, CORS preflight.
+      CORS BEFORE (old image): ACRM PATCH+ACRH If-Match -> 200; ACRM TRACE -> 400; ACRH X-Evil-Header -> 200
+      (old `allow_headers=["*"]`); allow-methods included HEAD (old `["*"]` ALL_METHODS expansion).
+T+03  G0 BUILD (one): BUILDX_CONFIG=/tmp/opencode/buildx docker compose build backend -> BUILD_EXIT=0, 12s
+      (15:13:52Z->15:14:04Z). Image sha256:76917528… -> sha256:c6fc45ab… (NEW).
+T+04  G0 RECREATE (exactly one): docker compose up -d --no-deps backend -> REC_EXIT=0, 1s, one Recreate.
+      Container 55d398ed7625… -> 596e7d7a35d2… (M42 discriminator = container id, NOT RestartCount; 0->0).
+T+05  G1 AFTER 15:14:46Z: health x6 exact 200 identical bodies; gate 301/401 unmoved; alembic sg114 unmoved;
+      28/28 counts delta 0; pages /capture /inbox /catalog 200; bundle UNCHANGED (index-CTQCofuO.js d9dbdef3…,
+      CSS 37b25dbd… identical) — direction stated, F-SG154-2 confirmed.
+      CORS AFTER (lockdown live): allow-methods GET, POST, PUT, PATCH, DELETE, OPTIONS (HEAD gone);
+      If-Match in allow-headers (200); ACRM TRACE -> 400; ACRH X-Evil-Header -> 400.
+T+06  G2 worklogs written (SG-154.log, SG-154_report.md, SG-154_verify.log). Diff ceiling: worklogs only; ZERO product hunks.
+
+Budget: recon+BEFORE ~60s/120s | build 12s/600s | recreate 1s/120s | AFTER verify ~30s/120s | overall ~200s/2400s.
+No command hit its bound; nothing killed. Spend REAL metered $0.000000 USD, zero metered calls (no USD-metered path).
+
+Findings:
+- F-SG154-1  Packet "24-count baseline" is stale: live DB has 28 user tables (SG-100 enrich_snapshot, SG-113
+             location/asset_location, SG-114 asset_relation added since the 24-table list). Counted all 28 so the
+             delta-zero check is complete, not narrowed.
+- F-SG154-2  Packet predicted "backend changed -> bundle moves". Measured: bundle UNCHANGED. `git diff
+             66497c6..HEAD -- frontend/` is EMPTY, so the deterministic Vite build emits byte-identical JS+CSS.
+             Stated direction (not assumed): UNCHANGED.
+- F-SG154-3  "TRACE -> 400" holds for the CORS PREFLIGHT (`Access-Control-Request-Method: TRACE` -> 400
+             "Disallowed CORS method"). An actual HTTP `TRACE /v1/assets` -> 405 Method Not Allowed (Starlette
+             routing), read-only. Both captured; the packet's 400 is the preflight form (SG-150 precedent).
+- Note: the BEFORE header line "worktree: 1 modified entries" is the verify log being created by tee at that
+  instant (self-reference), not pre-existing dirt; BASE was clean before capture.
+
+Receipt: WORK_HEAD note added + pushed + verified from a mapped fetch; final tip dual-annotated (SG-092 precedent).
+Consumed by: docs/worklogs/SG-154_report.md, docs/worklogs/SG-154_verify.log.
