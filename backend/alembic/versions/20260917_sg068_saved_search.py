@@ -22,7 +22,7 @@ def _has_table(name: str) -> bool:
 
 
 def upgrade() -> None:
-    if _has_table("saved_search"):
+    if not op.get_context().as_sql and _has_table("saved_search"):
         return
     op.create_table(
         "saved_search",

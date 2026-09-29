@@ -1,0 +1,78 @@
+=== SG-148 verify log (verbatim captures) ===
+
+--- G0: alembic upgrade head --sql at BASE=94ba35e (fail-pre, 300s class) ---
+$ (cd backend) timeout 300 venv/bin/alembic upgrade head --sql   # stdout+stderr merged
+EXIT=1  LINES=462  SHA256=ea0e8ebe7fd5ecb42e49292c1f5cc26d84ba084a4361466e52cb4290457948f1
+  File ".../20260917_sg068_saved_search.py", line 25, in upgrade
+    if _has_table("saved_search"):
+  File ".../20260917_sg068_saved_search.py", line 21, in _has_table
+    return sa.inspect(op.get_bind()).has_table(name)
+  sqlalchemy.exc.NoInspectionAvailable: No inspection system is available for object of type
+  <class 'sqlalchemy.engine.mock.MockConnection'>
+FTS DDL line from G0 stdout:
+  225:CREATE VIRTUAL TABLE IF NOT EXISTS asset_fts USING fts5(
+post-FTS markers present pre-fix (4 of 7): sg025, sg035, sg048, sg068
+  (sg068's "-- Running upgrade" line is emitted, then its body aborts before its DDL)
+
+--- G2: alembic upgrade head --sql post-fix (offline exit 0) ---
+EXIT=0  LINES=518  SHA256=a0013d4dbf9f449e42979574f8984dc5b7c03c02e096a4bedcc66fab68f1a655
+FTS DDL lines:
+  225:CREATE VIRTUAL TABLE IF NOT EXISTS asset_fts USING fts5(
+  387:CREATE VIRTUAL TABLE IF NOT EXISTS asset_fts USING fts5(
+3 triggers (CREATE), first install and post-sg048 reinstall:
+  233:CREATE TRIGGER IF NOT EXISTS asset_fts_after_insert
+  240:CREATE TRIGGER IF NOT EXISTS asset_fts_after_update
+  249:CREATE TRIGGER IF NOT EXISTS asset_fts_after_delete
+  395:CREATE TRIGGER IF NOT EXISTS asset_fts_after_insert
+  402:CREATE TRIGGER IF NOT EXISTS asset_fts_after_update
+  411:CREATE TRIGGER IF NOT EXISTS asset_fts_after_delete
+all 7 post-FTS markers (-- Running upgrade ... -> <rev>):
+  259 -> 20260912_sg025_provider_call
+  286 -> 20260914_sg035_foundations
+  346 -> 20260916_sg048_name_optional
+  421 -> 20260917_sg068_saved_search
+  439 -> 20260923_sg100_enrich_snapshot
+  462 -> 20260924_sg113_location
+  494 -> 20260924_sg114_relation
+tail:
+  UPDATE alembic_version SET version_num='20260924_sg114_relation'
+    WHERE alembic_version.version_num = '20260924_sg113_location';
+
+--- seen-to-fail of the new test against BASE (four guard edits stashed, test present) ---
+$ git stash push -- <four guard migrations>
+$ (cd backend) timeout 300 venv/bin/python -m pytest tests/test_sg148_offline_sql.py -q
+FAILED tests/test_sg148_offline_sql.py::test_upgrade_head_sql_renders_full_chain
+  assert 1 == 0   where 1 = CompletedProcess(...).returncode
+  (returncode=1; NoInspectionAvailable: ... MockConnection)
+1 failed in 0.51s
+$ git stash pop    # guards restored
+
+--- seen-to-pass post-fix ---
+$ (cd backend) venv/bin/python -m pytest tests/test_sg148_offline_sql.py -q
+1 passed in 0.48s
+
+--- online schema equivalence (temp SQLite, BASE vs fixed) ---
+$ python /tmp/sg148/online_schema.py /tmp/sg148/base.db  -> FIXED/BASE both EXIT=0
+$ diff /tmp/sg148/base_schema.txt /tmp/sg148/fixed_schema.txt
+ONLINE SCHEMA IDENTICAL
+alembic heads: 20260924_sg114_relation (head)      # before == after
+
+--- full backend suite ---
+2 failed, 636 passed, 32 warnings in 32.82s
+FAILED tests/test_signals.py::test_generated_codes_are_validated_and_bad_checksum_is_not_an_identifier
+FAILED tests/test_signals.py::test_ocr_has_text_boxes_and_mean_confidence
+BASE = 2 failed, 635 passed -> fixed = 2 failed, 636 passed (delta +1 green file, base-reds identical)
+
+--- ruff / mypy / secret scan / PG-SC-11 ---
+ruff: All checks passed!
+mypy app: Found 41 errors in 9 files (checked 90 source files) -- delta 0 vs BASE; none in touched files
+secret scan (added diff lines + new test): no password/key/token/private-key pattern
+PG-SC-11 head/rev-pinned assertions over the migration chain (all unchanged; no revision added):
+  tests/test_sg048_name_optional.py:21,101
+  tests/test_sg114_relations.py:29,34
+  tests/test_sg113_locations.py:29
+  tests/test_sg100_snapshot_persistence.py:33
+  tests/test_export.py:114-115 (ScriptDirectory.get_current_head() vs exports.ALEMBIC_HEAD)
+  tests/test_saved_searches.py:272 (downgrade target sg048)
+  command.upgrade(..., "head") call sites (test_search/test_signals/test_foundations/test_candidates)
+  resolve the live head, which is unchanged (single sg114).

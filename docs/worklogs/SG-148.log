@@ -1,0 +1,28 @@
+SG-148 running log (chronological; live clock UTC)
+
+BASE = origin/automation request -> resolved 94ba35ed3f7353746ee3c80a1ff328717b1e7779
+Contract recorded 0.40.0 == published, source /home/andrei/storagegenie-contract
+  (VERSION 0.40.0; commit f26dbd32e3c4bd7cf878333fba719a6ca1d10c3c; payload RULES.sha256
+   5b65629377bbac9e40bfa7e2f4d4e42a5667b3a08ec786beb47c6a677d9ac33c)
+
+2026-09-29T13:59:25Z  orientation: git status clean, HEAD == origin/automation == 94ba35e.
+2026-09-29T13:59:25Z  G0: real CLI `venv/bin/alembic upgrade head --sql` from backend/ (300s bound).
+                     EXIT=1, 462 lines, sha ea0e8ebe...; abort at sg068:21
+                     NoInspectionAvailable for MockConnection. Matches SG-147 post-fix capture.
+2026-09-29T~14:00Z   read the four guard migrations in full; one idiom confirmed
+                     (`sa.inspect(op.get_bind()).has_table(name)` in `_has_table`, early return in
+                     `upgrade()`): sg068:21/25, sg100:21/25, sg113:21/25, sg114:21/25.
+2026-09-29T~14:01Z   G1: four edits, each `if _has_table(name): return` ->
+                     `if not op.get_context().as_sql and _has_table(name): return`.
+                     Online branch (as_sql False) evaluates `_has_table` exactly as before.
+2026-09-29T~14:02Z   G2 re-drive: EXIT=0, 518 lines, sha a0013d4d...; FTS DDL present (lines 225,387);
+                     3 triggers CREATE present; all 7 post-FTS markers (sg025/035/048/068/100/113/114).
+2026-09-29T~14:03Z   new test tests/test_sg148_offline_sql.py; passes post-fix (1 passed).
+2026-09-29T~14:04Z   seen-to-fail: four guards stashed, test present -> 1 failed (exit 1,
+                     NoInspectionAvailable); stash popped, guards restored.
+2026-09-29T~14:05Z   online equivalence on temp SQLite: base vs fixed schema diff empty
+                     (ONLINE SCHEMA IDENTICAL), both exit 0; alembic heads single sg114.
+2026-09-29T~14:07Z   full suite: 2 failed, 636 passed (32.82s); base-reds = test_signals pair.
+                     ruff All checks passed; mypy 41 errors / 9 files (delta 0, none touched).
+                     secret scan over added diff lines + new test: clean. PG-SC-11 sweep listed.
+2026-09-29T~14:10Z   worklogs written; commit (WORK_HEAD) then receipt.

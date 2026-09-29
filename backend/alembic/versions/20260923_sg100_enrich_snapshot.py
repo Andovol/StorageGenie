@@ -22,7 +22,7 @@ def _has_table(name: str) -> bool:
 
 
 def upgrade() -> None:
-    if _has_table("enrich_snapshot"):
+    if not op.get_context().as_sql and _has_table("enrich_snapshot"):
         return
     op.create_table(
         "enrich_snapshot",

@@ -22,7 +22,7 @@ def _has_table(name: str) -> bool:
 
 
 def upgrade() -> None:
-    if _has_table("asset_relation"):
+    if not op.get_context().as_sql and _has_table("asset_relation"):
         return
     op.create_table(
         "asset_relation",
