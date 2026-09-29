@@ -8,7 +8,7 @@ MERGED: CORS lockdown landed as #42's method allowlist then #40's header allowli
 **Origin remote (as on host):** `git@github.com:Andovol/StorageGenie.git` (fetch+push)
 **BASE (packet ref `origin/automation` requested → resolved commit):** `3e557c9008d8869b238e6ada49c7dfe5b7ebb470`
 (the ref and the resolved commit are stated separately — two fields, never one).
-**WORK_HEAD:** `__WORK_HEAD__`
+**WORK_HEAD:** `bd37d75334f8995d0fd8ea28086ed59c2cc0aa16`
 **Contract:** recorded `0.40.0` == published — source path `/home/andrei/storagegenie-contract/VERSION`
 (`0.40.0`); `git -C /home/andrei/storagegenie-contract rev-parse HEAD` =
 `f26dbd32e3c4bd7cf878333fba719a6ca1d10c3c` (subject `Contract payload 0.40.0`); payload `RULES.sha256` =
@@ -57,7 +57,7 @@ the `If-Match` line. One coherent real-stack preflight test replaces `#42`'s two
   (`Extra items in the left set: 'HEAD'`). The TRACE test **passes at BASE** (see correction above).
 - **Pass-post commit `4baa4bb`** — `git diff 9fc1141 refs/pull/42/head -- backend/app/main.py | git apply` → applied cleanly; landed blob `a488e59…` == head blob `a488e59…`. `pytest tests/test_cors.py -q` → **5 passed**.
 
-Both runs are committed verbatim in `docs/worklogs/SG-150_verify.log` (work commit `__WORK_HEAD__`),
+Both runs are committed verbatim in `docs/worklogs/SG-150_verify.log` (work commit `bd37d75334f8995d0fd8ea28086ed59c2cc0aa16`),
 which is the committed destination for the pair (`PG-EV-09`).
 
 ## G1 — rewrite #40 over #42 with `If-Match` (`PG-SC-12`)
@@ -146,7 +146,23 @@ close-out rider).
 - Note on WORK_HEAD, then the notes ref pushed and verified from a **mapped** fetch
   (`refs/notes/sg150-fetched`); executed output, verbatim:
 
-__RECEIPT_BLOCK__
+```
+$ git notes --ref=refs/notes/storagegenie-coder-reports add -m "Dispatch-ID: SG-150 | Report: docs/worklogs/SG-150_report.md | Work-HEAD: bd37d75334f8995d0fd8ea28086ed59c2cc0aa16" bd37d75334f8995d0fd8ea28086ed59c2cc0aa16
+add_exit=0
+$ git push origin refs/notes/storagegenie-coder-reports
+To github.com:Andovol/StorageGenie.git
+   27ffc44..8cad39c  refs/notes/storagegenie-coder-reports -> refs/notes/storagegenie-coder-reports
+push_notes_exit=0
+$ git fetch origin refs/notes/storagegenie-coder-reports:refs/notes/sg150-fetched
+From github.com:Andovol/StorageGenie
+ * [new ref]         refs/notes/storagegenie-coder-reports -> refs/notes/sg150-fetched
+fetch_exit=0
+$ git notes --ref=refs/notes/sg150-fetched show bd37d75334f8995d0fd8ea28086ed59c2cc0aa16
+Dispatch-ID: SG-150 | Report: docs/worklogs/SG-150_report.md | Work-HEAD: bd37d75334f8995d0fd8ea28086ed59c2cc0aa16
+show_exit=0
+```
+
+- Branch push `3e557c9..bd37d75 HEAD -> automation` (exit 0) preceded the notes push.
 
 - Final tip dual-annotated (note-anchor inoculation, SG-092 precedent); mapped-fetch `show`, verbatim:
 
