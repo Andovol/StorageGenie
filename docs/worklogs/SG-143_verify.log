@@ -114,5 +114,50 @@ wrapping <label> AND a <select>, so a bare `className` would be ambiguous; `sele
 exact element. Applied as `className={selectClassName}` on the <select>. No other prop/API change.
 
 ================================================================================
-G1 — RUNS (filled after the edits)
+G1 — RUNS (real repo toolchain, PG-SC-12)
 ================================================================================
+Edits (4 files): HouseholdSelector.tsx (+`selectClassName?: string` + `className={selectClassName}` on
+the <select>), HouseholdSelector.test.tsx (+1 focused test), CapturePage.tsx (inline select -> shared
+component), InboxPage.tsx (inline select -> shared component). CatalogToolbar.tsx: UNTOUCHED (STOP).
+
+$ cd frontend && ./node_modules/.bin/tsc --noEmit
+TSC_EXIT=0
+(zero diagnostics; tsconfig `include: ["src"]` covers *.test.tsx as SG-141 proved)
+
+$ ./node_modules/.bin/eslint src/components/HouseholdSelector.tsx \
+    src/components/HouseholdSelector.test.tsx src/routes/CapturePage.tsx src/routes/InboxPage.tsx
+ESLINT_EXIT=0
+
+$ ./node_modules/.bin/vitest run src/components/HouseholdSelector.test.tsx \
+    src/routes/theme-adoption.test.tsx src/routes/InboxPage.test.tsx \
+    src/routes/ChatPage.test.tsx src/routes/PlanningPage.test.tsx \
+    src/components/shell/shell.test.tsx
+ ✓ src/routes/PlanningPage.test.tsx  (4 tests)
+ ✓ src/routes/ChatPage.test.tsx      (6 tests)
+ ✓ src/routes/InboxPage.test.tsx     (8 tests)
+ ✓ src/routes/theme-adoption.test.tsx (12 tests)
+ ✓ src/components/HouseholdSelector.test.tsx (4 tests)
+ ✓ src/components/shell/shell.test.tsx (23 tests)
+ Test Files  6 passed (6) | Tests  57 passed (57) | TARGET_EXIT=0
+The two themed-class guards (theme-adoption 12 incl. the Capture block; InboxPage 8) are GREEN
+UNCHANGED — no test was edited to make them pass.
+
+$ ./node_modules/.bin/vitest run            # FULL frontend suite
+ Test Files  27 passed (27) | Tests  244 passed (244) | FULL_EXIT=0
+(243 at BASE + the 1 new SG-143 component test; NO reds -> no bare-BASE stash-repro was applicable.)
+
+$ git diff --stat -- backend
+(empty)   -> backend diff EMPTY, so the backend suite was not re-run (stated reason, not silence).
+
+$ git diff --name-only -- frontend/src/components/shell/CatalogToolbar.tsx
+(empty)   -> CatalogToolbar.tsx byte-untouched (the committed call-site STOP).
+
+MAPPING TABLE (call-site -> props -> rendered result vs the G0 BASE block):
+| call-site | shipped props | rendered result | identical to G0? |
+|---|---|---|---|
+| CapturePage.tsx | value=effective; onChange=setHouseholdId+localStorage; households; labelStyle={fontSize:13}; selectStyle={...CONTROL_STYLE,marginLeft:6}; selectClassName=THEMED_CONTROL_CLASS; emptyOptionLabel="" | <label style={fontSize:13}>"Household " <select class=THEMED style={...CONTROL,marginLeft:6}>then household options (no empty option)</select></label> | YES (label text/space, class, style, no empty option, onChange/l10n all match) |
+| InboxPage.tsx | value=effectiveHousehold; onChange=setHouseholdId+localStorage; households as Household[]|undefined; selectStyle=CONTROL_STYLE; selectClassName=THEMED_CONTROL_CLASS | <label>"Household " <select class=THEMED style=CONTROL><option value="">Select household</option>then household options</select></label> | YES (default emptyOptionLabel="Select household"; plain label) |
+| CatalogToolbar.tsx | (none — STOP) | untouched | N/A (byte-untouched); F-SG143-2 |
+ChatPage.tsx / PlanningPage.tsx: no prop added; selectClassName defaults undefined -> React renders
+NO class attribute; suites green. The new component test asserts the bare default has `class === null`.
+

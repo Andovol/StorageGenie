@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useHouseholds } from "../hooks/useAssets";
 import { AssetForm } from "../components/AssetForm";
+import { HouseholdSelector } from "../components/HouseholdSelector";
 import { CONTROL_STYLE, THEMED_CONTROL_CLASS } from "../components/shell/CatalogToolbar";
 import { PageContainer } from "../components/shell/PageContainer";
 
@@ -24,24 +25,18 @@ export function CapturePage() {
     <PageContainer className="text-foreground">
       <h1 className="page-header text-foreground">Capture — Manual Create</h1>
       <div style={{ marginBottom: 16, display: "flex", gap: 12, alignItems: "center" }}>
-        <label style={{ fontSize: 13 }}>
-          Household{" "}
-          <select
-            className={THEMED_CONTROL_CLASS}
-            value={effective}
-            onChange={(e) => {
-              setHouseholdId(e.target.value);
-              localStorage.setItem("household_id", e.target.value);
-            }}
-            style={{ ...CONTROL_STYLE, marginLeft: 6 }}
-          >
-            {(households || []).map((h) => (
-              <option key={h.id} value={h.id}>
-                {h.name}
-              </option>
-            ))}
-          </select>
-        </label>
+        <HouseholdSelector
+          value={effective}
+          onChange={(id) => {
+            setHouseholdId(id);
+            localStorage.setItem("household_id", id);
+          }}
+          households={households}
+          labelStyle={{ fontSize: 13 }}
+          selectStyle={{ ...CONTROL_STYLE, marginLeft: 6 }}
+          selectClassName={THEMED_CONTROL_CLASS}
+          emptyOptionLabel=""
+        />
       </div>
       {!effective ? (
         <div className="text-muted-foreground">No household available — seed the database first.</div>

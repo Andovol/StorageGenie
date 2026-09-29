@@ -56,4 +56,30 @@ describe("HouseholdSelector", () => {
     expect(screen.getByRole("combobox")).toBeInTheDocument();
     expect(screen.getByText("No selection")).toBeInTheDocument();
   });
+
+  it("applies the optional selectClassName to the select and leaves it unset by default (SG-143)", () => {
+    const handleChange = vi.fn();
+    const { container, unmount } = render(
+      <HouseholdSelector
+        value="hh-1"
+        onChange={handleChange}
+        households={mockHouseholds}
+      />
+    );
+    const bareSelect = container.querySelector("select");
+    expect(bareSelect).not.toBeNull();
+    expect(bareSelect!.getAttribute("class")).toBeNull();
+    unmount();
+
+    const themed = render(
+      <HouseholdSelector
+        value="hh-1"
+        onChange={handleChange}
+        households={mockHouseholds}
+        selectClassName="bg-background text-foreground border-border focus-ring"
+      />
+    );
+    const select = themed.container.querySelector("select");
+    expect(select).toHaveClass("bg-background", "text-foreground", "border-border", "focus-ring");
+  });
 });
