@@ -14,14 +14,15 @@ Status: design approved in chat 2026-09-29. Next: implementation plan via writin
 
 ## S1 — scope (what finished means)
 
-In: cap-join correction (`F-SG132-5`), F-SG138-1 extraction remainder, frontend-service wording (F-SG140-2 family), runbook-command guard (`F-SG126-3`), offline `--sql` fts limit, host `gh` auth.
+In: cap-join correction (`F-SG132-5`), F-SG138-1 extraction remainder, runbook-command guard (`F-SG126-3`), offline `--sql` fts limit, host `gh` auth.
+Correction 2026-09-29 (pre-dispatch, zero harm): the "frontend-service wording (`F-SG140-2` family)" item is RETIRED — `SG-140_report.md:130` shows `F-SG140-2` is a packet queue-list premise delta, not a wording task; no verified wording source exists, so nothing ships under that name.
 Verdicts: hue eyes plus a scheduled Context Scene resume word.
 Out: ledger calibration, pilot tiers, per-field UI, chat persistence, D61 prompts, beauty verdict.
 Provenance: live items from `STATE.md` RESUME, waiting items from `docs/backlog.md:5-18`, recent ratings SG-133→SG-140b in `docs/ratings.md`.
 
 ## S2 — run order and exits
 
-Order: cap-join first (live spend figure reads low: 0.0067 vs 0.0104 true) → extraction remainder with frontend wording (one slice if surfaces allow, else two) → runbook guard → lane items (`--sql`, `gh` auth) → hue verdict on fresh post-deploy screenshots → Context Scene resume scheduled as a named resume word (date named in the implementation plan) → close-out deploy (rebuild + one recreate + verify).
+Order: cap-join first (live spend figure reads low: 0.0067 vs 0.0104 true) → extraction remainder → runbook guard → lane items (`--sql`, `gh` auth) → hue verdict on fresh post-deploy screenshots → Context Scene resume scheduled as a named resume word (date named in the implementation plan) → close-out deploy (rebuild + one recreate + verify).
 Exits: each slice exits only on green audit + rating + receipt. Any STOP-gate, engine failure needing a probe, or production write outside the slice outline halts the chain and returns with a decision, never a silent skip.
 State discipline: `STATE.md` stays the single source of next-slice scope, never duplicated into the backlog (`ARCHITECT.md:34-38`).
 

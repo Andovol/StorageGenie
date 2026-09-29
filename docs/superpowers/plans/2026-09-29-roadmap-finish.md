@@ -49,12 +49,14 @@
 - [ ] **Step 1: Packetize** — state the className-prop API choice explicitly (L3 carries the word); equivalence mapping per page; full vitest + eslint gates.
 - [ ] **Step 2: Dispatch** — `SG-143` via `job_spawn`, covering cap.
 - [ ] **Step 3: Audit + rate** — mapping table verified against shipped code; disposition `F-SG138-1`.
-- [ ] **Step 4: Chain or halt** — fold frontend-service wording here only if the same surface proves green; else split to Task 3.
+- [ ] **Step 4: Chain or halt.**
 
-### Task 3: SG-144 frontend-service wording + runbook guard
+### Task 3: SG-144 runbook-command guard
 
 **Files:**
-- Modify: frontend service wording site (packet verifies exact file — premise UNVERIFIED from code, grep at packetize time) + `README.md` runbook command strings
+- Modify: `README.md` runbook command strings ONLY if drifted (else byte-identical) + new guard test (expected home: `backend/tests/test_backup_drill.py` or beside it — VERIFY the file on the target, never inherit the path)
+- Read first: `README.md:26,33-34,63-65,121-136` (backup command strings), `backend/scripts/backup_restore_drill.py` (SG-086 runbook form), `docs/worklogs/SG-126_report.md:85-110`, `docs/backlog.md:12`
+- Correction 2026-09-29: no wording subtask — `F-SG140-2` is a queue-list premise delta (`SG-140_report.md:130`), not a wording task; retired pre-dispatch.
 - Create: runbook-command guard test pinning command strings to live paths (instances: SG-126 doubled `/_data`, `F-SG131-1`)
 - Read first: `docs/worklogs/SG-126_report.md:85-110`, `docs/backlog.md:12`
 
@@ -62,7 +64,7 @@
 - Consumes: wording premise verified at packetize time (never inherited); runbook drift instances.
 - Produces: wording corrected; guard green with a seen-to-fail leg (mutated command string trips it).
 
-- [ ] **Step 1: Packetize** — verification-first: exact wording lines quoted from code before any edit; guard shape named.
+- [ ] **Step 1: Packetize** — guard shape named (pins README command strings to the SG-086 runbook form, seen-to-fail leg required); drift repaired only if the strings drifted.
 - [ ] **Step 2: Dispatch** — `SG-144` via `job_spawn`, covering cap.
 - [ ] **Step 3: Audit + rate** — dispositions `F-SG126-3` (+ wording family).
 - [ ] **Step 4: Chain or halt.**
