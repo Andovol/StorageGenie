@@ -165,10 +165,22 @@ Dispatch-ID: SG-146 | Report: docs/worklogs/SG-146_report.md | Work-HEAD: 148843
 show_exit=0
 ```
 
-- Final tip dual-annotated (note-anchor inoculation, SG-092 precedent); mapped fetch `show`, verbatim:
+- Final tip `be871c7` dual-annotated (note-anchor inoculation, SG-092 precedent); mapped fetch `show`, verbatim:
 
 ```
-__FINAL_SHOW__
+$ git notes --ref=refs/notes/storagegenie-coder-reports add -m "Dispatch-ID: SG-146 | Report: docs/worklogs/SG-146_report.md | Work-HEAD: 1488438b7c1a910bbeabe9bffdb5dca2e5a2f499" be871c705078ac8c6161aae88f64f83a0ccdd4d5
+add_exit=0
+$ git push origin refs/notes/storagegenie-coder-reports
+To github.com:Andovol/StorageGenie.git
+   d6f9861..61f9639  refs/notes/storagegenie-coder-reports -> refs/notes/storagegenie-coder-reports
+push_exit=0
+$ git fetch origin refs/notes/storagegenie-coder-reports:refs/notes/sg146-fetched-final
+From github.com:Andovol/StorageGenie
+ * [new ref]         refs/notes/storagegenie-coder-reports -> refs/notes/sg146-fetched-final
+fetch_exit=0
+$ git notes --ref=refs/notes/sg146-fetched-final show be871c705078ac8c6161aae88f64f83a0ccdd4d5
+Dispatch-ID: SG-146 | Report: docs/worklogs/SG-146_report.md | Work-HEAD: 1488438b7c1a910bbeabe9bffdb5dca2e5a2f499
+show_exit=0
 ```
 
 ## Budget — actual versus budget (units stated)
