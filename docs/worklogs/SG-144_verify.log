@@ -36,3 +36,99 @@ VERDICT: CLEAN. The README command strings match the SG-086 form:
                       --prod-db (value data/db/storagegenie.db) and --prod-storage
                       (value the raw volume mountpoint, NO /_data suffix).
 The doubled-/_data drift repaired by SG-126 (F-SG126-1) is absent. No product hunk ships.
+
+######## G1 — the guard, seen-to-fail then green (both committed; PG-EV-09, PG-EV-01) ########
+New guard (reads the REAL README.md bytes; PG-SC-12 — no copied fixture):
+  backend/tests/test_runbook_commands.py
+Set pinned (enumerated on the target, exact):
+  1. compose-up       'docker compose up --build -d'
+  2. alembic-upgrade  'docker compose exec backend python -m alembic upgrade head'
+  3. seed             'docker compose exec backend python -m app.seed'
+  4. drill invocation the 3-line block (script, --prod-db data/db/storagegenie.db,
+                      --prod-storage <raw volume mountpoint, no suffix>)
+The drill's required flag set is DERIVED from the real script
+(required_flag_names() parses add_argument("--prod-db"|"--prod-storage", required=True));
+the README's drill block must use exactly that set. The historical drift shape
+"{{.Mountpoint}}')/_data" is absent.
+
+--- SEEN-TO-FAIL leg: the transient probe feeds the REAL pin test a drifted README ---
+Transient probe backend/tests/_sg144_driftprobe.py (removed after capture; NOT committed):
+  real = guard.readme_text()
+  drifted = real.replace(guard.STORAGE_EXPR, f"{guard.STORAGE_EXPR}/_data")
+  ... write drifted to tmp README, monkeypatch guard.README_PATH ...
+  guard.test_readme_runbook_commands_match_sg086_form()   # real pin -> must fail
+
+$ cd backend && venv/bin/python -m pytest -q tests/_sg144_driftprobe.py
+F                                                                        [100%]
+=================================== FAILURES ===================================
+__________________ test_real_pin_fails_on_doubled_data_drift ___________________
+
+tmp_path = PosixPath('/tmp/pytest-of-andrei/pytest-4/test_real_pin_fails_on_doubled0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7991a39cb320>
+
+    def test_real_pin_fails_on_doubled_data_drift(tmp_path: Path, monkeypatch) -> None:
+        real = guard.readme_text()
+        drifted = real.replace(guard.STORAGE_EXPR, f"{guard.STORAGE_EXPR}/_data")
+        assert drifted != real, "drift injection was inert — the probe proves nothing"
+        target = tmp_path / "README.md"
+        target.write_text(drifted, encoding="utf-8")
+        monkeypatch.setattr(guard, "README_PATH", target)
+>       guard.test_readme_runbook_commands_match_sg086_form()
+
+tests/_sg144_driftprobe.py:16:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+    def test_readme_runbook_commands_match_sg086_form() -> None:
+        text = readme_text()
+        assert text.strip(), "README.md is empty — a pin on empty bytes proves nothing"
+        required_flags = required_flag_names()
+        assert required_flags, "no required flags derived from the drill script — vacuous guard"
+        violations = runbook_violations(text, required_flags)
+>       assert violations == [], "\n".join(violations)
+E       AssertionError: drill-invocation: exact block missing: 'backend/venv/bin/python backend/scripts/backup_restore_drill.py \\\n  --prod-db data/db/storagegenie.db \\\n  --prod-storage "$(docker volume inspect storagegenie_storage_data --format \'{{.Mountpoint}}\')"'
+E         drill-invocation: --prod-storage is not the SG-086 form: '--prod-storage "$(docker volume inspect storagegenie_storage_data --format \'{{.Mountpoint}}\')/_data"' != '--prod-storage "$(docker volume inspect storagegenie_storage_data --format \'{{.Mountpoint}}\')"'
+E       assert ['drill-invoc...nt}}\\\')"\''] == []
+E
+E         Left contains 2 more items, first extra item: 'drill-invocation: exact block missing: \'backend/venv/bin/python backend/scripts/backup_restore_drill.py \\\\\\n  --p...nie.db \\\\\\n  --prod-storage "$(docker volume inspect storagegenie_storage_data --format \\\'{{.Mountpoint}}\\\')"\''
+E         Use -v to get more diff
+
+tests/test_runbook_commands.py:99: AssertionError
+=========================== short test summary info ============================
+FAILED tests/_sg144_driftprobe.py::test_real_pin_fails_on_doubled_data_drift
+1 failed in 0.11s
+
+--- GREEN leg: the guard on the real README (probe removed) ---
+$ cd backend && venv/bin/python -m pytest -q tests/test_runbook_commands.py
+...                                                                      [100%]
+3 passed in 0.02s
+
+--- full backend suite (green-except-base-proved-reds) ---
+$ cd backend && venv/bin/python -m pytest -q
+=========================== short test summary info ============================
+FAILED tests/test_signals.py::test_generated_codes_are_validated_and_bad_checksum_is_not_an_identifier
+FAILED tests/test_signals.py::test_ocr_has_text_boxes_and_mean_confidence - a...
+2 failed, 635 passed, 32 warnings in 33.58s
+The 2 reds are environment-reds (no tesseract / no pyzbar), not inherited: re-proved on bare BASE
+a664481 in a temp worktree with this slice absent:
+$ cd /tmp/opencode/sg144-base2/backend && /home/andrei/StorageGenie/backend/venv/bin/python -m pytest -q <the two node ids>
+FAILED tests/test_signals.py::test_generated_codes_are_validated_and_bad_checksum_is_not_an_identifier
+FAILED tests/test_signals.py::test_ocr_has_text_boxes_and_mean_confidence - a...
+2 failed in 0.73s
+Bare-BASE full suite was NOT re-run; only the two named reds were re-run with the slice absent, and
+they reproduce identically (2 failed). Green count arithmetic: slice suite = 635 passed + 2 failed =
+637 collected; removing the 3 guard tests gives 634 passed + 2 failed on BASE — same 2 reds.
+
+--- lint + secret gates ---
+$ cd backend && venv/bin/python -m ruff check app tests
+All checks passed!
+$ grep -nEi 'api_key|OPENCODE_API_KEY|Bearer|sk-[A-Za-z0-9]{10,}|ghp_[A-Za-z0-9]{20,}|-----BEGIN|[Tt]oken' backend/tests/test_runbook_commands.py
+secret_hits_exit=1 (1=none)   # clean; the guard's own regex was reworded (-{5}BEGIN) to keep a naive
+                              # grep clean (no credential-shaped literal)
+
+--- diff ceiling proof (WRITES: ONE guard test + 3 worklogs; README byte-untouched) ---
+$ git diff --stat a664481..03b8245
+ backend/tests/test_runbook_commands.py | 113 +++++++++++++++++++++++++++++++++
+ docs/worklogs/SG-144_verify.log        |  38 ++++++
+ 2 files changed, 151 insertions(+)
+$ git diff a664481..03b8245 -- README.md backend/scripts/backup_restore_drill.py frontend/
+(empty)

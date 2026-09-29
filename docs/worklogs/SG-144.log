@@ -1,0 +1,32 @@
+SG-144 coder log — opencode / deepseek-v4.1-flash / effort=high (per process args, /proc/792653/cmdline)
+Work dir /home/andrei/StorageGenie · BASE=a6644810d7d21e00247e3cfc7be33d6ab318f428 (origin/automation)
+Contract 0.40.0 · source /home/andrei/storagegenie-contract/VERSION · contract HEAD f26dbd32e3c4bd7cf878333fba719a6ca1d10c3c
+All timestamps UTC, live clock. Bounds: 120s ordinary / 600s suite / 2400s overall.
+Spend $0.000000 USD · zero metered calls.
+
+10:02:49  process start. HEAD=a664481==origin/automation, worktree clean. Contract 0.40.0 echo + HEAD.
+10:03:18  G0: quoted README runbook strings (26/33/34/63/64/65/127-131) + the SG-086 drill form
+          (script flags --prod-db/--prod-storage, both required). Anti-drift probe for the doubled
+          `/_data` shape: absent. VERDICT CLEAN. README.md sha256 1286ecd3….
+10:03:2x  committed the G0 capture BEFORE any edit: b3fb56596588825af4ab2a2019e5d99fcb4a6925.
+10:04     G1: wrote backend/tests/test_runbook_commands.py (113 lines) — reads the REAL README bytes,
+          derives the drill required flag set from the real script, pins compose-up/alembic/seed/drill,
+          and an anti-drift property for `/_data`. First cut compared a leading-space mismatch; fixed.
+10:05     seen-to-fail: transient probe backend/tests/_sg144_driftprobe.py fed the REAL pin test a
+          README with `/_data` re-appended → red (1 failed, AssertionError: --prod-storage not the
+          SG-086 form). Probe removed (not committed).
+10:05     green on the real README: 3 passed. Committed G1: 03b82459b57541586cc3e511b633390d38c73438.
+10:06     full suite: 2 failed, 635 passed (backend/venv). Reds = test_signals OCR/barcode env reds.
+          Re-proved on bare BASE a664481 in a temp worktree with this slice absent: same 2 failed. Not
+          inherited. ruff: All checks passed. secret grep: clean (exit 1 = none).
+10:06     NOTE: root venv /home/andrei/StorageGenie/venv lacks pillow_heif; the working interpreter is
+          backend/venv/bin/python (README:78-82 tells the reader `../venv/bin/python`, which is the
+          root venv — a real runbook weakness, OUT OF SCOPE here, reported as F-SG144-1).
+10:0x     pushed G0+G1 to origin/automation (a664481..03b8245). Receipt note added on WORK_HEAD, notes
+          ref pushed, fetched into mapped refs/notes/sg144-fetched, show OK (pasted in report).
+10:0x     report + log + verify log written; worklogs commit = final tip; final tip dual-annotated
+          (note-anchor inoculation, SG-092 precedent) and its fetched show pasted in the report.
+
+--- receipt (both notes executed; fetched-ref `show` pasted) ---
+WORK_HEAD 03b8245 note (fetched refs/notes/sg144-fetched), show:
+Dispatch-ID: SG-144 | Report: docs/worklogs/SG-144_report.md | Work-HEAD: 03b82459b57541586cc3e511b633390d38c73438
