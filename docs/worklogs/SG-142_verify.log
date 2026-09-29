@@ -1,0 +1,103 @@
+SG-142 — cap-join verification log (raw captures)
+
+Contract echo: `0.40.0` — source path `/home/andrei/storagegenie-contract/VERSION`
+(HEAD `f26dbd32e3c4bd7cf878333fba719a6ca1d10c3c "Contract payload 0.40.0"`,
+RULES.md sha256 `5b65629377bbac9e40bfa7e2f4d4e42a5667b3a08ec786beb47c6a677d9ac33c`).
+Recorded == published (D4 adoption, AGENTS.md rule-set 0.40.0).
+
+BASE (`origin/automation` requested; resolved at start): `2ae85918b3dc2d48c3db60d6317d45d53949a5cf`
+== local HEAD at start. BASE-ref-requested and resolved-commit are two fields.
+
+Live clock at capture: 2026-09-29T09:28:18Z.
+
+================================================================================
+G0 — FAIL-PRE on unmodified BASE reader (`git stash push -- reader.py`)
+================================================================================
+$ cd backend && venv/bin/python -m pytest tests/test_sg142_cap_join.py -q
+(reader.py at BASE; test_sg142_cap_join.py present)
+--- raw tail ---
+        assert _joined_only_spend(ledger, household_id) == pytest.approx(JOINED_COST)
+>       assert reader_mod._recorded_spend(ledger, household_id) == pytest.approx(DECIDED_TOTAL)
+E       assert 0.0067 == 0.0104 ± 1.0e-08
+E         comparison failed
+...
+>       assert reader_mod._recorded_spend(ledger, household_id) == pytest.approx(0.75)
+E       assert 0.5 == 0.75 ± 7.5e-07
+...
+>       assert reader_mod._recorded_spend(ledger, household_a) == pytest.approx(
+E       assert 0.5 == 0.5037 ± 5.0e-07
+FAILED tests/test_sg142_cap_join.py::test_null_job_rows_count_toward_the_month
+FAILED tests/test_sg142_cap_join.py::test_null_job_pool_is_boxed_to_the_current_month
+FAILED tests/test_sg142_cap_join.py::test_unattributed_pool_is_shared_across_households
+3 failed, 1 passed in 0.72s
+--- end raw ---
+The G0 seed (one joined row 0.006700 + one `None`-job row 0.003700) reads
+0.0067 on BASE — the `None`-job row is invisible (premise CONFIRMED, not falsified).
+The no-change case (`test_no_change_when_month_has_no_null_job_rows`) already
+passes on BASE, as designed.
+
+================================================================================
+G1 — FAIL-POST (reader.py fixed in the candidate tree)
+================================================================================
+$ cd backend && venv/bin/python -m pytest tests/test_sg142_cap_join.py -q
+....                                                                     [100%]
+4 passed in 0.70s
+
+$ venv/bin/python -m pytest tests/test_sg142_cap_join.py tests/test_sg132_jina_ledger_wiring.py tests/test_sg125_ledger_retention.py -q
+................                                                         [100%]
+16 passed, 2 warnings in 2.04s
+(test_sg132_jina_ledger_wiring.py and test_sg125_ledger_retention.py are
+BYTE-UNCHANGED and green — the no-change proof for their `None`-job-free worlds.)
+
+================================================================================
+G1 — full backend suite
+================================================================================
+$ cd backend && venv/bin/python -m pytest -q
+FAILED tests/test_signals.py::test_generated_codes_are_validated_and_bad_checksum_is_not_an_identifier
+FAILED tests/test_signals.py::test_ocr_has_text_boxes_and_mean_confidence
+2 failed, 632 passed, 32 warnings in 34.27s
+
+--- base-proof of the 2 reds (reader.py stashed to BASE, same two tests) ---
+$ venv/bin/python -m pytest -q \
+    tests/test_privacy_audit.py::test_g0_redact_call_sites_are_reader_and_direct_adapter \
+    tests/test_signals.py::test_generated_codes_are_validated_and_bad_checksum_is_not_an_identifier \
+    tests/test_signals.py::test_ocr_has_text_boxes_and_mean_confidence
+WARNING app.services.signals:signals.py:104 Barcode extraction unavailable: pyzbar/libzbar is not installed
+WARNING app.services.signals:signals.py:215 OCR extraction unavailable: tesseract is not installed or it's not in your PATH.
+2 failed, 1 passed in 0.72s
+--- both reds reproduce on bare BASE: environment reds (pyzbar/libzbar +
+tesseract absent on this host), NOT caused by SG-142. ---
+
+FINDING (line-pin shift, fixed): `test_privacy_audit.py::test_g0_redact_call_sites_are_reader_and_direct_adapter`
+pins `services/providers/reader.py:465` via M45's documented line-tracker. The
+SG-142 spend-reader hunk (docstring + pool query) adds 18 lines ABOVE the
+`redact_image(` call site, so the pinned line moved 465 -> 483. The caller SET is
+unchanged (still exactly `opencode_go.py:310` + `reader.py:483`). Updated the one
+pin and the docstring's shift history; precedent SG-101/SG-125 (same pin, same
+M45 convention).
+
+================================================================================
+G1 — ruff (candidate)
+================================================================================
+$ venv/bin/python -m ruff check .
+All checks passed!
+
+================================================================================
+G1 — mypy delta (candidate vs BASE)
+================================================================================
+$ venv/bin/python -m mypy app            # candidate
+Found 41 errors in 9 files (checked 90 source files)
+$ venv/bin/python -m mypy app            # reader.py stashed to BASE
+Found 41 errors in 9 files (checked 90 source files)
+mypy delta = 0 errors; `reader.py` appears in NO error line. The 41 are
+pre-existing in other modules (assets.py/main.py/etc.), not introduced here.
+
+================================================================================
+G1 — secret gate (CO-100) / privacy audit
+================================================================================
+$ venv/bin/python -m pytest -q tests/test_privacy_audit.py
+...........                                                              [100%]
+11 passed in 0.82s
+(`test_g2_payload_builders_accept_no_key_and_emit_no_secret` is the CO-100 gate;
+the SG-142 fixtures build rows with scripted provider names only — no key, no
+secret, no environment dump. Nothing secret is copied into any fixture.)

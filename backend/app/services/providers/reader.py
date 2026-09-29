@@ -268,7 +268,7 @@ def _retention_cutoff_utc(retention_months: int) -> datetime.datetime:
 
 
 def _recorded_spend(db: Session, household_id: str) -> float:
-    """Durable spend for one household in the CURRENT calendar month (SG-030 ISS-10, SG-125).
+    """Durable spend for one household in the CURRENT calendar month (SG-030 ISS-10, SG-125, SG-142).
 
     The provider instance is rebuilt every step, so an in-process counter resets
     and a monthly cap built on it can never bind across jobs. Summing the
@@ -277,15 +277,33 @@ def _recorded_spend(db: Session, household_id: str) -> float:
     to the current calendar month (server-local, live clock) so the cap matches
     its "monthly" name: deleting old ledger rows can no longer silently loosen
     the cap (a purge must never be fail-open).
+
+    SG-142 closes the join's blind spot. The chat/planning/analytics/synthesize
+    writers stamp `job_id=None`, and `provider_call` has no household column, so
+    those rows carry no household and can never satisfy the `Job` join. The cap
+    therefore under-counted real spend (the live read saw 0.0072005 against a
+    true month total of 0.01086845). This reader adds those rows as a SHARED
+    UNATTRIBUTED POOL boxed to the same month. It never attributes such a row to
+    a household by guessing; because the pool is unowned it counts against every
+    household reading that month, which is the fail-closed direction for a cap
+    (under-counting is the defect, over-counting merely refuses early). A month
+    with no `None`-job rows reads exactly as before.
     """
-    total = (
+    month_start = _current_month_start_utc()
+    joined = (
         db.query(func.coalesce(func.sum(ProviderCall.cost), 0.0))
         .join(Job, ProviderCall.job_id == Job.id)
         .filter(Job.household_id == household_id)
-        .filter(ProviderCall.created_at >= _current_month_start_utc())
+        .filter(ProviderCall.created_at >= month_start)
         .scalar()
     )
-    return float(total or 0.0)
+    unattributed = (
+        db.query(func.coalesce(func.sum(ProviderCall.cost), 0.0))
+        .filter(ProviderCall.job_id.is_(None))
+        .filter(ProviderCall.created_at >= month_start)
+        .scalar()
+    )
+    return float(joined or 0.0) + float(unattributed or 0.0)
 
 
 def purge_old_provider_calls(

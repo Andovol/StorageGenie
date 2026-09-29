@@ -1,0 +1,33 @@
+SG-142 — cap-join running log (first token SG-142)
+
+Dispatch-ID: SG-142 | coder=opencode effort=high | L3 finish chain slice 1 of 5
+BASE (origin/automation requested; resolved): 2ae85918b3dc2d48c3db60d6317d45d53949a5cf
+Contract: recorded 0.40.0 == published `/home/andrei/storagegenie-contract/VERSION` (HEAD f26dbd3)
+
+Recon (reads only):
+- Confirmed the failing join at reader.py `_recorded_spend` (inner join on Job).
+- Enumerated the `job_id=None` writers by grep: chat/service.py (2), planning/service.py (2),
+  analytics/service.py (2), enrich/synthesize.py (1). All pass `job_id=None`. `provider_call`
+  has NO household column; the ONLY route to a household is the Job join.
+- Consumers verified: `api/v1/enrich.py:93` (`monthly_cap_refusal`) + `reader.py:472`
+  (`run_ai_extraction` refusal). Both call `_recorded_spend`.
+- Live DB read-only (18 rows, 1 household): joined-only = 0.0072005; `None`-job rows = 9,
+  sum 0.00366795; true month total = 0.01086845.
+- DECISION (design call, mine): the `None`-job rows are unattributable (no household
+  anywhere in the row). The fix counts them as a SHARED UNATTRIBUTED POOL boxed to the
+  month, added to the household's joined rows. Never attribute by guessing. Fail-closed:
+  under-counting is the defect. Disclosed blast radius: every household reading that month
+  carries the pool; a `None`-job-free month reads byte-identical.
+
+G0 (fail-pre): new tests/test_sg142_cap_join.py committed RED at ff439b2 before any edit.
+  G0 seed reads 0.0067 on BASE (expected 0.0104) — NULL row invisible. 3 failed, 1 passed.
+
+G1 (fix): reader.py `_recorded_spend` now joined + month-boxed `None`-job pool.
+  fail-post 4/4; +sg132+sg125 16/16 unchanged; full suite 2 failed / 632 passed
+  (2 base-proved env reds: pyzbar/libzbar + tesseract absent); ruff clean; mypy delta 0.
+  One justified test edit: test_privacy_audit M45 line-pin 465 -> 483 (caller set unchanged).
+
+G2 (serve): BEFORE served capture = 0.0072005 (running container's own reader, read-only).
+  pending: rebuild + exactly ONE recreate + AFTER capture + counts delta.
+
+G3: report + notes receipt.
