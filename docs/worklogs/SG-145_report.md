@@ -181,6 +181,18 @@ Dispatch-ID: SG-145 | Report: docs/worklogs/SG-145_report.md | Work-HEAD: bd4f3a
 show_exit=0
 ```
 
+- Final tip `66d38ed` dual-annotated (note-anchor inoculation, SG-092 precedent); fetched `show` output,
+  verbatim:
+
+```
+$ git notes --ref=refs/notes/storagegenie-coder-reports add -m "Dispatch-ID: SG-145 | Report: docs/worklogs/SG-145_report.md | Work-HEAD: bd4f3acff8ae07f8995279714a05db6ca0d81d94" 66d38edeb053a223e6857410aba49a0310056aff   # add_exit=0
+$ git push origin refs/notes/storagegenie-coder-reports            # f8a4ede..e32b907 push_exit=0
+$ git fetch origin refs/notes/storagegenie-coder-reports:refs/notes/sg145-fetched-final   # fetch_exit=0
+$ git notes --ref=refs/notes/sg145-fetched-final show 66d38edeb053a223e6857410aba49a0310056aff
+Dispatch-ID: SG-145 | Report: docs/worklogs/SG-145_report.md | Work-HEAD: bd4f3acff8ae07f8995279714a05db6ca0d81d94
+show_exit=0
+```
+
 ## Budget — actual versus budget (units stated)
 
 | Leg | Command class | Budget | Actual |

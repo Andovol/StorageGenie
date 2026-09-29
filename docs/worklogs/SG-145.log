@@ -46,3 +46,7 @@ Ceiling: WRITES = docs/worklogs/{SG-145.log,SG-145_report.md,SG-145_verify.log} 
         push automation (worklogs only); receipt note on WORK_HEAD; push notes ref; mapped-fetch
         verify; dual-annotate final tip. No product hunk, no fix shipped (fix shape only,
         RECOMMENDED-NEXT). Spend real $0.000000 USD, zero metered calls. elapsed ~4 min.
+
+10:34Z  commits on automation: worklogs bd4f3ac (WORK_HEAD) -> receipt-record 66d38ed (dual-annotated)
+        -> this final record commit. Notes ref pushes: e5c0e00 -> f8a4ede -> e32b907. WORK_HEAD show and
+        final-tip show both pasted verbatim in SG-145_report.md. note=yes.
