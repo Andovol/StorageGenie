@@ -27,7 +27,11 @@ G1 (fix): reader.py `_recorded_spend` now joined + month-boxed `None`-job pool.
   (2 base-proved env reds: pyzbar/libzbar + tesseract absent); ruff clean; mypy delta 0.
   One justified test edit: test_privacy_audit M45 line-pin 465 -> 483 (caller set unchanged).
 
-G2 (serve): BEFORE served capture = 0.0072005 (running container's own reader, read-only).
-  pending: rebuild + exactly ONE recreate + AFTER capture + counts delta.
+G2 (serve): DONE. BEFORE served capture = 0.0072005 (old container's own reader, read-only).
+  BUILDX_CONFIG=/tmp/opencode/buildx docker compose build backend -> exit 0 (plain build hit
+  the documented EROFS sandbox). Exactly ONE recreate: container 2e623765... -> 229da27d...
+  health x6 {"status":"ok","db":"ok","storage":"ok"} 200; gate http:80 301 / https:443 401;
+  alembic head 20260924_sg114_relation unmoved; counts delta exactly 0 (no live rows created).
+  AFTER served capture = 0.01086845; delta +0.00366795 = the 9 None-job rows' sum.
 
 G3: report + notes receipt.
