@@ -904,8 +904,11 @@ def _create_asset_for_candidate(db: Session, candidate: Candidate) -> Asset:
             )
         )
 
-    for evidence_id in evidence_ids:
-        db.execute(asset_evidence.insert().values(asset_id=asset.id, evidence_id=evidence_id))
+    if evidence_ids:
+        db.execute(
+            asset_evidence.insert(),
+            [{"asset_id": asset.id, "evidence_id": evidence_id} for evidence_id in evidence_ids],
+        )
 
     audit_service.record(
         db,

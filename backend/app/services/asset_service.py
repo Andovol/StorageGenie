@@ -72,8 +72,11 @@ def create_asset(
             )
         )
     # Link evidence
-    for eid in evidence_ids:
-        db.execute(asset_evidence.insert().values(asset_id=asset.id, evidence_id=eid))
+    if evidence_ids:
+        db.execute(
+            asset_evidence.insert(),
+            [{"asset_id": asset.id, "evidence_id": eid} for eid in evidence_ids],
+        )
     audit_service.record(
         db,
         actor=actor,
