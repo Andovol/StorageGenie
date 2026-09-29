@@ -1,0 +1,39 @@
+SG-152 run log — merge Batch C: schemas-common tests (#33 + folded #37, test-only)
+Work dir: /home/andrei/StorageGenie   Branch: automation   Origin: git@github.com:Andovol/StorageGenie.git
+Role: Coder (never Architect — no dispatch verb run for any ID, no unit started or polled).
+
+2026-09-29T~14:44Z  Recon. BASE origin/automation == b26139c2a735e62fa688e0b567484be83da3ea7d (== HEAD).
+                    Contract recorded 0.40.0 == published: /home/andrei/storagegenie-contract/VERSION 0.40.0,
+                    HEAD f26dbd32e3c4bd7cf878333fba719a6ca1d10c3c, RULES.md sha256 5b656293... (D4).
+                    Model/effort from /proc/<pid>/cmdline: opencode run --auto --dir
+                    /home/andrei/StorageGenie --model opencode-go/deepseek-v4.1-flash --variant high.
+2026-09-29T~14:44Z  G0 absence at BASE proved: ls -> ENOENT; grep decode_cursor|loads_json|encode_cursor|
+                    dumps_json over backend/tests/ -> empty (exit 1); cat-file -> path absent (exit 128).
+                    common.py byte-identical on BASE/PR33/PR37 (8ef2b672...) so the heads' assertions
+                    target the live implementation. No conflicting file landed since the audit -> no STOP.
+2026-09-29T~14:45Z  Fetched refs/pull/33/head -> 46699c8f (blob 9ec30b77) and refs/pull/37/head ->
+                    ab374cac (blob ed852cdd) into origin/pr/33, origin/pr/37. Each head adds ONLY
+                    backend/tests/test_schemas_common.py (87 / 78 lines).
+2026-09-29T~14:45Z  Case enumeration (both heads): #33 = 8 tests pinning encode spec + decode ":" /
+                    legacy "|" / exception / no-separator / empty-string / dumps+loads(dict,None,invalid)
+                    / ProblemDetail default. #37 = 6 tests; UNIQUE = loads_json list/int/bool (+string
+                    scalar) and unicode dumps_json (ensure_ascii=False); the rest are duplicates of #33
+                    (spec round-trip, legacy, invalid trio, ProblemDetail). Silent drop avoided by
+                    folding the unique cases into the single adopted file.
+2026-09-29T14:46Z  G1 land: `git show origin/pr/33:... > ...`; hash-object 9ec30b77 == PR#33 blob
+                    (blob identity). committed dd22af3. Then folded ONLY #37's unique cases (diff dd22af3
+                    -> workspace = additions at EOF only, 87a88,106). committed e8f20a3 = WORK_HEAD.
+2026-09-29T14:46Z  G1 verify: new file -> 10 passed. Mutation harness under /tmp/opencode/sg152/mut (no
+                    product touch): 9 single-branch mutations, every one caught by the named test(s)
+                    (encode spec, ":" order, "|" branch, no-sep return, decode except, dumps ascii,
+                    loads None, loads invalid, ProblemDetail default). First harness run reused a copied
+                    __pycache__ and falsely showed two cursor mutations as passed; re-run with the
+                    imported module path asserted + bytecode disabled caught both. Finding logged.
+2026-09-29T14:47Z  G2 gates: FULL suite -> 2 failed, 648 passed (base-reds = the two test_signals env
+                    cases, identical to BASE 2/638; delta exactly +10 green = the one new file). ruff
+                    All checks passed. mypy app 41 errors / 9 files (delta 0). secret scan over added
+                    diff lines clean. diff ceiling = backend/tests/test_schemas_common.py only (106+).
+                    Interpreter note: repo-root venv lacks pillow_heif; backend/venv (1.8.0) is the
+                    suite interpreter. worktree clean.
+2026-09-29T~14:48Z  Worklogs written (this log + report + verify log); commit + push to automation;
+                    receipt notes (WORK_HEAD + final tip) to follow.

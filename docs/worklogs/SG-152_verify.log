@@ -1,0 +1,135 @@
+SG-152 verify log — captured command output, verbatim (temp SQLite; no live DB, no rebuild, no deploy)
+
+== Contract (recorded == published) and BASE resolve ==
+$ cat /home/andrei/storagegenie-contract/VERSION; git -C /home/andrei/storagegenie-contract rev-parse HEAD; sha256sum /home/andrei/storagegenie-contract/RULES.md
+0.40.0
+f26dbd32e3c4bd7cf878333fba719a6ca1d10c3c
+5b65629377bbac9e40bfa7e2f4d4e42a5667b3a08ec786beb47c6a677d9ac33c  /home/andrei/storagegenie-contract/RULES.md
+
+$ git rev-parse origin/automation HEAD
+b26139c2a735e62fa688e0b567484be83da3ea7d
+b26139c2a735e62fa688e0b567484be83da3ea7d
+
+== G0 — absence proof at BASE (PG-EV-08) ==
+$ ls backend/tests/test_schemas_common.py
+ls: cannot access 'backend/tests/test_schemas_common.py': No such file or directory
+ls_exit=2
+$ grep -rn "decode_cursor\|loads_json\|encode_cursor\|dumps_json" backend/tests/
+grep_exit=1                       # (no matching line — empty set, non-vacuously scoped to all of backend/tests)
+$ git cat-file -e origin/automation:backend/tests/test_schemas_common.py
+fatal: path 'backend/tests/test_schemas_common.py' does not exist in 'origin/automation'
+catfile_exit=128
+
+# Implementation branches under test (real source, byte-identical on BASE and both heads):
+$ git rev-parse HEAD:backend/app/schemas/common.py origin/pr/33:backend/app/schemas/common.py origin/pr/37:backend/app/schemas/common.py
+8ef2b672099fbc705e48e244770f16e7ef77f746
+8ef2b672099fbc705e48e244770f16e7ef77f746
+8ef2b672099fbc705e48e244770f16e7ef77f746
+
+== G1 — PR head blobs and #33 byte-exact landing (PG-SC-12) ==
+$ git rev-parse origin/pr/33:backend/tests/test_schemas_common.py
+9ec30b77e2924fd7f8d99c1915f48f05b29bb5a8
+$ git rev-parse origin/pr/37:backend/tests/test_schemas_common.py
+ed852cdd4493754421b73bb237e97c1060dbb97b
+
+$ git show origin/pr/33:backend/tests/test_schemas_common.py > backend/tests/test_schemas_common.py
+$ git hash-object backend/tests/test_schemas_common.py
+9ec30b77e2924fd7f8d99c1915f48f05b29bb5a8        # == PR#33 blob (blob-identity proof)
+$ git rev-parse HEAD:backend/tests/test_schemas_common.py
+9ec30b77e2924fd7f8d99c1915f48f05b29bb5a8
+committed dd22af343f0160d265629514f952f54e5e35d0ec
+
+== G1 — fold PR#37 UNIQUE cases only; diff is additions-at-EOF, nothing else ==
+$ git show dd22af3:backend/tests/test_schemas_common.py | diff - <folded file>
+87a88,106
+> 
+> 
+> def test_loads_json_non_dict_types() -> None:
+>     # Folded from PR #37 (unique cases: list/int/bool + string scalar).
+>     # Pins the loads_json `return json.loads(value)` success branch for
+>     # non-mapping JSON payloads (PR #33 covered only a dict payload).
+>     assert loads_json("[1, 2, 3]") == [1, 2, 3]
+>     assert loads_json("123") == 123
+>     assert loads_json("true") is True
+>     assert loads_json('"string"') == "string"
+> 
+> 
+> def test_dumps_json_unicode_not_escaped() -> None:
+>     # Folded from PR #37 (unique case). Pins dumps_json's ensure_ascii=False
+>     # branch: a unicode payload must round-trip through loads_json.
+>     data = {"name": "Test", "unicode": "こんにちは"}
+>     dumped = dumps_json(data)
+>     assert "こんにちは" in dumped
+>     assert loads_json(dumped) == data
+diff_exit=1                                  # (differences expected: additions only)
+committed e8f20a30c3313df4117e3396bb9df3bb0cef054a
+
+== G1 — the new file runs GREEN against the real implementation ==
+$ cd backend && PYTHONPATH=. ../venv/bin/python -m pytest tests/test_schemas_common.py -v
+collected 10 items
+tests/test_schemas_common.py::test_encode_and_decode_cursor_valid PASSED [ 10%]
+tests/test_schemas_common.py::test_decode_cursor_legacy_format PASSED    [ 20%]
+tests/test_schemas_common.py::test_decode_cursor_invalid_base64 PASSED   [ 30%]
+tests/test_schemas_common.py::test_decode_cursor_missing_separator PASSED [ 40%]
+tests/test_schemas_common.py::test_decode_cursor_invalid_timestamp_format PASSED [ 50%]
+tests/test_schemas_common.py::test_decode_cursor_empty_string PASSED     [ 60%]
+tests/test_schemas_common.py::test_json_dumps_and_loads PASSED           [ 70%]
+tests/test_schemas_common.py::test_problem_detail_model PASSED           [ 80%]
+tests/test_schemas_common.py::test_loads_json_non_dict_types PASSED      [ 90%]
+tests/test_schemas_common.py::test_dumps_json_unicode_not_escaped PASSED [100%]
+10 passed in 0.10s
+
+== G1 — mutation harness (isolated copy under /tmp/opencode/sg152/mut; NO product touch) ==
+# baseline on the isolated copy: 10 passed.
+# Each row breaks ONE real common.py branch; a caught mutation proves the named case
+# fails when that branch breaks (non-vacuity). PYTHONPATH pointed at the isolated copy,
+# PYTHONDONTWRITEBYTECODE=1; the harness first proved the imported module path.
+imported module: /tmp/opencode/sg152/mut/app/schemas/common.py
+encode_spec_swap:            rc=1 | 1 failed, 9 passed  failed=['test_encode_and_decode_cursor_valid']
+decode_colon_swap:           rc=1 | 1 failed, 9 passed  failed=['test_encode_and_decode_cursor_valid']
+legacy_branch_drop:          rc=1 | 1 failed, 9 passed  failed=['test_decode_cursor_legacy_format']
+no_sep_return_not_none:      rc=1 | 2 failed, 8 passed  failed=['test_decode_cursor_missing_separator', 'test_decode_cursor_empty_string']
+decode_except_raise:         rc=1 | 2 failed, 8 passed  failed=['test_decode_cursor_invalid_base64', 'test_decode_cursor_invalid_timestamp_format']
+dumps_ascii_true:            rc=1 | 1 failed, 9 passed  failed=['test_dumps_json_unicode_not_escaped']
+loads_none_mutated:          rc=1 | 1 failed, 9 passed  failed=['test_json_dumps_and_loads']
+loads_invalid_raise:         rc=1 | 1 failed, 9 passed  failed=['test_json_dumps_and_loads']
+problem_type_mutated:        rc=1 | 1 failed, 9 passed  failed=['test_problem_detail_model']
+restored: True
+# (My first harness attempt reused a copied __pycache__ and printed BOTH cursor mutations
+#  as "passed" — a harness artifact, not a test result. Re-run with the isolated module
+#  proven and bytecode disabled caught every mutation. Reported as a finding, PG-EV-09.)
+
+== G2 — FULL backend suite, lint, type, secret, blast-radius (PG-EV-01, PG-IC-08) ==
+$ cd backend && PYTHONPATH=. ./venv/bin/python -m pytest -q
+2 failed, 648 passed, 32 warnings in 33.39s
+FAILED tests/test_signals.py::test_generated_codes_are_validated_and_bad_checksum_is_not_an_identifier
+FAILED tests/test_signals.py::test_ocr_has_text_boxes_and_mean_confidence
+  (base-reds identical to BASE/SG-151; delta = exactly +10 green tests = the ONE new file;
+   BASE recorded 2 failed / 638 passed)
+
+$ ./venv/bin/python -m ruff check .
+All checks passed!
+
+$ ./venv/bin/python -m mypy app
+Found 41 errors in 9 files (checked 90 source files)
+  (delta 0 vs recorded BASE 41 errors / 9 files — no type surface touched)
+
+$ git diff --stat b26139c HEAD
+ backend/tests/test_schemas_common.py | 106 +++++++++++++++++++++++++++++++++++
+ 1 file changed, 106 insertions(+)
+
+$ git diff b26139c HEAD | grep '^+' | grep -v '^+++' | grep -nEi "(api[_-]?key|secret|password|passwd|token|private[_-]?key|BEGIN [A-Z ]*PRIVATE KEY|AKIA[0-9A-Z]{16}|ghp_|sk-[A-Za-z0-9]{20,})"
+(no secret-like token in added lines; grep_exit=1)
+
+$ git status --porcelain
+(empty — worktree clean, CO-55)
+
+== interpreter note (finding) ==
+$ ./venv/bin/python -c "import pillow_heif"          # repo-root venv
+ModuleNotFoundError: No module named 'pillow_heif'
+$ backend/venv/bin/python -c "import pillow_heif; print(pillow_heif.__version__)"
+1.8.0
+  (The complete suite interpreter on this host is backend/venv. The repo-root venv/ is
+   incomplete and cannot collect the suite; recorded, not worked around.)
+
+== no command killed by its bound; no interactive command ran ==
