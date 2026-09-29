@@ -188,6 +188,28 @@ show_exit=0
 
 **note=yes** (both required notes present; existing-note refusal not hit on either new hash).
 
+**Second final-tip annotation** (note-anchor inoculation continues one commit behind the tip, SG-092/SG-153
+precedent) on the record tip `7e09ad912ef31232907bff786326b9af19bc7dda`; mapped-fetch `show`, verbatim:
+
+```
+$ git notes --ref=refs/notes/storagegenie-coder-reports add -m "Dispatch-ID: SG-154 | Report: docs/worklogs/SG-154_report.md | Work-HEAD: 39cf71a99118332791db4e7d0e3a9dc51228ddb0" 7e09ad912ef31232907bff786326b9af19bc7dda
+add_exit=0
+
+$ git push origin refs/notes/storagegenie-coder-reports
+   afe2cd2..2e2785e  refs/notes/storagegenie-coder-reports -> refs/notes/storagegenie-coder-reports
+notes_push_exit=0
+
+$ git fetch origin refs/notes/storagegenie-coder-reports:refs/notes/sg154-fetched
+   afe2cd2..2e2785e  refs/notes/storagegenie-coder-reports -> refs/notes/sg154-fetched
+fetch_exit=0
+
+$ git notes --ref=refs/notes/sg154-fetched show 7e09ad912ef31232907bff786326b9af19bc7dda
+Dispatch-ID: SG-154 | Report: docs/worklogs/SG-154_report.md | Work-HEAD: 39cf71a99118332791db4e7d0e3a9dc51228ddb0
+show_tip2_exit=0
+```
+
+**note=yes**
+
 ---
 
 ## UNCLEAR
