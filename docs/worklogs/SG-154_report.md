@@ -5,7 +5,8 @@
 --model opencode-go/deepseek-v4.1-flash --variant high`; wrapper `bash /usr/local/lib/dispatch/run-coder SG-154`).
 **Work dir:** `/home/andrei/StorageGenie` · **Origin:** `git@github.com:Andovol/StorageGenie.git`.
 **BASE ref requested:** `origin/automation` → **resolved commit:** `b16d0670db5f1803bc385256e23801a4f71ac311`
-(== local HEAD at start, worktree clean). **WORK_HEAD:** the evidence commit (SG-154_verify.log).
+(== local HEAD at start, worktree clean). **WORK_HEAD:** `39cf71a99118332791db4e7d0e3a9dc51228ddb0`
+(the deploy-evidence commit carrying `SG-154_verify.log`).
 **Authoring date (metadata):** 2026-09-29. Live clock reads below.
 **Type:** DEPLOY RIDER. Production restart authorized by the standing close-out directive (`AGENTS.md` Close-out
 row; `G-K2` covered, not new). **Zero product hunks expected — and zero produced.**
