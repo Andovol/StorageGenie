@@ -1,4 +1,5 @@
 import json
+import logging
 
 from sqlalchemy.orm import Session
 
@@ -8,6 +9,8 @@ from app.models.evidence import asset_evidence
 from app.services import audit_service, lifecycle
 from app.services.assertion_service import upsert_assertion
 from app.services.candidates import _deterministic_display_name
+
+logger = logging.getLogger(__name__)
 
 
 def resolve_display_name(
@@ -133,8 +136,13 @@ def attach_evidence(db: Session, asset: Asset, evidence_ids: list[str], actor: s
         # Use INSERT OR IGNORE to avoid duplicate PK error
         try:
             db.execute(asset_evidence.insert().values(asset_id=asset.id, evidence_id=eid))
-        except Exception:
-            pass
+        except Exception as exc:
+            logger.warning(
+                "Failed to attach evidence_id=%s to asset_id=%s: %s",
+                eid,
+                asset.id,
+                exc,
+            )
     audit_service.record(
         db,
         actor=actor,

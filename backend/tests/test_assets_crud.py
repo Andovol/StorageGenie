@@ -281,3 +281,31 @@ def test_list_rows_carry_evidence_ids_for_the_card_thumbnail(db) -> None:  # typ
     rows = {row["id"]: row for row in listing.json()["items"]}
     assert rows[with_evidence.json()["id"]]["evidence_ids"] == [evidence.id]
     assert rows[without_evidence.json()["id"]]["evidence_ids"] == []
+
+
+def test_attach_evidence_handles_duplicates_and_logging(db, caplog) -> None:
+    import logging
+    from app.models import Asset
+    from app.services.asset_service import attach_evidence
+
+    session, household_id, _ = db
+    evidence = evidence_for(session, household_id, "yellow")
+    asset = Asset(
+        household_id=household_id,
+        display_name="Logged Asset",
+        asset_type="tool",
+        status="ACTIVE",
+    )
+    session.add(asset)
+    session.commit()
+
+    # First attach should succeed without duplicate log warning
+    with caplog.at_level(logging.WARNING):
+        attach_evidence(session, asset, [evidence.id])
+    assert "Failed to attach evidence_id=" not in caplog.text
+
+    # Second attach of duplicate evidence should trigger the exception handler and log warning
+    caplog.clear()
+    with caplog.at_level(logging.WARNING):
+        attach_evidence(session, asset, [evidence.id])
+    assert f"Failed to attach evidence_id={evidence.id} to asset_id={asset.id}" in caplog.text
