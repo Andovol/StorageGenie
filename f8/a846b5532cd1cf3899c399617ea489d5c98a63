@@ -1,0 +1,8 @@
+Negative-Receipt-ID: SG-144
+utc=2026-09-29T10:09:33Z
+DISPATCH_RESULT id=SG-144 coder=opencode exit=0 head=6cc780a943f616668c1ee4b9d29572cc0e5db91a note=no moved=yes rewrite=no dirty=no elapsed=487s budget=2100s
+P1_moved=PASS count=4
+P2_rewrite=PASS behind=0
+P3_note=FAIL note=no
+P5_receipt=FAIL
+P6_dirty=PASS dirty=no
