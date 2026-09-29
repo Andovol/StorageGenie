@@ -281,3 +281,41 @@ def test_list_rows_carry_evidence_ids_for_the_card_thumbnail(db) -> None:  # typ
     rows = {row["id"]: row for row in listing.json()["items"]}
     assert rows[with_evidence.json()["id"]]["evidence_ids"] == [evidence.id]
     assert rows[without_evidence.json()["id"]]["evidence_ids"] == []
+
+
+def test_attach_evidence_bulk_dedups_and_logs_failed_links(db, caplog) -> None:  # type: ignore[no-untyped-def]
+    """SG-151: the bulk asset_evidence path links once and still speaks failures.
+
+    Duplicate ids -- within one call or across calls -- collapse to a single
+    link with no duplicate-key error escaping. A link that cannot be written is
+    never swallowed: the real service logs it with both ``evidence_id`` and
+    ``asset_id`` (the #34 log repathed onto the bulk insert).
+    """
+    import logging
+
+    from app.models import Asset
+    from app.models.evidence import asset_evidence
+    from app.services.asset_service import attach_evidence
+
+    session, household_id, _ = db
+    evidence = evidence_for(session, household_id, "yellow")
+    asset = Asset(
+        household_id=household_id,
+        display_name="Bulk Attach Asset",
+        asset_type="tool",
+        status="ACTIVE",
+    )
+    session.add(asset)
+    session.commit()
+
+    with caplog.at_level(logging.WARNING):
+        attach_evidence(session, asset, [evidence.id, evidence.id])
+        attach_evidence(session, asset, [evidence.id])
+    assert session.query(asset_evidence).filter_by(asset_id=asset.id).count() == 1
+    assert "Failed to attach evidence_id=" not in caplog.text
+
+    caplog.clear()
+    with caplog.at_level(logging.WARNING):
+        attach_evidence(session, asset, ["ghost-evidence-id"])
+    assert "Failed to attach evidence_id=ghost-evidence-id to asset_id=" in caplog.text
+    assert session.query(asset_evidence).filter_by(asset_id=asset.id).count() == 1
