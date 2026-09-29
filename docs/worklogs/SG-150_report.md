@@ -19,8 +19,9 @@ host — SG-145 F-SG145-1; the live checkout above is the contract path.)
 --model opencode-go/deepseek-v4.1-flash --variant high # SG-150 …`. No system-prompt identity used.
 **Spend:** **$0.000000 actual USD** — zero metered calls on every path (local fetch/apply, `TestClient`
 preflight, temp-SQLite suite, lint/type). No USD-metered call exists on any path.
-**Live clock (`PG-IC-07`):** first capture `2026-09-29T14:19:25Z`; last ordinary capture
-`2026-09-29T14:27:27Z`.
+**Live clock (`PG-IC-07`):** first capture `2026-09-29T14:19:25Z`; as-of-report-writing
+`2026-09-29T14:29:18Z` (total elapsed `593 s`; the receipt-publish moments are after this and are the
+runner's record, `CO-79`).
 **Autonomy:** `L2` (merge-batch arc, D-0929-3 2nd word). **DATABASE none, restart none, deploy none**
 (served-code change ships via the standing close-out rider — `PG-PR-04`; stated).
 
@@ -166,7 +167,21 @@ show_exit=0
 
 - Final tip dual-annotated (note-anchor inoculation, SG-092 precedent); mapped-fetch `show`, verbatim:
 
-__DUAL_BLOCK__
+```
+$ git notes --ref=refs/notes/storagegenie-coder-reports add -m "Dispatch-ID: SG-150 | Report: docs/worklogs/SG-150_report.md | Work-HEAD: bd37d75334f8995d0fd8ea28086ed59c2cc0aa16" bfc785a9858213df59367308adef5218fe28179a
+add_exit=0
+$ git push origin refs/notes/storagegenie-coder-reports
+To github.com:Andovol/StorageGenie.git
+   8cad39c..18aa963  refs/notes/storagegenie-coder-reports -> refs/notes/storagegenie-coder-reports
+push_notes_exit=0
+$ git fetch origin refs/notes/storagegenie-coder-reports:refs/notes/sg150-fetched-final
+From github.com:Andovol/StorageGenie
+ * [new ref]         refs/notes/storagegenie-coder-reports -> refs/notes/sg150-fetched-final
+fetch_exit=0
+$ git notes --ref=refs/notes/sg150-fetched-final show bfc785a9858213df59367308adef5218fe28179a
+Dispatch-ID: SG-150 | Report: docs/worklogs/SG-150_report.md | Work-HEAD: bd37d75334f8995d0fd8ea28086ed59c2cc0aa16
+show_exit=0
+```
 
 ## Budget — actual versus budget (units stated)
 
@@ -180,7 +195,7 @@ __DUAL_BLOCK__
 | G2 ruff / mypy / secret / CO-101 tests | ordinary | 120 s | ~40 s |
 | Worklogs + commit + push | ordinary | 120 s | < 15 s |
 | Receipt notes (add/push/fetch/show) | ordinary / notes-push | 120 s / 300 s | < 15 s |
-| **Overall** | — | **2400 s (lane `RUN_BUDGET_S=2100`)** | reported below |
+| **Overall** | — | **2400 s (lane `RUN_BUDGET_S=2100`)** | `593 s` as of report writing (14:19:25Z→14:29:18Z) |
 
 Actual-versus-budget per goal: every leg well inside its class; overall well inside the 2400 s cap. No
 command was killed by its bound; no interactive command ran. **Real metered spend $0.000000 USD, zero
