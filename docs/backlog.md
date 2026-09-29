@@ -6,7 +6,7 @@ Created at the 2026-09-25 D2 close (discharges the long-owed "backlog-file creat
 |---|---|
 | Context Scene resume (`P1`/`T1b`/`D7` parked; `D132` §1.4 non-goal reopen gate; `D4` second provider for image gen) | Owner resume word (per-arc rhythm `D137`: brainstorm → perform) |
 | Cap-join fix (`F-SG132-5`: `_recorded_spend` inner-joins `Job`, ignores `None`-job rows — live cap sees 0.0067 vs 0.0104 true) | Owner word for a cap-join slice |
-| Dark-link hue sign-off | Owner visual verdict (no slice can close it) |
+| Dark-link hue sign-off | CLOSED 2026-09-29 (owner verdict "its ok" = KEEP, D-0929-4, live image `c6fc45ab`) |
 | 12-month window calibration (`LEDGER_RETENTION_MONTHS` UNCALIBRATED `G-A9`; or retire the vehicle) | Owner word |
 | Ledger auto-run / scheduler decision (vehicle exists, never scheduled, `SG-125` REMAINING) | Owner word |
 | `F-SG126-3` runbook-command guard (no guard pins runbook command strings; instances: `SG-126` drift, `F-SG131-1` `/_data` doubling) | Next runbook-touching slice, or owner word |
