@@ -13,7 +13,7 @@ def create_app_with_cors(cors_origins_str: str) -> FastAPI:
         CORSMiddleware,
         allow_origins=origins,
         allow_credentials=allow_credentials,
-        allow_methods=["*"],
+        allow_methods=["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
         allow_headers=["*"],
     )
 
@@ -43,3 +43,31 @@ def test_cors_disallows_credentials_when_wildcard_configured() -> None:
     response = client.get("/v1/health", headers={"Origin": "https://evil.com"})
     assert response.headers.get("access-control-allow-origin") == "*"
     assert response.headers.get("access-control-allow-credentials") is None
+
+
+def test_cors_preflight_allow_methods() -> None:
+    client = TestClient(default_app)
+    response = client.options(
+        "/v1/health",
+        headers={
+            "Origin": "http://localhost:5173",
+            "Access-Control-Request-Method": "POST",
+        },
+    )
+    assert response.status_code == 200
+    allowed_methods = response.headers.get("access-control-allow-methods", "")
+    methods_list = [m.strip() for m in allowed_methods.split(",") if m.strip()]
+    assert set(methods_list) == {"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"}
+
+
+def test_cors_preflight_unallowed_method() -> None:
+    client = TestClient(default_app)
+    response = client.options(
+        "/v1/health",
+        headers={
+            "Origin": "http://localhost:5173",
+            "Access-Control-Request-Method": "TRACE",
+        },
+    )
+    assert response.status_code == 400
+    assert response.text == "Disallowed CORS method"
