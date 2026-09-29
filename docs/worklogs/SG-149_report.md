@@ -6,7 +6,7 @@ Work dir:   /home/andrei/StorageGenie
 origin:     git@github.com:Andovol/StorageGenie.git (fetch+push, as on host)
 BASE ref:   origin/automation
 BASE commit: 48e30c4fb848058c66188a74f4acab377bfd5fdd (start HEAD; worktree clean at start)
-WORK_HEAD:  {{WORK_HEAD}}
+WORK_HEAD:  c147316a1aa868cae9645b0e8a2294021f173e46 (work commit; receipt-note target)
 Model:      opencode-go/deepseek-v4.1-flash  (per process arguments: /proc/<opencode-run-pid>/cmdline `--model`)
 Effort:     high                            (per process arguments: /proc/<opencode-run-pid>/cmdline `--variant high`)
 Coder:      opencode  (env CODER=opencode; lane job_spawn)
@@ -180,7 +180,19 @@ Pairs that cannot land together as-is: {#40,#42}, {#34,#36}, {#36,#39}, {#33,#37
   fetch (`refs/notes/sg149-fetched`); executed output, verbatim:
 
 ```
-{{WORKHEAD_SHOW}}
+$ git notes --ref=refs/notes/storagegenie-coder-reports add -m "Dispatch-ID: SG-149 | Report: docs/worklogs/SG-149_report.md | Work-HEAD: c147316a1aa868cae9645b0e8a2294021f173e46" c147316a1aa868cae9645b0e8a2294021f173e46
+add_exit=0
+$ git push origin refs/notes/storagegenie-coder-reports
+To github.com:Andovol/StorageGenie.git
+   6cbb7ba..d65484e  refs/notes/storagegenie-coder-reports -> refs/notes/storagegenie-coder-reports
+push_exit=0
+$ git fetch origin refs/notes/storagegenie-coder-reports:refs/notes/sg149-fetched
+From github.com:Andovol/StorageGenie
+ * [new ref]         refs/notes/storagegenie-coder-reports -> refs/notes/sg149-fetched
+fetch_exit=0
+$ git notes --ref=refs/notes/sg149-fetched show c147316a1aa868cae9645b0e8a2294021f173e46
+Dispatch-ID: SG-149 | Report: docs/worklogs/SG-149_report.md | Work-HEAD: c147316a1aa868cae9645b0e8a2294021f173e46
+show_exit=0
 ```
 
 - Final tip dual-annotated (note-anchor inoculation, SG-092 precedent); mapped-fetch `show`, verbatim:
@@ -199,7 +211,7 @@ Pairs that cannot land together as-is: {#40,#42}, {#34,#36}, {#36,#39}, {#33,#37
 | G1 source reads + local greps + secret scan | ordinary | 120 s | < 20 s |
 | G2 worklogs + commit + push | ordinary | 120 s | < 10 s |
 | Receipt notes (add/push/fetch/show, ×2) | ordinary / notes-push | 120 s / 300 s | < 15 s |
-| **Overall** | — | **2400 s (lane `RUN_BUDGET_S=2100`)** | **wall-clock ≈ {{WALL}}** |
+| **Overall** | — | **2400 s (lane `RUN_BUDGET_S=2100`)** | **wall-clock ≈ 8 min** |
 
 Actual-versus-budget per goal: G0, G1, G2 each well inside their 120 s class; overall well inside 2400 s.
 **Real metered spend $0.000000 USD, zero metered calls.**
