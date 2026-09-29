@@ -1,0 +1,118 @@
+SG-143 — Port the 3 blocked HouseholdSelector pages (className passthrough) — raw verification log
+
+Contract echo (verbatim): `0.40.0` — source path `/home/andrei/storagegenie-contract/VERSION`.
+Installed `RULES.md` sha256 `5b65629377bbac9e40bfa7e2f4d4e42a5667b3a08ec786beb47c6a677d9ac33c`
+== the AGENTS.md-recorded installed payload hash (0.39.0+0.40.0). Recorded == published (D4 adoption).
+
+BASE ref requested: `origin/automation`; resolved at start:
+`08bdd1e8ac802de11dbf461dc5d7a31a55fee197` == local HEAD == `origin/automation`, worktree clean.
+Live clock at capture: 2026-09-29T09:47Z.
+
+Model/effort (CO-78, from process arguments, never the identity line):
+pid `725282`, `/proc/725282/cmdline` =
+`opencode run --auto --dir /home/andrei/StorageGenie --model opencode-go/deepseek-v4.1-flash --variant high`
+-> modelID `opencode-go/deepseek-v4.1-flash`, effort `high`. Coder `opencode` (env CODER=opencode;
+OPENCODE_PID=725282; RUN_BUDGET_S=2100).
+
+================================================================================
+G0 — EQUIVALENCE MAP ON BASE (committed BEFORE any edit)
+================================================================================
+
+PREMISE CORRECTION (path level, loud): the packet writes `frontend/src/pages/*.tsx`; the real tree
+uses `frontend/src/routes/*.tsx` and `frontend/src/components/shell/CatalogToolbar.tsx`. The
+Architect's substance is correct; only the directory segment differs. Verified here, never inherited.
+
+The real set of household `<select>` call-sites NOT already on the shared selector is exactly three:
+  (1) frontend/src/routes/CapturePage.tsx
+  (2) frontend/src/routes/InboxPage.tsx
+  (3) frontend/src/components/shell/CatalogToolbar.tsx
+(4) CatalogPage.tsx renders NO household select (it forwards householdId/households/onHouseholdChange
+    to AppShell -> CatalogToolbar); ChatPage.tsx:79 + PlanningPage.tsx:71 already use HouseholdSelector.
+Packet's expected 3 == observed 3 (after the path correction). No difference in the SET.
+
+--- CALL-SITE 1: CapturePage.tsx:27-44 (verbatim) ---
+   27:         <label style={{ fontSize: 13 }}>
+   28:           Household{" "}
+   29:           <select
+   30:             className={THEMED_CONTROL_CLASS}
+   31:             value={effective}
+   32:             onChange={(e) => {
+   33:               setHouseholdId(e.target.value);
+   34:               localStorage.setItem("household_id", e.target.value);
+   35:             }}
+   36:             style={{ ...CONTROL_STYLE, marginLeft: 6 }}
+   37:           >
+   38:             {(households || []).map((h) => (
+   39:               <option key={h.id} value={h.id}>
+   40:                 {h.name}
+   41:               </option>
+   42:             ))}
+   43:           </select>
+   44:         </label>
+Attributes: label style {fontSize:13}; text "Household "; select className THEMED_CONTROL_CLASS,
+style {...CONTROL_STYLE, marginLeft:6}; NO empty option; onChange writes localStorage.
+Guarding test: frontend/src/routes/theme-adoption.test.tsx:219-228 (on target), assertion:
+  226:     const select = screen.getByRole("combobox", { name: /household/i });
+  227:     expect(select).toHaveClass("bg-background", "text-foreground", "border-border");
+(Packet cited 219-228 == target; line numbers VERIFIED on target, not inherited.)
+
+--- CALL-SITE 2: InboxPage.tsx:33 (verbatim, one line) ---
+  33:     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}><h1 className="page-header text-foreground">Inbox</h1><label>Household <select className={THEMED_CONTROL_CLASS} style={CONTROL_STYLE} value={effectiveHousehold} onChange={(event) => { setHouseholdId(event.target.value); localStorage.setItem("household_id", event.target.value); }}><option value="">Select household</option>{(households as Household[] | undefined)?.map((household) => <option key={household.id} value={household.id}>{household.name}</option>)}</select></label></div>
+Attributes: plain <label> (no style); select className THEMED_CONTROL_CLASS, style CONTROL_STYLE;
+empty option `Select household` FIRST; options then household names; onChange writes localStorage.
+Guarding test: frontend/src/routes/InboxPage.test.tsx:75-81 (on target), assertion:
+   79:     const select = screen.getByRole("combobox", { name: /household/i });
+   80:     expect(select).toHaveClass("bg-background", "text-foreground", "border-border");
+(Packet cited 75-81 == target; line numbers VERIFIED on target.)
+
+--- CALL-SITE 3: CatalogToolbar.tsx:123-136 (verbatim) — DIFFERENCED, re-mapped, NOT force-applied ---
+  123:       <select
+  124:         aria-label="Household"
+  125:         value={householdId}
+  126:         onChange={(event) => onHouseholdChange(event.target.value)}
+  127:         className={THEMED_CONTROL_CLASS}
+  128:         style={CONTROL_STYLE}
+  129:       >
+  130:         {households.map((household) => (
+  131:           <option key={household.id} value={household.id}>
+  132:             {household.name}
+  133:           </option>
+  134:         ))}
+  135:         {households.length === 0 && <option value="">No households</option>}
+  136:       </select>
+This markup DIFFERS from the page-level selector in three load-bearing ways:
+  (a) `aria-label="Household"` (the accessible name; NO <label> wrapper). HouseholdSelector has no
+      aria-label prop at all (it uses a wrapping <label> or nothing).
+  (b) NO empty option when households exist; a `No households` fallback shown ONLY when empty.
+      HouseholdSelector renders `emptyOptionLabel` as a permanent FIRST option whenever truthy, or
+      nothing when falsy — it cannot express "fallback only when empty".
+  (c) no label wrapper (showLabel={false} on the shared component gives a bare select, which matches
+      (c) only).
+Guarding test: frontend/src/components/shell/shell.test.tsx:594-606, which depends on the aria-label
+(via `getByLabelText("Household")`):
+  602:     fireEvent.change(screen.getByLabelText("Household"), { target: { value: "h2" } });
+
+CONSEQUENCE (STOP for call-site 3, per packet G0 clause "if the port becomes impossible inside the
+ceiling, STOP that call-site and ship the rest with the STOP committed"):
+  A byte-identical port of call-site 3 through HouseholdSelector would require (a) a new
+  `aria-label`/accessible-name prop and (b) a conditional empty-fallback option behaviour — i.e. at
+  least TWO API changes beyond the single class passthrough the packet allows ("the passthrough prop
+  ONLY"; "no other API change"). Dropping either breaks output identity and the shell test above.
+  HouseholderSelector is therefore NOT substituted in CatalogToolbar.tsx; that file is left byte-
+  untouched. This is a FINDING (F-SG143-2), reported, not force-applied.
+
+--- Reference: already-ported call-sites (MUST stay byte-identical; default prop = unset) ---
+ChatPage.tsx:79-86 and PlanningPage.tsx:71-78 both call:
+  <HouseholdSelector value={effectiveHousehold} onChange={...} households={households as Household[] | undefined} />
+with all presentation props defaulted. Adding an optional `selectClassName` defaulting to undefined
+leaves their rendered <select> with NO className attribute — byte-identical. To be proven by test and
+by the untouched Chat/Planning suites.
+
+--- The passthrough prop (DECIDED — report per packet) ---
+Name: `selectClassName` (optional, `string`, default unset). Rationale: the component can render a
+wrapping <label> AND a <select>, so a bare `className` would be ambiguous; `selectClassName` names the
+exact element. Applied as `className={selectClassName}` on the <select>. No other prop/API change.
+
+================================================================================
+G1 — RUNS (filled after the edits)
+================================================================================
