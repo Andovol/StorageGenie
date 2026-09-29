@@ -8,7 +8,7 @@ BLOCKED: acceptance criterion unreachable within the write ceiling — `upgrade 
 **Origin remote (as on host):** `git@github.com:Andovol/StorageGenie.git` (fetch+push)
 **BASE (packet ref `origin/automation` requested → resolved commit):** `6edd1be775ed79f69819f50b7784dc09040beed4`
 (packet's `BASE REF` is the ref; the resolved commit is stated separately — two fields, never one).
-**WORK_HEAD:** `__WORK_HEAD__`
+**WORK_HEAD:** `1488438b7c1a910bbeabe9bffdb5dca2e5a2f499`
 **Contract:** recorded `0.40.0` == published — source path `/home/andrei/storagegenie-contract/VERSION`
 (`0.40.0`); `git -C /home/andrei/storagegenie-contract rev-parse HEAD` = `f26dbd32e3c4bd7cf878333fba719a6ca1d10c3c`
 (subject `Contract payload 0.40.0`); payload `RULES.sha256` =
@@ -150,7 +150,19 @@ was needed to observe it.
   **mapped** fetch (`refs/notes/sg146-fetched`); executed output, verbatim:
 
 ```
-__NOTE_SHOW__
+$ git notes --ref=refs/notes/storagegenie-coder-reports add -m "Dispatch-ID: SG-146 | Report: docs/worklogs/SG-146_report.md | Work-HEAD: 1488438b7c1a910bbeabe9bffdb5dca2e5a2f499" 1488438b7c1a910bbeabe9bffdb5dca2e5a2f499
+add_exit=0
+$ git push origin refs/notes/storagegenie-coder-reports
+To github.com:Andovol/StorageGenie.git
+   82df164..d6f9861  refs/notes/storagegenie-coder-reports -> refs/notes/storagegenie-coder-reports
+push_exit=0
+$ git fetch origin refs/notes/storagegenie-coder-reports:refs/notes/sg146-fetched
+From github.com:Andovol/StorageGenie
+ * [new ref]         refs/notes/storagegenie-coder-reports -> refs/notes/sg146-fetched
+fetch_exit=0
+$ git notes --ref=refs/notes/sg146-fetched show 1488438b7c1a910bbeabe9bffdb5dca2e5a2f499
+Dispatch-ID: SG-146 | Report: docs/worklogs/SG-146_report.md | Work-HEAD: 1488438b7c1a910bbeabe9bffdb5dca2e5a2f499
+show_exit=0
 ```
 
 - Final tip dual-annotated (note-anchor inoculation, SG-092 precedent); mapped fetch `show`, verbatim:
