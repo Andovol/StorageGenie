@@ -1,0 +1,34 @@
+SG-143 coder log — opencode / deepseek-v4.1-flash / effort=high (per process args, /proc/725282/cmdline)
+Work dir /home/andrei/StorageGenie · BASE=08bdd1e8ac802de11dbf461dc5d7a31a55fee197 (origin/automation)
+Contract 0.40.0 · source /home/andrei/storagegenie-contract/VERSION · RULES.md sha256 5b656293… (installed payload)
+All timestamps UTC, live clock. Bounds: 120s ordinary / 600s suite / 2400s overall.
+
+09:46:58  process start. HEAD=08bdd1e…==origin/automation, worktree clean. Contract 0.40.0 echo + hash.
+09:47     G0 reads: real paths are frontend/src/routes/*.tsx (packet said pages/) — path-level premise
+          corrected. Real household-select call-sites not on the shared selector = exactly 3:
+          CapturePage.tsx, InboxPage.tsx, CatalogToolbar.tsx. CatalogPage.tsx renders no select.
+09:47     G0 map written with verbatim markup + the on-target guarding-test lines (theme-adoption:219-228,
+          InboxPage.test:75-81) + the CatalogToolbar difference (aria-label + conditional fallback).
+          CATALOG STOP decided: byte-identical port needs aria-label prop + conditional empty fallback =
+          two API changes beyond the single class passthrough (forbidden "passthrough prop ONLY").
+09:47     Committed the G0 map BEFORE any edit: 8587d06218fa110e50206c1a1dd69e531b8b3266.
+09:48     G1: added `selectClassName?: string` to HouseholdSelector (className={selectClassName} on the
+          <select>; default undefined). Ported CapturePage + InboxPage through the shared component.
+          Added 1 focused component test. CatalogToolbar.tsx left byte-untouched (STOP).
+09:48:17  Targeted vitest: HouseholdSelector(4) + theme-adoption(12) + InboxPage(8) + ChatPage(6) +
+          PlanningPage(4) + shell(23) = 6 files / 57 tests passed (TARGET_EXIT=0).
+09:48:25  Full frontend suite: 27 files / 244 tests passed (FULL_EXIT=0) — 243 BASE + 1 new; no reds.
+09:48     tsc --noEmit EXIT=0; eslint on the 4 touched files EXIT=0. Backend diff EMPTY (suite not re-run).
+09:48     Committed G1 port: 50304f0ff01fc2a4104f3b200ad3b906601a49ac (product+tests+verify log).
+09:49:00  G2 BEFORE (read-only, old container 229da27d…): bundle index-BnyUlS-i.js fc696d21… 318415 B;
+          `selectClassName` absent (grep 0); 3 pages 200; alembic sg114 head; 9 counts.
+09:49:06  build `BUILDX_CONFIG=/tmp/opencode/buildx docker compose build backend` → BUILD_EXIT=0 (11s).
+09:49:22  exactly ONE recreate: `docker compose up -d --no-deps backend` REC_EXIT=0; container id
+          229da27d… -> 55d398ed7625cf637f587d863d60c0d114355ca9312b554becdfccd59e71a4de (M42).
+09:49:32  verify: health ×6 exact 200; gate 301/401; alembic unmoved; counts delta 0; 3 pages 200;
+          bundle index-CTQCofuO.js d9dbdef3… 318152 B; `selectClassName` grep 1.
+09:50     pushed G0+G1 to origin/automation (08bdd1e..50304f0).
+09:50     receipt note on WORK_HEAD 50304f0 added on refs/notes/storagegenie-coder-reports, pushed,
+          fetched into mapped refs/notes/sg143-fetched, `show` OK (`note=yes` for WORK_HEAD).
+09:5x     report + log + verify log written; worklogs commit = final tip; final tip dual-annotated
+          (note-anchor inoculation, SG-092 precedent) and its fetched `show` pasted below.

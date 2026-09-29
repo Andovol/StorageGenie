@@ -161,3 +161,50 @@ MAPPING TABLE (call-site -> props -> rendered result vs the G0 BASE block):
 ChatPage.tsx / PlanningPage.tsx: no prop added; selectClassName defaults undefined -> React renders
 NO class attribute; suites green. The new component test asserts the bare default has `class === null`.
 
+
+================================================================================
+G2 — SERVE: BEFORE capture, rebuild, exactly ONE recreate, verify, AFTER capture
+================================================================================
+BEFORE (read-only, old container `229da27d…`, image `sha256:5f5b3ac3…`):
+  served entry   /assets/index-BnyUlS-i.js  (sha256 fc696d21a99543369424b904395e7f2a55364b76ddcad8294c08dac142cd581a, 318415 bytes)
+  SG-143 marker  grep -c "selectClassName" -> 0  (absent; bundle predates this slice)
+  /capture /inbox /catalog -> 200 200 200
+  alembic 20260924_sg114_relation (head)
+  counts provider_call=18 job=9 enrich_snapshot=4 candidate=8 evidence=13 guardrail_event=2 audit_event=68 asset=6 household=1
+
+BUILD (EROFS sandbox workaround, SG-132/SG-142 precedent):
+  $ BUILDX_CONFIG=/tmp/opencode/buildx docker compose build backend
+  Image storagegenie-backend Built   BUILD_EXIT=0   START_BUILD=2026-09-29T09:49:06Z END_BUILD=2026-09-29T09:49:17Z
+
+RECREATE — exactly ONE:
+  $ docker compose up -d --no-deps backend
+   Container storagegenie-backend-1 Recreate / Recreated / Starting / Started   REC_EXIT=0
+   START_REC=2026-09-29T09:49:22Z END_REC=2026-09-29T09:49:23Z
+  container-id CHANGE (M42 — the proof, never RestartCount):
+    BEFORE 229da27dfa7bfccff138ea8013d12379fea40c17a65df12bfbc59b8225578d44
+    AFTER  55d398ed7625cf637f587d863d60c0d114355ca9312b554becdfccd59e71a4de
+  image: BEFORE sha256:5f5b3ac38f9494ff1de020ce8d11233750e6b7f5eedd5a3b9a7608a16114acb9
+         AFTER  sha256:76917528f28bc92a89029dc7ef08bb94cdf8682852a003bd7c53470343601303
+  restarts=0 created=2026-09-29T09:49:22.387840497Z
+
+HEALTH x6 (2026-09-29T09:49:32Z):
+  1..6 = {"status":"ok","db":"ok","storage":"ok"} [http=200] each
+
+GATE:
+  http:80  code=301 redirect=https://storagegenie.dynv6.net/
+  https:443 code=401
+
+ALEMBIC head AFTER: `20260924_sg114_relation (head)` == BEFORE (UNCHANGED, no migration run).
+
+COUNTS AFTER (delta 0 on every table):
+  provider_call 18->18  job 9->9  enrich_snapshot 4->4  candidate 8->8  evidence 13->13
+  guardrail_event 2->2  audit_event 68->68  asset 6->6  household 1->1
+
+3 PAGES through the fresh server: /capture 200  /inbox 200  /catalog 200
+
+AFTER served entry /assets/index-CTQCofuO.js
+  sha256 d9dbdef301177ad9f82f0b1dd290336eb5e10dd47b6d68836eebf14d3cbeb12c  (318152 bytes)
+  SG-143 marker: grep -c "selectClassName" -> 1 ; grep -c "Select household" -> 1
+BUNDLE MARKER DELTA: index-BnyUlS-i.js (fc696d21…, 318415 B) -> index-CTQCofuO.js (d9dbdef3…, 318152 B)
+  CSS entry unchanged: index-DO0gjGV6.css (SG-143 adds no stylesheet bytes). The marker move is exactly
+  the SG-143 build (BEFORE grep proved the old bundle lacked `selectClassName`; AFTER proves it present).
