@@ -5,7 +5,7 @@ Created at the 2026-09-25 D2 close (discharges the long-owed "backlog-file creat
 | Item | Trigger that moves it back |
 |---|---|
 | Context Scene resume (`P1`/`T1b`/`D7` parked; `D132` §1.4 non-goal reopen gate; `D4` second provider for image gen) | Owner resume word (per-arc rhythm `D137`: brainstorm → perform) |
-| Cap-join fix (`F-SG132-5`: `_recorded_spend` inner-joins `Job`, ignores `None`-job rows — live cap sees 0.0067 vs 0.0104 true) | Owner word for a cap-join slice |
+| Cap-join fix (`F-SG132-5`) | CLOSED 2026-09-29 via SG-142 (month-boxed pool, SERVED image `5f5b3ac3`) |
 | Dark-link hue sign-off | CLOSED 2026-09-29 (owner verdict "its ok" = KEEP, D-0929-4, live image `c6fc45ab`) |
 | 12-month window calibration (`LEDGER_RETENTION_MONTHS` UNCALIBRATED `G-A9`; or retire the vehicle) | Owner word |
 | Ledger auto-run / scheduler decision (vehicle exists, never scheduled, `SG-125` REMAINING) | Owner word |
