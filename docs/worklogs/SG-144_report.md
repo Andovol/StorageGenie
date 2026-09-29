@@ -119,9 +119,17 @@ Dispatch-ID: SG-144 | Report: docs/worklogs/SG-144_report.md | Work-HEAD: 03b824
 show_exit=0
 ```
 
-- Final tip dual-annotated (note-anchor inoculation, SG-092 precedent); its fetched `show` is recorded in
-  `SG-144.log` and appended below after the final-tip note was pushed:
-  `<FINAL_TIP_SHOW_PLACEHOLDER>`
+- Final tip `1158109` dual-annotated (note-anchor inoculation, SG-092 precedent); fetched `show` output,
+  verbatim:
+
+```
+$ git notes --ref=refs/notes/storagegenie-coder-reports add -m "Dispatch-ID: SG-144 | Report: docs/worklogs/SG-144_report.md | Work-HEAD: 1158109d0afd01b51567d2abbc3fe2fbeffd1560" 1158109d0afd01b51567d2abbc3fe2fbeffd1560   # add_exit=0
+$ git push origin refs/notes/storagegenie-coder-reports            # 6b764f5..0c43dab push_exit=0
+$ git fetch origin refs/notes/storagegenie-coder-reports:refs/notes/sg144-fetched-final   # fetch_exit=0
+$ git notes --ref=refs/notes/sg144-fetched-final show 1158109d0afd01b51567d2abbc3fe2fbeffd1560
+Dispatch-ID: SG-144 | Report: docs/worklogs/SG-144_report.md | Work-HEAD: 1158109d0afd01b51567d2abbc3fe2fbeffd1560
+show_exit=0
+```
 - `note=yes`
 
 ## Budget — actual versus budget (units stated)
