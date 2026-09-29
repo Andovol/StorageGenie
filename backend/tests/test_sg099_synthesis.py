@@ -429,3 +429,12 @@ def test_one_ledger_row_written_to_the_caller_session(
     assert result.model == provider.model_id
     # The synthesis is returned, never persisted: only the call ledger row exists.
     assert syn_db.query(ProviderCall).count() == 1
+
+
+def test_extract_json_logs_candidate_failures(caplog: pytest.LogCaptureFixture) -> None:
+    with caplog.at_level("DEBUG", logger="app.services.enrich.synthesize"):
+        with pytest.raises(syn.SynthesisFormatError):
+            syn._extract_json("invalid json {also invalid}")
+
+    assert any("Candidate JSON parsing failed" in record.message for record in caplog.records)
+    assert any("Substring candidate JSON parsing failed" in record.message for record in caplog.records)

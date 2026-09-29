@@ -19,6 +19,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import logging
 import re
 from dataclasses import dataclass
 from pathlib import Path
@@ -35,6 +36,8 @@ from app.services.providers.opencode_go import (
     TEXT_MAX_TOKENS,
 )
 from app.services.providers.router import BudgetExceededError
+
+logger = logging.getLogger(__name__)
 
 PROMPTS_DIR = Path(__file__).resolve().parents[1] / "providers" / "prompts"
 SYNTHESIS_PROMPT_FILE = "enrich-synthesis-v1.md"
@@ -180,15 +183,15 @@ def _extract_json(text: str) -> Any:
     for candidate in candidates:
         try:
             return json.loads(candidate)
-        except ValueError:
-            pass
+        except ValueError as exc:
+            logger.debug("Candidate JSON parsing failed: %s", exc)
         start = candidate.find("{")
         end = candidate.rfind("}")
         if start != -1 and end > start:
             try:
                 return json.loads(candidate[start : end + 1])
-            except ValueError:
-                pass
+            except ValueError as exc:
+                logger.debug("Substring candidate JSON parsing failed: %s", exc)
     raise SynthesisFormatError("answer is not parseable JSON")
 
 
