@@ -1,0 +1,40 @@
+SG-153 worklog — merge Batch D: #32 + #35 + #38 + #41 (unserved). Append-only.
+
+2026-09-29 session start. Role Coder (SG-153); no dispatch verb run, no unit started or polled.
+- Contract: recorded /home/andrei/storagegenie-contract/VERSION = 0.40.0; HEAD f26dbd3 (payload RULES.sha256 5b656293…). `.rules-cache/` ABSENT on host (SG-145 F-SG145-1); live checkout is the contract path. Echoed in verify log.
+- Model/effort (CO-78): parent argv /proc/1172432/cmdline = `opencode run --auto --dir /home/andrei/StorageGenie --model opencode-go/deepseek-v4.1-flash --variant high`. Model opencode-go/deepseek-v4.1-flash, effort high.
+- BASE ref origin/automation resolved c035b3ad8ecdc91e5223113b4c23d3ca9542f4b5 (ref == commit). Branch automation, tree clean, remote git@github.com:Andovol/StorageGenie.git.
+
+Fetch the four pull-ref heads (refs/pull/N/head -> origin/pr/N):
+- #35 fetched first try; #32, #38, #41 each hit a transient `Permission denied (publickey)` and succeeded on retry (1-3 attempts). No privileged operation; `ssh -T git@github.com` succeeded. Resolved heads: #32 cd8e7ec2732476126eca2e1eb45922fe291c0724, #35 4398795ac0a62698f3184ad612aa8c8f75559ea9, #38 0809ba8a6ee7322f1efb13671844a396e8a93e3d, #41 aa9dfed6c91c4db0c1f0a406910e5b0c3035e169.
+
+Premise verification before any edit:
+- Touched files (runtime enumeration from the four diffs): .jules/bolt.md, backend/app/services/expiry_engine.py (#32); backend/app/models/__init__.py (#35); backend/app/services/enrich/synthesize.py, backend/tests/test_sg099_synthesis.py (#38); backend/app/services/candidates.py (#41). Six files, one per PR path; no fifth file.
+- merge-base blob == BASE blob for every touched file EXCEPT candidates.py (base 7c2e981 vs merge-base 3a6f919) — expected: SG-151 already landed #39's candidates change. #41 therefore needs 3-way (checked and clean).
+- test files exist; alembic single head 20260924_sg114_relation; synthesize.py:192 SynthesisFormatError confirmed.
+- Interpreter: backend/venv (Python 3.12.3); repo-root venv/ lacks pillow_heif (SG-152 finding, unchanged).
+
+G0 — land #32 + #35:
+- `git apply --3way` pr32.patch + pr35.patch: clean, exit 0. Landed blobs IDENTICAL to heads: bolt.md bcbe3b28, expiry_engine.py a7f6c31c, models/__init__.py 85b11319.
+- #32 semantics hardware: probe32.py loads the BASE expiry_engine file as a separate module and runs BASE vs candidate compute_status on one dataset (reachable states + one deliberate unreachable edge). Result: assertion SELECTs 15 (BASE) -> 1 (candidate); full result identical on every reachable state (reachable_map_mismatch_count 0). One DIVERGENCE on the deliberately UNREACHABLE edge `two_accepted_classification_EDGE` (two accepted classifications, newest invalid JSON): BASE skips the asset, candidate falls through to the older valid slug. Reachability: both write services maintain at most one active/accepted assertion per (asset, field) — assertion_service.upsert_assertion supersedes the previous accepted; expiry_tracker._write_assertion supersedes the previous active. So the divergent state cannot be produced through the app; it is reported as F-SG153-1, not silently resolved.
+- Tie-break quote: both paths order by `Assertion.created_at.desc()` with no secondary key; ties are unreachable for these maps because at most one active/accepted assertion per (asset, field) exists. No test pins tie behavior.
+- #35: AST-eval of BASE __all__ set vs landed set -> SETS_EQUAL (21 names); `import app.models` ok, 21 unique names, no missing attrs.
+- Affected tests #32/#35 legs: test_sg107_expiry_engine.py + test_sg111_lifecycle.py -> 30 passed.
+- Committed G0: c846500.
+
+G1 — land #38 + #41:
+- `git apply --3way` pr38.patch + pr41.patch: clean, exit 0. #38 landed blobs IDENTICAL (synthesize.py 7ebd4b5a, test_sg099_synthesis.py ff2c13f6). #41 landed blob differs from head only because SG-151's #39 change is in the base; the applied #41 hunk (headers stripped) is byte-identical to the head hunk -> HUNK_IDENTICAL.
+- #38 fail-pre: candidate test file overlaid on a BASE archive (git archive origin/automation) -> test_extract_json_logs_candidate_failures RED, failing on `assert any("Candidate JSON parsing failed" ...)` (base has no logger). Pass-post at candidate -> 1 passed. Test asserts BOTH debug messages through the real _extract_json("invalid json {also invalid}") and the terminal SynthesisFormatError; it drives both changed lines.
+- #41 order/value differential: probe41.py run in two subprocesses (BASE archive vs candidate), canonical label-normalised JSON, ordered scenarios S1 missing-first / S2 foreign-first / S3 decided-first / S4 blocked-first / S5 blocked-resolved+good / S6 good-only. Behavior fields (outcomes, status codes 404/403/409/409, messages, return winner/losers/resolved, candidate states, task status counts) IDENTICAL. Only the loser fetch changes: db statement counts equal except S5 10->9 (the loser batch fetch replaces one query per loser with one `.in_()` query). S6 1 loser -> same count 7.
+- Derived affected suites: 87 passed.
+- Committed G1: a5c0b88 = WORK_HEAD.
+
+G2 — gates:
+- FULL backend suite: 2 failed, 649 passed, 32 warnings in 32.98s. Red = test_signals.py::test_generated_codes_are_validated_and_bad_checksum_is_not_an_identifier + test_signals.py::test_ocr_has_text_boxes_and_mean_confidence — the known SG-151/152 base-reds, identical. Blast radius: +1 green vs recorded BASE 2/648 = exactly the new #38 test; no other delta.
+- ruff check . -> All checks passed!
+- mypy app -> Found 41 errors in 9 files (checked 90 source files); delta 0 vs recorded BASE 41/9.
+- secret scan over added diff lines -> no match (exit 1). CO-100 clean.
+- Diff ceiling vs BASE: exactly the six PR files, 112 insertions / 14 deletions.
+
+Decision: terminal class CHANGED. F-SG153-1 (#32 unreachable-edge fall-through) reported loudly, not resolved; reachable semantics preserved, blob/hunk identity proven for all four.
+Receipt: WORK_HEAD note added + pushed + verified from mapped fetch (show_wh_exit=0).

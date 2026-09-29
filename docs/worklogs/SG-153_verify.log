@@ -1,0 +1,158 @@
+SG-153 verify log — captured command output, verbatim (temp SQLite; no live DB, no rebuild, no deploy)
+
+== Live clock / model-effort provenance (CO-78) ==
+$ date -u +%Y-%m-%dT%H:%M:%SZ
+2026-09-29T15:05:18Z
+$ tr '\0' '\n' < /proc/1172432/cmdline | head -10   # my parent (opencode run) argv flags
+opencode
+run
+--auto
+--dir
+/home/andrei/StorageGenie
+--model
+opencode-go/deepseek-v4.1-flash
+--variant
+high
+# SG-153 — merge Batch D: independents (#32 + #35 + #38 + #41, unserved)
+
+== Contract (recorded == published) and BASE resolve ==
+$ cat /home/andrei/storagegenie-contract/VERSION; git -C /home/andrei/storagegenie-contract rev-parse HEAD; sha256sum /home/andrei/storagegenie-contract/RULES.md
+0.40.0
+f26dbd32e3c4bd7cf878333fba719a6ca1d10c3c
+5b65629377bbac9e40bfa7e2f4d4e42a5667b3a08ec786beb47c6a677d9ac33c  /home/andrei/storagegenie-contract/RULES.md
+$ git rev-parse origin/automation HEAD
+c035b3ad8ecdc91e5223113b4c23d3ca9542f4b5
+a5c0b88c96a7d3b1df724ebb83386b441c21cbe8
+
+== Premise: PR heads, touched files, merge-base vs BASE blobs ==
+PR #32 head = cd8e7ec2732476126eca2e1eb45922fe291c0724
+PR #35 head = 4398795ac0a62698f3184ad612aa8c8f75559ea9
+PR #38 head = 0809ba8a6ee7322f1efb13671844a396e8a93e3d
+PR #41 head = aa9dfed6c91c4db0c1f0a406910e5b0c3035e169
+$ git diff --name-status <merge-base> origin/pr/N  (files touched per PR)
+--- PR #32 (mb aa842682ee59da0363660855d3135f979ebfba1c) ---
+M	.jules/bolt.md
+M	backend/app/services/expiry_engine.py
+--- PR #35 (mb 9fc1141e92604966b861e4b41c8bddd2087478f7) ---
+M	backend/app/models/__init__.py
+--- PR #38 (mb 9fc1141e92604966b861e4b41c8bddd2087478f7) ---
+M	backend/app/services/enrich/synthesize.py
+M	backend/tests/test_sg099_synthesis.py
+--- PR #41 (mb 9fc1141e92604966b861e4b41c8bddd2087478f7) ---
+M	backend/app/services/candidates.py
+$ merge-base blob vs BASE blob per touched file (SAME => head applies byte-exact)
+pr#32 .jules/bolt.md                                       mb=d09b4750644e base=d09b4750644e SAME
+pr#32 backend/app/services/expiry_engine.py                mb=f6ae1593f177 base=f6ae1593f177 SAME
+pr#35 backend/app/models/__init__.py                       mb=e430f5bd5856 base=e430f5bd5856 SAME
+pr#38 backend/app/services/enrich/synthesize.py            mb=c39447cac6d5 base=c39447cac6d5 SAME
+pr#38 backend/tests/test_sg099_synthesis.py                mb=94f74933b209 base=94f74933b209 SAME
+pr#41 backend/app/services/candidates.py                   mb=3a6f919e10f5 base=7c2e9818653e DIFFER
+$ alembic heads
+20260924_sg114_relation (head)
+$ ls test files
+16521 backend/tests/test_sg099_synthesis.py
+20407 backend/tests/test_sg107_expiry_engine.py
+17234 backend/tests/test_sg112_merge.py
+
+== G0: 3-way applicability of every PR hunk before edit ==
+--- PR #32 ---
+Applied patch to '.jules/bolt.md' cleanly.
+Applied patch to 'backend/app/services/expiry_engine.py' cleanly.
+exit=0
+--- PR #35 ---
+Applied patch to 'backend/app/models/__init__.py' cleanly.
+exit=0
+--- PR #38 ---
+Applied patch to 'backend/app/services/enrich/synthesize.py' cleanly.
+Applied patch to 'backend/tests/test_sg099_synthesis.py' cleanly.
+exit=0
+--- PR #41 ---
+Applied patch to 'backend/app/services/candidates.py' cleanly.
+exit=0
+
+== G0: landed blob-identity proof (#32, #35) ==
+pr#32 .jules/bolt.md                                     landed=bcbe3b284b08 head=bcbe3b284b08 IDENTICAL
+pr#32 backend/app/services/expiry_engine.py              landed=a7f6c31c18f6 head=a7f6c31c18f6 IDENTICAL
+pr#35 backend/app/models/__init__.py                     landed=85b11319f8b4 head=85b11319f8b4 IDENTICAL
+
+== G0: #32 BASE-vs-candidate differential (batch map semantics + query count) ==
+base_assertion_selects: 15
+cand_assertion_selects: 1
+full_result_equal: False
+  DIVERGES two_accepted_classification_EDGE: base_row=None cand_row={'asset_id': '01a0edb2-e3e2-79b2-969b-470e81e3ba7e', 'display_name': 'two_accepted_classification_EDGE', 'category': 'food_beverages', 'expiry_date': '2026-06-01', 'date_type': 'expiry_date', 'days_remaining': 92, 'tier': 'safe', 'bucket': 'safe'} base_unres=None cand_unres=None
+map_mismatch_count: 1
+  MISMATCH ('classification', '01a0edb2-e3e2-79b2-969b-470e81e3ba7e', None, 'food_beverages') name= two_accepted_classification_EDGE
+reachable_map_mismatch_count: 0
+cand_has_batch_func: True
+base_has_batch_func: False
+
+== G0: #35 BASE __all__ SET vs landed SET (AST literal eval), import check ==
+['Assertion', 'Asset', 'AssetRelation', 'AuditEvent', 'Base', 'EnrichSnapshot', 'Evidence', 'GuardrailEvent', 'Household', 'IdempotencyKey', 'Job', 'JobStep', 'Location', 'PlanningSuggestion', 'ProviderCall', 'ReviewTask', 'SavedSearch', 'SourceAttribution', 'User', 'asset_evidence', 'asset_location']
+['Assertion', 'Asset', 'AssetRelation', 'AuditEvent', 'Base', 'EnrichSnapshot', 'Evidence', 'GuardrailEvent', 'Household', 'IdempotencyKey', 'Job', 'JobStep', 'Location', 'PlanningSuggestion', 'ProviderCall', 'ReviewTask', 'SavedSearch', 'SourceAttribution', 'User', 'asset_evidence', 'asset_location']
+$ set-difference (empty == equal)
+SETS_EQUAL
+import_ok 21 21
+missing_attrs []
+
+== G0: affected tests (#32 / #35 legs) ==
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+30 passed, 2 warnings in 2.52s
+
+== G1: landed blob-identity proof (#38 exact; #41 hunk-exact on moved base) ==
+pr#38 backend/app/services/enrich/synthesize.py          landed=7ebd4b5ad0f2 head=7ebd4b5ad0f2 IDENTICAL
+pr#38 backend/tests/test_sg099_synthesis.py              landed=ff2c13f6da2c head=ff2c13f6da2c IDENTICAL
+$ diff <(PR#41 hunk) <(landed-vs-BASE hunk)  # empty == hunk byte-identical
+HUNK_IDENTICAL
+
+== G1: #41 check-order + value differential (base archive vs candidate) ==
+$ diff of behavior fields (db_statements removed) — empty == identical order/values
+BEHAVIOR_IDENTICAL
+$ per-scenario db statement counts (base vs candidate) — only the loser fetch drops
+    "db_statements": 2,	    "db_statements": 2,
+    "db_statements": 2,	    "db_statements": 2,
+    "db_statements": 2,	    "db_statements": 2,
+    "db_statements": 3,	    "db_statements": 3,
+    "db_statements": 10,	    "db_statements": 9,
+    "db_statements": 7,	    "db_statements": 7,
+
+== G1: #38 fail-pre (candidate test vs BASE source archive) ==
+>       assert any("Candidate JSON parsing failed" in record.message for record in caplog.records)
+E       assert False
+E        +  where False = any(<generator object test_extract_json_logs_candidate_failures.<locals>.<genexpr> at 0x747fe5e758a0>)
+
+tests/test_sg099_synthesis.py:439: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_sg099_synthesis.py::test_extract_json_logs_candidate_failures
+1 failed in 0.37s
+
+== G1: #38 pass-post (candidate node) ==
+.                                                                        [100%]
+1 passed in 0.31s
+
+== G1: derived affected suites (candidate) ==
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+87 passed, 11 warnings in 6.61s
+
+== G2: FULL backend suite (committed capture from the authoritative run) ==
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/test_signals.py::test_generated_codes_are_validated_and_bad_checksum_is_not_an_identifier
+FAILED tests/test_signals.py::test_ocr_has_text_boxes_and_mean_confidence - a...
+2 failed, 649 passed, 32 warnings in 32.98s
+
+== G2: ruff / mypy / secret scan / diff ceiling ==
+All checks passed!
+app/main.py:64: error: Unused "type: ignore" comment  [unused-ignore]
+Found 41 errors in 9 files (checked 90 source files)
+$ git diff $BASE HEAD | grep '^+' | grep -inE 'password|secret|api[_-]?key|token|private[ _-]?key|AKIA|ghp_|sk-|credential'
+secret_scan_exit=1 (1 = no match)
+$ git diff --stat $BASE HEAD
+ .jules/bolt.md                            |  4 ++
+ backend/app/models/__init__.py            |  8 +--
+ backend/app/services/candidates.py        |  5 +-
+ backend/app/services/enrich/synthesize.py | 11 ++--
+ backend/app/services/expiry_engine.py     | 89 +++++++++++++++++++++++++++++--
+ backend/tests/test_sg099_synthesis.py     |  9 ++++
+ 6 files changed, 112 insertions(+), 14 deletions(-)
