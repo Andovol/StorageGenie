@@ -18,3 +18,4 @@ Created at the 2026-09-25 D2 close (discharges the long-owed "backlog-file creat
 | Brittle reader line-pin (accepted risk; caller-set assertion retires it when next touched) | Next slice touching the pin |
 
 Retired here, never reopened without a new shape: `sg026`-freeze (`D18`, `NOT FIXABLE`).
+| `F-SG144-1` runbook test-interpreter weakness (`README.md:78-82` root venv lacks `pillow_heif`; working interpreter is `backend/venv`) | Owner word or next runbook-touching slice |
