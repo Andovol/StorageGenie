@@ -1,5 +1,9 @@
 # Bolt's Performance Journal
 
+## 2026-09-28 - Batch Fetching Classification and Expiry Assertions in Expiry Engine
+**Learning:** `expiry_engine.compute_status` iterated over all active assets and executed 2 to 3 SQL queries per asset on the `Assertion` table to fetch classification and expiry details ($2N$ to $3N$ queries). Batching active assertion retrieval via `Assertion.asset_id.in_(asset_ids)` into a single query reduces database round-trips from $O(N)$ to $O(1)$.
+**Action:** Always pre-fetch asset assertion maps using `.in_(asset_ids)` before looping over asset lists in calculation engines or summary endpoints.
+
 ## 2026-09-28 - Inverted Token Index & Sub-scoring Caching for Taxonomy Search
 **Learning:** Fuzzy Jaccard string matching against ~5,500 taxonomy nodes creates a severe CPU bottleneck (~4.3ms/call) when linearly iterating all entries. Building an inverted token index (`dict[str, tuple[int, ...]]`) restricts scoring to entries sharing >=1 token, cutting candidate evaluation from 5,500 down to 10-50 entries. Decorating the candidate scoring function (`_score_candidates(proposal_tokens)`) rather than top-level resolution functions with `@lru_cache` allows tests/code to monkeypatch threshold attributes while still caching search results.
 **Action:** For large set-similarity searches, build an inverted index on tokens to prune disjoint items before computing distance. Cache candidate scoring on hashable token sets rather than top-level gate functions when gate thresholds may be dynamic or monkeypatched in tests.

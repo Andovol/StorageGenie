@@ -149,8 +149,7 @@ def _parse_expiry_value(value_json: str) -> tuple[date, str | None] | None:
     return expiry, (date_type if isinstance(date_type, str) else None)
 
 
-def _unresolved_reason(db: Session, asset_id: str) -> str:
-    latest = _latest_active_expiry(db, asset_id)
+def _unresolved_reason_from_assertion(latest: Assertion | None) -> str:
     if latest is None:
         return "dateless"
     if latest.review_state == "proposed":
@@ -158,6 +157,75 @@ def _unresolved_reason(db: Session, asset_id: str) -> str:
     if latest.review_state == "needs_evidence":
         return "needs_evidence"
     return "dateless"
+
+
+def _unresolved_reason(db: Session, asset_id: str) -> str:
+    latest = _latest_active_expiry(db, asset_id)
+    return _unresolved_reason_from_assertion(latest)
+
+
+def _process_classification_assertion(
+    assertion: Assertion, accepted_classification_map: dict[str, str]
+) -> None:
+    asset_id = assertion.asset_id
+    if assertion.review_state == "accepted" and asset_id not in accepted_classification_map:
+        try:
+            val = json.loads(assertion.value_json)
+            if isinstance(val, dict):
+                slug = val.get("category")
+                if isinstance(slug, str) and slug:
+                    accepted_classification_map[asset_id] = slug
+        except json.JSONDecodeError:
+            pass
+
+
+def _process_expiry_assertion(
+    assertion: Assertion,
+    accepted_expiry_map: dict[str, Assertion],
+    latest_active_expiry_map: dict[str, Assertion],
+) -> None:
+    asset_id = assertion.asset_id
+    if asset_id not in latest_active_expiry_map:
+        latest_active_expiry_map[asset_id] = assertion
+    if assertion.review_state == "accepted" and asset_id not in accepted_expiry_map:
+        accepted_expiry_map[asset_id] = assertion
+
+
+def _fetch_expiry_assertion_maps(
+    db: Session, asset_ids: list[str]
+) -> tuple[dict[str, str], dict[str, Assertion], dict[str, Assertion]]:
+    """Batch-fetch active classification and expiry assertions for asset IDs.
+
+    Performance optimization (N+1 query elimination):
+    Instead of executing 2-3 per-asset queries for classification and expiry
+    assertions inside a loop over assets, batch-fetch all active assertions
+    for all active asset IDs in a single query.
+    """
+    accepted_classification_map: dict[str, str] = {}
+    accepted_expiry_map: dict[str, Assertion] = {}
+    latest_active_expiry_map: dict[str, Assertion] = {}
+
+    if not asset_ids:
+        return accepted_classification_map, accepted_expiry_map, latest_active_expiry_map
+
+    assertions = (
+        db.query(Assertion)
+        .filter(
+            Assertion.asset_id.in_(asset_ids),
+            Assertion.field_path.in_([CLASSIFICATION_FIELD, EXPIRY_FIELD]),
+            Assertion.review_state.not_in(("superseded", "rejected")),
+        )
+        .order_by(Assertion.created_at.desc())
+        .all()
+    )
+
+    for assertion in assertions:
+        if assertion.field_path == CLASSIFICATION_FIELD:
+            _process_classification_assertion(assertion, accepted_classification_map)
+        elif assertion.field_path == EXPIRY_FIELD:
+            _process_expiry_assertion(assertion, accepted_expiry_map, latest_active_expiry_map)
+
+    return accepted_classification_map, accepted_expiry_map, latest_active_expiry_map
 
 
 def compute_status(
@@ -179,13 +247,19 @@ def compute_status(
         .order_by(Asset.id)
         .all()
     )
+
+    asset_ids = [asset.id for asset in assets]
+    classification_map, accepted_expiry_map, latest_active_expiry_map = (
+        _fetch_expiry_assertion_maps(db, asset_ids)
+    )
+
     for asset in assets:
-        slug = _accepted_classification_slug(db, asset.id)
+        slug = classification_map.get(asset.id)
         if slug is None:
             continue
         if category is not None and slug != category:
             continue
-        accepted = _accepted_expiry(db, asset.id)
+        accepted = accepted_expiry_map.get(asset.id)
         if accepted is not None:
             parsed = _parse_expiry_value(accepted.value_json)
             if parsed is None:
@@ -207,7 +281,12 @@ def compute_status(
             )
             continue
         unresolved_rows.append(
-            {"asset_id": asset.id, "reason": _unresolved_reason(db, asset.id)}
+            {
+                "asset_id": asset.id,
+                "reason": _unresolved_reason_from_assertion(
+                    latest_active_expiry_map.get(asset.id)
+                ),
+            }
         )
 
     rows.sort(key=lambda row: (row["days_remaining"], row["asset_id"]))
