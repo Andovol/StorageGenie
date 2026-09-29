@@ -6,7 +6,7 @@
 **Origin remote (as on host):** `git@github.com:Andovol/StorageGenie.git` (fetch+push)
 **BASE (packet ref `origin/automation` requested → resolved):** `b157618c0a76f2faae002cb5c3457a0c08fb02ab`
 (start HEAD was that same commit — the packet's `BASE REF` is a ref, the resolved commit is stated separately).
-**WORK_HEAD:** `__WORK_HEAD__`
+**WORK_HEAD:** `bd4f3acff8ae07f8995279714a05db6ca0d81d94`
 **Contract:** recorded `0.40.0` == published — source path `/home/andrei/storagegenie-contract/VERSION`
 (`0.40.0`); `git -C /home/andrei/storagegenie-contract rev-parse HEAD` = `f26dbd32e3c4bd7cf878333fba719a6ca1d10c3c`
 (commit subject `Contract payload 0.40.0`); `RULES.sha256` = `5b65629377bbac9e40bfa7e2f4d4e42a5667b3a08ec786beb47c6a677d9ac33c`.
@@ -149,7 +149,7 @@ Written: `docs/worklogs/SG-145.log`, `SG-145_report.md`, `SG-145_verify.log` (pr
 producing-code reads, diff-ceiling). **Diff ceiling — exactly the 3 worklogs, nothing else:**
 
 ```
-$ git diff --name-only origin/automation..__WORK_HEAD__
+$ git diff --name-only origin/automation..bd4f3acff8ae07f8995279714a05db6ca0d81d94
 docs/worklogs/SG-145.log
 docs/worklogs/SG-145_report.md
 docs/worklogs/SG-145_verify.log
@@ -169,7 +169,17 @@ docs/worklogs/SG-145_verify.log
 
 - Work pushed to `automation`; worktree clean (`CO-55`). No `storagegenie-evidence` push, no
   `{{RECEIPT_CMD}}`.
-__RECEIPT_SHOW__
+- Note added on WORK_HEAD `bd4f3ac`, then `refs/notes/storagegenie-coder-reports` pushed and verified from a
+  **mapped** fetch (`refs/notes/sg145-fetched`); executed output, verbatim:
+
+```
+$ git notes --ref=refs/notes/storagegenie-coder-reports add -m "Dispatch-ID: SG-145 | Report: docs/worklogs/SG-145_report.md | Work-HEAD: bd4f3acff8ae07f8995279714a05db6ca0d81d94" bd4f3acff8ae07f8995279714a05db6ca0d81d94   # add_exit=0
+$ git push origin refs/notes/storagegenie-coder-reports            # e5c0e00..f8a4ede push_exit=0
+$ git fetch origin refs/notes/storagegenie-coder-reports:refs/notes/sg145-fetched   # fetch_exit=0
+$ git notes --ref=refs/notes/sg145-fetched show bd4f3acff8ae07f8995279714a05db6ca0d81d94
+Dispatch-ID: SG-145 | Report: docs/worklogs/SG-145_report.md | Work-HEAD: bd4f3acff8ae07f8995279714a05db6ca0d81d94
+show_exit=0
+```
 
 ## Budget — actual versus budget (units stated)
 
