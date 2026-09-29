@@ -9,7 +9,7 @@ from typing import Sequence, Union
 
 from alembic import op
 
-from app.services.fts import install_asset_fts
+from app.services.fts import ddl_statements, install_asset_fts
 
 
 revision: str = "20260908_sg017_fts"
@@ -19,6 +19,13 @@ depends_on: Union[str, Sequence[str], None] = None
 
 
 def upgrade() -> None:
+    if op.get_context().as_sql:
+        # Offline (``--sql``) mode binds a MockConnection that has no
+        # ``exec_driver_sql``; render the DDL through Alembic instead. The
+        # rebuild needs live rows and stays online-only.
+        for statement in ddl_statements():
+            op.execute(statement)
+        return
     install_asset_fts(op.get_bind(), rebuild=True)
 
 

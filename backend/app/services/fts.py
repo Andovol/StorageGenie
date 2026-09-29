@@ -31,15 +31,22 @@ def sanitize_fts_query(value: str) -> str:
     return " ".join('"' + part.replace('"', '""') + '"' for part in parts)
 
 
-def _ddl(connection: Connection) -> None:
-    connection.exec_driver_sql(
+def ddl_statements() -> tuple[str, ...]:
+    """Return the FTS DDL statements in creation order.
+
+    Exposed separately from :func:`_ddl` so the Alembic revision can render the
+    same statements through ``op.execute`` in offline (``--sql``) mode, where
+    ``op.get_bind()`` is a ``MockConnection`` without ``exec_driver_sql``. The
+    online path keeps emitting the identical strings through
+    ``exec_driver_sql``.
+    """
+
+    return (
         """
         CREATE VIEW IF NOT EXISTS asset_fts_content AS
         SELECT rowid AS rowid, id AS asset_id, display_name, household_id
         FROM asset
-        """
-    )
-    connection.exec_driver_sql(
+        """,
         """
         CREATE VIRTUAL TABLE IF NOT EXISTS asset_fts USING fts5(
             asset_id UNINDEXED,
@@ -48,9 +55,7 @@ def _ddl(connection: Connection) -> None:
             content='asset_fts_content',
             content_rowid='rowid'
         )
-        """
-    )
-    connection.exec_driver_sql(
+        """,
         """
         CREATE TRIGGER IF NOT EXISTS asset_fts_after_insert
         AFTER INSERT ON asset
@@ -58,9 +63,7 @@ def _ddl(connection: Connection) -> None:
             INSERT INTO asset_fts(rowid, asset_id, display_name, household_id)
             VALUES (new.rowid, new.id, new.display_name, new.household_id);
         END
-        """
-    )
-    connection.exec_driver_sql(
+        """,
         """
         CREATE TRIGGER IF NOT EXISTS asset_fts_after_update
         AFTER UPDATE OF id, display_name, household_id ON asset
@@ -70,9 +73,7 @@ def _ddl(connection: Connection) -> None:
             INSERT INTO asset_fts(rowid, asset_id, display_name, household_id)
             VALUES (new.rowid, new.id, new.display_name, new.household_id);
         END
-        """
-    )
-    connection.exec_driver_sql(
+        """,
         """
         CREATE TRIGGER IF NOT EXISTS asset_fts_after_delete
         AFTER DELETE ON asset
@@ -80,8 +81,13 @@ def _ddl(connection: Connection) -> None:
             INSERT INTO asset_fts(asset_fts, rowid, asset_id, display_name, household_id)
             VALUES ('delete', old.rowid, old.id, old.display_name, old.household_id);
         END
-        """
+        """,
     )
+
+
+def _ddl(connection: Connection) -> None:
+    for statement in ddl_statements():
+        connection.exec_driver_sql(statement)
 
 
 def rebuild_asset_fts(connection: Connection) -> None:

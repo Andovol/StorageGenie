@@ -1,0 +1,48 @@
+# SG-146 — offline `--sql` FTS fix (repo slice, unserved) — Coder log
+
+Role: Coder (never Architect — no dispatch verb run, no unit started or polled for any ID).
+Work dir: /home/andrei/StorageGenie
+Model/effort: opencode-go/deepseek-v4.1-flash / high (from /proc/878997/cmdline, not identity line).
+Live clock first capture: 2026-09-29T10:51Z (G0 run ~10:53Z, commit ~11:0xZ).
+
+## Chronology
+
+- 10:5x — Session start; read AGENTS.md values/method routing; confirmed BASE
+  `origin/automation` = `6edd1be775ed79f69819f50b7784dc09040beed4` = start HEAD.
+- 10:5x — Premise check: `.rules-cache/` absent on host (SG-145 F-SG145-1 confirmed); host contract
+  checkout is `/home/andrei/storagegenie-contract` (VERSION 0.40.0, HEAD f26dbd3, RULES.sha256
+  5b656293…). fts.py exec_driver_sql at 35/42/53/63/75 confirmed; sg017:22 confirmed; alembic heads
+  single `20260924_sg114_relation` confirmed.
+- 10:53 — G0 fail-pre at BASE: `backend/venv/bin/alembic upgrade head --sql` → EXIT=1, 259 lines,
+  sha256 827323e3df69b7122a889fae36f8d3310162c668dab0aff4252ef7b8aba9d686 — byte-identical to SG-145's
+  drive. Aborts at `20260908_sg017_fts` with `AttributeError: 'MockConnection' object has no attribute
+  'exec_driver_sql'`.
+- 10:54 — G1: read write path (fts.py full, sg017) and read path (env.py offline branch, FTS query at
+  assets.py). Confirmed MockConnection is `sqlalchemy.engine.mock.MockConnection` (has `.execute`,
+  no `.exec_driver_sql`); `op.execute` → `DefaultImpl._exec` renders to `static_output` offline.
+  Chose the helper-split shape: extract `ddl_statements()` from `_ddl`; migration emits through
+  `op.execute` offline and keeps `install_asset_fts` online (so online DDL bytes are untouched).
+- 10:54 — Edited `backend/app/services/fts.py` (helper split) and
+  `backend/alembic/versions/20260908_sg017_fts.py` (offline branch + online-only rebuild gate).
+- 10:55 — Re-ran offline CLI: EXIT=1 again, but now FTS DDL emits and the run advances past sg017.
+  NEW offender revealed: `20260916_sg048_name_optional.py:36` `_drop_fts` also calls
+  `exec_driver_sql` (the packet named only sg017). sg048 is NOT in the write ceiling.
+- 10:55 — Read sg048 in full. It also uses `op.batch_alter_table("asset")` at :55/:73.
+- 10:56 — Read-only probe (in-process monkeypatch of `MockConnection.exec_driver_sql` in a /tmp script;
+  no repo write): with sg048's exec_driver_sql hypothetically mock-safe, the run still raises
+  `CommandError: ... batch mode with dialect sqlite requires a live database connection ... to reflect
+  the table "asset" ... copy_from`. So sg048 needs a substantive change, not a one-line one.
+- 10:56 — Packet substring check: the emitted statement is
+  `CREATE VIRTUAL TABLE IF NOT EXISTS asset_fts ...`; the packet's literal acceptance substring
+  `CREATE VIRTUAL TABLE asset_fts` occurs **0** times. As written the G2 assertion cannot pass.
+- 10:57 — Gates: ruff clean; mypy 41 errors before == 41 after (zero delta, touched files absent from
+  the error list); `alembic heads` single sg114 unchanged; credential-pattern scan clean (only the
+  English word "token" in the FTS docstring matches a blunt case-insensitive scan).
+- 10:57 — Full backend suite: 2 failed, 635 passed — identical to the packet's stated base pair
+  (`test_signals.py` decoder env pair); no blast-radius delta from the partial fix.
+- 10:58 — Verdict: **BLOCKED**. The acceptance criterion (exit 0 + all 7 post-FTS markers) is
+  unreachable within the write ceiling, because exit 0 requires writing `20260916_sg048_name_optional.py`
+  (both the `exec_driver_sql` and the `batch_alter_table`/`copy_from` problem). Per the ceiling,
+  "Any other write is a STOP." The within-ceiling sg017 + fts.py fix is committed as partial progress.
+- 11:0x — Report + verify log written; BLOCKED commit pushed; receipt note on WORK_HEAD; dual-annotate
+  final tip.

@@ -1,0 +1,184 @@
+# SG-146 verify log — raw captures (offline SQL generation + gates)
+
+All commands run from `/home/andrei/StorageGenie`. Bounds: ordinary 120s, suite 600s.
+No database opened by any `--sql` run; no live-DB write; no secret printed.
+
+## Contract echo (source path + values)
+
+```
+$ cat /home/andrei/storagegenie-contract/VERSION
+0.40.0
+$ git -C /home/andrei/storagegenie-contract rev-parse HEAD
+f26dbd32e3c4bd7cf878333fba719a6ca1d10c3c
+$ git -C /home/andrei/storagegenie-contract log -1 --format='%s'
+Contract payload 0.40.0
+$ cat /home/andrei/storagegenie-contract/RULES.sha256
+5b65629377bbac9e40bfa7e2f4d4e42a5667b3a08ec786beb47c6a677d9ac33c RULES.md
+```
+Recorded `0.40.0` == published `f26dbd3…`; payload hash matches AGENTS.md `5b656293…`. `.rules-cache/`
+is absent on the host (SG-145 F-SG145-1); the live checkout is the path above.
+
+## Environment
+
+```
+$ backend/venv/bin/python -c "import alembic, sqlalchemy; print(alembic.__version__, sqlalchemy.__version__)"
+1.19.1 2.0.52
+$ cd backend && venv/bin/alembic heads
+20260924_sg114_relation (head)        # single head, before the slice
+```
+
+## G0 — reproduce the fail-pre at BASE (REAL CLI, offline, 300s class)
+
+```
+$ cd backend && timeout 300 venv/bin/alembic upgrade head --sql > /tmp/opencode/sg146/G0_offline_base.txt 2>&1
+EXIT=1
+LINES=259
+SHA=827323e3df69b7122a889fae36f8d3310162c668dab0aff4252ef7b8aba9d686
+```
+Same file as SG-145's drive (same line count, same sha256). Tail (the abort):
+
+```
+  File "/home/andrei/StorageGenie/backend/alembic/versions/20260908_sg017_fts.py", line 22, in upgrade
+    install_asset_fts(op.get_bind(), rebuild=True)
+  File "/home/andrei/StorageGenie/backend/app/services/fts.py", line 104, in install_asset_fts
+    _ddl(connection)
+  File "/home/andrei/StorageGenie/backend/app/services/fts.py", line 35, in _ddl
+    connection.exec_driver_sql(
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'MockConnection' object has no attribute 'exec_driver_sql'
+```
+On stdout, 4 `-- Running upgrade` comments emit (core → sg013 → sg014 → sg017); the abort happens
+inside sg017, so only 3 revisions produce SQL. STOP condition checked: exit is NOT already 0 at BASE.
+
+## G1 — offline rendering mechanism verified against the installed lib
+
+`MockConnection` = `sqlalchemy.engine.mock.MockConnection` (`alembic/runtime/migration.py:23,36,672`
+via `MockEngineStrategy.MockConnection = MockConnection`). It exposes `.execute(obj, params)` whose
+impl is Alembic's `dump` → `impl._exec`; with `as_sql=True`, `DefaultImpl._exec`
+(`alembic/ddl/impl.py:209-237`) compiles the construct and writes `static_output`. Hence
+`op.execute(str)` renders offline. Online path is left on `exec_driver_sql` (byte-identical).
+
+Helper-split diff shape: `fts.py` gains `ddl_statements() -> tuple[str, ...]`; `_ddl` becomes
+`for statement in ddl_statements(): connection.exec_driver_sql(statement)`. sg017 `upgrade()` adds an
+`if op.get_context().as_sql:` branch that emits each statement through `op.execute` and returns before
+the online-only `install_asset_fts(..., rebuild=True)`.
+
+## G2 fail-post (partial) — FTS DDL now renders, second offender exposed
+
+```
+$ cd backend && timeout 300 venv/bin/alembic upgrade head --sql > /tmp/opencode/sg146/G2_offline_post.txt 2>&1
+EXIT=1
+LINES=384
+$ grep -n -- "-- Running upgrade" /tmp/opencode/sg146/G2_offline_post.txt
+10:-- Running upgrade  -> 0201cf10c56c
+176:-- Running upgrade 0201cf10c56c -> 20260908_sg013_observation
+195:-- Running upgrade 20260908_sg013_observation -> 20260908_sg014_candidate
+219:-- Running upgrade 20260908_sg014_candidate -> 20260908_sg017_fts
+259:-- Running upgrade 20260908_sg017_fts -> 20260912_sg025_provider_call
+286:-- Running upgrade 20260912_sg025_provider_call -> 20260914_sg035_foundations
+346:-- Running upgrade 20260914_sg035_foundations -> 20260916_sg048_name_optional
+$ grep -n "VIRTUAL TABLE\|CREATE VIEW\|CREATE TRIGGER" /tmp/opencode/sg146/G2_offline_post.txt
+221:CREATE VIEW IF NOT EXISTS asset_fts_content AS
+225:CREATE VIRTUAL TABLE IF NOT EXISTS asset_fts USING fts5(
+233:CREATE TRIGGER IF NOT EXISTS asset_fts_after_insert
+240:CREATE TRIGGER IF NOT EXISTS asset_fts_after_update
+249:CREATE TRIGGER IF NOT EXISTS asset_fts_after_delete
+```
+Tail (the new abort, now inside sg048 — NOT in the write ceiling):
+
+```
+  File "/home/andrei/StorageGenie/backend/alembic/versions/20260916_sg048_name_optional.py", line 54, in upgrade
+    _drop_fts()
+  File "/home/andrei/StorageGenie/backend/alembic/versions/20260916_sg048_name_optional.py", line 36, in _drop_fts
+    connection.exec_driver_sql("DROP TRIGGER IF EXISTS asset_fts_after_delete")
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'MockConnection' object has no attribute 'exec_driver_sql'
+```
+
+Only `exec_driver_sql` users in the tree (scope quoted):
+```
+$ grep -rn "exec_driver_sql" backend/ --include='*.py' | grep -v __pycache__ | grep -v '/venv/'
+backend/alembic/versions/20260916_sg048_name_optional.py:36-40   (DROP x5)
+backend/alembic/versions/20260908_sg017_fts.py:34-38             (downgrade DROP x5)
+```
+
+## G2 probe — sg048's second blocker (read-only, no repo write)
+
+In-process monkeypatch of `sqlalchemy.engine.mock.MockConnection.exec_driver_sql` in a `/tmp` script
+(no repository file written); then run the full offline upgrade programmatically:
+
+```
+$ cd backend && timeout 120 venv/bin/python /tmp/opencode/sg146/probe_sg048.py 2>/dev/null
+status: RAISED CommandError: This operation cannot proceed in --sql mode; batch mode with dialect sqlite requires a live database connection with which to reflect the table "asset". To generate a batch SQL migration script using table "move and copy", a complete Table object should be passed to the "copy_from" argument of the batch_alter_table() method so that table reflection can be skipped.
+len(out): 12307
+post_fts_markers: 3 / 7
+has CREATE VIRTUAL TABLE asset_fts: False
+has 3 triggers: True
+```
+So even if sg048's `exec_driver_sql` were mock-safe, `op.batch_alter_table("asset")`
+(`20260916_sg048_name_optional.py:55,73`) still raises offline. sg048 needs a substantive change.
+
+## Packet substring mismatch (G2 assertion as written cannot pass)
+
+```
+$ grep -c "CREATE VIRTUAL TABLE asset_fts" /tmp/opencode/sg146/G2_offline_post.txt
+0
+```
+The emitted statement is `CREATE VIRTUAL TABLE IF NOT EXISTS asset_fts USING fts5(` — the packet's
+literal substring `CREATE VIRTUAL TABLE asset_fts` (no `IF NOT EXISTS`) has zero matches.
+
+## Online-equivalence rail (no delta vs BASE)
+
+```
+$ cd backend && timeout 600 venv/bin/python -m pytest -q
+2 failed, 635 passed, 32 warnings in 33.46s
+FAILED tests/test_signals.py::test_generated_codes_are_validated_and_bad_checksum_is_not_an_identifier
+FAILED tests/test_signals.py::test_ocr_has_text_boxes_and_mean_confidence - a...
+```
+Identical to the packet's stated base pair (2 known environment-reds). Targeted FTS/chain tests:
+```
+$ cd backend && timeout 300 venv/bin/python -m pytest -q tests/test_search.py tests/test_sg048_name_optional.py tests/test_export.py
+25 passed, 11 warnings in 3.90s
+```
+
+## Lint / type / secret / head gates
+
+```
+$ cd backend && timeout 120 venv/bin/python -m ruff check app tests alembic
+All checks passed!                                    # ruff_exit=0
+$ cd backend && timeout 120 venv/bin/python -m mypy app
+Found 41 errors in 9 files (checked 90 source files)  # identical count with the slice stashed → delta 0
+$ cd backend && venv/bin/alembic heads
+20260924_sg114_relation (head)                        # single head, after == before
+$ grep -nEi 'sk-[A-Za-z0-9]{10,}|ghp_[A-Za-z0-9]{20,}|-----BEGIN|AKIA[0-9A-Z]{16}|password\s*=|api[_-]?key\s*=\s*["'\''][^"'\'']+' \
+    backend/app/services/fts.py backend/alembic/versions/20260908_sg017_fts.py
+(no output)                                           # credential_hits_exit=1 (1=none)
+```
+A blunt case-insensitive scan matches only the English word "token" in the `fts.py` docstring
+(`sanitize_fts_query`), not credential-shaped data.
+
+## End-relative assertions over the migration chain (`PG-SC-11`)
+
+```
+$ grep -rn "get_current_head\|get_heads\|HEAD_REVISION\|version_num\|db_revision" backend/tests/*.py
+tests/test_export.py:114:    expected_head = ScriptDirectory(.../alembic).get_current_head()
+tests/test_export.py:115:    assert body["db_revision"] == exports_api.ALEMBIC_HEAD
+tests/test_export.py:116:    assert body["db_revision"] == expected_head
+tests/test_sg048_name_optional.py:21: HEAD_REVISION = "20260916_sg048_name_optional"
+tests/test_sg048_name_optional.py:101: ... == HEAD_REVISION
+tests/test_sg100_snapshot_persistence.py:33: HEAD_REVISION = "20260923_sg100_enrich_snapshot"
+tests/test_sg113_locations.py:29: HEAD_REVISION = "20260924_sg113_location"
+tests/test_sg114_relations.py:29: HEAD_REVISION = "20260924_sg114_relation"
+```
+All are head-relative or pinned-to-current-head; because no revision is added, they are unchanged
+(`heads` before == after). SG-146 adds no revision file.
+
+## Diff ceiling (WRITES actual)
+
+```
+$ git diff --stat
+ backend/alembic/versions/20260908_sg017_fts.py |  9 ++++++-
+ backend/app/services/fts.py                    | 36 +++++++++++++++-----------
+ 2 files changed, 29 insertions(+), 16 deletions(-)
+```
+plus the three worklog files. No test file added (see report §G2 for why); no sg048 write.
