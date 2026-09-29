@@ -1,5 +1,6 @@
 import json
 
+from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.models.assertion import Assertion
@@ -37,7 +38,7 @@ def create_asset(
     payload: dict,
     actor: str = "api",
 ) -> Asset:
-    evidence_ids = payload.get("evidence_ids") or []
+    evidence_ids = list(dict.fromkeys(payload.get("evidence_ids") or []))
     display_name, name_source = resolve_display_name(db, payload, evidence_ids)
     asset = Asset(
         household_id=household_id,
@@ -71,9 +72,12 @@ def create_asset(
                 review_state="accepted",
             )
         )
-    # Link evidence
-    for eid in evidence_ids:
-        db.execute(asset_evidence.insert().values(asset_id=asset.id, evidence_id=eid))
+    # Link evidence via bulk insert
+    if evidence_ids:
+        db.execute(
+            asset_evidence.insert(),
+            [{"asset_id": asset.id, "evidence_id": eid} for eid in evidence_ids],
+        )
     audit_service.record(
         db,
         actor=actor,
@@ -129,12 +133,23 @@ def update_asset(
 
 
 def attach_evidence(db: Session, asset: Asset, evidence_ids: list[str], actor: str = "api") -> None:
-    for eid in evidence_ids:
-        # Use INSERT OR IGNORE to avoid duplicate PK error
-        try:
-            db.execute(asset_evidence.insert().values(asset_id=asset.id, evidence_id=eid))
-        except Exception:
-            pass
+    evidence_ids = list(dict.fromkeys(evidence_ids))
+    if evidence_ids:
+        existing_eids = set(
+            db.scalars(
+                select(asset_evidence.c.evidence_id).where(
+                    asset_evidence.c.asset_id == asset.id,
+                    asset_evidence.c.evidence_id.in_(evidence_ids),
+                )
+            ).all()
+        )
+        new_eids = [eid for eid in evidence_ids if eid not in existing_eids]
+        if new_eids:
+            db.execute(
+                asset_evidence.insert(),
+                [{"asset_id": asset.id, "evidence_id": eid} for eid in new_eids],
+            )
+
     audit_service.record(
         db,
         actor=actor,
