@@ -1,0 +1,48 @@
+SG-151 running log (chronological; live clock UTC)
+
+BASE = origin/automation request -> resolved aec6af19b7b4aa8aa609e0c089f20b78c878be72
+Contract recorded 0.40.0 == published, source /home/andrei/storagegenie-contract
+  (VERSION 0.40.0; commit f26dbd32e3c4bd7cf878333fba719a6ca1d10c3c; payload RULES.sha256
+   5b65629377bbac9e40bfa7e2f4d4e42a5667b3a08ec786beb47c6a677d9ac33c)
+Model/effort from /proc/1137479/cmdline (parent opencode): opencode-go/deepseek-v4.1-flash, --variant high
+
+2026-09-29T~14:34Z  orientation: git status clean, HEAD == origin/automation == aec6af1.
+                    Pull heads fetched into mapped local refs (sequential FETCH_HEAD keeps only the
+                    last; mapped explicitly):
+                      refs/sg/pr36 = ca949244374c584fe5ec38ac6fb4239d04e199d3
+                      refs/sg/pr39 = 0429ab7dc01fdf4059de29d36c1f06def47f5c9c
+                      refs/sg/pr34 = 673a22fe35a4ee98866839c54727424008e1df64
+                    Premise checks: base create_asset:75-76 / attach_evidence:131-137 per-item loop with
+                    `except Exception: pass` -> CONFIRMED; attach_evidence ZERO test refs -> CONFIRMED;
+                    alembic single head 20260924_sg114_relation -> CONFIRMED; SQLAlchemy 2.0.52 -> CONFIRMED.
+                    3-way checks at BASE against each PR head's diff: all four hunks apply cleanly
+                    (PR36 asset, PR39 asset+candidates, PR34 asset+test).
+2026-09-29T~14:34Z  base probe (real service, temp SQLite): BASE duplicate attach -> 1 row, call returns
+                    OK (PK blocks the dup, the failure is SWALLOWED; no warning). BASE ghost evidence id
+                    (FK violation) -> call returns OK, 1 row, NO warning logged. Fail-pre discriminator =
+                    warning visibility on the genuine failure (BASE swallows it).
+2026-09-29T14:34:39Z  G0 fail-pre: adapted #34's caplog test to the bulk path inside existing
+                    backend/tests/test_assets_crud.py (no new file). pytest test_assets_crud.py ->
+                    1 failed, 3 passed; failure is exactly `assert 'Failed to attach evidence_id=ghost...
+                    to asset_id=' in ''` (no warning at BASE). committed c93cbf1.
+2026-09-29T14:34:50Z  G0 pass: `git apply --3way` of refs/pull/36's asset_service.py diff -> applied
+                    cleanly; landed blob b37739af... == refs/sg/pr36:...asset_service.py b37739af...
+                    #36 removed the swallow: ghost now raises IntegrityError uncaught (G1 repaths the log).
+                    duplicate -> 1 row, no raise. committed 14b648b.
+2026-09-29T14:35:15Z  G1: `git apply --3way` of refs/pull/39's candidates.py diff -> landed blob
+                    7c2e9818... == refs/sg/pr39:...candidates.py 7c2e9818... (only the
+                    _create_asset_for_candidate bulk hunk; #39's duplicate create_asset region and its
+                    benchmark script DROPPED). Then repathed #34's logger.warning onto the bulk path in
+                    attach_evidence: bulk insert in try/except; on atomic failure `db.rollback()` then
+                    per-item fallback each logging `Failed to attach evidence_id=%s to asset_id=%s: %s`.
+                    Added `import logging` + module logger. committed 88688f5.
+2026-09-29T~14:35Z  G1 verify: pytest test_assets_crud.py -> 4 passed (reconciled test green).
+                    final probe: duplicate -> 1 row, no warning; ghost -> call OK, 1 row, warning logged
+                    with both ids. candidates.py blob still 7c2e9818.
+2026-09-29T~14:36Z  G2 gates: targeted test_assets_crud + test_candidates -> 7 passed.
+                    FULL suite -> 2 failed, 638 passed (base-reds = the two test_signals env cases,
+                    identical to BASE; delta exactly +1 green = the reconciled test). ruff All checks
+                    passed; mypy 41 errors in 9 files (delta 0; the 3 asset_service hits are pre-existing
+                    `payload: dict` annotations at :19/:41/:112); secret scan over added diff lines clean.
+                    diff ceiling = asset_service.py + candidates.py + test_assets_crud.py only.
+2026-09-29T~14:37Z  worklogs written; receipt notes to follow.

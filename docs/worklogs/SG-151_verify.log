@@ -1,0 +1,93 @@
+SG-151 verify log — captured command output, verbatim (temp SQLite; no live DB, no rebuild, no deploy)
+
+== Contract (recorded == published) and BASE resolve ==
+$ cat /home/andrei/storagegenie-contract/VERSION; git -C /home/andrei/storagegenie-contract rev-parse HEAD; sha256sum /home/andrei/storagegenie-contract/RULES.md
+0.40.0
+f26dbd32e3c4bd7cf878333fba719a6ca1d10c3c
+5b65629377bbac9e40bfa7e2f4d4e42a5667b3a08ec786beb47c6a677d9ac33c  /home/andrei/storagegenie-contract/RULES.md
+
+$ git rev-parse origin/automation; git rev-parse HEAD~3
+aec6af19b7b4aa8aa609e0c089f20b78c878be72
+aec6af19b7b4aa8aa609e0c089f20b78c878be72
+
+$ git rev-parse refs/sg/pr36 refs/sg/pr39 refs/sg/pr34
+ca949244374c584fe5ec38ac6fb4239d04e199d3
+0429ab7dc01fdf4059de29d36c1f06def47f5c9c
+673a22fe35a4ee98866839c54727424008e1df64
+
+== Pull heads still apply 3-way onto this BASE (pre-edit) ==
+$ git apply --3way --check /tmp/opencode/sg151/pr36_asset.diff
+Applied patch to 'backend/app/services/asset_service.py' cleanly.   (exit 0)
+$ git apply --3way --check /tmp/opencode/sg151/pr39_candidates.diff
+Applied patch to 'backend/app/services/candidates.py' cleanly.       (exit 0)
+$ git apply --3way --check /tmp/opencode/sg151/pr39_asset.diff
+Applied patch to 'backend/app/services/asset_service.py' cleanly.   (exit 0)
+$ git apply --3way --check /tmp/opencode/sg151/pr34_asset.diff
+Applied patch to 'backend/app/services/asset_service.py' cleanly.   (exit 0)
+$ git apply --3way --check /tmp/opencode/sg151/pr34_test.diff
+Applied patch to 'backend/tests/test_assets_crud.py' cleanly.       (exit 0)
+
+== G0 fail-pre — reconciled test RED at BASE (commit c93cbf1) ==
+$ PYTHONPATH=. venv/bin/python -m pytest tests/test_assets_crud.py -q
+...
+>       assert "Failed to attach evidence_id=ghost-evidence-id to asset_id=" in caplog.text
+E       AssertionError: assert 'Failed to attach evidence_id=ghost-evidence-id to asset_id=' in ''
+E        +  where '' = <_pytest.logging.LogCaptureFixture object at 0x71ed144b1400>.text
+
+tests/test_assets_crud.py:320: AssertionError
+FAILED tests/test_assets_crud.py::test_attach_evidence_bulk_dedups_and_logs_failed_links
+1 failed, 3 passed, 2 warnings in 0.92s
+
+== G0 pass-post (PR#36 only, commit 14b648b) — blob identity ==
+$ git show 14b648b:backend/app/services/asset_service.py | git hash-object --stdin
+b37739afa33d741cca83c3cd659e48c8d92084f0
+$ git rev-parse refs/sg/pr36:backend/app/services/asset_service.py
+b37739afa33d741cca83c3cd659e48c8d92084f0
+
+== G1 — PR#39 candidates hunk (commit 88688f5) — blob identity ==
+$ git hash-object backend/app/services/candidates.py
+7c2e9818653e37aa1027b91f5a3689ce88dfd88e
+$ git rev-parse refs/sg/pr39:backend/app/services/candidates.py
+7c2e9818653e37aa1027b91f5a3689ce88dfd88e
+
+== G1 pass-post — reconciled test GREEN, final probe (real service) ==
+$ PYTHONPATH=. venv/bin/python -m pytest tests/test_assets_crud.py -q
+4 passed, 2 warnings in 0.95s
+
+$ PYTHONPATH=. venv/bin/python /tmp/opencode/sg151/probe_base.py        # final tree
+=== duplicate input in ONE call ===   call returned OK   links now: 1
+=== repeat attach same evidence ===   call returned OK   links now: 1
+=== ghost evidence (FK violation) === call returned OK   links now: 1
+WARNING:app.services.asset_service:Failed to attach evidence_id=ghost-evidence-id to asset_id=01a0ed97-...: (sqlite3.IntegrityError) FOREIGN KEY constraint failed
+captured warns: ["Failed to attach evidence_id=ghost-evidence-id to asset_id=01a0ed97-...: (sqlite3.IntegrityError) FOREIGN KEY constraint failed ..."]
+
+(BASE same probe: ghost -> call OK, links 1, captured warns: []  -- the swallowed failure, no log.)
+
+== G2 gates ==
+$ PYTHONPATH=. venv/bin/python -m pytest tests/test_assets_crud.py tests/test_candidates.py -q
+7 passed, 5 warnings in 1.42s
+
+$ venv/bin/python -m pytest -q
+2 failed, 638 passed, 32 warnings in 34.05s
+FAILED tests/test_signals.py::test_generated_codes_are_validated_and_bad_checksum_is_not_an_identifier
+FAILED tests/test_signals.py::test_ocr_has_text_boxes_and_mean_confidence
+  (base-reds identical to BASE/SG-150; delta = exactly the one reconciled test green)
+
+$ venv/bin/python -m ruff check .
+All checks passed!
+
+$ venv/bin/python -m mypy app
+Found 41 errors in 9 files (checked 90 source files)
+  (delta 0 vs recorded BASE 41/9; the 3 asset_service hits :19/:41/:112 are pre-existing `payload: dict`
+   annotations, not introduced by this slice.)
+
+$ git diff --stat aec6af1 HEAD
+ backend/app/services/asset_service.py | 57 +++++++++++++++++++++++++++++------
+ backend/app/services/candidates.py    |  7 +++--
+ backend/tests/test_assets_crud.py     | 38 +++++++++++++++++++++++
+ 3 files changed, 90 insertions(+), 12 deletions(-)
+
+$ git diff aec6af1 HEAD | grep '^+' | grep -v '^+++' | grep -nEi "(api[_-]?key|secret|password|passwd|token|private[_-]?key|BEGIN [A-Z ]*PRIVATE KEY|AKIA[0-9A-Z]{16}|ghp_|sk-[A-Za-z0-9]{20,})"
+(no secret-like token in added lines)
+
+== no command killed by its bound; no interactive command ran ==
