@@ -1,0 +1,48 @@
+SG-145 — lane-probe running log (first token SG-145)
+
+Dispatch-ID: SG-145 | coder=opencode effort=high | L3 finish-chain slice 4 of 5
+BASE ref requested: origin/automation (resolved b157618c0a76f2faae002cb5c3457a0c08fb02ab; start HEAD == ref)
+Contract: recorded 0.40.0 == published `/home/andrei/storagegenie-contract/VERSION` (HEAD f26dbd32e3c4bd7cf878333fba719a6ca1d10c3c)
+Role: Coder — no dispatch verb run, no unit started or polled for any ID.
+Ceiling: WRITES = docs/worklogs/{SG-145.log,SG-145_report.md,SG-145_verify.log} only. DATABASE none (read-only
+  probes only). Restart none. Deploy none. Auth mutation forbidden.
+
+10:2xZ  Recon (reads only). Confirmed two moving parts are NOT both "lane" items:
+        - `--sql` is not a lane/wrapper flag; grep of /usr/local/bin/dispatch (and every
+          /etc/dispatch conf, /opt/storagegenie-dispatch/*.sh, and the contract dispatch/ dir
+          incl run-coder) => 0 matches. The flag is Alembic's OFFLINE mode flag (config.py:704).
+        - `.rules-cache/` (the Architect's workstation path) does NOT exist on the host; the host
+          contract checkout is /home/andrei/storagegenie-contract (lane conf CONTRACT_DIR).
+        - `gh` unauthenticated confirmed read-only; no credential file, no token env var.
+
+10:28Z  G0 grep scopes captured: repo-tracked `--sql` = 21 lines / 9 files, all docs/history
+        (STATE.md, packets SG-139/SG-145, ratings, plan, design, worklog SG-139 x3). Zero
+        product/script/test. Lane/wrapper/conf/contract = 0 each. ONLINE alembic invocations in
+        repo (Makefile:22, README:33/64) do NOT use --sql.
+
+10:29Z  G0 read-only drive: (cd backend && venv/bin/alembic upgrade head --sql) -> EXIT=1,
+        259 lines, 4 INFO "Running upgrade" lines, 14 CREATE TABLE, then
+        AttributeError: 'MockConnection' object has no attribute 'exec_driver_sql'.
+        Producing code: backend/alembic/versions/20260908_sg017_fts.py:22 ->
+        app/services/fts.py:104 install_asset_fts -> fts.py:35 _ddl
+        connection.exec_driver_sql(...). Offline completes 3/11 revisions, dies entering the
+        4th (FTS); the FTS DDL and all 7 later revisions never emit. Capture sha256
+        827323e3...a9d686. No DB written (offline mode prints SQL to stdout).
+
+10:30Z  G0 secondary bound: live SQLite opened READ-ONLY; assets=6, fts rows=6; MATCH counts
+        de=2, porc=2, Lapte=1. No bound in the FTS layer — the only query cap is the API page
+        limit (assets.py:274 default 20 / max 100; :299 limit+1 probe; :303 truncate). Quoted
+        from code, not guessed.
+
+10:31Z  G1: `gh auth status` -> "You are not logged into any GitHub hosts. To log in, run:
+        gh auth login" exit 1; gh 2.96.0 at /usr/bin/gh; ~/.config/gh absent; GH_TOKEN and
+        GITHUB_TOKEN unset. Genuinely unauthenticated — owner relay ask written; no auth flow
+        performed (that would be a STOP).
+
+10:32Z  Contract echo verified (VERSION 0.40.0, HEAD f26dbd3); model/effort read from process
+        args at /proc/846513/cmdline: --model opencode-go/deepseek-v4.1-flash --variant high.
+
+10:33Z  G2: worklogs SG-145.log + SG-145_report.md + SG-145_verify.log finalized; commit +
+        push automation (worklogs only); receipt note on WORK_HEAD; push notes ref; mapped-fetch
+        verify; dual-annotate final tip. No product hunk, no fix shipped (fix shape only,
+        RECOMMENDED-NEXT). Spend real $0.000000 USD, zero metered calls. elapsed ~4 min.

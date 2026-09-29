@@ -1,0 +1,179 @@
+SG-145 verify log — raw probe captures, grep scopes, diff ceiling (first token SG-145)
+Work dir /home/andrei/StorageGenie · host ubuntu (andrei) · live clock probes 2026-09-29T10:2x–10:32Z
+BASE ref requested origin/automation ; resolved b157618c0a76f2faae002cb5c3457a0c08fb02ab (start HEAD)
+
+================================================================================
+G0 — every `--sql` entry point: grep scopes (quoted)
+================================================================================
+
+$ git -C /home/andrei/StorageGenie grep -l -- "--sql" -- ':!*/venv/*' ':!*/node_modules/*' ':!output/*'
+STATE.md
+docs/packets/SG-139-caplog-mypy.md
+docs/packets/SG-145-lane-probes.md
+docs/ratings.md
+docs/superpowers/plans/2026-09-29-roadmap-finish.md
+docs/superpowers/specs/2026-09-29-roadmap-finish-design.md
+docs/worklogs/SG-139.log
+docs/worklogs/SG-139_report.md
+docs/worklogs/SG-139_verify.log
+(21 matching lines total, ALL under docs/ history-and-plan text; ZERO product/script/test files.)
+
+$ grep -c -- "--sql" /usr/local/bin/dispatch /opt/storagegenie-dispatch/*.sh /etc/dispatch/*.conf /home/andrei/storagegenie-contract/dispatch/*
+/usr/local/bin/dispatch:0
+/opt/storagegenie-dispatch/dispatch_coder.sh:0
+/opt/storagegenie-dispatch/finalize_dispatch_report.sh:0
+/etc/dispatch/dumpster.conf:0
+/etc/dispatch/healthylaws.conf:0
+/etc/dispatch/launcher.conf:0
+/etc/dispatch/shoperos.conf:0
+/etc/dispatch/storagegenie.conf:0
+/home/andrei/storagegenie-contract/dispatch/debug-evidence:0
+/home/andrei/storagegenie-contract/dispatch/debug-packet.md:0
+/home/andrei/storagegenie-contract/dispatch/dispatch:0
+/home/andrei/storagegenie-contract/dispatch/dispatch@.service:0
+/home/andrei/storagegenie-contract/dispatch/run-coder:0
+
+$ grep -in "sql" /usr/local/bin/dispatch    # broad case-insensitive over the whole wrapper
+(no output; exit 1 — the installed lane wrapper contains no `sql` substring at all)
+
+$ file /usr/local/bin/dispatch
+/usr/local/bin/dispatch: Bourne-Again shell script, Unicode text, UTF-8 text executable
+
+# Flag DEFINITION (dependency, not a project entry point):
+$ grep -n '"--sql"' /home/andrei/StorageGenie/backend/venv/lib/python3.12/site-packages/alembic/config.py
+704:            "--sql",
+# => `--sql` is Alembic's OFFLINE SQL flag. Only functional entry point is the alembic CLI.
+#    Online invocations in-repo use `python -m alembic upgrade head` with NO --sql:
+$ grep -n "alembic upgrade" /home/andrei/StorageGenie/Makefile /home/andrei/StorageGenie/README.md
+/home/andrei/StorageGenie/Makefile:22:	cd backend && python -m alembic upgrade head
+/home/andrei/StorageGenie/README.md:33:docker compose exec backend python -m alembic upgrade head
+/home/andrei/StorageGenie/README.md:64:docker compose exec backend python -m alembic upgrade head
+
+# Workstation premise `.rules-cache/dispatch` — host reality:
+$ ls -la /home/andrei/StorageGenie/.rules-cache/
+ls: cannot access '.rules-cache/': No such file or directory
+$ grep -n "rules-cache" /home/andrei/StorageGenie/.gitignore
+38:.rules-cache/
+$ find /home/andrei -maxdepth 2 -name ".rules-cache" 2>/dev/null
+(no output)
+# Host contract checkout instead lives at /home/andrei/storagegenie-contract (lane conf CONTRACT_DIR):
+$ grep -n "CONTRACT_DIR" /etc/dispatch/storagegenie.conf
+CONTRACT_DIR=/home/andrei/storagegenie-contract
+
+================================================================================
+G0 — the fts bound: producing code (read, never the number alone)
+================================================================================
+
+backend/app/services/fts.py
+  35:    connection.exec_driver_sql(          # <-- first online-only API reached in offline mode
+  94:def install_asset_fts(connection: Connection, *, rebuild: bool = False) -> None:
+ 104:    _ddl(connection)                       # <-- calls _ddl (line 35)
+  87:def rebuild_asset_fts(connection: Connection) -> None:   # needs live data
+
+backend/alembic/versions/20260908_sg017_fts.py
+  12: from app.services.fts import install_asset_fts
+  21: def upgrade() -> None:
+  22:     install_asset_fts(op.get_bind(), rebuild=True)   # <-- op.get_bind() is MockConnection offline
+
+backend/alembic/env.py
+  28: def run_migrations_offline() -> None:
+  30:     context.configure(url=url, target_metadata=target_metadata, literal_binds=True, dialect_opts={"paramstyle": "named"})
+  47: if context.is_offline_mode():
+  48:     run_migrations_offline()
+
+================================================================================
+G0 — read-only drive: `alembic upgrade head --sql` (offline; writes no DB, SQL to stdout)
+================================================================================
+
+$ (cd backend && timeout 120 venv/bin/alembic upgrade head --sql) > /tmp/opencode/sg145_alembic_sql.txt 2>&1
+EXIT=1
+LINES=259
+INFO  "Running upgrade" lines = 4
+"-- Running upgrade" comment lines = 4
+CREATE TABLE lines = 14
+
+--- head ---
+INFO  [alembic.runtime.migration] Context impl SQLiteImpl.
+INFO  [alembic.runtime.migration] Generating static SQL
+INFO  [alembic.runtime.migration] Will assume non-transactional DDL.
+CREATE TABLE alembic_version (
+    version_num VARCHAR(32) NOT NULL,
+    CONSTRAINT alembic_version_pkc PRIMARY KEY (version_num)
+);
+
+--- the 4 INFO Running upgrade lines (emitted before the abort) ---
+INFO  [alembic.runtime.migration] Running upgrade  -> 0201cf10c56c, 001 core foundation
+INFO  [alembic.runtime.migration] Running upgrade 0201cf10c56c -> 20260908_sg013_observation, deterministic signal observations
+INFO  [alembic.runtime.migration] Running upgrade 20260908_sg013_observation -> 20260908_sg014_candidate, deduplication candidates
+INFO  [alembic.runtime.migration] Running upgrade 20260908_sg014_candidate -> 20260908_sg017_fts, SQLite FTS5 index for asset catalog search.
+
+--- tail (the abort) ---
+  File "/home/andrei/StorageGenie/backend/alembic/versions/20260908_sg017_fts.py", line 22, in upgrade
+    install_asset_fts(op.get_bind(), rebuild=True)
+  File "/home/andrei/StorageGenie/backend/app/services/fts.py", line 104, in install_asset_fts
+    _ddl(connection)
+  File "/home/andrei/StorageGenie/backend/app/services/fts.py", line 35, in _ddl
+    connection.exec_driver_sql(
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'MockConnection' object has no attribute 'exec_driver_sql'
+
+# capture sha256: 827323e3df69b7122a889fae36f8d3310162c668dab0aff4252ef7b8aba9d686
+# => offline path completes 3 of 11 revisions; dies ENTERING the 4th (the FTS revision).
+#    The FTS DDL (view + virtual table + 3 triggers) is never emitted.
+#    The 7 revisions after FTS (sg025, sg035, sg048, sg068, sg100, sg113, sg114) never emit either.
+
+================================================================================
+G0 — read-only fts query bound (secondary; the only query-side bound)
+================================================================================
+
+# Production SQLite opened READ-ONLY (`?mode=ro`); no writes issued.
+$ sqlite3 "file:data/db/storagegenie.db?mode=ro" "SELECT count(*) FROM asset;"
+6
+$ sqlite3 "file:data/db/storagegenie.db?mode=ro" "SELECT count(*) FROM asset_fts;"
+6
+$ sqlite3 "file:data/db/storagegenie.db?mode=ro" "SELECT count(*) FROM asset_fts WHERE asset_fts MATCH '\"de\"';"
+2
+$ sqlite3 "file:data/db/storagegenie.db?mode=ro" "SELECT count(*) FROM asset_fts WHERE asset_fts MATCH '\"porc\"';"
+2
+$ sqlite3 "file:data/db/storagegenie.db?mode=ro" "SELECT count(*) FROM asset_fts WHERE asset_fts MATCH '\"Lapte\"';"
+1
+
+# The bound is NOT in the FTS layer. It is the API page cap:
+$ grep -n "limit" backend/app/api/v1/assets.py
+274:    limit: int = Query(default=20, ge=1, le=100),
+299:    query = query.order_by(Asset.created_at.desc(), Asset.id.desc()).limit(limit + 1)
+301:    has_more = len(items) > limit
+303:        items = items[:limit]
+# FTS MATCH subquery (assets.py:209-215) carries NO LIMIT — the outer Asset query is capped.
+
+================================================================================
+G1 — host `gh` auth state (read-only, presence-only; no token printed)
+================================================================================
+
+$ timeout 120 gh auth status
+You are not logged into any GitHub hosts. To log in, run: gh auth login
+gh_auth_status_exit=1
+
+$ command -v gh ; timeout 30 gh --version | head -1
+/usr/bin/gh
+gh version 2.96.0 (2026-07-02)
+
+$ ls -la ~/.config/gh/
+ls: cannot access '/home/andrei/.config/gh/': No such file or directory
+
+$ [ -n "$GH_TOKEN" ] && echo "GH_TOKEN=set" || echo "GH_TOKEN=unset"
+GH_TOKEN=unset
+$ [ -n "$GITHUB_TOKEN" ] && echo "GITHUB_TOKEN=set" || echo "GITHUB_TOKEN=unset"
+GITHUB_TOKEN=unset
+# No credential file, no token env var, no active host => genuinely unauthenticated.
+# Nothing credential-shaped was read or printed (CO-100).
+
+================================================================================
+Diff ceiling — the commit must be worklogs ONLY
+================================================================================
+
+$ git -C /home/andrei/StorageGenie diff --name-only origin/automation..WORK_HEAD
+docs/worklogs/SG-145.log
+docs/worklogs/SG-145_report.md
+docs/worklogs/SG-145_verify.log
+# (three files, all under docs/worklogs; no product/test/config/auth change)
