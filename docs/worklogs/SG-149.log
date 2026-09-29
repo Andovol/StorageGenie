@@ -1,0 +1,30 @@
+SG-149.log — outside-PR audit (11-PR pile #32–42), read-only, verdicts only
+
+Dispatch-ID: SG-149
+Coder: opencode · MODEL opencode-go/deepseek-v4.1-flash · effort high (from /proc cmdline --model/--variant)
+BASE origin/automation = 48e30c4fb848058c66188a74f4acab377bfd5fdd · worktree clean at start
+Contract 0.40.0 (f26dbd3; RULES.md sha256 5b656293…) · Spend real $0.000000 USD, zero metered calls
+
+[13:48Z] Recon: repo state, remote, branch, contract path, gh auth → gh unauthenticated (exit 1).
+[13:49Z] G0 enumerate: ls-remote refs/pull/*/head (41 refs) + public REST open list → 11 open, #32–42,
+         author Andovol, base automation. Reconcile vs packet: exact match, no arrivals/disappearances.
+[13:50Z] G0 fetch: `git fetch origin refs/pull/32..42/head` (one call, exit 0); no refs stored;
+         FETCH_HEAD holds all 11. Worktree clean before/after.
+[13:50Z] G0 bytes: 11 × `git diff merge-base..head` → 32,814 bytes total, per-file sha256 recorded.
+         0 UNREADABLE. (See SG-149_verify.log [3].)
+[13:51Z] G1 judgement: read all 11 diffs + the touched base sources (expiry_engine, asset_service,
+         candidates, main, schemas/common, synthesize, models/__init__, test_cors) + installed Starlette
+         CORS + frontend If-Match call sites.
+         - Verified #32/#41 semantic equivalence; #35 same-name reorder; #38 logging-only; #42 methods.
+         - Found #40 defect: allowlist omits If-Match (frontend sends it) → cross-origin PATCH 400.
+         - Overlap measured: {#34,#36,#39} asset_service; {#40,#42} main+test_cors; {#33,#37} same new
+           path; {#39,#41} candidates.py (different functions).
+         - Secret scan over 11 diffs: only benign "token index" prose; clean.
+         - Self-correction: PendingRollbackError hypothesis for #34 refuted by isolated SQLAlchemy probe.
+         Verdicts: MERGE 7 (#32,#33,#35,#36,#38,#41,#42) · REWRITE 4 (#34,#37,#39,#40) · CLOSE 0.
+[13:53Z] G2 write SG-149.log, SG-149_report.md, SG-149_verify.log; commit; push automation; receipt note.
+[13:5xZ] Receipt: note added on WORK_HEAD, notes ref pushed, verified via mapped fetch; final tip
+         dual-annotated (note-anchor inoculation). Worktree clean. note=yes.
+
+Nothing merged, closed, rewritten, or pushed except the worklog commit. No test or product file written.
+No dispatch verb run for any ID (Coder role guard held). No command killed; all within 120 s class.

@@ -1,0 +1,188 @@
+SG-149_verify.log — raw evidence for the SG-149 outside-PR audit (11-PR pile #32–42)
+
+Dispatch-ID: SG-149
+BASE ref: origin/automation → resolved 48e30c4fb848058c66188a74f4acab377bfd5fdd
+Model/effort (CO-78, process args): opencode-go/deepseek-v4.1-flash / high
+Spend: real $0.000000 USD, zero metered calls.
+
+====================================================================
+[1] ENUMERATION — open PRs aimed at automation
+====================================================================
+$ git ls-remote origin 'refs/pull/*/head'          # all pull refs (open + closed), 120 s class
+  → refs/pull/2/head … refs/pull/42/head (41 refs; pull 32-42 present)
+
+$ curl -s "https://api.github.com/repos/Andovol/StorageGenie/pulls?state=open&per_page=100&sort=created&direction=asc"
+  (unauthenticated, read-only public REST; no token, no login prompt)
+  → count=11
+  32 | open | automation <- bolt/batch-fetch-expiry-assertions-9805844303267441434 | Andovol
+  33 | open | automation <- test-decode-cursor-invalid-format-2740448297750613393 | Andovol
+  34 | open | automation <- fix/asset-service-exception-logging-3395863194390859121 | Andovol
+  35 | open | automation <- clean-models-all-exports-5061139618502718947 | Andovol
+  36 | open | automation <- perf/bulk-insert-asset-evidence-14308258920456442759 | Andovol
+  37 | open | automation <- test-loads-json-error-handling-11643751385192757386 | Andovol
+  38 | open | automation <- fix-synthesis-empty-except-logging-14922827253064615080 | Andovol
+  39 | open | automation <- perf/bulk-insert-asset-evidence-3013153069290929288 | Andovol
+  40 | open | automation <- fix/restrict-cors-allow-headers-9030401029426395364 | Andovol
+  41 | open | automation <- fix-n1-query-candidate-loser-merge-14169458296748822325 | Andovol
+  42 | open | automation <- fix/cors-overly-permissive-policy-381093961529617649 | Andovol
+
+$ gh auth status
+  You are not logged into any GitHub hosts. To log in, run: gh auth login   (exit=1)
+  → gh unusable for reads; prescribed pull-ref path used for diffs.
+
+REPORTED DIFFERENCE vs expectation: NONE. Expected #32–42, open; measured #32–42, open; 0 arrivals, 0 disappearances.
+
+====================================================================
+[2] FETCH SCOPE (no refs stored; FETCH_HEAD only)
+====================================================================
+$ git fetch origin refs/pull/32/head refs/pull/33/head refs/pull/34/head refs/pull/35/head \
+                 refs/pull/36/head refs/pull/37/head refs/pull/38/head refs/pull/39/head \
+                 refs/pull/40/head refs/pull/41/head refs/pull/42/head
+  From github.com:Andovol/StorageGenie
+   * branch            refs/pull/32/head -> FETCH_HEAD
+   ...
+   * branch            refs/pull/42/head -> FETCH_HEAD
+  fetch_exit=0
+
+$ cat .git/FETCH_HEAD
+  cd8e7ec2732476126eca2e1eb45922fe291c0724		'refs/pull/32/head' of github.com:Andovol/StorageGenie
+  46699c8ff17b7116a06347a16a5c8809512218f6		'refs/pull/33/head' of github.com:Andovol/StorageGenie
+  673a22fe35a4ee98866839c54727424008e1df64		'refs/pull/34/head' of github.com:Andovol/StorageGenie
+  4398795ac0a62698f3184ad612aa8c8f75559ea9		'refs/pull/35/head' of github.com:Andovol/StorageGenie
+  ca949244374c584fe5ec38ac6fb4239d04e199d3		'refs/pull/36/head' of github.com:Andovol/StorageGenie
+  ab374cacfa6526e0a1c936e240ea377da53f8999		'refs/pull/37/head' of github.com:Andovol/StorageGenie
+  0809ba8a6ee7322f1efb13671844a396e8a93e3d		'refs/pull/38/head' of github.com:Andovol/StorageGenie
+  0429ab7dc01fdf4059de29d36c1f06def47f5c9c		'refs/pull/39/head' of github.com:Andovol/StorageGenie
+  cc6610d959b589d4d5aeff34c065bf46e5f0bf2e		'refs/pull/40/head' of github.com:Andovol/StorageGenie
+  aa9dfed6c91c4db0c1f0a406910e5b0c3035e169		'refs/pull/41/head' of github.com:Andovol/StorageGenie
+  d1c39880ee9fd23fd42550e2e5b0af81bd1448ad		'refs/pull/42/head' of github.com:Andovol/StorageGenie
+
+====================================================================
+[3] BYTE CAPTURE — git diff <merge-base> <head>  (three-dot PR content)
+====================================================================
+PR32 mb=aa842682ee59 head=cd8e7ec27324 files=2 +88/-5  bytes=6586 sha256=66f61238e35779162c283b4280256b3489356199fafa74f9cb1d03ebe7bd52a8
+PR33 mb=9fc1141e9260 head=46699c8ff17b files=1 +87/-0  bytes=3083 sha256=94d8d109cdd56df6643c79eedffbfea1d66ab76649cbb881754b4c23dd431757
+PR34 mb=9fc1141e9260 head=673a22fe35a4 files=2 +38/-2  bytes=2718 sha256=b8d42d92371690ca4da893584cc19fe3c3a757a02c86a53ab39e9ad066db79eb
+PR35 mb=9fc1141e9260 head=4398795ac0a6 files=1 +4/-4   bytes=797  sha256=898f1cc23c46bd766a741fafd72a09d334fcd2d4203fef8cb4bad417d08ec922
+PR36 mb=9fc1141e9260 head=ca949244374c files=2 +110/-10 bytes=5298 sha256=f7485ff8da8de55d7d70139241096582b0a192c66dcaa31a8fea99649a56accb
+PR37 mb=9fc1141e9260 head=ab374cacfa65 files=1 +78/-0  bytes=2579 sha256=736bb314de4c9c2434f19c08654811e9ac6fbea617344070aba8230a15d763f5
+PR38 mb=9fc1141e9260 head=0809ba8a6ee7 files=2 +16/-4  bytes=2396 sha256=819dfa8963cbccaecaf9dfd026c979b495ee33521d7207b80f66a5d804e7f784
+PR39 mb=9fc1141e9260 head=0429ab7dc01f files=3 +78/-4  bytes=3745 sha256=9697b7caeebed499c79afcb351a861b5e38c862fac3fba5c1d5b513f538d686f
+PR40 mb=9fc1141e9260 head=cc6610d959b5 files=2 +48/-2  bytes=2602 sha256=307290bb8a73a25de02930db6cadaae79fd3032cf4a4d3250022eb2887d4d3f7
+PR41 mb=9fc1141e9260 head=aa9dfed6c91c files=1 +4/-1   bytes=843  sha256=eb8e06fca7a11fd02426cf3363c655c88175d960a2ac7671fe77edc7c0e13657
+PR42 mb=9fc1141e9260 head=d1c39880ee9f files=2 +30/-2  bytes=2167 sha256=02ed0bae2b8571a2b810dd5f786d4e43539f89b5735993f18aeb013a0340454c
+TOTAL: 11/11 non-empty text diffs, 32,814 bytes. UNREADABLE = 0.
+
+--- name-status per PR ---
+PR32: M .jules/bolt.md ; M backend/app/services/expiry_engine.py
+PR33: A backend/tests/test_schemas_common.py
+PR34: M backend/app/services/asset_service.py ; M backend/tests/test_assets_crud.py
+PR35: M backend/app/models/__init__.py
+PR36: M backend/app/services/asset_service.py ; A backend/scripts/benchmark_asset_evidence.py
+PR37: A backend/tests/test_schemas_common.py
+PR38: M backend/app/services/enrich/synthesize.py ; M backend/tests/test_sg099_synthesis.py
+PR39: M backend/app/services/asset_service.py ; M backend/app/services/candidates.py ; A backend/tests/benchmark_asset_evidence_insert.py
+PR40: M backend/app/main.py ; M backend/tests/test_cors.py
+PR41: M backend/app/services/candidates.py
+PR42: M backend/app/main.py ; M backend/tests/test_cors.py
+
+====================================================================
+[4] VERDICT TABLE (one per PR; evidence quoted in SG-149_report.md §G1)
+====================================================================
+#32 MERGE    batch expiry/classification maps preserve base per-asset query semantics
+#33 MERGE    new test_schemas_common.py against real module; no prior coverage
+#34 REWRITE  logging inside the swallow loop that #36 deletes → conflict
+#35 MERGE    pure __all__ reorder; names unchanged
+#36 MERGE    dedup + bulk insert (primary of the pair); fixes latent duplicate IntegrityError
+#37 REWRITE  same new path as #33 (add/add); fold unique cases
+#38 MERGE    debug-logging preserves behaviour; test drives the changed lines
+#39 REWRITE  overlaps #36 create_asset hunk; unique candidates.py hunk should fold in
+#40 REWRITE  allowlist omits If-Match (frontend sends it) → cross-origin PATCH preflight 400
+#41 MERGE    batched loser fetch preserves per-id checks/order
+#42 MERGE    explicit methods cover the app; test matches Starlette message
+Counts: MERGE 7 · REWRITE 4 · CLOSE 0.
+
+====================================================================
+[5] OVERLAP MATRIX (measured)
+====================================================================
+asset_service.py:  #34 & #36 & #39   (3-way; #36/#39 same create_asset hunk; #34/#36 same attach_evidence hunk)
+candidates.py:     #39 & #41         (same file, different functions; rebase order only)
+main.py + test_cors.py: #40 & #42    (same add_middleware region + same test_cors region)  CONFLICT
+test_schemas_common.py (new): #33 & #37  (add/add)  CONFLICT
+.jules/bolt.md:    #32 only          (single writer in this pile)
+Pairs that cannot land as-is: {#40,#42}, {#34,#36}, {#36,#39}, {#33,#37}.
+
+====================================================================
+[6] SECRET SCAN (CO-100)
+====================================================================
+scope: /tmp/opencode/sg149_diffs/pr-{32..42}.diff  (11 files, 32,814 bytes)
+$ grep -rInE "(api[_-]?key|secret|password|passwd|token|bearer|private[_-]?key|BEGIN [A-Z ]*PRIVATE KEY|AKIA[0-9A-Z]{16}|ghp_[A-Za-z0-9]{20,}|github_pat_|sk-[A-Za-z0-9]{20,}|xox[baprs]-|-----BEGIN)" *.diff
+  pr-32.diff:13: ...inverted token index (`dict[str, tuple[int, ...]]`)...   <-- prose "token", not a credential
+  pr-32.diff:14: ...build an inverted index on tokens...
+  rc=0
+high-entropy pass (runs >=40 of [A-Za-z0-9+/=_-], noise filtered): only prose/filenames/sha-like test data.
+RESULT: no secret, no API key, no private key, no token value. Clean.
+
+====================================================================
+[7] SUPPORTING READS (source of truth for verdicts)
+====================================================================
+Starlette CORS (backend/venv/lib/python3.12/site-packages/starlette/middleware/cors.py):
+  :124  if requested_method not in self.allow_methods: failures.append("method")
+  :131-135 elif requested_headers is not None: for header in ...: if header.strip() not in self.allow_headers: failures.append("headers")
+  :146-148 if failures: failure_text = "Disallowed CORS " + ", ".join(failures); return PlainTextResponse(..., 400)
+  → #40 test ("Disallowed CORS headers") and #42 test ("Disallowed CORS method") match this.
+
+Frontend sends If-Match (NOT in #40 allowlist):
+  frontend/src/components/shell/ItemInspectorDrawer.tsx:135
+    apiPatch(`/v1/assets/${asset.id}`, payload, { household_id: householdId }, { "If-Match": String(current.version ?? 1) })
+  frontend/src/routes/AssetDetailPage.tsx:287   (same pattern)
+
+Base expiry semantics PR32 must preserve (backend/app/services/expiry_engine.py):
+  :83  _accepted_classification_slug  review_state=="accepted", created_at.desc(), first
+  :106 _accepted_expiry               review_state=="accepted", created_at.desc(), first
+  :119 _latest_active_expiry          review_state.not_in(("superseded","rejected")), created_at.desc(), first
+
+Base create_asset/attach_evidence (backend/app/services/asset_service.py):
+  :74-76  for eid in evidence_ids: db.execute(asset_evidence.insert().values(...))
+  :131-137 attach_evidence try/except Exception: pass
+
+Base merge_candidates (backend/app/services/candidates.py:1237-1260): per-id 404/403/409 + blocking-task count, in order.
+
+Existing test coverage for schemas common BEFORE the PRs:
+  $ grep -rln "decode_cursor|loads_json|encode_cursor" backend/tests/   → (none)
+  $ grep -rIn "attach_evidence" backend/tests/                          → (none)
+
+Self-correction probe (isolated, pure SQLAlchemy 2.0.52, /tmp; no project code):
+  caught: IntegrityError
+  in_transaction: True
+  commit after swallow: OK     → refutes the PendingRollbackError hypothesis for #34.
+
+Versions: sqlalchemy 2.0.52 · starlette 1.6.0 · fastapi 0.141.1 (backend/venv).
+
+====================================================================
+[8] CONTRACT ECHO
+====================================================================
+/home/andrei/storagegenie-contract/VERSION          → 0.40.0
+git rev-parse HEAD (storagegenie-contract)          → f26dbd32e3c4bd7cf878333fba719a6ca1d10c3c  (subject: Contract payload 0.40.0)
+cat RULES.sha256                                    → 5b65629377bbac9e40bfa7e2f4d4e42a5667b3a08ec786beb47c6a677d9ac33c RULES.md
+sha256sum RULES.md                                  → 5b65629377bbac9e40bfa7e2f4d4e42a5667b3a08ec786beb47c6a677d9ac33c
+Recorded 0.40.0 == published. (.rules-cache/ absent on host.)
+
+====================================================================
+[9] CLEANLINESS
+====================================================================
+pre-fetch  git status --porcelain | wc -l  → 0
+post-fetch git status --porcelain | wc -l  → 0
+post-commit git status --porcelain        → (empty; see receipt in report)
+
+====================================================================
+[10] RECEIPT — WORK_HEAD note, executed output (verbatim)
+====================================================================
+{{WORKHEAD_SHOW}}
+
+====================================================================
+[11] RECEIPT — final tip dual-annotation, executed output (verbatim)
+====================================================================
+{{TIP_SHOW}}
+
+note=yes
