@@ -1234,9 +1234,12 @@ def merge_candidates(  # noqa: C901
             f"winner state {winner.state} is not mergeable", status_code=409
         )
 
+    fetched_losers = db.query(Candidate).filter(Candidate.id.in_(loser_ids)).all()
+    loser_map = {loser.id: loser for loser in fetched_losers}
+
     losers: list[Candidate] = []
     for loser_id in loser_ids:
-        loser = db.query(Candidate).filter_by(id=loser_id).first()
+        loser = loser_map.get(loser_id)
         if loser is None:
             raise CandidateMergeError(f"Loser candidate {loser_id} not found", status_code=404)
         if loser.household_id != household_id:
