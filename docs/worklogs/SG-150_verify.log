@@ -1,0 +1,97 @@
+=== SG-150 verify log (verbatim captures; work commit: __WORK_HEAD__) ===
+
+BASE = 3e557c9008d8869b238e6ada49c7dfe5b7ebb470 (origin/automation at slice start)
+
+--- G0 fail-pre (commit a7710b8: PR#42 test applied, main.py still allow_methods=["*"]) ---
+$ (cd backend) venv/bin/python -m pytest tests/test_cors.py -q
+        assert response.status_code == 200
+        allowed_methods = response.headers.get("access-control-allow-methods", "")
+        methods_list = [m.strip() for m in allowed_methods.split(",") if m.strip()]
+>       assert set(methods_list) == {"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"}
+E       AssertionError: assert {'DELETE', 'G..., 'POST', ...} == {'DELETE', 'G...'POST', 'PUT'}
+E         Extra items in the left set:
+E         'HEAD'
+tests/test_cors.py:60: AssertionError
+FAILED tests/test_cors.py::test_cors_preflight_allow_methods - AssertionError...
+1 failed, 4 passed, 2 warnings in 0.72s
+# CORRECTION: test_cors_preflight_unallowed_method PASSES at BASE. Starlette 1.6.0 expands
+# allow_methods=["*"] to ALL_METHODS = (DELETE, GET, HEAD, OPTIONS, PATCH, POST, PUT);
+# TRACE is excluded there too, so TRACE is already 400 at BASE (packet said "TRACE-200").
+# The genuine #42 fail-pre discriminator is the exact-set assertion (BASE set includes HEAD).
+
+--- G0 pass-post (commit 4baa4bb: PR#42 allow_methods six-set) ---
+$ (cd backend) venv/bin/python -m pytest tests/test_cors.py -q
+5 passed, 2 warnings in 0.62s
+
+--- byte-identity to PR heads (PG-SC-12) ---
+$ echo "head blob:   $(git rev-parse refs/pull/42/head:backend/app/main.py)"
+head blob:   a488e59b7b3160aea1b2e4dfecf2dd890d548f5f
+$ echo "landed blob: $(git hash-object backend/app/main.py)"   # at G0 pass-post
+landed blob: a488e59b7b3160aea1b2e4dfecf2dd890d548f5f
+$ git hash-object backend/tests/test_cors.py                  # at G0 fail-pre
+07bd4e8394350d4615a596ff7141896c25edfcc8   (== PR#42 head blob 07bd4e8...)
+
+--- real-stack preflight at BASE (TestClient(default_app)) ---
+BASE req_method='POST'   req_headers=None                                          -> 200 'OK'                       allow-methods='DELETE, GET, HEAD, OPTIONS, PATCH, POST, PUT'
+BASE req_method='TRACE'  req_headers=None                                          -> 400 'Disallowed CORS method'   allow-methods='DELETE, GET, HEAD, OPTIONS, PATCH, POST, PUT'
+BASE req_method='HEAD'   req_headers=None                                          -> 200 'OK'                       allow-methods='DELETE, GET, HEAD, OPTIONS, PATCH, POST, PUT'
+BASE req_method='GET'    req_headers='X-Evil-Header'                               -> 200 'OK'                       allow-methods='DELETE, GET, HEAD, OPTIONS, PATCH, POST, PUT'
+BASE req_method='GET'    req_headers='Content-Type, Idempotency-Key, If-Match'     -> 200 'OK'                       allow-methods='DELETE, GET, HEAD, OPTIONS, PATCH, POST, PUT'
+BASE req_method='GET'    req_headers='If-Match'                                    -> 200 'OK'                       allow-methods='DELETE, GET, HEAD, OPTIONS, PATCH, POST, PUT'
+# BASE allow_headers=["*"] mirrors any requested header -> X-Evil-Header and If-Match both 200 (no lockdown).
+
+--- G1 real-stack preflight, FINAL (commit abfb963) ---
+FINAL real-stack preflight (TestClient(default_app)):
+  ACRM='PATCH'  ACRH='Content-Type, Idempotency-Key, If-Match' -> 200 'OK'                       allow-methods='GET, POST, PUT, PATCH, DELETE, OPTIONS'
+      allow-headers='Accept, Accept-Language, Authorization, Content-Language, Content-Type, Idempotency-Key, If-Match, Origin, X-Requested-With'
+  ACRM='PATCH'  ACRH='If-Match'                               -> 200 'OK'                       allow-methods='GET, POST, PUT, PATCH, DELETE, OPTIONS'
+      allow-headers='Accept, Accept-Language, Authorization, Content-Language, Content-Type, Idempotency-Key, If-Match, Origin, X-Requested-With'
+  ACRM='POST'   ACRH=None                                     -> 200 'OK'                       allow-methods='GET, POST, PUT, PATCH, DELETE, OPTIONS'
+      allow-headers='Accept, Accept-Language, Authorization, Content-Language, Content-Type, Idempotency-Key, If-Match, Origin, X-Requested-With'
+  ACRM='TRACE'  ACRH=None                                     -> 400 'Disallowed CORS method'   allow-methods='GET, POST, PUT, PATCH, DELETE, OPTIONS'
+      allow-headers='Accept, Accept-Language, Authorization, Content-Language, Content-Type, Idempotency-Key, If-Match, Origin, X-Requested-With'
+  ACRM='HEAD'   ACRH=None                                     -> 400 'Disallowed CORS method'   allow-methods='GET, POST, PUT, PATCH, DELETE, OPTIONS'
+      allow-headers='Accept, Accept-Language, Authorization, Content-Language, Content-Type, Idempotency-Key, If-Match, Origin, X-Requested-With'
+  ACRM='PATCH'  ACRH='X-Evil-Header'                          -> 400 'Disallowed CORS headers'  allow-methods='GET, POST, PUT, PATCH, DELETE, OPTIONS'
+      allow-headers='Accept, Accept-Language, Authorization, Content-Language, Content-Type, Idempotency-Key, If-Match, Origin, X-Requested-With'
+
+--- G1 reconciled test alone (HEAD=abfb963) ---
+$ (cd backend) venv/bin/python -m pytest tests/test_cors.py -q
+4 passed, 2 warnings in 0.71s
+
+--- faithfulness: final main.py vs the two PR heads ---
+$ diff <(git show refs/pull/42/head:backend/app/main.py) backend/app/main.py
+<     allow_headers=["*"],
+---
+>     allow_headers=[ "Content-Type","Authorization","Accept","Origin","X-Requested-With","Idempotency-Key","If-Match", ]
+   # ONLY the header change (= PR#40 head's list + If-Match)
+$ diff <(git show refs/pull/40/head:backend/app/main.py) backend/app/main.py
+<     allow_methods=["*"],
+---
+>     allow_methods=["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+  + "If-Match",
+   # ONLY the method change (= PR#42) plus the If-Match line
+
+--- full backend suite ---
+BASE  (3e557c9): 2 failed, 636 passed, 32 warnings in 31.45s
+FINAL (abfb963): 2 failed, 637 passed, 32 warnings in 34.96s
+FAILED tests/test_signals.py::test_generated_codes_are_validated_and_bad_checksum_is_not_an_identifier
+FAILED tests/test_signals.py::test_ocr_has_text_boxes_and_mean_confidence
+# delta == +1 green (the reconciled CORS test); base-reds (test_signals env pair) identical.
+
+--- ruff / mypy / secret scan / CO-101 ---
+ruff: All checks passed!
+mypy app: Found 41 errors in 9 files (checked 90 source files) -- delta 0 vs BASE (recorded 41/9);
+  the 2 in app/main.py (:58, :64) are pre-existing `# type: ignore[no-untyped-def]` comments on
+  untouched handler defs (BASE lines 50/56), shifted by the +6 added header-list lines.
+$ git diff 3e557c9 HEAD | grep '^+' | grep -inE 'password|secret|token|api[_-]?key|private[_-]?key|BEGIN [A-Z ]*PRIVATE|aws_|bearer|credential|passwd|-----BEGIN'
+(no output) -> no secret-pattern match in added lines; no base64/hex run >=40 chars
+$ (cd backend) venv/bin/python -m pytest tests/test_assertions.py tests/test_search.py tests/test_privacy_audit.py tests/test_phase3_e2e.py tests/test_health.py -q
+41 passed, 5 warnings in 4.58s
+  # every backend test that sets an Origin header (CO-101); no CORS assertions exist outside test_cors.py
+
+--- ceiling diff (exactly the two write-ceiling files; no frontend) ---
+$ git diff --stat 3e557c9 HEAD
+ backend/app/main.py        | 12 ++++++++--
+ backend/tests/test_cors.py | 56 ++++++++++++++++++++++++++++++++++++++++++++--
+ 2 files changed, 64 insertions(+), 4 deletions(-)

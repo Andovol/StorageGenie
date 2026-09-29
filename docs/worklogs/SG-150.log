@@ -1,0 +1,33 @@
+SG-150 running log (chronological; live clock UTC)
+
+BASE = origin/automation request -> resolved 3e557c9008d8869b238e6ada49c7dfe5b7ebb470
+Contract recorded 0.40.0 == published, source /home/andrei/storagegenie-contract
+  (VERSION 0.40.0; commit f26dbd32e3c4bd7cf878333fba719a6ca1d10c3c; payload RULES.sha256
+   5b65629377bbac9e40bfa7e2f4d4e42a5667b3a08ec786beb47c6a677d9ac33c)
+Model/effort from /proc/1108044/cmdline: opencode-go/deepseek-v4.1-flash, --variant high
+
+2026-09-29T14:19:25Z  orientation: git status clean, HEAD == origin/automation == 3e557c9.
+                     Pull heads fetched into local refs/pull/42/head (d1c3988) and
+                     refs/pull/40/head (cc6610d); both merge-base 9fc1141.
+2026-09-29T~14:20Z    premise check: `git diff 9fc1141 origin/automation -- backend/app/main.py
+                     backend/tests/test_cors.py` is EMPTY -> the two ceiling files are byte-identical
+                     to both PRs' merge base; hunks carry exact context.
+                     baseline suite 2 failed, 636 passed (test_signals env pair). alembic heads single sg114.
+2026-09-29T~14:21Z    real-stack probe at BASE: allow_methods=["*"] expands to ALL_METHODS
+                     (DELETE,GET,HEAD,OPTIONS,PATCH,POST,PUT); TRACE is ALREADY 400 at BASE, and
+                     HEAD is allowed. Packet premise "wildcard TRACE-200" is CORRECTED: the genuine
+                     fail-pre discriminator is the exact-set assertion (BASE includes HEAD).
+2026-09-29T~14:22Z    G0 fail-pre: applied PR#42 test_cors.py hunk only (blob == head 07bd4e8);
+                     pytest tests/test_cors.py -> 1 failed (allow_methods exact set), 4 passed.
+                     committed a7710b8.
+2026-09-29T~14:23Z    G0 pass-post: applied PR#42 main.py hunk (blob == head a488e59); test_cors 5 passed.
+                     committed 4baa4bb.
+2026-09-29T~14:24Z    G1: PR#40 main.py hunk 3-way conflicted over #42 (adjacent lines, expected rewrite);
+                     reset, grafted #40's exact six-header list + If-Match (7). Reconciled test_cors.py
+                     into ONE coherent preflight test (methods exact set + headers incl If-Match + TRACE-400
+                     + disallowed-header-400) and updated the helper. Real-stack preflight green.
+                     committed abfb963.
+2026-09-29T~14:25Z    G2 gates: suite 2 failed, 637 passed (delta +1 green, base-reds identical);
+                     ruff All checks passed; mypy 41/9 delta 0; secret scan over added diff lines clean;
+                     CO-101 Origin-setting tests 41 passed. diff ceiling = the two files only.
+2026-09-29T~14:26Z    worklogs written; receipt notes to follow.
