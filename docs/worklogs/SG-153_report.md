@@ -188,8 +188,29 @@ Dispatch-ID: SG-153 | Report: docs/worklogs/SG-153_report.md | Work-HEAD: a5c0b8
 show_wh_exit=0
 ```
 
-- The first line carries BOTH `Dispatch-ID:` and `Report:` (`CO-97`). The final-tip dual-annotation
-  (SG-092 precedent) is executed and recorded in the subsection appended below.
+- The first line carries BOTH `Dispatch-ID:` and `Report:` (`CO-97`).
+
+**Final-tip dual-annotation** (note-anchor inoculation, SG-092 precedent) on the docs tip
+`76464f7a36bc2e93f58433d498d0232ef536ca54`; mapped-fetch `show`, verbatim:
+
+```
+$ git notes --ref=refs/notes/storagegenie-coder-reports add -m "Dispatch-ID: SG-153 | Report: docs/worklogs/SG-153_report.md | Work-HEAD: a5c0b88c96a7d3b1df724ebb83386b441c21cbe8" 76464f7a36bc2e93f58433d498d0232ef536ca54
+add_tip_exit=0
+
+$ git push origin refs/notes/storagegenie-coder-reports
+To github.com:Andovol/StorageGenie.git
+   98b4652..20962c4  refs/notes/storagegenie-coder-reports -> refs/notes/storagegenie-coder-reports
+push_exit=0
+
+$ git fetch origin refs/notes/storagegenie-coder-reports:refs/notes/sg153-fetched-e2
+From github.com:Andovol/StorageGenie
+ * [new ref]         refs/notes/storagegenie-coder-reports -> refs/notes/sg153-fetched-e2
+fetch_exit=0
+
+$ git notes --ref=refs/notes/sg153-fetched-e2 show 76464f7a36bc2e93f58433d498d0232ef536ca54
+Dispatch-ID: SG-153 | Report: docs/worklogs/SG-153_report.md | Work-HEAD: a5c0b88c96a7d3b1df724ebb83386b441c21cbe8
+show_tip_exit=0
+```
 
 ## Budget — actual versus budget (units stated)
 
