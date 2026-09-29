@@ -137,9 +137,56 @@ metered calls.**
 
 ## Receipt
 
-Push of the work to `automation`, receipt note on the notes ref, mapped-ref fetch and pasted `show` output are
-recorded in `docs/worklogs/SG-154.log` (final receipt block) after execution. No push to `storagegenie-evidence`,
-no `{{RECEIPT_CMD}}`.
+No push to `storagegenie-evidence`, no `{{RECEIPT_CMD}}`. The receipt is the note on
+`refs/notes/storagegenie-coder-reports`; the refspec is fetched into a **mapped** local name
+(`refs/notes/sg154-fetched`) and each `show` is pasted verbatim below (a default fetch never carries notes).
+
+**WORK_HEAD = `39cf71a99118332791db4e7d0e3a9dc51228ddb0`** (evidence commit) and
+**first tip = `993ab9f9b053752b3be7964c676b10e6f17b163c`** (worklog+report commit).
+
+```
+$ git push origin automation
+To github.com:Andovol/StorageGenie.git
+   b16d067..993ab9f  automation -> automation
+push_exit=0
+
+$ git notes --ref=refs/notes/storagegenie-coder-reports add -m "Dispatch-ID: SG-154 | Report: docs/worklogs/SG-154_report.md | Work-HEAD: 39cf71a99118332791db4e7d0e3a9dc51228ddb0" 39cf71a99118332791db4e7d0e3a9dc51228ddb0
+add_exit=0
+
+$ git push origin refs/notes/storagegenie-coder-reports
+To github.com:Andovol/StorageGenie.git
+   25a3eaf..f3fc49f  refs/notes/storagegenie-coder-reports -> refs/notes/storagegenie-coder-reports
+notes_push_exit=0
+
+$ git fetch origin refs/notes/storagegenie-coder-reports:refs/notes/sg154-fetched
+From github.com:Andovol/StorageGenie
+ * [new ref]         refs/notes/storagegenie-coder-reports -> refs/notes/sg154-fetched
+fetch_exit=0
+
+$ git notes --ref=refs/notes/sg154-fetched show 39cf71a99118332791db4e7d0e3a9dc51228ddb0
+Dispatch-ID: SG-154 | Report: docs/worklogs/SG-154_report.md | Work-HEAD: 39cf71a99118332791db4e7d0e3a9dc51228ddb0
+show_exit=0
+
+--- FINAL-TIP dual-annotation (note-anchor inoculation, SG-092 precedent) ---
+$ git notes --ref=refs/notes/storagegenie-coder-reports add -m "Dispatch-ID: SG-154 | Report: docs/worklogs/SG-154_report.md | Work-HEAD: 993ab9f9b053752b3be7964c676b10e6f17b163c" 993ab9f9b053752b3be7964c676b10e6f17b163c
+add_exit=0
+
+$ git push origin refs/notes/storagegenie-coder-reports
+To github.com:Andovol/StorageGenie.git
+   f3fc49f..afe2cd2  refs/notes/storagegenie-coder-reports -> refs/notes/storagegenie-coder-reports
+notes_push_exit=0
+
+$ git fetch origin refs/notes/storagegenie-coder-reports:refs/notes/sg154-fetched
+From github.com:Andovol/StorageGenie
+   f3fc49f..afe2cd2  refs/notes/storagegenie-coder-reports -> refs/notes/sg154-fetched
+fetch_exit=0
+
+$ git notes --ref=refs/notes/sg154-fetched show 993ab9f9b053752b3be7964c676b10e6f17b163c
+Dispatch-ID: SG-154 | Report: docs/worklogs/SG-154_report.md | Work-HEAD: 993ab9f9b053752b3be7964c676b10e6f17b163c
+show_exit=0
+```
+
+**note=yes** (both required notes present; existing-note refusal not hit on either new hash).
 
 ---
 
