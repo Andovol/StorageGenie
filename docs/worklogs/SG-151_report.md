@@ -191,6 +191,25 @@ Dispatch-ID: SG-151 | Report: docs/worklogs/SG-151_report.md | Work-HEAD: 88688f
 show_exit=0
 ```
 
+- The report-recording tip (`f87108a25ac9048d8d1a30ec0a1443831a4197e2`) was itself annotated; mapped-fetch
+  `show`, verbatim:
+
+```
+$ git notes --ref=refs/notes/storagegenie-coder-reports add -m "Dispatch-ID: SG-151 | Report: docs/worklogs/SG-151_report.md | Work-HEAD: 88688f50761c76e07a011cc2576adf5eb112924f" f87108a25ac9048d8d1a30ec0a1443831a4197e2
+add_exit=0
+$ git push origin refs/notes/storagegenie-coder-reports
+To github.com:Andovol/StorageGenie.git
+   b6daecb..1faeb2c  refs/notes/storagegenie-coder-reports -> refs/notes/storagegenie-coder-reports
+push_notes_exit=0
+$ git fetch origin refs/notes/storagegenie-coder-reports:refs/notes/sg151-fetched-e2
+From github.com:Andovol/StorageGenie
+ * [new ref]         refs/notes/storagegenie-coder-reports -> refs/notes/sg151-fetched-e2
+fetch_exit=0
+$ git notes --ref=refs/notes/sg151-fetched-e2 show f87108a25ac9048d8d1a30ec0a1443831a4197e2
+Dispatch-ID: SG-151 | Report: docs/worklogs/SG-151_report.md | Work-HEAD: 88688f50761c76e07a011cc2576adf5eb112924f
+show_exit=0
+```
+
 ## Budget — actual versus budget (units stated)
 
 | Leg | Command class | Budget | Actual |
