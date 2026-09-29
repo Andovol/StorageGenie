@@ -146,7 +146,35 @@ metered calls.**
 > Filled by executing the packet's note path and pasting the output verbatim. If this subsection carried
 > no pasted `git notes … show` output, the step was not executed — it is executed, and pasted below.
 
-RECEIPT_PLACEHOLDER
+Existing-note check before adding (must be empty): `git notes … show e8f20a3…` → `error: no note found`
+(exit 1); `git notes … show 29f488d…` → `error: no note found` (exit 1). No refusal encountered.
+
+Executed output, verbatim (`receipt1.txt`):
+
+```
+$ git notes --ref=refs/notes/storagegenie-coder-reports add -m "Dispatch-ID: SG-152 | Report: docs/worklogs/SG-152_report.md | Work-HEAD: e8f20a30c3313df4117e3396bb9df3bb0cef054a" e8f20a30c3313df4117e3396bb9df3bb0cef054a
+add_wh_exit=0
+$ git notes --ref=refs/notes/storagegenie-coder-reports add -m "Dispatch-ID: SG-152 | Report: docs/worklogs/SG-152_report.md | Work-HEAD: e8f20a30c3313df4117e3396bb9df3bb0cef054a" 29f488d494d1a87102ad825bbf669761a49be3ed
+add_tip_exit=0
+$ git push origin refs/notes/storagegenie-coder-reports
+To github.com:Andovol/StorageGenie.git
+   7c4d37f..bd7bcb3  refs/notes/storagegenie-coder-reports -> refs/notes/storagegenie-coder-reports
+push_exit=0
+$ git fetch origin refs/notes/storagegenie-coder-reports:refs/notes/sg152-fetched-e1
+From github.com:Andovol/StorageGenie
+ * [new ref]         refs/notes/storagegenie-coder-reports -> refs/notes/sg152-fetched-e1
+fetch_exit=0
+$ git notes --ref=refs/notes/sg152-fetched-e1 show e8f20a30c3313df4117e3396bb9df3bb0cef054a
+Dispatch-ID: SG-152 | Report: docs/worklogs/SG-152_report.md | Work-HEAD: e8f20a30c3313df4117e3396bb9df3bb0cef054a
+show_wh_exit=0
+$ git notes --ref=refs/notes/sg152-fetched-e1 show 29f488d494d1a87102ad825bbf669761a49be3ed
+Dispatch-ID: SG-152 | Report: docs/worklogs/SG-152_report.md | Work-HEAD: e8f20a30c3313df4117e3396bb9df3bb0cef054a
+show_tip_exit=0
+```
+
+The doubly-annotated tip `29f488d494d1a87102ad825bbf669761a49be3ed` (this report commit) and the work HEAD
+`e8f20a30c3313df4117e3396bb9df3bb0cef054a` both carry the note; first line carries BOTH `Dispatch-ID:`
+and `Report:` (`CO-97`). The final-tip dual-annotation is completed in the subsection below.
 
 ## UNCLEAR
 

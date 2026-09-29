@@ -35,5 +35,8 @@ Role: Coder (never Architect — no dispatch verb run for any ID, no unit starte
                     diff lines clean. diff ceiling = backend/tests/test_schemas_common.py only (106+).
                     Interpreter note: repo-root venv lacks pillow_heif; backend/venv (1.8.0) is the
                     suite interpreter. worktree clean.
-2026-09-29T~14:48Z  Worklogs written (this log + report + verify log); commit + push to automation;
-                    receipt notes (WORK_HEAD + final tip) to follow.
+2026-09-29T~14:48Z  Worklogs written (this log + report + verify log); committed 29f488d. Receipt:
+                    added notes on WORK_HEAD e8f20a3 and on 29f488d, pushed refs/notes/storagegenie-coder-reports
+                    (7c4d37f..bd7bcb3), fetched into mapped ref refs/notes/sg152-fetched-e1, `show` for both
+                    pasted verbatim into the report. Final-tip dual-annotation of the record commit follows;
+                    push automation; worktree clean.
