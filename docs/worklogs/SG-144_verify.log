@@ -1,0 +1,38 @@
+SG-144_verify.log — guard-test verification captures (G0 committed BEFORE any edit)
+
+BASE (packet ref origin/automation resolved) = a6644810d7d21e00247e3cfc7be33d6ab318f428
+Contract 0.40.0 · source /home/andrei/storagegenie-contract/VERSION · contract HEAD f26dbd32e3c4bd7cf878333fba719a6ca1d10c3c
+
+######## G0 — quote the README runbook strings + the SG-086 drill form; CLEAN or DRIFTED ########
+Live clock: 2026-09-29T10:03:18Z
+README.md sha256 at capture: 1286ecd3446a074e34e7fd835b99a245439b205c7fb2697caf7faa787f6c6859
+
+$ /home/andrei/StorageGenie/venv/bin/python -c "print(open('README.md').read().splitlines()[n-1] ...)"   # repr per expected line
+README.md:26   'docker compose up --build -d'
+README.md:33   'docker compose exec backend python -m alembic upgrade head'
+README.md:34   'docker compose exec backend python -m app.seed'
+README.md:63   'docker compose up --build -d'
+README.md:64   'docker compose exec backend python -m alembic upgrade head'
+README.md:65   'docker compose exec backend python -m app.seed'
+README.md:66   'curl -s http://127.0.0.1:8003/v1/health'
+README.md:127  '```sh'
+README.md:128  'backend/venv/bin/python backend/scripts/backup_restore_drill.py \\'
+README.md:129  '  --prod-db data/db/storagegenie.db \\'
+README.md:130  '  --prod-storage "$(docker volume inspect storagegenie_storage_data --format '"'"'{{.Mountpoint}}'"'"')"'
+README.md:131  '```'
+$ anti-drift probe: "{{.Mountpoint}}')/_data" present in README.md? False
+
+SG-086 drill invocation form (the operator tooling, backend/scripts/backup_restore_drill.py):
+  main() declares the two required flags (lines 243-244):
+    parser.add_argument("--prod-db", required=True, type=Path)
+    parser.add_argument("--prod-storage", required=True, type=Path)
+  No third flag is required; --work-dir is optional (line 245).
+
+VERDICT: CLEAN. The README command strings match the SG-086 form:
+  - compose-up:       'docker compose up --build -d'                                (lines 26 and 63)
+  - alembic-upgrade:  'docker compose exec backend python -m alembic upgrade head'  (lines 33 and 64)
+  - seed:             'docker compose exec backend python -m app.seed'              (lines 34 and 65)
+  - drill invocation: the 3-line block at lines 128-130, using exactly the script's
+                      --prod-db (value data/db/storagegenie.db) and --prod-storage
+                      (value the raw volume mountpoint, NO /_data suffix).
+The doubled-/_data drift repaired by SG-126 (F-SG126-1) is absent. No product hunk ships.
