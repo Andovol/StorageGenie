@@ -85,6 +85,25 @@ def ddl_statements() -> tuple[str, ...]:
     )
 
 
+def drop_statements() -> tuple[str, ...]:
+    """Return the FTS teardown statements in dependency order.
+
+    Exposed for the same reason as :func:`ddl_statements`: a revision can
+    render the drops through ``op.execute`` in offline (``--sql``) mode, where
+    ``op.get_bind()`` has no ``exec_driver_sql``. Triggers go before the table;
+    the external-content view names ``asset`` and must be dropped before any
+    batch recreate of that table.
+    """
+
+    return (
+        "DROP TRIGGER IF EXISTS asset_fts_after_delete",
+        "DROP TRIGGER IF EXISTS asset_fts_after_update",
+        "DROP TRIGGER IF EXISTS asset_fts_after_insert",
+        "DROP TABLE IF EXISTS asset_fts",
+        "DROP VIEW IF EXISTS asset_fts_content",
+    )
+
+
 def _ddl(connection: Connection) -> None:
     for statement in ddl_statements():
         connection.exec_driver_sql(statement)

@@ -1,0 +1,106 @@
+=== SG-147 verify log (verbatim captures) ===
+
+--- G0: alembic upgrade head --sql at BASE ---
+$ cd backend && timeout 300 venv/bin/alembic upgrade head --sql
+EXIT=1  LINES=384  SHA256=4f2615ab661e565165ba0007f5dc65b8ee8c2ad5dc233b10db1e1e4c467ef06c
+    _drop_fts()
+  File "/home/andrei/StorageGenie/backend/alembic/versions/20260916_sg048_name_optional.py", line 36, in _drop_fts
+    connection.exec_driver_sql("DROP TRIGGER IF EXISTS asset_fts_after_delete")
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'MockConnection' object has no attribute 'exec_driver_sql'
+
+FTS DDL line from G0 stdout:
+225:CREATE VIRTUAL TABLE IF NOT EXISTS asset_fts USING fts5(
+
+--- G2: alembic upgrade head --sql after sg048 fix (still blocked) ---
+EXIT=1  LINES=462  SHA256=ea0e8ebe7fd5ecb42e49292c1f5cc26d84ba084a4361466e52cb4290457948f1
+  File "/home/andrei/StorageGenie/backend/alembic/versions/20260917_sg068_saved_search.py", line 21, in _has_table
+    return sa.inspect(op.get_bind()).has_table(name)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/andrei/StorageGenie/backend/venv/lib/python3.12/site-packages/sqlalchemy/inspection.py", line 148, in inspect
+    raise exc.NoInspectionAvailable(
+sqlalchemy.exc.NoInspectionAvailable: No inspection system is available for object of type <class 'sqlalchemy.engine.mock.MockConnection'>
+
+sg048 batch render (G2 stdout lines 358-380):
+DROP VIEW IF EXISTS asset_fts_content;
+
+CREATE TABLE _alembic_tmp_asset (
+    id VARCHAR(36) NOT NULL, 
+    household_id VARCHAR(36) NOT NULL, 
+    display_name VARCHAR(300), 
+    asset_type VARCHAR(50) NOT NULL, 
+    status VARCHAR(30) NOT NULL, 
+    quantity FLOAT, 
+    unit VARCHAR(50), 
+    condition VARCHAR(50), 
+    version INTEGER NOT NULL, 
+    created_at DATETIME DEFAULT (CURRENT_TIMESTAMP) NOT NULL, 
+    updated_at DATETIME DEFAULT (CURRENT_TIMESTAMP) NOT NULL, 
+    PRIMARY KEY (id), 
+    FOREIGN KEY(household_id) REFERENCES household (id) ON DELETE CASCADE
+);
+
+INSERT INTO _alembic_tmp_asset (id, household_id, display_name, asset_type, status, quantity, unit, condition, version, created_at, updated_at) SELECT asset.id, asset.household_id, asset.display_name, asset.asset_type, asset.status, asset.quantity, asset.unit, asset.condition, asset.version, asset.created_at, asset.updated_at 
+FROM asset;
+
+DROP TABLE asset;
+
+ALTER TABLE _alembic_tmp_asset RENAME TO asset;
+
+
+post-FTS markers actually emitted (Running upgrade lines):
+INFO  [alembic.runtime.migration] Running upgrade  -> 0201cf10c56c, 001 core foundation
+-- Running upgrade  -> 0201cf10c56c
+INFO  [alembic.runtime.migration] Running upgrade 0201cf10c56c -> 20260908_sg013_observation, deterministic signal observations
+-- Running upgrade 0201cf10c56c -> 20260908_sg013_observation
+INFO  [alembic.runtime.migration] Running upgrade 20260908_sg014_candidate -> 20260908_sg017_fts, SQLite FTS5 index for asset catalog search.
+-- Running upgrade 20260908_sg014_candidate -> 20260908_sg017_fts
+INFO  [alembic.runtime.migration] Running upgrade 20260908_sg017_fts -> 20260912_sg025_provider_call, provider call ledger (SG-025, blueprint §3.3)
+-- Running upgrade 20260908_sg017_fts -> 20260912_sg025_provider_call
+INFO  [alembic.runtime.migration] Running upgrade 20260912_sg025_provider_call -> 20260914_sg035_foundations, data foundations: source attribution, planning suggestions, guardrail log (SG-035, Phase 3 S2/S3)
+-- Running upgrade 20260912_sg025_provider_call -> 20260914_sg035_foundations
+INFO  [alembic.runtime.migration] Running upgrade 20260914_sg035_foundations -> 20260916_sg048_name_optional, name-optional capture: asset.display_name becomes nullable (SG-048, S2)
+-- Running upgrade 20260914_sg035_foundations -> 20260916_sg048_name_optional
+INFO  [alembic.runtime.migration] Running upgrade 20260916_sg048_name_optional -> 20260917_sg068_saved_search, saved searches: named per-household filter sets (SG-068, Phase 4)
+-- Running upgrade 20260916_sg048_name_optional -> 20260917_sg068_saved_search
+
+--- online schema equivalence (BASE vs fixed) ---
+$ diff /tmp/sg147/base_online_schema.txt /tmp/sg147/fixed_online_schema.txt
+ONLINE SCHEMA IDENTICAL
+
+--- online upgrade head on temp SQLite (fixed) ---
+INFO  [alembic.runtime.migration] Running upgrade 20260923_sg100_enrich_snapshot -> 20260924_sg113_location, location tree + asset location assignment (SG-113, G3)
+INFO  [alembic.runtime.migration] Running upgrade 20260924_sg113_location -> 20260924_sg114_relation, asset relations: typed links (SG-114, G4)
+
+--- full suite ---
+2 failed, 635 passed, 32 warnings in 32.07s
+FAILED tests/test_signals.py::test_generated_codes_are_validated_and_bad_checksum_is_not_an_identifier
+FAILED tests/test_signals.py::test_ocr_has_text_boxes_and_mean_confidence
+
+--- ruff / mypy / heads ---
+ruff: All checks passed!
+mypy app: Found 41 errors in 9 files (checked 90 source files) -- none in touched files
+alembic heads: 20260924_sg114_relation (head)
+
+--- offline downgrade renders ---
+sg048:sg035 EXIT=0 (20 DDL/version lines); sg017:sg014 EXIT=0
+
+--- sg017 downgrade render tail ---
+DROP TRIGGER IF EXISTS asset_fts_after_delete;
+
+DROP TRIGGER IF EXISTS asset_fts_after_update;
+
+DROP TRIGGER IF EXISTS asset_fts_after_insert;
+
+DROP TABLE IF EXISTS asset_fts;
+
+DROP VIEW IF EXISTS asset_fts_content;
+
+UPDATE alembic_version SET version_num='20260908_sg014_candidate' WHERE alembic_version.version_num = '20260908_sg017_fts';
+
+
+--- sg048 downgrade render tail ---
+        END;
+
+UPDATE alembic_version SET version_num='20260914_sg035_foundations' WHERE alembic_version.version_num = '20260916_sg048_name_optional';
+

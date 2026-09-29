@@ -1,0 +1,63 @@
+# SG-147 worklog — offline `--sql` end-to-end fix (sg048 in ceiling, unserved)
+
+Role: Coder (never Architect; no dispatch verb run for any ID; no unit started or polled).
+Work dir: /home/andrei/StorageGenie
+Clock first capture: 2026-09-29T11:19:52Z
+
+## 11:05Z — G0 fail-pre at BASE (PG-EV-08, PG-SC-12)
+- BASE = origin/automation = HEAD = 843e3d220daf4f339289d4f38337a5cbba40c5da (SG-147 packet commit).
+- `cd backend && timeout 300 venv/bin/alembic upgrade head --sql` -> EXIT=1.
+  - 384 lines; sha256 4f2615ab661e565165ba0007f5dc65b8ee8c2ad5dc233b10db1e1e4c467ef06c.
+  - Aborts at `20260916_sg048_name_optional.py:36` `_drop_fts` -> `connection.exec_driver_sql` ->
+    `AttributeError: 'MockConnection' object has no attribute 'exec_driver_sql'`.
+  - Premise correction: the BASE abort is the sg048 `exec_driver_sql`, NOT the packet-quoted
+    `copy_from` CommandError (that was SG-146's monkeypatch probe, past the exec_driver_sql line).
+  - FTS DDL from sg017 already emits: `CREATE VIRTUAL TABLE IF NOT EXISTS asset_fts USING fts5(` (line 225).
+  - Only markers through sg048 reachable; sg068+ do not emit.
+- STOP conditions checked: exit is NOT already 0; no live-DB write needed. G0 proceeds.
+
+## 11:10Z — G1 sg048 offline-safe + copy_from
+- Read write path first: sg048 full, fts.py, sg017 offline branch; read path: env.py:28-32,47-48.
+- fts.py: added public `drop_statements()` (5 teardown strings, triggers->table->view). ddl_statements()
+  and _ddl() untouched.
+- sg017_fts.py downgrade(): offline branch renders `drop_statements()` through `op.execute`; online
+  keeps `exec_driver_sql` (F-SG146-5 symmetry). upgrade() untouched.
+- sg048_name_optional.py:
+  - `_exec(statement)` -> `op.execute` offline, `exec_driver_sql` online.
+  - `_drop_fts()` loops `drop_statements()` via `_exec`.
+  - `_reinstall_fts()` offline renders `ddl_statements()` via `op.execute`; online keeps
+    `install_asset_fts(bind, rebuild=True)` (rebuild needs live rows).
+  - `_asset_table(display_name_nullable)` builds the full pre-state asset Table (columns + cascade FK +
+    PK + server defaults + `ix_asset_household_id`) for `batch_alter_table(copy_from=...)`.
+  - Both batch calls pass `copy_from`; downgrade's live nameless-row guard is skipped offline (no
+    connection to read rows).
+- Proof the batch is real (G2 log lines 358-380): `CREATE TABLE _alembic_tmp_asset (...)` with the
+  `display_name` nullable + cascade FK, `INSERT ... SELECT`, `DROP TABLE asset`,
+  `ALTER TABLE _alembic_tmp_asset RENAME TO asset`, `CREATE INDEX ix_asset_household_id`.
+
+## 11:12Z — G1 online-equivalence rail (PG-SC-01)
+- Online `alembic upgrade head` on a temp SQLite -> EXIT=0.
+- `sqlite_master` dump for `asset` (table DDL + indexes + triggers) diffed BASE vs fixed -> IDENTICAL.
+- Targeted `tests/test_sg048_name_optional.py` -> 9 passed.
+- `alembic heads` single `20260924_sg114_relation` before == after (no new revision).
+- Offline downgrade renders also succeed: sg048:sg035 EXIT=0, sg017:sg014 EXIT=0.
+
+## 11:14Z — G2 end-to-end offline: BLOCKED at sg068
+- Re-run `alembic upgrade head --sql` -> still EXIT=1, 462 lines, sha ea0e8ebe7fd5ecb42e49292c1f5cc26d84ba084a4361466e52cb4290457948f1.
+  - sg048 now renders fully (FTS drop, batch recreate, FTS rebuild).
+  - New abort at `20260917_sg068_saved_search.py:21` `_has_table` ->
+    `sa.inspect(op.get_bind()).has_table(name)` ->
+    `sqlalchemy.exc.NoInspectionAvailable: No inspection system is available for object of type
+    <class 'sqlalchemy.engine.mock.MockConnection'>`.
+- Same `_has_table` offline guard found in three more post-FTS revisions:
+  sg100_enrich_snapshot.py:21, sg113_location.py:21, sg114_relation.py:21.
+- All four are OUTSIDE the write ceiling -> `Any other write is a STOP`. `upgrade head --sql` exit 0 +
+  all 7 post-FTS markers is unreachable within the ceiling.
+- G2 test withheld (would assert exit 0 and fail -> blast-radius violation, PG-IC-08). Not vacuous-added.
+- Full suite: 2 failed, 635 passed (base-reds = test_signals.py env pair), == BASE (delta +0 files).
+- ruff: All checks passed. mypy: 41 errors, none in touched files (SG-146 baseline 41).
+- Secret scan over the diff: clean.
+
+## 11:20Z — BLOCKED commit path (PG-EV-03)
+- Commit within-ceiling fix with `BLOCKED:` first line, push to automation, receipt note on WORK_HEAD,
+  push notes ref, mapped fetch + show. Worktree clean (CO-55).
