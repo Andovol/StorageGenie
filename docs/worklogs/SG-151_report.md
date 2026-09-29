@@ -157,14 +157,38 @@ close-out rider).
   (`refs/notes/sg151-fetched`); executed output, verbatim:
 
 ```
-<RECEIPT_WORKHEAD_TBD>
+$ git notes --ref=refs/notes/storagegenie-coder-reports add -m "Dispatch-ID: SG-151 | Report: docs/worklogs/SG-151_report.md | Work-HEAD: 88688f50761c76e07a011cc2576adf5eb112924f" 88688f50761c76e07a011cc2576adf5eb112924f
+add_exit=0
+$ git push origin refs/notes/storagegenie-coder-reports
+To github.com:Andovol/StorageGenie.git
+   427f5a1..153067b  refs/notes/storagegenie-coder-reports -> refs/notes/storagegenie-coder-reports
+push_notes_exit=0
+$ git fetch origin refs/notes/storagegenie-coder-reports:refs/notes/sg151-fetched
+From github.com:Andovol/StorageGenie
+ * [new ref]         refs/notes/storagegenie-coder-reports -> refs/notes/sg151-fetched
+fetch_exit=0
+$ git notes --ref=refs/notes/sg151-fetched show 88688f50761c76e07a011cc2576adf5eb112924f
+Dispatch-ID: SG-151 | Report: docs/worklogs/SG-151_report.md | Work-HEAD: 88688f50761c76e07a011cc2576adf5eb112924f
+show_exit=0
 ```
 
 - **Final-tip dual-annotation** (note-anchor inoculation, SG-092 precedent); mapped-fetch `show`,
   verbatim:
 
 ```
-<RECEIPT_TIP_TBD>
+$ git notes --ref=refs/notes/storagegenie-coder-reports add -m "Dispatch-ID: SG-151 | Report: docs/worklogs/SG-151_report.md | Work-HEAD: 88688f50761c76e07a011cc2576adf5eb112924f" 5a750806a73fed32e214ae69644cb20ad37af30e
+add_exit=0
+$ git push origin refs/notes/storagegenie-coder-reports
+To github.com:Andovol/StorageGenie.git
+   153067b..b6daecb  refs/notes/storagegenie-coder-reports -> refs/notes/storagegenie-coder-reports
+push_notes_exit=0
+$ git fetch origin refs/notes/storagegenie-coder-reports:refs/notes/sg151-fetched-final
+From github.com:Andovol/StorageGenie
+ * [new ref]         refs/notes/storagegenie-coder-reports -> refs/notes/sg151-fetched-final
+fetch_exit=0
+$ git notes --ref=refs/notes/sg151-fetched-final show 5a750806a73fed32e214ae69644cb20ad37af30e
+Dispatch-ID: SG-151 | Report: docs/worklogs/SG-151_report.md | Work-HEAD: 88688f50761c76e07a011cc2576adf5eb112924f
+show_exit=0
 ```
 
 ## Budget — actual versus budget (units stated)
