@@ -25,4 +25,5 @@ Contract recorded 0.40.0 == published, source /home/andrei/storagegenie-contract
 2026-09-29T~14:07Z   full suite: 2 failed, 636 passed (32.82s); base-reds = test_signals pair.
                      ruff All checks passed; mypy 41 errors / 9 files (delta 0, none touched).
                      secret scan over added diff lines + new test: clean. PG-SC-11 sweep listed.
-2026-09-29T~14:10Z   worklogs written; commit (WORK_HEAD) then receipt.
+2026-09-29T~14:10Z   worklogs written; commit H1=b4d31fa323d86e80f627cc046d8e8d2ae195bf86 (WORK_HEAD);
+                     branch pushed 94ba35e..b4d31fa; notes ref note added on H1, pushed, mapped-fetch verified.

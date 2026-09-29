@@ -8,7 +8,7 @@ FIXED: `alembic upgrade head --sql` now exits 0 across the full chain — the fo
 **Origin remote (as on host):** `git@github.com:Andovol/StorageGenie.git` (fetch+push)
 **BASE (packet ref `origin/automation` requested → resolved commit):** `94ba35ed3f7353746ee3c80a1ff328717b1e7779`
 (the ref and the resolved commit are stated separately — two fields, never one).
-**WORK_HEAD:** `__WORK_HEAD__`
+**WORK_HEAD:** `b4d31fa323d86e80f627cc046d8e8d2ae195bf86`
 **Contract:** recorded `0.40.0` == published — source path `/home/andrei/storagegenie-contract/VERSION`
 (`0.40.0`); `git -C /home/andrei/storagegenie-contract rev-parse HEAD` =
 `f26dbd32e3c4bd7cf878333fba719a6ca1d10c3c` (subject `Contract payload 0.40.0`); payload `RULES.sha256` =
@@ -157,7 +157,28 @@ only the call site now guards it. `sg017_fts.py`, `fts.py`, `sg048_name_optional
 - Note on WORK_HEAD, then `refs/notes/storagegenie-coder-reports` pushed and verified from a **mapped**
   fetch; executed output pasted verbatim below.
 
-__RECEIPT_BLOCK__
+- Note on WORK_HEAD, then `refs/notes/storagegenie-coder-reports` pushed and verified from a **mapped**
+  fetch (`refs/notes/sg148-fetched`); executed output, verbatim:
+
+```
+$ git notes --ref=refs/notes/storagegenie-coder-reports add -m "Dispatch-ID: SG-148 | Report: docs/worklogs/SG-148_report.md | Work-HEAD: b4d31fa323d86e80f627cc046d8e8d2ae195bf86" b4d31fa323d86e80f627cc046d8e8d2ae195bf86
+add_exit=0
+$ git push origin refs/notes/storagegenie-coder-reports
+To github.com:Andovol/StorageGenie.git
+   99426af..2572b8d  refs/notes/storagegenie-coder-reports -> refs/notes/storagegenie-coder-reports
+push_notes_exit=0
+$ git fetch origin refs/notes/storagegenie-coder-reports:refs/notes/sg148-fetched
+From github.com:Andovol/StorageGenie
+ * [new ref]         refs/notes/storagegenie-coder-reports -> refs/notes/sg148-fetched
+fetch_exit=0
+$ git notes --ref=refs/notes/sg148-fetched show b4d31fa323d86e80f627cc046d8e8d2ae195bf86
+Dispatch-ID: SG-148 | Report: docs/worklogs/SG-148_report.md | Work-HEAD: b4d31fa323d86e80f627cc046d8e8d2ae195bf86
+show_exit=0
+```
+
+- Branch push `94ba35e..b4d31fa HEAD -> automation` (exit 0) preceded the notes push.
+
+__DUAL_BLOCK__
 
 ## Budget — actual versus budget (units stated)
 
