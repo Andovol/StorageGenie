@@ -1,0 +1,414 @@
+SG-154 — close-out deploy rider — raw verification log (verbatim executed output)
+
+Contract echo: VERSION=0.40.0
+  source path: /home/andrei/storagegenie-contract/VERSION
+  contract HEAD: f26dbd32e3c4bd7cf878333fba719a6ca1d10c3c
+  RULES.md sha256: 5b65629377bbac9e40bfa7e2f4d4e42a5667b3a08ec786beb47c6a677d9ac33c
+  (== AGENTS.md recorded installed payload hash 5b656293… for 0.39.0+0.40.0; recorded == published, D4)
+  .rules-cache/ ABSENT on host (SG-145 F-SG145-1); live checkout is the contract path.
+
+Live clock at capture: 2026-09-29T15:13:06Z
+
+Model/effort (CO-78, from process arguments, never the identity line):
+  dispatch wrapper: bash /usr/local/lib/dispatch/run-coder SG-154
+  parent: PID 1191616 /proc/1191616/cmdline =
+  opencode run --auto --dir /home/andrei/StorageGenie --model opencode-go/deepseek-v4.1-flash --variant high
+  -> modelID opencode-go/deepseek-v4.1-flash, effort high, coder opencode (SG-154 trigger coder=opencode effort=high)
+
+BASE ref requested: origin/automation
+  git rev-parse origin/automation HEAD:
+b16d0670db5f1803bc385256e23801a4f71ac311
+b16d0670db5f1803bc385256e23801a4f71ac311
+  worktree: 1 modified entries
+
+================================================================================
+BEFORE — read-only snapshot (old container/image; pre-rebuild)
+================================================================================
+$ docker inspect -f 'ContainerID={{.Id}} Image={{.Image}} RestartCount={{.RestartCount}} Created={{.Created}}' storagegenie-backend-1
+ContainerID=55d398ed7625cf637f587d863d60c0d114355ca9312b554becdfccd59e71a4de Image=sha256:76917528f28bc92a89029dc7ef08bb94cdf8682852a003bd7c53470343601303 RestartCount=0 Created=2026-09-29T09:49:22.387840497Z
+$ docker images --no-trunc --format '{{.Repository}}:{{.Tag}} ID={{.ID}} Created={{.CreatedAt}}' storagegenie-backend
+storagegenie-backend:latest ID=sha256:76917528f28bc92a89029dc7ef08bb94cdf8682852a003bd7c53470343601303 Created=2026-09-29 09:49:17 +0000 UTC
+$ docker ps --filter name=storagegenie --format '{{.ID}} {{.Image}} {{.Status}} {{.Ports}}'
+55d398ed7625 storagegenie-backend Up 5 hours (healthy) 127.0.0.1:8003->8000/tcp
+
+--- BEFORE health x6 ({{HEALTH_CMD}}) ---
+read1 http=200 body={"status":"ok","db":"ok","storage":"ok"}
+read2 http=200 body={"status":"ok","db":"ok","storage":"ok"}
+read3 http=200 body={"status":"ok","db":"ok","storage":"ok"}
+read4 http=200 body={"status":"ok","db":"ok","storage":"ok"}
+read5 http=200 body={"status":"ok","db":"ok","storage":"ok"}
+read6 http=200 body={"status":"ok","db":"ok","storage":"ok"}
+
+--- BEFORE gate (unauthenticated, Host storagegenie.dynv6.net) ---
+http=301 -> 301
+https=401 -> 401
+
+--- BEFORE alembic current (in container) ---
+INFO  [alembic.runtime.migration] Context impl SQLiteImpl.
+INFO  [alembic.runtime.migration] Will assume non-transactional DDL.
+20260924_sg114_relation (head)
+  alembic_version row: 20260924_sg114_relation
+
+--- BEFORE 24 table row counts (sqlite3 -readonly) ---
+alembic_version = 1
+assertion = 28
+asset = 6
+asset_evidence = 12
+asset_fts = 6
+asset_fts_config = 1
+asset_fts_data = 8
+asset_fts_docsize = 6
+asset_fts_idx = 6
+audit_event = 68
+candidate = 8
+evidence = 13
+guardrail_event = 2
+household = 1
+idempotency_key = 9
+job = 9
+job_step = 56
+observation = 16
+planning_suggestion = 0
+provider_call = 18
+review_task = 6
+saved_search = 0
+source_attribution = 0
+user = 2
+table_count= 24
+
+--- BEFORE served bundle (in container /app/static) ---
+total 324
+drwxr-xr-x 2 root root   4096 Sep 29 09:49 .
+drwxr-xr-x 3 root root   4096 Sep 29 09:49 ..
+-rw-r--r-- 1 root root 318152 Sep 29 09:49 index-CTQCofuO.js
+-rw-r--r-- 1 root root   3911 Sep 29 09:49 index-DO0gjGV6.css
+assets/index-CTQCofuO.js
+d9dbdef301177ad9f82f0b1dd290336eb5e10dd47b6d68836eebf14d3cbeb12c  /app/static/assets/index-CTQCofuO.js
+37b25dbdd4b0ecfdedb8255bc7f8af286726334e95a1a3a9e85b9ba381b3d57c  /app/static/assets/index-DO0gjGV6.css
+
+--- BEFORE CORS live (OPTIONS preflight, zero writes) ---
+$ OPTIONS /v1/assets Origin: http://localhost:5173 ACRM: PATCH ACRH: If-Match
+HTTP/1.1 200 OK
+date: Tue, 29 Sep 2026 15:13:07 GMT
+server: uvicorn
+vary: Origin
+access-control-allow-methods: DELETE, GET, HEAD, OPTIONS, PATCH, POST, PUT
+access-control-max-age: 600
+access-control-allow-credentials: true
+access-control-allow-origin: http://localhost:5173
+access-control-allow-headers: If-Match
+content-length: 2
+content-type: text/plain; charset=utf-8
+
+$ OPTIONS ACRM: TRACE
+HTTP/1.1 400 Bad Request
+date: Tue, 29 Sep 2026 15:13:07 GMT
+server: uvicorn
+
+Disallowed CORS method$ OPTIONS ACRM: PATCH ACRH: X-Evil-Header
+HTTP/1.1 200 OK
+date: Tue, 29 Sep 2026 15:13:07 GMT
+server: uvicorn
+content-type: text/plain; charset=utf-8
+
+
+--- BEFORE counts, FULL dynamic table set (re-read, never inherited; correction of the packet's stale '24') ---
+$ sqlite3 -readonly "$DB" "SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%' ORDER BY name;"
+alembic_version = 1
+assertion = 28
+asset = 6
+asset_evidence = 12
+asset_fts = 6
+asset_fts_config = 1
+asset_fts_data = 8
+asset_fts_docsize = 6
+asset_fts_idx = 6
+asset_location = 1
+asset_relation = 1
+audit_event = 68
+candidate = 8
+enrich_snapshot = 4
+evidence = 13
+guardrail_event = 2
+household = 1
+idempotency_key = 9
+job = 9
+job_step = 56
+location = 1
+observation = 16
+planning_suggestion = 0
+provider_call = 18
+review_task = 6
+saved_search = 0
+source_attribution = 0
+user = 2
+table_count= 28
+  NOTE: packet says '24 counts'; the live schema has 28 user tables + 1 view (asset_fts_content).
+  The 24-table list predates SG-100 (enrich_snapshot), SG-113 (location, asset_location) and
+  SG-114 (asset_relation) migrations; counting only 24 would narrow the check. Full set counted.
+================================================================================
+G0 — REBUILD (exactly ONE), EROFS workaround (SG-132/SG-142/SG-143 precedent)
+================================================================================
+$ BUILDX_CONFIG=/tmp/opencode/buildx docker compose build backend
+--- build log (full) ---
+ Image storagegenie-backend Building 
+#1 [internal] load local bake definitions
+#1 reading from stdin 607B done
+#1 DONE 0.0s
+
+#2 [internal] load build definition from Dockerfile
+#2 transferring dockerfile: 1.06kB done
+#2 DONE 0.0s
+
+#3 [internal] load metadata for docker.io/library/python:3.12.11-slim-bookworm@sha256:519591d6871b7bc437060736b9f7456b8731f1499a57e22e6c285135ae657bf7
+#3 ...
+
+#4 [internal] load metadata for docker.io/library/node:20-alpine
+#4 DONE 0.2s
+
+#3 [internal] load metadata for docker.io/library/python:3.12.11-slim-bookworm@sha256:519591d6871b7bc437060736b9f7456b8731f1499a57e22e6c285135ae657bf7
+#3 DONE 0.7s
+
+#5 [internal] load .dockerignore
+#5 transferring context: 497B done
+#5 DONE 0.0s
+
+#6 [stage-1 1/9] FROM docker.io/library/python:3.12.11-slim-bookworm@sha256:519591d6871b7bc437060736b9f7456b8731f1499a57e22e6c285135ae657bf7
+#6 resolve docker.io/library/python:3.12.11-slim-bookworm@sha256:519591d6871b7bc437060736b9f7456b8731f1499a57e22e6c285135ae657bf7 0.0s done
+#6 DONE 0.0s
+
+#7 [frontend-build 1/6] FROM docker.io/library/node:20-alpine@sha256:fb4cd12c85ee03686f6af5362a0b0d56d50c58a04632e6c0fb8363f609372293
+#7 resolve docker.io/library/node:20-alpine@sha256:fb4cd12c85ee03686f6af5362a0b0d56d50c58a04632e6c0fb8363f609372293 0.0s done
+#7 DONE 0.0s
+
+#8 [internal] load build context
+#8 transferring context: 189.58MB 0.9s done
+#8 DONE 0.9s
+
+#9 [stage-1 3/9] RUN apt-get update && apt-get install -y --no-install-recommends curl tesseract-ocr libzbar0 && rm -rf /var/lib/apt/lists/*
+#9 CACHED
+
+#10 [stage-1 4/9] COPY backend/pyproject.toml backend/requirements.lock ./
+#10 CACHED
+
+#11 [stage-1 2/9] WORKDIR /app
+#11 CACHED
+
+#12 [frontend-build 4/6] RUN npm ci
+#12 CACHED
+
+#13 [frontend-build 5/6] COPY frontend/ ./
+#13 CACHED
+
+#14 [frontend-build 2/6] WORKDIR /ui
+#14 CACHED
+
+#15 [frontend-build 3/6] COPY frontend/package.json frontend/package-lock.json ./
+#15 CACHED
+
+#16 [stage-1 5/9] RUN pip install --no-cache-dir -r requirements.lock
+#16 CACHED
+
+#17 [frontend-build 6/6] RUN npm run build
+#17 CACHED
+
+#18 [stage-1 6/9] COPY backend/ ./
+#18 DONE 1.3s
+
+#19 [stage-1 7/9] RUN pip install --no-cache-dir "hatchling==1.32.0" "editables==0.6"
+#19 0.665 Collecting hatchling==1.32.0
+#19 0.690   Downloading hatchling-1.32.0-py3-none-any.whl.metadata (3.9 kB)
+#19 0.695 Collecting editables==0.6
+#19 0.698   Downloading editables-0.6-py3-none-any.whl.metadata (3.1 kB)
+#19 0.699 Requirement already satisfied: packaging>=24.2 in /usr/local/lib/python3.12/site-packages (from hatchling==1.32.0) (26.3)
+#19 0.700 Requirement already satisfied: pathspec>=0.10.1 in /usr/local/lib/python3.12/site-packages (from hatchling==1.32.0) (1.1.1)
+#19 0.700 Requirement already satisfied: pluggy>=1.0.0 in /usr/local/lib/python3.12/site-packages (from hatchling==1.32.0) (1.6.0)
+#19 0.708 Collecting tomlkit>=0.11.1 (from hatchling==1.32.0)
+#19 0.711   Downloading tomlkit-0.15.1-py3-none-any.whl.metadata (3.3 kB)
+#19 0.726 Collecting trove-classifiers (from hatchling==1.32.0)
+#19 0.729   Downloading trove_classifiers-2026.9.21.13-py3-none-any.whl.metadata (2.4 kB)
+#19 0.737 Downloading hatchling-1.32.0-py3-none-any.whl (78 kB)
+#19 0.744 Downloading editables-0.6-py3-none-any.whl (5.4 kB)
+#19 0.746 Downloading tomlkit-0.15.1-py3-none-any.whl (49 kB)
+#19 0.749 Downloading trove_classifiers-2026.9.21.13-py3-none-any.whl (14 kB)
+#19 0.793 Installing collected packages: trove-classifiers, tomlkit, editables, hatchling
+#19 0.908 Successfully installed editables-0.6 hatchling-1.32.0 tomlkit-0.15.1 trove-classifiers-2026.9.21.13
+#19 0.908 WARNING: Running pip as the 'root' user can result in broken permissions and conflicting behaviour with the system package manager, possibly rendering your system unusable. It is recommended to use a virtual environment instead: https://pip.pypa.io/warnings/venv. Use the --root-user-action option if you know what you are doing and want to suppress this warning.
+#19 0.995 
+#19 0.995 [notice] A new release of pip is available: 25.0.1 -> 26.2.1
+#19 0.995 [notice] To update, run: pip install --upgrade pip
+#19 DONE 1.1s
+
+#20 [stage-1 8/9] RUN pip install --no-cache-dir --no-build-isolation --no-deps -e .
+#20 0.479 Obtaining file:///app
+#20 0.480   Checking if build backend supports build_editable: started
+#20 0.509   Checking if build backend supports build_editable: finished with status 'done'
+#20 0.510   Preparing editable metadata (pyproject.toml): started
+#20 0.654   Preparing editable metadata (pyproject.toml): finished with status 'done'
+#20 0.660 Building wheels for collected packages: storagegenie-backend
+#20 0.661   Building editable for storagegenie-backend (pyproject.toml): started
+#20 0.691   Building editable for storagegenie-backend (pyproject.toml): finished with status 'done'
+#20 0.692   Created wheel for storagegenie-backend: filename=storagegenie_backend-0.1.0-py3-none-any.whl size=1320 sha256=6e6e229f189e8be07c917fc5f51f1076aefd781fbcc0814fa2fead0e73c5654a
+#20 0.692   Stored in directory: /tmp/pip-ephem-wheel-cache-w7qfeoye/wheels/54/1b/b7/aa63e25c8f14f4f2ae7b04e6097bdecb770e455c5c1ee0a600
+#20 0.694 Successfully built storagegenie-backend
+#20 0.694 Installing collected packages: storagegenie-backend
+#20 0.701 Successfully installed storagegenie-backend-0.1.0
+#20 0.701 WARNING: Running pip as the 'root' user can result in broken permissions and conflicting behaviour with the system package manager, possibly rendering your system unusable. It is recommended to use a virtual environment instead: https://pip.pypa.io/warnings/venv. Use the --root-user-action option if you know what you are doing and want to suppress this warning.
+#20 0.804 
+#20 0.804 [notice] A new release of pip is available: 25.0.1 -> 26.2.1
+#20 0.804 [notice] To update, run: pip install --upgrade pip
+#20 DONE 0.9s
+
+#21 [stage-1 9/9] COPY --from=frontend-build /ui/dist ./static
+#21 DONE 0.0s
+
+#22 exporting to image
+#22 exporting layers
+#22 exporting layers 5.2s done
+#22 exporting manifest sha256:ab95f2d497161e204e695f1b313bccd670e84e5dbb652d761c0e5db6aef1923f done
+#22 exporting config sha256:c09b23fe08deb7b3fbbd7274730d5615c6f972b8e56572ef134d7c0ab1020323 done
+#22 exporting attestation manifest sha256:0cdcdaebe29a183688142d353fd119fcf636a37244f78d566bd9e2b593557f0d done
+#22 exporting manifest list sha256:c6fc45abbd1e7725ccf6ef33027ce63fa0bd6192e6f39ea3094b83ff4acdee4f done
+#22 naming to docker.io/library/storagegenie-backend:latest done
+#22 unpacking to docker.io/library/storagegenie-backend:latest
+#22 unpacking to docker.io/library/storagegenie-backend:latest 1.8s done
+#22 DONE 7.1s
+
+#23 resolving provenance for metadata file
+#23 DONE 0.0s
+ Image storagegenie-backend Built 
+BUILD_EXIT=0 START_BUILD=2026-09-29T15:13:52Z END_BUILD=2026-09-29T15:14:04Z
+$ docker images --no-trunc --format '{{.Repository}}:{{.Tag}} ID={{.ID}} Created={{.CreatedAt}}' storagegenie-backend
+storagegenie-backend:latest ID=sha256:c6fc45abbd1e7725ccf6ef33027ce63fa0bd6192e6f39ea3094b83ff4acdee4f Created=2026-09-29 15:13:57 +0000 UTC
+
+================================================================================
+G0 — RECREATE (exactly ONE; authorized production restart per standing close-out directive)
+================================================================================
+$ docker compose up -d --no-deps backend
+ Container storagegenie-backend-1 Recreate 
+ Container storagegenie-backend-1 Recreated 
+ Container storagegenie-backend-1 Starting 
+ Container storagegenie-backend-1 Started 
+REC_EXIT=0 START_REC=2026-09-29T15:14:18Z END_REC=2026-09-29T15:14:19Z
+$ docker inspect -f 'ContainerID={{.Id}} Image={{.Image}} RestartCount={{.RestartCount}} Created={{.Created}}' storagegenie-backend-1
+ContainerID=596e7d7a35d2c0ec6483cb2a418419394c0ba383ea84a73d427f823f7c1a5f40 Image=sha256:c6fc45abbd1e7725ccf6ef33027ce63fa0bd6192e6f39ea3094b83ff4acdee4f RestartCount=0 Created=2026-09-29T15:14:18.703231663Z
+
+================================================================================
+G1 — VERIFY LIVE (post-state; AFTER 2026-09-29T15:14:46Z)
+================================================================================
+--- AFTER health x6 ({{HEALTH_CMD}} = curl -s http://127.0.0.1:8003/v1/health) ---
+read1 http=200 body={"status":"ok","db":"ok","storage":"ok"}
+read2 http=200 body={"status":"ok","db":"ok","storage":"ok"}
+read3 http=200 body={"status":"ok","db":"ok","storage":"ok"}
+read4 http=200 body={"status":"ok","db":"ok","storage":"ok"}
+read5 http=200 body={"status":"ok","db":"ok","storage":"ok"}
+read6 http=200 body={"status":"ok","db":"ok","storage":"ok"}
+
+--- AFTER gate (unauthenticated, Host storagegenie.dynv6.net) ---
+http=301 -> 301
+https=401 -> 401
+
+--- AFTER alembic current (in container) ---
+INFO  [alembic.runtime.migration] Context impl SQLiteImpl.
+INFO  [alembic.runtime.migration] Will assume non-transactional DDL.
+20260924_sg114_relation (head)
+  alembic_version row: 20260924_sg114_relation
+
+--- AFTER 28 table row counts (sqlite3 -readonly; delta must be 0) ---
+alembic_version = 1
+assertion = 28
+asset = 6
+asset_evidence = 12
+asset_fts = 6
+asset_fts_config = 1
+asset_fts_data = 8
+asset_fts_docsize = 6
+asset_fts_idx = 6
+asset_location = 1
+asset_relation = 1
+audit_event = 68
+candidate = 8
+enrich_snapshot = 4
+evidence = 13
+guardrail_event = 2
+household = 1
+idempotency_key = 9
+job = 9
+job_step = 56
+location = 1
+observation = 16
+planning_suggestion = 0
+provider_call = 18
+review_task = 6
+saved_search = 0
+source_attribution = 0
+user = 2
+table_count= 28
+
+--- AFTER served bundle (in container /app/static) ---
+total 324
+drwxr-xr-x 2 root root   4096 Sep 29 09:49 .
+drwxr-xr-x 3 root root   4096 Sep 29 09:49 ..
+-rw-r--r-- 1 root root 318152 Sep 29 09:49 index-CTQCofuO.js
+-rw-r--r-- 1 root root   3911 Sep 29 09:49 index-DO0gjGV6.css
+assets/index-CTQCofuO.js
+d9dbdef301177ad9f82f0b1dd290336eb5e10dd47b6d68836eebf14d3cbeb12c  /app/static/assets/index-CTQCofuO.js
+37b25dbdd4b0ecfdedb8255bc7f8af286726334e95a1a3a9e85b9ba381b3d57c  /app/static/assets/index-DO0gjGV6.css
+
+--- AFTER CORS live (OPTIONS preflight, zero writes) ---
+$ OPTIONS /v1/assets Origin: http://localhost:5173 ACRM: PATCH ACRH: If-Match
+HTTP/1.1 200 OK
+date: Tue, 29 Sep 2026 15:14:46 GMT
+server: uvicorn
+vary: Origin
+access-control-allow-methods: GET, POST, PUT, PATCH, DELETE, OPTIONS
+access-control-max-age: 600
+access-control-allow-headers: Accept, Accept-Language, Authorization, Content-Language, Content-Type, Idempotency-Key, If-Match, Origin, X-Requested-With
+access-control-allow-credentials: true
+access-control-allow-origin: http://localhost:5173
+content-length: 2
+content-type: text/plain; charset=utf-8
+
+$ OPTIONS ACRM: TRACE
+HTTP/1.1 400 Bad Request
+date: Tue, 29 Sep 2026 15:14:46 GMT
+server: uvicorn
+content-type: text/plain; charset=utf-8
+
+$ OPTIONS ACRM: PATCH ACRH: X-Evil-Header (lockdown proof)
+HTTP/1.1 400 Bad Request
+date: Tue, 29 Sep 2026 15:14:46 GMT
+server: uvicorn
+content-type: text/plain; charset=utf-8
+
+
+--- AFTER 3 pages through the fresh server (GET, read-only) ---
+/capture -> 200
+/inbox -> 200
+/catalog -> 200
+
+================================================================================
+SUMMARY — BEFORE vs AFTER (state change by post-state, PG-EV-02/PG-EV-08)
+================================================================================
+image     BEFORE sha256:76917528f28bc92a89029dc7ef08bb94cdf8682852a003bd7c53470343601303
+image     AFTER  sha256:c6fc45abbd1e7725ccf6ef33027ce63fa0bd6192e6f39ea3094b83ff4acdee4f   -> CHANGED (one build)
+container BEFORE 55d398ed7625cf637f587d863d60c0d114355ca9312b554becdfccd59e71a4de
+container AFTER  596e7d7a35d2c0ec6483cb2a418419394c0ba383ea84a73d427f823f7c1a5f40   -> CHANGED (exactly one recreation, M42; RestartCount 0->0)
+health    BEFORE 6x 200 {"status":"ok","db":"ok","storage":"ok"} == AFTER 6x 200 identical bodies
+gate      BEFORE http 301 / https 401 == AFTER http 301 / https 401  (UNCHANGED)
+alembic   BEFORE 20260924_sg114_relation (head) == AFTER 20260924_sg114_relation (head) (UNMOVED, no migration)
+counts    28/28 tables BEFORE == AFTER, every delta 0 (no live row written; reads only)
+bundle    BEFORE index-CTQCofuO.js sha256 d9dbdef301177ad9f82f0b1dd290336eb5e10dd47b6d68836eebf14d3cbeb12c (318152 B)
+bundle    AFTER  index-CTQCofuO.js sha256 d9dbdef301177ad9f82f0b1dd290336eb5e10dd47b6d68836eebf14d3cbeb12c (318152 B) -> UNCHANGED
+          (premise correction F-SG154-2: the packet predicted 'backend changed -> bundle moves';
+           git diff 66497c6..HEAD -- frontend/ is EMPTY, so the Vite output is byte-identical.
+           Direction stated: UNCHANGED, not assumed.)
+css       BEFORE index-DO0gjGV6.css 37b25dbd... == AFTER identical (no stylesheet change)
+CORS      BEFORE allow-methods included HEAD + X-Evil-Header -> 200 (pre-lockdown '*' expansion)
+CORS      AFTER  allow-methods = GET, POST, PUT, PATCH, DELETE, OPTIONS (HEAD gone);
+          If-Match in allow-headers -> 200; ACRM TRACE -> 400; X-Evil-Header -> 400 (lockdown live)
+pages     /capture /inbox /catalog -> 200 200 200
+
+elapsed: build 12s (2026-09-29T15:13:52Z->15:14:04Z); recreate 1s (15:14:18Z->15:14:19Z);
+         full verify from first BEFORE read ~15:12:34Z to AFTER summary ~15:14:47Z = ~133s.
+spend: REAL metered $0.000000 USD, zero metered calls (no USD-metered path exists in slice).
