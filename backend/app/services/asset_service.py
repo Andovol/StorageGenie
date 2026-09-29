@@ -1,4 +1,5 @@
 import json
+import logging
 
 from sqlalchemy import select
 from sqlalchemy.orm import Session
@@ -9,6 +10,8 @@ from app.models.evidence import asset_evidence
 from app.services import audit_service, lifecycle
 from app.services.assertion_service import upsert_assertion
 from app.services.candidates import _deterministic_display_name
+
+logger = logging.getLogger(__name__)
 
 
 def resolve_display_name(
@@ -145,10 +148,29 @@ def attach_evidence(db: Session, asset: Asset, evidence_ids: list[str], actor: s
         )
         new_eids = [eid for eid in evidence_ids if eid not in existing_eids]
         if new_eids:
-            db.execute(
-                asset_evidence.insert(),
-                [{"asset_id": asset.id, "evidence_id": eid} for eid in new_eids],
-            )
+            try:
+                db.execute(
+                    asset_evidence.insert(),
+                    [{"asset_id": asset.id, "evidence_id": eid} for eid in new_eids],
+                )
+            except Exception:
+                # SG-151: a bulk insert is atomic, so one unwritable link takes
+                # the whole batch down. Fall back to per-item inserts so the
+                # good links still land and every failure is logged with both
+                # ids -- the #34 failure visibility, repathed onto the bulk path.
+                db.rollback()
+                for eid in new_eids:
+                    try:
+                        db.execute(
+                            asset_evidence.insert().values(asset_id=asset.id, evidence_id=eid)
+                        )
+                    except Exception as exc:
+                        logger.warning(
+                            "Failed to attach evidence_id=%s to asset_id=%s: %s",
+                            eid,
+                            asset.id,
+                            exc,
+                        )
 
     audit_service.record(
         db,
