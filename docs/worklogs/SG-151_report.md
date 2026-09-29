@@ -210,6 +210,25 @@ Dispatch-ID: SG-151 | Report: docs/worklogs/SG-151_report.md | Work-HEAD: 88688f
 show_exit=0
 ```
 
+- The final tip (`61f3a97fa76ce0fa205244e0d373699a5daa96fa`) was also annotated; mapped-fetch `show`,
+  verbatim:
+
+```
+$ git notes --ref=refs/notes/storagegenie-coder-reports add -m "Dispatch-ID: SG-151 | Report: docs/worklogs/SG-151_report.md | Work-HEAD: 88688f50761c76e07a011cc2576adf5eb112924f" 61f3a97fa76ce0fa205244e0d373699a5daa96fa
+add_exit=0
+$ git push origin refs/notes/storagegenie-coder-reports
+To github.com:Andovol/StorageGenie.git
+   1faeb2c..48dc344  refs/notes/storagegenie-coder-reports -> refs/notes/storagegenie-coder-reports
+push_notes_exit=0
+$ git fetch origin refs/notes/storagegenie-coder-reports:refs/notes/sg151-fetched-e3
+From github.com:Andovol/StorageGenie
+ * [new ref]         refs/notes/storagegenie-coder-reports -> refs/notes/sg151-fetched-e3
+fetch_exit=0
+$ git notes --ref=refs/notes/sg151-fetched-e3 show 61f3a97fa76ce0fa205244e0d373699a5daa96fa
+Dispatch-ID: SG-151 | Report: docs/worklogs/SG-151_report.md | Work-HEAD: 88688f50761c76e07a011cc2576adf5eb112924f
+show_exit=0
+```
+
 ## Budget — actual versus budget (units stated)
 
 | Leg | Command class | Budget | Actual |
