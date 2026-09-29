@@ -7,6 +7,7 @@ origin:     git@github.com:Andovol/StorageGenie.git (fetch+push, as on host)
 BASE ref:   origin/automation
 BASE commit: 48e30c4fb848058c66188a74f4acab377bfd5fdd (start HEAD; worktree clean at start)
 WORK_HEAD:  c147316a1aa868cae9645b0e8a2294021f173e46 (work commit; receipt-note target)
+FINAL_TIP:  aa65fb9db475e32781fef439778549700cfd7a0b (dual-annotated at annotation time; SG-092 precedent)
 Model:      opencode-go/deepseek-v4.1-flash  (per process arguments: /proc/<opencode-run-pid>/cmdline `--model`)
 Effort:     high                            (per process arguments: /proc/<opencode-run-pid>/cmdline `--variant high`)
 Coder:      opencode  (env CODER=opencode; lane job_spawn)
@@ -198,7 +199,19 @@ show_exit=0
 - Final tip dual-annotated (note-anchor inoculation, SG-092 precedent); mapped-fetch `show`, verbatim:
 
 ```
-{{TIP_SHOW}}
+$ git notes --ref=refs/notes/storagegenie-coder-reports add -m "Dispatch-ID: SG-149 | Report: docs/worklogs/SG-149_report.md | Work-HEAD: c147316a1aa868cae9645b0e8a2294021f173e46" aa65fb9db475e32781fef439778549700cfd7a0b
+add_exit=0
+$ git push origin refs/notes/storagegenie-coder-reports
+To github.com:Andovol/StorageGenie.git
+   d65484e..1b9e335  refs/notes/storagegenie-coder-reports -> refs/notes/storagegenie-coder-reports
+push_exit=0
+$ git fetch origin refs/notes/storagegenie-coder-reports:refs/notes/sg149-fetched-2
+From github.com:Andovol/StorageGenie
+ * [new ref]         refs/notes/storagegenie-coder-reports -> refs/notes/sg149-fetched-2
+fetch_exit=0
+$ git notes --ref=refs/notes/sg149-fetched-2 show aa65fb9db475e32781fef439778549700cfd7a0b
+Dispatch-ID: SG-149 | Report: docs/worklogs/SG-149_report.md | Work-HEAD: c147316a1aa868cae9645b0e8a2294021f173e46
+show_exit=0
 ```
 
 ## Budget — actual versus budget (units stated)
