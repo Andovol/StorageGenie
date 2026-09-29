@@ -34,7 +34,15 @@ app.add_middleware(
     allow_origins=origins,
     allow_credentials=allow_credentials,
     allow_methods=["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
-    allow_headers=["*"],
+    allow_headers=[
+        "Content-Type",
+        "Authorization",
+        "Accept",
+        "Origin",
+        "X-Requested-With",
+        "Idempotency-Key",
+        "If-Match",
+    ],
 )
 
 
