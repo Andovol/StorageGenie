@@ -178,7 +178,23 @@ show_exit=0
 
 - Branch push `94ba35e..b4d31fa HEAD -> automation` (exit 0) preceded the notes push.
 
-__DUAL_BLOCK__
+- Final tip `badbafa` dual-annotated (note-anchor inoculation, SG-092 precedent); mapped fetch `show`,
+  verbatim:
+
+```
+$ git notes --ref=refs/notes/storagegenie-coder-reports add -m "Dispatch-ID: SG-148 | Report: docs/worklogs/SG-148_report.md | Work-HEAD: b4d31fa323d86e80f627cc046d8e8d2ae195bf86" badbafa8d3948e64bdc952e1b47c1e1345e49e7a
+add_exit=0
+$ git push origin refs/notes/storagegenie-coder-reports
+To github.com:Andovol/StorageGenie.git
+   2572b8d..f6af98b  refs/notes/storagegenie-coder-reports -> refs/notes/storagegenie-coder-reports
+$ git fetch origin refs/notes/storagegenie-coder-reports:refs/notes/sg148-fetched-final
+From github.com:Andovol/StorageGenie
+ * [new ref]         refs/notes/storagegenie-coder-reports -> refs/notes/sg148-fetched-final
+fetch_exit=0
+$ git notes --ref=refs/notes/sg148-fetched-final show badbafa8d3948e64bdc952e1b47c1e1345e49e7a
+Dispatch-ID: SG-148 | Report: docs/worklogs/SG-148_report.md | Work-HEAD: b4d31fa323d86e80f627cc046d8e8d2ae195bf86
+show_exit=0
+```
 
 ## Budget — actual versus budget (units stated)
 
