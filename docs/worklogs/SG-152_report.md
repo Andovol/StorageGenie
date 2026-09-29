@@ -176,6 +176,25 @@ The doubly-annotated tip `29f488d494d1a87102ad825bbf669761a49be3ed` (this report
 `e8f20a30c3313df4117e3396bb9df3bb0cef054a` both carry the note; first line carries BOTH `Dispatch-ID:`
 and `Report:` (`CO-97`). The final-tip dual-annotation is completed in the subsection below.
 
+The record commit `92482822e069132ac9ad4d661031b1de62a941de` (the final tip at annotation time) was
+dual-annotated; mapped-fetch `show`, verbatim (`receipt2.txt`):
+
+```
+$ git notes --ref=refs/notes/storagegenie-coder-reports add -m "Dispatch-ID: SG-152 | Report: docs/worklogs/SG-152_report.md | Work-HEAD: e8f20a30c3313df4117e3396bb9df3bb0cef054a" 92482822e069132ac9ad4d661031b1de62a941de
+add_tip2_exit=0
+$ git push origin refs/notes/storagegenie-coder-reports
+To github.com:Andovol/StorageGenie.git
+   bd7bcb3..fe5d3e4  refs/notes/storagegenie-coder-reports -> refs/notes/storagegenie-coder-reports
+push_exit=0
+$ git fetch origin refs/notes/storagegenie-coder-reports:refs/notes/sg152-fetched-e2
+From github.com:Andovol/StorageGenie
+ * [new ref]         refs/notes/storagegenie-coder-reports -> refs/notes/sg152-fetched-e2
+fetch_exit=0
+$ git notes --ref=refs/notes/sg152-fetched-e2 show 92482822e069132ac9ad4d661031b1de62a941de
+Dispatch-ID: SG-152 | Report: docs/worklogs/SG-152_report.md | Work-HEAD: e8f20a30c3313df4117e3396bb9df3bb0cef054a
+show_tip2_exit=0
+```
+
 ## UNCLEAR
 
 - **FIRST READ:** the packet named #37's unique cases as "`loads_json` list/int/bool, unicode `dumps_json`".
