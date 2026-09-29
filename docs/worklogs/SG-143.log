@@ -32,3 +32,16 @@ All timestamps UTC, live clock. Bounds: 120s ordinary / 600s suite / 2400s overa
           fetched into mapped refs/notes/sg143-fetched, `show` OK (`note=yes` for WORK_HEAD).
 09:5x     report + log + verify log written; worklogs commit = final tip; final tip dual-annotated
           (note-anchor inoculation, SG-092 precedent) and its fetched `show` pasted below.
+
+--- receipt (both notes executed; fetched-ref `show` pasted) ---
+WORK_HEAD 50304f0 note (fetched refs/notes/sg143-fetched), show:
+Dispatch-ID: SG-143 | Report: docs/worklogs/SG-143_report.md | Work-HEAD: 50304f0ff01fc2a4104f3b200ad3b906601a49ac
+
+FINAL-TIP 66497c6 dual-annotation (note-anchor inoculation, SG-092 precedent):
+$ git notes --ref=refs/notes/storagegenie-coder-reports add -m "Dispatch-ID: SG-143 | Report: docs/worklogs/SG-143_report.md | Work-HEAD: 66497c691d388b1445ce9ad81d535d7fb145d151" 66497c6   # add_exit=0
+$ git push origin refs/notes/storagegenie-coder-reports   # 84519f9..0b06328 push_exit=0
+$ git fetch origin refs/notes/storagegenie-coder-reports:refs/notes/sg143-fetched   # fetch_exit=0
+$ git notes --ref=refs/notes/sg143-fetched show 66497c6
+Dispatch-ID: SG-143 | Report: docs/worklogs/SG-143_report.md | Work-HEAD: 66497c691d388b1445ce9ad81d535d7fb145d151
+show_exit=0
+note=yes
