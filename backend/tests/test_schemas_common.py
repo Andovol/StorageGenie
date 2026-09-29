@@ -85,3 +85,22 @@ def test_problem_detail_model() -> None:
     assert detail.title == "Not Found"
     assert detail.status == 404
     assert detail.detail == "Resource not found"
+
+
+def test_loads_json_non_dict_types() -> None:
+    # Folded from PR #37 (unique cases: list/int/bool + string scalar).
+    # Pins the loads_json `return json.loads(value)` success branch for
+    # non-mapping JSON payloads (PR #33 covered only a dict payload).
+    assert loads_json("[1, 2, 3]") == [1, 2, 3]
+    assert loads_json("123") == 123
+    assert loads_json("true") is True
+    assert loads_json('"string"') == "string"
+
+
+def test_dumps_json_unicode_not_escaped() -> None:
+    # Folded from PR #37 (unique case). Pins dumps_json's ensure_ascii=False
+    # branch: a unicode payload must round-trip through loads_json.
+    data = {"name": "Test", "unicode": "こんにちは"}
+    dumped = dumps_json(data)
+    assert "こんにちは" in dumped
+    assert loads_json(dumped) == data
