@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState, type CSSProperties } from "react";
 import { useNavigate } from "react-router-dom";
-import { X } from "lucide-react";
+import { Loader2, X } from "lucide-react";
 import { apiPost, uploadEvidence } from "../../api/client";
 
 /**
@@ -320,15 +320,26 @@ export function AssetImportModal({ householdId, onClose }: AssetImportModalProps
             type="button"
             onClick={process}
             disabled={staged.length === 0 || processing}
+            aria-busy={processing}
             className="bg-primary text-primary-foreground focus-ring"
             style={{
               padding: "6px 12px",
               borderRadius: 6,
               border: "none",
               cursor: staged.length === 0 || processing ? "not-allowed" : "pointer",
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 6,
             }}
           >
-            {processing ? "Processing…" : `Process ${staged.length} Item${staged.length === 1 ? "" : "s"}`}
+            {processing ? (
+              <>
+                <Loader2 size={16} className="animate-spin" aria-hidden="true" />
+                <span>Processing…</span>
+              </>
+            ) : (
+              `Process ${staged.length} Item${staged.length === 1 ? "" : "s"}`
+            )}
           </button>
         </footer>
       </div>
