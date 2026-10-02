@@ -50,6 +50,27 @@ describe("ChatPage", () => {
     expect(await screen.findByText("Whole milk expires on 2026-09-16.")).toBeInTheDocument();
   });
 
+  test("submitting the form by pressing Enter sends the question", async () => {
+    api.sendChat.mockResolvedValue({
+      status: "ok",
+      answer: "Milk is in stock.",
+      grounded: true,
+      empty_catalogue: false,
+      category: "food",
+      catalogue_size: 1,
+    });
+    renderPage();
+
+    const input = screen.getByLabelText("Question");
+    fireEvent.change(input, { target: { value: "Is milk in stock?" } });
+    fireEvent.submit(input);
+
+    await waitFor(() =>
+      expect(api.sendChat).toHaveBeenCalledWith("food", household.id, "Is milk in stock?")
+    );
+    expect(await screen.findByText("Milk is in stock.")).toBeInTheDocument();
+  });
+
   test("the category selection drives the request", async () => {
     api.sendChat.mockResolvedValue({
       status: "ok",
