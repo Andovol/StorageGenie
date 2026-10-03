@@ -85,12 +85,54 @@ export function CandidateCard({
       </div>
       <WebAlternates alternates={candidate.web_alternates ?? []} />
       <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginTop: 18 }}>
-        <button type="button" onClick={() => onDecision("accept", values)} disabled={busy || blocked}>Accept</button>
-        <button type="button" onClick={() => onDecision("edit", values)} disabled={busy}>Save edits</button>
-        <button type="button" onClick={() => onDecision("hold")} disabled={busy}>Hold / Unknown</button>
-        <button type="button" onClick={() => onDecision("reject")} disabled={busy}>Reject</button>
+        <span title={blocked ? "Acceptance is blocked until open review tasks are resolved" : undefined}>
+          <button
+            type="button"
+            onClick={() => onDecision("accept", values)}
+            disabled={busy || blocked}
+            className={`${busy || blocked ? "bg-muted text-muted-foreground" : "bg-primary text-primary-foreground"} focus-ring`}
+            style={{ padding: "6px 12px", borderRadius: 6, border: "none", cursor: busy || blocked ? "not-allowed" : "pointer" }}
+          >
+            Accept
+          </button>
+        </span>
+        <button
+          type="button"
+          onClick={() => onDecision("edit", values)}
+          disabled={busy}
+          className="bg-card text-foreground border-border focus-ring"
+          style={{ padding: "6px 12px", borderRadius: 6, borderStyle: "solid", borderWidth: 1, cursor: busy ? "not-allowed" : "pointer" }}
+        >
+          Save edits
+        </button>
+        <button
+          type="button"
+          onClick={() => onDecision("hold")}
+          disabled={busy}
+          className="bg-card text-foreground border-border focus-ring"
+          style={{ padding: "6px 12px", borderRadius: 6, borderStyle: "solid", borderWidth: 1, cursor: busy ? "not-allowed" : "pointer" }}
+        >
+          Hold / Unknown
+        </button>
+        <button
+          type="button"
+          onClick={() => onDecision("reject")}
+          disabled={busy}
+          className="bg-card text-foreground border-border focus-ring"
+          style={{ padding: "6px 12px", borderRadius: 6, borderStyle: "solid", borderWidth: 1, cursor: busy ? "not-allowed" : "pointer" }}
+        >
+          Reject
+        </button>
         {splitItemCount != null && onSplit && (
-          <button type="button" onClick={onSplit} disabled={busy || splitBusy}>Split into {splitItemCount} items</button>
+          <button
+            type="button"
+            onClick={onSplit}
+            disabled={busy || splitBusy}
+            className="bg-card text-foreground border-border focus-ring"
+            style={{ padding: "6px 12px", borderRadius: 6, borderStyle: "solid", borderWidth: 1, cursor: busy || splitBusy ? "not-allowed" : "pointer" }}
+          >
+            Split into {splitItemCount} items
+          </button>
         )}
       </div>
     </article>
