@@ -97,6 +97,8 @@ export function ChatPage() {
           <select
             value={category}
             onChange={(event) => setCategory(event.target.value)}
+            className="bg-background text-foreground border-border focus-ring"
+            style={{ padding: "4px 8px", borderRadius: 6, borderStyle: "solid", borderWidth: 1 }}
           >
             {CATEGORIES.map((option) => (
               <option key={option.value} value={option.value}>
@@ -121,39 +123,71 @@ export function ChatPage() {
         <ChatTranscript messages={transcript} />
       </section>
 
-      <div style={{ display: "flex", gap: 8, marginTop: 16 }}>
+      <form
+        onSubmit={(event) => {
+          event.preventDefault();
+          if (effectiveHousehold && input.trim() && !send.isPending) {
+            send.mutate();
+          }
+        }}
+        style={{ display: "flex", gap: 8, marginTop: 16 }}
+      >
         <input
           aria-label="Question"
           value={input}
           onChange={(event) => setInput(event.target.value)}
           placeholder="Ask about this category…"
-          style={{ flex: 1, padding: 8 }}
+          className="bg-background text-foreground border-border focus-ring"
+          style={{ flex: 1, padding: 8, borderRadius: 6, borderStyle: "solid", borderWidth: 1 }}
         />
         <button
-          type="button"
-          onClick={() => send.mutate()}
+          type="submit"
           disabled={!effectiveHousehold || !input.trim() || send.isPending}
+          className="bg-primary text-primary-foreground focus-ring"
+          style={{
+            padding: "8px 16px",
+            borderRadius: 6,
+            border: "none",
+            fontWeight: 600,
+            cursor: !effectiveHousehold || !input.trim() || send.isPending ? "not-allowed" : "pointer",
+          }}
         >
           {send.isPending ? "Sending…" : "Send"}
         </button>
-      </div>
+      </form>
 
-      <div style={{ display: "flex", gap: 8, marginTop: 12 }}>
+      <form
+        onSubmit={(event) => {
+          event.preventDefault();
+          if (effectiveHousehold && correction.trim() && !logCorrection.isPending) {
+            logCorrection.mutate();
+          }
+        }}
+        style={{ display: "flex", gap: 8, marginTop: 12 }}
+      >
         <input
           aria-label="Correction"
           value={correction}
           onChange={(event) => setCorrection(event.target.value)}
           placeholder="Log a correction…"
-          style={{ flex: 1, padding: 8 }}
+          className="bg-background text-foreground border-border focus-ring"
+          style={{ flex: 1, padding: 8, borderRadius: 6, borderStyle: "solid", borderWidth: 1 }}
         />
         <button
-          type="button"
-          onClick={() => logCorrection.mutate()}
+          type="submit"
           disabled={!effectiveHousehold || !correction.trim() || logCorrection.isPending}
+          className="bg-card text-foreground border-border focus-ring"
+          style={{
+            padding: "8px 16px",
+            borderRadius: 6,
+            borderStyle: "solid",
+            borderWidth: 1,
+            cursor: !effectiveHousehold || !correction.trim() || logCorrection.isPending ? "not-allowed" : "pointer",
+          }}
         >
           Log correction
         </button>
-      </div>
+      </form>
     </PageContainer>
   );
 }
