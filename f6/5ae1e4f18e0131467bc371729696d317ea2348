@@ -1,0 +1,9 @@
+Partial-Receipt-ID: SG-155
+utc=2026-10-09T13:56:42Z
+killed=term
+pushed=0
+uncommitted=none
+DISPATCH_RESULT id=SG-155 coder=opencode exit=143 head=461c96f55ab81dafa13f8dd08560e3007ec66815 note=no moved=yes rewrite=no dirty=no elapsed=2100s budget=2100s killed=term
+P1_moved=PASS count=1
+P2_rewrite=PASS behind=0
+P6_dirty=PASS dirty=no
