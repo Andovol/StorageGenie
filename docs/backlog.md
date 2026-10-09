@@ -4,7 +4,7 @@ Created at the 2026-09-25 D2 close (discharges the long-owed "backlog-file creat
 
 | Item | Trigger that moves it back |
 |---|---|
-| Context Scene resume (`P1`/`T1b`/`D7` parked; `D132` §1.4 non-goal reopen gate; `D4` second provider for image gen) | Owner resume word (per-arc rhythm `D137`: brainstorm → perform) |
+| Context Scene resume (`P1`/`T1b`/`D7` parked; `D132` §1.4 non-goal reopen gate; `D4` second provider for image gen) | FIRED 2026-10-09 (D-1009-3; spec+plan+T0 approved, T0→recovery→comparison→T1b run SG-155–158) — now waits on owner allowed-providers word (D-1009-10: Widen vs Google-only), then R1/R2/R3 re-dispatch + D7 |
 | Cap-join fix (`F-SG132-5`) | CLOSED 2026-09-29 via SG-142 (month-boxed pool, SERVED image `5f5b3ac3`) |
 | Dark-link hue sign-off | CLOSED 2026-09-29 (owner verdict "its ok" = KEEP, D-0929-4, live image `c6fc45ab`) |
 | 12-month window calibration (`LEDGER_RETENTION_MONTHS` UNCALIBRATED `G-A9`; or retire the vehicle) | Owner word |
