@@ -1,0 +1,28 @@
+Dispatch-ID: SG-155.dbg | Report: note
+Debug-Report-Begin
+STAGE: budget kill (killed=term)
+CAUSE: The 2,100-second lane budget expired while the run was in its report and receipt phase, and systemd terminated it at the 35-minute start limit.
+EVIDENCE:
+- [evidence file, failed-unit-status] "TimeoutStartUSec=35min"
+- [evidence file, failed-unit-status] "Result=timeout"
+- [journal] "dispatch-storagegenie@SG-155.service: start operation timed out. Terminating."
+- [journal] "DISPATCH_RESULT id=SG-155 coder=opencode exit=143 head=461c96f55ab81dafa13f8dd08560e3007ec66815 note=no moved=yes rewrite=no dirty=no elapsed=2100s budget=2100s killed=term"
+- [journal] "P3_note=FAIL note=no"
+- [journal] "P5_receipt=FAIL"
+- [packet, docs/packets/SG-155-scene-t0-openrouter.md] "Expected duration 600s (recent read-only slices ~300s + two HTTP legs + suite; lane enforces RUN_BUDGET_S)."
+- [log, output/dispatch/SG-155.log] "[•] Write logs + report, commit, publish receipt"
+- [log, output/dispatch/SG-155.log] "442d85b..461c96f  automation -> automation"
+- [ref, refs/notes/storagegenie-coder-reports; target f65ae1e4f18e0131467bc371729696d317ea2348] "Partial-Receipt-ID: SG-155"
+- [ref, refs/notes/storagegenie-coder-reports] "killed=term"
+- [ref, refs/notes/storagegenie-coder-reports] "pushed=0"
+- [worktree check] "docs/worklogs/SG-155_report.md missing"; git status --porcelain was empty.
+STRANDED WORK:
+- refs/quarantine/SG-025-20260912T164340Z — quarantined SG-025 no-receipt provider abstraction work: provider-call migration/model, provider services, tests, ADRs, and logs (15 files).
+- refs/quarantine/SG-066-20260921T095958Z — quarantined SG-066 no-receipt analytics work: backend API/service/tests and frontend analytics route/client/types/tests (11 files).
+- refs/quarantine/SG-088-20260921T174803Z — quarantined SG-088 no-receipt test changes and work/verification logs (4 files).
+- refs/quarantine/preserve-20260907T083833Z — preserves the SG-008 receipt commit, which adds docs/worklogs/SG-008_report.md; one commit ahead of origin/automation.
+NEXT ACTION: change the lane configuration
+CONFIDENCE: high
+
+Debug-Report-End
+moved=no
