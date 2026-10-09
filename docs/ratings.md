@@ -523,3 +523,9 @@ Originals above (88 FLAG:TRUST / 91 FLAG:TRUST) stand as the audit trail; the ve
 | slice_id | phase | model | effort | score | flag | lever | guards_invoked | deduction_attribution |
 |---|---|---|---|---|---|---|---|---|
 | SG-155 | Scene T0 (D-1009-7 L3): OpenRouter client seam + frozen envelope + 12 offline tests fail-pre->pass-post + T0a 10 image models w/ prices + T0b stop-schema verbatim + reference-image answer, suite 2/649->2/661 base-reds stash-proved + ruff clean + mypy delta 0, $0; work complete at 461c96f but unit budget-killed in receipt phase (elapsed=budget=2100s) -- report + full receipt missing, partial receipt only | opencode (model omitted on trigger, identity unreported -- killed before report; effort high from trigger) | high | 98 | FLAG:TRUST(report-missing) | publish-before-bound ordering (report+receipt before 80% budget) on all future live-leg slices, from SG-156 | PG-EV-04, PG-EV-09, PG-SC-03, PG-IC-01, PG-IC-03, PG-IC-07, PG-IC-08, PG-IC-09 | mixed |
+
+### SG-156 (2026-10-09 - SG-155 report+receipt recovery, $0)
+
+| slice_id | phase | model | effort | score | flag | lever | guards_invoked | deduction_attribution |
+|---|---|---|---|---|---|---|---|---|
+| SG-156 | Scene recovery (D-1009-7 L3): re-verified SG-155 tree (12/12 + suite 2/661 same reds + ruff clean + mypy delta 0, no defect) + fresh $0 T0a/T0b re-fetch MATCH no drift + authored missing SG-155 report + own report + notes-ref receipt read back on remote, publish-before-bound honored (345s/355s vs 1050 half-bound), $0 | opencode (model deepseek-v4.1-flash from /proc cmdline --model; effort max from --variant max) | max | 99 |  |  | PG-EV-04, PG-EV-09, PG-SC-03, PG-IC-01, PG-IC-03, PG-IC-07, PG-IC-08, PG-IC-09 |  |

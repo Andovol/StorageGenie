@@ -28,7 +28,7 @@
 |---|---|---|
 | `{{WORKLOG_DIR}}` | `docs/worklogs` | Coder worklog per slice (`CO-57`) |
 | `{{HEALTH_CMD}}` | `curl -s http://127.0.0.1:8003/v1/health` (fallback `python3 -c "from fastapi.testclient import TestClient; from app.main import app; print(TestClient(app).get('/v1/health').json())"`) | `ARCHITECT.md` health probe |
-| `{{RECEIPT_CMD}}` | `/opt/storagegenie-dispatch/finalize_dispatch_report.sh` | Wrapper + receipt publisher (`root:root 755`) — `refs/heads/storagegenie-evidence`, header `contract_sync=refresh version=0.17.2` (per `DISPATCH.md:42-50`) |
+| `{{RECEIPT_CMD}}` | notes-ref receipt (live lane mechanism) | Note on `refs/notes/storagegenie-coder-reports`, first line `Dispatch-ID: <ID> | Report: <path>` (+ `Work-HEAD`), read back on remote by mapped fetch (SG-092/SG-156 precedent); legacy `/opt/storagegenie-dispatch/finalize_dispatch_report.sh` (v0.17.2 evidence-ref) refused `candidate_not_remote` on this lane — retired 2026-10-09 (F-SG156-1) |
 | `{{PROD_DB}}` | `not applicable` — Phase 0 is SQLite local (`sqlite:////data/db/storagegenie.db`) + `storage_data:/data/storage` | `blueprint.md:14` local-first; `CODER_PRODUCTION.md` not bound until datastore declared |
 | `{{TEST_DB}}` | `not applicable` | Same — tests use `TestClient` + temp SQLite |
 | `{{DEFAULT_BRANCH}}` | `automation` | Current branch (`git branch --show-current`) — evidence `storagegenie-evidence` |
