@@ -224,16 +224,24 @@ def test_g0_single_http_client_and_send_site_full_scan() -> None:
     The single POST send site is unchanged (all enrich carriers are read-only GETs).
     SG-101 shifts the adapter's send-site line by its text-path hunks; the pin
     below tracks the line, not the count (M45).
+    SG-158 (owner-approved packet) adds the scene-render sender: one httpx import
+    and two POST call-site lines (the injected-test-client branch and the
+    fresh-client branch) in `services/scene/openrouter.py`. Both send to the ONE
+    frozen endpoint with the Authorization header added at send time; the
+    inventory below now names them so the count stays visible.
     """
     assert _http_client_files() == {
         "api/v1/enrich.py": ["import httpx"],
         "services/enrich/client.py": ["import httpx"],
         "services/enrich/jina.py": ["import httpx", "import urllib"],
         "services/providers/opencode_go.py": ["import httpx"],
+        "services/scene/openrouter.py": ["import httpx"],
     }, f"unexpected HTTP clients: {_http_client_files()}"
-    assert _send_sites() == ["services/providers/opencode_go.py:263"], (
-        f"unexpected provider send sites: {_send_sites()}"
-    )
+    assert _send_sites() == [
+        "services/providers/opencode_go.py:263",
+        "services/scene/openrouter.py:595",
+        "services/scene/openrouter.py:597",
+    ], f"unexpected provider send sites: {_send_sites()}"
 
 
 def test_g0_redact_call_sites_are_reader_and_direct_adapter() -> None:
@@ -509,4 +517,8 @@ def test_g2_web_senders_are_the_two_researched_sources() -> None:
             if ("web_" + "detection") in lowered or ("visi" + "on") in lowered:
                 excluded_hits.append(f"{rel}:{number}: {line.strip()}")
     assert excluded_hits == [], f"excluded detection source must stay absent: {excluded_hits}"
-    assert _send_sites() == ["services/providers/opencode_go.py:263"]
+    assert _send_sites() == [
+        "services/providers/opencode_go.py:263",
+        "services/scene/openrouter.py:595",
+        "services/scene/openrouter.py:597",
+    ]

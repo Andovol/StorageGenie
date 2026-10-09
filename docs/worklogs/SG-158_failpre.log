@@ -1,0 +1,11 @@
+
+==================================== ERRORS ====================================
+______________ ERROR collecting tests/test_sg158_scene_render.py _______________
+tests/test_sg158_scene_render.py:54: in <module>
+    AUTHORITY = scene.SceneSpendAuthority(grant_id="D-1009-4 + L3 (D-1009-7)", cap_usd=1.0)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^
+E   AttributeError: module 'app.services.scene.openrouter' has no attribute 'SceneSpendAuthority'
+=========================== short test summary info ============================
+ERROR tests/test_sg158_scene_render.py - AttributeError: module 'app.services...
+!!!!!!!!!!!!!!!!!!!! Interrupted: 1 error during collection !!!!!!!!!!!!!!!!!!!!
+1 error in 0.34s

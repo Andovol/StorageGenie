@@ -1,0 +1,15 @@
+# SG-158 worklog (append-only, material actions only)
+2026-10-09 14:28Z lane start (run-coder SG-158, budget 2100s, idle kill 900s)
+14:29 G-L1: bash /home/andrei/storagegenie-contract/rules_check.sh -> "G-L1 UNCHECKED ... not checked out at a contract tag" exit 3 (F-SG157-2 stands); VERSION 0.44.1 == AGENTS.md recorded
+14:30 read packet docs/packets/SG-158-t1b-renders.md (67 lines) verbatim == prompt; BASE resolved b118649 (clean)
+14:31 enumerated live DB assets/evidence via sqlite read-only; read 5 label transcripts via `docker exec ... cat` (read-only)
+14:32 wrote G0 send path into backend/app/services/scene/openrouter.py (guard/POST/download/Evidence/ledger, key at send time)
+14:34 wrote backend/tests/test_sg158_scene_render.py (15 tests) + backend/scripts/sg158_render.py
+14:35 candidate pytest 15 passed; fail-pre on isolated worktree b118649 copied test -> AttributeError SceneSpendAuthority (committed log)
+14:36 re-verified live catalogue (469 models): image prices + orchestrator slugs MATCH T0-PINNED
+14:37 R1 attempt 1 (openai/gpt-5-image x ling-3.0-flash-vl): HTTP 404, ledger 01a12118-ce4b-79b3-88f8-c289e18d15a2, cost null
+14:38 R1 attempt 2 (same body; error-body capture added): 404 body = account allowed-providers policy; ledger 01a12119-de97-7a71-803c-cd17fb237c7c, cost null
+14:39 R2 (google/gemini-3.1-flash-image x bytedance-seed/seed-1.6-flash): HTTP 200, billed $0.000758925, image_url_missing (server tool executed 2 calls, image_tokens 0); ledger 01a1211b-3ae2-7ec2-aa57-4e1a8219c8f8
+14:40 stop per packet (R1 constraint impossible; 4th render would be a STOP; no further sends)
+14:41 privacy-audit coupled pins updated (SG-158 named); suite 2 failed (same test_signals env reds) 676 passed; ruff clean; mypy 41/9 none in scene
+14:44[+Z] commit work; receipt on WORK_HEAD; report read back (this fill commit)
