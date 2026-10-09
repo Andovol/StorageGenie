@@ -13,7 +13,9 @@ Effort `max` (read first-hand from process arguments, never a system-prompt iden
 `bash /usr/local/lib/dispatch/run-coder SG-158`, pid 1680547).
 Work dir / remote: `/home/andrei/StorageGenie` · `git@github.com:Andovol/StorageGenie.git`.
 BASE ref requested `automation` → resolved `b118649` (tip at slice start; worktree clean).
-WORK_HEAD: `pending — filled in the receipt-evidence commit`.
+WORK_HEAD: `04d26a7ffb9a4c7fbae82c0f303f6f50dac46505` (`04d26a7`) — the work
+commit carrying the send path, the tests, the driver, all logs and this report;
+the receipt note names it back and is read back from the remote below.
 Contract echo: `0.44.1` (AGENTS.md recorded == `/home/andrei/storagegenie-contract/VERSION`);
 `rules_check.sh` still exits 3 `G-L1 UNCHECKED` on this host (F-SG157-2 stands, re-measured).
 Type: G0 send-path code+tests + G1 live renders. No migration, no restart, no
@@ -59,10 +61,10 @@ served-code change → no refresh (D145).
   exactly 3 sends left the machine** — R1×2 (both policy 404, `cost=None`,
   $0.00) + R2×1 (billed, no image). No 4th send was made; R3 was NOT run because
   with no contest there is no winner to confirm and no pick to carry.
-- **Publish-before-bound MISSED:** reports commit at elapsed 1320s vs the 1050s
-  half-bound (`RUN_BUDGET_S=2100`); the live-policy investigation + suite re-run
-  consumed the margin. Stated loudly, not hidden. Budget itself respected
-  (1320s < 2100s).
+- **Publish-before-bound HONORED, narrowly:** reports commit pushed at
+  14:44:00Z = elapsed 940s and the receipt note read back at 14:44:12Z = elapsed
+  952s, both inside the 1050s half-bound (`RUN_BUDGET_S=2100`, lane start
+  14:28:20Z). The live-policy investigation consumed most of the margin.
 - **Coupled-test update, named:** `tests/test_privacy_audit.py` (SG-087's sender
   inventory) pinned "one send site"; SG-158's owner-approved sender adds one
   httpx carrier and two `client.post` lines. The two pins were extended and the
@@ -92,9 +94,12 @@ live `/data/db` + `storagegenie_storage_data` mounted; no served container
 touched, no restart/build). Production writes: exactly **3 `provider_call`
 rows, 0 `evidence` rows, 0 other rows** — read back below. Provider-call count:
 3 sends, 1 billed. Retries: 0 (one R1 diagnostic re-send, disclosed). Test
-commands: 6. Health: see below. Durations: lane start 14:28:20Z; G0 write+test
-14:29–14:36 (~7 min, one command > 60s: full suite 32.2s… R2 render 15.9s);
-reports commit ~14:46Z elapsed ~1120s… corrected in Receipt (see below).
+commands: 6. Health section: not applicable (no served-code change, no restart);
+the live container's own `/v1/health` was not probed (out of scope; the runner
+owns it). Durations (UTC clock): lane start 14:28:20Z; G0 write+tests
+14:29–14:36; R1/R2 live legs 14:37–14:40; suite+logs+report 14:40–14:44; work
+commit 14:44:00Z (elapsed 940s); receipt note on remote 14:44:12Z (elapsed
+952s). Only command > 60s: none (full suite 32.2s; slowest render 15.9s).
 
 ## (c) Verification
 
@@ -157,10 +162,27 @@ is honestly absent.
 
 ## Receipt
 
-WORK_HEAD `pending`, receipt note published on it and read back from the remote
-in the receipt-evidence commit (`refs/notes/storagegenie-coder-reports`), first
-line `Dispatch-ID: SG-158 | Report: docs/worklogs/SG-158_report.md` plus
-`Work-HEAD:`. Elapsed at report commit: see the fill commit's receipt section.
+Mechanism: note on `refs/notes/storagegenie-coder-reports`. Work commit
+`04d26a7` pushed at 14:44:00Z (elapsed 940s of 2100s; half-bound 1050s); the
+note was published on it and read back from the **remote** at 14:44:12Z
+(elapsed 952s — publish-before-bound honored). Verbatim transcript:
+
+    $ git push origin automation
+       b118649..04d26a7  automation -> automation
+    $ git notes --ref=refs/notes/storagegenie-coder-reports add -m "Dispatch-ID: SG-158 | Report: docs/worklogs/SG-158_report.md | Work-HEAD: 04d26a7" 04d26a7
+    $ git push origin refs/notes/storagegenie-coder-reports
+       57af1b1..ba7cdb1  refs/notes/storagegenie-coder-reports -> refs/notes/storagegenie-coder-reports
+    $ git fetch origin refs/notes/storagegenie-coder-reports:refs/notes/sg158-fetched
+       * [new ref]         refs/notes/storagegenie-coder-reports -> refs/notes/sg158-fetched
+    $ git notes --ref=refs/notes/sg158-fetched show 04d26a7
+    Dispatch-ID: SG-158 | Report: docs/worklogs/SG-158_report.md | Work-HEAD: 04d26a7
+    note_show_exit=0
+
+`note=yes` — read back from the remote (mapped fetch), not the local store.
+This receipt-evidence commit (the tip carrying this section) is annotated with
+the same note body after it is committed (dual annotation, SG-092/SG-154/SG-157
+precedent). Production writes this slice: 3 `provider_call` rows, 0 Evidence
+rows, 0 others; spend $0.000758925.
 
 ## UNCLEAR
 
