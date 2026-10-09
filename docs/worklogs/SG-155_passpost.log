@@ -1,0 +1,23 @@
+============================= test session starts ==============================
+platform linux -- Python 3.12.3, pytest-9.1.1, pluggy-1.6.0 -- /home/andrei/StorageGenie/backend/venv/bin/python
+cachedir: .pytest_cache
+rootdir: /home/andrei/StorageGenie/backend
+configfile: pyproject.toml
+plugins: asyncio-1.4.0, anyio-4.15.0
+asyncio: mode=Mode.AUTO, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collecting ... collected 12 items
+
+tests/test_sg155_scene_t0.py::test_env_name_and_endpoint_are_the_pinned_constants PASSED [  8%]
+tests/test_sg155_scene_t0.py::test_settings_field_beats_the_environment PASSED [ 16%]
+tests/test_sg155_scene_t0.py::test_explicit_argument_beats_the_settings_field PASSED [ 25%]
+tests/test_sg155_scene_t0.py::test_absent_field_falls_through_to_the_environment PASSED [ 33%]
+tests/test_sg155_scene_t0.py::test_no_field_no_env_resolves_to_none PASSED [ 41%]
+tests/test_sg155_scene_t0.py::test_built_request_is_the_frozen_envelope PASSED [ 50%]
+tests/test_sg155_scene_t0.py::test_photo_never_enters_the_text_part PASSED [ 58%]
+tests/test_sg155_scene_t0.py::test_stop_condition_uses_the_t0_pinned_schema PASSED [ 66%]
+tests/test_sg155_scene_t0.py::test_no_spend_condition_when_no_cap_is_configured PASSED [ 75%]
+tests/test_sg155_scene_t0.py::test_configured_cap_is_used_when_no_explicit_cap PASSED [ 83%]
+tests/test_sg155_scene_t0.py::test_builder_carries_no_key_material PASSED [ 91%]
+tests/test_sg155_scene_t0.py::test_refusal_constructors_are_loud_values_and_never_raise PASSED [100%]
+
+============================== 12 passed in 0.09s ==============================

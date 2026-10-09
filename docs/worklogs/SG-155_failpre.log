@@ -1,0 +1,24 @@
+============================= test session starts ==============================
+platform linux -- Python 3.12.3, pytest-9.1.1, pluggy-1.6.0 -- /home/andrei/StorageGenie/backend/venv/bin/python
+cachedir: .pytest_cache
+rootdir: /home/andrei/StorageGenie/backend
+configfile: pyproject.toml
+plugins: asyncio-1.4.0, anyio-4.15.0
+asyncio: mode=Mode.AUTO, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collecting ... collected 0 items / 1 error
+
+==================================== ERRORS ====================================
+________________ ERROR collecting tests/test_sg155_scene_t0.py _________________
+ImportError while importing test module '/home/andrei/StorageGenie/backend/tests/test_sg155_scene_t0.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+/usr/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_sg155_scene_t0.py:29: in <module>
+    from app.services.scene import openrouter as scene
+E   ModuleNotFoundError: No module named 'app.services.scene'
+=========================== short test summary info ============================
+ERROR tests/test_sg155_scene_t0.py
+!!!!!!!!!!!!!!!!!!!! Interrupted: 1 error during collection !!!!!!!!!!!!!!!!!!!!
+=============================== 1 error in 0.15s ===============================

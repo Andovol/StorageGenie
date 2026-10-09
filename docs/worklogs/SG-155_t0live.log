@@ -1,0 +1,103 @@
+SG-155 T0 live legs — read-only, $0, no key, no render
+UTC: 2026-10-09T13:51:15Z
+Host: ubuntu · cwd: /home/andrei/StorageGenie
+
+### T0a — GET https://openrouter.ai/api/v1/models (public, no Authorization)
+$ curl -sS -v -o /tmp/models.json https://openrouter.ai/api/v1/models
+> GET /api/v1/models HTTP/2
+< HTTP/2 200 
+request headers actually sent (curl '>' lines):
+> Host: openrouter.ai
+> User-Agent: curl/8.5.0
+> Accept: */*
+> 
+Authorization sent? -> 0 header(s)
+
+== image-output models (architecture.output_modalities contains 'image') ==
+google/gemini-2.5-flash-image	{'prompt': '0.0000003', 'completion': '0.0000025', 'image': '0.0000003', 'image_output': '0.00003', 'audio': '0.000001', 'input_audio_cache': '0.0000001', 'web_search': '0.014', 'internal_reasoning': '0.0000025', 'input_cache_read': '0.00000003', 'input_cache_write': '0.0000000833333333333333'}
+google/gemini-3-pro-image	{'prompt': '0.000002', 'completion': '0.000012', 'image': '0.000002', 'image_output': '0.00012', 'audio': '0.000002', 'input_audio_cache': '0.0000002', 'web_search': '0.014', 'internal_reasoning': '0.000012', 'input_cache_read': '0.0000002', 'input_cache_write': '0.000000375'}
+google/gemini-3-pro-image-preview	{'prompt': '0.000002', 'completion': '0.000012', 'image': '0.000002', 'image_output': '0.00012', 'audio': '0.000002', 'input_audio_cache': '0.0000002', 'web_search': '0.014', 'internal_reasoning': '0.000012', 'input_cache_read': '0.0000002', 'input_cache_write': '0.000000375'}
+google/gemini-3.1-flash-image	{'prompt': '0.0000005', 'completion': '0.000003', 'image_output': '0.00006', 'web_search': '0.014'}
+google/gemini-3.1-flash-image-preview	{'prompt': '0.0000005', 'completion': '0.000003', 'image_output': '0.00006', 'web_search': '0.014'}
+google/gemini-3.1-flash-lite-image	{'prompt': '0.00000025', 'completion': '0.0000015', 'image_output': '0.00003', 'web_search': '0.014'}
+google/gemini-nano-banana-2.1	{'prompt': '0.0000015', 'completion': '0.0000075', 'image_output': '0.00003', 'web_search': '0.014'}
+openai/gpt-5-image	{'prompt': '0.00001', 'completion': '0.00001', 'image_output': '0.00004', 'web_search': '0.01', 'input_cache_read': '0.00000125'}
+openai/gpt-5-image-mini	{'prompt': '0.0000025', 'completion': '0.000002', 'image_output': '0.000008', 'web_search': '0.01', 'input_cache_read': '0.00000025'}
+openai/gpt-5.4-image-2	{'prompt': '0.000008', 'completion': '0.000015', 'image_output': '0.00003', 'web_search': '0.01', 'input_cache_read': '0.000002'}
+openrouter/auto	{'prompt': '-1', 'completion': '-1'}
+openrouter/auto-beta	{'prompt': '-1', 'completion': '-1'}
+count: 12
+
+### T0b — GET https://openrouter.ai/openapi.json (public, no Authorization) — the live tool contract
+$ curl -sS -v -o /tmp/openapi.json https://openrouter.ai/openapi.json
+> GET /openapi.json HTTP/2
+< HTTP/2 200 
+Authorization sent? -> 0 header(s)
+
+== stop_server_tools_when schema (components/schemas/StopServerToolsWhen*) ==
+StopServerToolsWhen: {"description": "Stop conditions for the server-tool agent loop. Any condition firing halts the loop (OR logic). When set, this overrides `max_tool_calls`. When a condition fires while the model is still emitting tool calls, the pending tool calls are executed and one final turn is made with tool calls disabled so the response ends with a natural-language answer instead of an unfinished tool call.", "example": [{"step_count": 5, "type": "step_count_is"}, {"max_cost_in_dollars": 0.5, "type": "max_cost"}], "minItems": 1, "type": "array"}
+items -> {'$ref': '#/components/schemas/StopServerToolsWhenCondition'}
+{
+ "description": "A single condition that, when met, halts the server-tool agent loop.",
+ "discriminator": {
+  "mapping": {
+   "finish_reason_is": "#/components/schemas/StopServerToolsWhenFinishReasonIs",
+   "has_tool_call": "#/components/schemas/StopServerToolsWhenHasToolCall",
+   "max_cost": "#/components/schemas/StopServerToolsWhenMaxCost",
+   "max_tokens_used": "#/components/schemas/StopServerToolsWhenMaxTokensUsed",
+   "step_count_is": "#/components/schemas/StopServerToolsWhenStepCountIs"
+  },
+  "propertyName": "type"
+ },
+ "example": {
+  "step_count": 5,
+  "type": "step_count_is"
+ },
+ "oneOf": [
+  {
+   "$ref": "#/components/schemas/StopServerToolsWhenStepCountIs"
+  },
+  {
+   "$ref": "#/components/schemas/StopServerToolsWhenHasToolCall"
+  },
+  {
+   "$ref": "#/components/schemas/StopServerToolsWhenMaxTokensUsed"
+  },
+  {
+   "$ref": "#/components/schemas/StopServerToolsWhenMaxCost"
+  },
+  {
+   "$ref": "#/components/schemas/StopServerToolsWhenFinishReasonIs"
+  }
+ ]
+}
+StopServerToolsWhenCondition -> {"description": "A single condition that, when met, halts the server-tool agent loop.", "discriminator": {"mapping": {"finish_reason_is": "#/components/schemas/StopServerToolsWhenFinishReasonIs", "has_tool_call": "#/components/schemas/StopServerToolsWhenHasToolCall", "max_cost": "#/components/schemas/StopServerToolsWhenMaxCost", "max_tokens_used": "#/components/schemas/StopServerToolsWhenMaxTokensUsed", "step_count_is": "#/components/schemas/StopServerToolsWhenStepCountIs"}, "propertyName": "type"}, "example": {"step_count": 5, "type": "step_count_is"}, "oneOf": [{"$ref": "#/components/schemas/StopServerToolsWhenStepCountIs"}, {"$ref": "#/components/schemas/StopServerToolsWhenHasToolCall"}, {"$ref": "#/components/schemas/StopServerToolsWhenMaxTokensUsed"}, {"$ref": "#/components/schemas/StopServerToolsWhenMaxCost"}, {"$ref": "#/components/schemas/StopServerToolsWhenFinishReasonIs"}]}
+StopServerToolsWhenFinishReasonIs -> {"description": "Stop when the upstream model emits this finish reason (e.g. `length`).", "example": {"reason": "length", "type": "finish_reason_is"}, "properties": {"reason": {"minLength": 1, "type": "string"}, "type": {"enum": ["finish_reason_is"], "type": "string"}}, "required": ["type", "reason"], "type": "object"}
+StopServerToolsWhenHasToolCall -> {"description": "Stop after a tool with this name has been called.", "example": {"tool_name": "finalize", "type": "has_tool_call"}, "properties": {"tool_name": {"minLength": 1, "type": "string"}, "type": {"enum": ["has_tool_call"], "type": "string"}}, "required": ["type", "tool_name"], "type": "object"}
+StopServerToolsWhenMaxCost -> {"description": "Stop once cumulative cost across the loop exceeds this dollar threshold.", "example": {"max_cost_in_dollars": 0.5, "type": "max_cost"}, "properties": {"max_cost_in_dollars": {"format": "double", "type": "number"}, "type": {"enum": ["max_cost"], "type": "string"}}, "required": ["type", "max_cost_in_dollars"], "type": "object"}
+StopServerToolsWhenMaxTokensUsed -> {"description": "Stop once cumulative token usage across the loop exceeds this threshold.", "example": {"max_tokens": 10000, "type": "max_tokens_used"}, "properties": {"max_tokens": {"type": "integer"}, "type": {"enum": ["max_tokens_used"], "type": "string"}}, "required": ["type", "max_tokens"], "type": "object"}
+StopServerToolsWhenStepCountIs -> {"description": "Stop after the agent loop has executed this many steps.", "example": {"step_count": 5, "type": "step_count_is"}, "properties": {"step_count": {"type": "integer"}, "type": {"enum": ["step_count_is"], "type": "string"}}, "required": ["type", "step_count"], "type": "object"}
+
+== reference-image question ==
+ImageGenerationServerTool_OpenRouter.description: OpenRouter built-in server tool: generates images from text prompts using an image generation model
+ImageGenerationServerToolConfig.description: Configuration for the openrouter:image_generation server tool. Accepts all image_config params (aspect_ratio, quality, size, background, output_format, output_compression, moderation, etc.) plus a model field.
+ImageGenerationServerToolConfig.properties: {"model": {"description": "Which image generation model to use (e.g. \"openai/gpt-5-image\"). Defaults to \"openai/gpt-5-image\".", "example": "openai/gpt-5-image", "type": "string"}}
+ImageGenerationRequest.input_references: {"description": "Reference images to guide image-to-image generation, as base64 data URLs or HTTP(S) URLs.", "items": {"$ref": "#/components/schemas/ContentPartImage"}, "maxItems": 16, "type": "array"}
+
+Spend: $0.000000 — both GETs are public catalogue/spec reads; no Authorization header sent; no chat/render call made.
+
+== orchestrator candidates — image input + text output + tool support, cheapest paid (non-batch excluded) ==
+inclusionai/ling-3.0-flash-vl	prompt=0.000000021	completion=0.0000000616
+qwen/qwen3.7-flash	prompt=0.00000003	completion=0.00000013
+google/gemma-3-12b-it	prompt=0.00000005	completion=0.00000015
+openai/gpt-5-nano	prompt=0.00000005	completion=0.0000004
+amazon/nova-lite-v1	prompt=0.00000006	completion=0.00000024
+qwen/qwen3.5-flash-02-23	prompt=0.000000065	completion=0.00000026
+bytedance-seed/seed-1.6-flash	prompt=0.000000075	completion=0.0000003
+nex-agi/nex-n2.5-pro	prompt=0.000000075	completion=0.00000025
+prism-ml/ternary-bonsai-2-27b	prompt=0.000000075	completion=0.0000005
+google/gemma-3-27b-it	prompt=0.00000008	completion=0.00000045
+paid vision+tools total: 179
+
+NOTE: image-output list above includes 2 router pseudo-models (openrouter/auto*);
+      10 real image-generation models. Pricing fields are per-token/ per-unit, see values verbatim.

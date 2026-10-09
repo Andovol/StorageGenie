@@ -38,6 +38,13 @@ class Settings(BaseSettings):
     # SG-097: Jina Search fallback key (Enrich). Declared so the settings seam
     # reads it; the JINA_API_KEY process environment remains the fallback.
     jina_api_key: str | None = None
+    # SG-155: OpenRouter key for Context Scene rendering. Declared so the
+    # settings seam reads it; the OPENROUTER_API_KEY process environment
+    # remains the fallback. Off by default; the key value is never logged.
+    openrouter_api_key: str | None = None
+    # SG-155: per-arc scene render spend cap in USD. Off by default (uncapped)
+    # per F2; the request carries a `max_cost` stop condition only when set.
+    sg_scene_cap: float | None = None
     sg_per_job_cap: float | None = None
     sg_monthly_cap: float | None = None
     sg_consent: bool = False
