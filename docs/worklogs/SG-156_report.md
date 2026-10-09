@@ -8,8 +8,9 @@ model/effort line (`D302`).
 **Work dir / origin:** `/home/andrei/StorageGenie` · `git@github.com:Andovol/StorageGenie.git`.
 **BASE ref requested:** `automation` → **resolved commit:** `b799c65` (branch tip at slice start; worktree clean,
 pushed — `b799c65 SG-155 rated 98 FLAG:TRUST + SG-156 recovery packet (L3) + state`).
-**WORK_HEAD:** this report's own commit — named back by the receipt note (`Work-HEAD:` field); the actual hash and
-the verbatim publication transcripts are in the Receipt section appended by the receipt-evidence commit below.
+**WORK_HEAD:** `4084d1cfd70c22d01e801d12c679196646492368` (`4084d1c`) — the commit carrying both reports and
+the evidence logs; the receipt note names it back as `Work-HEAD:` and the verbatim publication transcripts are
+in the Receipt section below.
 **Contract echo (verbatim):** `0.44.1` — source path `/home/andrei/storagegenie-contract/VERSION`; `RULES.md`
 sha256 `f2565b1cb289cff8ddb03dfeeefcec1a02e615fa6c54d940933be48eb4f99d4f` == payload `RULES.sha256` (both read
 this run). Recorded == published (`D4`).
@@ -81,9 +82,8 @@ asserts exactly this note on END_HEAD and `dispatch`'s `receipted()` greps this 
 `Dispatch-ID: SG-156` — the replay guard and `--status` read it. Verbatim publication transcript is appended in
 the Receipt section below.
 
-**Timing:** G3 (both reports + receipt) was committed well before the half-budget bound (engine start
-14:10:35Z; `RUN_BUDGET_S=2100`, half = 1050s); the measured elapsed at the G3 commit is recorded in the
-Receipt section below.
+**Timing:** G3 honored publish-before-bound: reports committed as `4084d1c` at elapsed **345s**, receipt note
+published at **355s** — against `RUN_BUDGET_S=2100` (half-bound = 1050s), engine start 14:10:35Z.
 
 ## Deviation — the bound `{{RECEIPT_CMD}}` is stale against the live lane (F-SG156-1)
 
@@ -140,3 +140,34 @@ pass-post 12/12); the drift comparison parses both sides mechanically (no grep-s
 - **REMAINING:** Architect action on F-SG156-1 (rebind/retire `RECEIPT_CMD`) and F-SG156-2 (`G-L1` on a
   grafted cache); SG-155's audit may now be re-read against a complete report+receipt; comparison slice SG-157
   and T1b SG-158 are queued by the packet (outside this slice).
+
+---
+
+## Receipt — publication evidence (appended by the receipt-evidence commit)
+
+Mechanism: note on `refs/notes/storagegenie-coder-reports` — the ref `run-coder`'s P3 asserts and `dispatch`'s
+`receipted()` greps. Published on WORK_HEAD `4084d1c` at 2026-10-09T14:16:30Z (elapsed 355s of the 2100s budget).
+
+    $ git notes --ref=refs/notes/storagegenie-coder-reports add -m "Dispatch-ID: SG-156 | Report: docs/worklogs/SG-156_report.md | Work-HEAD: 4084d1cfd70c22d01e801d12c679196646492368" 4084d1cfd70c22d01e801d12c679196646492368
+    $ git push origin refs/notes/storagegenie-coder-reports
+       8b588ee..6b65cc9  refs/notes/storagegenie-coder-reports -> refs/notes/storagegenie-coder-reports
+    $ git fetch origin refs/notes/storagegenie-coder-reports:refs/notes/sg156-fetched
+     * [new ref]         refs/notes/storagegenie-coder-reports -> refs/notes/sg156-fetched
+    $ git notes --ref=refs/notes/sg156-fetched show 4084d1cfd70c22d01e801d12c679196646492368
+    Dispatch-ID: SG-156 | Report: docs/worklogs/SG-156_report.md | Work-HEAD: 4084d1cfd70c22d01e801d12c679196646492368
+    note_show_exit=0
+
+`note=yes` — the note was read back from the **remote** (mapped fetch), not merely from the local store. This
+receipt-evidence commit (the tip carrying this section) is annotated with the same note body after it is
+committed (dual annotation, SG-092/SG-154 precedent); the engine then appends its
+`Settings: coder=… model=… effort=…` line and re-proves the note on the remote (P3) before the dispatch is done.
+
+Bound `{{RECEIPT_CMD}}` probe (F-SG156-1), same work HEAD, **no writes performed** (checked before staging):
+
+    $ timeout 120 /opt/storagegenie-dispatch/finalize_dispatch_report.sh SG-156 "contract_sync=refresh version=0.17.2" docs/worklogs/SG-156_report.md 4084d1cfd70c22d01e801d12c679196646492368
+    DISPATCH_BLOCKED_REPORT: candidate_not_remote
+    finalize_exit=1
+
+Production writes this slice: **0** (no docker, no DB, no `.env` touch, no served-code change). Spend:
+**$0.000000** (two public keyless GETs only, 0 Authorization headers, re-proven in
+`docs/worklogs/SG-156_t0recheck.log`).
