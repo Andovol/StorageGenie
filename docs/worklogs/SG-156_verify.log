@@ -1,0 +1,74 @@
+### SG-156 G1 re-verification of SG-155 tree (work commit 461c96f)
+cmd cwd: /home/andrei/StorageGenie/backend
+UTC: 2026-10-09T14:12:36Z
+interpreter: Python 3.12.3 pytest pytest 9.1.1
+
+### SG-155 tests: pytest -q tests/test_sg155_scene_t0.py (bound 120s)
+............                                                             [100%]
+12 passed in 0.11s
+sg155_tests_exit=0
+
+### full suite: pytest -q (bound 600s)
+tests/test_sg100_snapshot_persistence.py: 3 warnings
+tests/test_sg113_locations.py: 3 warnings
+tests/test_sg114_relations.py: 3 warnings
+tests/test_signals.py: 3 warnings
+  /home/andrei/StorageGenie/backend/venv/lib/python3.12/site-packages/alembic/config.py:604: DeprecationWarning: No path_separator found in configuration; falling back to legacy splitting on spaces, commas, and colons for prepend_sys_path.  Consider adding path_separator=os to Alembic config.
+    util.warn_deprecated(
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/test_signals.py::test_generated_codes_are_validated_and_bad_checksum_is_not_an_identifier
+FAILED tests/test_signals.py::test_ocr_has_text_boxes_and_mean_confidence - a...
+2 failed, 661 passed, 32 warnings in 33.85s
+suite_exit=1
+
+### ruff: ruff check . (bound 120s)
+All checks passed!
+ruff_exit=0
+
+### mypy: mypy app (bound 300s)
+app/models/base.py:8: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/households.py:18: error: Function is missing a return type annotation  [no-untyped-def]
+app/api/v1/households.py:20: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/households.py:22: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/households.py:58: error: Function is missing a return type annotation  [no-untyped-def]
+app/api/v1/households.py:59: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/households.py:60: error: Unused "type: ignore" comment  [unused-ignore]
+app/services/audit_service.py:16: error: Missing type arguments for generic type "dict"  [type-arg]
+app/services/audit_service.py:17: error: Missing type arguments for generic type "dict"  [type-arg]
+app/api/v1/review_tasks.py:17: error: Function is missing a return type annotation  [no-untyped-def]
+app/api/v1/review_tasks.py:21: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/review_tasks.py:22: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/review_tasks.py:62: error: Function is missing a return type annotation  [no-untyped-def]
+app/api/v1/review_tasks.py:66: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/review_tasks.py:67: error: Unused "type: ignore" comment  [unused-ignore]
+app/schemas/asset.py:55: error: Missing type arguments for generic type "dict"  [type-arg]
+app/schemas/asset.py:57: error: Missing type arguments for generic type "dict"  [type-arg]
+app/services/asset_service.py:19: error: Missing type arguments for generic type "dict"  [type-arg]
+app/services/asset_service.py:41: error: Missing type arguments for generic type "dict"  [type-arg]
+app/services/asset_service.py:112: error: Missing type arguments for generic type "dict"  [type-arg]
+app/api/v1/evidence.py:19: error: Function is missing a return type annotation  [no-untyped-def]
+app/api/v1/evidence.py:20: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/evidence.py:22: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/evidence.py:24: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/assets.py:71: error: Function is missing a return type annotation  [no-untyped-def]
+app/api/v1/assets.py:74: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/assets.py:76: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/assets.py:101: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/assets.py:101: error: Missing type arguments for generic type "dict"  [type-arg]
+app/api/v1/assets.py:101: note: Error code "type-arg" not covered by "type: ignore[no-untyped-def]" comment
+app/api/v1/assets.py:267: error: Function is missing a return type annotation  [no-untyped-def]
+app/api/v1/assets.py:275: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/assets.py:276: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/assets.py:395: error: Function is missing a return type annotation  [no-untyped-def]
+app/api/v1/assets.py:399: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/assets.py:401: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/assets.py:505: error: Function is missing a return type annotation  [no-untyped-def]
+app/api/v1/assets.py:507: error: Missing type arguments for generic type "dict"  [type-arg]
+app/api/v1/assets.py:509: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/assets.py:510: error: Unused "type: ignore" comment  [unused-ignore]
+app/main.py:58: error: Unused "type: ignore" comment  [unused-ignore]
+app/main.py:64: error: Unused "type: ignore" comment  [unused-ignore]
+Found 41 errors in 9 files (checked 92 source files)
+mypy_exit=1

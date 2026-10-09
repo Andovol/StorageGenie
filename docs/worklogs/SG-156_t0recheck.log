@@ -1,0 +1,103 @@
+SG-156 G2 — re-check of SG-155 T0a/T0b, read-only, keyless, $0
+UTC: 2026-10-09T14:14:26Z
+Host: ubuntu · cwd: /home/andrei/StorageGenie · bound: 120s per GET (curl --max-time 110)
+Baseline compared against committed: docs/worklogs/SG-155_t0live.log (commit 461c96f)
+
+### T0a — GET https://openrouter.ai/api/v1/models (public, no Authorization)
+$ curl -sS -v --max-time 110 -o /tmp/sg156-models.json https://openrouter.ai/api/v1/models
+> GET /api/v1/models HTTP/2
+> Host: openrouter.ai
+> User-Agent: curl/8.5.0
+> Accept: */*
+> 
+Authorization sent? -> 0 header(s)
+curl_exit=0
+
+== image-output models fresh (architecture.output_modalities contains 'image') ==
+google/gemini-nano-banana-2.1	{"prompt": "0.0000015", "completion": "0.0000075", "image_output": "0.00003", "web_search": "0.014"}
+openrouter/auto-beta	{"prompt": "-1", "completion": "-1"}
+google/gemini-3.1-flash-lite-image	{"prompt": "0.00000025", "completion": "0.0000015", "image_output": "0.00003", "web_search": "0.014"}
+google/gemini-3.1-flash-image	{"prompt": "0.0000005", "completion": "0.000003", "image_output": "0.00006", "web_search": "0.014"}
+google/gemini-3-pro-image	{"prompt": "0.000002", "completion": "0.000012", "image": "0.000002", "image_output": "0.00012", "audio": "0.000002", "input_audio_cache": "0.0000002", "web_search": "0.014", "internal_reasoning": "0.000012", "input_cache_read": "0.0000002", "input_cache_write": "0.000000375"}
+openai/gpt-5.4-image-2	{"prompt": "0.000008", "completion": "0.000015", "image_output": "0.00003", "web_search": "0.01", "input_cache_read": "0.000002"}
+google/gemini-3.1-flash-image-preview	{"prompt": "0.0000005", "completion": "0.000003", "image_output": "0.00006", "web_search": "0.014"}
+google/gemini-3-pro-image-preview	{"prompt": "0.000002", "completion": "0.000012", "image": "0.000002", "image_output": "0.00012", "audio": "0.000002", "input_audio_cache": "0.0000002", "web_search": "0.014", "internal_reasoning": "0.000012", "input_cache_read": "0.0000002", "input_cache_write": "0.000000375"}
+openai/gpt-5-image-mini	{"prompt": "0.0000025", "completion": "0.000002", "image_output": "0.000008", "web_search": "0.01", "input_cache_read": "0.00000025"}
+openai/gpt-5-image	{"prompt": "0.00001", "completion": "0.00001", "image_output": "0.00004", "web_search": "0.01", "input_cache_read": "0.00000125"}
+google/gemini-2.5-flash-image	{"prompt": "0.0000003", "completion": "0.0000025", "image": "0.0000003", "image_output": "0.00003", "audio": "0.000001", "input_audio_cache": "0.0000001", "web_search": "0.014", "internal_reasoning": "0.0000025", "input_cache_read": "0.00000003", "input_cache_write": "0.0000000833333333333333"}
+openrouter/auto	{"prompt": "-1", "completion": "-1"}
+count: 12
+
+== T0a slug/pricing comparison (old: SG-155_t0live.log vs fresh) ==
+slugs added: none
+slugs removed: none
+google/gemini-2.5-flash-image: pricing MATCH (image_output=0.00003)
+google/gemini-3-pro-image: pricing MATCH (image_output=0.00012)
+google/gemini-3-pro-image-preview: pricing MATCH (image_output=0.00012)
+google/gemini-3.1-flash-image: pricing MATCH (image_output=0.00006)
+google/gemini-3.1-flash-image-preview: pricing MATCH (image_output=0.00006)
+google/gemini-3.1-flash-lite-image: pricing MATCH (image_output=0.00003)
+google/gemini-nano-banana-2.1: pricing MATCH (image_output=0.00003)
+openai/gpt-5-image: pricing MATCH (image_output=0.00004)
+openai/gpt-5-image-mini: pricing MATCH (image_output=0.000008)
+openai/gpt-5.4-image-2: pricing MATCH (image_output=0.00003)
+openrouter/auto: pricing MATCH (image_output=n/a)
+openrouter/auto-beta: pricing MATCH (image_output=n/a)
+real image models (excluding openrouter/auto*): 10
+
+== orchestrator candidates from SG-155 (slug pricing re-checked, not re-derived) ==
+inclusionai/ling-3.0-flash-vl: prompt=0.000000021 completion=0.0000000616 MATCH
+qwen/qwen3.7-flash: prompt=0.00000003 completion=0.00000013 MATCH
+google/gemma-3-12b-it: prompt=0.00000005 completion=0.00000015 MATCH
+openai/gpt-5-nano: prompt=0.00000005 completion=0.0000004 MATCH
+amazon/nova-lite-v1: prompt=0.00000006 completion=0.00000024 MATCH
+qwen/qwen3.5-flash-02-23: prompt=0.000000065 completion=0.00000026 MATCH
+bytedance-seed/seed-1.6-flash: prompt=0.000000075 completion=0.0000003 MATCH
+nex-agi/nex-n2.5-pro: prompt=0.000000075 completion=0.00000025 MATCH
+prism-ml/ternary-bonsai-2-27b: prompt=0.000000075 completion=0.0000005 MATCH
+google/gemma-3-27b-it: prompt=0.00000008 completion=0.00000045 MATCH
+orchestrator rows compared: 10
+
+### T0b — GET https://openrouter.ai/openapi.json (public, no Authorization)
+$ curl -sS -v --max-time 110 -o /tmp/sg156-openapi.json https://openrouter.ai/openapi.json
+> GET /openapi.json HTTP/2
+> Host: openrouter.ai
+> User-Agent: curl/8.5.0
+> Accept: */*
+> 
+Authorization sent? -> 0 header(s)
+curl_exit=0
+
+== stop_server_tools_when (fresh) ==
+condition types: ['finish_reason_is', 'has_tool_call', 'max_cost', 'max_tokens_used', 'step_count_is']
+finish_reason_is -> StopServerToolsWhenFinishReasonIs
+has_tool_call -> StopServerToolsWhenHasToolCall
+max_cost -> StopServerToolsWhenMaxCost
+max_tokens_used -> StopServerToolsWhenMaxTokensUsed
+step_count_is -> StopServerToolsWhenStepCountIs
+
+== T0b stop-schema comparison (parsed old SG-155 log vs fresh) ==
+StopServerToolsWhen: MATCH (items ref compared separately)
+StopServerToolsWhen.items ref: MATCH
+StopServerToolsWhenCondition: MATCH
+StopServerToolsWhenStepCountIs: MATCH
+StopServerToolsWhenHasToolCall: MATCH
+StopServerToolsWhenMaxTokensUsed: MATCH
+StopServerToolsWhenMaxCost: MATCH
+StopServerToolsWhenFinishReasonIs: MATCH
+
+== reference-image answer comparison (old lines vs fresh objects) ==
+ImageGenerationServerTool_OpenRouter.description: MATCH
+ImageGenerationServerToolConfig.description: MATCH
+ImageGenerationServerToolConfig.properties: MATCH
+ImageGenerationRequest.input_references: MATCH
+
+server-tool reference-image support (fresh answer, verbatim):
+  ImageGenerationServerTool_OpenRouter.description: OpenRouter built-in server tool: generates images from text prompts using an image generation model
+  ImageGenerationServerToolConfig.properties: {"model": {"description": "Which image generation model to use (e.g. \"openai/gpt-5-image\"). Defaults to \"openai/gpt-5-image\".", "example": "openai/gpt-5-image", "type": "string"}}
+  ImageGenerationRequest.input_references: {"description": "Reference images to guide image-to-image generation, as base64 data URLs or HTTP(S) URLs.", "items": {"$ref": "#/components/schemas/ContentPartImage"}, "maxItems": 16, "type": "array"}
+  -> answer on the chat-completions server-tool path: TEXT-PROMPT-ONLY (unchanged)
+
+Spend: $0.000000 — both GETs public catalogue/spec reads; no Authorization header sent; no chat/render call made.
+
+VERDICT: MATCH — slugs, prices, 5 stop types and reference-image answer all unchanged vs SG-155_t0live.log.
