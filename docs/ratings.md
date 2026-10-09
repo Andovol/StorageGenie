@@ -529,3 +529,9 @@ Originals above (88 FLAG:TRUST / 91 FLAG:TRUST) stand as the audit trail; the ve
 | slice_id | phase | model | effort | score | flag | lever | guards_invoked | deduction_attribution |
 |---|---|---|---|---|---|---|---|---|
 | SG-156 | Scene recovery (D-1009-7 L3): re-verified SG-155 tree (12/12 + suite 2/661 same reds + ruff clean + mypy delta 0, no defect) + fresh $0 T0a/T0b re-fetch MATCH no drift + authored missing SG-155 report + own report + notes-ref receipt read back on remote, publish-before-bound honored (345s/355s vs 1050 half-bound), $0 | opencode (model deepseek-v4.1-flash from /proc cmdline --model; effort max from --variant max) | max | 99 |  |  | PG-EV-04, PG-EV-09, PG-SC-03, PG-IC-01, PG-IC-03, PG-IC-07, PG-IC-08, PG-IC-09 |  |
+
+### SG-157 (2026-10-09 - Coder comparison on muse-spark/xhigh, $0)
+
+| slice_id | phase | model | effort | score | flag | lever | guards_invoked | deduction_attribution |
+|---|---|---|---|---|---|---|---|---|
+| SG-157 | Scene comparison (D-1009-7/D-1009-9 L3): independent T0 re-verification (12/12 + suite 2/661 same reds + ruff clean + mypy delta 0) + fresh $0 T0a/T0b MATCH no drift + orchestrator ranking independently re-derived (179 + order) + per-observation comparison vs SG-155/156 (convergence; harness-depth the only divergence) + notes-ref receipt read back, publish-before-bound honored (169s/176s), $0 | opencode (model muse-spark-1.3-contributor from /proc cmdline --model; effort xhigh from --variant xhigh) | xhigh | 99 |  |  | PG-EV-04, PG-EV-09, PG-SC-03, PG-IC-01, PG-IC-03, PG-IC-07, PG-IC-08, PG-IC-09 |  |
