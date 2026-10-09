@@ -535,3 +535,9 @@ Originals above (88 FLAG:TRUST / 91 FLAG:TRUST) stand as the audit trail; the ve
 | slice_id | phase | model | effort | score | flag | lever | guards_invoked | deduction_attribution |
 |---|---|---|---|---|---|---|---|---|
 | SG-157 | Scene comparison (D-1009-7/D-1009-9 L3): independent T0 re-verification (12/12 + suite 2/661 same reds + ruff clean + mypy delta 0) + fresh $0 T0a/T0b MATCH no drift + orchestrator ranking independently re-derived (179 + order) + per-observation comparison vs SG-155/156 (convergence; harness-depth the only divergence) + notes-ref receipt read back, publish-before-bound honored (169s/176s), $0 | opencode (model muse-spark-1.3-contributor from /proc cmdline --model; effort xhigh from --variant xhigh) | xhigh | 99 |  |  | PG-EV-04, PG-EV-09, PG-SC-03, PG-IC-01, PG-IC-03, PG-IC-07, PG-IC-08, PG-IC-09 |  |
+
+### SG-158 (2026-10-09 - Scene T1b renders, BLOCKED-correct on account policy)
+
+| slice_id | phase | model | effort | score | flag | lever | guards_invoked | deduction_attribution |
+|---|---|---|---|---|---|---|---|---|
+| SG-158 | Scene T1b (D-1009-7 L3): send/store/ledger path + 15 tests fail-pre->pass-post + privacy pins extended (CO-38) + suite 2/676 same reds + ruff/mypy clean; R1 BLOCKED-correct (openai slugs unroutable under account allowed-providers, quoted 404) + R2 billed USD 0.00076 imageless (image_url_missing, honestly unresolved) + D7 deliberately unanswered; spend under 1 USD cap, publish-before-bound honored, receipt VALID | opencode (model deepseek-v4.1-flash from /proc cmdline --model; effort max from --variant max) | max | 98 |  |  | PG-EV-04, PG-EV-06, PG-EV-09, PG-EV-14, PG-SC-03, PG-IC-01, PG-IC-03, PG-IC-07, PG-IC-08, PG-IC-09, PG-PR-10 | packet |
