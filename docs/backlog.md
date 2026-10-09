@@ -9,7 +9,7 @@ Created at the 2026-09-25 D2 close (discharges the long-owed "backlog-file creat
 | Dark-link hue sign-off | CLOSED 2026-09-29 (owner verdict "its ok" = KEEP, D-0929-4, live image `c6fc45ab`) |
 | 12-month window calibration (`LEDGER_RETENTION_MONTHS` UNCALIBRATED `G-A9`; or retire the vehicle) | Owner word |
 | Ledger auto-run / scheduler decision (vehicle exists, never scheduled, `SG-125` REMAINING) | Owner word |
-| `F-SG126-3` runbook-command guard (no guard pins runbook command strings; instances: `SG-126` drift, `F-SG131-1` `/_data` doubling) | Next runbook-touching slice, or owner word |
+| `F-SG126-3` runbook-command guard | CLOSED 2026-09-29 via SG-144 (guard live, seen-to-fail) |
 | Desk #53 OPEN (retired effort values in adoption notes) | Owner relay at a desk boundary |
 | Pilot tiers · per-field accept UI · chat persistence · `D61` prompts · beauty verdict | Individual scoping words |
 | `F-SG098-3` brand unpopulated | Verify whether `SG-119` closed it; if open, needs a slice word |
