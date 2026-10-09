@@ -8,7 +8,9 @@ No effort refusal occurred at trigger or in-slice: the packet's CAVEAT condition
 **Work dir / origin:** `/home/andrei/StorageGenie` · `git@github.com:Andovol/StorageGenie.git`.
 **BASE ref requested:** `automation` → **resolved commit:** `b948727` (branch tip at slice start; worktree clean —
 `b948727 SG-156 rated 99 + RECEIPT_CMD rebound to notes-ref + SG-157 packet + state`).
-**WORK_HEAD:** `TBD-first-commit` (filled by the receipt-evidence commit below; the receipt note names it back).
+**WORK_HEAD:** `10940c27e106bef1a75097a343dadfef0231c1b0` (`10940c2`) — the commit carrying the report and both
+evidence logs; the receipt note names it back as `Work-HEAD:` and the verbatim publication transcripts are
+in the Receipt section below.
 **Contract echo:** `0.44.1` — recorded in `AGENTS.md` (rule-set line) == host checkout
 `/home/andrei/storagegenie-contract/VERSION` = `0.44.1` (both read this run; `RULES.md` sha256 not re-read —
 SG-156 already recorded the match, cited not re-derived).
@@ -162,4 +164,24 @@ Reports + receipt publication timestamps and elapsed in the Receipt section belo
 
 ## Receipt — publication evidence (appended by the receipt-evidence commit)
 
-(TBD — filled after the reports commit is pushed and the notes-ref receipt is read back on remote.)
+Mechanism: note on `refs/notes/storagegenie-coder-reports` — the ref `run-coder`'s P3 asserts and `dispatch`'s
+`receipted()` greps. Published on WORK_HEAD `10940c2` at 2026-10-09T14:24:54Z (elapsed 176s of the 2100s budget;
+reports commit pushed at 14:24:47Z, elapsed 169s — publish-before-bound honored against half-bound 1050s).
+
+    $ git notes --ref=refs/notes/storagegenie-coder-reports add -m "Dispatch-ID: SG-157 | Report: docs/worklogs/SG-157_report.md | Work-HEAD: 10940c27e106bef1a75097a343dadfef0231c1b0" 10940c27e106bef1a75097a343dadfef0231c1b0
+    $ git push origin refs/notes/storagegenie-coder-reports
+       f388058..f7e85fd  refs/notes/storagegenie-coder-reports -> refs/notes/storagegenie-coder-reports
+    $ git fetch origin refs/notes/storagegenie-coder-reports:refs/notes/sg157-fetched
+     * [new ref]         refs/notes/storagegenie-coder-reports -> refs/notes/sg157-fetched
+    $ git notes --ref=refs/notes/sg157-fetched show 10940c27e106bef1a75097a343dadfef0231c1b0
+    Dispatch-ID: SG-157 | Report: docs/worklogs/SG-157_report.md | Work-HEAD: 10940c27e106bef1a75097a343dadfef0231c1b0
+    note_show_exit=0
+
+`note=yes` — the note was read back from the **remote** (mapped fetch), not merely from the local store. This
+receipt-evidence commit (the tip carrying this section) is annotated with the same note body after it is
+committed (dual annotation, SG-092/SG-154/SG-156 precedent); the engine then appends its
+`Settings: coder=… model=… effort=…` line and re-proves the note on the remote (P3) before the dispatch is done.
+
+Production writes this slice: **0** (no docker, no DB, no `.env` touch, no served-code change). Spend:
+**$0.000000** (four public keyless GET rounds — one discarded harness-bug round + three final — 0 Authorization
+headers on every round, re-proven in `docs/worklogs/SG-157_t0recheck.log`).
