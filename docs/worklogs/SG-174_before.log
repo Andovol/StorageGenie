@@ -1,0 +1,98 @@
+=== SG-174 before @ 2026-10-12T21:04:35Z ===
+--- git ---
+f53fcd554544421641fe41a8d9751f8becc4f5b1
+f53fcd554544421641fe41a8d9751f8becc4f5b1
+2
+f53fcd5 SG-173 audit 97: record repair chain and prepare SG-174 closeout
+--- container inspect ---
+CID=91a073730e495dae222f179710879199237398040926adbbf8c57602fe97ef3f
+Id=91a073730e495dae222f179710879199237398040926adbbf8c57602fe97ef3f
+Image=sha256:9064d2ced325220a4e7a2a16670cf678651e142c032c840e6e1e2d059c0cd4bf
+ImageName=storagegenie-backend
+RestartCount=0
+Status=running health=healthy
+StartedAt=2026-10-12T20:03:58.043100489Z
+Created=2026-10-12T20:03:57.235297734Z
+--- consecutive health GETs x6 ---
+h1: {"status":"ok","db":"ok","storage":"ok"} [200]
+h2: {"status":"ok","db":"ok","storage":"ok"} [200]
+h3: {"status":"ok","db":"ok","storage":"ok"} [200]
+h4: {"status":"ok","db":"ok","storage":"ok"} [200]
+h5: {"status":"ok","db":"ok","storage":"ok"} [200]
+h6: {"status":"ok","db":"ok","storage":"ok"} [200]
+--- gate (pinned to 127.0.0.1 via --resolve, SNI+Host = storagegenie.dynv6.net) ---
+http:80  = 301
+https:443= 401
+--- alembic current (read-only) ---
+INFO  [alembic.runtime.migration] Context impl SQLiteImpl.
+INFO  [alembic.runtime.migration] Will assume non-transactional DDL.
+20260924_sg114_relation (head)
+--- served bundle listing ---
+total 328
+drwxr-xr-x 2 root root   4096 Oct 12 20:03 .
+drwxr-xr-x 3 root root   4096 Oct 12 20:03 ..
+-rw-r--r-- 1 root root 322255 Oct 12 20:03 index-CYyuxefG.js
+-rw-r--r-- 1 root root   3911 Oct 12 20:03 index-DO0gjGV6.css
+--- index.html asset refs ---
+assets/index-CYyuxefG.js
+assets/index-DO0gjGV6.css
+--- served sha256 ---
+2f035becd05b63e226af82e2e8fe60c8f3b5effb9f37e49dd95a2265c4da0d55  /app/static/index.html
+1b4680a0eddadff3c95a64b6bc00d744764d127a72cd5690ebea948b7664a29d  /app/static/assets/index-CYyuxefG.js
+37b25dbdd4b0ecfdedb8255bc7f8af286726334e95a1a3a9e85b9ba381b3d57c  /app/static/assets/index-DO0gjGV6.css
+--- DB tables + counts (enumerated on target; sqlite read-only URI) ---
+alembic_version 1
+assertion 37
+asset 7
+asset_evidence 14
+asset_fts 7
+asset_fts_config 1
+asset_fts_data 9
+asset_fts_docsize 7
+asset_fts_idx 7
+asset_location 1
+asset_relation 1
+audit_event 91
+candidate 10
+enrich_snapshot 4
+evidence 18
+guardrail_event 2
+household 1
+idempotency_key 11
+job 11
+job_step 72
+location 1
+observation 20
+planning_suggestion 0
+provider_call 29
+review_task 8
+saved_search 0
+source_attribution 0
+user 2
+TABLES 28
+--- prod DB file sha256 (host path) ---
+e6bef157440fb8b4a3262577362b071dcae07507ea9a7e04a614e11be28ee5bd  /home/andrei/StorageGenie/data/db/storagegenie.db
+--- CORS preflight (OPTIONS only) ---
+If-Match PATCH => 200
+TRACE => 400
+X-Evil-Header => 400
+--- allow-methods ---
+access-control-allow-methods: GET, POST, PUT, PATCH, DELETE, OPTIONS
+access-control-max-age: 600
+access-control-allow-headers: Accept, Accept-Language, Authorization, Content-Language, Content-Type, Idempotency-Key, If-Match, Origin, X-Requested-With
+access-control-allow-credentials: true
+access-control-allow-origin: http://localhost:5173
+--- candidate enumeration (read-only) ---
+candidate ids: ['01a0afaa-3ff4-7da0-987a-87f29c73ee5b', '01a0c445-51a8-7921-b6cc-681d23b10f1b', '01a0c47f-246a-7263-a1af-490b313855af', '01a0c481-1e4b-7db1-a6d3-63452fe8a26c', '01a0c4a0-d574-75f0-87aa-a9a6abbd6a06']
+CHOSEN_REVIEW_ID= 01a0afaa-3ff4-7da0-987a-87f29c73ee5b
+--- story pages through served server (read-only GETs) ---
+/review/01a0afaa-3ff4-7da0-987a-87f29c73ee5b => 200
+/inbox => 200
+/catalog => 200
+--- served-JS marker occurrence counts ---
+JS=/app/static/assets/index-CYyuxefG.js
+OCC 'review_task_ids' => 2
+OCC 'open review task(s) are resolved' => 2
+OCC 'View them in the Inbox' => 1
+OCC 'Thumbnail unavailable' => 2
+=== END before ===

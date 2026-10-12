@@ -1,0 +1,17 @@
+=== SG-174 product-diff check vs SG-172 deployed base 3ae5541 @ 2026-10-12T21:04:31Z ===
+--- requested base ref: automation; resolved commit: f53fcd554544421641fe41a8d9751f8becc4f5b1 ---
+--- diff --stat 3ae5541..HEAD -- backend frontend (expect EMPTY: no product change) ---
+STAT_EXIT:0
+--- diff --name-only 3ae5541..HEAD -- backend frontend ---
+--- models/migrations explicit ---
+--- all non-worklog names changed since 3ae5541 ---
+AGENTS.md
+STATE.md
+docs/decisions/2026-10-12-codex-dispatch-transport.md
+docs/history/archive-2026-10-12-pre-SG173-resume.md
+docs/packets/SG-173-review-to-catalog-story.md
+docs/packets/SG-174-closeout-deploy.md
+docs/ratings.md
+--- worktree product dirt (expect none) ---
+(no lines above = clean)
+=== END ===

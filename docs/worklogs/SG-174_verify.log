@@ -1,0 +1,47 @@
+=== SG-174 VERIFY @ 2026-10-12T21:06:32Z ===
+--- BEFORE vs AFTER: health lines diff (expect empty) ---
+health_diff_exit=0
+--- BEFORE vs AFTER: table-count lines diff (expect empty) ---
+counts_diff_exit=0
+--- BEFORE vs AFTER: served sha256 diff (expect empty) ---
+sha_diff_exit=0
+--- BEFORE vs AFTER: alembic head line diff (expect empty) ---
+alembic_diff_exit=0
+--- BEFORE vs AFTER: CORS section diff (expect empty) ---
+cors_diff_exit=0
+--- BEFORE vs AFTER: identity lines (expect container Id/Created/Started/image to differ) ---
+BEFORE CID=91a073730e495dae222f179710879199237398040926adbbf8c57602fe97ef3f
+BEFORE Id=91a073730e495dae222f179710879199237398040926adbbf8c57602fe97ef3f
+BEFORE Image=sha256:9064d2ced325220a4e7a2a16670cf678651e142c032c840e6e1e2d059c0cd4bf
+BEFORE ImageName=storagegenie-backend
+BEFORE RestartCount=0
+BEFORE Status=running health=healthy
+BEFORE StartedAt=2026-10-12T20:03:58.043100489Z
+BEFORE Created=2026-10-12T20:03:57.235297734Z
+AFTER  CID=23d31ff5f3caa07d6b019f57ce686a595687e4dff64f8f8be708307bf5f124b9
+AFTER  Id=23d31ff5f3caa07d6b019f57ce686a595687e4dff64f8f8be708307bf5f124b9
+AFTER  Image=sha256:d5da5684a95e20e2ea9d85f8eddcbd007b2542cc6493ebb2f0da090bb2419927
+AFTER  ImageName=storagegenie-backend
+AFTER  RestartCount=0
+AFTER  Status=running health=healthy
+AFTER  StartedAt=2026-10-12T21:05:13.674463854Z
+AFTER  Created=2026-10-12T21:05:12.713648479Z
+--- BEFORE vs AFTER: served-JS marker counts diff (expect empty) ---
+markers_diff_exit=0
+--- BEFORE vs AFTER: story pages diff (expect empty) ---
+pages_diff_exit=0
+--- BEFORE vs AFTER: prod DB file sha256 diff (expect empty) ---
+prodhash_diff_exit=0
+--- worktree scope: porcelain (expect only SG-174 files) ---
+?? docs/worklogs/SG-174_after.log
+?? docs/worklogs/SG-174_before.log
+?? docs/worklogs/SG-174_build.log
+?? docs/worklogs/SG-174_diff.log
+?? docs/worklogs/SG-174_recreate.log
+?? docs/worklogs/SG-174_verify.log
+--- product-path dirt (expect empty) ---
+(no lines above = clean)
+--- product diff vs deployed base 3ae5541, re-confirmed post-recreate (expect empty) ---
+--- prod DB file sha256, re-read now ---
+e6bef157440fb8b4a3262577362b071dcae07507ea9a7e04a614e11be28ee5bd  data/db/storagegenie.db
+=== END VERIFY ===
