@@ -1,0 +1,97 @@
+### SG-170 BEFORE capture (read-only) 2026-10-12T19:09:21Z
+== container inspect ==
+container_id=a31f940cdc23d3e9467f6938e175be49527ca4326dc786e908099ab366e0de35
+image=sha256:85924507a2442f33427dc09464420c533712b3fcf5689bae5a9eaa634f4481e3
+restartcount=0
+created=2026-10-12T18:35:11.766685356Z
+state=running
+== image created ==
+image=sha256:85924507a2442f33427dc09464420c533712b3fcf5689bae5a9eaa634f4481e3 created=2026-10-12T18:34:56.019523813Z
+== health x6 ==
+health[1] http=200 body={"status":"ok","db":"ok","storage":"ok"}
+health[2] http=200 body={"status":"ok","db":"ok","storage":"ok"}
+health[3] http=200 body={"status":"ok","db":"ok","storage":"ok"}
+health[4] http=200 body={"status":"ok","db":"ok","storage":"ok"}
+health[5] http=200 body={"status":"ok","db":"ok","storage":"ok"}
+health[6] http=200 body={"status":"ok","db":"ok","storage":"ok"}
+== gate ==
+http:80=301
+https:443=401
+== alembic ==
+INFO  [alembic.runtime.migration] Context impl SQLiteImpl.
+INFO  [alembic.runtime.migration] Will assume non-transactional DDL.
+20260924_sg114_relation (head)
+== served static ==
+/app/static:
+total 16
+drwxr-xr-x 3 root root 4096 Oct 12 18:34 .
+drwxr-xr-x 1 root root 4096 Oct 12 18:34 ..
+drwxr-xr-x 2 root root 4096 Oct 12 18:34 assets
+-rw-r--r-- 1 root root  944 Oct 12 18:34 index.html
+
+/app/static/assets:
+total 328
+drwxr-xr-x 2 root root   4096 Oct 12 18:34 .
+drwxr-xr-x 3 root root   4096 Oct 12 18:34 ..
+-rw-r--r-- 1 root root 321317 Oct 12 18:34 index-CaM3_fbA.js
+-rw-r--r-- 1 root root   3911 Oct 12 18:34 index-DO0gjGV6.css
+== index.html asset reference ==
+assets/index-CaM3_fbA.js
+assets/index-DO0gjGV6.css
+a18b96840859d459d5f6350fa95952b46d58f6d6bc96a08d80338f40ba0c4770  /app/static/index.html
+== bundle sha256 ==
+sha256sum: '/app/static/assets/index-*.js': No such file or directory
+sha256sum: '/app/static/assets/index-*.css': No such file or directory
+== db path ==
+-rw------- 1 andrei andrei 651264 Oct 12 18:35 data/db/storagegenie.db
+3.45.1
+== 28-table counts ==
+alembic_version=1
+assertion=31
+asset=6
+asset_evidence=12
+asset_fts=6
+asset_fts_config=1
+asset_fts_data=8
+asset_fts_docsize=6
+asset_fts_idx=6
+asset_location=1
+asset_relation=1
+audit_event=78
+candidate=9
+enrich_snapshot=4
+evidence=16
+guardrail_event=2
+household=1
+idempotency_key=10
+job=10
+job_step=64
+location=1
+observation=18
+planning_suggestion=0
+provider_call=27
+review_task=7
+saved_search=0
+source_attribution=0
+user=2
+table_count=28
+== CORS preflight (OPTIONS only, zero writes) 2026-10-12T19:09:23Z ==
+-- OK: method GET, header If-Match --
+HTTP/1.1 200 OK
+access-control-allow-methods: GET, POST, PUT, PATCH, DELETE, OPTIONS
+access-control-max-age: 600
+access-control-allow-headers: Accept, Accept-Language, Authorization, Content-Language, Content-Type, Idempotency-Key, If-Match, Origin, X-Requested-With
+access-control-allow-credentials: true
+access-control-allow-origin: http://localhost:5173
+-- TRACE method --
+status=400
+-- X-Evil-Header --
+status=400
+== bundle sha256 (explicit) ==
+2fe32c978bf59a9fab8465473b88e46d0184c59a051545cd70f8395e42c6c707  /app/static/assets/index-CaM3_fbA.js
+37b25dbdd4b0ecfdedb8255bc7f8af286726334e95a1a3a9e85b9ba381b3d57c  /app/static/assets/index-DO0gjGV6.css
+total 328
+drwxr-xr-x 2 root root   4096 Oct 12 18:34 .
+drwxr-xr-x 3 root root   4096 Oct 12 18:34 ..
+-rw-r--r-- 1 root root 321317 Oct 12 18:34 index-CaM3_fbA.js
+-rw-r--r-- 1 root root   3911 Oct 12 18:34 index-DO0gjGV6.css
