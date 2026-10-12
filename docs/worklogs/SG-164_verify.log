@@ -1,0 +1,140 @@
+SG-164 verify log — 2026-10-12T15:09Z   BASE 1d96e84798742cd70cfd0fd99199dbc7486b1249   WORK_HEAD 9b46aeae00ba894afd3f1ec6fe9bedcb7ae136c8
+
+=== [0] contract echo ===
+$ cat /home/andrei/storagegenie-contract/VERSION
+0.46.0
+$ cat /home/andrei/storagegenie-contract/RULES.sha256
+487841b151a593c396353e8eb61f245ba6678976b13917534308e810a7d8c9ef RULES.md
+$ bash /home/andrei/storagegenie-contract/rules_check.sh ; echo exit=$?
+G-L1 UNCHECKED the cache is not checked out at a contract tag: /home/andrei/storagegenie-contract
+G-L5 UNCHECKED gh-unauthenticated
+G-L7 UNCHECKED gh-unauthenticated
+G-L6 BYTES /home/andrei/.codex/AGENTS.md 2275
+G-L6 BYTES /home/andrei/.config/opencode/AGENTS.md 1933
+G-L6 BYTES total[codex]=2275 unseen=architect-layer,state-file,other-ritual-files
+G-L6 BYTES total[opencode]=1933 unseen=architect-layer,state-file,other-ritual-files
+exit=3
+
+=== [1] head re-verified (packet expectation: #49 33252132) ===
+$ git ls-remote origin refs/pull/49/head refs/pull/46/head refs/heads/automation
+1d96e84798742cd70cfd0fd99199dbc7486b1249	refs/heads/automation
+78cf8e4260d8e66c63ab7bba905faaf5784b0779	refs/pull/46/head
+33252132a6b4b027a94e966f8cbc221a113a1c23	refs/pull/49/head
+#49 = 33252132a6b4b027a94e966f8cbc221a113a1c23  == expected (UNMOVED; no STOP)
+
+=== [2] #49 diff-to-base, ChatPage.tsx only (the theming delta source) ===
+$ git diff 4c1eb7da 33252132 --stat
+ frontend/pnpm-lock.yaml          | 3171 ++++++++++++++++++++++++++++++++++++++
+ frontend/src/routes/ChatPage.tsx |   54 +-
+#49's forms are the SAME wrapping #46 landed; the theming (5 control deltas) is what remains to add.
+
+=== [3] re-derived over landed #46 — form wiring byte-intact ===
+base blob (#46 landed, SG-163): 4ec5fb76de07792c4917f3decaba4cbcdbf73911
+$ git hash-object frontend/src/routes/ChatPage.tsx
+b55742c6668409b2b6c8f81fabb583e13b4dc7f0
+$ git rev-parse 33252132:frontend/src/routes/ChatPage.tsx
+b55742c6668409b2b6c8f81fabb583e13b4dc7f0
+RE-DERIVED == #49 HEAD (byte-identical)
+$ git diff --stat 33252132 -- frontend/src/routes/ChatPage.tsx   -> empty (diff_exit=0)
+
+$ git show HEAD:.../ChatPage.tsx | grep -E '<form|onSubmit=\{\(event\)|event\.preventDefault|\.mutate\(\);|type="submit"|</form>' | sed -E 's/^[0-9]+://' > pre
+$ grep ... current file ... > post ; diff pre post
+FORM+SUBMIT WIRING BYTE-INTACT (content diff empty)
+
+=== [4] lockfile absence (index and tree) ===
+$ git ls-files --error-unmatch frontend/pnpm-lock.yaml  -> exit 1 (absent)
+$ git diff --cached --name-only | grep -i pnpm          -> exit 1 (none staged)
+$ git ls-files | grep -i pnpm                            -> exit 1 (none tracked)
+
+=== [5] per-hunk theming presence (resulting file) ===
+100:            className="bg-background text-foreground border-border focus-ring"   (category <select>)
+140:          className="bg-background text-foreground border-border focus-ring"   (Question input)
+146:          className="bg-primary text-primary-foreground focus-ring"             (Send button)
+173:          className="bg-background text-foreground border-border focus-ring"   (Correction input)
+179:          className="bg-card text-foreground border-border focus-ring"          (Log correction button)
+cursor-state count: 2
+
+=== [5b] product diff (git show 9b46aea -- frontend/src/routes/ChatPage.tsx) ===
+diff --git a/frontend/src/routes/ChatPage.tsx b/frontend/src/routes/ChatPage.tsx
+index 4ec5fb7..b55742c 100644
+--- a/frontend/src/routes/ChatPage.tsx
++++ b/frontend/src/routes/ChatPage.tsx
+@@ -97,6 +97,8 @@ export function ChatPage() {
+           <select
+             value={category}
+             onChange={(event) => setCategory(event.target.value)}
++            className="bg-background text-foreground border-border focus-ring"
++            style={{ padding: "4px 8px", borderRadius: 6, borderStyle: "solid", borderWidth: 1 }}
+           >
+             {CATEGORIES.map((option) => (
+               <option key={option.value} value={option.value}>
+@@ -135,11 +137,20 @@ export function ChatPage() {
+           value={input}
+           onChange={(event) => setInput(event.target.value)}
+           placeholder="Ask about this category…"
+-          style={{ flex: 1, padding: 8 }}
++          className="bg-background text-foreground border-border focus-ring"
++          style={{ flex: 1, padding: 8, borderRadius: 6, borderStyle: "solid", borderWidth: 1 }}
+         />
+         <button
+           type="submit"
+           disabled={!effectiveHousehold || !input.trim() || send.isPending}
++          className="bg-primary text-primary-foreground focus-ring"
++          style={{
++            padding: "8px 16px",
++            borderRadius: 6,
++            border: "none",
++            fontWeight: 600,
++            cursor: !effectiveHousehold || !input.trim() || send.isPending ? "not-allowed" : "pointer",
++          }}
+         >
+           {send.isPending ? "Sending…" : "Send"}
+         </button>
+@@ -159,11 +170,20 @@ export function ChatPage() {
+           value={correction}
+           onChange={(event) => setCorrection(event.target.value)}
+           placeholder="Log a correction…"
+-          style={{ flex: 1, padding: 8 }}
++          className="bg-background text-foreground border-border focus-ring"
++          style={{ flex: 1, padding: 8, borderRadius: 6, borderStyle: "solid", borderWidth: 1 }}
+         />
+         <button
+           type="submit"
+           disabled={!effectiveHousehold || !correction.trim() || logCorrection.isPending}
++          className="bg-card text-foreground border-border focus-ring"
++          style={{
++            padding: "8px 16px",
++            borderRadius: 6,
++            borderStyle: "solid",
++            borderWidth: 1,
++            cursor: !effectiveHousehold || !correction.trim() || logCorrection.isPending ? "not-allowed" : "pointer",
++          }}
+         >
+           Log correction
+         </button>
+# Only className/style lines added; <form onSubmit>, type="submit", disabled untouched.
+
+=== [6] Enter-submit test, explicit (themed tree) ===
+$ ./node_modules/.bin/vitest run src/routes/ChatPage.test.tsx -t "submitting the form by pressing Enter sends the question"
+ ✓ src/routes/ChatPage.test.tsx  (7 tests | 6 skipped) 105ms
+ Test Files  1 passed (1)
+      Tests  1 passed | 6 skipped (7)
+ENTER_EXIT=0
+
+=== [7] derived test set + static gates ===
+$ ./node_modules/.bin/vitest run src/routes/ChatPage.test.tsx src/routes/theme-adoption.test.tsx
+ ✓ src/routes/ChatPage.test.tsx  (7 tests) 370ms
+ ✓ src/routes/theme-adoption.test.tsx  (12 tests) 379ms
+ Test Files  2 passed (2)
+      Tests  19 passed (19)
+SUITE_EXIT=0
+$ npm run lint              # eslint src
+LINT_EXIT=0
+$ ./node_modules/.bin/tsc --noEmit
+TSC_EXIT=0
+
+=== [8] diff file list vs base + secret scan ===
+$ git diff --name-only 1d96e84 9b46aea
+frontend/src/routes/ChatPage.tsx
+$ git diff | grep -iE 'api[_-]?key|secret|password|token|bearer|PRIVATE KEY|AKIA|ghp_|github_pat_|sk-|xox'  -> exit 1 (0 matches over 22+/2-)
+# no test file in the diff; no pnpm-lock anywhere

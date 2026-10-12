@@ -1,0 +1,51 @@
+SG-164 command log (chronological; unmetered local git/vitest/eslint/tsc only)
+Dispatch: SG-164 — Merge Batch 4 (Q1/D-1012-1): #49 theming rewrite over #46, unserved
+Work dir: /home/andrei/StorageGenie   Base ref: automation (resolved 1d96e84798742cd70cfd0fd99199dbc7486b1249)
+
+# -- orientation / contract
+bash /home/andrei/storagegenie-contract/rules_check.sh        # exit 3 (G-L1 UNCHECKED cache not at tag; G-L5/G-L7 gh-unauthenticated; 2x G-L6 BYTES)
+cat /home/andrei/storagegenie-contract/VERSION                 # 0.46.0
+cat /home/andrei/storagegenie-contract/RULES.sha256            # 487841b1... RULES.md
+
+# -- G1 premise: fetch #49 head, re-verify SHA (packet expectation: #49 33252132)
+git ls-remote origin refs/pull/49/head refs/pull/46/head refs/heads/automation
+#   #49 33252132a6b4b027a94e966f8cbc221a113a1c23  == expected
+#   #46 78cf8e4260d8e66c63ab7bba905faaf5784b0779  (landed SG-163, source of current ChatPage.tsx)
+#   automation 1d96e84798742cd70cfd0fd99199dbc7486b1249  == BASE
+git fetch origin refs/pull/49/head                             # FETCH_EXIT=0 (objects only, no ref stored)
+git merge-base 4c1eb7da6b282109f84a9130b500746453d33aa3 FETCH_HEAD   # 4c1eb7da... (common base)
+git diff --stat 4c1eb7da 33252132                               # #49: pnpm-lock.yaml + ChatPage.tsx (54 +/-)
+git diff 4c1eb7da 33252132 -- frontend/src/routes/ChatPage.tsx  # the theming deltas (extracted)
+
+# -- G1: re-derive #49 theming over the landed #46 ChatPage.tsx (edit, NOT head bytes)
+#   current ChatPage.tsx = HEAD:.../ChatPage.tsx blob 4ec5fb76 (== #46 head blob, landed SG-163)
+#   5 theming edits: select class+style; Question input class+style; Send class+style/cursor;
+#                    Correction input class+style; Log correction class+style/cursor
+#   form <form onSubmit> wrapping + type="submit" + disabled unchanged
+git hash-object frontend/src/routes/ChatPage.tsx               # b55742c6... == #49 head blob (byte-identical)
+
+# -- G1 prove (three-way)
+git rev-parse 33252132:frontend/src/routes/ChatPage.tsx        # b55742c6... IDENTICAL
+git rev-parse 78cf8e42:frontend/src/routes/ChatPage.tsx        # 4ec5fb76... (base blob #46)
+# form wiring content-only diff (line numbers stripped): empty -> BYTE-INTACT
+git ls-files --error-unmatch frontend/pnpm-lock.yaml           # exit 1 (absent)
+git diff --cached --name-only | grep -i pnpm                    # exit 1 (none staged)
+git ls-files | grep -i pnpm                                     # exit 1 (none tracked)
+
+# -- G2: derived test set (grep: importers/renderers of ChatPage = theme-adoption) + static gates
+cd frontend
+./node_modules/.bin/vitest run src/routes/ChatPage.test.tsx \
+  -t "submitting the form by pressing Enter sends the question"   # 1 passed | 6 skipped, exit 0
+./node_modules/.bin/vitest run src/routes/ChatPage.test.tsx src/routes/theme-adoption.test.tsx  # 2 files, 19 passed, exit 0
+npm run lint                                                      # eslint src, exit 0
+./node_modules/.bin/tsc --noEmit                                  # exit 0
+
+# -- A3: diff ceiling + secret scan
+git diff --name-only                                              # frontend/src/routes/ChatPage.tsx (only)
+git diff --cached --name-only                                     # frontend/src/routes/ChatPage.tsx; no pnpm
+git diff | grep -iE 'api[_-]?key|secret|password|token|bearer|PRIVATE KEY|AKIA|ghp_|github_pat_|sk-|xox'  # exit 1 (0 matches, 24 lines = 22+/2-)
+
+# -- commit + push (product commit = WORK_HEAD)
+git commit -m "SG-164 G1: re-derive PR#49 theming over landed #46 (Chat select+inputs+buttons classes/cursor states, unserved)"   # 9b46aea
+git push origin automation                                        # 1d96e84..9b46aea automation
+git diff --stat 33252132 -- frontend/src/routes/ChatPage.tsx      # empty (re-derived == #49 head)
