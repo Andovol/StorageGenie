@@ -1,0 +1,51 @@
+# SG-173 live observations (sanitized; UUIDs masked, no names/contents/photos/transcripts)
+utc_now=2026-10-12T20:35:16Z
+## dispatch identity (PB-4, /proc cmdline, truncated at packet text)
+opencode
+run
+--auto
+--dir
+/home/andrei/StorageGenie
+--model
+opencode-go/deepseek-v4.1-flash
+--variant
+wrapper: bash /usr/local/lib/dispatch/run-coder SG-173 
+## health: start observed 200 at slice start (first batch); end captures:
+health_end_1: {"status":"ok","db":"ok","storage":"ok"} HTTP=200
+health_end_2: {"status":"ok","db":"ok","storage":"ok"} HTTP=200
+## contract echo
+version_file=0.46.0  source=/home/andrei/storagegenie-contract/VERSION
+contract_head=925cb575c0ef0e1c5a15b6112041a270c2dbd730
+rules_sha256=487841b151a593c396353e8eb61f245ba6678976b13917534308e810a7d8c9ef
+rules_sha_file=487841b151a593c396353e8eb61f245ba6678976b13917534308e810a7d8c9ef RULES.md
+## rules_check (verbatim; exit 3)
+G-L1 UNCHECKED the cache is not checked out at a contract tag: /home/andrei/storagegenie-contract
+G-L5 UNCHECKED gh-unauthenticated
+G-L7 UNCHECKED gh-unauthenticated
+G-L6 BYTES /home/andrei/.codex/AGENTS.md 2275
+G-L6 BYTES /home/andrei/.config/opencode/AGENTS.md 1933
+G-L6 BYTES total[codex]=2275 unseen=architect-layer,state-file,other-ritual-files
+G-L6 BYTES total[opencode]=1933 unseen=architect-layer,state-file,other-ritual-files
+rules_check_exit=3
+## tag ls-remote
+4c23869c09683a749468a34ab193606d365cb111	refs/tags/contract-v0.46.0
+925cb575c0ef0e1c5a15b6112041a270c2dbd730	refs/tags/contract-v0.46.0^{}
+## running image
+container=91a073730e495dae222f179710879199237398040926adbbf8c57602fe97ef3f image=sha256:9064d2ced325220a4e7a2a16670cf678651e142c032c840e6e1e2d059c0cd4bf started=2026-10-12T20:03:58.043100489Z restarts=0
+## server log lines for this slice's read-only GETs (sanitized)
+INFO:     172.18.0.1:50864 - "GET /v1/assets/facets?household_id=<uuid> HTTP/1.1" 200 OK
+INFO:     172.18.0.1:50852 - "GET /v1/assets?household_id=<uuid>&limit=20 HTTP/1.1" 200 OK
+INFO:     172.18.0.1:50942 - "GET /v1/assets?household_id=<uuid>&limit=20 HTTP/1.1" 200 OK
+INFO:     172.18.0.1:50938 - "GET /v1/assets/facets?household_id=<uuid> HTTP/1.1" 200 OK
+INFO:     172.18.0.1:52614 - "GET /v1/review-tasks?household_id=<uuid> HTTP/1.1" 200 OK
+INFO:     172.18.0.1:52618 - "GET /v1/plugins/expiry-tracker/status?household_id=<uuid> HTTP/1.1" 200 OK
+INFO:     172.18.0.1:46746 - "GET /v1/candidates/<uuid>?household_id=<uuid> HTTP/1.1" 200 OK
+INFO:     172.18.0.1:36480 - "GET /v1/review-tasks?household_id=<uuid> HTTP/1.1" 200 OK
+INFO:     172.18.0.1:43316 - "GET /v1/review-tasks?household_id=<uuid> HTTP/1.1" 200 OK
+INFO:     172.18.0.1:43304 - "GET /v1/candidates/<uuid>?household_id=<uuid> HTTP/1.1" 200 OK
+INFO:     172.18.0.1:43342 - "GET /v1/review-tasks?household_id=<uuid> HTTP/1.1" 200 OK
+INFO:     172.18.0.1:43338 - "GET /v1/candidates/<uuid>?household_id=<uuid> HTTP/1.1" 200 OK
+INFO:     172.18.0.1:43338 - "GET /v1/assets/<uuid>?household_id=<uuid> HTTP/1.1" 200 OK
+INFO:     172.18.0.1:43398 - "GET /v1/plugins/expiry-tracker/status?household_id=<uuid> HTTP/1.1" 200 OK
+## historical mutating requests on the story routes since container start (sanitized)
+## SG-173 sent ZERO mutating requests (only GETs above); no browser clicks

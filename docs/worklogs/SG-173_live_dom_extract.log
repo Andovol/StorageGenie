@@ -1,0 +1,31 @@
+# SG-173 live DOM structural extract (sanitized)
+
+Method: headless `google-chrome` 150 (`--headless=new --dump-dom --virtual-time-budget=10000`),
+against a disposable vite dev server (`localhost:5173`) whose source tree is byte-identical to the
+served image tree (`git diff 3ae5541..HEAD -- backend frontend` = 0 lines), calling the live backend
+at `127.0.0.1:8003`. Read-only: GET navigation only, zero clicks, zero keys, zero writes.
+HOME redirected to `/tmp/opencode/chromehome` (host `$HOME` is read-only in this lane; Chrome's
+wrapper could not start otherwise — F-SG173-5). Raw DOMs (~11–18 KiB each) stayed in `/tmp/opencode`;
+only counts/states below are committed. UUIDs masked; no product names, photos or transcripts.
+
+## /review/<candidate-A>?household_id=<hh>  (embedded review_task_ids=1; ALL its tasks live-resolved)
+
+- blocked sentence "Acceptance is blocked until the open review task(s) are resolved." count = 1
+- Accept button present, `disabled` attribute = True
+- Inbox links: back-link `href="/inbox"`; SG-171 affordance `href="/inbox?household_id=<uuid>"`
+
+## /review/<candidate-B>?household_id=<hh>  (embedded review_task_ids=2; asset_id already committed)
+
+- blocked sentence count = 1; Accept disabled = True
+- "Manual expiry entry" form present; `data-testid="expiry-state"` = `needs_evidence`
+
+## /inbox?household_id=<hh>  (default filter = Open)
+
+- "No open review tasks." ×1  — all 8 live review tasks are resolved; the default Inbox is empty
+  while the Review page's own affordance says acceptance is blocked "until the open review task(s)
+  are resolved" (dead-end; observed live, see report T1/T2).
+
+## /expiry?household_id=<hh>
+
+- "No expiry items for this household." ×1 (rows=0, unresolved=0)
+- Uncategorized block count `<strong>7</strong>` — all 7 live assets carry no accepted classification

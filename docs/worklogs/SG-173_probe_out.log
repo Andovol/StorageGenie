@@ -1,0 +1,26 @@
+/home/andrei/StorageGenie/backend/venv/lib/python3.12/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+  from starlette.testclient import TestClient as TestClient  # noqa
+[ISO] probe_db=/tmp/sg173-probe-u6gunuh1/probe.db
+[ISO] prod_db=/home/andrei/StorageGenie/data/db/storagegenie.db hash_before=e6bef157440fb8b4a3262577362b071dcae07507ea9a7e04a614e11be28ee5bd
+[ISO] distinct_paths=True; prod_hash captured before first write
+[ISO] schema_created_in=/tmp/sg173-probe-u6gunuh1/probe.db (no repo path touched)
+[T1] GET candidate -> 200 review_task_ids(embedded)=2 state=proposed
+[T1] accept with OPEN task -> 409 detail='Candidate has unresolved review tasks' (control: live block works)
+[T1] bare POST resolve 88012dcf -> 200 {'id': '01a131d2-e0d9-7b92-a98b-bdcf88012dcf', 'status': 'resolved', 'subject_ref': '01a131d2-e0c9-7531-94ff-62e7b947f0b4'}
+[T1] bare POST resolve 51103faf -> 200 {'id': '01a131d2-e0d9-7b92-a98b-bdde51103faf', 'status': 'resolved', 'subject_ref': '01a131d2-e0c9-7531-94ff-62e7b947f0b4'}
+[T1] GET candidate after resolve -> embedded review_task_ids=2 live_open_tasks=0
+[T1] stale_membership_present=True
+[T1] accept after resolve -> 200 state=accepted keys=['asset_id', 'candidate_id', 'completed_at', 'created', 'job', 'state', 'status', 'step']
+[T1] committed asset exists=True
+[T2] asset assertions after accept path -> 200 [('asset_type', 'proposed'), ('display_name', 'accepted'), ('status', 'accepted')]
+[T2] manual expiry without classification -> 422 detail='Asset must be classified before manual expiry entry'
+[T3] rows=[["0df7ce5a", -1, "expired", null], ["2adc1914", 2, "this-week", "urgent"]]
+[T3] unresolved=[["4f25209c", "needs_evidence"], ["f5a80f0f", "needs_evidence"]]
+[T3] summary={"by_tier": {"none": 1, "urgent": 1}, "by_bucket": {"expired": 1, "this-week": 1}, "unresolved": 2, "total": 4}
+[T3] asset_without_classification_invisible=True
+[T3] control_pairs rows=2 unresolved=2
+[T4] manual expiry WITH classification -> 200 resolved_ids_contains_own_task=True
+[T4] task status now=resolved and expiry accepted assertion exists=True
+[ISO] prod_db hash_after=e6bef157440fb8b4a3262577362b071dcae07507ea9a7e04a614e11be28ee5bd
+[ISO] prod_db_untouched=True
+[RESULT] PROBE_OK
