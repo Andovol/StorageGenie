@@ -171,8 +171,8 @@ by file; a grep of the test tree for `unclassified`, the changed copy strings, `
 route found no other file naming the changed symbols.
 
 **A4 — report + receipt; publish-before-bound; writes.** Lane observed start
-`2026-10-12T18:55:34Z` (SG-169 `dispatch` process); this report's work commit lands ≈`19:02Z` →
-**elapsed ≈ 400s ≪ 1050s half-bound** (half of `RUN_BUDGET_S=2100`), HONORED. Receipt = notes-ref
+`2026-10-12T18:55:34Z` (SG-169 `dispatch` process); the work commit `22f1715` is stamped
+`2026-10-12T19:01:11Z` → **elapsed 337s ≪ 1050s half-bound** (half of `RUN_BUDGET_S=2100`), HONORED. Receipt = notes-ref
 (below), read back from the remote via mapped fetch. **Production writes = NONE.** **DATABASE: sqlite
 live, READ-ONLY — untouched.** The new code performs a filtered `SELECT ... count` only, and because the
 tree is UNSERVED that query never ran against the live SQLite; no test touched the live DB (tests use
