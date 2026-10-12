@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import type { Candidate, CandidateField, DedupMatch } from "../api/types";
 import { WebAlternates } from "./WebAlternates";
+import { CONTROL_STYLE, THEMED_CONTROL_CLASS } from "./shell/CatalogToolbar";
 
 function fieldInfo(raw: CandidateField) {
   if (raw && typeof raw === "object" && !Array.isArray(raw)) {
@@ -85,12 +86,52 @@ export function CandidateCard({
       </div>
       <WebAlternates alternates={candidate.web_alternates ?? []} />
       <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginTop: 18 }}>
-        <button type="button" onClick={() => onDecision("accept", values)} disabled={busy || blocked}>Accept</button>
-        <button type="button" onClick={() => onDecision("edit", values)} disabled={busy}>Save edits</button>
-        <button type="button" onClick={() => onDecision("hold")} disabled={busy}>Hold / Unknown</button>
-        <button type="button" onClick={() => onDecision("reject")} disabled={busy}>Reject</button>
+        <button
+          type="button"
+          onClick={() => onDecision("accept", values)}
+          disabled={busy || blocked}
+          className="bg-primary text-primary-foreground focus-ring"
+          style={{ ...CONTROL_STYLE, border: "none", opacity: busy || blocked ? 0.5 : 1, cursor: busy || blocked ? "not-allowed" : "pointer" }}
+        >
+          Accept
+        </button>
+        <button
+          type="button"
+          onClick={() => onDecision("edit", values)}
+          disabled={busy}
+          className={`${THEMED_CONTROL_CLASS}`}
+          style={{ ...CONTROL_STYLE, opacity: busy ? 0.5 : 1, cursor: busy ? "not-allowed" : "pointer" }}
+        >
+          Save edits
+        </button>
+        <button
+          type="button"
+          onClick={() => onDecision("hold")}
+          disabled={busy}
+          className={`${THEMED_CONTROL_CLASS}`}
+          style={{ ...CONTROL_STYLE, opacity: busy ? 0.5 : 1, cursor: busy ? "not-allowed" : "pointer" }}
+        >
+          Hold / Unknown
+        </button>
+        <button
+          type="button"
+          onClick={() => onDecision("reject")}
+          disabled={busy}
+          className={`${THEMED_CONTROL_CLASS}`}
+          style={{ ...CONTROL_STYLE, opacity: busy ? 0.5 : 1, cursor: busy ? "not-allowed" : "pointer" }}
+        >
+          Reject
+        </button>
         {splitItemCount != null && onSplit && (
-          <button type="button" onClick={onSplit} disabled={busy || splitBusy}>Split into {splitItemCount} items</button>
+          <button
+            type="button"
+            onClick={onSplit}
+            disabled={busy || splitBusy}
+            className={`${THEMED_CONTROL_CLASS}`}
+            style={{ ...CONTROL_STYLE, opacity: busy || splitBusy ? 0.5 : 1, cursor: busy || splitBusy ? "not-allowed" : "pointer" }}
+          >
+            Split into {splitItemCount} items
+          </button>
         )}
       </div>
     </article>
