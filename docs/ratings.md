@@ -553,3 +553,9 @@ Originals above (88 FLAG:TRUST / 91 FLAG:TRUST) stand as the audit trail; the ve
 | slice_id | phase | model | effort | score | flag | lever | guards_invoked | deduction_attribution | remaining | escape |
 |---|---|---|---|---|---|---|---|---|---|---|
 | SG-160 | Palette audit (Q1/D-1012-1 L2, read-only $0): 7/7 PR diffs as bytes (heads+SHAs+merge-base quoted) + per-PR verdicts MERGE 3 (#43,#45,#48) / REWRITE 4 (#44,#46,#47,#49) + overlap matrix + safe order + defect lesson per PR + secret scan clean; merge-trees clean vs automation; START==END tip; receipt VALID | opencode (model deepseek-v4.1-flash from /proc cmdline --model; effort high from --variant high) | high | 99 |  |  | PG-EV-02, PG-IC-01, PG-IC-07, PG-IC-09 |  | Merges per verdict table ride SG-161+ (D-1012-1); no UNCLEAR lines open |  |
+
+### SG-161 (2026-10-12 - Merge Batch 1, #43+#45 blob-identical, unserved)
+
+| slice_id | phase | model | effort | score | flag | lever | guards_invoked | deduction_attribution | remaining | escape |
+|---|---|---|---|---|---|---|---|---|---|---|
+| SG-161 | Merge Batch 1 (Q1/D-1012-1 L2, $0): #43 + #45 cherry-picked oldest-first, landed blobs byte-identical to heads (OIDs quoted, independently re-verified at tip) + heads unmoved + merge-trees clean; derived 5-file vitest 85/85 + eslint/tsc clean; diff exactly 2 component files; health unchanged; receipt VALID (note on WORK_HEAD + tip dual annotation) | opencode (model deepseek-v4.1-flash from /proc cmdline --model; effort high from --variant high) | high | 99 |  |  | PG-EV-02, PG-IC-01, PG-IC-07, PG-IC-09 |  | Batch 2+ ride SG-162+ (D-1012-1); bundle unserved until SG-165 |  |
