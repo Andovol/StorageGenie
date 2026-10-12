@@ -180,4 +180,11 @@ describe("ChatPage", () => {
       "unknown chat category: snacks"
     );
   });
+
+  test("the household select carries the shared themed control treatment (SG-167 G1a)", () => {
+    renderPage();
+
+    const select = screen.getByRole("combobox", { name: /household/i });
+    expect(select).toHaveClass("bg-background", "text-foreground", "border-border");
+  });
 });

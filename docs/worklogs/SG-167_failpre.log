@@ -1,0 +1,93 @@
+
+ RUN  v1.6.1 /home/andrei/StorageGenie/frontend
+
+stderr | src/routes/InboxPage.test.tsx > InboxPage > renders failed loaded job detail and retries that loaded id
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+stderr | src/routes/ChatPage.test.tsx > ChatPage > sending a question posts and renders the grounded reply
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+ ❯ src/routes/InboxPage.test.tsx  (8 tests | 2 failed) 307ms
+   ❯ src/routes/InboxPage.test.tsx > InboxPage > renders failed loaded job detail and retries that loaded id
+     → expect(element).toHaveClass("bg-background text-foreground border-border")
+
+Expected the element to have class:
+  bg-background text-foreground border-border
+Received:
+
+   ❯ src/routes/InboxPage.test.tsx > InboxPage > lists a loaded review task and resolves its loaded id
+     → expect(element).toHaveClass("bg-background text-foreground border-border")
+
+Expected the element to have class:
+  bg-background text-foreground border-border
+Received:
+
+ ❯ src/routes/ChatPage.test.tsx  (8 tests | 1 failed) 344ms
+   ❯ src/routes/ChatPage.test.tsx > ChatPage > the household select carries the shared themed control treatment (SG-167 G1a)
+     → expect(element).toHaveClass("bg-background text-foreground border-border")
+
+Expected the element to have class:
+  bg-background text-foreground border-border
+Received:
+
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 3 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/routes/ChatPage.test.tsx > ChatPage > the household select carries the shared themed control treatment (SG-167 G1a)
+Error: expect(element).toHaveClass("bg-background text-foreground border-border")
+
+Expected the element to have class:
+  bg-background text-foreground border-border
+Received:
+
+ ❯ src/routes/ChatPage.test.tsx:188:20
+    186| 
+    187|     const select = screen.getByRole("combobox", { name: /household/i }…
+    188|     expect(select).toHaveClass("bg-background", "text-foreground", "bo…
+       |                    ^
+    189|   });
+    190| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/3]⎯
+
+ FAIL  src/routes/InboxPage.test.tsx > InboxPage > renders failed loaded job detail and retries that loaded id
+Error: expect(element).toHaveClass("bg-background text-foreground border-border")
+
+Expected the element to have class:
+  bg-background text-foreground border-border
+Received:
+
+ ❯ src/routes/InboxPage.test.tsx:34:19
+     32|     const retry = await screen.findByRole("button", { name: "Retry fai…
+     33|     expect(retry).toBeEnabled();
+     34|     expect(retry).toHaveClass("bg-background", "text-foreground", "bor…
+       |                   ^
+     35|     fireEvent.click(retry);
+     36|     await waitFor(() => expect(api.apiPost).toHaveBeenCalledWith(`/v1/…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/3]⎯
+
+ FAIL  src/routes/InboxPage.test.tsx > InboxPage > lists a loaded review task and resolves its loaded id
+Error: expect(element).toHaveClass("bg-background text-foreground border-border")
+
+Expected the element to have class:
+  bg-background text-foreground border-border
+Received:
+
+ ❯ src/routes/InboxPage.test.tsx:53:24
+     51|     expect(await screen.findByText("identifier_collision")).toBeInTheD…
+     52|     const resolveBtn = screen.getByRole("button", { name: "Resolve" });
+     53|     expect(resolveBtn).toHaveClass("bg-background", "text-foreground",…
+       |                        ^
+     54|     fireEvent.click(resolveBtn);
+     55|     await waitFor(() => expect(api.resolveReviewTask).toHaveBeenCalled…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/3]⎯
+
+ Test Files  2 failed (2)
+      Tests  3 failed | 13 passed (16)
+   Start at  18:13:55
+   Duration  1.62s (transform 235ms, setup 190ms, collect 536ms, tests 651ms, environment 1.16s, prepare 229ms)
+

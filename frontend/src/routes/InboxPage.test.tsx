@@ -31,6 +31,7 @@ describe("InboxPage", () => {
     expect((await screen.findAllByText("decoder failed on loaded image")).length).toBeGreaterThan(0);
     const retry = await screen.findByRole("button", { name: "Retry failed job" });
     expect(retry).toBeEnabled();
+    expect(retry).toHaveClass("bg-background", "text-foreground", "border-border");
     fireEvent.click(retry);
     await waitFor(() => expect(api.apiPost).toHaveBeenCalledWith(`/v1/imports/${job.id}/retry`, {}, { household_id: household.id }));
   });
@@ -48,7 +49,9 @@ describe("InboxPage", () => {
     api.resolveReviewTask.mockResolvedValue({ id: task.id, status: "resolved" });
     renderPage();
     expect(await screen.findByText("identifier_collision")).toBeInTheDocument();
-    fireEvent.click(screen.getByRole("button", { name: "Resolve" }));
+    const resolveBtn = screen.getByRole("button", { name: "Resolve" });
+    expect(resolveBtn).toHaveClass("bg-background", "text-foreground", "border-border");
+    fireEvent.click(resolveBtn);
     await waitFor(() => expect(api.resolveReviewTask).toHaveBeenCalledWith(task.id, household.id));
   });
 
