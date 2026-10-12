@@ -1,0 +1,74 @@
+SG-163 verify log — 2026-10-12T15:05:00Z
+
+=== [1] heads re-verified (packet expectations: #46 78cf8e42, #47 742e1875) ===
+#46 refs/pull/46/head = 78cf8e4260d8e66c63ab7bba905faaf5784b0779
+#47 refs/pull/47/head = 742e18751f7691a02bdd44fa3cda8ba34b68318b
+#48 refs/pull/48/head = 33f079f3b691f3321763503100fc656124c44584 (landed SG-162)
+
+=== [2] #46 selected-paths apply (ChatPage.tsx + ChatPage.test.tsx ONLY) ===
+$ git checkout 78cf8e4260d8e66c63ab7bba905faaf5784b0779 -- frontend/src/routes/ChatPage.tsx frontend/src/routes/ChatPage.test.tsx
+checkout_exit=0
+46 frontend/src/routes/ChatPage.tsx landed=4ec5fb76de07792c4917f3decaba4cbcdbf73911 head=4ec5fb76de07792c4917f3decaba4cbcdbf73911 IDENTICAL
+46 frontend/src/routes/ChatPage.test.tsx landed=5fb1ad4cba04b616009cbffd0593d57de137aa9a head=5fb1ad4cba04b616009cbffd0593d57de137aa9a IDENTICAL
+
+=== [3] lockfile absence (both index and tree) ===
+$ git ls-files --error-unmatch frontend/pnpm-lock.yaml  -> exit 1 (absent)
+$ git diff --cached --name-only | grep -i pnpm          -> exit 1 (none staged)
+$ git ls-files | grep -i pnpm                            -> exit 1 (none tracked)
+
+=== [4] #47 rewrite over landed #48 (tooltip + shared constants) ===
+$ git diff 954b43b^ 954b43b -- frontend/src/components/CandidateCard.tsx  (Accept wrapped in <span title>)
+
+=== [5] literal grep in CandidateCard button block (lines 88-136) ===
+89:        <span title={blocked ? "Acceptance is blocked until open review tasks are resolved" : undefined}>
+7:            className="bg-primary text-primary-foreground focus-ring"
+(only line 94: bg-primary text-primary-foreground on the primary Accept button — repo convention)
+primary-token pair also used in 10 repo files incl CatalogToolbar.tsx:146,177
+
+=== [6] derived test set + static gates ===
+=== vitest derived set ===
+
+ RUN  v1.6.1 /home/andrei/StorageGenie/frontend
+
+stderr | src/routes/ReviewPage.test.tsx > ReviewPage > posts every decision with the loaded candidate id and supports keyboard actions
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+stderr | src/routes/ChatPage.test.tsx > ChatPage > sending a question posts and renders the grounded reply
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+ ✓ src/components/CandidateCard.test.tsx  (5 tests) 274ms
+ ✓ src/routes/ChatPage.test.tsx  (7 tests) 461ms
+ ✓ src/routes/ReviewPage.test.tsx  (4 tests) 516ms
+stderr | src/routes/theme-adoption.test.tsx > SG-075 screen adoption > App nav carries the card/border tokens and surfaces the theme toggle
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+ ✓ src/routes/theme-adoption.test.tsx  (12 tests) 408ms
+
+ Test Files  4 passed (4)
+      Tests  28 passed (28)
+   Start at  15:04:26
+   Duration  2.22s (transform 774ms, setup 334ms, collect 1.67s, tests 1.66s, environment 1.92s, prepare 455ms)
+
+VITEST_EXIT=0
+=== npm run lint ===
+
+> storagegenie-frontend@0.1.0 lint
+> eslint src
+
+npm notice
+npm notice New minor version of npm available! 11.11.0 -> 11.21.0
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v11.21.0
+npm notice To update run: npm install -g npm@11.21.0
+npm notice
+LINT_EXIT=0
+=== tsc --noEmit ===
+TSC_EXIT=0
+
+=== [7] diff file list vs base ===
+M	frontend/src/components/CandidateCard.tsx
+M	frontend/src/routes/ChatPage.test.tsx
+M	frontend/src/routes/ChatPage.tsx
+$ git diff --name-only cea0ecf..954b43b | grep -i pnpm -> exit 1 (no lockfile in diff)

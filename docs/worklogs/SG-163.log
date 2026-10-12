@@ -1,0 +1,51 @@
+SG-163 command log (chronological; unmetered local git/vitest/eslint/tsc only)
+Dispatch: SG-163 — Merge Batch 3 (Q1/D-1012-1): #47 rewrite over #48 + #46 minus lockfile, unserved
+Work dir: /home/andrei/StorageGenie   Base ref: origin/automation
+
+# -- orientation / contract
+bash /home/andrei/storagegenie-contract/rules_check.sh        # exit 3 (G-L1 UNCHECKED cache not at tag; G-L5/G-L7 gh-unauthenticated; 2x G-L6 BYTES)
+cat /home/andrei/storagegenie-contract/VERSION                 # 0.46.0
+cat /home/andrei/storagegenie-contract/RULES.sha256            # 487841b1... RULES.md
+
+# -- G1 premise: fetch heads, re-verify SHAs (packet expectation: #46 78cf8e42, #47 742e1875)
+git fetch origin refs/pull/46/head refs/pull/47/head refs/pull/48/head
+#   #46 78cf8e4260d8e66c63ab7bba905faaf5784b0779  == expected
+#   #47 742e18751f7691a02bdd44fa3cda8ba34b68318b  == expected
+#   #48 33f079f3b691f3321763503100fc656124c44584  == landed SG-162
+git merge-base HEAD 78cf8e4260d8e66c63ab7bba905faaf5784b0779  # 4c1eb7da... (common base)
+git diff 4c1eb7d 78cf8e42 --stat                               # #46: lockfile + ChatPage.tsx + ChatPage.test.tsx
+git diff 4c1eb7d 742e1875 --stat                               # #47: CandidateCard.tsx only
+
+# -- G1a: rewrite #47 over landed #48 (edit, not head bytes): wrap blocked-Accept in <span title>
+#   landed #48 = HEAD:frontend/src/components/CandidateCard.tsx blob a3784b29 (== #48 head blob)
+#   edit adds <span title={blocked ? "Acceptance is blocked ..." : undefined}> around Accept
+git add frontend/src/components/CandidateCard.tsx
+
+# -- G1b: selected-paths apply #46 (ChatPage.tsx + ChatPage.test.tsx ONLY; lockfile never staged)
+git checkout 78cf8e4260d8e66c63ab7bba905faaf5784b0779 -- frontend/src/routes/ChatPage.tsx frontend/src/routes/ChatPage.test.tsx
+#   landed blobs == head blobs: ChatPage.tsx 4ec5fb76; ChatPage.test.tsx 5fb1ad4c  (both IDENTICAL)
+git ls-files --error-unmatch frontend/pnpm-lock.yaml          # exit 1 (absent)
+git diff --cached --name-only | grep -i pnpm                  # exit 1 (none staged)
+git ls-files | grep -i pnpm                                   # exit 1 (none tracked)
+
+# -- G1 prove: clean merge-trees re-proved live
+git merge-tree $(git merge-base HEAD 78cf8e42) HEAD 78cf8e42  # #46 clean (ChatPage blobs merge to head)
+# (#47 textually overlaps #48 by design — it is re-expressed, never merged; not a merge target)
+
+# -- G2: derived test set (grep: importers of CandidateCard=ReviewPage; ChatPage=theme-adoption) + static gates
+cd frontend && ./node_modules/.bin/vitest run \
+  src/components/CandidateCard.test.tsx src/routes/ReviewPage.test.tsx \
+  src/routes/ChatPage.test.tsx src/routes/theme-adoption.test.tsx     # 4 files, 28 passed, exit 0
+npm run lint                                                          # eslint src, exit 0
+./node_modules/.bin/tsc --noEmit                                      # exit 0
+
+# -- A3: diff ceiling + secret scan
+git diff --name-status cea0ecf0c0989fe2277ba554beedf9b6411e8c7f 954b43b5598db9560531a8c0cdfb8ca01614c4bf
+#   M frontend/src/components/CandidateCard.tsx
+#   M frontend/src/routes/ChatPage.test.tsx
+#   M frontend/src/routes/ChatPage.tsx
+git diff --cached | grep -iE 'api[_-]?key|secret|password|token|bearer|PRIVATE KEY|AKIA|ghp_|github_pat_|sk-|xox'  # exit 1 (0 matches, 57 added lines)
+
+# -- commit + push (product commit = WORK_HEAD)
+git commit -m "SG-163 G1: rewrite PR#47 over landed #48 (blocked-Accept tooltip, shared constants) + land PR#46 minus smuggled pnpm lockfile (Chat form Enter-submit)"   # 954b43b
+git push origin automation                                     # cea0ecf..954b43b automation
