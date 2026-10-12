@@ -1,7 +1,7 @@
 # StorageGenie — project configuration
 
 > **Canonical for this repo. `CLAUDE.md` is a one-line adapter `@AGENTS.md` — edit here, never there.**
-> Rule-set version this project records: **0.44.1** (D-1009-1 adoption 2026-10-09: checkouts `0989384` (0.41.0) + `bf68d23` (0.42.0) + `3b5ab73` (0.43.0) + `1cd0756` (0.44.0) + `04a4b53` (0.44.1) oldest-first; delta = 0.41.0 `rules_check.sh` (D339) + report trim (D351/D345/D346) + `CO-53` prefix (D341) + `CO-102`/`CO-40` + `G-M6`/`G-M8` tighten + 0.42.0 ARCHITECT slim (§7→DISPATCH §7, D365) + `G-T6`/`PG-EV-14`/`PG-SC-13` + 0.43.0 shared-runner-only (D373) + `G-A7` merge-note + lane-actual durations + 0.44.0 `G-M5` new decision shape (D388) + probe byte-check (D385) + lane allowlist (D387) + 0.44.1 VERSION-only (`RULES.md` unchanged); installed `F2565B1C…` = payload `RULES.sha256` at 0.44.1 — clean; supersedes `0.40.0`).
+> Rule-set version this project records: **0.46.0** (D-1012-2 adoption 2026-10-12: checkouts `3fc4cab` (0.44.2) + `92c4e21` (0.45.0) + `99302a4` (0.45.1) + `01937bf` (0.45.2) + `4c23869` (0.46.0) oldest-first; delta = 0.45.0 packet-template PB-1/PB-3–PB-6 cite-don't-paste + L3 default (recorded L2 stays) + close triggers 330k/400k + 0.45.1 PB-1–PB-6 + privileged-denial STOPS slice + 0.46.0 ratings +remaining/+escape + 50min deadline + START filing lines; installed `487841B1…` = payload `RULES.sha256` at 0.46.0 — clean; supersedes `0.44.1`).
 
 ## Configuration table — the single source of every project value
 
