@@ -631,3 +631,9 @@ Originals above (88 FLAG:TRUST / 91 FLAG:TRUST) stand as the audit trail; the ve
 | slice_id | phase | model | effort | score | flag | lever | guards_invoked | deduction_attribution | remaining | escape |
 |---|---|---|---|---|---|---|---|---|---|---|
 | SG-173 | D-1012-14 L2 diagnosis: stale task IDs, missing classification UI and dataless Resolve confirmed; ordering disproved, visibility gap measured; live GET/audit + source-equivalent browser + isolated real routes; 30 backend and 23 frontend tests green; seven worklog files only; receipt VALID, audit SG-173_audit.md | opencode/opencode-go/deepseek-v4.1-flash (command settings in remote receipt) | max | 97 |  |  | PG-DP-03, PG-PR-03 | coder | SG-175..178 in STATE ordered work; SG-175 fixes literal probe-label verification/docstring and duplicate blocked text; final deployed-URL browser proof after repairs; parked Scene/taxonomy/F-SG144-1 in docs/backlog.md |  |
+
+### SG-174 (2026-10-13 - Standing close-out deploy, unchanged product)
+
+| slice_id | phase | model | effort | score | flag | lever | guards_invoked | deduction_attribution | remaining | escape |
+|---|---|---|---|---|---|---|---|---|---|---|
+| SG-174 | Standing L2 close-out: one cached rebuild + one recreate; live image d5da5684/container 23d31ff5; health 6x each side, 28 table counts/schema/DB hash/bundles unchanged; zero product hunks; receipt VALID; audit SG-174_audit.md | opencode/opencode-go/deepseek-v4.1-flash (remote receipt command settings) | max | 98 |  |  | PG-DP-01, PG-DP-02, PG-IC-07, PG-PR-03, PG-PR-04, PG-PR-06, PG-PR-10 | coder | SG-175..178 in STATE; owner visual verdict with actual deployed-URL story proof; inherited host cache/tag/auth observation in audit; F-SG144-1 and Scene triggers in docs/backlog.md |  |
