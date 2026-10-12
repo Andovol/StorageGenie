@@ -173,7 +173,7 @@ three; the asset move + occurrence deltas are).
 | **A1** rebuilt + one recreate + live | image ID new (one build)? container ID new (one recreate)? health ×6 delta 0, counts delta 0, preflight green? | YES — `5f4f4ccb…`→`9064d2ce…`, `420c4051…`→`91a07373…`, health ×6 = 200 delta 0, 28/28 counts delta 0, preflight 200/400/400 green |
 | **A2** no migration | `alembic current` == head both sides? `models/`+`alembic/` diff empty? | YES — `20260924_sg114_relation (head)` both sides; `git diff 3ae5541b -- backend/app/models backend/alembic` **EMPTY** (0 lines) |
 | **A3** product diff empty | is the diff exactly worklogs? | YES — only `docs/worklogs/SG-172*` added; `git diff 3ae5541b -- . ':(exclude)docs/worklogs'` EMPTY (0 lines) |
-| **A4** report + receipt remote | report + notes-ref note (Dispatch-ID + Work-HEAD) read back on remote? writes = rebuild + one recreate only? | YES — see Receipt; production writes = one rebuild + one recreate; image IDs quoted; publish-before-bound honored (elapsed ≈ 180 s ≪ 1050 s) |
+| **A4** report + receipt remote | report + notes-ref note (Dispatch-ID + Work-HEAD) read back on remote? writes = rebuild + one recreate only? | YES — see Receipt; production writes = one rebuild + one recreate; image IDs quoted; publish-before-bound honored (report + receipt published ≈ 294 s after lane start ≪ 1050 s) |
 | **A5** guards invoked | PG-DP-01, PG-DP-02, PG-IC-01, PG-IC-07, PG-PR-04, PG-PR-10 | YES — see Guards below |
 
 ---
@@ -205,7 +205,7 @@ three; the asset move + occurrence deltas are).
 | recreate | 120 s | **2 s** |
 | AFTER verify | 120 s | ~15 s |
 | report + receipt | remainder | see below |
-| **overall** | **2400 s** (lane `RUN_BUDGET_S=2100`) | within; lane start `20:01:42Z`, publish before `1050 s` half-bound |
+| **overall** | **2400 s** (lane `RUN_BUDGET_S=2100`) | within; lane start `20:01:42Z`, report + receipt published `20:06:36Z` (**≈ 294 s** ≪ `1050 s` half-bound) |
 
 No command hit its bound; nothing was killed; no command needed a retry. **Spend: REAL $0.000000 USD +
 zero metered calls.**
