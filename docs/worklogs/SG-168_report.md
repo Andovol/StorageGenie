@@ -195,17 +195,17 @@ notes). **WORK_HEAD = `e663c13a6bdaa606205aeec1762ee865c01a7898`** (deploy-evide
 
 ```
 $ git push origin automation
-   4db8da3..<report-tip>  automation -> automation
+   4db8da3..dc42d03  automation -> automation
 push_exit=0
 
 $ git notes --ref=refs/notes/storagegenie-coder-reports add -m "Dispatch-ID: SG-168 | Report: docs/worklogs/SG-168_report.md | Work-HEAD: e663c13a6bdaa606205aeec1762ee865c01a7898" e663c13a6bdaa606205aeec1762ee865c01a7898
 add_wh_exit=0
 
-$ git notes --ref=refs/notes/storagegenie-coder-reports add -m "Dispatch-ID: SG-168 | Report: docs/worklogs/SG-168_report.md | Work-HEAD: e663c13a6bdaa606205aeec1762ee865c01a7898" <report-tip>
+$ git notes --ref=refs/notes/storagegenie-coder-reports add -m "Dispatch-ID: SG-168 | Report: docs/worklogs/SG-168_report.md | Work-HEAD: e663c13a6bdaa606205aeec1762ee865c01a7898" dc42d036c5a09e4c9ec794d7e8e2bd1f2ae551f2
 add_rc_exit=0
 
 $ git push origin refs/notes/storagegenie-coder-reports
-   <old>..<new>  refs/notes/storagegenie-coder-reports -> refs/notes/storagegenie-coder-reports
+   d3befe2..d22dce2  refs/notes/storagegenie-coder-reports -> refs/notes/storagegenie-coder-reports
 notes_push_exit=0
 
 $ git fetch origin refs/notes/storagegenie-coder-reports:refs/notes/sg168-fetched
@@ -216,15 +216,16 @@ $ git notes --ref=refs/notes/sg168-fetched show e663c13a6bdaa606205aeec1762ee865
 Dispatch-ID: SG-168 | Report: docs/worklogs/SG-168_report.md | Work-HEAD: e663c13a6bdaa606205aeec1762ee865c01a7898
 show_wh_exit=0
 
-$ git notes --ref=refs/notes/sg168-fetched show <report-tip>
+$ git notes --ref=refs/notes/sg168-fetched show dc42d036c5a09e4c9ec794d7e8e2bd1f2ae551f2
 Dispatch-ID: SG-168 | Report: docs/worklogs/SG-168_report.md | Work-HEAD: e663c13a6bdaa606205aeec1762ee865c01a7898
 show_rc_exit=0
 ```
 
 **note=yes** (both required notes present on WORK_HEAD and the report commit; read back through the
-mapped refspec). `note=yes`, read back on the remote. The report commit `<report-tip>` is the tip at
-report write; its own final-tip note is published by the runner after this file is committed (`CO-79`:
-the report cannot contain the moment its own receipt is published).
+mapped refspec). `note=yes`, read back on the remote. The report commit `dc42d03` is the tip at receipt
+time; this transcript was carried by a follow-up receipt commit (`SG-165` `689c57c`→`f43ced8`
+precedent), and the very tip's own final note is published by the runner after this file is committed
+(`CO-79`: the report cannot contain the moment its own receipt is published).
 
 ---
 
