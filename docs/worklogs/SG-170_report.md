@@ -215,9 +215,27 @@ Dispatch-ID: SG-170 | Report: docs/worklogs/SG-170_report.md | Work-HEAD: b8017b
 show_wh_exit=0
 ```
 
-**note=yes** (required note present on WORK_HEAD, read back through the mapped refspec). The report
-commit note is added after this file is committed (`CO-79`: the report cannot contain the moment its own
-receipt is published); the very tip's final note is published by the runner after this file is committed.
+Report-commit note (added after this file was committed — `CO-79`: the report cannot contain the moment
+its own receipt is published), same mapped-refspec read-back:
+
+```
+$ git notes --ref=refs/notes/storagegenie-coder-reports add -f -m "Dispatch-ID: SG-170 | Report: docs/worklogs/SG-170_report.md | Work-HEAD: b8017b772f58bd4ee0498654e8b109a4e48d331d" 50b90162fd6e45f44464ccd30bf1c18d690a8cca
+add_rc_exit=0
+
+$ git push origin refs/notes/storagegenie-coder-reports
+notes_push_exit=0
+
+$ git fetch origin refs/notes/storagegenie-coder-reports:refs/notes/sg170-fetched
+fetch_exit=0
+
+$ git notes --ref=refs/notes/sg170-fetched show 50b90162fd6e45f44464ccd30bf1c18d690a8cca
+Dispatch-ID: SG-170 | Report: docs/worklogs/SG-170_report.md | Work-HEAD: b8017b772f58bd4ee0498654e8b109a4e48d331d
+show_rc_exit=0
+```
+
+**note=yes** (required note present on WORK_HEAD and on the report commit, both read back through the
+mapped refspec). `Report commit = 50b90162fd6e45f44464ccd30bf1c18d690a8cca`; the very tip's final note is
+published by the runner after this file is committed.
 
 ---
 
