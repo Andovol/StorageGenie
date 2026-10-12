@@ -154,7 +154,41 @@ No push to `storagegenie-evidence`, no `{{RECEIPT_CMD}}`. The receipt is the not
 
 **WORK_HEAD = `de02103848b544ac84e64a710809aedcfc8aa509`** (build+verify evidence commit).
 
-RECEIPT-TRANSCRIPT-PLACEHOLDER
+```
+$ git push origin automation
+To github.com:Andovol/StorageGenie.git
+   4ea62aa..689c57c  automation -> automation
+push_exit=0
+
+$ git notes --ref=refs/notes/storagegenie-coder-reports add -m "Dispatch-ID: SG-165 | Report: docs/worklogs/SG-165_report.md | Work-HEAD: de02103848b544ac84e64a710809aedcfc8aa509" de02103848b544ac84e64a710809aedcfc8aa509
+add_wh_exit=0
+
+$ git notes --ref=refs/notes/storagegenie-coder-reports add -m "Dispatch-ID: SG-165 | Report: docs/worklogs/SG-165_report.md | Work-HEAD: de02103848b544ac84e64a710809aedcfc8aa509" 689c57cd88eedd2097f7d1f13f0aade7ebccffcf
+add_rc_exit=0
+
+$ git push origin refs/notes/storagegenie-coder-reports
+To github.com:Andovol/StorageGenie.git
+   48385ec..36edc3f  refs/notes/storagegenie-coder-reports -> refs/notes/storagegenie-coder-reports
+notes_push_exit=0
+
+$ git fetch origin refs/notes/storagegenie-coder-reports:refs/notes/sg165-fetched
+From github.com:Andovol/StorageGenie
+ * [new ref]         refs/notes/storagegenie-coder-reports -> refs/notes/sg165-fetched
+fetch_exit=0
+
+$ git notes --ref=refs/notes/sg165-fetched show de02103848b544ac84e64a710809aedcfc8aa509
+Dispatch-ID: SG-165 | Report: docs/worklogs/SG-165_report.md | Work-HEAD: de02103848b544ac84e64a710809aedcfc8aa509
+show_wh_exit=0
+
+$ git notes --ref=refs/notes/sg165-fetched show 689c57cd88eedd2097f7d1f13f0aade7ebccffcf
+Dispatch-ID: SG-165 | Report: docs/worklogs/SG-165_report.md | Work-HEAD: de02103848b544ac84e64a710809aedcfc8aa509
+show_rc_exit=0
+```
+
+**note=yes** (both required notes present on WORK_HEAD and the report commit; read back through the mapped
+refspec — a default fetch never carries notes). The report commit `689c57c` is the tip at report write; its own
+final-tip note is published by the runner after this file is committed (`CO-79`: the report cannot contain the
+moment its own receipt is published).
 
 ---
 
