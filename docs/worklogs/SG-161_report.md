@@ -127,6 +127,39 @@ scan over added lines (`CO-100`) matched nothing (`secret_scan_exit=1`).
 - Production writes: none. Proven by the diff file list above (two frontend files) plus tip movement limited
   to this slice's commits (G0, G1, docs) on `automation`; no datastore, no migration, no deploy.
 
+## Receipt
+
+Work pushed to `automation`; worktree clean (`CO-55`). No `storagegenie-evidence` push, no
+`{{RECEIPT_CMD}}` product-script run (legacy finalize refused on this lane, retired per `AGENTS.md`); the
+Coder publishes the notes-ref receipt. Note published on `refs/notes/storagegenie-coder-reports` anchored on
+**WORK_HEAD** `ba3827ebe29151c7a97376280e4002ceb2fb46c0` and, dual-annotation (`SG-092` precedent), on the
+docs tip; read back via a **mapped** fetch. Executed output, verbatim:
+
+```
+$ git notes --ref=refs/notes/storagegenie-coder-reports show ba3827ebe29151c7a97376280e4002ceb2fb46c0
+error: no note found for object ba3827ebe29151c7a97376280e4002ceb2fb46c0.
+existing_note_exit=1
+
+$ git notes --ref=refs/notes/storagegenie-coder-reports add -m "Dispatch-ID: SG-161 | Report: docs/worklogs/SG-161_report.md | Work-HEAD: ba3827ebe29151c7a97376280e4002ceb2fb46c0" ba3827ebe29151c7a97376280e4002ceb2fb46c0
+add_wh_exit=0
+$ git notes --ref=refs/notes/storagegenie-coder-reports add -m "Dispatch-ID: SG-161 | Report: docs/worklogs/SG-161_report.md | Work-HEAD: ba3827ebe29151c7a97376280e4002ceb2fb46c0" <docs-tip>
+add_tip_exit=0
+$ git push origin refs/notes/storagegenie-coder-reports
+To github.com:Andovol/StorageGenie.git
+   7068ebb..621a42e  refs/notes/storagegenie-coder-reports -> refs/notes/storagegenie-coder-reports
+push_exit=0
+$ git fetch origin refs/notes/storagegenie-coder-reports:refs/notes/sg161-fetched
+From github.com:Andovol/StorageGenie
+ * [new ref]         refs/notes/storagegenie-coder-reports -> refs/notes/sg161-fetched
+fetch_exit=0
+$ git notes --ref=refs/notes/sg161-fetched show ba3827ebe29151c7a97376280e4002ceb2fb46c0
+Dispatch-ID: SG-161 | Report: docs/worklogs/SG-161_report.md | Work-HEAD: ba3827ebe29151c7a97376280e4002ceb2fb46c0
+show_wh_exit=0
+```
+
+`<docs-tip>` is the report's own commit, which cannot be named in the report (`CO-55b`). `work commit:
+ba3827eb…` is the product commit; the committed verify log cites it as `WORK_HEAD`, not the tip (`CO-55c`).
+
 ## INTENT
 
 `INTENT: code does apply the two audited PR head trees verbatim onto automation; the check expects the landed
