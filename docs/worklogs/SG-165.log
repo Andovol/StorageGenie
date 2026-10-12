@@ -1,0 +1,55 @@
+SG-165 command log (chronological; unmetered local docker/curl/sqlite only)
+Dispatch: SG-165 — Close-out deploy rider: serve the Palette pile (rebuild + one recreate + verify)
+Work dir: /home/andrei/StorageGenie   Base ref: automation (resolved 4ea62aa68d333a1b9fa08128084539f9f4d7039a)
+
+# -- orientation / contract
+bash /home/andrei/storagegenie-contract/rules_check.sh   # exit 3 (G-L1 UNCHECKED: cache HEAD not at a local tag; G-L5/G-L7 gh-unauthenticated; 2x G-L6 BYTES)
+cat /home/andrei/storagegenie-contract/VERSION           # 0.46.0
+cat /home/andrei/storagegenie-contract/RULES.sha256      # 487841b1... RULES.md
+git -C /home/andrei/storagegenie-contract rev-parse HEAD # 925cb575c0ef0e1c5a15b6112041a270c2dbd730
+git ls-remote --tags origin                              # contract-v0.46.0^{} == 925cb575... == HEAD (recorded == published)
+#   G-L1 UNCHECKED is local-tag-fetch shape, NOT payload drift: HEAD == the tag's peeled commit; payload hash matches.
+
+# -- before-capture premise facts
+git status --porcelain                                   # clean (worktree)
+git diff --stat b16d0670..HEAD -- backend/app/models backend/alembic   # EMPTY (no schema source changed since running-image base)
+git log -1 --format='%h %ci %s' -- backend/app/models backend/alembic  # c846500 2026-09-29 (SG-153) = last schema change, already in running image
+git diff --stat b16d0670..HEAD -- frontend/              # the pile: 7 files (ExpiryEntryForm, AssetImportModal, EvidenceGallery+tests, CandidateCard, ChatPage+tests)
+
+# -- lane docker access (per-unit runtime socket BindPaths=/run/user/1000/docker.sock)
+export DOCKER_HOST=unix:///run/dispatch-storagegenie-SG-165/docker.sock
+
+# -- G0 BEFORE (read-only)
+docker inspect -f '...' storagegenie-backend-1           # 596e7d7a35d2… Image sha256:c6fc45ab… RestartCount=0
+docker images --no-trunc ... storagegenie-backend        # sha256:c6fc45abbd1e… Created 2026-09-29 15:13:57
+curl -s http://127.0.0.1:8003/v1/health x6               # 6x 200 {"status":"ok","db":"ok","storage":"ok"}
+curl -H 'Host: storagegenie.dynv6.net' 127.0.0.1         # http 301 / https 401
+docker exec storagegenie-backend-1 alembic current       # 20260924_sg114_relation (head)
+sqlite3 -readonly data/db/storagegenie.db (28 tables)    # counts captured (provider_call=25)
+docker exec storagegenie-backend-1 ls -la /app/static    # index-CTQCofuO.js 318152 B / index-DO0gjGV6.css
+curl -X OPTIONS /v1/assets (preflight, no writes)        # 200 If-Match; 400 TRACE; 400 X-Evil-Header
+
+# -- G1 REBUILD (exactly one)
+mkdir -p /tmp/opencode/buildx
+BUILDX_CONFIG=/tmp/opencode/buildx docker compose build backend   # BUILD_EXIT=0; 26s; c6fc45ab… -> 0bed0cc4…
+#   frontend-build RUN npm run build: dist/assets/index-C7iDBZmw.js 321.13 kB (was index-CTQCofuO.js 318152 B)
+
+# -- G2 RECREATE (exactly one)
+docker compose up -d --no-deps backend                   # REC_EXIT=0; one Recreate/Recreated/Starting/Started; 2s
+docker inspect -f '...' storagegenie-backend-1           # 41ac9fd1ed96… Image sha256:0bed0cc4… RestartCount=0
+
+# -- G2 AFTER verify (read-only)
+curl -s http://127.0.0.1:8003/v1/health x6               # 6x 200 identical bodies (delta 0)
+curl -H 'Host: storagegenie.dynv6.net' 127.0.0.1         # http 301 / https 401 (unmoved)
+docker exec storagegenie-backend-1 alembic current       # 20260924_sg114_relation (head) (unmoved)
+sqlite3 -readonly data/db/storagegenie.db (28 tables)    # every delta 0
+docker exec storagegenie-backend-1 ls -la /app/static    # index-C7iDBZmw.js 321242 B (new)
+docker exec storagegenie-backend-1 sha256sum /app/static/...   # js a6c89a57…; css 37b25dbd… (css byte-identical)
+docker exec storagegenie-backend-1 grep -F marker /app/static/assets/index-C7iDBZmw.js
+#   No evidence attached=1; Thumbnail unavailable=1; Select a date to save=1; Save expiry=1;
+#   "Acceptance is blocked until open review tasks are resolved"=1; aria-busy=4
+curl -X OPTIONS /v1/assets (preflight, no writes)        # 200 If-Match; 400 TRACE; 400 X-Evil-Header (lockdown live)
+curl GET /capture /inbox /catalog                        # 200 200 200
+
+# -- diff ceiling
+git status --porcelain                                   # only docs/worklogs/SG-165_* (product diff EMPTY)
