@@ -1,0 +1,40 @@
+
+ RUN  v1.6.1 /home/andrei/StorageGenie/frontend
+
+stderr | src/routes/ChatPage.test.tsx > ChatPage > sending a question posts and renders the grounded reply
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+ ❯ src/routes/ChatPage.test.tsx  (11 tests | 1 failed) 480ms
+   ❯ src/routes/ChatPage.test.tsx > ChatPage > an empty catalogue with unclassified items names the cause and links to the Inbox
+     → expect(element).toHaveTextContent()
+
+Expected element to have text content:
+  No classified items in Food yet — 3 awaiting classification.
+Received:
+  No catalogue data for this category yet.
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/routes/ChatPage.test.tsx > ChatPage > an empty catalogue with unclassified items names the cause and links to the Inbox
+Error: expect(element).toHaveTextContent()
+
+Expected element to have text content:
+  No classified items in Food yet — 3 awaiting classification.
+Received:
+  No catalogue data for this category yet.
+ ❯ src/routes/ChatPage.test.tsx:189:19
+    187|     const alert = await screen.findByRole("alert");
+    188|     expect(alert).toHaveTextContent("No catalogue data for this catego…
+    189|     expect(alert).toHaveTextContent("No classified items in Food yet —…
+       |                   ^
+    190|     const link = await screen.findByRole("link", { name: "Review them …
+    191|     expect(link.getAttribute("href") || "").toContain("/inbox?househol…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 10 passed (11)
+   Start at  18:58:58
+   Duration  1.56s (transform 126ms, setup 70ms, collect 232ms, tests 480ms, environment 425ms, prepare 85ms)
+

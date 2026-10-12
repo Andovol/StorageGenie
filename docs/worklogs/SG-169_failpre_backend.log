@@ -1,0 +1,94 @@
+...........FFF........                                                   [100%]
+=================================== FAILURES ===================================
+______ test_empty_branch_carries_unclassified_count_from_shared_predicate ______
+
+chat_fixture = (<sqlalchemy.orm.session.Session object at 0x70df5a6112b0>, '01a1317b-8497-7e13-94f1-7d73bb5c823e', [])
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x70df59d2caa0>
+
+    def test_empty_branch_carries_unclassified_count_from_shared_predicate(
+        chat_fixture, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """SG-169 G1/A1: the empty branch carries `unclassified_count`.
+    
+        A household holding a classified asset, an other-category asset and one
+        asset with no classification assertion returns `unclassified_count == 1`
+        for a category whose catalogue is empty: the SAME predicate `build_catalog`
+        keeps entries on (live classification assertion) counts only the truly
+        unclassified asset. Zero provider calls, zero ledger rows; `EMPTY_ANSWER`
+        unchanged.
+        """
+        from app.services.chat.service import EMPTY_ANSWER
+    
+        session, household_id, network_attempts = chat_fixture
+        _seed_asset(session, household_id, "Ibuprofen", slug="medicine_pharma", expiry="2027-01-01")
+        _seed_asset(session, household_id, "Passport", slug="documents_other", expiry=None)
+        _seed_unclassified_asset(session, household_id, "Mystery box")
+        provider = ChatScriptedProvider()
+        _enable(monkeypatch, provider)
+        client = TestClient(app)
+    
+        response = _chat(client, household_id, "food", "What food do I have?")
+    
+        assert response.status_code == 200, response.text
+        body = response.json()
+        assert body["status"] == "ok"
+        assert body["empty_catalogue"] is True
+        assert body["catalogue_size"] == 0
+>       assert body["unclassified_count"] == 1
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       KeyError: 'unclassified_count'
+
+tests/test_chat.py:592: KeyError
+______ test_empty_branch_unclassified_count_zero_for_assetless_household _______
+
+chat_fixture = (<sqlalchemy.orm.session.Session object at 0x70df5a5e3bc0>, '01a1317b-857f-77c2-ba62-ba85c9819774', [])
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x70df5939eab0>
+
+    def test_empty_branch_unclassified_count_zero_for_assetless_household(
+        chat_fixture, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """SG-169 A1: a household with no assets at all reports 0, not an error."""
+        session, household_id, _ = chat_fixture
+        provider = ChatScriptedProvider()
+        _enable(monkeypatch, provider)
+        client = TestClient(app)
+    
+        response = _chat(client, household_id, "food", "Anything?")
+    
+        assert response.status_code == 200, response.text
+        body = response.json()
+        assert body["empty_catalogue"] is True
+>       assert body["unclassified_count"] == 0
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       KeyError: 'unclassified_count'
+
+tests/test_chat.py:613: KeyError
+___ test_unclassified_count_ignores_superseded_and_rejected_classifications ____
+
+chat_fixture = (<sqlalchemy.orm.session.Session object at 0x70df59d2ffe0>, '01a1317b-85fe-7bb1-9ac1-e604aa6b3a0f', [])
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x70df59d2e5d0>
+
+    def test_unclassified_count_ignores_superseded_and_rejected_classifications(
+        chat_fixture, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """SG-169 A1: a superseded/rejected classification retires the assertion, so
+        the asset counts as unclassified — the shared `INACTIVE_REVIEW_STATES` rule."""
+>       from app.services.chat.service import _unclassified_count
+E       ImportError: cannot import name '_unclassified_count' from 'app.services.chat.service' (/home/andrei/StorageGenie/backend/app/services/chat/service.py)
+
+tests/test_chat.py:623: ImportError
+=============================== warnings summary ===============================
+venv/lib/python3.12/site-packages/fastapi/testclient.py:1
+  /home/andrei/StorageGenie/backend/venv/lib/python3.12/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+venv/lib/python3.12/site-packages/starlette/testclient.py:53
+  /home/andrei/StorageGenie/backend/venv/lib/python3.12/site-packages/starlette/testclient.py:53: DeprecationWarning: The anyio.abc.BlockingPortal alias is deprecated, use anyio.from_thread.BlockingPortal instead.
+    _PortalFactoryType = Callable[[], AbstractContextManager[anyio.abc.BlockingPortal]]
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/test_chat.py::test_empty_branch_carries_unclassified_count_from_shared_predicate
+FAILED tests/test_chat.py::test_empty_branch_unclassified_count_zero_for_assetless_household
+FAILED tests/test_chat.py::test_unclassified_count_ignores_superseded_and_rejected_classifications
+3 failed, 19 passed, 2 warnings in 3.81s

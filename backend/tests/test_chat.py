@@ -167,6 +167,14 @@ def _seed_asset(
     return asset
 
 
+def _seed_unclassified_asset(db: Session, household_id: str, label: str) -> Asset:
+    """An ACTIVE asset with NO classification assertion at all (SG-169)."""
+    asset = Asset(household_id=household_id, display_name=label, asset_type="product")
+    db.add(asset)
+    db.commit()
+    return asset
+
+
 def _seed_source(db: Session, household_id: str, asset: Asset) -> None:
     db.add(
         SourceAttribution(
@@ -382,6 +390,7 @@ def test_no_consent_refuses_zero_calls_and_zero_rows(
     body = response.json()
     assert body["status"] == "skipped"
     assert body["reason"] == "consent_disabled"
+    assert "unclassified_count" not in body, "SG-169: only the empty branch gains the key"
     assert provider.invocations == 0
     assert network_attempts == []
     assert session.query(ProviderCall).count() == 0
@@ -551,6 +560,130 @@ def test_empty_catalogue_is_a_valid_path(
     assert session.query(ProviderCall).count() == 0
 
 
+def test_empty_branch_carries_unclassified_count_from_shared_predicate(
+    chat_fixture, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """SG-169 G1/A1: the empty branch carries `unclassified_count`.
+
+    A household holding a classified asset, an other-category asset and one
+    asset with no classification assertion returns `unclassified_count == 1`
+    for a category whose catalogue is empty: the SAME predicate `build_catalog`
+    keeps entries on (live classification assertion) counts only the truly
+    unclassified asset. Zero provider calls, zero ledger rows; `EMPTY_ANSWER`
+    unchanged.
+    """
+    from app.services.chat.service import EMPTY_ANSWER
+
+    session, household_id, network_attempts = chat_fixture
+    _seed_asset(session, household_id, "Ibuprofen", slug="medicine_pharma", expiry="2027-01-01")
+    _seed_asset(session, household_id, "Passport", slug="documents_other", expiry=None)
+    _seed_unclassified_asset(session, household_id, "Mystery box")
+    provider = ChatScriptedProvider()
+    _enable(monkeypatch, provider)
+    client = TestClient(app)
+
+    response = _chat(client, household_id, "food", "What food do I have?")
+
+    assert response.status_code == 200, response.text
+    body = response.json()
+    assert body["status"] == "ok"
+    assert body["empty_catalogue"] is True
+    assert body["catalogue_size"] == 0
+    assert body["unclassified_count"] == 1
+    assert body["answer"] == EMPTY_ANSWER
+    assert provider.invocations == 0
+    assert network_attempts == []
+    assert session.query(ProviderCall).count() == 0
+
+
+def test_empty_branch_unclassified_count_zero_for_assetless_household(
+    chat_fixture, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """SG-169 A1: a household with no assets at all reports 0, not an error."""
+    session, household_id, _ = chat_fixture
+    provider = ChatScriptedProvider()
+    _enable(monkeypatch, provider)
+    client = TestClient(app)
+
+    response = _chat(client, household_id, "food", "Anything?")
+
+    assert response.status_code == 200, response.text
+    body = response.json()
+    assert body["empty_catalogue"] is True
+    assert body["unclassified_count"] == 0
+    assert provider.invocations == 0
+    assert session.query(ProviderCall).count() == 0
+
+
+def test_unclassified_count_ignores_superseded_and_rejected_classifications(
+    chat_fixture, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """SG-169 A1: a superseded/rejected classification retires the assertion, so
+    the asset counts as unclassified — the shared `INACTIVE_REVIEW_STATES` rule."""
+    from app.services.chat.service import _unclassified_count
+
+    session, household_id, _ = chat_fixture
+    _seed_asset(session, household_id, "Ibuprofen", slug="medicine_pharma", expiry="2027-01-01")
+    superseded = _seed_unclassified_asset(session, household_id, "Retired")
+    session.add(
+        Assertion(
+            asset_id=superseded.id,
+            field_path=CLASSIFICATION_FIELD,
+            value_json=json.dumps({"category": "medicine_pharma"}),
+            source_type="user",
+            review_state="superseded",
+        )
+    )
+    rejected = _seed_unclassified_asset(session, household_id, "Refused")
+    session.add(
+        Assertion(
+            asset_id=rejected.id,
+            field_path=CLASSIFICATION_FIELD,
+            value_json=json.dumps({"category": "medicine_pharma"}),
+            source_type="user",
+            review_state="rejected",
+        )
+    )
+    session.commit()
+
+    assert _unclassified_count(session, household_id) == 2
+
+
+def test_non_empty_branch_has_no_unclassified_count_and_unchanged_shape(
+    chat_fixture, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """SG-169 A1: every OTHER respond() return shape is unchanged — the key is
+    absent and the non-empty `ok` dict carries its pre-slice key set exactly."""
+    session, household_id, _ = chat_fixture
+    _seed_asset(session, household_id, "Whole milk")
+    provider = ChatScriptedProvider()
+    _enable(monkeypatch, provider)
+    client = TestClient(app)
+
+    response = _chat(client, household_id, "food", "When does the milk expire?")
+
+    assert response.status_code == 200, response.text
+    body = response.json()
+    assert body["status"] == "ok"
+    assert body["empty_catalogue"] is False
+    assert "unclassified_count" not in body
+    assert set(body) == {
+        "status",
+        "reason",
+        "answer",
+        "grounded",
+        "empty_catalogue",
+        "category",
+        "catalogue_size",
+        "provider",
+        "model",
+        "provider_call_id",
+        "usage",
+        "cost",
+        "latency_ms",
+    }
+
+
 def test_correction_is_user_initiated_and_writes_one_event(
     chat_fixture, monkeypatch: pytest.MonkeyPatch
 ) -> None:
@@ -667,6 +800,7 @@ def test_chat_error_ledger_records_carried_usage(chat_fixture, monkeypatch: pyte
     assert response.status_code == 200, response.text
     body = response.json()
     assert body["status"] == "error"
+    assert "unclassified_count" not in body, "SG-169: only the empty branch gains the key"
     assert provider.invocations == 1
     assert network_attempts == []
     call = session.query(ProviderCall).one()
@@ -736,6 +870,7 @@ def test_budget_refusal_before_any_call(
 
     assert response.status_code == 200, response.text
     assert response.json()["status"] == "refused"
+    assert "unclassified_count" not in response.json(), "SG-169: only the empty branch gains the key"
     assert provider.invocations == 0
     assert network_attempts == []
     assert session.query(ProviderCall).count() == 0

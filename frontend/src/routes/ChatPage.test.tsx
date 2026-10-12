@@ -169,6 +169,70 @@ describe("ChatPage", () => {
     ).not.toBeInTheDocument();
   });
 
+  test("an empty catalogue with unclassified items names the cause and links to the Inbox", async () => {
+    api.sendChat.mockResolvedValue({
+      status: "ok",
+      answer: "There is no catalogue data recorded for this category yet, so I cannot answer from your items.",
+      grounded: true,
+      empty_catalogue: true,
+      category: "food",
+      catalogue_size: 0,
+      unclassified_count: 3,
+    });
+    renderPage();
+
+    fireEvent.change(screen.getByLabelText("Question"), { target: { value: "What expires?" } });
+    fireEvent.click(screen.getByRole("button", { name: "Send" }));
+
+    const alert = await screen.findByRole("alert");
+    expect(alert).toHaveTextContent("No catalogue data for this category yet.");
+    expect(alert).toHaveTextContent("No classified items in Food yet — 3 awaiting classification.");
+    const link = await screen.findByRole("link", { name: "Review them in the Inbox." });
+    expect(link.getAttribute("href") || "").toContain("/inbox?household_id=hh-chat");
+    expect(link).toHaveClass("text-link");
+  });
+
+  test("an empty catalogue with zero unclassified items keeps the legacy single line", async () => {
+    api.sendChat.mockResolvedValue({
+      status: "ok",
+      answer: "There is no catalogue data recorded for this category yet, so I cannot answer from your items.",
+      grounded: true,
+      empty_catalogue: true,
+      category: "food",
+      catalogue_size: 0,
+      unclassified_count: 0,
+    });
+    renderPage();
+
+    fireEvent.change(screen.getByLabelText("Question"), { target: { value: "What expires?" } });
+    fireEvent.click(screen.getByRole("button", { name: "Send" }));
+
+    const alert = await screen.findByRole("alert");
+    expect(alert).toHaveTextContent("No catalogue data for this category yet.");
+    expect(alert).not.toHaveTextContent("awaiting classification");
+    expect(screen.queryByRole("link", { name: "Review them in the Inbox." })).not.toBeInTheDocument();
+  });
+
+  test("an empty catalogue with the key absent keeps the legacy single line", async () => {
+    api.sendChat.mockResolvedValue({
+      status: "ok",
+      answer: "There is no catalogue data recorded for this category yet, so I cannot answer from your items.",
+      grounded: true,
+      empty_catalogue: true,
+      category: "food",
+      catalogue_size: 0,
+    });
+    renderPage();
+
+    fireEvent.change(screen.getByLabelText("Question"), { target: { value: "What expires?" } });
+    fireEvent.click(screen.getByRole("button", { name: "Send" }));
+
+    const alert = await screen.findByRole("alert");
+    expect(alert).toHaveTextContent("No catalogue data for this category yet.");
+    expect(alert).not.toHaveTextContent("awaiting classification");
+    expect(screen.queryByRole("link", { name: "Review them in the Inbox." })).not.toBeInTheDocument();
+  });
+
   test("an unsupported category error surfaces", async () => {
     api.sendChat.mockRejectedValue(new Error("unknown chat category: snacks"));
     renderPage();
