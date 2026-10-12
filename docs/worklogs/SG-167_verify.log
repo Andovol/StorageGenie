@@ -1,0 +1,27 @@
+SG-167 route-wide select/button enumeration (ON THE TARGET: the two route files + the components they render)
+generated 2026-10-12T18:14:46Z
+
+== <select> / <button> occurrences ==
+frontend/src/components/JobCard.tsx:27:    <button
+frontend/src/components/HouseholdSelector.tsx:28:    <select
+frontend/src/routes/InboxPage.tsx:37:      <section><h2>Selected job</h2>{!selectedJobId && <div>Select a job to see progress and errors.</div>}{detail.isLoading && <div>Loading job detail…</div>}{detail.data && <div><div><strong>{detail.data.state}</strong> · {detail.data.progress?.completed || 0}/{detail.data.progress?.total || 0} complete · {detail.data.progress?.failed || 0} failed · {detail.data.progress?.pending || 0} pending</div>{detail.data.errors?.map((error) => <div key={error} role="alert" className="text-danger" style={{ marginTop: 8 }}>{error}</div>)}{detail.data.steps?.map((step) => <div key={step.id} className="bg-card-muted" style={{ marginTop: 8, padding: 8 }}><strong>{step.step_name}</strong>: {step.state}{step.error && <div role="alert">{step.error}</div>}</div>)}{detail.data.state === "FAILED" && <button type="button" onClick={() => retry.mutate(detail.data!.id)} disabled={retry.isPending} className={THEMED_CONTROL_CLASS} style={{ ...CONTROL_STYLE, marginTop: 12 }}>{retry.isPending ? "Retrying…" : "Retry failed job"}</button>}</div>}</section>
+frontend/src/routes/InboxPage.tsx:42:        <label style={{ fontSize: 13 }}>Review status <select aria-label="Review status" className={THEMED_CONTROL_CLASS} style={CONTROL_STYLE} value={reviewFilter} onChange={(event) => setReviewFilter(event.target.value as "open" | "resolved" | "all")}><option value="open">Open</option><option value="resolved">Resolved</option><option value="all">All</option></select></label>
+frontend/src/routes/InboxPage.tsx:46:      <div style={{ display: "grid", gap: 8 }}>{reviewTasks.map((task) => <div key={task.id} className="bg-card border-border" style={{ display: "flex", justifyContent: "space-between", gap: 12, padding: 12, borderStyle: "solid", borderWidth: 1, borderRadius: 8 }}><div><strong>{task.task_type}</strong> · {task.priority} · {task.status}<div className="text-muted-foreground" style={{ fontSize: 12 }}>Task {task.id} · candidate {task.subject_ref}</div></div><div style={{ display: "flex", gap: 8 }}>{task.subject_ref && <Link className="text-link focus-ring" style={{ textDecoration: "underline" }} to={`/review/${task.subject_ref}?household_id=${effectiveHousehold}`}>Review</Link>}{task.status === "open" && <button type="button" onClick={() => resolve.mutate(task.id)} disabled={resolve.isPending} className={THEMED_CONTROL_CLASS} style={CONTROL_STYLE}>Resolve</button>}</div></div>)}</div>
+frontend/src/routes/ChatPage.tsx:100:          <select
+frontend/src/routes/ChatPage.tsx:146:        <button
+frontend/src/routes/ChatPage.tsx:179:        <button
+
+== theme-class judgement (THEMED_CONTROL_CLASS = 'bg-background text-foreground border-border focus-ring') ==
+ChatPage.tsx:79 HouseholdSelector -> selectClassName={THEMED_CONTROL_CLASS}  [THEMED]
+ChatPage.tsx:97 Category select -> className="bg-background text-foreground border-border focus-ring"  [THEMED]
+ChatPage.tsx:143 Send button -> className="bg-primary text-primary-foreground focus-ring"  [THEMED]
+ChatPage.tsx:176 Log correction button -> className="bg-card text-foreground border-border focus-ring"  [THEMED]
+ChatTranscript.tsx -> no select/button (list only)  [n/a]
+InboxPage.tsx:34 HouseholdSelector -> selectStyle/selectClassName shared pair  [THEMED]
+JobCard.tsx:27 job button -> className="bg-card text-foreground border-border focus-ring"  [THEMED]
+InboxPage.tsx:37 Retry failed job -> className={THEMED_CONTROL_CLASS}  [THEMED, this slice]
+InboxPage.tsx:42 Review status select -> className={THEMED_CONTROL_CLASS}  [THEMED]
+InboxPage.tsx:46 Resolve -> className={THEMED_CONTROL_CLASS}  [THEMED, this slice]
+
+bare selects/buttons remaining on ChatPage route: 0
+bare selects/buttons remaining on InboxPage route: 0

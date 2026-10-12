@@ -5,6 +5,7 @@ import { logChatCorrection, sendChat } from "../api/client";
 import type { ChatMessage, ChatResponse, Household } from "../api/types";
 import { ChatTranscript } from "../components/ChatTranscript";
 import { HouseholdSelector } from "../components/HouseholdSelector";
+import { CONTROL_STYLE, THEMED_CONTROL_CLASS } from "../components/shell/CatalogToolbar";
 import { PageContainer } from "../components/shell/PageContainer";
 import { useHouseholds } from "../hooks/useAssets";
 
@@ -83,6 +84,8 @@ export function ChatPage() {
             localStorage.setItem("household_id", id);
           }}
           households={households as Household[] | undefined}
+          selectStyle={CONTROL_STYLE}
+          selectClassName={THEMED_CONTROL_CLASS}
         />
       </div>
 
