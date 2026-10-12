@@ -27,4 +27,6 @@
 - `D-1012-9` (2026-10-12, owner quote "Yes, approved." on G-C1 restatement): chat empty-state HONESTY slice APPROVED as SG-169 (unclassified count + Inbox link, zero grounding change; D-1012-8 premise corrected — grounding keys on accepted classification, not asset_type).
 - `D-1012-10` (2026-10-12, same restatement, REJECTED per recommendation): asset_type fallback grounding declined (would rest answers on unreviewed extraction text).
 - `D-1012-11` (2026-10-12, owner quote "Approved."): close-out deploy of SG-169 APPROVED (rebuild + one recreate + verify, production restart).
-- `D-1012-12` (2026-10-12, Architect proposal): Review-gating repair slice (visible blocked-Accept reason + evidence-thumb fallback + I2 job-select live repro) queued for owner word.
+- `D-1012-12` (2026-10-12, Architect proposal, owner quote "D12 - approved" read as D-1012-12 — legacy `D12` collision disclosed: 2026-09-08 compose pass + 2026-09-25 SG-118 batch, both served/closed, re-approval incoherent): Review-gating repair slice APPROVED (visible blocked-Accept reason + evidence-thumb fallback; ISS-20 job-select works per owner, repro dropped).
+- `D-1012-13` (2026-10-12, Architect proposal): bare-Resolve erases `expiry.manual_entry` with zero data (review_tasks.py:83-97 resolves any task dataless) — options queued for owner word.
+- ISS-20 CLOSED 2026-10-12 (owner: "selection works, it loads" — earlier "no jobs" was the unselected placeholder state).
