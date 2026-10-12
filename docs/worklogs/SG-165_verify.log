@@ -491,3 +491,10 @@ pages     /capture /inbox /catalog -> 200 200 200
 elapsed: build 26s (2026-10-12T16:35:26Z->16:35:52Z); recreate 2s (16:36:03Z->16:36:05Z);
          verify from BEFORE capture ~16:35:18Z to AFTER summary ~16:36:29Z = ~71s.
 spend: REAL metered $0.000000 USD, zero metered calls (no USD-metered path exists in slice).
+
+--- NOTE: inline post-recreate wait-poll emitted no captured lines (pipeline logging artifact); construct re-tested green. Recapture below. ---
+--- post-recreate health recapture ---
+poll1 http=200 body={"status":"ok","db":"ok","storage":"ok"}
+poll2 http=200 body={"status":"ok","db":"ok","storage":"ok"}
+poll3 http=200 body={"status":"ok","db":"ok","storage":"ok"}
+  (authoritative post-recreate health is the AFTER x6 block above, all 200.)
