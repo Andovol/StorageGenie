@@ -61,6 +61,7 @@ from app.services import audit_service
 from app.storage.local_store import storage_path_for
 
 SCENE_ENDPOINT_URL = "https://openrouter.ai/api/v1/chat/completions"
+SCENE_IMAGE_API_URL = "https://openrouter.ai/api/v1/images"
 OPENROUTER_API_KEY_ENV = "OPENROUTER_API_KEY"
 
 # T0-PINNED condition types (live OpenAPI contract, 2026-10-09).
@@ -165,6 +166,33 @@ def build_scene_request(
     return {
         "method": "POST",
         "url": SCENE_ENDPOINT_URL,
+        "headers": {"Content-Type": "application/json"},
+        "json": body,
+    }
+
+
+def build_image_request(
+    photo_ref: str,
+    prompt: str,
+    image_model: str,
+) -> dict[str, object]:
+    """Build the dedicated Image API request (`POST /api/v1/images`, SG-159).
+
+    The asset photo enters as an `input_references` image (base64 data URL or
+    HTTP(S) URL) — the documented reference-image field of the Image API that
+    the chat-completions server tool does not expose. The key is added at SEND
+    time only. Response: `data[].b64_json` + `usage.cost` (all-or-nothing
+    billing; failures return non-2xx and are not billed).
+    """
+    body: dict[str, object] = {
+        "model": image_model,
+        "prompt": prompt,
+        "n": 1,
+        "input_references": [{"type": "image_url", "image_url": {"url": photo_ref}}],
+    }
+    return {
+        "method": "POST",
+        "url": SCENE_IMAGE_API_URL,
         "headers": {"Content-Type": "application/json"},
         "json": body,
     }
@@ -309,31 +337,62 @@ def guard_render_spend(
     return None
 
 
+_IMAGE_KEYS = ("imageUrl", "image_url", "url", "result", "imageB64", "b64_json")
+_PERSISTED_STRING_REDACT_OVER = 2048
+_PERSISTED_BODY_CAP = 65536
+
+
+def _looks_like_image_b64(value: str) -> bool:
+    """True when a long string decodes (as base64) to image bytes."""
+    sample = value.strip()[:128]
+    if len(sample) < 64:
+        return False
+    try:
+        data = base64.b64decode(sample + "=" * (-len(sample) % 4), validate=False)
+    except (ValueError, TypeError):
+        return False
+    return data.startswith((b"\x89PNG", b"\xff\xd8\xff", b"RIFF", b"GIF8"))
+
+
+def _as_image_ref(value: Any) -> str | None:
+    """An image URL/data URL, or a synthesized data URL from raw base64 bytes.
+
+    SG-159 hardening: the server-tool result may carry the image as
+    `imageB64`/`b64_json`/`result` base64 rather than a URL (the exact shape
+    SG-158's 200 used was not persisted; this covers the documented shapes).
+    """
+    if not isinstance(value, str):
+        return None
+    if value.startswith(("http://", "https://", "data:image/")):
+        return value
+    if _looks_like_image_b64(value):
+        return "data:image/png;base64," + value.strip()
+    return None
+
+
 def extract_image_url(response_json: Any) -> str | None:  # noqa: C901
     """First image-looking URL in a chat-completions response, else `None`.
 
-    Tolerant by design (the exact tool-result envelope is only pinned live at
-    first render): checks `imageUrl`/`image_url`/`url` keys, dict-valued
-    `image_url: {url: ...}`, then walks the whole tree. Only `http(s)://` and
-    `data:image/` values qualify.
+    Tolerant by design (SG-158 wrote it for the un-pinned tool-result envelope;
+    SG-159 hardens it for the documented `openrouter:image_generation` output
+    item): checks `imageUrl`/`image_url`/`url`/`result`/`imageB64`/`b64_json`
+    keys (URLs, `data:` URLs, raw base64 bytes, dict-valued `image_url: {url:
+    ...}`), then walks the whole tree. Only `http(s)://`, `data:image/` and
+    base64 strings that decode to image bytes qualify.
     """
-
-    def _url(value: Any) -> str | None:
-        if isinstance(value, str) and value.startswith(("http://", "https://", "data:image/")):
-            return value
-        return None
 
     def _walk(node: Any) -> str | None:  # noqa: C901
         if isinstance(node, dict):
-            for key in ("imageUrl", "image_url", "url"):
+            for key in _IMAGE_KEYS:
                 if key in node:
-                    found = _url(node[key])
+                    found = _as_image_ref(node[key])
                     if found is not None:
                         return found
                     if isinstance(node[key], dict):
-                        found = _url(node[key].get("url"))
-                        if found is not None:
-                            return found
+                        for inner in ("url", "b64_json", "image_url"):
+                            found = _as_image_ref(node[key].get(inner))
+                            if found is not None:
+                                return found
             for value in node.values():
                 found = _walk(value)
                 if found is not None:
@@ -346,6 +405,104 @@ def extract_image_url(response_json: Any) -> str | None:  # noqa: C901
         return None
 
     return _walk(response_json)
+
+
+def extract_image_tool_error(response_json: Any) -> str | None:  # noqa: C901
+    """A failed image-tool status message in a 2xx response, else `None`.
+
+    The documented tool result is `{"status": "ok", "imageUrl": ...}` or
+    `{"status": "error", "error": ...}`; the OpenAPI output item uses
+    `status: "failed"` + `error`. SG-158's 200 had no extractable image and no
+    persisted body; this surfaces the reason instead of a generic miss.
+    """
+
+    def _walk(node: Any) -> str | None:  # noqa: C901
+        if isinstance(node, dict):
+            status = node.get("status")
+            if isinstance(status, str) and status.lower() in ("failed", "error"):
+                err = node.get("error")
+                if isinstance(err, str) and err:
+                    return f"image_tool_{status.lower()}: {err[:200]}"
+                if isinstance(err, dict) and isinstance(err.get("message"), str):
+                    return f"image_tool_{status.lower()}: {err['message'][:200]}"
+            for value in node.values():
+                found = _walk(value)
+                if found is not None:
+                    return found
+        elif isinstance(node, list):
+            for value in node:
+                found = _walk(value)
+                if found is not None:
+                    return found
+        return None
+
+    return _walk(response_json)
+
+
+def extract_image_b64(response_json: Any) -> tuple[bytes, str | None] | None:  # noqa: C901
+    """First `b64_json` image in an Image API response, decoded to (bytes, media).
+
+    The dedicated Image API returns `{"data": [{"b64_json": ..., "media_type":
+    ...}]}` (OpenAPI `ImageGenerationResponse`, read 2026-10-12). Returns
+    `None` when no decodable image bytes are present.
+    """
+
+    def _walk(node: Any) -> tuple[bytes, str | None] | None:  # noqa: C901
+        if isinstance(node, dict):
+            val = node.get("b64_json")
+            if isinstance(val, str) and val:
+                try:
+                    data = base64.b64decode(val)
+                except (ValueError, TypeError):
+                    data = b""
+                if data:
+                    claimed = node.get("media_type")
+                    media = _sniff_image_media_type(
+                        data, claimed if isinstance(claimed, str) else None
+                    )
+                    if media is not None:
+                        return data, media
+            for value in node.values():
+                found = _walk(value)
+                if found is not None:
+                    return found
+        elif isinstance(node, list):
+            for value in node:
+                found = _walk(value)
+                if found is not None:
+                    return found
+        return None
+
+    return _walk(response_json)
+
+
+def _redact_long_strings(node: Any) -> Any:
+    if isinstance(node, dict):
+        return {key: _redact_long_strings(value) for key, value in node.items()}
+    if isinstance(node, list):
+        return [_redact_long_strings(value) for value in node]
+    if isinstance(node, str) and len(node) > _PERSISTED_STRING_REDACT_OVER:
+        sha = hashlib.sha256(node.encode("utf-8")).hexdigest()
+        return f"<redacted len={len(node)} sha256={sha}>"
+    return node
+
+
+def _persistable_response_body(response_json: Any, raw_text: str | None) -> str | None:
+    """The live response body as stored at return (PG-EV-06).
+
+    JSON bodies are persisted structure-preserving: strings longer than 2048
+    chars (inline base64 image payloads) are replaced by
+    `<redacted len=… sha256=…>` so the *shape* survives without multi-MB rows;
+    the stored string is capped at 64 KiB. Non-JSON bodies keep their first 800
+    chars (the existing error-body convention).
+    """
+    if response_json is not None:
+        text = json.dumps(_redact_long_strings(response_json), ensure_ascii=False)
+    else:
+        text = (raw_text or "")[:800]
+    if len(text) > _PERSISTED_BODY_CAP:
+        text = text[:_PERSISTED_BODY_CAP] + "...<truncated>"
+    return text or None
 
 
 def _sniff_image_media_type(data: bytes, claimed: str | None) -> str | None:
@@ -425,8 +582,14 @@ def record_scene_call(
     evidence_id: str | None,
     remote_url: str | None,
     error_body: str | None = None,
+    response_body: str | None = None,
 ) -> ProviderCall:
-    """Append ONE ledger row for one sent render request; commits immediately."""
+    """Append ONE ledger row for one sent render request; commits immediately.
+
+    SG-159: EVERY live response body is persisted at return, 2xx as well as
+    errors (`response_body`, redacted/capped see `_persistable_response_body`;
+    `response_body_sha256` = sha256 of the stored string).
+    """
     row = ProviderCall(
         provider=SCENE_LEDGER_PROVIDER,
         model=orchestrator,
@@ -444,6 +607,12 @@ def record_scene_call(
                 "evidence_id": evidence_id,
                 "remote_url": remote_url,
                 "error_body": error_body,
+                "response_body": response_body,
+                "response_body_sha256": (
+                    hashlib.sha256(response_body.encode("utf-8")).hexdigest()
+                    if response_body
+                    else None
+                ),
             },
             ensure_ascii=False,
         ),
@@ -545,14 +714,26 @@ def render_scene(  # noqa: C901
     key: str | None = None,
     http_client: httpx.Client | None = None,
     timeout_s: float = SCENE_SEND_TIMEOUT_S,
+    transport: str = "server_tool",
 ) -> SceneRenderOutcome:
-    """One paid render: guard, POST, immediate download, Evidence + ledger row.
+    """One paid render: guard, POST, image capture, Evidence + ledger row.
 
     Refusals happen BEFORE any send (`refused_consent`, `missing_key`,
     `over_cap`). Every POST that leaves the machine gets exactly one ledger row
     in a `finally`-equivalent path — including failures — so billed-but-unledgered
     cannot occur. `http_client` is the test seam; the live path builds a fresh
     `httpx.Client`.
+
+    `transport` (SG-159 G0-fix decision):
+    - `"server_tool"` (default, SG-158 envelope): chat completions + the
+      `openrouter:image_generation` server tool. Live 2xx bodies proved (twice,
+      persisted) that this path returns the rewritten text but NO image
+      artifact to the client for this account/model combo.
+    - `"image_api"`: the dedicated `POST /api/v1/images` path — the image comes
+      back inline as `data[].b64_json` (no temp URL) and the asset photo rides
+      `input_references`. This is the path used for the Google leg; the Image
+      API has ZERO endpoints for `meta/muse-image` (measured 2026-10-12), so
+      Muse stays on `server_tool`.
     """
     spent_usd, unknown_cost_calls = scene_spend_so_far(db)
     refusal = guard_render_spend(
@@ -568,8 +749,12 @@ def render_scene(  # noqa: C901
     if resolved_key is None:
         return SceneRenderOutcome(status="refused", refusal=missing_key())
 
-    request = build_scene_request(
-        photo_ref, brief, image_model, orchestrator, spend_cap_usd=worst_case_usd
+    request = (
+        build_image_request(photo_ref, brief, image_model)
+        if transport == "image_api"
+        else build_scene_request(
+            photo_ref, brief, image_model, orchestrator, spend_cap_usd=worst_case_usd
+        )
     )
     send_url = str(request["url"])
     send_body = cast("dict[str, Any]", request["json"])
@@ -586,6 +771,7 @@ def render_scene(  # noqa: C901
     cost_usd: float | None = None
     response_id: str | None = None
     image_url: str | None = None
+    image_bytes: bytes | None = None
     image_media: str | None = None
     evidence: Evidence | None = None
     started = time.monotonic()
@@ -623,12 +809,22 @@ def render_scene(  # noqa: C901
                 cost_usd = float(raw_cost)
         raw_id = response_json.get("id")
         response_id = raw_id if isinstance(raw_id, str) else None
-        image_url = extract_image_url(response_json)
+        if transport == "image_api":
+            extracted = extract_image_b64(response_json)
+            if extracted is not None:
+                image_bytes, image_media = extracted
+        else:
+            image_url = extract_image_url(response_json)
 
-    if status_code == 200 and image_url is not None:
-        data, media, download_error = _download_image(
-            image_url, http_client=http_client, timeout_s=SCENE_DOWNLOAD_TIMEOUT_S
-        )
+    if status_code == 200 and (image_url is not None or image_bytes is not None):
+        acquired: tuple[bytes | None, str | None, str | None]
+        if image_bytes is not None:
+            acquired = (image_bytes, image_media, None)
+        else:
+            acquired = _download_image(
+                image_url or "", http_client=http_client, timeout_s=SCENE_DOWNLOAD_TIMEOUT_S
+            )
+        data, media, download_error = acquired
         if data is not None and media is not None:
             image_media = media
             try:
@@ -649,7 +845,8 @@ def render_scene(  # noqa: C901
         else:
             error_state = download_error or "image_download_failed"
     elif status_code == 200:
-        error_state = error_state or "image_url_missing"
+        missing = "image_b64_missing" if transport == "image_api" else "image_url_missing"
+        error_state = error_state or extract_image_tool_error(response_json) or missing
     elif status_code is not None:
         error_state = error_state or f"http_status:{status_code}"
 
@@ -668,6 +865,7 @@ def render_scene(  # noqa: C901
         evidence_id=evidence.id if evidence is not None else None,
         remote_url=image_url,
         error_body=error_body,
+        response_body=_persistable_response_body(response_json, error_body),
     )
     status = "rendered" if evidence is not None else "failed"
     return SceneRenderOutcome(

@@ -1,0 +1,2 @@
+render=R2a photo=P1 image_model=google/gemini-3.1-flash-image photo_bytes=406377 orchestrator=bytedance-seed/seed-1.6-flash worst_case_usd=0.15
+{"cost_usd": null, "error_state": "http_status:429", "evidence_id": null, "image_media_type": null, "image_model": "google/gemini-3.1-flash-image", "image_sha256": null, "latency_ms": 376.3819606974721, "ledger_id": "01a13084-4367-7ad2-9984-bc7179dfb4f3", "orchestrator": "bytedance-seed/seed-1.6-flash", "refusal": null, "render": "R2a", "response_id": null, "status": "failed", "status_code": 429, "storage_key": null, "usage": null}

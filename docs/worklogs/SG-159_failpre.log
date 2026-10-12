@@ -1,0 +1,190 @@
+FF.FFFFFFFF.                                                             [100%]
+=================================== FAILURES ===================================
+_________________ test_extract_image_url_reads_b64_json_shape __________________
+
+    def test_extract_image_url_reads_b64_json_shape() -> None:
+        found = scene.extract_image_url({"data": [{"b64_json": PNG_B64, "media_type": "image/png"}]})
+>       assert found is not None and found.startswith("data:image/png;base64,")
+E       assert (None is not None)
+
+tests/test_sg159_scene_render_fix.py:135: AssertionError
+__________ test_extract_image_url_reads_result_imageb64_and_imageurl ___________
+
+    def test_extract_image_url_reads_result_imageb64_and_imageurl() -> None:
+>       assert (
+            scene.extract_image_url({"status": "completed", "result": "https://x/y.png"})
+            == "https://x/y.png"
+        )
+E       AssertionError: assert None == 'https://x/y.png'
+E        +  where None = <function extract_image_url at 0x711b88bb8720>({'status': 'completed', 'result': 'https://x/y.png'})
+E        +    where <function extract_image_url at 0x711b88bb8720> = scene.extract_image_url
+
+tests/test_sg159_scene_render_fix.py:140: AssertionError
+_____________ test_extract_image_tool_error_surfaces_a_failed_tool _____________
+
+    def test_extract_image_tool_error_surfaces_a_failed_tool() -> None:
+        payload = _tool_payload(tool_error="Generation failed due to content policy")
+>       message = scene.extract_image_tool_error(payload)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'app.services.scene.openrouter' has no attribute 'extract_image_tool_error'
+
+tests/test_sg159_scene_render_fix.py:162: AttributeError
+______________ test_successful_render_persists_2xx_body_with_sha _______________
+
+db = <sqlalchemy.orm.session.Session object at 0x711b88e509e0>
+
+    def test_successful_render_persists_2xx_body_with_sha(db: Session) -> None:
+        client, _ = _client(_tool_payload(image_url=PNG_DATA_URL))
+        outcome = _call(db, client)
+        assert outcome.status == "rendered"
+    
+        entry = db.query(ProviderCall).one()
+        payload = json.loads(entry.output_payload or "{}")
+>       body = payload["response_body"]
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+E       KeyError: 'response_body'
+
+tests/test_sg159_scene_render_fix.py:179: KeyError
+________________ test_error_response_body_is_persisted_as_well _________________
+
+db = <sqlalchemy.orm.session.Session object at 0x711b88b960c0>
+
+    def test_error_response_body_is_persisted_as_well(db: Session) -> None:
+        client, _ = _client({"error": {"message": "rate limited"}}, post_status=429)
+        outcome = _call(db, client)
+        assert outcome.status == "failed"
+        entry = db.query(ProviderCall).one()
+        payload = json.loads(entry.output_payload or "{}")
+>       assert "rate limited" in payload["response_body"]
+                                 ^^^^^^^^^^^^^^^^^^^^^^^^
+E       KeyError: 'response_body'
+
+tests/test_sg159_scene_render_fix.py:193: KeyError
+_______________ test_billed_tool_failure_ledgers_reason_and_cost _______________
+
+db = <sqlalchemy.orm.session.Session object at 0x711b88e515e0>
+
+    def test_billed_tool_failure_ledgers_reason_and_cost(db: Session) -> None:
+        client, seen = _client(_tool_payload(tool_error="Generation failed due to content policy"))
+        outcome = _call(db, client)
+        assert outcome.status == "failed"
+        assert outcome.error_state is not None
+>       assert outcome.error_state.startswith("image_tool_failed:")
+E       AssertionError: assert False
+E        +  where False = <built-in method startswith of str object at 0x711b88bd0d70>('image_tool_failed:')
+E        +    where <built-in method startswith of str object at 0x711b88bd0d70> = 'image_url_missing'.startswith
+E        +      where 'image_url_missing' = SceneRenderOutcome(status='failed', refusal=None, status_code=200, response_id='gen-sg159-1', image_url=None, image_sh...t_tokens': 10, 'completion_tokens': 5, 'cost': 0.0003}, latency_ms=0.3654351457953453, error_state='image_url_missing').error_state
+
+tests/test_sg159_scene_render_fix.py:203: AssertionError
+______________ test_long_inline_base64_is_redacted_structure_kept ______________
+
+db = <sqlalchemy.orm.session.Session object at 0x711b8a4cc740>
+
+    def test_long_inline_base64_is_redacted_structure_kept(db: Session) -> None:
+        blob = "A" * 3000
+        payload = _tool_payload(image_url=PNG_DATA_URL)
+        payload["debug"] = {"blob": blob, "note": "kept"}
+        client, _ = _client(payload)
+        outcome = _call(db, client)
+        assert outcome.status == "rendered"
+        entry = db.query(ProviderCall).one()
+>       stored = json.loads(entry.output_payload or "{}")["response_body"]
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       KeyError: 'response_body'
+
+tests/test_sg159_scene_render_fix.py:221: KeyError
+_________________________ test_image_api_request_shape _________________________
+
+    def test_image_api_request_shape() -> None:
+>       request = scene.build_image_request(PHOTO, BRIEF, IMAGE_MODEL)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'app.services.scene.openrouter' has no attribute 'build_image_request'. Did you mean: 'build_scene_request'?
+
+tests/test_sg159_scene_render_fix.py:231: AttributeError
+____________________ test_image_api_render_stores_b64_image ____________________
+
+db = <sqlalchemy.orm.session.Session object at 0x711b88928e60>
+
+    def test_image_api_render_stores_b64_image(db: Session) -> None:
+        payload = {
+            "created": 1748372400,
+            "data": [{"b64_json": PNG_B64, "media_type": "image/png"}],
+            "usage": {"prompt_tokens": 0, "completion_tokens": 4175, "cost": 0.01},
+        }
+        client, seen = _client(payload)
+>       outcome = _call(db, client, transport="image_api")
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_sg159_scene_render_fix.py:249: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+db = <sqlalchemy.orm.session.Session object at 0x711b88928e60>
+client = <httpx.Client object at 0x711b8891b560>
+overrides = {'transport': 'image_api'}
+
+    def _call(db: Session, client: httpx.Client, **overrides: Any) -> scene.SceneRenderOutcome:
+        kwargs: dict[str, Any] = {
+            "db": db,
+            "household_id": HOUSEHOLD_ID,
+            "photo_ref": PHOTO,
+            "brief": BRIEF,
+            "image_model": IMAGE_MODEL,
+            "orchestrator": ORCHESTRATOR,
+            "worst_case_usd": WORST_CASE,
+            "authority": AUTHORITY,
+            "key": KEY,
+            "http_client": client,
+        }
+        kwargs.update(overrides)
+>       return scene.render_scene(**kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: render_scene() got an unexpected keyword argument 'transport'
+
+tests/test_sg159_scene_render_fix.py:127: TypeError
+_____________ test_image_api_200_without_image_ledgers_billed_miss _____________
+
+db = <sqlalchemy.orm.session.Session object at 0x711b889fdb20>
+
+    def test_image_api_200_without_image_ledgers_billed_miss(db: Session) -> None:
+        client, _ = _client({"created": 1, "data": [], "usage": {"cost": 0.01}})
+>       outcome = _call(db, client, transport="image_api")
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_sg159_scene_render_fix.py:263: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+db = <sqlalchemy.orm.session.Session object at 0x711b889fdb20>
+client = <httpx.Client object at 0x711b889fe090>
+overrides = {'transport': 'image_api'}
+
+    def _call(db: Session, client: httpx.Client, **overrides: Any) -> scene.SceneRenderOutcome:
+        kwargs: dict[str, Any] = {
+            "db": db,
+            "household_id": HOUSEHOLD_ID,
+            "photo_ref": PHOTO,
+            "brief": BRIEF,
+            "image_model": IMAGE_MODEL,
+            "orchestrator": ORCHESTRATOR,
+            "worst_case_usd": WORST_CASE,
+            "authority": AUTHORITY,
+            "key": KEY,
+            "http_client": client,
+        }
+        kwargs.update(overrides)
+>       return scene.render_scene(**kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: render_scene() got an unexpected keyword argument 'transport'
+
+tests/test_sg159_scene_render_fix.py:127: TypeError
+=========================== short test summary info ============================
+FAILED tests/test_sg159_scene_render_fix.py::test_extract_image_url_reads_b64_json_shape
+FAILED tests/test_sg159_scene_render_fix.py::test_extract_image_url_reads_result_imageb64_and_imageurl
+FAILED tests/test_sg159_scene_render_fix.py::test_extract_image_tool_error_surfaces_a_failed_tool
+FAILED tests/test_sg159_scene_render_fix.py::test_successful_render_persists_2xx_body_with_sha
+FAILED tests/test_sg159_scene_render_fix.py::test_error_response_body_is_persisted_as_well
+FAILED tests/test_sg159_scene_render_fix.py::test_billed_tool_failure_ledgers_reason_and_cost
+FAILED tests/test_sg159_scene_render_fix.py::test_long_inline_base64_is_redacted_structure_kept
+FAILED tests/test_sg159_scene_render_fix.py::test_image_api_request_shape - A...
+FAILED tests/test_sg159_scene_render_fix.py::test_image_api_render_stores_b64_image
+FAILED tests/test_sg159_scene_render_fix.py::test_image_api_200_without_image_ledgers_billed_miss
+10 failed, 2 passed in 0.74s

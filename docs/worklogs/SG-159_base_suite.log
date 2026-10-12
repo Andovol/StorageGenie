@@ -1,0 +1,278 @@
+........................................................................ [ 10%]
+........................................................................ [ 21%]
+....................FFF................................................. [ 31%]
+.....................................................................FF. [ 42%]
+........................................................................ [ 53%]
+........................................................................ [ 63%]
+...................................................F.................... [ 74%]
+........................................................................ [ 84%]
+........................................................................ [ 95%]
+..............................                                           [100%]
+=================================== FAILURES ===================================
+_______ test_v4_prompt_loads_through_real_loader_as_v3_plus_block[food] ________
+
+category = 'food'
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7301275f8b60>
+
+    @pytest.mark.parametrize("category", V4_CATEGORIES)
+    def test_v4_prompt_loads_through_real_loader_as_v3_plus_block(
+        category: str, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """v4 = v3 loader output + spec block + front-matter bump; v3 still on disk."""
+>       block = _spec_block()
+                ^^^^^^^^^^^^^
+
+tests/test_google_taxonomy.py:232: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_google_taxonomy.py:183: in _spec_block
+    text = SPEC_PATH.read_text(encoding="utf-8")
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.12/pathlib.py:1027: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/docs/superpowers/specs/2026-09-21-google-taxonomy-design.md')
+mode = 'r', buffering = -1, encoding = 'utf-8', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed to by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/docs/superpowers/specs/2026-09-21-google-taxonomy-design.md'
+
+/usr/local/lib/python3.12/pathlib.py:1013: FileNotFoundError
+_____ test_v4_prompt_loads_through_real_loader_as_v3_plus_block[medicine] ______
+
+category = 'medicine'
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7301275faf30>
+
+    @pytest.mark.parametrize("category", V4_CATEGORIES)
+    def test_v4_prompt_loads_through_real_loader_as_v3_plus_block(
+        category: str, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """v4 = v3 loader output + spec block + front-matter bump; v3 still on disk."""
+>       block = _spec_block()
+                ^^^^^^^^^^^^^
+
+tests/test_google_taxonomy.py:232: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_google_taxonomy.py:183: in _spec_block
+    text = SPEC_PATH.read_text(encoding="utf-8")
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.12/pathlib.py:1027: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/docs/superpowers/specs/2026-09-21-google-taxonomy-design.md')
+mode = 'r', buffering = -1, encoding = 'utf-8', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed to by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/docs/superpowers/specs/2026-09-21-google-taxonomy-design.md'
+
+/usr/local/lib/python3.12/pathlib.py:1013: FileNotFoundError
+_____ test_v4_prompt_loads_through_real_loader_as_v3_plus_block[cosmetics] _____
+
+category = 'cosmetics'
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7301275fb9e0>
+
+    @pytest.mark.parametrize("category", V4_CATEGORIES)
+    def test_v4_prompt_loads_through_real_loader_as_v3_plus_block(
+        category: str, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """v4 = v3 loader output + spec block + front-matter bump; v3 still on disk."""
+>       block = _spec_block()
+                ^^^^^^^^^^^^^
+
+tests/test_google_taxonomy.py:232: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_google_taxonomy.py:183: in _spec_block
+    text = SPEC_PATH.read_text(encoding="utf-8")
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.12/pathlib.py:1027: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/docs/superpowers/specs/2026-09-21-google-taxonomy-design.md')
+mode = 'r', buffering = -1, encoding = 'utf-8', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed to by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/docs/superpowers/specs/2026-09-21-google-taxonomy-design.md'
+
+/usr/local/lib/python3.12/pathlib.py:1013: FileNotFoundError
+________________ test_readme_runbook_commands_match_sg086_form _________________
+
+    def test_readme_runbook_commands_match_sg086_form() -> None:
+>       text = readme_text()
+               ^^^^^^^^^^^^^
+
+tests/test_runbook_commands.py:94: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_runbook_commands.py:38: in readme_text
+    return README_PATH.read_text(encoding="utf-8")
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.12/pathlib.py:1027: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/README.md'), mode = 'r', buffering = -1, encoding = 'utf-8'
+errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed to by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/README.md'
+
+/usr/local/lib/python3.12/pathlib.py:1013: FileNotFoundError
+________________ test_guard_flags_the_doubled_data_suffix_drift ________________
+
+    def test_guard_flags_the_doubled_data_suffix_drift() -> None:
+        """Seen-to-fail property: the historical ``/_data`` doubling must be caught."""
+>       text = readme_text()
+               ^^^^^^^^^^^^^
+
+tests/test_runbook_commands.py:104: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_runbook_commands.py:38: in readme_text
+    return README_PATH.read_text(encoding="utf-8")
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.12/pathlib.py:1027: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/README.md'), mode = 'r', buffering = -1, encoding = 'utf-8'
+errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed to by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/README.md'
+
+/usr/local/lib/python3.12/pathlib.py:1013: FileNotFoundError
+_____________ test_worked_example_artifact_matches_the_real_driver _____________
+
+    def test_worked_example_artifact_matches_the_real_driver() -> None:
+        """SG-097: the committed worked example IS the request the REAL driver builds.
+    
+        The expected URL/params are derived from the real module constants
+        (`PG-SC-12`), never a re-typed copy; the artifact is names-only (the key is
+        added at send time and never appears in the example).
+        """
+        example = jina_mod.build_jina_request("Jacobs Cronat Gold", "Jacobs")
+        expected_params = tuple(
+            [("site", site) for site in jina_mod.SITE_FILTERS]
+            + [
+                ("num", jina_mod.JINA_NUM),
+                ("type", jina_mod.JINA_TYPE),
+                ("gl", jina_mod.JINA_GL),
+            ]
+        )
+        assert example.params == expected_params
+        assert example.url == f"{jina_mod.JINA_GLOBAL_BASE_URL}Jacobs+Jacobs+Cronat+Gold"
+        full_request = example.url + "?" + urllib.parse.urlencode(example.params)
+>       artifact = WORKED_EXAMPLE.read_text(encoding="utf-8")
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_sg082_enrich_jina.py:583: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/local/lib/python3.12/pathlib.py:1027: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/docs/enrich-jina-request-example.md'), mode = 'r'
+buffering = -1, encoding = 'utf-8', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed to by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/docs/enrich-jina-request-example.md'
+
+/usr/local/lib/python3.12/pathlib.py:1013: FileNotFoundError
+=============================== warnings summary ===============================
+../usr/local/lib/python3.12/site-packages/fastapi/testclient.py:1
+  /usr/local/lib/python3.12/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+../usr/local/lib/python3.12/site-packages/starlette/testclient.py:53
+  /usr/local/lib/python3.12/site-packages/starlette/testclient.py:53: DeprecationWarning: The anyio.abc.BlockingPortal alias is deprecated, use anyio.from_thread.BlockingPortal instead.
+    _PortalFactoryType = Callable[[], AbstractContextManager[anyio.abc.BlockingPortal]]
+
+tests/test_candidates.py: 3 warnings
+tests/test_foundations.py: 3 warnings
+tests/test_saved_searches.py: 3 warnings
+tests/test_search.py: 3 warnings
+tests/test_sg048_name_optional.py: 6 warnings
+tests/test_sg100_snapshot_persistence.py: 3 warnings
+tests/test_sg113_locations.py: 3 warnings
+tests/test_sg114_relations.py: 3 warnings
+tests/test_signals.py: 3 warnings
+  /usr/local/lib/python3.12/site-packages/alembic/config.py:604: DeprecationWarning: No path_separator found in configuration; falling back to legacy splitting on spaces, commas, and colons for prepend_sys_path.  Consider adding path_separator=os to Alembic config.
+    util.warn_deprecated(
+
+../usr/local/lib/python3.12/site-packages/_pytest/cacheprovider.py:469
+  /usr/local/lib/python3.12/site-packages/_pytest/cacheprovider.py:469: PytestCacheWarning: could not create cache path /app/.pytest_cache/v/cache/nodeids: [Errno 30] Read-only file system: '/app/pytest-cache-files-dlye_frg'
+    config.cache.set("cache/nodeids", sorted(self.cached_nodeids))
+
+../usr/local/lib/python3.12/site-packages/_pytest/cacheprovider.py:423
+  /usr/local/lib/python3.12/site-packages/_pytest/cacheprovider.py:423: PytestCacheWarning: could not create cache path /app/.pytest_cache/v/cache/lastfailed: [Errno 30] Read-only file system: '/app/pytest-cache-files-p_uqpba4'
+    config.cache.set("cache/lastfailed", self.lastfailed)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/test_google_taxonomy.py::test_v4_prompt_loads_through_real_loader_as_v3_plus_block[food]
+FAILED tests/test_google_taxonomy.py::test_v4_prompt_loads_through_real_loader_as_v3_plus_block[medicine]
+FAILED tests/test_google_taxonomy.py::test_v4_prompt_loads_through_real_loader_as_v3_plus_block[cosmetics]
+FAILED tests/test_runbook_commands.py::test_readme_runbook_commands_match_sg086_form
+FAILED tests/test_runbook_commands.py::test_guard_flags_the_doubled_data_suffix_drift
+FAILED tests/test_sg082_enrich_jina.py::test_worked_example_artifact_matches_the_real_driver
+6 failed, 672 passed, 34 warnings in 61.46s (0:01:01)

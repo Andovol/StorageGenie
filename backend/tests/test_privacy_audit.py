@@ -229,6 +229,10 @@ def test_g0_single_http_client_and_send_site_full_scan() -> None:
     fresh-client branch) in `services/scene/openrouter.py`. Both send to the ONE
     frozen endpoint with the Authorization header added at send time; the
     inventory below now names them so the count stays visible.
+    SG-159 (owner-approved packet) adds the `image_api` branch to the same send
+    path (the dedicated `POST /api/v1/images` transport): the sender set and the
+    two call-site lines are unchanged (the same `client.post` line serves both
+    URLs); only their line numbers shift, and the pin below tracks the lines.
     """
     assert _http_client_files() == {
         "api/v1/enrich.py": ["import httpx"],
@@ -239,8 +243,8 @@ def test_g0_single_http_client_and_send_site_full_scan() -> None:
     }, f"unexpected HTTP clients: {_http_client_files()}"
     assert _send_sites() == [
         "services/providers/opencode_go.py:263",
-        "services/scene/openrouter.py:595",
-        "services/scene/openrouter.py:597",
+        "services/scene/openrouter.py:781",
+        "services/scene/openrouter.py:783",
     ], f"unexpected provider send sites: {_send_sites()}"
 
 
@@ -519,6 +523,6 @@ def test_g2_web_senders_are_the_two_researched_sources() -> None:
     assert excluded_hits == [], f"excluded detection source must stay absent: {excluded_hits}"
     assert _send_sites() == [
         "services/providers/opencode_go.py:263",
-        "services/scene/openrouter.py:595",
-        "services/scene/openrouter.py:597",
+        "services/scene/openrouter.py:781",
+        "services/scene/openrouter.py:783",
     ]

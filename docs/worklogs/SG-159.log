@@ -1,0 +1,21 @@
+# SG-159 worklog (append-only, material actions only)
+2026-10-12 14:16:25Z lane start (run-coder SG-159, budget 2100s, idle kill 900s; DOCKER_HOST=/run/dispatch-storagegenie-SG-159/docker.sock per RUNTIME_SOCKETS)
+14:17 G-L1: bash /home/andrei/storagegenie-contract/rules_check.sh -> G-L1 UNCHECKED "not checked out at a contract tag" exit 3 (F-SG157-2 stands); host VERSION 0.46.0 (packet expected 0.44.1; delta 0.44.2..0.46.0 known, adoption deferred); AGENTS recorded 0.44.1
+14:18 read packet docs/packets/SG-159-google-muse-rerenders.md (67 lines) verbatim == prompt; BASE resolved eab2c5a (clean)
+14:19 read SG-158 report/logs; live DB recon (13 evidence, 21 provider_call, 7 openrouter); photos P1/P2 confirmed (sha 052a5f7b.../b6e11ecc...)
+14:20 free endpoints API: google/gemini-3.1-flash-image chat via Google AI Studio(permitted)+Google(blocked), image_output 0.00006 (T0 MATCH); meta/muse-image chat via Meta(permitted), image_token/image_output 0.00000239520958083832; muse Image-API endpoints [] (zero); seed orchestrator Seed(permitted) re-verified
+14:21 wrote G0-fix into backend/app/services/scene/openrouter.py: response-body persistence (_persistable_response_body + _redact_long_strings), extractor hardening (_as_image_ref, imageB64/result/b64_json, extract_image_tool_error), extract_image_b64 + build_image_request + transport=image_api branch
+14:23 wrote backend/tests/test_sg159_scene_render_fix.py (12 tests) + backend/scripts/sg159_render.py (R2a image_api / R2b server_tool / R3 image_api)
+14:23 fail-pre (isolated base worktree eab2c5a + candidate test): 10 failed, 2 passed (committed log)
+14:24 candidate scene tests: 36 passed (12 new + SG-155 + SG-158); ruff clean
+14:24 routability transcript + spend-so-far guard projection written (docs/worklogs/SG-159_routability.log)
+14:24 R2a server_tool (google x seed): HTTP 200 billed 0.000802275, image_tokens=0, no artifact; ledger 01a13080-8b71-7851-8460-813b909b6034
+14:25 read persisted 2xx body -> contains ONLY rewritten text + reasoning; NO image field anywhere (F-SG159-1; the R2 root-cause evidence SG-158 lacked)
+14:27 R2a image_api (POST /api/v1/images, input_references): HTTP 429 Google AI Studio upstream quota; cost null; ledger 01a13082-aadb-7602-b9dd-f4d48bf9b720
+14:27 R2b over_cap refusal at packet's 0.30 worst case (3 unknown-cost rows x0.30 + 0.30 > 1.0); re-derived honest bounds (muse ~0.011 -> 0.05; google 1K ~0.077 -> 0.15), disclosed; rerun
+14:28 R2b server_tool (muse x seed): HTTP 200 billed 0.000875925, image_tokens=0, no artifact; ledger 01a13084-21bb-7850-b8c8-e61f4e85698d
+14:28 R2a image_api retry (rate-limit backoff): HTTP 429 again; cost null; ledger 01a13084-4367-7ad2-9984-bc7179dfb4f3; sends STOPPED (Google leg BLOCKED on upstream quota; Muse artifact not surfaced; no substitution per PG-IC-03)
+14:29 privacy-audit coupled pins updated (send-site lines shift to :781/:783; SG-159 named, CO-38)
+14:30 verify: ruff clean; mypy 41/9 (none in scene; touched-file clean); full suite production image mounted /app: candidate 6 failed/684 passed vs base 6 failed/672 passed = zero new reds, +12 new green (the 6 are path artifacts reading /docs and repo-root files outside the mount)
+14:33 production write counts read back (evidence 13/0 scene_render; provider_call 25 total, 7 openrouter; sum 0.002437125); Authorization grep over live logs = 0
+14:36 report + logs; commit/push; notes-ref receipt on WORK_HEAD; remote read-back

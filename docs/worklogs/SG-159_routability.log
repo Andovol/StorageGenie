@@ -1,0 +1,16 @@
+SG-159 free routability check (endpoints API, no spend) 2026-10-12 14:24:18Z
+account allowed-providers (from SG-158 live 404 body): xai meta seed baidu nvidia xiaomi minimax stealth deepseek moonshotai open-inference google-ai-studio
+--- google/gemini-3.1-flash-image (chat completions endpoints) ---
+provider: Google AI Studio | slug: Google AI Studio | pricing: {"prompt": "0.0000005", "completion": "0.000003", "image_output": "0.00006", "web_search": "0.014", "discount": 0}
+provider: Google | slug: Google | pricing: {"prompt": "0.0000005", "completion": "0.000003", "image_output": "0.00006", "web_search": "0.014", "discount": 0}
+--- meta/muse-image (chat completions endpoints) ---
+provider: Meta | slug: Meta | pricing: {"prompt": "0", "completion": "0", "image_token": "0.00000239520958083832", "image_output": "0.00000239520958083832", "discount": 0}
+--- bytedance-seed/seed-1.6-flash (chat completions endpoints) ---
+provider: Seed | slug: Seed | pricing: {"prompt": "0.000000075", "completion": "0.0000003", "discount": 0, "overrides": [{"min_prompt_tokens": 128000, "prompt": "0.0000001", "completion": "0.0000008"}]}
+--- meta/muse-image (dedicated Image API endpoints) ---
+image-api endpoints: []
+--- google/gemini-3.1-flash-image (dedicated Image API endpoints) ---
+provider: Google AI Studio | slug: google-ai-studio | input_references: {'type': 'range', 'min': 0, 'max': 14}
+provider: Google Vertex | slug: google-vertex/global | input_references: {'type': 'range', 'min': 0, 'max': 14}
+spend-so-far (live DB): 0.000758925 (SG-158, 1 billed; 2 unknown-cost 404s charged at worst case by the guard 2x0.30)
+this render worst case 0.30 -> projected 0.900758925 <= 1.0 cap: OK
