@@ -1,0 +1,52 @@
+SG-168 command log (chronological; unmetered local docker/curl/sqlite/git only)
+Dispatch: SG-168 — Close-out deploy rider: serve SG-167 theming (rebuild + one recreate + verify)
+Work dir: /home/andrei/StorageGenie   Base ref: automation (resolved 4db8da3b88d2fe3cbbef9ca04d2e935da93a40f5)
+Lane observed start: 2026-10-12T18:33:33Z (runtime dir /run/dispatch-storagegenie-SG-168)
+
+# -- orientation / contract
+cat /home/andrei/storagegenie-contract/VERSION                 # 0.46.0
+bash /home/andrei/storagegenie-contract/rules_check.sh         # exit 3 (G-L1 UNCHECKED local-tag shape; G-L5/G-L7 gh-unauth; 2x G-L6 BYTES)
+git -C /home/andrei/storagegenie-contract rev-parse HEAD       # 925cb575c0ef0e1c5a15b6112041a270c2dbd730
+git -C /home/andrei/storagegenie-contract ls-remote --tags origin  # contract-v0.46.0^{} == 925cb575... == HEAD (recorded == published)
+cat /home/andrei/storagegenie-contract/RULES.sha256            # 487841b1... RULES.md == installed
+tr '\0' ' ' < /proc/$PPID/cmdline                              # --model opencode-go/deepseek-v4.1-flash --variant high
+git rev-parse HEAD                                             # 4db8da3 (base)
+git show f7722fa -- frontend/src/routes/{ChatPage,InboxPage}.tsx  # SG-167 change on disk (unserved)
+
+# -- lane docker access (per-unit runtime socket)
+export DOCKER_HOST=unix:///run/dispatch-storagegenie-SG-168/docker.sock
+
+# -- G0 BEFORE (read-only)  [SG-168_before.log]
+docker inspect storagegenie-backend-1            # 41ac9fd1ed96… image sha256:0bed0cc4… RestartCount=0 created 2026-10-12T16:36:03Z
+curl -s http://127.0.0.1:8003/v1/health x6       # 6x 200 {"status":"ok","db":"ok","storage":"ok"}
+curl -H 'Host: storagegenie.dynv6.net' 127.0.0.1 # http:80 301 / https:443 401
+docker exec storagegenie-backend-1 alembic current  # 20260924_sg114_relation (head)
+docker exec storagegenie-backend-1 ls -la /app/static[/assets]  # index-C7iDBZmw.js 321242 B / index-DO0gjGV6.css 3911 B
+docker exec storagegenie-backend-1 sha256sum ...  # js a6c89a57…; css 37b25dbd…; index.html e394fd6b…
+sqlite3 -readonly data/db/storagegenie.db (28 tables)  # counts captured (provider_call=27)
+curl -X OPTIONS /v1/assets (preflight, no writes)  # 200 If-Match; 400 TRACE; 400 X-Evil-Header
+
+# -- G1 REBUILD (exactly one)  [SG-168_build.log]
+mkdir -p /tmp/opencode/buildx
+BUILDX_CONFIG=/tmp/opencode/buildx docker compose build backend  # BUILD_EXIT=0; 29s (18:34:38→18:35:07); 0bed0cc4… -> 85924507…
+#   frontend-build RUN npm run build: dist/assets/index-CaM3_fbA.js 321.20 kB (was index-C7iDBZmw.js 321242 B)
+
+# -- G2 RECREATE (exactly one)  [SG-168_recreate.log]
+docker compose up -d --no-deps backend             # REC_EXIT=0; one Recreate/Recreated/Starting/Started; 2s (18:35:11→18:35:13)
+docker inspect storagegenie-backend-1              # a31f940cdc23… image sha256:85924507… RestartCount=0
+
+# -- G2 AFTER verify (read-only)  [SG-168_after.log]
+curl -s http://127.0.0.1:8003/v1/health x6         # 6x 200 identical bodies (delta 0)
+curl -H 'Host: storagegenie.dynv6.net' 127.0.0.1   # http:80 301 / https:443 401 (unmoved)
+docker exec storagegenie-backend-1 alembic current # 20260924_sg114_relation (head) (unmoved)
+sqlite3 -readonly data/db/storagegenie.db (28 tables)  # every delta 0 (provider_call 27 == 27)
+docker exec storagegenie-backend-1 ls -la /app/static/assets  # index-CaM3_fbA.js 321317 B (new)
+docker exec storagegenie-backend-1 sha256sum ...   # js 2fe32c97…; css 37b25dbd… (css byte-identical, F-SG165-2); index.html a18b9684…
+docker exec storagegenie-backend-1 grep -F marker /app/static/assets/index-CaM3_fbA.js
+#   "Retry failed job"=1; "Resolve"=2; "Household"=10; themed class token "bg-background text-foreground border-border focus-ring"=24
+curl -X OPTIONS /v1/assets (preflight, no writes)  # 200 If-Match; 400 TRACE; 400 X-Evil-Header (lockdown live)
+curl GET /capture /inbox /catalog                  # 200 200 200
+
+# -- diff ceiling
+git status --porcelain                             # only docs/worklogs/SG-168_* (product diff EMPTY)
+git diff --stat 4db8da3 -- backend/app/models backend/alembic  # EMPTY (0 lines)
