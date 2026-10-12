@@ -190,11 +190,25 @@ not counted as coverage.
 
 ## Receipt
 
-Mechanism: note on `refs/notes/storagegenie-coder-reports`. Work commit pushed, the note
-published on it, and the note read back from the remote (mapped fetch, SG-158 precedent) —
-verbatim transcript:
+Mechanism: note on `refs/notes/storagegenie-coder-reports`. Work commit `8ee3562` pushed at
+14:37:15Z (elapsed 1250s of 2100s; the 1050s half-bound was MISSED — F-SG159-5; work began at
+lane start 14:16:25Z); the note was published on it and read back from the **remote** at
+14:37:27Z (elapsed 1262s — publish-before-bound NOT honored, disclosed). Verbatim transcript:
 
-    (filled in the receipt-evidence commit, after the remote read-back)
+    $ git push origin automation
+       eab2c5a..8ee3562  automation -> automation
+    $ git notes --ref=refs/notes/storagegenie-coder-reports add -m "Dispatch-ID: SG-159 | Report: docs/worklogs/SG-159_report.md | Work-HEAD: 8ee3562" 8ee3562
+    $ git push origin refs/notes/storagegenie-coder-reports
+       093ee52..027de2d  refs/notes/storagegenie-coder-reports -> refs/notes/storagegenie-coder-reports
+    $ git fetch origin refs/notes/storagegenie-coder-reports:refs/notes/sg159-fetched
+       * [new ref]         refs/notes/storagegenie-coder-reports -> refs/notes/sg159-fetched
+    $ git notes --ref=refs/notes/sg159-fetched show 8ee3562
+    Dispatch-ID: SG-159 | Report: docs/worklogs/SG-159_report.md | Work-HEAD: 8ee3562
+    note_show_exit=0
+
+`note=yes` — read back from the remote (mapped fetch), not the local store. The receipt-evidence
+commit (the tip carrying this section) is annotated with the same note body after it is
+committed (dual annotation, SG-092/SG-154/SG-157/SG-158 precedent).
 
 Production writes this slice: 4 `provider_call` rows, 0 Evidence rows, 0 others; spend
 $0.0016782 (arc $0.002437125).
