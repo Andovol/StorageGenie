@@ -10,4 +10,5 @@
 17:45 fail-pre (isolated base worktree .sg166-base @ 702b7a1 + candidate test): FileNotFoundError /app/scripts/sg166_render.py -> 1 failed (committed); pass-post candidate 1 passed; targeted scene 40 passed; ruff clean
 17:45 G1 ONE direct POST: POST /api/v1/images {model: meta/muse-image, prompt: frozen, input_references:[b64 data URL]} -> HTTP 200 RENDERED, cost $0.01, image/webp, evidence 01a13137-fe76-7f32-afc1-9e80421351b8, ledger 01a13137-fe82-77e1-95fa-a9c97aff75b4, image_sha256 daf069...
 17:46 post-state: evidence 15->16 (scene_render 1), provider_call openrouter 7->8 sum 0.002437125->0.012437125, null_cost 4 unchanged; view render for D7 judgment (label faithful, scene high quality)
-17:46 report + logs; commit/push; notes-ref receipt on WORK_HEAD; remote read-back
+17:46 view render for D7 judgment (label faithful, scene high quality); report + logs written
+17:47 work commit 53423a1 pushed (elapsed ~549s <= 1050s half-bound: publish-before-bound HONORED); notes-ref receipt published + read back from remote (mapped fetch)

@@ -64,10 +64,11 @@ BASE ref requested `automation` → resolved **`702b7a1`** (packet commit; workt
 - **F-SG166-6 — the render is WebP, not PNG.** The Image API returned `media_type: image/webp`
   (654 image tokens); the Evidence row is stored as `.../da/daf069…webp` (256612 bytes) via the
   existing `_IMAGE_MEDIA_EXTENSIONS`. No code touched.
-- **F-SG166-7 — publish-before-bound MISSED.** Lane start 17:38Z (socket-dir mtime); the 1050s
-  half-bound fell ≈17:55:30Z and was passed during G0/G1 (discovery + the one billed send +
-  verify). Actual elapsed at the work commit is quoted in Receipt. The 2100s lane budget
-  (≈18:13Z) was respected; nothing was killed.
+- **F-SG166-7 — publish-before-bound HONORED.** Lane start 17:38Z (socket-dir mtime); work commit
+  `53423a1` pushed **17:47:09Z = elapsed ~549s**, well inside the 1050s half-bound (half of
+  `RUN_BUDGET_S=2100`); the receipt note was read back from the remote ~560s. The 2100s lane
+  budget was respected; nothing was killed. (This is a correction to my own initial read — the
+  wall clock advanced far less than the serialized command log suggested.)
 
 ## (b) G0 — free discovery (`SG-166_discovery.log`)
 
@@ -183,10 +184,24 @@ record); the Evidence count moved 15→16 (not an empty set). No AC passed vacuo
 
 ## Receipt
 
-Mechanism: note on `refs/notes/storagegenie-coder-reports`. Work-HEAD `WORK_HEAD_PLACEHOLDER`;
-publish-before-bound: **MISSED** (F-SG166-7; elapsed quoted below). Verbatim transcript:
+Mechanism: note on `refs/notes/storagegenie-coder-reports`. Work-HEAD `53423a1`; pushed
+**17:47:09Z (elapsed ~549s of 2100s; the 1050s half-bound was HONORED)**. Verbatim transcript:
 
-    RECEIPT_PLACEHOLDER
+    $ git push origin automation
+       702b7a1..53423a1  automation -> automation
+    $ git notes --ref=refs/notes/storagegenie-coder-reports add -f -m "Dispatch-ID: SG-166 | Report: docs/worklogs/SG-166_report.md | Work-HEAD: 53423a1" 53423a1
+    $ git push origin refs/notes/storagegenie-coder-reports
+       e25b96b..9f1c4b7  refs/notes/storagegenie-coder-reports -> refs/notes/storagegenie-coder-reports
+    $ git fetch origin refs/notes/storagegenie-coder-reports:refs/notes/sg166-fetched
+       * [new ref]         refs/notes/storagegenie-coder-reports -> refs/notes/sg166-fetched
+    $ git notes --ref=refs/notes/sg166-fetched show 53423a1
+    Dispatch-ID: SG-166 | Report: docs/worklogs/SG-166_report.md | Work-HEAD: 53423a1
+    note_show_exit=0
+
+`note=yes` — read back from the remote (mapped fetch), not the local store. The receipt-evidence
+commit (the tip carrying this section) is annotated with the same note body after it is committed
+(dual annotation, SG-092/SG-154/SG-157/SG-158/SG-159 precedent). Production writes this slice:
++1 Evidence + 1 `provider_call` + 1 `audit_event`; spend $0.01 (arc $0.012437125).
 
 ## UNCLEAR
 
@@ -201,5 +216,5 @@ publish-before-bound: **MISSED** (F-SG166-7; elapsed quoted below). Verbatim tra
   render says yes for Muse; nothing here re-opens Google, retired by D-1012-3); (2) the
   `pillow_heif`-missing repo venv (F-SG144-1 lineage) still forces suite runs into the production
   image; (3) the literal account `allowed-providers` enumeration remains owner/management-key-only;
-  (4) publish-before-bound was missed again (F-SG166-7) — free-discovery + one live send + verify
-  exceeds the packet's ~600s estimate once G0 reads and the render are serialized.
+  (4) publish-before-bound was HONORED this slice (~549s ≤ 1050s) — the free-discovery + one live
+  send + verify fit, unlike SG-158/159.
