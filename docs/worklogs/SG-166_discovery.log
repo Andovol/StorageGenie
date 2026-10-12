@@ -1,0 +1,139 @@
+key_present: True
+
+=== GET /api/v1/images/models :: HTTP 200 ===
+content-type: application/json
+{"data":[{"id":"google/gemini-nano-banana-2.1","name":"Google: Nano Banana 2.1","description":"Nano Banana 2.1 (Gemini Nano Banana 2.1) is Google's image generation and editing model on the Flash tier, succeeding Nano Banana 2 and Nano Banana Pro. It improves product recontextualization,...","created":1791300825,"architecture":{"input_modalities":["image","text"],"output_modalities":["image","text"]},"supported_parameters":{"resolution":{"type":"enum","values":["1K","2K","4K"]},"aspect_ratio":{"type":"enum","values":["1:1","1:4","1:8","2:3","3:2","3:4","4:1","4:3","4:5","5:4","8:1","9:16","16:9","21:9"]},"n":{"type":"range","min":1,"max":1},"input_references":{"type":"range","min":0,"max":14}},"supports_streaming":false,"endpoints":"/api/v1/images/models/google/gemini-nano-banana-2.1/endpoints"},{"id":"tencent/hy-image-v3.5-preview","name":"Tencent: Hy Image 3.5 Preview","description":"Hy Image 3.5 Preview is a unified image generation and editing model from Tencent. It handles text-to-image, image-to-image, and multi-turn editing through one endpoint, taking up to 20 reference images...","created":1791232017,"architecture":{"input_modalities":["text","image"],"output_modalities":["image"]},"supported_parameters":{"resolution":{"type":"enum","values":["1K","1.5K","2K","4K"]},"aspect_ratio":{"type":"enum","values":["1:1","1:2","1:4","2:1","2:3","3:2","3:4","4:1","4:3","4:5","5:4","9:16","16:9"]},"n":{"type":"range","min":1,"max":1},"input_references":{"type":"range","min":0,"max":20},"seed":{"type":"boolean"},"size":{"type":"boolean"}},"supports_streaming":false,"endpoints":"/api/v1/images/models/tencent/hy-image-v3.5-preview/endpoints"},{"id":"bytedance-seed/seedream-5-0-flash","name":"ByteDance Seed: Seedream 5.0 Flash","description":"Seedream 5.0 Flash is an image generation and editing model from ByteDance Seed. It is the fast, cost-efficient tier of the Seedream 5.0 family, suited for high-volume production and interactive...","created":1790889880,"architecture":{"input_modalities":["text","image"],"output_modalities":["image"]},"supported_parameters":{"resolution":{"type":"enum","values":["1K","2K"]},"aspect_ratio":{"type":"enum","values":["1:1","1:2","2:1","2:3","3:2","3:4","4:3","4:5","5:4","9:16","16:9","9:19.5","19.5:9","9:20","20:9","9:21","21:9","auto"]},"n":{"type":"range","min":1,"max":1},"input_references":{"type":"range","min":0,"max":14},"seed":{"type":"boolean"}},"supports_streaming":false,"endpoints":"/api/v1/images/models/bytedance-seed/seedream-5-0-flash/endpoints"},{"id":"black-forest-labs/flux-3-image","name":"Black Forest Labs: FLUX.3 Image","description":"FLUX.3 Image is Black Forest Labs' flagship image generation and editing model. It handles text-to-image and multi-reference editing with up to 10 input images, and renders at fixed resolution tiers...","created":1790885807,"architecture":{"input_modalities":["text","image"],"output_modalities":["image"]},"supported_parameters":{"resolution":{"type":"enum","values":["768","1K","1.5K","2K","4K"]},"aspect_ratio":{"type":"enum","values":["21:9","2:1","16:9","3:2","7:5","4:3","5:4","1:1","4:5","3:4","5:7","2:3","9:16","1:2","9:21","auto"]},"n":{"type":"range","min":1,"max":1},"input_references":{"type":"range","min":0,"max":10}},"supports_streaming":false,"endpoints":"/api/v1/images/models/black-forest-labs/flux-3-image/endpoints"},{"id":"inclusionai/ming-image-0.1-design-layer","name":"inclusionAI: Ming Image 0.1 Design Layer","description":"Ming Image 0.1 Design Layer is an image-to-image model from inclusionAI that decomposes a flattened design image into separate RGBA layers, such as a background layer and foreground elements, and...","created":1790201839,"architecture":{"input_modalities":["text","image"],"output_modalities":["image"]},"supported_parameters":{"output_format":{"type":"enum","values":["png","webp"]},"n":{"type":"range","min":1,"max":1},"input_references":{"type":"range","min":1,"max":1},"size":{"type":"boolean"}},"supports_streaming":false,"endpoints":"/api/v1/images/models/inclusionai/ming-image-0.1-design-layer/endpoints"},{"id":"recraft/recraft-v4.1-flash","name":"Recraft: Recraft V4.1 Flash","description":"Recraft V4.1 Flash is a text-to-image model from Recraft, the speed and cost tier of the V4.1 family. It generates ~1K raster images in about 1.5 seconds end to end,...","created":1790177946,"architecture":{"input_modalities":["text"],"output_modalities":["image"]},"supported_parameters":{"aspect_ratio":{"type":"enum","values":["1:1","4:3","3:4","16:9","9:16","auto"]},"n":{"type":"range","min":1,"max":6}},"supports_streaming":false,"endpoints":"/api/v1/images/models/recraft/recraft-v4.1-flash/endpoints"},{"id":"inclusionai/ming-image-0.1-design","name":"inclusionAI: Ming Image 0.1 Design","description":"Ming Image 0.1 Design is a text-to-image model from inclusionAI aimed at graphic-design output, with an emphasis on legible text rendering inside the generated image. It generates from a prompt...","created":1790095711,"architecture":{"input_modalities":["text"],"output_modalities":["image"]},"supported_parameters":{"output_format":{"type":"enum","values":["png","jpeg","webp"]},"n":{"type":"range","min":1,"max":1},"input_references":{"type":"range","min":0,"max":0},"size":{"type":"boolean"}},"supports_streaming":false,"endpoints":"/api/v1/images/models/inclusionai/ming-image-0.1-design/endpoints"},{"id":"openai/gpt-image-2.5-sunburst","name":"OpenAI: GPT Image 2.5 Sunburst","description":"GPT Image 2.5 Sunburst is an image generation and editing model from OpenAI, positioned as the precision-oriented tier of the GPT Image 2.5 series. It is suited to detailed creative...","created":1788916368,"architecture":{"input_modalities":["text","image"],"output_modalities":["image"]},"supported_parameters":{"aspect_ratio":{"type":"enum","values":["1:1","3:2","2:3","4:3","3:4","16:9","9:16","21:9","auto"]},"quality":{"type":"enum","values":["auto","low","medium","high","xhigh","max"]},"background":{"type
+image_model_count: 59
+muse_slugs_in_images_models: ['meta/muse-image']
+IMG_MODEL google/gemini-nano-banana-2.1 | endpoints /api/v1/images/models/google/gemini-nano-banana-2.1/endpoints
+IMG_MODEL tencent/hy-image-v3.5-preview | endpoints /api/v1/images/models/tencent/hy-image-v3.5-preview/endpoints
+IMG_MODEL bytedance-seed/seedream-5-0-flash | endpoints /api/v1/images/models/bytedance-seed/seedream-5-0-flash/endpoints
+IMG_MODEL black-forest-labs/flux-3-image | endpoints /api/v1/images/models/black-forest-labs/flux-3-image/endpoints
+IMG_MODEL inclusionai/ming-image-0.1-design-layer | endpoints /api/v1/images/models/inclusionai/ming-image-0.1-design-layer/endpoints
+IMG_MODEL recraft/recraft-v4.1-flash | endpoints /api/v1/images/models/recraft/recraft-v4.1-flash/endpoints
+IMG_MODEL inclusionai/ming-image-0.1-design | endpoints /api/v1/images/models/inclusionai/ming-image-0.1-design/endpoints
+IMG_MODEL openai/gpt-image-2.5-sunburst | endpoints /api/v1/images/models/openai/gpt-image-2.5-sunburst/endpoints
+IMG_MODEL openai/gpt-image-2.5-flare | endpoints /api/v1/images/models/openai/gpt-image-2.5-flare/endpoints
+IMG_MODEL microsoft/mai-image-2.6 | endpoints /api/v1/images/models/microsoft/mai-image-2.6/endpoints
+IMG_MODEL microsoft/mai-image-2.6-flash | endpoints /api/v1/images/models/microsoft/mai-image-2.6-flash/endpoints
+IMG_MODEL meta/muse-image | endpoints /api/v1/images/models/meta/muse-image/endpoints
+IMG_MODEL recraft/recraft-v4-styles-pro | endpoints /api/v1/images/models/recraft/recraft-v4-styles-pro/endpoints
+IMG_MODEL recraft/recraft-v4-styles-vector | endpoints /api/v1/images/models/recraft/recraft-v4-styles-vector/endpoints
+IMG_MODEL recraft/recraft-v4-styles-pro-vector | endpoints /api/v1/images/models/recraft/recraft-v4-styles-pro-vector/endpoints
+IMG_MODEL recraft/recraft-v4-styles | endpoints /api/v1/images/models/recraft/recraft-v4-styles/endpoints
+IMG_MODEL bytedance-seed/seedream-5-0-lite | endpoints /api/v1/images/models/bytedance-seed/seedream-5-0-lite/endpoints
+IMG_MODEL bytedance-seed/seedream-5-0-pro | endpoints /api/v1/images/models/bytedance-seed/seedream-5-0-pro/endpoints
+IMG_MODEL x-ai/grok-imagine-image-2.0 | endpoints /api/v1/images/models/x-ai/grok-imagine-image-2.0/endpoints
+IMG_MODEL qwen/qwen-image-3-pro | endpoints /api/v1/images/models/qwen/qwen-image-3-pro/endpoints
+IMG_MODEL qwen/qwen-image-3 | endpoints /api/v1/images/models/qwen/qwen-image-3/endpoints
+IMG_MODEL microsoft/mai-image-2.5-pro | endpoints /api/v1/images/models/microsoft/mai-image-2.5-pro/endpoints
+IMG_MODEL krea/krea-2-large | endpoints /api/v1/images/models/krea/krea-2-large/endpoints
+IMG_MODEL krea/krea-2-medium | endpoints /api/v1/images/models/krea/krea-2-medium/endpoints
+IMG_MODEL krea/krea-2-medium-turbo | endpoints /api/v1/images/models/krea/krea-2-medium-turbo/endpoints
+IMG_MODEL google/gemini-3.1-flash-lite-image | endpoints /api/v1/images/models/google/gemini-3.1-flash-lite-image/endpoints
+IMG_MODEL openai/gpt-image-2 | endpoints /api/v1/images/models/openai/gpt-image-2/endpoints
+IMG_MODEL openai/gpt-image-1-mini | endpoints /api/v1/images/models/openai/gpt-image-1-mini/endpoints
+IMG_MODEL openai/gpt-image-1 | endpoints /api/v1/images/models/openai/gpt-image-1/endpoints
+IMG_MODEL google/gemini-3.1-flash-image | endpoints /api/v1/images/models/google/gemini-3.1-flash-image/endpoints
+IMG_MODEL google/gemini-3-pro-image | endpoints /api/v1/images/models/google/gemini-3-pro-image/endpoints
+IMG_MODEL sourceful/riverflow-v2.5-pro | endpoints /api/v1/images/models/sourceful/riverflow-v2.5-pro/endpoints
+IMG_MODEL sourceful/riverflow-v2.5-fast | endpoints /api/v1/images/models/sourceful/riverflow-v2.5-fast/endpoints
+IMG_MODEL microsoft/mai-image-2.5 | endpoints /api/v1/images/models/microsoft/mai-image-2.5/endpoints
+IMG_MODEL x-ai/grok-imagine-image-quality | endpoints /api/v1/images/models/x-ai/grok-imagine-image-quality/endpoints
+IMG_MODEL recraft/recraft-v4.1-pro-vector | endpoints /api/v1/images/models/recraft/recraft-v4.1-pro-vector/endpoints
+IMG_MODEL recraft/recraft-v4.1-vector | endpoints /api/v1/images/models/recraft/recraft-v4.1-vector/endpoints
+IMG_MODEL recraft/recraft-v4.1-utility-pro | endpoints /api/v1/images/models/recraft/recraft-v4.1-utility-pro/endpoints
+IMG_MODEL recraft/recraft-v4.1-utility | endpoints /api/v1/images/models/recraft/recraft-v4.1-utility/endpoints
+IMG_MODEL recraft/recraft-v4.1-pro | endpoints /api/v1/images/models/recraft/recraft-v4.1-pro/endpoints
+IMG_MODEL recraft/recraft-v4.1 | endpoints /api/v1/images/models/recraft/recraft-v4.1/endpoints
+IMG_MODEL recraft/recraft-v4-pro-vector | endpoints /api/v1/images/models/recraft/recraft-v4-pro-vector/endpoints
+IMG_MODEL recraft/recraft-v4-vector | endpoints /api/v1/images/models/recraft/recraft-v4-vector/endpoints
+IMG_MODEL recraft/recraft-v4-pro | endpoints /api/v1/images/models/recraft/recraft-v4-pro/endpoints
+IMG_MODEL recraft/recraft-v4 | endpoints /api/v1/images/models/recraft/recraft-v4/endpoints
+IMG_MODEL recraft/recraft-v3 | endpoints /api/v1/images/models/recraft/recraft-v3/endpoints
+IMG_MODEL openai/gpt-5.4-image-2 | endpoints /api/v1/images/models/openai/gpt-5.4-image-2/endpoints
+IMG_MODEL google/gemini-3.1-flash-image-preview | endpoints /api/v1/images/models/google/gemini-3.1-flash-image-preview/endpoints
+IMG_MODEL sourceful/riverflow-v2-pro | endpoints /api/v1/images/models/sourceful/riverflow-v2-pro/endpoints
+IMG_MODEL sourceful/riverflow-v2-fast | endpoints /api/v1/images/models/sourceful/riverflow-v2-fast/endpoints
+IMG_MODEL black-forest-labs/flux.2-klein-4b | endpoints /api/v1/images/models/black-forest-labs/flux.2-klein-4b/endpoints
+IMG_MODEL bytedance-seed/seedream-4.5 | endpoints /api/v1/images/models/bytedance-seed/seedream-4.5/endpoints
+IMG_MODEL black-forest-labs/flux.2-max | endpoints /api/v1/images/models/black-forest-labs/flux.2-max/endpoints
+IMG_MODEL black-forest-labs/flux.2-flex | endpoints /api/v1/images/models/black-forest-labs/flux.2-flex/endpoints
+IMG_MODEL black-forest-labs/flux.2-pro | endpoints /api/v1/images/models/black-forest-labs/flux.2-pro/endpoints
+IMG_MODEL google/gemini-3-pro-image-preview | endpoints /api/v1/images/models/google/gemini-3-pro-image-preview/endpoints
+IMG_MODEL openai/gpt-5-image-mini | endpoints /api/v1/images/models/openai/gpt-5-image-mini/endpoints
+IMG_MODEL openai/gpt-5-image | endpoints /api/v1/images/models/openai/gpt-5-image/endpoints
+IMG_MODEL google/gemini-2.5-flash-image | endpoints /api/v1/images/models/google/gemini-2.5-flash-image/endpoints
+
+=== GET /api/v1/images/models/meta/muse-image/endpoints :: HTTP 200 ===
+content-type: application/json
+{"id":"meta/muse-image","endpoints":[]}
+
+=== GET /api/v1/models?output_modalities=image :: HTTP 200 ===
+content-type: application/json
+{"data":[{"id":"google/gemini-nano-banana-2.1","canonical_slug":"google/gemini-nano-banana-2.1-20261006","hugging_face_id":null,"name":"Google: Nano Banana 2.1","created":1791300825,"description":"Nano Banana 2.1 (Gemini Nano Banana 2.1) is Google's image generation and editing model on the Flash tier, succeeding Nano Banana 2 and Nano Banana Pro. It improves product recontextualization,...","context_length":65536,"architecture":{"modality":"text+image->text+image","input_modalities":["image","text"],"output_modalities":["image","text"],"tokenizer":"Gemini","instruct_type":null},"pricing":{"prompt":"0.0000015","completion":"0.0000075","image_output":"0.00003","web_search":"0.014"},"top_provider":{"context_length":65536,"max_completion_tokens":58982,"is_moderated":false},"per_request_limits":null,"supported_parameters":["include_reasoning","max_tokens","reasoning","reasoning_effort","response_format","seed","structured_outputs","temperature","tool_choice","tools","top_p"],"default_parameters":{},"supported_voices":null,"knowledge_cutoff":null,"expiration_date":null,"links":{"details":"/api/v1/models/google/gemini-nano-banana-2.1-20261006/endpoints"},"reasoning":{"mandatory":false,"default_enabled":true,"supported_efforts":["high","minimal"],"default_effort":"minimal"}},{"id":"tencent/hy-image-v3.5-preview","canonical_slug":"tencent/hy-image-v3.5-preview-20260922","hugging_face_id":null,"name":"Tencent: Hy Image 3.5 Preview","created":1791232017,"description":"Hy Image 3.5 Prev
+general_image_model_count: 61
+muse_in_general: ['meta/muse-image']
+
+=== GET /api/v1/key :: HTTP 200 ===
+content-type: application/json
+{"data":{"label":"sk-or-v1-329...b51","is_management_key":false,"is_provisioning_key":false,"limit":5,"limit_reset":null,"limit_remaining":4.997562875,"include_byok_in_limit":false,"budgets":[{"scope":"key_limit","guardrail_id":null,"budget_id":null,"limit_usd":5,"spend_usd":0.002437125,"remaining_usd":4.997562875,"reset_interval":null,"resets_at":null,"include_byok":false}],"effective_budget":{"scope":"key_limit","guardrail_id":null,"budget_id":null,"limit_usd":5,"spend_usd":0.002437125,"remaining_usd":4.997562875,"reset_interval":null,"resets_at":null,"include_byok":false},"usage":0.002437125,"usage_daily":0.0016782,"usage_weekly":0.0016782,"usage_monthly":0.002437125,"byok_usage":0,"byok_usage_daily":0,"byok_usage_weekly":0,"byok_usage_monthly":0,"is_free_tier":false,"expires_at":null,"creator_user_id":"user_2mUAw1vaqb6irdLXoKywacJtYtP","organization_id":null,"workspace_id":"a45827b6-07c2-5570-b48e-6127731945da","allowed_data_regions":["global"],"free_model_daily_requests":{"used":2,"limit":1000,"remaining":998},"rate_limit":{"requests":-1,"interval":"10s","note":"This field is deprecated and safe to ignore."}}}
+
+=== GET /api/v1/auth/key :: HTTP 200 ===
+content-type: application/json
+{"data":{"label":"sk-or-v1-329...b51","is_management_key":false,"is_provisioning_key":false,"limit":5,"limit_reset":null,"limit_remaining":4.997562875,"include_byok_in_limit":false,"budgets":[{"scope":"key_limit","guardrail_id":null,"budget_id":null,"limit_usd":5,"spend_usd":0.002437125,"remaining_usd":4.997562875,"reset_interval":null,"resets_at":null,"include_byok":false}],"effective_budget":{"scope":"key_limit","guardrail_id":null,"budget_id":null,"limit_usd":5,"spend_usd":0.002437125,"remaining_usd":4.997562875,"reset_interval":null,"resets_at":null,"include_byok":false},"usage":0.002437125,"usage_daily":0.0016782,"usage_weekly":0.0016782,"usage_monthly":0.002437125,"byok_usage":0,"byok_usage_daily":0,"byok_usage_weekly":0,"byok_usage_monthly":0,"is_free_tier":false,"expires_at":null,"creator_user_id":"user_2mUAw1vaqb6irdLXoKywacJtYtP","organization_id":null,"workspace_id":"a45827b6-07c2-5570-b48e-6127731945da","allowed_data_regions":["global"],"free_model_daily_requests":{"used":2,"limit":1000,"remaining":998},"rate_limit":{"requests":-1,"interval":"10s","note":"This field is deprecated and safe to ignore."}}}
+
+=== GET /api/v1/models/meta/muse-image/endpoints (chat) :: HTTP 200 ===
+content-type: application/json
+{"data":{"id":"meta/muse-image","name":"Meta: Muse Image","created":1787764532,"description":"Muse Image is an agentic image generation model from Meta that generates and edits images from text and reference images. Unlike single-pass image models, it reasons before it renders, breaking...","architecture":{"tokenizer":"Other","instruct_type":null,"modality":"text+image->image","input_modalities":["text","image"],"output_modalities":["image"]},"endpoints":[{"name":"Meta | meta/muse-image-1.0-eval-20260824","model_id":"meta/muse-image","model_name":"Meta: Muse Image","context_length":65536,"pricing":{"prompt":"0","completion":"0","image_token":"0.00000239520958083832","image_output":"0.00000239520958083832","discount":0},"provider_name":"Meta","tag":"meta","quantization":"unknown","max_completion_tokens":58982,"max_prompt_tokens":null,"supported_parameters":["max_tokens","repetition_penalty","top_k","temperature","top_p"],"supports_tool_choice":{"none":true,"auto":true,"required":true,"function":true},"status":0,"uptime_last_30m":100,"uptime_last_5m":100,"uptime_last_1d":99.93055555555556,"supports_implicit_caching":false,"native_tools":{},"supports_voice_cloning":false,"supports_multiple_audio_references":false,"supports_image_reference":false,"latency_last_30m":{"p50":21219.5,"p75":27253.75,"p90":34508.20000000001,"p99":50491.09000000004},"throughput_last_30m":{"p50":0,"p75":0,"p90":0,"p99":0},"perf_last_30m_by_workload":{"image_generation":{"latency":{"p50":21219.5,"p75":27253.75,"p90":34508.20000000001,"p99":50491.09000000004},"throughput":null,"request_count":2634}}}]}}
+
+### GET /providers -> 200 (26066 chars)
+{"data":[{"name":"Ionstream","slug":"ionstream","privacy_policy_url":"https://ionstream.ai/privacy-policy/","terms_of_service_url":"https://ionstream.ai/terms-and-conditions/","status_page_url":null,"headquarters":"US","datacenters":["US"]},{"name":"Moonshot AI","slug":"moonshotai","privacy_policy_url":"https://platform.moonshot.ai/docs/agreement/userprivacy","terms_of_service_url":"https://platform.moonshot.ai/docs/agreement/modeluse","status_page_url":null,"headquarters":"SG","datacenters":["SG"]},{"name":"Arcee AI","slug":"arcee-ai","privacy_policy_url":null,"terms_of_service_url":null,"status_page_url":null,"headquarters":"US","datacenters":["US"]},{"name":"Deepgram","slug":"deepgram","privacy_policy_url":"https://deepgram.com/privacy","terms_of_service_url":"https://deepgram.com/terms","status_page_url":null,"headquarters":null,"datacenters":[]},{"name":"Morph","slug":"morph","privacy_policy_url":"https://morphllm.com/privacy","terms_of_service_url":"https://www.morphllm.com/privacy/tos","status_page_url":null,"headquarters":"US","datacenters":["US"]},{"name":"StepFun","slug":"stepfun","privacy_policy_url":null,"terms_of_service_url":"https://platform.stepfun.ai/docs/en/agreem
+
+### GET /models/providers -> 404 (44 chars)
+{"error":{"message":"Not Found","code":404}}
+
+### GET /credits -> 200 (55 chars)
+{"data":{"total_credits":10,"total_usage":4.753877106}}
+
+### GET /me -> 404 (44 chars)
+{"error":{"message":"Not Found","code":404}}
+
+### GET /account -> 404 (44 chars)
+{"error":{"message":"Not Found","code":404}}
+
+### GET /user -> 404 (44 chars)
+{"error":{"message":"Not Found","code":404}}
+
+### GET /organization -> 401 (57 chars)
+{"error":{"message":"Invalid management key","code":401}}
+
+### GET /guardrails -> 401 (57 chars)
+{"error":{"message":"Invalid management key","code":401}}
+
+### GET /images/models/meta/muse-image -> 404 (13 chars)
+404 Not Found
+
+### GET /models/meta/muse-image -> 404 (44 chars)
+{"error":{"message":"Not Found","code":404}}
+
+### GET /auth/key -> 200 (1132 chars)
+{"data":{"label":"sk-or-v1-329...b51","is_management_key":false,"is_provisioning_key":false,"limit":5,"limit_reset":null,"limit_remaining":4.997562875,"include_byok_in_limit":false,"budgets":[{"scope":"key_limit","guardrail_id":null,"budget_id":null,"limit_usd":5,"spend_usd":0.002437125,"remaining_usd":4.997562875,"reset_interval":null,"resets_at":null,"include_byok":false}],"effective_budget":{"scope":"key_limit","guardrail_id":null,"budget_id":null,"limit_usd":5,"spend_usd":0.002437125,"remaining_usd":4.997562875,"reset_interval":null,"resets_at":null,"include_byok":false},"usage":0.002437125,"usage_daily":0.0016782,"usage_weekly":0.0016782,"usage_monthly":0.002437125,"byok_usage":0,"byok_usage_daily":0,"byok_usage_weekly":0,"byok_usage_monthly":0,"is_free_tier":false,"expires_at":null,"creator_user_id":"user_2mUAw1vaqb6irdLXoKywacJtYtP","organization_id":null,"workspace_id":"a45827b6-07c2-5570-b48e-6127731945da","allowed_data_regions":["global"],"free_model_daily_requests":{"used":2,"limit":1000,"remaining":998},"rate_limit":{"requests":-1,"interval":"10s","note":"This field is deprecated and safe to ignore."}}}
+
+### GET /key -> 200 (1132 chars)
+{"data":{"label":"sk-or-v1-329...b51","is_management_key":false,"is_provisioning_key":false,"limit":5,"limit_reset":null,"limit_remaining":4.997562875,"include_byok_in_limit":false,"budgets":[{"scope":"key_limit","guardrail_id":null,"budget_id":null,"limit_usd":5,"spend_usd":0.002437125,"remaining_usd":4.997562875,"reset_interval":null,"resets_at":null,"include_byok":false}],"effective_budget":{"scope":"key_limit","guardrail_id":null,"budget_id":null,"limit_usd":5,"spend_usd":0.002437125,"remaining_usd":4.997562875,"reset_interval":null,"resets_at":null,"include_byok":false},"usage":0.002437125,"usage_daily":0.0016782,"usage_weekly":0.0016782,"usage_monthly":0.002437125,"byok_usage":0,"byok_usage_daily":0,"byok_usage_weekly":0,"byok_usage_monthly":0,"is_free_tier":false,"expires_at":null,"creator_user_id":"user_2mUAw1vaqb6irdLXoKywacJtYtP","organization_id":null,"workspace_id":"a45827b6-07c2-5570-b48e-6127731945da","allowed_data_regions":["global"],"free_model_daily_requests":{"used":2,"limit":1000,"remaining":998},"rate_limit":{"requests":-1,"interval":"10s","note":"This field is deprecated and safe to ignore."}}}
+
+### GET /models/user -> 200
+count: 92
+muse: ['meta/muse-wonder', 'meta/muse-spark-1.3-contributor', 'meta/muse-spark-1.3', 'meta/muse-spark-1.2-contributor', 'meta/muse-spark-1.2', 'meta/muse-spark-1.1']
+openai: []
+google: ['google/gemini-nano-banana-2.1', 'google/gemini-3.8-flash', 'google/gemini-3.7-flash', 'google/gemini-3.6-flash', 'google/gemini-3.5-flash-lite', 'google/gemini-3.1-flash-lite-image', 'google/gemini-3.1-flash-image', 'google/gemini-3-pro-image']
+
+### GET /models/user?output_modalities=image -> 200
+count: 15
+muse: ['meta/muse-image']
+openai: []
+google: ['google/gemini-nano-banana-2.1', 'google/gemini-3.1-flash-lite-image', 'google/gemini-3.1-flash-image', 'google/gemini-3-pro-image', 'google/gemini-3.1-flash-image-preview', 'google/gemini-3-pro-image-preview']
+
+### GET /organization/settings -> 401
+{"error": {"message": "Unauthorized", "code": 401}}

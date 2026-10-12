@@ -1,0 +1,8 @@
+SG-166 verify — 2026-10-12T17:46:05Z
+--- targeted scene tests (candidate, production image) ---
+........................................                                 [100%]
+40 passed in 1.27s
+--- ruff (new files) ---
+All checks passed!
+--- Authorization leak grep over SG-166 logs ---
+docs/worklogs/SG-166_verify.log:7:--- Authorization leak grep over SG-166 logs ---

@@ -1,0 +1,13 @@
+# SG-166 worklog (append-only, material actions only)
+2026-10-12 17:38Z lane start (run-coder SG-166, budget 2100s, idle kill 900s; DOCKER_HOST=/run/dispatch-storagegenie-SG-166/docker.sock per RUNTIME_SOCKETS)
+17:40 G-L1: bash /home/andrei/storagegenie-contract/rules_check.sh -> exit 3 G-L1 UNCHECKED "not checked out at a contract tag" (F-SG157-2 stands); host VERSION 0.46.0 == AGENTS.md recorded 0.46.0
+17:40 read packet docs/packets/SG-166-muse-direct-post.md (70 lines) verbatim == prompt; BASE resolved 702b7a1 (clean); read SG-158/SG-159 reports + logs + scene service + drivers
+17:41 G0 free discovery (production image, --env-file .env, key name-only): GET /images/models -> 200, 59 image models incl. meta/muse-image; GET /images/models/meta/muse-image/endpoints -> 200 {"id":"meta/muse-image","endpoints":[]} (STILL EMPTY); chat endpoints -> Meta permitted
+17:42 allowed-providers re-read: GET /models/user -> 200, 92 account-scoped models, NO openai (matches F-SG158-1), image subset 15 incl. meta/muse-image; /organization/settings -> 401 Unauthorized (management key required) = privileged, not routed around; no GET exposes the literal allowed-providers string
+17:43 STOP-success evaluated: endpoints empty TRUE but servable Muse image slug present under permitted provider Meta -> NOT a STOP; proceed to G1
+17:44 enumerated food assets with clear labels from live DB + volume transcripts; pick P1 = evidence 01a0c481-08b8-72b2-ab22-8ad28fed8fda (Milbona Parmigiano Reggiano, 406377 bytes) = SG-159 photo 1; frozen brief = SG-158/159 FROZEN_BRIEF
+17:44 wrote backend/scripts/sg166_render.py (build_direct_payload + guarded image_api render) + backend/tests/test_sg166_muse_direct_post.py (offline shape pin)
+17:45 fail-pre (isolated base worktree .sg166-base @ 702b7a1 + candidate test): FileNotFoundError /app/scripts/sg166_render.py -> 1 failed (committed); pass-post candidate 1 passed; targeted scene 40 passed; ruff clean
+17:45 G1 ONE direct POST: POST /api/v1/images {model: meta/muse-image, prompt: frozen, input_references:[b64 data URL]} -> HTTP 200 RENDERED, cost $0.01, image/webp, evidence 01a13137-fe76-7f32-afc1-9e80421351b8, ledger 01a13137-fe82-77e1-95fa-a9c97aff75b4, image_sha256 daf069...
+17:46 post-state: evidence 15->16 (scene_render 1), provider_call openrouter 7->8 sum 0.002437125->0.012437125, null_cost 4 unchanged; view render for D7 judgment (label faithful, scene high quality)
+17:46 report + logs; commit/push; notes-ref receipt on WORK_HEAD; remote read-back

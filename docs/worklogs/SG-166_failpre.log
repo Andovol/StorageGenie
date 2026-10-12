@@ -1,0 +1,28 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+___________________ test_direct_post_payload_shape_is_exact ____________________
+
+    def test_direct_post_payload_shape_is_exact() -> None:
+>       driver = _load_direct_post_driver()
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_sg166_muse_direct_post.py:46: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_sg166_muse_direct_post.py:41: in _load_direct_post_driver
+    spec.loader.exec_module(module)
+<frozen importlib._bootstrap_external>:995: in exec_module
+    ???
+<frozen importlib._bootstrap_external>:1132: in get_code
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <_frozen_importlib_external.SourceFileLoader object at 0x75ba53d4b5f0>
+path = '/app/scripts/sg166_render.py'
+
+>   ???
+E   FileNotFoundError: [Errno 2] No such file or directory: '/app/scripts/sg166_render.py'
+
+<frozen importlib._bootstrap_external>:1190: FileNotFoundError
+=========================== short test summary info ============================
+FAILED tests/test_sg166_muse_direct_post.py::test_direct_post_payload_shape_is_exact
+1 failed in 0.58s
