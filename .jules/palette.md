@@ -1,0 +1,3 @@
+## 2026-09-30 - Accessible Thumbnail Image Links & Error Fallbacks
+**Learning:** External thumbnail image links (`<a target="_blank">`) lack context for screen readers and keyboard users if they rely on raw image `alt` attributes or hide failed images via `display: none`. Setting React error state ensures an accessible fallback element remains visible and focusable, while explicit `aria-label`s inform screen reader users of the file name and new tab behavior.
+**Action:** Always add `aria-label="View [name] (opens in new tab)"`, `className="focus-ring"`, and state-driven fallback blocks to image link wrappers.
