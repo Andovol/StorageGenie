@@ -565,3 +565,9 @@ Originals above (88 FLAG:TRUST / 91 FLAG:TRUST) stand as the audit trail; the ve
 | slice_id | phase | model | effort | score | flag | lever | guards_invoked | deduction_attribution | remaining | escape |
 |---|---|---|---|---|---|---|---|---|---|---|
 | SG-162 | Merge Batch 2 (Q1/D-1012-1 L2, $0): #44 selected-paths apply (3 blobs identical, lockfile never staged, absence proven 3 ways) + #48 whole (blob identical); heads unmoved + merge-trees re-proved; derived 5-file vitest 37/37 + eslint/tsc clean; diff exactly 4 named files; health deliberately not run (no server surface); receipt VALID | opencode (model deepseek-v4.1-flash from /proc cmdline --model; effort high from --variant high) | high | 99 |  |  | PG-EV-02, PG-IC-01, PG-IC-07, PG-IC-09 |  | SG-163 (#47 rewrite + #46) + SG-164 (#49) + SG-165 deploy ride on (D-1012-1); no UNCLEAR lines open |  |
+
+### SG-163 (2026-10-12 - Merge Batch 3, #47 rewrite + #46-minus-lockfile, unserved)
+
+| slice_id | phase | model | effort | score | flag | lever | guards_invoked | deduction_attribution | remaining | escape |
+|---|---|---|---|---|---|---|---|---|---|---|
+| SG-163 | Merge Batch 3 (Q1/D-1012-1 L2, $0): #47 re-expressed fresh over landed #48 (tooltip kept, #47 literals gone, primary pair rightly kept per repo convention — packet premise corrected, F-SG163-1 accepted) + #46 selected-paths (2 blobs identical, lockfile absent 3 ways); heads unmoved + merge-tree re-proved; derived 4-file vitest 28/28 + eslint/tsc clean; diff exactly 3 named files; receipt VALID | opencode (model deepseek-v4.1-flash from /proc cmdline --model; effort high from --variant high) | high | 99 |  |  | PG-EV-02, PG-IC-01, PG-IC-07, PG-IC-09 |  | SG-164 (#49 rewrite over #46) + SG-165 deploy ride on (D-1012-1); no UNCLEAR lines open |  |
