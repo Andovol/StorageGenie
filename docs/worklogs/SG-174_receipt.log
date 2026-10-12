@@ -1,0 +1,44 @@
+=== SG-174 post-commit checks + receipt @ 2026-10-12T21:06:51Z ===
+--- work diff vs base f53fcd5 (expect only docs/worklogs/SG-174*) ---
+docs/worklogs/SG-174_after.log
+docs/worklogs/SG-174_before.log
+docs/worklogs/SG-174_build.log
+docs/worklogs/SG-174_diff.log
+docs/worklogs/SG-174_recreate.log
+docs/worklogs/SG-174_verify.log
+STAT:
+ docs/worklogs/SG-174_after.log    | 98 +++++++++++++++++++++++++++++++++++++++
+ docs/worklogs/SG-174_before.log   | 98 +++++++++++++++++++++++++++++++++++++++
+ docs/worklogs/SG-174_build.log    | 90 +++++++++++++++++++++++++++++++++++
+ docs/worklogs/SG-174_diff.log     | 17 +++++++
+ docs/worklogs/SG-174_recreate.log |  8 ++++
+ docs/worklogs/SG-174_verify.log   | 47 +++++++++++++++++++
+ 6 files changed, 358 insertions(+)
+--- committed blob sha256 ---
+c96d2c6c4658cb682d3f7021540df2e0373cf923ef6e5eb3b7bb4035f178f711  docs/worklogs/SG-174_before.log
+9f456b2105872f77a107ff73c19f70fc7aa897c30ec1f12e2073183bef151c5a  docs/worklogs/SG-174_diff.log
+100503acf836716f9c02855eb22780f65e6f2bc5a057672cec70e71ac69444a8  docs/worklogs/SG-174_build.log
+5265819f069e0d9278cd9a16d1cd38cef06b1c803615bf6d4d43821048ff12db  docs/worklogs/SG-174_recreate.log
+88aaee3101c9081b1e663c00b269dd1156a8c99c985518d9bb043bd1c0a2a8d3  docs/worklogs/SG-174_after.log
+dcb178c7195daeeb726ee135b7700e9e074a3720f1f8a520259f25b858cf8d4e  docs/worklogs/SG-174_verify.log
+--- tracked in WORK_HEAD ---
+docs/worklogs/SG-174_after.log
+docs/worklogs/SG-174_before.log
+docs/worklogs/SG-174_build.log
+docs/worklogs/SG-174_diff.log
+docs/worklogs/SG-174_recreate.log
+docs/worklogs/SG-174_verify.log
+--- receipt: notes add ---
+add_wh_exit=0
+--- receipt: notes push ---
+To github.com:Andovol/StorageGenie.git
+   c6f8610..a9c61fa  refs/notes/storagegenie-coder-reports -> refs/notes/storagegenie-coder-reports
+notes_push_exit=0
+--- receipt: mapped fetch ---
+From github.com:Andovol/StorageGenie
+ * [new ref]         refs/notes/storagegenie-coder-reports -> refs/notes/sg174-fetched
+fetch_exit=0
+--- receipt: read back ---
+Dispatch-ID: SG-174 | Report: docs/worklogs/SG-174_report.md | Work-HEAD: ab55c0163d2025470bb81c2ea1253521c9cfdc33
+show_wh_exit=0
+=== END ===
