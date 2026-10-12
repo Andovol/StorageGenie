@@ -547,3 +547,9 @@ Originals above (88 FLAG:TRUST / 91 FLAG:TRUST) stand as the audit trail; the ve
 | slice_id | phase | model | effort | score | flag | lever | guards_invoked | deduction_attribution | remaining | escape |
 |---|---|---|---|---|---|---|---|---||---|---|
 | SG-159 | Scene T1b re-dispatch (D-1009-7/D-1009-10 L3): G0-fix (2xx-body persistence + extractor hardening + Image API transport + 12 tests, fail-pre 10 real reds -> pass-post) + privacy pins shifted (CO-38) + suite 6/684 identical reds + ruff/mypy clean; R2 root cause PROVEN live (server-tool 200s carry no image artifact, persisted bodies quoted) + Google leg BLOCKED (upstream 429 quota, quoted, 1 disclosed backoff retry) + Muse leg BLOCKED (chat 200 imageless, Image-API endpoints empty) + D7 deliberately unanswered; spend USD 0.00168 (arc 0.00244 inside 1.00 cap), half-bound MISSED by ~200s (disclosed), receipt VALID | opencode (model deepseek-v4.1-flash from /proc cmdline --model; effort max from --variant max) | max | 98 |  |  | PG-EV-02, PG-EV-04, PG-EV-06, PG-EV-09, PG-EV-14, PG-SC-03, PG-IC-01, PG-IC-03, PG-IC-07, PG-IC-08, PG-IC-09, PG-PR-10 | mixed |  |  |
+
+### SG-160 (2026-10-12 - Palette PR audit, read-only, 7/7 with verdicts)
+
+| slice_id | phase | model | effort | score | flag | lever | guards_invoked | deduction_attribution | remaining | escape |
+|---|---|---|---|---|---|---|---|---|---|---|
+| SG-160 | Palette audit (Q1/D-1012-1 L2, read-only $0): 7/7 PR diffs as bytes (heads+SHAs+merge-base quoted) + per-PR verdicts MERGE 3 (#43,#45,#48) / REWRITE 4 (#44,#46,#47,#49) + overlap matrix + safe order + defect lesson per PR + secret scan clean; merge-trees clean vs automation; START==END tip; receipt VALID | opencode (model deepseek-v4.1-flash from /proc cmdline --model; effort high from --variant high) | high | 99 |  |  | PG-EV-02, PG-IC-01, PG-IC-07, PG-IC-09 |  | Merges per verdict table ride SG-161+ (D-1012-1); no UNCLEAR lines open |  |
