@@ -1,0 +1,75 @@
+
+ RUN  v1.6.1 /home/andrei/StorageGenie/frontend
+
+ ✓ src/components/EvidenceGallery.test.tsx  (3 tests) 122ms
+stderr | src/routes/ReviewPage.test.tsx > ReviewPage > posts every decision with the loaded candidate id and supports keyboard actions
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+ ❯ src/components/CandidateCard.test.tsx  (9 tests | 2 failed) 406ms
+   ❯ src/components/CandidateCard.test.tsx > CandidateCard > blocked candidate with zero dedup matches shows a visible reason and Inbox link without hover or alert (SG-171 G1)
+     → expect(element).toHaveTextContent()
+
+Expected element to have text content:
+  Acceptance is blocked until the open review task(s) are resolved.
+Received:
+  Candidate candidate-loaded-7State: proposed · Job: job-loaded-7Candidate reviewCandidate fieldsdisplay_nameConfidence: 0.94 · Source: ocridentifierConfidence: Unknown · Source: deterministicSource evidenceevidence-loaded-7AcceptSave editsHold / UnknownReject
+   ❯ src/components/CandidateCard.test.tsx > CandidateCard > one photo plus one imageless evidence renders one image and one focusable fallback (SG-171 G2)
+     → expected <img …(4)></img>
+<img …(4)></img> to have a length of 1 but got 2
+stderr | src/components/CandidateCard.test.tsx > CandidateCard > keeps evidence beside fields and exposes confidence, source, and blocking collision
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+ ✓ src/routes/ReviewPage.test.tsx  (4 tests) 489ms
+ ✓ src/routes/theme-adoption.test.tsx  (12 tests) 449ms
+stderr | src/routes/theme-adoption.test.tsx > SG-075 screen adoption > App nav carries the card/border tokens and surfaces the theme toggle
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/components/CandidateCard.test.tsx > CandidateCard > blocked candidate with zero dedup matches shows a visible reason and Inbox link without hover or alert (SG-171 G1)
+Error: expect(element).toHaveTextContent()
+
+Expected element to have text content:
+  Acceptance is blocked until the open review task(s) are resolved.
+Received:
+  Candidate candidate-loaded-7State: proposed · Job: job-loaded-7Candidate reviewCandidate fieldsdisplay_nameConfidence: 0.94 · Source: ocridentifierConfidence: Unknown · Source: deterministicSource evidenceevidence-loaded-7AcceptSave editsHold / UnknownReject
+ ❯ src/components/CandidateCard.test.tsx:91:21
+     89|     const article = screen.getByRole("article");
+     90|     // The reason is visible text with no alert (no dedup matches) and…
+     91|     expect(article).toHaveTextContent("Acceptance is blocked until the…
+       |                     ^
+     92|     expect(screen.queryByRole("alert")).toBeNull();
+     93|     const link = screen.getByRole("link", { name: "View them in the In…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  src/components/CandidateCard.test.tsx > CandidateCard > one photo plus one imageless evidence renders one image and one focusable fallback (SG-171 G2)
+AssertionError: expected <img …(4)></img>
+<img …(4)></img> to have a length of 1 but got 2
+
+- Expected
++ Received
+
+- 1
++ 2
+
+ ❯ src/components/CandidateCard.test.tsx:112:45
+    110|     // The imageless (non-photo) evidence 404s its thumb; the broken i…
+    111|     fireEvent.error(imagesBefore[1]);
+    112|     expect(article.querySelectorAll("img")).toHaveLength(1);
+       |                                             ^
+    113|     const fallback = screen.getByText("Thumbnail unavailable");
+    114|     expect(fallback).toHaveAttribute("tabindex", "0");
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+ Test Files  1 failed | 3 passed (4)
+      Tests  2 failed | 26 passed (28)
+   Start at  19:50:53
+   Duration  2.44s (transform 837ms, setup 553ms, collect 1.70s, tests 1.47s, environment 2.32s, prepare 504ms)
+
+EXIT:1
