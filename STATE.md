@@ -22,3 +22,5 @@
 - `D-1012-4` (2026-10-12, owner quotes "Approved." + "Okay with your recommendations."): SG-166 Muse direct-POST probe APPROVED (≤$0.05 inside ≤$1 gate) + P1 theme-leaks slice (ISS-2 Chat select, ISS-3 Resolve) queued behind it; taxonomy mapping + Inbox sweep behind P1.
 - `D-1012-5` (2026-10-12, owner quote "Approved."): P1 theme-leaks slice APPROVED as SG-167 (ISS-2 Chat HouseholdSelector theming + ISS-3 Inbox Resolve button theming, tests, unserved).
 - `D-1012-6` (2026-10-12, Architect proposal, PARKED): Scene UI-wiring arc (Generate Context Scene button → endpoint → review surface) awaits owner word; D7 ANSWERED Muse is its transport.
+- `D-1012-7` (2026-10-12, owner quote "Both approved." for deploy): close-out deploy of SG-167 APPROVED (rebuild + one recreate + verify, production restart).
+- `D-1012-8` (2026-10-12, same quote for taxonomy): taxonomy-mapping slice APPROVED next after the deploy (Chat food/medicine vs catalog asset_type + unknown/Uncategorized vocabularies).
