@@ -121,7 +121,15 @@ export function ChatPage() {
         <ChatTranscript messages={transcript} />
       </section>
 
-      <div style={{ display: "flex", gap: 8, marginTop: 16 }}>
+      <form
+        onSubmit={(event) => {
+          event.preventDefault();
+          if (effectiveHousehold && input.trim() && !send.isPending) {
+            send.mutate();
+          }
+        }}
+        style={{ display: "flex", gap: 8, marginTop: 16 }}
+      >
         <input
           aria-label="Question"
           value={input}
@@ -130,15 +138,22 @@ export function ChatPage() {
           style={{ flex: 1, padding: 8 }}
         />
         <button
-          type="button"
-          onClick={() => send.mutate()}
+          type="submit"
           disabled={!effectiveHousehold || !input.trim() || send.isPending}
         >
           {send.isPending ? "Sending…" : "Send"}
         </button>
-      </div>
+      </form>
 
-      <div style={{ display: "flex", gap: 8, marginTop: 12 }}>
+      <form
+        onSubmit={(event) => {
+          event.preventDefault();
+          if (effectiveHousehold && correction.trim() && !logCorrection.isPending) {
+            logCorrection.mutate();
+          }
+        }}
+        style={{ display: "flex", gap: 8, marginTop: 12 }}
+      >
         <input
           aria-label="Correction"
           value={correction}
@@ -147,13 +162,12 @@ export function ChatPage() {
           style={{ flex: 1, padding: 8 }}
         />
         <button
-          type="button"
-          onClick={() => logCorrection.mutate()}
+          type="submit"
           disabled={!effectiveHousehold || !correction.trim() || logCorrection.isPending}
         >
           Log correction
         </button>
-      </div>
+      </form>
     </PageContainer>
   );
 }

@@ -86,15 +86,17 @@ export function CandidateCard({
       </div>
       <WebAlternates alternates={candidate.web_alternates ?? []} />
       <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginTop: 18 }}>
-        <button
-          type="button"
-          onClick={() => onDecision("accept", values)}
-          disabled={busy || blocked}
-          className="bg-primary text-primary-foreground focus-ring"
-          style={{ ...CONTROL_STYLE, border: "none", opacity: busy || blocked ? 0.5 : 1, cursor: busy || blocked ? "not-allowed" : "pointer" }}
-        >
-          Accept
-        </button>
+        <span title={blocked ? "Acceptance is blocked until open review tasks are resolved" : undefined}>
+          <button
+            type="button"
+            onClick={() => onDecision("accept", values)}
+            disabled={busy || blocked}
+            className="bg-primary text-primary-foreground focus-ring"
+            style={{ ...CONTROL_STYLE, border: "none", opacity: busy || blocked ? 0.5 : 1, cursor: busy || blocked ? "not-allowed" : "pointer" }}
+          >
+            Accept
+          </button>
+        </span>
         <button
           type="button"
           onClick={() => onDecision("edit", values)}
