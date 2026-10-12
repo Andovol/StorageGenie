@@ -24,3 +24,5 @@
 - `D-1012-6` (2026-10-12, Architect proposal, PARKED): Scene UI-wiring arc (Generate Context Scene button → endpoint → review surface) awaits owner word; D7 ANSWERED Muse is its transport.
 - `D-1012-7` (2026-10-12, owner quote "Both approved." for deploy): close-out deploy of SG-167 APPROVED (rebuild + one recreate + verify, production restart).
 - `D-1012-8` (2026-10-12, same quote for taxonomy): taxonomy-mapping slice APPROVED next after the deploy (Chat food/medicine vs catalog asset_type + unknown/Uncategorized vocabularies).
+- `D-1012-9` (2026-10-12, owner quote "Yes, approved." on G-C1 restatement): chat empty-state HONESTY slice APPROVED as SG-169 (unclassified count + Inbox link, zero grounding change; D-1012-8 premise corrected — grounding keys on accepted classification, not asset_type).
+- `D-1012-10` (2026-10-12, same restatement, REJECTED per recommendation): asset_type fallback grounding declined (would rest answers on unreviewed extraction text).
