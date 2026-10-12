@@ -571,3 +571,9 @@ Originals above (88 FLAG:TRUST / 91 FLAG:TRUST) stand as the audit trail; the ve
 | slice_id | phase | model | effort | score | flag | lever | guards_invoked | deduction_attribution | remaining | escape |
 |---|---|---|---|---|---|---|---|---|---|---|
 | SG-163 | Merge Batch 3 (Q1/D-1012-1 L2, $0): #47 re-expressed fresh over landed #48 (tooltip kept, #47 literals gone, primary pair rightly kept per repo convention — packet premise corrected, F-SG163-1 accepted) + #46 selected-paths (2 blobs identical, lockfile absent 3 ways); heads unmoved + merge-tree re-proved; derived 4-file vitest 28/28 + eslint/tsc clean; diff exactly 3 named files; receipt VALID | opencode (model deepseek-v4.1-flash from /proc cmdline --model; effort high from --variant high) | high | 99 |  |  | PG-EV-02, PG-IC-01, PG-IC-07, PG-IC-09 |  | SG-164 (#49 rewrite over #46) + SG-165 deploy ride on (D-1012-1); no UNCLEAR lines open |  |
+
+### SG-164 (2026-10-12 - Merge Batch 4, #49 theming re-derived, unserved)
+
+| slice_id | phase | model | effort | score | flag | lever | guards_invoked | deduction_attribution | remaining | escape |
+|---|---|---|---|---|---|---|---|---|---|---|
+| SG-164 | Merge Batch 4 (Q1/D-1012-1 L2, $0): #49 theming re-derived fresh over landed #46 (form wiring proven content-identical, result byte-identical to #49 head blob as a consequence, lockfile absent 3 ways, no test files touched); head unmoved; derived 2-file vitest 19/19 incl. explicit Enter-submit + eslint/tsc clean; diff exactly ChatPage.tsx + worklogs; receipt VALID | opencode (model deepseek-v4.1-flash from /proc cmdline --model; effort high from --variant high) | high | 99 |  |  | PG-EV-02, PG-IC-01, PG-IC-07, PG-IC-09 |  | Bundle unserved until SG-165 close-out deploy (standing directive); no UNCLEAR lines open |  |
