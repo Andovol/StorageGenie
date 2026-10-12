@@ -1,0 +1,27 @@
+SG-160 worklog (append-only) — Palette PR audit Q1/D-1012-1, read-only
+Lane start (packet commit 43c93b3) 2026-10-12T14:42:19Z.
+
+[14:42] Contract echo read: /home/andrei/storagegenie-contract/VERSION = 0.46.0 (verbatim).
+        rules_check.sh run live -> G-L1 UNCHECKED (no contract tag on cache), G-L5/G-L7 UNCHECKED (gh
+        unauthenticated), G-L6 BYTES lines. Exit 0. Recorded, not tripped on (packet expects 0.46.0).
+[14:43] Identity read from process args (PB-4): /proc/304839/cmdline =
+        opencode run --auto --dir /home/andrei/StorageGenie --model opencode-go/deepseek-v4.1-flash --variant high
+        -> model opencode-go/deepseek-v4.1-flash, effort high.
+[14:43] Enumeration: gh unauthenticated (F1); used unauthenticated public REST
+        GET /repos/Andovol/StorageGenie/pulls?state=open&base=automation -> exactly 7 open PRs #43-49,
+        all user.login=Andovol, base.ref=automation. Matches packet expectation, no difference.
+        head SHAs confirmed by git ls-remote origin refs/pull/43..49/head (identical to API).
+[14:44] G1 fetch: git fetch origin refs/pull/{43..49}/head -> objects in FETCH_HEAD (exit 0).
+        Base ref automation resolved 43c93b30abce575a2da0923c5ddfecbb353494ce (== origin/automation).
+        All 7 merge-base == 4c1eb7da6b282109f84a9130b500746453d33aa3 (automation tip 2026-09-29).
+        All 7 diffs non-empty, text, hashed. 0 UNREADABLE. No ref stored; no worktree file changed.
+[14:45] G2 audit: read every diff + the current source of the 5 changed files (ExpiryEntryForm,
+        EvidenceGallery, AssetImportModal, CandidateCard, ChatPage) + CatalogToolbar exports +
+        theme tokens + package.json + Makefile + .jules inventory + frontend test tree.
+        Findings: 3 PRs add a competing pnpm-lock.yaml (repo uses npm/package-lock.json);
+        duplicate pairs {#46,#49} and {#47,#48}; #44 fixes a real a11y defect (display:none).
+[14:46] Secret scan over all 7 diffs: only benign "token"/"tokenizer" prose in pnpm-lock package names.
+        Verdicts: MERGE #43,#45,#48; REWRITE #44,#46,#47,#49; CLOSE none.
+[14:47] Wrote docs/worklogs/SG-160_fetch.md + SG-160_report.md. Committed to automation (work commit).
+        Pushed origin automation. Published receipt note on refs/notes/storagegenie-coder-reports
+        (Dispatch-ID + Report + Work-HEAD); read back from mapped fetch. Tree clean; local==remote tip.
