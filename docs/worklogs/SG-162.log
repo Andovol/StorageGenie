@@ -1,0 +1,65 @@
+SG-162 key-command transcript (unserved merge batch 2: #44-minus-lockfile + #48)
+
+## Orientation
+$ git rev-parse origin/automation
+d97697c23c74bcdd73576cf210afa5d4bbee7884   (BASE resolved; start HEAD == this, tree clean)
+
+$ git fetch origin refs/pull/44/head:refs/remotes/origin/pr/44 refs/pull/48/head:refs/remotes/origin/pr/48
+ * [new ref] refs/pull/44/head -> origin/pr/44
+ * [new ref] refs/pull/48/head -> origin/pr/48
+
+$ git rev-parse origin/pr/44        # expected 03304b13
+03304b130cefa17bc285db6a092755669b43cc05
+$ git rev-parse origin/pr/48        # expected 33f079f3
+33f079f3b691f3321763503100fc656124c44584
+
+$ git merge-base origin/automation origin/pr/44 ; git merge-base origin/automation origin/pr/48
+4c1eb7da6b282109f84a9130b500746453d33aa3
+4c1eb7da6b282109f84a9130b500746453d33aa3
+
+$ git merge-tree --write-tree origin/automation origin/pr/44   # exit=0, tree 4b4d71b1a8b38d369a7c493741c970ccdb65d4c5
+$ git merge-tree --write-tree origin/automation origin/pr/48   # exit=0, tree 453321cb731337481ff976b5bb5b2687d377aed7
+
+## G0 - land PR#44 by selected paths (drop frontend/pnpm-lock.yaml)
+$ git checkout origin/pr/44 -- .jules/palette.md frontend/src/components/EvidenceGallery.tsx frontend/src/components/EvidenceGallery.test.tsx
+checkout_exit=0
+$ git status --porcelain
+A  .jules/palette.md
+A  frontend/src/components/EvidenceGallery.test.tsx
+M  frontend/src/components/EvidenceGallery.tsx
+# per-blob: landed index OID == head OID
+44 .jules/palette.md                                 landed=49178626778a0fa56e0a4d02f2c539f44518c9b3 head=49178626778a0fa56e0a4d02f2c539f44518c9b3  IDENTICAL
+44 frontend/src/components/EvidenceGallery.tsx       landed=564156dd8cf28dc883ffdc3ca460e974b0730692 head=564156dd8cf28dc883ffdc3ca460e974b0730692  IDENTICAL
+44 frontend/src/components/EvidenceGallery.test.tsx  landed=b782dc4f7606ab8c16925ce964555b893a72146d head=b782dc4f7606ab8c16925ce964555b893a72146d  IDENTICAL
+$ git ls-files --error-unmatch frontend/pnpm-lock.yaml   # index_has_pnpm_exit=1 (absent)
+$ git diff --cached --name-only | grep -i pnpm          # staged_pnpm_grep_exit=1 (absent)
+$ git commit -m "SG-162 G0: land PR#44 ... (minus smuggled pnpm-lock; blobs == head)"
+20e18a957e40dd1a04ba1df71a5115a4190fd7e8
+
+## G1 - land PR#48 whole
+$ git checkout origin/pr/48 -- frontend/src/components/CandidateCard.tsx
+checkout_exit=0
+48 frontend/src/components/CandidateCard.tsx landed=a3784b29bba669f63a8d4b79a232b63b5db4c252 head=a3784b29bba669f63a8d4b79a232b63b5db4c252  IDENTICAL
+$ git commit -m "SG-162 G1: land PR#48 ... (blob == head)"
+5592d6a05da9a457fb0b51a30c1a5ae9aa3acbed   (WORK_HEAD)
+
+## A3 - diff file list
+$ git diff --name-status origin/automation..HEAD
+A	.jules/palette.md
+M	frontend/src/components/CandidateCard.tsx
+A	frontend/src/components/EvidenceGallery.test.tsx
+M	frontend/src/components/EvidenceGallery.tsx
+$ git ls-files | grep -i pnpm     # pnpm_tree_grep_exit=1 (no pnpm lockfile anywhere in the tree)
+$ git ls-files | grep -iE lock    # backend/requirements.lock, frontend/package-lock.json (+ a docs path containing "lock")
+
+## G2 - derived suites + static gates
+$ ./node_modules/.bin/vitest run \
+    src/components/EvidenceGallery.test.tsx src/components/CandidateCard.test.tsx \
+    src/routes/ReviewPage.test.tsx src/routes/AssetDetailPage.test.tsx src/types/product.test.ts
+ Test Files  5 passed (5)   Tests  37 passed (37)   VITEST_EXIT=0
+$ npm run lint          # eslint src   -> LINT_EXIT=0
+$ ./node_modules/.bin/tsc --noEmit     -> TSC_EXIT=0
+
+## Secret scan (CO-100) over added lines of origin/automation..HEAD
+$ git diff origin/automation..HEAD -- . | grep -E "^\+" | grep -inE "<secret patterns>"
+secret_scan_match_exit=1   (0 matches)
