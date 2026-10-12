@@ -1,0 +1,87 @@
+=== SG-172 BEFORE @ 2026-10-12T20:03:08Z ===
+--- container/image/restart/created ---
+Id=420c4051c21564f309b3cd8922b405bcddf638bd63394b21f7f7e8497fe1cf09
+Image=sha256:5f4f4ccbff4707cffbcc11fcbdf02745909207e2a9bceed8b001f42045fadab2
+RestartCount=0
+Status=running
+StartedAt=2026-10-12T19:10:06.797351762Z
+Created=2026-10-12T19:10:05.677332479Z
+--- health x6 ---
+h1: {"status":"ok","db":"ok","storage":"ok"} [200]
+h2: {"status":"ok","db":"ok","storage":"ok"} [200]
+h3: {"status":"ok","db":"ok","storage":"ok"} [200]
+h4: {"status":"ok","db":"ok","storage":"ok"} [200]
+h5: {"status":"ok","db":"ok","storage":"ok"} [200]
+h6: {"status":"ok","db":"ok","storage":"ok"} [200]
+--- gate ---
+http:80  = 301
+https:443= 401
+--- alembic current ---
+INFO  [alembic.runtime.migration] Context impl SQLiteImpl.
+INFO  [alembic.runtime.migration] Will assume non-transactional DDL.
+20260924_sg114_relation (head)
+--- served bundle ---
+total 328
+drwxr-xr-x 2 root root   4096 Oct 12 19:09 .
+drwxr-xr-x 3 root root   4096 Oct 12 19:09 ..
+-rw-r--r-- 1 root root   3911 Oct 12 19:09 index-DO0gjGV6.css
+-rw-r--r-- 1 root root 321685 Oct 12 19:09 index-DtD-fVNX.js
+--- index.html asset refs ---
+assets/index-DtD-fVNX.js
+assets/index-DO0gjGV6.css
+--- sha256 ---
+e36ddb9489430d9a2b2e911513f0cc624c14f0829995aa78cfc928fd2d9513ca  /app/static/index.html
+37b25dbdd4b0ecfdedb8255bc7f8af286726334e95a1a3a9e85b9ba381b3d57c  /app/static/assets/index-DO0gjGV6.css
+3ff965fc69dd13d244f3240b95482cbc1a0adbd4900b73920516a3e0becdad91  /app/static/assets/index-DtD-fVNX.js
+--- 28-table counts ---
+alembic_version 1
+assertion 37
+asset 7
+asset_evidence 14
+asset_fts 7
+asset_fts_config 1
+asset_fts_data 9
+asset_fts_docsize 7
+asset_fts_idx 7
+asset_location 1
+asset_relation 1
+audit_event 91
+candidate 10
+enrich_snapshot 4
+evidence 18
+guardrail_event 2
+household 1
+idempotency_key 11
+job 11
+job_step 72
+location 1
+observation 20
+planning_suggestion 0
+provider_call 29
+review_task 8
+saved_search 0
+source_attribution 0
+user 2
+TABLES 28
+--- CORS preflight (OPTIONS only) ---
+If-Match PATCH => 200
+TRACE => 400
+X-Evil-Header => 400
+--- allow-methods ---
+access-control-allow-methods: GET, POST, PUT, PATCH, DELETE, OPTIONS
+access-control-max-age: 600
+access-control-allow-headers: Accept, Accept-Language, Authorization, Content-Language, Content-Type, Idempotency-Key, If-Match, Origin, X-Requested-With
+access-control-allow-credentials: true
+access-control-allow-origin: http://localhost:5173
+--- BEFORE served-JS markers (expect 0 for SG-171 copy) ---
+open review task(s) are resolved => 1
+View them in the Inbox => 0
+Thumbnail unavailable => 1
+--- candidate ids (for /review) ---
+candidate ids: ['01a0afaa-3ff4-7da0-987a-87f29c73ee5b', '01a0c445-51a8-7921-b6cc-681d23b10f1b', '01a0c47f-246a-7263-a1af-490b313855af', '01a0c481-1e4b-7db1-a6d3-63452fe8a26c', '01a0c4a0-d574-75f0-87aa-a9a6abbd6a06']
+review_task ids: ['01a0c445-51a9-7a70-ad22-6389d507d958', '01a0c47f-246c-7700-826a-823c3a12abd2', '01a0c481-1e4b-7db1-a6d3-635928354094', '01a0c4a0-d574-75f0-87aa-a9b6d624c626', '01a0c4a2-2a47-75c2-85c0-d8915d759405']
+=== END BEFORE ===
+--- before-bundle occurrence counts (append) ---
+OCC 'open review task(s) are resolved' => 1
+OCC 'View them in the Inbox' => 0
+OCC 'Thumbnail unavailable' => 1

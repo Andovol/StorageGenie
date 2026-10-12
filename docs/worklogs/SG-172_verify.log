@@ -1,0 +1,19 @@
+=== SG-172 VERIFY @ 2026-10-12T20:04:41Z ===
+table-count BEFORE: 28 AFTER: 28
+counts moved: NONE (delta 0 on every one of the 28 tables)
+  asset: 7 -> 7
+  candidate: 10 -> 10
+  review_task: 8 -> 8
+  job: 11 -> 11
+  job_step: 72 -> 72
+  audit_event: 91 -> 91
+  provider_call: 29 -> 29
+
+BEFORE image=sha256:5f4f4ccb...  AFTER image=sha256:9064d2ce...
+BEFORE container=420c4051...     AFTER container=91a07373...
+BEFORE JS index-DtD-fVNX.js 3ff965fc... (321685 B) -> AFTER JS index-CYyuxefG.js 1b4680a0... (322255 B)
+CSS index-DO0gjGV6.css 37b25dbd... (3911 B) BOTH sides (byte-identical, expected)
+index.html e36ddb94... -> 2f035bec... (references new JS)
+markers (occurrences): 'open review task(s) are resolved' 1->2 | 'View them in the Inbox' 0->1 | 'Thumbnail unavailable' 1->2
+health x6 = 200 {"status":"ok","db":"ok","storage":"ok"} both sides; gate 301/401 both sides; alembic 20260924_sg114_relation (head) both sides
+pages /review/<candidate> /inbox /catalog = 200/200/200
