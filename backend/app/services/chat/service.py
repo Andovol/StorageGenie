@@ -46,6 +46,12 @@ CLASSIFICATION_FIELD = "plugin:expiry-tracker/classification"
 EXPIRY_FIELD = "plugin:expiry-tracker/expiry_date"
 OPENED_DATE_FIELD = "opened_date"
 
+# The review states that RETIRE an assertion; any other state (accepted,
+# proposed, ...) is live for the catalogue. ONE definition, shared by
+# `_active_assertion`, `build_catalog` and `_unclassified_count` (SG-169,
+# PG-SC-05: exclude by rule, never by a second literal).
+INACTIVE_REVIEW_STATES = ("superseded", "rejected")
+
 DATA_OPEN = "<<<CATALOGUE_DATA>>>"
 DATA_CLOSE = "<<<END_CATALOGUE_DATA>>>"
 
@@ -104,7 +110,7 @@ def _active_assertion(db: Session, asset_id: str, field_path: str) -> Assertion 
         .filter(
             Assertion.asset_id == asset_id,
             Assertion.field_path == field_path,
-            Assertion.review_state.not_in(("superseded", "rejected")),
+            Assertion.review_state.not_in(INACTIVE_REVIEW_STATES),
         )
         .order_by(Assertion.created_at.desc())
         .first()
@@ -141,6 +147,43 @@ def _source_attributions(db: Session, asset_id: str) -> list[dict[str, Any]]:
     ]
 
 
+def _active_assets(db: Session, household_id: str) -> list[Asset]:
+    """The household's ACTIVE assets, the population every catalogue read uses."""
+    return (
+        db.query(Asset)
+        .filter(Asset.household_id == household_id, lifecycle.active_clause())
+        .order_by(Asset.display_name)
+        .all()
+    )
+
+
+def _unclassified_count(db: Session, household_id: str) -> int:
+    """Active household assets with NO live classification assertion (SG-169).
+
+    The SAME predicate `build_catalog` keeps a catalogue entry on: the
+    classification assertion must be `field_path == CLASSIFICATION_FIELD` and
+    not in `INACTIVE_REVIEW_STATES`. An asset with no such assertion, whatever
+    else it carries, is unclassified. Category-agnostic on purpose: the empty
+    branch asks whether the household holds items awaiting classification at
+    all, not only ones for the selected category.
+    """
+    assets = _active_assets(db, household_id)
+    if not assets:
+        return 0
+    asset_ids = [asset.id for asset in assets]
+    classified_ids = {
+        asset_id
+        for (asset_id,) in db.query(Assertion.asset_id)
+        .filter(
+            Assertion.asset_id.in_(asset_ids),
+            Assertion.field_path == CLASSIFICATION_FIELD,
+            Assertion.review_state.not_in(INACTIVE_REVIEW_STATES),
+        )
+        .all()
+    }
+    return sum(1 for asset in assets if asset.id not in classified_ids)
+
+
 def build_catalog(db: Session, household_id: str, category: str) -> list[dict[str, Any]]:  # noqa: C901
     """Label data for one category's ACTIVE assets: the ONLY grounding input.
 
@@ -150,12 +193,7 @@ def build_catalog(db: Session, household_id: str, category: str) -> list[dict[st
     to prevent N+1 query overhead during LLM context construction.
     """
     slug = resolve_category(category)
-    assets = (
-        db.query(Asset)
-        .filter(Asset.household_id == household_id, lifecycle.active_clause())
-        .order_by(Asset.display_name)
-        .all()
-    )
+    assets = _active_assets(db, household_id)
     if not assets:
         return []
 
@@ -167,7 +205,7 @@ def build_catalog(db: Session, household_id: str, category: str) -> list[dict[st
         .filter(
             Assertion.asset_id.in_(asset_ids),
             Assertion.field_path.in_((CLASSIFICATION_FIELD, EXPIRY_FIELD, OPENED_DATE_FIELD)),
-            Assertion.review_state.not_in(("superseded", "rejected")),
+            Assertion.review_state.not_in(INACTIVE_REVIEW_STATES),
         )
         .order_by(Assertion.created_at.desc())
         .all()
@@ -369,6 +407,7 @@ def respond(
             "empty_catalogue": True,
             "category": category,
             "catalogue_size": 0,
+            "unclassified_count": _unclassified_count(db, household_id),
             "provider": None,
             "model": None,
             "provider_call_id": None,

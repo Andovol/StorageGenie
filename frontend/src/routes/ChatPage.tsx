@@ -25,7 +25,11 @@ export function ChatPage() {
   const [transcript, setTranscript] = useState<ChatMessage[]>([]);
   const [notice, setNotice] = useState("");
   const [aiDisabled, setAiDisabled] = useState(false);
+  // SG-169: the empty-catalogue notice names the cause only when the household
+  // holds items awaiting classification; 0 is the no-action variant.
+  const [unclassified, setUnclassified] = useState(0);
   const effectiveHousehold = householdId || households?.[0]?.id || "";
+  const categoryLabel = CATEGORIES.find((option) => option.value === category)?.label ?? category;
 
   useEffect(() => {
     if (!householdId && households?.[0]) {
@@ -37,6 +41,7 @@ export function ChatPage() {
   const send = useMutation({
     mutationFn: () => sendChat(category, effectiveHousehold, input),
     onSuccess: (result: ChatResponse) => {
+      setUnclassified(0);
       if (result.status === "skipped") {
         setNotice(`Chat did not run: ${result.reason ?? "skipped"}`);
         setAiDisabled(result.reason === "consent_disabled");
@@ -53,6 +58,7 @@ export function ChatPage() {
         setNotice(
           result.empty_catalogue ? "No catalogue data for this category yet." : ""
         );
+        setUnclassified(result.empty_catalogue ? (result.unclassified_count ?? 0) : 0);
         setTranscript((messages) => [
           ...messages,
           { role: "user", text: input },
@@ -114,6 +120,14 @@ export function ChatPage() {
       {notice && (
         <div role="alert" className="text-foreground" style={{ marginTop: 12 }}>
           {notice}
+          {unclassified > 0 && (
+            <div style={{ marginTop: 4 }}>
+              No classified items in {categoryLabel} yet — {unclassified} awaiting classification.{" "}
+              <Link to={`/inbox?household_id=${effectiveHousehold}`} className="text-link focus-ring">
+                Review them in the Inbox.
+              </Link>
+            </div>
+          )}
           {aiDisabled && (
             <div style={{ marginTop: 4 }}>
               <Link to="/settings" className="text-link focus-ring">Enable AI in Settings to use chat</Link>

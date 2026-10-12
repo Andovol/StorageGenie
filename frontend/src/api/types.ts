@@ -255,6 +255,9 @@ export type ChatResponse = {
   empty_catalogue: boolean;
   category: string;
   catalogue_size: number;
+  // SG-169: present on the empty-catalogue branch only; active household assets
+  // with no live classification assertion. Absent on every other branch.
+  unclassified_count?: number;
   provider?: string | null;
   model?: string | null;
   provider_call_id?: string | null;

@@ -1,0 +1,189 @@
+=== SG-169 verify: base 7a1317e, working tree on 2cc504f ===
+
+--- git diff --stat (product files) ---
+ backend/app/services/chat/service.py | 55 ++++++++++++++++++++++++++++++------
+ frontend/src/api/types.ts            |  3 ++
+ frontend/src/routes/ChatPage.tsx     | 14 +++++++++
+ 3 files changed, 64 insertions(+), 8 deletions(-)
+
+--- full product diff ---
+diff --git a/backend/app/services/chat/service.py b/backend/app/services/chat/service.py
+index e43db4b..d49b99a 100644
+--- a/backend/app/services/chat/service.py
++++ b/backend/app/services/chat/service.py
+@@ -46,6 +46,12 @@ CLASSIFICATION_FIELD = "plugin:expiry-tracker/classification"
+ EXPIRY_FIELD = "plugin:expiry-tracker/expiry_date"
+ OPENED_DATE_FIELD = "opened_date"
+ 
++# The review states that RETIRE an assertion; any other state (accepted,
++# proposed, ...) is live for the catalogue. ONE definition, shared by
++# `_active_assertion`, `build_catalog` and `_unclassified_count` (SG-169,
++# PG-SC-05: exclude by rule, never by a second literal).
++INACTIVE_REVIEW_STATES = ("superseded", "rejected")
++
+ DATA_OPEN = "<<<CATALOGUE_DATA>>>"
+ DATA_CLOSE = "<<<END_CATALOGUE_DATA>>>"
+ 
+@@ -104,7 +110,7 @@ def _active_assertion(db: Session, asset_id: str, field_path: str) -> Assertion
+         .filter(
+             Assertion.asset_id == asset_id,
+             Assertion.field_path == field_path,
+-            Assertion.review_state.not_in(("superseded", "rejected")),
++            Assertion.review_state.not_in(INACTIVE_REVIEW_STATES),
+         )
+         .order_by(Assertion.created_at.desc())
+         .first()
+@@ -141,6 +147,43 @@ def _source_attributions(db: Session, asset_id: str) -> list[dict[str, Any]]:
+     ]
+ 
+ 
++def _active_assets(db: Session, household_id: str) -> list[Asset]:
++    """The household's ACTIVE assets, the population every catalogue read uses."""
++    return (
++        db.query(Asset)
++        .filter(Asset.household_id == household_id, lifecycle.active_clause())
++        .order_by(Asset.display_name)
++        .all()
++    )
++
++
++def _unclassified_count(db: Session, household_id: str) -> int:
++    """Active household assets with NO live classification assertion (SG-169).
++
++    The SAME predicate `build_catalog` keeps a catalogue entry on: the
++    classification assertion must be `field_path == CLASSIFICATION_FIELD` and
++    not in `INACTIVE_REVIEW_STATES`. An asset with no such assertion, whatever
++    else it carries, is unclassified. Category-agnostic on purpose: the empty
++    branch asks whether the household holds items awaiting classification at
++    all, not only ones for the selected category.
++    """
++    assets = _active_assets(db, household_id)
++    if not assets:
++        return 0
++    asset_ids = [asset.id for asset in assets]
++    classified_ids = {
++        asset_id
++        for (asset_id,) in db.query(Assertion.asset_id)
++        .filter(
++            Assertion.asset_id.in_(asset_ids),
++            Assertion.field_path == CLASSIFICATION_FIELD,
++            Assertion.review_state.not_in(INACTIVE_REVIEW_STATES),
++        )
++        .all()
++    }
++    return sum(1 for asset in assets if asset.id not in classified_ids)
++
++
+ def build_catalog(db: Session, household_id: str, category: str) -> list[dict[str, Any]]:  # noqa: C901
+     """Label data for one category's ACTIVE assets: the ONLY grounding input.
+ 
+@@ -150,12 +193,7 @@ def build_catalog(db: Session, household_id: str, category: str) -> list[dict[st
+     to prevent N+1 query overhead during LLM context construction.
+     """
+     slug = resolve_category(category)
+-    assets = (
+-        db.query(Asset)
+-        .filter(Asset.household_id == household_id, lifecycle.active_clause())
+-        .order_by(Asset.display_name)
+-        .all()
+-    )
++    assets = _active_assets(db, household_id)
+     if not assets:
+         return []
+ 
+@@ -167,7 +205,7 @@ def build_catalog(db: Session, household_id: str, category: str) -> list[dict[st
+         .filter(
+             Assertion.asset_id.in_(asset_ids),
+             Assertion.field_path.in_((CLASSIFICATION_FIELD, EXPIRY_FIELD, OPENED_DATE_FIELD)),
+-            Assertion.review_state.not_in(("superseded", "rejected")),
++            Assertion.review_state.not_in(INACTIVE_REVIEW_STATES),
+         )
+         .order_by(Assertion.created_at.desc())
+         .all()
+@@ -369,6 +407,7 @@ def respond(
+             "empty_catalogue": True,
+             "category": category,
+             "catalogue_size": 0,
++            "unclassified_count": _unclassified_count(db, household_id),
+             "provider": None,
+             "model": None,
+             "provider_call_id": None,
+diff --git a/frontend/src/api/types.ts b/frontend/src/api/types.ts
+index 5c17f9e..89f7808 100644
+--- a/frontend/src/api/types.ts
++++ b/frontend/src/api/types.ts
+@@ -255,6 +255,9 @@ export type ChatResponse = {
+   empty_catalogue: boolean;
+   category: string;
+   catalogue_size: number;
++  // SG-169: present on the empty-catalogue branch only; active household assets
++  // with no live classification assertion. Absent on every other branch.
++  unclassified_count?: number;
+   provider?: string | null;
+   model?: string | null;
+   provider_call_id?: string | null;
+diff --git a/frontend/src/routes/ChatPage.tsx b/frontend/src/routes/ChatPage.tsx
+index 21ff526..e682206 100644
+--- a/frontend/src/routes/ChatPage.tsx
++++ b/frontend/src/routes/ChatPage.tsx
+@@ -25,7 +25,11 @@ export function ChatPage() {
+   const [transcript, setTranscript] = useState<ChatMessage[]>([]);
+   const [notice, setNotice] = useState("");
+   const [aiDisabled, setAiDisabled] = useState(false);
++  // SG-169: the empty-catalogue notice names the cause only when the household
++  // holds items awaiting classification; 0 is the no-action variant.
++  const [unclassified, setUnclassified] = useState(0);
+   const effectiveHousehold = householdId || households?.[0]?.id || "";
++  const categoryLabel = CATEGORIES.find((option) => option.value === category)?.label ?? category;
+ 
+   useEffect(() => {
+     if (!householdId && households?.[0]) {
+@@ -37,6 +41,7 @@ export function ChatPage() {
+   const send = useMutation({
+     mutationFn: () => sendChat(category, effectiveHousehold, input),
+     onSuccess: (result: ChatResponse) => {
++      setUnclassified(0);
+       if (result.status === "skipped") {
+         setNotice(`Chat did not run: ${result.reason ?? "skipped"}`);
+         setAiDisabled(result.reason === "consent_disabled");
+@@ -53,6 +58,7 @@ export function ChatPage() {
+         setNotice(
+           result.empty_catalogue ? "No catalogue data for this category yet." : ""
+         );
++        setUnclassified(result.empty_catalogue ? (result.unclassified_count ?? 0) : 0);
+         setTranscript((messages) => [
+           ...messages,
+           { role: "user", text: input },
+@@ -114,6 +120,14 @@ export function ChatPage() {
+       {notice && (
+         <div role="alert" className="text-foreground" style={{ marginTop: 12 }}>
+           {notice}
++          {unclassified > 0 && (
++            <div style={{ marginTop: 4 }}>
++              No classified items in {categoryLabel} yet — {unclassified} awaiting classification.{" "}
++              <Link to={`/inbox?household_id=${effectiveHousehold}`} className="text-link focus-ring">
++                Review them in the Inbox.
++              </Link>
++            </div>
++          )}
+           {aiDisabled && (
+             <div style={{ marginTop: 4 }}>
+               <Link to="/settings" className="text-link focus-ring">Enable AI in Settings to use chat</Link>
+
+--- PB-7 derived-set grep: changed symbols/copy over the test tree ---
+backend/tests/test_chat.py
+frontend/src/routes/ChatPage.test.tsx
+
+--- copy/symbol hits in the changed product files ---
+backend/app/services/chat/service.py:51:# `_active_assertion`, `build_catalog` and `_unclassified_count` (SG-169,
+backend/app/services/chat/service.py:160:def _unclassified_count(db: Session, household_id: str) -> int:
+backend/app/services/chat/service.py:167:    branch asks whether the household holds items awaiting classification at
+backend/app/services/chat/service.py:410:            "unclassified_count": _unclassified_count(db, household_id),
+frontend/src/api/types.ts:260:  unclassified_count?: number;
+frontend/src/routes/ChatPage.tsx:29:  // holds items awaiting classification; 0 is the no-action variant.
+frontend/src/routes/ChatPage.tsx:61:        setUnclassified(result.empty_catalogue ? (result.unclassified_count ?? 0) : 0);
+frontend/src/routes/ChatPage.tsx:125:              No classified items in {categoryLabel} yet — {unclassified} awaiting classification.{" "}
+frontend/src/routes/ChatPage.tsx:127:                Review them in the Inbox.
+
+--- the read-back route (PG-SC-02): unwalled return ---
+backend/app/api/v1/chat.py:36:        return service.respond(db, household_id, category, payload.message)
