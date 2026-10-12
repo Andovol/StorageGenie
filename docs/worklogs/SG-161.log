@@ -1,0 +1,43 @@
+SG-161 worklog — Merge Batch 1 (#43 + #45), unserved. Append-only, material commands + decisions only.
+
+Contract / orientation
+- rules_check.sh at the live contract path (not .rules-cache/, absent on host — carry-over F-SG145-1):
+  G-L1 UNCHECKED (cache not checked out at a contract tag), G-L5/G-L7 UNCHECKED gh-unauthenticated,
+  two G-L6 BYTES lines. Recorded ruleset 0.46.0.
+- Read CODER.md 0.46.0 (incl. §14 PB-1..PB-6, PB-7 derived-set, CO-30/CO-55/CO-60/CO-86/CO-97) and AGENTS.md.
+- Contract echo: /home/andrei/storagegenie-contract/VERSION = 0.46.0 (== packet expected 0.46.0).
+- Precedent read: SG-153 report + verify log (two-PR merge batch) for house format.
+
+Heads re-verify (packet expectation, heads may move)
+- refs/pull/43/head = 6d34e6e9f943fc586a05f928b686f3129d0c2823 (== expected, UNMOVED)
+- refs/pull/45/head = 3676e69f1716f98e42e205ee057bce2be99e2438 (== expected, UNMOVED)
+- Both heads are single commits whose parent == common merge-base 4c1eb7da6b282109f84a9130b500746453d33aa3.
+- Touched files unchanged on automation since that base (git rev-list count 0 each);
+  merge-tree --write-tree clean for both against current automation (no CONFLICT line).
+
+G1 — apply by real hunks (cherry-pick -n, oldest first: #43 then #45)
+- git cherry-pick -n 6d34e6e9 -> ExpiryEntryForm.tsx; landed blob b9267e2d0126e6a55a7d1cf82e01027342941138
+  == head blob b9267e2d0126e6a55a7d1cf82e01027342941138 (IDENTICAL). Commit 373d701.
+- git cherry-pick -n 3676e69f -> AssetImportModal.tsx; landed blob 0727642fde9bdffe5ed2a0005ae1f69f21de3142
+  == head blob 0727642fde9bdffe5ed2a0005ae1f69f21de3142 (IDENTICAL). Commit ba3827e = WORK_HEAD.
+- No conflict; nothing rebased; no head moved. Residual diff of landed vs head blob: empty (blob hash equality).
+
+PB-7 — derived test set (packet named 2; grep added 3 more)
+- ExpiryEntryForm rendered by ExpiryEntryForm.test.tsx (direct) + AssetDetailPage.tsx
+  -> AssetDetailPage.test.tsx asserts "Save expiry" + empty-date-disabled (the touched button guard).
+- ReviewPage.tsx also renders ExpiryEntryForm but ReviewPage.test.tsx never references it -> NOT a hit.
+- AssetImportModal rendered by import-modal.test.tsx (direct) + AppHeader.tsx (shell.test.tsx opens the
+  import dialog) + ProductGrid.tsx (catalog.test.tsx opens the import dialog) -> both hits.
+- Derived set (5): ExpiryEntryForm.test.tsx, shell/import-modal.test.tsx, routes/AssetDetailPage.test.tsx,
+  shell/shell.test.tsx, catalog/catalog.test.tsx.
+
+G2 — proofs
+- vitest run (5 files): 5 passed / 85 tests passed / exit 0. (npx absent; used ./node_modules/.bin/vitest.)
+- npm run lint (eslint src): exit 0. tsc --noEmit: exit 0.
+- No full-suite sweep (packet: none). No deploy, no restart, no container exec.
+
+Close
+- Diff base..product-tip = exactly the two component files (64 ins / 6 del). Secret scan over added
+  lines: no match.
+- Worklogs SG-161.log / SG-161_verify.log / SG-161_report.md committed as the docs commit.
+- Push automation; notes-ref receipt on WORK_HEAD + docs tip; mapped-fetch read-back.

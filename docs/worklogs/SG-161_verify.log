@@ -1,0 +1,106 @@
+SG-161 verify log — captured command output, verbatim (frontend-only; no live DB, no rebuild, no deploy)
+
+== Live clock / model-effort provenance (CO-78 / PB-4) ==
+$ date -u +%Y-%m-%dT%H:%M:%SZ
+2026-10-12T14:54:02Z
+$ pgrep -af opencode            # my parent (opencode run) argv flags
+317222 opencode run --auto --dir /home/andrei/StorageGenie --model opencode-go/deepseek-v4.1-flash --variant high # SG-161 — Merge Batch 1 ...
+
+== Contract (recorded == published) and BASE resolve ==
+$ cat /home/andrei/storagegenie-contract/VERSION; git -C /home/andrei/storagegenie-contract rev-parse HEAD; cat /home/andrei/storagegenie-contract/RULES.sha256
+0.46.0
+925cb575c0ef0e1c5a15b6112041a270c2dbd730
+487841b151a593c396353e8eb61f245ba6678976b13917534308e810a7d8c9ef  RULES.md
+$ git rev-parse origin/automation HEAD
+7fa810c3d5f8f7a2fc9fbac820484de897ec346c
+ba3827ebe29151c7a97376280e4002ceb2fb46c0
+
+== Premise: heads unmoved, one file each, merge-base == common base ==
+PR #43 head = 6d34e6e9f943fc586a05f928b686f3129d0c2823  (packet expected 6d34e6e9) UNMOVED
+PR #45 head = 3676e69f1716f98e42e205ee057bce2be99e2438  (packet expected 3676e69f) UNMOVED
+$ git log --oneline -1 <head>   (each: single commit, parent = 4c1eb7da6b282109f84a9130b500746453d33aa3)
+6d34e6e 🎨 Palette: Add loading feedback, tooltip, and focus rings to ExpiryEntryForm
+3676e69 🎨 Palette: Add loading spinner and aria-busy state to asset import modal action button
+$ git rev-list --count 4c1eb7d..origin/automation -- <touched file>   (0 == file unchanged since base)
+43 frontend/src/components/ExpiryEntryForm.tsx: 0
+45 frontend/src/components/shell/AssetImportModal.tsx: 0
+$ git merge-tree --write-tree --merge-base=4c1eb7d origin/automation <head>   (single line == no CONFLICT)
+--43-- f88d6550efdaee002809268a23f5dae5b724c940
+--45-- ef32831542f5b2837b9e1cefa1f2852c2a6d7ece
+
+== G1: base / head blobs, then apply by real hunks (cherry-pick -n, oldest first) ==
+43 base=8bba870891148c4d2d213d4e505f162e8d99c447 head=b9267e2d0126e6a55a7d1cf82e01027342941138
+45 base=bdf074ff1d638518250d4b0ee83f493ffdbc0ef6 head=0727642fde9bdffe5ed2a0005ae1f69f21de3142
+
+== G1: apply #43 (older) then #45, cherry-pick -n each; prove landed blob == head blob ==
+$ git cherry-pick -n 6d34e6e9f943fc586a05f928b686f3129d0c2823
+exit=0
+$ git status --porcelain
+M  frontend/src/components/ExpiryEntryForm.tsx
+43 landed=b9267e2d0126e6a55a7d1cf82e01027342941138 head=b9267e2d0126e6a55a7d1cf82e01027342941138  [IDENTICAL if equal]
+$ git commit -m 'SG-161 G0: land PR#43 ExpiryEntryForm double-submit guard+tooltip+focus-ring (blob == head)'
+commit=373d7018ed53c02ce70c8ef5456016cda5cdfa44
+
+$ git cherry-pick -n 3676e69f1716f98e42e205ee057bce2be99e2438
+exit=0
+$ git status --porcelain
+M  frontend/src/components/shell/AssetImportModal.tsx
+45 landed=0727642fde9bdffe5ed2a0005ae1f69f21de3142 head=0727642fde9bdffe5ed2a0005ae1f69f21de3142  [IDENTICAL if equal]
+$ git commit -m 'SG-161 G1: land PR#45 AssetImportModal aria-busy+spinner (blob == head)'
+commit=ba3827ebe29151c7a97376280e4002ceb2fb46c0
+
+== G2: derived targeted vitest set (candidate) ==
+node: v24.14.1
+$ ./node_modules/.bin/vitest run src/components/ExpiryEntryForm.test.tsx src/components/shell/import-modal.test.tsx src/routes/AssetDetailPage.test.tsx src/components/shell/shell.test.tsx src/components/catalog/catalog.test.tsx
+
+ RUN  v1.6.1 /home/andrei/StorageGenie/frontend
+
+ ✓ src/components/ExpiryEntryForm.test.tsx  (2 tests) 167ms
+stderr | src/routes/AssetDetailPage.test.tsx > AssetDetailPage > editing quantity patches via PATCH and shows the superseded prior value in history
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+stderr | src/components/shell/shell.test.tsx > Catalog shell > the header labels the LOADED item count, not a household total
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+stderr | src/components/shell/import-modal.test.tsx > AssetImportModal staging > drop stages accepted files as Ready with a live count
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+stderr | src/components/catalog/catalog.test.tsx > ProductCard > renders the name, the category micro-pill and the primary-color dots
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+ ✓ src/components/shell/import-modal.test.tsx  (14 tests) 513ms
+ ✓ src/routes/AssetDetailPage.test.tsx  (13 tests) 897ms
+ ✓ src/components/catalog/catalog.test.tsx  (33 tests) 775ms
+ ✓ src/components/shell/shell.test.tsx  (23 tests) 2025ms
+
+ Test Files  5 passed (5)
+      Tests  85 passed (85)
+   Start at  14:53:42
+   Duration  3.64s (transform 756ms, setup 441ms, collect 2.38s, tests 4.38s, environment 2.50s, prepare 525ms)
+
+VITEST_EXIT=0
+
+== G2: static gates (candidate) ==
+$ npm run lint   # eslint src
+> storagegenie-frontend@0.1.0 lint
+> eslint src
+LINT_EXIT=0
+
+$ ./node_modules/.bin/tsc --noEmit
+TSC_EXIT=0
+
+== G2: secret scan (CO-100) + diff ceiling ==
+$ git diff origin/automation..HEAD | grep '^+' | grep -inE 'password|secret|api[_-]?key|token|private[ _-]?key|AKIA|ghp_|github_pat_|sk-|xox[baprs]-|credential|bearer'
+secret_scan_exit=1 (1 = no match)
+$ git diff --stat origin/automation..HEAD
+ frontend/src/components/ExpiryEntryForm.tsx        | 55 ++++++++++++++++++++--
+ frontend/src/components/shell/AssetImportModal.tsx | 15 +++++-
+ 2 files changed, 64 insertions(+), 6 deletions(-)
+
+== Health (CO-92) ==
+start: {"status":"ok","db":"ok","storage":"ok"}
+end:   {"status":"ok","db":"ok","storage":"ok"}
