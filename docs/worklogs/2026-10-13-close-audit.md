@@ -1,5 +1,7 @@
 # StorageGenie — 2026-10-13 close audit
 
+**Final readbacks:** close-record commit a0b4ba498880b4f1fc82b107f80e7bd6ace04986 was clean and equal to remote automation. Git object sizes confirm STATE 11658 / AGENTS 9397 / CLAUDE 11 canonical bytes. END posted and read back at https://github.com/Andovol/Launcher/issues/62#issuecomment-6133149995. The completion-record addendum is pushed after this evidence; final chat verdict additionally verifies its remote ref.
+
 Owner close requests: "Can we close this session?" → "Lets close this session fully." This is the same session continued by its one-shot heartbeat, not a new START. The follow-up fired after the lane's enforced deadline; one status query returned SG-174 done/inactive, and explicit notes-ref fetch found its valid report and Work-HEAD. No re-trigger, retry, new production mutation or SG-175 implementation was performed.
 
 ## Completed close prerequisites
