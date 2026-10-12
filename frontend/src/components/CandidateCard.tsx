@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { Link } from "react-router-dom";
 import type { Candidate, CandidateField, DedupMatch } from "../api/types";
 import { WebAlternates } from "./WebAlternates";
 import { CONTROL_STYLE, THEMED_CONTROL_CLASS } from "./shell/CatalogToolbar";
@@ -49,6 +50,7 @@ export function CandidateCard({
     const base = import.meta.env.VITE_API_BASE || "http://localhost:8003";
     return candidate.evidence_ids.map((id) => ({ id, url: `${base}/v1/evidence/${id}/thumb/256?household_id=${householdId}` }));
   }, [candidate.evidence_ids, householdId]);
+  const [failedEvidenceIds, setFailedEvidenceIds] = useState<Set<string>>(new Set());
 
   return (
     <article className="bg-card border-border" style={{ borderStyle: "solid", borderWidth: 1, borderRadius: 10, padding: 16 }}>
@@ -79,7 +81,7 @@ export function CandidateCard({
         <section aria-label="Source evidence">
           <h3 style={{ marginTop: 0 }}>Source evidence</h3>
           <div style={{ display: "flex", flexWrap: "wrap", gap: 10 }}>
-            {evidenceUrls.map((evidence) => <figure key={evidence.id} style={{ margin: 0 }}><img src={evidence.url} alt={`Evidence ${evidence.id}`} className="bg-card-muted" style={{ width: 160, height: 120, objectFit: "contain" }} /><figcaption className="text-muted-foreground" style={{ fontSize: 11 }}>{evidence.id}</figcaption></figure>)}
+            {evidenceUrls.map((evidence) => <figure key={evidence.id} style={{ margin: 0 }}>{failedEvidenceIds.has(evidence.id) ? <div tabIndex={0} className="bg-card-muted text-muted-foreground focus-ring" style={{ width: 160, height: 120, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, padding: 4, textAlign: "center" }}>Thumbnail unavailable</div> : <img src={evidence.url} alt={`Evidence ${evidence.id}`} className="bg-card-muted" style={{ width: 160, height: 120, objectFit: "contain" }} onError={() => setFailedEvidenceIds((previous) => new Set(previous).add(evidence.id))} />}<figcaption className="text-muted-foreground" style={{ fontSize: 11 }}>{evidence.id}</figcaption></figure>)}
           </div>
           {evidenceUrls.length === 0 && <div>No source evidence</div>}
         </section>
@@ -136,6 +138,12 @@ export function CandidateCard({
           </button>
         )}
       </div>
+      {blocked && (
+        <p style={{ marginTop: 10, marginBottom: 0 }}>
+          Acceptance is blocked until the open review task(s) are resolved.{" "}
+          <Link to={`/inbox?household_id=${householdId}`} className="text-link focus-ring">View them in the Inbox.</Link>
+        </p>
+      )}
     </article>
   );
 }

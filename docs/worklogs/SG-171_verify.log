@@ -1,0 +1,44 @@
+== SG-171 verify — 2026-10-12T19:52:47Z ==
+
+## rules_check.sh (host contract path)
+G-L1 UNCHECKED the cache is not checked out at a contract tag: /home/andrei/storagegenie-contract
+G-L5 UNCHECKED gh-unauthenticated
+G-L7 UNCHECKED gh-unauthenticated
+G-L6 BYTES /home/andrei/.codex/AGENTS.md 2275
+G-L6 BYTES /home/andrei/.config/opencode/AGENTS.md 1933
+G-L6 BYTES total[codex]=2275 unseen=architect-layer,state-file,other-ritual-files
+G-L6 BYTES total[opencode]=1933 unseen=architect-layer,state-file,other-ritual-files
+rules_check_exit=3
+
+## contract version + payload hash
+0.46.0
+487841b151a593c396353e8eb61f245ba6678976b13917534308e810a7d8c9ef  /home/andrei/storagegenie-contract/RULES.md
+
+## published tags (live ls-remote)
+4c23869c09683a749468a34ab193606d365cb111	refs/tags/contract-v0.46.0
+925cb575c0ef0e1c5a15b6112041a270c2dbd730	refs/tags/contract-v0.46.0^{}
+acfcfe4d39e39a030d35038ff2d7f40dd6abc723	refs/tags/v0.46.0
+87ef04b67092ef3a334eb672aa0e5942eb9d9c4f	refs/tags/v0.46.0^{}
+
+## local contract HEAD / remote branch tip
+925cb575c0ef0e1c5a15b6112041a270c2dbd730
+925cb575c0ef0e1c5a15b6112041a270c2dbd730	refs/heads/contract
+
+## base ref resolved
+f0e8940ec9173d96fb124b1a6ac8b70d901a2f28
+automation
+
+## premise reads (packet cited lines)
+48:  const blocked = candidate.review_task_ids.length > 0;
+61:      {candidate.dedup_matches.length > 0 && (
+84:            {evidenceUrls.map((evidence) => <figure key={evidence.id} style={{ margin: 0 }}>{failedEvidenceIds.has(evidence.id) ? <div tabIndex={0} className="bg-card-muted text-muted-foreground focus-ring" style={{ width: 160, height: 120, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, padding: 4, textAlign: "center" }}>Thumbnail unavailable</div> : <img src={evidence.url} alt={`Evidence ${evidence.id}`} className="bg-card-muted" style={{ width: 160, height: 120, objectFit: "contain" }} onError={() => setFailedEvidenceIds((previous) => new Set(previous).add(evidence.id))} />}<figcaption className="text-muted-foreground" style={{ fontSize: 11 }}>{evidence.id}</figcaption></figure>)}
+91:        <span title={blocked ? "Acceptance is blocked until open review tasks are resolved" : undefined}>
+51:                Thumbnail unavailable
+
+## diff --stat (ceiling: 2 product files)
+ frontend/src/components/CandidateCard.test.tsx | 56 +++++++++++++++++++++++---
+ frontend/src/components/CandidateCard.tsx      | 10 ++++-
+ 2 files changed, 59 insertions(+), 7 deletions(-)
+
+## health {{HEALTH_CMD}}
+{"status":"ok","db":"ok","storage":"ok"} HTTP:200
