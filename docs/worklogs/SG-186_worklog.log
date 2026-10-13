@@ -1,0 +1,44 @@
+SG-186 worklog — R6 evidence-integrity detection repair (serve-time content verification + household-scoped evidence key replay)
+
+Lane: unit dispatch-storagegenie@SG-186.service; runner pid 2053624 (bash /usr/local/lib/dispatch/run-coder SG-186); opencode pid 2053733 argv: opencode run --auto --dir /home/andrei/StorageGenie --model opencode-go/deepseek-v4.1-flash --variant max.
+Budget: RUN_BUDGET_S=2100 from /etc/dispatch/storagegenie.conf; lane start epoch 1791918601 (btime 1785224168 + starttime 669443334 ticks @100Hz) = 19:10:01Z; deadline epoch 1791920701 (19:45:01Z).
+Contract: /home/andrei/storagegenie-contract VERSION=0.47.0; sha256(RULES.md)=49338e39a5749821e7e26724d28715d4d27b0a34e01b359ec91bc3d85239e3ed == RULES.sha256; CODER.md line 3 echoed verbatim in the report. CODER_PRODUCTION.md not re-read this slice body (project declares a live service; production interaction = health GETs only).
+BASE: packet ref automation resolved 91aacb7d44de24b2949ce80eb5c0150a92f71b17 (== local HEAD == origin/automation at slice start; worktree clean).
+19:11:15Z health start GET: body {"status":"ok","db":"ok","storage":"ok"} (HTTP code lost to a -w format slip; re-captured 19:18:38Z HTTP 200; both in SG-186_health_start.log).
+
+FIRST READ (premises verified against tree, PB-1):
+- evidence.py:25-38 (base line refs): idempotency replay queries the key globally and returns the mapped Evidence row with no household qualification — same two-line shape SG-185 fixed in assets.py. Confirmed same shape; sibling fix taken in-slice.
+- evidence.py:94-104 (base): GET /file serves via absolute_path trusting the DB row; no content check. Confirmed.
+- Writers of Evidence enumerated: store_evidence (source_kind "upload", sha = sha256(bytes)), store_text_evidence (source_kind "transcript", sha = composed artifact digest household+source_evidence+item_index+text, SG-080), store_scene_render_evidence (source_kind "scene_render", sha = sha256(bytes), SG-155/158). Only transcript's row sha is not a content hash.
+- /file route consumers (frontend): types/product.ts:117 (originalUrl mapper), shell/ItemInspectorDrawer.tsx:146, EvidenceGallery.tsx:22. Thumb route consumers (unchanged, no row hash anchors a derived artifact): EvidenceGallery.tsx:55, catalog/ProductCard.tsx:57, CandidateCard.tsx:51, AssetCard.tsx:11. Backend direct storage readers bypassing the HTTP route (unaffected): services/signals.py:85 (_stored_path), services/providers/reader.py:202 (resolve_original_bytes).
+
+IMPLEMENTATION (backend/app/api/v1/evidence.py, +26/-1 net):
+- _ARTIFACT_DIGEST_SOURCE_KINDS = frozenset({"transcript"}); _stored_content_sha256(path) streaming 1 MiB chunks.
+- get_evidence_file: after the existing 404 exists() check, hash stored bytes and compare to ev.sha256 for every kind except transcript; mismatch -> logger.warning (id, storage_key, expected, stored) + HTTP 500 detail "evidence_integrity_error: stored content does not match the recorded sha256". Never serves the corrupt bytes; no fallback. Missing-original 404 and household 403 untouched.
+- upload_evidence replay: `if ev and ev.household_id == household_id:` + comment naming D4 semantics (foreign key = fresh key for the requester; re-registration rolls back because IdempotencyKey.key is globally unique; same-household changed payload returns the ORIGINAL row).
+- No schema/migration: comparison uses the existing row sha256 column.
+
+FAIL half (isolated worktree /tmp/opencode/sg186-base @ 91aacb7, test file copied in, never in-place):
+  command: venv/bin/python -m pytest -q tests/test_sg186_evidence_serve_integrity.py   (workdir /tmp/opencode/sg186-base/backend)
+  result: 3 failed, 1 passed, 2 warnings in 1.44s (exit 1) — SG-186_fail_base.log
+  raw: B received A's evidence id (test_foreign_household_key... assertion at :158); mutation leg served 200 (test_serve_refuses_same_length_mutation...); corrupted-row-sha leg served 200 (test_serve_refuses_corrupted_row_sha...); transcript control passed on base (control arm).
+
+PASS half (candidate):
+  focused file: 4 passed in 1.53s (exit 0) — SG-186_dev_pass.log (warning lines quote expected/stored sha pairs from the two refusal legs, not secrets).
+  authoritative derived set (8 files: sg186 + test_evidence_upload + test_sg080_ingest_pipeline + test_sg127_followup_batch + test_sg130_png_thumb_backfill + test_phase1_e2e + test_phase2_e2e + test_phase3_e2e; derivation: every test file that POSTs /v1/evidence or GETs /v1/evidence/{id}/file): 82 passed, 2 warnings in 11.27s (exit 0) — SG-186_verify_candidate.log.
+  gates: ruff check app/api/v1/evidence.py tests/test_sg186_evidence_serve_integrity.py -> "All checks passed!" (SG-186_ruff.log); mypy app candidate 41 errors/9 files == base 41/9; evidence.py carries the same 4 errors both sides, line numbers +25 (SG-186_mypy_candidate.log, SG-186_mypy_base.log).
+  work commit 0dd037d (8 files, +661/-1; trailer Dispatch-ID: SG-186).
+
+G2 overhead probe (docs/worklogs/SG-186_probe_overhead.py; disposable DB/storage asserted pre-import; real GET /file via TestClient; PDF fixtures 256 KiB/2 MiB/8 MiB/20 MiB):
+  candidate means: 6.527 / 15.756 / 45.093 / 93.990 ms; base means: 6.346 / 13.780 / 38.166 / 78.466 ms; per-read delta +0.181 / +1.976 / +6.927 / +15.524 ms; hash-only floor 0.299 / 1.849 / 7.099 / 16.607 ms (overhead ~= one sha256 pass, ~0.8-1.0 ms/MB) — SG-186_overhead_candidate.log, SG-186_overhead_base.log.
+  coverage: originals only; thumbnails keep metadata-trusting reads (derived artifacts, no row hash to compare); internal direct-storage readers unaffected.
+
+Existing counter-control rerun (SG-180_probe_g1.py, real route, disposable; base vs candidate):
+  same_size_corruption_served: base DEFECT_OBSERVED (200, served sha != row sha) -> candidate PASS (500).
+  missing_original_controls: PASS both (file 404, thumb 200); counter_control_missing_thumb_404 PASS both.
+  cross_household_key_replay_returns_a_row: base PASS (B got A's row: old defect) -> candidate FAIL (B no longer receives A's row; probe encodes the pre-fix expectation; intentional flip).
+  cross_household_sha_dedup_returned_a_row: PASS both — identical-byte uploads still resolve to the first household's row through global content addressing (report bound).
+  probe exit: base 0, candidate 1 (the one intentional expectation flip). SG-186_sg180_probe_candidate.log, SG-186_sg180_probe_base.log.
+
+Decisions: (i) verification applies to every source_kind except "transcript" (SG-080 artifact digest is not recomputable from the file) — fail-closed for future kinds; (ii) original-only, thumbnails excluded (no hash anchor) — reported residual; (iii) hash-then-FileResponse keeps response headers byte-identical; the verify-to-send TOCTOU window is a documented residual; (iv) no migration (existing column used).
+Retries 0. Test commands: base FAIL 2 (first run tail-only in-session, re-captured whole to the log), focused candidate 1, authoritative 1; probes 4; gates 3 (ruff + mypy x2). Provider calls 0; spend $0. No privileged operation attempted (all optional environment/Docker probes excluded); no production write; no deploy/restart; production interaction = health GETs only.
