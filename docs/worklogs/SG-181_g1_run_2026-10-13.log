@@ -1,0 +1,223 @@
+/home/andrei/StorageGenie/backend/venv/lib/python3.12/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+  from starlette.testclient import TestClient as TestClient  # noqa
+[PASS] isolation {"storage_root": "/tmp/sg181-g1-2tnte2vv/storage", "engine_url": "sqlite:////tmp/sg181-g1-2tnte2vv/storagegenie.db", "temp_root": "/tmp/sg181-g1-2tnte2vv"}
+[DEFECT_OBSERVED] asset_key_replay_same_key_other_household {"a_status": 201, "a_id": "01a13607-9fcb-7fd1-9d3d-1adebf7d262d", "a_household": "01a13607-9f9c-7f51-a33d-f446e379a61c", "b_status": 201, "b_returned_id": "01a13607-9fcb-7fd1-9d3d-1adebf7d262d", "b_returned_household": "01a13607-9f9c-7f51-a33d-f446e379a61c", "b_requested_household": "01a13607-9f9c-7f51-a33d-f4567b324e8b", "idempotency_rows": [{"key": "sg181-shared-asset-key", "response": "{\"id\":
+[OBSERVE] asset_key_replay_changed_payload_ignored {"returned_id": "01a13607-9fcb-7fd1-9d3d-1adebf7d262d", "original_id": "01a13607-9fcb-7fd1-9d3d-1adebf7d262d", "returned_name": "A keyed item", "note": "different display_name under same key silently returns the original row"}
+[PASS] counter_control_fresh_key_own_row {"status": 201, "id": "01a13607-9ffc-7011-821e-7e56603fef77", "household": "01a13607-9f9c-7f51-a33d-f4567b324e8b"}
+[PASS] counter_control_nokey_own_rows {}
+[PASS] asset_get_foreign_403 {"status": 403}
+[PASS] asset_patch_foreign_403 {"status": 403}
+[PASS] asset_evidence_attach_foreign_403 {"status": 403}
+[PASS] asset_list_scoped {"returned": ["01a13607-a014-7342-bec1-98e65ed1fc91", "01a13607-9ffc-7011-821e-7e56603fef77"]}
+[PASS] ifmatch_current_accepts {"status": 200, "before": 1, "after": 2}
+[PASS] ifmatch_stale_409 {"status": 409, "detail": "Version mismatch: expected 1, got 2"}
+[PASS] ifmatch_invalid_422 {"status": 422}
+[OBSERVE] ifmatch_missing_allowed {"status": 200, "version_after": 3, "note": "no If-Match -> unconditional update; last-write-wins"}
+[PASS] patch_empty_422 {"status": 422}
+[PASS] interleaved_same_version_second_409 {"first": 200, "second": 409, "note": "sequential CAS, not true concurrency"}
+Barcode extraction unavailable: pyzbar/libzbar is not installed
+OCR extraction unavailable: tesseract is not installed or it's not in your PATH. See README file for more information.
+[PASS] candidate_decision_foreign_403 {"status": 403}
+[PASS] c1_real_writer_partial_mutation_landed {"asset_id": "01a13607-a132-71d1-a3f2-f04e47434831", "asset_rows_in_txn": 3, "assertion_rows_in_txn": 3, "link_rows_in_txn": 1, "audit_rows_in_txn": 3, "idempotency_untouched": true}
+[PASS] c1_controlled_failure_marks_job_failed {"status": 200, "state": "FAILED", "errors": ["sg181 controlled failure AFTER real partial write"]}
+[PASS] c1_fresh_session_after_failure {"assets_before": 2, "assets_after_failure_fresh": 2, "job_state": "FAILED", "landed_asset_would_have_been": "01a13607-a132-71d1-a3f2-f04e47434831", "note": "same-request session count above shows the partial unit landed; fresh connection shows it rolled back"}
+[PASS] c1_rollback_differs_from_landed {"in_txn": 3, "fresh": 2}
+[PASS] c1_normal_commit_control_persists {"retry_status": 200, "state": "COMPLETED", "assets_after_retry": 3, "assertions": ["display_name", "asset_type", "status"], "links": 1, "audits": ["asset.create", "asset.accepted", "asset.lifecycle.created"]}
+[PASS] c1_asset_get_readback_lineage {"assertion_sources": ["deterministic", "extraction"], "audit_actions": ["asset.accepted", "asset.create", "asset.lifecycle.created"]}
+[PASS] c1_asset_get_foreign_403 {"status": 403}
+[OBSERVE] observation_lineage {"total": 1, "evidence_ids": ["01a13607-a088-74a0-b718-e55c44cd211a"]}
+{
+  "results": [
+    {
+      "check": "isolation",
+      "result": "PASS",
+      "storage_root": "/tmp/sg181-g1-2tnte2vv/storage",
+      "engine_url": "sqlite:////tmp/sg181-g1-2tnte2vv/storagegenie.db",
+      "temp_root": "/tmp/sg181-g1-2tnte2vv"
+    },
+    {
+      "check": "asset_key_replay_same_key_other_household",
+      "result": "DEFECT_OBSERVED",
+      "a_status": 201,
+      "a_id": "01a13607-9fcb-7fd1-9d3d-1adebf7d262d",
+      "a_household": "01a13607-9f9c-7f51-a33d-f446e379a61c",
+      "b_status": 201,
+      "b_returned_id": "01a13607-9fcb-7fd1-9d3d-1adebf7d262d",
+      "b_returned_household": "01a13607-9f9c-7f51-a33d-f446e379a61c",
+      "b_requested_household": "01a13607-9f9c-7f51-a33d-f4567b324e8b",
+      "idempotency_rows": [
+        {
+          "key": "sg181-shared-asset-key",
+          "response": "{\"id\": \"01a13607-9fcb-7fd1-9d3d-1adebf7d262d\"}"
+        }
+      ],
+      "assets_a": 1,
+      "assets_b": 0,
+      "expected": "household-scoped replay or 403 (import replay precedent F-SG180-11); CX-01"
+    },
+    {
+      "check": "asset_key_replay_changed_payload_ignored",
+      "result": "OBSERVE",
+      "returned_id": "01a13607-9fcb-7fd1-9d3d-1adebf7d262d",
+      "original_id": "01a13607-9fcb-7fd1-9d3d-1adebf7d262d",
+      "returned_name": "A keyed item",
+      "note": "different display_name under same key silently returns the original row"
+    },
+    {
+      "check": "counter_control_fresh_key_own_row",
+      "result": "PASS",
+      "status": 201,
+      "id": "01a13607-9ffc-7011-821e-7e56603fef77",
+      "household": "01a13607-9f9c-7f51-a33d-f4567b324e8b"
+    },
+    {
+      "check": "counter_control_nokey_own_rows",
+      "result": "PASS"
+    },
+    {
+      "check": "asset_get_foreign_403",
+      "result": "PASS",
+      "status": 403
+    },
+    {
+      "check": "asset_patch_foreign_403",
+      "result": "PASS",
+      "status": 403
+    },
+    {
+      "check": "asset_evidence_attach_foreign_403",
+      "result": "PASS",
+      "status": 403
+    },
+    {
+      "check": "asset_list_scoped",
+      "result": "PASS",
+      "returned": [
+        "01a13607-a014-7342-bec1-98e65ed1fc91",
+        "01a13607-9ffc-7011-821e-7e56603fef77"
+      ]
+    },
+    {
+      "check": "ifmatch_current_accepts",
+      "result": "PASS",
+      "status": 200,
+      "before": 1,
+      "after": 2
+    },
+    {
+      "check": "ifmatch_stale_409",
+      "result": "PASS",
+      "status": 409,
+      "detail": "Version mismatch: expected 1, got 2"
+    },
+    {
+      "check": "ifmatch_invalid_422",
+      "result": "PASS",
+      "status": 422
+    },
+    {
+      "check": "ifmatch_missing_allowed",
+      "result": "OBSERVE",
+      "status": 200,
+      "version_after": 3,
+      "note": "no If-Match -> unconditional update; last-write-wins"
+    },
+    {
+      "check": "patch_empty_422",
+      "result": "PASS",
+      "status": 422
+    },
+    {
+      "check": "interleaved_same_version_second_409",
+      "result": "PASS",
+      "first": 200,
+      "second": 409,
+      "note": "sequential CAS, not true concurrency"
+    },
+    {
+      "check": "candidate_decision_foreign_403",
+      "result": "PASS",
+      "status": 403
+    },
+    {
+      "check": "c1_real_writer_partial_mutation_landed",
+      "result": "PASS",
+      "asset_id": "01a13607-a132-71d1-a3f2-f04e47434831",
+      "asset_rows_in_txn": 3,
+      "assertion_rows_in_txn": 3,
+      "link_rows_in_txn": 1,
+      "audit_rows_in_txn": 3,
+      "idempotency_untouched": true
+    },
+    {
+      "check": "c1_controlled_failure_marks_job_failed",
+      "result": "PASS",
+      "status": 200,
+      "state": "FAILED",
+      "errors": [
+        "sg181 controlled failure AFTER real partial write"
+      ]
+    },
+    {
+      "check": "c1_fresh_session_after_failure",
+      "result": "PASS",
+      "assets_before": 2,
+      "assets_after_failure_fresh": 2,
+      "job_state": "FAILED",
+      "landed_asset_would_have_been": "01a13607-a132-71d1-a3f2-f04e47434831",
+      "note": "same-request session count above shows the partial unit landed; fresh connection shows it rolled back"
+    },
+    {
+      "check": "c1_rollback_differs_from_landed",
+      "result": "PASS",
+      "in_txn": 3,
+      "fresh": 2
+    },
+    {
+      "check": "c1_normal_commit_control_persists",
+      "result": "PASS",
+      "retry_status": 200,
+      "state": "COMPLETED",
+      "assets_after_retry": 3,
+      "assertions": [
+        "display_name",
+        "asset_type",
+        "status"
+      ],
+      "links": 1,
+      "audits": [
+        "asset.create",
+        "asset.accepted",
+        "asset.lifecycle.created"
+      ]
+    },
+    {
+      "check": "c1_asset_get_readback_lineage",
+      "result": "PASS",
+      "assertion_sources": [
+        "deterministic",
+        "extraction"
+      ],
+      "audit_actions": [
+        "asset.accepted",
+        "asset.create",
+        "asset.lifecycle.created"
+      ]
+    },
+    {
+      "check": "c1_asset_get_foreign_403",
+      "result": "PASS",
+      "status": 403
+    },
+    {
+      "check": "observation_lineage",
+      "result": "OBSERVE",
+      "total": 1,
+      "evidence_ids": [
+        "01a13607-a088-74a0-b718-e55c44cd211a"
+      ]
+    }
+  ]
+}
+TEMP_ROOT=/tmp/sg181-g1-2tnte2vv
+elapsed_s=0.6 start_epoch=1791907831 end_epoch=1791907832
