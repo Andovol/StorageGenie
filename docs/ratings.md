@@ -703,3 +703,9 @@ Originals above (88 FLAG:TRUST / 91 FLAG:TRUST) stand as the audit trail; the ve
 | slice_id | phase | model | effort | score | flag | lever | guards_invoked | deduction_attribution | remaining | escape |
 |---|---|---|---|---|---|---|---|---|---|---|
 | SG-186 | R6 integrity (F-SG180-3); receipt 7fe71d3; serve-time sha256 vs row → explicit 500, transcript gate narrow+fail-closed+pinned, replay sibling same-shape taken; 4 tests FAIL-then-PASS, authoritative 82/82, SG-180 probe rerun, overhead measured; audit SG-186_audit.md | opencode/opencode-go/deepseek-v4.1-flash (receipt command settings) | max | 97 |  |  | PG-EV-01/02/03/04/05/06/07/09/13; PG-SC-01/02/03/09/10/12; PG-IC-01/07/09; PG-DP-03; PG-PR-01/03/04/07/10 |  | Transcript/thumbnail anchors parked (schema decision); TOCTOU documented; sha-dedup own grant if wanted; mypy register; serve via normal deploy course |  |
+
+### SG-187 (2026-10-13 - R2 capture/import journey repair)
+
+| slice_id | phase | model | effort | score | flag | lever | guards_invoked | deduction_attribution | remaining | escape |
+|---|---|---|---|---|---|---|---|---|---|---|
+| SG-187 | R2 journey (SC-02/03 + hygiene + surface truth); receipt 45d0f2e; Inbox Start, orphan cleanup + readable errors, honest modal note; FAIL-then-PASS both layers, authoritative 97+41, screenshots independently read; forward-written push line self-corrected; audit SG-187_audit.md | opencode/opencode-go/deepseek-v4.1-flash (receipt command settings) | max | 96 |  |  | PG-EV-01/02/03/04/05/06/07/09/13; PG-SC-01/02/03/09/10/12; PG-IC-01/07/09; PG-DP-03; PG-PR-01/03/04/07/10 | coder (self-corrected CO-29/CO-51 report slip) | Import-order fragility reported; memory shape noted; no cancel writer per scope; mypy register; serve via normal deploy course |  |

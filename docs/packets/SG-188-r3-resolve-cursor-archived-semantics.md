@@ -2,9 +2,9 @@
 
 `PB-1`–`PB-6` bind (`CODER.md` §14).
 **BASE REF: automation.** Report actual resolved commit.
-**STATUS: DRAFT prepared 2026-10-13 from SG-181 observations; scope-approved D6-scope/D7/D8 (bare-Resolve guard + cursor 422 + archived exclude-by-default). SG-176/177/178 grants RETAIN their classification/Resolve/visibility scope — this slice works inside it. RE-REVIEW against the tree before dispatch next session.**
+**STATUS: RE-REVIEWED vs tree at `45d0f2e`+ under D16 L3 flow; premises hold (bare resolve with no guard; falsy-cursor skip; no ARCHIVED exclusion in list path; no archived policy in `compute_status`). Scope-approved D6-scope/D7/D8.**
 **DATABASE: separately isolated disposable test database/storage; production GET observations only.**
-**Restart: none. Autonomy: L2.**
+**Restart: none. Autonomy: L3** (D16 flow). SG-176/177/178 grants RETAIN their classification/Resolve/visibility repair scope — this slice works inside it and does not consume it.
 
 ## Why this exists
 
@@ -12,7 +12,7 @@ Three decided semantics from SG-181, all small and all in the task/list/read sur
 
 ## G1 — Data-required tasks cannot close without data
 
-`resolve_review_task` refuses a bare `{}` resolve for data-required task types (explicit 422 naming the missing data), while the real manual-entry path still resolves and returns `resolved_review_task_ids` as today. Classification→expiry→task readback fixtures from SG-181 G2 are the control population (food → task; non-perishable → no task). FAIL-then-PASS: pre-change bare Resolve 200-with-unknown-data; post-change 422 + data still unknown; real-entry resolve 200 accepted. SG-176/177/178 classification/repair scope is consumed, not widened.
+`resolve_review_task` refuses a bare `{}` resolve for data-required task types (explicit 422 naming the missing data), while the real manual-entry path still resolves and returns `resolved_review_task_ids` as today. Classification→expiry→task readback fixtures from SG-181 G2 are the control population (food → task; non-perishable → no task). FAIL-then-PASS: pre-change bare Resolve 200-with-unknown-data; post-change 422 + data still unknown; real-entry resolve 200 accepted. SG-176/177/178 fixtures are used as controls only; their repair scope stays with those grants, untouched here.
 
 ## G2 — Cursor and archived visibility per the decided semantics
 
