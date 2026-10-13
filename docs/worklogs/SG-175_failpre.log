@@ -1,0 +1,716 @@
+SG-175 failpre — discriminating new regression tests run against RESOLVED PRE-CHANGE code (CO-20c)
+base ref: automation; resolved base commit: 803cf522723158c65f9c4a6ba1ac3679da57f53a
+isolated worktree /tmp/sg175-base at base commit; only the three candidate test files were copied in; product code is the base tree unmodified
+
+== backend: /home/andrei/StorageGenie/backend/venv/bin/python -m pytest -q tests/test_candidate_read.py (cwd /tmp/sg175-base/backend) ==
+..FFFF.                                                                  [100%]
+=================================== FAILURES ===================================
+________ test_candidate_get_drops_resolved_task_ids_and_accept_succeeds ________
+
+candidate_read_db = (<sqlalchemy.orm.session.Session object at 0x71691a43bb60>, '01a1354e-27d9-78c3-830d-b3e7c450fece', '01a1354e-27d9-78c3-830d-b3f228ad6d76', '01a1354e-280f-7351-8bc6-a8aacba23443', '01a1354e-27dc-7761-ad7e-94bb501e19aa')
+
+    def test_candidate_get_drops_resolved_task_ids_and_accept_succeeds(candidate_read_db) -> None:  # type: ignore[no-untyped-def]
+        session, household_id, _, candidate_id, _ = candidate_read_db
+        live_task_id = _open_task_id(session, candidate_id)
+        snapshot_before = _candidate_snapshot(session, candidate_id)
+        with TestClient(app) as client:
+            resolved = client.post(
+                f"/v1/review-tasks/{live_task_id}/resolve", params={"household_id": household_id}, json={}
+            )
+            read = client.get(f"/v1/candidates/{candidate_id}", params={"household_id": household_id})
+            accepted = client.post(
+                f"/v1/candidates/{candidate_id}/decision",
+                params={"household_id": household_id},
+                json={"action": "accept", "corrected_fields": {}},
+            )
+        assert resolved.status_code == 200
+        assert resolved.json()["status"] == "resolved"
+>       assert read.json()["review_task_ids"] == []
+E       AssertionError: assert ['01a1354e-28...7b006f044572'] == []
+E         
+E         Left contains one more item: '01a1354e-2818-7121-a243-7b006f044572'
+E         Use -v to get more diff
+
+tests/test_candidate_read.py:151: AssertionError
+______________ test_candidate_get_ignores_stale_embedded_task_ids ______________
+
+candidate_read_db = (<sqlalchemy.orm.session.Session object at 0x716919ab5e20>, '01a1354e-2936-78d1-acc9-b2088f17e446', '01a1354e-2936-78d1-acc9-b21a32560d69', '01a1354e-2967-7201-871f-a943e70d0beb', '01a1354e-2939-7322-a288-ecf75f164805')
+
+    def test_candidate_get_ignores_stale_embedded_task_ids(candidate_read_db) -> None:  # type: ignore[no-untyped-def]
+        session, household_id, _, candidate_id, _ = candidate_read_db
+        live_task_id = _open_task_id(session, candidate_id)
+        _embed_task_ids(session, candidate_id, ["stale-task-id"])
+        with TestClient(app) as client:
+            client.post(f"/v1/review-tasks/{live_task_id}/resolve", params={"household_id": household_id}, json={})
+            read = client.get(f"/v1/candidates/{candidate_id}", params={"household_id": household_id})
+            accepted = client.post(
+                f"/v1/candidates/{candidate_id}/decision",
+                params={"household_id": household_id},
+                json={"action": "accept", "corrected_fields": {}},
+            )
+>       assert read.json()["review_task_ids"] == []
+E       AssertionError: assert ['stale-task-id'] == []
+E         
+E         Left contains one more item: 'stale-task-id'
+E         Use -v to get more diff
+
+tests/test_candidate_read.py:170: AssertionError
+__________ test_candidate_get_includes_live_task_absent_from_proposal __________
+
+candidate_read_db = (<sqlalchemy.orm.session.Session object at 0x7169191cdd30>, '01a1354e-2a5c-7952-9086-f9018e051064', '01a1354e-2a5c-7952-9086-f91676c4e100', '01a1354e-2a97-73a2-843b-f941914a48b9', '01a1354e-2a5f-7721-ae66-2a4609e5d5c4')
+
+    def test_candidate_get_includes_live_task_absent_from_proposal(candidate_read_db) -> None:  # type: ignore[no-untyped-def]
+        session, household_id, _, candidate_id, _ = candidate_read_db
+        live_task_id = _open_task_id(session, candidate_id)
+        _embed_task_ids(session, candidate_id, [])
+        omitted = ReviewTask(
+            task_type="candidate.multi_item",
+            priority="high",
+            subject_ref=candidate_id,
+            proposed_change=json.dumps({"candidate_id": candidate_id, "item_count": 2}),
+            status="open",
+            household_id=household_id,
+        )
+        session.add(omitted)
+        session.commit()
+        with TestClient(app) as client:
+            client.post(f"/v1/review-tasks/{live_task_id}/resolve", params={"household_id": household_id}, json={})
+            read = client.get(f"/v1/candidates/{candidate_id}", params={"household_id": household_id})
+            blocked = client.post(
+                f"/v1/candidates/{candidate_id}/decision",
+                params={"household_id": household_id},
+                json={"action": "accept", "corrected_fields": {}},
+            )
+>       assert read.json()["review_task_ids"] == [omitted.id]
+E       AssertionError: assert [] == ['01a1354e-2a...15bb92b3c9aa']
+E         
+E         Right contains one more item: '01a1354e-2aaa-7482-89cc-15bb92b3c9aa'
+E         Use -v to get more diff
+
+tests/test_candidate_read.py:197: AssertionError
+____ test_candidate_get_excludes_foreign_household_and_other_subject_tasks _____
+
+candidate_read_db = (<sqlalchemy.orm.session.Session object at 0x716918f7cc80>, '01a1354e-2b34-7151-85ef-8952ed001a62', '01a1354e-2b34-7151-85ef-89644a513c80', '01a1354e-2b65-7990-9930-e4964bcbfefe', '01a1354e-2b37-7813-b2f2-740bfc75592f')
+
+    def test_candidate_get_excludes_foreign_household_and_other_subject_tasks(candidate_read_db) -> None:  # type: ignore[no-untyped-def]
+        session, household_id, other_household_id, candidate_id, _ = candidate_read_db
+        live_task_id = _open_task_id(session, candidate_id)
+        foreign = ReviewTask(
+            task_type="identifier_collision",
+            priority="high",
+            subject_ref=candidate_id,
+            proposed_change=json.dumps({"candidate_id": candidate_id}),
+            status="open",
+            household_id=other_household_id,
+        )
+        other_subject = ReviewTask(
+            task_type="expiry.manual_entry",
+            priority="high",
+            subject_ref="candidate-elsewhere",
+            proposed_change=json.dumps({"candidate_id": "candidate-elsewhere"}),
+            status="open",
+            household_id=household_id,
+        )
+        session.add_all([foreign, other_subject])
+        session.commit()
+        _embed_task_ids(session, candidate_id, [foreign.id, other_subject.id])
+        with TestClient(app) as client:
+            client.post(f"/v1/review-tasks/{live_task_id}/resolve", params={"household_id": household_id}, json={})
+            read = client.get(f"/v1/candidates/{candidate_id}", params={"household_id": household_id})
+            accepted = client.post(
+                f"/v1/candidates/{candidate_id}/decision",
+                params={"household_id": household_id},
+                json={"action": "accept", "corrected_fields": {}},
+            )
+>       assert read.json()["review_task_ids"] == []
+E       AssertionError: assert ['01a1354e-2b...89e55f7b85f4'] == []
+E         
+E         Left contains 2 more items, first extra item: '01a1354e-2b78-7d62-9208-89d002b770b9'
+E         Use -v to get more diff
+
+tests/test_candidate_read.py:232: AssertionError
+=============================== warnings summary ===============================
+../../../home/andrei/StorageGenie/backend/venv/lib/python3.12/site-packages/fastapi/testclient.py:1
+  /home/andrei/StorageGenie/backend/venv/lib/python3.12/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+../../../home/andrei/StorageGenie/backend/venv/lib/python3.12/site-packages/starlette/testclient.py:53
+  /home/andrei/StorageGenie/backend/venv/lib/python3.12/site-packages/starlette/testclient.py:53: DeprecationWarning: The anyio.abc.BlockingPortal alias is deprecated, use anyio.from_thread.BlockingPortal instead.
+    _PortalFactoryType = Callable[[], AbstractContextManager[anyio.abc.BlockingPortal]]
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/test_candidate_read.py::test_candidate_get_drops_resolved_task_ids_and_accept_succeeds
+FAILED tests/test_candidate_read.py::test_candidate_get_ignores_stale_embedded_task_ids
+FAILED tests/test_candidate_read.py::test_candidate_get_includes_live_task_absent_from_proposal
+FAILED tests/test_candidate_read.py::test_candidate_get_excludes_foreign_household_and_other_subject_tasks
+4 failed, 3 passed, 2 warnings in 3.46s
+
+== frontend: node node_modules/vitest/vitest.mjs run src/components/CandidateCard.test.tsx src/routes/ReviewPage.test.tsx (cwd /tmp/sg175-base/frontend) ==
+
+ RUN  v1.6.1 /tmp/sg175-base/frontend
+
+stderr | src/routes/ReviewPage.test.tsx > ReviewPage > posts every decision with the loaded candidate id and supports keyboard actions
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+stderr | src/components/CandidateCard.test.tsx > CandidateCard > keeps evidence beside fields and exposes confidence, source, and blocking collision
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+ ❯ src/components/CandidateCard.test.tsx  (11 tests | 1 failed) 365ms
+   ❯ src/components/CandidateCard.test.tsx > CandidateCard > blocked candidate with dedup matches renders the blocked reason exactly once (SG-175 G2)
+     → expected 3 to be 2 // Object.is equality
+ ❯ src/routes/ReviewPage.test.tsx  (7 tests | 1 failed) 1678ms
+   ❯ src/routes/ReviewPage.test.tsx > ReviewPage > pending decision prevents repeated accept mutations from the keyboard (SG-175 A2)
+     → expected "spy" to be called 1 times, but got 3 times
+
+Ignored nodes: comments, script, style
+[36m<html>[39m
+  [36m<head />[39m
+  [36m<body>[39m
+    [36m<div>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"page-container text-foreground"[39m
+        [33mdata-testid[39m=[32m"page-container"[39m
+        [33mdata-variant[39m=[32m"page"[39m
+        [33mstyle[39m=[32m"width: 100%; max-width: 1100px; margin-left: auto; margin-right: auto; padding: 24px;"[39m
+      [36m>[39m
+        [36m<a[39m
+          [33mclass[39m=[32m"text-link focus-ring"[39m
+          [33mhref[39m=[32m"/inbox?household_id=household-loaded"[39m
+        [36m>[39m
+          [0m← Back to inbox[0m
+        [36m</a>[39m
+        [36m<h1[39m
+          [33mclass[39m=[32m"page-header text-foreground"[39m
+        [36m>[39m
+          [0mReview workspace[0m
+        [36m</h1>[39m
+        [36m<article[39m
+          [33mclass[39m=[32m"bg-card border-border"[39m
+          [33mstyle[39m=[32m"border-style: solid; border-width: 1px; border-radius: 10px; padding: 16px;"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mstyle[39m=[32m"display: flex; justify-content: space-between; align-items: baseline; gap: 12px;"[39m
+          [36m>[39m
+            [36m<div>[39m
+              [36m<h2[39m
+                [33mstyle[39m=[32m"margin: 0px;"[39m
+              [36m>[39m
+                [0mCandidate [0m
+                [0mcandidate-loaded-31[0m
+              [36m</h2>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"text-muted-foreground"[39m
+                [33mstyle[39m=[32m"font-size: 12px;"[39m
+              [36m>[39m
+                [0mState: [0m
+                [0mproposed[0m
+                [0m · Job: [0m
+                [0mjob-loaded-31[0m
+              [36m</div>[39m
+            [36m</div>[39m
+            [36m<span>[39m
+              [0mCandidate review[0m
+            [36m</span>[39m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mstyle[39m=[32m"display: grid; grid-template-columns: minmax(180px, 1fr) minmax(240px, 1.2fr); gap: 20px; margin-top: 18px;"[39m
+          [36m>[39m
+            [36m<section[39m
+              [33maria-label[39m=[32m"Candidate fields"[39m
+            [36m>[39m
+              [36m<h3[39m
+                [33mstyle[39m=[32m"margin-top: 0px;"[39m
+              [36m>[39m
+                [0mCandidate fields[0m
+              [36m</h3>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"border-border"[39m
+                [33mstyle[39m=[32m"padding: 8px 0px; border-bottom-style: solid; border-bottom-width: 1px;"[39m
+              [36m>[39m
+                [36m<label[39m
+                  [33mfor[39m=[32m"candidate-field-display_name"[39m
+                  [33mstyle[39m=[32m"display: block; font-weight: 600;"[39m
+                [36m>[39m
+                  [0mdisplay_name[0m
+                [36m</label>[39m
+                [36m<input[39m
+                  [33maria-label[39m=[32m"display_name value"[39m
+                  [33mclass[39m=[32m"bg-background text-foreground border-border focus-ring"[39m
+                  [33mid[39m=[32m"candidate-field-display_name"[39m
+                  [33mplaceholder[39m=[32m"Unknown"[39m
+                  [33mstyle[39m=[32m"width: 100%; box-sizing: border-box; padding: 7px; margin-top: 4px; border-style: solid; border-width: 1px; border-radius: 5px;"[39m
+                  [33mvalue[39m=[32m"Loaded item"[39m
+                [36m/>[39m
+                [36m<div[39m
+                  [33mclass[39m=[32m"text-muted-foreground"[39m
+                  [33mstyle[39m=[32m"font-size: 11px; margin-top: 3px;"[39m
+                [36m>[39m
+                  [0mConfidence: [0m
+                  [0mUnknown[0m
+                  [0m · Source: [0m
+                  [0mdeterministic[0m
+                [36m</div>[39m
+              [36m</div>[39m
+            [36m</section>[39m
+            [36m<section[39m
+              [33maria-label[39m=[32m"Source evidence"[39m
+            [36m>[39m
+              [36m<h3[39m
+                [33mstyle[39m=[32m"margin-top: 0px;"[39m
+              [36m>[39m
+                [0mSource evidence[0m
+              [36m</h3>[39m
+              [36m<div[39m
+                [33mstyle[39m=[32m"display: flex; flex-wrap: wrap; gap: 10px;"[39m
+              [36m>[39m
+                [36m<figure[39m
+                  [33mstyle[39m=[32m"margin: 0px;"[39m
+                [36m>[39m
+                  [36m<img[39m
+                    [33malt[39m=[32m"Evidence evidence-loaded-31"[39m
+                    [33mclass[39m=[32m"bg-card-muted"[39m
+                    [33msrc[39m=[32m"http://localhost:8003/v1/evidence/evidence-loaded-31/thumb/256?household_id=household-loaded"[39m
+                    [33mstyle[39m=[32m"width: 160px; height: 120px; object-fit: contain;"[39m
+                  [36m/>[39m
+                  [36m<figcaption[39m
+                    [33mclass[39m=[32m"text-muted-foreground"[39m
+                    [33mstyle[39m=[32m"font-size: 11px;"[39m
+                  [36m>[39m
+                    [0mevidence-loaded-31[0m
+                  [36m</figcaption>[39m
+                [36m</figure>[39m
+              [36m</div>[39m
+            [36m</section>[39m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mstyle[39m=[32m"display: flex; gap: 8px; flex-wrap: wrap; margin-top: 18px;"[39m
+          [36m>[39m
+            [36m<span>[39m
+              [36m<button[39m
+                [33mclass[39m=[32m"bg-primary text-primary-foreground focus-ring"[39m
+                [33mdisabled[39m=[32m""[39m
+                [33mstyle[39m=[32m"padding: 4px 10px; border-radius: 6px; font-size: 13px; cursor: not-allowed; opacity: 0.5;"[39m
+                [33mtype[39m=[32m"button"[39m
+              [36m>[39m
+                [0mAccept[0m
+              [36m</button>[39m
+            [36m</span>[39m
+            [36m<button[39m
+              [33mclass[39m=[32m"bg-background text-foreground border-border focus-ring"[39m
+              [33mdisabled[39m=[32m""[39m
+              [33mstyle[39m=[32m"padding: 4px 10px; border-radius: 6px; border-style: solid; border-width: 1px; font-size: 13px; cursor: not-allowed; opacity: 0.5;"[39m
+              [33mtype[39m=[32m"button"[39m
+            [36m>[39m
+              [0mSave edits[0m
+            [36m</button>[39m
+            [36m<button[39m
+              [33mclass[39m=[32m"bg-background text-foreground border-border focus-ring"[39m
+              [33mdisabled[39m=[32m""[39m
+              [33mstyle[39m=[32m"padding: 4px 10px; border-radius: 6px; border-style: solid; border-width: 1px; font-size: 13px; cursor: not-allowed; opacity: 0.5;"[39m
+              [33mtype[39m=[32m"button"[39m
+            [36m>[39m
+              [0mHold / Unknown[0m
+            [36m</button>[39m
+            [36m<button[39m
+              [33mclass[39m=[32m"bg-background text-foreground border-border focus-ring"[39m
+              [33mdisabled[39m=[32m""[39m
+              [33mstyle[39m=[32m"padding: 4px 10px; border-radius: 6px; border-style: solid; border-width: 1px; font-size: 13px; cursor: not-allowed; opacity: 0.5;"[39m
+              [33mtype[39m=[32m"button"[39m
+            [36m>[39m
+              [0mReject[0m
+            [36m</button>[39m
+          [36m</div>[39m
+        [36m</article>[39m
+        [36m<div[39m
+          [33mdata-testid[39m=[32m"keyboard-action"[39m
+          [33mrole[39m=[32m"status"[39m
+        [36m>[39m
+          [0mKeyboard: [0m
+          [0mreject[0m
+        [36m</div>[39m
+        [36m<section[39m
+          [33maria-label[39m=[32m"Manual expiry entry"[39m
+          [33mclass[39m=[32m"bg-card border-border"[39m
+          [33mstyle[39m=[32m"margin-top: 18px; padding: 14px; border-style: solid; border-width: 1px; border-radius: 8px;"[39m
+        [36m>[39m
+          [36m<h3[39m
+            [33mstyle[39m=[32m"margin-top: 0px;"[39m
+          [36m>[39m
+            [0mManual expiry entry[0m
+          [36m</h3>[39m
+          [36m<div>[39m
+            [0mExpiry evidence state: [0m
+            [36m<strong[39m
+              [33mdata-testid[39m=[32m"expiry-state"[39m
+            [36m>[39m
+              [0mneeds_evidence[0m
+            [36m</strong>[39m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mstyle[39m=[32m"display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; align-items: end;"[39m
+          [36m>[39m
+            [36m<label[39m
+              [33mstyle[39m=[32m"display: flex; flex-direction: column; gap: 4px; font-size: 13px;"[39m
+            [36m>[39m
+              [0mDate[0m
+              [36m<input[39m
+                [33mclass[39m=[32m"bg-background text-foreground border-border focus-ring"[39m
+                [33mstyle[39m=[32m"padding: 6px 10px; border-radius: 6px; border-style: solid; border-width: 1px;"[39m
+                [33mtype[39m=[32m"date"[39m
+                [33mvalue[39m=[32m""[39m
+              [36m/>[39m
+            [36m</label>[39m
+            [36m<label[39m
+              [33mstyle[39m=[32m"display: flex; flex-direction: column; gap: 4px; font-size: 13px;"[39m
+            [36m>[39m
+              [0mDate type[0m
+              [36m<select[39m
+                [33mclass[39m=[32m"bg-background text-foreground border-border focus-ring"[39m
+                [33mstyle[39m=[32m"padding: 6px 10px; border-radius: 6px; border-style: solid; border-width: 1px;"[39m
+              [36m>[39m
+                [36m<option[39m
+                  [33mvalue[39m=[32m"expiry_date"[39m
+                [36m>[39m
+                  [0mExpiry date[0m
+                [36m</option>[39m
+                [36m<option[39m
+                  [33mvalue[39m=[32m"best_before"[39m
+                [36m>[39m
+                  [0mBest before[0m
+                [36m</option>[39m
+                [36m<option[39m
+                  [33mvalue[39m=[32m"use_by"[39m
+                [36m>[39m
+                  [0mUse by[0m
+                [36m</option>[39m
+                [36m<option[39m
+                  [33mvalue[39m=[32m"manufacture_date"[39m
+                [36m>[39m
+                  [0mManufacture date[0m
+                [36m</option>[39m
+                [36m<option[39m
+                  [33mvalue[39m=[32m"period_after_opening"[39m
+                [36m>[39m
+                  [0mPeriod after opening[0m
+                [36m</option>[39m
+                [36m<option[39m
+                  [33mvalue[39m=[32m"batch_lot_code"[39m
+                [36m>[39m
+                  [0mBatch/lot code[0m
+                [36m</option>[39m
+              [36m</select>[39m
+            [36m</label>[39m
+            [36m<button[39m
+              [33mclass[39m=[32m"bg-primary text-primary-foreground focus-ring"[39m
+              [33mdisabled[39m=[32m""[39m
+              [33mstyle[39m=[32m"padding: 6px 12px; border-radius: 6px; cursor: not-allowed; font-weight: 500;"[39m
+              [33mtitle[39m=[32m"Select a date to save"[39m
+              [33mtype[39m=[32m"button"[39m
+            [36m>[39m
+              [0mSave expiry[0m
+            [36m</button>[39m
+          [36m</div>[39m
+        [36m</section>[39m
+      [36m</div>[39m
+    [36m</div>[39m
+  [36m</body>[39m
+[36m</html>[39m
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/components/CandidateCard.test.tsx > CandidateCard > blocked candidate with dedup matches renders the blocked reason exactly once (SG-175 G2)
+AssertionError: expected 3 to be 2 // Object.is equality
+
+- Expected
++ Received
+
+- 2
++ 3
+
+ ❯ src/components/CandidateCard.test.tsx:121:116
+    119|     renderCard(<CandidateCard candidate={{ ...candidate, review_task_i…
+    120|     const article = screen.getByRole("article");
+    121|     expect(article.textContent?.split("Acceptance is blocked until the…
+       |                                                                                                                    ^
+    122|     expect(article).toHaveTextContent("Identifier collision: SN-7");
+    123|     expect(screen.getAllByRole("link", { name: "View them in the Inbox…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  src/routes/ReviewPage.test.tsx > ReviewPage > pending decision prevents repeated accept mutations from the keyboard (SG-175 A2)
+AssertionError: expected "spy" to be called 1 times, but got 3 times
+
+Ignored nodes: comments, script, style
+[36m<html>[39m
+  [36m<head />[39m
+  [36m<body>[39m
+    [36m<div>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"page-container text-foreground"[39m
+        [33mdata-testid[39m=[32m"page-container"[39m
+        [33mdata-variant[39m=[32m"page"[39m
+        [33mstyle[39m=[32m"width: 100%; max-width: 1100px; margin-left: auto; margin-right: auto; padding: 24px;"[39m
+      [36m>[39m
+        [36m<a[39m
+          [33mclass[39m=[32m"text-link focus-ring"[39m
+          [33mhref[39m=[32m"/inbox?household_id=household-loaded"[39m
+        [36m>[39m
+          [0m← Back to inbox[0m
+        [36m</a>[39m
+        [36m<h1[39m
+          [33mclass[39m=[32m"page-header text-foreground"[39m
+        [36m>[39m
+          [0mReview workspace[0m
+        [36m</h1>[39m
+        [36m<article[39m
+          [33mclass[39m=[32m"bg-card border-border"[39m
+          [33mstyle[39m=[32m"border-style: solid; border-width: 1px; border-radius: 10px; padding: 16px;"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mstyle[39m=[32m"display: flex; justify-content: space-between; align-items: baseline; gap: 12px;"[39m
+          [36m>[39m
+            [36m<div>[39m
+              [36m<h2[39m
+                [33mstyle[39m=[32m"margin: 0px;"[39m
+              [36m>[39m
+                [0mCandidate [0m
+                [0mcandidate-loaded-31[0m
+              [36m</h2>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"text-muted-foreground"[39m
+                [33mstyle[39m=[32m"font-size: 12px;"[39m
+              [36m>[39m
+                [0mState: [0m
+                [0mproposed[0m
+                [0m · Job: [0m
+                [0mjob-loaded-31[0m
+              [36m</div>[39m
+            [36m</div>[39m
+            [36m<span>[39m
+              [0mCandidate review[0m
+            [36m</span>[39m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mstyle[39m=[32m"display: grid; grid-template-columns: minmax(180px, 1fr) minmax(240px, 1.2fr); gap: 20px; margin-top: 18px;"[39m
+          [36m>[39m
+            [36m<section[39m
+              [33maria-label[39m=[32m"Candidate fields"[39m
+            [36m>[39m
+              [36m<h3[39m
+                [33mstyle[39m=[32m"margin-top: 0px;"[39m
+              [36m>[39m
+                [0mCandidate fields[0m
+              [36m</h3>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"border-border"[39m
+                [33mstyle[39m=[32m"padding: 8px 0px; border-bottom-style: solid; border-bottom-width: 1px;"[39m
+              [36m>[39m
+                [36m<label[39m
+                  [33mfor[39m=[32m"candidate-field-display_name"[39m
+                  [33mstyle[39m=[32m"display: block; font-weight: 600;"[39m
+                [36m>[39m
+                  [0mdisplay_name[0m
+                [36m</label>[39m
+                [36m<input[39m
+                  [33maria-label[39m=[32m"display_name value"[39m
+                  [33mclass[39m=[32m"bg-background text-foreground border-border focus-ring"[39m
+                  [33mid[39m=[32m"candidate-field-display_name"[39m
+                  [33mplaceholder[39m=[32m"Unknown"[39m
+                  [33mstyle[39m=[32m"width: 100%; box-sizing: border-box; padding: 7px; margin-top: 4px; border-style: solid; border-width: 1px; border-radius: 5px;"[39m
+                  [33mvalue[39m=[32m"Loaded item"[39m
+                [36m/>[39m
+                [36m<div[39m
+                  [33mclass[39m=[32m"text-muted-foreground"[39m
+                  [33mstyle[39m=[32m"font-size: 11px; margin-top: 3px;"[39m
+                [36m>[39m
+                  [0mConfidence: [0m
+                  [0mUnknown[0m
+                  [0m · Source: [0m
+                  [0mdeterministic[0m
+                [36m</div>[39m
+              [36m</div>[39m
+            [36m</section>[39m
+            [36m<section[39m
+              [33maria-label[39m=[32m"Source evidence"[39m
+            [36m>[39m
+              [36m<h3[39m
+                [33mstyle[39m=[32m"margin-top: 0px;"[39m
+              [36m>[39m
+                [0mSource evidence[0m
+              [36m</h3>[39m
+              [36m<div[39m
+                [33mstyle[39m=[32m"display: flex; flex-wrap: wrap; gap: 10px;"[39m
+              [36m>[39m
+                [36m<figure[39m
+                  [33mstyle[39m=[32m"margin: 0px;"[39m
+                [36m>[39m
+                  [36m<img[39m
+                    [33malt[39m=[32m"Evidence evidence-loaded-31"[39m
+                    [33mclass[39m=[32m"bg-card-muted"[39m
+                    [33msrc[39m=[32m"http://localhost:8003/v1/evidence/evidence-loaded-31/thumb/256?household_id=household-loaded"[39m
+                    [33mstyle[39m=[32m"width: 160px; height: 120px; object-fit: contain;"[39m
+                  [36m/>[39m
+                  [36m<figcaption[39m
+                    [33mclass[39m=[32m"text-muted-foreground"[39m
+                    [33mstyle[39m=[32m"font-size: 11px;"[39m
+                  [36m>[39m
+                    [0mevidence-loaded-31[0m
+                  [36m</figcaption>[39m
+                [36m</figure>[39m
+              [36m</div>[39m
+            [36m</section>[39m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mstyle[39m=[32m"display: flex; gap: 8px; flex-wrap: wrap; margin-top: 18px;"[39m
+          [36m>[39m
+            [36m<span>[39m
+              [36m<button[39m
+                [33mclass[39m=[32m"bg-primary text-primary-foreground focus-ring"[39m
+                [33mdisabled[39m=[32m""[39m
+                [33mstyle[39m=[32m"padding: 4px 10px; border-radius: 6px; font-size: 13px; cursor: not-allowed; opacity: 0.5;"[39m
+                [33mtype[39m=[32m"button"[39m
+              [36m>[39m
+                [0mAccept[0m
+              [36m</button>[39m
+            [36m</span>[39m
+            [36m<button[39m
+              [33mclass[39m=[32m"bg-background text-foreground border-border focus-ring"[39m
+              [33mdisabled[39m=[32m""[39m
+              [33mstyle[39m=[32m"padding: 4px 10px; border-radius: 6px; border-style: solid; border-width: 1px; font-size: 13px; cursor: not-allowed; opacity: 0.5;"[39m
+              [33mtype[39m=[32m"button"[39m
+            [36m>[39m
+              [0mSave edits[0m
+            [36m</button>[39m
+            [36m<button[39m
+              [33mclass[39m=[32m"bg-background text-foreground border-border focus-ring"[39m
+              [33mdisabled[39m=[32m""[39m
+              [33mstyle[39m=[32m"padding: 4px 10px; border-radius: 6px; border-style: solid; border-width: 1px; font-size: 13px; cursor: not-allowed; opacity: 0.5;"[39m
+              [33mtype[39m=[32m"button"[39m
+            [36m>[39m
+              [0mHold / Unknown[0m
+            [36m</button>[39m
+            [36m<button[39m
+              [33mclass[39m=[32m"bg-background text-foreground border-border focus-ring"[39m
+              [33mdisabled[39m=[32m""[39m
+              [33mstyle[39m=[32m"padding: 4px 10px; border-radius: 6px; border-style: solid; border-width: 1px; font-size: 13px; cursor: not-allowed; opacity: 0.5;"[39m
+              [33mtype[39m=[32m"button"[39m
+            [36m>[39m
+              [0mReject[0m
+            [36m</button>[39m
+          [36m</div>[39m
+        [36m</article>[39m
+        [36m<div[39m
+          [33mdata-testid[39m=[32m"keyboard-action"[39m
+          [33mrole[39m=[32m"status"[39m
+        [36m>[39m
+          [0mKeyboard: [0m
+          [0mreject[0m
+        [36m</div>[39m
+        [36m<section[39m
+          [33maria-label[39m=[32m"Manual expiry entry"[39m
+          [33mclass[39m=[32m"bg-card border-border"[39m
+          [33mstyle[39m=[32m"margin-top: 18px; padding: 14px; border-style: solid; border-width: 1px; border-radius: 8px;"[39m
+        [36m>[39m
+          [36m<h3[39m
+            [33mstyle[39m=[32m"margin-top: 0px;"[39m
+          [36m>[39m
+            [0mManual expiry entry[0m
+          [36m</h3>[39m
+          [36m<div>[39m
+            [0mExpiry evidence state: [0m
+            [36m<strong[39m
+              [33mdata-testid[39m=[32m"expiry-state"[39m
+            [36m>[39m
+              [0mneeds_evidence[0m
+            [36m</strong>[39m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mstyle[39m=[32m"display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; align-items: end;"[39m
+          [36m>[39m
+            [36m<label[39m
+              [33mstyle[39m=[32m"display: flex; flex-direction: column; gap: 4px; font-size: 13px;"[39m
+            [36m>[39m
+              [0mDate[0m
+              [36m<input[39m
+                [33mclass[39m=[32m"bg-background text-foreground border-border focus-ring"[39m
+                [33mstyle[39m=[32m"padding: 6px 10px; border-radius: 6px; border-style: solid; border-width: 1px;"[39m
+                [33mtype[39m=[32m"date"[39m
+                [33mvalue[39m=[32m""[39m
+              [36m/>[39m
+            [36m</label>[39m
+            [36m<label[39m
+              [33mstyle[39m=[32m"display: flex; flex-direction: column; gap: 4px; font-size: 13px;"[39m
+            [36m>[39m
+              [0mDate type[0m
+              [36m<select[39m
+                [33mclass[39m=[32m"bg-background text-foreground border-border focus-ring"[39m
+                [33mstyle[39m=[32m"padding: 6px 10px; border-radius: 6px; border-style: solid; border-width: 1px;"[39m
+              [36m>[39m
+                [36m<option[39m
+                  [33mvalue[39m=[32m"expiry_date"[39m
+                [36m>[39m
+                  [0mExpiry date[0m
+                [36m</option>[39m
+                [36m<option[39m
+                  [33mvalue[39m=[32m"best_before"[39m
+                [36m>[39m
+                  [0mBest before[0m
+                [36m</option>[39m
+                [36m<option[39m
+                  [33mvalue[39m=[32m"use_by"[39m
+                [36m>[39m
+                  [0mUse by[0m
+                [36m</option>[39m
+                [36m<option[39m
+                  [33mvalue[39m=[32m"manufacture_date"[39m
+                [36m>[39m
+                  [0mManufacture date[0m
+                [36m</option>[39m
+                [36m<option[39m
+                  [33mvalue[39m=[32m"period_after_opening"[39m
+                [36m>[39m
+                  [0mPeriod after opening[0m
+                [36m</option>[39m
+                [36m<option[39m
+                  [33mvalue[39m=[32m"batch_lot_code"[39m
+                [36m>[39m
+                  [0mBatch/lot code[0m
+                [36m</option>[39m
+              [36m</select>[39m
+            [36m</label>[39m
+            [36m<button[39m
+              [33mclass[39m=[32m"bg-primary text-primary-foreground focus-ring"[39m
+              [33mdisabled[39m=[32m""[39m
+              [33mstyle[39m=[32m"padding: 6px 12px; border-radius: 6px; cursor: not-allowed; font-weight: 500;"[39m
+              [33mtitle[39m=[32m"Select a date to save"[39m
+              [33mtype[39m=[32m"button"[39m
+            [36m>[39m
+              [0mSave expiry[0m
+            [36m</button>[39m
+          [36m</div>[39m
+        [36m</section>[39m
+      [36m</div>[39m
+    [36m</div>[39m
+  [36m</body>[39m
+[36m</html>[39m
+ ❯ src/routes/ReviewPage.test.tsx:97:55
+     95|     await waitFor(() => expect(api.candidateDecision).toHaveBeenCalled…
+     96|     fireEvent.keyDown(window, { key: "r" });
+     97|     await waitFor(() => expect(api.candidateDecision).toHaveBeenCalled…
+       |                                                       ^
+     98|   });
+     99| 
+ ❯ runWithExpensiveErrorDiagnosticsDisabled ../../../home/andrei/StorageGenie/frontend/node_modules/@testing-library/dom/dist/config.js:47:12
+ ❯ checkCallback ../../../home/andrei/StorageGenie/frontend/node_modules/@testing-library/dom/dist/wait-for.js:124:77
+ ❯ Timeout.checkRealTimersCallback ../../../home/andrei/StorageGenie/frontend/node_modules/@testing-library/dom/dist/wait-for.js:118:16
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+ Test Files  2 failed (2)
+      Tests  2 failed | 16 passed (18)
+   Start at  12:47:56
+   Duration  3.04s (transform 259ms, setup 183ms, collect 565ms, tests 2.04s, environment 1.05s, prepare 247ms)
+

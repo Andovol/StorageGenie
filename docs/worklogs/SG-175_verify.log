@@ -1,0 +1,80 @@
+SG-175 verify log — commands, health, scope and capability readback (UTC)
+captured 2026-10-13T12:49:33Z; lane RUN_BUDGET_S=2100; session start 12:39:10Z
+requested base ref: automation; resolved base commit: 803cf522723158c65f9c4a6ba1ac3679da57f53a (== local HEAD == origin/automation at start)
+work commit: 0b42e7d62dd4e5bc379950c0175d4284176d3a1e
+
+== contract (host readback; no mutation) ==
+VERSION: 0.46.0
+RULES.sha256: 487841b151a593c396353e8eb61f245ba6678976b13917534308e810a7d8c9ef RULES.md
+RULES.md sha256: 487841b151a593c396353e8eb61f245ba6678976b13917534308e810a7d8c9ef  /home/andrei/storagegenie-contract/RULES.md
+contract version echo (CODER.md line 3): '**Contract version: 0.46.0** — **echo this line verbatim in your receipt.** It is the only proof that you'
+repo .rules-cache absent (inherited SG-173/174 shape); rules_check run from /home/andrei/storagegenie-contract/rules_check.sh:
+G-L1 UNCHECKED the cache is not checked out at a contract tag: /home/andrei/storagegenie-contract
+G-L5 UNCHECKED gh-unauthenticated
+G-L7 UNCHECKED gh-unauthenticated
+G-L6 BYTES /home/andrei/.codex/AGENTS.md 2275
+G-L6 BYTES /home/andrei/.config/opencode/AGENTS.md 1933
+G-L6 BYTES total[codex]=2275 unseen=architect-layer,state-file,other-ritual-files
+G-L6 BYTES total[opencode]=1933 unseen=architect-layer,state-file,other-ritual-files
+exit=3 (G-L1 tag-ref shape + gh-unauthenticated, inherited; no host change made)
+
+== health (CO-92) ==
+start: {"status":"ok","db":"ok","storage":"ok"}
+end:   {"status":"ok","db":"ok","storage":"ok"}
+delta: none
+production DB sha256 before: e6bef157440fb8b4a3262577362b071dcae07507ea9a7e04a614e11be28ee5bd
+production DB sha256 after:  e6bef157440fb8b4a3262577362b071dcae07507ea9a7e04a614e11be28ee5bd
+production writes by this slice: none
+
+== live read-only reproduction (GETs only; sanitized) ==
+container image re-observation: UNAVAILABLE in this lane — /var/run/docker.sock is mode s--------- root:root (user andrei is in group docker 988 but the socket is not readable); docker ps denied; no sudo/alternate socket/route-around attempted (PB-2). Expected deployed image d5da5684 is prior SG-174 evidence, not a freshness gate (packet).
+GET /v1/candidates/01a131a1-11c3-7f81-b2d9-0842a3cba350?household_id=01a0a029-1477-7ca0-b200-bce78a96c679 -> HTTP 200
+  state=edited review_task_ids=['01a131a1-11c4-7762-a33a-acb53b4e41e7'] (the embedded id points at a RESOLVED task)
+  dedup_matches=0 fields_keys=['asset_type','category_proposed','display_name','quantity','status','unit']
+GET /v1/review-tasks?household_id=...&limit=100 -> HTTP 200 total=8 statuses=['resolved'] open=0
+read-only sqlite: 8 review_task rows, all resolved, subject_refs of the 5 newest candidates
+served bundle GET /assets/index-CYyuxefG.js -> HTTP 200 bytes=322255
+  sha256 1b4680a0eddadff3c95a64b6bc00d744764d127a72cd5690ebea948b7664a29d (== SG-173 deployed record, unchanged by SG-174)
+  grep counts: review_task_ids=1 'Acceptance is blocked until the open review task'=1 'View them in the Inbox'=1
+  => live UI shows the stale-blocked dead-end (server serves a resolved task id; zero live blockers)
+
+== frontend build (deployed command: package.json scripts.build = 'tsc && vite build') ==
+cwd frontend; npm run build; exit=0
+
+> storagegenie-frontend@0.1.0 build
+> tsc && vite build
+
+vite v5.4.21 building for production...
+transforming...
+✓ 1965 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                   0.94 kB │ gzip:  0.48 kB
+dist/assets/index-DO0gjGV6.css    3.91 kB │ gzip:  1.06 kB
+dist/assets/index-DRTd3YaC.js   322.00 kB │ gzip: 93.15 kB
+✓ built in 3.30s
+npm notice
+npm notice New minor version of npm available! 11.11.0 -> 11.21.0
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v11.21.0
+npm notice To update run: npm install -g npm@11.21.0
+npm notice
+
+== scope diff (803cf522723158c65f9c4a6ba1ac3679da57f53a..0b42e7d62dd4e5bc379950c0175d4284176d3a1e) ==
+ backend/app/api/v1/candidates.py               |   4 +-
+ backend/app/services/candidates.py             |  20 ++
+ backend/tests/test_candidate_read.py           | 152 +++++++++
+ docs/worklogs/SG-175_probe.py                  | 453 +++++++++++++++++++++++++
+ frontend/src/components/CandidateCard.test.tsx |  17 +
+ frontend/src/components/CandidateCard.tsx      |   2 +-
+ frontend/src/routes/ReviewPage.test.tsx        |  49 +++
+ frontend/src/routes/ReviewPage.tsx             |   4 +-
+ 8 files changed, 695 insertions(+), 6 deletions(-)
+
+== git status at capture (untracked evidence logs assembled after) ==
+?? docs/worklogs/SG-175_failpre.log
+?? docs/worklogs/SG-175_passpost.log
+?? docs/worklogs/SG-175_probe_out.log
+?? docs/worklogs/SG-175_verify.log
+
+== workspace-time check ==
+captured_at=2026-10-13T12:49:33Z

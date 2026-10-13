@@ -1,0 +1,29 @@
+SG-175 probe output — command: cd /home/andrei/StorageGenie/backend && /home/andrei/StorageGenie/backend/venv/bin/python ../docs/worklogs/SG-175_probe.py
+exit=0; work commit: 0b42e7d62dd4e5bc379950c0175d4284176d3a1e; captured 2026-10-13 12:47Z UTC
+
+/home/andrei/StorageGenie/backend/venv/lib/python3.12/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+  from starlette.testclient import TestClient as TestClient  # noqa
+[ISO] interpreter=/home/andrei/StorageGenie/backend/venv/bin/python prefix=/home/andrei/StorageGenie/backend/venv (verified against backend/venv)
+[ISO] provider_forced=fake keys_nulled=True sg_consent=False (no paid provider calls)
+[ISO] probe_db=/tmp/sg175-probe-sssznl5u/probe.db
+[ISO] storage_root_override=/tmp/sg175-probe-sssznl5u/storage (evidence writes isolated before first write)
+[ISO] prod_db=/home/andrei/StorageGenie/data/db/storagegenie.db hash_before=e6bef157440fb8b4a3262577362b071dcae07507ea9a7e04a614e11be28ee5bd
+[ISO] prod_store=/home/andrei/StorageGenie/data/storage before=files=0 digest=e3b0c44298fc1c14
+[ISO] prod_store=/home/andrei/StorageGenie/backend/data/storage before=absent
+[T1] GET candidate -> 200 live_ids=3 includes_omitted=True state=proposed
+[T1] accept with live open tasks -> 409 detail='Candidate has unresolved review tasks' (control)
+[T1] real resolver resolved all 3 live tasks
+[T1] GET candidate after resolution -> review_task_ids=[] live_open_tasks=0
+[T1] accept after resolution -> 200 state=accepted asset_exists=True (repaired blocked state)
+[T2] completion POST -> 200 resolved_contains_own_task=True; GET readback value={'expiry_date': '2026-10-14', 'date_type': 'expiry_date'} source_type='user' source_evidence_ids=['01a1354e-0e43-7261-92f7-0c293bd014fc'] task_row=resolved
+[T2] CHECK_FAILED: accepted EXPIRY_FIELD count=0 expected exactly 1
+[CTL] expected rejection observed: accepted EXPIRY_FIELD count=0 expected exactly 1
+[T2] CHECK_FAILED: value mismatch expected {'expiry_date': '2026-10-22', 'date_type': 'expiry_date'} observed {'expiry_date': '2026-10-14', 'date_type': 'expiry_date'}
+[CTL] expected rejection observed: value mismatch expected {'expiry_date': '2026-10-22', 'date_type': 'expiry_date'} observed {'expiry_date': '2026-10-14', 'date_type': 'expiry_date'}
+[T3] missing-assertion rejection='accepted EXPIRY_FIELD count=0 expected exactly 1'; wrong-value rejection="value mismatch expected {'expiry_date': '2026-10-22', 'date_type': 'expiry_date'} observed {'expiry_date': '2026-10-14', 'date_type': 'expiry_date'}"; same reader accepts the true value; controls landed in disposable data
+[T4] STILL-UNREPAIRED (SG-177): bare resolve of expiry.manual_entry returns 200 with zero expiry data
+[T4] STILL-UNREPAIRED (SG-178): ACTIVE unclassified asset absent from rows and unresolved_rows
+[ISO] prod_db hash_after=e6bef157440fb8b4a3262577362b071dcae07507ea9a7e04a614e11be28ee5bd
+[ISO] prod_db_untouched=True; prod evidence stores untouched=True; evidence writes confined to override
+[CHECK] checks_passed=52 (every exercised criterion asserted before success)
+[RESULT] PROBE_OK
