@@ -54,7 +54,7 @@ export function CandidateCard({
 
   return (
     <article className="bg-card border-border" style={{ borderStyle: "solid", borderWidth: 1, borderRadius: 10, padding: 16 }}>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: 12 }}>
+      <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "space-between", alignItems: "baseline", gap: 12 }}>
         <div><h2 style={{ margin: 0 }}>Candidate {candidate.id}</h2><div className="text-muted-foreground" style={{ fontSize: 12 }}>State: {candidate.state} · Job: {candidate.job_id}</div></div>
         <span>Candidate review</span>
       </div>
@@ -65,7 +65,7 @@ export function CandidateCard({
           <div style={{ marginTop: 4 }}>This match is advisory; review it before accepting.</div>
         </div>
       )}
-      <div style={{ display: "grid", gridTemplateColumns: "minmax(180px, 1fr) minmax(240px, 1.2fr)", gap: 20, marginTop: 18 }}>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(240px, 100%), 1fr))", gap: 20, marginTop: 18 }}>
         <section aria-label="Candidate fields">
           <h3 style={{ marginTop: 0 }}>Candidate fields</h3>
           {Object.entries(candidate.fields).map(([key, raw]) => {

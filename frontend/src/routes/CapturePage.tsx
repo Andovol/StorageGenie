@@ -24,7 +24,7 @@ export function CapturePage() {
   return (
     <PageContainer className="text-foreground">
       <h1 className="page-header text-foreground">Capture — Manual Create</h1>
-      <div style={{ marginBottom: 16, display: "flex", gap: 12, alignItems: "center" }}>
+      <div style={{ marginBottom: 16, display: "flex", flexWrap: "wrap", gap: 12, alignItems: "center" }}>
         <HouseholdSelector
           value={effective}
           onChange={(id) => {

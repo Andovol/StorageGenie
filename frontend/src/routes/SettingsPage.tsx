@@ -41,7 +41,7 @@ export function SettingsPage() {
             value={settings.data?.model_id ?? ""}
             disabled={!settings.data || update.isPending}
             onChange={(event) => update.mutate(event.target.value)}
-            style={{ marginLeft: 8 }}
+            style={{ marginLeft: 8, maxWidth: "100%" }}
           >
             {(settings.data?.allowed_model_ids ?? []).map((model) => (
               <option key={model} value={model}>

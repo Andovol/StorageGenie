@@ -39,8 +39,10 @@ export function AppHeader({ loadedCount, searchValue, onSearchChange }: AppHeade
       className="bg-card border-border"
       style={{
         display: "flex",
+        flexWrap: "wrap",
         alignItems: "center",
         gap: 12,
+        rowGap: 8,
         padding: "10px 24px",
         borderBottomStyle: "solid",
         borderBottomWidth: 1,
@@ -54,7 +56,7 @@ export function AppHeader({ loadedCount, searchValue, onSearchChange }: AppHeade
         title="Items loaded on this page, not the household total"
         style={{ fontSize: 12, padding: "2px 8px", borderRadius: 999 }}
       >
-        Total: {loadedCount} {loadedCount === 1 ? "item" : "items"}
+        Loaded: {loadedCount} {loadedCount === 1 ? "item" : "items"}
       </span>
 
       {/* center stays reserved: category pills live in the toolbar, not here */}
@@ -73,7 +75,9 @@ export function AppHeader({ loadedCount, searchValue, onSearchChange }: AppHeade
           borderRadius: 6,
           borderStyle: "solid",
           borderWidth: 1,
-          minWidth: 200,
+          flex: "1 1 180px",
+          minWidth: 180,
+          maxWidth: 420,
           fontSize: 13,
         }}
       />

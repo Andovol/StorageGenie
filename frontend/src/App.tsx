@@ -1,4 +1,6 @@
+import { useState } from "react";
 import { Link, Routes, Route, NavLink, useLocation } from "react-router-dom";
+import { Upload } from "lucide-react";
 import { CatalogPage } from "./routes/CatalogPage";
 import { CapturePage } from "./routes/CapturePage";
 import { AssetDetailPage } from "./routes/AssetDetailPage";
@@ -10,12 +12,33 @@ import { ChatPage } from "./routes/ChatPage";
 import { AnalyticsPage } from "./routes/AnalyticsPage";
 import { ExpiryPage } from "./routes/ExpiryPage";
 import { ThemeToggle } from "./theme/ThemeToggle";
+import { AssetImportModal } from "./components/shell/AssetImportModal";
+import { useHouseholds } from "./hooks/useAssets";
+
+const NAV_DESTINATIONS: readonly { to: string; label: string; end?: boolean }[] = [
+  { to: "/", label: "Catalog", end: true },
+  { to: "/capture", label: "Capture" },
+  { to: "/inbox", label: "Inbox" },
+  { to: "/planning", label: "Planning" },
+  { to: "/chat", label: "Chat" },
+  { to: "/analytics", label: "Analytics" },
+  { to: "/expiry", label: "Expiry" },
+  { to: "/settings", label: "Settings" },
+];
 
 function Nav() {
   const { pathname } = useLocation();
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [importOpen, setImportOpen] = useState(false);
+  const { data: households } = useHouseholds();
+  const householdId =
+    (typeof localStorage !== "undefined" ? localStorage.getItem("household_id") : "") ||
+    households?.[0]?.id ||
+    "";
   // The catalog route renders its own header (AppHeader) which already carries
   // the toggle; every other route gets it here so it is reachable everywhere.
   const showToggle = pathname !== "/";
+  const showImport = pathname !== "/";
   const linkClass = (active: boolean): string =>
     `${active ? "bg-primary text-primary-foreground" : "text-foreground"} focus-ring`;
   const linkStyle = (active: boolean): React.CSSProperties => ({
@@ -28,7 +51,15 @@ function Nav() {
   return (
     <nav
       className="bg-card border-border"
-      style={{ display: "flex", gap: 8, padding: "12px 24px", borderBottomStyle: "solid", borderBottomWidth: 1, alignItems: "center" }}
+      style={{
+        display: "flex",
+        flexWrap: "wrap",
+        gap: 8,
+        padding: "12px 24px",
+        borderBottomStyle: "solid",
+        borderBottomWidth: 1,
+        alignItems: "center",
+      }}
     >
       <Link
         to="/"
@@ -37,34 +68,66 @@ function Nav() {
       >
         StorageGenie
       </Link>
-      <NavLink to="/" end className={({ isActive }) => linkClass(isActive)} style={({ isActive }) => linkStyle(isActive)}>
-        Catalog
-      </NavLink>
-      <NavLink to="/capture" className={({ isActive }) => linkClass(isActive)} style={({ isActive }) => linkStyle(isActive)}>
-        Capture
-      </NavLink>
-      <NavLink to="/settings" className={({ isActive }) => linkClass(isActive)} style={({ isActive }) => linkStyle(isActive)}>
-        Settings
-      </NavLink>
-      <NavLink to="/inbox" className={({ isActive }) => linkClass(isActive)} style={({ isActive }) => linkStyle(isActive)}>
-        Inbox
-      </NavLink>
-      <NavLink to="/planning" className={({ isActive }) => linkClass(isActive)} style={({ isActive }) => linkStyle(isActive)}>
-        Planning
-      </NavLink>
-      <NavLink to="/chat" className={({ isActive }) => linkClass(isActive)} style={({ isActive }) => linkStyle(isActive)}>
-        Chat
-      </NavLink>
-      <NavLink to="/analytics" className={({ isActive }) => linkClass(isActive)} style={({ isActive }) => linkStyle(isActive)}>
-        Analytics
-      </NavLink>
-      <NavLink to="/expiry" className={({ isActive }) => linkClass(isActive)} style={({ isActive }) => linkStyle(isActive)}>
-        Expiry
-      </NavLink>
+      <button
+        type="button"
+        className="nav-menu-toggle bg-card text-foreground border-border focus-ring"
+        aria-expanded={menuOpen}
+        aria-controls="sg-nav-menu"
+        onClick={() => setMenuOpen((open) => !open)}
+        style={{
+          padding: "6px 10px",
+          borderRadius: 6,
+          borderStyle: "solid",
+          borderWidth: 1,
+          fontSize: 13,
+          cursor: "pointer",
+        }}
+      >
+        Menu
+      </button>
+      <div id="sg-nav-menu" className="nav-menu" data-open={menuOpen ? "true" : "false"}>
+        {NAV_DESTINATIONS.map((destination) => (
+          <NavLink
+            key={destination.to}
+            to={destination.to}
+            end={destination.end}
+            className={({ isActive }) => linkClass(isActive)}
+            style={({ isActive }) => linkStyle(isActive)}
+          >
+            {destination.label}
+          </NavLink>
+        ))}
+      </div>
       {showToggle ? <ThemeToggle /> : null}
+      {showImport ? (
+        <Link
+          to="/capture"
+          onClick={(event) => {
+            event.preventDefault();
+            setImportOpen(true);
+          }}
+          className="bg-primary text-primary-foreground focus-ring"
+          style={{
+            padding: "6px 12px",
+            borderRadius: 6,
+            textDecoration: "none",
+            fontWeight: 600,
+            fontSize: 13,
+            display: "inline-flex",
+            alignItems: "center",
+            gap: 6,
+          }}
+        >
+          <Upload size={16} aria-hidden="true" />
+          Import Asset
+        </Link>
+      ) : null}
       <span className="text-muted-foreground" style={{ marginLeft: "auto", fontSize: 11 }}>
         Phase 0 · local-first
       </span>
+      {importOpen ? (
+        <AssetImportModal householdId={householdId} onClose={() => setImportOpen(false)} />
+      ) : null}
     </nav>
   );
 }

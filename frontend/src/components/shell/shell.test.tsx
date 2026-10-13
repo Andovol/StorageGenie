@@ -199,7 +199,7 @@ describe("Catalog shell", () => {
   test("the header labels the LOADED item count, not a household total", async () => {
     renderCatalog();
     expect(await screen.findByText("Drill")).toBeInTheDocument();
-    expect(screen.getByLabelText(/total loaded items: 4/i)).toHaveTextContent("Total: 4 items");
+    expect(screen.getByLabelText(/total loaded items: 4/i)).toHaveTextContent("Loaded: 4 items");
   });
 
   test("the toolbar renders All plus one counted pill per real asset_type vocabulary", async () => {
@@ -451,8 +451,8 @@ describe("Catalog shell", () => {
     renderCatalog();
     await screen.findByText("Drill");
 
-    expect(screen.getByText("Total: 1 item")).toBeInTheDocument();
-    expect(screen.queryByText("Total: 1 items")).not.toBeInTheDocument();
+    expect(screen.getByText("Loaded: 1 item")).toBeInTheDocument();
+    expect(screen.queryByText("Loaded: 1 items")).not.toBeInTheDocument();
   });
 });
 

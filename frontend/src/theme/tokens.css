@@ -5,7 +5,7 @@
   --card-muted: 60 4.8% 95.9%;
   --border: 20 5.9% 90%;
   --muted: 60 4.8% 95.9%;
-  --muted-foreground: 25 5.3% 44.7%;
+  --muted-foreground: 25 5.3% 40%;
   --primary: 2 41% 30.6%;
   --primary-foreground: 60 9.1% 97.8%;
   /* SG-118 G1: link text is its own token. In light the brand primary already
@@ -241,4 +241,69 @@ body {
   font-weight: 700;
   line-height: 1.2;
   margin: 0 0 12px;
+  overflow-wrap: break-word;
+}
+
+/* SG-190 shell layout: the single nav's destination set collapses behind a
+   disclosure button on narrow viewports. When collapsed its links are
+   display:none, so no hidden focusables exist; wide viewports always show
+   every destination and never show the button. */
+.nav-menu {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.nav-menu-toggle {
+  display: none;
+}
+
+@media (max-width: 767px) {
+  .nav-menu-toggle {
+    display: inline-flex;
+  }
+
+  .nav-menu:not([data-open="true"]) {
+    display: none;
+  }
+}
+
+/* Keep keyboard focus clear of the catalog's sticky header/toolbar
+   (measured sticky heights: 97px at 1440, 132px at 834, 268px at 390,
+   326px at 320). */
+.focus-ring {
+  scroll-margin-top: 160px;
+  scroll-margin-bottom: 24px;
+}
+
+@media (max-width: 767px) {
+  .focus-ring {
+    scroll-margin-top: 340px;
+  }
+}
+
+/* The real file input is visually hidden behind its label; move the visible
+   focus ring to the label so keyboard focus on the picker is never invisible. */
+.file-pick:focus-within {
+  outline: 2px solid hsl(var(--primary));
+  outline-offset: 2px;
+}
+
+/* SG-190 detail sections: history/evidence/assertions read as distinct
+   blocks, and the assertions table fits the viewport at every width. */
+.detail-heading {
+  margin: 24px 0 10px;
+  padding-top: 12px;
+  border-top: 1px solid hsl(var(--border));
+  font-size: 15px;
+}
+
+.detail-table {
+  table-layout: fixed;
+}
+
+.detail-table th,
+.detail-table td {
+  overflow-wrap: anywhere;
 }

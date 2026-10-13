@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { apiPost, uploadEvidence } from "../api/client";
 import { CONTROL_STYLE, THEMED_CONTROL_CLASS } from "./shell/CatalogToolbar";
+import { SERVER_CAP_LABEL } from "./shell/AssetImportModal";
 
 type Props = {
   householdId: string;
@@ -152,18 +153,18 @@ export function AssetForm({ householdId, onCreated }: Props) {
           <option value="collection">collection</option>
         </select>
       </label>
-      <div style={{ display: "flex", gap: 12 }}>
-        <label style={{ flex: 1, display: "flex", flexDirection: "column", gap: 4 }}>
+      <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
+        <label style={{ flex: "1 1 140px", display: "flex", flexDirection: "column", gap: 4 }}>
           <span>Quantity</span>
-          <input value={quantity} onChange={(e) => setQuantity(e.target.value)} type="number" step="any" className="bg-background text-foreground border-border focus-ring" style={{ padding: 8, borderStyle: "solid", borderWidth: 1, borderRadius: 6 }} />
+          <input value={quantity} onChange={(e) => setQuantity(e.target.value)} type="number" step="any" className="bg-background text-foreground border-border focus-ring" style={{ padding: 8, borderStyle: "solid", borderWidth: 1, borderRadius: 6, minWidth: 0 }} />
         </label>
-        <label style={{ flex: 1, display: "flex", flexDirection: "column", gap: 4 }}>
+        <label style={{ flex: "1 1 140px", display: "flex", flexDirection: "column", gap: 4 }}>
           <span>Unit</span>
-          <input value={unit} onChange={(e) => setUnit(e.target.value)} placeholder="pcs, kg…" className="bg-background text-foreground border-border focus-ring" style={{ padding: 8, borderStyle: "solid", borderWidth: 1, borderRadius: 6 }} />
+          <input value={unit} onChange={(e) => setUnit(e.target.value)} placeholder="pcs, kg…" className="bg-background text-foreground border-border focus-ring" style={{ padding: 8, borderStyle: "solid", borderWidth: 1, borderRadius: 6, minWidth: 0 }} />
         </label>
-        <label style={{ flex: 1, display: "flex", flexDirection: "column", gap: 4 }}>
+        <label style={{ flex: "1 1 140px", display: "flex", flexDirection: "column", gap: 4 }}>
           <span>Condition</span>
-          <input value={condition} onChange={(e) => setCondition(e.target.value)} placeholder="new, used…" className="bg-background text-foreground border-border focus-ring" style={{ padding: 8, borderStyle: "solid", borderWidth: 1, borderRadius: 6 }} />
+          <input value={condition} onChange={(e) => setCondition(e.target.value)} placeholder="new, used…" className="bg-background text-foreground border-border focus-ring" style={{ padding: 8, borderStyle: "solid", borderWidth: 1, borderRadius: 6, minWidth: 0 }} />
         </label>
       </div>
 
@@ -186,7 +187,7 @@ export function AssetForm({ householdId, onCreated }: Props) {
         <div className="text-muted-foreground" style={{ fontSize: 13, marginBottom: 8 }}>Drag &amp; drop photos here, click to select, or paste</div>
         <div style={{ display: "inline-flex", gap: 8, flexWrap: "wrap", justifyContent: "center" }}>
           <label
-            className={THEMED_CONTROL_CLASS}
+            className={`${THEMED_CONTROL_CLASS} file-pick`}
             style={{ ...CONTROL_STYLE, display: "inline-flex", alignItems: "center" }}
           >
             Choose files
@@ -202,7 +203,7 @@ export function AssetForm({ householdId, onCreated }: Props) {
             />
           </label>
           <label
-            className={THEMED_CONTROL_CLASS}
+            className={`${THEMED_CONTROL_CLASS} file-pick`}
             style={{ ...CONTROL_STYLE, display: "inline-flex", alignItems: "center" }}
           >
             Take a photo
@@ -218,6 +219,9 @@ export function AssetForm({ householdId, onCreated }: Props) {
             />
           </label>
         </div>
+        <p className="text-muted-foreground" data-testid="manual-formats-note" style={{ fontSize: 11, margin: "10px 0 0" }}>
+          PNG, JPG, WebP, TIFF, HEIC or PDF, up to {SERVER_CAP_LABEL} per file.
+        </p>
         {previewFiles.length > 0 && (
           <ul style={{ textAlign: "left", marginTop: 12, paddingLeft: 16 }}>
             {previewFiles.map((pf, i) => (

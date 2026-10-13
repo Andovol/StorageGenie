@@ -13,6 +13,7 @@ import type {
 } from "../api/types";
 import { HouseholdSelector } from "../components/HouseholdSelector";
 import { PlanningSuggestionCard } from "../components/PlanningSuggestionCard";
+import { CONTROL_STYLE, THEMED_CONTROL_CLASS } from "../components/shell/CatalogToolbar";
 import { PageContainer } from "../components/shell/PageContainer";
 import { useHouseholds } from "../hooks/useAssets";
 
@@ -65,7 +66,7 @@ export function PlanningPage() {
   return (
     <PageContainer className="text-foreground">
       <div
-        style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}
+        style={{ display: "flex", flexWrap: "wrap", justifyContent: "space-between", alignItems: "center", gap: 12 }}
       >
         <h1 className="page-header text-foreground">Planning</h1>
         <HouseholdSelector
@@ -82,17 +83,24 @@ export function PlanningPage() {
         or setting; nothing is ever executed automatically.
       </p>
 
-      <div style={{ display: "flex", gap: 12, alignItems: "center", marginTop: 12 }}>
+      <div style={{ display: "flex", flexWrap: "wrap", gap: 12, alignItems: "center", marginTop: 12 }}>
         <button
           type="button"
           onClick={() => run.mutate()}
           disabled={!effectiveHousehold || run.isPending}
+          className="bg-card text-foreground border-border focus-ring"
+          style={CONTROL_STYLE}
         >
           {run.isPending ? "Running…" : "Run planning"}
         </button>
         <label>
           Status{" "}
-          <select value={status} onChange={(event) => setStatus(event.target.value)}>
+          <select
+            value={status}
+            onChange={(event) => setStatus(event.target.value)}
+            className={THEMED_CONTROL_CLASS}
+            style={CONTROL_STYLE}
+          >
             {STATUS_OPTIONS.map((option) => (
               <option key={option || "all"} value={option}>
                 {option || "all"}

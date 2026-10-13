@@ -81,7 +81,7 @@ export function ChatPage() {
 
   return (
     <PageContainer className="text-foreground">
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+      <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "space-between", alignItems: "center", gap: 12 }}>
         <h1 className="page-header text-foreground">Chat</h1>
         <HouseholdSelector
           value={effectiveHousehold}
@@ -147,7 +147,7 @@ export function ChatPage() {
             send.mutate();
           }
         }}
-        style={{ display: "flex", gap: 8, marginTop: 16 }}
+        style={{ display: "flex", flexWrap: "wrap", gap: 8, marginTop: 16 }}
       >
         <input
           aria-label="Question"
@@ -155,7 +155,7 @@ export function ChatPage() {
           onChange={(event) => setInput(event.target.value)}
           placeholder="Ask about this category…"
           className="bg-background text-foreground border-border focus-ring"
-          style={{ flex: 1, padding: 8, borderRadius: 6, borderStyle: "solid", borderWidth: 1 }}
+          style={{ flex: 1, minWidth: 0, padding: 8, borderRadius: 6, borderStyle: "solid", borderWidth: 1 }}
         />
         <button
           type="submit"
@@ -180,7 +180,7 @@ export function ChatPage() {
             logCorrection.mutate();
           }
         }}
-        style={{ display: "flex", gap: 8, marginTop: 12 }}
+        style={{ display: "flex", flexWrap: "wrap", gap: 8, marginTop: 12 }}
       >
         <input
           aria-label="Correction"
@@ -188,7 +188,7 @@ export function ChatPage() {
           onChange={(event) => setCorrection(event.target.value)}
           placeholder="Log a correction…"
           className="bg-background text-foreground border-border focus-ring"
-          style={{ flex: 1, padding: 8, borderRadius: 6, borderStyle: "solid", borderWidth: 1 }}
+          style={{ flex: 1, minWidth: 0, padding: 8, borderRadius: 6, borderStyle: "solid", borderWidth: 1 }}
         />
         <button
           type="submit"

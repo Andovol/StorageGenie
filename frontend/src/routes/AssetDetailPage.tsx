@@ -147,7 +147,7 @@ export function LocationsSection({
           if (e.target.value) assignMut.mutate(e.target.value);
         }}
         className="bg-background text-foreground border-border focus-ring"
-        style={{ padding: 6, borderRadius: 6, borderStyle: "solid", borderWidth: 1, fontSize: 13 }}
+        style={{ padding: 6, borderRadius: 6, borderStyle: "solid", borderWidth: 1, fontSize: 13, maxWidth: "100%" }}
       >
         <option value="">Assign to location…</option>
         {available.map((l) => (
@@ -205,6 +205,7 @@ export function RelationsSection({
     borderStyle: "solid" as const,
     borderWidth: 1,
     fontSize: 13,
+    maxWidth: "100%",
   };
   return (
     <section style={{ marginBottom: 16 }}>
@@ -333,8 +334,8 @@ export function AssetDetailPage() {
   return (
     <PageContainer className="text-foreground">
       <Link to={`/?household_id=${householdId}`} className="text-link focus-ring" style={{ fontSize: 13 }}>← Back to catalog</Link>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 8 }}>
-        <h1 className="page-header text-foreground" style={{ margin: 0 }}>{displayName}</h1>
+      <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "space-between", alignItems: "center", gap: 12, marginTop: 8 }}>
+        <h1 className="page-header text-foreground" style={{ margin: 0, minWidth: 0, overflowWrap: "anywhere" }}>{displayName}</h1>
         <button
           onClick={() => {
             setEditName(asset.display_name ?? "");
@@ -403,9 +404,9 @@ export function AssetDetailPage() {
         <ExpiryEntryForm assetId={asset.id} householdId={householdId} evidenceIds={evidence.map((item) => item.id)} />
       )}
 
-      <h3>Evidence</h3>
+      <h3 className="detail-heading">Evidence</h3>
       <EvidenceGallery evidence={evidence} householdId={householdId} />
-      <div style={{ marginTop: 12, display: "flex", gap: 8, alignItems: "center" }}>
+      <div style={{ marginTop: 12, display: "flex", flexWrap: "wrap", gap: 8, alignItems: "center" }}>
         <input id="attach-input" type="file" multiple accept="image/*,.pdf" onChange={(e) => setAttachFiles(e.target.files)} />
         <button
           onClick={() => attachMut.mutate()}
@@ -417,11 +418,11 @@ export function AssetDetailPage() {
         </button>
       </div>
 
-      <h3 style={{ marginTop: 24 }}>Assertions (provenance)</h3>
+      <h3 className="detail-heading">Assertions (provenance)</h3>
       {assertions.length === 0 ? (
         <div className="text-muted-foreground" style={{ fontSize: 13 }}>No assertions</div>
       ) : (
-        <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
+        <table className="detail-table" style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
           <thead>
             <tr>
               <th className="border-border" style={{ textAlign: "left", borderBottomStyle: "solid", borderBottomWidth: 1, padding: 6 }}>Field</th>
@@ -451,7 +452,7 @@ export function AssetDetailPage() {
         </table>
       )}
 
-      <h3 style={{ marginTop: 24 }}>Audit history</h3>
+      <h3 className="detail-heading">Audit history</h3>
       {audits.length === 0 ? (
         <div className="text-muted-foreground" style={{ fontSize: 13 }}>No audit events</div>
       ) : (

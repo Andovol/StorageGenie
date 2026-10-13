@@ -3,6 +3,7 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { fetchAnalyticsSummary, generateAnalyticsInsights } from "../api/client";
 import type { AnalyticsInsightResult, AnalyticsSummary, Household } from "../api/types";
 import { PageContainer } from "../components/shell/PageContainer";
+import { CONTROL_STYLE, THEMED_CONTROL_CLASS } from "../components/shell/CatalogToolbar";
 import { useHouseholds } from "../hooks/useAssets";
 
 const EXPIRY_LABELS: Record<string, string> = {
@@ -60,7 +61,7 @@ export function AnalyticsPage() {
 
   return (
     <PageContainer className="text-foreground">
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+      <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "space-between", alignItems: "center", gap: 12 }}>
         <h1 className="page-header text-foreground">Analytics</h1>
         <label>
           Household{" "}
@@ -71,6 +72,8 @@ export function AnalyticsPage() {
               localStorage.setItem("household_id", event.target.value);
               setMessage("");
             }}
+            className={THEMED_CONTROL_CLASS}
+            style={{ ...CONTROL_STYLE, maxWidth: "100%" }}
           >
             <option value="">Select household</option>
             {(households as Household[] | undefined)?.map((household) => (

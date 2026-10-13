@@ -1,0 +1,19 @@
+SG-190 worklog — R8 responsive shell/design recovery. Presentation-only; contract 0.47.0.
+Base ref automation resolved 2112cd1c0759041ce497fa21f0a8ad6579a8a022 (packet start HEAD).
+Start health 2026-10-13T20:27:49Z epoch 1791923269: {"status":"ok","db":"ok","storage":"ok"} (GET /v1/health, http://127.0.0.1:8003).
+Reading: CODER.md (contract source /home/andrei/storagegenie-contract/CODER.md v0.47.0), AGENTS.md values table, packet docs/packets/SG-190-r8-responsive-shell-design.md, STATE.md.
+Premise checks (PB-1): SG-183 measure.json present (10 routes x 3 viewports; stored denominators 10/10 overflow 390px, 9/10 834px, 0/10 1440px; offenders identified: nav nowrap 845px + per-route intrinsic width defects). SG-182_consolidation.md UI plan present. Frontend tree with routes/components/theme present.
+Baseline runs (pre-edit) recorded below.
+Decision log:
+- Acceptance frame is presentation-only per CO-25: no new conditionals/queries/routes; diffs limited to stylesheets, class attributes, layout style objects and literal display text. Missing error branches on some routes are NOT added (would exit the presentation-only envelope); named in report REMAINING.
+- Nav: approved plan scopes "narrow layouts use an accessible menu (no hidden focusables)". Implemented as a local-state disclosure button in the shared nav (presentation-only: toggles CSS display of existing destination links; no API/data path). Documented as an interpretation in UNCLEAR.
+- Theme toggle placement preserved (AppHeader on "/", nav elsewhere) because pinned tests render AppHeader/CatalogPage without App.
+- Global nav import CTA shown on non-catalog routes (primary capture action persistent; reuses AssetImportModal, same household resolution as AppHeader).
+Baseline captures: npm test 28 files / 266 tests pass (20:30:47Z, ~11.4s); npm run lint rc=0; npm run build rc=0 (tsc+vite).
+Product edits (G1): App.tsx single nav (wrap + narrow disclosure menu + import CTA on non-catalog), AppHeader.tsx wrap + "Loaded: N items" honest wording, tokens.css muted-foreground 25 5.3% 44.7% -> 40% (clears 4.5:1 on every light surface incl. card-muted), tokens.css nav-menu/focus-ring scroll-margin/file-pick/detail CSS, AssetForm.tsx formats+limit note (reuses SERVER_CAP_LABEL) + wrap + file-pick focus, InboxPage grid auto-fit.
+Product edits (G2): CandidateCard responsive grid, AssetDetailPage header wrap + select maxWidth + detail-table layout + detail-heading sections, SettingsPage select maxWidth, PlanningPage themed controls + wrap, AnalyticsPage themed household select + wrap, ChatPage wrap + minWidth, CapturePage row wrap.
+Test update (SG-190 approved wording): shell.test.tsx "Total: 4 items" -> "Loaded: 4 items", "Total: 1 item(s)" -> "Loaded: 1 item(s)".
+Driver: docs/worklogs/SG-190_driver.mjs (raw CDP; static SPA server; controls fixtures; normal-Tab/menu/draft/sticky probes; GET-only transport guard). Browser: Playwright chrome-headless-shell 149.0.7827.55 with --headless --no-sandbox (environment restricts unprivileged userns sandbox via AppArmor; local disposable profile under /tmp, no elevation, no privileged operation attempted). Probe runs 20:38 and 20:41 UTC.
+Probe run 1 (out-probe): controls 7/7 pass; 40/40 route-viewports measured; overflow 0/10 at 390/834/1440/320; contrast no sample below AA; menu closed = display:none (links not focusable), open = 8/8 links visible at 390; toggle hidden at 1440; draft preserved across viewport round-trip; transport guard GET-only (271 requests, 0 blocked, 142 loopback-fulfilled, 0 failures); target dispositions 516 PASS-SIZE + 76 PASS-SPACING, 0 FAIL.
+Probe run 2 (out-probe2, after scroll-margin tuning to measured sticky heights 97/132/268/326px): overflow 0/10 all four viewports; normal Tab 30 presses -> obscured=0, invisible=0.
+
