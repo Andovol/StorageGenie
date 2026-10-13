@@ -1,0 +1,4 @@
+SG-180 health log (CO-92, {{HEALTH_CMD}} = curl -s http://127.0.0.1:8003/v1/health)
+2026-10-13T14:46:36Z (start, first command) {"status":"ok","db":"ok","storage":"ok"}
+2026-10-13T15:00:49Z (end) {"status":"ok","db":"ok","storage":"ok"}
+HEALTH: unchanged, OK. No production write; production GETs = health only.

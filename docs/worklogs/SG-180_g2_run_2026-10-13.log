@@ -1,0 +1,301 @@
+/home/andrei/StorageGenie/backend/venv/lib/python3.12/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+  from starlette.testclient import TestClient as TestClient  # noqa
+Barcode extraction unavailable: pyzbar/libzbar is not installed
+OCR extraction unavailable: tesseract is not installed or it's not in your PATH. See README file for more information.
+Barcode extraction unavailable: pyzbar/libzbar is not installed
+OCR extraction unavailable: tesseract is not installed or it's not in your PATH. See README file for more information.
+Barcode extraction unavailable: pyzbar/libzbar is not installed
+OCR extraction unavailable: tesseract is not installed or it's not in your PATH. See README file for more information.
+{
+  "results": [
+    {
+      "check": "isolation",
+      "result": "PASS",
+      "storage_root": "/tmp/sg180-g2-ssdpiiy6/storage",
+      "engine_url": "sqlite:////tmp/sg180-g2-ssdpiiy6/storagegenie.db"
+    },
+    {
+      "check": "create_only_created_pending",
+      "result": "PASS",
+      "state": "CREATED",
+      "step_count": 8,
+      "http": 201
+    },
+    {
+      "check": "created_progress_zero",
+      "result": "PASS",
+      "progress": {
+        "completed": 0,
+        "total": 8,
+        "failed": 0,
+        "pending": 8
+      }
+    },
+    {
+      "check": "run_reaches_awaiting_review",
+      "result": "PASS",
+      "state": "AWAITING_REVIEW",
+      "progress": {
+        "completed": 6,
+        "total": 8,
+        "failed": 0,
+        "pending": 1
+      }
+    },
+    {
+      "check": "candidate_listed_after_run",
+      "result": "PASS",
+      "total": 1,
+      "kind": "olive"
+    },
+    {
+      "check": "rerun_no_duplicate_work",
+      "result": "PASS",
+      "candidate_count": 1,
+      "obs_before": 1,
+      "obs_after": 1,
+      "attempts": {
+        "VALIDATING_INPUT": 0,
+        "NORMALIZING": 0,
+        "EXTRACTING_DETERMINISTIC_SIGNALS": 0,
+        "ANALYZING_WITH_AI": 0,
+        "BUILDING_CANDIDATES": 0,
+        "DEDUPLICATING": 0,
+        "AWAITING_REVIEW": 0,
+        "COMMITTING": 0
+      }
+    },
+    {
+      "check": "key_replay_same_household_same_job",
+      "result": "PASS",
+      "first": "01a135c3-229f-7201-b36a-5212212b8339",
+      "second": "01a135c3-229f-7201-b36a-5212212b8339"
+    },
+    {
+      "check": "key_replay_changed_payload_ignored",
+      "result": "OBSERVE",
+      "returned_id": "01a135c3-229f-7201-b36a-5212212b8339",
+      "original_id": "01a135c3-229f-7201-b36a-5212212b8339",
+      "note": "different evidence_ids under the same key silently return the original job"
+    },
+    {
+      "check": "key_replay_foreign_household_403",
+      "result": "PASS",
+      "status": 403
+    },
+    {
+      "check": "accept_commits_asset",
+      "result": "PASS",
+      "status": 200,
+      "state": "COMPLETED",
+      "assets": 1
+    },
+    {
+      "check": "duplicate_import_no_second_asset",
+      "result": "PASS",
+      "kind": "duplicate_of_asset",
+      "decision": "duplicate_linked",
+      "assets": 1
+    },
+    {
+      "check": "empty_import_flow",
+      "result": "OBSERVE",
+      "state": "AWAITING_REVIEW",
+      "candidate": {
+        "display_name": "Imported item",
+        "asset_type": "unknown",
+        "status": "ACTIVE"
+      }
+    },
+    {
+      "check": "controlled_failure_state",
+      "result": "PASS",
+      "state": "FAILED",
+      "steps": {
+        "VALIDATING_INPUT": [
+          "COMPLETED",
+          1
+        ],
+        "NORMALIZING": [
+          "COMPLETED",
+          1
+        ],
+        "EXTRACTING_DETERMINISTIC_SIGNALS": [
+          "FAILED",
+          1
+        ],
+        "ANALYZING_WITH_AI": [
+          "PENDING",
+          0
+        ],
+        "BUILDING_CANDIDATES": [
+          "PENDING",
+          0
+        ],
+        "DEDUPLICATING": [
+          "PENDING",
+          0
+        ],
+        "AWAITING_REVIEW": [
+          "PENDING",
+          0
+        ],
+        "COMMITTING": [
+          "PENDING",
+          0
+        ]
+      },
+      "errors": [
+        "sg180 controlled step failure"
+      ]
+    },
+    {
+      "check": "reopen_persists_failed_state",
+      "result": "PASS",
+      "state": "FAILED",
+      "attempts": {
+        "VALIDATING_INPUT": 1,
+        "NORMALIZING": 1,
+        "EXTRACTING_DETERMINISTIC_SIGNALS": 1,
+        "ANALYZING_WITH_AI": 0,
+        "BUILDING_CANDIDATES": 0,
+        "DEDUPLICATING": 0,
+        "AWAITING_REVIEW": 0,
+        "COMMITTING": 0
+      }
+    },
+    {
+      "check": "retry_after_reopen_resumes",
+      "result": "PASS",
+      "state": "AWAITING_REVIEW",
+      "attempts": {
+        "VALIDATING_INPUT": 1,
+        "NORMALIZING": 1,
+        "EXTRACTING_DETERMINISTIC_SIGNALS": 2,
+        "ANALYZING_WITH_AI": 1,
+        "BUILDING_CANDIDATES": 1,
+        "DEDUPLICATING": 1,
+        "AWAITING_REVIEW": 1,
+        "COMMITTING": 0
+      }
+    },
+    {
+      "check": "failed_job_audit_lineage",
+      "result": "OBSERVE",
+      "actions": [
+        "job.create",
+        "job.state_transition",
+        "job.state_transition",
+        "job.state_transition",
+        "job.state_transition",
+        "job.state_transition"
+      ],
+      "transitions": [
+        "{\"state\": \"RUNNING\", \"updated_at\": \"2026-10-13T14:55:43.438567+00:00\"}",
+        "{\"state\": \"FAILED\", \"updated_at\": \"2026-10-13T14:55:43.446024+00:00\"}",
+        "{\"state\": \"RETRYING\", \"updated_at\": \"2026-10-13T14:55:43.461816+00:00\"}",
+        "{\"state\": \"RUNNING\", \"updated_at\": \"2026-10-13T14:55:43.465530+00:00\"}",
+        "{\"state\": \"AWAITING_REVIEW\", \"updated_at\": \"2026-10-13T14:55:43.494633+00:00\"}"
+      ]
+    },
+    {
+      "check": "malformed_extraction_fails_job",
+      "result": "PASS",
+      "state": "FAILED",
+      "provider_invocations": 2,
+      "ledger_rows": [
+        {
+          "error_state": "schema_validation: payload failed schema validation after the single repair",
+          "cost": 0.0
+        },
+        {
+          "error_state": "schema_validation: payload failed schema validation after the single repair",
+          "cost": 0.0
+        }
+      ]
+    },
+    {
+      "check": "retry_with_valid_output_builds_candidate",
+      "result": "PASS",
+      "state": "AWAITING_REVIEW",
+      "ledger_rows": 3,
+      "proposal_calls": [
+        "01a135c3-23e5-71b2-92c8-87e4d3040239"
+      ],
+      "success_calls": [
+        "01a135c3-23e5-71b2-92c8-87e4d3040239"
+      ],
+      "error_rows": [
+        "schema_validation: payload failed schema validation after the single repair",
+        "schema_validation: payload failed schema validation after the single repair",
+        null
+      ]
+    },
+    {
+      "check": "commit_failure_rolls_back",
+      "result": "PASS",
+      "state": "FAILED",
+      "assets_before": 1,
+      "assets_during": 1,
+      "asset_evidence_rows": 1
+    },
+    {
+      "check": "commit_retry_creates_once",
+      "result": "PASS",
+      "state": "COMPLETED",
+      "assets_after": 2,
+      "assertion_fields": [
+        "asset_type",
+        "display_name",
+        "status"
+      ]
+    },
+    {
+      "check": "missing_original_fails_with_quarantine",
+      "result": "PASS",
+      "state": "FAILED",
+      "errors": [
+        "quarantined: original missing at storage key 01a135c3-21d6-7843-82ee-d5698da02753/9e/9e7b9a76dbb1adc50de68e7f258f5c6baee32db23af9f3c5b5e77d1e4bdb626f.png"
+      ]
+    },
+    {
+      "check": "missing_original_restored_retry",
+      "result": "PASS",
+      "state": "AWAITING_REVIEW"
+    },
+    {
+      "check": "multi_item_task_gates_accept",
+      "result": "PASS",
+      "task_types": [
+        "candidate.multi_item"
+      ],
+      "blocked_status": 409,
+      "after_resolve": 200,
+      "final_job_state": "COMPLETED"
+    },
+    {
+      "check": "run_blocks_full_pipeline",
+      "result": "PASS",
+      "elapsed_s": 0.636,
+      "provider_invocations": 1,
+      "state_in_response": "AWAITING_REVIEW"
+    },
+    {
+      "check": "cancel_route_absent",
+      "result": "OBSERVE",
+      "status": 405,
+      "job_state_after": "AWAITING_REVIEW",
+      "note": "job state machine names CANCELLED (job_service.py:164) but no writer/route reaches it"
+    },
+    {
+      "check": "final_counts",
+      "result": "OBSERVE",
+      "jobs": 9,
+      "candidates": 8,
+      "assets": 2,
+      "provider_calls": 6
+    }
+  ]
+}
+TEMP_ROOT=/tmp/sg180-g2-ssdpiiy6
+elapsed_s=1.5 start_epoch=1791903342

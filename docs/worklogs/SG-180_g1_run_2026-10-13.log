@@ -1,0 +1,252 @@
+/home/andrei/StorageGenie/backend/venv/lib/python3.12/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+  from starlette.testclient import TestClient as TestClient  # noqa
+Rejected decompression bomb sha=2ea9ee7a8bdd30cb56844d527ef3d3228763ba96fb7a4e539c491e1ae532f697 dimensions=20000x20000 limit_kind=pillow_max_image_pixels
+{
+  "isolation": {
+    "temp_root": "/tmp/sg180-g1-rvo9fahw",
+    "settings_database_url": "sqlite:////tmp/sg180-g1-rvo9fahw/storagegenie.db",
+    "settings_storage_root": "/tmp/sg180-g1-rvo9fahw/storage",
+    "engine_url": "sqlite:////tmp/sg180-g1-rvo9fahw/storagegenie.db",
+    "cwd": "/tmp/opencode"
+  }
+}
+{
+  "results": [
+    {
+      "check": "isolation",
+      "result": "PASS",
+      "temp_root": "/tmp/sg180-g1-rvo9fahw",
+      "settings_database_url": "sqlite:////tmp/sg180-g1-rvo9fahw/storagegenie.db",
+      "settings_storage_root": "/tmp/sg180-g1-rvo9fahw/storage",
+      "engine_url": "sqlite:////tmp/sg180-g1-rvo9fahw/storagegenie.db",
+      "cwd": "/tmp/opencode"
+    },
+    {
+      "check": "upload_jpeg_201",
+      "result": "PASS",
+      "status": 201,
+      "body": {
+        "id": "01a135c7-1fec-7680-96e9-212cbffba4b1",
+        "sha256": "ea0c64165b1f5cd9d39da10fe254db3ba60a1031cea9ae9b6b14a8b1822c4263",
+        "storage_key": "01a135c7-1fa5-7cb2-97de-87c5215cb91f/ea/ea0c64165b1f5cd9d39da10fe254db3ba60a1031cea9ae9b6b14a8b1822c4263.jpg",
+        "media_type": "image/jpeg",
+        "size_bytes": 677,
+        "original_filename": "a.jpg"
+      }
+    },
+    {
+      "check": "upload_sha_matches_bytes",
+      "result": "PASS",
+      "sha": "ea0c64165b1f5cd9d39da10fe254db3ba60a1031cea9ae9b6b14a8b1822c4263"
+    },
+    {
+      "check": "stored_file_under_temp_root",
+      "result": "PASS",
+      "path": "/tmp/sg180-g1-rvo9fahw/storage/01a135c7-1fa5-7cb2-97de-87c5215cb91f/ea/ea0c64165b1f5cd9d39da10fe254db3ba60a1031cea9ae9b6b14a8b1822c4263.jpg"
+    },
+    {
+      "check": "stored_bytes_identical",
+      "result": "PASS",
+      "size": 677
+    },
+    {
+      "check": "upload_pdf_201",
+      "result": "PASS",
+      "status": 201,
+      "body": {
+        "id": "01a135c7-1ffe-7142-a416-756800b54a23",
+        "sha256": "3e19daf729bb1d2c1102a4df22c92318e8c27c33158d8f8fadbc73385059267e",
+        "storage_key": "01a135c7-1fa5-7cb2-97de-87c5215cb91f/3e/3e19daf729bb1d2c1102a4df22c92318e8c27c33158d8f8fadbc73385059267e.pdf",
+        "media_type": "application/pdf",
+        "size_bytes": 68,
+        "original_filename": "doc.pdf"
+      }
+    },
+    {
+      "check": "mismatch_declared_detected_422",
+      "result": "PASS",
+      "status": 422,
+      "detail": "media_type_mismatch: claimed 'image/png', detected 'image/jpeg'"
+    },
+    {
+      "check": "mismatch_claim_bypassed_on_known_bytes",
+      "result": "DEFECT_OBSERVED",
+      "status": 201,
+      "returned_id": "01a135c7-1fec-7680-96e9-212cbffba4b1",
+      "note": "sha short-circuit runs before _detect_media_type; a replayed sha returns 201 regardless of claimed media_type"
+    },
+    {
+      "check": "unsupported_signature_422",
+      "result": "PASS",
+      "status": 422,
+      "detail": "media_type_mismatch: unsupported media signature"
+    },
+    {
+      "check": "oversize_413",
+      "result": "PASS",
+      "status": 413,
+      "detail": "max_upload_bytes limit exceeded: 20971521 > 20971520 bytes"
+    },
+    {
+      "check": "truncated_jpeg_422",
+      "result": "PASS",
+      "status": 422,
+      "detail": "Truncated File Read"
+    },
+    {
+      "check": "image_bomb_422",
+      "result": "PASS",
+      "status": 422,
+      "detail": "decompression_bomb limit exceeded: Pillow max_image_pixels (20000x20000)"
+    },
+    {
+      "check": "allowed_media_table",
+      "result": "OBSERVE",
+      "allowed": {
+        "image/jpeg": "\u00ff\u00d8\u00ff",
+        "image/png": "\u0089PNG",
+        "image/webp": "RIFF",
+        "application/pdf": "%PDF"
+      },
+      "configured": [
+        "image/jpeg",
+        "image/png",
+        "image/webp",
+        "image/tiff",
+        "image/heic",
+        "image/heif",
+        "application/pdf"
+      ],
+      "max_upload_bytes": 20971520,
+      "max_image_pixels": null
+    },
+    {
+      "check": "upload_gps_jpeg_201",
+      "result": "PASS",
+      "status": 201
+    },
+    {
+      "check": "original_retains_gps_thumbnail_strips",
+      "result": "OBSERVE",
+      "gps_tag_present": true,
+      "orientation": 6,
+      "thumb_status": 200,
+      "thumb_exif_keys": [],
+      "thumb_media": "image/jpeg"
+    },
+    {
+      "check": "cross_household_sha_dedup",
+      "result": "OBSERVE",
+      "b_upload_status": 201,
+      "returned_id": "01a135c7-1fec-7680-96e9-212cbffba4b1",
+      "a_evidence_id": "01a135c7-1fec-7680-96e9-212cbffba4b1",
+      "returned_row_household": "A",
+      "b_get_status": 403
+    },
+    {
+      "check": "cross_household_sha_dedup_returned_a_row",
+      "result": "PASS",
+      "returned_id": "01a135c7-1fec-7680-96e9-212cbffba4b1",
+      "a_id": "01a135c7-1fec-7680-96e9-212cbffba4b1"
+    },
+    {
+      "check": "counter_control_b_own_bytes_own_row",
+      "result": "PASS",
+      "status": 201,
+      "id": "01a135c7-2126-7ca1-9b75-8faea6be8fec"
+    },
+    {
+      "check": "cross_household_idempotency_replay",
+      "result": "OBSERVE",
+      "a_status": 201,
+      "a_id": "01a135c7-213a-79f3-925c-8f85ea7e024d",
+      "b_status": 201,
+      "b_returned_id": "01a135c7-213a-79f3-925c-8f85ea7e024d",
+      "b_returned_a_row": true,
+      "note": "B sent DIFFERENT bytes under the same key"
+    },
+    {
+      "check": "cross_household_key_replay_returns_a_row",
+      "result": "PASS",
+      "replay_id": "01a135c7-213a-79f3-925c-8f85ea7e024d",
+      "a_id": "01a135c7-213a-79f3-925c-8f85ea7e024d"
+    },
+    {
+      "check": "counter_control_fresh_key_own_row",
+      "result": "PASS",
+      "status": 201,
+      "id": "01a135c7-20f0-7e62-8751-d383d5736627"
+    },
+    {
+      "check": "reupload_same_bytes_same_row",
+      "result": "PASS",
+      "returned": "01a135c7-213a-79f3-925c-8f85ea7e024d",
+      "first": "01a135c7-213a-79f3-925c-8f85ea7e024d"
+    },
+    {
+      "check": "original_bytes_unchanged",
+      "result": "PASS",
+      "sha": "a4378b782658ddf3c38a327fe50c058412fe3aaa3fac40b8626e69c31234b545"
+    },
+    {
+      "check": "same_size_corruption_served",
+      "result": "DEFECT_OBSERVED",
+      "status": 200,
+      "served_sha256": "b6053593f80d3f1c64234205e069f04c4c5d3898b08e65294ee7b94baf138566",
+      "db_sha256": "668259c119ffa7b335b543f87ab479828a768f7be248d2c4ce261c915a589834",
+      "note": "read path does not verify content against sha256"
+    },
+    {
+      "check": "missing_original_controls",
+      "result": "PASS",
+      "file_status": 404,
+      "thumb_status_with_original_gone": 200,
+      "note": "thumbnail artifact is independent of the original at read time"
+    },
+    {
+      "check": "counter_control_missing_thumb_404",
+      "result": "PASS",
+      "status": 404
+    },
+    {
+      "check": "foreign_evidence_read_403",
+      "result": "PASS",
+      "status": 403
+    },
+    {
+      "check": "upload_unknown_household_orphan_file",
+      "result": "DEFECT_OBSERVED",
+      "status": 422,
+      "detail": "(sqlite3.IntegrityError) FOREIGN KEY constraint failed\n[SQL: INSERT INTO evidence (id, household_id, sha256, media_type, storage_key, original_filename, source_kind, size_bytes) VALUES (?, ?, ?, ?, ?, ?, ?, ?) RETURNING created_at, updated_at]\n[parameters: ('01a135c7-21a3-7fe0-9150-95ed7519ab3b', 'sg180-no-such-household', 'c4a4080153a33ea6515fb66e858e118a49994a2b12bd1e5a36ed4be7e379297b', 'image/jpeg', 'sg180-no-such-household/c4/c4a4080153a33ea6515fb66e858e118a49994a2b12bd1e5a36ed4be7e379297b.jpg', 'orphan.jpg', 'upload', 677)]\n(Background on this error at: https://sqlalche.me/e/20/gkpj)",
+      "orphan_files": [
+        "sg180-no-such-household/c4/c4a4080153a33ea6515fb66e858e118a49994a2b12bd1e5a36ed4be7e379297b.jpg",
+        "sg180-no-such-household/c4/c4a4080153a33ea6515fb66e858e118a49994a2b12bd1e5a36ed4be7e379297b_thumb256.jpg",
+        "sg180-no-such-household/c4/c4a4080153a33ea6515fb66e858e118a49994a2b12bd1e5a36ed4be7e379297b_thumb512.jpg"
+      ],
+      "note": "store_evidence writes the original before the Evidence row flush; FK rejection leaves the file"
+    },
+    {
+      "check": "storage_tree",
+      "result": "PASS",
+      "files": [
+        "01a135c7-1fa5-7cb2-97de-87c5215cb91f/26/263517a8edb82c975687c12cf933c06d9e18ee325246a2ea25b913f1d44daf50.jpg",
+        "01a135c7-1fa5-7cb2-97de-87c5215cb91f/26/263517a8edb82c975687c12cf933c06d9e18ee325246a2ea25b913f1d44daf50_thumb256.jpg",
+        "01a135c7-1fa5-7cb2-97de-87c5215cb91f/26/263517a8edb82c975687c12cf933c06d9e18ee325246a2ea25b913f1d44daf50_thumb512.jpg",
+        "01a135c7-1fa5-7cb2-97de-87c5215cb91f/3e/3e19daf729bb1d2c1102a4df22c92318e8c27c33158d8f8fadbc73385059267e.pdf",
+        "01a135c7-1fa5-7cb2-97de-87c5215cb91f/a4/a4378b782658ddf3c38a327fe50c058412fe3aaa3fac40b8626e69c31234b545.jpg",
+        "01a135c7-1fa5-7cb2-97de-87c5215cb91f/a4/a4378b782658ddf3c38a327fe50c058412fe3aaa3fac40b8626e69c31234b545_thumb256.jpg",
+        "01a135c7-1fa5-7cb2-97de-87c5215cb91f/a4/a4378b782658ddf3c38a327fe50c058412fe3aaa3fac40b8626e69c31234b545_thumb512.jpg",
+        "01a135c7-1fa5-7cb2-97de-87c5215cb91f/ea/ea0c64165b1f5cd9d39da10fe254db3ba60a1031cea9ae9b6b14a8b1822c4263.jpg",
+        "01a135c7-1fa5-7cb2-97de-87c5215cb91f/ea/ea0c64165b1f5cd9d39da10fe254db3ba60a1031cea9ae9b6b14a8b1822c4263_thumb256.jpg",
+        "01a135c7-1fa5-7cb2-97de-87c5215cb91f/ea/ea0c64165b1f5cd9d39da10fe254db3ba60a1031cea9ae9b6b14a8b1822c4263_thumb512.jpg",
+        "01a135c7-1fa5-7cb2-97de-87d52bbea19e/a6/a601ab159835c565900fd2ce495c096cecde701b728daf1ffdf4bd419decc9d7.jpg",
+        "01a135c7-1fa5-7cb2-97de-87d52bbea19e/a6/a601ab159835c565900fd2ce495c096cecde701b728daf1ffdf4bd419decc9d7_thumb256.jpg",
+        "01a135c7-1fa5-7cb2-97de-87d52bbea19e/a6/a601ab159835c565900fd2ce495c096cecde701b728daf1ffdf4bd419decc9d7_thumb512.jpg",
+        "sg180-no-such-household/c4/c4a4080153a33ea6515fb66e858e118a49994a2b12bd1e5a36ed4be7e379297b.jpg",
+        "sg180-no-such-household/c4/c4a4080153a33ea6515fb66e858e118a49994a2b12bd1e5a36ed4be7e379297b_thumb256.jpg",
+        "sg180-no-such-household/c4/c4a4080153a33ea6515fb66e858e118a49994a2b12bd1e5a36ed4be7e379297b_thumb512.jpg"
+      ]
+    }
+  ]
+}
+TEMP_ROOT=/tmp/sg180-g1-rvo9fahw

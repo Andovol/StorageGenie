@@ -1,0 +1,473 @@
+/home/andrei/StorageGenie/backend/venv/lib/python3.12/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+  from starlette.testclient import TestClient as TestClient  # noqa
+Barcode extraction unavailable: pyzbar/libzbar is not installed
+OCR extraction unavailable: tesseract is not installed or it's not in your PATH. See README file for more information.
+Barcode extraction unavailable: pyzbar/libzbar is not installed
+OCR extraction unavailable: tesseract is not installed or it's not in your PATH. See README file for more information.
+Barcode extraction unavailable: pyzbar/libzbar is not installed
+OCR extraction unavailable: tesseract is not installed or it's not in your PATH. See README file for more information.
+Barcode extraction unavailable: pyzbar/libzbar is not installed
+OCR extraction unavailable: tesseract is not installed or it's not in your PATH. See README file for more information.
+{
+  "results": [
+    {
+      "check": "isolation",
+      "result": "PASS",
+      "storage_root": "/tmp/sg180-g3-cfn0rbxf/storage",
+      "engine_url": "sqlite:////tmp/sg180-g3-cfn0rbxf/storagegenie.db"
+    },
+    {
+      "check": "wire_request_line",
+      "result": "PASS",
+      "method": "POST",
+      "url": "https://opencode.ai/zen/go/v1/chat/completions"
+    },
+    {
+      "check": "wire_identity_headers",
+      "result": "PASS",
+      "headers": {
+        "content-type": "application/json",
+        "user-agent": "StorageGenie/0.1 (opencode-go vision adapter)",
+        "x-opencode-session": "sg180-session",
+        "authorization": "Bearer sg180-audit-fake-key-not-a-real-secret"
+      }
+    },
+    {
+      "check": "wire_payload_envelope",
+      "result": "PASS",
+      "envelope": {
+        "model": "deepseek-v4-flash-vision-exp",
+        "stream": false,
+        "max_tokens": 2000,
+        "response_format": {
+          "type": "json_object"
+        }
+      },
+      "content_types": [
+        "text",
+        "image_url"
+      ]
+    },
+    {
+      "check": "wire_image_is_redacted_png_upright",
+      "result": "PASS",
+      "sent_size": [
+        48,
+        64
+      ],
+      "sent_exif": {},
+      "original_sha_unchanged": true
+    },
+    {
+      "check": "wire_result_and_cost",
+      "result": "PASS",
+      "cost": 4.5e-05,
+      "expected": 4.5e-05
+    },
+    {
+      "check": "text_payload_shape",
+      "result": "OBSERVE",
+      "payload": {
+        "model": "m",
+        "stream": false,
+        "max_tokens": 8000,
+        "messages": [
+          {
+            "role": "system",
+            "content": "SYS"
+          },
+          {
+            "role": "user",
+            "content": "USER"
+          }
+        ]
+      },
+      "note": "text turn: system+user plain text, max_tokens 8000, no response_format"
+    },
+    {
+      "check": "validation_zero_usage",
+      "result": "PASS",
+      "kind": "invalid_json",
+      "message": "provider returned zero or absent usage tokens",
+      "attached_usage": {}
+    },
+    {
+      "check": "validation_zero_usage_accounting_attached",
+      "result": "PASS",
+      "cost": 0.0
+    },
+    {
+      "check": "validation_empty_content",
+      "result": "PASS",
+      "kind": "invalid_json",
+      "message": "provider returned empty content (empty-200 reject)",
+      "attached_usage": "MISSING"
+    },
+    {
+      "check": "validation_no_choices",
+      "result": "PASS",
+      "kind": "invalid_json",
+      "message": "provider 200 with no choices",
+      "attached_usage": {
+        "total_tokens": 3
+      }
+    },
+    {
+      "check": "validation_no_choices_accounting_attached",
+      "result": "PASS",
+      "cost": 0.0
+    },
+    {
+      "check": "validation_non_json_200",
+      "result": "PASS",
+      "kind": "invalid_json",
+      "message": "provider 200 with a non-JSON body",
+      "attached_usage": "MISSING"
+    },
+    {
+      "check": "validation_non_object_200",
+      "result": "PASS",
+      "kind": "invalid_json",
+      "message": "provider 200 with a non-object body",
+      "attached_usage": "MISSING"
+    },
+    {
+      "check": "validation_http_500",
+      "result": "PASS",
+      "kind": "http_status",
+      "message": "provider returned HTTP 500: '{\"error\":\"server exploded: audit-body\"}'",
+      "attached_usage": "MISSING"
+    },
+    {
+      "check": "empty_200_accounting_vision_vs_text",
+      "result": "OBSERVE",
+      "vision_kind": "invalid_json",
+      "vision_cost_attached": null,
+      "text_kind": "invalid_json",
+      "text_cost_attached": 4.5e-05,
+      "note": "extract_text attaches body accounting (SG-101); extract_items does not"
+    },
+    {
+      "check": "validation_transport",
+      "result": "PASS",
+      "kind": "transport",
+      "message": "provider transport failure: ConnectError"
+    },
+    {
+      "check": "think_single_stripped",
+      "result": "PASS"
+    },
+    {
+      "check": "think_double_rejected",
+      "result": "PASS",
+      "message": "multiple <think> blocks: strip once, then fail loudly"
+    },
+    {
+      "check": "open_code_key_path_missing_key",
+      "result": "PASS",
+      "kind": "missing_key"
+    },
+    {
+      "check": "jina_key_seam_absent_returns_none",
+      "result": "PASS"
+    },
+    {
+      "check": "identity_builder_never_carries_key",
+      "result": "PASS",
+      "headers": {
+        "Content-Type": "application/json",
+        "User-Agent": "StorageGenie/0.1 (opencode-go vision adapter)",
+        "x-opencode-session": "s"
+      }
+    },
+    {
+      "check": "response_format_by_model",
+      "result": "PASS"
+    },
+    {
+      "check": "repair_once_then_valid",
+      "result": "PASS",
+      "supplies": 2
+    },
+    {
+      "check": "repair_twice_fails",
+      "result": "PASS",
+      "supplies": 2,
+      "error": "extraction payload invalid after the single repair (attempt 2/2)"
+    },
+    {
+      "check": "reader_repair_prompt_and_ledger",
+      "result": "PASS",
+      "invocations": 2,
+      "repair_appended": true,
+      "ledger": [
+        {
+          "error": "invalid_json: scripted invalid_json on attempt 1",
+          "version": "extract-food-v4"
+        },
+        {
+          "error": null,
+          "version": "extract-food-v4"
+        }
+      ]
+    },
+    {
+      "check": "reader_failure_twice_two_error_rows",
+      "result": "PASS",
+      "invocations": 2,
+      "error_rows_delta": 2
+    },
+    {
+      "check": "reader_non_retryable_one_supply",
+      "result": "PASS",
+      "invocations": 1
+    },
+    {
+      "check": "router_fallback_on_retryable",
+      "result": "PASS",
+      "calls": {
+        "primary": 1,
+        "fallback": 1
+      }
+    },
+    {
+      "check": "router_budget_refuses_before_call",
+      "result": "PASS",
+      "calls": {
+        "primary": 0,
+        "fallback": 0
+      }
+    },
+    {
+      "check": "router_no_fallback_on_non_retryable",
+      "result": "PASS",
+      "calls": {
+        "primary": 0,
+        "fallback": 0
+      }
+    },
+    {
+      "check": "router_unknown_provider",
+      "result": "PASS"
+    },
+    {
+      "check": "consent_off_skips_before_provider",
+      "result": "PASS",
+      "output": {
+        "status": "skipped",
+        "step": "ANALYZING_WITH_AI",
+        "reason": "consent_disabled",
+        "completed_at": "2026-10-13T14:58:48.295847+00:00"
+      },
+      "invocations": 0
+    },
+    {
+      "check": "provider_not_configured_skips",
+      "result": "PASS",
+      "output": {
+        "status": "skipped",
+        "step": "ANALYZING_WITH_AI",
+        "reason": "provider_not_configured",
+        "completed_at": "2026-10-13T14:58:48.379905+00:00"
+      }
+    },
+    {
+      "check": "reader_sends_redacted_png_real_prompt",
+      "result": "PASS",
+      "sent_png": true,
+      "sent_size": [
+        48,
+        64
+      ],
+      "exif": {},
+      "prompt_is_real": true,
+      "version": "extract-food-v4"
+    },
+    {
+      "check": "ledger_input_hash_is_redacted_sha",
+      "result": "PASS",
+      "input_hashes": {
+        "image_sha256": "73068dd20ec8392d3449513e88dace80f3fd9711bc639a47739f6b33d9214b61"
+      },
+      "expected_sha": "73068dd20ec8392d3449513e88dace80f3fd9711bc639a47739f6b33d9214b61"
+    },
+    {
+      "check": "candidate_provenance_threaded",
+      "result": "PASS",
+      "provenance": {
+        "ai_provider": "scripted",
+        "ai_model": "scripted-model-1",
+        "prompt_template_version": "extract-food-v4",
+        "provider_call_ids": [
+          "01a135c5-f606-7493-ae76-4fed277ff010"
+        ]
+      },
+      "field_provenance": {
+        "value": "Audit Beans",
+        "confidence": 0.98,
+        "source_type": "extraction",
+        "provider": "scripted",
+        "model": "scripted-model-1",
+        "prompt_template_version": "extract-food-v4",
+        "provider_call_id": "01a135c5-f606-7493-ae76-4fed277ff010"
+      }
+    },
+    {
+      "check": "assertion_model_json_has_provider_lineage",
+      "result": "PASS",
+      "status": 200,
+      "model_json_samples": [
+        {
+          "provider": "scripted",
+          "model": "scripted-model-1",
+          "prompt_template_version": "extract-food-v4",
+          "provider_call_id": "01a135c5-f606-7493-ae76-4fed277ff010",
+          "evidence_ids": [
+            "01a135c5-f5d3-7ae2-9149-423a0595d0cb"
+          ],
+          "observation_ids": [
+            "01a135c5-f600-7163-95e7-e707fced5b68"
+          ]
+        },
+        {
+          "provider": "scripted",
+          "model": "scripted-model-1",
+          "prompt_template_version": "extract-food-v4",
+          "provider_call_id": "01a135c5-f606-7493-ae76-4fed277ff010",
+          "evidence_ids": [
+            "01a135c5-f5d3-7ae2-9149-423a0595d0cb"
+          ],
+          "observation_ids": [
+            "01a135c5-f600-7163-95e7-e707fced5b68"
+          ]
+        }
+      ]
+    },
+    {
+      "check": "monthly_cap_refuses_before_provider",
+      "result": "PASS",
+      "state": "FAILED",
+      "invocations": 0,
+      "ledger_rows": 0,
+      "errors": [
+        "estimated monthly cost 1.000000 exceeds monthly cap 0.5 (0.000000 already recorded for this household)"
+      ]
+    },
+    {
+      "check": "durable_spend_reader_sums_job_and_unattributed",
+      "result": "PASS",
+      "before": 0.0,
+      "after": 0.35,
+      "with_jina": 0.35050000000000003,
+      "jina_cost": 0.0005
+    },
+    {
+      "check": "unattributed_pool_counts_against_every_household",
+      "result": "OBSERVE",
+      "note": "provider_call rows with job_id NULL are summed into every household's monthly spend (reader.py:286-306)",
+      "spend": 0.35050000000000003
+    },
+    {
+      "check": "off_request_shape",
+      "result": "PASS",
+      "params": {
+        "search_terms": "Sauce",
+        "brands_tags": "AuditBrand",
+        "countries_tags_en": "romania",
+        "page": "1",
+        "page_size": "10",
+        "fields": "code,product_name,brands,ingredients_text,nutriments,packaging,countries_tags_en"
+      }
+    },
+    {
+      "check": "off_success_snapshot",
+      "result": "PASS",
+      "status": 200,
+      "products": 1,
+      "request_url": "https://world.openfoodfacts.org/api/v2/search?search_terms=Sauce&brands_tags=AuditBrand&countries_tags_en=romania&page=1&page_size=10&fields=code%2Cproduct_name%2Cbrands%2Cingredients_text%2Cnutriments%2Cpackaging%2Ccountries_tags_en"
+    },
+    {
+      "check": "off_degradations_loud",
+      "result": "PASS",
+      "malformed": "malformed_payload: OFF response has no 'products' key",
+      "http500": "http_status: OFF returned HTTP 500: 'off down'",
+      "transport": "transport: ConnectTimeout: off timeout"
+    },
+    {
+      "check": "off_snapshot_persisted_verbatim",
+      "result": "PASS",
+      "raw_body": "{\"products\":[{\"code\":\"123\",\"product_name\":\"Sauce\"}]}",
+      "version": "enrich-snapshot-v1"
+    },
+    {
+      "check": "jina_request_identifiers_only",
+      "result": "PASS",
+      "url": "https://s.jina.ai/AuditBrand+Sauce",
+      "params": [
+        [
+          "site",
+          "mega-image.ro"
+        ],
+        [
+          "site",
+          "emag.ro"
+        ],
+        [
+          "site",
+          "farmaciatei.ro"
+        ],
+        [
+          "num",
+          "5"
+        ],
+        [
+          "type",
+          "web"
+        ],
+        [
+          "gl",
+          "ro"
+        ]
+      ],
+      "headers": {
+        "Accept": "application/json",
+        "X-Token-Budget": "6000",
+        "X-Timeout": "15",
+        "X-Respond-With": "content"
+      }
+    },
+    {
+      "check": "jina_bearer_added_at_send",
+      "result": "PASS"
+    },
+    {
+      "check": "jina_wire_shape_and_snapshot",
+      "result": "PASS",
+      "status": 200,
+      "sites": [
+        "mega-image.ro",
+        "emag.ro",
+        "farmaciatei.ro"
+      ],
+      "results": 1
+    },
+    {
+      "check": "jina_degradations",
+      "result": "PASS",
+      "malformed": "malformed_payload: Jina response has no 'data'/'results' list",
+      "empty_is_success": true,
+      "missing_key": "missing_key: JINA_API_KEY is not present in the backend envi"
+    },
+    {
+      "check": "jina_snapshot_persisted",
+      "result": "PASS"
+    },
+    {
+      "check": "synthesis_input_carries_source_attribution",
+      "result": "PASS",
+      "head": "<<<ENRICH_SOURCE_DATA>>>\nsource_name: OpenFoodFacts\nsource_url: https://world.openfoodfacts.org/api/v2/search?search_terms=Sauce&brands_tags=AuditBrand&countries_tags_en=romania&page=1&page_size=10&fi"
+    }
+  ],
+  "captured_wire_requests": 1
+}
+TEMP_ROOT=/tmp/sg180-g3-cfn0rbxf
