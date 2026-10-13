@@ -291,17 +291,24 @@ def list_assets(
         status=status,
         has_evidence=has_evidence,
     )
+    # SG-188 (D8): the default catalog is the live catalog -- ARCHIVED rows
+    # surface only when explicitly requested with `status=ARCHIVED`.
+    if status is None:
+        query = query.filter(Asset.status != lifecycle.ARCHIVED)
     # Cursor pagination: (created_at, id) descending — use strftime to handle microsecond mismatch (stored without micros)
-    if cursor:
+    # SG-188 (D7): a cursor that cannot be decoded is a 422, never a silent
+    # page-1 repeat (the pre-slice `if decoded:` skipped the filter).
+    if cursor is not None:
         decoded = decode_cursor(cursor)
-        if decoded:
-            ts, oid = decoded
-            ts_str = ts.strftime("%Y-%m-%d %H:%M:%S")
-            # Compare via strftime to avoid ".000000" mismatch between bound param and CURRENT_TIMESTAMP text
-            created_str = func.strftime("%Y-%m-%d %H:%M:%S", Asset.created_at)
-            query = query.filter(
-                or_(created_str < ts_str, and_(created_str == ts_str, Asset.id < oid))
-            )
+        if decoded is None:
+            raise HTTPException(status_code=422, detail="malformed cursor")
+        ts, oid = decoded
+        ts_str = ts.strftime("%Y-%m-%d %H:%M:%S")
+        # Compare via strftime to avoid ".000000" mismatch between bound param and CURRENT_TIMESTAMP text
+        created_str = func.strftime("%Y-%m-%d %H:%M:%S", Asset.created_at)
+        query = query.filter(
+            or_(created_str < ts_str, and_(created_str == ts_str, Asset.id < oid))
+        )
     query = query.order_by(Asset.created_at.desc(), Asset.id.desc()).limit(limit + 1)
     items = query.all()
     has_more = len(items) > limit

@@ -12,6 +12,27 @@ from app.services import audit_service
 
 router = APIRouter()
 
+# SG-188 (D7): data-required task types cannot be closed by a bare resolve.
+# `expiry.manual_entry` is satisfied only by real manual-entry data
+# (`store_manual_expiry` writes the accepted expiry assertion, resolves the
+# task(s) and answers `resolved_review_task_ids`); a bare `{}` resolve would
+# close it while the lived assert stays `{"status": "unknown"}`.
+DATA_REQUIRED_TASK_TYPES = frozenset({"expiry.manual_entry"})
+
+
+def _missing_data_name(task: ReviewTask) -> str:
+    """The field the task asks the user to supply, for the refusal message."""
+    if task.proposed_change:
+        try:
+            proposal = json.loads(task.proposed_change)
+        except ValueError:
+            proposal = None
+        if isinstance(proposal, dict):
+            field_path = proposal.get("field_path")
+            if isinstance(field_path, str) and field_path:
+                return field_path.rsplit("/", 1)[-1]
+    return "expiry_date"
+
 
 @router.get("/review-tasks")
 def list_review_tasks(
@@ -21,13 +42,16 @@ def list_review_tasks(
     db: Session = Depends(get_db),  # type: ignore[no-untyped-def]
 ):  # type: ignore[no-untyped-def]
     query = db.query(ReviewTask).filter(ReviewTask.household_id == household_id)
-    if cursor:
+    # SG-188 (D7): a cursor that cannot be decoded is a 422, never a silent
+    # page-1 repeat (the pre-slice `if decoded:` skipped the filter).
+    if cursor is not None:
         decoded = decode_cursor(cursor)
-        if decoded:
-            ts, oid = decoded
-            ts_str = ts.strftime("%Y-%m-%d %H:%M:%S")
-            created_str = func.strftime("%Y-%m-%d %H:%M:%S", ReviewTask.created_at)
-            query = query.filter(or_(created_str < ts_str, and_(created_str == ts_str, ReviewTask.id < oid)))
+        if decoded is None:
+            raise HTTPException(status_code=422, detail="malformed cursor")
+        ts, oid = decoded
+        ts_str = ts.strftime("%Y-%m-%d %H:%M:%S")
+        created_str = func.strftime("%Y-%m-%d %H:%M:%S", ReviewTask.created_at)
+        query = query.filter(or_(created_str < ts_str, and_(created_str == ts_str, ReviewTask.id < oid)))
     query = query.order_by(ReviewTask.created_at.desc(), ReviewTask.id.desc()).limit(limit + 1)
     items = query.all()
     has_more = len(items) > limit
@@ -80,6 +104,16 @@ def resolve_review_task(
         raise HTTPException(status_code=404, detail="Review task not found")
     if task.household_id != household_id:
         raise HTTPException(status_code=403, detail="Household mismatch")
+    # SG-188 (D7): refuse a dataless resolve of a data-required task type; the
+    # real manual-entry path is the completion that carries data.
+    if task.task_type in DATA_REQUIRED_TASK_TYPES and not payload:
+        raise HTTPException(
+            status_code=422,
+            detail=(
+                f"task requires the {_missing_data_name(task)} before it can be "
+                "resolved; enter it through the expiry manual-entry path"
+            ),
+        )
     if task.status != "resolved":
         before = {"status": task.status}
         task.status = "resolved"

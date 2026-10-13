@@ -190,6 +190,14 @@ def test_asset_cursor_pagination_and_mixed_filters(db) -> None:  # type: ignore[
             created[name] = response.json()
 
         assert len(created) > 2
+        # SG-188 (D8): the default list excludes ARCHIVED; the cursor walk now
+        # covers the three ACTIVE rows, and archived rows are reachable through
+        # the explicit status filter (controls below).
+        expected_default = {
+            created["Kitchen Blender"]["id"],
+            created["Garden Chair"]["id"],
+            created["Garage Shelf"]["id"],
+        }
         seen: list[str] = []
         cursor: str | None = None
         pages = 0
@@ -212,7 +220,7 @@ def test_asset_cursor_pagination_and_mixed_filters(db) -> None:  # type: ignore[
 
         assert pages > 1
         assert len(seen) == len(set(seen))
-        assert set(seen) == {item["id"] for item in created.values()}
+        assert set(seen) == expected_default
 
         def filtered_ids(**params: object) -> set[str]:
             response = client.get(
@@ -221,17 +229,14 @@ def test_asset_cursor_pagination_and_mixed_filters(db) -> None:  # type: ignore[
             assert response.status_code == 200
             return {item["id"] for item in response.json()["items"]}
 
-        expected_q = {created["Kitchen Blender"]["id"], created["Kitchen Table"]["id"]}
-        expected_type = {created["Kitchen Blender"]["id"], created["Office Lamp"]["id"]}
+        expected_q = {created["Kitchen Blender"]["id"]}
+        expected_type = {created["Kitchen Blender"]["id"]}
         expected_status = {
             created["Kitchen Blender"]["id"],
             created["Garden Chair"]["id"],
             created["Garage Shelf"]["id"],
         }
-        expected_evidence = {
-            created["Kitchen Blender"]["id"],
-            created["Kitchen Table"]["id"],
-        }
+        expected_evidence = {created["Kitchen Blender"]["id"]}
         all_created_ids = {item["id"] for item in created.values()}
         assert expected_q and expected_q != all_created_ids
         assert expected_type and expected_type != all_created_ids
@@ -241,7 +246,15 @@ def test_asset_cursor_pagination_and_mixed_filters(db) -> None:  # type: ignore[
         assert filtered_ids(asset_type="appliance") == expected_type
         assert filtered_ids(status="ACTIVE") == expected_status
         assert filtered_ids(has_evidence=True) == expected_evidence
-        assert filtered_ids(has_evidence=False) == all_created_ids - expected_evidence
+        assert filtered_ids(has_evidence=False) == expected_status - expected_evidence
+        assert filtered_ids(status="ARCHIVED") == {
+            created["Kitchen Table"]["id"],
+            created["Office Lamp"]["id"],
+        }
+        assert filtered_ids(q="Kitchen", status="ARCHIVED") == {created["Kitchen Table"]["id"]}
+        assert filtered_ids(status="ARCHIVED", has_evidence=True) == {
+            created["Kitchen Table"]["id"]
+        }
 
 
 def test_list_rows_carry_evidence_ids_for_the_card_thumbnail(db) -> None:  # type: ignore[no-untyped-def]

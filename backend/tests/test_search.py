@@ -95,11 +95,15 @@ def test_search_q_returns_exact_mixed_fixture_ids(search_fixtures) -> None:  # t
     _, household_id, assets = search_fixtures
     with TestClient(app) as client:
         actual = filtered_ids(client, household_id, q="Kitchen")
+        archived_hit = filtered_ids(client, household_id, q="Kitchen", status="ARCHIVED")
 
-    expected = {assets["Kitchen Blender"].id, assets["Kitchen Table"].id}
+    # SG-188 (D8): the default list (search included) excludes ARCHIVED; the
+    # archived match stays reachable through the explicit status filter.
+    expected = {assets["Kitchen Blender"].id}
     all_ids = {asset.id for asset in assets.values()}
     assert expected and expected < all_ids
     assert actual == expected
+    assert archived_hit == {assets["Kitchen Table"].id}
 
 
 def test_search_q_matches_multiple_literal_tokens(search_fixtures) -> None:  # type: ignore[no-untyped-def]
@@ -162,7 +166,7 @@ def test_search_q_rebuild_restores_matches(search_fixtures) -> None:  # type: ig
         session.commit()
         after = filtered_ids(client, household_id, q="Kitchen")
 
-    expected = {assets["Kitchen Blender"].id, assets["Kitchen Table"].id}
+    expected = {assets["Kitchen Blender"].id}
     assert before == expected
     assert after == expected
 
@@ -190,7 +194,7 @@ def test_search_asset_type_returns_exact_mixed_fixture_ids(search_fixtures) -> N
     with TestClient(app) as client:
         actual = filtered_ids(client, household_id, asset_type="appliance")
 
-    expected = {assets["Kitchen Blender"].id, assets["Office Lamp"].id}
+    expected = {assets["Kitchen Blender"].id}
     all_ids = {asset.id for asset in assets.values()}
     assert expected and expected < all_ids
     assert actual == expected
@@ -217,10 +221,9 @@ def test_search_has_evidence_returns_exact_ids_for_both_polarities(search_fixtur
         with_evidence = filtered_ids(client, household_id, has_evidence=True)
         without_evidence = filtered_ids(client, household_id, has_evidence=False)
 
-    expected_with = {assets["Kitchen Blender"].id, assets["Kitchen Table"].id}
+    expected_with = {assets["Kitchen Blender"].id}
     expected_without = {
         assets["Garden Chair"].id,
-        assets["Office Lamp"].id,
         assets["Garage Shelf"].id,
     }
     assert with_evidence == expected_with
