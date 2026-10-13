@@ -1,0 +1,20 @@
+== candidate ==
+browser: HeadlessChrome/149.0.7827.55
+serve: {"dir":"/tmp/opencode/sg190/authoritative/frontend/dist","port":8010}
+overflow by viewport: {"390x844":{"routes":10,"overflow":0,"offenders":0},"834x1112":{"routes":10,"overflow":0,"offenders":0},"1440x900":{"routes":10,"overflow":0,"offenders":0},"320x720":{"routes":10,"overflow":0,"offenders":0}}
+contrast: samples=1046 belowAA=0 unknown=0 min=5.2606
+contrast min sample: {"route":"catalog","viewport":"390x844","text":"Loaded:","fg":"rgb(107, 101, 97)","bg":"{\"r\":245,\"g\":245,\"b\":244,\"a\":1}","ratio":5.2606}
+contrast top pairs: [{"pair":"rgb(28, 25, 23) on 255","count":272,"min":17.4883},{"pair":"rgb(107, 101, 97) on 255","count":240,"min":5.7389},{"pair":"rgb(28, 25, 23) on 249","count":240,"min":16.7446},{"pair":"rgb(107, 101, 97) on 249","count":80,"min":5.4948},{"pair":"rgb(107, 101, 97) on 244","count":76,"min":5.2606},{"pair":"rgb(250, 250, 249) on 46","count":42,"min":9.4611}]
+target dispositions: {"PASS-SPACING":76,"PASS-SIZE":516}
+controls: [{"scratch_fit_390":true},{"scratch_overflow_390":true},{"transport_guard_post":true},{"spacing_pass_fixture":true},{"spacing_fail_fixture":true},{"contrast_known_controls":true},{"contrast_wrong_expectation_must_fail":true}]
+tab probe: {"tabs":30,"obscured":0,"invisible":0}
+draft probe: {"typed":{"found":true,"valueAfterType":"sg190 draft","active":false},"valueAfterViewportRoundTrip":"sg190 draft","preserved":true}
+guard: {"GET":271} blocked=0 externalBlocked=0 fulfilled=142 fulfillFailures=0
+checks: {"overflow_zero_all_viewports":true,"contrast_no_below_AA":true,"controls_all_pass":true,"transport_get_only":true,"tab_probe_clean":true,"menu_closed_no_visible_links":true,"menu_open_all_links_visible":true,"menu_toggle_hidden_wide":true,"draft_preserved":true}
+== base ==
+overflow by viewport: {"390x844":{"routes":10,"overflow":10,"offenders":136},"834x1112":{"routes":10,"overflow":9,"offenders":9},"1440x900":{"routes":10,"overflow":0,"offenders":0},"320x720":{"routes":10,"overflow":10,"offenders":153}}
+contrast: samples=1096 belowAA=76 min=4.3977
+contrast min sample: {"route":"catalog","viewport":"390x844","text":"Total:","fg":"rgb(120, 113, 108)","bg":"{\"r\":245,\"g\":245,\"b\":244,\"a\":1}","ratio":4.3977}
+target dispositions: {"PASS-SPACING":88,"PASS-SIZE":608}
+base checks (expected to fail): {"overflow_zero_all_viewports":false,"contrast_no_below_AA":false,"controls_all_pass":true,"transport_get_only":true,"tab_probe_clean":true,"menu_closed_no_visible_links":false,"menu_open_all_links_visible":false,"menu_toggle_hidden_wide":false,"draft_preserved":true}
+RESULT {"ok":true,"checks":{"overflow_zero_all_viewports":true,"contrast_no_below_AA":true,"controls_all_pass":true,"transport_get_only":true,"tab_probe_clean":true,"menu_closed_no_visible_links":true,"menu_open_all_links_visible":true,"menu_toggle_hidden_wide":true,"draft_preserved":true}}
