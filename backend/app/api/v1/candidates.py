@@ -161,9 +161,7 @@ def get_candidate(
     evidence_ids = json.loads(candidate.evidence_ids_json)
     if not isinstance(evidence_ids, list):
         raise HTTPException(status_code=500, detail="Candidate evidence is invalid")
-    review_task_ids = proposal.get("review_task_ids", [])
-    if not isinstance(review_task_ids, list):
-        review_task_ids = []
+    review_task_ids = candidates.open_review_task_ids(db, candidate)
     dedup_matches = proposal.get("dedup_matches", [])
     if not isinstance(dedup_matches, list):
         dedup_matches = []

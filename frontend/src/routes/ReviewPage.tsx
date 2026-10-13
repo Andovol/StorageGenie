@@ -45,8 +45,8 @@ export function ReviewPage() {
   useEffect(() => {
     function onKey(event: KeyboardEvent) {
       if ((event.target as HTMLElement)?.tagName === "INPUT" || (event.target as HTMLElement)?.tagName === "TEXTAREA") return;
-      if (event.key.toLowerCase() === "a" && candidate && candidate.review_task_ids.length === 0) { event.preventDefault(); setKeyboardAction("accept"); decision.mutate({ action: "accept", fields: candidate.fields as Record<string, unknown> }); }
-      if (event.key.toLowerCase() === "r" && candidate) { event.preventDefault(); setKeyboardAction("reject"); decision.mutate({ action: "reject" }); }
+      if (event.key.toLowerCase() === "a" && candidate && candidate.review_task_ids.length === 0 && !decision.isPending) { event.preventDefault(); setKeyboardAction("accept"); decision.mutate({ action: "accept", fields: candidate.fields as Record<string, unknown> }); }
+      if (event.key.toLowerCase() === "r" && candidate && !decision.isPending) { event.preventDefault(); setKeyboardAction("reject"); decision.mutate({ action: "reject" }); }
       if (event.key === "ArrowLeft") { event.preventDefault(); setKeyboardAction("previous"); navigate(-1); }
       if (event.key === "ArrowRight") { event.preventDefault(); setKeyboardAction("next"); navigate(1); }
     }

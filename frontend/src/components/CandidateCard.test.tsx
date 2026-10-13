@@ -115,6 +115,23 @@ describe("CandidateCard", () => {
     expect(fallback).toHaveClass("focus-ring");
   });
 
+  test("blocked candidate with dedup matches renders the blocked reason exactly once (SG-175 G2)", () => {
+    renderCard(<CandidateCard candidate={{ ...candidate, review_task_ids: ["task-g2"] }} householdId="household-g2" onDecision={vi.fn()} />);
+    const article = screen.getByRole("article");
+    expect(article.textContent?.split("Acceptance is blocked until the open review task(s) are resolved.").length).toBe(2);
+    expect(article).toHaveTextContent("Identifier collision: SN-7");
+    expect(screen.getAllByRole("link", { name: "View them in the Inbox." })).toHaveLength(1);
+    expect(screen.getByRole("button", { name: "Accept" })).toBeDisabled();
+  });
+
+  test("unblocked candidate with dedup matches keeps the advisory and no blocked reason (SG-175 G2)", () => {
+    renderCard(<CandidateCard candidate={{ ...candidate, review_task_ids: [] }} householdId="h" onDecision={vi.fn()} />);
+    const article = screen.getByRole("article");
+    expect(article.textContent?.split("Acceptance is blocked until the open review task(s) are resolved.").length).toBe(1);
+    expect(article).toHaveTextContent("This match is advisory; review it before accepting.");
+    expect(screen.queryByRole("link", { name: "View them in the Inbox." })).toBeNull();
+  });
+
   test("all-photo evidence renders zero fallback blocks (SG-171 G2)", () => {
     renderCard(<CandidateCard candidate={{ ...candidate, review_task_ids: [], dedup_matches: [], evidence_ids: ["photo-a", "photo-b"] }} householdId="h" onDecision={vi.fn()} />);
     const article = screen.getByRole("article");

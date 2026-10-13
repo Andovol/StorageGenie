@@ -943,6 +943,26 @@ def _create_asset_for_candidate(db: Session, candidate: Candidate) -> Asset:
     return asset
 
 
+def open_review_task_ids(db: Session, candidate: Candidate) -> list[str]:
+    """SG-175 G1: live open task ids for this candidate + household.
+
+    The same predicate the decision gate enforces. The candidate read projects
+    these so the response stops serving proposal-time snapshots that survive a
+    resolution; proposal storage and historical snapshots stay untouched.
+    """
+    rows = (
+        db.query(ReviewTask.id)
+        .filter(
+            ReviewTask.subject_ref == candidate.id,
+            ReviewTask.household_id == candidate.household_id,
+            ReviewTask.status == "open",
+        )
+        .order_by(ReviewTask.created_at, ReviewTask.id)
+        .all()
+    )
+    return [str(row[0]) for row in rows]
+
+
 def commit_candidate(db: Session, candidate: Candidate) -> dict[str, object]:
     if candidate.state not in {"accepted", "edited"}:
         raise CandidateBlockedError(f"candidate state {candidate.state} is not committable")

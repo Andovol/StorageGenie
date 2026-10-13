@@ -62,7 +62,7 @@ export function CandidateCard({
         <div role="alert" className="bg-accent border-accent" style={{ marginTop: 14, padding: 10, borderStyle: "solid", borderWidth: 1, borderRadius: 6 }}>
           <strong>Possible duplicates or collisions</strong>
           {candidate.dedup_matches.map((match, index) => <div key={`${match.type}-${index}`}>{matchLabel(match)}</div>)}
-          {blocked ? <div style={{ marginTop: 4 }}>Acceptance is blocked until the open review task(s) are resolved.</div> : <div style={{ marginTop: 4 }}>This match is advisory; review it before accepting.</div>}
+          <div style={{ marginTop: 4 }}>This match is advisory; review it before accepting.</div>
         </div>
       )}
       <div style={{ display: "grid", gridTemplateColumns: "minmax(180px, 1fr) minmax(240px, 1.2fr)", gap: 20, marginTop: 18 }}>

@@ -71,4 +71,53 @@ describe("ReviewPage", () => {
     fireEvent.click(await screen.findByRole("button", { name: /split/i }));
     expect(await screen.findByRole("alert")).toHaveTextContent("split failed");
   });
+
+  test("blocked live response offers no accept from button or shortcut (SG-175 A2)", async () => {
+    api.apiGet.mockImplementation((path: string) => path.startsWith("/v1/candidates/") ? Promise.resolve({ ...candidate, review_task_ids: ["task-open-1"] }) : Promise.resolve({ items: [], next_cursor: null, total: 0 }));
+    renderPage();
+    await screen.findByDisplayValue("Loaded item");
+    const accept = screen.getByRole("button", { name: "Accept" });
+    expect(accept).toBeDisabled();
+    fireEvent.click(accept);
+    fireEvent.keyDown(window, { key: "a" });
+    expect(api.candidateDecision).not.toHaveBeenCalled();
+  });
+
+  test("pending decision prevents repeated accept mutations from the keyboard (SG-175 A2)", async () => {
+    api.apiGet.mockImplementation((path: string) => path.startsWith("/v1/candidates/") ? Promise.resolve(candidate) : Promise.resolve({ items: [], next_cursor: null, total: 0 }));
+    api.candidateDecision.mockImplementation(() => new Promise(() => {}));
+    renderPage();
+    await screen.findByDisplayValue("Loaded item");
+    fireEvent.keyDown(window, { key: "a" });
+    await waitFor(() => expect(screen.getByRole("button", { name: "Accept" })).toBeDisabled());
+    expect(api.candidateDecision).toHaveBeenCalledTimes(1);
+    fireEvent.keyDown(window, { key: "a" });
+    await waitFor(() => expect(api.candidateDecision).toHaveBeenCalledTimes(1));
+    fireEvent.keyDown(window, { key: "r" });
+    await waitFor(() => expect(api.candidateDecision).toHaveBeenCalledTimes(1));
+  });
+
+  test("a refreshed unblocked response enables click and shortcut accept (SG-175 A2)", async () => {
+    let candidateReads = 0;
+    api.apiGet.mockImplementation((path: string) => {
+      if (path.startsWith("/v1/candidates/")) {
+        candidateReads += 1;
+        return Promise.resolve(candidateReads === 1 ? { ...candidate, review_task_ids: ["task-open-2"] } : { ...candidate, review_task_ids: [] });
+      }
+      return Promise.resolve({ items: [], next_cursor: null, total: 0 });
+    });
+    api.candidateDecision.mockResolvedValue({ candidate_id: candidate.id, state: "rejected" });
+    renderPage();
+    await screen.findByDisplayValue("Loaded item");
+    expect(screen.getByRole("button", { name: "Accept" })).toBeDisabled();
+    fireEvent.click(screen.getByRole("button", { name: "Reject" }));
+    await waitFor(() => expect(api.candidateDecision).toHaveBeenCalledTimes(1));
+    await waitFor(() => expect(screen.getByRole("button", { name: "Accept" })).toBeEnabled());
+    fireEvent.click(screen.getByRole("button", { name: "Accept" }));
+    await waitFor(() => expect(api.candidateDecision).toHaveBeenCalledTimes(2));
+    await waitFor(() => expect(screen.getByRole("button", { name: "Accept" })).toBeEnabled());
+    fireEvent.keyDown(window, { key: "a" });
+    await waitFor(() => expect(api.candidateDecision).toHaveBeenCalledTimes(3));
+    expect(api.candidateDecision).toHaveBeenLastCalledWith(candidate.id, "household-loaded", "accept", expect.anything());
+  });
 });
