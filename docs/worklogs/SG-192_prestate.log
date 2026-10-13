@@ -1,0 +1,188 @@
+SG-192 read-only pre-state; captured 2026-10-13T18:29:35Z; before any build/recreate attempt
+now_epoch=1791916175
+== git ==
+requested ref: automation
+fetch_exit=0
+resolved HEAD: 573c72d15636abab8dc0859d1d6e470afe43f866
+resolved HEAD date: 2026-10-13T21:27:30+03:00
+branch: automation
+origin/automation: 573c72d15636abab8dc0859d1d6e470afe43f866
+porcelain:
+?? docs/worklogs/SG-192_prestate.log
+0b42e7d ancestor of HEAD: yes
+0b42e7d ancestor of 3454e1c: no
+object 3ae5541: commit
+git log -3:
+573c72d Record-D15-SG-192-dispatch-approval
+f14c03d Audit-rate-SG-191-89-draft-SG-192-corrected-rider
+3f27f3f SG-191 receipt-paste: bind WORK_HEAD 24a9f93 + mapped-fetch receipt show output
+== lane identity ==
+RUNTIME_DIRECTORY=/run/dispatch-storagegenie-SG-192 RUNTIME_SOCKETS=docker.sock RUN_BUDGET_S=2100
+srw-rw---T 1 andrei 100987 0 Sep  8 20:16 /run/dispatch-storagegenie-SG-192/docker.sock
+opencode pid 1950510 cmdline: opencode run --auto --dir /home/andrei/StorageGenie --model opencode-go/deepseek-v4.1-flash --variant max # SG-192 — S
+
+`PB-1`–`PB-6` bind (`CODER.md` §14).
+**BASE REF: automation.** Echo requested ref and actual resolved commit separately.
+**DATABASE: production SQLite read-only.** No schema migration or application data write.
+**Restart: exactly one backend rebuild + one recreate.**
+**Autonomy: L3.** Production authorization basis: owner waiver D13 (serve the SG-175/R1 merged repair) + audit `docs/wor
+
+## Why this exists
+
+SG-191 stopped correctly before any build: its capability read hit the KNOWN-denied default Docker socket, which the pac
+
+Expected recorded/published/host contract 0.47.0; previous host echo comes from SG-191_report.md, `/home/andrei/storageg
+
+## G1 — Pre-state, one rebuild, one recreate — lane socket only
+
+Establish read-only pre-state: actual ref/hash, clean tree, running image/container ID/Created/RestartCount, health stat
+
+Docker endpoint rule (the SG-191 correction — read twice, then obey): every Docker call in this slice runs with `DOCKE
+
+Then, through the lane socket only: `BUILDX_CONFIG=/tmp/opencode/buildx docker compose build backend` exactly once, then
+
+## G2 — Verify the repaired behavior is served, without claiming more
+
+Observe a new container identity and start time (recreate proven by container ID/Created, not RestartCount). Health ok f
+
+Prove the repair live: candidate GET for a resolved-task candidate returns live `review_task_ids` (empty where none open
+
+## Constraints
+
+Scope: `docs/worklogs/SG-192*` only. No product, configuration, schema, migration or test edits. No production INSERT/UP
+
+Full suite waived per `PG-DP-02`; substitute is post-recreate read-only identity/health/schema/counts/pages/preflight ve
+
+## Acceptance and report
+
+- A1: one rebuild + one recreate THROUGH THE LANE SOCKET, direct new running-instance proof, health green and explicit a
+- A2: actual base/hash and product diff checked — only the waived R1 set differs from the served base; work diff only 
+- A3: command logs and final report `docs/worklogs/SG-192_report.md`; elapsed per leg and total vs observed lane bound; 
+- A4: notes-ref receipt on `refs/notes/storagegenie-coder-reports` published and mapped-fetch/read-back verified, first 
+
+Guards invoked: PG-EV-02/03; PG-IC-01/07; PG-DP-01/02; PG-PR-03/04/06/10. Stop follows `PB-6`; no silent deployment on a...
+process_start_epoch=1.79192e+09
+== docker capability read via lane socket (DOCKER_HOST=unix:///run/dispatch-storagegenie-SG-192/docker.sock) ==
+Client: Docker Engine - Community
+ Version:           29.6.2
+ API version:       1.55
+ Go version:        go1.26.5
+ Git commit:        dfc4efb
+ Built:             Thu Jul 16 16:12:18 2026
+ OS/Arch:           linux/amd64
+ Context:           default
+
+Server: Docker Engine - Community
+ Engine:
+  Version:          29.6.2
+  API version:      1.55 (minimum version 1.40)
+  Go version:       go1.26.5
+  Git commit:       3d80467
+  Built:            Thu Jul 16 16:12:18 2026
+  OS/Arch:          linux/amd64
+  Experimental:     false
+ containerd:
+  Version:          v2.2.6
+  GitCommit:        11ce9d5f3c68c941867e82890e93e815c1304f1b
+ runc:
+  Version:          1.3.6
+  GitCommit:        v1.3.6-0-g491b69ba
+ docker-init:
+  Version:          0.19.0
+  GitCommit:        de40ad0
+ rootlesskit:
+  Version:          3.0.2
+  ApiVersion:       1.1.2
+  NetworkDriver:    slirp4netns
+  PortDriver:       builtin
+  StateDir:         /run/user/1000/dockerd-rootless
+ slirp4netns:
+  Version:          1.2.1
+  GitCommit:        09e31e92fa3d2a1d3ca261adaeb012c8d75a8194
+docker_version_exit=0
+== running containers (lane) ==
+CONTAINER ID   IMAGE                  CREATED AT                      STATUS                  NAMES
+23d31ff5f3ca   storagegenie-backend   2026-10-12 21:05:12 +0000 UTC   Up 21 hours (healthy)   storagegenie-backend-1
+docker_ps_exit=0
+== backend container identity (lane) ==
+Id=23d31ff5f3caa07d6b019f57ce686a595687e4dff64f8f8be708307bf5f124b9 Created=2026-10-12T21:05:12.713648479Z RestartCount=0 Image=sha256:d5da5684a95e20e2ea9d85f8eddcbd007b2542cc6493ebb2f0da090bb2419927 State=running StartedAt=2026-10-12T21:05:13.674463854Z
+docker_inspect_exit=0
+== health GET (CO-92 start) ==
+{"status":"ok","db":"ok","storage":"ok"}
+HTTP 200
+health_exit=0
+== served bundle (live server, pre-recreate) ==
+index_http=200 bytes=944
+2f035becd05b63e226af82e2e8fe60c8f3b5effb9f37e49dd95a2265c4da0d55  /tmp/opencode/sg192_index_pre.html
+assets/index-CYyuxefG.js
+assets/index-DO0gjGV6.css
+assets/index-CYyuxefG.js HTTP 200 bytes=322255
+1b4680a0eddadff3c95a64b6bc00d744764d127a72cd5690ebea948b7664a29d  /tmp/opencode/sg192_pre_index-CYyuxefG.js
+assets/index-DO0gjGV6.css HTTP 200 bytes=3911
+37b25dbdd4b0ecfdedb8255bc7f8af286726334e95a1a3a9e85b9ba381b3d57c  /tmp/opencode/sg192_pre_index-DO0gjGV6.css
+== pre-recreate candidate GET (resolved-task candidate; expect OLD snapshot shape) ==
+{"id":"01a131a1-11c3-7f81-b2d9-0842a3cba350","state":"edited","job_id":"01a131a0-ca8e-7673-9869-af5a26264a73","fields":{"display_name":"TRACHISAN comprimate de supt","asset_type":"medicine","status":"ACTIVE","quantity":20,"unit":"comprimate","category_proposed":"medicine"},"dedup_matches":[],"review_task_ids":["01a131a1-11c4-7762-a33a-acb53b4e41e7"],"evidence_ids":["01a131a0-ca52-7d72-afa6-a7f79cc5a016","01a131a1-11a6-7240-b7c1-7f9cc9090e9e"],"asset_id":null,"web_alternates":[],"merged_into":null}
+HTTP 200
+== review-tasks statuses (pre) ==
+total 8
+{'01a131a1': 'resolved', '01a13115': 'resolved', '01a0c4a2': 'resolved', '01a0c4a0': 'resolved', '01a0c481': 'resolved', '01a0c47f': 'resolved', '01a0c445': 'resolved'}
+== db read-only (production SQLite) ==
+db_path /home/andrei/StorageGenie/data/db/storagegenie.db
+db_sha256 e6bef157440fb8b4a3262577362b071dcae07507ea9a7e04a614e11be28ee5bd
+table_count 28
+tables alembic_version assertion asset asset_evidence asset_fts asset_fts_config asset_fts_data asset_fts_docsize asset_fts_idx asset_location asset_relation audit_event candidate enrich_snapshot evidence guardrail_event household idempotency_key job job_step location observation planning_suggestion provider_call review_task saved_search source_attribution user
+alembic_version ['20260924_sg114_relation']
+count alembic_version 1
+count assertion 37
+count asset 7
+count asset_evidence 14
+count asset_fts 7
+count asset_fts_config 1
+count asset_fts_data 9
+count asset_fts_docsize 7
+count asset_fts_idx 7
+count asset_location 1
+count asset_relation 1
+count audit_event 91
+count candidate 10
+count enrich_snapshot 4
+count evidence 18
+count guardrail_event 2
+count household 1
+count idempotency_key 11
+count job 11
+count job_step 72
+count location 1
+count observation 20
+count planning_suggestion 0
+count provider_call 29
+count review_task 8
+count saved_search 0
+count source_attribution 0
+count user 2
+review_task_statuses {'resolved': 8}
+READONLY_OK
+end_db_sha256 e6bef157440fb8b4a3262577362b071dcae07507ea9a7e04a614e11be28ee5bd
+END_READONLY_OK
+== product diff guard (merged-vs-served) ==
+$ git diff --stat 3ae5541..HEAD -- backend frontend
+ backend/app/api/v1/candidates.py               |   4 +-
+ backend/app/services/candidates.py             |  20 ++++
+ backend/tests/test_candidate_read.py           | 152 +++++++++++++++++++++++++
+ frontend/src/components/CandidateCard.test.tsx |  17 +++
+ frontend/src/components/CandidateCard.tsx      |   2 +-
+ frontend/src/routes/ReviewPage.test.tsx        |  49 ++++++++
+ frontend/src/routes/ReviewPage.tsx             |   4 +-
+ 7 files changed, 242 insertions(+), 6 deletions(-)
+$ git diff --name-only 3ae5541..HEAD -- backend frontend
+backend/app/api/v1/candidates.py
+backend/app/services/candidates.py
+backend/tests/test_candidate_read.py
+frontend/src/components/CandidateCard.test.tsx
+frontend/src/components/CandidateCard.tsx
+frontend/src/routes/ReviewPage.test.tsx
+frontend/src/routes/ReviewPage.tsx
+$ git diff --name-only 3ae5541..HEAD -- backend/app/models backend/alembic
+(end models/alembic list)
+$ git diff --name-only 3ae5541..3454e1c -- backend frontend
+(end served-close list)

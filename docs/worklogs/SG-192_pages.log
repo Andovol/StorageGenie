@@ -1,0 +1,42 @@
+SG-192 live route/repair verification; captured 2026-10-13T18:32:01Z
+== candidate GET #1 (resolved-task candidate 01a131a1-11c3-7f81-b2d9-0842a3cba350; pre-recreate served snapshot id 01a131a1-11c4-7762-a33a-acb53b4e41e7) ==
+{"id":"01a131a1-11c3-7f81-b2d9-0842a3cba350","state":"edited","job_id":"01a131a0-ca8e-7673-9869-af5a26264a73","fields":{"display_name":"TRACHISAN comprimate de supt","asset_type":"medicine","status":"ACTIVE","quantity":20,"unit":"comprimate","category_proposed":"medicine"},"dedup_matches":[],"review_task_ids":[],"evidence_ids":["01a131a0-ca52-7d72-afa6-a7f79cc5a016","01a131a1-11a6-7240-b7c1-7f9cc9090e9e"],"asset_id":null,"web_alternates":[],"merged_into":null}
+HTTP 200
+== candidate GET #2 (resolved-task candidate 01a0c4a2-2a46-7d53-a4b2-de34d54ce993; pre-recreate served two snapshot ids) ==
+{"id":"01a0c4a2-2a46-7d53-a4b2-de34d54ce993","state":"edited","job_id":"01a0c4a1-adcd-75d1-b335-8b936b320c5f","fields":{"display_name":"Costiță de porc","asset_type":"meat","status":"ACTIVE","category_proposed":"meat"},"dedup_matches":[{"type":"similar","asset_id":"01a0c47f-fbb3-7db1-b6f3-aa52d20aa6a0","distance":9},{"type":"similar","asset_id":"01a0c481-720e-7923-ad6c-bee45caba30f","distance":9}],"review_task_ids":[],"evidence_ids":["01a0c4a1-acbd-7541-83b7-ce9d04730716","01a0c4a1-ad90-78e1-9c17-10d92260fd0e","01a0c4a2-2a41-77a1-9757-f0c1ae5c7cf4","01a0c4a2-2a42-72b3-8131-e392ced98263"],"asset_id":"01a0c47f-fbb3-7db1-b6f3-aa52d20aa6a0","web_alternates":[],"merged_into":null}
+HTTP 200
+== review-tasks statuses (post) ==
+total 8
+{'01a131a1': 'resolved', '01a13115': 'resolved', '01a0c4a2': 'resolved', '01a0c4a0': 'resolved', '01a0c481': 'resolved', '01a0c47f': 'resolved', '01a0c445': 'resolved'}
+== SPA routes through the new server (read-only GETs) ==
+/review HTTP 200 type=text/html; charset=utf-8 bytes=944
+98f1efa7cd25381004c7c5486a107f7d140a9defa3909c2eab43970e38d1aa36  /tmp/opencode/sg192_page_review.html
+/inbox HTTP 200 type=text/html; charset=utf-8 bytes=944
+98f1efa7cd25381004c7c5486a107f7d140a9defa3909c2eab43970e38d1aa36  /tmp/opencode/sg192_page_inbox.html
+/catalog HTTP 200 type=text/html; charset=utf-8 bytes=944
+98f1efa7cd25381004c7c5486a107f7d140a9defa3909c2eab43970e38d1aa36  /tmp/opencode/sg192_page_catalog.html
+(index.html post-recreate sha256 for SPA-fallback comparison: 98f1efa7cd25381004c7c5486a107f7d140a9defa3909c2eab43970e38d1aa36)
+== CORS preflight (OPTIONS, Origin http://localhost:5173, requested method GET) ==
+HTTP/1.1 200 OK
+date: Tue, 13 Oct 2026 18:32:00 GMT
+server: uvicorn
+vary: Origin
+access-control-allow-methods: GET, POST, PUT, PATCH, DELETE, OPTIONS
+access-control-max-age: 600
+access-control-allow-headers: Accept, Accept-Language, Authorization, Content-Language, Content-Type, Idempotency-Key, If-Match, Origin, X-Requested-With
+access-control-allow-credentials: true
+access-control-allow-origin: http://localhost:5173
+content-length: 2
+content-type: text/plain; charset=utf-8
+
+OK-- preflight done --
+== CORS on actual GET (Origin header) ==
+HTTP/1.1 200 OK
+date: Tue, 13 Oct 2026 18:32:00 GMT
+server: uvicorn
+content-length: 40
+content-type: application/json
+access-control-allow-credentials: true
+access-control-allow-origin: http://localhost:5173
+vary: Origin
+

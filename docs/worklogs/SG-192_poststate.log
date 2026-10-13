@@ -1,0 +1,52 @@
+SG-192 post-recreate state; captured 2026-10-13T18:31:48Z
+== container (lane) ==
+CONTAINER ID   IMAGE                  CREATED AT                      STATUS                        NAMES
+8f5b9707d92e   storagegenie-backend   2026-10-13 18:30:38 +0000 UTC   Up About a minute (healthy)   storagegenie-backend-1
+Id=8f5b9707d92ef3fbf8831664aa675842ee7f4a661a4e9f4c96ba7b9f6c4153b9 Created=2026-10-13T18:30:38.498947646Z RestartCount=0 Image=sha256:865a0e059f61b9b896463424d4c645fabff40431e49e9f4f556e0797080d2066 State=running StartedAt=2026-10-13T18:30:39.601316798Z Health=healthy
+== served bundle (live server, post-recreate) ==
+index_http=200 bytes=944
+98f1efa7cd25381004c7c5486a107f7d140a9defa3909c2eab43970e38d1aa36  /tmp/opencode/sg192_index_post.html
+assets/index-DO0gjGV6.css
+assets/index-wUMO9mRP.js
+assets/index-DO0gjGV6.css HTTP 200 bytes=3911
+37b25dbdd4b0ecfdedb8255bc7f8af286726334e95a1a3a9e85b9ba381b3d57c  /tmp/opencode/sg192_post_index-DO0gjGV6.css
+assets/index-wUMO9mRP.js HTTP 200 bytes=322169
+ac0039d69135b22019abe979ac8f88098dd27ef357f3ade5040740ad351f7e84  /tmp/opencode/sg192_post_index-wUMO9mRP.js
+== db read-only re-read (post) ==
+db_path /home/andrei/StorageGenie/data/db/storagegenie.db
+db_sha256 e6bef157440fb8b4a3262577362b071dcae07507ea9a7e04a614e11be28ee5bd
+table_count 28
+tables alembic_version assertion asset asset_evidence asset_fts asset_fts_config asset_fts_data asset_fts_docsize asset_fts_idx asset_location asset_relation audit_event candidate enrich_snapshot evidence guardrail_event household idempotency_key job job_step location observation planning_suggestion provider_call review_task saved_search source_attribution user
+alembic_version ['20260924_sg114_relation']
+count alembic_version 1
+count assertion 37
+count asset 7
+count asset_evidence 14
+count asset_fts 7
+count asset_fts_config 1
+count asset_fts_data 9
+count asset_fts_docsize 7
+count asset_fts_idx 7
+count asset_location 1
+count asset_relation 1
+count audit_event 91
+count candidate 10
+count enrich_snapshot 4
+count evidence 18
+count guardrail_event 2
+count household 1
+count idempotency_key 11
+count job 11
+count job_step 72
+count location 1
+count observation 20
+count planning_suggestion 0
+count provider_call 29
+count review_task 8
+count saved_search 0
+count source_attribution 0
+count user 2
+review_task_statuses {'resolved': 8}
+READONLY_OK
+end_db_sha256 e6bef157440fb8b4a3262577362b071dcae07507ea9a7e04a614e11be28ee5bd
+END_READONLY_OK

@@ -1,0 +1,51 @@
+SG-192 post-recreate health GETs (six, standing precedent); 2026-10-13T18:30:39Z
+--- GET 1 epoch=1791916239 ---
+curl: (52) Empty reply from server
+
+HTTP 000
+curl_exit=52
+--- GET 2 epoch=1791916244 ---
+{"status":"ok","db":"ok","storage":"ok"}
+HTTP 200
+curl_exit=0
+--- GET 3 epoch=1791916250 ---
+{"status":"ok","db":"ok","storage":"ok"}
+HTTP 200
+curl_exit=0
+--- GET 4 epoch=1791916255 ---
+{"status":"ok","db":"ok","storage":"ok"}
+HTTP 200
+curl_exit=0
+--- GET 5 epoch=1791916260 ---
+{"status":"ok","db":"ok","storage":"ok"}
+HTTP 200
+curl_exit=0
+--- GET 6 epoch=1791916265 ---
+{"status":"ok","db":"ok","storage":"ok"}
+HTTP 200
+curl_exit=0
+== steady-state six health GETs (standing precedent), after boot completes; 2026-10-13T18:31:23Z ==
+--- steady GET 1 epoch=1791916283 ---
+{"status":"ok","db":"ok","storage":"ok"}
+HTTP 200
+curl_exit=0
+--- steady GET 2 epoch=1791916288 ---
+{"status":"ok","db":"ok","storage":"ok"}
+HTTP 200
+curl_exit=0
+--- steady GET 3 epoch=1791916293 ---
+{"status":"ok","db":"ok","storage":"ok"}
+HTTP 200
+curl_exit=0
+--- steady GET 4 epoch=1791916298 ---
+{"status":"ok","db":"ok","storage":"ok"}
+HTTP 200
+curl_exit=0
+--- steady GET 5 epoch=1791916303 ---
+{"status":"ok","db":"ok","storage":"ok"}
+HTTP 200
+curl_exit=0
+--- steady GET 6 epoch=1791916308 ---
+{"status":"ok","db":"ok","storage":"ok"}
+HTTP 200
+curl_exit=0
