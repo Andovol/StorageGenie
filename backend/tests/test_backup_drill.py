@@ -5,7 +5,9 @@ production proof (the live SQLite file and the ``storagegenie_storage_data``
 volume) stays in ``docs/worklogs/SG-086_verify.log``; this test re-proves the
 same method against fixtures so the drill outlives the slice. The helpers under
 test are loaded from ``backend/scripts/backup_restore_drill.py``, the operator
-tooling the README runbook invokes.
+tooling the README runbook invokes. SG-189 adds the ``_guard`` geometry cases:
+both containment directions, equality, disjoint and missing, each rejected or
+accepted with a message naming its true geometry (F-SG182-1).
 """
 
 from __future__ import annotations
@@ -110,3 +112,50 @@ def test_byte_equality_gate_rejects_a_corrupted_copy(tmp_path: Path) -> None:
 
     with pytest.raises(AssertionError):
         DRILL.assert_byte_equal(backup, corrupted)
+
+
+def _scratch_prod_pair(tmp_path: Path) -> tuple[Path, Path]:
+    """A scratch production DB file + storage dir pair; never a production path."""
+    prod_db = tmp_path / "prod" / "db" / "storagegenie.db"
+    prod_db.parent.mkdir(parents=True)
+    prod_db.write_bytes(b"fixture-db")
+    storage = tmp_path / "prod" / "storage"
+    storage.mkdir()
+    return prod_db, storage
+
+
+def test_guard_rejects_work_dir_equal_to_production_storage(tmp_path: Path) -> None:
+    prod_db, storage = _scratch_prod_pair(tmp_path)
+    with pytest.raises(SystemExit, match="equals production storage"):
+        DRILL._guard(prod_db, storage, storage)
+
+
+def test_guard_rejects_work_dir_enclosing_production_storage(tmp_path: Path) -> None:
+    prod_db = tmp_path / "prod" / "db" / "storagegenie.db"
+    prod_db.parent.mkdir(parents=True)
+    prod_db.write_bytes(b"fixture-db")
+    work = tmp_path / "work"
+    storage = work / "storage"
+    storage.mkdir(parents=True)
+    with pytest.raises(SystemExit, match=r"production storage .* is inside work-dir"):
+        DRILL._guard(prod_db, storage, work)
+
+
+def test_guard_rejects_work_dir_inside_production_storage(tmp_path: Path) -> None:
+    prod_db, storage = _scratch_prod_pair(tmp_path)
+    work = storage / "work"
+    with pytest.raises(SystemExit, match=r"work-dir .* is inside production storage"):
+        DRILL._guard(prod_db, storage, work)
+
+
+def test_guard_allows_a_disjoint_work_dir(tmp_path: Path) -> None:
+    prod_db, storage = _scratch_prod_pair(tmp_path)
+    work = tmp_path / "work"
+    DRILL._guard(prod_db, storage, work)
+    assert work.is_dir()
+
+
+def test_guard_rejects_a_missing_production_db_on_a_scratch_path(tmp_path: Path) -> None:
+    _, storage = _scratch_prod_pair(tmp_path)
+    with pytest.raises(SystemExit, match="production DB not found"):
+        DRILL._guard(tmp_path / "prod" / "db" / "absent.db", storage, tmp_path / "work")

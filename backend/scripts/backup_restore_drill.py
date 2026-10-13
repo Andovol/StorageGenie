@@ -119,7 +119,11 @@ def _guard(prod_db: Path, prod_storage: Path, work_dir: Path) -> None:
         resolved = raw.resolve()
         if not resolved.exists():
             raise SystemExit(f"STOP: {label} not found: {resolved}")
-        if resolved == work or work in resolved.parents:
+        if resolved == work:
+            raise SystemExit(f"STOP: work-dir {work} equals {label} {resolved}")
+        if work in resolved.parents:
+            raise SystemExit(f"STOP: {label} {resolved} is inside work-dir {work}")
+        if resolved in work.parents:
             raise SystemExit(f"STOP: work-dir {work} is inside {label} {resolved}")
         if not os.access(resolved, os.R_OK):
             raise SystemExit(f"STOP: {label} not readable: {resolved}")
