@@ -1,0 +1,272 @@
+[
+  {
+    "sample": "catalog_390x844",
+    "viewport": "390x844",
+    "layoutWidth": 811,
+    "navClientWidth": 390,
+    "navScrollWidth": 811,
+    "reportedOverflow": 0,
+    "navOverflowObserved": true
+  },
+  {
+    "sample": "catalog_834x1112",
+    "viewport": "834x1112",
+    "layoutWidth": 834,
+    "navClientWidth": 819,
+    "navScrollWidth": 819,
+    "reportedOverflow": -15,
+    "navOverflowObserved": false
+  },
+  {
+    "sample": "catalog_1440x900",
+    "viewport": "1440x900",
+    "layoutWidth": 1440,
+    "navClientWidth": 1425,
+    "navScrollWidth": 1425,
+    "reportedOverflow": -15,
+    "navOverflowObserved": false
+  },
+  {
+    "sample": "capture_390x844",
+    "viewport": "390x844",
+    "layoutWidth": 851,
+    "navClientWidth": 390,
+    "navScrollWidth": 851,
+    "reportedOverflow": 0,
+    "navOverflowObserved": true
+  },
+  {
+    "sample": "capture_834x1112",
+    "viewport": "834x1112",
+    "layoutWidth": 834,
+    "navClientWidth": 819,
+    "navScrollWidth": 851,
+    "reportedOverflow": 17,
+    "navOverflowObserved": true
+  },
+  {
+    "sample": "capture_1440x900",
+    "viewport": "1440x900",
+    "layoutWidth": 1440,
+    "navClientWidth": 1440,
+    "navScrollWidth": 1440,
+    "reportedOverflow": 0,
+    "navOverflowObserved": false
+  },
+  {
+    "sample": "settings_390x844",
+    "viewport": "390x844",
+    "layoutWidth": 853,
+    "navClientWidth": 390,
+    "navScrollWidth": 853,
+    "reportedOverflow": 0,
+    "navOverflowObserved": true
+  },
+  {
+    "sample": "settings_834x1112",
+    "viewport": "834x1112",
+    "layoutWidth": 834,
+    "navClientWidth": 819,
+    "navScrollWidth": 853,
+    "reportedOverflow": 19,
+    "navOverflowObserved": true
+  },
+  {
+    "sample": "settings_1440x900",
+    "viewport": "1440x900",
+    "layoutWidth": 1440,
+    "navClientWidth": 1440,
+    "navScrollWidth": 1440,
+    "reportedOverflow": 0,
+    "navOverflowObserved": false
+  },
+  {
+    "sample": "inbox_390x844",
+    "viewport": "390x844",
+    "layoutWidth": 850,
+    "navClientWidth": 390,
+    "navScrollWidth": 850,
+    "reportedOverflow": 0,
+    "navOverflowObserved": true
+  },
+  {
+    "sample": "inbox_834x1112",
+    "viewport": "834x1112",
+    "layoutWidth": 834,
+    "navClientWidth": 819,
+    "navScrollWidth": 850,
+    "reportedOverflow": 16,
+    "navOverflowObserved": true
+  },
+  {
+    "sample": "inbox_1440x900",
+    "viewport": "1440x900",
+    "layoutWidth": 1440,
+    "navClientWidth": 1425,
+    "navScrollWidth": 1425,
+    "reportedOverflow": -15,
+    "navOverflowObserved": false
+  },
+  {
+    "sample": "planning_390x844",
+    "viewport": "390x844",
+    "layoutWidth": 853,
+    "navClientWidth": 390,
+    "navScrollWidth": 853,
+    "reportedOverflow": 0,
+    "navOverflowObserved": true
+  },
+  {
+    "sample": "planning_834x1112",
+    "viewport": "834x1112",
+    "layoutWidth": 834,
+    "navClientWidth": 819,
+    "navScrollWidth": 853,
+    "reportedOverflow": 19,
+    "navOverflowObserved": true
+  },
+  {
+    "sample": "planning_1440x900",
+    "viewport": "1440x900",
+    "layoutWidth": 1440,
+    "navClientWidth": 1440,
+    "navScrollWidth": 1440,
+    "reportedOverflow": 0,
+    "navOverflowObserved": false
+  },
+  {
+    "sample": "chat_390x844",
+    "viewport": "390x844",
+    "layoutWidth": 849,
+    "navClientWidth": 390,
+    "navScrollWidth": 848,
+    "reportedOverflow": 0,
+    "navOverflowObserved": true
+  },
+  {
+    "sample": "chat_834x1112",
+    "viewport": "834x1112",
+    "layoutWidth": 834,
+    "navClientWidth": 819,
+    "navScrollWidth": 848,
+    "reportedOverflow": 14,
+    "navOverflowObserved": true
+  },
+  {
+    "sample": "chat_1440x900",
+    "viewport": "1440x900",
+    "layoutWidth": 1440,
+    "navClientWidth": 1440,
+    "navScrollWidth": 1440,
+    "reportedOverflow": 0,
+    "navOverflowObserved": false
+  },
+  {
+    "sample": "analytics_390x844",
+    "viewport": "390x844",
+    "layoutWidth": 853,
+    "navClientWidth": 390,
+    "navScrollWidth": 853,
+    "reportedOverflow": 0,
+    "navOverflowObserved": true
+  },
+  {
+    "sample": "analytics_834x1112",
+    "viewport": "834x1112",
+    "layoutWidth": 834,
+    "navClientWidth": 819,
+    "navScrollWidth": 853,
+    "reportedOverflow": 19,
+    "navOverflowObserved": true
+  },
+  {
+    "sample": "analytics_1440x900",
+    "viewport": "1440x900",
+    "layoutWidth": 1440,
+    "navClientWidth": 1440,
+    "navScrollWidth": 1440,
+    "reportedOverflow": 0,
+    "navOverflowObserved": false
+  },
+  {
+    "sample": "expiry_390x844",
+    "viewport": "390x844",
+    "layoutWidth": 850,
+    "navClientWidth": 390,
+    "navScrollWidth": 850,
+    "reportedOverflow": 0,
+    "navOverflowObserved": true
+  },
+  {
+    "sample": "expiry_834x1112",
+    "viewport": "834x1112",
+    "layoutWidth": 834,
+    "navClientWidth": 819,
+    "navScrollWidth": 850,
+    "reportedOverflow": 16,
+    "navOverflowObserved": true
+  },
+  {
+    "sample": "expiry_1440x900",
+    "viewport": "1440x900",
+    "layoutWidth": 1440,
+    "navClientWidth": 1440,
+    "navScrollWidth": 1440,
+    "reportedOverflow": 0,
+    "navOverflowObserved": false
+  },
+  {
+    "sample": "asset_detail_390x844",
+    "viewport": "390x844",
+    "layoutWidth": 846,
+    "navClientWidth": 390,
+    "navScrollWidth": 845,
+    "reportedOverflow": 0,
+    "navOverflowObserved": true
+  },
+  {
+    "sample": "asset_detail_834x1112",
+    "viewport": "834x1112",
+    "layoutWidth": 834,
+    "navClientWidth": 819,
+    "navScrollWidth": 845,
+    "reportedOverflow": 11,
+    "navOverflowObserved": true
+  },
+  {
+    "sample": "asset_detail_1440x900",
+    "viewport": "1440x900",
+    "layoutWidth": 1440,
+    "navClientWidth": 1425,
+    "navScrollWidth": 1425,
+    "reportedOverflow": -15,
+    "navOverflowObserved": false
+  },
+  {
+    "sample": "review_390x844",
+    "viewport": "390x844",
+    "layoutWidth": 846,
+    "navClientWidth": 390,
+    "navScrollWidth": 845,
+    "reportedOverflow": 0,
+    "navOverflowObserved": true
+  },
+  {
+    "sample": "review_834x1112",
+    "viewport": "834x1112",
+    "layoutWidth": 834,
+    "navClientWidth": 819,
+    "navScrollWidth": 845,
+    "reportedOverflow": 11,
+    "navOverflowObserved": true
+  },
+  {
+    "sample": "review_1440x900",
+    "viewport": "1440x900",
+    "layoutWidth": 1440,
+    "navClientWidth": 1425,
+    "navScrollWidth": 1425,
+    "reportedOverflow": -15,
+    "navOverflowObserved": false
+  }
+]
