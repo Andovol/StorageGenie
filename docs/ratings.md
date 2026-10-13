@@ -691,3 +691,9 @@ Originals above (88 FLAG:TRUST / 91 FLAG:TRUST) stand as the audit trail; the ve
 | slice_id | phase | model | effort | score | flag | lever | guards_invoked | deduction_attribution | remaining | escape |
 |---|---|---|---|---|---|---|---|---|---|---|
 | SG-192 | Serving rider (R1 repair live); receipt 358023b (dual annotation); one lane-socket build + one recreate, new container/image/bundle, live [] reads, DB identical; inconclusive cross-check withdrawn, cosmetics disclosed; audit SG-192_audit.md | opencode/opencode-go/deepseek-v4.1-flash (receipt command settings) | max | 97 |  |  | PG-EV-02/03; PG-IC-01/07; PG-DP-01/02; PG-PR-03/04/06/10 | coder (evidence-craft nits I2/I3, self-disclosed) | CLOSE_BLOCKED CLEARS on this serve; SG-185 next per D16 outcome; still-broken stories + SG-176/177/178 per original grants |  |
+
+### SG-185 (2026-10-13 - R4 household-scoped asset replay repair)
+
+| slice_id | phase | model | effort | score | flag | lever | guards_invoked | deduction_attribution | remaining | escape |
+|---|---|---|---|---|---|---|---|---|---|---|
+| SG-185 | R4 key-replay repair (F-SG181-1); receipt 5be388f; one-line household qualification + doc comment, query-only, 2 new tests FAIL-then-PASS (11/11 with existing), ruff clean, mypy 41==41, sibling classified not widened; audit SG-185_audit.md | opencode/opencode-go/deepseek-v4.1-flash (receipt command settings) | max | 97 |  |  | PG-EV-01/02/03/04/05/06/07/09/13; PG-SC-01/02/03/09/10/12; PG-IC-01/07/09; PG-DP-03; PG-PR-01/03/04/07/10 |  | Foreign-key no-dedup parked (schema change unless owner asks); F-SG180 evidence-key sibling → SG-186; D8 → SG-188; serve via normal deploy course |  |

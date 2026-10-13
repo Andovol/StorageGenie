@@ -2,9 +2,9 @@
 
 `PB-1`–`PB-6` bind (`CODER.md` §14).
 **BASE REF: automation.** Report actual resolved commit.
-**STATUS: DRAFT prepared 2026-10-13 from SG-180 F-3 + SG-182 F-2 evidence; scope-approved D5 (read-time rehash). RE-REVIEW against the tree before dispatch next session.**
+**STATUS: RE-REVIEWED vs tree at `5be388f`+ under D16 L3 flow; premises hold (serve path trusts the DB row at `evidence.py:101`, untouched since SG-006; upload replay at `:25-26` is the same two-line shape SG-185 fixed in `assets.py`). Scope-approved D5, sibling homed below.**
 **DATABASE: separately isolated disposable test database/storage; production GET observations only.**
-**Restart: none. Autonomy: L2.** Owner decision D5 fixes the approach: read-time content-hash verification at serve time (not documented acceptance of silent corruption). Wrong-household sha dedup (F-SG180-1, the SG-185 family for assets) rides along only as far as the read path touches it — its own repair stays with its slice.
+**Restart: none. Autonomy: L3** (D16 flow). Owner decision D5 fixes the approach: read-time content-hash verification at serve time (not documented acceptance of silent corruption). Sibling homed (SG-185 I1 → here): `upload_evidence`'s key replay at `evidence.py:25-26` is the same two-line shape SG-185 fixed — qualify it by the requesting household (fresh key for the requester, original row incl. changed payload for the owner) and cover it with the same two-household test shape, all inside this slice's ceiling. If on FIRST READ it is NOT the same shape, do not widen: report it as a found sibling for a follow-up and say which. Its tests ride the same focused files.
 
 ## Why this exists
 
