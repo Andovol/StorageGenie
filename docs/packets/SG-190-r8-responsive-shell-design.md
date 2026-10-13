@@ -2,9 +2,9 @@
 
 `PB-1`–`PB-6` bind (`CODER.md` §14).
 **BASE REF: automation.** Report actual resolved commit.
-**STATUS: DRAFT prepared 2026-10-13 from the consolidation UI plan (`SG-182_consolidation.md:72-74`); scope-approved D9 (after correctness slices D4–D6). Presentation-only slice: no behavior change. RE-REVIEW against the tree before dispatch next session.**
+**STATUS: RE-REVIEWED vs tree at `57a202b`+ under D16 L3 flow; premises hold (SG-183 audit + measure evidence present; UI plan at `SG-182_consolidation.md:72-74`; frontend tree with routes/components/theme present; post-SG-187 modal shell path is the styling base — styling only, no logic). Scope-approved D9.**
 **DATABASE: none touched (presentation only; any fixture reads use disposable state or committed captures).**
-**Restart: none. Autonomy: L2.** No packages/frameworks added; reuse AppShell/AppHeader/Nav/tokens/components. Correctness slices (R1/R2/R3/R4/R6) are not reopened here — visual follow-ups to their surfaces ride only as styling, never as logic.
+**Restart: none. Autonomy: L3** (D16 flow). Retry affordances already present may be styled; no new behavior, no new controls. No packages/frameworks added; reuse AppShell/AppHeader/Nav/tokens/components. Correctness slices (R1/R2/R3/R4/R6) are not reopened here — visual follow-ups to their surfaces ride only as styling, never as logic.
 
 ## Why this exists
 
