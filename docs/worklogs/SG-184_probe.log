@@ -1,0 +1,37 @@
+SG-184 G3 probe — committed docs/worklogs/SG-175_probe.py re-run UNCHANGED on disposable state
+file identity: docs/worklogs/SG-175_probe.py at HEAD (unmodified since SG-175 W1 0b42e7d; W2/W3 touched only logs/report)
+loads the REAL readers: FastAPI TestClient over app.main routes (candidate GET/decision, review-task resolve, expiry classification/completion, asset GET) against a fresh /tmp SQLite + /tmp evidence root
+provider: forced in-process sg_provider_id="fake"; opencode/jina/openrouter keys nulled inside the probe before any job step (no paid call)
+disposable DATABASE_URL/STORAGE_ROOT asserted before any app import (process env):
+  DATABASE_URL=sqlite:////tmp/sg184-probe-guard.db
+  STORAGE_ROOT=/tmp/sg184-probe-guard-storage
+production fingerprinting by the probe itself: REPO/data/db/storagegenie.db and the production evidence roots are sha256-fingerprinted before the first write and after the last; both must be untouched for PROBE_OK
+command (bound 600 s, uncalibrated): cd /home/andrei/StorageGenie/backend && DATABASE_URL=sqlite:////tmp/sg184-probe-guard.db STORAGE_ROOT=/tmp/sg184-probe-guard-storage /home/andrei/StorageGenie/backend/venv/bin/python ../docs/worklogs/SG-175_probe.py
+expected: PROBE_OK with the missing-assertion and wrong-date controls rejecting on the same real reader
+
+/home/andrei/StorageGenie/backend/venv/lib/python3.12/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+  from starlette.testclient import TestClient as TestClient  # noqa
+[ISO] interpreter=/home/andrei/StorageGenie/backend/venv/bin/python prefix=/home/andrei/StorageGenie/backend/venv (verified against backend/venv)
+[ISO] provider_forced=fake keys_nulled=True sg_consent=False (no paid provider calls)
+[ISO] probe_db=/tmp/sg175-probe-8jg8lnz8/probe.db
+[ISO] storage_root_override=/tmp/sg175-probe-8jg8lnz8/storage (evidence writes isolated before first write)
+[ISO] prod_db=/home/andrei/StorageGenie/data/db/storagegenie.db hash_before=e6bef157440fb8b4a3262577362b071dcae07507ea9a7e04a614e11be28ee5bd
+[ISO] prod_store=/home/andrei/StorageGenie/data/storage before=files=0 digest=e3b0c44298fc1c14
+[ISO] prod_store=/home/andrei/StorageGenie/backend/data/storage before=absent
+[T1] GET candidate -> 200 live_ids=3 includes_omitted=True state=proposed
+[T1] accept with live open tasks -> 409 detail='Candidate has unresolved review tasks' (control)
+[T1] real resolver resolved all 3 live tasks
+[T1] GET candidate after resolution -> review_task_ids=[] live_open_tasks=0
+[T1] accept after resolution -> 200 state=accepted asset_exists=True (repaired blocked state)
+[T2] completion POST -> 200 resolved_contains_own_task=True; GET readback value={'expiry_date': '2026-10-14', 'date_type': 'expiry_date'} source_type='user' source_evidence_ids=['01a13652-b17c-7310-986e-9991e53b970d'] task_row=resolved
+[T2] CHECK_FAILED: accepted EXPIRY_FIELD count=0 expected exactly 1
+[CTL] expected rejection observed: accepted EXPIRY_FIELD count=0 expected exactly 1
+[T2] CHECK_FAILED: value mismatch expected {'expiry_date': '2026-10-22', 'date_type': 'expiry_date'} observed {'expiry_date': '2026-10-14', 'date_type': 'expiry_date'}
+[CTL] expected rejection observed: value mismatch expected {'expiry_date': '2026-10-22', 'date_type': 'expiry_date'} observed {'expiry_date': '2026-10-14', 'date_type': 'expiry_date'}
+[T3] missing-assertion rejection='accepted EXPIRY_FIELD count=0 expected exactly 1'; wrong-value rejection="value mismatch expected {'expiry_date': '2026-10-22', 'date_type': 'expiry_date'} observed {'expiry_date': '2026-10-14', 'date_type': 'expiry_date'}"; same reader accepts the true value; controls landed in disposable data
+[T4] STILL-UNREPAIRED (SG-177): bare resolve of expiry.manual_entry returns 200 with zero expiry data
+[T4] STILL-UNREPAIRED (SG-178): ACTIVE unclassified asset absent from rows and unresolved_rows
+[ISO] prod_db hash_after=e6bef157440fb8b4a3262577362b071dcae07507ea9a7e04a614e11be28ee5bd
+[ISO] prod_db_untouched=True; prod evidence stores untouched=True; evidence writes confined to override
+[CHECK] checks_passed=52 (every exercised criterion asserted before success)
+[RESULT] PROBE_OK

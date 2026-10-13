@@ -1,0 +1,163 @@
+SG-184 G1 failpre — merged SG-175 repair re-proof, discriminating pre-state (PG-SC-12)
+requested base ref: automation; resolved base commit: df1b5c825226676c0d9231b8f3938c61140e5811 (local automation == origin/automation == HEAD at slice start)
+reachability: 0b42e7d62dd4e5bc379950c0175d4284176d3a1e (SG-175 G1/G2) verified ancestor of HEAD via `git merge-base --is-ancestor 0b42e7d HEAD` (exit 0, HEAD != 0b42e7d)
+BEFORE derived at the pre-repair bytes, loader named: `git show 0b42e7d^:<path>` (parent 803cf522723158c65f9c4a6ba1ac3679da57f53a) written into disposable worktree /tmp/sg184-g1 (detached at resolved base), for ONLY:
+  - backend/app/api/v1/candidates.py  (grep open_review_task_ids = 0 occurrences after revert)
+  - backend/app/services/candidates.py (grep open_review_task_ids = 0 occurrences after revert)
+worktree diff vs resolved base: 2 files, +3/-21 lines (exact inverse of 0b42e7d's product hunks)
+HEAD candidate test files copied in unchanged: backend/tests/test_candidate_read.py, frontend/src/components/CandidateCard.test.tsx, frontend/src/routes/ReviewPage.test.tsx
+loader/interpreter: /home/andrei/StorageGenie/backend/venv/bin/python (pytest), cwd /tmp/sg184-g1/backend
+disposable DATABASE_URL/STORAGE_ROOT asserted before any app import (process env):
+  DATABASE_URL=sqlite:////tmp/sg184-g1/disposable-guard.db
+  STORAGE_ROOT=/tmp/sg184-g1/disposable-guard-storage
+command (bound 600 s, uncalibrated):
+  DATABASE_URL=sqlite:////tmp/sg184-g1/disposable-guard.db STORAGE_ROOT=/tmp/sg184-g1/disposable-guard-storage /home/andrei/StorageGenie/backend/venv/bin/python -m pytest -q tests/test_candidate_read.py tests/test_candidates.py
+
+..FFFF....                                                               [100%]
+=================================== FAILURES ===================================
+________ test_candidate_get_drops_resolved_task_ids_and_accept_succeeds ________
+
+candidate_read_db = (<sqlalchemy.orm.session.Session object at 0x714a5467f380>, '01a13651-6077-7c40-b3b0-5f47f1848202', '01a13651-6077-7c40-b3b0-5f522a93a332', '01a13651-60b3-7ff2-a870-4d14a595b086', '01a13651-607b-7663-9cdf-bba66dc93c5d')
+
+    def test_candidate_get_drops_resolved_task_ids_and_accept_succeeds(candidate_read_db) -> None:  # type: ignore[no-untyped-def]
+        session, household_id, _, candidate_id, _ = candidate_read_db
+        live_task_id = _open_task_id(session, candidate_id)
+        snapshot_before = _candidate_snapshot(session, candidate_id)
+        with TestClient(app) as client:
+            resolved = client.post(
+                f"/v1/review-tasks/{live_task_id}/resolve", params={"household_id": household_id}, json={}
+            )
+            read = client.get(f"/v1/candidates/{candidate_id}", params={"household_id": household_id})
+            accepted = client.post(
+                f"/v1/candidates/{candidate_id}/decision",
+                params={"household_id": household_id},
+                json={"action": "accept", "corrected_fields": {}},
+            )
+        assert resolved.status_code == 200
+        assert resolved.json()["status"] == "resolved"
+>       assert read.json()["review_task_ids"] == []
+E       AssertionError: assert ['01a13651-60...961aee27adeb'] == []
+E         
+E         Left contains one more item: '01a13651-60bc-75a1-93c5-961aee27adeb'
+E         Use -v to get more diff
+
+tests/test_candidate_read.py:151: AssertionError
+______________ test_candidate_get_ignores_stale_embedded_task_ids ______________
+
+candidate_read_db = (<sqlalchemy.orm.session.Session object at 0x714a54510560>, '01a13651-61a0-7ac1-8572-835b14445af8', '01a13651-61a0-7ac1-8572-83603f313147', '01a13651-61db-7760-a1de-fc591ea2ddef', '01a13651-61a4-7f93-b83d-55f5495b0845')
+
+    def test_candidate_get_ignores_stale_embedded_task_ids(candidate_read_db) -> None:  # type: ignore[no-untyped-def]
+        session, household_id, _, candidate_id, _ = candidate_read_db
+        live_task_id = _open_task_id(session, candidate_id)
+        _embed_task_ids(session, candidate_id, ["stale-task-id"])
+        with TestClient(app) as client:
+            client.post(f"/v1/review-tasks/{live_task_id}/resolve", params={"household_id": household_id}, json={})
+            read = client.get(f"/v1/candidates/{candidate_id}", params={"household_id": household_id})
+            accepted = client.post(
+                f"/v1/candidates/{candidate_id}/decision",
+                params={"household_id": household_id},
+                json={"action": "accept", "corrected_fields": {}},
+            )
+>       assert read.json()["review_task_ids"] == []
+E       AssertionError: assert ['stale-task-id'] == []
+E         
+E         Left contains one more item: 'stale-task-id'
+E         Use -v to get more diff
+
+tests/test_candidate_read.py:170: AssertionError
+__________ test_candidate_get_includes_live_task_absent_from_proposal __________
+
+candidate_read_db = (<sqlalchemy.orm.session.Session object at 0x714a533a1cd0>, '01a13651-628f-79e2-b2f0-f72767bd82c3', '01a13651-628f-79e2-b2f0-f734de6149fb', '01a13651-62bc-7da0-8548-4d0590b7dde2', '01a13651-6291-7b12-b4ee-6b69ab4e21eb')
+
+    def test_candidate_get_includes_live_task_absent_from_proposal(candidate_read_db) -> None:  # type: ignore[no-untyped-def]
+        session, household_id, _, candidate_id, _ = candidate_read_db
+        live_task_id = _open_task_id(session, candidate_id)
+        _embed_task_ids(session, candidate_id, [])
+        omitted = ReviewTask(
+            task_type="candidate.multi_item",
+            priority="high",
+            subject_ref=candidate_id,
+            proposed_change=json.dumps({"candidate_id": candidate_id, "item_count": 2}),
+            status="open",
+            household_id=household_id,
+        )
+        session.add(omitted)
+        session.commit()
+        with TestClient(app) as client:
+            client.post(f"/v1/review-tasks/{live_task_id}/resolve", params={"household_id": household_id}, json={})
+            read = client.get(f"/v1/candidates/{candidate_id}", params={"household_id": household_id})
+            blocked = client.post(
+                f"/v1/candidates/{candidate_id}/decision",
+                params={"household_id": household_id},
+                json={"action": "accept", "corrected_fields": {}},
+            )
+>       assert read.json()["review_task_ids"] == [omitted.id]
+E       AssertionError: assert [] == ['01a13651-62...5eecde6ea2ab']
+E         
+E         Right contains one more item: '01a13651-62cf-7f72-8398-5eecde6ea2ab'
+E         Use -v to get more diff
+
+tests/test_candidate_read.py:197: AssertionError
+____ test_candidate_get_excludes_foreign_household_and_other_subject_tasks _____
+
+candidate_read_db = (<sqlalchemy.orm.session.Session object at 0x714a53130e00>, '01a13651-6355-7cf1-879b-2cb15514b1c0', '01a13651-6355-7cf1-879b-2cc6a2913829', '01a13651-638b-7572-b651-d575854ea415', '01a13651-6358-76e2-bf37-7e7f6d4bc2d5')
+
+    def test_candidate_get_excludes_foreign_household_and_other_subject_tasks(candidate_read_db) -> None:  # type: ignore[no-untyped-def]
+        session, household_id, other_household_id, candidate_id, _ = candidate_read_db
+        live_task_id = _open_task_id(session, candidate_id)
+        foreign = ReviewTask(
+            task_type="identifier_collision",
+            priority="high",
+            subject_ref=candidate_id,
+            proposed_change=json.dumps({"candidate_id": candidate_id}),
+            status="open",
+            household_id=other_household_id,
+        )
+        other_subject = ReviewTask(
+            task_type="expiry.manual_entry",
+            priority="high",
+            subject_ref="candidate-elsewhere",
+            proposed_change=json.dumps({"candidate_id": "candidate-elsewhere"}),
+            status="open",
+            household_id=household_id,
+        )
+        session.add_all([foreign, other_subject])
+        session.commit()
+        _embed_task_ids(session, candidate_id, [foreign.id, other_subject.id])
+        with TestClient(app) as client:
+            client.post(f"/v1/review-tasks/{live_task_id}/resolve", params={"household_id": household_id}, json={})
+            read = client.get(f"/v1/candidates/{candidate_id}", params={"household_id": household_id})
+            accepted = client.post(
+                f"/v1/candidates/{candidate_id}/decision",
+                params={"household_id": household_id},
+                json={"action": "accept", "corrected_fields": {}},
+            )
+>       assert read.json()["review_task_ids"] == []
+E       AssertionError: assert ['01a13651-63...30d79b86e23a'] == []
+E         
+E         Left contains 2 more items, first extra item: '01a13651-6399-7020-b1e6-30cbad6b3802'
+E         Use -v to get more diff
+
+tests/test_candidate_read.py:232: AssertionError
+=============================== warnings summary ===============================
+../../../home/andrei/StorageGenie/backend/venv/lib/python3.12/site-packages/fastapi/testclient.py:1
+  /home/andrei/StorageGenie/backend/venv/lib/python3.12/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+../../../home/andrei/StorageGenie/backend/venv/lib/python3.12/site-packages/starlette/testclient.py:53
+  /home/andrei/StorageGenie/backend/venv/lib/python3.12/site-packages/starlette/testclient.py:53: DeprecationWarning: The anyio.abc.BlockingPortal alias is deprecated, use anyio.from_thread.BlockingPortal instead.
+    _PortalFactoryType = Callable[[], AbstractContextManager[anyio.abc.BlockingPortal]]
+
+tests/test_candidates.py::test_candidate_migration_upgrade_downgrade_upgrade
+tests/test_candidates.py::test_candidate_migration_upgrade_downgrade_upgrade
+tests/test_candidates.py::test_candidate_migration_upgrade_downgrade_upgrade
+  /home/andrei/StorageGenie/backend/venv/lib/python3.12/site-packages/alembic/config.py:604: DeprecationWarning: No path_separator found in configuration; falling back to legacy splitting on spaces, commas, and colons for prepend_sys_path.  Consider adding path_separator=os to Alembic config.
+    util.warn_deprecated(
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/test_candidate_read.py::test_candidate_get_drops_resolved_task_ids_and_accept_succeeds
+FAILED tests/test_candidate_read.py::test_candidate_get_ignores_stale_embedded_task_ids
+FAILED tests/test_candidate_read.py::test_candidate_get_includes_live_task_absent_from_proposal
+FAILED tests/test_candidate_read.py::test_candidate_get_excludes_foreign_household_and_other_subject_tasks
+4 failed, 6 passed, 5 warnings in 3.84s

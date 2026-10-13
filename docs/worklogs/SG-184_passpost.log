@@ -1,0 +1,28 @@
+SG-184 G1 passpost — merged HEAD bytes (df1b5c8 / Work-HEAD) on the same node set
+resolved base commit: df1b5c825226676c0d9231b8f3938c61140e5811 (HEAD at slice start; same tree the failpre worktree was checked out from before the two-file revert)
+candidate product bytes: HEAD versions (get_candidate serves candidates.open_review_task_ids at backend/app/api/v1/candidates.py:164; helper at backend/app/services/candidates.py:946)
+loader/interpreter: /home/andrei/StorageGenie/backend/venv/bin/python (pytest), cwd /home/andrei/StorageGenie/backend
+disposable DATABASE_URL/STORAGE_ROOT asserted before any app import (process env):
+  DATABASE_URL=sqlite:////tmp/sg184-passpost.db
+  STORAGE_ROOT=/tmp/sg184-passpost-storage
+command (bound 600 s, uncalibrated):
+  DATABASE_URL=sqlite:////tmp/sg184-passpost.db STORAGE_ROOT=/tmp/sg184-passpost-storage /home/andrei/StorageGenie/backend/venv/bin/python -m pytest -q tests/test_candidate_read.py tests/test_candidates.py
+
+..........                                                               [100%]
+=============================== warnings summary ===============================
+venv/lib/python3.12/site-packages/fastapi/testclient.py:1
+  /home/andrei/StorageGenie/backend/venv/lib/python3.12/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+venv/lib/python3.12/site-packages/starlette/testclient.py:53
+  /home/andrei/StorageGenie/backend/venv/lib/python3.12/site-packages/starlette/testclient.py:53: DeprecationWarning: The anyio.abc.BlockingPortal alias is deprecated, use anyio.from_thread.BlockingPortal instead.
+    _PortalFactoryType = Callable[[], AbstractContextManager[anyio.abc.BlockingPortal]]
+
+tests/test_candidates.py::test_candidate_migration_upgrade_downgrade_upgrade
+tests/test_candidates.py::test_candidate_migration_upgrade_downgrade_upgrade
+tests/test_candidates.py::test_candidate_migration_upgrade_downgrade_upgrade
+  /home/andrei/StorageGenie/backend/venv/lib/python3.12/site-packages/alembic/config.py:604: DeprecationWarning: No path_separator found in configuration; falling back to legacy splitting on spaces, commas, and colons for prepend_sys_path.  Consider adding path_separator=os to Alembic config.
+    util.warn_deprecated(
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+10 passed, 5 warnings in 3.40s

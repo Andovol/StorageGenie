@@ -1,0 +1,47 @@
+SG-184 G2 ui control — deliberate wrong-input must FAIL in the same run, proving the gate can fail
+transient edit ONLY in the disposable /tmp/sg184-g1 worktree (never in the repo): one WRONG-INPUT control test appended to the worktree copy of src/components/CandidateCard.test.tsx that expects the blocked sentence TWICE (split length 3) where the rendered truth is once (split length 2). This mirrors the exact assertion shape of the real test (split length 2) with a deliberately wrong expectation, demonstrating a duplicated-render regression would be caught.
+command (bound 600 s, uncalibrated): node node_modules/vitest/vitest.mjs run src/components/CandidateCard.test.tsx src/routes/ReviewPage.test.tsx   (cwd /tmp/sg184-g1/frontend; node_modules symlinked to the repo's)
+expected: the 18 real tests still pass; the 1 wrong-input control fails = 1 failed | 18 passed (19)
+
+
+ RUN  v1.6.1 /tmp/sg184-g1/frontend
+
+stderr | src/routes/ReviewPage.test.tsx > ReviewPage > posts every decision with the loaded candidate id and supports keyboard actions
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+stderr | src/components/CandidateCard.test.tsx > CandidateCard > keeps evidence beside fields and exposes confidence, source, and blocking collision
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+ ❯ src/components/CandidateCard.test.tsx  (12 tests | 1 failed) 335ms
+   ❯ src/components/CandidateCard.test.tsx > CandidateCard > WRONG-INPUT CONTROL (SG-184 G2): expecting the blocked sentence twice must fail
+     → expected 2 to be 3 // Object.is equality
+ ✓ src/routes/ReviewPage.test.tsx  (7 tests) 572ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/components/CandidateCard.test.tsx > CandidateCard > WRONG-INPUT CONTROL (SG-184 G2): expecting the blocked sentence twice must fail
+AssertionError: expected 2 to be 3 // Object.is equality
+
+- Expected
++ Received
+
+- 3
++ 2
+
+ ❯ src/components/CandidateCard.test.tsx:144:116
+    142|     renderCard(<CandidateCard candidate={{ ...candidate, review_task_i…
+    143|     const article = screen.getByRole("article");
+    144|     expect(article.textContent?.split("Acceptance is blocked until the…
+       |                                                                                                                    ^
+    145|   });
+    146| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+ Test Files  1 failed | 1 passed (2)
+      Tests  1 failed | 18 passed (19)
+   Start at  17:32:06
+   Duration  1.69s (transform 208ms, setup 149ms, collect 416ms, tests 907ms, environment 900ms, prepare 203ms)
+

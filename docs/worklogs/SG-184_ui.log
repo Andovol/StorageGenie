@@ -1,0 +1,27 @@
+SG-184 G2 ui — HEAD rendered-output assertions (CandidateCard + ReviewPage), zero frontend change
+resolved base/Work-HEAD: df1b5c825226676c0d9231b8f3938c61140e5811
+command (bound 600 s, uncalibrated): node node_modules/vitest/vitest.mjs run src/components/CandidateCard.test.tsx src/routes/ReviewPage.test.tsx   (cwd /home/andrei/StorageGenie/frontend)
+expected: 18 passed (11 CandidateCard + 7 ReviewPage, per SG-175 architect verify)
+rendered-output assertions covered by these node sets:
+  - blocked sentence "Acceptance is blocked until the open review task(s) are resolved." counted exactly once with dedup matches (CandidateCard > SG-175 G2); dedup alert keeps only its advisory text ("This match is advisory; review it before accepting.") with no second blocked sentence (unblocked-with-dedup test)
+  - shortcuts A/R inert while decision.isPending (ReviewPage > "pending decision prevents repeated accept mutations from the keyboard (SG-175 A2)") and blocked-Accept-with-no-shortcut (SG-175 A2)
+
+
+ RUN  v1.6.1 /home/andrei/StorageGenie/frontend
+
+stderr | src/routes/ReviewPage.test.tsx > ReviewPage > posts every decision with the loaded candidate id and supports keyboard actions
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+stderr | src/components/CandidateCard.test.tsx > CandidateCard > keeps evidence beside fields and exposes confidence, source, and blocking collision
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+ ✓ src/components/CandidateCard.test.tsx  (11 tests) 362ms
+ ✓ src/routes/ReviewPage.test.tsx  (7 tests) 633ms
+
+ Test Files  2 passed (2)
+      Tests  18 passed (18)
+   Start at  17:31:54
+   Duration  1.95s (transform 246ms, setup 173ms, collect 529ms, tests 995ms, environment 1.20s, prepare 222ms)
+
