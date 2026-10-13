@@ -12,13 +12,29 @@ assert.deepEqual(archived,old.subarray(cut));
 const raw=fs.readFileSync('.git/session-transfer-state-before.bin');
 assert.deepEqual(fs.readFileSync('docs/history/2026-10-13-state-decisions-preserved.md'),raw.subarray(3360));
 const changed=text(git('diff','--name-only','3454e1c','HEAD')).trim().split('\n');
-const checked=[], exceptions=[];
+const checked=[], exceptions=[], preserved=[];
+const ratingOld=git('show','3454e1c:docs/ratings.md');
+const moji=/\u00e2\u20ac[\u201c\u201d\u2018\u2019]|\u00c3[\u0080-\u00bf]/g;
+const sgr=/\x1b\[[0-9;]*m/g;
+const styledControl=Buffer.concat([normal,Buffer.from([27]),Buffer.from('[31m')]);
+assert.equal(controls(styledControl),1); assert.equal(controls(Buffer.from(text(styledControl).replace(sgr,''))),0);
 for(const p of changed.filter(p=>/\.(md|py|tsx?|jsx?|mjs|cjs|json|log|ya?ml)$/.test(p))){
   const b=git('show',`HEAD:${p}`);
-  try { assert.equal(controls(b),0,p); }
+  try {
+    const count=controls(b), s=text(b);
+    if(count && p.endsWith('.log') && controls(Buffer.from(s.replace(sgr,'')))===0){
+      const sequences=[...s.matchAll(sgr)].length; assert.equal(sequences,count);
+      preserved.push({path:p,kind:'raw ANSI SGR terminal capture; original bytes preserved',sequences});
+    } else assert.equal(count,0,p);
+  }
   catch(e){exceptions.push({path:p,problem:String(e.message)}); continue;}
   const s=text(b);
-  if(/\u00e2\u20ac[\u201c\u201d\u2018\u2019]|\u00c3[\u0080-\u00bf]/.test(s)) exceptions.push({path:p,problem:'possible mojibake; inspect stored bytes'});
+  if([...s.matchAll(moji)].length){
+    if(p==='docs/ratings.md' && b.subarray(0,ratingOld.length).equals(ratingOld)
+      && [...s.matchAll(moji)].length===[...text(ratingOld).matchAll(moji)].length)
+      preserved.push({path:p,kind:'inherited ratings mojibake; old Git prefix byte-identical; REC-ISS33',matches:[...s.matchAll(moji)].length});
+    else exceptions.push({path:p,problem:'possible newly introduced mojibake; inspect stored bytes'});
+  }
   checked.push(p);
 }
 assert.equal(exceptions.length,0,JSON.stringify(exceptions));
@@ -45,10 +61,10 @@ for(const id of ['SG-175','SG-179','SG-183','SG-180']){const row=ratings.split('
 const out={measurement:'canonical immutable Git snapshots, installed rules raw bytes, working bytes separately; not tokens/ingestion',
  previous,closingRecordsSnapshot:head,entries:table,rulesPreviousBytes:rulesOld.length,rulesInstalledBytes:rulesNow.length,
  mandatoryArchitectBytes:arch.length,coldStartBasisPrevious:oldBasis,coldStartBasisClosing:newBasis,change:newBasis-oldBasis,
- largestGrowingEntry:Object.entries(table).sort((a,b)=>(b[1].closingSnapshot-b[1].previous)-(a[1].closingSnapshot-a[1].previous))[0][0],
+ largestGrowingEntry:[...Object.entries(table).map(([p,v])=>({path:p,change:v.closingSnapshot-v.previous})),{path:'installed Codex AGENTS rules',change:rulesNow.length-rulesOld.length}].sort((a,b)=>b.change-a.change)[0],
  repository:[totals(previous),totals(head)],preservedHistoryGitBytes:archived.length,preservedHistoryWorkingBytes:8449,
  rawConservation:'3360+8449=11809',textFilesChecked:checked.length,controlProbe:'untouched README clear; planted byte0 detected',
- textExceptions:exceptions,currentReferencesExist:true,ratingRemainingFields:true,
+ textExceptions:exceptions,preservedExceptions:preserved,currentReferencesExist:true,ratingRemainingFields:true,
  contextTokens:'unavailable',platformCost:'unavailable'};
 fs.writeFileSync('docs/worklogs/2026-10-13-transfer-verification.json',JSON.stringify(out,null,2)+'\n');
 console.log(JSON.stringify({head,coldStart:oldBasis+' -> '+newBasis,change:out.change,archiveEquality:true,textFilesChecked:checked.length,exceptions:exceptions.length}));

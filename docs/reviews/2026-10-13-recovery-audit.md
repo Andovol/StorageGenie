@@ -89,6 +89,7 @@ Priority below is Architect judgement, provisional pending the consolidated reco
 | REC-ISS30 | SG-180 rollback probe raises before actual writer, yet claims rollback; independent audit narrows it to fail-before-create/re-entry. | FIX QUEUED single compatible measurement correction in SG-181 G1; SG-180 rated 93 FLAG:TRUST, original claim retained/rejected |
 | REC-ISS31 | Mid-session rule check proves installed bytes match released 0.47, project/cache still 0.46. Host report names untagged 0.47 source. | NEEDS DECISION RULE-ADOPT-047 before next dispatch; exact plan docs/decisions/2026-10-13-contract-0.47-adoption-plan.md; no FORKED claim |
 | REC-ISS32 | Same-household import key with changed payload returns original job; foreign replay rejects 403. | NEEDS DECISION future payload-replay policy, F-SG180-11; current semantics observed, no invented defect requirement |
+| REC-ISS33 | Closing raw Git-byte scan finds 84 mojibake-pattern matches in older ratings; current prefix equals 3454e1c and no new match introduced. | OPEN inherited documentation encoding debt; no score/value corruption inferred, historical raw evidence preserved; future bounded metadata repair, not silently rewritten at close |
 
 ## Audit execution boundaries
 
