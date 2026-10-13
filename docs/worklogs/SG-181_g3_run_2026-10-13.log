@@ -1,0 +1,391 @@
+/home/andrei/StorageGenie/backend/venv/lib/python3.12/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+  from starlette.testclient import TestClient as TestClient  # noqa
+[PASS] isolation {"storage_root": "/tmp/sg181-g3-msg30_zf/storage", "engine_url": "sqlite:////tmp/sg181-g3-msg30_zf/storagegenie.db", "temp_root": "/tmp/sg181-g3-msg30_zf"}
+[OBSERVE] fixtures {"a_food": "01a1360c-df65-7ec0-a7ae-de291bb75e57", "a_unknown": "01a1360c-dfcc-71a1-9db9-0c5c4b0426a6", "a_med": "01a1360c-dfe2-7182-8f82-c768e4dd016c", "a_typeonly": "01a1360c-dffb-7712-84cc-889278bb1551", "a_archived": "01a1360c-e012-73a2-b16b-3a5185a09dcd", "b_food": "01a1360c-e02f-73c2-9da7-3639dffcc997"}
+[PASS] chat_consent_off_skipped {"body": {"status": "skipped", "reason": "consent_disabled", "answer": null, "grounded": false, "empty_catalogue": false, "category": "food", "catalogue_size": 0, "provider_call_id": null}}
+[PASS] chat_grounded_answer {"status": 200, "body": {"status": "ok", "reason": null, "answer": "fake-text", "grounded": true, "empty_catalogue": false, "category": "food", "catalogue_size": 2, "provider": "fake-valid", "model": "fake-model-1", "provider_call_id": "01a1360c-e050-7311-92d5-29dfce17d4e5", "usage": {"prompt_tokens": 10, "completion_tokens": 5}, "cost": 0.01, "latency_ms": 1.5}, "invocations": 1, "ledger_rows": 1}
+[PASS] chat_empty_category_refuses_to_guess {"body": {"status": "ok", "reason": "empty_catalogue", "answer": "There is no catalogue data recorded for this category yet, so I cannot answer from your items.", "grounded": true, "empty_catalogue": true, "category": "documents", "catalogue_size": 0, "unclassified_count": 1, "provider": null, "model": null, "provider_call_id": null}, "invocations": 1}
+[PASS] chat_unsupported_category_422 {"status": 422}
+[PASS] chat_catalog_scope {"a_ids": ["01a1360c-df65-7ec0-a7ae-de291bb75e57", "01a1360c-dfcc-71a1-9db9-0c5c4b0426a6"], "b_ids": ["01a1360c-e02f-73c2-9da7-3639dffcc997"], "note": "category grounding requires the classification assertion; asset_type alone and archived rows are excluded"}
+[PASS] chat_correction_guardrail_persisted {"status": 200, "kind": "correction", "detail": {"message": "Olive oil is in the pantry", "category": "food", "source": "user"}}
+[OBSERVE] guardrail_reader_absent {"note": "no API route reads GuardrailEvent (source grep); rows observable only via DB/fresh session"}
+[PASS] planning_consent_off_skipped {"body": {"status": "skipped", "reason": "consent_disabled", "suggestion_count": 0, "catalog_size": 0}}
+[PASS] planning_run_writes_pending_suggestion {"body": {"status": "ok", "suggestion_count": 1, "catalog_size": 4, "provider": "plan-scripted", "model": "scripted-model-1", "guardrail_event_id": "01a1360c-e09a-75b1-8cbb-25256d52d262", "provider_call_ids": ["01a1360c-e097-79f1-a0c6-e6e8c07ec7e2"]}, "suggestion": {"id": "01a1360c-e099-7623-8563-4704698a4030", "household_id": "01a1360c-df2e-73e3-a270-1ca2514a4f62", "kind": "general", "title": "Audit expiry soon", "body": {"rationale": ["audit"],
+[PASS] planning_confirm_foreign_403 {"status": 403}
+[PASS] planning_confirm_transition {"confirm": 200, "again": 422, "detail": "cannot confirm a suggestion in status 'confirmed'"}
+[PASS] planning_confirm_does_not_execute {"note": "confirm records the suggestion only; no catalog write"}
+[PASS] planning_dismiss_transition {"status": 200}
+[PASS] planning_provider_failure_reported {"body": {"status": "error", "reason": "invalid_json: scripted invalid_json on attempt 2", "suggestion_count": 0, "catalog_size": 4, "provider": "plan-fail", "model": "scripted-model-1", "provider_call_ids": ["01a1360c-e0f0-7cf2-a858-7db2ea41c539", "01a1360c-e0f2-79d1-af10-60b42776ea4d"]}, "invocations": 2}
+[OBSERVE] planning_foreign_backing_ref {"backing_refs": [{"type": "label", "value": "01a1360c-e02f-73c2-9da7-3639dffcc997"}], "note": "fixture names a house-B asset id; observe whether it survives into a suggestion"}
+[PASS] analytics_counts_match_db {"total": 5, "active": 4, "db_total": 5, "db_active": 4}
+[OBSERVE] analytics_empty_and_uncategorized {"empty_total": {"assets.total": 1, "assets.active": 1, "assets.by_status": {"ACTIVE": 1}}, "uncategorized_stat": null}
+[PASS] insights_consent_off_skipped {"body": {"status": "skipped", "reason": "consent_disabled", "summary": null, "sentences": [], "cited_stat_ids": [], "provider_call_ids": []}}
+[PASS] insights_grounded_citation {"status": 200, "body": {"status": "ok", "summary": "You hold a measured catalog.", "cited_stat_ids": ["assets.total"], "cited_stats": [{"id": "assets.total", "label": "Total assets", "value": 5}]}}
+[PASS] insights_ungrounded_rejected_502 {"status": 502, "detail": "insight cites unknown stat id(s): bogus.stat", "guardrail_events": ["ok", "ungrounded"]}
+[PASS] insights_no_citation_502 {"status": 502, "detail": "insight cites unknown stat id(s):  (no citations found)"}
+[PASS] enrich_consent_off_refused_before_client {"status": 403}
+[OBSERVE] enrich_off_scripted {"status": 200, "off_accepted": true, "off_reason": "accepted", "fallback_fired": false, "fallback_reason": null, "fields": {"asset_type": {"value": "unknown", "source_type": "user"}, "display_name": {"value": "SG181 Enrich Widget", "source_type": "user"}, "brand": {"value": "AuditBrand", "source_type": "user"}, "identifier": {"value": "1234567890123", "confidence": null, "source_type": "web:OpenFoodFacts", "provider": null, "model": null, "promp
+[PASS] enrich_no_network_no_spend {"hits": {"off": 1, "jina": 0}, "note": "MockTransport only; no real provider call"}
+[PASS] enrich_foreign_asset_403 {"status": 403}
+{
+  "results": [
+    {
+      "check": "isolation",
+      "result": "PASS",
+      "storage_root": "/tmp/sg181-g3-msg30_zf/storage",
+      "engine_url": "sqlite:////tmp/sg181-g3-msg30_zf/storagegenie.db",
+      "temp_root": "/tmp/sg181-g3-msg30_zf"
+    },
+    {
+      "check": "fixtures",
+      "result": "OBSERVE",
+      "a_food": "01a1360c-df65-7ec0-a7ae-de291bb75e57",
+      "a_unknown": "01a1360c-dfcc-71a1-9db9-0c5c4b0426a6",
+      "a_med": "01a1360c-dfe2-7182-8f82-c768e4dd016c",
+      "a_typeonly": "01a1360c-dffb-7712-84cc-889278bb1551",
+      "a_archived": "01a1360c-e012-73a2-b16b-3a5185a09dcd",
+      "b_food": "01a1360c-e02f-73c2-9da7-3639dffcc997"
+    },
+    {
+      "check": "chat_consent_off_skipped",
+      "result": "PASS",
+      "body": {
+        "status": "skipped",
+        "reason": "consent_disabled",
+        "answer": null,
+        "grounded": false,
+        "empty_catalogue": false,
+        "category": "food",
+        "catalogue_size": 0,
+        "provider_call_id": null
+      }
+    },
+    {
+      "check": "chat_grounded_answer",
+      "result": "PASS",
+      "status": 200,
+      "body": {
+        "status": "ok",
+        "reason": null,
+        "answer": "fake-text",
+        "grounded": true,
+        "empty_catalogue": false,
+        "category": "food",
+        "catalogue_size": 2,
+        "provider": "fake-valid",
+        "model": "fake-model-1",
+        "provider_call_id": "01a1360c-e050-7311-92d5-29dfce17d4e5",
+        "usage": {
+          "prompt_tokens": 10,
+          "completion_tokens": 5
+        },
+        "cost": 0.01,
+        "latency_ms": 1.5
+      },
+      "invocations": 1,
+      "ledger_rows": 1
+    },
+    {
+      "check": "chat_empty_category_refuses_to_guess",
+      "result": "PASS",
+      "body": {
+        "status": "ok",
+        "reason": "empty_catalogue",
+        "answer": "There is no catalogue data recorded for this category yet, so I cannot answer from your items.",
+        "grounded": true,
+        "empty_catalogue": true,
+        "category": "documents",
+        "catalogue_size": 0,
+        "unclassified_count": 1,
+        "provider": null,
+        "model": null,
+        "provider_call_id": null
+      },
+      "invocations": 1
+    },
+    {
+      "check": "chat_unsupported_category_422",
+      "result": "PASS",
+      "status": 422
+    },
+    {
+      "check": "chat_catalog_scope",
+      "result": "PASS",
+      "a_ids": [
+        "01a1360c-df65-7ec0-a7ae-de291bb75e57",
+        "01a1360c-dfcc-71a1-9db9-0c5c4b0426a6"
+      ],
+      "b_ids": [
+        "01a1360c-e02f-73c2-9da7-3639dffcc997"
+      ],
+      "note": "category grounding requires the classification assertion; asset_type alone and archived rows are excluded"
+    },
+    {
+      "check": "chat_correction_guardrail_persisted",
+      "result": "PASS",
+      "status": 200,
+      "kind": "correction",
+      "detail": {
+        "message": "Olive oil is in the pantry",
+        "category": "food",
+        "source": "user"
+      }
+    },
+    {
+      "check": "guardrail_reader_absent",
+      "result": "OBSERVE",
+      "note": "no API route reads GuardrailEvent (source grep); rows observable only via DB/fresh session"
+    },
+    {
+      "check": "planning_consent_off_skipped",
+      "result": "PASS",
+      "body": {
+        "status": "skipped",
+        "reason": "consent_disabled",
+        "suggestion_count": 0,
+        "catalog_size": 0
+      }
+    },
+    {
+      "check": "planning_run_writes_pending_suggestion",
+      "result": "PASS",
+      "body": {
+        "status": "ok",
+        "suggestion_count": 1,
+        "catalog_size": 4,
+        "provider": "plan-scripted",
+        "model": "scripted-model-1",
+        "guardrail_event_id": "01a1360c-e09a-75b1-8cbb-25256d52d262",
+        "provider_call_ids": [
+          "01a1360c-e097-79f1-a0c6-e6e8c07ec7e2"
+        ]
+      },
+      "suggestion": {
+        "id": "01a1360c-e099-7623-8563-4704698a4030",
+        "household_id": "01a1360c-df2e-73e3-a270-1ca2514a4f62",
+        "kind": "general",
+        "title": "Audit expiry soon",
+        "body": {
+          "rationale": [
+            "audit"
+          ],
+          "expiry_date": "2026-11-01",
+          "opened_date": null,
+          "confidence": 0.9,
+          "asset_ref": "01a1360c-df65-7ec0-a7ae-de291bb75e57"
+        },
+        "backing_refs": [
+          {
+            "type": "asset",
+            "id": "01a1360c-df65-7ec0-a7ae-de291bb75e57",
+            "label": "SG181 Olive Oil",
+            "category": "food_beverages"
+          },
+          {
+            "type": "assertion",
+            "id": "01a1360c-dfc2-72a0-925e-a4655f7aca25",
+            "field_path": "plugin:expiry-tracker/expiry_date",
+            "value": "2026-11-30"
+          }
+        ],
+        "status": "pending",
+        "created_at": "2026-10-13T16:16:16",
+        "updated_at": "2026-10-13T16:16:16"
+      }
+    },
+    {
+      "check": "planning_confirm_foreign_403",
+      "result": "PASS",
+      "status": 403
+    },
+    {
+      "check": "planning_confirm_transition",
+      "result": "PASS",
+      "confirm": 200,
+      "again": 422,
+      "detail": "cannot confirm a suggestion in status 'confirmed'"
+    },
+    {
+      "check": "planning_confirm_does_not_execute",
+      "result": "PASS",
+      "note": "confirm records the suggestion only; no catalog write"
+    },
+    {
+      "check": "planning_dismiss_transition",
+      "result": "PASS",
+      "status": 200
+    },
+    {
+      "check": "planning_provider_failure_reported",
+      "result": "PASS",
+      "body": {
+        "status": "error",
+        "reason": "invalid_json: scripted invalid_json on attempt 2",
+        "suggestion_count": 0,
+        "catalog_size": 4,
+        "provider": "plan-fail",
+        "model": "scripted-model-1",
+        "provider_call_ids": [
+          "01a1360c-e0f0-7cf2-a858-7db2ea41c539",
+          "01a1360c-e0f2-79d1-af10-60b42776ea4d"
+        ]
+      },
+      "invocations": 2
+    },
+    {
+      "check": "planning_foreign_backing_ref",
+      "result": "OBSERVE",
+      "backing_refs": [
+        {
+          "type": "label",
+          "value": "01a1360c-e02f-73c2-9da7-3639dffcc997"
+        }
+      ],
+      "note": "fixture names a house-B asset id; observe whether it survives into a suggestion"
+    },
+    {
+      "check": "analytics_counts_match_db",
+      "result": "PASS",
+      "total": 5,
+      "active": 4,
+      "db_total": 5,
+      "db_active": 4
+    },
+    {
+      "check": "analytics_empty_and_uncategorized",
+      "result": "OBSERVE",
+      "empty_total": {
+        "assets.total": 1,
+        "assets.active": 1,
+        "assets.by_status": {
+          "ACTIVE": 1
+        }
+      },
+      "uncategorized_stat": null
+    },
+    {
+      "check": "insights_consent_off_skipped",
+      "result": "PASS",
+      "body": {
+        "status": "skipped",
+        "reason": "consent_disabled",
+        "summary": null,
+        "sentences": [],
+        "cited_stat_ids": [],
+        "provider_call_ids": []
+      }
+    },
+    {
+      "check": "insights_grounded_citation",
+      "result": "PASS",
+      "status": 200,
+      "body": {
+        "status": "ok",
+        "summary": "You hold a measured catalog.",
+        "cited_stat_ids": [
+          "assets.total"
+        ],
+        "cited_stats": [
+          {
+            "id": "assets.total",
+            "label": "Total assets",
+            "value": 5
+          }
+        ]
+      }
+    },
+    {
+      "check": "insights_ungrounded_rejected_502",
+      "result": "PASS",
+      "status": 502,
+      "detail": "insight cites unknown stat id(s): bogus.stat",
+      "guardrail_events": [
+        "ok",
+        "ungrounded"
+      ]
+    },
+    {
+      "check": "insights_no_citation_502",
+      "result": "PASS",
+      "status": 502,
+      "detail": "insight cites unknown stat id(s):  (no citations found)"
+    },
+    {
+      "check": "enrich_consent_off_refused_before_client",
+      "result": "PASS",
+      "status": 403
+    },
+    {
+      "check": "enrich_off_scripted",
+      "result": "OBSERVE",
+      "status": 200,
+      "off_accepted": true,
+      "off_reason": "accepted",
+      "fallback_fired": false,
+      "fallback_reason": null,
+      "fields": {
+        "asset_type": {
+          "value": "unknown",
+          "source_type": "user"
+        },
+        "display_name": {
+          "value": "SG181 Enrich Widget",
+          "source_type": "user"
+        },
+        "brand": {
+          "value": "AuditBrand",
+          "source_type": "user"
+        },
+        "identifier": {
+          "value": "1234567890123",
+          "confidence": null,
+          "source_type": "web:OpenFoodFacts",
+          "provider": null,
+          "model": null,
+          "prompt_template_version": null,
+          "provider_call_id": null,
+          "source_url": "https://world.openfoodfacts.org/api/v2/search?search_terms=SG181+Enrich+Widget&brands_tags=AuditBrand&countries_tags_en=romania&page=1&page_size=10&fields=code%2Cproduct_name%2Cbrands%2Cingredients_text%2Cnutriments%2Cpackaging%2Ccountries_tags_en",
+          "retrieved_at": "2026-10-13T16:16:16.228543+00:00"
+        }
+      },
+      "web_alternates": [
+        {
+          "field": "display_name",
+          "value": "SG181 Enrich Widget",
+          "source_type": "web:OpenFoodFacts",
+          "source_url": "https://world.openfoodfacts.org/api/v2/search?search_terms=SG181+Enrich+Widget&brands_tags=AuditBrand&countries_tags_en=romania&page=1&page_size=10&fields=code%2Cproduct_name%2Cbrands%2Cingredients_text%2Cnutriments%2Cpackaging%2Ccountries_tags_en",
+          "retrieved_at": "2026-10-13T16:16:16.228543+00:00"
+        },
+        {
+          "field": "brand",
+          "value": "AuditBrand",
+          "source_type": "web:OpenFoodFacts",
+          "source_url": "https://world.openfoodfacts.org/api/v2/search?search_terms=SG181+Enrich+Widget&brands_tags=AuditBrand&countries_tags_en=romania&page=1&page_size=10&fields=code%2Cproduct_name%2Cbrands%2Cingredients_text%2Cnutriments%2Cpackaging%2Ccountries_tags_en",
+          "retrieved_at": "2026-10-13T16:16:16.228543+00:00"
+        }
+      ],
+      "snapshot_rows": 1,
+      "candidate_state": "proposed",
+      "transport_hits": {
+        "off": 1,
+        "jina": 0
+      }
+    },
+    {
+      "check": "enrich_no_network_no_spend",
+      "result": "PASS",
+      "hits": {
+        "off": 1,
+        "jina": 0
+      },
+      "note": "MockTransport only; no real provider call"
+    },
+    {
+      "check": "enrich_foreign_asset_403",
+      "result": "PASS",
+      "status": 403
+    }
+  ]
+}
+TEMP_ROOT=/tmp/sg181-g3-msg30_zf
+elapsed_s=0.7 start_epoch=1791908175 end_epoch=1791908176
