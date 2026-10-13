@@ -10,3 +10,5 @@ Session directives (verbatim): “What is next? Do not start any slices yet” �
 Earlier D1 adoption approval, owner quote: “D1 - approved.” (this chat.) Executed as `785fe7d` (cache `contract-v0.47.0`, records 0.47.0, checks CLEAN/CURRENT twice).
 
 D11 R1 re-scope direction, owner quote: “D11 - as recommended.” (2026-10-13, this chat.) Adopts Option A: SG-184 becomes a zero-product-change verification + waiver slice proving merged `0b42e7d` cleanly on disposable state (revert-in-`/tmp` fail-pre, HEAD pass-post, probe re-run, served-baseline GETs); no history rewrite, no product edit; serving stays a later rider. Packet correction follows; dispatch still awaits a separate go.
+
+D12 dispatch approval + L3 mode, owner quotes: “We are running in L3 mode.” / “D12 approved.” (2026-10-13, this chat.) Packet autonomy line amended L2→L3 to match. Expected duration ~600 s (uncalibrated; derived from SG-182's 585 s lane actual for the same verification shape per `D369`), lane `RUN_BUDGET_S=2100`. Trigger: `SG-184 coder=opencode model=opencode-go/deepseek-v4.1-flash effort=max` (coder per `D29`, model+effort per `D-1012-15`).

@@ -4,7 +4,7 @@
 **BASE REF: automation.** Report actual resolved commit.
 **STATUS: RE-SCOPED 2026-10-13 per D11 Option A from tree re-review at `3f3ae8f`; supersedes the re-derive draft. Zero product/test file change by design — this slice proves the merged repair, it does not re-implement it.**
 **DATABASE: separately isolated disposable test database/storage; production GET observations read-only.**
-**Restart: none. Autonomy: L2.** No STOP-breach waiver granted by this slice — the waiver is REQUESTED here, GRANTED only by a later audit/owner verdict. Serving the merged code is a later rider, never this slice.
+**Restart: none. Autonomy: L3** (owner-set 2026-10-13; supersedes the L2 draft line). No STOP-breach waiver granted by this slice — the waiver is REQUESTED here, GRANTED only by a later audit/owner verdict. Serving the merged code is a later rider, never this slice.
 
 ## Why this exists
 
