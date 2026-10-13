@@ -1,0 +1,23 @@
+
+> storagegenie-frontend@0.1.0 test
+> vitest run --run src/components/CandidateCard.test.tsx src/routes/ReviewPage.test.tsx --reporter=dot
+
+
+ RUN  v1.6.1 C:/Coding/OpenCode/StorageGenie/frontend
+
+stderr | src/routes/ReviewPage.test.tsx > ReviewPage > posts every decision with the loaded candidate id and supports keyboard actions
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+stderr | src/components/CandidateCard.test.tsx > CandidateCard > keeps evidence beside fields and exposes confidence, source, and blocking collision
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+ ✓ src/components/CandidateCard.test.tsx  (11 tests) 219ms
+ ✓ src/routes/ReviewPage.test.tsx  (7 tests) 567ms
+
+ Test Files  2 passed (2)
+      Tests  18 passed (18)
+   Start at  16:02:28
+   Duration  1.70s (transform 179ms, setup 189ms, collect 393ms, tests 786ms, environment 938ms, prepare 206ms)
+

@@ -637,3 +637,9 @@ Originals above (88 FLAG:TRUST / 91 FLAG:TRUST) stand as the audit trail; the ve
 | slice_id | phase | model | effort | score | flag | lever | guards_invoked | deduction_attribution | remaining | escape |
 |---|---|---|---|---|---|---|---|---|---|---|
 | SG-174 | Standing L2 close-out: one cached rebuild + one recreate; live image d5da5684/container 23d31ff5; health 6x each side, 28 table counts/schema/DB hash/bundles unchanged; zero product hunks; receipt VALID; audit SG-174_audit.md | opencode/opencode-go/deepseek-v4.1-flash (remote receipt command settings) | max | 98 |  |  | PG-DP-01, PG-DP-02, PG-IC-07, PG-PR-03, PG-PR-04, PG-PR-06, PG-PR-10 | coder | SG-175..178 in STATE; owner visual verdict with actual deployed-URL story proof; inherited host cache/tag/auth observation in audit; F-SG144-1 and Scene triggers in docs/backlog.md |  |
+
+### SG-175 (2026-10-13 - Blocked-state repair candidate, acceptance held)
+
+| slice_id | phase | model | effort | score | flag | lever | guards_invoked | deduction_attribution | remaining | escape |
+|---|---|---|---|---|---|---|---|---|---|---|
+| SG-175 | Live GET projection, UI/keyboard pending guards, duplicate reason cleanup and measured expiry probe; 11 backend/18 frontend Coder passes, 18 independent frontend passes; valid receipt, UNSERVED; audit SG-175_audit.md | opencode/opencode-go/deepseek-v4.1-flash (remote receipt command settings) | max | 90 | FLAG:SAFETY(continued-after-privileged-denial) | SG-179 excludes known-denied optional Docker listing; PB-2 whole-slice STOP also applies to optional reads; report image UNVERIFIED, no privilege changes | PG-EV-01/02/03/05/06/09/13; PG-SC-01/02/04/09/10/12; PG-IC-01/07/09; PG-DP-02/03; PG-PR-03/04/07/10 | coder | REC-ISS11..14 in docs/reviews/2026-10-13-recovery-audit.md; acceptance/deploy held; deployed-URL proof owed; SG-176..178 retain approved scope after audit; historical snapshots preserved; host Docker/caches read limits OPEN |  |

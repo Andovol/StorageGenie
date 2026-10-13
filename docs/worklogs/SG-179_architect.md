@@ -1,0 +1,15 @@
+# SG-179 — Approved recovery journey audit preparation
+
+Authorization: RECOVERY-D1, owner “Approved” following AUD-P1–AUD-P3 audit-stage proposal; durable decision `docs/decisions/2026-10-13-recovery-audit-approval.md`. This is a separately approved read-only audit, not a continuation of implementation acceptance or permission to deploy SG-175.
+
+SG-175 prerequisite checkpoint: valid mapped final receipt b789c14, immutable base/work diff audited, score 90 with FLAG:SAFETY(continued-after-privileged-denial), all remaining entries dispositioned in SG-175_audit.md and the recovery register. Product candidate remains UNSERVED and held. Audit can inspect it safely within approved read-only/disposable-data boundaries; flag is not waived. No other product repair or sensitive-surface change is bundled.
+
+Selected envelope: `SG-179 coder=opencode model=opencode-go/deepseek-v4.1-flash effort=max`. Values from standing owner D-1012-15 and current catalogue; max remains uncalibrated. Codex background SSH, Class 4 under D-1012-17. One trigger, no polling or re-trigger. No completion callback or scheduled follow-up is configured by the background process itself; status/notes at next activation are authoritative.
+
+Contract axis: installed/local contract 0.46.0 CLEAN at this session start; cache clean exact tag contract-v0.46.0; SG-175 final report echoes host CODER/VERSION 0.46.0 and matching RULES SHA256. Known host tag/gh-auth limitations remain explicit, no host mutation. Expected duration UNVERIFIED: bounded prior diagnostics are narrower than this route/journey inventory; no summed goal estimate used. Previous lane status budget=2100 seconds + stop=60 seconds; Coder must report current lane bound and actual elapsed. Expected Codex stage cost HIGH is Architect judgement; exact Codex/Coder platform usage unavailable.
+
+Recurrence lever costs no new host machinery: remove optional known-denied Docker listing, report image/container identity UNVERIFIED, preserve mandatory PB-2 whole-slice STOP for any new denial. Scripted disposable proof and deployed read-only browser observations have separate provenance. Root datastore/evidence isolation must precede synthetic writes; paid application calls and production mutation/restart excluded.
+
+Initial independent preparation: source map/story register and scope decisions read at 803cf52; local dependency repair uses frozen npm ci, no package/lock changes; 41 selected baseline frontend tests passed, then SG-175 candidate's 18 frontend checks passed independently. These do not prove the deployed journeys or UI. In-app browser public URL failed invalid-auth-credentials; authorized access remains an observation to establish, never a license to change auth or retrieve unrelated secrets.
+
+No local product implementation by Architect. Publication records include approval, canonical register, initial baseline captures, SG-175 audit/rating and the SG-179 packet. STATE points to canonical records and retains existing repair grants after audit/consolidation. Trigger outcome is external to this prepared record; do not infer launched/running/done solely from it.

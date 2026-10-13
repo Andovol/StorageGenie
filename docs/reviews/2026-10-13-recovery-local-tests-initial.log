@@ -1,0 +1,27 @@
+Initial executed baseline, 2026-10-13 15:52:41 Europe/Bucharest.
+Immutable product source 803cf522723158c65f9c4a6ba1ac3679da57f53a.
+Command: npm test -- --run src/components/shell/import-modal.test.tsx src/components/shell/shell.test.tsx src/routes/ReviewPage.test.tsx --reporter=dot
+Working directory: C:\Coding\OpenCode\StorageGenie\frontend
+Exit: 1. Below are the material command-output lines copied from the tool capture; this is an excerpt, not a whole-log capture.
+
+ RUN  v1.6.1 C:/Coding/OpenCode/StorageGenie/frontend
+ ❯ src/components/shell/import-modal.test.tsx  (0 test)
+ ❯ src/components/shell/shell.test.tsx  (0 test)
+ ✓ src/routes/ReviewPage.test.tsx  (4 tests) 373ms
+
+ FAIL  src/components/shell/import-modal.test.tsx [ src/components/shell/import-modal.test.tsx ]
+Error: Failed to resolve import "lucide-react" from "src/components/shell/AssetImportModal.tsx". Does the file exist?
+
+ FAIL  src/components/shell/shell.test.tsx [ src/components/shell/shell.test.tsx ]
+Error: Failed to resolve import "lucide-react" from "src/components/catalog/ProductGrid.tsx". Does the file exist?
+
+ Test Files  2 failed | 1 passed (3)
+      Tests  4 passed (4)
+   Start at  15:52:41
+   Duration  2.89s
+
+Both React Router future-flag warnings also emitted. No product behavior assertion failed in the two uncollected files; this is a local dependency/setup failure, not a product defect proof.
+
+Control: Test-Path C:\Coding\OpenCode\StorageGenie\frontend\node_modules\lucide-react => False. package.json and package-lock.json list lucide-react; lock resolved package is registry.npmjs.org/lucide-react/-/lucide-react-1.46.0.tgz. Local environment restored by npm ci --ignore-scripts --no-audit --no-fund --loglevel=error (exit 0, “added 314 packages in 14s”). Correct frontend-directory npm ls lucide-react --depth=0 subsequently returned lucide-react@1.46.0. No package or lock change.
+
+Post-restore output is independently captured in 2026-10-13-recovery-local-tests.log. This documents environment recovery, not an application repair.
