@@ -697,3 +697,9 @@ Originals above (88 FLAG:TRUST / 91 FLAG:TRUST) stand as the audit trail; the ve
 | slice_id | phase | model | effort | score | flag | lever | guards_invoked | deduction_attribution | remaining | escape |
 |---|---|---|---|---|---|---|---|---|---|---|
 | SG-185 | R4 key-replay repair (F-SG181-1); receipt 5be388f; one-line household qualification + doc comment, query-only, 2 new tests FAIL-then-PASS (11/11 with existing), ruff clean, mypy 41==41, sibling classified not widened; audit SG-185_audit.md | opencode/opencode-go/deepseek-v4.1-flash (receipt command settings) | max | 97 |  |  | PG-EV-01/02/03/04/05/06/07/09/13; PG-SC-01/02/03/09/10/12; PG-IC-01/07/09; PG-DP-03; PG-PR-01/03/04/07/10 |  | Foreign-key no-dedup parked (schema change unless owner asks); F-SG180 evidence-key sibling → SG-186; D8 → SG-188; serve via normal deploy course |  |
+
+### SG-186 (2026-10-13 - R6 serve-time integrity verification + evidence replay sibling)
+
+| slice_id | phase | model | effort | score | flag | lever | guards_invoked | deduction_attribution | remaining | escape |
+|---|---|---|---|---|---|---|---|---|---|---|
+| SG-186 | R6 integrity (F-SG180-3); receipt 7fe71d3; serve-time sha256 vs row → explicit 500, transcript gate narrow+fail-closed+pinned, replay sibling same-shape taken; 4 tests FAIL-then-PASS, authoritative 82/82, SG-180 probe rerun, overhead measured; audit SG-186_audit.md | opencode/opencode-go/deepseek-v4.1-flash (receipt command settings) | max | 97 |  |  | PG-EV-01/02/03/04/05/06/07/09/13; PG-SC-01/02/03/09/10/12; PG-IC-01/07/09; PG-DP-03; PG-PR-01/03/04/07/10 |  | Transcript/thumbnail anchors parked (schema decision); TOCTOU documented; sha-dedup own grant if wanted; mypy register; serve via normal deploy course |  |
