@@ -1,0 +1,36 @@
+db_path /home/andrei/StorageGenie/data/db/storagegenie.db
+db_sha256 e6bef157440fb8b4a3262577362b071dcae07507ea9a7e04a614e11be28ee5bd
+table_count 28
+tables alembic_version assertion asset asset_evidence asset_fts asset_fts_config asset_fts_data asset_fts_docsize asset_fts_idx asset_location asset_relation audit_event candidate enrich_snapshot evidence guardrail_event household idempotency_key job job_step location observation planning_suggestion provider_call review_task saved_search source_attribution user
+alembic_version ['20260924_sg114_relation']
+count alembic_version 1
+count assertion 37
+count asset 7
+count asset_evidence 14
+count asset_fts 7
+count asset_fts_config 1
+count asset_fts_data 9
+count asset_fts_docsize 7
+count asset_fts_idx 7
+count asset_location 1
+count asset_relation 1
+count audit_event 91
+count candidate 10
+count enrich_snapshot 4
+count evidence 18
+count guardrail_event 2
+count household 1
+count idempotency_key 11
+count job 11
+count job_step 72
+count location 1
+count observation 20
+count planning_suggestion 0
+count provider_call 29
+count review_task 8
+count saved_search 0
+count source_attribution 0
+count user 2
+READONLY_OK
+end_db_sha256 e6bef157440fb8b4a3262577362b071dcae07507ea9a7e04a614e11be28ee5bd
+END_READONLY_OK

@@ -1,0 +1,10 @@
+SG-191 health (start) + served baseline; 2026-10-13T17:59:06Z
+{"status":"ok","db":"ok","storage":"ok"}
+HTTP 200
+GET / HTTP 200
+index.html sha256 2f035becd05b63e226af82e2e8fe60c8f3b5effb9f37e49dd95a2265c4da0d55
+GET /assets/index-CYyuxefG.js HTTP 200 sha256=1b4680a0eddadff3c95a64b6bc00d744764d127a72cd5690ebea948b7664a29d bytes=322255
+GET /assets/index-DO0gjGV6.css HTTP 200 sha256=37b25dbdd4b0ecfdedb8255bc7f8af286726334e95a1a3a9e85b9ba381b3d57c bytes=3911
+SG-191 health (end) — post-stop, service untouched; 2026-10-13T18:02:09Z
+{"status":"ok","db":"ok","storage":"ok"}
+HTTP 200

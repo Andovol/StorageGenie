@@ -1,0 +1,21 @@
+SG-191 product diff merged-vs-served; 2026-10-13T17:59:07Z
+served product base 3ae5541 (SG-172/174 deployed product tree, SG-174 report); merged HEAD 49947c2cba671ad3f72b90307a658dfb5a562afa
+== git diff --stat 3ae5541..HEAD -- backend frontend ==
+ backend/app/api/v1/candidates.py               |   4 +-
+ backend/app/services/candidates.py             |  20 ++++
+ backend/tests/test_candidate_read.py           | 152 +++++++++++++++++++++++++
+ frontend/src/components/CandidateCard.test.tsx |  17 +++
+ frontend/src/components/CandidateCard.tsx      |   2 +-
+ frontend/src/routes/ReviewPage.test.tsx        |  49 ++++++++
+ frontend/src/routes/ReviewPage.tsx             |   4 +-
+ 7 files changed, 242 insertions(+), 6 deletions(-)
+== name-only 3ae5541..HEAD (backend frontend) ==
+backend/app/api/v1/candidates.py
+backend/app/services/candidates.py
+backend/tests/test_candidate_read.py
+frontend/src/components/CandidateCard.test.tsx
+frontend/src/components/CandidateCard.tsx
+frontend/src/routes/ReviewPage.test.tsx
+frontend/src/routes/ReviewPage.tsx
+== models/alembic name-only 3ae5541..HEAD (expect empty) ==
+== product name-only 3ae5541..3454e1c served-close (expect empty) ==
