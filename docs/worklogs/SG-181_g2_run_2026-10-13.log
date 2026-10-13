@@ -1,0 +1,514 @@
+/home/andrei/StorageGenie/backend/venv/lib/python3.12/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+  from starlette.testclient import TestClient as TestClient  # noqa
+[PASS] isolation {"storage_root": "/tmp/sg181-g2-lc99oclf/storage", "engine_url": "sqlite:////tmp/sg181-g2-lc99oclf/storagegenie.db", "temp_root": "/tmp/sg181-g2-lc99oclf"}
+[OBSERVE] flags_default {"locations": false, "relations": false, "note": "privileged process settings; production effective state NOT inferred"}
+[PASS] population_tied_timestamps {"distinct_created_at": 2, "total": 25, "sample": ["2026-10-13T16:13:35", "2026-10-13T16:13:36"]}
+[PASS] cursor_paging_no_loss_no_dup {"pages": 3, "returned": 25}
+[PASS] cursor_order_matches_db {"first_page_5": ["01a1360a-7059-7d31-8eae-50de1d636bbe", "01a1360a-704e-7450-b7da-5c5766e352a4", "01a1360a-7045-7873-9d59-f22db7e6a1dd", "01a1360a-703b-7053-93da-1f361d5d4298", "01a1360a-7032-7d40-a181-8e49641aa1ce"], "note": "tied second-resolution created_at, id desc tiebreak"}
+[OBSERVE] malformed_cursor {"status": 200, "item_ids": ["01a1360a-7059-7d31-8eae-50de1d636bbe", "01a1360a-704e-7450-b7da-5c5766e352a4", "01a1360a-7045-7873-9d59-f22db7e6a1dd"], "note": "silent fallback to first page vs 422"}
+[PASS] fts_filter_hit {"total": 1}
+[PASS] fts_no_match_empty {}
+[PASS] fts_escape[Zebraphant" OR "x] {"status": 200, "total": 0}
+[PASS] fts_escape[Zebraphant'] {"status": 200, "total": 1}
+[PASS] fts_escape[Zebraphant*] {"status": 200, "total": 1}
+[PASS] fts_escape[NEAR(] {"status": 200, "total": 0}
+[PASS] facets_asset_type_match_list {"facet": {"food": 13, "household": 12}, "listed": 13}
+[PASS] facets_has_evidence_zero_but_present {"facets": {"with": 0, "without": 25}, "note": "populated household reports 0/25; keys omitted only when the whole base is empty (empty-household check below)"}
+[PASS] empty_household_distinct_zero {"list_items": 0, "facets": {"asset_type": {}, "status": {}, "has_evidence": {}}}
+[OBSERVE] sort_param_effect {"identical": true, "accepted_keys": ["name", "query"], "note": "server has no sort parameter; CatalogPage sorts the loaded page only (source)"}
+[PASS] saved_search_create {"status": 201, "query": {"asset_type": "food", "q": "Zebraphant"}}
+[PASS] saved_search_duplicate_name_409 {"status": 409}
+[PASS] saved_search_same_name_other_household_ok {"status": 201}
+[OBSERVE] saved_search_unknown_sort_key {"status": 422, "persisted_query": null}
+[PASS] saved_search_apply_roundtrip {"returned": 1}
+[PASS] saved_search_household_scoped {}
+[PASS] saved_search_foreign_delete_403 {"status": 403}
+[PASS] saved_search_delete {"status": 200, "remaining": 1}
+[PASS] lifecycle_active_disposed_422 {"status": 422, "detail": "illegal status transition 'ACTIVE' -> 'DISPOSED'; legal from 'ACTIVE': ['ARCHIVED', 'MERGED']"}
+[PASS] lifecycle_archive_then_illegal_reactivate {"archive": 200, "rearchive": 200, "reactivate": 422, "detail": "illegal status transition 'ARCHIVED' -> 'ACTIVE'; legal from 'ARCHIVED': ['DISPOSED']"}
+[OBSERVE] archived_visibility_default_list {"archived_in_default_list": true, "status_filtered": 1, "note": "list endpoint has no implicit ACTIVE filter; UI filtering not exercised"}
+[PASS] flags_off_routes_404 {"locations": 404, "relations": 404}
+[PASS] location_create_tree {"parent": 201, "child": 201}
+[PASS] location_cycle_self_cross_household_rejected {"cycle": 422, "self_parent": 422, "cross_parent": 403, "cross_detail": "Household mismatch"}
+[PASS] location_assign_idempotent_and_reader {"assign": 200, "again": 200, "foreign": 403, "reader": [{"id": "01a1360a-719c-7983-b123-a5f40e432c38", "name": "Fridge", "parent_id": "01a1360a-7193-7d82-bda6-318fed9f7659"}]}
+[PASS] relation_controls {"created": 201, "dup": 409, "self": 422, "cross": 403, "bad_type": 422}
+[PASS] relation_reader_both_directions {"reverse_view": "incoming", "forward": [{"id": "01a1360a-71d7-7750-8401-8e333764b372", "household_id": "01a1360a-6f1f-7d41-ae7e-5de50d576c4f", "from_asset_id": "01a1360a-7138-7a22-a277-2d9dc2041c6c", "to_asset_id": "01a1360a-6fac-7a10-b5c4-af038ccf41a6", "relation_type": "related_to", "direction": "outgoing", "created_at": "2026-10-13T16:13:36", "updated_at": "2026-10-13T16:13:36"}]}
+[PASS] classify_unknown_category_422 {"status": 422}
+[PASS] classify_food_unknown_expiry_and_task {"status": 200, "expiry": {"id": "01a1360a-723c-77e2-8ff5-f51686490d94", "field_path": "plugin:expiry-tracker/expiry_date", "value": {"status": "unknown"}, "source_type": "deterministic", "review_state": "needs_evidence", "source_evidence_ids": []}, "task": "01a1360a-7240-7e52-a034-e72ad1b0b62c"}
+[PASS] classify_non_perishable_no_task {"body": {"plugin_id": "expiry-tracker", "version": "1.0.0", "classification": {"category": "non_perishable", "label": "Non-perishable", "profile": {"notification_tier": null, "notification_days": null, "tier_defaults": {}, "opened_date_tracking": false, "disposal_guidance": false}}, "expiry_assertion": null, "review_task": null}}
+[PASS] review_task_readback {"task": {"id": "01a1360a-7240-7e52-a034-e72ad1b0b62c", "task_type": "expiry.manual_entry", "priority": "high", "subject_ref": "01a1360a-71fb-75c3-b55a-a898d3756489", "proposed_change": {"field_path": "plugin:expiry-tracker/expiry_date", "prompt": "Enter expiry date manually"}, "status": "open", "household_id": "01a1360a-6f1f-7d41-ae7e-5de50d576c4f", "created_at": "2026-10-13T16:13:36", "updated_at": "2026-10-13T16:13:36"}}
+[PASS] review_task_foreign_403 {"status": 403}
+[OBSERVE] bare_resolve_without_data {"resolve_status": 200, "task_status": "resolved", "expiry_assertion_still": [{"id": "01a1360a-723c-77e2-8ff5-f51686490d94", "field_path": "plugin:expiry-tracker/expiry_date", "value": {"status": "unknown"}, "source_type": "deterministic", "confidence": null, "review_state": "needs_evidence", "source_evidence_ids": null, "created_at": "2026-10-13T16:13:36"}], "note": "SC-08/09: bare Resolve closes the task without writing the expiry data-required
+[PASS] manual_entry_resolves_real_task {"status": 200, "resolved": ["01a1360a-7249-7051-bc8e-cd2dea7c65ba"], "task": {"id": "01a1360a-7249-7051-bc8e-cd2dea7c65ba", "task_type": "expiry.manual_entry", "priority": "high", "subject_ref": "01a1360a-7205-7c51-9fe8-bc1200474a7e", "proposed_change": {"field_path": "plugin:expiry-tracker/expiry_date", "prompt": "Enter expiry date manually"}, "status": "resolved", "household_id": "01a1360a-6f1f-7d41-ae7e-5de50d576c4f", "created_at": "2026-10-1
+[PASS] manual_entry_invalid_date_422 {"status": 422, "detail": "expiry_date must be a valid YYYY-MM-DD date"}
+[PASS] manual_entry_non_perishable_422 {"status": 422, "detail": "Manual expiry entry is not applicable to non-perishable assets"}
+[OBSERVE] status_engine_readback {"keys": ["as_of", "category", "household_id", "rows", "summary", "unresolved_rows"], "sample": {"household_id": "01a1360a-6f1f-7d41-ae7e-5de50d576c4f", "as_of": "2026-10-13", "category": null, "rows": [{"asset_id": "01a1360a-7205-7c51-9fe8-bc1200474a7e", "display_name": "Expiry Y", "category": "medicine_pharma", "expiry_date": "2026-11-30", "date_type": "expiry_date", "days_remaining": 48, "tier": "safe", "bucket": "safe"}], "summary": {"by_tier
+[OBSERVE] status_category_filter {"empty_result": {"household_id": "01a1360a-6f1f-7d41-ae7e-5de50d576c4f", "as_of": "2026-10-13", "category": "documents_other", "rows": [], "summary": {"by_tier": {}, "by_bucket": {}, "unresolved": 0, "total": 0}, "unresolved_rows": []}, "total": null}
+[OBSERVE] status_after_archive {"archive": 200, "rows": ["01a1360a-7205-7c51-9fe8-bc1200474a7e"], "unresolved_rows": [{"asset_id": "01a1360a-720d-7012-bd26-34f150c7b36f", "reason": "dateless"}], "summary": {"by_tier": {"safe": 1}, "by_bucket": {"safe": 1}, "unresolved": 1, "total": 2}}
+{
+  "results": [
+    {
+      "check": "isolation",
+      "result": "PASS",
+      "storage_root": "/tmp/sg181-g2-lc99oclf/storage",
+      "engine_url": "sqlite:////tmp/sg181-g2-lc99oclf/storagegenie.db",
+      "temp_root": "/tmp/sg181-g2-lc99oclf"
+    },
+    {
+      "check": "flags_default",
+      "result": "OBSERVE",
+      "locations": false,
+      "relations": false,
+      "note": "privileged process settings; production effective state NOT inferred"
+    },
+    {
+      "check": "population_tied_timestamps",
+      "result": "PASS",
+      "distinct_created_at": 2,
+      "total": 25,
+      "sample": [
+        "2026-10-13T16:13:35",
+        "2026-10-13T16:13:36"
+      ]
+    },
+    {
+      "check": "cursor_paging_no_loss_no_dup",
+      "result": "PASS",
+      "pages": 3,
+      "returned": 25
+    },
+    {
+      "check": "cursor_order_matches_db",
+      "result": "PASS",
+      "first_page_5": [
+        "01a1360a-7059-7d31-8eae-50de1d636bbe",
+        "01a1360a-704e-7450-b7da-5c5766e352a4",
+        "01a1360a-7045-7873-9d59-f22db7e6a1dd",
+        "01a1360a-703b-7053-93da-1f361d5d4298",
+        "01a1360a-7032-7d40-a181-8e49641aa1ce"
+      ],
+      "note": "tied second-resolution created_at, id desc tiebreak"
+    },
+    {
+      "check": "malformed_cursor",
+      "result": "OBSERVE",
+      "status": 200,
+      "item_ids": [
+        "01a1360a-7059-7d31-8eae-50de1d636bbe",
+        "01a1360a-704e-7450-b7da-5c5766e352a4",
+        "01a1360a-7045-7873-9d59-f22db7e6a1dd"
+      ],
+      "note": "silent fallback to first page vs 422"
+    },
+    {
+      "check": "fts_filter_hit",
+      "result": "PASS",
+      "total": 1
+    },
+    {
+      "check": "fts_no_match_empty",
+      "result": "PASS"
+    },
+    {
+      "check": "fts_escape[Zebraphant\" OR \"x]",
+      "result": "PASS",
+      "status": 200,
+      "total": 0
+    },
+    {
+      "check": "fts_escape[Zebraphant']",
+      "result": "PASS",
+      "status": 200,
+      "total": 1
+    },
+    {
+      "check": "fts_escape[Zebraphant*]",
+      "result": "PASS",
+      "status": 200,
+      "total": 1
+    },
+    {
+      "check": "fts_escape[NEAR(]",
+      "result": "PASS",
+      "status": 200,
+      "total": 0
+    },
+    {
+      "check": "facets_asset_type_match_list",
+      "result": "PASS",
+      "facet": {
+        "food": 13,
+        "household": 12
+      },
+      "listed": 13
+    },
+    {
+      "check": "facets_has_evidence_zero_but_present",
+      "result": "PASS",
+      "facets": {
+        "with": 0,
+        "without": 25
+      },
+      "note": "populated household reports 0/25; keys omitted only when the whole base is empty (empty-household check below)"
+    },
+    {
+      "check": "empty_household_distinct_zero",
+      "result": "PASS",
+      "list_items": 0,
+      "facets": {
+        "asset_type": {},
+        "status": {},
+        "has_evidence": {}
+      }
+    },
+    {
+      "check": "sort_param_effect",
+      "result": "OBSERVE",
+      "identical": true,
+      "accepted_keys": [
+        "name",
+        "query"
+      ],
+      "note": "server has no sort parameter; CatalogPage sorts the loaded page only (source)"
+    },
+    {
+      "check": "saved_search_create",
+      "result": "PASS",
+      "status": 201,
+      "query": {
+        "asset_type": "food",
+        "q": "Zebraphant"
+      }
+    },
+    {
+      "check": "saved_search_duplicate_name_409",
+      "result": "PASS",
+      "status": 409
+    },
+    {
+      "check": "saved_search_same_name_other_household_ok",
+      "result": "PASS",
+      "status": 201
+    },
+    {
+      "check": "saved_search_unknown_sort_key",
+      "result": "OBSERVE",
+      "status": 422,
+      "persisted_query": null
+    },
+    {
+      "check": "saved_search_apply_roundtrip",
+      "result": "PASS",
+      "returned": 1
+    },
+    {
+      "check": "saved_search_household_scoped",
+      "result": "PASS"
+    },
+    {
+      "check": "saved_search_foreign_delete_403",
+      "result": "PASS",
+      "status": 403
+    },
+    {
+      "check": "saved_search_delete",
+      "result": "PASS",
+      "status": 200,
+      "remaining": 1
+    },
+    {
+      "check": "lifecycle_active_disposed_422",
+      "result": "PASS",
+      "status": 422,
+      "detail": "illegal status transition 'ACTIVE' -> 'DISPOSED'; legal from 'ACTIVE': ['ARCHIVED', 'MERGED']"
+    },
+    {
+      "check": "lifecycle_archive_then_illegal_reactivate",
+      "result": "PASS",
+      "archive": 200,
+      "rearchive": 200,
+      "reactivate": 422,
+      "detail": "illegal status transition 'ARCHIVED' -> 'ACTIVE'; legal from 'ARCHIVED': ['DISPOSED']"
+    },
+    {
+      "check": "archived_visibility_default_list",
+      "result": "OBSERVE",
+      "archived_in_default_list": true,
+      "status_filtered": 1,
+      "note": "list endpoint has no implicit ACTIVE filter; UI filtering not exercised"
+    },
+    {
+      "check": "flags_off_routes_404",
+      "result": "PASS",
+      "locations": 404,
+      "relations": 404
+    },
+    {
+      "check": "location_create_tree",
+      "result": "PASS",
+      "parent": 201,
+      "child": 201
+    },
+    {
+      "check": "location_cycle_self_cross_household_rejected",
+      "result": "PASS",
+      "cycle": 422,
+      "self_parent": 422,
+      "cross_parent": 403,
+      "cross_detail": "Household mismatch"
+    },
+    {
+      "check": "location_assign_idempotent_and_reader",
+      "result": "PASS",
+      "assign": 200,
+      "again": 200,
+      "foreign": 403,
+      "reader": [
+        {
+          "id": "01a1360a-719c-7983-b123-a5f40e432c38",
+          "name": "Fridge",
+          "parent_id": "01a1360a-7193-7d82-bda6-318fed9f7659"
+        }
+      ]
+    },
+    {
+      "check": "relation_controls",
+      "result": "PASS",
+      "created": 201,
+      "dup": 409,
+      "self": 422,
+      "cross": 403,
+      "bad_type": 422
+    },
+    {
+      "check": "relation_reader_both_directions",
+      "result": "PASS",
+      "reverse_view": "incoming",
+      "forward": [
+        {
+          "id": "01a1360a-71d7-7750-8401-8e333764b372",
+          "household_id": "01a1360a-6f1f-7d41-ae7e-5de50d576c4f",
+          "from_asset_id": "01a1360a-7138-7a22-a277-2d9dc2041c6c",
+          "to_asset_id": "01a1360a-6fac-7a10-b5c4-af038ccf41a6",
+          "relation_type": "related_to",
+          "direction": "outgoing",
+          "created_at": "2026-10-13T16:13:36",
+          "updated_at": "2026-10-13T16:13:36"
+        }
+      ]
+    },
+    {
+      "check": "classify_unknown_category_422",
+      "result": "PASS",
+      "status": 422
+    },
+    {
+      "check": "classify_food_unknown_expiry_and_task",
+      "result": "PASS",
+      "status": 200,
+      "expiry": {
+        "id": "01a1360a-723c-77e2-8ff5-f51686490d94",
+        "field_path": "plugin:expiry-tracker/expiry_date",
+        "value": {
+          "status": "unknown"
+        },
+        "source_type": "deterministic",
+        "review_state": "needs_evidence",
+        "source_evidence_ids": []
+      },
+      "task": "01a1360a-7240-7e52-a034-e72ad1b0b62c"
+    },
+    {
+      "check": "classify_non_perishable_no_task",
+      "result": "PASS",
+      "body": {
+        "plugin_id": "expiry-tracker",
+        "version": "1.0.0",
+        "classification": {
+          "category": "non_perishable",
+          "label": "Non-perishable",
+          "profile": {
+            "notification_tier": null,
+            "notification_days": null,
+            "tier_defaults": {},
+            "opened_date_tracking": false,
+            "disposal_guidance": false
+          }
+        },
+        "expiry_assertion": null,
+        "review_task": null
+      }
+    },
+    {
+      "check": "review_task_readback",
+      "result": "PASS",
+      "task": {
+        "id": "01a1360a-7240-7e52-a034-e72ad1b0b62c",
+        "task_type": "expiry.manual_entry",
+        "priority": "high",
+        "subject_ref": "01a1360a-71fb-75c3-b55a-a898d3756489",
+        "proposed_change": {
+          "field_path": "plugin:expiry-tracker/expiry_date",
+          "prompt": "Enter expiry date manually"
+        },
+        "status": "open",
+        "household_id": "01a1360a-6f1f-7d41-ae7e-5de50d576c4f",
+        "created_at": "2026-10-13T16:13:36",
+        "updated_at": "2026-10-13T16:13:36"
+      }
+    },
+    {
+      "check": "review_task_foreign_403",
+      "result": "PASS",
+      "status": 403
+    },
+    {
+      "check": "bare_resolve_without_data",
+      "result": "OBSERVE",
+      "resolve_status": 200,
+      "task_status": "resolved",
+      "expiry_assertion_still": [
+        {
+          "id": "01a1360a-723c-77e2-8ff5-f51686490d94",
+          "field_path": "plugin:expiry-tracker/expiry_date",
+          "value": {
+            "status": "unknown"
+          },
+          "source_type": "deterministic",
+          "confidence": null,
+          "review_state": "needs_evidence",
+          "source_evidence_ids": null,
+          "created_at": "2026-10-13T16:13:36"
+        }
+      ],
+      "note": "SC-08/09: bare Resolve closes the task without writing the expiry data-required assertion"
+    },
+    {
+      "check": "manual_entry_resolves_real_task",
+      "result": "PASS",
+      "status": 200,
+      "resolved": [
+        "01a1360a-7249-7051-bc8e-cd2dea7c65ba"
+      ],
+      "task": {
+        "id": "01a1360a-7249-7051-bc8e-cd2dea7c65ba",
+        "task_type": "expiry.manual_entry",
+        "priority": "high",
+        "subject_ref": "01a1360a-7205-7c51-9fe8-bc1200474a7e",
+        "proposed_change": {
+          "field_path": "plugin:expiry-tracker/expiry_date",
+          "prompt": "Enter expiry date manually"
+        },
+        "status": "resolved",
+        "household_id": "01a1360a-6f1f-7d41-ae7e-5de50d576c4f",
+        "created_at": "2026-10-13T16:13:36",
+        "updated_at": "2026-10-13T16:13:36"
+      }
+    },
+    {
+      "check": "manual_entry_invalid_date_422",
+      "result": "PASS",
+      "status": 422,
+      "detail": "expiry_date must be a valid YYYY-MM-DD date"
+    },
+    {
+      "check": "manual_entry_non_perishable_422",
+      "result": "PASS",
+      "status": 422,
+      "detail": "Manual expiry entry is not applicable to non-perishable assets"
+    },
+    {
+      "check": "status_engine_readback",
+      "result": "OBSERVE",
+      "keys": [
+        "as_of",
+        "category",
+        "household_id",
+        "rows",
+        "summary",
+        "unresolved_rows"
+      ],
+      "sample": {
+        "household_id": "01a1360a-6f1f-7d41-ae7e-5de50d576c4f",
+        "as_of": "2026-10-13",
+        "category": null,
+        "rows": [
+          {
+            "asset_id": "01a1360a-7205-7c51-9fe8-bc1200474a7e",
+            "display_name": "Expiry Y",
+            "category": "medicine_pharma",
+            "expiry_date": "2026-11-30",
+            "date_type": "expiry_date",
+            "days_remaining": 48,
+            "tier": "safe",
+            "bucket": "safe"
+          }
+        ],
+        "summary": {
+          "by_tier": {
+            "safe": 1
+          },
+          "by_bucket": {
+            "safe": 1
+          },
+          "unresolved": 2,
+          "total": 3
+        },
+        "unresolved_rows": [
+          {
+            "asset_id": "01a1360a-71fb-75c3-b55a-a898d3756489",
+            "reason": "needs_evidence"
+          },
+          {
+            "asset_id": "01a1360a-720d-7012-bd26-34f150c7b36f",
+            "reason": "dateless"
+          }
+        ]
+      }
+    },
+    {
+      "check": "status_category_filter",
+      "result": "OBSERVE",
+      "empty_result": {
+        "household_id": "01a1360a-6f1f-7d41-ae7e-5de50d576c4f",
+        "as_of": "2026-10-13",
+        "category": "documents_other",
+        "rows": [],
+        "summary": {
+          "by_tier": {},
+          "by_bucket": {},
+          "unresolved": 0,
+          "total": 0
+        },
+        "unresolved_rows": []
+      },
+      "total": null
+    },
+    {
+      "check": "status_after_archive",
+      "result": "OBSERVE",
+      "archive": 200,
+      "rows": [
+        "01a1360a-7205-7c51-9fe8-bc1200474a7e"
+      ],
+      "unresolved_rows": [
+        {
+          "asset_id": "01a1360a-720d-7012-bd26-34f150c7b36f",
+          "reason": "dateless"
+        }
+      ],
+      "summary": {
+        "by_tier": {
+          "safe": 1
+        },
+        "by_bucket": {
+          "safe": 1
+        },
+        "unresolved": 1,
+        "total": 2
+      }
+    }
+  ]
+}
+TEMP_ROOT=/tmp/sg181-g2-lc99oclf
+elapsed_s=1.0 start_epoch=1791908015 end_epoch=1791908016
