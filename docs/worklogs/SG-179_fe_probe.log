@@ -1,0 +1,14 @@
+
+ RUN  v1.6.1 /home/andrei/StorageGenie/frontend
+
+stderr | src/__sg179__/probe.test.tsx > SG-179 probe: CREATED import offers no run control (REC-ST03) > CREATED job renders with no Run/Retry action while FAILED offers Retry (working control)
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+ ✓ src/__sg179__/probe.test.tsx  (1 test) 281ms
+
+ Test Files  1 passed (1)
+      Tests  1 passed (1)
+   Start at  13:30:32
+   Duration  1.54s (transform 158ms, setup 88ms, collect 265ms, tests 281ms, environment 506ms, prepare 115ms)
+

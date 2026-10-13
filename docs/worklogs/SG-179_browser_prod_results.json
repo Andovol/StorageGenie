@@ -1,0 +1,3747 @@
+{
+ "mode": "prod",
+ "version": "HeadlessChrome/149.0.7827.55",
+ "results": [
+  {
+   "route": "/",
+   "slug": "catalog_390x844",
+   "viewport": "390x844",
+   "file": "catalog_390x844.jpg",
+   "measure": {
+    "vw": 811,
+    "vh": 1756,
+    "scrollW": 811,
+    "scrollH": 1756,
+    "overflowX": 0,
+    "overflowY": 0,
+    "overflowOffenders": [],
+    "targetCount": 30,
+    "smallTargets": [
+     {
+      "t": "a",
+      "l": "text-foreground.focus-ring",
+      "w": 123,
+      "h": 19
+     }
+    ],
+    "smallTargetCount": 1,
+    "textSamples": 46,
+    "contrastBelowAA": [
+     {
+      "l": "Total loaded items: 7",
+      "ratio": 4.4,
+      "px": 12,
+      "bold": false
+     },
+     {
+      "l": "bg-card-muted.text-muted-foreground",
+      "ratio": 4.4,
+      "px": 13,
+      "bold": false
+     },
+     {
+      "l": "bg-card-muted.text-muted-foreground",
+      "ratio": 4.4,
+      "px": 13,
+      "bold": false
+     },
+     {
+      "l": "bg-card-muted.text-muted-foreground",
+      "ratio": 4.4,
+      "px": 13,
+      "bold": false
+     },
+     {
+      "l": "bg-card-muted.text-muted-foreground",
+      "ratio": 4.4,
+      "px": 13,
+      "bold": false
+     },
+     {
+      "l": "bg-card-muted.text-muted-foreground",
+      "ratio": 4.4,
+      "px": 13,
+      "bold": false
+     },
+     {
+      "l": "bg-card-muted.text-muted-foreground",
+      "ratio": 4.4,
+      "px": 13,
+      "bold": false
+     },
+     {
+      "l": "bg-card-muted.text-muted-foreground",
+      "ratio": 4.4,
+      "px": 11,
+      "bold": false
+     },
+     {
+      "l": "bg-card-muted.text-muted-foreground",
+      "ratio": 4.4,
+      "px": 11,
+      "bold": false
+     },
+     {
+      "l": "bg-card-muted.text-muted-foreground",
+      "ratio": 4.4,
+      "px": 11,
+      "bold": false
+     },
+     {
+      "l": "bg-card-muted.text-muted-foreground",
+      "ratio": 4.4,
+      "px": 11,
+      "bold": false
+     },
+     {
+      "l": "bg-card-muted.text-muted-foreground",
+      "ratio": 4.4,
+      "px": 11,
+      "bold": false
+     },
+     {
+      "l": "bg-card-muted.text-muted-foreground",
+      "ratio": 4.4,
+      "px": 11,
+      "bold": false
+     },
+     {
+      "l": "bg-card-muted.text-muted-foreground",
+      "ratio": 4.4,
+      "px": 11,
+      "bold": false
+     }
+    ],
+    "contrastBelowAALarge": [],
+    "nav": {
+     "h": 77,
+     "scrollH": 76,
+     "scrollW": 811,
+     "clientW": 390
+    },
+    "contentW": 390,
+    "bodyText": "StorageGenie\nCatalog\nCapture\nSettings\nInbox\nPlanning\nChat\nAnalytics\nExpiry\nPhase 0 · local-first\nTotal: 7 items\nImport Asset\n[redacted]\nAll (7)\ndairy (2)\nmeat (2)\nmedicine (1)\nsoup (1)\nUncategorized (1)\nRecently Added\nName (A-Z)\nProcessing Status\nStandard Grid\nCompact Table\nSave search\nNone yet\nSource Only\n[redacted]\nmedicine\nSource Only\n[redacted]\nmeat\nSource Only\n[redacted]\nsoup\nSource Only\n[redacted]\ndairy\nSource Only\n[redacted]\ndairy\nSource Only\n[redacted]\nmeat\nSource Only\n[redacted]\nUncategorized"
+   },
+   "focus": [
+    {
+     "t": "a",
+     "l": "text-foreground.focus-ring",
+     "outline": "solid 2px",
+     "shadow": false,
+     "w": 123,
+     "h": 19,
+     "visible": true
+    },
+    {
+     "t": "a",
+     "l": "bg-primary.text-primary-foreground",
+     "outline": "solid 2px",
+     "shadow": false,
+     "w": 76,
+     "h": 27,
+     "visible": true
+    },
+    {
+     "t": "a",
+     "l": "text-foreground.focus-ring",
+     "outline": "solid 2px",
+     "shadow": false,
+     "w": 72,
+     "h": 27,
+     "visible": true
+    },
+    {
+     "t": "a",
+     "l": "text-foreground.focus-ring",
+     "outline": "solid 2px",
+     "shadow": false,
+     "w": 73,
+     "h": 27,
+     "visible": true
+    },
+    {
+     "t": "a",
+     "l": "text-foreground.focus-ring",
+     "outline": "solid 2px",
+     "shadow": false,
+     "w": 56,
+     "h": 27,
+     "visible": true
+    },
+    {
+     "t": "a",
+     "l": "text-foreground.focus-ring",
+     "outline": "solid 2px",
+     "shadow": false,
+     "w": 76,
+     "h": 27,
+     "visible": true
+    },
+    {
+     "t": "a",
+     "l": "text-foreground.focus-ring",
+     "outline": "solid 2px",
+     "shadow": false,
+     "w": 50,
+     "h": 27,
+     "visible": true
+    },
+    {
+     "t": "a",
+     "l": "text-foreground.focus-ring",
+     "outline": "solid 2px",
+     "shadow": false,
+     "w": 79,
+     "h": 27,
+     "visible": true
+    },
+    {
+     "t": "a",
+     "l": "text-foreground.focus-ring",
+     "outline": "solid 2px",
+     "shadow": false,
+     "w": 61,
+     "h": 27,
+     "visible": true
+    }
+   ],
+   "requests": [
+    {
+     "url": "http://127.0.0.1:8003/",
+     "method": "GET"
+    },
+    {
+     "url": "http://127.0.0.1:8003/assets/index-CYyuxefG.js",
+     "method": "GET"
+    },
+    {
+     "url": "http://127.0.0.1:8003/assets/index-DO0gjGV6.css",
+     "method": "GET"
+    },
+    {
+     "url": "https://storagegenie.dynv6.net/v1/households",
+     "method": "GET"
+    },
+    {
+     "url": "https://storagegenie.dynv6.net/v1/saved-searches?household_id=[redacted]",
+     "method": "GET"
+    },
+    {
+     "url": "https://storagegenie.dynv6.net/v1/assets/facets?household_id=[redacted]",
+     "method": "GET"
+    },
+    {
+     "url": "https://storagegenie.dynv6.net/v1/assets?household_id=[redacted]&limit=20",
+     "method": "GET"
+    },
+    {
+     "url": "https://storagegenie.dynv6.net/v1/evidence/[id]/thumb/256?household_id=[redacted]",
+     "method": "GET"
+    },
+    {
+     "url": "https://storagegenie.dynv6.net/v1/evidence/[id]/thumb/256?household_id=[redacted]",
+     "method": "GET"
+    },
+    {
+     "url": "https://storagegenie.dynv6.net/v1/evidence/[id]/thumb/256?household_id=[redacted]",
+     "method": "GET"
+    },
+    {
+     "url": "https://storagegenie.dynv6.net/v1/evidence/[id]/thumb/256?household_id=[redacted]",
+     "method": "GET"
+    },
+    {
+     "url": "https://storagegenie.dynv6.net/v1/evidence/[id]/thumb/256?household_id=[redacted]",
+     "method": "GET"
+    },
+    {
+     "url": "https://storagegenie.dynv6.net/v1/evidence/[id]/thumb/256?household_id=[redacted]",
+     "method": "GET"
+    },
+    {
+     "url": "https://storagegenie.dynv6.net/v1/evidence/[id]/thumb/256?household_id=[redacted]",
+     "method": "GET"
+    }
+   ],
+   "statuses": [
+    200
+   ]
+  },
+  {
+   "route": "/",
+   "slug": "catalog_834x1112",
+   "viewport": "834x1112",
+   "file": "catalog_834x1112.jpg",
+   "measure": {
+    "vw": 834,
+    "vh": 1112,
+    "scrollW": 819,
+    "scrollH": 1189,
+    "overflowX": -15,
+    "overflowY": 77,
+    "overflowOffenders": [],
+    "targetCount": 30,
+    "smallTargets": [
+     {
+      "t": "a",
+      "l": "text-foreground.focus-ring",
+      "w": 123,
+      "h": 19
+     }
+    ],
+    "smallTargetCount": 1,
+    "textSamples": 46,
+    "contrastBelowAA": [
+     {
+      "l": "Total loaded items: 7",
+      "ratio": 4.4,
+      "px": 12,
+      "bold": false
+     },
+     {
+      "l": "bg-card-muted.text-muted-foreground",
+      "ratio": 4.4,
+      "px": 13,
+      "bold": false
+     },
+     {
+      "l": "bg-card-muted.text-muted-foreground",
+      "ratio": 4.4,
+      "px": 13,
+      "bold": false
+     },
+     {
+      "l": "bg-card-muted.text-muted-foreground",
+      "ratio": 4.4,
+      "px": 13,
+      "bold": false
+     },
+     {
+      "l": "bg-card-muted.text-muted-foreground",
+      "ratio": 4.4,
+      "px": 13,
+      "bold": false
+     },
+     {
+      "l": "bg-card-muted.text-muted-foreground",
+      "ratio": 4.4,
+      "px": 13,
+      "bold": false
+     },
+     {
+      "l": "bg-card-muted.text-muted-foreground",
+      "ratio": 4.4,
+      "px": 13,
+      "bold": false
+     },
+     {
+      "l": "bg-card-muted.text-muted-foreground",
+      "ratio": 4.4,
+      "px": 11,
+      "bold": false
+     },
+     {
+      "l": "bg-card-muted.text-muted-foreground",
+      "ratio": 4.4,
+      "px": 11,
+      "bold": false
+     },
+     {
+      "l": "bg-card-muted.text-muted-foreground",
+      "ratio": 4.4,
+      "px": 11,
+      "bold": false
+     },
+     {
+      "l": "bg-card-muted.text-muted-foreground",
+      "ratio": 4.4,
+      "px": 11,
+      "bold": false
+     },
+     {
+      "l": "bg-card-muted.text-muted-foreground",
+      "ratio": 4.4,
+      "px": 11,
+      "bold": false
+     },
+     {
+      "l": "bg-card-muted.text-muted-foreground",
+      "ratio": 4.4,
+      "px": 11,
+      "bold": false
+     },
+     {
+      "l": "bg-card-muted.text-muted-foreground",
+      "ratio": 4.4,
+      "px": 11,
+      "bold": false
+     }
+    ],
+    "contrastBelowAALarge": [],
+    "nav": {
+     "h": 77,
+     "scrollH": 76,
+     "scrollW": 819,
+     "clientW": 819
+    },
+    "contentW": 819,
+    "bodyText": "StorageGenie\nCatalog\nCapture\nSettings\nInbox\nPlanning\nChat\nAnalytics\nExpiry\nPhase 0 · local-first\nTotal: 7 items\nImport Asset\n[redacted]\nAll (7)\ndairy (2)\nmeat (2)\nmedicine (1)\nsoup (1)\nUncategorized (1)\nRecently Added\nName (A-Z)\nProcessing Status\nStandard Grid\nCompact Table\nSave search\nNone yet\nSource Only\n[redacted]\nmedicine\nSource Only\n[redacted]\nmeat\nSource Only\n[redacted]\nsoup\nSource Only\n[redacted]\ndairy\nSource Only\n[redacted]\ndairy\nSource Only\n[redacted]\nmeat\nSource Only\n[redacted]\nUncategorized"
+   },
+   "focus": [
+    {
+     "t": "a",
+     "l": "text-foreground.focus-ring",
+     "outline": "solid 2px",
+     "shadow": false,
+     "w": 123,
+     "h": 19,
+     "visible": true
+    },
+    {
+     "t": "a",
+     "l": "bg-primary.text-primary-foreground",
+     "outline": "solid 2px",
+     "shadow": false,
+     "w": 76,
+     "h": 27,
+     "visible": true
+    },
+    {
+     "t": "a",
+     "l": "text-foreground.focus-ring",
+     "outline": "solid 2px",
+     "shadow": false,
+     "w": 72,
+     "h": 27,
+     "visible": true
+    },
+    {
+     "t": "a",
+     "l": "text-foreground.focus-ring",
+     "outline": "solid 2px",
+     "shadow": false,
+     "w": 73,
+     "h": 27,
+     "visible": true
+    },
+    {
+     "t": "a",
+     "l": "text-foreground.focus-ring",
+     "outline": "solid 2px",
+     "shadow": false,
+     "w": 56,
+     "h": 27,
+     "visible": true
+    },
+    {
+     "t": "a",
+     "l": "text-foreground.focus-ring",
+     "outline": "solid 2px",
+     "shadow": false,
+     "w": 76,
+     "h": 27,
+     "visible": true
+    },
+    {
+     "t": "a",
+     "l": "text-foreground.focus-ring",
+     "outline": "solid 2px",
+     "shadow": false,
+     "w": 50,
+     "h": 27,
+     "visible": true
+    },
+    {
+     "t": "a",
+     "l": "text-foreground.focus-ring",
+     "outline": "solid 2px",
+     "shadow": false,
+     "w": 79,
+     "h": 27,
+     "visible": true
+    },
+    {
+     "t": "a",
+     "l": "text-foreground.focus-ring",
+     "outline": "solid 2px",
+     "shadow": false,
+     "w": 61,
+     "h": 27,
+     "visible": true
+    }
+   ],
+   "requests": [
+    {
+     "url": "http://127.0.0.1:8003/",
+     "method": "GET"
+    },
+    {
+     "url": "http://127.0.0.1:8003/assets/index-CYyuxefG.js",
+     "method": "GET"
+    },
+    {
+     "url": "http://127.0.0.1:8003/assets/index-DO0gjGV6.css",
+     "method": "GET"
+    },
+    {
+     "url": "https://storagegenie.dynv6.net/v1/households",
+     "method": "GET"
+    },
+    {
+     "url": "https://storagegenie.dynv6.net/v1/saved-searches?household_id=[redacted]",
+     "method": "GET"
+    },
+    {
+     "url": "https://storagegenie.dynv6.net/v1/assets/facets?household_id=[redacted]",
+     "method": "GET"
+    },
+    {
+     "url": "https://storagegenie.dynv6.net/v1/assets?household_id=[redacted]&limit=20",
+     "method": "GET"
+    },
+    {
+     "url": "https://storagegenie.dynv6.net/v1/evidence/[id]/thumb/256?household_id=[redacted]",
+     "method": "GET"
+    },
+    {
+     "url": "https://storagegenie.dynv6.net/v1/evidence/[id]/thumb/256?household_id=[redacted]",
+     "method": "GET"
+    },
+    {
+     "url": "https://storagegenie.dynv6.net/v1/evidence/[id]/thumb/256?household_id=[redacted]",
+     "method": "GET"
+    },
+    {
+     "url": "https://storagegenie.dynv6.net/v1/evidence/[id]/thumb/256?household_id=[redacted]",
+     "method": "GET"
+    },
+    {
+     "url": "https://storagegenie.dynv6.net/v1/evidence/[id]/thumb/256?household_id=[redacted]",
+     "method": "GET"
+    },
+    {
+     "url": "https://storagegenie.dynv6.net/v1/evidence/[id]/thumb/256?household_id=[redacted]",
+     "method": "GET"
+    },
+    {
+     "url": "https://storagegenie.dynv6.net/v1/evidence/[id]/thumb/256?household_id=[redacted]",
+     "method": "GET"
+    }
+   ],
+   "statuses": [
+    200
+   ]
+  },
+  {
+   "route": "/",
+   "slug": "catalog_1440x900",
+   "viewport": "1440x900",
+   "file": "catalog_1440x900.jpg",
+   "measure": {
+    "vw": 1440,
+    "vh": 900,
+    "scrollW": 1425,
+    "scrollH": 952,
+    "overflowX": -15,
+    "overflowY": 52,
+    "overflowOffenders": [],
+    "targetCount": 30,
+    "smallTargets": [
+     {
+      "t": "a",
+      "l": "text-foreground.focus-ring",
+      "w": 123,
+      "h": 19
+     }
+    ],
+    "smallTargetCount": 1,
+    "textSamples": 46,
+    "contrastBelowAA": [
+     {
+      "l": "Total loaded items: 7",
+      "ratio": 4.4,
+      "px": 12,
+      "bold": false
+     },
+     {
+      "l": "bg-card-muted.text-muted-foreground",
+      "ratio": 4.4,
+      "px": 13,
+      "bold": false
+     },
+     {
+      "l": "bg-card-muted.text-muted-foreground",
+      "ratio": 4.4,
+      "px": 13,
+      "bold": false
+     },
+     {
+      "l": "bg-card-muted.text-muted-foreground",
+      "ratio": 4.4,
+      "px": 13,
+      "bold": false
+     },
+     {
+      "l": "bg-card-muted.text-muted-foreground",
+      "ratio": 4.4,
+      "px": 13,
+      "bold": false
+     },
+     {
+      "l": "bg-card-muted.text-muted-foreground",
+      "ratio": 4.4,
+      "px": 13,
+      "bold": false
+     },
+     {
+      "l": "bg-card-muted.text-muted-foreground",
+      "ratio": 4.4,
+      "px": 13,
+      "bold": false
+     },
+     {
+      "l": "bg-card-muted.text-muted-foreground",
+      "ratio": 4.4,
+      "px": 11,
+      "bold": false
+     },
+     {
+      "l": "bg-card-muted.text-muted-foreground",
+      "ratio": 4.4,
+      "px": 11,
+      "bold": false
+     },
+     {
+      "l": "bg-card-muted.text-muted-foreground",
+      "ratio": 4.4,
+      "px": 11,
+      "bold": false
+     },
+     {
+      "l": "bg-card-muted.text-muted-foreground",
+      "ratio": 4.4,
+      "px": 11,
+      "bold": false
+     },
+     {
+      "l": "bg-card-muted.text-muted-foreground",
+      "ratio": 4.4,
+      "px": 11,
+      "bold": false
+     },
+     {
+      "l": "bg-card-muted.text-muted-foreground",
+      "ratio": 4.4,
+      "px": 11,
+      "bold": false
+     },
+     {
+      "l": "bg-card-muted.text-muted-foreground",
+      "ratio": 4.4,
+      "px": 11,
+      "bold": false
+     }
+    ],
+    "contrastBelowAALarge": [],
+    "nav": {
+     "h": 52,
+     "scrollH": 51,
+     "scrollW": 1425,
+     "clientW": 1425
+    },
+    "contentW": 1100,
+    "bodyText": "StorageGenie\nCatalog\nCapture\nSettings\nInbox\nPlanning\nChat\nAnalytics\nExpiry\nPhase 0 · local-first\nTotal: 7 items\nImport Asset\n[redacted]\nAll (7)\ndairy (2)\nmeat (2)\nmedicine (1)\nsoup (1)\nUncategorized (1)\nRecently Added\nName (A-Z)\nProcessing Status\nStandard Grid\nCompact Table\nSave search\nNone yet\nSource Only\n[redacted]\nmedicine\nSource Only\n[redacted]\nmeat\nSource Only\n[redacted]\nsoup\nSource Only\n[redacted]\ndairy\nSource Only\n[redacted]\ndairy\nSource Only\n[redacted]\nmeat\nSource Only\n[redacted]\nUncategorized"
+   },
+   "focus": [
+    {
+     "t": "a",
+     "l": "text-foreground.focus-ring",
+     "outline": "solid 2px",
+     "shadow": false,
+     "w": 123,
+     "h": 19,
+     "visible": true
+    },
+    {
+     "t": "a",
+     "l": "bg-primary.text-primary-foreground",
+     "outline": "solid 2px",
+     "shadow": false,
+     "w": 76,
+     "h": 27,
+     "visible": true
+    },
+    {
+     "t": "a",
+     "l": "text-foreground.focus-ring",
+     "outline": "solid 2px",
+     "shadow": false,
+     "w": 72,
+     "h": 27,
+     "visible": true
+    },
+    {
+     "t": "a",
+     "l": "text-foreground.focus-ring",
+     "outline": "solid 2px",
+     "shadow": false,
+     "w": 73,
+     "h": 27,
+     "visible": true
+    },
+    {
+     "t": "a",
+     "l": "text-foreground.focus-ring",
+     "outline": "solid 2px",
+     "shadow": false,
+     "w": 56,
+     "h": 27,
+     "visible": true
+    },
+    {
+     "t": "a",
+     "l": "text-foreground.focus-ring",
+     "outline": "solid 2px",
+     "shadow": false,
+     "w": 76,
+     "h": 27,
+     "visible": true
+    },
+    {
+     "t": "a",
+     "l": "text-foreground.focus-ring",
+     "outline": "solid 2px",
+     "shadow": false,
+     "w": 50,
+     "h": 27,
+     "visible": true
+    },
+    {
+     "t": "a",
+     "l": "text-foreground.focus-ring",
+     "outline": "solid 2px",
+     "shadow": false,
+     "w": 79,
+     "h": 27,
+     "visible": true
+    },
+    {
+     "t": "a",
+     "l": "text-foreground.focus-ring",
+     "outline": "solid 2px",
+     "shadow": false,
+     "w": 61,
+     "h": 27,
+     "visible": true
+    }
+   ],
+   "requests": [
+    {
+     "url": "http://127.0.0.1:8003/",
+     "method": "GET"
+    },
+    {
+     "url": "http://127.0.0.1:8003/assets/index-CYyuxefG.js",
+     "method": "GET"
+    },
+    {
+     "url": "http://127.0.0.1:8003/assets/index-DO0gjGV6.css",
+     "method": "GET"
+    },
+    {
+     "url": "https://storagegenie.dynv6.net/v1/households",
+     "method": "GET"
+    },
+    {
+     "url": "https://storagegenie.dynv6.net/v1/saved-searches?household_id=[redacted]",
+     "method": "GET"
+    },
+    {
+     "url": "https://storagegenie.dynv6.net/v1/assets/facets?household_id=[redacted]",
+     "method": "GET"
+    },
+    {
+     "url": "https://storagegenie.dynv6.net/v1/assets?household_id=[redacted]&limit=20",
+     "method": "GET"
+    },
+    {
+     "url": "https://storagegenie.dynv6.net/v1/evidence/[id]/thumb/256?household_id=[redacted]",
+     "method": "GET"
+    },
+    {
+     "url": "https://storagegenie.dynv6.net/v1/evidence/[id]/thumb/256?household_id=[redacted]",
+     "method": "GET"
+    },
+    {
+     "url": "https://storagegenie.dynv6.net/v1/evidence/[id]/thumb/256?household_id=[redacted]",
+     "method": "GET"
+    },
+    {
+     "url": "https://storagegenie.dynv6.net/v1/evidence/[id]/thumb/256?household_id=[redacted]",
+     "method": "GET"
+    },
+    {
+     "url": "https://storagegenie.dynv6.net/v1/evidence/[id]/thumb/256?household_id=[redacted]",
+     "method": "GET"
+    },
+    {
+     "url": "https://storagegenie.dynv6.net/v1/evidence/[id]/thumb/256?household_id=[redacted]",
+     "method": "GET"
+    },
+    {
+     "url": "https://storagegenie.dynv6.net/v1/evidence/[id]/thumb/256?household_id=[redacted]",
+     "method": "GET"
+    }
+   ],
+   "statuses": [
+    200
+   ]
+  },
+  {
+   "route": "/capture",
+   "slug": "capture_390x844",
+   "viewport": "390x844",
+   "file": "capture_390x844.jpg",
+   "measure": {
+    "vw": 851,
+    "vh": 1842,
+    "scrollW": 851,
+    "scrollH": 1842,
+    "overflowX": 0,
+    "overflowY": 0,
+    "overflowOffenders": [],
+    "targetCount": 19,
+    "smallTargets": [
+     {
+      "t": "a",
+      "l": "text-foreground.focus-ring",
+      "w": 123,
+      "h": 19
+     },
+     {
+      "t": "input",
+      "l": "bg-background.text-foreground",
+      "w": 1,
+      "h": 1
+     },
+     {
+      "t": "input",
+      "l": "bg-background.text-foreground",
+      "w": 1,
+      "h": 1
+     }
+    ],
+    "smallTargetCount": 3,
+    "textSamples": 28,
+    "contrastBelowAA": [
+     {
+      "l": "text-muted-foreground",
+      "ratio": 4.4,
+      "px": 13,
+      "bold": false
+     }
+    ],
+    "contrastBelowAALarge": [],
+    "nav": {
+     "h": 77,
+     "scrollH": 76,
+     "scrollW": 851,
+     "clientW": 390
+    },
+    "contentW": 390,
+    "bodyText": "StorageGenie\nCatalog\nCapture\nSettings\nInbox\nPlanning\nChat\nAnalytics\nExpiry\nPhase 0 · local-first\nCapture — Manual Create\nHousehold \n[redacted]\nDisplay name (optional)\nLeft blank, we use the photo's filename\nAsset type\nunknown\nequipment\nproduct\ncomponent\nconsumable\ncontainer\ndocument\ncollection\nQuantity\nUnit\nCondition\nDrag & drop photos here, click to select, or paste\nChoose files\nTake a photo\nCreate asset"
+   },
+   "focus": [
+    {
+     "t": "a",
+     "l": "text-foreground.focus-ring",
+     "outline": "solid 2px",
+     "shadow": false,
+     "w": 123,
+     "h": 19,
+     "visible": true
+    },
+    {
+     "t": "a",
+     "l": "text-foreground.focus-ring",
+     "outline": "solid 2px",
+     "shadow": false,
+     "w": 70,
+     "h": 27,
+     "visible": true
+    },
+    {
+     "t": "a",
+     "l": "bg-primary.text-primary-foreground",
+     "outline": "solid 2px",
+     "shadow": false,
+     "w": 78,
+     "h": 27,
+     "visible": true
+    },
+    {
+     "t": "a",
+     "l": "text-foreground.focus-ring",
+     "outline": "solid 2px",
+     "shadow": false,
+     "w": 73,
+     "h": 27,
+     "visible": true
+    },
+    {
+     "t": "a",
+     "l": "text-foreground.focus-ring",
+     "outline": "solid 2px",
+     "shadow": false,
+     "w": 56,
+     "h": 27,
+     "visible": true
+    },
+    {
+     "t": "a",
+     "l": "text-foreground.focus-ring",
+     "outline": "solid 2px",
+     "shadow": false,
+     "w": 76,
+     "h": 27,
+     "visible": true
+    },
+    {
+     "t": "a",
+     "l": "text-foreground.focus-ring",
+     "outline": "solid 2px",
+     "shadow": false,
+     "w": 50,
+     "h": 27,
+     "visible": true
+    },
+    {
+     "t": "a",
+     "l": "text-foreground.focus-ring",
+     "outline": "solid 2px",
+     "shadow": false,
+     "w": 79,
+     "h": 27,
+     "visible": true
+    },
+    {
+     "t": "a",
+     "l": "text-foreground.focus-ring",
+     "outline": "solid 2px",
+     "shadow": false,
+     "w": 61,
+     "h": 27,
+     "visible": true
+    }
+   ],
+   "requests": [
+    {
+     "url": "http://127.0.0.1:8003/capture",
+     "method": "GET"
+    },
+    {
+     "url": "http://127.0.0.1:8003/assets/index-CYyuxefG.js",
+     "method": "GET"
+    },
+    {
+     "url": "http://127.0.0.1:8003/assets/index-DO0gjGV6.css",
+     "method": "GET"
+    },
+    {
+     "url": "https://storagegenie.dynv6.net/v1/households",
+     "method": "GET"
+    }
+   ],
+   "statuses": [
+    200
+   ]
+  },
+  {
+   "route": "/capture",
+   "slug": "capture_834x1112",
+   "viewport": "834x1112",
+   "file": "capture_834x1112.jpg",
+   "measure": {
+    "vw": 834,
+    "vh": 1112,
+    "scrollW": 851,
+    "scrollH": 1112,
+    "overflowX": 17,
+    "overflowY": 0,
+    "overflowOffenders": [
+     {
+      "t": "span",
+      "l": "text-muted-foreground",
+      "left": 818,
+      "right": 851
+     }
+    ],
+    "targetCount": 19,
+    "smallTargets": [
+     {
+      "t": "a",
+      "l": "text-foreground.focus-ring",
+      "w": 123,
+      "h": 19
+     },
+     {
+      "t": "input",
+      "l": "bg-background.text-foreground",
+      "w": 1,
+      "h": 1
+     },
+     {
+      "t": "input",
+      "l": "bg-background.text-foreground",
+      "w": 1,
+      "h": 1
+     }
+    ],
+    "smallTargetCount": 3,
+    "textSamples": 28,
+    "contrastBelowAA": [
+     {
+      "l": "text-muted-foreground",
+      "ratio": 4.4,
+      "px": 13,
+      "bold": false
+     }
+    ],
+    "contrastBelowAALarge": [],
+    "nav": {
+     "h": 77,
+     "scrollH": 76,
+     "scrollW": 851,
+     "clientW": 819
+    },
+    "contentW": 819,
+    "bodyText": "StorageGenie\nCatalog\nCapture\nSettings\nInbox\nPlanning\nChat\nAnalytics\nExpiry\nPhase 0 · local-first\nCapture — Manual Create\nHousehold \n[redacted]\nDisplay name (optional)\nLeft blank, we use the photo's filename\nAsset type\nunknown\nequipment\nproduct\ncomponent\nconsumable\ncontainer\ndocument\ncollection\nQuantity\nUnit\nCondition\nDrag & drop photos here, click to select, or paste\nChoose files\nTake a photo\nCreate asset"
+   },
+   "focus": [
+    {
+     "t": "a",
+     "l": "text-foreground.focus-ring",
+     "outline": "solid 2px",
+     "shadow": false,
+     "w": 123,
+     "h": 19,
+     "visible": true
+    },
+    {
+     "t": "a",
+     "l": "text-foreground.focus-ring",
+     "outline": "solid 2px",
+     "shadow": false,
+     "w": 70,
+     "h": 27,
+     "visible": true
+    },
+    {
+     "t": "a",
+     "l": "bg-primary.text-primary-foreground",
+     "outline": "solid 2px",
+     "shadow": false,
+     "w": 78,
+     "h": 27,
+     "visible": true
+    },
+    {
+     "t": "a",
+     "l": "text-foreground.focus-ring",
+     "outline": "solid 2px",
+     "shadow": false,
+     "w": 73,
+     "h": 27,
+     "visible": true
+    },
+    {
+     "t": "a",
+     "l": "text-foreground.focus-ring",
+     "outline": "solid 2px",
+     "shadow": false,
+     "w": 56,
+     "h": 27,
+     "visible": true
+    },
+    {
+     "t": "a",
+     "l": "text-foreground.focus-ring",
+     "outline": "solid 2px",
+     "shadow": false,
+     "w": 76,
+     "h": 27,
+     "visible": true
+    },
+    {
+     "t": "a",
+     "l": "text-foreground.focus-ring",
+     "outline": "solid 2px",
+     "shadow": false,
+     "w": 50,
+     "h": 27,
+     "visible": true
+    },
+    {
+     "t": "a",
+     "l": "text-foreground.focus-ring",
+     "outline": "solid 2px",
+     "shadow": false,
+     "w": 79,
+     "h": 27,
+     "visible": true
+    },
+    {
+     "t": "a",
+     "l": "text-foreground.focus-ring",
+     "outline": "solid 2px",
+     "shadow": false,
+     "w": 61,
+     "h": 27,
+     "visible": true
+    }
+   ],
+   "requests": [
+    {
+     "url": "http://127.0.0.1:8003/capture",
+     "method": "GET"
+    },
+    {
+     "url": "http://127.0.0.1:8003/assets/index-CYyuxefG.js",
+     "method": "GET"
+    },
+    {
+     "url": "http://127.0.0.1:8003/assets/index-DO0gjGV6.css",
+     "method": "GET"
+    },
+    {
+     "url": "https://storagegenie.dynv6.net/v1/households",
+     "method": "GET"
+    }
+   ],
+   "statuses": [
+    200
+   ]
+  },
+  {
+   "route": "/capture",
+   "slug": "capture_1440x900",
+   "viewport": "1440x900",
+   "file": "capture_1440x900.jpg",
+   "measure": {
+    "vw": 1440,
+    "vh": 900,
+    "scrollW": 1440,
+    "scrollH": 900,
+    "overflowX": 0,
+    "overflowY": 0,
+    "overflowOffenders": [],
+    "targetCount": 19,
+    "smallTargets": [
+     {
+      "t": "a",
+      "l": "text-foreground.focus-ring",
+      "w": 123,
+      "h": 19
+     },
+     {
+      "t": "input",
+      "l": "bg-background.text-foreground",
+      "w": 1,
+      "h": 1
+     },
+     {
+      "t": "input",
+      "l": "bg-background.text-foreground",
+      "w": 1,
+      "h": 1
+     }
+    ],
+    "smallTargetCount": 3,
+    "textSamples": 28,
+    "contrastBelowAA": [
+     {
+      "l": "text-muted-foreground",
+      "ratio": 4.4,
+      "px": 13,
+      "bold": false
+     }
+    ],
+    "contrastBelowAALarge": [],
+    "nav": {
+     "h": 57,
+     "scrollH": 56,
+     "scrollW": 1440,
+     "clientW": 1440
+    },
+    "contentW": 1100,
+    "bodyText": "StorageGenie\nCatalog\nCapture\nSettings\nInbox\nPlanning\nChat\nAnalytics\nExpiry\nPhase 0 · local-first\nCapture — Manual Create\nHousehold \n[redacted]\nDisplay name (optional)\nLeft blank, we use the photo's filename\nAsset type\nunknown\nequipment\nproduct\ncomponent\nconsumable\ncontainer\ndocument\ncollection\nQuantity\nUnit\nCondition\nDrag & drop photos here, click to select, or paste\nChoose files\nTake a photo\nCreate asset"
+   },
+   "focus": [
+    {
+     "t": "a",
+     "l": "text-foreground.focus-ring",
+     "outline": "solid 2px",
+     "shadow": false,
+     "w": 123,
+     "h": 19,
+     "visible": true
+    },
+    {
+     "t": "a",
+     "l": "text-foreground.focus-ring",
+     "outline": "solid 2px",
+     "shadow": false,
+     "w": 70,
+     "h": 27,
+     "visible": true
+    },
+    {
+     "t": "a",
+     "l": "bg-primary.text-primary-foreground",
+     "outline": "solid 2px",
+     "shadow": false,
+     "w": 78,
+     "h": 27,
+     "visible": true
+    },
+    {
+     "t": "a",
+     "l": "text-foreground.focus-ring",
+     "outline": "solid 2px",
+     "shadow": false,
+     "w": 73,
+     "h": 27,
+     "visible": true
+    },
+    {
+     "t": "a",
+     "l": "text-foreground.focus-ring",
+     "outline": "solid 2px",
+     "shadow": false,
+     "w": 56,
+     "h": 27,
+     "visible": true
+    },
+    {
+     "t": "a",
+     "l": "text-foreground.focus-ring",
+     "outline": "solid 2px",
+     "shadow": false,
+     "w": 76,
+     "h": 27,
+     "visible": true
+    },
+    {
+     "t": "a",
+     "l": "text-foreground.focus-ring",
+     "outline": "solid 2px",
+     "shadow": false,
+     "w": 50,
+     "h": 27,
+     "visible": true
+    },
+    {
+     "t": "a",
+     "l": "text-foreground.focus-ring",
+     "outline": "solid 2px",
+     "shadow": false,
+     "w": 79,
+     "h": 27,
+     "visible": true
+    },
+    {
+     "t": "a",
+     "l": "text-foreground.focus-ring",
+     "outline": "solid 2px",
+     "shadow": false,
+     "w": 61,
+     "h": 27,
+     "visible": true
+    }
+   ],
+   "requests": [
+    {
+     "url": "http://127.0.0.1:8003/capture",
+     "method": "GET"
+    },
+    {
+     "url": "http://127.0.0.1:8003/assets/index-CYyuxefG.js",
+     "method": "GET"
+    },
+    {
+     "url": "http://127.0.0.1:8003/assets/index-DO0gjGV6.css",
+     "method": "GET"
+    },
+    {
+     "url": "https://storagegenie.dynv6.net/v1/households",
+     "method": "GET"
+    }
+   ],
+   "statuses": [
+    200
+   ]
+  },
+  {
+   "route": "/settings",
+   "slug": "settings_390x844",
+   "viewport": "390x844",
+   "file": "settings_390x844.jpg",
+   "measure": {
+    "vw": 853,
+    "vh": 1846,
+    "scrollW": 853,
+    "scrollH": 1846,
+    "overflowX": 0,
+    "overflowY": 0,
+    "overflowOffenders": [],
+    "targetCount": 12,
+    "smallTargets": [
+     {
+      "t": "a",
+      "l": "text-foreground.focus-ring",
+      "w": 123,
+      "h": 19
+     },
+     {
+      "t": "select",
+      "l": "select",
+      "w": 196,
+      "h": 19
+     }
+    ],
+    "smallTargetCount": 2,
+    "textSamples": 16,
+    "contrastBelowAA": [],
+    "contrastBelowAALarge": [],
+    "nav": {
+     "h": 77,
+     "scrollH": 76,
+     "scrollW": 853,
+     "clientW": 390
+    },
+    "contentW": 390,
+    "bodyText": "StorageGenie\nCatalog\nCapture\nSettings\nInbox\nPlanning\nChat\nAnalytics\nExpiry\nPhase 0 · local-first\nSettings\n\nPhase 0 — household and connection settings. API base: https://storagegenie.dynv6.net\n\nAI model\n\nEffective model: deepseek-v4-flash-vision-exp\n\nAI model\ndeepseek-v4-flash-vision-exp\nClear household selection"
+   },
+   "focus": [],
+   "requests": [
+    {
+     "url": "http://127.0.0.1:8003/settings",
+     "method": "GET"
+    },
+    {
+     "url": "http://127.0.0.1:8003/assets/index-CYyuxefG.js",
+     "method": "GET"
+    },
+    {
+     "url": "http://127.0.0.1:8003/assets/index-DO0gjGV6.css",
+     "method": "GET"
+    },
+    {
+     "url": "https://storagegenie.dynv6.net/v1/settings/ai",
+     "method": "GET"
+    }
+   ],
+   "statuses": [
+    200
+   ]
+  },
+  {
+   "route": "/settings",
+   "slug": "settings_834x1112",
+   "viewport": "834x1112",
+   "file": "settings_834x1112.jpg",
+   "measure": {
+    "vw": 834,
+    "vh": 1112,
+    "scrollW": 853,
+    "scrollH": 1112,
+    "overflowX": 19,
+    "overflowY": 0,
+    "overflowOffenders": [
+     {
+      "t": "span",
+      "l": "text-muted-foreground",
+      "left": 820,
+      "right": 853
+     }
+    ],
+    "targetCount": 12,
+    "smallTargets": [
+     {
+      "t": "a",
+      "l": "text-foreground.focus-ring",
+      "w": 123,
+      "h": 19
+     },
+     {
+      "t": "select",
+      "l": "select",
+      "w": 196,
+      "h": 19
+     }
+    ],
+    "smallTargetCount": 2,
+    "textSamples": 16,
+    "contrastBelowAA": [],
+    "contrastBelowAALarge": [],
+    "nav": {
+     "h": 77,
+     "scrollH": 76,
+     "scrollW": 853,
+     "clientW": 819
+    },
+    "contentW": 819,
+    "bodyText": "StorageGenie\nCatalog\nCapture\nSettings\nInbox\nPlanning\nChat\nAnalytics\nExpiry\nPhase 0 · local-first\nSettings\n\nPhase 0 — household and connection settings. API base: https://storagegenie.dynv6.net\n\nAI model\n\nEffective model: deepseek-v4-flash-vision-exp\n\nAI model\ndeepseek-v4-flash-vision-exp\nClear household selection"
+   },
+   "focus": [],
+   "requests": [
+    {
+     "url": "http://127.0.0.1:8003/settings",
+     "method": "GET"
+    },
+    {
+     "url": "http://127.0.0.1:8003/assets/index-CYyuxefG.js",
+     "method": "GET"
+    },
+    {
+     "url": "http://127.0.0.1:8003/assets/index-DO0gjGV6.css",
+     "method": "GET"
+    },
+    {
+     "url": "https://storagegenie.dynv6.net/v1/settings/ai",
+     "method": "GET"
+    }
+   ],
+   "statuses": [
+    200
+   ]
+  },
+  {
+   "route": "/settings",
+   "slug": "settings_1440x900",
+   "viewport": "1440x900",
+   "file": "settings_1440x900.jpg",
+   "measure": {
+    "vw": 1440,
+    "vh": 900,
+    "scrollW": 1440,
+    "scrollH": 900,
+    "overflowX": 0,
+    "overflowY": 0,
+    "overflowOffenders": [],
+    "targetCount": 12,
+    "smallTargets": [
+     {
+      "t": "a",
+      "l": "text-foreground.focus-ring",
+      "w": 123,
+      "h": 19
+     },
+     {
+      "t": "select",
+      "l": "select",
+      "w": 196,
+      "h": 19
+     }
+    ],
+    "smallTargetCount": 2,
+    "textSamples": 16,
+    "contrastBelowAA": [],
+    "contrastBelowAALarge": [],
+    "nav": {
+     "h": 57,
+     "scrollH": 56,
+     "scrollW": 1440,
+     "clientW": 1440
+    },
+    "contentW": 1100,
+    "bodyText": "StorageGenie\nCatalog\nCapture\nSettings\nInbox\nPlanning\nChat\nAnalytics\nExpiry\nPhase 0 · local-first\nSettings\n\nPhase 0 — household and connection settings. API base: https://storagegenie.dynv6.net\n\nAI model\n\nEffective model: deepseek-v4-flash-vision-exp\n\nAI model\ndeepseek-v4-flash-vision-exp\nClear household selection"
+   },
+   "focus": [],
+   "requests": [
+    {
+     "url": "http://127.0.0.1:8003/settings",
+     "method": "GET"
+    },
+    {
+     "url": "http://127.0.0.1:8003/assets/index-CYyuxefG.js",
+     "method": "GET"
+    },
+    {
+     "url": "http://127.0.0.1:8003/assets/index-DO0gjGV6.css",
+     "method": "GET"
+    },
+    {
+     "url": "https://storagegenie.dynv6.net/v1/settings/ai",
+     "method": "GET"
+    }
+   ],
+   "statuses": [
+    200
+   ]
+  },
+  {
+   "route": "/inbox",
+   "slug": "inbox_390x844",
+   "viewport": "390x844",
+   "file": "inbox_390x844.jpg",
+   "measure": {
+    "vw": 850,
+    "vh": 1840,
+    "scrollW": 850,
+    "scrollH": 1840,
+    "overflowX": 0,
+    "overflowY": 0,
+    "overflowOffenders": [],
+    "targetCount": 23,
+    "smallTargets": [
+     {
+      "t": "a",
+      "l": "text-foreground.focus-ring",
+      "w": 123,
+      "h": 19
+     }
+    ],
+    "smallTargetCount": 1,
+    "textSamples": 54,
+    "contrastBelowAA": [],
+    "contrastBelowAALarge": [],
+    "nav": {
+     "h": 77,
+     "scrollH": 76,
+     "scrollW": 850,
+     "clientW": 390
+    },
+    "contentW": 390,
+    "bodyText": "StorageGenie\nCatalog\nCapture\nSettings\nInbox\nPlanning\nChat\nAnalytics\nExpiry\nPhase 0 · local-first\nInbox\nHousehold \nSelect household\n[redacted]\nImport jobs\nImport 01a131a0\nRUNNING\nimport · 2026-10-12T19:39:43\nImport 01a13115\nAWAITING_REVIEW\nimport · 2026-10-12T17:07:52\nImport 01a0da39\nCOMPLETED\nenrich · 2026-09-25T20:19:52\nImport 01a0cf79\nCOMPLETED\nenrich · 2026-09-23T18:14:10\nImport 01a0c4a1\nCOMPLETED\nimport · 2026-09-21T15:42:05\nImport 01a0c4a0\nCOMPLETED\nimport · 2026-09-21T15:41:00\nImport 01a0c481\nCOMPLETED\nimport · 2026-09-21T15:06:25\nImport 01a0c47f\nCOMPLETED\nimport · 2026-09-21T15:04:14\nImport 01a0c445\nRUNNING\nimport · 2026-09-21T14:01:05\nImport 01a0afaa\nAWAITING_REVIEW\nimport · 2026-09-17T13:59:18\nImport 01a0af4c\nFAILED\nimport · 2026-09-17T12:17:26\nSelected job\nSelect a job to see progress and errors.\nReview queue\nReview status \nOpen\nResolved\nAll\nNo open review tasks."
+   },
+   "focus": [
+    {
+     "t": "a",
+     "l": "text-foreground.focus-ring",
+     "outline": "solid 2px",
+     "shadow": false,
+     "w": 123,
+     "h": 19,
+     "visible": true
+    },
+    {
+     "t": "a",
+     "l": "text-foreground.focus-ring",
+     "outline": "solid 2px",
+     "shadow": false,
+     "w": 70,
+     "h": 27,
+     "visible": true
+    },
+    {
+     "t": "a",
+     "l": "text-foreground.focus-ring",
+     "outline": "solid 2px",
+     "shadow": false,
+     "w": 72,
+     "h": 27,
+     "visible": true
+    },
+    {
+     "t": "a",
+     "l": "text-foreground.focus-ring",
+     "outline": "solid 2px",
+     "shadow": false,
+     "w": 73,
+     "h": 27,
+     "visible": true
+    },
+    {
+     "t": "a",
+     "l": "bg-primary.text-primary-foreground",
+     "outline": "solid 2px",
+     "shadow": false,
+     "w": 61,
+     "h": 27,
+     "visible": true
+    },
+    {
+     "t": "a",
+     "l": "text-foreground.focus-ring",
+     "outline": "solid 2px",
+     "shadow": false,
+     "w": 76,
+     "h": 27,
+     "visible": true
+    },
+    {
+     "t": "a",
+     "l": "text-foreground.focus-ring",
+     "outline": "solid 2px",
+     "shadow": false,
+     "w": 50,
+     "h": 27,
+     "visible": true
+    },
+    {
+     "t": "a",
+     "l": "text-foreground.focus-ring",
+     "outline": "solid 2px",
+     "shadow": false,
+     "w": 79,
+     "h": 27,
+     "visible": true
+    },
+    {
+     "t": "a",
+     "l": "text-foreground.focus-ring",
+     "outline": "solid 2px",
+     "shadow": false,
+     "w": 61,
+     "h": 27,
+     "visible": true
+    }
+   ],
+   "requests": [
+    {
+     "url": "http://127.0.0.1:8003/inbox",
+     "method": "GET"
+    },
+    {
+     "url": "http://127.0.0.1:8003/assets/index-CYyuxefG.js",
+     "method": "GET"
+    },
+    {
+     "url": "http://127.0.0.1:8003/assets/index-DO0gjGV6.css",
+     "method": "GET"
+    },
+    {
+     "url": "https://storagegenie.dynv6.net/v1/households",
+     "method": "GET"
+    },
+    {
+     "url": "https://storagegenie.dynv6.net/v1/jobs?household_id=[redacted]",
+     "method": "GET"
+    },
+    {
+     "url": "https://storagegenie.dynv6.net/v1/review-tasks?household_id=[redacted]",
+     "method": "GET"
+    }
+   ],
+   "statuses": [
+    200
+   ]
+  },
+  {
+   "route": "/inbox",
+   "slug": "inbox_834x1112",
+   "viewport": "834x1112",
+   "file": "inbox_834x1112.jpg",
+   "measure": {
+    "vw": 834,
+    "vh": 1112,
+    "scrollW": 850,
+    "scrollH": 1143,
+    "overflowX": 16,
+    "overflowY": 31,
+    "overflowOffenders": [
+     {
+      "t": "span",
+      "l": "text-muted-foreground",
+      "left": 817,
+      "right": 850
+     }
+    ],
+    "targetCount": 23,
+    "smallTargets": [
+     {
+      "t": "a",
+      "l": "text-foreground.focus-ring",
+      "w": 123,
+      "h": 19
+     }
+    ],
+    "smallTargetCount": 1,
+    "textSamples": 54,
+    "contrastBelowAA": [],
+    "contrastBelowAALarge": [],
+    "nav": {
+     "h": 77,
+     "scrollH": 76,
+     "scrollW": 850,
+     "clientW": 819
+    },
+    "contentW": 819,
+    "bodyText": "StorageGenie\nCatalog\nCapture\nSettings\nInbox\nPlanning\nChat\nAnalytics\nExpiry\nPhase 0 · local-first\nInbox\nHousehold \nSelect household\n[redacted]\nImport jobs\nImport 01a131a0\nRUNNING\nimport · 2026-10-12T19:39:43\nImport 01a13115\nAWAITING_REVIEW\nimport · 2026-10-12T17:07:52\nImport 01a0da39\nCOMPLETED\nenrich · 2026-09-25T20:19:52\nImport 01a0cf79\nCOMPLETED\nenrich · 2026-09-23T18:14:10\nImport 01a0c4a1\nCOMPLETED\nimport · 2026-09-21T15:42:05\nImport 01a0c4a0\nCOMPLETED\nimport · 2026-09-21T15:41:00\nImport 01a0c481\nCOMPLETED\nimport · 2026-09-21T15:06:25\nImport 01a0c47f\nCOMPLETED\nimport · 2026-09-21T15:04:14\nImport 01a0c445\nRUNNING\nimport · 2026-09-21T14:01:05\nImport 01a0afaa\nAWAITING_REVIEW\nimport · 2026-09-17T13:59:18\nImport 01a0af4c\nFAILED\nimport · 2026-09-17T12:17:26\nSelected job\nSelect a job to see progress and errors.\nReview queue\nReview status \nOpen\nResolved\nAll\nNo open review tasks."
+   },
+   "focus": [
+    {
+     "t": "a",
+     "l": "text-foreground.focus-ring",
+     "outline": "solid 2px",
+     "shadow": false,
+     "w": 123,
+     "h": 19,
+     "visible": true
+    },
+    {
+     "t": "a",
+     "l": "text-foreground.focus-ring",
+     "outline": "solid 2px",
+     "shadow": false,
+     "w": 70,
+     "h": 27,
+     "visible": true
+    },
+    {
+     "t": "a",
+     "l": "text-foreground.focus-ring",
+     "outline": "solid 2px",
+     "shadow": false,
+     "w": 72,
+     "h": 27,
+     "visible": true
+    },
+    {
+     "t": "a",
+     "l": "text-foreground.focus-ring",
+     "outline": "solid 2px",
+     "shadow": false,
+     "w": 73,
+     "h": 27,
+     "visible": true
+    },
+    {
+     "t": "a",
+     "l": "bg-primary.text-primary-foreground",
+     "outline": "solid 2px",
+     "shadow": false,
+     "w": 61,
+     "h": 27,
+     "visible": true
+    },
+    {
+     "t": "a",
+     "l": "text-foreground.focus-ring",
+     "outline": "solid 2px",
+     "shadow": false,
+     "w": 76,
+     "h": 27,
+     "visible": true
+    },
+    {
+     "t": "a",
+     "l": "text-foreground.focus-ring",
+     "outline": "solid 2px",
+     "shadow": false,
+     "w": 50,
+     "h": 27,
+     "visible": true
+    },
+    {
+     "t": "a",
+     "l": "text-foreground.focus-ring",
+     "outline": "solid 2px",
+     "shadow": false,
+     "w": 79,
+     "h": 27,
+     "visible": true
+    },
+    {
+     "t": "a",
+     "l": "text-foreground.focus-ring",
+     "outline": "solid 2px",
+     "shadow": false,
+     "w": 61,
+     "h": 27,
+     "visible": true
+    }
+   ],
+   "requests": [
+    {
+     "url": "http://127.0.0.1:8003/inbox",
+     "method": "GET"
+    },
+    {
+     "url": "http://127.0.0.1:8003/assets/index-CYyuxefG.js",
+     "method": "GET"
+    },
+    {
+     "url": "http://127.0.0.1:8003/assets/index-DO0gjGV6.css",
+     "method": "GET"
+    },
+    {
+     "url": "https://storagegenie.dynv6.net/v1/households",
+     "method": "GET"
+    },
+    {
+     "url": "https://storagegenie.dynv6.net/v1/jobs?household_id=[redacted]",
+     "method": "GET"
+    },
+    {
+     "url": "https://storagegenie.dynv6.net/v1/review-tasks?household_id=[redacted]",
+     "method": "GET"
+    }
+   ],
+   "statuses": [
+    200
+   ]
+  },
+  {
+   "route": "/inbox",
+   "slug": "inbox_1440x900",
+   "viewport": "1440x900",
+   "file": "inbox_1440x900.jpg",
+   "measure": {
+    "vw": 1440,
+    "vh": 900,
+    "scrollW": 1425,
+    "scrollH": 1123,
+    "overflowX": -15,
+    "overflowY": 223,
+    "overflowOffenders": [],
+    "targetCount": 23,
+    "smallTargets": [
+     {
+      "t": "a",
+      "l": "text-foreground.focus-ring",
+      "w": 123,
+      "h": 19
+     }
+    ],
+    "smallTargetCount": 1,
+    "textSamples": 54,
+    "contrastBelowAA": [],
+    "contrastBelowAALarge": [],
+    "nav": {
+     "h": 57,
+     "scrollH": 56,
+     "scrollW": 1425,
+     "clientW": 1425
+    },
+    "contentW": 1100,
+    "bodyText": "StorageGenie\nCatalog\nCapture\nSettings\nInbox\nPlanning\nChat\nAnalytics\nExpiry\nPhase 0 · local-first\nInbox\nHousehold \nSelect household\n[redacted]\nImport jobs\nImport 01a131a0\nRUNNING\nimport · 2026-10-12T19:39:43\nImport 01a13115\nAWAITING_REVIEW\nimport · 2026-10-12T17:07:52\nImport 01a0da39\nCOMPLETED\nenrich · 2026-09-25T20:19:52\nImport 01a0cf79\nCOMPLETED\nenrich · 2026-09-23T18:14:10\nImport 01a0c4a1\nCOMPLETED\nimport · 2026-09-21T15:42:05\nImport 01a0c4a0\nCOMPLETED\nimport · 2026-09-21T15:41:00\nImport 01a0c481\nCOMPLETED\nimport · 2026-09-21T15:06:25\nImport 01a0c47f\nCOMPLETED\nimport · 2026-09-21T15:04:14\nImport 01a0c445\nRUNNING\nimport · 2026-09-21T14:01:05\nImport 01a0afaa\nAWAITING_REVIEW\nimport · 2026-09-17T13:59:18\nImport 01a0af4c\nFAILED\nimport · 2026-09-17T12:17:26\nSelected job\nSelect a job to see progress and errors.\nReview queue\nReview status \nOpen\nResolved\nAll\nNo open review tasks."
+   },
+   "focus": [
+    {
+     "t": "a",
+     "l": "text-foreground.focus-ring",
+     "outline": "solid 2px",
+     "shadow": false,
+     "w": 123,
+     "h": 19,
+     "visible": true
+    },
+    {
+     "t": "a",
+     "l": "text-foreground.focus-ring",
+     "outline": "solid 2px",
+     "shadow": false,
+     "w": 70,
+     "h": 27,
+     "visible": true
+    },
+    {
+     "t": "a",
+     "l": "text-foreground.focus-ring",
+     "outline": "solid 2px",
+     "shadow": false,
+     "w": 72,
+     "h": 27,
+     "visible": true
+    },
+    {
+     "t": "a",
+     "l": "text-foreground.focus-ring",
+     "outline": "solid 2px",
+     "shadow": false,
+     "w": 73,
+     "h": 27,
+     "visible": true
+    },
+    {
+     "t": "a",
+     "l": "bg-primary.text-primary-foreground",
+     "outline": "solid 2px",
+     "shadow": false,
+     "w": 61,
+     "h": 27,
+     "visible": true
+    },
+    {
+     "t": "a",
+     "l": "text-foreground.focus-ring",
+     "outline": "solid 2px",
+     "shadow": false,
+     "w": 76,
+     "h": 27,
+     "visible": true
+    },
+    {
+     "t": "a",
+     "l": "text-foreground.focus-ring",
+     "outline": "solid 2px",
+     "shadow": false,
+     "w": 50,
+     "h": 27,
+     "visible": true
+    },
+    {
+     "t": "a",
+     "l": "text-foreground.focus-ring",
+     "outline": "solid 2px",
+     "shadow": false,
+     "w": 79,
+     "h": 27,
+     "visible": true
+    },
+    {
+     "t": "a",
+     "l": "text-foreground.focus-ring",
+     "outline": "solid 2px",
+     "shadow": false,
+     "w": 61,
+     "h": 27,
+     "visible": true
+    }
+   ],
+   "requests": [
+    {
+     "url": "http://127.0.0.1:8003/inbox",
+     "method": "GET"
+    },
+    {
+     "url": "http://127.0.0.1:8003/assets/index-CYyuxefG.js",
+     "method": "GET"
+    },
+    {
+     "url": "http://127.0.0.1:8003/assets/index-DO0gjGV6.css",
+     "method": "GET"
+    },
+    {
+     "url": "https://storagegenie.dynv6.net/v1/households",
+     "method": "GET"
+    },
+    {
+     "url": "https://storagegenie.dynv6.net/v1/jobs?household_id=[redacted]",
+     "method": "GET"
+    },
+    {
+     "url": "https://storagegenie.dynv6.net/v1/review-tasks?household_id=[redacted]",
+     "method": "GET"
+    }
+   ],
+   "statuses": [
+    200
+   ]
+  },
+  {
+   "route": "/planning",
+   "slug": "planning_390x844",
+   "viewport": "390x844",
+   "file": "planning_390x844.jpg",
+   "measure": {
+    "vw": 853,
+    "vh": 1846,
+    "scrollW": 853,
+    "scrollH": 1846,
+    "overflowX": 0,
+    "overflowY": 0,
+    "overflowOffenders": [],
+    "targetCount": 13,
+    "smallTargets": [
+     {
+      "t": "a",
+      "l": "text-foreground.focus-ring",
+      "w": 123,
+      "h": 19
+     },
+     {
+      "t": "select",
+      "l": "select",
+      "w": 142,
+      "h": 19
+     },
+     {
+      "t": "button",
+      "l": "button",
+      "w": 95,
+      "h": 21
+     },
+     {
+      "t": "select",
+      "l": "select",
+      "w": 82,
+      "h": 19
+     }
+    ],
+    "smallTargetCount": 4,
+    "textSamples": 20,
+    "contrastBelowAA": [],
+    "contrastBelowAALarge": [],
+    "nav": {
+     "h": 77,
+     "scrollH": 76,
+     "scrollW": 853,
+     "clientW": 390
+    },
+    "contentW": 390,
+    "bodyText": "StorageGenie\nCatalog\nCapture\nSettings\nInbox\nPlanning\nChat\nAnalytics\nExpiry\nPhase 0 · local-first\nPlanning\nHousehold \nSelect household\n[redacted]\n\nSuggestions are proposals only. Confirming or dismissing one changes no asset, job or setting; nothing is ever executed automatically.\n\nRun planning\nStatus \nall\npending\nconfirmed\ndismissed\nNo planning suggestions yet."
+   },
+   "focus": [],
+   "requests": [
+    {
+     "url": "http://127.0.0.1:8003/planning",
+     "method": "GET"
+    },
+    {
+     "url": "http://127.0.0.1:8003/assets/index-CYyuxefG.js",
+     "method": "GET"
+    },
+    {
+     "url": "http://127.0.0.1:8003/assets/index-DO0gjGV6.css",
+     "method": "GET"
+    },
+    {
+     "url": "https://storagegenie.dynv6.net/v1/households",
+     "method": "GET"
+    },
+    {
+     "url": "https://storagegenie.dynv6.net/v1/planning/suggestions?household_id=[redacted]",
+     "method": "GET"
+    }
+   ],
+   "statuses": [
+    200
+   ]
+  },
+  {
+   "route": "/planning",
+   "slug": "planning_834x1112",
+   "viewport": "834x1112",
+   "file": "planning_834x1112.jpg",
+   "measure": {
+    "vw": 834,
+    "vh": 1112,
+    "scrollW": 853,
+    "scrollH": 1112,
+    "overflowX": 19,
+    "overflowY": 0,
+    "overflowOffenders": [
+     {
+      "t": "span",
+      "l": "text-muted-foreground",
+      "left": 820,
+      "right": 853
+     }
+    ],
+    "targetCount": 13,
+    "smallTargets": [
+     {
+      "t": "a",
+      "l": "text-foreground.focus-ring",
+      "w": 123,
+      "h": 19
+     },
+     {
+      "t": "select",
+      "l": "select",
+      "w": 142,
+      "h": 19
+     },
+     {
+      "t": "button",
+      "l": "button",
+      "w": 95,
+      "h": 21
+     },
+     {
+      "t": "select",
+      "l": "select",
+      "w": 82,
+      "h": 19
+     }
+    ],
+    "smallTargetCount": 4,
+    "textSamples": 20,
+    "contrastBelowAA": [],
+    "contrastBelowAALarge": [],
+    "nav": {
+     "h": 77,
+     "scrollH": 76,
+     "scrollW": 853,
+     "clientW": 819
+    },
+    "contentW": 819,
+    "bodyText": "StorageGenie\nCatalog\nCapture\nSettings\nInbox\nPlanning\nChat\nAnalytics\nExpiry\nPhase 0 · local-first\nPlanning\nHousehold \nSelect household\n[redacted]\n\nSuggestions are proposals only. Confirming or dismissing one changes no asset, job or setting; nothing is ever executed automatically.\n\nRun planning\nStatus \nall\npending\nconfirmed\ndismissed\nNo planning suggestions yet."
+   },
+   "focus": [],
+   "requests": [
+    {
+     "url": "http://127.0.0.1:8003/planning",
+     "method": "GET"
+    },
+    {
+     "url": "http://127.0.0.1:8003/assets/index-CYyuxefG.js",
+     "method": "GET"
+    },
+    {
+     "url": "http://127.0.0.1:8003/assets/index-DO0gjGV6.css",
+     "method": "GET"
+    },
+    {
+     "url": "https://storagegenie.dynv6.net/v1/households",
+     "method": "GET"
+    },
+    {
+     "url": "https://storagegenie.dynv6.net/v1/planning/suggestions?household_id=[redacted]",
+     "method": "GET"
+    }
+   ],
+   "statuses": [
+    200
+   ]
+  },
+  {
+   "route": "/planning",
+   "slug": "planning_1440x900",
+   "viewport": "1440x900",
+   "file": "planning_1440x900.jpg",
+   "measure": {
+    "vw": 1440,
+    "vh": 900,
+    "scrollW": 1440,
+    "scrollH": 900,
+    "overflowX": 0,
+    "overflowY": 0,
+    "overflowOffenders": [],
+    "targetCount": 13,
+    "smallTargets": [
+     {
+      "t": "a",
+      "l": "text-foreground.focus-ring",
+      "w": 123,
+      "h": 19
+     },
+     {
+      "t": "select",
+      "l": "select",
+      "w": 142,
+      "h": 19
+     },
+     {
+      "t": "button",
+      "l": "button",
+      "w": 95,
+      "h": 21
+     },
+     {
+      "t": "select",
+      "l": "select",
+      "w": 82,
+      "h": 19
+     }
+    ],
+    "smallTargetCount": 4,
+    "textSamples": 20,
+    "contrastBelowAA": [],
+    "contrastBelowAALarge": [],
+    "nav": {
+     "h": 57,
+     "scrollH": 56,
+     "scrollW": 1440,
+     "clientW": 1440
+    },
+    "contentW": 1100,
+    "bodyText": "StorageGenie\nCatalog\nCapture\nSettings\nInbox\nPlanning\nChat\nAnalytics\nExpiry\nPhase 0 · local-first\nPlanning\nHousehold \nSelect household\n[redacted]\n\nSuggestions are proposals only. Confirming or dismissing one changes no asset, job or setting; nothing is ever executed automatically.\n\nRun planning\nStatus \nall\npending\nconfirmed\ndismissed\nNo planning suggestions yet."
+   },
+   "focus": [],
+   "requests": [
+    {
+     "url": "http://127.0.0.1:8003/planning",
+     "method": "GET"
+    },
+    {
+     "url": "http://127.0.0.1:8003/assets/index-CYyuxefG.js",
+     "method": "GET"
+    },
+    {
+     "url": "http://127.0.0.1:8003/assets/index-DO0gjGV6.css",
+     "method": "GET"
+    },
+    {
+     "url": "https://storagegenie.dynv6.net/v1/households",
+     "method": "GET"
+    },
+    {
+     "url": "https://storagegenie.dynv6.net/v1/planning/suggestions?household_id=[redacted]",
+     "method": "GET"
+    }
+   ],
+   "statuses": [
+    200
+   ]
+  },
+  {
+   "route": "/chat",
+   "slug": "chat_390x844",
+   "viewport": "390x844",
+   "file": "chat_390x844.jpg",
+   "measure": {
+    "vw": 849,
+    "vh": 1836,
+    "scrollW": 849,
+    "scrollH": 1836,
+    "overflowX": 0,
+    "overflowY": 0,
+    "overflowOffenders": [],
+    "targetCount": 16,
+    "smallTargets": [
+     {
+      "t": "a",
+      "l": "text-foreground.focus-ring",
+      "w": 123,
+      "h": 19
+     }
+    ],
+    "smallTargetCount": 1,
+    "textSamples": 19,
+    "contrastBelowAA": [],
+    "contrastBelowAALarge": [],
+    "nav": {
+     "h": 77,
+     "scrollH": 76,
+     "scrollW": 848,
+     "clientW": 390
+    },
+    "contentW": 390,
+    "bodyText": "StorageGenie\nCatalog\nCapture\nSettings\nInbox\nPlanning\nChat\nAnalytics\nExpiry\nPhase 0 · local-first\nChat\nHousehold \nSelect household\n[redacted]\n\nAnswers are grounded in the selected category's catalogue only. Chat changes no asset, job or setting, and sends nothing on a schedule.\n\nCategory \nFood\nMedicine\nNo messages yet.\nSend\nLog correction"
+   },
+   "focus": [],
+   "requests": [
+    {
+     "url": "http://127.0.0.1:8003/chat",
+     "method": "GET"
+    },
+    {
+     "url": "http://127.0.0.1:8003/assets/index-CYyuxefG.js",
+     "method": "GET"
+    },
+    {
+     "url": "http://127.0.0.1:8003/assets/index-DO0gjGV6.css",
+     "method": "GET"
+    },
+    {
+     "url": "https://storagegenie.dynv6.net/v1/households",
+     "method": "GET"
+    }
+   ],
+   "statuses": [
+    200
+   ]
+  },
+  {
+   "route": "/chat",
+   "slug": "chat_834x1112",
+   "viewport": "834x1112",
+   "file": "chat_834x1112.jpg",
+   "measure": {
+    "vw": 834,
+    "vh": 1112,
+    "scrollW": 848,
+    "scrollH": 1112,
+    "overflowX": 14,
+    "overflowY": 0,
+    "overflowOffenders": [
+     {
+      "t": "span",
+      "l": "text-muted-foreground",
+      "left": 815,
+      "right": 848
+     }
+    ],
+    "targetCount": 16,
+    "smallTargets": [
+     {
+      "t": "a",
+      "l": "text-foreground.focus-ring",
+      "w": 123,
+      "h": 19
+     }
+    ],
+    "smallTargetCount": 1,
+    "textSamples": 19,
+    "contrastBelowAA": [],
+    "contrastBelowAALarge": [],
+    "nav": {
+     "h": 77,
+     "scrollH": 76,
+     "scrollW": 848,
+     "clientW": 819
+    },
+    "contentW": 819,
+    "bodyText": "StorageGenie\nCatalog\nCapture\nSettings\nInbox\nPlanning\nChat\nAnalytics\nExpiry\nPhase 0 · local-first\nChat\nHousehold \nSelect household\n[redacted]\n\nAnswers are grounded in the selected category's catalogue only. Chat changes no asset, job or setting, and sends nothing on a schedule.\n\nCategory \nFood\nMedicine\nNo messages yet.\nSend\nLog correction"
+   },
+   "focus": [],
+   "requests": [
+    {
+     "url": "http://127.0.0.1:8003/chat",
+     "method": "GET"
+    },
+    {
+     "url": "http://127.0.0.1:8003/assets/index-CYyuxefG.js",
+     "method": "GET"
+    },
+    {
+     "url": "http://127.0.0.1:8003/assets/index-DO0gjGV6.css",
+     "method": "GET"
+    },
+    {
+     "url": "https://storagegenie.dynv6.net/v1/households",
+     "method": "GET"
+    }
+   ],
+   "statuses": [
+    200
+   ]
+  },
+  {
+   "route": "/chat",
+   "slug": "chat_1440x900",
+   "viewport": "1440x900",
+   "file": "chat_1440x900.jpg",
+   "measure": {
+    "vw": 1440,
+    "vh": 900,
+    "scrollW": 1440,
+    "scrollH": 900,
+    "overflowX": 0,
+    "overflowY": 0,
+    "overflowOffenders": [],
+    "targetCount": 16,
+    "smallTargets": [
+     {
+      "t": "a",
+      "l": "text-foreground.focus-ring",
+      "w": 123,
+      "h": 19
+     }
+    ],
+    "smallTargetCount": 1,
+    "textSamples": 19,
+    "contrastBelowAA": [],
+    "contrastBelowAALarge": [],
+    "nav": {
+     "h": 57,
+     "scrollH": 56,
+     "scrollW": 1440,
+     "clientW": 1440
+    },
+    "contentW": 1100,
+    "bodyText": "StorageGenie\nCatalog\nCapture\nSettings\nInbox\nPlanning\nChat\nAnalytics\nExpiry\nPhase 0 · local-first\nChat\nHousehold \nSelect household\n[redacted]\n\nAnswers are grounded in the selected category's catalogue only. Chat changes no asset, job or setting, and sends nothing on a schedule.\n\nCategory \nFood\nMedicine\nNo messages yet.\nSend\nLog correction"
+   },
+   "focus": [],
+   "requests": [
+    {
+     "url": "http://127.0.0.1:8003/chat",
+     "method": "GET"
+    },
+    {
+     "url": "http://127.0.0.1:8003/assets/index-CYyuxefG.js",
+     "method": "GET"
+    },
+    {
+     "url": "http://127.0.0.1:8003/assets/index-DO0gjGV6.css",
+     "method": "GET"
+    },
+    {
+     "url": "https://storagegenie.dynv6.net/v1/households",
+     "method": "GET"
+    }
+   ],
+   "statuses": [
+    200
+   ]
+  },
+  {
+   "route": "/analytics",
+   "slug": "analytics_390x844",
+   "viewport": "390x844",
+   "file": "analytics_390x844.jpg",
+   "measure": {
+    "vw": 853,
+    "vh": 1846,
+    "scrollW": 853,
+    "scrollH": 1846,
+    "overflowX": 0,
+    "overflowY": 0,
+    "overflowOffenders": [],
+    "targetCount": 12,
+    "smallTargets": [
+     {
+      "t": "a",
+      "l": "text-foreground.focus-ring",
+      "w": 123,
+      "h": 19
+     },
+     {
+      "t": "select",
+      "l": "select",
+      "w": 142,
+      "h": 19
+     },
+     {
+      "t": "button",
+      "l": "button",
+      "w": 130,
+      "h": 21
+     }
+    ],
+    "smallTargetCount": 3,
+    "textSamples": 55,
+    "contrastBelowAA": [],
+    "contrastBelowAALarge": [],
+    "nav": {
+     "h": 77,
+     "scrollH": 76,
+     "scrollW": 853,
+     "clientW": 390
+    },
+    "contentW": 390,
+    "bodyText": "StorageGenie\nCatalog\nCapture\nSettings\nInbox\nPlanning\nChat\nAnalytics\nExpiry\nPhase 0 · local-first\nAnalytics\nHousehold \nSelect household\n[redacted]\n\nThese numbers are computed from your own recorded items. The summary is prose only — it is grounded in the numbers shown, takes no action, and is never refreshed automatically.\n\nAssets\nTotal\n7\nActive\n7\nExpiry urgency\nExpired\n0\nExpiring within 7 days\n0\nExpiring within 30 days\n0\nSafe (beyond 30 days)\n0\nNo active expiry date\n7\nCategories\nFood & beverages\n0\nMedicine/pharma\n0\nCosmetics/personal care\n0\nHousehold chemicals\n0\nDocuments/other\n0\nNon-perishable\n0\nUncategorized\n7\nSignals\nExpired still active\n0\nSuggestions pending\n0\nSuggestions confirmed\n0\nReview tasks open\n0\nGenerate summary"
+   },
+   "focus": [],
+   "requests": [
+    {
+     "url": "http://127.0.0.1:8003/analytics",
+     "method": "GET"
+    },
+    {
+     "url": "http://127.0.0.1:8003/assets/index-CYyuxefG.js",
+     "method": "GET"
+    },
+    {
+     "url": "http://127.0.0.1:8003/assets/index-DO0gjGV6.css",
+     "method": "GET"
+    },
+    {
+     "url": "https://storagegenie.dynv6.net/v1/households",
+     "method": "GET"
+    },
+    {
+     "url": "https://storagegenie.dynv6.net/v1/analytics/summary?household_id=[redacted]",
+     "method": "GET"
+    }
+   ],
+   "statuses": [
+    200
+   ]
+  },
+  {
+   "route": "/analytics",
+   "slug": "analytics_834x1112",
+   "viewport": "834x1112",
+   "file": "analytics_834x1112.jpg",
+   "measure": {
+    "vw": 834,
+    "vh": 1112,
+    "scrollW": 853,
+    "scrollH": 1112,
+    "overflowX": 19,
+    "overflowY": 0,
+    "overflowOffenders": [
+     {
+      "t": "span",
+      "l": "text-muted-foreground",
+      "left": 820,
+      "right": 853
+     }
+    ],
+    "targetCount": 12,
+    "smallTargets": [
+     {
+      "t": "a",
+      "l": "text-foreground.focus-ring",
+      "w": 123,
+      "h": 19
+     },
+     {
+      "t": "select",
+      "l": "select",
+      "w": 142,
+      "h": 19
+     },
+     {
+      "t": "button",
+      "l": "button",
+      "w": 130,
+      "h": 21
+     }
+    ],
+    "smallTargetCount": 3,
+    "textSamples": 55,
+    "contrastBelowAA": [],
+    "contrastBelowAALarge": [],
+    "nav": {
+     "h": 77,
+     "scrollH": 76,
+     "scrollW": 853,
+     "clientW": 819
+    },
+    "contentW": 819,
+    "bodyText": "StorageGenie\nCatalog\nCapture\nSettings\nInbox\nPlanning\nChat\nAnalytics\nExpiry\nPhase 0 · local-first\nAnalytics\nHousehold \nSelect household\n[redacted]\n\nThese numbers are computed from your own recorded items. The summary is prose only — it is grounded in the numbers shown, takes no action, and is never refreshed automatically.\n\nAssets\nTotal\n7\nActive\n7\nExpiry urgency\nExpired\n0\nExpiring within 7 days\n0\nExpiring within 30 days\n0\nSafe (beyond 30 days)\n0\nNo active expiry date\n7\nCategories\nFood & beverages\n0\nMedicine/pharma\n0\nCosmetics/personal care\n0\nHousehold chemicals\n0\nDocuments/other\n0\nNon-perishable\n0\nUncategorized\n7\nSignals\nExpired still active\n0\nSuggestions pending\n0\nSuggestions confirmed\n0\nReview tasks open\n0\nGenerate summary"
+   },
+   "focus": [],
+   "requests": [
+    {
+     "url": "http://127.0.0.1:8003/analytics",
+     "method": "GET"
+    },
+    {
+     "url": "http://127.0.0.1:8003/assets/index-CYyuxefG.js",
+     "method": "GET"
+    },
+    {
+     "url": "http://127.0.0.1:8003/assets/index-DO0gjGV6.css",
+     "method": "GET"
+    },
+    {
+     "url": "https://storagegenie.dynv6.net/v1/households",
+     "method": "GET"
+    },
+    {
+     "url": "https://storagegenie.dynv6.net/v1/analytics/summary?household_id=[redacted]",
+     "method": "GET"
+    }
+   ],
+   "statuses": [
+    200
+   ]
+  },
+  {
+   "route": "/analytics",
+   "slug": "analytics_1440x900",
+   "viewport": "1440x900",
+   "file": "analytics_1440x900.jpg",
+   "measure": {
+    "vw": 1440,
+    "vh": 900,
+    "scrollW": 1440,
+    "scrollH": 900,
+    "overflowX": 0,
+    "overflowY": 0,
+    "overflowOffenders": [],
+    "targetCount": 12,
+    "smallTargets": [
+     {
+      "t": "a",
+      "l": "text-foreground.focus-ring",
+      "w": 123,
+      "h": 19
+     },
+     {
+      "t": "select",
+      "l": "select",
+      "w": 142,
+      "h": 19
+     },
+     {
+      "t": "button",
+      "l": "button",
+      "w": 130,
+      "h": 21
+     }
+    ],
+    "smallTargetCount": 3,
+    "textSamples": 55,
+    "contrastBelowAA": [],
+    "contrastBelowAALarge": [],
+    "nav": {
+     "h": 57,
+     "scrollH": 56,
+     "scrollW": 1440,
+     "clientW": 1440
+    },
+    "contentW": 1100,
+    "bodyText": "StorageGenie\nCatalog\nCapture\nSettings\nInbox\nPlanning\nChat\nAnalytics\nExpiry\nPhase 0 · local-first\nAnalytics\nHousehold \nSelect household\n[redacted]\n\nThese numbers are computed from your own recorded items. The summary is prose only — it is grounded in the numbers shown, takes no action, and is never refreshed automatically.\n\nAssets\nTotal\n7\nActive\n7\nExpiry urgency\nExpired\n0\nExpiring within 7 days\n0\nExpiring within 30 days\n0\nSafe (beyond 30 days)\n0\nNo active expiry date\n7\nCategories\nFood & beverages\n0\nMedicine/pharma\n0\nCosmetics/personal care\n0\nHousehold chemicals\n0\nDocuments/other\n0\nNon-perishable\n0\nUncategorized\n7\nSignals\nExpired still active\n0\nSuggestions pending\n0\nSuggestions confirmed\n0\nReview tasks open\n0\nGenerate summary"
+   },
+   "focus": [],
+   "requests": [
+    {
+     "url": "http://127.0.0.1:8003/analytics",
+     "method": "GET"
+    },
+    {
+     "url": "http://127.0.0.1:8003/assets/index-CYyuxefG.js",
+     "method": "GET"
+    },
+    {
+     "url": "http://127.0.0.1:8003/assets/index-DO0gjGV6.css",
+     "method": "GET"
+    },
+    {
+     "url": "https://storagegenie.dynv6.net/v1/households",
+     "method": "GET"
+    },
+    {
+     "url": "https://storagegenie.dynv6.net/v1/analytics/summary?household_id=[redacted]",
+     "method": "GET"
+    }
+   ],
+   "statuses": [
+    200
+   ]
+  },
+  {
+   "route": "/expiry",
+   "slug": "expiry_390x844",
+   "viewport": "390x844",
+   "file": "expiry_390x844.jpg",
+   "measure": {
+    "vw": 850,
+    "vh": 1840,
+    "scrollW": 850,
+    "scrollH": 1840,
+    "overflowX": 0,
+    "overflowY": 0,
+    "overflowOffenders": [],
+    "targetCount": 12,
+    "smallTargets": [
+     {
+      "t": "a",
+      "l": "text-foreground.focus-ring",
+      "w": 123,
+      "h": 19
+     }
+    ],
+    "smallTargetCount": 1,
+    "textSamples": 25,
+    "contrastBelowAA": [],
+    "contrastBelowAALarge": [],
+    "nav": {
+     "h": 77,
+     "scrollH": 76,
+     "scrollW": 850,
+     "clientW": 390
+    },
+    "contentW": 390,
+    "bodyText": "StorageGenie\nCatalog\nCapture\nSettings\nInbox\nPlanning\nChat\nAnalytics\nExpiry\nPhase 0 · local-first\nExpiry\nCategory filter \nAll categories\nFood & beverages\nMedicine/pharma\nCosmetics/personal care\nHousehold chemicals\nDocuments/other\nNon-perishable\nHousehold \nSelect household\n[redacted]\n\nItems are grouped by the accepted expiry date each one carries, in blueprint urgency order. Filtering a category narrows the read on the server; the uncategorized count below comes from the served analytics summary and is never merged into the expiry stream.\n\nNo expiry items for this household.\nUncategorized\nItems outside the expiry stream (no accepted classification)\n7"
+   },
+   "focus": [],
+   "requests": [
+    {
+     "url": "http://127.0.0.1:8003/expiry",
+     "method": "GET"
+    },
+    {
+     "url": "http://127.0.0.1:8003/assets/index-CYyuxefG.js",
+     "method": "GET"
+    },
+    {
+     "url": "http://127.0.0.1:8003/assets/index-DO0gjGV6.css",
+     "method": "GET"
+    },
+    {
+     "url": "https://storagegenie.dynv6.net/v1/households",
+     "method": "GET"
+    },
+    {
+     "url": "https://storagegenie.dynv6.net/v1/taxonomy",
+     "method": "GET"
+    },
+    {
+     "url": "https://storagegenie.dynv6.net/v1/plugins/expiry-tracker/status?household_id=[redacted]",
+     "method": "GET"
+    },
+    {
+     "url": "https://storagegenie.dynv6.net/v1/analytics/summary?household_id=[redacted]",
+     "method": "GET"
+    }
+   ],
+   "statuses": [
+    200
+   ]
+  },
+  {
+   "route": "/expiry",
+   "slug": "expiry_834x1112",
+   "viewport": "834x1112",
+   "file": "expiry_834x1112.jpg",
+   "measure": {
+    "vw": 834,
+    "vh": 1112,
+    "scrollW": 850,
+    "scrollH": 1112,
+    "overflowX": 16,
+    "overflowY": 0,
+    "overflowOffenders": [
+     {
+      "t": "span",
+      "l": "text-muted-foreground",
+      "left": 817,
+      "right": 850
+     }
+    ],
+    "targetCount": 12,
+    "smallTargets": [
+     {
+      "t": "a",
+      "l": "text-foreground.focus-ring",
+      "w": 123,
+      "h": 19
+     }
+    ],
+    "smallTargetCount": 1,
+    "textSamples": 25,
+    "contrastBelowAA": [],
+    "contrastBelowAALarge": [],
+    "nav": {
+     "h": 77,
+     "scrollH": 76,
+     "scrollW": 850,
+     "clientW": 819
+    },
+    "contentW": 819,
+    "bodyText": "StorageGenie\nCatalog\nCapture\nSettings\nInbox\nPlanning\nChat\nAnalytics\nExpiry\nPhase 0 · local-first\nExpiry\nCategory filter \nAll categories\nFood & beverages\nMedicine/pharma\nCosmetics/personal care\nHousehold chemicals\nDocuments/other\nNon-perishable\nHousehold \nSelect household\n[redacted]\n\nItems are grouped by the accepted expiry date each one carries, in blueprint urgency order. Filtering a category narrows the read on the server; the uncategorized count below comes from the served analytics summary and is never merged into the expiry stream.\n\nNo expiry items for this household.\nUncategorized\nItems outside the expiry stream (no accepted classification)\n7"
+   },
+   "focus": [],
+   "requests": [
+    {
+     "url": "http://127.0.0.1:8003/expiry",
+     "method": "GET"
+    },
+    {
+     "url": "http://127.0.0.1:8003/assets/index-CYyuxefG.js",
+     "method": "GET"
+    },
+    {
+     "url": "http://127.0.0.1:8003/assets/index-DO0gjGV6.css",
+     "method": "GET"
+    },
+    {
+     "url": "https://storagegenie.dynv6.net/v1/households",
+     "method": "GET"
+    },
+    {
+     "url": "https://storagegenie.dynv6.net/v1/taxonomy",
+     "method": "GET"
+    },
+    {
+     "url": "https://storagegenie.dynv6.net/v1/plugins/expiry-tracker/status?household_id=[redacted]",
+     "method": "GET"
+    },
+    {
+     "url": "https://storagegenie.dynv6.net/v1/analytics/summary?household_id=[redacted]",
+     "method": "GET"
+    }
+   ],
+   "statuses": [
+    200
+   ]
+  },
+  {
+   "route": "/expiry",
+   "slug": "expiry_1440x900",
+   "viewport": "1440x900",
+   "file": "expiry_1440x900.jpg",
+   "measure": {
+    "vw": 1440,
+    "vh": 900,
+    "scrollW": 1440,
+    "scrollH": 900,
+    "overflowX": 0,
+    "overflowY": 0,
+    "overflowOffenders": [],
+    "targetCount": 12,
+    "smallTargets": [
+     {
+      "t": "a",
+      "l": "text-foreground.focus-ring",
+      "w": 123,
+      "h": 19
+     }
+    ],
+    "smallTargetCount": 1,
+    "textSamples": 25,
+    "contrastBelowAA": [],
+    "contrastBelowAALarge": [],
+    "nav": {
+     "h": 57,
+     "scrollH": 56,
+     "scrollW": 1440,
+     "clientW": 1440
+    },
+    "contentW": 1100,
+    "bodyText": "StorageGenie\nCatalog\nCapture\nSettings\nInbox\nPlanning\nChat\nAnalytics\nExpiry\nPhase 0 · local-first\nExpiry\nCategory filter \nAll categories\nFood & beverages\nMedicine/pharma\nCosmetics/personal care\nHousehold chemicals\nDocuments/other\nNon-perishable\nHousehold \nSelect household\n[redacted]\n\nItems are grouped by the accepted expiry date each one carries, in blueprint urgency order. Filtering a category narrows the read on the server; the uncategorized count below comes from the served analytics summary and is never merged into the expiry stream.\n\nNo expiry items for this household.\nUncategorized\nItems outside the expiry stream (no accepted classification)\n7"
+   },
+   "focus": [],
+   "requests": [
+    {
+     "url": "http://127.0.0.1:8003/expiry",
+     "method": "GET"
+    },
+    {
+     "url": "http://127.0.0.1:8003/assets/index-CYyuxefG.js",
+     "method": "GET"
+    },
+    {
+     "url": "http://127.0.0.1:8003/assets/index-DO0gjGV6.css",
+     "method": "GET"
+    },
+    {
+     "url": "https://storagegenie.dynv6.net/v1/households",
+     "method": "GET"
+    },
+    {
+     "url": "https://storagegenie.dynv6.net/v1/taxonomy",
+     "method": "GET"
+    },
+    {
+     "url": "https://storagegenie.dynv6.net/v1/plugins/expiry-tracker/status?household_id=[redacted]",
+     "method": "GET"
+    },
+    {
+     "url": "https://storagegenie.dynv6.net/v1/analytics/summary?household_id=[redacted]",
+     "method": "GET"
+    }
+   ],
+   "statuses": [
+    200
+   ]
+  },
+  {
+   "route": "/assets/[id]",
+   "slug": "asset_detail_390x844",
+   "viewport": "390x844",
+   "file": "asset_detail_390x844.jpg",
+   "measure": {
+    "vw": 846,
+    "vh": 1829,
+    "scrollW": 846,
+    "scrollH": 1829,
+    "overflowX": 0,
+    "overflowY": 0,
+    "overflowOffenders": [],
+    "targetCount": 21,
+    "smallTargets": [
+     {
+      "t": "a",
+      "l": "text-foreground.focus-ring",
+      "w": 123,
+      "h": 19
+     },
+     {
+      "t": "a",
+      "l": "text-link.focus-ring",
+      "w": 116,
+      "h": 15
+     },
+     {
+      "t": "input",
+      "l": "input",
+      "w": 253,
+      "h": 21
+     }
+    ],
+    "smallTargetCount": 3,
+    "textSamples": 82,
+    "contrastBelowAA": [
+     {
+      "l": "bg-muted.text-muted-foreground",
+      "ratio": 4.4,
+      "px": 13,
+      "bold": false
+     },
+     {
+      "l": "bg-card-muted.text-muted-foreground",
+      "ratio": 4.4,
+      "px": 11,
+      "bold": false
+     },
+     {
+      "l": "bg-muted.text-muted-foreground",
+      "ratio": 4.4,
+      "px": 13,
+      "bold": false
+     }
+    ],
+    "contrastBelowAALarge": [],
+    "nav": {
+     "h": 77,
+     "scrollH": 76,
+     "scrollW": 845,
+     "clientW": 390
+    },
+    "contentW": 390,
+    "bodyText": "StorageGenie\nCatalog\nCapture\nSettings\nInbox\nPlanning\nChat\nAnalytics\nExpiry\nPhase 0 · local-first\n← Back to catalog\n[redacted]\nEdit\nmedicine · ACTIVE · v1 · 01a0a029 · qty 20 comprimate\nEnrich\nLast measured spend: $0.00 · per-press cap $0.05\nLocations\nNo locations assigned\nAssign to location…\nKitchen\nRelated assets\nNo related assets\nSelect asset…\n[redacted]\n[redacted]\n[redacted]\n[redacted]\n[redacted]\n[redacted]\nrelated_to\ncontains\nLink\nEvidence\nThumbnail unavailable\nAttach evidence\nAssertions (provenance)\nField\tValue\tSource\tState\tConfidence\tEvidence\nasset_type\tmedicine\tdeterministic\tproposed\t—\t[id], 01\ncategory_proposed\tmedicine\tdeterministic\tproposed\t—\t[id], 01\ndisplay_name\t[redacted]\tdeterministic\taccepted\t—\t[id], 01\nquantity\t20\tdeterministic\tproposed\t—\t[id], 01\nstatus\tACTIVE\tdeterministic\taccepted\t—\t[id], 01\nunit\tcomprimate\tdeterministic\tproposed\t—\t[id], 01\nAudit history\nasset.create by import-runner — 2026-10-12T19:54:40.526247\nasset.accepted by import-runner — 2026-10-12T19:54:40.526355\nasset.lifecycle.created by import-runner — 2026-10-12T19:54:40.526410"
+   },
+   "focus": [],
+   "requests": [
+    {
+     "url": "http://127.0.0.1:8003/assets/[redacted]",
+     "method": "GET"
+    },
+    {
+     "url": "http://127.0.0.1:8003/assets/index-CYyuxefG.js",
+     "method": "GET"
+    },
+    {
+     "url": "http://127.0.0.1:8003/assets/index-DO0gjGV6.css",
+     "method": "GET"
+    },
+    {
+     "url": "https://storagegenie.dynv6.net/v1/assets/[redacted]?household_id=[redacted]",
+     "method": "GET"
+    },
+    {
+     "url": "https://storagegenie.dynv6.net/v1/locations?household_id=[redacted]",
+     "method": "GET"
+    },
+    {
+     "url": "https://storagegenie.dynv6.net/v1/assets/[redacted]/relations?household_id=[redacted]",
+     "method": "GET"
+    },
+    {
+     "url": "https://storagegenie.dynv6.net/v1/evidence/[id]/thumb/256?household_id=[redacted]",
+     "method": "GET"
+    },
+    {
+     "url": "https://storagegenie.dynv6.net/v1/evidence/[id]/thumb/256?household_id=[redacted]",
+     "method": "GET"
+    },
+    {
+     "url": "https://storagegenie.dynv6.net/v1/assets?household_id=[redacted]",
+     "method": "GET"
+    }
+   ],
+   "statuses": [
+    200,
+    404
+   ]
+  },
+  {
+   "route": "/assets/[id]",
+   "slug": "asset_detail_834x1112",
+   "viewport": "834x1112",
+   "file": "asset_detail_834x1112.jpg",
+   "measure": {
+    "vw": 834,
+    "vh": 1112,
+    "scrollW": 845,
+    "scrollH": 1124,
+    "overflowX": 11,
+    "overflowY": 12,
+    "overflowOffenders": [
+     {
+      "t": "span",
+      "l": "text-muted-foreground",
+      "left": 812,
+      "right": 845
+     }
+    ],
+    "targetCount": 21,
+    "smallTargets": [
+     {
+      "t": "a",
+      "l": "text-foreground.focus-ring",
+      "w": 123,
+      "h": 19
+     },
+     {
+      "t": "a",
+      "l": "text-link.focus-ring",
+      "w": 116,
+      "h": 15
+     },
+     {
+      "t": "input",
+      "l": "input",
+      "w": 253,
+      "h": 21
+     }
+    ],
+    "smallTargetCount": 3,
+    "textSamples": 82,
+    "contrastBelowAA": [
+     {
+      "l": "bg-muted.text-muted-foreground",
+      "ratio": 4.4,
+      "px": 13,
+      "bold": false
+     },
+     {
+      "l": "bg-card-muted.text-muted-foreground",
+      "ratio": 4.4,
+      "px": 11,
+      "bold": false
+     },
+     {
+      "l": "bg-muted.text-muted-foreground",
+      "ratio": 4.4,
+      "px": 13,
+      "bold": false
+     }
+    ],
+    "contrastBelowAALarge": [],
+    "nav": {
+     "h": 77,
+     "scrollH": 76,
+     "scrollW": 845,
+     "clientW": 819
+    },
+    "contentW": 819,
+    "bodyText": "StorageGenie\nCatalog\nCapture\nSettings\nInbox\nPlanning\nChat\nAnalytics\nExpiry\nPhase 0 · local-first\n← Back to catalog\n[redacted]\nEdit\nmedicine · ACTIVE · v1 · 01a0a029 · qty 20 comprimate\nEnrich\nLast measured spend: $0.00 · per-press cap $0.05\nLocations\nNo locations assigned\nAssign to location…\nKitchen\nRelated assets\nNo related assets\nSelect asset…\n[redacted]\n[redacted]\n[redacted]\n[redacted]\n[redacted]\n[redacted]\nrelated_to\ncontains\nLink\nEvidence\nThumbnail unavailable\nAttach evidence\nAssertions (provenance)\nField\tValue\tSource\tState\tConfidence\tEvidence\nasset_type\tmedicine\tdeterministic\tproposed\t—\t[id], 01\ncategory_proposed\tmedicine\tdeterministic\tproposed\t—\t[id], 01\ndisplay_name\t[redacted]\tdeterministic\taccepted\t—\t[id], 01\nquantity\t20\tdeterministic\tproposed\t—\t[id], 01\nstatus\tACTIVE\tdeterministic\taccepted\t—\t[id], 01\nunit\tcomprimate\tdeterministic\tproposed\t—\t[id], 01\nAudit history\nasset.create by import-runner — 2026-10-12T19:54:40.526247\nasset.accepted by import-runner — 2026-10-12T19:54:40.526355\nasset.lifecycle.created by import-runner — 2026-10-12T19:54:40.526410"
+   },
+   "focus": [],
+   "requests": [
+    {
+     "url": "http://127.0.0.1:8003/assets/[redacted]",
+     "method": "GET"
+    },
+    {
+     "url": "http://127.0.0.1:8003/assets/index-CYyuxefG.js",
+     "method": "GET"
+    },
+    {
+     "url": "http://127.0.0.1:8003/assets/index-DO0gjGV6.css",
+     "method": "GET"
+    },
+    {
+     "url": "https://storagegenie.dynv6.net/v1/assets/[redacted]?household_id=[redacted]",
+     "method": "GET"
+    },
+    {
+     "url": "https://storagegenie.dynv6.net/v1/evidence/[id]/thumb/256?household_id=[redacted]",
+     "method": "GET"
+    },
+    {
+     "url": "https://storagegenie.dynv6.net/v1/locations?household_id=[redacted]",
+     "method": "GET"
+    },
+    {
+     "url": "https://storagegenie.dynv6.net/v1/assets/[redacted]/relations?household_id=[redacted]",
+     "method": "GET"
+    },
+    {
+     "url": "https://storagegenie.dynv6.net/v1/evidence/[id]/thumb/256?household_id=[redacted]",
+     "method": "GET"
+    },
+    {
+     "url": "https://storagegenie.dynv6.net/v1/assets?household_id=[redacted]",
+     "method": "GET"
+    }
+   ],
+   "statuses": [
+    200,
+    404
+   ]
+  },
+  {
+   "route": "/assets/[id]",
+   "slug": "asset_detail_1440x900",
+   "viewport": "1440x900",
+   "file": "asset_detail_1440x900.jpg",
+   "measure": {
+    "vw": 1440,
+    "vh": 900,
+    "scrollW": 1425,
+    "scrollH": 1052,
+    "overflowX": -15,
+    "overflowY": 152,
+    "overflowOffenders": [],
+    "targetCount": 21,
+    "smallTargets": [
+     {
+      "t": "a",
+      "l": "text-foreground.focus-ring",
+      "w": 123,
+      "h": 19
+     },
+     {
+      "t": "a",
+      "l": "text-link.focus-ring",
+      "w": 116,
+      "h": 15
+     },
+     {
+      "t": "input",
+      "l": "input",
+      "w": 253,
+      "h": 21
+     }
+    ],
+    "smallTargetCount": 3,
+    "textSamples": 82,
+    "contrastBelowAA": [
+     {
+      "l": "bg-muted.text-muted-foreground",
+      "ratio": 4.4,
+      "px": 13,
+      "bold": false
+     },
+     {
+      "l": "bg-card-muted.text-muted-foreground",
+      "ratio": 4.4,
+      "px": 11,
+      "bold": false
+     },
+     {
+      "l": "bg-muted.text-muted-foreground",
+      "ratio": 4.4,
+      "px": 13,
+      "bold": false
+     }
+    ],
+    "contrastBelowAALarge": [],
+    "nav": {
+     "h": 57,
+     "scrollH": 56,
+     "scrollW": 1425,
+     "clientW": 1425
+    },
+    "contentW": 1100,
+    "bodyText": "StorageGenie\nCatalog\nCapture\nSettings\nInbox\nPlanning\nChat\nAnalytics\nExpiry\nPhase 0 · local-first\n← Back to catalog\n[redacted]\nEdit\nmedicine · ACTIVE · v1 · 01a0a029 · qty 20 comprimate\nEnrich\nLast measured spend: $0.00 · per-press cap $0.05\nLocations\nNo locations assigned\nAssign to location…\nKitchen\nRelated assets\nNo related assets\nSelect asset…\n[redacted]\n[redacted]\n[redacted]\n[redacted]\n[redacted]\n[redacted]\nrelated_to\ncontains\nLink\nEvidence\nThumbnail unavailable\nAttach evidence\nAssertions (provenance)\nField\tValue\tSource\tState\tConfidence\tEvidence\nasset_type\tmedicine\tdeterministic\tproposed\t—\t[id], 01\ncategory_proposed\tmedicine\tdeterministic\tproposed\t—\t[id], 01\ndisplay_name\t[redacted]\tdeterministic\taccepted\t—\t[id], 01\nquantity\t20\tdeterministic\tproposed\t—\t[id], 01\nstatus\tACTIVE\tdeterministic\taccepted\t—\t[id], 01\nunit\tcomprimate\tdeterministic\tproposed\t—\t[id], 01\nAudit history\nasset.create by import-runner — 2026-10-12T19:54:40.526247\nasset.accepted by import-runner — 2026-10-12T19:54:40.526355\nasset.lifecycle.created by import-runner — 2026-10-12T19:54:40.526410"
+   },
+   "focus": [],
+   "requests": [
+    {
+     "url": "http://127.0.0.1:8003/assets/[redacted]",
+     "method": "GET"
+    },
+    {
+     "url": "http://127.0.0.1:8003/assets/index-CYyuxefG.js",
+     "method": "GET"
+    },
+    {
+     "url": "http://127.0.0.1:8003/assets/index-DO0gjGV6.css",
+     "method": "GET"
+    },
+    {
+     "url": "https://storagegenie.dynv6.net/v1/assets/[redacted]?household_id=[redacted]",
+     "method": "GET"
+    },
+    {
+     "url": "https://storagegenie.dynv6.net/v1/evidence/[id]/thumb/256?household_id=[redacted]",
+     "method": "GET"
+    },
+    {
+     "url": "https://storagegenie.dynv6.net/v1/locations?household_id=[redacted]",
+     "method": "GET"
+    },
+    {
+     "url": "https://storagegenie.dynv6.net/v1/assets/[redacted]/relations?household_id=[redacted]",
+     "method": "GET"
+    },
+    {
+     "url": "https://storagegenie.dynv6.net/v1/evidence/[id]/thumb/256?household_id=[redacted]",
+     "method": "GET"
+    },
+    {
+     "url": "https://storagegenie.dynv6.net/v1/assets?household_id=[redacted]",
+     "method": "GET"
+    }
+   ],
+   "statuses": [
+    200,
+    404
+   ]
+  },
+  {
+   "route": "/review/[id]",
+   "slug": "review_390x844",
+   "viewport": "390x844",
+   "file": "review_390x844.jpg",
+   "measure": {
+    "vw": 846,
+    "vh": 1829,
+    "scrollW": 846,
+    "scrollH": 1829,
+    "overflowX": 0,
+    "overflowY": 0,
+    "overflowOffenders": [],
+    "targetCount": 23,
+    "smallTargets": [
+     {
+      "t": "a",
+      "l": "text-foreground.focus-ring",
+      "w": 123,
+      "h": 19
+     },
+     {
+      "t": "a",
+      "l": "text-link.focus-ring",
+      "w": 127,
+      "h": 19
+     },
+     {
+      "t": "button",
+      "l": "bg-primary.text-primary-foreground",
+      "w": 60,
+      "h": 23
+     }
+    ],
+    "smallTargetCount": 3,
+    "textSamples": 49,
+    "contrastBelowAA": [
+     {
+      "l": "bg-card-muted.text-muted-foreground",
+      "ratio": 4.4,
+      "px": 11,
+      "bold": false
+     },
+     {
+      "l": "bg-card-muted.text-muted-foreground",
+      "ratio": 4.4,
+      "px": 11,
+      "bold": false
+     }
+    ],
+    "contrastBelowAALarge": [],
+    "nav": {
+     "h": 77,
+     "scrollH": 76,
+     "scrollW": 845,
+     "clientW": 390
+    },
+    "contentW": 390,
+    "bodyText": "StorageGenie\nCatalog\nCapture\nSettings\nInbox\nPlanning\nChat\nAnalytics\nExpiry\nPhase 0 · local-first\n← Back to inbox\nReview workspace\nCandidate [redacted]\nState: edited · Job: [id]\nCandidate review\nPossible duplicates or collisions\nSimilar to asset [id] (distance 9)\nSimilar to asset [id] (distance 9)\nAcceptance is blocked until the open review task(s) are resolved.\nCandidate fields\ndisplay_name\nConfidence: Unknown · Source: deterministic\nasset_type\nConfidence: Unknown · Source: deterministic\nstatus\nConfidence: Unknown · Source: deterministic\ncategory_proposed\nConfidence: Unknown · Source: deterministic\nSource evidence\n[id]\n[id]\nThumbnail unavailable\n[id]\nThumbnail unavailable\n[id]\nAccept\nSave edits\nHold / Unknown\nReject\n\nAcceptance is blocked until the open review task(s) are resolved. View them in the Inbox.\n\nManual expiry entry\nExpiry evidence state: needs_evidence\nDate\nDate type\nExpiry date\nBest before\nUse by\nManufacture date\nPeriod after opening\nBatch/lot code\nSave expiry"
+   },
+   "focus": [
+    {
+     "t": "a",
+     "l": "text-foreground.focus-ring",
+     "outline": "solid 2px",
+     "shadow": false,
+     "w": 123,
+     "h": 19,
+     "visible": true
+    },
+    {
+     "t": "a",
+     "l": "text-foreground.focus-ring",
+     "outline": "solid 2px",
+     "shadow": false,
+     "w": 70,
+     "h": 27,
+     "visible": true
+    },
+    {
+     "t": "a",
+     "l": "text-foreground.focus-ring",
+     "outline": "solid 2px",
+     "shadow": false,
+     "w": 72,
+     "h": 27,
+     "visible": true
+    },
+    {
+     "t": "a",
+     "l": "text-foreground.focus-ring",
+     "outline": "solid 2px",
+     "shadow": false,
+     "w": 73,
+     "h": 27,
+     "visible": true
+    },
+    {
+     "t": "a",
+     "l": "text-foreground.focus-ring",
+     "outline": "solid 2px",
+     "shadow": false,
+     "w": 56,
+     "h": 27,
+     "visible": true
+    },
+    {
+     "t": "a",
+     "l": "text-foreground.focus-ring",
+     "outline": "solid 2px",
+     "shadow": false,
+     "w": 76,
+     "h": 27,
+     "visible": true
+    },
+    {
+     "t": "a",
+     "l": "text-foreground.focus-ring",
+     "outline": "solid 2px",
+     "shadow": false,
+     "w": 50,
+     "h": 27,
+     "visible": true
+    },
+    {
+     "t": "a",
+     "l": "text-foreground.focus-ring",
+     "outline": "solid 2px",
+     "shadow": false,
+     "w": 79,
+     "h": 27,
+     "visible": true
+    },
+    {
+     "t": "a",
+     "l": "text-foreground.focus-ring",
+     "outline": "solid 2px",
+     "shadow": false,
+     "w": 61,
+     "h": 27,
+     "visible": true
+    }
+   ],
+   "requests": [
+    {
+     "url": "http://127.0.0.1:8003/review/[redacted]",
+     "method": "GET"
+    },
+    {
+     "url": "http://127.0.0.1:8003/assets/index-CYyuxefG.js",
+     "method": "GET"
+    },
+    {
+     "url": "http://127.0.0.1:8003/assets/index-DO0gjGV6.css",
+     "method": "GET"
+    },
+    {
+     "url": "https://storagegenie.dynv6.net/v1/candidates/[redacted]?household_id=[redacted]",
+     "method": "GET"
+    },
+    {
+     "url": "https://storagegenie.dynv6.net/v1/review-tasks?household_id=[redacted]",
+     "method": "GET"
+    },
+    {
+     "url": "https://storagegenie.dynv6.net/v1/evidence/[id]/thumb/256?household_id=[redacted]",
+     "method": "GET"
+    },
+    {
+     "url": "https://storagegenie.dynv6.net/v1/evidence/[id]/thumb/256?household_id=[redacted]",
+     "method": "GET"
+    },
+    {
+     "url": "https://storagegenie.dynv6.net/v1/evidence/[id]/thumb/256?household_id=[redacted]",
+     "method": "GET"
+    },
+    {
+     "url": "https://storagegenie.dynv6.net/v1/evidence/[id]/thumb/256?household_id=[redacted]",
+     "method": "GET"
+    },
+    {
+     "url": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNiIgaGVpZ2h0PSIxNSIgdmlld0JveD0iMCAwIDI0IDI0Ij48cGF0aCBmaWxsPSJXaW5kb3dUZXh0IiBkPSJNMjAgM2gtMVYxaC0ydjJIN1YxSDV2Mkg0Yy0xLjEgMC0yIC45LTIgMnYxNmMwIDEuMS45IDIgMiAyaDE2YzEuMSAwIDItLjkgMi0yVjVjMC0xLjEtLjktMi0yLTJ6bTAgMThINFY4aDE2djEzeiIvPjxwYXRoIGZpbGw9Im5vbmUiIGQ9Ik0wIDBoMjR2MjRIMHoiLz48L3N2Zz4=",
+     "method": "GET"
+    },
+    {
+     "url": "https://storagegenie.dynv6.net/v1/assets/[id]?household_id=[redacted]",
+     "method": "GET"
+    }
+   ],
+   "statuses": [
+    200,
+    404
+   ]
+  },
+  {
+   "route": "/review/[id]",
+   "slug": "review_834x1112",
+   "viewport": "834x1112",
+   "file": "review_834x1112.jpg",
+   "measure": {
+    "vw": 834,
+    "vh": 1112,
+    "scrollW": 845,
+    "scrollH": 1272,
+    "overflowX": 11,
+    "overflowY": 160,
+    "overflowOffenders": [
+     {
+      "t": "span",
+      "l": "text-muted-foreground",
+      "left": 812,
+      "right": 845
+     }
+    ],
+    "targetCount": 23,
+    "smallTargets": [
+     {
+      "t": "a",
+      "l": "text-foreground.focus-ring",
+      "w": 123,
+      "h": 19
+     },
+     {
+      "t": "a",
+      "l": "text-link.focus-ring",
+      "w": 127,
+      "h": 19
+     },
+     {
+      "t": "button",
+      "l": "bg-primary.text-primary-foreground",
+      "w": 60,
+      "h": 23
+     },
+     {
+      "t": "a",
+      "l": "text-link.focus-ring",
+      "w": 190,
+      "h": 19
+     }
+    ],
+    "smallTargetCount": 4,
+    "textSamples": 49,
+    "contrastBelowAA": [
+     {
+      "l": "bg-card-muted.text-muted-foreground",
+      "ratio": 4.4,
+      "px": 11,
+      "bold": false
+     },
+     {
+      "l": "bg-card-muted.text-muted-foreground",
+      "ratio": 4.4,
+      "px": 11,
+      "bold": false
+     }
+    ],
+    "contrastBelowAALarge": [],
+    "nav": {
+     "h": 77,
+     "scrollH": 76,
+     "scrollW": 845,
+     "clientW": 819
+    },
+    "contentW": 819,
+    "bodyText": "StorageGenie\nCatalog\nCapture\nSettings\nInbox\nPlanning\nChat\nAnalytics\nExpiry\nPhase 0 · local-first\n← Back to inbox\nReview workspace\nCandidate [redacted]\nState: edited · Job: [id]\nCandidate review\nPossible duplicates or collisions\nSimilar to asset [id] (distance 9)\nSimilar to asset [id] (distance 9)\nAcceptance is blocked until the open review task(s) are resolved.\nCandidate fields\ndisplay_name\nConfidence: Unknown · Source: deterministic\nasset_type\nConfidence: Unknown · Source: deterministic\nstatus\nConfidence: Unknown · Source: deterministic\ncategory_proposed\nConfidence: Unknown · Source: deterministic\nSource evidence\n[id]\n[id]\nThumbnail unavailable\n[id]\nThumbnail unavailable\n[id]\nAccept\nSave edits\nHold / Unknown\nReject\n\nAcceptance is blocked until the open review task(s) are resolved. View them in the Inbox.\n\nManual expiry entry\nExpiry evidence state: needs_evidence\nDate\nDate type\nExpiry date\nBest before\nUse by\nManufacture date\nPeriod after opening\nBatch/lot code\nSave expiry"
+   },
+   "focus": [
+    {
+     "t": "a",
+     "l": "text-foreground.focus-ring",
+     "outline": "solid 2px",
+     "shadow": false,
+     "w": 123,
+     "h": 19,
+     "visible": true
+    },
+    {
+     "t": "a",
+     "l": "text-foreground.focus-ring",
+     "outline": "solid 2px",
+     "shadow": false,
+     "w": 70,
+     "h": 27,
+     "visible": true
+    },
+    {
+     "t": "a",
+     "l": "text-foreground.focus-ring",
+     "outline": "solid 2px",
+     "shadow": false,
+     "w": 72,
+     "h": 27,
+     "visible": true
+    },
+    {
+     "t": "a",
+     "l": "text-foreground.focus-ring",
+     "outline": "solid 2px",
+     "shadow": false,
+     "w": 73,
+     "h": 27,
+     "visible": true
+    },
+    {
+     "t": "a",
+     "l": "text-foreground.focus-ring",
+     "outline": "solid 2px",
+     "shadow": false,
+     "w": 56,
+     "h": 27,
+     "visible": true
+    },
+    {
+     "t": "a",
+     "l": "text-foreground.focus-ring",
+     "outline": "solid 2px",
+     "shadow": false,
+     "w": 76,
+     "h": 27,
+     "visible": true
+    },
+    {
+     "t": "a",
+     "l": "text-foreground.focus-ring",
+     "outline": "solid 2px",
+     "shadow": false,
+     "w": 50,
+     "h": 27,
+     "visible": true
+    },
+    {
+     "t": "a",
+     "l": "text-foreground.focus-ring",
+     "outline": "solid 2px",
+     "shadow": false,
+     "w": 79,
+     "h": 27,
+     "visible": true
+    },
+    {
+     "t": "a",
+     "l": "text-foreground.focus-ring",
+     "outline": "solid 2px",
+     "shadow": false,
+     "w": 61,
+     "h": 27,
+     "visible": true
+    }
+   ],
+   "requests": [
+    {
+     "url": "http://127.0.0.1:8003/review/[redacted]",
+     "method": "GET"
+    },
+    {
+     "url": "http://127.0.0.1:8003/assets/index-CYyuxefG.js",
+     "method": "GET"
+    },
+    {
+     "url": "http://127.0.0.1:8003/assets/index-DO0gjGV6.css",
+     "method": "GET"
+    },
+    {
+     "url": "https://storagegenie.dynv6.net/v1/candidates/[redacted]?household_id=[redacted]",
+     "method": "GET"
+    },
+    {
+     "url": "https://storagegenie.dynv6.net/v1/review-tasks?household_id=[redacted]",
+     "method": "GET"
+    },
+    {
+     "url": "https://storagegenie.dynv6.net/v1/evidence/[id]/thumb/256?household_id=[redacted]",
+     "method": "GET"
+    },
+    {
+     "url": "https://storagegenie.dynv6.net/v1/evidence/[id]/thumb/256?household_id=[redacted]",
+     "method": "GET"
+    },
+    {
+     "url": "https://storagegenie.dynv6.net/v1/evidence/[id]/thumb/256?household_id=[redacted]",
+     "method": "GET"
+    },
+    {
+     "url": "https://storagegenie.dynv6.net/v1/evidence/[id]/thumb/256?household_id=[redacted]",
+     "method": "GET"
+    },
+    {
+     "url": "https://storagegenie.dynv6.net/v1/assets/[id]?household_id=[redacted]",
+     "method": "GET"
+    },
+    {
+     "url": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNiIgaGVpZ2h0PSIxNSIgdmlld0JveD0iMCAwIDI0IDI0Ij48cGF0aCBmaWxsPSJXaW5kb3dUZXh0IiBkPSJNMjAgM2gtMVYxaC0ydjJIN1YxSDV2Mkg0Yy0xLjEgMC0yIC45LTIgMnYxNmMwIDEuMS45IDIgMiAyaDE2YzEuMSAwIDItLjkgMi0yVjVjMC0xLjEtLjktMi0yLTJ6bTAgMThINFY4aDE2djEzeiIvPjxwYXRoIGZpbGw9Im5vbmUiIGQ9Ik0wIDBoMjR2MjRIMHoiLz48L3N2Zz4=",
+     "method": "GET"
+    }
+   ],
+   "statuses": [
+    200,
+    404
+   ]
+  },
+  {
+   "route": "/review/[id]",
+   "slug": "review_1440x900",
+   "viewport": "1440x900",
+   "file": "review_1440x900.jpg",
+   "measure": {
+    "vw": 1440,
+    "vh": 900,
+    "scrollW": 1425,
+    "scrollH": 1002,
+    "overflowX": -15,
+    "overflowY": 102,
+    "overflowOffenders": [],
+    "targetCount": 23,
+    "smallTargets": [
+     {
+      "t": "a",
+      "l": "text-foreground.focus-ring",
+      "w": 123,
+      "h": 19
+     },
+     {
+      "t": "a",
+      "l": "text-link.focus-ring",
+      "w": 127,
+      "h": 19
+     },
+     {
+      "t": "button",
+      "l": "bg-primary.text-primary-foreground",
+      "w": 60,
+      "h": 23
+     },
+     {
+      "t": "a",
+      "l": "text-link.focus-ring",
+      "w": 190,
+      "h": 19
+     }
+    ],
+    "smallTargetCount": 4,
+    "textSamples": 49,
+    "contrastBelowAA": [
+     {
+      "l": "bg-card-muted.text-muted-foreground",
+      "ratio": 4.4,
+      "px": 11,
+      "bold": false
+     },
+     {
+      "l": "bg-card-muted.text-muted-foreground",
+      "ratio": 4.4,
+      "px": 11,
+      "bold": false
+     }
+    ],
+    "contrastBelowAALarge": [],
+    "nav": {
+     "h": 57,
+     "scrollH": 56,
+     "scrollW": 1425,
+     "clientW": 1425
+    },
+    "contentW": 1100,
+    "bodyText": "StorageGenie\nCatalog\nCapture\nSettings\nInbox\nPlanning\nChat\nAnalytics\nExpiry\nPhase 0 · local-first\n← Back to inbox\nReview workspace\nCandidate [redacted]\nState: edited · Job: [id]\nCandidate review\nPossible duplicates or collisions\nSimilar to asset [id] (distance 9)\nSimilar to asset [id] (distance 9)\nAcceptance is blocked until the open review task(s) are resolved.\nCandidate fields\ndisplay_name\nConfidence: Unknown · Source: deterministic\nasset_type\nConfidence: Unknown · Source: deterministic\nstatus\nConfidence: Unknown · Source: deterministic\ncategory_proposed\nConfidence: Unknown · Source: deterministic\nSource evidence\n[id]\n[id]\nThumbnail unavailable\n[id]\nThumbnail unavailable\n[id]\nAccept\nSave edits\nHold / Unknown\nReject\n\nAcceptance is blocked until the open review task(s) are resolved. View them in the Inbox.\n\nManual expiry entry\nExpiry evidence state: needs_evidence\nDate\nDate type\nExpiry date\nBest before\nUse by\nManufacture date\nPeriod after opening\nBatch/lot code\nSave expiry"
+   },
+   "focus": [
+    {
+     "t": "a",
+     "l": "text-foreground.focus-ring",
+     "outline": "solid 2px",
+     "shadow": false,
+     "w": 123,
+     "h": 19,
+     "visible": true
+    },
+    {
+     "t": "a",
+     "l": "text-foreground.focus-ring",
+     "outline": "solid 2px",
+     "shadow": false,
+     "w": 70,
+     "h": 27,
+     "visible": true
+    },
+    {
+     "t": "a",
+     "l": "text-foreground.focus-ring",
+     "outline": "solid 2px",
+     "shadow": false,
+     "w": 72,
+     "h": 27,
+     "visible": true
+    },
+    {
+     "t": "a",
+     "l": "text-foreground.focus-ring",
+     "outline": "solid 2px",
+     "shadow": false,
+     "w": 73,
+     "h": 27,
+     "visible": true
+    },
+    {
+     "t": "a",
+     "l": "text-foreground.focus-ring",
+     "outline": "solid 2px",
+     "shadow": false,
+     "w": 56,
+     "h": 27,
+     "visible": true
+    },
+    {
+     "t": "a",
+     "l": "text-foreground.focus-ring",
+     "outline": "solid 2px",
+     "shadow": false,
+     "w": 76,
+     "h": 27,
+     "visible": true
+    },
+    {
+     "t": "a",
+     "l": "text-foreground.focus-ring",
+     "outline": "solid 2px",
+     "shadow": false,
+     "w": 50,
+     "h": 27,
+     "visible": true
+    },
+    {
+     "t": "a",
+     "l": "text-foreground.focus-ring",
+     "outline": "solid 2px",
+     "shadow": false,
+     "w": 79,
+     "h": 27,
+     "visible": true
+    },
+    {
+     "t": "a",
+     "l": "text-foreground.focus-ring",
+     "outline": "solid 2px",
+     "shadow": false,
+     "w": 61,
+     "h": 27,
+     "visible": true
+    }
+   ],
+   "requests": [
+    {
+     "url": "http://127.0.0.1:8003/review/[redacted]",
+     "method": "GET"
+    },
+    {
+     "url": "http://127.0.0.1:8003/assets/index-CYyuxefG.js",
+     "method": "GET"
+    },
+    {
+     "url": "http://127.0.0.1:8003/assets/index-DO0gjGV6.css",
+     "method": "GET"
+    },
+    {
+     "url": "https://storagegenie.dynv6.net/v1/candidates/[redacted]?household_id=[redacted]",
+     "method": "GET"
+    },
+    {
+     "url": "https://storagegenie.dynv6.net/v1/review-tasks?household_id=[redacted]",
+     "method": "GET"
+    },
+    {
+     "url": "https://storagegenie.dynv6.net/v1/evidence/[id]/thumb/256?household_id=[redacted]",
+     "method": "GET"
+    },
+    {
+     "url": "https://storagegenie.dynv6.net/v1/evidence/[id]/thumb/256?household_id=[redacted]",
+     "method": "GET"
+    },
+    {
+     "url": "https://storagegenie.dynv6.net/v1/evidence/[id]/thumb/256?household_id=[redacted]",
+     "method": "GET"
+    },
+    {
+     "url": "https://storagegenie.dynv6.net/v1/evidence/[id]/thumb/256?household_id=[redacted]",
+     "method": "GET"
+    },
+    {
+     "url": "https://storagegenie.dynv6.net/v1/assets/[id]?household_id=[redacted]",
+     "method": "GET"
+    },
+    {
+     "url": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNiIgaGVpZ2h0PSIxNSIgdmlld0JveD0iMCAwIDI0IDI0Ij48cGF0aCBmaWxsPSJXaW5kb3dUZXh0IiBkPSJNMjAgM2gtMVYxaC0ydjJIN1YxSDV2Mkg0Yy0xLjEgMC0yIC45LTIgMnYxNmMwIDEuMS45IDIgMiAyaDE2YzEuMSAwIDItLjkgMi0yVjVjMC0xLjEtLjktMi0yLTJ6bTAgMThINFY4aDE2djEzeiIvPjxwYXRoIGZpbGw9Im5vbmUiIGQ9Ik0wIDBoMjR2MjRIMHoiLz48L3N2Zz4=",
+     "method": "GET"
+    }
+   ],
+   "statuses": [
+    200,
+    404
+   ]
+  }
+ ]
+}

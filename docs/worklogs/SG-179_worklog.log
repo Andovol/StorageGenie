@@ -1,0 +1,12 @@
+SG-179 worklog (append-only, UTC)
+2026-10-13T13:09:44Z start health ok (curl 127.0.0.1:8003/v1/health {"status":"ok","db":"ok","storage":"ok"}); contract 0.46.0 RULES 487841b1... verified at /home/andrei/storagegenie-contract
+13:10 base 06ff99824c824257b23ed2aad673845d0b74fa46 automation clean; README/STATE/register/decision/SG-175 audit read
+13:11 chrome-headless-shell (playwright cache, host tool) chosen after /usr/bin/google-chrome crashpad failure; no project dependency added; raw-CDP harness /tmp/opencode/sg179/cdp.mjs
+13:14 read-only prod GETs: 1 household, 7 assets (5+2 pages), 11 jobs (RUNNING/AWAITING_REVIEW/COMPLETED/FAILED), 8 review tasks (candidate.multi_item, expiry.manual_entry); values kept uncommitted, redaction list local
+13:20 deployed-bundle browser audit: 10 routes x 3 viewports (390x844, 834x1112, 1440x900); API GETs fulfilled from loopback 8003, non-GET blocked 405; capture set out/ then masked set out-masked/
+13:22 source grep: only production frontend import /run caller is AssetImportModal.tsx:140 (checked branch); capture file inputs differ manual (image/*,.pdf + capture=environment) vs import modal (image/png,image/jpeg,image/webp)
+13:26 unauth format: bundle rendered with public API failing -> "No households" silent state
+13:29 backend isolated probe docs/worklogs/SG-179_probe.py: first run exposed missing-original quarantine (kept as failure-path), fixed fixture file -> PROBE_OK 40 checks
+13:30 focused tests: vitest probe+4 named files; one probe harness misuse fixed (screen.unmount -> view.unmount); fe regression 52 passed + probe 1 passed; backend pytest import_jobs/candidate_read/plugin_expiry 19 passed
+13:33 transient probe test removed from frontend tree; source preserved at docs/worklogs/SG-179_inbox_probe.test.tsx
+13:36 masked screenshot recapture (text transparent, images blurred) for privacy-safe committed pixels

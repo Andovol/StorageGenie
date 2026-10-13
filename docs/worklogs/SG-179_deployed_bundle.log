@@ -1,0 +1,12 @@
+[deployed-bundle] SG-179 served-bytes identity, read-only observation 2026-10-13
+[cmd] curl -s http://127.0.0.1:8003/ -o dep/index.html
+[out] sha256 2f035becd05b63e226af82e2e8fe60c8f3b5effb9f37e49dd95a2265c4da0d55  size 944
+[cmd] curl -s http://127.0.0.1:8003/assets/index-CYyuxefG.js -o dep/main.js
+[out] sha256 1b4680a0eddadff3c95a64b6bc00d744764d127a72cd5690ebea948b7664a29d  size 322255
+[cmd] curl -s http://127.0.0.1:8003/assets/index-*.css
+[out] sha256 37b25dbdd4b0ecfdedb8255bc7f8af286726334e95a1a3a9e85b9ba381b3d57c
+[marker] 'Acceptance is blocked until the open review task(s) are resolved.' present in served main.js (count 1) -> pre-SG-175 dedup-alert reason still served
+[marker] rendered deployed review page shows the blocked reason inside the dedup alert (SG-172-era behaviour); local source at 06ff998 removed that duplicate (diff 803cf52..06ff998, CandidateCard.tsx)
+[public-edge] curl -sI https://storagegenie.dynv6.net/ -> HTTP/2 401, www-authenticate: Basic realm="StorageGenie Restricted" (nginx/1.24.0); no credentials sought or used
+[unauth-render] deployed bundle loaded on loopback with no API substitution: API calls to the baked public base fail; UI silently shows "No households" and "Total: 0 items" (no error state), env/text captured in SG-179_browser_unauth_results.json
+[provenance] loopback 127.0.0.1:8003 serves the same container that nginx proxies at the public hostname; container/image identity remains UNVERIFIED (known-excluded Docker read, per packet)

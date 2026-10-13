@@ -1,0 +1,231 @@
+{
+ "mode": "unauth",
+ "version": "HeadlessChrome/149.0.7827.55",
+ "results": [
+  {
+   "route": "/",
+   "slug": "catalog_unauth_390x844",
+   "viewport": "390x844",
+   "file": "catalog_unauth_390x844.jpg",
+   "measure": {
+    "vw": 811,
+    "vh": 1756,
+    "scrollW": 811,
+    "scrollH": 1756,
+    "overflowX": 0,
+    "overflowY": 0,
+    "overflowOffenders": [],
+    "targetCount": 19,
+    "smallTargets": [
+     {
+      "t": "a",
+      "l": "text-foreground.focus-ring",
+      "w": 123,
+      "h": 19
+     }
+    ],
+    "smallTargetCount": 1,
+    "textSamples": 23,
+    "contrastBelowAA": [
+     {
+      "l": "Total loaded items: 0",
+      "ratio": 4.4,
+      "px": 12,
+      "bold": false
+     },
+     {
+      "l": "bg-card-muted.text-muted-foreground",
+      "ratio": 4.4,
+      "px": 13,
+      "bold": false
+     }
+    ],
+    "contrastBelowAALarge": [],
+    "nav": {
+     "h": 77,
+     "scrollH": 76,
+     "scrollW": 811,
+     "clientW": 390
+    },
+    "contentW": 390,
+    "bodyText": "StorageGenie\nCatalog\nCapture\nSettings\nInbox\nPlanning\nChat\nAnalytics\nExpiry\nPhase 0 · local-first\nTotal: 0 items\nImport Asset\nNo households\nAll (0)\nRecently Added\nName (A-Z)\nProcessing Status\nStandard Grid\nCompact Table\nSave search\nNone yet\n\nNo items match the current view.\n\nImport New Item\n\nOpens the import dialog: drop, select or paste photos. The Capture route stays for direct navigation."
+   },
+   "focus": [],
+   "requests": [
+    {
+     "url": "http://127.0.0.1:8003/",
+     "method": "GET"
+    },
+    {
+     "url": "http://127.0.0.1:8003/assets/index-CYyuxefG.js",
+     "method": "GET"
+    },
+    {
+     "url": "http://127.0.0.1:8003/assets/index-DO0gjGV6.css",
+     "method": "GET"
+    },
+    {
+     "url": "https://storagegenie.dynv6.net/v1/households",
+     "method": "GET"
+    },
+    {
+     "url": "https://storagegenie.dynv6.net/v1/households",
+     "method": "GET"
+    }
+   ],
+   "statuses": [
+    200
+   ]
+  },
+  {
+   "route": "/",
+   "slug": "catalog_unauth_834x1112",
+   "viewport": "834x1112",
+   "file": "catalog_unauth_834x1112.jpg",
+   "measure": {
+    "vw": 834,
+    "vh": 1112,
+    "scrollW": 819,
+    "scrollH": 1189,
+    "overflowX": -15,
+    "overflowY": 77,
+    "overflowOffenders": [],
+    "targetCount": 19,
+    "smallTargets": [
+     {
+      "t": "a",
+      "l": "text-foreground.focus-ring",
+      "w": 123,
+      "h": 19
+     }
+    ],
+    "smallTargetCount": 1,
+    "textSamples": 23,
+    "contrastBelowAA": [
+     {
+      "l": "Total loaded items: 0",
+      "ratio": 4.4,
+      "px": 12,
+      "bold": false
+     },
+     {
+      "l": "bg-card-muted.text-muted-foreground",
+      "ratio": 4.4,
+      "px": 13,
+      "bold": false
+     }
+    ],
+    "contrastBelowAALarge": [],
+    "nav": {
+     "h": 77,
+     "scrollH": 76,
+     "scrollW": 819,
+     "clientW": 819
+    },
+    "contentW": 819,
+    "bodyText": "StorageGenie\nCatalog\nCapture\nSettings\nInbox\nPlanning\nChat\nAnalytics\nExpiry\nPhase 0 · local-first\nTotal: 0 items\nImport Asset\nNo households\nAll (0)\nRecently Added\nName (A-Z)\nProcessing Status\nStandard Grid\nCompact Table\nSave search\nNone yet\n\nNo items match the current view.\n\nImport New Item\n\nOpens the import dialog: drop, select or paste photos. The Capture route stays for direct navigation."
+   },
+   "focus": [],
+   "requests": [
+    {
+     "url": "http://127.0.0.1:8003/",
+     "method": "GET"
+    },
+    {
+     "url": "http://127.0.0.1:8003/assets/index-CYyuxefG.js",
+     "method": "GET"
+    },
+    {
+     "url": "http://127.0.0.1:8003/assets/index-DO0gjGV6.css",
+     "method": "GET"
+    },
+    {
+     "url": "https://storagegenie.dynv6.net/v1/households",
+     "method": "GET"
+    },
+    {
+     "url": "https://storagegenie.dynv6.net/v1/households",
+     "method": "GET"
+    }
+   ],
+   "statuses": [
+    200
+   ]
+  },
+  {
+   "route": "/",
+   "slug": "catalog_unauth_1440x900",
+   "viewport": "1440x900",
+   "file": "catalog_unauth_1440x900.jpg",
+   "measure": {
+    "vw": 1440,
+    "vh": 900,
+    "scrollW": 1425,
+    "scrollH": 952,
+    "overflowX": -15,
+    "overflowY": 52,
+    "overflowOffenders": [],
+    "targetCount": 19,
+    "smallTargets": [
+     {
+      "t": "a",
+      "l": "text-foreground.focus-ring",
+      "w": 123,
+      "h": 19
+     }
+    ],
+    "smallTargetCount": 1,
+    "textSamples": 23,
+    "contrastBelowAA": [
+     {
+      "l": "Total loaded items: 0",
+      "ratio": 4.4,
+      "px": 12,
+      "bold": false
+     },
+     {
+      "l": "bg-card-muted.text-muted-foreground",
+      "ratio": 4.4,
+      "px": 13,
+      "bold": false
+     }
+    ],
+    "contrastBelowAALarge": [],
+    "nav": {
+     "h": 52,
+     "scrollH": 51,
+     "scrollW": 1425,
+     "clientW": 1425
+    },
+    "contentW": 1100,
+    "bodyText": "StorageGenie\nCatalog\nCapture\nSettings\nInbox\nPlanning\nChat\nAnalytics\nExpiry\nPhase 0 · local-first\nTotal: 0 items\nImport Asset\nNo households\nAll (0)\nRecently Added\nName (A-Z)\nProcessing Status\nStandard Grid\nCompact Table\nSave search\nNone yet\n\nNo items match the current view.\n\nImport New Item\n\nOpens the import dialog: drop, select or paste photos. The Capture route stays for direct navigation."
+   },
+   "focus": [],
+   "requests": [
+    {
+     "url": "http://127.0.0.1:8003/",
+     "method": "GET"
+    },
+    {
+     "url": "http://127.0.0.1:8003/assets/index-CYyuxefG.js",
+     "method": "GET"
+    },
+    {
+     "url": "http://127.0.0.1:8003/assets/index-DO0gjGV6.css",
+     "method": "GET"
+    },
+    {
+     "url": "https://storagegenie.dynv6.net/v1/households",
+     "method": "GET"
+    },
+    {
+     "url": "https://storagegenie.dynv6.net/v1/households",
+     "method": "GET"
+    }
+   ],
+   "statuses": [
+    200
+   ]
+  }
+ ]
+}
