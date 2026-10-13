@@ -1,0 +1,9 @@
+# SG-182 — Operations/consolidation draft pending earlier audit outcomes
+
+Prepared during SG-180; not dispatched/published. Scope map at b02e322: actual backend/alembic/env.py (settings overrides ini), backend/scripts/backup_restore_drill.py, its real test module/runbook tests, locked requirements and Dockerfiles/compose. Bounded .github/requirements.txt paths absent; no absence-of-CI or packaging capability inference. Existing shared-host Docker denial explicitly excluded. Current container/volume access is not granted by read-only approval. No live backup/restore/deploy or operator changes.
+
+Actual guard source 115–125 suggests ancestor-direction mismatch; disposable ACTUAL-helper discriminating proof assigned to SG-182, no confirmed incident or product fix claimed. Existing WAL backup method is reused, not replaced with file-copy machinery. Pending consolidation covers all full scenario definitions and source/deferred/unverified distinctions, then smallest root-cause recovery slices; new design implementation approval not implied.
+
+Fresh official W3C understanding pages for reflow and focus-not-obscured were searched 2026-10-13 for acceptance-source accuracy; exact links included in packet alongside already-read target/contrast sources. 320px reflow is a criterion source, not measured current conformance. Native focus claim remains rejected because driver preventScroll:true is induced behavior. Design recommendation must be labelled judgement and compared with simpler existing CSS/component alternatives. No visualizations/assets requested/generated.
+
+Before dispatch: reconcile SG-180/181 actual audit/rating and scope limits; tighten any hypothesis resolved there. Publish only at inactive shared-branch boundary. Architect final close remains after all receipts/audits/full consolidation; if deploy hold persists, CLOSE_BLOCKED names it without new close-time question or unsafe action.

@@ -1,0 +1,25 @@
+{
+  "g1": {
+    "checks": 29,
+    "dispositions": {
+      "PASS": 22,
+      "DEFECT_OBSERVED": 3,
+      "OBSERVE": 4
+    }
+  },
+  "g2": {
+    "checks": 26,
+    "dispositions": {
+      "PASS": 21,
+      "OBSERVE": 5
+    }
+  },
+  "g3": {
+    "checks": 51,
+    "dispositions": {
+      "PASS": 48,
+      "OBSERVE": 3
+    }
+  }
+}
+Stored evidence checks agree with named controls; not a local backend rerun or full-suite pass.
