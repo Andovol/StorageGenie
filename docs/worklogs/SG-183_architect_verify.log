@@ -1,0 +1,28 @@
+{
+  "counts": {
+    "390x844": {
+      "samples": 10,
+      "overflow": 10
+    },
+    "834x1112": {
+      "samples": 10,
+      "overflow": 9
+    },
+    "1440x900": {
+      "samples": 10,
+      "overflow": 0
+    }
+  },
+  "dispositions": {
+    "PASS-SPACING": 48,
+    "PASS-SIZE": 270
+  },
+  "belowAASamples": 57,
+  "independentRatio": 4.397733606829998,
+  "limitations": [
+    "stored evidence only",
+    "focus probe prevents native scrolling",
+    "alpha control has tautological branch",
+    "sampled targets only"
+  ]
+}

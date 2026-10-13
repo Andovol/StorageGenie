@@ -1,0 +1,13 @@
+# RECOVERY-D2 — Complete the full audit, save scenarios/gaps, then close
+
+Owner quote in this chat, 2026-10-13: “Complete the audit and then lets close this session. Make sure you save all our work regarding the full audit of the app, including the user scenarios and any gaps found.”
+
+This authorizes finishing RECOVERY-D1's audit stage before closing, not ending it at the current partial journey review. It also requires durable publication of the full app audit, executable user scenarios, all gaps, their provenance/status, corrective audit dispositions, scope proposal and a small paste-ready starter.
+
+Execution order remains STATE's single owner: SG-183 (one responsive-audit correction), SG-180 (ingestion/evidence/providers), SG-181 (API/domain), SG-182 (operations/test trust and consolidated recovery report). Audit/rate each; no unnecessary repeated approval request. If the sole correction fails, record the unresolved responsive proof without a third correction; independently authorized read-only audit domains may be completed where their scope does not depend on it. Never claim unobserved coverage or repaired functionality. Any unsafe/denied operation still stops its slice.
+
+Close after the consolidated audit and all active execution are reconciled. Use CLOSE.md, publish all non-sensitive records and actual receipts, update RESUME, inspect every clean-state dimension, file/read back END and supply a paste-ready starter. Deployment is the standing close-out requirement, not new permission to ship held code: SG-175 FLAG:SAFETY and any unresolved trust/safety issue cannot be silently overridden. If that prevents the standing deployment, record the exact close blocker and a self-contained decision for the next session; do not claim CLOSE_COMPLETE or ask new close-time questions (CLOSE.md §5).
+
+Definition/record ownership: scenario details in `docs/reviews/2026-10-13-user-scenarios.md`; coverage/findings/status in canonical `docs/reviews/2026-10-13-recovery-audit.md`; final audit/consolidation will point to both. Historical per-slice reports/captures and prior flags remain preserved; corrections are explicit supersessions, not erased history. State carries pointers and current next action, not copied issue/decision tables.
+
+The scheduled continuation must carry this close-after-audit directive. One deadline wake per dispatched slice, no recurring watcher or host helper. This local decision was recorded while SG-183 ran and is published at its next safe boundary; no shared-branch push during execution. No product repair, production row mutation, paid application provider call, credential/infrastructure change or new UI implementation is authorized by this request.

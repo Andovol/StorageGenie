@@ -71,10 +71,12 @@ Priority below is Architect judgement, provisional pending the consolidated reco
 | REC-ISS12 | SG-175 initial failed probe setup has no committed capture; final corrected fake-provider command is auditable. | OPEN evidence limitation; SG-180 isolation/privacy audit; do not infer initial run spend/safety from final script |
 | REC-ISS13 | SG-175 evidence fingerprints cover names/sizes of empty/absent host paths, not actual production-volume contents. | OPEN measurement limitation; SG-180; temp-root/dependency isolation remains separate accepted evidence |
 | REC-ISS14 | SG-175 benchmark script is ephemeral; worker-clock budget end differs from engine status deadline. | OPEN reproducibility/clock limitation; SG-182; stored fixture measurement is not a general performance rate |
-| REC-ISS15 | SG-179 labels all phones clean, but stored 390px samples have layout width 811–853 and Nav scroll/client mismatch; independent desktop control has no Nav overflow. | FIX QUEUED, SG-183 one L2 correction; original SG-179 rated 91 FLAG:TRUST, not accepted responsive proof |
-| REC-ISS16 | Size-only WCAG failure claim omitted spacing/other exceptions; contrast lacks pairs/measurement code. | FIX QUEUED, SG-183; retain dimensions as observations, no categorical conformance claim yet |
-| REC-ISS17 | Browser driver not committed; all-text-transparent masks prevent reading public UI. | FIX QUEUED, SG-183 reproducible capture and targeted privacy masking |
+| REC-ISS15 | Corrected SG-183 raw geometry independently recomputed: document overflow on ten 390px routes, nine 834px routes, none at 1440. Original phone-clean verdict rejected. | OPEN responsive product defect; stored denominator correction observed, no product repair; correction exhausted |
+| REC-ISS16 | Independent spacing recomputation retracts size-only failure for sampled controls. Opaque muted pair measures 4.397733606829998 against 4.5. Alpha control vacuous; broader conformance unverified. | OPEN sampled contrast defect; size-only allegation RESOLVED/retracted; compositing/coverage limitations consolidated plan |
+| REC-ISS17 | Driver committed, public labels readable, all seven screenshots viewed. Served build via loopback GET fulfillment, authenticated URL/container identity unestablished. | RESOLVED driver/unreadable-label artifacts; OPEN provenance/touch/zoom/dark/photo-bearing limits |
 | REC-ISS18 | Catalog API-failure captures at three viewports render No households without error wording; source error branch absent. | OPEN, sampled failure state confirmed; consolidated recovery plan |
+| REC-ISS19 | SG-183 repeats excluded Docker listing and continues after denial, inventing pre-existing exemption; report/worklog disclose it. | OPEN safety breach; correction rejected, no third retry; audit SG-183_audit.md |
+| REC-ISS20 | Focus uses preventScroll:true; alpha control has true/true branch. | OPEN trust gaps; native-focus allegation RETRACTED; normal behavior/compositing UNVERIFIED, consolidated plan |
 
 ## Audit execution boundaries
 
@@ -94,6 +96,8 @@ After each slice: mapped receipt, immutable base→work diff, claims versus stor
 Each packet must enumerate its actual targeted tests and isolated database/storage dependency path. No blanket full-suite launch implied by this approval. Metered application providers, production writes, service recreate, credential/config changes and backup restore into live storage are excluded. Existing opaque production IDs/customer content must be sanitized from committed evidence. Browser layout proof must identify actual viewport and rendered state; source-equivalent temporary Vite is not deployed frontend proof.
 
 ## Current next action
+
+CURRENT 2026-10-13: SG-183 inactive receipt c5725bd audited/rated in SG-183_audit.md; ONE correction exhausted/rejected with bounded retained evidence. Publish pending RECOVERY-D2, scenarios and close-intent/launch records at safe boundary; dispatch independent SG-180, then audit/rate before SG-181/182. Full audit IN PROGRESS. Scenario definitions owner: 2026-10-13-user-scenarios.md (SC-01..15/CX-01..08), mapped to this coverage register. Owner requested full audit THEN close; no implementation/release grant or safety waiver. Earlier paragraphs below are historical, superseded by CURRENT.
 
 Complete independent local audit preparation while SG-175 is active; do not push shared branch. On the next authoritative activation, check its status/notes once, fetch/pull the actual receipt candidate, audit/rate and record remaining work. Then publish this approval/register with STATE pointer and prepare/dispatch the first bounded audit slice. Comprehensive audit and modern UI recovery are NOT complete at this initial inventory.
 
