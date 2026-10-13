@@ -709,3 +709,9 @@ Originals above (88 FLAG:TRUST / 91 FLAG:TRUST) stand as the audit trail; the ve
 | slice_id | phase | model | effort | score | flag | lever | guards_invoked | deduction_attribution | remaining | escape |
 |---|---|---|---|---|---|---|---|---|---|---|
 | SG-187 | R2 journey (SC-02/03 + hygiene + surface truth); receipt 45d0f2e; Inbox Start, orphan cleanup + readable errors, honest modal note; FAIL-then-PASS both layers, authoritative 97+41, screenshots independently read; forward-written push line self-corrected; audit SG-187_audit.md | opencode/opencode-go/deepseek-v4.1-flash (receipt command settings) | max | 96 |  |  | PG-EV-01/02/03/04/05/06/07/09/13; PG-SC-01/02/03/09/10/12; PG-IC-01/07/09; PG-DP-03; PG-PR-01/03/04/07/10 | coder (self-corrected CO-29/CO-51 report slip) | Import-order fragility reported; memory shape noted; no cancel writer per scope; mypy register; serve via normal deploy course |  |
+
+### SG-188 (2026-10-13 - R3 resolve guard + cursor + archived semantics)
+
+| slice_id | phase | model | effort | score | flag | lever | guards_invoked | deduction_attribution | remaining | escape |
+|---|---|---|---|---|---|---|---|---|---|---|
+| SG-188 | R3 semantics (D7/D8); receipt 2400f6f; bare-resolve 422, cursor 422 both surfaces, default ARCHIVED exclusion; engine half proven already-satisfied (F-SG181-7 misattribution corrected with 3-link proof, no manufactured diff); FAIL 8F/12P, authoritative 172/172; audit SG-188_audit.md | opencode/opencode-go/deepseek-v4.1-flash (receipt command settings) | max | 97 |  |  | PG-EV-01/02/03/04/05/06/07/09/13; PG-SC-01/02/03/09/10/12; PG-IC-01/07/09; PG-DP-03; PG-PR-01/03/04/07/10 |  | jobs.py:116 cursor twin → SG-189 to consider; non-perishable unresolved → SG-176/177/178 scope; serve via normal deploy course |  |

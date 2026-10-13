@@ -2,9 +2,9 @@
 
 `PB-1`–`PB-6` bind (`CODER.md` §14).
 **BASE REF: automation.** Report actual resolved commit.
-**STATUS: DRAFT prepared 2026-10-13 from SG-182 G1 proof; scope-approved D10 (smallest reversible operator fix; may ride an operator grant). RE-REVIEW against the tree before dispatch next session.**
+**STATUS: RE-REVIEWED vs tree at `2400f6f`+ under D16 L3 flow; premises hold exactly (`_guard` at `backup_restore_drill.py:115-125`: equal + prod-inside-work rejected with inverted message, work-inside-prod allowed; helper + test untouched since SG-086). Scope-approved D10.**
 **DATABASE: none touched — all proof on scratch temp directories; production DB/storage never opened.**
-**Restart: none. Autonomy: L2.**
+**Restart: none. Autonomy: L3** (D16 flow). Out of ceiling by design: `jobs.py:116` cursor twin is a product-route fix, not an operator-script comparator — it rides a follow-up micro-slice after SG-190, not this slice (D10 smallest-fix scope kept).
 
 ## Why this exists
 
