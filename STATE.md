@@ -3,7 +3,7 @@
 
 **Close / next entry:** Owner RECOVERY-D3 requests close now and continue unfinished work in a fresh session (docs/decisions/2026-10-13-fresh-session-transfer.md). Handoff/verification/END owner: docs/worklogs/2026-10-13-recovery-session-handoff.md. CLOSE_BLOCKED: mandatory live close-out deploy cannot safely ship SG-175's held code; no deployment or waiver. Reconcile this blocked handoff at START, never infer completed audit/release.
 
-**Rules / first decision:** Project/cache remain 0.46.0. Installed global bytes/released tag are 0.47.0: Git Bash check BEHIND, not FORKED. RULE-ADOPT-047 unapproved; first present complete recorded decision docs/decisions/2026-10-13-contract-0.47-adoption-plan.md. After explicit approval adopt released tag/update active expectations and verify version chain before dispatch. No global/host rewrite or inferred consent.
+**Rules / first decision:** D1 APPROVED 2026-10-13 — project/cache at 0.47.0 (tag `contract-v0.47.0` commit `bdbbaa7`, payload `49338e39…`); controlled-axis BEHIND cleared, host link stated 0.47.0/`bdbbaa7` from SG-180 report to be echoed on SG-181. RULE-ADOPT-047 executed; no global/host rewrite.
 
 **Execution / release:** automation branch; re-read actual refs/status. SG-175/179/183/180 all done/inactive at close readback; mapped notes receipts/audits/ratings durable. SG-183 correction exhausted, no third retry. SG-175 UNSERVED safety/deployment hold remains. Last independently verified deployment SG-174 image d5da5684/container 23d31ff5; not fresh container proof from denied Docker reads. All this chat's one-shot continuations retired; no background audit here.
 

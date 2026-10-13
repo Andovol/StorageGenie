@@ -1,7 +1,7 @@
 # StorageGenie — project configuration
 
 > **Canonical for this repo. `CLAUDE.md` is a one-line adapter `@AGENTS.md` — edit here, never there.**
-> Rule-set version this project records: **0.46.0** (D-1012-2 adoption 2026-10-12: checkouts `3fc4cab` (0.44.2) + `92c4e21` (0.45.0) + `99302a4` (0.45.1) + `01937bf` (0.45.2) + `4c23869` (0.46.0) oldest-first; delta = 0.45.0 packet-template PB-1/PB-3–PB-6 cite-don't-paste + L3 default (recorded L2 stays) + close triggers 330k/400k + 0.45.1 PB-1–PB-6 + privileged-denial STOPS slice + 0.46.0 ratings +remaining/+escape + 50min deadline + START filing lines; installed `487841B1…` = payload `RULES.sha256` at 0.46.0 — clean; supersedes `0.44.1`).
+> Rule-set version this project records: **0.47.0** (D1 adoption 2026-10-13: checkout `e4bacf4`/`bdbbaa7` (contract-v0.47.0); delta = ARCHITECT every-screenshot-read + no-wake/context-reading note + START/END harness name + AUDIT open-every-image + CLOSE harness/deadline/context + CODER elapsed-from-epochs + PACKET first-user-flow-walk + never-cut-report + RULES G-M2 continuation + onboarding-no-Architect; installed `49338e39a574…` = payload `RULES.sha256` at 0.47.0 — clean; supersedes `0.46.0`, chain D-1012-2 preserved).
 
 ## Configuration table — the single source of every project value
 
@@ -59,6 +59,6 @@ Pinned pre-conversion state `26e9e8b` (local `automation` head `26e9e8b→9f1cc0
 
 ## Loading
 
-- Session start: `G-L1` version check FIRST (run `bash .rules-cache/rules_check.sh` per D339 and write its output down; never checkout-vs-stamp, M3), then this file + `.rules-cache/` (contract `contract-v0.44.1`) + `STATE.md:1` RESUME.
+- Session start: `G-L1` version check FIRST (run `bash .rules-cache/rules_check.sh` per D339 and write its output down; never checkout-vs-stamp, M3), then this file + `.rules-cache/` (contract `contract-v0.47.0`) + `STATE.md:1` RESUME.
 - Before packet: `PACKET.md`; before dispatch: `DISPATCH.md` (+ `PRODUCTION.md:1` because host + SQLite are live).
 - Never copy shared contract into repo — project holds only values and narrowings.
