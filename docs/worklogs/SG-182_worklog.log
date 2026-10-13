@@ -57,3 +57,19 @@ G1 results (2026-10-13):
     effective deployment AI settings: provider_id=opencode-go model=deepseek-v4-flash-vision-exp consent=true caps null category=food
     production schema readable mode=ro: alembic_version=20260924_sg114_relation (= this tree's head), 28 tables
   PB-1 correction: alembic.ini sqlalchemy.url is line 3 (packet said line 23); env.py:23 override verified effective
+
+G2 results (2026-10-13):
+  focused mapped nodes: cd backend && venv/bin/python -m pytest -q -p no:cacheprovider tests/test_backup_drill.py tests/test_runbook_commands.py
+    -> SG-182_focused_tests_2026-10-13.log: 6 passed in 0.10s, rc=0 (3 drill method controls incl. same-length corruption gate; 3 runbook pins incl. seen-to-fail drift injection + no-secret guard)
+  test layers (source inventory at d0591dc): backend pytest 69 test_*.py (pyproject testpaths=["tests"], asyncio_mode=auto); frontend vitest 28 *.test.* under src (jsdom, globals, test-setup); backend/eval offline/live harness (frozen baselines corpus, run.py; live mode opt-in)
+  coverage-gap/trust observations:
+    pytest skip/xfail/importorskip/unittest-skip in backend tests: 0 matches; broad `or` alternatives spot-check (test_eval_corpus.py:108 parsed.items or raw[...] == []) real but narrow
+    50/69 backend files use tmp_path; 6 files delete provider/API keys via monkeypatch.delenv/os.environ.pop
+    native tooling ABSENT in audit venv: `import pyzbar.pyzbar` -> ImportError zbar shared library; tesseract/zbarimg absent
+      (explains SG-180 F-SG180-13 250-passed/2-failed audit environment; Dockerfile line 14 installs tesseract-ocr+libzbar0)
+    test_eval_corpus.py references host corpus path (documentation/fixture path; no live network path observed)
+  CI/provenance planes: repo contains NO .github and no other CI config (only docker-compose.yml matches *.yml at HEAD; git log --all -- .github empty).
+    gh is installed (2.96.0) but unauthenticated (rules_check G-L5/L7 UNCHECKED gh-unauthenticated): remote-run/workflow provenance NOT verifiable from this lane -> UNVERIFIED, NOT evidence CI does not exist remotely.
+    Branch inventory: many automation-tool remote branches (jules/bolt/palette/fix/test/perf/...); no workflow-ref evidence available unauthenticated.
+  identity planes distinct: product commit (automation), evidence diffs, notes receipt (refs/notes/storagegenie-coder-reports), contract cache (0.47.0/bdbbaa7), image digest (Dockerfile FROM sha256=519591d6...), served bundle (index.html/asset sha256 above), runtime health GET. Container/image identity remains UNVERIFIED (Docker excluded; loopback service is the observed deployed surface).
+  schedule/clock/readback ownership: dispatch unit status verb (engine-side ends_by) + one native wake per dispatch (SG-183_architect.md), worker clock separately reported (CO-79). SG-175 REC-ISS14: +1.504 ms/GET over 300 GETs on a 4-row fixture (SG-175_query_delta.log); ephemeral /tmp script not archived; worker start != engine deadline basis. Recipe persisted in consolidation (read-only fixture GET loop, 300 samples, before/after comparison, engine deadline authoritative).
