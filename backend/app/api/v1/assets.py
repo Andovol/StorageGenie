@@ -74,8 +74,14 @@ def post_asset(
     db: Session = Depends(get_db),  # type: ignore[no-untyped-def]
     idempotency_key: str | None = Header(default=None, alias="Idempotency-Key"),
 ):  # type: ignore[no-untyped-def]
-    # Idempotency: if key exists, return existing asset with same display_name+household?
-    # Simplified: check IdempotencyKey table for response id
+    # Idempotency replay is household-scoped (SG-185, owner D4): a key
+    # registered by one household never hands its asset to another, so the
+    # looked-up row is qualified by the requesting household. Same-household
+    # changed payload is deliberately ignored -- the key wins and the ORIGINAL
+    # row is returned (documented semantics, not a fingerprinting surface). A
+    # foreign key behaves as a fresh key for the requester: `key` is globally
+    # unique by schema, so it stays its first household's registration and the
+    # requester's own row is created (the re-registration below rolls back).
     if idempotency_key:
         from app.models.idempotency import IdempotencyKey
 
@@ -83,7 +89,7 @@ def post_asset(
         if existing and existing.response_json:
             data = json.loads(existing.response_json)
             a = db.query(Asset).options(selectinload(Asset.assertions)).filter_by(id=data["id"]).first()
-            if a:
+            if a and a.household_id == household_id:
                 return _asset_to_dict(a, db)
     a = create_asset(db, household_id, payload.model_dump())
     if idempotency_key:
