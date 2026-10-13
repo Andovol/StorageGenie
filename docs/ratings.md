@@ -715,3 +715,15 @@ Originals above (88 FLAG:TRUST / 91 FLAG:TRUST) stand as the audit trail; the ve
 | slice_id | phase | model | effort | score | flag | lever | guards_invoked | deduction_attribution | remaining | escape |
 |---|---|---|---|---|---|---|---|---|---|---|
 | SG-188 | R3 semantics (D7/D8); receipt 2400f6f; bare-resolve 422, cursor 422 both surfaces, default ARCHIVED exclusion; engine half proven already-satisfied (F-SG181-7 misattribution corrected with 3-link proof, no manufactured diff); FAIL 8F/12P, authoritative 172/172; audit SG-188_audit.md | opencode/opencode-go/deepseek-v4.1-flash (receipt command settings) | max | 97 |  |  | PG-EV-01/02/03/04/05/06/07/09/13; PG-SC-01/02/03/09/10/12; PG-IC-01/07/09; PG-DP-03; PG-PR-01/03/04/07/10 |  | jobs.py:116 cursor twin → SG-189 to consider; non-perishable unresolved → SG-176/177/178 scope; serve via normal deploy course |  |
+
+### SG-189 (2026-10-13 - R7 guard direction fix)
+
+| slice_id | phase | model | effort | score | flag | lever | guards_invoked | deduction_attribution | remaining | escape |
+|---|---|---|---|---|---|---|---|---|---|---|
+| SG-189 | R7 operator guard (D10); receipt 57a202b; 3-way split with true-geometry messages; candidate tests sha-pinned across trees (base 3F/5P, candidate 11/11); CO-101 SG-182 probe re-run 22 checks, 1 dated-expectation fail; F-SG182-1 RESOLVED; audit SG-189_audit.md | opencode/opencode-go/deepseek-v4.1-flash (receipt command settings) | max | 97 |  |  | PG-EV-01/02/03/04/05/06/07/09/13; PG-SC-01/02/03/09/10/12; PG-IC-01/07/09; PG-DP-03; PG-PR-01/03/04/07/10 |  | jobs.py:116 cursor twin → post-SG-190 micro-slice; serve via normal deploy course |  |
+
+### SG-190 (2026-10-13 - R8 responsive shell/design recovery)
+
+| slice_id | phase | model | effort | score | flag | lever | guards_invoked | deduction_attribution | remaining | escape |
+|---|---|---|---|---|---|---|---|---|---|---|
+| SG-190 | R8 presentation-only (D9); receipt 82788dd; overflow 10/10→0/10 at 390, 9/10→0/10 at 834, 320 reflow 0; contrast min 4.3977→5.2606, 0 below AA; 266/266 + lint/build clean; backend diff empty; all 43 images opened; SC-15 RESOLVED on sampled denominators; audit SG-190_audit.md | opencode/opencode-go/deepseek-v4.1-flash (receipt command settings) | max | 97 |  |  | PG-EV-01/02/03/04/05/06/07/09/13; PG-SC-01/02/03/09/10/12; PG-IC-01/07/09; PG-DP-03; PG-PR-01/03/04/07/10 |  | SG-190 REMAINING (error branches, nav household context, zoom/touch/dark, density) → next-session candidates; serve via the recorded deploy decision |  |
