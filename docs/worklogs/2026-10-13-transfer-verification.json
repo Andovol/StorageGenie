@@ -1,0 +1,66 @@
+{
+  "measurement": "canonical immutable Git snapshots, installed rules raw bytes, working bytes separately; not tokens/ingestion",
+  "previous": "3454e1c",
+  "closingRecordsSnapshot": "ff1ad8017499bed90617f2976497c7fbb0b49a22",
+  "entries": {
+    "AGENTS.md": {
+      "previous": 9397,
+      "closingSnapshot": 9397,
+      "workingBytes": 9461
+    },
+    "CLAUDE.md": {
+      "previous": 11,
+      "closingSnapshot": 11,
+      "workingBytes": 11
+    },
+    "STATE.md": {
+      "previous": 11658,
+      "closingSnapshot": 2896,
+      "workingBytes": 2896
+    }
+  },
+  "rulesPreviousBytes": 24487,
+  "rulesInstalledBytes": 24696,
+  "mandatoryArchitectBytes": 19242,
+  "coldStartBasisPrevious": 64795,
+  "coldStartBasisClosing": 56242,
+  "change": -8553,
+  "largestGrowingEntry": {
+    "path": "installed Codex AGENTS rules",
+    "change": 209
+  },
+  "repository": [
+    {
+      "snapshot": "3454e1c",
+      "trackedBlobCount": 1114,
+      "trackedBlobBytes": 11218916
+    },
+    {
+      "snapshot": "ff1ad8017499bed90617f2976497c7fbb0b49a22",
+      "trackedBlobCount": 1227,
+      "trackedBlobBytes": 13461321
+    }
+  ],
+  "preservedHistoryGitBytes": 8422,
+  "preservedHistoryWorkingBytes": 8449,
+  "rawConservation": "3360+8449=11809",
+  "textFilesChecked": 84,
+  "controlProbe": "untouched README clear; planted byte0 detected",
+  "textExceptions": [],
+  "preservedExceptions": [
+    {
+      "path": "docs/ratings.md",
+      "kind": "inherited ratings mojibake; old Git prefix byte-identical; REC-ISS33",
+      "matches": 84
+    },
+    {
+      "path": "docs/worklogs/SG-175_failpre.log",
+      "kind": "raw ANSI SGR terminal capture; original bytes preserved",
+      "sequences": 1336
+    }
+  ],
+  "currentReferencesExist": true,
+  "ratingRemainingFields": true,
+  "contextTokens": "unavailable",
+  "platformCost": "unavailable"
+}

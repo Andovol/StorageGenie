@@ -43,6 +43,10 @@ Owner RECOVERY-D2: “Complete the audit and then lets close this session. Make 
 
 ## Paste-ready starter
 
+Final evidence: records snapshot ff1ad8017499bed90617f2976497c7fbb0b49a22 was pushed and read back; executed transfer verifier passed raw/Git archive equality, current-reference existence, rating remaining fields and text checks with preserved exceptions. Comparable cold-start basis 64795→56242B (-8553), STATE2896B; installed rules +209B largest entry growth. Repo totals are explicitly the immutable snapshots in verification JSON, not claimed final-tip totals. END posted https://github.com/Andovol/Launcher/issues/62#issuecomment-6149562604; API body readback exactly equals saved recovery-END.md. Final metadata commit and full clean/ref dimensions are read back after publication in the final chat; no guessed self-referential commit ID or CLOSE_COMPLETE claim.
+
+Contract cache remains clean at intentionally detached contract-v0.46.0, adoption pending; this is distinct from product branch attachment. No shared Launcher working tree was touched. This handoff closes work in this chat at owner request, with unresolved close-out deployment recorded rather than attempted.
+
 StorageGenie — run the project Git Bash rules_check first, then read STATE.md RESUME and docs/worklogs/2026-10-13-recovery-session-handoff.md; reconcile preserved CLOSE_BLOCKED handoff.
 Project/cache 0.46.0 versus released/installed 0.47.0; first present recorded RULE-ADOPT-047 decision, do not infer approval or deploy held SG-175.
 Full read-only audit remains approved: SG-181 API/domain plus SG-180's ONE partial-write rollback measurement correction, then SG-182 operations/test trust/full consolidation. Scenarios/gaps/recovery/UI proposal saved; no third SG-183 correction.
