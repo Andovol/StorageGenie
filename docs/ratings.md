@@ -673,3 +673,9 @@ Originals above (88 FLAG:TRUST / 91 FLAG:TRUST) stand as the audit trail; the ve
 | slice_id | phase | model | effort | score | flag | lever | guards_invoked | deduction_attribution | remaining | escape |
 |---|---|---|---|---|---|---|---|---|---|---|
 | SG-182 | Operations/test-trust + full SC/CX consolidation; receipt 1c8317b; no product diff; guard defect confirmed, WAL drill + single-head migration verified disposable, served identity read, mypy-red gate open; audit SG-182_audit.md | opencode/opencode-go/deepseek-v4.1-flash (receipt command settings) | max | 96 |  |  | PG-EV-01/02/03/04/05/06/07/09/13; PG-SC-01/02/03/09/10/12; PG-IC-01/07/09; PG-DP-03; PG-PR-01/03/04/07/10 |  | Register merged REC-ISS34..40 + matured 06/07/10/29/30/31; owner decisions R1/F-grants/semantics/R8/R5; R7 operator fix own grant; mypy owner priority; UNVERIFIED limits stand; CLOSE_BLOCKED until R1 |  |
+
+### SG-184 (2026-10-13 - R1 merged-repair verification, waiver requested)
+
+| slice_id | phase | model | effort | score | flag | lever | guards_invoked | deduction_attribution | remaining | escape |
+|---|---|---|---|---|---|---|---|---|---|---|
+| SG-184 | R1 verification (merged-SG-175 re-proof, zero product change); receipt 7d68408; failpre 4F/6P then passpost 10P, UI 18P + shown-failing control, probe PROBE_OK 52 checks, served OLD-shape baseline; audit SG-184_audit.md | opencode/opencode-go/deepseek-v4.1-flash (receipt command settings) | max | 96 |  |  | PG-EV-01/02/03/05/09/13; PG-SC-09/10/12; PG-IC-01/07/09; PG-DP-02/03; PG-PR-03/04/10 | packet | Waiver REQUESTED, grant is owner D13; serving rider gated on D13; SG-176/177/178 + STILL-UNREPAIRED per original grants; open-task production branch vacuous-closed by failpre |  |
