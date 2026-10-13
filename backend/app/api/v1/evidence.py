@@ -1,5 +1,7 @@
 import hashlib
 import json
+import logging
+from pathlib import Path
 
 from fastapi import APIRouter, Depends, File, Header, HTTPException, Query, UploadFile
 from fastapi.responses import FileResponse
@@ -14,6 +16,29 @@ from app.storage.local_store import absolute_path, thumbnail_path
 
 router = APIRouter()
 
+logger = logging.getLogger(__name__)
+
+# SG-186 (owner D5): serve-time content verification compares the stored bytes
+# against `Evidence.sha256`, which every writer defines as the sha256 of those
+# bytes except `store_text_evidence` (SG-080): a transcript row's sha256 is a
+# composed artifact digest (household + source evidence + item index + text)
+# that cannot be recomputed from the file alone, and its stored bytes are the
+# transcript text. That kind keeps the pre-slice read path; EVERY other kind is
+# verified, so a future kind whose sha is not a content hash fails loudly at
+# serve time (500) instead of serving bytes no hash anchors. Coverage is
+# original-only: thumbnails are derived artifacts with no row hash to compare
+# against (caller map in the SG-186 report).
+_ARTIFACT_DIGEST_SOURCE_KINDS = frozenset({"transcript"})
+_READ_CHUNK_BYTES = 1024 * 1024
+
+
+def _stored_content_sha256(path: Path) -> str:
+    digest = hashlib.sha256()
+    with path.open("rb") as handle:
+        for chunk in iter(lambda: handle.read(_READ_CHUNK_BYTES), b""):
+            digest.update(chunk)
+    return digest.hexdigest()
+
 
 @router.post("/evidence", status_code=201)
 async def upload_evidence(  # noqa: C901
@@ -23,11 +48,19 @@ async def upload_evidence(  # noqa: C901
     idempotency_key: str | None = Header(default=None, alias="Idempotency-Key"),
 ):  # type: ignore[no-untyped-def]
     if idempotency_key:
+        # SG-186 (sibling of SG-185, owner D4 semantics): the replay lookup is
+        # qualified by the requesting household, so a key registered by one
+        # household never hands its evidence row to another. A foreign key
+        # behaves as a fresh key for the requester: `key` is globally unique by
+        # schema, so it stays its first household's registration while the
+        # requester's own upload creates its own row (the re-registration
+        # below rolls back). A same-household replay -- changed payload
+        # included -- deliberately returns the ORIGINAL row.
         existing = db.query(IdempotencyKey).filter_by(key=idempotency_key).first()
         if existing and existing.response_json:
             data = json.loads(existing.response_json)
             ev = db.query(Evidence).filter_by(id=data["id"]).first()
-            if ev:
+            if ev and ev.household_id == household_id:
                 return {
                     "id": ev.id,
                     "sha256": ev.sha256,
@@ -101,6 +134,27 @@ def get_evidence_file(evidence_id: str, household_id: str = Query(...), db: Sess
     path = absolute_path(ev.storage_key)
     if not path.exists():
         raise HTTPException(status_code=404, detail="File not found on storage")
+    # SG-186 (owner D5): read-time content verification. The stored bytes are
+    # hashed before anything is served and a mismatch is refused loudly -- the
+    # corrupt bytes are never served and there is no silent fallback. A
+    # between-verify-and-send mutation of the file (TOCTOU) is a residual
+    # documented in the SG-186 report; the row's sha is the existing column,
+    # no schema change.
+    if ev.source_kind not in _ARTIFACT_DIGEST_SOURCE_KINDS:
+        stored_sha256 = _stored_content_sha256(path)
+        if stored_sha256 != ev.sha256:
+            logger.warning(
+                "Evidence integrity failure: stored content does not match the recorded sha256 "
+                "id=%s storage_key=%s expected=%s stored=%s",
+                ev.id,
+                ev.storage_key,
+                ev.sha256,
+                stored_sha256,
+            )
+            raise HTTPException(
+                status_code=500,
+                detail="evidence_integrity_error: stored content does not match the recorded sha256",
+            )
     return FileResponse(path, media_type=ev.media_type, filename=ev.original_filename)
 
 

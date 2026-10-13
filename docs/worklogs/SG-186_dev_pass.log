@@ -1,0 +1,24 @@
+....                                                                     [100%]
+=============================== warnings summary ===============================
+venv/lib/python3.12/site-packages/fastapi/testclient.py:1
+  /home/andrei/StorageGenie/backend/venv/lib/python3.12/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+venv/lib/python3.12/site-packages/starlette/testclient.py:53
+  /home/andrei/StorageGenie/backend/venv/lib/python3.12/site-packages/starlette/testclient.py:53: DeprecationWarning: The anyio.abc.BlockingPortal alias is deprecated, use anyio.from_thread.BlockingPortal instead.
+    _PortalFactoryType = Callable[[], AbstractContextManager[anyio.abc.BlockingPortal]]
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+==================================== PASSES ====================================
+____ test_serve_refuses_same_length_mutation_and_keeps_missing_original_404 ____
+------------------------------ Captured log call -------------------------------
+WARNING  app.api.v1.evidence:evidence.py:146 Evidence integrity failure: stored content does not match the recorded sha256 id=01a136b2-597d-7ca2-8b58-e0fc227a326b storage_key=01a136b2-5955-71f1-a195-9e0bb2f66dd9/ea/ea0c64165b1f5cd9d39da10fe254db3ba60a1031cea9ae9b6b14a8b1822c4263.jpg expected=ea0c64165b1f5cd9d39da10fe254db3ba60a1031cea9ae9b6b14a8b1822c4263 stored=3c646b847de79b81c61df2ddbe40a7ef5d09e55d9f4aaaefbe8ade31027798fd
+_______ test_serve_refuses_corrupted_row_sha_despite_ok_integrity_check ________
+------------------------------ Captured log call -------------------------------
+WARNING  app.api.v1.evidence:evidence.py:146 Evidence integrity failure: stored content does not match the recorded sha256 id=01a136b2-59ae-7993-819c-e99b51dbd8ea storage_key=01a136b2-59a2-7e32-945f-a3a47690720f/a6/a601ab159835c565900fd2ce495c096cecde701b728daf1ffdf4bd419decc9d7.jpg expected=0000000000000000000000000000000000000000000000000000000000000000 stored=a601ab159835c565900fd2ce495c096cecde701b728daf1ffdf4bd419decc9d7
+=========================== short test summary info ============================
+PASSED tests/test_sg186_evidence_serve_integrity.py::test_serve_refuses_same_length_mutation_and_keeps_missing_original_404
+PASSED tests/test_sg186_evidence_serve_integrity.py::test_serve_refuses_corrupted_row_sha_despite_ok_integrity_check
+PASSED tests/test_sg186_evidence_serve_integrity.py::test_foreign_household_key_never_returns_foreign_evidence_row
+PASSED tests/test_sg186_evidence_serve_integrity.py::test_transcript_artifact_digest_rows_keep_serving
+4 passed, 2 warnings in 1.53s
