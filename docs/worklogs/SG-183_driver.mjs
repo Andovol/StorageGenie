@@ -29,6 +29,7 @@ function arg(name, dflt) {
   return i >= 0 && argv[i + 1] ? argv[i + 1] : dflt;
 }
 const BASE = arg("base", "http://127.0.0.1:8003");
+const API_ORIGIN = arg("api-origin", "https://storagegenie.dynv6.net");
 const BROWSER = arg("browser", "/home/andrei/.cache/ms-playwright/chromium_headless_shell-1228/chrome-headless-shell-linux64/chrome-headless-shell");
 const OUT = arg("out", "/tmp/opencode/sg183/out");
 const SHOTS = arg("shots", "");
@@ -282,13 +283,41 @@ class Session {
       if (msg.method === "Fetch.requestPaused") {
         const p = msg.params; const m = p.request.method;
         this.guard.methods[m] = (this.guard.methods[m] || 0) + 1;
-        this.requestLog.push({ method: m, url: p.request.url.slice(0, 120) });
-        if (m === "GET" || m === "HEAD" || m === "OPTIONS") {
-          this.cdp.send("Fetch.continueRequest", { requestId: p.requestId }, this.sessionId).catch(() => {});
-        } else {
-          this.guard.blocked.push({ method: m, url: p.request.url.slice(0, 120) });
+        this.requestLog.push({ method: m, url: p.request.url.slice(0, 160) });
+        if (m !== "GET" && m !== "HEAD" && m !== "OPTIONS") {
+          this.guard.blocked.push({ method: m, url: p.request.url.slice(0, 160) });
           this.cdp.send("Fetch.failRequest", { requestId: p.requestId, errorReason: "AccessDenied" }, this.sessionId).catch(() => {});
+          return;
         }
+        const u = p.request.url;
+        if (u.startsWith("http://127.0.0.1:") || u.startsWith("http://localhost:") || u.startsWith("data:") || u.startsWith("blob:")) {
+          this.cdp.send("Fetch.continueRequest", { requestId: p.requestId }, this.sessionId).catch(() => {});
+          return;
+        }
+        if (u.startsWith(API_ORIGIN + "/")) {
+          // Served-build rendering with loopback GET fulfillment: the deployed bundle's API base
+          // is the public origin; re-issue the same GET against the loopback service, no
+          // credentials/cookies forwarded. This is NOT authenticated public-URL proof.
+          const lurl = BASE + u.slice(API_ORIGIN.length);
+          fetch(lurl, { method: m === "HEAD" ? "GET" : m, redirect: "follow" })
+            .then(async (r) => {
+              const buf = Buffer.from(await r.arrayBuffer());
+              const headers = [];
+              for (const [n, v] of r.headers) {
+                const ln = n.toLowerCase();
+                if (["content-encoding", "content-length", "transfer-encoding"].includes(ln)) continue;
+                headers.push({ name: n, value: v });
+              }
+              headers.push({ name: "Access-Control-Allow-Origin", value: "*" });
+              this.fulfilled = (this.fulfilled || 0) + 1;
+              return this.cdp.send("Fetch.fulfillRequest", { requestId: p.requestId, responseCode: r.status, responseHeaders: headers, body: buf.toString("base64") }, this.sessionId);
+            })
+            .catch(() => { this.fulfillFailures = (this.fulfillFailures || 0) + 1; this.cdp.send("Fetch.failRequest", { requestId: p.requestId, errorReason: "ConnectionRefused" }, this.sessionId).catch(() => {}); });
+          return;
+        }
+        this.guard.blockedExternal = this.guard.blockedExternal || [];
+        this.guard.blockedExternal.push({ method: m, url: u.slice(0, 160) });
+        this.cdp.send("Fetch.failRequest", { requestId: p.requestId, errorReason: "AccessDenied" }, this.sessionId).catch(() => {});
       }
     });
     await this.cdp.send("Page.enable", {}, this.sessionId);
@@ -354,6 +383,55 @@ async function resolvePrivates() {
 }
 
 // ---------------------------------------------------------------- controls
+// Shared SC 2.5.8 evaluator: circle-intersection spacing test over measured rects.
+// Used identically for the scratch fixtures and the app targets (one implementation).
+function evalTargets(ts) {
+  const R = (n) => Math.round(n * 100) / 100;
+  const res = [];
+  const centers = ts.map((t) => ({ cx: t.rect.left + t.rect.width / 2, cy: t.rect.top + t.rect.height / 2 }));
+  for (let i = 0; i < ts.length; i++) {
+    const t = ts[i], r = t.rect;
+    const undersized = r.width < 24 || r.height < 24;
+    const cx = r.left + r.width / 2, cy = r.top + r.height / 2;
+    // WCAG 2.2 SC 2.5.8 spacing: circle radius 12 centered on the bounding box must not
+    // intersect another target (circle-vs-rect edge distance < 12) nor the circle of another
+    // undersized target (center distance < 24). Both rules recorded.
+    const intersections = [];
+    for (let j = 0; j < ts.length; j++) {
+      if (i === j) continue;
+      const o = ts[j].rect;
+      const dx = Math.max(o.left - cx, 0, cx - o.right);
+      const dy = Math.max(o.top - cy, 0, cy - o.bottom);
+      const edgeDist = Math.hypot(dx, dy);
+      const cj = { cx: o.left + o.width / 2, cy: o.top + o.height / 2 };
+      const centerDist = Math.hypot(cx - cj.cx, cy - cj.cy);
+      const otherUndersized = o.width < 24 || o.height < 24;
+      if (edgeDist < 12) intersections.push({ j, rule: "circle-vs-target-rect", edgeDistance: R(edgeDist), other: ts[j].text });
+      else if (otherUndersized && centerDist < 24) intersections.push({ j, rule: "circle-vs-circle", centerDistance: R(centerDist), other: ts[j].text });
+    }
+    const inlineInText = t.computedDisplay === "inline" && !/flex|grid/.test(t.parentDisplay || "") && (t.tag === "a" || t.tag === "span");
+    res.push({ text: t.text, tag: t.tag, size: { w: R(r.width), h: R(r.height) }, undersized, circleIntersections: intersections, inlineEvidence: inlineInText ? { display: t.computedDisplay, parentDisplay: t.parentDisplay } : null, disposition: !undersized ? "PASS-SIZE" : (intersections.length === 0 ? "PASS-SPACING" : (inlineInText ? "EXCEPTION-INLINE(candidate)" : "FAIL")) });
+  }
+  return res;
+}
+
+// DOM/API source per published field (A1: every field names where it was read).
+const MEASUREMENT_SOURCES = {
+  requested: "driver CLI viewport argument (Emulation.setDeviceMetricsOverride width/height)",
+  devicePixelRatio: "window.devicePixelRatio",
+  innerWidth_window: "window.innerWidth (layout viewport incl. scrollbar)",
+  docEl_clientWidth: "document.documentElement.clientWidth (layout viewport excl. scrollbar)",
+  docEl_scrollWidth: "document.documentElement.scrollWidth (content extent incl. overflow)",
+  body_clientWidth: "document.body.clientWidth", body_scrollWidth: "document.body.scrollWidth",
+  docOverflowX: "documentElement.scrollWidth - documentElement.clientWidth (real-viewport denominator)",
+  visualViewport: "window.visualViewport {width,height,scale,offsetLeft,offsetTop}",
+  horizontalScrollability: "window.scrollTo(maxScrollX,0) then window.scrollX; restored to 0",
+  nav: "document.querySelector('nav') clientWidth/scrollWidth/getBoundingClientRect + getComputedStyle overflow",
+  nav_phaseSpan: "nav span containing 'Phase 0' getBoundingClientRect + getComputedStyle",
+  offenders: "every element rect.right > clientWidth+1 or rect.left < -1 (getBoundingClientRect)",
+  targets: "a[href],button,select,input,textarea,[role] getBoundingClientRect + getComputedStyle",
+  contrast: "TreeWalker text nodes; getComputedStyle color/background-color/opacity/font; WCAG relative-luminance contrast",
+};
 function assertControl(list, name, ok, detail) {
   list.push({ name, ok: !!ok, detail });
   if (!ok) log("CONTROL FAIL:", name, detail);
@@ -392,24 +470,6 @@ async function runControls(cdp, versionLabel) {
   let mp = await s.measure({ wv: { width: 390, height: 844, dpr: 1 }, targets: true, contrast: false });
   await s.navigate(`http://127.0.0.1:${scratchPort}/spacing-fail.html`);
   let mf = await s.measure({ wv: { width: 390, height: 844, dpr: 1 }, targets: true, contrast: false });
-  const evalTargets = (ts) => {
-    const R = (n) => Math.round(n * 100) / 100;
-    const res = [];
-    const centers = ts.map((t) => ({ cx: t.rect.left + t.rect.width / 2, cy: t.rect.top + t.rect.height / 2 }));
-    for (let i = 0; i < ts.length; i++) {
-      const t = ts[i], r = t.rect;
-      const undersized = r.width < 24 || r.height < 24;
-      const intersections = [];
-      for (let j = 0; j < ts.length; j++) {
-        if (i === j) continue;
-        const d = Math.hypot(centers[i].cx - centers[j].cx, centers[i].cy - centers[j].cy);
-        if (d < 24) intersections.push({ j, centerDistance: R(d), other: ts[j].text });
-      }
-      const inlineInText = t.computedDisplay === "inline" && !/flex|grid/.test(t.parentDisplay || "") && (t.tag === "a" || t.tag === "span");
-      res.push({ text: t.text, tag: t.tag, size: { w: R(r.width), h: R(r.height) }, undersized, circleIntersections: intersections, inlineEvidence: inlineInText ? { display: t.computedDisplay, parentDisplay: t.parentDisplay } : null, disposition: !undersized ? "PASS-SIZE" : (intersections.length === 0 ? "PASS-SPACING" : (inlineInText ? "EXCEPTION-INLINE(candidate)" : "FAIL")) });
-    }
-    return res;
-  };
   const spacingPassEval = evalTargets(mp.targets);
   const spacingFailEval = evalTargets(mf.targets);
   results.controls.push({ name: "spacing_pass_fixture", expected: "PASS-SPACING", got: spacingPassEval[0].disposition, geometry: spacingPassEval.map((x) => x.size), ok: spacingPassEval[0].disposition === "PASS-SPACING" && spacingPassEval[1].disposition === "PASS-SPACING" });
@@ -479,12 +539,13 @@ async function main() {
       { name: "review", path: priv.reviewPath, shots: [390, 834, 1440], targets: true, contrast: true },
     ];
     const viewports = [[390, 844], [834, 1112], [1440, 900]];
-    const app = { viewports, routes: [], screenshots: [], focus: [], guardAggregate: null };
+    const app = { viewports, routes: [], screenshots: [], focus: [], guardAggregate: null, measurementSources: MEASUREMENT_SOURCES, evaluator: "evalTargets (shared with fixture controls)" };
     const s = new Session(cdp, br.versionInfo["Browser"]);
     await s.open();
     for (const rt of routes) {
       for (const [w, h] of viewports) {
-        const rec = { route: rt.name, path: rt.path, viewport: `${w}x${h}` };
+        const publicPath = rt.name === "asset_detail" ? "/assets/{asset_id}" : rt.name === "review" ? "/review/{candidate_id}" : rt.path;
+        const rec = { route: rt.name, path: publicPath, viewport: `${w}x${h}` };
         if (!rt.path) { rec.error = "route path unresolvable (no candidate/asset id from loopback GET)"; rec.measured = false; app.routes.push(rec); continue; }
         try {
           await s.setViewport(w, h);
@@ -493,13 +554,14 @@ async function main() {
           // sanitize text fields with the private list BEFORE writing (measurement itself was unmasked)
           const scrubbed = JSON.parse(JSON.stringify(m));
           const scrub = (o) => {
-            if (typeof o === "string") { let v = o; for (const p of priv.privates) if (p && p.length >= 3 && v.includes(p)) v = v.split(p).join("■".repeat(p.length)); return v; }
+            if (typeof o === "string") { let v = o; for (const p of priv.privates) if (p && p.length >= 3 && v.includes(p)) v = v.split(p).join("■".repeat(p.length)); v = v.replace(/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/gi, (m) => "■".repeat(m.length)); return v; }
             if (Array.isArray(o)) return o.map(scrub);
             if (o && typeof o === "object") { for (const k of Object.keys(o)) o[k] = scrub(o[k]); return o; }
             return o;
           };
           rec.measured = true;
           rec.measure = scrub(scrubbed);
+          if (rt.targets && m.targets) rec.targetDispositions = scrub(evalTargets(JSON.parse(JSON.stringify(m.targets))));
           if (w === 390 && (rt.name === "catalog" || rt.name === "review")) {
             rec.focus = await s.evaluate(FOCUS_JS);
           }
@@ -520,7 +582,7 @@ async function main() {
         log("app", rt.name, `${w}x${h}`, rec.error ? "ERROR" : "ok");
       }
     }
-    app.guardAggregate = { methods: { ...s.guard.methods }, blocked: s.guard.blocked.slice(), requestCount: s.requestLog.length };
+    app.guardAggregate = { methods: { ...s.guard.methods }, blocked: s.guard.blocked.slice(), blockedExternal: s.guard.blockedExternal || [], requestCount: s.requestLog.length, fulfilledFromLoopback: s.fulfilled || 0, fulfillFailures: s.fulfillFailures || 0, apiOrigin: API_ORIGIN };
     summary.app = app;
   }
   try { br.child.kill("SIGTERM"); } catch {}

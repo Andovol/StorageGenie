@@ -73,8 +73,8 @@ Fontconfig error: No writable cache directories
 	/home/andrei/.cache/fontconfig
 	/home/andrei/.fontconfig
 [sg183] browser: HeadlessChrome/149.0.7827.55
-[sg183] scratch server on 127.0.0.1:37915
-[sg183] browser stderr: [1013/140628.712967:ERROR:dbus/bus.cc:405] Failed to connect to the bus: Could not parse server address: Unknown address type (examples of valid types are "tcp" and on UNIX "unix")
-[sg183] browser stderr: [1013/140628.713024:ERROR:dbus/object_proxy.cc:572] Failed to call method: org.freedesktop.DBus.NameHasOwner: object_path= /org/freedesktop/DBus: unknown error type:
+[sg183] scratch server on 127.0.0.1:42929
+[sg183] browser stderr: [1013/140934.650990:ERROR:dbus/bus.cc:405] Failed to connect to the bus: Could not parse server address: Unknown address type (examples of valid types are "tcp" and on UNIX "unix")
+[sg183] browser stderr: [1013/140934.651095:ERROR:dbus/object_proxy.cc:572] Failed to call method: org.freedesktop.DBus.NameHasOwner: object_path= /org/freedesktop/DBus: unknown error type:
 [sg183] wrote /tmp/opencode/sg183/out/sg183_result.json elapsed 9s
 {"outFile":"/tmp/opencode/sg183/out/sg183_result.json","elapsedSeconds":9,"controlFailures":0,"appRoutes":0}

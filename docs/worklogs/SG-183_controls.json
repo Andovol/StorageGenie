@@ -1,5 +1,5 @@
 {
- "ts": "2026-10-13T14:06:28.316Z",
+ "ts": "2026-10-13T14:09:34.252Z",
  "browser": {
   "executable": "/home/andrei/.cache/ms-playwright/chromium_headless_shell-1228/chrome-headless-shell-linux64/chrome-headless-shell",
   "versionProtocol": "HeadlessChrome/149.0.7827.55",
@@ -7,7 +7,7 @@
   "userAgent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/149.0.7827.55 Safari/537.36",
   "launchArgs": [
    "--remote-debugging-port=0",
-   "--user-data-dir=/tmp/opencode/sg183/profile-1791900388317",
+   "--user-data-dir=/tmp/opencode/sg183/profile-1791900574253",
    "--no-first-run",
    "--no-default-browser-check",
    "--disable-gpu",
@@ -18,7 +18,7 @@
    "about:blank"
   ],
   "transport": "raw CDP over DevTools websocket (DevToolsActivePort; no wrappers)",
-  "remoteDebuggingPort": 41509
+  "remoteDebuggingPort": 39355
  },
  "jar": null,
  "controls": {
@@ -295,7 +295,7 @@
    "blockedList": [
     {
      "method": "POST",
-     "url": "http://127.0.0.1:37915/probe"
+     "url": "http://127.0.0.1:42929/probe"
     }
    ],
    "methodsSeen": {
@@ -304,7 +304,7 @@
    }
   },
   "browser": "HeadlessChrome/149.0.7827.55",
-  "ts": "2026-10-13T14:06:28.316Z",
+  "ts": "2026-10-13T14:09:34.252Z",
   "spacingFixturePass": [
    {
     "text": "a",
@@ -343,7 +343,8 @@
     "circleIntersections": [
      {
       "j": 1,
-      "centerDistance": 20,
+      "rule": "circle-vs-target-rect",
+      "edgeDistance": 10,
       "other": "b"
      }
     ],
@@ -361,7 +362,8 @@
     "circleIntersections": [
      {
       "j": 0,
-      "centerDistance": 20,
+      "rule": "circle-vs-target-rect",
+      "edgeDistance": 10,
       "other": "a"
      }
     ],
