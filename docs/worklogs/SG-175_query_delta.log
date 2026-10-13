@@ -1,0 +1,6 @@
+SG-175 query/runtime delta — candidate GET vs pre-change base (disposable TestClient benchmark, 300 GETs, one open + three resolved tasks in one household)
+candidate (work commit 0b42e7d): cd backend && /home/andrei/StorageGenie/backend/venv/bin/python /tmp/sg175_bench.py
+{"cwd": "/home/andrei/StorageGenie/backend", "n": 300, "avg_ms": 5.648, "ids": ["01a13550-445a-75f3-b777-3afc04803d56"], "open_only": true}
+base (803cf52, isolated worktree): cd /tmp/sg175-base/backend && /home/andrei/StorageGenie/backend/venv/bin/python /tmp/sg175_bench.py
+{"cwd": "/tmp/sg175-base/backend", "n": 300, "avg_ms": 4.144, "ids": [], "open_only": false}
+delta: +1.504 ms/GET (+36.3% on this 4-row fixture) = one added indexed SELECT on review_task (household_id indexed, subject_ref/status filtered); base read served the stale snapshot [] while one live open task existed (open_only=false) — the exact disagreement this slice repairs
