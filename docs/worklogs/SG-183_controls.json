@@ -1,0 +1,403 @@
+{
+ "ts": "2026-10-13T14:06:28.316Z",
+ "browser": {
+  "executable": "/home/andrei/.cache/ms-playwright/chromium_headless_shell-1228/chrome-headless-shell-linux64/chrome-headless-shell",
+  "versionProtocol": "HeadlessChrome/149.0.7827.55",
+  "protocolVersion": "1.3",
+  "userAgent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/149.0.7827.55 Safari/537.36",
+  "launchArgs": [
+   "--remote-debugging-port=0",
+   "--user-data-dir=/tmp/opencode/sg183/profile-1791900388317",
+   "--no-first-run",
+   "--no-default-browser-check",
+   "--disable-gpu",
+   "--no-sandbox",
+   "--disable-dev-shm-usage",
+   "--force-device-scale-factor=1",
+   "--window-size=1280,900",
+   "about:blank"
+  ],
+  "transport": "raw CDP over DevTools websocket (DevToolsActivePort; no wrappers)",
+  "remoteDebuggingPort": 41509
+ },
+ "jar": null,
+ "controls": {
+  "controls": [
+   {
+    "name": "scratch_fit_390",
+    "ok": true,
+    "detail": {
+     "docOverflowX": 0,
+     "docEl_scrollWidth": 390,
+     "docEl_clientWidth": 390
+    }
+   },
+   {
+    "name": "scratch_overflow_390",
+    "mutationAsserted": {
+     "wideRectWidth": 1200,
+     "expected": 1200,
+     "landed": true
+    },
+    "ok": true,
+    "detail": {
+     "docOverflowX": 810,
+     "docEl_scrollWidth": 1200,
+     "docEl_clientWidth": 390,
+     "offenders": 1
+    }
+   },
+   {
+    "name": "transport_guard_post",
+    "ok": true,
+    "detail": {
+     "postResult": "rejected:TypeError",
+     "serverSawPost": false,
+     "guardBlocked": true
+    }
+   },
+   {
+    "name": "spacing_pass_fixture",
+    "expected": "PASS-SPACING",
+    "got": "PASS-SPACING",
+    "geometry": [
+     {
+      "w": 20,
+      "h": 20
+     },
+     {
+      "w": 20,
+      "h": 20
+     }
+    ],
+    "ok": true
+   },
+   {
+    "name": "spacing_fail_fixture",
+    "expected": "FAIL",
+    "got": "FAIL",
+    "geometry": [
+     {
+      "w": 20,
+      "h": 20
+     },
+     {
+      "w": 20,
+      "h": 20
+     },
+     {
+      "w": 30,
+      "h": 19
+     },
+     {
+      "w": 37.36,
+      "h": 17
+     }
+    ],
+    "ok": true
+   },
+   {
+    "name": "spacing_fixture_geometry",
+    "ok": true,
+    "detail": {
+     "passGeomOk": true,
+     "failGeomOk": true,
+     "passRects": [
+      {
+       "x": 0,
+       "y": 0,
+       "left": 0,
+       "top": 0,
+       "right": 20,
+       "bottom": 20,
+       "width": 20,
+       "height": 20
+      },
+      {
+       "x": 24,
+       "y": 0,
+       "left": 24,
+       "top": 0,
+       "right": 44,
+       "bottom": 20,
+       "width": 20,
+       "height": 20
+      }
+     ],
+     "failRects": [
+      {
+       "x": 0,
+       "y": 0,
+       "left": 0,
+       "top": 0,
+       "right": 20,
+       "bottom": 20,
+       "width": 20,
+       "height": 20
+      },
+      {
+       "x": 20,
+       "y": 0,
+       "left": 20,
+       "top": 0,
+       "right": 40,
+       "bottom": 20,
+       "width": 20,
+       "height": 20
+      },
+      {
+       "x": 44.45,
+       "y": 0.5,
+       "left": 44.45,
+       "top": 0.5,
+       "right": 74.45,
+       "bottom": 19.5,
+       "width": 30,
+       "height": 19
+      },
+      {
+       "x": 148.53,
+       "y": 36,
+       "left": 148.53,
+       "top": 36,
+       "right": 185.89,
+       "bottom": 53,
+       "width": 37.36,
+       "height": 17
+      }
+     ]
+    }
+   },
+   {
+    "name": "contrast_known_controls",
+    "ok": true,
+    "detail": [
+     {
+      "case": "#767676 on #ffffff",
+      "computed": 4.5422,
+      "expected": 4.54,
+      "ok": true
+     },
+     {
+      "case": "#777777 on #ffffff",
+      "computed": 4.4781,
+      "expected": 4.48,
+      "ok": true
+     },
+     {
+      "case": "#000000 on #ffffff",
+      "computed": 21,
+      "expected": 21,
+      "ok": true
+     },
+     {
+      "case": "#ffffff on #ffffff",
+      "computed": 1,
+      "expected": 1,
+      "ok": true
+     },
+     {
+      "case": "#767676 on #ffffff == 5.0 (deliberately wrong control)",
+      "computed": 4.5422,
+      "expected": 5,
+      "ok": false
+     }
+    ]
+   },
+   {
+    "name": "contrast_wrong_expectation_must_fail",
+    "ok": true,
+    "detail": {
+     "case": "#767676 on #ffffff == 5.0 (deliberately wrong control)",
+     "computed": 4.5422,
+     "expected": 5,
+     "ok": false
+    }
+   },
+   {
+    "name": "contrast_alpha_case",
+    "ok": true,
+    "detail": {
+     "fg_rgba": {
+      "r": 0,
+      "g": 0,
+      "b": 0,
+      "a": 0.5
+     },
+     "bg_effective": {
+      "r": 255,
+      "g": 255,
+      "b": 255,
+      "a": 1
+     },
+     "ratio": 3.9767
+    }
+   }
+  ],
+  "contrastKnown": [
+   {
+    "case": "#767676 on #ffffff",
+    "computed": 4.5422,
+    "expected": 4.54,
+    "ok": true
+   },
+   {
+    "case": "#777777 on #ffffff",
+    "computed": 4.4781,
+    "expected": 4.48,
+    "ok": true
+   },
+   {
+    "case": "#000000 on #ffffff",
+    "computed": 21,
+    "expected": 21,
+    "ok": true
+   },
+   {
+    "case": "#ffffff on #ffffff",
+    "computed": 1,
+    "expected": 1,
+    "ok": true
+   },
+   {
+    "case": "#767676 on #ffffff == 5.0 (deliberately wrong control)",
+    "computed": 4.5422,
+    "expected": 5,
+    "ok": false
+   }
+  ],
+  "scratchServerLog": {
+   "requests": [
+    {
+     "method": "GET",
+     "url": "/guard.html"
+    },
+    {
+     "method": "GET",
+     "url": "/spacing-pass.html"
+    },
+    {
+     "method": "GET",
+     "url": "/spacing-fail.html"
+    },
+    {
+     "method": "GET",
+     "url": "/contrast.html"
+    }
+   ],
+   "postCount": 0,
+   "nonGetCount": 0
+  },
+  "guard": {
+   "postResult": "rejected:TypeError",
+   "serverSawPost": false,
+   "blockedByDriver": true,
+   "blockedList": [
+    {
+     "method": "POST",
+     "url": "http://127.0.0.1:37915/probe"
+    }
+   ],
+   "methodsSeen": {
+    "GET": 3,
+    "POST": 1
+   }
+  },
+  "browser": "HeadlessChrome/149.0.7827.55",
+  "ts": "2026-10-13T14:06:28.316Z",
+  "spacingFixturePass": [
+   {
+    "text": "a",
+    "tag": "button",
+    "size": {
+     "w": 20,
+     "h": 20
+    },
+    "undersized": true,
+    "circleIntersections": [],
+    "inlineEvidence": null,
+    "disposition": "PASS-SPACING"
+   },
+   {
+    "text": "b",
+    "tag": "button",
+    "size": {
+     "w": 20,
+     "h": 20
+    },
+    "undersized": true,
+    "circleIntersections": [],
+    "inlineEvidence": null,
+    "disposition": "PASS-SPACING"
+   }
+  ],
+  "spacingFixtureFail": [
+   {
+    "text": "a",
+    "tag": "button",
+    "size": {
+     "w": 20,
+     "h": 20
+    },
+    "undersized": true,
+    "circleIntersections": [
+     {
+      "j": 1,
+      "centerDistance": 20,
+      "other": "b"
+     }
+    ],
+    "inlineEvidence": null,
+    "disposition": "FAIL"
+   },
+   {
+    "text": "b",
+    "tag": "button",
+    "size": {
+     "w": 20,
+     "h": 20
+    },
+    "undersized": true,
+    "circleIntersections": [
+     {
+      "j": 0,
+      "centerDistance": 20,
+      "other": "a"
+     }
+    ],
+    "inlineEvidence": null,
+    "disposition": "FAIL"
+   },
+   {
+    "text": "n",
+    "tag": "select",
+    "size": {
+     "w": 30,
+     "h": 19
+    },
+    "undersized": true,
+    "circleIntersections": [],
+    "inlineEvidence": null,
+    "disposition": "PASS-SPACING"
+   },
+   {
+    "text": "a link",
+    "tag": "a",
+    "size": {
+     "w": 37.36,
+     "h": 17
+    },
+    "undersized": true,
+    "circleIntersections": [],
+    "inlineEvidence": {
+     "display": "inline",
+     "parentDisplay": "block"
+    },
+    "disposition": "PASS-SPACING"
+   }
+  ]
+ },
+ "app": null,
+ "errors": [],
+ "elapsedSeconds": 9
+}
