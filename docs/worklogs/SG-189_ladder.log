@@ -1,0 +1,24 @@
+SG-189 implementation ladder: touched files + runbook pins (pre-commit)
+command: backend/venv/bin/python -m pytest backend/tests/test_backup_drill.py backend/tests/test_runbook_commands.py -v
+============================= test session starts ==============================
+platform linux -- Python 3.12.3, pytest-9.1.1, pluggy-1.6.0 -- /home/andrei/StorageGenie/backend/venv/bin/python
+cachedir: .pytest_cache
+rootdir: /home/andrei/StorageGenie/backend
+configfile: pyproject.toml
+plugins: asyncio-1.4.0, anyio-4.15.0
+asyncio: mode=Mode.AUTO, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collecting ... collected 11 items
+
+backend/tests/test_backup_drill.py::test_consistent_backup_restores_byte_equal_with_matching_state PASSED [  9%]
+backend/tests/test_backup_drill.py::test_storage_copy_is_byte_equal PASSED [ 18%]
+backend/tests/test_backup_drill.py::test_byte_equality_gate_rejects_a_corrupted_copy PASSED [ 27%]
+backend/tests/test_backup_drill.py::test_guard_rejects_work_dir_equal_to_production_storage PASSED [ 36%]
+backend/tests/test_backup_drill.py::test_guard_rejects_work_dir_enclosing_production_storage PASSED [ 45%]
+backend/tests/test_backup_drill.py::test_guard_rejects_work_dir_inside_production_storage PASSED [ 54%]
+backend/tests/test_backup_drill.py::test_guard_allows_a_disjoint_work_dir PASSED [ 63%]
+backend/tests/test_backup_drill.py::test_guard_rejects_a_missing_production_db_on_a_scratch_path PASSED [ 72%]
+backend/tests/test_runbook_commands.py::test_readme_runbook_commands_match_sg086_form PASSED [ 81%]
+backend/tests/test_runbook_commands.py::test_guard_flags_the_doubled_data_suffix_drift PASSED [ 90%]
+backend/tests/test_runbook_commands.py::test_guard_constants_carry_no_secret PASSED [100%]
+
+============================== 11 passed in 0.11s ==============================

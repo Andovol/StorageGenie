@@ -1,0 +1,16 @@
+SG-189 worklog — R7 operator _guard direction fix (D16 L3; packet docs/packets/SG-189-r7-guard-direction-fix.md)
+Lane: dispatch-storagegenie@SG-189.service (cgroup own); runner pid 2187134 starttime_ticks 669835731, btime 1785224168, CLK_TCK 100 -> start epoch 1791922525; RUN_BUDGET_S=2100 -> deadline 1791924625.
+BASE: automation = b4a995312aabe927ec108d871cd5531fc8b2abe4 (= origin/automation at start); tree clean at start.
+Contract: /home/andrei/storagegenie-contract VERSION=0.47.0, sha256(RULES.md)=49338e39a5749821e7e26724d28715d4d27b0a34e01b359ec91bc3d85239e3ed == RULES.sha256 payload; HEAD bdbbaa7; no tag at HEAD (rules_check G-L1 UNCHECKED); G-L5/L7 gh-unauthenticated; rules_check rc=3.
+Settings (own process args): coder=opencode model=opencode-go/deepseek-v4.1-flash effort=max; coder source=command.
+Health START epoch 1791922608: {"status":"ok","db":"ok","storage":"ok"}.
+G1 fix backend/scripts/backup_restore_drill.py:118-128 — _guard split into three branches (equal / prod-inside-work / work-inside-prod); both containment directions rejected, each message names its true geometry; missing + readability checks unchanged. Accepted-set diff (CO-18): old {disjoint, work-inside-prod} -> new {disjoint}; the only member that left is work-inside-prod (intended, packet G1).
+FAIL leg (git archive of b4a9953 + candidate test file): 3 failed, 5 passed, rc=1 — equal-message regex, inverted prod-inside-work message, and work-inside-prod DID NOT RAISE. Log SG-189_focused_base.log.
+Pre-commit ladder (candidate): 11 passed, rc=0 (test_backup_drill.py 8 + test_runbook_commands.py 3). Log SG-189_ladder.log.
+Probe BASE: checks=9 fails=4 (work-inside-prod allowed; equal + prod-inside-work messages inverted; disjoint + missing correct). Log SG-189_probe_base.log.
+Probe CANDIDATE: checks=9 fails=0. Log SG-189_probe_candidate.log.
+CO-101 rerun SG-182_probe_g1.py against fixed helper: checks=22 fails=1 — the single fail is its dated pre-fix expectation guard[work-inside-source] expected=allowed actual=rejected (the inversion itself; corrected message quoted). Log SG-189_sg182_probe_rerun.log.
+Twin search CO-17: `in .*parents` comparator class in backend/scripts+app = the fixed helper only (class count 1); jobs.py:116 cursor twin is a different construct on a product route, out of packet scope by design (no operator-script twin).
+AUTHORITATIVE focused run (post-commit candidate tree): 11 passed, rc=0 (test_backup_drill.py 8 + test_runbook_commands.py 3); CANDIDATE HEAD echoed = published work commit 02f1214. Log SG-189_focused_candidate.log.
+Health END epoch 1791922778: {"status":"ok","db":"ok","storage":"ok"} — identical to START; delta none. Log SG-189_health_end.log.
+Work commit 02f1214 (product: drill script + its test). Evidence commit (docs/worklogs/SG-189*) follows; report commit after that; notes receipt last. No production DB/storage opened; no Docker/environment probe; no privileged operation attempted.

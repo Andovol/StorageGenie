@@ -1,0 +1,17 @@
+SG-189 probe — CANDIDATE helper (working tree after G1 fix; drill source = repo path)
+candidate drill sha256: ea58412b68c69fe5002ab02e587bdb472d4c274546e1979feb74172dec3aa175
+command: backend/venv/bin/python docs/worklogs/SG-189_probe_g1.py
+[phase] drill source = /home/andrei/StorageGenie/backend/scripts/backup_restore_drill.py
+[phase] scratch root = /tmp/opencode/sg189-ha8i5fbs
+[PASS] guard[equal] expected=rejected actual=rejected work=/tmp/opencode/sg189-ha8i5fbs/equal/stor storage=/tmp/opencode/sg189-ha8i5fbs/equal/stor msg='STOP: work-dir /tmp/opencode/sg189-ha8i5fbs/equal/stor equals production storage /tmp/opencode/sg189-ha8i5fbs/equal/stor'
+[PASS] guard[equal] message names the true geometry fragment='equals production storage' msg='STOP: work-dir /tmp/opencode/sg189-ha8i5fbs/equal/stor equals production storage /tmp/opencode/sg189-ha8i5fbs/equal/stor'
+[PASS] guard[prod-inside-work] expected=rejected actual=rejected work=/tmp/opencode/sg189-ha8i5fbs/prod-inside-work/enclose storage=/tmp/opencode/sg189-ha8i5fbs/prod-inside-work/enclose/stor msg='STOP: production storage /tmp/opencode/sg189-ha8i5fbs/prod-inside-work/enclose/stor is inside work-dir /tmp/opencode/sg189-ha8i5fbs/prod-inside-work/enclose'
+[PASS] guard[prod-inside-work] message names the true geometry fragment='is inside work-dir' msg='STOP: production storage /tmp/opencode/sg189-ha8i5fbs/prod-inside-work/enclose/stor is inside work-dir /tmp/opencode/sg189-ha8i5fbs/prod-inside-work/enclose'
+[PASS] guard[work-inside-prod] expected=rejected actual=rejected work=/tmp/opencode/sg189-ha8i5fbs/work-inside-prod/stor/work storage=/tmp/opencode/sg189-ha8i5fbs/work-inside-prod/stor msg='STOP: work-dir /tmp/opencode/sg189-ha8i5fbs/work-inside-prod/stor/work is inside production storage /tmp/opencode/sg189-ha8i5fbs/work-inside-prod/stor'
+[PASS] guard[work-inside-prod] message names the true geometry fragment='is inside production storage' msg='STOP: work-dir /tmp/opencode/sg189-ha8i5fbs/work-inside-prod/stor/work is inside production storage /tmp/opencode/sg189-ha8i5fbs/work-inside-prod/stor'
+[value] recursive shape (rejected pre-execution, drill intentionally not executed): backup destination /tmp/opencode/sg189-ha8i5fbs/work-inside-prod/stor/work/backup is inside copy source /tmp/opencode/sg189-ha8i5fbs/work-inside-prod/stor
+[PASS] guard[disjoint] expected=allowed actual=allowed work=/tmp/opencode/sg189-ha8i5fbs/disjoint/work storage=/tmp/opencode/sg189-ha8i5fbs/disjoint/stor msg=''
+[PASS] guard[missing] expected=rejected actual=rejected work=/tmp/opencode/sg189-ha8i5fbs/missing/work storage=/tmp/opencode/sg189-ha8i5fbs/missing/stor msg='STOP: production DB not found: /tmp/opencode/sg189-ha8i5fbs/missing/db/absent.db'
+[PASS] guard[missing] message names the true geometry fragment='production DB not found' msg='STOP: production DB not found: /tmp/opencode/sg189-ha8i5fbs/missing/db/absent.db'
+[cleanup] removed verified scratch target /tmp/opencode/sg189-ha8i5fbs
+[summary] checks=9 fails=0

@@ -1,0 +1,17 @@
+SG-189 probe — BASE helper (git archive of b4a9953) via SG189_DRILL=/tmp/opencode/sg189-base-tree/.../backup_restore_drill.py
+base drill sha256: f81b09b70c95ee3cc72e0a874e5b4289881b62dd90146f193f2bd8d67c7cfeb2
+command: SG189_DRILL=<base> backend/venv/bin/python docs/worklogs/SG-189_probe_g1.py
+[phase] drill source = /tmp/opencode/sg189-base-tree/backend/scripts/backup_restore_drill.py
+[phase] scratch root = /tmp/opencode/sg189-nfz7fazu
+[PASS] guard[equal] expected=rejected actual=rejected work=/tmp/opencode/sg189-nfz7fazu/equal/stor storage=/tmp/opencode/sg189-nfz7fazu/equal/stor msg='STOP: work-dir /tmp/opencode/sg189-nfz7fazu/equal/stor is inside production storage /tmp/opencode/sg189-nfz7fazu/equal/stor'
+[FAIL] guard[equal] message names the true geometry fragment='equals production storage' msg='STOP: work-dir /tmp/opencode/sg189-nfz7fazu/equal/stor is inside production storage /tmp/opencode/sg189-nfz7fazu/equal/stor'
+[PASS] guard[prod-inside-work] expected=rejected actual=rejected work=/tmp/opencode/sg189-nfz7fazu/prod-inside-work/enclose storage=/tmp/opencode/sg189-nfz7fazu/prod-inside-work/enclose/stor msg='STOP: work-dir /tmp/opencode/sg189-nfz7fazu/prod-inside-work/enclose is inside production storage /tmp/opencode/sg189-nfz7fazu/prod-inside-work/enclose/stor'
+[FAIL] guard[prod-inside-work] message names the true geometry fragment='is inside work-dir' msg='STOP: work-dir /tmp/opencode/sg189-nfz7fazu/prod-inside-work/enclose is inside production storage /tmp/opencode/sg189-nfz7fazu/prod-inside-work/enclose/stor'
+[FAIL] guard[work-inside-prod] expected=rejected actual=allowed work=/tmp/opencode/sg189-nfz7fazu/work-inside-prod/stor/work storage=/tmp/opencode/sg189-nfz7fazu/work-inside-prod/stor msg=''
+[FAIL] guard[work-inside-prod] message names the true geometry fragment='is inside production storage' msg=''
+[value] recursive shape (rejected pre-execution, drill intentionally not executed): backup destination /tmp/opencode/sg189-nfz7fazu/work-inside-prod/stor/work/backup is inside copy source /tmp/opencode/sg189-nfz7fazu/work-inside-prod/stor
+[PASS] guard[disjoint] expected=allowed actual=allowed work=/tmp/opencode/sg189-nfz7fazu/disjoint/work storage=/tmp/opencode/sg189-nfz7fazu/disjoint/stor msg=''
+[PASS] guard[missing] expected=rejected actual=rejected work=/tmp/opencode/sg189-nfz7fazu/missing/work storage=/tmp/opencode/sg189-nfz7fazu/missing/stor msg='STOP: production DB not found: /tmp/opencode/sg189-nfz7fazu/missing/db/absent.db'
+[PASS] guard[missing] message names the true geometry fragment='production DB not found' msg='STOP: production DB not found: /tmp/opencode/sg189-nfz7fazu/missing/db/absent.db'
+[cleanup] removed verified scratch target /tmp/opencode/sg189-nfz7fazu
+[summary] checks=9 fails=4

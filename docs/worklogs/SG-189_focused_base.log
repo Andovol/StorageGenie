@@ -1,0 +1,70 @@
+SG-189 focused drill tests — FAIL leg: CANDIDATE test file vs BASE helper (git archive of b4a9953)
+packet BASE (automation resolved at dispatch): b4a995312aabe927ec108d871cd5531fc8b2abe4
+base archive: git archive b4a9953 -> /tmp/opencode/sg189-base-tree
+candidate test sha256: 2cac034c8bf078ab03fc0179be15a766e4b073c81062961464c7aac7f3635bf2
+base drill sha256: f81b09b70c95ee3cc72e0a874e5b4289881b62dd90146f193f2bd8d67c7cfeb2
+command: /home/andrei/StorageGenie/backend/venv/bin/python -m pytest backend/tests/test_backup_drill.py -v (cwd=/tmp/opencode/sg189-base-tree)
+============================= test session starts ==============================
+platform linux -- Python 3.12.3, pytest-9.1.1, pluggy-1.6.0 -- /home/andrei/StorageGenie/backend/venv/bin/python
+cachedir: .pytest_cache
+rootdir: /tmp/opencode/sg189-base-tree/backend
+configfile: pyproject.toml
+plugins: asyncio-1.4.0, anyio-4.15.0
+asyncio: mode=Mode.AUTO, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collecting ... collected 8 items
+
+backend/tests/test_backup_drill.py::test_consistent_backup_restores_byte_equal_with_matching_state PASSED [ 12%]
+backend/tests/test_backup_drill.py::test_storage_copy_is_byte_equal PASSED [ 25%]
+backend/tests/test_backup_drill.py::test_byte_equality_gate_rejects_a_corrupted_copy PASSED [ 37%]
+backend/tests/test_backup_drill.py::test_guard_rejects_work_dir_equal_to_production_storage FAILED [ 50%]
+backend/tests/test_backup_drill.py::test_guard_rejects_work_dir_enclosing_production_storage FAILED [ 62%]
+backend/tests/test_backup_drill.py::test_guard_rejects_work_dir_inside_production_storage FAILED [ 75%]
+backend/tests/test_backup_drill.py::test_guard_allows_a_disjoint_work_dir PASSED [ 87%]
+backend/tests/test_backup_drill.py::test_guard_rejects_a_missing_production_db_on_a_scratch_path PASSED [100%]
+
+=================================== FAILURES ===================================
+___________ test_guard_rejects_work_dir_equal_to_production_storage ____________
+
+tmp_path = PosixPath('/tmp/pytest-of-andrei/pytest-0/test_guard_rejects_work_dir_eq0')
+
+    def test_guard_rejects_work_dir_equal_to_production_storage(tmp_path: Path) -> None:
+        prod_db, storage = _scratch_prod_pair(tmp_path)
+>       with pytest.raises(SystemExit, match="equals production storage"):
+E       AssertionError: Regex pattern did not match.
+E         Expected regex: 'equals production storage'
+E         Actual message: 'STOP: work-dir /tmp/pytest-of-andrei/pytest-0/test_guard_rejects_work_dir_eq0/prod/storage is inside production storage /tmp/pytest-of-andrei/pytest-0/test_guard_rejects_work_dir_eq0/prod/storage'
+
+backend/tests/test_backup_drill.py:129: AssertionError
+___________ test_guard_rejects_work_dir_enclosing_production_storage ___________
+
+tmp_path = PosixPath('/tmp/pytest-of-andrei/pytest-0/test_guard_rejects_work_dir_en0')
+
+    def test_guard_rejects_work_dir_enclosing_production_storage(tmp_path: Path) -> None:
+        prod_db = tmp_path / "prod" / "db" / "storagegenie.db"
+        prod_db.parent.mkdir(parents=True)
+        prod_db.write_bytes(b"fixture-db")
+        work = tmp_path / "work"
+        storage = work / "storage"
+        storage.mkdir(parents=True)
+>       with pytest.raises(SystemExit, match=r"production storage .* is inside work-dir"):
+E       AssertionError: Regex pattern did not match.
+E         Expected regex: 'production storage .* is inside work-dir'
+E         Actual message: 'STOP: work-dir /tmp/pytest-of-andrei/pytest-0/test_guard_rejects_work_dir_en0/work is inside production storage /tmp/pytest-of-andrei/pytest-0/test_guard_rejects_work_dir_en0/work/storage'
+
+backend/tests/test_backup_drill.py:140: AssertionError
+____________ test_guard_rejects_work_dir_inside_production_storage _____________
+
+tmp_path = PosixPath('/tmp/pytest-of-andrei/pytest-0/test_guard_rejects_work_dir_in0')
+
+    def test_guard_rejects_work_dir_inside_production_storage(tmp_path: Path) -> None:
+        prod_db, storage = _scratch_prod_pair(tmp_path)
+        work = storage / "work"
+>       with pytest.raises(SystemExit, match=r"work-dir .* is inside production storage"):
+E       Failed: DID NOT RAISE SystemExit
+
+backend/tests/test_backup_drill.py:147: Failed
+=========================== short test summary info ============================
+FAILED backend/tests/test_backup_drill.py::test_guard_rejects_work_dir_equal_to_production_storage
+FAILED backend/tests/test_backup_drill.py::test_guard_rejects_work_dir_enclosing_production_storage
+FAILED backend/tests/test_backup_drill.py::test_guard_rejects_work_dir_inside_production_storage
+========================= 3 failed, 5 passed in 0.13s ==========================
