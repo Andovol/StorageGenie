@@ -322,25 +322,26 @@ const FOCUS_STEP_JS = `(function(){
 
 const MASK_JS = (privates) => `(function(){
   var P = ${JSON.stringify(privates)};
+  var blockRun = function(len){ var out=''; for (var i=0;i<len;i++) out += '\u25A0\u200B'; return out; };
   var n=0;
   var imgs=document.querySelectorAll('img, video, canvas');
   for (var i=0;i<imgs.length;i++){ imgs[i].style.filter='blur(14px)'; n++; }
   var fields=document.querySelectorAll('input, textarea');
   for (var f=0; f<fields.length; f++){
     var fv=fields[f].value; if(!fv) continue; var nf=fv;
-    for (var q=0;q<P.length;q++){ var sq=P[q]; if (sq && sq.length>=3 && nf.indexOf(sq)>=0) nf=nf.split(sq).join(Array(sq.length+1).join('\u25A0')); }
-    nf=nf.replace(/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/gi,function(m){return Array(m.length+1).join('\u25A0');});
+    for (var q=0;q<P.length;q++){ var sq=P[q]; if (sq && sq.length>=3 && nf.indexOf(sq)>=0) nf=nf.split(sq).join(blockRun(sq.length)); }
+    nf=nf.replace(/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/gi,function(m){return blockRun(m.length);});
     if (nf!==fv){ fields[f].value=nf; n++; }
   }
   var walker=document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
   var t;
   while ((t=walker.nextNode())){
     var v=t.nodeValue; if(!v) continue; var o=v;
-    for (var p=0;p<P.length;p++){ var s=P[p]; if (s && s.length>=3 && v.indexOf(s)>=0) v=v.split(s).join(Array(s.length+1).join('\u25A0')); }
-    v=v.replace(/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/gi,function(m){return Array(m.length+1).join('\u25A0');});
+    for (var p=0;p<P.length;p++){ var s=P[p]; if (s && s.length>=3 && v.indexOf(s)>=0) v=v.split(s).join(blockRun(s.length)); }
+    v=v.replace(/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/gi,function(m){return blockRun(m.length);});
     if (v!==o) t.nodeValue=v;
   }
-  return {blurred:imgs.length, maskedFields:n, privates:P.length};
+  return {blurred:imgs.length, maskedFields:n, privates:P.length, blockRun: "\u25A0 + U+200B (layout-safe line break opportunities)"};
 })()`;
 
 // ---------------------------------------------------------------- capture engine
@@ -587,9 +588,11 @@ async function runApp(cdp, versionLabel) {
           const menuProbe = { route: rt.name, viewport: `${w}x${h}`, ...scrub(JSON.parse(JSON.stringify(m.menu))) };
           if (w === 390) app.menuProbes.push({ phase: "closed", ...menuProbe });
         }
-        if (rt.shots && SHOTS) {
+        if (SHOTS) {
           const maskInfo = await s.mask(priv.privates);
           rec.mask = { ...maskInfo, order: "after_measurement_before_screenshot" };
+          const postMask = await s.evaluate(`(function(){ return { docOverflowX: document.documentElement.scrollWidth - document.documentElement.clientWidth, docEl_clientWidth: document.documentElement.clientWidth, docEl_scrollWidth: document.documentElement.scrollWidth }; })()`);
+          rec.postMaskGeometry = postMask;
           const file = `${SHOTS}/${rt.name}_${w}x${h}.jpg`;
           await s.screenshot(file);
           rec.screenshot = file;
