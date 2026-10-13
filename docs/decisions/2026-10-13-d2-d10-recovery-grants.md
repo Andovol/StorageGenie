@@ -21,4 +21,6 @@ D15 corrected-rider dispatch approval, owner quote: “D15 - approved.” (2026-
 
 D16 L3 flow rule, owner quote: “D16 - ok” (2026-10-13, this chat.) Per-slice gos end; recovery slices flow with audit + rate after each. Checkpoints only on (a) G-K2 surfaces — production writes, sensitive surfaces, irreversible/outward-facing acts; (b) results changing the next packet's assumptions; (c) grant-needing verdicts. SG-185 first under this rule.
 
-SG-185 dispatched under D16 (no per-slice go; disposable DB + read-only GETs, no G-K2 surface). Re-reviewed vs `328851e`: global `filter_by(key=…)` holds at `assets.py:82`, untouched since SG-136. Expected ~600 s (uncalibrated; single-endpoint repair + focused tests).
+SG-185 dispatched under D16 (no per-slice go; disposable DB + read-only GETs, no G-K2 surface). Re-reviewed vs `328851e`: global `filter_by(key=…)` holds at `assets.py:82`, untouched since SG-136. Expected ~600 s (uncalibrated; single-endpoint repair + focused tests). Done `5be388f`, rated 97 no flag (audit SG-185_audit.md).
+
+SG-186 dispatched under D16 (same class: disposable + read-only GETs, no restart, no prod write). Re-reviewed vs `5be388f`: serve-path gap holds at `evidence.py:101` (untouched since SG-006); upload-replay sibling homed with same-shape conditional (SG-185 I1 → here). Expected ~600 s (uncalibrated; rehash repair + overhead loop + conditional sibling).
