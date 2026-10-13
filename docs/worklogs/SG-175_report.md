@@ -82,8 +82,9 @@ unchanged (served bundle `1b4680a0…` == SG-173 deployed record).
   `enrich.py:276` (literal `[]`), `services/candidates.py:792` (job-step historical output).
   Proposal writers (`dedup.py:199/216/232/241`, `services/candidates.py:722/771/1154`) untouched;
   historical snapshots not rewritten.
-- Durations (UTC clock): start 12:39:10Z; W1 12:49Z; W2 12:50Z; report write ≈12:57Z; elapsed
-  ≈ 1080 s of lane `RUN_BUDGET_S=2100` (stop window ≈13:14:10Z) — inside bound. No command hit
+- Durations (UTC clock, measured at commit time): session start 12:39:10Z; W1 committed
+  12:49:06Z; W2 12:49:42Z; report commit 12:52:41Z; elapsed at report commit 811 s of lane
+  `RUN_BUDGET_S=2100` (stop window 13:14:10Z) — inside bound. No command hit
   its bound and none hung (reads <1 s; tests 4.3 s and 2.1 s; probe ≈20 s; build ≈7 s including
   tsc). Test-command count: backend 3 runs (implementation, failpre base, passpost), frontend 3
   (implementation, failpre base, passpost), probe 2 (one setup-failed, one clean). No prove
