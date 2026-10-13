@@ -36,6 +36,38 @@ describe("InboxPage", () => {
     await waitFor(() => expect(api.apiPost).toHaveBeenCalledWith(`/v1/imports/${job.id}/retry`, {}, { household_id: household.id }));
   });
 
+  test("a CREATED job offers Start, calls /run, and shows the terminal state (SG-187 G1)", async () => {
+    const created = { ...job, id: "job-start-187", state: "CREATED" };
+    let state = "CREATED";
+    api.apiGet.mockImplementation((path: string) => {
+      if (path === "/v1/jobs") return Promise.resolve({ items: [{ ...created, state }], next_cursor: null, total: 1 });
+      if (path === `/v1/imports/${created.id}`) return Promise.resolve({ ...detail, id: created.id, state, errors: [] });
+      return Promise.resolve({ items: [], next_cursor: null, total: 0 });
+    });
+    api.apiPost.mockImplementation(() => {
+      state = "AWAITING_REVIEW";
+      return Promise.resolve({ ...detail, id: created.id, state, errors: [] });
+    });
+    renderPage();
+    fireEvent.click(await screen.findByText("Import job-star"));
+    const start = await screen.findByRole("button", { name: "Start import job" });
+    fireEvent.click(start);
+    await waitFor(() => expect(api.apiPost).toHaveBeenCalledWith(`/v1/imports/${created.id}/run`, {}, { household_id: household.id }));
+    expect((await screen.findAllByText("AWAITING_REVIEW")).length).toBeGreaterThan(0);
+  });
+
+  test("a FAILED job keeps Retry and offers no Start (no fake success)", async () => {
+    api.apiGet.mockImplementation((path: string) => {
+      if (path === "/v1/jobs") return Promise.resolve({ items: [job], next_cursor: null, total: 1 });
+      if (path === `/v1/imports/${job.id}`) return Promise.resolve(detail);
+      return Promise.resolve({ items: [], next_cursor: null, total: 0 });
+    });
+    renderPage();
+    fireEvent.click(await screen.findByText("Import job-load"));
+    expect(await screen.findByRole("button", { name: "Retry failed job" })).toBeEnabled();
+    expect(screen.queryByRole("button", { name: "Start import job" })).not.toBeInTheDocument();
+  });
+
   test("shows both loaded empty states", async () => {
     api.apiGet.mockResolvedValue({ items: [], next_cursor: null, total: 0 });
     renderPage();

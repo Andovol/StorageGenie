@@ -10,12 +10,23 @@ import { apiPost, uploadEvidence } from "../../api/client";
  * executes it when auto-detect is checked. No model is called from here.
  */
 
-const ACCEPTED_MIME = ["image/png", "image/jpeg", "image/webp"];
-const ACCEPTED_EXT = /\.(png|jpe?g|webp)$/i;
+// The server's accepted set (`evidence_service.ALLOWED_MEDIA`,
+// `config.allowed_mime_types`) and byte cap (`config.max_upload_bytes`, 20 MiB).
+// The client pre-checks below mirror them for a fast rejection; the server
+// stays authoritative.
+const ACCEPTED_MIME = [
+  "image/png",
+  "image/jpeg",
+  "image/webp",
+  "image/tiff",
+  "image/heic",
+  "image/heif",
+  "application/pdf",
+];
+const ACCEPTED_EXT = /\.(png|jpe?g|webp|tiff?|heics?|heif|pdf)$/i;
 
-// DQ9 names 25 MB as the target; the server enforces 20 MB today (`config.py:11`).
-export const DQ9_TARGET_MB = 25;
-export const SERVER_CAP_MB = 20;
+export const SERVER_CAP_BYTES = 20 * 1024 * 1024;
+export const SERVER_CAP_LABEL = "20 MiB";
 
 type Rejected = { name: string; reason: string };
 
@@ -85,13 +96,15 @@ export function AssetImportModal({ householdId, onClose }: AssetImportModalProps
     const accepted: File[] = [];
     const bad: Rejected[] = [];
     for (const file of Array.from(incoming)) {
-      if (isAccepted(file)) {
-        accepted.push(file);
-      } else {
+      if (!isAccepted(file)) {
         bad.push({
           name: file.name,
           reason: file.type ? `unsupported type ${file.type}` : "unsupported type",
         });
+      } else if (file.size > SERVER_CAP_BYTES) {
+        bad.push({ name: file.name, reason: `larger than the ${SERVER_CAP_LABEL} server limit` });
+      } else {
+        accepted.push(file);
       }
     }
     if (accepted.length) setStaged((prev) => [...prev, ...accepted]);
@@ -206,15 +219,14 @@ export function AssetImportModal({ householdId, onClose }: AssetImportModalProps
             type="file"
             multiple
             aria-label="Choose image files"
-            accept="image/png,image/jpeg,image/webp"
+            accept="image/png,image/jpeg,image/webp,image/tiff,image/heic,image/heif,application/pdf"
             onChange={(event) => {
               if (event.target.files?.length) addFiles(event.target.files);
               event.target.value = "";
             }}
           />
           <p data-testid="import-size-note" className="text-muted-foreground" style={{ margin: "10px 0 0", fontSize: 11 }}>
-            PNG, JPG or WebP. DQ9 target: up to {DQ9_TARGET_MB} MB per file — this server currently
-            accepts up to {SERVER_CAP_MB} MB.
+            PNG, JPG, WebP, TIFF, HEIC or PDF, up to {SERVER_CAP_LABEL} per file.
           </p>
         </div>
 

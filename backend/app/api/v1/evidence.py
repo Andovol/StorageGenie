@@ -5,6 +5,7 @@ from pathlib import Path
 
 from fastapi import APIRouter, Depends, File, Header, HTTPException, Query, UploadFile
 from fastapi.responses import FileResponse
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from app.config import settings
@@ -86,9 +87,15 @@ async def upload_evidence(  # noqa: C901
             raise HTTPException(status_code=413, detail=str(e))
         except EvidenceValidationError as e:
             raise HTTPException(status_code=422, detail=str(e))
-        except Exception as e:
-            # Could be FK violation for household
-            raise HTTPException(status_code=422, detail=str(e))
+        except IntegrityError:
+            # SG-187 G2: a row failure (unknown-household FK) is a readable
+            # rejection; the raw constraint/SQL text never reaches the client
+            # and store_evidence has already removed the written files.
+            logger.warning("Evidence upload rejected by database constraint household_id=%s", household_id)
+            raise HTTPException(status_code=422, detail="unknown household: evidence cannot be stored")
+        except Exception:
+            logger.error("Evidence upload failed household_id=%s", household_id)
+            raise HTTPException(status_code=500, detail="upload_failed: evidence could not be stored")
     if idempotency_key:
         ik = IdempotencyKey(key=idempotency_key, response_json=json.dumps({"id": ev.id}))
         db.add(ik)

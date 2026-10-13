@@ -159,6 +159,27 @@ def _thumbnail_bytes(image: Image.Image, media_type: str, size: int) -> bytes:
     return output.getvalue()
 
 
+def _remove_written_artifacts(full: Path, rel: str, keep_storage_key: str | None = None) -> None:
+    """SG-187 G2: remove files written for a row that then failed to persist.
+
+    `store_evidence` writes the original (and best-effort thumbnails) before
+    the `Evidence` row is flushed, so a row failure -- e.g. an unknown
+    household's FK rejection -- would otherwise leave orphaned bytes on disk.
+    `keep_storage_key` protects the race winner's file when our copy shares its
+    path; a cleanup failure is logged, never swallowed silently.
+    """
+    if keep_storage_key != rel:
+        for path in (full, *(thumbnail_path(rel, size) for size in settings.thumbnail_sizes)):
+            try:
+                path.unlink(missing_ok=True)
+            except OSError:
+                logger.warning("Evidence orphan cleanup failed path=%s", path, exc_info=True)
+        try:
+            full.parent.rmdir()
+        except OSError:
+            pass
+
+
 def store_evidence(  # noqa: C901
     file_bytes: bytes,
     original_filename: str,
@@ -241,7 +262,15 @@ def store_evidence(  # noqa: C901
         db.rollback()
         race = db.query(Evidence).filter_by(sha256=sha).first()
         if race is not None:
+            # The identical bytes already own a row; our written copy is an
+            # orphan unless it is that row's own file (same storage key).
+            _remove_written_artifacts(full, rel, keep_storage_key=race.storage_key)
             return race
+        _remove_written_artifacts(full, rel)
+        raise
+    except Exception:
+        db.rollback()
+        _remove_written_artifacts(full, rel)
         raise
     db.refresh(ev)
     return ev

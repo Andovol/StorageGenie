@@ -233,6 +233,42 @@ describe("AssetImportModal processing", () => {
   });
 });
 
+describe("Surface truth (SG-187 G3)", () => {
+  test("the size note states the enforced 20 MiB cap and the full accepted set", () => {
+    renderModal();
+    const note = screen.getByTestId("import-size-note");
+    expect(note).toHaveTextContent("20 MiB");
+    expect(note).toHaveTextContent(/TIFF/);
+    expect(note).toHaveTextContent(/HEIC/);
+    expect(note).toHaveTextContent(/PDF/);
+    expect(note).not.toHaveTextContent("25 MB");
+  });
+
+  test("backend-accepted formats stage (TIFF, HEIC, PDF)", () => {
+    renderModal();
+    dropFiles(
+      imageFile("scan.tiff", "image/tiff"),
+      imageFile("photo.heic", ""),
+      imageFile("doc.pdf", "application/pdf")
+    );
+
+    expect(screen.getAllByTestId("queue-item")).toHaveLength(3);
+    expect(screen.queryByTestId("rejected-files")).not.toBeInTheDocument();
+  });
+
+  test("a file over the 20 MiB server cap is rejected client-side with the limit named", () => {
+    renderModal();
+    const big = imageFile("huge.png");
+    Object.defineProperty(big, "size", { value: 20 * 1024 * 1024 + 1 });
+    dropFiles(big);
+
+    const rejected = screen.getByTestId("rejected-files");
+    expect(rejected).toHaveTextContent("huge.png");
+    expect(rejected).toHaveTextContent(/20 MiB/);
+    expect(screen.queryAllByTestId("queue-item")).toHaveLength(0);
+  });
+});
+
 describe("AssetImportModal dialog behaviour", () => {
   test("Cancel discards staged bytes, uploads nothing, and closes", () => {
     const onClose = vi.fn();
