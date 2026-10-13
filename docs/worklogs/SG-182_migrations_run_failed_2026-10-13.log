@@ -1,0 +1,63 @@
+[phase] scratch root = /tmp/opencode/sg182-mig-nhf9gyeb
+[PASS] revision graph has exactly one head heads=['20260924_sg114_relation'] revisions=11
+[value] linear chain length=11 head=20260924_sg114_relation
+----- alembic history (rc=0) -----
+20260924_sg113_location -> 20260924_sg114_relation (head), asset relations: typed links (SG-114, G4)
+20260923_sg100_enrich_snapshot -> 20260924_sg113_location, location tree + asset location assignment (SG-113, G3)
+20260917_sg068_saved_search -> 20260923_sg100_enrich_snapshot, enrichment snapshot store (SG-100, Arc A)
+20260916_sg048_name_optional -> 20260917_sg068_saved_search, saved searches: named per-household filter sets (SG-068, Phase 4)
+20260914_sg035_foundations -> 20260916_sg048_name_optional, name-optional capture: asset.display_name becomes nullable (SG-048, S2)
+20260912_sg025_provider_call -> 20260914_sg035_foundations, data foundations: source attribution, planning suggestions, guardrail log (SG-035, Phase 3 S2/S3)
+20260908_sg017_fts -> 20260912_sg025_provider_call, provider call ledger (SG-025, blueprint §3.3)
+20260908_sg014_candidate -> 20260908_sg017_fts, SQLite FTS5 index for asset catalog search.
+20260908_sg013_observation -> 20260908_sg014_candidate, deduplication candidates
+0201cf10c56c -> 20260908_sg013_observation, deterministic signal observations
+<base> -> 0201cf10c56c, 001 core foundation
+
+[PASS] alembic history rc=0
+----- alembic heads (rc=0) -----
+20260924_sg114_relation (head)
+
+[PASS] alembic heads agrees with source-derived head 20260924_sg114_relation (head)
+----- alembic upgrade head (fresh isolated DB) (rc=0) -----
+
+[stderr] INFO  [alembic.runtime.migration] Context impl SQLiteImpl.
+INFO  [alembic.runtime.migration] Will assume non-transactional DDL.
+INFO  [alembic.runtime.migration] Running upgrade  -> 0201cf10c56c, 001 core foundation
+INFO  [alembic.runtime.migration] Running upgrade 0201cf10c56c -> 20260908_sg013_observation, deterministic signal observations
+INFO  [alembic.runtime.migration] Running upgrade 20260908_sg013_observation -> 20260908_sg014_candidate, deduplication candidates
+INFO  [alembic.runtime.migration] Running upgrade 20260908_sg014_candidate -> 20260908_sg017_fts, SQLite FTS5 index for asset catalog search.
+INFO  [alembic.runtime.migration] Running upgrade 20260908_sg017_fts -> 20260912_sg025_provider_call, provider call ledger (SG-025, blueprint §3.3)
+INFO  [alembic.runtime.migration] Running upgrade 20260912_sg025_provider_call -> 20260914_sg035_foundations, data foundations: source attribution, planning suggestions, guardrail log (SG-035, Phase 3 S2/S3)
+INFO  [alembic.runtime.migration] Running upgrade 20260914_sg035_foundations -> 20260916_sg048_name_optional, name-optional capture: asset.display_name becomes nullable (SG-048, S2)
+INFO  [alembic.runtime.migration] Running upgrade 20260916_sg048_name_optional -> 20260917_sg068_saved_search, saved searches: named per-household filter sets (SG-068, Phase 4)
+INFO  [alembic.runtime.migration] Running upgrade 20260917_sg068_saved_search -> 20260923_sg100_enrich_snapshot, enrichment snapshot store (SG-100, Arc A)
+INFO  [alembic.runtime.migration] Running upgrade 20260923_sg100_enrich_snapshot -> 20260924_sg113_location, location tree + asset location assignment (SG-113, G3)
+INFO  [alembic.runtime.migration] Running upgrade 20260924_sg113_location -> 20260924_sg114_relation, asset relations: typed links (SG-114, G4)
+
+[PASS] fresh upgrade to head rc=0
+[FAIL] upgrade executed real revision steps
+----- alembic upgrade head (idempotent rerun) (rc=0) -----
+
+[stderr] INFO  [alembic.runtime.migration] Context impl SQLiteImpl.
+INFO  [alembic.runtime.migration] Will assume non-transactional DDL.
+
+[PASS] second upgrade head is a no-op (already at head)
+[PASS] settings override effective: ini-path DB not created ini_path_db_exists=False
+[PASS] upgraded DB integrity_check ok
+[PASS] DB alembic_version == expected head [('20260924_sg114_relation',)]
+[value] upgraded tables (28): ['alembic_version', 'assertion', 'asset', 'asset_evidence', 'asset_fts', 'asset_fts_config', 'asset_fts_data', 'asset_fts_docsize', 'asset_fts_idx', 'asset_location', 'asset_relation', 'audit_event', 'candidate', 'enrich_snapshot', 'evidence', 'guardrail_event', 'household', 'idempotency_key', 'job', 'job_step', 'location', 'observation', 'planning_suggestion', 'provider_call', 'review_task', 'saved_search', 'source_attribution', 'user']
+[PASS] settings.database_url == scratch override sqlite:////tmp/opencode/sg182-mig-nhf9gyeb/fresh.db
+[PASS] all 20 metadata tables/columns present after upgrade
+----- runbook seed against migrated scratch DB (rc=0) -----
+Seeded household 01a13617-f0db-7d90-b8d5-b86be563c6c8 name=Popescu Household
+
+[PASS] app.seed runbook step rc=0
+/home/andrei/StorageGenie/backend/venv/lib/python3.12/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+  from starlette.testclient import TestClient as TestClient  # noqa
+[PASS] real app health GET on migrated DB {"status":"ok","db":"ok","storage":"ok"}
+[PASS] real reader /v1/households returns seeded household (no rows exposed here) status=200 count=1
+[FAIL] real reader /v1/assets on empty migrated catalog status=200
+[PASS] real reader /v1/settings/ai on migrated DB status=200
+[cleanup] removed verified scratch target /tmp/opencode/sg182-mig-nhf9gyeb
+[summary] checks=16 fails=2

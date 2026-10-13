@@ -1,0 +1,67 @@
+[phase] drill source = /home/andrei/StorageGenie/backend/scripts/backup_restore_drill.py
+[phase] scratch root = /tmp/opencode/sg182-g1-kjkau1ec
+[PASS] guard[equal] expected=rejected actual=rejected work=/tmp/opencode/sg182-g1-kjkau1ec/guard/stor db=/tmp/opencode/sg182-g1-kjkau1ec/guard/db/prod.db storage=/tmp/opencode/sg182-g1-kjkau1ec/guard/stor msg='STOP: work-dir /tmp/opencode/sg182-g1-kjkau1ec/guard/stor is inside production storage /tmp/opencode/sg182-g1-kjkau1ec/guard/stor'
+[PASS] guard[source-inside-work] expected=rejected actual=rejected work=/tmp/opencode/sg182-g1-kjkau1ec/guard/enclose db=/tmp/opencode/sg182-g1-kjkau1ec/guard/enclose/db2/prod.db storage=/tmp/opencode/sg182-g1-kjkau1ec/guard/enclose/stor2 msg='STOP: work-dir /tmp/opencode/sg182-g1-kjkau1ec/guard/enclose is inside production DB /tmp/opencode/sg182-g1-kjkau1ec/guard/enclose/db2/prod.db'
+[PASS] guard[work-inside-source] expected=allowed actual=allowed work=/tmp/opencode/sg182-g1-kjkau1ec/guard/stor3/work db=/tmp/opencode/sg182-g1-kjkau1ec/guard/db3/prod.db storage=/tmp/opencode/sg182-g1-kjkau1ec/guard/stor3 msg=''
+[PASS] guard[work-inside-source] drill storage destination lands INSIDE its own source (recursive copy shape the guard missed; drill intentionally not executed) backup_dir=/tmp/opencode/sg182-g1-kjkau1ec/guard/stor3/work/backup
+[PASS] guard[disjoint] expected=allowed actual=allowed work=/tmp/opencode/sg182-g1-kjkau1ec/guard/work4 db=/tmp/opencode/sg182-g1-kjkau1ec/guard/db4/prod.db storage=/tmp/opencode/sg182-g1-kjkau1ec/guard/stor4 msg=''
+[PASS] guard[missing-db] expected=rejected actual=rejected work=/tmp/opencode/sg182-g1-kjkau1ec/guard/work5 db=/tmp/opencode/sg182-g1-kjkau1ec/guard/db5/missing.db storage=/tmp/opencode/sg182-g1-kjkau1ec/guard/stor5 msg='STOP: production DB not found: /tmp/opencode/sg182-g1-kjkau1ec/guard/db5/missing.db'
+[PASS] synthetic prod has WAL-resident committed state wal_bytes=61832
+[PASS] live synthetic integrity_check ok
+[value] live counts (9 rows total): {'asset': 5, 'evidence': 3, 'household': 1}
+[value] control (raw single-file copy is not a backup): raw-cp-of-only-main-file cannot even read schema: OperationalError: no such table: household
+[PASS] raw copy control differs from the full backup snapshot (WAL data absent) raw-cp-of-only-main-file cannot even read schema: OperationalError: no such table: household
+work-dir    = /tmp/opencode/sg182-g1-kjkau1ec/drill/work
+backup-dir  = /tmp/opencode/sg182-g1-kjkau1ec/drill/work/backup
+restore-dir = /tmp/opencode/sg182-g1-kjkau1ec/drill/work/restore
+[G1.1] BEFORE per-table counts + integrity (read-only, live)
+  live asset	5
+  live evidence	3
+  live household	1
+  live integrity_check=ok
+[G1.2] consistent copy via SQLite native backup API (read-only source)
+  backup sha256=526916e76afb4570679bd1f23fc65e65306b6f064934bcd91b04b1ab283ffdfd bytes=28672
+  backup integrity_check=ok
+[G1.3] storage recursive copy (read-only source)
+  source files=3 bytes=52
+  backup files=3 bytes=52
+  sample h1/ab/photo.bin 75d808cd9d5abfe1b928651f74fb314454eb071c93b0e94d6a9bb8a17c9c5f5c
+  sample h1/manifest.json c52747804789e256e8423f976810171ce1e8984906eb95ccd1b35bbf1e632c2f
+  sample h2/deep/note.txt acc4da733461020fb77d7a8a4c5172a16260c38316954272a1286931b508505d
+[G2.1] restore into a fresh temp dir (never the live paths)
+  backup == restored sha256=526916e76afb4570679bd1f23fc65e65306b6f064934bcd91b04b1ab283ffdfd
+  restored integrity_check=ok
+  restored evidence: ('e0', 'h1', 'h1/ab/e0.bin')
+  restored evidence: ('e1', 'h1', 'h1/ab/e1.bin')
+  restored evidence: ('e2', 'h1', 'h1/ab/e2.bin')
+  restored asset: ('a0', 'h1', 'Asset 0')
+  restored asset: ('a1', 'h1', 'Asset 1')
+  restored asset: ('a2', 'h1', 'Asset 2')
+  storage backup == restored: file hashes identical
+[G2.2] seen-to-fail: a deliberately corrupted temp copy must fail the equality gate
+  equality gate FAILED as expected: byte inequality: /tmp/opencode/sg182-g1-kjkau1ec/drill/work/backup/storagegenie.db=526916e76afb4570679bd1f23fc65e65306b6f064934bcd91b04b1ab283ffdfd vs /tmp/opencode/sg182-g1-kjkau1ec/drill/work/restore/corrupted.db=fee6d9c3a7879b50a89d4eba36871c373f142ffb5e33c402e742f6ebcdaf3287
+  corrupted artifact discarded
+[G1.4] AFTER per-table counts + integrity (read-only, live)
+  live asset	5
+  live evidence	3
+  live household	1
+  live integrity_check=ok
+  production-untouched: BEFORE == AFTER (counts identical)
+work-dir kept: /tmp/opencode/sg182-g1-kjkau1ec/drill/work
+
+[PASS] full drill exit code 0
+[PASS] drill reports production-untouched
+[PASS] built-in same-length corruption gate observed failing
+[PASS] backup integrity_check ok
+[PASS] backup counts == live BEFORE counts (WAL-resident state captured) {"asset": 5, "evidence": 3, "household": 1}
+[PASS] backup real row reader returns all synthetic rows [('a0', 'h1', 'Asset 0'), ('a1', 'h1', 'Asset 1'), ('a2', 'h1', 'Asset 2'), ('a3', 'h1', 'Asset 3'), ('a4', 'h1', 'Asset 4')]
+[PASS] backup == restored byte-equal
+[PASS] missing source DB => STOP (differs from normal control) rejected: STOP: production DB not found: /tmp/opencode/sg182-g1-kjkau1ec/drill/missing.db
+[PASS] same-length DB corruption keeps identical size
+[PASS] same-length DB corruption changes sha256 (names/sizes-blind check misses it)
+[PASS] byte-equality gate rejects same-length DB corruption
+[value] integrity_check on same-length corrupted DB = ok
+[PASS] same-length evidence corruption keeps name+size fingerprint identical ('h1/ab/photo.bin', 19)
+[PASS] same-length evidence corruption changes content hash (names/sizes fingerprint misses it)
+[cleanup] removed verified scratch target /tmp/opencode/sg182-g1-kjkau1ec
+[summary] checks=22 fails=0

@@ -1,0 +1,14 @@
+[PASS] GET / served status=200 bytes=944
+[value] index.html sha256=2f035becd05b63e226af82e2e8fe60c8f3b5effb9f37e49dd95a2265c4da0d55
+[PASS] served index references built assets count=2
+[value] served asset /assets/index-CYyuxefG.js status=200 bytes=322255 sha256=1b4680a0eddadff3c95a64b6bc00d744764d127a72cd5690ebea948b7664a29d
+[PASS] served asset fetch /assets/index-CYyuxefG.js
+[value] served asset /assets/index-DO0gjGV6.css status=200 bytes=3911 sha256=37b25dbdd4b0ecfdedb8255bc7f8af286726334e95a1a3a9e85b9ba381b3d57c
+[PASS] served asset fetch /assets/index-DO0gjGV6.css
+[PASS] GET /v1/settings/ai effective deployment AI config status=200
+[value] effective AI settings: {"allowed_model_ids": ["deepseek-v4-flash-vision-exp"], "consent": true, "model_id": "deepseek-v4-flash-vision-exp", "monthly_cap": null, "per_job_cap": null, "prompt_category": "food", "provider_id": "opencode-go"}
+[PASS] GET /v1/health {"status":"ok","db":"ok","storage":"ok"}
+[value] production DB file readable: True
+[value] served schema: alembic_version=[('20260924_sg114_relation',)] table_count=28
+[PASS] production schema identifies exactly one alembic head [('20260924_sg114_relation',)]
+[summary] checks=7 fails=0

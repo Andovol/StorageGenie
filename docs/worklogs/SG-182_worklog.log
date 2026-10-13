@@ -1,0 +1,59 @@
+SG-182 worklog — 2026-10-13 (UTC unless stated)
+Dispatch: SG-182 coder=opencode model=opencode-go/deepseek-v4.1-flash effort=max
+  (read from own process args /proc/$PPID/cmdline: `opencode run --auto --dir /home/andrei/StorageGenie
+   --model opencode-go/deepseek-v4.1-flash --variant max`)
+Base ref: automation, resolved commit d0591dc83810e987f656894a037dda8f633e208b (SG-181 audit head), clean.
+Rules check (G-L1/D339): bash /home/andrei/storagegenie-contract/rules_check.sh
+  -> G-L1 UNCHECKED the cache is not checked out at a contract tag: /home/andrei/storagegenie-contract; EXIT 3
+  -> G-L5 UNCHECKED gh-unauthenticated; G-L7 UNCHECKED gh-unauthenticated
+  -> G-L6 BYTES codex 2275 / opencode 1933
+  Contract checkout: VERSION=0.47.0, RULES.sha256 payload 49338e39a5749821e7e26724d28715d4d27b0a34e01b359ec91bc3d85239e3ed,
+  HEAD bdbbaa75df067805bba2b4103a78b1ced46e0725 ("Contract payload 0.47.0"), git describe: no tags reachable
+  (same state SG-181 measured; tag-object peel still not done — limitation retained).
+START health: curl -s http://127.0.0.1:8003/v1/health -> {"status":"ok","db":"ok","storage":"ok"}
+Engine (own-dispatch metadata): cgroup dispatch-storagegenie@SG-182.service; ancestor runner pid 1525733
+  starttime ticks 668440626, btime 1785224168, CLK_TCK 100 -> start epoch 1791908574, RUN_BUDGET_S=2100
+  (read from world-readable /etc/dispatch/storagegenie.conf) -> deadline epoch 1791910674.
+Source reconciliation (packaging):
+  docker-compose.yml: ONE production service `backend` (build context repo root, backend/Dockerfile),
+  ports 127.0.0.1:8003:8000, volumes storage_data:/data/storage + ./data/db:/data/db, env DATABASE_URL/
+  STORAGE_ROOT/HOUSEHOLD_DEFAULT_NAME/CORS_ORIGINS, healthcheck python urllib /v1/health.
+  frontend service is profiles:["dev"] only with node alarm; frontend/Dockerfile is a dev server (npm install).
+  backend/Dockerfile: node:20-alpine frontend build -> VITE_API_BASE, python:3.12.11-slim-bookworm@sha256:519591d6871b7bc437060736b9f7456b8731f1499a57e22e6c285135ae657bf7,
+  apt curl tesseract-ocr libzbar0 (line 14), pip -r requirements.lock, hatchling editable install, COPY static dist, CMD uvicorn.
+  No startup migration step anywhere: main.py has no startup hook; runbook owns `python -m alembic upgrade head`.
+PB-1 corrections recorded:
+  * packet says "ini line 23"; actual backend/alembic.ini `sqlalchemy.url` is LINE 3 (whole file 35 lines).
+  * `sqlalchemy.url` in ini is overridden at env.py:23 by settings.database_url (env DATABASE_URL wins) — verified live in probe.
+Probe G1 (guard + real drill) run started; probe migrations (fresh upgrade + readers) run started.
+
+G1 results (2026-10-13):
+  probe SG-182_probe_g1.py -> SG-182_g1_run_2026-10-13.log (22 checks, 0 fail; first run SG-182_g1_run_failed_2026-10-13.log preserved: probe fingerprint compare bug, product untouched)
+    guard ACTUAL helper outcomes (resolved paths in log):
+      equal (work==prod_storage) -> REJECTED, msg "work-dir ... is inside production storage ..."
+      source-inside-work (prod inside work) -> REJECTED, msg claims opposite direction ("work-dir X is inside production DB Y"; actual geometry Y inside X)
+      work-inside-source (work inside prod_storage) -> ALLOWED (defect confirmed; backup_dir=work/backup lands inside its own copy source; drill intentionally NOT run)
+      disjoint -> ALLOWED; missing prod DB -> REJECTED "not found"
+    real drill on synthetic WAL DB (wal_bytes=61832, 9 rows) + evidence bytes: exit 0, production-untouched BEFORE==AFTER,
+      backup==live counts incl. WAL-resident state, integrity ok, named rows a0..a4, backup==restored byte-equal,
+      built-in same-length corruption gate seen failing; raw single-file main-db copy control: "no such table: household"
+    independent same-length corruption: size equal, sha differs, equality gate raises; note integrity_check on corrupted copy = ok
+      (byte landed in unused space) — hash is the only reliable same-length detector; evidence names/sizes fingerprint blind to content
+  probe SG-182_probe_migrations.py -> SG-182_migrations_run_2026-10-13.log (16 checks, 0 fail; first run ..._failed_... preserved:
+    assertion assumptions about alembic log stream + /v1/assets envelope, both probe defects)
+    revision graph: 11 revisions, exactly one head 20260924_sg114_relation; alembic history/heads rc=0
+    fresh isolated upgrade head rc=0 with 11 real revision steps (stderr); rerun no-op; ini-path DB backend/data/db NOT created
+    (settings override of alembic.ini line 3 effective); upgraded DB integrity ok, alembic_version=head, 28 tables
+    all 20 metadata tables/columns present; seed rc=0; TestClient readers /v1/health, /v1/households (1), /v1/assets (items[]),
+    /v1/settings/ai all 200 on migrated scratch DB
+  build/type gates (existing venv/node_modules, offline):
+    frontend tsc 5.9.3 rc=0; vite build rc=0 (3.04s, scratch outDir /tmp/opencode/sg182-dist-*; local frontend/dist untouched)
+    backend ruff 0.16.5 `ruff check --no-cache app tests` rc=0 "All checks passed!"
+    backend mypy 2.3.1 `mypy app` rc=1: 41 errors in 9 files (mostly unused-ignore/no-untyped-def/type-arg) -> SG-182_mypy_2026-10-13.log
+      README lint gate therefore RED at this tree; no CI exists to catch it; introducing commit not established (root cause unknown)
+  served identity (GET-only + mode=ro schema; SG-182_served_identity_2026-10-13.log, 7 checks 0 fail):
+    index.html sha256=2f035bec... asset /assets/index-CYyuxefG.js sha256=1b4680a0... bytes=322255; CSS /assets/index-DO0gjGV6.css sha256=37b25dbd... bytes=3911
+    fresh scratch build emitted index-DRTd3YaC.js (different, older/newer deployed build) and index-DO0gjGV6.css hash EQUAL to served
+    effective deployment AI settings: provider_id=opencode-go model=deepseek-v4-flash-vision-exp consent=true caps null category=food
+    production schema readable mode=ro: alembic_version=20260924_sg114_relation (= this tree's head), 28 tables
+  PB-1 correction: alembic.ini sqlalchemy.url is line 3 (packet said line 23); env.py:23 override verified effective
