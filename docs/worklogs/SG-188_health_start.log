@@ -1,0 +1,8 @@
+SG-188 START health (CO-92) — production GET, read-only, no write.
+Command: curl -s http://127.0.0.1:8003/v1/health
+Result: HTTP 200 {"status":"ok","db":"ok","storage":"ok"}
+Read as the session's first command batch, seconds after lane start
+(dispatch-storagegenie@SG-188.service ExecMainStartTimestamp 2026-10-13
+19:55:07 UTC = epoch 1791921307). The exact second-level wall time of this
+read was not captured in the tool output — reported honestly; it is bounded
+to lane start + first-command latency.

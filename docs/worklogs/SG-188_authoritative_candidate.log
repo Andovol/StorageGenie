@@ -1,0 +1,389 @@
+........................................................................ [ 41%]
+........................................................................ [ 83%]
+............................                                             [100%]
+=============================== warnings summary ===============================
+venv/lib/python3.12/site-packages/fastapi/testclient.py:1
+  /home/andrei/StorageGenie/backend/venv/lib/python3.12/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+venv/lib/python3.12/site-packages/starlette/testclient.py:53
+  /home/andrei/StorageGenie/backend/venv/lib/python3.12/site-packages/starlette/testclient.py:53: DeprecationWarning: The anyio.abc.BlockingPortal alias is deprecated, use anyio.from_thread.BlockingPortal instead.
+    _PortalFactoryType = Callable[[], AbstractContextManager[anyio.abc.BlockingPortal]]
+
+tests/test_search.py::test_fts_migration_upgrade_downgrade_upgrade
+tests/test_search.py::test_fts_migration_upgrade_downgrade_upgrade
+tests/test_search.py::test_fts_migration_upgrade_downgrade_upgrade
+tests/test_saved_searches.py::test_saved_search_migration_upgrade_downgrade_upgrade
+tests/test_saved_searches.py::test_saved_search_migration_upgrade_downgrade_upgrade
+tests/test_saved_searches.py::test_saved_search_migration_upgrade_downgrade_upgrade
+  /home/andrei/StorageGenie/backend/venv/lib/python3.12/site-packages/alembic/config.py:604: DeprecationWarning: No path_separator found in configuration; falling back to legacy splitting on spaces, commas, and colons for prepend_sys_path.  Consider adding path_separator=os to Alembic config.
+    util.warn_deprecated(
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+==================================== PASSES ====================================
+____________ test_attach_evidence_bulk_dedups_and_logs_failed_links ____________
+------------------------------ Captured log call -------------------------------
+WARNING  app.services.asset_service:asset_service.py:168 Failed to attach evidence_id=ghost-evidence-id to asset_id=01a136dc-0416-7853-883c-db47105c080c: (sqlite3.IntegrityError) FOREIGN KEY constraint failed
+[SQL: INSERT INTO asset_evidence (asset_id, evidence_id) VALUES (?, ?)]
+[parameters: ('01a136dc-0416-7853-883c-db47105c080c', 'ghost-evidence-id')]
+(Background on this error at: https://sqlalche.me/e/20/gkpj)
+_________________ test_fts_migration_upgrade_downgrade_upgrade _________________
+----------------------------- Captured stderr call -----------------------------
+INFO  [alembic.runtime.migration] Context impl SQLiteImpl.
+INFO  [alembic.runtime.migration] Will assume non-transactional DDL.
+INFO  [alembic.runtime.migration] Running upgrade  -> 0201cf10c56c, 001 core foundation
+INFO  [alembic.runtime.migration] Running upgrade 0201cf10c56c -> 20260908_sg013_observation, deterministic signal observations
+INFO  [alembic.runtime.migration] Running upgrade 20260908_sg013_observation -> 20260908_sg014_candidate, deduplication candidates
+INFO  [alembic.runtime.migration] Running upgrade 20260908_sg014_candidate -> 20260908_sg017_fts, SQLite FTS5 index for asset catalog search.
+INFO  [alembic.runtime.migration] Running upgrade 20260908_sg017_fts -> 20260912_sg025_provider_call, provider call ledger (SG-025, blueprint §3.3)
+INFO  [alembic.runtime.migration] Running upgrade 20260912_sg025_provider_call -> 20260914_sg035_foundations, data foundations: source attribution, planning suggestions, guardrail log (SG-035, Phase 3 S2/S3)
+INFO  [alembic.runtime.migration] Running upgrade 20260914_sg035_foundations -> 20260916_sg048_name_optional, name-optional capture: asset.display_name becomes nullable (SG-048, S2)
+INFO  [alembic.runtime.migration] Running upgrade 20260916_sg048_name_optional -> 20260917_sg068_saved_search, saved searches: named per-household filter sets (SG-068, Phase 4)
+INFO  [alembic.runtime.migration] Running upgrade 20260917_sg068_saved_search -> 20260923_sg100_enrich_snapshot, enrichment snapshot store (SG-100, Arc A)
+INFO  [alembic.runtime.migration] Running upgrade 20260923_sg100_enrich_snapshot -> 20260924_sg113_location, location tree + asset location assignment (SG-113, G3)
+INFO  [alembic.runtime.migration] Running upgrade 20260924_sg113_location -> 20260924_sg114_relation, asset relations: typed links (SG-114, G4)
+INFO  [alembic.runtime.migration] Context impl SQLiteImpl.
+INFO  [alembic.runtime.migration] Will assume non-transactional DDL.
+INFO  [alembic.runtime.migration] Running downgrade 20260924_sg114_relation -> 20260924_sg113_location, asset relations: typed links (SG-114, G4)
+INFO  [alembic.runtime.migration] Running downgrade 20260924_sg113_location -> 20260923_sg100_enrich_snapshot, location tree + asset location assignment (SG-113, G3)
+INFO  [alembic.runtime.migration] Running downgrade 20260923_sg100_enrich_snapshot -> 20260917_sg068_saved_search, enrichment snapshot store (SG-100, Arc A)
+INFO  [alembic.runtime.migration] Running downgrade 20260917_sg068_saved_search -> 20260916_sg048_name_optional, saved searches: named per-household filter sets (SG-068, Phase 4)
+INFO  [alembic.runtime.migration] Running downgrade 20260916_sg048_name_optional -> 20260914_sg035_foundations, name-optional capture: asset.display_name becomes nullable (SG-048, S2)
+INFO  [alembic.runtime.migration] Running downgrade 20260914_sg035_foundations -> 20260912_sg025_provider_call, data foundations: source attribution, planning suggestions, guardrail log (SG-035, Phase 3 S2/S3)
+INFO  [alembic.runtime.migration] Running downgrade 20260912_sg025_provider_call -> 20260908_sg017_fts, provider call ledger (SG-025, blueprint §3.3)
+INFO  [alembic.runtime.migration] Running downgrade 20260908_sg017_fts -> 20260908_sg014_candidate, SQLite FTS5 index for asset catalog search.
+INFO  [alembic.runtime.migration] Context impl SQLiteImpl.
+INFO  [alembic.runtime.migration] Will assume non-transactional DDL.
+INFO  [alembic.runtime.migration] Running upgrade 20260908_sg014_candidate -> 20260908_sg017_fts, SQLite FTS5 index for asset catalog search.
+INFO  [alembic.runtime.migration] Running upgrade 20260908_sg017_fts -> 20260912_sg025_provider_call, provider call ledger (SG-025, blueprint §3.3)
+INFO  [alembic.runtime.migration] Running upgrade 20260912_sg025_provider_call -> 20260914_sg035_foundations, data foundations: source attribution, planning suggestions, guardrail log (SG-035, Phase 3 S2/S3)
+INFO  [alembic.runtime.migration] Running upgrade 20260914_sg035_foundations -> 20260916_sg048_name_optional, name-optional capture: asset.display_name becomes nullable (SG-048, S2)
+INFO  [alembic.runtime.migration] Running upgrade 20260916_sg048_name_optional -> 20260917_sg068_saved_search, saved searches: named per-household filter sets (SG-068, Phase 4)
+INFO  [alembic.runtime.migration] Running upgrade 20260917_sg068_saved_search -> 20260923_sg100_enrich_snapshot, enrichment snapshot store (SG-100, Arc A)
+INFO  [alembic.runtime.migration] Running upgrade 20260923_sg100_enrich_snapshot -> 20260924_sg113_location, location tree + asset location assignment (SG-113, G3)
+INFO  [alembic.runtime.migration] Running upgrade 20260924_sg113_location -> 20260924_sg114_relation, asset relations: typed links (SG-114, G4)
+_______________ test_search_10k_fixture_latency_is_observed_once _______________
+----------------------------- Captured stdout call -----------------------------
+10k FTS latency machine=ubuntu platform=Linux-6.8.0-136-generic-x86_64-with-glibc2.39 p50=34.41ms p95=49.66ms samples=20
+____________ test_saved_search_migration_upgrade_downgrade_upgrade _____________
+----------------------------- Captured stderr call -----------------------------
+INFO  [alembic.runtime.migration] Context impl SQLiteImpl.
+INFO  [alembic.runtime.migration] Will assume non-transactional DDL.
+INFO  [alembic.runtime.migration] Running upgrade  -> 0201cf10c56c, 001 core foundation
+INFO  [alembic.runtime.migration] Running upgrade 0201cf10c56c -> 20260908_sg013_observation, deterministic signal observations
+INFO  [alembic.runtime.migration] Running upgrade 20260908_sg013_observation -> 20260908_sg014_candidate, deduplication candidates
+INFO  [alembic.runtime.migration] Running upgrade 20260908_sg014_candidate -> 20260908_sg017_fts, SQLite FTS5 index for asset catalog search.
+INFO  [alembic.runtime.migration] Running upgrade 20260908_sg017_fts -> 20260912_sg025_provider_call, provider call ledger (SG-025, blueprint §3.3)
+INFO  [alembic.runtime.migration] Running upgrade 20260912_sg025_provider_call -> 20260914_sg035_foundations, data foundations: source attribution, planning suggestions, guardrail log (SG-035, Phase 3 S2/S3)
+INFO  [alembic.runtime.migration] Running upgrade 20260914_sg035_foundations -> 20260916_sg048_name_optional, name-optional capture: asset.display_name becomes nullable (SG-048, S2)
+INFO  [alembic.runtime.migration] Running upgrade 20260916_sg048_name_optional -> 20260917_sg068_saved_search, saved searches: named per-household filter sets (SG-068, Phase 4)
+INFO  [alembic.runtime.migration] Running upgrade 20260917_sg068_saved_search -> 20260923_sg100_enrich_snapshot, enrichment snapshot store (SG-100, Arc A)
+INFO  [alembic.runtime.migration] Running upgrade 20260923_sg100_enrich_snapshot -> 20260924_sg113_location, location tree + asset location assignment (SG-113, G3)
+INFO  [alembic.runtime.migration] Running upgrade 20260924_sg113_location -> 20260924_sg114_relation, asset relations: typed links (SG-114, G4)
+INFO  [alembic.runtime.migration] Context impl SQLiteImpl.
+INFO  [alembic.runtime.migration] Will assume non-transactional DDL.
+INFO  [alembic.runtime.migration] Running downgrade 20260924_sg114_relation -> 20260924_sg113_location, asset relations: typed links (SG-114, G4)
+INFO  [alembic.runtime.migration] Running downgrade 20260924_sg113_location -> 20260923_sg100_enrich_snapshot, location tree + asset location assignment (SG-113, G3)
+INFO  [alembic.runtime.migration] Running downgrade 20260923_sg100_enrich_snapshot -> 20260917_sg068_saved_search, enrichment snapshot store (SG-100, Arc A)
+INFO  [alembic.runtime.migration] Running downgrade 20260917_sg068_saved_search -> 20260916_sg048_name_optional, saved searches: named per-household filter sets (SG-068, Phase 4)
+INFO  [alembic.runtime.migration] Context impl SQLiteImpl.
+INFO  [alembic.runtime.migration] Will assume non-transactional DDL.
+INFO  [alembic.runtime.migration] Running upgrade 20260916_sg048_name_optional -> 20260917_sg068_saved_search, saved searches: named per-household filter sets (SG-068, Phase 4)
+INFO  [alembic.runtime.migration] Running upgrade 20260917_sg068_saved_search -> 20260923_sg100_enrich_snapshot, enrichment snapshot store (SG-100, Arc A)
+INFO  [alembic.runtime.migration] Running upgrade 20260923_sg100_enrich_snapshot -> 20260924_sg113_location, location tree + asset location assignment (SG-113, G3)
+INFO  [alembic.runtime.migration] Running upgrade 20260924_sg113_location -> 20260924_sg114_relation, asset relations: typed links (SG-114, G4)
+__________________________ test_phase1_exit_condition __________________________
+----------------------------- Captured stdout call -----------------------------
+SG-020 E2E job_id=01a136dc-3e0c-7aa2-a8e6-325fc7f488e4 candidate_id=01a136dc-3ec0-7b00-b82b-1f3b7408d201 asset_id=01a136dc-3ef8-7a81-aa0b-c784efab5525 anchor_asset_id=01a136dc-3d96-7210-956c-27203bda1365 evidence_ids=['01a136dc-3dde-7630-b4c1-f452ce96fe8f', '01a136dc-3deb-7753-b612-52803b9581ae', '01a136dc-3df4-7573-9a6c-f2451ac8f747', '01a136dc-3dfb-7922-a84b-ff79f019bbf3', '01a136dc-3e02-7203-bfd9-bc1e48c79fd2'] similar_anchor=01a136dc-3d96-7210-956c-27203bda1365 collision_409=409 retry=AWAITING_REVIEW decoder_status={'qr': 'degraded', 'ean': 'present'} uv5_seconds=0.237017
+----------------------------- Captured stderr call -----------------------------
+WARNI [app.services.signals] Barcode extraction unavailable: pyzbar/libzbar is not installed
+WARNI [app.services.signals] OCR extraction unavailable: tesseract is not installed or it's not in your PATH. See README file for more information.
+WARNI [app.services.signals] Barcode extraction unavailable: pyzbar/libzbar is not installed
+WARNI [app.services.signals] OCR extraction unavailable: tesseract is not installed or it's not in your PATH. See README file for more information.
+WARNI [app.services.signals] Barcode extraction unavailable: pyzbar/libzbar is not installed
+WARNI [app.services.signals] OCR extraction unavailable: tesseract is not installed or it's not in your PATH. See README file for more information.
+WARNI [app.services.signals] Barcode extraction unavailable: pyzbar/libzbar is not installed
+WARNI [app.services.signals] OCR extraction unavailable: tesseract is not installed or it's not in your PATH. See README file for more information.
+WARNI [app.services.signals] Barcode extraction unavailable: pyzbar/libzbar is not installed
+WARNI [app.services.signals] OCR extraction unavailable: tesseract is not installed or it's not in your PATH. See README file for more information.
+WARNI [app.services.signals] Barcode extraction unavailable: pyzbar/libzbar is not installed
+WARNI [app.services.signals] OCR extraction unavailable: tesseract is not installed or it's not in your PATH. See README file for more information.
+------------------------------ Captured log call -------------------------------
+WARNING  app.services.signals:signals.py:104 Barcode extraction unavailable: pyzbar/libzbar is not installed
+WARNING  app.services.signals:signals.py:215 OCR extraction unavailable: tesseract is not installed or it's not in your PATH. See README file for more information.
+WARNING  app.services.signals:signals.py:104 Barcode extraction unavailable: pyzbar/libzbar is not installed
+WARNING  app.services.signals:signals.py:215 OCR extraction unavailable: tesseract is not installed or it's not in your PATH. See README file for more information.
+WARNING  app.services.signals:signals.py:104 Barcode extraction unavailable: pyzbar/libzbar is not installed
+WARNING  app.services.signals:signals.py:215 OCR extraction unavailable: tesseract is not installed or it's not in your PATH. See README file for more information.
+WARNING  app.services.signals:signals.py:104 Barcode extraction unavailable: pyzbar/libzbar is not installed
+WARNING  app.services.signals:signals.py:215 OCR extraction unavailable: tesseract is not installed or it's not in your PATH. See README file for more information.
+WARNING  app.services.signals:signals.py:104 Barcode extraction unavailable: pyzbar/libzbar is not installed
+WARNING  app.services.signals:signals.py:215 OCR extraction unavailable: tesseract is not installed or it's not in your PATH. See README file for more information.
+WARNING  app.services.signals:signals.py:104 Barcode extraction unavailable: pyzbar/libzbar is not installed
+WARNING  app.services.signals:signals.py:215 OCR extraction unavailable: tesseract is not installed or it's not in your PATH. See README file for more information.
+___________ test_ai_proposes_expiry_candidates_for_food_and_medicine ___________
+----------------------------- Captured stderr call -----------------------------
+WARNI [app.services.signals] Barcode extraction unavailable: pyzbar/libzbar is not installed
+WARNI [app.services.signals] OCR extraction unavailable: tesseract is not installed or it's not in your PATH. See README file for more information.
+WARNI [app.services.signals] Barcode extraction unavailable: pyzbar/libzbar is not installed
+WARNI [app.services.signals] OCR extraction unavailable: tesseract is not installed or it's not in your PATH. See README file for more information.
+------------------------------ Captured log call -------------------------------
+WARNING  app.services.signals:signals.py:104 Barcode extraction unavailable: pyzbar/libzbar is not installed
+WARNING  app.services.signals:signals.py:215 OCR extraction unavailable: tesseract is not installed or it's not in your PATH. See README file for more information.
+WARNING  app.services.signals:signals.py:104 Barcode extraction unavailable: pyzbar/libzbar is not installed
+WARNING  app.services.signals:signals.py:215 OCR extraction unavailable: tesseract is not installed or it's not in your PATH. See README file for more information.
+________ test_accept_commit_is_atomic_and_rolls_back_on_forced_failure _________
+----------------------------- Captured stderr call -----------------------------
+WARNI [app.services.signals] Barcode extraction unavailable: pyzbar/libzbar is not installed
+WARNI [app.services.signals] OCR extraction unavailable: tesseract is not installed or it's not in your PATH. See README file for more information.
+------------------------------ Captured log call -------------------------------
+WARNING  app.services.signals:signals.py:104 Barcode extraction unavailable: pyzbar/libzbar is not installed
+WARNING  app.services.signals:signals.py:215 OCR extraction unavailable: tesseract is not installed or it's not in your PATH. See README file for more information.
+________________ test_needs_evidence_manual_entry_never_guesses ________________
+----------------------------- Captured stderr call -----------------------------
+WARNI [app.services.signals] Barcode extraction unavailable: pyzbar/libzbar is not installed
+WARNI [app.services.signals] OCR extraction unavailable: tesseract is not installed or it's not in your PATH. See README file for more information.
+------------------------------ Captured log call -------------------------------
+WARNING  app.services.signals:signals.py:104 Barcode extraction unavailable: pyzbar/libzbar is not installed
+WARNING  app.services.signals:signals.py:215 OCR extraction unavailable: tesseract is not installed or it's not in your PATH. See README file for more information.
+_____________________ test_correction_supersedes_auditably _____________________
+----------------------------- Captured stderr call -----------------------------
+WARNI [app.services.signals] Barcode extraction unavailable: pyzbar/libzbar is not installed
+WARNI [app.services.signals] OCR extraction unavailable: tesseract is not installed or it's not in your PATH. See README file for more information.
+------------------------------ Captured log call -------------------------------
+WARNING  app.services.signals:signals.py:104 Barcode extraction unavailable: pyzbar/libzbar is not installed
+WARNING  app.services.signals:signals.py:215 OCR extraction unavailable: tesseract is not installed or it's not in your PATH. See README file for more information.
+_____________ test_provider_call_rows_per_call_with_scripted_cost ______________
+----------------------------- Captured stderr call -----------------------------
+WARNI [app.services.signals] Barcode extraction unavailable: pyzbar/libzbar is not installed
+WARNI [app.services.signals] OCR extraction unavailable: tesseract is not installed or it's not in your PATH. See README file for more information.
+WARNI [app.services.signals] Barcode extraction unavailable: pyzbar/libzbar is not installed
+WARNI [app.services.signals] OCR extraction unavailable: tesseract is not installed or it's not in your PATH. See README file for more information.
+------------------------------ Captured log call -------------------------------
+WARNING  app.services.signals:signals.py:104 Barcode extraction unavailable: pyzbar/libzbar is not installed
+WARNING  app.services.signals:signals.py:215 OCR extraction unavailable: tesseract is not installed or it's not in your PATH. See README file for more information.
+WARNING  app.services.signals:signals.py:104 Barcode extraction unavailable: pyzbar/libzbar is not installed
+WARNING  app.services.signals:signals.py:215 OCR extraction unavailable: tesseract is not installed or it's not in your PATH. See README file for more information.
+____________________ test_default_off_is_phase1_equivalent _____________________
+----------------------------- Captured stderr call -----------------------------
+WARNI [app.services.signals] Barcode extraction unavailable: pyzbar/libzbar is not installed
+WARNI [app.services.signals] OCR extraction unavailable: tesseract is not installed or it's not in your PATH. See README file for more information.
+------------------------------ Captured log call -------------------------------
+WARNING  app.services.signals:signals.py:104 Barcode extraction unavailable: pyzbar/libzbar is not installed
+WARNING  app.services.signals:signals.py:215 OCR extraction unavailable: tesseract is not installed or it's not in your PATH. See README file for more information.
+___________ test_multi_item_split_full_coverage_and_partial_refused ____________
+----------------------------- Captured stderr call -----------------------------
+WARNI [app.services.signals] Barcode extraction unavailable: pyzbar/libzbar is not installed
+WARNI [app.services.signals] OCR extraction unavailable: tesseract is not installed or it's not in your PATH. See README file for more information.
+------------------------------ Captured log call -------------------------------
+WARNING  app.services.signals:signals.py:104 Barcode extraction unavailable: pyzbar/libzbar is not installed
+WARNING  app.services.signals:signals.py:215 OCR extraction unavailable: tesseract is not installed or it's not in your PATH. See README file for more information.
+___________ test_manual_expiry_entry_on_needs_evidence_resolves_task ___________
+----------------------------- Captured stderr call -----------------------------
+WARNI [app.services.signals] Barcode extraction unavailable: pyzbar/libzbar is not installed
+WARNI [app.services.signals] OCR extraction unavailable: tesseract is not installed or it's not in your PATH. See README file for more information.
+------------------------------ Captured log call -------------------------------
+WARNING  app.services.signals:signals.py:104 Barcode extraction unavailable: pyzbar/libzbar is not installed
+WARNING  app.services.signals:signals.py:215 OCR extraction unavailable: tesseract is not installed or it's not in your PATH. See README file for more information.
+_________ test_cosmetics_extraction_persists_opened_date_after_accept __________
+----------------------------- Captured stderr call -----------------------------
+WARNI [app.services.signals] Barcode extraction unavailable: pyzbar/libzbar is not installed
+WARNI [app.services.signals] OCR extraction unavailable: tesseract is not installed or it's not in your PATH. See README file for more information.
+------------------------------ Captured log call -------------------------------
+WARNING  app.services.signals:signals.py:104 Barcode extraction unavailable: pyzbar/libzbar is not installed
+WARNING  app.services.signals:signals.py:215 OCR extraction unavailable: tesseract is not installed or it's not in your PATH. See README file for more information.
+___________________ test_item_without_opened_date_stays_null ___________________
+----------------------------- Captured stderr call -----------------------------
+WARNI [app.services.signals] Barcode extraction unavailable: pyzbar/libzbar is not installed
+WARNI [app.services.signals] OCR extraction unavailable: tesseract is not installed or it's not in your PATH. See README file for more information.
+------------------------------ Captured log call -------------------------------
+WARNING  app.services.signals:signals.py:104 Barcode extraction unavailable: pyzbar/libzbar is not installed
+WARNING  app.services.signals:signals.py:215 OCR extraction unavailable: tesseract is not installed or it's not in your PATH. See README file for more information.
+_________ test_planning_carries_persisted_opened_date_in_backing_refs __________
+----------------------------- Captured stderr call -----------------------------
+WARNI [app.services.signals] Barcode extraction unavailable: pyzbar/libzbar is not installed
+WARNI [app.services.signals] OCR extraction unavailable: tesseract is not installed or it's not in your PATH. See README file for more information.
+------------------------------ Captured log call -------------------------------
+WARNING  app.services.signals:signals.py:104 Barcode extraction unavailable: pyzbar/libzbar is not installed
+WARNING  app.services.signals:signals.py:215 OCR extraction unavailable: tesseract is not installed or it's not in your PATH. See README file for more information.
+___________ test_default_off_refuses_planning_and_chat_and_skips_ai ____________
+----------------------------- Captured stderr call -----------------------------
+WARNI [app.services.signals] Barcode extraction unavailable: pyzbar/libzbar is not installed
+WARNI [app.services.signals] OCR extraction unavailable: tesseract is not installed or it's not in your PATH. See README file for more information.
+------------------------------ Captured log call -------------------------------
+WARNING  app.services.signals:signals.py:104 Barcode extraction unavailable: pyzbar/libzbar is not installed
+WARNING  app.services.signals:signals.py:215 OCR extraction unavailable: tesseract is not installed or it's not in your PATH. See README file for more information.
+=========================== short test summary info ============================
+PASSED tests/test_evidence_upload.py::test_detect_media_type_accepts_every_supported_signature[\xff\xd8\xfffixture-image/jpeg-image/jpeg]
+PASSED tests/test_evidence_upload.py::test_detect_media_type_accepts_every_supported_signature[\x89PNG\r\n\x1afixture-image/png-image/png]
+PASSED tests/test_evidence_upload.py::test_detect_media_type_accepts_every_supported_signature[%PDF-1.7 fixture-application/pdf-application/pdf]
+PASSED tests/test_evidence_upload.py::test_detect_media_type_accepts_every_supported_signature[RIFF\x00\x00\x00\x00WEBP-image/webp-image/webp]
+PASSED tests/test_evidence_upload.py::test_detect_media_type_accepts_every_supported_signature[II*\x00fixture-image/tiff-image/tiff]
+PASSED tests/test_evidence_upload.py::test_detect_media_type_accepts_every_supported_signature[MM\x00*fixture-image/tiff-image/tiff]
+PASSED tests/test_evidence_upload.py::test_detect_media_type_accepts_every_supported_signature[\x00\x00\x00\x10ftypheic\x00\x00\x00\x00-image/heic-image/heic]
+PASSED tests/test_evidence_upload.py::test_detect_media_type_accepts_every_supported_signature[\x00\x00\x00\x10ftypheix\x00\x00\x00\x00-image/heic-image/heic]
+PASSED tests/test_evidence_upload.py::test_detect_media_type_accepts_every_supported_signature[\x00\x00\x00\x10ftypheim\x00\x00\x00\x00-image/heic-image/heic]
+PASSED tests/test_evidence_upload.py::test_detect_media_type_accepts_every_supported_signature[\x00\x00\x00\x10ftypheis\x00\x00\x00\x00-image/heic-image/heic]
+PASSED tests/test_evidence_upload.py::test_detect_media_type_accepts_every_supported_signature[\x00\x00\x00\x10ftyphevc\x00\x00\x00\x00-image/heic-image/heic]
+PASSED tests/test_evidence_upload.py::test_detect_media_type_accepts_every_supported_signature[\x00\x00\x00\x10ftyphevx\x00\x00\x00\x00-image/heic-image/heic]
+PASSED tests/test_evidence_upload.py::test_detect_media_type_accepts_every_supported_signature[\x00\x00\x00\x10ftyphevm\x00\x00\x00\x00-image/heic-image/heic]
+PASSED tests/test_evidence_upload.py::test_detect_media_type_accepts_every_supported_signature[\x00\x00\x00\x10ftyphevs\x00\x00\x00\x00-image/heic-image/heic]
+PASSED tests/test_evidence_upload.py::test_detect_media_type_accepts_every_supported_signature[\x00\x00\x00\x10ftypmif1\x00\x00\x00\x00-image/heif-image/heif]
+PASSED tests/test_evidence_upload.py::test_detect_media_type_accepts_every_supported_signature[\x00\x00\x00\x10ftypmsf1\x00\x00\x00\x00-image/heif-image/heif]
+PASSED tests/test_evidence_upload.py::test_detect_media_type_rejects_unknown_signature
+PASSED tests/test_evidence_upload.py::test_detect_media_type_rejects_ftyp_variants_outside_the_table[\x00\x00\x00\x10ftypavif\x00\x00\x00\x00-image/heic]
+PASSED tests/test_evidence_upload.py::test_detect_media_type_rejects_ftyp_variants_outside_the_table[\x00\x00\x00\x10ftypheia\x00\x00\x00\x00-image/heic]
+PASSED tests/test_evidence_upload.py::test_endpoint_accepts_classic_tiff_in_both_byte_orders
+PASSED tests/test_evidence_upload.py::test_endpoint_accepts_generated_heif_with_thumbnail[heic-image/heic]
+PASSED tests/test_evidence_upload.py::test_endpoint_accepts_generated_heif_with_thumbnail[mif1-image/heif]
+PASSED tests/test_evidence_upload.py::test_store_is_idempotent_audited_and_writes_thumbnail
+PASSED tests/test_evidence_upload.py::test_thumbnail_has_no_exif_or_gps_and_original_is_immutable
+PASSED tests/test_evidence_upload.py::test_thumbnail_failure_is_logged_with_sha_and_size
+PASSED tests/test_evidence_upload.py::test_bomb_is_rejected_before_any_storage_or_row[1000-5000-5000]
+PASSED tests/test_evidence_upload.py::test_bomb_is_rejected_before_any_storage_or_row[None-10000-10000]
+PASSED tests/test_evidence_upload.py::test_endpoint_duplicate_returns_same_id
+PASSED tests/test_evidence_upload.py::test_endpoint_oversize_reject_names_configured_limit
+PASSED tests/test_evidence_upload.py::test_endpoint_rejects_claimed_signature_mismatch
+PASSED tests/test_sg188_semantics.py::test_bare_resolve_refused_for_data_required_task_and_real_entry_resolves
+PASSED tests/test_sg188_semantics.py::test_controls_non_perishable_needs_no_task_and_non_data_task_resolves_bare
+PASSED tests/test_sg188_semantics.py::test_malformed_cursor_refused_and_valid_25_row_walk_is_lossless
+PASSED tests/test_sg188_semantics.py::test_default_asset_list_excludes_archived_and_explicit_filter_includes
+PASSED tests/test_sg188_semantics.py::test_expiry_status_reports_archived_nowhere
+PASSED tests/test_assets_crud.py::test_manual_create_idempotency_detail_scoping_and_archive
+PASSED tests/test_assets_crud.py::test_asset_cursor_pagination_and_mixed_filters
+PASSED tests/test_assets_crud.py::test_list_rows_carry_evidence_ids_for_the_card_thumbnail
+PASSED tests/test_assets_crud.py::test_attach_evidence_bulk_dedups_and_logs_failed_links
+PASSED tests/test_search.py::test_search_q_returns_exact_mixed_fixture_ids
+PASSED tests/test_search.py::test_search_q_matches_multiple_literal_tokens
+PASSED tests/test_search.py::test_search_q_quotes_hostile_match_syntax
+PASSED tests/test_search.py::test_search_q_keeps_same_named_asset_in_other_household_isolated
+PASSED tests/test_search.py::test_search_q_rebuild_restores_matches
+PASSED tests/test_search.py::test_fts_triggers_follow_asset_insert_update_delete
+PASSED tests/test_search.py::test_search_asset_type_returns_exact_mixed_fixture_ids
+PASSED tests/test_search.py::test_search_status_returns_exact_mixed_fixture_ids
+PASSED tests/test_search.py::test_search_has_evidence_returns_exact_ids_for_both_polarities
+PASSED tests/test_search.py::test_fts_migration_upgrade_downgrade_upgrade
+PASSED tests/test_search.py::test_search_10k_fixture_latency_is_observed_once
+PASSED tests/test_saved_searches.py::test_saved_search_crud_round_trips_name_and_query
+PASSED tests/test_saved_searches.py::test_saved_filter_reads_back_to_the_same_query_the_manual_state_sends
+PASSED tests/test_saved_searches.py::test_second_household_cannot_see_or_delete_the_firsts_search
+PASSED tests/test_saved_searches.py::test_unknown_filter_key_is_rejected_and_named
+PASSED tests/test_saved_searches.py::test_name_and_query_caps_reject_visibly
+PASSED tests/test_saved_searches.py::test_duplicate_name_is_case_insensitive_within_a_household
+PASSED tests/test_saved_searches.py::test_empty_household_renders_empty_items_not_an_error
+PASSED tests/test_saved_searches.py::test_delete_missing_saved_search_is_404
+PASSED tests/test_saved_searches.py::test_saved_search_migration_upgrade_downgrade_upgrade
+PASSED tests/test_saved_searches.py::test_saved_search_row_carries_the_parsed_query_json
+PASSED tests/test_asset_facets.py::test_facets_counts_each_dimension_without_its_own_filter
+PASSED tests/test_asset_facets.py::test_facets_q_narrows_the_shared_base
+PASSED tests/test_asset_facets.py::test_facets_empty_household_is_empty_maps_not_error
+PASSED tests/test_asset_facets.py::test_facets_aggregate_statements_compile_for_postgresql
+PASSED tests/test_sg111_lifecycle.py::test_vocabulary_literals_are_exact
+PASSED tests/test_sg111_lifecycle.py::test_transition_table_matches_the_blueprint_oracle
+PASSED tests/test_sg111_lifecycle.py::test_every_ordered_pair_legal_or_rejected
+PASSED tests/test_sg111_lifecycle.py::test_legal_chain_walks_end_to_end_and_terminals_are_closed
+PASSED tests/test_sg111_lifecycle.py::test_patch_transition_matrix_through_real_route
+PASSED tests/test_sg111_lifecycle.py::test_patch_unknown_status_is_422
+PASSED tests/test_sg111_lifecycle.py::test_patch_legal_chain_through_real_route
+PASSED tests/test_sg111_lifecycle.py::test_delete_archives_through_the_map
+PASSED tests/test_sg111_lifecycle.py::test_engine_excludes_non_active_from_rows_and_unresolved
+PASSED tests/test_sg111_lifecycle.py::test_assets_list_status_filter
+PASSED tests/test_sg111_lifecycle.py::test_analytics_chat_planning_active_semantics_unchanged
+PASSED tests/test_sg111_lifecycle.py::test_backfill_dry_run_then_apply_on_temp
+PASSED tests/test_sg111_lifecycle.py::test_backfill_is_idempotent_on_a_clean_vocabulary
+PASSED tests/test_sg107_expiry_engine.py::test_category_windows_are_the_declared_uncalibrated_data
+PASSED tests/test_sg107_expiry_engine.py::test_boundary_table_reproduces_every_category_window
+PASSED tests/test_sg107_expiry_engine.py::test_non_perishable_tier_is_null_and_bucket_still_computed
+PASSED tests/test_sg107_expiry_engine.py::test_bucket_boundaries
+PASSED tests/test_sg107_expiry_engine.py::test_days_remaining_is_calendar_difference
+PASSED tests/test_sg107_expiry_engine.py::test_discrimination_proposed_near_date_never_tiers
+PASSED tests/test_sg107_expiry_engine.py::test_unresolved_reasons_cover_all_four
+PASSED tests/test_sg107_expiry_engine.py::test_household_isolation
+PASSED tests/test_sg107_expiry_engine.py::test_as_of_shifts_days_exactly
+PASSED tests/test_sg107_expiry_engine.py::test_urgency_sort_is_expired_first_then_days_ascending
+PASSED tests/test_sg107_expiry_engine.py::test_compute_status_writes_nothing
+PASSED tests/test_sg107_expiry_engine.py::test_route_shape_summary_reconciles_and_writes_nothing
+PASSED tests/test_sg107_expiry_engine.py::test_route_empty_sets_are_200_and_zeroed
+PASSED tests/test_sg107_expiry_engine.py::test_route_category_filter_narrows_without_fallback
+PASSED tests/test_sg107_expiry_engine.py::test_route_unknown_household_404
+PASSED tests/test_sg107_expiry_engine.py::test_route_unparseable_as_of_422
+PASSED tests/test_sg107_expiry_engine.py::test_route_default_as_of_is_live_today
+PASSED tests/test_plugin_expiry.py::test_registry_rejects_unknown_and_version_mismatch
+PASSED tests/test_plugin_expiry.py::test_classification_profiles_round_trip_and_activated_phase
+PASSED tests/test_plugin_expiry.py::test_cosmetics_classifies_without_a_new_task_type
+PASSED tests/test_plugin_expiry.py::test_plugin_and_extension_validation_rejects_all_core_overrides
+PASSED tests/test_plugin_expiry.py::test_dateless_import_requires_manual_entry_and_reads_back
+PASSED tests/test_plugin_expiry.py::test_expiry_observed_date_uses_visible_observation_kinds_only
+PASSED tests/test_plugin_expiry.py::test_manual_expiry_enforces_date_type_and_unit_enums
+PASSED tests/test_plugin_expiry.py::test_non_perishable_has_no_expiry_and_manual_entry_is_rejected
+PASSED tests/test_plugin_expiry.py::test_manual_entry_resolves_own_and_split_origin_orphan_tasks
+PASSED tests/test_candidate_read.py::test_candidate_read_returns_review_payload_and_checks_household
+PASSED tests/test_candidate_read.py::test_candidate_get_serves_live_open_task_and_gate_blocks_accept
+PASSED tests/test_candidate_read.py::test_candidate_get_drops_resolved_task_ids_and_accept_succeeds
+PASSED tests/test_candidate_read.py::test_candidate_get_ignores_stale_embedded_task_ids
+PASSED tests/test_candidate_read.py::test_candidate_get_includes_live_task_absent_from_proposal
+PASSED tests/test_candidate_read.py::test_candidate_get_excludes_foreign_household_and_other_subject_tasks
+PASSED tests/test_candidate_read.py::test_candidate_get_and_gate_deny_household_mismatch
+PASSED tests/test_dedup.py::test_exact_duplicate_proposes_existing_asset_without_new_asset
+PASSED tests/test_dedup.py::test_near_duplicate_is_advisory_and_far_duplicate_has_no_similar_match
+PASSED tests/test_dedup.py::test_identifier_collision_creates_task_and_blocks_commit_until_resolved
+PASSED tests/test_dedup.py::test_no_merge_path_is_present_in_dedup_module
+PASSED tests/test_ai_pipeline.py::test_low_risk_auto_accept_at_or_above_threshold
+PASSED tests/test_ai_pipeline.py::test_expiry_always_proposed_never_auto_accepted
+PASSED tests/test_ai_pipeline.py::test_opened_date_persisted_gated_with_value
+PASSED tests/test_ai_pipeline.py::test_opened_date_none_writes_no_field_and_no_assertion
+PASSED tests/test_ai_pipeline.py::test_split_children_keep_their_item_opened_date
+PASSED tests/test_ai_pipeline.py::test_needs_evidence_opens_manual_entry_and_keeps_unknowns
+PASSED tests/test_ai_pipeline.py::test_correction_chain_supersedes_and_audits
+PASSED tests/test_ai_pipeline.py::test_default_config_is_phase1_skip
+PASSED tests/test_ai_pipeline.py::test_multi_item_preserved_and_blocking_task_resolves_to_commit
+PASSED tests/test_ai_pipeline.py::test_provider_call_ledger_row_per_call_with_job_link
+PASSED tests/test_ai_pipeline.py::test_real_provider_without_consent_skips_and_never_networks
+PASSED tests/test_ai_pipeline.py::test_repair_once_then_success
+PASSED tests/test_ai_pipeline.py::test_second_failure_fails_the_step_loudly
+PASSED tests/test_ai_pipeline.py::test_cap_binds_from_pipeline_zero_calls_zero_rows
+PASSED tests/test_ai_pipeline.py::test_provider_error_is_ledgered_and_survives_rollback
+PASSED tests/test_ai_pipeline.py::test_ai_candidate_still_receives_dedup_matches
+PASSED tests/test_ai_pipeline.py::test_returned_body_failing_schema_is_ledgered_durably
+PASSED tests/test_ai_pipeline.py::test_failed_body_with_usage_is_ledgered_with_that_usage
+PASSED tests/test_ai_pipeline.py::test_invalid_body_provider_post_change_is_ledgered_durably
+PASSED tests/test_ai_pipeline.py::test_content_guard_leg_stays_usage_free
+PASSED tests/test_ai_pipeline.py::test_monthly_cap_binds_across_jobs_from_durable_ledger
+PASSED tests/test_phase1_e2e.py::test_phase1_exit_condition
+PASSED tests/test_phase2_e2e.py::test_ai_proposes_expiry_candidates_for_food_and_medicine
+PASSED tests/test_phase2_e2e.py::test_accept_commit_is_atomic_and_rolls_back_on_forced_failure
+PASSED tests/test_phase2_e2e.py::test_needs_evidence_manual_entry_never_guesses
+PASSED tests/test_phase2_e2e.py::test_correction_supersedes_auditably
+PASSED tests/test_phase2_e2e.py::test_provider_call_rows_per_call_with_scripted_cost
+PASSED tests/test_phase2_e2e.py::test_default_off_is_phase1_equivalent
+PASSED tests/test_phase3_e2e.py::test_settings_picker_round_trip_422_and_no_key_bytes
+PASSED tests/test_phase3_e2e.py::test_multi_item_split_full_coverage_and_partial_refused
+PASSED tests/test_phase3_e2e.py::test_manual_expiry_entry_on_needs_evidence_resolves_task
+PASSED tests/test_phase3_e2e.py::test_correction_chain_supersedes_and_audits
+PASSED tests/test_phase3_e2e.py::test_planning_run_writes_pending_suggestion_backing_refs_and_row
+PASSED tests/test_phase3_e2e.py::test_planning_confirm_dismiss_and_illegal_moves
+PASSED tests/test_phase3_e2e.py::test_planning_run_mutates_no_catalogue_state
+PASSED tests/test_phase3_e2e.py::test_chat_grounded_answer_scoped_by_category
+PASSED tests/test_phase3_e2e.py::test_chat_correction_is_user_only_and_model_output_writes_nothing
+PASSED tests/test_phase3_e2e.py::test_cosmetics_extraction_persists_opened_date_after_accept
+PASSED tests/test_phase3_e2e.py::test_item_without_opened_date_stays_null
+PASSED tests/test_phase3_e2e.py::test_planning_carries_persisted_opened_date_in_backing_refs
+PASSED tests/test_phase3_e2e.py::test_chat_catalogue_carries_opened_date_for_supported_category
+PASSED tests/test_phase3_e2e.py::test_guardrail_log_rows_readable
+PASSED tests/test_phase3_e2e.py::test_default_off_refuses_planning_and_chat_and_skips_ai
+PASSED tests/test_export.py::test_export_manifest_is_complete_and_downloadable
+PASSED tests/test_export.py::test_export_manifest_restores_into_a_fresh_database
+PASSED tests/test_export.py::test_phase_zero_list_stubs_have_paginated_envelopes[/v1/jobs]
+PASSED tests/test_export.py::test_phase_zero_list_stubs_have_paginated_envelopes[/v1/review-tasks]
+PASSED tests/test_export.py::test_asset_idempotency_is_persisted_and_reused
+PASSED tests/test_schemas_common.py::test_encode_and_decode_cursor_valid
+PASSED tests/test_schemas_common.py::test_decode_cursor_legacy_format
+PASSED tests/test_schemas_common.py::test_decode_cursor_invalid_base64
+PASSED tests/test_schemas_common.py::test_decode_cursor_missing_separator
+PASSED tests/test_schemas_common.py::test_decode_cursor_invalid_timestamp_format
+PASSED tests/test_schemas_common.py::test_decode_cursor_empty_string
+PASSED tests/test_schemas_common.py::test_json_dumps_and_loads
+PASSED tests/test_schemas_common.py::test_problem_detail_model
+PASSED tests/test_schemas_common.py::test_loads_json_non_dict_types
+PASSED tests/test_schemas_common.py::test_dumps_json_unicode_not_escaped
+172 passed, 8 warnings in 23.91s

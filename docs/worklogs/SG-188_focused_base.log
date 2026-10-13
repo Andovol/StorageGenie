@@ -1,0 +1,330 @@
+.F..F...F.F.F..F.FF.                                                     [100%]
+=================================== FAILURES ===================================
+________________ test_asset_cursor_pagination_and_mixed_filters ________________
+
+db = (<sqlalchemy.orm.session.Session object at 0x73e73556ba40>, '01a136db-96ff-7920-a55c-962781418f20', '01a136db-96ff-7920-a55c-963700e6b42f')
+
+    def test_asset_cursor_pagination_and_mixed_filters(db) -> None:  # type: ignore[no-untyped-def]
+        from app.main import app
+    
+        session, household_id, _ = db
+        evidence = evidence_for(session, household_id, "green")
+        fixtures = [
+            ("Kitchen Blender", "appliance", "ACTIVE", True),
+            ("Garden Chair", "furniture", "ACTIVE", False),
+            ("Kitchen Table", "furniture", "ARCHIVED", True),
+            ("Office Lamp", "appliance", "ARCHIVED", False),
+            ("Garage Shelf", "storage", "ACTIVE", False),
+        ]
+        created: dict[str, dict[str, object]] = {}
+        with TestClient(app) as client:
+            for name, asset_type, status, has_evidence in fixtures:
+                response = post_asset(
+                    client,
+                    household_id,
+                    display_name=name,
+                    asset_type=asset_type,
+                    status=status,
+                    **({"evidence_ids": [evidence.id]} if has_evidence else {}),
+                )
+                assert response.status_code == 201
+                created[name] = response.json()
+    
+            assert len(created) > 2
+            # SG-188 (D8): the default list excludes ARCHIVED; the cursor walk now
+            # covers the three ACTIVE rows, and archived rows are reachable through
+            # the explicit status filter (controls below).
+            expected_default = {
+                created["Kitchen Blender"]["id"],
+                created["Garden Chair"]["id"],
+                created["Garage Shelf"]["id"],
+            }
+            seen: list[str] = []
+            cursor: str | None = None
+            pages = 0
+            while True:
+                params: dict[str, object] = {"household_id": household_id, "limit": 2}
+                if cursor is not None:
+                    params["cursor"] = cursor
+                response = client.get("/v1/assets", params=params)
+                assert response.status_code == 200
+                body = response.json()
+                page_ids = [item["id"] for item in body["items"]]
+                assert page_ids
+                assert len(page_ids) <= 2
+                seen.extend(page_ids)
+                pages += 1
+                cursor = body["next_cursor"]
+                if cursor is None:
+                    break
+                assert pages < len(created)
+    
+            assert pages > 1
+            assert len(seen) == len(set(seen))
+>           assert set(seen) == expected_default
+E           AssertionError: assert {'01a136db-97...56f670c7700b'} == {'01a136db-97...56f670c7700b'}
+E             
+E             Extra items in the left set:
+E             '01a136db-972b-7773-9d30-e1232c3b916d'
+E             '01a136db-9722-7d73-a1b7-480d736cba43'
+E             Use -v to get more diff
+
+tests/test_assets_crud.py:223: AssertionError
+________________ test_search_q_returns_exact_mixed_fixture_ids _________________
+
+search_fixtures = (<sqlalchemy.orm.session.Session object at 0x73e7344579b0>, '01a136db-983c-7290-bd09-24d6a566598d', {'Kitchen Blender'...p.models.asset.Asset object at 0x73e7355f3ef0>, 'Office Lamp': <app.models.asset.Asset object at 0x73e734433ec0>, ...})
+
+    def test_search_q_returns_exact_mixed_fixture_ids(search_fixtures) -> None:  # type: ignore[no-untyped-def]
+        _, household_id, assets = search_fixtures
+        with TestClient(app) as client:
+            actual = filtered_ids(client, household_id, q="Kitchen")
+            archived_hit = filtered_ids(client, household_id, q="Kitchen", status="ARCHIVED")
+    
+        # SG-188 (D8): the default list (search included) excludes ARCHIVED; the
+        # archived match stays reachable through the explicit status filter.
+        expected = {assets["Kitchen Blender"].id}
+        all_ids = {asset.id for asset in assets.values()}
+        assert expected and expected < all_ids
+>       assert actual == expected
+E       AssertionError: assert {'01a136db-98...4dfea10ab0bf'} == {'01a136db-98...a2ec046b9404'}
+E         
+E         Extra items in the left set:
+E         '01a136db-9851-7e53-9022-4dfea10ab0bf'
+E         Use -v to get more diff
+
+tests/test_search.py:105: AssertionError
+____________________ test_search_q_rebuild_restores_matches ____________________
+
+search_fixtures = (<sqlalchemy.orm.session.Session object at 0x73e734433740>, '01a136db-9b36-7103-a8a3-d0832c741b82', {'Kitchen Blender'...p.models.asset.Asset object at 0x73e73438f830>, 'Office Lamp': <app.models.asset.Asset object at 0x73e73438efc0>, ...})
+
+    def test_search_q_rebuild_restores_matches(search_fixtures) -> None:  # type: ignore[no-untyped-def]
+        session, household_id, assets = search_fixtures
+        with TestClient(app) as client:
+            before = filtered_ids(client, household_id, q="Kitchen")
+            session.execute(text("INSERT INTO asset_fts(asset_fts) VALUES ('delete-all')"))
+            session.commit()
+            assert filtered_ids(client, household_id, q="Kitchen") == set()
+            rebuild_asset_fts(session.connection())
+            session.commit()
+            after = filtered_ids(client, household_id, q="Kitchen")
+    
+        expected = {assets["Kitchen Blender"].id}
+>       assert before == expected
+E       AssertionError: assert {'01a136db-9b...cf8f89c0d749'} == {'01a136db-9b...a3e84877b773'}
+E         
+E         Extra items in the left set:
+E         '01a136db-9b48-7b00-94bb-cf8f89c0d749'
+E         Use -v to get more diff
+
+tests/test_search.py:170: AssertionError
+____________ test_search_asset_type_returns_exact_mixed_fixture_ids ____________
+
+search_fixtures = (<sqlalchemy.orm.session.Session object at 0x73e7344e1fd0>, '01a136db-9c94-7b92-8438-9e660215ec90', {'Kitchen Blender'...p.models.asset.Asset object at 0x73e734417ce0>, 'Office Lamp': <app.models.asset.Asset object at 0x73e7343cef90>, ...})
+
+    def test_search_asset_type_returns_exact_mixed_fixture_ids(search_fixtures) -> None:  # type: ignore[no-untyped-def]
+        _, household_id, assets = search_fixtures
+        with TestClient(app) as client:
+            actual = filtered_ids(client, household_id, asset_type="appliance")
+    
+        expected = {assets["Kitchen Blender"].id}
+        all_ids = {asset.id for asset in assets.values()}
+        assert expected and expected < all_ids
+>       assert actual == expected
+E       AssertionError: assert {'01a136db-9c...772a2a5cb224'} == {'01a136db-9c...c55c134413bc'}
+E         
+E         Extra items in the left set:
+E         '01a136db-9ca9-74e3-9336-772a2a5cb224'
+E         Use -v to get more diff
+
+tests/test_search.py:200: AssertionError
+________ test_search_has_evidence_returns_exact_ids_for_both_polarities ________
+
+search_fixtures = (<sqlalchemy.orm.session.Session object at 0x73e7343f3f80>, '01a136db-9d9e-7f83-827c-9aba55b11fc0', {'Kitchen Blender'...p.models.asset.Asset object at 0x73e734382120>, 'Office Lamp': <app.models.asset.Asset object at 0x73e734267f20>, ...})
+
+    def test_search_has_evidence_returns_exact_ids_for_both_polarities(search_fixtures) -> None:  # type: ignore[no-untyped-def]
+        _, household_id, assets = search_fixtures
+        with TestClient(app) as client:
+            with_evidence = filtered_ids(client, household_id, has_evidence=True)
+            without_evidence = filtered_ids(client, household_id, has_evidence=False)
+    
+        expected_with = {assets["Kitchen Blender"].id}
+        expected_without = {
+            assets["Garden Chair"].id,
+            assets["Garage Shelf"].id,
+        }
+>       assert with_evidence == expected_with
+E       AssertionError: assert {'01a136db-9d...12238554218a'} == {'01a136db-9d...63254daa203a'}
+E         
+E         Extra items in the left set:
+E         '01a136db-9db0-7223-bb79-12238554218a'
+E         Use -v to get more diff
+
+tests/test_search.py:229: AssertionError
+___ test_bare_resolve_refused_for_data_required_task_and_real_entry_resolves ___
+
+sg188_db = (<sqlalchemy.orm.session.Session object at 0x73e734142ed0>, '01a136db-a479-7600-95fd-18c88c157918', '01a136db-a479-7600-95fd-18d9db8166a6')
+
+    def test_bare_resolve_refused_for_data_required_task_and_real_entry_resolves(sg188_db) -> None:  # type: ignore[no-untyped-def]
+        session, household_id, other_household_id = sg188_db
+        with TestClient(app) as client:
+            food_asset = _post_asset(client, household_id, "Food jar")
+            classified = client.post(
+                f"{EXP}/assets/{food_asset}/classification",
+                params={"household_id": household_id},
+                json={"category": "food"},
+            )
+            assert classified.status_code == 200, classified.text
+            assert classified.json()["expiry_assertion"]["value"] == {"status": "unknown"}
+            assert classified.json()["expiry_assertion"]["review_state"] == "needs_evidence"
+            task_id = classified.json()["review_task"]
+            assert task_id
+    
+            foreign = client.post(
+                f"/v1/review-tasks/{task_id}/resolve",
+                params={"household_id": other_household_id},
+                json={},
+            )
+            assert foreign.status_code == 403, foreign.text
+    
+            bare = client.post(
+                f"/v1/review-tasks/{task_id}/resolve",
+                params={"household_id": household_id},
+                json={},
+            )
+>           assert bare.status_code == 422, bare.text
+E           AssertionError: {"id":"01a136db-a4d1-7581-abb6-d087d1f5a70d","status":"resolved","subject_ref":"01a136db-a482-7bd0-a252-cd76ef8a6b34"}
+E           assert 200 == 422
+E            +  where 200 = <Response [200 OK]>.status_code
+
+tests/test_sg188_semantics.py:101: AssertionError
+_______ test_malformed_cursor_refused_and_valid_25_row_walk_is_lossless ________
+
+sg188_db = (<sqlalchemy.orm.session.Session object at 0x73e72f9c0200>, '01a136db-a5d7-7591-904e-2d4a5d4c0e9c', '01a136db-a5d7-7591-904e-2d56c0761563')
+
+    def test_malformed_cursor_refused_and_valid_25_row_walk_is_lossless(sg188_db) -> None:  # type: ignore[no-untyped-def]
+        session, household_id, _ = sg188_db
+        with TestClient(app) as client:
+            created_ids = [_post_asset(client, household_id, f"Tied row {index:02d}") for index in range(25)]
+            tied = datetime(2026, 10, 13, 12, 0, 0)
+            session.query(Asset).filter(Asset.id.in_(created_ids)).update(
+                {"created_at": tied}, synchronize_session=False
+            )
+            session.commit()
+    
+            malformed = client.get(
+                "/v1/assets",
+                params={"household_id": household_id, "cursor": "%%%not-a-cursor%%%"},
+            )
+>           assert malformed.status_code == 422, malformed.text
+E           AssertionError: {"items":[{"id":"01a136db-a6cc-7693-8e85-dd38a4c0198d","household_id":"01a136db-a5d7-7591-904e-2d4a5d4c0e9c","display_name":"Tied row 24","asset_type":"unknown","status":"ACTIVE","quantity":null,"unit":null,"condition":null,"version":1,"created_at":"2026-10-13T12:00:00","evidence_ids":[]},{"id":"01a136db-a6c3-79a3-ab89-cc310b5072fa","household_id":"01a136db-a5d7-7591-904e-2d4a5d4c0e9c","display_name":"Tied row 23","asset_type":"unknown","status":"ACTIVE","quantity":null,"unit":null,"condition":null,"version":1,"created_at":"2026-10-13T12:00:00","evidence_ids":[]},{"id":"01a136db-a6bb-7022-a5e1-14cb6fed6233","household_id":"01a136db-a5d7-7591-904e-2d4a5d4c0e9c","display_name":"Tied row 22","asset_type":"unknown","status":"ACTIVE","quantity":null,"unit":null,"condition":null,"version":1,"created_at":"2026-10-13T12:00:00","evidence_ids":[]},{"id":"01a136db-a6b3-7131-bacb-cd2c9a275664","household_id":"01a136db-a5d7-7591-904e-2d4a5d4c0e9c","display_name":"Tied row 21","asset_type":"unknown","status":"ACTIVE","quantity":null,"unit":null,"condition":null,"version":1,"created_at":"2026-10-13T12:00:00","evidence_ids":[]},{"id":"01a136db-a6ab-72e1-9eca-67ee9a0f6b60","household_id":"01a136db-a5d7-7591-904e-2d4a5d4c0e9c","display_name":"Tied row 20","asset_type":"unknown","status":"ACTIVE","quantity":null,"unit":null,"condition":null,"version":1,"created_at":"2026-10-13T12:00:00","evidence_ids":[]},{"id":"01a136db-a6a3-74d2-8343-74d7a64dc9f8","household_id":"01a136db-a5d7-7591-904e-2d4a5d4c0e9c","display_name":"Tied row 19","asset_type":"unknown","status":"ACTIVE","quantity":null,"unit":null,"condition":null,"version":1,"created_at":"2026-10-13T12:00:00","evidence_ids":[]},{"id":"01a136db-a69c-7fb1-9b27-0431a0346ba9","household_id":"01a136db-a5d7-7591-904e-2d4a5d4c0e9c","display_name":"Tied row 18","asset_type":"unknown","status":"ACTIVE","quantity":null,"unit":null,"condition":null,"version":1,"created_at":"2026-10-13T12:00:00","evidence_ids":[]},{"id":"01a136db-a694-7421-8915-5fc143505aee","household_id":"01a136db-a5d7-7591-904e-2d4a5d4c0e9c","display_name":"Tied row 17","asset_type":"unknown","status":"ACTIVE","quantity":null,"unit":null,"condition":null,"version":1,"created_at":"2026-10-13T12:00:00","evidence_ids":[]},{"id":"01a136db-a68b-79d0-91fd-d12eda072dac","household_id":"01a136db-a5d7-7591-904e-2d4a5d4c0e9c","display_name":"Tied row 16","asset_type":"unknown","status":"ACTIVE","quantity":null,"unit":null,"condition":null,"version":1,"created_at":"2026-10-13T12:00:00","evidence_ids":[]},{"id":"01a136db-a680-75a2-a2c6-0cba94fbf43d","household_id":"01a136db-a5d7-7591-904e-2d4a5d4c0e9c","display_name":"Tied row 15","asset_type":"unknown","status":"ACTIVE","quantity":null,"unit":null,"condition":null,"version":1,"created_at":"2026-10-13T12:00:00","evidence_ids":[]},{"id":"01a136db-a676-7093-9623-a9cc7cd32ff4","household_id":"01a136db-a5d7-7591-904e-2d4a5d4c0e9c","display_name":"Tied row 14","asset_type":"unknown","status":"ACTIVE","quantity":null,"unit":null,"condition":null,"version":1,"created_at":"2026-10-13T12:00:00","evidence_ids":[]},{"id":"01a136db-a66b-7e01-a63c-2987c4f42027","household_id":"01a136db-a5d7-7591-904e-2d4a5d4c0e9c","display_name":"Tied row 13","asset_type":"unknown","status":"ACTIVE","quantity":null,"unit":null,"condition":null,"version":1,"created_at":"2026-10-13T12:00:00","evidence_ids":[]},{"id":"01a136db-a661-7da1-b36f-45486ae3cc38","household_id":"01a136db-a5d7-7591-904e-2d4a5d4c0e9c","display_name":"Tied row 12","asset_type":"unknown","status":"ACTIVE","quantity":null,"unit":null,"condition":null,"version":1,"created_at":"2026-10-13T12:00:00","evidence_ids":[]},{"id":"01a136db-a657-7db3-83b9-39f47660b47e","household_id":"01a136db-a5d7-7591-904e-2d4a5d4c0e9c","display_name":"Tied row 11","asset_type":"unknown","status":"ACTIVE","quantity":null,"unit":null,"condition":null,"version":1,"created_at":"2026-10-13T12:00:00","evidence_ids":[]},{"id":"01a136db-a64b-7002-858b-5bdb85434871","household_id":"01a136db-a5d7-7591-904e-2d4a5d4c0e9c","display_name":"Tied row 10","asset_type":"unknown","status":"ACTIVE","quantity":null,"unit":null,"condition":null,"version":1,"created_at":"2026-10-13T12:00:00","evidence_ids":[]},{"id":"01a136db-a641-7e62-a569-b884cc887946","household_id":"01a136db-a5d7-7591-904e-2d4a5d4c0e9c","display_name":"Tied row 09","asset_type":"unknown","status":"ACTIVE","quantity":null,"unit":null,"condition":null,"version":1,"created_at":"2026-10-13T12:00:00","evidence_ids":[]},{"id":"01a136db-a636-7801-a51d-d75f46e3e693","household_id":"01a136db-a5d7-7591-904e-2d4a5d4c0e9c","display_name":"Tied row 08","asset_type":"unknown","status":"ACTIVE","quantity":null,"unit":null,"condition":null,"version":1,"created_at":"2026-10-13T12:00:00","evidence_ids":[]},{"id":"01a136db-a62b-7950-a707-9c9e15b31e12","household_id":"01a136db-a5d7-7591-904e-2d4a5d4c0e9c","display_name":"Tied row 07","asset_type":"unknown","status":"ACTIVE","quantity":null,"unit":null,"condition":null,"version":1,"created_at":"2026-10-13T12:00:00","evidence_ids":[]},{"id":"01a136db-a621-7cc1-aa95-ba315d82d1d4","household_id":"01a136db-a5d7-7591-904e-2d4a5d4c0e9c","display_name":"Tied row 06","asset_type":"unknown","status":"ACTIVE","quantity":null,"unit":null,"condition":null,"version":1,"created_at":"2026-10-13T12:00:00","evidence_ids":[]},{"id":"01a136db-a617-7ed2-8f8a-0d9ba015fa13","household_id":"01a136db-a5d7-7591-904e-2d4a5d4c0e9c","display_name":"Tied row 05","asset_type":"unknown","status":"ACTIVE","quantity":null,"unit":null,"condition":null,"version":1,"created_at":"2026-10-13T12:00:00","evidence_ids":[]}],"next_cursor":"MDFhMTM2ZGItYTYxNy03ZWQyLThmOGEtMGQ5YmEwMTVmYTEzOjIwMjYtMTAtMTNUMTI6MDA6MDA="}
+E           assert 200 == 422
+E            +  where 200 = <Response [200 OK]>.status_code
+
+tests/test_sg188_semantics.py:186: AssertionError
+____ test_default_asset_list_excludes_archived_and_explicit_filter_includes ____
+
+sg188_db = (<sqlalchemy.orm.session.Session object at 0x73e72f9322a0>, '01a136db-a747-79c1-91ec-2cecad6c8aec', '01a136db-a747-79c1-91ec-2cf190e4b65f')
+
+    def test_default_asset_list_excludes_archived_and_explicit_filter_includes(sg188_db) -> None:  # type: ignore[no-untyped-def]
+        session, household_id, _ = sg188_db
+        with TestClient(app) as client:
+            active_one = _post_asset(client, household_id, "Active one")
+            active_two = _post_asset(client, household_id, "Active two")
+            archived = _post_asset(client, household_id, "Archived one")
+            gone = client.delete(
+                f"/v1/assets/{archived}", params={"household_id": household_id}
+            )
+            assert gone.status_code == 200, gone.text
+    
+            default = client.get(
+                "/v1/assets", params={"household_id": household_id, "limit": 100}
+            )
+            assert default.status_code == 200, default.text
+            default_ids = {item["id"] for item in default.json()["items"]}
+>           assert archived not in default_ids
+E           AssertionError: assert '01a136db-a768-7b61-906c-073ec10531c5' not in {'01a136db-a74f-7aa3-85cb-6e4ccabc4d2a', '01a136db-a75f-7263-bc56-2e5eb4d7073b', '01a136db-a768-7b61-906c-073ec10531c5'}
+
+tests/test_sg188_semantics.py:245: AssertionError
+=============================== warnings summary ===============================
+../../../../home/andrei/StorageGenie/backend/venv/lib/python3.12/site-packages/fastapi/testclient.py:1
+  /home/andrei/StorageGenie/backend/venv/lib/python3.12/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+../../../../home/andrei/StorageGenie/backend/venv/lib/python3.12/site-packages/starlette/testclient.py:53
+  /home/andrei/StorageGenie/backend/venv/lib/python3.12/site-packages/starlette/testclient.py:53: DeprecationWarning: The anyio.abc.BlockingPortal alias is deprecated, use anyio.from_thread.BlockingPortal instead.
+    _PortalFactoryType = Callable[[], AbstractContextManager[anyio.abc.BlockingPortal]]
+
+tests/test_search.py::test_fts_migration_upgrade_downgrade_upgrade
+tests/test_search.py::test_fts_migration_upgrade_downgrade_upgrade
+tests/test_search.py::test_fts_migration_upgrade_downgrade_upgrade
+  /home/andrei/StorageGenie/backend/venv/lib/python3.12/site-packages/alembic/config.py:604: DeprecationWarning: No path_separator found in configuration; falling back to legacy splitting on spaces, commas, and colons for prepend_sys_path.  Consider adding path_separator=os to Alembic config.
+    util.warn_deprecated(
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+==================================== PASSES ====================================
+____________ test_attach_evidence_bulk_dedups_and_logs_failed_links ____________
+------------------------------ Captured log call -------------------------------
+WARNING  app.services.asset_service:asset_service.py:168 Failed to attach evidence_id=ghost-evidence-id to asset_id=01a136db-97c2-7480-b21a-766943c284c9: (sqlite3.IntegrityError) FOREIGN KEY constraint failed
+[SQL: INSERT INTO asset_evidence (asset_id, evidence_id) VALUES (?, ?)]
+[parameters: ('01a136db-97c2-7480-b21a-766943c284c9', 'ghost-evidence-id')]
+(Background on this error at: https://sqlalche.me/e/20/gkpj)
+_________________ test_fts_migration_upgrade_downgrade_upgrade _________________
+----------------------------- Captured stderr call -----------------------------
+INFO  [alembic.runtime.migration] Context impl SQLiteImpl.
+INFO  [alembic.runtime.migration] Will assume non-transactional DDL.
+INFO  [alembic.runtime.migration] Running upgrade  -> 0201cf10c56c, 001 core foundation
+INFO  [alembic.runtime.migration] Running upgrade 0201cf10c56c -> 20260908_sg013_observation, deterministic signal observations
+INFO  [alembic.runtime.migration] Running upgrade 20260908_sg013_observation -> 20260908_sg014_candidate, deduplication candidates
+INFO  [alembic.runtime.migration] Running upgrade 20260908_sg014_candidate -> 20260908_sg017_fts, SQLite FTS5 index for asset catalog search.
+INFO  [alembic.runtime.migration] Running upgrade 20260908_sg017_fts -> 20260912_sg025_provider_call, provider call ledger (SG-025, blueprint §3.3)
+INFO  [alembic.runtime.migration] Running upgrade 20260912_sg025_provider_call -> 20260914_sg035_foundations, data foundations: source attribution, planning suggestions, guardrail log (SG-035, Phase 3 S2/S3)
+INFO  [alembic.runtime.migration] Running upgrade 20260914_sg035_foundations -> 20260916_sg048_name_optional, name-optional capture: asset.display_name becomes nullable (SG-048, S2)
+INFO  [alembic.runtime.migration] Running upgrade 20260916_sg048_name_optional -> 20260917_sg068_saved_search, saved searches: named per-household filter sets (SG-068, Phase 4)
+INFO  [alembic.runtime.migration] Running upgrade 20260917_sg068_saved_search -> 20260923_sg100_enrich_snapshot, enrichment snapshot store (SG-100, Arc A)
+INFO  [alembic.runtime.migration] Running upgrade 20260923_sg100_enrich_snapshot -> 20260924_sg113_location, location tree + asset location assignment (SG-113, G3)
+INFO  [alembic.runtime.migration] Running upgrade 20260924_sg113_location -> 20260924_sg114_relation, asset relations: typed links (SG-114, G4)
+INFO  [alembic.runtime.migration] Context impl SQLiteImpl.
+INFO  [alembic.runtime.migration] Will assume non-transactional DDL.
+INFO  [alembic.runtime.migration] Running downgrade 20260924_sg114_relation -> 20260924_sg113_location, asset relations: typed links (SG-114, G4)
+INFO  [alembic.runtime.migration] Running downgrade 20260924_sg113_location -> 20260923_sg100_enrich_snapshot, location tree + asset location assignment (SG-113, G3)
+INFO  [alembic.runtime.migration] Running downgrade 20260923_sg100_enrich_snapshot -> 20260917_sg068_saved_search, enrichment snapshot store (SG-100, Arc A)
+INFO  [alembic.runtime.migration] Running downgrade 20260917_sg068_saved_search -> 20260916_sg048_name_optional, saved searches: named per-household filter sets (SG-068, Phase 4)
+INFO  [alembic.runtime.migration] Running downgrade 20260916_sg048_name_optional -> 20260914_sg035_foundations, name-optional capture: asset.display_name becomes nullable (SG-048, S2)
+INFO  [alembic.runtime.migration] Running downgrade 20260914_sg035_foundations -> 20260912_sg025_provider_call, data foundations: source attribution, planning suggestions, guardrail log (SG-035, Phase 3 S2/S3)
+INFO  [alembic.runtime.migration] Running downgrade 20260912_sg025_provider_call -> 20260908_sg017_fts, provider call ledger (SG-025, blueprint §3.3)
+INFO  [alembic.runtime.migration] Running downgrade 20260908_sg017_fts -> 20260908_sg014_candidate, SQLite FTS5 index for asset catalog search.
+INFO  [alembic.runtime.migration] Context impl SQLiteImpl.
+INFO  [alembic.runtime.migration] Will assume non-transactional DDL.
+INFO  [alembic.runtime.migration] Running upgrade 20260908_sg014_candidate -> 20260908_sg017_fts, SQLite FTS5 index for asset catalog search.
+INFO  [alembic.runtime.migration] Running upgrade 20260908_sg017_fts -> 20260912_sg025_provider_call, provider call ledger (SG-025, blueprint §3.3)
+INFO  [alembic.runtime.migration] Running upgrade 20260912_sg025_provider_call -> 20260914_sg035_foundations, data foundations: source attribution, planning suggestions, guardrail log (SG-035, Phase 3 S2/S3)
+INFO  [alembic.runtime.migration] Running upgrade 20260914_sg035_foundations -> 20260916_sg048_name_optional, name-optional capture: asset.display_name becomes nullable (SG-048, S2)
+INFO  [alembic.runtime.migration] Running upgrade 20260916_sg048_name_optional -> 20260917_sg068_saved_search, saved searches: named per-household filter sets (SG-068, Phase 4)
+INFO  [alembic.runtime.migration] Running upgrade 20260917_sg068_saved_search -> 20260923_sg100_enrich_snapshot, enrichment snapshot store (SG-100, Arc A)
+INFO  [alembic.runtime.migration] Running upgrade 20260923_sg100_enrich_snapshot -> 20260924_sg113_location, location tree + asset location assignment (SG-113, G3)
+INFO  [alembic.runtime.migration] Running upgrade 20260924_sg113_location -> 20260924_sg114_relation, asset relations: typed links (SG-114, G4)
+_______________ test_search_10k_fixture_latency_is_observed_once _______________
+----------------------------- Captured stdout call -----------------------------
+10k FTS latency machine=ubuntu platform=Linux-6.8.0-136-generic-x86_64-with-glibc2.39 p50=35.37ms p95=51.72ms samples=20
+=========================== short test summary info ============================
+PASSED tests/test_assets_crud.py::test_manual_create_idempotency_detail_scoping_and_archive
+PASSED tests/test_assets_crud.py::test_list_rows_carry_evidence_ids_for_the_card_thumbnail
+PASSED tests/test_assets_crud.py::test_attach_evidence_bulk_dedups_and_logs_failed_links
+PASSED tests/test_search.py::test_search_q_matches_multiple_literal_tokens
+PASSED tests/test_search.py::test_search_q_quotes_hostile_match_syntax
+PASSED tests/test_search.py::test_search_q_keeps_same_named_asset_in_other_household_isolated
+PASSED tests/test_search.py::test_fts_triggers_follow_asset_insert_update_delete
+PASSED tests/test_search.py::test_search_status_returns_exact_mixed_fixture_ids
+PASSED tests/test_search.py::test_fts_migration_upgrade_downgrade_upgrade
+PASSED tests/test_search.py::test_search_10k_fixture_latency_is_observed_once
+PASSED tests/test_sg188_semantics.py::test_controls_non_perishable_needs_no_task_and_non_data_task_resolves_bare
+PASSED tests/test_sg188_semantics.py::test_expiry_status_reports_archived_nowhere
+FAILED tests/test_assets_crud.py::test_asset_cursor_pagination_and_mixed_filters
+FAILED tests/test_search.py::test_search_q_returns_exact_mixed_fixture_ids - ...
+FAILED tests/test_search.py::test_search_q_rebuild_restores_matches - Asserti...
+FAILED tests/test_search.py::test_search_asset_type_returns_exact_mixed_fixture_ids
+FAILED tests/test_search.py::test_search_has_evidence_returns_exact_ids_for_both_polarities
+FAILED tests/test_sg188_semantics.py::test_bare_resolve_refused_for_data_required_task_and_real_entry_resolves
+FAILED tests/test_sg188_semantics.py::test_malformed_cursor_refused_and_valid_25_row_walk_is_lossless
+FAILED tests/test_sg188_semantics.py::test_default_asset_list_excludes_archived_and_explicit_filter_includes
+8 failed, 12 passed, 5 warnings in 6.42s

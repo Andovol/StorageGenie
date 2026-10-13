@@ -1,0 +1,5 @@
+SG-188 END health (CO-92) — production GET, read-only, no write.
+Command: curl -s -w "\nHTTP=%{http_code}\n" http://127.0.0.1:8003/v1/health
+Result: HTTP 200 {"status":"ok","db":"ok","storage":"ok"}
+Read epoch 1791921798 = 2026-10-13 20:03:18 UTC.
+Delta: unchanged vs START (same three ok fields).

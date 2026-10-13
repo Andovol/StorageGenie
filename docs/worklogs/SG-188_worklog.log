@@ -1,0 +1,77 @@
+SG-188 worklog — R3 + data semantics: resolve guard, cursor and archived visibility
+(append-only frozen at evidence commit; material commands, decisions, results)
+
+LANE. dispatch-storagegenie@SG-188.service, MainPID 2161382, ExecMainStartTimestamp
+2026-10-13 19:55:07 UTC (epoch 1791921307); RUN_BUDGET_S=2100 -> deadline epoch
+1791923407 = 20:30:07Z. Coder process 2161451: `opencode run --auto --dir
+/home/andrei/StorageGenie --model opencode-go/deepseek-v4.1-flash --variant max`
+(read from /proc/2161451/cmdline, PB-4). BASE ref automation resolved
+d7f6ba9906809357659454e6ea594a7aa6dc3c92 (== local HEAD == clean tree).
+
+CONTRACT. Host copy /home/andrei/storagegenie-contract/CODER.md line 3 (0.47.0)
+echoed verbatim in the report; rules_check.sh run once, output verbatim in the
+report (exit 3; reported as read). CODER_PRODUCTION.md binds (declared: live
+service + datastore + rendered surface): production interaction this slice =
+two health GETs only.
+
+RECON / PB-1 VERIFICATION.
+- review_tasks.py resolve (pre-change :71-97) had no type/data guard: premise holds.
+- assets.py cursor (pre-change :294-304) `if cursor:` + `if decoded:` silently
+  skipped the filter on a falsy decode: premise holds. Twin search found the same
+  construct in review_tasks.py list (:24-30) and jobs.py (:116).
+- list_assets filters status only when passed: premise holds.
+- CORRECTION: compute_status ALREADY filters `lifecycle.active_clause()` (SG-111
+  ISS-2 at :241-249); commit 3913381 predates the SG-181 base 785fe7d. The
+  packet premise "no archived policy in compute_status" is wrong on this tree.
+  Re-derived F-SG181-7 from SG-181_probe_g2.py:189-221 + the g2 log line
+  `status_after_archive`: the archived asset exp_x is absent from both rows and
+  unresolved_rows; the unresolved row (01a1360a-720d-...) is a different asset —
+  the ACTIVE non-perishable. No code change for this clause; the archived test
+  passes on base too (declared in the report, PB-3).
+
+DECISIONS (CO-04 reversible ambiguity, all stated in the report).
+- Guard: bare = payload absent or {} only, for task_type `expiry.manual_entry`
+  (the data-required type; SG-173's planned repair "refuse dataless resolution
+  ... 409/422 with pointer"). Keeps the approved journeys that resolve a
+  candidate-level task with a resolution note (phase2/phase3/ai_pipeline tests).
+- Cursor 422 applied to both in-ceiling list surfaces (assets.py, review_tasks.py);
+  jobs.py is outside the write ceiling -> reported twin, not changed.
+- Default ARCHIVED exclusion lives in list_assets, NOT in the shared
+  `_apply_asset_filters` -> `asset_facets` counts are unchanged (facets show
+  reachable counts; explicit status filter still lists archived).
+
+COMMANDS / OUTCOMES (all logs committed beside this note).
+1. Focused candidate run (tests/test_assets_crud.py tests/test_search.py
+   tests/test_sg188_semantics.py): 20 passed in 5.44s, exit 0
+   (SG-188_focused_candidate.log).
+2. Product commit e911cdc (5 files: assets.py, review_tasks.py,
+   test_sg188_semantics.py, test_assets_crud.py, test_search.py).
+3. Base worktree /tmp/opencode/sg188-base @ d7f6ba9, candidate tests copied in:
+   8 failed, 12 passed in 6.42s, exit 1 (SG-188_focused_base.log). Base FAIL
+   evidence verbatim: bare resolve 200 {"status":"resolved"}; malformed cursor
+   200 page-1; archived in the default list; the D8-coupled expectations in the
+   two updated files.
+4. Authoritative candidate derived set (test_evidence_upload.py first per the
+   SG-187 a7 import-order precedent, then 16 files driving the changed routes):
+   172 passed, 8 warnings in 23.91s, exit 0 (SG-188_authoritative_candidate.log).
+5. Gates: ruff clean on the five touched files (SG-188_ruff.log); mypy app =
+   41 errors / 9 files on candidate and on base, same error sites, only line
+   shifts from this slice's insertions (SG-188_mypy_candidate.log,
+   SG-188_mypy_base.log).
+6. Health: START (first session command) 200 ok/ok/ok; END epoch 1791921798 =
+   20:03:18Z 200 ok/ok/ok (SG-188_health_start.log, SG-188_health_end.log).
+
+COUPLED TEST UPDATES (CO-38; approving slice SG-188/D8): expectations narrowed
+to the default-non-archived surface with explicit-ARCHIVED controls added in
+test_assets_crud.py::test_asset_cursor_pagination_and_mixed_filters and
+test_search.py::{test_search_q_returns_exact_mixed_fixture_ids,
+test_search_q_rebuild_restores_matches,
+test_search_asset_type_returns_exact_mixed_fixture_ids,
+test_search_has_evidence_returns_exact_ids_for_both_polarities}.
+
+EXTERNAL / PRODUCTION EFFECTS (CO-85): none with side effects. Production reads
+only (two health GETs). No deploy, restart, migration, schema change, provider
+call, paid call ($0), credential or infra change; no .env handled; disposable
+DB/storage for every test; temp artifacts under /tmp/opencode/sg188* (base
+worktree + logs) left in place, disposable. No privileged operation attempted
+therefore no denial; PB-2 stop path never reached.
