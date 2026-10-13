@@ -685,3 +685,9 @@ Originals above (88 FLAG:TRUST / 91 FLAG:TRUST) stand as the audit trail; the ve
 | slice_id | phase | model | effort | score | flag | lever | guards_invoked | deduction_attribution | remaining | escape |
 |---|---|---|---|---|---|---|---|---|---|---|
 | SG-191 | Serving rider (R1 repair live); receipt 3f27f3f (dual annotation); zero builds/recreates — correct whole-slice STOP on default-socket denial the packet failed to exclude; pre-state/diff/baseline evidence full; audit SG-191_audit.md | opencode/opencode-go/deepseek-v4.1-flash (receipt command settings) | max | 89 |  | SG-192 corrected packet: name per-unit DOCKER_HOST lane socket explicitly + SG-179 default-socket exclusion (project-specific, lives in the packet) | PG-EV-02/03; PG-IC-01/07; PG-DP-01/02; PG-PR-03/04/06/10 | mixed (packet primary: missing endpoint + exclusion; coder: default-first probe, disclosed) | Re-dispatch as SG-192 on owner go (D15); CLOSE_BLOCKED until verified serve; SG-176/177/178 + STILL-UNREPAIRED per original grants |  |
+
+### SG-192 (2026-10-13 - Serving rider, R1 repair served and verified live)
+
+| slice_id | phase | model | effort | score | flag | lever | guards_invoked | deduction_attribution | remaining | escape |
+|---|---|---|---|---|---|---|---|---|---|---|
+| SG-192 | Serving rider (R1 repair live); receipt 358023b (dual annotation); one lane-socket build + one recreate, new container/image/bundle, live [] reads, DB identical; inconclusive cross-check withdrawn, cosmetics disclosed; audit SG-192_audit.md | opencode/opencode-go/deepseek-v4.1-flash (receipt command settings) | max | 97 |  |  | PG-EV-02/03; PG-IC-01/07; PG-DP-01/02; PG-PR-03/04/06/10 | coder (evidence-craft nits I2/I3, self-disclosed) | CLOSE_BLOCKED CLEARS on this serve; SG-185 next per D16 outcome; still-broken stories + SG-176/177/178 per original grants |  |
