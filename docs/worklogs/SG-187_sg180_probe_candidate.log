@@ -1,0 +1,248 @@
+/home/andrei/StorageGenie/backend/venv/lib/python3.12/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+  from starlette.testclient import TestClient as TestClient  # noqa
+Evidence upload failed household_id=01a136ca-62ff-71e2-9242-12f67adefe01
+Rejected decompression bomb sha=2ea9ee7a8bdd30cb56844d527ef3d3228763ba96fb7a4e539c491e1ae532f697 dimensions=20000x20000 limit_kind=pillow_max_image_pixels
+Evidence integrity failure: stored content does not match the recorded sha256 id=01a136ca-6466-70d1-bff7-0bd9892a915b storage_key=01a136ca-62ff-71e2-9242-12f67adefe01/66/668259c119ffa7b335b543f87ab479828a768f7be248d2c4ce261c915a589834.jpg expected=668259c119ffa7b335b543f87ab479828a768f7be248d2c4ce261c915a589834 stored=b6053593f80d3f1c64234205e069f04c4c5d3898b08e65294ee7b94baf138566
+Evidence upload rejected by database constraint household_id=sg180-no-such-household
+{
+  "isolation": {
+    "temp_root": "/tmp/sg180-g1-y6odtq8o",
+    "settings_database_url": "sqlite:////tmp/sg180-g1-y6odtq8o/storagegenie.db",
+    "settings_storage_root": "/tmp/sg180-g1-y6odtq8o/storage",
+    "engine_url": "sqlite:////tmp/sg180-g1-y6odtq8o/storagegenie.db",
+    "cwd": "/tmp/opencode"
+  }
+}
+{
+  "results": [
+    {
+      "check": "isolation",
+      "result": "PASS",
+      "temp_root": "/tmp/sg180-g1-y6odtq8o",
+      "settings_database_url": "sqlite:////tmp/sg180-g1-y6odtq8o/storagegenie.db",
+      "settings_storage_root": "/tmp/sg180-g1-y6odtq8o/storage",
+      "engine_url": "sqlite:////tmp/sg180-g1-y6odtq8o/storagegenie.db",
+      "cwd": "/tmp/opencode"
+    },
+    {
+      "check": "upload_jpeg_201",
+      "result": "PASS",
+      "status": 201,
+      "body": {
+        "id": "01a136ca-6341-7e12-8d8b-06167984aa5c",
+        "sha256": "ea0c64165b1f5cd9d39da10fe254db3ba60a1031cea9ae9b6b14a8b1822c4263",
+        "storage_key": "01a136ca-62ff-71e2-9242-12f67adefe01/ea/ea0c64165b1f5cd9d39da10fe254db3ba60a1031cea9ae9b6b14a8b1822c4263.jpg",
+        "media_type": "image/jpeg",
+        "size_bytes": 677,
+        "original_filename": "a.jpg"
+      }
+    },
+    {
+      "check": "upload_sha_matches_bytes",
+      "result": "PASS",
+      "sha": "ea0c64165b1f5cd9d39da10fe254db3ba60a1031cea9ae9b6b14a8b1822c4263"
+    },
+    {
+      "check": "stored_file_under_temp_root",
+      "result": "PASS",
+      "path": "/tmp/sg180-g1-y6odtq8o/storage/01a136ca-62ff-71e2-9242-12f67adefe01/ea/ea0c64165b1f5cd9d39da10fe254db3ba60a1031cea9ae9b6b14a8b1822c4263.jpg"
+    },
+    {
+      "check": "stored_bytes_identical",
+      "result": "PASS",
+      "size": 677
+    },
+    {
+      "check": "upload_pdf_201",
+      "result": "PASS",
+      "status": 201,
+      "body": {
+        "id": "01a136ca-634f-7343-8c92-616252ba86e2",
+        "sha256": "3e19daf729bb1d2c1102a4df22c92318e8c27c33158d8f8fadbc73385059267e",
+        "storage_key": "01a136ca-62ff-71e2-9242-12f67adefe01/3e/3e19daf729bb1d2c1102a4df22c92318e8c27c33158d8f8fadbc73385059267e.pdf",
+        "media_type": "application/pdf",
+        "size_bytes": 68,
+        "original_filename": "doc.pdf"
+      }
+    },
+    {
+      "check": "mismatch_declared_detected_422",
+      "result": "PASS",
+      "status": 422,
+      "detail": "media_type_mismatch: claimed 'image/png', detected 'image/jpeg'"
+    },
+    {
+      "check": "mismatch_claim_bypassed_on_known_bytes",
+      "result": "DEFECT_OBSERVED",
+      "status": 201,
+      "returned_id": "01a136ca-6341-7e12-8d8b-06167984aa5c",
+      "note": "sha short-circuit runs before _detect_media_type; a replayed sha returns 201 regardless of claimed media_type"
+    },
+    {
+      "check": "unsupported_signature_422",
+      "result": "PASS",
+      "status": 422,
+      "detail": "media_type_mismatch: unsupported media signature"
+    },
+    {
+      "check": "oversize_413",
+      "result": "PASS",
+      "status": 413,
+      "detail": "max_upload_bytes limit exceeded: 20971521 > 20971520 bytes"
+    },
+    {
+      "check": "truncated_jpeg_422",
+      "result": "FAIL",
+      "status": 500,
+      "detail": "upload_failed: evidence could not be stored"
+    },
+    {
+      "check": "image_bomb_422",
+      "result": "PASS",
+      "status": 422,
+      "detail": "decompression_bomb limit exceeded: Pillow max_image_pixels (20000x20000)"
+    },
+    {
+      "check": "allowed_media_table",
+      "result": "OBSERVE",
+      "allowed": {
+        "image/jpeg": "\u00ff\u00d8\u00ff",
+        "image/png": "\u0089PNG",
+        "image/webp": "RIFF",
+        "application/pdf": "%PDF"
+      },
+      "configured": [
+        "image/jpeg",
+        "image/png",
+        "image/webp",
+        "image/tiff",
+        "image/heic",
+        "image/heif",
+        "application/pdf"
+      ],
+      "max_upload_bytes": 20971520,
+      "max_image_pixels": null
+    },
+    {
+      "check": "upload_gps_jpeg_201",
+      "result": "PASS",
+      "status": 201
+    },
+    {
+      "check": "original_retains_gps_thumbnail_strips",
+      "result": "OBSERVE",
+      "gps_tag_present": true,
+      "orientation": 6,
+      "thumb_status": 200,
+      "thumb_exif_keys": [],
+      "thumb_media": "image/jpeg"
+    },
+    {
+      "check": "cross_household_sha_dedup",
+      "result": "OBSERVE",
+      "b_upload_status": 201,
+      "returned_id": "01a136ca-6341-7e12-8d8b-06167984aa5c",
+      "a_evidence_id": "01a136ca-6341-7e12-8d8b-06167984aa5c",
+      "returned_row_household": "A",
+      "b_get_status": 403
+    },
+    {
+      "check": "cross_household_sha_dedup_returned_a_row",
+      "result": "PASS",
+      "returned_id": "01a136ca-6341-7e12-8d8b-06167984aa5c",
+      "a_id": "01a136ca-6341-7e12-8d8b-06167984aa5c"
+    },
+    {
+      "check": "counter_control_b_own_bytes_own_row",
+      "result": "PASS",
+      "status": 201,
+      "id": "01a136ca-643e-7972-9125-7d4154745f38"
+    },
+    {
+      "check": "cross_household_idempotency_replay",
+      "result": "OBSERVE",
+      "a_status": 201,
+      "a_id": "01a136ca-6448-7610-9e9f-7b19466d4553",
+      "b_status": 201,
+      "b_returned_id": "01a136ca-641d-7313-947a-1f51b184034d",
+      "b_returned_a_row": false,
+      "note": "B sent DIFFERENT bytes under the same key"
+    },
+    {
+      "check": "cross_household_key_replay_returns_a_row",
+      "result": "FAIL",
+      "replay_id": "01a136ca-641d-7313-947a-1f51b184034d",
+      "a_id": "01a136ca-6448-7610-9e9f-7b19466d4553"
+    },
+    {
+      "check": "counter_control_fresh_key_own_row",
+      "result": "PASS",
+      "status": 201,
+      "id": "01a136ca-641d-7313-947a-1f51b184034d"
+    },
+    {
+      "check": "reupload_same_bytes_same_row",
+      "result": "PASS",
+      "returned": "01a136ca-6448-7610-9e9f-7b19466d4553",
+      "first": "01a136ca-6448-7610-9e9f-7b19466d4553"
+    },
+    {
+      "check": "original_bytes_unchanged",
+      "result": "PASS",
+      "sha": "a4378b782658ddf3c38a327fe50c058412fe3aaa3fac40b8626e69c31234b545"
+    },
+    {
+      "check": "same_size_corruption_served",
+      "result": "PASS",
+      "status": 500,
+      "served_sha256": "d3ca74cc6f5f0c4ef7c5402ce0019052261d65034f4309d79ac80e660661e3cd",
+      "db_sha256": "668259c119ffa7b335b543f87ab479828a768f7be248d2c4ce261c915a589834",
+      "note": "read path does not verify content against sha256"
+    },
+    {
+      "check": "missing_original_controls",
+      "result": "PASS",
+      "file_status": 404,
+      "thumb_status_with_original_gone": 200,
+      "note": "thumbnail artifact is independent of the original at read time"
+    },
+    {
+      "check": "counter_control_missing_thumb_404",
+      "result": "PASS",
+      "status": 404
+    },
+    {
+      "check": "foreign_evidence_read_403",
+      "result": "PASS",
+      "status": 403
+    },
+    {
+      "check": "upload_unknown_household_orphan_file",
+      "result": "PASS",
+      "status": 422,
+      "detail": "unknown household: evidence cannot be stored",
+      "orphan_files": [],
+      "note": "store_evidence writes the original before the Evidence row flush; FK rejection leaves the file"
+    },
+    {
+      "check": "storage_tree",
+      "result": "PASS",
+      "files": [
+        "01a136ca-62ff-71e2-9242-12f67adefe01/26/263517a8edb82c975687c12cf933c06d9e18ee325246a2ea25b913f1d44daf50.jpg",
+        "01a136ca-62ff-71e2-9242-12f67adefe01/26/263517a8edb82c975687c12cf933c06d9e18ee325246a2ea25b913f1d44daf50_thumb256.jpg",
+        "01a136ca-62ff-71e2-9242-12f67adefe01/26/263517a8edb82c975687c12cf933c06d9e18ee325246a2ea25b913f1d44daf50_thumb512.jpg",
+        "01a136ca-62ff-71e2-9242-12f67adefe01/3e/3e19daf729bb1d2c1102a4df22c92318e8c27c33158d8f8fadbc73385059267e.pdf",
+        "01a136ca-62ff-71e2-9242-12f67adefe01/a4/a4378b782658ddf3c38a327fe50c058412fe3aaa3fac40b8626e69c31234b545.jpg",
+        "01a136ca-62ff-71e2-9242-12f67adefe01/a4/a4378b782658ddf3c38a327fe50c058412fe3aaa3fac40b8626e69c31234b545_thumb256.jpg",
+        "01a136ca-62ff-71e2-9242-12f67adefe01/a4/a4378b782658ddf3c38a327fe50c058412fe3aaa3fac40b8626e69c31234b545_thumb512.jpg",
+        "01a136ca-62ff-71e2-9242-12f67adefe01/ea/ea0c64165b1f5cd9d39da10fe254db3ba60a1031cea9ae9b6b14a8b1822c4263.jpg",
+        "01a136ca-62ff-71e2-9242-12f67adefe01/ea/ea0c64165b1f5cd9d39da10fe254db3ba60a1031cea9ae9b6b14a8b1822c4263_thumb256.jpg",
+        "01a136ca-62ff-71e2-9242-12f67adefe01/ea/ea0c64165b1f5cd9d39da10fe254db3ba60a1031cea9ae9b6b14a8b1822c4263_thumb512.jpg",
+        "01a136ca-62ff-71e2-9242-130650f65ee7/a6/a601ab159835c565900fd2ce495c096cecde701b728daf1ffdf4bd419decc9d7.jpg",
+        "01a136ca-62ff-71e2-9242-130650f65ee7/a6/a601ab159835c565900fd2ce495c096cecde701b728daf1ffdf4bd419decc9d7_thumb256.jpg",
+        "01a136ca-62ff-71e2-9242-130650f65ee7/a6/a601ab159835c565900fd2ce495c096cecde701b728daf1ffdf4bd419decc9d7_thumb512.jpg"
+      ]
+    }
+  ]
+}
+TEMP_ROOT=/tmp/sg180-g1-y6odtq8o

@@ -1,0 +1,1438 @@
+
+ RUN  v1.6.1 /tmp/opencode/sg187-base/frontend
+
+stderr | src/routes/InboxPage.test.tsx > InboxPage > renders failed loaded job detail and retries that loaded id
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+stderr | src/components/shell/import-modal.test.tsx > AssetImportModal staging > drop stages accepted files as Ready with a live count
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+ ❯ src/components/shell/import-modal.test.tsx  (17 tests | 3 failed) 605ms
+   ❯ src/components/shell/import-modal.test.tsx > Surface truth (SG-187 G3) > the size note states the enforced 20 MiB cap and the full accepted set
+     → expect(element).toHaveTextContent()
+
+Expected element to have text content:
+  20 MiB
+Received:
+  PNG, JPG or WebP. DQ9 target: up to 25 MB per file — this server currently accepts up to 20 MB.
+   ❯ src/components/shell/import-modal.test.tsx > Surface truth (SG-187 G3) > backend-accepted formats stage (TIFF, HEIC, PDF)
+     → Unable to find an element by: [data-testid="queue-item"]
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<div[39m
+      [33mclass[39m=[32m"font-sans"[39m
+    [36m>[39m
+      [36m<div[39m
+        [33maria-hidden[39m=[32m"true"[39m
+        [33mclass[39m=[32m"bg-background"[39m
+        [33mdata-testid[39m=[32m"import-backdrop"[39m
+        [33mstyle[39m=[32m"position: fixed; inset: 0; opacity: 0.5; z-index: 40;"[39m
+      [36m/>[39m
+      [36m<div[39m
+        [33maria-label[39m=[32m"Import assets"[39m
+        [33maria-modal[39m=[32m"true"[39m
+        [33mclass[39m=[32m"bg-card text-foreground border-border"[39m
+        [33mrole[39m=[32m"dialog"[39m
+        [33mstyle[39m=[32m"position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 41; width: min(560px, 92vw); max-height: 88vh; overflow-y: auto; border-style: solid; border-width: 1px; border-radius: 12px; padding: 20px;"[39m
+      [36m>[39m
+        [36m<header[39m
+          [33mstyle[39m=[32m"display: flex; align-items: center; gap: 8px; margin-bottom: 12px;"[39m
+        [36m>[39m
+          [36m<h2[39m
+            [33mstyle[39m=[32m"margin: 0px; font-size: 18px; flex: 1 1 0%;"[39m
+          [36m>[39m
+            [0mImport assets[0m
+          [36m</h2>[39m
+          [36m<button[39m
+            [33maria-label[39m=[32m"Close import dialog"[39m
+            [33mclass[39m=[32m"text-muted-foreground focus-ring"[39m
+            [33mstyle[39m=[32m"background: none; cursor: pointer; padding: 4px; border-radius: 4px;"[39m
+            [33mtype[39m=[32m"button"[39m
+          [36m>[39m
+            [36m<svg[39m
+              [33maria-hidden[39m=[32m"true"[39m
+              [33mclass[39m=[32m"lucide lucide-x"[39m
+              [33mfill[39m=[32m"none"[39m
+              [33mheight[39m=[32m"18"[39m
+              [33mstroke[39m=[32m"currentColor"[39m
+              [33mstroke-linecap[39m=[32m"round"[39m
+              [33mstroke-linejoin[39m=[32m"round"[39m
+              [33mstroke-width[39m=[32m"2"[39m
+              [33mviewBox[39m=[32m"0 0 24 24"[39m
+              [33mwidth[39m=[32m"18"[39m
+              [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+            [36m>[39m
+              [36m<path[39m
+                [33md[39m=[32m"M18 6 6 18"[39m
+              [36m/>[39m
+              [36m<path[39m
+                [33md[39m=[32m"m6 6 12 12"[39m
+              [36m/>[39m
+            [36m</svg>[39m
+          [36m</button>[39m
+        [36m</header>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"border-border bg-card-muted"[39m
+          [33mdata-testid[39m=[32m"import-dropzone"[39m
+          [33mstyle[39m=[32m"border-style: dashed; border-width: 2px; border-radius: 8px; padding: 16px; text-align: center;"[39m
+        [36m>[39m
+          [36m<p[39m
+            [33mclass[39m=[32m"text-muted-foreground"[39m
+            [33mstyle[39m=[32m"margin: 0px 0px 10px; font-size: 13px;"[39m
+          [36m>[39m
+            [0mDrag & drop photos here, choose files, or paste (Ctrl+V / ⌘V).[0m
+          [36m</p>[39m
+          [36m<input[39m
+            [33maccept[39m=[32m"image/png,image/jpeg,image/webp"[39m
+            [33maria-label[39m=[32m"Choose image files"[39m
+            [33mmultiple[39m=[32m""[39m
+            [33mtype[39m=[32m"file"[39m
+          [36m/>[39m
+          [36m<p[39m
+            [33mclass[39m=[32m"text-muted-foreground"[39m
+            [33mdata-testid[39m=[32m"import-size-note"[39m
+            [33mstyle[39m=[32m"margin: 10px 0px 0px; font-size: 11px;"[39m
+          [36m>[39m
+            [0mPNG, JPG or WebP. DQ9 target: up to [0m
+            [0m25[0m
+            [0m MB per file — this server currently accepts up to [0m
+            [0m20[0m
+            [0m MB.[0m
+          [36m</p>[39m
+        [36m</div>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"text-danger"[39m
+          [33mdata-testid[39m=[32m"rejected-files"[39m
+          [33mrole[39m=[32m"alert"[39m
+          [33mstyle[39m=[32m"margin-top: 12px; font-size: 12px;"[39m
+        [36m>[39m
+          [36m<strong>[39m
+            [0mSkipped [0m
+            [0m3[0m
+            [0m file[0m
+            [0ms[0m
+            [0m:[0m
+          [36m</strong>[39m
+          [36m<ul[39m
+            [33mstyle[39m=[32m"margin: 4px 0px 0px; padding-left: 18px;"[39m
+          [36m>[39m
+            [36m<li>[39m
+              [0mscan.tiff[0m
+              [0m — [0m
+              [0munsupported type image/tiff[0m
+            [36m</li>[39m
+            [36m<li>[39m
+              [0mphoto.heic[0m
+              [0m — [0m
+              [0munsupported type[0m
+            [36m</li>[39m
+            [36m<li>[39m
+              [0mdoc.pdf[0m
+              [0m — [0m
+              [0munsupported type application/pdf[0m
+            [36m</li>[39m
+          [36m</ul>[39m
+        [36m</div>[39m
+        [36m<label[39m
+          [33mstyle[39m=[32m"display: flex; align-items: center; gap: 8px; margin-top: 16px; font-size: 13px;"[39m
+        [36m>[39m
+          [36m<input[39m
+            [33mchecked[39m=[32m""[39m
+            [33mtype[39m=[32m"checkbox"[39m
+          [36m/>[39m
+          [0mAutomatically detect items and isolate cutouts[0m
+        [36m</label>[39m
+        [36m<p[39m
+          [33mclass[39m=[32m"text-muted-foreground"[39m
+          [33mdata-testid[39m=[32m"auto-detect-help"[39m
+          [33mstyle[39m=[32m"margin: 4px 0px 0px 24px; font-size: 11px;"[39m
+        [36m>[39m
+          [0mChecked: the import job is created and run immediately.[0m
+        [36m</p>[39m
+        [36m<section[39m
+          [33mstyle[39m=[32m"margin-top: 16px;"[39m
+        [36m>[39m
+          [36m<h3[39m
+            [33mdata-testid[39m=[32m"queue-count"[39m
+            [33mstyle[39m=[32m"margin: 0px 0px 8px; font-size: 14px;"[39m
+          [36m>[39m
+            [0mPending queue ([0m
+            [0m0[0m
+            [0m)[0m
+          [36m</h3>[39m
+          [36m<p[39m
+            [33mclass[39m=[32m"text-muted-foreground"[39m
+            [33mdata-testid[39m=[32m"queue-empty"[39m
+            [33mstyle[39m=[32m"margin: 0px; font-size: 12px;"[39m
+          [36m>[39m
+            [0mNo files staged yet.[0m
+          [36m</p>[39m
+        [36m</section>[39m
+        [36m<footer[39m
+          [33mstyle[39m=[32m"display: flex; justify-content: flex-end; gap: 8px; margin-top: 20px;"[39m
+        [36m>[39m
+          [36m<button[39m
+            [33mclass[39m=[32m"bg-card text-foreground border-border focus-ring"[39m
+            [33mstyle[39m=[32m"padding: 6px 12px; border-radius: 6px; border-style: solid; border-width: 1px; cursor: pointer;"[39m
+            [33mtype[39m=[32m"button"[39m
+          [36m>[39m
+            [0mCancel[0m
+          [36m</button>[39m
+          [36m<button[39m
+            [33maria-busy[39m=[32m"false"[39m
+            [33mclass[39m=[32m"bg-primary text-primary-foreground focus-ring"[39m
+            [33mdisabled[39m=[32m""[39m
+            [33mstyle[39m=[32m"padding: 6px 12px; border-radius: 6px; cursor: not-allowed; display: inline-flex; align-items: center; gap: 6px;"[39m
+            [33mtype[39m=[32m"button"[39m
+          [36m>[39m
+            [0mProcess 0 Items[0m
+          [36m</button>[39m
+        [36m</footer>[39m
+      [36m</div>[39m
+    [36m</div>[39m
+  [36m</div>[39m
+[36m</body>[39m
+   ❯ src/components/shell/import-modal.test.tsx > Surface truth (SG-187 G3) > a file over the 20 MiB server cap is rejected client-side with the limit named
+     → Unable to find an element by: [data-testid="rejected-files"]
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<div[39m
+      [33mclass[39m=[32m"font-sans"[39m
+    [36m>[39m
+      [36m<div[39m
+        [33maria-hidden[39m=[32m"true"[39m
+        [33mclass[39m=[32m"bg-background"[39m
+        [33mdata-testid[39m=[32m"import-backdrop"[39m
+        [33mstyle[39m=[32m"position: fixed; inset: 0; opacity: 0.5; z-index: 40;"[39m
+      [36m/>[39m
+      [36m<div[39m
+        [33maria-label[39m=[32m"Import assets"[39m
+        [33maria-modal[39m=[32m"true"[39m
+        [33mclass[39m=[32m"bg-card text-foreground border-border"[39m
+        [33mrole[39m=[32m"dialog"[39m
+        [33mstyle[39m=[32m"position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 41; width: min(560px, 92vw); max-height: 88vh; overflow-y: auto; border-style: solid; border-width: 1px; border-radius: 12px; padding: 20px;"[39m
+      [36m>[39m
+        [36m<header[39m
+          [33mstyle[39m=[32m"display: flex; align-items: center; gap: 8px; margin-bottom: 12px;"[39m
+        [36m>[39m
+          [36m<h2[39m
+            [33mstyle[39m=[32m"margin: 0px; font-size: 18px; flex: 1 1 0%;"[39m
+          [36m>[39m
+            [0mImport assets[0m
+          [36m</h2>[39m
+          [36m<button[39m
+            [33maria-label[39m=[32m"Close import dialog"[39m
+            [33mclass[39m=[32m"text-muted-foreground focus-ring"[39m
+            [33mstyle[39m=[32m"background: none; cursor: pointer; padding: 4px; border-radius: 4px;"[39m
+            [33mtype[39m=[32m"button"[39m
+          [36m>[39m
+            [36m<svg[39m
+              [33maria-hidden[39m=[32m"true"[39m
+              [33mclass[39m=[32m"lucide lucide-x"[39m
+              [33mfill[39m=[32m"none"[39m
+              [33mheight[39m=[32m"18"[39m
+              [33mstroke[39m=[32m"currentColor"[39m
+              [33mstroke-linecap[39m=[32m"round"[39m
+              [33mstroke-linejoin[39m=[32m"round"[39m
+              [33mstroke-width[39m=[32m"2"[39m
+              [33mviewBox[39m=[32m"0 0 24 24"[39m
+              [33mwidth[39m=[32m"18"[39m
+              [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+            [36m>[39m
+              [36m<path[39m
+                [33md[39m=[32m"M18 6 6 18"[39m
+              [36m/>[39m
+              [36m<path[39m
+                [33md[39m=[32m"m6 6 12 12"[39m
+              [36m/>[39m
+            [36m</svg>[39m
+          [36m</button>[39m
+        [36m</header>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"border-border bg-card-muted"[39m
+          [33mdata-testid[39m=[32m"import-dropzone"[39m
+          [33mstyle[39m=[32m"border-style: dashed; border-width: 2px; border-radius: 8px; padding: 16px; text-align: center;"[39m
+        [36m>[39m
+          [36m<p[39m
+            [33mclass[39m=[32m"text-muted-foreground"[39m
+            [33mstyle[39m=[32m"margin: 0px 0px 10px; font-size: 13px;"[39m
+          [36m>[39m
+            [0mDrag & drop photos here, choose files, or paste (Ctrl+V / ⌘V).[0m
+          [36m</p>[39m
+          [36m<input[39m
+            [33maccept[39m=[32m"image/png,image/jpeg,image/webp"[39m
+            [33maria-label[39m=[32m"Choose image files"[39m
+            [33mmultiple[39m=[32m""[39m
+            [33mtype[39m=[32m"file"[39m
+          [36m/>[39m
+          [36m<p[39m
+            [33mclass[39m=[32m"text-muted-foreground"[39m
+            [33mdata-testid[39m=[32m"import-size-note"[39m
+            [33mstyle[39m=[32m"margin: 10px 0px 0px; font-size: 11px;"[39m
+          [36m>[39m
+            [0mPNG, JPG or WebP. DQ9 target: up to [0m
+            [0m25[0m
+            [0m MB per file — this server currently accepts up to [0m
+            [0m20[0m
+            [0m MB.[0m
+          [36m</p>[39m
+        [36m</div>[39m
+        [36m<label[39m
+          [33mstyle[39m=[32m"display: flex; align-items: center; gap: 8px; margin-top: 16px; font-size: 13px;"[39m
+        [36m>[39m
+          [36m<input[39m
+            [33mchecked[39m=[32m""[39m
+            [33mtype[39m=[32m"checkbox"[39m
+          [36m/>[39m
+          [0mAutomatically detect items and isolate cutouts[0m
+        [36m</label>[39m
+        [36m<p[39m
+          [33mclass[39m=[32m"text-muted-foreground"[39m
+          [33mdata-testid[39m=[32m"auto-detect-help"[39m
+          [33mstyle[39m=[32m"margin: 4px 0px 0px 24px; font-size: 11px;"[39m
+        [36m>[39m
+          [0mChecked: the import job is created and run immediately.[0m
+        [36m</p>[39m
+        [36m<section[39m
+          [33mstyle[39m=[32m"margin-top: 16px;"[39m
+        [36m>[39m
+          [36m<h3[39m
+            [33mdata-testid[39m=[32m"queue-count"[39m
+            [33mstyle[39m=[32m"margin: 0px 0px 8px; font-size: 14px;"[39m
+          [36m>[39m
+            [0mPending queue ([0m
+            [0m1[0m
+            [0m)[0m
+          [36m</h3>[39m
+          [36m<ul[39m
+            [33mstyle[39m=[32m"list-style: none; margin: 0px; padding: 0px; display: grid; gap: 6px;"[39m
+          [36m>[39m
+            [36m<li[39m
+              [33mclass[39m=[32m"bg-card-muted"[39m
+              [33mdata-testid[39m=[32m"queue-item"[39m
+              [33mstyle[39m=[32m"display: flex; align-items: center; gap: 8px; padding: 6px 10px; border-radius: 6px; font-size: 12px;"[39m
+            [36m>[39m
+              [36m<span[39m
+                [33mstyle[39m=[32m"flex: 1 1 0%; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"[39m
+              [36m>[39m
+                [0mhuge.png[0m
+              [36m</span>[39m
+              [36m<span[39m
+                [33mclass[39m=[32m"text-muted-foreground font-mono"[39m
+              [36m>[39m
+                [0m20480.0 KB[0m
+              [36m</span>[39m
+              [36m<span[39m
+                [33mclass[39m=[32m"text-processed"[39m
+                [33mstyle[39m=[32m"font-weight: 600;"[39m
+              [36m>[39m
+                [0mReady[0m
+              [36m</span>[39m
+              [36m<button[39m
+                [33maria-label[39m=[32m"Remove huge.png"[39m
+                [33mclass[39m=[32m"text-muted-foreground focus-ring"[39m
+                [33mstyle[39m=[32m"background: none; cursor: pointer; font-size: 12px;"[39m
+                [33mtype[39m=[32m"button"[39m
+              [36m>[39m
+                [0mRemove[0m
+              [36m</button>[39m
+            [36m</li>[39m
+          [36m</ul>[39m
+        [36m</section>[39m
+        [36m<footer[39m
+          [33mstyle[39m=[32m"display: flex; justify-content: flex-end; gap: 8px; margin-top: 20px;"[39m
+        [36m>[39m
+          [36m<button[39m
+            [33mclass[39m=[32m"bg-card text-foreground border-border focus-ring"[39m
+            [33mstyle[39m=[32m"padding: 6px 12px; border-radius: 6px; border-style: solid; border-width: 1px; cursor: pointer;"[39m
+            [33mtype[39m=[32m"button"[39m
+          [36m>[39m
+            [0mCancel[0m
+          [36m</button>[39m
+          [36m<button[39m
+            [33maria-busy[39m=[32m"false"[39m
+            [33mclass[39m=[32m"bg-primary text-primary-foreground focus-ring"[39m
+            [33mstyle[39m=[32m"padding: 6px 12px; border-radius: 6px; cursor: pointer; display: inline-flex; align-items: center; gap: 6px;"[39m
+            [33mtype[39m=[32m"button"[39m
+          [36m>[39m
+            [0mProcess 1 Item[0m
+          [36m</button>[39m
+        [36m</footer>[39m
+      [36m</div>[39m
+    [36m</div>[39m
+  [36m</div>[39m
+[36m</body>[39m
+ ❯ src/routes/InboxPage.test.tsx  (10 tests | 1 failed) 1480ms
+   ❯ src/routes/InboxPage.test.tsx > InboxPage > a CREATED job offers Start, calls /run, and shows the terminal state (SG-187 G1)
+     → Unable to find role="button" and name "Start import job"
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<div[39m
+      [33mclass[39m=[32m"page-container text-foreground"[39m
+      [33mdata-testid[39m=[32m"page-container"[39m
+      [33mdata-variant[39m=[32m"page"[39m
+      [33mstyle[39m=[32m"width: 100%; max-width: 1100px; margin-left: auto; margin-right: auto; padding: 24px;"[39m
+    [36m>[39m
+      [36m<div[39m
+        [33mstyle[39m=[32m"display: flex; justify-content: space-between; align-items: center;"[39m
+      [36m>[39m
+        [36m<h1[39m
+          [33mclass[39m=[32m"page-header text-foreground"[39m
+        [36m>[39m
+          [0mInbox[0m
+        [36m</h1>[39m
+        [36m<label>[39m
+          [0mHousehold [0m
+          [36m<select[39m
+            [33mclass[39m=[32m"bg-background text-foreground border-border focus-ring"[39m
+            [33mstyle[39m=[32m"padding: 4px 10px; border-radius: 6px; border-style: solid; border-width: 1px; font-size: 13px; cursor: pointer;"[39m
+          [36m>[39m
+            [36m<option[39m
+              [33mvalue[39m=[32m""[39m
+            [36m>[39m
+              [0mSelect household[0m
+            [36m</option>[39m
+            [36m<option[39m
+              [33mvalue[39m=[32m"household-loaded"[39m
+            [36m>[39m
+              [0mLoaded home[0m
+            [36m</option>[39m
+          [36m</select>[39m
+        [36m</label>[39m
+      [36m</div>[39m
+      [36m<div[39m
+        [33mstyle[39m=[32m"display: grid; grid-template-columns: minmax(260px, .8fr) minmax(320px, 1.2fr); gap: 20px;"[39m
+      [36m>[39m
+        [36m<section>[39m
+          [36m<h2>[39m
+            [0mImport jobs[0m
+          [36m</h2>[39m
+          [36m<div[39m
+            [33mstyle[39m=[32m"display: grid; gap: 8px;"[39m
+          [36m>[39m
+            [36m<button[39m
+              [33maria-pressed[39m=[32m"true"[39m
+              [33mclass[39m=[32m"bg-card text-foreground border-primary focus-ring"[39m
+              [33mstyle[39m=[32m"display: block; width: 100%; text-align: left; padding: 14px; border-radius: 8px; border-style: solid; border-width: 2px; cursor: pointer;"[39m
+              [33mtype[39m=[32m"button"[39m
+            [36m>[39m
+              [36m<div[39m
+                [33mstyle[39m=[32m"display: flex; justify-content: space-between; gap: 12px;"[39m
+              [36m>[39m
+                [36m<strong>[39m
+                  [0mImport [0m
+                  [0mjob-star[0m
+                [36m</strong>[39m
+                [36m<span[39m
+                  [33mclass[39m=[32m"text-muted-foreground"[39m
+                  [33mdata-testid[39m=[32m"job-state-job-start-187"[39m
+                [36m>[39m
+                  [0mCREATED[0m
+                [36m</span>[39m
+              [36m</div>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"text-muted-foreground"[39m
+                [33mstyle[39m=[32m"font-size: 12px; margin-top: 6px;"[39m
+              [36m>[39m
+                [0mimport[0m
+                [0m · [0m
+              [36m</div>[39m
+            [36m</button>[39m
+          [36m</div>[39m
+        [36m</section>[39m
+        [36m<section>[39m
+          [36m<h2>[39m
+            [0mSelected job[0m
+          [36m</h2>[39m
+          [36m<div>[39m
+            [36m<div>[39m
+              [36m<strong>[39m
+                [0mCREATED[0m
+              [36m</strong>[39m
+              [0m · [0m
+              [0m2[0m
+              [0m/[0m
+              [0m6[0m
+              [0m complete · [0m
+              [0m1[0m
+              [0m failed · [0m
+              [0m3[0m
+              [0m pending[0m
+            [36m</div>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"bg-card-muted"[39m
+              [33mstyle[39m=[32m"margin-top: 8px; padding: 8px;"[39m
+            [36m>[39m
+              [36m<strong>[39m
+                [0mEXTRACTING[0m
+              [36m</strong>[39m
+              [0m: [0m
+              [0mFAILED[0m
+              [36m<div[39m
+                [33mrole[39m=[32m"alert"[39m
+              [36m>[39m
+                [0mdecoder failed on loaded image[0m
+              [36m</div>[39m
+            [36m</div>[39m
+          [36m</div>[39m
+        [36m</section>[39m
+      [36m</div>[39m
+      [36m<section[39m
+        [33mstyle[39m=[32m"margin-top: 28px;"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mstyle[39m=[32m"display: flex; justify-content: space-between; align-items: center; gap: 12px;"[39m
+        [36m>[39m
+          [36m<h2>[39m
+            [0mReview queue[0m
+          [36m</h2>[39m
+          [36m<label[39m
+            [33mstyle[39m=[32m"font-size: 13px;"[39m
+          [36m>[39m
+            [0mReview status [0m
+            [36m<select[39m
+              [33maria-label[39m=[32m"Review status"[39m
+              [33mclass[39m=[32m"bg-background text-foreground border-border focus-ring"[39m
+              [33mstyle[39m=[32m"padding: 4px 10px; border-radius: 6px; border-style: solid; border-width: 1px; font-size: 13px; cursor: pointer;"[39m
+            [36m>[39m
+              [36m<option[39m
+                [33mvalue[39m=[32m"open"[39m
+              [36m>[39m
+                [0mOpen[0m
+              [36m</option>[39m
+              [36m<option[39m
+                [33mvalue[39m=[32m"resolved"[39m
+              [36m>[39m
+                [0mResolved[0m
+              [36m</option>[39m
+              [36m<option[39m
+                [33mvalue[39m=[32m"all"[39m
+              [36m>[39m
+                [0mAll[0m
+              [36m</option>[39m
+            [36m</select>[39m
+          [36m</label>[39m
+        [36m</div>[39m
+        [36m<div[39m
+          [33mrole[39m=[32m"status"[39m
+        [36m>[39m
+          [0mNo review tasks.[0m
+        [36m</div>[39m
+        [36m<div[39m
+          [33mstyle[39m=[32m"display: grid; gap: 8px;"[39m
+        [36m/>[39m
+      [36m</section>[39m
+    [36m</div>[39m
+  [36m</div>[39m
+[36m</body>[39m
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<div[39m
+      [33mclass[39m=[32m"page-container text-foreground"[39m
+      [33mdata-testid[39m=[32m"page-container"[39m
+      [33mdata-variant[39m=[32m"page"[39m
+      [33mstyle[39m=[32m"width: 100%; max-width: 1100px; margin-left: auto; margin-right: auto; padding: 24px;"[39m
+    [36m>[39m
+      [36m<div[39m
+        [33mstyle[39m=[32m"display: flex; justify-content: space-between; align-items: center;"[39m
+      [36m>[39m
+        [36m<h1[39m
+          [33mclass[39m=[32m"page-header text-foreground"[39m
+        [36m>[39m
+          [0mInbox[0m
+        [36m</h1>[39m
+        [36m<label>[39m
+          [0mHousehold [0m
+          [36m<select[39m
+            [33mclass[39m=[32m"bg-background text-foreground border-border focus-ring"[39m
+            [33mstyle[39m=[32m"padding: 4px 10px; border-radius: 6px; border-style: solid; border-width: 1px; font-size: 13px; cursor: pointer;"[39m
+          [36m>[39m
+            [36m<option[39m
+              [33mvalue[39m=[32m""[39m
+            [36m>[39m
+              [0mSelect household[0m
+            [36m</option>[39m
+            [36m<option[39m
+              [33mvalue[39m=[32m"household-loaded"[39m
+            [36m>[39m
+              [0mLoaded home[0m
+            [36m</option>[39m
+          [36m</select>[39m
+        [36m</label>[39m
+      [36m</div>[39m
+      [36m<div[39m
+        [33mstyle[39m=[32m"display: grid; grid-template-columns: minmax(260px, .8fr) minmax(320px, 1.2fr); gap: 20px;"[39m
+      [36m>[39m
+        [36m<section>[39m
+          [36m<h2>[39m
+            [0mImport jobs[0m
+          [36m</h2>[39m
+          [36m<div[39m
+            [33mstyle[39m=[32m"display: grid; gap: 8px;"[39m
+          [36m>[39m
+            [36m<button[39m
+              [33maria-pressed[39m=[32m"true"[39m
+              [33mclass[39m=[32m"bg-card text-foreground border-primary focus-ring"[39m
+              [33mstyle[39m=[32m"display: block; width: 100%; text-align: left; padding: 14px; border-radius: 8px; border-style: solid; border-width: 2px; cursor: pointer;"[39m
+              [33mtype[39m=[32m"button"[39m
+            [36m>[39m
+              [36m<div[39m
+                [33mstyle[39m=[32m"display: flex; justify-content: space-between; gap: 12px;"[39m
+              [36m>[39m
+                [36m<strong>[39m
+                  [0mImport [0m
+                  [0mjob-star[0m
+                [36m</strong>[39m
+                [36m<span[39m
+                  [33mclass[39m=[32m"text-muted-foreground"[39m
+                  [33mdata-testid[39m=[32m"job-state-job-start-187"[39m
+                [36m>[39m
+                  [0mCREATED[0m
+                [36m</span>[39m
+              [36m</div>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"text-muted-foreground"[39m
+                [33mstyle[39m=[32m"font-size: 12px; margin-top: 6px;"[39m
+              [36m>[39m
+                [0mimport[0m
+                [0m · [0m
+              [36m</div>[39m
+            [36m</button>[39m
+          [36m</div>[39m
+        [36m</section>[39m
+        [36m<section>[39m
+          [36m<h2>[39m
+            [0mSelected job[0m
+          [36m</h2>[39m
+          [36m<div>[39m
+            [36m<div>[39m
+              [36m<strong>[39m
+                [0mCREATED[0m
+              [36m</strong>[39m
+              [0m · [0m
+              [0m2[0m
+              [0m/[0m
+              [0m6[0m
+              [0m complete · [0m
+              [0m1[0m
+              [0m failed · [0m
+              [0m3[0m
+              [0m pending[0m
+            [36m</div>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"bg-card-muted"[39m
+              [33mstyle[39m=[32m"margin-top: 8px; padding: 8px;"[39m
+            [36m>[39m
+              [36m<strong>[39m
+                [0mEXTRACTING[0m
+              [36m</strong>[39m
+              [0m: [0m
+              [0mFAILED[0m
+              [36m<div[39m
+                [33mrole[39m=[32m"alert"[39m
+              [36m>[39m
+                [0mdecoder failed on loaded image[0m
+              [36m</div>[39m
+            [36m</div>[39m
+          [36m</div>[39m
+        [36m</section>[39m
+      [36m</div>[39m
+      [36m<section[39m
+        [33mstyle[39m=[32m"margin-top: 28px;"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mstyle[39m=[32m"display: flex; justify-content: space-between; align-items: center; gap: 12px;"[39m
+        [36m>[39m
+          [36m<h2>[39m
+            [0mReview queue[0m
+          [36m</h2>[39m
+          [36m<label[39m
+            [33mstyle[39m=[32m"font-size: 13px;"[39m
+          [36m>[39m
+            [0mReview status [0m
+            [36m<select[39m
+              [33maria-label[39m=[32m"Review status"[39m
+              [33mclass[39m=[32m"bg-background text-foreground border-border focus-ring"[39m
+              [33mstyle[39m=[32m"padding: 4px 10px; border-radius: 6px; border-style: solid; border-width: 1px; font-size: 13px; cursor: pointer;"[39m
+            [36m>[39m
+              [36m<option[39m
+                [33mvalue[39m=[32m"open"[39m
+              [36m>[39m
+                [0mOpen[0m
+              [36m</option>[39m
+              [36m<option[39m
+                [33mvalue[39m=[32m"resolved"[39m
+              [36m>[39m
+                [0mResolved[0m
+              [36m</option>[39m
+              [36m<option[39m
+                [33mvalue[39m=[32m"all"[39m
+              [36m>[39m
+                [0mAll[0m
+              [36m</option>[39m
+            [36m</select>[39m
+          [36m</label>[39m
+        [36m</div>[39m
+        [36m<div[39m
+          [33mrole[39m=[32m"status"[39m
+        [36m>[39m
+          [0mNo review tasks.[0m
+        [36m</div>[39m
+        [36m<div[39m
+          [33mstyle[39m=[32m"display: grid; gap: 8px;"[39m
+        [36m/>[39m
+      [36m</section>[39m
+    [36m</div>[39m
+  [36m</div>[39m
+[36m</body>[39m
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 4 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/routes/InboxPage.test.tsx > InboxPage > a CREATED job offers Start, calls /run, and shows the terminal state (SG-187 G1)
+TestingLibraryElementError: Unable to find role="button" and name "Start import job"
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<div[39m
+      [33mclass[39m=[32m"page-container text-foreground"[39m
+      [33mdata-testid[39m=[32m"page-container"[39m
+      [33mdata-variant[39m=[32m"page"[39m
+      [33mstyle[39m=[32m"width: 100%; max-width: 1100px; margin-left: auto; margin-right: auto; padding: 24px;"[39m
+    [36m>[39m
+      [36m<div[39m
+        [33mstyle[39m=[32m"display: flex; justify-content: space-between; align-items: center;"[39m
+      [36m>[39m
+        [36m<h1[39m
+          [33mclass[39m=[32m"page-header text-foreground"[39m
+        [36m>[39m
+          [0mInbox[0m
+        [36m</h1>[39m
+        [36m<label>[39m
+          [0mHousehold [0m
+          [36m<select[39m
+            [33mclass[39m=[32m"bg-background text-foreground border-border focus-ring"[39m
+            [33mstyle[39m=[32m"padding: 4px 10px; border-radius: 6px; border-style: solid; border-width: 1px; font-size: 13px; cursor: pointer;"[39m
+          [36m>[39m
+            [36m<option[39m
+              [33mvalue[39m=[32m""[39m
+            [36m>[39m
+              [0mSelect household[0m
+            [36m</option>[39m
+            [36m<option[39m
+              [33mvalue[39m=[32m"household-loaded"[39m
+            [36m>[39m
+              [0mLoaded home[0m
+            [36m</option>[39m
+          [36m</select>[39m
+        [36m</label>[39m
+      [36m</div>[39m
+      [36m<div[39m
+        [33mstyle[39m=[32m"display: grid; grid-template-columns: minmax(260px, .8fr) minmax(320px, 1.2fr); gap: 20px;"[39m
+      [36m>[39m
+        [36m<section>[39m
+          [36m<h2>[39m
+            [0mImport jobs[0m
+          [36m</h2>[39m
+          [36m<div[39m
+            [33mstyle[39m=[32m"display: grid; gap: 8px;"[39m
+          [36m>[39m
+            [36m<button[39m
+              [33maria-pressed[39m=[32m"true"[39m
+              [33mclass[39m=[32m"bg-card text-foreground border-primary focus-ring"[39m
+              [33mstyle[39m=[32m"display: block; width: 100%; text-align: left; padding: 14px; border-radius: 8px; border-style: solid; border-width: 2px; cursor: pointer;"[39m
+              [33mtype[39m=[32m"button"[39m
+            [36m>[39m
+              [36m<div[39m
+                [33mstyle[39m=[32m"display: flex; justify-content: space-between; gap: 12px;"[39m
+              [36m>[39m
+                [36m<strong>[39m
+                  [0mImport [0m
+                  [0mjob-star[0m
+                [36m</strong>[39m
+                [36m<span[39m
+                  [33mclass[39m=[32m"text-muted-foreground"[39m
+                  [33mdata-testid[39m=[32m"job-state-job-start-187"[39m
+                [36m>[39m
+                  [0mCREATED[0m
+                [36m</span>[39m
+              [36m</div>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"text-muted-foreground"[39m
+                [33mstyle[39m=[32m"font-size: 12px; margin-top: 6px;"[39m
+              [36m>[39m
+                [0mimport[0m
+                [0m · [0m
+              [36m</div>[39m
+            [36m</button>[39m
+          [36m</div>[39m
+        [36m</section>[39m
+        [36m<section>[39m
+          [36m<h2>[39m
+            [0mSelected job[0m
+          [36m</h2>[39m
+          [36m<div>[39m
+            [36m<div>[39m
+              [36m<strong>[39m
+                [0mCREATED[0m
+              [36m</strong>[39m
+              [0m · [0m
+              [0m2[0m
+              [0m/[0m
+              [0m6[0m
+              [0m complete · [0m
+              [0m1[0m
+              [0m failed · [0m
+              [0m3[0m
+              [0m pending[0m
+            [36m</div>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"bg-card-muted"[39m
+              [33mstyle[39m=[32m"margin-top: 8px; padding: 8px;"[39m
+            [36m>[39m
+              [36m<strong>[39m
+                [0mEXTRACTING[0m
+              [36m</strong>[39m
+              [0m: [0m
+              [0mFAILED[0m
+              [36m<div[39m
+                [33mrole[39m=[32m"alert"[39m
+              [36m>[39m
+                [0mdecoder failed on loaded image[0m
+              [36m</div>[39m
+            [36m</div>[39m
+          [36m</div>[39m
+        [36m</section>[39m
+      [36m</div>[39m
+      [36m<section[39m
+        [33mstyle[39m=[32m"margin-top: 28px;"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mstyle[39m=[32m"display: flex; justify-content: space-between; align-items: center; gap: 12px;"[39m
+        [36m>[39m
+          [36m<h2>[39m
+            [0mReview queue[0m
+          [36m</h2>[39m
+          [36m<label[39m
+            [33mstyle[39m=[32m"font-size: 13px;"[39m
+          [36m>[39m
+            [0mReview status [0m
+            [36m<select[39m
+              [33maria-label[39m=[32m"Review status"[39m
+              [33mclass[39m=[32m"bg-background text-foreground border-border focus-ring"[39m
+              [33mstyle[39m=[32m"padding: 4px 10px; border-radius: 6px; border-style: solid; border-width: 1px; font-size: 13px; cursor: pointer;"[39m
+            [36m>[39m
+              [36m<option[39m
+                [33mvalue[39m=[32m"open"[39m
+              [36m>[39m
+                [0mOpen[0m
+              [36m</option>[39m
+              [36m<option[39m
+                [33mvalue[39m=[32m"resolved"[39m
+              [36m>[39m
+                [0mResolved[0m
+              [36m</option>[39m
+              [36m<option[39m
+                [33mvalue[39m=[32m"all"[39m
+              [36m>[39m
+                [0mAll[0m
+              [36m</option>[39m
+            [36m</select>[39m
+          [36m</label>[39m
+        [36m</div>[39m
+        [36m<div[39m
+          [33mrole[39m=[32m"status"[39m
+        [36m>[39m
+          [0mNo review tasks.[0m
+        [36m</div>[39m
+        [36m<div[39m
+          [33mstyle[39m=[32m"display: grid; gap: 8px;"[39m
+        [36m/>[39m
+      [36m</section>[39m
+    [36m</div>[39m
+  [36m</div>[39m
+[36m</body>[39m
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<div[39m
+      [33mclass[39m=[32m"page-container text-foreground"[39m
+      [33mdata-testid[39m=[32m"page-container"[39m
+      [33mdata-variant[39m=[32m"page"[39m
+      [33mstyle[39m=[32m"width: 100%; max-width: 1100px; margin-left: auto; margin-right: auto; padding: 24px;"[39m
+    [36m>[39m
+      [36m<div[39m
+        [33mstyle[39m=[32m"display: flex; justify-content: space-between; align-items: center;"[39m
+      [36m>[39m
+        [36m<h1[39m
+          [33mclass[39m=[32m"page-header text-foreground"[39m
+        [36m>[39m
+          [0mInbox[0m
+        [36m</h1>[39m
+        [36m<label>[39m
+          [0mHousehold [0m
+          [36m<select[39m
+            [33mclass[39m=[32m"bg-background text-foreground border-border focus-ring"[39m
+            [33mstyle[39m=[32m"padding: 4px 10px; border-radius: 6px; border-style: solid; border-width: 1px; font-size: 13px; cursor: pointer;"[39m
+          [36m>[39m
+            [36m<option[39m
+              [33mvalue[39m=[32m""[39m
+            [36m>[39m
+              [0mSelect household[0m
+            [36m</option>[39m
+            [36m<option[39m
+              [33mvalue[39m=[32m"household-loaded"[39m
+            [36m>[39m
+              [0mLoaded home[0m
+            [36m</option>[39m
+          [36m</select>[39m
+        [36m</label>[39m
+      [36m</div>[39m
+      [36m<div[39m
+        [33mstyle[39m=[32m"display: grid; grid-template-columns: minmax(260px, .8fr) minmax(320px, 1.2fr); gap: 20px;"[39m
+      [36m>[39m
+        [36m<section>[39m
+          [36m<h2>[39m
+            [0mImport jobs[0m
+          [36m</h2>[39m
+          [36m<div[39m
+            [33mstyle[39m=[32m"display: grid; gap: 8px;"[39m
+          [36m>[39m
+            [36m<button[39m
+              [33maria-pressed[39m=[32m"true"[39m
+              [33mclass[39m=[32m"bg-card text-foreground border-primary focus-ring"[39m
+              [33mstyle[39m=[32m"display: block; width: 100%; text-align: left; padding: 14px; border-radius: 8px; border-style: solid; border-width: 2px; cursor: pointer;"[39m
+              [33mtype[39m=[32m"button"[39m
+            [36m>[39m
+              [36m<div[39m
+                [33mstyle[39m=[32m"display: flex; justify-content: space-between; gap: 12px;"[39m
+              [36m>[39m
+                [36m<strong>[39m
+                  [0mImport [0m
+                  [0mjob-star[0m
+                [36m</strong>[39m
+                [36m<span[39m
+                  [33mclass[39m=[32m"text-muted-foreground"[39m
+                  [33mdata-testid[39m=[32m"job-state-job-start-187"[39m
+                [36m>[39m
+                  [0mCREATED[0m
+                [36m</span>[39m
+              [36m</div>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"text-muted-foreground"[39m
+                [33mstyle[39m=[32m"font-size: 12px; margin-top: 6px;"[39m
+              [36m>[39m
+                [0mimport[0m
+                [0m · [0m
+              [36m</div>[39m
+            [36m</button>[39m
+          [36m</div>[39m
+        [36m</section>[39m
+        [36m<section>[39m
+          [36m<h2>[39m
+            [0mSelected job[0m
+          [36m</h2>[39m
+          [36m<div>[39m
+            [36m<div>[39m
+              [36m<strong>[39m
+                [0mCREATED[0m
+              [36m</strong>[39m
+              [0m · [0m
+              [0m2[0m
+              [0m/[0m
+              [0m6[0m
+              [0m complete · [0m
+              [0m1[0m
+              [0m failed · [0m
+              [0m3[0m
+              [0m pending[0m
+            [36m</div>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"bg-card-muted"[39m
+              [33mstyle[39m=[32m"margin-top: 8px; padding: 8px;"[39m
+            [36m>[39m
+              [36m<strong>[39m
+                [0mEXTRACTING[0m
+              [36m</strong>[39m
+              [0m: [0m
+              [0mFAILED[0m
+              [36m<div[39m
+                [33mrole[39m=[32m"alert"[39m
+              [36m>[39m
+                [0mdecoder failed on loaded image[0m
+              [36m</div>[39m
+            [36m</div>[39m
+          [36m</div>[39m
+        [36m</section>[39m
+      [36m</div>[39m
+      [36m<section[39m
+        [33mstyle[39m=[32m"margin-top: 28px;"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mstyle[39m=[32m"display: flex; justify-content: space-between; align-items: center; gap: 12px;"[39m
+        [36m>[39m
+          [36m<h2>[39m
+            [0mReview queue[0m
+          [36m</h2>[39m
+          [36m<label[39m
+            [33mstyle[39m=[32m"font-size: 13px;"[39m
+          [36m>[39m
+            [0mReview status [0m
+            [36m<select[39m
+              [33maria-label[39m=[32m"Review status"[39m
+              [33mclass[39m=[32m"bg-background text-foreground border-border focus-ring"[39m
+              [33mstyle[39m=[32m"padding: 4px 10px; border-radius: 6px; border-style: solid; border-width: 1px; font-size: 13px; cursor: pointer;"[39m
+            [36m>[39m
+              [36m<option[39m
+                [33mvalue[39m=[32m"open"[39m
+              [36m>[39m
+                [0mOpen[0m
+              [36m</option>[39m
+              [36m<option[39m
+                [33mvalue[39m=[32m"resolved"[39m
+              [36m>[39m
+                [0mResolved[0m
+              [36m</option>[39m
+              [36m<option[39m
+                [33mvalue[39m=[32m"all"[39m
+              [36m>[39m
+                [0mAll[0m
+              [36m</option>[39m
+            [36m</select>[39m
+          [36m</label>[39m
+        [36m</div>[39m
+        [36m<div[39m
+          [33mrole[39m=[32m"status"[39m
+        [36m>[39m
+          [0mNo review tasks.[0m
+        [36m</div>[39m
+        [36m<div[39m
+          [33mstyle[39m=[32m"display: grid; gap: 8px;"[39m
+        [36m/>[39m
+      [36m</section>[39m
+    [36m</div>[39m
+  [36m</div>[39m
+[36m</body>[39m
+ ❯ waitForWrapper ../../../../home/andrei/StorageGenie/frontend/node_modules/@testing-library/dom/dist/wait-for.js:163:27
+ ❯ ../../../../home/andrei/StorageGenie/frontend/node_modules/@testing-library/dom/dist/query-helpers.js:86:33
+ ❯ src/routes/InboxPage.test.tsx:53:32
+     51|     renderPage();
+     52|     fireEvent.click(await screen.findByText("Import job-star"));
+     53|     const start = await screen.findByRole("button", { name: "Start imp…
+       |                                ^
+     54|     fireEvent.click(start);
+     55|     await waitFor(() => expect(api.apiPost).toHaveBeenCalledWith(`/v1/…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/4]⎯
+
+ FAIL  src/components/shell/import-modal.test.tsx > Surface truth (SG-187 G3) > the size note states the enforced 20 MiB cap and the full accepted set
+Error: expect(element).toHaveTextContent()
+
+Expected element to have text content:
+  20 MiB
+Received:
+  PNG, JPG or WebP. DQ9 target: up to 25 MB per file — this server currently accepts up to 20 MB.
+ ❯ src/components/shell/import-modal.test.tsx:240:18
+    238|     renderModal();
+    239|     const note = screen.getByTestId("import-size-note");
+    240|     expect(note).toHaveTextContent("20 MiB");
+       |                  ^
+    241|     expect(note).toHaveTextContent(/TIFF/);
+    242|     expect(note).toHaveTextContent(/HEIC/);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/4]⎯
+
+ FAIL  src/components/shell/import-modal.test.tsx > Surface truth (SG-187 G3) > backend-accepted formats stage (TIFF, HEIC, PDF)
+TestingLibraryElementError: Unable to find an element by: [data-testid="queue-item"]
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<div[39m
+      [33mclass[39m=[32m"font-sans"[39m
+    [36m>[39m
+      [36m<div[39m
+        [33maria-hidden[39m=[32m"true"[39m
+        [33mclass[39m=[32m"bg-background"[39m
+        [33mdata-testid[39m=[32m"import-backdrop"[39m
+        [33mstyle[39m=[32m"position: fixed; inset: 0; opacity: 0.5; z-index: 40;"[39m
+      [36m/>[39m
+      [36m<div[39m
+        [33maria-label[39m=[32m"Import assets"[39m
+        [33maria-modal[39m=[32m"true"[39m
+        [33mclass[39m=[32m"bg-card text-foreground border-border"[39m
+        [33mrole[39m=[32m"dialog"[39m
+        [33mstyle[39m=[32m"position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 41; width: min(560px, 92vw); max-height: 88vh; overflow-y: auto; border-style: solid; border-width: 1px; border-radius: 12px; padding: 20px;"[39m
+      [36m>[39m
+        [36m<header[39m
+          [33mstyle[39m=[32m"display: flex; align-items: center; gap: 8px; margin-bottom: 12px;"[39m
+        [36m>[39m
+          [36m<h2[39m
+            [33mstyle[39m=[32m"margin: 0px; font-size: 18px; flex: 1 1 0%;"[39m
+          [36m>[39m
+            [0mImport assets[0m
+          [36m</h2>[39m
+          [36m<button[39m
+            [33maria-label[39m=[32m"Close import dialog"[39m
+            [33mclass[39m=[32m"text-muted-foreground focus-ring"[39m
+            [33mstyle[39m=[32m"background: none; cursor: pointer; padding: 4px; border-radius: 4px;"[39m
+            [33mtype[39m=[32m"button"[39m
+          [36m>[39m
+            [36m<svg[39m
+              [33maria-hidden[39m=[32m"true"[39m
+              [33mclass[39m=[32m"lucide lucide-x"[39m
+              [33mfill[39m=[32m"none"[39m
+              [33mheight[39m=[32m"18"[39m
+              [33mstroke[39m=[32m"currentColor"[39m
+              [33mstroke-linecap[39m=[32m"round"[39m
+              [33mstroke-linejoin[39m=[32m"round"[39m
+              [33mstroke-width[39m=[32m"2"[39m
+              [33mviewBox[39m=[32m"0 0 24 24"[39m
+              [33mwidth[39m=[32m"18"[39m
+              [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+            [36m>[39m
+              [36m<path[39m
+                [33md[39m=[32m"M18 6 6 18"[39m
+              [36m/>[39m
+              [36m<path[39m
+                [33md[39m=[32m"m6 6 12 12"[39m
+              [36m/>[39m
+            [36m</svg>[39m
+          [36m</button>[39m
+        [36m</header>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"border-border bg-card-muted"[39m
+          [33mdata-testid[39m=[32m"import-dropzone"[39m
+          [33mstyle[39m=[32m"border-style: dashed; border-width: 2px; border-radius: 8px; padding: 16px; text-align: center;"[39m
+        [36m>[39m
+          [36m<p[39m
+            [33mclass[39m=[32m"text-muted-foreground"[39m
+            [33mstyle[39m=[32m"margin: 0px 0px 10px; font-size: 13px;"[39m
+          [36m>[39m
+            [0mDrag & drop photos here, choose files, or paste (Ctrl+V / ⌘V).[0m
+          [36m</p>[39m
+          [36m<input[39m
+            [33maccept[39m=[32m"image/png,image/jpeg,image/webp"[39m
+            [33maria-label[39m=[32m"Choose image files"[39m
+            [33mmultiple[39m=[32m""[39m
+            [33mtype[39m=[32m"file"[39m
+          [36m/>[39m
+          [36m<p[39m
+            [33mclass[39m=[32m"text-muted-foreground"[39m
+            [33mdata-testid[39m=[32m"import-size-note"[39m
+            [33mstyle[39m=[32m"margin: 10px 0px 0px; font-size: 11px;"[39m
+          [36m>[39m
+            [0mPNG, JPG or WebP. DQ9 target: up to [0m
+            [0m25[0m
+            [0m MB per file — this server currently accepts up to [0m
+            [0m20[0m
+            [0m MB.[0m
+          [36m</p>[39m
+        [36m</div>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"text-danger"[39m
+          [33mdata-testid[39m=[32m"rejected-files"[39m
+          [33mrole[39m=[32m"alert"[39m
+          [33mstyle[39m=[32m"margin-top: 12px; font-size: 12px;"[39m
+        [36m>[39m
+          [36m<strong>[39m
+            [0mSkipped [0m
+            [0m3[0m
+            [0m file[0m
+            [0ms[0m
+            [0m:[0m
+          [36m</strong>[39m
+          [36m<ul[39m
+            [33mstyle[39m=[32m"margin: 4px 0px 0px; padding-left: 18px;"[39m
+          [36m>[39m
+            [36m<li>[39m
+              [0mscan.tiff[0m
+              [0m — [0m
+              [0munsupported type image/tiff[0m
+            [36m</li>[39m
+            [36m<li>[39m
+              [0mphoto.heic[0m
+              [0m — [0m
+              [0munsupported type[0m
+            [36m</li>[39m
+            [36m<li>[39m
+              [0mdoc.pdf[0m
+              [0m — [0m
+              [0munsupported type application/pdf[0m
+            [36m</li>[39m
+          [36m</ul>[39m
+        [36m</div>[39m
+        [36m<label[39m
+          [33mstyle[39m=[32m"display: flex; align-items: center; gap: 8px; margin-top: 16px; font-size: 13px;"[39m
+        [36m>[39m
+          [36m<input[39m
+            [33mchecked[39m=[32m""[39m
+            [33mtype[39m=[32m"checkbox"[39m
+          [36m/>[39m
+          [0mAutomatically detect items and isolate cutouts[0m
+        [36m</label>[39m
+        [36m<p[39m
+          [33mclass[39m=[32m"text-muted-foreground"[39m
+          [33mdata-testid[39m=[32m"auto-detect-help"[39m
+          [33mstyle[39m=[32m"margin: 4px 0px 0px 24px; font-size: 11px;"[39m
+        [36m>[39m
+          [0mChecked: the import job is created and run immediately.[0m
+        [36m</p>[39m
+        [36m<section[39m
+          [33mstyle[39m=[32m"margin-top: 16px;"[39m
+        [36m>[39m
+          [36m<h3[39m
+            [33mdata-testid[39m=[32m"queue-count"[39m
+            [33mstyle[39m=[32m"margin: 0px 0px 8px; font-size: 14px;"[39m
+          [36m>[39m
+            [0mPending queue ([0m
+            [0m0[0m
+            [0m)[0m
+          [36m</h3>[39m
+          [36m<p[39m
+            [33mclass[39m=[32m"text-muted-foreground"[39m
+            [33mdata-testid[39m=[32m"queue-empty"[39m
+            [33mstyle[39m=[32m"margin: 0px; font-size: 12px;"[39m
+          [36m>[39m
+            [0mNo files staged yet.[0m
+          [36m</p>[39m
+        [36m</section>[39m
+        [36m<footer[39m
+          [33mstyle[39m=[32m"display: flex; justify-content: flex-end; gap: 8px; margin-top: 20px;"[39m
+        [36m>[39m
+          [36m<button[39m
+            [33mclass[39m=[32m"bg-card text-foreground border-border focus-ring"[39m
+            [33mstyle[39m=[32m"padding: 6px 12px; border-radius: 6px; border-style: solid; border-width: 1px; cursor: pointer;"[39m
+            [33mtype[39m=[32m"button"[39m
+          [36m>[39m
+            [0mCancel[0m
+          [36m</button>[39m
+          [36m<button[39m
+            [33maria-busy[39m=[32m"false"[39m
+            [33mclass[39m=[32m"bg-primary text-primary-foreground focus-ring"[39m
+            [33mdisabled[39m=[32m""[39m
+            [33mstyle[39m=[32m"padding: 6px 12px; border-radius: 6px; cursor: not-allowed; display: inline-flex; align-items: center; gap: 6px;"[39m
+            [33mtype[39m=[32m"button"[39m
+          [36m>[39m
+            [0mProcess 0 Items[0m
+          [36m</button>[39m
+        [36m</footer>[39m
+      [36m</div>[39m
+    [36m</div>[39m
+  [36m</div>[39m
+[36m</body>[39m
+ ❯ Object.getElementError ../../../../home/andrei/StorageGenie/frontend/node_modules/@testing-library/dom/dist/config.js:37:19
+ ❯ ../../../../home/andrei/StorageGenie/frontend/node_modules/@testing-library/dom/dist/query-helpers.js:76:38
+ ❯ ../../../../home/andrei/StorageGenie/frontend/node_modules/@testing-library/dom/dist/query-helpers.js:109:15
+ ❯ src/components/shell/import-modal.test.tsx:255:19
+    253|     );
+    254| 
+    255|     expect(screen.getAllByTestId("queue-item")).toHaveLength(3);
+       |                   ^
+    256|     expect(screen.queryByTestId("rejected-files")).not.toBeInTheDocume…
+    257|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/4]⎯
+
+ FAIL  src/components/shell/import-modal.test.tsx > Surface truth (SG-187 G3) > a file over the 20 MiB server cap is rejected client-side with the limit named
+TestingLibraryElementError: Unable to find an element by: [data-testid="rejected-files"]
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<div[39m
+      [33mclass[39m=[32m"font-sans"[39m
+    [36m>[39m
+      [36m<div[39m
+        [33maria-hidden[39m=[32m"true"[39m
+        [33mclass[39m=[32m"bg-background"[39m
+        [33mdata-testid[39m=[32m"import-backdrop"[39m
+        [33mstyle[39m=[32m"position: fixed; inset: 0; opacity: 0.5; z-index: 40;"[39m
+      [36m/>[39m
+      [36m<div[39m
+        [33maria-label[39m=[32m"Import assets"[39m
+        [33maria-modal[39m=[32m"true"[39m
+        [33mclass[39m=[32m"bg-card text-foreground border-border"[39m
+        [33mrole[39m=[32m"dialog"[39m
+        [33mstyle[39m=[32m"position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 41; width: min(560px, 92vw); max-height: 88vh; overflow-y: auto; border-style: solid; border-width: 1px; border-radius: 12px; padding: 20px;"[39m
+      [36m>[39m
+        [36m<header[39m
+          [33mstyle[39m=[32m"display: flex; align-items: center; gap: 8px; margin-bottom: 12px;"[39m
+        [36m>[39m
+          [36m<h2[39m
+            [33mstyle[39m=[32m"margin: 0px; font-size: 18px; flex: 1 1 0%;"[39m
+          [36m>[39m
+            [0mImport assets[0m
+          [36m</h2>[39m
+          [36m<button[39m
+            [33maria-label[39m=[32m"Close import dialog"[39m
+            [33mclass[39m=[32m"text-muted-foreground focus-ring"[39m
+            [33mstyle[39m=[32m"background: none; cursor: pointer; padding: 4px; border-radius: 4px;"[39m
+            [33mtype[39m=[32m"button"[39m
+          [36m>[39m
+            [36m<svg[39m
+              [33maria-hidden[39m=[32m"true"[39m
+              [33mclass[39m=[32m"lucide lucide-x"[39m
+              [33mfill[39m=[32m"none"[39m
+              [33mheight[39m=[32m"18"[39m
+              [33mstroke[39m=[32m"currentColor"[39m
+              [33mstroke-linecap[39m=[32m"round"[39m
+              [33mstroke-linejoin[39m=[32m"round"[39m
+              [33mstroke-width[39m=[32m"2"[39m
+              [33mviewBox[39m=[32m"0 0 24 24"[39m
+              [33mwidth[39m=[32m"18"[39m
+              [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+            [36m>[39m
+              [36m<path[39m
+                [33md[39m=[32m"M18 6 6 18"[39m
+              [36m/>[39m
+              [36m<path[39m
+                [33md[39m=[32m"m6 6 12 12"[39m
+              [36m/>[39m
+            [36m</svg>[39m
+          [36m</button>[39m
+        [36m</header>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"border-border bg-card-muted"[39m
+          [33mdata-testid[39m=[32m"import-dropzone"[39m
+          [33mstyle[39m=[32m"border-style: dashed; border-width: 2px; border-radius: 8px; padding: 16px; text-align: center;"[39m
+        [36m>[39m
+          [36m<p[39m
+            [33mclass[39m=[32m"text-muted-foreground"[39m
+            [33mstyle[39m=[32m"margin: 0px 0px 10px; font-size: 13px;"[39m
+          [36m>[39m
+            [0mDrag & drop photos here, choose files, or paste (Ctrl+V / ⌘V).[0m
+          [36m</p>[39m
+          [36m<input[39m
+            [33maccept[39m=[32m"image/png,image/jpeg,image/webp"[39m
+            [33maria-label[39m=[32m"Choose image files"[39m
+            [33mmultiple[39m=[32m""[39m
+            [33mtype[39m=[32m"file"[39m
+          [36m/>[39m
+          [36m<p[39m
+            [33mclass[39m=[32m"text-muted-foreground"[39m
+            [33mdata-testid[39m=[32m"import-size-note"[39m
+            [33mstyle[39m=[32m"margin: 10px 0px 0px; font-size: 11px;"[39m
+          [36m>[39m
+            [0mPNG, JPG or WebP. DQ9 target: up to [0m
+            [0m25[0m
+            [0m MB per file — this server currently accepts up to [0m
+            [0m20[0m
+            [0m MB.[0m
+          [36m</p>[39m
+        [36m</div>[39m
+        [36m<label[39m
+          [33mstyle[39m=[32m"display: flex; align-items: center; gap: 8px; margin-top: 16px; font-size: 13px;"[39m
+        [36m>[39m
+          [36m<input[39m
+            [33mchecked[39m=[32m""[39m
+            [33mtype[39m=[32m"checkbox"[39m
+          [36m/>[39m
+          [0mAutomatically detect items and isolate cutouts[0m
+        [36m</label>[39m
+        [36m<p[39m
+          [33mclass[39m=[32m"text-muted-foreground"[39m
+          [33mdata-testid[39m=[32m"auto-detect-help"[39m
+          [33mstyle[39m=[32m"margin: 4px 0px 0px 24px; font-size: 11px;"[39m
+        [36m>[39m
+          [0mChecked: the import job is created and run immediately.[0m
+        [36m</p>[39m
+        [36m<section[39m
+          [33mstyle[39m=[32m"margin-top: 16px;"[39m
+        [36m>[39m
+          [36m<h3[39m
+            [33mdata-testid[39m=[32m"queue-count"[39m
+            [33mstyle[39m=[32m"margin: 0px 0px 8px; font-size: 14px;"[39m
+          [36m>[39m
+            [0mPending queue ([0m
+            [0m1[0m
+            [0m)[0m
+          [36m</h3>[39m
+          [36m<ul[39m
+            [33mstyle[39m=[32m"list-style: none; margin: 0px; padding: 0px; display: grid; gap: 6px;"[39m
+          [36m>[39m
+            [36m<li[39m
+              [33mclass[39m=[32m"bg-card-muted"[39m
+              [33mdata-testid[39m=[32m"queue-item"[39m
+              [33mstyle[39m=[32m"display: flex; align-items: center; gap: 8px; padding: 6px 10px; border-radius: 6px; font-size: 12px;"[39m
+            [36m>[39m
+              [36m<span[39m
+                [33mstyle[39m=[32m"flex: 1 1 0%; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"[39m
+              [36m>[39m
+                [0mhuge.png[0m
+              [36m</span>[39m
+              [36m<span[39m
+                [33mclass[39m=[32m"text-muted-foreground font-mono"[39m
+              [36m>[39m
+                [0m20480.0 KB[0m
+              [36m</span>[39m
+              [36m<span[39m
+                [33mclass[39m=[32m"text-processed"[39m
+                [33mstyle[39m=[32m"font-weight: 600;"[39m
+              [36m>[39m
+                [0mReady[0m
+              [36m</span>[39m
+              [36m<button[39m
+                [33maria-label[39m=[32m"Remove huge.png"[39m
+                [33mclass[39m=[32m"text-muted-foreground focus-ring"[39m
+                [33mstyle[39m=[32m"background: none; cursor: pointer; font-size: 12px;"[39m
+                [33mtype[39m=[32m"button"[39m
+              [36m>[39m
+                [0mRemove[0m
+              [36m</button>[39m
+            [36m</li>[39m
+          [36m</ul>[39m
+        [36m</section>[39m
+        [36m<footer[39m
+          [33mstyle[39m=[32m"display: flex; justify-content: flex-end; gap: 8px; margin-top: 20px;"[39m
+        [36m>[39m
+          [36m<button[39m
+            [33mclass[39m=[32m"bg-card text-foreground border-border focus-ring"[39m
+            [33mstyle[39m=[32m"padding: 6px 12px; border-radius: 6px; border-style: solid; border-width: 1px; cursor: pointer;"[39m
+            [33mtype[39m=[32m"button"[39m
+          [36m>[39m
+            [0mCancel[0m
+          [36m</button>[39m
+          [36m<button[39m
+            [33maria-busy[39m=[32m"false"[39m
+            [33mclass[39m=[32m"bg-primary text-primary-foreground focus-ring"[39m
+            [33mstyle[39m=[32m"padding: 6px 12px; border-radius: 6px; cursor: pointer; display: inline-flex; align-items: center; gap: 6px;"[39m
+            [33mtype[39m=[32m"button"[39m
+          [36m>[39m
+            [0mProcess 1 Item[0m
+          [36m</button>[39m
+        [36m</footer>[39m
+      [36m</div>[39m
+    [36m</div>[39m
+  [36m</div>[39m
+[36m</body>[39m
+ ❯ Object.getElementError ../../../../home/andrei/StorageGenie/frontend/node_modules/@testing-library/dom/dist/config.js:37:19
+ ❯ ../../../../home/andrei/StorageGenie/frontend/node_modules/@testing-library/dom/dist/query-helpers.js:76:38
+ ❯ ../../../../home/andrei/StorageGenie/frontend/node_modules/@testing-library/dom/dist/query-helpers.js:52:17
+ ❯ ../../../../home/andrei/StorageGenie/frontend/node_modules/@testing-library/dom/dist/query-helpers.js:95:19
+ ❯ src/components/shell/import-modal.test.tsx:265:29
+    263|     dropFiles(big);
+    264| 
+    265|     const rejected = screen.getByTestId("rejected-files");
+       |                             ^
+    266|     expect(rejected).toHaveTextContent("huge.png");
+    267|     expect(rejected).toHaveTextContent(/20 MiB/);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/4]⎯
+
+ Test Files  2 failed (2)
+      Tests  4 failed | 23 passed (27)
+   Start at  19:40:26
+   Duration  2.73s (transform 376ms, setup 142ms, collect 828ms, tests 2.08s, environment 966ms, prepare 194ms)
+

@@ -1,0 +1,12 @@
+SG-187 worklog (append-only; commands, decisions, results)
+2026-10-13T19:38:18Z lane start 1791919602 (19:26:42Z), budget 2100s, deadline 1791921702 (20:01:42Z)
+2026-10-13T19:38:18Z base ref automation -> acdf81f5003c3794da0ca6c4e15a4257d05d7ade; base worktree /tmp/opencode/sg187-base
+2026-10-13T19:38:18Z health start HTTP 200 {ok,ok,ok} -> docs/worklogs/SG-187_health_start.log
+2026-10-13T19:38:18Z contract source /home/andrei/storagegenie-contract/CODER.md v0.47.0; rules_check: G-L1 UNCHECKED (dir not at a tag), exit 3
+2026-10-13T19:40Z G1/G2/G3 implemented: evidence_service.py _remove_written_artifacts + row-failure cleanup (race keeps winner file); evidence.py IntegrityError -> 422 clean detail, unexpected -> 500 clean; AssetImportModal accepted set = backend set, 20 MiB client pre-check, honest note; InboxPage run mutation + Start import job button on CREATED only. Product commit 07d4ea8.
+2026-10-13T19:40Z candidate focused: backend 4 passed (2 files); frontend 27 passed (2 files, InboxPage 10 + import-modal 17).
+2026-10-13T19:40Z base FAIL (worktree /tmp/opencode/sg187-base @ acdf81f, tests copied in, never in-place): backend 1 failed/3 passed (orphan files + raw SQL detail); frontend 4 failed/23 passed (3x G3 + CREATED Start).
+2026-10-13T19:45Z authoritative backend 13 files: 97 passed (first invocation ordered sg187 files first -> 5 setup errors in test_assertions/test_assets_crud, which rely on being the first app importer; invocation artifact, re-run with test_evidence_upload first = green; no product impact). frontend derived 4 files: 41 passed.
+2026-10-13T19:45Z gates: ruff clean; mypy app 41 errors/9 files both trees (unchanged debt); tsc --noEmit clean; eslint touched files clean.
+2026-10-13T19:45Z SG-180 probe real route: base DEFECT_OBSERVED (422 raw SQL detail + 3 orphan files) -> candidate PASS (422 "unknown household: evidence cannot be stored", 0 orphans); probe exit 1 both (candidate also flips the known SG-185 replay expectation line).
+2026-10-13T19:45Z screenshots: esbuild static harness mounting the real component source + tokens.css; first capture blank (import.meta.env undefined under esbuild iife) -> fixed --define:import.meta.env={}; 760x900 + 390x844 verified by eye (note reads PNG, JPG, WebP, TIFF, HEIC or PDF, up to 20 MiB per file).

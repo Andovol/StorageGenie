@@ -1,0 +1,59 @@
+..F.                                                                     [100%]
+=================================== FAILURES ===================================
+______ test_unknown_household_upload_leaves_no_orphan_and_speaks_plainly _______
+
+db = (<sqlalchemy.orm.session.Session object at 0x72999150f440>, '01a136c7-c8b5-77e3-8586-0edfbc88991f', PosixPath('/tmp/pytest-of-andrei/pytest-2/test_unknown_household_upload_0/storage'))
+
+    def test_unknown_household_upload_leaves_no_orphan_and_speaks_plainly(db) -> None:  # type: ignore[no-untyped-def]
+        session, _, storage_root = db
+        image_bytes = jpeg_bytes()
+        sha = hashlib.sha256(image_bytes).hexdigest()
+        before = stored_files(storage_root)
+    
+        with TestClient(app) as client:
+            response = client.post(
+                "/v1/evidence",
+                params={"household_id": "sg187-no-such-household"},
+                files={"file": ("orphan.jpg", image_bytes, "image/jpeg")},
+            )
+    
+        after = stored_files(storage_root)
+        detail = response.json()["detail"]
+        assert response.status_code == 422
+>       assert "FOREIGN KEY" not in detail
+E       AssertionError: assert 'FOREIGN KEY' not in '(sqlite3.In...e/e/20/gkpj)'
+E         
+E         'FOREIGN KEY' is contained here:
+E           (sqlite3.IntegrityError) FOREIGN KEY constraint failed
+E         ?                          +++++++++++
+E           [SQL: INSERT INTO evidence (id, household_id, sha256, media_type, storage_key, original_filename, source_kind, size_bytes) VALUES (?, ?, ?, ?, ?, ?, ?, ?) RETURNING created_at, updated_at]
+E           [parameters: ('01a136c7-c8c1-7e42-ba38-a0807e276384', 'sg187-no-such-household', 'c4a4080153a33ea6515fb66e858e118a49994a2b12bd1e5a36ed4be7e379297b', 'image/jpeg', 'sg187-no-such-household/c4/c4a4080153a33ea6515fb66e858e118a49994a2b12bd1e5a36ed4be7e379297b.jpg', 'orphan.jpg...
+E         
+E         ...Full output truncated (2 lines hidden), use '-vv' to show
+
+tests/test_sg187_rejection_hygiene.py:87: AssertionError
+=============================== warnings summary ===============================
+../../../../home/andrei/StorageGenie/backend/venv/lib/python3.12/site-packages/fastapi/testclient.py:1
+  /home/andrei/StorageGenie/backend/venv/lib/python3.12/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+../../../../home/andrei/StorageGenie/backend/venv/lib/python3.12/site-packages/starlette/testclient.py:53
+  /home/andrei/StorageGenie/backend/venv/lib/python3.12/site-packages/starlette/testclient.py:53: DeprecationWarning: The anyio.abc.BlockingPortal alias is deprecated, use anyio.from_thread.BlockingPortal instead.
+    _PortalFactoryType = Callable[[], AbstractContextManager[anyio.abc.BlockingPortal]]
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+==================================== PASSES ====================================
+_______ test_created_job_start_reaches_awaiting_review_with_foreign_403 ________
+------------------------------ Captured log call -------------------------------
+WARNING  app.services.signals:signals.py:104 Barcode extraction unavailable: pyzbar/libzbar is not installed
+WARNING  app.services.signals:signals.py:215 OCR extraction unavailable: tesseract is not installed or it's not in your PATH. See README file for more information.
+____________ test_run_on_failed_job_stays_failed_and_retry_recovers ____________
+------------------------------ Captured log call -------------------------------
+WARNING  app.services.signals:signals.py:104 Barcode extraction unavailable: pyzbar/libzbar is not installed
+WARNING  app.services.signals:signals.py:215 OCR extraction unavailable: tesseract is not installed or it's not in your PATH. See README file for more information.
+=========================== short test summary info ============================
+PASSED tests/test_sg187_capture_journey.py::test_created_job_start_reaches_awaiting_review_with_foreign_403
+PASSED tests/test_sg187_capture_journey.py::test_run_on_failed_job_stays_failed_and_retry_recovers
+PASSED tests/test_sg187_rejection_hygiene.py::test_oversize_413_and_mismatch_422_leave_no_files
+FAILED tests/test_sg187_rejection_hygiene.py::test_unknown_household_upload_leaves_no_orphan_and_speaks_plainly
+1 failed, 3 passed, 2 warnings in 2.08s
