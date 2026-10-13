@@ -2,9 +2,9 @@
 
 `PB-1`–`PB-6` bind (`CODER.md` §14).
 **BASE REF: automation.** Report actual resolved commit.
-**STATUS: DRAFT prepared 2026-10-13 from SG-181 G1 evidence; scope-approved D4 (R4 + changed-payload replay policy). RE-REVIEW against the tree before dispatch next session.**
+**STATUS: RE-REVIEWED vs tree at `328851e` under D16 L3 flow; premises hold (global `filter_by(key=…)` at `:82`, file untouched since SG-136, defect live in tree and served). Scope-approved D4.**
 **DATABASE: separately isolated disposable test database/storage; production GET observations only.**
-**Restart: none. Autonomy: L2.** Owner decision D4 fixes the semantics: replay is household-scoped (same key in another household never returns a foreign row). Changed-payload same-key policy: same-household changed payload returns the ORIGINAL row explicitly (current semantics kept, documented) — do not invent fingerprinting.
+**Restart: none. Autonomy: L3** (D16 flow). Owner decision D4 fixes the semantics: replay is household-scoped (same key in another household never returns a foreign row). Changed-payload same-key policy: same-household changed payload returns the ORIGINAL row explicitly (current semantics kept, documented) — do not invent fingerprinting.
 
 ## Why this exists
 
