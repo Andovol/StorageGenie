@@ -260,6 +260,13 @@ const MASK_JS = (privates) => `(function(){
   var n=0;
   var imgs=document.querySelectorAll('img, video, canvas');
   for (var i=0;i<imgs.length;i++){ imgs[i].style.filter='blur(14px)'; n++; }
+  var fields=document.querySelectorAll('input, textarea');
+  for (var f=0; f<fields.length; f++){
+    var fv=fields[f].value; if(!fv) continue; var nf=fv;
+    for (var q=0;q<P.length;q++){ var sq=P[q]; if (sq && sq.length>=3 && nf.indexOf(sq)>=0) nf=nf.split(sq).join(Array(sq.length+1).join('\u25A0')); }
+    nf=nf.replace(/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/gi,function(m){return Array(m.length+1).join('\u25A0');});
+    if (nf!==fv){ fields[f].value=nf; n++; }
+  }
   var walker=document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
   var t;
   while ((t=walker.nextNode())){
@@ -268,7 +275,7 @@ const MASK_JS = (privates) => `(function(){
     v=v.replace(/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/gi,function(m){return Array(m.length+1).join('\\u25A0');});
     if (v!==o) t.nodeValue=v;
   }
-  return {blurred:imgs.length, privates:P.length};
+  return {blurred:imgs.length, maskedFields:n, privates:P.length};
 })()`;
 
 // ---------------------------------------------------------------- capture engine

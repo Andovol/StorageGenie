@@ -1,5 +1,5 @@
 {
- "ts": "2026-10-13T14:15:06.620Z",
+ "ts": "2026-10-13T14:17:07.252Z",
  "browser": {
   "executable": "/home/andrei/.cache/ms-playwright/chromium_headless_shell-1228/chrome-headless-shell-linux64/chrome-headless-shell",
   "versionProtocol": "HeadlessChrome/149.0.7827.55",
@@ -7,7 +7,7 @@
   "userAgent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/149.0.7827.55 Safari/537.36",
   "launchArgs": [
    "--remote-debugging-port=0",
-   "--user-data-dir=/tmp/opencode/sg183/profile-1791900906622",
+   "--user-data-dir=/tmp/opencode/sg183/profile-1791901027254",
    "--no-first-run",
    "--no-default-browser-check",
    "--disable-gpu",
@@ -18,7 +18,7 @@
    "about:blank"
   ],
   "transport": "raw CDP over DevTools websocket (DevToolsActivePort; no wrappers)",
-  "remoteDebuggingPort": 37815
+  "remoteDebuggingPort": 34731
  },
  "jar": null,
  "controls": null,
@@ -2574,6 +2574,7 @@
     },
     "mask": {
      "blurred": 7,
+     "maskedFields": 7,
      "privates": 8,
      "order": "after_measurement_before_screenshot"
     },
@@ -4951,6 +4952,7 @@
     ],
     "mask": {
      "blurred": 7,
+     "maskedFields": 7,
      "privates": 8,
      "order": "after_measurement_before_screenshot"
     },
@@ -7328,6 +7330,7 @@
     ],
     "mask": {
      "blurred": 7,
+     "maskedFields": 7,
      "privates": 8,
      "order": "after_measurement_before_screenshot"
     },
@@ -11934,6 +11937,7 @@
     ],
     "mask": {
      "blurred": 1,
+     "maskedFields": 1,
      "privates": 8,
      "order": "after_measurement_before_screenshot"
     },
@@ -30680,6 +30684,7 @@
     },
     "mask": {
      "blurred": 1,
+     "maskedFields": 2,
      "privates": 8,
      "order": "after_measurement_before_screenshot"
     },
@@ -33210,6 +33215,7 @@
     ],
     "mask": {
      "blurred": 1,
+     "maskedFields": 2,
      "privates": 8,
      "order": "after_measurement_before_screenshot"
     },
@@ -35721,6 +35727,7 @@
     ],
     "mask": {
      "blurred": 1,
+     "maskedFields": 2,
      "privates": 8,
      "order": "after_measurement_before_screenshot"
     },

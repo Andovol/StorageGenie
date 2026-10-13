@@ -2,10 +2,6 @@
 	/var/cache/fontconfig
 	/home/andrei/.cache/fontconfig
 	/home/andrei/.fontconfig
-[sg183] browser stderr: Fontconfig error: No writable cache directories
-	/var/cache/fontconfig
-	/home/andrei/.cache/fontconfig
-	/home/andrei/.fontconfig
 
 Fontconfig error: No writable cache directories
 	/var/cache/fontconfig
@@ -18,21 +14,16 @@ Fontconfig error: No writable cache dire
 	/home/andrei/.cache/fontconfig
 	/home/andrei/.fontconfig
 [sg183] browser stderr: Fontconfig error: No writable cache directories
+[sg183] browser stderr: /var/cache/fontconfig
+	/home/andrei/.cache/fontconfig
+	/home/andrei/.fontconfig
+
+Fontconfig error: No writable cache directories
 	/var/cache/fontconfig
 	/home/andrei/.cache/fontconfig
 	/home/andrei/.fontconfig
 [sg183] browser stderr: Fontconfig error: No writable cache directories
-	/var/cache/fontconfig
-	/home/andrei/.cache/fontconfig
-	/home/andrei/.fontconfig
 [sg183] browser stderr: Fontconfig error: No writable cache directories
-	/var/cache/fontconfig
-	/home/andrei/.cache/fontconfig
-	/home/andrei/.fontconfig
-[sg183] browser stderr: Fontconfig error: No writable cache directories
-	/var/cache/fontconfig
-	/home/andrei/.cache/fontconfig
-	/home/andrei/.fontconfig
 [sg183] browser stderr: Fontconfig error: No writable cache directories
 	/var/cache/fontconfig
 	/home/andrei/.cache/fontconfig
@@ -71,8 +62,8 @@ Fontconfig error: No writable cache dire
 	/home/andrei/.fontconfig
 [sg183] browser: HeadlessChrome/149.0.7827.55
 [sg183] resolved: assets? true review? true private values: 8
-[sg183] browser stderr: [1013/141507.038374:ERROR:dbus/bus.cc:405] Failed to connect to the bus: Could not parse server address: Unknown address type (examples of valid types are "tcp" and on UNIX "unix")
-[sg183] browser stderr: [1013/141507.038676:ERROR:dbus/object_proxy.cc:572] Failed to call method: org.freedesktop.DBus.NameHasOwner: object_path= /org/freedesktop/DBus: unknown error type:
+[sg183] browser stderr: [1013/141707.660825:ERROR:dbus/bus.cc:405] Failed to connect to the bus: Could not parse server address: Unknown address type (examples of valid types are "tcp" and on UNIX "unix")
+[sg183] browser stderr: [1013/141707.660912:ERROR:dbus/object_proxy.cc:572] Failed to call method: org.freedesktop.DBus.NameHasOwner: object_path= /org/freedesktop/DBus: unknown error type:
 [sg183] app catalog 390x844 ok
 [sg183] app catalog 834x1112 ok
 [sg183] app catalog 1440x900 ok
@@ -103,5 +94,5 @@ Fontconfig error: No writable cache dire
 [sg183] app review 390x844 ok
 [sg183] app review 834x1112 ok
 [sg183] app review 1440x900 ok
-[sg183] wrote /tmp/opencode/sg183/out_final3/sg183_result.json elapsed 38s
-{"outFile":"/tmp/opencode/sg183/out_final3/sg183_result.json","elapsedSeconds":38,"controlFailures":0,"appRoutes":30}
+[sg183] wrote /tmp/opencode/sg183/out_final4/sg183_result.json elapsed 38s
+{"outFile":"/tmp/opencode/sg183/out_final4/sg183_result.json","elapsedSeconds":38,"controlFailures":0,"appRoutes":30}
