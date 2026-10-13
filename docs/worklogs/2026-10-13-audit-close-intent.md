@@ -1,5 +1,7 @@
 # Full audit then close — pending execution receipt
 
+SUPERSEDED CURRENT ORDERING by RECOVERY-D3, owner “I want to close this session and continue in a fresh one.” All prior words remain historical; unfinished audit transfers to fresh session. Final handoff/close blocker docs/worklogs/2026-10-13-recovery-session-handoff.md; no pending execution or automatic wake in this chat.
+
 Owner request is recorded verbatim in `docs/decisions/2026-10-13-audit-then-close.md` (RECOVERY-D2). This is an intent/progress record, not CLOSE_COMPLETE or an END report.
 
 At the check following that request: SG-183 status activating, receipt absent, elapsed_s=158, budget_s=2100, stop_s=60, ends_by=2026-10-13T14:34:53Z. Existing one-shot same-chat continuation is scheduled for 17:35:53 Europe/Bucharest, not a recurring monitor. Those are immutable observations; re-read actual status/notes on continuation rather than updating saved counters.
