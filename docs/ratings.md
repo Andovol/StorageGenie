@@ -727,3 +727,9 @@ Originals above (88 FLAG:TRUST / 91 FLAG:TRUST) stand as the audit trail; the ve
 | slice_id | phase | model | effort | score | flag | lever | guards_invoked | deduction_attribution | remaining | escape |
 |---|---|---|---|---|---|---|---|---|---|---|
 | SG-190 | R8 presentation-only (D9); receipt 82788dd; overflow 10/10→0/10 at 390, 9/10→0/10 at 834, 320 reflow 0; contrast min 4.3977→5.2606, 0 below AA; 266/266 + lint/build clean; backend diff empty; all 43 images opened; SC-15 RESOLVED on sampled denominators; audit SG-190_audit.md | opencode/opencode-go/deepseek-v4.1-flash (receipt command settings) | max | 97 |  |  | PG-EV-01/02/03/04/05/06/07/09/13; PG-SC-01/02/03/09/10/12; PG-IC-01/07/09; PG-DP-03; PG-PR-01/03/04/07/10 |  | SG-190 REMAINING (error branches, nav household context, zoom/touch/dark, density) → next-session candidates; serve via the recorded deploy decision |  |
+
+### SG-193 (2026-10-15 - close-out deploy rider)
+
+| slice_id | phase | model | effort | score | flag | lever | guards_invoked | deduction_attribution | remaining | escape |
+|---|---|---|---|---|---|---|---|---|---|---|
+| SG-193 | Close-out deploy rider (D-1); receipts eb6ba1b + 3c89c69, settings envelope-sourced; one rebuild 31s + one recreate 2s lane-socket, zero denials; container e8a6ed69/image c3b85d5a/bundle fd4a916e; six repairs SERVED; 76+50 focused tests; 12x200 health; DB byte-identical; merged-vs-served exactly six commits; I1 partial API pre-capture disclosed; audit SG-193_audit.md | opencode/opencode-go/deepseek-v4.1-flash (receipt settings) | max | 97 |  |  | PG-EV-02/03/08; PG-IC-01/07; PG-DP-01/02; PG-PR-03/04/06/10 | coder | Report REMAINING closed here except: SG-176/178 open + post-SG-193 delta (micro-slice, candidates) to STATE; six slices' REMAINING stand; contract 0.47.0 to 0.50.0 delta to D-2 owner adoption (blocks next dispatch) |  |
