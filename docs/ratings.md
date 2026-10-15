@@ -733,3 +733,9 @@ Originals above (88 FLAG:TRUST / 91 FLAG:TRUST) stand as the audit trail; the ve
 | slice_id | phase | model | effort | score | flag | lever | guards_invoked | deduction_attribution | remaining | escape |
 |---|---|---|---|---|---|---|---|---|---|---|
 | SG-193 | Close-out deploy rider (D-1); receipts eb6ba1b + 3c89c69, settings envelope-sourced; one rebuild 31s + one recreate 2s lane-socket, zero denials; container e8a6ed69/image c3b85d5a/bundle fd4a916e; six repairs SERVED; 76+50 focused tests; 12x200 health; DB byte-identical; merged-vs-served exactly six commits; I1 partial API pre-capture disclosed; audit SG-193_audit.md | opencode/opencode-go/deepseek-v4.1-flash (receipt settings) | max | 97 |  |  | PG-EV-02/03/08; PG-IC-01/07; PG-DP-01/02; PG-PR-03/04/06/10 | coder | Report REMAINING closed here except: SG-176/178 open + post-SG-193 delta (micro-slice, candidates) to STATE; six slices' REMAINING stand; contract 0.47.0 to 0.50.0 delta to D-2 owner adoption (blocks next dispatch) |  |
+
+### SG-194 (2026-10-15 - jobs.py cursor-twin 422)
+
+| slice_id | phase | model | effort | score | flag | lever | guards_invoked | deduction_attribution | remaining | escape | slowest_waste |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| SG-194 | Micro-slice (starter arc/D16); receipts 8a67ce3 + db663b5, settings envelope-sourced; jobs.py 422 hunk + 3 genuine FAIL-then-PASS tests; twin census 1+2+0; full suite 722/2 both env base-identical (D443); mypy/ruff clean; health delta none; audit SG-194_audit.md | opencode/opencode-go/deepseek-v4.1-flash (receipt settings) | max | 98 |  |  | PG-EV-02/03/09; PG-IC-01/07/09; PG-DP-02; PG-PR-03/06 | coder | Env signal rows (libzbar/tesseract) to STATE known-host condition; serving to close-deploy rider; no other open items |  | 5s precommit-focused |
