@@ -1,0 +1,86 @@
+SG-193 live route/repair verification; captured 2026-10-15T19:49:59Z
+== SPA routes through the new server (read-only GETs) ==
+/review HTTP 200 type=text/html; charset=utf-8 bytes=944
+dc9fbbbf50c25d2cd8c756c614e798bd691898b5191e2b5769506bcf3fe0aba0  /tmp/opencode/sg193_page_review.html
+/inbox HTTP 200 type=text/html; charset=utf-8 bytes=944
+dc9fbbbf50c25d2cd8c756c614e798bd691898b5191e2b5769506bcf3fe0aba0  /tmp/opencode/sg193_page_inbox.html
+/catalog HTTP 200 type=text/html; charset=utf-8 bytes=944
+dc9fbbbf50c25d2cd8c756c614e798bd691898b5191e2b5769506bcf3fe0aba0  /tmp/opencode/sg193_page_catalog.html
+(index.html post-recreate sha256 for SPA-fallback comparison: dc9fbbbf50c25d2cd8c756c614e798bd691898b5191e2b5769506bcf3fe0aba0)
+== CORS preflight (OPTIONS, Origin http://localhost:5173, requested method GET) ==
+HTTP/1.1 200 OK
+date: Thu, 15 Oct 2026 19:49:59 GMT
+server: uvicorn
+vary: Origin
+access-control-allow-methods: GET, POST, PUT, PATCH, DELETE, OPTIONS
+access-control-max-age: 600
+access-control-allow-headers: Accept, Accept-Language, Authorization, Content-Language, Content-Type, Idempotency-Key, If-Match, Origin, X-Requested-With
+access-control-allow-credentials: true
+access-control-allow-origin: http://localhost:5173
+content-length: 2
+content-type: text/plain; charset=utf-8
+
+OK== CORS on actual GET (Origin header) ==
+HTTP/1.1 422 Unprocessable Entity
+date: Thu, 15 Oct 2026 19:49:59 GMT
+server: uvicorn
+content-length: 297
+content-type: application/problem+json
+access-control-allow-credentials: true
+access-control-allow-origin: http://localhost:5173
+vary: Origin
+
+{"type":"about:blank","title":"Unprocessable Entity","status":422,"detail":"1 validation error:\n  {'type': 'missing', 'loc': ('query', 'household_id'), 'msg': 'Field required', 'input': None}\n\n  File \"/app/app/api/v1/review_tasks.py\", line 37, in list_review_tasks\n    GET /v1/review-tasks"}== SG-188 read-only semantics on the served server ==
+-- malformed cursor: GET /v1/assets?cursor=not-a-cursor --
+HTTP 422
+{"type":"about:blank","title":"Unprocessable Entity","status":422,"detail":"1 validation error:\n  {'type': 'missing', 'loc': ('query', 'household_id'), 'msg': 'Field required', 'input': None}\n\n  File \"/app/app/api/v1/assets.py\", line 272, in list_assets\n    GET /v1/assets"}
+-- malformed cursor: GET /v1/review-tasks?cursor=not-a-cursor --
+HTTP 422
+{"type":"about:blank","title":"Unprocessable Entity","status":422,"detail":"1 validation error:\n  {'type': 'missing', 'loc': ('query', 'household_id'), 'msg': 'Field required', 'input': None}\n\n  File \"/app/app/api/v1/review_tasks.py\", line 37, in list_review_tasks\n    GET /v1/review-tasks"}
+-- archived default: read-only DB asset statuses --
+asset_statuses {'ACTIVE': 7}
+archived_ids []
+-- default list GET /v1/assets --
+keys ['detail', 'status', 'title', 'type']
+n_items 0
+ids []
+statuses []
+-- explicit GET /v1/assets?status=ARCHIVED --
+keys ['detail', 'status', 'title', 'type']
+n_items 0
+ids []
+statuses []
+-- review-tasks listing: GET /v1/review-tasks --
+n_items 0
+statuses {}
+== re-run corrections (verification attempt 2; attempt 1 invoked list GETs without the required household_id -> 422 validation, not a product failure; captured 2026-10-15T19:50:20Z) ==
+household_id_prefix 01a0a029
+-- CORS on actual GET (household_id supplied) --
+HTTP/1.1 200 OK
+date: Thu, 15 Oct 2026 19:50:20 GMT
+server: uvicorn
+content-length: 3330
+content-type: application/json
+access-control-allow-credentials: true
+access-control-allow-origin: http://localhost:5173
+vary: Origin
+
+{"items":[{"id":"01a131a1-11c4-7762-a33a-acb53b4e41e7","task_type":"expiry.manual_entry","priority":"high","subject_ref":"01a131a1-11c3-7f81-b2d9-0842a3cba350","proposed_change":{"candidate_id":"01a131a1-11c3-7f81-b2d9-0842a3cba350","prompt":"Enter expiry date manually"},"status":"resolved","household_id":"01a0a029-1477-7ca0-b200-bce78a96c679","created_at":"2026-10-12T19:40:01","updated_at":"2026-10-12T19:44:35.767877"},{"id":"01a13115-e5ff-7911-b757-6e8f37006048","task_type":"expiry.manual_entry","priority":"high","subject_ref":"01a13115-e5fd-77c3-99fe-b356e5b2d1e9","proposed_change":{"candidate_id":"01a13115-e5fd-77c3-99fe-b356e5b2d1e9","prompt":"Enter expiry date manually"},"status":"resolved","household_id":"01a0a029-1477-7ca0-b200-bce78a96c679","created_at":"2026-10-12T17:08:01","updated_at":"2026-10-12T19:52:46.004991"},{"id":"01a0c4a2-2a47-75c2-85c0-d8a9c02c5ba1","task_type":"expiry.manual_entry","priority":"high","subject_ref":"01a0c4a2-2a46-7d53-a4b2-de34d54ce993","proposed_change":{"candidate_id":"01a0c4a2-2a46-7d53-a4b2-de34d54ce993","prompt":"Enter expiry date manually"},"status":"resolved","household_id":"01a0a029-1477-7ca0-b200-bce78a96c679","created_at":"2026-09-21T15:42:37","updated_at":"2026-09-21T15:51:34.422348"},{"id":"01a0c4a2-2a47-75c2-85c0-d8915d759405","task_type":"candidate.multi_item","priority":"high","subject_ref":"01a0c4a2-2a46-7d53-a4b2-de34d54ce993","proposed_change":{"candidate_id":"01a0c4a2-2a46-7d53-a4b2-de34d54ce993","item_count":2},"status":"resolved","household_id":"01a0a029-1477-7ca0-b200-bce78a96c679","created_at":"2026-09-21T15:42:37","updated_at":"2026-09-21T15:51:35.445488"},{"id":"01a0c4a0-d574-75f0-87aa-a9b6d624c626","task_type":"expiry.manual_entry","priority":"high","subject_ref":"01a0c4a0-d574-75f0-87aa-a9a6abbd6a06","proposed_change":{"candidate_id":"01a0c4a0-d574-75f0-87aa-a9a6abbd6a06","prompt":"Enter expiry date manually"},"status":"resolved","household_id":"01a0a029-1477-7ca0-b200-bce78a96c679","created_at":"2026-09-21T15:41:09","updated_at":"2026-09-21T15:51:36.558688"},{"id":"01a0c481-1e4b-7db1-a6d3-635928354094","task_type":"expiry.manual_entry","priority":"high","subject_ref":"01a0c481-1e4b-7db1-a6d3-63452fe8a26c","proposed_change":{"candidate_id":"01a0c481-1e4b-7db1-a6d3-63452fe8a26c","prompt":"Enter expiry date manually"},"status":"resolved","household_id":"01a0a029-1477-7ca0-b200-bce78a96c679","created_at":"2026-09-21T15:06:31","updated_at":"2026-09-21T15:06:49.262213"},{"id":"01a0c47f-246c-7700-826a-823c3a12abd2","task_type":"expiry.manual_entry","priority":"high","subject_ref":"01a0c47f-246a-7263-a1af-490b313855af","proposed_change":{"candidate_id":"01a0c47f-246a-7263-a1af-490b313855af","prompt":"Enter expiry date manually"},"status":"resolved","household_id":"01a0a029-1477-7ca0-b200-bce78a96c679","created_at":"2026-09-21T15:04:21","updated_at":"2026-09-21T15:04:43.682318"},{"id":"01a0c445-51a9-7a70-ad22-6389d507d958","task_type":"expiry.manual_entry","priority":"high","subject_ref":"01a0c445-51a8-7921-b6cc-681d23b10f1b","proposed_change":{"candidate_id":"01a0c445-51a8-7921-b6cc-681d23b10f1b","prompt":"Enter expiry date manually"},"status":"resolved","household_id":"01a0a029-1477-7ca0-b200-bce78a96c679","created_at":"2026-09-21T14:01:12","updated_at":"2026-09-21T14:02:06.825049"}],"next_cursor":null,"total":8}-- malformed cursor: GET /v1/assets?cursor=not-a-cursor --
+HTTP 422
+{"type":"about:blank","title":"Unprocessable Entity","status":422,"detail":"malformed cursor"}
+-- malformed cursor: GET /v1/review-tasks?cursor=not-a-cursor --
+HTTP 422
+{"type":"about:blank","title":"Unprocessable Entity","status":422,"detail":"malformed cursor"}
+-- default list GET /v1/assets --
+keys ['items', 'next_cursor']
+n_items 7
+ids ['01a0a467', '01a0c446', '01a0c47f', '01a0c481', '01a0c4aa', '01a0c4ab', '01a131ae']
+statuses ['ACTIVE']
+-- explicit GET /v1/assets?status=ARCHIVED --
+keys ['items', 'next_cursor']
+n_items 0
+ids []
+statuses []
+-- review-tasks listing --
+n_items 8
+statuses {'resolved': 8}

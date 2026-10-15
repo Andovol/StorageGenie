@@ -1,0 +1,29 @@
+SG-193 focused frontend tests (SG-187 InboxPage/import-modal, SG-190 shell); 2026-10-15T19:51:25Z
+cwd /home/andrei/StorageGenie/frontend; runner node_modules/.bin/vitest run
+cmd: vitest run src/routes/InboxPage.test.tsx src/components/shell/import-modal.test.tsx src/components/shell/shell.test.tsx
+start_epoch=1792093885
+
+ RUN  v1.6.1 /home/andrei/StorageGenie/frontend
+
+stderr | src/routes/InboxPage.test.tsx > InboxPage > renders failed loaded job detail and retries that loaded id
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+ ✓ src/routes/InboxPage.test.tsx  (10 tests) 559ms
+stderr | src/components/shell/import-modal.test.tsx > AssetImportModal staging > drop stages accepted files as Ready with a live count
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+stderr | src/components/shell/shell.test.tsx > Catalog shell > the header labels the LOADED item count, not a household total
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+ ✓ src/components/shell/import-modal.test.tsx  (17 tests) 626ms
+ ✓ src/components/shell/shell.test.tsx  (23 tests) 2208ms
+
+ Test Files  3 passed (3)
+      Tests  50 passed (50)
+   Start at  19:51:26
+   Duration  4.17s (transform 788ms, setup 312ms, collect 1.75s, tests 3.39s, environment 1.86s, prepare 357ms)
+
+vitest_exit=0 elapsed_s=5
