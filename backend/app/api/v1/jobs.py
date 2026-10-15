@@ -112,13 +112,14 @@ def list_jobs(
     db: Session = Depends(get_db),
 ) -> dict[str, object]:
     query = db.query(Job).filter(Job.household_id == household_id)
-    if cursor:
+    if cursor is not None:
         decoded = decode_cursor(cursor)
-        if decoded:
-            ts, oid = decoded
-            ts_str = ts.strftime("%Y-%m-%d %H:%M:%S")
-            created_str = func.strftime("%Y-%m-%d %H:%M:%S", Job.created_at)
-            query = query.filter(or_(created_str < ts_str, and_(created_str == ts_str, Job.id < oid)))
+        if decoded is None:
+            raise HTTPException(status_code=422, detail="malformed cursor")
+        ts, oid = decoded
+        ts_str = ts.strftime("%Y-%m-%d %H:%M:%S")
+        created_str = func.strftime("%Y-%m-%d %H:%M:%S", Job.created_at)
+        query = query.filter(or_(created_str < ts_str, and_(created_str == ts_str, Job.id < oid)))
     query = query.order_by(Job.created_at.desc(), Job.id.desc()).limit(limit + 1)
     items = query.all()
     has_more = len(items) > limit
