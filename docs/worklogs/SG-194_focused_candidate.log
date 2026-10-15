@@ -1,0 +1,45 @@
+PASS half (focused, post-commit candidate); CANDIDATE HEAD 8a67ce3f21bfbd7b21a3a8b52d7503ede3bfe84a; BASE (packet start) 03d24b466fded5342ff1c01da5ddc3077361939d
+Thu Oct 15 21:01:17 UTC 2026
+....................                                                     [100%]
+=============================== warnings summary ===============================
+venv/lib/python3.12/site-packages/fastapi/testclient.py:1
+  /home/andrei/StorageGenie/backend/venv/lib/python3.12/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+venv/lib/python3.12/site-packages/starlette/testclient.py:53
+  /home/andrei/StorageGenie/backend/venv/lib/python3.12/site-packages/starlette/testclient.py:53: DeprecationWarning: The anyio.abc.BlockingPortal alias is deprecated, use anyio.from_thread.BlockingPortal instead.
+    _PortalFactoryType = Callable[[], AbstractContextManager[anyio.abc.BlockingPortal]]
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+==================================== PASSES ====================================
+_____________________ test_import_create_run_and_jobs_list _____________________
+------------------------------ Captured log call -------------------------------
+WARNING  app.services.signals:signals.py:104 Barcode extraction unavailable: pyzbar/libzbar is not installed
+WARNING  app.services.signals:signals.py:215 OCR extraction unavailable: tesseract is not installed or it's not in your PATH. See README file for more information.
+_________________ test_failure_retry_is_durable_and_idempotent _________________
+------------------------------ Captured log call -------------------------------
+WARNING  app.services.signals:signals.py:104 Barcode extraction unavailable: pyzbar/libzbar is not installed
+WARNING  app.services.signals:signals.py:215 OCR extraction unavailable: tesseract is not installed or it's not in your PATH. See README file for more information.
+=========================== short test summary info ============================
+PASSED tests/test_sg194_jobs_cursor.py::test_malformed_cursor_refused_on_jobs_list
+PASSED tests/test_sg194_jobs_cursor.py::test_absent_cursor_is_first_page_unchanged
+PASSED tests/test_sg194_jobs_cursor.py::test_valid_cursor_walk_is_lossless
+PASSED tests/test_import_jobs.py::test_import_create_run_and_jobs_list
+PASSED tests/test_import_jobs.py::test_failure_retry_is_durable_and_idempotent
+PASSED tests/test_import_jobs.py::test_import_idempotency_and_cross_household_protection
+PASSED tests/test_export.py::test_export_manifest_is_complete_and_downloadable
+PASSED tests/test_export.py::test_export_manifest_restores_into_a_fresh_database
+PASSED tests/test_export.py::test_phase_zero_list_stubs_have_paginated_envelopes[/v1/jobs]
+PASSED tests/test_export.py::test_phase_zero_list_stubs_have_paginated_envelopes[/v1/review-tasks]
+PASSED tests/test_export.py::test_asset_idempotency_is_persisted_and_reused
+PASSED tests/test_sg127_followup_batch.py::test_served_thumbnail_bytes_match_served_name[jpeg]
+PASSED tests/test_sg127_followup_batch.py::test_served_thumbnail_bytes_match_served_name[png]
+PASSED tests/test_sg127_followup_batch.py::test_served_thumbnail_bytes_match_served_name[webp]
+PASSED tests/test_sg127_followup_batch.py::test_served_thumbnail_bytes_match_served_name[heic]
+PASSED tests/test_sg127_followup_batch.py::test_jpeg_thumbnail_still_generated_and_bounded
+PASSED tests/test_sg127_followup_batch.py::test_extraction_brand_reaches_served_candidate_and_committed_assertion
+PASSED tests/test_sg127_followup_batch.py::test_extraction_null_brand_stays_null
+PASSED tests/test_sg127_followup_batch.py::test_split_child_keeps_its_own_brand_or_none
+PASSED tests/test_sg127_followup_batch.py::test_job_candidates_route_lists_and_gates
+20 passed, 2 warnings in 4.85s
+exit=0

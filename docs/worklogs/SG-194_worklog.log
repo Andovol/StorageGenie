@@ -1,0 +1,90 @@
+SG-194 worklog — jobs.py cursor twin: malformed cursor is a 422, never a silent page-1 repeat
+(append-only frozen at evidence commit; material commands, decisions, results)
+
+LANE. dispatch-storagegenie@SG-194.service, MainPID 233463, ExecMainStartTimestamp
+2026-10-15 20:57:11 UTC (epoch 1792097831); RUN_BUDGET_S=2100 -> deadline epoch
+1792099931 = 21:32:11Z. Coder process 233513: `opencode run --auto --dir
+/home/andrei/StorageGenie --model opencode-go/deepseek-v4.1-flash --variant max`
+(read from /proc/233513/cmdline, PB-4). BASE ref automation resolved
+03d24b466fded5342ff1c01da5ddc3077361939d (== local HEAD == origin/automation at
+start after fetch; worktree clean).
+
+CONTRACT. Host copy /home/andrei/storagegenie-contract/CODER.md line 3 (0.50.0)
+echoed verbatim in the report; rules_check.sh run once, output verbatim in the
+report. Project declares live service + datastore + rendered surface
+(CODER_PRODUCTION.md); production interaction this slice = two health GETs only.
+
+RECON / PB-1 VERIFICATION.
+- jobs.py:115-121 holds `if cursor:` + `if decoded:` exactly as the packet says:
+  a truthy-but-undecodable cursor skips the filter and repeats page 1. Premise
+  holds on this tree (BASE 03d24b4; construct verified by read FIRST READ).
+- SG-188 shape present in assets.py:301-311 and review_tasks.py:47-55
+  (`if cursor is not None` + `if decoded is None: raise 422 malformed cursor`).
+- Twin census (CO-17; exact construct class = decode_cursor result tested for
+  truthiness to gate the list filter): 3 call sites of decode_cursor in
+  backend/app — assets.py (fixed, SG-188), review_tasks.py (fixed, SG-188),
+  jobs.py:116 (LIVE, this slice). Zero further sites; locations.py:115
+  `cursor == location.id or cursor in seen` is a different construct (string
+  membership on Location ids, no decode_cursor), scene/openrouter.py:543
+  `if decoded is None:` is a different class.
+- Contract expectation 0.50.0 matches host VERSION=0.50.0; no difference.
+
+DECISIONS (CO-04 reversible ambiguity, all stated in the report).
+- Repair is the exact SG-188 mirror: `if cursor is not None` + `if decoded is
+  None: raise HTTPException(422, "malformed cursor")`; the filter arithmetic
+  (`or_(created_str < ts_str, and_(created_str == ts_str, Job.id < oid))`) is
+  untouched. Accepted-set diff (CO-18): only the falsy-decode arm (empty/malformed
+  cursor) leaves the accepted set; absent and valid cursors unchanged.
+- New test module backend/tests/test_sg194_jobs_cursor.py (fixture pattern of
+  test_sg188_semantics.py; three tests: malformed+empty 422, absent first page,
+  25-row tied-timestamp walk). test_sg188_semantics.py not extended — no reason
+  to couple the two slices.
+
+COMMANDS / OUTCOMES (all logs committed beside this note).
+1. Health START 2026-10-15T20:59:41Z epoch 1792097981 200 {"status":"ok","db":"ok","storage":"ok"} (SG-194_health_start.log; first session command batch after recon reads).
+2. Ladder FAIL (in-place, pre-fix): new module vs unfixed tree — 1 failed
+   (test_malformed_cursor_refused_on_jobs_list, 200 == 422 assertion with the
+   page-1 body captured verbatim), 2 passed in 2.44s exit 1 (SG-194_ladder.log).
+3. Repair applied to jobs.py:115-121: `if cursor is not None` + `if decoded is
+   None: raise HTTPException(422, "malformed cursor")`; filter arithmetic
+   untouched. Net +1 line in the hunk.
+4. Focused pre-commit candidate (new module + referencing files
+   test_import_jobs.py, test_export.py, test_sg127_followup_batch.py):
+   20 passed in 4.47s exit 0 (SG-194_focused_precommit.log).
+5. Work commit 8a67ce3f21bfbd7b21a3a8b52d7503ede3bfe84a (2 files, +149/-6).
+6. FAIL half on isolated worktree /tmp/opencode/sg194-base @ 03d24b4: candidate
+   test sha256 d3e07009e88f164dbc9ab293151721c82df6432534dcefbc1a5447059eb7a479
+   equal in both trees; 1 failed, 2 passed in 2.33s exit 1
+   (SG-194_focused_base.log); worktree removed after.
+7. PASS half post-commit candidate, same four files: 20 passed in 4.85s exit 0
+   (SG-194_focused_candidate.log; log echoes CANDIDATE HEAD 8a67ce3 and BASE
+   03d24b4).
+8. FULL backend suite on candidate (D443): 2 failed, 722 passed in 59.04s
+   exit 1 (SG-194_suite_candidate.log); the two failures are test_signals.py
+   barcode/OCR rows. Run ALONE on the base worktree 03d24b4: 2 failed in 1.23s
+   exit 1 (SG-194_base_reruns.log) with the same pyzbar/libzbar + tesseract
+   "not installed" warnings — host environment misses, present on base,
+   unrelated to this slice (D443 comparison executed).
+9. Gates: ruff clean on the two touched files, exit 0 (SG-194_ruff.log);
+   mypy app 41 errors / 9 files on CANDIDATE and on BASE, error-site set
+   identical modulo line shifts, jobs.py zero errors
+   (SG-194_mypy_candidate.log, SG-194_mypy_base.log).
+10. Health END 2026-10-15T21:03:30Z epoch 1792098210 200
+    {"status":"ok","db":"ok","storage":"ok"} (SG-194_health_end.log) ->
+    HEALTH: unchanged, OK.
+
+EXTERNAL / PRODUCTION EFFECTS (CO-85): none with side effects. Production reads
+only (two health GETs). No deploy, restart, migration, schema change, provider
+call, paid call ($0), credential or infra change; no .env handled; disposable
+DB/storage for every test; temp artifacts under /tmp/opencode (base worktree
+removed; raw logs moved into docs/worklogs/SG-194*). No privileged operation
+attempted, therefore no denial; PB-2 stop path never reached.
+
+TWIN CENSUS (CO-17): construct class = decode_cursor result tested for
+truthiness before gating a list filter: 1 live site (jobs.py:116, fixed here),
+2 already fixed (assets.py, review_tasks.py, SG-188), 0 further sites.
+
+LANE BUDGET: start epoch 1792097831 (20:57:11Z); orientation+FIRST READ+recon
+203s; implementation + work commit 26s; verification leg (base FAIL, focused
+PASS, full suite, base reruns, gates, health end) 144s to 21:03:30Z;
+elapsed at report writing ~ (as of 1792098224 = 21:03:44Z) 393s of 2100.
