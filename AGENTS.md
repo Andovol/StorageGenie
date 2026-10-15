@@ -1,7 +1,7 @@
 # StorageGenie — project configuration
 
 > **Canonical for this repo. `CLAUDE.md` is a one-line adapter `@AGENTS.md` — edit here, never there.**
-> Rule-set version this project records: **0.47.0** (D1 adoption 2026-10-13: checkout `e4bacf4`/`bdbbaa7` (contract-v0.47.0); delta = ARCHITECT every-screenshot-read + no-wake/context-reading note + START/END harness name + AUDIT open-every-image + CLOSE harness/deadline/context + CODER elapsed-from-epochs + PACKET first-user-flow-walk + never-cut-report + RULES G-M2 continuation + onboarding-no-Architect; installed `49338e39a574…` = payload `RULES.sha256` at 0.47.0 — clean; supersedes `0.46.0`, chain D-1012-2 preserved).
+> Rule-set version this project records: **0.50.0** (D2 adoption 2026-10-15: checkout tag `contract-v0.50.0` (commit `1723165` per tag log); delta = ARCHITECT stage-definition + SECOND_OPINION routing + AUDIT slowest-waste + CODER CO-103 + CODERS plan-agent + DISPATCH agent-setting + LEDGER 12th column + ONBOARDING reviewer value + PACKET waste-cutting/D443 + lane run-coder rework; RULES.md hash unchanged `49338e39a574…`; supersedes `0.47.0`, chain D-1012-2 preserved).
 
 ## Configuration table — the single source of every project value
 
@@ -13,10 +13,11 @@
 | **Host project path** | `/home/andrei/StorageGenie` | Owner directive `m0045` — use this folder |
 | **Credential reference** | `~/.ssh/storagegenie-architect-dispatch` (ed25519, `~/.ssh/storagegenie-architect-dispatch.pub` on host forced-command) + unrestricted `C:\Users\popes\Desktop\key_Andrei.ppk` (Launcher-only, provisioning) | Naming `<project>-architect-dispatch` per `PROVISIONING.md:129` — private never on host |
 | **Coder** | `opencode` (SELECTED from `CODERS.md` — `opencode run --auto --dir <workdir> [--variant <effort>] <prompt-text>`, prompt travels on argv) | Owner directive `D29` (2026-09-11) — opencode going forward; supersedes `m0106` (codex high, kept as history). `G-O2` — packet says "the Coder", config names it. Effort per catalogue row for opencode (deepseek rows `low|high|max`; muse-spark rows `minimal..xhigh`, `xhigh` proven live SG-157 — validity was always per-model, F-SG157-1) → `--variant` (explicit per trigger per D120/D15, uncalibrated per `G-A9`; the Coder default `max` is NOT taken — stated explicitly so no silent drift). Catalogue `coder_models.tsv` (0.44.1, re-measured 2026-10-08): `high` listed for `opencode-go/deepseek-v4.1-flash` — engine-checked strictly, trigger effort (D266/D302). Hard ceiling: packet file stays far under the 128 KiB single-argv limit. Provider partially unproven (`ISS-6`); entry-point run-2 owed (`ISS-7`) |
-| **Dispatch verb** | `SG-<nnn> [coder= model= effort=] [--status\|--attach\|--force\|--quarantine]` (e.g. `SG-021 coder=opencode effort=high`) | ID prefix `SG-` for StorageGenie. Settings ride the trigger, any subset (D302) — the packet carries the task only; a packet `coder:`/`model:`/`effort:` line is refused `packet_settings_retired`. `--force` bypasses replay guard only, `--quarantine` per `DISPATCH.md` §2 (D331), packet resolves `$ID.md\|$ID-*.md` exactly-one |
+| **Dispatch verb** | `SG-<nnn> [coder= model= effort=] [agent=<a>] [--status\|--attach\|--force\|--quarantine]` (e.g. `SG-021 coder=opencode effort=high`) | ID prefix `SG-` for StorageGenie. Settings ride the trigger, any subset (D302) — the packet carries the task only; a packet `coder:`/`model:`/`effort:` line is refused `packet_settings_retired`. `agent=plan` for second-opinion reviews (0.50.0/D451). `--force` bypasses replay guard only, `--quarantine` per `DISPATCH.md` §2 (D331), packet resolves `$ID.md\|$ID-*.md` exactly-one |
 | **Harness** | Codex: one SSH trigger via background `exec_command` (Class 4 if no completion wake). OpenCode — background dispatches ride `job_spawn` (wake on exit), status verb only for re-attach checks, never the trigger log (`DISPATCH.md` §2c) | Owner directive 2026-09-12: use the `job_spawn` spawner for background dispatch (supersedes the Start-Process + blocking-wait chunking) |
 | **Wrapper** | `/usr/local/bin/dispatch` (forced command `DISPATCH_CONF=/etc/dispatch/storagegenie.conf /usr/local/bin/dispatch`; `run-coder` takes settings from the dispatch command → lane conf → Coder default, packet settings refused per D302) | Measured 2026-09-21 by SG-071 (journal + launch artifact); supersedes the stale `/opt/storagegenie-dispatch/dispatch_coder.sh` path (legacy grok-codex-only whitelist, never reads the opencode coder) |
 | **Model policy** | Model + effort sent explicitly on every trigger: `model=opencode-go/deepseek-v4.1-flash effort=max` (owner directive D-1012-15, 2026-10-12; catalogue-valid `low,high,max` row; `max` uncalibrated vs D120/D15-`high`, stated per `G-A9`) | Supersedes the omit-model row (D302 subset still contract-legal; explicit chosen per owner). Coder default `opencode-go/deepseek-v4.1-flash` proven live SG-120 |
+| **Second opinion** | `coder=opencode model=opencode-go/deepseek-v4.1-flash effort=max` | Explicit per D-2 (reviewer never own model under either reading of the Muse-1.3 condition); owner may set `default`/`off` (`SECOND_OPINION.md`, `D451`) |
 | **Packet directory** | `docs/packets` (committed, pushed) | `DISPATCH.md:49` — unpushed packet fails as `packet_missing` |
 | **Autonomy** | `L2` (slice autonomy, 1 retry, per `ARCHITECT.md:60-72` §6) — escalates to `L3` only after clean stage | State the level in approval message |
 | **Close-out** | Live deploy (rebuild + one recreate + verify) before every session close | Standing owner directive 2026-09-28 ("Always do a live deploy before session close", `G-O4` record) — the rider runs as a dispatched slice and is reported; unrated or blocked work stops the deploy, never ships silently |
@@ -41,7 +42,7 @@
 
 ## Method routing — what loads, when
 
-`ARCHITECT.md` before planning/packet/dispatch/audit/rating/touching state · `PACKET.md` before writing a packet · `DISPATCH.md` before dispatching · `CLOSE.md` before closing · `LEDGER.md` before rating · `RATIONALE.md` before changing a rule · `VPS.md` before planning anything on the shared VPS (a web page, a hostname, a port, a database, heavy work)
+`ARCHITECT.md` before planning/packet/dispatch/audit/rating/touching state · `PACKET.md` before writing a packet · `DISPATCH.md` before dispatching · `CLOSE.md` before closing · `LEDGER.md` before rating · `SECOND_OPINION.md` before bringing a 🟡/🟠/🔴 decision · `RATIONALE.md` before changing a rule · `VPS.md` before planning anything on the shared VPS (a web page, a hostname, a port, a database, heavy work)
 
 Coder reads read-only copy on host (`/opt/storagegenie-dispatch/` + global `CODER.md` + `lang/python.md`) — never from repo (cutover pattern; the copy's version tracks the adopted rule set).
 
@@ -59,6 +60,6 @@ Pinned pre-conversion state `26e9e8b` (local `automation` head `26e9e8b→9f1cc0
 
 ## Loading
 
-- Session start: `G-L1` version check FIRST (run `bash .rules-cache/rules_check.sh` per D339 and write its output down; never checkout-vs-stamp, M3), then this file + `.rules-cache/` (contract `contract-v0.47.0`) + `STATE.md:1` RESUME.
+- Session start: `G-L1` version check FIRST (run `bash .rules-cache/rules_check.sh` per D339 and write its output down; never checkout-vs-stamp, M3), then this file + `.rules-cache/` (contract `contract-v0.50.0`) + `STATE.md:1` RESUME.
 - Before packet: `PACKET.md`; before dispatch: `DISPATCH.md` (+ `PRODUCTION.md:1` because host + SQLite are live).
 - Never copy shared contract into repo — project holds only values and narrowings.
