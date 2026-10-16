@@ -100,3 +100,13 @@ reached. Local commits, pushes and notes only.
 LIMITS. This session ran interactively; no RUN_BUDGET_S / IDLE_KILL_S was enforced by
 a runner for it (the packet's bounds were applied per command: reads 120 s, focused
 600 s, suite 900 s; none hit a bound; nothing killed).
+
+CORRECTION (appended with the report commit, CO-76). The SESSION paragraph says "no
+systemd lane unit for this run; stated, not hidden". Wrong — checked with systemctl
+show after the evidence commit: the run IS dispatch-storagegenie@SG-196.service
+(MainPID 244780, ExecMainStartTimestamp 2026-10-16 20:15:14 UTC = epoch 1792181714;
+coder PID 244865, argv `opencode run --auto --dir /home/andrei/StorageGenie --model
+opencode-go/deepseek-v4.1-flash --variant max`), RUN_BUDGET_S=2100 -> deadline
+20:50:14Z. The LIMITS paragraph's "no RUN_BUDGET_S enforced by a runner" is likewise
+superseded: the lane budget applied; nothing hit it. Corrected from the lane record,
+not from memory.
