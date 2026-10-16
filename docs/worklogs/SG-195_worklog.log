@@ -98,3 +98,7 @@ LANE BUDGET: start epoch 1792171241 (17:20:41Z); orientation+FIRST READ+recon to
 ~17:25:10 (~270s); implementation+2 dev runs+work commit to 17:26:10;
 verification leg 17:26:15Z -> 17:26:45Z (focused PASS 1.97s, base FAIL 9.80s,
 full suite 9.65s, gates tsc/eslint). Elapsed figure finalized in the report.
+
+CORRECTION (appended with the report commit): item 2 says the new test module
+is 254 lines; wc -l on the committed file is 295. The 254 was written before
+the final ThemeProvider harness fix landed. The committed figure is 295.
