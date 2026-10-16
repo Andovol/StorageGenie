@@ -327,7 +327,12 @@ describe("CTA wiring (G2)", () => {
               path="/"
               element={
                 <>
-                  <AppHeader loadedCount={0} searchValue="" onSearchChange={vi.fn()} />
+                  {/* SG-198: AppHeader reads the shared household context now;
+                      preserved behavior: the CTA still opens the dialog and does
+                      not route to /capture (assertions below unchanged). */}
+                  <HouseholdProvider>
+                    <AppHeader loadedCount={0} searchValue="" onSearchChange={vi.fn()} />
+                  </HouseholdProvider>
                   <div>catalog probe</div>
                 </>
               }
@@ -343,6 +348,30 @@ describe("CTA wiring (G2)", () => {
     expect(screen.getByRole("dialog", { name: "Import assets" })).toBeInTheDocument();
     expect(screen.getByText("catalog probe")).toBeInTheDocument();
     expect(screen.queryByText("capture probe")).not.toBeInTheDocument();
+  });
+
+  test("SG-198: the modal id is the shared context's household (localStorage-empty fallback)", async () => {
+    // preserved behavior: with no stored household_id the modal receives the
+    // first household's id — the context derives localStorage-first, then falls
+    // back to households[0] and persists it, exactly the value AppHeader derived
+    // locally before the swap.
+    window.localStorage.clear();
+    render(
+      <ThemeProvider>
+        <MemoryRouter initialEntries={["/"]}>
+          <HouseholdProvider>
+            <AppHeader loadedCount={0} searchValue="" onSearchChange={vi.fn()} />
+          </HouseholdProvider>
+        </MemoryRouter>
+      </ThemeProvider>
+    );
+
+    fireEvent.click(screen.getByRole("link", { name: /import asset/i }));
+    dropFiles(imageFile("ctx.png"));
+    fireEvent.click(screen.getByRole("button", { name: "Process 1 Item" }));
+
+    await waitFor(() => expect(api.uploadEvidence).toHaveBeenCalledTimes(1));
+    expect(api.uploadEvidence.mock.calls.map(([householdId]) => householdId)).toEqual(["h1"]);
   });
 
   test("the empty-state Import New Item CTA opens the dialog instead of routing", () => {

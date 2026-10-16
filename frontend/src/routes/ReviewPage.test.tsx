@@ -97,6 +97,21 @@ describe("ReviewPage", () => {
     await waitFor(() => expect(api.candidateDecision).toHaveBeenCalledTimes(1));
   });
 
+  test("SG-198: the review-tasks list loads through the shared useReviewTasks wiring", async () => {
+    // preserved behavior: one ["review-tasks", householdId] fetch for the URL
+    // household, and the loaded task still drives the split affordance.
+    const task = { id: "task-wiring-1", task_type: "candidate.multi_item", priority: "high", subject_ref: candidate.id, proposed_change: { candidate_id: candidate.id, item_count: 2 }, status: "open", household_id: "household-loaded", created_at: null, updated_at: null };
+    api.apiGet.mockImplementation((path: string) => {
+      if (path.startsWith("/v1/candidates/")) return Promise.resolve({ ...candidate, review_task_ids: [task.id] });
+      if (path.startsWith("/v1/review-tasks")) return Promise.resolve({ items: [task], next_cursor: null, total: 1 });
+      return Promise.resolve({});
+    });
+    renderPage();
+    await screen.findByDisplayValue("Loaded item");
+    await waitFor(() => expect(api.apiGet).toHaveBeenCalledWith("/v1/review-tasks", { household_id: "household-loaded" }));
+    expect(await screen.findByRole("button", { name: /split/i })).toBeInTheDocument();
+  });
+
   test("a refreshed unblocked response enables click and shortcut accept (SG-175 A2)", async () => {
     let candidateReads = 0;
     api.apiGet.mockImplementation((path: string) => {

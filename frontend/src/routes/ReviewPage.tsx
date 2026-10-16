@@ -2,10 +2,11 @@ import { useEffect, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link, useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { apiGet, candidateDecision, candidateSplit } from "../api/client";
-import type { Candidate, CandidateSplitChild, ReviewTaskListResponse } from "../api/types";
+import type { Candidate, CandidateSplitChild } from "../api/types";
 import { CandidateCard } from "../components/CandidateCard";
 import { ExpiryEntryForm } from "../components/ExpiryEntryForm";
 import { PageContainer } from "../components/shell/PageContainer";
+import { useReviewTasks } from "../hooks/useAssets";
 
 function splitChildLabel(child: CandidateSplitChild): string {
   const raw = child.fields.display_name;
@@ -36,7 +37,10 @@ export function ReviewPage() {
   const [keyboardAction, setKeyboardAction] = useState("");
   const [splitChildren, setSplitChildren] = useState<CandidateSplitChild[]>([]);
   const candidateQuery = useQuery<Candidate>({ queryKey: ["candidate", candidateId, householdId], queryFn: () => apiGet<Candidate>(`/v1/candidates/${candidateId}`, { household_id: householdId }), enabled: !!candidateId && !!householdId });
-  const tasksQuery = useQuery<ReviewTaskListResponse>({ queryKey: ["review-tasks", householdId], queryFn: () => apiGet<ReviewTaskListResponse>("/v1/review-tasks", { household_id: householdId }), enabled: !!householdId });
+  // SG-198 G1: the review-tasks query is now the shared useReviewTasks
+  // definition — same key, same queryFn, same enabled flag; the invalidation
+  // below is unchanged.
+  const tasksQuery = useReviewTasks(householdId);
   useEffect(() => { if (candidateQuery.data?.asset_id) setAssetId(candidateQuery.data.asset_id); }, [candidateQuery.data?.asset_id]);
   const decision = useMutation({ mutationFn: ({ action, fields }: { action: "accept" | "edit" | "hold" | "reject"; fields?: Record<string, unknown> }) => candidateDecision(candidateId, householdId, action, fields), onSuccess: (result) => { if (result.asset_id) setAssetId(result.asset_id); qc.invalidateQueries({ queryKey: ["candidate", candidateId, householdId] }); } });
   const splitItemCount = multiItemCount((tasksQuery.data?.items ?? []).find((task) => task.subject_ref === candidateId && task.task_type === "candidate.multi_item" && task.status === "open"));

@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { Upload } from "lucide-react";
 import { ThemeToggle } from "../../theme/ThemeToggle";
 import { AssetImportModal } from "./AssetImportModal";
-import { useHouseholds } from "../../hooks/useAssets";
+import { useHouseholdContext } from "../../hooks/HouseholdContext";
 
 type AppHeaderProps = {
   loadedCount: number;
@@ -13,12 +13,12 @@ type AppHeaderProps = {
 
 export function AppHeader({ loadedCount, searchValue, onSearchChange }: AppHeaderProps) {
   const searchRef = useRef<HTMLInputElement>(null);
-  const { data: households } = useHouseholds();
+  // SG-198 G1: the import-modal id comes from the shared household context;
+  // preserved behavior: localStorage-first with the first-household fallback,
+  // now derived (and persisted) once in HouseholdProvider — same accepted id,
+  // no branch or wording change.
+  const { householdId } = useHouseholdContext();
   const [importOpen, setImportOpen] = useState(false);
-  const householdId =
-    (typeof localStorage !== "undefined" ? localStorage.getItem("household_id") : "") ||
-    households?.[0]?.id ||
-    "";
 
   useEffect(() => {
     const handler = (event: KeyboardEvent) => {
