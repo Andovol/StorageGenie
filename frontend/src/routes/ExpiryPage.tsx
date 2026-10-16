@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
 import { fetchAnalyticsSummary, fetchExpiryStatus } from "../api/client";
@@ -10,7 +10,8 @@ import type {
 } from "../api/types";
 import { CONTROL_STYLE, THEMED_CONTROL_CLASS } from "../components/shell/CatalogToolbar";
 import { PageContainer } from "../components/shell/PageContainer";
-import { useHouseholds, useTaxonomy } from "../hooks/useAssets";
+import { useTaxonomy } from "../hooks/useAssets";
+import { useHouseholdContext } from "../hooks/HouseholdContext";
 
 // Blueprint §11.2 screen 7: the fixed urgency buckets, in that order.
 const BUCKET_SECTIONS: { bucket: string; label: string }[] = [
@@ -81,18 +82,11 @@ function ExpiryRow({ row, householdId, categoryName }: { row: ExpiryStatusRow; h
 }
 
 export function ExpiryPage() {
-  const { data: households } = useHouseholds();
+  // SG-196 G1: household selection comes from the shared context.
+  const { households, householdId, setHouseholdId } = useHouseholdContext();
   const { data: taxonomy } = useTaxonomy();
-  const [householdId, setHouseholdId] = useState(() => localStorage.getItem("household_id") || "");
   const [category, setCategory] = useState("");
   const effectiveHousehold = householdId || households?.[0]?.id || "";
-
-  useEffect(() => {
-    if (!householdId && households?.[0]) {
-      setHouseholdId(households[0].id);
-      localStorage.setItem("household_id", households[0].id);
-    }
-  }, [householdId, households]);
 
   const status = useQuery<ExpiryStatusResponse>({
     queryKey: ["expiry-status", effectiveHousehold, category],
@@ -140,10 +134,7 @@ export function ExpiryPage() {
               className={THEMED_CONTROL_CLASS}
               style={CONTROL_STYLE}
               value={effectiveHousehold}
-              onChange={(event) => {
-                setHouseholdId(event.target.value);
-                localStorage.setItem("household_id", event.target.value);
-              }}
+              onChange={(event) => setHouseholdId(event.target.value)}
             >
               <option value="">Select household</option>
               {(households as Household[] | undefined)?.map((entry) => (

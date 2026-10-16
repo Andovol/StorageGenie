@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
 import { logChatCorrection, sendChat } from "../api/client";
@@ -7,7 +7,7 @@ import { ChatTranscript } from "../components/ChatTranscript";
 import { HouseholdSelector } from "../components/HouseholdSelector";
 import { CONTROL_STYLE, THEMED_CONTROL_CLASS } from "../components/shell/CatalogToolbar";
 import { PageContainer } from "../components/shell/PageContainer";
-import { useHouseholds } from "../hooks/useAssets";
+import { useHouseholdContext } from "../hooks/HouseholdContext";
 
 const CATEGORIES = [
   { value: "food", label: "Food" },
@@ -15,10 +15,8 @@ const CATEGORIES = [
 ] as const;
 
 export function ChatPage() {
-  const { data: households } = useHouseholds();
-  const [householdId, setHouseholdId] = useState(
-    () => localStorage.getItem("household_id") || ""
-  );
+  // SG-196 G1: household selection comes from the shared context.
+  const { households, householdId, setHouseholdId } = useHouseholdContext();
   const [category, setCategory] = useState("food");
   const [input, setInput] = useState("");
   const [correction, setCorrection] = useState("");
@@ -30,13 +28,6 @@ export function ChatPage() {
   const [unclassified, setUnclassified] = useState(0);
   const effectiveHousehold = householdId || households?.[0]?.id || "";
   const categoryLabel = CATEGORIES.find((option) => option.value === category)?.label ?? category;
-
-  useEffect(() => {
-    if (!householdId && households?.[0]) {
-      setHouseholdId(households[0].id);
-      localStorage.setItem("household_id", households[0].id);
-    }
-  }, [householdId, households]);
 
   const send = useMutation({
     mutationFn: () => sendChat(category, effectiveHousehold, input),
@@ -85,10 +76,7 @@ export function ChatPage() {
         <h1 className="page-header text-foreground">Chat</h1>
         <HouseholdSelector
           value={effectiveHousehold}
-          onChange={(id) => {
-            setHouseholdId(id);
-            localStorage.setItem("household_id", id);
-          }}
+          onChange={setHouseholdId}
           households={households as Household[] | undefined}
           selectStyle={CONTROL_STYLE}
           selectClassName={THEMED_CONTROL_CLASS}

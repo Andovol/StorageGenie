@@ -3,6 +3,7 @@ import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { InboxPage } from "./InboxPage";
+import { HouseholdProvider } from "../hooks/HouseholdContext";
 
 const household = { id: "household-loaded", name: "Loaded home", created_at: "2026-01-01" };
 const job = { id: "job-loaded-91", job_type: "import", state: "FAILED", household_id: household.id, created_at: null, updated_at: null };
@@ -10,10 +11,17 @@ const detail = { ...job, steps: [{ id: "step-loaded", step_name: "EXTRACTING", s
 
 const api = vi.hoisted(() => ({ apiGet: vi.fn(), apiPost: vi.fn(), resolveReviewTask: vi.fn() }));
 vi.mock("../api/client", () => api);
-vi.mock("../hooks/useAssets", () => ({ useHouseholds: () => ({ data: [household] }) }));
+// SG-196: only useHouseholds is stubbed; the real useReviewTasks runs so the
+// shared-query wiring is exercised. Preserved behavior: the page still reads
+// and resolves the loaded ids against household-loaded.
+vi.mock("../hooks/useAssets", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("../hooks/useAssets")>()),
+  useHouseholds: () => ({ data: [household] }),
+}));
 
 function renderPage() {
-  return render(<QueryClientProvider client={new QueryClient({ defaultOptions: { queries: { retry: false } } })}><MemoryRouter><InboxPage /></MemoryRouter></QueryClientProvider>);
+  // SG-196: the page consumes the context now; the provider is the one fetch.
+  return render(<QueryClientProvider client={new QueryClient({ defaultOptions: { queries: { retry: false } } })}><HouseholdProvider><MemoryRouter><InboxPage /></MemoryRouter></HouseholdProvider></QueryClientProvider>);
 }
 
 afterEach(() => { vi.clearAllMocks(); });

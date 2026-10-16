@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   confirmPlanningSuggestion,
@@ -15,25 +15,24 @@ import { HouseholdSelector } from "../components/HouseholdSelector";
 import { PlanningSuggestionCard } from "../components/PlanningSuggestionCard";
 import { CONTROL_STYLE, THEMED_CONTROL_CLASS } from "../components/shell/CatalogToolbar";
 import { PageContainer } from "../components/shell/PageContainer";
-import { useHouseholds } from "../hooks/useAssets";
+import { useHouseholdContext } from "../hooks/HouseholdContext";
 
 const STATUS_OPTIONS = ["", "pending", "confirmed", "dismissed"] as const;
 
 export function PlanningPage() {
-  const { data: households, isError: householdsIsError, error: householdsError } = useHouseholds();
-  const [householdId, setHouseholdId] = useState(
-    () => localStorage.getItem("household_id") || ""
-  );
+  // SG-196 G1: selection state lives in the shared context; the household
+  // failure branch now reads the context's error state.
+  const {
+    households,
+    isError: householdsIsError,
+    error: householdsError,
+    householdId,
+    setHouseholdId,
+  } = useHouseholdContext();
   const [status, setStatus] = useState("");
   const [message, setMessage] = useState("");
   const qc = useQueryClient();
   const effectiveHousehold = householdId || households?.[0]?.id || "";
-  useEffect(() => {
-    if (!householdId && households?.[0]) {
-      setHouseholdId(households[0].id);
-      localStorage.setItem("household_id", households[0].id);
-    }
-  }, [householdId, households]);
 
   const suggestions = useQuery<PlanningSuggestionListResponse>({
     queryKey: ["planning-suggestions", effectiveHousehold, status],
@@ -71,10 +70,7 @@ export function PlanningPage() {
         <h1 className="page-header text-foreground">Planning</h1>
         <HouseholdSelector
           value={effectiveHousehold}
-          onChange={(id) => {
-            setHouseholdId(id);
-            localStorage.setItem("household_id", id);
-          }}
+          onChange={setHouseholdId}
           households={households as Household[] | undefined}
         />
       </div>

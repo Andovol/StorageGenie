@@ -1,23 +1,21 @@
-import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useHouseholds } from "../hooks/useAssets";
+import { useHouseholdContext } from "../hooks/HouseholdContext";
 import { AssetForm } from "../components/AssetForm";
 import { HouseholdSelector } from "../components/HouseholdSelector";
 import { CONTROL_STYLE, THEMED_CONTROL_CLASS } from "../components/shell/CatalogToolbar";
 import { PageContainer } from "../components/shell/PageContainer";
 
 export function CapturePage() {
-  const { data: households, isError: householdsIsError, error: householdsError } = useHouseholds();
-  const [householdId, setHouseholdId] = useState(() => localStorage.getItem("household_id") || "");
+  // SG-196 G1: selection state lives in the shared context; the household
+  // failure branch now reads the context's error state.
+  const {
+    households,
+    isError: householdsIsError,
+    error: householdsError,
+    householdId,
+    setHouseholdId,
+  } = useHouseholdContext();
   const navigate = useNavigate();
-
-  useEffect(() => {
-    if (households && households.length && !householdId) {
-      const first = households[0].id;
-      setHouseholdId(first);
-      localStorage.setItem("household_id", first);
-    }
-  }, [households, householdId]);
 
   const effective = householdId || households?.[0]?.id || "";
 
@@ -27,10 +25,7 @@ export function CapturePage() {
       <div style={{ marginBottom: 16, display: "flex", flexWrap: "wrap", gap: 12, alignItems: "center" }}>
         <HouseholdSelector
           value={effective}
-          onChange={(id) => {
-            setHouseholdId(id);
-            localStorage.setItem("household_id", id);
-          }}
+          onChange={setHouseholdId}
           households={households}
           labelStyle={{ fontSize: 13 }}
           selectStyle={{ ...CONTROL_STYLE, marginLeft: 6 }}

@@ -7,6 +7,7 @@ import { AppHeader } from "./AppHeader";
 import { ProductGrid } from "../catalog/ProductGrid";
 import { InboxPage } from "../../routes/InboxPage";
 import { ThemeProvider } from "../../theme/ThemeProvider";
+import { HouseholdProvider } from "../../hooks/HouseholdContext";
 
 // The transport boundary is mocked; the app API is the only external system this slice talks to.
 const api = vi.hoisted(() => ({
@@ -16,7 +17,10 @@ const api = vi.hoisted(() => ({
   resolveReviewTask: vi.fn(),
 }));
 vi.mock("../../api/client", () => api);
-vi.mock("../../hooks/useAssets", () => ({
+vi.mock("../../hooks/useAssets", async (importOriginal) => ({
+  // SG-196: only useHouseholds is stubbed; the real useReviewTasks ships with
+  // the module and serves InboxPage below.
+  ...(await importOriginal<typeof import("../../hooks/useAssets")>()),
   useHouseholds: () => ({
     data: [{ id: "h1", name: "Home", created_at: "2026-09-01T00:00:00Z" }],
   }),
@@ -219,7 +223,14 @@ describe("AssetImportModal processing", () => {
         <MemoryRouter initialEntries={["/"]}>
           <Routes>
             <Route path="/" element={<AssetImportModal householdId="h1" onClose={vi.fn()} />} />
-            <Route path="/inbox" element={<InboxPage />} />
+            <Route
+              path="/inbox"
+              element={
+                <HouseholdProvider>
+                  <InboxPage />
+                </HouseholdProvider>
+              }
+            />
           </Routes>
         </MemoryRouter>
       </QueryClientProvider>

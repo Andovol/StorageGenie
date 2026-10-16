@@ -7,6 +7,7 @@ import type { ProductStatus } from "../../types/product";
 import type { Asset } from "../../api/types";
 import { CatalogPage } from "../../routes/CatalogPage";
 import { ThemeProvider } from "../../theme/ThemeProvider";
+import { HouseholdProvider } from "../../hooks/HouseholdContext";
 import { BADGE_CLASS, ProductCard, type CatalogProduct } from "./ProductCard";
 import { ProductCardSkeleton } from "./ProductCardSkeleton";
 import { ProductGrid, formatRelativeDate } from "./ProductGrid";
@@ -467,11 +468,15 @@ describe("CatalogPage drawer wiring", () => {
   };
 
   function renderCatalog(client: QueryClient) {
+    // SG-196: CatalogPage reads household selection from the shared context;
+    // preserved behavior: the drawer wiring assertions below are unchanged.
     return render(
       <QueryClientProvider client={client}>
         <ThemeProvider>
           <MemoryRouter initialEntries={["/"]}>
-            <CatalogPage />
+            <HouseholdProvider>
+              <CatalogPage />
+            </HouseholdProvider>
           </MemoryRouter>
         </ThemeProvider>
       </QueryClientProvider>

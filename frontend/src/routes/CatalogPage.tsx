@@ -3,10 +3,10 @@ import {
   useAssets,
   useDeleteSavedSearch,
   useFacets,
-  useHouseholds,
   useSaveSearch,
   useSavedSearches,
 } from "../hooks/useAssets";
+import { useHouseholdContext } from "../hooks/HouseholdContext";
 import { ProductGrid } from "../components/catalog/ProductGrid";
 import { AppShell } from "../components/shell/AppShell";
 import { ItemInspectorDrawer } from "../components/shell/ItemInspectorDrawer";
@@ -30,8 +30,9 @@ function useDebounced<T>(value: T, delayMs: number): T {
 }
 
 export function CatalogPage() {
-  const { data: households } = useHouseholds();
-  const [householdId, setHouseholdId] = useState(() => localStorage.getItem("household_id") || "");
+  // SG-196 G1: household selection now comes from the shared context; the
+  // effective-household derivation shape is unchanged.
+  const { households, householdId, setHouseholdId } = useHouseholdContext();
   const [qRaw, setQRaw] = useState("");
   const q = useDebounced(qRaw, 200);
   const [category, setCategory] = useState<string>(CATEGORY_ALL);
@@ -47,7 +48,8 @@ export function CatalogPage() {
     [householdId, households]
   );
 
-  const { data: savedSearchesData } = useSavedSearches(effectiveHousehold);
+  const { data: savedSearchesData, isError: savedSearchesIsError, error: savedSearchesError } =
+    useSavedSearches(effectiveHousehold);
   const savedSearches = useMemo(() => savedSearchesData?.items ?? [], [savedSearchesData]);
   const saveSearch = useSaveSearch(effectiveHousehold);
   const deleteSavedSearch = useDeleteSavedSearch(effectiveHousehold);
@@ -58,18 +60,13 @@ export function CatalogPage() {
     setSelectedSavedSearchId("");
   }, [effectiveHousehold]);
 
-  useEffect(() => {
-    if (households && households.length && !householdId) {
-      const first = households[0].id;
-      setHouseholdId(first);
-      localStorage.setItem("household_id", first);
-    }
-  }, [households, householdId]);
-
   // Facet counts share the list base (household + debounced `q`). The active
   // category is deliberately NOT sent, so every pill keeps showing the count
   // reachable by selecting it (SG-064 G1: counts omit their own dimension).
-  const { data: facets } = useFacets(effectiveHousehold, q);
+  const { data: facets, isError: facetsIsError, error: facetsError } = useFacets(
+    effectiveHousehold,
+    q
+  );
   const categoryCounts = useMemo(() => facets?.asset_type ?? {}, [facets]);
 
   // Pills come from the real `asset_type` population and speak the same
@@ -209,16 +206,19 @@ export function CatalogPage() {
       onClearAll={clearAll}
       householdId={effectiveHousehold}
       households={households || []}
-      onHouseholdChange={(id) => {
-        setHouseholdId(id);
-        localStorage.setItem("household_id", id);
-      }}
+      onHouseholdChange={setHouseholdId}
       savedSearches={savedSearches}
       selectedSavedSearchId={selectedSavedSearchId}
       onSavedSearchSelect={handleSavedSearchSelect}
       onSavedSearchDelete={handleSavedSearchDelete}
       onSaveSearch={handleSaveSearch}
     >
+      {facetsIsError && (
+        <div role="alert">Could not load catalog facets: {String(facetsError)}</div>
+      )}
+      {savedSearchesIsError && (
+        <div role="alert">Could not load saved searches: {String(savedSearchesError)}</div>
+      )}
       {isError && (
         <div role="alert">Could not load the asset list: {String(error)}</div>
       )}

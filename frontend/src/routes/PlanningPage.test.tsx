@@ -2,6 +2,7 @@ import { afterEach, describe, expect, test, vi } from "vitest";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { PlanningPage } from "./PlanningPage";
+import { HouseholdProvider } from "../hooks/HouseholdContext";
 import type { PlanningSuggestion } from "../api/types";
 
 const household = { id: "hh-planning", name: "Planning home", created_at: "2026-01-01" };
@@ -28,9 +29,13 @@ vi.mock("../api/client", () => api);
 vi.mock("../hooks/useAssets", () => ({ useHouseholds: () => ({ data: [household] }) }));
 
 function renderPage() {
+  // SG-196: household selection now comes from the shared context provider;
+  // preserved behavior: planning reads and writes still carry hh-planning.
   return render(
     <QueryClientProvider client={new QueryClient({ defaultOptions: { queries: { retry: false } } })}>
-      <PlanningPage />
+      <HouseholdProvider>
+        <PlanningPage />
+      </HouseholdProvider>
     </QueryClientProvider>
   );
 }

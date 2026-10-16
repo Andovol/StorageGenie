@@ -4,6 +4,7 @@ import type {
   Asset,
   AssetListResponse,
   Household,
+  ReviewTaskListResponse,
   SavedSearch,
   SavedSearchListResponse,
   SavedSearchQuery,
@@ -54,6 +55,20 @@ export function useHouseholds() {
   return useQuery<Household[]>({
     queryKey: ["households"],
     queryFn: () => apiGet<Household[]>("/v1/households"),
+  });
+}
+
+/**
+ * SG-196 G3: one shared review-task read. The nav badge and InboxPage both use
+ * this so they share the ["review-tasks", household] cache entry — no new
+ * endpoint, no second fetch shape.
+ */
+export function useReviewTasks(householdId: string) {
+  return useQuery<ReviewTaskListResponse>({
+    queryKey: ["review-tasks", householdId],
+    queryFn: () =>
+      apiGet<ReviewTaskListResponse>("/v1/review-tasks", { household_id: householdId }),
+    enabled: !!householdId,
   });
 }
 

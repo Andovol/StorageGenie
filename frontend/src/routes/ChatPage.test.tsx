@@ -3,6 +3,7 @@ import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { MemoryRouter } from "react-router-dom";
 import { ChatPage } from "./ChatPage";
+import { HouseholdProvider } from "../hooks/HouseholdContext";
 
 const household = { id: "hh-chat", name: "Chat home", created_at: "2026-01-01" };
 
@@ -14,11 +15,15 @@ vi.mock("../api/client", () => api);
 vi.mock("../hooks/useAssets", () => ({ useHouseholds: () => ({ data: [household] }) }));
 
 function renderPage() {
+  // SG-196: household selection now comes from the shared context provider;
+  // preserved behavior: every request still carries hh-chat.
   return render(
     <QueryClientProvider client={new QueryClient({ defaultOptions: { queries: { retry: false } } })}>
-      <MemoryRouter>
-        <ChatPage />
-      </MemoryRouter>
+      <HouseholdProvider>
+        <MemoryRouter>
+          <ChatPage />
+        </MemoryRouter>
+      </HouseholdProvider>
     </QueryClientProvider>
   );
 }

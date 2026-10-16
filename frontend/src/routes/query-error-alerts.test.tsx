@@ -9,6 +9,7 @@ import { CatalogPage } from "./CatalogPage";
 import { InboxPage } from "./InboxPage";
 import { PlanningPage } from "./PlanningPage";
 import { ThemeProvider } from "../theme/ThemeProvider";
+import { HouseholdProvider } from "../hooks/HouseholdContext";
 import type { AnalyticsSummary } from "../api/types";
 
 /**
@@ -77,13 +78,17 @@ function inboxApiGet(
 }
 
 function renderPage(node: ReactNode) {
+  // SG-196: routes read household selection from the shared context, so the
+  // page renders under the provider; preserved behavior: the SG-195 alerts
+  // below still fire on their mocked query failures (household failures now
+  // reach the route through the provider's query).
   return render(
     <MemoryRouter>
       <ThemeProvider>
         <QueryClientProvider
           client={new QueryClient({ defaultOptions: { queries: { retry: false } } })}
         >
-          {node}
+          <HouseholdProvider>{node}</HouseholdProvider>
         </QueryClientProvider>
       </ThemeProvider>
     </MemoryRouter>

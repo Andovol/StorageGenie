@@ -3,6 +3,7 @@ import { fireEvent, render, screen, waitFor, within } from "@testing-library/rea
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { MemoryRouter } from "react-router-dom";
 import { ExpiryPage } from "./ExpiryPage";
+import { HouseholdProvider } from "../hooks/HouseholdContext";
 import type { AnalyticsSummary, ExpiryStatusResponse } from "../api/types";
 
 // Fixtures are hoisted so the `vi.mock` factory below can close over them
@@ -120,11 +121,15 @@ afterEach(() => {
 });
 
 function renderPage() {
+  // SG-196: household selection now comes from the shared context provider;
+  // preserved behavior: engine reads and asset links still carry hh-expiry.
   return render(
     <QueryClientProvider client={new QueryClient({ defaultOptions: { queries: { retry: false } } })}>
-      <MemoryRouter>
-        <ExpiryPage />
-      </MemoryRouter>
+      <HouseholdProvider>
+        <MemoryRouter>
+          <ExpiryPage />
+        </MemoryRouter>
+      </HouseholdProvider>
     </QueryClientProvider>
   );
 }

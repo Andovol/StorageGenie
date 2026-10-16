@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import App from "../../App";
 import { CatalogPage } from "../../routes/CatalogPage";
 import { ThemeProvider } from "../../theme/ThemeProvider";
+import { HouseholdProvider } from "../../hooks/HouseholdContext";
 import { assetToProductItem, type ProductStatus } from "../../types/product";
 import { sortCatalog } from "./CatalogToolbar";
 import type { Asset } from "../../api/types";
@@ -91,11 +92,15 @@ function mockMatchMedia() {
 }
 
 function renderCatalog() {
+  // SG-196: CatalogPage reads household selection from the shared context;
+  // preserved behavior: every catalog assertion below is unchanged.
   return render(
     <QueryClientProvider client={new QueryClient({ defaultOptions: { queries: { retry: false } } })}>
       <ThemeProvider>
         <MemoryRouter initialEntries={["/"]}>
-          <CatalogPage />
+          <HouseholdProvider>
+            <CatalogPage />
+          </HouseholdProvider>
         </MemoryRouter>
       </ThemeProvider>
     </QueryClientProvider>
@@ -388,7 +393,7 @@ describe("Catalog shell", () => {
         <ThemeProvider>
           <MemoryRouter initialEntries={["/"]}>
             <Routes>
-              <Route path="/" element={<CatalogPage />} />
+              <Route path="/" element={<HouseholdProvider><CatalogPage /></HouseholdProvider>} />
               <Route path="/capture" element={<div>capture probe</div>} />
             </Routes>
           </MemoryRouter>

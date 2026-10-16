@@ -13,6 +13,7 @@ import { InboxPage } from "./InboxPage";
 import { PlanningPage } from "./PlanningPage";
 import { ReviewPage } from "./ReviewPage";
 import { SettingsPage } from "./SettingsPage";
+import { HouseholdProvider } from "../hooks/HouseholdContext";
 
 /**
  * SG-075: per-screen adoption proof. Every landmark assertion here is a
@@ -64,6 +65,7 @@ const fixtures = vi.hoisted(() => {
     deleteSavedSearch: { mutate: noop },
     asset: { data: asset, isLoading: false },
     taxonomy: { data: { plugins: [] } },
+    reviewTasks: { data: { items: [], next_cursor: null, total: 0 } },
   };
   return { household, asset, candidate, hooks };
 });
@@ -101,6 +103,7 @@ vi.mock("../hooks/useAssets", () => ({
   useDeleteSavedSearch: () => fixtures.hooks.deleteSavedSearch,
   useAsset: () => fixtures.hooks.asset,
   useTaxonomy: () => fixtures.hooks.taxonomy,
+  useReviewTasks: () => fixtures.hooks.reviewTasks,
 }));
 
 function renderWithProviders(ui: ReactElement, initialEntries: string[] = ["/"]) {
@@ -167,7 +170,7 @@ describe("SG-075 screen adoption", () => {
   });
 
   test("analytics screen header is token-styled", async () => {
-    renderWithProviders(<AnalyticsPage />);
+    renderWithProviders(<HouseholdProvider><AnalyticsPage /></HouseholdProvider>);
     expectPageHeader(/analytics/i);
   });
 
@@ -182,22 +185,22 @@ describe("SG-075 screen adoption", () => {
   });
 
   test("capture screen header is token-styled", () => {
-    renderWithProviders(<CapturePage />);
+    renderWithProviders(<HouseholdProvider><CapturePage /></HouseholdProvider>);
     expectPageHeader(/capture/i);
   });
 
   test("chat screen header is token-styled", () => {
-    renderWithProviders(<ChatPage />);
+    renderWithProviders(<HouseholdProvider><ChatPage /></HouseholdProvider>);
     expectPageHeader(/chat/i);
   });
 
   test("inbox screen header is token-styled", async () => {
-    renderWithProviders(<InboxPage />);
+    renderWithProviders(<HouseholdProvider><InboxPage /></HouseholdProvider>);
     expectPageHeader(/inbox/i);
   });
 
   test("planning screen header is token-styled", () => {
-    renderWithProviders(<PlanningPage />);
+    renderWithProviders(<HouseholdProvider><PlanningPage /></HouseholdProvider>);
     expectPageHeader(/planning/i);
   });
 
@@ -217,7 +220,7 @@ describe("SG-075 screen adoption", () => {
   });
 
   test("capture screen rides the shared centered container and themed household select (SG-105 G1/G2)", () => {
-    const { container } = renderWithProviders(<CapturePage />);
+    const { container } = renderWithProviders(<HouseholdProvider><CapturePage /></HouseholdProvider>);
 
     const page = container.querySelector(".page-container") as HTMLElement;
     expect(page).not.toBeNull();
@@ -229,11 +232,11 @@ describe("SG-075 screen adoption", () => {
 
   test("every swept route rides the shared centered PageContainer (SG-118 G2)", () => {
     const renders: Array<[string, ReactElement, string[]]> = [
-      ["analytics", <AnalyticsPage />, ["/"]],
-      ["chat", <ChatPage />, ["/"]],
+      ["analytics", <HouseholdProvider><AnalyticsPage /></HouseholdProvider>, ["/"]],
+      ["chat", <HouseholdProvider><ChatPage /></HouseholdProvider>, ["/"]],
       ["settings", <SettingsPage />, ["/"]],
-      ["planning", <PlanningPage />, ["/"]],
-      ["inbox", <InboxPage />, ["/"]],
+      ["planning", <HouseholdProvider><PlanningPage /></HouseholdProvider>, ["/"]],
+      ["inbox", <HouseholdProvider><InboxPage /></HouseholdProvider>, ["/"]],
       [
         "review",
         <Routes>

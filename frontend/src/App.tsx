@@ -13,7 +13,10 @@ import { AnalyticsPage } from "./routes/AnalyticsPage";
 import { ExpiryPage } from "./routes/ExpiryPage";
 import { ThemeToggle } from "./theme/ThemeToggle";
 import { AssetImportModal } from "./components/shell/AssetImportModal";
-import { useHouseholds } from "./hooks/useAssets";
+import { HouseholdSelector } from "./components/HouseholdSelector";
+import { CONTROL_STYLE, THEMED_CONTROL_CLASS } from "./components/shell/CatalogToolbar";
+import { useReviewTasks } from "./hooks/useAssets";
+import { HouseholdProvider, useHouseholdContext } from "./hooks/HouseholdContext";
 
 const NAV_DESTINATIONS: readonly { to: string; label: string; end?: boolean }[] = [
   { to: "/", label: "Catalog", end: true },
@@ -30,11 +33,22 @@ function Nav() {
   const { pathname } = useLocation();
   const [menuOpen, setMenuOpen] = useState(false);
   const [importOpen, setImportOpen] = useState(false);
-  const { data: households } = useHouseholds();
-  const householdId =
-    (typeof localStorage !== "undefined" ? localStorage.getItem("household_id") : "") ||
-    households?.[0]?.id ||
-    "";
+  // SG-196 G1: the nav reads the shared household context; its selector is the
+  // one control that reaches every route in the same session.
+  const {
+    households,
+    isError: householdsIsError,
+    error: householdsError,
+    householdId,
+    setHouseholdId,
+  } = useHouseholdContext();
+  const effectiveHousehold = householdId || households?.[0]?.id || "";
+  // SG-196 G3: the badge reads the same ["review-tasks", household] entry
+  // InboxPage uses, so it counts the LOADED open tasks and shares one cache.
+  // While there is no data (loading / error / no household) NO badge renders —
+  // a zero there would be a false completion.
+  const { data: reviewTasks } = useReviewTasks(effectiveHousehold);
+  const openTaskCount = reviewTasks?.items.filter((task) => task.status !== "resolved").length;
   // The catalog route renders its own header (AppHeader) which already carries
   // the toggle; every other route gets it here so it is reachable everywhere.
   const showToggle = pathname !== "/";
@@ -86,19 +100,53 @@ function Nav() {
         Menu
       </button>
       <div id="sg-nav-menu" className="nav-menu" data-open={menuOpen ? "true" : "false"}>
-        {NAV_DESTINATIONS.map((destination) => (
-          <NavLink
-            key={destination.to}
-            to={destination.to}
-            end={destination.end}
-            className={({ isActive }) => linkClass(isActive)}
-            style={({ isActive }) => linkStyle(isActive)}
-          >
-            {destination.label}
-          </NavLink>
-        ))}
+        {NAV_DESTINATIONS.map((destination) => {
+          const badgeCount = destination.to === "/inbox" ? openTaskCount : undefined;
+          return (
+            <NavLink
+              key={destination.to}
+              to={destination.to}
+              end={destination.end}
+              aria-label={
+                badgeCount !== undefined ? `Inbox, ${badgeCount} open review tasks` : undefined
+              }
+              className={({ isActive }) => linkClass(isActive)}
+              style={({ isActive }) => linkStyle(isActive)}
+            >
+              {destination.label}
+              {badgeCount !== undefined ? (
+                <span
+                  data-testid="inbox-open-count"
+                  aria-hidden="true"
+                  style={{
+                    marginLeft: 6,
+                    padding: "0 6px",
+                    borderRadius: 999,
+                    borderStyle: "solid",
+                    borderWidth: 1,
+                    fontSize: 11,
+                  }}
+                >
+                  {badgeCount}
+                </span>
+              ) : null}
+            </NavLink>
+          );
+        })}
       </div>
       {showToggle ? <ThemeToggle /> : null}
+      <HouseholdSelector
+        value={effectiveHousehold}
+        onChange={setHouseholdId}
+        households={households}
+        selectStyle={{ ...CONTROL_STYLE, maxWidth: "100%" }}
+        selectClassName={THEMED_CONTROL_CLASS}
+      />
+      {householdsIsError ? (
+        <div role="alert" style={{ fontSize: 12 }}>
+          Could not load households: {String(householdsError)}
+        </div>
+      ) : null}
       {showImport ? (
         <Link
           to="/capture"
@@ -126,7 +174,7 @@ function Nav() {
         Phase 0 · local-first
       </span>
       {importOpen ? (
-        <AssetImportModal householdId={householdId} onClose={() => setImportOpen(false)} />
+        <AssetImportModal householdId={effectiveHousehold} onClose={() => setImportOpen(false)} />
       ) : null}
     </nav>
   );
@@ -134,20 +182,22 @@ function Nav() {
 
 export default function App() {
   return (
-    <div className="bg-background text-foreground" style={{ minHeight: "100vh" }}>
-      <Nav />
-      <Routes>
-        <Route path="/" element={<CatalogPage />} />
-        <Route path="/capture" element={<CapturePage />} />
-        <Route path="/assets/:id" element={<AssetDetailPage />} />
-        <Route path="/settings" element={<SettingsPage />} />
-        <Route path="/inbox" element={<InboxPage />} />
-        <Route path="/planning" element={<PlanningPage />} />
-        <Route path="/chat" element={<ChatPage />} />
-        <Route path="/analytics" element={<AnalyticsPage />} />
-        <Route path="/expiry" element={<ExpiryPage />} />
-        <Route path="/review/:candidateId" element={<ReviewPage />} />
-      </Routes>
-    </div>
+    <HouseholdProvider>
+      <div className="bg-background text-foreground" style={{ minHeight: "100vh" }}>
+        <Nav />
+        <Routes>
+          <Route path="/" element={<CatalogPage />} />
+          <Route path="/capture" element={<CapturePage />} />
+          <Route path="/assets/:id" element={<AssetDetailPage />} />
+          <Route path="/settings" element={<SettingsPage />} />
+          <Route path="/inbox" element={<InboxPage />} />
+          <Route path="/planning" element={<PlanningPage />} />
+          <Route path="/chat" element={<ChatPage />} />
+          <Route path="/analytics" element={<AnalyticsPage />} />
+          <Route path="/expiry" element={<ExpiryPage />} />
+          <Route path="/review/:candidateId" element={<ReviewPage />} />
+        </Routes>
+      </div>
+    </HouseholdProvider>
   );
 }
