@@ -751,3 +751,9 @@ Originals above (88 FLAG:TRUST / 91 FLAG:TRUST) stand as the audit trail; the ve
 | slice_id | phase | model | effort | score | flag | lever | guards_invoked | deduction_attribution | remaining | escape | slowest_waste |
 |---|---|---|---|---|---|---|---|---|---|---|---|
 | SG-197 | Close-out deploy rider (D-3); receipts 94c8fc2 + 2f840d5, settings envelope-sourced; one rebuild 27s + one recreate 2s lane-socket, zero denials; container a77e3f2f/image e3b7c0aa/bundle 8ba02c64; two repairs SERVED; 20+17 focused tests; 6x200 health; DB byte-identical; merged-vs-served exactly two commits; I1 aborted invocations disclosed; audit SG-197_audit.md | opencode/opencode-go/deepseek-v4.1-flash (receipt settings) | max | 97 |  |  | PG-EV-02/03/08; PG-IC-01/07; PG-DP-01/02; PG-PR-03/04/06/10 | coder | Paste-note post-report by construction (closed here); out-of-set + SG-190 REMAINING to SG-196; no other open items |  | none |
+
+### SG-196 (2026-10-16 - nav household context/count)
+
+| slice_id | phase | model | effort | score | flag | lever | guards_invoked | deduction_attribution | remaining | escape | slowest_waste |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| SG-196 | Nav household context/count (starter arc/D16); WORK receipt verified (dual paste note missing - runner report_unreadable misfire, 2nd ISS-4 instance, not slice fault); shared context (9 sites to 1 + AppHeader outlier); nav selector + household alert + Inbox badge + 2 Catalog branch alerts; 13 genuine tests (8 FAIL base + 13 PASS); suite 296/296; tsc/eslint clean; census base-vs-target; under estimate; audit SG-196_audit.md | opencode/opencode-go/deepseek-v4.1-flash (receipt settings) | max | 98 |  |  | PG-EV-01/02/03/09; PG-IC-01/07/09; PG-PR-03/06 |  | AppHeader outlier + ReviewPage inline query to follow-up candidate; zoom/touch/dark + backend suite stand; runner-misfire 2nd instance to desk #84 |  | none |
