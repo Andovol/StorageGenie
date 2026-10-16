@@ -745,3 +745,9 @@ Originals above (88 FLAG:TRUST / 91 FLAG:TRUST) stand as the audit trail; the ve
 | slice_id | phase | model | effort | score | flag | lever | guards_invoked | deduction_attribution | remaining | escape | slowest_waste |
 |---|---|---|---|---|---|---|---|---|---|---|---|
 | SG-195 | R8 error branches (starter arc/D16); WORK receipt verified (dual note missing — runner report_unreadable misfire ISS-4, not slice fault); 8 conditionals + 17 genuine tests (8 FAIL base + 17 PASS); suite 283/283; tsc/eslint clean; census 5 + out-of-set; under estimate; audit SG-195_audit.md | opencode/opencode-go/deepseek-v4.1-flash (receipt settings) | max | 98 |  |  | PG-EV-01/02/03/09; PG-IC-01/07/09; PG-PR-03/06 |  | Out-of-set household queries to SG-196 premises; zoom/touch/dark + backend suite stand; ISS-4 desk relay owed |  | none |
+
+### SG-197 (2026-10-16 - close-out deploy rider D-3)
+
+| slice_id | phase | model | effort | score | flag | lever | guards_invoked | deduction_attribution | remaining | escape | slowest_waste |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| SG-197 | Close-out deploy rider (D-3); receipts 94c8fc2 + 2f840d5, settings envelope-sourced; one rebuild 27s + one recreate 2s lane-socket, zero denials; container a77e3f2f/image e3b7c0aa/bundle 8ba02c64; two repairs SERVED; 20+17 focused tests; 6x200 health; DB byte-identical; merged-vs-served exactly two commits; I1 aborted invocations disclosed; audit SG-197_audit.md | opencode/opencode-go/deepseek-v4.1-flash (receipt settings) | max | 97 |  |  | PG-EV-02/03/08; PG-IC-01/07; PG-DP-01/02; PG-PR-03/04/06/10 | coder | Paste-note post-report by construction (closed here); out-of-set + SG-190 REMAINING to SG-196; no other open items |  | none |
