@@ -1,0 +1,5 @@
+candidate HEAD: 144190c7078162ebf5a9a07d88e3b0ada0a7716f
+start_epoch: 1792182977
+$ timeout 300 node_modules/.bin/eslint src
+eslint_exit=0
+end_epoch: 1792182979

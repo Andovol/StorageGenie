@@ -1,0 +1,94 @@
+SG-198 worklog — consolidation micro-slice: AppHeader onto household context,
+ReviewPage onto shared useReviewTasks
+(append-only; frozen at the evidence commit; material commands, decisions, results)
+
+SESSION. Interactive coder session under the dispatch lane on the host. Lane unit
+dispatch-storagegenie@SG-198.service, MainPID 285272, ExecMainStartTimestamp Fri
+2026-10-16 20:31:55 UTC; coder process PID 285581, argv `opencode run --auto --dir
+/home/andrei/StorageGenie --model opencode-go/deepseek-v4.1-flash --variant max`.
+RUN_BUDGET_S not exposed by systemctl show Environment for this unit (only
+XDG_RUNTIME_DIR/HOME printed); no RUN_BUDGET_S record read this session. Working dir
+/home/andrei/StorageGenie, remote git@github.com:Andovol/StorageGenie.git, BASE ref
+automation resolved 894083eea55aafba30a3099d87c426eceea011e2 (== local HEAD ==
+origin/automation after fetch at admission; worktree clean). Contract copy
+/home/andrei/storagegenie-contract (VERSION 0.50.0, RULES.md sha256
+49338e39… == RULES.sha256); CODER.md line 3 echoed verbatim in the report.
+rules_check.sh: G-L1 UNCHECKED (contract dir not at a tag — cache checkout form),
+G-L5/G-L7 UNCHECKED gh-unauthenticated, G-L6 bytes printed; exit 0; environment,
+same as SG-190/194/195/196 — recorded, not slice scope. Dispatch settings ride the
+trigger; this packet carries none. Concurrent unrelated dispatch observed (P513,
+/home/andrei/pip) — not touched, not in scope.
+
+RECON / PB-1 (base 894083e).
+- AppHeader.tsx:16 ran its own useHouseholds(); lines 18-21 derived the import-modal
+  id localStorage-first with households[0] fallback. Packet lines match the tree.
+- ReviewPage.tsx:39 inlined its own ["review-tasks", householdId] useQuery; line 32
+  householdId sourcing (URL param + localStorage) confirmed — OUT of scope, untouched.
+- hooks/useAssets.ts:66 exports useReviewTasks with the identical key/queryFn/enabled.
+- Census on base (git grep 894083e): product useHouseholds( sites = 3 (definition
+  useAssets.ts:54 + provider HouseholdContext.tsx:23 + AppHeader:16); review-tasks
+  query DEFINITIONS = 2 (useAssets.ts:70 + ReviewPage.tsx:39). Target after the slice:
+  2 and 1 respectively.
+- Provider derivation this slice leans on (read before editing,
+  hooks/HouseholdContext.tsx:24-35): householdId state init localStorage-first; effect
+  falls back to households[0].id and persists it. Exact OLD accepted set for the
+  modal id was localStorage || households[0]?.id || ""; NEW is the context's
+  householdId — same accepted value; only timing differs (effect round-trip vs
+  render-time derivation) and the provider already persisted the fallback app-wide
+  since SG-196. No behavioral difference found; nothing to STOP on.
+
+DESIGN (PB-6; decided and reported).
+- AppHeader: consume useHouseholdContext().householdId; delete the useHouseholds
+  import/call and the local fallback derivation. No branch change.
+- ReviewPage: replace the inline useQuery with useReviewTasks(householdId); dropped
+  the now-unused ReviewTaskListResponse type import (the hook carries it); kept
+  useQuery import (candidateQuery still uses it), every consumer, the split
+  invalidation ["review-tasks", householdId] and the ["review-tasks", householdId]
+  key shape identical.
+- Test edits required by the swap (each names the preserved behavior in-code, no
+  assertion text changed): import-modal.test CTA-wiring render wraps AppHeader in
+  HouseholdProvider (AppHeader now throws outside the provider); new targeted renders
+  — import-modal.test "the modal id is the shared context's household
+  (localStorage-empty fallback)" (drop+Process path asserts uploadEvidence receives
+  "h1") and ReviewPage.test "the review-tasks list loads through the shared
+  useReviewTasks wiring" (asserts the /v1/review-tasks fetch with the URL household
+  and the loaded task still drives the split affordance). No other test file needed
+  edits — every other renderer of AppHeader/CatalogPage/App was provider-wrapped by
+  SG-196 already.
+
+VERIFICATION (all on committed work HEAD 144190c7078162ebf5a9a07d88e3b0ada0a7716f).
+1. Dev focused run (pre-commit, 3 directly-named suites): 3 files, 49 tests, exit 0,
+   4.05 s (20:34:43->20:34:47Z).
+2. Dev gates: tsc --noEmit exit 0; eslint src exit 0.
+3. Authoritative focused run post-commit (derived set = shell, import-modal,
+   ReviewPage, theme-adoption, catalog, App.household-nav): 6 files, 107 tests,
+   exit 0, 4.76 s (start_epoch 1792182927 -> end_epoch 1792182932;
+   SG-198_focused_candidate.log echoes candidate HEAD 144190c, base 894083e).
+4. Full frontend suite ONCE on candidate (D443): 30 files, 298 passed, exit 0,
+   12.31 s (start_epoch 1792182936 -> end_epoch 1792182949; SG-198_suite_candidate.log
+   echoes candidate HEAD 144190c, base 894083e). 298 = SG-196's 296 + this slice's 2
+   new targeted renders — own count, not carried; no FAIL half owed (behavior-
+   preserving slice; re-proof only, stated per the packet).
+5. Gates at work HEAD: tsc exit 0 (1792182973->1792182977); eslint exit 0
+   (1792182977->1792182979); SG-198_tsc.log, SG-198_eslint.log echo candidate HEAD.
+6. Census (SG-198_census.log): useHouseholds( product sites 3 -> 2 (definition +
+   provider); review-tasks query definitions 2 -> 1 (useReviewTasks); remaining
+   ["review-tasks"] literals on target are the two preserved invalidateQueries calls.
+
+HEALTH: start {"status":"ok","db":"ok","storage":"ok"} (read-only curl GET,
+20:32Z); end probe re-run at close — reported as delta in the report only.
+No restart, no write, no host change (packet: DATABASE none, Restart none).
+
+EXTERNAL / PRODUCTION EFFECTS (CO-85): none with side effects. No deploy, restart,
+migration, schema or host change; no provider/paid call; no credential or .env
+handled; no sudo; no privileged operation attempted, so no denial and PB-2's stop
+path was never reached. Local commits, git pushes and a notes-ref publication only.
+
+LIMITS. Bounds applied per command: reads 120 s, focused 600 s, full suite 900 s;
+no timeout finding — nothing hit a bound, nothing killed, no single command over
+60 s; idle kill never approached. No polling, no interactive prompt, no host change,
+no sudo.
+
+SCOPE CEILING. Product edits: exactly AppHeader.tsx + ReviewPage.tsx. Test edits:
+exactly the two files named above, only where the hook swap requires them. No
+backend, no branches, no screenshots/driver (jsdom only), no other file.

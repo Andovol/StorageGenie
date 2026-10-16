@@ -1,0 +1,41 @@
+SG-198 census — base 894083e vs target 144190c7078162ebf5a9a07d88e3b0ada0a7716f
+generated: 2026-10-16T20:36:13Z
+
+== useHouseholds( product call sites — BASE ==
+894083e:frontend/src/components/shell/AppHeader.tsx:16:  const { data: households } = useHouseholds();
+894083e:frontend/src/hooks/HouseholdContext.tsx:23:  const { data: households, isError, error } = useHouseholds();
+894083e:frontend/src/hooks/useAssets.ts:54:export function useHouseholds() {
+
+== useHouseholds( product call sites — TARGET ==
+frontend/src/hooks/HouseholdContext.tsx:23:  const { data: households, isError, error } = useHouseholds();
+frontend/src/hooks/useAssets.ts:54:export function useHouseholds() {
+
+== review-tasks query DEFINITIONS apiGet<ReviewTaskListResponse>("/v1/review-tasks") — BASE ==
+894083e:frontend/src/hooks/useAssets.ts:70:      apiGet<ReviewTaskListResponse>("/v1/review-tasks", { household_id: householdId }),
+894083e:frontend/src/routes/ReviewPage.tsx:39:  const tasksQuery = useQuery<ReviewTaskListResponse>({ queryKey: ["review-tasks", householdId], queryFn: () => apiGet<ReviewTaskListResponse>("/v1/review-tasks", { household_id: householdId }), enabled: !!householdId });
+
+== review-tasks query DEFINITIONS — TARGET ==
+frontend/src/hooks/useAssets.ts:70:      apiGet<ReviewTaskListResponse>("/v1/review-tasks", { household_id: householdId }),
+
+== ["review-tasks" key literals TARGET (definitions + preserved invalidations; comments included) ==
+frontend/src/hooks/useAssets.ts:63: * this so they share the ["review-tasks", household] cache entry — no new
+frontend/src/hooks/useAssets.ts:68:    queryKey: ["review-tasks", householdId],
+frontend/src/App.tsx:46:  // SG-196 G3: the badge reads the same ["review-tasks", household] entry
+frontend/src/routes/ReviewPage.tsx:47:  const split = useMutation({ mutationFn: (indexes: number[]) => candidateSplit(candidateId, householdId, indexes), onSuccess: (result) => { setSplitChildren(result.children); qc.invalidateQueries({ queryKey: ["candidate", candidateId, householdId] }); qc.invalidateQueries({ queryKey: ["review-tasks", householdId] }); } });
+frontend/src/routes/InboxPage.tsx:30:  const resolve = useMutation({ mutationFn: (taskId: string) => resolveReviewTask(taskId, effectiveHousehold), onSuccess: () => qc.invalidateQueries({ queryKey: ["review-tasks", effectiveHousehold] }) });
+
+== useReviewTasks product sites TARGET (definition + consumers) ==
+frontend/src/hooks/useAssets.ts:66:export function useReviewTasks(householdId: string) {
+frontend/src/App.tsx:18:import { useReviewTasks } from "./hooks/useAssets";
+frontend/src/App.tsx:50:  const { data: reviewTasks } = useReviewTasks(effectiveHousehold);
+frontend/src/routes/ReviewPage.tsx:9:import { useReviewTasks } from "../hooks/useAssets";
+frontend/src/routes/ReviewPage.tsx:40:  // SG-198 G1: the review-tasks query is now the shared useReviewTasks
+frontend/src/routes/ReviewPage.tsx:43:  const tasksQuery = useReviewTasks(householdId);
+frontend/src/routes/InboxPage.tsx:10:import { useReviewTasks } from "../hooks/useAssets";
+frontend/src/routes/InboxPage.tsx:24:  const tasks = useReviewTasks(effectiveHousehold);
+
+== useHouseholds( occurrences incl. tests TARGET (test files stub the module, not this call form) ==
+frontend/src/hooks/HouseholdContext.tsx:23:  const { data: households, isError, error } = useHouseholds();
+frontend/src/hooks/useAssets.ts:54:export function useHouseholds() {
+
+classification: product useHouseholds( sites 3 -> 2 (definition useAssets.ts + provider HouseholdContext.tsx); query DEFINITIONS of review-tasks 2 -> 1 (useReviewTasks); the two remaining ["review-tasks"] literals on the target are invalidateQueries calls (ReviewPage preserved line, InboxPage).
