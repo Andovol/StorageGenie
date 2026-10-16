@@ -1,0 +1,12 @@
+[sg199] static server on 127.0.0.1:8011 for /tmp/opencode/sg199/candidate/frontend/dist
+[sg199] browser: HeadlessChrome/149.0.7827.55
+[sg199] browser stderr: [1016/211146.741007:ERROR:dbus/bus.cc:405] Failed to connect to the bus: Could not parse server address: Unknown address type (examples of valid types are "tcp" and on UNIX "unix")
+[sg199] browser stderr: [1016/211146.741097:ERROR:dbus/object_proxy.cc:572] Failed to call method: org.freedesktop.DBus.NameHasOwner: object_path= /org/freedesktop/DBus: unknown error type:
+[sg199] touch catalog ok
+[sg199] touch capture ok
+[sg199] touch inbox ok
+[sg199] touch planning ok
+[sg199] touch analytics ok
+[sg199] touch asset_detail ok
+[sg199] wrote /tmp/opencode/sg199/out-touch/result.json elapsed 18s
+{"outFile":"/tmp/opencode/sg199/out-touch/result.json","elapsedSeconds":18,"controlFailures":0,"touchRoutes":6,"zoomRoutes":null,"darkRoutes":null,"errors":[],"loopbackDriverGets":74}

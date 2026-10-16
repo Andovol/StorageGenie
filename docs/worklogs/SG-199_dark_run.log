@@ -1,0 +1,12 @@
+[sg199] static server on 127.0.0.1:8011 for /tmp/opencode/sg199/candidate/frontend/dist
+[sg199] browser: HeadlessChrome/149.0.7827.55
+[sg199] browser stderr: [1016/211220.535745:ERROR:dbus/bus.cc:405] Failed to connect to the bus: Could not parse server address: Unknown address type (examples of valid types are "tcp" and on UNIX "unix")
+[sg199] browser stderr: [1016/211220.535835:ERROR:dbus/object_proxy.cc:572] Failed to call method: org.freedesktop.DBus.NameHasOwner: object_path= /org/freedesktop/DBus: unknown error type:
+[sg199] dark catalog ok dark=true
+[sg199] dark capture ok dark=true
+[sg199] dark inbox ok dark=true
+[sg199] dark planning ok dark=true
+[sg199] dark analytics ok dark=true
+[sg199] dark asset_detail ok dark=true
+[sg199] wrote /tmp/opencode/sg199/out-dark/result.json elapsed 16s
+{"outFile":"/tmp/opencode/sg199/out-dark/result.json","elapsedSeconds":16,"controlFailures":0,"touchRoutes":null,"zoomRoutes":null,"darkRoutes":6,"errors":[],"loopbackDriverGets":90}

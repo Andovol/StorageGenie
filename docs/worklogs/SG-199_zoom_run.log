@@ -1,0 +1,12 @@
+[sg199] static server on 127.0.0.1:8011 for /tmp/opencode/sg199/candidate/frontend/dist
+[sg199] browser: HeadlessChrome/149.0.7827.55
+[sg199] browser stderr: [1016/211204.417975:ERROR:dbus/bus.cc:405] Failed to connect to the bus: Could not parse server address: Unknown address type (examples of valid types are "tcp" and on UNIX "unix")
+[sg199] browser stderr: [1016/211204.418059:ERROR:dbus/object_proxy.cc:572] Failed to call method: org.freedesktop.DBus.NameHasOwner: object_path= /org/freedesktop/DBus: unknown error type:
+[sg199] zoom catalog ok100 ok200
+[sg199] zoom capture ok100 ok200
+[sg199] zoom inbox ok100 ok200
+[sg199] zoom planning ok100 ok200
+[sg199] zoom analytics ok100 ok200
+[sg199] zoom asset_detail ok100 ok200
+[sg199] wrote /tmp/opencode/sg199/out-zoom/result.json elapsed 16s
+{"outFile":"/tmp/opencode/sg199/out-zoom/result.json","elapsedSeconds":16,"controlFailures":0,"touchRoutes":null,"zoomRoutes":6,"darkRoutes":null,"errors":[],"loopbackDriverGets":108}
