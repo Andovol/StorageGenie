@@ -1,0 +1,11 @@
+Partial-Receipt-ID: SG-195
+utc=2026-10-16T17:28:48Z
+killed=exit_no_receipt
+pushed=0
+uncommitted=none
+wip=none
+wip_elapsed_ms=67
+DISPATCH_RESULT id=SG-195 coder=opencode exit=0 head=5c99cd7292a2f33f469426e3d6f77a585a304a57 note=no moved=yes rewrite=no dirty=no elapsed=486s budget=2100s killed=exit_no_receipt stragglers=0
+P1_moved=PASS count=3
+P2_rewrite=PASS behind=0
+P6_dirty=PASS dirty=no
