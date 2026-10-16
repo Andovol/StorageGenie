@@ -1,0 +1,58 @@
+SG-197 post-recreate state; captured 2026-10-16T19:42:15Z
+== container (lane) ==
+CONTAINER ID   IMAGE                  COMMAND                  CREATED          STATUS                    PORTS                      NAMES
+a77e3f2ff0dd   storagegenie-backend   "uvicorn app.main:ap…"   56 seconds ago   Up 54 seconds (healthy)   127.0.0.1:8003->8000/tcp   storagegenie-backend-1
+ps_exit=0
+Id=a77e3f2ff0ddc844888db24959d9e139395d1edfcf88e1ecade4efe009a81e0c Created=2026-10-16T19:41:19.974177688Z RestartCount=0 Image=sha256:e3b7c0aad28b4f27a07bf1032870d25eb50de3eefcde64581b8a9d780ec9468c State=running StartedAt=2026-10-16T19:41:21.658871595Z Health=healthy
+inspect_exit=0
+== served bundle (live server, post-recreate) ==
+index_http=200 bytes=944
+5ce95f29a81bcc48e0ad1de94ed926c91a1a9f91bf4ba5444da8490cb014bc40  /tmp/opencode/sg197_index_post.html
+/assets/index-DHv-3aM4.css HTTP 200 bytes=4541
+e1e5ff6385e02f80e05bb94732b4d93dcf59cca184139e22164c0fad4a26f042  /tmp/opencode/sg197_post_index-DHv-3aM4.css
+/assets/index-_9IDZb0V.js HTTP 200 bytes=325053
+8ba02c647f29cc401f5b9a92f759a4a46441a67b2709be1bdf19622edcc8e88a  /tmp/opencode/sg197_post_index-_9IDZb0V.js
+== db read-only re-read (post) ==
+total 704
+drwxr-xr-x 2 andrei andrei   4096 Oct 16 19:41 .
+drwxr-xr-x 4 andrei andrei   4096 Sep  2 12:00 ..
+-rw------- 1 andrei andrei 675840 Oct 12 20:03 storagegenie.db
+-rw------- 1 andrei andrei  32768 Oct 16 19:41 storagegenie.db-shm
+-rw------- 1 andrei andrei      0 Oct 16 19:41 storagegenie.db-wal
+db_path /home/andrei/StorageGenie/data/db/storagegenie.db
+db_sha256 e6bef157440fb8b4a3262577362b071dcae07507ea9a7e04a614e11be28ee5bd
+table_count 28
+tables alembic_version assertion asset asset_evidence asset_fts asset_fts_config asset_fts_data asset_fts_docsize asset_fts_idx asset_location asset_relation audit_event candidate enrich_snapshot evidence guardrail_event household idempotency_key job job_step location observation planning_suggestion provider_call review_task saved_search source_attribution user
+alembic_version [('20260924_sg114_relation',)]
+count alembic_version 1
+count assertion 37
+count asset 7
+count asset_evidence 14
+count asset_fts 7
+count asset_fts_config 1
+count asset_fts_data 9
+count asset_fts_docsize 7
+count asset_fts_idx 7
+count asset_location 1
+count asset_relation 1
+count audit_event 91
+count candidate 10
+count enrich_snapshot 4
+count evidence 18
+count guardrail_event 2
+count household 1
+count idempotency_key 11
+count job 11
+count job_step 72
+count location 1
+count observation 20
+count planning_suggestion 0
+count provider_call 29
+count review_task 8
+count saved_search 0
+count source_attribution 0
+count user 2
+review_task_statuses {'resolved': 8}
+READONLY_OK
+end_db_sha256 e6bef157440fb8b4a3262577362b071dcae07507ea9a7e04a614e11be28ee5bd
+END_READONLY_OK

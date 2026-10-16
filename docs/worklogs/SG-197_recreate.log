@@ -1,0 +1,15 @@
+SG-197 recreate issuance #1 (of exactly one); 2026-10-16T19:41:19Z
+cmd: DOCKER_HOST=unix:///run/dispatch-storagegenie-SG-197/docker.sock timeout 120 docker compose up -d --no-deps backend
+start_epoch=1792179679
+ Container storagegenie-backend-1 Recreate 
+ Container storagegenie-backend-1 Recreated 
+ Container storagegenie-backend-1 Starting 
+ Container storagegenie-backend-1 Started 
+up_exit=0
+end_epoch=1792179681
+== post-recreate container identity (lane) ==
+Id=a77e3f2ff0ddc844888db24959d9e139395d1edfcf88e1ecade4efe009a81e0c Created=2026-10-16T19:41:19.974177688Z RestartCount=0 Image=sha256:e3b7c0aad28b4f27a07bf1032870d25eb50de3eefcde64581b8a9d780ec9468c State=running StartedAt=2026-10-16T19:41:21.658871595Z Health=starting
+inspect_exit=0
+CONTAINER ID   IMAGE                  COMMAND                  CREATED         STATUS                                     PORTS                      NAMES
+a77e3f2ff0dd   storagegenie-backend   "uvicorn app.main:ap…"   2 seconds ago   Up Less than a second (health: starting)   127.0.0.1:8003->8000/tcp   storagegenie-backend-1
+ps_exit=0

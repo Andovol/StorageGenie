@@ -1,0 +1,44 @@
+SG-197 live route/repair verification; captured 2026-10-16T19:42:16Z
+== SPA routes through the new server (read-only GETs) ==
+/review HTTP 200 type=text/html; charset=utf-8 bytes=944
+5ce95f29a81bcc48e0ad1de94ed926c91a1a9f91bf4ba5444da8490cb014bc40  /tmp/opencode/sg197_page_review.html
+/inbox HTTP 200 type=text/html; charset=utf-8 bytes=944
+5ce95f29a81bcc48e0ad1de94ed926c91a1a9f91bf4ba5444da8490cb014bc40  /tmp/opencode/sg197_page_inbox.html
+/catalog HTTP 200 type=text/html; charset=utf-8 bytes=944
+5ce95f29a81bcc48e0ad1de94ed926c91a1a9f91bf4ba5444da8490cb014bc40  /tmp/opencode/sg197_page_catalog.html
+(index.html post-recreate sha256 for SPA-fallback comparison: 5ce95f29a81bcc48e0ad1de94ed926c91a1a9f91bf4ba5444da8490cb014bc40)
+== CORS preflight (OPTIONS, Origin http://localhost:5173, requested method GET) ==
+HTTP/1.1 200 OK
+date: Fri, 16 Oct 2026 19:42:15 GMT
+server: uvicorn
+vary: Origin
+access-control-allow-methods: GET, POST, PUT, PATCH, DELETE, OPTIONS
+access-control-max-age: 600
+access-control-allow-headers: Accept, Accept-Language, Authorization, Content-Language, Content-Type, Idempotency-Key, If-Match, Origin, X-Requested-With
+access-control-allow-credentials: true
+access-control-allow-origin: http://localhost:5173
+content-length: 2
+content-type: text/plain; charset=utf-8
+
+household_id_prefix 01a0a029
+== CORS on actual GET (household_id supplied) ==
+HTTP 200 bytes=3330
+access-control-allow-credentials: true
+access-control-allow-origin: http://localhost:5173
+review-tasks body head: {"items":[{"id":"01a131a1-11c4-7762-a33a-acb53b4e41e7","task_type":"expiry.manual_entry","priority":"high","subject_ref":"01a131a1-11c3-7f81-b2d9-0842a3cba350",
+== SG-194 served repair: /v1/jobs cursor probes (post-recreate; PG-EV-08 after) ==
+GET /v1/jobs plain: HTTP 200 bytes=2419
+GET /v1/jobs cursor=not-a-cursor: HTTP 422 bytes=94
+GET /v1/jobs cursor=(empty): HTTP 422 bytes=94
+GET /v1/review-tasks cursor=not-a-cursor (SG-188 control): HTTP 422 bytes=94
+body sha256s (plain / bad-cursor / empty-cursor / rt-control):
+045a80a7cb09fee0e98f634d80a5b883aa8a0e28aceca0b9952c71506ea12c07  /tmp/opencode/sg197_post_jobs_page1.json
+d117e66a2a7a79c74d83ce247b60e5ad56c5e4a1cc502fd2cb4182122642d382  /tmp/opencode/sg197_post_jobs_badcursor.json
+d117e66a2a7a79c74d83ce247b60e5ad56c5e4a1cc502fd2cb4182122642d382  /tmp/opencode/sg197_post_jobs_emptycursor.json
+d117e66a2a7a79c74d83ce247b60e5ad56c5e4a1cc502fd2cb4182122642d382  /tmp/opencode/sg197_post_rt_badcursor.json
+jobs bad-cursor body: {"type":"about:blank","title":"Unprocessable Entity","status":422,"detail":"malformed cursor"}
+jobs empty-cursor body: {"type":"about:blank","title":"Unprocessable Entity","status":422,"detail":"malformed cursor"}
+compare plain page-1 body pre vs post:
+IDENTICAL (no row change visible on page 1)
+compare bad-cursor body pre (200 page-1) vs post (422):
+CHANGED as expected (200 page-1 -> 422 malformed cursor)

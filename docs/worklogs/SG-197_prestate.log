@@ -1,0 +1,219 @@
+SG-197 read-only pre-state; captured 2026-10-16T19:38:53Z; before any build/recreate attempt
+now_epoch=1792179533
+== git ==
+requested ref: automation
+fetch_exit=0
+resolved HEAD: e025fc35de3e9da6a40e094521f3cb3a0d887fcd
+resolved HEAD date: 2026-10-16 22:26:34 +0300
+branch: automation
+origin/automation (post-fetch): e025fc35de3e9da6a40e094521f3cb3a0d887fcd
+porcelain:
+?? docs/worklogs/SG-197_prestate.log
+git log -3:
+e025fc3 SG-197 packet: close-out deploy rider serving SG-194+SG-195 (D-3)
+2ff1551 Close: STATE handoff CLOSE_COMPLETE + D-3 parked + ISS-4 filed-84
+f23266f Audit-rate-SG-195-98-error-branches-runner-misfire-ISS-4
+8a67ce3 ancestor of HEAD: yes
+f757ebd ancestor of HEAD: yes
+== product diff guard (merged-vs-served; served base = SG-193 serve commit 3c89c69) ==
+$ git log --oneline 3c89c69..HEAD -- backend frontend
+f757ebd SG-195 G1: failed queries render a named role=alert on Catalog, Inbox, Analytics, Planning, Capture + focused error-branch tests
+8a67ce3 SG-194 G1: jobs list cursor - malformed cursor is a 422 (SG-188 shape mirrored) + focused tests
+$ git diff --stat 3c89c69..HEAD -- backend frontend
+ backend/app/api/v1/jobs.py                      |  13 +-
+ backend/tests/test_sg194_jobs_cursor.py         | 142 ++++++++++++
+ frontend/src/routes/AnalyticsPage.tsx           |   3 +
+ frontend/src/routes/CapturePage.tsx             |   6 +-
+ frontend/src/routes/CatalogPage.tsx             |  19 +-
+ frontend/src/routes/InboxPage.tsx               |   5 +-
+ frontend/src/routes/PlanningPage.tsx            |   8 +-
+ frontend/src/routes/query-error-alerts.test.tsx | 295 ++++++++++++++++++++++++
+ 8 files changed, 473 insertions(+), 18 deletions(-)
+$ git diff --name-only 3c89c69..HEAD -- backend frontend
+backend/app/api/v1/jobs.py
+backend/tests/test_sg194_jobs_cursor.py
+frontend/src/routes/AnalyticsPage.tsx
+frontend/src/routes/CapturePage.tsx
+frontend/src/routes/CatalogPage.tsx
+frontend/src/routes/InboxPage.tsx
+frontend/src/routes/PlanningPage.tsx
+frontend/src/routes/query-error-alerts.test.tsx
+$ git diff --name-only 3c89c69..HEAD -- backend/app/models backend/alembic
+(end models/alembic list)
+== lane identity ==
+RUNTIME_DIRECTORY=/run/dispatch-storagegenie-SG-197 RUNTIME_SOCKETS=docker.sock RUN_BUDGET_S=2100
+srw-rw---T 1 andrei 100987 0 Oct 16 17:19 /run/dispatch-storagegenie-SG-197/docker.sock
+opencode pid=169319 cmdline(head): opencode run --auto --dir /home/andrei/StorageGenie --model opencode-go/deepseek-v4.1-flash --variant max # SG-197 — Close-out deploy rider: serve the two rat
+
+`PB-1`–`PB-6` bind (`CODER.md` §14).
+**BASE REF: automation.** Echo requested ref and actual resolved commit separately.
+**DATABASE: production SQLite read-only.** No schema migration or application data write.
+**Restart: exactly one backend rebuild + one recreate.**
+**Autonomy: L3.** Production authorization basis: owner D-3 approval 2026-10-16 (chat "D3 - approved."; recorded `docs/decisions/2026-10-16-close-out-deploy-d3.
+
+Authoring date (metadata, never a gate): 2026-10-16.
+
+## Why this exists
+
+SG-193 served SG-185..SG-190 (container `e8a6ed6985ef`, image `c3b85d5a…`, bundle `fd4a916e…` 324210 B — EXPECTED pre-state, re-read on target). Two rated
+- EXPECTED `8a67ce3` SG-194 jobs list cursor — malformed cursor is a 422 (SG-188 shape mirrored) + focused tests (`backend/app/api/v1/jobs.py`, `backend/tests
+- EXPECTED `f757ebd` SG-195 failed queries render a named role=alert on Catalog, Inbox, Analytics, Planning, Capture + focused error-branch tests (5 route files
+
+Verify each EXPECTED hash is an ancestor of HEAD (reachability form); never assert HEAD equals any hash (`PG-IC-07`).
+
+Previous reports' open items answered: SG-194 REMAINING closed in its audit except serving (this rider) + known-host env rows to STATE (no project action); SG-1
+
+Expected recorded/published/host contract 0.50.0; previous host echo from SG-195_report.md FIRST READ (`/home/andrei/storagegenie-contract/`, complete 0.50.0 co
+
+Waste cut (`D434`/`D436`): none owed — most recent audit SG-195 names `slowest_waste = none`; SG-194's `5s precommit-focused` was already removed (SG-195 obey
+
+## G1 — Pre-state, one rebuild, one recreate — lane socket only
+
+Establish read-only pre-state: actual ref/hash, clean tree, running image/container ID/Created/RestartCount, health status/body, served JS/CSS/index hashes, sch
+
+Docker endpoint rule (SG-191 correction, carried — read twice, then obey): every Docker call runs with `DOCKER_HOST` set to YOUR unit's own runtime socket as 
+
+Then, through the lane socket only: build the backend image exactly once, then recreate the backend container exactly once (`PG-PR-04`: this is how the code bec
+
+## G2 — Verify the two repairs are served, without claiming more
+
+Observe a new container identity and start time (recreate proven by container ID/Created, not RestartCount). Health ok for DB/storage; six health GETs as the st
+
+Run the two slices' focused test modules in-process against the merged tree (enumerate them from the two reports on target — EXPECT the SG-194 cursor tests + 
+
+Prove the serve live: served bundle hash DIFFERENT from `fd4a916e…` unless the build proves byte-identical for a stated reason (a retained hash over changed p
+
+## Constraints
+
+Scope: `docs/worklogs/SG-197*` only. No product, configuration, schema, migration or test edits. No production INSERT/UPDATE/DELETE, manual resolving, imports o
+
+Full suite waived per `PG-DP-02` with substitute above. Runtime-vs-lane budget reported with seconds and source, never guessed (`PG-PR-06`: seconds, from the la
+
+## Acceptance and report
+
+- A1: one rebuild + one recreate THROUGH THE LANE SOCKET, direct new running-instance proof, health green and explicit application/schema/count deltas; served b
+- A2: actual base/hash and merged-vs-served diff checked — only the two expected sets differ; still-open items expressly identified as unchanged (SG-195 out-o
+- A3: command logs and final report `docs/worklogs/SG-197_report.md`; elapsed per leg and total vs observed lane bound; all constraints answered; FIRST READ / D
+- A4: notes-ref receipt on `refs/notes/storagegenie-coder-reports` published and mapped-fetch/read-back verified, first line `Dispatch-ID: SG-197 | Report: docs
+
+Guards invoked: PG-EV-02/03/08; PG-IC-01/07; PG-DP-01/02; PG-PR-03/04/06/10. Stop follows `PB-6`; no silent deployment on any unrated/blocked result. 
+process_start_epoch=1792179397  (btime 1792171190 + 820763 ticks/100, CLK_TCK 100)
+unit:
+MainPID=169199
+ExecMainStartTimestamp=Fri 2026-10-16 19:36:36 UTC
+== docker capability read via lane socket (DOCKER_HOST=unix:///run/dispatch-storagegenie-SG-197/docker.sock) ==
+Client: Docker Engine - Community
+ Version:           29.6.2
+ API version:       1.55
+ Go version:        go1.26.5
+ Git commit:        dfc4efb
+ Built:             Thu Jul 16 16:12:18 2026
+ OS/Arch:           linux/amd64
+ Context:           default
+
+Server: Docker Engine - Community
+ Engine:
+  Version:          29.6.2
+  API version:      1.55 (minimum version 1.40)
+  Go version:       go1.26.5
+  Git commit:       3d80467
+  Built:            Thu Jul 16 16:12:18 2026
+  OS/Arch:          linux/amd64
+  Experimental:     false
+ containerd:
+  Version:          v2.2.6
+  GitCommit:        11ce9d5f3c68c941867e82890e93e815c1304f1b
+ runc:
+  Version:          1.3.6
+  GitCommit:        v1.3.6-0-g491b69ba
+ docker-init:
+  Version:          0.19.0
+  GitCommit:        de40ad0
+ rootlesskit:
+  Version:          3.0.2
+  ApiVersion:       1.1.2
+  NetworkDriver:    slirp4netns
+  PortDriver:       builtin
+  StateDir:         /run/user/1000/dockerd-rootless
+ slirp4netns:
+  Version:          1.2.1
+  GitCommit:        09e31e92fa3d2a1d3ca261adaeb012c8d75a8194
+docker_version_exit=0
+== running containers (lane) ==
+CONTAINER ID   IMAGE                  COMMAND                  CREATED        STATUS                 PORTS                      NAMES
+e8a6ed6985ef   storagegenie-backend   "uvicorn app.main:ap…"   24 hours ago   Up 2 hours (healthy)   127.0.0.1:8003->8000/tcp   storagegenie-backend-1
+docker_ps_exit=0
+== backend container identity (lane) ==
+Id=e8a6ed6985ef49b5848d35385231186e684745ae0566e764c87811745b07c25a Created=2026-10-15T19:48:14.676658976Z RestartCount=0 Image=sha256:c3b85d5a76c0c601f6f8b1808b85bf7fe9a743bbb49b1be19213fe74e734eac9 State=running StartedAt=2026-10-16T17:20:00.736705702Z Health=healthy
+docker_inspect_exit=0
+Mounts=/home/andrei/StorageGenie/data/db=>/data/db /home/andrei/.local/share/docker/volumes/storagegenie_storage_data/_data=>/data/storage 
+docker_mounts_exit=0
+== health GET (CO-92 start) ==
+{"status":"ok","db":"ok","storage":"ok"}
+HTTP 200
+health_exit=0
+== served bundle (live server, pre-recreate) ==
+index_http=200 bytes=944
+dc9fbbbf50c25d2cd8c756c614e798bd691898b5191e2b5769506bcf3fe0aba0  /tmp/opencode/sg197_index_pre.html
+/assets/index-DE13qk1Q.js HTTP 200 bytes=324210
+fd4a916e6175e414f24b1ab2538cc331a5841fe41a94fad46f1299651f070b70  /tmp/opencode/sg197_pre_index-DE13qk1Q.js
+/assets/index-DHv-3aM4.css HTTP 200 bytes=4541
+e1e5ff6385e02f80e05bb94732b4d93dcf59cca184139e22164c0fad4a26f042  /tmp/opencode/sg197_pre_index-DHv-3aM4.css
+== pre-serve API shape (PG-EV-08; before) ==
+household_id_prefix 01a0a029
+GET /v1/jobs plain: HTTP 200 bytes=2419
+GET /v1/jobs cursor=not-a-cursor: HTTP 200 bytes=2419
+GET /v1/jobs cursor=(empty): HTTP 200 bytes=2419
+GET /v1/review-tasks cursor=not-a-cursor (SG-188 control, already served): HTTP 422 bytes=94
+body sha256s:
+045a80a7cb09fee0e98f634d80a5b883aa8a0e28aceca0b9952c71506ea12c07  /tmp/opencode/sg197_pre_jobs_page1.json
+045a80a7cb09fee0e98f634d80a5b883aa8a0e28aceca0b9952c71506ea12c07  /tmp/opencode/sg197_pre_jobs_badcursor.json
+045a80a7cb09fee0e98f634d80a5b883aa8a0e28aceca0b9952c71506ea12c07  /tmp/opencode/sg197_pre_jobs_emptycursor.json
+d117e66a2a7a79c74d83ce247b60e5ad56c5e4a1cc502fd2cb4182122642d382  /tmp/opencode/sg197_pre_rt_badcursor.json
+bad-cursor body head: {"items":[{"id":"01a131a0-ca8e-7673-9869-af5a26264a73","job_type":"import","state":"RUNNING","household_id":"01a0a029-1477-7ca0-b200-bce78a96c679","created_at":"2026-10-12T19:39:43","updated_at":"2026-10-12T19:55:43.6115
+rt-control body head: {"type":"about:blank","title":"Unprocessable Entity","status":422,"detail":"malformed cursor"}
+== db read-only (production SQLite) ==
+total 704
+drwxr-xr-x 2 andrei andrei   4096 Oct 16 17:20 .
+drwxr-xr-x 4 andrei andrei   4096 Sep  2 12:00 ..
+-rw------- 1 andrei andrei 675840 Oct 12 20:03 storagegenie.db
+-rw------- 1 andrei andrei  32768 Oct 16 17:20 storagegenie.db-shm
+-rw------- 1 andrei andrei      0 Oct 16 17:20 storagegenie.db-wal
+db_path /home/andrei/StorageGenie/data/db/storagegenie.db
+db_sha256 e6bef157440fb8b4a3262577362b071dcae07507ea9a7e04a614e11be28ee5bd
+table_count 28
+tables alembic_version assertion asset asset_evidence asset_fts asset_fts_config asset_fts_data asset_fts_docsize asset_fts_idx asset_location asset_relation audit_event candidate enrich_snapshot evidence guardrail_event household idempotency_key job job_step location observation planning_suggestion provider_call review_task saved_search source_attribution user
+alembic_version [('20260924_sg114_relation',)]
+count alembic_version 1
+count assertion 37
+count asset 7
+count asset_evidence 14
+count asset_fts 7
+count asset_fts_config 1
+count asset_fts_data 9
+count asset_fts_docsize 7
+count asset_fts_idx 7
+count asset_location 1
+count asset_relation 1
+count audit_event 91
+count candidate 10
+count enrich_snapshot 4
+count evidence 18
+count guardrail_event 2
+count household 1
+count idempotency_key 11
+count job 11
+count job_step 72
+count location 1
+count observation 20
+count planning_suggestion 0
+count provider_call 29
+count review_task 8
+count saved_search 0
+count source_attribution 0
+count user 2
+review_task_statuses {'resolved': 8}
+household_ids ['01a0a029-1477-7ca0-b200-bce78a96c679']
+READONLY_OK
+end_db_sha256 e6bef157440fb8b4a3262577362b071dcae07507ea9a7e04a614e11be28ee5bd
+END_READONLY_OK

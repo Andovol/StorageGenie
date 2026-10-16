@@ -1,0 +1,19 @@
+SG-197 post-recreate health; six GETs (standing precedent, not a reliability rate); captured 2026-10-16T19:42:00Z
+-- GET 1 @ 2026-10-16T19:42:00Z --
+{"status":"ok","db":"ok","storage":"ok"}
+HTTP 200
+-- GET 2 @ 2026-10-16T19:42:03Z --
+{"status":"ok","db":"ok","storage":"ok"}
+HTTP 200
+-- GET 3 @ 2026-10-16T19:42:06Z --
+{"status":"ok","db":"ok","storage":"ok"}
+HTTP 200
+-- GET 4 @ 2026-10-16T19:42:09Z --
+{"status":"ok","db":"ok","storage":"ok"}
+HTTP 200
+-- GET 5 @ 2026-10-16T19:42:12Z --
+{"status":"ok","db":"ok","storage":"ok"}
+HTTP 200
+-- GET 6 @ 2026-10-16T19:42:15Z --
+{"status":"ok","db":"ok","storage":"ok"}
+HTTP 200

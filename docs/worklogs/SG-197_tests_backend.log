@@ -1,0 +1,136 @@
+SG-197 focused backend tests (set enumerated from SG-194_report.md PASS half); 2026-10-16T19:42:44Z
+cmd: timeout 120 ../venv/bin/python -m pytest -q -rA tests/test_sg194_jobs_cursor.py tests/test_import_jobs.py tests/test_export.py tests/test_sg127_followup_batch.py (cwd=backend)
+
+==================================== ERRORS ====================================
+_______________ ERROR collecting tests/test_sg194_jobs_cursor.py _______________
+ImportError while importing test module '/home/andrei/StorageGenie/backend/tests/test_sg194_jobs_cursor.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+/usr/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_sg194_jobs_cursor.py:24: in <module>
+    from app.main import app
+app/main.py:9: in <module>
+    from app.api.v1.analytics import router as analytics_router
+app/api/v1/analytics.py:19: in <module>
+    from app.services.analytics import service
+app/services/analytics/service.py:50: in <module>
+    from app.services.providers import reader as reader_mod
+app/services/providers/reader.py:35: in <module>
+    from app.services.evidence_service import store_text_evidence
+app/services/evidence_service.py:11: in <module>
+    from pillow_heif import register_heif_opener
+E   ModuleNotFoundError: No module named 'pillow_heif'
+__________________ ERROR collecting tests/test_import_jobs.py __________________
+ImportError while importing test module '/home/andrei/StorageGenie/backend/tests/test_import_jobs.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+/usr/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_import_jobs.py:13: in <module>
+    from app.main import app
+app/main.py:9: in <module>
+    from app.api.v1.analytics import router as analytics_router
+app/api/v1/analytics.py:19: in <module>
+    from app.services.analytics import service
+app/services/analytics/service.py:50: in <module>
+    from app.services.providers import reader as reader_mod
+app/services/providers/reader.py:35: in <module>
+    from app.services.evidence_service import store_text_evidence
+app/services/evidence_service.py:11: in <module>
+    from pillow_heif import register_heif_opener
+E   ModuleNotFoundError: No module named 'pillow_heif'
+____________________ ERROR collecting tests/test_export.py _____________________
+ImportError while importing test module '/home/andrei/StorageGenie/backend/tests/test_export.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+/usr/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_export.py:17: in <module>
+    from app.main import app
+app/main.py:9: in <module>
+    from app.api.v1.analytics import router as analytics_router
+app/api/v1/analytics.py:19: in <module>
+    from app.services.analytics import service
+app/services/analytics/service.py:50: in <module>
+    from app.services.providers import reader as reader_mod
+app/services/providers/reader.py:35: in <module>
+    from app.services.evidence_service import store_text_evidence
+app/services/evidence_service.py:11: in <module>
+    from pillow_heif import register_heif_opener
+E   ModuleNotFoundError: No module named 'pillow_heif'
+_____________ ERROR collecting tests/test_sg127_followup_batch.py ______________
+ImportError while importing test module '/home/andrei/StorageGenie/backend/tests/test_sg127_followup_batch.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+/usr/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_sg127_followup_batch.py:23: in <module>
+    import pillow_heif
+E   ModuleNotFoundError: No module named 'pillow_heif'
+=============================== warnings summary ===============================
+../venv/lib/python3.12/site-packages/fastapi/testclient.py:1
+  /home/andrei/StorageGenie/venv/lib/python3.12/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+ERROR tests/test_sg194_jobs_cursor.py
+ERROR tests/test_import_jobs.py
+ERROR tests/test_export.py
+ERROR tests/test_sg127_followup_batch.py
+!!!!!!!!!!!!!!!!!!! Interrupted: 4 errors during collection !!!!!!!!!!!!!!!!!!!!
+1 warning, 4 errors in 1.51s
+pytest_exit=2
+end_epoch=1792179767
+
+=== attempt 2 (corrected invocation: interpreter venv/bin/python (backend-local venv, the one SG-194 used); attempt 1 used ../venv (root) -> ModuleNotFoundError pillow_heif, 4 collection errors, zero tests executed) 2026-10-16T19:43:11Z
+cmd: timeout 120 venv/bin/python -m pytest -q -rA tests/test_sg194_jobs_cursor.py tests/test_import_jobs.py tests/test_export.py tests/test_sg127_followup_batch.py (cwd=backend)
+....................                                                     [100%]
+=============================== warnings summary ===============================
+venv/lib/python3.12/site-packages/fastapi/testclient.py:1
+  /home/andrei/StorageGenie/backend/venv/lib/python3.12/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+venv/lib/python3.12/site-packages/starlette/testclient.py:53
+  /home/andrei/StorageGenie/backend/venv/lib/python3.12/site-packages/starlette/testclient.py:53: DeprecationWarning: The anyio.abc.BlockingPortal alias is deprecated, use anyio.from_thread.BlockingPortal instead.
+    _PortalFactoryType = Callable[[], AbstractContextManager[anyio.abc.BlockingPortal]]
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+==================================== PASSES ====================================
+_____________________ test_import_create_run_and_jobs_list _____________________
+------------------------------ Captured log call -------------------------------
+WARNING  app.services.signals:signals.py:104 Barcode extraction unavailable: pyzbar/libzbar is not installed
+WARNING  app.services.signals:signals.py:215 OCR extraction unavailable: tesseract is not installed or it's not in your PATH. See README file for more information.
+_________________ test_failure_retry_is_durable_and_idempotent _________________
+------------------------------ Captured log call -------------------------------
+WARNING  app.services.signals:signals.py:104 Barcode extraction unavailable: pyzbar/libzbar is not installed
+WARNING  app.services.signals:signals.py:215 OCR extraction unavailable: tesseract is not installed or it's not in your PATH. See README file for more information.
+=========================== short test summary info ============================
+PASSED tests/test_sg194_jobs_cursor.py::test_malformed_cursor_refused_on_jobs_list
+PASSED tests/test_sg194_jobs_cursor.py::test_absent_cursor_is_first_page_unchanged
+PASSED tests/test_sg194_jobs_cursor.py::test_valid_cursor_walk_is_lossless
+PASSED tests/test_import_jobs.py::test_import_create_run_and_jobs_list
+PASSED tests/test_import_jobs.py::test_failure_retry_is_durable_and_idempotent
+PASSED tests/test_import_jobs.py::test_import_idempotency_and_cross_household_protection
+PASSED tests/test_export.py::test_export_manifest_is_complete_and_downloadable
+PASSED tests/test_export.py::test_export_manifest_restores_into_a_fresh_database
+PASSED tests/test_export.py::test_phase_zero_list_stubs_have_paginated_envelopes[/v1/jobs]
+PASSED tests/test_export.py::test_phase_zero_list_stubs_have_paginated_envelopes[/v1/review-tasks]
+PASSED tests/test_export.py::test_asset_idempotency_is_persisted_and_reused
+PASSED tests/test_sg127_followup_batch.py::test_served_thumbnail_bytes_match_served_name[jpeg]
+PASSED tests/test_sg127_followup_batch.py::test_served_thumbnail_bytes_match_served_name[png]
+PASSED tests/test_sg127_followup_batch.py::test_served_thumbnail_bytes_match_served_name[webp]
+PASSED tests/test_sg127_followup_batch.py::test_served_thumbnail_bytes_match_served_name[heic]
+PASSED tests/test_sg127_followup_batch.py::test_jpeg_thumbnail_still_generated_and_bounded
+PASSED tests/test_sg127_followup_batch.py::test_extraction_brand_reaches_served_candidate_and_committed_assertion
+PASSED tests/test_sg127_followup_batch.py::test_extraction_null_brand_stays_null
+PASSED tests/test_sg127_followup_batch.py::test_split_child_keeps_its_own_brand_or_none
+PASSED tests/test_sg127_followup_batch.py::test_job_candidates_route_lists_and_gates
+20 passed, 2 warnings in 5.34s
+pytest_exit=0
+end_epoch=1792179797
