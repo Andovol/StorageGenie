@@ -757,3 +757,9 @@ Originals above (88 FLAG:TRUST / 91 FLAG:TRUST) stand as the audit trail; the ve
 | slice_id | phase | model | effort | score | flag | lever | guards_invoked | deduction_attribution | remaining | escape | slowest_waste |
 |---|---|---|---|---|---|---|---|---|---|---|---|
 | SG-196 | Nav household context/count (starter arc/D16); WORK receipt verified (dual paste note missing - runner report_unreadable misfire, 2nd ISS-4 instance, not slice fault); shared context (9 sites to 1 + AppHeader outlier); nav selector + household alert + Inbox badge + 2 Catalog branch alerts; 13 genuine tests (8 FAIL base + 13 PASS); suite 296/296; tsc/eslint clean; census base-vs-target; under estimate; audit SG-196_audit.md | opencode/opencode-go/deepseek-v4.1-flash (receipt settings) | max | 98 |  |  | PG-EV-01/02/03/09; PG-IC-01/07/09; PG-PR-03/06 |  | AppHeader outlier + ReviewPage inline query to follow-up candidate; zoom/touch/dark + backend suite stand; runner-misfire 2nd instance to desk #84 |  | none |
+
+### SG-198 (2026-10-16 - consolidation outliers)
+
+| slice_id | phase | model | effort | score | flag | lever | guards_invoked | deduction_attribution | remaining | escape | slowest_waste |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| SG-198 | Consolidation micro-slice (starter arc/D16); WORK receipt verified (dual paste note missing - runner report_unreadable misfire, 3rd ISS-4 instance, not slice fault); AppHeader onto context + ReviewPage onto useReviewTasks, zero behavior change; re-proof only (no FAIL half owed); suite 298/298; tsc/eslint clean; census 3-to-2 + 2-to-1; 19 s over estimate, stated; audit SG-198_audit.md | opencode/opencode-go/deepseek-v4.1-flash (receipt settings) | max | 98 |  |  | PG-EV-01/02/03; PG-IC-01/07/09; PG-PR-03/06 |  | zoom/touch/dark + backend suite stand; runner-misfire 3rd instance to desk #84 |  | none |
