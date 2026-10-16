@@ -114,7 +114,7 @@ export function CatalogPage() {
     setCursor(undefined);
   }, [effectiveHousehold, q, category]);
 
-  const { data, isLoading, isFetching } = useAssets(
+  const { data, isLoading, isFetching, isError, error } = useAssets(
     effectiveHousehold,
     q,
     cursor,
@@ -219,6 +219,9 @@ export function CatalogPage() {
       onSavedSearchDelete={handleSavedSearchDelete}
       onSaveSearch={handleSaveSearch}
     >
+      {isError && (
+        <div role="alert">Could not load the asset list: {String(error)}</div>
+      )}
       {isLoading && !data ? (
         <ProductGrid
           items={[]}
@@ -229,12 +232,14 @@ export function CatalogPage() {
         />
       ) : (
         <>
-          <ProductGrid
-            items={visibleItems}
-            density={density}
-            householdId={effectiveHousehold}
-            onSelect={setSelectedAssetId}
-          />
+          {!(isError && displayed.length === 0) && (
+            <ProductGrid
+              items={visibleItems}
+              density={density}
+              householdId={effectiveHousehold}
+              onSelect={setSelectedAssetId}
+            />
+          )}
           <div style={{ marginTop: 16, display: "flex", gap: 12, alignItems: "center" }}>
             {nextCursor && (
               <button

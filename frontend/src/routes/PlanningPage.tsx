@@ -20,7 +20,7 @@ import { useHouseholds } from "../hooks/useAssets";
 const STATUS_OPTIONS = ["", "pending", "confirmed", "dismissed"] as const;
 
 export function PlanningPage() {
-  const { data: households } = useHouseholds();
+  const { data: households, isError: householdsIsError, error: householdsError } = useHouseholds();
   const [householdId, setHouseholdId] = useState(
     () => localStorage.getItem("household_id") || ""
   );
@@ -78,6 +78,9 @@ export function PlanningPage() {
           households={households as Household[] | undefined}
         />
       </div>
+      {householdsIsError && (
+        <div role="alert">Could not load households: {String(householdsError)}</div>
+      )}
       <p className="text-muted-foreground" style={{ fontSize: 13 }}>
         Suggestions are proposals only. Confirming or dismissing one changes no asset, job
         or setting; nothing is ever executed automatically.
@@ -117,6 +120,9 @@ export function PlanningPage() {
 
       <section style={{ marginTop: 20, display: "grid", gap: 8 }}>
         {suggestions.isLoading && <div>Loading suggestions…</div>}
+        {suggestions.isError && (
+          <div role="alert">Could not load planning suggestions: {String(suggestions.error)}</div>
+        )}
         {!suggestions.isLoading && suggestions.data?.items.length === 0 && (
           <div role="status">No planning suggestions yet.</div>
         )}

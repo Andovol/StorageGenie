@@ -7,7 +7,7 @@ import { CONTROL_STYLE, THEMED_CONTROL_CLASS } from "../components/shell/Catalog
 import { PageContainer } from "../components/shell/PageContainer";
 
 export function CapturePage() {
-  const { data: households } = useHouseholds();
+  const { data: households, isError: householdsIsError, error: householdsError } = useHouseholds();
   const [householdId, setHouseholdId] = useState(() => localStorage.getItem("household_id") || "");
   const navigate = useNavigate();
 
@@ -38,7 +38,9 @@ export function CapturePage() {
           emptyOptionLabel=""
         />
       </div>
-      {!effective ? (
+      {householdsIsError ? (
+        <div role="alert">Could not load households: {String(householdsError)}</div>
+      ) : !effective ? (
         <div className="text-muted-foreground">No household available — seed the database first.</div>
       ) : (
         <PageContainer variant="form">

@@ -91,6 +91,9 @@ export function AnalyticsPage() {
       </p>
 
       {summary.isLoading && <div>Loading analytics…</div>}
+      {summary.isError && (
+        <div role="alert">Could not load the analytics summary: {String(summary.error)}</div>
+      )}
       {!summary.isLoading && data && data.assets.total === 0 && (
         <div role="status">No analytics data yet for this household.</div>
       )}
