@@ -1,0 +1,3460 @@
+SG-195 focused FAIL half — isolated base worktree (PG-EV-01/09)
+date_utc=2026-10-16T17:26:16Z
+cmd: node_modules/.bin/vitest run src/routes/query-error-alerts.test.tsx  (timeout 120)
+base worktree HEAD: 7edf5f50cac953e2a1d363765ca5dfc1626064a0
+worktree: /tmp/opencode/sg195-base (detached at packet base)
+===
+
+ RUN  v1.6.1 /tmp/opencode/sg195-base/frontend
+
+stderr | src/routes/query-error-alerts.test.tsx > SG-195 route query-error alerts > Catalog: a failed asset-list query alerts naming the list and hides the empty view
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+ ❯ src/routes/query-error-alerts.test.tsx  (17 tests | 8 failed) 8304ms
+   ❯ src/routes/query-error-alerts.test.tsx > SG-195 route query-error alerts > Catalog: a failed asset-list query alerts naming the list and hides the empty view
+     → Unable to find role="alert"
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<div[39m
+      [33mclass[39m=[32m"bg-background text-foreground"[39m
+      [33mstyle[39m=[32m"min-height: 100vh;"[39m
+    [36m>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"bg-background"[39m
+        [33mstyle[39m=[32m"position: sticky; top: 0px; z-index: 10;"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"bg-card border-border"[39m
+          [33mstyle[39m=[32m"display: flex; flex-wrap: wrap; align-items: center; gap: 12px; row-gap: 8px; padding: 10px 24px; border-bottom-style: solid; border-bottom-width: 1px;"[39m
+        [36m>[39m
+          [36m<span[39m
+            [33maria-label[39m=[32m"Total loaded items: 0"[39m
+            [33mclass[39m=[32m"bg-card-muted text-muted-foreground"[39m
+            [33mstyle[39m=[32m"font-size: 12px; padding: 2px 8px; border-radius: 999px;"[39m
+            [33mtitle[39m=[32m"Items loaded on this page, not the household total"[39m
+          [36m>[39m
+            [0mLoaded: [0m
+            [0m0[0m
+            [0m [0m
+            [0mitems[0m
+          [36m</span>[39m
+          [36m<div[39m
+            [33maria-hidden[39m=[32m"true"[39m
+            [33mstyle[39m=[32m"flex: 1 1 0%;"[39m
+          [36m/>[39m
+          [36m<input[39m
+            [33maria-label[39m=[32m"Search catalog"[39m
+            [33mclass[39m=[32m"bg-background text-foreground border-border focus-ring"[39m
+            [33mplaceholder[39m=[32m"Search…"[39m
+            [33mstyle[39m=[32m"padding: 6px 10px; border-radius: 6px; border-style: solid; border-width: 1px; flex: 1 1 180px; min-width: 180px; max-width: 420px; font-size: 13px;"[39m
+            [33mtype[39m=[32m"search"[39m
+            [33mvalue[39m=[32m""[39m
+          [36m/>[39m
+          [36m<button[39m
+            [33maria-label[39m=[32m"Switch to dark theme"[39m
+            [33mclass[39m=[32m"bg-card text-foreground border-border focus-ring"[39m
+            [33mstyle[39m=[32m"display: inline-flex; align-items: center; justify-content: center; padding: 6px; border-radius: 6px; border-style: solid; border-width: 1px; cursor: pointer;"[39m
+            [33mtitle[39m=[32m"Switch to dark theme"[39m
+            [33mtype[39m=[32m"button"[39m
+          [36m>[39m
+            [36m<svg[39m
+              [33maria-hidden[39m=[32m"true"[39m
+              [33mclass[39m=[32m"lucide lucide-moon"[39m
+              [33mfill[39m=[32m"none"[39m
+              [33mheight[39m=[32m"18"[39m
+              [33mstroke[39m=[32m"currentColor"[39m
+              [33mstroke-linecap[39m=[32m"round"[39m
+              [33mstroke-linejoin[39m=[32m"round"[39m
+              [33mstroke-width[39m=[32m"2"[39m
+              [33mviewBox[39m=[32m"0 0 24 24"[39m
+              [33mwidth[39m=[32m"18"[39m
+              [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+            [36m>[39m
+              [36m<path[39m
+                [33md[39m=[32m"M20.985 12.486a9 9 0 1 1-9.473-9.472c.405-.022.617.46.402.803a6 6 0 0 0 8.268 8.268c.344-.215.825-.004.803.401"[39m
+              [36m/>[39m
+            [36m</svg>[39m
+          [36m</button>[39m
+          [36m<a[39m
+            [33mclass[39m=[32m"bg-primary text-primary-foreground focus-ring"[39m
+            [33mhref[39m=[32m"/capture"[39m
+            [33mstyle[39m=[32m"padding: 6px 12px; border-radius: 6px; text-decoration: none; font-weight: 600; font-size: 13px; display: inline-flex; align-items: center; gap: 6px;"[39m
+          [36m>[39m
+            [36m<svg[39m
+              [33maria-hidden[39m=[32m"true"[39m
+              [33mclass[39m=[32m"lucide lucide-upload"[39m
+              [33mfill[39m=[32m"none"[39m
+              [33mheight[39m=[32m"16"[39m
+              [33mstroke[39m=[32m"currentColor"[39m
+              [33mstroke-linecap[39m=[32m"round"[39m
+              [33mstroke-linejoin[39m=[32m"round"[39m
+              [33mstroke-width[39m=[32m"2"[39m
+              [33mviewBox[39m=[32m"0 0 24 24"[39m
+              [33mwidth[39m=[32m"16"[39m
+              [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+            [36m>[39m
+              [36m<path[39m
+                [33md[39m=[32m"M12 3v12"[39m
+              [36m/>[39m
+              [36m<path[39m
+                [33md[39m=[32m"m17 8-5-5-5 5"[39m
+              [36m/>[39m
+              [36m<path[39m
+                [33md[39m=[32m"M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"[39m
+              [36m/>[39m
+            [36m</svg>[39m
+            [0mImport Asset[0m
+          [36m</a>[39m
+        [36m</div>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"bg-card border-border"[39m
+          [33mstyle[39m=[32m"display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 8px 24px; border-bottom-style: solid; border-bottom-width: 1px;"[39m
+        [36m>[39m
+          [36m<select[39m
+            [33maria-label[39m=[32m"Household"[39m
+            [33mclass[39m=[32m"bg-background text-foreground border-border focus-ring"[39m
+            [33mstyle[39m=[32m"padding: 4px 10px; border-radius: 6px; border-style: solid; border-width: 1px; font-size: 13px; cursor: pointer;"[39m
+          [36m>[39m
+            [36m<option[39m
+              [33mvalue[39m=[32m"hh-sg195"[39m
+            [36m>[39m
+              [0mError home[0m
+            [36m</option>[39m
+          [36m</select>[39m
+          [36m<button[39m
+            [33maria-pressed[39m=[32m"true"[39m
+            [33mclass[39m=[32m"bg-primary text-primary-foreground focus-ring"[39m
+            [33mstyle[39m=[32m"padding: 4px 10px; border-radius: 6px; border-style: solid; border-width: 1px; font-size: 13px; cursor: pointer; font-weight: 600;"[39m
+            [33mtype[39m=[32m"button"[39m
+          [36m>[39m
+            [0mAll (0)[0m
+          [36m</button>[39m
+          [36m<select[39m
+            [33maria-label[39m=[32m"Sort catalog"[39m
+            [33mclass[39m=[32m"bg-background text-foreground border-border focus-ring"[39m
+            [33mstyle[39m=[32m"padding: 4px 10px; border-radius: 6px; border-style: solid; border-width: 1px; font-size: 13px; cursor: pointer;"[39m
+          [36m>[39m
+            [36m<option[39m
+              [33mvalue[39m=[32m"recent"[39m
+            [36m>[39m
+              [0mRecently Added[0m
+            [36m</option>[39m
+            [36m<option[39m
+              [33mvalue[39m=[32m"name"[39m
+            [36m>[39m
+              [0mName (A-Z)[0m
+            [36m</option>[39m
+            [36m<option[39m
+              [33mvalue[39m=[32m"status"[39m
+            [36m>[39m
+              [0mProcessing Status[0m
+            [36m</option>[39m
+          [36m</select>[39m
+          [36m<div[39m
+            [33maria-label[39m=[32m"Density"[39m
+            [33mrole[39m=[32m"group"[39m
+            [33mstyle[39m=[32m"display: inline-flex; gap: 4px;"[39m
+          [36m>[39m
+            [36m<button[39m
+              [33maria-pressed[39m=[32m"true"[39m
+              [33mclass[39m=[32m"bg-primary text-primary-foreground focus-ring"[39m
+              [33mstyle[39m=[32m"padding: 4px 10px; border-radius: 6px; border-style: solid; border-width: 1px; font-size: 13px; cursor: pointer; font-weight: 600;"[39m
+              [33mtype[39m=[32m"button"[39m
+            [36m>[39m
+              [0mStandard Grid[0m
+            [36m</button>[39m
+            [36m<button[39m
+              [33maria-pressed[39m=[32m"false"[39m
+              [33mclass[39m=[32m"bg-card-muted text-muted-foreground focus-ring"[39m
+              [33mstyle[39m=[32m"padding: 4px 10px; border-radius: 6px; border-style: solid; border-width: 1px; font-size: 13px; cursor: pointer; font-weight: 400;"[39m
+              [33mtype[39m=[32m"button"[39m
+            [36m>[39m
+              [0mCompact Table[0m
+            [36m</button>[39m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mstyle[39m=[32m"flex: 1 1 0%;"[39m
+          [36m/>[39m
+          [36m<button[39m
+            [33mclass[39m=[32m"bg-card text-foreground border-border focus-ring"[39m
+            [33mdisabled[39m=[32m""[39m
+            [33mstyle[39m=[32m"padding: 4px 10px; border-radius: 6px; border-style: solid; border-width: 1px; font-size: 13px; cursor: pointer; opacity: 0.5;"[39m
+            [33mtype[39m=[32m"button"[39m
+          [36m>[39m
+            [0mSave search[0m
+          [36m</button>[39m
+          [36m<span[39m
+            [33mclass[39m=[32m"text-muted-foreground"[39m
+            [33mstyle[39m=[32m"font-size: 12px;"[39m
+          [36m>[39m
+            [0mNone yet[0m
+          [36m</span>[39m
+        [36m</div>[39m
+      [36m</div>[39m
+      [36m<main[39m
+        [33mclass[39m=[32m"page-container"[39m
+        [33mdata-testid[39m=[32m"page-container"[39m
+        [33mdata-variant[39m=[32m"page"[39m
+        [33mstyle[39m=[32m"width: 100%; max-width: 1100px; margin-left: auto; margin-right: auto; padding: 24px;"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33maria-busy[39m=[32m"false"[39m
+          [33maria-label[39m=[32m"Product results"[39m
+          [33mclass[39m=[32m"border-border text-foreground"[39m
+          [33mdata-testid[39m=[32m"catalog-grid-empty"[39m
+          [33mrole[39m=[32m"region"[39m
+          [33mstyle[39m=[32m"border-style: dashed; border-width: 1px; border-radius: 12px; padding: 56px 24px; display: flex; flex-direction: column; align-items: center; gap: 12px; text-align: center;"[39m
+        [36m>[39m
+          [36m<p[39m
+            [33mclass[39m=[32m"text-muted-foreground"[39m
+            [33mstyle[39m=[32m"margin: 0px;"[39m
+          [36m>[39m
+            [0mNo items match the current view.[0m
+          [36m</p>[39m
+          [36m<a[39m
+            [33mclass[39m=[32m"bg-primary text-primary-foreground focus-ring"[39m
+            [33mhref[39m=[32m"/capture"[39m
+            [33mstyle[39m=[32m"padding: 8px 16px; border-radius: 6px; text-decoration: none; font-weight: 600; font-size: 13px;"[39m
+          [36m>[39m
+            [0mImport New Item[0m
+          [36m</a>[39m
+          [36m<p[39m
+            [33mclass[39m=[32m"text-muted-foreground"[39m
+            [33mstyle[39m=[32m"margin: 0px; font-size: 12px;"[39m
+          [36m>[39m
+            [0mOpens the import dialog: drop, select or paste photos. The Capture route stays for direct navigation.[0m
+          [36m</p>[39m
+        [36m</div>[39m
+        [36m<div[39m
+          [33mstyle[39m=[32m"margin-top: 16px; display: flex; gap: 12px; align-items: center;"[39m
+        [36m/>[39m
+      [36m</main>[39m
+    [36m</div>[39m
+  [36m</div>[39m
+[36m</body>[39m
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<div[39m
+      [33mclass[39m=[32m"bg-background text-foreground"[39m
+      [33mstyle[39m=[32m"min-height: 100vh;"[39m
+    [36m>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"bg-background"[39m
+        [33mstyle[39m=[32m"position: sticky; top: 0px; z-index: 10;"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"bg-card border-border"[39m
+          [33mstyle[39m=[32m"display: flex; flex-wrap: wrap; align-items: center; gap: 12px; row-gap: 8px; padding: 10px 24px; border-bottom-style: solid; border-bottom-width: 1px;"[39m
+        [36m>[39m
+          [36m<span[39m
+            [33maria-label[39m=[32m"Total loaded items: 0"[39m
+            [33mclass[39m=[32m"bg-card-muted text-muted-foreground"[39m
+            [33mstyle[39m=[32m"font-size: 12px; padding: 2px 8px; border-radius: 999px;"[39m
+            [33mtitle[39m=[32m"Items loaded on this page, not the household total"[39m
+          [36m>[39m
+            [0mLoaded: [0m
+            [0m0[0m
+            [0m [0m
+            [0mitems[0m
+          [36m</span>[39m
+          [36m<div[39m
+            [33maria-hidden[39m=[32m"true"[39m
+            [33mstyle[39m=[32m"flex: 1 1 0%;"[39m
+          [36m/>[39m
+          [36m<input[39m
+            [33maria-label[39m=[32m"Search catalog"[39m
+            [33mclass[39m=[32m"bg-background text-foreground border-border focus-ring"[39m
+            [33mplaceholder[39m=[32m"Search…"[39m
+            [33mstyle[39m=[32m"padding: 6px 10px; border-radius: 6px; border-style: solid; border-width: 1px; flex: 1 1 180px; min-width: 180px; max-width: 420px; font-size: 13px;"[39m
+            [33mtype[39m=[32m"search"[39m
+            [33mvalue[39m=[32m""[39m
+          [36m/>[39m
+          [36m<button[39m
+            [33maria-label[39m=[32m"Switch to dark theme"[39m
+            [33mclass[39m=[32m"bg-card text-foreground border-border focus-ring"[39m
+            [33mstyle[39m=[32m"display: inline-flex; align-items: center; justify-content: center; padding: 6px; border-radius: 6px; border-style: solid; border-width: 1px; cursor: pointer;"[39m
+            [33mtitle[39m=[32m"Switch to dark theme"[39m
+            [33mtype[39m=[32m"button"[39m
+          [36m>[39m
+            [36m<svg[39m
+              [33maria-hidden[39m=[32m"true"[39m
+              [33mclass[39m=[32m"lucide lucide-moon"[39m
+              [33mfill[39m=[32m"none"[39m
+              [33mheight[39m=[32m"18"[39m
+              [33mstroke[39m=[32m"currentColor"[39m
+              [33mstroke-linecap[39m=[32m"round"[39m
+              [33mstroke-linejoin[39m=[32m"round"[39m
+              [33mstroke-width[39m=[32m"2"[39m
+              [33mviewBox[39m=[32m"0 0 24 24"[39m
+              [33mwidth[39m=[32m"18"[39m
+              [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+            [36m>[39m
+              [36m<path[39m
+                [33md[39m=[32m"M20.985 12.486a9 9 0 1 1-9.473-9.472c.405-.022.617.46.402.803a6 6 0 0 0 8.268 8.268c.344-.215.825-.004.803.401"[39m
+              [36m/>[39m
+            [36m</svg>[39m
+          [36m</button>[39m
+          [36m<a[39m
+            [33mclass[39m=[32m"bg-primary text-primary-foreground focus-ring"[39m
+            [33mhref[39m=[32m"/capture"[39m
+            [33mstyle[39m=[32m"padding: 6px 12px; border-radius: 6px; text-decoration: none; font-weight: 600; font-size: 13px; display: inline-flex; align-items: center; gap: 6px;"[39m
+          [36m>[39m
+            [36m<svg[39m
+              [33maria-hidden[39m=[32m"true"[39m
+              [33mclass[39m=[32m"lucide lucide-upload"[39m
+              [33mfill[39m=[32m"none"[39m
+              [33mheight[39m=[32m"16"[39m
+              [33mstroke[39m=[32m"currentColor"[39m
+              [33mstroke-linecap[39m=[32m"round"[39m
+              [33mstroke-linejoin[39m=[32m"round"[39m
+              [33mstroke-width[39m=[32m"2"[39m
+              [33mviewBox[39m=[32m"0 0 24 24"[39m
+              [33mwidth[39m=[32m"16"[39m
+              [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+            [36m>[39m
+              [36m<path[39m
+                [33md[39m=[32m"M12 3v12"[39m
+              [36m/>[39m
+              [36m<path[39m
+                [33md[39m=[32m"m17 8-5-5-5 5"[39m
+              [36m/>[39m
+              [36m<path[39m
+                [33md[39m=[32m"M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"[39m
+              [36m/>[39m
+            [36m</svg>[39m
+            [0mImport Asset[0m
+          [36m</a>[39m
+        [36m</div>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"bg-card border-border"[39m
+          [33mstyle[39m=[32m"display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 8px 24px; border-bottom-style: solid; border-bottom-width: 1px;"[39m
+        [36m>[39m
+          [36m<select[39m
+            [33maria-label[39m=[32m"Household"[39m
+            [33mclass[39m=[32m"bg-background text-foreground border-border focus-ring"[39m
+            [33mstyle[39m=[32m"padding: 4px 10px; border-radius: 6px; border-style: solid; border-width: 1px; font-size: 13px; cursor: pointer;"[39m
+          [36m>[39m
+            [36m<option[39m
+              [33mvalue[39m=[32m"hh-sg195"[39m
+            [36m>[39m
+              [0mError home[0m
+            [36m</option>[39m
+          [36m</select>[39m
+          [36m<button[39m
+            [33maria-pressed[39m=[32m"true"[39m
+            [33mclass[39m=[32m"bg-primary text-primary-foreground focus-ring"[39m
+            [33mstyle[39m=[32m"padding: 4px 10px; border-radius: 6px; border-style: solid; border-width: 1px; font-size: 13px; cursor: pointer; font-weight: 600;"[39m
+            [33mtype[39m=[32m"button"[39m
+          [36m>[39m
+            [0mAll (0)[0m
+          [36m</button>[39m
+          [36m<select[39m
+            [33maria-label[39m=[32m"Sort catalog"[39m
+            [33mclass[39m=[32m"bg-background text-foreground border-border focus-ring"[39m
+            [33mstyle[39m=[32m"padding: 4px 10px; border-radius: 6px; border-style: solid; border-width: 1px; font-size: 13px; cursor: pointer;"[39m
+          [36m>[39m
+            [36m<option[39m
+              [33mvalue[39m=[32m"recent"[39m
+            [36m>[39m
+              [0mRecently Added[0m
+            [36m</option>[39m
+            [36m<option[39m
+              [33mvalue[39m=[32m"name"[39m
+            [36m>[39m
+              [0mName (A-Z)[0m
+            [36m</option>[39m
+            [36m<option[39m
+              [33mvalue[39m=[32m"status"[39m
+            [36m>[39m
+              [0mProcessing Status[0m
+            [36m</option>[39m
+          [36m</select>[39m
+          [36m<div[39m
+            [33maria-label[39m=[32m"Density"[39m
+            [33mrole[39m=[32m"group"[39m
+            [33mstyle[39m=[32m"display: inline-flex; gap: 4px;"[39m
+          [36m>[39m
+            [36m<button[39m
+              [33maria-pressed[39m=[32m"true"[39m
+              [33mclass[39m=[32m"bg-primary text-primary-foreground focus-ring"[39m
+              [33mstyle[39m=[32m"padding: 4px 10px; border-radius: 6px; border-style: solid; border-width: 1px; font-size: 13px; cursor: pointer; font-weight: 600;"[39m
+              [33mtype[39m=[32m"button"[39m
+            [36m>[39m
+              [0mStandard Grid[0m
+            [36m</button>[39m
+            [36m<button[39m
+              [33maria-pressed[39m=[32m"false"[39m
+              [33mclass[39m=[32m"bg-card-muted text-muted-foreground focus-ring"[39m
+              [33mstyle[39m=[32m"padding: 4px 10px; border-radius: 6px; border-style: solid; border-width: 1px; font-size: 13px; cursor: pointer; font-weight: 400;"[39m
+              [33mtype[39m=[32m"button"[39m
+            [36m>[39m
+              [0mCompact Table[0m
+            [36m</button>[39m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mstyle[39m=[32m"flex: 1 1 0%;"[39m
+          [36m/>[39m
+          [36m<button[39m
+            [33mclass[39m=[32m"bg-card text-foreground border-border focus-ring"[39m
+            [33mdisabled[39m=[32m""[39m
+            [33mstyle[39m=[32m"padding: 4px 10px; border-radius: 6px; border-style: solid; border-width: 1px; font-size: 13px; cursor: pointer; opacity: 0.5;"[39m
+            [33mtype[39m=[32m"button"[39m
+          [36m>[39m
+            [0mSave search[0m
+          [36m</button>[39m
+          [36m<span[39m
+            [33mclass[39m=[32m"text-muted-foreground"[39m
+            [33mstyle[39m=[32m"font-size: 12px;"[39m
+          [36m>[39m
+            [0mNone yet[0m
+          [36m</span>[39m
+        [36m</div>[39m
+      [36m</div>[39m
+      [36m<main[39m
+        [33mclass[39m=[32m"page-container"[39m
+        [33mdata-testid[39m=[32m"page-container"[39m
+        [33mdata-variant[39m=[32m"page"[39m
+        [33mstyle[39m=[32m"width: 100%; max-width: 1100px; margin-left: auto; margin-right: auto; padding: 24px;"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33maria-busy[39m=[32m"false"[39m
+          [33maria-label[39m=[32m"Product results"[39m
+          [33mclass[39m=[32m"border-border text-foreground"[39m
+          [33mdata-testid[39m=[32m"catalog-grid-empty"[39m
+          [33mrole[39m=[32m"region"[39m
+          [33mstyle[39m=[32m"border-style: dashed; border-width: 1px; border-radius: 12px; padding: 56px 24px; display: flex; flex-direction: column; align-items: center; gap: 12px; text-align: center;"[39m
+        [36m>[39m
+          [36m<p[39m
+            [33mclass[39m=[32m"text-muted-foreground"[39m
+            [33mstyle[39m=[32m"margin: 0px;"[39m
+          [36m>[39m
+            [0mNo items match the current view.[0m
+          [36m</p>[39m
+          [36m<a[39m
+            [33mclass[39m=[32m"bg-primary text-primary-foreground focus-ring"[39m
+            [33mhref[39m=[32m"/capture"[39m
+            [33mstyle[39m=[32m"padding: 8px 16px; border-radius: 6px; text-decoration: none; font-weight: 600; font-size: 13px;"[39m
+          [36m>[39m
+            [0mImport New Item[0m
+          [36m</a>[39m
+          [36m<p[39m
+            [33mclass[39m=[32m"text-muted-foreground"[39m
+            [33mstyle[39m=[32m"margin: 0px; font-size: 12px;"[39m
+          [36m>[39m
+            [0mOpens the import dialog: drop, select or paste photos. The Capture route stays for direct navigation.[0m
+          [36m</p>[39m
+        [36m</div>[39m
+        [36m<div[39m
+          [33mstyle[39m=[32m"margin-top: 16px; display: flex; gap: 12px; align-items: center;"[39m
+        [36m/>[39m
+      [36m</main>[39m
+    [36m</div>[39m
+  [36m</div>[39m
+[36m</body>[39m
+   ❯ src/routes/query-error-alerts.test.tsx > SG-195 route query-error alerts > Capture: a failed household query alerts and never claims an unseeded database
+     → Unable to find role="alert"
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<div[39m
+      [33mclass[39m=[32m"page-container text-foreground"[39m
+      [33mdata-testid[39m=[32m"page-container"[39m
+      [33mdata-variant[39m=[32m"page"[39m
+      [33mstyle[39m=[32m"width: 100%; max-width: 1100px; margin-left: auto; margin-right: auto; padding: 24px;"[39m
+    [36m>[39m
+      [36m<h1[39m
+        [33mclass[39m=[32m"page-header text-foreground"[39m
+      [36m>[39m
+        [0mCapture — Manual Create[0m
+      [36m</h1>[39m
+      [36m<div[39m
+        [33mstyle[39m=[32m"margin-bottom: 16px; display: flex; flex-wrap: wrap; gap: 12px; align-items: center;"[39m
+      [36m>[39m
+        [36m<label[39m
+          [33mstyle[39m=[32m"font-size: 13px;"[39m
+        [36m>[39m
+          [0mHousehold [0m
+          [36m<select[39m
+            [33mclass[39m=[32m"bg-background text-foreground border-border focus-ring"[39m
+            [33mstyle[39m=[32m"padding: 4px 10px; border-radius: 6px; border-style: solid; border-width: 1px; font-size: 13px; cursor: pointer; margin-left: 6px;"[39m
+          [36m/>[39m
+        [36m</label>[39m
+      [36m</div>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"text-muted-foreground"[39m
+      [36m>[39m
+        [0mNo household available — seed the database first.[0m
+      [36m</div>[39m
+    [36m</div>[39m
+  [36m</div>[39m
+[36m</body>[39m
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<div[39m
+      [33mclass[39m=[32m"page-container text-foreground"[39m
+      [33mdata-testid[39m=[32m"page-container"[39m
+      [33mdata-variant[39m=[32m"page"[39m
+      [33mstyle[39m=[32m"width: 100%; max-width: 1100px; margin-left: auto; margin-right: auto; padding: 24px;"[39m
+    [36m>[39m
+      [36m<h1[39m
+        [33mclass[39m=[32m"page-header text-foreground"[39m
+      [36m>[39m
+        [0mCapture — Manual Create[0m
+      [36m</h1>[39m
+      [36m<div[39m
+        [33mstyle[39m=[32m"margin-bottom: 16px; display: flex; flex-wrap: wrap; gap: 12px; align-items: center;"[39m
+      [36m>[39m
+        [36m<label[39m
+          [33mstyle[39m=[32m"font-size: 13px;"[39m
+        [36m>[39m
+          [0mHousehold [0m
+          [36m<select[39m
+            [33mclass[39m=[32m"bg-background text-foreground border-border focus-ring"[39m
+            [33mstyle[39m=[32m"padding: 4px 10px; border-radius: 6px; border-style: solid; border-width: 1px; font-size: 13px; cursor: pointer; margin-left: 6px;"[39m
+          [36m/>[39m
+        [36m</label>[39m
+      [36m</div>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"text-muted-foreground"[39m
+      [36m>[39m
+        [0mNo household available — seed the database first.[0m
+      [36m</div>[39m
+    [36m</div>[39m
+  [36m</div>[39m
+[36m</body>[39m
+   ❯ src/routes/query-error-alerts.test.tsx > SG-195 route query-error alerts > Analytics: a failed summary query alerts naming the summary
+     → Unable to find role="alert"
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<div[39m
+      [33mclass[39m=[32m"page-container text-foreground"[39m
+      [33mdata-testid[39m=[32m"page-container"[39m
+      [33mdata-variant[39m=[32m"page"[39m
+      [33mstyle[39m=[32m"width: 100%; max-width: 1100px; margin-left: auto; margin-right: auto; padding: 24px;"[39m
+    [36m>[39m
+      [36m<div[39m
+        [33mstyle[39m=[32m"display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px;"[39m
+      [36m>[39m
+        [36m<h1[39m
+          [33mclass[39m=[32m"page-header text-foreground"[39m
+        [36m>[39m
+          [0mAnalytics[0m
+        [36m</h1>[39m
+        [36m<label>[39m
+          [0mHousehold[0m
+          [0m [0m
+          [36m<select[39m
+            [33mclass[39m=[32m"bg-background text-foreground border-border focus-ring"[39m
+            [33mstyle[39m=[32m"padding: 4px 10px; border-radius: 6px; border-style: solid; border-width: 1px; font-size: 13px; cursor: pointer; max-width: 100%;"[39m
+          [36m>[39m
+            [36m<option[39m
+              [33mvalue[39m=[32m""[39m
+            [36m>[39m
+              [0mSelect household[0m
+            [36m</option>[39m
+            [36m<option[39m
+              [33mvalue[39m=[32m"hh-sg195"[39m
+            [36m>[39m
+              [0mError home[0m
+            [36m</option>[39m
+          [36m</select>[39m
+        [36m</label>[39m
+      [36m</div>[39m
+      [36m<p[39m
+        [33mclass[39m=[32m"text-muted-foreground"[39m
+        [33mstyle[39m=[32m"font-size: 13px;"[39m
+      [36m>[39m
+        [0mThese numbers are computed from your own recorded items. The summary is prose only — it is grounded in the numbers shown, takes no action, and is never refreshed automatically.[0m
+      [36m</p>[39m
+      [36m<div[39m
+        [33mstyle[39m=[32m"margin-top: 20px;"[39m
+      [36m>[39m
+        [36m<button[39m
+          [33mtype[39m=[32m"button"[39m
+        [36m>[39m
+          [0mGenerate summary[0m
+        [36m</button>[39m
+      [36m</div>[39m
+    [36m</div>[39m
+  [36m</div>[39m
+[36m</body>[39m
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<div[39m
+      [33mclass[39m=[32m"page-container text-foreground"[39m
+      [33mdata-testid[39m=[32m"page-container"[39m
+      [33mdata-variant[39m=[32m"page"[39m
+      [33mstyle[39m=[32m"width: 100%; max-width: 1100px; margin-left: auto; margin-right: auto; padding: 24px;"[39m
+    [36m>[39m
+      [36m<div[39m
+        [33mstyle[39m=[32m"display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px;"[39m
+      [36m>[39m
+        [36m<h1[39m
+          [33mclass[39m=[32m"page-header text-foreground"[39m
+        [36m>[39m
+          [0mAnalytics[0m
+        [36m</h1>[39m
+        [36m<label>[39m
+          [0mHousehold[0m
+          [0m [0m
+          [36m<select[39m
+            [33mclass[39m=[32m"bg-background text-foreground border-border focus-ring"[39m
+            [33mstyle[39m=[32m"padding: 4px 10px; border-radius: 6px; border-style: solid; border-width: 1px; font-size: 13px; cursor: pointer; max-width: 100%;"[39m
+          [36m>[39m
+            [36m<option[39m
+              [33mvalue[39m=[32m""[39m
+            [36m>[39m
+              [0mSelect household[0m
+            [36m</option>[39m
+            [36m<option[39m
+              [33mvalue[39m=[32m"hh-sg195"[39m
+            [36m>[39m
+              [0mError home[0m
+            [36m</option>[39m
+          [36m</select>[39m
+        [36m</label>[39m
+      [36m</div>[39m
+      [36m<p[39m
+        [33mclass[39m=[32m"text-muted-foreground"[39m
+        [33mstyle[39m=[32m"font-size: 13px;"[39m
+      [36m>[39m
+        [0mThese numbers are computed from your own recorded items. The summary is prose only — it is grounded in the numbers shown, takes no action, and is never refreshed automatically.[0m
+      [36m</p>[39m
+      [36m<div[39m
+        [33mstyle[39m=[32m"margin-top: 20px;"[39m
+      [36m>[39m
+        [36m<button[39m
+          [33mtype[39m=[32m"button"[39m
+        [36m>[39m
+          [0mGenerate summary[0m
+        [36m</button>[39m
+      [36m</div>[39m
+    [36m</div>[39m
+  [36m</div>[39m
+[36m</body>[39m
+   ❯ src/routes/query-error-alerts.test.tsx > SG-195 route query-error alerts > Planning: a failed household query alerts and suggestions stay unrequested
+     → Unable to find role="alert"
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<div[39m
+      [33mclass[39m=[32m"page-container text-foreground"[39m
+      [33mdata-testid[39m=[32m"page-container"[39m
+      [33mdata-variant[39m=[32m"page"[39m
+      [33mstyle[39m=[32m"width: 100%; max-width: 1100px; margin-left: auto; margin-right: auto; padding: 24px;"[39m
+    [36m>[39m
+      [36m<div[39m
+        [33mstyle[39m=[32m"display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px;"[39m
+      [36m>[39m
+        [36m<h1[39m
+          [33mclass[39m=[32m"page-header text-foreground"[39m
+        [36m>[39m
+          [0mPlanning[0m
+        [36m</h1>[39m
+        [36m<label>[39m
+          [0mHousehold [0m
+          [36m<select>[39m
+            [36m<option[39m
+              [33mvalue[39m=[32m""[39m
+            [36m>[39m
+              [0mSelect household[0m
+            [36m</option>[39m
+          [36m</select>[39m
+        [36m</label>[39m
+      [36m</div>[39m
+      [36m<p[39m
+        [33mclass[39m=[32m"text-muted-foreground"[39m
+        [33mstyle[39m=[32m"font-size: 13px;"[39m
+      [36m>[39m
+        [0mSuggestions are proposals only. Confirming or dismissing one changes no asset, job or setting; nothing is ever executed automatically.[0m
+      [36m</p>[39m
+      [36m<div[39m
+        [33mstyle[39m=[32m"display: flex; flex-wrap: wrap; gap: 12px; align-items: center; margin-top: 12px;"[39m
+      [36m>[39m
+        [36m<button[39m
+          [33mclass[39m=[32m"bg-card text-foreground border-border focus-ring"[39m
+          [33mdisabled[39m=[32m""[39m
+          [33mstyle[39m=[32m"padding: 4px 10px; border-radius: 6px; border-style: solid; border-width: 1px; font-size: 13px; cursor: pointer;"[39m
+          [33mtype[39m=[32m"button"[39m
+        [36m>[39m
+          [0mRun planning[0m
+        [36m</button>[39m
+        [36m<label>[39m
+          [0mStatus[0m
+          [0m [0m
+          [36m<select[39m
+            [33mclass[39m=[32m"bg-background text-foreground border-border focus-ring"[39m
+            [33mstyle[39m=[32m"padding: 4px 10px; border-radius: 6px; border-style: solid; border-width: 1px; font-size: 13px; cursor: pointer;"[39m
+          [36m>[39m
+            [36m<option[39m
+              [33mvalue[39m=[32m""[39m
+            [36m>[39m
+              [0mall[0m
+            [36m</option>[39m
+            [36m<option[39m
+              [33mvalue[39m=[32m"pending"[39m
+            [36m>[39m
+              [0mpending[0m
+            [36m</option>[39m
+            [36m<option[39m
+              [33mvalue[39m=[32m"confirmed"[39m
+            [36m>[39m
+              [0mconfirmed[0m
+            [36m</option>[39m
+            [36m<option[39m
+              [33mvalue[39m=[32m"dismissed"[39m
+            [36m>[39m
+              [0mdismissed[0m
+            [36m</option>[39m
+          [36m</select>[39m
+        [36m</label>[39m
+      [36m</div>[39m
+      [36m<section[39m
+        [33mstyle[39m=[32m"margin-top: 20px; display: grid; gap: 8px;"[39m
+      [36m/>[39m
+    [36m</div>[39m
+  [36m</div>[39m
+[36m</body>[39m
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<div[39m
+      [33mclass[39m=[32m"page-container text-foreground"[39m
+      [33mdata-testid[39m=[32m"page-container"[39m
+      [33mdata-variant[39m=[32m"page"[39m
+      [33mstyle[39m=[32m"width: 100%; max-width: 1100px; margin-left: auto; margin-right: auto; padding: 24px;"[39m
+    [36m>[39m
+      [36m<div[39m
+        [33mstyle[39m=[32m"display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px;"[39m
+      [36m>[39m
+        [36m<h1[39m
+          [33mclass[39m=[32m"page-header text-foreground"[39m
+        [36m>[39m
+          [0mPlanning[0m
+        [36m</h1>[39m
+        [36m<label>[39m
+          [0mHousehold [0m
+          [36m<select>[39m
+            [36m<option[39m
+              [33mvalue[39m=[32m""[39m
+            [36m>[39m
+              [0mSelect household[0m
+            [36m</option>[39m
+          [36m</select>[39m
+        [36m</label>[39m
+      [36m</div>[39m
+      [36m<p[39m
+        [33mclass[39m=[32m"text-muted-foreground"[39m
+        [33mstyle[39m=[32m"font-size: 13px;"[39m
+      [36m>[39m
+        [0mSuggestions are proposals only. Confirming or dismissing one changes no asset, job or setting; nothing is ever executed automatically.[0m
+      [36m</p>[39m
+      [36m<div[39m
+        [33mstyle[39m=[32m"display: flex; flex-wrap: wrap; gap: 12px; align-items: center; margin-top: 12px;"[39m
+      [36m>[39m
+        [36m<button[39m
+          [33mclass[39m=[32m"bg-card text-foreground border-border focus-ring"[39m
+          [33mdisabled[39m=[32m""[39m
+          [33mstyle[39m=[32m"padding: 4px 10px; border-radius: 6px; border-style: solid; border-width: 1px; font-size: 13px; cursor: pointer;"[39m
+          [33mtype[39m=[32m"button"[39m
+        [36m>[39m
+          [0mRun planning[0m
+        [36m</button>[39m
+        [36m<label>[39m
+          [0mStatus[0m
+          [0m [0m
+          [36m<select[39m
+            [33mclass[39m=[32m"bg-background text-foreground border-border focus-ring"[39m
+            [33mstyle[39m=[32m"padding: 4px 10px; border-radius: 6px; border-style: solid; border-width: 1px; font-size: 13px; cursor: pointer;"[39m
+          [36m>[39m
+            [36m<option[39m
+              [33mvalue[39m=[32m""[39m
+            [36m>[39m
+              [0mall[0m
+            [36m</option>[39m
+            [36m<option[39m
+              [33mvalue[39m=[32m"pending"[39m
+            [36m>[39m
+              [0mpending[0m
+            [36m</option>[39m
+            [36m<option[39m
+              [33mvalue[39m=[32m"confirmed"[39m
+            [36m>[39m
+              [0mconfirmed[0m
+            [36m</option>[39m
+            [36m<option[39m
+              [33mvalue[39m=[32m"dismissed"[39m
+            [36m>[39m
+              [0mdismissed[0m
+            [36m</option>[39m
+          [36m</select>[39m
+        [36m</label>[39m
+      [36m</div>[39m
+      [36m<section[39m
+        [33mstyle[39m=[32m"margin-top: 20px; display: grid; gap: 8px;"[39m
+      [36m/>[39m
+    [36m</div>[39m
+  [36m</div>[39m
+[36m</body>[39m
+   ❯ src/routes/query-error-alerts.test.tsx > SG-195 route query-error alerts > Planning: a failed suggestions query alerts naming the suggestions
+     → Unable to find role="alert"
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<div[39m
+      [33mclass[39m=[32m"page-container text-foreground"[39m
+      [33mdata-testid[39m=[32m"page-container"[39m
+      [33mdata-variant[39m=[32m"page"[39m
+      [33mstyle[39m=[32m"width: 100%; max-width: 1100px; margin-left: auto; margin-right: auto; padding: 24px;"[39m
+    [36m>[39m
+      [36m<div[39m
+        [33mstyle[39m=[32m"display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px;"[39m
+      [36m>[39m
+        [36m<h1[39m
+          [33mclass[39m=[32m"page-header text-foreground"[39m
+        [36m>[39m
+          [0mPlanning[0m
+        [36m</h1>[39m
+        [36m<label>[39m
+          [0mHousehold [0m
+          [36m<select>[39m
+            [36m<option[39m
+              [33mvalue[39m=[32m""[39m
+            [36m>[39m
+              [0mSelect household[0m
+            [36m</option>[39m
+            [36m<option[39m
+              [33mvalue[39m=[32m"hh-sg195"[39m
+            [36m>[39m
+              [0mError home[0m
+            [36m</option>[39m
+          [36m</select>[39m
+        [36m</label>[39m
+      [36m</div>[39m
+      [36m<p[39m
+        [33mclass[39m=[32m"text-muted-foreground"[39m
+        [33mstyle[39m=[32m"font-size: 13px;"[39m
+      [36m>[39m
+        [0mSuggestions are proposals only. Confirming or dismissing one changes no asset, job or setting; nothing is ever executed automatically.[0m
+      [36m</p>[39m
+      [36m<div[39m
+        [33mstyle[39m=[32m"display: flex; flex-wrap: wrap; gap: 12px; align-items: center; margin-top: 12px;"[39m
+      [36m>[39m
+        [36m<button[39m
+          [33mclass[39m=[32m"bg-card text-foreground border-border focus-ring"[39m
+          [33mstyle[39m=[32m"padding: 4px 10px; border-radius: 6px; border-style: solid; border-width: 1px; font-size: 13px; cursor: pointer;"[39m
+          [33mtype[39m=[32m"button"[39m
+        [36m>[39m
+          [0mRun planning[0m
+        [36m</button>[39m
+        [36m<label>[39m
+          [0mStatus[0m
+          [0m [0m
+          [36m<select[39m
+            [33mclass[39m=[32m"bg-background text-foreground border-border focus-ring"[39m
+            [33mstyle[39m=[32m"padding: 4px 10px; border-radius: 6px; border-style: solid; border-width: 1px; font-size: 13px; cursor: pointer;"[39m
+          [36m>[39m
+            [36m<option[39m
+              [33mvalue[39m=[32m""[39m
+            [36m>[39m
+              [0mall[0m
+            [36m</option>[39m
+            [36m<option[39m
+              [33mvalue[39m=[32m"pending"[39m
+            [36m>[39m
+              [0mpending[0m
+            [36m</option>[39m
+            [36m<option[39m
+              [33mvalue[39m=[32m"confirmed"[39m
+            [36m>[39m
+              [0mconfirmed[0m
+            [36m</option>[39m
+            [36m<option[39m
+              [33mvalue[39m=[32m"dismissed"[39m
+            [36m>[39m
+              [0mdismissed[0m
+            [36m</option>[39m
+          [36m</select>[39m
+        [36m</label>[39m
+      [36m</div>[39m
+      [36m<section[39m
+        [33mstyle[39m=[32m"margin-top: 20px; display: grid; gap: 8px;"[39m
+      [36m/>[39m
+    [36m</div>[39m
+  [36m</div>[39m
+[36m</body>[39m
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<div[39m
+      [33mclass[39m=[32m"page-container text-foreground"[39m
+      [33mdata-testid[39m=[32m"page-container"[39m
+      [33mdata-variant[39m=[32m"page"[39m
+      [33mstyle[39m=[32m"width: 100%; max-width: 1100px; margin-left: auto; margin-right: auto; padding: 24px;"[39m
+    [36m>[39m
+      [36m<div[39m
+        [33mstyle[39m=[32m"display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px;"[39m
+      [36m>[39m
+        [36m<h1[39m
+          [33mclass[39m=[32m"page-header text-foreground"[39m
+        [36m>[39m
+          [0mPlanning[0m
+        [36m</h1>[39m
+        [36m<label>[39m
+          [0mHousehold [0m
+          [36m<select>[39m
+            [36m<option[39m
+              [33mvalue[39m=[32m""[39m
+            [36m>[39m
+              [0mSelect household[0m
+            [36m</option>[39m
+            [36m<option[39m
+              [33mvalue[39m=[32m"hh-sg195"[39m
+            [36m>[39m
+              [0mError home[0m
+            [36m</option>[39m
+          [36m</select>[39m
+        [36m</label>[39m
+      [36m</div>[39m
+      [36m<p[39m
+        [33mclass[39m=[32m"text-muted-foreground"[39m
+        [33mstyle[39m=[32m"font-size: 13px;"[39m
+      [36m>[39m
+        [0mSuggestions are proposals only. Confirming or dismissing one changes no asset, job or setting; nothing is ever executed automatically.[0m
+      [36m</p>[39m
+      [36m<div[39m
+        [33mstyle[39m=[32m"display: flex; flex-wrap: wrap; gap: 12px; align-items: center; margin-top: 12px;"[39m
+      [36m>[39m
+        [36m<button[39m
+          [33mclass[39m=[32m"bg-card text-foreground border-border focus-ring"[39m
+          [33mstyle[39m=[32m"padding: 4px 10px; border-radius: 6px; border-style: solid; border-width: 1px; font-size: 13px; cursor: pointer;"[39m
+          [33mtype[39m=[32m"button"[39m
+        [36m>[39m
+          [0mRun planning[0m
+        [36m</button>[39m
+        [36m<label>[39m
+          [0mStatus[0m
+          [0m [0m
+          [36m<select[39m
+            [33mclass[39m=[32m"bg-background text-foreground border-border focus-ring"[39m
+            [33mstyle[39m=[32m"padding: 4px 10px; border-radius: 6px; border-style: solid; border-width: 1px; font-size: 13px; cursor: pointer;"[39m
+          [36m>[39m
+            [36m<option[39m
+              [33mvalue[39m=[32m""[39m
+            [36m>[39m
+              [0mall[0m
+            [36m</option>[39m
+            [36m<option[39m
+              [33mvalue[39m=[32m"pending"[39m
+            [36m>[39m
+              [0mpending[0m
+            [36m</option>[39m
+            [36m<option[39m
+              [33mvalue[39m=[32m"confirmed"[39m
+            [36m>[39m
+              [0mconfirmed[0m
+            [36m</option>[39m
+            [36m<option[39m
+              [33mvalue[39m=[32m"dismissed"[39m
+            [36m>[39m
+              [0mdismissed[0m
+            [36m</option>[39m
+          [36m</select>[39m
+        [36m</label>[39m
+      [36m</div>[39m
+      [36m<section[39m
+        [33mstyle[39m=[32m"margin-top: 20px; display: grid; gap: 8px;"[39m
+      [36m/>[39m
+    [36m</div>[39m
+  [36m</div>[39m
+[36m</body>[39m
+   ❯ src/routes/query-error-alerts.test.tsx > SG-195 route query-error alerts > Inbox: a failed jobs query alerts naming import jobs
+     → Unable to find role="alert"
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<div[39m
+      [33mclass[39m=[32m"page-container text-foreground"[39m
+      [33mdata-testid[39m=[32m"page-container"[39m
+      [33mdata-variant[39m=[32m"page"[39m
+      [33mstyle[39m=[32m"width: 100%; max-width: 1100px; margin-left: auto; margin-right: auto; padding: 24px;"[39m
+    [36m>[39m
+      [36m<div[39m
+        [33mstyle[39m=[32m"display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap;"[39m
+      [36m>[39m
+        [36m<h1[39m
+          [33mclass[39m=[32m"page-header text-foreground"[39m
+        [36m>[39m
+          [0mInbox[0m
+        [36m</h1>[39m
+        [36m<label>[39m
+          [0mHousehold [0m
+          [36m<select[39m
+            [33mclass[39m=[32m"bg-background text-foreground border-border focus-ring"[39m
+            [33mstyle[39m=[32m"padding: 4px 10px; border-radius: 6px; border-style: solid; border-width: 1px; font-size: 13px; cursor: pointer;"[39m
+          [36m>[39m
+            [36m<option[39m
+              [33mvalue[39m=[32m""[39m
+            [36m>[39m
+              [0mSelect household[0m
+            [36m</option>[39m
+            [36m<option[39m
+              [33mvalue[39m=[32m"hh-sg195"[39m
+            [36m>[39m
+              [0mError home[0m
+            [36m</option>[39m
+          [36m</select>[39m
+        [36m</label>[39m
+      [36m</div>[39m
+      [36m<div[39m
+        [33mstyle[39m=[32m"display: grid; grid-template-columns: repeat(auto-fit, minmax(min(280px, 100%), 1fr)); gap: 20px;"[39m
+      [36m>[39m
+        [36m<section>[39m
+          [36m<h2>[39m
+            [0mImport jobs[0m
+          [36m</h2>[39m
+          [36m<div[39m
+            [33mstyle[39m=[32m"display: grid; gap: 8px;"[39m
+          [36m/>[39m
+        [36m</section>[39m
+        [36m<section>[39m
+          [36m<h2>[39m
+            [0mSelected job[0m
+          [36m</h2>[39m
+          [36m<div>[39m
+            [0mSelect a job to see progress and errors.[0m
+          [36m</div>[39m
+        [36m</section>[39m
+      [36m</div>[39m
+      [36m<section[39m
+        [33mstyle[39m=[32m"margin-top: 28px;"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mstyle[39m=[32m"display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap;"[39m
+        [36m>[39m
+          [36m<h2>[39m
+            [0mReview queue[0m
+          [36m</h2>[39m
+          [36m<label[39m
+            [33mstyle[39m=[32m"font-size: 13px;"[39m
+          [36m>[39m
+            [0mReview status [0m
+            [36m<select[39m
+              [33maria-label[39m=[32m"Review status"[39m
+              [33mclass[39m=[32m"bg-background text-foreground border-border focus-ring"[39m
+              [33mstyle[39m=[32m"padding: 4px 10px; border-radius: 6px; border-style: solid; border-width: 1px; font-size: 13px; cursor: pointer;"[39m
+            [36m>[39m
+              [36m<option[39m
+                [33mvalue[39m=[32m"open"[39m
+              [36m>[39m
+                [0mOpen[0m
+              [36m</option>[39m
+              [36m<option[39m
+                [33mvalue[39m=[32m"resolved"[39m
+              [36m>[39m
+                [0mResolved[0m
+              [36m</option>[39m
+              [36m<option[39m
+                [33mvalue[39m=[32m"all"[39m
+              [36m>[39m
+                [0mAll[0m
+              [36m</option>[39m
+            [36m</select>[39m
+          [36m</label>[39m
+        [36m</div>[39m
+        [36m<div[39m
+          [33mrole[39m=[32m"status"[39m
+        [36m>[39m
+          [0mNo review tasks.[0m
+        [36m</div>[39m
+        [36m<div[39m
+          [33mstyle[39m=[32m"display: grid; gap: 8px;"[39m
+        [36m/>[39m
+      [36m</section>[39m
+    [36m</div>[39m
+  [36m</div>[39m
+[36m</body>[39m
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<div[39m
+      [33mclass[39m=[32m"page-container text-foreground"[39m
+      [33mdata-testid[39m=[32m"page-container"[39m
+      [33mdata-variant[39m=[32m"page"[39m
+      [33mstyle[39m=[32m"width: 100%; max-width: 1100px; margin-left: auto; margin-right: auto; padding: 24px;"[39m
+    [36m>[39m
+      [36m<div[39m
+        [33mstyle[39m=[32m"display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap;"[39m
+      [36m>[39m
+        [36m<h1[39m
+          [33mclass[39m=[32m"page-header text-foreground"[39m
+        [36m>[39m
+          [0mInbox[0m
+        [36m</h1>[39m
+        [36m<label>[39m
+          [0mHousehold [0m
+          [36m<select[39m
+            [33mclass[39m=[32m"bg-background text-foreground border-border focus-ring"[39m
+            [33mstyle[39m=[32m"padding: 4px 10px; border-radius: 6px; border-style: solid; border-width: 1px; font-size: 13px; cursor: pointer;"[39m
+          [36m>[39m
+            [36m<option[39m
+              [33mvalue[39m=[32m""[39m
+            [36m>[39m
+              [0mSelect household[0m
+            [36m</option>[39m
+            [36m<option[39m
+              [33mvalue[39m=[32m"hh-sg195"[39m
+            [36m>[39m
+              [0mError home[0m
+            [36m</option>[39m
+          [36m</select>[39m
+        [36m</label>[39m
+      [36m</div>[39m
+      [36m<div[39m
+        [33mstyle[39m=[32m"display: grid; grid-template-columns: repeat(auto-fit, minmax(min(280px, 100%), 1fr)); gap: 20px;"[39m
+      [36m>[39m
+        [36m<section>[39m
+          [36m<h2>[39m
+            [0mImport jobs[0m
+          [36m</h2>[39m
+          [36m<div[39m
+            [33mstyle[39m=[32m"display: grid; gap: 8px;"[39m
+          [36m/>[39m
+        [36m</section>[39m
+        [36m<section>[39m
+          [36m<h2>[39m
+            [0mSelected job[0m
+          [36m</h2>[39m
+          [36m<div>[39m
+            [0mSelect a job to see progress and errors.[0m
+          [36m</div>[39m
+        [36m</section>[39m
+      [36m</div>[39m
+      [36m<section[39m
+        [33mstyle[39m=[32m"margin-top: 28px;"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mstyle[39m=[32m"display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap;"[39m
+        [36m>[39m
+          [36m<h2>[39m
+            [0mReview queue[0m
+          [36m</h2>[39m
+          [36m<label[39m
+            [33mstyle[39m=[32m"font-size: 13px;"[39m
+          [36m>[39m
+            [0mReview status [0m
+            [36m<select[39m
+              [33maria-label[39m=[32m"Review status"[39m
+              [33mclass[39m=[32m"bg-background text-foreground border-border focus-ring"[39m
+              [33mstyle[39m=[32m"padding: 4px 10px; border-radius: 6px; border-style: solid; border-width: 1px; font-size: 13px; cursor: pointer;"[39m
+            [36m>[39m
+              [36m<option[39m
+                [33mvalue[39m=[32m"open"[39m
+              [36m>[39m
+                [0mOpen[0m
+              [36m</option>[39m
+              [36m<option[39m
+                [33mvalue[39m=[32m"resolved"[39m
+              [36m>[39m
+                [0mResolved[0m
+              [36m</option>[39m
+              [36m<option[39m
+                [33mvalue[39m=[32m"all"[39m
+              [36m>[39m
+                [0mAll[0m
+              [36m</option>[39m
+            [36m</select>[39m
+          [36m</label>[39m
+        [36m</div>[39m
+        [36m<div[39m
+          [33mrole[39m=[32m"status"[39m
+        [36m>[39m
+          [0mNo review tasks.[0m
+        [36m</div>[39m
+        [36m<div[39m
+          [33mstyle[39m=[32m"display: grid; gap: 8px;"[39m
+        [36m/>[39m
+      [36m</section>[39m
+    [36m</div>[39m
+  [36m</div>[39m
+[36m</body>[39m
+   ❯ src/routes/query-error-alerts.test.tsx > SG-195 route query-error alerts > Inbox: a failed review-tasks query alerts naming review tasks
+     → Unable to find role="alert"
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<div[39m
+      [33mclass[39m=[32m"page-container text-foreground"[39m
+      [33mdata-testid[39m=[32m"page-container"[39m
+      [33mdata-variant[39m=[32m"page"[39m
+      [33mstyle[39m=[32m"width: 100%; max-width: 1100px; margin-left: auto; margin-right: auto; padding: 24px;"[39m
+    [36m>[39m
+      [36m<div[39m
+        [33mstyle[39m=[32m"display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap;"[39m
+      [36m>[39m
+        [36m<h1[39m
+          [33mclass[39m=[32m"page-header text-foreground"[39m
+        [36m>[39m
+          [0mInbox[0m
+        [36m</h1>[39m
+        [36m<label>[39m
+          [0mHousehold [0m
+          [36m<select[39m
+            [33mclass[39m=[32m"bg-background text-foreground border-border focus-ring"[39m
+            [33mstyle[39m=[32m"padding: 4px 10px; border-radius: 6px; border-style: solid; border-width: 1px; font-size: 13px; cursor: pointer;"[39m
+          [36m>[39m
+            [36m<option[39m
+              [33mvalue[39m=[32m""[39m
+            [36m>[39m
+              [0mSelect household[0m
+            [36m</option>[39m
+            [36m<option[39m
+              [33mvalue[39m=[32m"hh-sg195"[39m
+            [36m>[39m
+              [0mError home[0m
+            [36m</option>[39m
+          [36m</select>[39m
+        [36m</label>[39m
+      [36m</div>[39m
+      [36m<div[39m
+        [33mstyle[39m=[32m"display: grid; grid-template-columns: repeat(auto-fit, minmax(min(280px, 100%), 1fr)); gap: 20px;"[39m
+      [36m>[39m
+        [36m<section>[39m
+          [36m<h2>[39m
+            [0mImport jobs[0m
+          [36m</h2>[39m
+          [36m<div[39m
+            [33mrole[39m=[32m"status"[39m
+          [36m>[39m
+            [0mNo import jobs yet.[0m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mstyle[39m=[32m"display: grid; gap: 8px;"[39m
+          [36m/>[39m
+        [36m</section>[39m
+        [36m<section>[39m
+          [36m<h2>[39m
+            [0mSelected job[0m
+          [36m</h2>[39m
+          [36m<div>[39m
+            [0mSelect a job to see progress and errors.[0m
+          [36m</div>[39m
+        [36m</section>[39m
+      [36m</div>[39m
+      [36m<section[39m
+        [33mstyle[39m=[32m"margin-top: 28px;"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mstyle[39m=[32m"display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap;"[39m
+        [36m>[39m
+          [36m<h2>[39m
+            [0mReview queue[0m
+          [36m</h2>[39m
+          [36m<label[39m
+            [33mstyle[39m=[32m"font-size: 13px;"[39m
+          [36m>[39m
+            [0mReview status [0m
+            [36m<select[39m
+              [33maria-label[39m=[32m"Review status"[39m
+              [33mclass[39m=[32m"bg-background text-foreground border-border focus-ring"[39m
+              [33mstyle[39m=[32m"padding: 4px 10px; border-radius: 6px; border-style: solid; border-width: 1px; font-size: 13px; cursor: pointer;"[39m
+            [36m>[39m
+              [36m<option[39m
+                [33mvalue[39m=[32m"open"[39m
+              [36m>[39m
+                [0mOpen[0m
+              [36m</option>[39m
+              [36m<option[39m
+                [33mvalue[39m=[32m"resolved"[39m
+              [36m>[39m
+                [0mResolved[0m
+              [36m</option>[39m
+              [36m<option[39m
+                [33mvalue[39m=[32m"all"[39m
+              [36m>[39m
+                [0mAll[0m
+              [36m</option>[39m
+            [36m</select>[39m
+          [36m</label>[39m
+        [36m</div>[39m
+        [36m<div[39m
+          [33mrole[39m=[32m"status"[39m
+        [36m>[39m
+          [0mNo review tasks.[0m
+        [36m</div>[39m
+        [36m<div[39m
+          [33mstyle[39m=[32m"display: grid; gap: 8px;"[39m
+        [36m/>[39m
+      [36m</section>[39m
+    [36m</div>[39m
+  [36m</div>[39m
+[36m</body>[39m
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<div[39m
+      [33mclass[39m=[32m"page-container text-foreground"[39m
+      [33mdata-testid[39m=[32m"page-container"[39m
+      [33mdata-variant[39m=[32m"page"[39m
+      [33mstyle[39m=[32m"width: 100%; max-width: 1100px; margin-left: auto; margin-right: auto; padding: 24px;"[39m
+    [36m>[39m
+      [36m<div[39m
+        [33mstyle[39m=[32m"display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap;"[39m
+      [36m>[39m
+        [36m<h1[39m
+          [33mclass[39m=[32m"page-header text-foreground"[39m
+        [36m>[39m
+          [0mInbox[0m
+        [36m</h1>[39m
+        [36m<label>[39m
+          [0mHousehold [0m
+          [36m<select[39m
+            [33mclass[39m=[32m"bg-background text-foreground border-border focus-ring"[39m
+            [33mstyle[39m=[32m"padding: 4px 10px; border-radius: 6px; border-style: solid; border-width: 1px; font-size: 13px; cursor: pointer;"[39m
+          [36m>[39m
+            [36m<option[39m
+              [33mvalue[39m=[32m""[39m
+            [36m>[39m
+              [0mSelect household[0m
+            [36m</option>[39m
+            [36m<option[39m
+              [33mvalue[39m=[32m"hh-sg195"[39m
+            [36m>[39m
+              [0mError home[0m
+            [36m</option>[39m
+          [36m</select>[39m
+        [36m</label>[39m
+      [36m</div>[39m
+      [36m<div[39m
+        [33mstyle[39m=[32m"display: grid; grid-template-columns: repeat(auto-fit, minmax(min(280px, 100%), 1fr)); gap: 20px;"[39m
+      [36m>[39m
+        [36m<section>[39m
+          [36m<h2>[39m
+            [0mImport jobs[0m
+          [36m</h2>[39m
+          [36m<div[39m
+            [33mrole[39m=[32m"status"[39m
+          [36m>[39m
+            [0mNo import jobs yet.[0m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mstyle[39m=[32m"display: grid; gap: 8px;"[39m
+          [36m/>[39m
+        [36m</section>[39m
+        [36m<section>[39m
+          [36m<h2>[39m
+            [0mSelected job[0m
+          [36m</h2>[39m
+          [36m<div>[39m
+            [0mSelect a job to see progress and errors.[0m
+          [36m</div>[39m
+        [36m</section>[39m
+      [36m</div>[39m
+      [36m<section[39m
+        [33mstyle[39m=[32m"margin-top: 28px;"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mstyle[39m=[32m"display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap;"[39m
+        [36m>[39m
+          [36m<h2>[39m
+            [0mReview queue[0m
+          [36m</h2>[39m
+          [36m<label[39m
+            [33mstyle[39m=[32m"font-size: 13px;"[39m
+          [36m>[39m
+            [0mReview status [0m
+            [36m<select[39m
+              [33maria-label[39m=[32m"Review status"[39m
+              [33mclass[39m=[32m"bg-background text-foreground border-border focus-ring"[39m
+              [33mstyle[39m=[32m"padding: 4px 10px; border-radius: 6px; border-style: solid; border-width: 1px; font-size: 13px; cursor: pointer;"[39m
+            [36m>[39m
+              [36m<option[39m
+                [33mvalue[39m=[32m"open"[39m
+              [36m>[39m
+                [0mOpen[0m
+              [36m</option>[39m
+              [36m<option[39m
+                [33mvalue[39m=[32m"resolved"[39m
+              [36m>[39m
+                [0mResolved[0m
+              [36m</option>[39m
+              [36m<option[39m
+                [33mvalue[39m=[32m"all"[39m
+              [36m>[39m
+                [0mAll[0m
+              [36m</option>[39m
+            [36m</select>[39m
+          [36m</label>[39m
+        [36m</div>[39m
+        [36m<div[39m
+          [33mrole[39m=[32m"status"[39m
+        [36m>[39m
+          [0mNo review tasks.[0m
+        [36m</div>[39m
+        [36m<div[39m
+          [33mstyle[39m=[32m"display: grid; gap: 8px;"[39m
+        [36m/>[39m
+      [36m</section>[39m
+    [36m</div>[39m
+  [36m</div>[39m
+[36m</body>[39m
+   ❯ src/routes/query-error-alerts.test.tsx > SG-195 route query-error alerts > Inbox: a failed job-detail query alerts naming the detail
+     → Unable to find role="alert"
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<div[39m
+      [33mclass[39m=[32m"page-container text-foreground"[39m
+      [33mdata-testid[39m=[32m"page-container"[39m
+      [33mdata-variant[39m=[32m"page"[39m
+      [33mstyle[39m=[32m"width: 100%; max-width: 1100px; margin-left: auto; margin-right: auto; padding: 24px;"[39m
+    [36m>[39m
+      [36m<div[39m
+        [33mstyle[39m=[32m"display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap;"[39m
+      [36m>[39m
+        [36m<h1[39m
+          [33mclass[39m=[32m"page-header text-foreground"[39m
+        [36m>[39m
+          [0mInbox[0m
+        [36m</h1>[39m
+        [36m<label>[39m
+          [0mHousehold [0m
+          [36m<select[39m
+            [33mclass[39m=[32m"bg-background text-foreground border-border focus-ring"[39m
+            [33mstyle[39m=[32m"padding: 4px 10px; border-radius: 6px; border-style: solid; border-width: 1px; font-size: 13px; cursor: pointer;"[39m
+          [36m>[39m
+            [36m<option[39m
+              [33mvalue[39m=[32m""[39m
+            [36m>[39m
+              [0mSelect household[0m
+            [36m</option>[39m
+            [36m<option[39m
+              [33mvalue[39m=[32m"hh-sg195"[39m
+            [36m>[39m
+              [0mError home[0m
+            [36m</option>[39m
+          [36m</select>[39m
+        [36m</label>[39m
+      [36m</div>[39m
+      [36m<div[39m
+        [33mstyle[39m=[32m"display: grid; grid-template-columns: repeat(auto-fit, minmax(min(280px, 100%), 1fr)); gap: 20px;"[39m
+      [36m>[39m
+        [36m<section>[39m
+          [36m<h2>[39m
+            [0mImport jobs[0m
+          [36m</h2>[39m
+          [36m<div[39m
+            [33mstyle[39m=[32m"display: grid; gap: 8px;"[39m
+          [36m>[39m
+            [36m<button[39m
+              [33maria-pressed[39m=[32m"true"[39m
+              [33mclass[39m=[32m"bg-card text-foreground border-primary focus-ring"[39m
+              [33mstyle[39m=[32m"display: block; width: 100%; text-align: left; padding: 14px; border-radius: 8px; border-style: solid; border-width: 2px; cursor: pointer;"[39m
+              [33mtype[39m=[32m"button"[39m
+            [36m>[39m
+              [36m<div[39m
+                [33mstyle[39m=[32m"display: flex; justify-content: space-between; gap: 12px;"[39m
+              [36m>[39m
+                [36m<strong>[39m
+                  [0mImport [0m
+                  [0mjobquery[0m
+                [36m</strong>[39m
+                [36m<span[39m
+                  [33mclass[39m=[32m"text-muted-foreground"[39m
+                  [33mdata-testid[39m=[32m"job-state-jobquery195"[39m
+                [36m>[39m
+                  [0mCREATED[0m
+                [36m</span>[39m
+              [36m</div>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"text-muted-foreground"[39m
+                [33mstyle[39m=[32m"font-size: 12px; margin-top: 6px;"[39m
+              [36m>[39m
+                [0mimport[0m
+                [0m · [0m
+              [36m</div>[39m
+            [36m</button>[39m
+          [36m</div>[39m
+        [36m</section>[39m
+        [36m<section>[39m
+          [36m<h2>[39m
+            [0mSelected job[0m
+          [36m</h2>[39m
+        [36m</section>[39m
+      [36m</div>[39m
+      [36m<section[39m
+        [33mstyle[39m=[32m"margin-top: 28px;"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mstyle[39m=[32m"display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap;"[39m
+        [36m>[39m
+          [36m<h2>[39m
+            [0mReview queue[0m
+          [36m</h2>[39m
+          [36m<label[39m
+            [33mstyle[39m=[32m"font-size: 13px;"[39m
+          [36m>[39m
+            [0mReview status [0m
+            [36m<select[39m
+              [33maria-label[39m=[32m"Review status"[39m
+              [33mclass[39m=[32m"bg-background text-foreground border-border focus-ring"[39m
+              [33mstyle[39m=[32m"padding: 4px 10px; border-radius: 6px; border-style: solid; border-width: 1px; font-size: 13px; cursor: pointer;"[39m
+            [36m>[39m
+              [36m<option[39m
+                [33mvalue[39m=[32m"open"[39m
+              [36m>[39m
+                [0mOpen[0m
+              [36m</option>[39m
+              [36m<option[39m
+                [33mvalue[39m=[32m"resolved"[39m
+              [36m>[39m
+                [0mResolved[0m
+              [36m</option>[39m
+              [36m<option[39m
+                [33mvalue[39m=[32m"all"[39m
+              [36m>[39m
+                [0mAll[0m
+              [36m</option>[39m
+            [36m</select>[39m
+          [36m</label>[39m
+        [36m</div>[39m
+        [36m<div[39m
+          [33mrole[39m=[32m"status"[39m
+        [36m>[39m
+          [0mNo review tasks.[0m
+        [36m</div>[39m
+        [36m<div[39m
+          [33mstyle[39m=[32m"display: grid; gap: 8px;"[39m
+        [36m/>[39m
+      [36m</section>[39m
+    [36m</div>[39m
+  [36m</div>[39m
+[36m</body>[39m
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<div[39m
+      [33mclass[39m=[32m"page-container text-foreground"[39m
+      [33mdata-testid[39m=[32m"page-container"[39m
+      [33mdata-variant[39m=[32m"page"[39m
+      [33mstyle[39m=[32m"width: 100%; max-width: 1100px; margin-left: auto; margin-right: auto; padding: 24px;"[39m
+    [36m>[39m
+      [36m<div[39m
+        [33mstyle[39m=[32m"display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap;"[39m
+      [36m>[39m
+        [36m<h1[39m
+          [33mclass[39m=[32m"page-header text-foreground"[39m
+        [36m>[39m
+          [0mInbox[0m
+        [36m</h1>[39m
+        [36m<label>[39m
+          [0mHousehold [0m
+          [36m<select[39m
+            [33mclass[39m=[32m"bg-background text-foreground border-border focus-ring"[39m
+            [33mstyle[39m=[32m"padding: 4px 10px; border-radius: 6px; border-style: solid; border-width: 1px; font-size: 13px; cursor: pointer;"[39m
+          [36m>[39m
+            [36m<option[39m
+              [33mvalue[39m=[32m""[39m
+            [36m>[39m
+              [0mSelect household[0m
+            [36m</option>[39m
+            [36m<option[39m
+              [33mvalue[39m=[32m"hh-sg195"[39m
+            [36m>[39m
+              [0mError home[0m
+            [36m</option>[39m
+          [36m</select>[39m
+        [36m</label>[39m
+      [36m</div>[39m
+      [36m<div[39m
+        [33mstyle[39m=[32m"display: grid; grid-template-columns: repeat(auto-fit, minmax(min(280px, 100%), 1fr)); gap: 20px;"[39m
+      [36m>[39m
+        [36m<section>[39m
+          [36m<h2>[39m
+            [0mImport jobs[0m
+          [36m</h2>[39m
+          [36m<div[39m
+            [33mstyle[39m=[32m"display: grid; gap: 8px;"[39m
+          [36m>[39m
+            [36m<button[39m
+              [33maria-pressed[39m=[32m"true"[39m
+              [33mclass[39m=[32m"bg-card text-foreground border-primary focus-ring"[39m
+              [33mstyle[39m=[32m"display: block; width: 100%; text-align: left; padding: 14px; border-radius: 8px; border-style: solid; border-width: 2px; cursor: pointer;"[39m
+              [33mtype[39m=[32m"button"[39m
+            [36m>[39m
+              [36m<div[39m
+                [33mstyle[39m=[32m"display: flex; justify-content: space-between; gap: 12px;"[39m
+              [36m>[39m
+                [36m<strong>[39m
+                  [0mImport [0m
+                  [0mjobquery[0m
+                [36m</strong>[39m
+                [36m<span[39m
+                  [33mclass[39m=[32m"text-muted-foreground"[39m
+                  [33mdata-testid[39m=[32m"job-state-jobquery195"[39m
+                [36m>[39m
+                  [0mCREATED[0m
+                [36m</span>[39m
+              [36m</div>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"text-muted-foreground"[39m
+                [33mstyle[39m=[32m"font-size: 12px; margin-top: 6px;"[39m
+              [36m>[39m
+                [0mimport[0m
+                [0m · [0m
+              [36m</div>[39m
+            [36m</button>[39m
+          [36m</div>[39m
+        [36m</section>[39m
+        [36m<section>[39m
+          [36m<h2>[39m
+            [0mSelected job[0m
+          [36m</h2>[39m
+        [36m</section>[39m
+      [36m</div>[39m
+      [36m<section[39m
+        [33mstyle[39m=[32m"margin-top: 28px;"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mstyle[39m=[32m"display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap;"[39m
+        [36m>[39m
+          [36m<h2>[39m
+            [0mReview queue[0m
+          [36m</h2>[39m
+          [36m<label[39m
+            [33mstyle[39m=[32m"font-size: 13px;"[39m
+          [36m>[39m
+            [0mReview status [0m
+            [36m<select[39m
+              [33maria-label[39m=[32m"Review status"[39m
+              [33mclass[39m=[32m"bg-background text-foreground border-border focus-ring"[39m
+              [33mstyle[39m=[32m"padding: 4px 10px; border-radius: 6px; border-style: solid; border-width: 1px; font-size: 13px; cursor: pointer;"[39m
+            [36m>[39m
+              [36m<option[39m
+                [33mvalue[39m=[32m"open"[39m
+              [36m>[39m
+                [0mOpen[0m
+              [36m</option>[39m
+              [36m<option[39m
+                [33mvalue[39m=[32m"resolved"[39m
+              [36m>[39m
+                [0mResolved[0m
+              [36m</option>[39m
+              [36m<option[39m
+                [33mvalue[39m=[32m"all"[39m
+              [36m>[39m
+                [0mAll[0m
+              [36m</option>[39m
+            [36m</select>[39m
+          [36m</label>[39m
+        [36m</div>[39m
+        [36m<div[39m
+          [33mrole[39m=[32m"status"[39m
+        [36m>[39m
+          [0mNo review tasks.[0m
+        [36m</div>[39m
+        [36m<div[39m
+          [33mstyle[39m=[32m"display: grid; gap: 8px;"[39m
+        [36m/>[39m
+      [36m</section>[39m
+    [36m</div>[39m
+  [36m</div>[39m
+[36m</body>[39m
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 8 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/routes/query-error-alerts.test.tsx > SG-195 route query-error alerts > Catalog: a failed asset-list query alerts naming the list and hides the empty view
+TestingLibraryElementError: Unable to find role="alert"
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<div[39m
+      [33mclass[39m=[32m"bg-background text-foreground"[39m
+      [33mstyle[39m=[32m"min-height: 100vh;"[39m
+    [36m>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"bg-background"[39m
+        [33mstyle[39m=[32m"position: sticky; top: 0px; z-index: 10;"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"bg-card border-border"[39m
+          [33mstyle[39m=[32m"display: flex; flex-wrap: wrap; align-items: center; gap: 12px; row-gap: 8px; padding: 10px 24px; border-bottom-style: solid; border-bottom-width: 1px;"[39m
+        [36m>[39m
+          [36m<span[39m
+            [33maria-label[39m=[32m"Total loaded items: 0"[39m
+            [33mclass[39m=[32m"bg-card-muted text-muted-foreground"[39m
+            [33mstyle[39m=[32m"font-size: 12px; padding: 2px 8px; border-radius: 999px;"[39m
+            [33mtitle[39m=[32m"Items loaded on this page, not the household total"[39m
+          [36m>[39m
+            [0mLoaded: [0m
+            [0m0[0m
+            [0m [0m
+            [0mitems[0m
+          [36m</span>[39m
+          [36m<div[39m
+            [33maria-hidden[39m=[32m"true"[39m
+            [33mstyle[39m=[32m"flex: 1 1 0%;"[39m
+          [36m/>[39m
+          [36m<input[39m
+            [33maria-label[39m=[32m"Search catalog"[39m
+            [33mclass[39m=[32m"bg-background text-foreground border-border focus-ring"[39m
+            [33mplaceholder[39m=[32m"Search…"[39m
+            [33mstyle[39m=[32m"padding: 6px 10px; border-radius: 6px; border-style: solid; border-width: 1px; flex: 1 1 180px; min-width: 180px; max-width: 420px; font-size: 13px;"[39m
+            [33mtype[39m=[32m"search"[39m
+            [33mvalue[39m=[32m""[39m
+          [36m/>[39m
+          [36m<button[39m
+            [33maria-label[39m=[32m"Switch to dark theme"[39m
+            [33mclass[39m=[32m"bg-card text-foreground border-border focus-ring"[39m
+            [33mstyle[39m=[32m"display: inline-flex; align-items: center; justify-content: center; padding: 6px; border-radius: 6px; border-style: solid; border-width: 1px; cursor: pointer;"[39m
+            [33mtitle[39m=[32m"Switch to dark theme"[39m
+            [33mtype[39m=[32m"button"[39m
+          [36m>[39m
+            [36m<svg[39m
+              [33maria-hidden[39m=[32m"true"[39m
+              [33mclass[39m=[32m"lucide lucide-moon"[39m
+              [33mfill[39m=[32m"none"[39m
+              [33mheight[39m=[32m"18"[39m
+              [33mstroke[39m=[32m"currentColor"[39m
+              [33mstroke-linecap[39m=[32m"round"[39m
+              [33mstroke-linejoin[39m=[32m"round"[39m
+              [33mstroke-width[39m=[32m"2"[39m
+              [33mviewBox[39m=[32m"0 0 24 24"[39m
+              [33mwidth[39m=[32m"18"[39m
+              [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+            [36m>[39m
+              [36m<path[39m
+                [33md[39m=[32m"M20.985 12.486a9 9 0 1 1-9.473-9.472c.405-.022.617.46.402.803a6 6 0 0 0 8.268 8.268c.344-.215.825-.004.803.401"[39m
+              [36m/>[39m
+            [36m</svg>[39m
+          [36m</button>[39m
+          [36m<a[39m
+            [33mclass[39m=[32m"bg-primary text-primary-foreground focus-ring"[39m
+            [33mhref[39m=[32m"/capture"[39m
+            [33mstyle[39m=[32m"padding: 6px 12px; border-radius: 6px; text-decoration: none; font-weight: 600; font-size: 13px; display: inline-flex; align-items: center; gap: 6px;"[39m
+          [36m>[39m
+            [36m<svg[39m
+              [33maria-hidden[39m=[32m"true"[39m
+              [33mclass[39m=[32m"lucide lucide-upload"[39m
+              [33mfill[39m=[32m"none"[39m
+              [33mheight[39m=[32m"16"[39m
+              [33mstroke[39m=[32m"currentColor"[39m
+              [33mstroke-linecap[39m=[32m"round"[39m
+              [33mstroke-linejoin[39m=[32m"round"[39m
+              [33mstroke-width[39m=[32m"2"[39m
+              [33mviewBox[39m=[32m"0 0 24 24"[39m
+              [33mwidth[39m=[32m"16"[39m
+              [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+            [36m>[39m
+              [36m<path[39m
+                [33md[39m=[32m"M12 3v12"[39m
+              [36m/>[39m
+              [36m<path[39m
+                [33md[39m=[32m"m17 8-5-5-5 5"[39m
+              [36m/>[39m
+              [36m<path[39m
+                [33md[39m=[32m"M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"[39m
+              [36m/>[39m
+            [36m</svg>[39m
+            [0mImport Asset[0m
+          [36m</a>[39m
+        [36m</div>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"bg-card border-border"[39m
+          [33mstyle[39m=[32m"display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 8px 24px; border-bottom-style: solid; border-bottom-width: 1px;"[39m
+        [36m>[39m
+          [36m<select[39m
+            [33maria-label[39m=[32m"Household"[39m
+            [33mclass[39m=[32m"bg-background text-foreground border-border focus-ring"[39m
+            [33mstyle[39m=[32m"padding: 4px 10px; border-radius: 6px; border-style: solid; border-width: 1px; font-size: 13px; cursor: pointer;"[39m
+          [36m>[39m
+            [36m<option[39m
+              [33mvalue[39m=[32m"hh-sg195"[39m
+            [36m>[39m
+              [0mError home[0m
+            [36m</option>[39m
+          [36m</select>[39m
+          [36m<button[39m
+            [33maria-pressed[39m=[32m"true"[39m
+            [33mclass[39m=[32m"bg-primary text-primary-foreground focus-ring"[39m
+            [33mstyle[39m=[32m"padding: 4px 10px; border-radius: 6px; border-style: solid; border-width: 1px; font-size: 13px; cursor: pointer; font-weight: 600;"[39m
+            [33mtype[39m=[32m"button"[39m
+          [36m>[39m
+            [0mAll (0)[0m
+          [36m</button>[39m
+          [36m<select[39m
+            [33maria-label[39m=[32m"Sort catalog"[39m
+            [33mclass[39m=[32m"bg-background text-foreground border-border focus-ring"[39m
+            [33mstyle[39m=[32m"padding: 4px 10px; border-radius: 6px; border-style: solid; border-width: 1px; font-size: 13px; cursor: pointer;"[39m
+          [36m>[39m
+            [36m<option[39m
+              [33mvalue[39m=[32m"recent"[39m
+            [36m>[39m
+              [0mRecently Added[0m
+            [36m</option>[39m
+            [36m<option[39m
+              [33mvalue[39m=[32m"name"[39m
+            [36m>[39m
+              [0mName (A-Z)[0m
+            [36m</option>[39m
+            [36m<option[39m
+              [33mvalue[39m=[32m"status"[39m
+            [36m>[39m
+              [0mProcessing Status[0m
+            [36m</option>[39m
+          [36m</select>[39m
+          [36m<div[39m
+            [33maria-label[39m=[32m"Density"[39m
+            [33mrole[39m=[32m"group"[39m
+            [33mstyle[39m=[32m"display: inline-flex; gap: 4px;"[39m
+          [36m>[39m
+            [36m<button[39m
+              [33maria-pressed[39m=[32m"true"[39m
+              [33mclass[39m=[32m"bg-primary text-primary-foreground focus-ring"[39m
+              [33mstyle[39m=[32m"padding: 4px 10px; border-radius: 6px; border-style: solid; border-width: 1px; font-size: 13px; cursor: pointer; font-weight: 600;"[39m
+              [33mtype[39m=[32m"button"[39m
+            [36m>[39m
+              [0mStandard Grid[0m
+            [36m</button>[39m
+            [36m<button[39m
+              [33maria-pressed[39m=[32m"false"[39m
+              [33mclass[39m=[32m"bg-card-muted text-muted-foreground focus-ring"[39m
+              [33mstyle[39m=[32m"padding: 4px 10px; border-radius: 6px; border-style: solid; border-width: 1px; font-size: 13px; cursor: pointer; font-weight: 400;"[39m
+              [33mtype[39m=[32m"button"[39m
+            [36m>[39m
+              [0mCompact Table[0m
+            [36m</button>[39m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mstyle[39m=[32m"flex: 1 1 0%;"[39m
+          [36m/>[39m
+          [36m<button[39m
+            [33mclass[39m=[32m"bg-card text-foreground border-border focus-ring"[39m
+            [33mdisabled[39m=[32m""[39m
+            [33mstyle[39m=[32m"padding: 4px 10px; border-radius: 6px; border-style: solid; border-width: 1px; font-size: 13px; cursor: pointer; opacity: 0.5;"[39m
+            [33mtype[39m=[32m"button"[39m
+          [36m>[39m
+            [0mSave search[0m
+          [36m</button>[39m
+          [36m<span[39m
+            [33mclass[39m=[32m"text-muted-foreground"[39m
+            [33mstyle[39m=[32m"font-size: 12px;"[39m
+          [36m>[39m
+            [0mNone yet[0m
+          [36m</span>[39m
+        [36m</div>[39m
+      [36m</div>[39m
+      [36m<main[39m
+        [33mclass[39m=[32m"page-container"[39m
+        [33mdata-testid[39m=[32m"page-container"[39m
+        [33mdata-variant[39m=[32m"page"[39m
+        [33mstyle[39m=[32m"width: 100%; max-width: 1100px; margin-left: auto; margin-right: auto; padding: 24px;"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33maria-busy[39m=[32m"false"[39m
+          [33maria-label[39m=[32m"Product results"[39m
+          [33mclass[39m=[32m"border-border text-foreground"[39m
+          [33mdata-testid[39m=[32m"catalog-grid-empty"[39m
+          [33mrole[39m=[32m"region"[39m
+          [33mstyle[39m=[32m"border-style: dashed; border-width: 1px; border-radius: 12px; padding: 56px 24px; display: flex; flex-direction: column; align-items: center; gap: 12px; text-align: center;"[39m
+        [36m>[39m
+          [36m<p[39m
+            [33mclass[39m=[32m"text-muted-foreground"[39m
+            [33mstyle[39m=[32m"margin: 0px;"[39m
+          [36m>[39m
+            [0mNo items match the current view.[0m
+          [36m</p>[39m
+          [36m<a[39m
+            [33mclass[39m=[32m"bg-primary text-primary-foreground focus-ring"[39m
+            [33mhref[39m=[32m"/capture"[39m
+            [33mstyle[39m=[32m"padding: 8px 16px; border-radius: 6px; text-decoration: none; font-weight: 600; font-size: 13px;"[39m
+          [36m>[39m
+            [0mImport New Item[0m
+          [36m</a>[39m
+          [36m<p[39m
+            [33mclass[39m=[32m"text-muted-foreground"[39m
+            [33mstyle[39m=[32m"margin: 0px; font-size: 12px;"[39m
+          [36m>[39m
+            [0mOpens the import dialog: drop, select or paste photos. The Capture route stays for direct navigation.[0m
+          [36m</p>[39m
+        [36m</div>[39m
+        [36m<div[39m
+          [33mstyle[39m=[32m"margin-top: 16px; display: flex; gap: 12px; align-items: center;"[39m
+        [36m/>[39m
+      [36m</main>[39m
+    [36m</div>[39m
+  [36m</div>[39m
+[36m</body>[39m
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<div[39m
+      [33mclass[39m=[32m"bg-background text-foreground"[39m
+      [33mstyle[39m=[32m"min-height: 100vh;"[39m
+    [36m>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"bg-background"[39m
+        [33mstyle[39m=[32m"position: sticky; top: 0px; z-index: 10;"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"bg-card border-border"[39m
+          [33mstyle[39m=[32m"display: flex; flex-wrap: wrap; align-items: center; gap: 12px; row-gap: 8px; padding: 10px 24px; border-bottom-style: solid; border-bottom-width: 1px;"[39m
+        [36m>[39m
+          [36m<span[39m
+            [33maria-label[39m=[32m"Total loaded items: 0"[39m
+            [33mclass[39m=[32m"bg-card-muted text-muted-foreground"[39m
+            [33mstyle[39m=[32m"font-size: 12px; padding: 2px 8px; border-radius: 999px;"[39m
+            [33mtitle[39m=[32m"Items loaded on this page, not the household total"[39m
+          [36m>[39m
+            [0mLoaded: [0m
+            [0m0[0m
+            [0m [0m
+            [0mitems[0m
+          [36m</span>[39m
+          [36m<div[39m
+            [33maria-hidden[39m=[32m"true"[39m
+            [33mstyle[39m=[32m"flex: 1 1 0%;"[39m
+          [36m/>[39m
+          [36m<input[39m
+            [33maria-label[39m=[32m"Search catalog"[39m
+            [33mclass[39m=[32m"bg-background text-foreground border-border focus-ring"[39m
+            [33mplaceholder[39m=[32m"Search…"[39m
+            [33mstyle[39m=[32m"padding: 6px 10px; border-radius: 6px; border-style: solid; border-width: 1px; flex: 1 1 180px; min-width: 180px; max-width: 420px; font-size: 13px;"[39m
+            [33mtype[39m=[32m"search"[39m
+            [33mvalue[39m=[32m""[39m
+          [36m/>[39m
+          [36m<button[39m
+            [33maria-label[39m=[32m"Switch to dark theme"[39m
+            [33mclass[39m=[32m"bg-card text-foreground border-border focus-ring"[39m
+            [33mstyle[39m=[32m"display: inline-flex; align-items: center; justify-content: center; padding: 6px; border-radius: 6px; border-style: solid; border-width: 1px; cursor: pointer;"[39m
+            [33mtitle[39m=[32m"Switch to dark theme"[39m
+            [33mtype[39m=[32m"button"[39m
+          [36m>[39m
+            [36m<svg[39m
+              [33maria-hidden[39m=[32m"true"[39m
+              [33mclass[39m=[32m"lucide lucide-moon"[39m
+              [33mfill[39m=[32m"none"[39m
+              [33mheight[39m=[32m"18"[39m
+              [33mstroke[39m=[32m"currentColor"[39m
+              [33mstroke-linecap[39m=[32m"round"[39m
+              [33mstroke-linejoin[39m=[32m"round"[39m
+              [33mstroke-width[39m=[32m"2"[39m
+              [33mviewBox[39m=[32m"0 0 24 24"[39m
+              [33mwidth[39m=[32m"18"[39m
+              [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+            [36m>[39m
+              [36m<path[39m
+                [33md[39m=[32m"M20.985 12.486a9 9 0 1 1-9.473-9.472c.405-.022.617.46.402.803a6 6 0 0 0 8.268 8.268c.344-.215.825-.004.803.401"[39m
+              [36m/>[39m
+            [36m</svg>[39m
+          [36m</button>[39m
+          [36m<a[39m
+            [33mclass[39m=[32m"bg-primary text-primary-foreground focus-ring"[39m
+            [33mhref[39m=[32m"/capture"[39m
+            [33mstyle[39m=[32m"padding: 6px 12px; border-radius: 6px; text-decoration: none; font-weight: 600; font-size: 13px; display: inline-flex; align-items: center; gap: 6px;"[39m
+          [36m>[39m
+            [36m<svg[39m
+              [33maria-hidden[39m=[32m"true"[39m
+              [33mclass[39m=[32m"lucide lucide-upload"[39m
+              [33mfill[39m=[32m"none"[39m
+              [33mheight[39m=[32m"16"[39m
+              [33mstroke[39m=[32m"currentColor"[39m
+              [33mstroke-linecap[39m=[32m"round"[39m
+              [33mstroke-linejoin[39m=[32m"round"[39m
+              [33mstroke-width[39m=[32m"2"[39m
+              [33mviewBox[39m=[32m"0 0 24 24"[39m
+              [33mwidth[39m=[32m"16"[39m
+              [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+            [36m>[39m
+              [36m<path[39m
+                [33md[39m=[32m"M12 3v12"[39m
+              [36m/>[39m
+              [36m<path[39m
+                [33md[39m=[32m"m17 8-5-5-5 5"[39m
+              [36m/>[39m
+              [36m<path[39m
+                [33md[39m=[32m"M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"[39m
+              [36m/>[39m
+            [36m</svg>[39m
+            [0mImport Asset[0m
+          [36m</a>[39m
+        [36m</div>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"bg-card border-border"[39m
+          [33mstyle[39m=[32m"display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 8px 24px; border-bottom-style: solid; border-bottom-width: 1px;"[39m
+        [36m>[39m
+          [36m<select[39m
+            [33maria-label[39m=[32m"Household"[39m
+            [33mclass[39m=[32m"bg-background text-foreground border-border focus-ring"[39m
+            [33mstyle[39m=[32m"padding: 4px 10px; border-radius: 6px; border-style: solid; border-width: 1px; font-size: 13px; cursor: pointer;"[39m
+          [36m>[39m
+            [36m<option[39m
+              [33mvalue[39m=[32m"hh-sg195"[39m
+            [36m>[39m
+              [0mError home[0m
+            [36m</option>[39m
+          [36m</select>[39m
+          [36m<button[39m
+            [33maria-pressed[39m=[32m"true"[39m
+            [33mclass[39m=[32m"bg-primary text-primary-foreground focus-ring"[39m
+            [33mstyle[39m=[32m"padding: 4px 10px; border-radius: 6px; border-style: solid; border-width: 1px; font-size: 13px; cursor: pointer; font-weight: 600;"[39m
+            [33mtype[39m=[32m"button"[39m
+          [36m>[39m
+            [0mAll (0)[0m
+          [36m</button>[39m
+          [36m<select[39m
+            [33maria-label[39m=[32m"Sort catalog"[39m
+            [33mclass[39m=[32m"bg-background text-foreground border-border focus-ring"[39m
+            [33mstyle[39m=[32m"padding: 4px 10px; border-radius: 6px; border-style: solid; border-width: 1px; font-size: 13px; cursor: pointer;"[39m
+          [36m>[39m
+            [36m<option[39m
+              [33mvalue[39m=[32m"recent"[39m
+            [36m>[39m
+              [0mRecently Added[0m
+            [36m</option>[39m
+            [36m<option[39m
+              [33mvalue[39m=[32m"name"[39m
+            [36m>[39m
+              [0mName (A-Z)[0m
+            [36m</option>[39m
+            [36m<option[39m
+              [33mvalue[39m=[32m"status"[39m
+            [36m>[39m
+              [0mProcessing Status[0m
+            [36m</option>[39m
+          [36m</select>[39m
+          [36m<div[39m
+            [33maria-label[39m=[32m"Density"[39m
+            [33mrole[39m=[32m"group"[39m
+            [33mstyle[39m=[32m"display: inline-flex; gap: 4px;"[39m
+          [36m>[39m
+            [36m<button[39m
+              [33maria-pressed[39m=[32m"true"[39m
+              [33mclass[39m=[32m"bg-primary text-primary-foreground focus-ring"[39m
+              [33mstyle[39m=[32m"padding: 4px 10px; border-radius: 6px; border-style: solid; border-width: 1px; font-size: 13px; cursor: pointer; font-weight: 600;"[39m
+              [33mtype[39m=[32m"button"[39m
+            [36m>[39m
+              [0mStandard Grid[0m
+            [36m</button>[39m
+            [36m<button[39m
+              [33maria-pressed[39m=[32m"false"[39m
+              [33mclass[39m=[32m"bg-card-muted text-muted-foreground focus-ring"[39m
+              [33mstyle[39m=[32m"padding: 4px 10px; border-radius: 6px; border-style: solid; border-width: 1px; font-size: 13px; cursor: pointer; font-weight: 400;"[39m
+              [33mtype[39m=[32m"button"[39m
+            [36m>[39m
+              [0mCompact Table[0m
+            [36m</button>[39m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mstyle[39m=[32m"flex: 1 1 0%;"[39m
+          [36m/>[39m
+          [36m<button[39m
+            [33mclass[39m=[32m"bg-card text-foreground border-border focus-ring"[39m
+            [33mdisabled[39m=[32m""[39m
+            [33mstyle[39m=[32m"padding: 4px 10px; border-radius: 6px; border-style: solid; border-width: 1px; font-size: 13px; cursor: pointer; opacity: 0.5;"[39m
+            [33mtype[39m=[32m"button"[39m
+          [36m>[39m
+            [0mSave search[0m
+          [36m</button>[39m
+          [36m<span[39m
+            [33mclass[39m=[32m"text-muted-foreground"[39m
+            [33mstyle[39m=[32m"font-size: 12px;"[39m
+          [36m>[39m
+            [0mNone yet[0m
+          [36m</span>[39m
+        [36m</div>[39m
+      [36m</div>[39m
+      [36m<main[39m
+        [33mclass[39m=[32m"page-container"[39m
+        [33mdata-testid[39m=[32m"page-container"[39m
+        [33mdata-variant[39m=[32m"page"[39m
+        [33mstyle[39m=[32m"width: 100%; max-width: 1100px; margin-left: auto; margin-right: auto; padding: 24px;"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33maria-busy[39m=[32m"false"[39m
+          [33maria-label[39m=[32m"Product results"[39m
+          [33mclass[39m=[32m"border-border text-foreground"[39m
+          [33mdata-testid[39m=[32m"catalog-grid-empty"[39m
+          [33mrole[39m=[32m"region"[39m
+          [33mstyle[39m=[32m"border-style: dashed; border-width: 1px; border-radius: 12px; padding: 56px 24px; display: flex; flex-direction: column; align-items: center; gap: 12px; text-align: center;"[39m
+        [36m>[39m
+          [36m<p[39m
+            [33mclass[39m=[32m"text-muted-foreground"[39m
+            [33mstyle[39m=[32m"margin: 0px;"[39m
+          [36m>[39m
+            [0mNo items match the current view.[0m
+          [36m</p>[39m
+          [36m<a[39m
+            [33mclass[39m=[32m"bg-primary text-primary-foreground focus-ring"[39m
+            [33mhref[39m=[32m"/capture"[39m
+            [33mstyle[39m=[32m"padding: 8px 16px; border-radius: 6px; text-decoration: none; font-weight: 600; font-size: 13px;"[39m
+          [36m>[39m
+            [0mImport New Item[0m
+          [36m</a>[39m
+          [36m<p[39m
+            [33mclass[39m=[32m"text-muted-foreground"[39m
+            [33mstyle[39m=[32m"margin: 0px; font-size: 12px;"[39m
+          [36m>[39m
+            [0mOpens the import dialog: drop, select or paste photos. The Capture route stays for direct navigation.[0m
+          [36m</p>[39m
+        [36m</div>[39m
+        [36m<div[39m
+          [33mstyle[39m=[32m"margin-top: 16px; display: flex; gap: 12px; align-items: center;"[39m
+        [36m/>[39m
+      [36m</main>[39m
+    [36m</div>[39m
+  [36m</div>[39m
+[36m</body>[39m
+ ❯ waitForWrapper ../../../../home/andrei/StorageGenie/frontend/node_modules/@testing-library/dom/dist/wait-for.js:163:27
+ ❯ ../../../../home/andrei/StorageGenie/frontend/node_modules/@testing-library/dom/dist/query-helpers.js:86:33
+ ❯ src/routes/query-error-alerts.test.tsx:106:32
+    104|     renderPage(<CatalogPage />);
+    105| 
+    106|     const alert = await screen.findByRole("alert");
+       |                                ^
+    107|     expect(alert).toHaveTextContent("Could not load the asset list");
+    108|     expect(alert).toHaveTextContent("asset list read failed");
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/8]⎯
+
+ FAIL  src/routes/query-error-alerts.test.tsx > SG-195 route query-error alerts > Capture: a failed household query alerts and never claims an unseeded database
+TestingLibraryElementError: Unable to find role="alert"
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<div[39m
+      [33mclass[39m=[32m"page-container text-foreground"[39m
+      [33mdata-testid[39m=[32m"page-container"[39m
+      [33mdata-variant[39m=[32m"page"[39m
+      [33mstyle[39m=[32m"width: 100%; max-width: 1100px; margin-left: auto; margin-right: auto; padding: 24px;"[39m
+    [36m>[39m
+      [36m<h1[39m
+        [33mclass[39m=[32m"page-header text-foreground"[39m
+      [36m>[39m
+        [0mCapture — Manual Create[0m
+      [36m</h1>[39m
+      [36m<div[39m
+        [33mstyle[39m=[32m"margin-bottom: 16px; display: flex; flex-wrap: wrap; gap: 12px; align-items: center;"[39m
+      [36m>[39m
+        [36m<label[39m
+          [33mstyle[39m=[32m"font-size: 13px;"[39m
+        [36m>[39m
+          [0mHousehold [0m
+          [36m<select[39m
+            [33mclass[39m=[32m"bg-background text-foreground border-border focus-ring"[39m
+            [33mstyle[39m=[32m"padding: 4px 10px; border-radius: 6px; border-style: solid; border-width: 1px; font-size: 13px; cursor: pointer; margin-left: 6px;"[39m
+          [36m/>[39m
+        [36m</label>[39m
+      [36m</div>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"text-muted-foreground"[39m
+      [36m>[39m
+        [0mNo household available — seed the database first.[0m
+      [36m</div>[39m
+    [36m</div>[39m
+  [36m</div>[39m
+[36m</body>[39m
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<div[39m
+      [33mclass[39m=[32m"page-container text-foreground"[39m
+      [33mdata-testid[39m=[32m"page-container"[39m
+      [33mdata-variant[39m=[32m"page"[39m
+      [33mstyle[39m=[32m"width: 100%; max-width: 1100px; margin-left: auto; margin-right: auto; padding: 24px;"[39m
+    [36m>[39m
+      [36m<h1[39m
+        [33mclass[39m=[32m"page-header text-foreground"[39m
+      [36m>[39m
+        [0mCapture — Manual Create[0m
+      [36m</h1>[39m
+      [36m<div[39m
+        [33mstyle[39m=[32m"margin-bottom: 16px; display: flex; flex-wrap: wrap; gap: 12px; align-items: center;"[39m
+      [36m>[39m
+        [36m<label[39m
+          [33mstyle[39m=[32m"font-size: 13px;"[39m
+        [36m>[39m
+          [0mHousehold [0m
+          [36m<select[39m
+            [33mclass[39m=[32m"bg-background text-foreground border-border focus-ring"[39m
+            [33mstyle[39m=[32m"padding: 4px 10px; border-radius: 6px; border-style: solid; border-width: 1px; font-size: 13px; cursor: pointer; margin-left: 6px;"[39m
+          [36m/>[39m
+        [36m</label>[39m
+      [36m</div>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"text-muted-foreground"[39m
+      [36m>[39m
+        [0mNo household available — seed the database first.[0m
+      [36m</div>[39m
+    [36m</div>[39m
+  [36m</div>[39m
+[36m</body>[39m
+ ❯ waitForWrapper ../../../../home/andrei/StorageGenie/frontend/node_modules/@testing-library/dom/dist/wait-for.js:163:27
+ ❯ ../../../../home/andrei/StorageGenie/frontend/node_modules/@testing-library/dom/dist/query-helpers.js:86:33
+ ❯ src/routes/query-error-alerts.test.tsx:136:32
+    134|     renderPage(<CapturePage />);
+    135| 
+    136|     const alert = await screen.findByRole("alert");
+       |                                ^
+    137|     expect(alert).toHaveTextContent("Could not load households");
+    138|     expect(alert).toHaveTextContent("households read failed");
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/8]⎯
+
+ FAIL  src/routes/query-error-alerts.test.tsx > SG-195 route query-error alerts > Analytics: a failed summary query alerts naming the summary
+TestingLibraryElementError: Unable to find role="alert"
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<div[39m
+      [33mclass[39m=[32m"page-container text-foreground"[39m
+      [33mdata-testid[39m=[32m"page-container"[39m
+      [33mdata-variant[39m=[32m"page"[39m
+      [33mstyle[39m=[32m"width: 100%; max-width: 1100px; margin-left: auto; margin-right: auto; padding: 24px;"[39m
+    [36m>[39m
+      [36m<div[39m
+        [33mstyle[39m=[32m"display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px;"[39m
+      [36m>[39m
+        [36m<h1[39m
+          [33mclass[39m=[32m"page-header text-foreground"[39m
+        [36m>[39m
+          [0mAnalytics[0m
+        [36m</h1>[39m
+        [36m<label>[39m
+          [0mHousehold[0m
+          [0m [0m
+          [36m<select[39m
+            [33mclass[39m=[32m"bg-background text-foreground border-border focus-ring"[39m
+            [33mstyle[39m=[32m"padding: 4px 10px; border-radius: 6px; border-style: solid; border-width: 1px; font-size: 13px; cursor: pointer; max-width: 100%;"[39m
+          [36m>[39m
+            [36m<option[39m
+              [33mvalue[39m=[32m""[39m
+            [36m>[39m
+              [0mSelect household[0m
+            [36m</option>[39m
+            [36m<option[39m
+              [33mvalue[39m=[32m"hh-sg195"[39m
+            [36m>[39m
+              [0mError home[0m
+            [36m</option>[39m
+          [36m</select>[39m
+        [36m</label>[39m
+      [36m</div>[39m
+      [36m<p[39m
+        [33mclass[39m=[32m"text-muted-foreground"[39m
+        [33mstyle[39m=[32m"font-size: 13px;"[39m
+      [36m>[39m
+        [0mThese numbers are computed from your own recorded items. The summary is prose only — it is grounded in the numbers shown, takes no action, and is never refreshed automatically.[0m
+      [36m</p>[39m
+      [36m<div[39m
+        [33mstyle[39m=[32m"margin-top: 20px;"[39m
+      [36m>[39m
+        [36m<button[39m
+          [33mtype[39m=[32m"button"[39m
+        [36m>[39m
+          [0mGenerate summary[0m
+        [36m</button>[39m
+      [36m</div>[39m
+    [36m</div>[39m
+  [36m</div>[39m
+[36m</body>[39m
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<div[39m
+      [33mclass[39m=[32m"page-container text-foreground"[39m
+      [33mdata-testid[39m=[32m"page-container"[39m
+      [33mdata-variant[39m=[32m"page"[39m
+      [33mstyle[39m=[32m"width: 100%; max-width: 1100px; margin-left: auto; margin-right: auto; padding: 24px;"[39m
+    [36m>[39m
+      [36m<div[39m
+        [33mstyle[39m=[32m"display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px;"[39m
+      [36m>[39m
+        [36m<h1[39m
+          [33mclass[39m=[32m"page-header text-foreground"[39m
+        [36m>[39m
+          [0mAnalytics[0m
+        [36m</h1>[39m
+        [36m<label>[39m
+          [0mHousehold[0m
+          [0m [0m
+          [36m<select[39m
+            [33mclass[39m=[32m"bg-background text-foreground border-border focus-ring"[39m
+            [33mstyle[39m=[32m"padding: 4px 10px; border-radius: 6px; border-style: solid; border-width: 1px; font-size: 13px; cursor: pointer; max-width: 100%;"[39m
+          [36m>[39m
+            [36m<option[39m
+              [33mvalue[39m=[32m""[39m
+            [36m>[39m
+              [0mSelect household[0m
+            [36m</option>[39m
+            [36m<option[39m
+              [33mvalue[39m=[32m"hh-sg195"[39m
+            [36m>[39m
+              [0mError home[0m
+            [36m</option>[39m
+          [36m</select>[39m
+        [36m</label>[39m
+      [36m</div>[39m
+      [36m<p[39m
+        [33mclass[39m=[32m"text-muted-foreground"[39m
+        [33mstyle[39m=[32m"font-size: 13px;"[39m
+      [36m>[39m
+        [0mThese numbers are computed from your own recorded items. The summary is prose only — it is grounded in the numbers shown, takes no action, and is never refreshed automatically.[0m
+      [36m</p>[39m
+      [36m<div[39m
+        [33mstyle[39m=[32m"margin-top: 20px;"[39m
+      [36m>[39m
+        [36m<button[39m
+          [33mtype[39m=[32m"button"[39m
+        [36m>[39m
+          [0mGenerate summary[0m
+        [36m</button>[39m
+      [36m</div>[39m
+    [36m</div>[39m
+  [36m</div>[39m
+[36m</body>[39m
+ ❯ waitForWrapper ../../../../home/andrei/StorageGenie/frontend/node_modules/@testing-library/dom/dist/wait-for.js:163:27
+ ❯ ../../../../home/andrei/StorageGenie/frontend/node_modules/@testing-library/dom/dist/query-helpers.js:86:33
+ ❯ src/routes/query-error-alerts.test.tsx:159:32
+    157|     renderPage(<AnalyticsPage />);
+    158| 
+    159|     const alert = await screen.findByRole("alert");
+       |                                ^
+    160|     expect(alert).toHaveTextContent("Could not load the analytics summ…
+    161|     expect(alert).toHaveTextContent("summary read failed");
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/8]⎯
+
+ FAIL  src/routes/query-error-alerts.test.tsx > SG-195 route query-error alerts > Planning: a failed household query alerts and suggestions stay unrequested
+TestingLibraryElementError: Unable to find role="alert"
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<div[39m
+      [33mclass[39m=[32m"page-container text-foreground"[39m
+      [33mdata-testid[39m=[32m"page-container"[39m
+      [33mdata-variant[39m=[32m"page"[39m
+      [33mstyle[39m=[32m"width: 100%; max-width: 1100px; margin-left: auto; margin-right: auto; padding: 24px;"[39m
+    [36m>[39m
+      [36m<div[39m
+        [33mstyle[39m=[32m"display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px;"[39m
+      [36m>[39m
+        [36m<h1[39m
+          [33mclass[39m=[32m"page-header text-foreground"[39m
+        [36m>[39m
+          [0mPlanning[0m
+        [36m</h1>[39m
+        [36m<label>[39m
+          [0mHousehold [0m
+          [36m<select>[39m
+            [36m<option[39m
+              [33mvalue[39m=[32m""[39m
+            [36m>[39m
+              [0mSelect household[0m
+            [36m</option>[39m
+          [36m</select>[39m
+        [36m</label>[39m
+      [36m</div>[39m
+      [36m<p[39m
+        [33mclass[39m=[32m"text-muted-foreground"[39m
+        [33mstyle[39m=[32m"font-size: 13px;"[39m
+      [36m>[39m
+        [0mSuggestions are proposals only. Confirming or dismissing one changes no asset, job or setting; nothing is ever executed automatically.[0m
+      [36m</p>[39m
+      [36m<div[39m
+        [33mstyle[39m=[32m"display: flex; flex-wrap: wrap; gap: 12px; align-items: center; margin-top: 12px;"[39m
+      [36m>[39m
+        [36m<button[39m
+          [33mclass[39m=[32m"bg-card text-foreground border-border focus-ring"[39m
+          [33mdisabled[39m=[32m""[39m
+          [33mstyle[39m=[32m"padding: 4px 10px; border-radius: 6px; border-style: solid; border-width: 1px; font-size: 13px; cursor: pointer;"[39m
+          [33mtype[39m=[32m"button"[39m
+        [36m>[39m
+          [0mRun planning[0m
+        [36m</button>[39m
+        [36m<label>[39m
+          [0mStatus[0m
+          [0m [0m
+          [36m<select[39m
+            [33mclass[39m=[32m"bg-background text-foreground border-border focus-ring"[39m
+            [33mstyle[39m=[32m"padding: 4px 10px; border-radius: 6px; border-style: solid; border-width: 1px; font-size: 13px; cursor: pointer;"[39m
+          [36m>[39m
+            [36m<option[39m
+              [33mvalue[39m=[32m""[39m
+            [36m>[39m
+              [0mall[0m
+            [36m</option>[39m
+            [36m<option[39m
+              [33mvalue[39m=[32m"pending"[39m
+            [36m>[39m
+              [0mpending[0m
+            [36m</option>[39m
+            [36m<option[39m
+              [33mvalue[39m=[32m"confirmed"[39m
+            [36m>[39m
+              [0mconfirmed[0m
+            [36m</option>[39m
+            [36m<option[39m
+              [33mvalue[39m=[32m"dismissed"[39m
+            [36m>[39m
+              [0mdismissed[0m
+            [36m</option>[39m
+          [36m</select>[39m
+        [36m</label>[39m
+      [36m</div>[39m
+      [36m<section[39m
+        [33mstyle[39m=[32m"margin-top: 20px; display: grid; gap: 8px;"[39m
+      [36m/>[39m
+    [36m</div>[39m
+  [36m</div>[39m
+[36m</body>[39m
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<div[39m
+      [33mclass[39m=[32m"page-container text-foreground"[39m
+      [33mdata-testid[39m=[32m"page-container"[39m
+      [33mdata-variant[39m=[32m"page"[39m
+      [33mstyle[39m=[32m"width: 100%; max-width: 1100px; margin-left: auto; margin-right: auto; padding: 24px;"[39m
+    [36m>[39m
+      [36m<div[39m
+        [33mstyle[39m=[32m"display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px;"[39m
+      [36m>[39m
+        [36m<h1[39m
+          [33mclass[39m=[32m"page-header text-foreground"[39m
+        [36m>[39m
+          [0mPlanning[0m
+        [36m</h1>[39m
+        [36m<label>[39m
+          [0mHousehold [0m
+          [36m<select>[39m
+            [36m<option[39m
+              [33mvalue[39m=[32m""[39m
+            [36m>[39m
+              [0mSelect household[0m
+            [36m</option>[39m
+          [36m</select>[39m
+        [36m</label>[39m
+      [36m</div>[39m
+      [36m<p[39m
+        [33mclass[39m=[32m"text-muted-foreground"[39m
+        [33mstyle[39m=[32m"font-size: 13px;"[39m
+      [36m>[39m
+        [0mSuggestions are proposals only. Confirming or dismissing one changes no asset, job or setting; nothing is ever executed automatically.[0m
+      [36m</p>[39m
+      [36m<div[39m
+        [33mstyle[39m=[32m"display: flex; flex-wrap: wrap; gap: 12px; align-items: center; margin-top: 12px;"[39m
+      [36m>[39m
+        [36m<button[39m
+          [33mclass[39m=[32m"bg-card text-foreground border-border focus-ring"[39m
+          [33mdisabled[39m=[32m""[39m
+          [33mstyle[39m=[32m"padding: 4px 10px; border-radius: 6px; border-style: solid; border-width: 1px; font-size: 13px; cursor: pointer;"[39m
+          [33mtype[39m=[32m"button"[39m
+        [36m>[39m
+          [0mRun planning[0m
+        [36m</button>[39m
+        [36m<label>[39m
+          [0mStatus[0m
+          [0m [0m
+          [36m<select[39m
+            [33mclass[39m=[32m"bg-background text-foreground border-border focus-ring"[39m
+            [33mstyle[39m=[32m"padding: 4px 10px; border-radius: 6px; border-style: solid; border-width: 1px; font-size: 13px; cursor: pointer;"[39m
+          [36m>[39m
+            [36m<option[39m
+              [33mvalue[39m=[32m""[39m
+            [36m>[39m
+              [0mall[0m
+            [36m</option>[39m
+            [36m<option[39m
+              [33mvalue[39m=[32m"pending"[39m
+            [36m>[39m
+              [0mpending[0m
+            [36m</option>[39m
+            [36m<option[39m
+              [33mvalue[39m=[32m"confirmed"[39m
+            [36m>[39m
+              [0mconfirmed[0m
+            [36m</option>[39m
+            [36m<option[39m
+              [33mvalue[39m=[32m"dismissed"[39m
+            [36m>[39m
+              [0mdismissed[0m
+            [36m</option>[39m
+          [36m</select>[39m
+        [36m</label>[39m
+      [36m</div>[39m
+      [36m<section[39m
+        [33mstyle[39m=[32m"margin-top: 20px; display: grid; gap: 8px;"[39m
+      [36m/>[39m
+    [36m</div>[39m
+  [36m</div>[39m
+[36m</body>[39m
+ ❯ waitForWrapper ../../../../home/andrei/StorageGenie/frontend/node_modules/@testing-library/dom/dist/wait-for.js:163:27
+ ❯ ../../../../home/andrei/StorageGenie/frontend/node_modules/@testing-library/dom/dist/query-helpers.js:86:33
+ ❯ src/routes/query-error-alerts.test.tsx:193:32
+    191|     renderPage(<PlanningPage />);
+    192| 
+    193|     const alert = await screen.findByRole("alert");
+       |                                ^
+    194|     expect(alert).toHaveTextContent("Could not load households");
+    195|     expect(alert).toHaveTextContent("households read failed");
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/8]⎯
+
+ FAIL  src/routes/query-error-alerts.test.tsx > SG-195 route query-error alerts > Planning: a failed suggestions query alerts naming the suggestions
+TestingLibraryElementError: Unable to find role="alert"
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<div[39m
+      [33mclass[39m=[32m"page-container text-foreground"[39m
+      [33mdata-testid[39m=[32m"page-container"[39m
+      [33mdata-variant[39m=[32m"page"[39m
+      [33mstyle[39m=[32m"width: 100%; max-width: 1100px; margin-left: auto; margin-right: auto; padding: 24px;"[39m
+    [36m>[39m
+      [36m<div[39m
+        [33mstyle[39m=[32m"display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px;"[39m
+      [36m>[39m
+        [36m<h1[39m
+          [33mclass[39m=[32m"page-header text-foreground"[39m
+        [36m>[39m
+          [0mPlanning[0m
+        [36m</h1>[39m
+        [36m<label>[39m
+          [0mHousehold [0m
+          [36m<select>[39m
+            [36m<option[39m
+              [33mvalue[39m=[32m""[39m
+            [36m>[39m
+              [0mSelect household[0m
+            [36m</option>[39m
+            [36m<option[39m
+              [33mvalue[39m=[32m"hh-sg195"[39m
+            [36m>[39m
+              [0mError home[0m
+            [36m</option>[39m
+          [36m</select>[39m
+        [36m</label>[39m
+      [36m</div>[39m
+      [36m<p[39m
+        [33mclass[39m=[32m"text-muted-foreground"[39m
+        [33mstyle[39m=[32m"font-size: 13px;"[39m
+      [36m>[39m
+        [0mSuggestions are proposals only. Confirming or dismissing one changes no asset, job or setting; nothing is ever executed automatically.[0m
+      [36m</p>[39m
+      [36m<div[39m
+        [33mstyle[39m=[32m"display: flex; flex-wrap: wrap; gap: 12px; align-items: center; margin-top: 12px;"[39m
+      [36m>[39m
+        [36m<button[39m
+          [33mclass[39m=[32m"bg-card text-foreground border-border focus-ring"[39m
+          [33mstyle[39m=[32m"padding: 4px 10px; border-radius: 6px; border-style: solid; border-width: 1px; font-size: 13px; cursor: pointer;"[39m
+          [33mtype[39m=[32m"button"[39m
+        [36m>[39m
+          [0mRun planning[0m
+        [36m</button>[39m
+        [36m<label>[39m
+          [0mStatus[0m
+          [0m [0m
+          [36m<select[39m
+            [33mclass[39m=[32m"bg-background text-foreground border-border focus-ring"[39m
+            [33mstyle[39m=[32m"padding: 4px 10px; border-radius: 6px; border-style: solid; border-width: 1px; font-size: 13px; cursor: pointer;"[39m
+          [36m>[39m
+            [36m<option[39m
+              [33mvalue[39m=[32m""[39m
+            [36m>[39m
+              [0mall[0m
+            [36m</option>[39m
+            [36m<option[39m
+              [33mvalue[39m=[32m"pending"[39m
+            [36m>[39m
+              [0mpending[0m
+            [36m</option>[39m
+            [36m<option[39m
+              [33mvalue[39m=[32m"confirmed"[39m
+            [36m>[39m
+              [0mconfirmed[0m
+            [36m</option>[39m
+            [36m<option[39m
+              [33mvalue[39m=[32m"dismissed"[39m
+            [36m>[39m
+              [0mdismissed[0m
+            [36m</option>[39m
+          [36m</select>[39m
+        [36m</label>[39m
+      [36m</div>[39m
+      [36m<section[39m
+        [33mstyle[39m=[32m"margin-top: 20px; display: grid; gap: 8px;"[39m
+      [36m/>[39m
+    [36m</div>[39m
+  [36m</div>[39m
+[36m</body>[39m
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<div[39m
+      [33mclass[39m=[32m"page-container text-foreground"[39m
+      [33mdata-testid[39m=[32m"page-container"[39m
+      [33mdata-variant[39m=[32m"page"[39m
+      [33mstyle[39m=[32m"width: 100%; max-width: 1100px; margin-left: auto; margin-right: auto; padding: 24px;"[39m
+    [36m>[39m
+      [36m<div[39m
+        [33mstyle[39m=[32m"display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px;"[39m
+      [36m>[39m
+        [36m<h1[39m
+          [33mclass[39m=[32m"page-header text-foreground"[39m
+        [36m>[39m
+          [0mPlanning[0m
+        [36m</h1>[39m
+        [36m<label>[39m
+          [0mHousehold [0m
+          [36m<select>[39m
+            [36m<option[39m
+              [33mvalue[39m=[32m""[39m
+            [36m>[39m
+              [0mSelect household[0m
+            [36m</option>[39m
+            [36m<option[39m
+              [33mvalue[39m=[32m"hh-sg195"[39m
+            [36m>[39m
+              [0mError home[0m
+            [36m</option>[39m
+          [36m</select>[39m
+        [36m</label>[39m
+      [36m</div>[39m
+      [36m<p[39m
+        [33mclass[39m=[32m"text-muted-foreground"[39m
+        [33mstyle[39m=[32m"font-size: 13px;"[39m
+      [36m>[39m
+        [0mSuggestions are proposals only. Confirming or dismissing one changes no asset, job or setting; nothing is ever executed automatically.[0m
+      [36m</p>[39m
+      [36m<div[39m
+        [33mstyle[39m=[32m"display: flex; flex-wrap: wrap; gap: 12px; align-items: center; margin-top: 12px;"[39m
+      [36m>[39m
+        [36m<button[39m
+          [33mclass[39m=[32m"bg-card text-foreground border-border focus-ring"[39m
+          [33mstyle[39m=[32m"padding: 4px 10px; border-radius: 6px; border-style: solid; border-width: 1px; font-size: 13px; cursor: pointer;"[39m
+          [33mtype[39m=[32m"button"[39m
+        [36m>[39m
+          [0mRun planning[0m
+        [36m</button>[39m
+        [36m<label>[39m
+          [0mStatus[0m
+          [0m [0m
+          [36m<select[39m
+            [33mclass[39m=[32m"bg-background text-foreground border-border focus-ring"[39m
+            [33mstyle[39m=[32m"padding: 4px 10px; border-radius: 6px; border-style: solid; border-width: 1px; font-size: 13px; cursor: pointer;"[39m
+          [36m>[39m
+            [36m<option[39m
+              [33mvalue[39m=[32m""[39m
+            [36m>[39m
+              [0mall[0m
+            [36m</option>[39m
+            [36m<option[39m
+              [33mvalue[39m=[32m"pending"[39m
+            [36m>[39m
+              [0mpending[0m
+            [36m</option>[39m
+            [36m<option[39m
+              [33mvalue[39m=[32m"confirmed"[39m
+            [36m>[39m
+              [0mconfirmed[0m
+            [36m</option>[39m
+            [36m<option[39m
+              [33mvalue[39m=[32m"dismissed"[39m
+            [36m>[39m
+              [0mdismissed[0m
+            [36m</option>[39m
+          [36m</select>[39m
+        [36m</label>[39m
+      [36m</div>[39m
+      [36m<section[39m
+        [33mstyle[39m=[32m"margin-top: 20px; display: grid; gap: 8px;"[39m
+      [36m/>[39m
+    [36m</div>[39m
+  [36m</div>[39m
+[36m</body>[39m
+ ❯ waitForWrapper ../../../../home/andrei/StorageGenie/frontend/node_modules/@testing-library/dom/dist/wait-for.js:163:27
+ ❯ ../../../../home/andrei/StorageGenie/frontend/node_modules/@testing-library/dom/dist/query-helpers.js:86:33
+ ❯ src/routes/query-error-alerts.test.tsx:204:32
+    202|     renderPage(<PlanningPage />);
+    203| 
+    204|     const alert = await screen.findByRole("alert");
+       |                                ^
+    205|     expect(alert).toHaveTextContent("Could not load planning suggestio…
+    206|     expect(alert).toHaveTextContent("suggestions read failed");
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/8]⎯
+
+ FAIL  src/routes/query-error-alerts.test.tsx > SG-195 route query-error alerts > Inbox: a failed jobs query alerts naming import jobs
+TestingLibraryElementError: Unable to find role="alert"
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<div[39m
+      [33mclass[39m=[32m"page-container text-foreground"[39m
+      [33mdata-testid[39m=[32m"page-container"[39m
+      [33mdata-variant[39m=[32m"page"[39m
+      [33mstyle[39m=[32m"width: 100%; max-width: 1100px; margin-left: auto; margin-right: auto; padding: 24px;"[39m
+    [36m>[39m
+      [36m<div[39m
+        [33mstyle[39m=[32m"display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap;"[39m
+      [36m>[39m
+        [36m<h1[39m
+          [33mclass[39m=[32m"page-header text-foreground"[39m
+        [36m>[39m
+          [0mInbox[0m
+        [36m</h1>[39m
+        [36m<label>[39m
+          [0mHousehold [0m
+          [36m<select[39m
+            [33mclass[39m=[32m"bg-background text-foreground border-border focus-ring"[39m
+            [33mstyle[39m=[32m"padding: 4px 10px; border-radius: 6px; border-style: solid; border-width: 1px; font-size: 13px; cursor: pointer;"[39m
+          [36m>[39m
+            [36m<option[39m
+              [33mvalue[39m=[32m""[39m
+            [36m>[39m
+              [0mSelect household[0m
+            [36m</option>[39m
+            [36m<option[39m
+              [33mvalue[39m=[32m"hh-sg195"[39m
+            [36m>[39m
+              [0mError home[0m
+            [36m</option>[39m
+          [36m</select>[39m
+        [36m</label>[39m
+      [36m</div>[39m
+      [36m<div[39m
+        [33mstyle[39m=[32m"display: grid; grid-template-columns: repeat(auto-fit, minmax(min(280px, 100%), 1fr)); gap: 20px;"[39m
+      [36m>[39m
+        [36m<section>[39m
+          [36m<h2>[39m
+            [0mImport jobs[0m
+          [36m</h2>[39m
+          [36m<div[39m
+            [33mstyle[39m=[32m"display: grid; gap: 8px;"[39m
+          [36m/>[39m
+        [36m</section>[39m
+        [36m<section>[39m
+          [36m<h2>[39m
+            [0mSelected job[0m
+          [36m</h2>[39m
+          [36m<div>[39m
+            [0mSelect a job to see progress and errors.[0m
+          [36m</div>[39m
+        [36m</section>[39m
+      [36m</div>[39m
+      [36m<section[39m
+        [33mstyle[39m=[32m"margin-top: 28px;"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mstyle[39m=[32m"display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap;"[39m
+        [36m>[39m
+          [36m<h2>[39m
+            [0mReview queue[0m
+          [36m</h2>[39m
+          [36m<label[39m
+            [33mstyle[39m=[32m"font-size: 13px;"[39m
+          [36m>[39m
+            [0mReview status [0m
+            [36m<select[39m
+              [33maria-label[39m=[32m"Review status"[39m
+              [33mclass[39m=[32m"bg-background text-foreground border-border focus-ring"[39m
+              [33mstyle[39m=[32m"padding: 4px 10px; border-radius: 6px; border-style: solid; border-width: 1px; font-size: 13px; cursor: pointer;"[39m
+            [36m>[39m
+              [36m<option[39m
+                [33mvalue[39m=[32m"open"[39m
+              [36m>[39m
+                [0mOpen[0m
+              [36m</option>[39m
+              [36m<option[39m
+                [33mvalue[39m=[32m"resolved"[39m
+              [36m>[39m
+                [0mResolved[0m
+              [36m</option>[39m
+              [36m<option[39m
+                [33mvalue[39m=[32m"all"[39m
+              [36m>[39m
+                [0mAll[0m
+              [36m</option>[39m
+            [36m</select>[39m
+          [36m</label>[39m
+        [36m</div>[39m
+        [36m<div[39m
+          [33mrole[39m=[32m"status"[39m
+        [36m>[39m
+          [0mNo review tasks.[0m
+        [36m</div>[39m
+        [36m<div[39m
+          [33mstyle[39m=[32m"display: grid; gap: 8px;"[39m
+        [36m/>[39m
+      [36m</section>[39m
+    [36m</div>[39m
+  [36m</div>[39m
+[36m</body>[39m
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<div[39m
+      [33mclass[39m=[32m"page-container text-foreground"[39m
+      [33mdata-testid[39m=[32m"page-container"[39m
+      [33mdata-variant[39m=[32m"page"[39m
+      [33mstyle[39m=[32m"width: 100%; max-width: 1100px; margin-left: auto; margin-right: auto; padding: 24px;"[39m
+    [36m>[39m
+      [36m<div[39m
+        [33mstyle[39m=[32m"display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap;"[39m
+      [36m>[39m
+        [36m<h1[39m
+          [33mclass[39m=[32m"page-header text-foreground"[39m
+        [36m>[39m
+          [0mInbox[0m
+        [36m</h1>[39m
+        [36m<label>[39m
+          [0mHousehold [0m
+          [36m<select[39m
+            [33mclass[39m=[32m"bg-background text-foreground border-border focus-ring"[39m
+            [33mstyle[39m=[32m"padding: 4px 10px; border-radius: 6px; border-style: solid; border-width: 1px; font-size: 13px; cursor: pointer;"[39m
+          [36m>[39m
+            [36m<option[39m
+              [33mvalue[39m=[32m""[39m
+            [36m>[39m
+              [0mSelect household[0m
+            [36m</option>[39m
+            [36m<option[39m
+              [33mvalue[39m=[32m"hh-sg195"[39m
+            [36m>[39m
+              [0mError home[0m
+            [36m</option>[39m
+          [36m</select>[39m
+        [36m</label>[39m
+      [36m</div>[39m
+      [36m<div[39m
+        [33mstyle[39m=[32m"display: grid; grid-template-columns: repeat(auto-fit, minmax(min(280px, 100%), 1fr)); gap: 20px;"[39m
+      [36m>[39m
+        [36m<section>[39m
+          [36m<h2>[39m
+            [0mImport jobs[0m
+          [36m</h2>[39m
+          [36m<div[39m
+            [33mstyle[39m=[32m"display: grid; gap: 8px;"[39m
+          [36m/>[39m
+        [36m</section>[39m
+        [36m<section>[39m
+          [36m<h2>[39m
+            [0mSelected job[0m
+          [36m</h2>[39m
+          [36m<div>[39m
+            [0mSelect a job to see progress and errors.[0m
+          [36m</div>[39m
+        [36m</section>[39m
+      [36m</div>[39m
+      [36m<section[39m
+        [33mstyle[39m=[32m"margin-top: 28px;"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mstyle[39m=[32m"display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap;"[39m
+        [36m>[39m
+          [36m<h2>[39m
+            [0mReview queue[0m
+          [36m</h2>[39m
+          [36m<label[39m
+            [33mstyle[39m=[32m"font-size: 13px;"[39m
+          [36m>[39m
+            [0mReview status [0m
+            [36m<select[39m
+              [33maria-label[39m=[32m"Review status"[39m
+              [33mclass[39m=[32m"bg-background text-foreground border-border focus-ring"[39m
+              [33mstyle[39m=[32m"padding: 4px 10px; border-radius: 6px; border-style: solid; border-width: 1px; font-size: 13px; cursor: pointer;"[39m
+            [36m>[39m
+              [36m<option[39m
+                [33mvalue[39m=[32m"open"[39m
+              [36m>[39m
+                [0mOpen[0m
+              [36m</option>[39m
+              [36m<option[39m
+                [33mvalue[39m=[32m"resolved"[39m
+              [36m>[39m
+                [0mResolved[0m
+              [36m</option>[39m
+              [36m<option[39m
+                [33mvalue[39m=[32m"all"[39m
+              [36m>[39m
+                [0mAll[0m
+              [36m</option>[39m
+            [36m</select>[39m
+          [36m</label>[39m
+        [36m</div>[39m
+        [36m<div[39m
+          [33mrole[39m=[32m"status"[39m
+        [36m>[39m
+          [0mNo review tasks.[0m
+        [36m</div>[39m
+        [36m<div[39m
+          [33mstyle[39m=[32m"display: grid; gap: 8px;"[39m
+        [36m/>[39m
+      [36m</section>[39m
+    [36m</div>[39m
+  [36m</div>[39m
+[36m</body>[39m
+ ❯ waitForWrapper ../../../../home/andrei/StorageGenie/frontend/node_modules/@testing-library/dom/dist/wait-for.js:163:27
+ ❯ ../../../../home/andrei/StorageGenie/frontend/node_modules/@testing-library/dom/dist/query-helpers.js:86:33
+ ❯ src/routes/query-error-alerts.test.tsx:235:32
+    233|     renderPage(<InboxPage />);
+    234| 
+    235|     const alert = await screen.findByRole("alert");
+       |                                ^
+    236|     expect(alert).toHaveTextContent("Could not load import jobs");
+    237|     expect(alert).toHaveTextContent("jobs read failed");
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/8]⎯
+
+ FAIL  src/routes/query-error-alerts.test.tsx > SG-195 route query-error alerts > Inbox: a failed review-tasks query alerts naming review tasks
+TestingLibraryElementError: Unable to find role="alert"
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<div[39m
+      [33mclass[39m=[32m"page-container text-foreground"[39m
+      [33mdata-testid[39m=[32m"page-container"[39m
+      [33mdata-variant[39m=[32m"page"[39m
+      [33mstyle[39m=[32m"width: 100%; max-width: 1100px; margin-left: auto; margin-right: auto; padding: 24px;"[39m
+    [36m>[39m
+      [36m<div[39m
+        [33mstyle[39m=[32m"display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap;"[39m
+      [36m>[39m
+        [36m<h1[39m
+          [33mclass[39m=[32m"page-header text-foreground"[39m
+        [36m>[39m
+          [0mInbox[0m
+        [36m</h1>[39m
+        [36m<label>[39m
+          [0mHousehold [0m
+          [36m<select[39m
+            [33mclass[39m=[32m"bg-background text-foreground border-border focus-ring"[39m
+            [33mstyle[39m=[32m"padding: 4px 10px; border-radius: 6px; border-style: solid; border-width: 1px; font-size: 13px; cursor: pointer;"[39m
+          [36m>[39m
+            [36m<option[39m
+              [33mvalue[39m=[32m""[39m
+            [36m>[39m
+              [0mSelect household[0m
+            [36m</option>[39m
+            [36m<option[39m
+              [33mvalue[39m=[32m"hh-sg195"[39m
+            [36m>[39m
+              [0mError home[0m
+            [36m</option>[39m
+          [36m</select>[39m
+        [36m</label>[39m
+      [36m</div>[39m
+      [36m<div[39m
+        [33mstyle[39m=[32m"display: grid; grid-template-columns: repeat(auto-fit, minmax(min(280px, 100%), 1fr)); gap: 20px;"[39m
+      [36m>[39m
+        [36m<section>[39m
+          [36m<h2>[39m
+            [0mImport jobs[0m
+          [36m</h2>[39m
+          [36m<div[39m
+            [33mrole[39m=[32m"status"[39m
+          [36m>[39m
+            [0mNo import jobs yet.[0m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mstyle[39m=[32m"display: grid; gap: 8px;"[39m
+          [36m/>[39m
+        [36m</section>[39m
+        [36m<section>[39m
+          [36m<h2>[39m
+            [0mSelected job[0m
+          [36m</h2>[39m
+          [36m<div>[39m
+            [0mSelect a job to see progress and errors.[0m
+          [36m</div>[39m
+        [36m</section>[39m
+      [36m</div>[39m
+      [36m<section[39m
+        [33mstyle[39m=[32m"margin-top: 28px;"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mstyle[39m=[32m"display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap;"[39m
+        [36m>[39m
+          [36m<h2>[39m
+            [0mReview queue[0m
+          [36m</h2>[39m
+          [36m<label[39m
+            [33mstyle[39m=[32m"font-size: 13px;"[39m
+          [36m>[39m
+            [0mReview status [0m
+            [36m<select[39m
+              [33maria-label[39m=[32m"Review status"[39m
+              [33mclass[39m=[32m"bg-background text-foreground border-border focus-ring"[39m
+              [33mstyle[39m=[32m"padding: 4px 10px; border-radius: 6px; border-style: solid; border-width: 1px; font-size: 13px; cursor: pointer;"[39m
+            [36m>[39m
+              [36m<option[39m
+                [33mvalue[39m=[32m"open"[39m
+              [36m>[39m
+                [0mOpen[0m
+              [36m</option>[39m
+              [36m<option[39m
+                [33mvalue[39m=[32m"resolved"[39m
+              [36m>[39m
+                [0mResolved[0m
+              [36m</option>[39m
+              [36m<option[39m
+                [33mvalue[39m=[32m"all"[39m
+              [36m>[39m
+                [0mAll[0m
+              [36m</option>[39m
+            [36m</select>[39m
+          [36m</label>[39m
+        [36m</div>[39m
+        [36m<div[39m
+          [33mrole[39m=[32m"status"[39m
+        [36m>[39m
+          [0mNo review tasks.[0m
+        [36m</div>[39m
+        [36m<div[39m
+          [33mstyle[39m=[32m"display: grid; gap: 8px;"[39m
+        [36m/>[39m
+      [36m</section>[39m
+    [36m</div>[39m
+  [36m</div>[39m
+[36m</body>[39m
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<div[39m
+      [33mclass[39m=[32m"page-container text-foreground"[39m
+      [33mdata-testid[39m=[32m"page-container"[39m
+      [33mdata-variant[39m=[32m"page"[39m
+      [33mstyle[39m=[32m"width: 100%; max-width: 1100px; margin-left: auto; margin-right: auto; padding: 24px;"[39m
+    [36m>[39m
+      [36m<div[39m
+        [33mstyle[39m=[32m"display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap;"[39m
+      [36m>[39m
+        [36m<h1[39m
+          [33mclass[39m=[32m"page-header text-foreground"[39m
+        [36m>[39m
+          [0mInbox[0m
+        [36m</h1>[39m
+        [36m<label>[39m
+          [0mHousehold [0m
+          [36m<select[39m
+            [33mclass[39m=[32m"bg-background text-foreground border-border focus-ring"[39m
+            [33mstyle[39m=[32m"padding: 4px 10px; border-radius: 6px; border-style: solid; border-width: 1px; font-size: 13px; cursor: pointer;"[39m
+          [36m>[39m
+            [36m<option[39m
+              [33mvalue[39m=[32m""[39m
+            [36m>[39m
+              [0mSelect household[0m
+            [36m</option>[39m
+            [36m<option[39m
+              [33mvalue[39m=[32m"hh-sg195"[39m
+            [36m>[39m
+              [0mError home[0m
+            [36m</option>[39m
+          [36m</select>[39m
+        [36m</label>[39m
+      [36m</div>[39m
+      [36m<div[39m
+        [33mstyle[39m=[32m"display: grid; grid-template-columns: repeat(auto-fit, minmax(min(280px, 100%), 1fr)); gap: 20px;"[39m
+      [36m>[39m
+        [36m<section>[39m
+          [36m<h2>[39m
+            [0mImport jobs[0m
+          [36m</h2>[39m
+          [36m<div[39m
+            [33mrole[39m=[32m"status"[39m
+          [36m>[39m
+            [0mNo import jobs yet.[0m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mstyle[39m=[32m"display: grid; gap: 8px;"[39m
+          [36m/>[39m
+        [36m</section>[39m
+        [36m<section>[39m
+          [36m<h2>[39m
+            [0mSelected job[0m
+          [36m</h2>[39m
+          [36m<div>[39m
+            [0mSelect a job to see progress and errors.[0m
+          [36m</div>[39m
+        [36m</section>[39m
+      [36m</div>[39m
+      [36m<section[39m
+        [33mstyle[39m=[32m"margin-top: 28px;"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mstyle[39m=[32m"display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap;"[39m
+        [36m>[39m
+          [36m<h2>[39m
+            [0mReview queue[0m
+          [36m</h2>[39m
+          [36m<label[39m
+            [33mstyle[39m=[32m"font-size: 13px;"[39m
+          [36m>[39m
+            [0mReview status [0m
+            [36m<select[39m
+              [33maria-label[39m=[32m"Review status"[39m
+              [33mclass[39m=[32m"bg-background text-foreground border-border focus-ring"[39m
+              [33mstyle[39m=[32m"padding: 4px 10px; border-radius: 6px; border-style: solid; border-width: 1px; font-size: 13px; cursor: pointer;"[39m
+            [36m>[39m
+              [36m<option[39m
+                [33mvalue[39m=[32m"open"[39m
+              [36m>[39m
+                [0mOpen[0m
+              [36m</option>[39m
+              [36m<option[39m
+                [33mvalue[39m=[32m"resolved"[39m
+              [36m>[39m
+                [0mResolved[0m
+              [36m</option>[39m
+              [36m<option[39m
+                [33mvalue[39m=[32m"all"[39m
+              [36m>[39m
+                [0mAll[0m
+              [36m</option>[39m
+            [36m</select>[39m
+          [36m</label>[39m
+        [36m</div>[39m
+        [36m<div[39m
+          [33mrole[39m=[32m"status"[39m
+        [36m>[39m
+          [0mNo review tasks.[0m
+        [36m</div>[39m
+        [36m<div[39m
+          [33mstyle[39m=[32m"display: grid; gap: 8px;"[39m
+        [36m/>[39m
+      [36m</section>[39m
+    [36m</div>[39m
+  [36m</div>[39m
+[36m</body>[39m
+ ❯ waitForWrapper ../../../../home/andrei/StorageGenie/frontend/node_modules/@testing-library/dom/dist/wait-for.js:163:27
+ ❯ ../../../../home/andrei/StorageGenie/frontend/node_modules/@testing-library/dom/dist/query-helpers.js:86:33
+ ❯ src/routes/query-error-alerts.test.tsx:248:32
+    246|     renderPage(<InboxPage />);
+    247| 
+    248|     const alert = await screen.findByRole("alert");
+       |                                ^
+    249|     expect(alert).toHaveTextContent("Could not load review tasks");
+    250|     expect(alert).toHaveTextContent("tasks read failed");
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/8]⎯
+
+ FAIL  src/routes/query-error-alerts.test.tsx > SG-195 route query-error alerts > Inbox: a failed job-detail query alerts naming the detail
+TestingLibraryElementError: Unable to find role="alert"
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<div[39m
+      [33mclass[39m=[32m"page-container text-foreground"[39m
+      [33mdata-testid[39m=[32m"page-container"[39m
+      [33mdata-variant[39m=[32m"page"[39m
+      [33mstyle[39m=[32m"width: 100%; max-width: 1100px; margin-left: auto; margin-right: auto; padding: 24px;"[39m
+    [36m>[39m
+      [36m<div[39m
+        [33mstyle[39m=[32m"display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap;"[39m
+      [36m>[39m
+        [36m<h1[39m
+          [33mclass[39m=[32m"page-header text-foreground"[39m
+        [36m>[39m
+          [0mInbox[0m
+        [36m</h1>[39m
+        [36m<label>[39m
+          [0mHousehold [0m
+          [36m<select[39m
+            [33mclass[39m=[32m"bg-background text-foreground border-border focus-ring"[39m
+            [33mstyle[39m=[32m"padding: 4px 10px; border-radius: 6px; border-style: solid; border-width: 1px; font-size: 13px; cursor: pointer;"[39m
+          [36m>[39m
+            [36m<option[39m
+              [33mvalue[39m=[32m""[39m
+            [36m>[39m
+              [0mSelect household[0m
+            [36m</option>[39m
+            [36m<option[39m
+              [33mvalue[39m=[32m"hh-sg195"[39m
+            [36m>[39m
+              [0mError home[0m
+            [36m</option>[39m
+          [36m</select>[39m
+        [36m</label>[39m
+      [36m</div>[39m
+      [36m<div[39m
+        [33mstyle[39m=[32m"display: grid; grid-template-columns: repeat(auto-fit, minmax(min(280px, 100%), 1fr)); gap: 20px;"[39m
+      [36m>[39m
+        [36m<section>[39m
+          [36m<h2>[39m
+            [0mImport jobs[0m
+          [36m</h2>[39m
+          [36m<div[39m
+            [33mstyle[39m=[32m"display: grid; gap: 8px;"[39m
+          [36m>[39m
+            [36m<button[39m
+              [33maria-pressed[39m=[32m"true"[39m
+              [33mclass[39m=[32m"bg-card text-foreground border-primary focus-ring"[39m
+              [33mstyle[39m=[32m"display: block; width: 100%; text-align: left; padding: 14px; border-radius: 8px; border-style: solid; border-width: 2px; cursor: pointer;"[39m
+              [33mtype[39m=[32m"button"[39m
+            [36m>[39m
+              [36m<div[39m
+                [33mstyle[39m=[32m"display: flex; justify-content: space-between; gap: 12px;"[39m
+              [36m>[39m
+                [36m<strong>[39m
+                  [0mImport [0m
+                  [0mjobquery[0m
+                [36m</strong>[39m
+                [36m<span[39m
+                  [33mclass[39m=[32m"text-muted-foreground"[39m
+                  [33mdata-testid[39m=[32m"job-state-jobquery195"[39m
+                [36m>[39m
+                  [0mCREATED[0m
+                [36m</span>[39m
+              [36m</div>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"text-muted-foreground"[39m
+                [33mstyle[39m=[32m"font-size: 12px; margin-top: 6px;"[39m
+              [36m>[39m
+                [0mimport[0m
+                [0m · [0m
+              [36m</div>[39m
+            [36m</button>[39m
+          [36m</div>[39m
+        [36m</section>[39m
+        [36m<section>[39m
+          [36m<h2>[39m
+            [0mSelected job[0m
+          [36m</h2>[39m
+        [36m</section>[39m
+      [36m</div>[39m
+      [36m<section[39m
+        [33mstyle[39m=[32m"margin-top: 28px;"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mstyle[39m=[32m"display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap;"[39m
+        [36m>[39m
+          [36m<h2>[39m
+            [0mReview queue[0m
+          [36m</h2>[39m
+          [36m<label[39m
+            [33mstyle[39m=[32m"font-size: 13px;"[39m
+          [36m>[39m
+            [0mReview status [0m
+            [36m<select[39m
+              [33maria-label[39m=[32m"Review status"[39m
+              [33mclass[39m=[32m"bg-background text-foreground border-border focus-ring"[39m
+              [33mstyle[39m=[32m"padding: 4px 10px; border-radius: 6px; border-style: solid; border-width: 1px; font-size: 13px; cursor: pointer;"[39m
+            [36m>[39m
+              [36m<option[39m
+                [33mvalue[39m=[32m"open"[39m
+              [36m>[39m
+                [0mOpen[0m
+              [36m</option>[39m
+              [36m<option[39m
+                [33mvalue[39m=[32m"resolved"[39m
+              [36m>[39m
+                [0mResolved[0m
+              [36m</option>[39m
+              [36m<option[39m
+                [33mvalue[39m=[32m"all"[39m
+              [36m>[39m
+                [0mAll[0m
+              [36m</option>[39m
+            [36m</select>[39m
+          [36m</label>[39m
+        [36m</div>[39m
+        [36m<div[39m
+          [33mrole[39m=[32m"status"[39m
+        [36m>[39m
+          [0mNo review tasks.[0m
+        [36m</div>[39m
+        [36m<div[39m
+          [33mstyle[39m=[32m"display: grid; gap: 8px;"[39m
+        [36m/>[39m
+      [36m</section>[39m
+    [36m</div>[39m
+  [36m</div>[39m
+[36m</body>[39m
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<div[39m
+      [33mclass[39m=[32m"page-container text-foreground"[39m
+      [33mdata-testid[39m=[32m"page-container"[39m
+      [33mdata-variant[39m=[32m"page"[39m
+      [33mstyle[39m=[32m"width: 100%; max-width: 1100px; margin-left: auto; margin-right: auto; padding: 24px;"[39m
+    [36m>[39m
+      [36m<div[39m
+        [33mstyle[39m=[32m"display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap;"[39m
+      [36m>[39m
+        [36m<h1[39m
+          [33mclass[39m=[32m"page-header text-foreground"[39m
+        [36m>[39m
+          [0mInbox[0m
+        [36m</h1>[39m
+        [36m<label>[39m
+          [0mHousehold [0m
+          [36m<select[39m
+            [33mclass[39m=[32m"bg-background text-foreground border-border focus-ring"[39m
+            [33mstyle[39m=[32m"padding: 4px 10px; border-radius: 6px; border-style: solid; border-width: 1px; font-size: 13px; cursor: pointer;"[39m
+          [36m>[39m
+            [36m<option[39m
+              [33mvalue[39m=[32m""[39m
+            [36m>[39m
+              [0mSelect household[0m
+            [36m</option>[39m
+            [36m<option[39m
+              [33mvalue[39m=[32m"hh-sg195"[39m
+            [36m>[39m
+              [0mError home[0m
+            [36m</option>[39m
+          [36m</select>[39m
+        [36m</label>[39m
+      [36m</div>[39m
+      [36m<div[39m
+        [33mstyle[39m=[32m"display: grid; grid-template-columns: repeat(auto-fit, minmax(min(280px, 100%), 1fr)); gap: 20px;"[39m
+      [36m>[39m
+        [36m<section>[39m
+          [36m<h2>[39m
+            [0mImport jobs[0m
+          [36m</h2>[39m
+          [36m<div[39m
+            [33mstyle[39m=[32m"display: grid; gap: 8px;"[39m
+          [36m>[39m
+            [36m<button[39m
+              [33maria-pressed[39m=[32m"true"[39m
+              [33mclass[39m=[32m"bg-card text-foreground border-primary focus-ring"[39m
+              [33mstyle[39m=[32m"display: block; width: 100%; text-align: left; padding: 14px; border-radius: 8px; border-style: solid; border-width: 2px; cursor: pointer;"[39m
+              [33mtype[39m=[32m"button"[39m
+            [36m>[39m
+              [36m<div[39m
+                [33mstyle[39m=[32m"display: flex; justify-content: space-between; gap: 12px;"[39m
+              [36m>[39m
+                [36m<strong>[39m
+                  [0mImport [0m
+                  [0mjobquery[0m
+                [36m</strong>[39m
+                [36m<span[39m
+                  [33mclass[39m=[32m"text-muted-foreground"[39m
+                  [33mdata-testid[39m=[32m"job-state-jobquery195"[39m
+                [36m>[39m
+                  [0mCREATED[0m
+                [36m</span>[39m
+              [36m</div>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"text-muted-foreground"[39m
+                [33mstyle[39m=[32m"font-size: 12px; margin-top: 6px;"[39m
+              [36m>[39m
+                [0mimport[0m
+                [0m · [0m
+              [36m</div>[39m
+            [36m</button>[39m
+          [36m</div>[39m
+        [36m</section>[39m
+        [36m<section>[39m
+          [36m<h2>[39m
+            [0mSelected job[0m
+          [36m</h2>[39m
+        [36m</section>[39m
+      [36m</div>[39m
+      [36m<section[39m
+        [33mstyle[39m=[32m"margin-top: 28px;"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mstyle[39m=[32m"display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap;"[39m
+        [36m>[39m
+          [36m<h2>[39m
+            [0mReview queue[0m
+          [36m</h2>[39m
+          [36m<label[39m
+            [33mstyle[39m=[32m"font-size: 13px;"[39m
+          [36m>[39m
+            [0mReview status [0m
+            [36m<select[39m
+              [33maria-label[39m=[32m"Review status"[39m
+              [33mclass[39m=[32m"bg-background text-foreground border-border focus-ring"[39m
+              [33mstyle[39m=[32m"padding: 4px 10px; border-radius: 6px; border-style: solid; border-width: 1px; font-size: 13px; cursor: pointer;"[39m
+            [36m>[39m
+              [36m<option[39m
+                [33mvalue[39m=[32m"open"[39m
+              [36m>[39m
+                [0mOpen[0m
+              [36m</option>[39m
+              [36m<option[39m
+                [33mvalue[39m=[32m"resolved"[39m
+              [36m>[39m
+                [0mResolved[0m
+              [36m</option>[39m
+              [36m<option[39m
+                [33mvalue[39m=[32m"all"[39m
+              [36m>[39m
+                [0mAll[0m
+              [36m</option>[39m
+            [36m</select>[39m
+          [36m</label>[39m
+        [36m</div>[39m
+        [36m<div[39m
+          [33mrole[39m=[32m"status"[39m
+        [36m>[39m
+          [0mNo review tasks.[0m
+        [36m</div>[39m
+        [36m<div[39m
+          [33mstyle[39m=[32m"display: grid; gap: 8px;"[39m
+        [36m/>[39m
+      [36m</section>[39m
+    [36m</div>[39m
+  [36m</div>[39m
+[36m</body>[39m
+ ❯ waitForWrapper ../../../../home/andrei/StorageGenie/frontend/node_modules/@testing-library/dom/dist/wait-for.js:163:27
+ ❯ ../../../../home/andrei/StorageGenie/frontend/node_modules/@testing-library/dom/dist/query-helpers.js:86:33
+ ❯ src/routes/query-error-alerts.test.tsx:270:32
+    268| 
+    269|     fireEvent.click(await screen.findByText("Import jobquery"));
+    270|     const alert = await screen.findByRole("alert");
+       |                                ^
+    271|     expect(alert).toHaveTextContent("Could not load job detail");
+    272|     expect(alert).toHaveTextContent("detail read failed");
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[8/8]⎯
+
+ Test Files  1 failed (1)
+      Tests  8 failed | 9 passed (17)
+   Start at  17:26:16
+   Duration  9.80s (transform 325ms, setup 67ms, collect 640ms, tests 8.30s, environment 420ms, prepare 97ms)
+
+vitest_exit=1
+elapsed_s=10

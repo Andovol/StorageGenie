@@ -1,0 +1,24 @@
+SG-195 focused PASS half — post-commit candidate (PG-EV-09 destination)
+date_utc=2026-10-16T17:26:14Z
+cmd: node_modules/.bin/vitest run src/routes/query-error-alerts.test.tsx  (timeout 120)
+candidate HEAD: f757ebdca903bd262861bc53ceeb8fd9a0ac7c77
+packet base: 7edf5f50cac953e2a1d363765ca5dfc1626064a0
+status:
+?? ../docs/worklogs/SG-195_focused_candidate.log
+===
+
+ RUN  v1.6.1 /home/andrei/StorageGenie/frontend
+
+stderr | src/routes/query-error-alerts.test.tsx > SG-195 route query-error alerts > Catalog: a failed asset-list query alerts naming the list and hides the empty view
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+ ✓ src/routes/query-error-alerts.test.tsx  (17 tests) 487ms
+
+ Test Files  1 passed (1)
+      Tests  17 passed (17)
+   Start at  17:26:15
+   Duration  1.97s (transform 330ms, setup 73ms, collect 595ms, tests 487ms, environment 495ms, prepare 92ms)
+
+vitest_exit=0
+elapsed_s=3

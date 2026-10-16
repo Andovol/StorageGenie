@@ -1,0 +1,100 @@
+SG-195 worklog — route error branches: failed queries render a named alert, never loading/empty text
+(Catalog, Inbox, Analytics, Planning, Capture)
+(append-only frozen at evidence commit; material commands, decisions, results)
+
+LANE. dispatch-storagegenie@SG-195.service, MainPID 5982, ExecMainStartTimestamp
+2026-10-16 17:20:41 UTC (epoch 1792171241); RUN_BUDGET_S=2100 -> deadline
+epoch 1792173341 = 17:55:41Z. Coder process 6022: `opencode run --auto --dir
+/home/andrei/StorageGenie --model opencode-go/deepseek-v4.1-flash --variant max`
+(read from /proc/6022/cmdline, PB-4). BASE ref automation resolved
+7edf5f50cac953e2a1d363765ca5dfc1626064a0 (== local HEAD == origin/automation at
+start after fetch; worktree clean).
+
+CONTRACT. Host copy /home/andrei/storagegenie-contract/ VERSION=0.50.0, HEAD
+17231659ff34d4a91760a6d4d877280b7e32fc59 (tag objects absent in this grafted
+clone so rules_check.sh reports G-L1 UNCHECKED; RULES.md sha256
+49338e39a5749821e7e26724d28715d4d27b0a34e01b359ec91bc3d85239e3ed equals
+RULES.sha256). rules_check.sh output: G-L1 UNCHECKED (cache not checked out at a
+contract tag), G-L5/G-L7 UNCHECKED gh-unauthenticated, G-L6 bytes printed; exit
+3 — environment, not slice scope. Contract expectation 0.50.0 matches host
+VERSION=0.50.0; no difference. CODER.md line 3 echoed verbatim in the report.
+
+RECON / PB-1 VERIFICATION (base 7edf5f5, FIRST READ).
+- Premise holds: grep `isError` over the five route files finds zero use as a
+  query-error branch on the base. Pre-existing `role="alert"` uses are NOT
+  query branches: InboxPage detail.data.errors/steps (job payload errors),
+  AnalyticsPage:165 mutation message, PlanningPage:113 mutation message.
+- Sibling precedent confirmed verbatim: SettingsPage.tsx:36
+  `{settings.isError && <div role="alert">{String(settings.error)}</div>}`;
+  ReviewPage.tsx:56 candidateQuery.error alert; ExpiryPage.tsx:163-164
+  `{status.isError && (<div role="alert" className="text-danger" ...
+  >{String(status.error)}</div>)}` with `isEmpty = !!data && rows.length===0`
+  gating the empty state off on error.
+- Query census per EXPECTED set (hooks/useAssets.ts + routes):
+  Catalog: assets list (useAssets:13-33) — named; also useHouseholds 53,
+  useFacets 41, useSavedSearches 81 (enumerated, outside the named set; not
+  widened).
+  Inbox: jobs (InboxPage:22), tasks (:23), detail (:24) — all three named.
+  Analytics: summary (AnalyticsPage:40-44) — named.
+  Planning: useHouseholds (:23) + suggestions (:38-42) — both named.
+  Capture: useHouseholds (:10) — named.
+  Named total 8 conditionals over 5 routes.
+- Retry-affordance sweep: no route renders a query-refetch control (only
+  mutation-driven invalidations: Inbox retry/run/resolve, Planning run/confirm/
+  dismiss, saved-search saves). Decision: text-only on every route — no refetch
+  plumbing invented.
+
+DECISIONS (CO-04 reversible ambiguity, all stated in the report).
+- ONE new test module frontend/src/routes/query-error-alerts.test.tsx (17
+  tests): the behaviour is one cross-route contract and the FAIL-then-PASS pair
+  runs as one node set; only ../api/client is mocked, so the real hooks and
+  query wiring execute (CO-101: no other test names these alert strings).
+- Alert shape mirrors the precedent: `role="alert"` + text naming the failed
+  query + `String(error)` detail (Settings/Expiry precedent).
+- Catalog: when isError and no items are displayed the empty grid is suppressed
+  (`!(isError && displayed.length === 0)`) so "No items match the current view."
+  cannot show on a failed list load — mirrors ExpiryPage's data-gated isEmpty.
+  Stale items from a prior success still render beside the alert.
+- Capture: on household error the "seed the database first" text is replaced by
+  the alert (it would be false guidance); loaded-empty path unchanged.
+- "Could not load households: " text repeats on Planning+Capture = 2 routes
+  (< 3) -> per-route text, duplication reported, no shared helper component.
+- Tests: error test per query (8), plus loading and empty/success controls (9).
+
+COMMANDS / OUTCOMES (all logs committed beside this note; vitest via
+frontend/node_modules/.bin/vitest).
+1. Development iteration run (not a gate; the only pre-commit run, recorded for
+   honesty): first attempt 14/17 with 3 harness-only failures (CatalogPage
+   needs ThemeProvider), fixed in the test harness; second run 17/17 452ms
+   exit 0.
+2. Work commit f757ebdca903bd262861bc53ceeb8fd9a0ac7c77 (6 files, +324/-12):
+   five route files (CatalogPage, InboxPage, AnalyticsPage, PlanningPage,
+   CapturePage) + query-error-alerts.test.tsx (new, 254 lines).
+3. Focused PASS half post-commit on candidate f757ebd: 17 passed in 1.97s exit
+   0 (SG-195_focused_candidate.log). D434/D436: deliberately no pre-commit
+   focused gate; this post-commit run gates acceptance.
+4. FAIL half on isolated worktree /tmp/opencode/sg195-base @ 7edf5f5 (detached):
+   candidate test sha256 fa6d0994330ed889c718a689735a328e1a3186a40ff20973b13ed0eea5fc1363
+   equal in both trees; 8 failed, 9 passed in 9.80s exit 1
+   (SG-195_focused_base.log) — the 8 error tests fail without the fix, the 9
+   loading/empty controls pass on the base too; worktree removed after.
+5. FULL frontend suite on candidate (D443): 29 files, 283 passed in 9.65s exit
+   0 (SG-195_suite_candidate.log). No old row failed on the candidate, so no
+   base rerun was owed; no count carried from an earlier slice (283 counted
+   here, SG-190's 266 not reused).
+6. Gates: tsc --noEmit exit 0 (SG-195_tsc.log); eslint on the six touched files
+   no output exit 0 (SG-195_eslint.log). Backend suite untouched/unrun — no
+   backend in the ceiling.
+
+HEALTH: not applicable — jsdom-only slice, no live interaction, stated per the
+packet (never silently skipped; no probe run).
+
+EXTERNAL / PRODUCTION EFFECTS (CO-85): none with side effects. No deploy,
+restart, migration, schema or host change, provider/paid call ($0), credential
+or .env handled; no sudo. Local commits and git pushes/notes only. No privileged
+operation attempted, therefore no denial; PB-2 stop path never reached.
+
+LANE BUDGET: start epoch 1792171241 (17:20:41Z); orientation+FIRST READ+recon to
+~17:25:10 (~270s); implementation+2 dev runs+work commit to 17:26:10;
+verification leg 17:26:15Z -> 17:26:45Z (focused PASS 1.97s, base FAIL 9.80s,
+full suite 9.65s, gates tsc/eslint). Elapsed figure finalized in the report.

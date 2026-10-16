@@ -1,0 +1,3 @@
+SG-195 eslint gate (touched files)
+cmd: node_modules/.bin/eslint src/routes/CatalogPage.tsx src/routes/InboxPage.tsx src/routes/AnalyticsPage.tsx src/routes/PlanningPage.tsx src/routes/CapturePage.tsx src/routes/query-error-alerts.test.tsx  (timeout 120)
+eslint_exit=0

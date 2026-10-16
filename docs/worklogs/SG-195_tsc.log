@@ -1,0 +1,3 @@
+SG-195 tsc gate
+cmd: node_modules/.bin/tsc --noEmit  (timeout 120)
+tsc_exit=0
