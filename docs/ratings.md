@@ -739,3 +739,9 @@ Originals above (88 FLAG:TRUST / 91 FLAG:TRUST) stand as the audit trail; the ve
 | slice_id | phase | model | effort | score | flag | lever | guards_invoked | deduction_attribution | remaining | escape | slowest_waste |
 |---|---|---|---|---|---|---|---|---|---|---|---|
 | SG-194 | Micro-slice (starter arc/D16); receipts 8a67ce3 + db663b5, settings envelope-sourced; jobs.py 422 hunk + 3 genuine FAIL-then-PASS tests; twin census 1+2+0; full suite 722/2 both env base-identical (D443); mypy/ruff clean; health delta none; audit SG-194_audit.md | opencode/opencode-go/deepseek-v4.1-flash (receipt settings) | max | 98 |  |  | PG-EV-02/03/09; PG-IC-01/07/09; PG-DP-02; PG-PR-03/06 | coder | Env signal rows (libzbar/tesseract) to STATE known-host condition; serving to close-deploy rider; no other open items |  | 5s precommit-focused |
+
+### SG-195 (2026-10-15 - route error branches)
+
+| slice_id | phase | model | effort | score | flag | lever | guards_invoked | deduction_attribution | remaining | escape | slowest_waste |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| SG-195 | R8 error branches (starter arc/D16); WORK receipt verified (dual note missing — runner report_unreadable misfire ISS-4, not slice fault); 8 conditionals + 17 genuine tests (8 FAIL base + 17 PASS); suite 283/283; tsc/eslint clean; census 5 + out-of-set; under estimate; audit SG-195_audit.md | opencode/opencode-go/deepseek-v4.1-flash (receipt settings) | max | 98 |  |  | PG-EV-01/02/03/09; PG-IC-01/07/09; PG-PR-03/06 |  | Out-of-set household queries to SG-196 premises; zoom/touch/dark + backend suite stand; ISS-4 desk relay owed |  | none |
