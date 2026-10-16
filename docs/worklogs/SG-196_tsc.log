@@ -1,0 +1,4 @@
+# SG-196 tsc gate at work HEAD faea4d60804325dbf169f73e018c43d0aa3066ed
+# 2026-10-16T20:26:20Z
+$ node_modules/.bin/tsc --noEmit
+tsc_exit=0

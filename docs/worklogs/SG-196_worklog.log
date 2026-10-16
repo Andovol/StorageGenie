@@ -1,0 +1,102 @@
+SG-196 worklog — nav household context/count: shared context, nav selector, household
+error branches, Inbox badge
+(append-only; frozen at the evidence commit; material commands, decisions, results)
+
+SESSION. Interactive coder session on the dispatch host (no systemd lane unit for this
+run; stated, not hidden). First stamp 2026-10-16 20:21:11Z (epoch 1792182071). Working
+dir /home/andrei/StorageGenie, remote git@github.com:Andovol/StorageGenie.git, BASE ref
+automation resolved 04f18520cfce4bde4e63dccc8f3c5ac3ad116da1 (== local HEAD at start;
+worktree clean). Contract copy /home/andrei/storagegenie-contract (VERSION 0.50.0);
+CODER.md line 3 echoed verbatim in the report. rules_check.sh is absent on this workdir
+(same environment note SG-195/SG-190 recorded; .rules-cache/ is untracked by design per
+.gitignore). Dispatch settings (model/effort) ride the trigger; this packet carries none.
+
+RECON / PB-1 (base 04f1852).
+- Census difference vs the packet: the base tree has NINE product useHouseholds call
+  sites, not eight. The extra is components/shell/AppHeader.tsx:16 (import-modal id
+  derivation, the old Nav shape). It is outside the packet's scope ceiling (App.tsx,
+  HouseholdSelector.tsx, the 7 route files, hooks/*) and outside the EXPECTED branch
+  set; NOT migrated and NOT widened — reported. Its read still shares the
+  ["households"] cache key with the provider, so network I/O stays a single request.
+- EXPECTED unbranched household queries confirmed on base: CatalogPage:33,
+  InboxPage:13, AnalyticsPage:27, App.tsx:33 (nav) — plus AppHeader out-of-set.
+  CapturePage:10 and PlanningPage:23 were already branched by SG-195
+  ("Could not load households"), reported-not-rebuilt, re-sourced from the context.
+- ReviewPage.tsx:39 already carries its own inline review-tasks query with the same
+  ["review-tasks", household] key; left untouched (outside the ceiling) — the cache is
+  shared regardless.
+- Packet line citations re-verified against the tree; route/selector lines match.
+
+DESIGN (PB-6; decided and reported, never asked).
+- HouseholdContext (new hooks/HouseholdContext.tsx): provider calls useHouseholds()
+  once; value { households, isError, error, householdId, setHouseholdId };
+  localStorage-first state init; first-household fallback + auto-persist effect hoisted
+  verbatim from the per-route code; setHouseholdId persists. useHouseholdContext()
+  throws outside the provider (a missing provider is a wiring bug, never a silent
+  second fetch).
+- Seven routes migrated: deleted their useState/useHouseholds/fallback-effect; kept
+  each route's effectiveHousehold derivation shape and selector placement. Capture and
+  Planning keep their SG-195 household alerts, now reading the context error state.
+- G2: Catalog facets text "Could not load catalog facets: …", saved searches
+  "Could not load saved searches: …" — role="alert", text-only, per-route (<3
+  duplicates, no shared helper).
+- G3: useReviewTasks in hooks/useAssets.ts = the same queryKey/queryFn/enabled as
+  InboxPage's former inline query; both Nav and InboxPage consume it. Badge renders iff
+  data is loaded (open = status !== "resolved"); a loaded zero renders the honest "0";
+  error / loading / no-household render NO badge (never a false zero). NavLink carries
+  aria-label "Inbox, N open review tasks" exactly when the count is known.
+- Nav household alert: `{householdsIsError && <div role="alert">Could not load
+  households: {String(error)}</div>}` per the G1 text convention (same text now on 3
+  surfaces: nav + Capture + Planning — duplication reported, no helper).
+
+TEST EDITS REQUIRED BY THE HOOK-SHAPE MIGRATION (each names the preserved behavior
+in-code). Provider wrapper added where a page is rendered directly: InboxPage.test,
+ChatPage.test, PlanningPage.test, AnalyticsPage.test, ExpiryPage.test,
+query-error-alerts.test, shell.test (renderCatalog + one inline render), catalog.test
+(renderCatalog), theme-adoption.test (5 page renders + the swept-route array),
+import-modal.test (the /inbox route render). Mock shape changes: InboxPage.test and
+import-modal.test switch to importOriginal spread (only useHouseholds stubbed; real
+useReviewTasks runs); theme-adoption.test gains the useReviewTasks fixture. No
+assertion text changed; preserved behaviors named: household-scoped requests still
+carry the loaded id, all SG-195 alerts still fire.
+
+EPISODE (recorded per CO-76 honesty). Interim work commit a0c814b (unpushed) contained
+3 "(control)" rows coupled to candidate-only signals (nav combobox, nav-fired
+review-tasks fetch); the base FAIL run exposed them (11 failed / 2 passed on base).
+Controls were rewritten to prove absence on states present on both trees (the Inbox
+route supplies the alert/loading anchor); the interim commit was replaced by amended
+work commit faea4d6 while still unpushed — no published history was rewritten. Final
+base run: 8 failed / 5 passed, all 8 failures structurally absent-on-base
+(combobox ×3, alert ×3, badge ×2).
+
+COMMANDS / OUTCOMES (logs committed beside this note).
+1. Dev iteration run (not a gate, D434/D436): 11 files, 153 passed, exit 0, 6.23 s
+   (20:23:31Z).
+2. Work commit faea4d60804325dbf169f73e018c43d0aa3066ed (21 files, +556/-161;
+   20:24:0xZ interim a0c814b, amended 20:25:3xZ).
+3. Focused PASS half at work HEAD (11-file derived set): 153 passed, exit 0, 6.12 s
+   (20:25:36Z; SG-196_focused_candidate.log).
+4. FAIL half: isolated worktree /tmp/opencode/sg196-base @ 04f1852; module sha256
+   48fea66946f449101071d8390edfc6ea2c7780785fe96578b8bf02d3da35acd2 equal in both
+   trees; 8 failed | 5 passed, exit 1 (20:25:5xZ; SG-196_base_newrows_fail.log);
+   worktree removed after.
+5. Full frontend suite on candidate once (D443): 30 files, 296 passed, exit 0, 11.71 s
+   (20:26:04Z; SG-196_suite_candidate.log). 296 = SG-195's 283 + this slice's 13; no
+   count carried — this run's own totals. No old row failed on the candidate, so no
+   single-row base rerun was owed.
+6. Gates at work HEAD: tsc --noEmit exit 0; eslint src exit 0 (20:26:20-25Z;
+   SG-196_tsc.log, SG-196_eslint.log).
+7. Census base-vs-target: SG-196_census.log (useHouseholds 9 product call sites at
+   base -> 1 provider call site at target + AppHeader reported; isError sites listed).
+
+HEALTH: not applicable — jsdom-only slice, no live interaction; stated per the packet,
+never silently skipped.
+
+EXTERNAL / PRODUCTION EFFECTS (CO-85): none with side effects. No deploy, restart,
+migration, schema or host change; no provider/paid call; no credential or .env handled;
+no sudo; no privileged operation attempted, so no denial and PB-2's stop path was never
+reached. Local commits, pushes and notes only.
+
+LIMITS. This session ran interactively; no RUN_BUDGET_S / IDLE_KILL_S was enforced by
+a runner for it (the packet's bounds were applied per command: reads 120 s, focused
+600 s, suite 900 s; none hit a bound; nothing killed).

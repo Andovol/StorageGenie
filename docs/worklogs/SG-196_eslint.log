@@ -1,0 +1,4 @@
+# SG-196 eslint gate at work HEAD faea4d60804325dbf169f73e018c43d0aa3066ed
+# 2026-10-16T20:26:25Z
+$ node_modules/.bin/eslint src
+eslint_exit=0
