@@ -763,3 +763,9 @@ Originals above (88 FLAG:TRUST / 91 FLAG:TRUST) stand as the audit trail; the ve
 | slice_id | phase | model | effort | score | flag | lever | guards_invoked | deduction_attribution | remaining | escape | slowest_waste |
 |---|---|---|---|---|---|---|---|---|---|---|---|
 | SG-198 | Consolidation micro-slice (starter arc/D16); WORK receipt verified (dual paste note missing - runner report_unreadable misfire, 3rd ISS-4 instance, not slice fault); AppHeader onto context + ReviewPage onto useReviewTasks, zero behavior change; re-proof only (no FAIL half owed); suite 298/298; tsc/eslint clean; census 3-to-2 + 2-to-1; 19 s over estimate, stated; audit SG-198_audit.md | opencode/opencode-go/deepseek-v4.1-flash (receipt settings) | max | 98 |  |  | PG-EV-01/02/03; PG-IC-01/07/09; PG-PR-03/06 |  | zoom/touch/dark + backend suite stand; runner-misfire 3rd instance to desk #84 |  | none |
+
+### SG-199 (2026-10-16 - touch/zoom/dark measurement)
+
+| slice_id | phase | model | effort | score | flag | lever | guards_invoked | deduction_attribution | remaining | escape | slowest_waste |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| SG-199 | Read-only measurement (starter arc/D16 + D-4); WORK receipt verified (dual paste note missing - runner report_unreadable misfire, 4th ISS-4 instance, not slice fault); touch 0/6 + zoom 0/6x2 + dark 0-below-AA, all verified in JSON; 22/22 controls with must-fail arms; 28/28 shots opened by both; clock classifier controlled; 1132 s vs ~1200 s; audit SG-199_audit.md (28/28 shots opened) | opencode/opencode-go/deepseek-v4.1-flash (receipt settings) | max | 98 |  |  | PG-EV-01/02/03/04/05/07/09/13; PG-SC-01/02/03/09/10/12; PG-IC-01/07/09; PG-DP-03; PG-PR-01/03/04/07/10 |  | Density proposal to owner (D-4); auth-live + container identity blocked; runner-misfire 4th instance to desk #84 |  | none |
