@@ -1,0 +1,120 @@
+# SG-202 pre-state capture (read-only) — 2026-10-17T12:03:02Z
+start_epoch=1792238582
+
+== lane ==
+RUNTIME_DIRECTORY=/run/dispatch-storagegenie-SG-202 RUNTIME_SOCKETS=docker.sock
+DOCKER_HOST=unix:///run/dispatch-storagegenie-SG-202/docker.sock
+srw-rw---T 1 andrei 100987 0 Oct 16 17:19 /run/dispatch-storagegenie-SG-202/docker.sock
+
+== git ==
+From github.com:Andovol/StorageGenie
+ * branch            automation -> FETCH_HEAD
+requested ref: automation
+resolved local HEAD: 23c59b16c78f87ed4abb55aa226745cdfe0d8974
+origin/automation:   23c59b16c78f87ed4abb55aa226745cdfe0d8974
+branch: automation
+status --porcelain:
+?? docs/worklogs/SG-202_prestate.log
+f757ebd ancestor-of-HEAD: yes
+faea4d6 ancestor-of-HEAD: yes
+144190c ancestor-of-HEAD: yes
+
+== docker via lane socket (never default) ==
+Client 29.6.2 / Server 29.6.2 (API 1.55)
+version_exit=0
+Docker Compose version v5.3.1
+
+== container pre ==
+Id=a77e3f2ff0ddc844888db24959d9e139395d1edfcf88e1ecade4efe009a81e0c
+Name=/storagegenie-backend-1
+Created=2026-10-16T19:41:19.974177688Z
+RestartCount=0
+Image=sha256:e3b7c0aad28b4f27a07bf1032870d25eb50de3eefcde64581b8a9d780ec9468c
+State=running StartedAt=2026-10-16T19:41:21.658871595Z Health=healthy
+inspect_exit=0
+volume /home/andrei/.local/share/docker/volumes/storagegenie_storage_data/_data => /data/storage
+bind /home/andrei/StorageGenie/data/db => /data/db
+ImageId=sha256:e3b7c0aad28b4f27a07bf1032870d25eb50de3eefcde64581b8a9d780ec9468c Created=2026-10-16T19:39:36.372215302Z
+
+== health pre ==
+{"status":"ok","db":"ok","storage":"ok"} [200]
+
+== served assets pre (expected SG-197 serve: bundle 8ba02c64…) ==
+assets/index-_9IDZb0V.js
+assets/index-DHv-3aM4.css
+5ce95f29a81bcc48e0ad1de94ed926c91a1a9f91bf4ba5444da8490cb014bc40  /tmp/opencode/sg202/pre_index.html
+8ba02c647f29cc401f5b9a92f759a4a46441a67b2709be1bdf19622edcc8e88a  /tmp/opencode/sg202/pre_app.js
+e1e5ff6385e02f80e05bb94732b4d93dcf59cca184139e22164c0fad4a26f042  /tmp/opencode/sg202/pre_app.css
+bytes=944 name=/tmp/opencode/sg202/pre_index.html
+bytes=325053 name=/tmp/opencode/sg202/pre_app.js
+bytes=4541 name=/tmp/opencode/sg202/pre_app.css
+
+== API shape pre (PG-EV-08 before) ==
+GET /v1/households [200] 6921583771fb79bec868339653a91050d1163430ed19fa0e96268522adf8038f  /tmp/opencode/sg202/pre_households.json
+[{"id":"01a0a029-1477-7ca0-b200-bce78a96c679","name":"Popescu Household","created_at":"2026-09-14T13:44:01","updated_at":"2026-09-14T13:44:01"}]
+GET /v1/jobs plain [422] 4f398b7e254d77da15e71fefa586eb89604890a76a8a60a47c66e6074bdfb5c0  /tmp/opencode/sg202/pre_jobs.json
+GET /v1/jobs?cursor=not-a-cursor [422] 4f398b7e254d77da15e71fefa586eb89604890a76a8a60a47c66e6074bdfb5c0  /tmp/opencode/sg202/pre_jobs_bad.json
+{"type":"about:blank","title":"Unprocessable Entity","status":422,"detail":"1 validation error:\n  {'type': 'missing', 'loc': ('query', 'household_id'), 'msg': 'Field required', 'input': None}\n\n  File \"/app/app/api/v1/jobs.py\", line 107, in list_jobs\n    GET /v1/jobs"}
+GET /v1/review-tasks?cursor=not-a-cursor [422] 11e8060149f74e7ead7834dec9aaec2423c9e25de3e6851856a7621c8a132a19  /tmp/opencode/sg202/pre_review_bad.json
+{"type":"about:blank","title":"Unprocessable Entity","status":422,"detail":"1 validation error:\n  {'type': 'missing', 'loc': ('query', 'household_id'), 'msg': 'Field required', 'input': None}\n\n  File \"/app/app/api/v1/review_tasks.py\", line 37, in list_review_tasks\n    GET /v1/review-tasks"}
+
+== production DB (mode=ro) ==
+total 696
+-rw------- 1 andrei andrei 675840 Oct 12 20:03 storagegenie.db
+-rw------- 1 andrei andrei  32768 Oct 16 19:41 storagegenie.db-shm
+-rw------- 1 andrei andrei      0 Oct 16 19:41 storagegenie.db-wal
+e6bef157440fb8b4a3262577362b071dcae07507ea9a7e04a614e11be28ee5bd  data/db/storagegenie.db
+tables_enumerated: 28
+counts: {"alembic_version": 1, "assertion": 37, "asset": 7, "asset_evidence": 14, "asset_fts": 7, "asset_fts_config": 1, "asset_fts_data": 9, "asset_fts_docsize": 7, "asset_fts_idx": 7, "asset_location": 1, "asset_relation": 1, "audit_event": 91, "candidate": 10, "enrich_snapshot": 4, "evidence": 18, "guardrail_event": 2, "household": 1, "idempotency_key": 11, "job": 11, "job_step": 72, "location": 1, "observation": 20, "planning_suggestion": 0, "provider_call": 29, "review_task": 8, "saved_search": 0, "source_attribution": 0, "user": 2}
+alembic_version: [('20260924_sg114_relation',)]
+db_read_exit=0
+
+== product diff merged-vs-served (f757ebd = last served commit by SG-197) ==
+-- git log --oneline f757ebd..HEAD -- backend frontend
+144190c SG-198 G1: AppHeader onto household context, ReviewPage onto shared useReviewTasks
+faea4d6 SG-196 G1+G2+G3: shared household context (one fetch), nav selector+household alert, Inbox open-task badge, catalog facets/saved-search alerts
+-- git diff --stat f757ebd..HEAD -- backend frontend (tail)
+ frontend/src/routes/query-error-alerts.test.tsx    |   7 +-
+ frontend/src/routes/theme-adoption.test.tsx        |  23 +-
+ 24 files changed, 622 insertions(+), 170 deletions(-)
+-- git diff --name-only f757ebd..HEAD -- backend frontend
+frontend/src/App.household-nav.test.tsx
+frontend/src/App.tsx
+frontend/src/components/catalog/catalog.test.tsx
+frontend/src/components/shell/AppHeader.tsx
+frontend/src/components/shell/import-modal.test.tsx
+frontend/src/components/shell/shell.test.tsx
+frontend/src/hooks/HouseholdContext.tsx
+frontend/src/hooks/useAssets.ts
+frontend/src/routes/AnalyticsPage.test.tsx
+frontend/src/routes/AnalyticsPage.tsx
+frontend/src/routes/CapturePage.tsx
+frontend/src/routes/CatalogPage.tsx
+frontend/src/routes/ChatPage.test.tsx
+frontend/src/routes/ChatPage.tsx
+frontend/src/routes/ExpiryPage.test.tsx
+frontend/src/routes/ExpiryPage.tsx
+frontend/src/routes/InboxPage.test.tsx
+frontend/src/routes/InboxPage.tsx
+frontend/src/routes/PlanningPage.test.tsx
+frontend/src/routes/PlanningPage.tsx
+frontend/src/routes/ReviewPage.test.tsx
+frontend/src/routes/ReviewPage.tsx
+frontend/src/routes/query-error-alerts.test.tsx
+frontend/src/routes/theme-adoption.test.tsx
+-- migration paths (backend/app/models backend/alembic):
+(end migration list)
+-- changed top-level paths since f757ebd (all, for outside-product check):
+      1 AGENTS.md
+      1 STATE.md
+     96 docs
+     24 frontend
+
+end_epoch=1792238584
+
+== API shape pre — supplementary (household_id supplied; the required-param 422s above are themselves shape) ==
+GET /v1/jobs?household_id=... plain [200] 045a80a7cb09fee0e98f634d80a5b883aa8a0e28aceca0b9952c71506ea12c07  /tmp/opencode/sg202/pre_jobs_hh.json
+GET /v1/jobs?household_id=...&cursor=not-a-cursor [422] d117e66a2a7a79c74d83ce247b60e5ad56c5e4a1cc502fd2cb4182122642d382  /tmp/opencode/sg202/pre_jobs_hh_bad.json
+{"type":"about:blank","title":"Unprocessable Entity","status":422,"detail":"malformed cursor"}
+GET /v1/review-tasks?household_id=...&cursor=not-a-cursor [422] d117e66a2a7a79c74d83ce247b60e5ad56c5e4a1cc502fd2cb4182122642d382  /tmp/opencode/sg202/pre_review_hh_bad.json
+{"type":"about:blank","title":"Unprocessable Entity","status":422,"detail":"malformed cursor"}

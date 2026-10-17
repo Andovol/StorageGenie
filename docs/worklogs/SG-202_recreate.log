@@ -1,0 +1,12 @@
+# SG-202 recreate issuance #1 (of exactly one); 2026-10-17T12:03:52Z
+cmd: DOCKER_HOST=unix:///run/dispatch-storagegenie-SG-202/docker.sock timeout 120 docker compose up -d --no-deps backend
+start_epoch=1792238632
+ Container storagegenie-backend-1 Recreate 
+ Container storagegenie-backend-1 Recreated 
+ Container storagegenie-backend-1 Starting 
+ Container storagegenie-backend-1 Started 
+up_exit=0
+end_epoch=1792238633
+== post-recreate container identity (lane) ==
+Id=d868f373b661e51247db757ca755bd9dad5906606233a76807860141a0ef780d Created=2026-10-17T12:03:52.700720908Z RestartCount=0 Image=sha256:15a1fe632ef87f459e9747afd21fd1fba29a5aff01566144c7ebec97ebe0f20d State=running StartedAt=2026-10-17T12:03:53.419536516Z Health=starting
+inspect_exit=0

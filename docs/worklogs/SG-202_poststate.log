@@ -1,0 +1,75 @@
+# SG-202 post-recreate state — 2026-10-17T12:04:45Z
+start_epoch=1792238685
+
+== container post (lane) ==
+Id=d868f373b661e51247db757ca755bd9dad5906606233a76807860141a0ef780d
+Created=2026-10-17T12:03:52.700720908Z
+RestartCount=0
+Image=sha256:15a1fe632ef87f459e9747afd21fd1fba29a5aff01566144c7ebec97ebe0f20d
+State=running StartedAt=2026-10-17T12:03:53.419536516Z Health=healthy
+volume /home/andrei/.local/share/docker/volumes/storagegenie_storage_data/_data => /data/storage
+bind /home/andrei/StorageGenie/data/db => /data/db
+ImageId=sha256:15a1fe632ef87f459e9747afd21fd1fba29a5aff01566144c7ebec97ebe0f20d
+
+== six post-recreate health GETs (standing precedent) ==
+{"status":"ok","db":"ok","storage":"ok"} [200]
+{"status":"ok","db":"ok","storage":"ok"} [200]
+{"status":"ok","db":"ok","storage":"ok"} [200]
+{"status":"ok","db":"ok","storage":"ok"} [200]
+{"status":"ok","db":"ok","storage":"ok"} [200]
+{"status":"ok","db":"ok","storage":"ok"} [200]
+
+== served assets post ==
+assets/index-DgiNiCw9.js
+assets/index-DHv-3aM4.css
+e3eb67360d145260465ca379bb325bf5868bf4923692f274902caf11c2d44280  /tmp/opencode/sg202/post_index.html
+dd4f1bd0876de5dfba0b0bc351342a4e5ca3df35f8b5f4752e0ab31845579f53  /tmp/opencode/sg202/post_app.js
+e1e5ff6385e02f80e05bb94732b4d93dcf59cca184139e22164c0fad4a26f042  /tmp/opencode/sg202/post_app.css
+bytes=944 name=/tmp/opencode/sg202/post_index.html
+bytes=325039 name=/tmp/opencode/sg202/post_app.js
+bytes=4541 name=/tmp/opencode/sg202/post_app.css
+build-log asset name (expected served): dist/assets/index-DgiNiCw9.js
+
+== SG-196/SG-198 markers in served bundle (counts) ==
+inbox-open-count: 1
+Could not load households: 3
+Could not load catalog facets: 1
+Could not load saved searches: 1
+Select household: 3
+
+== DB post (mode=ro) ==
+e6bef157440fb8b4a3262577362b071dcae07507ea9a7e04a614e11be28ee5bd  data/db/storagegenie.db
+tables_enumerated: 28
+counts: {"alembic_version": 1, "assertion": 37, "asset": 7, "asset_evidence": 14, "asset_fts": 7, "asset_fts_config": 1, "asset_fts_data": 9, "asset_fts_docsize": 7, "asset_fts_idx": 7, "asset_location": 1, "asset_relation": 1, "audit_event": 91, "candidate": 10, "enrich_snapshot": 4, "evidence": 18, "guardrail_event": 2, "household": 1, "idempotency_key": 11, "job": 11, "job_step": 72, "location": 1, "observation": 20, "planning_suggestion": 0, "provider_call": 29, "review_task": 8, "saved_search": 0, "source_attribution": 0, "user": 2}
+alembic_version: [('20260924_sg114_relation',)]
+
+== API shape post (PG-EV-08 after) ==
+GET /v1/households [200] 6921583771fb79bec868339653a91050d1163430ed19fa0e96268522adf8038f  /tmp/opencode/sg202/post_households.json
+GET /v1/jobs?household_id=... plain [200] 045a80a7cb09fee0e98f634d80a5b883aa8a0e28aceca0b9952c71506ea12c07  /tmp/opencode/sg202/post_jobs_hh.json
+GET /v1/jobs?household_id=...&cursor=not-a-cursor [422] d117e66a2a7a79c74d83ce247b60e5ad56c5e4a1cc502fd2cb4182122642d382  /tmp/opencode/sg202/post_jobs_hh_bad.json
+{"type":"about:blank","title":"Unprocessable Entity","status":422,"detail":"malformed cursor"}
+GET /v1/review-tasks?household_id=...&cursor=not-a-cursor [422] d117e66a2a7a79c74d83ce247b60e5ad56c5e4a1cc502fd2cb4182122642d382  /tmp/opencode/sg202/post_review_hh_bad.json
+{"type":"about:blank","title":"Unprocessable Entity","status":422,"detail":"malformed cursor"}
+
+== SPA routes through the new server (read-only GETs) ==
+GET /inbox [200] bytes=944 sha256=e3eb67360d145260465ca379bb325bf5868bf4923692f274902caf11c2d44280
+GET /catalog [200] bytes=944 sha256=e3eb67360d145260465ca379bb325bf5868bf4923692f274902caf11c2d44280
+GET /analytics [200] bytes=944 sha256=e3eb67360d145260465ca379bb325bf5868bf4923692f274902caf11c2d44280
+GET /planning [200] bytes=944 sha256=e3eb67360d145260465ca379bb325bf5868bf4923692f274902caf11c2d44280
+GET /capture [200] bytes=944 sha256=e3eb67360d145260465ca379bb325bf5868bf4923692f274902caf11c2d44280
+GET /review [200] bytes=944 sha256=e3eb67360d145260465ca379bb325bf5868bf4923692f274902caf11c2d44280
+
+== CORS preflight ==
+HTTP/1.1 200 OK
+date: Sat, 17 Oct 2026 12:04:58 GMT
+server: uvicorn
+vary: Origin
+access-control-allow-methods: GET, POST, PUT, PATCH, DELETE, OPTIONS
+access-control-max-age: 600
+access-control-allow-headers: Accept, Accept-Language, Authorization, Content-Language, Content-Type, Idempotency-Key, If-Match, Origin, X-Requested-With
+access-control-allow-credentials: true
+access-control-allow-origin: http://localhost:5173
+content-length: 2
+content-type: text/plain; charset=utf-8
+
+end_epoch=1792238698
