@@ -1,0 +1,126 @@
+SG-208 smoke transcript (lane driver, reused from refs/quarantine/SG-208-20261017T171409Z; run 2026-10-17 by this unit)
+=== catalog run (--page / --mask '[data-testid="product-card"]') stderr ===
+[sg208] static server on 127.0.0.1:5173 serving /home/andrei/StorageGenie/frontend/dist
+[sg208] browser pid 1039092, DevTools port 39659 (HeadlessChrome/149.0.7827.55)
+[sg208] browser stderr: [1017/173143.691409:ERROR:dbus/bus.cc:405] Failed to connect to the bus: Could not parse server address: Unknown address type (examples of valid types are "tcp" and on UNIX "unix")
+[1017/173143.691495:ERROR:dbus/object_proxy.cc:572] Failed to call method: org.freedesktop.DBus.NameHasOwner: object_pa
+[sg208] navigated http://localhost:5173/
+[sg208] ready=true at http://localhost:5173/
+[sg208] assertions: {"selectCount":1,"selectNames":["Sort catalog"],"householdSelectCount":0,"ariaHouseholdPresent":false,"selectHouseholdTextPresent":false,"bodyHasHouseholdWord":false,"productCards":7,"headingTexts":[],"reviewStatusSelect":false,"alertsText":[],"bodyTextLength":578}
+[sg208] mask: {"blurredImages":7,"maskedTextNodes":24,"selectors":["[data-testid=\"product-card\"]"],"blockRun":"U+25A0 + U+200B (layout-safe)"}
+[sg208] screenshot docs/worklogs/SG-208_shots/catalog_no_household.png f585a9ce683f41e436e8007a85f167494e72cfee1a9af4eba91dd41a201c5465 171855 B
+=== catalog run stdout (machine summary) ===
+{
+  "ts": "2026-10-17T17:31:43.295Z",
+  "url": "http://localhost:5173/",
+  "page": "/",
+  "gate": {
+    "noHouseholdSelect": true,
+    "noHouseholdWordOnPage": true,
+    "selectScanLive": true,
+    "scopedReads": true,
+    "pageRendered": true
+  },
+  "pass": true,
+  "shot": {
+    "file": "docs/worklogs/SG-208_shots/catalog_no_household.png",
+    "sha256": "f585a9ce683f41e436e8007a85f167494e72cfee1a9af4eba91dd41a201c5465",
+    "bytes": 171855
+  },
+  "served": {
+    "index.html": {
+      "sha256": "2a7c3fd021c404f6948b0025a64093061c09e082da7c2c2876f3b65015f633c2",
+      "bytes": 944
+    },
+    "assets/index-l4vny6dM.js": {
+      "sha256": "a70000800c3e6f8205b168636ee3b8ee0df2c6faf49694770c8caca131f7c6bf",
+      "bytes": 320646
+    },
+    "assets/index-C07VbG0m.css": {
+      "sha256": "c3b58cda696a22970fc2a4a348849fc1359f2105f80f81304ed5dfd5ca31a557",
+      "bytes": 4535
+    }
+  },
+  "assertions": {
+    "selectCount": 1,
+    "selectNames": [
+      "Sort catalog"
+    ],
+    "householdSelectCount": 0,
+    "ariaHouseholdPresent": false,
+    "selectHouseholdTextPresent": false,
+    "bodyHasHouseholdWord": false,
+    "productCards": 7,
+    "headingTexts": [],
+    "reviewStatusSelect": false,
+    "alertsText": [],
+    "bodyTextLength": 578
+  },
+  "scopedRequestCount": 11,
+  "scopedOkCount": 11
+}
+=== inbox run (--page /inbox --mask 'section .bg-card') stderr ===
+[sg208] static server on 127.0.0.1:5173 serving /home/andrei/StorageGenie/frontend/dist
+[sg208] browser pid 1039496, DevTools port 39643 (HeadlessChrome/149.0.7827.55)
+[sg208] browser stderr: [1017/173151.807633:ERROR:dbus/bus.cc:405] Failed to connect to the bus: Could not parse server address: Unknown address type (examples of valid types are "tcp" and on UNIX "unix")
+[sg208] browser stderr: [1017/173151.807710:ERROR:dbus/object_proxy.cc:572] Failed to call method: org.freedesktop.DBus.NameHasOwner: object_path= /org/freedesktop/DBus: unknown error type:
+[sg208] navigated http://localhost:5173/inbox
+[sg208] ready=true at http://localhost:5173/inbox
+[sg208] assertions: {"selectCount":1,"selectNames":["Review status"],"householdSelectCount":0,"ariaHouseholdPresent":false,"selectHouseholdTextPresent":false,"bodyHasHouseholdWord":false,"productCards":0,"headingTexts":["Inbox","Import jobs","Selected job","Review queue"],"reviewStatusSelect":true,"alertsText":[],"bodyTextLength":860}
+[sg208] mask: {"blurredImages":0,"maskedTextNodes":69,"selectors":["section .bg-card"],"blockRun":"U+25A0 + U+200B (layout-safe)"}
+[sg208] screenshot docs/worklogs/SG-208_shots/inbox_no_household.png d05920ee957eda965e8691c97e5a79a87de58f57eb338172ff1128e05c8d3f43 41071 B
+=== inbox run stdout (machine summary) ===
+{
+  "ts": "2026-10-17T17:31:51.564Z",
+  "url": "http://localhost:5173/inbox",
+  "page": "/inbox",
+  "gate": {
+    "noHouseholdSelect": true,
+    "noHouseholdWordOnPage": true,
+    "selectScanLive": true,
+    "scopedReads": true,
+    "pageRendered": true
+  },
+  "pass": true,
+  "shot": {
+    "file": "docs/worklogs/SG-208_shots/inbox_no_household.png",
+    "sha256": "d05920ee957eda965e8691c97e5a79a87de58f57eb338172ff1128e05c8d3f43",
+    "bytes": 41071
+  },
+  "served": {
+    "index.html": {
+      "sha256": "2a7c3fd021c404f6948b0025a64093061c09e082da7c2c2876f3b65015f633c2",
+      "bytes": 944
+    },
+    "assets/index-l4vny6dM.js": {
+      "sha256": "a70000800c3e6f8205b168636ee3b8ee0df2c6faf49694770c8caca131f7c6bf",
+      "bytes": 320646
+    },
+    "assets/index-C07VbG0m.css": {
+      "sha256": "c3b58cda696a22970fc2a4a348849fc1359f2105f80f81304ed5dfd5ca31a557",
+      "bytes": 4535
+    }
+  },
+  "assertions": {
+    "selectCount": 1,
+    "selectNames": [
+      "Review status"
+    ],
+    "householdSelectCount": 0,
+    "ariaHouseholdPresent": false,
+    "selectHouseholdTextPresent": false,
+    "bodyHasHouseholdWord": false,
+    "productCards": 0,
+    "headingTexts": [
+      "Inbox",
+      "Import jobs",
+      "Selected job",
+      "Review queue"
+    ],
+    "reviewStatusSelect": true,
+    "alertsText": [],
+    "bodyTextLength": 860
+  },
+  "scopedRequestCount": 2,
+  "scopedOkCount": 2
+}

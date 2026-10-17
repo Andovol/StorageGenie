@@ -1,0 +1,5 @@
+SG-208 health — curl -s http://127.0.0.1:8003/v1/health (loopback GET, read-only)
+read 1 (pre-smoke, executed ~17:31:35Z; output verbatim as captured; bracketed by health-end read and catalog smoke ts 17:31:43.295Z): {"status":"ok","db":"ok","storage":"ok"}
+read 2 (post-smoke, executed ~17:31:55Z after inbox smoke ts 17:31:51.564Z; output verbatim): {"status":"ok","db":"ok","storage":"ok"}
+read 3 (at evidence freeze, 1792258365 (17:32:45Z)): {"status":"ok","db":"ok","storage":"ok"}
+identical: yes (all reads byte-identical)

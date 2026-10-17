@@ -1,0 +1,54 @@
+SG-208 scope-ceiling proof + absence grep gates (PG-SC-05; run 2026-10-17 17:32:53Z on the candidate tree)
+
+=== (1) CANDIDATE FILE SET — git diff --cached --name-status (pre-commit staging = commit 1 payload) ===
+M	frontend/src/App.household-nav.test.tsx
+M	frontend/src/App.tsx
+D	frontend/src/components/HouseholdSelector.test.tsx
+D	frontend/src/components/HouseholdSelector.tsx
+M	frontend/src/components/shell/AppShell.tsx
+M	frontend/src/components/shell/CatalogToolbar.tsx
+M	frontend/src/components/shell/shell.test.tsx
+M	frontend/src/hooks/HouseholdContext.tsx
+M	frontend/src/routes/AnalyticsPage.tsx
+M	frontend/src/routes/CapturePage.tsx
+M	frontend/src/routes/CatalogPage.tsx
+M	frontend/src/routes/ChatPage.test.tsx
+M	frontend/src/routes/ChatPage.tsx
+M	frontend/src/routes/ExpiryPage.tsx
+M	frontend/src/routes/InboxPage.test.tsx
+M	frontend/src/routes/InboxPage.tsx
+M	frontend/src/routes/PlanningPage.tsx
+M	frontend/src/routes/SettingsPage.tsx
+M	frontend/src/routes/theme-adoption.test.tsx
+all staged paths under frontend/src/ (product+test only), docs/worklogs/SG-208_* evidence untracked at this point
+
+=== (2) FILE-LIST OF THE PRODUCT COMMIT (created below) ===
+(captured after commit; see report section (c)); the staged set above is byte-identical to it
+
+=== (3) TREE GREP GATES on the candidate (frontend/src; PG-SC-05) ===
+$ grep -rn 'aria-label="Household"' frontend/src
+rc=1
+$ grep -rn 'onHouseholdChange' frontend/src
+rc=1
+$ grep -rn 'setHouseholdId' frontend/src
+rc=1
+$ grep -rn 'HouseholdSelector' frontend/src
+rc=1
+$ grep -rni 'select household\|no households\|clear household' frontend/src
+rc=1
+
+=== (4) JUSTIFIED REMAINDER — resolution rail writes (kept; not an affordance) ===
+$ grep -rn 'setItem("household_id"' frontend/src
+frontend/src/hooks/HouseholdContext.tsx:34:      localStorage.setItem("household_id", households[0].id);
+frontend/src/App.household-nav.test.tsx:117:    window.localStorage.setItem("household_id", "hh-b");
+rc=0
+$ grep -rn 'removeItem("household_id"' frontend/src
+rc=1
+line 34 = the kept resolution rail (stored id else first household, auto-persisted; packet explicitly keeps it); the test line = fixture setup. No removeItem call-site remains: the Settings clear-control was the only one.
+
+=== (5) REMAINING server-side multi-household paths (reported, NOT touched; scope exclusion) ===
+backend/app/api/v1/households.py: POST /v1/households (:17), PATCH /v1/households/{id} (:57), GET list (:12); no frontend caller of POST/PATCH exists (frontend consumes GET /v1/households only: hooks/useAssets.ts:57)
+
+=== (6) SCOPE CHECK — no backend/api/seed/migration/config bytes in the commit ===
+$ git diff --cached --name-only | grep -v '^frontend/src/'
+rc=1 (1 = empty: zero paths outside frontend/src)

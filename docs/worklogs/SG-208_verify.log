@@ -1,0 +1,40 @@
+SG-208 verification transcript — FAIL-half (base product + candidate tests) then PASS-half (candidate, full suite once)
+generated 2026-10-17T17:33:50Z (epoch 1792258430)
+
+=== FAIL-HALF — purpose (CO-25): the replacement absence assertions must FAIL against the starting behaviour (base product tree). Executed in a throwaway worktree at 31982f8 with the five candidate test files copied in; main worktree untouched. ===
+$ git worktree add --detach /tmp/opencode/sg208-base 31982f8179380bb4206f999092d6f6d0ab8db97d   # + node_modules symlink; 5 candidate test files copied over base
+$ node_modules/.bin/vitest run src/App.household-nav.test.tsx src/components/shell/shell.test.tsx src/routes/ChatPage.test.tsx src/routes/InboxPage.test.tsx src/routes/theme-adoption.test.tsx
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[10/10]⎯
+
+ Test Files  5 failed (5)
+      Tests  10 failed | 58 passed (68)
+   Start at  17:33:32
+   Duration  4.68s (transform 954ms, setup 621ms, collect 3.12s, tests 4.95s, environment 4.09s, prepare 1.26s)
+
+fail_half_rc=1 (vitest exit 1 — 5 files failed, 10 tests failed | 58 passed; every failure is an SG-208 absence row, verbatim failure names below)
+
+ FAIL  src/App.household-nav.test.tsx > SG-196 Catalog household-adjacent alerts (G2) > (control) the loaded Catalog path renders neither alert
+ FAIL  src/App.household-nav.test.tsx > SG-196 nav Inbox badge (G3) > (control) no household renders no badge and requests no tasks
+ FAIL  src/App.household-nav.test.tsx > SG-196 shared household context / SG-208 no switching UI > (control) a loaded households read renders no nav alert
+ FAIL  src/App.household-nav.test.tsx > SG-196 shared household context / SG-208 no switching UI > a failed households read alerts in the nav (G1)
+ FAIL  src/App.household-nav.test.tsx > SG-196 shared household context / SG-208 no switching UI > a stored household_id scopes every read; no route renders a household control (A1)
+ FAIL  src/App.household-nav.test.tsx > SG-196 shared household context / SG-208 no switching UI > the nav carries no household control; the first household is resolved and persisted (A1)
+ FAIL  src/components/shell/shell.test.tsx > Saved searches (SG-068) > the toolbar carries NO household control; the saved-search selection has no switch to react to (SG-208/D-13)
+ FAIL  src/routes/ChatPage.test.tsx > ChatPage > the page carries NO household control (SG-208/D-13)
+ FAIL  src/routes/InboxPage.test.tsx > InboxPage > the page carries NO household control (SG-208/D-13)
+ FAIL  src/routes/theme-adoption.test.tsx > SG-075 screen adoption > capture screen rides the shared centered container with no household select (SG-105 G1; SG-208/D-13)
+
+example failure body (shell.test.tsx, verbatim):
+ FAIL  src/components/shell/shell.test.tsx > Saved searches (SG-068) > the toolbar carries NO household control; the saved-search selection has no switch to react to (SG-208/D-13)
+AssertionError: expected [ <select …(3)>…(2)</select> ] to have a length of +0 but got 1
+
+
+=== PASS-HALF (the packet's ONE full suite on the candidate) — verbatim counts (full transcript committed as SG-208_suite.log) ===
+ Test Files  29 passed (29)
+      Tests  293 passed (293)
+   Start at  17:31:08
+   Duration  11.83s (transform 1.77s, setup 2.71s, collect 8.00s, tests 18.16s, environment 17.46s, prepare 3.98s)
+suite_rc=0
+
+worktree removed after the fail-half: git worktree remove --force /tmp/opencode/sg208-base (rc=0)

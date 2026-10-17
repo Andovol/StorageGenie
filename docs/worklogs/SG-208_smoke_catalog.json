@@ -1,0 +1,196 @@
+{
+  "ts": "2026-10-17T17:31:43.295Z",
+  "url": "http://localhost:5173/",
+  "page": "/",
+  "browser": "HeadlessChrome/149.0.7827.55",
+  "staticRequests": [
+    {
+      "method": "GET",
+      "url": "/"
+    },
+    {
+      "method": "GET",
+      "url": "/assets/index-l4vny6dM.js"
+    },
+    {
+      "method": "GET",
+      "url": "/assets/index-C07VbG0m.css"
+    }
+  ],
+  "served": {
+    "index.html": {
+      "sha256": "2a7c3fd021c404f6948b0025a64093061c09e082da7c2c2876f3b65015f633c2",
+      "bytes": 944
+    },
+    "assets/index-l4vny6dM.js": {
+      "sha256": "a70000800c3e6f8205b168636ee3b8ee0df2c6faf49694770c8caca131f7c6bf",
+      "bytes": 320646
+    },
+    "assets/index-C07VbG0m.css": {
+      "sha256": "c3b58cda696a22970fc2a4a348849fc1359f2105f80f81304ed5dfd5ca31a557",
+      "bytes": 4535
+    }
+  },
+  "assertions": {
+    "selectCount": 1,
+    "selectNames": [
+      "Sort catalog"
+    ],
+    "householdSelectCount": 0,
+    "ariaHouseholdPresent": false,
+    "selectHouseholdTextPresent": false,
+    "bodyHasHouseholdWord": false,
+    "productCards": 7,
+    "headingTexts": [],
+    "reviewStatusSelect": false,
+    "alertsText": [],
+    "bodyTextLength": 578
+  },
+  "apiRequests": [
+    {
+      "kind": "request",
+      "method": "GET",
+      "url": "http://localhost:8003/v1/households"
+    },
+    {
+      "kind": "request",
+      "method": "GET",
+      "url": "http://localhost:8003/v1/review-tasks?household_id=<redacted>"
+    },
+    {
+      "kind": "request",
+      "method": "GET",
+      "url": "http://localhost:8003/v1/saved-searches?household_id=<redacted>"
+    },
+    {
+      "kind": "request",
+      "method": "GET",
+      "url": "http://localhost:8003/v1/assets/facets?household_id=<redacted>"
+    },
+    {
+      "kind": "request",
+      "method": "GET",
+      "url": "http://localhost:8003/v1/assets?household_id=<redacted>&limit=20"
+    },
+    {
+      "kind": "request",
+      "method": "GET",
+      "url": "http://localhost:8003/v1/evidence/01a131a0-ca52-7d72-afa6-a7f79cc5a016/thumb/256?household_id=<redacted>"
+    },
+    {
+      "kind": "request",
+      "method": "GET",
+      "url": "http://localhost:8003/v1/evidence/01a0c4a1-acbd-7541-83b7-ce9d04730716/thumb/256?household_id=<redacted>"
+    },
+    {
+      "kind": "request",
+      "method": "GET",
+      "url": "http://localhost:8003/v1/evidence/01a0c4a0-af88-7903-a070-a44e7b120712/thumb/256?household_id=<redacted>"
+    },
+    {
+      "kind": "request",
+      "method": "GET",
+      "url": "http://localhost:8003/v1/evidence/01a0c481-08b8-72b2-ab22-8ad28fed8fda/thumb/256?household_id=<redacted>"
+    },
+    {
+      "kind": "request",
+      "method": "GET",
+      "url": "http://localhost:8003/v1/evidence/01a0c47f-0830-75f0-a027-9e8bde8eae48/thumb/256?household_id=<redacted>"
+    },
+    {
+      "kind": "request",
+      "method": "GET",
+      "url": "http://localhost:8003/v1/evidence/01a0c445-35b0-7a53-9b8d-22fa3d6523de/thumb/256?household_id=<redacted>"
+    },
+    {
+      "kind": "request",
+      "method": "GET",
+      "url": "http://localhost:8003/v1/evidence/01a0a467-eacf-7e13-bbd0-078b1bc93860/thumb/256?household_id=<redacted>"
+    }
+  ],
+  "apiResponses": [
+    {
+      "kind": "response",
+      "url": "http://localhost:8003/v1/households",
+      "status": 200
+    },
+    {
+      "kind": "response",
+      "url": "http://localhost:8003/v1/review-tasks?household_id=<redacted>",
+      "status": 200
+    },
+    {
+      "kind": "response",
+      "url": "http://localhost:8003/v1/assets?household_id=<redacted>&limit=20",
+      "status": 200
+    },
+    {
+      "kind": "response",
+      "url": "http://localhost:8003/v1/saved-searches?household_id=<redacted>",
+      "status": 200
+    },
+    {
+      "kind": "response",
+      "url": "http://localhost:8003/v1/assets/facets?household_id=<redacted>",
+      "status": 200
+    },
+    {
+      "kind": "response",
+      "url": "http://localhost:8003/v1/evidence/01a0c4a1-acbd-7541-83b7-ce9d04730716/thumb/256?household_id=<redacted>",
+      "status": 200
+    },
+    {
+      "kind": "response",
+      "url": "http://localhost:8003/v1/evidence/01a131a0-ca52-7d72-afa6-a7f79cc5a016/thumb/256?household_id=<redacted>",
+      "status": 200
+    },
+    {
+      "kind": "response",
+      "url": "http://localhost:8003/v1/evidence/01a0c481-08b8-72b2-ab22-8ad28fed8fda/thumb/256?household_id=<redacted>",
+      "status": 200
+    },
+    {
+      "kind": "response",
+      "url": "http://localhost:8003/v1/evidence/01a0c445-35b0-7a53-9b8d-22fa3d6523de/thumb/256?household_id=<redacted>",
+      "status": 200
+    },
+    {
+      "kind": "response",
+      "url": "http://localhost:8003/v1/evidence/01a0c47f-0830-75f0-a027-9e8bde8eae48/thumb/256?household_id=<redacted>",
+      "status": 200
+    },
+    {
+      "kind": "response",
+      "url": "http://localhost:8003/v1/evidence/01a0c4a0-af88-7903-a070-a44e7b120712/thumb/256?household_id=<redacted>",
+      "status": 200
+    },
+    {
+      "kind": "response",
+      "url": "http://localhost:8003/v1/evidence/01a0a467-eacf-7e13-bbd0-078b1bc93860/thumb/256?household_id=<redacted>",
+      "status": 200
+    }
+  ],
+  "scopedRequestCount": 11,
+  "scopedOkCount": 11,
+  "mask": {
+    "blurredImages": 7,
+    "maskedTextNodes": 24,
+    "selectors": [
+      "[data-testid=\"product-card\"]"
+    ],
+    "blockRun": "U+25A0 + U+200B (layout-safe)"
+  },
+  "gate": {
+    "noHouseholdSelect": true,
+    "noHouseholdWordOnPage": true,
+    "selectScanLive": true,
+    "scopedReads": true,
+    "pageRendered": true
+  },
+  "pass": true,
+  "shot": {
+    "file": "docs/worklogs/SG-208_shots/catalog_no_household.png",
+    "sha256": "f585a9ce683f41e436e8007a85f167494e72cfee1a9af4eba91dd41a201c5465",
+    "bytes": 171855
+  }
+}
