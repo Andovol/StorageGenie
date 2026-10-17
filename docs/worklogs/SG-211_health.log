@@ -1,0 +1,4 @@
+== SG-211 health — 2026-10-17T19:21:24Z epoch 1792264884 ==
+start (from SG-211_live.log, 19:20:12Z): http=200 {"status":"ok","db":"ok","storage":"ok"}
+end: {"status":"ok","db":"ok","storage":"ok"} http=200
+health_end_exit=0
