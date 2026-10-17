@@ -1,0 +1,22 @@
+== SG-215 tag transcript — 2026-10-17T20:07:29Z epoch 1792267649 ==
+verified_HEAD=e1a508acdb3e591459064cf7ee448affed51eb58
+== create annotated tag on verified HEAD ==
+tag_create_rc=0
+== push tag ==
+To github.com:Andovol/StorageGenie.git
+ * [new tag]         release-2026-10-17-sg212 -> release-2026-10-17-sg212
+tag_push_rc=0
+== local read-back ==
+e740c0cda4c33f0a7a49c7eeae441b6d9224d38d
+tag_type=tag
+object e1a508acdb3e591459064cf7ee448affed51eb58
+type commit
+tag release-2026-10-17-sg212
+tagger Andrei P <popescu.m.andrei@gmail.com> 1792267649 +0000
+
+StorageGenie release release-2026-10-17-sg212 — SG-212 width-adaptive Catalog density served live (container d45005fb, image 98f8af1f, JS 8bab60ce, index b52f84ca, CSS c3b58cda, DB e6bef157); attestation docs/releases/2026-10-17-sg212.md; authority D-22 close-release (SG-215).
+tag_points_at=release-2026-10-17-sg212
+== remote read-back (ls-remote) ==
+e740c0cda4c33f0a7a49c7eeae441b6d9224d38d	refs/tags/release-2026-10-17-sg212
+e1a508acdb3e591459064cf7ee448affed51eb58	refs/tags/release-2026-10-17-sg212^{}
+lsremote_rc=0
