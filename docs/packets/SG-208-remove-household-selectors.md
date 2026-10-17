@@ -26,7 +26,7 @@ A user belongs to exactly one household and cannot hold several (D-13 requiremen
 ## G2 — prove it
 
 - Full frontend suite ONCE on the candidate; tree grep `aria-label="Household"` + `onHouseholdChange` + `setHouseholdId` call-sites committed empty-or-justified (`PG-SC-05`); diff file-list proof (product files + their tests only).
-- Lane smoke: Catalog + one non-Catalog route served, household-scoped reads working with no selector on screen; two screenshots committed, opened, dispositioned (UI/layout/data).
+- Lane smoke: Catalog (route is `/` — `App.tsx:188-199`; there is NO `/catalog` route — SG-207 finding #3, learned at the cost of two wasted attempts) + one non-Catalog route served, household-scoped reads working with no selector on screen; two screenshots committed, opened, dispositioned (UI/layout/data).
 
 ## Constraints
 
