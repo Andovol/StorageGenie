@@ -1,0 +1,11 @@
+Partial-Receipt-ID: SG-203
+utc=2026-10-17T12:23:42Z
+killed=exit_no_receipt
+pushed=0
+uncommitted=none
+wip=none
+wip_elapsed_ms=69
+DISPATCH_RESULT id=SG-203 coder=opencode exit=0 head=2abe8a73739f2edcf8ed76e611405172294199a0 note=no moved=yes rewrite=no dirty=no elapsed=797s budget=2100s killed=exit_no_receipt stragglers=0
+P1_moved=PASS count=2
+P2_rewrite=PASS behind=0
+P6_dirty=PASS dirty=no
