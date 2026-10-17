@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, test, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { MemoryRouter, Route, Routes } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -565,5 +565,175 @@ describe("CatalogPage drawer wiring", () => {
       "src",
       expect.stringContaining("/v1/evidence/ev-thumb-1/thumb/256")
     );
+  });
+});
+
+describe("CatalogPage width-adaptive density default (SG-212 / D-21)", () => {
+  const catalogAsset: Asset = {
+    id: "a-drill",
+    household_id: "h1",
+    display_name: "Drill",
+    asset_type: "Hardware & Tools",
+    status: "ACTIVE",
+    quantity: null,
+    unit: null,
+    condition: null,
+    version: 1,
+    created_at: "2026-09-10T00:00:00Z",
+    updated_at: null,
+  };
+
+  function mockCatalogApi() {
+    api.apiGet.mockImplementation((path: string) => {
+      if (path === "/v1/households") {
+        return Promise.resolve([{ id: "h1", name: "Home", created_at: "2026-09-01T00:00:00Z" }]);
+      }
+      if (path === "/v1/assets/facets") {
+        return Promise.resolve({
+          asset_type: { "Hardware & Tools": 1 },
+          status: { ACTIVE: 1 },
+          has_evidence: { with: 0, without: 1 },
+        });
+      }
+      if (path === "/v1/assets") {
+        return Promise.resolve({ items: [catalogAsset], next_cursor: null });
+      }
+      return Promise.resolve(null);
+    });
+  }
+
+  /**
+   * jsdom lays nothing out, so clientWidth is 0 for every element. The rule
+   * reads the content column (data-testid="catalog-content-column"); mock that
+   * read only. The spy doubles as the "the rule consulted the column" guard.
+   */
+  function mockContentColumnWidth(width: number) {
+    const spy = vi.spyOn(Element.prototype, "clientWidth", "get");
+    spy.mockImplementation(function (this: Element) {
+      return this instanceof HTMLElement &&
+        this.getAttribute("data-testid") === "catalog-content-column"
+        ? width
+        : 0;
+    });
+    return spy;
+  }
+
+  function renderCatalog() {
+    return render(
+      <QueryClientProvider client={new QueryClient({ defaultOptions: { queries: { retry: false } } })}>
+        <ThemeProvider>
+          <MemoryRouter initialEntries={["/"]}>
+            <HouseholdProvider>
+              <CatalogPage />
+            </HouseholdProvider>
+          </MemoryRouter>
+        </ThemeProvider>
+      </QueryClientProvider>
+    );
+  }
+
+  beforeEach(() => {
+    window.localStorage.clear();
+    api.apiGet.mockReset();
+    api.apiPatch.mockReset();
+    mockCatalogApi();
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  test("a content column >=860 px at mount initialises the table", async () => {
+    const spy = mockContentColumnWidth(860);
+    renderCatalog();
+
+    // The read point exists and the mount-time measure has already settled the
+    // state (layout effect: no grid-first frame ever paints).
+    expect(screen.getByTestId("catalog-content-column")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Compact Table" })).toHaveAttribute(
+      "aria-pressed",
+      "true"
+    );
+    expect(spy).toHaveBeenCalled();
+
+    await screen.findByTestId("product-row");
+    expect(screen.getByTestId("table-scroll")).toBeInTheDocument();
+    expect(screen.queryByTestId("catalog-grid")).not.toBeInTheDocument();
+  });
+
+  test("a content column <860 px at mount initialises the grid", async () => {
+    const spy = mockContentColumnWidth(859);
+    renderCatalog();
+
+    expect(screen.getByTestId("catalog-content-column")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Standard Grid" })).toHaveAttribute(
+      "aria-pressed",
+      "true"
+    );
+    expect(spy).toHaveBeenCalled();
+
+    await screen.findByTestId("product-card");
+    expect(screen.getByTestId("catalog-grid")).toBeInTheDocument();
+    expect(screen.queryByTestId("table-scroll")).not.toBeInTheDocument();
+  });
+
+  test("an unreadable measure (non-finite or zero) falls back to the grid", async () => {
+    for (const unreadable of [Number.NaN, 0]) {
+      const spy = mockContentColumnWidth(unreadable);
+      const view = renderCatalog();
+
+      expect(screen.getByTestId("catalog-content-column")).toBeInTheDocument();
+      expect(screen.getByRole("button", { name: "Standard Grid" })).toHaveAttribute(
+        "aria-pressed",
+        "true"
+      );
+      expect(spy).toHaveBeenCalled();
+
+      await screen.findByTestId("product-card");
+      expect(screen.queryByTestId("table-scroll")).not.toBeInTheDocument();
+
+      spy.mockRestore();
+      view.unmount();
+    }
+  });
+
+  test("the toggle flips both ways after mount; a fresh navigation recomputes (no stored choice)", async () => {
+    mockContentColumnWidth(900);
+    const first = renderCatalog();
+
+    expect(screen.getByRole("button", { name: "Compact Table" })).toHaveAttribute(
+      "aria-pressed",
+      "true"
+    );
+    await screen.findByTestId("product-row");
+
+    fireEvent.click(screen.getByRole("button", { name: "Standard Grid" }));
+    expect(screen.getByRole("button", { name: "Standard Grid" })).toHaveAttribute(
+      "aria-pressed",
+      "true"
+    );
+    await screen.findByTestId("product-card");
+    expect(screen.queryByTestId("table-scroll")).not.toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole("button", { name: "Compact Table" }));
+    expect(screen.getByRole("button", { name: "Compact Table" })).toHaveAttribute(
+      "aria-pressed",
+      "true"
+    );
+    await screen.findByTestId("product-row");
+
+    // Leave the session on the grid via the control, then remount: the default
+    // must come from the width again, not from any kept or stored choice.
+    fireEvent.click(screen.getByRole("button", { name: "Standard Grid" }));
+    await screen.findByTestId("product-card");
+    first.unmount();
+
+    renderCatalog();
+    expect(screen.getByRole("button", { name: "Compact Table" })).toHaveAttribute(
+      "aria-pressed",
+      "true"
+    );
+    await screen.findByTestId("product-row");
+    expect(Object.keys(window.localStorage).filter((key) => /densit/i.test(key))).toEqual([]);
   });
 });

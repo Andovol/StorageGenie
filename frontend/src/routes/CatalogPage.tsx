@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import {
   useAssets,
   useDeleteSavedSearch,
@@ -29,6 +29,22 @@ function useDebounced<T>(value: T, delayMs: number): T {
   return debounced;
 }
 
+// SG-212 / D-21 content-fit density rule: the table's seven columns measure
+// 838 px (SG-203), so a Catalog content column of >= 860 px (838 + 22 px
+// uncalibrated margin, G-A9) opens in table; narrower or unreadable opens in
+// the non-scrolling grid. No stored preference: re-measured on every mount.
+const CATALOG_TABLE_FIT_MIN_PX = 860;
+
+function measureContentColumnWidth(el: HTMLElement | null): number | null {
+  if (!el) return null;
+  const width = el.clientWidth;
+  return Number.isFinite(width) && width > 0 ? width : null;
+}
+
+function resolveInitialDensity(contentWidth: number | null): Density {
+  return contentWidth !== null && contentWidth >= CATALOG_TABLE_FIT_MIN_PX ? "table" : "grid";
+}
+
 export function CatalogPage() {
   // SG-196 G1: household selection now comes from the shared context; the
   // effective-household derivation shape is unchanged.
@@ -38,7 +54,16 @@ export function CatalogPage() {
   const [category, setCategory] = useState<string>(CATEGORY_ALL);
   const [sort, setSort] = useState<SortOption>("recent");
   const [density, setDensity] = useState<Density>("grid");
+  const contentColumnRef = useRef<HTMLDivElement | null>(null);
   const [cursor, setCursor] = useState<string | undefined>(undefined);
+
+  // SG-212 / D-21: measure at mount in a layout effect so the state is settled
+  // before the first paint; later toggles are untouched (mount-only deps). The
+  // component re-mounts on fresh navigation, which re-runs the rule; nothing is
+  // persisted anywhere.
+  useLayoutEffect(() => {
+    setDensity(resolveInitialDensity(measureContentColumnWidth(contentColumnRef.current)));
+  }, []);
   const [allItems, setAllItems] = useState<Asset[]>([]);
   const [selectedAssetId, setSelectedAssetId] = useState<string | null>(null);
   const [selectedSavedSearchId, setSelectedSavedSearchId] = useState("");
@@ -210,55 +235,57 @@ export function CatalogPage() {
       onSavedSearchDelete={handleSavedSearchDelete}
       onSaveSearch={handleSaveSearch}
     >
-      {facetsIsError && (
-        <div role="alert">Could not load catalog facets: {String(facetsError)}</div>
-      )}
-      {savedSearchesIsError && (
-        <div role="alert">Could not load saved searches: {String(savedSearchesError)}</div>
-      )}
-      {isError && (
-        <div role="alert">Could not load the asset list: {String(error)}</div>
-      )}
-      {isLoading && !data ? (
-        <ProductGrid
-          items={[]}
-          density={density}
-          householdId={effectiveHousehold}
-          loading
-          limit={20}
-        />
-      ) : (
-        <>
-          {!(isError && displayed.length === 0) && (
-            <ProductGrid
-              items={visibleItems}
-              density={density}
-              householdId={effectiveHousehold}
-              onSelect={setSelectedAssetId}
-            />
-          )}
-          <div style={{ marginTop: 16, display: "flex", gap: 12, alignItems: "center" }}>
-            {nextCursor && (
-              <button
-                onClick={() => setCursor(nextCursor)}
-                disabled={isFetching}
-                className="bg-card text-foreground border-border focus-ring"
-                style={{ padding: "8px 16px", borderRadius: 6, borderStyle: "solid", borderWidth: 1, cursor: "pointer" }}
-              >
-                {isFetching ? "Loading..." : "Load more"}
-              </button>
+      <div ref={contentColumnRef} data-testid="catalog-content-column">
+        {facetsIsError && (
+          <div role="alert">Could not load catalog facets: {String(facetsError)}</div>
+        )}
+        {savedSearchesIsError && (
+          <div role="alert">Could not load saved searches: {String(savedSearchesError)}</div>
+        )}
+        {isError && (
+          <div role="alert">Could not load the asset list: {String(error)}</div>
+        )}
+        {isLoading && !data ? (
+          <ProductGrid
+            items={[]}
+            density={density}
+            householdId={effectiveHousehold}
+            loading
+            limit={20}
+          />
+        ) : (
+          <>
+            {!(isError && displayed.length === 0) && (
+              <ProductGrid
+                items={visibleItems}
+                density={density}
+                householdId={effectiveHousehold}
+                onSelect={setSelectedAssetId}
+              />
             )}
-            {isFetching && <span className="text-muted-foreground" style={{ fontSize: 12 }}>Fetching...</span>}
-          </div>
-          {selectedAsset ? (
-            <ItemInspectorDrawer
-              asset={selectedAsset}
-              householdId={effectiveHousehold}
-              onClose={() => setSelectedAssetId(null)}
-            />
-          ) : null}
-        </>
-      )}
+            <div style={{ marginTop: 16, display: "flex", gap: 12, alignItems: "center" }}>
+              {nextCursor && (
+                <button
+                  onClick={() => setCursor(nextCursor)}
+                  disabled={isFetching}
+                  className="bg-card text-foreground border-border focus-ring"
+                  style={{ padding: "8px 16px", borderRadius: 6, borderStyle: "solid", borderWidth: 1, cursor: "pointer" }}
+                >
+                  {isFetching ? "Loading..." : "Load more"}
+                </button>
+              )}
+              {isFetching && <span className="text-muted-foreground" style={{ fontSize: 12 }}>Fetching...</span>}
+            </div>
+            {selectedAsset ? (
+              <ItemInspectorDrawer
+                asset={selectedAsset}
+                householdId={effectiveHousehold}
+                onClose={() => setSelectedAssetId(null)}
+              />
+            ) : null}
+          </>
+        )}
+      </div>
     </AppShell>
   );
 }
