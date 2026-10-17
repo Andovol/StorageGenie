@@ -1,0 +1,69 @@
+== SG-210 poststate — 2026-10-17T17:58:16Z epoch 1792259896 ==
+== container post ==
+Id=5f82f760d9bfbaad52020e1476f04b1d697f7d009aa629820d31e86fd5a46188 Created=2026-10-17T17:57:53.711535827Z Image=sha256:38fcae5e3a81f8ed6fa4557b164ca791589d753e92230dd435996f2a91945e6b RestartCount=0 State=running Health=healthy StartedAt=2026-10-17T17:57:54.516273092Z
+image Id=sha256:38fcae5e3a81f8ed6fa4557b164ca791589d753e92230dd435996f2a91945e6b Created=2026-10-17T17:57:44.734853371Z
+== health GETs post (6) ==
+health_1=200 {"status":"ok","db":"ok","storage":"ok"}
+health_2=200 {"status":"ok","db":"ok","storage":"ok"}
+health_3=200 {"status":"ok","db":"ok","storage":"ok"}
+health_4=200 {"status":"ok","db":"ok","storage":"ok"}
+health_5=200 {"status":"ok","db":"ok","storage":"ok"}
+health_6=200 {"status":"ok","db":"ok","storage":"ok"}
+== container post re-inspect (final health field) ==
+Id=5f82f760d9bfbaad52020e1476f04b1d697f7d009aa629820d31e86fd5a46188 RestartCount=0 State=running Health=healthy Image=sha256:38fcae5e3a81f8ed6fa4557b164ca791589d753e92230dd435996f2a91945e6b
+== served post ==
+index_http=200
+231224da729ca1034562c6be32a2f88f2b9b48e9fbeaec1e507e75717346fb4a  /tmp/opencode/sg210_index_post.html
+index_bytes=944
+post_JS_asset=assets/index-DbppHp6C.js post_CSS_asset=assets/index-C07VbG0m.css
+js_http=200
+css_http=200
+47c65dea3d7909974786314b1de6c3adf4792a5e40582bc34f6d283781f26c57  /tmp/opencode/sg210_js_post
+c3b58cda696a22970fc2a4a348849fc1359f2105f80f81304ed5dfd5ca31a557  /tmp/opencode/sg210_css_post
+js_bytes=320700
+css_bytes=4535
+== served post marker greps (the two removals IN the served bytes; PG-SC-12) ==
+raw-json_count=0
+rawJson_count=0
+Raw data_count=0
+aria-label-Household_markup_count=0
+Household_capital_count=3
+Household contexts post (first 6, if any):
+wp);if(!e)throw new Error("useHouseholdContext must be used within a 
+splay name");return}if(!e){p("Household not selected");return}c(!0),p
+aria-label_count_control=47
+control_'Sort catalog'=1
+control_'Generate Context Scene'=1
+control_pre_vs_post: raw-json pre=1 -> post=0; Household pre=21 -> post=3
+index.html and CSS spot-checks: raw-json/aria-label-Household counts:
+index: raw-json=0 aria=0; css: raw-json=0 aria=0
+== SPA routes post ==
+route / http=200 sha=231224da729ca1034562c6be32a2f88f2b9b48e9fbeaec1e507e75717346fb4a
+route /inbox http=200 sha=231224da729ca1034562c6be32a2f88f2b9b48e9fbeaec1e507e75717346fb4a
+route /analytics http=200 sha=231224da729ca1034562c6be32a2f88f2b9b48e9fbeaec1e507e75717346fb4a
+route /planning http=200 sha=231224da729ca1034562c6be32a2f88f2b9b48e9fbeaec1e507e75717346fb4a
+== API control post ==
+api_households=200
+6921583771fb79bec868339653a91050d1163430ed19fa0e96268522adf8038f  /tmp/opencode/sg210_api_post.json
+== DB post (mode=ro) ==
+e6bef157440fb8b4a3262577362b071dcae07507ea9a7e04a614e11be28ee5bd  data/db/storagegenie.db
+28
+20260924_sg114_relation
+== candidate build bytes extraction (docker cp, READ of the running container fs) ==
+docker_cp_rc=0
+320700 /tmp/opencode/sg210_static/assets/index-DbppHp6C.js
+4535 /tmp/opencode/sg210_static/assets/index-C07VbG0m.css
+944 /tmp/opencode/sg210_static/index.html
+231224da729ca1034562c6be32a2f88f2b9b48e9fbeaec1e507e75717346fb4a  /tmp/opencode/sg210_static/index.html
+47c65dea3d7909974786314b1de6c3adf4792a5e40582bc34f6d283781f26c57  /tmp/opencode/sg210_static/assets/index-DbppHp6C.js
+c3b58cda696a22970fc2a4a348849fc1359f2105f80f81304ed5dfd5ca31a557  /tmp/opencode/sg210_static/assets/index-C07VbG0m.css
+cmp_index_served_vs_inimage=0
+cmp_js_served_vs_inimage=0
+cmp_css_served_vs_inimage=0
+== build manifest cross-check ==
+build log manifest list sha256:38fcae5e3a81f8ed6fa4557b164ca791589d753e92230dd435996f2a91945e6b; image Id above must equal it
+== end poststate — 2026-10-17T17:58:17Z epoch 1792259897 ==
+== Household remaining-context adjudication (all 3, post bundle) ==
+seContext(wp);if(!e)throw new Error("useHouseholdContext must be used within a HouseholdP
+to or a display name");return}if(!e){p("Household not selected");return}c(!0),p(null);try
+-- none is aria-label markup; count of exact markup pattern: 0

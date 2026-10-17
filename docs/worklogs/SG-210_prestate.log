@@ -1,0 +1,224 @@
+SG-210 prestate — FIRST READ — 2026-10-17T17:56:36Z (epoch 1792259796)
+lane_start=Sat 2026-10-17 17:53:10 UTC (systemd ExecMainStartTimestamp dispatch-storagegenie@SG-210.service) start_epoch=1792259590 RUN_BUDGET_S=2100 (/etc/dispatch/storagegenie.conf read)
+== git ==
+BASE ref requested: automation
+ls-remote origin automation:
+145277dd6c4da85dddd7534c03497984d883a22b	refs/heads/automation
+resolved origin/automation: 145277dd6c4da85dddd7534c03497984d883a22b
+HEAD: 145277dd6c4da85dddd7534c03497984d883a22b
+automation
+?? docs/worklogs/SG-210_prestate.log
+status_rc=0
+== rules/contract ==
+G-L1 UNCHECKED the cache is not checked out at a contract tag: /home/andrei/storagegenie-contract
+G-L5 UNCHECKED gh-unauthenticated
+G-L7 UNCHECKED gh-unauthenticated
+G-L6 BYTES /home/andrei/.codex/AGENTS.md 2275
+G-L6 BYTES /home/andrei/.config/opencode/AGENTS.md 1933
+G-L6 BYTES total[codex]=2275 unseen=architect-layer,state-file,other-ritual-files
+G-L6 BYTES total[opencode]=1933 unseen=architect-layer,state-file,other-ritual-files
+rules_check_rc=3
+VERSION=0.50.0
+CODER.md line3: **Contract version: 0.50.0** — **echo this line verbatim in your receipt.** It is the only proof that you
+== lane ==
+srw-rw---T 1 andrei 100987 0 Oct 16 17:19 /run/dispatch-storagegenie-SG-210/docker.sock
+Client 29.6.2 / Server 29.6.2 (API 1.55)
+version_rc=0
+Docker Compose version v5.3.1
+compose_rc=0
+== container/image pre ==
+f2055f3b572c storagegenie-backend Up About an hour (healthy) storagegenie-backend-1
+Id=f2055f3b572cbeb8694c08d7cbaa88720a05d6b199e5e59d061e98306a82bf5b Created=2026-10-17T16:29:13.102064587Z Image=sha256:fe537fd4e6cd3281d1f0ff9be1a2b5f2741e3f630bd618ea7eea6340bc24f822 RestartCount=0 State=running Health=healthy StartedAt=2026-10-17T16:29:13.837712432Z
+image Id=sha256:fe537fd4e6cd3281d1f0ff9be1a2b5f2741e3f630bd618ea7eea6340bc24f822 Created=2026-10-17T16:28:41.99408866Z
+[{"Type":"volume","Name":"storagegenie_storage_data","Source":"/home/andrei/.local/share/docker/volumes/storagegenie_storage_data/_data","Destination":"/data/storage","Driver":"local","Mode":"rw","RW":true,"Propagation":""},{"Type":"bind","Source":"/home/andrei/StorageGenie/data/db","Destination":"/data/db","Mode":"rw","RW":true,"Propagation":"rprivate"}]
+(inspect_rc=0)
+== health pre ==
+health_pre_http=200
+{"status":"ok","db":"ok","storage":"ok"}
+== served bundle pre ==
+index_http=200
+50ddaad1f490ff7e63998aaa2639950ea633377dccc3fa5c7a2bed5fa988f2b0  /tmp/opencode/sg210_index_pre.html
+index_bytes=944
+pre_JS_asset=assets/index-Cv0EK3ka.js pre_CSS_asset=assets/index-C07VbG0m.css
+js_http=200
+css_http=200
+dd4f1bd0876de5dfba0b0bc351342a4e5ca3df35f8b5f4752e0ab31845579f53  /tmp/opencode/sg210_js_pre
+c3b58cda696a22970fc2a4a348849fc1359f2105f80f81304ed5dfd5ca31a557  /tmp/opencode/sg210_css_pre
+js_bytes=325039
+css_bytes=4535
+== served pre marker greps (CONTROLS: both removals NOT yet live, must be present pre) ==
+raw-json_count=1
+rawJson_count=0
+Raw data_count=1
+Household_count=21
+aria-label_count=49
+raw-json context: &&l.jsx("pre",{"data-testid":"raw-json",className:"bg-card-muted fon
+Household contexts:
+or:n,error:r,householdId:i,setHouseholdId:o}),[t,n,r,i,o]);return l.j
+Cp);if(!e)throw new Error("useHouseholdContext must be used within a 
+,householdId:d,households:m,onHouseholdChange:p,savedSearches:g,selec
+.jsxs("select",{"aria-label":"Household",value:d,onChange:f=>p(f.targ
+,householdId:g,households:S,onHouseholdChange:j,savedSearches:k,selec
+,householdId:g,households:S,onHouseholdChange:j,savedSearches:k,selec
+== DB pre (mode=ro) ==
+e6bef157440fb8b4a3262577362b071dcae07507ea9a7e04a614e11be28ee5bd  data/db/storagegenie.db
+28
+tables_rc=0
+20260924_sg114_relation
+alembic_rc=0
+db_mtime=2026-10-17 16:29:24.236627588 +0000 wal_bytes=0
+== product delta since served b029593 (re-derived, not assumed) ==
+145277d SG-209 audit + rating 98 STOP (no muse transport); D-15 refuted, new pick needed; SG-210 packet
+0858098 SG-209 receipt transcript (notes-ref publish + mapped read-back; Work-HEAD f67d8f7) + final gate re-run
+0add225 SG-209 report (D-17 muse probe): STOP - slug present but endpoints [] on direct OpenRouter image API, input_references undeclared; render leg not run, zero billed, $2.00 unspent; controls + gate log; receipt pending
+f67d8f7 SG-209 G1+G2 STOP: muse endpoint record empty on the direct OpenRouter image API (input_references undeclared, no pricing; SG-159 re-measured identical, "different surface" premise refuted); zero billed calls, $2.00 unspent; free-read bodies + controls + ledger TSV + run transcripts
+0bd5518 SG-208 audit + rating 98; server-side single-household decision opened; queue SG-209 next
+264d30a SG-208 receipt transcript (notes-ref publish + mapped read-back; Work-HEAD f71df61)
+aa737b0 SG-208 report (D-13 household switching UI removal): reuse provenance, fail-half+pass-half, served smoke, receipt pending
+f71df61 SG-208 G2 evidence: fail-half (5 files/10 tests red on base, absence rows) + full suite once 29/293 green; absence grep gates empty-or-justified; served smoke / and /inbox pass with two screenshots; health identical; reuse provenance
+e81147f SG-208 G1: remove the household switching UI (D-13): all 9 affordances (nav, catalog toolbar, Chat, Planning, Inbox, Capture, Analytics, Expiry, Settings clear) + shared HouseholdSelector + context setter retired; absence tests; full suite 293 pass (candidate reused from preserved ref, re-verified)
+31982f8 SG-208 retry: preserved-refs amendment + queue resumed (key rotated)
+c19ae1d SG-208 failed (expired provider key, debug done, preserved refs); queue paused on key rotation
+82fec77 SG-207 audit + rating 98; SG-208 packet route amendment; STATE queue SG-208 next
+478c77a SG-207 receipt transcript (notes-ref publish + mapped read-back; Work-HEAD 8b99866)
+4e79dd5 SG-207 report (D-12 Raw Data panel removal: suite 298, served smoke pass, one screenshot; WORK_HEAD 8b99866)
+8b99866 SG-207 scope-ceiling proof
+da22a23 SG-207 G2: evidence — pre/post test transcripts, grep gates, candidate build, served drawer smoke (pass) + screenshot, health
+476bd42 SG-207 G1: remove the Raw Data dev panel from the asset drawer (D-12); absence test; full suite 298 pass
+145d297 SG-206 audit + rating 97 SERVED live; D-17 probe approval + L3 + standing reminder rule; STATE queue SG-207 next
+a5a1c77 SG-209 muse-image probe packet (D-17 pending dispatch)
+907dc39 D-15 muse-image-only pick via OpenRouter direct (Q2); Google leg suspended
+b1475e5 SG-206 receipt transcript (notes-ref publish + mapped fetch read-back; Work-HEAD b029593)
+3dd5b7c SG-206 report (serve rider: SG-205 focus-ring fix live; laptop: see report)
+-- product-surface diff (frontend/backend/compose/Dockerfiles):
+M	frontend/src/App.household-nav.test.tsx
+M	frontend/src/App.tsx
+D	frontend/src/components/HouseholdSelector.test.tsx
+D	frontend/src/components/HouseholdSelector.tsx
+M	frontend/src/components/shell/AppShell.tsx
+M	frontend/src/components/shell/CatalogToolbar.tsx
+M	frontend/src/components/shell/ItemInspectorDrawer.tsx
+M	frontend/src/components/shell/drawer.test.tsx
+M	frontend/src/components/shell/shell.test.tsx
+M	frontend/src/hooks/HouseholdContext.tsx
+M	frontend/src/routes/AnalyticsPage.tsx
+M	frontend/src/routes/CapturePage.tsx
+M	frontend/src/routes/CatalogPage.tsx
+M	frontend/src/routes/ChatPage.test.tsx
+M	frontend/src/routes/ChatPage.tsx
+M	frontend/src/routes/ExpiryPage.tsx
+M	frontend/src/routes/InboxPage.test.tsx
+M	frontend/src/routes/InboxPage.tsx
+M	frontend/src/routes/PlanningPage.tsx
+M	frontend/src/routes/SettingsPage.tsx
+M	frontend/src/routes/theme-adoption.test.tsx
+-- changed paths OUTSIDE docs/ (must be exactly the product set):
+STATE.md
+frontend/src/App.household-nav.test.tsx
+frontend/src/App.tsx
+frontend/src/components/HouseholdSelector.test.tsx
+frontend/src/components/HouseholdSelector.tsx
+frontend/src/components/shell/AppShell.tsx
+frontend/src/components/shell/CatalogToolbar.tsx
+frontend/src/components/shell/ItemInspectorDrawer.tsx
+frontend/src/components/shell/drawer.test.tsx
+frontend/src/components/shell/shell.test.tsx
+frontend/src/hooks/HouseholdContext.tsx
+frontend/src/routes/AnalyticsPage.tsx
+frontend/src/routes/CapturePage.tsx
+frontend/src/routes/CatalogPage.tsx
+frontend/src/routes/ChatPage.test.tsx
+frontend/src/routes/ChatPage.tsx
+frontend/src/routes/ExpiryPage.tsx
+frontend/src/routes/InboxPage.test.tsx
+frontend/src/routes/InboxPage.tsx
+frontend/src/routes/PlanningPage.tsx
+frontend/src/routes/SettingsPage.tsx
+frontend/src/routes/theme-adoption.test.tsx
+non_docs_rc=0
+-- migration paths (must be empty):
+migration_rc=0
+== consumer-set derivation (on target) ==
+L1 focus-ring-asserting (rg -l 'focus-ring' frontend/src --glob '*.test.tsx'):
+frontend/src/components/CandidateCard.test.tsx
+frontend/src/components/EvidenceGallery.test.tsx
+frontend/src/theme/theme.test.tsx
+L2 household-referencing tests (rg -l -i 'household' frontend/src --glob '*.test.tsx'):
+frontend/src/App.household-nav.test.tsx
+frontend/src/components/AssetCard.test.tsx
+frontend/src/components/AssetForm.test.tsx
+frontend/src/components/CandidateCard.test.tsx
+frontend/src/components/EvidenceGallery.test.tsx
+frontend/src/components/ExpiryEntryForm.test.tsx
+frontend/src/components/JobCard.test.tsx
+frontend/src/components/PlanningSuggestionCard.test.tsx
+frontend/src/components/catalog/catalog.test.tsx
+frontend/src/components/shell/drawer.test.tsx
+frontend/src/components/shell/import-modal.test.tsx
+frontend/src/components/shell/shell.test.tsx
+frontend/src/routes/AnalyticsPage.test.tsx
+frontend/src/routes/AssetDetailPage.test.tsx
+frontend/src/routes/ChatPage.test.tsx
+frontend/src/routes/ExpiryPage.test.tsx
+frontend/src/routes/InboxPage.test.tsx
+frontend/src/routes/PlanningPage.test.tsx
+frontend/src/routes/ReviewPage.test.tsx
+frontend/src/routes/query-error-alerts.test.tsx
+frontend/src/routes/theme-adoption.test.tsx
+L3 raw-removal test (rg -l 'raw-json|raw data' frontend/src --glob '*.test.tsx'):
+frontend/src/components/shell/drawer.test.tsx
+== end prestate — 2026-10-17T17:56:38Z epoch 1792259798 ==
+== consumer-set derivation, tightened L2 (selector-absence-asserting) ==
+rg -l -i 'select household|householdselector|no households|clear household|aria-label..household' frontend/src --glob '*.test.tsx':
+-- absence-idiom check on those files (queryBy/length 0/not.toBe):
+frontend/src/routes/theme-adoption.test.tsx:1
+frontend/src/routes/AnalyticsPage.test.tsx:1
+frontend/src/routes/InboxPage.test.tsx:3
+frontend/src/routes/ChatPage.test.tsx:5
+frontend/src/routes/query-error-alerts.test.tsx:12
+frontend/src/routes/AssetDetailPage.test.tsx:3
+frontend/src/App.household-nav.test.tsx:12
+frontend/src/components/shell/shell.test.tsx:6
+frontend/src/components/shell/drawer.test.tsx:6
+frontend/src/components/shell/import-modal.test.tsx:4
+frontend/src/components/AssetForm.test.tsx:2
+frontend/src/components/WebAlternates.test.tsx:1
+frontend/src/components/CandidateCard.test.tsx:6
+frontend/src/components/PlanningSuggestionCard.test.tsx:2
+frontend/src/components/catalog/catalog.test.tsx:13
+docs/worklogs/SG-171_report.md:2
+docs/worklogs/SG-179_inbox_probe.test.tsx:2
+docs/worklogs/SG-054_verify.log:7
+docs/worklogs/SG-051_report.md:1
+docs/worklogs/SG-179_fe_regression.log:1
+docs/worklogs/SG-171_failpre.log:1
+docs/worklogs/SG-105_verify.log:1
+docs/worklogs/SG-051_verify.log:2
+docs/worklogs/SG-187_fail_base_frontend.log:1
+docs/worklogs/SG-207_report.md:1
+docs/worklogs/SG-207_scope.txt:1
+docs/worklogs/SG-042_verify.log:3
+-- HouseholdSelector.test.tsx existence (deleted by SG-208):
+ls: cannot access 'frontend/src/components/HouseholdSelector.test.tsx': No such file or directory
+
+== consumer-set derivation, tightened L2 — CORRECTED (previous line's pattern matched nothing on the post-SG-208 tree; empty file list made the check run repo-wide — recorded as-is, corrected here) ==
+Idiom derivation (from the SG-208 G2 test diff, read live): absence rows assert queryAllByRole("combobox", { name: /household/i }) / queryByRole variants (and the drawer test asserts the raw-panel absence).
+rg -l 'combobox[^)]*household|household[^)]*combobox' -i frontend/src --glob '*.test.tsx':
+frontend/src/App.household-nav.test.tsx
+frontend/src/components/shell/shell.test.tsx
+frontend/src/routes/ChatPage.test.tsx
+frontend/src/routes/InboxPage.test.tsx
+frontend/src/routes/theme-adoption.test.tsx
+cross-check — files whose diff in e81147f (SG-208 G1) touches test files:
+frontend/src/App.household-nav.test.tsx
+frontend/src/components/HouseholdSelector.test.tsx
+frontend/src/components/shell/shell.test.tsx
+frontend/src/routes/ChatPage.test.tsx
+frontend/src/routes/InboxPage.test.tsx
+frontend/src/routes/theme-adoption.test.tsx
+absence assertion counts (queryAllByRole/queryByRole with household) per derived file:
+frontend/src/routes/InboxPage.test.tsx:1
+frontend/src/routes/theme-adoption.test.tsx:1
+frontend/src/routes/ChatPage.test.tsx:1
+frontend/src/App.household-nav.test.tsx:1
+frontend/src/components/shell/shell.test.tsx:1

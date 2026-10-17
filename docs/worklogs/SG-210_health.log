@@ -1,0 +1,13 @@
+SG-210 health — CO-92 {{HEALTH_CMD}}
+start: 2026-10-17T17:56:36Z [200] {"status":"ok","db":"ok","storage":"ok"} (SG-210_prestate.log; epoch 1792259796)
+post-recreate ×6 17:58:16Z all [200] identical (SG-210_poststate.log)
+end 2026-10-17T17:58:51Z epoch 1792259931:
+  health_end_1=200 {"status":"ok","db":"ok","storage":"ok"}
+  health_end_2=200 {"status":"ok","db":"ok","storage":"ok"}
+  health_end_3=200 {"status":"ok","db":"ok","storage":"ok"}
+  container: Id=5f82f760d9bfbaad52020e1476f04b1d697f7d009aa629820d31e86fd5a46188 RestartCount=0 State=running Health=healthy
+HEALTH: unchanged, OK
+-- DB post-tests (mode=ro) --
+e6bef157440fb8b4a3262577362b071dcae07507ea9a7e04a614e11be28ee5bd  data/db/storagegenie.db
+28
+20260924_sg114_relation

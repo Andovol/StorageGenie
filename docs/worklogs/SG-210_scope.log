@@ -1,0 +1,52 @@
+SG-210 scope + secret gates — 2026-10-17T17:58:51Z
+== git status --short (expect SG-210_* files only) ==
+?? docs/worklogs/SG-210_build.log
+?? docs/worklogs/SG-210_health.log
+?? docs/worklogs/SG-210_poststate.log
+?? docs/worklogs/SG-210_prestate.log
+?? docs/worklogs/SG-210_recreate.log
+?? docs/worklogs/SG-210_scope.log
+?? docs/worklogs/SG-210_tests_frontend.log
+== git diff --name-only HEAD (tracked, expect empty) ==
+rc=0
+== rider byte ceiling: staged-vs-HEAD once staged; product-diff guard vs served b029593 ==
+STATE.md
+frontend/src/App.household-nav.test.tsx
+frontend/src/App.tsx
+frontend/src/components/HouseholdSelector.test.tsx
+frontend/src/components/HouseholdSelector.tsx
+frontend/src/components/shell/AppShell.tsx
+frontend/src/components/shell/CatalogToolbar.tsx
+frontend/src/components/shell/ItemInspectorDrawer.tsx
+frontend/src/components/shell/drawer.test.tsx
+frontend/src/components/shell/shell.test.tsx
+frontend/src/hooks/HouseholdContext.tsx
+frontend/src/routes/AnalyticsPage.tsx
+frontend/src/routes/CapturePage.tsx
+frontend/src/routes/CatalogPage.tsx
+frontend/src/routes/ChatPage.test.tsx
+frontend/src/routes/ChatPage.tsx
+frontend/src/routes/ExpiryPage.tsx
+frontend/src/routes/InboxPage.test.tsx
+frontend/src/routes/InboxPage.tsx
+frontend/src/routes/PlanningPage.tsx
+frontend/src/routes/SettingsPage.tsx
+frontend/src/routes/theme-adoption.test.tsx
+non_docs_rc=0
+== secret pattern scan over SG-210 evidence ==
+grep: docs/worklogs/SG-210_scope.log: input file is also the output
+secret_rc=2 (1 = none found)
+
+== secret pattern scan over SG-210 evidence (corrected: excludes the output file itself) ==
+secret_rc=1 (1 = none found)
+== tracked-diff at capture time ==
+tracked_diff_rc=0 (empty expected)
+== staged listing at commit time ==
+docs/worklogs/SG-210_build.log
+docs/worklogs/SG-210_health.log
+docs/worklogs/SG-210_poststate.log
+docs/worklogs/SG-210_prestate.log
+docs/worklogs/SG-210_recreate.log
+docs/worklogs/SG-210_scope.log
+docs/worklogs/SG-210_tests_frontend.log
+docs/worklogs/SG-210_worklog.log
