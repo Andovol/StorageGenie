@@ -1,0 +1,7 @@
+guard_selftest: synthetic projections against cap=2.00, known_spend=0.50
+selftest_over_cap  total=3.5000 verdict=REFUSE_over_cap
+selftest_under_cap total=0.6000 verdict=proceed
+guard_selftest=PASS (refusal observed on over-cap input, proceed on under-cap)
+selftest_exit=0
+G2_VERDICT endpoints_empty -> STOP (no billed call)
+render_exit=0

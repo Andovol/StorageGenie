@@ -1,0 +1,10 @@
+g1_models http=200 ts=2026-10-17T17:44:52Z bytes=47720 body=SG-209_g1_models_body.json
+g1_models ids_count=61 parsed_path=$.data[*].id
+g1_models slug_exact_present=True target=meta/muse-image
+g1_models muse_candidates=["meta/muse-image"]
+g1_models chosen_id=meta/muse-image
+g1_endpoints http=200 url=https://openrouter.ai/api/v1/images/models/meta/muse-image/endpoints bytes=39 body=SG-209_g1_endpoints_body.json
+g1_endpoints endpoints_count=0 path=$.endpoints[*]
+ledger_db_rows=2 (/evidence/sg209_ledger.sqlite)
+ledger_row	2026-10-17T17:44:52Z	g1_models	-	200	null	null
+ledger_row	2026-10-17T17:44:52Z	g1_endpoints	meta/muse-image	200	null	null

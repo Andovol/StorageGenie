@@ -1,0 +1,10 @@
+control slug=google/gemini-3.1-flash-image http=200 endpoints_count=3 input_references_declared=True body=SG-209_g1_control_google_gemini-3.1-flash-image_body.json
+control_endpoints[0] pricing=[{"billable": "output_image", "unit": "token", "cost_usd": 6.6e-05}]
+control_endpoints[1] pricing=[{"billable": "output_image", "unit": "token", "cost_usd": 6e-05}]
+control slug=black-forest-labs/flux.2-pro http=200 endpoints_count=1 input_references_declared=True body=SG-209_g1_control_black-forest-labs_flux.2-pro_body.json
+control_endpoints[0] pricing=[{"billable": "output_image", "unit": "megapixel", "cost_usd": 0.03}]
+ledger_db_rows=4 (/evidence/sg209_ledger.sqlite)
+ledger_row	2026-10-17T17:44:52Z	g1_models	-	200	null	null
+ledger_row	2026-10-17T17:44:52Z	g1_endpoints	meta/muse-image	200	null	null
+ledger_row	2026-10-17T17:45:55Z	g1_control_endpoints	google/gemini-3.1-flash-image	200	null	null
+ledger_row	2026-10-17T17:45:55Z	g1_control_endpoints	black-forest-labs/flux.2-pro	200	null	null
