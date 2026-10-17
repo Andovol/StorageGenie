@@ -806,6 +806,12 @@ Originals above (88 FLAG:TRUST / 91 FLAG:TRUST) stand as the audit trail; the ve
 |---|---|---|---|---|---|---|---|---|---|---|---|
 | SG-207 | D-12 removal (owner "I don't need it"); WORK receipt verified (dual paste note missing - runner report_unreadable misfire, 10th ISS-4 instance, not slice fault); product = ItemInspectorDrawer.tsx (-25: section, rawOpen, rawJson memo, Chevron imports) + drawer.test.tsx (raw test -> absence test: toggle/testid-family/pre absent); useMemo still used 3x; suite 30/298 green on candidate, pre-change targeted run green both committed; grep gates rc=1 empty (single token = disclosed negative matcher, PB-6 design call); served smoke all gates true + screenshot opened (drawer ends at AI notice, sections intact, masked); served-byte check base 1x/1x -> candidate 0x; scope 15 files, outside grep empty; health identical; 842s vs ~450s (two smoke self-corrections ~320s: unpinned Catalog route, no-op scroll; packet-side route gap, amended into SG-208); audit SG-207_audit.md | opencode/opencode-go/deepseek-v4.1-flash (receipt settings) | max | 98 |  |  | PG-EV-02/03/05/09; PG-SC-05/09/12; PG-IC-01/07/08/09; PG-PR-01/03 | packet | Serve rider after SG-208 (prod still serves pre-change bundle); SG-208 route gap amended; ISS-4 10th instance to desk #84; SG-208 next (L3), SG-209 queued; D-14(c-monthly) still owed |  | none |
 
+### SG-211 (2026-10-17 - D-22 first production release)
+
+| slice_id | phase | model | effort | score | flag | lever | guards_invoked | deduction_attribution | remaining | escape | slowest_waste |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| SG-211 | D-22 release (R5 word spoken); WORK receipt verified (dual paste note missing - runner report_unreadable misfire, 14th ISS-4 instance, not slice fault); live re-read all 14 values == SG-210 poststate (container/image/bundle/DB/health); release record docs/releases/2026-10-17.md committed; first annotated tag release-2026-10-17 created on verified HEAD 394e4e7, pushed, ls-remote + local read-back verified; zero product/config/test bytes; 174s vs ~300s; audit SG-211_audit.md | opencode/opencode-go/deepseek-v4.1-flash (receipt settings) | max | 98 |  |  | PG-EV-02/03/05; PG-SC-09; PG-IC-01/07; PG-PR-03 |  | Standing close-release owns future closes; ISS-4 14th to desk #84; SG-212 next (L3) |  | none |
+
 ### SG-208 (2026-10-17 - D-13 household switching UI removal, retry after env failure)
 
 | slice_id | phase | model | effort | score | flag | lever | guards_invoked | deduction_attribution | remaining | escape | slowest_waste |
