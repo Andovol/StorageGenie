@@ -60,3 +60,5 @@ Named by the pack but absent from the repository at BASE: `.rules-cache/SECOND_O
 I read the repo's `AGENTS.md` top section, the context pack, and the 15 named files above; I attempted the two named `.rules-cache` files and found them absent from the repository. I deliberately did not use: the Architect's picks (none exist in any file I read), live host/container or git state (no command execution in this read-only run), `STATE.md`, ledgers, or worklogs/packets beyond the named set, and the host contract copy at `/home/andrei/storagegenie-contract/` (outside the repository and outside the read confinement). I wrote nothing — no file, commit, push, or receipt note; this message is the only output.
 Debug-Report-End
 moved=no
+
+Settings: coder=opencode coder_source=command model=opencode-go/deepseek-v4.1-flash model_source=command effort=max effort_source=command agent=plan agent_source=command
