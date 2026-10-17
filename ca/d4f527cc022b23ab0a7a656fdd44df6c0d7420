@@ -1,0 +1,11 @@
+Partial-Receipt-ID: SG-205
+utc=2026-10-17T16:20:45Z
+killed=exit_no_receipt
+pushed=0
+uncommitted=none
+wip=none
+wip_elapsed_ms=70
+DISPATCH_RESULT id=SG-205 coder=opencode exit=0 head=0834ce7616f4d71a3992ca147144854f885e2e06 note=no moved=yes rewrite=no dirty=no elapsed=741s budget=2100s killed=exit_no_receipt stragglers=0
+P1_moved=PASS count=5
+P2_rewrite=PASS behind=0
+P6_dirty=PASS dirty=no
