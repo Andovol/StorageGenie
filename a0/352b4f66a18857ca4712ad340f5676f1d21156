@@ -1,0 +1,11 @@
+Partial-Receipt-ID: SG-207
+utc=2026-10-17T16:51:33Z
+killed=exit_no_receipt
+pushed=0
+uncommitted=none
+wip=none
+wip_elapsed_ms=68
+DISPATCH_RESULT id=SG-207 coder=opencode exit=0 head=478c77a35b302fc6e883e108b9a0985bda7a662e note=no moved=yes rewrite=no dirty=no elapsed=920s budget=2100s killed=exit_no_receipt stragglers=0
+P1_moved=PASS count=5
+P2_rewrite=PASS behind=0
+P6_dirty=PASS dirty=no
