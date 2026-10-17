@@ -1,0 +1,8 @@
+[sg203] static server on 127.0.0.1:8023 for /tmp/opencode/sg203/candidate/frontend/dist
+[sg203] browser: HeadlessChrome/149.0.7827.55
+[sg203] scratch server on 127.0.0.1:35691
+[sg203] browser stderr: [1017/121826.545995:ERROR:dbus/bus.cc:405] Failed to connect to the bus: Could not parse server address: Unknown address type (examples of valid types are "tcp" and on UNIX "unix")
+[sg203] browser stderr: [1017/121826.546073:ERROR:dbus/object_proxy.cc:572] Failed to call method: org.freedesktop.DBus.NameHasOwner: object_path= /org/freedesktop/DBus: unknown error type:
+[sg203] wrote /tmp/opencode/sg203/out/controls/result.json elapsed 22s
+{"outFile":"/tmp/opencode/sg203/out/controls/result.json","elapsedSeconds":22,"controlFailures":0,"densityWorlds":null,"densityScreenshots":null,"touchRoutes":null,"zoomRoutes":null,"darkRoutes":null,"errors":[],"loopbackDriverGets":57}
+controls_rc=0
