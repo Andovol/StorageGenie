@@ -1,0 +1,57 @@
+### SG-205 scope-ceiling proof (product bytes ONLY frontend/src/theme/tokens.css; evidence ONLY docs/worklogs/SG-205*)
+# generated 2026-10-17T16:18:31Z over base 5db6cde2a81e72914d5c86dd5c5dd5d623fa2e6d..HEAD
+
+$ git diff --name-only 5db6cde2a81e72914d5c86dd5c5dd5d623fa2e6d..HEAD
+docs/worklogs/SG-205_after_result.json
+docs/worklogs/SG-205_after_run.log
+docs/worklogs/SG-205_before_result.json
+docs/worklogs/SG-205_before_run.log
+docs/worklogs/SG-205_build.log
+docs/worklogs/SG-205_controls.json
+docs/worklogs/SG-205_controls_run.log
+docs/worklogs/SG-205_driver.mjs
+docs/worklogs/SG-205_measure.json
+docs/worklogs/SG-205_shots/before_dark1440_density_focus.jpg
+docs/worklogs/SG-205_shots/before_light1440_density_focus.jpg
+docs/worklogs/SG-205_shots/candidate_dark1440_density_focus.jpg
+docs/worklogs/SG-205_shots/candidate_light1440_density_focus.jpg
+docs/worklogs/SG-205_tests_frontend.log
+docs/worklogs/SG-205_worklog.log
+frontend/src/theme/tokens.css
+
+$ git diff 5db6cde..HEAD | grep '^diff --git' | grep -v -E '^diff --git a/(docs/worklogs/SG-205|frontend/src/theme/tokens\.css)' ; echo outside_rc=$?
+outside_rc=1
+
+# allowed roots regex used: ^diff --git a/(docs/worklogs/SG-205|frontend/src/theme/tokens\.css)
+# shots live under docs/worklogs/SG-205_shots/ (SG-203/204 precedent; covered by the docs/worklogs/SG-205 prefix)
+
+### the product diff (only product bytes in the slice)
+$ git diff 5db6cde2a81e72914d5c86dd5c5dd5d623fa2e6d..HEAD -- frontend/src/theme/tokens.css
+diff --git a/frontend/src/theme/tokens.css b/frontend/src/theme/tokens.css
+index 991c1a3..150f1b9 100644
+--- a/frontend/src/theme/tokens.css
++++ b/frontend/src/theme/tokens.css
+@@ -170,8 +170,13 @@ body {
+   font-family: var(--font-mono);
+ }
+ 
++/* SG-205 G1 (D-8 option B): the focus outline takes the --link tint instead of
++   --primary. In light the two tokens hold the same value (2 41% 30.6%), so the
++   light ring is unchanged; in dark --link is the SG-118 dark-adapted tint and
++   clears the 3:1 non-text floor on every measured surrounding (SG-205_measure.json).
++   .file-pick:focus-within below takes the same tint for the same reason. */
+ .focus-ring:focus-visible {
+-  outline: 2px solid hsl(var(--primary));
++  outline: 2px solid hsl(var(--link));
+   outline-offset: 2px;
+ }
+ 
+@@ -286,7 +291,7 @@ body {
+ /* The real file input is visually hidden behind its label; move the visible
+    focus ring to the label so keyboard focus on the picker is never invisible. */
+ .file-pick:focus-within {
+-  outline: 2px solid hsl(var(--primary));
++  outline: 2px solid hsl(var(--link));
+   outline-offset: 2px;
+ }
+ 
