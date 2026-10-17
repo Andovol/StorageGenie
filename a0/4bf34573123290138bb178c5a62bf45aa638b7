@@ -59,3 +59,5 @@ Grep-swept matched lines only, not read in full: `docs/ratings.md` (:537 SG-157 
 I read AGENTS.md in full, the context pack, Phase A's report, and the 19 items listed above (STATE.md and the two second-opinion packets beyond the named set; every other named file in full); the host contract copy was attempted and denied — recorded, not routed around, not retried. I deliberately did not use: the host contract copy's own rule text (unreadable), live host/container/git state (no command execution in this read-only run), `STATE.md` beyond line 14, `docs/ratings.md` in full, all worklogs/packets/decisions not listed, the D145 archived line (read via grep, not used), and the ISS-4 runner thread (not needed). I wrote nothing — no file, no commit, no push, no receipt note; this message is the only output.
 Debug-Report-End
 moved=no
+
+Settings: coder=opencode coder_source=command model=opencode-go/deepseek-v4.1-flash model_source=command effort=max effort_source=command agent=plan agent_source=command
