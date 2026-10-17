@@ -1,0 +1,14 @@
+SG-207 scope / grep-gate proof (PG-SC-05, A1) — base 145d2970860d06d7cad1b0f86465290427ed35f3, generated 2026-10-17T16:41:37Z
+
+$ grep -rn -e rawJson -e raw-json -e 'Raw data' frontend/src
+rc=1
+
+$ grep -rni -e raw-json -e rawjson frontend/src   # case-insensitive, raw-json/rawJson only
+rc=1
+
+$ grep -rn 'raw data' frontend/src | grep -v drawer.test.tsx   # lowercase, production files only
+rc=1
+
+$ grep -rn 'raw data' frontend/src   # complete listing: every remaining mention (expected: the test's negative role matcher ONLY)
+frontend/src/components/shell/drawer.test.tsx:198:    expect(screen.queryByRole("button", { name: /raw data/i })).not.toBeInTheDocument();
+rc=0

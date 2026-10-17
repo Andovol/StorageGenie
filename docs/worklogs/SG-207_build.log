@@ -1,0 +1,53 @@
+SG-207 candidate build evidence — 2026-10-17T16:43:34Z
+dist PRE (stale host build from the SG-205 session):
+total 328
+-rw-r--r-- 1 andrei andrei   4535 Oct 17 16:16 index-C07VbG0m.css
+-rw-r--r-- 1 andrei andrei 324985 Oct 17 16:16 index-CZwTapqp.js
+c3b58cda696a22970fc2a4a348849fc1359f2105f80f81304ed5dfd5ca31a557  /home/andrei/StorageGenie/frontend/dist/assets/index-C07VbG0m.css
+626d10384f9a3b748baed4248718be1c802ddb476201b7fa14a9e3f3571e72e8  /home/andrei/StorageGenie/frontend/dist/assets/index-CZwTapqp.js
+build_start_epoch=1792255414
+$ cd frontend && npm run build   (tsc && vite build; bound 600s)
+
+> storagegenie-frontend@0.1.0 build
+> tsc && vite build
+
+vite v5.4.21 building for production...
+transforming...
+✓ 1966 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                   0.94 kB │ gzip:  0.48 kB
+dist/assets/index-C07VbG0m.css    4.54 kB │ gzip:  1.30 kB
+dist/assets/index-GIBlLfbr.js   323.63 kB │ gzip: 93.84 kB
+✓ built in 2.62s
+npm notice
+npm notice New minor version of npm available! 11.11.0 -> 11.21.1
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v11.21.1
+npm notice To update run: npm install -g npm@11.21.1
+npm notice
+build_rc=0 build_end_epoch=1792255422
+dist POST (candidate):
+total 328
+-rw-r--r-- 1 andrei andrei   4535 Oct 17 16:43 index-C07VbG0m.css
+-rw-r--r-- 1 andrei andrei 323740 Oct 17 16:43 index-GIBlLfbr.js
+c3b58cda696a22970fc2a4a348849fc1359f2105f80f81304ed5dfd5ca31a557  /home/andrei/StorageGenie/frontend/dist/assets/index-C07VbG0m.css
+19e8d9f4468733737eae791862cd5ecc303eb997185a4bb838c8d941386039f1  /home/andrei/StorageGenie/frontend/dist/assets/index-GIBlLfbr.js
+
+candidate bundle string check (the served bytes must not carry the removed panel's tokens):
+$ grep -o 'Raw data' frontend/dist/assets/index-GIBlLfbr.js | wc -l
+0
+$ grep -o 'raw-json' frontend/dist/assets/index-GIBlLfbr.js | wc -l
+0
+$ grep -o 'rawOpen' frontend/dist/assets/index-GIBlLfbr.js | wc -l
+0
+(control) $ grep -o 'Generate Context Scene' frontend/dist/assets/index-GIBlLfbr.js | wc -l
+1
+stale PRE build (base tree) for contrast: index-CZwTapqp.js sha 626d1038… — grep on it is not possible (overwritten); recorded shas above only.
+
+live production serve (base product bytes, SG-206 poststate: assets/index-Cv0EK3ka.js dd4f1bd0…, 325039 B) — READ-ONLY GET:
+$ curl -s http://127.0.0.1:8003/assets/index-Cv0EK3ka.js | sha256sum
+dd4f1bd0876de5dfba0b0bc351342a4e5ca3df35f8b5f4752e0ab31845579f53  -
+$ curl -s http://127.0.0.1:8003/assets/index-Cv0EK3ka.js | grep -o -e 'Raw data' -e 'raw-json' -e 'rawOpen' | sort | uniq -c
+      1 Raw data
+      1 raw-json
+(the live-served BASE bytes carry the removed panel tokens; the candidate bundle does not — before/after at the byte level, measured)

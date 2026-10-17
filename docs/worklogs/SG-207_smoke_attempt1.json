@@ -1,0 +1,81 @@
+{
+  "ts": "2026-10-17T16:44:04.979Z",
+  "url": "http://localhost:5173/catalog",
+  "released": {
+    "cdpTarget": "518F271ECCCC19BB042BD093DDF50EDA",
+    "browser": "HeadlessChrome/149.0.7827.55"
+  },
+  "userDataDir": "/tmp/opencode/sg207/profile-1792255444991",
+  "staticRequests": [
+    {
+      "method": "GET",
+      "url": "/catalog"
+    },
+    {
+      "method": "GET",
+      "url": "/assets/index-GIBlLfbr.js"
+    },
+    {
+      "method": "GET",
+      "url": "/assets/index-C07VbG0m.css"
+    }
+  ],
+  "served": {
+    "index.html": {
+      "sha256": "08483c93bfdc64b9718adc99127fd9dc4ac9d5ba6723e2f5cbf67b5a16862b12",
+      "bytes": 944
+    },
+    "assets/index-GIBlLfbr.js": {
+      "sha256": "19e8d9f4468733737eae791862cd5ecc303eb997185a4bb838c8d941386039f1",
+      "bytes": 323740
+    },
+    "assets/index-C07VbG0m.css": {
+      "sha256": "c3b58cda696a22970fc2a4a348849fc1359f2105f80f81304ed5dfd5ca31a557",
+      "bytes": 4535
+    }
+  },
+  "cards": 0,
+  "click": {
+    "clicked": false,
+    "cards": 0
+  },
+  "assertions": {
+    "drawerPresent": false,
+    "drawerRole": null,
+    "drawerAriaLabel": null,
+    "titleText": null,
+    "headings": null,
+    "labels": null,
+    "inputCount": null,
+    "buttonNames": [],
+    "rawJsonNodes": null,
+    "preNodes": null,
+    "rawDataButtons": null,
+    "bodyTextMatchesRawData": false,
+    "sourceState": null,
+    "hasSaveButton": null,
+    "hasAiButtons": null,
+    "drawerTextTail": null
+  },
+  "mask": {
+    "blurredImages": 0,
+    "maskedTextNodes": 2,
+    "blockRun": "U+25A0 + U+200B (layout-safe)"
+  },
+  "gate": {
+    "drawerPresent": false,
+    "noRawJsonNode": false,
+    "noPreNode": false,
+    "noRawDataButton": false,
+    "bodyHasNoRawDataText": true,
+    "sectionsIntact": false,
+    "editableInputs": false,
+    "aiButtonsPresent": false
+  },
+  "pass": false,
+  "shot": {
+    "file": "docs/worklogs/SG-207_shots/drawer_no_raw_data.png",
+    "sha256": "31df3e4d8247ea320ede49a4750b9f38a8612e22d2480fcac2123e912ed0107f",
+    "bytes": 20204
+  }
+}

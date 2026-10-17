@@ -1,0 +1,4 @@
+SG-207 health evidence (CO-92) — {{HEALTH_CMD}} as bound in AGENTS.md: curl -s http://127.0.0.1:8003/v1/health
+start: 1792255168 (2026-10-17T16:39:28Z) {"status":"ok","db":"ok","storage":"ok"} [200]   [read during lane recon, read-only]
+end:   1792255728 (2026-10-17T16:48:48Z) {"status":"ok","db":"ok","storage":"ok"} [200]
+delta: none — HEALTH: unchanged, OK

@@ -1,0 +1,114 @@
+SG-207 verify log — frontend evidence (base 145d2970860d06d7cad1b0f86465290427ed35f3)
+run1_start_epoch=1792255208 (2026-10-17T16:40:08Z)
+RUN 1 — PRE-CHANGE, targeted: the test this slice deletes (frontend: npx vitest run src/components/shell/drawer.test.tsx -t "raw panel"; bound 600s)
+timeout: failed to run command ‘npx’: No such file or directory
+run1_rc=127 run1_end_epoch=1792255208 (2026-10-17T16:40:08Z)
+NOTE: npx absent from the lane PATH (rc=127 above; no test executed). Re-running run 1 with the project-local binary.
+run1_retry_start_epoch=1792255233 (2026-10-17T16:40:33Z)
+RUN 1 (retry) — PRE-CHANGE, targeted: frontend: ./node_modules/.bin/vitest run src/components/shell/drawer.test.tsx -t "raw panel"; bound 600s
+
+ RUN  v1.6.1 /home/andrei/StorageGenie/frontend
+
+ ✓ src/components/shell/drawer.test.tsx  (17 tests | 16 skipped) 190ms
+
+ Test Files  1 passed (1)
+      Tests  1 passed | 16 skipped (17)
+   Start at  16:40:34
+   Duration  1.42s (transform 178ms, setup 83ms, collect 389ms, tests 190ms, environment 436ms, prepare 99ms)
+
+run1_rc=0 run1_end_epoch=1792255235 (2026-10-17T16:40:35Z)
+
+run2_start_epoch=1792255266 (2026-10-17T16:41:06Z)
+RUN 2 — POST-CHANGE, FULL frontend suite ONCE on the candidate (frontend: npm test = vitest run; bound 600s)
+
+ RUN  v1.6.1 /home/andrei/StorageGenie/frontend
+
+ ✓ src/api/client.test.ts  (30 tests) 40ms
+stderr | src/components/shell/shell.test.tsx > Catalog shell > the header labels the LOADED item count, not a household total
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+stderr | src/components/shell/import-modal.test.tsx > AssetImportModal staging > drop stages accepted files as Ready with a live count
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+stderr | src/components/catalog/catalog.test.tsx > ProductCard > renders the name, the category micro-pill and the primary-color dots
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+stderr | src/routes/AssetDetailPage.test.tsx > AssetDetailPage > editing quantity patches via PATCH and shows the superseded prior value in history
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+ ✓ src/components/shell/import-modal.test.tsx  (18 tests) 776ms
+ ✓ src/components/shell/drawer.test.tsx  (17 tests) 1009ms
+ ✓ src/components/catalog/catalog.test.tsx  (33 tests) 1140ms
+ ✓ src/routes/AssetDetailPage.test.tsx  (13 tests) 1134ms
+stderr | src/routes/query-error-alerts.test.tsx > SG-195 route query-error alerts > Catalog: a failed asset-list query alerts naming the list and hides the empty view
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+stderr | src/App.household-nav.test.tsx > SG-196 shared household context > one household fetch; the nav selector shows the fallback and persists it (A1)
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+ ✓ src/routes/query-error-alerts.test.tsx  (17 tests) 619ms
+ ✓ src/routes/theme-adoption.test.tsx  (12 tests) 651ms
+stderr | src/routes/theme-adoption.test.tsx > SG-075 screen adoption > App nav carries the card/border tokens and surfaces the theme toggle
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+stderr | src/routes/ReviewPage.test.tsx > ReviewPage > posts every decision with the loaded candidate id and supports keyboard actions
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+ ✓ src/components/shell/shell.test.tsx  (23 tests) 2781ms
+ ✓ src/App.household-nav.test.tsx  (13 tests) 818ms
+ ✓ src/routes/ReviewPage.test.tsx  (8 tests) 720ms
+stderr | src/routes/ExpiryPage.test.tsx > ExpiryPage > reads the SG-107 engine route with the household (and no category by default)
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+stderr | src/routes/ChatPage.test.tsx > ChatPage > sending a question posts and renders the grounded reply
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+stderr | src/routes/InboxPage.test.tsx > InboxPage > renders failed loaded job detail and retries that loaded id
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+ ✓ src/routes/ExpiryPage.test.tsx  (9 tests) 532ms
+ ✓ src/routes/ChatPage.test.tsx  (11 tests) 569ms
+ ✓ src/theme/theme.test.tsx  (11 tests) 218ms
+ ✓ src/routes/InboxPage.test.tsx  (10 tests) 713ms
+ ✓ src/components/CandidateCard.test.tsx  (11 tests) 461ms
+stderr | src/components/CandidateCard.test.tsx > CandidateCard > keeps evidence beside fields and exposes confidence, source, and blocking collision
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+ ✓ src/types/product.test.ts  (12 tests) 6ms
+ ✓ src/routes/AnalyticsPage.test.tsx  (4 tests) 287ms
+ ✓ src/components/AssetForm.test.tsx  (9 tests) 447ms
+ ✓ src/routes/PlanningPage.test.tsx  (4 tests) 449ms
+ ✓ src/components/WebAlternates.test.tsx  (4 tests) 142ms
+ ✓ src/routes/SettingsPage.test.tsx  (3 tests) 210ms
+ ✓ src/components/HouseholdSelector.test.tsx  (4 tests) 211ms
+ ✓ src/components/shell/PageContainer.test.tsx  (6 tests) 202ms
+ ✓ src/components/PlanningSuggestionCard.test.tsx  (2 tests) 181ms
+ ✓ src/components/ExpiryEntryForm.test.tsx  (2 tests) 312ms
+ ✓ src/components/EvidenceGallery.test.tsx  (3 tests) 126ms
+ ✓ src/components/JobCard.test.tsx  (2 tests) 143ms
+ ✓ src/components/AssetCard.test.tsx  (2 tests) 61ms
+stderr | src/components/AssetCard.test.tsx > AssetCard > renders display_name and type
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+ ✓ src/components/ChatTranscript.test.tsx  (2 tests) 88ms
+ ✓ src/components/ProvenanceBadge.test.tsx  (3 tests) 68ms
+
+ Test Files  30 passed (30)
+      Tests  298 passed (298)
+   Start at  16:41:06
+   Duration  10.39s (transform 1.91s, setup 2.34s, collect 7.54s, tests 15.11s, environment 15.69s, prepare 3.52s)
+
+run2_rc=0 run2_end_epoch=1792255277 (2026-10-17T16:41:17Z)
