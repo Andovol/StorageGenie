@@ -1,0 +1,28 @@
+SG-214 focused suite — ONE vitest invocation — 2026-10-17T19:49:07Z epoch 1792266547
+derivation: L1 rule-read-point-asserting (catalog-content-column) = catalog.test.tsx; L2 density-control-label-asserting (Compact Table/Standard Grid) = catalog.test.tsx + shell.test.tsx; L3 CatalogPage-mounting = catalog.test.tsx + shell.test.tsx + query-error-alerts.test.tsx; union 3 files (SG-214_prestate.log); excluded: theme-adoption.test.tsx (CatalogPage only in a comment), import-modal.test.tsx (density fixture prop only, never mounts CatalogPage)
+$ node_modules/.bin/vitest run src/components/catalog/catalog.test.tsx src/components/shell/shell.test.tsx src/routes/query-error-alerts.test.tsx
+
+ RUN  v1.6.1 /home/andrei/StorageGenie/frontend
+
+stderr | src/routes/query-error-alerts.test.tsx > SG-195 route query-error alerts > Catalog: a failed asset-list query alerts naming the list and hides the empty view
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+stderr | src/components/shell/shell.test.tsx > Catalog shell > the header labels the LOADED item count, not a household total
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+stderr | src/components/catalog/catalog.test.tsx > ProductCard > renders the name, the category micro-pill and the primary-color dots
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+ ✓ src/routes/query-error-alerts.test.tsx  (17 tests) 451ms
+ ✓ src/components/catalog/catalog.test.tsx  (37 tests) 1068ms
+ ✓ src/components/shell/shell.test.tsx  (23 tests) 2074ms
+
+ Test Files  3 passed (3)
+      Tests  77 passed (77)
+   Start at  19:49:08
+   Duration  3.65s (transform 809ms, setup 204ms, collect 2.00s, tests 3.59s, environment 1.31s, prepare 264ms)
+
+vitest_rc=0

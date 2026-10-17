@@ -1,0 +1,79 @@
+SG-214 poststate — 2026-10-17T19:48:52Z (epoch 1792266532)
+== container/image post ==
+d45005fb7fab6828e07a4aff6c12893ce5ef493feb1d9d169cd85cbee4f801bc storagegenie-backend Up 35 seconds (healthy) storagegenie-backend-1
+Id=d45005fb7fab6828e07a4aff6c12893ce5ef493feb1d9d169cd85cbee4f801bc Created=2026-10-17T19:48:15.931194106Z Image=sha256:98f8af1f30262487e824731a0fa258b5a54b09cd0b9129c5c613cb9668e4556c RestartCount=0 State=running Health=healthy StartedAt=2026-10-17T19:48:16.576085009Z
+image_Id=sha256:98f8af1f30262487e824731a0fa258b5a54b09cd0b9129c5c613cb9668e4556c image_Created=2026-10-17T19:48:04.670555828Z
+== health GETs post-recreate x6 ==
+health_1 {"status":"ok","db":"ok","storage":"ok"} [200] 
+health_2 {"status":"ok","db":"ok","storage":"ok"} [200] 
+health_3 {"status":"ok","db":"ok","storage":"ok"} [200] 
+health_4 {"status":"ok","db":"ok","storage":"ok"} [200] 
+health_5 {"status":"ok","db":"ok","storage":"ok"} [200] 
+health_6 {"status":"ok","db":"ok","storage":"ok"} [200] 
+== served bundle post ==
+index_http=200
+b52f84ca4dc70463f4782fa77603bf9e2f7b09b43dd5f0625bb5e1f92c8366bc  /tmp/opencode/sg214_index_post.html
+index_bytes=944
+post_JS_asset=assets/index-ZkOUf-iS.js post_CSS_asset=assets/index-C07VbG0m.css
+js_http=200
+css_http=200
+8bab60ce6994cb9595aea213bbfd2fbfda88d4814dcfe81dfff4e4f626f9c163  /tmp/opencode/sg214_js_post
+c3b58cda696a22970fc2a4a348849fc1359f2105f80f81304ed5dfd5ca31a557  /tmp/opencode/sg214_css_post
+js_bytes=321010 css_bytes=4535
+== served post marker greps (SG-212 rule now live; pre counts were 0/0/0) ==
+CATALOG_TABLE_FIT_MIN_PX count=0
+resolveInitialDensity count=0
+catalog-content-column count=1
+Compact Table count=1
+Standard Grid count=1
+Density count=5
+Sort catalog count=1
+Generate Context Scene count=1
+aria-label count=47
+storagegenie.dynv6.net count=6
+localhost:8003 count=0
+catalog-content-column context:
+onSaveSearch:Lp,children:l.jsxs("div",{ref:m,"data-testid":"catalog-content-column",children:[re&&l.jsxs("div",{role:"alert",children:["Could 
+== SPA routes ==
+/ [200] b52f84ca4dc70463f4782fa77603bf9e2f7b09b43dd5f0625bb5e1f92c8366bc
+/inbox [200] b52f84ca4dc70463f4782fa77603bf9e2f7b09b43dd5f0625bb5e1f92c8366bc
+/analytics [200] b52f84ca4dc70463f4782fa77603bf9e2f7b09b43dd5f0625bb5e1f92c8366bc
+/planning [200] b52f84ca4dc70463f4782fa77603bf9e2f7b09b43dd5f0625bb5e1f92c8366bc
+== API control ==
+households_http=200
+6921583771fb79bec868339653a91050d1163430ed19fa0e96268522adf8038f  /tmp/opencode/sg214_households.json
+== candidate-build byte extraction (disclosed READ of the running container fs; no state change, no third build/recreate) ==
+cp_rc=0
+/tmp/opencode/sg214_static:
+total 16
+drwxr-xr-x 3 andrei andrei 4096 Oct 17 19:48 .
+drwxr-xr-x 4 andrei andrei 4096 Oct 17 19:48 ..
+drwxr-xr-x 2 andrei andrei 4096 Oct 17 19:48 assets
+-rw-r--r-- 1 andrei andrei  944 Oct 17 19:48 index.html
+
+/tmp/opencode/sg214_static/assets:
+total 332
+drwxr-xr-x 2 andrei andrei   4096 Oct 17 19:48 .
+drwxr-xr-x 3 andrei andrei   4096 Oct 17 19:48 ..
+-rw-r--r-- 1 andrei andrei   4535 Oct 17 19:48 index-C07VbG0m.css
+-rw-r--r-- 1 andrei andrei 321010 Oct 17 19:48 index-ZkOUf-iS.js
+b52f84ca4dc70463f4782fa77603bf9e2f7b09b43dd5f0625bb5e1f92c8366bc  /tmp/opencode/sg214_static/index.html
+8bab60ce6994cb9595aea213bbfd2fbfda88d4814dcfe81dfff4e4f626f9c163  /tmp/opencode/sg214_static/assets/index-ZkOUf-iS.js
+c3b58cda696a22970fc2a4a348849fc1359f2105f80f81304ed5dfd5ca31a557  /tmp/opencode/sg214_static/assets/index-C07VbG0m.css
+-- cmp served-vs-in-image:
+cmp_js_rc=0
+cmp_css_rc=0
+cmp_index_rc=0
+== DB post (mode=ro) ==
+e6bef157440fb8b4a3262577362b071dcae07507ea9a7e04a614e11be28ee5bd  data/db/storagegenie.db
+28
+tables_rc=0
+20260924_sg114_relation
+alembic_rc=0
+total 704
+drwxr-xr-x 2 andrei andrei   4096 Oct 17 19:48 .
+drwxr-xr-x 4 andrei andrei   4096 Sep  2 12:00 ..
+-rw------- 1 andrei andrei 675840 Oct 12 20:03 storagegenie.db
+-rw------- 1 andrei andrei  32768 Oct 17 19:48 storagegenie.db-shm
+-rw------- 1 andrei andrei      0 Oct 17 19:48 storagegenie.db-wal
+== end poststate — 2026-10-17T19:48:52Z epoch 1792266532 ==

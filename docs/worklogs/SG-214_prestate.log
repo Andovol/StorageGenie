@@ -1,0 +1,124 @@
+SG-214 prestate — FIRST READ — 2026-10-17T19:46:52Z (epoch 1792266412)
+lane_start=Sat 2026-10-17 19:44:44 UTC start_epoch=1792266284 RUN_BUDGET_S=2100 (/etc/dispatch/storagegenie.conf read)
+== git ==
+BASE ref requested: automation
+ls-remote origin automation:
+7aacc8411eef2e62cf8f7236af17d33f84ef5618	refs/heads/automation
+resolved origin/automation: 7aacc8411eef2e62cf8f7236af17d33f84ef5618
+HEAD: 7aacc8411eef2e62cf8f7236af17d33f84ef5618
+branch: automation
+?? docs/worklogs/SG-214_prestate.log
+status_rc=0
+== rules/contract ==
+ls: cannot access '/home/andrei/StorageGenie/.rules-cache/': No such file or directory
+G-L1 UNCHECKED the cache is not checked out at a contract tag: /home/andrei/storagegenie-contract
+G-L5 UNCHECKED gh-unauthenticated
+G-L7 UNCHECKED gh-unauthenticated
+G-L6 BYTES /home/andrei/.codex/AGENTS.md 2275
+G-L6 BYTES /home/andrei/.config/opencode/AGENTS.md 1933
+G-L6 BYTES total[codex]=2275 unseen=architect-layer,state-file,other-ritual-files
+G-L6 BYTES total[opencode]=1933 unseen=architect-layer,state-file,other-ritual-files
+rules_check_rc=3
+0.50.0
+**Contract version: 0.50.0** — **echo this line verbatim in your receipt.** It is the only proof that you
+== lane ==
+srw-rw---T 1 andrei 100987 0 Oct 16 17:19 /run/dispatch-storagegenie-SG-214/docker.sock
+Client 29.6.2 / Server 29.6.2 (API 1.55)
+version_rc=0
+Docker Compose version v5.3.1
+compose_rc=0
+== container/image pre ==
+5f82f760d9bfbaad52020e1476f04b1d697f7d009aa629820d31e86fd5a46188 storagegenie-backend Up 2 hours (healthy) storagegenie-backend-1
+Id=5f82f760d9bfbaad52020e1476f04b1d697f7d009aa629820d31e86fd5a46188 Created=2026-10-17T17:57:53.711535827Z Image=sha256:38fcae5e3a81f8ed6fa4557b164ca791589d753e92230dd435996f2a91945e6b RestartCount=0 State=running Health=healthy StartedAt=2026-10-17T17:57:54.516273092Z
+[{"Type":"volume","Name":"storagegenie_storage_data","Source":"/home/andrei/.local/share/docker/volumes/storagegenie_storage_data/_data","Destination":"/data/storage","Driver":"local","Mode":"rw","RW":true,"Propagation":""},{"Type":"bind","Source":"/home/andrei/StorageGenie/data/db","Destination":"/data/db","Mode":"rw","RW":true,"Propagation":"rprivate"}]
+inspect_rc=0
+== health pre ({{HEALTH_CMD}}) ==
+health_pre_http=200
+{"status":"ok","db":"ok","storage":"ok"}
+== served bundle pre ==
+index_http=200
+231224da729ca1034562c6be32a2f88f2b9b48e9fbeaec1e507e75717346fb4a  /tmp/opencode/sg214_index_pre.html
+index_bytes=944
+pre_JS_asset=assets/index-DbppHp6C.js pre_CSS_asset=assets/index-C07VbG0m.css
+js_http=200
+css_http=200
+47c65dea3d7909974786314b1de6c3adf4792a5e40582bc34f6d283781f26c57  /tmp/opencode/sg214_js_pre
+c3b58cda696a22970fc2a4a348849fc1359f2105f80f81304ed5dfd5ca31a557  /tmp/opencode/sg214_css_pre
+js_bytes=320700 css_bytes=4535
+== served pre marker greps (CONTROLS: SG-212 rule not yet live, expect 0 rule markers) ==
+CATALOG_TABLE_FIT_MIN_PX count=0
+resolveInitialDensity count=0
+catalog-content-column count=0
+Compact Table count=1
+Standard Grid count=1
+Density count=5
+Sort catalog count=1
+Generate Context Scene count=1
+aria-label count=47
+== DB pre (mode=ro) ==
+e6bef157440fb8b4a3262577362b071dcae07507ea9a7e04a614e11be28ee5bd  data/db/storagegenie.db
+28
+tables_rc=0
+20260924_sg114_relation
+alembic_rc=0
+db_mtime=2026-10-12 20:03:57.686976600 +0000 db_bytes=675840
+total 704
+drwxr-xr-x 2 andrei andrei   4096 Oct 17 17:57 .
+drwxr-xr-x 4 andrei andrei   4096 Sep  2 12:00 ..
+-rw------- 1 andrei andrei 675840 Oct 12 20:03 storagegenie.db
+-rw------- 1 andrei andrei  32768 Oct 17 17:57 storagegenie.db-shm
+-rw------- 1 andrei andrei      0 Oct 17 17:57 storagegenie.db-wal
+== product delta since served 4952c0a (re-derived, not assumed) ==
+7aacc84 SG-213 audit + rating 98 STOP (402 wall stands); D-23 opened; SG-214 packet
+254bdff SG-213 receipt transcript (notes-ref publish on Work-HEAD 0740d44 + mapped read-back; remote tips 22da308/0f22238) + gate pass D
+0f22238 SG-213 report: 402 prepayment-credits wall stands (unbilled), G2 skipped, $0.000000 spent of $2.00; PG-SC-05 gate log (passes A-C exit 1 EMPTY)
+0740d44 SG-213 render leg: quota re-check returned HTTP 402 prepayment-credits-depleted (unbilled, Google AI Studio) -> STOP per packet; G2 input_references leg skipped; request/response bodies + transcript + ledger
+5958ba1 SG-213 G1: discovery re-measured (slug + 3 endpoints, input_references 0..14, pricing 6.6e-05/6e-05/6e-05) + guard selftest + fixture copy + probe driver
+916aa53 SG-212 audit + rating 98 (D-21 proved); D-18(b) Google retry queued
+e6ba4a3 SG-212 receipt transcript (notes-ref publish + mapped read-back; Work-HEAD c371b34)
+a0e1d58 SG-212 report (D-21 width-adaptive density default: failpre 4 red -> passpost 4 green; suite 297; served smoke wide1440 table/no-scroll + touch390 grid/no-overflow + toggle both ways; receipt pending)
+c371b34 SG-212 G2 evidence: served smoke wide1440 opens table (content 1052, maxScrollLeft 0) + touch390 opens grid (content 342, docOverflowX 0) + toggle both ways via CDP clicks (frozen driver b46781eb; 4 shots); failpre/passpost/suite/tsc/eslint/build/health logs; enumeration+scope (Dispatch-ID: SG-212 trailer)
+f54449a SG-212 G1: width-adaptive Catalog density default (D-21) — content-fit rule: table iff the Catalog content column measures >=860px at mount (layout effect, pre-paint), else grid; recompute per fresh navigation, no persistence; toggle untouched post-mount. New-rule tests failpre 4 red -> passpost 4 green; full suite 297 pass
+c27beab SG-211 audit + rating 98 released (first tag on origin); queue SG-212
+a21f4d2 SG-211 receipt transcript (notes-ref publish + mapped read-back; Work-HEAD d1e2225)
+80fb84e SG-211 report (release-2026-10-17 attested on verified HEAD 394e4e7; first tag published; receipt pending) + health log
+d1e2225 SG-211 G1: release record for release-2026-10-17 (first tag) on verified HEAD 394e4e7; live re-read == SG-210 poststate, all 14 values; prestate+live evidence
+394e4e7 D-19..D-22 answered (leave, /day, D-21 values, release now+standing); SG-211/212 packets
+8ca680a SG-210 audit + rating 98 SERVED live; L3 queue empty, stage ends
+90779a8 SG-210 receipt transcript (notes-ref publish + mapped read-back; Work-HEAD 4952c0a) + final gate re-run
+15a9903 SG-210 report (serve rider: SG-207+SG-208 product delta live; served bytes == candidate build cmp 0; both removals absent from served bundle; DB sha identical x3; receipt pending)
+-- product-surface diff (frontend/backend):
+M	frontend/src/components/catalog/catalog.test.tsx
+M	frontend/src/routes/CatalogPage.tsx
+-- changed paths OUTSIDE docs/ (must be exactly the product set):
+frontend/src/components/catalog/catalog.test.tsx
+frontend/src/routes/CatalogPage.tsx
+non_docs_rc=0
+-- migration paths (must be empty):
+migration_rc=0
+== consumer-set derivation (on target) ==
+T1 density-markup-asserting (rg -l 'catalog-content-column' --glob '*.test.tsx' frontend/src):
+frontend/src/components/catalog/catalog.test.tsx
+T2 density-referencing tests (rg -l -i 'density' --glob '*.test.tsx' frontend/src):
+frontend/src/components/catalog/catalog.test.tsx
+frontend/src/components/shell/import-modal.test.tsx
+T3 CatalogPage-driving tests (rg -l 'CatalogPage' --glob '*.test.tsx' frontend/src):
+frontend/src/routes/theme-adoption.test.tsx
+frontend/src/routes/query-error-alerts.test.tsx
+frontend/src/components/shell/shell.test.tsx
+frontend/src/components/catalog/catalog.test.tsx
+T4 rule-symbol references (source+test):
+frontend/src/routes/CatalogPage.tsx
+T5 catalog-surface-asserting tests (rg -l 'catalog-content-column|Compact Table|Standard Grid' --glob '*.test.tsx' frontend/src):
+frontend/src/components/shell/shell.test.tsx
+frontend/src/components/catalog/catalog.test.tsx
+new describe blocks in catalog.test.tsx:
+62:describe("ProductCard", () => {
+145:describe("ProductCardSkeleton", () => {
+156:describe("ProductGrid", () => {
+298:describe("mockProducts", () => {
+332:describe("ProductCard onSelect", () => {
+395:describe("ProductGrid onSelect", () => {
+455:describe("CatalogPage drawer wiring", () => {
+571:describe("CatalogPage width-adaptive density default (SG-212 / D-21)", () => {
+== end prestate — 2026-10-17T19:46:54Z epoch 1792266414 ==
