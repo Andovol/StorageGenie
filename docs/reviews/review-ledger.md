@@ -1,0 +1,12 @@
+# Review ledger — second opinions (`SECOND_OPINION.md`, `D451`)
+
+One row per reviewed decision. Columns: date · review IDs · decisions · reviewer (as dispatched) · Phase A pick · Phase B strongest objection · Architect disposition. A row never restates the reports; it points at them.
+
+| Date | Review IDs | Decisions | Reviewer (dispatched) | Phase A pick | Phase B strongest objection | Architect disposition |
+|---|---|---|---|---|---|---|
+| 2026-10-17 | SG-200 (A, blind) · SG-201 (B, critique) | D-5 · D-6 · D-7 | `opencode-go/deepseek-v4.1-flash` effort=max, `agent=plan` | D-5 = B carry-to-close (`SG-200_report.md:38`); D-6 = P1 proposal; D-7 = keep-explicit (`:46`) | D-5: A doubles production cycles against sensitive surfaces for zero repair content (D-3:9; `SG-201_report.md` D-5a) · D-6: G-A7 — no live reason remained, toggle never measured (D-6a/b) · D-7: `default` reinstates the ambiguity / reviewer lands in the Architect's recorded family (D-7a) | D-5 = **A kept** (rejected B) · D-6 = **P1 kept** with both refinements accepted · D-7 = **`default` kept** (rejected both) · all three OPEN to owner |
+
+## Standing lane condition recorded here
+
+- A host session launched with `agent=plan` **cannot read outside the repository** — `/home/andrei/storagegenie-contract/` was denied (`external_directory: deny`) for both SG-200 and SG-201. A review that needs a rule's own text must carry it in the packet or the context pack (as both did, from the pack's verbatim quote at `2026-10-17-second-opinion-d5-d6-d7-context.md:63`). Recorded, not routed around; no re-run ordered on this account (every acceptance criterion was met from the repository corpus).
+- SG-201 flagged a record inconsistency (not a defect): SG-196's delta is `+565/−161` in its audit (`SG-196_audit.md:3`) but `+556` in its report (`SG-196_report.md:13,16`) — a 9-line discrepancy; the audit figure reconciles with the measured `+622` total (`565+57`).
