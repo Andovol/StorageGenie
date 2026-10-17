@@ -192,16 +192,12 @@ describe("ItemInspectorDrawer", () => {
     expect(api.apiGet.mock.calls.length + api.apiPatch.mock.calls.length).toBe(before);
   });
 
-  test("the raw panel expands with the asset + assertions JSON, coordinates/confidence as data", async () => {
+  test("the removed dev panel leaves no expand toggle and no JSON dump node (D-12)", async () => {
     renderDrawer();
     await screen.findByTestId("inspector-drawer");
-    expect(screen.queryByTestId("raw-json")).not.toBeInTheDocument();
-
-    fireEvent.click(screen.getByRole("button", { name: /raw data/i }));
-    const raw = screen.getByTestId("raw-json");
-    expect(raw.textContent).toContain("asset-1");
-    expect(raw.textContent).toContain("primary_colors");
-    expect(raw.textContent).toContain("0.82");
+    expect(screen.queryByRole("button", { name: /raw data/i })).not.toBeInTheDocument();
+    expect(screen.queryByTestId(/^raw-/)).not.toBeInTheDocument();
+    expect(document.querySelector("pre")).toBeNull();
   });
 
   test("an asset with no evidence shows the honest empty source state", async () => {

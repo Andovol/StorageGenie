@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { ChevronDown, ChevronRight, ScanLine, Sparkles, X } from "lucide-react";
+import { ScanLine, Sparkles, X } from "lucide-react";
 import { apiGet, apiPatch } from "../../api/client";
 import type { Asset, Assertion, Evidence } from "../../api/types";
 import { useTaxonomy } from "../../hooks/useAssets";
@@ -69,7 +69,6 @@ export function ItemInspectorDrawer({ asset, householdId, onClose }: ItemInspect
   const [quantity, setQuantity] = useState(asset.quantity != null ? String(asset.quantity) : "");
   const [unit, setUnit] = useState(asset.unit ?? "");
   const [condition, setCondition] = useState(asset.condition ?? "");
-  const [rawOpen, setRawOpen] = useState(false);
   const [notice, setNotice] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -167,11 +166,6 @@ export function ItemInspectorDrawer({ asset, householdId, onClose }: ItemInspect
   const showAiNotice = () => {
     setNotice("scene rendering lands with the AI stages — nothing was sent anywhere");
   };
-
-  const rawJson = useMemo(
-    () => JSON.stringify({ asset: current, assertions }, null, 2),
-    [current, assertions]
-  );
 
   return (
     <div data-testid="inspector-drawer" className="font-sans">
@@ -434,28 +428,6 @@ export function ItemInspectorDrawer({ asset, householdId, onClose }: ItemInspect
           <p className="text-muted-foreground" style={{ margin: "6px 0 0", fontSize: 11 }}>
             No model or cost text is shown: with no provider backend a model/cost string would be fabricated.
           </p>
-        </section>
-
-        <section>
-          <button
-            type="button"
-            aria-expanded={rawOpen}
-            onClick={() => setRawOpen((value) => !value)}
-            className="text-foreground focus-ring"
-            style={{ display: "inline-flex", alignItems: "center", gap: 4, background: "none", border: "none", cursor: "pointer", padding: 0, fontSize: 14, fontWeight: 600 }}
-          >
-            {rawOpen ? <ChevronDown size={16} aria-hidden="true" /> : <ChevronRight size={16} aria-hidden="true" />}
-            Raw data
-          </button>
-          {rawOpen && (
-            <pre
-              data-testid="raw-json"
-              className="bg-card-muted font-mono"
-              style={{ marginTop: 8, padding: 10, borderRadius: 8, fontSize: 11, overflowX: "auto", maxHeight: 280 }}
-            >
-              {rawJson}
-            </pre>
-          )}
         </section>
       </aside>
     </div>
