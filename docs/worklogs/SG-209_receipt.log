@@ -1,0 +1,24 @@
+SG-209 receipt transcript — lane notes-ref mechanism (CO-60/CO-97), generated 2026-10-17T17:50:48Z
+
+$ git fetch origin refs/notes/storagegenie-coder-reports:refs/notes/storagegenie-coder-reports
+fetch_exit=0
+local_tip_before=2ca69edf992a1dc336bd701092f3bc51963b5e1c
+
+$ git notes --ref=refs/notes/storagegenie-coder-reports add -m "Dispatch-ID: SG-209 | Report: docs/worklogs/SG-209_report.md | Work-HEAD: f67d8f7aa64c5fdb9543a9d65bd38e7fa86cacbb" f67d8f7aa64c5fdb9543a9d65bd38e7fa86cacbb
+add_exit=0
+
+$ git push origin refs/notes/storagegenie-coder-reports
+To github.com:Andovol/StorageGenie.git
+   2ca69ed..4486b0e  refs/notes/storagegenie-coder-reports -> refs/notes/storagegenie-coder-reports
+notes_push_exit=0
+
+$ git fetch origin refs/notes/storagegenie-coder-reports:refs/notes/sg209-fetched
+From github.com:Andovol/StorageGenie
+ * [new ref]         refs/notes/storagegenie-coder-reports -> refs/notes/sg209-fetched
+mapped_fetch_exit=0
+$ git notes --ref=refs/notes/sg209-fetched show f67d8f7aa64c5fdb9543a9d65bd38e7fa86cacbb
+Dispatch-ID: SG-209 | Report: docs/worklogs/SG-209_report.md | Work-HEAD: f67d8f7aa64c5fdb9543a9d65bd38e7fa86cacbb
+show_exit=0
+
+remote notes tip (ls-remote readback): 4486b0e6b34cb3032882dd170c68e12afdb96fff
+remote head (ls-remote readback): 0add225fd24131a5031663d3d421c8380009e049
