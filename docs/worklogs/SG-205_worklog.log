@@ -1,0 +1,13 @@
+SG-205 worklog (append-only; material commands, decisions, results)
+Dispatch-ID: SG-205
+Contract: 0.50.0 (read live /home/andrei/storagegenie-contract/CODER.md; VERSION 0.50.0)
+BASE requested=automation resolved=5db6cde2a81e72914d5c86dd5c5dd5d623fa2e6d (== origin/automation, admission clean)
+Lane: RUN_BUDGET_S=2100 (/etc/dispatch/storagegenie.conf read-only). Database: none. Restart: none.
+Health start 1792253542 (16:12:22Z): {"status":"ok","db":"ok","storage":"ok"}
+Recon (PB-1 re-verify on target):
+- frontend/src/theme/tokens.css:173-176 `.focus-ring:focus-visible { outline: 2px solid hsl(var(--primary)); outline-offset: 2px; }` CONFIRMED
+- tokens.css:288-291 `.file-pick:focus-within` same outline CONFIRMED; dark --primary `2 41% 30.6%` (:44), dark --link `2 41% 72%` (:47) CONFIRMED
+- CatalogToolbar.tsx:5,13-15,44-45,63,168-184 CONFIRMED; CatalogPage.tsx:40 default grid; ProductGrid breakpoints/table CONFIRMED
+- prior artifacts re-read: SG-203_measure.json focusProbes light 9.8813 / dark 1.7559; SG-204_measure.json option2 ringBefore/After 7.4784 / own-face 4.2589 CONFIRMED
+- enumeration (G2): rg -l 'focus-ring' frontend/src -> exactly 28 files; outline declarations in the whole src tree -> tokens.css ONLY (2 rules: :174, :289); no other :focus/:focus-visible/:focus-within rule
+Decision (G1): substitute hsl(var(--link)) for hsl(var(--primary)) in both rules (light --link == light --primary `2 41% 30.6%` -> light renders unchanged; dark --link is the SG-118 dark-adapted same-hue tint; single definition, smallest change, matches the measured D-8 simulation's computed result).

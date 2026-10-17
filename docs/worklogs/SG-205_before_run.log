@@ -1,0 +1,8 @@
+[sg205] static server on 127.0.0.1:8011 for /tmp/opencode/sg205/base_dist
+[sg205] browser: HeadlessChrome/149.0.7827.55
+[sg205] browser stderr: [1017/161444.323854:ERROR:dbus/bus.cc:405] Failed to connect to the bus: Could not parse server address: Unknown address type (examples of valid types are "tcp" and on UNIX "unix")
+[sg205] browser stderr: [1017/161444.323954:ERROR:dbus/object_proxy.cc:572] Failed to call method: org.freedesktop.DBus.NameHasOwner: object_path= /org/freedesktop/DBus: unknown error type:
+[sg205] focus light1440 stops 30 gate PASS worstSur 9.4611 worstOwn 1
+[sg205] focus dark1440 stops 30 gate FAIL worstSur 1.7559 worstOwn 1
+[sg205] wrote /tmp/opencode/sg205/before_out/result.json elapsed 13s
+{"outFile":"/tmp/opencode/sg205/before_out/result.json","elapsedSeconds":13,"controlFailures":0,"densityWorlds":null,"densityScreenshots":null,"touchRoutes":null,"zoomRoutes":null,"darkRoutes":null,"focusWorlds":2,"focusGateVerdicts":"light1440:PASS,dark1440:FAIL","errors":["FOCUS RING FLOOR VIOLATIONS count=2 (>=3:1 not met; expected on the base tree, must be 0 on the candidate)"],"loopbackDriverGets":44}
