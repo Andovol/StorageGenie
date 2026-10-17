@@ -1,7 +1,7 @@
 # StorageGenie — State
 ## RESUME — 2026-10-17 CLOSE_COMPLETE (SG-205→SG-215: eleven slices 97–98, two releases live)
 
-**Close / next entry:** CLOSE_COMPLETE 2026-10-17 (owner-ordered close; close record `docs/decisions/2026-10-17-close-sg205-sg215.md`, END filed Launcher #62). SG-215 rated 98 (14/14 re-read, second tag on origin; 18th ISS-4 misfire). No dispatch in flight; tree committed/pushed; staged none; untracked none; no merge/rebase/bisect; no stash; no submodule; `sensitive_uncommitted_state_present` — no. Standing rules persist: close-deploy + close-release at every close; outstanding-decisions list every turn.
+**Close / next entry:** CLOSE_COMPLETE 2026-10-17 (owner-ordered close; close record `docs/decisions/2026-10-17-close-sg205-sg215.md`, END filed Launcher #62 + proposal #89 verify-after-edit-for-truncated-reads). SG-215 rated 98 (14/14 re-read, second tag on origin; 18th ISS-4 misfire). No dispatch in flight; tree committed/pushed; staged none; untracked none; no merge/rebase/bisect; no stash; no submodule; `sensitive_uncommitted_state_present` — no. Standing rules persist: close-deploy + close-release at every close; outstanding-decisions list every turn.
 
 **Rules / version:** ruleset **0.50.0 CURRENT** (adoption D-2 2026-10-15; tag `contract-v0.50.0`/commit `1723165`; local `rules_check.sh` 2026-10-17: G-L1 CLEAN ×3 installed copies, VERSION CURRENT, recorded version in `AGENTS.md` matches). Contract cache `.rules-cache/`; host copy `/home/andrei/storagegenie-contract/` (host `.rules-cache/` absent — host G-L1/G-L5/G-L7 UNCHECKED as designed).
 
