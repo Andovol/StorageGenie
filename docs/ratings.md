@@ -812,6 +812,12 @@ Originals above (88 FLAG:TRUST / 91 FLAG:TRUST) stand as the audit trail; the ve
 |---|---|---|---|---|---|---|---|---|---|---|---|
 | SG-211 | D-22 release (R5 word spoken); WORK receipt verified (dual paste note missing - runner report_unreadable misfire, 14th ISS-4 instance, not slice fault); live re-read all 14 values == SG-210 poststate (container/image/bundle/DB/health); release record docs/releases/2026-10-17.md committed; first annotated tag release-2026-10-17 created on verified HEAD 394e4e7, pushed, ls-remote + local read-back verified; zero product/config/test bytes; 174s vs ~300s; audit SG-211_audit.md | opencode/opencode-go/deepseek-v4.1-flash (receipt settings) | max | 98 |  |  | PG-EV-02/03/05; PG-SC-09; PG-IC-01/07; PG-PR-03 |  | Standing close-release owns future closes; ISS-4 14th to desk #84; SG-212 next (L3) |  | none |
 
+### SG-212 (2026-10-17 - D-21 width-adaptive density default)
+
+| slice_id | phase | model | effort | score | flag | lever | guards_invoked | deduction_attribution | remaining | escape | slowest_waste |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| SG-212 | D-21 values made executable; WORK receipt verified (dual paste note missing - runner report_unreadable misfire, 15th ISS-4 instance, not slice fault); product = CatalogPage.tsx (860px content-fit rule, layout-effect pre-paint, recompute-per-mount, no persistence) + catalog.test.tsx (4 rows); failpre 4 red / passpost 4 green both committed; suite 29/297 (base 29/293 + 4); served smoke wide1440 TABLE 1052 maxScrollLeft 0 + touch390 GRID 342 docOverflowX 0 + CDP toggle both ways; 4 screenshots opened; enumeration single-default-site, no density persistence; mask-coverage harness defect self-found + repaired on frozen driver; pre-existing eslint unused-import proven-at-base, parked; 489s vs ~600s; audit SG-212_audit.md | opencode/opencode-go/deepseek-v4.1-flash (receipt settings) | max | 98 |  |  | PG-EV-02/03/05/08/09; PG-SC-05/09/12; PG-IC-01/07/08/09; PG-PR-01/03 |  | Pre-existing eslint -> next test-touching slice; serve rider after SG-213 (SG-212 product unserved); ISS-4 15th to desk #84; SG-213 next (L3) |  | none |
+
 ### SG-208 (2026-10-17 - D-13 household switching UI removal, retry after env failure)
 
 | slice_id | phase | model | effort | score | flag | lever | guards_invoked | deduction_attribution | remaining | escape | slowest_waste |
