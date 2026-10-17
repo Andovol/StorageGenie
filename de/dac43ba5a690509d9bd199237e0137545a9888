@@ -1,0 +1,11 @@
+Partial-Receipt-ID: SG-210
+utc=2026-10-17T18:02:34Z
+killed=exit_no_receipt
+pushed=0
+uncommitted=none
+wip=none
+wip_elapsed_ms=72
+DISPATCH_RESULT id=SG-210 coder=opencode exit=0 head=90779a8a32fbc19d289782e99ce1c27b78cbaf81 note=no moved=yes rewrite=no dirty=no elapsed=564s budget=2100s killed=exit_no_receipt stragglers=0
+P1_moved=PASS count=3
+P2_rewrite=PASS behind=0
+P6_dirty=PASS dirty=no
