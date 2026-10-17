@@ -1,0 +1,6 @@
+SG-215 worklog — opened 2026-10-17T20:06:44Z
+admission: requested automation resolved e1a508acdb3e591459064cf7ee448affed51eb58; origin e1a508acdb3e591459064cf7ee448affed51eb58; HEAD e1a508acdb3e591459064cf7ee448affed51eb58; branch automation; worktree clean except untracked SG-215_prestate.log/SG-215_health.log (created now); new tag absent locally+remote; legacy tag release-2026-10-17 present.
+contract: 0.50.0 read live from /home/andrei/storagegenie-contract/CODER.md (echo line seen); VERSION 0.50.0; lang/python.md not read (no Python toolchain work — docker/curl/sqlite3/git only), stated.
+model/effort: read from own process args (PB-4/CO-78).
+health start: 2026-10-17T20:06:44Z http=200 body={"status":"ok","db":"ok","storage":"ok"}
+plan: read-only live re-read via lane socket /run/dispatch-storagegenie-SG-215/docker.sock + localhost GETs + DB mode=ro; compare to SG-214 poststate; record; annotated tag release-2026-10-17-sg212; report; notes-ref receipt.

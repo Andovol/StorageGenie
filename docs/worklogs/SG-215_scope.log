@@ -1,0 +1,18 @@
+== SG-215 scope/secret freeze — 2026-10-17T20:07:17Z ==
+== secret pattern scan over SG-215 evidence + release record (strict; rc=1 means none) ==
+secret_scan_rc=1
+== worktree status ==
+?? docs/releases/2026-10-17-sg212.md
+?? docs/worklogs/SG-215_health.log
+?? docs/worklogs/SG-215_live.log
+?? docs/worklogs/SG-215_prestate.log
+?? docs/worklogs/SG-215_scope.log
+?? docs/worklogs/SG-215_worklog.log
+== tracked unstaged diff (must be empty) ==
+unstaged_lines=0
+== untracked SG-215 files ==
+docs/worklogs/SG-215_health.log
+docs/worklogs/SG-215_live.log
+docs/worklogs/SG-215_prestate.log
+docs/worklogs/SG-215_scope.log
+docs/worklogs/SG-215_worklog.log

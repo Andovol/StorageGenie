@@ -1,0 +1,34 @@
+== SG-215 prestate — 2026-10-17T20:06:42Z epoch 1792267602 ==
+git_requested_ref=automation
+git_resolved_automation=e1a508acdb3e591459064cf7ee448affed51eb58
+git_resolved_origin_automation=e1a508acdb3e591459064cf7ee448affed51eb58
+git_HEAD=e1a508acdb3e591459064cf7ee448affed51eb58
+branch=automation
+remote_url=git@github.com:Andovol/StorageGenie.git
+worktree_short:
+?? docs/worklogs/SG-215_prestate.log
+tag_release-2026-10-17-sg212_local=ABSENT
+tag_release-2026-10-17-sg212_remote=0 line(s)
+existing_tags_local:
+release-2026-10-17
+existing_tags_remote:
+6fec36da39b54468ef054cf5600101afb698b19c	refs/tags/release-2026-10-17
+394e4e75fa585b00c81d3fae708515fb536247fe	refs/tags/release-2026-10-17^{}
+lane_socket:
+total 0
+srw-rw---T 1 andrei 100987 0 Oct 16 17:19 docker.sock
+served_work=cfd7fe63f0f24a754dd5108f60767b555930bcda (SG-214 work commit)
+product_diff_cfd7fe6..HEAD_backend_frontend_lines=0
+product_diff_names_cfd7fe6..HEAD_backend_frontend:
+diff_names_cfd7fe6..HEAD_all:
+STATE.md
+docs/decisions/2026-10-17-d14-monthly-cap.md
+docs/decisions/2026-10-17-d24-d25-d26.md
+docs/packets/SG-215-close-release.md
+docs/ratings.md
+docs/worklogs/SG-214_audit.md
+docs/worklogs/SG-214_receipt.log
+docs/worklogs/SG-214_report.md
+head_commit:
+e1a508acdb3e591459064cf7ee448affed51eb58 2026-10-17T23:05:52+03:00 SG-215 close-release packet (attest SG-212 delta live, record, tag)
+== end prestate ==

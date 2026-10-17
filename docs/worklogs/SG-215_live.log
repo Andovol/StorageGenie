@@ -1,0 +1,53 @@
+== SG-215 live verification — 2026-10-17T20:06:54Z epoch 1792267614 ==
+== container inspect (lane socket) ==
+Id=d45005fb7fab6828e07a4aff6c12893ce5ef493feb1d9d169cd85cbee4f801bc Created=2026-10-17T19:48:15.931194106Z Image=sha256:98f8af1f30262487e824731a0fa258b5a54b09cd0b9129c5c613cb9668e4556c RestartCount=0 State=running Health=healthy StartedAt=2026-10-17T19:48:16.576085009Z
+container_inspect_exit=0
+container_image_field=sha256:98f8af1f30262487e824731a0fa258b5a54b09cd0b9129c5c613cb9668e4556c
+== image inspect ==
+Id=sha256:98f8af1f30262487e824731a0fa258b5a54b09cd0b9129c5c613cb9668e4556c Created=2026-10-17T19:48:04.670555828Z
+image_inspect_exit=0
+== health GET live ==
+health_http=200 curl_rc=0 body={"status":"ok","db":"ok","storage":"ok"}
+== served index ==
+index_http=200
+index_bytes=944
+b52f84ca4dc70463f4782fa77603bf9e2f7b09b43dd5f0625bb5e1f92c8366bc  /tmp/opencode/sg215_index.html
+js_asset=assets/index-ZkOUf-iS.js css_asset=assets/index-C07VbG0m.css
+== served assets ==
+js_http=200
+css_http=200
+js_bytes=321010 css_bytes=4535
+8bab60ce6994cb9595aea213bbfd2fbfda88d4814dcfe81dfff4e4f626f9c163  /tmp/opencode/sg215_js
+c3b58cda696a22970fc2a4a348849fc1359f2105f80f81304ed5dfd5ca31a557  /tmp/opencode/sg215_css
+== served marker greps (SG-212 rule live) ==
+catalog-content-column count=1
+CATALOG_TABLE_FIT_MIN_PX count=0
+resolveInitialDensity count=0
+Compact Table count=1
+Standard Grid count=1
+Density count=5
+Sort catalog count=1
+Generate Context Scene count=1
+aria-label count=47
+storagegenie.dynv6.net count=6
+localhost:8003 count=0
+catalog-content-column context:
+avedSearchDelete:Op,onSaveSearch:Lp,children:l.jsxs("div",{ref:m,"data-testid":"catalog-content-column",children:[re&&l.jsxs("div",{role:"alert",children:["Could not load catalog facets: ",String(L)]}),E&&l.jsxs("div",{role:"alert",children:["Could not load save
+== SPA routes ==
+/ [200] b52f84ca4dc70463f4782fa77603bf9e2f7b09b43dd5f0625bb5e1f92c8366bc
+/inbox [200] b52f84ca4dc70463f4782fa77603bf9e2f7b09b43dd5f0625bb5e1f92c8366bc
+/analytics [200] b52f84ca4dc70463f4782fa77603bf9e2f7b09b43dd5f0625bb5e1f92c8366bc
+/planning [200] b52f84ca4dc70463f4782fa77603bf9e2f7b09b43dd5f0625bb5e1f92c8366bc
+== API control ==
+households_http=200
+6921583771fb79bec868339653a91050d1163430ed19fa0e96268522adf8038f  /tmp/opencode/sg215_households.json
+== DB read (mode=ro) ==
+total 696
+-rw------- 1 andrei andrei 675840 Oct 12 20:03 storagegenie.db
+-rw------- 1 andrei andrei  32768 Oct 17 19:48 storagegenie.db-shm
+-rw------- 1 andrei andrei      0 Oct 17 19:48 storagegenie.db-wal
+e6bef157440fb8b4a3262577362b071dcae07507ea9a7e04a614e11be28ee5bd  data/db/storagegenie.db
+tables=28
+alembic_head=20260924_sg114_relation
+db_read_exit=0
+== end live verification 2026-10-17T20:06:55Z epoch 1792267615 ==
