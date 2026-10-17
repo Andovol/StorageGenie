@@ -11,6 +11,10 @@ Authoring date (metadata, never a gate): 2026-10-17.
 
 A user belongs to exactly one household and cannot hold several (D-13 requirement), so household-switching UI selects nothing. Remove every switching affordance; keep resolution (stored id else first household) and all server scoping byte-identical.
 
+## Prior attempt (SG-208 failed on environment, NOT on this task)
+
+The first SG-208 unit died on an expired provider key after ~553 s with no receipt; the key has since been rotated. Its work is preserved in fetchable origin refs — driver + screenshots + smoke JSONs at `refs/quarantine/SG-208-20261017T171409Z`, candidate (household-selector removal, 19 files) at `refs/quarantine/preserve-20261017T171411Z`. Fetch, inspect, and REUSE whatever verifies; redo whatever does not; report reused-vs-redone file by file. If both refs are unusable, redo from this packet whole and say so. The lane workdir may hold residue from the dead run — reconcile it (not inherited trust) and report the prestate before writing.
+
 ## Handed-over facts (expected — re-verify on target, `PB-1`; a handed list is a fact too — enumerate, don't trust)
 
 - Known selectors (expected, non-exhaustive): nav selector in `frontend/src/App.tsx` (uses `householdId`/`setHouseholdId` from context at `:40-45`); toolbar selector `frontend/src/components/shell/CatalogToolbar.tsx:123-137` (`aria-label="Household"`, `value`/`onHouseholdChange` at `:48-50,:84`); context `frontend/src/hooks/HouseholdContext.tsx` (localStorage-first else `households[0]` auto-persist rail); props `householdId`/`onHouseholdChange` threaded through `CatalogPage` (expected — verify).

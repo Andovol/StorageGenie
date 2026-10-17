@@ -1,7 +1,7 @@
 # StorageGenie — State
-## RESUME — 2026-10-17 SG-208 FAILED (environment: expired provider key); RETRY BLOCKED ON KEY ROTATION
+## RESUME — 2026-10-17 KEY ROTATED; SG-208 RETRY NEXT (packet amended with preserved refs)
 
-**Close / next entry:** SG-208 unit failed exit 1, `no_receipt`, nothing published. `SG-208 --debug` done (result=done): STAGE=Coder-or-provider, CAUSE=expired OpenCode provider API key (log: "This API key has expired... replace it"; journal exit=1, 553 s, no receipt). Confidence high. Preserved: quarantine refs `SG-208-20261017T171409Z` (driver, screenshots, 4 smoke JSONs) + `preserve-20261017T171411Z` (candidate: household-selector removal, 19 files) — retry reuses these, nothing lost. Older stranded refs (SG-025/066/088) untouched, not mine. L3 queue PAUSED: SG-208 retry (`--force` expected) → SG-209 → serve rider. No dispatch in flight at this write; no retry until the key is rotated (blind retry burns budget identically).
+**Close / next entry:** Owner confirms the OpenCode provider key is rotated. SG-208 packet amended this turn (prior-attempt preserved refs + workdir-residue reconciliation). L3 queue RESUMED: SG-208 retry (`--force` — documented replay path under explicit owner "try again") → SG-209 → serve rider. No dispatch in flight at this write.
 
 **Rules / version:** ruleset **0.50.0 CURRENT** (adoption D-2 2026-10-15; tag `contract-v0.50.0`/commit `1723165`; local `rules_check.sh` 2026-10-17: G-L1 CLEAN ×3 installed copies, VERSION CURRENT, recorded version in `AGENTS.md` matches). Contract cache `.rules-cache/`; host copy `/home/andrei/storagegenie-contract/` (host `.rules-cache/` absent — host G-L1/G-L5/G-L7 UNCHECKED as designed).
 
