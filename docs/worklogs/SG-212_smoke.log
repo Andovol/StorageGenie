@@ -1,0 +1,22 @@
+[sg212] static server on 127.0.0.1:5173 serving frontend/dist
+[sg212] browser pid 1180815, DevTools port 39487 (HeadlessChrome/149.0.7827.55)
+[sg212] browser stderr: [1017/193050.874860:ERROR:dbus/bus.cc:405] Failed to connect to the bus: Could not parse server address: Unknown address type (examples of valid types are "tcp" and on UNIX "unix")
+[sg212] browser stderr: [1017/193050.874929:ERROR:dbus/object_proxy.cc:572] Failed to call method: org.freedesktop.DBus.NameHasOwner: object_path= /org/freedesktop/DBus: unknown error type:
+[sg212] navigated http://localhost:5173/ world=wide1440
+[sg212] ready=true at http://localhost:5173/
+[sg212] probe1: {"density":[{"label":"Standard Grid","pressed":"false"},{"label":"Compact Table","pressed":"true"}],"content":1052,"rows":7,"cards":0,"docOverflowX":0}
+[sg212] mask: {"blurredImages":7,"maskedTextNodes":10,"selectors":["[data-testid=\"product-row\"] td:nth-child(2)","[data-testid=\"product-card\"] span[title]"],"blockRun":"U+25A0 + U+200B (layout-safe)"}
+[sg212] screenshot docs/worklogs/SG-212_shots/wide1440-initial-table.png 78c5a3fea060368fe455f2580349c726f9e604663a8534e42eae0f2e30ed639f 88243 B
+[sg212] screenshot docs/worklogs/SG-212_shots/wide1440-after-grid.png 028e002853afd8b4006eb60839d94140030157eee9c70d8f9e3f2193a379717d 181507 B
+[sg212] toggle -> grid: {"density":[{"label":"Standard Grid","pressed":"true"},{"label":"Compact Table","pressed":"false"}],"grid":true,"table":false,"docOverflowX":0}
+[sg212] screenshot docs/worklogs/SG-212_shots/wide1440-after-table.png c04a2d499da90f6cb9abfb276873bcb0e4be13dfb160b3a76a55eed3d06fd812 88004 B
+[sg212] toggle -> table: {"density":[{"label":"Standard Grid","pressed":"false"},{"label":"Compact Table","pressed":"true"}],"grid":false,"table":true,"docOverflowX":0}
+[sg212] static server on 127.0.0.1:5173 serving frontend/dist
+[sg212] browser pid 1180939, DevTools port 38237 (HeadlessChrome/149.0.7827.55)
+[sg212] browser stderr: [1017/193056.077048:ERROR:dbus/bus.cc:405] Failed to connect to the bus: Could not parse server address: Unknown address type (examples of valid types are "tcp" and on UNIX "unix")
+[sg212] browser stderr: [1017/193056.077113:ERROR:dbus/object_proxy.cc:572] Failed to call method: org.freedesktop.DBus.NameHasOwner: object_path= /org/freedesktop/DBus: unknown error type:
+[sg212] navigated http://localhost:5173/ world=touch390
+[sg212] ready=true at http://localhost:5173/
+[sg212] probe1: {"density":[{"label":"Standard Grid","pressed":"true"},{"label":"Compact Table","pressed":"false"}],"content":342,"rows":0,"cards":7,"docOverflowX":0}
+[sg212] mask: {"blurredImages":7,"maskedTextNodes":10,"selectors":["[data-testid=\"product-row\"] td:nth-child(2)","[data-testid=\"product-card\"] span[title]"],"blockRun":"U+25A0 + U+200B (layout-safe)"}
+[sg212] screenshot docs/worklogs/SG-212_shots/touch390-initial-grid.png 88a0b817baae116ac836bd3b0d1526c09fba8f3e3c186d8e9be3475f88016247 87940 B

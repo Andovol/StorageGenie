@@ -1,0 +1,36 @@
+{
+  "ts": "2026-10-17T19:30:55.843Z",
+  "world": "touch390",
+  "url": "http://localhost:5173/",
+  "gate": {
+    "ready": true,
+    "narrowMeasure": true,
+    "opensInGrid": true,
+    "noDocOverflow": true,
+    "noAlerts": true,
+    "noNonGet": true,
+    "noExceptions": true
+  },
+  "pass": true,
+  "shots": [
+    {
+      "file": "docs/worklogs/SG-212_shots/touch390-initial-grid.png",
+      "sha256": "88a0b817baae116ac836bd3b0d1526c09fba8f3e3c186d8e9be3475f88016247",
+      "bytes": 87940
+    }
+  ],
+  "served": {
+    "index.html": {
+      "sha256": "84aa1267a81e636c2e031999ce067fc51b21ddce564d04601cee9b48d09469e5",
+      "bytes": 944
+    },
+    "assets/index-B4ojUV03.js": {
+      "sha256": "04c9e2e29cf25058d27cade78f5c177cee00041f0c0960b19901b8e8f66c7f6c",
+      "bytes": 320956
+    },
+    "assets/index-C07VbG0m.css": {
+      "sha256": "c3b58cda696a22970fc2a4a348849fc1359f2105f80f81304ed5dfd5ca31a557",
+      "bytes": 4535
+    }
+  }
+}

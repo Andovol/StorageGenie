@@ -1,0 +1,1354 @@
+
+ RUN  v1.6.1 /home/andrei/StorageGenie/frontend
+
+stderr | src/components/catalog/catalog.test.tsx > CatalogPage width-adaptive density default (SG-212 / D-21) > a content column >=860 px at mount initialises the table
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+ ❯ src/components/catalog/catalog.test.tsx  (37 tests | 4 failed | 33 skipped) 212ms
+   ❯ src/components/catalog/catalog.test.tsx > CatalogPage width-adaptive density default (SG-212 / D-21) > a content column >=860 px at mount initialises the table
+     → Unable to find an element by: [data-testid="catalog-content-column"]
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<div[39m
+      [33mclass[39m=[32m"bg-background text-foreground"[39m
+      [33mstyle[39m=[32m"min-height: 100vh;"[39m
+    [36m>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"bg-background"[39m
+        [33mstyle[39m=[32m"position: sticky; top: 0px; z-index: 10;"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"bg-card border-border"[39m
+          [33mstyle[39m=[32m"display: flex; flex-wrap: wrap; align-items: center; gap: 12px; row-gap: 8px; padding: 10px 24px; border-bottom-style: solid; border-bottom-width: 1px;"[39m
+        [36m>[39m
+          [36m<span[39m
+            [33maria-label[39m=[32m"Total loaded items: 0"[39m
+            [33mclass[39m=[32m"bg-card-muted text-muted-foreground"[39m
+            [33mstyle[39m=[32m"font-size: 12px; padding: 2px 8px; border-radius: 999px;"[39m
+            [33mtitle[39m=[32m"Items loaded on this page, not the household total"[39m
+          [36m>[39m
+            [0mLoaded: [0m
+            [0m0[0m
+            [0m [0m
+            [0mitems[0m
+          [36m</span>[39m
+          [36m<div[39m
+            [33maria-hidden[39m=[32m"true"[39m
+            [33mstyle[39m=[32m"flex: 1 1 0%;"[39m
+          [36m/>[39m
+          [36m<input[39m
+            [33maria-label[39m=[32m"Search catalog"[39m
+            [33mclass[39m=[32m"bg-background text-foreground border-border focus-ring"[39m
+            [33mplaceholder[39m=[32m"Search…"[39m
+            [33mstyle[39m=[32m"padding: 6px 10px; border-radius: 6px; border-style: solid; border-width: 1px; flex: 1 1 180px; min-width: 180px; max-width: 420px; font-size: 13px;"[39m
+            [33mtype[39m=[32m"search"[39m
+            [33mvalue[39m=[32m""[39m
+          [36m/>[39m
+          [36m<button[39m
+            [33maria-label[39m=[32m"Switch to dark theme"[39m
+            [33mclass[39m=[32m"bg-card text-foreground border-border focus-ring"[39m
+            [33mstyle[39m=[32m"display: inline-flex; align-items: center; justify-content: center; padding: 6px; border-radius: 6px; border-style: solid; border-width: 1px; cursor: pointer;"[39m
+            [33mtitle[39m=[32m"Switch to dark theme"[39m
+            [33mtype[39m=[32m"button"[39m
+          [36m>[39m
+            [36m<svg[39m
+              [33maria-hidden[39m=[32m"true"[39m
+              [33mclass[39m=[32m"lucide lucide-moon"[39m
+              [33mfill[39m=[32m"none"[39m
+              [33mheight[39m=[32m"18"[39m
+              [33mstroke[39m=[32m"currentColor"[39m
+              [33mstroke-linecap[39m=[32m"round"[39m
+              [33mstroke-linejoin[39m=[32m"round"[39m
+              [33mstroke-width[39m=[32m"2"[39m
+              [33mviewBox[39m=[32m"0 0 24 24"[39m
+              [33mwidth[39m=[32m"18"[39m
+              [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+            [36m>[39m
+              [36m<path[39m
+                [33md[39m=[32m"M20.985 12.486a9 9 0 1 1-9.473-9.472c.405-.022.617.46.402.803a6 6 0 0 0 8.268 8.268c.344-.215.825-.004.803.401"[39m
+              [36m/>[39m
+            [36m</svg>[39m
+          [36m</button>[39m
+          [36m<a[39m
+            [33mclass[39m=[32m"bg-primary text-primary-foreground focus-ring"[39m
+            [33mhref[39m=[32m"/capture"[39m
+            [33mstyle[39m=[32m"padding: 6px 12px; border-radius: 6px; text-decoration: none; font-weight: 600; font-size: 13px; display: inline-flex; align-items: center; gap: 6px;"[39m
+          [36m>[39m
+            [36m<svg[39m
+              [33maria-hidden[39m=[32m"true"[39m
+              [33mclass[39m=[32m"lucide lucide-upload"[39m
+              [33mfill[39m=[32m"none"[39m
+              [33mheight[39m=[32m"16"[39m
+              [33mstroke[39m=[32m"currentColor"[39m
+              [33mstroke-linecap[39m=[32m"round"[39m
+              [33mstroke-linejoin[39m=[32m"round"[39m
+              [33mstroke-width[39m=[32m"2"[39m
+              [33mviewBox[39m=[32m"0 0 24 24"[39m
+              [33mwidth[39m=[32m"16"[39m
+              [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+            [36m>[39m
+              [36m<path[39m
+                [33md[39m=[32m"M12 3v12"[39m
+              [36m/>[39m
+              [36m<path[39m
+                [33md[39m=[32m"m17 8-5-5-5 5"[39m
+              [36m/>[39m
+              [36m<path[39m
+                [33md[39m=[32m"M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"[39m
+              [36m/>[39m
+            [36m</svg>[39m
+            [0mImport Asset[0m
+          [36m</a>[39m
+        [36m</div>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"bg-card border-border"[39m
+          [33mstyle[39m=[32m"display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 8px 24px; border-bottom-style: solid; border-bottom-width: 1px;"[39m
+        [36m>[39m
+          [36m<button[39m
+            [33maria-pressed[39m=[32m"true"[39m
+            [33mclass[39m=[32m"bg-primary text-primary-foreground focus-ring"[39m
+            [33mstyle[39m=[32m"padding: 4px 10px; border-radius: 6px; border-style: solid; border-width: 1px; font-size: 13px; cursor: pointer; font-weight: 600;"[39m
+            [33mtype[39m=[32m"button"[39m
+          [36m>[39m
+            [0mAll (0)[0m
+          [36m</button>[39m
+          [36m<select[39m
+            [33maria-label[39m=[32m"Sort catalog"[39m
+            [33mclass[39m=[32m"bg-background text-foreground border-border focus-ring"[39m
+            [33mstyle[39m=[32m"padding: 4px 10px; border-radius: 6px; border-style: solid; border-width: 1px; font-size: 13px; cursor: pointer;"[39m
+          [36m>[39m
+            [36m<option[39m
+              [33mvalue[39m=[32m"recent"[39m
+            [36m>[39m
+              [0mRecently Added[0m
+            [36m</option>[39m
+            [36m<option[39m
+              [33mvalue[39m=[32m"name"[39m
+            [36m>[39m
+              [0mName (A-Z)[0m
+            [36m</option>[39m
+            [36m<option[39m
+              [33mvalue[39m=[32m"status"[39m
+            [36m>[39m
+              [0mProcessing Status[0m
+            [36m</option>[39m
+          [36m</select>[39m
+          [36m<div[39m
+            [33maria-label[39m=[32m"Density"[39m
+            [33mrole[39m=[32m"group"[39m
+            [33mstyle[39m=[32m"display: inline-flex; gap: 4px;"[39m
+          [36m>[39m
+            [36m<button[39m
+              [33maria-pressed[39m=[32m"true"[39m
+              [33mclass[39m=[32m"bg-primary text-primary-foreground focus-ring"[39m
+              [33mstyle[39m=[32m"padding: 4px 10px; border-radius: 6px; border-style: solid; border-width: 1px; font-size: 13px; cursor: pointer; font-weight: 600;"[39m
+              [33mtype[39m=[32m"button"[39m
+            [36m>[39m
+              [0mStandard Grid[0m
+            [36m</button>[39m
+            [36m<button[39m
+              [33maria-pressed[39m=[32m"false"[39m
+              [33mclass[39m=[32m"bg-card-muted text-muted-foreground focus-ring"[39m
+              [33mstyle[39m=[32m"padding: 4px 10px; border-radius: 6px; border-style: solid; border-width: 1px; font-size: 13px; cursor: pointer; font-weight: 400;"[39m
+              [33mtype[39m=[32m"button"[39m
+            [36m>[39m
+              [0mCompact Table[0m
+            [36m</button>[39m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mstyle[39m=[32m"flex: 1 1 0%;"[39m
+          [36m/>[39m
+          [36m<button[39m
+            [33mclass[39m=[32m"bg-card text-foreground border-border focus-ring"[39m
+            [33mdisabled[39m=[32m""[39m
+            [33mstyle[39m=[32m"padding: 4px 10px; border-radius: 6px; border-style: solid; border-width: 1px; font-size: 13px; cursor: pointer; opacity: 0.5;"[39m
+            [33mtype[39m=[32m"button"[39m
+          [36m>[39m
+            [0mSave search[0m
+          [36m</button>[39m
+          [36m<span[39m
+            [33mclass[39m=[32m"text-muted-foreground"[39m
+            [33mstyle[39m=[32m"font-size: 12px;"[39m
+          [36m>[39m
+            [0mNone yet[0m
+          [36m</span>[39m
+        [36m</div>[39m
+      [36m</div>[39m
+      [36m<main[39m
+        [33mclass[39m=[32m"page-container"[39m
+        [33mdata-testid[39m=[32m"page-container"[39m
+        [33mdata-variant[39m=[32m"page"[39m
+        [33mstyle[39m=[32m"width: 100%; max-width: 1100px; margin-left: auto; margin-right: auto; padding: 24px;"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33maria-busy[39m=[32m"false"[39m
+          [33maria-label[39m=[32m"Product results"[39m
+          [33mclass[39m=[32m"border-border text-foreground"[39m
+          [33mdata-testid[39m=[32m"catalog-grid-empty"[39m
+          [33mrole[39m=[32m"region"[39m
+          [33mstyle[39m=[32m"border-style: dashed; border-width: 1px; border-radius: 12px; padding: 56px 24px; display: flex; flex-direction: column; align-items: center; gap: 12px; text-align: center;"[39m
+        [36m>[39m
+          [36m<p[39m
+            [33mclass[39m=[32m"text-muted-foreground"[39m
+            [33mstyle[39m=[32m"margin: 0px;"[39m
+          [36m>[39m
+            [0mNo items match the current view.[0m
+          [36m</p>[39m
+          [36m<a[39m
+            [33mclass[39m=[32m"bg-primary text-primary-foreground focus-ring"[39m
+            [33mhref[39m=[32m"/capture"[39m
+            [33mstyle[39m=[32m"padding: 8px 16px; border-radius: 6px; text-decoration: none; font-weight: 600; font-size: 13px;"[39m
+          [36m>[39m
+            [0mImport New Item[0m
+          [36m</a>[39m
+          [36m<p[39m
+            [33mclass[39m=[32m"text-muted-foreground"[39m
+            [33mstyle[39m=[32m"margin: 0px; font-size: 12px;"[39m
+          [36m>[39m
+            [0mOpens the import dialog: drop, select or paste photos. The Capture route stays for direct navigation.[0m
+          [36m</p>[39m
+        [36m</div>[39m
+        [36m<div[39m
+          [33mstyle[39m=[32m"margin-top: 16px; display: flex; gap: 12px; align-items: center;"[39m
+        [36m/>[39m
+      [36m</main>[39m
+    [36m</div>[39m
+  [36m</div>[39m
+[36m</body>[39m
+   ❯ src/components/catalog/catalog.test.tsx > CatalogPage width-adaptive density default (SG-212 / D-21) > a content column <860 px at mount initialises the grid
+     → Unable to find an element by: [data-testid="catalog-content-column"]
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<div[39m
+      [33mclass[39m=[32m"bg-background text-foreground"[39m
+      [33mstyle[39m=[32m"min-height: 100vh;"[39m
+    [36m>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"bg-background"[39m
+        [33mstyle[39m=[32m"position: sticky; top: 0px; z-index: 10;"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"bg-card border-border"[39m
+          [33mstyle[39m=[32m"display: flex; flex-wrap: wrap; align-items: center; gap: 12px; row-gap: 8px; padding: 10px 24px; border-bottom-style: solid; border-bottom-width: 1px;"[39m
+        [36m>[39m
+          [36m<span[39m
+            [33maria-label[39m=[32m"Total loaded items: 0"[39m
+            [33mclass[39m=[32m"bg-card-muted text-muted-foreground"[39m
+            [33mstyle[39m=[32m"font-size: 12px; padding: 2px 8px; border-radius: 999px;"[39m
+            [33mtitle[39m=[32m"Items loaded on this page, not the household total"[39m
+          [36m>[39m
+            [0mLoaded: [0m
+            [0m0[0m
+            [0m [0m
+            [0mitems[0m
+          [36m</span>[39m
+          [36m<div[39m
+            [33maria-hidden[39m=[32m"true"[39m
+            [33mstyle[39m=[32m"flex: 1 1 0%;"[39m
+          [36m/>[39m
+          [36m<input[39m
+            [33maria-label[39m=[32m"Search catalog"[39m
+            [33mclass[39m=[32m"bg-background text-foreground border-border focus-ring"[39m
+            [33mplaceholder[39m=[32m"Search…"[39m
+            [33mstyle[39m=[32m"padding: 6px 10px; border-radius: 6px; border-style: solid; border-width: 1px; flex: 1 1 180px; min-width: 180px; max-width: 420px; font-size: 13px;"[39m
+            [33mtype[39m=[32m"search"[39m
+            [33mvalue[39m=[32m""[39m
+          [36m/>[39m
+          [36m<button[39m
+            [33maria-label[39m=[32m"Switch to dark theme"[39m
+            [33mclass[39m=[32m"bg-card text-foreground border-border focus-ring"[39m
+            [33mstyle[39m=[32m"display: inline-flex; align-items: center; justify-content: center; padding: 6px; border-radius: 6px; border-style: solid; border-width: 1px; cursor: pointer;"[39m
+            [33mtitle[39m=[32m"Switch to dark theme"[39m
+            [33mtype[39m=[32m"button"[39m
+          [36m>[39m
+            [36m<svg[39m
+              [33maria-hidden[39m=[32m"true"[39m
+              [33mclass[39m=[32m"lucide lucide-moon"[39m
+              [33mfill[39m=[32m"none"[39m
+              [33mheight[39m=[32m"18"[39m
+              [33mstroke[39m=[32m"currentColor"[39m
+              [33mstroke-linecap[39m=[32m"round"[39m
+              [33mstroke-linejoin[39m=[32m"round"[39m
+              [33mstroke-width[39m=[32m"2"[39m
+              [33mviewBox[39m=[32m"0 0 24 24"[39m
+              [33mwidth[39m=[32m"18"[39m
+              [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+            [36m>[39m
+              [36m<path[39m
+                [33md[39m=[32m"M20.985 12.486a9 9 0 1 1-9.473-9.472c.405-.022.617.46.402.803a6 6 0 0 0 8.268 8.268c.344-.215.825-.004.803.401"[39m
+              [36m/>[39m
+            [36m</svg>[39m
+          [36m</button>[39m
+          [36m<a[39m
+            [33mclass[39m=[32m"bg-primary text-primary-foreground focus-ring"[39m
+            [33mhref[39m=[32m"/capture"[39m
+            [33mstyle[39m=[32m"padding: 6px 12px; border-radius: 6px; text-decoration: none; font-weight: 600; font-size: 13px; display: inline-flex; align-items: center; gap: 6px;"[39m
+          [36m>[39m
+            [36m<svg[39m
+              [33maria-hidden[39m=[32m"true"[39m
+              [33mclass[39m=[32m"lucide lucide-upload"[39m
+              [33mfill[39m=[32m"none"[39m
+              [33mheight[39m=[32m"16"[39m
+              [33mstroke[39m=[32m"currentColor"[39m
+              [33mstroke-linecap[39m=[32m"round"[39m
+              [33mstroke-linejoin[39m=[32m"round"[39m
+              [33mstroke-width[39m=[32m"2"[39m
+              [33mviewBox[39m=[32m"0 0 24 24"[39m
+              [33mwidth[39m=[32m"16"[39m
+              [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+            [36m>[39m
+              [36m<path[39m
+                [33md[39m=[32m"M12 3v12"[39m
+              [36m/>[39m
+              [36m<path[39m
+                [33md[39m=[32m"m17 8-5-5-5 5"[39m
+              [36m/>[39m
+              [36m<path[39m
+                [33md[39m=[32m"M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"[39m
+              [36m/>[39m
+            [36m</svg>[39m
+            [0mImport Asset[0m
+          [36m</a>[39m
+        [36m</div>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"bg-card border-border"[39m
+          [33mstyle[39m=[32m"display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 8px 24px; border-bottom-style: solid; border-bottom-width: 1px;"[39m
+        [36m>[39m
+          [36m<button[39m
+            [33maria-pressed[39m=[32m"true"[39m
+            [33mclass[39m=[32m"bg-primary text-primary-foreground focus-ring"[39m
+            [33mstyle[39m=[32m"padding: 4px 10px; border-radius: 6px; border-style: solid; border-width: 1px; font-size: 13px; cursor: pointer; font-weight: 600;"[39m
+            [33mtype[39m=[32m"button"[39m
+          [36m>[39m
+            [0mAll (0)[0m
+          [36m</button>[39m
+          [36m<select[39m
+            [33maria-label[39m=[32m"Sort catalog"[39m
+            [33mclass[39m=[32m"bg-background text-foreground border-border focus-ring"[39m
+            [33mstyle[39m=[32m"padding: 4px 10px; border-radius: 6px; border-style: solid; border-width: 1px; font-size: 13px; cursor: pointer;"[39m
+          [36m>[39m
+            [36m<option[39m
+              [33mvalue[39m=[32m"recent"[39m
+            [36m>[39m
+              [0mRecently Added[0m
+            [36m</option>[39m
+            [36m<option[39m
+              [33mvalue[39m=[32m"name"[39m
+            [36m>[39m
+              [0mName (A-Z)[0m
+            [36m</option>[39m
+            [36m<option[39m
+              [33mvalue[39m=[32m"status"[39m
+            [36m>[39m
+              [0mProcessing Status[0m
+            [36m</option>[39m
+          [36m</select>[39m
+          [36m<div[39m
+            [33maria-label[39m=[32m"Density"[39m
+            [33mrole[39m=[32m"group"[39m
+            [33mstyle[39m=[32m"display: inline-flex; gap: 4px;"[39m
+          [36m>[39m
+            [36m<button[39m
+              [33maria-pressed[39m=[32m"true"[39m
+              [33mclass[39m=[32m"bg-primary text-primary-foreground focus-ring"[39m
+              [33mstyle[39m=[32m"padding: 4px 10px; border-radius: 6px; border-style: solid; border-width: 1px; font-size: 13px; cursor: pointer; font-weight: 600;"[39m
+              [33mtype[39m=[32m"button"[39m
+            [36m>[39m
+              [0mStandard Grid[0m
+            [36m</button>[39m
+            [36m<button[39m
+              [33maria-pressed[39m=[32m"false"[39m
+              [33mclass[39m=[32m"bg-card-muted text-muted-foreground focus-ring"[39m
+              [33mstyle[39m=[32m"padding: 4px 10px; border-radius: 6px; border-style: solid; border-width: 1px; font-size: 13px; cursor: pointer; font-weight: 400;"[39m
+              [33mtype[39m=[32m"button"[39m
+            [36m>[39m
+              [0mCompact Table[0m
+            [36m</button>[39m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mstyle[39m=[32m"flex: 1 1 0%;"[39m
+          [36m/>[39m
+          [36m<button[39m
+            [33mclass[39m=[32m"bg-card text-foreground border-border focus-ring"[39m
+            [33mdisabled[39m=[32m""[39m
+            [33mstyle[39m=[32m"padding: 4px 10px; border-radius: 6px; border-style: solid; border-width: 1px; font-size: 13px; cursor: pointer; opacity: 0.5;"[39m
+            [33mtype[39m=[32m"button"[39m
+          [36m>[39m
+            [0mSave search[0m
+          [36m</button>[39m
+          [36m<span[39m
+            [33mclass[39m=[32m"text-muted-foreground"[39m
+            [33mstyle[39m=[32m"font-size: 12px;"[39m
+          [36m>[39m
+            [0mNone yet[0m
+          [36m</span>[39m
+        [36m</div>[39m
+      [36m</div>[39m
+      [36m<main[39m
+        [33mclass[39m=[32m"page-container"[39m
+        [33mdata-testid[39m=[32m"page-container"[39m
+        [33mdata-variant[39m=[32m"page"[39m
+        [33mstyle[39m=[32m"width: 100%; max-width: 1100px; margin-left: auto; margin-right: auto; padding: 24px;"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33maria-busy[39m=[32m"false"[39m
+          [33maria-label[39m=[32m"Product results"[39m
+          [33mclass[39m=[32m"border-border text-foreground"[39m
+          [33mdata-testid[39m=[32m"catalog-grid-empty"[39m
+          [33mrole[39m=[32m"region"[39m
+          [33mstyle[39m=[32m"border-style: dashed; border-width: 1px; border-radius: 12px; padding: 56px 24px; display: flex; flex-direction: column; align-items: center; gap: 12px; text-align: center;"[39m
+        [36m>[39m
+          [36m<p[39m
+            [33mclass[39m=[32m"text-muted-foreground"[39m
+            [33mstyle[39m=[32m"margin: 0px;"[39m
+          [36m>[39m
+            [0mNo items match the current view.[0m
+          [36m</p>[39m
+          [36m<a[39m
+            [33mclass[39m=[32m"bg-primary text-primary-foreground focus-ring"[39m
+            [33mhref[39m=[32m"/capture"[39m
+            [33mstyle[39m=[32m"padding: 8px 16px; border-radius: 6px; text-decoration: none; font-weight: 600; font-size: 13px;"[39m
+          [36m>[39m
+            [0mImport New Item[0m
+          [36m</a>[39m
+          [36m<p[39m
+            [33mclass[39m=[32m"text-muted-foreground"[39m
+            [33mstyle[39m=[32m"margin: 0px; font-size: 12px;"[39m
+          [36m>[39m
+            [0mOpens the import dialog: drop, select or paste photos. The Capture route stays for direct navigation.[0m
+          [36m</p>[39m
+        [36m</div>[39m
+        [36m<div[39m
+          [33mstyle[39m=[32m"margin-top: 16px; display: flex; gap: 12px; align-items: center;"[39m
+        [36m/>[39m
+      [36m</main>[39m
+    [36m</div>[39m
+  [36m</div>[39m
+[36m</body>[39m
+   ❯ src/components/catalog/catalog.test.tsx > CatalogPage width-adaptive density default (SG-212 / D-21) > an unreadable measure (non-finite or zero) falls back to the grid
+     → Unable to find an element by: [data-testid="catalog-content-column"]
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<div[39m
+      [33mclass[39m=[32m"bg-background text-foreground"[39m
+      [33mstyle[39m=[32m"min-height: 100vh;"[39m
+    [36m>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"bg-background"[39m
+        [33mstyle[39m=[32m"position: sticky; top: 0px; z-index: 10;"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"bg-card border-border"[39m
+          [33mstyle[39m=[32m"display: flex; flex-wrap: wrap; align-items: center; gap: 12px; row-gap: 8px; padding: 10px 24px; border-bottom-style: solid; border-bottom-width: 1px;"[39m
+        [36m>[39m
+          [36m<span[39m
+            [33maria-label[39m=[32m"Total loaded items: 0"[39m
+            [33mclass[39m=[32m"bg-card-muted text-muted-foreground"[39m
+            [33mstyle[39m=[32m"font-size: 12px; padding: 2px 8px; border-radius: 999px;"[39m
+            [33mtitle[39m=[32m"Items loaded on this page, not the household total"[39m
+          [36m>[39m
+            [0mLoaded: [0m
+            [0m0[0m
+            [0m [0m
+            [0mitems[0m
+          [36m</span>[39m
+          [36m<div[39m
+            [33maria-hidden[39m=[32m"true"[39m
+            [33mstyle[39m=[32m"flex: 1 1 0%;"[39m
+          [36m/>[39m
+          [36m<input[39m
+            [33maria-label[39m=[32m"Search catalog"[39m
+            [33mclass[39m=[32m"bg-background text-foreground border-border focus-ring"[39m
+            [33mplaceholder[39m=[32m"Search…"[39m
+            [33mstyle[39m=[32m"padding: 6px 10px; border-radius: 6px; border-style: solid; border-width: 1px; flex: 1 1 180px; min-width: 180px; max-width: 420px; font-size: 13px;"[39m
+            [33mtype[39m=[32m"search"[39m
+            [33mvalue[39m=[32m""[39m
+          [36m/>[39m
+          [36m<button[39m
+            [33maria-label[39m=[32m"Switch to dark theme"[39m
+            [33mclass[39m=[32m"bg-card text-foreground border-border focus-ring"[39m
+            [33mstyle[39m=[32m"display: inline-flex; align-items: center; justify-content: center; padding: 6px; border-radius: 6px; border-style: solid; border-width: 1px; cursor: pointer;"[39m
+            [33mtitle[39m=[32m"Switch to dark theme"[39m
+            [33mtype[39m=[32m"button"[39m
+          [36m>[39m
+            [36m<svg[39m
+              [33maria-hidden[39m=[32m"true"[39m
+              [33mclass[39m=[32m"lucide lucide-moon"[39m
+              [33mfill[39m=[32m"none"[39m
+              [33mheight[39m=[32m"18"[39m
+              [33mstroke[39m=[32m"currentColor"[39m
+              [33mstroke-linecap[39m=[32m"round"[39m
+              [33mstroke-linejoin[39m=[32m"round"[39m
+              [33mstroke-width[39m=[32m"2"[39m
+              [33mviewBox[39m=[32m"0 0 24 24"[39m
+              [33mwidth[39m=[32m"18"[39m
+              [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+            [36m>[39m
+              [36m<path[39m
+                [33md[39m=[32m"M20.985 12.486a9 9 0 1 1-9.473-9.472c.405-.022.617.46.402.803a6 6 0 0 0 8.268 8.268c.344-.215.825-.004.803.401"[39m
+              [36m/>[39m
+            [36m</svg>[39m
+          [36m</button>[39m
+          [36m<a[39m
+            [33mclass[39m=[32m"bg-primary text-primary-foreground focus-ring"[39m
+            [33mhref[39m=[32m"/capture"[39m
+            [33mstyle[39m=[32m"padding: 6px 12px; border-radius: 6px; text-decoration: none; font-weight: 600; font-size: 13px; display: inline-flex; align-items: center; gap: 6px;"[39m
+          [36m>[39m
+            [36m<svg[39m
+              [33maria-hidden[39m=[32m"true"[39m
+              [33mclass[39m=[32m"lucide lucide-upload"[39m
+              [33mfill[39m=[32m"none"[39m
+              [33mheight[39m=[32m"16"[39m
+              [33mstroke[39m=[32m"currentColor"[39m
+              [33mstroke-linecap[39m=[32m"round"[39m
+              [33mstroke-linejoin[39m=[32m"round"[39m
+              [33mstroke-width[39m=[32m"2"[39m
+              [33mviewBox[39m=[32m"0 0 24 24"[39m
+              [33mwidth[39m=[32m"16"[39m
+              [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+            [36m>[39m
+              [36m<path[39m
+                [33md[39m=[32m"M12 3v12"[39m
+              [36m/>[39m
+              [36m<path[39m
+                [33md[39m=[32m"m17 8-5-5-5 5"[39m
+              [36m/>[39m
+              [36m<path[39m
+                [33md[39m=[32m"M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"[39m
+              [36m/>[39m
+            [36m</svg>[39m
+            [0mImport Asset[0m
+          [36m</a>[39m
+        [36m</div>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"bg-card border-border"[39m
+          [33mstyle[39m=[32m"display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 8px 24px; border-bottom-style: solid; border-bottom-width: 1px;"[39m
+        [36m>[39m
+          [36m<button[39m
+            [33maria-pressed[39m=[32m"true"[39m
+            [33mclass[39m=[32m"bg-primary text-primary-foreground focus-ring"[39m
+            [33mstyle[39m=[32m"padding: 4px 10px; border-radius: 6px; border-style: solid; border-width: 1px; font-size: 13px; cursor: pointer; font-weight: 600;"[39m
+            [33mtype[39m=[32m"button"[39m
+          [36m>[39m
+            [0mAll (0)[0m
+          [36m</button>[39m
+          [36m<select[39m
+            [33maria-label[39m=[32m"Sort catalog"[39m
+            [33mclass[39m=[32m"bg-background text-foreground border-border focus-ring"[39m
+            [33mstyle[39m=[32m"padding: 4px 10px; border-radius: 6px; border-style: solid; border-width: 1px; font-size: 13px; cursor: pointer;"[39m
+          [36m>[39m
+            [36m<option[39m
+              [33mvalue[39m=[32m"recent"[39m
+            [36m>[39m
+              [0mRecently Added[0m
+            [36m</option>[39m
+            [36m<option[39m
+              [33mvalue[39m=[32m"name"[39m
+            [36m>[39m
+              [0mName (A-Z)[0m
+            [36m</option>[39m
+            [36m<option[39m
+              [33mvalue[39m=[32m"status"[39m
+            [36m>[39m
+              [0mProcessing Status[0m
+            [36m</option>[39m
+          [36m</select>[39m
+          [36m<div[39m
+            [33maria-label[39m=[32m"Density"[39m
+            [33mrole[39m=[32m"group"[39m
+            [33mstyle[39m=[32m"display: inline-flex; gap: 4px;"[39m
+          [36m>[39m
+            [36m<button[39m
+              [33maria-pressed[39m=[32m"true"[39m
+              [33mclass[39m=[32m"bg-primary text-primary-foreground focus-ring"[39m
+              [33mstyle[39m=[32m"padding: 4px 10px; border-radius: 6px; border-style: solid; border-width: 1px; font-size: 13px; cursor: pointer; font-weight: 600;"[39m
+              [33mtype[39m=[32m"button"[39m
+            [36m>[39m
+              [0mStandard Grid[0m
+            [36m</button>[39m
+            [36m<button[39m
+              [33maria-pressed[39m=[32m"false"[39m
+              [33mclass[39m=[32m"bg-card-muted text-muted-foreground focus-ring"[39m
+              [33mstyle[39m=[32m"padding: 4px 10px; border-radius: 6px; border-style: solid; border-width: 1px; font-size: 13px; cursor: pointer; font-weight: 400;"[39m
+              [33mtype[39m=[32m"button"[39m
+            [36m>[39m
+              [0mCompact Table[0m
+            [36m</button>[39m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mstyle[39m=[32m"flex: 1 1 0%;"[39m
+          [36m/>[39m
+          [36m<button[39m
+            [33mclass[39m=[32m"bg-card text-foreground border-border focus-ring"[39m
+            [33mdisabled[39m=[32m""[39m
+            [33mstyle[39m=[32m"padding: 4px 10px; border-radius: 6px; border-style: solid; border-width: 1px; font-size: 13px; cursor: pointer; opacity: 0.5;"[39m
+            [33mtype[39m=[32m"button"[39m
+          [36m>[39m
+            [0mSave search[0m
+          [36m</button>[39m
+          [36m<span[39m
+            [33mclass[39m=[32m"text-muted-foreground"[39m
+            [33mstyle[39m=[32m"font-size: 12px;"[39m
+          [36m>[39m
+            [0mNone yet[0m
+          [36m</span>[39m
+        [36m</div>[39m
+      [36m</div>[39m
+      [36m<main[39m
+        [33mclass[39m=[32m"page-container"[39m
+        [33mdata-testid[39m=[32m"page-container"[39m
+        [33mdata-variant[39m=[32m"page"[39m
+        [33mstyle[39m=[32m"width: 100%; max-width: 1100px; margin-left: auto; margin-right: auto; padding: 24px;"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33maria-busy[39m=[32m"false"[39m
+          [33maria-label[39m=[32m"Product results"[39m
+          [33mclass[39m=[32m"border-border text-foreground"[39m
+          [33mdata-testid[39m=[32m"catalog-grid-empty"[39m
+          [33mrole[39m=[32m"region"[39m
+          [33mstyle[39m=[32m"border-style: dashed; border-width: 1px; border-radius: 12px; padding: 56px 24px; display: flex; flex-direction: column; align-items: center; gap: 12px; text-align: center;"[39m
+        [36m>[39m
+          [36m<p[39m
+            [33mclass[39m=[32m"text-muted-foreground"[39m
+            [33mstyle[39m=[32m"margin: 0px;"[39m
+          [36m>[39m
+            [0mNo items match the current view.[0m
+          [36m</p>[39m
+          [36m<a[39m
+            [33mclass[39m=[32m"bg-primary text-primary-foreground focus-ring"[39m
+            [33mhref[39m=[32m"/capture"[39m
+            [33mstyle[39m=[32m"padding: 8px 16px; border-radius: 6px; text-decoration: none; font-weight: 600; font-size: 13px;"[39m
+          [36m>[39m
+            [0mImport New Item[0m
+          [36m</a>[39m
+          [36m<p[39m
+            [33mclass[39m=[32m"text-muted-foreground"[39m
+            [33mstyle[39m=[32m"margin: 0px; font-size: 12px;"[39m
+          [36m>[39m
+            [0mOpens the import dialog: drop, select or paste photos. The Capture route stays for direct navigation.[0m
+          [36m</p>[39m
+        [36m</div>[39m
+        [36m<div[39m
+          [33mstyle[39m=[32m"margin-top: 16px; display: flex; gap: 12px; align-items: center;"[39m
+        [36m/>[39m
+      [36m</main>[39m
+    [36m</div>[39m
+  [36m</div>[39m
+[36m</body>[39m
+   ❯ src/components/catalog/catalog.test.tsx > CatalogPage width-adaptive density default (SG-212 / D-21) > the toggle flips both ways after mount; a fresh navigation recomputes (no stored choice)
+     → expect(element).toHaveAttribute("aria-pressed", "true") // element.getAttribute("aria-pressed") === "true"
+
+Expected the element to have attribute:
+  aria-pressed="true"
+Received:
+  aria-pressed="false"
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 4 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/components/catalog/catalog.test.tsx > CatalogPage width-adaptive density default (SG-212 / D-21) > a content column >=860 px at mount initialises the table
+TestingLibraryElementError: Unable to find an element by: [data-testid="catalog-content-column"]
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<div[39m
+      [33mclass[39m=[32m"bg-background text-foreground"[39m
+      [33mstyle[39m=[32m"min-height: 100vh;"[39m
+    [36m>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"bg-background"[39m
+        [33mstyle[39m=[32m"position: sticky; top: 0px; z-index: 10;"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"bg-card border-border"[39m
+          [33mstyle[39m=[32m"display: flex; flex-wrap: wrap; align-items: center; gap: 12px; row-gap: 8px; padding: 10px 24px; border-bottom-style: solid; border-bottom-width: 1px;"[39m
+        [36m>[39m
+          [36m<span[39m
+            [33maria-label[39m=[32m"Total loaded items: 0"[39m
+            [33mclass[39m=[32m"bg-card-muted text-muted-foreground"[39m
+            [33mstyle[39m=[32m"font-size: 12px; padding: 2px 8px; border-radius: 999px;"[39m
+            [33mtitle[39m=[32m"Items loaded on this page, not the household total"[39m
+          [36m>[39m
+            [0mLoaded: [0m
+            [0m0[0m
+            [0m [0m
+            [0mitems[0m
+          [36m</span>[39m
+          [36m<div[39m
+            [33maria-hidden[39m=[32m"true"[39m
+            [33mstyle[39m=[32m"flex: 1 1 0%;"[39m
+          [36m/>[39m
+          [36m<input[39m
+            [33maria-label[39m=[32m"Search catalog"[39m
+            [33mclass[39m=[32m"bg-background text-foreground border-border focus-ring"[39m
+            [33mplaceholder[39m=[32m"Search…"[39m
+            [33mstyle[39m=[32m"padding: 6px 10px; border-radius: 6px; border-style: solid; border-width: 1px; flex: 1 1 180px; min-width: 180px; max-width: 420px; font-size: 13px;"[39m
+            [33mtype[39m=[32m"search"[39m
+            [33mvalue[39m=[32m""[39m
+          [36m/>[39m
+          [36m<button[39m
+            [33maria-label[39m=[32m"Switch to dark theme"[39m
+            [33mclass[39m=[32m"bg-card text-foreground border-border focus-ring"[39m
+            [33mstyle[39m=[32m"display: inline-flex; align-items: center; justify-content: center; padding: 6px; border-radius: 6px; border-style: solid; border-width: 1px; cursor: pointer;"[39m
+            [33mtitle[39m=[32m"Switch to dark theme"[39m
+            [33mtype[39m=[32m"button"[39m
+          [36m>[39m
+            [36m<svg[39m
+              [33maria-hidden[39m=[32m"true"[39m
+              [33mclass[39m=[32m"lucide lucide-moon"[39m
+              [33mfill[39m=[32m"none"[39m
+              [33mheight[39m=[32m"18"[39m
+              [33mstroke[39m=[32m"currentColor"[39m
+              [33mstroke-linecap[39m=[32m"round"[39m
+              [33mstroke-linejoin[39m=[32m"round"[39m
+              [33mstroke-width[39m=[32m"2"[39m
+              [33mviewBox[39m=[32m"0 0 24 24"[39m
+              [33mwidth[39m=[32m"18"[39m
+              [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+            [36m>[39m
+              [36m<path[39m
+                [33md[39m=[32m"M20.985 12.486a9 9 0 1 1-9.473-9.472c.405-.022.617.46.402.803a6 6 0 0 0 8.268 8.268c.344-.215.825-.004.803.401"[39m
+              [36m/>[39m
+            [36m</svg>[39m
+          [36m</button>[39m
+          [36m<a[39m
+            [33mclass[39m=[32m"bg-primary text-primary-foreground focus-ring"[39m
+            [33mhref[39m=[32m"/capture"[39m
+            [33mstyle[39m=[32m"padding: 6px 12px; border-radius: 6px; text-decoration: none; font-weight: 600; font-size: 13px; display: inline-flex; align-items: center; gap: 6px;"[39m
+          [36m>[39m
+            [36m<svg[39m
+              [33maria-hidden[39m=[32m"true"[39m
+              [33mclass[39m=[32m"lucide lucide-upload"[39m
+              [33mfill[39m=[32m"none"[39m
+              [33mheight[39m=[32m"16"[39m
+              [33mstroke[39m=[32m"currentColor"[39m
+              [33mstroke-linecap[39m=[32m"round"[39m
+              [33mstroke-linejoin[39m=[32m"round"[39m
+              [33mstroke-width[39m=[32m"2"[39m
+              [33mviewBox[39m=[32m"0 0 24 24"[39m
+              [33mwidth[39m=[32m"16"[39m
+              [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+            [36m>[39m
+              [36m<path[39m
+                [33md[39m=[32m"M12 3v12"[39m
+              [36m/>[39m
+              [36m<path[39m
+                [33md[39m=[32m"m17 8-5-5-5 5"[39m
+              [36m/>[39m
+              [36m<path[39m
+                [33md[39m=[32m"M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"[39m
+              [36m/>[39m
+            [36m</svg>[39m
+            [0mImport Asset[0m
+          [36m</a>[39m
+        [36m</div>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"bg-card border-border"[39m
+          [33mstyle[39m=[32m"display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 8px 24px; border-bottom-style: solid; border-bottom-width: 1px;"[39m
+        [36m>[39m
+          [36m<button[39m
+            [33maria-pressed[39m=[32m"true"[39m
+            [33mclass[39m=[32m"bg-primary text-primary-foreground focus-ring"[39m
+            [33mstyle[39m=[32m"padding: 4px 10px; border-radius: 6px; border-style: solid; border-width: 1px; font-size: 13px; cursor: pointer; font-weight: 600;"[39m
+            [33mtype[39m=[32m"button"[39m
+          [36m>[39m
+            [0mAll (0)[0m
+          [36m</button>[39m
+          [36m<select[39m
+            [33maria-label[39m=[32m"Sort catalog"[39m
+            [33mclass[39m=[32m"bg-background text-foreground border-border focus-ring"[39m
+            [33mstyle[39m=[32m"padding: 4px 10px; border-radius: 6px; border-style: solid; border-width: 1px; font-size: 13px; cursor: pointer;"[39m
+          [36m>[39m
+            [36m<option[39m
+              [33mvalue[39m=[32m"recent"[39m
+            [36m>[39m
+              [0mRecently Added[0m
+            [36m</option>[39m
+            [36m<option[39m
+              [33mvalue[39m=[32m"name"[39m
+            [36m>[39m
+              [0mName (A-Z)[0m
+            [36m</option>[39m
+            [36m<option[39m
+              [33mvalue[39m=[32m"status"[39m
+            [36m>[39m
+              [0mProcessing Status[0m
+            [36m</option>[39m
+          [36m</select>[39m
+          [36m<div[39m
+            [33maria-label[39m=[32m"Density"[39m
+            [33mrole[39m=[32m"group"[39m
+            [33mstyle[39m=[32m"display: inline-flex; gap: 4px;"[39m
+          [36m>[39m
+            [36m<button[39m
+              [33maria-pressed[39m=[32m"true"[39m
+              [33mclass[39m=[32m"bg-primary text-primary-foreground focus-ring"[39m
+              [33mstyle[39m=[32m"padding: 4px 10px; border-radius: 6px; border-style: solid; border-width: 1px; font-size: 13px; cursor: pointer; font-weight: 600;"[39m
+              [33mtype[39m=[32m"button"[39m
+            [36m>[39m
+              [0mStandard Grid[0m
+            [36m</button>[39m
+            [36m<button[39m
+              [33maria-pressed[39m=[32m"false"[39m
+              [33mclass[39m=[32m"bg-card-muted text-muted-foreground focus-ring"[39m
+              [33mstyle[39m=[32m"padding: 4px 10px; border-radius: 6px; border-style: solid; border-width: 1px; font-size: 13px; cursor: pointer; font-weight: 400;"[39m
+              [33mtype[39m=[32m"button"[39m
+            [36m>[39m
+              [0mCompact Table[0m
+            [36m</button>[39m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mstyle[39m=[32m"flex: 1 1 0%;"[39m
+          [36m/>[39m
+          [36m<button[39m
+            [33mclass[39m=[32m"bg-card text-foreground border-border focus-ring"[39m
+            [33mdisabled[39m=[32m""[39m
+            [33mstyle[39m=[32m"padding: 4px 10px; border-radius: 6px; border-style: solid; border-width: 1px; font-size: 13px; cursor: pointer; opacity: 0.5;"[39m
+            [33mtype[39m=[32m"button"[39m
+          [36m>[39m
+            [0mSave search[0m
+          [36m</button>[39m
+          [36m<span[39m
+            [33mclass[39m=[32m"text-muted-foreground"[39m
+            [33mstyle[39m=[32m"font-size: 12px;"[39m
+          [36m>[39m
+            [0mNone yet[0m
+          [36m</span>[39m
+        [36m</div>[39m
+      [36m</div>[39m
+      [36m<main[39m
+        [33mclass[39m=[32m"page-container"[39m
+        [33mdata-testid[39m=[32m"page-container"[39m
+        [33mdata-variant[39m=[32m"page"[39m
+        [33mstyle[39m=[32m"width: 100%; max-width: 1100px; margin-left: auto; margin-right: auto; padding: 24px;"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33maria-busy[39m=[32m"false"[39m
+          [33maria-label[39m=[32m"Product results"[39m
+          [33mclass[39m=[32m"border-border text-foreground"[39m
+          [33mdata-testid[39m=[32m"catalog-grid-empty"[39m
+          [33mrole[39m=[32m"region"[39m
+          [33mstyle[39m=[32m"border-style: dashed; border-width: 1px; border-radius: 12px; padding: 56px 24px; display: flex; flex-direction: column; align-items: center; gap: 12px; text-align: center;"[39m
+        [36m>[39m
+          [36m<p[39m
+            [33mclass[39m=[32m"text-muted-foreground"[39m
+            [33mstyle[39m=[32m"margin: 0px;"[39m
+          [36m>[39m
+            [0mNo items match the current view.[0m
+          [36m</p>[39m
+          [36m<a[39m
+            [33mclass[39m=[32m"bg-primary text-primary-foreground focus-ring"[39m
+            [33mhref[39m=[32m"/capture"[39m
+            [33mstyle[39m=[32m"padding: 8px 16px; border-radius: 6px; text-decoration: none; font-weight: 600; font-size: 13px;"[39m
+          [36m>[39m
+            [0mImport New Item[0m
+          [36m</a>[39m
+          [36m<p[39m
+            [33mclass[39m=[32m"text-muted-foreground"[39m
+            [33mstyle[39m=[32m"margin: 0px; font-size: 12px;"[39m
+          [36m>[39m
+            [0mOpens the import dialog: drop, select or paste photos. The Capture route stays for direct navigation.[0m
+          [36m</p>[39m
+        [36m</div>[39m
+        [36m<div[39m
+          [33mstyle[39m=[32m"margin-top: 16px; display: flex; gap: 12px; align-items: center;"[39m
+        [36m/>[39m
+      [36m</main>[39m
+    [36m</div>[39m
+  [36m</div>[39m
+[36m</body>[39m
+ ❯ Object.getElementError node_modules/@testing-library/dom/dist/config.js:37:19
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:76:38
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:52:17
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:95:19
+ ❯ src/components/catalog/catalog.test.tsx:652:19
+    650|     // The read point exists and the mount-time measure has already se…
+    651|     // state (layout effect: no grid-first frame ever paints).
+    652|     expect(screen.getByTestId("catalog-content-column")).toBeInTheDocu…
+       |                   ^
+    653|     expect(screen.getByRole("button", { name: "Compact Table" })).toHa…
+    654|       "aria-pressed",
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/4]⎯
+
+ FAIL  src/components/catalog/catalog.test.tsx > CatalogPage width-adaptive density default (SG-212 / D-21) > a content column <860 px at mount initialises the grid
+TestingLibraryElementError: Unable to find an element by: [data-testid="catalog-content-column"]
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<div[39m
+      [33mclass[39m=[32m"bg-background text-foreground"[39m
+      [33mstyle[39m=[32m"min-height: 100vh;"[39m
+    [36m>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"bg-background"[39m
+        [33mstyle[39m=[32m"position: sticky; top: 0px; z-index: 10;"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"bg-card border-border"[39m
+          [33mstyle[39m=[32m"display: flex; flex-wrap: wrap; align-items: center; gap: 12px; row-gap: 8px; padding: 10px 24px; border-bottom-style: solid; border-bottom-width: 1px;"[39m
+        [36m>[39m
+          [36m<span[39m
+            [33maria-label[39m=[32m"Total loaded items: 0"[39m
+            [33mclass[39m=[32m"bg-card-muted text-muted-foreground"[39m
+            [33mstyle[39m=[32m"font-size: 12px; padding: 2px 8px; border-radius: 999px;"[39m
+            [33mtitle[39m=[32m"Items loaded on this page, not the household total"[39m
+          [36m>[39m
+            [0mLoaded: [0m
+            [0m0[0m
+            [0m [0m
+            [0mitems[0m
+          [36m</span>[39m
+          [36m<div[39m
+            [33maria-hidden[39m=[32m"true"[39m
+            [33mstyle[39m=[32m"flex: 1 1 0%;"[39m
+          [36m/>[39m
+          [36m<input[39m
+            [33maria-label[39m=[32m"Search catalog"[39m
+            [33mclass[39m=[32m"bg-background text-foreground border-border focus-ring"[39m
+            [33mplaceholder[39m=[32m"Search…"[39m
+            [33mstyle[39m=[32m"padding: 6px 10px; border-radius: 6px; border-style: solid; border-width: 1px; flex: 1 1 180px; min-width: 180px; max-width: 420px; font-size: 13px;"[39m
+            [33mtype[39m=[32m"search"[39m
+            [33mvalue[39m=[32m""[39m
+          [36m/>[39m
+          [36m<button[39m
+            [33maria-label[39m=[32m"Switch to dark theme"[39m
+            [33mclass[39m=[32m"bg-card text-foreground border-border focus-ring"[39m
+            [33mstyle[39m=[32m"display: inline-flex; align-items: center; justify-content: center; padding: 6px; border-radius: 6px; border-style: solid; border-width: 1px; cursor: pointer;"[39m
+            [33mtitle[39m=[32m"Switch to dark theme"[39m
+            [33mtype[39m=[32m"button"[39m
+          [36m>[39m
+            [36m<svg[39m
+              [33maria-hidden[39m=[32m"true"[39m
+              [33mclass[39m=[32m"lucide lucide-moon"[39m
+              [33mfill[39m=[32m"none"[39m
+              [33mheight[39m=[32m"18"[39m
+              [33mstroke[39m=[32m"currentColor"[39m
+              [33mstroke-linecap[39m=[32m"round"[39m
+              [33mstroke-linejoin[39m=[32m"round"[39m
+              [33mstroke-width[39m=[32m"2"[39m
+              [33mviewBox[39m=[32m"0 0 24 24"[39m
+              [33mwidth[39m=[32m"18"[39m
+              [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+            [36m>[39m
+              [36m<path[39m
+                [33md[39m=[32m"M20.985 12.486a9 9 0 1 1-9.473-9.472c.405-.022.617.46.402.803a6 6 0 0 0 8.268 8.268c.344-.215.825-.004.803.401"[39m
+              [36m/>[39m
+            [36m</svg>[39m
+          [36m</button>[39m
+          [36m<a[39m
+            [33mclass[39m=[32m"bg-primary text-primary-foreground focus-ring"[39m
+            [33mhref[39m=[32m"/capture"[39m
+            [33mstyle[39m=[32m"padding: 6px 12px; border-radius: 6px; text-decoration: none; font-weight: 600; font-size: 13px; display: inline-flex; align-items: center; gap: 6px;"[39m
+          [36m>[39m
+            [36m<svg[39m
+              [33maria-hidden[39m=[32m"true"[39m
+              [33mclass[39m=[32m"lucide lucide-upload"[39m
+              [33mfill[39m=[32m"none"[39m
+              [33mheight[39m=[32m"16"[39m
+              [33mstroke[39m=[32m"currentColor"[39m
+              [33mstroke-linecap[39m=[32m"round"[39m
+              [33mstroke-linejoin[39m=[32m"round"[39m
+              [33mstroke-width[39m=[32m"2"[39m
+              [33mviewBox[39m=[32m"0 0 24 24"[39m
+              [33mwidth[39m=[32m"16"[39m
+              [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+            [36m>[39m
+              [36m<path[39m
+                [33md[39m=[32m"M12 3v12"[39m
+              [36m/>[39m
+              [36m<path[39m
+                [33md[39m=[32m"m17 8-5-5-5 5"[39m
+              [36m/>[39m
+              [36m<path[39m
+                [33md[39m=[32m"M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"[39m
+              [36m/>[39m
+            [36m</svg>[39m
+            [0mImport Asset[0m
+          [36m</a>[39m
+        [36m</div>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"bg-card border-border"[39m
+          [33mstyle[39m=[32m"display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 8px 24px; border-bottom-style: solid; border-bottom-width: 1px;"[39m
+        [36m>[39m
+          [36m<button[39m
+            [33maria-pressed[39m=[32m"true"[39m
+            [33mclass[39m=[32m"bg-primary text-primary-foreground focus-ring"[39m
+            [33mstyle[39m=[32m"padding: 4px 10px; border-radius: 6px; border-style: solid; border-width: 1px; font-size: 13px; cursor: pointer; font-weight: 600;"[39m
+            [33mtype[39m=[32m"button"[39m
+          [36m>[39m
+            [0mAll (0)[0m
+          [36m</button>[39m
+          [36m<select[39m
+            [33maria-label[39m=[32m"Sort catalog"[39m
+            [33mclass[39m=[32m"bg-background text-foreground border-border focus-ring"[39m
+            [33mstyle[39m=[32m"padding: 4px 10px; border-radius: 6px; border-style: solid; border-width: 1px; font-size: 13px; cursor: pointer;"[39m
+          [36m>[39m
+            [36m<option[39m
+              [33mvalue[39m=[32m"recent"[39m
+            [36m>[39m
+              [0mRecently Added[0m
+            [36m</option>[39m
+            [36m<option[39m
+              [33mvalue[39m=[32m"name"[39m
+            [36m>[39m
+              [0mName (A-Z)[0m
+            [36m</option>[39m
+            [36m<option[39m
+              [33mvalue[39m=[32m"status"[39m
+            [36m>[39m
+              [0mProcessing Status[0m
+            [36m</option>[39m
+          [36m</select>[39m
+          [36m<div[39m
+            [33maria-label[39m=[32m"Density"[39m
+            [33mrole[39m=[32m"group"[39m
+            [33mstyle[39m=[32m"display: inline-flex; gap: 4px;"[39m
+          [36m>[39m
+            [36m<button[39m
+              [33maria-pressed[39m=[32m"true"[39m
+              [33mclass[39m=[32m"bg-primary text-primary-foreground focus-ring"[39m
+              [33mstyle[39m=[32m"padding: 4px 10px; border-radius: 6px; border-style: solid; border-width: 1px; font-size: 13px; cursor: pointer; font-weight: 600;"[39m
+              [33mtype[39m=[32m"button"[39m
+            [36m>[39m
+              [0mStandard Grid[0m
+            [36m</button>[39m
+            [36m<button[39m
+              [33maria-pressed[39m=[32m"false"[39m
+              [33mclass[39m=[32m"bg-card-muted text-muted-foreground focus-ring"[39m
+              [33mstyle[39m=[32m"padding: 4px 10px; border-radius: 6px; border-style: solid; border-width: 1px; font-size: 13px; cursor: pointer; font-weight: 400;"[39m
+              [33mtype[39m=[32m"button"[39m
+            [36m>[39m
+              [0mCompact Table[0m
+            [36m</button>[39m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mstyle[39m=[32m"flex: 1 1 0%;"[39m
+          [36m/>[39m
+          [36m<button[39m
+            [33mclass[39m=[32m"bg-card text-foreground border-border focus-ring"[39m
+            [33mdisabled[39m=[32m""[39m
+            [33mstyle[39m=[32m"padding: 4px 10px; border-radius: 6px; border-style: solid; border-width: 1px; font-size: 13px; cursor: pointer; opacity: 0.5;"[39m
+            [33mtype[39m=[32m"button"[39m
+          [36m>[39m
+            [0mSave search[0m
+          [36m</button>[39m
+          [36m<span[39m
+            [33mclass[39m=[32m"text-muted-foreground"[39m
+            [33mstyle[39m=[32m"font-size: 12px;"[39m
+          [36m>[39m
+            [0mNone yet[0m
+          [36m</span>[39m
+        [36m</div>[39m
+      [36m</div>[39m
+      [36m<main[39m
+        [33mclass[39m=[32m"page-container"[39m
+        [33mdata-testid[39m=[32m"page-container"[39m
+        [33mdata-variant[39m=[32m"page"[39m
+        [33mstyle[39m=[32m"width: 100%; max-width: 1100px; margin-left: auto; margin-right: auto; padding: 24px;"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33maria-busy[39m=[32m"false"[39m
+          [33maria-label[39m=[32m"Product results"[39m
+          [33mclass[39m=[32m"border-border text-foreground"[39m
+          [33mdata-testid[39m=[32m"catalog-grid-empty"[39m
+          [33mrole[39m=[32m"region"[39m
+          [33mstyle[39m=[32m"border-style: dashed; border-width: 1px; border-radius: 12px; padding: 56px 24px; display: flex; flex-direction: column; align-items: center; gap: 12px; text-align: center;"[39m
+        [36m>[39m
+          [36m<p[39m
+            [33mclass[39m=[32m"text-muted-foreground"[39m
+            [33mstyle[39m=[32m"margin: 0px;"[39m
+          [36m>[39m
+            [0mNo items match the current view.[0m
+          [36m</p>[39m
+          [36m<a[39m
+            [33mclass[39m=[32m"bg-primary text-primary-foreground focus-ring"[39m
+            [33mhref[39m=[32m"/capture"[39m
+            [33mstyle[39m=[32m"padding: 8px 16px; border-radius: 6px; text-decoration: none; font-weight: 600; font-size: 13px;"[39m
+          [36m>[39m
+            [0mImport New Item[0m
+          [36m</a>[39m
+          [36m<p[39m
+            [33mclass[39m=[32m"text-muted-foreground"[39m
+            [33mstyle[39m=[32m"margin: 0px; font-size: 12px;"[39m
+          [36m>[39m
+            [0mOpens the import dialog: drop, select or paste photos. The Capture route stays for direct navigation.[0m
+          [36m</p>[39m
+        [36m</div>[39m
+        [36m<div[39m
+          [33mstyle[39m=[32m"margin-top: 16px; display: flex; gap: 12px; align-items: center;"[39m
+        [36m/>[39m
+      [36m</main>[39m
+    [36m</div>[39m
+  [36m</div>[39m
+[36m</body>[39m
+ ❯ Object.getElementError node_modules/@testing-library/dom/dist/config.js:37:19
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:76:38
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:52:17
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:95:19
+ ❯ src/components/catalog/catalog.test.tsx:668:19
+    666|     renderCatalog();
+    667| 
+    668|     expect(screen.getByTestId("catalog-content-column")).toBeInTheDocu…
+       |                   ^
+    669|     expect(screen.getByRole("button", { name: "Standard Grid" })).toHa…
+    670|       "aria-pressed",
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/4]⎯
+
+ FAIL  src/components/catalog/catalog.test.tsx > CatalogPage width-adaptive density default (SG-212 / D-21) > an unreadable measure (non-finite or zero) falls back to the grid
+TestingLibraryElementError: Unable to find an element by: [data-testid="catalog-content-column"]
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<div[39m
+      [33mclass[39m=[32m"bg-background text-foreground"[39m
+      [33mstyle[39m=[32m"min-height: 100vh;"[39m
+    [36m>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"bg-background"[39m
+        [33mstyle[39m=[32m"position: sticky; top: 0px; z-index: 10;"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"bg-card border-border"[39m
+          [33mstyle[39m=[32m"display: flex; flex-wrap: wrap; align-items: center; gap: 12px; row-gap: 8px; padding: 10px 24px; border-bottom-style: solid; border-bottom-width: 1px;"[39m
+        [36m>[39m
+          [36m<span[39m
+            [33maria-label[39m=[32m"Total loaded items: 0"[39m
+            [33mclass[39m=[32m"bg-card-muted text-muted-foreground"[39m
+            [33mstyle[39m=[32m"font-size: 12px; padding: 2px 8px; border-radius: 999px;"[39m
+            [33mtitle[39m=[32m"Items loaded on this page, not the household total"[39m
+          [36m>[39m
+            [0mLoaded: [0m
+            [0m0[0m
+            [0m [0m
+            [0mitems[0m
+          [36m</span>[39m
+          [36m<div[39m
+            [33maria-hidden[39m=[32m"true"[39m
+            [33mstyle[39m=[32m"flex: 1 1 0%;"[39m
+          [36m/>[39m
+          [36m<input[39m
+            [33maria-label[39m=[32m"Search catalog"[39m
+            [33mclass[39m=[32m"bg-background text-foreground border-border focus-ring"[39m
+            [33mplaceholder[39m=[32m"Search…"[39m
+            [33mstyle[39m=[32m"padding: 6px 10px; border-radius: 6px; border-style: solid; border-width: 1px; flex: 1 1 180px; min-width: 180px; max-width: 420px; font-size: 13px;"[39m
+            [33mtype[39m=[32m"search"[39m
+            [33mvalue[39m=[32m""[39m
+          [36m/>[39m
+          [36m<button[39m
+            [33maria-label[39m=[32m"Switch to dark theme"[39m
+            [33mclass[39m=[32m"bg-card text-foreground border-border focus-ring"[39m
+            [33mstyle[39m=[32m"display: inline-flex; align-items: center; justify-content: center; padding: 6px; border-radius: 6px; border-style: solid; border-width: 1px; cursor: pointer;"[39m
+            [33mtitle[39m=[32m"Switch to dark theme"[39m
+            [33mtype[39m=[32m"button"[39m
+          [36m>[39m
+            [36m<svg[39m
+              [33maria-hidden[39m=[32m"true"[39m
+              [33mclass[39m=[32m"lucide lucide-moon"[39m
+              [33mfill[39m=[32m"none"[39m
+              [33mheight[39m=[32m"18"[39m
+              [33mstroke[39m=[32m"currentColor"[39m
+              [33mstroke-linecap[39m=[32m"round"[39m
+              [33mstroke-linejoin[39m=[32m"round"[39m
+              [33mstroke-width[39m=[32m"2"[39m
+              [33mviewBox[39m=[32m"0 0 24 24"[39m
+              [33mwidth[39m=[32m"18"[39m
+              [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+            [36m>[39m
+              [36m<path[39m
+                [33md[39m=[32m"M20.985 12.486a9 9 0 1 1-9.473-9.472c.405-.022.617.46.402.803a6 6 0 0 0 8.268 8.268c.344-.215.825-.004.803.401"[39m
+              [36m/>[39m
+            [36m</svg>[39m
+          [36m</button>[39m
+          [36m<a[39m
+            [33mclass[39m=[32m"bg-primary text-primary-foreground focus-ring"[39m
+            [33mhref[39m=[32m"/capture"[39m
+            [33mstyle[39m=[32m"padding: 6px 12px; border-radius: 6px; text-decoration: none; font-weight: 600; font-size: 13px; display: inline-flex; align-items: center; gap: 6px;"[39m
+          [36m>[39m
+            [36m<svg[39m
+              [33maria-hidden[39m=[32m"true"[39m
+              [33mclass[39m=[32m"lucide lucide-upload"[39m
+              [33mfill[39m=[32m"none"[39m
+              [33mheight[39m=[32m"16"[39m
+              [33mstroke[39m=[32m"currentColor"[39m
+              [33mstroke-linecap[39m=[32m"round"[39m
+              [33mstroke-linejoin[39m=[32m"round"[39m
+              [33mstroke-width[39m=[32m"2"[39m
+              [33mviewBox[39m=[32m"0 0 24 24"[39m
+              [33mwidth[39m=[32m"16"[39m
+              [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+            [36m>[39m
+              [36m<path[39m
+                [33md[39m=[32m"M12 3v12"[39m
+              [36m/>[39m
+              [36m<path[39m
+                [33md[39m=[32m"m17 8-5-5-5 5"[39m
+              [36m/>[39m
+              [36m<path[39m
+                [33md[39m=[32m"M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"[39m
+              [36m/>[39m
+            [36m</svg>[39m
+            [0mImport Asset[0m
+          [36m</a>[39m
+        [36m</div>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"bg-card border-border"[39m
+          [33mstyle[39m=[32m"display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 8px 24px; border-bottom-style: solid; border-bottom-width: 1px;"[39m
+        [36m>[39m
+          [36m<button[39m
+            [33maria-pressed[39m=[32m"true"[39m
+            [33mclass[39m=[32m"bg-primary text-primary-foreground focus-ring"[39m
+            [33mstyle[39m=[32m"padding: 4px 10px; border-radius: 6px; border-style: solid; border-width: 1px; font-size: 13px; cursor: pointer; font-weight: 600;"[39m
+            [33mtype[39m=[32m"button"[39m
+          [36m>[39m
+            [0mAll (0)[0m
+          [36m</button>[39m
+          [36m<select[39m
+            [33maria-label[39m=[32m"Sort catalog"[39m
+            [33mclass[39m=[32m"bg-background text-foreground border-border focus-ring"[39m
+            [33mstyle[39m=[32m"padding: 4px 10px; border-radius: 6px; border-style: solid; border-width: 1px; font-size: 13px; cursor: pointer;"[39m
+          [36m>[39m
+            [36m<option[39m
+              [33mvalue[39m=[32m"recent"[39m
+            [36m>[39m
+              [0mRecently Added[0m
+            [36m</option>[39m
+            [36m<option[39m
+              [33mvalue[39m=[32m"name"[39m
+            [36m>[39m
+              [0mName (A-Z)[0m
+            [36m</option>[39m
+            [36m<option[39m
+              [33mvalue[39m=[32m"status"[39m
+            [36m>[39m
+              [0mProcessing Status[0m
+            [36m</option>[39m
+          [36m</select>[39m
+          [36m<div[39m
+            [33maria-label[39m=[32m"Density"[39m
+            [33mrole[39m=[32m"group"[39m
+            [33mstyle[39m=[32m"display: inline-flex; gap: 4px;"[39m
+          [36m>[39m
+            [36m<button[39m
+              [33maria-pressed[39m=[32m"true"[39m
+              [33mclass[39m=[32m"bg-primary text-primary-foreground focus-ring"[39m
+              [33mstyle[39m=[32m"padding: 4px 10px; border-radius: 6px; border-style: solid; border-width: 1px; font-size: 13px; cursor: pointer; font-weight: 600;"[39m
+              [33mtype[39m=[32m"button"[39m
+            [36m>[39m
+              [0mStandard Grid[0m
+            [36m</button>[39m
+            [36m<button[39m
+              [33maria-pressed[39m=[32m"false"[39m
+              [33mclass[39m=[32m"bg-card-muted text-muted-foreground focus-ring"[39m
+              [33mstyle[39m=[32m"padding: 4px 10px; border-radius: 6px; border-style: solid; border-width: 1px; font-size: 13px; cursor: pointer; font-weight: 400;"[39m
+              [33mtype[39m=[32m"button"[39m
+            [36m>[39m
+              [0mCompact Table[0m
+            [36m</button>[39m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mstyle[39m=[32m"flex: 1 1 0%;"[39m
+          [36m/>[39m
+          [36m<button[39m
+            [33mclass[39m=[32m"bg-card text-foreground border-border focus-ring"[39m
+            [33mdisabled[39m=[32m""[39m
+            [33mstyle[39m=[32m"padding: 4px 10px; border-radius: 6px; border-style: solid; border-width: 1px; font-size: 13px; cursor: pointer; opacity: 0.5;"[39m
+            [33mtype[39m=[32m"button"[39m
+          [36m>[39m
+            [0mSave search[0m
+          [36m</button>[39m
+          [36m<span[39m
+            [33mclass[39m=[32m"text-muted-foreground"[39m
+            [33mstyle[39m=[32m"font-size: 12px;"[39m
+          [36m>[39m
+            [0mNone yet[0m
+          [36m</span>[39m
+        [36m</div>[39m
+      [36m</div>[39m
+      [36m<main[39m
+        [33mclass[39m=[32m"page-container"[39m
+        [33mdata-testid[39m=[32m"page-container"[39m
+        [33mdata-variant[39m=[32m"page"[39m
+        [33mstyle[39m=[32m"width: 100%; max-width: 1100px; margin-left: auto; margin-right: auto; padding: 24px;"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33maria-busy[39m=[32m"false"[39m
+          [33maria-label[39m=[32m"Product results"[39m
+          [33mclass[39m=[32m"border-border text-foreground"[39m
+          [33mdata-testid[39m=[32m"catalog-grid-empty"[39m
+          [33mrole[39m=[32m"region"[39m
+          [33mstyle[39m=[32m"border-style: dashed; border-width: 1px; border-radius: 12px; padding: 56px 24px; display: flex; flex-direction: column; align-items: center; gap: 12px; text-align: center;"[39m
+        [36m>[39m
+          [36m<p[39m
+            [33mclass[39m=[32m"text-muted-foreground"[39m
+            [33mstyle[39m=[32m"margin: 0px;"[39m
+          [36m>[39m
+            [0mNo items match the current view.[0m
+          [36m</p>[39m
+          [36m<a[39m
+            [33mclass[39m=[32m"bg-primary text-primary-foreground focus-ring"[39m
+            [33mhref[39m=[32m"/capture"[39m
+            [33mstyle[39m=[32m"padding: 8px 16px; border-radius: 6px; text-decoration: none; font-weight: 600; font-size: 13px;"[39m
+          [36m>[39m
+            [0mImport New Item[0m
+          [36m</a>[39m
+          [36m<p[39m
+            [33mclass[39m=[32m"text-muted-foreground"[39m
+            [33mstyle[39m=[32m"margin: 0px; font-size: 12px;"[39m
+          [36m>[39m
+            [0mOpens the import dialog: drop, select or paste photos. The Capture route stays for direct navigation.[0m
+          [36m</p>[39m
+        [36m</div>[39m
+        [36m<div[39m
+          [33mstyle[39m=[32m"margin-top: 16px; display: flex; gap: 12px; align-items: center;"[39m
+        [36m/>[39m
+      [36m</main>[39m
+    [36m</div>[39m
+  [36m</div>[39m
+[36m</body>[39m
+ ❯ Object.getElementError node_modules/@testing-library/dom/dist/config.js:37:19
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:76:38
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:52:17
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:95:19
+ ❯ src/components/catalog/catalog.test.tsx:685:21
+    683|       const view = renderCatalog();
+    684| 
+    685|       expect(screen.getByTestId("catalog-content-column")).toBeInTheDo…
+       |                     ^
+    686|       expect(screen.getByRole("button", { name: "Standard Grid" })).to…
+    687|         "aria-pressed",
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/4]⎯
+
+ FAIL  src/components/catalog/catalog.test.tsx > CatalogPage width-adaptive density default (SG-212 / D-21) > the toggle flips both ways after mount; a fresh navigation recomputes (no stored choice)
+Error: expect(element).toHaveAttribute("aria-pressed", "true") // element.getAttribute("aria-pressed") === "true"
+
+Expected the element to have attribute:
+  aria-pressed="true"
+Received:
+  aria-pressed="false"
+ ❯ src/components/catalog/catalog.test.tsx:704:67
+    702|     const first = renderCatalog();
+    703| 
+    704|     expect(screen.getByRole("button", { name: "Compact Table" })).toHa…
+       |                                                                   ^
+    705|       "aria-pressed",
+    706|       "true"
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/4]⎯
+
+ Test Files  1 failed (1)
+      Tests  4 failed | 33 skipped (37)
+   Start at  19:27:53
+   Duration  1.53s (transform 306ms, setup 70ms, collect 555ms, tests 212ms, environment 396ms, prepare 94ms)
+

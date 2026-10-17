@@ -1,0 +1,427 @@
+{
+  "ts": "2026-10-17T19:30:50.643Z",
+  "world": "wide1440",
+  "emulation": {
+    "metrics": {
+      "width": 1440,
+      "height": 900,
+      "deviceScaleFactor": 1,
+      "mobile": false,
+      "screenWidth": 1440,
+      "screenHeight": 900
+    },
+    "touch": false
+  },
+  "url": "http://localhost:5173/",
+  "browser": "HeadlessChrome/149.0.7827.55",
+  "staticRequests": [
+    {
+      "method": "GET",
+      "url": "/"
+    },
+    {
+      "method": "GET",
+      "url": "/assets/index-B4ojUV03.js"
+    },
+    {
+      "method": "GET",
+      "url": "/assets/index-C07VbG0m.css"
+    }
+  ],
+  "served": {
+    "index.html": {
+      "sha256": "84aa1267a81e636c2e031999ce067fc51b21ddce564d04601cee9b48d09469e5",
+      "bytes": 944
+    },
+    "assets/index-B4ojUV03.js": {
+      "sha256": "04c9e2e29cf25058d27cade78f5c177cee00041f0c0960b19901b8e8f66c7f6c",
+      "bytes": 320956
+    },
+    "assets/index-C07VbG0m.css": {
+      "sha256": "c3b58cda696a22970fc2a4a348849fc1359f2105f80f81304ed5dfd5ca31a557",
+      "bytes": 4535
+    }
+  },
+  "probe1": {
+    "url": "http://localhost:5173/",
+    "viewport": {
+      "innerWidth": 1440,
+      "innerHeight": 900,
+      "dpr": 1
+    },
+    "contentColumnPresent": true,
+    "contentColumnWidth": 1052,
+    "densityButtons": [
+      {
+        "label": "Standard Grid",
+        "pressed": "false"
+      },
+      {
+        "label": "Compact Table",
+        "pressed": "true"
+      }
+    ],
+    "gridPresent": false,
+    "tablePresent": true,
+    "tableRows": 7,
+    "tableHeaders": [
+      "Asset",
+      "Name",
+      "Category",
+      "Status",
+      "Dimensions/Specs",
+      "Added",
+      "Actions"
+    ],
+    "itemCards": 0,
+    "tableScroll": {
+      "clientWidth": 1052,
+      "scrollWidth": 1052,
+      "maxScrollLeft": 0,
+      "reachedMax": 0,
+      "overflowX": "auto"
+    },
+    "maxHScrollableWidth": 247,
+    "hScrollOffenders": [
+      {
+        "tag": "SPAN",
+        "testid": null,
+        "cls": "",
+        "clientWidth": 200,
+        "scrollWidth": 259,
+        "overflowX": "hidden"
+      },
+      {
+        "tag": "SPAN",
+        "testid": null,
+        "cls": "",
+        "clientWidth": 200,
+        "scrollWidth": 447,
+        "overflowX": "hidden"
+      }
+    ],
+    "docOverflowX": 0,
+    "alertsText": [],
+    "bodyTextLength": 761
+  },
+  "phases": {
+    "initial": {
+      "probe": {
+        "url": "http://localhost:5173/",
+        "viewport": {
+          "innerWidth": 1440,
+          "innerHeight": 900,
+          "dpr": 1
+        },
+        "contentColumnPresent": true,
+        "contentColumnWidth": 1052,
+        "densityButtons": [
+          {
+            "label": "Standard Grid",
+            "pressed": "false"
+          },
+          {
+            "label": "Compact Table",
+            "pressed": "true"
+          }
+        ],
+        "gridPresent": false,
+        "tablePresent": true,
+        "tableRows": 7,
+        "tableHeaders": [
+          "Asset",
+          "Name",
+          "Category",
+          "Status",
+          "Dimensions/Specs",
+          "Added",
+          "Actions"
+        ],
+        "itemCards": 0,
+        "tableScroll": {
+          "clientWidth": 1052,
+          "scrollWidth": 1052,
+          "maxScrollLeft": 0,
+          "reachedMax": 0,
+          "overflowX": "auto"
+        },
+        "maxHScrollableWidth": 247,
+        "hScrollOffenders": [
+          {
+            "tag": "SPAN",
+            "testid": null,
+            "cls": "",
+            "clientWidth": 200,
+            "scrollWidth": 259,
+            "overflowX": "hidden"
+          },
+          {
+            "tag": "SPAN",
+            "testid": null,
+            "cls": "",
+            "clientWidth": 200,
+            "scrollWidth": 447,
+            "overflowX": "hidden"
+          }
+        ],
+        "docOverflowX": 0,
+        "alertsText": [],
+        "bodyTextLength": 761
+      },
+      "shot": {
+        "file": "docs/worklogs/SG-212_shots/wide1440-initial-table.png",
+        "sha256": "78c5a3fea060368fe455f2580349c726f9e604663a8534e42eae0f2e30ed639f",
+        "bytes": 88243
+      }
+    },
+    "toggle": [
+      {
+        "label": "Standard Grid",
+        "expect": "grid",
+        "click": {
+          "clicked": true,
+          "at": {
+            "x": 927,
+            "y": 127
+          },
+          "wasPressed": "false"
+        },
+        "probe": {
+          "url": "http://localhost:5173/",
+          "viewport": {
+            "innerWidth": 1440,
+            "innerHeight": 900,
+            "dpr": 1
+          },
+          "contentColumnPresent": true,
+          "contentColumnWidth": 1052,
+          "densityButtons": [
+            {
+              "label": "Standard Grid",
+              "pressed": "true"
+            },
+            {
+              "label": "Compact Table",
+              "pressed": "false"
+            }
+          ],
+          "gridPresent": true,
+          "tablePresent": false,
+          "tableRows": 0,
+          "tableHeaders": [],
+          "itemCards": 7,
+          "tableScroll": null,
+          "maxHScrollableWidth": 218,
+          "hScrollOffenders": [
+            {
+              "tag": "SPAN",
+              "testid": null,
+              "cls": "",
+              "clientWidth": 226,
+              "scrollWidth": 255,
+              "overflowX": "hidden"
+            },
+            {
+              "tag": "SPAN",
+              "testid": null,
+              "cls": "",
+              "clientWidth": 226,
+              "scrollWidth": 444,
+              "overflowX": "hidden"
+            }
+          ],
+          "docOverflowX": 0,
+          "alertsText": [],
+          "bodyTextLength": 701
+        },
+        "shot": {
+          "file": "docs/worklogs/SG-212_shots/wide1440-after-grid.png",
+          "sha256": "028e002853afd8b4006eb60839d94140030157eee9c70d8f9e3f2193a379717d",
+          "bytes": 181507
+        }
+      },
+      {
+        "label": "Compact Table",
+        "expect": "table",
+        "click": {
+          "clicked": true,
+          "at": {
+            "x": 1091,
+            "y": 127
+          },
+          "wasPressed": "false"
+        },
+        "probe": {
+          "url": "http://localhost:5173/",
+          "viewport": {
+            "innerWidth": 1440,
+            "innerHeight": 900,
+            "dpr": 1
+          },
+          "contentColumnPresent": true,
+          "contentColumnWidth": 1052,
+          "densityButtons": [
+            {
+              "label": "Standard Grid",
+              "pressed": "false"
+            },
+            {
+              "label": "Compact Table",
+              "pressed": "true"
+            }
+          ],
+          "gridPresent": false,
+          "tablePresent": true,
+          "tableRows": 7,
+          "tableHeaders": [
+            "Asset",
+            "Name",
+            "Category",
+            "Status",
+            "Dimensions/Specs",
+            "Added",
+            "Actions"
+          ],
+          "itemCards": 0,
+          "tableScroll": {
+            "clientWidth": 1052,
+            "scrollWidth": 1052,
+            "maxScrollLeft": 0,
+            "reachedMax": 0,
+            "overflowX": "auto"
+          },
+          "maxHScrollableWidth": 247,
+          "hScrollOffenders": [
+            {
+              "tag": "SPAN",
+              "testid": null,
+              "cls": "",
+              "clientWidth": 200,
+              "scrollWidth": 259,
+              "overflowX": "hidden"
+            },
+            {
+              "tag": "SPAN",
+              "testid": null,
+              "cls": "",
+              "clientWidth": 200,
+              "scrollWidth": 447,
+              "overflowX": "hidden"
+            }
+          ],
+          "docOverflowX": 0,
+          "alertsText": [],
+          "bodyTextLength": 960
+        },
+        "shot": {
+          "file": "docs/worklogs/SG-212_shots/wide1440-after-table.png",
+          "sha256": "c04a2d499da90f6cb9abfb276873bcb0e4be13dfb160b3a76a55eed3d06fd812",
+          "bytes": 88004
+        }
+      }
+    ]
+  },
+  "apiRequests": [
+    {
+      "kind": "request",
+      "method": "GET",
+      "url": "http://localhost:8003/v1/households"
+    },
+    {
+      "kind": "request",
+      "method": "GET",
+      "url": "http://localhost:8003/v1/review-tasks?household_id=<redacted>"
+    },
+    {
+      "kind": "request",
+      "method": "GET",
+      "url": "http://localhost:8003/v1/saved-searches?household_id=<redacted>"
+    },
+    {
+      "kind": "request",
+      "method": "GET",
+      "url": "http://localhost:8003/v1/assets/facets?household_id=<redacted>"
+    },
+    {
+      "kind": "request",
+      "method": "GET",
+      "url": "http://localhost:8003/v1/assets?household_id=<redacted>&limit=20"
+    },
+    {
+      "kind": "request",
+      "method": "GET",
+      "url": "http://localhost:8003/v1/evidence/01a131a0-ca52-7d72-afa6-a7f79cc5a016/thumb/256?household_id=<redacted>"
+    },
+    {
+      "kind": "request",
+      "method": "GET",
+      "url": "http://localhost:8003/v1/evidence/01a0c4a1-acbd-7541-83b7-ce9d04730716/thumb/256?household_id=<redacted>"
+    },
+    {
+      "kind": "request",
+      "method": "GET",
+      "url": "http://localhost:8003/v1/evidence/01a0c4a0-af88-7903-a070-a44e7b120712/thumb/256?household_id=<redacted>"
+    },
+    {
+      "kind": "request",
+      "method": "GET",
+      "url": "http://localhost:8003/v1/evidence/01a0c481-08b8-72b2-ab22-8ad28fed8fda/thumb/256?household_id=<redacted>"
+    },
+    {
+      "kind": "request",
+      "method": "GET",
+      "url": "http://localhost:8003/v1/evidence/01a0c47f-0830-75f0-a027-9e8bde8eae48/thumb/256?household_id=<redacted>"
+    },
+    {
+      "kind": "request",
+      "method": "GET",
+      "url": "http://localhost:8003/v1/evidence/01a0c445-35b0-7a53-9b8d-22fa3d6523de/thumb/256?household_id=<redacted>"
+    },
+    {
+      "kind": "request",
+      "method": "GET",
+      "url": "http://localhost:8003/v1/evidence/01a0a467-eacf-7e13-bbd0-078b1bc93860/thumb/256?household_id=<redacted>"
+    }
+  ],
+  "apiNonGet": [],
+  "exceptions": [],
+  "mask": {
+    "blurredImages": 7,
+    "maskedTextNodes": 10,
+    "selectors": [
+      "[data-testid=\"product-row\"] td:nth-child(2)",
+      "[data-testid=\"product-card\"] span[title]"
+    ],
+    "blockRun": "U+25A0 + U+200B (layout-safe)"
+  },
+  "gate": {
+    "ready": true,
+    "wideMeasure": true,
+    "opensInTable": true,
+    "tableNoScroll": true,
+    "noDocOverflow": true,
+    "toggleToGrid": true,
+    "toggleBackToTable": true,
+    "noAlerts": true,
+    "noNonGet": true,
+    "noExceptions": true
+  },
+  "pass": true,
+  "shots": [
+    {
+      "file": "docs/worklogs/SG-212_shots/wide1440-initial-table.png",
+      "sha256": "78c5a3fea060368fe455f2580349c726f9e604663a8534e42eae0f2e30ed639f",
+      "bytes": 88243
+    },
+    {
+      "file": "docs/worklogs/SG-212_shots/wide1440-after-grid.png",
+      "sha256": "028e002853afd8b4006eb60839d94140030157eee9c70d8f9e3f2193a379717d",
+      "bytes": 181507
+    },
+    {
+      "file": "docs/worklogs/SG-212_shots/wide1440-after-table.png",
+      "sha256": "c04a2d499da90f6cb9abfb276873bcb0e4be13dfb160b3a76a55eed3d06fd812",
+      "bytes": 88004
+    }
+  ]
+}

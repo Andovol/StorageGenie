@@ -1,0 +1,79 @@
+# SG-212 enumeration + scope gate (2026-10-17, lane SG-212)
+
+## Enumeration criterion: every density-default or persistence site on target (frontend/src)
+
+### density-default sites (useState<Density>)
+frontend/src/routes/CatalogPage.tsx:56:  const [density, setDensity] = useState<Density>("grid");
+
+### density references by file
+frontend/src/components/catalog/ProductGrid.tsx
+frontend/src/components/catalog/catalog.test.tsx
+frontend/src/components/shell/import-modal.test.tsx
+frontend/src/components/shell/AppShell.tsx
+frontend/src/components/shell/CatalogToolbar.tsx
+frontend/src/routes/CatalogPage.tsx
+
+### density reference count
+31
+
+### persistence sites (localStorage / sessionStorage / document.cookie)
+frontend/src/components/catalog/catalog.test.tsx:487:    window.localStorage.clear();
+frontend/src/components/catalog/catalog.test.tsx:636:    window.localStorage.clear();
+frontend/src/components/catalog/catalog.test.tsx:737:    expect(Object.keys(window.localStorage).filter((key) => /densit/i.test(key))).toEqual([]);
+frontend/src/components/shell/import-modal.test.tsx:353:  test("SG-198: the modal id is the shared context's household (localStorage-empty fallback)", async () => {
+frontend/src/components/shell/import-modal.test.tsx:355:    // first household's id — the context derives localStorage-first, then falls
+frontend/src/components/shell/import-modal.test.tsx:358:    window.localStorage.clear();
+frontend/src/components/shell/shell.test.tsx:129:  window.localStorage.clear();
+frontend/src/components/shell/AppHeader.tsx:17:  // preserved behavior: localStorage-first with the first-household fallback,
+frontend/src/hooks/HouseholdContext.tsx:25:    typeof localStorage !== "undefined" ? localStorage.getItem("household_id") || "" : ""
+frontend/src/hooks/HouseholdContext.tsx:28:  // Behavior-preservation rail (every route did this for itself): localStorage
+frontend/src/hooks/HouseholdContext.tsx:34:      localStorage.setItem("household_id", households[0].id);
+frontend/src/theme/ThemeProvider.tsx:32:    const stored = window.localStorage.getItem(THEME_STORAGE_KEY);
+frontend/src/theme/ThemeProvider.tsx:67:      window.localStorage.setItem(THEME_STORAGE_KEY, next);
+frontend/src/theme/theme.test.tsx:122:    window.localStorage.clear();
+frontend/src/theme/theme.test.tsx:153:  test("explicit dark flips the class and persists to localStorage", () => {
+frontend/src/theme/theme.test.tsx:161:    expect(window.localStorage.getItem("sg-theme")).toBe("dark");
+frontend/src/theme/theme.test.tsx:165:    window.localStorage.setItem("sg-theme", "dark");
+frontend/src/theme/theme.test.tsx:178:    window.localStorage.clear();
+frontend/src/theme/theme.test.tsx:207:    expect(window.localStorage.getItem("sg-theme")).toBe("dark");
+frontend/src/App.household-nav.test.tsx:86:  window.localStorage.clear();
+frontend/src/App.household-nav.test.tsx:110:    await waitFor(() => expect(window.localStorage.getItem("household_id")).toBe("hh-a"));
+frontend/src/App.household-nav.test.tsx:117:    window.localStorage.setItem("household_id", "hh-b");
+frontend/src/App.household-nav.test.tsx:134:    expect(window.localStorage.getItem("household_id")).toBe("hh-b");
+frontend/src/App.household-nav.test.tsx:150:    await waitFor(() => expect(window.localStorage.getItem("household_id")).toBe("hh-a"));
+frontend/src/routes/query-error-alerts.test.tsx:103:  localStorage.clear();
+frontend/src/routes/ExpiryPage.test.tsx:104:  localStorage.clear();
+frontend/src/routes/ReviewPage.tsx:33:  const householdId = search.get("household_id") || localStorage.getItem("household_id") || "";
+frontend/src/routes/theme-adoption.test.tsx:120:  window.localStorage.clear();
+frontend/src/routes/theme-adoption.test.tsx:275:    expect(window.localStorage.getItem("sg-theme")).toBe("dark");
+frontend/src/routes/AssetDetailPage.tsx:275:  const householdId = search.get("household_id") || localStorage.getItem("household_id") || "";
+
+### URL-persistence sites (useSearchParams / URLSearchParams / location.search)
+frontend/src/routes/ReviewPage.tsx:3:import { Link, useNavigate, useParams, useSearchParams } from "react-router-dom";
+frontend/src/routes/ReviewPage.tsx:32:  const [search] = useSearchParams();
+frontend/src/routes/AssetDetailPage.tsx:2:import { useParams, useSearchParams, Link } from "react-router-dom";
+frontend/src/routes/AssetDetailPage.tsx:274:  const [search] = useSearchParams();
+
+## Scope gate: changed paths (porcelain)
+ M frontend/src/components/catalog/catalog.test.tsx
+ M frontend/src/routes/CatalogPage.tsx
+?? docs/worklogs/SG-212_build.log
+?? docs/worklogs/SG-212_driver.mjs
+?? docs/worklogs/SG-212_eslint.log
+?? docs/worklogs/SG-212_failpre.log
+?? docs/worklogs/SG-212_health.log
+?? docs/worklogs/SG-212_passpost.log
+?? docs/worklogs/SG-212_scope.txt
+?? docs/worklogs/SG-212_shots/
+?? docs/worklogs/SG-212_smoke.log
+?? docs/worklogs/SG-212_smoke_touch390.json
+?? docs/worklogs/SG-212_smoke_touch390.stdout
+?? docs/worklogs/SG-212_smoke_wide1440.json
+?? docs/worklogs/SG-212_smoke_wide1440.stdout
+?? docs/worklogs/SG-212_suite.log
+?? docs/worklogs/SG-212_tsc.log
+
+## Diff stat
+ frontend/src/components/catalog/catalog.test.tsx | 172 ++++++++++++++++++++++-
+ frontend/src/routes/CatalogPage.tsx              | 125 +++++++++-------
+ 2 files changed, 247 insertions(+), 50 deletions(-)
