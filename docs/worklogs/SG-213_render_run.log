@@ -1,0 +1,16 @@
+input_references_declared=True
+resolution_auto path=supported_parameters.resolution.values=['512', '1K', '2K', '4K'] chosen=512
+projection endpoints[0] worst_case_usd=0.54067200 detail=unit=token x8192tok=0.54067200
+projection endpoints[1] worst_case_usd=0.49152000 detail=unit=token x8192tok=0.49152000
+projection endpoints[2] worst_case_usd=0.49152000 detail=unit=token x8192tok=0.49152000
+guard cheapest per_render=0.49152000 known_spend=0.002437125 renders=2 total=0.98547713 verdict=proceed
+guard most_expensive per_render=0.54067200 known_spend=0.002437125 renders=2 total=1.08378113 verdict=proceed
+G2_VERDICT projection_ok total_most_expensive=1.08378113 cap=2.0 (D-20 daily bound; arc known_spend=0.002437125)
+render model=google/gemini-3.1-flash-image prompt="A plain gray ceramic cup on a plain white background." n=1 resolution=512
+g1_render sending input_references=False request_body=SG-213_g1_render_request.json
+g1_render http=402 ts=2026-10-17T19:39:53Z cost=None cost_field=null error=http_402 body=SG-213_g1_render_body.json
+G1_VERDICT http_402 -> STOP (body committed)
+g2_render skipped: stop condition on g1_render
+render_sends=1 billed_rows_with_cost=0 actual_cost_sum=0.000000000 known_spend_at_projection=0.002437125 cap=2.0
+ledger_db_rows=1 (/evidence/sg213_ledger.sqlite)
+ledger_row	2026-10-17T19:39:53Z	g1_render	google/gemini-3.1-flash-image	402	null	http_402
