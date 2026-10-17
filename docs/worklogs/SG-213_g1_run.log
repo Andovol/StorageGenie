@@ -1,0 +1,33 @@
+g1_models http=200 ts=2026-10-17T19:39:14Z bytes=47720 body=SG-213_g1_models_body.json
+g1_models ids_count=61 parsed_path=$.data[*].id
+g1_models slug_exact_present=True target=google/gemini-3.1-flash-image
+g1_models chosen_id=google/gemini-3.1-flash-image
+g1_endpoints http=200 url=https://openrouter.ai/api/v1/images/models/google/gemini-3.1-flash-image/endpoints bytes=1744 body=SG-213_g1_endpoints_body.json
+g1_endpoints endpoints_count=3 path=$.endpoints[*]
+endpoints[0].provider_name=Google Vertex
+endpoints[0].provider_slug=google-vertex/us
+endpoints[0].supported_parameters={"resolution": {"type": "enum", "values": ["512", "1K", "2K", "4K"]}, "aspect_ratio": {"type": "enum", "values": ["1:1", "1:4", "1:8", "2:3", "3:2", "3:4", "4:1", "4:3", "4:5", "5:4", "8:1", "9:16", "16:9", "21:9"]}, "n": {"type": "range", "min": 1, "max": 1}, "input_references": {"type": "range", "min": 0, "max": 14}}
+endpoints[0].pricing=[{"billable": "output_image", "unit": "token", "cost_usd": 6.6e-05}]
+endpoints[0].supports_streaming=False
+endpoints[0].param_names=["resolution", "aspect_ratio", "n", "input_references"]
+endpoints[0].input_references_in_supported=True
+endpoints[0].cheapest_resolution=model_default source=resolution not declared -> model default
+endpoints[1].provider_name=Google AI Studio
+endpoints[1].provider_slug=google-ai-studio
+endpoints[1].supported_parameters={"resolution": {"type": "enum", "values": ["512", "1K", "2K", "4K"]}, "aspect_ratio": {"type": "enum", "values": ["1:1", "1:4", "1:8", "2:3", "3:2", "3:4", "4:1", "4:3", "4:5", "5:4", "8:1", "9:16", "16:9", "21:9"]}, "n": {"type": "range", "min": 1, "max": 1}, "input_references": {"type": "range", "min": 0, "max": 14}}
+endpoints[1].pricing=[{"billable": "output_image", "unit": "token", "cost_usd": 6e-05}]
+endpoints[1].supports_streaming=False
+endpoints[1].param_names=["resolution", "aspect_ratio", "n", "input_references"]
+endpoints[1].input_references_in_supported=True
+endpoints[1].cheapest_resolution=model_default source=resolution not declared -> model default
+endpoints[2].provider_name=Google Vertex
+endpoints[2].provider_slug=google-vertex/global
+endpoints[2].supported_parameters={"resolution": {"type": "enum", "values": ["512", "1K", "2K", "4K"]}, "aspect_ratio": {"type": "enum", "values": ["1:1", "1:4", "1:8", "2:3", "3:2", "3:4", "4:1", "4:3", "4:5", "5:4", "8:1", "9:16", "16:9", "21:9"]}, "n": {"type": "range", "min": 1, "max": 1}, "input_references": {"type": "range", "min": 0, "max": 14}}
+endpoints[2].pricing=[{"billable": "output_image", "unit": "token", "cost_usd": 6e-05}]
+endpoints[2].supports_streaming=False
+endpoints[2].param_names=["resolution", "aspect_ratio", "n", "input_references"]
+endpoints[2].input_references_in_supported=True
+endpoints[2].cheapest_resolution=model_default source=resolution not declared -> model default
+ledger_db_rows=2 (/evidence/sg213_ledger.sqlite)
+ledger_row	2026-10-17T19:39:14Z	g1_models	-	200	null	null
+ledger_row	2026-10-17T19:39:14Z	g1_endpoints	google/gemini-3.1-flash-image	200	null	null
