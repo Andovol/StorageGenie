@@ -1,0 +1,12 @@
+[sg203] static server on 127.0.0.1:8014 for /tmp/opencode/sg204/build/frontend/dist
+[sg203] browser: HeadlessChrome/149.0.7827.55
+[sg203] scratch server on 127.0.0.1:34409
+[sg203] browser stderr: [1017/123947.523504:ERROR:dbus/bus.cc:405] Failed to connect to the bus: Could not parse server address: Unknown address type (examples of valid types are "tcp" and on UNIX "unix")
+[sg203] browser stderr: [1017/123947.523584:ERROR:dbus/object_proxy.cc:572] Failed to call method: org.freedesktop.DBus.NameHasOwner: object_path= /org/freedesktop/DBus: unknown error type:
+[sg203] wrote /tmp/opencode/sg204/controls-run/result.json elapsed 23s
+[sg203] static server on 127.0.0.1:8014 for /tmp/opencode/sg204/build/frontend/dist
+[sg203] browser: HeadlessChrome/149.0.7827.55
+[sg203] scratch server on 127.0.0.1:40921
+[sg203] browser stderr: [1017/124151.574671:ERROR:dbus/bus.cc:405] Failed to connect to the bus: Could not parse server address: Unknown address type (examples of valid types are "tcp" and on UNIX "unix")
+[sg203] browser stderr: [1017/124151.574831:ERROR:dbus/object_proxy.cc:572] Failed to call method: org.freedesktop.DBus.NameHasOwner: object_path= /org/freedesktop/DBus: unknown error type:
+[sg203] wrote /tmp/opencode/sg204/controls-run2/result.json elapsed 22s

@@ -1,0 +1,17 @@
+SG-204 worklog — command and event record (box clock UTC; approximate marks from artifact mtimes for the build leg)
+
+12:32:55  lane start (dispatch-storagegenie@SG-204.service; MainPID 836431; systemctl show)
+12:35:38  rules check: `bash /home/andrei/storagegenie-contract/rules_check.sh` -> rc=3; G-L1 UNCHECKED (cache not checked out at a contract tag), G-L5/G-L7 UNCHECKED (gh-unauthenticated), G-L6 BYTES (AGENTS.md sizes). Contract copy read live: CODER.md v0.50.0; RULES.md sha256 49338e39a5749821e7e26724d28715d4d27b0a34e01b359ec91bc3d85239e3ed == RULES.sha256. (`.rules-cache/` absent in repo, same condition as SG-190/194/195/196/199/203.)
+12:35:52  BASE requested=automation resolved=42f248adba37174472ac70f88d654851ea03cf3e; clean at admission; equals origin/automation before and after
+12:36:40  premises re-read on tree: CatalogToolbar.tsx:5 (Density type), :13-15 (labels), :44-45 (props), :168 (control); CatalogPage.tsx:40 (useState grid); ProductGrid.tsx:15-18 (breakpoints), :331 (table branch); tokens.css actual path frontend/src/theme/tokens.css:173 (packet cites frontend/src/styles/tokens.css:173 — path finding, line content identical)
+12:37:40  driver reused by copy: docs/worklogs/SG-203_driver.mjs (sha256 757f05c8...) -> docs/proposals/2026-10-17-density-driver.mjs; --renders mode added (options 1-4)
+12:38:40  build: `git archive HEAD frontend | tar -x -C /tmp/opencode/sg204/build` + repo node_modules symlink + `npm run build` rc=0 (~3 s; log docs/worklogs/SG-204_build.log); assets index-DHv-3aM4.css sha256 e1e5ff63...f042 and index-Yqlco3Fi.js sha256 626d1038...72e8 — byte-identical to the SG-199/SG-203 build
+12:39:47  health START {"status":"ok","db":"ok","storage":"ok"} (SG-204_health.log)
+12:39:48  controls run 1 (driver before the option-4 fix): 23 s, 0 control failures, 26/26 (SG-204_controls_run.log)
+12:40:12  renders run 1 (driver before the fix): 11 s; renders 3, renderErrors 1 — option 4 ERROR `TypeError: priv.scrub is not a function` (new runRenders code path); transcript preserved in SG-204_renders_run.log, not reconstructed
+12:40:25  material change: option-4 measure via the in-scope scrubber; frozen driver sha256 7e3c70675fa77b675fd9d97cf7e28f410977a5af5d4f3985d087b8ca0b69f089
+12:40:47  renders run 2 (frozen sha): 11 s, renders 4, renderErrors 0; guard GET 37, blocked 0, blockedExternal 0, fulfilledFromLoopback 25, byte-compares 1 clock-classified / 0 unexplained; loopbackDriverGets 52 -> /tmp/opencode/sg204/renders-run2/result.json
+12:41:20  controls re-run on the frozen sha: 22 s, 26/26 (SG-204_controls.json overwritten; log appended) — one frozen sha now covers the whole evidence set
+12:42:49  docs/worklogs/SG-204_measure.json = renders run 2 result.json (4 renders, 0 errors)
+12:43:32  health END {"status":"ok","db":"ok","storage":"ok"}
+12:43:50  all 4 renders opened by the Coder and dispositioned (UI + layout + data); proposal document written (docs/proposals/2026-10-17-density-proposal.md)

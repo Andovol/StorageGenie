@@ -1,0 +1,931 @@
+{
+ "ts": "2026-10-17T12:40:46.957Z",
+ "browser": {
+  "executable": "/home/andrei/.cache/ms-playwright/chromium_headless_shell-1228/chrome-headless-shell-linux64/chrome-headless-shell",
+  "versionProtocol": "HeadlessChrome/149.0.7827.55",
+  "protocolVersion": "1.3",
+  "userAgent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/149.0.7827.55 Safari/537.36",
+  "launchArgs": [
+   "--headless",
+   "--no-sandbox",
+   "--remote-debugging-port=0",
+   "--user-data-dir=/tmp/opencode/sg199/profile-1792240846968",
+   "--no-first-run",
+   "--no-default-browser-check",
+   "--disable-gpu",
+   "--disable-dev-shm-usage",
+   "--force-device-scale-factor=1",
+   "--window-size=1280,900",
+   "about:blank"
+  ],
+  "transport": "raw CDP over DevTools websocket (DevToolsActivePort; no wrappers)",
+  "remoteDebuggingPort": 41287
+ },
+ "serve": {
+  "dir": "/tmp/opencode/sg204/build/frontend/dist",
+  "port": 8014
+ },
+ "controls": null,
+ "density": null,
+ "touch": null,
+ "zoom": null,
+ "dark": null,
+ "renders": {
+  "axis": "renders",
+  "renderDir": "docs/proposals/2026-10-17-density-renders",
+  "base": "http://127.0.0.1:8003",
+  "renders": [
+   {
+    "option": 1,
+    "name": "leave-it (baseline)",
+    "world": "1440x900 DPR1 light",
+    "file": "docs/proposals/2026-10-17-density-renders/option-1-leave-it-baseline-grid-1440.jpg",
+    "injection": null,
+    "simulated": false,
+    "dom": {
+     "gridPresent": true,
+     "tablePresent": false,
+     "gridPressed": "true",
+     "tablePressed": "false",
+     "gridLabel": "Standard Grid",
+     "tableLabel": "Compact Table",
+     "gridAriaBusy": "false",
+     "tableRows": 0
+    },
+    "theme": {
+     "stored": null,
+     "htmlDark": false,
+     "bodyBg": "rgb(250, 250, 249)"
+    },
+    "label": "shipped default state (grid) on the real Catalog; nothing injected",
+    "maskOrder": "after_measurement_before_screenshot"
+   },
+   {
+    "option": 4,
+    "name": "width-adaptive default",
+    "world": "1440x900 DPR1 light",
+    "file": "docs/proposals/2026-10-17-density-renders/option-4-width-adaptive-table-1440.jpg",
+    "injection": "none (DOM state only: CDP Input.dispatchMouseEvent click at the real [role=group][aria-label=Density] 'Compact Table' control center — the state-selection rule is the option; the rendered state itself is the shipped table state)",
+    "simulated": "state-selection only (shipped default remains grid)",
+    "label": "the table state a fit-based width rule would select at this width; entered via the real control; the image is real rendering, not CSS simulation",
+    "entry": {
+     "method": "CDP Input.dispatchMouseEvent mouseMoved+mousePressed+mouseReleased at the control center",
+     "controlSelector": "[role=\"group\"][aria-label=\"Density\"] button:nth-of-type(2)",
+     "requested": "table",
+     "before": {
+      "gridPresent": true,
+      "tablePresent": false,
+      "gridPressed": "true",
+      "tablePressed": "false",
+      "gridLabel": "Standard Grid",
+      "tableLabel": "Compact Table",
+      "gridAriaBusy": "false",
+      "tableRows": 0
+     },
+     "after": {
+      "gridPresent": false,
+      "tablePresent": true,
+      "gridPressed": "false",
+      "tablePressed": "true",
+      "gridLabel": "Standard Grid",
+      "tableLabel": "Compact Table",
+      "gridAriaBusy": null,
+      "tableRows": 7
+     },
+     "action": {
+      "ok": true,
+      "method": "CDP Input.dispatchMouseEvent mouseMoved+mousePressed+mouseReleased at the control center",
+      "found": true,
+      "text": "Compact Table",
+      "ariaPressed": "false",
+      "rect": {
+       "left": 993.46875,
+       "top": 114,
+       "right": 1101.953125,
+       "bottom": 139,
+       "width": 108.484375,
+       "height": 25
+      },
+      "point": {
+       "x": 1047.7109375,
+       "y": 126.5
+      },
+      "insideViewport": true,
+      "pathBefore": "/",
+      "scrollY": 0,
+      "activeTag": "button",
+      "ariaPressedNow": "true",
+      "gridPresent": false,
+      "tablePresent": true,
+      "pathAfter": "/",
+      "clickPoint": {
+       "x": 1047.7109375,
+       "y": 126.5
+      }
+     }
+    },
+    "dom": {
+     "gridPresent": false,
+     "tablePresent": true,
+     "gridPressed": "false",
+     "tablePressed": "true",
+     "gridLabel": "Standard Grid",
+     "tableLabel": "Compact Table",
+     "gridAriaBusy": null,
+     "tableRows": 7
+    },
+    "measure": {
+     "requested": {
+      "width": 1440,
+      "height": 900,
+      "dpr": 1,
+      "mobile": false,
+      "touch": false
+     },
+     "devicePixelRatio": 1,
+     "ua": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/149.0.7827.55 Safari/537.36",
+     "maxTouchPoints": 0,
+     "ontouchstart": false,
+     "innerWidth_window": 1440,
+     "innerHeight_window": 900,
+     "docEl_clientWidth": 1425,
+     "docEl_clientHeight": 900,
+     "docEl_scrollWidth": 1425,
+     "docEl_scrollHeight": 952,
+     "body_scrollWidth": 1425,
+     "docEl_rect": {
+      "x": 0,
+      "y": 0,
+      "left": 0,
+      "top": 0,
+      "right": 1425,
+      "bottom": 952,
+      "width": 1425,
+      "height": 952
+     },
+     "htmlClassDark": false,
+     "storedTheme": null,
+     "visualViewport": {
+      "width": 1425,
+      "height": 900,
+      "scale": 1,
+      "offsetLeft": 0,
+      "offsetTop": 0
+     },
+     "docOverflowX": 0,
+     "docOverflowY": 52,
+     "horizontalScrollability": {
+      "maxScrollX": 0,
+      "reachedScrollX": 0
+     },
+     "stickyShell": {
+      "path": "html.light>body>div>div.bg-background.text-foreground>div.bg-background.text-foreground>div.bg-background",
+      "rect": {
+       "x": 0,
+       "y": 52,
+       "left": 0,
+       "top": 52,
+       "right": 1425,
+       "bottom": 149,
+       "width": 1425,
+       "height": 97
+      },
+      "height": 97
+     },
+     "nav": {
+      "path": "html.light>body>div>div.bg-background.text-foreground>nav.bg-card.border-border",
+      "clientWidth": 1425,
+      "clientHeight": 51,
+      "scrollWidth": 1425,
+      "rect": {
+       "x": 0,
+       "y": 0,
+       "left": 0,
+       "top": 0,
+       "right": 1425,
+       "bottom": 52,
+       "width": 1425,
+       "height": 52
+      },
+      "computedOverflowX": "visible",
+      "computedDisplay": "flex",
+      "computedFlexWrap": "wrap"
+     },
+     "navLinks": [
+      {
+       "text": "StorageGenie",
+       "rect": {
+        "x": 24,
+        "y": 16,
+        "left": 24,
+        "top": 16,
+        "right": 146.88,
+        "bottom": 35,
+        "width": 122.88,
+        "height": 19
+       },
+       "visible": true
+      },
+      {
+       "text": "Catalog",
+       "rect": {
+        "x": 170.88,
+        "y": 12,
+        "left": 170.88,
+        "top": 12,
+        "right": 246.88,
+        "bottom": 39,
+        "width": 76,
+        "height": 27
+       },
+       "visible": true
+      },
+      {
+       "text": "Capture",
+       "rect": {
+        "x": 254.88,
+        "y": 12,
+        "left": 254.88,
+        "top": 12,
+        "right": 326.58,
+        "bottom": 39,
+        "width": 71.7,
+        "height": 27
+       },
+       "visible": true
+      },
+      {
+       "text": "Inbox0",
+       "rect": {
+        "x": 334.58,
+        "y": 12,
+        "left": 334.58,
+        "top": 12,
+        "right": 417.16,
+        "bottom": 39,
+        "width": 82.58,
+        "height": 27
+       },
+       "visible": true
+      },
+      {
+       "text": "Planning",
+       "rect": {
+        "x": 425.16,
+        "y": 12,
+        "left": 425.16,
+        "top": 12,
+        "right": 501.16,
+        "bottom": 39,
+        "width": 76,
+        "height": 27
+       },
+       "visible": true
+      },
+      {
+       "text": "Chat",
+       "rect": {
+        "x": 509.16,
+        "y": 12,
+        "left": 509.16,
+        "top": 12,
+        "right": 559.55,
+        "bottom": 39,
+        "width": 50.39,
+        "height": 27
+       },
+       "visible": true
+      },
+      {
+       "text": "Analytics",
+       "rect": {
+        "x": 567.55,
+        "y": 12,
+        "left": 567.55,
+        "top": 12,
+        "right": 646.59,
+        "bottom": 39,
+        "width": 79.05,
+        "height": 27
+       },
+       "visible": true
+      },
+      {
+       "text": "Expiry",
+       "rect": {
+        "x": 654.59,
+        "y": 12,
+        "left": 654.59,
+        "top": 12,
+        "right": 715.41,
+        "bottom": 39,
+        "width": 60.81,
+        "height": 27
+       },
+       "visible": true
+      },
+      {
+       "text": "Settings",
+       "rect": {
+        "x": 723.41,
+        "y": 12,
+        "left": 723.41,
+        "top": 12,
+        "right": 796.73,
+        "bottom": 39,
+        "width": 73.33,
+        "height": 27
+       },
+       "visible": true
+      }
+     ],
+     "offenders": [],
+     "density": {
+      "grids": [],
+      "tables": [
+       {
+        "path": "div>div.bg-background.text-foreground>div.bg-background.text-foreground>main.page-container>div>table",
+        "rect": {
+         "x": 186.5,
+         "y": 173,
+         "left": 186.5,
+         "top": 173,
+         "right": 1238.5,
+         "bottom": 630,
+         "width": 1052,
+         "height": 457
+        },
+        "rows": 7,
+        "firstRowCells": 7,
+        "firstRowHeight": 61,
+        "tableScrollWidth": 1052,
+        "parentClientWidth": 1052,
+        "tableOverflowsParent": false,
+        "fontSize": "16px"
+       }
+      ]
+     },
+     "gridTarget": null,
+     "tableTarget": {
+      "selector": "table[role=\"table\"]",
+      "present": true,
+      "ariaLabel": "Product results",
+      "rect": {
+       "x": 186.5,
+       "y": 173,
+       "left": 186.5,
+       "top": 173,
+       "right": 1238.5,
+       "bottom": 630,
+       "width": 1052,
+       "height": 457
+      },
+      "rowCount": 7,
+      "headerCellCount": 7,
+      "firstRowCellCount": 7,
+      "firstRowHeight": 61,
+      "headerRowHeight": 29.5,
+      "tableScrollWidth": 1052,
+      "tableClientWidth": 1052,
+      "parentClientWidth": 1052,
+      "colgroupWidths": [
+       "56px",
+       "200px",
+       "140px",
+       "130px",
+       "120px",
+       "110px",
+       "48px"
+      ],
+      "firstRowCells": [
+       {
+        "tag": "td",
+        "rect": {
+         "x": 186.5,
+         "y": 202.5,
+         "left": 186.5,
+         "top": 202.5,
+         "right": 261.8,
+         "bottom": 263.5,
+         "width": 75.3,
+         "height": 61
+        },
+        "fontSize": "16px",
+        "textAlign": "center",
+        "computedColor": "rgb(28, 25, 23)",
+        "computedBg": "rgba(0, 0, 0, 0)"
+       },
+       {
+        "tag": "td",
+        "rect": {
+         "x": 261.8,
+         "y": 202.5,
+         "left": 261.8,
+         "top": 202.5,
+         "right": 512.78,
+         "bottom": 263.5,
+         "width": 250.98,
+         "height": 61
+        },
+        "fontSize": "16px",
+        "textAlign": "start",
+        "computedColor": "rgb(28, 25, 23)",
+        "computedBg": "rgba(0, 0, 0, 0)"
+       },
+       {
+        "tag": "td",
+        "rect": {
+         "x": 512.78,
+         "y": 202.5,
+         "left": 512.78,
+         "top": 202.5,
+         "right": 688.47,
+         "bottom": 263.5,
+         "width": 175.69,
+         "height": 61
+        },
+        "fontSize": "16px",
+        "textAlign": "start",
+        "computedColor": "rgb(28, 25, 23)",
+        "computedBg": "rgba(0, 0, 0, 0)"
+       },
+       {
+        "tag": "td",
+        "rect": {
+         "x": 688.47,
+         "y": 202.5,
+         "left": 688.47,
+         "top": 202.5,
+         "right": 851.61,
+         "bottom": 263.5,
+         "width": 163.14,
+         "height": 61
+        },
+        "fontSize": "16px",
+        "textAlign": "start",
+        "computedColor": "rgb(28, 25, 23)",
+        "computedBg": "rgba(0, 0, 0, 0)"
+       },
+       {
+        "tag": "td",
+        "rect": {
+         "x": 851.61,
+         "y": 202.5,
+         "left": 851.61,
+         "top": 202.5,
+         "right": 1017.59,
+         "bottom": 263.5,
+         "width": 165.98,
+         "height": 61
+        },
+        "fontSize": "16px",
+        "textAlign": "start",
+        "computedColor": "rgb(28, 25, 23)",
+        "computedBg": "rgba(0, 0, 0, 0)"
+       },
+       {
+        "tag": "td",
+        "rect": {
+         "x": 1017.59,
+         "y": 202.5,
+         "left": 1017.59,
+         "top": 202.5,
+         "right": 1155.64,
+         "bottom": 263.5,
+         "width": 138.05,
+         "height": 61
+        },
+        "fontSize": "16px",
+        "textAlign": "right",
+        "computedColor": "rgb(107, 101, 97)",
+        "computedBg": "rgba(0, 0, 0, 0)"
+       },
+       {
+        "tag": "td",
+        "rect": {
+         "x": 1155.64,
+         "y": 202.5,
+         "left": 1155.64,
+         "top": 202.5,
+         "right": 1238.5,
+         "bottom": 263.5,
+         "width": 82.86,
+         "height": 61
+        },
+        "fontSize": "16px",
+        "textAlign": "center",
+        "computedColor": "rgb(28, 25, 23)",
+        "computedBg": "rgba(0, 0, 0, 0)"
+       }
+      ],
+      "container": {
+       "selector": "[data-testid=\"table-scroll\"]",
+       "present": true,
+       "role": "region",
+       "ariaLabel": "Product results table",
+       "rect": {
+        "x": 186.5,
+        "y": 173,
+        "left": 186.5,
+        "top": 173,
+        "right": 1238.5,
+        "bottom": 630,
+        "width": 1052,
+        "height": 457
+       },
+       "clientWidth": 1052,
+       "clientHeight": 457,
+       "scrollWidth": 1052,
+       "scrollHeight": 457,
+       "computedOverflowX": "auto",
+       "scrollable": false,
+       "maxScrollLeft": 0,
+       "reachedScrollLeft": 0,
+       "scrollLeftResetTo": 0,
+       "documentScrolledX": 0
+      },
+      "docOverflowXAtTable": 0
+     },
+     "densityControl": {
+      "found": true,
+      "selector": "[role=\"group\"][aria-label=\"Density\"]",
+      "groupAriaLabel": "Density",
+      "groupDisplay": "flex",
+      "groupGap": "4px",
+      "groupRect": {
+       "x": 880.78,
+       "y": 114,
+       "left": 880.78,
+       "top": 114,
+       "right": 1101.94,
+       "bottom": 139,
+       "width": 221.16,
+       "height": 25
+      },
+      "buttons": [
+       {
+        "text": "Standard Grid",
+        "ariaPressed": "false",
+        "rect": {
+         "x": 880.78,
+         "y": 114,
+         "left": 880.78,
+         "top": 114,
+         "right": 983.72,
+         "bottom": 139,
+         "width": 102.94,
+         "height": 25
+        },
+        "computedBg": "rgb(245, 245, 244)",
+        "computedColor": "rgb(107, 101, 97)",
+        "borderColor": "rgb(0, 0, 0)",
+        "fontWeight": "400",
+        "fontSize": "13px",
+        "cursor": "pointer",
+        "contrast_ratio": 5.2606,
+        "largeText": false,
+        "bgChainAllOpaque": false,
+        "bgCompositeAlphaOverTransparent": 1,
+        "partialAlphaLinks": [],
+        "backdrop_image": null,
+        "opacity_chain": [],
+        "focusVisibleNow": false
+       },
+       {
+        "text": "Compact Table",
+        "ariaPressed": "true",
+        "rect": {
+         "x": 987.72,
+         "y": 114,
+         "left": 987.72,
+         "top": 114,
+         "right": 1101.94,
+         "bottom": 139,
+         "width": 114.22,
+         "height": 25
+        },
+        "computedBg": "rgb(110, 48, 46)",
+        "computedColor": "rgb(250, 250, 249)",
+        "borderColor": "rgb(0, 0, 0)",
+        "fontWeight": "600",
+        "fontSize": "13px",
+        "cursor": "pointer",
+        "contrast_ratio": 9.4611,
+        "largeText": false,
+        "bgChainAllOpaque": false,
+        "bgCompositeAlphaOverTransparent": 1,
+        "partialAlphaLinks": [],
+        "backdrop_image": null,
+        "opacity_chain": [],
+        "focusVisibleNow": false
+       }
+      ]
+     }
+    },
+    "maskOrder": "after_measurement_before_screenshot"
+   },
+   {
+    "option": 2,
+    "name": "dark focus-ring fix",
+    "world": "1440x900 DPR1 dark (sg-theme=dark seeded pre-load)",
+    "file": "docs/proposals/2026-10-17-density-renders/option-2-dark-focus-ring-fix.jpg",
+    "injection": "html.dark .focus-ring:focus-visible { outline-color: hsl(var(--link)); }",
+    "simulated": true,
+    "label": "driver-injected CSS simulation of a dark-adapted ring tint on the real focused control (2x close-up); not shipped behaviour",
+    "theme": {
+     "stored": "dark",
+     "htmlDark": true,
+     "bodyBg": "rgb(15, 14, 13)"
+    },
+    "focusEntry": {
+     "found": true,
+     "tabs": 22,
+     "startActive": {
+      "tag": "body",
+      "text": "StorageGenieMenuCatalogCapture",
+      "inDensityGroup": false
+     }
+    },
+    "ringBefore": {
+     "tag": "button",
+     "text": "Standard Grid",
+     "ariaPressed": "true",
+     "focusVisible": true,
+     "rect": {
+      "left": 880.78,
+      "top": 114,
+      "right": 989.47,
+      "bottom": 139,
+      "width": 108.69,
+      "height": 25
+     },
+     "outlineStyle": "solid",
+     "outlineWidth": "2px",
+     "outlineColor": "rgb(110, 48, 46)",
+     "outlineOffset": "2px",
+     "boxShadow": "none",
+     "outlineRgba": {
+      "r": 110,
+      "g": 48,
+      "b": 46,
+      "a": 1
+     },
+     "outlineSurroundingBg": {
+      "r": 28,
+      "g": 26,
+      "b": 24,
+      "a": 1
+     },
+     "ownComputedBg": {
+      "r": 110,
+      "g": 48,
+      "b": 46,
+      "a": 1
+     },
+     "ringVsOwnBgRatio": 1,
+     "ringVsSurroundingBgRatio": 1.7559,
+     "note": "the ring sits outside the button (outline-offset 2px), so its contrast surface is the surrounding background chain (parent), recorded as ringVsSurroundingBgRatio; ringVsOwnBgRatio is the worst case against the button face"
+    },
+    "ringAfter": {
+     "tag": "button",
+     "text": "Standard Grid",
+     "ariaPressed": "true",
+     "focusVisible": true,
+     "rect": {
+      "left": 880.78,
+      "top": 114,
+      "right": 989.47,
+      "bottom": 139,
+      "width": 108.69,
+      "height": 25
+     },
+     "outlineStyle": "solid",
+     "outlineWidth": "2px",
+     "outlineColor": "rgb(213, 156, 154)",
+     "outlineOffset": "2px",
+     "boxShadow": "none",
+     "outlineRgba": {
+      "r": 213,
+      "g": 156,
+      "b": 154,
+      "a": 1
+     },
+     "outlineSurroundingBg": {
+      "r": 28,
+      "g": 26,
+      "b": 24,
+      "a": 1
+     },
+     "ownComputedBg": {
+      "r": 110,
+      "g": 48,
+      "b": 46,
+      "a": 1
+     },
+     "ringVsOwnBgRatio": 4.2589,
+     "ringVsSurroundingBgRatio": 7.4784,
+     "note": "the ring sits outside the button (outline-offset 2px), so its contrast surface is the surrounding background chain (parent), recorded as ringVsSurroundingBgRatio; ringVsOwnBgRatio is the worst case against the button face"
+    },
+    "injectionResult": {
+     "injected": true,
+     "label": "sg204-option-2-focus-ring",
+     "cssText": "html.dark .focus-ring:focus-visible { outline-color: hsl(var(--link)); }",
+     "styleSheetCount": 3
+    },
+    "clip": {
+     "x": 861.78125,
+     "y": 78,
+     "width": 293.171875,
+     "height": 97
+    }
+   },
+   {
+    "option": 3,
+    "name": "native default-button token alignment in dark",
+    "world": "1440x900 DPR1 dark, /analytics (the 'Generate summary' native face)",
+    "file": "docs/proposals/2026-10-17-density-renders/option-3-native-button-token-dark.jpg",
+    "injection": "html.dark button:not([class]) { background-color: hsl(var(--card)); color: hsl(var(--foreground)); border: 1px solid hsl(var(--border)); border-radius: 6px; padding: 4px 10px; cursor: pointer; font-size: 13px; }",
+    "simulated": true,
+    "label": "driver-injected CSS simulation of a token-consistent treatment for unclassed native buttons; not shipped behaviour",
+    "theme": {
+     "stored": "dark",
+     "htmlDark": true,
+     "bodyBg": "rgb(15, 14, 13)"
+    },
+    "offTokenBefore": [
+     {
+      "text": "Generate summary",
+      "classNameAttr": null,
+      "rect": {
+       "left": 194,
+       "top": 511.55,
+       "width": 130.08,
+       "height": 21
+      },
+      "computedBg": "rgb(239, 239, 239)",
+      "computedColor": "rgb(0, 0, 0)",
+      "bgLum": 0.8632,
+      "fgLum": 0,
+      "lightFaceInDark": true
+     }
+    ],
+    "offTokenCount": 1,
+    "buttonsBefore": [
+     {
+      "text": "",
+      "classNameAttr": "bg-card text-foreground border-border focus-ring",
+      "rect": {
+       "left": 806.77,
+       "top": 12,
+       "width": 32,
+       "height": 32
+      },
+      "computedBg": "rgb(28, 26, 24)",
+      "computedColor": "rgb(245, 245, 244)",
+      "bgLum": 0.0105,
+      "fgLum": 0.9125,
+      "lightFaceInDark": false
+     },
+     {
+      "text": "Generate summary",
+      "classNameAttr": null,
+      "rect": {
+       "left": 194,
+       "top": 511.55,
+       "width": 130.08,
+       "height": 21
+      },
+      "computedBg": "rgb(239, 239, 239)",
+      "computedColor": "rgb(0, 0, 0)",
+      "bgLum": 0.8632,
+      "fgLum": 0,
+      "lightFaceInDark": true
+     }
+    ],
+    "buttonsAfter": [
+     {
+      "text": "",
+      "classNameAttr": "bg-card text-foreground border-border focus-ring",
+      "rect": {
+       "left": 806.77,
+       "top": 12,
+       "width": 32,
+       "height": 32
+      },
+      "computedBg": "rgb(28, 26, 24)",
+      "computedColor": "rgb(245, 245, 244)",
+      "bgLum": 0.0105,
+      "fgLum": 0.9125,
+      "lightFaceInDark": false
+     },
+     {
+      "text": "Generate summary",
+      "classNameAttr": null,
+      "rect": {
+       "left": 194,
+       "top": 511.55,
+       "width": 133.27,
+       "height": 25
+      },
+      "computedBg": "rgb(28, 26, 24)",
+      "computedColor": "rgb(245, 245, 244)",
+      "bgLum": 0.0105,
+      "fgLum": 0.9125,
+      "lightFaceInDark": false
+     }
+    ],
+    "injectionResult": {
+     "injected": true,
+     "label": "sg204-option-3-native-button",
+     "cssText": "html.dark button:not([class]) { background-color: hsl(var(--card)); color: hsl(var(--foreground)); border: 1px solid hsl(var(--border)); border-radius: 6px; padding: 4px 10px; cursor: pointer; font-size: 13px; }",
+     "styleSheetCount": 2
+    }
+   }
+  ],
+  "guardAggregate": {
+   "methods": {
+    "GET": 37
+   },
+   "blocked": [],
+   "blockedExternal": [],
+   "requestCount": 37,
+   "fulfilledFromLoopback": 25,
+   "fulfillFailures": 0,
+   "simulatedFailures": 0,
+   "byteMismatches": [
+    {
+     "url": "/v1/analytics/summary?household_id=■■",
+     "sha_fulfilled": "de6df692bcf8c624fb4ca6a026f665cb1714cdcf0ce50ffc88298b97029b71e7",
+     "sha_direct": "824cf998277accea8cf91ed7d674df04e99f1d03b16444ad5e49b81b9e126e72",
+     "classification": "nondeterministic_clock_field",
+     "diffPaths": [
+      {
+       "path": "generated_at",
+       "a": "2026-10-17T12:40:54.989082+00:00",
+       "b": "2026-10-17T12:40:54.998627+00:00"
+      }
+     ],
+     "fields": [
+      "generated_at"
+     ]
+    }
+   ],
+   "byteMismatchClock": 1,
+   "byteMismatchUnexplained": 0,
+   "bytesCompared": 71112,
+   "apiOrigin": "http://localhost:8003"
+  }
+ },
+ "errors": [],
+ "staticServerLog": [
+  {
+   "method": "GET",
+   "url": "/"
+  },
+  {
+   "method": "GET",
+   "url": "/assets/index-Yqlco3Fi.js"
+  },
+  {
+   "method": "GET",
+   "url": "/assets/index-DHv-3aM4.css"
+  },
+  {
+   "method": "GET",
+   "url": "/"
+  },
+  {
+   "method": "GET",
+   "url": "/assets/index-Yqlco3Fi.js"
+  },
+  {
+   "method": "GET",
+   "url": "/assets/index-DHv-3aM4.css"
+  },
+  {
+   "method": "GET",
+   "url": "/"
+  },
+  {
+   "method": "GET",
+   "url": "/assets/index-Yqlco3Fi.js"
+  },
+  {
+   "method": "GET",
+   "url": "/assets/index-DHv-3aM4.css"
+  },
+  {
+   "method": "GET",
+   "url": "/analytics"
+  },
+  {
+   "method": "GET",
+   "url": "/assets/index-Yqlco3Fi.js"
+  },
+  {
+   "method": "GET",
+   "url": "/assets/index-DHv-3aM4.css"
+  }
+ ],
+ "elapsedSeconds": 11
+}

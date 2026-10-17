@@ -1,0 +1,19 @@
+[sg203] static server on 127.0.0.1:8014 for /tmp/opencode/sg204/build/frontend/dist
+[sg203] browser: HeadlessChrome/149.0.7827.55
+[sg203] browser stderr: [1017/124013.324678:ERROR:dbus/bus.cc:405] Failed to connect to the bus: Could not parse server address: Unknown address type (examples of valid types are "tcp" and on UNIX "unix")
+[sg203] browser stderr: [1017/124013.324777:ERROR:dbus/object_proxy.cc:572] Failed to call method: org.freedesktop.DBus.NameHasOwner: object_path= /org/freedesktop/DBus: unknown error type:
+[sg203] render 1 docs/proposals/2026-10-17-density-renders/option-1-leave-it-baseline-grid-1440.jpg
+[sg203] render 4 ERROR TypeError: priv.scrub is not a function
+[sg203] render 2 docs/proposals/2026-10-17-density-renders/option-2-dark-focus-ring-fix.jpg
+[sg203] render 3 docs/proposals/2026-10-17-density-renders/option-3-native-button-token-dark.jpg
+[sg203] wrote /tmp/opencode/sg204/renders-run/result.json elapsed 11s
+=== failed run preserved ===
+[sg203] static server on 127.0.0.1:8014 for /tmp/opencode/sg204/build/frontend/dist
+[sg203] browser: HeadlessChrome/149.0.7827.55
+[sg203] browser stderr: [1017/124047.208567:ERROR:dbus/bus.cc:405] Failed to connect to the bus: Could not parse server address: Unknown address type (examples of valid types are "tcp" and on UNIX "unix")
+[sg203] browser stderr: [1017/124047.208669:ERROR:dbus/object_proxy.cc:572] Failed to call method: org.freedesktop.DBus.NameHasOwner: object_path= /org/freedesktop/DBus: unknown error type:
+[sg203] render 1 docs/proposals/2026-10-17-density-renders/option-1-leave-it-baseline-grid-1440.jpg
+[sg203] render 4 docs/proposals/2026-10-17-density-renders/option-4-width-adaptive-table-1440.jpg
+[sg203] render 2 docs/proposals/2026-10-17-density-renders/option-2-dark-focus-ring-fix.jpg
+[sg203] render 3 docs/proposals/2026-10-17-density-renders/option-3-native-button-token-dark.jpg
+[sg203] wrote /tmp/opencode/sg204/renders-run2/result.json elapsed 11s

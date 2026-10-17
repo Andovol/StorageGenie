@@ -1,0 +1,678 @@
+{
+ "controls": [
+  {
+   "name": "scratch_fit_390",
+   "ok": true,
+   "detail": {
+    "docOverflowX": 0,
+    "clientWidth": 390,
+    "scrollWidth": 390
+   }
+  },
+  {
+   "name": "scratch_overflow_390",
+   "ok": true,
+   "detail": {
+    "wideRectWidth": 1200,
+    "docOverflowX": 810
+   }
+  },
+  {
+   "name": "touch_emulation_negative",
+   "ok": true,
+   "detail": {
+    "maxTouchPoints": 0,
+    "config": "mobile:false touch:false"
+   }
+  },
+  {
+   "name": "touch_emulation_positive",
+   "ok": true,
+   "detail": {
+    "maxTouchPoints": 5,
+    "ontouchstart": false,
+    "ua": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/149.0.7827.55 Safari/537.36",
+    "config": "mobile:true touch:true maxTouchPoints=5",
+    "ontouchstartNote": "property absent in this shell; tap fixture proves delivery"
+   }
+  },
+  {
+   "name": "touch_emulation_wrong_expectation_must_fail",
+   "ok": true,
+   "detail": {
+    "computed": 5,
+    "wrongExpectation": 7
+   }
+  },
+  {
+   "name": "scratch_fit_390_mobile",
+   "ok": true,
+   "detail": {
+    "docOverflowX": 0,
+    "clientWidth": 390,
+    "config": "mobile:true touch:true"
+   }
+  },
+  {
+   "name": "scratch_overflow_390_mobile",
+   "ok": true,
+   "detail": {
+    "wideRectWidth": 1200,
+    "docOverflowX": 810
+   }
+  },
+  {
+   "name": "tap_fixture_delivers",
+   "ok": true,
+   "detail": {
+    "tapProbe": {
+     "ok": true,
+     "hit": "html>body>button",
+     "activeTag": "button"
+    },
+    "touchLog": {
+     "t": {
+      "touchstart": 1,
+      "touchend": 1,
+      "click": 1
+     },
+     "u": {
+      "touchstart": 0,
+      "touchend": 0,
+      "click": 0
+     }
+    }
+   }
+  },
+  {
+   "name": "tap_fixture_wrong_expectation_must_fail",
+   "ok": true,
+   "detail": {
+    "computed": 1,
+    "wrongExpectation": 99
+   }
+  },
+  {
+   "name": "zoom_emulation_pair",
+   "ok": true,
+   "detail": {
+    "at100": {
+     "clientWidth": 1280,
+     "dpr": 1
+    },
+    "at200": {
+     "clientWidth": 640,
+     "dpr": 2
+    }
+   }
+  },
+  {
+   "name": "zoom_wrong_expectation_must_fail",
+   "ok": true,
+   "detail": {
+    "computedAt200": 640,
+    "wrongExpectation": 700
+   }
+  },
+  {
+   "name": "dark_seed_negative",
+   "ok": true,
+   "detail": {
+    "stored": null,
+    "htmlDark": false,
+    "prefersDark": false
+   }
+  },
+  {
+   "name": "dark_seed_positive",
+   "ok": true,
+   "detail": {
+    "stored": "dark",
+    "htmlDark": true
+   }
+  },
+  {
+   "name": "dark_seed_wrong_expectation_must_fail",
+   "ok": true,
+   "detail": {
+    "computed": "dark",
+    "wrongExpectation": "light"
+   }
+  },
+  {
+   "name": "density_toggle_grid_state",
+   "ok": true,
+   "detail": {
+    "gridPresent": true,
+    "tablePresent": false,
+    "gridPressed": "true",
+    "tablePressed": "false",
+    "gridLabel": "Standard Grid",
+    "tableLabel": "Compact Table",
+    "gridAriaBusy": "false",
+    "tableRows": 0
+   }
+  },
+  {
+   "name": "density_toggle_table_state",
+   "ok": true,
+   "detail": {
+    "stateEnteredVia": "CDP Input.dispatchMouseEvent mouseMoved+mousePressed+mouseReleased at the control center",
+    "ariaBefore": "false",
+    "tg1": {
+     "gridPresent": false,
+     "tablePresent": true,
+     "gridPressed": "false",
+     "tablePressed": "true",
+     "gridLabel": "Standard Grid",
+     "tableLabel": "Compact Table",
+     "gridAriaBusy": null,
+     "tableRows": 7
+    }
+   }
+  },
+  {
+   "name": "density_toggle_wrong_expectation_must_fail",
+   "ok": true,
+   "detail": {
+    "computedGridDomPresentInTableState": false,
+    "wrongExpectation": true
+   }
+  },
+  {
+   "name": "density_toggle_keyboard_returns_grid",
+   "ok": true,
+   "detail": {
+    "stateEnteredVia": "element.focus() + CDP Input.dispatchKeyEvent rawKeyDown/keyUp Enter",
+    "keyboard": {
+     "ok": true,
+     "method": "element.focus() + CDP Input.dispatchKeyEvent rawKeyDown/keyUp Enter",
+     "found": true,
+     "activeText": "Standard Grid",
+     "activeTag": "button",
+     "focusVisible": false,
+     "ariaPressedNow": "true",
+     "gridPresent": true,
+     "tablePresent": false
+    },
+    "after": {
+     "gridPresent": true,
+     "tablePresent": false,
+     "gridPressed": "true",
+     "tablePressed": "false",
+     "gridLabel": "Standard Grid",
+     "tableLabel": "Compact Table",
+     "gridAriaBusy": "false",
+     "tableRows": 0
+    }
+   }
+  },
+  {
+   "name": "surfaces_probe_present_absent",
+   "ok": true,
+   "detail": {
+    "surfaces": [
+     {
+      "label": "fixture present div",
+      "selector": "#x",
+      "present": true,
+      "tag": "div",
+      "text": "sg199 fixture",
+      "rect": {
+       "x": 0,
+       "y": 0,
+       "left": 0,
+       "top": 0,
+       "right": 1440,
+       "bottom": 60,
+       "width": 1440,
+       "height": 60
+      },
+      "visibleInViewport": true,
+      "computedColor": "rgb(0, 0, 0)",
+      "fg_rgba": {
+       "r": 0,
+       "g": 0,
+       "b": 0,
+       "a": 1
+      },
+      "bg_effective": {
+       "r": 238,
+       "g": 238,
+       "b": 238,
+       "a": 1
+      },
+      "backdrop_image": null,
+      "opacity_chain": [],
+      "bgChainAllOpaque": false,
+      "chainDepth": 3,
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "largeText": false,
+      "ratio_exact": 18.0999,
+      "sampleMethod": "element computed color vs ancestor background chain (works for select/link text without a laid-out text node)"
+     },
+     {
+      "label": "fixture absent div",
+      "selector": "#nope",
+      "present": false
+     }
+    ]
+   }
+  },
+  {
+   "name": "spacing_pass_fixture",
+   "ok": true,
+   "detail": {
+    "got": [
+     "PASS-SPACING",
+     "PASS-SPACING"
+    ]
+   }
+  },
+  {
+   "name": "spacing_fail_fixture",
+   "ok": true,
+   "detail": {
+    "got": [
+     "FAIL",
+     "FAIL"
+    ]
+   }
+  },
+  {
+   "name": "contrast_known_controls",
+   "ok": true,
+   "detail": {
+    "cases": [
+     {
+      "case": "#767676 on #ffffff",
+      "computed": 4.5422,
+      "expected": 4.54,
+      "ok": true
+     },
+     {
+      "case": "#777777 on #ffffff",
+      "computed": 4.4781,
+      "expected": 4.48,
+      "ok": true
+     },
+     {
+      "case": "#000000 on #ffffff",
+      "computed": 21,
+      "expected": 21,
+      "ok": true
+     },
+     {
+      "case": "#ffffff on #ffffff",
+      "computed": 1,
+      "expected": 1,
+      "ok": true
+     }
+    ]
+   }
+  },
+  {
+   "name": "contrast_wrong_expectation_must_fail",
+   "ok": true,
+   "detail": {
+    "case": "#767676 on #ffffff == 5.0 (deliberately wrong control)",
+    "computed": 4.5422,
+    "expected": 5,
+    "ok": false
+   }
+  },
+  {
+   "name": "transport_guard_post",
+   "ok": true,
+   "detail": {
+    "postResult": "rejected:TypeError",
+    "serverSawPost": false,
+    "guardBlocked": true
+   }
+  },
+  {
+   "name": "fulfillment_bytecompare_discriminates",
+   "ok": true,
+   "detail": {
+    "sameEqual": true,
+    "diffDifferent": true,
+    "sha_health_a": "b7f215e0f5e1651310da6973f2cf9fdb33eec26c5134bc6591f172e1ece9743f",
+    "sha_health_b": "b7f215e0f5e1651310da6973f2cf9fdb33eec26c5134bc6591f172e1ece9743f",
+    "sha_households": "6921583771fb79bec868339653a91050d1163430ed19fa0e96268522adf8038f"
+   }
+  },
+  {
+   "name": "bytecompare_classifier_clock_vs_unexplained",
+   "ok": true,
+   "detail": {
+    "clockOnlyPair": {
+     "clockOnly": true,
+     "diffPaths": [
+      {
+       "path": "generated_at",
+       "a": "2026-10-16T00:00:00.000001+00:00",
+       "b": "2026-10-16T00:00:01.000002+00:00"
+      }
+     ],
+     "fields": [
+      "generated_at"
+     ]
+    },
+    "otherFieldDiff": {
+     "clockOnly": false,
+     "diffPaths": [
+      {
+       "path": "a",
+       "a": 1,
+       "b": 2
+      },
+      {
+       "path": "generated_at",
+       "a": "2026-10-16T00:00:00.000001+00:00",
+       "b": "2026-10-16T00:00:01.000002+00:00"
+      }
+     ],
+     "fields": [
+      "a",
+      "generated_at"
+     ]
+    },
+    "nonJsonDiff": {
+     "clockOnly": false,
+     "diffPaths": [
+      {
+       "path": "(body is not JSON)"
+      }
+     ]
+    },
+    "nonIsoClock": {
+     "clockOnly": false,
+     "diffPaths": [
+      {
+       "path": "generated_at",
+       "a": "not-a-date",
+       "b": "still-not-a-date"
+      }
+     ],
+     "fields": [
+      "generated_at"
+     ]
+    }
+   }
+  }
+ ],
+ "contrastKnown": [
+  {
+   "case": "#767676 on #ffffff",
+   "computed": 4.5422,
+   "expected": 4.54,
+   "ok": true
+  },
+  {
+   "case": "#777777 on #ffffff",
+   "computed": 4.4781,
+   "expected": 4.48,
+   "ok": true
+  },
+  {
+   "case": "#000000 on #ffffff",
+   "computed": 21,
+   "expected": 21,
+   "ok": true
+  },
+  {
+   "case": "#ffffff on #ffffff",
+   "computed": 1,
+   "expected": 1,
+   "ok": true
+  },
+  {
+   "case": "#767676 on #ffffff == 5.0 (deliberately wrong control)",
+   "computed": 4.5422,
+   "expected": 5,
+   "ok": false
+  }
+ ],
+ "scratchServerLog": {
+  "requests": [
+   {
+    "method": "GET",
+    "url": "/guard.html"
+   }
+  ]
+ },
+ "guard": {
+  "postResult": "rejected:TypeError",
+  "serverSawPost": false,
+  "blockedByDriver": true,
+  "blockedList": [
+   {
+    "method": "POST",
+    "url": "http://127.0.0.1:40921/probe"
+   }
+  ],
+  "methodsSeen": {
+   "GET": 51,
+   "POST": 1
+  }
+ },
+ "browser": "HeadlessChrome/149.0.7827.55",
+ "ts": "2026-10-17T12:41:51.335Z",
+ "seedRemovedAfterControls": true,
+ "seedAfterRemoval": {
+  "stored": "dark",
+  "htmlDark": true
+ },
+ "seedCleared": null,
+ "densityToggleControl": {
+  "gridState": {
+   "gridPresent": true,
+   "tablePresent": false,
+   "gridPressed": "true",
+   "tablePressed": "false",
+   "gridLabel": "Standard Grid",
+   "tableLabel": "Compact Table",
+   "gridAriaBusy": "false",
+   "tableRows": 0
+  },
+  "tableState": {
+   "gridPresent": false,
+   "tablePresent": true,
+   "gridPressed": "false",
+   "tablePressed": "true",
+   "gridLabel": "Standard Grid",
+   "tableLabel": "Compact Table",
+   "gridAriaBusy": null,
+   "tableRows": 7
+  },
+  "backToGridState": {
+   "gridPresent": true,
+   "tablePresent": false,
+   "gridPressed": "true",
+   "tablePressed": "false",
+   "gridLabel": "Standard Grid",
+   "tableLabel": "Compact Table",
+   "gridAriaBusy": "false",
+   "tableRows": 0
+  },
+  "tableSwitch": {
+   "ok": true,
+   "method": "CDP Input.dispatchMouseEvent mouseMoved+mousePressed+mouseReleased at the control center",
+   "found": true,
+   "text": "Compact Table",
+   "ariaPressed": "false",
+   "rect": {
+    "left": 993.46875,
+    "top": 114,
+    "right": 1101.953125,
+    "bottom": 139,
+    "width": 108.484375,
+    "height": 25
+   },
+   "point": {
+    "x": 1047.7109375,
+    "y": 126.5
+   },
+   "insideViewport": true,
+   "pathBefore": "/",
+   "scrollY": 0,
+   "activeTag": "button",
+   "ariaPressedNow": "true",
+   "gridPresent": false,
+   "tablePresent": true,
+   "pathAfter": "/",
+   "clickPoint": {
+    "x": 1047.7109375,
+    "y": 126.5
+   }
+  },
+  "gridSwitchKeyboard": {
+   "ok": true,
+   "method": "element.focus() + CDP Input.dispatchKeyEvent rawKeyDown/keyUp Enter",
+   "found": true,
+   "activeText": "Standard Grid",
+   "activeTag": "button",
+   "focusVisible": false,
+   "ariaPressedNow": "true",
+   "gridPresent": true,
+   "tablePresent": false
+  }
+ },
+ "spacingFixturePass": [
+  {
+   "text": "a",
+   "tag": "button",
+   "path": "html>body>button",
+   "inNavShell": false,
+   "size": {
+    "w": 20,
+    "h": 20
+   },
+   "undersized": true,
+   "circleIntersections": [],
+   "inlineEvidence": null,
+   "disposition": "PASS-SPACING"
+  },
+  {
+   "text": "b",
+   "tag": "button",
+   "path": "html>body>button",
+   "inNavShell": false,
+   "size": {
+    "w": 20,
+    "h": 20
+   },
+   "undersized": true,
+   "circleIntersections": [],
+   "inlineEvidence": null,
+   "disposition": "PASS-SPACING"
+  }
+ ],
+ "spacingFixtureFail": [
+  {
+   "text": "a",
+   "tag": "button",
+   "path": "html>body>button",
+   "inNavShell": false,
+   "size": {
+    "w": 20,
+    "h": 20
+   },
+   "undersized": true,
+   "circleIntersections": [
+    {
+     "j": 1,
+     "rule": "circle-vs-target-rect",
+     "edgeDistance": 10,
+     "other": "b"
+    }
+   ],
+   "inlineEvidence": null,
+   "disposition": "FAIL"
+  },
+  {
+   "text": "b",
+   "tag": "button",
+   "path": "html>body>button",
+   "inNavShell": false,
+   "size": {
+    "w": 20,
+    "h": 20
+   },
+   "undersized": true,
+   "circleIntersections": [
+    {
+     "j": 0,
+     "rule": "circle-vs-target-rect",
+     "edgeDistance": 10,
+     "other": "a"
+    }
+   ],
+   "inlineEvidence": null,
+   "disposition": "FAIL"
+  }
+ ],
+ "byteCompare": {
+  "sameEqual": true,
+  "diffDifferent": true,
+  "sha_health_a": "b7f215e0f5e1651310da6973f2cf9fdb33eec26c5134bc6591f172e1ece9743f",
+  "sha_health_b": "b7f215e0f5e1651310da6973f2cf9fdb33eec26c5134bc6591f172e1ece9743f",
+  "sha_households": "6921583771fb79bec868339653a91050d1163430ed19fa0e96268522adf8038f"
+ },
+ "byteCompareClassifier": {
+  "clockOnlyPair": {
+   "clockOnly": true,
+   "diffPaths": [
+    {
+     "path": "generated_at",
+     "a": "2026-10-16T00:00:00.000001+00:00",
+     "b": "2026-10-16T00:00:01.000002+00:00"
+    }
+   ],
+   "fields": [
+    "generated_at"
+   ]
+  },
+  "otherFieldDiff": {
+   "clockOnly": false,
+   "diffPaths": [
+    {
+     "path": "a",
+     "a": 1,
+     "b": 2
+    },
+    {
+     "path": "generated_at",
+     "a": "2026-10-16T00:00:00.000001+00:00",
+     "b": "2026-10-16T00:00:01.000002+00:00"
+    }
+   ],
+   "fields": [
+    "a",
+    "generated_at"
+   ]
+  },
+  "nonJsonDiff": {
+   "clockOnly": false,
+   "diffPaths": [
+    {
+     "path": "(body is not JSON)"
+    }
+   ]
+  },
+  "nonIsoClock": {
+   "clockOnly": false,
+   "diffPaths": [
+    {
+     "path": "generated_at",
+     "a": "not-a-date",
+     "b": "still-not-a-date"
+    }
+   ],
+   "fields": [
+    "generated_at"
+   ]
+  }
+ }
+}
