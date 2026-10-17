@@ -12,3 +12,34 @@ rc=1
 $ grep -rn 'raw data' frontend/src   # complete listing: every remaining mention (expected: the test's negative role matcher ONLY)
 frontend/src/components/shell/drawer.test.tsx:198:    expect(screen.queryByRole("button", { name: /raw data/i })).not.toBeInTheDocument();
 rc=0
+
+=== Final scope-ceiling proof (PG-SC-05), range base..da22a23 (work + evidence commits) ===
+$ git diff --name-only 145d2970860d06d7cad1b0f86465290427ed35f3..da22a23
+docs/worklogs/SG-207_build.log
+docs/worklogs/SG-207_driver.mjs
+docs/worklogs/SG-207_health.log
+docs/worklogs/SG-207_scope.txt
+docs/worklogs/SG-207_shots/drawer_no_raw_data.png
+docs/worklogs/SG-207_smoke.json
+docs/worklogs/SG-207_smoke.log
+docs/worklogs/SG-207_smoke_attempt1.json
+docs/worklogs/SG-207_smoke_attempt2.json
+docs/worklogs/SG-207_smoke_attempt3.json
+docs/worklogs/SG-207_smoke_attempt4.json
+docs/worklogs/SG-207_verify.log
+docs/worklogs/SG-207_worklog.log
+frontend/src/components/shell/ItemInspectorDrawer.tsx
+frontend/src/components/shell/drawer.test.tsx
+
+$ git diff --name-only 145d297..da22a23 | grep -v -E '^(docs/worklogs/SG-207_|frontend/src/components/shell/ItemInspectorDrawer\.tsx$|frontend/src/components/shell/drawer\.test\.tsx$)'
+outside_rc=1
+
+$ git diff 145d297..da22a23 --stat -- frontend
+ .../src/components/shell/ItemInspectorDrawer.tsx   | 30 +---------------------
+ frontend/src/components/shell/drawer.test.tsx      | 12 +++------
+ 2 files changed, 5 insertions(+), 37 deletions(-)
+$ git diff 145d297..da22a23 -- frontend | grep '^diff --git'
+diff --git a/frontend/src/components/shell/ItemInspectorDrawer.tsx b/frontend/src/components/shell/ItemInspectorDrawer.tsx
+diff --git a/frontend/src/components/shell/drawer.test.tsx b/frontend/src/components/shell/drawer.test.tsx
+
+product bytes: ONLY the two named files (ItemInspectorDrawer.tsx, drawer.test.tsx); no backend/config/schema/other route/component; evidence ONLY docs/worklogs/SG-207_*.
