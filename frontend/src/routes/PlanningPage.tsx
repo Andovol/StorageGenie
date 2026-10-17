@@ -7,11 +7,9 @@ import {
   runPlanning,
 } from "../api/client";
 import type {
-  Household,
   PlanningRunResult,
   PlanningSuggestionListResponse,
 } from "../api/types";
-import { HouseholdSelector } from "../components/HouseholdSelector";
 import { PlanningSuggestionCard } from "../components/PlanningSuggestionCard";
 import { CONTROL_STYLE, THEMED_CONTROL_CLASS } from "../components/shell/CatalogToolbar";
 import { PageContainer } from "../components/shell/PageContainer";
@@ -27,7 +25,6 @@ export function PlanningPage() {
     isError: householdsIsError,
     error: householdsError,
     householdId,
-    setHouseholdId,
   } = useHouseholdContext();
   const [status, setStatus] = useState("");
   const [message, setMessage] = useState("");
@@ -64,16 +61,7 @@ export function PlanningPage() {
 
   return (
     <PageContainer className="text-foreground">
-      <div
-        style={{ display: "flex", flexWrap: "wrap", justifyContent: "space-between", alignItems: "center", gap: 12 }}
-      >
-        <h1 className="page-header text-foreground">Planning</h1>
-        <HouseholdSelector
-          value={effectiveHousehold}
-          onChange={setHouseholdId}
-          households={households as Household[] | undefined}
-        />
-      </div>
+      <h1 className="page-header text-foreground">Planning</h1>
       {householdsIsError && (
         <div role="alert">Could not load households: {String(householdsError)}</div>
       )}

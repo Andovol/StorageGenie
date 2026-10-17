@@ -32,7 +32,7 @@ function useDebounced<T>(value: T, delayMs: number): T {
 export function CatalogPage() {
   // SG-196 G1: household selection now comes from the shared context; the
   // effective-household derivation shape is unchanged.
-  const { households, householdId, setHouseholdId } = useHouseholdContext();
+  const { households, householdId } = useHouseholdContext();
   const [qRaw, setQRaw] = useState("");
   const q = useDebounced(qRaw, 200);
   const [category, setCategory] = useState<string>(CATEGORY_ALL);
@@ -204,9 +204,6 @@ export function CatalogPage() {
       onDensityChange={setDensity}
       activeFilters={activeFilters}
       onClearAll={clearAll}
-      householdId={effectiveHousehold}
-      households={households || []}
-      onHouseholdChange={setHouseholdId}
       savedSearches={savedSearches}
       selectedSavedSearchId={selectedSavedSearchId}
       onSavedSearchSelect={handleSavedSearchSelect}

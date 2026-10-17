@@ -115,12 +115,14 @@ describe("InboxPage", () => {
     expect(page).toHaveStyle({ maxWidth: "1100px", marginLeft: "auto", marginRight: "auto" });
   });
 
-  test("the household select carries the themed control treatment (SG-105 G2)", async () => {
+  test("the page carries NO household control (SG-208/D-13)", async () => {
     api.apiGet.mockResolvedValue({ items: [], next_cursor: null, total: 0 });
     renderPage();
 
-    const select = screen.getByRole("combobox", { name: /household/i });
-    expect(select).toHaveClass("bg-background", "text-foreground", "border-border");
+    // Non-vacuity: the Review status combobox renders on this screen, so the
+    // role query is proven live on this DOM; the household matcher finds nothing.
+    expect(await screen.findByRole("combobox", { name: /review status/i })).toBeInTheDocument();
+    expect(screen.queryAllByRole("combobox", { name: /household/i })).toHaveLength(0);
   });
 
   test("the review link carries the theme link treatment, not default purple (SG-105 G3)", async () => {

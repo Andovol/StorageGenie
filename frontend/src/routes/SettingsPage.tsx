@@ -15,7 +15,7 @@ export function SettingsPage() {
     <PageContainer className="text-foreground">
       <h1 className="page-header text-foreground">Settings</h1>
       <p className="text-muted-foreground" style={{ fontSize: 13 }}>
-        Phase 0 — household and connection settings. API base: {import.meta.env.VITE_API_BASE || "http://localhost:8003"}
+        Phase 0 — connection settings. API base: {import.meta.env.VITE_API_BASE || "http://localhost:8003"}
       </p>
 
       <section
@@ -57,18 +57,6 @@ export function SettingsPage() {
         )}
       </section>
 
-      <div style={{ marginTop: 16 }}>
-        <button
-          onClick={() => {
-            localStorage.removeItem("household_id");
-            window.location.reload();
-          }}
-          className="bg-card text-foreground border-border focus-ring"
-          style={{ padding: "6px 12px", borderRadius: 6, borderStyle: "solid", borderWidth: 1, cursor: "pointer" }}
-        >
-          Clear household selection
-        </button>
-      </div>
     </PageContainer>
   );
 }

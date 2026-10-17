@@ -6,7 +6,6 @@ import type {
   AnalyticsSummary,
   ExpiryStatusResponse,
   ExpiryStatusRow,
-  Household,
 } from "../api/types";
 import { CONTROL_STYLE, THEMED_CONTROL_CLASS } from "../components/shell/CatalogToolbar";
 import { PageContainer } from "../components/shell/PageContainer";
@@ -83,7 +82,7 @@ function ExpiryRow({ row, householdId, categoryName }: { row: ExpiryStatusRow; h
 
 export function ExpiryPage() {
   // SG-196 G1: household selection comes from the shared context.
-  const { households, householdId, setHouseholdId } = useHouseholdContext();
+  const { households, householdId } = useHouseholdContext();
   const { data: taxonomy } = useTaxonomy();
   const [category, setCategory] = useState("");
   const effectiveHousehold = householdId || households?.[0]?.id || "";
@@ -123,21 +122,6 @@ export function ExpiryPage() {
             >
               <option value="">All categories</option>
               {categories.map((entry) => (
-                <option key={entry.id} value={entry.id}>{entry.name}</option>
-              ))}
-            </select>
-          </label>
-          <label style={{ fontSize: 13 }}>
-            Household{" "}
-            <select
-              aria-label="Household"
-              className={THEMED_CONTROL_CLASS}
-              style={CONTROL_STYLE}
-              value={effectiveHousehold}
-              onChange={(event) => setHouseholdId(event.target.value)}
-            >
-              <option value="">Select household</option>
-              {(households as Household[] | undefined)?.map((entry) => (
                 <option key={entry.id} value={entry.id}>{entry.name}</option>
               ))}
             </select>

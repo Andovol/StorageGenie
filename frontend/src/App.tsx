@@ -13,8 +13,6 @@ import { AnalyticsPage } from "./routes/AnalyticsPage";
 import { ExpiryPage } from "./routes/ExpiryPage";
 import { ThemeToggle } from "./theme/ThemeToggle";
 import { AssetImportModal } from "./components/shell/AssetImportModal";
-import { HouseholdSelector } from "./components/HouseholdSelector";
-import { CONTROL_STYLE, THEMED_CONTROL_CLASS } from "./components/shell/CatalogToolbar";
 import { useReviewTasks } from "./hooks/useAssets";
 import { HouseholdProvider, useHouseholdContext } from "./hooks/HouseholdContext";
 
@@ -33,14 +31,13 @@ function Nav() {
   const { pathname } = useLocation();
   const [menuOpen, setMenuOpen] = useState(false);
   const [importOpen, setImportOpen] = useState(false);
-  // SG-196 G1: the nav reads the shared household context; its selector is the
-  // one control that reaches every route in the same session.
+  // SG-196 G1 / SG-208 D-13: the nav reads the shared household context's
+  // resolved household; it carries no switching control.
   const {
     households,
     isError: householdsIsError,
     error: householdsError,
     householdId,
-    setHouseholdId,
   } = useHouseholdContext();
   const effectiveHousehold = householdId || households?.[0]?.id || "";
   // SG-196 G3: the badge reads the same ["review-tasks", household] entry
@@ -135,13 +132,6 @@ function Nav() {
         })}
       </div>
       {showToggle ? <ThemeToggle /> : null}
-      <HouseholdSelector
-        value={effectiveHousehold}
-        onChange={setHouseholdId}
-        households={households}
-        selectStyle={{ ...CONTROL_STYLE, maxWidth: "100%" }}
-        selectClassName={THEMED_CONTROL_CLASS}
-      />
       {householdsIsError ? (
         <div role="alert" style={{ fontSize: 12 }}>
           Could not load households: {String(householdsError)}

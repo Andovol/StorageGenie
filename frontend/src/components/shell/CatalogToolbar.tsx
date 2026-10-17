@@ -1,5 +1,5 @@
 import type { ProductItem } from "../../types/product";
-import type { Household, SavedSearch } from "../../api/types";
+import type { SavedSearch } from "../../api/types";
 
 export type SortOption = "recent" | "name" | "status";
 export type Density = "grid" | "table";
@@ -45,9 +45,6 @@ type CatalogToolbarProps = {
   onDensityChange: (density: Density) => void;
   activeFilters: string[];
   onClearAll: () => void;
-  householdId: string;
-  households: Household[];
-  onHouseholdChange: (householdId: string) => void;
   savedSearches: SavedSearch[];
   selectedSavedSearchId: string;
   onSavedSearchSelect: (id: string) => void;
@@ -81,9 +78,6 @@ export function CatalogToolbar({
   onDensityChange,
   activeFilters,
   onClearAll,
-  householdId,
-  households,
-  onHouseholdChange,
   savedSearches,
   selectedSavedSearchId,
   onSavedSearchSelect,
@@ -120,21 +114,6 @@ export function CatalogToolbar({
         borderBottomWidth: 1,
       }}
     >
-      <select
-        aria-label="Household"
-        value={householdId}
-        onChange={(event) => onHouseholdChange(event.target.value)}
-        className={THEMED_CONTROL_CLASS}
-        style={CONTROL_STYLE}
-      >
-        {households.map((household) => (
-          <option key={household.id} value={household.id}>
-            {household.name}
-          </option>
-        ))}
-        {households.length === 0 && <option value="">No households</option>}
-      </select>
-
       {categories.map((category) => {
         const active = category === activeCategory;
         return (

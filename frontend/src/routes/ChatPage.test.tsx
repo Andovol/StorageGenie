@@ -250,10 +250,12 @@ describe("ChatPage", () => {
     );
   });
 
-  test("the household select carries the shared themed control treatment (SG-167 G1a)", () => {
+  test("the page carries NO household control (SG-208/D-13)", () => {
     renderPage();
 
-    const select = screen.getByRole("combobox", { name: /household/i });
-    expect(select).toHaveClass("bg-background", "text-foreground", "border-border");
+    // Non-vacuity: the Category combobox renders on this screen, so the role
+    // query is proven live on this DOM; the household matcher finds nothing.
+    expect(screen.getByRole("combobox", { name: /category/i })).toBeInTheDocument();
+    expect(screen.queryAllByRole("combobox", { name: /household/i })).toHaveLength(0);
   });
 });

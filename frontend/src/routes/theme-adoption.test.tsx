@@ -219,15 +219,19 @@ describe("SG-075 screen adoption", () => {
     expectPageHeader(/settings/i);
   });
 
-  test("capture screen rides the shared centered container and themed household select (SG-105 G1/G2)", () => {
+  test("capture screen rides the shared centered container with no household select (SG-105 G1; SG-208/D-13)", () => {
     const { container } = renderWithProviders(<HouseholdProvider><CapturePage /></HouseholdProvider>);
 
     const page = container.querySelector(".page-container") as HTMLElement;
     expect(page).not.toBeNull();
     expect(page).toHaveStyle({ maxWidth: "1100px", marginLeft: "auto", marginRight: "auto" });
 
-    const select = screen.getByRole("combobox", { name: /household/i });
-    expect(select).toHaveClass("bg-background", "text-foreground", "border-border");
+    // Non-vacuity: the form's own themed select renders on this screen (one
+    // combobox), so the role query is proven live; no household combobox exists.
+    const selects = screen.getAllByRole("combobox");
+    expect(selects).toHaveLength(1);
+    expect(selects[0]).toHaveClass("bg-background", "text-foreground", "border-border");
+    expect(screen.queryAllByRole("combobox", { name: /household/i })).toHaveLength(0);
   });
 
   test("every swept route rides the shared centered PageContainer (SG-118 G2)", () => {

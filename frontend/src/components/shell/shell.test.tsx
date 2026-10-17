@@ -596,7 +596,7 @@ describe("Saved searches (SG-068)", () => {
     expect(options).toEqual({ method: "DELETE" });
   });
 
-  test("switching household clears the applied saved-search selection", async () => {
+  test("the toolbar carries NO household control; the saved-search selection has no switch to react to (SG-208/D-13)", async () => {
     mockSavedSearches([saved]);
     renderCatalog();
     await screen.findByText("Drill");
@@ -604,9 +604,11 @@ describe("Saved searches (SG-068)", () => {
     fireEvent.change(await screen.findByLabelText("Saved searches"), { target: { value: "s1" } });
     await screen.findByText("q: zap");
 
-    fireEvent.change(screen.getByLabelText("Household"), { target: { value: "h2" } });
-    await waitFor(() =>
-      expect((screen.getByLabelText("Saved searches") as HTMLSelectElement).value).toBe("")
-    );
+    // Non-vacuity: the toolbar's own comboboxes render (sort + saved searches),
+    // so the role query is proven live; no household combobox exists to reset
+    // the selection, and the applied one stays.
+    expect(screen.getByLabelText("Sort catalog")).toBeInTheDocument();
+    expect(screen.queryAllByRole("combobox", { name: /household/i })).toHaveLength(0);
+    expect((screen.getByLabelText("Saved searches") as HTMLSelectElement).value).toBe("s1");
   });
 });

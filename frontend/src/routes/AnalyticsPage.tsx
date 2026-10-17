@@ -1,9 +1,8 @@
 import { useState } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { fetchAnalyticsSummary, generateAnalyticsInsights } from "../api/client";
-import type { AnalyticsInsightResult, AnalyticsSummary, Household } from "../api/types";
+import type { AnalyticsInsightResult, AnalyticsSummary } from "../api/types";
 import { PageContainer } from "../components/shell/PageContainer";
-import { CONTROL_STYLE, THEMED_CONTROL_CLASS } from "../components/shell/CatalogToolbar";
 import { useHouseholdContext } from "../hooks/HouseholdContext";
 
 const EXPIRY_LABELS: Record<string, string> = {
@@ -25,7 +24,7 @@ function CountRow({ label, value }: { label: string; value: number }) {
 
 export function AnalyticsPage() {
   // SG-196 G1: household selection comes from the shared context.
-  const { households, householdId, setHouseholdId } = useHouseholdContext();
+  const { households, householdId } = useHouseholdContext();
   const [message, setMessage] = useState("");
   const effectiveHousehold = householdId || households?.[0]?.id || "";
 
@@ -53,28 +52,7 @@ export function AnalyticsPage() {
 
   return (
     <PageContainer className="text-foreground">
-      <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "space-between", alignItems: "center", gap: 12 }}>
-        <h1 className="page-header text-foreground">Analytics</h1>
-        <label>
-          Household{" "}
-          <select
-            value={effectiveHousehold}
-            onChange={(event) => {
-              setHouseholdId(event.target.value);
-              setMessage("");
-            }}
-            className={THEMED_CONTROL_CLASS}
-            style={{ ...CONTROL_STYLE, maxWidth: "100%" }}
-          >
-            <option value="">Select household</option>
-            {(households as Household[] | undefined)?.map((household) => (
-              <option key={household.id} value={household.id}>
-                {household.name}
-              </option>
-            ))}
-          </select>
-        </label>
-      </div>
+      <h1 className="page-header text-foreground">Analytics</h1>
       <p className="text-muted-foreground" style={{ fontSize: 13 }}>
         These numbers are computed from your own recorded items. The summary is prose only —
         it is grounded in the numbers shown, takes no action, and is never refreshed

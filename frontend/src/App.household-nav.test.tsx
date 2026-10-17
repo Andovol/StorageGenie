@@ -7,15 +7,18 @@ import { ThemeProvider } from "./theme/ThemeProvider";
 import type { ReviewTask } from "./api/types";
 
 /**
- * SG-196: one shared household context mounted at App level. The nav carries
- * the household selector, the household failure alert and the Inbox open-task
- * badge; Catalog carries its facets/saved-search alerts. Only ../api/client is
- * mocked, so the real hooks, context and query wiring run.
+ * SG-196: one shared household context mounted at App level. SG-208/D-13: the
+ * household SWITCHING controls are gone — these rows assert the ABSENCE of any
+ * household combobox while the resolution rail (stored id else first household,
+ * auto-persisted) keeps scoping the reads. The nav keeps its household failure
+ * alert and the Inbox open-task badge; Catalog keeps its facets/saved-search
+ * alerts. Only ../api/client is mocked, so the real hooks, context and query
+ * wiring run.
  *
- * The FAIL half on base is structural: the base App has no nav selector, no
- * nav household alert, no badge and no facets/saved-search branches. Rows
- * labelled (control) assert absence on states that must render NO badge or
- * alert; they pass on base too and are deliberate controls, not prove rows.
+ * Non-vacuity (PB-3): each absence row first pins content that DOES render on
+ * the same DOM (the nav footer, the Inbox review-status combobox) or a scoped
+ * read fired by the page, so the role query is proven live and the row cannot
+ * pass by never looking.
  */
 const api = vi.hoisted(() => ({
   apiGet: vi.fn(),
@@ -75,15 +78,8 @@ function renderApp(initialEntries: string[] = ["/settings"]) {
   );
 }
 
-function navScope() {
-  return within(screen.getByRole("navigation"));
-}
-
-function pageHouseholdComboboxes(): HTMLElement[] {
-  const navElement = screen.getByRole("navigation");
-  return screen
-    .getAllByRole("combobox", { name: /household/i })
-    .filter((element) => !navElement.contains(element)) as HTMLElement[];
+function householdComboboxes(): HTMLElement[] {
+  return screen.queryAllByRole("combobox", { name: /household/i }) as HTMLElement[];
 }
 
 beforeEach(() => {
@@ -105,25 +101,21 @@ afterEach(() => {
   vi.clearAllMocks();
 });
 
-describe("SG-196 shared household context", () => {
-  test("one household fetch; the nav selector shows the fallback and persists it (A1)", async () => {
+describe("SG-196 shared household context / SG-208 no switching UI", () => {
+  test("the nav carries no household control; the first household is resolved and persisted (A1)", async () => {
     renderApp();
 
-    const select = await navScope().findByRole("combobox", { name: /household/i });
-    await waitFor(() => expect(select).toHaveValue("hh-a"));
-    expect(window.localStorage.getItem("household_id")).toBe("hh-a");
+    // Non-vacuity: the nav itself rendered (its footer), then the absence row.
+    expect(await screen.findByText("Phase 0 · local-first")).toBeInTheDocument();
+    await waitFor(() => expect(window.localStorage.getItem("household_id")).toBe("hh-a"));
+    expect(householdComboboxes()).toHaveLength(0);
     const householdCalls = api.apiGet.mock.calls.filter(([path]) => path === "/v1/households");
     expect(householdCalls).toHaveLength(1);
   });
 
-  test("a nav selector change reaches the route selector in the same session (A1)", async () => {
-    window.localStorage.setItem("household_id", "hh-a");
+  test("a stored household_id scopes every read; no route renders a household control (A1)", async () => {
+    window.localStorage.setItem("household_id", "hh-b");
     renderApp(["/inbox"]);
-
-    const navSelect = await navScope().findByRole("combobox", { name: /household/i });
-    await waitFor(() => expect(navSelect).toHaveValue("hh-a"));
-
-    fireEvent.change(navSelect, { target: { value: "hh-b" } });
 
     await waitFor(() =>
       expect(
@@ -134,18 +126,12 @@ describe("SG-196 shared household context", () => {
         )
       ).toBe(true)
     );
-    const pageSelects = pageHouseholdComboboxes();
-    expect(pageSelects).toHaveLength(1);
-    expect(pageSelects[0]).toHaveValue("hh-b");
+    // Non-vacuity: the Inbox's own review-status combobox renders (the role
+    // query is live on this DOM); the household matcher finds nothing and the
+    // stored id survives untouched.
+    expect(await screen.findByRole("combobox", { name: /review status/i })).toBeInTheDocument();
+    expect(householdComboboxes()).toHaveLength(0);
     expect(window.localStorage.getItem("household_id")).toBe("hh-b");
-  });
-
-  test("a persisted household_id is used on a fresh mount (A1)", async () => {
-    window.localStorage.setItem("household_id", "hh-b");
-    renderApp();
-
-    const select = await navScope().findByRole("combobox", { name: /household/i });
-    await waitFor(() => expect(select).toHaveValue("hh-b"));
   });
 
   test("a failed households read alerts in the nav (G1)", async () => {
@@ -155,19 +141,15 @@ describe("SG-196 shared household context", () => {
     const alert = await screen.findByRole("alert");
     expect(alert).toHaveTextContent("Could not load households");
     expect(alert).toHaveTextContent("households read failed");
+    expect(householdComboboxes()).toHaveLength(0);
   });
 
   test("(control) a loaded households read renders no nav alert", async () => {
     renderApp(["/inbox"]);
 
-    await waitFor(() =>
-      expect(
-        screen
-          .getAllByRole("combobox", { name: /household/i })
-          .some((element) => (element as HTMLSelectElement).value === "hh-a")
-      ).toBe(true)
-    );
+    await waitFor(() => expect(window.localStorage.getItem("household_id")).toBe("hh-a"));
     expect(screen.queryByRole("alert")).toBeNull();
+    expect(householdComboboxes()).toHaveLength(0);
   });
 });
 
@@ -233,6 +215,7 @@ describe("SG-196 nav Inbox badge (G3)", () => {
     await waitFor(() => expect(screen.queryByTestId("inbox-open-count")).toBeNull());
     expect(api.apiGet.mock.calls.some(([path]) => path === "/v1/review-tasks")).toBe(false);
     expect(screen.getByRole("link", { name: "Inbox" })).toBeInTheDocument();
+    expect(householdComboboxes()).toHaveLength(0);
   });
 });
 
@@ -260,5 +243,6 @@ describe("SG-196 Catalog household-adjacent alerts (G2)", () => {
 
     expect(await screen.findByText("No items match the current view.")).toBeInTheDocument();
     expect(screen.queryByRole("alert")).toBeNull();
+    expect(householdComboboxes()).toHaveLength(0);
   });
 });

@@ -2,10 +2,8 @@ import { useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
 import { logChatCorrection, sendChat } from "../api/client";
-import type { ChatMessage, ChatResponse, Household } from "../api/types";
+import type { ChatMessage, ChatResponse } from "../api/types";
 import { ChatTranscript } from "../components/ChatTranscript";
-import { HouseholdSelector } from "../components/HouseholdSelector";
-import { CONTROL_STYLE, THEMED_CONTROL_CLASS } from "../components/shell/CatalogToolbar";
 import { PageContainer } from "../components/shell/PageContainer";
 import { useHouseholdContext } from "../hooks/HouseholdContext";
 
@@ -16,7 +14,7 @@ const CATEGORIES = [
 
 export function ChatPage() {
   // SG-196 G1: household selection comes from the shared context.
-  const { households, householdId, setHouseholdId } = useHouseholdContext();
+  const { households, householdId } = useHouseholdContext();
   const [category, setCategory] = useState("food");
   const [input, setInput] = useState("");
   const [correction, setCorrection] = useState("");
@@ -72,16 +70,7 @@ export function ChatPage() {
 
   return (
     <PageContainer className="text-foreground">
-      <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "space-between", alignItems: "center", gap: 12 }}>
-        <h1 className="page-header text-foreground">Chat</h1>
-        <HouseholdSelector
-          value={effectiveHousehold}
-          onChange={setHouseholdId}
-          households={households as Household[] | undefined}
-          selectStyle={CONTROL_STYLE}
-          selectClassName={THEMED_CONTROL_CLASS}
-        />
-      </div>
+      <h1 className="page-header text-foreground">Chat</h1>
 
       <p className="text-muted-foreground" style={{ fontSize: 13 }}>
         Answers are grounded in the selected category&apos;s catalogue only. Chat changes no

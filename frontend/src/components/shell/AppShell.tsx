@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import type { Household, SavedSearch } from "../../api/types";
+import type { SavedSearch } from "../../api/types";
 import { AppHeader } from "./AppHeader";
 import { CatalogToolbar, type Density, type SortOption } from "./CatalogToolbar";
 import { PageContainer } from "./PageContainer";
@@ -17,9 +17,6 @@ type AppShellProps = {
   onDensityChange: (density: Density) => void;
   activeFilters: string[];
   onClearAll: () => void;
-  householdId: string;
-  households: Household[];
-  onHouseholdChange: (householdId: string) => void;
   savedSearches: SavedSearch[];
   selectedSavedSearchId: string;
   onSavedSearchSelect: (id: string) => void;
@@ -41,9 +38,6 @@ export function AppShell({
   onDensityChange,
   activeFilters,
   onClearAll,
-  householdId,
-  households,
-  onHouseholdChange,
   savedSearches,
   selectedSavedSearchId,
   onSavedSearchSelect,
@@ -65,9 +59,6 @@ export function AppShell({
           onDensityChange={onDensityChange}
           activeFilters={activeFilters}
           onClearAll={onClearAll}
-          householdId={householdId}
-          households={households}
-          onHouseholdChange={onHouseholdChange}
           savedSearches={savedSearches}
           selectedSavedSearchId={selectedSavedSearchId}
           onSavedSearchSelect={onSavedSearchSelect}
