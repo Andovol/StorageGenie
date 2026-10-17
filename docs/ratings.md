@@ -818,6 +818,12 @@ Originals above (88 FLAG:TRUST / 91 FLAG:TRUST) stand as the audit trail; the ve
 |---|---|---|---|---|---|---|---|---|---|---|---|
 | SG-212 | D-21 values made executable; WORK receipt verified (dual paste note missing - runner report_unreadable misfire, 15th ISS-4 instance, not slice fault); product = CatalogPage.tsx (860px content-fit rule, layout-effect pre-paint, recompute-per-mount, no persistence) + catalog.test.tsx (4 rows); failpre 4 red / passpost 4 green both committed; suite 29/297 (base 29/293 + 4); served smoke wide1440 TABLE 1052 maxScrollLeft 0 + touch390 GRID 342 docOverflowX 0 + CDP toggle both ways; 4 screenshots opened; enumeration single-default-site, no density persistence; mask-coverage harness defect self-found + repaired on frozen driver; pre-existing eslint unused-import proven-at-base, parked; 489s vs ~600s; audit SG-212_audit.md | opencode/opencode-go/deepseek-v4.1-flash (receipt settings) | max | 98 |  |  | PG-EV-02/03/05/08/09; PG-SC-05/09/12; PG-IC-01/07/08/09; PG-PR-01/03 |  | Pre-existing eslint -> next test-touching slice; serve rider after SG-213 (SG-212 product unserved); ISS-4 15th to desk #84; SG-213 next (L3) |  | none |
 
+### SG-213 (2026-10-17 - D-18(b) Google retry: wall stands on 402)
+
+| slice_id | phase | model | effort | score | flag | lever | guards_invoked | deduction_attribution | remaining | escape | slowest_waste |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| SG-213 | D-18(b) Google retry; WORK receipt verified (dual paste note missing - runner report_unreadable misfire, 16th ISS-4 instance, not slice fault); discovery re-measured (slug + 3 endpoints + input_references 0..14 + pricing, matches SG-209); ONE billed POST -> HTTP 402 prepayment-credits-depleted (body verbatim with billing surface, unbilled); STOP executed, G2 not run, Vertex route honestly untested (packet bound); driver dict-key bug self-caught pre-bill, fixed forward; spend $0.000000 vs $1.0838 projected, $2 cap unspent; secret-grep empty over full set; 255s vs ~600s; audit SG-213_audit.md | opencode/opencode-go/deepseek-v4.1-flash (receipt settings) | max | 98 |  |  | PG-EV-02/03/05/06/07/09; PG-SC-03/05/09; PG-IC-01/07/08/09; PG-PR-01/03 |  | D-23: billing action vs Vertex test vs park; serve rider SG-214 next (L3; SG-212 product unserved); ISS-4 16th to desk #84 |  | none |
+
 ### SG-208 (2026-10-17 - D-13 household switching UI removal, retry after env failure)
 
 | slice_id | phase | model | effort | score | flag | lever | guards_invoked | deduction_attribution | remaining | escape | slowest_waste |
