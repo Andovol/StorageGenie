@@ -1,0 +1,6 @@
+SG-206 worklog (append-only). Lane start 2026-10-17T16:24:54Z epoch 1792254294 RUN_BUDGET_S=2100. Model opencode-go/deepseek-v4.1-flash effort=max (own process /proc/956586/cmdline). BASE ref requested=automation resolved ec8be4f5d62e543129c5ed5a7fac5c61af3e42ed (== origin/automation == HEAD, clean). Scope: serve rider, zero product bytes, evidence docs/worklogs/SG-206_* only. Retired finalizer never used.
+2026-10-17T16:28:27Z FIRST READ complete: prestate frozen SG-206_prestate.log; container pre d868f373b661 image 15a1fe63; served pre index e3eb6736 / JS dd4f1bd0 (325039 B) / CSS e1e5ff63 (4541 B, prior hsl(var(--primary)) focus tint); DB e6bef157 28 tables alembic 20260924_sg114_relation; product delta since served 3857b6a = tokens.css only (ec9cd6c +7/-2); focus-ring test files derived: CandidateCard/EvidenceGallery/HouseholdSelector/theme.test.
+2026-10-17T16:28:42Z G1 build: exit=0 elapsed=15s log SG-206_build.log
+2026-10-17T16:29:14Z G1 recreate: exit=0 elapsed=2s log SG-206_recreate.log
+2026-10-17T16:29:49Z G1 poststate frozen SG-206_poststate.log; build 15s + recreate 2s
+2026-10-17T16:30:34Z G2 focused suite: exit=0 elapsed=9s log SG-206_tests_frontend.log; DB post-tests sha re-read; health end frozen SG-206_health.log

@@ -1,0 +1,69 @@
+SG-206 prestate — FIRST READ — 2026-10-17T16:28:10Z (epoch 1792254490)
+lane_start=2026-10-17T16:24:54Z (systemd ExecMainStartTimestamp) start_epoch=1792254294 RUN_BUDGET_S=2100 (/etc/dispatch/storagegenie.conf read)
+== git ==
+BASE ref requested: automation
+ec8be4f5d62e543129c5ed5a7fac5c61af3e42ed
+resolved origin/automation: ec8be4f5d62e543129c5ed5a7fac5c61af3e42ed
+HEAD: ec8be4f5d62e543129c5ed5a7fac5c61af3e42ed
+automation
+?? docs/worklogs/SG-206_prestate.log
+status_rc=0 (empty above = clean)
+== rules/contract ==
+G-L1 UNCHECKED the cache is not checked out at a contract tag: /home/andrei/storagegenie-contract
+G-L5 UNCHECKED gh-unauthenticated
+G-L7 UNCHECKED gh-unauthenticated
+G-L6 BYTES /home/andrei/.codex/AGENTS.md 2275
+G-L6 BYTES /home/andrei/.config/opencode/AGENTS.md 1933
+G-L6 BYTES total[codex]=2275 unseen=architect-layer,state-file,other-ritual-files
+G-L6 BYTES total[opencode]=1933 unseen=architect-layer,state-file,other-ritual-files
+rules_check_rc=3
+VERSION=0.50.0
+== lane ==
+/run/dispatch-storagegenie-SG-206/docker.sock mode=srw-rw---T uid=1000 gid=100987
+RUNTIME_SOCKETS=docker.sock (from /etc/dispatch/storagegenie.conf)
+Client 29.6.2 / Server 29.6.2 (API 1.55)
+version_rc=0
+Docker Compose version v5.3.1
+compose_rc=0
+== container/image pre ==
+d868f373b661 storagegenie-backend Up 4 hours (healthy) storagegenie-backend-1
+Id=d868f373b661e51247db757ca755bd9dad5906606233a76807860141a0ef780d Created=2026-10-17T12:03:52.700720908Z Image=sha256:15a1fe632ef87f459e9747afd21fd1fba29a5aff01566144c7ebec97ebe0f20d RestartCount=0 State=running Health=healthy StartedAt=2026-10-17T12:03:53.419536516Z
+image storagegenie-backend:latest Id=sha256:15a1fe632ef87f459e9747afd21fd1fba29a5aff01566144c7ebec97ebe0f20d Created=2026-10-17T12:03:39.446008289Z
+image_rc=0
+[{"Type":"volume","Name":"storagegenie_storage_data","Source":"/home/andrei/.local/share/docker/volumes/storagegenie_storage_data/_data","Destination":"/data/storage","Driver":"local","Mode":"rw","RW":true,"Propagation":""},{"Type":"bind","Source":"/home/andrei/StorageGenie/data/db","Destination":"/data/db","Mode":"rw","RW":true,"Propagation":"rprivate"}]
+
+== health pre ==
+health_pre_http=200
+{"status":"ok","db":"ok","storage":"ok"}
+== served bundle pre ==
+index_http=200
+e3eb67360d145260465ca379bb325bf5868bf4923692f274902caf11c2d44280  /tmp/opencode/sg206_index_pre.html
+index_bytes=944
+pre_JS_asset=assets/index-DgiNiCw9.js pre_CSS_asset=assets/index-DHv-3aM4.css
+js_http=200
+css_http=200
+dd4f1bd0876de5dfba0b0bc351342a4e5ca3df35f8b5f4752e0ab31845579f53  /tmp/opencode/sg206_js_pre
+js_bytes=325039
+e1e5ff6385e02f80e05bb94732b4d93dcf59cca184139e22164c0fad4a26f042  /tmp/opencode/sg206_css_pre
+css_bytes=4541
+== served CSS focus rules PRE (marker state; expect the PRIOR --primary tint) ==
+.focus-ring:focus-visible{outline:2px solid hsl(var(--primary));outline-offset:2px}
+.file-pick:focus-within{outline:2px solid hsl(var(--primary));outline-offset:2px}
+== DB pre (mode=ro) ==
+e6bef157440fb8b4a3262577362b071dcae07507ea9a7e04a614e11be28ee5bd  data/db/storagegenie.db
+28
+20260924_sg114_relation
+sqlite_rc=0
+== product diff guard since served 3857b6a ==
+ec9cd6c SG-205: dark focus-ring fix — both tokens.css focus-indicator rules take the --link tint (light value identical, dark 3:1-clean); before FAIL 1.7559 -> after PASS 7.4784/4.2589, file-pick 1.5816 -> 6.7361; suite 298 pass
+ frontend/src/theme/tokens.css | 9 +++++++--
+ 1 file changed, 7 insertions(+), 2 deletions(-)
+frontend/src/theme/tokens.css
+-- migration paths (must be empty):
+(end)
+== focus-ring consumer derivation ==
+frontend/src/components/CandidateCard.test.tsx
+frontend/src/components/EvidenceGallery.test.tsx
+frontend/src/components/HouseholdSelector.test.tsx
+frontend/src/theme/theme.test.tsx
+focus_ring_files_total=28

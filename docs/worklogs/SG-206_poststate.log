@@ -1,0 +1,40 @@
+== SG-206 poststate — 2026-10-17T16:29:42Z epoch 1792254582 ==
+== container post ==
+Id=f2055f3b572cbeb8694c08d7cbaa88720a05d6b199e5e59d061e98306a82bf5b Created=2026-10-17T16:29:13.102064587Z Image=sha256:fe537fd4e6cd3281d1f0ff9be1a2b5f2741e3f630bd618ea7eea6340bc24f822 RestartCount=0 State=running Health=healthy StartedAt=2026-10-17T16:29:13.837712432Z
+image storagegenie-backend:latest Id=sha256:fe537fd4e6cd3281d1f0ff9be1a2b5f2741e3f630bd618ea7eea6340bc24f822 Created=2026-10-17T16:28:41.99408866Z
+== health GETs post (6) ==
+health_1=200 {"status":"ok","db":"ok","storage":"ok"}
+health_2=200 {"status":"ok","db":"ok","storage":"ok"}
+health_3=200 {"status":"ok","db":"ok","storage":"ok"}
+health_4=200 {"status":"ok","db":"ok","storage":"ok"}
+health_5=200 {"status":"ok","db":"ok","storage":"ok"}
+health_6=200 {"status":"ok","db":"ok","storage":"ok"}
+== container post re-inspect (final health field) ==
+Id=f2055f3b572cbeb8694c08d7cbaa88720a05d6b199e5e59d061e98306a82bf5b RestartCount=0 State=running Health=healthy
+== served post ==
+index_post_http=200
+50ddaad1f490ff7e63998aaa2639950ea633377dccc3fa5c7a2bed5fa988f2b0  /tmp/opencode/sg206_index_post.html
+index_post_bytes=944
+post_JS_asset=assets/index-Cv0EK3ka.js post_CSS_asset=assets/index-C07VbG0m.css
+js_post_http=200
+css_post_http=200
+dd4f1bd0876de5dfba0b0bc351342a4e5ca3df35f8b5f4752e0ab31845579f53  /tmp/opencode/sg206_js_post
+js_post_bytes=325039
+c3b58cda696a22970fc2a4a348849fc1359f2105f80f81304ed5dfd5ca31a557  /tmp/opencode/sg206_css_post
+css_post_bytes=4535
+== served CSS focus rules POST (expect hsl(var(--link))) ==
+.focus-ring:focus-visible{outline:2px solid hsl(var(--link));outline-offset:2px}
+.file-pick:focus-within{outline:2px solid hsl(var(--link));outline-offset:2px}
+== SPA routes + API post ==
+/inbox=200 /catalog=200 /analytics=200 /planning=200 
+api_households=200
+6921583771fb79bec868339653a91050d1163430ed19fa0e96268522adf8038f  /tmp/opencode/sg206_api_post.json
+== DB post (mode=ro) ==
+e6bef157440fb8b4a3262577362b071dcae07507ea9a7e04a614e11be28ee5bd  data/db/storagegenie.db
+28
+20260924_sg114_relation
+sqlite_rc=0
+== JS pre-vs-post byte adjudication ==
+pre_bytes=325039 post_bytes=325039
+0
+-- readable diff (fold 120):

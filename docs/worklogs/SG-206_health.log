@@ -1,0 +1,5 @@
+SG-206 health log — {{HEALTH_CMD}} bound = curl -s http://127.0.0.1:8003/v1/health
+start 2026-10-17T16:28:10Z [200] {"status":"ok","db":"ok","storage":"ok"} (prestate, epoch 1792254490)
+post-recreate 6x GET all [200] ok/ok/ok (poststate, 16:29:42Z..16:29:47Z)
+end 2026-10-17T16:30:34Z epoch 1792254634 [200] {"status":"ok","db":"ok","storage":"ok"}
+HEALTH: unchanged, OK
