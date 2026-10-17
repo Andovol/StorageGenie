@@ -1,0 +1,30 @@
+== SG-211 live verification — 2026-10-17T19:20:12Z epoch 1792264812 ==
+== container inspect ==
+Id=5f82f760d9bfbaad52020e1476f04b1d697f7d009aa629820d31e86fd5a46188 Image=sha256:38fcae5e3a81f8ed6fa4557b164ca791589d753e92230dd435996f2a91945e6b Created=2026-10-17T17:57:53.711535827Z Status=running Health=healthy RestartCount=0
+inspect_exit=0
+container_image_field=sha256:38fcae5e3a81f8ed6fa4557b164ca791589d753e92230dd435996f2a91945e6b
+== image inspect ==
+Id=sha256:38fcae5e3a81f8ed6fa4557b164ca791589d753e92230dd435996f2a91945e6b Created=2026-10-17T17:57:44.734853371Z
+image_inspect_exit=0
+== health GET start ==
+{"status":"ok","db":"ok","storage":"ok"}
+http=200
+health_exit=0
+== served index ==
+index_http=200 bytes=944
+231224da729ca1034562c6be32a2f88f2b9b48e9fbeaec1e507e75717346fb4a  /tmp/opencode/sg211_index.html
+js_asset=assets/index-DbppHp6C.js css_asset=assets/index-C07VbG0m.css
+== served assets ==
+js_http=200 bytes=320700
+css_http=200 bytes=4535
+47c65dea3d7909974786314b1de6c3adf4792a5e40582bc34f6d283781f26c57  /tmp/opencode/sg211_js
+c3b58cda696a22970fc2a4a348849fc1359f2105f80f81304ed5dfd5ca31a557  /tmp/opencode/sg211_css
+== DB read (mode=ro) ==
+e6bef157440fb8b4a3262577362b071dcae07507ea9a7e04a614e11be28ee5bd  data/db/storagegenie.db
+-rw------- 1 andrei andrei 675840 Oct 12 20:03 storagegenie.db
+-rw------- 1 andrei andrei  32768 Oct 17 17:57 storagegenie.db-shm
+28
+tables_exit=0
+20260924_sg114_relation
+alembic_exit=0
+== end live verification 2026-10-17T19:20:12Z

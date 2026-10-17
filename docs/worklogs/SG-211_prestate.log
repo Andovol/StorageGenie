@@ -1,0 +1,33 @@
+== SG-211 prestate — 2026-10-17T19:20:12Z epoch 1792264812 ==
+git_requested_ref=automation
+git_resolved_automation=394e4e75fa585b00c81d3fae708515fb536247fe
+git_resolved_origin_automation=394e4e75fa585b00c81d3fae708515fb536247fe
+git_HEAD=394e4e75fa585b00c81d3fae708515fb536247fe
+branch=automation
+worktree_short:
+?? docs/worklogs/SG-211_prestate.log
+tag_count=0
+lane_socket:
+total 0
+drwx------  2 andrei andrei   60 Oct 17 19:18 .
+drwxr-xr-x 35 root   root   1080 Oct 17 19:18 ..
+srw-rw---T  1 andrei 100987    0 Oct 16 17:19 docker.sock
+product_diff_145277d..HEAD_backend_frontend_lines=0
+product_diff_names_145277d..HEAD_backend_frontend:
+diff_stat_names_145277d..HEAD_all:
+STATE.md
+docs/decisions/2026-10-17-d19-d22-answers.md
+docs/packets/SG-211-release.md
+docs/packets/SG-212-width-adaptive-density.md
+docs/ratings.md
+docs/worklogs/SG-210_audit.md
+docs/worklogs/SG-210_build.log
+docs/worklogs/SG-210_health.log
+docs/worklogs/SG-210_poststate.log
+docs/worklogs/SG-210_prestate.log
+docs/worklogs/SG-210_receipt.log
+docs/worklogs/SG-210_recreate.log
+docs/worklogs/SG-210_report.md
+docs/worklogs/SG-210_scope.log
+docs/worklogs/SG-210_tests_frontend.log
+docs/worklogs/SG-210_worklog.log

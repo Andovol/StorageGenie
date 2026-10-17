@@ -1,0 +1,7 @@
+SG-211 worklog — 2026-10-17 (append-only; lane dispatch-storagegenie@SG-211, budget 2100 s)
+19:18:59 lane start (systemd ExecMainStartTimestamp).
+19:20:12 prestate: requested ref automation resolved 394e4e75fa585b00c81d3fae708515fb536247fe == origin/automation == HEAD; worktree clean (own prestate log untracked at capture); tag count 0; lane socket /run/dispatch-storagegenie-SG-211/docker.sock present; product diff 145277d..HEAD backend+frontend = 0 lines (docs/STATE only).
+19:20:12 live re-read: container 5f82f760…a46188 (running/healthy, RestartCount 0, created 17:57:53.711535827Z), image sha256:38fcae5e… (created 17:57:44.734853371Z); health 200 {"status":"ok","db":"ok","storage":"ok"}; index 231224da… 944 B; JS index-DbppHp6C.js 47c65dea… 320700 B; CSS index-C07VbG0m.css c3b58cda… 4535 B; DB sha e6bef157… 28 tables alembic 20260924_sg114_relation. All 14 values == SG-210 poststate — match, no delta. Evidence SG-211_prestate.log + SG-211_live.log.
+19:21 release record written docs/releases/2026-10-17.md (first file under docs/releases/).
+19:21 annotated tag release-2026-10-17 created (tag object 6fec36da39b54468ef054cf5600101afb698b19c) on verified HEAD 394e4e7; message carries the served shas.
+19:22 work commit (release record + this worklog + prestate + live logs); push origin automation; tag push; ls-remote read-back — hashes/exit codes in the report.
