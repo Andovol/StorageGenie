@@ -1,0 +1,11 @@
+Partial-Receipt-ID: SG-209
+utc=2026-10-17T17:51:29Z
+killed=exit_no_receipt
+pushed=0
+uncommitted=none
+wip=none
+wip_elapsed_ms=68
+DISPATCH_RESULT id=SG-209 coder=opencode exit=0 head=0858098e01e9f7add2a1bafcd914641d468e7ff0 note=no moved=yes rewrite=no dirty=no elapsed=815s budget=2100s killed=exit_no_receipt stragglers=0
+P1_moved=PASS count=3
+P2_rewrite=PASS behind=0
+P6_dirty=PASS dirty=no
