@@ -1,0 +1,22 @@
+Dispatch-ID: SG-208.dbg | Report: note
+Debug-Report-Begin
+STAGE: Coder or provider
+CAUSE: The OpenCode provider rejected a request because its API key had expired; the Coder exited 1 without publishing the required receipt.
+EVIDENCE:
+- evidence file: "Result=exit-code" and "ExecMainStatus=1"
+- journal: "DISPATCH_RESULT id=SG-208 coder=opencode exit=1 head=7a99fc74de9851bb8577e2103f94ca2c40d0a132 note=no moved=yes rewrite=no dirty=yes elapsed=553s budget=2100s stragglers=0"
+- log: "Error: This API key has expired. Create a new API key in OpenCode Console and replace it in your client or secret store. Signing in again will not renew this key."
+- packet: "A4: notes-ref receipt, first line `Dispatch-ID: SG-208 | Report: docs/worklogs/SG-208_report.md`, Work-HEAD recorded, pushed + read back."
+- ref: "Negative-Receipt-ID: SG-208" and "P5_receipt=FAIL"; no positive receipt note was found for the preserved SG-208 commit.
+STRANDED WORK:
+- refs/quarantine/SG-025-20260912T164340Z — provider-call migration, provider abstraction/services/tests, ADRs, and SG-025 logs/report.
+- refs/quarantine/SG-066-20260921T095958Z — analytics backend service/API, frontend analytics page, and tests.
+- refs/quarantine/SG-088-20260921T174803Z — plugin taxonomy and PostgreSQL test changes plus SG-088 logs.
+- refs/quarantine/SG-208-20261017T171409Z — SG-208 driver, catalog and inbox screenshots, and four smoke JSON files; no report file.
+- refs/quarantine/preserve-20260907T083833Z — SG-008 receipt commit holding docs/worklogs/SG-008_report.md.
+- refs/quarantine/preserve-20261017T171411Z — SG-208 candidate commit holding the household-selector UI removal and related frontend tests across 19 files.
+NEXT ACTION: change the lane configuration
+CONFIDENCE: high
+
+Debug-Report-End
+moved=no
