@@ -1,0 +1,5 @@
+SG-216 additional key-value gate: scan every evidence artifact byte-for-byte for the live credential value.
+command: grep -rFl "$OPENROUTER_API_KEY" /evidence   (the value is expanded from the container environment; it is never printed)
+exit=1 (1 = zero matches = EMPTY; 0 = MATCH -> STOP and do not commit)
+matching_bytes=0
+key_grep_rc=0
