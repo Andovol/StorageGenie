@@ -1,0 +1,28 @@
+SG-226 LATE RECEIPT TRANSCRIPT — recovery published by SG-227 (the killed unit could not publish it).
+Reason: SG-226 was killed 1s over its lane budget AFTER its report commit, BEFORE publishing the receipt (result=partial killed=term pushed=3 wip=none; lane partial note on record; NO Dispatch-ID note existed).
+Target: report commit live-resolved as the tip-most commit containing docs/worklogs/SG-226_report.md (method, not an inherited hash).
+utc=2026-10-21T22:08:54Z
+--- git log --format=%H -n 1 HEAD   [this slice's own HEAD, not the note target]
+1b74cdc5888ed43a20533e555cdab076236ae75e
+--- git log --format=%H -n 1 -- docs/worklogs/SG-226_report.md   [live-resolved work-head]
+cb9734ae90f153b0bac9f349723a0a5095a40762
+--- git notes --ref=refs/notes/storagegenie-coder-reports add -m "Dispatch-ID: SG-226 | Report: docs/worklogs/SG-226_report.md" cb9734ae90f153b0bac9f349723a0a5095a40762
+notes_add_exit=0
+--- git push origin refs/notes/storagegenie-coder-reports
+To github.com:Andovol/StorageGenie.git
+   35c9a92..154a634  refs/notes/storagegenie-coder-reports -> refs/notes/storagegenie-coder-reports
+notes_push_exit=0
+--- git push origin automation   [no-op expected; nothing to push]
+Everything up-to-date
+automation_push_exit=0
+--- mapped fetch read-back: git fetch origin refs/notes/storagegenie-coder-reports:refs/notes/sg226-readback
+From github.com:Andovol/StorageGenie
+ * [new ref]         refs/notes/storagegenie-coder-reports -> refs/notes/sg226-readback
+fetch_exit=0
+--- git rev-parse refs/notes/sg226-readback
+154a6349c4576a9982afda7d390c811d469c1c07
+--- git notes --ref=refs/notes/sg226-readback show cb9734ae90f153b0bac9f349723a0a5095a40762
+Dispatch-ID: SG-226 | Report: docs/worklogs/SG-226_report.md
+readback_show_exit=0
+--- git ls-remote origin refs/notes/storagegenie-coder-reports   [remote ref after push]
+154a6349c4576a9982afda7d390c811d469c1c07	refs/notes/storagegenie-coder-reports

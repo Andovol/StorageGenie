@@ -1,0 +1,48 @@
+SG-227 G1 live verification (read-only; sqlite mode=ro; served route GET; no writes)
+utc=2026-10-21T22:08:07Z
+--- health start (packet: ONE GET /v1/health start+end)
+command: curl -s http://127.0.0.1:8003/v1/health
+{"status":"ok","db":"ok","storage":"ok"}
+--- db file sha256 (host bind /home/andrei/StorageGenie/data/db)
+be86d23cdd051dd59429804e5a906d0f7e3d254cf44ddf80da84bce2405404b6  data/db/storagegenie.db
+cb46d5f5faf657124c5d88362b4d746d42e8c30a776e3dffb31aeb26c42242f6  data/db/storagegenie.db-wal
+478465c47d5f4a10161d61adf3b5e3cb97ddc59c4faee1a3cadf3d58f1cec1aa  data/db/storagegenie.db-shm
+--- migration head
+20260924_sg114_relation
+--- table counts vs SG-226 post-state (evidence 27, provider_call 39, audit_event 100, asset_evidence 20)
+evidence  provider_call  audit_event  asset_evidence  provider_call_null_cost  provider_call_known_cost
+--------  -------------  -----------  --------------  -----------------------  ------------------------
+27        39             100          20              0                        0.025178175             
+--- evidence rows (report ids)
+id                                    household_id                          sha256                                                            media_type  source_kind   size_bytes  original_filename                               created_at         
+------------------------------------  ------------------------------------  ----------------------------------------------------------------  ----------  ------------  ----------  ----------------------------------------------  -------------------
+01a1605c-2829-74e0-b628-98574f4711fb  01a0a029-1477-7ca0-b200-bce78a96c679  076276a58ebc1f84a50740e162ae47fd2d581e57459ff0d3bf144a1d8fcdede0  image/jpeg  scene_render  531826      scene-render-google-gemini-3.1-flash-image.jpg  2026-10-21 21:26:54
+01a1605c-4aa9-74f3-8bf3-f15c6c72bbe5  01a0a029-1477-7ca0-b200-bce78a96c679  2ff0fd948a23bdf5bca838db7f55cd8da2b5c483244eaff96bf7293975b8fd3b  image/jpeg  scene_render  589030      scene-render-google-gemini-3.1-flash-image.jpg  2026-10-21 21:27:03
+01a1605c-6f0f-7eb3-abff-56343649ea24  01a0a029-1477-7ca0-b200-bce78a96c679  5c3076942bd7d059f84da9f48df00015715d4195beaee315dde431fd43730f48  image/jpeg  scene_render  503143      scene-render-google-gemini-3.1-flash-image.jpg  2026-10-21 21:27:12
+01a1605c-8fc7-7043-837b-1e1633576d15  01a0a029-1477-7ca0-b200-bce78a96c679  70f495b97ffa8261f1365adcedf679d6349e5d2f98d3079837d09fdf65de3a7d  image/jpeg  scene_render  546385      scene-render-google-gemini-3.1-flash-image.jpg  2026-10-21 21:27:21
+--- provider_call rows (report ledger ids)
+id                                    provider    model                          prompt_template_version  cost  error_state  latency_ms        created_at           input_hashes_head                                                                                                         usage_head                                                                                                                                                      
+------------------------------------  ----------  -----------------------------  -----------------------  ----  -----------  ----------------  -------------------  ------------------------------------------------------------------------------------------------------------------------  ----------------------------------------------------------------------------------------------------------------------------------------------------------------
+01a1605c-2832-7142-9cc7-31ed8032cdf1  openrouter  bytedance-seed/seed-1.6-flash  scene-render-v1          0.0                8587.98780397046  2026-10-21 21:26:54  {"photo_sha256": "83c59fb9840fff65b2e214394ee04904482aa31bec6ed5a28043e6f10906e58f", "brief_sha256": "39a56f8bc60ab5043a  {"prompt_tokens": 288, "completion_tokens": 1408, "total_tokens": 1696, "cost": 0, "is_byok": true, "prompt_tokens_details": {"cached_tokens": 0, "cache_write_t
+01a1605c-4aaf-7811-9e1b-34a203c195ca  openrouter  bytedance-seed/seed-1.6-flash  scene-render-v1          0.0                8700.11290698312  2026-10-21 21:27:03  {"photo_sha256": "76ef008bf309207c21d126dae390020ffb51d6872d978ce02532849fd0570a59", "brief_sha256": "39a56f8bc60ab5043a  {"prompt_tokens": 288, "completion_tokens": 1431, "total_tokens": 1719, "cost": 0, "is_byok": true, "prompt_tokens_details": {"cached_tokens": 0, "cache_write_t
+01a1605c-6f13-7d20-8db8-989bf9856ceb  openrouter  bytedance-seed/seed-1.6-flash  scene-render-v1          0.0                9183.23682801565  2026-10-21 21:27:12  {"photo_sha256": "925c115e67fc76ed527e0e1755a17c9d1d4aac9ce6d57422be4f728959f473c9", "brief_sha256": "39a56f8bc60ab5043a  {"prompt_tokens": 288, "completion_tokens": 1452, "total_tokens": 1740, "cost": 0, "is_byok": true, "prompt_tokens_details": {"cached_tokens": 0, "cache_write_t
+01a1605c-8fcb-7c52-ad12-9cd64f08e0ca  openrouter  bytedance-seed/seed-1.6-flash  scene-render-v1          0.0                8237.49021202093  2026-10-21 21:27:21  {"photo_sha256": "de892ff51d0ee73abd96df0438bcc55777ded92f54ecff83635fef99be6a9359", "brief_sha256": "39a56f8bc60ab5043a  {"prompt_tokens": 288, "completion_tokens": 1422, "total_tokens": 1710, "cost": 0, "is_byok": true, "prompt_tokens_details": {"cached_tokens": 0, "cache_write_t
+--- audit_event rows (report audit ids)
+id                                    actor         action           entity_type  entity_id                             household_id                          timestamp                 
+------------------------------------  ------------  ---------------  -----------  ------------------------------------  ------------------------------------  --------------------------
+01a1605c-282b-79e2-9b4c-f6a1cf90b5fd  scene-render  evidence.create  evidence     01a1605c-2829-74e0-b628-98574f4711fb  01a0a029-1477-7ca0-b200-bce78a96c679  2026-10-21 21:26:54.762396
+01a1605c-4aa9-74f3-8bf3-f16c9c2b90cf  scene-render  evidence.create  evidence     01a1605c-4aa9-74f3-8bf3-f15c6c72bbe5  01a0a029-1477-7ca0-b200-bce78a96c679  2026-10-21 21:27:03.593712
+01a1605c-6f10-7e70-956f-c89a54414ca6  scene-render  evidence.create  evidence     01a1605c-6f0f-7eb3-abff-56343649ea24  01a0a029-1477-7ca0-b200-bce78a96c679  2026-10-21 21:27:12.911737
+01a1605c-8fc7-7043-837b-1e2612d57a82  scene-render  evidence.create  evidence     01a1605c-8fc7-7043-837b-1e1633576d15  01a0a029-1477-7ca0-b200-bce78a96c679  2026-10-21 21:27:21.287680
+--- asset_evidence link rows for the four assets (joined to evidence)
+asset_id                              display_name                                            evidence_id                           source_kind   sha256                                                            size_bytes  created_at         
+------------------------------------  ------------------------------------------------------  ------------------------------------  ------------  ----------------------------------------------------------------  ----------  -------------------
+01a0a467-eb0e-7b83-a227-af122dc9268b  Toothpaste                                              01a1605c-2829-74e0-b628-98574f4711fb  scene_render  076276a58ebc1f84a50740e162ae47fd2d581e57459ff0d3bf144a1d8fcdede0  531826      2026-10-21 21:32:47
+01a0c47f-fbb3-7db1-b6f3-aa52d20aa6a0  UHT Lapte 3,5% grăsime                                  01a1605c-4aa9-74f3-8bf3-f15c6c72bbe5  scene_render  2ff0fd948a23bdf5bca838db7f55cd8da2b5c483244eaff96bf7293975b8fd3b  589030      2026-10-21 21:32:49
+01a0c481-720e-7923-ad6c-bee45caba30f  Milbona Parmigiano Reggiano Italian hard cheese flakes  01a1605c-6f0f-7eb3-abff-56343649ea24  scene_render  5c3076942bd7d059f84da9f48df00015715d4195beaee315dde431fd43730f48  503143      2026-10-21 21:32:50
+01a131ae-7a0c-7363-91c8-cfef6bd1faa3  TRACHISAN comprimate de supt                            01a1605c-8fc7-7043-837b-1e1633576d15  scene_render  70f495b97ffa8261f1365adcedf679d6349e5d2f98d3079837d09fdf65de3a7d  546385      2026-10-21 21:32:51
+--- health end (packet: ONE GET /v1/health start+end; no restart, no served-code change in this slice)
+command: curl -s http://127.0.0.1:8003/v1/health
+{"status":"ok","db":"ok","storage":"ok"}
+--- served container state (unchanged) ---
+f419758d5dfb storagegenie-backend Up 2 hours (healthy) storagegenie-backend-1

@@ -1,0 +1,15 @@
+SG-227 G1 live surface re-verification (read-only GET, served container f419758d, image d6c6a106; no restart).
+utc=2026-10-21T22:08:28Z
+route: GET http://127.0.0.1:8003/v1/assets/<asset_id>?household_id=01a0a029-1477-7ca0-b200-bce78a96c679
+--- Toothpaste 01a0a467-eb0e-7b83-a227-af122dc9268b
+scene_render_links= [('01a1605c-2829-74e0-b628-98574f4711fb', 'scene_render', '076276a58ebc1f84a50740e162ae47fd2d581e57459ff0d3bf144a1d8fcdede0')]
+match_report=True
+--- UHT 01a0c47f-fbb3-7db1-b6f3-aa52d20aa6a0
+scene_render_links= [('01a1605c-4aa9-74f3-8bf3-f15c6c72bbe5', 'scene_render', '2ff0fd948a23bdf5bca838db7f55cd8da2b5c483244eaff96bf7293975b8fd3b')]
+match_report=True
+--- Milbona 01a0c481-720e-7923-ad6c-bee45caba30f
+scene_render_links= [('01a1605c-6f0f-7eb3-abff-56343649ea24', 'scene_render', '5c3076942bd7d059f84da9f48df00015715d4195beaee315dde431fd43730f48')]
+match_report=True
+--- TRACHISAN 01a131ae-7a0c-7363-91c8-cfef6bd1faa3
+scene_render_links= [('01a1605c-8fc7-7043-837b-1e1633576d15', 'scene_render', '70f495b97ffa8261f1365adcedf679d6349e5d2f98d3079837d09fdf65de3a7d')]
+match_report=True

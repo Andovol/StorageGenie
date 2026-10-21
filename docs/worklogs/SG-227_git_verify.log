@@ -1,0 +1,43 @@
+SG-227 G1 git-side verification of the pushed SG-226 delta (read-only).
+utc=2026-10-21T22:09:19Z
+--- requested base ref: automation
+--- resolved base commit at admission (== origin/automation == local HEAD; worktree clean)
+1b74cdc5888ed43a20533e555cdab076236ae75e
+1b74cdc5888ed43a20533e555cdab076236ae75e
+--- SG-226 delta commits named by the packet
+daf5e9ca06bcb5245a71cc49121c34fa97ce11bb 2026-10-21 21:26:40 +0000 SG-226 G1: driver + live enumeration (4 uncovered photos) + whole-list bound
+f20867f68b1f8531a606350d7a013fa339dda142 2026-10-21 21:32:31 +0000 SG-226 G2: four bulk scene renders (all HTTP 200, image bytes) + reviews
+cb9734ae90f153b0bac9f349723a0a5095a40762 2026-10-21 21:53:55 +0000 SG-226 G3: links for four faithful renders + live surface + report
+--- live-resolved report commit (method: tip-most commit containing docs/worklogs/SG-226_report.md)
+cb9734ae90f153b0bac9f349723a0a5095a40762
+--- report file tracked in that commit
+docs/worklogs/SG-226_report.md
+--- SG-226 artifact count tracked in the report commit
+75
+--- cited render/source/link files tracked (sample of the report's citations)
+docs/worklogs/SG-226_guard_list.json
+docs/worklogs/SG-226_guard_render1.json
+docs/worklogs/SG-226_guard_render2.json
+docs/worklogs/SG-226_guard_render3.json
+docs/worklogs/SG-226_guard_render4.json
+docs/worklogs/SG-226_ledger_row_render1.json
+docs/worklogs/SG-226_ledger_row_render2.json
+docs/worklogs/SG-226_ledger_row_render3.json
+docs/worklogs/SG-226_ledger_row_render4.json
+docs/worklogs/SG-226_link_decisions.json
+docs/worklogs/SG-226_live_surface.log
+docs/worklogs/SG-226_source_milbona.png
+docs/worklogs/SG-226_source_toothpaste.jpg
+docs/worklogs/SG-226_source_trachisan.png
+docs/worklogs/SG-226_source_uht.png
+docs/worklogs/SG-226_render1.jpg
+docs/worklogs/SG-226_render2.jpg
+docs/worklogs/SG-226_render3.jpg
+docs/worklogs/SG-226_render4.jpg
+--- driver tracked
+backend/scripts/sg226_bulk_scene.py
+--- pre-publication note check (live, earlier in this slice): error: no note found for object cb9734ae90f153b0bac9f349723a0a5095a40762.
+--- note on report commit NOW (published by this slice; exactly the Dispatch-ID line)
+Dispatch-ID: SG-226 | Report: docs/worklogs/SG-226_report.md
+--- history between report commit and current head
+1b74cdc5888ed43a20533e555cdab076236ae75e SG-226 audit + rating 98 (4/4 linked live, killed 1s over budget); SG-227 recovery + SG-228 release packets
