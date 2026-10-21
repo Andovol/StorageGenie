@@ -1,0 +1,12 @@
+plan mode: offline dry pass over committed bodies; sends nothing
+input_references_declared=True
+resolution_auto path=supported_parameters.resolution.values=['512', '1K', '2K', '4K'] chosen=512
+projection endpoints[0] worst_case_usd=0.54067200 detail=unit=token x8192tok=0.54067200
+projection endpoints[1] worst_case_usd=0.49152000 detail=unit=token x8192tok=0.49152000
+projection endpoints[2] worst_case_usd=0.49152000 detail=unit=token x8192tok=0.49152000
+guard daily   per_render=0.54067200 known_spend_daily=0.0 renders=2 total=1.08134400 cap=2.0 verdict=proceed
+guard monthly per_render=0.54067200 known_spend_monthly=0.012437125 renders=2 total=1.09378113 cap=10.0 verdict=proceed
+G2_VERDICT projection_ok daily_total=1.08134400 monthly_total=1.09378113 (D-20 daily + D-14 monthly; arc all-time=0.012437125)
+g1_render would_send={"model": "google/gemini-3.1-flash-image", "prompt": "A plain gray ceramic cup on a plain white background.", "n": 1, "resolution": "512"}
+g2_render would_send={"model": "google/gemini-3.1-flash-image", "prompt": "A plain gray ceramic cup on a plain white background.", "n": 1, "resolution": "512", "input_references": [{"type": "image_url", "image_url": {"url": "<data:image/png;base64,...>"}}]}
+plan_rc=0

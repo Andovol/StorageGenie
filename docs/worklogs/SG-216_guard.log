@@ -1,0 +1,6 @@
+guard_selftest: synthetic projections, known_spend=0.50, daily cap=2.00 monthly cap=10.00
+selftest_daily_over  total=2.5000 cap=2.0 verdict=REFUSE_over_daily_cap
+selftest_month_over  total=10.5000 cap=10.0 verdict=REFUSE_over_monthly_cap
+selftest_under       total=0.6000 cap=2.0 verdict=proceed
+guard_selftest=PASS (both cap refusals observed, under-cap proceeds)
+guard_rc=0
