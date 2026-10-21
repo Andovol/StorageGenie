@@ -1,0 +1,8 @@
+[2026-10-21T21:04:40.032318+00:00] SG-225 mode=verify image_model=google/gemini-3.1-flash-image transport=image_api evidence_dir=/evidence db={'database_url': 'sqlite:////data/db/storagegenie.db', 'resolved_path': '/data/db/storagegenie.db', 'storage_root': '/data/storage'}
+table_counts={'evidence': 22, 'provider_call': 34, 'audit_event': 95, 'asset_evidence': 16, 'provider_call_null_cost': 0, 'provider_call_known_cost': 0.025178174999999997}
+photo leg=miso evidence=01a0c4a0-af88-7903-a070-a44e7b120712 asset=01a0c4aa-8b62-7360-b11e-a476ddaea0f6 sha256=71901cac327fdd76926e36aa2a7889b2b17fb4e2619ca92d97f86d53aac0de63 bytes=1280694 ref_sha256=d07bd5bd3240d4de95baf6709590571b63661c914ef523040178bebc8cd5111e brief_sha256=74bc810a5ff90a0099e149c7b92b2ced1c8d488395813ec9eb8ab365fd9c451f
+[2026-10-21T21:04:40.050153+00:00] wrote /evidence/SG-225_cutout_unused.json
+cutout_unused raw_sha_rows=0 ref_sha_rows=1 cutout_rows=0
+pilot_cutoff=2026-10-21 00:00:00 billed=4 rendered=4 helper_consumed=5 rows=[{'id': '01a15f6f-13c4-75a3-8123-00142db2ba42', 'cost': 0.0, 'error_state': None, 'created_at': '2026-10-21 17:07:57'}, {'id': '01a15fdc-f5be-7941-b46b-e9773349ec4c', 'cost': 0.0, 'error_state': None, 'created_at': '2026-10-21 19:07:58'}, {'id': '01a15fe8-aa48-7830-86ec-b3725b611639', 'cost': 0.0, 'error_state': 'http_status:400', 'created_at': '2026-10-21 19:20:45'}, {'id': '01a15ff5-11ec-7770-8143-8cc825a1a13d', 'cost': 0.0, 'error_state': None, 'created_at': '2026-10-21 19:34:18'}, {'id': '01a16018-3eb1-79c2-bffa-39a2f0fc88c3', 'cost': 0.0, 'error_state': None, 'created_at': '2026-10-21 20:12:44'}]
+scene_spend known=0.012437125 unknown=0 owner_today=0.273168000 owner_month=0.285605125
+[2026-10-21T21:04:40.070307+00:00] wrote /evidence/SG-225_verify.json

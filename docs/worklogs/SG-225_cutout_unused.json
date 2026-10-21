@@ -1,0 +1,21 @@
+{
+ "cutout_brief_sha256": "74bc810a5ff90a0099e149c7b92b2ced1c8d488395813ec9eb8ab365fd9c451f",
+ "cutout_rows": [],
+ "photo_evidence_id": "01a0c4a0-af88-7903-a070-a44e7b120712",
+ "photo_raw_sha256": "71901cac327fdd76926e36aa2a7889b2b17fb4e2619ca92d97f86d53aac0de63",
+ "photo_ref_sha256": "d07bd5bd3240d4de95baf6709590571b63661c914ef523040178bebc8cd5111e",
+ "raw_sha_rows": 0,
+ "ref_sha_rows": 1,
+ "rows": [
+  {
+   "brief_sha256": "39a56f8bc60ab5043ac837293b89b1627a8897a7b9b045df4b8ff5ac67ff6105",
+   "cost": 0.0,
+   "created_at": "2026-10-21 17:07:57",
+   "error_state": null,
+   "id": "01a15f6f-13c4-75a3-8123-00142db2ba42",
+   "photo_sha256": "d07bd5bd3240d4de95baf6709590571b63661c914ef523040178bebc8cd5111e",
+   "prompt": "Restage this packaged product on a clean kitchen counter in warm natural daylight; keep the package, its label and its printed text exactly as photographed."
+  }
+ ],
+ "timestamp": "2026-10-21T21:04:40.049800+00:00"
+}

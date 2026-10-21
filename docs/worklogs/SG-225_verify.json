@@ -1,0 +1,181 @@
+{
+ "cutout_unused": {
+  "cutout_brief_sha256": "74bc810a5ff90a0099e149c7b92b2ced1c8d488395813ec9eb8ab365fd9c451f",
+  "cutout_rows": [],
+  "photo_evidence_id": "01a0c4a0-af88-7903-a070-a44e7b120712",
+  "photo_raw_sha256": "71901cac327fdd76926e36aa2a7889b2b17fb4e2619ca92d97f86d53aac0de63",
+  "photo_ref_sha256": "d07bd5bd3240d4de95baf6709590571b63661c914ef523040178bebc8cd5111e",
+  "raw_sha_rows": 0,
+  "ref_sha_rows": 1,
+  "rows": [
+   {
+    "brief_sha256": "39a56f8bc60ab5043ac837293b89b1627a8897a7b9b045df4b8ff5ac67ff6105",
+    "cost": 0.0,
+    "created_at": "2026-10-21 17:07:57",
+    "error_state": null,
+    "id": "01a15f6f-13c4-75a3-8123-00142db2ba42",
+    "photo_sha256": "d07bd5bd3240d4de95baf6709590571b63661c914ef523040178bebc8cd5111e",
+    "prompt": "Restage this packaged product on a clean kitchen counter in warm natural daylight; keep the package, its label and its printed text exactly as photographed."
+   }
+  ],
+  "timestamp": "2026-10-21T21:04:40.049800+00:00"
+ },
+ "database": {
+  "database_url": "sqlite:////data/db/storagegenie.db",
+  "resolved_path": "/data/db/storagegenie.db",
+  "storage_root": "/data/storage"
+ },
+ "household": {
+  "id": "01a0a029-1477-7ca0-b200-bce78a96c679",
+  "name": "Popescu Household"
+ },
+ "miso_links": [
+  {
+   "asset_id": "01a0c4aa-8b62-7360-b11e-a476ddaea0f6",
+   "evidence_id": "01a0c4a0-af88-7903-a070-a44e7b120712",
+   "media_type": "image/png",
+   "original_filename": "image.png",
+   "sha256": "71901cac327fdd76926e36aa2a7889b2b17fb4e2619ca92d97f86d53aac0de63",
+   "size_bytes": 1280694,
+   "source_kind": "upload"
+  },
+  {
+   "asset_id": "01a0c4aa-8b62-7360-b11e-a476ddaea0f6",
+   "evidence_id": "01a0c4a0-d56f-7400-a295-6ac3b2176006",
+   "media_type": "text/plain",
+   "original_filename": "transcript.txt",
+   "sha256": "9a21f4fa07f52268b5b215b802462571ca873133cfc814278f6c2fe120901971",
+   "size_bytes": 104,
+   "source_kind": "transcript"
+  },
+  {
+   "asset_id": "01a0c4aa-8b62-7360-b11e-a476ddaea0f6",
+   "evidence_id": "01a15f6f-13ba-76e0-9238-acd5883c65f1",
+   "media_type": "image/jpeg",
+   "original_filename": "scene-render-google-gemini-3.1-flash-image.jpg",
+   "sha256": "41d619db9f6950762cb54053dfb5f9050711bb662bb0cba5119a9225f8738f7b",
+   "size_bytes": 703036,
+   "source_kind": "scene_render"
+  }
+ ],
+ "photo": {
+  "asset_id": "01a0c4aa-8b62-7360-b11e-a476ddaea0f6",
+  "asset_type": "soup",
+  "brief": "Isolate this packaged product on a plain seamless white background, front-facing, even studio lighting; the full package with its label and printed text exactly as photographed; no props, no scene, no shadow, no hands.",
+  "brief_sha256": "74bc810a5ff90a0099e149c7b92b2ced1c8d488395813ec9eb8ab365fd9c451f",
+  "created_at": "2026-09-21 15:41:00",
+  "display_name": "Miso Soup",
+  "evidence_id": "01a0c4a0-af88-7903-a070-a44e7b120712",
+  "label": "Miso Soup cutout",
+  "leg": "miso",
+  "media_type": "image/png",
+  "photo_bytes": 1280694,
+  "photo_ref_sha256": "d07bd5bd3240d4de95baf6709590571b63661c914ef523040178bebc8cd5111e",
+  "photo_sha256": "71901cac327fdd76926e36aa2a7889b2b17fb4e2619ca92d97f86d53aac0de63",
+  "sha256": "71901cac327fdd76926e36aa2a7889b2b17fb4e2619ca92d97f86d53aac0de63",
+  "size_bytes": 1280694,
+  "source_copy": "/evidence/SG-225_source_miso.png",
+  "source_kind": "upload",
+  "status": "ACTIVE",
+  "storage_key": "01a0a029-1477-7ca0-b200-bce78a96c679/71/71901cac327fdd76926e36aa2a7889b2b17fb4e2619ca92d97f86d53aac0de63.png"
+ },
+ "pilot": {
+  "billed": 4,
+  "cutoff": "2026-10-21 00:00:00",
+  "helper_consumed": 5,
+  "rendered": 4,
+  "rows": [
+   {
+    "cost": 0.0,
+    "created_at": "2026-10-21 17:07:57",
+    "error_state": null,
+    "id": "01a15f6f-13c4-75a3-8123-00142db2ba42"
+   },
+   {
+    "cost": 0.0,
+    "created_at": "2026-10-21 19:07:58",
+    "error_state": null,
+    "id": "01a15fdc-f5be-7941-b46b-e9773349ec4c"
+   },
+   {
+    "cost": 0.0,
+    "created_at": "2026-10-21 19:20:45",
+    "error_state": "http_status:400",
+    "id": "01a15fe8-aa48-7830-86ec-b3725b611639"
+   },
+   {
+    "cost": 0.0,
+    "created_at": "2026-10-21 19:34:18",
+    "error_state": null,
+    "id": "01a15ff5-11ec-7770-8143-8cc825a1a13d"
+   },
+   {
+    "cost": 0.0,
+    "created_at": "2026-10-21 20:12:44",
+    "error_state": null,
+    "id": "01a16018-3eb1-79c2-bffa-39a2f0fc88c3"
+   }
+  ]
+ },
+ "scene_module": {
+  "file": "/app/app/services/scene/openrouter.py",
+  "sha256": "69f5abeca6d2e298ba74d225e09fe855dd81cd049100c79158fd2761d64c8b15"
+ },
+ "spend": {
+  "known": 0.012437125,
+  "owner_month": 0.285605125,
+  "owner_rows": [
+   {
+    "created_at": "2026-10-09 14:39:55",
+    "id": "01a1211b-3ae2-7ec2-aa57-4e1a8219c8f8",
+    "upstream": 0.0007589249999999999
+   },
+   {
+    "created_at": "2026-10-12 14:24:53",
+    "id": "01a13080-8b71-7851-8460-813b909b6034",
+    "upstream": 0.000802275
+   },
+   {
+    "created_at": "2026-10-12 14:28:48",
+    "id": "01a13084-21bb-7850-b8c8-e61f4e85698d",
+    "upstream": 0.0008759250000000001
+   },
+   {
+    "created_at": "2026-10-12 17:45:15",
+    "id": "01a13137-fe82-77e1-95fa-a9c97aff75b4",
+    "upstream": 0.01
+   },
+   {
+    "created_at": "2026-10-21 17:07:57",
+    "id": "01a15f6f-13c4-75a3-8123-00142db2ba42",
+    "upstream": 0.068184
+   },
+   {
+    "created_at": "2026-10-21 19:07:58",
+    "id": "01a15fdc-f5be-7941-b46b-e9773349ec4c",
+    "upstream": 0.068256
+   },
+   {
+    "created_at": "2026-10-21 19:34:18",
+    "id": "01a15ff5-11ec-7770-8143-8cc825a1a13d",
+    "upstream": 0.068229
+   },
+   {
+    "created_at": "2026-10-21 20:12:44",
+    "id": "01a16018-3eb1-79c2-bffa-39a2f0fc88c3",
+    "upstream": 0.068499
+   }
+  ],
+  "owner_today": 0.27316799999999997,
+  "unknown_cost_calls": 0
+ },
+ "table_counts": {
+  "asset_evidence": 16,
+  "audit_event": 95,
+  "evidence": 22,
+  "provider_call": 34,
+  "provider_call_known_cost": 0.025178174999999997,
+  "provider_call_null_cost": 0
+ },
+ "timestamp": "2026-10-21T21:04:40.069040+00:00"
+}
