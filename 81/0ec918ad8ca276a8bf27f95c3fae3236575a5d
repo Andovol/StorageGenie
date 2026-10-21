@@ -1,0 +1,11 @@
+Partial-Receipt-ID: SG-224
+utc=2026-10-21T20:59:08Z
+killed=exit_no_receipt
+pushed=0
+uncommitted=none
+wip=none
+wip_elapsed_ms=66
+DISPATCH_RESULT id=SG-224 coder=opencode exit=0 head=56fd3851429b872015e08ebc16b0819bfdb63f05 note=no moved=yes rewrite=no dirty=no elapsed=389s budget=2100s killed=exit_no_receipt stragglers=0
+P1_moved=PASS count=4
+P2_rewrite=PASS behind=0
+P6_dirty=PASS dirty=no
