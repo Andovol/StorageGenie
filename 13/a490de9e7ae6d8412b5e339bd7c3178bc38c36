@@ -1,0 +1,11 @@
+Partial-Receipt-ID: SG-222
+utc=2026-10-21T19:58:37Z
+killed=exit_no_receipt
+pushed=0
+uncommitted=none
+wip=none
+wip_elapsed_ms=71
+DISPATCH_RESULT id=SG-222 coder=opencode exit=0 head=6a656ee8be5cf5f6f75cca79af75e5ff020cba9b note=no moved=yes rewrite=no dirty=no elapsed=297s budget=2100s killed=exit_no_receipt stragglers=0
+P1_moved=PASS count=3
+P2_rewrite=PASS behind=0
+P6_dirty=PASS dirty=no
