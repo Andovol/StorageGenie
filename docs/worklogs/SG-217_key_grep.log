@@ -1,4 +1,4 @@
-SG-217 additional key-value gate (final pre-commit pass): scan every evidence artifact byte-for-byte for the live credential value.
+SG-217 additional key-value gate (final pass incl. receipt log): scan every evidence artifact byte-for-byte for the live credential value.
 The value is expanded from the container environment; it is never printed.
-key_gate scanned_files=1180 matching_bytes=0
+key_gate scanned_files=1181 matching_bytes=0
 key_gate_exit=0
