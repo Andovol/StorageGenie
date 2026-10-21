@@ -1,0 +1,11 @@
+Partial-Receipt-ID: SG-226
+utc=2026-10-21T21:58:06Z
+killed=term
+pushed=3
+uncommitted=none
+wip=none
+wip_elapsed_ms=68
+DISPATCH_RESULT id=SG-226 coder=opencode exit=143 head=cb9734ae90f153b0bac9f349723a0a5095a40762 note=no moved=yes rewrite=no dirty=no elapsed=2101s budget=2100s killed=term
+P1_moved=PASS count=3
+P2_rewrite=PASS behind=0
+P6_dirty=PASS dirty=no
