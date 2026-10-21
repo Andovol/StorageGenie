@@ -1,0 +1,42 @@
+SG-216 receipt transcript (verbatim commands + outputs, UTC 2026-10-21T16:54:28Z)
+requested_ref=automation
+--- git log --format=%H -n 1 HEAD
+820cc9cf06b6b76f639ea2f2287b931158abd659
+Work-HEAD: 820cc9cf06b6b76f639ea2f2287b931158abd659
+--- git notes --ref=refs/notes/storagegenie-coder-reports add -m "Dispatch-ID: SG-216 | Report: docs/worklogs/SG-216_report.md" 820cc9cf06b6b76f639ea2f2287b931158abd659
+notes_add_rc=0
+--- git push origin refs/notes/storagegenie-coder-reports
+To github.com:Andovol/StorageGenie.git
+   11a9a7e..be7b873  refs/notes/storagegenie-coder-reports -> refs/notes/storagegenie-coder-reports
+notes_push_rc=0
+--- git push origin automation
+To github.com:Andovol/StorageGenie.git
+   5a69bf6..820cc9c  automation -> automation
+automation_push_rc=0
+--- mapped fetch of the notes ref: git fetch origin refs/notes/storagegenie-coder-reports:refs/remotes/origin/storagegenie-coder-reports
+From github.com:Andovol/StorageGenie
+ * [new ref]         refs/notes/storagegenie-coder-reports -> origin/storagegenie-coder-reports
+notes_fetch_rc=0
+--- remote read-back: git notes --ref=refs/remotes/origin/storagegenie-coder-reports show 820cc9cf06b6b76f639ea2f2287b931158abd659
+error: no note found for object 820cc9cf06b6b76f639ea2f2287b931158abd659.
+notes_show_rc=1
+--- remote refs: git ls-remote origin refs/notes/storagegenie-coder-reports refs/heads/automation
+820cc9cf06b6b76f639ea2f2287b931158abd659	refs/heads/automation
+be7b873420243c22834dfa4cdc0d375c13e8b322	refs/notes/storagegenie-coder-reports
+ls_remote_rc=0
+
+--- CORRECTION (CO-21), same receipt, appended: the first mapped read-back used --ref=refs/remotes/origin/storagegenie-coder-reports; git notes prefixes a ref that is not already under refs/notes/, so it resolved to refs/notes/refs/remotes/origin/storagegenie-coder-reports (nonexistent) and reported no note. The fetched tree itself DID contain the note (proved below by cat-file). Re-fetch mapped under refs/notes/ and read back with git notes.
+--- git fetch origin refs/notes/storagegenie-coder-reports:refs/notes/sg216-readback
+From github.com:Andovol/StorageGenie
+ * [new ref]         refs/notes/storagegenie-coder-reports -> refs/notes/sg216-readback
+mapped_fetch_rc=0
+--- git notes --ref=sg216-readback get-ref
+refs/notes/sg216-readback
+get_ref_rc=0
+--- git notes --ref=sg216-readback show 820cc9cf06b6b76f639ea2f2287b931158abd659
+Dispatch-ID: SG-216 | Report: docs/worklogs/SG-216_report.md
+notes_show_corrected_rc=0
+--- git cat-file -p refs/notes/sg216-readback:82/0cc9cf06b6b76f639ea2f2287b931158abd659
+Dispatch-ID: SG-216 | Report: docs/worklogs/SG-216_report.md
+cat_file_rc=0
+--- remote refs after the receipt commit will be re-checked
