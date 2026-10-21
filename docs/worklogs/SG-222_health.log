@@ -1,0 +1,5 @@
+SG-222 health log (start/end; GET http://127.0.0.1:8003/v1/health)
+start 2026-10-21T19:54:35Z: {"status":"ok","db":"ok","storage":"ok"} [200]
+post-recreate 2026-10-21T19:55:43Z: x6 [200] identical (SG-222_poststate.log)
+end 2026-10-21T19:56:35Z: {"status":"ok","db":"ok","storage":"ok"} [200]
+delta: none

@@ -1,0 +1,27 @@
+SG-222 byte proof: served (localhost:8003) vs in-image (/app/static), read via one docker cp 2026-10-21T19:56:01Z
+--- in-image stat
+/tmp/opencode/SG-222/in-image:
+total 16
+drwxr-xr-x 3 andrei andrei 4096 Oct 21 19:55 .
+drwxr-xr-x 5 andrei andrei 4096 Oct 21 19:56 ..
+drwxr-xr-x 2 andrei andrei 4096 Oct 21 19:55 assets
+-rw-r--r-- 1 andrei andrei  944 Oct 21 19:55 index.html
+
+/tmp/opencode/SG-222/in-image/assets:
+total 332
+drwxr-xr-x 2 andrei andrei   4096 Oct 21 19:55 .
+drwxr-xr-x 3 andrei andrei   4096 Oct 21 19:55 ..
+-rw-r--r-- 1 andrei andrei   4535 Oct 21 19:55 index-C07VbG0m.css
+-rw-r--r-- 1 andrei andrei 321283 Oct 21 19:55 index-DGAIzmTn.js
+--- in-image shas
+345bbe8c3601e631c2a9d767f8688a1df20b7980d1fea8640d9f8bc2ffca5aa8  /tmp/opencode/SG-222/in-image/index.html
+43c05c518c08d2b59cc2fbe54846519ec03aa03352bf3c2e2a09635f1efb054c  /tmp/opencode/SG-222/in-image/assets/index-DGAIzmTn.js
+c3b58cda696a22970fc2a4a348849fc1359f2105f80f81304ed5dfd5ca31a557  /tmp/opencode/SG-222/in-image/assets/index-C07VbG0m.css
+--- cmp served vs in-image x3
+cmp served-post/index.html vs in-image/index.html rc=0 (0=byte-identical)
+cmp served-post/app.js vs in-image/assets/index-DGAIzmTn.js rc=0 (0=byte-identical)
+cmp served-post/app.css vs in-image/assets/index-C07VbG0m.css rc=0 (0=byte-identical)
+--- served JS moved off SG-214 value
+pre_SG214_js_sha=8bab60ce6994cb9595aea213bbfd2fbfda88d4814dcfe81dfff4e4f626f9c163 (index-ZkOUf-iS.js)
+post_js_sha=43c05c518c08d2b59cc2fbe54846519ec03aa03352bf3c2e2a09635f1efb054c (index-DGAIzmTn.js)
+--- in-image backend serializer key (grep on the docker-cp'd? no: live API proves it; image filesystem read NOT issued beyond /app/static)

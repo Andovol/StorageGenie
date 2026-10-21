@@ -1,0 +1,55 @@
+SG-222 end health + DB post-tests (read-only) 2026-10-21T19:56:35Z epoch=1792612595
+--- end health x2 ({{HEALTH_CMD}})
+health_end[1] http=200 {"status":"ok","db":"ok","storage":"ok"}
+health_end[2] http=200 {"status":"ok","db":"ok","storage":"ok"}
+health_pre: {"status":"ok","db":"ok","storage":"ok"}
+delta_pre_to_end: none (identical body {"status":"ok","db":"ok","storage":"ok"})
+--- container end
+Id=f419758d5dfb241438a62d110faa6bc83c147881456e334a913cc561d58fa995 Image=sha256:d6c6a106176f0ea954d4ad47a26a8e389033146e2647c3ab60ff7713741b8865 RestartCount=0 State=running Health=healthy StartedAt=2026-10-21T19:55:22.360576491Z
+--- DB post-tests (hash first, then reads)
+be86d23cdd051dd59429804e5a906d0f7e3d254cf44ddf80da84bce2405404b6  data/db/storagegenie.db
+e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  data/db/storagegenie.db-wal
+fd4c9fda9cd3f9ae7c962b0ddf37232294d55580e1aa165aa06129b8549389eb  data/db/storagegenie.db-shm
+total 716
+drwxr-xr-x 2 andrei andrei   4096 Oct 21 19:55 .
+drwxr-xr-x 4 andrei andrei   4096 Sep  2 12:00 ..
+-rw------- 1 andrei andrei 688128 Oct 21 19:55 storagegenie.db
+-rw------- 1 andrei andrei  32768 Oct 21 19:55 storagegenie.db-shm
+-rw------- 1 andrei andrei      0 Oct 21 19:55 storagegenie.db-wal
+28
+20260924_sg114_relation
+--- table counts (normalized) vs SG-221 post inventory
+table_counts_identical_to_SG221_post=yes (28 tables)
+alembic_version|1
+assertion|37
+asset_evidence|17
+asset_fts_config|1
+asset_fts_data|9
+asset_fts_docsize|7
+asset_fts_idx|7
+asset_fts|7
+asset_location|1
+asset_relation|1
+asset|7
+audit_event|94
+candidate|10
+enrich_snapshot|4
+evidence|21
+guardrail_event|2
+household|1
+idempotency_key|11
+job_step|72
+job|11
+location|1
+observation|20
+planning_suggestion|0
+provider_call|33
+review_task|8
+saved_search|0
+source_attribution|0
+user|2
+--- the 3 SG-221 link rows (unchanged)
+01a0c4aa-8b62-7360-b11e-a476ddaea0f6|01a15f6f-13ba-76e0-9238-acd5883c65f1|2026-10-21 19:48:05
+01a0c4ab-3765-7e10-8d0a-705390c6560d|01a15fdc-f5b6-7f31-9008-2f8d89be8813|2026-10-21 19:48:05
+01a0c4ab-3765-7e10-8d0a-705390c6560d|01a15ff5-11e3-7243-99a6-9eeb9bbe1e09|2026-10-21 19:48:05
+END 2026-10-21T19:56:35Z epoch=1792612595

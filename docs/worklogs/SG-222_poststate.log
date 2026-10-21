@@ -1,0 +1,65 @@
+SG-222 poststate (read-only) captured 2026-10-21T19:55:43Z epoch=1792612543
+--- container post
+Id=f419758d5dfb241438a62d110faa6bc83c147881456e334a913cc561d58fa995 Created=2026-10-21T19:55:20.498187489Z Image=sha256:d6c6a106176f0ea954d4ad47a26a8e389033146e2647c3ab60ff7713741b8865 RestartCount=0 State=running Health=healthy StartedAt=2026-10-21T19:55:22.360576491Z
+--- image post (storagegenie-backend:latest)
+Id=sha256:d6c6a106176f0ea954d4ad47a26a8e389033146e2647c3ab60ff7713741b8865 Created=2026-10-21T19:55:06.320582092Z RepoTags=[storagegenie-backend:latest]
+--- health post x6
+health[1] http=200 {"status":"ok","db":"ok","storage":"ok"} at 19:55:43Z
+health[2] http=200 {"status":"ok","db":"ok","storage":"ok"} at 19:55:43Z
+health[3] http=200 {"status":"ok","db":"ok","storage":"ok"} at 19:55:43Z
+health[4] http=200 {"status":"ok","db":"ok","storage":"ok"} at 19:55:43Z
+health[5] http=200 {"status":"ok","db":"ok","storage":"ok"} at 19:55:43Z
+health[6] http=200 {"status":"ok","db":"ok","storage":"ok"} at 19:55:43Z
+--- served post (localhost:8003)
+GET / http=200 size=944B
+served_js_path=/assets/index-DGAIzmTn.js
+served_css_path=/assets/index-C07VbG0m.css
+GET JS http=200 size=321283B
+GET CSS http=200 size=4535B
+345bbe8c3601e631c2a9d767f8688a1df20b7980d1fea8640d9f8bc2ffca5aa8  /tmp/opencode/SG-222/served-post/index.html
+43c05c518c08d2b59cc2fbe54846519ec03aa03352bf3c2e2a09635f1efb054c  /tmp/opencode/SG-222/served-post/app.js
+c3b58cda696a22970fc2a4a348849fc1359f2105f80f81304ed5dfd5ca31a557  /tmp/opencode/SG-222/served-post/app.css
+   944 /tmp/opencode/SG-222/served-post/index.html
+321283 /tmp/opencode/SG-222/served-post/app.js
+  4535 /tmp/opencode/SG-222/served-post/app.css
+326762 total
+--- post-bundle marker counts (served JS)
+scene-image=1
+scene_render=1
+scene-honest-state=1
+Generate Context Scene=1
+Source Photo=1
+storagegenie.dynv6.net=7
+localhost:8003=0
+--- compiled context for scene-image/scene_render (first matches, 220 chars)
+sts yet. Cutouts arrive with the AI stages — nothing is being processed."}),o==="scene"&&(I?l.jsx("img",{"data-testid":"scene-image",src:I,alt:`${_} context scene`,style:{width:"100%",height:"100%",objectFit:"contain"}}):l.jsx("p",{"data-testid":"scen
+],Yt=lt?`https://storagegenie.dynv6.net/v1/evidence/${lt.id}/file?household_id=${t}`:null,Xt=P.find(F=>F.source_kind==="scene_render"),I=Xt?`https://storagegenie.dynv6.net/v1/evidence/${Xt.id}/file?household_id=${t}`:null,M=E0(T),A=b0(T,"description"),
+--- SPA routes
+GET / http=200 345bbe8c3601e631c2a9d767f8688a1df20b7980d1fea8640d9f8bc2ffca5aa8  /tmp/opencode/SG-222/spa.html
+GET /inbox http=200 345bbe8c3601e631c2a9d767f8688a1df20b7980d1fea8640d9f8bc2ffca5aa8  /tmp/opencode/SG-222/spa.html
+GET /analytics http=200 345bbe8c3601e631c2a9d767f8688a1df20b7980d1fea8640d9f8bc2ffca5aa8  /tmp/opencode/SG-222/spa.html
+GET /planning http=200 345bbe8c3601e631c2a9d767f8688a1df20b7980d1fea8640d9f8bc2ffca5aa8  /tmp/opencode/SG-222/spa.html
+--- API control
+GET /v1/households http=200
+6921583771fb79bec868339653a91050d1163430ed19fa0e96268522adf8038f  /tmp/opencode/SG-222/households.json
+[{"id":"01a0a029-1477-7ca0-b200-bce78a96c679","name":"Popescu Household","created_at":"2026-09-14T13:44:01","updated_at":"2026-09-14T13:44:01"}]
+--- live asset routes (household_id=01a0a029-1477-7ca0-b200-bce78a96c679)
+GET /v1/assets/01a0c4aa-8b62-7360-b11e-a476ddaea0f6 http=200 size=4100B
+asset 01a0c4aa-8b62-7360-b11e-a476ddaea0f6 name=Miso Soup evidence=[01a0c4a0-af88-7903-a070-a44e7b120712 kind=upload image/png 1280694B; 01a0c4a0-d56f-7400-a295-6ac3b2176006 kind=transcript text/plain 104B; 01a15f6f-13ba-76e0-9238-acd5883c65f1 kind=scene_render image/jpeg 703036B]
+GET /v1/assets/01a0c4ab-3765-7e10-8d0a-705390c6560d http=200 size=5827B
+asset 01a0c4ab-3765-7e10-8d0a-705390c6560d name=Costiță de porc evidence=[01a0c4a1-acbd-7541-83b7-ce9d04730716 kind=upload image/png 565806B; 01a0c4a1-ad90-78e1-9c17-10d92260fd0e kind=upload image/png 1259505B; 01a0c4a2-2a41-77a1-9757-f0c1ae5c7cf4 kind=transcript text/plain 873B; 01a0c4a2-2a42-72b3-8131-e392ced98263 kind=transcript text/plain 99B; 01a15fdc-f5b6-7f31-9008-2f8d89be8813 kind=scene_render image/jpeg 731496B; 01a15ff5-11e3-7243-99a6-9eeb9bbe1e09 kind=scene_render image/jpeg 664184B]
+--- render file GETs (the linked scene renders)
+GET render 01a15f6f http=200 size=703036B type=image/jpeg
+GET render 01a15fdc http=200 size=731496B type=image/jpeg
+GET render 01a15ff5 http=200 size=664184B type=image/jpeg
+41d619db9f6950762cb54053dfb5f9050711bb662bb0cba5119a9225f8738f7b  /tmp/opencode/SG-222/render_miso.jpg
+ce4794a2b7422746ed541d503e61eeb9c23095485794d33c78735fe382c9e7b0  /tmp/opencode/SG-222/render_costita1.jpg
+f3d56bfb33a2df27e3079d1fc61735eac0292b5be60f656c6c03255ba7a5cae3  /tmp/opencode/SG-222/render_costita2.jpg
+--- DB post (read-only; hash first, then query)
+be86d23cdd051dd59429804e5a906d0f7e3d254cf44ddf80da84bce2405404b6  data/db/storagegenie.db
+e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  data/db/storagegenie.db-wal
+fd4c9fda9cd3f9ae7c962b0ddf37232294d55580e1aa165aa06129b8549389eb  data/db/storagegenie.db-shm
+28
+20260924_sg114_relation
+wal
+END poststate 2026-10-21T19:55:44Z epoch=1792612544

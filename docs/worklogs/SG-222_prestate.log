@@ -1,0 +1,64 @@
+SG-222 prestate (read-only) captured 2026-10-21T19:54:35Z epoch=1792612475
+lane_start_epoch=1792612420 (2026-10-21T19:53:40Z; runner 'bash /usr/local/lib/dispatch/run-coder SG-222' PID 708356 start per ps)
+--- git
+requested_ref=automation resolved_commit=d221db0ca3f204a9e1309da4557e1b7d51ec874e
+origin_automation=d221db0ca3f204a9e1309da4557e1b7d51ec874e
+HEAD=d221db0ca3f204a9e1309da4557e1b7d51ec874e
+worktree_status_lines=1
+?? docs/worklogs/SG-222_prestate.log
+--- lane
+socket=/run/dispatch-storagegenie-SG-222/docker.sock mode=srw-rw---T uid=1000 gid=100987
+client=29.6.2 server=29.6.2 api=1.55
+Docker Compose version v5.3.1
+--- container pre
+Id=d45005fb7fab6828e07a4aff6c12893ce5ef493feb1d9d169cd85cbee4f801bc Created=2026-10-17T19:48:15.931194106Z Image=sha256:98f8af1f30262487e824731a0fa258b5a54b09cd0b9129c5c613cb9668e4556c RestartCount=0 State=running Health=healthy Name=/storagegenie-backend-1
+--- image pre (storagegenie-backend:latest)
+Id=sha256:98f8af1f30262487e824731a0fa258b5a54b09cd0b9129c5c613cb9668e4556c Created=2026-10-17T19:48:04.670555828Z RepoTags=[storagegenie-backend:latest]
+--- health pre
+http=200 time=0.003454s
+{"status":"ok","db":"ok","storage":"ok"}
+--- served pre (localhost:8003)
+GET / http=200 size=944B
+served_js_path=/assets/index-ZkOUf-iS.js
+served_css_path=/assets/index-C07VbG0m.css
+GET JS http=200 size=321010B
+GET CSS http=200 size=4535B
+b52f84ca4dc70463f4782fa77603bf9e2f7b09b43dd5f0625bb5e1f92c8366bc  /tmp/opencode/SG-222/served-pre/index.html
+8bab60ce6994cb9595aea213bbfd2fbfda88d4814dcfe81dfff4e4f626f9c163  /tmp/opencode/SG-222/served-pre/app.js
+c3b58cda696a22970fc2a4a348849fc1359f2105f80f81304ed5dfd5ca31a557  /tmp/opencode/SG-222/served-pre/app.css
+   944 /tmp/opencode/SG-222/served-pre/index.html
+321010 /tmp/opencode/SG-222/served-pre/app.js
+  4535 /tmp/opencode/SG-222/served-pre/app.css
+326489 total
+--- pre-bundle marker counts (served JS)
+scene-image=0
+scene_render=0
+scene-honest-state=1
+Generate Context Scene=1
+Source Photo=1
+storagegenie.dynv6.net=6
+localhost:8003=0
+--- DB pre (read-only)
+e6bef157440fb8b4a3262577362b071dcae07507ea9a7e04a614e11be28ee5bd  data/db/storagegenie.db
+cd31678aa794bb17f2fb3cef060e410bf7b2b5b634ce99830ff4b599031b4cc7  data/db/storagegenie.db-wal
+10eb9c7465ad12bbd35d854d4491eb167669fa1438aa32be10f127c602c49ede  data/db/storagegenie.db-shm
+28
+20260924_sg114_relation
+wal
+--- product delta served-image source cfd7fe6..HEAD (product paths)
+M	backend/app/api/v1/assets.py
+A	backend/tests/test_sg221_evidence_source_kind.py
+M	frontend/src/api/types.ts
+M	frontend/src/components/shell/ItemInspectorDrawer.tsx
+M	frontend/src/components/shell/drawer.test.tsx
+--- all product-tree paths changed cfd7fe6..HEAD (incl scripts)
+M	backend/app/api/v1/assets.py
+A	backend/scripts/sg217_render.py
+A	backend/scripts/sg218_render.py
+A	backend/scripts/sg219_render.py
+A	backend/scripts/sg220_render.py
+A	backend/tests/test_sg221_evidence_source_kind.py
+M	frontend/src/api/types.ts
+M	frontend/src/components/shell/ItemInspectorDrawer.tsx
+M	frontend/src/components/shell/drawer.test.tsx
+END prestate 2026-10-21T19:54:35Z epoch=1792612475

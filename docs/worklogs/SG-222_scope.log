@@ -1,0 +1,26 @@
+SG-222 scope gate 2026-10-21T19:56:47Z
+--- git status --porcelain
+?? docs/worklogs/SG-222_build.log
+?? docs/worklogs/SG-222_byte_proof.log
+?? docs/worklogs/SG-222_db_post_tests.log
+?? docs/worklogs/SG-222_health.log
+?? docs/worklogs/SG-222_poststate.log
+?? docs/worklogs/SG-222_prestate.log
+?? docs/worklogs/SG-222_recreate.log
+?? docs/worklogs/SG-222_scope.log
+?? docs/worklogs/SG-222_tests.log
+--- unstaged tracked diff
+--- staged diff
+--- product/config/test/DB paths in status (must be empty)
+--- evidence files
+-rw-r--r-- 1 andrei andrei 7543 Oct 21 19:55 docs/worklogs/SG-222_build.log
+-rw-r--r-- 1 andrei andrei 1671 Oct 21 19:56 docs/worklogs/SG-222_byte_proof.log
+-rw-r--r-- 1 andrei andrei 2178 Oct 21 19:56 docs/worklogs/SG-222_db_post_tests.log
+-rw-r--r-- 1 andrei andrei  305 Oct 21 19:56 docs/worklogs/SG-222_health.log
+-rw-r--r-- 1 andrei andrei 5182 Oct 21 19:55 docs/worklogs/SG-222_poststate.log
+-rw-r--r-- 1 andrei andrei 3106 Oct 21 19:54 docs/worklogs/SG-222_prestate.log
+-rw-r--r-- 1 andrei andrei  331 Oct 21 19:55 docs/worklogs/SG-222_recreate.log
+-rw-r--r-- 1 andrei andrei  516 Oct 21 19:56 docs/worklogs/SG-222_scope.log
+-rw-r--r-- 1 andrei andrei 2156 Oct 21 19:56 docs/worklogs/SG-222_tests.log
+--- HEAD unchanged since prestate
+d221db0ca3f204a9e1309da4557e1b7d51ec874e
