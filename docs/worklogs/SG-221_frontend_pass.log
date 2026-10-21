@@ -1,0 +1,11 @@
+
+ RUN  v1.6.1 /home/andrei/StorageGenie/frontend
+
+ ✓ src/components/shell/drawer.test.tsx  (18 tests | 17 skipped) 161ms
+
+ Test Files  1 passed (1)
+      Tests  1 passed | 17 skipped (18)
+   Start at  19:49:01
+   Duration  1.51s (transform 194ms, setup 80ms, collect 449ms, tests 161ms, environment 492ms, prepare 93ms)
+
+frontend_exit=0

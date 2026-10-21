@@ -120,6 +120,7 @@ def _asset_to_dict(asset: Asset, db: Session) -> dict:  # type: ignore[no-untype
             "storage_key": e.storage_key,
             "original_filename": e.original_filename,
             "size_bytes": e.size_bytes,
+            "source_kind": e.source_kind,
         }
         for e in evs
     ]

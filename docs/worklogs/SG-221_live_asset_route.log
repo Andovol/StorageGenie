@@ -1,0 +1,17 @@
+/home/andrei/StorageGenie/venv/lib/python3.12/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+  from starlette.testclient import TestClient as TestClient  # noqa
+asset 01a0c4aa-8b62-7360-b11e-a476ddaea0f6 status 200
+display_name: Miso Soup
+  evidence 01a0c4a0-af88-7903-a070-a44e7b120712 source_kind= upload media_type= image/png size_bytes= 1280694 filename= image.png
+  evidence 01a0c4a0-d56f-7400-a295-6ac3b2176006 source_kind= transcript media_type= text/plain size_bytes= 104 filename= transcript.txt
+  evidence 01a15f6f-13ba-76e0-9238-acd5883c65f1 source_kind= scene_render media_type= image/jpeg size_bytes= 703036 filename= scene-render-google-gemini-3.1-flash-image.jpg
+  scene_render_count: 1
+asset 01a0c4ab-3765-7e10-8d0a-705390c6560d status 200
+display_name: Costiță de porc
+  evidence 01a0c4a1-acbd-7541-83b7-ce9d04730716 source_kind= upload media_type= image/png size_bytes= 565806 filename= image.png
+  evidence 01a0c4a1-ad90-78e1-9c17-10d92260fd0e source_kind= upload media_type= image/png size_bytes= 1259505 filename= image.png
+  evidence 01a0c4a2-2a41-77a1-9757-f0c1ae5c7cf4 source_kind= transcript media_type= text/plain size_bytes= 873 filename= transcript.txt
+  evidence 01a0c4a2-2a42-72b3-8131-e392ced98263 source_kind= transcript media_type= text/plain size_bytes= 99 filename= transcript.txt
+  evidence 01a15fdc-f5b6-7f31-9008-2f8d89be8813 source_kind= scene_render media_type= image/jpeg size_bytes= 731496 filename= scene-render-google-gemini-3.1-flash-image.jpg
+  evidence 01a15ff5-11e3-7243-99a6-9eeb9bbe1e09 source_kind= scene_render media_type= image/jpeg size_bytes= 664184 filename= scene-render-google-gemini-3.1-flash-image.jpg
+  scene_render_count: 2

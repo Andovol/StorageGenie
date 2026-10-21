@@ -144,6 +144,10 @@ export function ItemInspectorDrawer({ asset, householdId, onClose }: ItemInspect
   const sourceUrl = firstEvidence
     ? `${import.meta.env.VITE_API_BASE || "http://localhost:8003"}/v1/evidence/${firstEvidence.id}/file?household_id=${householdId}`
     : null;
+  const sceneEvidence = evidence.find((entry) => entry.source_kind === "scene_render");
+  const sceneUrl = sceneEvidence
+    ? `${import.meta.env.VITE_API_BASE || "http://localhost:8003"}/v1/evidence/${sceneEvidence.id}/file?household_id=${householdId}`
+    : null;
 
   const colors = colorTags(assertions);
   const description = assertionFor(assertions, "description");
@@ -268,11 +272,19 @@ export function ItemInspectorDrawer({ asset, householdId, onClose }: ItemInspect
               No isolated cutout exists yet. Cutouts arrive with the AI stages — nothing is being processed.
             </p>
           )}
-          {tab === "scene" && (
-            <p data-testid="scene-honest-state" className="text-muted-foreground" style={{ margin: 0, padding: 24, textAlign: "center", fontSize: 13 }}>
-              No context scene exists yet. Scene rendering arrives with the AI stages — nothing is being rendered.
-            </p>
-          )}
+          {tab === "scene" &&
+            (sceneUrl ? (
+              <img
+                data-testid="scene-image"
+                src={sceneUrl}
+                alt={`${displayName} context scene`}
+                style={{ width: "100%", height: "100%", objectFit: "contain" }}
+              />
+            ) : (
+              <p data-testid="scene-honest-state" className="text-muted-foreground" style={{ margin: 0, padding: 24, textAlign: "center", fontSize: 13 }}>
+                No context scene exists yet. Scene rendering arrives with the AI stages — nothing is being rendered.
+              </p>
+            ))}
           {tab === "source" &&
             (sourceUrl ? (
               <img
