@@ -1,0 +1,51 @@
+{
+ "after_table_counts": {
+  "asset_evidence": 19,
+  "audit_event": 100,
+  "evidence": 27,
+  "provider_call": 39,
+  "provider_call_known_cost": 0.025178174999999997,
+  "provider_call_null_cost": 0
+ },
+ "asset_id": "01a0c481-720e-7923-ad6c-bee45caba30f",
+ "asset_links": [
+  {
+   "asset_id": "01a0c481-720e-7923-ad6c-bee45caba30f",
+   "evidence_id": "01a0c481-08b8-72b2-ab22-8ad28fed8fda",
+   "media_type": "image/png",
+   "original_filename": "image.png",
+   "sha256": "052a5f7b47d0556aace108ea32fbd67f8641c9e940f4a7ef69e1cc92e75a1a45",
+   "size_bytes": 406377,
+   "source_kind": "upload"
+  },
+  {
+   "asset_id": "01a0c481-720e-7923-ad6c-bee45caba30f",
+   "evidence_id": "01a0c481-1e46-79e2-b4ba-f471151d6d47",
+   "media_type": "text/plain",
+   "original_filename": "transcript.txt",
+   "sha256": "1a25be1618ec558a879a626ef6332790cee0d3510a1cd0c79442d82a1adc1e18",
+   "size_bytes": 181,
+   "source_kind": "transcript"
+  },
+  {
+   "asset_id": "01a0c481-720e-7923-ad6c-bee45caba30f",
+   "evidence_id": "01a1605c-6f0f-7eb3-abff-56343649ea24",
+   "media_type": "image/jpeg",
+   "original_filename": "scene-render-google-gemini-3.1-flash-image.jpg",
+   "sha256": "5c3076942bd7d059f84da9f48df00015715d4195beaee315dde431fd43730f48",
+   "size_bytes": 503143,
+   "source_kind": "scene_render"
+  }
+ ],
+ "before_table_counts": {
+  "asset_evidence": 18,
+  "audit_event": 100,
+  "evidence": 27,
+  "provider_call": 39,
+  "provider_call_known_cost": 0.025178174999999997,
+  "provider_call_null_cost": 0
+ },
+ "evidence_id": "01a1605c-6f0f-7eb3-abff-56343649ea24",
+ "reason": "faithful: same Milbona Parmigiano Reggiano 125 g pouch; primary label text exact (Milbona, Parmigiano Reggiano, Italian hard cheese flakes, 125 g e, 12 mesi, Italy badge); small certification ribbon text is a model artifact; scene clean and warm",
+ "timestamp": "2026-10-21T21:32:50.432596+00:00"
+}

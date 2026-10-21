@@ -1,0 +1,51 @@
+{
+ "after_table_counts": {
+  "asset_evidence": 20,
+  "audit_event": 100,
+  "evidence": 27,
+  "provider_call": 39,
+  "provider_call_known_cost": 0.025178174999999997,
+  "provider_call_null_cost": 0
+ },
+ "asset_id": "01a131ae-7a0c-7363-91c8-cfef6bd1faa3",
+ "asset_links": [
+  {
+   "asset_id": "01a131ae-7a0c-7363-91c8-cfef6bd1faa3",
+   "evidence_id": "01a131a0-ca52-7d72-afa6-a7f79cc5a016",
+   "media_type": "image/png",
+   "original_filename": "image.png",
+   "sha256": "d40d90a9903679d02055a60a2a89c111946607263e9f3c292cdea4c83107b89a",
+   "size_bytes": 591222,
+   "source_kind": "upload"
+  },
+  {
+   "asset_id": "01a131ae-7a0c-7363-91c8-cfef6bd1faa3",
+   "evidence_id": "01a131a1-11a6-7240-b7c1-7f9cc9090e9e",
+   "media_type": "text/plain",
+   "original_filename": "transcript.txt",
+   "sha256": "fb3dd410511b20fcd6c64ed2083e137e822354a8a5253fa3e7f2afabea796c4a",
+   "size_bytes": 126,
+   "source_kind": "transcript"
+  },
+  {
+   "asset_id": "01a131ae-7a0c-7363-91c8-cfef6bd1faa3",
+   "evidence_id": "01a1605c-8fc7-7043-837b-1e1633576d15",
+   "media_type": "image/jpeg",
+   "original_filename": "scene-render-google-gemini-3.1-flash-image.jpg",
+   "sha256": "70f495b97ffa8261f1365adcedf679d6349e5d2f98d3079837d09fdf65de3a7d",
+   "size_bytes": 546385,
+   "source_kind": "scene_render"
+  }
+ ],
+ "before_table_counts": {
+  "asset_evidence": 19,
+  "audit_event": 100,
+  "evidence": 27,
+  "provider_call": 39,
+  "provider_call_known_cost": 0.025178174999999997,
+  "provider_call_null_cost": 0
+ },
+ "evidence_id": "01a1605c-8fc7-7043-837b-1e1633576d15",
+ "reason": "faithful: same TRACHISAN 20 comprimate de supt box; primary label text exact (TRACHISAN, comprimate de supt, 20 comprimate de supt, full ingredient line); small ECHILIBRU ALIMENTAR logo text is a model artifact; scene clean and warm",
+ "timestamp": "2026-10-21T21:32:51.681799+00:00"
+}

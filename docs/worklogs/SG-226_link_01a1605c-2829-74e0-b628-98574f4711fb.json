@@ -1,0 +1,42 @@
+{
+ "after_table_counts": {
+  "asset_evidence": 17,
+  "audit_event": 100,
+  "evidence": 27,
+  "provider_call": 39,
+  "provider_call_known_cost": 0.025178174999999997,
+  "provider_call_null_cost": 0
+ },
+ "asset_id": "01a0a467-eb0e-7b83-a227-af122dc9268b",
+ "asset_links": [
+  {
+   "asset_id": "01a0a467-eb0e-7b83-a227-af122dc9268b",
+   "evidence_id": "01a0a467-eacf-7e13-bbd0-078b1bc93860",
+   "media_type": "image/jpeg",
+   "original_filename": "pasta-de-dinti-colgate-50-ml-total-original-iN6RhsW3.jpg",
+   "sha256": "6050ed6f7f83bf90722057f1a376b1adcfc8099de4f8995e5cb85ee0ae100630",
+   "size_bytes": 239596,
+   "source_kind": "upload"
+  },
+  {
+   "asset_id": "01a0a467-eb0e-7b83-a227-af122dc9268b",
+   "evidence_id": "01a1605c-2829-74e0-b628-98574f4711fb",
+   "media_type": "image/jpeg",
+   "original_filename": "scene-render-google-gemini-3.1-flash-image.jpg",
+   "sha256": "076276a58ebc1f84a50740e162ae47fd2d581e57459ff0d3bf144a1d8fcdede0",
+   "size_bytes": 531826,
+   "source_kind": "scene_render"
+  }
+ ],
+ "before_table_counts": {
+  "asset_evidence": 16,
+  "audit_event": 100,
+  "evidence": 27,
+  "provider_call": 39,
+  "provider_call_known_cost": 0.025178174999999997,
+  "provider_call_null_cost": 0
+ },
+ "evidence_id": "01a1605c-2829-74e0-b628-98574f4711fb",
+ "reason": "faithful: same Colgate Total Original box; primary label text exact (brand, Total, ACTIVE PREVENTION, ORIGINAL PASTE, NEW FORMULA, Fight the Root Causes*, full benefits list); top-face Romanian microtext is a model artifact (SG-220 small-print standard); scene clean and warm",
+ "timestamp": "2026-10-21T21:32:47.928803+00:00"
+}
