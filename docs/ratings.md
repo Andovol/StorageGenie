@@ -902,6 +902,12 @@ Originals above (88 FLAG:TRUST / 91 FLAG:TRUST) stand as the audit trail; the ve
 |---|---|---|---|---|---|---|---|---|---|---|---|
 | SG-225 | L3 bulk stage cutout probe; WORK receipt verified (clean trigger, no misfire); cutout-unused proved live (raw 0, scene-ref 1, cutout-brief 0); ONE POST -> 200 rendered (479144 B, opened: white background, full product, margins positive); faithfulness fail on exact-label clause (FROZEN->ERO7EN, badge recolored, crops committed) -> explicitly unlinked with reason; triple-bound proof + actual 0.068243 held both accountings; zero product bytes; 779s vs ~600s; audit SG-225_audit.md | opencode/opencode-go/deepseek-v4.1-flash (receipt settings) | max | 98 |  |  | PG-EV-02/03/05/06/07/09/14; PG-SC-03/05/09; PG-IC-01/07/08/09; PG-PR-01/03/10 |  | Bulk cutouts wait on better brief; bulk scenes SG-226 next under L3 |  | none |
 
+### SG-226 (2026-10-21 - L3 bulk scenes: 4/4 RENDERED, linked, live; killed 1s over budget post-report)
+
+| slice_id | phase | model | effort | score | flag | lever | guards_invoked | deduction_attribution | remaining | escape | slowest_waste |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| SG-226 | L3 bulk scenes; WORK pushed complete (3 commits) but killed 1s over RUN_BUDGET_S post-report (elapsed 2101s > 2100s, measured from lane partial note); receipt unpublished by the unit (no Dispatch-ID note; partial note on record); 4/4 renders opened by audit (faithful at primary-label, microtext artifacts recorded), 4 links + live routes verified from the diff; triple-bound proofs + actuals held both accountings; zero product bytes; SG-227 verify+publish recovery next; audit SG-226_audit.md | opencode/opencode-go/deepseek-v4.1-flash (receipt settings) | max | 98 |  |  | PG-EV-02/03/05/06/07/09/14; PG-SC-03/05/09; PG-IC-01/07/08/09; PG-PR-01/03/10 |  | SG-227 publishes the SG-226 note (recovery authorized); sizing lesson: budget review/crop time, not just sends |  | none |
+
 ### SG-221 (2026-10-21 - surface pilot renders in drawer: 3 links + serializer field + Scene tab)
 
 | slice_id | phase | model | effort | score | flag | lever | guards_invoked | deduction_attribution | remaining | escape | slowest_waste |
