@@ -1,0 +1,13 @@
+{
+ "cost": 0.0,
+ "created_at": "2026-10-21 19:07:58",
+ "error_state": null,
+ "id": "01a15fdc-f5be-7941-b46b-e9773349ec4c",
+ "input_hashes": "{\"photo_sha256\": \"254a91f75d7cf8acbd6ee6defc13b95436fed4414ba7a05be0cd95752a2c964a\", \"brief_sha256\": \"39a56f8bc60ab5043ac837293b89b1627a8897a7b9b045df4b8ff5ac67ff6105\"}",
+ "latency_ms": 8822.104045946617,
+ "model": "bytedance-seed/seed-1.6-flash",
+ "output_payload": "{\"image_model\": \"google/gemini-3.1-flash-image\", \"orchestrator\": \"bytedance-seed/seed-1.6-flash\", \"prompt\": \"Restage this packaged product on a clean kitchen counter in warm natural daylight; keep the package, its label and its printed text exactly as photographed.\", \"status_code\": 200, \"response_id\": null, \"evidence_id\": \"01a15fdc-f5b6-7f31-9008-2f8d89be8813\", \"remote_url\": null, \"error_body\": null, \"response_body\": \"{\\\"created\\\": 0, \\\"data\\\": [{\\\"b64_json\\\": \\\"<redacted len=975328 sha256=1dca523b2c83c511950b6ae1b8199d8849b4049165435fb034a12f93b31b7c70>\\\", \\\"media_type\\\": \\\"image/jpeg\\\"}], \\\"usage\\\": {\\\"prompt_tokens\\\": 288, \\\"completion_tokens\\\": 1424, \\\"total_tokens\\\": 1712, \\\"cost\\\": 0, \\\"is_byok\\\": true, \\\"prompt_tokens_details\\\": {\\\"cached_tokens\\\": 0, \\\"cache_write_tokens\\\": 0, \\\"audio_tokens\\\": 0, \\\"video_tokens\\\": 0}, \\\"cost_details\\\": {\\\"upstream_inference_cost\\\": 0.068256, \\\"upstream_inference_prompt_cost\\\": 0.000144, \\\"upstream_inference_completions_cost\\\": 0.068112}, \\\"completion_tokens_details\\\": {\\\"reasoning_tokens\\\": 0, \\\"image_tokens\\\": 1120}}}\", \"response_body_sha256\": \"2bbb60983c6bf4d6709b0f4bdabba63bfeba741bb53676463496929f9c4a75ee\"}",
+ "prompt_template_version": "scene-render-v1",
+ "provider": "openrouter",
+ "usage_json": "{\"prompt_tokens\": 288, \"completion_tokens\": 1424, \"total_tokens\": 1712, \"cost\": 0, \"is_byok\": true, \"prompt_tokens_details\": {\"cached_tokens\": 0, \"cache_write_tokens\": 0, \"audio_tokens\": 0, \"video_tokens\": 0}, \"cost_details\": {\"upstream_inference_cost\": 0.068256, \"upstream_inference_prompt_cost\": 0.000144, \"upstream_inference_completions_cost\": 0.068112}, \"completion_tokens_details\": {\"reasoning_tokens\": 0, \"image_tokens\": 1120}}"
+}
