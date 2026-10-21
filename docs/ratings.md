@@ -896,6 +896,12 @@ Originals above (88 FLAG:TRUST / 91 FLAG:TRUST) stand as the audit trail; the ve
 |---|---|---|---|---|---|---|---|---|---|---|---|
 | SG-224 | D-30 classify 5 null rows; WORK receipt verified (clean trigger, no misfire); live null set == expected 5 (per-row proof: no usage keys, key spend unchanged, cumulative cross-check); 5 UPDATEs each changes()=1, one commit, revert-hash equality, no other delta; guard re-proof live (wall 1.034117125 refused pre-write, 0.182717125 proceeds post-write, formula unweakened); tooling iterations fixed pre-effect with transcripts preserved; $0, zero sends; driver + SG-224_* only; 269s vs ~300s; audit SG-224_audit.md | opencode/opencode-go/deepseek-v4.1-flash (receipt settings) | max | 98 |  |  | PG-EV-02/03/05/06/09/14; PG-SC-03/09; PG-IC-01/07/08/09; PG-PR-01/03/10 |  | D-30 discharged (unknown 5->0); cutout probe SG-225 next under L3; bulk run packets after |  | none |
 
+### SG-225 (2026-10-21 - first cutout probe: isolation passes, exact-label fidelity fails, unlinked)
+
+| slice_id | phase | model | effort | score | flag | lever | guards_invoked | deduction_attribution | remaining | escape | slowest_waste |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| SG-225 | L3 bulk stage cutout probe; WORK receipt verified (clean trigger, no misfire); cutout-unused proved live (raw 0, scene-ref 1, cutout-brief 0); ONE POST -> 200 rendered (479144 B, opened: white background, full product, margins positive); faithfulness fail on exact-label clause (FROZEN->ERO7EN, badge recolored, crops committed) -> explicitly unlinked with reason; triple-bound proof + actual 0.068243 held both accountings; zero product bytes; 779s vs ~600s; audit SG-225_audit.md | opencode/opencode-go/deepseek-v4.1-flash (receipt settings) | max | 98 |  |  | PG-EV-02/03/05/06/07/09/14; PG-SC-03/05/09; PG-IC-01/07/08/09; PG-PR-01/03/10 |  | Bulk cutouts wait on better brief; bulk scenes SG-226 next under L3 |  | none |
+
 ### SG-221 (2026-10-21 - surface pilot renders in drawer: 3 links + serializer field + Scene tab)
 
 | slice_id | phase | model | effort | score | flag | lever | guards_invoked | deduction_attribution | remaining | escape | slowest_waste |
