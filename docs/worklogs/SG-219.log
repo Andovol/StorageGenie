@@ -1,0 +1,10 @@
+SG-219 worklog (append-only; all times UTC unless stated)
+
+2026-10-21T19:14:34Z lane start (opencode pid 653667 lstart); model opencode-go/deepseek-v4.1-flash effort=max (read from process args).
+BASE requested=automation resolved=da63d455731b92f443d6335902856138936a52c2 (== origin/automation; worktree clean at admission).
+Contract version 0.50.0 (CODER.md read live from /home/andrei/storagegenie-contract; lang/python.md read in full). `.rules-cache/` absent on this host (STATE records that as designed); host contract copy read instead; G-L1/G-L5/G-L7 UNCHECKED, stated.
+Authority: D-27 bounded pilot (renders 3+4 of 10) + D-20 ($2.00/day) + D-14 ($10.00/month); exactly two billed renders this slice; no 11th render under this authority.
+Scope: backend/scripts/sg219_render.py (lane-run driver) + docs/worklogs/SG-219_* only; zero product/test bytes; no migration; no restart.
+Driver written as a two-render extension of the SG-218 precedent (one invocation, up to two sends, per-send triple-bound proof, durable duplicate-photo guard on the live ledger's input_hashes).
+2026-10-21T19:17Z both pick photos opened from the live storage volume before any send: CEAFĂ DE PORC (1500x1125 PNG, 861,026 B, S.C. Smithfield label front-facing) and Costiță de porc / BARONI (1500x1125 PNG, 565,806 B, Amontex Kutno label front-facing). Both are real upload Evidence, neither is a fixture.
+2026-10-21T19:19:38Z plan run in an ephemeral container from the production image (no send): enumeration 6 candidates, eligible 2, picks CEAFĂ (render 3) + Costiță-2 (render 4). Live baseline 1290 image tokens x2 = 2580 x 6.6e-05 = 0.17028000. Pilot consumed 2/10; remainders credits daily 2.00000000, credits monthly 9.98756288, pilot 1.36224000, owner daily 1.86356000, owner monthly 9.85112287; cap 1.36224000; all-in projection 0.86383713 -> proceed. No POST.
