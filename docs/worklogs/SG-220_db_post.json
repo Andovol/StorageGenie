@@ -1,0 +1,149 @@
+{
+ "audit_event_rows": [
+  {
+   "action": "evidence.create",
+   "actor": "scene-render",
+   "after_json": "{\"sha256\": \"f3d56bfb33a2df27e3079d1fc61735eac0292b5be60f656c6c03255ba7a5cae3\", \"original_filename\": \"scene-render-google-gemini-3.1-flash-image.jpg\", \"size_bytes\": 664184, \"provider\": \"openrouter\", \"image_model\": \"google/gemini-3.1-flash-image\", \"orchestrator\": \"bytedance-seed/seed-1.6-flash\", \"prompt\": \"Restage this packaged product on a clean kitchen counter in warm natural daylight; keep the package, its label and its printed text exactly as photographed.\", \"usage\": {\"prompt_tokens\": 288, \"completion_tokens\": 1415, \"total_tokens\": 1703, \"cost\": 0, \"is_byok\": true, \"prompt_tokens_details\": {\"cached_tokens\": 0, \"cache_write_tokens\": 0, \"audio_tokens\": 0, \"video_tokens\": 0}, \"cost_details\": {\"upstream_inference_cost\": 0.068229, \"upstream_inference_prompt_cost\": 0.000144, \"upstream_inference_completions_cost\": 0.068085}, \"completion_tokens_details\": {\"reasoning_tokens\": 0, \"image_tokens\": 1120}}, \"cost_usd\": 0.0, \"response_id\": null, \"timestamp\": \"2026-10-21T19:34:18.851878+00:00\"}",
+   "before_json": null,
+   "entity_id": "01a15ff5-11e3-7243-99a6-9eeb9bbe1e09",
+   "entity_type": "evidence",
+   "household_id": "01a0a029-1477-7ca0-b200-bce78a96c679",
+   "id": "01a15ff5-11e5-7183-b373-6b8ec8242516",
+   "timestamp": "2026-10-21 19:34:18.851946"
+  }
+ ],
+ "delta": {
+  "audit_event": 1,
+  "evidence": 1,
+  "provider_call": 1,
+  "provider_call_known_cost": 0,
+  "provider_call_null_cost": 0
+ },
+ "evidence_rows": [
+  {
+   "created_at": "2026-10-21 19:34:18",
+   "household_id": "01a0a029-1477-7ca0-b200-bce78a96c679",
+   "id": "01a15ff5-11e3-7243-99a6-9eeb9bbe1e09",
+   "media_type": "image/jpeg",
+   "original_filename": "scene-render-google-gemini-3.1-flash-image.jpg",
+   "sha256": "f3d56bfb33a2df27e3079d1fc61735eac0292b5be60f656c6c03255ba7a5cae3",
+   "size_bytes": 664184,
+   "source_kind": "scene_render",
+   "storage_key": "01a0a029-1477-7ca0-b200-bce78a96c679/f3/f3d56bfb33a2df27e3079d1fc61735eac0292b5be60f656c6c03255ba7a5cae3.jpg",
+   "updated_at": "2026-10-21 19:34:18"
+  }
+ ],
+ "finished_at": "2026-10-21T19:34:18.967709+00:00",
+ "new_evidence_ids": [
+  "01a15ff5-11e3-7243-99a6-9eeb9bbe1e09"
+ ],
+ "new_ledger_ids": [
+  "01a15ff5-11ec-7770-8143-8cc825a1a13d"
+ ],
+ "outcomes": [
+  {
+   "asset_id": "01a0c4ab-3765-7e10-8d0a-705390c6560d",
+   "authority_cap_usd": 1.3622400000000001,
+   "cost_usd": 0.0,
+   "display_name": "Costiță de porc",
+   "error_state": null,
+   "evidence_id": "01a15ff5-11e3-7243-99a6-9eeb9bbe1e09",
+   "image_media_type": "image/jpeg",
+   "image_model": "google/gemini-3.1-flash-image",
+   "image_sha256": "f3d56bfb33a2df27e3079d1fc61735eac0292b5be60f656c6c03255ba7a5cae3",
+   "latency_ms": 9341.715002956335,
+   "ledger_id": "01a15ff5-11ec-7770-8143-8cc825a1a13d",
+   "orchestrator": "bytedance-seed/seed-1.6-flash",
+   "photo_evidence_id": "01a0c4a1-acbd-7541-83b7-ce9d04730716",
+   "photo_ref_sha256": "ce9bc82a8047eca60a4702ecb8de8dc9d57a86523c090036ff9652010952524c",
+   "photo_sha256": "63b3ec707f184a6c4026948701b0cc3d074cea5aa8449bcb1d22711891a9bd09",
+   "refusal": null,
+   "render_number": 3,
+   "response_id": null,
+   "returned_at": "2026-10-21T19:34:18.862461+00:00",
+   "status": "rendered",
+   "status_code": 200,
+   "storage_key": "01a0a029-1477-7ca0-b200-bce78a96c679/f3/f3d56bfb33a2df27e3079d1fc61735eac0292b5be60f656c6c03255ba7a5cae3.jpg",
+   "transport": "image_api",
+   "usage": {
+    "completion_tokens": 1415,
+    "completion_tokens_details": {
+     "image_tokens": 1120,
+     "reasoning_tokens": 0
+    },
+    "cost": 0,
+    "cost_details": {
+     "upstream_inference_completions_cost": 0.068085,
+     "upstream_inference_cost": 0.068229,
+     "upstream_inference_prompt_cost": 0.000144
+    },
+    "is_byok": true,
+    "prompt_tokens": 288,
+    "prompt_tokens_details": {
+     "audio_tokens": 0,
+     "cache_write_tokens": 0,
+     "cached_tokens": 0,
+     "video_tokens": 0
+    },
+    "total_tokens": 1703
+   },
+   "worst_case_usd": 0.17028000000000001
+  }
+ ],
+ "pilot_after": {
+  "billed_sends": 3,
+  "billed_successful_renders": 3,
+  "cutoff": "2026-10-21 00:00:00",
+  "rows": [
+   {
+    "cost": 0.0,
+    "created_at": "2026-10-21 17:07:57",
+    "error_state": null,
+    "id": "01a15f6f-13c4-75a3-8123-00142db2ba42"
+   },
+   {
+    "cost": 0.0,
+    "created_at": "2026-10-21 19:07:58",
+    "error_state": null,
+    "id": "01a15fdc-f5be-7941-b46b-e9773349ec4c"
+   },
+   {
+    "cost": 0.0,
+    "created_at": "2026-10-21 19:34:18",
+    "error_state": null,
+    "id": "01a15ff5-11ec-7770-8143-8cc825a1a13d"
+   }
+  ]
+ },
+ "post": {
+  "audit_event": 94,
+  "evidence": 21,
+  "provider_call": 33,
+  "provider_call_known_cost": 0.025178174999999997,
+  "provider_call_null_cost": 5
+ },
+ "pre": {
+  "audit_event": 93,
+  "evidence": 20,
+  "provider_call": 32,
+  "provider_call_known_cost": 0.025178174999999997,
+  "provider_call_null_cost": 5
+ },
+ "provider_call_rows": [
+  {
+   "cost": 0.0,
+   "created_at": "2026-10-21 19:34:18",
+   "error_state": null,
+   "id": "01a15ff5-11ec-7770-8143-8cc825a1a13d",
+   "input_hashes": "{\"photo_sha256\": \"ce9bc82a8047eca60a4702ecb8de8dc9d57a86523c090036ff9652010952524c\", \"brief_sha256\": \"39a56f8bc60ab5043ac837293b89b1627a8897a7b9b045df4b8ff5ac67ff6105\"}",
+   "job_id": null,
+   "latency_ms": 9341.715002956335,
+   "model": "bytedance-seed/seed-1.6-flash",
+   "output_payload": "{\"image_model\": \"google/gemini-3.1-flash-image\", \"orchestrator\": \"bytedance-seed/seed-1.6-flash\", \"prompt\": \"Restage this packaged product on a clean kitchen counter in warm natural daylight; keep the package, its label and its printed text exactly as photographed.\", \"status_code\": 200, \"response_id\": null, \"evidence_id\": \"01a15ff5-11e3-7243-99a6-9eeb9bbe1e09\", \"remote_url\": null, \"error_body\": null, \"response_body\": \"{\\\"created\\\": 0, \\\"data\\\": [{\\\"b64_json\\\": \\\"<redacted len=885580 sha256=fdb8f9b0dfe4e5ea9880434f168fccadea4e43a0f4200e33b9744a4110c1ee00>\\\", \\\"media_type\\\": \\\"image/jpeg\\\"}], \\\"usage\\\": {\\\"prompt_tokens\\\": 288, \\\"completion_tokens\\\": 1415, \\\"total_tokens\\\": 1703, \\\"cost\\\": 0, \\\"is_byok\\\": true, \\\"prompt_tokens_details\\\": {\\\"cached_tokens\\\": 0, \\\"cache_write_tokens\\\": 0, \\\"audio_tokens\\\": 0, \\\"video_tokens\\\": 0}, \\\"cost_details\\\": {\\\"upstream_inference_cost\\\": 0.068229, \\\"upstream_inference_prompt_cost\\\": 0.000144, \\\"upstream_inference_completions_cost\\\": 0.068085}, \\\"completion_tokens_details\\\": {\\\"reasoning_tokens\\\": 0, \\\"image_tokens\\\": 1120}}}\", \"response_body_sha256\": \"fd5fc2abf750c354db1f9dde0de49a11f894b0fa5c6b8d581dd78e8cde4c9729\"}",
+   "prompt_template_version": "scene-render-v1",
+   "provider": "openrouter",
+   "updated_at": "2026-10-21 19:34:18",
+   "usage_json": "{\"prompt_tokens\": 288, \"completion_tokens\": 1415, \"total_tokens\": 1703, \"cost\": 0, \"is_byok\": true, \"prompt_tokens_details\": {\"cached_tokens\": 0, \"cache_write_tokens\": 0, \"audio_tokens\": 0, \"video_tokens\": 0}, \"cost_details\": {\"upstream_inference_cost\": 0.068229, \"upstream_inference_prompt_cost\": 0.000144, \"upstream_inference_completions_cost\": 0.068085}, \"completion_tokens_details\": {\"reasoning_tokens\": 0, \"image_tokens\": 1120}}"
+  }
+ ]
+}

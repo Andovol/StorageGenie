@@ -1,0 +1,48 @@
+{
+ "asset_id": "01a0c4ab-3765-7e10-8d0a-705390c6560d",
+ "authority_cap_usd": 1.3622400000000001,
+ "cost_usd": 0.0,
+ "display_name": "Costiță de porc",
+ "error_state": null,
+ "evidence_id": "01a15ff5-11e3-7243-99a6-9eeb9bbe1e09",
+ "image_media_type": "image/jpeg",
+ "image_model": "google/gemini-3.1-flash-image",
+ "image_sha256": "f3d56bfb33a2df27e3079d1fc61735eac0292b5be60f656c6c03255ba7a5cae3",
+ "latency_ms": 9341.715002956335,
+ "ledger_id": "01a15ff5-11ec-7770-8143-8cc825a1a13d",
+ "orchestrator": "bytedance-seed/seed-1.6-flash",
+ "photo_evidence_id": "01a0c4a1-acbd-7541-83b7-ce9d04730716",
+ "photo_ref_sha256": "ce9bc82a8047eca60a4702ecb8de8dc9d57a86523c090036ff9652010952524c",
+ "photo_sha256": "63b3ec707f184a6c4026948701b0cc3d074cea5aa8449bcb1d22711891a9bd09",
+ "refusal": null,
+ "render_number": 3,
+ "response_id": null,
+ "returned_at": "2026-10-21T19:34:18.862461+00:00",
+ "status": "rendered",
+ "status_code": 200,
+ "storage_key": "01a0a029-1477-7ca0-b200-bce78a96c679/f3/f3d56bfb33a2df27e3079d1fc61735eac0292b5be60f656c6c03255ba7a5cae3.jpg",
+ "transport": "image_api",
+ "usage": {
+  "completion_tokens": 1415,
+  "completion_tokens_details": {
+   "image_tokens": 1120,
+   "reasoning_tokens": 0
+  },
+  "cost": 0,
+  "cost_details": {
+   "upstream_inference_completions_cost": 0.068085,
+   "upstream_inference_cost": 0.068229,
+   "upstream_inference_prompt_cost": 0.000144
+  },
+  "is_byok": true,
+  "prompt_tokens": 288,
+  "prompt_tokens_details": {
+   "audio_tokens": 0,
+   "cache_write_tokens": 0,
+   "cached_tokens": 0,
+   "video_tokens": 0
+  },
+  "total_tokens": 1703
+ },
+ "worst_case_usd": 0.17028000000000001
+}
