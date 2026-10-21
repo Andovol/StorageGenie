@@ -1,0 +1,26 @@
+[2026-10-21T17:07:38.084064+00:00] SG-217 mode=plan image_model=google/gemini-3.1-flash-image transport=image_api evidence_dir=/evidence
+precedent_brief='Restage this packaged product on a clean kitchen counter in warm natural daylight; keep the package, its label and its printed text exactly as photographed.'
+precedent_excluded_photos=['01a0a029-1477-7ca0-b200-bce78a96c679/05/052a5f7b47d0556aace108ea32fbd67f8641c9e940f4a7ef69e1cc92e75a1a45.png', '01a0a029-1477-7ca0-b200-bce78a96c679/b6/b6e11ecce9be93ee2470ad75143e8e1d89489da1e128baecc89688ae9e3a833e.png']
+enumeration_count=6
+candidate asset=01a0c4aa-8b62-7360-b11e-a476ddaea0f6 name='Miso Soup' type=soup evidence=01a0c4a0-af88-7903-a070-a44e7b120712 media=image/png bytes=1280694 storage_key=01a0a029-1477-7ca0-b200-bce78a96c679/71/71901cac327fdd76926e36aa2a7889b2b17fb4e2619ca92d97f86d53aac0de63.png ELIGIBLE
+candidate asset=01a0c4ab-3765-7e10-8d0a-705390c6560d name='Costiță de porc' type=meat evidence=01a0c4a1-ad90-78e1-9c17-10d92260fd0e media=image/png bytes=1259505 storage_key=01a0a029-1477-7ca0-b200-bce78a96c679/f9/f9d71a40b1c5ac455fe568576c77b042abc4755c65dce99a9dfcb25f64a8f367.png ELIGIBLE
+candidate asset=01a0c446-44c9-7b82-9d1c-2b51fa518191 name='CEAFĂ DE PORC' type=meat evidence=01a0c445-35b0-7a53-9b8d-22fa3d6523de media=image/png bytes=861026 storage_key=01a0a029-1477-7ca0-b200-bce78a96c679/b6/b64034e5c91212098f9895535b5ba45e752bfdf70c24c4cd296b2007823f06bd.png ELIGIBLE
+candidate asset=01a0c4ab-3765-7e10-8d0a-705390c6560d name='Costiță de porc' type=meat evidence=01a0c4a1-acbd-7541-83b7-ce9d04730716 media=image/png bytes=565806 storage_key=01a0a029-1477-7ca0-b200-bce78a96c679/63/63b3ec707f184a6c4026948701b0cc3d074cea5aa8449bcb1d22711891a9bd09.png ELIGIBLE
+candidate asset=01a0c47f-fbb3-7db1-b6f3-aa52d20aa6a0 name='UHT Lapte 3,5% grăsime' type=dairy evidence=01a0c47f-0830-75f0-a027-9e8bde8eae48 media=image/png bytes=478195 storage_key=01a0a029-1477-7ca0-b200-bce78a96c679/b6/b6e11ecce9be93ee2470ad75143e8e1d89489da1e128baecc89688ae9e3a833e.png excluded:used_by_sg159_precedent
+candidate asset=01a0c481-720e-7923-ad6c-bee45caba30f name='Milbona Parmigiano Reggiano Italian hard cheese flakes' type=dairy evidence=01a0c481-08b8-72b2-ab22-8ad28fed8fda media=image/png bytes=406377 storage_key=01a0a029-1477-7ca0-b200-bce78a96c679/05/052a5f7b47d0556aace108ea32fbd67f8641c9e940f4a7ef69e1cc92e75a1a45.png excluded:used_by_sg159_precedent
+pick evidence=01a0c4a0-af88-7903-a070-a44e7b120712 asset=01a0c4aa-8b62-7360-b11e-a476ddaea0f6 name='Miso Soup' type=soup bytes=1280694
+[2026-10-21T17:07:38.087290+00:00] wrote /evidence/SG-217_enumeration.json
+photo_sha256=71901cac327fdd76926e36aa2a7889b2b17fb4e2619ca92d97f86d53aac0de63 photo_bytes=1280694
+[2026-10-21T17:07:38.348078+00:00] wrote /evidence/SG-217_spend_body.json
+[2026-10-21T17:07:38.365332+00:00] wrote /evidence/SG-217_pricing_body.json
+worst_case_usd=0.17028000 tokens=2580 (1290 baseline x2) x max_live_price=6.6e-05 from [('google-vertex/us', 6.6e-05), ('google-ai-studio', 6e-05), ('google-vertex/global', 6e-05)]
+pilot_cutoff=2026-10-21 00:00:00 billed_sends_since=0 billed_successful_renders=0 rows=[]
+remainders daily=2.00000000 monthly=9.98756288 pilot=1.70280000 -> authority_cap=1.70280000
+guard_inputs spent_usd=0.012437125 unknown_cost_calls=4 worst_case_usd=0.17028000000000001 projected_all_in=0.86383713 cap=1.70280000
+guard_selftest_over_cap=('over_cap', 'over_cap: projected worst case 2.87308 USD (spent 2.7028 + 0 unknown-cost call(s) x 0.17028000000000001 + this render 0.17028000000000001) exceeds cap 1.7028 USD; refusing to spend')
+guard_selftest_no_authority=refused_consent
+guard_verdict=proceed
+[2026-10-21T17:07:38.390433+00:00] wrote /evidence/SG-217_guard.json
+[2026-10-21T17:07:38.409885+00:00] wrote /evidence/SG-217_request.json
+request_url=https://openrouter.ai/api/v1/images body_keys=['input_references', 'model', 'n', 'prompt'] photo_ref_chars=1707614
+plan_only: no send

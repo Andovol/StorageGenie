@@ -1,0 +1,113 @@
+{
+ "candidates": [
+  {
+   "asset_id": "01a0c4aa-8b62-7360-b11e-a476ddaea0f6",
+   "asset_type": "soup",
+   "created_at": "2026-09-21 15:41:00",
+   "display_name": "Miso Soup",
+   "evidence_id": "01a0c4a0-af88-7903-a070-a44e7b120712",
+   "excluded": [],
+   "file_exists": true,
+   "media_type": "image/png",
+   "on_disk_bytes": 1280694,
+   "sha256": "71901cac327fdd76926e36aa2a7889b2b17fb4e2619ca92d97f86d53aac0de63",
+   "size_bytes": 1280694,
+   "source_kind": "upload",
+   "storage_key": "01a0a029-1477-7ca0-b200-bce78a96c679/71/71901cac327fdd76926e36aa2a7889b2b17fb4e2619ca92d97f86d53aac0de63.png"
+  },
+  {
+   "asset_id": "01a0c4ab-3765-7e10-8d0a-705390c6560d",
+   "asset_type": "meat",
+   "created_at": "2026-09-21 15:42:05",
+   "display_name": "Costiță de porc",
+   "evidence_id": "01a0c4a1-ad90-78e1-9c17-10d92260fd0e",
+   "excluded": [],
+   "file_exists": true,
+   "media_type": "image/png",
+   "on_disk_bytes": 1259505,
+   "sha256": "f9d71a40b1c5ac455fe568576c77b042abc4755c65dce99a9dfcb25f64a8f367",
+   "size_bytes": 1259505,
+   "source_kind": "upload",
+   "storage_key": "01a0a029-1477-7ca0-b200-bce78a96c679/f9/f9d71a40b1c5ac455fe568576c77b042abc4755c65dce99a9dfcb25f64a8f367.png"
+  },
+  {
+   "asset_id": "01a0c446-44c9-7b82-9d1c-2b51fa518191",
+   "asset_type": "meat",
+   "created_at": "2026-09-21 14:01:05",
+   "display_name": "CEAFĂ DE PORC",
+   "evidence_id": "01a0c445-35b0-7a53-9b8d-22fa3d6523de",
+   "excluded": [],
+   "file_exists": true,
+   "media_type": "image/png",
+   "on_disk_bytes": 861026,
+   "sha256": "b64034e5c91212098f9895535b5ba45e752bfdf70c24c4cd296b2007823f06bd",
+   "size_bytes": 861026,
+   "source_kind": "upload",
+   "storage_key": "01a0a029-1477-7ca0-b200-bce78a96c679/b6/b64034e5c91212098f9895535b5ba45e752bfdf70c24c4cd296b2007823f06bd.png"
+  },
+  {
+   "asset_id": "01a0c4ab-3765-7e10-8d0a-705390c6560d",
+   "asset_type": "meat",
+   "created_at": "2026-09-21 15:42:04",
+   "display_name": "Costiță de porc",
+   "evidence_id": "01a0c4a1-acbd-7541-83b7-ce9d04730716",
+   "excluded": [],
+   "file_exists": true,
+   "media_type": "image/png",
+   "on_disk_bytes": 565806,
+   "sha256": "63b3ec707f184a6c4026948701b0cc3d074cea5aa8449bcb1d22711891a9bd09",
+   "size_bytes": 565806,
+   "source_kind": "upload",
+   "storage_key": "01a0a029-1477-7ca0-b200-bce78a96c679/63/63b3ec707f184a6c4026948701b0cc3d074cea5aa8449bcb1d22711891a9bd09.png"
+  },
+  {
+   "asset_id": "01a0c47f-fbb3-7db1-b6f3-aa52d20aa6a0",
+   "asset_type": "dairy",
+   "created_at": "2026-09-21 15:04:14",
+   "display_name": "UHT Lapte 3,5% grăsime",
+   "evidence_id": "01a0c47f-0830-75f0-a027-9e8bde8eae48",
+   "excluded": [
+    "used_by_sg159_precedent"
+   ],
+   "file_exists": true,
+   "media_type": "image/png",
+   "on_disk_bytes": 478195,
+   "sha256": "b6e11ecce9be93ee2470ad75143e8e1d89489da1e128baecc89688ae9e3a833e",
+   "size_bytes": 478195,
+   "source_kind": "upload",
+   "storage_key": "01a0a029-1477-7ca0-b200-bce78a96c679/b6/b6e11ecce9be93ee2470ad75143e8e1d89489da1e128baecc89688ae9e3a833e.png"
+  },
+  {
+   "asset_id": "01a0c481-720e-7923-ad6c-bee45caba30f",
+   "asset_type": "dairy",
+   "created_at": "2026-09-21 15:06:25",
+   "display_name": "Milbona Parmigiano Reggiano Italian hard cheese flakes",
+   "evidence_id": "01a0c481-08b8-72b2-ab22-8ad28fed8fda",
+   "excluded": [
+    "used_by_sg159_precedent"
+   ],
+   "file_exists": true,
+   "media_type": "image/png",
+   "on_disk_bytes": 406377,
+   "sha256": "052a5f7b47d0556aace108ea32fbd67f8641c9e940f4a7ef69e1cc92e75a1a45",
+   "size_bytes": 406377,
+   "source_kind": "upload",
+   "storage_key": "01a0a029-1477-7ca0-b200-bce78a96c679/05/052a5f7b47d0556aace108ea32fbd67f8641c9e940f4a7ef69e1cc92e75a1a45.png"
+  }
+ ],
+ "pick": {
+  "asset_id": "01a0c4aa-8b62-7360-b11e-a476ddaea0f6",
+  "asset_type": "soup",
+  "created_at": "2026-09-21 15:41:00",
+  "display_name": "Miso Soup",
+  "evidence_id": "01a0c4a0-af88-7903-a070-a44e7b120712",
+  "excluded": [],
+  "file_exists": true,
+  "media_type": "image/png",
+  "on_disk_bytes": 1280694,
+  "sha256": "71901cac327fdd76926e36aa2a7889b2b17fb4e2619ca92d97f86d53aac0de63",
+  "size_bytes": 1280694,
+  "source_kind": "upload",
+  "storage_key": "01a0a029-1477-7ca0-b200-bce78a96c679/71/71901cac327fdd76926e36aa2a7889b2b17fb4e2619ca92d97f86d53aac0de63.png"
+ }
+}
