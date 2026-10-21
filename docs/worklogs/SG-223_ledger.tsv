@@ -1,0 +1,7 @@
+timestamp	leg	url	http_status	cost_usd	error
+2026-10-21T20:12:35.143373+00:00	key_costita	https://openrouter.ai/api/v1/key	200	null	
+2026-10-21T20:12:35.155106+00:00	endpoints_costita	https://openrouter.ai/api/v1/images/models/google/gemini-3.1-flash-image/endpoints	200	null	
+2026-10-21T20:12:44.138827+00:00	post_spend_costita	https://openrouter.ai/api/v1/key	200	null	
+2026-10-21T20:12:44.189369+00:00	key_miso	https://openrouter.ai/api/v1/key	200	null	
+2026-10-21T20:12:44.206022+00:00	endpoints_miso	https://openrouter.ai/api/v1/images/models/google/gemini-3.1-flash-image/endpoints	200	null	
+2026-10-21T20:12:44.249694+00:00	post_spend_final	https://openrouter.ai/api/v1/key	200	null	

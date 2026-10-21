@@ -1,0 +1,18 @@
+{
+ "effective_budget": {
+  "budget_id": null,
+  "guardrail_id": null,
+  "include_byok": false,
+  "limit_usd": 5,
+  "remaining_usd": 4.987562875,
+  "reset_interval": null,
+  "resets_at": null,
+  "scope": "key_limit",
+  "spend_usd": 0.012437125
+ },
+ "limit": 5,
+ "limit_remaining": 4.987562875,
+ "usage": 0.012437125,
+ "usage_daily": 0,
+ "usage_monthly": 0.012437125
+}

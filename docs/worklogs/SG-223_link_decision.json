@@ -1,0 +1,28 @@
+{
+ "timestamp": "2026-10-21T20:13:00+00:00",
+ "criterion": "review-before-link: faithful to the source photo first, then the asset's product identity; the SG-218 lesson is that a plausible render of the wrong product is still a failure",
+ "asset_under_review": {
+  "asset_id": "01a0c4ab-3765-7e10-8d0a-705390c6560d",
+  "display_name": "Costiță de porc"
+ },
+ "costita": {
+  "render_evidence_id": "01a16018-3ea8-7c03-b843-4029f85bacdb",
+  "render_sha256": "03b19f26b036b1980210799d75933af67a5ed3cf3eb4361be100d7203a9419f1",
+  "render_bytes": 653722,
+  "source_photo_evidence_id": "01a0c4a1-ad90-78e1-9c17-10d92260fd0e",
+  "source_sha256": "f9d71a40b1c5ac455fe568576c77b042abc4755c65dce99a9dfcb25f64a8f367",
+  "faithful_to_source": true,
+  "source_is_asset_product": false,
+  "disposition": "unlinked",
+  "reason": "The render faithfully reproduces the source photo: the source is a PIKOK 'PORK MEAT WITH PORK KNUCKLE' 300 g tin can (verified on the live storage volume by sha256 f9d71a40...). The new render shows the same PIKOK can, label text, 89% mark, pig illustration, ring pull and red rim. But the asset 'Costiță de porc' is the BARONI vacuum-packed pork ribs product, whose photo is 01a0c4a1-acbd... and whose faithful render is the already-linked SG-220 evidence 01a15ff5.... Linking this new PIKOK-can render would re-associate the exact product the owner rejected and that D-28 unlinked. The correction note's premise that SG-218 was made from the BARONI photo is contradicted by the live bytes and the SG-218 ledger photo-ref hash (254a91f7... = data URL of the PIKOK-can photo).",
+  "scene_tab_after": "Costiță asset carries exactly one linked scene_render: 01a15ff5-11e3-7243-99a6-9eeb9bbe1e09 (SG-220, BARONI vacuum pack)"
+ },
+ "miso": {
+  "render_evidence_id": null,
+  "disposition": "not_rendered",
+  "reason": "Guard refused the second send pre-send: over_cap, projected 1.034117125 USD > cap 1.02168000 USD. No request body was built, no POST left the machine, no image exists, so there is nothing to link.",
+  "guard_result": "docs/worklogs/SG-223_render_miso_result.json"
+ },
+ "asset_evidence_count_after": 16,
+ "new_link_rows": 0
+}

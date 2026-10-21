@@ -1,0 +1,23 @@
+{
+ "renders": [
+  {
+   "evidence_id": "01a16018-3ea8-7c03-b843-4029f85bacdb",
+   "ledger_id": "01a16018-3eb1-79c2-bffa-39a2f0fc88c3",
+   "leg": "costita",
+   "photo_evidence_id": "01a0c4a1-ad90-78e1-9c17-10d92260fd0e",
+   "photo_ref_sha256": "254a91f75d7cf8acbd6ee6defc13b95436fed4414ba7a05be0cd95752a2c964a",
+   "photo_sha256": "f9d71a40b1c5ac455fe568576c77b042abc4755c65dce99a9dfcb25f64a8f367",
+   "post_sent": true,
+   "render_number": 4,
+   "returned_at": "2026-10-21T20:12:44.083497+00:00",
+   "started_at": "2026-10-21T20:12:35.171716+00:00",
+   "status": "rendered"
+  },
+  {
+   "leg": "miso",
+   "post_sent": false,
+   "status": "refused"
+  }
+ ],
+ "started_at": "2026-10-21T20:12:34.895364+00:00"
+}

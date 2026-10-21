@@ -23,7 +23,6 @@ import hashlib
 import importlib.util
 import json
 import os
-import sys
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -249,6 +248,9 @@ def confirm_photo(db, spec: dict) -> dict:
     )
     pick.update(
         {
+            "leg": spec["leg"],
+            "label": spec["label"],
+            "brief": spec["brief"],
             "photo_bytes": len(data),
             "photo_sha256": sha,
             "photo_ref": photo_ref,
@@ -700,7 +702,7 @@ def unlink_wrong_render(db) -> int:
     return 0
 
 
-def run_render(db, ctx: dict) -> int:
+def run_render(db, ctx: dict) -> int:  # noqa: C901
     marker = EVIDENCE_DIR / "SG-223_attempt.json"
     if marker.exists():
         try:

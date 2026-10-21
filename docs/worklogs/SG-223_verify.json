@@ -38,15 +38,6 @@
   },
   {
    "asset_id": "01a0c4ab-3765-7e10-8d0a-705390c6560d",
-   "evidence_id": "01a15fdc-f5b6-7f31-9008-2f8d89be8813",
-   "media_type": "image/jpeg",
-   "original_filename": "scene-render-google-gemini-3.1-flash-image.jpg",
-   "sha256": "ce4794a2b7422746ed541d503e61eeb9c23095485794d33c78735fe382c9e7b0",
-   "size_bytes": 731496,
-   "source_kind": "scene_render"
-  },
-  {
-   "asset_id": "01a0c4ab-3765-7e10-8d0a-705390c6560d",
    "evidence_id": "01a15ff5-11e3-7243-99a6-9eeb9bbe1e09",
    "media_type": "image/jpeg",
    "original_filename": "scene-render-google-gemini-3.1-flash-image.jpg",
@@ -63,9 +54,9 @@
  },
  "link_counts": {
   "sg220_render_link_rows": 1,
-  "total": 17,
-  "wrong_pair_rows": 1,
-  "wrong_render_link_rows": 1
+  "total": 16,
+  "wrong_pair_rows": 0,
+  "wrong_render_link_rows": 0
  },
  "miso_links": [
   {
@@ -104,6 +95,8 @@
    "created_at": "2026-09-21 15:42:05",
    "display_name": "Costiță de porc",
    "evidence_id": "01a0c4a1-ad90-78e1-9c17-10d92260fd0e",
+   "label": "Costiță-1",
+   "leg": "costita",
    "media_type": "image/png",
    "photo_bytes": 1259505,
    "photo_ref_sha256": "254a91f75d7cf8acbd6ee6defc13b95436fed4414ba7a05be0cd95752a2c964a",
@@ -118,9 +111,12 @@
   "miso": {
    "asset_id": "01a0c4aa-8b62-7360-b11e-a476ddaea0f6",
    "asset_type": "soup",
+   "brief": "Isolate this packaged product on a plain seamless white background, front-facing, even studio lighting; the full package with its label and printed text exactly as photographed; no props, no scene, no shadow, no hands.",
    "created_at": "2026-09-21 15:41:00",
    "display_name": "Miso Soup",
    "evidence_id": "01a0c4a0-af88-7903-a070-a44e7b120712",
+   "label": "Miso Soup cutout",
+   "leg": "miso",
    "media_type": "image/png",
    "photo_bytes": 1280694,
    "photo_ref_sha256": "d07bd5bd3240d4de95baf6709590571b63661c914ef523040178bebc8cd5111e",
@@ -206,12 +202,12 @@
   "unknown_cost_calls": 5
  },
  "table_counts": {
-  "asset_evidence": 17,
+  "asset_evidence": 16,
   "audit_event": 94,
   "evidence": 21,
   "provider_call": 33,
   "provider_call_known_cost": 0.025178174999999997,
   "provider_call_null_cost": 5
  },
- "timestamp": "2026-10-21T20:12:05.354247+00:00"
+ "timestamp": "2026-10-21T20:12:34.892717+00:00"
 }

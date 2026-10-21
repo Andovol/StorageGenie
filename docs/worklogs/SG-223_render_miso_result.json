@@ -1,0 +1,15 @@
+{
+ "authority_cap_usd": 1.0216800000000001,
+ "leg": "miso",
+ "photo_evidence_id": "01a0c4a0-af88-7903-a070-a44e7b120712",
+ "photo_ref_sha256": "d07bd5bd3240d4de95baf6709590571b63661c914ef523040178bebc8cd5111e",
+ "photo_sha256": "71901cac327fdd76926e36aa2a7889b2b17fb4e2619ca92d97f86d53aac0de63",
+ "projected_all_in": 1.034117125,
+ "refusal": {
+  "code": "over_cap",
+  "reason": "over_cap: projected worst case 1.034117125 USD (spent 0.012437125 + 5 unknown-cost call(s) x 0.17028000000000001 + this render 0.17028000000000001) exceeds cap 1.0216800000000001 USD; refusing to spend"
+ },
+ "render_number": 5,
+ "returned_at": "2026-10-21T20:12:44.209221+00:00",
+ "status": "refused"
+}

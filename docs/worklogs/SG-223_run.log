@@ -1,0 +1,50 @@
+[2026-10-21T20:12:34.842514+00:00] SG-223 mode=render image_model=google/gemini-3.1-flash-image transport=image_api evidence_dir=/evidence
+table_counts={'evidence': 21, 'provider_call': 33, 'audit_event': 94, 'asset_evidence': 16, 'provider_call_null_cost': 5, 'provider_call_known_cost': 0.025178174999999997}
+link_counts={'total': 16, 'wrong_pair_rows': 0, 'wrong_render_link_rows': 0, 'sg220_render_link_rows': 1}
+photo leg=costita evidence=01a0c4a1-ad90-78e1-9c17-10d92260fd0e asset=01a0c4ab-3765-7e10-8d0a-705390c6560d sha256=f9d71a40b1c5ac455fe568576c77b042abc4755c65dce99a9dfcb25f64a8f367 bytes=1259505 ref_sha256=254a91f75d7cf8acbd6ee6defc13b95436fed4414ba7a05be0cd95752a2c964a
+photo leg=miso evidence=01a0c4a0-af88-7903-a070-a44e7b120712 asset=01a0c4aa-8b62-7360-b11e-a476ddaea0f6 sha256=71901cac327fdd76926e36aa2a7889b2b17fb4e2619ca92d97f86d53aac0de63 bytes=1280694 ref_sha256=d07bd5bd3240d4de95baf6709590571b63661c914ef523040178bebc8cd5111e
+frozen_brief='Restage this packaged product on a clean kitchen counter in warm natural daylight; keep the package, its label and its printed text exactly as photographed.'
+cutout_brief='Isolate this packaged product on a plain seamless white background, front-facing, even studio lighting; the full package with its label and printed text exactly as photographed; no props, no scene, no shadow, no hands.'
+pilot_cutoff=2026-10-21 00:00:00 rendered=3 billed_sends=3 rows=[{'id': '01a15f6f-13c4-75a3-8123-00142db2ba42', 'cost': 0.0, 'error_state': None, 'created_at': '2026-10-21 17:07:57'}, {'id': '01a15fdc-f5be-7941-b46b-e9773349ec4c', 'cost': 0.0, 'error_state': None, 'created_at': '2026-10-21 19:07:58'}, {'id': '01a15ff5-11ec-7770-8143-8cc825a1a13d', 'cost': 0.0, 'error_state': None, 'created_at': '2026-10-21 19:34:18'}]
+scene_spend known=0.012437125 unknown=5 owner_today=0.204669000 owner_month=0.217106125
+[2026-10-21T20:12:34.894575+00:00] wrote /evidence/SG-223_verify.json
+[2026-10-21T20:12:34.895733+00:00] wrote /evidence/SG-223_attempt.json
+[2026-10-21T20:12:35.143788+00:00] wrote /evidence/SG-223_spend_body_costita.json
+[2026-10-21T20:12:35.155979+00:00] wrote /evidence/SG-223_pricing_body_costita.json
+measured_default_image_tokens live_max=1120 rows=[{'id': '01a13137-fe82-77e1-95fa-a9c97aff75b4', 'image_tokens': 654, 'created_at': '2026-10-12 17:45:15'}, {'id': '01a15f6f-13c4-75a3-8123-00142db2ba42', 'image_tokens': 1120, 'created_at': '2026-10-21 17:07:57'}, {'id': '01a15fdc-f5be-7941-b46b-e9773349ec4c', 'image_tokens': 1120, 'created_at': '2026-10-21 19:07:58'}, {'id': '01a15ff5-11ec-7770-8143-8cc825a1a13d', 'image_tokens': 1120, 'created_at': '2026-10-21 19:34:18'}] sg159_cited=1290 -> baseline=1290
+worst_case_usd=0.17028000 tokens=2580 (1290 measured baseline x2) x max_live_price=6.6e-05 from [('google-vertex/us', 6.6e-05), ('google-ai-studio', 6e-05), ('google-vertex/global', 6e-05)]
+bounds leg=costita render=4 slice_sends_done=0 planned_remaining=2 pilot_consumed=3 pilot_planned_total=5
+remainders credits_daily=2.00000000 credits_monthly=9.98756288 pilot=1.19196000 owner_daily=1.79533100 owner_monthly=9.78289387
+authority_cap=1.19196000
+guard_inputs spent_usd=0.012437125 unknown_cost_calls=5 worst_case_usd=0.17028000000000001 projected_all_in=1.03411713 cap=1.19196000
+guard_selftest_over_cap=('over_cap', 'over_cap: projected worst case 2.36224 USD (spent 2.19196 + 0 unknown-cost call(s) x 0.17028000000000001 + this render 0.17028000000000001) exceeds cap 1.1919600000000001 USD; refusing to spend')
+guard_selftest_no_authority=refused_consent
+guard_verdict=proceed
+[2026-10-21T20:12:35.159908+00:00] wrote /evidence/SG-223_guard_costita.json
+[2026-10-21T20:12:35.171646+00:00] wrote /evidence/SG-223_request_costita.json
+leg=costita request_url=https://openrouter.ai/api/v1/images body_keys=['input_references', 'model', 'n', 'prompt'] photo_ref_chars=1679362
+[2026-10-21T20:12:35.172116+00:00] wrote /evidence/SG-223_attempt.json
+[2026-10-21T20:12:44.083907+00:00] wrote /evidence/SG-223_render_costita_result.json
+[2026-10-21T20:12:44.084241+00:00] wrote /evidence/SG-223_attempt.json
+[2026-10-21T20:12:44.084973+00:00] wrote /evidence/SG-223_ledger_row_costita.json
+stored_image_copied /evidence/SG-223_render_costita.jpg bytes=653722 sha256=03b19f26b036b1980210799d75933af67a5ed3cf3eb4361be100d7203a9419f1
+[2026-10-21T20:12:44.139350+00:00] wrote /evidence/SG-223_post_spend_costita.json
+leg=costita status=rendered evidence=01a16018-3ea8-7c03-b843-4029f85bacdb ledger=01a16018-3eb1-79c2-bffa-39a2f0fc88c3 cost=0.0 error=None
+[2026-10-21T20:12:44.189832+00:00] wrote /evidence/SG-223_spend_body_miso.json
+[2026-10-21T20:12:44.206574+00:00] wrote /evidence/SG-223_pricing_body_miso.json
+measured_default_image_tokens live_max=1120 rows=[{'id': '01a13137-fe82-77e1-95fa-a9c97aff75b4', 'image_tokens': 654, 'created_at': '2026-10-12 17:45:15'}, {'id': '01a15f6f-13c4-75a3-8123-00142db2ba42', 'image_tokens': 1120, 'created_at': '2026-10-21 17:07:57'}, {'id': '01a15fdc-f5be-7941-b46b-e9773349ec4c', 'image_tokens': 1120, 'created_at': '2026-10-21 19:07:58'}, {'id': '01a15ff5-11ec-7770-8143-8cc825a1a13d', 'image_tokens': 1120, 'created_at': '2026-10-21 19:34:18'}, {'id': '01a16018-3eb1-79c2-bffa-39a2f0fc88c3', 'image_tokens': 1120, 'created_at': '2026-10-21 20:12:44'}] sg159_cited=1290 -> baseline=1290
+worst_case_usd=0.17028000 tokens=2580 (1290 measured baseline x2) x max_live_price=6.6e-05 from [('google-vertex/us', 6.6e-05), ('google-ai-studio', 6e-05), ('google-vertex/global', 6e-05)]
+bounds leg=miso render=5 slice_sends_done=1 planned_remaining=1 pilot_consumed=4 pilot_planned_total=5
+remainders credits_daily=2.00000000 credits_monthly=9.98756288 pilot=1.02168000 owner_daily=1.72683200 owner_monthly=9.71439487
+authority_cap=1.02168000
+guard_inputs spent_usd=0.012437125 unknown_cost_calls=5 worst_case_usd=0.17028000000000001 projected_all_in=1.03411713 cap=1.02168000
+guard_selftest_over_cap=('over_cap', 'over_cap: projected worst case 2.19196 USD (spent 2.02168 + 0 unknown-cost call(s) x 0.17028000000000001 + this render 0.17028000000000001) exceeds cap 1.0216800000000001 USD; refusing to spend')
+guard_selftest_no_authority=refused_consent
+guard_verdict=over_cap: over_cap: projected worst case 1.034117125 USD (spent 0.012437125 + 5 unknown-cost call(s) x 0.17028000000000001 + this render 0.17028000000000001) exceeds cap 1.0216800000000001 USD; refusing to spend
+[2026-10-21T20:12:44.209182+00:00] wrote /evidence/SG-223_guard_miso.json
+[2026-10-21T20:12:44.209500+00:00] wrote /evidence/SG-223_render_miso_result.json
+[2026-10-21T20:12:44.209824+00:00] wrote /evidence/SG-223_attempt.json
+leg=miso refused over_cap: over_cap: projected worst case 1.034117125 USD (spent 0.012437125 + 5 unknown-cost call(s) x 0.17028000000000001 + this render 0.17028000000000001) exceeds cap 1.0216800000000001 USD; refusing to spend
+[2026-10-21T20:12:44.250105+00:00] wrote /evidence/SG-223_post_spend_final.json
+[2026-10-21T20:12:44.252779+00:00] wrote /evidence/SG-223_db_post.json
+slice_outcomes rendered=1 attempted=2
