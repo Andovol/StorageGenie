@@ -1,0 +1,62 @@
+{
+ "planned": 4,
+ "renders": [
+  {
+   "asset_id": "01a0a467-eb0e-7b83-a227-af122dc9268b",
+   "display_name": "Toothpaste",
+   "evidence_id": "01a1605c-2829-74e0-b628-98574f4711fb",
+   "ledger_id": "01a1605c-2832-7142-9cc7-31ed8032cdf1",
+   "photo_evidence_id": "01a0a467-eacf-7e13-bbd0-078b1bc93860",
+   "photo_ref_sha256": "83c59fb9840fff65b2e214394ee04904482aa31bec6ed5a28043e6f10906e58f",
+   "photo_sha256": "6050ed6f7f83bf90722057f1a376b1adcfc8099de4f8995e5cb85ee0ae100630",
+   "post_sent": true,
+   "returned_at": "2026-10-21T21:26:54.771923+00:00",
+   "started_at": "2026-10-21T21:26:46.164891+00:00",
+   "status": "rendered",
+   "tag": "render1"
+  },
+  {
+   "asset_id": "01a0c47f-fbb3-7db1-b6f3-aa52d20aa6a0",
+   "display_name": "UHT Lapte 3,5% grăsime",
+   "evidence_id": "01a1605c-4aa9-74f3-8bf3-f15c6c72bbe5",
+   "ledger_id": "01a1605c-4aaf-7811-9e1b-34a203c195ca",
+   "photo_evidence_id": "01a0c47f-0830-75f0-a027-9e8bde8eae48",
+   "photo_ref_sha256": "76ef008bf309207c21d126dae390020ffb51d6872d978ce02532849fd0570a59",
+   "photo_sha256": "b6e11ecce9be93ee2470ad75143e8e1d89489da1e128baecc89688ae9e3a833e",
+   "post_sent": true,
+   "returned_at": "2026-10-21T21:27:03.601067+00:00",
+   "started_at": "2026-10-21T21:26:54.886288+00:00",
+   "status": "rendered",
+   "tag": "render2"
+  },
+  {
+   "asset_id": "01a0c481-720e-7923-ad6c-bee45caba30f",
+   "display_name": "Milbona Parmigiano Reggiano Italian hard cheese flakes",
+   "evidence_id": "01a1605c-6f0f-7eb3-abff-56343649ea24",
+   "ledger_id": "01a1605c-6f13-7d20-8db8-989bf9856ceb",
+   "photo_evidence_id": "01a0c481-08b8-72b2-ab22-8ad28fed8fda",
+   "photo_ref_sha256": "925c115e67fc76ed527e0e1755a17c9d1d4aac9ce6d57422be4f728959f473c9",
+   "photo_sha256": "052a5f7b47d0556aace108ea32fbd67f8641c9e940f4a7ef69e1cc92e75a1a45",
+   "post_sent": true,
+   "returned_at": "2026-10-21T21:27:12.916565+00:00",
+   "started_at": "2026-10-21T21:27:03.721152+00:00",
+   "status": "rendered",
+   "tag": "render3"
+  },
+  {
+   "asset_id": "01a131ae-7a0c-7363-91c8-cfef6bd1faa3",
+   "display_name": "TRACHISAN comprimate de supt",
+   "evidence_id": "01a1605c-8fc7-7043-837b-1e1633576d15",
+   "ledger_id": "01a1605c-8fcb-7c52-ad12-9cd64f08e0ca",
+   "photo_evidence_id": "01a131a0-ca52-7d72-afa6-a7f79cc5a016",
+   "photo_ref_sha256": "de892ff51d0ee73abd96df0438bcc55777ded92f54ecff83635fef99be6a9359",
+   "photo_sha256": "d40d90a9903679d02055a60a2a89c111946607263e9f3c292cdea4c83107b89a",
+   "post_sent": true,
+   "returned_at": "2026-10-21T21:27:21.292900+00:00",
+   "started_at": "2026-10-21T21:27:13.043282+00:00",
+   "status": "rendered",
+   "tag": "render4"
+  }
+ ],
+ "started_at": "2026-10-21T21:26:45.971789+00:00"
+}

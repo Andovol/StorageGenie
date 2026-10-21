@@ -1,0 +1,29 @@
+{
+ "both_under_projection": true,
+ "credits_cost_usd": 0.0,
+ "owner_month_usd": 0.558673125,
+ "owner_today_usd": 0.5462359999999999,
+ "post_spend_body": {
+  "effective_budget": {
+   "budget_id": null,
+   "guardrail_id": null,
+   "include_byok": false,
+   "limit_usd": 5,
+   "remaining_usd": 4.987562875,
+   "reset_interval": null,
+   "resets_at": null,
+   "scope": "key_limit",
+   "spend_usd": 0.012437125
+  },
+  "limit": 5,
+  "limit_remaining": 4.987562875,
+  "usage": 0.012437125,
+  "usage_daily": 0,
+  "usage_monthly": 0.012437125
+ },
+ "projection_usd": 0.17028000000000001,
+ "status": "rendered",
+ "tag": "render3",
+ "timestamp": "2026-10-21T21:27:12.964747+00:00",
+ "upstream_inference_cost_usd": 0.06834
+}

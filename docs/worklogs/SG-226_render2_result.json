@@ -1,0 +1,48 @@
+{
+ "asset_id": "01a0c47f-fbb3-7db1-b6f3-aa52d20aa6a0",
+ "authority_cap_usd": 1.590381,
+ "cost_usd": 0.0,
+ "display_name": "UHT Lapte 3,5% grăsime",
+ "error_state": null,
+ "evidence_id": "01a1605c-4aa9-74f3-8bf3-f15c6c72bbe5",
+ "image_media_type": "image/jpeg",
+ "image_model": "google/gemini-3.1-flash-image",
+ "image_sha256": "2ff0fd948a23bdf5bca838db7f55cd8da2b5c483244eaff96bf7293975b8fd3b",
+ "latency_ms": 8700.112906983122,
+ "ledger_id": "01a1605c-4aaf-7811-9e1b-34a203c195ca",
+ "orchestrator": "bytedance-seed/seed-1.6-flash",
+ "photo_evidence_id": "01a0c47f-0830-75f0-a027-9e8bde8eae48",
+ "photo_ref_sha256": "76ef008bf309207c21d126dae390020ffb51d6872d978ce02532849fd0570a59",
+ "photo_sha256": "b6e11ecce9be93ee2470ad75143e8e1d89489da1e128baecc89688ae9e3a833e",
+ "refusal": null,
+ "response_id": null,
+ "status": "rendered",
+ "status_code": 200,
+ "storage_key": "01a0a029-1477-7ca0-b200-bce78a96c679/2f/2ff0fd948a23bdf5bca838db7f55cd8da2b5c483244eaff96bf7293975b8fd3b.jpg",
+ "tag": "render2",
+ "timestamp": "2026-10-21T21:27:03.601067+00:00",
+ "transport": "image_api",
+ "usage": {
+  "completion_tokens": 1431,
+  "completion_tokens_details": {
+   "image_tokens": 1120,
+   "reasoning_tokens": 0
+  },
+  "cost": 0,
+  "cost_details": {
+   "upstream_inference_completions_cost": 0.068133,
+   "upstream_inference_cost": 0.068277,
+   "upstream_inference_prompt_cost": 0.000144
+  },
+  "is_byok": true,
+  "prompt_tokens": 288,
+  "prompt_tokens_details": {
+   "audio_tokens": 0,
+   "cache_write_tokens": 0,
+   "cached_tokens": 0,
+   "video_tokens": 0
+  },
+  "total_tokens": 1719
+ },
+ "worst_case_usd": 0.17028000000000001
+}

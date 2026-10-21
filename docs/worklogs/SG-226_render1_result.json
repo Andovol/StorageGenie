@@ -1,0 +1,48 @@
+{
+ "asset_id": "01a0a467-eb0e-7b83-a227-af122dc9268b",
+ "authority_cap_usd": 1.658589,
+ "cost_usd": 0.0,
+ "display_name": "Toothpaste",
+ "error_state": null,
+ "evidence_id": "01a1605c-2829-74e0-b628-98574f4711fb",
+ "image_media_type": "image/jpeg",
+ "image_model": "google/gemini-3.1-flash-image",
+ "image_sha256": "076276a58ebc1f84a50740e162ae47fd2d581e57459ff0d3bf144a1d8fcdede0",
+ "latency_ms": 8587.987803970464,
+ "ledger_id": "01a1605c-2832-7142-9cc7-31ed8032cdf1",
+ "orchestrator": "bytedance-seed/seed-1.6-flash",
+ "photo_evidence_id": "01a0a467-eacf-7e13-bbd0-078b1bc93860",
+ "photo_ref_sha256": "83c59fb9840fff65b2e214394ee04904482aa31bec6ed5a28043e6f10906e58f",
+ "photo_sha256": "6050ed6f7f83bf90722057f1a376b1adcfc8099de4f8995e5cb85ee0ae100630",
+ "refusal": null,
+ "response_id": null,
+ "status": "rendered",
+ "status_code": 200,
+ "storage_key": "01a0a029-1477-7ca0-b200-bce78a96c679/07/076276a58ebc1f84a50740e162ae47fd2d581e57459ff0d3bf144a1d8fcdede0.jpg",
+ "tag": "render1",
+ "timestamp": "2026-10-21T21:26:54.771923+00:00",
+ "transport": "image_api",
+ "usage": {
+  "completion_tokens": 1408,
+  "completion_tokens_details": {
+   "image_tokens": 1120,
+   "reasoning_tokens": 0
+  },
+  "cost": 0,
+  "cost_details": {
+   "upstream_inference_completions_cost": 0.068064,
+   "upstream_inference_cost": 0.068208,
+   "upstream_inference_prompt_cost": 0.000144
+  },
+  "is_byok": true,
+  "prompt_tokens": 288,
+  "prompt_tokens_details": {
+   "audio_tokens": 0,
+   "cache_write_tokens": 0,
+   "cached_tokens": 0,
+   "video_tokens": 0
+  },
+  "total_tokens": 1696
+ },
+ "worst_case_usd": 0.17028000000000001
+}

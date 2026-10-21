@@ -1,0 +1,48 @@
+{
+ "asset_id": "01a0c481-720e-7923-ad6c-bee45caba30f",
+ "authority_cap_usd": 1.5221040000000001,
+ "cost_usd": 0.0,
+ "display_name": "Milbona Parmigiano Reggiano Italian hard cheese flakes",
+ "error_state": null,
+ "evidence_id": "01a1605c-6f0f-7eb3-abff-56343649ea24",
+ "image_media_type": "image/jpeg",
+ "image_model": "google/gemini-3.1-flash-image",
+ "image_sha256": "5c3076942bd7d059f84da9f48df00015715d4195beaee315dde431fd43730f48",
+ "latency_ms": 9183.236828015652,
+ "ledger_id": "01a1605c-6f13-7d20-8db8-989bf9856ceb",
+ "orchestrator": "bytedance-seed/seed-1.6-flash",
+ "photo_evidence_id": "01a0c481-08b8-72b2-ab22-8ad28fed8fda",
+ "photo_ref_sha256": "925c115e67fc76ed527e0e1755a17c9d1d4aac9ce6d57422be4f728959f473c9",
+ "photo_sha256": "052a5f7b47d0556aace108ea32fbd67f8641c9e940f4a7ef69e1cc92e75a1a45",
+ "refusal": null,
+ "response_id": null,
+ "status": "rendered",
+ "status_code": 200,
+ "storage_key": "01a0a029-1477-7ca0-b200-bce78a96c679/5c/5c3076942bd7d059f84da9f48df00015715d4195beaee315dde431fd43730f48.jpg",
+ "tag": "render3",
+ "timestamp": "2026-10-21T21:27:12.916565+00:00",
+ "transport": "image_api",
+ "usage": {
+  "completion_tokens": 1452,
+  "completion_tokens_details": {
+   "image_tokens": 1120,
+   "reasoning_tokens": 0
+  },
+  "cost": 0,
+  "cost_details": {
+   "upstream_inference_completions_cost": 0.068196,
+   "upstream_inference_cost": 0.06834,
+   "upstream_inference_prompt_cost": 0.000144
+  },
+  "is_byok": true,
+  "prompt_tokens": 288,
+  "prompt_tokens_details": {
+   "audio_tokens": 0,
+   "cache_write_tokens": 0,
+   "cached_tokens": 0,
+   "video_tokens": 0
+  },
+  "total_tokens": 1740
+ },
+ "worst_case_usd": 0.17028000000000001
+}

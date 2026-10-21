@@ -1,3 +1,17 @@
 timestamp	leg	url	http_status	cost_usd	error
 2026-10-21T21:26:24.772445+00:00	key_list	https://openrouter.ai/api/v1/key	200	null	
 2026-10-21T21:26:24.787959+00:00	endpoints_list	https://openrouter.ai/api/v1/images/models/google/gemini-3.1-flash-image/endpoints	200	null	
+2026-10-21T21:26:46.046407+00:00	key_list	https://openrouter.ai/api/v1/key	200	null	
+2026-10-21T21:26:46.060436+00:00	endpoints_list	https://openrouter.ai/api/v1/images/models/google/gemini-3.1-flash-image/endpoints	200	null	
+2026-10-21T21:26:46.142716+00:00	key_render1	https://openrouter.ai/api/v1/key	200	null	
+2026-10-21T21:26:46.157028+00:00	endpoints_render1	https://openrouter.ai/api/v1/images/models/google/gemini-3.1-flash-image/endpoints	200	null	
+2026-10-21T21:26:54.818742+00:00	post_spend_render1	https://openrouter.ai/api/v1/key	200	null	
+2026-10-21T21:26:54.865221+00:00	key_render2	https://openrouter.ai/api/v1/key	200	null	
+2026-10-21T21:26:54.875884+00:00	endpoints_render2	https://openrouter.ai/api/v1/images/models/google/gemini-3.1-flash-image/endpoints	200	null	
+2026-10-21T21:27:03.653143+00:00	post_spend_render2	https://openrouter.ai/api/v1/key	200	null	
+2026-10-21T21:27:03.698050+00:00	key_render3	https://openrouter.ai/api/v1/key	200	null	
+2026-10-21T21:27:03.711535+00:00	endpoints_render3	https://openrouter.ai/api/v1/images/models/google/gemini-3.1-flash-image/endpoints	200	null	
+2026-10-21T21:27:12.963511+00:00	post_spend_render3	https://openrouter.ai/api/v1/key	200	null	
+2026-10-21T21:27:13.017232+00:00	key_render4	https://openrouter.ai/api/v1/key	200	null	
+2026-10-21T21:27:13.031687+00:00	endpoints_render4	https://openrouter.ai/api/v1/images/models/google/gemini-3.1-flash-image/endpoints	200	null	
+2026-10-21T21:27:21.342796+00:00	post_spend_render4	https://openrouter.ai/api/v1/key	200	null	
