@@ -1,0 +1,213 @@
+{
+ "changed_rows": [
+  {
+   "error_state": "http_status:404",
+   "id": "01a12118-ce4b-79b3-88f8-c289e18d15a2",
+   "other_fields_unchanged": true,
+   "post_cost": 0.0,
+   "pre_cost": null,
+   "updated_at": "2026-10-09 14:37:16"
+  },
+  {
+   "error_state": "http_status:404",
+   "id": "01a12119-de97-7a71-803c-cd17fb237c7c",
+   "other_fields_unchanged": true,
+   "post_cost": 0.0,
+   "pre_cost": null,
+   "updated_at": "2026-10-09 14:38:25"
+  },
+  {
+   "error_state": "http_status:429",
+   "id": "01a13082-aadb-7602-b9dd-f4d48bf9b720",
+   "other_fields_unchanged": true,
+   "post_cost": 0.0,
+   "pre_cost": null,
+   "updated_at": "2026-10-12 14:27:12"
+  },
+  {
+   "error_state": "http_status:429",
+   "id": "01a13084-4367-7ad2-9984-bc7179dfb4f3",
+   "other_fields_unchanged": true,
+   "post_cost": 0.0,
+   "pre_cost": null,
+   "updated_at": "2026-10-12 14:28:56"
+  },
+  {
+   "error_state": "http_status:400",
+   "id": "01a15fe8-aa48-7830-86ec-b3725b611639",
+   "other_fields_unchanged": true,
+   "post_cost": 0.0,
+   "pre_cost": null,
+   "updated_at": "2026-10-21 19:20:45"
+  }
+ ],
+ "classified_rows": [
+  {
+   "cost": 0.0,
+   "created_at": "2026-10-09 14:37:16",
+   "error_state": "http_status:404",
+   "id": "01a12118-ce4b-79b3-88f8-c289e18d15a2",
+   "input_hashes": "{\"photo_sha256\": \"925c115e67fc76ed527e0e1755a17c9d1d4aac9ce6d57422be4f728959f473c9\", \"brief_sha256\": \"39a56f8bc60ab5043ac837293b89b1627a8897a7b9b045df4b8ff5ac67ff6105\"}",
+   "job_id": null,
+   "latency_ms": 460.91977693140507,
+   "model": "inclusionai/ling-3.0-flash-vl",
+   "output_payload": "{\"image_model\": \"openai/gpt-5-image\", \"orchestrator\": \"inclusionai/ling-3.0-flash-vl\", \"prompt\": \"Restage this packaged product on a clean kitchen counter in warm natural daylight; keep the package, its label and its printed text exactly as photographed.\", \"status_code\": 404, \"response_id\": null, \"evidence_id\": null, \"remote_url\": null}",
+   "prompt_template_version": "scene-render-v1",
+   "provider": "openrouter",
+   "updated_at": "2026-10-09 14:37:16",
+   "usage_json": null
+  },
+  {
+   "cost": 0.0,
+   "created_at": "2026-10-09 14:38:25",
+   "error_state": "http_status:404",
+   "id": "01a12119-de97-7a71-803c-cd17fb237c7c",
+   "input_hashes": "{\"photo_sha256\": \"925c115e67fc76ed527e0e1755a17c9d1d4aac9ce6d57422be4f728959f473c9\", \"brief_sha256\": \"39a56f8bc60ab5043ac837293b89b1627a8897a7b9b045df4b8ff5ac67ff6105\"}",
+   "job_id": null,
+   "latency_ms": 447.08849396556616,
+   "model": "inclusionai/ling-3.0-flash-vl",
+   "output_payload": "{\"image_model\": \"openai/gpt-5-image\", \"orchestrator\": \"inclusionai/ling-3.0-flash-vl\", \"prompt\": \"Restage this packaged product on a clean kitchen counter in warm natural daylight; keep the package, its label and its printed text exactly as photographed.\", \"status_code\": 404, \"response_id\": null, \"evidence_id\": null, \"remote_url\": null, \"error_body\": \"{\\\"error\\\": {\\\"message\\\": \\\"No allowed providers are available for the selected model. Providers serving inclusionai/ling-3.0-flash-vl-20260910: novita, deepinfra, but your account's allowed-providers setting permits only: xai, meta, seed, baidu, nvidia, xiaomi, minimax, stealth, deepseek, moonshotai, open-inference, google-ai-studio. To change your allowed providers, visit: https://openrouter.ai/settings/privacy.\\\", \\\"code\\\": 404, \\\"metadata\\\": {\\\"available_providers\\\": [\\\"novita\\\", \\\"deepinfra\\\"], \\\"requested_providers\\\": [\\\"xai\\\", \\\"meta\\\", \\\"seed\\\", \\\"baidu\\\", \\\"nvidia\\\", \\\"xiaomi\\\", \\\"minimax\\\", \\\"stealth\\\", \\\"deepseek\\\", \\\"moonshotai\\\", \\\"open-inference\\\", \\\"google-ai-studio\\\"], \\\"routing_funnel\\\": [{\\\"step\\\": \\\"Initial Endpoints\\\", \\\"endpoint_count\\\": 2}], \\\"failed_routing_step\\\": \\\"Filter by Allowed Providers\\\"}}}\"}",
+   "prompt_template_version": "scene-render-v1",
+   "provider": "openrouter",
+   "updated_at": "2026-10-09 14:38:25",
+   "usage_json": null
+  },
+  {
+   "cost": 0.0,
+   "created_at": "2026-10-12 14:27:12",
+   "error_state": "http_status:429",
+   "id": "01a13082-aadb-7602-b9dd-f4d48bf9b720",
+   "input_hashes": "{\"photo_sha256\": \"925c115e67fc76ed527e0e1755a17c9d1d4aac9ce6d57422be4f728959f473c9\", \"brief_sha256\": \"39a56f8bc60ab5043ac837293b89b1627a8897a7b9b045df4b8ff5ac67ff6105\"}",
+   "job_id": null,
+   "latency_ms": 700.1647092401981,
+   "model": "bytedance-seed/seed-1.6-flash",
+   "output_payload": "{\"image_model\": \"google/gemini-3.1-flash-image\", \"orchestrator\": \"bytedance-seed/seed-1.6-flash\", \"prompt\": \"Restage this packaged product on a clean kitchen counter in warm natural daylight; keep the package, its label and its printed text exactly as photographed.\", \"status_code\": 429, \"response_id\": null, \"evidence_id\": null, \"remote_url\": null, \"error_body\": \"{\\\"error\\\": {\\\"message\\\": \\\"You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current us\u2026\\\", \\\"code\\\": 429, \\\"metadata\\\": {\\\"provider_name\\\": \\\"Google AI Studio\\\"}}}\", \"response_body\": \"{\\\"error\\\": {\\\"message\\\": \\\"You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current us\u2026\\\", \\\"code\\\": 429, \\\"metadata\\\": {\\\"provider_name\\\": \\\"Google AI Studio\\\"}}}\", \"response_body_sha256\": \"cb827338b2ad29276adbd8df37ef8f2bdbbf36000f5759c3d2a2df49c8bca7d9\"}",
+   "prompt_template_version": "scene-render-v1",
+   "provider": "openrouter",
+   "updated_at": "2026-10-12 14:27:12",
+   "usage_json": null
+  },
+  {
+   "cost": 0.0,
+   "created_at": "2026-10-12 14:28:56",
+   "error_state": "http_status:429",
+   "id": "01a13084-4367-7ad2-9984-bc7179dfb4f3",
+   "input_hashes": "{\"photo_sha256\": \"925c115e67fc76ed527e0e1755a17c9d1d4aac9ce6d57422be4f728959f473c9\", \"brief_sha256\": \"39a56f8bc60ab5043ac837293b89b1627a8897a7b9b045df4b8ff5ac67ff6105\"}",
+   "job_id": null,
+   "latency_ms": 376.3819606974721,
+   "model": "bytedance-seed/seed-1.6-flash",
+   "output_payload": "{\"image_model\": \"google/gemini-3.1-flash-image\", \"orchestrator\": \"bytedance-seed/seed-1.6-flash\", \"prompt\": \"Restage this packaged product on a clean kitchen counter in warm natural daylight; keep the package, its label and its printed text exactly as photographed.\", \"status_code\": 429, \"response_id\": null, \"evidence_id\": null, \"remote_url\": null, \"error_body\": \"{\\\"error\\\": {\\\"message\\\": \\\"You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current us\u2026\\\", \\\"code\\\": 429, \\\"metadata\\\": {\\\"provider_name\\\": \\\"Google AI Studio\\\"}}}\", \"response_body\": \"{\\\"error\\\": {\\\"message\\\": \\\"You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current us\u2026\\\", \\\"code\\\": 429, \\\"metadata\\\": {\\\"provider_name\\\": \\\"Google AI Studio\\\"}}}\", \"response_body_sha256\": \"cb827338b2ad29276adbd8df37ef8f2bdbbf36000f5759c3d2a2df49c8bca7d9\"}",
+   "prompt_template_version": "scene-render-v1",
+   "provider": "openrouter",
+   "updated_at": "2026-10-12 14:28:56",
+   "usage_json": null
+  },
+  {
+   "cost": 0.0,
+   "created_at": "2026-10-21 19:20:45",
+   "error_state": "http_status:400",
+   "id": "01a15fe8-aa48-7830-86ec-b3725b611639",
+   "input_hashes": "{\"photo_sha256\": \"b0d3d6618436f0265c2dae689686f20fc1984c892ab652cc7bc690184ae88425\", \"brief_sha256\": \"39a56f8bc60ab5043ac837293b89b1627a8897a7b9b045df4b8ff5ac67ff6105\"}",
+   "job_id": null,
+   "latency_ms": 4998.9674590178765,
+   "model": "bytedance-seed/seed-1.6-flash",
+   "output_payload": "{\"image_model\": \"google/gemini-3.1-flash-image\", \"orchestrator\": \"bytedance-seed/seed-1.6-flash\", \"prompt\": \"Restage this packaged product on a clean kitchen counter in warm natural daylight; keep the package, its label and its printed text exactly as photographed.\", \"status_code\": 400, \"response_id\": null, \"evidence_id\": null, \"remote_url\": null, \"error_body\": \"{\\\"error\\\": {\\\"message\\\": \\\"Gemini blocked this request: it was flagged for copyrighted or trademarked material.\\\", \\\"code\\\": 400, \\\"metadata\\\": {\\\"provider_name\\\": \\\"Google AI Studio\\\", \\\"finish_reason\\\": \\\"RECITATION\\\", \\\"candidate_count\\\": 1, \\\"block_reason\\\": \\\"RECITATION\\\"}}}\", \"response_body\": \"{\\\"error\\\": {\\\"message\\\": \\\"Gemini blocked this request: it was flagged for copyrighted or trademarked material.\\\", \\\"code\\\": 400, \\\"metadata\\\": {\\\"provider_name\\\": \\\"Google AI Studio\\\", \\\"finish_reason\\\": \\\"RECITATION\\\", \\\"candidate_count\\\": 1, \\\"block_reason\\\": \\\"RECITATION\\\"}}}\", \"response_body_sha256\": \"970f192b0c0169b045dc643841ba6546f7e64c7cc6cb566e53a3dac77f365c03\"}",
+   "prompt_template_version": "scene-render-v1",
+   "provider": "openrouter",
+   "updated_at": "2026-10-21 19:20:45",
+   "usage_json": null
+  }
+ ],
+ "database_url": "sqlite:////home/andrei/StorageGenie/data/db/storagegenie.db",
+ "other_rows_changed": 0,
+ "owner_side": {
+  "daily_cap_usd": 2.0,
+  "month_usd": 0.285605125,
+  "monthly_cap_usd": 10.0,
+  "rows": [
+   {
+    "created_at": "2026-10-09 14:39:55",
+    "id": "01a1211b-3ae2-7ec2-aa57-4e1a8219c8f8",
+    "upstream": 0.0007589249999999999
+   },
+   {
+    "created_at": "2026-10-12 14:24:53",
+    "id": "01a13080-8b71-7851-8460-813b909b6034",
+    "upstream": 0.000802275
+   },
+   {
+    "created_at": "2026-10-12 14:28:48",
+    "id": "01a13084-21bb-7850-b8c8-e61f4e85698d",
+    "upstream": 0.0008759250000000001
+   },
+   {
+    "created_at": "2026-10-12 17:45:15",
+    "id": "01a13137-fe82-77e1-95fa-a9c97aff75b4",
+    "upstream": 0.01
+   },
+   {
+    "created_at": "2026-10-21 17:07:57",
+    "id": "01a15f6f-13c4-75a3-8123-00142db2ba42",
+    "upstream": 0.068184
+   },
+   {
+    "created_at": "2026-10-21 19:07:58",
+    "id": "01a15fdc-f5be-7941-b46b-e9773349ec4c",
+    "upstream": 0.068256
+   },
+   {
+    "created_at": "2026-10-21 19:34:18",
+    "id": "01a15ff5-11ec-7770-8143-8cc825a1a13d",
+    "upstream": 0.068229
+   },
+   {
+    "created_at": "2026-10-21 20:12:44",
+    "id": "01a16018-3eb1-79c2-bffa-39a2f0fc88c3",
+    "upstream": 0.068499
+   }
+  ],
+  "slice_actual_usd": 0.0,
+  "today_usd": 0.27316799999999997
+ },
+ "provider_call_snapshot_sha256_post": "80cee9c5d3a65f7f1a4d42efc2d359c26a08ffe5b7d0167b62c2b74d3cc445c9",
+ "provider_call_snapshot_sha256_pre": "8bdb9b536b92645a1099398df2bac996bb32c27388488f76cfe84c8b1a6e8b1d",
+ "resolved_store": "/home/andrei/StorageGenie/data/db/storagegenie.db",
+ "revert_five_costs_equals_pre_snapshot": true,
+ "scene_spend_so_far": {
+  "known_unchanged": true,
+  "known_usd": 0.012437125,
+  "unknown_cost_calls": 0
+ },
+ "table_counts": {
+  "alembic_version": 1,
+  "assertion": 37,
+  "asset": 7,
+  "asset_evidence": 16,
+  "asset_fts": 7,
+  "asset_fts_config": 1,
+  "asset_fts_data": 9,
+  "asset_fts_docsize": 7,
+  "asset_fts_idx": 7,
+  "asset_location": 1,
+  "asset_relation": 1,
+  "audit_event": 95,
+  "candidate": 10,
+  "enrich_snapshot": 4,
+  "evidence": 22,
+  "guardrail_event": 2,
+  "household": 1,
+  "idempotency_key": 11,
+  "job": 11,
+  "job_step": 72,
+  "location": 1,
+  "observation": 20,
+  "planning_suggestion": 0,
+  "provider_call": 34,
+  "review_task": 8,
+  "saved_search": 0,
+  "source_attribution": 0,
+  "user": 2
+ },
+ "table_counts_unchanged": true,
+ "timestamp": "2026-10-21T20:56:11Z"
+}

@@ -1,0 +1,25 @@
+{
+ "baseline_tokens": 1290,
+ "http_status": 200,
+ "max_live_price": 6.6e-05,
+ "multiplier": 2,
+ "pricing_lines": [
+  {
+   "cost_usd": 6.6e-05,
+   "provider_slug": "google-vertex/us"
+  },
+  {
+   "cost_usd": 6e-05,
+   "provider_slug": "google-ai-studio"
+  },
+  {
+   "cost_usd": 6e-05,
+   "provider_slug": "google-vertex/global"
+  }
+ ],
+ "source": "live pricing body committed as SG-224_pricing_body.json",
+ "timestamp": "2026-10-21T20:55:32Z",
+ "tokens": 2580,
+ "url": "https://openrouter.ai/api/v1/images/models/google/gemini-3.1-flash-image/endpoints",
+ "worst_case_usd": 0.17028000000000001
+}

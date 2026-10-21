@@ -1,0 +1,21 @@
+[2026-10-21T20:55:32Z] SG-224 mode=run database_url=sqlite:////home/andrei/StorageGenie/data/db/storagegenie.db resolved=/home/andrei/StorageGenie/data/db/storagegenie.db expected=/home/andrei/StorageGenie/data/db/storagegenie.db
+[2026-10-21T20:55:32Z] scene_spend_pre=(0.012437125, 5)
+[2026-10-21T20:55:32Z] null_cost_rows=5
+[2026-10-21T20:55:32Z] proved id=01a12118-ce4b-79b3-88f8-c289e18d15a2 error=http_status:404 spend_proof=predates_spend_logging
+[2026-10-21T20:55:32Z] proved id=01a12119-de97-7a71-803c-cd17fb237c7c error=http_status:404 spend_proof=predates_spend_logging
+[2026-10-21T20:55:32Z] proved id=01a13082-aadb-7602-b9dd-f4d48bf9b720 error=http_status:429 spend_proof=predates_spend_logging
+[2026-10-21T20:55:32Z] proved id=01a13084-4367-7ad2-9984-bc7179dfb4f3 error=http_status:429 spend_proof=predates_spend_logging
+[2026-10-21T20:55:32Z] proved id=01a15fe8-aa48-7830-86ec-b3725b611639 error=http_status:400 spend_proof=pre_post_key_spend_identical
+[2026-10-21T20:55:32Z] worst_case_usd=0.17028000 max_price=6.6e-05 tokens=2580
+[2026-10-21T20:55:32Z] guard_pre spent=0.012437125 unknown=5 projected=1.034117125 cap=1.02168000 verdict=refused
+[2026-10-21T20:55:32Z] update id=01a12118-ce4b-79b3-88f8-c289e18d15a2 changes=1 rowcount=1
+[2026-10-21T20:55:32Z] update id=01a12119-de97-7a71-803c-cd17fb237c7c changes=1 rowcount=1
+[2026-10-21T20:55:32Z] update id=01a13082-aadb-7602-b9dd-f4d48bf9b720 changes=1 rowcount=1
+[2026-10-21T20:55:32Z] update id=01a13084-4367-7ad2-9984-bc7179dfb4f3 changes=1 rowcount=1
+[2026-10-21T20:55:32Z] update id=01a15fe8-aa48-7830-86ec-b3725b611639 changes=1 rowcount=1
+[2026-10-21T20:55:32Z] COMMIT statements=5
+[2026-10-21T20:55:32Z] guard_post spent=0.012437125 unknown=0 projected=0.182717125 cap=1.02168000 verdict=proceed
+[2026-10-21T20:55:32Z] guard_selftest_over_cap=('over_cap', 'over_cap: projected worst case 2.19196 USD (spent 2.02168 + 0 unknown-cost call(s) x 0.17028000000000001 + this render 0.17028000000000001) exceeds cap 1.0216800000000001 USD; refusing to spend')
+[2026-10-21T20:55:32Z] guard_selftest_no_authority=refused_consent
+[2026-10-21T20:55:32Z] owner_side today=0.273168000 month=0.285605125 caps=2.00/10.00
+owner_month_differs today=0.27316799999999997 month=0.285605125 -> STOP

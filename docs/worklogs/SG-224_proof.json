@@ -1,0 +1,220 @@
+{
+ "cumulative_key_spend_crosscheck": {
+  "equals_known_sum": true,
+  "note": "Read after all five null rows existed (SG-223 final spend body, 2026-10-21T20:12:44Z); it equals the sum of known costs exactly.",
+  "source": "docs/worklogs/SG-223_post_spend_final.json",
+  "usage": 0.012437125
+ },
+ "derived_null_set": [
+  {
+   "created_at": "2026-10-09 14:37:16",
+   "error_state": "http_status:404",
+   "id": "01a12118-ce4b-79b3-88f8-c289e18d15a2"
+  },
+  {
+   "created_at": "2026-10-09 14:38:25",
+   "error_state": "http_status:404",
+   "id": "01a12119-de97-7a71-803c-cd17fb237c7c"
+  },
+  {
+   "created_at": "2026-10-12 14:27:12",
+   "error_state": "http_status:429",
+   "id": "01a13082-aadb-7602-b9dd-f4d48bf9b720"
+  },
+  {
+   "created_at": "2026-10-12 14:28:56",
+   "error_state": "http_status:429",
+   "id": "01a13084-4367-7ad2-9984-bc7179dfb4f3"
+  },
+  {
+   "created_at": "2026-10-21 19:20:45",
+   "error_state": "http_status:400",
+   "id": "01a15fe8-aa48-7830-86ec-b3725b611639"
+  }
+ ],
+ "expected_set": [
+  {
+   "error_state": "http_status:404",
+   "id": "01a12118-ce4b-79b3-88f8-c289e18d15a2",
+   "status_code": 404
+  },
+  {
+   "error_state": "http_status:404",
+   "id": "01a12119-de97-7a71-803c-cd17fb237c7c",
+   "status_code": 404
+  },
+  {
+   "error_state": "http_status:429",
+   "id": "01a13082-aadb-7602-b9dd-f4d48bf9b720",
+   "status_code": 429
+  },
+  {
+   "error_state": "http_status:429",
+   "id": "01a13084-4367-7ad2-9984-bc7179dfb4f3",
+   "status_code": 429
+  },
+  {
+   "error_state": "http_status:400",
+   "id": "01a15fe8-aa48-7830-86ec-b3725b611639",
+   "status_code": 400
+  }
+ ],
+ "known_usd_pre": 0.012437125,
+ "null_rows_all_providers": 5,
+ "rows": [
+  {
+   "body_usage_or_cost_keys": [],
+   "cost_pre": null,
+   "created_at": "2026-10-09 14:37:16",
+   "error_absent_note": "No error_body was stored for this 404 row; the stored payload carries status_code=404 and response_id=null, and error_state is http_status:404.",
+   "error_quoted": null,
+   "error_state": "http_status:404",
+   "id": "01a12118-ce4b-79b3-88f8-c289e18d15a2",
+   "model": "inclusionai/ling-3.0-flash-vl",
+   "provider": "openrouter",
+   "spend_proof": {
+    "first_logged_spend_evidence": {
+     "commit": "a549bd77e49bbcf785df6eeeb6934ca7fd96c98f",
+     "committed_at": "2026-10-21T16:52:57+00:00",
+     "path": "docs/worklogs/SG-216_g1_key_body.json"
+    },
+    "kind": "predates_spend_logging",
+    "row_created_at": "2026-10-09 14:37:16",
+    "statement": "The call predates spend logging; the row's own body is the whole proof."
+   },
+   "status_code": 404,
+   "usage_json": null
+  },
+  {
+   "body_usage_or_cost_keys": [],
+   "cost_pre": null,
+   "created_at": "2026-10-09 14:38:25",
+   "error_absent_note": null,
+   "error_quoted": "{\"error\": {\"message\": \"No allowed providers are available for the selected model. Providers serving inclusionai/ling-3.0-flash-vl-20260910: novita, deepinfra, but your account's allowed-providers setting permits only: xai, meta, seed, baidu, nvidia, xiaomi, minimax, stealth, deepseek, moonshotai, open-inference, google-ai-studio. To change your allowed providers, visit: https://openrouter.ai/settings/privacy.\", \"code\": 404, \"metadata\": {\"available_providers\": [\"novita\", \"deepinfra\"], \"requested_providers\": [\"xai\", \"meta\", \"seed\", \"baidu\", \"nvidia\", \"xiaomi\", \"minimax\", \"stealth\", \"deepseek\", \"moonshotai\", \"open-inference\", \"google-ai-studio\"], \"routing_funnel\": [{\"step\": \"Initial Endpoints\", \"endpoint_count\": 2}], \"failed_routing_step\": \"Filter by Allowed Providers\"}}}",
+   "error_state": "http_status:404",
+   "id": "01a12119-de97-7a71-803c-cd17fb237c7c",
+   "model": "inclusionai/ling-3.0-flash-vl",
+   "provider": "openrouter",
+   "spend_proof": {
+    "first_logged_spend_evidence": {
+     "commit": "a549bd77e49bbcf785df6eeeb6934ca7fd96c98f",
+     "committed_at": "2026-10-21T16:52:57+00:00",
+     "path": "docs/worklogs/SG-216_g1_key_body.json"
+    },
+    "kind": "predates_spend_logging",
+    "row_created_at": "2026-10-09 14:38:25",
+    "statement": "The call predates spend logging; the row's own body is the whole proof."
+   },
+   "status_code": 404,
+   "usage_json": null
+  },
+  {
+   "body_usage_or_cost_keys": [],
+   "cost_pre": null,
+   "created_at": "2026-10-12 14:27:12",
+   "error_absent_note": null,
+   "error_quoted": "{\"error\": {\"message\": \"You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current us\u2026\", \"code\": 429, \"metadata\": {\"provider_name\": \"Google AI Studio\"}}}",
+   "error_state": "http_status:429",
+   "id": "01a13082-aadb-7602-b9dd-f4d48bf9b720",
+   "model": "bytedance-seed/seed-1.6-flash",
+   "provider": "openrouter",
+   "spend_proof": {
+    "first_logged_spend_evidence": {
+     "commit": "a549bd77e49bbcf785df6eeeb6934ca7fd96c98f",
+     "committed_at": "2026-10-21T16:52:57+00:00",
+     "path": "docs/worklogs/SG-216_g1_key_body.json"
+    },
+    "kind": "predates_spend_logging",
+    "row_created_at": "2026-10-12 14:27:12",
+    "statement": "The call predates spend logging; the row's own body is the whole proof."
+   },
+   "status_code": 429,
+   "usage_json": null
+  },
+  {
+   "body_usage_or_cost_keys": [],
+   "cost_pre": null,
+   "created_at": "2026-10-12 14:28:56",
+   "error_absent_note": null,
+   "error_quoted": "{\"error\": {\"message\": \"You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current us\u2026\", \"code\": 429, \"metadata\": {\"provider_name\": \"Google AI Studio\"}}}",
+   "error_state": "http_status:429",
+   "id": "01a13084-4367-7ad2-9984-bc7179dfb4f3",
+   "model": "bytedance-seed/seed-1.6-flash",
+   "provider": "openrouter",
+   "spend_proof": {
+    "first_logged_spend_evidence": {
+     "commit": "a549bd77e49bbcf785df6eeeb6934ca7fd96c98f",
+     "committed_at": "2026-10-21T16:52:57+00:00",
+     "path": "docs/worklogs/SG-216_g1_key_body.json"
+    },
+    "kind": "predates_spend_logging",
+    "row_created_at": "2026-10-12 14:28:56",
+    "statement": "The call predates spend logging; the row's own body is the whole proof."
+   },
+   "status_code": 429,
+   "usage_json": null
+  },
+  {
+   "body_usage_or_cost_keys": [],
+   "cost_pre": null,
+   "created_at": "2026-10-21 19:20:45",
+   "error_absent_note": null,
+   "error_quoted": "{\"error\": {\"message\": \"Gemini blocked this request: it was flagged for copyrighted or trademarked material.\", \"code\": 400, \"metadata\": {\"provider_name\": \"Google AI Studio\", \"finish_reason\": \"RECITATION\", \"candidate_count\": 1, \"block_reason\": \"RECITATION\"}}}",
+   "error_state": "http_status:400",
+   "id": "01a15fe8-aa48-7830-86ec-b3725b611639",
+   "model": "bytedance-seed/seed-1.6-flash",
+   "provider": "openrouter",
+   "spend_proof": {
+    "byte_identical": true,
+    "kind": "pre_post_key_spend_identical",
+    "post": {
+     "fields": {
+      "effective_budget": {
+       "budget_id": null,
+       "guardrail_id": null,
+       "include_byok": false,
+       "limit_usd": 5,
+       "remaining_usd": 4.987562875,
+       "reset_interval": null,
+       "resets_at": null,
+       "scope": "key_limit",
+       "spend_usd": 0.012437125
+      },
+      "limit": 5,
+      "limit_remaining": 4.987562875,
+      "usage": 0.012437125,
+      "usage_daily": 0,
+      "usage_monthly": 0.012437125
+     },
+     "path": "docs/worklogs/SG-219_post_spend_body_render3.json",
+     "sha256": "11684fbacb75a26e58ff40d76a03be60c40193d55f436502dfcd63fb3f814121"
+    },
+    "pre": {
+     "fields": {
+      "effective_budget": {
+       "budget_id": null,
+       "guardrail_id": null,
+       "include_byok": false,
+       "limit_usd": 5,
+       "remaining_usd": 4.987562875,
+       "reset_interval": null,
+       "resets_at": null,
+       "scope": "key_limit",
+       "spend_usd": 0.012437125
+      },
+      "limit": 5,
+      "limit_remaining": 4.987562875,
+      "usage": 0.012437125,
+      "usage_daily": 0,
+      "usage_monthly": 0.012437125
+     },
+     "path": "docs/worklogs/SG-219_spend_body_render3.json",
+     "sha256": "11684fbacb75a26e58ff40d76a03be60c40193d55f436502dfcd63fb3f814121"
+    }
+   },
+   "status_code": 400,
+   "usage_json": null
+  }
+ ],
+ "unknown_cost_calls_pre": 5
+}

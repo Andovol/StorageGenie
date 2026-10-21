@@ -1,0 +1,49 @@
+{
+ "committed": true,
+ "discipline": "One SessionLocal (autocommit=False, the app's own convention): the five UPDATEs share one transaction and one commit; any changes()!=1 or a lingering null row rolls the whole transaction back.",
+ "rolled_back": false,
+ "statements": [
+  {
+   "changes": 1,
+   "error_state": "http_status:404",
+   "id": "01a12118-ce4b-79b3-88f8-c289e18d15a2",
+   "pre_cost": null,
+   "rowcount": 1,
+   "sql": "UPDATE provider_call SET cost = 0.0 WHERE id = :id AND provider = 'openrouter' AND cost IS NULL AND error_state = :err"
+  },
+  {
+   "changes": 1,
+   "error_state": "http_status:404",
+   "id": "01a12119-de97-7a71-803c-cd17fb237c7c",
+   "pre_cost": null,
+   "rowcount": 1,
+   "sql": "UPDATE provider_call SET cost = 0.0 WHERE id = :id AND provider = 'openrouter' AND cost IS NULL AND error_state = :err"
+  },
+  {
+   "changes": 1,
+   "error_state": "http_status:429",
+   "id": "01a13082-aadb-7602-b9dd-f4d48bf9b720",
+   "pre_cost": null,
+   "rowcount": 1,
+   "sql": "UPDATE provider_call SET cost = 0.0 WHERE id = :id AND provider = 'openrouter' AND cost IS NULL AND error_state = :err"
+  },
+  {
+   "changes": 1,
+   "error_state": "http_status:429",
+   "id": "01a13084-4367-7ad2-9984-bc7179dfb4f3",
+   "pre_cost": null,
+   "rowcount": 1,
+   "sql": "UPDATE provider_call SET cost = 0.0 WHERE id = :id AND provider = 'openrouter' AND cost IS NULL AND error_state = :err"
+  },
+  {
+   "changes": 1,
+   "error_state": "http_status:400",
+   "id": "01a15fe8-aa48-7830-86ec-b3725b611639",
+   "pre_cost": null,
+   "rowcount": 1,
+   "sql": "UPDATE provider_call SET cost = 0.0 WHERE id = :id AND provider = 'openrouter' AND cost IS NULL AND error_state = :err"
+  }
+ ],
+ "transaction_finished": "2026-10-21T20:55:32Z",
+ "transaction_started": "2026-10-21T20:55:32Z"
+}

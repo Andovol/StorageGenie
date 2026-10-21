@@ -1,0 +1,40 @@
+{
+ "database_url": "sqlite:////home/andrei/StorageGenie/data/db/storagegenie.db",
+ "provider_call_snapshot_sha256": "8bdb9b536b92645a1099398df2bac996bb32c27388488f76cfe84c8b1a6e8b1d",
+ "resolved_store": "/home/andrei/StorageGenie/data/db/storagegenie.db",
+ "scene_spend_so_far": {
+  "known_usd": 0.012437125,
+  "unknown_cost_calls": 5
+ },
+ "table_counts": {
+  "alembic_version": 1,
+  "assertion": 37,
+  "asset": 7,
+  "asset_evidence": 16,
+  "asset_fts": 7,
+  "asset_fts_config": 1,
+  "asset_fts_data": 9,
+  "asset_fts_docsize": 7,
+  "asset_fts_idx": 7,
+  "asset_location": 1,
+  "asset_relation": 1,
+  "audit_event": 95,
+  "candidate": 10,
+  "enrich_snapshot": 4,
+  "evidence": 22,
+  "guardrail_event": 2,
+  "household": 1,
+  "idempotency_key": 11,
+  "job": 11,
+  "job_step": 72,
+  "location": 1,
+  "observation": 20,
+  "planning_suggestion": 0,
+  "provider_call": 34,
+  "review_task": 8,
+  "saved_search": 0,
+  "source_attribution": 0,
+  "user": 2
+ },
+ "timestamp": "2026-10-21T20:55:32Z"
+}

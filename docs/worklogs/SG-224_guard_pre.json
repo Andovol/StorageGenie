@@ -1,0 +1,13 @@
+{
+ "cap_usd": 1.0216800000000001,
+ "projected_all_in": 1.034117125,
+ "refusal": {
+  "code": "over_cap",
+  "reason": "over_cap: projected worst case 1.034117125 USD (spent 0.012437125 + 5 unknown-cost call(s) x 0.17028000000000001 + this render 0.17028000000000001) exceeds cap 1.0216800000000001 USD; refusing to spend"
+ },
+ "spent_usd": 0.012437125,
+ "timestamp": "2026-10-21T20:55:32Z",
+ "unknown_cost_calls": 5,
+ "verdict": "refused",
+ "worst_case_usd": 0.17028000000000001
+}

@@ -1,0 +1,6 @@
+[2026-10-21T20:56:11Z] SG-224 mode=post database_url=sqlite:////home/andrei/StorageGenie/data/db/storagegenie.db resolved=/home/andrei/StorageGenie/data/db/storagegenie.db expected=/home/andrei/StorageGenie/data/db/storagegenie.db
+[2026-10-21T20:56:11Z] guard_post spent=0.012437125 unknown=0 projected=0.182717125 cap=1.02168000 verdict=proceed
+[2026-10-21T20:56:11Z] guard_selftest_over_cap=('over_cap', 'over_cap: projected worst case 2.19196 USD (spent 2.02168 + 0 unknown-cost call(s) x 0.17028000000000001 + this render 0.17028000000000001) exceeds cap 1.0216800000000001 USD; refusing to spend')
+[2026-10-21T20:56:11Z] guard_selftest_no_authority=refused_consent
+[2026-10-21T20:56:11Z] owner_side today=0.273168000 month=0.285605125 caps=2.00/10.00
+[2026-10-21T20:56:11Z] post_counts provider_call=34 scene_spend_post=(0.012437125, 0)
