@@ -1,7 +1,7 @@
 # StorageGenie — State
 ## RESUME — 2026-10-21 SG-217 RATED 98 (pilot render 1 of 10 RENDERED via product path, BYOK $0.068184); D-27 continues
 
-**Close / next entry:** SG-217 rated 98 this turn (D-27 pilot render 1 of 10 RENDERED: Miso Soup scene via `render_scene`, Evidence + ledger rows, triple-bound proof, 9 pilot renders remain; receipt clean, no new ISS-4). No dispatch in flight; tree committed/pushed; staged none; untracked none (temp verify scripts live outside the repo); no merge/rebase/bisect; no stash; no submodule; `sensitive_uncommitted_state_present` — no. Standing rules persist: close-deploy + close-release at every close; outstanding-decisions list every turn.
+**Close / next entry:** SG-217 rated 98 this turn (D-27 pilot render 1 of 10 RENDERED: Miso Soup scene via `render_scene`, Evidence + ledger rows, triple-bound proof, 9 pilot renders remain; receipt clean, no new ISS-4). No dispatch in flight; tree committed/pushed; staged none; untracked none (temp verify scripts live outside the repo); no merge/rebase/bisect; no stash; no submodule; `sensitive_uncommitted_state_present` — no. Standing rules persist: close-deploy + close-release at every close; decision reporting narrowed 2026-10-21 (owner: full every-turn inventory is noise) — report only blocking items and live needs-owner questions, never the parked list.
 
 **Rules / version:** ruleset **0.50.0 CURRENT** (adoption D-2 2026-10-15; tag `contract-v0.50.0`/commit `1723165`; local `rules_check.sh` 2026-10-17: G-L1 CLEAN ×3 installed copies, VERSION CURRENT, recorded version in `AGENTS.md` matches). Contract cache `.rules-cache/`; host copy `/home/andrei/storagegenie-contract/` (host `.rules-cache/` absent — host G-L1/G-L5/G-L7 UNCHECKED as designed).
 
