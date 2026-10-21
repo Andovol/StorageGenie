@@ -1,0 +1,17 @@
+SG-217 worklog (UTC). Coder opencode, model opencode-go/deepseek-v4.1-flash, effort max (process args).
+BASE requested=automation resolved=6e36e9145c04d215a8ad06b4bebb7fba23314755 (== local HEAD at admission; worktree clean).
+
+17:02:54 lane start (run-coder SG-217, pid 366306; budget 2100s).
+17:03 read AGENTS.md + contract 0.50.0 CODER.md + lang/python.md in full; read the packet, SG-216 report, D-27 record, SG-159 report + sg159_render.py + openrouter.py on target.
+17:03 capability check: lane socket /run/dispatch-storagegenie-SG-217/docker.sock works; live container d45005fb7fab running healthy (image 98f8af1f, Up 3 days); live DB bind data/db + volume storagegenie_storage_data; key present by name only.
+17:04 recon free read inside the production image (no DB/storage mounts): GET /api/v1/key HTTP 200; usage 0.012437125, daily 0.0, monthly 0.012437125. Proves the key seam; no send. (Not a driver-ledger row; disclosed in the report.)
+17:04 live DB before: evidence 18 (scene_render 1), provider_call openrouter 8, null-cost 4, known sum 0.012437125. The scene_render row is a pre-pilot Muse render 2026-10-12 17:45:15 cost 0.01 (explains SG-216 F-SG216-2's +$0.01).
+17:05 wrote backend/scripts/sg217_render.py (plan/render/key-gate; real DB + storage mounts; one POST max; attempt marker).
+17:06 py_compile OK.
+17:07:38 plan (dry pass, same analysis code, no send): 6 candidates; pick Miso Soup evidence 01a0c4a0-af88-7903-a070-a44e7b120712 (1,280,694 B, 1500x1125 PNG, sha256 71901cac...); live pricing max 6.6e-05/token; worst case 2580 tok x 6.6e-05 = 0.17028; remainders daily 2.00000000 / monthly 9.98756288 / pilot 1.70280000; cap 1.70280000; guard projection 0.86383713 (0.012437125 + 4x0.17028 + 0.17028) -> proceed; synthetic over-cap selftest refused; no-authority selftest refused_consent. Plan log committed.
+17:07:47 render (one billed send): attempt marker written BEFORE the send; render_scene(image_api) POST https://openrouter.ai/api/v1/images.
+17:07:57 returned HTTP 200 rendered, latency 10044.6 ms; Evidence 01a15f6f-13ba-76e0-9238-acd5883c65f1; ledger 01a15f6f-13c4-75a3-8123-00142db2ba42; cost 0.0; upstream 0.068184; image 1195x896 JPEG 703,036 B sha256 41d619db...
+17:07:57 result JSON written immediately, then ledger row + image copy + post-spend re-read (usage unchanged 0.012437125; daily 0.0).
+17:08:20 health end [200] {"status":"ok","db":"ok","storage":"ok"} epoch 1792602500; container healthy; no restart.
+17:08 live DB after: evidence 19 (scene_render 2), provider_call openrouter 9, null-cost 4, known sum 0.012437125; exactly 1 new ledger row + 1 new Evidence row, no UPDATE/DELETE.
+17:09 image opened and judged (see report); secret gates; report + commit; receipt.
