@@ -1,0 +1,26 @@
+Dispatch-ID: SG-226.dbg | Report: note
+Debug-Report-Begin
+STAGE: budget kill (killed=term)
+CAUSE: The run exceeded the configured 2,100-second budget by one second and systemd sent TERM before the required A4 receipt note was published; the three work commits, including the report, had already been pushed.
+EVIDENCE:
+- [evidence file /var/lib/dispatch-debug-evidence/storagegenie/SG-226.dbg.txt] "TimeoutStartUSec=35min"; "Result=timeout"; "ExecMainStatus=143".
+- [retained journal in evidence file] "dispatch-storagegenie@SG-226.service: start operation timed out. Terminating."
+- [retained journal in evidence file] "DISPATCH_RESULT id=SG-226 coder=opencode exit=143 head=cb9734ae90f153b0bac9f349723a0a5095a40762 note=no moved=yes rewrite=no dirty=no elapsed=2101s budget=2100s killed=term".
+- [packet docs/packets/SG-226-bulk-scene-renders.md] "A4: notes-ref receipt: FIRST line exactly `Dispatch-ID: SG-226 | Report: docs/worklogs/SG-226_report.md` + `Work-HEAD` recorded, pushed + read back."
+- [retained journal in evidence file] "P3_note=FAIL note=no"; "P5_receipt=FAIL"; "partial_receipt=published".
+- [partial receipt on refs/notes/storagegenie-coder-reports] "Partial-Receipt-ID: SG-226"; "pushed=3"; "uncommitted=none"; "wip=none"; "P1_moved=PASS count=3".
+- [ref check: refs/notes/storagegenie-coder-reports at cb9734ae90f153b0bac9f349723a0a5095a40762] "error: no note found for object cb9734ae90f153b0bac9f349723a0a5095a40762."
+- [ref check: origin/automation] "cb9734a SG-226 G3: links for four faithful renders + live surface + report"; "fatal: path 'docs/worklogs/SG-226_receipt.log' does not exist in 'cb9734ae90f153b0bac9f349723a0a5095a40762'."
+STRANDED WORK:
+- SG-226 work is on origin/automation through cb9734ae90f153b0bac9f349723a0a5095a40762; the report and three commits are present, no uncommitted work remains, and the required Dispatch-ID receipt note and receipt transcript are absent.
+- refs/quarantine/SG-025-20260912T164340Z — quarantined no-receipt debris: provider abstraction/gateway, provider fake, tests, ADRs, and SG-025 worklogs (b6f17d5).
+- refs/quarantine/SG-066-20260921T095958Z — quarantined no-receipt debris: Analytics API/service, provider prompt, tests, and frontend Analytics page (ae29ca4).
+- refs/quarantine/SG-088-20260921T174803Z — quarantined no-receipt debris: derived-table registry test changes and SG-088 verification worklogs (dd13458).
+- refs/quarantine/SG-208-20261017T171409Z — quarantined no-receipt debris: SG-208 driver, smoke results, and screenshots (0de3ba9).
+- refs/quarantine/preserve-20260907T083833Z — preserved commit ahead of origin: SG-008 receipt commit containing docs/worklogs/SG-008_report.md (6d96856).
+- refs/quarantine/preserve-20261017T171411Z — preserved commit ahead of origin: SG-208 G1 household-selector removal across frontend components/routes and tests (7a99fc7).
+NEXT ACTION: change the packet
+CONFIDENCE: high
+
+Debug-Report-End
+moved=no
