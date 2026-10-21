@@ -1,0 +1,33 @@
+SG-221 receipt transcript (verbatim commands + outputs, UTC 2026-10-21T19:51Z)
+requested_ref=automation
+--- git log --format=%H -n 1 HEAD
+d953027c3cdf972dbd26f7c1d90e92d8e5bcbf9a
+Work-HEAD: d953027c3cdf972dbd26f7c1d90e92d8e5bcbf9a
+--- git notes --ref=refs/notes/storagegenie-coder-reports add -m "Dispatch-ID: SG-221 | Report: docs/worklogs/SG-221_report.md" d953027c3cdf972dbd26f7c1d90e92d8e5bcbf9a
+notes_add_rc=0
+--- git push origin refs/notes/storagegenie-coder-reports
+To github.com:Andovol/StorageGenie.git
+   26c89cf..904aa65  refs/notes/storagegenie-coder-reports -> refs/notes/storagegenie-coder-reports
+notes_push_rc=0
+--- git push origin automation
+To github.com:Andovol/StorageGenie.git
+   0779966..d953027  automation -> automation
+automation_push_rc=0
+--- mapped fetch of the notes ref: git fetch origin refs/notes/storagegenie-coder-reports:refs/notes/storagegenie-coder-reports-sg221-readback
+From github.com:Andovol/StorageGenie
+ * [new ref]         refs/notes/storagegenie-coder-reports -> refs/notes/storagegenie-coder-reports-sg221-readback
+mapped_fetch_rc=0
+--- remote read-back: git notes --ref=refs/notes/storagegenie-coder-reports-sg221-readback show d953027c3cdf972dbd26f7c1d90e92d8e5bcbf9a
+Dispatch-ID: SG-221 | Report: docs/worklogs/SG-221_report.md
+notes_show_rc=0
+--- note object: git notes --ref=refs/notes/storagegenie-coder-reports-sg221-readback list d953027c3cdf972dbd26f7c1d90e92d8e5bcbf9a; git cat-file -p <blob>
+note_blob=e31a13c655bf0199fd564ef4424010312bc41468
+Dispatch-ID: SG-221 | Report: docs/worklogs/SG-221_report.md
+cat_file_rc=0
+--- remote refs: git ls-remote origin refs/notes/storagegenie-coder-reports refs/heads/automation
+d953027c3cdf972dbd26f7c1d90e92d8e5bcbf9a	refs/heads/automation
+904aa6591a1cf1e3526a48dce31e382afedae80c	refs/notes/storagegenie-coder-reports
+ls_remote_rc=0
+--- post-receipt final gates (UTC 2026-10-21T19:51:40Z)
+command: grep -rIlE "sk-or-""v1-[A-Za-z0-9]|OPENROUTER_API_""KEY[[:space:]]*=|JINA_API_""KEY[[:space:]]*=" docs/worklogs/SG-221_* (output written to /tmp, outside the glob)
+literal_exit_final=1 (1 = zero matches = EMPTY; 0 = MATCH)
