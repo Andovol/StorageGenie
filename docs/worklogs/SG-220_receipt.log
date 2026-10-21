@@ -1,0 +1,34 @@
+SG-220 receipt transcript (verbatim commands + outputs, UTC 2026-10-21T19:36:32Z)
+requested_ref=automation
+--- git log --format=%H -n 1 HEAD
+100148952b928de2d9b296d9b1d1a5501dbfcc14
+Work-HEAD: 100148952b928de2d9b296d9b1d1a5501dbfcc14
+--- git notes --ref=refs/notes/storagegenie-coder-reports add -m "Dispatch-ID: SG-220 | Report: docs/worklogs/SG-220_report.md" 100148952b928de2d9b296d9b1d1a5501dbfcc14
+notes_add_rc=0
+--- git push origin refs/notes/storagegenie-coder-reports
+To github.com:Andovol/StorageGenie.git
+   4c3a57e..1ddd651  refs/notes/storagegenie-coder-reports -> refs/notes/storagegenie-coder-reports
+notes_push_rc=0
+--- git push origin automation
+Everything up-to-date
+automation_push_rc=0
+--- mapped fetch of the notes ref: git fetch origin refs/notes/storagegenie-coder-reports:refs/notes/sg220-readback
+From github.com:Andovol/StorageGenie
+ * [new ref]         refs/notes/storagegenie-coder-reports -> refs/notes/sg220-readback
+mapped_fetch_rc=0
+--- remote read-back: git notes --ref=sg220-readback show 100148952b928de2d9b296d9b1d1a5501dbfcc14
+Dispatch-ID: SG-220 | Report: docs/worklogs/SG-220_report.md
+notes_show_rc=0
+--- git cat-file -p refs/notes/sg220-readback:10/0148952b928de2d9b296d9b1d1a5501dbfcc14
+Dispatch-ID: SG-220 | Report: docs/worklogs/SG-220_report.md
+cat_file_rc=0
+--- remote refs: git ls-remote origin refs/notes/storagegenie-coder-reports refs/heads/automation
+100148952b928de2d9b296d9b1d1a5501dbfcc14	refs/heads/automation
+1ddd651fc3a0cf843e5775683c301731bb3be502	refs/notes/storagegenie-coder-reports
+ls_remote_rc=0
+--- post-receipt final gates (UTC 2026-10-21T19:36:59Z)
+command: grep -rEi "bea""rer|author""ization" docs/worklogs/SG-220_* (output written to /tmp, outside the glob)
+literal_exit_final=1 (1 = zero matches = EMPTY; 0 = MATCH)
+command: python /repo/backend/scripts/sg220_render.py key-gate --dir /evidence (ephemeral container; value never printed)
+key_gate scanned_files=1249 matching_bytes=0
+evidence_gate_rc=0
