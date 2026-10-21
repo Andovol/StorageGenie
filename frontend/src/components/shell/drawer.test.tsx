@@ -133,6 +133,33 @@ describe("ItemInspectorDrawer", () => {
     expect(screen.getByText(/bounding-box overlay omitted/i)).toBeInTheDocument();
   });
 
+  test("the scene tab shows the linked scene render through the evidence file route", async () => {
+    const sceneAsset: Asset = {
+      ...baseAsset,
+      evidence: [
+        { ...baseAsset.evidence![0], id: "ev-photo", source_kind: "upload" },
+        {
+          ...baseAsset.evidence![0],
+          id: "ev-scene",
+          original_filename: "scene-render.jpg",
+          source_kind: "scene_render",
+        },
+      ],
+    };
+    api.apiGet.mockResolvedValue(sceneAsset);
+    renderDrawer(sceneAsset);
+    await screen.findByTestId("inspector-drawer");
+    fireEvent.click(screen.getByRole("tab", { name: "Scene / Context" }));
+
+    const image = await screen.findByTestId("scene-image");
+    expect(image).toHaveAttribute(
+      "src",
+      expect.stringContaining("/v1/evidence/ev-scene/file?household_id=h1")
+    );
+    expect(image).toHaveAttribute("alt", "Cordless Drill context scene");
+    expect(screen.queryByTestId("scene-honest-state")).not.toBeInTheDocument();
+  });
+
   test("Title + Category save PATCHes display_name/asset_type with If-Match", async () => {
     renderDrawer();
     await screen.findByTestId("inspector-drawer");

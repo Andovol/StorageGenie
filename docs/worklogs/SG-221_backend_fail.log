@@ -1,0 +1,82 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+______________ test_asset_detail_serializes_evidence_source_kind _______________
+
+tmp_path = PosixPath('/tmp/pytest-of-andrei/pytest-0/test_asset_detail_serializes_e0')
+
+    def test_asset_detail_serializes_evidence_source_kind(tmp_path: Path) -> None:
+        engine = create_engine(
+            f"sqlite:///{tmp_path / 'sg221.db'}", connect_args={"check_same_thread": False}
+        )
+        Base.metadata.create_all(engine)
+        session: Session = sessionmaker(bind=engine)()
+        session.add(Household(id=HOUSEHOLD_ID, name="SG-221 Household"))
+        session.add(
+            Asset(
+                id=ASSET_ID,
+                household_id=HOUSEHOLD_ID,
+                display_name="Linked asset",
+                asset_type="food",
+            )
+        )
+        session.add_all(
+            [
+                Evidence(
+                    id=PHOTO_EVIDENCE_ID,
+                    household_id=HOUSEHOLD_ID,
+                    sha256="a" * 64,
+                    media_type="image/png",
+                    storage_key=f"{HOUSEHOLD_ID}/source.png",
+                    original_filename="source.png",
+                    source_kind="upload",
+                    size_bytes=10,
+                ),
+                Evidence(
+                    id=SCENE_EVIDENCE_ID,
+                    household_id=HOUSEHOLD_ID,
+                    sha256="b" * 64,
+                    media_type="image/jpeg",
+                    storage_key=f"{HOUSEHOLD_ID}/scene.jpg",
+                    original_filename="scene-render.jpg",
+                    source_kind="scene_render",
+                    size_bytes=20,
+                ),
+            ]
+        )
+        session.execute(
+            asset_evidence.insert(),
+            [
+                {"asset_id": ASSET_ID, "evidence_id": PHOTO_EVIDENCE_ID},
+                {"asset_id": ASSET_ID, "evidence_id": SCENE_EVIDENCE_ID},
+            ],
+        )
+        session.commit()
+    
+        app = FastAPI()
+        app.include_router(assets_router, prefix="/v1")
+        app.dependency_overrides[get_db] = lambda: session
+        try:
+            response = TestClient(app).get(
+                f"/v1/assets/{ASSET_ID}", params={"household_id": HOUSEHOLD_ID}
+            )
+        finally:
+            session.close()
+    
+        assert response.status_code == 200
+        evidence = {row["id"]: row for row in response.json()["evidence"]}
+        assert set(evidence) == {PHOTO_EVIDENCE_ID, SCENE_EVIDENCE_ID}
+>       assert evidence[SCENE_EVIDENCE_ID]["source_kind"] == "scene_render"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       KeyError: 'source_kind'
+
+tests/test_sg221_evidence_source_kind.py:92: KeyError
+=============================== warnings summary ===============================
+../venv/lib/python3.12/site-packages/fastapi/testclient.py:1
+  /home/andrei/StorageGenie/venv/lib/python3.12/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/test_sg221_evidence_source_kind.py::test_asset_detail_serializes_evidence_source_kind
+1 failed, 1 warning in 0.96s
+backend_exit=1

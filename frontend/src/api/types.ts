@@ -7,6 +7,10 @@ export type Evidence = {
   media_type: string;
   original_filename: string;
   size_bytes: number;
+  // SG-221: the asset detail route carries the row's kind (`upload`,
+  // `scene_render`, `transcript`, ...) so the drawer can tell a context-scene
+  // render from a source photo. Optional because non-detail payloads may omit it.
+  source_kind?: string;
 };
 export type Assertion = {
   id: string;
