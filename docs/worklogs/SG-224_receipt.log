@@ -1,0 +1,37 @@
+SG-224 receipt transcript (verbatim commands + outputs, UTC 2026-10-21T20:58:22Z)
+requested_ref=automation
+report corrected after the first publication (final key-gate scan count 15); the prior note on 813febc was removed and the receipt re-published on the corrected work HEAD
+--- git log --format=%H -n 1 HEAD
+c1e5e8bc947867e79a7fb07d52e00f678a4a9c1c
+Work-HEAD: c1e5e8bc947867e79a7fb07d52e00f678a4a9c1c
+rc=0
+--- git notes --ref=refs/notes/storagegenie-coder-reports remove 813febc547763dd92cfcd8ce187043940932fa67
+Removing note for object 813febc547763dd92cfcd8ce187043940932fa67
+notes_remove_rc=0
+--- git notes --ref=refs/notes/storagegenie-coder-reports add -m "Dispatch-ID: SG-224 | Report: docs/worklogs/SG-224_report.md" c1e5e8bc947867e79a7fb07d52e00f678a4a9c1c
+notes_add_rc=0
+--- git push origin refs/notes/storagegenie-coder-reports
+To github.com:Andovol/StorageGenie.git
+   1607dee..d6c7edb  refs/notes/storagegenie-coder-reports -> refs/notes/storagegenie-coder-reports
+notes_push_rc=0
+--- git push origin automation
+To github.com:Andovol/StorageGenie.git
+   813febc..c1e5e8b  automation -> automation
+automation_push_rc=0
+--- mapped fetch of the notes ref: git fetch origin refs/notes/storagegenie-coder-reports:refs/notes/sg224-readback
+From github.com:Andovol/StorageGenie
+   1607dee..d6c7edb  refs/notes/storagegenie-coder-reports -> refs/notes/sg224-readback
+mapped_fetch_rc=0
+--- remote read-back: git notes --ref=sg224-readback show c1e5e8bc947867e79a7fb07d52e00f678a4a9c1c
+Dispatch-ID: SG-224 | Report: docs/worklogs/SG-224_report.md
+notes_show_rc=0
+--- old work HEAD read-back (expect empty after removal): git notes --ref=sg224-readback show 813febc547763dd92cfcd8ce187043940932fa67
+error: no note found for object 813febc547763dd92cfcd8ce187043940932fa67.
+old_notes_show_rc=1
+--- git cat-file -p refs/notes/sg224-readback:c1/e5e8bc947867e79a7fb07d52e00f678a4a9c1c
+Dispatch-ID: SG-224 | Report: docs/worklogs/SG-224_report.md
+cat_file_rc=0
+--- remote refs: git ls-remote origin refs/notes/storagegenie-coder-reports refs/heads/automation
+c1e5e8bc947867e79a7fb07d52e00f678a4a9c1c	refs/heads/automation
+d6c7edb0cf65110263372f5764ce7c9f692b22e7	refs/notes/storagegenie-coder-reports
+ls_remote_rc=0
