@@ -1,0 +1,11 @@
+Partial-Receipt-ID: SG-227
+utc=2026-10-21T22:10:48Z
+killed=exit_no_receipt
+pushed=0
+uncommitted=none
+wip=none
+wip_elapsed_ms=68
+DISPATCH_RESULT id=SG-227 coder=opencode exit=0 head=893b94518fa392948239fe0d720f87c00475aec2 note=no moved=yes rewrite=no dirty=no elapsed=204s budget=2100s killed=exit_no_receipt stragglers=0
+P1_moved=PASS count=2
+P2_rewrite=PASS behind=0
+P6_dirty=PASS dirty=no
