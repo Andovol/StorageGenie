@@ -1,0 +1,30 @@
+[2026-10-21T21:04:54.470074+00:00] SG-225 mode=render image_model=google/gemini-3.1-flash-image transport=image_api evidence_dir=/evidence db={'database_url': 'sqlite:////data/db/storagegenie.db', 'resolved_path': '/data/db/storagegenie.db', 'storage_root': '/data/storage'}
+table_counts={'evidence': 22, 'provider_call': 34, 'audit_event': 95, 'asset_evidence': 16, 'provider_call_null_cost': 0, 'provider_call_known_cost': 0.025178174999999997}
+photo leg=miso evidence=01a0c4a0-af88-7903-a070-a44e7b120712 asset=01a0c4aa-8b62-7360-b11e-a476ddaea0f6 sha256=71901cac327fdd76926e36aa2a7889b2b17fb4e2619ca92d97f86d53aac0de63 bytes=1280694 ref_sha256=d07bd5bd3240d4de95baf6709590571b63661c914ef523040178bebc8cd5111e brief_sha256=74bc810a5ff90a0099e149c7b92b2ced1c8d488395813ec9eb8ab365fd9c451f
+[2026-10-21T21:04:54.490935+00:00] wrote /evidence/SG-225_cutout_unused.json
+cutout_unused raw_sha_rows=0 ref_sha_rows=1 cutout_rows=0
+pilot_cutoff=2026-10-21 00:00:00 billed=4 rendered=4 helper_consumed=5 rows=[{'id': '01a15f6f-13c4-75a3-8123-00142db2ba42', 'cost': 0.0, 'error_state': None, 'created_at': '2026-10-21 17:07:57'}, {'id': '01a15fdc-f5be-7941-b46b-e9773349ec4c', 'cost': 0.0, 'error_state': None, 'created_at': '2026-10-21 19:07:58'}, {'id': '01a15fe8-aa48-7830-86ec-b3725b611639', 'cost': 0.0, 'error_state': 'http_status:400', 'created_at': '2026-10-21 19:20:45'}, {'id': '01a15ff5-11ec-7770-8143-8cc825a1a13d', 'cost': 0.0, 'error_state': None, 'created_at': '2026-10-21 19:34:18'}, {'id': '01a16018-3eb1-79c2-bffa-39a2f0fc88c3', 'cost': 0.0, 'error_state': None, 'created_at': '2026-10-21 20:12:44'}]
+scene_spend known=0.012437125 unknown=0 owner_today=0.273168000 owner_month=0.285605125
+[2026-10-21T21:04:54.510006+00:00] wrote /evidence/SG-225_verify.json
+[2026-10-21T21:04:54.841046+00:00] wrote /evidence/SG-225_spend_body_pre.json
+[2026-10-21T21:04:54.854994+00:00] wrote /evidence/SG-225_pricing_body_pre.json
+measured_default_image_tokens live_max=1120 rows=[{'id': '01a13137-fe82-77e1-95fa-a9c97aff75b4', 'image_tokens': 654, 'created_at': '2026-10-12 17:45:15'}, {'id': '01a15f6f-13c4-75a3-8123-00142db2ba42', 'image_tokens': 1120, 'created_at': '2026-10-21 17:07:57'}, {'id': '01a15fdc-f5be-7941-b46b-e9773349ec4c', 'image_tokens': 1120, 'created_at': '2026-10-21 19:07:58'}, {'id': '01a15ff5-11ec-7770-8143-8cc825a1a13d', 'image_tokens': 1120, 'created_at': '2026-10-21 19:34:18'}, {'id': '01a16018-3eb1-79c2-bffa-39a2f0fc88c3', 'image_tokens': 1120, 'created_at': '2026-10-21 20:12:44'}] sg159_cited=1290 -> baseline=1290
+worst_case_usd=0.17028000 tokens=2580 (1290 measured baseline x2) x max_live_price=6.6e-05 from [('google-vertex/us', 6.6e-05), ('google-ai-studio', 6e-05), ('google-vertex/global', 6e-05)]
+pilot_cutoff=2026-10-21 00:00:00 billed=4 rendered=4 helper_consumed=5 rows=[{'id': '01a15f6f-13c4-75a3-8123-00142db2ba42', 'cost': 0.0, 'error_state': None, 'created_at': '2026-10-21 17:07:57'}, {'id': '01a15fdc-f5be-7941-b46b-e9773349ec4c', 'cost': 0.0, 'error_state': None, 'created_at': '2026-10-21 19:07:58'}, {'id': '01a15fe8-aa48-7830-86ec-b3725b611639', 'cost': 0.0, 'error_state': 'http_status:400', 'created_at': '2026-10-21 19:20:45'}, {'id': '01a15ff5-11ec-7770-8143-8cc825a1a13d', 'cost': 0.0, 'error_state': None, 'created_at': '2026-10-21 19:34:18'}, {'id': '01a16018-3eb1-79c2-bffa-39a2f0fc88c3', 'cost': 0.0, 'error_state': None, 'created_at': '2026-10-21 20:12:44'}]
+remainders credits_daily=2.00000000 credits_monthly=9.98756288 pilot=1.02168000 owner_daily=1.72683200 owner_monthly=9.71439487
+authority_cap=1.02168000
+guard_inputs spent_usd=0.012437125 unknown_cost_calls=0 worst_case_usd=0.17028000000000001 projected_all_in=0.18271713 cap=1.02168000
+guard_selftest_over_cap=('over_cap', 'over_cap: projected worst case 2.19196 USD (spent 2.02168 + 0 unknown-cost call(s) x 0.17028000000000001 + this render 0.17028000000000001) exceeds cap 1.0216800000000001 USD; refusing to spend')
+guard_selftest_no_authority=refused_consent
+guard_verdict=proceed
+[2026-10-21T21:04:54.858045+00:00] wrote /evidence/SG-225_guard_proof.json
+[2026-10-21T21:04:54.868971+00:00] wrote /evidence/SG-225_request.json
+request_url=https://openrouter.ai/api/v1/images body_keys=['input_references', 'model', 'n', 'prompt'] photo_ref_chars=1707614
+[2026-10-21T21:04:54.869321+00:00] wrote /evidence/SG-225_attempt.json
+[2026-10-21T21:05:03.506822+00:00] wrote /evidence/SG-225_attempt.json
+[2026-10-21T21:05:03.507288+00:00] wrote /evidence/SG-225_render_result.json
+[2026-10-21T21:05:03.508225+00:00] wrote /evidence/SG-225_ledger_row.json
+stored_image_copied /evidence/SG-225_render_miso.jpg bytes=479144 sha256=b5e49978343f5aafe3291a492d238e93f0363d3cce770edd064fca9c04e26c27
+[2026-10-21T21:05:03.561501+00:00] wrote /evidence/SG-225_post_spend.json
+[2026-10-21T21:05:03.564812+00:00] wrote /evidence/SG-225_db_post.json
+render status=rendered evidence=01a16048-2602-7f80-9f0c-40f21202a724 ledger=01a16048-260f-7462-96d4-f9fc62824d4d cost=0.0 error=None

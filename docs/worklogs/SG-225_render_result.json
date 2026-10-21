@@ -1,0 +1,49 @@
+{
+ "asset_id": "01a0c4aa-8b62-7360-b11e-a476ddaea0f6",
+ "authority_cap_usd": 1.0216800000000001,
+ "brief": "Isolate this packaged product on a plain seamless white background, front-facing, even studio lighting; the full package with its label and printed text exactly as photographed; no props, no scene, no shadow, no hands.",
+ "brief_sha256": "74bc810a5ff90a0099e149c7b92b2ced1c8d488395813ec9eb8ab365fd9c451f",
+ "cost_usd": 0.0,
+ "display_name": "Miso Soup cutout",
+ "error_state": null,
+ "evidence_id": "01a16048-2602-7f80-9f0c-40f21202a724",
+ "image_media_type": "image/jpeg",
+ "image_model": "google/gemini-3.1-flash-image",
+ "image_sha256": "b5e49978343f5aafe3291a492d238e93f0363d3cce770edd064fca9c04e26c27",
+ "latency_ms": 8605.55789299542,
+ "ledger_id": "01a16048-260f-7462-96d4-f9fc62824d4d",
+ "orchestrator": "bytedance-seed/seed-1.6-flash",
+ "photo_evidence_id": "01a0c4a0-af88-7903-a070-a44e7b120712",
+ "photo_ref_sha256": "d07bd5bd3240d4de95baf6709590571b63661c914ef523040178bebc8cd5111e",
+ "photo_sha256": "71901cac327fdd76926e36aa2a7889b2b17fb4e2619ca92d97f86d53aac0de63",
+ "refusal": null,
+ "response_id": null,
+ "returned_at": "2026-10-21T21:05:03.506210+00:00",
+ "status": "rendered",
+ "status_code": 200,
+ "storage_key": "01a0a029-1477-7ca0-b200-bce78a96c679/b5/b5e49978343f5aafe3291a492d238e93f0363d3cce770edd064fca9c04e26c27.jpg",
+ "transport": "image_api",
+ "usage": {
+  "completion_tokens": 1417,
+  "completion_tokens_details": {
+   "image_tokens": 1120,
+   "reasoning_tokens": 0
+  },
+  "cost": 0,
+  "cost_details": {
+   "upstream_inference_completions_cost": 0.068091,
+   "upstream_inference_cost": 0.068243,
+   "upstream_inference_prompt_cost": 0.000152
+  },
+  "is_byok": true,
+  "prompt_tokens": 304,
+  "prompt_tokens_details": {
+   "audio_tokens": 0,
+   "cache_write_tokens": 0,
+   "cached_tokens": 0,
+   "video_tokens": 0
+  },
+  "total_tokens": 1721
+ },
+ "worst_case_usd": 0.17028000000000001
+}

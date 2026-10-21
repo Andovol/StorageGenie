@@ -1,0 +1,200 @@
+{
+ "audit_event_rows": [
+  {
+   "action": "evidence.create",
+   "actor": "scene-render",
+   "after_json": "{\"sha256\": \"b5e49978343f5aafe3291a492d238e93f0363d3cce770edd064fca9c04e26c27\", \"original_filename\": \"scene-render-google-gemini-3.1-flash-image.jpg\", \"size_bytes\": 479144, \"provider\": \"openrouter\", \"image_model\": \"google/gemini-3.1-flash-image\", \"orchestrator\": \"bytedance-seed/seed-1.6-flash\", \"prompt\": \"Isolate this packaged product on a plain seamless white background, front-facing, even studio lighting; the full package with its label and printed text exactly as photographed; no props, no scene, no shadow, no hands.\", \"usage\": {\"prompt_tokens\": 304, \"completion_tokens\": 1417, \"total_tokens\": 1721, \"cost\": 0, \"is_byok\": true, \"prompt_tokens_details\": {\"cached_tokens\": 0, \"cache_write_tokens\": 0, \"audio_tokens\": 0, \"video_tokens\": 0}, \"cost_details\": {\"upstream_inference_cost\": 0.068243, \"upstream_inference_prompt_cost\": 0.000152, \"upstream_inference_completions_cost\": 0.068091}, \"completion_tokens_details\": {\"reasoning_tokens\": 0, \"image_tokens\": 1120}}, \"cost_usd\": 0.0, \"response_id\": null, \"timestamp\": \"2026-10-21T21:05:03.491092+00:00\"}",
+   "before_json": null,
+   "entity_id": "01a16048-2602-7f80-9f0c-40f21202a724",
+   "entity_type": "evidence",
+   "household_id": "01a0a029-1477-7ca0-b200-bce78a96c679",
+   "id": "01a16048-2605-78e2-8b9c-d9cadd2ffd5c",
+   "timestamp": "2026-10-21 21:05:03.491168"
+  }
+ ],
+ "delta": {
+  "asset_evidence": 0,
+  "audit_event": 1,
+  "evidence": 1,
+  "provider_call": 1,
+  "provider_call_known_cost": 0,
+  "provider_call_null_cost": 0
+ },
+ "evidence_rows": [
+  {
+   "created_at": "2026-10-21 21:05:03",
+   "household_id": "01a0a029-1477-7ca0-b200-bce78a96c679",
+   "id": "01a16048-2602-7f80-9f0c-40f21202a724",
+   "media_type": "image/jpeg",
+   "original_filename": "scene-render-google-gemini-3.1-flash-image.jpg",
+   "sha256": "b5e49978343f5aafe3291a492d238e93f0363d3cce770edd064fca9c04e26c27",
+   "size_bytes": 479144,
+   "source_kind": "scene_render",
+   "storage_key": "01a0a029-1477-7ca0-b200-bce78a96c679/b5/b5e49978343f5aafe3291a492d238e93f0363d3cce770edd064fca9c04e26c27.jpg",
+   "updated_at": "2026-10-21 21:05:03"
+  }
+ ],
+ "finished_at": "2026-10-21T21:05:03.564012+00:00",
+ "miso_links": [
+  {
+   "asset_id": "01a0c4aa-8b62-7360-b11e-a476ddaea0f6",
+   "evidence_id": "01a0c4a0-af88-7903-a070-a44e7b120712",
+   "media_type": "image/png",
+   "original_filename": "image.png",
+   "sha256": "71901cac327fdd76926e36aa2a7889b2b17fb4e2619ca92d97f86d53aac0de63",
+   "size_bytes": 1280694,
+   "source_kind": "upload"
+  },
+  {
+   "asset_id": "01a0c4aa-8b62-7360-b11e-a476ddaea0f6",
+   "evidence_id": "01a0c4a0-d56f-7400-a295-6ac3b2176006",
+   "media_type": "text/plain",
+   "original_filename": "transcript.txt",
+   "sha256": "9a21f4fa07f52268b5b215b802462571ca873133cfc814278f6c2fe120901971",
+   "size_bytes": 104,
+   "source_kind": "transcript"
+  },
+  {
+   "asset_id": "01a0c4aa-8b62-7360-b11e-a476ddaea0f6",
+   "evidence_id": "01a15f6f-13ba-76e0-9238-acd5883c65f1",
+   "media_type": "image/jpeg",
+   "original_filename": "scene-render-google-gemini-3.1-flash-image.jpg",
+   "sha256": "41d619db9f6950762cb54053dfb5f9050711bb662bb0cba5119a9225f8738f7b",
+   "size_bytes": 703036,
+   "source_kind": "scene_render"
+  }
+ ],
+ "new_evidence_ids": [
+  "01a16048-2602-7f80-9f0c-40f21202a724"
+ ],
+ "new_ledger_ids": [
+  "01a16048-260f-7462-96d4-f9fc62824d4d"
+ ],
+ "outcome": {
+  "asset_id": "01a0c4aa-8b62-7360-b11e-a476ddaea0f6",
+  "authority_cap_usd": 1.0216800000000001,
+  "brief": "Isolate this packaged product on a plain seamless white background, front-facing, even studio lighting; the full package with its label and printed text exactly as photographed; no props, no scene, no shadow, no hands.",
+  "brief_sha256": "74bc810a5ff90a0099e149c7b92b2ced1c8d488395813ec9eb8ab365fd9c451f",
+  "cost_usd": 0.0,
+  "display_name": "Miso Soup cutout",
+  "error_state": null,
+  "evidence_id": "01a16048-2602-7f80-9f0c-40f21202a724",
+  "image_media_type": "image/jpeg",
+  "image_model": "google/gemini-3.1-flash-image",
+  "image_sha256": "b5e49978343f5aafe3291a492d238e93f0363d3cce770edd064fca9c04e26c27",
+  "latency_ms": 8605.55789299542,
+  "ledger_id": "01a16048-260f-7462-96d4-f9fc62824d4d",
+  "orchestrator": "bytedance-seed/seed-1.6-flash",
+  "photo_evidence_id": "01a0c4a0-af88-7903-a070-a44e7b120712",
+  "photo_ref_sha256": "d07bd5bd3240d4de95baf6709590571b63661c914ef523040178bebc8cd5111e",
+  "photo_sha256": "71901cac327fdd76926e36aa2a7889b2b17fb4e2619ca92d97f86d53aac0de63",
+  "refusal": null,
+  "response_id": null,
+  "returned_at": "2026-10-21T21:05:03.506210+00:00",
+  "status": "rendered",
+  "status_code": 200,
+  "storage_key": "01a0a029-1477-7ca0-b200-bce78a96c679/b5/b5e49978343f5aafe3291a492d238e93f0363d3cce770edd064fca9c04e26c27.jpg",
+  "transport": "image_api",
+  "usage": {
+   "completion_tokens": 1417,
+   "completion_tokens_details": {
+    "image_tokens": 1120,
+    "reasoning_tokens": 0
+   },
+   "cost": 0,
+   "cost_details": {
+    "upstream_inference_completions_cost": 0.068091,
+    "upstream_inference_cost": 0.068243,
+    "upstream_inference_prompt_cost": 0.000152
+   },
+   "is_byok": true,
+   "prompt_tokens": 304,
+   "prompt_tokens_details": {
+    "audio_tokens": 0,
+    "cache_write_tokens": 0,
+    "cached_tokens": 0,
+    "video_tokens": 0
+   },
+   "total_tokens": 1721
+  },
+  "worst_case_usd": 0.17028000000000001
+ },
+ "pilot_after": {
+  "billed": 5,
+  "cutoff": "2026-10-21 00:00:00",
+  "helper_consumed": 6,
+  "rendered": 5,
+  "rows": [
+   {
+    "cost": 0.0,
+    "created_at": "2026-10-21 17:07:57",
+    "error_state": null,
+    "id": "01a15f6f-13c4-75a3-8123-00142db2ba42"
+   },
+   {
+    "cost": 0.0,
+    "created_at": "2026-10-21 19:07:58",
+    "error_state": null,
+    "id": "01a15fdc-f5be-7941-b46b-e9773349ec4c"
+   },
+   {
+    "cost": 0.0,
+    "created_at": "2026-10-21 19:20:45",
+    "error_state": "http_status:400",
+    "id": "01a15fe8-aa48-7830-86ec-b3725b611639"
+   },
+   {
+    "cost": 0.0,
+    "created_at": "2026-10-21 19:34:18",
+    "error_state": null,
+    "id": "01a15ff5-11ec-7770-8143-8cc825a1a13d"
+   },
+   {
+    "cost": 0.0,
+    "created_at": "2026-10-21 20:12:44",
+    "error_state": null,
+    "id": "01a16018-3eb1-79c2-bffa-39a2f0fc88c3"
+   },
+   {
+    "cost": 0.0,
+    "created_at": "2026-10-21 21:05:03",
+    "error_state": null,
+    "id": "01a16048-260f-7462-96d4-f9fc62824d4d"
+   }
+  ]
+ },
+ "post": {
+  "asset_evidence": 16,
+  "audit_event": 96,
+  "evidence": 23,
+  "provider_call": 35,
+  "provider_call_known_cost": 0.025178174999999997,
+  "provider_call_null_cost": 0
+ },
+ "pre": {
+  "asset_evidence": 16,
+  "audit_event": 95,
+  "evidence": 22,
+  "provider_call": 34,
+  "provider_call_known_cost": 0.025178174999999997,
+  "provider_call_null_cost": 0
+ },
+ "provider_call_rows": [
+  {
+   "cost": 0.0,
+   "created_at": "2026-10-21 21:05:03",
+   "error_state": null,
+   "id": "01a16048-260f-7462-96d4-f9fc62824d4d",
+   "input_hashes": "{\"photo_sha256\": \"d07bd5bd3240d4de95baf6709590571b63661c914ef523040178bebc8cd5111e\", \"brief_sha256\": \"74bc810a5ff90a0099e149c7b92b2ced1c8d488395813ec9eb8ab365fd9c451f\"}",
+   "job_id": null,
+   "latency_ms": 8605.55789299542,
+   "model": "bytedance-seed/seed-1.6-flash",
+   "output_payload": "{\"image_model\": \"google/gemini-3.1-flash-image\", \"orchestrator\": \"bytedance-seed/seed-1.6-flash\", \"prompt\": \"Isolate this packaged product on a plain seamless white background, front-facing, even studio lighting; the full package with its label and printed text exactly as photographed; no props, no scene, no shadow, no hands.\", \"status_code\": 200, \"response_id\": null, \"evidence_id\": \"01a16048-2602-7f80-9f0c-40f21202a724\", \"remote_url\": null, \"error_body\": null, \"response_body\": \"{\\\"created\\\": 0, \\\"data\\\": [{\\\"b64_json\\\": \\\"<redacted len=638860 sha256=573e6da204cee30547ae037b0ecadb1f8637f7e589e34a95d8a91a79c09bfdba>\\\", \\\"media_type\\\": \\\"image/jpeg\\\"}], \\\"usage\\\": {\\\"prompt_tokens\\\": 304, \\\"completion_tokens\\\": 1417, \\\"total_tokens\\\": 1721, \\\"cost\\\": 0, \\\"is_byok\\\": true, \\\"prompt_tokens_details\\\": {\\\"cached_tokens\\\": 0, \\\"cache_write_tokens\\\": 0, \\\"audio_tokens\\\": 0, \\\"video_tokens\\\": 0}, \\\"cost_details\\\": {\\\"upstream_inference_cost\\\": 0.068243, \\\"upstream_inference_prompt_cost\\\": 0.000152, \\\"upstream_inference_completions_cost\\\": 0.068091}, \\\"completion_tokens_details\\\": {\\\"reasoning_tokens\\\": 0, \\\"image_tokens\\\": 1120}}}\", \"response_body_sha256\": \"e580336127215cb190cdd52d2c1a4931042a8b986dd9843418a6329da03143e3\"}",
+   "prompt_template_version": "scene-render-v1",
+   "provider": "openrouter",
+   "updated_at": "2026-10-21 21:05:03",
+   "usage_json": "{\"prompt_tokens\": 304, \"completion_tokens\": 1417, \"total_tokens\": 1721, \"cost\": 0, \"is_byok\": true, \"prompt_tokens_details\": {\"cached_tokens\": 0, \"cache_write_tokens\": 0, \"audio_tokens\": 0, \"video_tokens\": 0}, \"cost_details\": {\"upstream_inference_cost\": 0.068243, \"upstream_inference_prompt_cost\": 0.000152, \"upstream_inference_completions_cost\": 0.068091}, \"completion_tokens_details\": {\"reasoning_tokens\": 0, \"image_tokens\": 1120}}"
+  }
+ ],
+ "timestamp": "2026-10-21T21:05:03.562414+00:00"
+}

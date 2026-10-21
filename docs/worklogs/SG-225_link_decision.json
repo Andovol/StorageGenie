@@ -1,0 +1,101 @@
+{
+ "asset_display_name": "Miso Soup",
+ "asset_id": "01a0c4aa-8b62-7360-b11e-a476ddaea0f6",
+ "audit_event_id": "01a16048-2605-78e2-8b9c-d9cadd2ffd5c",
+ "criteria": {
+  "faithfulness": {
+   "printed_text_exact": false,
+   "product_identity_preserved": true,
+   "reasons": [
+    "Printed text: source bottom-left reads FROZEN; render reads ERO7EN (the F is absent and the Z is malformed). Brief requires the printed text exactly as photographed.",
+    "Label artwork: source chicken badge is a gold/yellow disc RGB (253,197,66) with a dark line-art chicken head; render badge is a dark red disc RGB (150,33,42) with a white full-chicken silhouette."
+   ],
+   "verdict": "fail: label artwork and one printed word differ"
+  },
+  "isolation": {
+   "full_product": true,
+   "label_legible": true,
+   "measured": {
+    "border_ring_rgb_max": [
+     255,
+     255,
+     255
+    ],
+    "border_ring_rgb_min": [
+     250,
+     249,
+     250
+    ],
+    "corner_pixels": [
+     [
+      253,
+      251,
+      252
+     ],
+     [
+      255,
+      255,
+      255
+     ],
+     [
+      254,
+      254,
+      254
+     ],
+     [
+      255,
+      255,
+      255
+     ]
+    ],
+    "near_white_fraction": 0.5255,
+    "nonwhite_bbox": [
+     240,
+     28,
+     954,
+     868
+    ],
+    "product_margins_px": {
+     "bottom": 28,
+     "left": 240,
+     "right": 241,
+     "top": 28
+    }
+   },
+   "verdict": "pass: plain seamless white, full package visible, no props/hands/scene",
+   "white_background": true
+  }
+ },
+ "decision": "unlinked",
+ "disposition": "keep as Evidence; do not create an asset_evidence row; the Miso asset keeps its existing upload, transcript and SG-219 scene_render links",
+ "evidence_id": "01a16048-2602-7f80-9f0c-40f21202a724",
+ "image_dimensions": [
+  1195,
+  896
+ ],
+ "image_file": "docs/worklogs/SG-225_render_miso.jpg",
+ "image_sha256": "b5e49978343f5aafe3291a492d238e93f0363d3cce770edd064fca9c04e26c27",
+ "image_size_bytes": 479144,
+ "ledger_id": "01a16048-260f-7462-96d4-f9fc62824d4d",
+ "other_label_text_legible": [
+  "VITASIA",
+  "JAPANESE STYLE",
+  "Miso Soup",
+  "WITH VEGETABLES & CHICKEN",
+  "Ready in 6-11 min.",
+  "500 g e"
+ ],
+ "photo_evidence_id": "01a0c4a0-af88-7903-a070-a44e7b120712",
+ "reason": "Isolated on white and recognizable as the same product, but the brief requires the package, label and printed text exactly as photographed; FROZEN -> ERO7EN and the badge color/design change make it not faithful enough to link (review-before-link, SG-218 lesson).",
+ "render_status": "rendered",
+ "review_artifacts": [
+  "docs/worklogs/SG-225_source_miso.png",
+  "docs/worklogs/SG-225_render_miso.jpg",
+  "docs/worklogs/SG-225_detail_frozen_source.png",
+  "docs/worklogs/SG-225_detail_frozen_render.png",
+  "docs/worklogs/SG-225_detail_badge_source.png",
+  "docs/worklogs/SG-225_detail_badge_render.png"
+ ],
+ "status_code": 200,
+ "timestamp": "2026-10-21T21:11:02.990425+00:00"
+}

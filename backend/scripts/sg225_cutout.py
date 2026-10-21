@@ -825,6 +825,60 @@ def run_render(db) -> int:  # noqa: C901
     return 0 if outcome.status == "rendered" else 1
 
 
+def post_state(db) -> int:
+    counts = table_counts(db)
+    cutoff = pilot_cutoff()
+    billed, rendered, helper_consumed, rows = pilot_counts(db, cutoff)
+    spent_usd, unknown = scene.scene_spend_so_far(db)
+    owner_today, owner_month, owner_detail = owner_upstream_totals(db)
+    result_path = EVIDENCE_DIR / "SG-225_render_result.json"
+    result = json.loads(result_path.read_text()) if result_path.exists() else {}
+    decision_path = EVIDENCE_DIR / "SG-225_link_decision.json"
+    decision = json.loads(decision_path.read_text()) if decision_path.exists() else None
+    evidence_id = result.get("evidence_id")
+    ledger_id = result.get("ledger_id")
+    out = {
+        "timestamp": now_utc(),
+        "database": resolved_database(),
+        "table_counts": counts,
+        "pilot_after": {
+            "cutoff": cutoff,
+            "billed": billed,
+            "rendered": rendered,
+            "helper_consumed": helper_consumed,
+            "rows": rows,
+        },
+        "spend": {
+            "known": spent_usd,
+            "unknown_cost_calls": unknown,
+            "owner_today": owner_today,
+            "owner_month": owner_month,
+            "owner_rows": owner_detail,
+        },
+        "new_evidence_ids": [evidence_id] if evidence_id else [],
+        "new_ledger_ids": [ledger_id] if ledger_id else [],
+        "evidence_rows": rows_by_ids(db, "evidence", "id", [evidence_id] if evidence_id else []),
+        "provider_call_rows": rows_by_ids(
+            db, "provider_call", "id", [ledger_id] if ledger_id else []
+        ),
+        "audit_event_rows": rows_by_ids(
+            db, "audit_event", "entity_id", [evidence_id] if evidence_id else []
+        ),
+        "miso_links": asset_links(db, MISO_ASSET_ID),
+        "render_status": result.get("status"),
+        "link_decision": decision,
+    }
+    write_json(EVIDENCE_DIR / "SG-225_post_state.json", out)
+    print(
+        f"post_state billed={billed} rendered={rendered} known={spent_usd} "
+        f"unknown={unknown} owner_today={owner_today:.9f} "
+        f"owner_month={owner_month:.9f} miso_links={len(out['miso_links'])} "
+        f"render_status={out['render_status']}",
+        flush=True,
+    )
+    return 0 if result.get("status") == "rendered" else 1
+
+
 def link_render(db, reason: str) -> int:
     if not reason.strip():
         raise SystemExit("link requires a non-empty --reason -> STOP")
@@ -904,7 +958,7 @@ def key_gate(path: Path) -> int:
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("mode", choices=("verify", "render", "link", "key-gate"))
+    parser.add_argument("mode", choices=("verify", "render", "post", "link", "key-gate"))
     parser.add_argument("--reason", default="")
     parser.add_argument("--dir", default=None, help="key-gate target directory")
     args = parser.parse_args()
@@ -923,6 +977,8 @@ def main() -> int:
         if args.mode == "verify":
             verify_live(db)
             return 0
+        if args.mode == "post":
+            return post_state(db)
         if args.mode == "link":
             return link_render(db, args.reason)
         return run_render(db)

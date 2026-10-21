@@ -1,0 +1,7 @@
+SG-225 live-value key gate (value never printed).
+--- command: python /repo/backend/scripts/sg225_cutout.py key-gate --dir /evidence
+key_gate scanned_files=1359 matching_bytes=0
+evidence_gate_rc=0
+--- command: python /repo/backend/scripts/sg225_cutout.py key-gate --dir /repo/backend/scripts
+key_gate scanned_files=22 matching_bytes=0
+driver_gate_rc=0

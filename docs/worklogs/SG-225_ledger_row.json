@@ -1,0 +1,15 @@
+{
+ "cost": 0.0,
+ "created_at": "2026-10-21 21:05:03",
+ "error_state": null,
+ "id": "01a16048-260f-7462-96d4-f9fc62824d4d",
+ "input_hashes": "{\"photo_sha256\": \"d07bd5bd3240d4de95baf6709590571b63661c914ef523040178bebc8cd5111e\", \"brief_sha256\": \"74bc810a5ff90a0099e149c7b92b2ced1c8d488395813ec9eb8ab365fd9c451f\"}",
+ "job_id": null,
+ "latency_ms": 8605.55789299542,
+ "model": "bytedance-seed/seed-1.6-flash",
+ "output_payload": "{\"image_model\": \"google/gemini-3.1-flash-image\", \"orchestrator\": \"bytedance-seed/seed-1.6-flash\", \"prompt\": \"Isolate this packaged product on a plain seamless white background, front-facing, even studio lighting; the full package with its label and printed text exactly as photographed; no props, no scene, no shadow, no hands.\", \"status_code\": 200, \"response_id\": null, \"evidence_id\": \"01a16048-2602-7f80-9f0c-40f21202a724\", \"remote_url\": null, \"error_body\": null, \"response_body\": \"{\\\"created\\\": 0, \\\"data\\\": [{\\\"b64_json\\\": \\\"<redacted len=638860 sha256=573e6da204cee30547ae037b0ecadb1f8637f7e589e34a95d8a91a79c09bfdba>\\\", \\\"media_type\\\": \\\"image/jpeg\\\"}], \\\"usage\\\": {\\\"prompt_tokens\\\": 304, \\\"completion_tokens\\\": 1417, \\\"total_tokens\\\": 1721, \\\"cost\\\": 0, \\\"is_byok\\\": true, \\\"prompt_tokens_details\\\": {\\\"cached_tokens\\\": 0, \\\"cache_write_tokens\\\": 0, \\\"audio_tokens\\\": 0, \\\"video_tokens\\\": 0}, \\\"cost_details\\\": {\\\"upstream_inference_cost\\\": 0.068243, \\\"upstream_inference_prompt_cost\\\": 0.000152, \\\"upstream_inference_completions_cost\\\": 0.068091}, \\\"completion_tokens_details\\\": {\\\"reasoning_tokens\\\": 0, \\\"image_tokens\\\": 1120}}}\", \"response_body_sha256\": \"e580336127215cb190cdd52d2c1a4931042a8b986dd9843418a6329da03143e3\"}",
+ "prompt_template_version": "scene-render-v1",
+ "provider": "openrouter",
+ "updated_at": "2026-10-21 21:05:03",
+ "usage_json": "{\"prompt_tokens\": 304, \"completion_tokens\": 1417, \"total_tokens\": 1721, \"cost\": 0, \"is_byok\": true, \"prompt_tokens_details\": {\"cached_tokens\": 0, \"cache_write_tokens\": 0, \"audio_tokens\": 0, \"video_tokens\": 0}, \"cost_details\": {\"upstream_inference_cost\": 0.068243, \"upstream_inference_prompt_cost\": 0.000152, \"upstream_inference_completions_cost\": 0.068091}, \"completion_tokens_details\": {\"reasoning_tokens\": 0, \"image_tokens\": 1120}}"
+}

@@ -1,0 +1,294 @@
+{
+ "audit_event_rows": [
+  {
+   "action": "evidence.create",
+   "actor": "scene-render",
+   "after_json": "{\"sha256\": \"b5e49978343f5aafe3291a492d238e93f0363d3cce770edd064fca9c04e26c27\", \"original_filename\": \"scene-render-google-gemini-3.1-flash-image.jpg\", \"size_bytes\": 479144, \"provider\": \"openrouter\", \"image_model\": \"google/gemini-3.1-flash-image\", \"orchestrator\": \"bytedance-seed/seed-1.6-flash\", \"prompt\": \"Isolate this packaged product on a plain seamless white background, front-facing, even studio lighting; the full package with its label and printed text exactly as photographed; no props, no scene, no shadow, no hands.\", \"usage\": {\"prompt_tokens\": 304, \"completion_tokens\": 1417, \"total_tokens\": 1721, \"cost\": 0, \"is_byok\": true, \"prompt_tokens_details\": {\"cached_tokens\": 0, \"cache_write_tokens\": 0, \"audio_tokens\": 0, \"video_tokens\": 0}, \"cost_details\": {\"upstream_inference_cost\": 0.068243, \"upstream_inference_prompt_cost\": 0.000152, \"upstream_inference_completions_cost\": 0.068091}, \"completion_tokens_details\": {\"reasoning_tokens\": 0, \"image_tokens\": 1120}}, \"cost_usd\": 0.0, \"response_id\": null, \"timestamp\": \"2026-10-21T21:05:03.491092+00:00\"}",
+   "before_json": null,
+   "entity_id": "01a16048-2602-7f80-9f0c-40f21202a724",
+   "entity_type": "evidence",
+   "household_id": "01a0a029-1477-7ca0-b200-bce78a96c679",
+   "id": "01a16048-2605-78e2-8b9c-d9cadd2ffd5c",
+   "timestamp": "2026-10-21 21:05:03.491168"
+  }
+ ],
+ "database": {
+  "database_url": "sqlite:////data/db/storagegenie.db",
+  "resolved_path": "/data/db/storagegenie.db",
+  "storage_root": "/data/storage"
+ },
+ "evidence_rows": [
+  {
+   "created_at": "2026-10-21 21:05:03",
+   "household_id": "01a0a029-1477-7ca0-b200-bce78a96c679",
+   "id": "01a16048-2602-7f80-9f0c-40f21202a724",
+   "media_type": "image/jpeg",
+   "original_filename": "scene-render-google-gemini-3.1-flash-image.jpg",
+   "sha256": "b5e49978343f5aafe3291a492d238e93f0363d3cce770edd064fca9c04e26c27",
+   "size_bytes": 479144,
+   "source_kind": "scene_render",
+   "storage_key": "01a0a029-1477-7ca0-b200-bce78a96c679/b5/b5e49978343f5aafe3291a492d238e93f0363d3cce770edd064fca9c04e26c27.jpg",
+   "updated_at": "2026-10-21 21:05:03"
+  }
+ ],
+ "link_decision": {
+  "asset_display_name": "Miso Soup",
+  "asset_id": "01a0c4aa-8b62-7360-b11e-a476ddaea0f6",
+  "audit_event_id": "01a16048-2605-78e2-8b9c-d9cadd2ffd5c",
+  "criteria": {
+   "faithfulness": {
+    "printed_text_exact": false,
+    "product_identity_preserved": true,
+    "reasons": [
+     "Printed text: source bottom-left reads FROZEN; render reads ERO7EN (the F is absent and the Z is malformed). Brief requires the printed text exactly as photographed.",
+     "Label artwork: source chicken badge is a gold/yellow disc RGB (253,197,66) with a dark line-art chicken head; render badge is a dark red disc RGB (150,33,42) with a white full-chicken silhouette."
+    ],
+    "verdict": "fail: label artwork and one printed word differ"
+   },
+   "isolation": {
+    "full_product": true,
+    "label_legible": true,
+    "measured": {
+     "border_ring_rgb_max": [
+      255,
+      255,
+      255
+     ],
+     "border_ring_rgb_min": [
+      250,
+      249,
+      250
+     ],
+     "corner_pixels": [
+      [
+       253,
+       251,
+       252
+      ],
+      [
+       255,
+       255,
+       255
+      ],
+      [
+       254,
+       254,
+       254
+      ],
+      [
+       255,
+       255,
+       255
+      ]
+     ],
+     "near_white_fraction": 0.5255,
+     "nonwhite_bbox": [
+      240,
+      28,
+      954,
+      868
+     ],
+     "product_margins_px": {
+      "bottom": 28,
+      "left": 240,
+      "right": 241,
+      "top": 28
+     }
+    },
+    "verdict": "pass: plain seamless white, full package visible, no props/hands/scene",
+    "white_background": true
+   }
+  },
+  "decision": "unlinked",
+  "disposition": "keep as Evidence; do not create an asset_evidence row; the Miso asset keeps its existing upload, transcript and SG-219 scene_render links",
+  "evidence_id": "01a16048-2602-7f80-9f0c-40f21202a724",
+  "image_dimensions": [
+   1195,
+   896
+  ],
+  "image_file": "docs/worklogs/SG-225_render_miso.jpg",
+  "image_sha256": "b5e49978343f5aafe3291a492d238e93f0363d3cce770edd064fca9c04e26c27",
+  "image_size_bytes": 479144,
+  "ledger_id": "01a16048-260f-7462-96d4-f9fc62824d4d",
+  "other_label_text_legible": [
+   "VITASIA",
+   "JAPANESE STYLE",
+   "Miso Soup",
+   "WITH VEGETABLES & CHICKEN",
+   "Ready in 6-11 min.",
+   "500 g e"
+  ],
+  "photo_evidence_id": "01a0c4a0-af88-7903-a070-a44e7b120712",
+  "reason": "Isolated on white and recognizable as the same product, but the brief requires the package, label and printed text exactly as photographed; FROZEN -> ERO7EN and the badge color/design change make it not faithful enough to link (review-before-link, SG-218 lesson).",
+  "render_status": "rendered",
+  "review_artifacts": [
+   "docs/worklogs/SG-225_source_miso.png",
+   "docs/worklogs/SG-225_render_miso.jpg",
+   "docs/worklogs/SG-225_detail_frozen_source.png",
+   "docs/worklogs/SG-225_detail_frozen_render.png",
+   "docs/worklogs/SG-225_detail_badge_source.png",
+   "docs/worklogs/SG-225_detail_badge_render.png"
+  ],
+  "status_code": 200,
+  "timestamp": "2026-10-21T21:11:02.990425+00:00"
+ },
+ "miso_links": [
+  {
+   "asset_id": "01a0c4aa-8b62-7360-b11e-a476ddaea0f6",
+   "evidence_id": "01a0c4a0-af88-7903-a070-a44e7b120712",
+   "media_type": "image/png",
+   "original_filename": "image.png",
+   "sha256": "71901cac327fdd76926e36aa2a7889b2b17fb4e2619ca92d97f86d53aac0de63",
+   "size_bytes": 1280694,
+   "source_kind": "upload"
+  },
+  {
+   "asset_id": "01a0c4aa-8b62-7360-b11e-a476ddaea0f6",
+   "evidence_id": "01a0c4a0-d56f-7400-a295-6ac3b2176006",
+   "media_type": "text/plain",
+   "original_filename": "transcript.txt",
+   "sha256": "9a21f4fa07f52268b5b215b802462571ca873133cfc814278f6c2fe120901971",
+   "size_bytes": 104,
+   "source_kind": "transcript"
+  },
+  {
+   "asset_id": "01a0c4aa-8b62-7360-b11e-a476ddaea0f6",
+   "evidence_id": "01a15f6f-13ba-76e0-9238-acd5883c65f1",
+   "media_type": "image/jpeg",
+   "original_filename": "scene-render-google-gemini-3.1-flash-image.jpg",
+   "sha256": "41d619db9f6950762cb54053dfb5f9050711bb662bb0cba5119a9225f8738f7b",
+   "size_bytes": 703036,
+   "source_kind": "scene_render"
+  }
+ ],
+ "new_evidence_ids": [
+  "01a16048-2602-7f80-9f0c-40f21202a724"
+ ],
+ "new_ledger_ids": [
+  "01a16048-260f-7462-96d4-f9fc62824d4d"
+ ],
+ "pilot_after": {
+  "billed": 5,
+  "cutoff": "2026-10-21 00:00:00",
+  "helper_consumed": 6,
+  "rendered": 5,
+  "rows": [
+   {
+    "cost": 0.0,
+    "created_at": "2026-10-21 17:07:57",
+    "error_state": null,
+    "id": "01a15f6f-13c4-75a3-8123-00142db2ba42"
+   },
+   {
+    "cost": 0.0,
+    "created_at": "2026-10-21 19:07:58",
+    "error_state": null,
+    "id": "01a15fdc-f5be-7941-b46b-e9773349ec4c"
+   },
+   {
+    "cost": 0.0,
+    "created_at": "2026-10-21 19:20:45",
+    "error_state": "http_status:400",
+    "id": "01a15fe8-aa48-7830-86ec-b3725b611639"
+   },
+   {
+    "cost": 0.0,
+    "created_at": "2026-10-21 19:34:18",
+    "error_state": null,
+    "id": "01a15ff5-11ec-7770-8143-8cc825a1a13d"
+   },
+   {
+    "cost": 0.0,
+    "created_at": "2026-10-21 20:12:44",
+    "error_state": null,
+    "id": "01a16018-3eb1-79c2-bffa-39a2f0fc88c3"
+   },
+   {
+    "cost": 0.0,
+    "created_at": "2026-10-21 21:05:03",
+    "error_state": null,
+    "id": "01a16048-260f-7462-96d4-f9fc62824d4d"
+   }
+  ]
+ },
+ "provider_call_rows": [
+  {
+   "cost": 0.0,
+   "created_at": "2026-10-21 21:05:03",
+   "error_state": null,
+   "id": "01a16048-260f-7462-96d4-f9fc62824d4d",
+   "input_hashes": "{\"photo_sha256\": \"d07bd5bd3240d4de95baf6709590571b63661c914ef523040178bebc8cd5111e\", \"brief_sha256\": \"74bc810a5ff90a0099e149c7b92b2ced1c8d488395813ec9eb8ab365fd9c451f\"}",
+   "job_id": null,
+   "latency_ms": 8605.55789299542,
+   "model": "bytedance-seed/seed-1.6-flash",
+   "output_payload": "{\"image_model\": \"google/gemini-3.1-flash-image\", \"orchestrator\": \"bytedance-seed/seed-1.6-flash\", \"prompt\": \"Isolate this packaged product on a plain seamless white background, front-facing, even studio lighting; the full package with its label and printed text exactly as photographed; no props, no scene, no shadow, no hands.\", \"status_code\": 200, \"response_id\": null, \"evidence_id\": \"01a16048-2602-7f80-9f0c-40f21202a724\", \"remote_url\": null, \"error_body\": null, \"response_body\": \"{\\\"created\\\": 0, \\\"data\\\": [{\\\"b64_json\\\": \\\"<redacted len=638860 sha256=573e6da204cee30547ae037b0ecadb1f8637f7e589e34a95d8a91a79c09bfdba>\\\", \\\"media_type\\\": \\\"image/jpeg\\\"}], \\\"usage\\\": {\\\"prompt_tokens\\\": 304, \\\"completion_tokens\\\": 1417, \\\"total_tokens\\\": 1721, \\\"cost\\\": 0, \\\"is_byok\\\": true, \\\"prompt_tokens_details\\\": {\\\"cached_tokens\\\": 0, \\\"cache_write_tokens\\\": 0, \\\"audio_tokens\\\": 0, \\\"video_tokens\\\": 0}, \\\"cost_details\\\": {\\\"upstream_inference_cost\\\": 0.068243, \\\"upstream_inference_prompt_cost\\\": 0.000152, \\\"upstream_inference_completions_cost\\\": 0.068091}, \\\"completion_tokens_details\\\": {\\\"reasoning_tokens\\\": 0, \\\"image_tokens\\\": 1120}}}\", \"response_body_sha256\": \"e580336127215cb190cdd52d2c1a4931042a8b986dd9843418a6329da03143e3\"}",
+   "prompt_template_version": "scene-render-v1",
+   "provider": "openrouter",
+   "updated_at": "2026-10-21 21:05:03",
+   "usage_json": "{\"prompt_tokens\": 304, \"completion_tokens\": 1417, \"total_tokens\": 1721, \"cost\": 0, \"is_byok\": true, \"prompt_tokens_details\": {\"cached_tokens\": 0, \"cache_write_tokens\": 0, \"audio_tokens\": 0, \"video_tokens\": 0}, \"cost_details\": {\"upstream_inference_cost\": 0.068243, \"upstream_inference_prompt_cost\": 0.000152, \"upstream_inference_completions_cost\": 0.068091}, \"completion_tokens_details\": {\"reasoning_tokens\": 0, \"image_tokens\": 1120}}"
+  }
+ ],
+ "render_status": "rendered",
+ "spend": {
+  "known": 0.012437125,
+  "owner_month": 0.353848125,
+  "owner_rows": [
+   {
+    "created_at": "2026-10-09 14:39:55",
+    "id": "01a1211b-3ae2-7ec2-aa57-4e1a8219c8f8",
+    "upstream": 0.0007589249999999999
+   },
+   {
+    "created_at": "2026-10-12 14:24:53",
+    "id": "01a13080-8b71-7851-8460-813b909b6034",
+    "upstream": 0.000802275
+   },
+   {
+    "created_at": "2026-10-12 14:28:48",
+    "id": "01a13084-21bb-7850-b8c8-e61f4e85698d",
+    "upstream": 0.0008759250000000001
+   },
+   {
+    "created_at": "2026-10-12 17:45:15",
+    "id": "01a13137-fe82-77e1-95fa-a9c97aff75b4",
+    "upstream": 0.01
+   },
+   {
+    "created_at": "2026-10-21 17:07:57",
+    "id": "01a15f6f-13c4-75a3-8123-00142db2ba42",
+    "upstream": 0.068184
+   },
+   {
+    "created_at": "2026-10-21 19:07:58",
+    "id": "01a15fdc-f5be-7941-b46b-e9773349ec4c",
+    "upstream": 0.068256
+   },
+   {
+    "created_at": "2026-10-21 19:34:18",
+    "id": "01a15ff5-11ec-7770-8143-8cc825a1a13d",
+    "upstream": 0.068229
+   },
+   {
+    "created_at": "2026-10-21 20:12:44",
+    "id": "01a16018-3eb1-79c2-bffa-39a2f0fc88c3",
+    "upstream": 0.068499
+   },
+   {
+    "created_at": "2026-10-21 21:05:03",
+    "id": "01a16048-260f-7462-96d4-f9fc62824d4d",
+    "upstream": 0.068243
+   }
+  ],
+  "owner_today": 0.34141099999999996,
+  "unknown_cost_calls": 0
+ },
+ "table_counts": {
+  "asset_evidence": 16,
+  "audit_event": 96,
+  "evidence": 23,
+  "provider_call": 35,
+  "provider_call_known_cost": 0.025178174999999997,
+  "provider_call_null_cost": 0
+ },
+ "timestamp": "2026-10-21T21:11:08.257829+00:00"
+}
