@@ -1,0 +1,44 @@
+SG-223 receipt transcript (verbatim commands + outputs, UTC 2026-10-21T20:20:29Z)
+requested_ref=automation
+--- git log --format=%H -n 1 HEAD
+4c7221bfcb0e760753eed097088f960132ce4511
+Work-HEAD: 4c7221bfcb0e760753eed097088f960132ce4511
+--- git notes --ref=refs/notes/storagegenie-coder-reports add -m "Dispatch-ID: SG-223 | Report: docs/worklogs/SG-223_report.md" 4c7221bfcb0e760753eed097088f960132ce4511
+notes_add_rc=0
+--- git push origin refs/notes/storagegenie-coder-reports
+To github.com:Andovol/StorageGenie.git
+   6b89907..519158a  refs/notes/storagegenie-coder-reports -> refs/notes/storagegenie-coder-reports
+notes_push_rc=0
+--- git push origin automation
+To github.com:Andovol/StorageGenie.git
+ ! [rejected]        automation -> automation (fetch first)
+error: failed to push some refs to 'github.com:Andovol/StorageGenie.git'
+hint: Updates were rejected because the remote contains work that you do not
+hint: have locally. This is usually caused by another repository pushing to
+hint: the same ref. If you want to integrate the remote changes, use
+hint: 'git pull' before pushing again.
+hint: See the 'Note about fast-forwards' in 'git push --help' for details.
+automation_push_rc=1
+--- mapped fetch of the notes ref: git fetch origin refs/notes/storagegenie-coder-reports:refs/notes/sg223-readback
+From github.com:Andovol/StorageGenie
+ * [new ref]         refs/notes/storagegenie-coder-reports -> refs/notes/sg223-readback
+mapped_fetch_rc=0
+--- remote read-back: git notes --ref=sg223-readback show 4c7221bfcb0e760753eed097088f960132ce4511
+Dispatch-ID: SG-223 | Report: docs/worklogs/SG-223_report.md
+notes_show_rc=0
+--- git cat-file -p refs/notes/sg223-readback:4c/7221bfcb0e760753eed097088f960132ce4511
+Dispatch-ID: SG-223 | Report: docs/worklogs/SG-223_report.md
+cat_file_rc=0
+--- remote refs: git ls-remote origin refs/notes/storagegenie-coder-reports refs/heads/automation
+091dba31fcdaa99720ac7c03b75f181885876f23	refs/heads/automation
+519158ac86e47de8e72db19cb8e1d10a05f8a77a	refs/notes/storagegenie-coder-reports
+ls_remote_rc=0
+
+--- follow-up after the automation push rejection: origin advanced to D-29 during SG-223
+--- git fetch origin
+fetch_rc=0
+--- git log --format='%H %s' -1 origin/automation
+091dba31fcdaa99720ac7c03b75f181885876f23 D-29 decided (bulk scene+cutout run for all products, cap-paced)
+--- git merge --no-ff origin/automation -m "Merge origin/automation (D-29 decision record) into SG-223 evidence branch"
+Already up to date.
+merge_rc=0
