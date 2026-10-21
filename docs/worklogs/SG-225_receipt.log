@@ -1,0 +1,31 @@
+SG-225 receipt transcript (verbatim commands + outputs, UTC 2026-10-21T21:17Z)
+requested_ref=automation
+notes_ref=refs/notes/storagegenie-coder-reports
+--- git log --format=%H -n 1 HEAD
+e717b2a5f41c3ade28985905397556683d23eb55
+Work-HEAD: e717b2a5f41c3ade28985905397556683d23eb55
+rc=0
+--- git notes --ref=refs/notes/storagegenie-coder-reports add -m "Dispatch-ID: SG-225 | Report: docs/worklogs/SG-225_report.md" e717b2a5f41c3ade28985905397556683d23eb55
+notes_add_rc=0
+--- git push origin refs/notes/storagegenie-coder-reports
+To github.com:Andovol/StorageGenie.git
+   a22a888..515cb34  refs/notes/storagegenie-coder-reports -> refs/notes/storagegenie-coder-reports
+notes_push_rc=0
+--- git push origin automation
+To github.com:Andovol/StorageGenie.git
+   bd1186a..e717b2a  automation -> automation
+automation_push_rc=0
+--- mapped fetch of the notes ref: git fetch origin refs/notes/storagegenie-coder-reports:refs/notes/sg225-readback
+From github.com:Andovol/StorageGenie
+ * [new ref]         refs/notes/storagegenie-coder-reports -> refs/notes/sg225-readback
+mapped_fetch_rc=0
+--- remote read-back: git notes --ref=sg225-readback show e717b2a5f41c3ade28985905397556683d23eb55
+Dispatch-ID: SG-225 | Report: docs/worklogs/SG-225_report.md
+notes_show_rc=0
+--- git cat-file -p refs/notes/sg225-readback:e7/17b2a5f41c3ade28985905397556683d23eb55
+Dispatch-ID: SG-225 | Report: docs/worklogs/SG-225_report.md
+cat_file_rc=0
+--- remote refs: git ls-remote origin refs/notes/storagegenie-coder-reports refs/heads/automation
+e717b2a5f41c3ade28985905397556683d23eb55	refs/heads/automation
+515cb34c440163e12b496fa391b9e7ead200f43d	refs/notes/storagegenie-coder-reports
+ls_remote_rc=0

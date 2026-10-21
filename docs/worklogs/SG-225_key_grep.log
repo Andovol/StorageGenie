@@ -5,3 +5,6 @@ evidence_gate_rc=0
 --- command: python /repo/backend/scripts/sg225_cutout.py key-gate --dir /repo/backend/scripts
 key_gate scanned_files=22 matching_bytes=0
 driver_gate_rc=0
+--- post-receipt final scan: python /repo/backend/scripts/sg225_cutout.py key-gate --dir /evidence
+key_gate scanned_files=1365 matching_bytes=0
+post_receipt_gate_rc=0
