@@ -1,0 +1,35 @@
+{
+ "cap_usd": 1.53252,
+ "grant_id": "D-27 bounded pilot (render 2 of 10) + D-20 + D-14",
+ "measured_default_image_tokens": {
+  "baseline": 1290,
+  "live_max": 1120,
+  "multiplier": 2,
+  "rows": [
+   {
+    "created_at": "2026-10-12 17:45:15",
+    "id": "01a13137-fe82-77e1-95fa-a9c97aff75b4",
+    "image_tokens": 654
+   },
+   {
+    "created_at": "2026-10-21 17:07:57",
+    "id": "01a15f6f-13c4-75a3-8123-00142db2ba42",
+    "image_tokens": 1120
+   }
+  ],
+  "sg159_cited": 1290
+ },
+ "pilot_billed_sends_since_cutoff": 1,
+ "pilot_consumed": 1,
+ "projected_all_in": 0.8638371250000001,
+ "remainders": {
+  "daily": 2.0,
+  "monthly": 9.987562875,
+  "pilot": 1.53252
+ },
+ "slice_renders": 1,
+ "spent_usd": 0.012437125,
+ "unknown_cost_calls": 4,
+ "verdict": "proceed",
+ "worst_case_usd": 0.17028000000000001
+}
