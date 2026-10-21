@@ -1,0 +1,129 @@
+{
+ "cap_usd": 1.658589,
+ "grant_id": "D-29 bulk scene run (L3 stage D-31) + D-20 + D-14",
+ "measured_default_image_tokens": {
+  "baseline": 1290,
+  "live_max": 1120,
+  "multiplier": 2,
+  "rows": [
+   {
+    "created_at": "2026-10-12 17:45:15",
+    "id": "01a13137-fe82-77e1-95fa-a9c97aff75b4",
+    "image_tokens": 654
+   },
+   {
+    "created_at": "2026-10-21 17:07:57",
+    "id": "01a15f6f-13c4-75a3-8123-00142db2ba42",
+    "image_tokens": 1120
+   },
+   {
+    "created_at": "2026-10-21 19:07:58",
+    "id": "01a15fdc-f5be-7941-b46b-e9773349ec4c",
+    "image_tokens": 1120
+   },
+   {
+    "created_at": "2026-10-21 19:34:18",
+    "id": "01a15ff5-11ec-7770-8143-8cc825a1a13d",
+    "image_tokens": 1120
+   },
+   {
+    "created_at": "2026-10-21 20:12:44",
+    "id": "01a16018-3eb1-79c2-bffa-39a2f0fc88c3",
+    "image_tokens": 1120
+   },
+   {
+    "created_at": "2026-10-21 21:05:03",
+    "id": "01a16048-260f-7462-96d4-f9fc62824d4d",
+    "image_tokens": 1120
+   }
+  ],
+  "sg159_cited": 1290
+ },
+ "owner_side_ledger": {
+  "month": 0.353848125,
+  "rows": [
+   {
+    "created_at": "2026-10-09 14:39:55",
+    "id": "01a1211b-3ae2-7ec2-aa57-4e1a8219c8f8",
+    "upstream": 0.0007589249999999999
+   },
+   {
+    "created_at": "2026-10-12 14:24:53",
+    "id": "01a13080-8b71-7851-8460-813b909b6034",
+    "upstream": 0.000802275
+   },
+   {
+    "created_at": "2026-10-12 14:28:48",
+    "id": "01a13084-21bb-7850-b8c8-e61f4e85698d",
+    "upstream": 0.0008759250000000001
+   },
+   {
+    "created_at": "2026-10-12 17:45:15",
+    "id": "01a13137-fe82-77e1-95fa-a9c97aff75b4",
+    "upstream": 0.01
+   },
+   {
+    "created_at": "2026-10-21 17:07:57",
+    "id": "01a15f6f-13c4-75a3-8123-00142db2ba42",
+    "upstream": 0.068184
+   },
+   {
+    "created_at": "2026-10-21 19:07:58",
+    "id": "01a15fdc-f5be-7941-b46b-e9773349ec4c",
+    "upstream": 0.068256
+   },
+   {
+    "created_at": "2026-10-21 19:34:18",
+    "id": "01a15ff5-11ec-7770-8143-8cc825a1a13d",
+    "upstream": 0.068229
+   },
+   {
+    "created_at": "2026-10-21 20:12:44",
+    "id": "01a16018-3eb1-79c2-bffa-39a2f0fc88c3",
+    "upstream": 0.068499
+   },
+   {
+    "created_at": "2026-10-21 21:05:03",
+    "id": "01a16048-260f-7462-96d4-f9fc62824d4d",
+    "upstream": 0.068243
+   }
+  ],
+  "today": 0.34141099999999996
+ },
+ "planned_sends": 4,
+ "planned_total": 4,
+ "projected_all_in": 0.6935571250000001,
+ "remainders": {
+  "credits_daily": 2.0,
+  "credits_monthly": 9.987562875,
+  "owner_daily": 1.658589,
+  "owner_monthly": 9.646151875
+ },
+ "remaining": 4,
+ "spend_body": {
+  "effective_budget": {
+   "budget_id": null,
+   "guardrail_id": null,
+   "include_byok": false,
+   "limit_usd": 5,
+   "remaining_usd": 4.987562875,
+   "reset_interval": null,
+   "resets_at": null,
+   "scope": "key_limit",
+   "spend_usd": 0.012437125
+  },
+  "limit": 5,
+  "limit_remaining": 4.987562875,
+  "usage": 0.012437125,
+  "usage_daily": 0,
+  "usage_monthly": 0.012437125
+ },
+ "spent_usd": 0.012437125,
+ "tag": "list",
+ "timestamp": "2026-10-21T21:26:24.813135+00:00",
+ "unknown_cost_calls": 0,
+ "verdict": "proceed",
+ "whole_list": true,
+ "worst_case_detail": "tokens=2580 (1290 measured baseline x2) x max_live_price=6.6e-05 from [('google-vertex/us', 6.6e-05), ('google-ai-studio', 6e-05), ('google-vertex/global', 6e-05)]",
+ "worst_case_usd": 0.17028000000000001
+}
