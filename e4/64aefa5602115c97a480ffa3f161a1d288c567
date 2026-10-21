@@ -1,0 +1,11 @@
+Partial-Receipt-ID: SG-223
+utc=2026-10-21T20:21:56Z
+killed=exit_no_receipt
+pushed=0
+uncommitted=none
+wip=none
+wip_elapsed_ms=68
+DISPATCH_RESULT id=SG-223 coder=opencode exit=0 head=9fff5c1fcde096e13046025221c6c5a2c4ed5fbd note=no moved=yes rewrite=no dirty=no elapsed=786s budget=2100s killed=exit_no_receipt stragglers=0
+P1_moved=PASS count=7
+P2_rewrite=PASS behind=0
+P6_dirty=PASS dirty=no
