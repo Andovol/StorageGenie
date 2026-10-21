@@ -1,0 +1,15 @@
+{
+ "cost": null,
+ "created_at": "2026-10-21 19:20:45",
+ "error_state": "http_status:400",
+ "id": "01a15fe8-aa48-7830-86ec-b3725b611639",
+ "input_hashes": "{\"photo_sha256\": \"b0d3d6618436f0265c2dae689686f20fc1984c892ab652cc7bc690184ae88425\", \"brief_sha256\": \"39a56f8bc60ab5043ac837293b89b1627a8897a7b9b045df4b8ff5ac67ff6105\"}",
+ "job_id": null,
+ "latency_ms": 4998.9674590178765,
+ "model": "bytedance-seed/seed-1.6-flash",
+ "output_payload": "{\"image_model\": \"google/gemini-3.1-flash-image\", \"orchestrator\": \"bytedance-seed/seed-1.6-flash\", \"prompt\": \"Restage this packaged product on a clean kitchen counter in warm natural daylight; keep the package, its label and its printed text exactly as photographed.\", \"status_code\": 400, \"response_id\": null, \"evidence_id\": null, \"remote_url\": null, \"error_body\": \"{\\\"error\\\": {\\\"message\\\": \\\"Gemini blocked this request: it was flagged for copyrighted or trademarked material.\\\", \\\"code\\\": 400, \\\"metadata\\\": {\\\"provider_name\\\": \\\"Google AI Studio\\\", \\\"finish_reason\\\": \\\"RECITATION\\\", \\\"candidate_count\\\": 1, \\\"block_reason\\\": \\\"RECITATION\\\"}}}\", \"response_body\": \"{\\\"error\\\": {\\\"message\\\": \\\"Gemini blocked this request: it was flagged for copyrighted or trademarked material.\\\", \\\"code\\\": 400, \\\"metadata\\\": {\\\"provider_name\\\": \\\"Google AI Studio\\\", \\\"finish_reason\\\": \\\"RECITATION\\\", \\\"candidate_count\\\": 1, \\\"block_reason\\\": \\\"RECITATION\\\"}}}\", \"response_body_sha256\": \"970f192b0c0169b045dc643841ba6546f7e64c7cc6cb566e53a3dac77f365c03\"}",
+ "prompt_template_version": "scene-render-v1",
+ "provider": "openrouter",
+ "updated_at": "2026-10-21 19:20:45",
+ "usage_json": null
+}

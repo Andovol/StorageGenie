@@ -374,7 +374,9 @@ def guard_selftest(worst_case: float, cap: float) -> None:
     )
 
 
-def pre_send_proof(db, ctx: dict, index: int, tag: str) -> tuple[object | None, dict]:
+def pre_send_proof(
+    db, ctx: dict, index: int, tag: str
+) -> tuple[object | None, dict, scene.SceneSpendAuthority]:
     """The triple bound, re-derived live BEFORE this send.
 
     (a) `guard_render_spend` projection against the tightest remainder;
@@ -497,7 +499,7 @@ def pre_send_proof(db, ctx: dict, index: int, tag: str) -> tuple[object | None, 
         "photo_ref_sha256": pick["photo_ref_sha256"],
     }
     write_json(EVIDENCE_DIR / f"SG-219_guard_{tag}.json", proof)
-    return refusal, proof
+    return refusal, proof, authority
 
 
 def scene_brief() -> str:
@@ -663,7 +665,7 @@ def run_renders(db, ctx: dict) -> int:
             outcomes.append(result)
             break
 
-        refusal, proof = pre_send_proof(db, ctx, index, f"render{render_no}")
+        refusal, proof, authority = pre_send_proof(db, ctx, index, f"render{render_no}")
         if refusal is not None:
             result = {
                 "render_number": render_no,
@@ -711,7 +713,7 @@ def run_renders(db, ctx: dict) -> int:
             image_model=IMAGE_MODEL,
             orchestrator=ORCHESTRATOR,
             worst_case_usd=float(proof["worst_case_usd"]),
-            authority=proof["authority"],
+            authority=authority,
             transport=TRANSPORT,
             timeout_s=RENDER_TIMEOUT_S,
         )
@@ -871,7 +873,7 @@ def main() -> int:
         ctx = prepare(db, args)
         ctx["household_id"] = household_id
         if args.mode == "plan":
-            refusal, proof = pre_send_proof(db, ctx, 0, "plan")
+            refusal, proof, authority = pre_send_proof(db, ctx, 0, "plan")
             print(
                 f"plan_only: no send verdict={'proceed' if refusal is None else refusal.code}",
                 flush=True,

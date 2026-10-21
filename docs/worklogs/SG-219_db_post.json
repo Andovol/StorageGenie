@@ -1,0 +1,76 @@
+{
+ "audit_event_rows": [],
+ "delta": {
+  "audit_event": 0,
+  "evidence": 0,
+  "provider_call": 1,
+  "provider_call_known_cost": 0,
+  "provider_call_null_cost": 1
+ },
+ "evidence_rows": [],
+ "finished_at": "2026-10-21T19:20:46.011641+00:00",
+ "new_evidence_ids": [],
+ "new_ledger_ids": [
+  "01a15fe8-aa48-7830-86ec-b3725b611639"
+ ],
+ "outcomes": [
+  {
+   "asset_id": "01a0c446-44c9-7b82-9d1c-2b51fa518191",
+   "authority_cap_usd": 1.3622400000000001,
+   "cost_usd": null,
+   "display_name": "CEAFĂ DE PORC",
+   "error_state": "http_status:400",
+   "evidence_id": null,
+   "image_media_type": null,
+   "image_model": "google/gemini-3.1-flash-image",
+   "image_sha256": null,
+   "latency_ms": 4998.9674590178765,
+   "ledger_id": "01a15fe8-aa48-7830-86ec-b3725b611639",
+   "orchestrator": "bytedance-seed/seed-1.6-flash",
+   "photo_evidence_id": "01a0c445-35b0-7a53-9b8d-22fa3d6523de",
+   "photo_ref_sha256": "b0d3d6618436f0265c2dae689686f20fc1984c892ab652cc7bc690184ae88425",
+   "photo_sha256": "b64034e5c91212098f9895535b5ba45e752bfdf70c24c4cd296b2007823f06bd",
+   "refusal": null,
+   "render_number": 3,
+   "response_id": null,
+   "returned_at": "2026-10-21T19:20:45.899693+00:00",
+   "status": "failed",
+   "status_code": 400,
+   "storage_key": null,
+   "transport": "image_api",
+   "usage": null,
+   "worst_case_usd": 0.17028000000000001
+  }
+ ],
+ "post": {
+  "audit_event": 93,
+  "evidence": 20,
+  "provider_call": 32,
+  "provider_call_known_cost": 0.025178174999999997,
+  "provider_call_null_cost": 5
+ },
+ "pre": {
+  "audit_event": 93,
+  "evidence": 20,
+  "provider_call": 31,
+  "provider_call_known_cost": 0.025178174999999997,
+  "provider_call_null_cost": 4
+ },
+ "provider_call_rows": [
+  {
+   "cost": null,
+   "created_at": "2026-10-21 19:20:45",
+   "error_state": "http_status:400",
+   "id": "01a15fe8-aa48-7830-86ec-b3725b611639",
+   "input_hashes": "{\"photo_sha256\": \"b0d3d6618436f0265c2dae689686f20fc1984c892ab652cc7bc690184ae88425\", \"brief_sha256\": \"39a56f8bc60ab5043ac837293b89b1627a8897a7b9b045df4b8ff5ac67ff6105\"}",
+   "job_id": null,
+   "latency_ms": 4998.9674590178765,
+   "model": "bytedance-seed/seed-1.6-flash",
+   "output_payload": "{\"image_model\": \"google/gemini-3.1-flash-image\", \"orchestrator\": \"bytedance-seed/seed-1.6-flash\", \"prompt\": \"Restage this packaged product on a clean kitchen counter in warm natural daylight; keep the package, its label and its printed text exactly as photographed.\", \"status_code\": 400, \"response_id\": null, \"evidence_id\": null, \"remote_url\": null, \"error_body\": \"{\\\"error\\\": {\\\"message\\\": \\\"Gemini blocked this request: it was flagged for copyrighted or trademarked material.\\\", \\\"code\\\": 400, \\\"metadata\\\": {\\\"provider_name\\\": \\\"Google AI Studio\\\", \\\"finish_reason\\\": \\\"RECITATION\\\", \\\"candidate_count\\\": 1, \\\"block_reason\\\": \\\"RECITATION\\\"}}}\", \"response_body\": \"{\\\"error\\\": {\\\"message\\\": \\\"Gemini blocked this request: it was flagged for copyrighted or trademarked material.\\\", \\\"code\\\": 400, \\\"metadata\\\": {\\\"provider_name\\\": \\\"Google AI Studio\\\", \\\"finish_reason\\\": \\\"RECITATION\\\", \\\"candidate_count\\\": 1, \\\"block_reason\\\": \\\"RECITATION\\\"}}}\", \"response_body_sha256\": \"970f192b0c0169b045dc643841ba6546f7e64c7cc6cb566e53a3dac77f365c03\"}",
+   "prompt_template_version": "scene-render-v1",
+   "provider": "openrouter",
+   "updated_at": "2026-10-21 19:20:45",
+   "usage_json": null
+  }
+ ]
+}
