@@ -1,0 +1,15 @@
+post_spend http=200 bytes=1116 body=SG-216_post_spend_body.json
+post_spend $.data.usage (arc all-time)=0.012437125
+post_spend $.data.usage_daily (current UTC day)=0.0
+post_spend $.data.usage_monthly (current UTC month)=0.012437125
+post_spend $.data.limit=5.0 $.data.limit_remaining=4.987562875
+post_spend $.data.effective_budget='{"budget_id": null, "guardrail_id": null, "include_byok": false, "limit_usd": 5, "remaining_usd": 4.987562875, "reset_interval": null, "resets_at": null, "scope": "key_limit", "spend_usd": 0.012437125}'
+ledger_db_rows=7 (/evidence/sg216_ledger.sqlite)
+ledger_row	2026-10-21T16:51:33Z	g1_models	-	200	null	null
+ledger_row	2026-10-21T16:51:33Z	g1_endpoints	google/gemini-3.1-flash-image	200	null	null
+ledger_row	2026-10-21T16:51:33Z	g1_spend	-	200	null	null
+ledger_row	2026-10-21T16:51:50Z	render_spend	-	200	null	null
+ledger_row	2026-10-21T16:51:56Z	g1_render	google/gemini-3.1-flash-image	200	0.0	null
+ledger_row	2026-10-21T16:52:01Z	g2_render	google/gemini-3.1-flash-image	200	0.0	null
+ledger_row	2026-10-21T16:52:20Z	post_spend	-	200	null	null
+spend_rc=0

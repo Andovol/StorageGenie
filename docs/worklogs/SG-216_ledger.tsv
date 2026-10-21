@@ -1,0 +1,8 @@
+timestamp	leg	model	http	cost_usd	error
+2026-10-21T16:51:33Z	g1_models	-	200	null	-
+2026-10-21T16:51:33Z	g1_endpoints	google/gemini-3.1-flash-image	200	null	-
+2026-10-21T16:51:33Z	g1_spend	-	200	null	-
+2026-10-21T16:51:50Z	render_spend	-	200	null	-
+2026-10-21T16:51:56Z	g1_render	google/gemini-3.1-flash-image	200	0.0	-
+2026-10-21T16:52:01Z	g2_render	google/gemini-3.1-flash-image	200	0.0	-
+2026-10-21T16:52:20Z	post_spend	-	200	null	-

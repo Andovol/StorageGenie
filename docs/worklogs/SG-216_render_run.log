@@ -1,0 +1,32 @@
+render_spend http=200 bytes=1116 body=SG-216_render_spend_body.json
+render_spend $.data.usage (arc all-time)=0.012437125
+render_spend $.data.usage_daily (current UTC day)=0.0
+render_spend $.data.usage_monthly (current UTC month)=0.012437125
+render_spend $.data.limit=5.0 $.data.limit_remaining=4.987562875
+render_spend $.data.effective_budget='{"budget_id": null, "guardrail_id": null, "include_byok": false, "limit_usd": 5, "remaining_usd": 4.987562875, "reset_interval": null, "resets_at": null, "scope": "key_limit", "spend_usd": 0.012437125}'
+input_references_declared=True
+resolution_auto path=supported_parameters.resolution.values=['512', '1K', '2K', '4K'] chosen=512
+projection endpoints[0] worst_case_usd=0.54067200 detail=unit=token x8192tok=0.54067200
+projection endpoints[1] worst_case_usd=0.49152000 detail=unit=token x8192tok=0.49152000
+projection endpoints[2] worst_case_usd=0.49152000 detail=unit=token x8192tok=0.49152000
+guard daily   per_render=0.54067200 known_spend_daily=0.0 renders=2 total=1.08134400 cap=2.0 verdict=proceed
+guard monthly per_render=0.54067200 known_spend_monthly=0.012437125 renders=2 total=1.09378113 cap=10.0 verdict=proceed
+G2_VERDICT projection_ok daily_total=1.08134400 monthly_total=1.09378113 (D-20 daily + D-14 monthly; arc all-time=0.012437125)
+render model=google/gemini-3.1-flash-image prompt="A plain gray ceramic cup on a plain white background." n=1 resolution=512
+g1_render sending input_references=False request_body=SG-216_g1_render_request.json
+g1_render image_file=SG-216_g1_render.jpg bytes=116493 media_type=image/jpeg sha256=faf1f85ccdb197888e7de1b9e1dfd3841a988f379c1ffaac8448e0c64c28412a
+g1_render http=200 ts=2026-10-21T16:51:56Z cost=0.0 cost_field=0.0 error=- body=SG-216_g1_render_body.json
+G1_VERDICT quota_wall_down http=200 image_bytes_present=true -> G2 reference leg runs
+g2_render sending input_references=True request_body=SG-216_g2_render_request.json
+g2_render image_file=SG-216_g2_render.jpg bytes=87656 media_type=image/jpeg sha256=db08c866a9bded3917b2f8a944340c1c0443362c0b152bcae48bafad8259417a
+g2_render http=200 ts=2026-10-21T16:52:01Z cost=0.0 cost_field=0.0 error=- body=SG-216_g2_render_body.json
+G2_VERDICT input_references_render_ok image_bytes_present=true
+render_sends=2 billed_rows_with_cost=2 actual_cost_sum=0.000000000 known_daily_at_projection=0.0 known_monthly_at_projection=0.012437125 caps=$2.00/day $10.00/month
+ledger_db_rows=6 (/evidence/sg216_ledger.sqlite)
+ledger_row	2026-10-21T16:51:33Z	g1_models	-	200	null	null
+ledger_row	2026-10-21T16:51:33Z	g1_endpoints	google/gemini-3.1-flash-image	200	null	null
+ledger_row	2026-10-21T16:51:33Z	g1_spend	-	200	null	null
+ledger_row	2026-10-21T16:51:50Z	render_spend	-	200	null	null
+ledger_row	2026-10-21T16:51:56Z	g1_render	google/gemini-3.1-flash-image	200	0.0	null
+ledger_row	2026-10-21T16:52:01Z	g2_render	google/gemini-3.1-flash-image	200	0.0	null
+render_rc=0
