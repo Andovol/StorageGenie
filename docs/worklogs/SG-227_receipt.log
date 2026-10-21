@@ -1,0 +1,26 @@
+SG-227 RECEIPT TRANSCRIPT (notes-ref receipt + mapped remote read-back).
+Work-HEAD: 37368983dfa4845d235c111a6a61e3b2848eabe6 (SG-227 report commit; this transcript is committed after it, CO-55(a)/(b)).
+Note first line must be exactly: Dispatch-ID: SG-227 | Report: docs/worklogs/SG-227_report.md
+utc=2026-10-21T22:10:26Z
+--- git log --format=%H -n 1 HEAD
+37368983dfa4845d235c111a6a61e3b2848eabe6
+--- git notes --ref=refs/notes/storagegenie-coder-reports add -m "Dispatch-ID: SG-227 | Report: docs/worklogs/SG-227_report.md" 37368983dfa4845d235c111a6a61e3b2848eabe6
+notes_add_exit=0
+--- git push origin refs/notes/storagegenie-coder-reports
+To github.com:Andovol/StorageGenie.git
+   154a634..44ccfdb  refs/notes/storagegenie-coder-reports -> refs/notes/storagegenie-coder-reports
+notes_push_exit=0
+--- git push origin automation   [no-op expected after the report commit push]
+Everything up-to-date
+automation_push_exit=0
+--- mapped fetch read-back: git fetch origin refs/notes/storagegenie-coder-reports:refs/notes/sg227-readback
+From github.com:Andovol/StorageGenie
+ * [new ref]         refs/notes/storagegenie-coder-reports -> refs/notes/sg227-readback
+fetch_exit=0
+--- git rev-parse refs/notes/sg227-readback
+44ccfdb177c05a1438e26118acc6b69d8f3d8c87
+--- git notes --ref=refs/notes/sg227-readback show 37368983dfa4845d235c111a6a61e3b2848eabe6
+Dispatch-ID: SG-227 | Report: docs/worklogs/SG-227_report.md
+readback_show_exit=0
+--- git ls-remote origin refs/notes/storagegenie-coder-reports
+44ccfdb177c05a1438e26118acc6b69d8f3d8c87	refs/notes/storagegenie-coder-reports
