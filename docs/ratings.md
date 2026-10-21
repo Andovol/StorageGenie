@@ -890,6 +890,12 @@ Originals above (88 FLAG:TRUST / 91 FLAG:TRUST) stand as the audit trail; the ve
 |---|---|---|---|---|---|---|---|---|---|---|---|
 | SG-223 | D-28 unlink + re-render + cutout probe; WORK receipt verified (clean trigger, no misfire); exactly 1 link DELETE (17->16, route re-read shows only SG-220 render); ONE POST -> 200 rendered (faithful to PIKOK-can source, wrong product for asset, explicitly unlinked with reason); Miso cutout leg REFUSED pre-send by live guard (1.034117125 > 1.02168, no POST, formula unweakened); F-SG223-1 corrects Correction 1 (SG-218 was faithful; pairing is the defect); mid-flight D-29 push cost realized (1 rejected push + trivial merge); driver + SG-223_* only; 488s vs ~600s; audit SG-223_audit.md | opencode/opencode-go/deepseek-v4.1-flash (receipt settings) | max | 98 |  |  | PG-EV-02/03/05/06/07/09/14; PG-SC-03/05/09; PG-IC-01/07/08/09; PG-PR-01/03/10 |  | D-30: guard wall blocks all further pilot renders (classify 5 stale null rows, wider grant, or park); Costita canonical photo rides D-30 |  | none |
 
+### SG-224 (2026-10-21 - D-30: 5 stale null-cost rows classified, guard wall clears)
+
+| slice_id | phase | model | effort | score | flag | lever | guards_invoked | deduction_attribution | remaining | escape | slowest_waste |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| SG-224 | D-30 classify 5 null rows; WORK receipt verified (clean trigger, no misfire); live null set == expected 5 (per-row proof: no usage keys, key spend unchanged, cumulative cross-check); 5 UPDATEs each changes()=1, one commit, revert-hash equality, no other delta; guard re-proof live (wall 1.034117125 refused pre-write, 0.182717125 proceeds post-write, formula unweakened); tooling iterations fixed pre-effect with transcripts preserved; $0, zero sends; driver + SG-224_* only; 269s vs ~300s; audit SG-224_audit.md | opencode/opencode-go/deepseek-v4.1-flash (receipt settings) | max | 98 |  |  | PG-EV-02/03/05/06/09/14; PG-SC-03/09; PG-IC-01/07/08/09; PG-PR-01/03/10 |  | D-30 discharged (unknown 5->0); cutout probe SG-225 next under L3; bulk run packets after |  | none |
+
 ### SG-221 (2026-10-21 - surface pilot renders in drawer: 3 links + serializer field + Scene tab)
 
 | slice_id | phase | model | effort | score | flag | lever | guards_invoked | deduction_attribution | remaining | escape | slowest_waste |
