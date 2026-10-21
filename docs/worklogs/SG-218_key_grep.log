@@ -1,6 +1,6 @@
-SG-218 additional key-value gate (final pass incl. final report and run log): scan every evidence artifact byte-for-byte for the live credential value.
+SG-218 additional key-value gate (final pass incl. receipt log): scan every evidence artifact byte-for-byte for the live credential value.
 The value is expanded from the container environment; it is never printed.
 key_gate scanned_files=11 matching_bytes=0
 key_gate_evidence_exit=0
-key_gate scanned_files=1199 matching_bytes=0
+key_gate scanned_files=1200 matching_bytes=0
 key_gate_worklogs_exit=0
