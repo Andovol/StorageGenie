@@ -1,0 +1,217 @@
+{
+ "costita_links": [
+  {
+   "asset_id": "01a0c4ab-3765-7e10-8d0a-705390c6560d",
+   "evidence_id": "01a0c4a1-acbd-7541-83b7-ce9d04730716",
+   "media_type": "image/png",
+   "original_filename": "image.png",
+   "sha256": "63b3ec707f184a6c4026948701b0cc3d074cea5aa8449bcb1d22711891a9bd09",
+   "size_bytes": 565806,
+   "source_kind": "upload"
+  },
+  {
+   "asset_id": "01a0c4ab-3765-7e10-8d0a-705390c6560d",
+   "evidence_id": "01a0c4a1-ad90-78e1-9c17-10d92260fd0e",
+   "media_type": "image/png",
+   "original_filename": "image.png",
+   "sha256": "f9d71a40b1c5ac455fe568576c77b042abc4755c65dce99a9dfcb25f64a8f367",
+   "size_bytes": 1259505,
+   "source_kind": "upload"
+  },
+  {
+   "asset_id": "01a0c4ab-3765-7e10-8d0a-705390c6560d",
+   "evidence_id": "01a0c4a2-2a41-77a1-9757-f0c1ae5c7cf4",
+   "media_type": "text/plain",
+   "original_filename": "transcript.txt",
+   "sha256": "6b70acf5391c3aef732feff1813d9f94b997f7721bcc49d90e118490763b5595",
+   "size_bytes": 873,
+   "source_kind": "transcript"
+  },
+  {
+   "asset_id": "01a0c4ab-3765-7e10-8d0a-705390c6560d",
+   "evidence_id": "01a0c4a2-2a42-72b3-8131-e392ced98263",
+   "media_type": "text/plain",
+   "original_filename": "transcript.txt",
+   "sha256": "c81455960e46c0db5c95966718d5905ce6eb42b2ca0e15ee5476dfd93b2989be",
+   "size_bytes": 99,
+   "source_kind": "transcript"
+  },
+  {
+   "asset_id": "01a0c4ab-3765-7e10-8d0a-705390c6560d",
+   "evidence_id": "01a15fdc-f5b6-7f31-9008-2f8d89be8813",
+   "media_type": "image/jpeg",
+   "original_filename": "scene-render-google-gemini-3.1-flash-image.jpg",
+   "sha256": "ce4794a2b7422746ed541d503e61eeb9c23095485794d33c78735fe382c9e7b0",
+   "size_bytes": 731496,
+   "source_kind": "scene_render"
+  },
+  {
+   "asset_id": "01a0c4ab-3765-7e10-8d0a-705390c6560d",
+   "evidence_id": "01a15ff5-11e3-7243-99a6-9eeb9bbe1e09",
+   "media_type": "image/jpeg",
+   "original_filename": "scene-render-google-gemini-3.1-flash-image.jpg",
+   "sha256": "f3d56bfb33a2df27e3079d1fc61735eac0292b5be60f656c6c03255ba7a5cae3",
+   "size_bytes": 664184,
+   "source_kind": "scene_render"
+  }
+ ],
+ "cutout_brief": "Isolate this packaged product on a plain seamless white background, front-facing, even studio lighting; the full package with its label and printed text exactly as photographed; no props, no scene, no shadow, no hands.",
+ "frozen_brief": "Restage this packaged product on a clean kitchen counter in warm natural daylight; keep the package, its label and its printed text exactly as photographed.",
+ "household": {
+  "id": "01a0a029-1477-7ca0-b200-bce78a96c679",
+  "name": "Popescu Household"
+ },
+ "link_counts": {
+  "sg220_render_link_rows": 1,
+  "total": 17,
+  "wrong_pair_rows": 1,
+  "wrong_render_link_rows": 1
+ },
+ "miso_links": [
+  {
+   "asset_id": "01a0c4aa-8b62-7360-b11e-a476ddaea0f6",
+   "evidence_id": "01a0c4a0-af88-7903-a070-a44e7b120712",
+   "media_type": "image/png",
+   "original_filename": "image.png",
+   "sha256": "71901cac327fdd76926e36aa2a7889b2b17fb4e2619ca92d97f86d53aac0de63",
+   "size_bytes": 1280694,
+   "source_kind": "upload"
+  },
+  {
+   "asset_id": "01a0c4aa-8b62-7360-b11e-a476ddaea0f6",
+   "evidence_id": "01a0c4a0-d56f-7400-a295-6ac3b2176006",
+   "media_type": "text/plain",
+   "original_filename": "transcript.txt",
+   "sha256": "9a21f4fa07f52268b5b215b802462571ca873133cfc814278f6c2fe120901971",
+   "size_bytes": 104,
+   "source_kind": "transcript"
+  },
+  {
+   "asset_id": "01a0c4aa-8b62-7360-b11e-a476ddaea0f6",
+   "evidence_id": "01a15f6f-13ba-76e0-9238-acd5883c65f1",
+   "media_type": "image/jpeg",
+   "original_filename": "scene-render-google-gemini-3.1-flash-image.jpg",
+   "sha256": "41d619db9f6950762cb54053dfb5f9050711bb662bb0cba5119a9225f8738f7b",
+   "size_bytes": 703036,
+   "source_kind": "scene_render"
+  }
+ ],
+ "photos": {
+  "costita": {
+   "asset_id": "01a0c4ab-3765-7e10-8d0a-705390c6560d",
+   "asset_type": "meat",
+   "brief": "Restage this packaged product on a clean kitchen counter in warm natural daylight; keep the package, its label and its printed text exactly as photographed.",
+   "created_at": "2026-09-21 15:42:05",
+   "display_name": "Costiță de porc",
+   "evidence_id": "01a0c4a1-ad90-78e1-9c17-10d92260fd0e",
+   "media_type": "image/png",
+   "photo_bytes": 1259505,
+   "photo_ref_sha256": "254a91f75d7cf8acbd6ee6defc13b95436fed4414ba7a05be0cd95752a2c964a",
+   "photo_sha256": "f9d71a40b1c5ac455fe568576c77b042abc4755c65dce99a9dfcb25f64a8f367",
+   "sha256": "f9d71a40b1c5ac455fe568576c77b042abc4755c65dce99a9dfcb25f64a8f367",
+   "size_bytes": 1259505,
+   "source_copy": "/evidence/SG-223_source_costita.png",
+   "source_kind": "upload",
+   "status": "ACTIVE",
+   "storage_key": "01a0a029-1477-7ca0-b200-bce78a96c679/f9/f9d71a40b1c5ac455fe568576c77b042abc4755c65dce99a9dfcb25f64a8f367.png"
+  },
+  "miso": {
+   "asset_id": "01a0c4aa-8b62-7360-b11e-a476ddaea0f6",
+   "asset_type": "soup",
+   "created_at": "2026-09-21 15:41:00",
+   "display_name": "Miso Soup",
+   "evidence_id": "01a0c4a0-af88-7903-a070-a44e7b120712",
+   "media_type": "image/png",
+   "photo_bytes": 1280694,
+   "photo_ref_sha256": "d07bd5bd3240d4de95baf6709590571b63661c914ef523040178bebc8cd5111e",
+   "photo_sha256": "71901cac327fdd76926e36aa2a7889b2b17fb4e2619ca92d97f86d53aac0de63",
+   "sha256": "71901cac327fdd76926e36aa2a7889b2b17fb4e2619ca92d97f86d53aac0de63",
+   "size_bytes": 1280694,
+   "source_copy": "/evidence/SG-223_source_miso.png",
+   "source_kind": "upload",
+   "status": "ACTIVE",
+   "storage_key": "01a0a029-1477-7ca0-b200-bce78a96c679/71/71901cac327fdd76926e36aa2a7889b2b17fb4e2619ca92d97f86d53aac0de63.png"
+  }
+ },
+ "pilot": {
+  "billed_sends": 3,
+  "cutoff": "2026-10-21 00:00:00",
+  "rendered": 3,
+  "rows": [
+   {
+    "cost": 0.0,
+    "created_at": "2026-10-21 17:07:57",
+    "error_state": null,
+    "id": "01a15f6f-13c4-75a3-8123-00142db2ba42"
+   },
+   {
+    "cost": 0.0,
+    "created_at": "2026-10-21 19:07:58",
+    "error_state": null,
+    "id": "01a15fdc-f5be-7941-b46b-e9773349ec4c"
+   },
+   {
+    "cost": 0.0,
+    "created_at": "2026-10-21 19:34:18",
+    "error_state": null,
+    "id": "01a15ff5-11ec-7770-8143-8cc825a1a13d"
+   }
+  ]
+ },
+ "scene_module": {
+  "file": "/app/app/services/scene/openrouter.py",
+  "sha256": "69f5abeca6d2e298ba74d225e09fe855dd81cd049100c79158fd2761d64c8b15"
+ },
+ "spend": {
+  "known": 0.012437125,
+  "owner_month": 0.21710612499999998,
+  "owner_rows": [
+   {
+    "created_at": "2026-10-09 14:39:55",
+    "id": "01a1211b-3ae2-7ec2-aa57-4e1a8219c8f8",
+    "upstream": 0.0007589249999999999
+   },
+   {
+    "created_at": "2026-10-12 14:24:53",
+    "id": "01a13080-8b71-7851-8460-813b909b6034",
+    "upstream": 0.000802275
+   },
+   {
+    "created_at": "2026-10-12 14:28:48",
+    "id": "01a13084-21bb-7850-b8c8-e61f4e85698d",
+    "upstream": 0.0008759250000000001
+   },
+   {
+    "created_at": "2026-10-12 17:45:15",
+    "id": "01a13137-fe82-77e1-95fa-a9c97aff75b4",
+    "upstream": 0.01
+   },
+   {
+    "created_at": "2026-10-21 17:07:57",
+    "id": "01a15f6f-13c4-75a3-8123-00142db2ba42",
+    "upstream": 0.068184
+   },
+   {
+    "created_at": "2026-10-21 19:07:58",
+    "id": "01a15fdc-f5be-7941-b46b-e9773349ec4c",
+    "upstream": 0.068256
+   },
+   {
+    "created_at": "2026-10-21 19:34:18",
+    "id": "01a15ff5-11ec-7770-8143-8cc825a1a13d",
+    "upstream": 0.068229
+   }
+  ],
+  "owner_today": 0.204669,
+  "unknown_cost_calls": 5
+ },
+ "table_counts": {
+  "asset_evidence": 17,
+  "audit_event": 94,
+  "evidence": 21,
+  "provider_call": 33,
+  "provider_call_known_cost": 0.025178174999999997,
+  "provider_call_null_cost": 5
+ },
+ "timestamp": "2026-10-21T20:12:05.354247+00:00"
+}

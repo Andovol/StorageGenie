@@ -1,0 +1,133 @@
+{
+ "after_costita_links": [
+  {
+   "asset_id": "01a0c4ab-3765-7e10-8d0a-705390c6560d",
+   "evidence_id": "01a0c4a1-acbd-7541-83b7-ce9d04730716",
+   "media_type": "image/png",
+   "original_filename": "image.png",
+   "sha256": "63b3ec707f184a6c4026948701b0cc3d074cea5aa8449bcb1d22711891a9bd09",
+   "size_bytes": 565806,
+   "source_kind": "upload"
+  },
+  {
+   "asset_id": "01a0c4ab-3765-7e10-8d0a-705390c6560d",
+   "evidence_id": "01a0c4a1-ad90-78e1-9c17-10d92260fd0e",
+   "media_type": "image/png",
+   "original_filename": "image.png",
+   "sha256": "f9d71a40b1c5ac455fe568576c77b042abc4755c65dce99a9dfcb25f64a8f367",
+   "size_bytes": 1259505,
+   "source_kind": "upload"
+  },
+  {
+   "asset_id": "01a0c4ab-3765-7e10-8d0a-705390c6560d",
+   "evidence_id": "01a0c4a2-2a41-77a1-9757-f0c1ae5c7cf4",
+   "media_type": "text/plain",
+   "original_filename": "transcript.txt",
+   "sha256": "6b70acf5391c3aef732feff1813d9f94b997f7721bcc49d90e118490763b5595",
+   "size_bytes": 873,
+   "source_kind": "transcript"
+  },
+  {
+   "asset_id": "01a0c4ab-3765-7e10-8d0a-705390c6560d",
+   "evidence_id": "01a0c4a2-2a42-72b3-8131-e392ced98263",
+   "media_type": "text/plain",
+   "original_filename": "transcript.txt",
+   "sha256": "c81455960e46c0db5c95966718d5905ce6eb42b2ca0e15ee5476dfd93b2989be",
+   "size_bytes": 99,
+   "source_kind": "transcript"
+  },
+  {
+   "asset_id": "01a0c4ab-3765-7e10-8d0a-705390c6560d",
+   "evidence_id": "01a15ff5-11e3-7243-99a6-9eeb9bbe1e09",
+   "media_type": "image/jpeg",
+   "original_filename": "scene-render-google-gemini-3.1-flash-image.jpg",
+   "sha256": "f3d56bfb33a2df27e3079d1fc61735eac0292b5be60f656c6c03255ba7a5cae3",
+   "size_bytes": 664184,
+   "source_kind": "scene_render"
+  }
+ ],
+ "after_link_counts": {
+  "sg220_render_link_rows": 1,
+  "total": 16,
+  "wrong_pair_rows": 0,
+  "wrong_render_link_rows": 0
+ },
+ "after_table_counts": {
+  "asset_evidence": 16,
+  "audit_event": 94,
+  "evidence": 21,
+  "provider_call": 33,
+  "provider_call_known_cost": 0.025178174999999997,
+  "provider_call_null_cost": 5
+ },
+ "before_costita_links": [
+  {
+   "asset_id": "01a0c4ab-3765-7e10-8d0a-705390c6560d",
+   "evidence_id": "01a0c4a1-acbd-7541-83b7-ce9d04730716",
+   "media_type": "image/png",
+   "original_filename": "image.png",
+   "sha256": "63b3ec707f184a6c4026948701b0cc3d074cea5aa8449bcb1d22711891a9bd09",
+   "size_bytes": 565806,
+   "source_kind": "upload"
+  },
+  {
+   "asset_id": "01a0c4ab-3765-7e10-8d0a-705390c6560d",
+   "evidence_id": "01a0c4a1-ad90-78e1-9c17-10d92260fd0e",
+   "media_type": "image/png",
+   "original_filename": "image.png",
+   "sha256": "f9d71a40b1c5ac455fe568576c77b042abc4755c65dce99a9dfcb25f64a8f367",
+   "size_bytes": 1259505,
+   "source_kind": "upload"
+  },
+  {
+   "asset_id": "01a0c4ab-3765-7e10-8d0a-705390c6560d",
+   "evidence_id": "01a0c4a2-2a41-77a1-9757-f0c1ae5c7cf4",
+   "media_type": "text/plain",
+   "original_filename": "transcript.txt",
+   "sha256": "6b70acf5391c3aef732feff1813d9f94b997f7721bcc49d90e118490763b5595",
+   "size_bytes": 873,
+   "source_kind": "transcript"
+  },
+  {
+   "asset_id": "01a0c4ab-3765-7e10-8d0a-705390c6560d",
+   "evidence_id": "01a0c4a2-2a42-72b3-8131-e392ced98263",
+   "media_type": "text/plain",
+   "original_filename": "transcript.txt",
+   "sha256": "c81455960e46c0db5c95966718d5905ce6eb42b2ca0e15ee5476dfd93b2989be",
+   "size_bytes": 99,
+   "source_kind": "transcript"
+  },
+  {
+   "asset_id": "01a0c4ab-3765-7e10-8d0a-705390c6560d",
+   "evidence_id": "01a15fdc-f5b6-7f31-9008-2f8d89be8813",
+   "media_type": "image/jpeg",
+   "original_filename": "scene-render-google-gemini-3.1-flash-image.jpg",
+   "sha256": "ce4794a2b7422746ed541d503e61eeb9c23095485794d33c78735fe382c9e7b0",
+   "size_bytes": 731496,
+   "source_kind": "scene_render"
+  },
+  {
+   "asset_id": "01a0c4ab-3765-7e10-8d0a-705390c6560d",
+   "evidence_id": "01a15ff5-11e3-7243-99a6-9eeb9bbe1e09",
+   "media_type": "image/jpeg",
+   "original_filename": "scene-render-google-gemini-3.1-flash-image.jpg",
+   "sha256": "f3d56bfb33a2df27e3079d1fc61735eac0292b5be60f656c6c03255ba7a5cae3",
+   "size_bytes": 664184,
+   "source_kind": "scene_render"
+  }
+ ],
+ "before_table_counts": {
+  "asset_evidence": 17,
+  "audit_event": 94,
+  "evidence": 21,
+  "provider_call": 33,
+  "provider_call_known_cost": 0.025178174999999997,
+  "provider_call_null_cost": 5
+ },
+ "delete_rowcount": 1,
+ "deleted_pair": {
+  "asset_id": "01a0c4ab-3765-7e10-8d0a-705390c6560d",
+  "evidence_id": "01a15fdc-f5b6-7f31-9008-2f8d89be8813"
+ },
+ "timestamp": "2026-10-21T20:12:05.360136+00:00"
+}

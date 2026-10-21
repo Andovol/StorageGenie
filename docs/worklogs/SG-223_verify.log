@@ -1,0 +1,10 @@
+[2026-10-21T20:11:56.452224+00:00] SG-223 mode=verify image_model=google/gemini-3.1-flash-image transport=image_api evidence_dir=/evidence
+table_counts={'evidence': 21, 'provider_call': 33, 'audit_event': 94, 'asset_evidence': 17, 'provider_call_null_cost': 5, 'provider_call_known_cost': 0.025178174999999997}
+link_counts={'total': 17, 'wrong_pair_rows': 1, 'wrong_render_link_rows': 1, 'sg220_render_link_rows': 1}
+photo leg=costita evidence=01a0c4a1-ad90-78e1-9c17-10d92260fd0e asset=01a0c4ab-3765-7e10-8d0a-705390c6560d sha256=f9d71a40b1c5ac455fe568576c77b042abc4755c65dce99a9dfcb25f64a8f367 bytes=1259505 ref_sha256=254a91f75d7cf8acbd6ee6defc13b95436fed4414ba7a05be0cd95752a2c964a
+photo leg=miso evidence=01a0c4a0-af88-7903-a070-a44e7b120712 asset=01a0c4aa-8b62-7360-b11e-a476ddaea0f6 sha256=71901cac327fdd76926e36aa2a7889b2b17fb4e2619ca92d97f86d53aac0de63 bytes=1280694 ref_sha256=d07bd5bd3240d4de95baf6709590571b63661c914ef523040178bebc8cd5111e
+frozen_brief='Restage this packaged product on a clean kitchen counter in warm natural daylight; keep the package, its label and its printed text exactly as photographed.'
+cutout_brief='Isolate this packaged product on a plain seamless white background, front-facing, even studio lighting; the full package with its label and printed text exactly as photographed; no props, no scene, no shadow, no hands.'
+pilot_cutoff=2026-10-21 00:00:00 rendered=3 billed_sends=3 rows=[{'id': '01a15f6f-13c4-75a3-8123-00142db2ba42', 'cost': 0.0, 'error_state': None, 'created_at': '2026-10-21 17:07:57'}, {'id': '01a15fdc-f5be-7941-b46b-e9773349ec4c', 'cost': 0.0, 'error_state': None, 'created_at': '2026-10-21 19:07:58'}, {'id': '01a15ff5-11ec-7770-8143-8cc825a1a13d', 'cost': 0.0, 'error_state': None, 'created_at': '2026-10-21 19:34:18'}]
+scene_spend known=0.012437125 unknown=5 owner_today=0.204669000 owner_month=0.217106125
+[2026-10-21T20:11:56.502736+00:00] wrote /evidence/SG-223_verify.json
