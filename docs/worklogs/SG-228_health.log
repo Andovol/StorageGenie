@@ -1,0 +1,6 @@
+SG-228 health (read-only) 2026-10-22T18:01:55Z epoch=1792692115
+start 2026-10-22T18:00:48Z: {"status":"ok","db":"ok","storage":"ok"} http=200
+mid   2026-10-22T18:00:55Z: {"status":"ok","db":"ok","storage":"ok"} http=200
+end   2026-10-22T18:01:55Z: {"status":"ok","db":"ok","storage":"ok"} http=200
+container_end=f419758d5dfb241438a62d110faa6bc83c147881456e334a913cc561d58fa995 running healthy restarts=0 started=2026-10-21T19:55:22.360576491Z
+END health 2026-10-22T18:01:56Z

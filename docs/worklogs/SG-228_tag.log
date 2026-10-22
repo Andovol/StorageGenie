@@ -1,0 +1,26 @@
+SG-228 tag operations 2026-10-22T18:01:42Z
+verified_HEAD=634db9872b0e358d3dfe474e6911103fbbc5e078
+--- absent check before creation
+local=ABSENT
+remote_refs=0
+--- create annotated tag
+exit=0
+tag_object=678bbf62e57e350ce4523fb996ed70892eecfbfc
+tag_type=tag
+tag_target=634db9872b0e358d3dfe474e6911103fbbc5e078
+tag_points_at_verified_HEAD=release-2026-10-21 
+--- cat-file
+object 634db9872b0e358d3dfe474e6911103fbbc5e078
+type commit
+tag release-2026-10-21
+tagger Andrei P <popescu.m.andrei@gmail.com> 1792692103 +0000
+
+release-2026-10-21: SG-221 drawer surfacing (Evidence.source_kind + Scene tab) served by SG-222. Verified live 2026-10-22: container f419758d, image d6c6a106, index 345bbe8c, JS 43c05c51 (321283 B), CSS c3b58cda, DB alembic 20260924_sg114_relation (asset_evidence 20; 6 scene_render links). D-22 close-release SG-228.
+--- push tag
+To github.com:Andovol/StorageGenie.git
+ * [new tag]         release-2026-10-21 -> release-2026-10-21
+push_exit=0
+--- ls-remote read-back
+678bbf62e57e350ce4523fb996ed70892eecfbfc	refs/tags/release-2026-10-21
+634db9872b0e358d3dfe474e6911103fbbc5e078	refs/tags/release-2026-10-21^{}
+END tag 2026-10-22T18:01:48Z
