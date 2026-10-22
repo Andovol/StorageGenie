@@ -1,0 +1,108 @@
+SG-228 G1 live re-read (read-only; zero writes; no restart)
+utc=2026-10-22T18:00:48Z epoch=1792692048
+lane_start=Thu Oct 22 18:00:08 2026
+git_requested=automation
+git_resolved=634db9872b0e358d3dfe474e6911103fbbc5e078
+git_origin_automation=634db9872b0e358d3dfe474e6911103fbbc5e078
+worktree_porcelain_lines=0
+--- health start
+{"status":"ok","db":"ok","storage":"ok"}
+http=200
+--- served index
+http=200 size=944
+served_js_path=/assets/index-DGAIzmTn.js
+served_css_path=/assets/index-C07VbG0m.css
+http=200 size=321283
+http=200 size=4535
+345bbe8c3601e631c2a9d767f8688a1df20b7980d1fea8640d9f8bc2ffca5aa8  /tmp/opencode/SG-228/served/index.html
+43c05c518c08d2b59cc2fbe54846519ec03aa03352bf3c2e2a09635f1efb054c  /tmp/opencode/SG-228/served/app.js
+c3b58cda696a22970fc2a4a348849fc1359f2105f80f81304ed5dfd5ca31a557  /tmp/opencode/SG-228/served/app.css
+944 /tmp/opencode/SG-228/served/index.html
+321283 /tmp/opencode/SG-228/served/app.js
+4535 /tmp/opencode/SG-228/served/app.css
+--- served bundle markers
+scene-image=1
+scene_render=1
+scene-honest-state=1
+Generate Context Scene=1
+Source Photo=1
+storagegenie.dynv6.net=7
+localhost:8003=0
+--- compiled scene branch context
+],Yt=lt?`https://storagegenie.dynv6.net/v1/evidence/${lt.id}/file?household_id=${t}`:null,Xt=P.find(F=>F.source_kind==="scene_render"),I=Xt?`https://storagegenie.dynv6.net/v1/evidence/${Xt.id}/file?household_id=${t}`:null,M=E0(T),A=b0(T,"description"),K=A?C0(A.value):null,Z=()=>{const F=ie.find(je=>je.toLowerCase()===f.trim().toLowerCase()),G={display_name:u.trim(),asset_type:F??f.trim()};
+--- SPA routes
+GET / http=200 345bbe8c3601e631c2a9d767f8688a1df20b7980d1fea8640d9f8bc2ffca5aa8
+GET /inbox http=200 345bbe8c3601e631c2a9d767f8688a1df20b7980d1fea8640d9f8bc2ffca5aa8
+GET /analytics http=200 345bbe8c3601e631c2a9d767f8688a1df20b7980d1fea8640d9f8bc2ffca5aa8
+GET /planning http=200 345bbe8c3601e631c2a9d767f8688a1df20b7980d1fea8640d9f8bc2ffca5aa8
+--- API control
+GET /v1/households http=200 size=144
+6921583771fb79bec868339653a91050d1163430ed19fa0e96268522adf8038f  /tmp/opencode/SG-228/served/households.json
+--- asset routes (pilot + bulk)
+GET /v1/assets/01a0c4aa-8b62-7360-b11e-a476ddaea0f6?household_id=01a0a029-1477-7ca0-b200-bce78a96c679 http=200 size=4100
+GET /v1/assets/01a0c4ab-3765-7e10-8d0a-705390c6560d?household_id=01a0a029-1477-7ca0-b200-bce78a96c679 http=200 size=5436
+GET /v1/assets/01a0a467-eb0e-7b83-a227-af122dc9268b?household_id=01a0a029-1477-7ca0-b200-bce78a96c679 http=200 size=2711
+GET /v1/assets/01a0c47f-fbb3-7db1-b6f3-aa52d20aa6a0?household_id=01a0a029-1477-7ca0-b200-bce78a96c679 http=200 size=4139
+GET /v1/assets/01a0c481-720e-7923-ad6c-bee45caba30f?household_id=01a0a029-1477-7ca0-b200-bce78a96c679 http=200 size=4239
+GET /v1/assets/01a131ae-7a0c-7363-91c8-cfef6bd1faa3?household_id=01a0a029-1477-7ca0-b200-bce78a96c679 http=200 size=4200
+01a0a467-eb0e-7b83-a227-af122dc9268b None scene_render_links= [('01a1605c-2829-74e0-b628-98574f4711fb', 'scene_render', '076276a58ebc1f84a50740e162ae47fd2d581e57459ff0d3bf144a1d8fcdede0', 'image/jpeg', 531826)]
+01a0c47f-fbb3-7db1-b6f3-aa52d20aa6a0 None scene_render_links= [('01a1605c-4aa9-74f3-8bf3-f15c6c72bbe5', 'scene_render', '2ff0fd948a23bdf5bca838db7f55cd8da2b5c483244eaff96bf7293975b8fd3b', 'image/jpeg', 589030)]
+01a0c481-720e-7923-ad6c-bee45caba30f None scene_render_links= [('01a1605c-6f0f-7eb3-abff-56343649ea24', 'scene_render', '5c3076942bd7d059f84da9f48df00015715d4195beaee315dde431fd43730f48', 'image/jpeg', 503143)]
+01a0c4aa-8b62-7360-b11e-a476ddaea0f6 None scene_render_links= [('01a15f6f-13ba-76e0-9238-acd5883c65f1', 'scene_render', '41d619db9f6950762cb54053dfb5f9050711bb662bb0cba5119a9225f8738f7b', 'image/jpeg', 703036)]
+01a0c4ab-3765-7e10-8d0a-705390c6560d None scene_render_links= [('01a15ff5-11e3-7243-99a6-9eeb9bbe1e09', 'scene_render', 'f3d56bfb33a2df27e3079d1fc61735eac0292b5be60f656c6c03255ba7a5cae3', 'image/jpeg', 664184)]
+01a131ae-7a0c-7363-91c8-cfef6bd1faa3 None scene_render_links= [('01a1605c-8fc7-7043-837b-1e1633576d15', 'scene_render', '70f495b97ffa8261f1365adcedf679d6349e5d2f98d3079837d09fdf65de3a7d', 'image/jpeg', 546385)]
+--- render file GETs
+GET /v1/evidence/01a15f6f-13ba-76e0-9238-acd5883c65f1/file http=200 size=703036 type=image/jpeg
+GET /v1/evidence/01a15fdc-f5b6-7f31-9008-2f8d89be8813/file http=200 size=731496 type=image/jpeg
+GET /v1/evidence/01a15ff5-11e3-7243-99a6-9eeb9bbe1e09/file http=200 size=664184 type=image/jpeg
+GET /v1/evidence/01a1605c-2829-74e0-b628-98574f4711fb/file http=200 size=531826 type=image/jpeg
+GET /v1/evidence/01a1605c-4aa9-74f3-8bf3-f15c6c72bbe5/file http=200 size=589030 type=image/jpeg
+GET /v1/evidence/01a1605c-6f0f-7eb3-abff-56343649ea24/file http=200 size=503143 type=image/jpeg
+GET /v1/evidence/01a1605c-8fc7-7043-837b-1e1633576d15/file http=200 size=546385 type=image/jpeg
+41d619db9f6950762cb54053dfb5f9050711bb662bb0cba5119a9225f8738f7b  /tmp/opencode/SG-228/served/render_01a15f6f-13ba-76e0-9238-acd5883c65f1.bin
+ce4794a2b7422746ed541d503e61eeb9c23095485794d33c78735fe382c9e7b0  /tmp/opencode/SG-228/served/render_01a15fdc-f5b6-7f31-9008-2f8d89be8813.bin
+f3d56bfb33a2df27e3079d1fc61735eac0292b5be60f656c6c03255ba7a5cae3  /tmp/opencode/SG-228/served/render_01a15ff5-11e3-7243-99a6-9eeb9bbe1e09.bin
+076276a58ebc1f84a50740e162ae47fd2d581e57459ff0d3bf144a1d8fcdede0  /tmp/opencode/SG-228/served/render_01a1605c-2829-74e0-b628-98574f4711fb.bin
+2ff0fd948a23bdf5bca838db7f55cd8da2b5c483244eaff96bf7293975b8fd3b  /tmp/opencode/SG-228/served/render_01a1605c-4aa9-74f3-8bf3-f15c6c72bbe5.bin
+5c3076942bd7d059f84da9f48df00015715d4195beaee315dde431fd43730f48  /tmp/opencode/SG-228/served/render_01a1605c-6f0f-7eb3-abff-56343649ea24.bin
+70f495b97ffa8261f1365adcedf679d6349e5d2f98d3079837d09fdf65de3a7d  /tmp/opencode/SG-228/served/render_01a1605c-8fc7-7043-837b-1e1633576d15.bin
+--- health end
+{"status":"ok","db":"ok","storage":"ok"}
+http=200
+END live 2026-10-22T18:00:49Z
+--- DB read-only probes (2026-10-22T18:00:55Z)
+be86d23cdd051dd59429804e5a906d0f7e3d254cf44ddf80da84bce2405404b6  data/db/storagegenie.db
+cb46d5f5faf657124c5d88362b4d746d42e8c30a776e3dffb31aeb26c42242f6  data/db/storagegenie.db-wal
+478465c47d5f4a10161d61adf3b5e3cb97ddc59c4faee1a3cadf3d58f1cec1aa  data/db/storagegenie.db-shm
+688128 data/db/storagegenie.db
+453232 data/db/storagegenie.db-wal
+32768 data/db/storagegenie.db-shm
+tables=28
+alembic_head=20260924_sg114_relation
+asset_evidence=20
+evidence=27
+provider_call=39
+provider_call_null_cost=0
+provider_call_known_cost=0.025178175
+scene_render_evidence=10
+scene_render_links=6
+--- link rows (joined)
+asset_id                              display_name                                            evidence_id                           source_kind   sha256                                                            size_bytes  created_at         
+------------------------------------  ------------------------------------------------------  ------------------------------------  ------------  ----------------------------------------------------------------  ----------  -------------------
+01a0c4aa-8b62-7360-b11e-a476ddaea0f6  Miso Soup                                               01a15f6f-13ba-76e0-9238-acd5883c65f1  scene_render  41d619db9f6950762cb54053dfb5f9050711bb662bb0cba5119a9225f8738f7b  703036      2026-10-21 19:48:05
+01a0c4ab-3765-7e10-8d0a-705390c6560d  Costiță de porc                                         01a15ff5-11e3-7243-99a6-9eeb9bbe1e09  scene_render  f3d56bfb33a2df27e3079d1fc61735eac0292b5be60f656c6c03255ba7a5cae3  664184      2026-10-21 19:48:05
+01a0a467-eb0e-7b83-a227-af122dc9268b  Toothpaste                                              01a1605c-2829-74e0-b628-98574f4711fb  scene_render  076276a58ebc1f84a50740e162ae47fd2d581e57459ff0d3bf144a1d8fcdede0  531826      2026-10-21 21:32:47
+01a0c47f-fbb3-7db1-b6f3-aa52d20aa6a0  UHT Lapte 3,5% grăsime                                  01a1605c-4aa9-74f3-8bf3-f15c6c72bbe5  scene_render  2ff0fd948a23bdf5bca838db7f55cd8da2b5c483244eaff96bf7293975b8fd3b  589030      2026-10-21 21:32:49
+01a0c481-720e-7923-ad6c-bee45caba30f  Milbona Parmigiano Reggiano Italian hard cheese flakes  01a1605c-6f0f-7eb3-abff-56343649ea24  scene_render  5c3076942bd7d059f84da9f48df00015715d4195beaee315dde431fd43730f48  503143      2026-10-21 21:32:50
+01a131ae-7a0c-7363-91c8-cfef6bd1faa3  TRACHISAN comprimate de supt                            01a1605c-8fc7-7043-837b-1e1633576d15  scene_render  70f495b97ffa8261f1365adcedf679d6349e5d2f98d3079837d09fdf65de3a7d  546385      2026-10-21 21:32:51
+--- orphan scene_render evidence (unlinked)
+id                                    created_at           size_bytes
+------------------------------------  -------------------  ----------
+01a13137-fe76-7f32-afc1-9e80421351b8  2026-10-12 17:45:15  256612    
+01a15fdc-f5b6-7f31-9008-2f8d89be8813  2026-10-21 19:07:58  731496    
+01a16018-3ea8-7c03-b843-4029f85bacdb  2026-10-21 20:12:44  653722    
+01a16048-2602-7f80-9f0c-40f21202a724  2026-10-21 21:05:03  479144    
+--- health post-DB
+{"status":"ok","db":"ok","storage":"ok"}
+http=200
+END db 2026-10-22T18:00:55Z epoch=1792692055

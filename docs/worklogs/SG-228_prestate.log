@@ -1,0 +1,41 @@
+SG-228 prestate (read-only) captured 2026-10-22T18:01:04Z epoch=1792692064
+--- git
+requested_ref=automation
+resolved_commit=634db9872b0e358d3dfe474e6911103fbbc5e078
+origin_automation=634db9872b0e358d3dfe474e6911103fbbc5e078
+head_subject=SG-227 audit + rating 98 (SG-226 work re-verified, late receipt published)
+worktree_porcelain=0 lines
+local_tags:
+release-2026-10-17
+release-2026-10-17-sg212
+remote_tags:
+6fec36da39b54468ef054cf5600101afb698b19c refs/tags/release-2026-10-17
+394e4e75fa585b00c81d3fae708515fb536247fe refs/tags/release-2026-10-17^{}
+e740c0cda4c33f0a7a49c7eeae441b6d9224d38d refs/tags/release-2026-10-17-sg212
+e1a508acdb3e591459064cf7ee448affed51eb58 refs/tags/release-2026-10-17-sg212^{}
+tag_release_2026_10_21_local=ABSENT
+tag_release_2026_10_21_remote=0 refs
+--- lane
+srw-rw---T 1 andrei 100987 0 Oct 16 17:19 /run/dispatch-storagegenie-SG-228/docker.sock
+RUN_BUDGET_S=2100
+--- container (lane socket; read-only inspect)
+Id=f419758d5dfb241438a62d110faa6bc83c147881456e334a913cc561d58fa995 Created=2026-10-21T19:55:20.498187489Z Image=sha256:d6c6a106176f0ea954d4ad47a26a8e389033146e2647c3ab60ff7713741b8865 RestartCount=0 State=running Health=healthy StartedAt=2026-10-21T19:55:22.360576491Z
+--- image (lane socket)
+Id=sha256:d6c6a106176f0ea954d4ad47a26a8e389033146e2647c3ab60ff7713741b8865 Created=2026-10-21T19:55:06.320582092Z RepoTags=[storagegenie-backend:latest]
+--- product delta (served image source d221db0..verified HEAD)
+runtime_surface backend/app+frontend/src:
+(empty = zero lines)
+product_tree_excluding_lane_scripts (backend minus scripts, frontend minus src):
+(empty = zero lines)
+all_commits_since_served_source:
+32
+634db98 SG-227 audit + rating 98 (SG-226 work re-verified, late receipt published)
+893b945 SG-227 receipt: notes-ref published on work HEAD 3736898 + mapped read-back transcript
+3736898 SG-227: verify SG-226 work live + publish late SG-226 receipt note + transcript
+1b74cdc SG-226 audit + rating 98 (4/4 linked live, killed 1s over budget); SG-227 recovery + SG-228 release packets
+cb9734a SG-226 G3: links for four faithful renders + live surface + report
+full diff stat since served source (top):
+ docs/worklogs/SG-227_report.md                     |   74 ++
+ docs/worklogs/SG-227_secret_grep.log               |   24 +
+ 200 files changed, 13136 insertions(+), 4 deletions(-)
+END prestate 2026-10-22T18:01:07Z
