@@ -26,7 +26,7 @@ LANE: Runner `bash /usr/local/lib/dispatch/run-coder SG-228` started 18:00:06Z; 
 - **External / production effects (CO-85):** the tag push `refs/tags/release-2026-10-21` → origin (the outward act D-22 approves). No deploy, no build, no recreate, no restart, zero DB writes, zero provider calls, $0.
 - **Durations (CO-79, UTC, epochs printed):** lane start 18:00:06Z; report reading 18:01:56Z epoch 1792692116 → **108 s** vs ≈300 s (`G-A9` uncalibrated; under, stated). Phases: orientation + contract/precedent reads + lane/git prestate 18:00:08→18:00:48 (~40 s); live served/asset/render reads 18:00:48→18:00:49 (~1 s); DB probes + health 18:00:55 (~1 s); record drafting + scope/secret gates + work commit + push 18:00:55→18:01:31; tag create/push/read-back 18:01:42→18:01:48; health end 18:01:55; report drafting remainder.
 - **Counts (CO-80 units):** retry 0; test-command count 0 (no product/test bytes — read-only attestation, `CO-25` needs no product failure — stated); docker build issuances 0; docker recreate issuances 0; provider-call count 0; GETs: 4 health + 3 served assets + 4 SPA routes + 1 API control + 6 asset routes + 7 render files = 25, all 200. Highest-impact action: the tag push.
-- **Scope ceiling:** work commit = `docs/releases/2026-10-21.md` + `docs/worklogs/SG-228_{prestate,live,scope,secret_grep}.log`; report commit adds `SG-228_report.md` + `SG-228_tag.log` + `SG-228_health.log`; receipt commit adds `SG-228_receipt.log`. Zero product/config/test/lockfile/schema/migration bytes; no restart; no secret in any artifact (gate rc=1, below).
+- **Scope ceiling:** work commit = `docs/releases/2026-10-21.md` + `docs/worklogs/SG-228_{prestate,live,scope,secret_grep}.log`; report commit adds `SG-228_report.md` + `SG-228_tag.log` + `SG-228_health.log`; receipt commit adds `SG-228_receipt.log`; a final docs-only gate commit adds `SG-228_final_gate.log` (re-run secret scan over the record + all evidence, rc=1). Zero product/config/test/lockfile/schema/migration bytes; no restart; no secret in any artifact (gate rc=1, below).
 
 ## (c) VERIFICATION
 
@@ -57,7 +57,7 @@ Served controls: `Generate Context Scene` 1, `Source Photo` 1, `storagegenie.dyn
 
 **A3 — report, elapsed, constraints, FIRST/DURING/REMAINING:** this file; elapsed 108 s vs ≈300 s (b); constraint lines below; first token `SG-228`; FIRST/DURING/REMAINING at the end.
 
-**A4 — receipt (published after this report's commit):** note on `refs/notes/storagegenie-coder-reports`, FIRST line exactly `Dispatch-ID: SG-228 | Report: docs/worklogs/SG-228_report.md`, `Work-HEAD` recorded, pushed + mapped-fetch read-back; verbatim transcript committed as `docs/worklogs/SG-228_receipt.log`; never the retired finalizer.
+**A4 — receipt (published after this report's commit):** note on `refs/notes/storagegenie-coder-reports`, FIRST line exactly `Dispatch-ID: SG-228 | Report: docs/worklogs/SG-228_report.md`, `Work-HEAD` recorded, pushed + mapped-fetch read-back; verbatim transcript committed as `docs/worklogs/SG-228_receipt.log`; a docs-only final gate commit (`SG-228_final_gate.log`) follows the receipt log; never the retired finalizer.
 
 **PB-3 vacuity:** non-vacuous — the tag could only be created after the served values, the DB inventory and the marker counts were read live and matched; the tag object (`678bbf62…` → `634db98…`) is independently observable locally and on origin; the record names exact shas; no criterion passes on an empty poststate.
 
