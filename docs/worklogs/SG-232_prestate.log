@@ -1,0 +1,165 @@
+SG-232 prestate (read-only) utc=2026-10-23T13:41:39Z epoch=1792762899
+--- identity PB-4 (/proc/2090088/cmdline) ---
+opencode run --auto --dir /home/andrei/StorageGenie --model opencode-go/deepseek-v4.1-flash --variant max # SG-232 — Standing close-deploy rider, retry (root-cause fix for F-SG231-1; re-proof, no product delta expected)
+
+`PB-1`–`PB-6` bind (`CODER.md` §14).
+**BASE REF: automation.** Echo requested ref and actual resolved commit separately.
+**DATABASE: production SQLite read-only.** No schema migration or application data write.
+**Restart: exactly one backend rebuild + one recreate.**
+**Autonomy: L2 (the one retry).** Production authorization basis: standing owner directive 2026-09-28 (`G-O4`; `AGENTS.md` Close-out row) + SG-231 audit (retry owned by Architect; fault was the Coder's first call, not the packet). Dispatch settings ride the trigger, never this packet. No product repair is implemented here.
+
+Authoring date (metadata, never a gate): 2026-10-23.
+
+## Why this exists
+
+SG-231 stopped before the build: its first docker call ran without `DOCKER_HOST` (F-SG231-1, self-inflicted, `PB-2` STOP correctly honored — audit `SG-231_audit.md`, rated 90). Zero rebuilds/recreates, zero production effect; pre-state re-confirmed live==tree read-only (served bundle == SG-222/SG-228, health green, DB unchanged). The standing close-deploy remains owed. This is the L2 retry with 
+
+Verify the merged-vs-served product diff is EXPECTED empty at runtime (`backend/app` + `frontend/src` — SG-231 measured 0 lines) — report the actual diff; any runtime product change is served and named exactly, a diff outside the served paths is STOP. Named premises carried from SG-231 (do not re-litigate, verify on target): (a) non-runtime delta = `STATE.md` + four non-imported `backend/scrip
+
+Expected recorded/published/host contract 0.50.0; previous host echo from `SG-231_report.md:7` (host copy, 0.50.0). Echo version/source and report differences.
+
+Waste cut: SG-231 audit names `slowest_waste = none`. Full suite waived per `PG-DP-02` with substitute below (read-only post-recreate verification; zero product bytes change).
+
+## G0 — Socket first (root-cause fix for F-SG231-1; runs before anything Docker)
+
+Print the lane socket from YOUR unit's own process environment, `export DOCKER_HOST` to it, then prove the server line with `docker version` (the server section must answer — a client-only block is NOT proof). No `docker` invocation of any kind — not `version`, not `compose`, not a probe — before the export. A second default-endpoint call is the SG-231 repeat and STOPS the slice again (`PB-2
+
+## G1 — Pre-state, one rebuild, one recreate — lane socket only
+
+Establish read-only pre-state: actual ref/hash, clean tree, running image/container ID/Created/RestartCount, health status/body, served JS/CSS/index hashes (EXPECTED index `345bbe8c…`, JS `43c05c51…`, CSS `c3b58cda…` per SG-231 — re-read, do not trust), schema head and authoritative table counts (`PG-EV-08`: capture the production observable before AND after).
+
+Then, through the lane socket only: build the backend image exactly once, then recreate the backend container exactly once (`PG-PR-04`). No host config changes. Second build/recreate issuance is STOP.
+
+## G2 — Verify the serve, without claiming more
+
+Observe a new container identity and start time (ID/Created, not RestartCount). Health ok for DB/storage; six health GETs as the standing precedent. Re-read hashes, schema and table counts; require no migration and no slice-caused row change. Owner-activity deltas get direct discriminating evidence, never hidden.
+
+Suite stays waived per `PG-DP-02`; substitute is post-recreate read-only identity/health/schema/counts/pages/preflight verification. Walk the shell routes read-only (`/`, `/catalog`, `/inbox`, one Scene-tab page). No writes; no paid calls. Application provider spend prohibited.
+
+## Constraints
+
+Scope: `docs/worklogs/SG-232*` only. No product/config/schema/migration/test edits. No production INSERT/UPDATE/DELETE, imports or evidence-store mutation. Reads are git / lane-socket docker / curl GETs / read-only SQLite; only executed runtimes are the G0-verified build and recreate (`PG-IC-01`). Reads/verification ≤120 s per command, build ≤600 s (inherited precedent); visible timeout findin
+
+## Acceptance and report
+
+- A1: G0 proven (export + server line) BEFORE any other docker call; one rebuild + one recreate THROUGH THE LANE SOCKET; new running-instance proof; health green; explicit deltas (EXPECTED none); bundle hashes recorded (SAME-as-before only with byte-identical-build reason).
+- A2: base/hash echoed separately; merged-vs-served diff checked (EXPECTED runtime-empty); named premises (a)(b) verified; work diff only SG-232 namespace.
+- A3: command logs + report `docs/worklogs/SG-232_report.md`; elapsed per leg vs lane bound; constraints answered; FIRST/DURING/REMAINING dispositioned. First token SG-232.
+- A4: notes-ref receipt `refs/notes/storagegenie-coder-reports`, first line `Dispatch-ID: SG-232 | Report: docs/worklogs/SG-232_report.md`, Work-HEAD recorded, push + mapped read-back. Bound lane receipt only.
+
+Guards invoked: PG-EV-02/03/08; PG-IC-01/07; PG-DP-01/02; PG-PR-03/04/06/10. Stop follows `PB-6`. 
+
+--- lane ---
+lane MainPID=2089932
+lane ExecMainStartTimestamp=Fri 2026-10-23 13:40:16 UTC
+lane ActiveState=activating
+RUN_BUDGET_S=2100 source=/etc/dispatch/storagegenie.conf
+--- git ---
+requested_ref=automation
+head=0e2c41e631f181b25521d2892d92daf22bded52c
+origin_automation=0e2c41e631f181b25521d2892d92daf22bded52c
+branch=automation
+worktree_porcelain_at_this_read:
+?? docs/worklogs/SG-232_g0.log
+?? docs/worklogs/SG-232_prestate.log
+--- contract ---
+**Contract version: 0.50.0** — **echo this line verbatim in your receipt.** It is the only proof that you
+VERSION=0.50.0
+G-L1 UNCHECKED the cache is not checked out at a contract tag: /home/andrei/storagegenie-contract
+G-L5 UNCHECKED gh-unauthenticated
+G-L7 UNCHECKED gh-unauthenticated
+G-L6 BYTES /home/andrei/.codex/AGENTS.md 2275
+G-L6 BYTES /home/andrei/.config/opencode/AGENTS.md 1933
+G-L6 BYTES total[codex]=2275 unseen=architect-layer,state-file,other-ritual-files
+G-L6 BYTES total[opencode]=1933 unseen=architect-layer,state-file,other-ritual-files
+rules_check_rc=3
+repo_rules_cache=absent
+--- docker pre-state (lane socket) ---
+NAME                      IMAGE                   COMMAND                  SERVICE    CREATED        STATUS                   PORTS
+storagegenie-backend-1    storagegenie-backend    "uvicorn app.main:ap…"   backend    42 hours ago   Up 42 hours (healthy)    127.0.0.1:8003->8000/tcp
+storagegenie-frontend-1   storagegenie-frontend   "docker-entrypoint.s…"   frontend   5 weeks ago    Exited (0) 5 weeks ago   
+compose_ps_rc=0
+backend_container_query=f419758d5dfb241438a62d110faa6bc83c147881456e334a913cc561d58fa995
+container_id=f419758d5dfb241438a62d110faa6bc83c147881456e334a913cc561d58fa995 created=2026-10-21T19:55:20.498187489Z image=sha256:d6c6a106176f0ea954d4ad47a26a8e389033146e2647c3ab60ff7713741b8865 config_image=storagegenie-backend started=2026-10-21T19:55:22.360576491Z status=running health=healthy restartcount=0 restartpolicy=unless-stopped
+inspect_rc=0
+image_id=sha256:d6c6a106176f0ea954d4ad47a26a8e389033146e2647c3ab60ff7713741b8865 created=2026-10-21T19:55:06.320582092Z tags=[storagegenie-backend:latest] compose_project=storagegenie compose_service=backend compose_config_hash=<no value>
+image_inspect_rc=0
+CONTAINER                REPOSITORY             TAG                 PLATFORM            IMAGE ID            SIZE                CREATED
+storagegenie-backend-1   storagegenie-backend   latest              linux/amd64         d6c6a106176f        213MB               42 hours ago
+compose_images_rc=0
+--- health (read-only GET) ---
+{"status":"ok","db":"ok","storage":"ok"}
+http=200
+health_rc=0
+--- served bundle (read-only GETs) ---
+index_http=200 size=944
+/assets/index-C07VbG0m.css
+/assets/index-DGAIzmTn.js
+/assets/index-C07VbG0m.css http=200 size=4535
+/assets/index-DGAIzmTn.js http=200 size=321283
+345bbe8c3601e631c2a9d767f8688a1df20b7980d1fea8640d9f8bc2ffca5aa8  /tmp/opencode/SG-232/served-pre/index.html
+43c05c518c08d2b59cc2fbe54846519ec03aa03352bf3c2e2a09635f1efb054c  /tmp/opencode/SG-232/served-pre/index-DGAIzmTn.js
+c3b58cda696a22970fc2a4a348849fc1359f2105f80f81304ed5dfd5ca31a557  /tmp/opencode/SG-232/served-pre/index-C07VbG0m.css
+--- production SQLite (read-only; resolved store /home/andrei/StorageGenie/data/db/storagegenie.db from compose bind ./data/db) ---
+be86d23cdd051dd59429804e5a906d0f7e3d254cf44ddf80da84bce2405404b6  data/db/storagegenie.db
+cb46d5f5faf657124c5d88362b4d746d42e8c30a776e3dffb31aeb26c42242f6  data/db/storagegenie.db-wal
+478465c47d5f4a10161d61adf3b5e3cb97ddc59c4faee1a3cadf3d58f1cec1aa  data/db/storagegenie.db-shm
+data/db/storagegenie.db 688128
+data/db/storagegenie.db-wal 453232
+data/db/storagegenie.db-shm 32768
+alembic_head=20260924_sg114_relation
+table_count=28
+--- per-table counts ---
+alembic_version=1
+assertion=37
+asset=7
+asset_evidence=20
+asset_fts=7
+asset_fts_config=1
+asset_fts_data=9
+asset_fts_docsize=7
+asset_fts_idx=7
+asset_location=1
+asset_relation=1
+audit_event=100
+candidate=10
+enrich_snapshot=4
+evidence=27
+guardrail_event=2
+household=1
+idempotency_key=11
+job=11
+job_step=72
+location=1
+observation=20
+planning_suggestion=0
+provider_call=39
+review_task=8
+saved_search=0
+source_attribution=0
+user=2
+db_read_rc=0
+--- merged-vs-served diff (served source d221db0 per SG-222 report) ---
+runtime_numstat:
+runtime_name_status_count=0
+non_docs_changed:
+M	STATE.md
+A	backend/scripts/sg223_render.py
+A	backend/scripts/sg224_classify.py
+A	backend/scripts/sg225_cutout.py
+A	backend/scripts/sg226_bulk_scene.py
+--- scripts imported by app? (expect none) ---
+scripts_import_grep_rc=1 (1 = no match)
+--- Catalog route premise ---
+4:import { CatalogPage } from "./routes/CatalogPage";
+179:          <Route path="/" element={<CatalogPage />} />
+180:          <Route path="/capture" element={<CapturePage />} />
+181:          <Route path="/assets/:id" element={<AssetDetailPage />} />
+182:          <Route path="/settings" element={<SettingsPage />} />
+183:          <Route path="/inbox" element={<InboxPage />} />
+184:          <Route path="/planning" element={<PlanningPage />} />
+185:          <Route path="/chat" element={<ChatPage />} />
+186:          <Route path="/analytics" element={<AnalyticsPage />} />
+187:          <Route path="/expiry" element={<ExpiryPage />} />
+188:          <Route path="/review/:candidateId" element={<ReviewPage />} />
+utc_end=2026-10-23T13:41:40Z epoch_end=1792762900

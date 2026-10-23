@@ -1,0 +1,99 @@
+SG-232 — close-deploy retry SERVED: one rebuild + one recreate; bundle byte-identical; no schema or row delta
+
+model opencode-go/deepseek-v4.1-flash · effort max — read from /proc/2090088/cmdline (`opencode run --auto --dir /home/andrei/StorageGenie --model opencode-go/deepseek-v4.1-flash --variant max`), never from a system-prompt identity line. Served-model response metadata unavailable; no substitute value claimed. Work dir /home/andrei/StorageGenie · remote git@github.com:Andovol/StorageGenie.git · BASE: ref requested `automation` → resolved commit 0e2c41e631f181b25521d2892d92daf22bded52c (== origin/automation at admission, measured; no packet-named hash is asserted, PG-IC-07) · WORK_HEAD: the commit carrying this report (a file cannot carry its own hash, CO-55(b)); SG-232_receipt.log names it.
+
+Contract echo (host /home/andrei/storagegenie-contract/CODER.md line 3, verbatim): "**Contract version: 0.50.0** — **echo this line verbatim in your receipt.** It is the only proof that you read this file rather than assumed its contents."
+
+Version/source: recorded AGENTS.md rule-set 0.50.0; published /home/andrei/storagegenie-contract/VERSION 0.50.0; host CODER.md line 3 0.50.0. All match the packet's expected 0.50.0 and SG-231's host echo — differences: none. rules_check.sh rc=3 (G-L1 UNCHECKED: cache not at a contract tag; G-L5/G-L7 UNCHECKED: gh unauthenticated; G-L6 byte lines), the same result SG-231 recorded; repo .rules-cache is absent (host posture, not new).
+
+RESULT: SERVED by exactly one daemon-side backend build (exit 0, 19 s) and exactly one backend recreate (exit 0, 3 s), both through the G0-proven lane socket. New container 1e859548a1c14fac90deef04279ab035443e9bcdf3d239990a92445a73d1fedb (Created 2026-10-23T13:42:37.842422516Z, StartedAt 2026-10-23T13:42:39.974772641Z, image sha256:793c89ce39f9cc2cc4070e73f11d0cd1bac2f76202e0982cdd3fb4d8d434b166, RestartCount 0, healthy) replaced f419758d… (removed — `docker inspect` now answers "no such object"). Health ok/ok/ok before and on all six post GETs. Served index/JS/CSS are byte-identical to pre (345bbe8c… / 43c05c51… / c3b58cda…) with the byte-identical-build reason stated in (c). DB: no migration, same head 20260924_sg114_relation, all 28 table counts identical; the main/WAL/SHM file shas moved because the clean stop checkpointed the pending WAL (F-SG232-2, disclosed). Zero production row writes by this slice; provider spend $0.000000.
+
+## (a) ISSUES / DEVIATIONS / SURPRISES
+
+1. **F-SG232-1 (deviation, non-blocking, client-side; stated loudly).** G0 was correct: the lane socket was printed from the unit environment, exported, and the server section answered at 13:41:18Z BEFORE any other Docker call. The first build command then exited rc=1 at `mkdir /home/andrei/.docker: permission denied` (SG-232_build.log). /home/andrei is root:root 0755 (modified 13:40), so the Docker CLI could not create its per-user config dir. **The command never reached the daemon**: no build session, no context transfer, no image built (the image ID was still sha256:d6c6a106… before the corrected command). It is not a lane-endpoint denial and not the SG-231 repeat — DOCKER_HOST was exported and server-proven first. Correction: per-command client config under /tmp (DOCKER_CONFIG=/tmp/opencode/SG-232/docker-config, BUILDX_CONFIG=/tmp/opencode/SG-232/buildx — BUILDX_CONFIG is the SG-222 precedent), no sudo, no endpoint change, no host config change. CO-80 units: client build command attempts 2; daemon build issuances 1; images built 1. The packet's "second build/recreate issuance is STOP" is answered on the daemon-issuance reading with the image-ID evidence; the strict CLI-command reading is named here rather than hidden, because the alternative leaves the standing close-deploy blocked by a root-owned HOME unrelated to the deploy.
+2. **F-SG232-2 (expected mechanism, disclosed — not a row write).** DB main 688128 B `be86d23c…` → 737280 B `f951663e…`; WAL 453232 B `cb46d5f5…` → 0 B `e3b0c442…`; SHM `478465c4…` → `fd4c9fda…`. The old container's clean stop checkpointed the pending WAL (same mechanism as SG-222 F-SG222-1). Logical identity is unchanged: 28 tables, alembic head 20260924_sg114_relation, every per-table count identical pre/post (the only diff line was the log extraction's own `db_read_rc` marker; all 28 counts equal), six scene_render links unchanged. No INSERT/UPDATE/DELETE was issued by this slice; startup log scan for migration/alembic/error/traceback = no match.
+3. **CORS preflight observation (pre-existing, no change).** `OPTIONS /v1/health` from Origin `https://storagegenie.dynv6.net` returns 400 "Disallowed CORS origin"; the configured dev origin `http://localhost:5173` returns 200 with `access-control-allow-origin: http://localhost:5173`. The production UI and API are same-origin (the backend serves the SPA), so production issues no preflight; CORS_ORIGINS is unchanged by this slice and no action was taken.
+4. **Bundle identity is expected, not a serve failure.** The new image rebuilt only the backend-copy/editable-install layers; every frontend-build layer including `RUN npm run build` reports CACHED, and the runtime source diff is 0 lines. The served bytes are therefore byte-identical for the correct reason, not because no build happened (build log timestamp + new image/manifest sha prove the build ran).
+5. **No other surprise.** Premises (a) and (b) verified exactly (below). One lane, zero lane denials, zero retries, zero provider calls, zero browser runs. The receipt publication is ordered last by construction (CO-55(b)); this report does not claim to observe it.
+
+## (b) ACTIONS
+
+- **G0 (before any other Docker call):** printed `XDG_RUNTIME_DIR=/run/dispatch-storagegenie-SG-232` from the unit process environment and `/etc/dispatch/storagegenie.conf` `RUNTIME_SOCKETS='docker.sock'`; exported `DOCKER_HOST=unix:///run/dispatch-storagegenie-SG-232/docker.sock`; `docker version` server answered 29.6.2 (rc=0).
+- **G1 pre-state (read-only):** git refs/status; lane-socket `docker compose ps`/`inspect` for container and image; one health GET; served index/JS/CSS GETs + sha256; production SQLite shas, head, 28 table counts (read-only, `PRAGMA query_only=ON`); merged-vs-served diff; scripts-import check; Catalog route check.
+- **One build:** the first CLI attempt failed client-side (F-SG232-1, no daemon build); the single daemon build then ran with the lane socket + per-command client config, rc=0, 19 s, manifest list `sha256:793c89ce…`.
+- **One recreate:** `docker compose up -d --no-deps --force-recreate --no-build backend`, rc=0, 3 s; old container removed; new container healthy after the 10 s healthcheck interval.
+- **G2 verification (read-only):** six health GETs; served bundle re-read + `cmp`; DB shas/head/counts re-read and diffed; SPA routes `/`, `/catalog`, `/inbox`, `/assets/01a0c4aa-…`; one asset API GET (`scene_render` present); two CORS preflights (production origin 400 expected same-origin, allowed dev origin 200); startup log scan.
+- **Changed paths:** `docs/worklogs/SG-232_g0.log`, `SG-232_prestate.log`, `SG-232_build.log`, `SG-232_deploy.log`, `SG-232_verify.log`, `SG-232_scope.log`, `SG-232_report.md` (one evidence+report commit), then `SG-232_receipt.log` (receipt transcript, the approved receipt/evidence exception). No product/config/schema/migration/test bytes.
+- **Commits/push:** one commit carrying the logs + this report; push `automation`; then the notes-ref receipt on that commit, mapped read-back, and the receipt transcript committed. The report commit hash is recorded in SG-232_receipt.log, not here (CO-55(b)).
+- **External / production effects (CO-85):** one image build (completed, image `793c89ce…`, Created 2026-10-23T13:42:17.222911661Z) and one container recreate (completed, container `1e859548…`, Created 13:42:37.842Z, StartedAt 13:42:39.974Z). Tell: `docker inspect` IDs and the served bundle hashes. No other production effect; DB read-only; provider spend $0.000000.
+- **Durations (CO-79, UTC, epochs printed):** lane start 2026-10-23T13:40:16Z epoch 1792762816 (systemctl ExecMainStartTimestamp, MainPID 2089932); G0 13:41:18Z epoch 1792762878 (62 s); pre-state 13:41:39–13:41:40Z epochs 1792762899–900; build leg 13:41:45–13:42:28Z epochs 1792762905–948 (43 s; the daemon build itself 19 s); recreate+health 13:42:37–13:42:52Z epochs 1792762957–972 (15 s); post verification 13:43:18–13:43:51Z epochs 1792762998–3031 (33 s); report-writing end 13:44:50Z epoch 1792763090 → **274 s of RUN_BUDGET_S=2100 (13.0%)** as of report writing; the final figure is the runner's record. No single command over 60 s; the 600 s build bound was not approached; the 900 s idle kill was never approached.
+- **Counts (CO-80 units):** docker daemon build issuances 1; client build command attempts 2 (F-SG232-1); recreate issuances 1; images built 1; containers recreated 1; GETs 18 (1 pre health + 6 post health + 3 pre assets + 3 post assets + 4 SPA routes + 1 asset API); non-mutating OPTIONS preflights 2; test-command invocations 0 (suite waived per PG-DP-02); provider calls 0; browser runs 0; sudo/alternate-identity calls 0; lane denials 0; client-config denials 1. Highest-impact action: the single recreate at 13:42:37Z, which put image `793c89ce…` live.
+- **Health delta:** none — ok/ok/ok at pre-state and on all six post GETs.
+- **Skipped as unnecessary (CO-103):** full test suite (waived per PG-DP-02; zero product bytes changed, substitute performed); browser interaction (no UI/layout change); provider calls (prohibited by the packet); container-filesystem copy (served bytes observed over HTTP); no migration step (the diff contains no migration). CO-101: no test or script found using an object this slice writes — none was written, none run.
+- **Production authorization:** standing owner directive 2026-09-28 (G-O4, AGENTS.md Close-out row) + SG-231 audit, carried on the trigger; production SQLite resolved store `/home/andrei/StorageGenie/data/db/storagegenie.db` (compose bind `./data/db`) opened read-only (PG-PR-10).
+
+## (c) VERIFICATION
+
+    G0 (13:41:18Z, first Docker call after the export):
+      lane_socket=/run/dispatch-storagegenie-SG-232/docker.sock (XDG_RUNTIME_DIR from /proc/2092032/environ; RUNTIME_SOCKETS=docker.sock)
+      export DOCKER_HOST=unix:///run/dispatch-storagegenie-SG-232/docker.sock
+      Server: Docker Engine - Community 29.6.2 API 1.55; docker_version_rc=0
+
+    Pre-state (13:41:39Z):
+      requested_ref=automation; resolved 0e2c41e631f181b25521d2892d92daf22bded52c; origin/automation 0e2c41e631f181b25521d2892d92daf22bded52c; branch automation
+      container f419758d5dfb241438a62d110faa6bc83c147881456e334a913cc561d58fa995 Created 2026-10-21T19:55:20.498187489Z StartedAt 2026-10-21T19:55:22.360576491Z image sha256:d6c6a106176f0ea954d4ad47a26a8e389033146e2647c3ab60ff7713741b8865 RestartCount 0 healthy restart unless-stopped
+      health {"status":"ok","db":"ok","storage":"ok"} http=200
+      index 345bbe8c3601e631c2a9d767f8688a1df20b7980d1fea8640d9f8bc2ffca5aa8 944 B
+      JS   43c05c518c08d2b59cc2fbe54846519ec03aa03352bf3c2e2a09635f1efb054c 321283 B
+      CSS  c3b58cda696a22970fc2a4a348849fc1359f2105f80f81304ed5dfd5ca31a557 4535 B
+      db main be86d23cdd051dd59429804e5a906d0f7e3d254cf44ddf80da84bce2405404b6 688128 B
+         wal  cb46d5f5faf657124c5d88362b4d746d42e8c30a776e3dffb31aeb26c42242f6 453232 B
+         shm  478465c47d5f4a10161d61adf3b5e3cb97ddc59c4faee1a3cadf3d58f1cec1aa 32768 B
+         28 tables; alembic head 20260924_sg114_relation; counts captured (same set below)
+      merged-vs-served diff d221db0..HEAD over backend/app+frontend/src = 0 lines (EXPECTED empty, actual empty)
+      non-doc delta: M STATE.md; A backend/scripts/sg223_render.py, sg224_classify.py, sg225_cutout.py, sg226_bulk_scene.py (3836 lines, not imported: grep backend/app+frontend/src rc=1)
+      CatalogPage mounted at "/" (frontend/src/App.tsx:179); /catalog is not a declared route (SPA fallback)
+
+    Build and recreate (lane socket only):
+      attempt 1: build_rc=1 mkdir /home/andrei/.docker: permission denied — client config only; image still d6c6a106… (F-SG232-1)
+      attempt 2 (single daemon build): DOCKER_CONFIG=/tmp/opencode/SG-232/docker-config BUILDX_CONFIG=/tmp/opencode/SG-232/buildx; build_rc=0
+        13:42:09Z → 13:42:28Z (1792762929 → 1792762948, 19 s); exporting manifest list sha256:793c89ce39f9cc2cc4070e73f11d0cd1bac2f76202e0982cdd3fb4d8d434b166
+        frontend-build layers all CACHED including #17 RUN npm run build (byte-identical dist reason)
+      recreate: pre_cid f419758d…; docker compose up -d --no-deps --force-recreate --no-build backend; recreate_rc=0; 13:42:37Z → 13:42:40Z
+        post_cid 1e859548a1c14fac90deef04279ab035443e9bcdf3d239990a92445a73d1fedb
+        Created 2026-10-23T13:42:37.842422516Z; StartedAt 2026-10-23T13:42:39.974772641Z; image sha256:793c89ce…; RestartCount 0; health healthy
+        old container inspect: error: no such object: f419758d… (rc=1)
+
+    Post-recreate (13:42:52Z and 13:43:18–13:43:51Z):
+      six health GETs: all {"status":"ok","db":"ok","storage":"ok"} http=200
+      index 345bbe8c…; JS 43c05c51…; CSS c3b58cda…; cmp_same=index.html, cmp_same=index-C07VbG0m.css, cmp_same=index-DGAIzmTn.js
+      db main f951663e12a94b4e45a1003865f5803576cc227140f4b956d43064d5c5225729 737280 B
+         wal  e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 0 B
+         shm  fd4c9fda9cd3f9ae7c962b0ddf37232294d55580e1aa165aa06129b8549389eb 32768 B
+         28 tables; alembic head 20260924_sg114_relation; table_count_diff_pre_vs_post: identical (only the extraction's own rc marker differed)
+      pages: / 200, /catalog 200, /inbox 200, /assets/01a0c4aa-8b62-7360-b11e-a476ddaea0f6 200 — all index sha 345bbe8c…
+      asset API GET /v1/assets/01a0c4aa-… 200 4100 B; scene_render occurrences=1
+      preflight: production origin 400 "Disallowed CORS origin" (expected: production is same-origin; CORS_ORIGINS=localhost:5173); dev origin 200 allow-origin http://localhost:5173
+      startup log scan migration|alembic|error|traceback: rc=1 (no match)
+
+**A1 — MET, with F-SG232-2 stated rather than smoothed.** G0 was proven before any other Docker call; one daemon build + one recreate through the lane socket; new container identity/start time; health green; no schema/row delta; bundle hashes recorded same-as-before with the byte-identical-build reason. The only delta is the DB file-level WAL checkpoint (F-SG232-2), not a product, schema or row change.
+
+**A2 — MET.** BASE ref and resolved commit echoed separately (requested `automation`; resolved 0e2c41e…); merged-vs-served runtime diff 0 lines; premises (a) non-runtime delta = STATE.md + four non-imported backend/scripts drivers and (b) CatalogPage at `/` verified on target; work diff only `docs/worklogs/SG-232*`.
+
+**A3 — MET.** Command logs (SG-232_g0.log, SG-232_prestate.log, SG-232_build.log, SG-232_deploy.log, SG-232_verify.log) + this report; elapsed per leg and total vs the lane bound in seconds with sources; all constraints answered; FIRST/DURING/REMAINING below; first token SG-232.
+
+**A4 — ordered last (CO-55(b)).** The bound lane receipt is a note on `refs/notes/storagegenie-coder-reports` whose first line is exactly `Dispatch-ID: SG-232 | Report: docs/worklogs/SG-232_report.md`, attached to the Work-HEAD commit that carries this report, pushed and mapped-fetch read back; SG-232_receipt.log records the verbatim transcript and Work-HEAD. The retired finalizer was not used.
+
+**PB-3 vacuity:** non-vacuous. The pre/post contrast is a real identity change (f419758d… → 1e859548…, image d6c6a106… → 793c89ce…), six health GETs with the DB/storage keys, byte comparisons of three served assets, 28 per-table counts diffed, and an old-container absence check. The empty runtime diff is the expected finding, not the evidence of a serve; the serve is proven by the container/image churn and the rebuilt image manifest. No criterion rests on an empty set.
+
+**Constraints answered on explicit lines:** scope `docs/worklogs/SG-232*` only; zero product/config/schema/migration/test edits; production SQLite read-only with no INSERT/UPDATE/DELETE by this slice, no imports, no evidence-store mutation (F-SG232-2 is SQLite's checkpoint on clean stop, not an application write); reads = git, lane-socket docker inspect/ps/logs, curl GETs + two non-mutating OPTIONS, read-only SQLite; only executed runtimes were the G0-verified build and recreate (PG-IC-01); ordinary reads under 120 s, build under 600 s, no visible timeout, nothing killed, idle kill never approached; no prompt or polling loop (the six health GETs are the fixed standing sequence, one 12 s wait after the recreate); no sudo/alternate identity/mount/host config; no secret in any artifact; runtime-vs-lane budget in seconds from the lane stamps (PG-PR-06). **PG-EV-02/03/08:** the production observable (identity, health, bundle, schema, counts) was captured before and after; no criterion is claimed by disclosure. **PG-IC-01/07:** scope and criteria agree (build/recreate + read-only proof); no packet-named hash is asserted. **PG-DP-01/02:** zero product bytes changed, so the full suite is waived; the substitute is the post-recreate read-only verification above, with its log paths named. **PG-PR-03/04/06/10:** no denial was routed around (F-SG232-1 is a client-side config failure, not a lane refusal); the packet states how the code becomes live and it did; the runtime/budget is 274 s of 2100; the production DB is named and opened read-only under the standing grant.
+
+**State of the world:** product tree unchanged at 0e2c41e + docs-only SG-232 commits; live service is the rebuilt image `793c89ce…` in container `1e859548…`, serving the same three bundle hashes as SG-222/SG-228 (correctly identical — product runtime diff 0); no schema or row change; production writes none; provider spend $0.000000. The standing close-deploy is now PROVEN SERVED; the close-release (tag) is not part of this packet.
+
+**INTENT:** not applicable — no product byte changed. **TWINS:** not applicable — no product defect fixed in this slice.
+
+## UNCLEAR
+
+- **FIRST READ:** G0 was executed exactly as the root-cause fix ordered: socket from the unit environment, export, server line first. The pre-state matched SG-231/SG-222/SG-228 on every read value (three bundle shas, health, DB logical counts, 28 tables, head, six links); the container/image identity was then read live and matched the SG-222 record exactly. The first build call's failure was a new, client-side HOME-permission obstruction, not the SG-231 endpoint fault.
+- **DURING EXECUTION:** the judgement call is F-SG232-1 — after the client-side `mkdir` refusal I set per-command client config dirs under /tmp and issued the one daemon build. The evidence that no daemon build occurred on the failed attempt (image ID unchanged, no build session/context transfer) is in SG-232_build.log; both counts (2 CLI attempts, 1 daemon issuance) are stated. No endpoint was changed, no sudo, no host config. The second judgement call is F-SG232-2 — the recreate caused the expected SQLite checkpoint; I disclosed the file-sha movement instead of calling the DB "unchanged" at file level.
+- **REMAINING:** (1) the Architect's audit/rating turn owns the STATE/ratings updates; this slice wrote no state file. (2) The `/catalog` route premise remains as recorded: the page is mounted at `/` and `/catalog` is a 200 SPA-fallback shell. (3) The production-origin CORS preflight 400 is pre-existing (same-origin in production); no change was made and none is proposed here. (4) The receipt transcript is committed after this report by construction (CO-55(b)); its Work-HEAD names this report's commit. (5) The close-release tag remains the separate next close step, not authorized by this packet.

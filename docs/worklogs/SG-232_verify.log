@@ -1,0 +1,121 @@
+SG-232 post-recreate verification (read-only) utc=2026-10-23T13:43:18Z epoch=1792762998
+--- new running identity ---
+container_id=1e859548a1c14fac90deef04279ab035443e9bcdf3d239990a92445a73d1fedb created=2026-10-23T13:42:37.842422516Z image=sha256:793c89ce39f9cc2cc4070e73f11d0cd1bac2f76202e0982cdd3fb4d8d434b166 started=2026-10-23T13:42:39.974772641Z status=running health=healthy restartcount=0
+inspect_rc=0
+image_id=sha256:793c89ce39f9cc2cc4070e73f11d0cd1bac2f76202e0982cdd3fb4d8d434b166 created=2026-10-23T13:42:17.222911661Z tags=[storagegenie-backend:latest]
+image_rc=0
+--- served bundle (read-only GETs) ---
+index_http=200 size=944
+/assets/index-C07VbG0m.css
+/assets/index-DGAIzmTn.js
+/assets/index-C07VbG0m.css http=200 size=4535
+/assets/index-DGAIzmTn.js http=200 size=321283
+345bbe8c3601e631c2a9d767f8688a1df20b7980d1fea8640d9f8bc2ffca5aa8  /tmp/opencode/SG-232/served-post/index.html
+43c05c518c08d2b59cc2fbe54846519ec03aa03352bf3c2e2a09635f1efb054c  /tmp/opencode/SG-232/served-post/index-DGAIzmTn.js
+c3b58cda696a22970fc2a4a348849fc1359f2105f80f81304ed5dfd5ca31a557  /tmp/opencode/SG-232/served-post/index-C07VbG0m.css
+--- byte comparison pre vs post ---
+cmp_same=index.html
+cmp_same=index-C07VbG0m.css
+cmp_same=index-DGAIzmTn.js
+--- production SQLite (read-only) ---
+f951663e12a94b4e45a1003865f5803576cc227140f4b956d43064d5c5225729  data/db/storagegenie.db
+e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  data/db/storagegenie.db-wal
+fd4c9fda9cd3f9ae7c962b0ddf37232294d55580e1aa165aa06129b8549389eb  data/db/storagegenie.db-shm
+data/db/storagegenie.db 737280
+data/db/storagegenie.db-wal 0
+data/db/storagegenie.db-shm 32768
+alembic_head=20260924_sg114_relation
+table_count=28
+alembic_version=1
+assertion=37
+asset=7
+asset_evidence=20
+asset_fts=7
+asset_fts_config=1
+asset_fts_data=9
+asset_fts_docsize=7
+asset_fts_idx=7
+asset_location=1
+asset_relation=1
+audit_event=100
+candidate=10
+enrich_snapshot=4
+evidence=27
+guardrail_event=2
+household=1
+idempotency_key=11
+job=11
+job_step=72
+location=1
+observation=20
+planning_suggestion=0
+provider_call=39
+review_task=8
+saved_search=0
+source_attribution=0
+user=2
+table_count_diff_pre_vs_post:
+29d28
+< db_read_rc=0
+--- shell routes (read-only GETs) ---
+/ http=200 size=944 345bbe8c3601e631c2a9d767f8688a1df20b7980d1fea8640d9f8bc2ffca5aa8
+/catalog http=200 size=944 345bbe8c3601e631c2a9d767f8688a1df20b7980d1fea8640d9f8bc2ffca5aa8
+/inbox http=200 size=944 345bbe8c3601e631c2a9d767f8688a1df20b7980d1fea8640d9f8bc2ffca5aa8
+/assets/01a0c4aa-8b62-7360-b11e-a476ddaea0f6 http=200 size=944 345bbe8c3601e631c2a9d767f8688a1df20b7980d1fea8640d9f8bc2ffca5aa8
+--- asset API read (Scene tab data) ---
+asset_api_http=200 size=4100
+scene_render_occurrences=1
+--- CORS preflight (non-mutating OPTIONS) ---
+HTTP/1.1 400 Bad Request
+date: Fri, 23 Oct 2026 13:43:19 GMT
+server: uvicorn
+vary: Origin
+access-control-allow-methods: GET, POST, PUT, PATCH, DELETE, OPTIONS
+access-control-max-age: 600
+access-control-allow-headers: Accept, Accept-Language, Authorization, Content-Language, Content-Type, Idempotency-Key, If-Match, Origin, X-Requested-With
+access-control-allow-credentials: true
+content-length: 22
+content-type: text/plain; charset=utf-8
+
+preflight_http=400
+--- startup logs (read-only; migration scan) ---
+log_scan_rc=1 (1 = no match)
+utc_end=2026-10-23T13:43:19Z epoch_end=1792762999
+SG-232 supplementary reads utc=2026-10-23T13:43:50Z epoch=1792763030
+--- preflight body, production origin (400 expected: cross-origin not in CORS_ORIGINS; app is same-origin in prod) ---
+Disallowed CORS origin
+http=400
+--- preflight, allowed dev origin ---
+HTTP/1.1 200 OK
+date: Fri, 23 Oct 2026 13:43:50 GMT
+server: uvicorn
+vary: Origin
+access-control-allow-methods: GET, POST, PUT, PATCH, DELETE, OPTIONS
+access-control-max-age: 600
+access-control-allow-headers: Accept, Accept-Language, Authorization, Content-Language, Content-Type, Idempotency-Key, If-Match, Origin, X-Requested-With
+access-control-allow-credentials: true
+access-control-allow-origin: http://localhost:5173
+content-length: 2
+content-type: text/plain; charset=utf-8
+
+http=200
+--- CORS config (read-only source) ---
+grep: backend/app/__pycache__/main.cpython-312.pyc: binary file matches
+backend/app/main.py:6:from fastapi.middleware.cors import CORSMiddleware
+backend/app/main.py:33:    CORSMiddleware,
+backend/app/main.py:34:    allow_origins=origins,
+--- container inventory ---
+name=storagegenie-backend-1 id=1e859548a1c1 image=storagegenie-backend status=Up About a minute (healthy) created=2026-10-23 13:42:37 +0000 UTC
+old_container_inspect: 
+error: no such object: f419758d5dfb241438a62d110faa6bc83c147881456e334a913cc561d58fa995
+old_container_inspect_rc=1
+--- git work diff ---
+?? docs/worklogs/SG-232_build.log
+?? docs/worklogs/SG-232_deploy.log
+?? docs/worklogs/SG-232_g0.log
+?? docs/worklogs/SG-232_prestate.log
+?? docs/worklogs/SG-232_verify.log
+tracked_diff_stat:
+utc_end=2026-10-23T13:43:51Z epoch_end=1792763031
+--- appended to verify log ---
+post_link_read 13:45:42Z: scene_render_links=6 (read-only join)

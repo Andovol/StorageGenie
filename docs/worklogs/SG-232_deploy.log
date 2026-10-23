@@ -1,0 +1,20 @@
+SG-232 one backend recreate (lane socket; issuance 1 of 1) utc=2026-10-23T13:42:37Z epoch=1792762957
+pre_cid=f419758d5dfb241438a62d110faa6bc83c147881456e334a913cc561d58fa995
+pre_started=2026-10-21T19:55:22.360576491Z
+ Container storagegenie-backend-1 Recreate 
+ Container storagegenie-backend-1 Recreated 
+ Container storagegenie-backend-1 Starting 
+ Container storagegenie-backend-1 Started 
+recreate_rc=0 utc_end=2026-10-23T13:42:40Z epoch_end=1792762960
+post_cid=1e859548a1c14fac90deef04279ab035443e9bcdf3d239990a92445a73d1fedb
+container_id=1e859548a1c14fac90deef04279ab035443e9bcdf3d239990a92445a73d1fedb created=2026-10-23T13:42:37.842422516Z image=sha256:793c89ce39f9cc2cc4070e73f11d0cd1bac2f76202e0982cdd3fb4d8d434b166 started=2026-10-23T13:42:39.974772641Z status=running health=starting restartcount=0 restartpolicy=unless-stopped
+inspect_rc=0
+--- post-wait identity/health ---
+container_id=1e859548a1c14fac90deef04279ab035443e9bcdf3d239990a92445a73d1fedb created=2026-10-23T13:42:37.842422516Z started=2026-10-23T13:42:39.974772641Z status=running health=healthy restartcount=0
+health_get_1 {"status":"ok","db":"ok","storage":"ok"} http=200
+health_get_2 {"status":"ok","db":"ok","storage":"ok"} http=200
+health_get_3 {"status":"ok","db":"ok","storage":"ok"} http=200
+health_get_4 {"status":"ok","db":"ok","storage":"ok"} http=200
+health_get_5 {"status":"ok","db":"ok","storage":"ok"} http=200
+health_get_6 {"status":"ok","db":"ok","storage":"ok"} http=200
+utc=2026-10-23T13:42:52Z epoch=1792762972

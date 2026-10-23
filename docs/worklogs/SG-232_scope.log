@@ -1,0 +1,31 @@
+SG-232 scope utc=2026-10-23T13:45:52Z epoch=1792763152
+--- post link count (read-only join; supplements SG-232_verify.log) ---
+scene_render_links=6 asset_evidence=20 evidence=27
+--- scripts diff stat (carried premise a) ---
+ backend/scripts/sg223_render.py     | 1030 +++++++++++++++++++++++++++++++++++
+ backend/scripts/sg224_classify.py   |  804 +++++++++++++++++++++++++++
+ backend/scripts/sg225_cutout.py     |  990 +++++++++++++++++++++++++++++++++
+ backend/scripts/sg226_bulk_scene.py | 1012 ++++++++++++++++++++++++++++++++++
+ 4 files changed, 3836 insertions(+)
+--- git status --porcelain ---
+?? docs/worklogs/SG-232_build.log
+?? docs/worklogs/SG-232_deploy.log
+?? docs/worklogs/SG-232_g0.log
+?? docs/worklogs/SG-232_prestate.log
+?? docs/worklogs/SG-232_report.md
+?? docs/worklogs/SG-232_scope.log
+?? docs/worklogs/SG-232_verify.log
+--- tracked diff (must be empty) ---
+--- artifact sha256 ---
+5d47b14522a64f638436b8f4fade98067c639b7ecbcd75d27712aa7ef95badfb  docs/worklogs/SG-232_g0.log
+17683932ce9400ae13a7b5be4dd06ba4941f5bb21b72c0c2be56c45d912a30f7  docs/worklogs/SG-232_prestate.log
+034b3df3fb364ef5699923bfff464dbf3ea38ba28b6de26e9b61a71d6e22cf58  docs/worklogs/SG-232_build.log
+89e818bf2700e0f30034720c1c3c869e971a0f4d59c7f3db0c64eb36253a09d5  docs/worklogs/SG-232_deploy.log
+8729c8af58ec518c70c091a8754967fcd3ff3c79bd16dc436f153cd489885029  docs/worklogs/SG-232_verify.log
+5f8749dab541480dbb491e76d1360f4fbe9f7f2fddaca8a27de6fa25897b6458  docs/worklogs/SG-232_report.md
+--- secret scan (strict patterns; rc=1 = no match; excludes this log and the not-yet-written receipt log) ---
+grep_rc=1
+--- branch / origin ---
+local_head=0e2c41e631f181b25521d2892d92daf22bded52c
+0e2c41e631f181b25521d2892d92daf22bded52c	refs/heads/automation
+END scope 2026-10-23T13:45:54Z epoch=1792763154
