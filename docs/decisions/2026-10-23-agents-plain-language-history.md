@@ -4,6 +4,7 @@ This file holds every decision number, superseded value, and history line remove
 
 ## Rule-set version history
 
+- Recorded version 0.51.0 adopted 2026-10-23 (adoption D3; checkout tag `contract-v0.51.0`; delta = Roadmap-if-none + G-M5 numbered Actions + G-M3 plain words + G-O5 + harness-plugin check + ARCHITECT/CLOSE/CODER/DISPATCH/ONBOARDING/PACKET/RATIONALE/RECIPES/RULES/SECOND_OPINION doc updates + lane run-coder/dispatch rework; supersedes 0.50.0).
 - Recorded version 0.50.0 adopted 2026-10-15 (adoption D2; checkout tag `contract-v0.50.0`, commit `1723165` per tag log; delta = ARCHITECT stage-definition + SECOND_OPINION routing + AUDIT slowest-waste + CODER CO-103 + CODERS plan-agent + DISPATCH agent-setting + LEDGER 12th column + ONBOARDING reviewer value + PACKET waste-cutting/D443 + lane run-coder rework; RULES.md hash unchanged `49338e39a574…`; supersedes 0.47.0, chain D-1012-2 preserved).
 
 ## Field history
