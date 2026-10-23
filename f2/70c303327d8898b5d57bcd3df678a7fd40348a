@@ -1,0 +1,11 @@
+Partial-Receipt-ID: SG-234
+utc=2026-10-23T20:23:07Z
+killed=exit_no_receipt
+pushed=0
+uncommitted=none
+wip=none
+wip_elapsed_ms=69
+DISPATCH_RESULT id=SG-234 coder=opencode exit=0 head=e0249ada48cd7e5a4f87f113879a9ed9b023972f note=no moved=yes rewrite=no dirty=no elapsed=511s budget=2100s killed=exit_no_receipt stragglers=0
+P1_moved=PASS count=2
+P2_rewrite=PASS behind=0
+P6_dirty=PASS dirty=no
