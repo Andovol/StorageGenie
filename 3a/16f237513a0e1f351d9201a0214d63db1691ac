@@ -40,3 +40,5 @@ Phase A's pick is substantively the Architect's pick (A, bar first, SG-223-shape
 **Closing.** I read the twelve files listed above (the three assigned plus nine extras) and nothing else; the only other repository access was one PNG filename glob (names only, no contents). I deliberately did not use the live app/DB, git history, backend code, packets, ratings, backlog, `docs/reviews/review-ledger.md`, the prior 2026-10-17 second-opinion context, the contract copy outside the repo, or the per-render image/JSON artifacts — including the named calibration `SG-226_calib_costita_label.png` — relying instead on the reports' and audits' written image findings. I wrote nothing: no file, commit, push, or receipt note; PB-2 was never triggered and there was no STOP.
 Debug-Report-End
 moved=no
+
+Settings: coder=opencode coder_source=command model=opencode-go/deepseek-v4.1-flash model_source=command effort=max effort_source=command agent=plan agent_source=command
