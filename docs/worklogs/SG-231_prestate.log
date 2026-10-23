@@ -1,0 +1,161 @@
+SG-231 prestate (read-only; captured after STOP trigger; no lane Docker call after the denial) utc=2026-10-23T13:32:16Z epoch=1792762336
+--- identity (PB-4, /proc/2072719/cmdline) ---
+opencode run --auto --dir /home/andrei/StorageGenie --model opencode-go/deepseek-v4.1-flash --variant max # SG-231 — Standing close-deploy rider: rebuild + one recreate + verify (re-proof, no product delta expected)
+
+`PB-1`–`PB-6` bind (`CODER.md` §14).
+**BASE REF: automation.** Echo requested ref and actual resolved commit separately.
+**DATABASE: production SQLite read-only.** No schema migration or application data write.
+**Restart: exactly one backend rebuild + one recreate.**
+**Autonomy: L2.** Production authorization basis: standing owner directive 2026-09-28 ("Always do a live deploy before session close", `G-O4`; `AGENTS.md` Close-out row) executing after D-33 (all renders accepted, zero product delta since SG-222). Dispatch settings ride the trigger, never this packet. No product repair is implemented here.
+
+Authoring date (metadata, never a gate): 2026-10-23.
+
+## Why this exists
+
+The last serve (SG-222) put the SG-221 tree live (image `d6c6a106`, container `f419758d` — EXPECTED pre-state, re-read on target). Since then only drivers, evidence, records and decision files have landed (SG-223–SG-230 + D-32/D-33 — EXPECTED docs-only, re-verify on target, do not trust this list). The standing close-out directive fires before session close regardless of product delta (`AGENTS.md:23` literal; the `SG-230` (b) finding is answered by running the rider, not by skipping it). This rider re-proves live==tree and reports it.
+
+Verify the merged-vs-served product diff is EXPECTED empty — report the actual diff; any product change is served and named exactly (that is this rider's purpose), but a diff outside the served backend/frontend paths is STOP before deployment. Never assert HEAD equals any hash (`PG-IC-07`).
+
+Expected recorded/published/host contract 0.50.0; previous host echo from `SG-226_report.md:4` (`/home/andrei/storagegenie-contract/CODER.md` line 3, 0.50.0). Echo version/source and report differences.
+
+Waste cut: none owed — most recent audits name `slowest_waste = none`. Full suite waived per `PG-DP-02` with substitute below (read-only post-recreate verification; zero product bytes change).
+
+## G1 — Pre-state, one rebuild, one recreate — lane socket only
+
+Establish read-only pre-state: actual ref/hash, clean tree, running image/container ID/Created/RestartCount, health status/body, served JS/CSS/index hashes, schema head and authoritative table counts (enumerate tables on target). Check the product diff merged-vs-served: EXPECT empty — report the actual diff either way (`PG-EV-08`: capture the production observable before AND after).
+
+Docker endpoint rule (SG-191 correction, carried — read twice, then obey): every Docker call runs with `DOCKER_HOST` set to YOUR unit's own runtime socket as YOUR process environment names it — never a prior unit's path, never the default. Never run `docker` without `DOCKER_HOST`, never read `/var/run/docker.sock`, never use it as a probe. ANY new privileged denial, on any endpoint, STOPS the whole slice (`PB-2`); disclosure never substitutes for stopping.
+
+Then, through the lane socket only: build the backend image exactly once, then recreate the backend container exactly once (`PG-PR-04`: this is how the code becomes live). No host config changes. Second build/recreate issuance is STOP.
+
+## G2 — Verify the serve, without claiming more
+
+Observe a new container identity and start time (recreate proven by container ID/Created, not RestartCount). Health ok for DB/storage; six health GETs as the standing precedent, not a reliability rate. Re-read hashes, schema and table counts; require no migration and no slice-caused row change. If owner activity changes counts, report direct discriminating evidence; do not hide unexplained deltas.
+
+With zero product change expected, the full suite stays waived per `PG-DP-02`; substitute is post-recreate read-only identity/health/schema/counts/pages/preflight verification. Walk the app shell routes with read-only GETs (`/`, `/catalog`, `/inbox`, plus one Scene-tab page proving the accepted renders serve). No browser interaction causing writes; no paid calls. Application provider spend prohibited.
+
+## Constraints
+
+Scope: `docs/worklogs/SG-231*` only. No product, configuration, schema, migration or test edits. No production INSERT/UPDATE/DELETE, manual resolving, imports or evidence-store mutation. Reads are git / lane-socket docker inspect / curl GETs / read-only SQLite enumeration; the only executed runtimes are the authorized build and recreate (`PG-IC-01`). Ordinary reads/verification bounded at 120 s per command, build at 600 s (uncalibrated inherited precedent); visible timeout finding; never approach idle kill 900 s. No interactive prompt or polling loop. No sudo, no alternate identity, no alternate mount, no host config change. No secret or credential in any log or committed artifact (none is needed).
+
+Full suite waived per `PG-DP-02` with substitute above. Runtime-vs-lane budget reported with seconds and source, never guessed (`PG-PR-06`: seconds, from the lane's own stamps).
+
+## Acceptance and report
+
+- A1: one rebuild + one recreate THROUGH THE LANE SOCKET, direct new running-instance proof, health green and explicit application/schema/count deltas (EXPECTED none); served bundle hash recorded, SAME-as-before only with the byte-identical-build reason stated.
+- A2: actual base/hash and merged-vs-served diff checked — EXPECTED empty; any delta served and named exactly; work diff only SG-231 namespace.
+- A3: command logs and final report `docs/worklogs/SG-231_report.md`; elapsed per leg and total vs observed lane bound; all constraints answered; FIRST READ / DURING EXECUTION / REMAINING dispositioned. First report token SG-231.
+- A4: notes-ref receipt on `refs/notes/storagegenie-coder-reports` published and mapped-fetch/read-back verified, first line `Dispatch-ID: SG-231 | Report: docs/worklogs/SG-231_report.md`, Work-HEAD recorded, branch/report push complete. Use the bound lane receipt, never the retired finalizer.
+
+Guards invoked: PG-EV-02/03/08; PG-IC-01/07; PG-DP-01/02; PG-PR-03/04/06/10. Stop follows `PB-6`; no silent deployment on any unrated/blocked result. 
+--- lane ---
+MainPID=2072624
+ExecMainStartTimestamp=Fri 2026-10-23 13:29:24 UTC
+ActiveState=activating
+BRANCH=automation
+NOTES_REF=refs/notes/storagegenie-coder-reports
+RUN_BUDGET_S=2100
+RUNTIME_SOCKETS='docker.sock'
+/run/dispatch-storagegenie-SG-231/docker.sock mode=1660 uid=1000 gid=100987
+/var/run/docker.sock mode=0 uid=0 gid=0
+--- contract ---
+**Contract version: 0.50.0** — **echo this line verbatim in your receipt.** It is the only proof that you
+0.50.0
+--- git ---
+requested_ref=automation
+resolved_commit=ad6b9efc2f9bdbbd6e3e713fda94a02652f3dc1f
+origin_automation=ad6b9efc2f9bdbbd6e3e713fda94a02652f3dc1f
+ad6b9ef SG-231 standing close-deploy rider packet (re-proof, D-33 all accepted)
+worktree_porcelain:
+?? docs/worklogs/SG-231_prestate.log
+--- product diff merged-vs-served (served source d221db0 = SG-222 build tree) ---
+runtime_surface backend/app+frontend/src:
+(empty above = zero lines)
+all_non_doc_paths:
+M	STATE.md
+A	backend/scripts/sg223_render.py
+A	backend/scripts/sg224_classify.py
+A	backend/scripts/sg225_cutout.py
+A	backend/scripts/sg226_bulk_scene.py
+--- health (read-only GET) ---
+{"status":"ok","db":"ok","storage":"ok"}
+http=200
+--- served index/bundle (read-only GETs) ---
+index http=200 size=944
+served_js_path=/assets/index-DGAIzmTn.js
+served_css_path=/assets/index-C07VbG0m.css
+js http=200 size=321283
+css http=200 size=4535
+345bbe8c3601e631c2a9d767f8688a1df20b7980d1fea8640d9f8bc2ffca5aa8  /tmp/opencode/SG-231/served/index.html
+43c05c518c08d2b59cc2fbe54846519ec03aa03352bf3c2e2a09635f1efb054c  /tmp/opencode/SG-231/served/app.js
+c3b58cda696a22970fc2a4a348849fc1359f2105f80f81304ed5dfd5ca31a557  /tmp/opencode/SG-231/served/app.css
+944 /tmp/opencode/SG-231/served/index.html
+321283 /tmp/opencode/SG-231/served/app.js
+4535 /tmp/opencode/SG-231/served/app.css
+--- SPA shell routes (read-only GETs) ---
+GET / http=200 size=944
+GET /catalog http=200 size=944
+GET /inbox http=200 size=944
+note: /catalog is not a declared route in frontend/src/App.tsx; CatalogPage is mounted at / (PB-1 finding)
+--- DB read-only ---
+be86d23cdd051dd59429804e5a906d0f7e3d254cf44ddf80da84bce2405404b6  /home/andrei/StorageGenie/data/db/storagegenie.db
+cb46d5f5faf657124c5d88362b4d746d42e8c30a776e3dffb31aeb26c42242f6  /home/andrei/StorageGenie/data/db/storagegenie.db-wal
+478465c47d5f4a10161d61adf3b5e3cb97ddc59c4faee1a3cadf3d58f1cec1aa  /home/andrei/StorageGenie/data/db/storagegenie.db-shm
+688128 /home/andrei/StorageGenie/data/db/storagegenie.db
+453232 /home/andrei/StorageGenie/data/db/storagegenie.db-wal
+32768 /home/andrei/StorageGenie/data/db/storagegenie.db-shm
+tables=28
+alembic_head=20260924_sg114_relation
+alembic_version=1
+assertion=37
+asset=7
+asset_evidence=20
+asset_fts=7
+asset_fts_config=1
+asset_fts_data=9
+asset_fts_docsize=7
+asset_fts_idx=7
+asset_location=1
+asset_relation=1
+audit_event=100
+candidate=10
+enrich_snapshot=4
+evidence=27
+guardrail_event=2
+household=1
+idempotency_key=11
+job=11
+job_step=72
+location=1
+observation=20
+planning_suggestion=0
+provider_call=39
+review_task=8
+saved_search=0
+source_attribution=0
+user=2
+--- key logical counts ---
+Error: in prepare, no such column: source_kind
+  ender_links='||count(*) FROM asset_evidence WHERE source_kind='scene_render';
+                                      error here ---^
+asset_evidence=20
+evidence=27
+provider_call=39
+scene_render_evidence=10
+END prestate 2026-10-23T13:32:16Z epoch=1792762336
+--- link rows (read-only join; corrected query) ---
+01a0c4aa-8b62-7360-b11e-a476ddaea0f6|Miso Soup|01a15f6f-13ba-76e0-9238-acd5883c65f1|scene_render|41d619db9f6950762cb54053dfb5f9050711bb662bb0cba5119a9225f8738f7b|703036|2026-10-21 19:48:05
+01a0c4ab-3765-7e10-8d0a-705390c6560d|Costiță de porc|01a15ff5-11e3-7243-99a6-9eeb9bbe1e09|scene_render|f3d56bfb33a2df27e3079d1fc61735eac0292b5be60f656c6c03255ba7a5cae3|664184|2026-10-21 19:48:05
+01a0a467-eb0e-7b83-a227-af122dc9268b|Toothpaste|01a1605c-2829-74e0-b628-98574f4711fb|scene_render|076276a58ebc1f84a50740e162ae47fd2d581e57459ff0d3bf144a1d8fcdede0|531826|2026-10-21 21:32:47
+01a0c47f-fbb3-7db1-b6f3-aa52d20aa6a0|UHT Lapte 3,5% grăsime|01a1605c-4aa9-74f3-8bf3-f15c6c72bbe5|scene_render|2ff0fd948a23bdf5bca838db7f55cd8da2b5c483244eaff96bf7293975b8fd3b|589030|2026-10-21 21:32:49
+01a0c481-720e-7923-ad6c-bee45caba30f|Milbona Parmigiano Reggiano Italian hard cheese flakes|01a1605c-6f0f-7eb3-abff-56343649ea24|scene_render|5c3076942bd7d059f84da9f48df00015715d4195beaee315dde431fd43730f48|503143|2026-10-21 21:32:50
+01a131ae-7a0c-7363-91c8-cfef6bd1faa3|TRACHISAN comprimate de supt|01a1605c-8fc7-7043-837b-1e1633576d15|scene_render|70f495b97ffa8261f1365adcedf679d6349e5d2f98d3079837d09fdf65de3a7d|546385|2026-10-21 21:32:51
+scene_render_links=6
+--- DB end re-read (no writes by this slice) ---
+be86d23cdd051dd59429804e5a906d0f7e3d254cf44ddf80da84bce2405404b6  /home/andrei/StorageGenie/data/db/storagegenie.db
+cb46d5f5faf657124c5d88362b4d746d42e8c30a776e3dffb31aeb26c42242f6  /home/andrei/StorageGenie/data/db/storagegenie.db-wal
+478465c47d5f4a10161d61adf3b5e3cb97ddc59c4faee1a3cadf3d58f1cec1aa  /home/andrei/StorageGenie/data/db/storagegenie.db-shm
+688128 /home/andrei/StorageGenie/data/db/storagegenie.db
+453232 /home/andrei/StorageGenie/data/db/storagegenie.db-wal
+32768 /home/andrei/StorageGenie/data/db/storagegenie.db-shm
+END db 2026-10-23T13:32:47Z epoch=1792762367

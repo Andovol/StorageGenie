@@ -1,0 +1,16 @@
+SG-231 contract check utc=2026-10-23T13:33:47Z
+source=/home/andrei/storagegenie-contract/CODER.md line 3
+**Contract version: 0.50.0** — **echo this line verbatim in your receipt.** It is the only proof that you
+VERSION=0.50.0
+--- rules_check.sh ---
+G-L1 UNCHECKED the cache is not checked out at a contract tag: /home/andrei/storagegenie-contract
+G-L5 UNCHECKED gh-unauthenticated
+G-L7 UNCHECKED gh-unauthenticated
+G-L6 BYTES /home/andrei/.codex/AGENTS.md 2275
+G-L6 BYTES /home/andrei/.config/opencode/AGENTS.md 1933
+G-L6 BYTES total[codex]=2275 unseen=architect-layer,state-file,other-ritual-files
+G-L6 BYTES total[opencode]=1933 unseen=architect-layer,state-file,other-ritual-files
+rc=3
+--- repo .rules-cache ---
+ls: cannot access '.rules-cache': No such file or directory
+END contract 2026-10-23T13:33:47Z

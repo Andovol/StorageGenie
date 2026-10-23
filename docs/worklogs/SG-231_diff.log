@@ -1,0 +1,20 @@
+SG-231 diff (merged-vs-served; read-only git; utc=2026-10-23T13:32:47Z)
+served_source=d221db0ca3f204a9e1309da4557e1b7d51ec874e (SG-222 build tree, per SG-222_report.md:26)
+HEAD=ad6b9efc2f9bdbbd6e3e713fda94a02652f3dc1f
+--- runtime surface backend/app + frontend/src ---
+(empty = zero lines)
+--- all non-doc paths ---
+M	STATE.md
+A	backend/scripts/sg223_render.py
+A	backend/scripts/sg224_classify.py
+A	backend/scripts/sg225_cutout.py
+A	backend/scripts/sg226_bulk_scene.py
+--- config/build/schema/migration/test paths ---
+(empty = zero lines)
+--- scripts added (non-runtime; not imported by app; would enter a new image via COPY backend/ ./) ---
+ backend/scripts/sg223_render.py     | 1030 +++++++++++++++++++++++++++++++++++
+ backend/scripts/sg224_classify.py   |  804 +++++++++++++++++++++++++++
+ backend/scripts/sg225_cutout.py     |  990 +++++++++++++++++++++++++++++++++
+ backend/scripts/sg226_bulk_scene.py | 1012 ++++++++++++++++++++++++++++++++++
+ 4 files changed, 3836 insertions(+)
+END diff 2026-10-23T13:32:47Z

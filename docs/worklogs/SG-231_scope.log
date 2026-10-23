@@ -1,0 +1,18 @@
+SG-231 scope utc=2026-10-23T13:35:30Z
+--- git status --porcelain ---
+?? docs/worklogs/SG-231_contract.log
+?? docs/worklogs/SG-231_diff.log
+?? docs/worklogs/SG-231_health.log
+?? docs/worklogs/SG-231_prestate.log
+?? docs/worklogs/SG-231_report.md
+?? docs/worklogs/SG-231_scope.log
+?? docs/worklogs/SG-231_secret_grep.log
+--- tracked diff (must be empty) ---
+--- artifact sha256 ---
+2f9e4756ce1b57a418d9e49120a782bd6c52b054fd7e9ad367a89b03924d2904  docs/worklogs/SG-231_prestate.log
+0a8bf9d7657abee57401c51c9df752cefb99fa3fe80243b24546e32fb12d685c  docs/worklogs/SG-231_diff.log
+d1953915cdb67bcbe4ac4484ea0413a3baf3e31987ef858c07b948c407e34972  docs/worklogs/SG-231_health.log
+7625ec5796f3492b8b0d7b08481df008ac50aac2ae6ab2a5175144f1f2bab6f1  docs/worklogs/SG-231_contract.log
+41f5a35b9f42a46879f0bc9151745c30ce89049469af83dd54a77ad14a5802b8  docs/worklogs/SG-231_report.md
+dfe4314d5cb1c62cc040e6fb559b6e0747c66777af74c0963f23c85943407736  docs/worklogs/SG-231_secret_grep.log
+END scope 2026-10-23T13:35:30Z
