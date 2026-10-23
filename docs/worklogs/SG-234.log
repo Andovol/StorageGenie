@@ -1,0 +1,80 @@
+SG-234 Coder worklog — standing close-deploy rider: serve the SG-233 reminders delta
+=====================================================================================
+Append-only worklog. Host /home/andrei/StorageGenie, branch automation.
+Coder identity from /proc/2398941/cmdline (never a system-prompt line):
+  opencode run --auto --dir /home/andrei/StorageGenie --model opencode-go/deepseek-v4.1-flash --variant max
+  => model opencode-go/deepseek-v4.1-flash, effort max. Served-model metadata not exposed; no substitute claimed.
+BASE ref requested origin/automation -> resolved f332cc0684ec3ad38cdf77f9d527d4f41c7d4a6c (== start HEAD).
+Lane own stamps: MainPID=2398867, ExecMainStartTimestamp=Fri 2026-10-23 20:14:36 UTC (epoch 1792786476),
+ActiveState=activating, RUN_BUDGET_S=2100 (lane) vs packet overall 1800 s.
+Contract: recorded AGENTS.md 0.51.0 == published VERSION 0.51.0 == host CODER.md line 3 0.51.0 == prior
+host echo SG-233_report.md I1 0.51.0. No difference.
+Spend: $0.000000 actual, $0 bound. Provider calls 0.
+
+G0 — socket first
+-----------------
+Lane socket from the unit's own environment: XDG_RUNTIME_DIR=/run/dispatch-storagegenie-SG-234,
+RUNTIME_SOCKETS=docker.sock => unix:///run/dispatch-storagegenie-SG-234/docker.sock (mode 1660, owner andrei).
+exported DOCKER_HOST to it, then `docker version`: client and SERVER both answered, server 29.6.2.
+This first G0 ran before any docker invocation in the session. Finding I1: that exact stdout was not persisted;
+SG-234_g0.log carries a labelled re-read for the artifact, never a reconstruction.
+
+G1 — read-only pre-state (SG-234_prestate.log, SG-234_scope.log)
+---------------------------------------------------------------
+head f332cc0684ec3ad38cdf77f9d527d4f41c7d4a6c == origin/automation (measured, PG-IC-07: no HEAD==named-hash
+assertion; 0e2c41e is an ancestor). porcelain: only the new SG-234 logs.
+container cid=1e859548a1c14fac90deef04279ab035443e9bcdf3d239990a92445a73d1fedb created 2026-10-23T13:42:37Z
+  started 13:42:39Z image sha256:793c89ce... restartcount 0 health healthy.
+health {"status":"ok","db":"ok","storage":"ok"} http=200.
+served bundle: index 345bbe8c... / JS index-DGAIzmTn.js 43c05c51... / CSS index-C07VbG0m.css c3b58cda...
+production SQLite (read-only URI): sha256 f951663e..., 737280 B; head 20260924_sg114_relation; 28 tables;
+quick_check ok; per-table counts captured (asset 7, audit_event 100, provider_call 39, ... user 2).
+served tree = 0e2c41e631f181b25521d2892d92daf22bded52c: /app/app/main.py blob bf3f813c... equals
+`git show 0e2c41e:backend/app/main.py`; /app/app/models/reminder.py, /app/app/services/reminders/service.py and
+/app/app/api/v1/reminders.py are ABSENT in the live image; in-image alembic current 20260924_sg114_relation.
+merged-vs-served product diff 0e2c41e..HEAD = exactly the SG-233 set (migration, model, services/reminders/,
+api, main.py +1 line, ExpiryPage.tsx, client.ts, types.ts). No runtime change outside it; test file
+backend/tests/test_sg233_reminders.py and docs/ are non-runtime (I3).
+
+Order decision (I2)
+--------------------
+G1 states migrate -> build -> recreate. The live image does not contain revision 20261023_sg233_reminder, so a
+migrate from that image cannot reach the new head. Resolved: build once, migrate once from a one-off NEW-image
+container, recreate once (the SG-104 vehicle), preserving one issuance each AND the safety property that the
+new code is not served before the schema exists. All three executed through the lane socket.
+
+G1 — one build (SG-234_build.log; issuance 1 of 1)
+--------------------------------------------------
+DOCKER_CONFIG/BUILDX_CONFIG under /tmp/opencode/SG-234 so the build never writes a root-owned HOME dotdir.
+20:16:58Z -> 20:17:27Z, rc=0, 29 s of 600 s. image sha256:793c89ce... -> sha256:6bdaa3b0...;
+built JS index-CT9Dr00Y.js (previous index-DGAIzmTn.js). No retry, no second issuance.
+
+G1 — one migrate (SG-234_deploy.log; issuance 1 of 1)
+-----------------------------------------------------
+`docker compose run --rm --no-deps -T backend python -m alembic upgrade head` on the NEW image, 20:17:35Z ->
+20:17:37Z, rc=0. 20260924_sg114_relation -> 20261023_sg233_reminder. Read-only after-check: head
+20261023_sg233_reminder, 29 tables, reminder 0 rows, expected 10 columns + 3 indexes + unique + 2 CASCADE FKs.
+
+G1 — one recreate (SG-234_deploy.log; issuance 1 of 1)
+-------------------------------------------------------
+`docker compose up -d --no-deps backend`, 20:17:38Z, rc=0. cid 1e859548... -> e1142971e08c1395d9d8447422ebcdfd7eed98fdd2a701008ba1a087d91a8759,
+created 2026-10-23T20:17:37Z, started 20:17:38Z, image sha256:6bdaa3b0..., restartcount 0.
+
+G2 — read-only post verification (SG-234_verify.log)
+----------------------------------------------------
+healthy at t=2 s; six GET /v1/health all {"status":"ok","db":"ok","storage":"ok"} http=200.
+bundle now index 5dbcfb12... / JS index-CT9Dr00Y.js 11b3edee... / CSS unchanged c3b58cda... (EXPECTED changed).
+/ /expiry /inbox /planning all 200, same SPA index 5dbcfb12...; served JS contains "Unread reminders",
+"unread_count" and "/v1/reminders"; live GET /v1/reminders?household_id=01a0a029-... -> 200
+{"household_id":"...","unread_count":0,"items":[]}; reminder table 0 rows.
+in-container blobs equal HEAD for main.py, models/reminder.py, services/reminders/service.py, api/v1/reminders.py.
+head 20261023_sg233_reminder; 29 tables; all 28 pre-existing counts identical pre vs post; added=[reminder];
+removed=[]; quick_check ok. Startup log: no traceback/error/exception (grep count 0).
+
+Effects and counts
+------------------
+Production effects: exactly one schema migration (empty reminder), one image build, one service recreate.
+No INSERT/UPDATE/DELETE of application rows; no imports; no evidence-store mutation; no host config change.
+Rows this run created: 0 data rows (reminder=0); alembic_version stayed 1 row (value changed).
+Retries: 0. Test commands: 0 (full suite waived per PG-DP-02; substitute is the post-recreate read-only check).
+Provider calls: 0. NETWORK: loopback + container-runtime only.

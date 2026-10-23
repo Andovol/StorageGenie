@@ -1,0 +1,107 @@
+SG-234 post-recreate verification (read-only) utc=2026-10-23T20:18:05Z epoch=1792786685
+--- wait for health (<=60s) ---
+t=2s health=healthy
+--- new running identity ---
+container_id=e1142971e08c1395d9d8447422ebcdfd7eed98fdd2a701008ba1a087d91a8759 created=2026-10-23T20:17:37.47452733Z image=sha256:6bdaa3b01535a40da29626ae68e7de246ab21b6f607fb8db143d3ff9314f0c6c started=2026-10-23T20:17:38.385103384Z status=running health=healthy restartcount=0 restartpolicy=unless-stopped
+image_id=sha256:6bdaa3b01535a40da29626ae68e7de246ab21b6f607fb8db143d3ff9314f0c6c created=2026-10-23T20:17:16.755607953Z tags=["storagegenie-backend:latest"]
+--- six health GETs ---
+health_get_1 {"status":"ok","db":"ok","storage":"ok"} http=200
+health_get_2 {"status":"ok","db":"ok","storage":"ok"} http=200
+health_get_3 {"status":"ok","db":"ok","storage":"ok"} http=200
+health_get_4 {"status":"ok","db":"ok","storage":"ok"} http=200
+health_get_5 {"status":"ok","db":"ok","storage":"ok"} http=200
+health_get_6 {"status":"ok","db":"ok","storage":"ok"} http=200
+--- served bundle post ---
+index_http=200 size=944
+/assets/index-C07VbG0m.css
+/assets/index-CT9Dr00Y.js
+/assets/index-C07VbG0m.css http=200 size=4535
+/assets/index-CT9Dr00Y.js http=200 size=322038
+c3b58cda696a22970fc2a4a348849fc1359f2105f80f81304ed5dfd5ca31a557  /tmp/opencode/SG-234/served-post/index-C07VbG0m.css
+11b3edeeb3e3c77d8f8ab85c4f90ec06d241a9c66dad8168407849d3bc3d932a  /tmp/opencode/SG-234/served-post/index-CT9Dr00Y.js
+5dbcfb12d230606f98b03f3855a0acf30aa37f24d23075609aa7a6eb32a3d529  /tmp/opencode/SG-234/served-post/index.html
+--- pre vs post hash comparison ---
+cmp_changed=index.html
+cmp_same=index-C07VbG0m.css
+--- shell routes (read-only GETs) ---
+/ http=200 size=944 5dbcfb12d230606f98b03f3855a0acf30aa37f24d23075609aa7a6eb32a3d529
+/expiry http=200 size=944 5dbcfb12d230606f98b03f3855a0acf30aa37f24d23075609aa7a6eb32a3d529
+/inbox http=200 size=944 5dbcfb12d230606f98b03f3855a0acf30aa37f24d23075609aa7a6eb32a3d529
+/planning http=200 size=944 5dbcfb12d230606f98b03f3855a0acf30aa37f24d23075609aa7a6eb32a3d529
+--- reminders API read (household from read-only DB) ---
+{"household_id":"01a0a029-1477-7ca0-b200-bce78a96c679","unread_count":0,"items":[]}
+reminders_http=200 size=83
+--- served bundle contains SG-233 badge strings ---
+1
+1
+1
+--- in-container source blob check vs git HEAD ---
+/app/app/main.py container=8711ef3da9b2dec839bc69e509fca8418b9ae08eb599832292e66a01fad5bdab git_HEAD=8711ef3da9b2dec839bc69e509fca8418b9ae08eb599832292e66a01fad5bdab
+/app/app/models/reminder.py container=61a1126a10e6decc2d9b2328ac61255bf02fddd53593cd5acb7029052c5ff9f1 git_HEAD=61a1126a10e6decc2d9b2328ac61255bf02fddd53593cd5acb7029052c5ff9f1
+/app/app/services/reminders/service.py container=6e416dc129ecdd24f5267e84a10e34f8c05c030a8fe0a3006995d85dd1b1c187 git_HEAD=6e416dc129ecdd24f5267e84a10e34f8c05c030a8fe0a3006995d85dd1b1c187
+/app/app/api/v1/reminders.py container=98fcbd88d4acbd0720bba40f8fd0306b3f46fb5f790a83d6197bcc616bc8487e git_HEAD=98fcbd88d4acbd0720bba40f8fd0306b3f46fb5f790a83d6197bcc616bc8487e
+--- schema head + table counts (read-only) ---
+db_sha256=863c758aacd239a6d79a6aa65edfc0134353dc45d3cc6a3d76fc63195af3216e bytes=765952
+aux-wal exists=True bytes=0
+aux-shm exists=True bytes=32768
+alembic_version=[('20261023_sg233_reminder',)]
+table_count=29
+alembic_version=1
+assertion=37
+asset=7
+asset_evidence=20
+asset_fts=7
+asset_fts_config=1
+asset_fts_data=9
+asset_fts_docsize=7
+asset_fts_idx=7
+asset_location=1
+asset_relation=1
+audit_event=100
+candidate=10
+enrich_snapshot=4
+evidence=27
+guardrail_event=2
+household=1
+idempotency_key=11
+job=11
+job_step=72
+location=1
+observation=20
+planning_suggestion=0
+provider_call=39
+reminder=0
+review_task=8
+saved_search=0
+source_attribution=0
+user=2
+reminder_rows=0
+quick_check=[('ok',)]
+counts_pre_vs_post_changed={}
+added_tables=['reminder']
+removed_tables=[]
+--- startup logs (read-only; error scan) ---
+INFO:     Started server process [1]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+INFO:     127.0.0.1:33490 - "GET /v1/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55054 - "GET /v1/health HTTP/1.1" 200 OK
+INFO:     172.18.0.1:38034 - "GET /v1/health HTTP/1.1" 200 OK
+INFO:     172.18.0.1:38042 - "GET /v1/health HTTP/1.1" 200 OK
+INFO:     172.18.0.1:38046 - "GET /v1/health HTTP/1.1" 200 OK
+INFO:     172.18.0.1:38060 - "GET /v1/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:44890 - "GET /v1/health HTTP/1.1" 200 OK
+INFO:     172.18.0.1:38072 - "GET /v1/health HTTP/1.1" 200 OK
+INFO:     172.18.0.1:38076 - "GET /v1/health HTTP/1.1" 200 OK
+INFO:     172.18.0.1:38084 - "GET / HTTP/1.1" 200 OK
+INFO:     172.18.0.1:38100 - "GET /assets/index-C07VbG0m.css HTTP/1.1" 200 OK
+INFO:     172.18.0.1:38114 - "GET /assets/index-CT9Dr00Y.js HTTP/1.1" 200 OK
+INFO:     172.18.0.1:38128 - "GET / HTTP/1.1" 200 OK
+INFO:     172.18.0.1:38134 - "GET /expiry HTTP/1.1" 200 OK
+INFO:     172.18.0.1:38144 - "GET /inbox HTTP/1.1" 200 OK
+INFO:     172.18.0.1:38150 - "GET /planning HTTP/1.1" 200 OK
+INFO:     172.18.0.1:38164 - "GET /v1/reminders?household_id=01a0a029-1477-7ca0-b200-bce78a96c679 HTTP/1.1" 200 OK
+log_error_scan_rc=
+0
+utc_end=2026-10-23T20:18:12Z epoch_end=1792786692

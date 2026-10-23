@@ -1,0 +1,40 @@
+SG-234 one migrate + one recreate (lane socket; issuance 1 of 1 each) utc=2026-10-23T20:17:35Z epoch=1792786655
+--- before: DB head + container identity ---
+alembic_version=[('20260924_sg114_relation',)]
+table_count=28
+pre_cid=1e859548a1c14fac90deef04279ab035443e9bcdf3d239990a92445a73d1fedb pre_created=2026-10-23T13:42:37.842422516Z pre_started=2026-10-23T13:42:39.974772641Z pre_image=sha256:793c89ce39f9cc2cc4070e73f11d0cd1bac2f76202e0982cdd3fb4d8d434b166 pre_restarts=0
+--- migrate via one-off NEW image (the migration vehicle; NOT a recreate) ---
+ Container storagegenie-backend-run-4b2c472cefec Creating 
+ Container storagegenie-backend-run-4b2c472cefec Created 
+INFO  [alembic.runtime.migration] Context impl SQLiteImpl.
+INFO  [alembic.runtime.migration] Will assume non-transactional DDL.
+INFO  [alembic.runtime.migration] Running upgrade 20260924_sg114_relation -> 20261023_sg233_reminder, expiry reminders: durable per-asset daily rows (SG-233, G1)
+migrate_rc=0 utc_mid=2026-10-23T20:17:37Z epoch_mid=1792786657
+--- after migrate: head + reminder table (read-only) ---
+alembic_version=[('20261023_sg233_reminder',)]
+table_count=29
+reminder_rows=0
+reminder_sql=CREATE TABLE reminder (
+	id VARCHAR(36) NOT NULL, 
+	household_id VARCHAR(36) NOT NULL, 
+	asset_id VARCHAR(36) NOT NULL, 
+	as_of_day VARCHAR(10) NOT NULL, 
+	tier VARCHAR(50), 
+	bucket VARCHAR(20) NOT NULL, 
+	days_remaining INTEGER NOT NULL, 
+	status VARCHAR(20) NOT NULL, 
+	created_at DATETIME DEFAULT (CURRENT_TIMESTAMP) NOT NULL, 
+	updated_at DATETIME DEFAULT (CURRENT_TIMESTAMP) NOT NULL, 
+	PRIMARY KEY (id), 
+	FOREIGN KEY(household_id) REFERENCES household (id) ON DELETE CASCADE, 
+	FOREIGN KEY(asset_id) REFERENCES asset (id) ON DELETE CASCADE, 
+	CONSTRAINT uq_reminder_asset_as_of_day UNIQUE (asset_id, as_of_day)
+)
+--- one recreate ---
+ Container storagegenie-backend-1 Recreate 
+ Container storagegenie-backend-1 Recreated 
+ Container storagegenie-backend-1 Starting 
+ Container storagegenie-backend-1 Started 
+recreate_rc=0 utc_end=2026-10-23T20:17:38Z epoch_end=1792786658
+--- post recreate identity (immediate) ---
+post_cid=e1142971e08c1395d9d8447422ebcdfd7eed98fdd2a701008ba1a087d91a8759 post_created=2026-10-23T20:17:37.47452733Z post_started=2026-10-23T20:17:38.385103384Z post_image=sha256:6bdaa3b01535a40da29626ae68e7de246ab21b6f607fb8db143d3ff9314f0c6c post_restarts=0 status=running health=starting

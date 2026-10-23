@@ -1,0 +1,87 @@
+SG-234 prestate (read-only) utc=2026-10-23T20:16:32Z epoch=1792786592
+DOCKER_HOST=unix:///run/dispatch-storagegenie-SG-234/docker.sock DOCKER_CONFIG=/tmp/opencode/SG-234/docker-config BUILDX_CONFIG=/tmp/opencode/SG-234/buildx
+--- identity PB-4 (own process args) ---
+/bin/bash -c mkdir -p /tmp/opencode/SG-234/served-pre docs/worklogs; export DOCKER_HOST="unix://$XDG_RUNTIME_DIR/${RUNTIME_SOCKETS}"; export DOCKER_CONFIG=/tmp/opencode/SG-234/docker-config BUILDX_CONFIG=/tmp/opencode/SG-234/buildx; OUT=docs/worklogs/SG-234_prestate.log; { echo "SG-234 prestate (read-only) utc=$(date -u +%Y-%m-%dT%H:%M:%SZ) epoch=$(date -u +%s)"; echo "DOCKER_HOST=$DOCKER_HOST DOCKER_CONFIG=$DOCKER_CONFIG BUILDX_CONFIG=$BUILDX_CONFIG"; echo '--- identity PB-4 (own process args) ---'; tr '\0' ' ' < /proc/$$/cmdline; echo; echo '--- git ---'; echo "requested_ref=automation"; echo "head=$(git rev-parse HEAD)"; echo "origin_automation=$(git rev-parse refs/remotes/origin/automation)"; echo "ancestor_0e2c41e=$(git merge-base --is-ancestor 0e2c41e631f181b25521d2892d92daf22bded52c HEAD && echo yes || echo no)"; echo "porcelain:"; git status --porcelain; echo '--- contract ---'; echo "VERSION=$(cat /home/andrei/storagegenie-contract/VERSION)"; sed -n '3p' /home/andrei/storagegenie-contract/CODER.md; grep -n 'Rule-set version recorded here' AGENTS.md; echo "prior_host_echo:"; grep -m1 'Contract echo' docs/worklogs/SG-233_report.md; echo '--- container ---'; docker inspect storagegenie-backend-1 --format 'cid={{.Id}} created={{.Created}} started={{.State.StartedAt}} image={{.Image}} status={{.State.Status}} health={{.State.Health.Status}} restarts={{.RestartCount}} restartpolicy={{.HostConfig.RestartPolicy.Name}}'; docker image inspect storagegenie-backend:latest --format 'image={{.Id}} created={{.Created}} tags={{json .RepoTags}}'; echo '--- health pre ---'; curl -s -w '\nhttp=%{http_code} size=%{size_download}\n' http://127.0.0.1:8003/v1/health; echo '--- served bundle pre ---'; curl -s -o /tmp/opencode/SG-234/served-pre/index.html -w 'index_http=%{http_code} size=%{size_download}\n' http://127.0.0.1:8003/; grep -oE '/assets/[A-Za-z0-9._-]+\.(js|css)' /tmp/opencode/SG-234/served-pre/index.html | sort -u; while read -r a; do n=$(basename "$a"); curl -s -o "/tmp/opencode/SG-234/served-pre/$n" -w "$a http=%{http_code} size=%{size_download}\n" "http://127.0.0.1:8003$a"; done < <(grep -oE '/assets/[A-Za-z0-9._-]+\.(js|css)' /tmp/opencode/SG-234/served-pre/index.html | sort -u); sha256sum /tmp/opencode/SG-234/served-pre/*; echo '--- production SQLite (read-only) ---'; python3 - <<'PY'
+import sqlite3, hashlib, os
+p='/home/andrei/StorageGenie/data/db/storagegenie.db'
+print('db_sha256='+hashlib.sha256(open(p,'rb').read()).hexdigest(), 'bytes='+str(os.path.getsize(p)))
+for s in ('-wal','-shm'):
+    q=p+s
+    print('aux'+s, 'exists='+str(os.path.exists(q)), 'bytes='+str(os.path.getsize(q)) if os.path.exists(q) else '')
+c=sqlite3.connect('file:'+p+'?mode=ro',uri=True)
+v=c.execute('select version_num from alembic_version').fetchall()
+print('alembic_version='+repr(v))
+names=[r[0] for r in c.execute("select name from sqlite_master where type='table' and name not like 'sqlite_%' order by name")]
+print('table_count='+str(len(names)))
+for n in names: print(f'{n}={c.execute("select count(*) from "+n).fetchone()[0]}')
+print('quick_check='+repr(c.execute('pragma quick_check').fetchall()))
+PY
+echo '--- in-container served source blob check vs git 0e2c41e ---'; for f in app/main.py app/models/reminder.py app/services/reminders/service.py app/api/v1/reminders.py; do h=$(docker exec storagegenie-backend-1 sh -lc "test -f /$f && sha256sum /$f | cut -d' ' -f1 || echo absent"); echo "$f container=$h"; done; git show 0e2c41e:backend/app/main.py | sha256sum; } > "$OUT" 2>&1; rc=$?; cat "$OUT"; echo "capture_rc=$rc" 
+--- git ---
+requested_ref=automation
+head=f332cc0684ec3ad38cdf77f9d527d4f41c7d4a6c
+origin_automation=f332cc0684ec3ad38cdf77f9d527d4f41c7d4a6c
+ancestor_0e2c41e=yes
+porcelain:
+?? docs/worklogs/SG-234_prestate.log
+--- contract ---
+VERSION=0.51.0
+**Contract version: 0.51.0** — **echo this line verbatim in your receipt.** It is the only proof that you
+4:> Rule-set version recorded here: 0.51.0. Past version notes, old values, and decision numbers moved to `docs/decisions/2026-10-23-agents-plain-language-history.md`.
+prior_host_echo:
+--- container ---
+cid=1e859548a1c14fac90deef04279ab035443e9bcdf3d239990a92445a73d1fedb created=2026-10-23T13:42:37.842422516Z started=2026-10-23T13:42:39.974772641Z image=sha256:793c89ce39f9cc2cc4070e73f11d0cd1bac2f76202e0982cdd3fb4d8d434b166 status=running health=healthy restarts=0 restartpolicy=unless-stopped
+image=sha256:793c89ce39f9cc2cc4070e73f11d0cd1bac2f76202e0982cdd3fb4d8d434b166 created=2026-10-23T13:42:17.222911661Z tags=["storagegenie-backend:latest"]
+--- health pre ---
+{"status":"ok","db":"ok","storage":"ok"}
+http=200 size=40
+--- served bundle pre ---
+index_http=200 size=944
+/assets/index-C07VbG0m.css
+/assets/index-DGAIzmTn.js
+/assets/index-C07VbG0m.css http=200 size=4535
+/assets/index-DGAIzmTn.js http=200 size=321283
+c3b58cda696a22970fc2a4a348849fc1359f2105f80f81304ed5dfd5ca31a557  /tmp/opencode/SG-234/served-pre/index-C07VbG0m.css
+43c05c518c08d2b59cc2fbe54846519ec03aa03352bf3c2e2a09635f1efb054c  /tmp/opencode/SG-234/served-pre/index-DGAIzmTn.js
+345bbe8c3601e631c2a9d767f8688a1df20b7980d1fea8640d9f8bc2ffca5aa8  /tmp/opencode/SG-234/served-pre/index.html
+--- production SQLite (read-only) ---
+db_sha256=f951663e12a94b4e45a1003865f5803576cc227140f4b956d43064d5c5225729 bytes=737280
+aux-wal exists=True bytes=0
+aux-shm exists=True bytes=32768
+alembic_version=[('20260924_sg114_relation',)]
+table_count=28
+alembic_version=1
+assertion=37
+asset=7
+asset_evidence=20
+asset_fts=7
+asset_fts_config=1
+asset_fts_data=9
+asset_fts_docsize=7
+asset_fts_idx=7
+asset_location=1
+asset_relation=1
+audit_event=100
+candidate=10
+enrich_snapshot=4
+evidence=27
+guardrail_event=2
+household=1
+idempotency_key=11
+job=11
+job_step=72
+location=1
+observation=20
+planning_suggestion=0
+provider_call=39
+review_task=8
+saved_search=0
+source_attribution=0
+user=2
+quick_check=[('ok',)]
+--- in-container served source blob check vs git 0e2c41e ---
+app/main.py container=absent
+app/models/reminder.py container=absent
+app/services/reminders/service.py container=absent
+app/api/v1/reminders.py container=absent
+bf3f813cf94c2086e75e247452126a289a4db36c85bc9505d6795a9654136529  -
