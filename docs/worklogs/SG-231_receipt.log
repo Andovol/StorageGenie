@@ -1,0 +1,30 @@
+Dispatch-ID: SG-231 | Report: docs/worklogs/SG-231_report.md
+Work-HEAD: 92c9082a907c267312fd8342381394b8750dccf6
+receipt transcript 2026-10-23T13:35:46Z — commands run after the report commit, mapped remote read-back verbatim
+$ git fetch origin refs/notes/storagegenie-coder-reports:refs/notes/storagegenie-coder-reports
+fetch_exit=0
+$ git log --format=%H -n 1 HEAD
+92c9082a907c267312fd8342381394b8750dccf6
+$ git notes --ref=refs/notes/storagegenie-coder-reports add -m "Dispatch-ID: SG-231 | Report: docs/worklogs/SG-231_report.md" 92c9082a907c267312fd8342381394b8750dccf6
+notes_add_exit=0
+$ git push origin refs/notes/storagegenie-coder-reports
+To github.com:Andovol/StorageGenie.git
+   f20794a..90abd5b  refs/notes/storagegenie-coder-reports -> refs/notes/storagegenie-coder-reports
+notes_push_exit=0
+$ git push origin automation   [no-op expected after the report commit push]
+Everything up-to-date
+automation_push_exit=0
+$ git fetch origin refs/notes/storagegenie-coder-reports:refs/notes/sg231-readback
+From github.com:Andovol/StorageGenie
+ * [new ref]         refs/notes/storagegenie-coder-reports -> refs/notes/sg231-readback
+fetch_exit=0
+$ git rev-parse refs/notes/sg231-readback
+90abd5b9dc1a855f04e8e129c5bbf7a6f2b7f5da
+$ git notes --ref=refs/notes/sg231-readback show 92c9082a907c267312fd8342381394b8750dccf6
+Dispatch-ID: SG-231 | Report: docs/worklogs/SG-231_report.md
+readback_show_exit=0
+$ git ls-remote origin refs/notes/storagegenie-coder-reports
+90abd5b9dc1a855f04e8e129c5bbf7a6f2b7f5da	refs/notes/storagegenie-coder-reports
+--- local notes-ref head: 90abd5b9dc1a855f04e8e129c5bbf7a6f2b7f5da
+--- branch local=92c9082a907c267312fd8342381394b8750dccf6
+END receipt 2026-10-23T13:35:53Z
