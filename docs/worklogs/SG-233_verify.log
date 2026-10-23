@@ -685,3 +685,17 @@ output: 20261023_sg233_reminder (head)
 
 === 12. health at end ===
 output: {"status":"ok","db":"ok","storage":"ok"} (live service still serves the previous build; this slice did not deploy or restart)
+
+=== 13. Receipt publication and mapped-fetch read-back (executed after the report commit) ===
+command: git fetch origin refs/notes/storagegenie-coder-reports:refs/notes/storagegenie-coder-reports-fetched
+output:
+From github.com:Andovol/StorageGenie
+   20b4c46..5b79994  refs/notes/storagegenie-coder-reports -> refs/notes/storagegenie-coder-reports-fetched
+
+mapped ref head: 5b799942704bd25f5a71b90ffdbe24ddac1ed387
+note object list grep: c2a3e65c40cbbf906b024d3e1b110f1c9b0329c7 a2d715eae23eef1887199a7b0c78becaf12adb9d
+command: git notes --ref=storagegenie-coder-reports-fetched show a2d715eae23eef1887199a7b0c78becaf12adb9d
+output:
+Dispatch-ID: SG-233 | Report: docs/worklogs/SG-233_report.md | Work-HEAD: a2d715eae23eef1887199a7b0c78becaf12adb9d
+id grep: line 1 matched Dispatch-ID: SG-233 (grep rc=0)
+note=yes
