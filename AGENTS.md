@@ -1,65 +1,74 @@
 # StorageGenie — project configuration
 
-> **Canonical for this repo. `CLAUDE.md` is a one-line adapter `@AGENTS.md` — edit here, never there.**
-> Rule-set version this project records: **0.50.0** (D2 adoption 2026-10-15: checkout tag `contract-v0.50.0` (commit `1723165` per tag log); delta = ARCHITECT stage-definition + SECOND_OPINION routing + AUDIT slowest-waste + CODER CO-103 + CODERS plan-agent + DISPATCH agent-setting + LEDGER 12th column + ONBOARDING reviewer value + PACKET waste-cutting/D443 + lane run-coder rework; RULES.md hash unchanged `49338e39a574…`; supersedes `0.47.0`, chain D-1012-2 preserved).
+> Canonical for this repo. `CLAUDE.md` only points here — edit here, never there.
+> Rule-set version recorded here: 0.50.0. Past version notes, old values, and decision numbers moved to `docs/decisions/2026-10-23-agents-plain-language-history.md`.
 
-## Configuration table — the single source of every project value
+Slices are numbered with the prefix SG, which stands for StorageGenie (for example SG-1, SG-2). Autonomy L2 means the owner approves each slice once and the builder owns retries inside that slice.
 
-| Field | Value | Notes |
+## Configuration table — every project value in one place
+
+| Field | Value | Why |
 |---|---|---|
-| **Workspace** | `C:\Coding\OpenCode\StorageGenie` (local) → `/home/andrei/StorageGenie` (VPS) | Local is `automation` branch, VPS is `andrei@87.106.66.242:2222:/home/andrei/StorageGenie` — `VPS.md` (contract `.rules-cache/`) is the host authority |
-| **Repository** | `Andovol/StorageGenie` (`git@github.com:Andovol/StorageGenie.git`) | Create if absent; default branch `automation`, evidence ref `refs/heads/storagegenie-evidence` (per `CO-86`) |
-| **Host** | `87.106.66.242:2222` (`ubuntu`, `andrei`) | `VPS.md` F2 — pin against `[87.106.66.242]:2222` in `~/.ssh/known_hosts` |
-| **Host project path** | `/home/andrei/StorageGenie` | Owner directive `m0045` — use this folder |
-| **Credential reference** | `~/.ssh/storagegenie-architect-dispatch` (ed25519, `~/.ssh/storagegenie-architect-dispatch.pub` on host forced-command) + unrestricted `C:\Users\popes\Desktop\key_Andrei.ppk` (Launcher-only, provisioning) | Naming `<project>-architect-dispatch` per `PROVISIONING.md:129` — private never on host |
-| **Coder** | `opencode` (SELECTED from `CODERS.md` — `opencode run --auto --dir <workdir> [--variant <effort>] <prompt-text>`, prompt travels on argv) | Owner directive `D29` (2026-09-11) — opencode going forward; supersedes `m0106` (codex high, kept as history). `G-O2` — packet says "the Coder", config names it. Effort per catalogue row for opencode (deepseek rows `low|high|max`; muse-spark rows `minimal..xhigh`, `xhigh` proven live SG-157 — validity was always per-model, F-SG157-1) → `--variant` (explicit per trigger per D120/D15, uncalibrated per `G-A9`; the Coder default `max` is NOT taken — stated explicitly so no silent drift). Catalogue `coder_models.tsv` (0.44.1, re-measured 2026-10-08): `high` listed for `opencode-go/deepseek-v4.1-flash` — engine-checked strictly, trigger effort (D266/D302). Hard ceiling: packet file stays far under the 128 KiB single-argv limit. Provider partially unproven (`ISS-6`); entry-point run-2 owed (`ISS-7`) |
-| **Dispatch verb** | `SG-<nnn> [coder= model= effort=] [agent=<a>] [--status\|--attach\|--force\|--quarantine]` (e.g. `SG-021 coder=opencode effort=high`) | ID prefix `SG-` for StorageGenie. Settings ride the trigger, any subset (D302) — the packet carries the task only; a packet `coder:`/`model:`/`effort:` line is refused `packet_settings_retired`. `agent=plan` for second-opinion reviews (0.50.0/D451). `--force` bypasses replay guard only, `--quarantine` per `DISPATCH.md` §2 (D331), packet resolves `$ID.md\|$ID-*.md` exactly-one |
-| **Harness** | Codex: one SSH trigger via background `exec_command` (Class 4 if no completion wake). OpenCode — background dispatches ride `job_spawn` (wake on exit), status verb only for re-attach checks, never the trigger log (`DISPATCH.md` §2c) | Owner directive 2026-09-12: use the `job_spawn` spawner for background dispatch (supersedes the Start-Process + blocking-wait chunking) |
-| **Wrapper** | `/usr/local/bin/dispatch` (forced command `DISPATCH_CONF=/etc/dispatch/storagegenie.conf /usr/local/bin/dispatch`; `run-coder` takes settings from the dispatch command → lane conf → Coder default, packet settings refused per D302) | Measured 2026-09-21 by SG-071 (journal + launch artifact); supersedes the stale `/opt/storagegenie-dispatch/dispatch_coder.sh` path (legacy grok-codex-only whitelist, never reads the opencode coder) |
-| **Model policy** | Model + effort sent explicitly on every trigger: `model=opencode-go/deepseek-v4.1-flash effort=max` (owner directive D-1012-15, 2026-10-12; catalogue-valid `low,high,max` row; `max` uncalibrated vs D120/D15-`high`, stated per `G-A9`) | Supersedes the omit-model row (D302 subset still contract-legal; explicit chosen per owner). Coder default `opencode-go/deepseek-v4.1-flash` proven live SG-120 |
-| **Second opinion** | `default` | Owner D-7 approved 2026-10-17 (`docs/decisions/2026-10-17-d5-d6-d7-answers-l4-window.md`) — rule resolves the reviewer at dispatch: `opencode-go/muse-spark-1.3-contributor effort=xhigh`, or `opencode-go/deepseek-v4.1-flash effort=max` when the Architect runs Muse 1.3 (never the Architect's own model, `D451`). Supersedes the explicit value recorded 2026-10-15 (`…contract-050-adoption.md:35`) |
-| **Packet directory** | `docs/packets` (committed, pushed) | `DISPATCH.md:49` — unpushed packet fails as `packet_missing` |
-| **Autonomy** | `L2` (slice autonomy, 1 retry, per `ARCHITECT.md:60-72` §6) — escalates to `L3` only after clean stage | State the level in approval message |
-| **Close-out** | Live deploy (rebuild + one recreate + verify) before every session close | Standing owner directive 2026-09-28 ("Always do a live deploy before session close", `G-O4` record) — the rider runs as a dispatched slice and is reported; unrated or blocked work stops the deploy, never ships silently |
-| **Values bindings** | See Values table below — every `{{NAME}}` the contract uses is bound there | `CO-08` stop if unbound |
+| **Workspace** | `C:\Coding\OpenCode\StorageGenie` on this computer, `/home/andrei/StorageGenie` on the server | This computer holds the `automation` branch; the server holds the live app. The server guide in the shared contract is the authority on host details. |
+| **Repository** | `Andovol/StorageGenie` | One place holds the code. The main work branch is `automation`. |
+| **Host** | `87.106.66.242`, port `2222`, user `andrei` | This is the computer that runs the live app. |
+| **Host project path** | `/home/andrei/StorageGenie` | The owner chose this folder on the server. |
+| **Credential** | `~/.ssh/storagegenie-architect-dispatch` on this computer, plus a provisioning key kept on the owner's desk | The first key is the only key the dispatch uses. It can only run the dispatch command on the server and cannot open a shell. |
+| **Coder** | `opencode`, run as `opencode run --auto --dir <work folder> [--variant <effort>] <task text>` | The owner chose this builder going forward. The task text travels on the command line. Effort is always stated on the trigger and stays far under the command-line size limit. |
+| **Dispatch verb** | `SG-<number> [coder=... model=... effort=...] [agent=...] [--status\|--attach\|--force\|--quarantine]` | This is the single command that starts a slice. Settings ride on the trigger; the task file itself carries only the task. `--force` replays a finished slice; `--quarantine` isolates a broken run. |
+| **Harness** | Server runs in the background and wakes this session when done | Background runs never block the planning chat. Status checks only re-attach; they never carry the task. |
+| **Wrapper** | `/usr/local/bin/dispatch` on the server | This is the only entry point the server key can run. It picks settings from the trigger command first. |
+| **Model policy** | Every trigger states the model and effort explicitly, currently `model=opencode-go/deepseek-v4.1-flash effort=max` | Stating both on every trigger stops silent drift between slices. |
+| **Second opinion** | `default` | The word default asks the contract to pick a reviewer that is not the current builder. |
+| **Packet directory** | `docs/packets` | Task files are committed and pushed, so the server always reads what this computer sent. |
+| **Autonomy** | L2 | The owner approves each slice once. The builder owns one retry inside the slice and returns after that. |
+| **Close-out** | Deploy the live app before every close | The owner asks for a live check at every close. Work that is unrated or blocked stops the deploy instead of shipping silently. |
+| **Values bindings** | See the table below | The coder contract uses placeholders in double braces. Every placeholder it reads must have a value here, or the run stops. Never guess a value. |
 
-## Values table — every `{{NAME}}` the Coder contract reads
+## Values table — what each placeholder means
 
-| `{{NAME}}` | Bound value | Source |
+| Placeholder | Value | Why |
 |---|---|---|
-| `{{WORKLOG_DIR}}` | `docs/worklogs` | Coder worklog per slice (`CO-57`) |
-| `{{HEALTH_CMD}}` | `curl -s http://127.0.0.1:8003/v1/health` (fallback `python3 -c "from fastapi.testclient import TestClient; from app.main import app; print(TestClient(app).get('/v1/health').json())"`) | `ARCHITECT.md` health probe |
-| `{{RECEIPT_CMD}}` | notes-ref receipt (live lane mechanism) | Note on `refs/notes/storagegenie-coder-reports`, first line `Dispatch-ID: <ID> | Report: <path>` (+ `Work-HEAD`), read back on remote by mapped fetch (SG-092/SG-156 precedent); legacy `/opt/storagegenie-dispatch/finalize_dispatch_report.sh` (v0.17.2 evidence-ref) refused `candidate_not_remote` on this lane — retired 2026-10-09 (F-SG156-1) |
-| `{{PROD_DB}}` | `not applicable` — Phase 0 is SQLite local (`sqlite:////data/db/storagegenie.db`) + `storage_data:/data/storage` | `blueprint.md:14` local-first; `CODER_PRODUCTION.md` not bound until datastore declared |
-| `{{TEST_DB}}` | `not applicable` | Same — tests use `TestClient` + temp SQLite |
-| `{{DEFAULT_BRANCH}}` | `automation` | Current branch (`git branch --show-current`) — evidence `storagegenie-evidence` |
-| `{{DISPATCH_KEY}}` | `~/.ssh/storagegenie-architect-dispatch` | Layer A — forced-command at `andrei@87.106.66.242:2222` |
-| `{{HOST}}` | `87.106.66.242` | `VPS.md` F2 |
-| `{{HOST_SSH_PORT}}` | `2222` | `VPS.md` F2 |
-| `{{HOST_USER}}` | `andrei` | `VPS.md` F2 + dispatch key binding |
+| `{{WORKLOG_DIR}}` | `docs/worklogs` | Each slice writes its work log here. |
+| `{{HEALTH_CMD}}` | `curl -s http://127.0.0.1:8003/v1/health` | This probe proves the database and storage answer. The builder runs it at the start and end and reports the change. |
+| `{{RECEIPT_CMD}}` | Notes-based receipt on the server | The builder leaves a note on the report that states the slice number and the report path, read back from the server. |
+| `{{PROD_DB}}` | Local files only — app database `sqlite:////data/db/storagegenie.db` plus storage folder `storage_data:/data/storage` | Phase zero runs on the local computer with no separate production database. |
+| `{{TEST_DB}}` | Local test database only | Tests use a temporary database, never the live one. |
+| `{{DEFAULT_BRANCH}}` | `automation` | Work starts here; evidence lives on its own branch. |
+| `{{DISPATCH_KEY}}` | `~/.ssh/storagegenie-architect-dispatch` | The only key the dispatch uses. |
+| `{{HOST}}` | `87.106.66.242` | The live computer. |
+| `{{HOST_SSH_PORT}}` | `2222` | The port the live computer listens on. |
+| `{{HOST_USER}}` | `andrei` | The account that runs the live app. |
 
-`{{NAME}}` not listed is a `CO-08` STOP — never guess, never use placeholder literally.
+A placeholder with no value here stops the run.
 
-## Method routing — what loads, when
+## Method routing — what to read, and when
 
-`ARCHITECT.md` before planning/packet/dispatch/audit/rating/touching state · `PACKET.md` before writing a packet · `DISPATCH.md` before dispatching · `CLOSE.md` before closing · `LEDGER.md` before rating · `SECOND_OPINION.md` before bringing a 🟡/🟠/🔴 decision · `RATIONALE.md` before changing a rule · `VPS.md` before planning anything on the shared VPS (a web page, a hostname, a port, a database, heavy work)
+- Before planning, writing a task, dispatching, auditing, rating, or touching project state: read the architect guide.
+- Before writing a task file: read the packet guide.
+- Before dispatching: read the dispatch guide (plus the production guide, because the host and database are live).
+- Before closing: read the close guide.
+- Before rating: read the ledger guide.
+- Before asking for a second opinion on a medium or larger decision: read the second-opinion guide.
+- Before changing a rule: read the reasoning guide.
+- Before planning anything on the shared server: read the server guide.
 
-Coder reads read-only copy on host (`/opt/storagegenie-dispatch/` + global `CODER.md` + `lang/python.md`) — never from repo (cutover pattern; the copy's version tracks the adopted rule set).
+The coder reads its own copy on the server and never reads from this repo.
 
-## Project narrowings of global rules — may narrow, never contradict (`G-P2`)
+## Project rules — small additions to the shared rules
 
-- **Budget:** `G-A8` — 20 MB upload cap (`backend/app/config.py:20`; corrected 2026-09-17 by SG-061 — was `:11`) is a security hard cap with visible `413` truncation, not a silent guideline.
-- **Duplicate:** `docs/decisions/2026-08-28-phase-0-approvals.md:33-41` Launcher block duplicates `G-O1`, `G-P2`, `G-C1` — keep global, project copy is a pointer not a second copy.
-- **Sensitive surfaces (`G-K3`) — declared per `PRODUCTION.md` trigger:** evidence store (`/data/storage` + `backend/data/storage`), SQLite DB (`/data/db/storagegenie.db`), dispatch host/credential. Every decision touching any goes to owner individually (`G-K2`) at every autonomy level. A surface not listed is "not declared", never "safe".
-- **Restart allowlist:** `docker-compose.yml:19,37` `restart: unless-stopped` both services — `PRODUCTION.md:restart` binding if declared.
-- **Health:** `G-T9` — `GET /v1/health` proves DB+storage; Coder runs `{{HEALTH_CMD}}` start+end per `CO-92` and reports delta.
+- **Upload cap:** 20 megabytes in `backend/app/config.py` is a hard security limit. A larger upload gets a too-large answer, never a silent cut.
+- **No second copies:** where this repo repeats a shared rule, the shared rule wins and this copy is only a pointer.
+- **Sensitive areas:** the stored photos and files, the app database, and the dispatch key and host. Every plan touching one goes to the owner alone, at every autonomy level. An area not listed here is not declared safe — it is simply not declared.
+- **Restart:** both app services restart on their own unless stopped.
+- **Health:** the health address proves database plus storage. The builder runs the health probe at start and end.
 
-## What this repo already owns — conserved on cutover (`ONBOARDING.md` conversion)
+## What this repo already owns
 
-Pinned pre-conversion state `26e9e8b` (local `automation` head `26e9e8b→9f1cc09→d43d793→74d066b→ad20dc0→bad8bff:550b35c`). Disposition `m0064` — 40 obligations dispositioned `keep`/`covered`/`retire`, zero `CONFLICT`. New obligations start here.
+Pinned state from before onboarding lives in git history and the history file named at the top. Forty old obligations were sorted once; none conflicted. New work starts here.
 
 ## Loading
 
-- Session start: `G-L1` version check FIRST (run `bash .rules-cache/rules_check.sh` per D339 and write its output down; never checkout-vs-stamp, M3), then this file + `.rules-cache/` (contract `contract-v0.50.0`) + `STATE.md:1` RESUME.
-- Before packet: `PACKET.md`; before dispatch: `DISPATCH.md` (+ `PRODUCTION.md:1` because host + SQLite are live).
-- Never copy shared contract into repo — project holds only values and narrowings.
+- At session start, check versions first with the one contract command, then read this file, the contract cache, and the resume block in `STATE.md`.
+- Before a task file, read the packet guide; before dispatch, read the dispatch guide plus the production guide.
+- Never copy shared contract files into this repo — this file holds only values and small additions.
