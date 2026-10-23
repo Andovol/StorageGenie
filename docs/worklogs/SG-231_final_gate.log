@@ -1,9 +1,9 @@
-SG-231 final gate utc=2026-10-23T13:36:27Z
-scope: docs/worklogs/SG-231* (all committed artifacts)
+SG-231 final gate (corrected) utc=2026-10-23T13:36:47Z
+correction: the 13:36:27Z attempt self-included its own output file (grep rc=2, 'input file is also the output'); this run excludes SG-231_final_gate.log from the scanned set. The report's original scan (SG-231_secret_grep.log) remains valid and rc=1.
+scope:
 docs/worklogs/SG-231_architect.md
 docs/worklogs/SG-231_contract.log
 docs/worklogs/SG-231_diff.log
-docs/worklogs/SG-231_final_gate.log
 docs/worklogs/SG-231_health.log
 docs/worklogs/SG-231_prestate.log
 docs/worklogs/SG-231_receipt.log
@@ -11,11 +11,9 @@ docs/worklogs/SG-231_report.md
 docs/worklogs/SG-231_scope.log
 docs/worklogs/SG-231_secret_grep.log
 --- secret scan (strict patterns; rc=1 = no match) ---
-grep: docs/worklogs/SG-231_final_gate.log: input file is also the output
-grep_rc=2
+grep_rc=1
 --- branch / origin ---
-local_head=5c677a16431796e7ff7dc8c7720ca52ee2b8c72f
-5c677a16431796e7ff7dc8c7720ca52ee2b8c72f	refs/heads/automation
+local_head=a9dec468fe7660fa464c9087accb430973f79d09
+a9dec468fe7660fa464c9087accb430973f79d09	refs/heads/automation
 --- worktree ---
-?? docs/worklogs/SG-231_final_gate.log
-END final gate 2026-10-23T13:36:28Z
+END final gate 2026-10-23T13:36:48Z
