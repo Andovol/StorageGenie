@@ -1,0 +1,11 @@
+Partial-Receipt-ID: SG-233
+utc=2026-10-23T19:32:26Z
+killed=exit_no_receipt
+pushed=0
+uncommitted=none
+wip=none
+wip_elapsed_ms=70
+DISPATCH_RESULT id=SG-233 coder=opencode exit=0 head=72af5955096aac66eaab6c3b39bb85a7030b7154 note=no moved=yes rewrite=no dirty=no elapsed=1103s budget=2100s killed=exit_no_receipt stragglers=0
+P1_moved=PASS count=3
+P2_rewrite=PASS behind=0
+P6_dirty=PASS dirty=no
