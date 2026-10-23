@@ -1,9 +1,9 @@
 # StorageGenie — State
-## RESUME — 2026-10-23, live matches the code, nothing in flight; next: build expiry reminders that reach the user (roadmap row 9), because dates that sit silent miss the core promise and this builds on the urgency math that already works
+## RESUME — 2026-10-23, SG-233 landed and rated 98; product delta on `automation` waits for the deploy-at-close; next: deploy at close, then the daily scheduler caller, then email on owner SMTP word
 
-**Live:** the running app matches the code on branch `automation`. No product change waits to be deployed. Nothing is in flight. The last full check was clean.
+**Live:** the running app serves the pre-SG-233 build. SG-233 (reminder store, daily compute, in-app sender) is committed as `72af595`, rated 98, not yet deployed. Nothing is in flight. Health was green at both ends of the slice.
 
-**Next:** the top item in `docs/ROADMAP.md` (row 9, expiry reminders that reach the user). The urgency math and the expiry dashboard already exist; what is missing is the sender and the schedule, so dates never reach the user in time.
+**Next:** deploy the SG-233 delta at close per the standing rule; then a scheduler-caller slice for `record_due` (row 9 remainder); email stays out until the owner binds SMTP creds (D1). Rule delta `0.51.0` adoption owed: one plan plus owner yes at a boundary.
 
 **Rules for reports:** every report ends with next steps and starts step 1; the parked list is never shown. This keeps the owner's wish for no irrelevant detail while always saying what comes next.
 
