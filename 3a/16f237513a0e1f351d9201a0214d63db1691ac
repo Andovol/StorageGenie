@@ -1,0 +1,42 @@
+Dispatch-ID: SG-230 | Report: note
+Debug-Report-Begin
+SG-230 — Phase B second opinion (critique), read-only; agent=plan; model=opencode-go/deepseek-v4.1-flash (runtime identity; effort not self-read — no process-args access in this lane); wd=/home/andrei/StorageGenie; BASE=automation.
+
+Contract version: 0.50.0 — per `AGENTS.md:4`, `STATE.md:6`, and the context-pack header (`docs/reviews/2026-10-23-second-opinion-next-stage-context.md:3`). `CODER.md` is outside this repository and was not read; the PB-4 echo is sourced from repository records (`SG-229_report.md:3` precedent).
+
+**Files read beyond `AGENTS.md` top section, the context pack, and `SG-229_report.md`** (all named by one of those):
+1. `docs/worklogs/SG-226_report.md`
+2. `docs/worklogs/SG-226_audit.md`
+3. `docs/worklogs/SG-225_report.md`
+4. `docs/worklogs/SG-225_audit.md`
+5. `STATE.md`
+6. `docs/decisions/2026-10-21-d31-l3-bulk-stage.md`
+7. `docs/decisions/2026-10-23-d32-bulk-forks-decided.md`
+8. `docs/decisions/2026-10-21-close-sg216-sg228.md`
+9. `docs/decisions/2026-10-21-d29-bulk-run-all-products.md`
+
+## N-1 — case against the Architect's pick
+
+**(a) STRONGEST CASE AGAINST — the pick's one global bar contradicts the brief-relative record, and its strict branch cannot close the review it opens.**
+
+The pick's first move asks the owner for a single bar — "primary-label-exact is enough vs any garbled printed text rejects" — then takes per-render verdicts on the four SG-226 links. The record does not support a single bar; it records two brief-specific ones, and each answer the pick offers collides with a committed link decision the pick does not revisit:
+
+- SG-225's unlink was brief-compliance, not a global fidelity bar. `SG-225_report.md:10` quotes the cutout brief requiring "the full package with its label and printed text exactly as photographed" and records `FROZEN` → `ERO7EN`; `SG-225_audit.md:7` confirms the unlink carried its reason.
+- SG-226 linked the same artifact class under a different stated standard: "All four renders carry a small secondary-text artifact; the primary labels are exact. The review standard is calibrated to the pilot's linked SG-220 Costiță-2 render, whose small ingredient print is garbled…" (`SG-226_report.md:10`), independently re-checked after opening every image (`SG-226_audit.md:7`).
+- The calibration render is itself linked (`2026-10-21-close-sg216-sg228.md:30`, "Costiță-2 faithful, linked"; `STATE.md:10`), and it is outside the pick's four-render review set.
+
+The pincer: if the owner says "primary-label-exact is enough," the bar is in tension with SG-225's unlink, which failed on exact text the owner has now declared unnecessary; if he says "any garbled printed text rejects," then all four SG-226 links reject **and so does the SG-220 calibration link**, which the pick never puts up for review. In that branch the reject pass is not closed under its own rule; the four products are left with no scene while D-32:13 keeps the stage scenes-only; and the pick states an end state only for 4/4 acceptance ("if all four are accepted, the stage terminates in the (D) end state"), leaving the rejection branch — the branch its own bar question can produce — with no termination condition.
+
+Either answer also makes the per-render verdict predetermined by committed evidence: `SG-226_report.md:10` already assigns exact primary labels plus one secondary-text artifact per render, so "primary-label-exact" accepts all four and "any garbled" rejects all four without a second eyeball pass. The pick therefore spends owner review time (`…context.md:29`, "owner eyeball time") to re-derive a result the bar alone fixes.
+
+**(b) UNVERIFIED PREMISE — "close light, no deploy/release owed."**
+
+The pick's all-accepted branch asserts the (D) end state, which the pack defines as "no deploy/release owed" (`…context.md:32`). That premise is not established across the repository's own records: `AGENTS.md:23` states the close-out as "Live deploy (rebuild + one recreate + verify) **before every session close**" (standing owner directive, `G-O4`), unconditioned on product commits, while `STATE.md:8` narrows the re-fire to "when new product commits land" — the reading the pick adopts without reconciling the two, although `AGENTS.md:6` calls the configuration table "the single source of every project value." **Verify/falsify:** the `CLOSE.md` close-deploy condition (contract, outside this repository, unreadable from this lane) or the `G-O4` record; failing that, one owner line on whether a no-product-commit close still owes the deploy rider. If `AGENTS.md:23` is literal, the pick's end state is a deploy-owed close, not (D).
+
+**(c) SETTLING OBSERVATION.**
+
+Phase A's pick is substantively the Architect's pick (A, bar first, SG-223-shaped unlinks, D on 4/4 acceptance), so there is no disagreement on the option — only on whether per-render verdicts are needed once the bar is stated. The observation that settles that: **record the owner's four verdicts and compare them with the bar he states.** If all four track the bar (primary-label-exact → 4 accept; strict → 4 reject, plus SG-220 if the bar is global), the bar *is* the decision and the verdict pass is redundant; if any verdict diverges from his own bar, acceptance is intuitive/per-render and the review pass is load-bearing. A secondary observation within the same answer — whether the owner applies his bar to the SG-220 calibration link — settles whether the bar is global (then the review set is five, not four) or brief-scoped (then the two precedents are consistent and the pick's framing is wrong, not the decisions).
+
+**Closing.** I read the twelve files listed above (the three assigned plus nine extras) and nothing else; the only other repository access was one PNG filename glob (names only, no contents). I deliberately did not use the live app/DB, git history, backend code, packets, ratings, backlog, `docs/reviews/review-ledger.md`, the prior 2026-10-17 second-opinion context, the contract copy outside the repo, or the per-render image/JSON artifacts — including the named calibration `SG-226_calib_costita_label.png` — relying instead on the reports' and audits' written image findings. I wrote nothing: no file, commit, push, or receipt note; PB-2 was never triggered and there was no STOP.
+Debug-Report-End
+moved=no
