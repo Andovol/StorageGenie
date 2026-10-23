@@ -35,3 +35,5 @@ Contract version: 0.50.0 — per `AGENTS.md:4`, `STATE.md:6`, and the context-pa
 **Closing.** I read the eleven files listed above (AGENTS.md, the context pack, and the nine extras) and nothing else; the only other repository access was three filename globs (`**/CODER.md`, `docs/reviews/*`, `.rules-cache/**`) that returned names or empty results, not contents. I deliberately did not use the live app, DB, git history, backend code, ratings, backlog, packets, `docs/reviews/review-ledger.md` (the packet already stated the lane condition), or the prior `2026-10-17` second-opinion context (it would break blindness). I wrote nothing — no file, commit, push, or receipt note; PB-2 was never triggered, PB-6 was not invoked, and there was no STOP.
 Debug-Report-End
 moved=no
+
+Settings: coder=opencode coder_source=command model=opencode-go/deepseek-v4.1-flash model_source=command effort=max effort_source=command agent=plan agent_source=command
