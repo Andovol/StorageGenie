@@ -1,0 +1,33 @@
+SG-229 — Phase A second opinion (blind), read-only; agent=plan; model=opencode-go/deepseek-v4.1-flash (runtime identity; effort not self-read — no process-args access in this lane); wd=/home/andrei/StorageGenie; BASE=automation.
+
+Contract version: 0.50.0 — per `AGENTS.md:4`, `STATE.md:6`, and the context-pack header (`docs/reviews/2026-10-23-second-opinion-next-stage-context.md:3`). The live `CODER.md` is outside this repository and was not read; no `CODER.md` or `.rules-cache/` exists under the repo root, so the PB-4 echo is sourced from repository records, not the host copy.
+
+**Files read beyond `AGENTS.md` and the context pack** (all named by the pack):
+1. `docs/worklogs/SG-226_report.md`
+2. `docs/worklogs/SG-226_audit.md`
+3. `docs/worklogs/SG-225_report.md`
+4. `docs/worklogs/SG-225_audit.md`
+5. `STATE.md`
+6. `docs/decisions/2026-10-21-d31-l3-bulk-stage.md`
+7. `docs/decisions/2026-10-23-d32-bulk-forks-decided.md`
+8. `docs/decisions/2026-10-21-close-sg216-sg228.md`
+9. `docs/decisions/2026-10-21-d29-bulk-run-all-products.md`
+
+## N-1 — which stage follows D-32
+
+**(a) PICK: (A) render-review + reject pass**, run as a bounded acceptance gate rather than a new render stage: the owner reviews the four SG-226 links live; each rejection becomes its own SG-223-shaped unlink slice (exact `asset_evidence` DELETE, Evidence preserved); if all four are accepted, the stage terminates in the (D) end state (close light, no deploy/release owed). I would execute A with the standard question in (c) put first.
+
+**(b) WHY.**
+1. **The only unresolved output of the stage is owner acceptance.** `SG-226_report.md:65` item (5): "the four new links are live but unlinked/rejected later by owner word if the artifacts are unacceptable." That is an open acceptance question, not a parked implementation item; A is the only listed option that closes it.
+2. **Acceptance is unevidenced and the artifacts are known-imperfect.** `SG-226_report.md:10`: "All four renders carry a small secondary-text artifact; the primary labels are exact. The review standard is calibrated to the pilot's linked SG-220 Costiță-2 render…". The standard was calibrated by the Coder against an earlier link, not stated by the owner.
+3. **A is $0 in billed renders and its rejection path is proven.** Pack `:18`: one exact `asset_evidence` DELETE, 17→16, render Evidence preserved, re-verified live. `STATE.md:8`: "live==tree; unserved product delta NONE"; close-deploy/close-release re-fire only "when new product commits land." Review and a link DELETE add no product commit, so no deploy/release follows.
+4. **A is a precondition for B and C, not a parallel branch.** B only has something to decide if an artifact is rejected for fidelity; C is admitted by the pack to serve only "re-renders and rejections" (`…context.md:31`: "render demand is mostly done or parked, so the button would serve re-renders and rejections only"). Spending on either before A buys against a standard the owner has not stated — my inference from those two lines.
+5. **B's two named levers are already closed or excluded for the forks that raised them.** D-32 D1: "No better-brief slice, no bulk cutout renders" (`2026-10-23-d32-bulk-forks-decided.md:13`); D-32 D3: "No same-brief re-render, no rephrased brief" (`:15`); the resolution pin is listed excluded (`SG-225_report.md:55`). B would re-litigate closed levers rather than test a fresh one.
+6. **C is premature.** It adds a product slice + suite + serve rider for a self-serve demand no named file records; the pack's own cost line says the button would serve re-renders only. The absence of an owner request for it in the named files is the evidence (`opinion` on the absence, not on the code path).
+7. **D is the fallback, not the pick.** `STATE.md:2`: "next: no render slice owed — live already matches, await owner word on close or next stage." D waits for that word; it does not obtain it. If the owner is unavailable, A degrades to D with nothing lost; choosing D first guarantees the acceptance question stays open while four owner-rejectable artifacts are live.
+
+**(c) Option the pack misses: make the acceptance *standard* the decision, not the four artifacts.** The pack's A asks for per-render verdicts; none of A–D asks the owner to state the bar — "primary label exact is enough" versus "any garbled printed text rejects" — even though the two slices applied different bars: SG-226 linked garbled microtext (`SG-226_report.md:10`) while SG-225 unlinked a render whose brief demanded text "exactly as photographed" (`SG-225_report.md:10`). One $0 owner answer would settle the four links and the parked cutout brief together, without a fidelity probe. Checked: A–D as written; `SG-226_report.md:10` and `:65`; `SG-225_report.md:10` and `:55`; `2026-10-23-d32-bulk-forks-decided.md:13-15`; and the D-31 stage-end clause (`2026-10-21-d31-l3-bulk-stage.md:23-25`). None makes the standard itself the decision.
+
+**(d) Riskiest unverified premise: that the SG-226 calibration is the owner's acceptance standard.** `SG-226_report.md:10` says the standard is "calibrated to the pilot's linked SG-220 Costiță-2 render", and `:65` item (5) preserves owner rejection; no named file contains an owner statement of the bar. If the owner requires exact printed text, all four links are unacceptable, "complete-as-narrowed" is false, and the framing's "no approved executable remains" collapses into remediation of the current stage rather than a choice of next stage — A would end in rejections, and B/C would become live again. That is why the (c) question should precede treating A's verdict as final.
+
+**Closing.** I read the eleven files listed above (AGENTS.md, the context pack, and the nine extras) and nothing else; the only other repository access was three filename globs (`**/CODER.md`, `docs/reviews/*`, `.rules-cache/**`) that returned names or empty results, not contents. I deliberately did not use the live app, DB, git history, backend code, ratings, backlog, packets, `docs/reviews/review-ledger.md` (the packet already stated the lane condition), or the prior `2026-10-17` second-opinion context (it would break blindness). I wrote nothing — no file, commit, push, or receipt note; PB-2 was never triggered, PB-6 was not invoked, and there was no STOP.
