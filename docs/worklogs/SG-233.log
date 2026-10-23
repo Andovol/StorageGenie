@@ -35,3 +35,17 @@ Commands (UTC, outcome):
 - frontend npm run build (tsc && vite build): green, 3.58s.
 - frontend vitest ExpiryPage.test.tsx: 9 passed.
 - transient badge test (untracked, removed before commit): 1 passed, badge "Unread reminders (2)".
+
+Verification (all raw output in docs/worklogs/SG-233_verify.log):
+- work commit a2d715e; base 7d0cc91 (origin/automation).
+- BASE new nodes: 7 failed (2.77s of 120s) — expected FAIL half.
+- CANDIDATE new nodes: 7 passed (2.92s of 120s).
+- discrimination inversion: 1 failed urgent != critical (1.62s of 120s).
+- full backend suite on candidate: 730 passed, 2 failed (58.74s of 600s); both failures
+  (test_signals pyzbar/libzbar and tesseract) reproduced alone on base 7d0cc91 (2 failed, 1.27s).
+- ruff: All checks passed. mypy: 41 errors base == 41 candidate; main.py:58,64 pre-existing; new modules 0.
+- frontend: tsc + vite build green (3.58s of 600s); ExpiryPage 9/9; transient badge check 1/1 (deleted).
+- secret grep empty (rc=1); no email-shaped address; diff = 11 ceiling paths, one migration.
+- prod DB untouched; health start/end {"status":"ok","db":"ok","storage":"ok"};
+  live service still the previous build (no deploy, no restart).
+- overall elapsed at report writing: 745s of 1800s.

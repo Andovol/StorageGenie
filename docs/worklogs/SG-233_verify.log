@@ -1,0 +1,687 @@
+SG-233 verify log — raw FAIL and PASS runs (PG-EV-09)
+work commit: a2d715eae23eef1887199a7b0c78becaf12adb9d
+base: 7d0cc91fe7ecdfb4e7f360f52bdcf6e79f176469 (origin/automation)
+construction: every database is sqlite:///<pytest tmp_path>/sg233*.db built by the committed migration; app.dependency_overrides[get_db] points routes at that temp factory; temp storage never used; production SQLite and storage untouched.
+
+=== 1. BASE FAIL run: candidate test file copied into a detached worktree at base, new nodes only ===
+command: cd /tmp/sg233-base/backend && /home/andrei/StorageGenie/backend/venv/bin/python -m pytest -q tests/test_sg233_reminders.py
+observed: 7 failed (all 6 behavioural nodes plus the scope gate on its empty base diff)
+
+FFFFFFF                                                                  [100%]
+=================================== FAILURES ===================================
+__________ test_sg233_migration_upgrade_downgrade_upgrade_and_unique ___________
+
+tmp_path = PosixPath('/tmp/pytest-of-andrei/pytest-2/test_sg233_migration_upgrade_d0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x719fa164f320>
+
+    def test_sg233_migration_upgrade_downgrade_upgrade_and_unique(
+        tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        url = f"sqlite:///{tmp_path / 'sg233_migration.db'}"
+        monkeypatch.setattr(settings, "database_url", url)
+        config = _alembic_config(url)
+        command.upgrade(config, "head")
+    
+        inspector = sa_inspect(create_engine(url))
+>       assert "reminder" in set(inspector.get_table_names())
+E       AssertionError: assert 'reminder' in {'alembic_version', 'assertion', 'asset', 'asset_evidence', 'asset_fts', 'asset_fts_config', ...}
+E        +  where {'alembic_version', 'assertion', 'asset', 'asset_evidence', 'asset_fts', 'asset_fts_config', ...} = set(['alembic_version', 'assertion', 'asset', 'asset_evidence', 'asset_fts', 'asset_fts_config', ...])
+E        +    where ['alembic_version', 'assertion', 'asset', 'asset_evidence', 'asset_fts', 'asset_fts_config', ...] = get_table_names()
+E        +      where get_table_names = <sqlalchemy.engine.reflection.Inspector object at 0x719fa150b680>.get_table_names
+
+tests/test_sg233_reminders.py:159: AssertionError
+----------------------------- Captured stderr call -----------------------------
+INFO  [alembic.runtime.migration] Context impl SQLiteImpl.
+INFO  [alembic.runtime.migration] Will assume non-transactional DDL.
+INFO  [alembic.runtime.migration] Running upgrade  -> 0201cf10c56c, 001 core foundation
+INFO  [alembic.runtime.migration] Running upgrade 0201cf10c56c -> 20260908_sg013_observation, deterministic signal observations
+INFO  [alembic.runtime.migration] Running upgrade 20260908_sg013_observation -> 20260908_sg014_candidate, deduplication candidates
+INFO  [alembic.runtime.migration] Running upgrade 20260908_sg014_candidate -> 20260908_sg017_fts, SQLite FTS5 index for asset catalog search.
+INFO  [alembic.runtime.migration] Running upgrade 20260908_sg017_fts -> 20260912_sg025_provider_call, provider call ledger (SG-025, blueprint §3.3)
+INFO  [alembic.runtime.migration] Running upgrade 20260912_sg025_provider_call -> 20260914_sg035_foundations, data foundations: source attribution, planning suggestions, guardrail log (SG-035, Phase 3 S2/S3)
+INFO  [alembic.runtime.migration] Running upgrade 20260914_sg035_foundations -> 20260916_sg048_name_optional, name-optional capture: asset.display_name becomes nullable (SG-048, S2)
+INFO  [alembic.runtime.migration] Running upgrade 20260916_sg048_name_optional -> 20260917_sg068_saved_search, saved searches: named per-household filter sets (SG-068, Phase 4)
+INFO  [alembic.runtime.migration] Running upgrade 20260917_sg068_saved_search -> 20260923_sg100_enrich_snapshot, enrichment snapshot store (SG-100, Arc A)
+INFO  [alembic.runtime.migration] Running upgrade 20260923_sg100_enrich_snapshot -> 20260924_sg113_location, location tree + asset location assignment (SG-113, G3)
+INFO  [alembic.runtime.migration] Running upgrade 20260924_sg113_location -> 20260924_sg114_relation, asset relations: typed links (SG-114, G4)
+_________ test_sg233_due_fixture_creates_engine_shaped_unread_reminder _________
+
+reminder_env = (<sqlalchemy.orm.session.Session object at 0x719fa150b200>, '01a16a35-b91f-7401-ad93-57ac17b52a49', '01a16a35-b91f-7401-ad93-57baedcc3633')
+
+    def test_sg233_due_fixture_creates_engine_shaped_unread_reminder(
+        reminder_env,  # type: ignore[no-untyped-def]
+    ) -> None:
+        session, household_id, _other = reminder_env
+        client = TestClient(app)
+        asset, today, _expiry = _due_asset(client, session, household_id)
+    
+        before = client.get("/v1/reminders", params={"household_id": household_id})
+>       assert before.status_code == 200, before.text
+E       AssertionError: {"type":"about:blank","title":"Not Found","status":404,"detail":"Not Found: /v1/reminders"}
+E       assert 404 == 200
+E        +  where 404 = <Response [404 Not Found]>.status_code
+
+tests/test_sg233_reminders.py:245: AssertionError
+---------------------------- Captured stderr setup -----------------------------
+INFO  [alembic.runtime.migration] Context impl SQLiteImpl.
+INFO  [alembic.runtime.migration] Will assume non-transactional DDL.
+INFO  [alembic.runtime.migration] Running upgrade  -> 0201cf10c56c, 001 core foundation
+INFO  [alembic.runtime.migration] Running upgrade 0201cf10c56c -> 20260908_sg013_observation, deterministic signal observations
+INFO  [alembic.runtime.migration] Running upgrade 20260908_sg013_observation -> 20260908_sg014_candidate, deduplication candidates
+INFO  [alembic.runtime.migration] Running upgrade 20260908_sg014_candidate -> 20260908_sg017_fts, SQLite FTS5 index for asset catalog search.
+INFO  [alembic.runtime.migration] Running upgrade 20260908_sg017_fts -> 20260912_sg025_provider_call, provider call ledger (SG-025, blueprint §3.3)
+INFO  [alembic.runtime.migration] Running upgrade 20260912_sg025_provider_call -> 20260914_sg035_foundations, data foundations: source attribution, planning suggestions, guardrail log (SG-035, Phase 3 S2/S3)
+INFO  [alembic.runtime.migration] Running upgrade 20260914_sg035_foundations -> 20260916_sg048_name_optional, name-optional capture: asset.display_name becomes nullable (SG-048, S2)
+INFO  [alembic.runtime.migration] Running upgrade 20260916_sg048_name_optional -> 20260917_sg068_saved_search, saved searches: named per-household filter sets (SG-068, Phase 4)
+INFO  [alembic.runtime.migration] Running upgrade 20260917_sg068_saved_search -> 20260923_sg100_enrich_snapshot, enrichment snapshot store (SG-100, Arc A)
+INFO  [alembic.runtime.migration] Running upgrade 20260923_sg100_enrich_snapshot -> 20260924_sg113_location, location tree + asset location assignment (SG-113, G3)
+INFO  [alembic.runtime.migration] Running upgrade 20260924_sg113_location -> 20260924_sg114_relation, asset relations: typed links (SG-114, G4)
+______________ test_sg233_record_due_defaults_to_the_live_utc_day ______________
+
+reminder_env = (<sqlalchemy.orm.session.Session object at 0x719fa0bc2ed0>, '01a16a35-ba43-7d31-9e21-447a74abb443', '01a16a35-ba43-7d31-9e21-4480c46534e8')
+
+    def test_sg233_record_due_defaults_to_the_live_utc_day(
+        reminder_env,  # type: ignore[no-untyped-def]
+    ) -> None:
+        session, household_id, _other = reminder_env
+        client = TestClient(app)
+        _due_asset(client, session, household_id)
+        before = datetime.now(timezone.utc).date()
+    
+>       from app.services.reminders.service import record_due
+E       ModuleNotFoundError: No module named 'app.services.reminders'
+
+tests/test_sg233_reminders.py:305: ModuleNotFoundError
+---------------------------- Captured stderr setup -----------------------------
+INFO  [alembic.runtime.migration] Context impl SQLiteImpl.
+INFO  [alembic.runtime.migration] Will assume non-transactional DDL.
+INFO  [alembic.runtime.migration] Running upgrade  -> 0201cf10c56c, 001 core foundation
+INFO  [alembic.runtime.migration] Running upgrade 0201cf10c56c -> 20260908_sg013_observation, deterministic signal observations
+INFO  [alembic.runtime.migration] Running upgrade 20260908_sg013_observation -> 20260908_sg014_candidate, deduplication candidates
+INFO  [alembic.runtime.migration] Running upgrade 20260908_sg014_candidate -> 20260908_sg017_fts, SQLite FTS5 index for asset catalog search.
+INFO  [alembic.runtime.migration] Running upgrade 20260908_sg017_fts -> 20260912_sg025_provider_call, provider call ledger (SG-025, blueprint §3.3)
+INFO  [alembic.runtime.migration] Running upgrade 20260912_sg025_provider_call -> 20260914_sg035_foundations, data foundations: source attribution, planning suggestions, guardrail log (SG-035, Phase 3 S2/S3)
+INFO  [alembic.runtime.migration] Running upgrade 20260914_sg035_foundations -> 20260916_sg048_name_optional, name-optional capture: asset.display_name becomes nullable (SG-048, S2)
+INFO  [alembic.runtime.migration] Running upgrade 20260916_sg048_name_optional -> 20260917_sg068_saved_search, saved searches: named per-household filter sets (SG-068, Phase 4)
+INFO  [alembic.runtime.migration] Running upgrade 20260917_sg068_saved_search -> 20260923_sg100_enrich_snapshot, enrichment snapshot store (SG-100, Arc A)
+INFO  [alembic.runtime.migration] Running upgrade 20260923_sg100_enrich_snapshot -> 20260924_sg113_location, location tree + asset location assignment (SG-113, G3)
+INFO  [alembic.runtime.migration] Running upgrade 20260924_sg113_location -> 20260924_sg114_relation, asset relations: typed links (SG-114, G4)
+__________ test_sg233_unresolved_and_non_warning_rows_create_nothing ___________
+
+reminder_env = (<sqlalchemy.orm.session.Session object at 0x719fa1600bf0>, '01a16a35-bb68-78c1-8e56-deda23e7c836', '01a16a35-bb68-78c1-8e56-dee9d50c66c7')
+
+    def test_sg233_unresolved_and_non_warning_rows_create_nothing(
+        reminder_env,  # type: ignore[no-untyped-def]
+    ) -> None:
+        session, household_id, _other = reminder_env
+        client = TestClient(app)
+        today = datetime.now(timezone.utc).date()
+    
+        unresolved = _asset(session, household_id, "SG233 Proposed")
+        _classify(client, unresolved.id, household_id)
+        _add_assertion(
+            session,
+            unresolved,
+            EXPIRY_FIELD,
+            {"expiry_date": (today + timedelta(days=3)).isoformat(), "date_type": "expiry_date"},
+            "proposed",
+        )
+    
+        expired = _asset(session, household_id, "SG233 Expired")
+        _classify(client, expired.id, household_id)
+        _add_assertion(
+            session,
+            expired,
+            EXPIRY_FIELD,
+            {"expiry_date": (today - timedelta(days=1)).isoformat(), "date_type": "expiry_date"},
+            "accepted",
+        )
+    
+        safe = _asset(session, household_id, "SG233 Safe")
+        _classify(client, safe.id, household_id)
+        _add_assertion(
+            session,
+            safe,
+            EXPIRY_FIELD,
+            {"expiry_date": (today + timedelta(days=60)).isoformat(), "date_type": "expiry_date"},
+            "accepted",
+        )
+    
+>       from app.models.reminder import Reminder
+E       ModuleNotFoundError: No module named 'app.models.reminder'
+
+tests/test_sg233_reminders.py:350: ModuleNotFoundError
+---------------------------- Captured stderr setup -----------------------------
+INFO  [alembic.runtime.migration] Context impl SQLiteImpl.
+INFO  [alembic.runtime.migration] Will assume non-transactional DDL.
+INFO  [alembic.runtime.migration] Running upgrade  -> 0201cf10c56c, 001 core foundation
+INFO  [alembic.runtime.migration] Running upgrade 0201cf10c56c -> 20260908_sg013_observation, deterministic signal observations
+INFO  [alembic.runtime.migration] Running upgrade 20260908_sg013_observation -> 20260908_sg014_candidate, deduplication candidates
+INFO  [alembic.runtime.migration] Running upgrade 20260908_sg014_candidate -> 20260908_sg017_fts, SQLite FTS5 index for asset catalog search.
+INFO  [alembic.runtime.migration] Running upgrade 20260908_sg017_fts -> 20260912_sg025_provider_call, provider call ledger (SG-025, blueprint §3.3)
+INFO  [alembic.runtime.migration] Running upgrade 20260912_sg025_provider_call -> 20260914_sg035_foundations, data foundations: source attribution, planning suggestions, guardrail log (SG-035, Phase 3 S2/S3)
+INFO  [alembic.runtime.migration] Running upgrade 20260914_sg035_foundations -> 20260916_sg048_name_optional, name-optional capture: asset.display_name becomes nullable (SG-048, S2)
+INFO  [alembic.runtime.migration] Running upgrade 20260916_sg048_name_optional -> 20260917_sg068_saved_search, saved searches: named per-household filter sets (SG-068, Phase 4)
+INFO  [alembic.runtime.migration] Running upgrade 20260917_sg068_saved_search -> 20260923_sg100_enrich_snapshot, enrichment snapshot store (SG-100, Arc A)
+INFO  [alembic.runtime.migration] Running upgrade 20260923_sg100_enrich_snapshot -> 20260924_sg113_location, location tree + asset location assignment (SG-113, G3)
+INFO  [alembic.runtime.migration] Running upgrade 20260924_sg113_location -> 20260924_sg114_relation, asset relations: typed links (SG-114, G4)
+_________________ test_sg233_same_day_rerun_inserts_zero_rows __________________
+
+reminder_env = (<sqlalchemy.orm.session.Session object at 0x719fa610fa70>, '01a16a35-bc63-7091-bdb7-e338f8b49fd0', '01a16a35-bc63-7091-bdb7-e346f3779897')
+
+    def test_sg233_same_day_rerun_inserts_zero_rows(
+        reminder_env,  # type: ignore[no-untyped-def]
+    ) -> None:
+        session, household_id, _other = reminder_env
+        client = TestClient(app)
+        _due_asset(client, session, household_id)
+        today = datetime.now(timezone.utc).date()
+    
+>       from app.models.reminder import Reminder
+E       ModuleNotFoundError: No module named 'app.models.reminder'
+
+tests/test_sg233_reminders.py:369: ModuleNotFoundError
+---------------------------- Captured stderr setup -----------------------------
+INFO  [alembic.runtime.migration] Context impl SQLiteImpl.
+INFO  [alembic.runtime.migration] Will assume non-transactional DDL.
+INFO  [alembic.runtime.migration] Running upgrade  -> 0201cf10c56c, 001 core foundation
+INFO  [alembic.runtime.migration] Running upgrade 0201cf10c56c -> 20260908_sg013_observation, deterministic signal observations
+INFO  [alembic.runtime.migration] Running upgrade 20260908_sg013_observation -> 20260908_sg014_candidate, deduplication candidates
+INFO  [alembic.runtime.migration] Running upgrade 20260908_sg014_candidate -> 20260908_sg017_fts, SQLite FTS5 index for asset catalog search.
+INFO  [alembic.runtime.migration] Running upgrade 20260908_sg017_fts -> 20260912_sg025_provider_call, provider call ledger (SG-025, blueprint §3.3)
+INFO  [alembic.runtime.migration] Running upgrade 20260912_sg025_provider_call -> 20260914_sg035_foundations, data foundations: source attribution, planning suggestions, guardrail log (SG-035, Phase 3 S2/S3)
+INFO  [alembic.runtime.migration] Running upgrade 20260914_sg035_foundations -> 20260916_sg048_name_optional, name-optional capture: asset.display_name becomes nullable (SG-048, S2)
+INFO  [alembic.runtime.migration] Running upgrade 20260916_sg048_name_optional -> 20260917_sg068_saved_search, saved searches: named per-household filter sets (SG-068, Phase 4)
+INFO  [alembic.runtime.migration] Running upgrade 20260917_sg068_saved_search -> 20260923_sg100_enrich_snapshot, enrichment snapshot store (SG-100, Arc A)
+INFO  [alembic.runtime.migration] Running upgrade 20260923_sg100_enrich_snapshot -> 20260924_sg113_location, location tree + asset location assignment (SG-113, G3)
+INFO  [alembic.runtime.migration] Running upgrade 20260924_sg113_location -> 20260924_sg114_relation, asset relations: typed links (SG-114, G4)
+_______ test_sg233_read_and_dismiss_round_trip_with_illegal_transitions ________
+
+reminder_env = (<sqlalchemy.orm.session.Session object at 0x719fa0bc1490>, '01a16a35-bd33-74e2-a9b7-1f695846fd29', '01a16a35-bd33-74e2-a9b7-1f7234ac1f7c')
+
+    def test_sg233_read_and_dismiss_round_trip_with_illegal_transitions(
+        reminder_env,  # type: ignore[no-untyped-def]
+    ) -> None:
+        session, household_id, other_household = reminder_env
+        client = TestClient(app)
+        _due_asset(client, session, household_id)
+        today = datetime.now(timezone.utc).date()
+    
+>       from app.services.reminders.service import record_due
+E       ModuleNotFoundError: No module named 'app.services.reminders'
+
+tests/test_sg233_reminders.py:387: ModuleNotFoundError
+---------------------------- Captured stderr setup -----------------------------
+INFO  [alembic.runtime.migration] Context impl SQLiteImpl.
+INFO  [alembic.runtime.migration] Will assume non-transactional DDL.
+INFO  [alembic.runtime.migration] Running upgrade  -> 0201cf10c56c, 001 core foundation
+INFO  [alembic.runtime.migration] Running upgrade 0201cf10c56c -> 20260908_sg013_observation, deterministic signal observations
+INFO  [alembic.runtime.migration] Running upgrade 20260908_sg013_observation -> 20260908_sg014_candidate, deduplication candidates
+INFO  [alembic.runtime.migration] Running upgrade 20260908_sg014_candidate -> 20260908_sg017_fts, SQLite FTS5 index for asset catalog search.
+INFO  [alembic.runtime.migration] Running upgrade 20260908_sg017_fts -> 20260912_sg025_provider_call, provider call ledger (SG-025, blueprint §3.3)
+INFO  [alembic.runtime.migration] Running upgrade 20260912_sg025_provider_call -> 20260914_sg035_foundations, data foundations: source attribution, planning suggestions, guardrail log (SG-035, Phase 3 S2/S3)
+INFO  [alembic.runtime.migration] Running upgrade 20260914_sg035_foundations -> 20260916_sg048_name_optional, name-optional capture: asset.display_name becomes nullable (SG-048, S2)
+INFO  [alembic.runtime.migration] Running upgrade 20260916_sg048_name_optional -> 20260917_sg068_saved_search, saved searches: named per-household filter sets (SG-068, Phase 4)
+INFO  [alembic.runtime.migration] Running upgrade 20260917_sg068_saved_search -> 20260923_sg100_enrich_snapshot, enrichment snapshot store (SG-100, Arc A)
+INFO  [alembic.runtime.migration] Running upgrade 20260923_sg100_enrich_snapshot -> 20260924_sg113_location, location tree + asset location assignment (SG-113, G3)
+INFO  [alembic.runtime.migration] Running upgrade 20260924_sg113_location -> 20260924_sg114_relation, asset relations: typed links (SG-114, G4)
+______________ test_sg233_diff_touches_only_the_approved_ceiling _______________
+
+    def test_sg233_diff_touches_only_the_approved_ceiling() -> None:
+        result = subprocess.run(
+            ["git", "-C", str(ROOT), "diff", "--name-only", "origin/automation...HEAD"],
+            capture_output=True,
+            text=True,
+            timeout=60,
+            check=False,
+        )
+        assert result.returncode == 0, result.stderr
+        paths = [line for line in result.stdout.splitlines() if line.strip()]
+        for path in paths:
+            assert path in CEILING_PATHS or path.startswith(
+                "backend/app/services/reminders/"
+            ) or path.startswith("backend/alembic/versions/"), path
+        migrations = [path for path in paths if path.startswith("backend/alembic/versions/")]
+>       assert migrations == ["backend/alembic/versions/20261023_sg233_reminder.py"]
+E       AssertionError: assert [] == ['backend/ale..._reminder.py']
+E         
+E         Right contains one more item: 'backend/alembic/versions/20261023_sg233_reminder.py'
+E         Use -v to get more diff
+
+tests/test_sg233_reminders.py:465: AssertionError
+=============================== warnings summary ===============================
+../../../home/andrei/StorageGenie/backend/venv/lib/python3.12/site-packages/fastapi/testclient.py:1
+  /home/andrei/StorageGenie/backend/venv/lib/python3.12/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+../../../home/andrei/StorageGenie/backend/venv/lib/python3.12/site-packages/starlette/testclient.py:53
+  /home/andrei/StorageGenie/backend/venv/lib/python3.12/site-packages/starlette/testclient.py:53: DeprecationWarning: The anyio.abc.BlockingPortal alias is deprecated, use anyio.from_thread.BlockingPortal instead.
+    _PortalFactoryType = Callable[[], AbstractContextManager[anyio.abc.BlockingPortal]]
+
+tests/test_sg233_reminders.py::test_sg233_migration_upgrade_downgrade_upgrade_and_unique
+tests/test_sg233_reminders.py::test_sg233_due_fixture_creates_engine_shaped_unread_reminder
+tests/test_sg233_reminders.py::test_sg233_record_due_defaults_to_the_live_utc_day
+tests/test_sg233_reminders.py::test_sg233_unresolved_and_non_warning_rows_create_nothing
+tests/test_sg233_reminders.py::test_sg233_same_day_rerun_inserts_zero_rows
+tests/test_sg233_reminders.py::test_sg233_read_and_dismiss_round_trip_with_illegal_transitions
+  /home/andrei/StorageGenie/backend/venv/lib/python3.12/site-packages/alembic/config.py:604: DeprecationWarning: No path_separator found in configuration; falling back to legacy splitting on spaces, commas, and colons for prepend_sys_path.  Consider adding path_separator=os to Alembic config.
+    util.warn_deprecated(
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/test_sg233_reminders.py::test_sg233_migration_upgrade_downgrade_upgrade_and_unique
+FAILED tests/test_sg233_reminders.py::test_sg233_due_fixture_creates_engine_shaped_unread_reminder
+FAILED tests/test_sg233_reminders.py::test_sg233_record_due_defaults_to_the_live_utc_day
+FAILED tests/test_sg233_reminders.py::test_sg233_unresolved_and_non_warning_rows_create_nothing
+FAILED tests/test_sg233_reminders.py::test_sg233_same_day_rerun_inserts_zero_rows
+FAILED tests/test_sg233_reminders.py::test_sg233_read_and_dismiss_round_trip_with_illegal_transitions
+FAILED tests/test_sg233_reminders.py::test_sg233_diff_touches_only_the_approved_ceiling
+7 failed, 8 warnings in 2.77s
+
+=== 2. CANDIDATE PASS run: the same file on work commit a2d715e ===
+command: cd backend && venv/bin/python -m pytest -q tests/test_sg233_reminders.py
+observed: 7 passed
+
+.......                                                                  [100%]
+=============================== warnings summary ===============================
+venv/lib/python3.12/site-packages/fastapi/testclient.py:1
+  /home/andrei/StorageGenie/backend/venv/lib/python3.12/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+venv/lib/python3.12/site-packages/starlette/testclient.py:53
+  /home/andrei/StorageGenie/backend/venv/lib/python3.12/site-packages/starlette/testclient.py:53: DeprecationWarning: The anyio.abc.BlockingPortal alias is deprecated, use anyio.from_thread.BlockingPortal instead.
+    _PortalFactoryType = Callable[[], AbstractContextManager[anyio.abc.BlockingPortal]]
+
+tests/test_sg233_reminders.py::test_sg233_migration_upgrade_downgrade_upgrade_and_unique
+tests/test_sg233_reminders.py::test_sg233_migration_upgrade_downgrade_upgrade_and_unique
+tests/test_sg233_reminders.py::test_sg233_migration_upgrade_downgrade_upgrade_and_unique
+tests/test_sg233_reminders.py::test_sg233_due_fixture_creates_engine_shaped_unread_reminder
+tests/test_sg233_reminders.py::test_sg233_record_due_defaults_to_the_live_utc_day
+tests/test_sg233_reminders.py::test_sg233_unresolved_and_non_warning_rows_create_nothing
+tests/test_sg233_reminders.py::test_sg233_same_day_rerun_inserts_zero_rows
+tests/test_sg233_reminders.py::test_sg233_read_and_dismiss_round_trip_with_illegal_transitions
+  /home/andrei/StorageGenie/backend/venv/lib/python3.12/site-packages/alembic/config.py:604: DeprecationWarning: No path_separator found in configuration; falling back to legacy splitting on spaces, commas, and colons for prepend_sys_path.  Consider adding path_separator=os to Alembic config.
+    util.warn_deprecated(
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+7 passed, 10 warnings in 2.92s
+
+=== 3. PG-EV-01 discrimination leg: wrong-tier expectation inverted in a transient copy, shown failing ===
+command: sed s/assert row.tier == "urgent"/assert row.tier == "critical"/ > transient copy; pytest -q that node; copy deleted before commit
+observed: assert failed with urgent != critical
+
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_________ test_sg233_due_fixture_creates_engine_shaped_unread_reminder _________
+
+reminder_env = (<sqlalchemy.orm.session.Session object at 0x71a21e635280>, '01a16a35-e56a-73c1-bdbc-2ab9da4de65e', '01a16a35-e56a-73c1-bdbc-2acd7b082153')
+
+    def test_sg233_due_fixture_creates_engine_shaped_unread_reminder(
+        reminder_env,  # type: ignore[no-untyped-def]
+    ) -> None:
+        session, household_id, _other = reminder_env
+        client = TestClient(app)
+        asset, today, _expiry = _due_asset(client, session, household_id)
+    
+        before = client.get("/v1/reminders", params={"household_id": household_id})
+        assert before.status_code == 200, before.text
+        assert before.json()["items"] == []
+    
+        from app.services.reminders.service import record_due
+    
+        created = record_due(session, household_id, today)
+        assert len(created) == 1, "a due fixture must create exactly one reminder"
+        row = created[0]
+        assert row.asset_id == asset.id
+        assert row.as_of_day == today.isoformat()
+>       assert row.tier == "critical"
+E       AssertionError: assert 'urgent' == 'critical'
+E         
+E         - critical
+E         + urgent
+
+tests/test_sg233_inverted_tmp.py:255: AssertionError
+---------------------------- Captured stderr setup -----------------------------
+INFO  [alembic.runtime.migration] Context impl SQLiteImpl.
+INFO  [alembic.runtime.migration] Will assume non-transactional DDL.
+INFO  [alembic.runtime.migration] Running upgrade  -> 0201cf10c56c, 001 core foundation
+INFO  [alembic.runtime.migration] Running upgrade 0201cf10c56c -> 20260908_sg013_observation, deterministic signal observations
+INFO  [alembic.runtime.migration] Running upgrade 20260908_sg013_observation -> 20260908_sg014_candidate, deduplication candidates
+INFO  [alembic.runtime.migration] Running upgrade 20260908_sg014_candidate -> 20260908_sg017_fts, SQLite FTS5 index for asset catalog search.
+INFO  [alembic.runtime.migration] Running upgrade 20260908_sg017_fts -> 20260912_sg025_provider_call, provider call ledger (SG-025, blueprint §3.3)
+INFO  [alembic.runtime.migration] Running upgrade 20260912_sg025_provider_call -> 20260914_sg035_foundations, data foundations: source attribution, planning suggestions, guardrail log (SG-035, Phase 3 S2/S3)
+INFO  [alembic.runtime.migration] Running upgrade 20260914_sg035_foundations -> 20260916_sg048_name_optional, name-optional capture: asset.display_name becomes nullable (SG-048, S2)
+INFO  [alembic.runtime.migration] Running upgrade 20260916_sg048_name_optional -> 20260917_sg068_saved_search, saved searches: named per-household filter sets (SG-068, Phase 4)
+INFO  [alembic.runtime.migration] Running upgrade 20260917_sg068_saved_search -> 20260923_sg100_enrich_snapshot, enrichment snapshot store (SG-100, Arc A)
+INFO  [alembic.runtime.migration] Running upgrade 20260923_sg100_enrich_snapshot -> 20260924_sg113_location, location tree + asset location assignment (SG-113, G3)
+INFO  [alembic.runtime.migration] Running upgrade 20260924_sg113_location -> 20260924_sg114_relation, asset relations: typed links (SG-114, G4)
+INFO  [alembic.runtime.migration] Running upgrade 20260924_sg114_relation -> 20261023_sg233_reminder, expiry reminders: durable per-asset daily rows (SG-233, G1)
+=============================== warnings summary ===============================
+venv/lib/python3.12/site-packages/fastapi/testclient.py:1
+  /home/andrei/StorageGenie/backend/venv/lib/python3.12/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+venv/lib/python3.12/site-packages/starlette/testclient.py:53
+  /home/andrei/StorageGenie/backend/venv/lib/python3.12/site-packages/starlette/testclient.py:53: DeprecationWarning: The anyio.abc.BlockingPortal alias is deprecated, use anyio.from_thread.BlockingPortal instead.
+    _PortalFactoryType = Callable[[], AbstractContextManager[anyio.abc.BlockingPortal]]
+
+tests/test_sg233_inverted_tmp.py::test_sg233_due_fixture_creates_engine_shaped_unread_reminder
+  /home/andrei/StorageGenie/backend/venv/lib/python3.12/site-packages/alembic/config.py:604: DeprecationWarning: No path_separator found in configuration; falling back to legacy splitting on spaces, commas, and colons for prepend_sys_path.  Consider adding path_separator=os to Alembic config.
+    util.warn_deprecated(
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/test_sg233_inverted_tmp.py::test_sg233_due_fixture_creates_engine_shaped_unread_reminder
+1 failed, 3 warnings in 1.62s
+
+=== 4. CANDIDATE full backend suite, run ONCE on a2d715e ===
+command: cd backend && venv/bin/python -m pytest -q (bound 600s)
+observed: 2 failed, 730 passed; both failures are pre-existing environment gaps proven on base below
+
+........................................................................ [  9%]
+........................................................................ [ 19%]
+........................................................................ [ 29%]
+........................................................................ [ 39%]
+........................................................................ [ 49%]
+........................................................................ [ 59%]
+........................................................................ [ 68%]
+........................................................................ [ 78%]
+........................................................................ [ 88%]
+........................................................................ [ 98%]
+.....FF.....                                                             [100%]
+=================================== FAILURES ===================================
+___ test_generated_codes_are_validated_and_bad_checksum_is_not_an_identifier ___
+
+isolated_db = (<sqlalchemy.orm.session.Session object at 0x7f543b286480>, '01a16a37-ab38-7be2-b561-5fd5c9dcfb0f', PosixPath('/tmp/pytest-of-andrei/pytest-4/test_generated_codes_are_valid0/storage'))
+
+    def test_generated_codes_are_validated_and_bad_checksum_is_not_an_identifier(isolated_db) -> None:  # type: ignore[no-untyped-def]
+        session, household_id, root = isolated_db
+        qr_value = "https://example.test/SG-013"
+        qr_image = qrcode.make(qr_value).convert("RGB")
+        qr = _evidence(session, household_id, root, _png(qr_image), "qr.png", "image/png")
+        ean_image, ean_value = _ean13_image("590123412345")
+        ean = _evidence(session, household_id, root, _png(ean_image), "ean.png", "image/png")
+        # Deliberately render a syntactically valid EAN with the wrong check digit.
+        bad_value = ean_value[:-1] + ("0" if ean_value[-1] != "0" else "1")
+        bad_image, _ = _ean13_image(ean_value[:-1], bad_value[-1])
+        bad = _evidence(session, household_id, root, _png(bad_image), "bad.png", "image/png")
+    
+        qr_rows = signals.extract_observations(qr.id, session)
+        ean_rows = signals.extract_observations(ean.id, session)
+        bad_rows = signals.extract_observations(bad.id, session)
+    
+        qr_values = [json.loads(row.value_json) for row in qr_rows if row.kind == "barcode_qr"]
+        ean_values = [json.loads(row.value_json) for row in ean_rows if row.kind == "barcode_qr"]
+        bad_values = [json.loads(row.value_json) for row in bad_rows if row.kind == "barcode_qr"]
+>       assert any(item.get("value") == qr_value and item["validated"] for item in qr_values)
+E       assert False
+E        +  where False = any(<generator object test_generated_codes_are_validated_and_bad_checksum_is_not_an_identifier.<locals>.<genexpr> at 0x7f54393db3e0>)
+
+tests/test_signals.py:136: AssertionError
+----------------------------- Captured stderr call -----------------------------
+WARNI [app.services.signals] Barcode extraction unavailable: pyzbar/libzbar is not installed
+WARNI [app.services.signals] OCR extraction unavailable: tesseract is not installed or it's not in your PATH. See README file for more information.
+WARNI [app.services.signals] Barcode extraction unavailable: pyzbar/libzbar is not installed
+WARNI [app.services.signals] OCR extraction unavailable: tesseract is not installed or it's not in your PATH. See README file for more information.
+WARNI [app.services.signals] Barcode extraction unavailable: pyzbar/libzbar is not installed
+WARNI [app.services.signals] OCR extraction unavailable: tesseract is not installed or it's not in your PATH. See README file for more information.
+------------------------------ Captured log call -------------------------------
+WARNING  app.services.signals:signals.py:104 Barcode extraction unavailable: pyzbar/libzbar is not installed
+WARNING  app.services.signals:signals.py:215 OCR extraction unavailable: tesseract is not installed or it's not in your PATH. See README file for more information.
+WARNING  app.services.signals:signals.py:104 Barcode extraction unavailable: pyzbar/libzbar is not installed
+WARNING  app.services.signals:signals.py:215 OCR extraction unavailable: tesseract is not installed or it's not in your PATH. See README file for more information.
+WARNING  app.services.signals:signals.py:104 Barcode extraction unavailable: pyzbar/libzbar is not installed
+WARNING  app.services.signals:signals.py:215 OCR extraction unavailable: tesseract is not installed or it's not in your PATH. See README file for more information.
+_________________ test_ocr_has_text_boxes_and_mean_confidence __________________
+
+isolated_db = (<sqlalchemy.orm.session.Session object at 0x7f543b4b2b10>, '01a16a37-ac3c-7ac1-b296-7f3d70668a45', PosixPath('/tmp/pytest-of-andrei/pytest-4/test_ocr_has_text_boxes_and_me0/storage'))
+
+    def test_ocr_has_text_boxes_and_mean_confidence(isolated_db) -> None:  # type: ignore[no-untyped-def]
+        session, household_id, root = isolated_db
+        evidence = _evidence(session, household_id, root, _png(_text_image()), "text.png", "image/png")
+        rows = signals.extract_observations(evidence.id, session)
+        ocr = [json.loads(row.value_json) for row in rows if row.kind == "ocr"]
+>       assert ocr
+E       assert []
+
+tests/test_signals.py:148: AssertionError
+----------------------------- Captured stderr call -----------------------------
+WARNI [app.services.signals] Barcode extraction unavailable: pyzbar/libzbar is not installed
+WARNI [app.services.signals] OCR extraction unavailable: tesseract is not installed or it's not in your PATH. See README file for more information.
+------------------------------ Captured log call -------------------------------
+WARNING  app.services.signals:signals.py:104 Barcode extraction unavailable: pyzbar/libzbar is not installed
+WARNING  app.services.signals:signals.py:215 OCR extraction unavailable: tesseract is not installed or it's not in your PATH. See README file for more information.
+=============================== warnings summary ===============================
+venv/lib/python3.12/site-packages/fastapi/testclient.py:1
+  /home/andrei/StorageGenie/backend/venv/lib/python3.12/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+venv/lib/python3.12/site-packages/starlette/testclient.py:53
+  /home/andrei/StorageGenie/backend/venv/lib/python3.12/site-packages/starlette/testclient.py:53: DeprecationWarning: The anyio.abc.BlockingPortal alias is deprecated, use anyio.from_thread.BlockingPortal instead.
+    _PortalFactoryType = Callable[[], AbstractContextManager[anyio.abc.BlockingPortal]]
+
+tests/test_candidates.py: 3 warnings
+tests/test_foundations.py: 3 warnings
+tests/test_saved_searches.py: 3 warnings
+tests/test_search.py: 3 warnings
+tests/test_sg048_name_optional.py: 6 warnings
+tests/test_sg100_snapshot_persistence.py: 3 warnings
+tests/test_sg113_locations.py: 3 warnings
+tests/test_sg114_relations.py: 3 warnings
+tests/test_sg233_reminders.py: 8 warnings
+tests/test_signals.py: 3 warnings
+  /home/andrei/StorageGenie/backend/venv/lib/python3.12/site-packages/alembic/config.py:604: DeprecationWarning: No path_separator found in configuration; falling back to legacy splitting on spaces, commas, and colons for prepend_sys_path.  Consider adding path_separator=os to Alembic config.
+    util.warn_deprecated(
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/test_signals.py::test_generated_codes_are_validated_and_bad_checksum_is_not_an_identifier
+FAILED tests/test_signals.py::test_ocr_has_text_boxes_and_mean_confidence - a...
+2 failed, 730 passed, 40 warnings in 58.74s
+
+=== 5. The two old red rows run alone on base 7d0cc91 (CO-37 evidence) ===
+command: cd /tmp/sg233-base/backend && /home/andrei/StorageGenie/backend/venv/bin/python -m pytest -q tests/test_signals.py::test_generated_codes_are_validated_and_bad_checksum_is_not_an_identifier tests/test_signals.py::test_ocr_has_text_boxes_and_mean_confidence
+observed: 2 failed on base for the same missing pyzbar/libzbar and tesseract
+
+FF                                                                       [100%]
+=================================== FAILURES ===================================
+___ test_generated_codes_are_validated_and_bad_checksum_is_not_an_identifier ___
+
+isolated_db = (<sqlalchemy.orm.session.Session object at 0x7172f470b800>, '01a16a37-de4f-7110-9ec9-55eae74b078c', PosixPath('/tmp/pytest-of-andrei/pytest-5/test_generated_codes_are_valid0/storage'))
+
+    def test_generated_codes_are_validated_and_bad_checksum_is_not_an_identifier(isolated_db) -> None:  # type: ignore[no-untyped-def]
+        session, household_id, root = isolated_db
+        qr_value = "https://example.test/SG-013"
+        qr_image = qrcode.make(qr_value).convert("RGB")
+        qr = _evidence(session, household_id, root, _png(qr_image), "qr.png", "image/png")
+        ean_image, ean_value = _ean13_image("590123412345")
+        ean = _evidence(session, household_id, root, _png(ean_image), "ean.png", "image/png")
+        # Deliberately render a syntactically valid EAN with the wrong check digit.
+        bad_value = ean_value[:-1] + ("0" if ean_value[-1] != "0" else "1")
+        bad_image, _ = _ean13_image(ean_value[:-1], bad_value[-1])
+        bad = _evidence(session, household_id, root, _png(bad_image), "bad.png", "image/png")
+    
+        qr_rows = signals.extract_observations(qr.id, session)
+        ean_rows = signals.extract_observations(ean.id, session)
+        bad_rows = signals.extract_observations(bad.id, session)
+    
+        qr_values = [json.loads(row.value_json) for row in qr_rows if row.kind == "barcode_qr"]
+        ean_values = [json.loads(row.value_json) for row in ean_rows if row.kind == "barcode_qr"]
+        bad_values = [json.loads(row.value_json) for row in bad_rows if row.kind == "barcode_qr"]
+>       assert any(item.get("value") == qr_value and item["validated"] for item in qr_values)
+E       assert False
+E        +  where False = any(<generator object test_generated_codes_are_validated_and_bad_checksum_is_not_an_identifier.<locals>.<genexpr> at 0x7172f270e880>)
+
+tests/test_signals.py:136: AssertionError
+------------------------------ Captured log call -------------------------------
+WARNING  app.services.signals:signals.py:104 Barcode extraction unavailable: pyzbar/libzbar is not installed
+WARNING  app.services.signals:signals.py:215 OCR extraction unavailable: tesseract is not installed or it's not in your PATH. See README file for more information.
+WARNING  app.services.signals:signals.py:104 Barcode extraction unavailable: pyzbar/libzbar is not installed
+WARNING  app.services.signals:signals.py:215 OCR extraction unavailable: tesseract is not installed or it's not in your PATH. See README file for more information.
+WARNING  app.services.signals:signals.py:104 Barcode extraction unavailable: pyzbar/libzbar is not installed
+WARNING  app.services.signals:signals.py:215 OCR extraction unavailable: tesseract is not installed or it's not in your PATH. See README file for more information.
+_________________ test_ocr_has_text_boxes_and_mean_confidence __________________
+
+isolated_db = (<sqlalchemy.orm.session.Session object at 0x7172f7097e30>, '01a16a37-df5f-7022-ab13-ea57967f875e', PosixPath('/tmp/pytest-of-andrei/pytest-5/test_ocr_has_text_boxes_and_me0/storage'))
+
+    def test_ocr_has_text_boxes_and_mean_confidence(isolated_db) -> None:  # type: ignore[no-untyped-def]
+        session, household_id, root = isolated_db
+        evidence = _evidence(session, household_id, root, _png(_text_image()), "text.png", "image/png")
+        rows = signals.extract_observations(evidence.id, session)
+        ocr = [json.loads(row.value_json) for row in rows if row.kind == "ocr"]
+>       assert ocr
+E       assert []
+
+tests/test_signals.py:148: AssertionError
+------------------------------ Captured log call -------------------------------
+WARNING  app.services.signals:signals.py:104 Barcode extraction unavailable: pyzbar/libzbar is not installed
+WARNING  app.services.signals:signals.py:215 OCR extraction unavailable: tesseract is not installed or it's not in your PATH. See README file for more information.
+=========================== short test summary info ============================
+FAILED tests/test_signals.py::test_generated_codes_are_validated_and_bad_checksum_is_not_an_identifier
+FAILED tests/test_signals.py::test_ocr_has_text_boxes_and_mean_confidence - a...
+2 failed in 1.27s
+
+=== 6. mypy delta on touched app files ===
+base command: cd /tmp/sg233-base/backend && venv/bin/python -m mypy app/main.py
+candidate command: cd backend && venv/bin/python -m mypy app/main.py app/models/reminder.py app/services/reminders/service.py app/api/v1/reminders.py
+observed: 41 errors on both; main.py errors are the same pre-existing lines 58 and 64; the three new modules add zero.
+
+--- base ---
+app/models/base.py:8: error: Unused "type: ignore" comment  [unused-ignore]
+app/services/audit_service.py:16: error: Missing type arguments for generic type "dict"  [type-arg]
+app/services/audit_service.py:17: error: Missing type arguments for generic type "dict"  [type-arg]
+app/schemas/asset.py:55: error: Missing type arguments for generic type "dict"  [type-arg]
+app/schemas/asset.py:57: error: Missing type arguments for generic type "dict"  [type-arg]
+app/services/asset_service.py:19: error: Missing type arguments for generic type "dict"  [type-arg]
+app/services/asset_service.py:41: error: Missing type arguments for generic type "dict"  [type-arg]
+app/services/asset_service.py:112: error: Missing type arguments for generic type "dict"  [type-arg]
+app/api/v1/review_tasks.py:38: error: Function is missing a return type annotation  [no-untyped-def]
+app/api/v1/review_tasks.py:42: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/review_tasks.py:43: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/review_tasks.py:86: error: Function is missing a return type annotation  [no-untyped-def]
+app/api/v1/review_tasks.py:90: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/review_tasks.py:91: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/households.py:18: error: Function is missing a return type annotation  [no-untyped-def]
+app/api/v1/households.py:20: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/households.py:22: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/households.py:58: error: Function is missing a return type annotation  [no-untyped-def]
+app/api/v1/households.py:59: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/households.py:60: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/evidence.py:45: error: Function is missing a return type annotation  [no-untyped-def]
+app/api/v1/evidence.py:46: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/evidence.py:48: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/evidence.py:50: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/assets.py:71: error: Function is missing a return type annotation  [no-untyped-def]
+app/api/v1/assets.py:74: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/assets.py:76: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/assets.py:107: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/assets.py:107: error: Missing type arguments for generic type "dict"  [type-arg]
+app/api/v1/assets.py:107: note: Error code "type-arg" not covered by "type: ignore[no-untyped-def]" comment
+app/api/v1/assets.py:274: error: Function is missing a return type annotation  [no-untyped-def]
+app/api/v1/assets.py:282: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/assets.py:283: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/assets.py:409: error: Function is missing a return type annotation  [no-untyped-def]
+app/api/v1/assets.py:413: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/assets.py:415: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/assets.py:519: error: Function is missing a return type annotation  [no-untyped-def]
+app/api/v1/assets.py:521: error: Missing type arguments for generic type "dict"  [type-arg]
+app/api/v1/assets.py:523: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/assets.py:524: error: Unused "type: ignore" comment  [unused-ignore]
+app/main.py:58: error: Unused "type: ignore" comment  [unused-ignore]
+app/main.py:64: error: Unused "type: ignore" comment  [unused-ignore]
+Found 41 errors in 9 files (checked 1 source file)
+--- candidate ---
+app/models/base.py:8: error: Unused "type: ignore" comment  [unused-ignore]
+app/services/audit_service.py:16: error: Missing type arguments for generic type "dict"  [type-arg]
+app/services/audit_service.py:17: error: Missing type arguments for generic type "dict"  [type-arg]
+app/schemas/asset.py:55: error: Missing type arguments for generic type "dict"  [type-arg]
+app/schemas/asset.py:57: error: Missing type arguments for generic type "dict"  [type-arg]
+app/services/asset_service.py:19: error: Missing type arguments for generic type "dict"  [type-arg]
+app/services/asset_service.py:41: error: Missing type arguments for generic type "dict"  [type-arg]
+app/services/asset_service.py:112: error: Missing type arguments for generic type "dict"  [type-arg]
+app/api/v1/review_tasks.py:38: error: Function is missing a return type annotation  [no-untyped-def]
+app/api/v1/review_tasks.py:42: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/review_tasks.py:43: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/review_tasks.py:86: error: Function is missing a return type annotation  [no-untyped-def]
+app/api/v1/review_tasks.py:90: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/review_tasks.py:91: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/households.py:18: error: Function is missing a return type annotation  [no-untyped-def]
+app/api/v1/households.py:20: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/households.py:22: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/households.py:58: error: Function is missing a return type annotation  [no-untyped-def]
+app/api/v1/households.py:59: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/households.py:60: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/evidence.py:45: error: Function is missing a return type annotation  [no-untyped-def]
+app/api/v1/evidence.py:46: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/evidence.py:48: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/evidence.py:50: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/assets.py:71: error: Function is missing a return type annotation  [no-untyped-def]
+app/api/v1/assets.py:74: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/assets.py:76: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/assets.py:107: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/assets.py:107: error: Missing type arguments for generic type "dict"  [type-arg]
+app/api/v1/assets.py:107: note: Error code "type-arg" not covered by "type: ignore[no-untyped-def]" comment
+app/api/v1/assets.py:274: error: Function is missing a return type annotation  [no-untyped-def]
+app/api/v1/assets.py:282: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/assets.py:283: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/assets.py:409: error: Function is missing a return type annotation  [no-untyped-def]
+app/api/v1/assets.py:413: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/assets.py:415: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/assets.py:519: error: Function is missing a return type annotation  [no-untyped-def]
+app/api/v1/assets.py:521: error: Missing type arguments for generic type "dict"  [type-arg]
+app/api/v1/assets.py:523: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/assets.py:524: error: Unused "type: ignore" comment  [unused-ignore]
+app/main.py:58: error: Unused "type: ignore" comment  [unused-ignore]
+app/main.py:64: error: Unused "type: ignore" comment  [unused-ignore]
+Found 41 errors in 9 files (checked 4 source files)
+
+=== 7. ruff (touched files) ===
+command: cd backend && venv/bin/python -m ruff check app/main.py app/models/reminder.py app/services/reminders/service.py app/api/v1/reminders.py tests/test_sg233_reminders.py alembic/versions/20261023_sg233_reminder.py
+output: All checks passed!
+
+=== 8. frontend build and existing page test ===
+command: cd frontend && npm run build (tsc && vite build; bound 600s)
+output:
+> storagegenie-frontend@0.1.0 build
+> tsc && vite build
+vite v5.4.21 building for production...
+✓ 1965 modules transformed.
+dist/index.html                   0.94 kB │ gzip:  0.48 kB
+dist/assets/index-C07VbG0m.css    4.54 kB │ gzip:  1.30 kB
+dist/assets/index-BwELt1C2.js   321.86 kB │ gzip: 93.67 kB
+✓ built in 3.58s
+
+command: cd frontend && ./node_modules/.bin/vitest run src/routes/ExpiryPage.test.tsx
+output: 1 test file passed, 9 tests passed in 1.90s
+
+=== 9. badge renders the count (transient untracked vitest check, deleted before commit) ===
+output: 1 test file passed; assertions saw "Unread reminders (2)", two reusing row renderer rows, and "Computed 2026-10-23 · 7-day window"; duration 1.14s
+
+=== 10. secret scan and diff gate ===
+command: grep -rniE smtp|password|secret|api[_-]?key backend/app/services/reminders backend/app/api/v1/reminders.py
+output: empty (grep rc=1)
+command: git diff origin/automation...HEAD -- . :(exclude)docs/worklogs | grep -inE smtp|password|secret|api[_-]?key
+output: empty (grep rc=1)
+command: grep -nHiE [A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,} changed source files | grep -v :@
+output: no email-shaped address
+command: git diff --name-only origin/automation...HEAD
+output:
+backend/alembic/versions/20261023_sg233_reminder.py
+backend/app/api/v1/reminders.py
+backend/app/main.py
+backend/app/models/reminder.py
+backend/app/services/reminders/__init__.py
+backend/app/services/reminders/service.py
+backend/tests/test_sg233_reminders.py
+docs/worklogs/SG-233.log
+frontend/src/api/client.ts
+frontend/src/api/types.ts
+frontend/src/routes/ExpiryPage.tsx
+observed: 11 paths, all inside the packet ceiling; one migration; no dependency or .env path.
+
+=== 11. alembic head enumeration ===
+command: cd backend && venv/bin/python -m alembic heads
+output: 20261023_sg233_reminder (head)
+
+=== 12. health at end ===
+output: {"status":"ok","db":"ok","storage":"ok"} (live service still serves the previous build; this slice did not deploy or restart)
