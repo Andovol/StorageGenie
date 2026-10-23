@@ -14,6 +14,8 @@ import type {
   PlanningSuggestion,
   PlanningSuggestionListResponse,
   RelationListResponse,
+  Reminder,
+  ReminderListResponse,
 } from "./types";
 
 const BASE = import.meta.env.VITE_API_BASE || "http://localhost:8003";
@@ -288,6 +290,29 @@ export function fetchExpiryStatus(householdId: string, category?: string) {
     household_id: householdId,
     category: category ?? "",
   });
+}
+
+// SG-233: in-app reminder reads and transitions, shaped by the reminders API.
+export function fetchReminders(householdId: string) {
+  return apiGet<ReminderListResponse>("/v1/reminders", {
+    household_id: householdId,
+  });
+}
+
+export function markReminderRead(reminderId: string, householdId: string) {
+  return apiPost<Reminder>(
+    `/v1/reminders/${reminderId}/read`,
+    {},
+    { household_id: householdId }
+  );
+}
+
+export function dismissReminder(reminderId: string, householdId: string) {
+  return apiPost<Reminder>(
+    `/v1/reminders/${reminderId}/dismiss`,
+    {},
+    { household_id: householdId }
+  );
 }
 
 export function generateAnalyticsInsights(householdId: string) {

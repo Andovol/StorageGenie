@@ -80,6 +80,7 @@ app.include_router(enrich_router, prefix="/v1")
 app.include_router(plugins_router, prefix="/v1")
 app.include_router(planning_router, prefix="/v1")
 app.include_router(analytics_router, prefix="/v1")
+app.include_router(__import__("app.api.v1.reminders", fromlist=["router"]).router, prefix="/v1")
 app.include_router(settings_router, prefix="/v1")
 
 

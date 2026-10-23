@@ -1,11 +1,11 @@
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
-import { fetchAnalyticsSummary, fetchExpiryStatus } from "../api/client";
+import { fetchAnalyticsSummary, fetchExpiryStatus, fetchReminders } from "../api/client";
 import type {
   AnalyticsSummary,
   ExpiryStatusResponse,
-  ExpiryStatusRow,
+  ReminderListResponse,
 } from "../api/types";
 import { CONTROL_STYLE, THEMED_CONTROL_CLASS } from "../components/shell/CatalogToolbar";
 import { PageContainer } from "../components/shell/PageContainer";
@@ -50,7 +50,14 @@ function daysLabel(days: number): string {
   return `${days} ${days === 1 ? "day" : "days"} remaining`;
 }
 
-function ExpiryRow({ row, householdId, categoryName }: { row: ExpiryStatusRow; householdId: string; categoryName: (slug: string) => string }) {
+type ExpiryRowItem = {
+  asset_id: string;
+  display_name: string | null;
+  days_remaining: number;
+  tier: string | null;
+};
+
+function ExpiryRow({ row, householdId, detail }: { row: ExpiryRowItem; householdId: string; detail: ReactNode }) {
   return (
     <div
       className="bg-card border-border"
@@ -63,11 +70,7 @@ function ExpiryRow({ row, householdId, categoryName }: { row: ExpiryStatusRow; h
       >
         {row.display_name || "Untitled item"}
       </Link>
-      <span className="text-muted-foreground" style={{ fontSize: 12 }}>{categoryName(row.category)}</span>
-      <span style={{ fontSize: 13 }}>
-        {row.expiry_date}
-        {row.date_type ? ` · ${row.date_type}` : ""}
-      </span>
+      {detail}
       <span className="text-muted-foreground" style={{ fontSize: 13 }}>{daysLabel(row.days_remaining)}</span>
       <span
         data-testid="tier-pill"
@@ -97,6 +100,11 @@ export function ExpiryPage() {
     queryFn: () => fetchAnalyticsSummary(effectiveHousehold),
     enabled: !!effectiveHousehold,
   });
+  const reminders = useQuery<ReminderListResponse>({
+    queryKey: ["reminders", effectiveHousehold],
+    queryFn: () => fetchReminders(effectiveHousehold),
+    enabled: !!effectiveHousehold,
+  });
 
   const categories = taxonomy?.plugins.find((plugin) => plugin.plugin_id === "expiry-tracker")?.categories ?? [];
   const categoryName = (slug: string) => categories.find((entry) => entry.id === slug)?.name ?? slug;
@@ -105,6 +113,8 @@ export function ExpiryPage() {
   const rows = data?.rows ?? [];
   const unresolved = data?.unresolved_rows ?? [];
   const isEmpty = !!data && rows.length === 0 && unresolved.length === 0;
+  const unreadReminders = (reminders.data?.items ?? []).filter((item) => item.status === "unread");
+  const unreadCount = reminders.data?.unread_count ?? 0;
 
   return (
     <PageContainer className="text-foreground">
@@ -134,6 +144,29 @@ export function ExpiryPage() {
         the served analytics summary and is never merged into the expiry stream.
       </p>
 
+      <div style={{ marginTop: 20 }}>
+        <h2 style={{ fontSize: 15 }}>Unread reminders ({unreadCount})</h2>
+        {unreadReminders.length === 0 ? (
+          <div className="text-muted-foreground" style={{ fontSize: 12 }}>None</div>
+        ) : (
+          <div style={{ display: "grid", gap: 8 }}>
+            {unreadReminders.map((reminder) => (
+              <ExpiryRow
+                key={reminder.id}
+                row={reminder}
+                householdId={effectiveHousehold}
+                detail={
+                  <span className="text-muted-foreground" style={{ fontSize: 12 }}>
+                    Computed {reminder.as_of_day}
+                    {reminder.window_days !== null ? ` · ${reminder.window_days}-day window` : ""}
+                  </span>
+                }
+              />
+            ))}
+          </div>
+        )}
+      </div>
+
       {status.isLoading && <div>Loading expiry status…</div>}
       {status.isError && (
         <div role="alert" className="text-danger" style={{ marginTop: 12 }}>{String(status.error)}</div>
@@ -152,7 +185,20 @@ export function ExpiryPage() {
                 ) : (
                   <div style={{ display: "grid", gap: 8 }}>
                     {sectionRows.map((row) => (
-                      <ExpiryRow key={row.asset_id} row={row} householdId={effectiveHousehold} categoryName={categoryName} />
+                      <ExpiryRow
+                        key={row.asset_id}
+                        row={row}
+                        householdId={effectiveHousehold}
+                        detail={
+                          <>
+                            <span className="text-muted-foreground" style={{ fontSize: 12 }}>{categoryName(row.category)}</span>
+                            <span style={{ fontSize: 13 }}>
+                              {row.expiry_date}
+                              {row.date_type ? ` · ${row.date_type}` : ""}
+                            </span>
+                          </>
+                        }
+                      />
                     ))}
                   </div>
                 )}

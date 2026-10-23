@@ -387,3 +387,26 @@ export type ExpiryStatusResponse = {
   };
   unresolved_rows: ExpiryUnresolvedRow[];
 };
+
+// SG-233: the in-app reminder the Expiry page sends to the user. `as_of_day`
+// is the compute day; `window_days` is the live tier window that fired.
+export type ReminderStatus = "unread" | "read" | "dismissed";
+export type Reminder = {
+  id: string;
+  household_id: string;
+  asset_id: string;
+  display_name: string | null;
+  as_of_day: string;
+  tier: ExpiryTier | null;
+  window_days: number | null;
+  bucket: ExpiryBucket;
+  days_remaining: number;
+  status: ReminderStatus;
+  created_at: string | null;
+  updated_at: string | null;
+};
+export type ReminderListResponse = {
+  household_id: string;
+  unread_count: number;
+  items: Reminder[];
+};
