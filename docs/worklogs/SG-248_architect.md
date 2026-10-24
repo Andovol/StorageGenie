@@ -37,6 +37,11 @@ authority with it, and standing caps set on mixed attribution would bind surface
 
 ## The Architect's picks after Phase B (what goes to the owner)
 
+> **These are the Architect's RECOMMENDATIONS, not decisions** (owner, D-1024-16, 2026-10-24: *"Don't make model
+> decisions without asking me first."*). `SECOND_OPINION.md` requires the Architect's pick to be in the repository
+> before Phase B — that is what makes the blindness work — so the pick stays and is **labelled a recommendation**.
+> The vendor, the vision model id and the whitelist are the owner's; the four items go to the owner separately.
+
 **D-R14-a — the second cloud provider: OpenAI directly, with a provider id that is never `openrouter`.** The
 shape and the separation, not the price: the tree already speaks the OpenAI-compatible `POST …/chat/completions`
 shape **twice** (the existing reader `providers/opencode_go.py:32-33`, the payload builder `:167-186`; the

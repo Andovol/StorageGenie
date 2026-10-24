@@ -1,4 +1,4 @@
-# 2026-10-24 — Session approvals (D-1024-1 … D-1024-15)
+# 2026-10-24 — Session approvals (D-1024-1 … D-1024-16)
 
 Owner instruction, quoted byte-identical (2026-10-24, this chat):
 
@@ -176,3 +176,33 @@ them, and one runs (SG-248 blind, SG-249 critique) before they come back.
 
 **Scope.** The ruling is about **the live server** — the only server this project runs on. It says nothing about
 a developer's own machine, and it does not forbid a local model on a different host if the owner ever wants one.
+## D-1024-16 — Model decisions belong to the owner: the Architect recommends, the owner decides
+
+Owner, 2026-10-24 (this chat), verbatim: *"Don't make model decisions without asking me first."*
+
+**Do:** the Architect may **recommend**; the owner **decides**. Anything that chooses an AI model or an AI provider
+for the product — the second photo reader's vendor, the vision model id and the model whitelist, whether any path
+runs a model at all — is an owner decision, and it reaches the owner as an item **with its second-opinion line**
+before anything is built.
+
+**What this changes in practice.**
+
+- The Architect's picks are **recommendations**, and the records must read that way. A pick inside a review packet
+  or an architect record is the object the review attacks — never a decision taken, and never written as one.
+- **The review protocol is unchanged.** `SECOND_OPINION.md` requires the Architect's pick to be in the repository
+  before Phase B — that is what makes the blindness work — so the pick stays, **labelled as a recommendation**.
+  The owner asked for a second opinion on these decisions and then to be brought them; the review informs the
+  owner's choice, it does not make it.
+- **The slice-envelope models are already the owner's standing setting** (`AGENTS.md`: every trigger states
+  `model=opencode-go/deepseek-v4.1-flash effort=max`; the second-opinion reviewer is the contract's configured
+  `opencode-go/muse-spark-1.3-contributor`, which is never the Architect's own model). So **no new question
+  arises** for a dispatch that follows the standing policy; the owner is asked **only if a dispatch would deviate**
+  from it.
+- The owner's earlier ruling stands and is not re-opened: **no local models on the server** (D-1024-15).
+
+**Where it bites now.** D-R14-a (the second provider) and the vision model id are the owner's; the four row-14
+items go to the owner as four separate items after the round-2 review (SG-249), each with its review line.
+
+**Scope note.** The rule is read in the strong sense — it covers **every** model or provider choice for the
+product, and it also covers a change to the model that runs a slice. If the owner meant only the product's AI
+models, the standing dispatch policy continues unchanged either way.
