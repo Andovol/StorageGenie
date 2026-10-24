@@ -81,7 +81,10 @@ the local path is the landing.
   tree. The facts the reviewer must weigh against it: the key slot was declared **for scene rendering**
   (`config.py:41-44`) with its own cap (`sg_scene_cap`) — so both image surfaces would sit on **one vendor and
   one key**; and the vendor-neutral guards live **inside** the vendor file, so a second adapter **duplicates
-  them** and the two copies can diverge silently.
+  them** and the two copies can diverge silently (measured: **119 lines**). Measured in SG-247: **scene spend is
+  unattributed and the scene cap filters `provider == "openrouter"` with no month filter** — so a photo adapter
+  that reused the id `openrouter` would also be charged to the scene cap, and the two surfaces' budgets would be
+  coupled. The reviewer must say how the photo adapter's provider id and its budget separation would work.
 - **A2** — **Google AI Studio (Gemini) directly**: the cheapest vision class per published rates, but it needs
   a new key slot and its own API surface (the pack's earlier rate note: Gemini 2.5 Flash $0.30 in / $2.50 out;
   Gemini 2.5 Flash-Lite $0.10 / $0.40; ~258 tokens per 1024×1024 image).
@@ -143,8 +146,11 @@ its own probe.
   shared box).
 - **D5** — **what "changing providers needs configuration, not code" (`blueprint.md:539`) means**: a **stable
   seam with per-vendor adapters** (the tree already branches per model family, `opencode_go.py:63-67`), or
-  literally **no code per vendor** — which no adapter can satisfy. This reading is the owner's to confirm, and
-  the reviewer should say which reading it believes the stage can actually meet.
+  literally **no code per vendor** — which no adapter can satisfy. **The measured answer (SG-247): the literal
+  reading is false today** — adding a vendor needs an adapter, a registry branch and a rate table; selecting a
+  provider or fallback needs the settings surface and the caller wiring at five call sites. What the stage can
+  meet is the seam reading, with the touch-list as its scope. This reading is the owner's to confirm, and the
+  reviewer should say which reading it believes the stage can actually meet.
 
 The slice-1 exit question the reviewer must answer: with **no production fallback configured** (so nothing can
 fabricate a reading), what is an exit that is **observable rather than vacuous** — a configuration read-back, or
@@ -152,9 +158,67 @@ something else?
 
 ## Measured facts from the read-only verification slice (SG-247)
 
-*(filled from `docs/worklogs/SG-247_report.md` and its evidence logs — three questions, no database, no
-provider, $0: the static adapter touch-list; the served image's local libraries; where scene spend lands and
-which retryable classes the gateway test covers.)*
+Measured in a slice that wrote nothing: no product byte, no database opened (not even read-only), no provider
+called, no key read, **$0**, 569 s. Evidence: `docs/worklogs/SG-247_report.md`, `SG-247_g1_g3.log`,
+`SG-247_g2_build.log`, `SG-247_g2_measure.log`, `SG-247_g2_digest.log`, `SG-247_orientation.log`.
+
+**G1 — the adapter touch-list (measured).** A second adapter must touch: a **new adapter file**;
+`providers/reader.py` (registry gate `:90-105`, `ai_status()` `:108-114`, `run_ai_extraction` `:456-469`);
+`config.py` (the new key/base-url/model **and** a fallback-id setting); `api/v1/settings.py` (whitelist `:26`,
+GET shape `:29-36`, PUT shape `:39-40`, validation `:62-63`); the **four `RouterConfig` call sites**
+(`reader.py:463-469`, `chat/service.py:423-429`, `planning/service.py:442-448`, `analytics/service.py:595-601`);
+**`services/enrich/synthesize.py:276-285` — a sixth caller the slice found, which calls the provider directly
+and bypasses `ProviderRouter` entirely**; `tests/test_privacy_audit.py` (client file set `:237-243`, send sites
+`:244-248` and `:524-528`, `redact_image` sites `:264-267`); conditionally `providers/router.py` (the
+per-destination retryable set) and `providers/opencode_go.py` (the shared base); `tests/test_provider_conformance.py`
+plus a new adapter test file; the lockfiles **only** if a new SDK is used.
+
+- **G1.1 — the seam question, measured: NO.** The list does **not** stay inside seam + adapter + pins. The
+  **policy, ledger and outcome half stays untouched** (the repair policy, the ledger writers, `ExtractionOutput`,
+  `ProviderResult`, `models/provider_call.py`, `redaction.py`, `protocols.py`, `reader._estimate_call` need no
+  edit) — but the four router sites need a caller **wiring** edit, `synthesize.py` bypasses the router, and the
+  runtime-selection surface does not exist. So "changing providers needs configuration, not code" is **false
+  today**, both for adding a vendor and for selecting provider/fallback.
+- **G1.2 — the vendor-neutral logic is 119 lines** (`70-164` = 95, `298-309` = 12, `361-372` = 12, measured with
+  `wc -l`) — the guards, the accounting, the estimate shape and the two copies of the budget guard. The rate
+  constants `:44-45` and the vendor-specific `response_format_for` `:63-67` stay per adapter.
+- **G1.3 — what runtime selection needs:** `sg_fallback_id` in `config.py`; `_runtime_provider_id` /
+  `_runtime_fallback_id` and `effective_provider_id()` / `effective_fallback_id()` in `reader.py`; every configured
+  adapter registered; the effective ids used in `ai_status()`, `run_ai_extraction` and the four router sites;
+  `AiSettingsOut` / `AiSettingsUpdate` extended with `provider_id` / `fallback_id` and validated against the
+  registered ids; `synthesize.py` if text is in scope. **A restart resets the overrides to the env defaults.**
+
+**G2 — the served image's local-signal path (measured inside a `--network none` throwaway container).**
+`tesseract 5.3.0` at `/usr/bin/tesseract` (`which_rc=0`); `from pyzbar.pyzbar import decode` **OK**;
+`import pytesseract` **OK** (its own version read 5.3.0); `libzbar.so.0` **loadable** (`ctypes.CDLL` rc=0) at
+`/lib/x86_64-linux-gnu/`. The built tag's top-level digest differs from the running image's (a BuildKit
+attestation manifest), while the **12 rootfs layer digests and the runtime Config are identical** — so the facts
+transfer by layer identity, and the running container was not touched. **OCR quality on real photos is NOT
+measured** — that needs the owner's photos and their consent.
+
+**G3 — where the spend lands, and which retryable classes are tested (measured from the code).**
+
+- **Scene rows land in `provider_call` with `job_id=None`** (`scene/openrouter.py:623`; cost from the response's
+  `usage.cost` `:803-809`; row appended `:853-869`), and the scene cap filters `provider == "openrouter"` with
+  **no month filter** (`:288-296`) — so scene spend is **all-time by provider**, and it reaches the monthly cap
+  only through the unattributed pool. **A photo adapter that reused the id `openrouter` would therefore be
+  charged to the scene cap as well.**
+- **The monthly cap mixes categories** (`reader.py:292-306`): the household's job-linked rows **plus every
+  `job_id IS NULL` row** — chat (`:331`, `:369`), planning (`:238`, `:272`), analytics (`:434`, `:469`),
+  synthesize (`synthesize.py:310`) and scene (`openrouter.py:623`) — charged against **every household** reading
+  that month. The photo path writes job-linked rows (`reader.py:226`, `:386`); the Jina snapshot writer is
+  job-linked too (`snapshots.py:140`).
+- **The gateway test is narrower than production and misclassifies one class**: production
+  `{outage, timeout, rate_limited, transport, http_status, invalid_json}` (`reader.py:61-63`) against the test's
+  `{outage, timeout, rate_limited}` (`test_provider_gateway.py:54`); the test exercises only `outage`, and its
+  negative branch asserts that `invalid_json_once` does **not** fall back (`:85-91`) — **the opposite of
+  production**. Uncovered by name: **`transport`**, **`http_status`**, **`invalid_json`**.
+- **A keyless local adapter cannot register through the current gate** (`reader.py:97` is
+  `if settings.opencode_api_key`), so a local provider needs a registration condition that is **not** a key.
+
+**Not measured, and left to the owner:** the runtime magnitude of the unattributed pool (one read-only query on
+the app database — a declared sensitive surface), the cap values, the money authority, and the OCR's quality on
+the owner's own photos.
 
 ## What binds it
 
