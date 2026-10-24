@@ -1,0 +1,47 @@
+scope_check_utc=2026-10-24T14:14:15Z
+$ git status --porcelain=v1
+ M Makefile
+ M backend/app/services/reminders/daily.py
+ M backend/tests/test_sg233_reminders.py
+ M backend/tests/test_sg235_daily_caller.py
+?? docs/worklogs/SG-238_g0.log
+?? docs/worklogs/SG-238_g1_fail_demo.log
+?? docs/worklogs/SG-238_g1_green.log
+?? docs/worklogs/SG-238_g3_host_after.log
+?? docs/worklogs/SG-238_g3_image.log
+?? docs/worklogs/SG-238_g3_image_libs.log
+?? docs/worklogs/SG-238_g3_make_target.log
+?? docs/worklogs/SG-238_lint.log
+?? docs/worklogs/SG-238_log_line_observed.log
+?? docs/worklogs/SG-238_mypy_focused.log
+?? docs/worklogs/SG-238_premises.log
+?? docs/worklogs/SG-238_scope.log
+?? docs/worklogs/SG-238_sudo_probe.log
+?? docs/worklogs/SG-238_suite_after.log
+?? docs/worklogs/SG-238_suite_before.log
+$ git diff --name-only
+Makefile
+backend/app/services/reminders/daily.py
+backend/tests/test_sg233_reminders.py
+backend/tests/test_sg235_daily_caller.py
+$ git diff --stat
+ Makefile                                 |  5 +-
+ backend/app/services/reminders/daily.py  |  8 +++
+ backend/tests/test_sg233_reminders.py    | 41 +++++---------
+ backend/tests/test_sg235_daily_caller.py | 97 ++++++++++++++++++++++----------
+ 4 files changed, 93 insertions(+), 58 deletions(-)
+$ git diff --name-only origin/automation...HEAD  # range the old gates read (empty after publication)
+$ grep -n "origin/automation\\|git", in the two replacement gate functions
+def test_sg233_shipped_paths_still_exist() -> None:
+    missing = _missing_shipped_paths(SHIPPED_PATHS)
+    assert missing == [], f"SG-233 shipped paths missing or empty: {missing}"
+def test_sg235_shipped_paths_still_exist() -> None:
+    missing = _missing_shipped_paths(SHIPPED_PATHS)
+    assert missing == [], f"SG-235 shipped paths missing or empty: {missing}"
+$ git diff --name-only -- backend/pyproject.toml backend/requirements.lock backend/alembic/versions docker-compose.yml backend/app/server.py backend/Dockerfile frontend
+(empty above = no dependency, migration, compose, server, Dockerfile or frontend change)
+$ docker ps --format "{{.ID}} {{.Names}} {{.Image}} {{.Status}}"
+ee4e165af4b6 storagegenie-backend-1 storagegenie-backend Up 15 minutes (healthy)
+$ docker image inspect storagegenie-backend:latest --format "{{.Id}}"
+sha256:2bd3599f2b68980576454f889a7b93db291ec8e0c08f5f7a7afd52b7af93ef5f
+scope_check_end_utc=2026-10-24T14:14:15Z

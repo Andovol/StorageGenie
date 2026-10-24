@@ -1,0 +1,5 @@
+sudo_probe_start_utc=2026-10-24T14:09:17Z epoch=1792850957
+sudo: The "no new privileges" flag is set, which prevents sudo from running as root.
+sudo: If sudo is running in a container, you may need to adjust the container configuration to disable the flag.
+sudo_rc=1
+sudo_probe_end_utc=2026-10-24T14:09:17Z elapsed_s=0

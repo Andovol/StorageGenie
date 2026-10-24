@@ -10,6 +10,7 @@ against the start-base tree, where they do not exist.
 from __future__ import annotations
 
 import asyncio
+import logging
 import subprocess
 import sys
 import threading
@@ -31,7 +32,7 @@ from app.models import Asset, Household
 
 ROOT = Path(__file__).resolve().parents[2]
 
-ALLOWED_PATHS = {
+SHIPPED_PATHS = (
     "backend/app/services/reminders/daily.py",
     "backend/app/server.py",
     "backend/app/main.py",
@@ -39,20 +40,15 @@ ALLOWED_PATHS = {
     "backend/tests/test_sg235_daily_caller.py",
     "frontend/src/routes/ExpiryPage.tsx",
     "frontend/src/routes/ExpiryPage.test.tsx",
-    "docs/worklogs/SG-235.log",
-    "docs/worklogs/SG-235_report.md",
-    "docs/worklogs/SG-235_verify.log",
-}
+)
 
-REQUIRED_PATHS = {
-    "backend/app/services/reminders/daily.py",
-    "backend/app/server.py",
-    "backend/app/main.py",
-    "backend/Dockerfile",
-    "backend/tests/test_sg235_daily_caller.py",
-    "frontend/src/routes/ExpiryPage.tsx",
-    "frontend/src/routes/ExpiryPage.test.tsx",
-}
+
+def _missing_shipped_paths(paths: tuple[str, ...]) -> list[str]:
+    return [
+        path
+        for path in paths
+        if not (ROOT / path).is_file() or (ROOT / path).stat().st_size == 0
+    ]
 
 
 def _alembic_config(url: str) -> Config:
@@ -429,6 +425,7 @@ def test_sg235_health_answers_while_a_pass_is_in_flight(
 def test_sg235_pass_isolates_a_failing_household(
     daily_env,  # type: ignore[no-untyped-def]
     monkeypatch: pytest.MonkeyPatch,
+    caplog: pytest.LogCaptureFixture,
 ) -> None:
     from app.services.reminders import daily, service
 
@@ -448,13 +445,22 @@ def test_sg235_pass_isolates_a_failing_household(
 
     monkeypatch.setattr(daily, "record_due", flaky_record_due)
 
-    result = daily.run_daily_pass(factory, as_of_day=today)
+    with caplog.at_level(logging.ERROR, logger="app.services.reminders.daily"):
+        result = daily.run_daily_pass(factory, as_of_day=today)
     assert result.households_visited == 2
     assert result.reminders_created == 1
     assert len(result.errors) == 1
     assert result.errors[0].household_id == first_id
     assert "boom" in result.errors[0].error
     assert set(calls) == {first_id, second_id}
+    failure_lines = [
+        record.getMessage()
+        for record in caplog.records
+        if record.name == "app.services.reminders.daily" and record.levelno == logging.ERROR
+    ]
+    assert len(failure_lines) == 1
+    assert "Daily reminder pass failed for household" in failure_lines[0]
+    assert first_id in failure_lines[0]
 
     from app.models.reminder import Reminder
 
@@ -466,6 +472,48 @@ def test_sg235_pass_isolates_a_failing_household(
         assert rows[0].asset_id == asset.id
     finally:
         check.close()
+
+
+def test_sg235_pass_logs_one_success_line_with_real_counts(
+    daily_env,  # type: ignore[no-untyped-def]
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    from app.services.reminders import daily
+
+    factory, first_id, second_id, session = daily_env
+    today = _today()
+    client = TestClient(app)
+    first_asset = _due_asset(client, session, first_id, today + timedelta(days=3))
+    second_asset = _due_asset(client, session, second_id, today + timedelta(days=3))
+
+    caplog.clear()
+    with caplog.at_level(logging.INFO, logger="app.services.reminders.daily"):
+        first = daily.run_daily_pass(factory, as_of_day=today)
+        second = daily.run_daily_pass(factory, as_of_day=today)
+
+    lines = [
+        record.getMessage()
+        for record in caplog.records
+        if record.name == "app.services.reminders.daily" and record.levelno == logging.INFO
+    ]
+    assert first.households_visited == 2
+    assert first.reminders_created == 2
+    assert second.households_visited == 2
+    assert second.reminders_created == 0
+    assert len(lines) == 2
+    assert f"as_of={today.isoformat()}" in lines[0]
+    assert "households_visited=2" in lines[0]
+    assert "reminders_created=2" in lines[0]
+    assert "errors=0" in lines[0]
+    assert f"as_of={today.isoformat()}" in lines[1]
+    assert "households_visited=2" in lines[1]
+    assert "reminders_created=0" in lines[1]
+    assert "errors=0" in lines[1]
+    for line in lines:
+        assert "SG235 First Household" not in line
+        assert "SG235 Second Household" not in line
+        assert first_asset.id not in line
+        assert second_asset.id not in line
 
 
 def test_sg235_suite_starts_no_pass_and_creates_no_relative_db(
@@ -492,19 +540,6 @@ def test_sg235_suite_starts_no_pass_and_creates_no_relative_db(
     assert not (ROOT / "backend" / "data").exists()
 
 
-def test_sg235_diff_touches_only_the_approved_ceiling() -> None:
-    result = subprocess.run(
-        ["git", "-C", str(ROOT), "diff", "--name-only", "origin/automation...HEAD"],
-        capture_output=True,
-        text=True,
-        timeout=60,
-        check=False,
-    )
-    assert result.returncode == 0, result.stderr
-    paths = {line for line in result.stdout.splitlines() if line.strip()}
-    for path in paths:
-        assert path in ALLOWED_PATHS, path
-    assert REQUIRED_PATHS <= paths
-    assert not any(path.startswith("backend/alembic/versions/") for path in paths)
-    assert "docker-compose.yml" not in paths
-    print("sg235_diff_paths=" + ",".join(sorted(paths)))
+def test_sg235_shipped_paths_still_exist() -> None:
+    missing = _missing_shipped_paths(SHIPPED_PATHS)
+    assert missing == [], f"SG-235 shipped paths missing or empty: {missing}"

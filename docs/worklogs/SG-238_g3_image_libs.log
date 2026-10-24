@@ -1,0 +1,7 @@
+image_lib_probe_start_utc=2026-10-24T14:13:49Z
+host test_signals.py sha256=0582e355210b2ff961865716ba424875e08ea89e9ba504e605be16a09d516fb7
+0582e355210b2ff961865716ba424875e08ea89e9ba504e605be16a09d516fb7  /app/tests/test_signals.py
+tesseract 5.3.0
+	libzbar.so.0 (libc6,x86-64) => /lib/x86_64-linux-gnu/libzbar.so.0
+pyzbar+pytesseract import ok; tesseract 5.3.0
+image_lib_probe_end_utc=2026-10-24T14:13:50Z elapsed_s=1

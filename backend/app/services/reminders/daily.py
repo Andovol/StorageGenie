@@ -72,6 +72,14 @@ def run_daily_pass(
                 )
     finally:
         session.close()
+    logger.info(
+        "Daily reminder pass completed as_of=%s households_visited=%d "
+        "reminders_created=%d errors=%d",
+        day.isoformat(),
+        visited,
+        created,
+        len(errors),
+    )
     return DailyPassResult(
         as_of_day=day,
         households_visited=visited,

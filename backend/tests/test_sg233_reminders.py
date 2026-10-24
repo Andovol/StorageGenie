@@ -10,7 +10,6 @@ against the start-base tree, where they do not exist.
 from __future__ import annotations
 
 import json
-import subprocess
 from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
 
@@ -44,18 +43,21 @@ REMINDER_COLUMNS = {
     "updated_at",
 }
 
-CEILING_PATHS = {
+SHIPPED_PATHS = (
+    "backend/alembic/versions/20261023_sg233_reminder.py",
     "backend/app/models/reminder.py",
+    "backend/app/services/reminders/service.py",
     "backend/app/api/v1/reminders.py",
-    "backend/app/main.py",
     "frontend/src/routes/ExpiryPage.tsx",
-    "frontend/src/api/client.ts",
-    "frontend/src/api/types.ts",
-    "backend/tests/test_sg233_reminders.py",
-    "docs/worklogs/SG-233.log",
-    "docs/worklogs/SG-233_report.md",
-    "docs/worklogs/SG-233_verify.log",
-}
+)
+
+
+def _missing_shipped_paths(paths: tuple[str, ...]) -> list[str]:
+    return [
+        path
+        for path in paths
+        if not (ROOT / path).is_file() or (ROOT / path).stat().st_size == 0
+    ]
 
 
 def _alembic_config(url: str) -> Config:
@@ -447,19 +449,6 @@ def test_sg233_read_and_dismiss_round_trip_with_illegal_transitions(
     )
 
 
-def test_sg233_diff_touches_only_the_approved_ceiling() -> None:
-    result = subprocess.run(
-        ["git", "-C", str(ROOT), "diff", "--name-only", "origin/automation...HEAD"],
-        capture_output=True,
-        text=True,
-        timeout=60,
-        check=False,
-    )
-    assert result.returncode == 0, result.stderr
-    paths = [line for line in result.stdout.splitlines() if line.strip()]
-    for path in paths:
-        assert path in CEILING_PATHS or path.startswith(
-            "backend/app/services/reminders/"
-        ) or path.startswith("backend/alembic/versions/"), path
-    migrations = [path for path in paths if path.startswith("backend/alembic/versions/")]
-    assert migrations == ["backend/alembic/versions/20261023_sg233_reminder.py"]
+def test_sg233_shipped_paths_still_exist() -> None:
+    missing = _missing_shipped_paths(SHIPPED_PATHS)
+    assert missing == [], f"SG-233 shipped paths missing or empty: {missing}"

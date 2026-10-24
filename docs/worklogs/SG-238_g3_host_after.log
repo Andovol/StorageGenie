@@ -1,0 +1,60 @@
+host_signal_after_start_utc=2026-10-24T14:10:36Z
+FF                                                                       [100%]
+=================================== FAILURES ===================================
+___ test_generated_codes_are_validated_and_bad_checksum_is_not_an_identifier ___
+
+isolated_db = (<sqlalchemy.orm.session.Session object at 0x787a07fa7170>, '01a16e3f-cef6-7461-8f43-6d36bb0c93d2', PosixPath('/tmp/pytest-of-andrei/pytest-4/test_generated_codes_are_valid0/storage'))
+
+    def test_generated_codes_are_validated_and_bad_checksum_is_not_an_identifier(isolated_db) -> None:  # type: ignore[no-untyped-def]
+        session, household_id, root = isolated_db
+        qr_value = "https://example.test/SG-013"
+        qr_image = qrcode.make(qr_value).convert("RGB")
+        qr = _evidence(session, household_id, root, _png(qr_image), "qr.png", "image/png")
+        ean_image, ean_value = _ean13_image("590123412345")
+        ean = _evidence(session, household_id, root, _png(ean_image), "ean.png", "image/png")
+        # Deliberately render a syntactically valid EAN with the wrong check digit.
+        bad_value = ean_value[:-1] + ("0" if ean_value[-1] != "0" else "1")
+        bad_image, _ = _ean13_image(ean_value[:-1], bad_value[-1])
+        bad = _evidence(session, household_id, root, _png(bad_image), "bad.png", "image/png")
+    
+        qr_rows = signals.extract_observations(qr.id, session)
+        ean_rows = signals.extract_observations(ean.id, session)
+        bad_rows = signals.extract_observations(bad.id, session)
+    
+        qr_values = [json.loads(row.value_json) for row in qr_rows if row.kind == "barcode_qr"]
+        ean_values = [json.loads(row.value_json) for row in ean_rows if row.kind == "barcode_qr"]
+        bad_values = [json.loads(row.value_json) for row in bad_rows if row.kind == "barcode_qr"]
+>       assert any(item.get("value") == qr_value and item["validated"] for item in qr_values)
+E       assert False
+E        +  where False = any(<generator object test_generated_codes_are_validated_and_bad_checksum_is_not_an_identifier.<locals>.<genexpr> at 0x787a0a9592a0>)
+
+tests/test_signals.py:136: AssertionError
+------------------------------ Captured log call -------------------------------
+WARNING  app.services.signals:signals.py:104 Barcode extraction unavailable: pyzbar/libzbar is not installed
+WARNING  app.services.signals:signals.py:215 OCR extraction unavailable: tesseract is not installed or it's not in your PATH. See README file for more information.
+WARNING  app.services.signals:signals.py:104 Barcode extraction unavailable: pyzbar/libzbar is not installed
+WARNING  app.services.signals:signals.py:215 OCR extraction unavailable: tesseract is not installed or it's not in your PATH. See README file for more information.
+WARNING  app.services.signals:signals.py:104 Barcode extraction unavailable: pyzbar/libzbar is not installed
+WARNING  app.services.signals:signals.py:215 OCR extraction unavailable: tesseract is not installed or it's not in your PATH. See README file for more information.
+_________________ test_ocr_has_text_boxes_and_mean_confidence __________________
+
+isolated_db = (<sqlalchemy.orm.session.Session object at 0x787a0a903b30>, '01a16e3f-d052-7bf1-baa6-a36ee58ee6af', PosixPath('/tmp/pytest-of-andrei/pytest-4/test_ocr_has_text_boxes_and_me0/storage'))
+
+    def test_ocr_has_text_boxes_and_mean_confidence(isolated_db) -> None:  # type: ignore[no-untyped-def]
+        session, household_id, root = isolated_db
+        evidence = _evidence(session, household_id, root, _png(_text_image()), "text.png", "image/png")
+        rows = signals.extract_observations(evidence.id, session)
+        ocr = [json.loads(row.value_json) for row in rows if row.kind == "ocr"]
+>       assert ocr
+E       assert []
+
+tests/test_signals.py:148: AssertionError
+------------------------------ Captured log call -------------------------------
+WARNING  app.services.signals:signals.py:104 Barcode extraction unavailable: pyzbar/libzbar is not installed
+WARNING  app.services.signals:signals.py:215 OCR extraction unavailable: tesseract is not installed or it's not in your PATH. See README file for more information.
+=========================== short test summary info ============================
+FAILED tests/test_signals.py::test_generated_codes_are_validated_and_bad_checksum_is_not_an_identifier
+FAILED tests/test_signals.py::test_ocr_has_text_boxes_and_mean_confidence - a...
+2 failed in 1.26s
+rc=1
+host_signal_after_end_utc=2026-10-24T14:10:38Z elapsed_s=2

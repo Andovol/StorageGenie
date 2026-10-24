@@ -1,0 +1,75 @@
+g1_fail_demo_start_utc=2026-10-24T14:10:20Z
+plant: moving frontend/src/routes/ExpiryPage.tsx out of the tree
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_____________________ test_sg233_shipped_paths_still_exist _____________________
+
+    def test_sg233_shipped_paths_still_exist() -> None:
+        missing = _missing_shipped_paths(SHIPPED_PATHS)
+>       assert missing == [], f"SG-233 shipped paths missing or empty: {missing}"
+E       AssertionError: SG-233 shipped paths missing or empty: ['frontend/src/routes/ExpiryPage.tsx']
+E       assert ['frontend/sr...piryPage.tsx'] == []
+E         
+E         Left contains one more item: 'frontend/src/routes/ExpiryPage.tsx'
+E         Use -v to get more diff
+
+tests/test_sg233_reminders.py:454: AssertionError
+=============================== warnings summary ===============================
+venv/lib/python3.12/site-packages/fastapi/testclient.py:1
+  /home/andrei/StorageGenie/backend/venv/lib/python3.12/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+venv/lib/python3.12/site-packages/starlette/testclient.py:53
+  /home/andrei/StorageGenie/backend/venv/lib/python3.12/site-packages/starlette/testclient.py:53: DeprecationWarning: The anyio.abc.BlockingPortal alias is deprecated, use anyio.from_thread.BlockingPortal instead.
+    _PortalFactoryType = Callable[[], AbstractContextManager[anyio.abc.BlockingPortal]]
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/test_sg233_reminders.py::test_sg233_shipped_paths_still_exist - ...
+1 failed, 2 warnings in 1.21s
+sg233_planted_absent_rc=1
+restored frontend/src/routes/ExpiryPage.tsx sha256=ebae39d283a4aae862338f8d3187209dcd1046c69aaabc7154d43e40be86c44e (before=ebae39d283a4aae862338f8d3187209dcd1046c69aaabc7154d43e40be86c44e)
+plant: moving backend/Dockerfile out of the tree
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_____________________ test_sg235_shipped_paths_still_exist _____________________
+
+    def test_sg235_shipped_paths_still_exist() -> None:
+        missing = _missing_shipped_paths(SHIPPED_PATHS)
+>       assert missing == [], f"SG-235 shipped paths missing or empty: {missing}"
+E       AssertionError: SG-235 shipped paths missing or empty: ['backend/Dockerfile']
+E       assert ['backend/Dockerfile'] == []
+E         
+E         Left contains one more item: 'backend/Dockerfile'
+E         Use -v to get more diff
+
+tests/test_sg235_daily_caller.py:545: AssertionError
+=============================== warnings summary ===============================
+venv/lib/python3.12/site-packages/fastapi/testclient.py:1
+  /home/andrei/StorageGenie/backend/venv/lib/python3.12/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+venv/lib/python3.12/site-packages/starlette/testclient.py:53
+  /home/andrei/StorageGenie/backend/venv/lib/python3.12/site-packages/starlette/testclient.py:53: DeprecationWarning: The anyio.abc.BlockingPortal alias is deprecated, use anyio.from_thread.BlockingPortal instead.
+    _PortalFactoryType = Callable[[], AbstractContextManager[anyio.abc.BlockingPortal]]
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/test_sg235_daily_caller.py::test_sg235_shipped_paths_still_exist
+1 failed, 2 warnings in 1.21s
+sg235_planted_absent_rc=1
+restored backend/Dockerfile sha256=d9c60bbaadbb9717ed64ffd7b0cd7445c37995e0f961e2c0553b774fa760503e (before=d9c60bbaadbb9717ed64ffd7b0cd7445c37995e0f961e2c0553b774fa760503e)
+..                                                                       [100%]
+=============================== warnings summary ===============================
+venv/lib/python3.12/site-packages/fastapi/testclient.py:1
+  /home/andrei/StorageGenie/backend/venv/lib/python3.12/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+venv/lib/python3.12/site-packages/starlette/testclient.py:53
+  /home/andrei/StorageGenie/backend/venv/lib/python3.12/site-packages/starlette/testclient.py:53: DeprecationWarning: The anyio.abc.BlockingPortal alias is deprecated, use anyio.from_thread.BlockingPortal instead.
+    _PortalFactoryType = Callable[[], AbstractContextManager[anyio.abc.BlockingPortal]]
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+2 passed, 2 warnings in 1.09s
+restored_green_rc=0
+g1_fail_demo_end_utc=2026-10-24T14:10:26Z

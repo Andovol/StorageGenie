@@ -1,0 +1,26 @@
+premises_start_utc=2026-10-24T14:13:52Z
+contract_line3:
+**Contract version: 0.52.0** — **echo this line verbatim in your receipt.** It is the only proof that you
+contract_VERSION=0.52.0
+agents_version_line:
+> Rule-set version recorded here: 0.52.0. Past version notes, old values, and decision numbers moved to `docs/decisions/2026-10-23-agents-plain-language-history.md`.
+base_ref_requested=origin/automation
+base_ref_resolved=ce672346a087478aa6a7d0c94fd458406ae0ab22
+start_head=ce672346a087478aa6a7d0c94fd458406ae0ab22
+model_cmdline:
+opencode
+run
+--auto
+--dir
+/home/andrei/StorageGenie
+--model
+opencode-go/deepseek-v4.1-flash
+--variant
+max
+# SG-238 — D-1024-6 + the two queued audit fixes: durable scope gates, a daily-pass success log line, and the two always-red signal tests proved environmental
+
+host_libzbar=0
+host_tesseract=absent
+backend_venv_pyzbar=ImportError: Unable to find zbar shared library
+backend_venv_pytesseract=import ok
+premises_end_utc=2026-10-24T14:13:52Z elapsed_s=0

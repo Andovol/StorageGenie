@@ -1,0 +1,9 @@
+lint_start_utc=2026-10-24T14:10:38Z
+All checks passed!
+ruff_rc=0
+app/models/base.py:8: error: Unused "type: ignore" comment  [unused-ignore]
+app/services/audit_service.py:16: error: Missing type arguments for generic type "dict"  [type-arg]
+app/services/audit_service.py:17: error: Missing type arguments for generic type "dict"  [type-arg]
+Found 3 errors in 2 files (checked 1 source file)
+mypy_rc=1
+lint_end_utc=2026-10-24T14:10:38Z elapsed_s=0
