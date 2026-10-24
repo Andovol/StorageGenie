@@ -1,4 +1,4 @@
-# 2026-10-24 — Session approvals (D-1024-1 … D-1024-4)
+# 2026-10-24 — Session approvals (D-1024-1 … D-1024-5)
 
 Owner instruction, quoted byte-identical (2026-10-24, this chat):
 
@@ -31,6 +31,18 @@ Owner instruction, quoted byte-identical (2026-10-24, this chat):
 
 - **Close Launcher #89** now — D477 is live.
 - **Launcher #84 is answered**: engine v0.52.0 is live since 2026-10-24 10:24Z. It closes **after the next slice shows no false `report_unreadable`** — the condition is the gate, not the date.
+
+## D-1024-5 — Context compression is DCP's call, not mine
+
+Owner directive (2026-10-24, this chat), quoted:
+
+> Why did you request compress? I have certain limits set in DCP. you need to let DCP suggest compression.
+
+**Do:** the Architect does **not** initiate a `compress` call on its own initiative in this project. **DCP suggests; the Architect acts on the suggestion.** The generic harness guidance ("use `compress` deliberately") is a default, and this project narrows it: context compression waits for DCP's signal.
+
+**Why:** the owner holds the DCP limits for this workspace, and a self-initiated compression can cut material the owner wanted kept (and, in this session, fired without the owner's limits being consulted).
+
+**Note on this session:** one self-initiated compression already ran (block `b1`, covering the closed steps 1–3: contract adoption, release record, PR closes). Its content was preserved in the summary and the underlying facts are durable in git (`f9f63b3`, `67f1aa4`) and in `docs/decisions/2026-10-24-contract-052-adoption.md`. Nothing else was compressed, and no further compression happens in this session unless DCP suggests it.
 
 ## Standing order for this session (owner, quoted)
 
