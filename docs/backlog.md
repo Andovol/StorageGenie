@@ -19,3 +19,5 @@ Created at the 2026-09-25 D2 close (discharges the long-owed "backlog-file creat
 
 Retired here, never reopened without a new shape: `sg026`-freeze (`D18`, `NOT FIXABLE`).
 | `F-SG144-1` runbook test-interpreter weakness (`README.md:78-82` root venv lacks `pillow_heif`; working interpreter is `backend/venv`) | Owner word or next runbook-touching slice |
+| **D1** — host test libraries `libzbar0` + `tesseract` on `87.106.66.242` (two suite tests red on every run, base-proved environmental; `G-K2` host change) | Owner word (recommended: authorize in SG-237) |
+| **D2** — accept one near expiry date for the live household `01a0a029-…c679` so the daily pass is observed creating a row and the Expiry page's Read/Dismiss work on it (production data write; `G-K2`) | Owner word (recommended: one item, expiry date near) |
