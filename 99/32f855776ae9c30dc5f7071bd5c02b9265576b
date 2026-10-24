@@ -1,2 +1,4 @@
 Dispatch-ID: SG-250 | Report: docs/worklogs/SG-250_report.md | Work-HEAD: 9932f855776ae9c30dc5f7071bd5c02b9265576b
 Contract version: 0.53.0
+
+Settings: coder=opencode coder_source=command model=opencode-go/deepseek-v4.1-flash model_source=command effort=max effort_source=command
