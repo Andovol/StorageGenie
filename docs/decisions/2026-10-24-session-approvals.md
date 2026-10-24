@@ -1,4 +1,4 @@
-# 2026-10-24 — Session approvals (D-1024-1 … D-1024-12)
+# 2026-10-24 — Session approvals (D-1024-1 … D-1024-14)
 
 Owner instruction, quoted byte-identical (2026-10-24, this chat):
 
@@ -129,3 +129,23 @@ Recorded 2026-10-24 after the SG-241 audit (D-1024-11 correction). **The owner d
 **Do:** **SG-244** (`docs/packets/SG-244-dismiss-the-miso-soup-row.md`) performs the one remaining authorized write — `POST /v1/reminders/{id}/dismiss` on that row, exactly once, with the pre-state quoted before it and the post-state after, and no other write. It is a **carry of D-1024-11, not a new decision**: the owner already authorised this write and it was not performed because of a clause in my packet.
 
 **Standing rule this session adds:** a rider's end-state branch must name **the transition that reaches the requested state**, and must not treat *"the row is in some other non-unread state"* as the end state. And a rider's closing advice must never name a UI affordance that does not exist for the row's state (SG-241's report told the owner to click Dismiss on the Expiry page — the page renders unread rows only, so that button does not exist for a `read` row).
+## D-1024-14 — Report to the owner after each completed slice
+
+Owner, 2026-10-24 (this chat), verbatim: *"I want you to keep me informed after each completed slice."*
+
+**Do:** every slice that reaches a rating sends the owner **one report as soon as it is rated** — what ran, what
+landed, the issues table, and the decisions that need them — instead of batching the news until the session
+closes.
+
+**Why this is recorded here:** it is a standing directive about how the Architect works with this owner, not a
+one-off request for this session's report, so it belongs in the project's record (G-O4) and outlives the
+session.
+
+**What it does not change:** the three-section report shape (STATUS · ISSUES & BUGS · DECISIONS FOR YOU); the
+rule that a 🟠/🴠 item reaches the owner only with its second-opinion line; the rule that unrated or blocked
+work stops the deploy instead of shipping silently; and the rule that a slice the owner is waiting on is
+reported by its result, not by a plan.
+
+**One addition the owner asked for in the same breath — status, roadmap progress and what is next.** Each
+post-slice report also states the roadmap position (which rows are built, which are partly built, which are
+missing) so the owner never has to ask where the work stands.

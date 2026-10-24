@@ -11,7 +11,7 @@
 
 **Parked:** email until the owner binds SMTP credentials (D-1024-2) · the full `mypy app` reds (**41 errors in 9 untouched files** — the earlier "three reds" note counted files) and the one pre-existing `eslint` error in `App.household-nav.test.tsx` · the W3 hygiene slice from the SG-240 audit (a second reader of the accepted classification; the logging unit test's redirected handler stream) · W4 (reminder transitions record no actor and no audit row) · every roadmap row but 14.
 
-**Rules for reports:** every report ends with next steps and starts step 1; the parked list is never shown. This keeps the owner's wish for no irrelevant detail while always saying what comes next.
+**Rules for reports:** every report ends with next steps and starts step 1; the parked list is never shown. This keeps the owner's wish for no irrelevant detail while always saying what comes next. **Every rated slice sends the owner one report as soon as it is rated** (D-1024-14), and that report also states the roadmap position.
 
 **Standing:** every app-changing slice is deployed as its own slice, right after it is rated; before every close, deploy the live app and record a release. Unrated or blocked work stops the deploy instead of shipping silently. **Every 🟠 or 🴠 decision item goes through the two-phase second opinion before the owner sees it** (D-1024-10); the review IDs and the disposition go into the decision item and the review ledger.
 
