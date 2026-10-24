@@ -1,0 +1,37 @@
+G3_COUNTS_UTC 2026-10-24T16:40:19Z
+alembic_version 1
+assertion 40
+asset 7
+asset_evidence 20
+asset_fts 7
+asset_fts_config 1
+asset_fts_data 9
+asset_fts_docsize 7
+asset_fts_idx 7
+asset_location 1
+asset_relation 1
+audit_event 104
+candidate 10
+enrich_snapshot 4
+evidence 27
+guardrail_event 2
+household 1
+idempotency_key 11
+job 11
+job_step 72
+location 1
+observation 20
+planning_suggestion 0
+provider_call 39
+reminder 1
+review_task 9
+saved_search 0
+source_attribution 0
+user 2
+--- access log mutating lines
+1
+{"log":"INFO:     172.18.0.1:48604 - \"POST /v1/reminders/01a16e35-4394-7c11-9798-844754826bcc/dismiss?household_id=01a0a029-1477-7ca0-b200-bce78a96c679 HTTP/1.1\" 200 OK\n","stream":"stdout","time":"2026-10-24T16:40:13.444250567Z"}
+--- unit stamps
+Sat 2026-10-24 16:39:08 UTC
+
+NOW_UTC 2026-10-24T16:40:19Z

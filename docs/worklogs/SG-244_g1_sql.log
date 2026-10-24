@@ -1,0 +1,47 @@
+G1_UTC 2026-10-24T16:39:33Z
+alembic_version      asset_location       job_step           
+assertion            asset_relation       location           
+asset                audit_event          observation        
+asset_evidence       candidate            planning_suggestion
+asset_fts            enrich_snapshot      provider_call      
+asset_fts_config     evidence             reminder           
+asset_fts_content    guardrail_event      review_task        
+asset_fts_data       household            saved_search       
+asset_fts_docsize    idempotency_key      source_attribution 
+asset_fts_idx        job                  user               
+--- schema reminder
+CREATE TABLE reminder (
+	id VARCHAR(36) NOT NULL, 
+	household_id VARCHAR(36) NOT NULL, 
+	asset_id VARCHAR(36) NOT NULL, 
+	as_of_day VARCHAR(10) NOT NULL, 
+	tier VARCHAR(50), 
+	bucket VARCHAR(20) NOT NULL, 
+	days_remaining INTEGER NOT NULL, 
+	status VARCHAR(20) NOT NULL, 
+	created_at DATETIME DEFAULT (CURRENT_TIMESTAMP) NOT NULL, 
+	updated_at DATETIME DEFAULT (CURRENT_TIMESTAMP) NOT NULL, 
+	PRIMARY KEY (id), 
+	FOREIGN KEY(household_id) REFERENCES household (id) ON DELETE CASCADE, 
+	FOREIGN KEY(asset_id) REFERENCES asset (id) ON DELETE CASCADE, 
+	CONSTRAINT uq_reminder_asset_as_of_day UNIQUE (asset_id, as_of_day)
+);
+CREATE INDEX ix_reminder_household_id ON reminder (household_id);
+CREATE INDEX ix_reminder_asset_id ON reminder (asset_id);
+CREATE INDEX ix_reminder_status ON reminder (status);
+--- row
+            id = 01a16e35-4394-7c11-9798-844754826bcc
+  household_id = 01a0a029-1477-7ca0-b200-bce78a96c679
+      asset_id = 01a0c4aa-8b62-7360-b11e-a476ddaea0f6
+     as_of_day = 2026-10-24
+          tier = urgent
+        bucket = this-week
+days_remaining = 3
+        status = read
+    created_at = 2026-10-24 13:59:06
+    updated_at = 2026-10-24 15:21:24
+--- reminder count
+1
+--- alembic
+version_num
+20261023_sg233_reminder

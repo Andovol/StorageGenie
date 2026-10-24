@@ -1,0 +1,17 @@
+G1_API_UTC 2026-10-24T16:39:40Z
+HTTP/1.1 200 OK
+date: Sat, 24 Oct 2026 16:39:39 GMT
+server: uvicorn
+content-length: 442
+content-type: application/json
+
+--- body
+{"household_id":"01a0a029-1477-7ca0-b200-bce78a96c679","unread_count":0,"items":[{"id":"01a16e35-4394-7c11-9798-844754826bcc","household_id":"01a0a029-1477-7ca0-b200-bce78a96c679","asset_id":"01a0c4aa-8b62-7360-b11e-a476ddaea0f6","display_name":"Miso Soup","as_of_day":"2026-10-24","tier":"urgent","window_days":7,"bucket":"this-week","days_remaining":3,"status":"read","created_at":"2026-10-24T13:59:06","updated_at":"2026-10-24T15:21:24"}]}
+--- health
+HTTP/1.1 200 OK
+date: Sat, 24 Oct 2026 16:39:39 GMT
+server: uvicorn
+content-length: 40
+content-type: application/json
+
+{"status":"ok","db":"ok","storage":"ok"}

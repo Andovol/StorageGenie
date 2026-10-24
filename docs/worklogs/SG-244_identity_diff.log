@@ -1,0 +1,17 @@
+DIFF_UTC 2026-10-24T16:41:45Z
+--- census diff (G1 vs G3 table lines)
+IDENTICAL: all 29 table counts
+--- identity-field diff (API JSON, excluding status and updated_at)
+id: pre='01a16e35-4394-7c11-9798-844754826bcc' post='01a16e35-4394-7c11-9798-844754826bcc' SAME
+household_id: pre='01a0a029-1477-7ca0-b200-bce78a96c679' post='01a0a029-1477-7ca0-b200-bce78a96c679' SAME
+asset_id: pre='01a0c4aa-8b62-7360-b11e-a476ddaea0f6' post='01a0c4aa-8b62-7360-b11e-a476ddaea0f6' SAME
+display_name: pre='Miso Soup' post='Miso Soup' SAME
+as_of_day: pre='2026-10-24' post='2026-10-24' SAME
+tier: pre='urgent' post='urgent' SAME
+window_days: pre=7 post=7 SAME
+bucket: pre='this-week' post='this-week' SAME
+days_remaining: pre=3 post=3 SAME
+created_at: pre='2026-10-24T13:59:06' post='2026-10-24T13:59:06' SAME
+unread_count: pre=0 post=0
+status: pre='read' post='dismissed'
+updated_at: pre='2026-10-24T15:21:24' post='2026-10-24T16:40:13'

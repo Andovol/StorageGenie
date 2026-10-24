@@ -1,0 +1,8 @@
+G3_STATUS_UTC 2026-10-24T16:40:50Z
+HTTP/1.1 200 OK
+date: Sat, 24 Oct 2026 16:40:50 GMT
+server: uvicorn
+content-length: 426
+content-type: application/json
+
+{"household_id":"01a0a029-1477-7ca0-b200-bce78a96c679","as_of":"2026-10-24","category":null,"rows":[{"asset_id":"01a0c4aa-8b62-7360-b11e-a476ddaea0f6","display_name":"Miso Soup","category":"food_beverages","expiry_date":"2026-10-27","date_type":"expiry_date","days_remaining":3,"tier":"urgent","bucket":"this-week"}],"summary":{"by_tier":{"urgent":1},"by_bucket":{"this-week":1},"unresolved":0,"total":1},"unresolved_rows":[]}
