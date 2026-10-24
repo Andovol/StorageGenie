@@ -1,0 +1,186 @@
+SG-236 G2 post-recreate verification (read-only except the startup pass's own authorised writes) utc=2026-10-24T11:31:15Z epoch=1792841475
+DOCKER_HOST=unix:///run/dispatch-storagegenie-SG-236/docker.sock household_id=01a0a029-1477-7ca0-b200-bce78a96c679 live_day_utc=2026-10-24
+--- bounded readiness/pass wait: at most 60 s in 5 s steps ---
+attempt=1 utc=2026-10-24T11:31:15Z health_http=200 health_body={"status":"ok","db":"ok","storage":"ok"} docker_health=healthy log_lines=7
+ready_at_attempt=1
+--- container identity post ---
+cid=ee4e165af4b62da2f20af53a3ce887ba79fb1da0244417d8648dbcc5d53fd17c created=2026-10-24T11:30:45.946797846Z started=2026-10-24T11:30:46.845151157Z finished=0001-01-01T00:00:00Z image=sha256:2bd3599f2b68980576454f889a7b93db291ec8e0c08f5f7a7afd52b7af93ef5f status=running health=healthy restarts=0 restartpolicy=unless-stopped cmd=["uvicorn","app.server:app","--host","0.0.0.0","--port","8000"]
+inspect_rc=0
+image=sha256:2bd3599f2b68980576454f889a7b93db291ec8e0c08f5f7a7afd52b7af93ef5f created=2026-10-24T11:30:23.733717477Z tags=["storagegenie-backend:latest"]
+--- six health GETs ---
+{"status":"ok","db":"ok","storage":"ok"} http=200 time=0.003408
+{"status":"ok","db":"ok","storage":"ok"} http=200 time=0.002818
+{"status":"ok","db":"ok","storage":"ok"} http=200 time=0.006351
+{"status":"ok","db":"ok","storage":"ok"} http=200 time=0.003414
+{"status":"ok","db":"ok","storage":"ok"} http=200 time=0.005502
+{"status":"ok","db":"ok","storage":"ok"} http=200 time=0.003332
+--- served bundle post ---
+index_http=200 size=0
+/bin/bash: line 25: /tmp/opencode/SG-236/served-post/assets.txt: No such file or directory
+grep: /tmp/opencode/SG-236/served-post/index.html: No such file or directory
+cat: /tmp/opencode/SG-236/served-post/assets.txt: No such file or directory
+/bin/bash: line 111: /tmp/opencode/SG-236/served-post/assets.txt: No such file or directory
+sha256sum: '/tmp/opencode/SG-236/served-post/*': No such file or directory
+--- pre vs post bundle hash comparison ---
+index-C07VbG0m.css pre=c3b58cda696a22970fc2a4a348849fc1359f2105f80f81304ed5dfd5ca31a557 post=None changed=True
+index-CT9Dr00Y.js pre=11b3edeeb3e3c77d8f8ab85c4f90ec06d241a9c66dad8168407849d3bc3d932a post=None changed=True
+index.html pre=5dbcfb12d230606f98b03f3855a0acf30aa37f24d23075609aa7a6eb32a3d529 post=None changed=True
+--- served tree identity vs HEAD (in-image package root /app/app) ---
+/app/app/main.py container=49b63485456f9fa5cf272e27ceeff700bc4b3a78aaf958b921498e5cfc4def02
+git_HEAD_app/main.py=49b63485456f9fa5cf272e27ceeff700bc4b3a78aaf958b921498e5cfc4def02
+/app/app/server.py container=6fa5f33908d6e86aea13c8f12d83943504c2ffe5b8432b5b84f42410cd1d1289
+git_HEAD_app/server.py=6fa5f33908d6e86aea13c8f12d83943504c2ffe5b8432b5b84f42410cd1d1289
+/app/app/services/reminders/daily.py container=26845506107e243e31eabada3ca17948aec0b9d95bb9c15093f9a91c553e6959
+git_HEAD_app/services/reminders/daily.py=26845506107e243e31eabada3ca17948aec0b9d95bb9c15093f9a91c553e6959
+/app/app/services/reminders/service.py container=6e416dc129ecdd24f5267e84a10e34f8c05c030a8fe0a3006995d85dd1b1c187
+git_HEAD_app/services/reminders/service.py=6e416dc129ecdd24f5267e84a10e34f8c05c030a8fe0a3006995d85dd1b1c187
+/app/app/api/v1/reminders.py container=98fcbd88d4acbd0720bba40f8fd0306b3f46fb5f790a83d6197bcc616bc8487e
+git_HEAD_app/api/v1/reminders.py=98fcbd88d4acbd0720bba40f8fd0306b3f46fb5f790a83d6197bcc616bc8487e
+/app/app/models/reminder.py container=61a1126a10e6decc2d9b2328ac61255bf02fddd53593cd5acb7029052c5ff9f1
+git_HEAD_app/models/reminder.py=61a1126a10e6decc2d9b2328ac61255bf02fddd53593cd5acb7029052c5ff9f1
+/app/Dockerfile container=d9c60bbaadbb9717ed64ffd7b0cd7445c37995e0f961e2c0553b774fa760503e
+git_HEAD_Dockerfile=d9c60bbaadbb9717ed64ffd7b0cd7445c37995e0f961e2c0553b774fa760503e
+--- shell routes (read-only GET) ---
+route=/ http=200 size=944 sha256=9850538ada127ac99cb5ecabea3eaf1ab9234fd39cfc28badd54b34a36bddfce
+route=/expiry http=200 size=944 sha256=9850538ada127ac99cb5ecabea3eaf1ab9234fd39cfc28badd54b34a36bddfce
+route=/inbox http=200 size=944 sha256=9850538ada127ac99cb5ecabea3eaf1ab9234fd39cfc28badd54b34a36bddfce
+route=/planning http=200 size=944 sha256=9850538ada127ac99cb5ecabea3eaf1ab9234fd39cfc28badd54b34a36bddfce
+--- served JS markers (Reminders section + Read/Dismiss buttons + API paths) ---
+grep: /tmp/opencode/SG-236/served-post/assets.txt: No such file or directory
+js_asset=
+marker=Unread reminders count=grep: /tmp/opencode/SG-236/served-post/: No such file or directory
+0
+marker=Read reminder count=grep: /tmp/opencode/SG-236/served-post/: No such file or directory
+0
+marker=Dismiss reminder count=grep: /tmp/opencode/SG-236/served-post/: No such file or directory
+0
+marker=unread_count count=grep: /tmp/opencode/SG-236/served-post/: No such file or directory
+0
+marker=/v1/reminders count=grep: /tmp/opencode/SG-236/served-post/: No such file or directory
+0
+--- live API reads (GET only) ---
+reminders_pre_engine_rows=0 as_of=2026-10-24 summary={"by_bucket": {}, "by_tier": {}, "total": 0, "unresolved": 0}
+status_http=200
+reminders_http=200
+{"household_id":"01a0a029-1477-7ca0-b200-bce78a96c679","unread_count":0,"items":[]}
+--- engine-shape property check (property, not count) ---
+status_as_of=2026-10-24
+engine_rows=0
+reminder_items=0 unread=0 unread_count=0
+unread_count_equals_unread_rows=True
+shape_mismatches=[]
+vacuous_empty_set=True
+--- container own log since start: pass line / errors / startup ---
+logs_rc=0 lines=21
+grep_pass_line:
+pass_line_grep_rc=1
+grep_errors:
+error_grep_rc=1
+grep_startup:
+2:INFO:     Waiting for application startup.
+3:INFO:     Application startup complete.
+4:INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+startup_grep_rc=0
+--- full startup log ---
+INFO:     Started server process [1]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+INFO:     127.0.0.1:49188 - "GET /v1/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:35978 - "GET /v1/health HTTP/1.1" 200 OK
+INFO:     172.18.0.1:44148 - "GET /v1/health HTTP/1.1" 200 OK
+INFO:     172.18.0.1:44154 - "GET /v1/health HTTP/1.1" 200 OK
+INFO:     172.18.0.1:44160 - "GET /v1/health HTTP/1.1" 200 OK
+INFO:     172.18.0.1:44162 - "GET /v1/health HTTP/1.1" 200 OK
+INFO:     172.18.0.1:44174 - "GET /v1/health HTTP/1.1" 200 OK
+INFO:     172.18.0.1:44182 - "GET /v1/health HTTP/1.1" 200 OK
+INFO:     172.18.0.1:44194 - "GET /v1/health HTTP/1.1" 200 OK
+INFO:     172.18.0.1:44196 - "GET / HTTP/1.1" 200 OK
+INFO:     172.18.0.1:44204 - "GET / HTTP/1.1" 200 OK
+INFO:     172.18.0.1:44216 - "GET /expiry HTTP/1.1" 200 OK
+INFO:     172.18.0.1:44224 - "GET /inbox HTTP/1.1" 200 OK
+INFO:     172.18.0.1:44228 - "GET /planning HTTP/1.1" 200 OK
+INFO:     172.18.0.1:44230 - "GET /v1/plugins/expiry-tracker/status?household_id=01a0a029-1477-7ca0-b200-bce78a96c679 HTTP/1.1" 200 OK
+INFO:     172.18.0.1:44236 - "GET /v1/plugins/expiry-tracker/status?household_id=01a0a029-1477-7ca0-b200-bce78a96c679 HTTP/1.1" 200 OK
+INFO:     172.18.0.1:44246 - "GET /v1/reminders?household_id=01a0a029-1477-7ca0-b200-bce78a96c679 HTTP/1.1" 200 OK
+--- production SQLite post (read-only URI) ---
+db_path=/home/andrei/StorageGenie/data/db/storagegenie.db
+db_sha256=863c758aacd239a6d79a6aa65edfc0134353dc45d3cc6a3d76fc63195af3216e bytes=765952
+aux-wal exists=True bytes=0
+aux-shm exists=True bytes=32768
+alembic_version=[('20261023_sg233_reminder',)]
+table_count=29
+alembic_version=1
+assertion=37
+asset=7
+asset_evidence=20
+asset_fts=7
+asset_fts_config=1
+asset_fts_data=9
+asset_fts_docsize=7
+asset_fts_idx=7
+asset_location=1
+asset_relation=1
+audit_event=100
+candidate=10
+enrich_snapshot=4
+evidence=27
+guardrail_event=2
+household=1
+idempotency_key=11
+job=11
+job_step=72
+location=1
+observation=20
+planning_suggestion=0
+provider_call=39
+reminder=0
+review_task=8
+saved_search=0
+source_attribution=0
+user=2
+quick_check=[('ok',)]
+reminder_detail=[]
+counts_pre_vs_post_changed={}
+post_tables_absent_from_pre_block=[]
+reminder_pre_post=(0, 0)
+
+--- bundle re-capture (corrects a capture slip: served-post/ did not exist, so the first download wrote no file although HTTP was 200; no product change) utc=2026-10-24T11:31:28Z ---
+index_http=200 size=944
+/assets/index-B0lDq5dE.js
+/assets/index-C07VbG0m.css
+/assets/index-B0lDq5dE.js http=200 size=323000
+/assets/index-C07VbG0m.css http=200 size=4535
+9850538ada127ac99cb5ecabea3eaf1ab9234fd39cfc28badd54b34a36bddfce  /tmp/opencode/SG-236/served-post/index.html
+b6e26a8e99ef4a802bcbd77ae9661a54344383b2895d6989c9e34235b1742a93  /tmp/opencode/SG-236/served-post/index-B0lDq5dE.js
+c3b58cda696a22970fc2a4a348849fc1359f2105f80f81304ed5dfd5ca31a557  /tmp/opencode/SG-236/served-post/index-C07VbG0m.css
+--- pre vs post bundle hash comparison ---
+index-B0lDq5dE.js pre=None post=b6e26a8e99ef4a802bcbd77ae9661a54344383b2895d6989c9e34235b1742a93 changed=True
+index-C07VbG0m.css pre=c3b58cda696a22970fc2a4a348849fc1359f2105f80f81304ed5dfd5ca31a557 post=c3b58cda696a22970fc2a4a348849fc1359f2105f80f81304ed5dfd5ca31a557 changed=False
+index-CT9Dr00Y.js pre=11b3edeeb3e3c77d8f8ab85c4f90ec06d241a9c66dad8168407849d3bc3d932a post=None changed=True
+index.html pre=5dbcfb12d230606f98b03f3855a0acf30aa37f24d23075609aa7a6eb32a3d529 post=9850538ada127ac99cb5ecabea3eaf1ab9234fd39cfc28badd54b34a36bddfce changed=True
+--- served JS markers ---
+js_asset=/assets/index-B0lDq5dE.js
+marker=Unread reminders count=1
+marker=Read reminder count=1
+marker=Dismiss reminder count=1
+marker=unread_count count=1
+marker=/v1/reminders count=3
+--- index.html asset references ---
+/assets/index-B0lDq5dE.js
+/assets/index-C07VbG0m.css
+
+--- why the startup pass created zero rows: live data shape (read-only SQLite + engine GET) utc=2026-10-24T11:32:25Z ---
+active_assets=7
+accepted_classification_assertions=0
+accepted_expiry_assertions=0
+any_expiry_assertions=0
+reminder_rows_today=0
+reminder_rows_total=0
+--- old-container stop promptness (from the one recreate) ---
+recreate wall from SG-236_deploy.log: 1.419 s total (stop + remove + create + start); new StartedAt 2026-10-24T11:30:46.845151157Z precedes command end 11:30:47.094; old container removed (inspect rc=1 no such object). No stop exceeded the lifespan 5 s bound.
+--- restart count and identity ---
+restarts=0 status=running health=healthy started=2026-10-24T11:30:46.845151157Z cmd=["uvicorn","app.server:app","--host","0.0.0.0","--port","8000"]
+--- no migration run: DB head and tree head ---
+db_head=[('20261023_sg233_reminder',)]
+backend/alembic/versions/20261023_sg233_reminder.py:revision: str = "20261023_sg233_reminder"

@@ -1,0 +1,95 @@
+SG-236 Coder worklog — close-deploy rider: serve the SG-235 daily caller + Expiry Read/Dismiss delta
+=====================================================================================================
+Append-only worklog. Host /home/andrei/StorageGenie, branch automation.
+Coder identity from /proc/$PPID/cmdline (never a system-prompt line):
+  opencode run --auto --dir /home/andrei/StorageGenie --model opencode-go/deepseek-v4.1-flash --variant max
+  => model opencode-go/deepseek-v4.1-flash, effort max. Served-model metadata not exposed; no substitute claimed.
+BASE ref requested origin/automation -> resolved 5c0c9f874198216e0e1cd27d326a7abdfab404e5 (== start HEAD).
+Lane own stamps: MainPID=3189458, ExecMainStartTimestamp=Sat 2026-10-24 11:27:10 UTC,
+ActiveState=activating, RUN_BUDGET_S=2100 (lane) vs packet overall 1800 s.
+Contract: recorded AGENTS.md line 4 0.52.0 == published VERSION 0.52.0 == host CODER.md line 3 0.52.0 ==
+prior host echo SG-235_report.md I1 0.52.0. Source path /home/andrei/storagegenie-contract/CODER.md.
+Spend: $0.000000 actual, $0 bound. Provider calls 0.
+
+G0 — socket first
+-----------------
+Lane socket from the unit's own environment: XDG_RUNTIME_DIR=/run/dispatch-storagegenie-SG-236,
+RUNTIME_SOCKETS=docker.sock => unix:///run/dispatch-storagegenie-SG-236/docker.sock (mode 1660, owner andrei).
+exported DOCKER_HOST to it, then `docker version`: client and SERVER both answered, server 29.6.2, rc=0.
+No docker invocation preceded the export. Artifact: SG-236_g0.log.
+
+G1 — read-only pre-state (SG-236_prestate.log)
+-----------------------------------------------
+head 5c0c9f8... == origin/automation (measured, PG-IC-07: two fields, no HEAD==named-hash assertion).
+porcelain: only the new SG-236 logs.
+served container pre: cid e1142971e08c1395d9d8447422ebcdfd7eed98fdd2a701008ba1a087d91a8759,
+created 2026-10-23T20:17:37Z, image sha256:6bdaa3b0..., Cmd ["uvicorn","app.main:app",...],
+health healthy, restarts 0. Served bundle pre: index 5dbcfb12... / JS index-CT9Dr00Y.js 11b3edee...
+(322038 B) / CSS index-C07VbG0m.css c3b58cda... (4535 B).
+Served baseline f332cc06 confirmed by in-container blobs: /app/app/main.py 8711ef3d...,
+services/reminders/service.py 6e416dc1..., api/v1/reminders.py 98fcbd88..., models/reminder.py
+61a1126a... all equal `git show f332cc06:...`; daily.py and server.py ABSENT. The first path check in the
+prestate used /app/<f> instead of /app/app/<f> and read absent; corrected in the same log at 11:29:22Z.
+Production SQLite pre (read-only URI): sha256 863c758a..., 765952 B; head 20261023_sg233_reminder;
+29 tables; quick_check ok; reminder=0; household 01a0a029-1477-7ca0-b200-bce78a96c679.
+Merged(f332cc06)-vs-HEAD runtime product diff = exactly the SG-235 set: backend/Dockerfile (one CMD token),
+backend/app/main.py (import + registration line), backend/app/server.py (new),
+backend/app/services/reminders/daily.py (new), frontend/src/routes/ExpiryPage.tsx (buttons). The same
+range also holds two TEST files (backend/tests/test_sg235_daily_caller.py, frontend/src/routes/ExpiryPage.test.tsx)
+and docs/STATE/AGENTS/decisions/worklogs/packets — non-runtime, named, not served.
+Tree alembic: 12 revisions, one head 20261023_sg233_reminder; DB head equal; no migration pending/run.
+
+G1 — one build (SG-236_build.log; issuance 1 of 1)
+---------------------------------------------------
+`docker compose build backend`, 11:30:06Z -> 11:30:35Z (29 s of 600 s), rc=0. image
+sha256:6bdaa3b0... -> sha256:2bd3599f...; built JS index-B0lDq5dE.js (previous index-CT9Dr00Y.js);
+CSS index-C07VbG0m.css unchanged. DOCKER_CONFIG/BUILDX_CONFIG under /tmp/opencode/SG-236. No retry.
+
+G1 — one recreate (SG-236_deploy.log; issuance 1 of 1; NO migration)
+----------------------------------------------------------------------
+`docker compose up -d --no-deps backend`, 11:30:45.675Z -> 11:30:47.094Z (1.419 s wall), rc=0.
+cid e1142971... -> ee4e165af4b62da2f20af53a3ce887ba79fb1da0244417d8648dbcc5d53fd17c, created
+2026-10-24T11:30:45.946Z, started 11:30:46.845Z, image sha256:2bd3599f..., Cmd
+["uvicorn","app.server:app",...], restarts 0. Old container removed (inspect rc=1 no such object);
+stop prompt (new started 1.17 s after the command began, well inside the 5 s lifespan bound).
+
+G2 — read-only post verification (SG-236_verify.log)
+-----------------------------------------------------
+healthy at attempt 1 (11:31:15Z); six GET /v1/health all {"status":"ok","db":"ok","storage":"ok"} 200.
+Bundle post: index 9850538a..., JS index-B0lDq5dE.js b6e26a8e... (323000 B), CSS unchanged c3b58cda...
+(EXPECTED changed JS, unchanged CSS). Served JS markers: "Unread reminders" 1, "Read reminder" 1,
+"Dismiss reminder" 1, "unread_count" 1, "/v1/reminders" 3. Routes / /expiry /inbox /planning all 200,
+same SPA index 9850538a...
+Served tree = HEAD: /app/app/main.py 49b63485... = HEAD, server.py 6fa5f339... = HEAD, daily.py
+26845506... = HEAD, service.py 6e416dc1... = HEAD, reminders.py 98fcbd88... = HEAD, reminder.py
+61a1126a... = HEAD, /app/Dockerfile d9c60bba... = HEAD.
+DB post: sha256 863c758a... (identical), head 20261023_sg233_reminder, 29 tables, quick_check ok,
+per-table counts identical to pre (counts_pre_vs_post_changed={}), reminder 0 -> 0.
+Live reads: GET /v1/plugins/expiry-tracker/status -> 200, as_of 2026-10-24, rows=0; GET /v1/reminders ->
+200 {"unread_count":0,"items":[]}; unread_count == unread rows (0==0); shape_mismatches=[].
+Container log (21 lines): Started server process, Waiting for application startup, Application startup
+complete, Uvicorn running; then only health/route access lines. **No pass line** (grep for daily
+reminder/households visited/reminders created: 0 hits; error/traceback/failed: 0 hits).
+
+Findings from the live observation
+----------------------------------
+F1. SG-235's daily caller logs ONLY failures (`logger.exception` at daily.py:69 and :98); it emits no
+success line with households visited / reminders created. The packet's "pass line" does not exist. The
+loop's start is evidenced by "Application startup complete." plus the absence of any failure log; the
+pass's own execution is INFERRED, not observed (the A2 log-line leg).
+F2. The live household has 7 ACTIVE assets and ZERO accepted `plugin:expiry-tracker/classification` and
+ZERO accepted `plugin:expiry-tracker/expiry_date` assertions (any expiry assertions: 0). compute_status
+returns 0 rows, so record_due inserts nothing. The startup pass created 0 reminder rows; `reminder` is 0
+before and after. The "every unread row is engine-shaped" property is VACUOUS (empty set), and the
+packet's "the household's due items become unread reminders" is false on this data.
+
+Effects and counts
+------------------
+Production effects: one image build, one backend recreate, NO migration, NO host config change. The
+startup pass inserted 0 reminder rows (its authorised write was available; there was nothing due). No
+other table moved; DB sha256 identical pre/post. No imports, no evidence-store mutation.
+Retries: 0 product retries; one bundle capture retake (missing /tmp directory) and one path-prefix
+correction in the prestate capture, both disclosed, neither a product change.
+Test commands: 0 (suite waived per PG-DP-02). Provider calls: 0. Spend $0.000000.
+NETWORK: loopback + container-runtime only.
+

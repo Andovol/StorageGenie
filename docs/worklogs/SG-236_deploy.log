@@ -1,0 +1,37 @@
+SG-236 one recreate (lane socket; NO migration; issuance 1 of 1) utc=2026-10-24T11:30:45Z epoch=1792841445
+DOCKER_HOST=unix:///run/dispatch-storagegenie-SG-236/docker.sock
+--- before: container identity + Cmd + last log lines ---
+pre_cid=e1142971e08c1395d9d8447422ebcdfd7eed98fdd2a701008ba1a087d91a8759 pre_created=2026-10-23T20:17:37.47452733Z pre_started=2026-10-23T20:17:38.385103384Z pre_image=sha256:6bdaa3b01535a40da29626ae68e7de246ab21b6f607fb8db143d3ff9314f0c6c pre_cmd=["uvicorn","app.main:app","--host","0.0.0.0","--port","8000"] pre_restarts=0 status=running health=healthy
+pre_inspect_rc=0
+pre_log_tail:
+INFO:     127.0.0.1:52868 - "GET /v1/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:42066 - "GET /v1/health HTTP/1.1" 200 OK
+INFO:     172.18.0.1:44578 - "GET /v1/plugins/expiry-tracker/status?household_id=01a0a029-1477-7ca0-b200-bce78a96c679 HTTP/1.1" 200 OK
+INFO:     172.18.0.1:44582 - "GET /v1/reminders?household_id=01a0a029-1477-7ca0-b200-bce78a96c679 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59050 - "GET /v1/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:34462 - "GET /v1/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37180 - "GET /v1/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:43818 - "GET /v1/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:34078 - "GET /v1/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54092 - "GET /v1/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:40142 - "GET /v1/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:48172 - "GET /v1/health HTTP/1.1" 200 OK
+pre_logs_rc=0
+--- one recreate via compose (image changed; no --force) ---
+recreate_start_epoch=1792841445 recreate_start_utc=2026-10-24T11:30:45Z monotonic=1792841445.675620028
+ Container storagegenie-backend-1 Recreate 
+ Container storagegenie-backend-1 Recreated 
+ Container storagegenie-backend-1 Starting 
+ Container storagegenie-backend-1 Started 
+recreate_rc=0 recreate_end_epoch=1792841447 recreate_end_utc=2026-10-24T11:30:47Z monotonic=1792841447.094417738
+recreate_wall_seconds=1.419
+--- after: new container identity + Cmd (immediate) ---
+post_cid=ee4e165af4b62da2f20af53a3ce887ba79fb1da0244417d8648dbcc5d53fd17c post_created=2026-10-24T11:30:45.946797846Z post_started=2026-10-24T11:30:46.845151157Z post_image=sha256:2bd3599f2b68980576454f889a7b93db291ec8e0c08f5f7a7afd52b7af93ef5f post_cmd=["uvicorn","app.server:app","--host","0.0.0.0","--port","8000"] post_restarts=0 status=running health=starting
+post_inspect_rc=0
+--- old container object after recreate (removal proof) ---
+
+error: no such object: e1142971e08c1395d9d8447422ebcdfd7eed98fdd2a701008ba1a087d91a8759
+old_inspect_rc=1
+ps: ee4e165af4b6 storagegenie-backend 2026-10-24 11:30:45 +0000 UTC Up Less than a second (health: starting) "uvicorn app.server:…"
+--- new container log (immediate, startup) ---
+new_logs_rc=0

@@ -1,0 +1,158 @@
+SG-236 one backend build (lane socket; issuance 1 of 1) utc=2026-10-24T11:30:06Z epoch=1792841406
+DOCKER_HOST=unix:///run/dispatch-storagegenie-SG-236/docker.sock DOCKER_CONFIG=/tmp/opencode/SG-236/docker-config BUILDX_CONFIG=/tmp/opencode/SG-236/buildx
+pre_build_image_id=sha256:6bdaa3b01535a40da29626ae68e7de246ab21b6f607fb8db143d3ff9314f0c6c
+pre_build_head=5c0c9f874198216e0e1cd27d326a7abdfab404e5 tree_porcelain_count=4
+ Image storagegenie-backend Building 
+#1 [internal] load local bake definitions
+#1 reading from stdin 607B done
+#1 DONE 0.0s
+
+#2 [internal] load build definition from Dockerfile
+#2 transferring dockerfile: 1.06kB done
+#2 DONE 0.0s
+
+#3 [internal] load metadata for docker.io/library/node:20-alpine
+#3 DONE 0.0s
+
+#4 [internal] load metadata for docker.io/library/python:3.12.11-slim-bookworm@sha256:519591d6871b7bc437060736b9f7456b8731f1499a57e22e6c285135ae657bf7
+#4 DONE 0.8s
+
+#5 [internal] load .dockerignore
+#5 transferring context:
+#5 transferring context: 497B done
+#5 DONE 0.3s
+
+#6 [frontend-build 1/6] FROM docker.io/library/node:20-alpine@sha256:fb4cd12c85ee03686f6af5362a0b0d56d50c58a04632e6c0fb8363f609372293
+#6 resolve docker.io/library/node:20-alpine@sha256:fb4cd12c85ee03686f6af5362a0b0d56d50c58a04632e6c0fb8363f609372293 0.0s done
+#6 DONE 0.0s
+
+#7 [stage-1 1/9] FROM docker.io/library/python:3.12.11-slim-bookworm@sha256:519591d6871b7bc437060736b9f7456b8731f1499a57e22e6c285135ae657bf7
+#7 resolve docker.io/library/python:3.12.11-slim-bookworm@sha256:519591d6871b7bc437060736b9f7456b8731f1499a57e22e6c285135ae657bf7 0.0s done
+#7 DONE 0.0s
+
+#8 [internal] load build context
+#8 transferring context: 190.13MB 1.7s done
+#8 DONE 1.7s
+
+#9 [frontend-build 3/6] COPY frontend/package.json frontend/package-lock.json ./
+#9 CACHED
+
+#10 [frontend-build 2/6] WORKDIR /ui
+#10 CACHED
+
+#11 [frontend-build 4/6] RUN npm ci
+#11 CACHED
+
+#12 [stage-1 2/9] WORKDIR /app
+#12 CACHED
+
+#13 [stage-1 3/9] RUN apt-get update && apt-get install -y --no-install-recommends curl tesseract-ocr libzbar0 && rm -rf /var/lib/apt/lists/*
+#13 CACHED
+
+#14 [stage-1 4/9] COPY backend/pyproject.toml backend/requirements.lock ./
+#14 CACHED
+
+#15 [stage-1 5/9] RUN pip install --no-cache-dir -r requirements.lock
+#15 CACHED
+
+#16 [stage-1 6/9] COPY backend/ ./
+#16 ...
+
+#17 [frontend-build 5/6] COPY frontend/ ./
+#17 DONE 0.4s
+
+#18 [frontend-build 6/6] RUN npm run build
+#18 ...
+
+#16 [stage-1 6/9] COPY backend/ ./
+#16 DONE 1.3s
+
+#18 [frontend-build 6/6] RUN npm run build
+#18 1.086 
+#18 1.086 > storagegenie-frontend@0.1.0 build
+#18 1.086 > tsc && vite build
+#18 1.086 
+#18 ...
+
+#19 [stage-1 7/9] RUN pip install --no-cache-dir "hatchling==1.32.0" "editables==0.6"
+#19 1.149 Collecting hatchling==1.32.0
+#19 1.209   Downloading hatchling-1.32.0-py3-none-any.whl.metadata (3.9 kB)
+#19 1.220 Collecting editables==0.6
+#19 1.223   Downloading editables-0.6-py3-none-any.whl.metadata (3.1 kB)
+#19 1.227 Requirement already satisfied: packaging>=24.2 in /usr/local/lib/python3.12/site-packages (from hatchling==1.32.0) (26.3)
+#19 1.228 Requirement already satisfied: pathspec>=0.10.1 in /usr/local/lib/python3.12/site-packages (from hatchling==1.32.0) (1.1.1)
+#19 1.229 Requirement already satisfied: pluggy>=1.0.0 in /usr/local/lib/python3.12/site-packages (from hatchling==1.32.0) (1.6.0)
+#19 1.248 Collecting tomlkit>=0.11.1 (from hatchling==1.32.0)
+#19 1.251   Downloading tomlkit-0.15.2-py3-none-any.whl.metadata (3.4 kB)
+#19 1.285 Collecting trove-classifiers (from hatchling==1.32.0)
+#19 1.288   Downloading trove_classifiers-2026.9.21.13-py3-none-any.whl.metadata (2.4 kB)
+#19 1.303 Downloading hatchling-1.32.0-py3-none-any.whl (78 kB)
+#19 1.320 Downloading editables-0.6-py3-none-any.whl (5.4 kB)
+#19 1.324 Downloading tomlkit-0.15.2-py3-none-any.whl (52 kB)
+#19 1.328 Downloading trove_classifiers-2026.9.21.13-py3-none-any.whl (14 kB)
+#19 1.435 Installing collected packages: trove-classifiers, tomlkit, editables, hatchling
+#19 1.638 Successfully installed editables-0.6 hatchling-1.32.0 tomlkit-0.15.2 trove-classifiers-2026.9.21.13
+#19 1.640 WARNING: Running pip as the 'root' user can result in broken permissions and conflicting behaviour with the system package manager, possibly rendering your system unusable. It is recommended to use a virtual environment instead: https://pip.pypa.io/warnings/venv. Use the --root-user-action option if you know what you are doing and want to suppress this warning.
+#19 1.816 
+#19 1.816 [notice] A new release of pip is available: 25.0.1 -> 26.2.2
+#19 1.816 [notice] To update, run: pip install --upgrade pip
+#19 DONE 1.9s
+
+#20 [stage-1 8/9] RUN pip install --no-cache-dir --no-build-isolation --no-deps -e .
+#20 0.805 Obtaining file:///app
+#20 0.808   Checking if build backend supports build_editable: started
+#20 0.860   Checking if build backend supports build_editable: finished with status 'done'
+#20 0.861   Preparing editable metadata (pyproject.toml): started
+#20 1.106   Preparing editable metadata (pyproject.toml): finished with status 'done'
+#20 1.116 Building wheels for collected packages: storagegenie-backend
+#20 1.117   Building editable for storagegenie-backend (pyproject.toml): started
+#20 1.163   Building editable for storagegenie-backend (pyproject.toml): finished with status 'done'
+#20 1.164   Created wheel for storagegenie-backend: filename=storagegenie_backend-0.1.0-py3-none-any.whl size=1320 sha256=6e6e229f189e8be07c917fc5f51f1076aefd781fbcc0814fa2fead0e73c5654a
+#20 1.164   Stored in directory: /tmp/pip-ephem-wheel-cache-emstzijd/wheels/54/1b/b7/aa63e25c8f14f4f2ae7b04e6097bdecb770e455c5c1ee0a600
+#20 1.167 Successfully built storagegenie-backend
+#20 1.167 Installing collected packages: storagegenie-backend
+#20 1.181 Successfully installed storagegenie-backend-0.1.0
+#20 1.184 WARNING: Running pip as the 'root' user can result in broken permissions and conflicting behaviour with the system package manager, possibly rendering your system unusable. It is recommended to use a virtual environment instead: https://pip.pypa.io/warnings/venv. Use the --root-user-action option if you know what you are doing and want to suppress this warning.
+#20 1.296 
+#20 1.296 [notice] A new release of pip is available: 25.0.1 -> 26.2.2
+#20 1.296 [notice] To update, run: pip install --upgrade pip
+#20 DONE 1.4s
+
+#18 [frontend-build 6/6] RUN npm run build
+#18 9.100 vite v5.4.21 building for production...
+#18 9.176 transforming...
+#18 13.03 ✓ 1965 modules transformed.
+#18 13.30 rendering chunks...
+#18 13.32 computing gzip size...
+#18 13.33 dist/index.html                   0.94 kB │ gzip:  0.48 kB
+#18 13.33 dist/assets/index-C07VbG0m.css    4.54 kB │ gzip:  1.30 kB
+#18 13.33 dist/assets/index-B0lDq5dE.js   322.88 kB │ gzip: 93.87 kB
+#18 13.33 ✓ built in 4.20s
+#18 13.41 npm notice
+#18 13.41 npm notice New major version of npm available! 10.8.2 -> 12.2.1
+#18 13.41 npm notice Changelog: https://github.com/npm/cli/releases/tag/v12.2.1
+#18 13.41 npm notice To update run: npm install -g npm@12.2.1
+#18 13.41 npm notice
+#18 DONE 13.5s
+
+#21 [stage-1 9/9] COPY --from=frontend-build /ui/dist ./static
+#21 DONE 0.0s
+
+#22 exporting to image
+#22 exporting layers
+#22 exporting layers 8.9s done
+#22 exporting manifest sha256:193082cbae80ef7d08a3fa476d6a9ea8558b4b0f857dafc0af27f9ffdf342830 done
+#22 exporting config sha256:39ab44f5252495dbf2cd242f2a9a98c43fad488a58c7e85baef84dfe64bf9c94 done
+#22 exporting attestation manifest sha256:f281a019e300faf9f413e12d6e789841a055bb0c62622037862dfa4ae79baa18 done
+#22 exporting manifest list sha256:2bd3599f2b68980576454f889a7b93db291ec8e0c08f5f7a7afd52b7af93ef5f done
+#22 naming to docker.io/library/storagegenie-backend:latest done
+#22 unpacking to docker.io/library/storagegenie-backend:latest
+#22 unpacking to docker.io/library/storagegenie-backend:latest 2.3s done
+#22 DONE 11.2s
+
+#23 resolving provenance for metadata file
+#23 DONE 0.0s
+ Image storagegenie-backend Built 
+build_rc=0
+post_build_image_id=sha256:2bd3599f2b68980576454f889a7b93db291ec8e0c08f5f7a7afd52b7af93ef5f
+utc_end=2026-10-24T11:30:35Z epoch_end=1792841435
