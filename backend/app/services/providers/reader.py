@@ -5,9 +5,10 @@ The Protocol in `protocols.py` describes the seam shape (`image_ref`); the
 adapter surface built in SG-027 is `extract_items(image_bytes, prompt, ...)`.
 This module is the ONE bridge that supplies BYTES + prompt: it resolves the
 immutable original the way `signals.py` does, redacts through the SHARED
-`redact_image` (GPS never leaves), calls through the SG-025 router (budget
-refusal happens BEFORE any call), validates strictly with exactly one repair
-(§5.3), and writes ONE `provider_call` ledger row per completed call.
+`redact_image` (GPS never leaves), calls through the SG-025 router (no cost is
+estimated or refused before a call), validates strictly with exactly one repair
+(§5.3), and writes ONE `provider_call` ledger row per completed call carrying
+the ACTUAL post-call cost from the response's real usage.
 
 Tests inject a schema-valid scripted provider through the single named seam
 `provider_registry`; production builds it from the named settings. No key is
@@ -20,12 +21,10 @@ import calendar
 import datetime
 import hashlib
 import json
-import math
 from pathlib import Path
 from typing import Any
 
 from pydantic import ValidationError as PydanticValidationError
-from sqlalchemy import func
 from sqlalchemy.orm import Session
 
 from app.config import settings
@@ -37,7 +36,6 @@ from app.services.providers.fake import FakeProvider
 from app.services.providers.opencode_go import OpenCodeGoProvider
 from app.services.providers.redaction import redact_image
 from app.services.providers.router import (
-    BudgetExceededError,
     ProviderError,
     ProviderRouter,
     RouterConfig,
@@ -99,8 +97,6 @@ def provider_registry() -> dict[str, Any]:
             session_id="storagegenie-sg028",
             api_key=settings.opencode_api_key,
             model_id=effective_model_id(),
-            per_job_cap=settings.sg_per_job_cap,
-            monthly_cap=settings.sg_monthly_cap,
         )
     return registry
 
@@ -230,18 +226,6 @@ def _write_ledger(
     return row
 
 
-def _estimate_call(provider: Any, image_bytes: bytes, prompt: str) -> float:
-    """Bounded worst-case cost handed to the router BEFORE any call (SG-029 G0).
-
-    A provider with no rate table (the test doubles) reports 0.0, so caps bind
-    only where a real estimate exists — never on a guessed number.
-    """
-    estimator = getattr(provider, "estimate_cost", None)
-    if callable(estimator):
-        return float(estimator(image_bytes, prompt))
-    return 0.0
-
-
 def _current_month_start_utc() -> datetime.datetime:
     """Start of the current calendar month (server-local clock), as naive UTC.
 
@@ -265,45 +249,6 @@ def _retention_cutoff_utc(retention_months: int) -> datetime.datetime:
     day = min(local_now.day, calendar.monthrange(year, month)[1])
     cutoff_local = local_now.replace(year=year, month=month, day=day)
     return cutoff_local.astimezone(datetime.timezone.utc).replace(tzinfo=None)
-
-
-def _recorded_spend(db: Session, household_id: str) -> float:
-    """Durable spend for one household in the CURRENT calendar month (SG-030 ISS-10, SG-125, SG-142).
-
-    The provider instance is rebuilt every step, so an in-process counter resets
-    and a monthly cap built on it can never bind across jobs. Summing the
-    committed `provider_call` cost rows through their jobs survives that rebuild
-    and is the same figure the audit trail already carries. SG-125 boxes the sum
-    to the current calendar month (server-local, live clock) so the cap matches
-    its "monthly" name: deleting old ledger rows can no longer silently loosen
-    the cap (a purge must never be fail-open).
-
-    SG-142 closes the join's blind spot. The chat/planning/analytics/synthesize
-    writers stamp `job_id=None`, and `provider_call` has no household column, so
-    those rows carry no household and can never satisfy the `Job` join. The cap
-    therefore under-counted real spend (the live read saw 0.0072005 against a
-    true month total of 0.01086845). This reader adds those rows as a SHARED
-    UNATTRIBUTED POOL boxed to the same month. It never attributes such a row to
-    a household by guessing; because the pool is unowned it counts against every
-    household reading that month, which is the fail-closed direction for a cap
-    (under-counting is the defect, over-counting merely refuses early). A month
-    with no `None`-job rows reads exactly as before.
-    """
-    month_start = _current_month_start_utc()
-    joined = (
-        db.query(func.coalesce(func.sum(ProviderCall.cost), 0.0))
-        .join(Job, ProviderCall.job_id == Job.id)
-        .filter(Job.household_id == household_id)
-        .filter(ProviderCall.created_at >= month_start)
-        .scalar()
-    )
-    unattributed = (
-        db.query(func.coalesce(func.sum(ProviderCall.cost), 0.0))
-        .filter(ProviderCall.job_id.is_(None))
-        .filter(ProviderCall.created_at >= month_start)
-        .scalar()
-    )
-    return float(joined or 0.0) + float(unattributed or 0.0)
 
 
 def purge_old_provider_calls(
@@ -399,12 +344,10 @@ def _extract_one(
     provider_id: str,
     model_id: str,
     template_version: str,
-    estimated_cost: float,
 ) -> tuple[ExtractionOutput, list[str]]:
     """One evidence, one logical call, at most one repair (§5.3).
 
-    Every failed attempt leaves a committed `error_state` ledger row; a budget
-    refusal raises before any provider call and therefore writes no row.
+    Every failed attempt leaves a committed `error_state` ledger row.
     """
     call_ids: list[str] = []
     attempt = {"n": 0}
@@ -413,9 +356,7 @@ def _extract_one(
         attempt["n"] += 1
         call_prompt = prompt if attempt["n"] == 1 else repair_prompt(prompt)
         try:
-            result = router.execute(
-                "extract_items", image_bytes, call_prompt, estimated_cost=estimated_cost
-            )
+            result = router.execute("extract_items", image_bytes, call_prompt)
         except PydanticValidationError as exc:
             provider_exc = ProviderError("invalid_json", "adapter schema parse failed")
             _write_error_ledger(
@@ -464,7 +405,6 @@ def run_ai_extraction(db: Session, job: Job) -> dict[str, object]:
         provider_id=provider_id,
         fallback_id=None,
         json_strict=True,
-        cost_budget=settings.sg_per_job_cap if settings.sg_per_job_cap is not None else math.inf,
         retryable_errors=RETRYABLE_ERRORS,
     )
     router = ProviderRouter(config=config, registry=registry)
@@ -477,31 +417,17 @@ def run_ai_extraction(db: Session, job: Job) -> dict[str, object]:
             "reason": "no_analyzable_image",
         }
 
-    prepared: list[tuple[Evidence, bytes, float]] = []
+    prepared: list[tuple[Evidence, bytes]] = []
     for evidence in evidence_rows:
         raw = resolve_original_bytes(db, evidence.id)
-        redacted = redact_image(raw)
-        prepared.append((evidence, redacted, _estimate_call(provider, redacted, prompt)))
-
-    # SG-030 ISS-10: the monthly cap binds across jobs from the durable ledger,
-    # never a per-instance counter a fresh step resets. Refuse BEFORE any call
-    # when the whole job's worst-case estimate would cross the cap.
-    if settings.sg_monthly_cap is not None:
-        already_spent = _recorded_spend(db, job.household_id or "")
-        projected = already_spent + sum(estimate for _, _, estimate in prepared)
-        if projected > settings.sg_monthly_cap:
-            raise BudgetExceededError(
-                f"estimated monthly cost {projected:.6f} exceeds monthly cap "
-                f"{settings.sg_monthly_cap} ({already_spent:.6f} already recorded "
-                f"for this household)"
-            )
+        prepared.append((evidence, redact_image(raw)))
 
     items: list[dict[str, object]] = []
     unknowns: list[str] = []
     call_ids: list[str] = []
     pending_transcripts: list[tuple[str, int, str]] = []
     needs_evidence = False
-    for evidence, redacted, estimate in prepared:
+    for evidence, redacted in prepared:
         output, evidence_call_ids = _extract_one(
             db,
             job,
@@ -511,7 +437,6 @@ def run_ai_extraction(db: Session, job: Job) -> dict[str, object]:
             provider_id,
             model_id,
             template_version,
-            estimate,
         )
         offset = len(items)
         items.extend(item.model_dump() for item in output.items)

@@ -43,21 +43,17 @@ class ChatScriptedProvider:
         *,
         provider_id: str = "scripted-chat",
         model_id: str = "scripted-chat-1",
-        estimate: float = 0.0,
     ) -> None:
         self.provider_id = provider_id
         self.model_id = model_id
         self.answer = answer
-        self.estimate = estimate
         self.invocations = 0
         self.texts: list[str] = []
         self.prompts: list[str] = []
 
-    def estimate_cost(self, payload_bytes: bytes, prompt: str) -> float:
-        return self.estimate
 
     def extract_text(
-        self, text: str, prompt: str = "", *, estimated_cost: float = 0.0
+        self, text: str, prompt: str = ""
     ) -> ProviderResult:
         self.invocations += 1
         self.texts.append(text)
@@ -90,8 +86,6 @@ def chat_fixture(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):  # type: igno
     monkeypatch.setattr(settings, "storage_root", str(storage_root))
     monkeypatch.setattr(settings, "sg_consent", False)
     monkeypatch.setattr(settings, "sg_provider_id", "fake")
-    monkeypatch.setattr(settings, "sg_per_job_cap", None)
-    monkeypatch.setattr(settings, "sg_monthly_cap", None)
 
     from app.services.providers import opencode_go
 
@@ -244,7 +238,7 @@ def test_text_payload_shape_no_image_no_key() -> None:
 
 def test_adapter_extract_text_guards_and_result_populated() -> None:
     from app.services.providers import opencode_go as go
-    from app.services.providers.router import BudgetExceededError, ProviderError
+    from app.services.providers.router import ProviderError
 
     usage = {"prompt_tokens": 100, "completion_tokens": 50, "total_tokens": 150}
 
@@ -269,7 +263,7 @@ def test_adapter_extract_text_guards_and_result_populated() -> None:
         "usage": usage,
     }
     provider = _Canned(good_body, model_id="adapter-model")
-    result = provider.extract_text("USER", "SYSTEM", estimated_cost=0.0)
+    result = provider.extract_text("USER", "SYSTEM")
     assert result.normalized_output == {
         "text": "Grounded answer",
         "model": "canned-model",
@@ -281,11 +275,6 @@ def test_adapter_extract_text_guards_and_result_populated() -> None:
     assert result.latency_ms >= 0.0
     assert provider.calls == 1
     assert provider.sent[0]["messages"][0]["content"] == "SYSTEM"
-
-    capped = _Canned(good_body, model_id="adapter-model", per_job_cap=0.0001)
-    with pytest.raises(BudgetExceededError):
-        capped.extract_text("USER", "SYSTEM", estimated_cost=1.0)
-    assert capped.calls == 0, "per-job cap refuses before any call"
 
     empty = _Canned(
         {"id": "x", "model": "m", "choices": [{"message": {"content": "  "}}], "usage": usage}
@@ -773,11 +762,9 @@ class _FailingUsageChatProvider:
         self.cost = 0.0000237
         self.latency_ms = 123.4
 
-    def estimate_cost(self, payload_bytes: bytes, prompt: str) -> float:
-        return 0.0
 
     def extract_text(
-        self, text: str, prompt: str = "", *, estimated_cost: float = 0.0
+        self, text: str, prompt: str = ""
     ) -> ProviderResult:
         self.invocations += 1
         exc = ProviderError("invalid_json", "provider 200 with no choices")
@@ -818,7 +805,7 @@ def test_chat_error_ledger_without_usage_stays_zero(chat_fixture, monkeypatch: p
     _enable(monkeypatch, provider)
     client = TestClient(app)
 
-    def _fail(text: str, prompt: str = "", *, estimated_cost: float = 0.0):  # type: ignore[no-untyped-def]
+    def _fail(text: str, prompt: str = ""):  # type: ignore[no-untyped-def]
         raise ProviderError("transport", "provider transport failure: ConnectError")
 
     monkeypatch.setattr(provider, "extract_text", _fail)
@@ -854,23 +841,3 @@ def test_no_key_material_in_any_written_row(
     for blob in _written_text(session):
         assert SENTINEL_KEY not in blob
         assert "sk-" not in blob
-
-
-def test_budget_refusal_before_any_call(
-    chat_fixture, monkeypatch: pytest.MonkeyPatch
-) -> None:
-    session, household_id, network_attempts = chat_fixture
-    _seed_asset(session, household_id, "Whole milk")
-    provider = ChatScriptedProvider(estimate=1.0)
-    _enable(monkeypatch, provider)
-    monkeypatch.setattr(settings, "sg_per_job_cap", 0.01)
-    client = TestClient(app)
-
-    response = _chat(client, household_id, "food", "Hi")
-
-    assert response.status_code == 200, response.text
-    assert response.json()["status"] == "refused"
-    assert "unclassified_count" not in response.json(), "SG-169: only the empty branch gains the key"
-    assert provider.invocations == 0
-    assert network_attempts == []
-    assert session.query(ProviderCall).count() == 0

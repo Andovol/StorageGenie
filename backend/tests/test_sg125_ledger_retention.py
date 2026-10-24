@@ -1,18 +1,14 @@
-"""SG-125 ledger retention: month-boxed spend + purge vehicle (temp-DB only, $0).
+"""SG-125 ledger retention: purge vehicle (temp-DB only, $0).
 
 Scope: this file exercises the REAL `app.services.providers.reader` module on a
 fresh temp SQLite database. It makes no network call, reads no key and touches
-no live database: the production DB is never opened. What it proves:
+no live database: the production DB is never opened. SG-250 removed the monthly
+cap reader; what remains here proves the retention vehicle only:
 
-- `_recorded_spend` (NEW) sums the current calendar month only; the OLD behavior
-  (lifetime sum) is computed beside it as `_lifetime_spend`, so the fail-then-pass
-  delta is visible in one run;
-- an empty household spends `0.0` and purges nothing (the empty world is named);
+- an empty household purges nothing (the empty world is named);
 - `purge_old_provider_calls` deletes only `provider_call` rows older than the
   retention cutoff, returns their ids, and leaves `guardrail_event`/`audit_event`
-  untouched (proved by before/after SELECTs, not by the vehicle's own return);
-- re-running the month math on the purged DB is unchanged (the purge cannot move
-  the monthly figure once the query is month-boxed).
+  untouched (proved by before/after SELECTs, not by the vehicle's own return).
 """
 
 from __future__ import annotations
@@ -108,34 +104,10 @@ def test_retention_constant_is_twelve_months() -> None:
     assert reader_mod.LEDGER_RETENTION_MONTHS == 12
 
 
-def test_recorded_spend_boxes_to_current_month(ledger: Session) -> None:
-    """OLD returns the lifetime total; NEW returns this-month-only (both quoted)."""
-    household_id = _household(ledger)
-    job = _job(ledger, household_id)
-
-    now = _now_utc_naive()
-    last_month = now - datetime.timedelta(days=40)  # >31 days back => never this month
-
-    _call(ledger, job, cost=5.0, created_at=last_month)
-    _call(ledger, job, cost=2.0, created_at=now)
-    _call(ledger, job, cost=3.0, created_at=now)
-
-    # A different household's rows must never enter this household's figure.
-    other_household_id = _household(ledger, "Other Household")
-    other_job = _job(ledger, other_household_id)
-    _call(ledger, other_job, cost=100.0, created_at=now)
+def test_empty_household_purges_nothing(ledger: Session) -> None:
+    _household(ledger, "Empty Household")
     ledger.commit()
 
-    assert _lifetime_spend(ledger, household_id) == pytest.approx(10.0)
-    assert reader_mod._recorded_spend(ledger, household_id) == pytest.approx(5.0)
-    assert reader_mod._recorded_spend(ledger, other_household_id) == pytest.approx(100.0)
-
-
-def test_empty_household_spends_zero_and_purges_nothing(ledger: Session) -> None:
-    household_id = _household(ledger, "Empty Household")
-    ledger.commit()
-
-    assert reader_mod._recorded_spend(ledger, household_id) == pytest.approx(0.0)
     assert reader_mod.purge_old_provider_calls(ledger) == []
     assert ledger.query(ProviderCall).count() == 0
 
@@ -173,13 +145,11 @@ def test_purge_vehicle_deletes_only_old_rows_and_spares_non_spend_tables(
     ledger.commit()
 
     lifetime_before = _lifetime_spend(ledger, household_id)
-    month_before = reader_mod._recorded_spend(ledger, household_id)
     calls_before = ledger.query(ProviderCall).count()
     guardrail_before = ledger.query(GuardrailEvent).count()
     audit_before = ledger.query(AuditEvent).count()
     assert calls_before == 5
     assert lifetime_before == pytest.approx(5.0)
-    assert month_before == pytest.approx(2.0)
     assert guardrail_before == 1 and audit_before == 1
 
     deleted = reader_mod.purge_old_provider_calls(ledger)
@@ -190,9 +160,8 @@ def test_purge_vehicle_deletes_only_old_rows_and_spares_non_spend_tables(
     assert {row.id for row in ledger.query(ProviderCall).all()} == recent_ids
     assert ledger.query(GuardrailEvent).count() == guardrail_before
     assert ledger.query(AuditEvent).count() == audit_before
-    # The old rows are gone from the durable total; the monthly figure never moved.
+    # The old rows are gone from the durable total.
     assert _lifetime_spend(ledger, household_id) == pytest.approx(2.0)
-    assert reader_mod._recorded_spend(ledger, household_id) == pytest.approx(month_before)
 
 
 def test_purge_keeps_rows_inside_the_retention_window(ledger: Session) -> None:

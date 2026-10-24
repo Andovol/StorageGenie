@@ -1,0 +1,6 @@
+$ date -u; final ruff + mypy on touched files
+Sat Oct 24 19:16:19 UTC 2026
+All checks passed!
+ruff exit=0
+Success: no issues found in 14 source files
+mypy exit=0

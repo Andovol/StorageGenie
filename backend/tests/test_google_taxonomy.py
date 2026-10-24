@@ -277,8 +277,6 @@ def sg095_env(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):  # type: ignore[
     monkeypatch.setattr(settings, "storage_root", str(storage_root))
     monkeypatch.setattr(settings, "sg_consent", False)
     monkeypatch.setattr(settings, "sg_provider_id", "fake")
-    monkeypatch.setattr(settings, "sg_per_job_cap", None)
-    monkeypatch.setattr(settings, "sg_monthly_cap", None)
     monkeypatch.setattr(settings, "sg_confidence_threshold", 0.9)
     monkeypatch.setattr(settings, "sg_prompt_category", "food")
 

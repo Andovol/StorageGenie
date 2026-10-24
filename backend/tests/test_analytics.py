@@ -46,13 +46,11 @@ class AnalyticsScriptedProvider:
         provider_id: str = "scripted-analytics",
         model_id: str = "scripted-analytics-1",
         fail_times: int = 0,
-        estimate: float = 0.0,
     ) -> None:
         self.provider_id = provider_id
         self.model_id = model_id
         self.payload = payload
         self.fail_times = fail_times
-        self.estimate = estimate
         self.invocations = 0
         self.images: list[bytes] = []
         self.prompts: list[str] = []
@@ -64,11 +62,9 @@ class AnalyticsScriptedProvider:
         self.cost: float = 0.0
         self.latency_ms: float = 2.0
 
-    def estimate_cost(self, image_bytes: bytes, prompt: str) -> float:
-        return self.estimate
 
     def extract_items(
-        self, image_bytes: bytes, prompt: str, *, estimated_cost: float = 0.0
+        self, image_bytes: bytes, prompt: str
     ) -> ProviderResult:
         self.invocations += 1
         self.images.append(image_bytes)
@@ -104,8 +100,6 @@ def analytics_fixture(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):  # type:
     session.commit()
     monkeypatch.setattr(settings, "sg_consent", False)
     monkeypatch.setattr(settings, "sg_provider_id", "fake")
-    monkeypatch.setattr(settings, "sg_per_job_cap", None)
-    monkeypatch.setattr(settings, "sg_monthly_cap", None)
 
     from app.services.providers import opencode_go
 
@@ -434,27 +428,6 @@ def test_insights_empty_household_calls_nothing(
     assert session.query(ProviderCall).count() == 0
     event = session.query(GuardrailEvent).one()
     assert json.loads(event.detail_json)["outcome"] == "empty_household"
-
-
-def test_insights_budget_refusal_before_any_call(
-    analytics_fixture, monkeypatch: pytest.MonkeyPatch
-) -> None:  # type: ignore[no-untyped-def]
-    session, household_id, network_attempts = analytics_fixture
-    _seed_asset(session, household_id, "Milk", category="food_beverages")
-    provider = AnalyticsScriptedProvider(
-        _payload(_item("x", stat_id="assets.active")), estimate=1.0
-    )
-    _enable(monkeypatch, provider)
-    monkeypatch.setattr(settings, "sg_per_job_cap", 0.01)
-    client = TestClient(app)
-
-    response = _insights(client, household_id)
-
-    assert response.status_code == 200, response.text
-    assert response.json()["status"] == "refused"
-    assert provider.invocations == 0
-    assert network_attempts == []
-    assert session.query(ProviderCall).count() == 0
 
 
 def test_insights_single_repair_turn_then_success(

@@ -13,9 +13,9 @@ flipped the reader from v3). No key, no SDK, no network, no metered call:
 - G3: `category_proposed` is a visible, gated proposal (never auto-accepted at
   any confidence); every other v3 field crosses byte-equal into `ai_items` and
   is explicitly deferred from accept-writable promotion.
-- G4: split-first on multi-item output with per-item quantity; consent gate
-  and monthly-ledger refusal both fire BEFORE any provider call; the outgoing
-  request shape (v4 prompt + redacted PNG bytes) is asserted, not mocked away.
+- G4: split-first on multi-item output with per-item quantity; the consent gate
+  fires BEFORE any provider call; the outgoing request shape (v4 prompt +
+  redacted PNG bytes) is asserted, not mocked away.
 """
 
 from __future__ import annotations
@@ -84,8 +84,6 @@ def sg080_env(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):  # type: ignore[
     monkeypatch.setattr(settings, "storage_root", str(storage_root))
     monkeypatch.setattr(settings, "sg_consent", False)
     monkeypatch.setattr(settings, "sg_provider_id", "fake")
-    monkeypatch.setattr(settings, "sg_per_job_cap", None)
-    monkeypatch.setattr(settings, "sg_monthly_cap", None)
     monkeypatch.setattr(settings, "sg_confidence_threshold", 0.9)
     monkeypatch.setattr(settings, "sg_prompt_category", "food")
 
@@ -471,25 +469,6 @@ def test_consent_gate_refuses_before_any_call(sg080_env, monkeypatch: pytest.Mon
     assert session.query(Evidence).filter_by(source_kind="transcript").count() == 0
 
 
-class _RefusingProvider:
-    """Estimating provider that would raise loudly if invoked (pre-call refusal proof)."""
-
-    provider_id = "capped-v3"
-    model_id = "capped-v3-model"
-
-    def __init__(self) -> None:
-        self.invocations = 0
-
-    def estimate_cost(self, image_bytes: bytes, prompt: str) -> float:
-        return 1.0
-
-    def extract_items(  # type: ignore[no-untyped-def]
-        self, image_bytes: bytes, prompt: str, *, estimated_cost: float = 0.0
-    ):
-        self.invocations += 1
-        raise AssertionError("provider must not be invoked on monthly-ledger refusal")
-
-
 class _OneCallThenFailProvider:
     """Succeeds on the first image, then fails (a provider-side leg)."""
 
@@ -501,7 +480,7 @@ class _OneCallThenFailProvider:
         self.invocations = 0
 
     def extract_items(  # type: ignore[no-untyped-def]
-        self, image_bytes: bytes, prompt: str, *, estimated_cost: float = 0.0
+        self, image_bytes: bytes, prompt: str
     ):
         self.invocations += 1
         if self.invocations >= 2:
@@ -557,44 +536,6 @@ def test_partial_job_failure_leaves_no_unlinked_transcript(sg080_env, monkeypatc
     assert job.state == "FAILED"
     assert provider.invocations == 2
     assert session.query(Evidence).filter_by(source_kind="transcript").count() == 0
-
-
-def test_monthly_ledger_refuses_before_any_call(sg080_env, monkeypatch: pytest.MonkeyPatch) -> None:  # type: ignore[no-untyped-def]
-    session, household_id, evidence_id, _network = sg080_env
-    prior_job = Job(
-        job_type="import",
-        state="COMPLETED",
-        config_snapshot=json.dumps({"evidence_ids": []}),
-        household_id=household_id,
-    )
-    session.add(prior_job)
-    session.flush()
-    session.add(
-        ProviderCall(
-            provider="scripted",
-            model="scripted-model-1",
-            prompt_template_version="extract-food-v3",
-            cost=0.6,
-            job_id=prior_job.id,
-        )
-    )
-    session.commit()
-
-    provider = _RefusingProvider()
-    monkeypatch.setattr(reader, "provider_registry", lambda: {provider.provider_id: provider})
-    monkeypatch.setattr(settings, "sg_consent", True)
-    monkeypatch.setattr(settings, "sg_provider_id", provider.provider_id)
-    monkeypatch.setattr(settings, "sg_prompt_category", "food")
-    monkeypatch.setattr(settings, "sg_monthly_cap", 1.5)
-
-    job = _run(session, household_id, evidence_id)
-
-    assert job.state == "FAILED"
-    assert provider.invocations == 0
-    assert session.query(ProviderCall).filter_by(job_id=job.id).count() == 0
-    steps = {step.step_name: step for step in job_service._steps(session, job.id)}
-    error = json.loads(steps["ANALYZING_WITH_AI"].output_refs or "{}")
-    assert "monthly" in error["error"]
 
 
 def test_v4_request_wire_shape_carries_prompt_and_json_object_flag(sg080_env, monkeypatch: pytest.MonkeyPatch) -> None:  # type: ignore[no-untyped-def]

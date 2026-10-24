@@ -1,0 +1,21 @@
+SG-250 worklog — material commands and results (lane clock, UTC)
+
+Lane start (run-coder SG-250 process): 2026-10-24T18:58:40Z
+Identity (from process args): opencode-go/deepseek-v4.1-flash, --variant max
+Base ref: origin/automation
+Base commit: da78bae1ad4b156a976a5bba6eac1227203285b3 (work-tree HEAD at start same)
+
+1. Read the packet's named files and enumerated every reference to the removed symbols with grep over backend/app and backend/tests. Findings beyond the named set: api/v1/enrich.py (second _recorded_spend user), services/enrich/synthesize.py (own estimate cap), backend/eval/run.py (estimate_call_cost import), test_privacy_audit.py (line pins), test_sg125/sg132/sg142 (reader observations).
+2. Edited product: opencode_go.py, router.py, reader.py, protocols.py, fake.py, config.py, api/v1/settings.py, services/chat/service.py, services/planning/service.py, services/analytics/service.py, services/enrich/synthesize.py, api/v1/enrich.py, services/enrich/snapshots.py (doc), eval/run.py (post-call actual-spend stop).
+3. Updated tests: 18 modules changed, test_sg142_cap_join.py deleted (it tested only the removed reader). Added A3 (test_ledger_cost_is_post_call_computation_of_real_usage) and A4 (three adapter log tests).
+4. Verification commands and results:
+   - grep A1 over backend/app + backend/tests: 0 hits, exit 1 -> docs/worklogs/SG-250_g1_grep.log
+   - router signature / no budget error -> docs/worklogs/SG-250_g2_router.log
+   - A3/A4 targeted pytest: 5 passed -> docs/worklogs/SG-250_g3_g4.log
+   - A5 kept behaviour: 5 passed -> docs/worklogs/SG-250_g5_kept.log
+   - A6 diff/hashes/alembic head/provider_call columns -> docs/worklogs/SG-250_g6_a6.log
+   - full suite: 742 passed, 2 failed (the two known environmental signals reds) -> docs/worklogs/SG-250_g7_suite.log
+   - ruff + mypy on touched files: clean -> docs/worklogs/SG-250_g8_lint.log
+   - identity/base/lane clock -> docs/worklogs/SG-250_g9_identity.log
+5. No provider call, no key or .env read, no database opened, no migration, no deployment, no restart. Actual spend: $0.
+6. Elapsed at report-writing start: 995 s of 1500 s.

@@ -12,8 +12,8 @@ call the ONE adapter through the SG-028 reader path (`reader.run_ai_extraction`,
 which already owns the single §5.3 repair and the per-call ledger). The validated
 output is cached back into the fixture JSON so scoring stays offline and
 reproducible. Every call's provider-returned model id, latency, usage and cost
-are printed, and the run aborts before any call that would take the projected
-total past `SPEND_CEILING_USD`.
+are printed, and the run stops once recorded spend has passed
+`SPEND_CEILING_USD` (actual cost only; no pre-call estimate).
 
 Consent/provider for a live run are set by environment for that one command
 (`SG_CONSENT=true`, `SG_PROVIDER_ID=opencode-go`); the key is read from the host
@@ -43,7 +43,6 @@ from app.models import Asset, AuditEvent, Evidence, Household, Job, ReviewTask  
 from app.models.provider_call import ProviderCall  # noqa: E402
 from app.plugins import expiry_tracker  # noqa: E402
 from app.services.providers import reader  # noqa: E402
-from app.services.providers.opencode_go import estimate_call_cost  # noqa: E402
 from app.services.providers.schemas import parse_extraction_output  # noqa: E402
 
 CORPUS_DIR = Path(__file__).resolve().parent / "corpus"
@@ -325,9 +324,14 @@ def _run_live_fixture(
             "calls": _ledger_calls(rows),
             "provider_call_ids": [row.id for row in rows],
         }
-    call_ids = [str(value) for value in result.get("provider_call_ids", [])]
+    raw_call_ids = result.get("provider_call_ids", [])
+    call_ids = [str(value) for value in raw_call_ids] if isinstance(raw_call_ids, list) else []
     rows = session.query(ProviderCall).filter(ProviderCall.id.in_(call_ids)).all() if call_ids else []
-    return result["extraction"], {"calls": _ledger_calls(rows), "provider_call_ids": call_ids}
+    extraction = result.get("extraction")
+    return (
+        extraction if isinstance(extraction, dict) else None,
+        {"calls": _ledger_calls(rows), "provider_call_ids": call_ids},
+    )
 
 
 def run_live(paths: list[Path]) -> int:
@@ -352,14 +356,6 @@ def run_live(paths: list[Path]) -> int:
         for path in paths:
             fixture = json.loads(path.read_text(encoding="utf-8"))
             prompt, _version = reader.load_prompt(str(fixture["category"]))
-            image_path = path.parent / str(fixture["image"])
-            estimate = estimate_call_cost(image_path.read_bytes(), prompt)
-            if spent + 2 * estimate > SPEND_CEILING_USD:
-                print(
-                    f"ABORT: projected total {spent + 2 * estimate:.4f} exceeds "
-                    f"ceiling {SPEND_CEILING_USD:.2f} before fixture {fixture['id']}"
-                )
-                return 2
             extraction, meta = _run_live_fixture(session, household.id, fixture, path)
             per_fixture = 0.0
             for call in meta["calls"]:
@@ -371,6 +367,12 @@ def run_live(paths: list[Path]) -> int:
                     f"cost=${cost:.6f} error_state={call['error_state']}"
                 )
             spent += per_fixture
+            if spent > SPEND_CEILING_USD:
+                print(
+                    f"ABORT: recorded spend {spent:.4f} exceeds "
+                    f"ceiling {SPEND_CEILING_USD:.2f} after fixture {fixture['id']}"
+                )
+                return 2
             if extraction is None:
                 print(
                     f"fixture {fixture['id']}: FAILED {meta.get('error')}; "

@@ -5,10 +5,11 @@ inherited from the packet. ONE stable session id is supplied per conversation;
 header VALUES are never logged, and the API key is read from the backend
 environment only and never placed in a log line, payload, or repr.
 
-F2 (owner 2026-09-11: "no caps at first, we will re-evaluate later."): the
-per-job and monthly cap mechanisms ship here, but their configured defaults
-are None (uncapped). A cap that binds logs by name and number only;
-re-evaluation is owed.
+SG-250 (owner 2026-10-24: "Stop carrying about predicting costs, just log the
+costs and thats it."): the pre-call estimate and both cost caps are gone. Every
+call records the ACTUAL cost computed after the response from its real `usage`,
+and emits one INFO line carrying provider, model, operation, cost, token counts
+and latency — on success and on failure.
 """
 
 from __future__ import annotations
@@ -24,7 +25,7 @@ import httpx
 
 from app.services.providers.protocols import ProviderResult
 from app.services.providers.redaction import redact_image
-from app.services.providers.router import BudgetExceededError, ProviderError
+from app.services.providers.router import ProviderError
 from app.services.providers.schemas import parse_extraction_output
 
 logger = logging.getLogger(__name__)
@@ -139,29 +140,40 @@ def attach_body_accounting(
 def compute_cost(usage: dict[str, Any]) -> float:
     """Computed USD for one call from the vendor rate table (off-peak rates).
 
-    The peak multiplier (x2 at 01:00-04:00 and 06:00-10:00 UTC Mon-Fri) is a
-    vendor fact recorded in the report, not a clock here: a time-dependent
-    calculation would make unit tests date-dependent (PG-IC-07).
+    This prices what actually happened: it reads the response's real token
+    counts after the call. The peak multiplier (x2 at 01:00-04:00 and
+    06:00-10:00 UTC Mon-Fri) is a vendor fact recorded in the report, not a
+    clock here: a time-dependent calculation would make unit tests
+    date-dependent (PG-IC-07).
     """
     tokens_in = usage.get("prompt_tokens") or 0
     tokens_out = usage.get("completion_tokens") or 0
     return (tokens_in * INPUT_USD_PER_1M + tokens_out * OUTPUT_USD_PER_1M) / 1_000_000
 
 
-def estimate_call_cost(
-    image_bytes: bytes, prompt: str, *, max_tokens: int = DEFAULT_MAX_TOKENS
-) -> float:
-    """Bounded worst-case USD for ONE call from the same vendor rate table (SG-029 G0).
-
-    Input tokens are bounded above by one token per source byte (prompt bytes plus
-    the base64 body of the image); output is bounded by `max_tokens`. This
-    deliberately over-counts the real tokenizer: it is an upper bound, not a
-    forecast, so a cap compared against it can never be surprised by a call it
-    admitted. No clock, no network, no key (`PG-IC-07`).
-    """
-    base64_len = ((len(image_bytes) + 2) // 3) * 4
-    input_tokens = len(prompt.encode("utf-8")) + base64_len
-    return (input_tokens * INPUT_USD_PER_1M + max_tokens * OUTPUT_USD_PER_1M) / 1_000_000
+def _log_call(
+    *,
+    operation: str,
+    model_id: str,
+    usage: dict[str, Any] | None,
+    cost: float | None,
+    latency_ms: float | None,
+    status: str,
+) -> None:
+    """One INFO line per provider call: never a prompt, body, image or key."""
+    tokens = usage or {}
+    logger.info(
+        "provider call: provider=%s model=%s operation=%s status=%s cost=%.8f "
+        "input_tokens=%d output_tokens=%d latency_ms=%s",
+        "opencode-go",
+        model_id,
+        operation,
+        status,
+        float(cost or 0.0),
+        int(tokens.get("prompt_tokens") or 0),
+        int(tokens.get("completion_tokens") or 0),
+        f"{latency_ms:.1f}" if latency_ms is not None else "unknown",
+    )
 
 
 def build_chat_payload(model: str, prompt: str, image_b64: str) -> dict[str, Any]:
@@ -207,10 +219,10 @@ def build_text_payload(model: str, prompt: str, text: str) -> dict[str, Any]:
 
 
 class OpenCodeGoProvider:
-    """Raw-httpx implementation of the vision extraction operation.
+    """Raw-httpx implementation of the vision and text operations.
 
-    `extract_items(image_bytes, prompt, estimated_cost=...)` is the SG-027
-    surface; the SG-028 pipeline reader wires it to the provider protocol.
+    The recorded cost is the post-call computation of the response's real
+    `usage`; no call is refused for cost.
     """
 
     provider_id = "opencode-go"
@@ -221,33 +233,14 @@ class OpenCodeGoProvider:
         *,
         model_id: str = DEFAULT_MODEL_ID,
         api_key: str | None = None,
-        per_job_cap: float | None = None,
-        monthly_cap: float | None = None,
         base_url: str = BASE_URL,
         timeout_s: float = CALL_TIMEOUT_S,
     ) -> None:
         self._session_id = session_id
         self._model_id = model_id
         self._api_key = api_key
-        self._per_job_cap = per_job_cap
-        self._monthly_cap = monthly_cap
-        self._monthly_spent = 0.0
         self._base_url = base_url
         self._timeout_s = timeout_s
-        logger.info(
-            "opencode-go bound: model=%s per_job_cap=%s monthly_cap=%s",
-            self._model_id,
-            "uncapped" if per_job_cap is None else per_job_cap,
-            "uncapped" if monthly_cap is None else monthly_cap,
-        )
-
-    def estimate_cost(self, image_bytes: bytes, prompt: str) -> float:
-        """Bounded worst-case cost for one call; consumed by the SG-028 reader.
-
-        The reader passes this to the router so a cap refuses BEFORE any network
-        call. It is intentionally the upper bound from `estimate_call_cost`.
-        """
-        return estimate_call_cost(image_bytes, prompt)
 
     def _resolve_api_key(self) -> str:
         key = self._api_key or os.environ.get("OPENCODE_API_KEY", "")
@@ -278,132 +271,122 @@ class OpenCodeGoProvider:
             raise ProviderError("invalid_json", "provider 200 with a non-object body")
         return body
 
-    def extract_items(
-        self,
-        image_bytes: bytes,
-        prompt: str,
-        *,
-        estimated_cost: float = 0.0,
-    ) -> ProviderResult:
-        """Vision turn on the real adapter, guarded for DIRECT invocations only.
-
-        The per-job + monthly pre-call refusal below fires for direct callers
-        (tests, eval harnesses). On the router-routed path it is shadowed but
-        harmless: `router.execute` consumes `estimated_cost` for its own
-        pre-call refusal and forwards only `*args, **kwargs`, so this method
-        always sees the `estimated_cost` default (0.0) there. Routed
-        enforcement is owned by the router (`cost_budget`) plus the reader's
-        ledger-durable monthly check. No logic change; documented per SG-060.
-        """
-        if self._per_job_cap is not None and estimated_cost > self._per_job_cap:
-            raise BudgetExceededError(
-                f"estimated cost {estimated_cost} exceeds per-job cap {self._per_job_cap}"
-            )
-        if (
-            self._monthly_cap is not None
-            and self._monthly_spent + estimated_cost > self._monthly_cap
-        ):
-            raise BudgetExceededError(
-                f"estimated cost {estimated_cost} exceeds remaining monthly budget "
-                f"({self._monthly_spent} spent of {self._monthly_cap})"
-            )
+    def extract_items(self, image_bytes: bytes, prompt: str) -> ProviderResult:
+        """Vision turn on the real adapter: one call, one actual-cost result."""
         redacted = redact_image(image_bytes)
         image_b64 = base64.b64encode(redacted).decode("ascii")
         payload = build_chat_payload(self._model_id, prompt, image_b64)
         started = time.monotonic()
-        body = self._post(payload)
-        latency_ms = (time.monotonic() - started) * 1000.0
-        usage = guard_usage(body.get("usage") or {})
-        choices = body.get("choices") or []
-        if not isinstance(choices, list) or not choices:
-            exc = ProviderError("invalid_json", "provider 200 with no choices")
-            attach_body_accounting(exc, usage, latency_ms=latency_ms)
-            raise exc
-        message = choices[0].get("message") or {}
-        content = strip_single_think(guard_content(message.get("content")))
-        parsed = parse_extraction_output(content)
-        cost = compute_cost(usage)
-        self._monthly_spent += cost
-        return ProviderResult(
-            normalized_output=parsed.model_dump(),
-            raw_payload=body,
-            request_id=str(body.get("id") or ""),
-            usage=usage,
-            cost=cost,
-            model_id=str(body.get("model") or self._model_id),
-            latency_ms=latency_ms,
+        usage: dict[str, Any] | None = None
+        try:
+            body = self._post(payload)
+            latency_ms = (time.monotonic() - started) * 1000.0
+            usage = guard_usage(body.get("usage") or {})
+            choices = body.get("choices") or []
+            if not isinstance(choices, list) or not choices:
+                exc = ProviderError("invalid_json", "provider 200 with no choices")
+                attach_body_accounting(exc, usage, latency_ms=latency_ms)
+                raise exc
+            message = choices[0].get("message") or {}
+            content = strip_single_think(guard_content(message.get("content")))
+            parsed = parse_extraction_output(content)
+            cost = compute_cost(usage)
+            result = ProviderResult(
+                normalized_output=parsed.model_dump(),
+                raw_payload=body,
+                request_id=str(body.get("id") or ""),
+                usage=usage,
+                cost=cost,
+                model_id=str(body.get("model") or self._model_id),
+                latency_ms=latency_ms,
+            )
+        except Exception as exc:
+            error_latency = getattr(exc, "latency_ms", None)
+            if error_latency is None:
+                error_latency = (time.monotonic() - started) * 1000.0
+            _log_call(
+                operation="extract_items",
+                model_id=self._model_id,
+                usage=getattr(exc, "usage", usage),
+                cost=getattr(exc, "cost", None),
+                latency_ms=error_latency,
+                status="failed",
+            )
+            raise
+        _log_call(
+            operation="extract_items",
+            model_id=result.model_id,
+            usage=result.usage,
+            cost=result.cost,
+            latency_ms=result.latency_ms,
+            status="ok",
         )
+        return result
 
-    def extract_text(
-        self,
-        text: str,
-        prompt: str,
-        *,
-        estimated_cost: float = 0.0,
-    ) -> ProviderResult:
-        """Text turn on the real adapter (SG-038 G1), same guards as `extract_items`.
+    def extract_text(self, text: str, prompt: str) -> ProviderResult:
+        """Text turn on the real adapter: one call, one actual-cost result.
 
-        Pre-call per-job + monthly refusal, identity headers, 200/envelope
-        checks, `guard_usage`, `strip_single_think`/`guard_content`, cost from
-        usage, one fully populated `ProviderResult`. No image, no base64, no
-        `parse_extraction_output`: the normalized output is the answer text plus
-        the response metadata (`model`, `finish_reason`) — decided here and
-        reported.
-
-        The per-job + monthly pre-call refusal below fires for DIRECT
-        invocations only. On the router-routed path it is shadowed but
-        harmless: `router.execute` consumes `estimated_cost` for its own
-        pre-call refusal and forwards only `*args, **kwargs`, so this method
-        always sees the `estimated_cost` default (0.0) there. Routed
-        enforcement is owned by the router (`cost_budget`) plus the reader's
-        ledger-durable monthly check. No logic change; documented per SG-060.
+        No image, no base64, no `parse_extraction_output`: the normalized output
+        is the answer text plus the response metadata (`model`, `finish_reason`).
         """
-        if self._per_job_cap is not None and estimated_cost > self._per_job_cap:
-            raise BudgetExceededError(
-                f"estimated cost {estimated_cost} exceeds per-job cap {self._per_job_cap}"
-            )
-        if (
-            self._monthly_cap is not None
-            and self._monthly_spent + estimated_cost > self._monthly_cap
-        ):
-            raise BudgetExceededError(
-                f"estimated cost {estimated_cost} exceeds remaining monthly budget "
-                f"({self._monthly_spent} spent of {self._monthly_cap})"
-            )
         payload = build_text_payload(self._model_id, prompt, text)
         started = time.monotonic()
-        body = self._post(payload)
-        latency_ms = (time.monotonic() - started) * 1000.0
-        usage = guard_usage(body.get("usage") or {})
-        choices = body.get("choices") or []
-        if not isinstance(choices, list) or not choices:
-            exc = ProviderError("invalid_json", "provider 200 with no choices")
-            attach_body_accounting(exc, usage, latency_ms=latency_ms)
-            raise exc
-        choice = choices[0]
-        message = choice.get("message") or {}
+        usage: dict[str, Any] | None = None
         try:
-            content = strip_single_think(guard_content(message.get("content")))
-        except ProviderError as exc:
-            # SG-101: a content-shape rejection AFTER a completed 200 body is a
-            # billed leg (SG-099's empty-200 spent reasoning tokens, `content`
-            # empty). Attach what crossed the wire, exactly like the no-choices
-            # leg above, so `reader._write_error_ledger` records it.
-            attach_body_accounting(exc, usage, latency_ms=latency_ms)
+            body = self._post(payload)
+            latency_ms = (time.monotonic() - started) * 1000.0
+            usage = guard_usage(body.get("usage") or {})
+            choices = body.get("choices") or []
+            if not isinstance(choices, list) or not choices:
+                exc = ProviderError("invalid_json", "provider 200 with no choices")
+                attach_body_accounting(exc, usage, latency_ms=latency_ms)
+                raise exc
+            choice = choices[0]
+            message = choice.get("message") or {}
+            try:
+                content = strip_single_think(guard_content(message.get("content")))
+            except ProviderError as exc:
+                # SG-101: a content-shape rejection AFTER a completed 200 body is
+                # a billed leg (SG-099's empty-200 spent reasoning tokens,
+                # `content` empty). Attach what crossed the wire, exactly like
+                # the no-choices leg above, so `reader._write_error_ledger`
+                # records it.
+                attach_body_accounting(exc, usage, latency_ms=latency_ms)
+                raise
+            model_id = str(body.get("model") or self._model_id)
+            cost = compute_cost(usage)
+            result = ProviderResult(
+                normalized_output={
+                    "text": content,
+                    "model": model_id,
+                    "finish_reason": choice.get("finish_reason"),
+                },
+                raw_payload=body,
+                request_id=str(body.get("id") or ""),
+                usage=usage,
+                cost=cost,
+                model_id=model_id,
+                latency_ms=latency_ms,
+            )
+        except Exception as exc:
+            error_latency = getattr(exc, "latency_ms", None)
+            if error_latency is None:
+                error_latency = (time.monotonic() - started) * 1000.0
+            _log_call(
+                operation="extract_text",
+                model_id=self._model_id,
+                usage=getattr(exc, "usage", usage),
+                cost=getattr(exc, "cost", None),
+                latency_ms=error_latency,
+                status="failed",
+            )
             raise
-        model_id = str(body.get("model") or self._model_id)
-        cost = compute_cost(usage)
-        self._monthly_spent += cost
-        return ProviderResult(
-            normalized_output={
-                "text": content,
-                "model": model_id,
-                "finish_reason": choice.get("finish_reason"),
-            },
-            raw_payload=body,
-            request_id=str(body.get("id") or ""),
-            usage=usage,
-            cost=cost,
-            model_id=model_id,
-            latency_ms=latency_ms,
+        _log_call(
+            operation="extract_text",
+            model_id=result.model_id,
+            usage=result.usage,
+            cost=result.cost,
+            latency_ms=result.latency_ms,
+            status="ok",
         )
+        return result

@@ -12,9 +12,9 @@ argument (brand+name TEXT only — never a photo, a coordinate or a key).
 SG-132 adds the Jina Search COST ledger beside the snapshot: every Jina request
 that actually left the machine appends ONE ``provider_call`` row carrying the
 ``jina.estimate_jina_search_cost`` figure, joined through the enrichment job so
-the month-boxed spend reader (``providers.reader._recorded_spend``) counts it
-with no reader change. The writer is the production seam the wire path calls; a
-test that inserts the row itself would prove only that the table accepts it.
+the cost is attributable with no reader change. The writer is the production
+seam the wire path calls; a test that inserts the row itself would prove only
+that the table accepts it.
 """
 
 from __future__ import annotations

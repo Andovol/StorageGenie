@@ -31,8 +31,6 @@ class AiSettingsOut(BaseModel):
     model_id: str
     allowed_model_ids: list[str]
     consent: bool
-    per_job_cap: float | None
-    monthly_cap: float | None
     prompt_category: str
 
 
@@ -46,8 +44,6 @@ def _read_safe_settings() -> AiSettingsOut:
         model_id=effective_model_id(),
         allowed_model_ids=list(ALLOWED_MODEL_IDS),
         consent=settings.sg_consent,
-        per_job_cap=settings.sg_per_job_cap,
-        monthly_cap=settings.sg_monthly_cap,
         prompt_category=settings.sg_prompt_category,
     )
 

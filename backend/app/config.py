@@ -5,10 +5,8 @@ class Settings(BaseSettings):
     """Runtime settings. Phase 2 additions (SG-027) are named settings only.
 
     Cloud use stays OFF until selected: the provider id defaults to the
-    deterministic fake double, both cost caps default to None (uncapped) per
-    F2 (owner 2026-09-11: "no caps at first, we will re-evaluate later."), and
-    consent defaults to False. Every value is env-overridable; nothing binds
-    silently. The window that logs a bound cap is the provider (SG-027 G2).
+    deterministic fake double, consent defaults to False, and no cost cap can
+    stop a call. Every value is env-overridable; nothing binds silently.
     """
 
     database_url: str = "sqlite:///./data/db/storagegenie.db"
@@ -45,8 +43,6 @@ class Settings(BaseSettings):
     # SG-155: per-arc scene render spend cap in USD. Off by default (uncapped)
     # per F2; the request carries a `max_cost` stop condition only when set.
     sg_scene_cap: float | None = None
-    sg_per_job_cap: float | None = None
-    sg_monthly_cap: float | None = None
     sg_consent: bool = False
     # SG-028: confidence gate for AI auto-accept of low-risk fields. Every
     # gated field (identifier/expiry/expiry_date/condition/lot) is always

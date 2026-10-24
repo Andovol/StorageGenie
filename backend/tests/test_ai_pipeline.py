@@ -574,57 +574,6 @@ def test_second_failure_fails_the_step_loudly(ai_env, monkeypatch: pytest.Monkey
     assert session.query(Candidate).filter_by(job_id=job.id).count() == 0
 
 
-class _CapProbeProvider:
-    """Estimating provider used ONLY to prove a cap binds before any call (SG-029 G0).
-
-    The shipped `ScriptedProvider` reports no estimate, so it cannot exercise the
-    pre-call refusal; this probe returns a bounded worst-case estimate and would
-    raise loudly if the pipeline invoked it despite the refusal.
-    """
-
-    provider_id = "capped"
-    model_id = "capped-model"
-
-    def __init__(self) -> None:
-        self.invocations = 0
-
-    def estimate_cost(self, image_bytes: bytes, prompt: str) -> float:
-        return 1.0
-
-    def extract_items(  # type: ignore[no-untyped-def]
-        self, image_bytes: bytes, prompt: str, *, estimated_cost: float = 0.0
-    ):
-        self.invocations += 1
-        raise AssertionError("provider must not be invoked on budget refusal")
-
-
-def test_cap_binds_from_pipeline_zero_calls_zero_rows(ai_env, monkeypatch: pytest.MonkeyPatch) -> None:  # type: ignore[no-untyped-def]
-    """SG-029 G0: a cap below the pipeline's supplied estimate refuses BEFORE a call.
-
-    Pre-fix the pipeline passed no estimate (router default 0.0), so the cap could
-    never bind and the provider was invoked. Post-fix: 0 invocations, 0 ledger rows,
-    no network, step FAILED with the budget refusal.
-    """
-    session, household_id, evidence_id = ai_env
-    from app.services.providers import reader as reader_mod
-
-    provider = _CapProbeProvider()
-    monkeypatch.setattr(reader_mod, "provider_registry", lambda: {provider.provider_id: provider})
-    monkeypatch.setattr(settings, "sg_consent", True)
-    monkeypatch.setattr(settings, "sg_provider_id", provider.provider_id)
-    monkeypatch.setattr(settings, "sg_prompt_category", "food")
-    monkeypatch.setattr(settings, "sg_per_job_cap", 0.01)
-
-    job = _run(session, household_id, evidence_id)
-
-    assert job.state == "FAILED"
-    assert provider.invocations == 0
-    assert session.query(ProviderCall).count() == 0
-    steps = {step.step_name: step for step in job_service._steps(session, job.id)}
-    error = json.loads(steps["ANALYZING_WITH_AI"].output_refs or "{}")
-    assert "estimated cost 1.0 exceeds" in error["error"]
-
-
 def test_provider_error_is_ledgered_and_survives_rollback(ai_env, monkeypatch: pytest.MonkeyPatch) -> None:  # type: ignore[no-untyped-def]
     """SG-029 G0: every failed provider call leaves a durable `error_state` ledger row.
 
@@ -634,7 +583,6 @@ def test_provider_error_is_ledgered_and_survives_rollback(ai_env, monkeypatch: p
     survives the step rollback.
     """
     session, household_id, evidence_id = ai_env
-    monkeypatch.setattr(settings, "sg_per_job_cap", None)
     provider = _enable(monkeypatch, _payload([_valid_item()]), fail_times=2)
     job = _run(session, household_id, evidence_id)
 
@@ -703,7 +651,7 @@ class _InvalidBodyProvider:
         self.invocations = 0
 
     def extract_items(  # type: ignore[no-untyped-def]
-        self, image_bytes: bytes, prompt: str, *, estimated_cost: float = 0.0
+        self, image_bytes: bytes, prompt: str
     ):
         self.invocations += 1
         return ProviderResult(
@@ -733,8 +681,6 @@ def test_returned_body_failing_schema_is_ledgered_durably(ai_env, monkeypatch: p
     monkeypatch.setattr(settings, "sg_consent", True)
     monkeypatch.setattr(settings, "sg_provider_id", provider.provider_id)
     monkeypatch.setattr(settings, "sg_prompt_category", "food")
-    monkeypatch.setattr(settings, "sg_per_job_cap", None)
-    monkeypatch.setattr(settings, "sg_monthly_cap", None)
 
     job = _run(session, household_id, evidence_id)
 
@@ -768,7 +714,7 @@ class _DroppingBodyProvider:
         self.cost = 0.0003177
 
     def extract_items(  # type: ignore[no-untyped-def]
-        self, image_bytes: bytes, prompt: str, *, estimated_cost: float = 0.0
+        self, image_bytes: bytes, prompt: str
     ):
         self.invocations += 1
         exc = ProviderError("invalid_json", "provider 200 with no choices")
@@ -793,8 +739,6 @@ def test_failed_body_with_usage_is_ledgered_with_that_usage(ai_env, monkeypatch:
     monkeypatch.setattr(settings, "sg_consent", True)
     monkeypatch.setattr(settings, "sg_provider_id", provider.provider_id)
     monkeypatch.setattr(settings, "sg_prompt_category", "food")
-    monkeypatch.setattr(settings, "sg_per_job_cap", None)
-    monkeypatch.setattr(settings, "sg_monthly_cap", None)
 
     job = _run(session, household_id, evidence_id)
 
@@ -820,8 +764,6 @@ def test_invalid_body_provider_post_change_is_ledgered_durably(ai_env, monkeypat
     monkeypatch.setattr(settings, "sg_consent", True)
     monkeypatch.setattr(settings, "sg_provider_id", provider.provider_id)
     monkeypatch.setattr(settings, "sg_prompt_category", "food")
-    monkeypatch.setattr(settings, "sg_per_job_cap", None)
-    monkeypatch.setattr(settings, "sg_monthly_cap", None)
 
     job = _run(session, household_id, evidence_id)
 
@@ -855,7 +797,7 @@ def test_content_guard_leg_stays_usage_free(ai_env, monkeypatch: pytest.MonkeyPa
             self.invocations = 0
 
         def extract_items(  # type: ignore[no-untyped-def]
-            self, image_bytes: bytes, prompt: str, *, estimated_cost: float = 0.0
+            self, image_bytes: bytes, prompt: str
         ):
             self.invocations += 1
             raise ProviderError("invalid_json", "provider returned empty content (empty-200 reject)")
@@ -865,8 +807,6 @@ def test_content_guard_leg_stays_usage_free(ai_env, monkeypatch: pytest.MonkeyPa
     monkeypatch.setattr(settings, "sg_consent", True)
     monkeypatch.setattr(settings, "sg_provider_id", provider.provider_id)
     monkeypatch.setattr(settings, "sg_prompt_category", "food")
-    monkeypatch.setattr(settings, "sg_per_job_cap", None)
-    monkeypatch.setattr(settings, "sg_monthly_cap", None)
 
     job = _run(session, household_id, evidence_id)
 
@@ -881,79 +821,48 @@ def test_content_guard_leg_stays_usage_free(ai_env, monkeypatch: pytest.MonkeyPa
         assert row.latency_ms is None
 
 
-class _MonthlyProbeProvider:
-    """An estimating provider that records a real cost per call (SG-030 ISS-10)."""
+class _ActualCostProvider:
+    """A provider whose reported cost is the post-call computation of real usage."""
 
-    provider_id = "monthly-probe"
-    model_id = "monthly-probe-model"
+    provider_id = "actual-cost"
+    model_id = "actual-cost-model"
 
-    def __init__(self, *, estimate: float, cost: float) -> None:
-        self.estimate = estimate
-        self.cost = cost
+    def __init__(self) -> None:
         self.invocations = 0
+        self.usage = {"prompt_tokens": 211, "completion_tokens": 89, "total_tokens": 300}
 
-    def estimate_cost(self, image_bytes: bytes, prompt: str) -> float:
-        return self.estimate
+    def extract_items(self, image_bytes: bytes, prompt: str) -> ProviderResult:
+        from app.services.providers.opencode_go import compute_cost
 
-    def extract_items(  # type: ignore[no-untyped-def]
-        self, image_bytes: bytes, prompt: str, *, estimated_cost: float = 0.0
-    ):
         self.invocations += 1
         return ProviderResult(
-            normalized_output={
-                "items": [
-                    {
-                        "name": "Monthly Milk",
-                        "expiry_date": None,
-                        "date_type": None,
-                        "lot": None,
-                        "confidence": 1.0,
-                        "uncertainty_reasons": [],
-                    }
-                ],
-                "unknowns": [],
-                "needs_evidence": False,
-            },
+            normalized_output=_payload([_valid_item()]),
             raw_payload={"provider": self.provider_id},
-            request_id=f"monthly-{self.invocations}",
-            usage={"prompt_tokens": 10, "completion_tokens": 5, "total_tokens": 15},
-            cost=self.cost,
+            request_id="actual-cost-1",
+            usage=dict(self.usage),
+            cost=compute_cost(self.usage),
             model_id=self.model_id,
-            latency_ms=1.0,
+            latency_ms=3.0,
         )
 
 
-def test_monthly_cap_binds_across_jobs_from_durable_ledger(ai_env, monkeypatch: pytest.MonkeyPatch) -> None:  # type: ignore[no-untyped-def]
-    """SG-030 ISS-10: recorded spend counts toward the next job's pre-call check.
-
-    Pre-fix `_monthly_spent` lived on a provider instance rebuilt per step, so it
-    reset and the second job called out again. Post-fix the reader derives the
-    baseline from the committed `provider_call` ledger: job 1 succeeds and records
-    0.6; job 2 estimates 1.0 against a 1.5 cap and refuses with 0 invocations and
-    0 new ledger rows, with the refusal visible in the step error.
-    """
+def test_ledger_cost_is_post_call_computation_of_real_usage(
+    ai_env, monkeypatch: pytest.MonkeyPatch
+) -> None:  # type: ignore[no-untyped-def]
+    """SG-250 A3: the row's cost is compute_cost(the response's real usage)."""
     session, household_id, evidence_id = ai_env
     from app.services.providers import reader as reader_mod
+    from app.services.providers.opencode_go import compute_cost
 
-    provider = _MonthlyProbeProvider(estimate=1.0, cost=0.6)
+    provider = _ActualCostProvider()
     monkeypatch.setattr(reader_mod, "provider_registry", lambda: {provider.provider_id: provider})
     monkeypatch.setattr(settings, "sg_consent", True)
     monkeypatch.setattr(settings, "sg_provider_id", provider.provider_id)
     monkeypatch.setattr(settings, "sg_prompt_category", "food")
-    monkeypatch.setattr(settings, "sg_per_job_cap", None)
-    monkeypatch.setattr(settings, "sg_monthly_cap", 1.5)
 
-    first = _run(session, household_id, evidence_id)
-    assert first.state == "AWAITING_REVIEW"
-    assert provider.invocations == 1
-    first_rows = session.query(ProviderCall).filter_by(job_id=first.id).all()
-    assert len(first_rows) == 1
-    assert first_rows[0].cost == 0.6
+    job = _run(session, household_id, evidence_id)
 
-    second = _run(session, household_id, evidence_id)
-    assert second.state == "FAILED"
-    assert provider.invocations == 1
-    assert session.query(ProviderCall).filter_by(job_id=second.id).count() == 0
-    steps = {step.step_name: step for step in job_service._steps(session, second.id)}
-    error = json.loads(steps["ANALYZING_WITH_AI"].output_refs or "{}")
-    assert "monthly" in error["error"]
+    assert job.state == "AWAITING_REVIEW"
+    row = session.query(ProviderCall).filter_by(job_id=job.id).one()
+    assert row.cost == pytest.approx(compute_cost(provider.usage))
+    assert json.loads(row.usage_json or "{}") == provider.usage

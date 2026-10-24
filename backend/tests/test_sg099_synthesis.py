@@ -10,7 +10,6 @@ What this file proves (`PG-SC-12`: no re-implemented stand-in):
 - the frozen prompt loads by version from its file, and the file on disk is the
   loader's source;
 - consent-off refuses by name with ZERO invocations (`reader.ai_status`);
-- an over-cap estimate refuses BEFORE any call;
 - the EXACT user turn + system prompt that cross into `extract_text` are the
   ones the real builder/prompt produce (`PG-EV-04`), carrying fixture-derived
   OFF+Jina text and their attribution slots;
@@ -39,7 +38,6 @@ from app.models.provider_call import ProviderCall
 from app.services.enrich import synthesize as syn
 from app.services.providers import reader as reader_mod
 from app.services.providers.protocols import ProviderResult
-from app.services.providers.router import BudgetExceededError
 
 FIXTURES = Path(__file__).resolve().parent / "fixtures" / "enrich"
 
@@ -112,27 +110,21 @@ class ScriptedSynthesisProvider:
         *,
         provider_id: str = "scripted-synthesis",
         model_id: str = "scripted-synthesis-1",
-        estimate: float = 0.0,
     ) -> None:
         self.provider_id = provider_id
         self.model_id = model_id
         self.answer = answer
-        self.estimate = estimate
         self.invocations = 0
         self.texts: list[str] = []
         self.prompts: list[str] = []
-        self.estimated_costs: list[float] = []
 
-    def estimate_cost(self, payload_bytes: bytes, prompt: str) -> float:
-        return self.estimate
 
     def extract_text(
-        self, text: str, prompt: str = "", *, estimated_cost: float = 0.0
+        self, text: str, prompt: str = ""
     ) -> ProviderResult:
         self.invocations += 1
         self.texts.append(text)
         self.prompts.append(prompt)
-        self.estimated_costs.append(estimated_cost)
         return ProviderResult(
             normalized_output={"text": self.answer, "model": self.model_id},
             raw_payload={"scripted": True, "provider_id": self.provider_id},
@@ -209,7 +201,7 @@ def test_frozen_prompt_carries_the_grounding_rules() -> None:
 
 
 # --------------------------------------------------------------------------- #
-# G2 — consent + cap refusals, seen-to-fail with zero invocations
+# G2 — consent refusal, seen-to-fail with zero invocations
 # --------------------------------------------------------------------------- #
 def test_consent_off_refuses_by_name_with_zero_invocations(
     syn_db: Session, monkeypatch: pytest.MonkeyPatch
@@ -219,18 +211,6 @@ def test_consent_off_refuses_by_name_with_zero_invocations(
     with pytest.raises(syn.SynthesisRefusedError) as excinfo:
         _call(syn_db, provider)
     assert "consent_disabled" in str(excinfo.value)
-    assert provider.invocations == 0
-    assert syn_db.query(ProviderCall).count() == 0
-
-
-def test_over_cap_estimate_refuses_before_any_call(
-    syn_db: Session, monkeypatch: pytest.MonkeyPatch
-) -> None:
-    provider = ScriptedSynthesisProvider(_answer())
-    _enable(monkeypatch, provider)
-    with pytest.raises(BudgetExceededError) as excinfo:
-        _call(syn_db, provider, per_call_cap_usd=0.0000001)
-    assert "per-call cap" in str(excinfo.value)
     assert provider.invocations == 0
     assert syn_db.query(ProviderCall).count() == 0
 
@@ -276,16 +256,6 @@ def test_request_shape_is_exactly_what_crosses_into_extract_text(
     assert "base64" not in blob and "image_url" not in blob
     assert "Authorization" not in blob and "sk-" not in blob
     assert "OPENCODE_API_KEY" not in blob
-
-
-def test_estimated_cost_is_bounded_and_under_the_cap(
-    syn_db: Session, monkeypatch: pytest.MonkeyPatch
-) -> None:
-    provider = ScriptedSynthesisProvider(_answer())
-    _enable(monkeypatch, provider)
-    _call(syn_db, provider)
-    estimate = provider.estimated_costs[0]
-    assert 0.0 < estimate <= syn.SYNTHESIS_PER_CALL_CAP_USD
 
 
 # --------------------------------------------------------------------------- #

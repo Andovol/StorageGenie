@@ -2,11 +2,12 @@
 
 Turns committed OFF JSON + Jina content into attributed proposals by calling the
 metered TEXT seam ``OpenCodeGoProvider.extract_text`` DIRECTLY — never through
-the catalogue-bound ``chat.service.respond``. Consent (``reader.ai_status``) and
-a per-call cap gate the call before any invocation; the provider's own
-``ProviderCall`` ledger row is written to the caller-supplied session; the
-synthesis is RETURNED, never persisted (``PG-SC-02`` — consumption is a later
-slice). No endpoint, no migration, no deploy rides here.
+the catalogue-bound ``chat.service.respond``. Consent (``reader.ai_status``)
+gates the call before any invocation; no cost is predicted or refused. The
+provider's own ``ProviderCall`` ledger row is written to the caller-supplied
+session with the ACTUAL post-call cost; the synthesis is RETURNED, never
+persisted (``PG-SC-02`` — consumption is a later slice). No endpoint, no
+migration, no deploy rides here.
 
 Inputs are the committed SG-081/082 fixtures' shapes (OFF JSON + Jina payload).
 The caller assembles ONE user turn carrying each source block with its
@@ -30,12 +31,6 @@ from sqlalchemy.orm import Session
 from app.config import settings
 from app.models.provider_call import ProviderCall
 from app.services.providers import reader as reader_mod
-from app.services.providers.opencode_go import (
-    INPUT_USD_PER_1M,
-    OUTPUT_USD_PER_1M,
-    TEXT_MAX_TOKENS,
-)
-from app.services.providers.router import BudgetExceededError
 
 logger = logging.getLogger(__name__)
 
@@ -44,10 +39,6 @@ SYNTHESIS_PROMPT_FILE = "enrich-synthesis-v1.md"
 
 DATA_OPEN = "<<<ENRICH_SOURCE_DATA>>>"
 DATA_CLOSE = "<<<END_ENRICH_SOURCE_DATA>>>"
-
-# Mirror of the endpoint's per-press cap (`api/v1/enrich.py`); stated and
-# uncalibrated (`G-A9`). The worst-case estimate binds here BEFORE any call.
-SYNTHESIS_PER_CALL_CAP_USD = 0.05
 BRAND_ABSENT = "ABSENT"
 
 _FENCE_RE = re.compile(r"^```(?:json)?\s*|\s*```$", re.MULTILINE)
@@ -116,22 +107,6 @@ def load_synthesis_prompt() -> tuple[str, str]:
     if not version:
         raise ValueError(f"prompt file missing template_version: {SYNTHESIS_PROMPT_FILE}")
     return text, version
-
-
-def estimate_text_cost(
-    text: str, prompt: str, *, max_tokens: int = TEXT_MAX_TOKENS
-) -> float:
-    """Bounded worst-case USD for ONE text call from the vendor rate table.
-
-    Input tokens are bounded above by one token per source byte (prompt plus
-    user text); output is bounded by ``max_tokens``, which defaults to the
-    text-turn bound ``TEXT_MAX_TOKENS`` (SG-101) — the same bound
-    ``build_text_payload`` sends — so the cap this estimate guards is not blind
-    to the text-turn output budget. Deliberately an upper bound, so a cap
-    compared against it can never be surprised. No clock, no network.
-    """
-    input_tokens = len(prompt.encode("utf-8")) + len(text.encode("utf-8"))
-    return (input_tokens * INPUT_USD_PER_1M + max_tokens * OUTPUT_USD_PER_1M) / 1_000_000
 
 
 def _source_block(
@@ -247,15 +222,13 @@ def synthesize(
     jina_retrieved_at: str,
     brand: str | None = None,
     provider: Any | None = None,
-    per_call_cap_usd: float = SYNTHESIS_PER_CALL_CAP_USD,
-    estimated_cost: float | None = None,
 ) -> SynthesisResult:
     """One attributed synthesis over OFF JSON + Jina content, gated and ledgered.
 
-    Consent refuses before any invocation. An over-cap worst-case estimate
-    refuses before any invocation. The call goes DIRECTLY to ``extract_text``
-    (never the catalogue-bound ``respond``); exactly one ``ProviderCall`` row is
-    written to ``db``. The synthesis is returned, never persisted.
+    Consent refuses before any invocation. The call goes DIRECTLY to
+    ``extract_text`` (never the catalogue-bound ``respond``); exactly one
+    ``ProviderCall`` row is written to ``db`` with the actual cost the provider
+    returned. The synthesis is returned, never persisted.
     """
     enabled, reason = reader_mod.ai_status()
     if not enabled:
@@ -277,14 +250,7 @@ def synthesize(
         provider = registry[settings.sg_provider_id]
     provider_id = str(getattr(provider, "provider_id", settings.sg_provider_id))
 
-    if estimated_cost is None:
-        estimated_cost = estimate_text_cost(user_text, prompt_text)
-    if per_call_cap_usd is not None and estimated_cost > per_call_cap_usd:
-        raise BudgetExceededError(
-            f"estimated cost {estimated_cost:.6f} exceeds per-call cap {per_call_cap_usd}"
-        )
-
-    result = provider.extract_text(user_text, prompt_text, estimated_cost=estimated_cost)
+    result = provider.extract_text(user_text, prompt_text)
 
     model_id = str(
         getattr(result, "model_id", "") or getattr(provider, "model_id", "") or settings.sg_model_id

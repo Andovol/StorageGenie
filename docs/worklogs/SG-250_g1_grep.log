@@ -1,0 +1,3 @@
+$ date -u; grep -rn -E "estimate_call_cost|estimate_cost|_estimate_call|estimated_cost|cost_budget|sg_per_job_cap|sg_monthly_cap|per_job_cap|monthly_cap|BudgetExceededError" backend/app backend/tests
+Sat Oct 24 19:11:00 UTC 2026
+grep exit=1 (1 = no matches)

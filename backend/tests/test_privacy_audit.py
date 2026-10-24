@@ -242,7 +242,7 @@ def test_g0_single_http_client_and_send_site_full_scan() -> None:
         "services/scene/openrouter.py": ["import httpx"],
     }, f"unexpected HTTP clients: {_http_client_files()}"
     assert _send_sites() == [
-        "services/providers/opencode_go.py:263",
+        "services/providers/opencode_go.py:256",
         "services/scene/openrouter.py:781",
         "services/scene/openrouter.py:783",
     ], f"unexpected provider send sites: {_send_sites()}"
@@ -262,8 +262,8 @@ def test_g0_redact_call_sites_are_reader_and_direct_adapter() -> None:
             if "redact_image(" in line and "def redact_image" not in line:
                 callers.append(f"{path.relative_to(APP_DIR)}:{number}")
     assert callers == [
-        "services/providers/opencode_go.py:310",
-        "services/providers/reader.py:483",
+        "services/providers/opencode_go.py:276",
+        "services/providers/reader.py:423",
     ], f"unexpected redact_image call sites: {callers}"
 
 
@@ -432,13 +432,13 @@ class _ExplodingProvider:
         self.calls: list[str] = []
 
     def extract_items(  # type: ignore[no-untyped-def]
-        self, image_bytes: bytes, prompt: str, *, estimated_cost: float = 0.0
+        self, image_bytes: bytes, prompt: str
     ):
         self.calls.append("extract_items")
         raise AssertionError("provider must never be called while consent is false")
 
     def extract_text(  # type: ignore[no-untyped-def]
-        self, text: str, prompt: str = "", *, estimated_cost: float = 0.0
+        self, text: str, prompt: str = ""
     ):
         self.calls.append("extract_text")
         raise AssertionError("provider must never be called while consent is false")
@@ -522,7 +522,7 @@ def test_g2_web_senders_are_the_two_researched_sources() -> None:
                 excluded_hits.append(f"{rel}:{number}: {line.strip()}")
     assert excluded_hits == [], f"excluded detection source must stay absent: {excluded_hits}"
     assert _send_sites() == [
-        "services/providers/opencode_go.py:263",
+        "services/providers/opencode_go.py:256",
         "services/scene/openrouter.py:781",
         "services/scene/openrouter.py:783",
     ]

@@ -1,0 +1,9 @@
+$ date -u
+Sat Oct 24 19:12:23 UTC 2026
+$ venv/bin/python -c "inspect.signature(ProviderRouter.execute)"
+ProviderRouter.execute(self, operation: 'str', *args: 'Any', **kwargs: 'Any') -> 'Any'
+RouterConfig fields: ['provider_id', 'fallback_id', 'json_strict', 'retryable_errors']
+--- grep -rn -E "budget|Budget" app --include=*.py ---
+app/services/providers/opencode_go.py:39:# model, so `reasoning_content` consumes completion budget before any answer;
+app/services/providers/opencode_go.py:77:    reasoning tokens consumed the completion budget, `content` arrived empty)
+app/services/enrich/jina.py:175:        "X-Token-Budget": TOKEN_BUDGET,

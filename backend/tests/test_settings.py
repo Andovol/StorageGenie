@@ -50,8 +50,6 @@ SAFE_FIELDS = {
     "model_id",
     "allowed_model_ids",
     "consent",
-    "per_job_cap",
-    "monthly_cap",
     "prompt_category",
 }
 
@@ -118,8 +116,6 @@ def test_get_exposes_only_safe_subset_and_no_key_bytes(
     monkeypatch.setattr(settings, "sg_provider_id", "fake")
     monkeypatch.setattr(settings, "sg_consent", False)
     monkeypatch.setattr(settings, "sg_prompt_category", "food")
-    monkeypatch.setattr(settings, "sg_per_job_cap", None)
-    monkeypatch.setattr(settings, "sg_monthly_cap", None)
     _clear_override()
 
     with TestClient(app) as client:
@@ -132,7 +128,6 @@ def test_get_exposes_only_safe_subset_and_no_key_bytes(
     assert body["model_id"] == settings.sg_model_id
     assert body["allowed_model_ids"] == [ALLOWED_MODEL]
     assert body["consent"] is False
-    assert body["per_job_cap"] is None and body["monthly_cap"] is None
     assert body["prompt_category"] == "food"
     raw = response.content.decode()
     assert SENTINEL_KEY not in raw
@@ -223,8 +218,6 @@ def test_reader_resolves_override_and_records_selected_model(
     monkeypatch.setattr(settings, "sg_consent", True)
     monkeypatch.setattr(settings, "opencode_api_key", SENTINEL_KEY)
     monkeypatch.setattr(settings, "sg_model_id", ENV_DEFAULT_SENTINEL)
-    monkeypatch.setattr(settings, "sg_per_job_cap", None)
-    monkeypatch.setattr(settings, "sg_monthly_cap", None)
     _clear_override()
 
     with TestClient(app) as client:
@@ -259,8 +252,6 @@ def test_reader_env_default_is_used_without_override(
     monkeypatch.setattr(settings, "sg_consent", True)
     monkeypatch.setattr(settings, "opencode_api_key", SENTINEL_KEY)
     monkeypatch.setattr(settings, "sg_model_id", ENV_DEFAULT_SENTINEL)
-    monkeypatch.setattr(settings, "sg_per_job_cap", None)
-    monkeypatch.setattr(settings, "sg_monthly_cap", None)
     _clear_override()
 
     job = job_service.create_job(session, household_id, [evidence_id])

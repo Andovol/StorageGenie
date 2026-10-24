@@ -9,6 +9,8 @@ these tests. PG-EV-04: the outgoing payload SHAPE is asserted pre-send
 from __future__ import annotations
 
 import io
+import json
+import logging
 
 import pytest
 from PIL import Image
@@ -149,25 +151,109 @@ def test_redaction_gps_stripped_byte_proven():
     assert dict(reparsed.getexif()) == {}, "no EXIF/GPS survives on the exact bytes sent"
 
 
-def test_budget_refusal_zero_calls():
+def test_success_logs_actual_cost_and_token_counts(caplog) -> None:  # type: ignore[no-untyped-def]
     from app.services.providers import opencode_go as go
-    from app.services.providers.router import BudgetExceededError
 
-    calls: list[str] = []
+    usage = {"prompt_tokens": 754, "completion_tokens": 341, "total_tokens": 1095}
+    body = {
+        "id": "log-1",
+        "model": "canned-model",
+        "usage": usage,
+        "choices": [
+            {
+                "message": {
+                    "content": json.dumps({"items": [], "unknowns": [], "needs_evidence": False})
+                }
+            }
+        ],
+    }
 
-    class _Probe(go.OpenCodeGoProvider):
+    class _BodyProvider(go.OpenCodeGoProvider):
         def _post(self, payload: dict) -> dict:  # type: ignore[override]
-            calls.append("called")
-            raise AssertionError("must not be called")
+            return body
 
-    probe = _Probe(session_id="storagegenie-sg027-run1", per_job_cap=0.001)
-    try:
-        probe.extract_items(b"fake-bytes", "prompt", estimated_cost=1.0)
-    except BudgetExceededError:
-        pass
-    else:
-        raise AssertionError("tiny cap must refuse before any call")
-    assert calls == [], "zero provider calls on budget refusal"
+    provider = _BodyProvider(session_id="sg250-log", model_id="configured-model")
+    with caplog.at_level(logging.INFO, logger="app.services.providers.opencode_go"):
+        result = provider.extract_items(_png_bytes(), "PROMPT-SENTINEL")
+
+    lines = [
+        record.getMessage()
+        for record in caplog.records
+        if record.name == "app.services.providers.opencode_go"
+    ]
+    assert len(lines) == 1, lines
+    line = lines[0]
+    assert "provider=opencode-go" in line
+    assert "model=canned-model" in line
+    assert "operation=extract_items" in line
+    assert "status=ok" in line
+    assert f"cost={result.cost:.8f}" in line
+    assert f"input_tokens={usage['prompt_tokens']}" in line
+    assert f"output_tokens={usage['completion_tokens']}" in line
+
+
+def test_cost_log_carries_no_prompt_image_or_key(caplog) -> None:  # type: ignore[no-untyped-def]
+    from app.services.providers import opencode_go as go
+
+    usage = {"prompt_tokens": 20, "completion_tokens": 5, "total_tokens": 25}
+    body = {
+        "id": "log-2",
+        "model": "canned-model",
+        "usage": usage,
+        "choices": [{"message": {"content": "plain answer"}}],
+    }
+
+    class _BodyProvider(go.OpenCodeGoProvider):
+        def _post(self, payload: dict) -> dict:  # type: ignore[override]
+            return body
+
+    provider = _BodyProvider(
+        session_id="sg250-log-2", api_key="sk-SENTINEL-DO-NOT-LOG", model_id="canned-model"
+    )
+    with caplog.at_level(logging.INFO, logger="app.services.providers.opencode_go"):
+        provider.extract_text(
+            "USER-TEXT-SENTINEL-DO-NOT-LOG", "PROMPT-SENTINEL-DO-NOT-LOG"
+        )
+
+    line = caplog.records[0].getMessage()
+    for forbidden in (
+        "PROMPT-SENTINEL-DO-NOT-LOG",
+        "USER-TEXT-SENTINEL-DO-NOT-LOG",
+        "sk-SENTINEL-DO-NOT-LOG",
+        "data:image",
+        "base64",
+        "iVBOR",
+    ):
+        assert forbidden not in line
+
+
+def test_failure_logs_the_cost_the_error_carried(caplog) -> None:  # type: ignore[no-untyped-def]
+    from app.services.providers import opencode_go as go
+    from app.services.providers.router import ProviderError
+
+    usage = {"prompt_tokens": 40, "completion_tokens": 9, "total_tokens": 49}
+    body = {"id": "log-3", "model": "canned-model", "usage": usage, "choices": []}
+
+    class _BodyProvider(go.OpenCodeGoProvider):
+        def _post(self, payload: dict) -> dict:  # type: ignore[override]
+            return body
+
+    provider = _BodyProvider(session_id="sg250-log-3")
+    with caplog.at_level(logging.INFO, logger="app.services.providers.opencode_go"):
+        with pytest.raises(ProviderError):
+            provider.extract_text("USER", "SYSTEM")
+
+    lines = [
+        record.getMessage()
+        for record in caplog.records
+        if record.name == "app.services.providers.opencode_go"
+    ]
+    assert len(lines) == 1, lines
+    line = lines[0]
+    assert "status=failed" in line
+    assert f"cost={go.compute_cost(usage):.8f}" in line
+    assert f"input_tokens={usage['prompt_tokens']}" in line
+    assert f"output_tokens={usage['completion_tokens']}" in line
 
 
 def test_outgoing_payload_shape_no_key_material():
@@ -361,8 +447,6 @@ def test_config_readback_new_values():
 
     original = cfgmod.settings
     os.environ["SG_PROVIDER_ID"] = "opencode-go"
-    os.environ["SG_PER_JOB_CAP"] = "0.5"
-    os.environ["SG_MONTHLY_CAP"] = "5.0"
     os.environ["SG_CONSENT"] = "true"
     try:
         # SG-028 carried fix: read the environment through a fresh Settings()
@@ -371,11 +455,9 @@ def test_config_readback_new_values():
         # later migration tests (test_search / test_signals).
         s = cfgmod.Settings()
         assert s.sg_provider_id == "opencode-go"
-        assert s.sg_per_job_cap == 0.5
-        assert s.sg_monthly_cap == 5.0
         assert s.sg_consent is True
         assert hasattr(s, "opencode_api_key")
     finally:
-        for k in ("SG_PROVIDER_ID", "SG_PER_JOB_CAP", "SG_MONTHLY_CAP", "SG_CONSENT"):
+        for k in ("SG_PROVIDER_ID", "SG_CONSENT"):
             os.environ.pop(k, None)
         assert cfgmod.settings is original

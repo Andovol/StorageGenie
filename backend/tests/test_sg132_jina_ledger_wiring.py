@@ -3,22 +3,19 @@
 Scope: the REAL endpoint (`POST /v1/enrich/{asset_id}`) through the REAL router
 (`app.main`), the REAL OFF/Jina clients (`app.services.enrich`) and the REAL
 production ledger writer (`app.services.enrich.snapshots.record_jina_search_call`)
-read back by the REAL month-boxed spend reader
-(`app.services.providers.reader._recorded_spend`). Every HTTP leg is a scripted
+read back from the `provider_call` rows themselves. Every HTTP leg is a scripted
 `httpx.MockTransport` injected through the endpoint's own dependency seams, so no
 key crosses a wire and no metered call is made.
 
 What this file proves (`PG-SC-12`: the row crosses the real boundary):
 - every Jina search that leaves the machine appends exactly ONE `provider_call`
   row carrying `jina.estimate_jina_search_cost()` ($0.0005 at the vendor floor);
-- the row joins through the enrichment job, so `_recorded_spend` moves by that
-  figure with NO reader change — BEFORE/AFTER around the real endpoint;
-- an OFF hit (no Jina) writes no ledger row and leaves spend 0.0 (`PG-SC-07`);
+- the row joins through the enrichment job and moves the ledger total by that
+  figure — BEFORE/AFTER around the real endpoint;
+- an OFF hit (no Jina) writes no ledger row and leaves the ledger total 0.0
+  (`PG-SC-07`);
 - a missing-key refusal (nothing sent) records the snapshot but no cost row;
 - a degraded HTTP response (a sent attempt) IS charged the floor estimate;
-- the household month-boxed recorded spend gates the press: with a cap above the
-  one-search floor the first press is allowed and, after the row lands, the next
-  press refuses by name — no live-search loop is used to reach the cap;
 - `PG-IC-08` blast radius: expected row counts and figures are written here, so a
   measured figure differing in either direction fails the run.
 """
@@ -46,7 +43,6 @@ from app.models.job import Job
 from app.models.provider_call import ProviderCall
 from app.services.enrich import jina as jina_mod
 from app.services.enrich import snapshots as snap_mod
-from app.services.providers import reader as reader_mod
 
 FIXTURES = Path(__file__).resolve().parent / "fixtures" / "enrich"
 
@@ -57,7 +53,13 @@ EXPECTED_JINA_COST_USD = 0.0005
 EXPECTED_ROWS_ONE_SEARCH = 1
 EXPECTED_COST_TWO_SEARCHES = 0.001
 EXPECTED_ROWS_TWO_SEARCHES = 2
-MONTHLY_TEST_CAP_USD = 0.0007  # > one floor, < two floors: discriminates the row's effect
+
+
+def _ledger_total(session: Session) -> float:
+    """The durable ledger total across every provider_call row in this temp DB."""
+    from sqlalchemy import func
+
+    return float(session.query(func.coalesce(func.sum(ProviderCall.cost), 0.0)).scalar() or 0.0)
 
 
 def _load(name: str) -> Any:
@@ -153,7 +155,7 @@ def _post(asset_id: str, household_id: str) -> Any:
 
 
 # --------------------------------------------------------------------------- #
-# G1 — one Jina search appends one cost row; _recorded_spend moves by the figure
+# G1 — one Jina search appends one cost row; the ledger total moves by the figure
 # --------------------------------------------------------------------------- #
 def test_jina_search_ledgers_estimate_and_moves_month_spend(enrich_env, monkeypatch) -> None:  # type: ignore[no-untyped-def]
     session, household_id, asset_id = enrich_env
@@ -163,7 +165,7 @@ def test_jina_search_ledgers_estimate_and_moves_month_spend(enrich_env, monkeypa
     jina, jina_seen = _scripted(_load("jina_hit"))
     _install(off, jina)
 
-    before = reader_mod._recorded_spend(session, household_id)
+    before = _ledger_total(session)
     assert before == 0.0  # empty-household world: no search yet, spend 0.0
 
     response = _post(asset_id, household_id)
@@ -186,7 +188,7 @@ def test_jina_search_ledgers_estimate_and_moves_month_spend(enrich_env, monkeypa
     usage = json.loads(row.usage_json or "{}")
     assert usage["tokens"] == jina_mod.JINA_SEARCH_TOKENS_PER_REQUEST == 10_000
 
-    after = reader_mod._recorded_spend(session, household_id)
+    after = _ledger_total(session)
     assert after == pytest.approx(EXPECTED_JINA_COST_USD)
     assert after - before == pytest.approx(EXPECTED_JINA_COST_USD)
 
@@ -211,7 +213,7 @@ def test_off_hit_writes_no_ledger_row_and_keeps_spend_zero(enrich_env, monkeypat
     assert len(off_seen) == 1
     assert jina_seen == []
     assert session.query(ProviderCall).count() == 0
-    assert reader_mod._recorded_spend(session, household_id) == 0.0
+    assert _ledger_total(session) == 0.0
 
 
 # --------------------------------------------------------------------------- #
@@ -236,7 +238,7 @@ def test_missing_key_records_no_cost_row(enrich_env, monkeypatch) -> None:  # ty
     assert len(jina_rows) == 1
     assert (jina_rows[0].no_result_reason or "").startswith("missing_key")
     assert session.query(ProviderCall).count() == 0
-    assert reader_mod._recorded_spend(session, household_id) == 0.0
+    assert _ledger_total(session) == 0.0
 
 
 # --------------------------------------------------------------------------- #
@@ -258,42 +260,9 @@ def test_degraded_jina_http_status_still_records_estimate(enrich_env, monkeypatc
     assert len(rows) == EXPECTED_ROWS_ONE_SEARCH
     assert rows[0].cost == pytest.approx(EXPECTED_JINA_COST_USD)
     assert "http_status" in (rows[0].error_state or "")
-    assert reader_mod._recorded_spend(session, household_id) == pytest.approx(
+    assert _ledger_total(session) == pytest.approx(
         EXPECTED_JINA_COST_USD
     )
-
-
-# --------------------------------------------------------------------------- #
-# G2 — the household month-boxed spend gates the press: the first press is under
-# the cap, the Jina row lands, the next press refuses by name (no live loop).
-# --------------------------------------------------------------------------- #
-def test_jina_spend_trips_enrich_monthly_refusal(enrich_env, monkeypatch) -> None:  # type: ignore[no-untyped-def]
-    session, household_id, asset_id = enrich_env
-    monkeypatch.setattr(settings, "sg_consent", True)
-    monkeypatch.setattr(settings, "jina_api_key", "test-sg132-sentinel")
-    monkeypatch.setattr(settings, "sg_monthly_cap", MONTHLY_TEST_CAP_USD)
-    off, off_seen = _scripted(_load("off_empty"))
-    jina, jina_seen = _scripted(_load("jina_hit"))
-    _install(off, jina)
-
-    first = _post(asset_id, household_id)
-    assert first.status_code == 200
-    assert len(jina_seen) == 1
-    assert reader_mod._recorded_spend(session, household_id) == pytest.approx(
-        EXPECTED_JINA_COST_USD
-    )
-
-    second = _post(asset_id, household_id)
-
-    assert second.status_code == 402
-    detail = second.json()["detail"]
-    assert detail.startswith("monthly_cap_exceeded")
-    assert "0.001000 exceeds" in detail
-    assert "0.000500 already recorded" in detail
-    # The refusal precedes every client touch and writes nothing.
-    assert len(off_seen) == 1
-    assert len(jina_seen) == 1
-    assert session.query(ProviderCall).count() == EXPECTED_ROWS_ONE_SEARCH
 
 
 # --------------------------------------------------------------------------- #
@@ -311,7 +280,7 @@ def test_two_jina_searches_are_two_rows_and_double_spend(enrich_env, monkeypatch
     assert _post(asset_id, household_id).status_code == 200
 
     assert session.query(ProviderCall).count() == EXPECTED_ROWS_TWO_SEARCHES
-    assert reader_mod._recorded_spend(session, household_id) == pytest.approx(
+    assert _ledger_total(session) == pytest.approx(
         EXPECTED_COST_TWO_SEARCHES
     )
 
@@ -347,6 +316,6 @@ def test_production_writer_prices_the_caller_token_bound(enrich_env) -> None:  #
     )
     assert base.cost == pytest.approx(EXPECTED_JINA_COST_USD)
     assert bigger.cost == pytest.approx(2 * EXPECTED_JINA_COST_USD)
-    assert reader_mod._recorded_spend(session, household_id) == pytest.approx(
+    assert _ledger_total(session) == pytest.approx(
         EXPECTED_JINA_COST_USD + 2 * EXPECTED_JINA_COST_USD
     )

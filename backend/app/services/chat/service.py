@@ -18,7 +18,6 @@ from __future__ import annotations
 
 import hashlib
 import json
-import math
 from pathlib import Path
 from typing import Any
 
@@ -33,7 +32,6 @@ from app.models.source_attribution import SourceAttribution
 from app.services import lifecycle
 from app.services.providers import reader as reader_mod
 from app.services.providers.router import (
-    BudgetExceededError,
     ProviderError,
     ProviderRouter,
     RouterConfig,
@@ -301,13 +299,6 @@ def build_user_content(message: str, catalog: list[dict[str, Any]]) -> str:
     )
 
 
-def _estimate(provider: Any, payload_bytes: bytes, prompt: str) -> float:
-    estimator = getattr(provider, "estimate_cost", None)
-    if callable(estimator):
-        return float(estimator(payload_bytes, prompt))
-    return 0.0
-
-
 def _write_ledger(
     db: Session,
     provider_id: str,
@@ -424,27 +415,12 @@ def respond(
         provider_id=provider_id,
         fallback_id=None,
         json_strict=True,
-        cost_budget=settings.sg_per_job_cap if settings.sg_per_job_cap is not None else math.inf,
         retryable_errors=reader_mod.RETRYABLE_ERRORS,
     )
     router = ProviderRouter(config=config, registry=registry)
-    estimate = _estimate(provider, content.encode("utf-8"), prompt_text)
 
     try:
-        result = router.execute(
-            CHAT_OPERATION, content, prompt_text, estimated_cost=estimate
-        )
-    except BudgetExceededError as exc:
-        return {
-            "status": "refused",
-            "reason": str(exc),
-            "answer": None,
-            "grounded": False,
-            "empty_catalogue": False,
-            "category": category,
-            "catalogue_size": len(catalog),
-            "provider_call_id": None,
-        }
+        result = router.execute(CHAT_OPERATION, content, prompt_text)
     except ProviderError as exc:
         _write_error_ledger(
             db,

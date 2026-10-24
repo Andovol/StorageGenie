@@ -23,7 +23,6 @@ from __future__ import annotations
 import hashlib
 import io
 import json
-import math
 from pathlib import Path
 from typing import Any
 
@@ -40,7 +39,6 @@ from app.models.provider_call import ProviderCall
 from app.services import lifecycle
 from app.services.providers import reader as reader_mod
 from app.services.providers.router import (
-    BudgetExceededError,
     ProviderError,
     ProviderRouter,
     RouterConfig,
@@ -201,13 +199,6 @@ def _carrier_png() -> bytes:
     return buffer.getvalue()
 
 
-def _estimate(provider: Any, carrier: bytes, prompt: str) -> float:
-    estimator = getattr(provider, "estimate_cost", None)
-    if callable(estimator):
-        return float(estimator(carrier, prompt))
-    return 0.0
-
-
 def _repair_prompt(prompt: str) -> str:
     return (
         prompt
@@ -287,20 +278,14 @@ def _run_provider(
 ) -> tuple[ExtractionOutput | None, list[str], str | None]:
     """One logical planning call with at most one repair turn (§5.3 shape).
 
-    Every failed attempt leaves a committed `error_state` ledger row; a budget
-    refusal raises before any provider call and therefore writes no row.
+    Every failed attempt leaves a committed `error_state` ledger row.
     """
-    estimate = _estimate(provider, carrier, prompt)
     call_ids: list[str] = []
     last_error: str | None = None
     for attempt in (1, 2):
         call_prompt = prompt if attempt == 1 else _repair_prompt(prompt)
         try:
-            result = router.execute(
-                PLANNING_OPERATION, carrier, call_prompt, estimated_cost=estimate
-            )
-        except BudgetExceededError:
-            raise
+            result = router.execute(PLANNING_OPERATION, carrier, call_prompt)
         except ProviderError as exc:
             row = _write_error_ledger(
                 db,
@@ -443,7 +428,6 @@ def run_planning(db: Session, household_id: str) -> dict[str, Any]:
         provider_id=provider_id,
         fallback_id=None,
         json_strict=True,
-        cost_budget=settings.sg_per_job_cap if settings.sg_per_job_cap is not None else math.inf,
         retryable_errors=reader_mod.RETRYABLE_ERRORS,
     )
     router = ProviderRouter(config=config, registry=registry)
@@ -453,10 +437,11 @@ def run_planning(db: Session, household_id: str) -> dict[str, Any]:
         output, call_ids, error = _run_provider(
             db, provider, provider_id, model_id, router, carrier, base_prompt
         )
-    except BudgetExceededError as exc:
+    except ProviderError as exc:
+        db.commit()
         return {
-            "status": "refused",
-            "reason": str(exc),
+            "status": "error",
+            "reason": f"{exc.kind}: {exc}",
             "suggestion_count": 0,
             "catalog_size": len(catalog),
         }

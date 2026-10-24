@@ -19,7 +19,6 @@ from app.models.provider_call import ProviderCall  # noqa: E402
 from app.services.providers.fake import FakeProvider  # noqa: E402
 from app.services.providers.protocols import ProviderResult  # noqa: E402
 from app.services.providers.router import (  # noqa: E402
-    BudgetExceededError,
     ProviderError,
     ProviderRouter,
     RouterConfig,
@@ -50,7 +49,6 @@ def _valid_router(primary: FakeProvider, fallback: FakeProvider | None = None) -
         provider_id=primary.provider_id,
         fallback_id=fallback_id,
         json_strict=True,
-        cost_budget=10.0,
         retryable_errors=frozenset({"outage", "timeout", "rate_limited"}),
     )
     return ProviderRouter(config=config, registry=registry)
@@ -62,7 +60,7 @@ def test_router_picks_configured_provider() -> None:
     router = _valid_router(primary, fallback)
 
     assert router.resolve("fake-primary") is primary
-    result = router.execute("extract_text", "img-1", estimated_cost=1.0)
+    result = router.execute("extract_text", "img-1")
 
     assert isinstance(result, ProviderResult)
     assert result.model_id == "fake-model-1"
@@ -75,7 +73,7 @@ def test_fallback_fires_on_retryable_error_only() -> None:
     fallback = FakeProvider(mode="valid", provider_id="fake-fallback")
     router = _valid_router(primary, fallback)
 
-    result = router.execute("extract_text", "img-1", estimated_cost=1.0)
+    result = router.execute("extract_text", "img-1")
 
     assert result.normalized_output["text"] == "fake-text"
     assert primary.invocations == 1
@@ -86,7 +84,7 @@ def test_fallback_fires_on_retryable_error_only() -> None:
     bad_fallback = FakeProvider(mode="valid", provider_id="bad-fallback")
     bad_router = _valid_router(bad_primary, bad_fallback)
     with pytest.raises(ProviderError):
-        bad_router.execute("extract_text", "img-1", estimated_cost=1.0)
+        bad_router.execute("extract_text", "img-1")
     assert bad_primary.invocations == 1
     assert bad_fallback.invocations == 0
 
@@ -95,7 +93,7 @@ def test_ledger_row_per_call_carries_section_33_fields(ledger_db: Session) -> No
     primary = FakeProvider(mode="valid", provider_id="fake-primary")
     router = _valid_router(primary)
 
-    result = router.execute("embed", "hello", estimated_cost=0.5)
+    result = router.execute("embed", "hello")
 
     row = ProviderCall(
         provider="fake-primary",
@@ -124,89 +122,6 @@ def test_ledger_row_per_call_carries_section_33_fields(ledger_db: Session) -> No
     assert read_back.job_id is None
     assert read_back.created_at is not None
     assert read_back.updated_at is not None
-
-
-def test_budget_exceeded_refuses_precall_with_zero_invocations() -> None:
-    primary = FakeProvider(mode="valid", provider_id="fake-primary")
-    fallback = FakeProvider(mode="valid", provider_id="fake-fallback")
-    config = RouterConfig(
-        provider_id="fake-primary",
-        fallback_id="fake-fallback",
-        json_strict=True,
-        cost_budget=1.0,
-        retryable_errors=frozenset({"outage"}),
-    )
-    router = ProviderRouter(config=config, registry={primary.provider_id: primary, fallback.provider_id: fallback})
-
-    with pytest.raises(BudgetExceededError):
-        router.execute("extract_text", "img-1", estimated_cost=5.0)
-
-    assert primary.invocations == 0
-    assert fallback.invocations == 0
-
-
-def test_router_consumes_estimate_and_shadows_adapter_guard() -> None:
-    """Pin the SG-060 split in executable form (no network, no key, no adapter).
-
-    A local recording double stands in for a provider, so the test proves the
-    two halves of the documented behaviour directly:
-
-    (a) over budget, `router.execute` refuses at the router with ZERO provider
-        invocations; and
-    (b) in budget, the router consumes `estimated_cost` for that check and does
-        NOT forward it (only `*args, **kwargs` travel), so the provider sees the
-        `estimated_cost` default 0.0 — the adapter-level guard is shadowed on
-        the routed path and enforces direct invocations only.
-
-    This sits beside `test_budget_exceeded_refuses_precall_with_zero_invocations`
-    because it is the same router concern; the recording double is what makes
-    the shadowing (b) observable, which `FakeProvider` does not expose.
-    """
-
-    class _RecordingProvider:
-        provider_id = "recording-primary"
-
-        def __init__(self) -> None:
-            self.invocations = 0
-            self.seen_estimates: list[float] = []
-
-        def extract_text(
-            self, text: str, prompt: str = "", *, estimated_cost: float = 0.0
-        ) -> ProviderResult:
-            self.invocations += 1
-            self.seen_estimates.append(estimated_cost)
-            return ProviderResult(
-                normalized_output={"text": "recorded", "source": text},
-                raw_payload={"recording": True},
-                request_id="recording-1",
-                usage={},
-                cost=0.0,
-                model_id="recording-model",
-                latency_ms=0.0,
-            )
-
-    provider = _RecordingProvider()
-    router = ProviderRouter(
-        config=RouterConfig(
-            provider_id=provider.provider_id,
-            fallback_id=None,
-            json_strict=True,
-            cost_budget=1.0,
-            retryable_errors=frozenset({"outage"}),
-        ),
-        registry={provider.provider_id: provider},
-    )
-
-    with pytest.raises(BudgetExceededError):
-        router.execute("extract_text", "over-budget", estimated_cost=5.0)
-    assert provider.invocations == 0, "router refusal must precede any provider invocation"
-
-    result = router.execute("extract_text", "in-budget", estimated_cost=0.5)
-    assert result.normalized_output["text"] == "recorded"
-    assert provider.invocations == 1
-    assert provider.seen_estimates == [0.0], (
-        "router consumes the estimate; the adapter receives only its default"
-    )
 
 
 def test_all_four_fake_shapes_green() -> None:

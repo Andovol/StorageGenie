@@ -49,13 +49,7 @@ class FakeProvider:
             latency_ms=1.5,
         )
 
-    def extract_items(
-        self,
-        image_bytes: bytes,
-        prompt: str,
-        *,
-        estimated_cost: float = 0.0,
-    ) -> ProviderResult:
+    def extract_items(self, image_bytes: bytes, prompt: str) -> ProviderResult:
         if self.mode == "needs_evidence":
             return self._behave(operation="extract_items", normalized={"needs_evidence": True, "items": []})
         return self._behave(
@@ -63,9 +57,7 @@ class FakeProvider:
             normalized={"needs_evidence": False, "items": [{"name": "fake-item", "source": image_bytes}]},
         )
 
-    def extract_text(
-        self, text: str, prompt: str = "", *, estimated_cost: float = 0.0
-    ) -> ProviderResult:
+    def extract_text(self, text: str, prompt: str = "") -> ProviderResult:
         """Scripted text response (SG-038 G1): no network, no key, cost fixed."""
         return self._behave(operation="extract_text", normalized={"text": "fake-text", "source": text})
 
@@ -107,13 +99,7 @@ class ScriptedProvider:
         self.images: list[bytes] = []
         self.prompts: list[str] = []
 
-    def extract_items(
-        self,
-        image_bytes: bytes,
-        prompt: str,
-        *,
-        estimated_cost: float = 0.0,
-    ) -> ProviderResult:
+    def extract_items(self, image_bytes: bytes, prompt: str) -> ProviderResult:
         self.invocations += 1
         self.images.append(image_bytes)
         self.prompts.append(prompt)

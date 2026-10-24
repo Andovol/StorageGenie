@@ -86,8 +86,6 @@ def phase3_fixture(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):  # type: ig
     # Shipped default posture for the fixture; tests opt in explicitly.
     monkeypatch.setattr(settings, "sg_consent", False)
     monkeypatch.setattr(settings, "sg_provider_id", "fake")
-    monkeypatch.setattr(settings, "sg_per_job_cap", None)
-    monkeypatch.setattr(settings, "sg_monthly_cap", None)
     monkeypatch.setattr(settings, "sg_confidence_threshold", 0.9)
     monkeypatch.setattr(settings, "sg_prompt_category", "food")
     set_runtime_model_id(None)
@@ -272,11 +270,9 @@ class ScriptedPhase3Provider:
         self.prompts: list[str] = []
         self.texts: list[str] = []
 
-    def estimate_cost(self, payload_bytes: bytes, prompt: str) -> float:
-        return 0.0
 
     def extract_items(  # type: ignore[no-untyped-def]
-        self, image_bytes: bytes, prompt: str, *, estimated_cost: float = 0.0
+        self, image_bytes: bytes, prompt: str
     ) -> ProviderResult:
         index = self.invocations
         self.invocations += 1
@@ -298,7 +294,7 @@ class ScriptedPhase3Provider:
         )
 
     def extract_text(
-        self, text: str, prompt: str = "", *, estimated_cost: float = 0.0
+        self, text: str, prompt: str = ""
     ) -> ProviderResult:
         self.text_invocations += 1
         self.texts.append(text)

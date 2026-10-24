@@ -1,0 +1,23 @@
+$ date -u
+Sat Oct 24 19:12:22 UTC 2026
+--- git diff --name-only origin/automation -- backend/alembic backend/requirements.lock backend/app/models/provider_call.py ---
+diff exit=0 (no names = unchanged)
+--- requirements.lock sha256: work tree vs base ---
+aaecbf51a2c271c20963e38d0ec7fdcde6fedd8c16763a7fcddec2af55defda0  backend/requirements.lock
+aaecbf51a2c271c20963e38d0ec7fdcde6fedd8c16763a7fcddec2af55defda0  -
+--- alembic head resolution (parse revisions; head = revision never used as down_revision) ---
+migration files: 12
+heads: ['20261023_sg233_reminder']
+head file(s): ['20261023_sg233_reminder.py']
+--- provider_call model column names (unchanged file) ---
+13:    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=new_id)
+14:    provider: Mapped[str] = mapped_column(String(100), nullable=False, index=True)
+15:    model: Mapped[str] = mapped_column(String(200), nullable=False)
+16:    prompt_template_version: Mapped[str] = mapped_column(String(100), nullable=False)
+17:    input_hashes: Mapped[str | None] = mapped_column(Text, nullable=True)
+18:    output_payload: Mapped[str | None] = mapped_column(Text, nullable=True)
+19:    cost: Mapped[float | None] = mapped_column(Float, nullable=True)
+20:    usage_json: Mapped[str | None] = mapped_column(Text, nullable=True)
+21:    latency_ms: Mapped[float | None] = mapped_column(Float, nullable=True)
+22:    error_state: Mapped[str | None] = mapped_column(String(200), nullable=True)
+23:    job_id: Mapped[str | None] = mapped_column(

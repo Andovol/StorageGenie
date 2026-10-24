@@ -43,13 +43,11 @@ class PlanningScriptedProvider:
         provider_id: str = "scripted-plan",
         model_id: str = "scripted-plan-1",
         fail_times: int = 0,
-        estimate: float = 0.0,
     ) -> None:
         self.provider_id = provider_id
         self.model_id = model_id
         self.payload = payload
         self.fail_times = fail_times
-        self.estimate = estimate
         self.invocations = 0
         self.images: list[bytes] = []
         self.prompts: list[str] = []
@@ -61,11 +59,9 @@ class PlanningScriptedProvider:
         self.cost: float = 0.0
         self.latency_ms: float = 1.0
 
-    def estimate_cost(self, image_bytes: bytes, prompt: str) -> float:
-        return self.estimate
 
     def extract_items(
-        self, image_bytes: bytes, prompt: str, *, estimated_cost: float = 0.0
+        self, image_bytes: bytes, prompt: str
     ) -> ProviderResult:
         self.invocations += 1
         self.images.append(image_bytes)
@@ -104,8 +100,6 @@ def planning_fixture(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):  # type: 
     monkeypatch.setattr(settings, "storage_root", str(storage_root))
     monkeypatch.setattr(settings, "sg_consent", False)
     monkeypatch.setattr(settings, "sg_provider_id", "fake")
-    monkeypatch.setattr(settings, "sg_per_job_cap", None)
-    monkeypatch.setattr(settings, "sg_monthly_cap", None)
 
     from app.services.providers import opencode_go
 
@@ -573,24 +567,6 @@ def test_planning_error_ledger_without_usage_stays_zero(
     for call in calls:
         assert call.cost == 0.0
         assert call.usage_json is None
-
-
-def test_budget_refusal_before_any_call(
-    planning_fixture, monkeypatch: pytest.MonkeyPatch
-) -> None:
-    session, household_id, network_attempts = planning_fixture
-    asset, _ = _seed_asset(session, household_id, "Milk")
-    provider = PlanningScriptedProvider(_payload(_item(asset.id)), estimate=1.0)
-    _enable(monkeypatch, provider)
-    monkeypatch.setattr(settings, "sg_per_job_cap", 0.01)
-    client = TestClient(app)
-
-    result = _run(client, household_id)
-
-    assert result["status"] == "refused"
-    assert provider.invocations == 0
-    assert network_attempts == []
-    assert session.query(ProviderCall).count() == 0
 
 
 def test_prompt_is_versioned_and_carries_catalog_label_data(
