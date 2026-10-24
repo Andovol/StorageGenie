@@ -1,0 +1,14 @@
+Partial-Receipt-ID: SG-237
+utc=2026-10-24T14:02:16Z
+invocation=15ec36570930455ba0193790fffe6184
+killed=exit_no_receipt
+pushed=0
+uncommitted=none
+wip=none
+wip_elapsed_ms=78
+wip_tracked=none
+wip_untracked=0 host_local
+DISPATCH_RESULT id=SG-237 coder=opencode exit=0 head=09cb913a03d2a46a422c39ce4701dfa19673f507 note=no moved=yes rewrite=no dirty=no elapsed=363s budget=2100s killed=exit_no_receipt stragglers=0
+P1_moved=PASS count=2
+P2_rewrite=PASS behind=0
+P6_dirty=PASS dirty=no
