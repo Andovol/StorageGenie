@@ -1,0 +1,34 @@
+SG-236 receipt transcript utc=2026-10-24T11:34:42Z epoch=1792841682
+Contract echo (host /home/andrei/storagegenie-contract/CODER.md line 3, verbatim): **Contract version: 0.52.0** — **echo this line verbatim in your receipt.** It is the only proof that you
+Work-HEAD=a130529cadbe92f2b5ea8cc1c87d5d7e1a15b988
+$ git notes --ref=refs/notes/storagegenie-coder-reports show a130529cadbe92f2b5ea8cc1c87d5d7e1a15b988
+error: no note found for object a130529cadbe92f2b5ea8cc1c87d5d7e1a15b988.
+pre_show_exit=1
+$ git notes --ref=refs/notes/storagegenie-coder-reports add -m 'Dispatch-ID: SG-236 | Report: docs/worklogs/SG-236_report.md | Work-HEAD: a130529cadbe92f2b5ea8cc1c87d5d7e1a15b988' a130529cadbe92f2b5ea8cc1c87d5d7e1a15b988
+notes_add_exit=0
+$ git notes --ref=refs/notes/storagegenie-coder-reports show a130529cadbe92f2b5ea8cc1c87d5d7e1a15b988
+Dispatch-ID: SG-236 | Report: docs/worklogs/SG-236_report.md | Work-HEAD: a130529cadbe92f2b5ea8cc1c87d5d7e1a15b988
+local_show_exit=0
+$ git push origin refs/notes/storagegenie-coder-reports
+To github.com:Andovol/StorageGenie.git
+   12aff9d..7147d42  refs/notes/storagegenie-coder-reports -> refs/notes/storagegenie-coder-reports
+notes_push_exit=0
+$ git fetch origin +refs/notes/storagegenie-coder-reports:refs/notes/storagegenie-coder-reports-sg236-fetched
+From github.com:Andovol/StorageGenie
+ * [new ref]         refs/notes/storagegenie-coder-reports -> refs/notes/storagegenie-coder-reports-sg236-fetched
+readback_fetch_exit=0
+$ git rev-parse refs/notes/storagegenie-coder-reports-sg236-fetched
+7147d42e4fda8dafbbda20fcc587100d08d2576b
+revparse_exit=0
+$ git notes --ref=refs/notes/storagegenie-coder-reports-sg236-fetched show a130529cadbe92f2b5ea8cc1c87d5d7e1a15b988
+Dispatch-ID: SG-236 | Report: docs/worklogs/SG-236_report.md | Work-HEAD: a130529cadbe92f2b5ea8cc1c87d5d7e1a15b988
+readback_show_exit=0
+$ git notes --ref=refs/notes/storagegenie-coder-reports-sg236-fetched list | cut -d' ' -f1 | while read -r n; do git cat-file -p "$n"; done | grep -c 'Dispatch-ID: SG-236'
+1
+grep_count_exit=0
+$ git ls-remote origin refs/notes/storagegenie-coder-reports refs/heads/automation
+a130529cadbe92f2b5ea8cc1c87d5d7e1a15b988	refs/heads/automation
+7147d42e4fda8dafbbda20fcc587100d08d2576b	refs/notes/storagegenie-coder-reports
+lsremote_exit=0
+utc_end=2026-10-24T11:34:48Z epoch_end=1792841688
+note=yes
