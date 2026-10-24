@@ -13,6 +13,7 @@ import type {
   ExpiryStatusResponse,
   ReminderListResponse,
 } from "../api/types";
+import { OpenedCountdownSection } from "../components/OpenedCountdownSection";
 import { CONTROL_STYLE, THEMED_CONTROL_CLASS } from "../components/shell/CatalogToolbar";
 import { PageContainer } from "../components/shell/PageContainer";
 import { useTaxonomy } from "../hooks/useAssets";
@@ -223,6 +224,8 @@ export function ExpiryPage() {
           </div>
         )}
       </div>
+
+      <OpenedCountdownSection householdId={effectiveHousehold} />
 
       {status.isLoading && <div>Loading expiry status…</div>}
       {status.isError && (

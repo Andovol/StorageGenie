@@ -1,0 +1,9 @@
+SG-240 full backend suite on the candidate (host venv), captured tail of the run
+(the full stream was not redirected to a file; these are the final lines as printed).
+Command: cd backend && ./venv/bin/python -m pytest -q
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/test_signals.py::test_generated_codes_are_validated_and_bad_checksum_is_not_an_identifier
+FAILED tests/test_signals.py::test_ocr_has_text_boxes_and_mean_confidence - a...
+2 failed, 757 passed, 48 warnings in 61.85s (0:01:01)

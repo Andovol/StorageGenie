@@ -1,0 +1,7 @@
+SG-240 G5 live census, read-only over loopback http://127.0.0.1:8003 (utc=2026-10-24).
+Counts only; no item names, no household id, no write.
+
+households 1
+active_assets 7
+by_accepted_category {'food_beverages': 1}
+with_accepted_opened_date {}
