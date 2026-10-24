@@ -98,7 +98,40 @@ With the module: `1 passed`. The test asserts the daily logger's effective level
 
 ## Receipt
 
-The work is pushed to `automation` with a clean worktree before the note is added. The note (`Dispatch-ID: SG-240 | Report: docs/worklogs/SG-240_report.md | Work-HEAD: <hash>`) is added on the work commit, the notes ref is pushed, the refspec fetched into a mapped local name, listed and grepped for `SG-240`, and read back with `git notes ... show`. The verbatim output — including the pasted `show` line and the final `note=yes` — is committed as the docs-only `docs/worklogs/SG-240_receipt.log`. This report does not pre-claim `note=yes`; that line is in the transcript after execution.
+The work was pushed to `automation` with a clean worktree before the note was added. The note was added on the work commit, the notes ref pushed, the refspec fetched into a mapped local name, listed and grepped for `SG-240`, and read back with `git notes ... show`. Executed output, verbatim (also committed as `docs/worklogs/SG-240_receipt.log`):
+
+```
+SG-240 receipt transcript utc=2026-10-24T15:45:29Z epoch=1792856729
+Contract echo (/home/andrei/storagegenie-contract/CODER.md line 3, verbatim): **Contract version: 0.52.0** — **echo this line verbatim in your receipt.** It is the only proof that you
+Work-HEAD=37d28e54d9bf3009a60c2dcca3c2a93034b54e03
+$ git notes --ref=refs/notes/storagegenie-coder-reports show 37d28e54d9bf3009a60c2dcca3c2a93034b54e03
+error: no note found for object 37d28e54d9bf3009a60c2dcca3c2a93034b54e03.
+pre_show_exit=1
+$ git notes --ref=refs/notes/storagegenie-coder-reports add -m "Dispatch-ID: SG-240 | Report: docs/worklogs/SG-240_report.md | Work-HEAD: 37d28e54d9bf3009a60c2dcca3c2a93034b54e03" 37d28e54d9bf3009a60c2dcca3c2a93034b54e03
+notes_add_exit=0
+$ git notes --ref=refs/notes/storagegenie-coder-reports show 37d28e54d9bf3009a60c2dcca3c2a93034b54e03
+Dispatch-ID: SG-240 | Report: docs/worklogs/SG-240_report.md | Work-HEAD: 37d28e54d9bf3009a60c2dcca3c2a93034b54e03
+notes_show_exit=0
+$ timeout 300 git push origin refs/notes/storagegenie-coder-reports
+To github.com:Andovol/StorageGenie.git
+   0d37c55..856a5a6  refs/notes/storagegenie-coder-reports -> refs/notes/storagegenie-coder-reports
+notes_push_exit=0
+$ git fetch origin +refs/notes/storagegenie-coder-reports:refs/notes/storagegenie-coder-reports-sg240-fetched
+ * [new ref]         refs/notes/storagegenie-coder-reports -> refs/notes/storagegenie-coder-reports-sg240-fetched
+readback_fetch_exit=0
+$ git rev-parse refs/notes/storagegenie-coder-reports-sg240-fetched
+856a5a69e2fffe5133f8790c066d4dff95fee9ca
+$ git notes --ref=refs/notes/storagegenie-coder-reports-sg240-fetched list | grep 37d28e54d9bf3009a60c2dcca3c2a93034b54e03
+11f9e9750b362677de8be4309d26552e8aea1d7a 37d28e54d9bf3009a60c2dcca3c2a93034b54e03
+$ git notes --ref=refs/notes/storagegenie-coder-reports-sg240-fetched show 37d28e54d9bf3009a60c2dcca3c2a93034b54e03
+Dispatch-ID: SG-240 | Report: docs/worklogs/SG-240_report.md | Work-HEAD: 37d28e54d9bf3009a60c2dcca3c2a93034b54e03
+fetched_show_exit=0
+$ git notes --ref=refs/notes/storagegenie-coder-reports-sg240-fetched show 37d28e54d9bf3009a60c2dcca3c2a93034b54e03 | grep -c 'Dispatch-ID: SG-240'
+1
+note=yes
+```
+
+This report did not pre-claim `note=yes`; the line above was produced by the executed read-back after publication.
 
 ## Timing (CO-79 / PG-PR-06)
 
