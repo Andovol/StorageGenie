@@ -20,6 +20,7 @@ from app.api.v1.locations import router as locations_router
 from app.api.v1.planning import router as planning_router
 from app.api.v1.plugins import router as plugins_router
 from app.api.v1.relations import router as relations_router
+from app.api.v1.reminders import router as reminders_router
 from app.api.v1.review_tasks import router as review_tasks_router
 from app.api.v1.settings import router as settings_router
 from app.api.v1.users import router as users_router
@@ -80,7 +81,7 @@ app.include_router(enrich_router, prefix="/v1")
 app.include_router(plugins_router, prefix="/v1")
 app.include_router(planning_router, prefix="/v1")
 app.include_router(analytics_router, prefix="/v1")
-app.include_router(__import__("app.api.v1.reminders", fromlist=["router"]).router, prefix="/v1")
+app.include_router(reminders_router, prefix="/v1")
 app.include_router(settings_router, prefix="/v1")
 
 

@@ -1,7 +1,13 @@
 import { useState, type ReactNode } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
-import { fetchAnalyticsSummary, fetchExpiryStatus, fetchReminders } from "../api/client";
+import {
+  dismissReminder,
+  fetchAnalyticsSummary,
+  fetchExpiryStatus,
+  fetchReminders,
+  markReminderRead,
+} from "../api/client";
 import type {
   AnalyticsSummary,
   ExpiryStatusResponse,
@@ -87,7 +93,10 @@ export function ExpiryPage() {
   // SG-196 G1: household selection comes from the shared context.
   const { households, householdId } = useHouseholdContext();
   const { data: taxonomy } = useTaxonomy();
+  const queryClient = useQueryClient();
   const [category, setCategory] = useState("");
+  const [pendingReminder, setPendingReminder] = useState<{ id: string; action: "read" | "dismiss" } | null>(null);
+  const [reminderError, setReminderError] = useState<string | null>(null);
   const effectiveHousehold = householdId || households?.[0]?.id || "";
 
   const status = useQuery<ExpiryStatusResponse>({
@@ -115,6 +124,25 @@ export function ExpiryPage() {
   const isEmpty = !!data && rows.length === 0 && unresolved.length === 0;
   const unreadReminders = (reminders.data?.items ?? []).filter((item) => item.status === "unread");
   const unreadCount = reminders.data?.unread_count ?? 0;
+
+  // SG-235: the server owns the unread count and the row list. A transition
+  // re-reads the same query key; nothing is removed or decremented locally.
+  const transitionReminder = async (reminderId: string, action: "read" | "dismiss") => {
+    setPendingReminder({ id: reminderId, action });
+    setReminderError(null);
+    try {
+      if (action === "read") {
+        await markReminderRead(reminderId, effectiveHousehold);
+      } else {
+        await dismissReminder(reminderId, effectiveHousehold);
+      }
+      await queryClient.invalidateQueries({ queryKey: ["reminders", effectiveHousehold] });
+    } catch (error) {
+      setReminderError(error instanceof Error ? error.message : String(error));
+    } finally {
+      setPendingReminder(null);
+    }
+  };
 
   return (
     <PageContainer className="text-foreground">
@@ -156,13 +184,42 @@ export function ExpiryPage() {
                 row={reminder}
                 householdId={effectiveHousehold}
                 detail={
-                  <span className="text-muted-foreground" style={{ fontSize: 12 }}>
-                    Computed {reminder.as_of_day}
-                    {reminder.window_days !== null ? ` · ${reminder.window_days}-day window` : ""}
-                  </span>
+                  <>
+                    <span className="text-muted-foreground" style={{ fontSize: 12 }}>
+                      Computed {reminder.as_of_day}
+                      {reminder.window_days !== null ? ` · ${reminder.window_days}-day window` : ""}
+                    </span>
+                    <div style={{ display: "flex", gap: 8 }}>
+                      <button
+                        type="button"
+                        aria-label={`Read reminder ${reminder.id}`}
+                        className={THEMED_CONTROL_CLASS}
+                        style={CONTROL_STYLE}
+                        disabled={pendingReminder?.id === reminder.id}
+                        onClick={() => void transitionReminder(reminder.id, "read")}
+                      >
+                        Read
+                      </button>
+                      <button
+                        type="button"
+                        aria-label={`Dismiss reminder ${reminder.id}`}
+                        className={THEMED_CONTROL_CLASS}
+                        style={CONTROL_STYLE}
+                        disabled={pendingReminder?.id === reminder.id}
+                        onClick={() => void transitionReminder(reminder.id, "dismiss")}
+                      >
+                        Dismiss
+                      </button>
+                    </div>
+                  </>
                 }
               />
             ))}
+          </div>
+        )}
+        {reminderError && (
+          <div role="alert" className="text-danger" style={{ marginTop: 8, fontSize: 12 }}>
+            {reminderError}
           </div>
         )}
       </div>

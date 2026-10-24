@@ -4,7 +4,12 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { MemoryRouter } from "react-router-dom";
 import { ExpiryPage } from "./ExpiryPage";
 import { HouseholdProvider } from "../hooks/HouseholdContext";
-import type { AnalyticsSummary, ExpiryStatusResponse } from "../api/types";
+import type {
+  AnalyticsSummary,
+  ExpiryStatusResponse,
+  Reminder,
+  ReminderListResponse,
+} from "../api/types";
 
 // Fixtures are hoisted so the `vi.mock` factory below can close over them
 // without a temporal-dead-zone race against the hoisted mock call.
@@ -94,17 +99,74 @@ function jsonResponse(body: unknown): Response {
   return { ok: true, json: async () => body } as Response;
 }
 
+function errorResponse(status: number, body: unknown): Response {
+  return { ok: false, status, json: async () => body, statusText: "Error" } as Response;
+}
+
+const unreadReminder: Reminder = {
+  id: "r1",
+  household_id: household.id,
+  asset_id: "a2",
+  display_name: "Yogurt",
+  as_of_day: "2026-09-24",
+  tier: "urgent",
+  window_days: 7,
+  bucket: "this-week",
+  days_remaining: 3,
+  status: "unread",
+  created_at: "2026-09-24T00:00:00+00:00",
+  updated_at: "2026-09-24T00:00:00+00:00",
+};
+
+const readReminder: Reminder = {
+  ...unreadReminder,
+  id: "r2",
+  asset_id: "a3",
+  display_name: "Aspirin",
+  status: "read",
+};
+
+const reminderListFixture: ReminderListResponse = {
+  household_id: household.id,
+  unread_count: 1,
+  items: [unreadReminder, readReminder],
+};
+
 let statusBody: ExpiryStatusResponse;
-let fetchMock = vi.fn((input: RequestInfo | URL): Promise<Response> => {
+let remindersBody: ReminderListResponse;
+let reminderActionStatus: number | null;
+let remindersGetCount: number;
+let fetchMock = vi.fn((input: RequestInfo | URL, init?: RequestInit): Promise<Response> => {
   void input;
+  void init;
   return Promise.resolve(jsonResponse({}));
 });
 
 beforeEach(() => {
   localStorage.clear();
   statusBody = statusFixture;
-  fetchMock = vi.fn((input: RequestInfo | URL): Promise<Response> => {
+  remindersBody = reminderListFixture;
+  reminderActionStatus = null;
+  remindersGetCount = 0;
+  fetchMock = vi.fn((input: RequestInfo | URL, init?: RequestInit): Promise<Response> => {
     const url = String(input);
+    const method = init?.method ?? "GET";
+    if (url.includes("/v1/reminders/") && url.includes("/read") && method === "POST") {
+      if (reminderActionStatus !== null) {
+        return Promise.resolve(errorResponse(reminderActionStatus, { detail: "illegal transition" }));
+      }
+      return Promise.resolve(jsonResponse({ ...unreadReminder, status: "read" }));
+    }
+    if (url.includes("/v1/reminders/") && url.includes("/dismiss") && method === "POST") {
+      if (reminderActionStatus !== null) {
+        return Promise.resolve(errorResponse(reminderActionStatus, { detail: "illegal transition" }));
+      }
+      return Promise.resolve(jsonResponse({ ...unreadReminder, status: "dismissed" }));
+    }
+    if (url.includes("/v1/reminders")) {
+      remindersGetCount += 1;
+      return Promise.resolve(jsonResponse(remindersBody));
+    }
     if (url.includes("/v1/plugins/expiry-tracker/status")) {
       return Promise.resolve(jsonResponse(statusBody));
     }
@@ -239,5 +301,74 @@ describe("ExpiryPage", () => {
     const uncategorized = await screen.findByRole("region", { name: "Uncategorized" });
     expect(within(uncategorized).getByText("6")).toBeInTheDocument();
     expect(calledUrls().some((url) => url.includes("/v1/analytics/summary"))).toBe(true);
+  });
+});
+
+describe("ExpiryPage reminder actions (SG-235)", () => {
+  test("an unread reminder row shows Read and Dismiss; a read row shows none", async () => {
+    renderPage();
+    const readButton = await screen.findByRole("button", { name: "Read reminder r1" });
+    const dismissButton = screen.getByRole("button", { name: "Dismiss reminder r1" });
+
+    expect(readButton).toHaveTextContent("Read");
+    expect(dismissButton).toHaveTextContent("Dismiss");
+    expect(readButton).toHaveClass("focus-ring");
+    expect(dismissButton).toHaveClass("focus-ring");
+    expect(screen.queryByRole("button", { name: "Read reminder r2" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Dismiss reminder r2" })).not.toBeInTheDocument();
+    expect(screen.getByText("Unread reminders (1)")).toBeInTheDocument();
+  });
+
+  test("Read posts the household and re-reads the list from the server", async () => {
+    renderPage();
+    await screen.findByRole("button", { name: "Read reminder r1" });
+    const initialGets = remindersGetCount;
+
+    fireEvent.click(screen.getByRole("button", { name: "Read reminder r1" }));
+
+    await waitFor(() => {
+      const call = fetchMock.mock.calls.find(
+        ([input, init]) =>
+          String(input).includes("/v1/reminders/r1/read") &&
+          (init as RequestInit | undefined)?.method === "POST"
+      );
+      expect(call).toBeTruthy();
+      expect(String(call?.[0])).toContain("household_id=hh-expiry");
+    });
+    await waitFor(() => expect(remindersGetCount).toBeGreaterThan(initialGets));
+    expect(await screen.findByRole("button", { name: "Read reminder r1" })).toBeInTheDocument();
+    expect(screen.getByText("Unread reminders (1)")).toBeInTheDocument();
+  });
+
+  test("Dismiss posts the household", async () => {
+    renderPage();
+    await screen.findByRole("button", { name: "Dismiss reminder r1" });
+
+    fireEvent.click(screen.getByRole("button", { name: "Dismiss reminder r1" }));
+
+    await waitFor(() => {
+      const call = fetchMock.mock.calls.find(
+        ([input, init]) =>
+          String(input).includes("/v1/reminders/r1/dismiss") &&
+          (init as RequestInit | undefined)?.method === "POST"
+      );
+      expect(call).toBeTruthy();
+      expect(String(call?.[0])).toContain("household_id=hh-expiry");
+    });
+  });
+
+  test("a 422 shows an error and leaves the server row in place", async () => {
+    reminderActionStatus = 422;
+    renderPage();
+    await screen.findByRole("button", { name: "Read reminder r1" });
+    const initialGets = remindersGetCount;
+
+    fireEvent.click(screen.getByRole("button", { name: "Read reminder r1" }));
+
+    const alert = await screen.findByRole("alert");
+    expect(alert).toHaveTextContent("illegal transition");
+    expect(screen.getByRole("button", { name: "Read reminder r1" })).toBeInTheDocument();
+    expect(screen.getByText("Unread reminders (1)")).toBeInTheDocument();
+    expect(remindersGetCount).toBe(initialGets);
   });
 });

@@ -19,4 +19,4 @@ RUN pip install --no-cache-dir "hatchling==1.32.0" "editables==0.6"
 RUN pip install --no-cache-dir --no-build-isolation --no-deps -e .
 COPY --from=frontend-build /ui/dist ./static
 EXPOSE 8000
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["uvicorn", "app.server:app", "--host", "0.0.0.0", "--port", "8000"]
