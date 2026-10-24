@@ -71,7 +71,7 @@ backend-test-image:
 	docker run --rm --network none storagegenie-backend:latest python -m pytest -q tests/test_signals.py::test_generated_codes_are_validated_and_bad_checksum_is_not_an_identifier tests/test_signals.py::test_ocr_has_text_boxes_and_mean_confidence
 ```
 
-**The lane's shape (from the previous slices' own logs, `docs/worklogs/SG-238.log`, `docs/worklogs/SG-239.log`):**
+**The lane's shape (from the previous slices' own logs, `docs/worklogs/SG-238_sudo_probe.log` — the lane's own unit properties — and `docs/worklogs/SG-239.log`):**
 
 - The slice runs as the dispatch account `andrei` in a systemd unit (`dispatch-storagegenie@<ID>`), with `RUN_BUDGET_S=2100`.
 - The unit sets the **no-new-privileges** flag — the verbatim sudo probe above is that flag, not a password prompt. Escalation inside a slice unit is therefore impossible today; it is a unit property, not an account policy alone.
