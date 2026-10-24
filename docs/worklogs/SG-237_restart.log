@@ -1,0 +1,134 @@
+SG-237 G3 restart utc=2026-10-24T13:59:04Z epoch=1792850344
+storagegenie-backend-1
+restart_exit=0
+restart_command_returned utc=2026-10-24T13:59:05Z epoch=1792850345 command_elapsed_s=1
+--- bounded wait: <=60 s, 5 s steps, health 200 AND reminder count 1 ---
+attempt=1 utc=2026-10-24T13:59:05Z elapsed_s=0 health=000err reminder_rows=0
+attempt=2 utc=2026-10-24T13:59:10Z elapsed_s=5 health=200 reminder_rows=1
+--- health body ---
+{"status":"ok","db":"ok","storage":"ok"}
+HTTP=200
+--- container after ---
+id=ee4e165af4b62da2f20af53a3ce887ba79fb1da0244417d8648dbcc5d53fd17c
+name=/storagegenie-backend-1
+created=2026-10-24T11:30:45.946797846Z
+started=2026-10-24T13:59:05.238544242Z
+image=sha256:2bd3599f2b68980576454f889a7b93db291ec8e0c08f5f7a7afd52b7af93ef5f
+imageName=storagegenie-backend
+cmd=["uvicorn","app.server:app","--host","0.0.0.0","--port","8000"]
+restartcount=0
+status=running
+health=starting
+--- container log (last 80 lines, timestamped) ---
+2026-10-24T13:49:18.567319124Z INFO:     127.0.0.1:59826 - "GET /v1/health HTTP/1.1" 200 OK
+2026-10-24T13:49:28.727764348Z INFO:     127.0.0.1:53930 - "GET /v1/health HTTP/1.1" 200 OK
+2026-10-24T13:49:38.894679059Z INFO:     127.0.0.1:45280 - "GET /v1/health HTTP/1.1" 200 OK
+2026-10-24T13:49:49.057693923Z INFO:     127.0.0.1:55646 - "GET /v1/health HTTP/1.1" 200 OK
+2026-10-24T13:49:59.217120438Z INFO:     127.0.0.1:38346 - "GET /v1/health HTTP/1.1" 200 OK
+2026-10-24T13:50:09.386023027Z INFO:     127.0.0.1:40494 - "GET /v1/health HTTP/1.1" 200 OK
+2026-10-24T13:50:19.559734330Z INFO:     127.0.0.1:59318 - "GET /v1/health HTTP/1.1" 200 OK
+2026-10-24T13:50:29.734008618Z INFO:     127.0.0.1:52846 - "GET /v1/health HTTP/1.1" 200 OK
+2026-10-24T13:50:39.923261953Z INFO:     127.0.0.1:43870 - "GET /v1/health HTTP/1.1" 200 OK
+2026-10-24T13:50:50.093815409Z INFO:     127.0.0.1:48870 - "GET /v1/health HTTP/1.1" 200 OK
+2026-10-24T13:51:00.317112497Z INFO:     127.0.0.1:57716 - "GET /v1/health HTTP/1.1" 200 OK
+2026-10-24T13:51:10.486088917Z INFO:     127.0.0.1:47612 - "GET /v1/health HTTP/1.1" 200 OK
+2026-10-24T13:51:20.645268083Z INFO:     127.0.0.1:49202 - "GET /v1/health HTTP/1.1" 200 OK
+2026-10-24T13:51:30.805573054Z INFO:     127.0.0.1:47658 - "GET /v1/health HTTP/1.1" 200 OK
+2026-10-24T13:51:40.988449212Z INFO:     127.0.0.1:53190 - "GET /v1/health HTTP/1.1" 200 OK
+2026-10-24T13:51:51.140698395Z INFO:     127.0.0.1:34454 - "GET /v1/health HTTP/1.1" 200 OK
+2026-10-24T13:52:01.359600711Z INFO:     127.0.0.1:38442 - "GET /v1/health HTTP/1.1" 200 OK
+2026-10-24T13:52:11.576318238Z INFO:     127.0.0.1:40032 - "GET /v1/health HTTP/1.1" 200 OK
+2026-10-24T13:52:21.742018011Z INFO:     127.0.0.1:37998 - "GET /v1/health HTTP/1.1" 200 OK
+2026-10-24T13:52:31.929961146Z INFO:     127.0.0.1:47272 - "GET /v1/health HTTP/1.1" 200 OK
+2026-10-24T13:52:42.112826955Z INFO:     127.0.0.1:41126 - "GET /v1/health HTTP/1.1" 200 OK
+2026-10-24T13:52:52.276445148Z INFO:     127.0.0.1:58280 - "GET /v1/health HTTP/1.1" 200 OK
+2026-10-24T13:53:02.453983728Z INFO:     127.0.0.1:42620 - "GET /v1/health HTTP/1.1" 200 OK
+2026-10-24T13:53:12.621448555Z INFO:     127.0.0.1:51876 - "GET /v1/health HTTP/1.1" 200 OK
+2026-10-24T13:53:22.789555325Z INFO:     127.0.0.1:42756 - "GET /v1/health HTTP/1.1" 200 OK
+2026-10-24T13:53:32.947026952Z INFO:     127.0.0.1:44906 - "GET /v1/health HTTP/1.1" 200 OK
+2026-10-24T13:53:43.096691646Z INFO:     127.0.0.1:49194 - "GET /v1/health HTTP/1.1" 200 OK
+2026-10-24T13:53:53.269017523Z INFO:     127.0.0.1:48550 - "GET /v1/health HTTP/1.1" 200 OK
+2026-10-24T13:54:03.453907217Z INFO:     127.0.0.1:34884 - "GET /v1/health HTTP/1.1" 200 OK
+2026-10-24T13:54:13.619659362Z INFO:     127.0.0.1:48398 - "GET /v1/health HTTP/1.1" 200 OK
+2026-10-24T13:54:23.812377618Z INFO:     127.0.0.1:48644 - "GET /v1/health HTTP/1.1" 200 OK
+2026-10-24T13:54:33.987526342Z INFO:     127.0.0.1:60508 - "GET /v1/health HTTP/1.1" 200 OK
+2026-10-24T13:54:44.142928404Z INFO:     127.0.0.1:37986 - "GET /v1/health HTTP/1.1" 200 OK
+2026-10-24T13:54:54.304545557Z INFO:     127.0.0.1:48224 - "GET /v1/health HTTP/1.1" 200 OK
+2026-10-24T13:55:04.500785122Z INFO:     127.0.0.1:58038 - "GET /v1/health HTTP/1.1" 200 OK
+2026-10-24T13:55:14.671258592Z INFO:     127.0.0.1:38846 - "GET /v1/health HTTP/1.1" 200 OK
+2026-10-24T13:55:24.831094591Z INFO:     127.0.0.1:48160 - "GET /v1/health HTTP/1.1" 200 OK
+2026-10-24T13:55:34.992740360Z INFO:     127.0.0.1:48956 - "GET /v1/health HTTP/1.1" 200 OK
+2026-10-24T13:55:45.152203776Z INFO:     127.0.0.1:41412 - "GET /v1/health HTTP/1.1" 200 OK
+2026-10-24T13:55:55.317523855Z INFO:     127.0.0.1:49614 - "GET /v1/health HTTP/1.1" 200 OK
+2026-10-24T13:56:05.481748659Z INFO:     127.0.0.1:38102 - "GET /v1/health HTTP/1.1" 200 OK
+2026-10-24T13:56:15.691919078Z INFO:     127.0.0.1:53826 - "GET /v1/health HTTP/1.1" 200 OK
+2026-10-24T13:56:25.878199344Z INFO:     127.0.0.1:50092 - "GET /v1/health HTTP/1.1" 200 OK
+2026-10-24T13:56:35.857529043Z INFO:     172.18.0.1:33706 - "GET /v1/health HTTP/1.1" 200 OK
+2026-10-24T13:56:36.037706666Z INFO:     127.0.0.1:40532 - "GET /v1/health HTTP/1.1" 200 OK
+2026-10-24T13:56:46.208766929Z INFO:     127.0.0.1:50446 - "GET /v1/health HTTP/1.1" 200 OK
+2026-10-24T13:56:56.384644573Z INFO:     127.0.0.1:48426 - "GET /v1/health HTTP/1.1" 200 OK
+2026-10-24T13:57:06.537238890Z INFO:     127.0.0.1:41940 - "GET /v1/health HTTP/1.1" 200 OK
+2026-10-24T13:57:16.695950688Z INFO:     127.0.0.1:56876 - "GET /v1/health HTTP/1.1" 200 OK
+2026-10-24T13:57:26.849886392Z INFO:     127.0.0.1:58630 - "GET /v1/health HTTP/1.1" 200 OK
+2026-10-24T13:57:37.028120057Z INFO:     127.0.0.1:44946 - "GET /v1/health HTTP/1.1" 200 OK
+2026-10-24T13:57:47.180683946Z INFO:     127.0.0.1:57496 - "GET /v1/health HTTP/1.1" 200 OK
+2026-10-24T13:57:57.373106407Z INFO:     127.0.0.1:42134 - "GET /v1/health HTTP/1.1" 200 OK
+2026-10-24T13:57:58.138730378Z INFO:     172.18.0.1:48872 - "GET / HTTP/1.1" 200 OK
+2026-10-24T13:57:58.150919183Z INFO:     172.18.0.1:48878 - "GET / HTTP/1.1" 200 OK
+2026-10-24T13:57:58.163644163Z INFO:     172.18.0.1:48892 - "GET /assets/index-B0lDq5dE.js HTTP/1.1" 200 OK
+2026-10-24T13:58:07.565876361Z INFO:     127.0.0.1:54708 - "GET /v1/health HTTP/1.1" 200 OK
+2026-10-24T13:58:17.726459971Z INFO:     127.0.0.1:40084 - "GET /v1/health HTTP/1.1" 200 OK
+2026-10-24T13:58:27.942177571Z INFO:     127.0.0.1:47160 - "GET /v1/health HTTP/1.1" 200 OK
+2026-10-24T13:58:28.437529691Z INFO:     172.18.0.1:55552 - "GET /v1/health HTTP/1.1" 200 OK
+2026-10-24T13:58:28.478325901Z INFO:     172.18.0.1:55564 - "GET /v1/plugins/expiry-tracker/status?household_id=01a0a029-1477-7ca0-b200-bce78a96c679 HTTP/1.1" 200 OK
+2026-10-24T13:58:28.496860149Z INFO:     172.18.0.1:55566 - "GET /v1/reminders?household_id=01a0a029-1477-7ca0-b200-bce78a96c679 HTTP/1.1" 200 OK
+2026-10-24T13:58:28.513627512Z INFO:     172.18.0.1:55582 - "GET / HTTP/1.1" 200 OK
+2026-10-24T13:58:28.528206922Z INFO:     172.18.0.1:55594 - "GET /assets/index-B0lDq5dE.js HTTP/1.1" 200 OK
+2026-10-24T13:58:38.099598191Z INFO:     127.0.0.1:38960 - "GET /v1/health HTTP/1.1" 200 OK
+2026-10-24T13:58:48.253985806Z INFO:     127.0.0.1:50234 - "GET /v1/health HTTP/1.1" 200 OK
+2026-10-24T13:58:52.806992478Z INFO:     172.18.0.1:34486 - "POST /v1/plugins/expiry-tracker/assets/01a0c4aa-8b62-7360-b11e-a476ddaea0f6/classification?household_id=01a0a029-1477-7ca0-b200-bce78a96c679 HTTP/1.1" 200 OK
+2026-10-24T13:58:52.832172072Z INFO:     172.18.0.1:34498 - "POST /v1/plugins/expiry-tracker/assets/01a0c4aa-8b62-7360-b11e-a476ddaea0f6/expiry?household_id=01a0a029-1477-7ca0-b200-bce78a96c679 HTTP/1.1" 200 OK
+2026-10-24T13:58:52.849980838Z INFO:     172.18.0.1:34512 - "GET /v1/plugins/expiry-tracker/status?household_id=01a0a029-1477-7ca0-b200-bce78a96c679 HTTP/1.1" 200 OK
+2026-10-24T13:58:58.411109507Z INFO:     127.0.0.1:38220 - "GET /v1/health HTTP/1.1" 200 OK
+2026-10-24T13:59:04.617437131Z INFO:     Shutting down
+2026-10-24T13:59:04.718060366Z INFO:     Waiting for application shutdown.
+2026-10-24T13:59:04.718267775Z INFO:     Application shutdown complete.
+2026-10-24T13:59:04.718403770Z INFO:     Finished server process [1]
+2026-10-24T13:59:06.863400063Z INFO:     Started server process [1]
+2026-10-24T13:59:06.863427244Z INFO:     Waiting for application startup.
+2026-10-24T13:59:06.865331827Z INFO:     Application startup complete.
+2026-10-24T13:59:06.877810105Z INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+2026-10-24T13:59:10.563204557Z INFO:     172.18.0.1:59460 - "GET /v1/health HTTP/1.1" 200 OK
+2026-10-24T13:59:10.583641663Z INFO:     172.18.0.1:59466 - "GET /v1/health HTTP/1.1" 200 OK
+--- reminder table ---
+id                                    household_id                          asset_id                              as_of_day   tier    bucket     days_remaining  status  created_at         
+------------------------------------  ------------------------------------  ------------------------------------  ----------  ------  ---------  --------------  ------  -------------------
+01a16e35-4394-7c11-9798-844754826bcc  01a0a029-1477-7ca0-b200-bce78a96c679  01a0c4aa-8b62-7360-b11e-a476ddaea0f6  2026-10-24  urgent  this-week  3               unread  2026-10-24 13:59:06
+--- GET /v1/reminders ---
+{"household_id":"01a0a029-1477-7ca0-b200-bce78a96c679","unread_count":1,"items":[{"id":"01a16e35-4394-7c11-9798-844754826bcc","household_id":"01a0a029-1477-7ca0-b200-bce78a96c679","asset_id":"01a0c4aa-8b62-7360-b11e-a476ddaea0f6","display_name":"Miso Soup","as_of_day":"2026-10-24","tier":"urgent","window_days":7,"bucket":"this-week","days_remaining":3,"status":"unread","created_at":"2026-10-24T13:59:06","updated_at":"2026-10-24T13:59:06"}]}
+HTTP=200
+--- engine status for the same day ---
+{"household_id":"01a0a029-1477-7ca0-b200-bce78a96c679","as_of":"2026-10-24","category":null,"rows":[{"asset_id":"01a0c4aa-8b62-7360-b11e-a476ddaea0f6","display_name":"Miso Soup","category":"food_beverages","expiry_date":"2026-10-27","date_type":"expiry_date","days_remaining":3,"tier":"urgent","bucket":"this-week"}],"summary":{"by_tier":{"urgent":1},"by_bucket":{"this-week":1},"unresolved":0,"total":1},"unresolved_rows":[]}
+HTTP=200
+--- counts after restart ---
+t                n  
+---------------  ---
+assertion        40 
+asset            7  
+reminder         1  
+household        1  
+audit_event      104
+review_task      9  
+evidence         27 
+asset_evidence   20 
+observation      20 
+idempotency_key  11 
+alembic_head           
+-----------------------
+20261023_sg233_reminder
+--- served JS markers after restart ---
+served_js=/assets/index-B0lDq5dE.js
+      1 Dismiss reminder
+      1 Read reminder
+      1 Unread reminders
+restart_leg_end utc=2026-10-24T13:59:10Z epoch=1792850350

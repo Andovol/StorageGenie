@@ -1,0 +1,38 @@
+SG-237 G2 write utc=2026-10-24T13:58:52Z epoch=1792850332
+today_utc=2026-10-24 expiry_date=2026-10-27 asset=01a0c4aa-8b62-7360-b11e-a476ddaea0f6 household=01a0a029-1477-7ca0-b200-bce78a96c679
+--- classification POST ---
+{"plugin_id":"expiry-tracker","version":"1.0.0","classification":{"category":"food_beverages","label":"Food & beverages","profile":{"notification_tier":"upcoming","notification_days":30,"tier_defaults":{"critical":1,"urgent":7,"upcoming":30},"opened_date_tracking":false,"disposal_guidance":true}},"expiry_assertion":{"id":"01a16e35-0c7e-7403-b324-43ac30c478a6","field_path":"plugin:expiry-tracker/expiry_date","value":{"status":"unknown"},"source_type":"deterministic","review_state":"needs_evidence","source_evidence_ids":[]},"review_task":"01a16e35-0c82-7801-8fac-8ea68abee909"}
+HTTP=200
+--- expiry POST ---
+{"asset_id":"01a0c4aa-8b62-7360-b11e-a476ddaea0f6","assertion":{"id":"01a16e35-0c98-7112-9dd5-7c9a4ae027d7","field_path":"plugin:expiry-tracker/expiry_date","value":{"expiry_date":"2026-10-27","date_type":"expiry_date"},"source_type":"user","review_state":"accepted","source_evidence_ids":[]},"resolved_review_task_ids":["01a16e35-0c82-7801-8fac-8ea68abee909"]}
+HTTP=200
+--- engine status after ---
+{"household_id":"01a0a029-1477-7ca0-b200-bce78a96c679","as_of":"2026-10-24","category":null,"rows":[{"asset_id":"01a0c4aa-8b62-7360-b11e-a476ddaea0f6","display_name":"Miso Soup","category":"food_beverages","expiry_date":"2026-10-27","date_type":"expiry_date","days_remaining":3,"tier":"urgent","bucket":"this-week"}],"summary":{"by_tier":{"urgent":1},"by_bucket":{"this-week":1},"unresolved":0,"total":1},"unresolved_rows":[]}
+HTTP=200
+--- counts after write ---
+t            n  
+-----------  ---
+assertion    40 
+asset        7  
+reminder     0  
+household    1  
+audit_event  104
+review_task  9  
+--- new expiry-tracker assertions ---
+id                                    asset_id                              field_path                            value_json                                                                                                                                                                                                                                                   review_state  source_type    created_at         
+------------------------------------  ------------------------------------  ------------------------------------  -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------  ------------  -------------  -------------------
+01a16e35-0c78-7743-81bb-86364165197b  01a0c4aa-8b62-7360-b11e-a476ddaea0f6  plugin:expiry-tracker/classification  {"category": "food_beverages", "label": "Food & beverages", "profile": {"notification_tier": "upcoming", "notification_days": 30, "tier_defaults": {"critical": 1, "urgent": 7, "upcoming": 30}, "opened_date_tracking": false, "disposal_guidance": true}}  accepted      user           2026-10-24 13:58:52
+01a16e35-0c7e-7403-b324-43ac30c478a6  01a0c4aa-8b62-7360-b11e-a476ddaea0f6  plugin:expiry-tracker/expiry_date     {"status": "unknown"}                                                                                                                                                                                                                                        superseded    deterministic  2026-10-24 13:58:52
+01a16e35-0c98-7112-9dd5-7c9a4ae027d7  01a0c4aa-8b62-7360-b11e-a476ddaea0f6  plugin:expiry-tracker/expiry_date     {"expiry_date": "2026-10-27", "date_type": "expiry_date"}                                                                                                                                                                                                    accepted      user           2026-10-24 13:58:52
+--- new audit events ---
+id                                    actor           action                  entity_type  entity_id                             after_json                                                                                            timestamp                 
+------------------------------------  --------------  ----------------------  -----------  ------------------------------------  ----------------------------------------------------------------------------------------------------  --------------------------
+01a16e35-0c7f-74f2-816e-e55904e422c1  expiry-tracker  plugin.assertion.write  assertion    01a16e35-0c78-7743-81bb-86364165197b  {"field_path": "plugin:expiry-tracker/classification", "review_state": "accepted", "value": {"catego  2026-10-24 13:58:52.793396
+01a16e35-0c81-7562-8758-36fa3c45c51a  expiry-tracker  plugin.assertion.write  assertion    01a16e35-0c7e-7403-b324-43ac30c478a6  {"field_path": "plugin:expiry-tracker/expiry_date", "review_state": "needs_evidence", "value": {"sta  2026-10-24 13:58:52.799531
+01a16e35-0c9d-73b2-85ed-08ccc40225ef  expiry-tracker  plugin.assertion.write  assertion    01a16e35-0c98-7112-9dd5-7c9a4ae027d7  {"field_path": "plugin:expiry-tracker/expiry_date", "review_state": "accepted", "value": {"expiry_da  2026-10-24 13:58:52.825188
+01a16e35-0c9d-73b2-85ed-08d6fef9c80c  user            expiry.manual_entry     asset        01a0c4aa-8b62-7360-b11e-a476ddaea0f6  {"review_state": "accepted", "field_path": "plugin:expiry-tracker/expiry_date"}                       2026-10-24 13:58:52.828681
+--- new review task ---
+id                                    task_type            status    subject_ref                         
+------------------------------------  -------------------  --------  ------------------------------------
+01a16e35-0c82-7801-8fac-8ea68abee909  expiry.manual_entry  resolved  01a0c4aa-8b62-7360-b11e-a476ddaea0f6
+write_end utc=2026-10-24T13:58:52Z epoch=1792850332

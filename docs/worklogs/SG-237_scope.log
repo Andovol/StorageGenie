@@ -1,0 +1,148 @@
+SG-237 scope and code-derived write model utc=2026-10-24T13:58:42Z epoch=1792850322
+base_ref_requested=origin/automation
+base_ref_resolved=9d340cfabcd17f962f81bb88b397e265cf34be9b
+head_at_start=9d340cfabcd17f962f81bb88b397e265cf34be9b
+--- decision ---
+The packet's row model (exactly 3 new rows: 2 assertions + 1 reminder; no other table touched) does not match the committed route code.
+backend/app/plugins/expiry_tracker.py:323-357 _write_assertion inserts one audit_service.record row per assertion.
+backend/app/plugins/expiry_tracker.py:414-439 classify_asset writes the classification assertion AND a second EXPIRY_FIELD assertion (unknown/needs_evidence when no OCR date) and opens a review task.
+backend/app/api/v1/plugins.py:174-183 enter_expiry records a second audit row and backend/app/plugins/expiry_tracker.py:498-518 supersedes the placeholder and resolves the task.
+Predicted actual movement for the owner-authorised one-asset/one-date action:
+  assertion +3 (classification accepted; expiry_date unknown needs_evidence -> superseded; expiry_date accepted)
+  audit_event +4 (3 x plugin.assertion.write, 1 x expiry.manual_entry)
+  review_task +1 (inserted open, then resolved)
+  reminder +1 (daily pass after restart)
+The owner grant D-1024-7 authorises the action through the app's own plugin routes; the audit/state rows are that route's own trail. Proceeding under the grant, and reporting the packet's row envelope as a false premise (not bending the counts).
+--- route code excerpts ---
+@router.post("/assets/{asset_id}/classification")
+def classify(
+    asset_id: str,
+    payload: dict[str, object],
+    household_id: str = Query(...),
+    db: Session = Depends(get_db),
+) -> dict[str, object]:
+    _plugin(payload)
+    asset = _asset(db, asset_id, household_id)
+    try:
+        category = expiry_tracker.canonical_category(payload.get("category"))
+        tier = payload.get("notification_tier")
+        if tier is not None and not isinstance(tier, str):
+            raise ExpiryValidationError("notification_tier must be a string")
+        result = expiry_tracker.classify_asset(db, asset, category, tier)
+    except ExpiryValidationError as exc:
+        raise _error(exc) from exc
+    db.commit()
+    task = result["review_task"]
+    expiry_assertion = result["expiry_assertion"]
+    return {
+        "plugin_id": expiry_tracker.PLUGIN_ID,
+        "version": expiry_tracker.PLUGIN_VERSION,
+        "classification": result["classification"],
+        "expiry_assertion": _assertion_view(
+            expiry_assertion if isinstance(expiry_assertion, Assertion) else None
+        ),
+        "review_task": task.id if isinstance(task, ReviewTask) else None,
+    }
+@router.post("/assets/{asset_id}/expiry")
+def enter_expiry(
+    asset_id: str,
+    payload: dict[str, object],
+    household_id: str = Query(...),
+    db: Session = Depends(get_db),
+) -> dict[str, object]:
+    _plugin(payload)
+    asset = _asset(db, asset_id, household_id)
+    try:
+        entry = expiry_tracker.parse_manual_entry(payload)
+        source_ids = payload.get("source_evidence_ids", payload.get("evidence_ids"))
+        if source_ids is not None and (
+            not isinstance(source_ids, list) or any(not isinstance(item, str) for item in source_ids)
+        ):
+            raise ExpiryValidationError("source_evidence_ids must be a list of strings")
+        evidence_ids = [str(item) for item in source_ids] if source_ids is not None else None
+        if evidence_ids:
+            evidence = db.query(Evidence).filter(Evidence.id.in_(evidence_ids)).all()
+            if len(evidence) != len(set(evidence_ids)):
+                raise ExpiryValidationError("source evidence was not found")
+            if any(item.household_id != household_id for item in evidence):
+                raise HTTPException(status_code=403, detail="Evidence household mismatch")
+        assertion, tasks = expiry_tracker.store_manual_expiry(db, asset, entry, evidence_ids)
+    except ExpiryValidationError as exc:
+        raise _error(exc) from exc
+    audit_service.record(
+        db,
+        actor="user",
+        action="expiry.manual_entry",
+        entity_type="asset",
+        entity_id=asset.id,
+        before={"review_state": "needs_evidence"},
+        after={"review_state": "accepted", "field_path": expiry_tracker.EXPIRY_FIELD},
+        household_id=asset.household_id,
+    )
+    db.commit()
+    return {
+        "asset_id": asset.id,
+        "assertion": _assertion_view(assertion),
+        "resolved_review_task_ids": [task.id for task in tasks],
+    }
+def _write_assertion(
+    db: Session,
+    asset: Asset,
+    field_path: str,
+    value: object,
+    source_type: str,
+    review_state: str,
+    evidence_ids: list[str] | None,
+) -> Assertion:
+    previous = _active_assertion(db, asset.id, field_path)
+    if previous is not None:
+        if previous.review_state == review_state and json.loads(previous.value_json) == value:
+            return previous
+        previous.review_state = "superseded"
+    assertion = Assertion(
+        asset_id=asset.id,
+        field_path=field_path,
+        value_json=json.dumps(value, ensure_ascii=False),
+        source_type=source_type,
+        review_state=review_state,
+        source_evidence_ids=json.dumps(evidence_ids) if evidence_ids else None,
+    )
+    db.add(assertion)
+    db.flush()
+    audit_service.record(
+        db,
+        actor="expiry-tracker",
+        action="plugin.assertion.write",
+        entity_type="assertion",
+        entity_id=assertion.id,
+        before={"field_path": field_path, "review_state": previous.review_state if previous else None},
+        after={"field_path": field_path, "review_state": review_state, "value": value},
+        household_id=asset.household_id,
+    )
+    return assertion
+def classify_asset(db: Session, asset: Asset, category: Category, tier: str | None) -> dict[str, object]:
+    if tier is not None and tier not in category.tier_defaults:
+        raise ExpiryValidationError(f"Invalid notification_tier: {tier}")
+    profile = category.profile(tier)
+    classification = {"category": category.slug, "label": category.label, "profile": profile}
+    _write_assertion(db, asset, CLASSIFICATION_FIELD, classification, "user", "accepted", None)
+    expiry_assertion: Assertion | None = None
+    task: ReviewTask | None = None
+    observed = _observed_date(db, asset) if category.has_expiry else None
+    if category.has_expiry:
+        if observed is None:
+            expiry_assertion = _write_assertion(
+                db, asset, EXPIRY_FIELD, {"status": "unknown"}, "deterministic", "needs_evidence", None
+            )
+            task = _manual_task(db, asset)
+        else:
+            expiry_assertion = _write_assertion(
+                db,
+                asset,
+                EXPIRY_FIELD,
+                {"expiry_date": observed[0], "date_type": DateType.EXPIRY_DATE.value},
+                "deterministic",
+                "proposed",
+                observed[1],
+            )
+    return {"classification": classification, "expiry_assertion": expiry_assertion, "review_task": task}

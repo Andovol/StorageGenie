@@ -1,0 +1,60 @@
+SG-237 pre-state utc=2026-10-24T13:58:28Z epoch=1792850308
+--- container (served) ---
+id=ee4e165af4b62da2f20af53a3ce887ba79fb1da0244417d8648dbcc5d53fd17c
+name=/storagegenie-backend-1
+created=2026-10-24T11:30:45.946797846Z
+started=2026-10-24T11:30:46.845151157Z
+image=sha256:2bd3599f2b68980576454f889a7b93db291ec8e0c08f5f7a7afd52b7af93ef5f
+imageName=storagegenie-backend
+cmd=["uvicorn","app.server:app","--host","0.0.0.0","--port","8000"]
+restartcount=0
+status=running
+health=healthy
+ports={"8000/tcp":[{"HostIp":"127.0.0.1","HostPort":"8003"}]}
+--- health ---
+{"status":"ok","db":"ok","storage":"ok"}
+HTTP=200
+--- per-table counts ---
+t                n  
+---------------  ---
+assertion        37 
+asset            7  
+reminder         0  
+household        1  
+audit_event      100
+review_task      8  
+evidence         27 
+asset_evidence   20 
+observation      20 
+idempotency_key  11 
+alembic_head           
+-----------------------
+20261023_sg233_reminder
+--- asset inventory (all) ---
+id                                    display_name                                            status  asset_type
+------------------------------------  ------------------------------------------------------  ------  ----------
+01a0a467-eb0e-7b83-a227-af122dc9268b  Toothpaste                                              ACTIVE  unknown   
+01a0c446-44c9-7b82-9d1c-2b51fa518191  CEAFĂ DE PORC                                           ACTIVE  meat      
+01a0c47f-fbb3-7db1-b6f3-aa52d20aa6a0  UHT Lapte 3,5% grăsime                                  ACTIVE  dairy     
+01a0c481-720e-7923-ad6c-bee45caba30f  Milbona Parmigiano Reggiano Italian hard cheese flakes  ACTIVE  dairy     
+01a0c4aa-8b62-7360-b11e-a476ddaea0f6  Miso Soup                                               ACTIVE  soup      
+01a0c4ab-3765-7e10-8d0a-705390c6560d  Costiță de porc                                         ACTIVE  meat      
+01a131ae-7a0c-7363-91c8-cfef6bd1faa3  TRACHISAN comprimate de supt                            ACTIVE  medicine  
+--- household ---
+id                                    name             
+------------------------------------  -----------------
+01a0a029-1477-7ca0-b200-bce78a96c679  Popescu Household
+--- expiry-tracker assertions (before) ---
+--- open review tasks (before) ---
+--- engine status before ---
+{"household_id":"01a0a029-1477-7ca0-b200-bce78a96c679","as_of":"2026-10-24","category":null,"rows":[],"summary":{"by_tier":{},"by_bucket":{},"unresolved":0,"total":0},"unresolved_rows":[]}
+HTTP=200
+--- reminders before ---
+{"household_id":"01a0a029-1477-7ca0-b200-bce78a96c679","unread_count":0,"items":[]}
+HTTP=200
+--- served JS markers ---
+served_js=/assets/index-B0lDq5dE.js
+      1 Dismiss reminder
+      1 Read reminder
+      1 Unread reminders
+prestate_end utc=2026-10-24T13:58:28Z epoch=1792850308
