@@ -1,0 +1,14 @@
+Partial-Receipt-ID: SG-239
+utc=2026-10-24T14:26:22Z
+invocation=7237a368161c4f38b517c8fa6dc1140b
+killed=exit_no_receipt
+pushed=0
+uncommitted=none
+wip=none
+wip_elapsed_ms=70
+wip_tracked=none
+wip_untracked=0 host_local
+DISPATCH_RESULT id=SG-239 coder=opencode exit=0 head=ee6722e89e507170b5af0dc6502395db24453f6f note=no moved=yes rewrite=no dirty=no elapsed=405s budget=2100s killed=exit_no_receipt stragglers=0
+P1_moved=PASS count=2
+P2_rewrite=PASS behind=0
+P6_dirty=PASS dirty=no
