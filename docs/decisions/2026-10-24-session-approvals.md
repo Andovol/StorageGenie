@@ -1,4 +1,4 @@
-# 2026-10-24 — Session approvals (D-1024-1 … D-1024-14)
+# 2026-10-24 — Session approvals (D-1024-1 … D-1024-15)
 
 Owner instruction, quoted byte-identical (2026-10-24, this chat):
 
@@ -149,3 +149,30 @@ reported by its result, not by a plan.
 **One addition the owner asked for in the same breath — status, roadmap progress and what is next.** Each
 post-slice report also states the roadmap position (which rows are built, which are partly built, which are
 missing) so the owner never has to ask where the work stands.
+## D-1024-15 — No local models on the server
+
+Owner, 2026-10-24 (this chat), verbatim: *"We will not have local models on the server."*
+
+**Do:** the live server (`87.106.66.242`) will never run a local model. Roadmap row 14's "local option" therefore
+means the **no-model** local path — the deterministic provider double already in the registry
+(`backend/app/services/providers/reader.py:96`) and the local OCR / barcode observation path
+(`backend/app/services/signals.py:102-109`, `:205-245`) — and **not** a local model server, not an on-demand
+model sidecar, and not a model downloaded to the host.
+
+**What this closes.** D-R14-b's **L2 branch is closed by the owner's decision, not deferred**. The review's L2
+item — a local model served on the live host, with its host-rule change, its stated memory budget and a
+re-measure of the shared 7.7 GiB box — **does not go to the owner at all**, and no slice may plan for it.
+The review's **L3 survives** (local as the *fallback destination*, reached on transport/outage classes only),
+with its two constraints: a local landing must never present a fabricated reading (`fake` returns `fake-item`,
+`fake.py:63`), and `invalid_json` must surface rather than be absorbed by a fixture
+(`RETRYABLE_ERRORS`, `providers/reader.py:61-63`).
+
+**Why it is recorded durably (G-O4):** it is a standing product decision, not a question — it removes a branch
+that was in front of the owner, and it changes what the row-14 stage may contain.
+
+**What this does not change.** The review rule stands: the decisions that ride on this ruling still need their
+second-opinion line before they reach the owner — which is why the owner asked for a second opinion on all of
+them, and one runs (SG-248 blind, SG-249 critique) before they come back.
+
+**Scope.** The ruling is about **the live server** — the only server this project runs on. It says nothing about
+a developer's own machine, and it does not forbid a local model on a different host if the owner ever wants one.
