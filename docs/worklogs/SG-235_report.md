@@ -22,6 +22,8 @@ I8. Ordering rule resolved as: three UNCLEAR lines, then the absolute last line 
 
 I9. The 24-hour cadence is measured from the previous pass, not aligned to midnight; the shipped default is the feature constant `DAILY_INTERVAL_SECONDS = 86400.0`, with no setting/env/compose key. A container restart re-runs the startup pass and the unique `(asset_id, as_of_day)` guard makes it a no-op for the same UTC day; a restart after missed days computes today only.
 
+I10. The new scope gate compares `origin/automation...HEAD`, exactly as SG-233's did. It is meaningful and green on the candidate **before** the push (section 2, seven product paths; section 9, ten paths after the evidence commit). Once the push moves `origin/automation` to this HEAD the range is empty and the gate's `REQUIRED_PATHS` assertion becomes red; a rerun after publication is therefore not a product signal. This is the same slice-local limitation as the SG-233 gate in I3 and does not affect the quoted pre-push runs.
+
 (a2) Premises re-verified (quoted, not trusted)
 
 - `backend/app/services/reminders/service.py:3` "The single production writer is ``record_due``."; lines 41-49 `def record_due(db: Session, household_id: str, as_of_day: date | None = None)` ... `day = as_of_day if as_of_day is not None else today_utc()`.
