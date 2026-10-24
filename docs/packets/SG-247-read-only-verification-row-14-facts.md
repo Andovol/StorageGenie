@@ -1,0 +1,101 @@
+# SG-247 — Read-only verification: three facts that settle the row-14 decisions (touch-list, served-image libraries, spend attribution)
+
+`PB-1`–`PB-6` bind (`CODER.md` §14).
+
+**This slice changes nothing.** No product, config, schema, migration, dependency or test byte. No database write, no provider call, no key read, no spend. It exists to turn three unverified premises into measured facts before any row-14 slice is written.
+
+**BASE REF: `origin/automation`.** The ref is what the packet requests; the commit it resolved to is what the report states back — two fields, never one.
+**DATABASE: none.** No database is opened, read or written — not even read-only. (The production database is a declared sensitive surface; the one read it needs is the owner's to approve separately.)
+**Restart: none.**
+**Provider: none.** No provider is called, no model is downloaded, no key is read, no spend occurs. Target: **$0**.
+
+## Why this exists
+
+The second opinion on roadmap row 14 ran in two phases (SG-245 blind, SG-246 critique; `docs/reviews/review-ledger.md`). Its report names three observations that would settle the open questions, and each is a **read or a measurement with no side effect**:
+
+- the review's D-R14-d settling observation: a **static touch-list** of every file a second provider adapter MUST touch — which decides whether the stage's exit condition ("changing providers needs configuration, not code") is honest or has to be renegotiated with the owner **before** the first slice;
+- the review's D-R14-b settling observation: whether the **local signal path is actually available** in the image the app runs on;
+- the review's D-R14-a and D-R14-c settling observations (the code half): **where scene spend lands** in the ledger and **whether the monthly cap's numbers mix text spend with photo spend**, and whether the gateway tests cover the retryable classes production uses.
+
+Everything below is a hypothesis to be measured, not a fact to be confirmed. If a measurement contradicts a stated expectation, **report the contradiction** — do not adjust the measurement to fit the expectation.
+
+## G1 — The static adapter touch-list
+
+Enumerate **every file a second provider adapter must touch**, and for each say **what** changes and **why**. Start from the seams, not from a guess:
+
+- the provider registry gate — `backend/app/services/providers/reader.py:90-105`;
+- the `RouterConfig` wiring at the four call sites that hardcode `fallback_id=None` — `providers/reader.py:465`, `services/chat/service.py:425`, `services/planning/service.py:444`, `services/analytics/service.py:597`;
+- the rate table and the cost estimate — `providers/opencode_go.py:44-45`, `:151-164` — and `_estimate_call` (`providers/reader.py:233-242`);
+- the per-model response-format branch — `providers/opencode_go.py:63-67`;
+- the two privacy pins — `backend/tests/test_privacy_audit.py:237-248` (the httpx-client file set and the exact send-site lines) and `:251-267` (the `redact_image` call sites);
+- the settings surface — `backend/app/api/v1/settings.py:26` (the model whitelist) and `:39-41` (the PUT limits), plus `backend/app/config.py:44` (the key carrier) and `:48-50` (the caps and consent);
+- the redaction helper — `backend/app/services/providers/redaction.py:16-21`.
+
+**Then answer, in one line each:**
+
+1. Does the touch-list stay inside **the seam, the adapter and the pins** — with **no caller-logic edit** to the repair policy, the ledger writers or the outcome contracts?
+2. Which **vendor-neutral logic** currently lives inside `providers/opencode_go.py` and would be **duplicated** by a second adapter (the review names the usage guard, the think-strip, the estimate shape and the budget guards, `opencode_go.py:70-164`, `:298-309`)? Name the lines and say how many lines a shared base would move.
+3. What would have to change for the provider id and the fallback id to be **selectable by configuration** at runtime — given `provider_id` is not settable at runtime today (`backend/app/api/v1/settings.py:29-36`)?
+
+**Expected (hypothesis, to be measured, not assumed):** the list is confined to the seam + adapter + pins, with the settings surface as the one addition. If any **caller-logic** edit turns out to be required, say so plainly and name it — that changes the stage's exit condition and the owner must renegotiate it **before** the first slice.
+
+## G2 — The served image's local-signal dependencies
+
+Build the image from the repository's own `backend/Dockerfile` **once**, in a **throwaway container**, with `--network none` and no bind mount, and measure inside it:
+
+- `tesseract --version`;
+- `shutil.which("tesseract")` — the binary, which is what `pytesseract` actually needs;
+- `from pyzbar.pyzbar import decode` — the shared-library load, not the Python package;
+- `import pytesseract`.
+
+**Do not** rebuild, **do not** recreate or touch the running container, **do not** restart anything, and **do not** read any `.env` value. Report the image id you built and the image id the running container uses, and state whether they are the same digest — read only, never write.
+
+**Expected (hypothesis):** the image holds `tesseract 5.3.0` and `libzbar.so.0` (`docs/worklogs/SG-238_g3_image_libs.log:4-6` measured that in the project's image on 2026-10-24). If the running container's image differs from the one you built, say so.
+
+**Do not** measure OCR quality on real photos and **do not** call any provider — a quality measurement needs the owner's photos, which is the owner's to consent to.
+
+## G3 — Where the spend lands, and which retryable classes are tested
+
+Read, do not run:
+
+1. **The scene ledger writer** — `backend/app/services/scene/openrouter.py` around its provider-call/spend recording (the review points at ≈`:800-885`) — and `backend/app/models/provider_call.py`: **do scene rows land in `provider_call` with `job_id=None`?** Quote the lines that decide it.
+2. **The monthly-cap arithmetic** — `backend/app/services/providers/reader.py:293-306` — and what it counts: the household-joined sum and the unattributed pool. Quote both SELECTs.
+3. **The photo path's writer** — `providers/reader.py:208-230` — and **which `job_id`** it writes.
+4. **The retryable sets in play** — production `providers/reader.py:61-63` and the gateway test `backend/tests/test_provider_gateway.py:43-56` (and `:73-91`). List which production classes the gateway test does **not** cover, by name.
+
+**Expected (hypothesis, to be measured):** the photo path writes job-linked rows; the chat/planning/analytics writers do not; the gateway test covers a narrower set than production. If the code says otherwise, report the code.
+
+## G4 — Report
+
+Report the three answers (G1's three lines, G2's measurements, G4 of G3) and, for each, **what it changes** in the row-14 stage:
+
+- a one-line answer: *which of the four owner decisions this fact settles, and which it leaves open*;
+- a **list of every file you read** beyond the ones named above, and every command you ran with its exit code and its measured output (the command, not a paraphrase of it);
+- state plainly that you wrote nothing, called no provider, read no key, opened no database and spent nothing.
+
+The report's last line: `Verification: PASS` (or the honest failure reason). The report destination: `{{WORKLOG_DIR}}/SG-247_report.md`, and the receipt goes to the notes ref `refs/notes/storagegenie-coder-reports` with the first line `Dispatch-ID: SG-247 | Report: docs/worklogs/SG-247_report.md | Work-HEAD: <work commit>` (the notes ref is fetched explicitly: `git fetch origin refs/notes/storagegenie-coder-reports:refs/notes/storagegenie-coder-reports`).
+
+## Scope ceiling
+
+- **Read-only by construction.** The only write is the report and its evidence logs under `{{WORKLOG_DIR}}`; nothing else is committed. A write outside that directory is a STOP.
+- **No** database open (not even `-readonly`), **no** provider call, **no** key or `.env` value read, **no** change to the running container (no build of the live tag, no recreate, no restart, no migration), **no** edit to any product, config, schema, dependency or test file.
+- One image build of the repository's own `backend/Dockerfile` into a **throwaway tag**; the `:latest` tag and the running container are **not** touched. Remove the throwaway container when done; the built image may stay (it is unlabelled by `latest`), and say which.
+- Host: `{{HOST}}` port `{{HOST_SSH_PORT}}`, user `{{HOST_USER}}`. The project directory is the one the lane is started in.
+- Budget: the lane's own `RUN_BUDGET_S` is the ceiling; **publish before the bound** at 1500 s. Expected ≈900 s, derived from SG-240's actual elapsed time (1504 s for a build + a full suite + a census) and SG-241's (257 s for a build + recreate + verify).
+
+## Acceptance criteria
+
+- **A1** — the touch-list names every file a second adapter must touch, each with what changes and why, and the three G1 lines are answered with quotes or `file:line`.
+- **A2** — G2 reports the four measured facts from inside the throwaway container, plus the built image id and the running container's image id, and states whether they are the same digest.
+- **A3** — G3 answers its four questions with quoted lines from the code, including the exact list of production retryable classes the gateway test does not cover.
+- **A4** — for each of the three answers, the line *which owner decision it settles and which it leaves open*.
+- **A5** — the evidence is **artifact, not claim**: the raw command output is pasted into a committed log under `{{WORKLOG_DIR}}`, and the report quotes it. A number with no command behind it does not satisfy this.
+- **A6** — `PB-3` vacuity: a check that cannot fail is decoration. Each measurement must be one that **could** report the opposite — say what the opposite result would have looked like. If a measurement cannot fail, it is not a measurement.
+- **A7** — the last line is `Verification: PASS` or the honest failure reason.
+
+## Out of scope (state it if you are tempted)
+
+- No cap value, no money authority, no probe — these are the owner's and come after this slice.
+- No adapter code, no settings change, no registry change, no test edit.
+- No real-photo quality measurement, no provider call, no model download.
+- No database read, including the unattributed-pool magnitude — the code half is in G3; the runtime half is the owner's to approve.
