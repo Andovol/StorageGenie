@@ -3,7 +3,7 @@
 > Canonical for this repo. `CLAUDE.md` only points here — edit here, never there.
 > Rule-set version recorded here: 0.52.0. Past version notes, old values, and decision numbers moved to `docs/decisions/2026-10-23-agents-plain-language-history.md`.
 
-Slices are numbered with the prefix SG, which stands for StorageGenie (for example SG-1, SG-2). Autonomy L2 means the owner approves each slice once and the builder owns retries inside that slice.
+Slices are numbered with the prefix SG, which stands for StorageGenie (for example SG-1, SG-2). Autonomy L3 means the owner approves a stage (a named set of slices toward one outcome); inside it the Architect packets, dispatches, audits and rates without asking, and the builder owns retries inside each slice.
 
 ## Configuration table — every project value in one place
 
@@ -21,8 +21,8 @@ Slices are numbered with the prefix SG, which stands for StorageGenie (for examp
 | **Model policy** | Every trigger states the model and effort explicitly, currently `model=opencode-go/deepseek-v4.1-flash effort=max` | Stating both on every trigger stops silent drift between slices. |
 | **Second opinion** | `default` | The word default asks the contract to pick a reviewer that is not the current builder. |
 | **Packet directory** | `docs/packets` | Task files are committed and pushed, so the server always reads what this computer sent. |
-| **Autonomy** | L2 | The owner approves each slice once. The builder owns one retry inside the slice and returns after that. |
-| **Close-out** | Deploy the live app before every close | The owner asks for a live check at every close. Work that is unrated or blocked stops the deploy instead of shipping silently. |
+| **Autonomy** | L3 | The owner approves a stage — a named set of slices toward one outcome, stated in the approval message. Inside the stage the Architect packets, dispatches, audits and rates each slice without asking. The builder owns one retry inside a slice and returns after that. A stage boundary is a new approval. |
+| **Close-out** | Deploy every app-changing slice as its own slice, right after it is rated, and deploy the live app before every close | The owner asks for a live check at every close. Work that is unrated or blocked stops the deploy instead of shipping silently. |
 | **Values bindings** | See the table below | The coder contract uses placeholders in double braces. Every placeholder it reads must have a value here, or the run stops. Never guess a value. |
 
 ## Values table — what each placeholder means
