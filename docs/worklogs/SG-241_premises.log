@@ -1,0 +1,51 @@
+=== SG-241 premises log ===
+2026-10-24T16:18:50Z
+--- identity (argv from /proc/3415301/cmdline; model/effort read, not recalled) ---
+opencode
+run
+--auto
+--dir
+/home/andrei/StorageGenie
+--model
+opencode-go/deepseek-v4.1-flash
+--variant
+max
+--- base fields (separate) ---
+BASE_REF=origin/automation
+resolved_commit=04a53512d83457ce7f4eaf6a776866a589b58116
+start_HEAD=04a53512d83457ce7f4eaf6a776866a589b58116
+--- merge commit stat (runtime backend files only, first 6 lines) ---
+04a5351 Merge remote-tracking branch 'origin/automation' into automation
+
+ backend/app/api/v1/plugins.py                      |  52 ++-
+ backend/app/logging_config.py                      |  35 +++
+ backend/app/plugins/expiry_tracker.py              |  80 ++++-
+ backend/app/server.py                              |   4 +
+ backend/app/services/opened_countdown.py           | 121 +++++++
+ backend/tests/test_sg240_logging_config.py         |  57 ++++
+--- SG-240 implementation backend diff ---
+ backend/app/api/v1/plugins.py            |  52 ++++++++++++-
+ backend/app/logging_config.py            |  35 +++++++++
+ backend/app/plugins/expiry_tracker.py    |  80 +++++++++++++++++++-
+ backend/app/server.py                    |   4 +
+ backend/app/services/opened_countdown.py | 121 +++++++++++++++++++++++++++++++
+ 5 files changed, 290 insertions(+), 2 deletions(-)
+--- declared ceiling: server.py, logging_config.py (new, optional), plugins/expiry_tracker.py, api/v1/plugins.py, services/opened_countdown.py (new) ---
+runtime_diff_prebuild (old image 54f520da -> worktree): exactly the 5 ceiling files; see SG-241_prestate.log
+runtime_diff_postbuild (image 97ced17c -> worktree): clean, 100/100 py files; see SG-241_image_check.log
+--- packet premises vs measured ---
+(a) runtime diff = the 5 ceiling files, no file outside the ceiling — match
+(b) pre container 67f668e2 / image 54f520da: measured 67f668e2 / 54f520da — match
+(c) bundle pre: index 9850538a JS B0lDq5dE b6e26a8e 323000 B, CSS C07VbG0m c3b58cda 4535 B — match
+(d) 29 tables, head 20261023_sg233_reminder, assertion 40, audit_event 104, review_task 9, asset 7, household 1 — match
+(d) reminder status: packet says unread; measured read (updated_at 2026-10-24 15:21:24, before unit start 16:14:53) — FINDING; G3 fallback applied, no write
+(e)/(f) pass line and logger names: see SG-241_verify.log
+--- git status at premises check ---
+?? docs/worklogs/SG-241_build.log
+?? docs/worklogs/SG-241_deploy.log
+?? docs/worklogs/SG-241_g0.log
+?? docs/worklogs/SG-241_g3.log
+?? docs/worklogs/SG-241_image_check.log
+?? docs/worklogs/SG-241_premises.log
+?? docs/worklogs/SG-241_prestate.log
+?? docs/worklogs/SG-241_verify.log

@@ -1,0 +1,115 @@
+=== SG-241 G2 post-recreate verification (read-only) ===
+2026-10-24T16:17:31Z
+epoch=1792858651
+--- container state ---
+6c648f1cdce6 storagegenie-backend-1 storagegenie-backend Up 26 seconds (healthy) 127.0.0.1:8003->8000/tcp
+Id=6c648f1cdce63b17e042a20e35e8cede291b637973d98c94d46f2ca7ab1e0dee
+Created=2026-10-24T16:17:03.117534625Z
+StartedAt=2026-10-24T16:17:04.212198218Z
+RestartCount=0
+Status=running
+Health=healthy
+ImageID=sha256:97ced17c3120f12eb16ca830bb3a83d3ff78fa980151043f8ec44a172434b2f0
+Cmd=["uvicorn","app.server:app","--host","0.0.0.0","--port","8000"]
+--- six health GETs ---
+health_1 http=200 time=0.003751 {"status":"ok","db":"ok","storage":"ok"}
+health_2 http=200 time=0.003357 {"status":"ok","db":"ok","storage":"ok"}
+health_3 http=200 time=0.003580 {"status":"ok","db":"ok","storage":"ok"}
+health_4 http=200 time=0.003152 {"status":"ok","db":"ok","storage":"ok"}
+health_5 http=200 time=0.003842 {"status":"ok","db":"ok","storage":"ok"}
+health_6 http=200 time=0.002912 {"status":"ok","db":"ok","storage":"ok"}
+--- shell routes ---
+/ http=200 bytes=944
+/expiry http=200 bytes=944
+/inbox http=200 bytes=944
+/planning http=200 bytes=944
+--- served index + bundle (post) ---
+index_http=200 bytes=944
+cec37cf5eecd12a9d23da6ccaa1bb40da306fd38ce7454c1daa59909b3825caf  /tmp/sg241-post/index.html
+/assets/index-C07VbG0m.css http=200 bytes=4535
+c3b58cda696a22970fc2a4a348849fc1359f2105f80f81304ed5dfd5ca31a557  /tmp/sg241-post/index-C07VbG0m.css
+/assets/index-CWp6nYu6.js http=200 bytes=326217
+fe7dff6e58dd934ec14f693d40166aee5117453c13cb8caee45f371d4a944b99  /tmp/sg241-post/index-CWp6nYu6.js
+--- expiry-tracker read routes (read-only) ---
+opened http=200 bytes=86
+{"household_id":"01a0a029-1477-7ca0-b200-bce78a96c679","as_of":"2026-10-24","rows":[]}
+status http=200 bytes=426
+{"household_id":"01a0a029-1477-7ca0-b200-bce78a96c679","as_of":"2026-10-24","category":null,"rows":[{"asset_id":"01a0c4aa-8b62-7360-b11e-a476ddaea0f6","display_name":"Miso Soup","category":"food_beverages","expiry_date":"2026-10-27","date_type":"expiry_date","days_remaining":3,"tier":"urgent","bucket":"this-week"}],"summary":{"by_tier":{"urgent":1},"by_bucket":{"this-week":1},"unresolved":0,"total":1},"unresolved_rows":[]}
+--- reminders endpoint post ---
+{"household_id":"01a0a029-1477-7ca0-b200-bce78a96c679","unread_count":0,"items":[{"id":"01a16e35-4394-7c11-9798-844754826bcc","household_id":"01a0a029-1477-7ca0-b200-bce78a96c679","asset_id":"01a0c4aa-8b62-7360-b11e-a476ddaea0f6","display_name":"Miso Soup","as_of_day":"2026-10-24","tier":"urgent","window_days":7,"bucket":"this-week","days_remaining":3,"status":"read","created_at":"2026-10-24T13:59:06","updated_at":"2026-10-24T15:21:24"}]}
+http=200
+--- production sqlite post (read-only) ---
+acf11596e2105c0ab38355fce10a10c5296ea1ac61b22c96af5c2748e24ccd64  data/db/storagegenie.db
+db_bytes=765952 mtime=2026-10-24 16:17:03.668148310 +0000
+wal
+head=20261023_sg233_reminder
+table_count=29
+alembic_version=1
+assertion=40
+asset=7
+asset_evidence=20
+asset_fts=7
+asset_fts_config=1
+asset_fts_data=9
+asset_fts_docsize=7
+asset_fts_idx=7
+asset_location=1
+asset_relation=1
+audit_event=104
+candidate=10
+enrich_snapshot=4
+evidence=27
+guardrail_event=2
+household=1
+idempotency_key=11
+job=11
+job_step=72
+location=1
+observation=20
+planning_suggestion=0
+provider_call=39
+reminder=1
+review_task=9
+saved_search=0
+source_attribution=0
+user=2
+--- reminder row post ---
+id                                    household_id                          asset_id                              display_name  as_of_day   tier    bucket     days_remaining  status  created_at           updated_at         
+------------------------------------  ------------------------------------  ------------------------------------  ------------  ----------  ------  ---------  --------------  ------  -------------------  -------------------
+01a16e35-4394-7c11-9798-844754826bcc  01a0a029-1477-7ca0-b200-bce78a96c679  01a0c4aa-8b62-7360-b11e-a476ddaea0f6  Miso Soup     2026-10-24  urgent  this-week  3               read    2026-10-24 13:59:06  2026-10-24 15:21:24
+--- bounded pass-line wait: 60 s bound, 5 s steps, stop at first hit ---
+step=1 elapsed_s=0 pass_lines=1
+pass_line_found=1
+--- container log verbatim (full) ---
+INFO:     Started server process [1]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+INFO:     app.services.reminders.daily - Daily reminder pass completed as_of=2026-10-24 households_visited=1 reminders_created=0 errors=0
+INFO:     127.0.0.1:53026 - "GET /v1/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:32942 - "GET /v1/health HTTP/1.1" 200 OK
+INFO:     172.18.0.1:58412 - "GET /v1/health HTTP/1.1" 200 OK
+INFO:     172.18.0.1:58424 - "GET /v1/health HTTP/1.1" 200 OK
+INFO:     172.18.0.1:58428 - "GET /v1/health HTTP/1.1" 200 OK
+INFO:     172.18.0.1:58440 - "GET /v1/health HTTP/1.1" 200 OK
+INFO:     172.18.0.1:58454 - "GET /v1/health HTTP/1.1" 200 OK
+INFO:     172.18.0.1:58464 - "GET /v1/health HTTP/1.1" 200 OK
+INFO:     172.18.0.1:58480 - "GET / HTTP/1.1" 200 OK
+INFO:     172.18.0.1:58490 - "GET /expiry HTTP/1.1" 200 OK
+INFO:     172.18.0.1:58496 - "GET /inbox HTTP/1.1" 200 OK
+INFO:     172.18.0.1:58502 - "GET /planning HTTP/1.1" 200 OK
+INFO:     172.18.0.1:58508 - "GET / HTTP/1.1" 200 OK
+INFO:     172.18.0.1:58512 - "GET /assets/index-C07VbG0m.css HTTP/1.1" 200 OK
+INFO:     172.18.0.1:58514 - "GET /assets/index-CWp6nYu6.js HTTP/1.1" 200 OK
+INFO:     172.18.0.1:58530 - "GET /v1/plugins/expiry-tracker/opened?household_id=01a0a029-1477-7ca0-b200-bce78a96c679 HTTP/1.1" 200 OK
+INFO:     172.18.0.1:58534 - "GET /v1/plugins/expiry-tracker/status?household_id=01a0a029-1477-7ca0-b200-bce78a96c679 HTTP/1.1" 200 OK
+INFO:     172.18.0.1:58544 - "GET /v1/reminders?household_id=01a0a029-1477-7ca0-b200-bce78a96c679 HTTP/1.1" 200 OK
+--- log census ---
+total_log_lines=23 pass_lines=1
+distinct_INFO_named_loggers:
+app.services.reminders.daily
+failure_scan:
+INFO:     app.services.reminders.daily - Daily reminder pass completed as_of=2026-10-24 households_visited=1 reminders_created=0 errors=0
+--- pass line exact ---
+INFO:     app.services.reminders.daily - Daily reminder pass completed as_of=2026-10-24 households_visited=1 reminders_created=0 errors=0
+utc_end=2026-10-24T16:17:31Z epoch_end=1792858651

@@ -1,0 +1,29 @@
+=== SG-241 G3 — owner-named reminder: precondition and decision ===
+2026-10-24T16:18:08Z
+packet G3 clause: if the row is already dismissed OR read, make no write; report end state reached; treat as pass
+unit_start=2026-10-24T16:14:53Z (systemctl ExecMainStartTimestamp)
+--- precondition: endpoint + SQL, before any G3 action (already read pre-state at 16:15:54Z) ---
+{"household_id":"01a0a029-1477-7ca0-b200-bce78a96c679","unread_count":0,"items":[{"id":"01a16e35-4394-7c11-9798-844754826bcc","household_id":"01a0a029-1477-7ca0-b200-bce78a96c679","asset_id":"01a0c4aa-8b62-7360-b11e-a476ddaea0f6","display_name":"Miso Soup","as_of_day":"2026-10-24","tier":"urgent","window_days":7,"bucket":"this-week","days_remaining":3,"status":"read","created_at":"2026-10-24T13:59:06","updated_at":"2026-10-24T15:21:24"}]}
+http=200
+id                                    asset_id                              display_name  as_of_day   tier    bucket     days_remaining  status  updated_at         
+------------------------------------  ------------------------------------  ------------  ----------  ------  ---------  --------------  ------  -------------------
+01a16e35-4394-7c11-9798-844754826bcc  01a0c4aa-8b62-7360-b11e-a476ddaea0f6  Miso Soup     2026-10-24  urgent  this-week  3               read    2026-10-24 15:21:24
+--- decision ---
+status=read (not unread); display_name=Miso Soup; updated_at=2026-10-24 15:21:24 (before this unit started 16:14:53Z).
+No POST issued to /dismiss (or /read) by this slice: the packet's G3 fallback forbids a write when the row is already read.
+The app records no actor on reminder transitions, so the cause is attributed by the packet clause, not by an audit row.
+--- proof no write by this slice ---
+reminder.updated_at before recreate: 2026-10-24 15:21:24 (SG-241_prestate.log)
+reminder.updated_at after recreate:  2026-10-24 15:21:24 (SG-241_verify.log, this log)
+POST/PUT/PATCH/DELETE lines in new container access log:
+0
+0
+--- failure scan excluding the pass line (the word 'errors=0' is not a failure) ---
+none
+--- post state (read-only) ---
+{"household_id":"01a0a029-1477-7ca0-b200-bce78a96c679","unread_count":0,"items":[{"id":"01a16e35-4394-7c11-9798-844754826bcc","household_id":"01a0a029-1477-7ca0-b200-bce78a96c679","asset_id":"01a0c4aa-8b62-7360-b11e-a476ddaea0f6","display_name":"Miso Soup","as_of_day":"2026-10-24","tier":"urgent","window_days":7,"bucket":"this-week","days_remaining":3,"status":"read","created_at":"2026-10-24T13:59:06","updated_at":"2026-10-24T15:21:24"}]}
+http=200
+id                                    asset_id                              display_name  as_of_day   tier    bucket     days_remaining  status  updated_at         
+------------------------------------  ------------------------------------  ------------  ----------  ------  ---------  --------------  ------  -------------------
+01a16e35-4394-7c11-9798-844754826bcc  01a0c4aa-8b62-7360-b11e-a476ddaea0f6  Miso Soup     2026-10-24  urgent  this-week  3               read    2026-10-24 15:21:24
+utc_end=2026-10-24T16:18:08Z
