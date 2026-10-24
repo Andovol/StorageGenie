@@ -64,7 +64,7 @@ Observe the new container identity and start time (ID/Created, not RestartCount)
 
 Also required: the old container's stop must be prompt (the lifespan cancels the daily task with a 5 s bound — a stop that hangs past that is a finding; the old container's own shutdown log may be unreadable once it is removed, so record the recreate's wall time and the new `StartedAt` as the evidence), the new container must be `running`/`healthy`, and the shell routes must still answer (`/`, `/expiry`, `/inbox`, `/planning`).
 
-**The new route answers (read-only):** `GET /v1/plugins/expiry-tracker/opened` must answer `200` with a body — a `404`/`500` here means SG-240's read path did not reach the served image, and that is a finding to report, not a pass. `GET /v1/plugins/expiry-tracker/status` must still answer. Do **not** POST to the opened-date write path: this rider serves and verifies; it does not create opened-date rows.
+**The new route answers (read-only):** `GET /v1/plugins/expiry-tracker/opened?household_id={household_id}` must answer `200` with a body — **the `household_id` query parameter is required**, and the household id is the one read in G1 (`GET /v1/households`); a `422` that only says the parameter is missing is your call missing it, not the route failing, so read the detail and report what it says. A `404`/`500` from the route itself means SG-240's read path did not reach the served image, and that is a finding to report, not a pass. `GET /v1/plugins/expiry-tracker/status?household_id={household_id}` must still answer. Do **not** POST to the opened-date write path: this rider serves and verifies; it does not create opened-date rows.
 
 ## G3 — The one owner-named write: dismiss the Miso Soup reminder
 
