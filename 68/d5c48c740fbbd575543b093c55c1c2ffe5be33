@@ -1,0 +1,14 @@
+Partial-Receipt-ID: SG-238
+utc=2026-10-24T14:16:45Z
+invocation=3e3339a8607f40c4822878f1d303fab9
+killed=exit_no_receipt
+pushed=0
+uncommitted=none
+wip=none
+wip_elapsed_ms=72
+wip_tracked=none
+wip_untracked=0 host_local
+DISPATCH_RESULT id=SG-238 coder=opencode exit=0 head=92dc8375f7c2cc7b689e1615bec58170aa347428 note=no moved=yes rewrite=no dirty=no elapsed=662s budget=2100s killed=exit_no_receipt stragglers=0
+P1_moved=PASS count=2
+P2_rewrite=PASS behind=0
+P6_dirty=PASS dirty=no
