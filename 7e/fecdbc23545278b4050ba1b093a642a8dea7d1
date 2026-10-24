@@ -1,0 +1,14 @@
+Partial-Receipt-ID: SG-235
+utc=2026-10-24T11:19:14Z
+invocation=015c9721b6c74f41b9cb38dfa7d3b3f3
+killed=exit_no_receipt
+pushed=0
+uncommitted=none
+wip=none
+wip_elapsed_ms=76
+wip_tracked=none
+wip_untracked=0 host_local
+DISPATCH_RESULT id=SG-235 coder=opencode exit=0 head=c029a65fd96a6fffaa0437864f6d24d7581b1c97 note=no moved=yes rewrite=no dirty=no elapsed=794s budget=2100s killed=exit_no_receipt stragglers=0
+P1_moved=PASS count=5
+P2_rewrite=PASS behind=0
+P6_dirty=PASS dirty=no
