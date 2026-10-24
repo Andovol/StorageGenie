@@ -17,7 +17,7 @@ from app.models.review_task import ReviewTask
 from app.plugins import expiry_tracker
 from app.plugins.expiry_tracker import ExpiryValidationError
 from app.plugins.registry import PluginError, get_plugin
-from app.services import audit_service, expiry_engine
+from app.services import audit_service, expiry_engine, opened_countdown
 
 router = APIRouter(prefix="/plugins/expiry-tracker")
 
@@ -93,6 +93,33 @@ def read_status(
         except ExpiryValidationError:
             canonical = category
     return expiry_engine.compute_status(db, household_id, parsed_as_of, category=canonical)
+
+
+@router.get("/opened")
+def read_opened_countdown(
+    household_id: str = Query(...),
+    as_of: str | None = Query(None),
+    db: Session = Depends(get_db),
+) -> dict[str, object]:
+    """SG-240: opened-date countdown rows for one household, read-only.
+
+    `as_of` defaults to today UTC; a household with nothing to count returns the
+    same shape with `rows: []` (200), never a fallback to another set.
+    """
+    if db.query(Household).filter_by(id=household_id).first() is None:
+        raise HTTPException(status_code=404, detail="Household not found")
+    if as_of is None:
+        parsed_as_of = datetime.now(timezone.utc).date()
+    else:
+        try:
+            parsed_as_of = date.fromisoformat(as_of)
+        except ValueError as exc:
+            raise _error(
+                ExpiryValidationError("as_of must be a valid YYYY-MM-DD date")
+            ) from exc
+        if parsed_as_of.isoformat() != as_of:
+            raise _error(ExpiryValidationError("as_of must use YYYY-MM-DD format"))
+    return opened_countdown.compute_opened_countdown(db, household_id, parsed_as_of)
 
 
 @router.post("/assets/{asset_id}/classification")
@@ -186,6 +213,29 @@ def enter_expiry(
         "asset_id": asset.id,
         "assertion": _assertion_view(assertion),
         "resolved_review_task_ids": [task.id for task in tasks],
+    }
+
+
+@router.post("/assets/{asset_id}/opened")
+def record_opened_date(
+    asset_id: str,
+    payload: dict[str, object],
+    household_id: str = Query(...),
+    db: Session = Depends(get_db),
+) -> dict[str, object]:
+    """SG-240 D2: record one accepted `opened_date` assertion for an asset."""
+    _plugin(payload)
+    asset = _asset(db, asset_id, household_id)
+    try:
+        assertion = expiry_tracker.store_opened_date(
+            db, asset, payload.get("opened_date", payload.get("date"))
+        )
+    except ExpiryValidationError as exc:
+        raise _error(exc) from exc
+    db.commit()
+    return {
+        "asset_id": asset.id,
+        "assertion": _assertion_view(assertion),
     }
 
 

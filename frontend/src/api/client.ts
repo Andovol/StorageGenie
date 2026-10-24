@@ -10,6 +10,8 @@ import type {
   ChatResponse,
   ExpiryStatusResponse,
   LocationListResponse,
+  OpenedCountdownResponse,
+  OpenedDateResponse,
   PlanningRunResult,
   PlanningSuggestion,
   PlanningSuggestionListResponse,
@@ -290,6 +292,24 @@ export function fetchExpiryStatus(householdId: string, category?: string) {
     household_id: householdId,
     category: category ?? "",
   });
+}
+
+// SG-240: the opened-date countdown rows and the one write that records a date.
+// `asOf` is optional; an empty string is dropped by `buildUrl` so the server
+// applies its live UTC day.
+export function fetchOpenedCountdown(householdId: string, asOf?: string) {
+  return apiGet<OpenedCountdownResponse>("/v1/plugins/expiry-tracker/opened", {
+    household_id: householdId,
+    as_of: asOf ?? "",
+  });
+}
+
+export function recordOpenedDate(assetId: string, householdId: string, openedDate: string) {
+  return apiPost<OpenedDateResponse>(
+    `/v1/plugins/expiry-tracker/assets/${assetId}/opened`,
+    { opened_date: openedDate },
+    { household_id: householdId }
+  );
 }
 
 // SG-233: in-app reminder reads and transitions, shaped by the reminders API.

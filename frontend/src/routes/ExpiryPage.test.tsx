@@ -167,6 +167,11 @@ beforeEach(() => {
       remindersGetCount += 1;
       return Promise.resolve(jsonResponse(remindersBody));
     }
+    if (url.includes("/v1/plugins/expiry-tracker/opened")) {
+      return Promise.resolve(
+        jsonResponse({ household_id: household.id, as_of: "2026-09-24", rows: [] })
+      );
+    }
     if (url.includes("/v1/plugins/expiry-tracker/status")) {
       return Promise.resolve(jsonResponse(statusBody));
     }
@@ -220,6 +225,7 @@ describe("ExpiryPage", () => {
     await screen.findByText("Milk");
 
     expect(screen.getAllByRole("region").map((region) => region.getAttribute("aria-label"))).toEqual([
+      "Opened countdown",
       "Expired",
       "This week",
       "This month",

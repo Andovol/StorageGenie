@@ -10,7 +10,7 @@ from __future__ import annotations
 import json
 import re
 from dataclasses import dataclass
-from datetime import date
+from datetime import date, datetime, timezone
 from enum import StrEnum
 from typing import Any
 
@@ -30,6 +30,10 @@ FIELD_PREFIX = "plugin:expiry-tracker/"
 CLASSIFICATION_FIELD = f"{FIELD_PREFIX}classification"
 EXPIRY_FIELD = f"{FIELD_PREFIX}expiry_date"
 EXTENSION_PREFIX = f"{FIELD_PREFIX}extension/"
+# SG-240 D2: the opened date is a BARE field path carrying a bare JSON string
+# ("YYYY-MM-DD"), matching the convention candidates.py writes and the planning
+# and chat readers already expect.
+OPENED_DATE_FIELD = "opened_date"
 
 
 class DateType(StrEnum):
@@ -70,6 +74,13 @@ class Category:
     default_tier: str
     phase: str | None = None
     opened_date_tracking: bool = False
+    # SG-240 D1: the after-opening window in months, DECLARED UNCALIBRATED.
+    # Source: EU Regulation 1223/2009 Art. 19 — the printed period-after-opening
+    # ("12M" open-jar) figure for cosmetics whose minimum durability exceeds 30
+    # months. The printed figure varies per product (the pack may say 6M or 18M),
+    # so this is a category default the countdown response names as such; a
+    # per-item PAO override is parked.
+    opened_window_months: int | None = None
 
     def profile(self, tier: str | None = None) -> dict[str, Any]:
         if not self.tier_defaults:
@@ -136,6 +147,7 @@ CATEGORIES: dict[str, Category] = {
         COSMETICS_TIERS,
         NotificationTier.UPCOMING.value,
         opened_date_tracking=True,
+        opened_window_months=12,
     ),
     "household_chemicals": Category(
         "household_chemicals",
@@ -448,6 +460,72 @@ def store_extensions(db: Session, asset: Asset, attributes: dict[str, object]) -
     for key, value in attributes.items():
         rows.append(_write_assertion(db, asset, f"{EXTENSION_PREFIX}{key}", value, "user", "accepted", None))
     return rows
+
+
+def _accepted_classification_category(db: Session, asset_id: str) -> Category | None:
+    assertion = (
+        db.query(Assertion)
+        .filter(
+            Assertion.asset_id == asset_id,
+            Assertion.field_path == CLASSIFICATION_FIELD,
+            Assertion.review_state == "accepted",
+        )
+        .order_by(Assertion.created_at.desc())
+        .first()
+    )
+    if assertion is None:
+        return None
+    try:
+        value = json.loads(assertion.value_json)
+    except json.JSONDecodeError:
+        return None
+    if not isinstance(value, dict):
+        return None
+    slug = value.get("category")
+    if not isinstance(slug, str):
+        return None
+    return CATEGORIES.get(slug)
+
+
+def parse_opened_date(value: object, *, today: date | None = None) -> str:
+    """Validate an opened date: exact ``YYYY-MM-DD``, never after the live UTC day."""
+    if not isinstance(value, str):
+        raise ExpiryValidationError("opened_date is required as YYYY-MM-DD")
+    try:
+        parsed = date.fromisoformat(value)
+    except ValueError as exc:
+        raise ExpiryValidationError("opened_date must be a valid YYYY-MM-DD date") from exc
+    if parsed.isoformat() != value:
+        raise ExpiryValidationError("opened_date must use YYYY-MM-DD format")
+    current_day = today if today is not None else datetime.now(timezone.utc).date()
+    if parsed > current_day:
+        raise ExpiryValidationError("opened_date must not be after today (UTC)")
+    return value
+
+
+def store_opened_date(
+    db: Session, asset: Asset, value: object, *, today: date | None = None
+) -> Assertion:
+    """Store one accepted ``opened_date`` assertion (SG-240 D2).
+
+    The asset must carry an accepted classification whose category tracks opened
+    dates. The existing ``_write_assertion`` path is used so a new value
+    supersedes the previous active one and the audit row is written exactly as
+    every other plugin write does.
+    """
+    category = _accepted_classification_category(db, asset.id)
+    if category is None:
+        raise ExpiryValidationError(
+            "Asset must have an accepted classification before recording an opened date"
+        )
+    if not category.opened_date_tracking:
+        raise ExpiryValidationError(
+            f"Opened-date tracking is not enabled for category: {category.slug}"
+        )
+    opened_date = parse_opened_date(value, today=today)
+    return _write_assertion(
+        db, asset, OPENED_DATE_FIELD, opened_date, "user", "accepted", None
+    )
 
 
 def _orphan_manual_tasks(

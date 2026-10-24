@@ -410,3 +410,28 @@ export type ReminderListResponse = {
   unread_count: number;
   items: Reminder[];
 };
+
+// SG-240: the opened-date countdown rows (GET /v1/plugins/expiry-tracker/opened).
+// `window_months`/`window_source` name the live category window; nulls mean the
+// item has no opened date yet, never a zero.
+export type OpenedCountdownWindowSource = "category_default";
+export type OpenedCountdownRow = {
+  asset_id: string;
+  display_name: string | null;
+  category: string;
+  opened_date: string | null;
+  days_open: number | null;
+  window_months: number | null;
+  window_source: OpenedCountdownWindowSource;
+  days_remaining: number | null;
+  window_end: string | null;
+};
+export type OpenedCountdownResponse = {
+  household_id: string;
+  as_of: string;
+  rows: OpenedCountdownRow[];
+};
+export type OpenedDateResponse = {
+  asset_id: string;
+  assertion: Assertion;
+};

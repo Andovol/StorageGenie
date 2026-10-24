@@ -1,0 +1,22 @@
+SG-240 premise evidence, measured in throwaway containers (utc=2026-10-24).
+
+1) Installed uvicorn 0.52.4 LOGGING_CONFIG, read from the shipped image:
+disable_existing_loggers= False
+root_entry= None
+logger_names= ['uvicorn', 'uvicorn.access', 'uvicorn.error']
+uvicorn_handlers= ['default'] propagate= False
+
+2) Old image storagegenie-backend:latest (pre-slice code), fresh process under uvicorn's dictConfig:
+root_level= 30
+daily_effective_level= 30
+root_handlers= 0
+Old-image container log lines matching "Daily reminder pass completed": 0
+(The old-image run's health probe answered 503 because /app/data/storage did not exist in that
+throwaway container; the after run creates it, and health answers 200 there.)
+
+3) New image storagegenie-backend:sg240-proof (this slice's tree), fresh process under uvicorn's
+dictConfig, before and after configure_logging():
+before_configure root_level= 30 daily_effective_level= 30 root_handlers= 0
+after_configure  root_level= 20 daily_effective_level= 20 root_handlers= 1
+
+4) New-image container log lines matching "Daily reminder pass completed": 1

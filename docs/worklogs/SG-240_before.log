@@ -1,0 +1,45 @@
+INFO  [alembic.runtime.migration] Context impl SQLiteImpl.
+INFO  [alembic.runtime.migration] Will assume non-transactional DDL.
+INFO  [alembic.runtime.migration] Running upgrade  -> 0201cf10c56c, 001 core foundation
+INFO  [alembic.runtime.migration] Running upgrade 0201cf10c56c -> 20260908_sg013_observation, deterministic signal observations
+INFO  [alembic.runtime.migration] Running upgrade 20260908_sg013_observation -> 20260908_sg014_candidate, deduplication candidates
+INFO  [alembic.runtime.migration] Running upgrade 20260908_sg014_candidate -> 20260908_sg017_fts, SQLite FTS5 index for asset catalog search.
+INFO  [alembic.runtime.migration] Running upgrade 20260908_sg017_fts -> 20260912_sg025_provider_call, provider call ledger (SG-025, blueprint §3.3)
+INFO  [alembic.runtime.migration] Running upgrade 20260912_sg025_provider_call -> 20260914_sg035_foundations, data foundations: source attribution, planning suggestions, guardrail log (SG-035, Phase 3 S2/S3)
+INFO  [alembic.runtime.migration] Running upgrade 20260914_sg035_foundations -> 20260916_sg048_name_optional, name-optional capture: asset.display_name becomes nullable (SG-048, S2)
+INFO  [alembic.runtime.migration] Running upgrade 20260916_sg048_name_optional -> 20260917_sg068_saved_search, saved searches: named per-household filter sets (SG-068, Phase 4)
+INFO  [alembic.runtime.migration] Running upgrade 20260917_sg068_saved_search -> 20260923_sg100_enrich_snapshot, enrichment snapshot store (SG-100, Arc A)
+INFO  [alembic.runtime.migration] Running upgrade 20260923_sg100_enrich_snapshot -> 20260924_sg113_location, location tree + asset location assignment (SG-113, G3)
+INFO  [alembic.runtime.migration] Running upgrade 20260924_sg113_location -> 20260924_sg114_relation, asset relations: typed links (SG-114, G4)
+INFO  [alembic.runtime.migration] Running upgrade 20260924_sg114_relation -> 20261023_sg233_reminder, expiry reminders: durable per-asset daily rows (SG-233, G1)
+INFO:     Started server process [1]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://127.0.0.1:8000 (Press CTRL+C to quit)
+INFO:     127.0.0.1:36316 - "GET /v1/health HTTP/1.1" 503 Service Unavailable
+INFO:     127.0.0.1:36342 - "GET /v1/health HTTP/1.1" 503 Service Unavailable
+INFO:     127.0.0.1:42012 - "GET /v1/health HTTP/1.1" 503 Service Unavailable
+INFO:     127.0.0.1:42020 - "GET /v1/health HTTP/1.1" 503 Service Unavailable
+INFO:     127.0.0.1:42026 - "GET /v1/health HTTP/1.1" 503 Service Unavailable
+INFO:     127.0.0.1:42034 - "GET /v1/health HTTP/1.1" 503 Service Unavailable
+INFO:     127.0.0.1:42050 - "GET /v1/health HTTP/1.1" 503 Service Unavailable
+INFO:     127.0.0.1:42066 - "GET /v1/health HTTP/1.1" 503 Service Unavailable
+INFO:     127.0.0.1:42078 - "GET /v1/health HTTP/1.1" 503 Service Unavailable
+INFO:     127.0.0.1:42086 - "GET /v1/health HTTP/1.1" 503 Service Unavailable
+INFO:     127.0.0.1:42100 - "GET /v1/health HTTP/1.1" 503 Service Unavailable
+INFO:     127.0.0.1:60048 - "GET /v1/health HTTP/1.1" 503 Service Unavailable
+INFO:     127.0.0.1:60056 - "GET /v1/health HTTP/1.1" 503 Service Unavailable
+INFO:     127.0.0.1:60060 - "GET /v1/health HTTP/1.1" 503 Service Unavailable
+INFO:     127.0.0.1:60074 - "GET /v1/health HTTP/1.1" 503 Service Unavailable
+INFO:     127.0.0.1:60076 - "GET /v1/health HTTP/1.1" 503 Service Unavailable
+INFO:     127.0.0.1:60090 - "GET /v1/health HTTP/1.1" 503 Service Unavailable
+INFO:     127.0.0.1:60096 - "GET /v1/health HTTP/1.1" 503 Service Unavailable
+INFO:     127.0.0.1:60112 - "GET /v1/health HTTP/1.1" 503 Service Unavailable
+INFO:     127.0.0.1:60130 - "GET /v1/health HTTP/1.1" 503 Service Unavailable
+INFO:     127.0.0.1:53612 - "GET /v1/health HTTP/1.1" 503 Service Unavailable
+INFO:     127.0.0.1:53628 - "GET /v1/health HTTP/1.1" 503 Service Unavailable
+INFO:     127.0.0.1:53636 - "GET /v1/health HTTP/1.1" 503 Service Unavailable
+INFO:     127.0.0.1:53660 - "GET /v1/health HTTP/1.1" 503 Service Unavailable
+INFO:     127.0.0.1:53670 - "GET /v1/health HTTP/1.1" 503 Service Unavailable
+INFO:     127.0.0.1:53672 - "GET /v1/health HTTP/1.1" 503 Service Unavailable
+INFO:     127.0.0.1:53678 - "GET /v1/health HTTP/1.1" 503 Service Unavailable
