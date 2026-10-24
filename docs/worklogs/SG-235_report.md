@@ -44,7 +44,7 @@ Design: `run_daily_pass(session_factory, *, as_of_day=None)` enumerates every `h
 
 Retries: 0 test retries; one expected pre-commit red on my own scope gate (empty diff before the product commit), fixed by committing before the authoritative run. Provider calls: 0. Production rows created: 0 by construction. External effects: none; no deploy, restart, image build, nginx, cron or host timer.
 
-Elapsed, as of this report writing: 560 s of 1800 s overall (process start 2026-10-24T11:06:01Z). Legs: base backend new nodes 2.72 s of 120 s; candidate backend new nodes 4.19 s of 120 s; discrimination 1.48 s of 120 s; base frontend nodes 5.60 s of 300 s; candidate frontend nodes 2.21 s of 300 s; full backend suite 58.00 s of 600 s (run once); base old reds 1.60 s of 120 s; ruff 0.07 s, mypy 0.34 s, eslint touched 1.05 s (under 120 s each); frontend build 2.69 s of 600 s. No command was killed; no bound was approached; no wall-clock wait was used for cadence or gap tests.
+Elapsed, as of the final report write: 700 s of 1800 s overall (process start 2026-10-24T11:06:01Z). Legs: base backend new nodes 2.72 s of 120 s; candidate backend new nodes 4.19 s of 120 s; discrimination 1.48 s of 120 s; base frontend nodes 5.60 s of 300 s; candidate frontend nodes 2.21 s of 300 s; full backend suite 58.00 s of 600 s (run once); base old reds 1.60 s of 120 s; ruff 0.07 s, mypy 0.34 s, eslint touched 1.05 s (under 120 s each); frontend build 2.69 s of 600 s; receipt note 120 s bound, push 300 s bound, both completed in well under their bounds. No command was killed; no bound was approached; no wall-clock wait was used for cadence or gap tests.
 
 (c) Verification
 
@@ -68,7 +68,40 @@ FAIL-then-PASS (`PG-EV-09`) — new backend nodes fail on base d049238 (9 failed
 
 No vacuity (`PB-3`) — the due fixture would fail on an empty reminder set (exact 1-row and engine-shape assertions); the loop tests assert clock calls and recorded delays, so a loop that never ran fails; the scope gate requires the seven product paths, so an empty diff fails; no criterion rests on an exit code alone.
 
-Receipt — the notes-ref note `Dispatch-ID: SG-235 | Report: docs/worklogs/SG-235_report.md | Work-HEAD: fdfc44e2eeb253f4cffa0dcf16e67e17cc019aa1` is added on WORK_HEAD after this report's first evidence commit, pushed, fetched into a mapped local ref, listed and shown. The executed transcript is appended below.
+Receipt — the note was added on WORK_HEAD fdfc44e after the evidence commit, pushed, and read back from the explicitly fetched mapped ref. Executed output (full raw transcript, including the complete note list, is in SG-235_verify.log section 10):
+
+```
+$ git notes --ref=refs/notes/storagegenie-coder-reports show fdfc44e2eeb253f4cffa0dcf16e67e17cc019aa1
+error: no note found for object fdfc44e2eeb253f4cffa0dcf16e67e17cc019aa1.
+EXIT=1
+
+$ git notes --ref=refs/notes/storagegenie-coder-reports add -m "Dispatch-ID: SG-235 | Report: docs/worklogs/SG-235_report.md | Work-HEAD: fdfc44e2eeb253f4cffa0dcf16e67e17cc019aa1" fdfc44e2eeb253f4cffa0dcf16e67e17cc019aa1
+EXIT=0
+
+$ git notes --ref=refs/notes/storagegenie-coder-reports show fdfc44e2eeb253f4cffa0dcf16e67e17cc019aa1
+Dispatch-ID: SG-235 | Report: docs/worklogs/SG-235_report.md | Work-HEAD: fdfc44e2eeb253f4cffa0dcf16e67e17cc019aa1
+EXIT=0
+
+$ git push origin refs/notes/storagegenie-coder-reports
+To github.com:Andovol/StorageGenie.git
+   d11de68..5b103ed  refs/notes/storagegenie-coder-reports -> refs/notes/storagegenie-coder-reports
+EXIT=0
+
+$ git fetch origin "+refs/notes/storagegenie-coder-reports:refs/notes/storagegenie-coder-reports-sg235-fetched"
+From github.com:Andovol/StorageGenie
+ * [new ref]         refs/notes/storagegenie-coder-reports -> refs/notes/storagegenie-coder-reports-sg235-fetched
+EXIT=0
+
+$ git notes --ref=refs/notes/storagegenie-coder-reports-sg235-fetched show fdfc44e2eeb253f4cffa0dcf16e67e17cc019aa1
+Dispatch-ID: SG-235 | Report: docs/worklogs/SG-235_report.md | Work-HEAD: fdfc44e2eeb253f4cffa0dcf16e67e17cc019aa1
+EXIT=0
+
+$ git notes --ref=refs/notes/storagegenie-coder-reports-sg235-fetched list | cut -d" " -f1 | while read -r note; do git cat-file -p "$note"; done | grep -c "Dispatch-ID: SG-235"
+1
+EXIT=0
+```
+
+note=yes
 
 UNCLEAR
 FIRST READ: the packet's premise (d) hit count versus the literal grep (I2), and the order of the three UNCLEAR lines versus the mandatory last `Verification:` line (I8). I kept the literal grep result and put Verification last.

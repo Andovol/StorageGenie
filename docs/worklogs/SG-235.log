@@ -70,3 +70,7 @@ Verification (all raw output in docs/worklogs/SG-235_verify.log):
 - measured one pass: 0.0098 s wall clock, 2 households (1 due), 1 row; ~0.0049 s/household.
 - shutdown bound 5.0 s, measured 0.0000 s with the spy; health latency 0.0027-0.0040 s during a pass.
 - elapsed at this log write: 514 s of 1800 s overall.
+- receipt: note added on WORK_HEAD fdfc44e, pushed, fetched into the mapped ref
+  refs/notes/storagegenie-coder-reports-sg235-fetched, listed by content and shown; the fetched show
+  output reads `Dispatch-ID: SG-235 | Report: docs/worklogs/SG-235_report.md | Work-HEAD: fdfc44e...`;
+  content grep count=1; note=yes. Full raw transcript: SG-235_verify.log section 10.
