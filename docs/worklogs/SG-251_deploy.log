@@ -1,0 +1,26 @@
+=== SG-251 one recreate (lane socket; NO migration; issuance 1 of 1) ===
+2026-10-24T19:25:03Z
+epoch_start=1792869903
+--- before ---
+pre_Id=6c648f1cdce63b17e042a20e35e8cede291b637973d98c94d46f2ca7ab1e0dee
+pre_ImageID=sha256:97ced17c3120f12eb16ca830bb3a83d3ff78fa980151043f8ec44a172434b2f0
+pre_RestartCount=0
+pre_Status=running
+pre_Health=healthy
+new_image_id=sha256:e8c7373577f9770bf486ae478e1a867b7ba41165aefa81d5f81d2b1d543d4ec3
+ Container storagegenie-backend-1 Recreate 
+ Container storagegenie-backend-1 Recreated 
+ Container storagegenie-backend-1 Starting 
+ Container storagegenie-backend-1 Started 
+recreate_rc=0
+recreate_start_utc=2026-10-24T19:25:04Z recreate_end_utc=2026-10-24T19:25:05Z recreate_wall_s=1
+--- after (immediate) ---
+post_Id=a831fbd0f8d2895d810efc4794f42166d194fa4e31c23403f02a8ff0cc19c2c1
+post_Created=2026-10-24T19:25:04.308330921Z
+post_StartedAt=2026-10-24T19:25:05.063123154Z
+post_ImageID=sha256:e8c7373577f9770bf486ae478e1a867b7ba41165aefa81d5f81d2b1d543d4ec3
+post_Cmd=["uvicorn","app.server:app","--host","0.0.0.0","--port","8000"]
+post_RestartCount=0
+post_Status=running
+post_Health=starting
+2026-10-24T19:25:05Z

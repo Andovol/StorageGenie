@@ -1,0 +1,74 @@
+=== SG-251 G2 — the served bytes are SG-250's, and nothing else ===
+2026-10-24T19:27:33Z
+--- runtime diff, pre-serve image -> worktree, over backend/app (served Python tree) ---
+measured_changed_files=13
+api/v1/enrich.py
+api/v1/settings.py
+config.py
+services/analytics/service.py
+services/chat/service.py
+services/enrich/snapshots.py
+services/enrich/synthesize.py
+services/planning/service.py
+services/providers/fake.py
+services/providers/opencode_go.py
+services/providers/protocols.py
+services/providers/reader.py
+services/providers/router.py
+--- SG-250 product files (git show d0a87c6 --name-only) ---
+sg250_app_product_files=13
+api/v1/enrich.py
+api/v1/settings.py
+config.py
+services/analytics/service.py
+services/chat/service.py
+services/enrich/snapshots.py
+services/enrich/synthesize.py
+services/planning/service.py
+services/providers/fake.py
+services/providers/opencode_go.py
+services/providers/protocols.py
+services/providers/reader.py
+services/providers/router.py
+--- set comparison: measured vs SG-250 app product files ---
+set_diff_rc=0
+extra_files_in_measured=0
+missing_files_from_measured=0
+SG-250 also changed backend/eval/run.py (not runtime, outside the served tree): 1
+
+--- frontend bundle: pre vs post, hashes and sizes (from SG-251_prestate.log and SG-251_verify.log) ---
+pre:
+index_http=200 bytes=944
+cec37cf5eecd12a9d23da6ccaa1bb40da306fd38ce7454c1daa59909b3825caf  /tmp/sg251-pre.U7QAVW/index.html
+bytes=944
+/assets/index-C07VbG0m.css http=200 bytes=4535
+c3b58cda696a22970fc2a4a348849fc1359f2105f80f81304ed5dfd5ca31a557  /tmp/sg251-pre.U7QAVW/index-C07VbG0m.css
+/assets/index-CWp6nYu6.js http=200 bytes=326217
+fe7dff6e58dd934ec14f693d40166aee5117453c13cb8caee45f371d4a944b99  /tmp/sg251-pre.U7QAVW/index-CWp6nYu6.js
+post:
+index_http=200 bytes=944
+cec37cf5eecd12a9d23da6ccaa1bb40da306fd38ce7454c1daa59909b3825caf  /tmp/sg251-post.Zae63i/index.html
+bytes=944
+/assets/index-C07VbG0m.css http=200 bytes=4535
+c3b58cda696a22970fc2a4a348849fc1359f2105f80f81304ed5dfd5ca31a557  /tmp/sg251-post.Zae63i/index-C07VbG0m.css
+/assets/index-CWp6nYu6.js http=200 bytes=326217
+fe7dff6e58dd934ec14f693d40166aee5117453c13cb8caee45f371d4a944b99  /tmp/sg251-post.Zae63i/index-CWp6nYu6.js
+byte comparison (cmp rc, 0 = identical):
+pre_dir=/tmp/sg251-pre.U7QAVW
+index.html pre_vs_post_cmp_rc=0
+index-C07VbG0m.css pre_vs_post_cmp_rc=0
+index-CWp6nYu6.js pre_vs_post_cmp_rc=0
+
+--- served tree equals worktree after build ---
+image_app_py_files=100 host_app_py_files=100
+python_diff_rc=0
+
+--- census: pre vs post (diff; empty = identical) ---
+pre_census_lines=32 post_census_lines=32
+census_diff_rc=0
+provider_call pre=provider_call=39 post=provider_call=39
+
+--- final health ---
+{"status":"ok","db":"ok","storage":"ok"}http=200 time=0.003236
+
+2026-10-24T19:27:33Z

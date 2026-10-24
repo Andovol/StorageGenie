@@ -1,0 +1,314 @@
+=== SG-251 G0 pre-state (read-only) ===
+2026-10-24T19:24:03Z
+--- docker ps -a ---
+6c648f1cdce6 storagegenie-backend-1 storagegenie-backend Up 3 hours (healthy) 127.0.0.1:8003->8000/tcp
+1aabf2905704 storagegenie-frontend-1 storagegenie-frontend Exited (0) 6 weeks ago 
+--- container identity (inspect) ---
+.Id=6c648f1cdce63b17e042a20e35e8cede291b637973d98c94d46f2ca7ab1e0dee
+.Image=sha256:97ced17c3120f12eb16ca830bb3a83d3ff78fa980151043f8ec44a172434b2f0
+.Config.Cmd=[uvicorn app.server:app --host 0.0.0.0 --port 8000]
+.RestartCount=0
+.State.Status=running
+.State.Health.Status=healthy
+.Created=2026-10-24T16:17:03.117534625Z
+.State.StartedAt=2026-10-24T16:17:04.212198218Z
+.RestartPolicy.Name=
+template parsing error: template: :1:16: executing "" at <.RestartPolicy.Name>: map has no entry for key "RestartPolicy"
+--- health start ---
+http=200 time=0.003929
+{"status":"ok","db":"ok","storage":"ok"}
+--- served index + bundle (HTTP) ---
+index_http=200 bytes=944
+cec37cf5eecd12a9d23da6ccaa1bb40da306fd38ce7454c1daa59909b3825caf  /tmp/sg251-pre.U7QAVW/index.html
+bytes=944
+/assets/index-C07VbG0m.css http=200 bytes=4535
+c3b58cda696a22970fc2a4a348849fc1359f2105f80f81304ed5dfd5ca31a557  /tmp/sg251-pre.U7QAVW/index-C07VbG0m.css
+/assets/index-CWp6nYu6.js http=200 bytes=326217
+fe7dff6e58dd934ec14f693d40166aee5117453c13cb8caee45f371d4a944b99  /tmp/sg251-pre.U7QAVW/index-CWp6nYu6.js
+--- pre-serve image Python tree vs worktree backend/ ---
+pre_image=sha256:97ced17c3120f12eb16ca830bb3a83d3ff78fa980151043f8ec44a172434b2f0
+image_py_files=2182 host_py_files=2181
+python_diff_rc=1
+--- /tmp/sg251-pre.U7QAVW/image-py.txt	2026-10-24 19:24:06.627237541 +0000
++++ /tmp/sg251-pre.U7QAVW/host-py.txt	2026-10-24 19:24:06.720237516 +0000
+@@ -19,7 +19,7 @@
+ 1955e1c91da517e0696fb81c3d4784ddb67faaa8a77fce463c67b1ea3af092a4  ./app/api/v1/assets.py
+ 6222946e3ad5f267438bc147279d2fe608556609abb094ad335295aad86a4fce  ./app/api/v1/candidates.py
+ 91e04d62117d41b03c16c83cd51086443e0b1d0a3063853e2c6117717a25a32b  ./app/api/v1/chat.py
+-d835ff9c15eb3331eb189b23517ced08439875419f2625bc077aff0381fa7ff5  ./app/api/v1/enrich.py
++e3d8b3f2380c32646933921df41d564fca7787dd384730aab9f1754cb51c5a1f  ./app/api/v1/enrich.py
+ c2f02c14b5219fb5e1c9229c1dcab3884b906ed94657406c106dcc3ff6c4ec7e  ./app/api/v1/evidence.py
+ 346dc612341c102736ce828c42b4d7a298fb1a82456f29f66c6268b65256fd35  ./app/api/v1/exports.py
+ 57b7c79bf7b0c31600575710c316b543f82f2cb2ebd6edaba10e3f8dac3ccd53  ./app/api/v1/health.py
+@@ -31,9 +31,9 @@
+ 4ef350eaf372a1cf35f9ce936a400702b97ef0a5c74bc1ffe36d12c74f365c0e  ./app/api/v1/relations.py
+ 98fcbd88d4acbd0720bba40f8fd0306b3f46fb5f790a83d6197bcc616bc8487e  ./app/api/v1/reminders.py
+ e394dc63b08a5dfa3ab23165e63aff99a29a7558081c2d06010c79e09c27d23f  ./app/api/v1/review_tasks.py
+-3476f84361d8c39b706c8076207222c887eb6621549536bc2a1f925bd6f80f9e  ./app/api/v1/settings.py
++94bea574bd2dd68f687d7741b95f128cce2e4ebe32d73b29583e6a85a0aceca7  ./app/api/v1/settings.py
+ 759b548ef868a77b0e85a37250454e9f1e6e04f6a4de9d673d4f24debc9f8d5b  ./app/api/v1/users.py
+-24a1e2c052f79d4b3d50f2061dda5de6be1de8d688cd7d85866bd940689cd8ab  ./app/config.py
++8dd0c83a6ff72bea42fb88c12be7cc327039ab83151ba20c223e17698f8585a1  ./app/config.py
+ e79f67fdb7692d5a5fa1c5a3f726afdff720042a8ac55753cbe9d6fed73e4141  ./app/db.py
+ 80ddcdccb6c7ab64517475a5fd7a9961b1abf372affae03d487b900eb6b94813  ./app/logging_config.py
+ 49b63485456f9fa5cf272e27ceeff700bc4b3a78aaf958b921498e5cfc4def02  ./app/main.py
+@@ -72,20 +72,20 @@
+ db26aa0c560f8d294c9c81078a007da6d41c6f7080c89dc8de33bcd777e7224f  ./app/server.py
+ e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  ./app/services/__init__.py
+ 0b93beee1f04e97b26007be2622439a0ecb9c9a5e6bcd3d275ea3beeafaf7fa1  ./app/services/analytics/__init__.py
+-95a5aef8a0a6e725a906cf43864eb3d62efd1709c048eb9ff3104af3159e85a7  ./app/services/analytics/service.py
++fc6be8a337e319efa63e470c56b28a0d15788b8cf4e5f9211ab04294a144fe9e  ./app/services/analytics/service.py
+ 75f60f1f1fd630b51ed2225d19ac6cd91b5d4cb7b8ba8c1d58474844b49f9f02  ./app/services/assertion_service.py
+ 9a1bebb15094569dd88fbdc74c3f823015dc58302e36ae5f9b673feee7bcba3b  ./app/services/asset_service.py
+ 96776e153b12eeac7a6c6e52e36424a78cd3bf6af3c092152eab1ebb8c10cea9  ./app/services/audit_service.py
+ 75078fd8d3b927584888f41dff6c872132eeb618ad28692f7888a5c6a3aef3ea  ./app/services/candidates.py
+ 83f6dc033447959e3fef79cf04fb1d066b81e1e429dc83b1fe22fde46cc4a7f4  ./app/services/chat/__init__.py
+-90d662265a6db1886c357f2c47d93f736439bf70816ba503c1d7398800962806  ./app/services/chat/service.py
++3516d945816feb2375d8c78269545b0a744037ac17739367e5fd3c6551bcd0c3  ./app/services/chat/service.py
+ f6b985b3ebeef8a0d3b7e87b0a70f047ead6e733a8d097043bdca159607251cd  ./app/services/dedup.py
+ f3d13cee92160f0802bec9615dbdd24b200effd5dfd6c586a425bf0bfc82103c  ./app/services/enrich/__init__.py
+ f8cb44e8e926e5d83111511ae17a4c8ae7ccc5c2834046059b4e53218561f2a5  ./app/services/enrich/client.py
+ 49ee26a60b2bca339a3ad58a4e262c1e7cdf87a37e1f51826d3ce818f8721215  ./app/services/enrich/jina.py
+ 8720aaa8f9ecce4d7065ac8241ee39ca9d7d54a5d8fb08828f32fd2e42a2e94e  ./app/services/enrich/scoring.py
+-8a13f50a762cee8388b67540c82c28901aa1d81e01910a90cf897414bc45c653  ./app/services/enrich/snapshots.py
+-294f71a933bbe274344489a45cda5305e30b356af0d64b7cf39bcb326a117461  ./app/services/enrich/synthesize.py
++8be4db240d66db3861aa1b0248ee159ad9e5508a3e17696d4382a360cd830aa8  ./app/services/enrich/snapshots.py
++7cfd13e50bb94ed80c8acd900a4cd4355f0b188b1824d4de8e4dbf6a8ad97a25  ./app/services/enrich/synthesize.py
+ a08b77683f965b7e85174b532689816c4bcbcc31dfe46c3f03b250a7b2efe617  ./app/services/evidence_service.py
+ 00da03c6aa7b64f7cd80bf33ea4480b0f9a40bcffc3670337286a8dd10c135b1  ./app/services/expiry_engine.py
+ b7578a3f3fb327c4f2b3c3c1b7e63c9e0aa0d3cd9a4e3d502f2e443a0b6855f6  ./app/services/fts.py
+@@ -95,13 +95,13 @@
+ 082bf49f19e7fa7e778ecafb6f3deb04e83f0a85a04830dd2c423d77e9c674b4  ./app/services/observations.py
+ 5e4760d38e1aa7a0a0e0b13a4100610a7ecca00faf81c3f504d40fb8c5903d37  ./app/services/opened_countdown.py
+ e39a22485661940a6aa92b6d2256e36e5f1571a7c419044ca1579bae6b6f8541  ./app/services/planning/__init__.py
+-34ea76554e267232b8c2099ec99d82c6f5f6a5e52252a02bcd2b4c4688d1bdb3  ./app/services/planning/service.py
+-1a2b68f100e75585d79f9e551ad575e1b756a97750d63ceddf52c1a8b76ffe1a  ./app/services/providers/fake.py
+-00a9bcb6419c9e41b2779a7c10cb46c139ce0ab51ae16e9dd5236f68e8069c5b  ./app/services/providers/opencode_go.py
+-d1f12d5e5508b574da118c30b6ffdcbecc7be320fac8de13df344f7d7d519286  ./app/services/providers/protocols.py
+-5348f3495a3f812cf89608355070be7636e8659d1c3596ea902de01079b90a8d  ./app/services/providers/reader.py
++7f582663d8cded1aff8bdd6467f858053e749c54ba7aee7ab16d784bed742887  ./app/services/planning/service.py
++48e5f7887877fba13d7ddd6d34d9c4b89d4eab92ea66b115979e802a7d90828d  ./app/services/providers/fake.py
++588975b081097a6da9b5ff118897ce2b766a81612b89e7133401e7a27d308b15  ./app/services/providers/opencode_go.py
++d6d5110d0bb1f2c8c74c29995ff85e679e71ab23eea1c613a94a3a6642539c41  ./app/services/providers/protocols.py
++45ee0f53d5bab9da33455b367cdff2c51b10247094d184671be07a6eb3749ab3  ./app/services/providers/reader.py
+ 4151b5f01a26a2c68e9ee9f51398387328cdec859078a0336e68692139a0e2e7  ./app/services/providers/redaction.py
+-1d2d17cff04a00cedccaf80f32d95a62fef0f52242a1ebb56dd39151956e2254  ./app/services/providers/router.py
++8e5fd07408c12010907404705ce22f1615a0cdf2abb4da0e5bf53e328959c481  ./app/services/providers/router.py
+ 94e8d6827d5adc18aa6469e86f4b24053a3a00f06a306db7ff55b71d0291deee  ./app/services/providers/schemas.py
+ e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  ./app/services/reminders/__init__.py
+ 96dc2edc024fc42fc175fb6b76f97c6f1215254f1ee2876e09d0a3e25b8e8d83  ./app/services/reminders/daily.py
+@@ -112,7 +112,7 @@
+ e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  ./app/storage/__init__.py
+ 4a405977ce013af9d3cd9706cc21c4649f2afd51326f4bca653a1cc0432bb012  ./app/storage/local_store.py
+ d11bc2716c7640ac99fab5fdc57d1f066e373caac9adcd5ee131faf6894c1159  ./eval/corpus/sg029/generate.py
+-069d0002c050ed9350e6208a2a5be9f0017834999c0f092f321b5e99b1c48a78  ./eval/run.py
++1d56343189e7558b8ee8d5941a6fa424ee9be7a243d46cdfba7d788b14fb1799  ./eval/run.py
+ 5cda7cc1757d9c80772de58df77ea61047c7c71bafc50404082a8288e607a63c  ./scripts/backfill_asset_lifecycle.py
+ 58efa624e4295aa25a4fc9291361cf38d68d2e2215a5db0368ea04400acfac9d  ./scripts/backfill_legacy_png_thumbs.py
+ ea58412b68c69fe5002ab02e587bdb472d4c274546e1979feb74172dec3aa175  ./scripts/backup_restore_drill.py
+@@ -127,15 +127,15 @@
+ 94740c186185b85d94f481da02c4a34c3a3f7721cda3386185f0cab17dd0e6e0  ./scripts/sg224_classify.py
+ 3393d42239fb0afdc43fb6954aea4dd5967cd9f920332ed154366eb3799065c5  ./scripts/sg225_cutout.py
+ 6eb01656f244388b7a5658ccffcebefeb8072946d0f859e9ecd321c0792dbdae  ./scripts/sg226_bulk_scene.py
+-4ba9ff5b3b8b242192e68259b8fdfe69555c1a9eb46692b569803176acd2a700  ./tests/test_ai_pipeline.py
+-2190795f06d7e9c1a7047605a2bf63ac8d333072e713e7284e2709c32eb3932b  ./tests/test_analytics.py
++c29ec7199597386783dd528a064543e0305c4556c6f80c719ef75ac6c8366e0d  ./tests/test_ai_pipeline.py
++8cad0a3b922809cffbd04bd0fbf08a6b1625884f76ff7686091238dd06fe8a80  ./tests/test_analytics.py
+ c5371159d184ece6479f28cc74cd7fcc0fd54b9bebb68e0c1d26c896ee5cee7a  ./tests/test_assertions.py
+ 3c207ffc315e8f28efe407ee2df163048f9b6ebe9d16d89207514ff8a8d2e974  ./tests/test_asset_facets.py
+ 774fe062315b535014d506c53664455746f32265cf52eb3a1e179c774a2d1613  ./tests/test_assets_crud.py
+ 2cac034c8bf078ab03fc0179be15a766e4b073c81062961464c7aac7f3635bf2  ./tests/test_backup_drill.py
+ fd52571cbd3cda827d23856fd7ffa01a93fa6f49dac81d297559da83c8431d01  ./tests/test_candidate_read.py
+ d73d633dab8a8113171350a486593d0bf6d51a5f2f648ac31d4cd0136455f866  ./tests/test_candidates.py
+-ed0103326c80f5ccfd8cc2ec9de55f6da4aa2294d2ad35238702c1379d71970d  ./tests/test_chat.py
++dfe98bceaac3eb2055881df2e43be5006dbe4a4b3018bb5794f3d44b1543a1f3  ./tests/test_chat.py
+ 13fb7360d4d45907a56282902e5e08afda1e2904a825a83a1c17fbe013cde7eb  ./tests/test_cors.py
+ be31d49616a3811db86353bfb9fee6347a5c5d8c86ff0d1e3df755d467827464  ./tests/test_dedup.py
+ 7e4eed172a57e20f41ff0a3e98594bd3689ebd4ebe5f2dca71e2121494b7efe1  ./tests/test_eval_corpus.py
+@@ -143,38 +143,38 @@
+ c40bb23047b7f4238f6149bfc1083330662a0b2f582e5df7fa267b5a71249c71  ./tests/test_export.py
+ e50d3f8490e60370adfed045766e24822b44b1cfa490d334aa29a2a97398cddf  ./tests/test_extraction_contract.py
+ 7765bb49ffa5a80d9e30a9e08b6abe29bc232c8b2247442fefccf2462e70cdad  ./tests/test_foundations.py
+-794ba7f5021e7c332dd53427c5ec272986c5d6d31b9c045306842dfe0991d566  ./tests/test_google_taxonomy.py
++7f54949a267bcb4d4db914825c12fa9b65a79bb57a385115a6a3486d8139036c  ./tests/test_google_taxonomy.py
+ ff023db38b6e4728e11ce4dd9a69e64b5549c9b9b5b532648993b60c2705a3a5  ./tests/test_health.py
+ 9b1fd8a85d5f8679abf27f02c22733c540cdacafe1931c12dc17d890d3a2d6ce  ./tests/test_import_jobs.py
+-bb0ecc08e8d2d22dc43de10bd0addb221188e8101342d1d813400efa7a8d9707  ./tests/test_opencode_go.py
++20e8da8ee7b71ac7b4408233c55419ed94ef97553bd3e3462f58097fa76a9430  ./tests/test_opencode_go.py
+ 760e4e232542af97288aefc5540de157c7b7457c9499248210aa2a4430db038f  ./tests/test_phase0_e2e.py
+ fe07cadfe98b680233b7db4a08cdb6651c5e0cb3269b0d3f27109ffb14c329ea  ./tests/test_phase1_e2e.py
+-ff1ec7d9721e587c5bc032ef7b89b44f0e256ec0a125cae8995399abdc0a5fca  ./tests/test_phase2_e2e.py
+-1e222377f3ba38fd4b0969f976a48053fd19e266b42ed572ed8a7756b124cd20  ./tests/test_phase3_e2e.py
+-934180212725cc92a2f9b6ea5b41d0ab882d0e1827eb84379fec125a13789140  ./tests/test_planning.py
++2c310a2e702baaa34f3f8762cb0af6d15df04c420c346863c92833a339813262  ./tests/test_phase2_e2e.py
++dd1df9c0757f864e865f70177d97ed8d5ad78eebb29a2780d2132e66c2769d18  ./tests/test_phase3_e2e.py
++8668a4b584f9edc184dbb5a3c4bc63f90056fbda5369faf32a6b034231f648de  ./tests/test_planning.py
+ d729ae775c0001ca5b3a12ee1f5b357039cbd0e0c8b653022ae95d2ed04bf8df  ./tests/test_plugin_expiry.py
+ 0c370dbf85c0cd7bdc9d3fbef3e48083b1aa4ffb85ae21b84f56495199663790  ./tests/test_plugin_taxonomy.py
+ d96e2a51b5e98f2e313f7ac7509442f9bd8c32de47eb18e765bdd232ea52e7c5  ./tests/test_postgres_dialect.py
+-b47da50c37b36408e007925858465648eef2cc0ff33c42dc21ffdc1be3430d2a  ./tests/test_privacy_audit.py
++e989782e50104609759cacc6c2b73754a2a69165155e4f09f23af20a3cd28bb5  ./tests/test_privacy_audit.py
+ 449403a1356f70d19b8d12e6aa9ff7ce3beab8621273a10a317788b2ed9250f1  ./tests/test_production_serving.py
+-53d972a590fc912b57823685acd05a69b9c7848174c0076cfd30aeff80bef875  ./tests/test_provider_conformance.py
+-caade2f4c2c400e7b43f6bbf5eba05a270e49de22a0d66fc759101d58b94c5f1  ./tests/test_provider_gateway.py
++e917f09d3347918bc759a5bdce0a0c6bcfc776eebd60342630e12677267c0f04  ./tests/test_provider_conformance.py
++e9498aa309667dfd8ec26759e6abd10fa4b932399dd8324aecc1374412d52b16  ./tests/test_provider_gateway.py
+ 21ab201a672250f2d0f150082f8061b3164bb9a184916331af8de89688356a7f  ./tests/test_review_split.py
+ e3a8e57a78fa34b09d3e82df46ab90ef235264ed710b06311b7b7a1bf030cf7f  ./tests/test_runbook_commands.py
+ 3e5064f1682a56ee788d1280d8ea7cae667f1e81c1e8022903cee324a406feb1  ./tests/test_saved_searches.py
+ dc1fe39628a1d8d1665ef364a76e33ee7004badb5c1ff9eced724b5c1601aed9  ./tests/test_schemas_common.py
+ e33f3ac6273c236358c79eab0509b8709cbc2ff68d1a0a2d4ed4b4df5a06a69d  ./tests/test_search.py
+-a68cc083db9387280168e49d37b3071c4cc2c1677c199b3666fc92934bebbac9  ./tests/test_settings.py
++df5e297ca05a00655f5de7625e490868fdbcc080a08e0253c87d1e928dc34c38  ./tests/test_settings.py
+ 1eb77a27d48d2c57fe879f6a92cc83e64c492117a892ecc0cdde19dc1bce4642  ./tests/test_sg048_name_optional.py
+ 55d842babd9a5859fa30280f8d560fbe435d2b26b3d254f995a8b2dd17448fef  ./tests/test_sg049_v2_extraction.py
+ 6d77508e62714cd51c38bc6f6f0296bf5179c04e5d7f09debe0490e90dc02391  ./tests/test_sg079_v3_schema.py
+-c3bce2285a47db129d00088bb15b317ecf504726f4fd57ec670eaea4b708c252  ./tests/test_sg080_ingest_pipeline.py
++115c642fbdd57b0de99c08a98cd684e004740d4012b00a75517bb39080f8d35d  ./tests/test_sg080_ingest_pipeline.py
+ 378dcfc3243451049ecf15ecaddf76d4432d8217357a8c1375c60cab490ab2dd  ./tests/test_sg081_enrich_fetch.py
+ 70c9e9b950ec97310f516a901bb8c4c0dc7bbcd35a9f22069fad395748170c09  ./tests/test_sg082_enrich_jina.py
+ 9e52801089a7a5ece54f8190b279eca1d5d67d9c889fbea97ee01d2392d6fde3  ./tests/test_sg098_enrich_endpoint.py
+-0dd1dd17c7f10d2c1838b40a4b62580971b92fc7d32d47c3134bc613a1894d4f  ./tests/test_sg099_synthesis.py
++87378ec80972eebc30a3de510e8d109fab002a18fce3f8739fdd7f5a352c29c6  ./tests/test_sg099_synthesis.py
+ c546013f9653c62e69319270b5f224b2cbd892f8de297cb30e90ca0dd3f5fde0  ./tests/test_sg100_snapshot_persistence.py
+-b8df3b81b3654c375135b33cd578acbee49ba549fffbfef8d32b695a2953fb2f  ./tests/test_sg101_text_path.py
++30d9e1daeaa48cf78cc662fa23f1533e1aabe1a1b73c928a65ddbfc987d6ad6f  ./tests/test_sg101_text_path.py
+ e762f485aa27422a4f7263a657867e40d860e13957e1232e9ae78b95389353e4  ./tests/test_sg102_enrich_wiring.py
+ 53a910b457856850d7a8c27c9715c65fb00d3a1cefc86a9324ec33d3d0d18ec6  ./tests/test_sg103_web_alternates.py
+ bd2e78d76724f17aedbea6cf819c692a03c1aa01c07c56a01f4b8a2e95d7c932  ./tests/test_sg107_expiry_engine.py
+@@ -184,12 +184,11 @@
+ 8468875dfb9bbb09f9792c5fce2b34931b99d9fd5286a75eb1ccd806061621c7  ./tests/test_sg114_relations.py
+ 302c58c2106b5a459afd86c772f6279ba069f94dc1bc44430d5e0307414a5c10  ./tests/test_sg119_brand_alternates.py
+ b4cadee3e8c8e5500de1e5377de063ed83587ec34d7193375699ef928e49b9f2  ./tests/test_sg124_jina_price.py
+-6205af2aba5c17412457aa2e2c4d9da5429e6c121d75e2341117d57acfdc2168  ./tests/test_sg125_ledger_retention.py
++765bb61d3a18bb173719430813fd4a466c3f7aa480f205d1c049994be9cc81cc  ./tests/test_sg125_ledger_retention.py
+ b814c2af6f2a5f18616ddf2f24a271156161a46672d4e117ffda859483fa5456  ./tests/test_sg127_followup_batch.py
+ b4ce0621afea1b9ce63a3a29c11957c5738ef636f85a1c3fa5f5c92f6f3ad49e  ./tests/test_sg130_png_thumb_backfill.py
+-838dcbb60bdc4869cc76b23b0121d5b04df601018280eeec67c88ce2fa8b109b  ./tests/test_sg132_jina_ledger_wiring.py
++d81abf76853c7cca78b49862d115e83cd8e9a06eb1d2397f6465b407786df630  ./tests/test_sg132_jina_ledger_wiring.py
+ 29924f1e8a284938c8468d971bafe17633d0130ffd44c561482ef01f39528cab  ./tests/test_sg136_assertion_batch.py
+-2a9736b1bd31078df443358a9ad91a8300657e848d5d2eaffba9f2b1bfff0d06  ./tests/test_sg142_cap_join.py
+ fc0f58a6a7c898e3bff6e204b0baedfab63e34e9f858a3ae89912138715b7abc  ./tests/test_sg148_offline_sql.py
+ 4c481e79e47a8826ca0afa27b8e96ca199b54f7f699b04b73dd3d00cc01e2275  ./tests/test_sg155_scene_t0.py
+ 69da543572a861dfc5e967c5a70d038d1c4ff11edc003e712ff4c342c8f7b768  ./tests/test_sg158_scene_render.py
+--- image Dockerfile hash vs worktree ---
+d9c60bbaadbb9717ed64ffd7b0cd7445c37995e0f961e2c0553b774fa760503e  /tmp/sg251-pre.U7QAVW/app/Dockerfile
+d9c60bbaadbb9717ed64ffd7b0cd7445c37995e0f961e2c0553b774fa760503e  backend/Dockerfile
+--- alembic head + census (read-only, container's own sqlite helper) ---
+--- production sqlite main-file ---
+acf11596e2105c0ab38355fce10a10c5296ea1ac61b22c96af5c2748e24ccd64  data/db/storagegenie.db
+db_bytes=765952 mtime=2026-10-24 16:17:03.668148310 +0000
+2026-10-24T19:24:06Z
+
+=== SG-251 G0 correction (same pre-state; two defects in the first block) ===
+2026-10-24T19:24:26Z
+C1: the first Python-tree diff walked all of backend/ (2181 files) instead of the SERVED tree backend/app (the SG-240/SG-241 precedent counted 100). Diff below is backend/app only.
+C2: the first census exec omitted 'docker exec -i', so its stdin here-doc never reached python and it printed nothing. Re-run below with -i.
+--- served Python tree: image /app/app vs worktree backend/app ---
+image_app_py_files=100 host_app_py_files=100
+python_diff_rc=1
+--- /tmp/sg251-pre2.iMgt35/image-py.txt	2026-10-24 19:24:26.907232195 +0000
++++ /tmp/sg251-pre2.iMgt35/host-py.txt	2026-10-24 19:24:26.918232192 +0000
+@@ -6,7 +6,7 @@
+ 1955e1c91da517e0696fb81c3d4784ddb67faaa8a77fce463c67b1ea3af092a4  ./api/v1/assets.py
+ 6222946e3ad5f267438bc147279d2fe608556609abb094ad335295aad86a4fce  ./api/v1/candidates.py
+ 91e04d62117d41b03c16c83cd51086443e0b1d0a3063853e2c6117717a25a32b  ./api/v1/chat.py
+-d835ff9c15eb3331eb189b23517ced08439875419f2625bc077aff0381fa7ff5  ./api/v1/enrich.py
++e3d8b3f2380c32646933921df41d564fca7787dd384730aab9f1754cb51c5a1f  ./api/v1/enrich.py
+ c2f02c14b5219fb5e1c9229c1dcab3884b906ed94657406c106dcc3ff6c4ec7e  ./api/v1/evidence.py
+ 346dc612341c102736ce828c42b4d7a298fb1a82456f29f66c6268b65256fd35  ./api/v1/exports.py
+ 57b7c79bf7b0c31600575710c316b543f82f2cb2ebd6edaba10e3f8dac3ccd53  ./api/v1/health.py
+@@ -18,9 +18,9 @@
+ 4ef350eaf372a1cf35f9ce936a400702b97ef0a5c74bc1ffe36d12c74f365c0e  ./api/v1/relations.py
+ 98fcbd88d4acbd0720bba40f8fd0306b3f46fb5f790a83d6197bcc616bc8487e  ./api/v1/reminders.py
+ e394dc63b08a5dfa3ab23165e63aff99a29a7558081c2d06010c79e09c27d23f  ./api/v1/review_tasks.py
+-3476f84361d8c39b706c8076207222c887eb6621549536bc2a1f925bd6f80f9e  ./api/v1/settings.py
++94bea574bd2dd68f687d7741b95f128cce2e4ebe32d73b29583e6a85a0aceca7  ./api/v1/settings.py
+ 759b548ef868a77b0e85a37250454e9f1e6e04f6a4de9d673d4f24debc9f8d5b  ./api/v1/users.py
+-24a1e2c052f79d4b3d50f2061dda5de6be1de8d688cd7d85866bd940689cd8ab  ./config.py
++8dd0c83a6ff72bea42fb88c12be7cc327039ab83151ba20c223e17698f8585a1  ./config.py
+ e79f67fdb7692d5a5fa1c5a3f726afdff720042a8ac55753cbe9d6fed73e4141  ./db.py
+ 80ddcdccb6c7ab64517475a5fd7a9961b1abf372affae03d487b900eb6b94813  ./logging_config.py
+ 49b63485456f9fa5cf272e27ceeff700bc4b3a78aaf958b921498e5cfc4def02  ./main.py
+@@ -59,20 +59,20 @@
+ db26aa0c560f8d294c9c81078a007da6d41c6f7080c89dc8de33bcd777e7224f  ./server.py
+ e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  ./services/__init__.py
+ 0b93beee1f04e97b26007be2622439a0ecb9c9a5e6bcd3d275ea3beeafaf7fa1  ./services/analytics/__init__.py
+-95a5aef8a0a6e725a906cf43864eb3d62efd1709c048eb9ff3104af3159e85a7  ./services/analytics/service.py
++fc6be8a337e319efa63e470c56b28a0d15788b8cf4e5f9211ab04294a144fe9e  ./services/analytics/service.py
+ 75f60f1f1fd630b51ed2225d19ac6cd91b5d4cb7b8ba8c1d58474844b49f9f02  ./services/assertion_service.py
+ 9a1bebb15094569dd88fbdc74c3f823015dc58302e36ae5f9b673feee7bcba3b  ./services/asset_service.py
+ 96776e153b12eeac7a6c6e52e36424a78cd3bf6af3c092152eab1ebb8c10cea9  ./services/audit_service.py
+ 75078fd8d3b927584888f41dff6c872132eeb618ad28692f7888a5c6a3aef3ea  ./services/candidates.py
+ 83f6dc033447959e3fef79cf04fb1d066b81e1e429dc83b1fe22fde46cc4a7f4  ./services/chat/__init__.py
+-90d662265a6db1886c357f2c47d93f736439bf70816ba503c1d7398800962806  ./services/chat/service.py
++3516d945816feb2375d8c78269545b0a744037ac17739367e5fd3c6551bcd0c3  ./services/chat/service.py
+ f6b985b3ebeef8a0d3b7e87b0a70f047ead6e733a8d097043bdca159607251cd  ./services/dedup.py
+ f3d13cee92160f0802bec9615dbdd24b200effd5dfd6c586a425bf0bfc82103c  ./services/enrich/__init__.py
+ f8cb44e8e926e5d83111511ae17a4c8ae7ccc5c2834046059b4e53218561f2a5  ./services/enrich/client.py
+ 49ee26a60b2bca339a3ad58a4e262c1e7cdf87a37e1f51826d3ce818f8721215  ./services/enrich/jina.py
+ 8720aaa8f9ecce4d7065ac8241ee39ca9d7d54a5d8fb08828f32fd2e42a2e94e  ./services/enrich/scoring.py
+-8a13f50a762cee8388b67540c82c28901aa1d81e01910a90cf897414bc45c653  ./services/enrich/snapshots.py
+-294f71a933bbe274344489a45cda5305e30b356af0d64b7cf39bcb326a117461  ./services/enrich/synthesize.py
++8be4db240d66db3861aa1b0248ee159ad9e5508a3e17696d4382a360cd830aa8  ./services/enrich/snapshots.py
++7cfd13e50bb94ed80c8acd900a4cd4355f0b188b1824d4de8e4dbf6a8ad97a25  ./services/enrich/synthesize.py
+ a08b77683f965b7e85174b532689816c4bcbcc31dfe46c3f03b250a7b2efe617  ./services/evidence_service.py
+ 00da03c6aa7b64f7cd80bf33ea4480b0f9a40bcffc3670337286a8dd10c135b1  ./services/expiry_engine.py
+ b7578a3f3fb327c4f2b3c3c1b7e63c9e0aa0d3cd9a4e3d502f2e443a0b6855f6  ./services/fts.py
+@@ -82,13 +82,13 @@
+ 082bf49f19e7fa7e778ecafb6f3deb04e83f0a85a04830dd2c423d77e9c674b4  ./services/observations.py
+ 5e4760d38e1aa7a0a0e0b13a4100610a7ecca00faf81c3f504d40fb8c5903d37  ./services/opened_countdown.py
+ e39a22485661940a6aa92b6d2256e36e5f1571a7c419044ca1579bae6b6f8541  ./services/planning/__init__.py
+-34ea76554e267232b8c2099ec99d82c6f5f6a5e52252a02bcd2b4c4688d1bdb3  ./services/planning/service.py
+-1a2b68f100e75585d79f9e551ad575e1b756a97750d63ceddf52c1a8b76ffe1a  ./services/providers/fake.py
+-00a9bcb6419c9e41b2779a7c10cb46c139ce0ab51ae16e9dd5236f68e8069c5b  ./services/providers/opencode_go.py
+-d1f12d5e5508b574da118c30b6ffdcbecc7be320fac8de13df344f7d7d519286  ./services/providers/protocols.py
+-5348f3495a3f812cf89608355070be7636e8659d1c3596ea902de01079b90a8d  ./services/providers/reader.py
++7f582663d8cded1aff8bdd6467f858053e749c54ba7aee7ab16d784bed742887  ./services/planning/service.py
++48e5f7887877fba13d7ddd6d34d9c4b89d4eab92ea66b115979e802a7d90828d  ./services/providers/fake.py
++588975b081097a6da9b5ff118897ce2b766a81612b89e7133401e7a27d308b15  ./services/providers/opencode_go.py
++d6d5110d0bb1f2c8c74c29995ff85e679e71ab23eea1c613a94a3a6642539c41  ./services/providers/protocols.py
++45ee0f53d5bab9da33455b367cdff2c51b10247094d184671be07a6eb3749ab3  ./services/providers/reader.py
+ 4151b5f01a26a2c68e9ee9f51398387328cdec859078a0336e68692139a0e2e7  ./services/providers/redaction.py
+-1d2d17cff04a00cedccaf80f32d95a62fef0f52242a1ebb56dd39151956e2254  ./services/providers/router.py
++8e5fd07408c12010907404705ce22f1615a0cdf2abb4da0e5bf53e328959c481  ./services/providers/router.py
+ 94e8d6827d5adc18aa6469e86f4b24053a3a00f06a306db7ff55b71d0291deee  ./services/providers/schemas.py
+ e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  ./services/reminders/__init__.py
+ 96dc2edc024fc42fc175fb6b76f97c6f1215254f1ee2876e09d0a3e25b8e8d83  ./services/reminders/daily.py
+--- runtime file names changed (pre-serve image -> worktree) ---
+runtime_files_changed=0
+--- alembic head + census (read-only, docker exec -i, container's own sqlite helper) ---
+head=20261023_sg233_reminder
+table_count=29
+alembic_version_rows=1
+alembic_version=1
+assertion=40
+asset=7
+asset_evidence=20
+asset_fts=7
+asset_fts_config=1
+asset_fts_data=9
+asset_fts_docsize=7
+asset_fts_idx=7
+asset_location=1
+asset_relation=1
+audit_event=104
+candidate=10
+enrich_snapshot=4
+evidence=27
+guardrail_event=2
+household=1
+idempotency_key=11
+job=11
+job_step=72
+location=1
+observation=20
+planning_suggestion=0
+provider_call=39
+reminder=1
+review_task=9
+saved_search=0
+source_attribution=0
+user=2
+census_rc=0
+2026-10-24T19:24:27Z

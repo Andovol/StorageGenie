@@ -1,0 +1,78 @@
+=== SG-251 post-recreate verification (read-only) ===
+2026-10-24T19:25:37Z
+epoch=1792869937
+--- container state ---
+a831fbd0f8d2 storagegenie-backend-1 storagegenie-backend Up 32 seconds (healthy) 127.0.0.1:8003->8000/tcp
+.Id=a831fbd0f8d2895d810efc4794f42166d194fa4e31c23403f02a8ff0cc19c2c1
+.Created=2026-10-24T19:25:04.308330921Z
+.State.StartedAt=2026-10-24T19:25:05.063123154Z
+.Image=sha256:e8c7373577f9770bf486ae478e1a867b7ba41165aefa81d5f81d2b1d543d4ec3
+.Config.Cmd=[uvicorn app.server:app --host 0.0.0.0 --port 8000]
+.RestartCount=0
+.State.Status=running
+.State.Health.Status=healthy
+--- six health GETs ---
+health_1 {"status":"ok","db":"ok","storage":"ok"}http=200 time=0.003426 
+health_2 {"status":"ok","db":"ok","storage":"ok"}http=200 time=0.003529 
+health_3 {"status":"ok","db":"ok","storage":"ok"}http=200 time=0.003430 
+health_4 {"status":"ok","db":"ok","storage":"ok"}http=200 time=0.003685 
+health_5 {"status":"ok","db":"ok","storage":"ok"}http=200 time=0.003581 
+health_6 {"status":"ok","db":"ok","storage":"ok"}http=200 time=0.003869 
+--- served index + bundle (post HTTP) ---
+index_http=200 bytes=944
+cec37cf5eecd12a9d23da6ccaa1bb40da306fd38ce7454c1daa59909b3825caf  /tmp/sg251-post.Zae63i/index.html
+bytes=944
+/assets/index-C07VbG0m.css http=200 bytes=4535
+c3b58cda696a22970fc2a4a348849fc1359f2105f80f81304ed5dfd5ca31a557  /tmp/sg251-post.Zae63i/index-C07VbG0m.css
+/assets/index-CWp6nYu6.js http=200 bytes=326217
+fe7dff6e58dd934ec14f693d40166aee5117453c13cb8caee45f371d4a944b99  /tmp/sg251-post.Zae63i/index-CWp6nYu6.js
+--- pre vs post bundle byte comparison ---
+pre_dir=/tmp/sg251-pre.U7QAVW
+index.html pre_vs_post_cmp_rc=0
+index-C07VbG0m.css pre_vs_post_cmp_rc=0
+index-CWp6nYu6.js pre_vs_post_cmp_rc=0
+--- post-serve image Python tree vs worktree backend/app ---
+post_image=sha256:e8c7373577f9770bf486ae478e1a867b7ba41165aefa81d5f81d2b1d543d4ec3
+image_app_py_files=100 host_app_py_files=100
+python_diff_rc=0
+--- image Dockerfile hash vs worktree ---
+sha256sum: /tmp/sg251-post.Zae63i/app/Dockerfile: No such file or directory
+d9c60bbaadbb9717ed64ffd7b0cd7445c37995e0f961e2c0553b774fa760503e  backend/Dockerfile
+--- alembic head + census (read-only, docker exec -i) ---
+head=20261023_sg233_reminder
+table_count=29
+alembic_version_rows=1
+alembic_version=1
+assertion=40
+asset=7
+asset_evidence=20
+asset_fts=7
+asset_fts_config=1
+asset_fts_data=9
+asset_fts_docsize=7
+asset_fts_idx=7
+asset_location=1
+asset_relation=1
+audit_event=104
+candidate=10
+enrich_snapshot=4
+evidence=27
+guardrail_event=2
+household=1
+idempotency_key=11
+job=11
+job_step=72
+location=1
+observation=20
+planning_suggestion=0
+provider_call=39
+reminder=1
+review_task=9
+saved_search=0
+source_attribution=0
+user=2
+census_rc=0
+--- production sqlite main-file ---
+e41074372a05fa1aee903d447cf0ad27fd258c530c699d121411a0d303eb6dea  data/db/storagegenie.db
+db_bytes=765952 mtime=2026-10-24 19:25:04.745222191 +0000
+2026-10-24T19:25:44Z

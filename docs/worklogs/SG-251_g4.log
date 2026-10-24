@@ -1,0 +1,12 @@
+=== SG-251 G4 — provider ids held by the served app's registry (names only) ===
+2026-10-24T19:27:51Z
+method: docker exec -i storagegenie-backend-1 python (imports app.services.providers.reader; same container environment the app started with; no .env file in the image)
+env_file_check: absent
+provider_ids=fake,opencode-go
+provider_count=2
+real_provider_opencode_go_present=True
+ai_status_reason=enabled
+effective_provider_id=opencode-go
+registry_rc=0
+NO key value was printed, hashed, stored or transmitted; the helper printed only dict keys, the count, a membership boolean, the ai_status reason and the provider id name.
+2026-10-24T19:27:52Z

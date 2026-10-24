@@ -1,0 +1,27 @@
+=== SG-251 G3 control — the absences are not vacuous ===
+2026-10-24T19:27:52Z
+The pre-serve image sha256:97ced17c... was removed from the daemon during the build (see below), so the control greps run against the git blob it was built from (d0a87c6^ = 21b79d6 tree).
+--- pre-serve image lookup after the build ---
+old_image_lookup_rc=1 (1 = absent)
+--- control: removed symbols DO appear in the pre-SG-250 blob ---
+$ git show d0a87c6^:backend/app/services/providers/opencode_go.py | grep -n "estimate_call_cost|estimate_cost"
+151:def estimate_call_cost(
+244:    def estimate_cost(self, image_bytes: bytes, prompt: str) -> float:
+248:        call. It is intentionally the upper bound from `estimate_call_cost`.
+250:        return estimate_call_cost(image_bytes, prompt)
+$ git show d0a87c6^:backend/app/config.py | grep -n "sg_per_job_cap|sg_monthly_cap"
+48:    sg_per_job_cap: float | None = None
+49:    sg_monthly_cap: float | None = None
+$ git show d0a87c6^:backend/app/services/providers/router.py | grep -n cost_budget
+35:    cost_budget: float
+71:        if estimated_cost > self.config.cost_budget:
+73:                f"estimated cost {estimated_cost} exceeds budget {self.config.cost_budget}"
+$ git show d0a87c6^:backend/app/services/providers/reader.py | grep -n "_estimate_call|_recorded_spend"
+233:def _estimate_call(provider: Any, image_bytes: bytes, prompt: str) -> float:
+270:def _recorded_spend(db: Session, household_id: str) -> float:
+484:        prepared.append((evidence, redacted, _estimate_call(provider, redacted, prompt)))
+490:        already_spent = _recorded_spend(db, job.household_id or "")
+control_rc=0
+--- first control attempt (recorded, failed because the pre-serve image was already gone) ---
+docker create sha256:97ced17c... -> 'Error response from daemon: No such image'; no files copied; no state changed.
+2026-10-24T19:27:53Z

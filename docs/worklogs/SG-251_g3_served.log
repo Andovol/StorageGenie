@@ -1,0 +1,125 @@
+=== SG-251 G3 — proofs from the SERVED image's own files ===
+2026-10-24T19:26:20Z
+served_image=sha256:e8c7373577f9770bf486ae478e1a867b7ba41165aefa81d5f81d2b1d543d4ec3
+served_tree_extracted_from=sha256:e8c7373577f9770bf486ae478e1a867b7ba41165aefa81d5f81d2b1d543d4ec3:/app/app (docker create+cp, no execution)
+
+--- G3.1a served opencode_go.py: estimate_call_cost / estimate_cost must be ABSENT ---
+grep_rc=1 (1 = no match = pass)
+--- G3.1b served router.py: cost_budget must be ABSENT; execute signature quoted ---
+grep_rc=1 (1 = no match = pass)
+47:    def execute(self, operation: str, *args: Any, **kwargs: Any) -> Any:
+--- G3.1c served reader.py: _estimate_call / _recorded_spend must be ABSENT ---
+grep_rc=1 (1 = no match = pass)
+--- G3.1d served config.py: sg_per_job_cap / sg_monthly_cap must be ABSENT ---
+grep_rc=1 (1 = no match = pass)
+--- G3.1e control: the same pattern DOES match the pre-serve image file (proves the grep can match) ---
+Error response from daemon: No such image: sha256:97ced17c3120f12eb16ca830bb3a83d3ff78fa980151043f8ec44a172434b2f0
+must specify at least one container source
+must specify at least one container source
+container name cannot be empty
+grep: /tmp/sg251-served.tJZWjw/pre-opencode_go.py: No such file or directory
+pre_grep_rc=0
+grep: /tmp/sg251-served.tJZWjw/pre-config.py: No such file or directory
+pre_config_grep_rc=0
+
+--- G3.2 served opencode_go.py: the cost line and post-call real-usage cost ---
+163:    """One INFO line per provider call: never a prompt, body, image or key."""
+165:    logger.info(
+166:        "provider call: provider=%s model=%s operation=%s status=%s cost=%.8f "
+def compute_cost(usage: dict[str, Any]) -> float:
+    """Computed USD for one call from the vendor rate table (off-peak rates).
+
+    This prices what actually happened: it reads the response's real token
+    counts after the call. The peak multiplier (x2 at 01:00-04:00 and
+    06:00-10:00 UTC Mon-Fri) is a vendor fact recorded in the report, not a
+    clock here: a time-dependent calculation would make unit tests
+    date-dependent (PG-IC-07).
+    """
+    tokens_in = usage.get("prompt_tokens") or 0
+    tokens_out = usage.get("completion_tokens") or 0
+    return (tokens_in * INPUT_USD_PER_1M + tokens_out * OUTPUT_USD_PER_1M) / 1_000_000
+
+
+def _log_call(
+    *,
+    operation: str,
+    model_id: str,
+    usage: dict[str, Any] | None,
+    cost: float | None,
+    latency_ms: float | None,
+    status: str,
+) -> None:
+    """One INFO line per provider call: never a prompt, body, image or key."""
+    tokens = usage or {}
+    logger.info(
+        "provider call: provider=%s model=%s operation=%s status=%s cost=%.8f "
+        "input_tokens=%d output_tokens=%d latency_ms=%s",
+        "opencode-go",
+        model_id,
+        operation,
+        status,
+        float(cost or 0.0),
+        int(tokens.get("prompt_tokens") or 0),
+        int(tokens.get("completion_tokens") or 0),
+        f"{latency_ms:.1f}" if latency_ms is not None else "unknown",
+    )
+...
+        """Vision turn on the real adapter: one call, one actual-cost result."""
+        redacted = redact_image(image_bytes)
+        image_b64 = base64.b64encode(redacted).decode("ascii")
+        payload = build_chat_payload(self._model_id, prompt, image_b64)
+        started = time.monotonic()
+        usage: dict[str, Any] | None = None
+        try:
+            body = self._post(payload)
+            latency_ms = (time.monotonic() - started) * 1000.0
+            usage = guard_usage(body.get("usage") or {})
+            choices = body.get("choices") or []
+            if not isinstance(choices, list) or not choices:
+                exc = ProviderError("invalid_json", "provider 200 with no choices")
+                attach_body_accounting(exc, usage, latency_ms=latency_ms)
+                raise exc
+            message = choices[0].get("message") or {}
+            content = strip_single_think(guard_content(message.get("content")))
+            parsed = parse_extraction_output(content)
+            cost = compute_cost(usage)
+            result = ProviderResult(
+                normalized_output=parsed.model_dump(),
+                raw_payload=body,
+                request_id=str(body.get("id") or ""),
+                usage=usage,
+                cost=cost,
+                model_id=str(body.get("model") or self._model_id),
+                latency_ms=latency_ms,
+            )
+
+--- G3.3 served config.py: extra ignore (quoted; environment NOT read) ---
+63:    model_config = {"env_file": ".env", "extra": "ignore"}
+
+--- served startup log: error/traceback scan ---
+total_log_lines=21
+5:INFO:     app.services.reminders.daily - Daily reminder pass completed as_of=2026-10-24 households_visited=1 reminders_created=0 errors=0
+error_scan_rc=0
+--- full startup log (verbatim) ---
+INFO:     Started server process [1]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+INFO:     app.services.reminders.daily - Daily reminder pass completed as_of=2026-10-24 households_visited=1 reminders_created=0 errors=0
+INFO:     127.0.0.1:37724 - "GET /v1/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52916 - "GET /v1/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55718 - "GET /v1/health HTTP/1.1" 200 OK
+INFO:     172.18.0.1:44762 - "GET /v1/health HTTP/1.1" 200 OK
+INFO:     172.18.0.1:44778 - "GET /v1/health HTTP/1.1" 200 OK
+INFO:     172.18.0.1:44794 - "GET /v1/health HTTP/1.1" 200 OK
+INFO:     172.18.0.1:44810 - "GET /v1/health HTTP/1.1" 200 OK
+INFO:     172.18.0.1:44816 - "GET /v1/health HTTP/1.1" 200 OK
+INFO:     172.18.0.1:44830 - "GET /v1/health HTTP/1.1" 200 OK
+INFO:     172.18.0.1:59114 - "GET / HTTP/1.1" 200 OK
+INFO:     172.18.0.1:59118 - "GET /assets/index-C07VbG0m.css HTTP/1.1" 200 OK
+INFO:     172.18.0.1:59122 - "GET /assets/index-CWp6nYu6.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:48018 - "GET /v1/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:40584 - "GET /v1/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55754 - "GET /v1/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60498 - "GET /v1/health HTTP/1.1" 200 OK
+2026-10-24T19:26:20Z
