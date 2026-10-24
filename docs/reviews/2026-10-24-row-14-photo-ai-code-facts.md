@@ -35,6 +35,14 @@ The blueprint's routing policy (`:318`): *"provider, fallback, local fallback, J
 4. **"The local option" has no implementation and no defined meaning in this repo.** The blueprint says "optional local provider adapter" (`:535`) and "local fallback" (`:318`); there is no local adapter, no local endpoint setting, and no local-model runtime on the host. What "local" means here (a local model server on the host, an on-device path, a different vendor) is **undefined by the code** — it is a decision, not a build.
 5. **The privacy inventory is a pinned ledger** — any new outbound carrier must be added to it deliberately, and the redactor's call-site pin moves with it.
 
+**What the shared host says about "local" (host facts, measured 2026-09-17 by Launcher; `G-A5` — re-measure before building on them).** From this project's own contract cache, `.rules-cache/VPS.md`:
+
+- **F1: 6 logical CPUs (AMD EPYC-Milan), RAM 7.7 GiB, swap ~8 GiB** — and **S6: "RAM is marginal and shared by every project."**
+- **F4: "Ollama is installed but INACTIVE (2026-09-17). Do not plan on a local model being served."**
+- **S4: every service binds to loopback**; a new always-on service must state its expected memory (S6).
+
+**Consequence for D-R14-b, stated as a fact and not as a decision:** a local *vision* model serving the photo path on this host would run on a 7.7 GiB RAM box shared with every other project, with the one local-model runtime already installed **inactive** and explicitly marked as not-to-plan-on. **No local model is currently serving anything.** The cheapest "local" reading that this host can actually carry is therefore not "a local model server" — it is **a local code path that needs no inference at all** (for example the deterministic `fake` provider already in the registry, or the local OCR/zbar path already in `app/services/signals.py`, which reads text and barcodes from a photo **without any provider**). Whether the owner's "local option" means a local *model* or a local *no-provider path* is exactly the undefined piece D-R14-b exists to settle — and it changes the cost of the whole row by an order of magnitude.
+
 ## What is NOT in this row
 
 The scene reader (image generation) is a different surface and stays as it is; `services/scene/` is not photo reading. The OCR/zbar path (`app/services/signals.py`) is a **local** capability already — it is the existing local option for *reading text from a photo*, not for extracting catalog items, and it must not be confused with a local LLM adapter.
