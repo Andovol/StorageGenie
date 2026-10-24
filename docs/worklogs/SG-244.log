@@ -1,0 +1,63 @@
+SG-244 worklog — append-only record of material commands and outcomes
+Lane start (systemd unit stamp): 2026-10-24T16:39:08Z
+Working directory: /home/andrei/StorageGenie
+Branch: automation == origin/automation
+BASE REF: origin/automation
+BASE COMMIT: 723d0d05a41134b98882161d2b9b78a948020aff (git rev-parse origin/automation and git ls-remote agree)
+Initial worktree: clean; no unrelated dirt.
+
+Model/effort, read from this process's own arguments (ps -o args= -p 3445384):
+  opencode run --auto --dir /home/andrei/StorageGenie --model opencode-go/deepseek-v4.1-flash --variant max ...
+  model=opencode-go/deepseek-v4.1-flash effort=max (variant max)
+
+16:39:33Z  G1 SQL pre-state (read-only sqlite3 -readonly on ./data/db/storagegenie.db):
+  row id=01a16e35-4394-7c11-9798-844754826bcc household=01a0a029-1477-7ca0-b200-bce78a96c679
+  asset=01a0c4aa-8b62-7360-b11e-a476ddaea0f6 as_of_day=2026-10-24 tier=urgent
+  bucket=this-week days_remaining=3 status=read created_at=2026-10-24 13:59:06
+  updated_at=2026-10-24 15:21:24
+  reminder count=1; alembic_version=20261023_sg233_reminder
+  Captured in docs/worklogs/SG-244_g1_sql.log.
+
+16:39:40Z  G1 API pre-state (loopback ONLY, http://127.0.0.1:8003):
+  GET /v1/reminders?household_id=... -> HTTP 200, unread_count=0, the same row with
+  display_name="Miso Soup", status="read", updated_at="2026-10-24T15:21:24".
+  GET /v1/health -> HTTP 200 {"status":"ok","db":"ok","storage":"ok"}.
+  Captured in docs/worklogs/SG-244_g1_api.log.
+
+16:39:40Z  G1 per-table census (29 tables, read-only) captured in
+  docs/worklogs/SG-244_g1_counts.log. reminder=1, audit_event=104, asset=7, household=1.
+  Premise check: asset display_name = "Miso Soup"; row present; status=read, not dismissed.
+
+16:40:07Z  Access-log baseline (backend container JSON log, read as a FILE through the
+  rootless-docker data root; NO docker command was run): grep count of
+  POST/PUT/PATCH/DELETE lines = 0.
+
+16:40:13Z  G2: exactly one POST, through the app's own route:
+  POST http://127.0.0.1:8003/v1/reminders/01a16e35-4394-7c11-9798-844754826bcc/dismiss?household_id=01a0a029-1477-7ca0-b200-bce78a96c679
+  -> HTTP 200; body status="dismissed", updated_at="2026-10-24T16:40:13".
+  No retry; no second mutating call. Captured in docs/worklogs/SG-244_g2.log.
+
+16:40:19Z  G3 read-only re-read: GET reminders -> 200, unread_count=0, status="dismissed",
+  identity fields unchanged; GET health -> 200; SQL row status=dismissed,
+  created_at unchanged, updated_at=2026-10-24 16:40:13; reminder count=1;
+  alembic head unchanged; all 29 table counts identical to G1.
+  Access log now has exactly 1 POST/PUT/PATCH/DELETE line: the 16:40:13 POST above.
+  Captured in docs/worklogs/SG-244_g3.log and SG-244_g3_counts.log.
+
+16:40:50Z  Read-only plugin status (supports the recurrence statement):
+  expiry_date=2026-10-27, days_remaining=3, tier=urgent.
+  Captured in docs/worklogs/SG-244_g3_status.log.
+
+Findings recorded in the report:
+  F1: the app's own route writes status AND advances updated_at via TimestampMixin
+      onupdate=func.now() (backend/app/models/base.py:24-25). One UPDATE statement, one
+      row, two columns; the packet's "one column" wording is imprecise, not violated.
+  F2: A3's "every other field identical" has this single expected exception (updated_at).
+  F3: the decision file's "if the owner has already clicked Dismiss on the Expiry page"
+      path is impossible for a read row: ExpiryPage.tsx:126 filters to unread only.
+  F4: recurrence is by design: record_due keys on (asset_id, as_of_day)
+      (service.py:49-60; unique constraint uq_reminder_asset_as_of_day).
+
+No build, no restart, no docker command, no migration command, no provider call, no
+dependency change, no secret in any artifact. Runtime budget from the lane stamp is in
+the report.
