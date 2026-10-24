@@ -1,0 +1,14 @@
+Partial-Receipt-ID: SG-240
+utc=2026-10-24T15:46:22Z
+invocation=a022f5de91a14254be23a85cf4526dee
+killed=exit_no_receipt
+pushed=0
+uncommitted=none
+wip=none
+wip_elapsed_ms=75
+wip_tracked=none
+wip_untracked=0 host_local
+DISPATCH_RESULT id=SG-240 coder=opencode exit=0 head=a9db5b2cdaa60907725697ed4df533f2fd56f912 note=no moved=yes rewrite=no dirty=no elapsed=1680s budget=2100s killed=exit_no_receipt stragglers=0
+P1_moved=PASS count=2
+P2_rewrite=PASS behind=0
+P6_dirty=PASS dirty=no
