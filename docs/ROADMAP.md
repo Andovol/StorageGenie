@@ -8,7 +8,9 @@ How to read the table: Status is Built (works today), Partly built (works halfwa
 
 ## Next action
 
-Build row 9: expiry reminders that reach the user. The app already computes how urgent each item is, and already shows an expiry dashboard, but nothing reaches the user before food or medicine expires. That notification is the core promise of the expiry tracker, and it unlocks daily use. It builds directly on the urgency math that already exists.
+**Row 11 — opened-date countdown for cosmetics** is in flight (SG-240 and its close-deploy rider): record when a cosmetic was opened, then count the days against the category's after-opening window, and make the daily pass visible in the server log while the slice is there.
+
+**Then row 14 — the remaining missing photo AI features:** a second photo reader wired into the provider router, with the local option, the fallback and the spending limits (owner, 2026-10-24 — D-1024-12). Rows 15, 16 and 8 stay parked behind it.
 
 ## Roadmap
 
@@ -33,4 +35,4 @@ Build row 9: expiry reminders that reach the user. The app already computes how 
 | 17 | Sign-in and household enforcement | Intentionally out | Household scoping exists (`backend/app/api/v1/households.py`, `backend/app/api/v1/users.py`); no passwords by design for the single-household server | — |
 | 18 | Move database and storage later (only when this computer is no longer enough) | Intentionally later | Runs on local files today (`docker-compose.yml`, local data folders); move only when scale demands it | L |
 
-Rows 1–8, 10, 12–13 are done and need no further work. The build order from here is rows 9, 11, 14, 15, 16, then 8 on a schedule. Rows 17–18 stay as written until the owner says otherwise.
+Rows 1–8, 10, 12–13 are done and need no further work. Row 9 closed on 2026-10-24 (SG-235–SG-239: the in-app daily caller, the Expiry page's Read/Dismiss, one live reminder in production). The build order from here is rows 11, 14, 15, 16, then 8 on a schedule — **row 14 first after row 11**, by the owner's priority of 2026-10-24 (D-1024-12). Rows 17–18 stay as written until the owner says otherwise.

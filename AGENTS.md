@@ -19,7 +19,7 @@ Slices are numbered with the prefix SG, which stands for StorageGenie (for examp
 | **Harness** | Server runs in the background and wakes this session when done | Background runs never block the planning chat. Status checks only re-attach; they never carry the task. |
 | **Wrapper** | `/usr/local/bin/dispatch` on the server | This is the only entry point the server key can run. It picks settings from the trigger command first. |
 | **Model policy** | Every trigger states the model and effort explicitly, currently `model=opencode-go/deepseek-v4.1-flash effort=max` | Stating both on every trigger stops silent drift between slices. |
-| **Second opinion** | `default` | The word default asks the contract to pick a reviewer that is not the current builder. |
+| **Second opinion** | `coder=opencode model=opencode-go/muse-spark-1.3-contributor effort=xhigh`, dispatched with `agent=plan` | The contract's default, resolved for this project: the Architect runs on `opencode-go/minimax-m3.1-flash`, so the reviewer must not be that model, and the slice builder must not be the reviewer either. |
 | **Packet directory** | `docs/packets` | Task files are committed and pushed, so the server always reads what this computer sent. |
 | **Autonomy** | L3 | The owner approves a stage — a named set of slices toward one outcome, stated in the approval message. Inside the stage the Architect packets, dispatches, audits and rates each slice without asking. The builder owns one retry inside a slice and returns after that. A stage boundary is a new approval. |
 | **Close-out** | Deploy every app-changing slice as its own slice, right after it is rated, and deploy the live app before every close | The owner asks for a live check at every close. Work that is unrated or blocked stops the deploy instead of shipping silently. |
@@ -49,7 +49,7 @@ A placeholder with no value here stops the run.
 - Before dispatching: read the dispatch guide (plus the production guide, because the host and database are live).
 - Before closing: read the close guide.
 - Before rating: read the ledger guide.
-- Before asking for a second opinion on a medium or larger decision: read the second-opinion guide.
+- Before bringing the owner any 🟠 or 🔴 decision item: **run** the second opinion (two phases), not only read its guide. See the project rule below.
 - Before changing a rule: read the reasoning guide.
 - Before planning anything on the shared server: read the server guide.
 
@@ -62,6 +62,7 @@ The coder reads its own copy on the server and never reads from this repo.
 - **Sensitive areas:** the stored photos and files, the app database, and the dispatch key and host. Every plan touching one goes to the owner alone, at every autonomy level. An area not listed here is not declared safe — it is simply not declared.
 - **Restart:** both app services restart on their own unless stopped.
 - **Health:** the health address proves database plus storage. The builder runs the health probe at start and end.
+- **Second opinion before the owner** (owner, 2026-10-24): every 🟠 or 🔴 decision item goes through the two-phase second opinion **before** the owner sees it, and so does a 🟡 item whose subject is the live host, the dispatch key, the app database, or the owner's own data. Never for 🔵. The review runs on the project's own lane with `agent=plan`; the review ID and the disposition go into the decision item and into `docs/reviews/review-ledger.md`.
 
 ## What this repo already owns
 
