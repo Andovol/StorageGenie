@@ -1,0 +1,49 @@
+SG-247 G2 in-container measurement evidence
+utc=2026-10-24T17:06:02Z epoch=1792861562
+
+$ docker image inspect --format "{{.Id}} | {{.Created}} | {{json .RootFS.Layers}}" storagegenie-backend:latest
+sha256:97ced17c3120f12eb16ca830bb3a83d3ff78fa980151043f8ec44a172434b2f0 | 2026-10-24T15:40:06.739668157Z | ["sha256:aca83606673032726b42f8e1396ceb979c32bfb26b602732baf699053e46b33e","sha256:9cec99e910cbef45442323a31a04c92b5c14dddf236dd769d02c54af99e56d6d","sha256:4858806d59148b044f1fb5491f84963f5742556eefa0ce9de13717e1a195edae","sha256:6bcbbe0b3546e8b3e707223aee64fd1c2d220d8d8c6834829e392648f38d5b6e","sha256:051d222ea13a477df07683f02a57f0fba8ddc379d6996505054b3d11c3c2422a","sha256:3956679c1b2d6deee3bcacf61dca12fd7ea9008b459de6b3643442fd28f71e61","sha256:74da3f3a3d5a8223b39bff40063c3afc0610df457e73cb8cdbb409bcc8e9cfd8","sha256:beb232e3a37ca237af8c9f0004a143bd140fa1973bbfa727c69c429a9473378f","sha256:937b0f9a4618162754c0a52f21b54d739a31257366311b69c9b1b816dbed638b","sha256:4932a923b951cfa7c5936f2c817de4d511e7405eea8a983f27220cf37bb5e86a","sha256:4e3ec81ea4c3564ce6fe3f647ac8f5e98f5ddbea4476564a17a745bbf6b3ee80","sha256:19fe4c750cd9123bb88197a9c76a5d3132909a1729793fa7b01a215ec7a5657d"]
+rc=0
+
+$ docker image inspect --format "{{.Id}} | {{.Created}} | {{json .RootFS.Layers}}" storagegenie-backend:sg247-verify
+sha256:0cb60586c19deee43250610e71e7bac53dd8947d1ab03c500af3213b38a6c716 | 2026-10-24T15:40:06.739668157Z | ["sha256:aca83606673032726b42f8e1396ceb979c32bfb26b602732baf699053e46b33e","sha256:9cec99e910cbef45442323a31a04c92b5c14dddf236dd769d02c54af99e56d6d","sha256:4858806d59148b044f1fb5491f84963f5742556eefa0ce9de13717e1a195edae","sha256:6bcbbe0b3546e8b3e707223aee64fd1c2d220d8d8c6834829e392648f38d5b6e","sha256:051d222ea13a477df07683f02a57f0fba8ddc379d6996505054b3d11c3c2422a","sha256:3956679c1b2d6deee3bcacf61dca12fd7ea9008b459de6b3643442fd28f71e61","sha256:74da3f3a3d5a8223b39bff40063c3afc0610df457e73cb8cdbb409bcc8e9cfd8","sha256:beb232e3a37ca237af8c9f0004a143bd140fa1973bbfa727c69c429a9473378f","sha256:937b0f9a4618162754c0a52f21b54d739a31257366311b69c9b1b816dbed638b","sha256:4932a923b951cfa7c5936f2c817de4d511e7405eea8a983f27220cf37bb5e86a","sha256:4e3ec81ea4c3564ce6fe3f647ac8f5e98f5ddbea4476564a17a745bbf6b3ee80","sha256:19fe4c750cd9123bb88197a9c76a5d3132909a1729793fa7b01a215ec7a5657d"]
+rc=0
+
+$ docker image inspect --format "{{.Id}} | {{.RepoDigests}}" sha256:97ced17c3120f12eb16ca830bb3a83d3ff78fa980151043f8ec44a172434b2f0
+sha256:97ced17c3120f12eb16ca830bb3a83d3ff78fa980151043f8ec44a172434b2f0 | [storagegenie-backend@sha256:97ced17c3120f12eb16ca830bb3a83d3ff78fa980151043f8ec44a172434b2f0]
+rc=0
+
+$ docker run --rm -i --network none --name sg247-verify storagegenie-backend:sg247-verify sh -s
+== tesseract --version ==
+tesseract 5.3.0
+ leptonica-1.82.0
+  libgif 5.2.1 : libjpeg 6b (libjpeg-turbo 2.1.2) : libpng 1.6.39 : libtiff 4.5.0 : zlib 1.2.13 : libwebp 1.2.4 : libopenjp2 2.5.0
+ Found AVX2
+ Found AVX
+ Found FMA
+ Found SSE4.1
+ Found OpenMP 201511
+ Found libarchive 3.6.2 zlib/1.2.13 liblzma/5.4.1 bz2lib/1.0.8 liblz4/1.9.4 libzstd/1.5.4
+ Found libcurl/7.88.1 OpenSSL/3.0.17 zlib/1.2.13 brotli/1.0.9 zstd/1.5.4 libidn2/2.3.3 libpsl/0.21.2 (+libidn2/2.3.3) libssh2/1.10.0 nghttp2/1.52.0 librtmp/2.3 OpenLDAP/2.5.13
+tesseract_version_rc=0
+== shutil.which(tesseract) ==
+which=/usr/bin/tesseract
+which_rc=0
+== from pyzbar.pyzbar import decode ==
+pyzbar_decode_import=OK
+pyzbar_rc=0
+== import pytesseract ==
+pytesseract_import=OK
+get_tesseract_version=5.3.0
+pytesseract_rc=0
+== ldconfig -p | grep zbar ==
+	libzbar.so.0 (libc6,x86-64) => /lib/x86_64-linux-gnu/libzbar.so.0
+ldconfig_grep_rc=0
+== ctypes.CDLL(libzbar.so.0) ==
+libzbar.so.0=loadable
+cdll_rc=0
+run_exit=0
+
+$ docker ps -a --filter name=sg247-verify --format "{{.Names}} | {{.Status}}"
+rc=0
+utc_end=2026-10-24T17:06:03Z epoch_end=1792861563

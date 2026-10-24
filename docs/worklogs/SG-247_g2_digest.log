@@ -1,0 +1,60 @@
+SG-247 G2 digest comparison evidence
+utc=2026-10-24T17:07:59Z epoch=1792861679
+
+$ docker image inspect --format "{{json .Config}}" storagegenie-backend:latest > /tmp/opencode/sg247-latest-config.json
+rc=0
+$ docker image inspect --format "{{json .Config}}" storagegenie-backend:sg247-verify > /tmp/opencode/sg247-verify-config.json
+rc=0
+$ sha256sum /tmp/opencode/sg247-latest-config.json /tmp/opencode/sg247-verify-config.json
+6d3ecdebaf2d8b9b8843e060d9a9b22f42091500d1a8247dd44e061a579d8d46  /tmp/opencode/sg247-latest-config.json
+33b763fd51648c42f5eb455d1b2c59b8b43b45b18f3487c5f0127df824386663  /tmp/opencode/sg247-verify-config.json
+rc=0
+$ diff -q /tmp/opencode/sg247-latest-config.json /tmp/opencode/sg247-verify-config.json
+Files /tmp/opencode/sg247-latest-config.json and /tmp/opencode/sg247-verify-config.json differ
+rc=1
+
+$ docker image inspect --format "{{json .History}}" storagegenie-backend:latest | sha256sum
+template parsing error: template: :1:7: executing "" at <.History>: map has no entry for key "History"
+01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b  -
+rc=0
+$ docker image inspect --format "{{json .History}}" storagegenie-backend:sg247-verify | sha256sum
+template parsing error: template: :1:7: executing "" at <.History>: map has no entry for key "History"
+01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b  -
+rc=0
+
+$ docker image inspect --format "{{.Os}}/{{.Architecture}} | {{.Created}}" storagegenie-backend:latest
+linux/amd64 | 2026-10-24T15:40:06.739668157Z
+rc=0
+$ docker image inspect --format "{{.Os}}/{{.Architecture}} | {{.Created}}" storagegenie-backend:sg247-verify
+linux/amd64 | 2026-10-24T15:40:06.739668157Z
+rc=0
+
+$ docker ps --format "{{.Names}} | {{.Image}} | {{.ID}} | {{.Status}}"
+storagegenie-backend-1 | storagegenie-backend | 6c648f1cdce6 | Up 50 minutes (healthy)
+rc=0
+
+$ docker image inspect --format "{{.Id}}" storagegenie-backend:latest
+sha256:97ced17c3120f12eb16ca830bb3a83d3ff78fa980151043f8ec44a172434b2f0
+rc=0
+$ docker image inspect --format "{{.Id}}" storagegenie-backend:sg247-verify
+sha256:0cb60586c19deee43250610e71e7bac53dd8947d1ab03c500af3213b38a6c716
+rc=0
+
+$ docker ps -a --filter name=sg247-verify --format "{{.Names}} | {{.Status}}"
+rc=0
+
+$ docker images --format "{{.Repository}}:{{.Tag}} | {{.ID}} | {{.CreatedAt}}" | grep storagegenie-backend
+storagegenie-backend:latest | 97ced17c3120 | 2026-10-24 15:40:06 +0000 UTC
+storagegenie-backend:sg247-verify | 0cb60586c19d | 2026-10-24 15:40:06 +0000 UTC
+storagegenie-backend:sg240-proof | ae1d292d7d3e | 2026-10-24 15:40:06 +0000 UTC
+rc=0
+utc_end=2026-10-24T17:08:00Z epoch_end=1792861680
+
+--- appended: the one Config field that differs (utc=2026-10-24T17:09:12Z) ---
+$ python3 -c "load both Config JSONs and print differing fields and the Labels map"
+keys_only_latest= ['Labels']
+keys_only_built= []
+latest_Labels= {"com.docker.compose.project": "storagegenie", "com.docker.compose.service": "backend", "com.docker.compose.version": "5.3.1"}
+built_Labels= null
+runtime_fields_equal= True
+rc=0

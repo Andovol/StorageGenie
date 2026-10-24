@@ -1,0 +1,617 @@
+SG-247 G1/G3 read-only evidence (no database opened, no provider called)
+utc=2026-10-24T17:07:18Z epoch=1792861638
+base_ref=origin/automation resolved=20a8dd9e0e79f24506a9bc2930e4d8db3c4c6a68 head=20a8dd9e0e79f24506a9bc2930e4d8db3c4c6a68
+
+$ grep -rn "fallback_id=None" backend/app
+backend/app/services/providers/reader.py:465:        fallback_id=None,
+backend/app/services/analytics/service.py:597:        fallback_id=None,
+backend/app/services/planning/service.py:444:        fallback_id=None,
+backend/app/services/chat/service.py:425:        fallback_id=None,
+rc=0
+
+$ grep -rn "RouterConfig(" backend/app
+backend/app/services/providers/reader.py:463:    config = RouterConfig(
+backend/app/services/analytics/service.py:595:    config = RouterConfig(
+backend/app/services/planning/service.py:442:    config = RouterConfig(
+backend/app/services/chat/service.py:423:    config = RouterConfig(
+rc=0
+
+$ grep -rn "job_id=" backend/app --include=*.py
+backend/app/services/scene/openrouter.py:623:        job_id=None,
+backend/app/services/dedup.py:183:    candidate = db.query(Candidate).filter_by(job_id=job.id).first()
+backend/app/services/dedup.py:202:            job_id=job.id,
+backend/app/services/job_service.py:90:                job_id=job.id,
+backend/app/services/providers/reader.py:226:        job_id=job.id,
+backend/app/services/providers/reader.py:282:    writers stamp `job_id=None`, and `provider_call` has no household column, so
+backend/app/services/providers/reader.py:386:        job_id=job.id,
+backend/app/services/enrich/synthesize.py:310:        job_id=None,
+backend/app/services/enrich/snapshots.py:140:        job_id=job.id,
+backend/app/services/analytics/service.py:434:        job_id=None,
+backend/app/services/analytics/service.py:469:        job_id=None,
+backend/app/services/candidates.py:565:        .filter_by(job_id=job_id, step_name="EXTRACTING_DETERMINISTIC_SIGNALS")
+backend/app/services/candidates.py:576:    step = db.query(JobStep).filter_by(job_id=job_id, step_name=step_name).first()
+backend/app/services/candidates.py:733:        job_id=job.id,
+backend/app/services/candidates.py:994:    candidate = db.query(Candidate).filter_by(job_id=job.id).order_by(Candidate.created_at).first()
+backend/app/services/candidates.py:1166:            job_id=candidate.job_id,
+backend/app/services/planning/service.py:238:        job_id=None,
+backend/app/services/planning/service.py:272:        job_id=None,
+backend/app/services/chat/service.py:331:        job_id=None,
+backend/app/services/chat/service.py:369:        job_id=None,
+backend/app/api/v1/enrich.py:281:        job_id=job.id,
+rc=0
+
+$ grep -rn "settings.sg_provider_id\|reader_mod.provider_registry" backend/app --include=*.py
+backend/app/services/providers/reader.py:112:    if settings.sg_provider_id not in provider_registry():
+backend/app/services/providers/reader.py:459:    provider_id = settings.sg_provider_id
+backend/app/services/enrich/synthesize.py:276:        registry = reader_mod.provider_registry()
+backend/app/services/enrich/synthesize.py:277:        provider = registry[settings.sg_provider_id]
+backend/app/services/enrich/synthesize.py:278:    provider_id = str(getattr(provider, "provider_id", settings.sg_provider_id))
+backend/app/services/analytics/service.py:591:    registry = reader_mod.provider_registry()
+backend/app/services/analytics/service.py:592:    provider_id = settings.sg_provider_id
+backend/app/services/planning/service.py:438:    registry = reader_mod.provider_registry()
+backend/app/services/planning/service.py:439:    provider_id = settings.sg_provider_id
+backend/app/services/chat/service.py:419:    registry = reader_mod.provider_registry()
+backend/app/services/chat/service.py:420:    provider_id = settings.sg_provider_id
+backend/app/api/v1/settings.py:45:        provider_id=settings.sg_provider_id,
+rc=0
+
+$ grep -rn "fallback_id" backend/app/services/providers/router.py backend/tests/test_provider_gateway.py
+backend/app/services/providers/router.py:33:    fallback_id: str | None
+backend/app/services/providers/router.py:79:            if self.config.fallback_id is not None and exc.kind in self.config.retryable_errors:
+backend/app/services/providers/router.py:80:                fallback = self.resolve(self.config.fallback_id)
+backend/tests/test_provider_gateway.py:45:    fallback_id = None
+backend/tests/test_provider_gateway.py:48:        fallback_id = fallback.provider_id
+backend/tests/test_provider_gateway.py:51:        fallback_id=fallback_id,
+backend/tests/test_provider_gateway.py:134:        fallback_id="fake-fallback",
+backend/tests/test_provider_gateway.py:192:            fallback_id=None,
+rc=0
+
+$ sed -n "90,105p" backend/app/services/providers/reader.py
+    90	def provider_registry() -> dict[str, Any]:
+    91	    """Build the id -> provider map from settings.
+    92	
+    93	    Only `fake` is always present; a real adapter is registered only when its
+    94	    backend-only key exists. This is the single injection seam for tests.
+    95	    """
+    96	    registry: dict[str, Any] = {"fake": FakeProvider(mode="valid", provider_id="fake")}
+    97	    if settings.opencode_api_key:
+    98	        registry["opencode-go"] = OpenCodeGoProvider(
+    99	            session_id="storagegenie-sg028",
+   100	            api_key=settings.opencode_api_key,
+   101	            model_id=effective_model_id(),
+   102	            per_job_cap=settings.sg_per_job_cap,
+   103	            monthly_cap=settings.sg_monthly_cap,
+   104	        )
+   105	    return registry
+rc=0
+
+$ sed -n "208,242p" backend/app/services/providers/reader.py
+   208	def _write_ledger(
+   209	    db: Session,
+   210	    job: Job,
+   211	    provider_id: str,
+   212	    template_version: str,
+   213	    image_bytes: bytes,
+   214	    result: Any,
+   215	) -> ProviderCall:
+   216	    row = ProviderCall(
+   217	        provider=provider_id,
+   218	        model=str(result.model_id or settings.sg_model_id),
+   219	        prompt_template_version=template_version,
+   220	        input_hashes=json.dumps({"image_sha256": hashlib.sha256(image_bytes).hexdigest()}),
+   221	        output_payload=json.dumps(result.raw_payload, ensure_ascii=False, default=str),
+   222	        cost=result.cost,
+   223	        usage_json=json.dumps(result.usage, ensure_ascii=False),
+   224	        latency_ms=result.latency_ms,
+   225	        error_state=None,
+   226	        job_id=job.id,
+   227	    )
+   228	    db.add(row)
+   229	    db.flush()
+   230	    return row
+   231	
+   232	
+   233	def _estimate_call(provider: Any, image_bytes: bytes, prompt: str) -> float:
+   234	    """Bounded worst-case cost handed to the router BEFORE any call (SG-029 G0).
+   235	
+   236	    A provider with no rate table (the test doubles) reports 0.0, so caps bind
+   237	    only where a real estimate exists — never on a guessed number.
+   238	    """
+   239	    estimator = getattr(provider, "estimate_cost", None)
+   240	    if callable(estimator):
+   241	        return float(estimator(image_bytes, prompt))
+   242	    return 0.0
+rc=0
+
+$ sed -n "270,306p" backend/app/services/providers/reader.py
+   270	def _recorded_spend(db: Session, household_id: str) -> float:
+   271	    """Durable spend for one household in the CURRENT calendar month (SG-030 ISS-10, SG-125, SG-142).
+   272	
+   273	    The provider instance is rebuilt every step, so an in-process counter resets
+   274	    and a monthly cap built on it can never bind across jobs. Summing the
+   275	    committed `provider_call` cost rows through their jobs survives that rebuild
+   276	    and is the same figure the audit trail already carries. SG-125 boxes the sum
+   277	    to the current calendar month (server-local, live clock) so the cap matches
+   278	    its "monthly" name: deleting old ledger rows can no longer silently loosen
+   279	    the cap (a purge must never be fail-open).
+   280	
+   281	    SG-142 closes the join's blind spot. The chat/planning/analytics/synthesize
+   282	    writers stamp `job_id=None`, and `provider_call` has no household column, so
+   283	    those rows carry no household and can never satisfy the `Job` join. The cap
+   284	    therefore under-counted real spend (the live read saw 0.0072005 against a
+   285	    true month total of 0.01086845). This reader adds those rows as a SHARED
+   286	    UNATTRIBUTED POOL boxed to the same month. It never attributes such a row to
+   287	    a household by guessing; because the pool is unowned it counts against every
+   288	    household reading that month, which is the fail-closed direction for a cap
+   289	    (under-counting is the defect, over-counting merely refuses early). A month
+   290	    with no `None`-job rows reads exactly as before.
+   291	    """
+   292	    month_start = _current_month_start_utc()
+   293	    joined = (
+   294	        db.query(func.coalesce(func.sum(ProviderCall.cost), 0.0))
+   295	        .join(Job, ProviderCall.job_id == Job.id)
+   296	        .filter(Job.household_id == household_id)
+   297	        .filter(ProviderCall.created_at >= month_start)
+   298	        .scalar()
+   299	    )
+   300	    unattributed = (
+   301	        db.query(func.coalesce(func.sum(ProviderCall.cost), 0.0))
+   302	        .filter(ProviderCall.job_id.is_(None))
+   303	        .filter(ProviderCall.created_at >= month_start)
+   304	        .scalar()
+   305	    )
+   306	    return float(joined or 0.0) + float(unattributed or 0.0)
+rc=0
+
+$ sed -n "61,63p" backend/app/services/providers/reader.py
+    61	RETRYABLE_ERRORS = frozenset(
+    62	    {"outage", "timeout", "rate_limited", "transport", "http_status", "invalid_json"}
+    63	)
+rc=0
+
+$ sed -n "43,56p" backend/tests/test_provider_gateway.py
+    43	def _valid_router(primary: FakeProvider, fallback: FakeProvider | None = None) -> ProviderRouter:
+    44	    registry = {primary.provider_id: primary}
+    45	    fallback_id = None
+    46	    if fallback is not None:
+    47	        registry[fallback.provider_id] = fallback
+    48	        fallback_id = fallback.provider_id
+    49	    config = RouterConfig(
+    50	        provider_id=primary.provider_id,
+    51	        fallback_id=fallback_id,
+    52	        json_strict=True,
+    53	        cost_budget=10.0,
+    54	        retryable_errors=frozenset({"outage", "timeout", "rate_limited"}),
+    55	    )
+    56	    return ProviderRouter(config=config, registry=registry)
+rc=0
+
+$ sed -n "73,91p" backend/tests/test_provider_gateway.py
+    73	def test_fallback_fires_on_retryable_error_only() -> None:
+    74	    primary = FakeProvider(mode="outage_retryable", provider_id="fake-primary")
+    75	    fallback = FakeProvider(mode="valid", provider_id="fake-fallback")
+    76	    router = _valid_router(primary, fallback)
+    77	
+    78	    result = router.execute("extract_text", "img-1", estimated_cost=1.0)
+    79	
+    80	    assert result.normalized_output["text"] == "fake-text"
+    81	    assert primary.invocations == 1
+    82	    assert fallback.invocations == 1
+    83	
+    84	    # Non-retryable surfaces: no fallback, error propagates.
+    85	    bad_primary = FakeProvider(mode="invalid_json_once", provider_id="bad-primary")
+    86	    bad_fallback = FakeProvider(mode="valid", provider_id="bad-fallback")
+    87	    bad_router = _valid_router(bad_primary, bad_fallback)
+    88	    with pytest.raises(ProviderError):
+    89	        bad_router.execute("extract_text", "img-1", estimated_cost=1.0)
+    90	    assert bad_primary.invocations == 1
+    91	    assert bad_fallback.invocations == 0
+rc=0
+
+$ sed -n "237,267p" backend/tests/test_privacy_audit.py
+   237	    assert _http_client_files() == {
+   238	        "api/v1/enrich.py": ["import httpx"],
+   239	        "services/enrich/client.py": ["import httpx"],
+   240	        "services/enrich/jina.py": ["import httpx", "import urllib"],
+   241	        "services/providers/opencode_go.py": ["import httpx"],
+   242	        "services/scene/openrouter.py": ["import httpx"],
+   243	    }, f"unexpected HTTP clients: {_http_client_files()}"
+   244	    assert _send_sites() == [
+   245	        "services/providers/opencode_go.py:263",
+   246	        "services/scene/openrouter.py:781",
+   247	        "services/scene/openrouter.py:783",
+   248	    ], f"unexpected provider send sites: {_send_sites()}"
+   249	
+   250	
+   251	def test_g0_redact_call_sites_are_reader_and_direct_adapter() -> None:
+   252	    """The only two callers of the shared redactor are the two image paths.
+   253	
+   254	    SG-101 shifts the adapter's call-site line by its text-path hunks; SG-125
+   255	    shifts the reader call site by its ledger-retention hunks; SG-142 shifts it
+   256	    again by its cap-join hunks (the caller SET is unchanged — still exactly the
+   257	    two image paths). The pin below tracks the line, not the caller set (M45).
+   258	    """
+   259	    callers: list[str] = []
+   260	    for path in sorted(APP_DIR.rglob("*.py")):
+   261	        for number, line in enumerate(path.read_text(encoding="utf-8").splitlines(), start=1):
+   262	            if "redact_image(" in line and "def redact_image" not in line:
+   263	                callers.append(f"{path.relative_to(APP_DIR)}:{number}")
+   264	    assert callers == [
+   265	        "services/providers/opencode_go.py:310",
+   266	        "services/providers/reader.py:483",
+   267	    ], f"unexpected redact_image call sites: {callers}"
+rc=0
+
+$ sed -n "288,296p" backend/app/services/scene/openrouter.py
+   288	def scene_spend_so_far(db: Session) -> tuple[float, int]:
+   289	    """Recorded scene spend: (sum of known costs, count of rows with cost NULL)."""
+   290	    known = 0.0
+   291	    unknown = 0
+   292	    for row in db.query(ProviderCall).filter(ProviderCall.provider == SCENE_LEDGER_PROVIDER).all():
+   293	        if row.cost is None:
+   294	            unknown += 1
+   295	        else:
+   296	            known += float(row.cost)
+rc=0
+
+$ sed -n "592,624p" backend/app/services/scene/openrouter.py
+   592	    """
+   593	    row = ProviderCall(
+   594	        provider=SCENE_LEDGER_PROVIDER,
+   595	        model=orchestrator,
+   596	        prompt_template_version=SCENE_LEDGER_TEMPLATE_VERSION,
+   597	        input_hashes=json.dumps(
+   598	            {"photo_sha256": photo_sha256, "brief_sha256": hashlib.sha256(brief.encode()).hexdigest()}
+   599	        ),
+   600	        output_payload=json.dumps(
+   601	            {
+   602	                "image_model": image_model,
+   603	                "orchestrator": orchestrator,
+   604	                "prompt": brief,
+   605	                "status_code": status_code,
+   606	                "response_id": response_id,
+   607	                "evidence_id": evidence_id,
+   608	                "remote_url": remote_url,
+   609	                "error_body": error_body,
+   610	                "response_body": response_body,
+   611	                "response_body_sha256": (
+   612	                    hashlib.sha256(response_body.encode("utf-8")).hexdigest()
+   613	                    if response_body
+   614	                    else None
+   615	                ),
+   616	            },
+   617	            ensure_ascii=False,
+   618	        ),
+   619	        cost=cost_usd,
+   620	        usage_json=json.dumps(usage, ensure_ascii=False) if usage is not None else None,
+   621	        latency_ms=latency_ms,
+   622	        error_state=error_state[:200] if error_state else None,
+   623	        job_id=None,
+   624	    )
+rc=0
+
+$ sed -n "801,869p" backend/app/services/scene/openrouter.py
+   801	    latency_ms = (time.monotonic() - started) * 1000.0
+   802	
+   803	    if response_json is not None:
+   804	        raw_usage = response_json.get("usage")
+   805	        if isinstance(raw_usage, dict):
+   806	            usage = raw_usage
+   807	            raw_cost = raw_usage.get("cost")
+   808	            if isinstance(raw_cost, (int, float)) and not isinstance(raw_cost, bool):
+   809	                cost_usd = float(raw_cost)
+   810	        raw_id = response_json.get("id")
+   811	        response_id = raw_id if isinstance(raw_id, str) else None
+   812	        if transport == "image_api":
+   813	            extracted = extract_image_b64(response_json)
+   814	            if extracted is not None:
+   815	                image_bytes, image_media = extracted
+   816	        else:
+   817	            image_url = extract_image_url(response_json)
+   818	
+   819	    if status_code == 200 and (image_url is not None or image_bytes is not None):
+   820	        acquired: tuple[bytes | None, str | None, str | None]
+   821	        if image_bytes is not None:
+   822	            acquired = (image_bytes, image_media, None)
+   823	        else:
+   824	            acquired = _download_image(
+   825	                image_url or "", http_client=http_client, timeout_s=SCENE_DOWNLOAD_TIMEOUT_S
+   826	            )
+   827	        data, media, download_error = acquired
+   828	        if data is not None and media is not None:
+   829	            image_media = media
+   830	            try:
+   831	                evidence = store_scene_render_evidence(
+   832	                    db,
+   833	                    household_id=household_id,
+   834	                    image_bytes=data,
+   835	                    media_type=media,
+   836	                    image_model=image_model,
+   837	                    brief=brief,
+   838	                    orchestrator=orchestrator,
+   839	                    response_id=response_id,
+   840	                    cost_usd=cost_usd,
+   841	                    usage=usage,
+   842	                )
+   843	            except Exception:
+   844	                error_state = "evidence_write_failed"
+   845	        else:
+   846	            error_state = download_error or "image_download_failed"
+   847	    elif status_code == 200:
+   848	        missing = "image_b64_missing" if transport == "image_api" else "image_url_missing"
+   849	        error_state = error_state or extract_image_tool_error(response_json) or missing
+   850	    elif status_code is not None:
+   851	        error_state = error_state or f"http_status:{status_code}"
+   852	
+   853	    ledger = record_scene_call(
+   854	        db,
+   855	        image_model=image_model,
+   856	        orchestrator=orchestrator,
+   857	        brief=brief,
+   858	        photo_sha256=photo_sha256,
+   859	        status_code=status_code,
+   860	        response_id=response_id,
+   861	        usage=usage,
+   862	        cost_usd=cost_usd,
+   863	        latency_ms=latency_ms,
+   864	        error_state=error_state,
+   865	        evidence_id=evidence.id if evidence is not None else None,
+   866	        remote_url=image_url,
+   867	        error_body=error_body,
+   868	        response_body=_persistable_response_body(response_json, error_body),
+   869	    )
+rc=0
+
+$ sed -n "316,330p" backend/app/services/chat/service.py
+   316	    content: str,
+   317	    result: Any,
+   318	) -> ProviderCall:
+   319	    row = ProviderCall(
+   320	        provider=provider_id,
+   321	        model=str(result.model_id or model_id),
+   322	        prompt_template_version=template_version,
+   323	        input_hashes=json.dumps(
+   324	            {"content_sha256": hashlib.sha256(content.encode("utf-8")).hexdigest()}
+   325	        ),
+   326	        output_payload=json.dumps(result.raw_payload, ensure_ascii=False, default=str),
+   327	        cost=result.cost,
+   328	        usage_json=json.dumps(result.usage, ensure_ascii=False),
+   329	        latency_ms=result.latency_ms,
+   330	        error_state=None,
+rc=0
+
+$ sed -n "225,242p" backend/app/services/planning/service.py
+   225	    prompt: str,
+   226	    result: Any,
+   227	) -> ProviderCall:
+   228	    row = ProviderCall(
+   229	        provider=provider_id,
+   230	        model=str(result.model_id or model_id),
+   231	        prompt_template_version="planning-v1",
+   232	        input_hashes=json.dumps({"prompt_sha256": hashlib.sha256(prompt.encode("utf-8")).hexdigest()}),
+   233	        output_payload=json.dumps(result.raw_payload, ensure_ascii=False, default=str),
+   234	        cost=result.cost,
+   235	        usage_json=json.dumps(result.usage, ensure_ascii=False),
+   236	        latency_ms=result.latency_ms,
+   237	        error_state=None,
+   238	        job_id=None,
+   239	    )
+   240	    db.add(row)
+   241	    db.flush()
+   242	    return row
+rc=0
+
+$ sed -n "421,438p" backend/app/services/analytics/service.py
+   421	def _write_ledger(
+   422	    db: Session, provider_id: str, model_id: str, version: str, prompt: str, result: Any
+   423	) -> ProviderCall:
+   424	    row = ProviderCall(
+   425	        provider=provider_id,
+   426	        model=str(result.model_id or model_id),
+   427	        prompt_template_version=version,
+   428	        input_hashes=json.dumps({"prompt_sha256": hashlib.sha256(prompt.encode("utf-8")).hexdigest()}),
+   429	        output_payload=json.dumps(result.raw_payload, ensure_ascii=False, default=str),
+   430	        cost=result.cost,
+   431	        usage_json=json.dumps(result.usage, ensure_ascii=False),
+   432	        latency_ms=result.latency_ms,
+   433	        error_state=None,
+   434	        job_id=None,
+   435	    )
+   436	    db.add(row)
+   437	    db.flush()
+   438	    return row
+rc=0
+
+$ sed -n "296,310p" backend/app/services/enrich/synthesize.py
+   296	    row = ProviderCall(
+   297	        provider=provider_id,
+   298	        model=model_id,
+   299	        prompt_template_version=template_version,
+   300	        input_hashes=json.dumps(
+   301	            {"synthesis_input_sha256": hashlib.sha256(user_text.encode("utf-8")).hexdigest()}
+   302	        ),
+   303	        output_payload=json.dumps(
+   304	            getattr(result, "raw_payload", {}) or {}, ensure_ascii=False, default=str
+   305	        ),
+   306	        cost=cost,
+   307	        usage_json=json.dumps(usage, ensure_ascii=False),
+   308	        latency_ms=latency_ms,
+   309	        error_state=None,
+   310	        job_id=None,
+rc=0
+
+$ sed -n "114,126p" backend/app/services/enrich/snapshots.py
+   114	    if a later step in the press fails.
+   115	    """
+   116	    text = query.strip()
+   117	    if not text:
+   118	        raise ValueError("query must be non-empty brand+name text")
+   119	    reason = snapshot.no_result_reason
+   120	    row = ProviderCall(
+   121	        provider=JINA_LEDGER_PROVIDER,
+   122	        model=JINA_LEDGER_MODEL,
+   123	        prompt_template_version=JINA_LEDGER_TEMPLATE_VERSION,
+   124	        input_hashes=json.dumps(
+   125	            {"query_sha256": hashlib.sha256(text.encode("utf-8")).hexdigest()}
+   126	        ),
+rc=0
+
+$ awk range line counts (shared-base move): 70-164, 298-309, 361-372
+95
+12
+12
+sum=119
+
+$ grep -n "input_usd\|output_usd\|INPUT_USD\|OUTPUT_USD\|def response_format_for\|def guard_content\|def guard_usage\|def strip_single_think\|def attach_body_accounting\|def compute_cost\|def estimate_call_cost" backend/app/services/providers/opencode_go.py
+44:INPUT_USD_PER_1M = 0.15
+45:OUTPUT_USD_PER_1M = 0.60
+63:def response_format_for(model: str) -> dict[str, str]:
+70:def guard_content(content: str | None) -> str:
+85:def guard_usage(usage: dict[str, Any]) -> dict[str, Any]:
+101:def strip_single_think(text: str) -> str:
+114:def attach_body_accounting(
+139:def compute_cost(usage: dict[str, Any]) -> float:
+148:    return (tokens_in * INPUT_USD_PER_1M + tokens_out * OUTPUT_USD_PER_1M) / 1_000_000
+151:def estimate_call_cost(
+164:    return (input_tokens * INPUT_USD_PER_1M + max_tokens * OUTPUT_USD_PER_1M) / 1_000_000
+rc=0
+
+$ grep -n "class OpenCodeGoProvider\|def extract_items\|def extract_text\|def _post\|def estimate_cost" backend/app/services/providers/opencode_go.py
+209:class OpenCodeGoProvider:
+244:    def estimate_cost(self, image_bytes: bytes, prompt: str) -> float:
+258:    def _post(self, payload: dict[str, Any]) -> dict[str, Any]:
+281:    def extract_items(
+337:    def extract_text(
+rc=0
+
+$ sed -n "26,41p" backend/app/api/v1/settings.py
+    26	ALLOWED_MODEL_IDS: tuple[str, ...] = ("deepseek-v4-flash-vision-exp",)
+    27	
+    28	
+    29	class AiSettingsOut(BaseModel):
+    30	    provider_id: str
+    31	    model_id: str
+    32	    allowed_model_ids: list[str]
+    33	    consent: bool
+    34	    per_job_cap: float | None
+    35	    monthly_cap: float | None
+    36	    prompt_category: str
+    37	
+    38	
+    39	class AiSettingsUpdate(BaseModel):
+    40	    model_id: str
+    41	
+rc=0
+
+$ sed -n "35,50p" backend/app/config.py
+    35	    sg_provider_id: str = "fake"
+    36	    sg_model_id: str = "deepseek-v4-flash-vision-exp"
+    37	    opencode_api_key: str | None = None
+    38	    # SG-097: Jina Search fallback key (Enrich). Declared so the settings seam
+    39	    # reads it; the JINA_API_KEY process environment remains the fallback.
+    40	    jina_api_key: str | None = None
+    41	    # SG-155: OpenRouter key for Context Scene rendering. Declared so the
+    42	    # settings seam reads it; the OPENROUTER_API_KEY process environment
+    43	    # remains the fallback. Off by default; the key value is never logged.
+    44	    openrouter_api_key: str | None = None
+    45	    # SG-155: per-arc scene render spend cap in USD. Off by default (uncapped)
+    46	    # per F2; the request carries a `max_cost` stop condition only when set.
+    47	    sg_scene_cap: float | None = None
+    48	    sg_per_job_cap: float | None = None
+    49	    sg_monthly_cap: float | None = None
+    50	    sg_consent: bool = False
+rc=0
+
+$ sed -n "16,21p" backend/app/services/providers/redaction.py
+    16	def redact_image(raw: bytes) -> bytes:
+    17	    """Re-encode any decodable image to PNG carrying zero EXIF/GPS tags."""
+    18	    with Image.open(io.BytesIO(raw)) as img:
+    19	        upright = ImageOps.exif_transpose(img)
+    20	        buffer = io.BytesIO()
+    21	        upright.save(buffer, format="PNG")
+rc=0
+
+$ sed -n "216,230p" backend/app/models/provider_call.py
+rc=0
+(provider_call.py has only 25 lines; the command above returns nothing, noted honestly)
+
+$ sed -n "8,25p" backend/app/models/provider_call.py
+     8	class ProviderCall(TimestampMixin, Base):
+     9	    """Ledger row for every AI provider call (blueprint §3.3)."""
+    10	
+    11	    __tablename__ = "provider_call"
+    12	
+    13	    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=new_id)
+    14	    provider: Mapped[str] = mapped_column(String(100), nullable=False, index=True)
+    15	    model: Mapped[str] = mapped_column(String(200), nullable=False)
+    16	    prompt_template_version: Mapped[str] = mapped_column(String(100), nullable=False)
+    17	    input_hashes: Mapped[str | None] = mapped_column(Text, nullable=True)
+    18	    output_payload: Mapped[str | None] = mapped_column(Text, nullable=True)
+    19	    cost: Mapped[float | None] = mapped_column(Float, nullable=True)
+    20	    usage_json: Mapped[str | None] = mapped_column(Text, nullable=True)
+    21	    latency_ms: Mapped[float | None] = mapped_column(Float, nullable=True)
+    22	    error_state: Mapped[str | None] = mapped_column(String(200), nullable=True)
+    23	    job_id: Mapped[str | None] = mapped_column(
+    24	        String(36), ForeignKey("job.id", ondelete="SET NULL"), nullable=True, index=True
+    25	    )
+rc=0
+
+$ grep -n "VALID_MODES\|ProviderError(" backend/app/services/providers/fake.py
+20:VALID_MODES = ("valid", "invalid_json_once", "needs_evidence", "outage_retryable")
+27:        if mode not in VALID_MODES:
+38:            raise ProviderError("outage", f"fake outage on {operation}")
+41:            raise ProviderError("invalid_json", f"fake invalid JSON on {operation}")
+121:            raise ProviderError("invalid_json", f"scripted invalid_json on attempt {self.invocations}")
+rc=0
+utc_end=2026-10-24T17:07:18Z epoch_end=1792861638
+
+--- appended: Jina snapshot writer job link (utc=2026-10-24T17:10:14Z) ---
+$ sed -n "118,145p" backend/app/services/enrich/snapshots.py
+   118	        raise ValueError("query must be non-empty brand+name text")
+   119	    reason = snapshot.no_result_reason
+   120	    row = ProviderCall(
+   121	        provider=JINA_LEDGER_PROVIDER,
+   122	        model=JINA_LEDGER_MODEL,
+   123	        prompt_template_version=JINA_LEDGER_TEMPLATE_VERSION,
+   124	        input_hashes=json.dumps(
+   125	            {"query_sha256": hashlib.sha256(text.encode("utf-8")).hexdigest()}
+   126	        ),
+   127	        output_payload=json.dumps(
+   128	            {
+   129	                "request_url": snapshot.request_url,
+   130	                "status_code": snapshot.status_code,
+   131	                "no_result_reason": reason,
+   132	                "result_count": len(snapshot.results),
+   133	            },
+   134	            ensure_ascii=False,
+   135	        ),
+   136	        cost=jina_mod.estimate_jina_search_cost(tokens),
+   137	        usage_json=json.dumps({"requests": 1, "tokens": tokens}, ensure_ascii=False),
+   138	        latency_ms=None,
+   139	        error_state=reason[:200] if reason else None,
+   140	        job_id=job.id,
+   141	    )
+   142	    db.add(row)
+   143	    db.commit()
+   144	    return row
+   145	
+rc=0
+
+$ sed -n "331p;369p" backend/app/services/chat/service.py
+     1	        job_id=None,
+     2	        job_id=None,
+rc=0
+
+$ sed -n "238p;272p" backend/app/services/planning/service.py
+     1	        job_id=None,
+     2	        job_id=None,
+rc=0
+
+$ sed -n "434p;469p" backend/app/services/analytics/service.py
+     1	        job_id=None,
+     2	        job_id=None,
+rc=0
+
+$ sed -n "310p" backend/app/services/enrich/synthesize.py
+     1	        job_id=None,
+rc=0
