@@ -1,0 +1,41 @@
+SG-244 receipt transcript (pub) utc=2026-10-24T16:42:49Z
+Contract echo (/home/andrei/storagegenie-contract/CODER.md line 3, verbatim): **Contract version: 0.52.0** — **echo this line verbatim in your receipt.** It is the only proof that you
+Work-HEAD=e447c8930708bba1f8d1cbb8499e65b5f32c2542
+$ git fetch origin +refs/notes/storagegenie-coder-reports:refs/notes/storagegenie-coder-reports
+prefetch_exit=0
+$ git notes --ref=refs/notes/storagegenie-coder-reports show e447c8930708bba1f8d1cbb8499e65b5f32c2542
+error: no note found for object e447c8930708bba1f8d1cbb8499e65b5f32c2542.
+pre_show_exit=1
+$ git notes --ref=refs/notes/storagegenie-coder-reports add -m "Dispatch-ID: SG-244 | Report: docs/worklogs/SG-244_report.md | Work-HEAD: e447c8930708bba1f8d1cbb8499e65b5f32c2542" e447c8930708bba1f8d1cbb8499e65b5f32c2542
+notes_add_exit=0
+$ git notes --ref=refs/notes/storagegenie-coder-reports show e447c8930708bba1f8d1cbb8499e65b5f32c2542
+Dispatch-ID: SG-244 | Report: docs/worklogs/SG-244_report.md | Work-HEAD: e447c8930708bba1f8d1cbb8499e65b5f32c2542
+notes_show_exit=0
+$ timeout 300 git push origin refs/notes/storagegenie-coder-reports
+To github.com:Andovol/StorageGenie.git
+   66fc0a4..925f543  refs/notes/storagegenie-coder-reports -> refs/notes/storagegenie-coder-reports
+notes_push_exit=0
+utc_end=2026-10-24T16:42:52Z
+
+SG-244 receipt read-back utc=2026-10-24T16:42:56Z
+$ git fetch origin +refs/notes/storagegenie-coder-reports:refs/notes/storagegenie-coder-reports-sg244-fetched
+readback_fetch_exit=0
+ * [new ref]         refs/notes/storagegenie-coder-reports -> refs/notes/storagegenie-coder-reports-sg244-fetched
+$ git rev-parse refs/notes/storagegenie-coder-reports-sg244-fetched
+925f5433a78559268cc47f40a0c3b190c1f989bd
+$ git notes --ref=refs/notes/storagegenie-coder-reports-sg244-fetched show e447c8930708bba1f8d1cbb8499e65b5f32c2542
+Dispatch-ID: SG-244 | Report: docs/worklogs/SG-244_report.md | Work-HEAD: e447c8930708bba1f8d1cbb8499e65b5f32c2542
+fetched_show_exit=0
+$ git notes --ref=refs/notes/storagegenie-coder-reports-sg244-fetched show e447c8930708bba1f8d1cbb8499e65b5f32c2542 | grep -c 'Dispatch-ID: SG-244'
+1
+$ git ls-remote origin refs/notes/storagegenie-coder-reports refs/heads/automation
+e447c8930708bba1f8d1cbb8499e65b5f32c2542	refs/heads/automation
+925f5433a78559268cc47f40a0c3b190c1f989bd	refs/notes/storagegenie-coder-reports
+lsremote_exit=0
+utc_end=2026-10-24T16:42:59Z
+
+Result: receipt present on refs/notes/storagegenie-coder-reports at
+925f5433a78559268cc47f40a0c3b190c1f989bd, attached to Work-HEAD
+e447c8930708bba1f8d1cbb8499e65b5f32c2542; note=yes. This transcript itself is
+committed docs-only after the note; the note stays attached to the work commit that
+carries the report.
