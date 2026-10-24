@@ -206,3 +206,97 @@ items go to the owner as four separate items after the round-2 review (SG-249), 
 **Scope note.** The rule is read in the strong sense — it covers **every** model or provider choice for the
 product, and it also covers a change to the model that runs a slice. If the owner meant only the product's AI
 models, the standing dispatch policy continues unchanged either way.
+## D-1024-17 — D1: no fallback yet
+
+Owner, 2026-10-24 (this chat), verbatim: *"D1 - no fallback yet."*
+
+**Do:** roadmap row 14's **fallback is not built now**. No second photo reader, no fallback wiring, no provider or
+fallback id in the settings surface, no shared-base extraction (it exists only to serve a second adapter), no
+second key, no vendor choice, no vision model id. The router's fallback branch stays exactly as it is — built,
+tested, and unreachable in production because no call site sets `fallback_id` — which is precisely "not yet".
+
+**What this defers to `docs/backlog.md` (W6), each with the owner's word as its trigger:** the second photo
+reader and its own rate table and estimator; the fallback wiring at the five call sites (four router sites plus
+the `services/enrich/synthesize.py:276-285` bypass); the shared base (the measured 119 vendor-neutral lines); the
+provider/fallback settings surface; the ledger reader's provider filter; the gateway test's parity with the
+production retryable classes; and the vision model id.
+
+**What this does not stop:** the cost-logging work of D-1024-19, and W1 (the two always-red host signal tests) —
+the app's existing local signals feature is untouched (D-1024-18).
+
+## D-1024-18 — D2: cloud only — no built-in reader, no local reader
+
+Owner, 2026-10-24 (this chat), verbatim: *"D2 - No built in or local reader, only cloud."*
+
+**Do:** roadmap row 14's **"local option" is not built**. No local provider, no local fallback destination, and no
+local reader added to the product. Together with D-1024-15 (**no local models on the server**), the path that
+*proposes items* is **cloud only**.
+
+**Scope, stated plainly, because it matters.** This decision is about **what we build**. The app's **existing**
+local signals feature — roadmap row 3, "read labels automatically": the barcode and OCR observations read from
+the stored photo in `backend/app/services/signals.py` — is **not removed by it**, because that path reads two
+things a cloud model cannot: the photo's own **date** (EXIF) and, just as important, it is where the image's
+**GPS is stripped** (`backend/app/services/providers/redaction.py:16-21`; the signal path reads the stored file).
+A privacy property that depends on the image never carrying location data off the machine does not belong to a
+model. **If the owner means the existing reader also goes, say so** — that is a separate, larger product change
+and it would also dissolve W1.
+
+**Consequences:** the blueprint's local-fallback language is **amended** to the no-model, no-local reading
+(`inception/generic_asset_catalog_expiry_tracker_blueprint.md:318`, `:533-539`); row 14's "local" half is closed;
+`fallback_id` may never resolve to a local provider.
+
+## D-1024-19 — D3: stop predicting costs, log the actual costs
+
+Owner, 2026-10-24 (this chat), verbatim: *"D3 - Stop carrying about predicting costs, just log the costs and thats
+it."*
+
+**Do:** the app stops **predicting** what a call will cost and stops **refusing a call on a prediction**. It
+records and logs what each call **actually** cost.
+
+**Removed**
+
+- the pre-call cost estimate — `providers/opencode_go.py:151-164` (`estimate_call_cost`), `:244-250`
+  (`estimate_cost`);
+- the router's cost budget and its pre-call refusal — `providers/router.py:35` (`cost_budget`), `:52-74`
+  (`execute(..., estimated_cost=…)`, the refusal at `:71-74`);
+- the reader's estimate plumbing — `providers/reader.py:233-242` (`_estimate_call`), `:480-484`;
+- the monthly cap and the ledger reader that fed it — `providers/reader.py:293-306` (`_recorded_spend`),
+  `:486-497`;
+- the per-job cap and the adapter's duplicate budget guards — `providers/opencode_go.py:298-309`, `:361-372`;
+- the `estimated_cost` parameter of the provider protocol — `providers/protocols.py:28-37`;
+- the two cap settings — `backend/app/config.py:48-49` (`sg_per_job_cap`, `sg_monthly_cap`) and their place in
+  the settings surface — `backend/app/api/v1/settings.py:29-36`.
+
+**Kept**
+
+- the **consent gate** — `providers/reader.py:108-114`, `config.py:50`: that is the owner's switch for AI use,
+  not a cost prediction;
+- the **actual** post-call cost — computed from the response's real token usage
+  (`providers/opencode_go.py:139-148`, `compute_cost`) and recorded in the `provider_call` ledger
+  (`providers/reader.py:208-230`);
+- the **scene** feature's own cap — `config.py:45-47`, `services/scene/openrouter.py:288-296`: a different
+  feature's limit, enforced against **actual** reported cost, not a prediction, and therefore outside this
+  decision.
+
+**Added** — one INFO line per provider call carrying the **actual** cost and the token counts, so the cost is
+visible in the server log without a query.
+
+**No schema change, no migration** — the ledger table and its columns stay as they are.
+
+**Why this is a simplification rather than a loss:** both caps have been `None` — off — since the owner's own
+"no caps at first" (2026-09-11, F2), so the machinery bound nothing; what the app keeps is a truthful record of
+what each call cost, and the budget conversation moves to the owner, where it belongs.
+
+**What it does not touch:** the fallback work (deferred, D-1024-17), the local reader (D-1024-18), and the
+app's local signals feature.
+
+## The three answers together — what roadmap row 14 now is
+
+Row 14's original scope ("Second AI provider and local option with fallback and spending limits") reduces to
+**one small slice**: stop predicting costs, keep and complete the actual-cost record, and log it. The second
+provider, the fallback and the local option are **deferred by the owner** (D-1024-17, D-1024-18), and the
+blueprint is amended to say so. The **next slice is therefore a slimming slice, not a building slice** — and the
+money the review spent on caps and estimates bought exactly this: a smaller row.
+
+**W1 is untouched by all three answers** — the two always-red host signal tests belong to the app's existing
+local signals feature (roadmap row 3), which D-1024-18 does not remove. W1 stays open as it was.

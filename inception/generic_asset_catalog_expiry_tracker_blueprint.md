@@ -315,7 +315,7 @@ Each result includes normalized output, raw provider payload, request ID, usage/
 
 ### 6.2 Provider router
 
-Routing policy is configuration-driven (provider, fallback, local fallback, JSON-schema strictness, per-job cost budget, retryable errors). Do not route on nominal model quality alone — measure structured-output validity, extraction agreement, latency, cost, and human-correction rate against a private evaluation set.
+Routing policy is configuration-driven (provider, fallback, JSON-schema strictness, retryable errors). **Amended 2026-10-24 (D-1024-18, D-1024-19):** the *local fallback* and the *per-job cost budget* are out — there is no local provider (no local models on the server, D-1024-15), and the app does not predict call costs: it records and logs the actual cost of each call. Do not route on nominal model quality alone — measure structured-output validity, extraction agreement, latency, cost, and human-correction rate against a private evaluation set.
 
 ### 6.3 Prompt and schema discipline
 
@@ -532,11 +532,11 @@ Build a private evaluation set before optimizing prompts, covering: visible vs. 
 
 ### Phase 4 — Provider flexibility, extensibility, analytics
 
-- Second cloud provider + optional local provider adapter; router, fallback, budgets.
+- Second cloud provider + optional local provider adapter; router, fallback, budgets. **Amended 2026-10-24 (D-1024-17, D-1024-18, D-1024-19):** the second cloud provider and the fallback are **deferred by the owner**; there is **no local provider adapter** (no local models on the server — D-1024-15 — and the reading path is cloud only — D-1024-18); the **budgets are replaced by actual-cost logging** — the app predicts no call cost and refuses no call on a prediction; it records and logs what each call actually cost. The router keeps its fallback branch, built and unreachable until a second provider is chosen.
 - Taxonomy editor, plugin contract hardening, FTS, advanced filters, asset relations.
 - Analytics Insight Agent; remaining categories (Household chemicals, Documents).
 
-**Exit condition:** changing providers needs configuration, not code; a new plugin domain can be defined without modifying core tables.
+**Exit condition:** changing providers needs configuration, not code; a new plugin domain can be defined without modifying core tables. **Amended 2026-10-24 (D-1024-17):** with the second provider deferred, the exit condition reads as: *switching and budgeting between providers is configuration; adding a brand-new provider costs one small adapter.* Choosing the second provider, its key and its vision model id are the owner's (D-1024-16).
 
 ### Phase 5 — Hardening (ongoing)
 
