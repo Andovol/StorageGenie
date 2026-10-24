@@ -1,0 +1,138 @@
+=== G1 pre-state read-only ===
+2026-10-24T14:21:01Z
+1792851661
+--- docker ps ---
+ee4e165af4b6 storagegenie-backend-1 storagegenie-backend Up 21 minutes (healthy) 127.0.0.1:8003->8000/tcp
+--- container identity ---
+Id=ee4e165af4b62da2f20af53a3ce887ba79fb1da0244417d8648dbcc5d53fd17c
+Name=/storagegenie-backend-1
+Created=2026-10-24T11:30:45.946797846Z
+State.StartedAt=2026-10-24T13:59:05.238544242Z
+State.RestartCount=
+template parsing error: template: :1:8: executing "" at <.State.RestartCount>: map has no entry for key "RestartCount"
+State.Health.Status=healthy
+State.Status=running
+Config.Image=storagegenie-backend
+Config.Cmd=[uvicorn app.server:app --host 0.0.0.0 --port 8000]
+HostConfig.RestartPolicy.Name=unless-stopped
+image_id_from_repo_digests:
+"sha256:2bd3599f2b68980576454f889a7b93db291ec8e0c08f5f7a7afd52b7af93ef5f"
+--- health start ---
+http=200 time=0.004907
+{"status":"ok","db":"ok","storage":"ok"}
+--- served index + bundle ---
+index_http=200 bytes=944
+9850538ada127ac99cb5ecabea3eaf1ab9234fd39cfc28badd54b34a36bddfce  /tmp/opencode/SG-239/pre/index.html
+assets=/assets/index-B0lDq5dE.js
+/assets/index-C07VbG0m.css
+/assets/index-B0lDq5dE.js http=200 bytes=323000
+b6e26a8e99ef4a802bcbd77ae9661a54344383b2895d6989c9e34235b1742a93  /tmp/opencode/SG-239/pre/index-B0lDq5dE.js
+/assets/index-C07VbG0m.css http=200 bytes=4535
+c3b58cda696a22970fc2a4a348849fc1359f2105f80f81304ed5dfd5ca31a557  /tmp/opencode/SG-239/pre/index-C07VbG0m.css
+--- production sqlite (read-only) ---
+43d81b771fb4583ded49c7496c10df3722ce0b6a92828bba7d8b0fb70661de00  data/db/storagegenie.db
+db_bytes=765952
+ok
+20261023_sg233_reminder
+table_count=29
+alembic_version=1
+assertion=40
+asset=7
+asset_evidence=20
+asset_fts=7
+asset_fts_config=1
+asset_fts_data=9
+asset_fts_docsize=7
+asset_fts_idx=7
+asset_location=1
+asset_relation=1
+audit_event=104
+candidate=10
+enrich_snapshot=4
+evidence=27
+guardrail_event=2
+household=1
+idempotency_key=11
+job=11
+job_step=72
+location=1
+observation=20
+planning_suggestion=0
+provider_call=39
+reminder=1
+review_task=9
+saved_search=0
+source_attribution=0
+user=2
+--- reminder row ---
+Error: in prepare, no such column: window_days
+  select id,household_id,asset_id,as_of_day,tier,window_days,bucket,days_remaini
+                                   error here ---^
+--- household ---
+id                                    name             
+------------------------------------  -----------------
+01a0a029-1477-7ca0-b200-bce78a96c679  Popescu Household
+--- runtime diff: old image vs worktree (docker create+cp, no execution) ---
+old_image=sha256:2bd3599f2b68980576454f889a7b93db291ec8e0c08f5f7a7afd52b7af93ef5f
+temp_container=37559658529a94db9f0016d85cdf2e1dcea9c6ba198fafe125dcf2e88586d5ff
+image_files=115 host_files=115
+--- /tmp/opencode/SG-239/image_hashes.txt	2026-10-24 14:21:02.571056613 +0000
++++ /tmp/opencode/SG-239/host_hashes.txt	2026-10-24 14:21:02.583056610 +0000
+@@ -106,7 +106,7 @@
+ 1d2d17cff04a00cedccaf80f32d95a62fef0f52242a1ebb56dd39151956e2254  ./services/providers/router.py
+ 94e8d6827d5adc18aa6469e86f4b24053a3a00f06a306db7ff55b71d0291deee  ./services/providers/schemas.py
+ e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  ./services/reminders/__init__.py
+-26845506107e243e31eabada3ca17948aec0b9d95bb9c15093f9a91c553e6959  ./services/reminders/daily.py
++96dc2edc024fc42fc175fb6b76f97c6f1215254f1ee2876e09d0a3e25b8e8d83  ./services/reminders/daily.py
+ 6e416dc129ecdd24f5267e84a10e34f8c05c030a8fe0a3006995d85dd1b1c187  ./services/reminders/service.py
+ d81971447f0961f88acd18bd67315a06631a223ad58a25a81c9b324a36971d52  ./services/scene/__init__.py
+ 69f5abeca6d2e298ba74d225e09fe855dd81cd049100c79158fd2761d64c8b15  ./services/scene/openrouter.py
+runtime_file_diff_rc=1
+--- Dockerfile ---
+d9c60bbaadbb9717ed64ffd7b0cd7445c37995e0f961e2c0553b774fa760503e  /tmp/opencode/SG-239/image_Dockerfile
+d9c60bbaadbb9717ed64ffd7b0cd7445c37995e0f961e2c0553b774fa760503e  backend/Dockerfile
+--- live day ---
+2026-10-24
+2026-10-24T14:21:02Z
+1792851662
+--- restart count + reminder schema/row (correction of failed column name) ---
+RestartCount=0
+cid  name            type         notnull  dflt_value         pk
+---  --------------  -----------  -------  -----------------  --
+0    id              VARCHAR(36)  1                           1 
+1    household_id    VARCHAR(36)  1                           0 
+2    asset_id        VARCHAR(36)  1                           0 
+3    as_of_day       VARCHAR(10)  1                           0 
+4    tier            VARCHAR(50)  0                           0 
+5    bucket          VARCHAR(20)  1                           0 
+6    days_remaining  INTEGER      1                           0 
+7    status          VARCHAR(20)  1                           0 
+8    created_at      DATETIME     1        CURRENT_TIMESTAMP  0 
+9    updated_at      DATETIME     1        CURRENT_TIMESTAMP  0 
+id                                    household_id                          asset_id                              as_of_day   tier    bucket     days_remaining  status  created_at           updated_at         
+------------------------------------  ------------------------------------  ------------------------------------  ----------  ------  ---------  --------------  ------  -------------------  -------------------
+01a16e35-4394-7c11-9798-844754826bcc  01a0a029-1477-7ca0-b200-bce78a96c679  01a0c4aa-8b62-7360-b11e-a476ddaea0f6  2026-10-24  urgent  this-week  3               unread  2026-10-24 13:59:06  2026-10-24 13:59:06
+--- reminder via live endpoint pre ---
+{"household_id":"01a0a029-1477-7ca0-b200-bce78a96c679","unread_count":1,"items":[{"id":"01a16e35-4394-7c11-9798-844754826bcc","household_id":"01a0a029-1477-7ca0-b200-bce78a96c679","asset_id":"01a0c4aa-8b62-7360-b11e-a476ddaea0f6","display_name":"Miso Soup","as_of_day":"2026-10-24","tier":"urgent","window_days":7,"bucket":"this-week","days_remaining":3,"status":"unread","created_at":"2026-10-24T13:59:06","updated_at":"2026-10-24T13:59:06"}]}
+http=200
+--- exact runtime diff daily.py (image -> worktree) ---
+--- /tmp/opencode/SG-239/image_app/services/reminders/daily.py	2026-10-24 11:08:53.000000000 +0000
++++ backend/app/services/reminders/daily.py	2026-10-24 14:10:00.216214793 +0000
+@@ -72,6 +72,14 @@
+                 )
+     finally:
+         session.close()
++    logger.info(
++        "Daily reminder pass completed as_of=%s households_visited=%d "
++        "reminders_created=%d errors=%d",
++        day.isoformat(),
++        visited,
++        created,
++        len(errors),
++    )
+     return DailyPassResult(
+         as_of_day=day,
+         households_visited=visited,
+diff_rc=1
+2026-10-24T14:21:10Z
+1792851670

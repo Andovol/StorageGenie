@@ -1,0 +1,58 @@
+SG-239 one recreate (lane socket; NO migration; issuance 1 of 1)
+2026-10-24T14:21:45Z
+1792851705
+--- before ---
+pre_Id=ee4e165af4b62da2f20af53a3ce887ba79fb1da0244417d8648dbcc5d53fd17c
+pre_Created=2026-10-24T11:30:45.946797846Z
+pre_State.StartedAt=2026-10-24T13:59:05.238544242Z
+pre_RestartCount=0
+pre_State.Health.Status=healthy
+pre_State.Status=running
+pre_Config.Image=storagegenie-backend
+pre_cmd=["uvicorn","app.server:app","--host","0.0.0.0","--port","8000"]
+--- compose up -d --no-deps --force-recreate backend ---
+ Container storagegenie-backend-1 Recreate 
+ Container storagegenie-backend-1 Recreated 
+ Container storagegenie-backend-1 Starting 
+ Container storagegenie-backend-1 Started 
+recreate_rc=0
+recreate_start_utc=2026-10-24T14:21:46Z recreate_end_utc=2026-10-24T14:21:47Z recreate_wall_s=1.544
+--- after (immediate) ---
+post_Id=67f668e206e3e8e33bb07f9002b57adbd25a734eb938114e248bb9fc66c9b470
+post_Created=2026-10-24T14:21:46.352517418Z
+post_State.StartedAt=2026-10-24T14:21:47.390964715Z
+post_RestartCount=0
+post_State.Health.Status=starting
+post_State.Status=running
+post_Config.Image=storagegenie-backend
+post_cmd=["uvicorn","app.server:app","--host","0.0.0.0","--port","8000"]
+--- bounded wait for pass line: 60 s bound, 5 s steps ---
+step=1 elapsed_s=5 pass_lines=0
+step=2 elapsed_s=10 pass_lines=0
+step=3 elapsed_s=15 pass_lines=0
+step=4 elapsed_s=20 pass_lines=0
+step=5 elapsed_s=25 pass_lines=0
+step=6 elapsed_s=30 pass_lines=0
+step=7 elapsed_s=35 pass_lines=0
+step=8 elapsed_s=40 pass_lines=0
+step=9 elapsed_s=45 pass_lines=0
+step=10 elapsed_s=50 pass_lines=0
+step=11 elapsed_s=55 pass_lines=0
+step=12 elapsed_s=60 pass_lines=0
+pass_line_found=0
+--- new container log (verbatim) ---
+INFO:     Started server process [1]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+INFO:     127.0.0.1:45920 - "GET /v1/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:38180 - "GET /v1/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51172 - "GET /v1/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:35880 - "GET /v1/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:43642 - "GET /v1/health HTTP/1.1" 200 OK
+--- pass-line grep (count and text) ---
+grep_rc=1
+--- failure scan ---
+failure_grep_rc=1
+2026-10-24T14:22:48Z
+1792851768

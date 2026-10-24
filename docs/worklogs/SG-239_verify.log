@@ -1,0 +1,131 @@
+=== G2 post-recreate verification (read-only) ===
+2026-10-24T14:23:31Z
+1792851811
+--- identity ---
+Id=67f668e206e3e8e33bb07f9002b57adbd25a734eb938114e248bb9fc66c9b470
+Created=2026-10-24T14:21:46.352517418Z
+State.StartedAt=2026-10-24T14:21:47.390964715Z
+RestartCount=0
+State.Health.Status=healthy
+State.Status=running
+Config.Image=storagegenie-backend
+Cmd=["uvicorn","app.server:app","--host","0.0.0.0","--port","8000"]
+old_container_inspect_after_recreate:
+
+error: no such object: ee4e165af4b62da2f20af53a3ce887ba79fb1da0244417d8648dbcc5d53fd17c
+old_inspect_rc=1
+--- six health GETs ---
+health_1 http=200 time=0.003217 {"status":"ok","db":"ok","storage":"ok"}
+health_2 http=200 time=0.002689 {"status":"ok","db":"ok","storage":"ok"}
+health_3 http=200 time=0.002734 {"status":"ok","db":"ok","storage":"ok"}
+health_4 http=200 time=0.002390 {"status":"ok","db":"ok","storage":"ok"}
+health_5 http=200 time=0.003348 {"status":"ok","db":"ok","storage":"ok"}
+health_6 http=200 time=0.003165 {"status":"ok","db":"ok","storage":"ok"}
+--- served bundle post ---
+index_http=200 bytes=944
+9850538ada127ac99cb5ecabea3eaf1ab9234fd39cfc28badd54b34a36bddfce  /tmp/opencode/SG-239/post/index.html
+assets=/assets/index-B0lDq5dE.js
+/assets/index-C07VbG0m.css
+/assets/index-B0lDq5dE.js http=200 bytes=323000
+b6e26a8e99ef4a802bcbd77ae9661a54344383b2895d6989c9e34235b1742a93  /tmp/opencode/SG-239/post/index-B0lDq5dE.js
+/assets/index-C07VbG0m.css http=200 bytes=4535
+c3b58cda696a22970fc2a4a348849fc1359f2105f80f81304ed5dfd5ca31a557  /tmp/opencode/SG-239/post/index-C07VbG0m.css
+--- pre-vs-post bundle ---
+index-B0lDq5dE.js IDENTICAL
+index-C07VbG0m.css IDENTICAL
+index.html IDENTICAL
+--- pages ---
+/ http=200 bytes=944 9850538ada127ac99cb5ecabea3eaf1ab9234fd39cfc28badd54b34a36bddfce
+/expiry http=200 bytes=944 9850538ada127ac99cb5ecabea3eaf1ab9234fd39cfc28badd54b34a36bddfce
+/inbox http=200 bytes=944 9850538ada127ac99cb5ecabea3eaf1ab9234fd39cfc28badd54b34a36bddfce
+/planning http=200 bytes=944 9850538ada127ac99cb5ecabea3eaf1ab9234fd39cfc28badd54b34a36bddfce
+--- production sqlite post (read-only) ---
+2865c7ba977e72094e9386845b94e172ce78fc7b5ca10fa38bd7be8ea4a8d0ce  data/db/storagegenie.db
+db_bytes=765952
+ok
+20261023_sg233_reminder
+table_count=29
+alembic_version=1
+assertion=40
+asset=7
+asset_evidence=20
+asset_fts=7
+asset_fts_config=1
+asset_fts_data=9
+asset_fts_docsize=7
+asset_fts_idx=7
+asset_location=1
+asset_relation=1
+audit_event=104
+candidate=10
+enrich_snapshot=4
+evidence=27
+guardrail_event=2
+household=1
+idempotency_key=11
+job=11
+job_step=72
+location=1
+observation=20
+planning_suggestion=0
+provider_call=39
+reminder=1
+review_task=9
+saved_search=0
+source_attribution=0
+user=2
+--- reminder row post ---
+id                                    household_id                          asset_id                              as_of_day   tier    bucket     days_remaining  status  created_at           updated_at         
+------------------------------------  ------------------------------------  ------------------------------------  ----------  ------  ---------  --------------  ------  -------------------  -------------------
+01a16e35-4394-7c11-9798-844754826bcc  01a0a029-1477-7ca0-b200-bce78a96c679  01a0c4aa-8b62-7360-b11e-a476ddaea0f6  2026-10-24  urgent  this-week  3               unread  2026-10-24 13:59:06  2026-10-24 13:59:06
+--- GET /v1/reminders post ---
+{"household_id":"01a0a029-1477-7ca0-b200-bce78a96c679","unread_count":1,"items":[{"id":"01a16e35-4394-7c11-9798-844754826bcc","household_id":"01a0a029-1477-7ca0-b200-bce78a96c679","asset_id":"01a0c4aa-8b62-7360-b11e-a476ddaea0f6","display_name":"Miso Soup","as_of_day":"2026-10-24","tier":"urgent","window_days":7,"bucket":"this-week","days_remaining":3,"status":"unread","created_at":"2026-10-24T13:59:06","updated_at":"2026-10-24T13:59:06"}]}
+http=200
+--- served image vs worktree runtime diff (docker create+cp, no execution) ---
+served_image=sha256:54f520da868a3859a4e8715d6584a93843413868694e8a375383b44647ba477e
+served_vs_worktree_diff_rc=0
+d9c60bbaadbb9717ed64ffd7b0cd7445c37995e0f961e2c0553b774fa760503e  /tmp/opencode/SG-239/served_Dockerfile
+d9c60bbaadbb9717ed64ffd7b0cd7445c37995e0f961e2c0553b774fa760503e  backend/Dockerfile
+--- container log: pass-line count ---
+0
+pass_line_count_rc=1
+--- full container log ---
+INFO:     Started server process [1]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+INFO:     127.0.0.1:45920 - "GET /v1/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:38180 - "GET /v1/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51172 - "GET /v1/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:35880 - "GET /v1/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:43642 - "GET /v1/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58410 - "GET /v1/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58500 - "GET /v1/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60058 - "GET /v1/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57570 - "GET /v1/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:33302 - "GET /v1/health HTTP/1.1" 200 OK
+INFO:     172.18.0.1:60452 - "GET /v1/health HTTP/1.1" 200 OK
+INFO:     172.18.0.1:60454 - "GET /v1/health HTTP/1.1" 200 OK
+INFO:     172.18.0.1:60462 - "GET /v1/health HTTP/1.1" 200 OK
+INFO:     172.18.0.1:60468 - "GET /v1/health HTTP/1.1" 200 OK
+INFO:     172.18.0.1:60476 - "GET /v1/health HTTP/1.1" 200 OK
+INFO:     172.18.0.1:60490 - "GET /v1/health HTTP/1.1" 200 OK
+INFO:     172.18.0.1:60502 - "GET / HTTP/1.1" 200 OK
+INFO:     172.18.0.1:60506 - "GET /assets/index-B0lDq5dE.js HTTP/1.1" 200 OK
+INFO:     172.18.0.1:60516 - "GET /assets/index-C07VbG0m.css HTTP/1.1" 200 OK
+INFO:     172.18.0.1:60524 - "GET / HTTP/1.1" 200 OK
+INFO:     172.18.0.1:60532 - "GET /expiry HTTP/1.1" 200 OK
+INFO:     172.18.0.1:60540 - "GET /inbox HTTP/1.1" 200 OK
+INFO:     172.18.0.1:60544 - "GET /planning HTTP/1.1" 200 OK
+INFO:     172.18.0.1:60552 - "GET /v1/reminders?household_id=01a0a029-1477-7ca0-b200-bce78a96c679 HTTP/1.1" 200 OK
+2026-10-24T14:23:32Z
+1792851812
+--- final log checks ---
+pass_line_count=0
+post_lines=0
+failure_lines=0
+--- health now ---
+{"status":"ok","db":"ok","storage":"ok"} http=200
+--- old container log availability ---
+Error response from daemon: No such container: ee4e165af4b62da2f20af53a3ce887ba79fb1da0244417d8648dbcc5d53fd17c
+old_logs_rc=0

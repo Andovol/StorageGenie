@@ -1,0 +1,90 @@
+SG-239 pass-line diagnosis (read-only)
+2026-10-24T14:23:16Z
+1792851796
+--- uvicorn configure_logging source ---
+            if isinstance(self.log_config, os.PathLike):
+                self.log_config = os.fspath(self.log_config)
+
+            if isinstance(self.log_config, dict):
+                if self.use_colors in (True, False):
+                    self.log_config["formatters"]["default"]["use_colors"] = self.use_colors
+                    self.log_config["formatters"]["access"]["use_colors"] = self.use_colors
+                logging.config.dictConfig(self.log_config)
+            elif isinstance(self.log_config, str) and self.log_config.endswith(".json"):
+                with open(self.log_config) as file:
+                    loaded_config = json.load(file)
+                    logging.config.dictConfig(loaded_config)
+            elif isinstance(self.log_config, str) and self.log_config.endswith((".yaml", ".yml")):
+                try:
+                    import yaml
+                except ImportError as e:
+                    raise ImportError(
+                        "Install the PyYAML package or uvicorn[standard] to use `--log-config` with YAML files."
+                    ) from e
+
+                with open(self.log_config) as file:
+                    loaded_config = yaml.safe_load(file)
+                    logging.config.dictConfig(loaded_config)
+            else:
+                # See the note about fileConfig() here:
+                # https://docs.python.org/3/library/logging.config.html#configuration-file-format
+                logging.config.fileConfig(self.log_config, disable_existing_loggers=False)
+
+        if self.log_level is not None:
+            if isinstance(self.log_level, str):
+                log_level = LOG_LEVELS[self.log_level.lower()]
+            else:
+                log_level = self.log_level
+            logging.getLogger("uvicorn.error").setLevel(log_level)
+            logging.getLogger("uvicorn.access").setLevel(log_level)
+            logging.getLogger("uvicorn.asgi").setLevel(log_level)
+        if self.access_log is False:
+            logging.getLogger("uvicorn.access").handlers = []
+            logging.getLogger("uvicorn.access").propagate = False
+
+    def load_app(self) -> Any:
+--- app logger configuration sites ---
+grep: backend/app/services/providers/__pycache__/opencode_go.cpython-312.pyc: binary file matches
+grep: backend/app/services/enrich/__pycache__/synthesize.cpython-312.pyc: binary file matches
+grep: backend/app/services/__pycache__/asset_service.cpython-312.pyc: binary file matches
+grep: backend/app/services/__pycache__/evidence_service.cpython-312.pyc: binary file matches
+grep: backend/app/services/__pycache__/signals.cpython-312.pyc: binary file matches
+grep: backend/app/services/reminders/__pycache__/daily.cpython-312.pyc: binary file matches
+grep: backend/app/api/v1/__pycache__/health.cpython-312.pyc: binary file matches
+grep: backend/app/api/v1/__pycache__/evidence.cpython-312.pyc: binary file matches
+grep: backend/app/__pycache__/server.cpython-312.pyc: binary file matches
+backend/app/server.py:21:logger = logging.getLogger(__name__)
+backend/app/services/signals.py:18:logger = logging.getLogger(__name__)
+backend/app/services/providers/opencode_go.py:30:logger = logging.getLogger(__name__)
+backend/app/services/asset_service.py:14:logger = logging.getLogger(__name__)
+backend/app/services/enrich/synthesize.py:40:logger = logging.getLogger(__name__)
+backend/app/services/evidence_service.py:20:logger = logging.getLogger(__name__)
+backend/app/services/reminders/daily.py:23:logger = logging.getLogger(__name__)
+backend/app/api/v1/health.py:13:logger = logging.getLogger(__name__)
+backend/app/api/v1/evidence.py:20:logger = logging.getLogger(__name__)
+--- compose env for backend (no secret values printed) ---
+
+CORS_ORIGINS=http://localhost:5173
+DATABASE_URL=sqlite:////data/db/storagegenie.db
+HOUSEHOLD_DEFAULT_NAME=Popescu Household
+LANG=C.UTF-8
+PATH=/usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+PYTHON_SHA256=c30bb24b7f1e9a19b11b55a546434f74e739bb4c271a3e3a80ff4380d49f7adb
+PYTHON_VERSION=3.12.11
+SG_CONSENT=true
+SG_LOCATIONS_ENABLED=true
+SG_PROVIDER_ID=opencode-go
+SG_RELATIONS_ENABLED=true
+STORAGE_ROOT=/data/storage
+--- served image has new daily.py? ---
+served_image=sha256:54f520da868a3859a4e8715d6584a93843413868694e8a375383b44647ba477e
+96dc2edc024fc42fc175fb6b76f97c6f1215254f1ee2876e09d0a3e25b8e8d83  /tmp/opencode/SG-239/served_app/services/reminders/daily.py
+96dc2edc024fc42fc175fb6b76f97c6f1215254f1ee2876e09d0a3e25b8e8d83  backend/app/services/reminders/daily.py
+--- shipped-image logging probe (throwaway, --rm, --network none) ---
+root_level= 30 root_effective= 30 logger_effective= 30
+PROBE_WARNING_LINE_should_appear
+probe_rc=0
+--- pass-line grep over full log ---
+pass_grep_rc=1
+2026-10-24T14:23:17Z
+1792851797
