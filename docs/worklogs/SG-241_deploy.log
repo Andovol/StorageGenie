@@ -1,0 +1,31 @@
+SG-241 one recreate (lane socket; NO migration; issuance 1 of 1)
+2026-10-24T16:17:02Z
+epoch_start=1792858622
+--- before ---
+pre_Id=67f668e206e3e8e33bb07f9002b57adbd25a734eb938114e248bb9fc66c9b470
+pre_Created=2026-10-24T14:21:46.352517418Z
+pre_StartedAt=2026-10-24T14:21:47.390964715Z
+pre_RestartCount=0
+pre_Status=running
+pre_Health=healthy
+pre_Image=storagegenie-backend
+pre_ImageID=sha256:54f520da868a3859a4e8715d6584a93843413868694e8a375383b44647ba477e
+pre_cmd=["uvicorn","app.server:app","--host","0.0.0.0","--port","8000"]
+ Container storagegenie-backend-1 Recreate 
+ Container storagegenie-backend-1 Recreated 
+ Container storagegenie-backend-1 Starting 
+ Container storagegenie-backend-1 Started 
+recreate_rc=0
+recreate_start_utc=2026-10-24T16:17:02Z recreate_end_utc=2026-10-24T16:17:04Z recreate_wall_s=2
+--- after (immediate) ---
+post_Id=6c648f1cdce63b17e042a20e35e8cede291b637973d98c94d46f2ca7ab1e0dee
+post_Created=2026-10-24T16:17:03.117534625Z
+post_StartedAt=2026-10-24T16:17:04.212198218Z
+post_FinishedAt=0001-01-01T00:00:00Z
+post_RestartCount=0
+post_Status=running
+post_Health=starting
+post_Image=storagegenie-backend
+post_ImageID=sha256:97ced17c3120f12eb16ca830bb3a83d3ff78fa980151043f8ec44a172434b2f0
+post_cmd=["uvicorn","app.server:app","--host","0.0.0.0","--port","8000"]
+utc_end=2026-10-24T16:17:04Z epoch_end=1792858624

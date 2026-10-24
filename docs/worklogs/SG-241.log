@@ -1,0 +1,50 @@
+SG-241 worklog (append-only ledger; details in the per-phase logs)
+
+Lane start 2026-10-24T16:14:53Z (unit ExecMainStartTimestamp / runtime dir stamp).
+Identity read from /proc/3415301/cmdline: model=opencode-go/deepseek-v4.1-flash effort=max.
+BASE_REF=origin/automation -> 04a53512d83457ce7f4eaf6a776866a589b58116 (= start HEAD).
+
+16:15:30Z  G0: lane socket /run/dispatch-storagegenie-SG-241/docker.sock printed from this
+           unit's environment; DOCKER_HOST/DOCKER_CONFIG exported; docker version answered a
+           Server block (29.6.2, API 1.55, rc=0). No docker call preceded the export.
+16:15:54Z  G1 pre-state: container 67f668e2 from image 54f520da, Cmd uvicorn app.server:app,
+           restarts 0, running/healthy; health 200 {"status":"ok","db":"ok","storage":"ok"};
+           bundle index 9850538a, JS B0lDq5dE b6e26a8e 323000 B, CSS C07VbG0m c3b58cda
+           4535 B; head 20261023_sg233_reminder; 29 tables; all counts as the packet names.
+           Runtime diff old image -> worktree: exactly the 5 SG-240 ceiling files
+           (api/v1/plugins.py, logging_config.py new, plugins/expiry_tracker.py, server.py,
+           services/opened_countdown.py new). Nothing outside the ceiling.
+           Reminder row 01a16e35-4394-7c11-9798-844754826bcc, display_name Miso Soup,
+           status READ (updated_at 2026-10-24 15:21:24Z), unread_count 0 - finding vs the
+           packet's "unread" premise; the G3 read/dismissed fallback therefore binds.
+16:16:29Z  Build issuance 1 of 1: docker compose build backend, rc=0, 2 s of 600 s. All build
+           steps cached from SG-240's proof build; storagegenie-backend:latest moved
+           54f520da -> 97ced17c. Content checked: image Python tree equals worktree 100/100;
+           image bundle index cec37cf5, JS CWp6nYu6 fe7dff6e 326217 B, CSS c3b58cda unchanged.
+16:17:02Z  Recreate issuance 1 of 1: docker compose up -d --no-deps --force-recreate backend,
+           rc=0, 2 s of 120 s. New container 6c648f1c, Created 16:17:03.117Z,
+           StartedAt 16:17:04.212Z, Cmd uvicorn app.server:app, restarts 0, running/healthy.
+           No migration command ran; no host config change.
+16:17:07Z  Startup log: one pass line, verified on the first read (bounded wait 60 s in 5 s
+           steps; hit at step 1, elapsed 0 s):
+           INFO:     app.services.reminders.daily - Daily reminder pass completed
+           as_of=2026-10-24 households_visited=1 reminders_created=0 errors=0
+16:17:31Z  G2: six health GETs 200; shell routes / /expiry /inbox /planning 200;
+           GET /v1/plugins/expiry-tracker/opened 200 {"...","rows":[]};
+           GET .../status 200 with the Miso Soup row (expiry 2026-10-27, days 3);
+           GET /v1/reminders -> unread_count 0, same row, status read, fields unchanged;
+           head unchanged; all 29 table counts identical; reminder still 1.
+           Distinct INFO named loggers: app.services.reminders.daily only; 1 pass line;
+           failure scan (excluding the pass line's "errors=0") none.
+16:18:08Z  G3: row already read before this unit (updated_at 15:21:24Z). Packet G3 forbids a
+           write when already read/dismissed. No POST issued. Post-state identical. No other
+           row touched. The app records no actor on reminder transitions; attribution follows
+           the packet clause, not an audit row.
+16:18:54Z  End health 200; container running/healthy; pass lines still 1.
+
+External effects (CO-85): build completed (image 97ced17c tagged latest); recreate completed
+(container 6c648f1c running/healthy); startup daily pass completed and is now observed live
+(the pass line above); rows created 0; reminder status transitions issued 0 (G3 fallback);
+migration 0; provider calls 0.
+DB note: main-file sha256 2865c7ba -> acf11596 with identical byte size/counts/row - WAL
+checkpoint on the old container's stop, same explanation SG-239 recorded; not a row change.
