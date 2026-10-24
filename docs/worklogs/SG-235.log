@@ -1,0 +1,72 @@
+SG-235 worklog (append-only)
+start_utc=2026-10-24T11:06:01Z (opencode process 3170757 start, Sat Oct 24 11:06:01 2026)
+workdir=/home/andrei/StorageGenie
+remote=origin git@github.com:Andovol/StorageGenie.git
+BASE=d0492383dd6364c26b68f2c12038c757f138af46 (origin/automation at start)
+WORK_HEAD=fdfc44e2eeb253f4cffa0dcf16e67e17cc019aa1
+model=opencode-go/deepseek-v4.1-flash variant=max (process args: opencode run --auto --dir /home/andrei/StorageGenie --model opencode-go/deepseek-v4.1-flash --variant max)
+contract_read=/home/andrei/storagegenie-contract/CODER.md line 3: "**Contract version: 0.52.0** — **echo this line verbatim in your receipt.** It is the only proof that you"
+health_start={"status":"ok","db":"ok","storage":"ok"}
+health_end={"status":"ok","db":"ok","storage":"ok"}
+
+Premises re-read in-slice:
+- backend/app/services/reminders/service.py:3 "The single production writer is ``record_due``."; lines 41-49 signature
+  `def record_due(db: Session, household_id: str, as_of_day: date | None = None)` and
+  `day = as_of_day if as_of_day is not None else today_utc()`.
+- backend/app/db.py:15 `engine = create_engine(settings.database_url, connect_args=connect_args)` at import time;
+  :31 `SessionLocal = sessionmaker(bind=engine, ...)`; :34 request-scoped `get_db`.
+- backend/app/main.py (start base): no lifespan/on_event/create_task/BackgroundTask/APScheduler anywhere under
+  backend/app; the packet's own pattern returns 0 hits and "scheduler" hits only docstrings
+  (`expiry_engine.py:3`, `analytics/service.py:3`). `app = FastAPI(...)` at :29.
+- backend/Dockerfile (start base): `CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]`.
+- frontend/src/api/client.ts:296/302/310 `fetchReminders`, `markReminderRead(reminderId, householdId)`,
+  `dismissReminder(reminderId, householdId)`; types.ts:391-412 Reminder/ReminderListResponse/ReminderStatus.
+- frontend/src/routes/ExpiryPage.tsx:176 `Unread reminders ({unreadCount})`, query key
+  ["reminders", effectiveHousehold], filters status === "unread"; no action button existed.
+- backend/alembic heads before and after: one head, `20261023_sg233_reminder`; no new revision.
+- backend/tests/conftest.py absent; every module carries its own fixtures.
+- docker CLI observation denied (`permission denied ... /var/run/docker.sock`); no docker action was needed or
+  attempted, so this is reported as unanswered, not routed around.
+
+Design calls:
+- One module `backend/app/services/reminders/daily.py`: `run_daily_pass(session_factory, *, as_of_day=None)`
+  enumerates every household, calls the production `record_due`, records per-household errors and continues,
+  and closes its own session; `run_daily_forever(session_factory, *, interval_seconds=86400.0, clock=None,
+  sleep=None)` runs one pass first, then sleeps 86400 s between passes, using the live UTC day each pass.
+- One new served entrypoint `backend/app/server.py` attaches a lifespan to the SAME `app` object from
+  `app.main` and cancels the task with a 5.0 s shutdown bound; Dockerfile CMD now `app.server:app`.
+  `app.main` import alone starts nothing; existing tests that enter `TestClient(app)` still see no lifespan.
+- `run_daily_pass` runs via `asyncio.to_thread`, so the event loop stays free; measured `/v1/health` latency
+  during a blocked pass was 0.0027-0.0040 s in the committed test.
+- main.py normalized `__import__("app.api.v1.reminders", ...)` to a top-level import plus `reminders_router`.
+- Frontend adds per-unread-row buttons with accessible names `Read reminder <id>` and
+  `Dismiss reminder <id>`; success invalidates the same ["reminders", household] query and never adjusts the
+  count/list locally; failure shows role="alert" and leaves the row.
+
+Commands (UTC, outcome):
+- cd backend && pytest -q tests/test_sg235_daily_caller.py (candidate): 9 passed in 4.19 s of 300 s.
+- same file on /tmp/opencode/sg235-base at d049238: 9 failed in 2.72 s of 120 s (ImportError daily/server and
+  the empty-diff scope gate), both raw runs in SG-235_verify.log sections 1-2.
+- discrimination inversion (count 2 -> 3): 1 failed `assert 2 == 3` in 1.48 s of 120 s; reverted.
+- cd frontend && vitest run src/routes/ExpiryPage.test.tsx: base 4 failed / 9 passed in 5.60 s of 300 s;
+  candidate 13 passed in 2.21 s of 300 s; both raw in sections 4-5.
+- cd backend && pytest -q (full suite, once): 738 passed, 3 failed in 58.00 s of 600 s. Reds: the historical
+  SG-233 diff gate (rejects later slices) and two environment gaps (pyzbar/libzbar, tesseract); all three
+  reproduce alone on base d049238 (section 7).
+- ruff whole backend: 9 pre-existing errors on base == 9 on candidate; touched files All checks passed (0.07 s).
+- mypy whole app: 41 errors on base == 41 on candidate (main.py:58/64 -> 59/65, same two unused-ignore rows;
+  new modules zero). 0.34 s.
+- eslint touched frontend files: clean (1.05 s). npm run lint: pre-existing App.household-nav.test.tsx unused
+  `fireEvent` red on both base and candidate. npm run build (tsc && vite build): green in 2.69 s of 600 s.
+- no migration; no dependency change; no email/SMTP path; diff has only `@pytest.fixture` as an @ token.
+- production database untouched; every DB is `sqlite:///<pytest tmp_path>/sg235*.db` built by the committed
+  migration, and `backend/data/` does not exist after the full suite.
+
+Verification (all raw output in docs/worklogs/SG-235_verify.log):
+- BASE d049238 new backend nodes: 9 failed (2.72 s of 120 s).
+- CANDIDATE fdfc44e new backend nodes: 9 passed (4.19 s of 120 s).
+- base frontend nodes: 4 failed | 9 passed (5.60 s of 300 s); candidate: 13 passed (2.21 s of 300 s).
+- full suite: 738 passed, 3 failed, all three red alone on base (1.60 s of 120 s).
+- measured one pass: 0.0098 s wall clock, 2 households (1 due), 1 row; ~0.0049 s/household.
+- shutdown bound 5.0 s, measured 0.0000 s with the spy; health latency 0.0027-0.0040 s during a pass.
+- elapsed at this log write: 514 s of 1800 s overall.
