@@ -1,0 +1,14 @@
+Partial-Receipt-ID: SG-241
+utc=2026-10-24T16:22:32Z
+invocation=d391e200ec954696bb9117e3273ba527
+killed=exit_no_receipt
+pushed=0
+uncommitted=none
+wip=none
+wip_elapsed_ms=78
+wip_tracked=none
+wip_untracked=0 host_local
+DISPATCH_RESULT id=SG-241 coder=opencode exit=0 head=8582ee1d67aeae47182685fcc153401d0c40f8bd note=no moved=yes rewrite=no dirty=no elapsed=459s budget=2100s killed=exit_no_receipt stragglers=0
+P1_moved=PASS count=2
+P2_rewrite=PASS behind=0
+P6_dirty=PASS dirty=no
