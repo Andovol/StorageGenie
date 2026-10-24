@@ -1,0 +1,14 @@
+Partial-Receipt-ID: SG-236
+utc=2026-10-24T11:35:18Z
+invocation=964f8ca8ca0a4a5384af49bb3649180c
+killed=exit_no_receipt
+pushed=0
+uncommitted=none
+wip=none
+wip_elapsed_ms=72
+wip_tracked=none
+wip_untracked=0 host_local
+DISPATCH_RESULT id=SG-236 coder=opencode exit=0 head=30b0d0571a76de3a3b2e6c29cce7e6eb0c1318cb note=no moved=yes rewrite=no dirty=no elapsed=488s budget=2100s killed=exit_no_receipt stragglers=0
+P1_moved=PASS count=2
+P2_rewrite=PASS behind=0
+P6_dirty=PASS dirty=no
