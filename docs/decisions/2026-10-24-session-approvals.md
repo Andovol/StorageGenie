@@ -44,6 +44,33 @@ Owner directive (2026-10-24, this chat), quoted:
 
 **Note on this session:** one self-initiated compression already ran (block `b1`, covering the closed steps 1–3: contract adoption, release record, PR closes). Its content was preserved in the summary and the underlying facts are durable in git (`f9f63b3`, `67f1aa4`) and in `docs/decisions/2026-10-24-contract-052-adoption.md`. Nothing else was compressed, and no further compression happens in this session unless DCP suggests it.
 
+## D-1024-6 — D1 approved: the two always-red suite tests must stop masking signal
+
+Owner, 2026-10-24 (this chat), verbatim: *"Okay with D1 and D2"*.
+
+**Do:** make the two red tests (`backend/tests/test_signals.py` — generated-code validation and OCR text boxes) stop masking signal in every later suite run.
+
+- **Cheapest mechanism first:** the project's own image already installs both libraries (`backend/Dockerfile`: `apt-get install tesseract-ocr libzbar0`), so the fix is to run those tests **inside the image** and record the result — **no host change needed**.
+- The host package install the owner authorised is the **fallback**, used only if the image route fails.
+
+## D-1024-7 — D2 approved: accept one near expiry date so the daily reminder path is proven end-to-end
+
+Owner, 2026-10-24 (this chat), verbatim: *"Okay with D1 and D2"*.
+
+**Do:** accept one classification plus one near expiry date (≈3 days out) for one ACTIVE asset of the live household `01a0a029-…c679`, through the app's own plugin routes; let the daily pass run; observe the reminder row it creates.
+
+- **This is a production data write on the owner's own data — authorised by the owner on 2026-10-24 (this section).**
+- The reminder is left **unread**, so the owner can click Read/Dismiss on the Expiry page and finish the loop by hand.
+- The slice reports which asset it touched and the expiry date it set.
+
+## The close reading (owner query, 2026-10-24)
+
+Owner, verbatim: *"But I did not ask for a close, did I?"*
+
+- The Architect read the owner's step 6 — *"Close out: deploy, record the release, then close the session."* — as a close order; it is the authorisation the SG-236 rider packet cites for the deploy.
+- The close-out obligations were discharged and are durable: the deploy, `docs/releases/2026-10-24.md` + tag `release-2026-10-24`, the END report on Launcher issue 62, the state file and the starter. **Nothing needs undoing.**
+- If the owner meant "close out the work and keep going in this chat", the filed END report covers the deploy+release batch and the **next** close files a fresh one. The session continues with the approved D1/D2 work and then roadmap row 11.
+
 ## Standing order for this session (owner, quoted)
 
 > Steps:
