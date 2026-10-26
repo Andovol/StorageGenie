@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import io
 import json
+import os
+from collections.abc import Callable
 from pathlib import Path
 from typing import cast
 
@@ -114,33 +116,66 @@ def _text_image() -> Image.Image:
     return image
 
 
+def _require_native(capability: str, probe: Callable[[], None]) -> None:
+    try:
+        probe()
+    except Exception as exc:
+        message = f"{capability} unavailable: {exc}"
+        if os.environ.get("SG_IMAGE_PROOF") == "1":
+            pytest.fail(message)
+        pytest.skip(message)
+
+
+def _zbar_available() -> None:
+    from pyzbar.pyzbar import decode  # noqa: F401
+
+
+def _tesseract_available() -> None:
+    import pytesseract
+
+    pytesseract.get_tesseract_version()
+    if not Path("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf").is_file():
+        raise FileNotFoundError("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf")
+
+
+@pytest.mark.requires_native_libs
 def test_generated_codes_are_validated_and_bad_checksum_is_not_an_identifier(isolated_db) -> None:  # type: ignore[no-untyped-def]
+    _require_native("zbar (libzbar0)", _zbar_available)
     session, household_id, root = isolated_db
     qr_value = "https://example.test/SG-013"
     qr_image = qrcode.make(qr_value).convert("RGB")
     qr = _evidence(session, household_id, root, _png(qr_image), "qr.png", "image/png")
     ean_image, ean_value = _ean13_image("590123412345")
     ean = _evidence(session, household_id, root, _png(ean_image), "ean.png", "image/png")
+
+    qr_rows = signals.extract_observations(qr.id, session)
+    ean_rows = signals.extract_observations(ean.id, session)
+
+    qr_values = [json.loads(row.value_json) for row in qr_rows if row.kind == "barcode_qr"]
+    ean_values = [json.loads(row.value_json) for row in ean_rows if row.kind == "barcode_qr"]
+    assert any(item.get("value") == qr_value and item["validated"] for item in qr_values)
+    assert any(item.get("value") == ean_value and item["validated"] for item in ean_values)
+
+
+def test_bad_ean_check_digit_is_not_persisted(isolated_db) -> None:  # type: ignore[no-untyped-def]
+    session, household_id, root = isolated_db
+    _, ean_value = _ean13_image("590123412345")
     # Deliberately render a syntactically valid EAN with the wrong check digit.
     bad_value = ean_value[:-1] + ("0" if ean_value[-1] != "0" else "1")
     bad_image, _ = _ean13_image(ean_value[:-1], bad_value[-1])
     bad = _evidence(session, household_id, root, _png(bad_image), "bad.png", "image/png")
 
-    qr_rows = signals.extract_observations(qr.id, session)
-    ean_rows = signals.extract_observations(ean.id, session)
     bad_rows = signals.extract_observations(bad.id, session)
 
-    qr_values = [json.loads(row.value_json) for row in qr_rows if row.kind == "barcode_qr"]
-    ean_values = [json.loads(row.value_json) for row in ean_rows if row.kind == "barcode_qr"]
     bad_values = [json.loads(row.value_json) for row in bad_rows if row.kind == "barcode_qr"]
-    assert any(item.get("value") == qr_value and item["validated"] for item in qr_values)
-    assert any(item.get("value") == ean_value and item["validated"] for item in ean_values)
     assert bad_value not in json.dumps(bad_values)
     assert any(item.get("validated") is False for item in bad_values)
     assert any(row.confidence is not None and row.confidence < 0.5 for row in bad_rows)
 
 
+@pytest.mark.requires_native_libs
 def test_ocr_has_text_boxes_and_mean_confidence(isolated_db) -> None:  # type: ignore[no-untyped-def]
+    _require_native("tesseract and DejaVuSans.ttf", _tesseract_available)
     session, household_id, root = isolated_db
     evidence = _evidence(session, household_id, root, _png(_text_image()), "text.png", "image/png")
     rows = signals.extract_observations(evidence.id, session)

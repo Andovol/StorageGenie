@@ -1,0 +1,16 @@
+SG-252 A4 image file identity (create + cp, no start)
+start_utc=2026-10-26T19:23:56Z
+4d7ea83102790c199ccb5db8a6c48c2633275e4165a4ee522703c74813cf6b64
+create_rc=0
+cp_tests_rc=0
+cp_signals_rc=0
+Id=sha256:87fc25d9f9d2653757fe80623f47d6c3165ebe2c7773e449a3f3be6c70a2275b Created=2026-10-26T19:22:18.200764265Z
+--- worktree ---
+9ef8616735a7fa3737e66c14bc5b18682af172e741a73091528b3d1fc183c3ed  backend/tests/test_signals.py
+72942850348fdcf574eeb5da64daf9979c89fc91d0134fdc1ef8a1d2cb017494  backend/app/services/signals.py
+--- image ---
+9ef8616735a7fa3737e66c14bc5b18682af172e741a73091528b3d1fc183c3ed  /tmp/sg252_image_files/test_signals.py
+72942850348fdcf574eeb5da64daf9979c89fc91d0134fdc1ef8a1d2cb017494  /tmp/sg252_image_files/signals.py
+cmp_tests_rc=0
+cmp_signals_rc=0
+rm_rc=0

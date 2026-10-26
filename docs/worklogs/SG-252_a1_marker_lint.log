@@ -1,0 +1,11 @@
+SG-252 lint of the changed test file
+All checks passed!
+ruff_rc=0
+--- marker registration and selected set ---
+@pytest.mark.requires_native_libs: tests that need libzbar0 / tesseract native libraries
+
+tests/test_signals.py::test_generated_codes_are_validated_and_bad_checksum_is_not_an_identifier
+tests/test_signals.py::test_ocr_has_text_boxes_and_mean_confidence
+
+2/8 tests collected (6 deselected) in 0.65s
+collect_rc=0

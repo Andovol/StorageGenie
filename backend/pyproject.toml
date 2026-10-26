@@ -32,6 +32,9 @@ dev = [
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 asyncio_mode = "auto"
+markers = [
+  "requires_native_libs: tests that need libzbar0 / tesseract native libraries",
+]
 
 [tool.ruff]
 line-length = 100

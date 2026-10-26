@@ -1,0 +1,6 @@
+ss                                                                       [100%]
+=========================== short test summary info ============================
+SKIPPED [1] tests/test_signals.py:126: zbar (libzbar0) unavailable: Unable to find zbar shared library
+SKIPPED [1] tests/test_signals.py:126: tesseract and DejaVuSans.ttf unavailable: tesseract is not installed or it's not in your PATH. See README file for more information.
+2 skipped, 6 deselected in 1.17s
+rc=0

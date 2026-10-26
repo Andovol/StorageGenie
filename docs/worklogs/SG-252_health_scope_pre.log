@@ -1,0 +1,26 @@
+SG-252 end health and pre-commit scope
+end_utc=2026-10-26T19:25:50Z end_epoch=1793042750
+health_end={"status":"ok","db":"ok","storage":"ok"} http=200
+
+--- git diff --check ---
+diff_check_rc=0
+--- git status --short ---
+ M Makefile
+ M backend/pyproject.toml
+ M backend/tests/test_signals.py
+?? docs/worklogs/SG-252_a4_image_files.log
+?? docs/worklogs/SG-252_g0.log
+?? docs/worklogs/SG-252_g1_host_guard_fail.log
+?? docs/worklogs/SG-252_g1_host_skip.log
+?? docs/worklogs/SG-252_g3_build_run_fail.log
+?? docs/worklogs/SG-252_g3_gate_fail_combined.log
+?? docs/worklogs/SG-252_g3_gate_fail_image.log
+?? docs/worklogs/SG-252_g3_guard_pass_setup_fail.log
+?? docs/worklogs/SG-252_g3_runtime_block.log
+?? docs/worklogs/SG-252_g4_blocked.log
+?? docs/worklogs/SG-252_g5_host_suite.log
+?? docs/worklogs/SG-252_g5_new_test.log
+--- git diff --name-only (worktree vs base) ---
+Makefile
+backend/pyproject.toml
+backend/tests/test_signals.py

@@ -1,15 +1,19 @@
 .PHONY: dev test lint backend-test backend-test-image frontend-test check-postgres-dialect migrate clean
 
+PROVER_IMAGE ?= storagegenie-backend:prover
+
 dev:
 	docker compose up --build
 
 test: backend-test frontend-test
 
 backend-test:
-	cd backend && python -m pytest -q
+	cd backend && python -m pytest -q -m "not requires_native_libs"
+	$(MAKE) backend-test-image
 
 backend-test-image:
-	docker run --rm --network none storagegenie-backend:latest python -m pytest -q tests/test_signals.py::test_generated_codes_are_validated_and_bad_checksum_is_not_an_identifier tests/test_signals.py::test_ocr_has_text_boxes_and_mean_confidence
+	docker build -f backend/Dockerfile -t storagegenie-backend:prover .
+	docker run --rm --network none -e SG_IMAGE_PROOF=1 $(PROVER_IMAGE) python -m pytest -q -m requires_native_libs tests/test_signals.py
 
 frontend-test:
 	cd frontend && npm test -- --run

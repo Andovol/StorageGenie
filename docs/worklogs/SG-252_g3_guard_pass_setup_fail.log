@@ -1,0 +1,7 @@
+SG-252 G3 image proof (build from worktree + marked set)
+start_utc=2026-10-26T19:21:23Z start_epoch=1793042483
+docker build -f backend/Dockerfile -t storagegenie-backend:prover .
+ERROR: mkdir /home/andrei/.docker: permission denied
+make: *** [Makefile:15: backend-test-image] Error 1
+rc=2
+end_utc=2026-10-26T19:21:24Z end_epoch=1793042484 elapsed_s=1

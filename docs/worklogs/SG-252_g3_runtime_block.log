@@ -1,0 +1,30 @@
+SG-252 runtime blocker probe
+start_utc=2026-10-26T19:23:53Z
+--- busybox default runtime ---
+docker: Error response from daemon: failed to create task for container: failed to start shim: start failed: io.containerd.runc.v2: bootstrap parameters do not match command-line arguments: shim was started through the deprecated API but was built against the new API; if you upgraded containerd, you may need to restart the daemon: exit status 1
+
+Run 'docker run --help' for more information
+rc=125
+--- busybox runtime=runc ---
+docker: Error response from daemon: failed to create task for container: failed to start shim: start failed: io.containerd.runc.v2: bootstrap parameters do not match command-line arguments: shim was started through the deprecated API but was built against the new API; if you upgraded containerd, you may need to restart the daemon: exit status 1
+
+Run 'docker run --help' for more information
+rc=125
+--- prover image python -V ---
+docker: Error response from daemon: failed to create task for container: failed to start shim: start failed: io.containerd.runc.v2: bootstrap parameters do not match command-line arguments: shim was started through the deprecated API but was built against the new API; if you upgraded containerd, you may need to restart the daemon: exit status 1
+
+Run 'docker run --help' for more information
+rc=125
+--- docker info runtimes ---
+ Server Version: 29.6.2
+ Storage Driver: overlayfs
+  driver-type: io.containerd.snapshotter.v1
+ Cgroup Driver: systemd
+ Cgroup Version: 2
+ Runtimes: io.containerd.runc.v2 runc
+ containerd version: 11ce9d5f3c68c941867e82890e93e815c1304f1b
+ Security Options:
+  rootless
+--- image present ---
+Id=sha256:87fc25d9f9d2653757fe80623f47d6c3165ebe2c7773e449a3f3be6c70a2275b Created=2026-10-26T19:22:18.200764265Z Os=linux Arch=amd64
+inspect_rc=0

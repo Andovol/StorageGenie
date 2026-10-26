@@ -1,0 +1,12 @@
+SG-252 G4 trial attempt: whole suite and mount variant
+start_utc=2026-10-26T19:23:54Z
+--- whole suite, no mount ---
+docker: Error response from daemon: failed to create task for container: failed to start shim: start failed: io.containerd.runc.v2: bootstrap parameters do not match command-line arguments: shim was started through the deprecated API but was built against the new API; if you upgraded containerd, you may need to restart the daemon: exit status 1
+
+Run 'docker run --help' for more information
+rc=125
+--- marked set with worktree mount ---
+docker: Error response from daemon: failed to create task for container: failed to start shim: start failed: io.containerd.runc.v2: bootstrap parameters do not match command-line arguments: shim was started through the deprecated API but was built against the new API; if you upgraded containerd, you may need to restart the daemon: exit status 1
+
+Run 'docker run --help' for more information
+rc=125

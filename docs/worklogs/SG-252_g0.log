@@ -1,0 +1,189 @@
+SG-252 G0 start
+2026-10-26T19:19:56Z
+1793042396
+workdir=/home/andrei/StorageGenie
+remote=git@github.com:Andovol/StorageGenie.git
+BASE ref=origin/automation
+BASE commit=bdb5733e4906c7782a0611ba662a01afc14096af
+HEAD=bdb5733e4906c7782a0611ba662a01afc14096af
+socket=srw-rw---T 1 andrei 100987 0 Oct 16 17:19 /run/dispatch-storagegenie-SG-252/docker.sock
+DOCKER_HOST=unix:///run/dispatch-storagegenie-SG-252/docker.sock
+Client: Docker Engine - Community
+ Version:           29.9.2
+ API version:       1.55 (downgraded from 1.56)
+ Go version:        go1.26.10
+ Git commit:        a82e528
+ Built:             Tue Oct 20 18:44:40 2026
+ OS/Arch:           linux/amd64
+ Context:           default
+
+Server: Docker Engine - Community
+ Engine:
+  Version:          29.6.2
+  API version:      1.55 (minimum version 1.40)
+  Go version:       go1.26.5
+  Git commit:       3d80467
+  Built:            Thu Jul 16 16:12:18 2026
+  OS/Arch:          linux/amd64
+  Experimental:     false
+ containerd:
+  Version:          v2.2.6
+  GitCommit:        11ce9d5f3c68c941867e82890e93e815c1304f1b
+ runc:
+  Version:          1.5.2
+  GitCommit:        v1.5.2-0-g29dd3dc2
+ docker-init:
+  Version:          0.19.0
+  GitCommit:        de40ad0
+ rootlesskit:
+  Version:          3.0.2
+  ApiVersion:       1.1.2
+  NetworkDriver:    slirp4netns
+  PortDriver:       builtin
+  StateDir:         /run/user/1000/dockerd-rootless
+ slirp4netns:
+  Version:          1.2.1
+  GitCommit:        09e31e92fa3d2a1d3ca261adaeb012c8d75a8194
+docker_version_rc=0
+process_cmdline=opencode run --auto --dir /home/andrei/StorageGenie --model opencode-go/deepseek-v4.1-flash --variant max # SG-252 — W1: the image route as the home of the two library-dependent tests, one marker, and an enforced `make backend-test` gate
+
+`PB-1`–`PB-6` bind (`CODER.md` §14).
+
+**BASE REF: `origin/automation`.** The ref is what the packet requests; the commit it resolved to is what the report states back — two fields, never one.
+**DATABASE: none.** No database is opened, read or written; the tests use temporary SQLite files.
+**Restart: none.** The running container, its image tag and the host are untouched.
+**Provider: none.** No provider is called, no key is read or printed, **no spend**. Target: **$0**.
+
+**Contract chain:** recorded `0.53.0` (the adoption commit carrying this packet) == published payload `contract-v0.53.0` == the host's contract `0.53.0` (the SG-251 receipt echo) == the echo this report must carry from `/home/andrei/storagegenie-contract/CODER.md` line 3.
+
+## Why this exists
+
+Every backend suite run on the host ends with the same two reds, and every slice must first re-prove they are environmental before its own numbers can be read:
+
+- `backend/tests/test_signals.py::test_generated_codes_are_validated_and_bad_checksum_is_not_an_identifier` and
+- `backend/tests/test_signals.py::test_ocr_has_text_boxes_and_mean_confidence`.
+
+The host lacks `libzbar0` and `tesseract`; the project's own image installs both (`backend/Dockerfile:14`). SG-238 proved the two tests green inside the image and left `make backend-test-image` as the repeatable route, but that target runs the **stale** `storagegenie-backend:latest` tag and is not part of `make backend-test`. The two-phase review (SG-242 blind, SG-243 critique; `docs/reviews/review-ledger.md`) resolved W1 as **D kept with three fixes**: enforcement moved into the Makefile target, **one pytest marker as the single source of truth** for the gated set, the prover image built **from the worktree**, and **the pure-Python EAN coverage split out so the host keeps it**. A (move the whole suite into the image) is not the immediate pick; one measured whole-suite trial decides it.
+
+The owner approved the slice on 2026-10-26 (`D1`, `docs/decisions/2026-10-26-session-approvals.md`) and set L3 for the stage.
+
+## G1 — One marker, exact capability guards, and the pure-Python split
+
+1. **Register one marker** in `backend/pyproject.toml` under `[tool.pytest.ini_options]` — name it `requires_native_libs`, with a one-line description (`libzbar0` / `tesseract`). Mark **both** library-dependent tests with `@pytest.mark.requires_native_libs`. The marker is the gated set: the host run deselects it, the image proof selects it. No node-ID list in the Makefile.
+2. **Split the first test.** Move the bad-check-digit assertions out of `test_generated_codes_are_validated_and_bad_checksum_is_not_an_identifier` into a **new, unmarked** host test (suggested name `test_bad_ean_check_digit_is_not_persisted`) that calls the real `extract_observations` on the generated bad EAN image. With no zbar, `_barcode_observations` falls through to `_fallback_ean13` and `_ean_check_digit` (`backend/app/services/signals.py:100-197`) — that is the pure-Python coverage the host must keep. The marked test keeps the QR and valid-EAN positives. Do not weaken any assertion; the new test must assert the same bad-checksum properties (no persisted identifier, `validated is False`, confidence < 0.5).
+3. **Guard each marked test by its exact capability**, through one small helper in `backend/tests/test_signals.py`:
+   - the QR/EAN test needs **zbar**: `from pyzbar.pyzbar import decode` must succeed (the import loads `libzbar`; a missing shared library raises);
+   - the OCR test needs **tesseract** and the font the test renders with: `pytesseract.get_tesseract_version()` must succeed **and** `/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf` must exist (the test's `_text_image` uses that path).
+   - **The guard's two behaviours are deliberate:** when a capability is absent, it **skips** with a reason naming the capability; when `SG_IMAGE_PROOF=1` is set (the image proof), it **fails** with that same message instead of skipping. This is what stops the proof passing vacuously; a skipped proof test is a failed proof.
+4. `-q` must not hide the reason: the skip/fail message names the missing capability.
+
+## G2 — `make backend-test` runs the host suite **and** the image proof, and fails if the proof fails
+
+Edit `Makefile` only:
+
+```
+backend-test:
+	cd backend && python -m pytest -q -m "not requires_native_libs"
+	$(MAKE) backend-test-image
+
+backend-test-image:
+	docker build -f backend/Dockerfile -t storagegenie-backend:prover .
+	docker run --rm --network none -e SG_IMAGE_PROOF=1 storagegenie-backend:prover python -m pytest -q -m requires_native_libs tests/test_signals.py
+```
+
+- `PROVER_IMAGE ?= storagegenie-backend:prover` may be used so the deliberate-wrong-image control below is one variable, not an edit. The default must be the prover tag, never `:latest`.
+- **Build from the current worktree**, with the repo root as context (the Dockerfile's own context requirement). Do not retag or overwrite the running app's image tag.
+- The proof run is `--network none`; the **build** may use the network (npm/apt layers) — state that distinction in the report.
+- The host suite is the full backend suite minus the marker. The proof runs the marked set.
+- A make recipe line fails the target on a non-zero exit; the second line is the gate. Do not add `-` or `|| true` anywhere.
+
+## G3 — Prove the guard and the gate with deliberately wrong inputs (`PG-EV-01`)
+
+Capture every run in a committed log:
+
+1. **Guard FAIL:** on the host (no zbar/tesseract), run the two marked tests with `SG_IMAGE_PROOF=1`. Both must **fail** with the capability message — not skip. This is the FAIL half.
+2. **Guard PASS:** the image proof (`make backend-test-image`) must print **2 passed, 0 skipped** — not 2 skipped. This is the PASS half.
+3. **Gate FAIL:** run `make backend-test-image PROVER_IMAGE=busybox` (or another tag with no Python/pytest) and capture the non-zero exit and the reason. Then run `make backend-test PROVER_IMAGE=busybox` once and capture that the combined target is non-zero **after** the host suite passed.
+4. **Gate PASS:** `make backend-test` on the candidate returns 0 with the prover image, twice in a row (`PG-DP-04`: the second run proves the first left no state that breaks the entry point). The second run's build is expected to be cache-satisfied; report that, and report the image's `/app/tests/test_signals.py` sha256 equal to the worktree's so a cached build is not mistaken for a stale one.
+
+## G4 — The whole-suite image trial (one run; the data decides A vs D later)
+
+Run in the built prover image, `--network none`, no bind mount:
+
+```
+docker run --rm --network none storagegenie-backend:prover python -m pytest -q
+```
+
+Record: return code, wall duration (box clock), pass/fail/skip counts, and the **failure list** if any. This trial does **not** gate the slice and must not be made to pass by changing product code — its failures are the measurement.
+
+Then answer the review's two added questions in one measurement each:
+
+- **Build time:** the `docker build` wall time (cold or cache-satisfied, say which).
+- **Worktree mount under `--network none`:** run the marked set with the worktree mounted, e.g. `docker run --rm --network none -v "$PWD/backend:/app" -e SG_IMAGE_PROOF=1 storagegenie-backend:prover python -m pytest -q -m requires_native_libs tests/test_signals.py`; record rc and whether `/app/tests/test_signals.py` inside the container is the worktree file. A failure is a finding, not a slice failure.
+
+**The SG-243 decision rule, quoted for the report:** A (the whole suite in the image) holds if the whole suite greens with a duration comparable to the host's measured `61.96 s` and within `RUN_BUDGET_S`, with no extra mounts, network or services; if it reds or needs any of those, A's premise is false and D (host suite + gated two) stands. State which case the numbers show. **Do not move the whole suite this slice.**
+
+## G5 — The host suite keeps its coverage and loses the reds
+
+Record on the host, from the candidate:
+
+- the base expectation from SG-250's audit: **2 failed / 740 passed** (the two environmental reds);
+- the candidate: **0 failed**, the two tests **deselected** (not skipped), and the **new pure-Python EAN test passing**. Expectation: **741 passed / 2 deselected** (one test added). If the count differs in either direction, report the difference and do not force it (`PG-IC-08`).
+- the new host test's own line in the output proves it ran; the deselection count proves the two are out of the host run.
+
+## Acceptance criteria
+
+- **A1** — `requires_native_libs` is registered and carried by both library-dependent tests; the pure-Python EAN test is unmarked and passes on the host; each marked test's guard names its exact capability and **fails instead of skipping** under `SG_IMAGE_PROOF=1`.
+- **A2** — the host suite is green (0 failed), the two are deselected, and the new host test is among the passes; the base and candidate counts are quoted.
+- **A3** — the guard FAIL (host, `SG_IMAGE_PROOF=1`) and PASS (image, **2 passed / 0 skipped**) are both captured in committed logs (`PG-EV-09`).
+- **A4** — the prover image is built from the worktree with a dedicated tag; the image's `tests/test_signals.py` and `app/services/signals.py` sha256 equal the worktree's; report the image's `Created` and the build's cache status (a cache-satisfied build is proved fresh by the file hashes, not by the timestamp); build time is stated (cache-satisfied or cold).
+- **A5** — the gate is seen to fail: the deliberately wrong image returns non-zero from `backend-test-image` and from the combined `backend-test`; the real prover run returns 0 twice in a row.
+- **A6** — the whole-suite image trial's rc, duration, counts and failure list are recorded; the mount variant's rc and file identity are recorded; the A-vs-D verdict per the SG-243 rule is stated from the numbers.
+- **A7** — `git diff --name-only` against the base shows **only** `Makefile`, `backend/pyproject.toml`, `backend/tests/test_signals.py` and `docs/worklogs/SG-252*`; zero `backend/app`, Dockerfile, compose, lockfile, dependency, migration or schema bytes; zero production container, host package, sudo, database or provider action.
+- **A8** — `PB-3` vacuity: say what each check would have looked like if it failed — the host still showing 2 failed; the proof printing `2 skipped`; the image's files differing from the worktree; the wrong-image control returning 0; the trial unable to start. None of these was the observed result.
+- **A9** — the report ends with `Verification: PASS` or the honest failure reason.
+
+## Scope ceiling
+
+- **Changed** product files: `Makefile`, `backend/pyproject.toml`, `backend/tests/test_signals.py` only. Reads of any file, and of the image's own files, are allowed and expected.
+- Evidence: `docs/worklogs/SG-252*` only.
+- **No** `backend/app/**`, `backend/Dockerfile`, `docker-compose.yml`, `backend/requirements.lock`, `backend/alembic/**`, any migration, any dependency, the running container, its image tag, the host's packages, the database, or any provider.
+- Docker: the lane's socket must answer `docker version` with a **Server** section **before any docker command** (the SG-251 shape; the socket path is expected to be `/run/dispatch-storagegenie-SG-252/docker.sock` — verify it, a difference is a finding). The build tags only `storagegenie-backend:prover`; no production tag is overwritten.
+- **A denied privileged operation is a STOP** (`PB-2`, `PG-PR-03`): never route around missing packages, sudo or the socket.
+- No browser, no frontend build other than the image's own Dockerfile layer, no network in the proof runs.
+
+## Hang bounds
+
+`make backend-test` / host suite **600 s**; `docker build` **900 s**; image proof **300 s**; whole-suite trial **900 s**; mount trial **900 s**; ordinary commands **120 s**. Nothing may reach the lane's idle kill; longer work runs in the background and is checked with short calls. No interactive command.
+
+## Budget
+
+The lane's `RUN_BUDGET_S` is the ceiling. **Publish before the bound at 1200 s.** Expected ≈500 s, bracketed from this lane's recent actuals (149, 398, 569 s) — the two ≈62 s suites, one build and the evidence dominate. If new work passes 1200 s, stop starting, commit, write the report, publish the receipt.
+
+## Report
+
+Destination: `docs/worklogs/SG-252_report.md`, evidence logs beside it (`docs/worklogs/SG-252_*.log`). The first line states the slice ID, model and effort read from the process arguments (never a system-prompt label), working directory, remote, BASE ref and resolved BASE commit, and WORK_HEAD. The report compares the engine elapsed time against the ≈500 s expectation and names every phase over 60 s.
+
+The receipt goes to the notes ref `refs/notes/storagegenie-coder-reports`, first line:
+
+```
+Dispatch-ID: SG-252 | Report: docs/worklogs/SG-252_report.md | Work-HEAD: <work commit>
+```
+
+Fetch the ref explicitly (`git fetch origin refs/notes/storagegenie-coder-reports:refs/notes/storagegenie-coder-reports`), add the note with `git notes --ref=refs/notes/storagegenie-coder-reports add -m "<that first line>" HEAD`, and push it (`git push origin refs/notes/storagegenie-coder-reports`). A receipt that moves the product branch is refused (`CO-86`).
+
+The report's last line is `Verification: PASS`, or `Verification: FAIL — <check>`. 
+health_start={"status":"ok","db":"ok","storage":"ok"} http=200
+
+--- candidate diff stat ---
+ Makefile                      |  8 ++++++--
+ backend/pyproject.toml        |  3 +++
+ backend/tests/test_signals.py | 47 +++++++++++++++++++++++++++++++++++++------
+ 3 files changed, 50 insertions(+), 8 deletions(-)
+--- candidate status ---
+ M Makefile
+ M backend/pyproject.toml
+ M backend/tests/test_signals.py
+?? docs/worklogs/SG-252_g1_host_guard_fail.log
+?? docs/worklogs/SG-252_g1_host_skip.log
+?? docs/worklogs/SG-252_g5_new_test.log
