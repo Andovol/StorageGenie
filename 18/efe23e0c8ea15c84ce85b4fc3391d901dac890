@@ -1,3 +1,5 @@
 Dispatch-ID: SG-252 | Report: docs/worklogs/SG-252_report.md | Work-HEAD: 2d351a1803021cbcb03348f6895d052134f6ee67
 **Contract version: 0.53.0** — **echo this line verbatim in your receipt.** It is the only proof that you
 Verification: FAIL — the lane Docker runtime cannot start any container (containerd shim API mismatch); see docs/worklogs/SG-252_report.md.
+
+Settings: coder=opencode coder_source=command model=opencode-go/deepseek-v4.1-flash model_source=command effort=max effort_source=command
