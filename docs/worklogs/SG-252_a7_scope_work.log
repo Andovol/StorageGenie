@@ -1,0 +1,42 @@
+SG-252 A7 scope at WORK_HEAD
+BASE=bdb5733e4906c7782a0611ba662a01afc14096af
+WORK_HEAD=2d351a1803021cbcb03348f6895d052134f6ee67
+--- git diff --name-only BASE..WORK_HEAD ---
+Makefile
+backend/pyproject.toml
+backend/tests/test_signals.py
+docs/worklogs/SG-252_a1_marker_lint.log
+docs/worklogs/SG-252_a4_image_files.log
+docs/worklogs/SG-252_g0.log
+docs/worklogs/SG-252_g1_host_guard_fail.log
+docs/worklogs/SG-252_g1_host_skip.log
+docs/worklogs/SG-252_g3_build_run_fail.log
+docs/worklogs/SG-252_g3_gate_fail_combined.log
+docs/worklogs/SG-252_g3_gate_fail_image.log
+docs/worklogs/SG-252_g3_guard_pass_setup_fail.log
+docs/worklogs/SG-252_g3_runtime_block.log
+docs/worklogs/SG-252_g4_blocked.log
+docs/worklogs/SG-252_g5_host_suite.log
+docs/worklogs/SG-252_g5_new_test.log
+docs/worklogs/SG-252_health_scope_pre.log
+--- git show --stat --oneline WORK_HEAD ---
+2d351a1 BLOCKED: SG-252 image proof unavailable — lane Docker runtime cannot start any container
+ Makefile                                          |   8 +-
+ backend/pyproject.toml                            |   3 +
+ backend/tests/test_signals.py                     |  47 ++-
+ docs/worklogs/SG-252_a1_marker_lint.log           |  11 +
+ docs/worklogs/SG-252_a4_image_files.log           |  16 +
+ docs/worklogs/SG-252_g0.log                       | 189 ++++++++++++
+ docs/worklogs/SG-252_g1_host_guard_fail.log       | 358 ++++++++++++++++++++++
+ docs/worklogs/SG-252_g1_host_skip.log             |   6 +
+ docs/worklogs/SG-252_g3_build_run_fail.log        | 286 +++++++++++++++++
+ docs/worklogs/SG-252_g3_gate_fail_combined.log    | 127 ++++++++
+ docs/worklogs/SG-252_g3_gate_fail_image.log       |  86 ++++++
+ docs/worklogs/SG-252_g3_guard_pass_setup_fail.log |   7 +
+ docs/worklogs/SG-252_g3_runtime_block.log         |  30 ++
+ docs/worklogs/SG-252_g4_blocked.log               |  12 +
+ docs/worklogs/SG-252_g5_host_suite.log            |  37 +++
+ docs/worklogs/SG-252_g5_new_test.log              |   3 +
+ docs/worklogs/SG-252_health_scope_pre.log         |  26 ++
+ 17 files changed, 1244 insertions(+), 8 deletions(-)
+--- product-path check (must be empty apart from the three) ---
