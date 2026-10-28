@@ -1,0 +1,13 @@
+SG-257 receipt transcript (notes ref refs/notes/storagegenie-coder-reports)
+
+First line of the note:
+
+Dispatch-ID: SG-257 | Report: docs/worklogs/SG-257_report.md | Work-HEAD: d06e2300387e42f47532fc6b544d5d47272bd70b
+
+Commands run after this commit is created:
+
+git fetch origin refs/notes/storagegenie-coder-reports:refs/notes/storagegenie-coder-reports
+git notes --ref=refs/notes/storagegenie-coder-reports add -m "Dispatch-ID: SG-257 | Report: docs/worklogs/SG-257_report.md | Work-HEAD: d06e2300387e42f47532fc6b544d5d47272bd70b" HEAD
+git push origin refs/notes/storagegenie-coder-reports
+
+The note is attached to this report commit (HEAD) after it is created; its push result follows this file and cannot appear inside it. Work-HEAD names the evidence commit, not the receipt commit (CO-55(b)).
