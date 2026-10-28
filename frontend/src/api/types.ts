@@ -435,3 +435,7 @@ export type OpenedDateResponse = {
   asset_id: string;
   assertion: Assertion;
 };
+export type OpenedDateClearResponse = {
+  asset_id: string;
+  assertion: Assertion | null;
+};

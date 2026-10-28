@@ -11,6 +11,7 @@ import type {
   ExpiryStatusResponse,
   LocationListResponse,
   OpenedCountdownResponse,
+  OpenedDateClearResponse,
   OpenedDateResponse,
   PlanningRunResult,
   PlanningSuggestion,
@@ -308,6 +309,14 @@ export function recordOpenedDate(assetId: string, householdId: string, openedDat
   return apiPost<OpenedDateResponse>(
     `/v1/plugins/expiry-tracker/assets/${assetId}/opened`,
     { opened_date: openedDate },
+    { household_id: householdId }
+  );
+}
+
+export function clearOpenedDate(assetId: string, householdId: string) {
+  return apiPost<OpenedDateClearResponse>(
+    `/v1/plugins/expiry-tracker/assets/${assetId}/opened/clear`,
+    {},
     { household_id: householdId }
   );
 }

@@ -528,6 +528,32 @@ def store_opened_date(
     )
 
 
+def clear_opened_date(db: Session, asset: Asset) -> Assertion | None:
+    """Clear the active ``opened_date`` assertion (SG-256 D4).
+
+    The asset must carry an accepted classification whose category tracks opened
+    dates, exactly as ``store_opened_date`` requires. With no active accepted
+    opened date this is a no-op: nothing is written and ``None`` is returned.
+    Otherwise the existing ``_write_assertion`` path supersedes the old date with
+    a new accepted assertion holding JSON ``null`` and records the same audit row.
+    """
+    category = _accepted_classification_category(db, asset.id)
+    if category is None:
+        raise ExpiryValidationError(
+            "Asset must have an accepted classification before clearing an opened date"
+        )
+    if not category.opened_date_tracking:
+        raise ExpiryValidationError(
+            f"Opened-date tracking is not enabled for category: {category.slug}"
+        )
+    active = _active_assertion(db, asset.id, OPENED_DATE_FIELD)
+    if active is None or active.review_state != "accepted":
+        return None
+    return _write_assertion(
+        db, asset, OPENED_DATE_FIELD, None, "user", "accepted", None
+    )
+
+
 def _orphan_manual_tasks(
     db: Session, asset: Asset, evidence_ids: list[str]
 ) -> list[ReviewTask]:

@@ -73,6 +73,16 @@ def record_opened(
     )
 
 
+def clear_opened(
+    client: TestClient, asset_id: str, household_id: str
+) -> object:
+    return client.post(
+        f"/v1/plugins/expiry-tracker/assets/{asset_id}/opened/clear",
+        params={"household_id": household_id},
+        json={},
+    )
+
+
 def read_countdown(client: TestClient, household_id: str, as_of: str) -> object:
     return client.get(
         "/v1/plugins/expiry-tracker/opened",
@@ -228,6 +238,157 @@ def test_the_write_leaves_an_audit_row(sg240_db) -> None:  # type: ignore[no-unt
     assert audit.household_id == household_id
     assert json.loads(audit.after_json)["value"] == opened
     assert json.loads(audit.after_json)["review_state"] == "accepted"
+
+
+# --- SG-256: clearing the opened date ---------------------------------------
+
+
+def test_clear_supersedes_the_date_and_nulls_the_countdown(sg240_db) -> None:  # type: ignore[no-untyped-def]
+    session, household_id = sg240_db
+    asset = make_asset(session, household_id, "Cleanser")
+    today = utc_today()
+    opened = (today - timedelta(days=10)).isoformat()
+    with TestClient(app) as client:
+        assert classify(client, asset.id, household_id, COSMETICS).status_code == 200
+        assert record_opened(client, asset.id, household_id, opened).status_code == 200
+        response = clear_opened(client, asset.id, household_id)
+        countdown = read_countdown(client, household_id, today.isoformat())
+
+    assert response.status_code == 200
+    body = response.json()
+    assert body["asset_id"] == asset.id
+    assert body["assertion"]["field_path"] == OPENED_DATE_FIELD
+    assert body["assertion"]["value"] is None
+    assert body["assertion"]["review_state"] == "accepted"
+
+    session.expire_all()
+    rows = (
+        session.query(Assertion)
+        .filter_by(asset_id=asset.id, field_path=OPENED_DATE_FIELD)
+        .all()
+    )
+    assert len(rows) == 2
+    by_state = {row.review_state: row for row in rows}
+    assert json.loads(by_state["superseded"].value_json) == opened
+    assert json.loads(by_state["accepted"].value_json) is None
+    active = [row for row in rows if row.review_state not in ("superseded", "rejected")]
+    assert len(active) == 1
+    assert json.loads(active[0].value_json) is None
+
+    assert countdown.status_code == 200
+    row = countdown.json()["rows"][0]
+    assert row["asset_id"] == asset.id
+    assert row["opened_date"] is None
+    assert row["days_open"] is None
+    assert row["days_remaining"] is None
+    assert row["window_end"] is None
+
+
+def test_clear_leaves_an_audit_row_with_a_null_value(sg240_db) -> None:  # type: ignore[no-untyped-def]
+    session, household_id = sg240_db
+    asset = make_asset(session, household_id)
+    opened = (utc_today() - timedelta(days=3)).isoformat()
+    with TestClient(app) as client:
+        assert classify(client, asset.id, household_id, COSMETICS).status_code == 200
+        assert record_opened(client, asset.id, household_id, opened).status_code == 200
+        response = clear_opened(client, asset.id, household_id)
+
+    assertion_id = response.json()["assertion"]["id"]
+    audit = (
+        session.query(AuditEvent)
+        .filter_by(action="plugin.assertion.write", entity_id=assertion_id)
+        .one()
+    )
+    before = json.loads(audit.before_json)
+    after = json.loads(audit.after_json)
+    assert before["field_path"] == OPENED_DATE_FIELD
+    assert before["review_state"] == "superseded"
+    assert after["field_path"] == OPENED_DATE_FIELD
+    assert after["review_state"] == "accepted"
+    assert after["value"] is None
+
+
+def test_clear_without_an_opened_date_is_a_no_op(sg240_db) -> None:  # type: ignore[no-untyped-def]
+    session, household_id = sg240_db
+    asset = make_asset(session, household_id)
+    with TestClient(app) as client:
+        assert classify(client, asset.id, household_id, COSMETICS).status_code == 200
+        session.expire_all()
+        assertions_before = (
+            session.query(Assertion)
+            .filter_by(asset_id=asset.id, field_path=OPENED_DATE_FIELD)
+            .count()
+        )
+        audits_before = session.query(AuditEvent).count()
+        response = clear_opened(client, asset.id, household_id)
+
+    assert response.status_code == 200
+    assert response.json() == {"asset_id": asset.id, "assertion": None}
+    session.expire_all()
+    assert assertions_before == 0
+    assert (
+        session.query(Assertion)
+        .filter_by(asset_id=asset.id, field_path=OPENED_DATE_FIELD)
+        .count()
+        == 0
+    )
+    assert session.query(AuditEvent).count() == audits_before
+
+
+def test_clear_uses_the_same_category_and_asset_guards(sg240_db) -> None:  # type: ignore[no-untyped-def]
+    session, household_id = sg240_db
+    food = make_asset(session, household_id, "Milk")
+    unclassified = make_asset(session, household_id, "Mystery")
+    dated = make_asset(session, household_id, "Cream")
+    opened = (utc_today() - timedelta(days=1)).isoformat()
+    with TestClient(app) as client:
+        assert classify(client, food.id, household_id, "food_beverages").status_code == 200
+        assert classify(client, dated.id, household_id, COSMETICS).status_code == 200
+        assert record_opened(client, dated.id, household_id, opened).status_code == 200
+        non_tracking = clear_opened(client, food.id, household_id)
+        unclassified_response = clear_opened(client, unclassified.id, household_id)
+        unknown = clear_opened(client, "does-not-exist", household_id)
+        mismatch = clear_opened(client, dated.id, "another-household")
+
+    assert non_tracking.status_code == 422
+    assert "Opened-date tracking is not enabled" in non_tracking.json()["detail"]
+    assert "food_beverages" in non_tracking.json()["detail"]
+    assert unclassified_response.status_code == 422
+    assert "accepted classification" in unclassified_response.json()["detail"]
+    assert unknown.status_code == 404
+    assert mismatch.status_code == 403
+
+    session.expire_all()
+    active = (
+        session.query(Assertion)
+        .filter_by(
+            asset_id=dated.id,
+            field_path=OPENED_DATE_FIELD,
+            review_state="accepted",
+        )
+        .one()
+    )
+    assert json.loads(active.value_json) == opened
+
+
+def test_edit_through_the_existing_write_updates_the_countdown(sg240_db) -> None:  # type: ignore[no-untyped-def]
+    session, household_id = sg240_db
+    asset = make_asset(session, household_id, "Serum")
+    today = utc_today()
+    first = (today - timedelta(days=30)).isoformat()
+    second = (today - timedelta(days=5)).isoformat()
+    with TestClient(app) as client:
+        assert classify(client, asset.id, household_id, COSMETICS).status_code == 200
+        assert record_opened(client, asset.id, household_id, first).status_code == 200
+        assert record_opened(client, asset.id, household_id, second).status_code == 200
+        response = read_countdown(client, household_id, today.isoformat())
+
+    row = response.json()["rows"][0]
+    expected_end = add_months(today - timedelta(days=5), 12)
+    assert row["opened_date"] == second
+    assert row["days_open"] == 5
+    assert row["window_end"] == expected_end.isoformat()
+    assert row["days_remaining"] == (expected_end - today).days
 
 
 # --- G3: the read path ------------------------------------------------------

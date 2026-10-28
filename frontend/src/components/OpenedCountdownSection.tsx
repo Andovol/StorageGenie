@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
-import { fetchOpenedCountdown, recordOpenedDate } from "../api/client";
+import { clearOpenedDate, fetchOpenedCountdown, recordOpenedDate } from "../api/client";
 import type { OpenedCountdownResponse, OpenedCountdownRow } from "../api/types";
 import { CONTROL_STYLE, THEMED_CONTROL_CLASS } from "./shell/CatalogToolbar";
 
@@ -31,6 +31,8 @@ function OpenedRow({
 }) {
   const [value, setValue] = useState("");
   const [saving, setSaving] = useState(false);
+  const [clearing, setClearing] = useState(false);
+  const [editing, setEditing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const name = row.display_name || "Untitled item";
 
@@ -40,11 +42,27 @@ function OpenedRow({
     setError(null);
     try {
       await recordOpenedDate(row.asset_id, householdId, value);
+      setEditing(false);
       onSaved();
     } catch (caught) {
       setError(caught instanceof Error ? caught.message : String(caught));
     } finally {
       setSaving(false);
+    }
+  };
+
+  const clear = async () => {
+    setClearing(true);
+    setError(null);
+    try {
+      await clearOpenedDate(row.asset_id, householdId);
+      setEditing(false);
+      setValue("");
+      onSaved();
+    } catch (caught) {
+      setError(caught instanceof Error ? caught.message : String(caught));
+    } finally {
+      setClearing(false);
     }
   };
 
@@ -98,6 +116,52 @@ function OpenedRow({
             {row.days_open} {row.days_open === 1 ? "day" : "days"} open
           </span>
           <span className="text-muted-foreground" style={{ fontSize: 13 }}>{daysText(row.days_remaining)}</span>
+          {editing ? (
+            <>
+              <input
+                type="date"
+                aria-label={`Opened date for ${name}`}
+                className={THEMED_CONTROL_CLASS}
+                style={CONTROL_STYLE}
+                value={value}
+                onChange={(event) => setValue(event.target.value)}
+              />
+              <button
+                type="button"
+                aria-label={`Save opened date for ${name}`}
+                className={THEMED_CONTROL_CLASS}
+                style={CONTROL_STYLE}
+                disabled={!value || saving || clearing}
+                onClick={() => void save()}
+              >
+                Save
+              </button>
+            </>
+          ) : (
+            <button
+              type="button"
+              aria-label={`Edit opened date for ${name}`}
+              className={THEMED_CONTROL_CLASS}
+              style={CONTROL_STYLE}
+              disabled={clearing}
+              onClick={() => {
+                setValue(row.opened_date ?? "");
+                setEditing(true);
+              }}
+            >
+              Edit
+            </button>
+          )}
+          <button
+            type="button"
+            aria-label={`Clear opened date for ${name}`}
+            className={THEMED_CONTROL_CLASS}
+            style={CONTROL_STYLE}
+            disabled={saving || clearing}
+            onClick={() => void clear()}
+          >
+            Clear
+          </button>
         </>
       )}
       <span

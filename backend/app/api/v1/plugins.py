@@ -239,6 +239,27 @@ def record_opened_date(
     }
 
 
+@router.post("/assets/{asset_id}/opened/clear")
+def clear_opened_date(
+    asset_id: str,
+    payload: dict[str, object],
+    household_id: str = Query(...),
+    db: Session = Depends(get_db),
+) -> dict[str, object]:
+    """SG-256 D4: clear the accepted opened date by superseding it with null."""
+    _plugin(payload)
+    asset = _asset(db, asset_id, household_id)
+    try:
+        assertion = expiry_tracker.clear_opened_date(db, asset)
+    except ExpiryValidationError as exc:
+        raise _error(exc) from exc
+    db.commit()
+    return {
+        "asset_id": asset.id,
+        "assertion": _assertion_view(assertion),
+    }
+
+
 @router.post("/assets/{asset_id}/extensions")
 def write_extensions(
     asset_id: str,
