@@ -1,0 +1,19 @@
+SG-256 G3 frontend PASS run: candidate code, candidate test file
+base: 4942b3740401c6b97db73869293d1a569ba357e1
+work commit: b3c18f38d1bdd10c8258fc1c69f0198b53cb2a4a (the run used this exact product tree, then uncommitted)
+command: ./node_modules/.bin/vitest run src/components/OpenedCountdownSection.test.tsx
+
+ RUN  v1.6.1 /home/andrei/StorageGenie/frontend
+
+stderr | src/components/OpenedCountdownSection.test.tsx > OpenedCountdownSection > renders the countdown text and the window with its source
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+ ✓ src/components/OpenedCountdownSection.test.tsx  (8 tests) 328ms
+
+ Test Files  1 passed (1)
+      Tests  8 passed (8)
+   Start at  21:11:15
+   Duration  1.47s (transform 132ms, setup 93ms, collect 250ms, tests 328ms, environment 484ms, prepare 91ms)
+
+rc=0

@@ -1,0 +1,8 @@
+SG-256 targeted lint
+base: 4942b3740401c6b97db73869293d1a569ba357e1
+work commit: b3c18f38d1bdd10c8258fc1c69f0198b53cb2a4a (the run used this exact product tree, then uncommitted)
+command: backend/venv/bin/python -m ruff check backend/app/plugins/expiry_tracker.py backend/app/api/v1/plugins.py backend/tests/test_sg240_opened_countdown.py
+All checks passed!
+ruff-rc=0
+command: cd frontend && ./node_modules/.bin/eslint src/components/OpenedCountdownSection.tsx src/components/OpenedCountdownSection.test.tsx src/api/client.ts src/api/types.ts
+eslint-rc=0

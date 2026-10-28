@@ -1,0 +1,705 @@
+SG-256 G3 frontend FAIL run: candidate test file on BASE code
+base: 4942b3740401c6b97db73869293d1a569ba357e1
+candidate test file: b3c18f38d1bdd10c8258fc1c69f0198b53cb2a4a's frontend/src/components/OpenedCountdownSection.test.tsx copied into the base worktree
+command: ./node_modules/.bin/vitest run src/components/OpenedCountdownSection.test.tsx
+
+ RUN  v1.6.1 /tmp/opencode/sg256-base/frontend
+
+stderr | src/components/OpenedCountdownSection.test.tsx > OpenedCountdownSection > renders the countdown text and the window with its source
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+ ❯ src/components/OpenedCountdownSection.test.tsx  (8 tests | 3 failed) 296ms
+   ❯ src/components/OpenedCountdownSection.test.tsx > OpenedCountdownSection > an opened row shows Edit and Clear, not the no-date form
+     → Unable to find an accessible element with the role "button" and name "Edit opened date for Serum"
+
+Here are the accessible roles:
+
+  region:
+
+  Name "Opened countdown":
+  [36m<section[39m
+    [33maria-label[39m=[32m"Opened countdown"[39m
+    [33mstyle[39m=[32m"margin-top: 20px;"[39m
+  [36m/>[39m
+
+  --------------------------------------------------
+  heading:
+
+  Name "Opened countdown":
+  [36m<h2[39m
+    [33mstyle[39m=[32m"font-size: 15px;"[39m
+  [36m/>[39m
+
+  --------------------------------------------------
+  paragraph:
+
+  Name "":
+  [36m<p[39m
+    [33mclass[39m=[32m"text-muted-foreground"[39m
+    [33mstyle[39m=[32m"font-size: 13px;"[39m
+  [36m/>[39m
+
+  --------------------------------------------------
+  link:
+
+  Name "Serum":
+  [36m<a[39m
+    [33mclass[39m=[32m"text-link focus-ring"[39m
+    [33mhref[39m=[32m"/assets/a1?household_id=hh-1"[39m
+    [33mstyle[39m=[32m"text-decoration: underline; font-weight: 600;"[39m
+  [36m/>[39m
+
+  --------------------------------------------------
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<section[39m
+      [33maria-label[39m=[32m"Opened countdown"[39m
+      [33mstyle[39m=[32m"margin-top: 20px;"[39m
+    [36m>[39m
+      [36m<h2[39m
+        [33mstyle[39m=[32m"font-size: 15px;"[39m
+      [36m>[39m
+        [0mOpened countdown[0m
+      [36m</h2>[39m
+      [36m<p[39m
+        [33mclass[39m=[32m"text-muted-foreground"[39m
+        [33mstyle[39m=[32m"font-size: 13px;"[39m
+      [36m>[39m
+        [0mDays since each cosmetics item was opened, counted against its category's after-opening window.[0m
+      [36m</p>[39m
+      [36m<div[39m
+        [33mstyle[39m=[32m"display: grid; gap: 8px;"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"bg-card border-border"[39m
+          [33mstyle[39m=[32m"display: flex; flex-wrap: wrap; gap: 12px; align-items: center; padding: 12px; border-style: solid; border-width: 1px; border-radius: 8px;"[39m
+        [36m>[39m
+          [36m<a[39m
+            [33mclass[39m=[32m"text-link focus-ring"[39m
+            [33mhref[39m=[32m"/assets/a1?household_id=hh-1"[39m
+            [33mstyle[39m=[32m"text-decoration: underline; font-weight: 600;"[39m
+          [36m>[39m
+            [0mSerum[0m
+          [36m</a>[39m
+          [36m<span[39m
+            [33mclass[39m=[32m"text-muted-foreground"[39m
+            [33mstyle[39m=[32m"font-size: 12px;"[39m
+          [36m>[39m
+            [0mOpened [0m
+            [0m2026-01-31[0m
+          [36m</span>[39m
+          [36m<span[39m
+            [33mstyle[39m=[32m"font-size: 13px;"[39m
+          [36m>[39m
+            [0m15[0m
+            [0m [0m
+            [0mdays[0m
+            [0m open[0m
+          [36m</span>[39m
+          [36m<span[39m
+            [33mclass[39m=[32m"text-muted-foreground"[39m
+            [33mstyle[39m=[32m"font-size: 13px;"[39m
+          [36m>[39m
+            [0m350 days left[0m
+          [36m</span>[39m
+          [36m<span[39m
+            [33mclass[39m=[32m"bg-card-muted"[39m
+            [33mdata-testid[39m=[32m"opened-window"[39m
+            [33mstyle[39m=[32m"margin-left: auto; padding: 2px 8px; border-radius: 999px; font-size: 12px;"[39m
+          [36m>[39m
+            [0m12-month default[0m
+          [36m</span>[39m
+        [36m</div>[39m
+      [36m</div>[39m
+    [36m</section>[39m
+  [36m</div>[39m
+[36m</body>[39m
+   ❯ src/components/OpenedCountdownSection.test.tsx > OpenedCountdownSection > editing an opened date posts it and re-reads
+     → Unable to find an accessible element with the role "button" and name "Edit opened date for Serum"
+
+Here are the accessible roles:
+
+  region:
+
+  Name "Opened countdown":
+  [36m<section[39m
+    [33maria-label[39m=[32m"Opened countdown"[39m
+    [33mstyle[39m=[32m"margin-top: 20px;"[39m
+  [36m/>[39m
+
+  --------------------------------------------------
+  heading:
+
+  Name "Opened countdown":
+  [36m<h2[39m
+    [33mstyle[39m=[32m"font-size: 15px;"[39m
+  [36m/>[39m
+
+  --------------------------------------------------
+  paragraph:
+
+  Name "":
+  [36m<p[39m
+    [33mclass[39m=[32m"text-muted-foreground"[39m
+    [33mstyle[39m=[32m"font-size: 13px;"[39m
+  [36m/>[39m
+
+  --------------------------------------------------
+  link:
+
+  Name "Serum":
+  [36m<a[39m
+    [33mclass[39m=[32m"text-link focus-ring"[39m
+    [33mhref[39m=[32m"/assets/a1?household_id=hh-1"[39m
+    [33mstyle[39m=[32m"text-decoration: underline; font-weight: 600;"[39m
+  [36m/>[39m
+
+  --------------------------------------------------
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<section[39m
+      [33maria-label[39m=[32m"Opened countdown"[39m
+      [33mstyle[39m=[32m"margin-top: 20px;"[39m
+    [36m>[39m
+      [36m<h2[39m
+        [33mstyle[39m=[32m"font-size: 15px;"[39m
+      [36m>[39m
+        [0mOpened countdown[0m
+      [36m</h2>[39m
+      [36m<p[39m
+        [33mclass[39m=[32m"text-muted-foreground"[39m
+        [33mstyle[39m=[32m"font-size: 13px;"[39m
+      [36m>[39m
+        [0mDays since each cosmetics item was opened, counted against its category's after-opening window.[0m
+      [36m</p>[39m
+      [36m<div[39m
+        [33mstyle[39m=[32m"display: grid; gap: 8px;"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"bg-card border-border"[39m
+          [33mstyle[39m=[32m"display: flex; flex-wrap: wrap; gap: 12px; align-items: center; padding: 12px; border-style: solid; border-width: 1px; border-radius: 8px;"[39m
+        [36m>[39m
+          [36m<a[39m
+            [33mclass[39m=[32m"text-link focus-ring"[39m
+            [33mhref[39m=[32m"/assets/a1?household_id=hh-1"[39m
+            [33mstyle[39m=[32m"text-decoration: underline; font-weight: 600;"[39m
+          [36m>[39m
+            [0mSerum[0m
+          [36m</a>[39m
+          [36m<span[39m
+            [33mclass[39m=[32m"text-muted-foreground"[39m
+            [33mstyle[39m=[32m"font-size: 12px;"[39m
+          [36m>[39m
+            [0mOpened [0m
+            [0m2026-01-31[0m
+          [36m</span>[39m
+          [36m<span[39m
+            [33mstyle[39m=[32m"font-size: 13px;"[39m
+          [36m>[39m
+            [0m15[0m
+            [0m [0m
+            [0mdays[0m
+            [0m open[0m
+          [36m</span>[39m
+          [36m<span[39m
+            [33mclass[39m=[32m"text-muted-foreground"[39m
+            [33mstyle[39m=[32m"font-size: 13px;"[39m
+          [36m>[39m
+            [0m350 days left[0m
+          [36m</span>[39m
+          [36m<span[39m
+            [33mclass[39m=[32m"bg-card-muted"[39m
+            [33mdata-testid[39m=[32m"opened-window"[39m
+            [33mstyle[39m=[32m"margin-left: auto; padding: 2px 8px; border-radius: 999px; font-size: 12px;"[39m
+          [36m>[39m
+            [0m12-month default[0m
+          [36m</span>[39m
+        [36m</div>[39m
+      [36m</div>[39m
+    [36m</section>[39m
+  [36m</div>[39m
+[36m</body>[39m
+   ❯ src/components/OpenedCountdownSection.test.tsx > OpenedCountdownSection > clearing an opened date posts to the clear route and returns the row to the form
+     → Unable to find an accessible element with the role "button" and name "Clear opened date for Serum"
+
+Here are the accessible roles:
+
+  region:
+
+  Name "Opened countdown":
+  [36m<section[39m
+    [33maria-label[39m=[32m"Opened countdown"[39m
+    [33mstyle[39m=[32m"margin-top: 20px;"[39m
+  [36m/>[39m
+
+  --------------------------------------------------
+  heading:
+
+  Name "Opened countdown":
+  [36m<h2[39m
+    [33mstyle[39m=[32m"font-size: 15px;"[39m
+  [36m/>[39m
+
+  --------------------------------------------------
+  paragraph:
+
+  Name "":
+  [36m<p[39m
+    [33mclass[39m=[32m"text-muted-foreground"[39m
+    [33mstyle[39m=[32m"font-size: 13px;"[39m
+  [36m/>[39m
+
+  --------------------------------------------------
+  link:
+
+  Name "Serum":
+  [36m<a[39m
+    [33mclass[39m=[32m"text-link focus-ring"[39m
+    [33mhref[39m=[32m"/assets/a1?household_id=hh-1"[39m
+    [33mstyle[39m=[32m"text-decoration: underline; font-weight: 600;"[39m
+  [36m/>[39m
+
+  --------------------------------------------------
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<section[39m
+      [33maria-label[39m=[32m"Opened countdown"[39m
+      [33mstyle[39m=[32m"margin-top: 20px;"[39m
+    [36m>[39m
+      [36m<h2[39m
+        [33mstyle[39m=[32m"font-size: 15px;"[39m
+      [36m>[39m
+        [0mOpened countdown[0m
+      [36m</h2>[39m
+      [36m<p[39m
+        [33mclass[39m=[32m"text-muted-foreground"[39m
+        [33mstyle[39m=[32m"font-size: 13px;"[39m
+      [36m>[39m
+        [0mDays since each cosmetics item was opened, counted against its category's after-opening window.[0m
+      [36m</p>[39m
+      [36m<div[39m
+        [33mstyle[39m=[32m"display: grid; gap: 8px;"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"bg-card border-border"[39m
+          [33mstyle[39m=[32m"display: flex; flex-wrap: wrap; gap: 12px; align-items: center; padding: 12px; border-style: solid; border-width: 1px; border-radius: 8px;"[39m
+        [36m>[39m
+          [36m<a[39m
+            [33mclass[39m=[32m"text-link focus-ring"[39m
+            [33mhref[39m=[32m"/assets/a1?household_id=hh-1"[39m
+            [33mstyle[39m=[32m"text-decoration: underline; font-weight: 600;"[39m
+          [36m>[39m
+            [0mSerum[0m
+          [36m</a>[39m
+          [36m<span[39m
+            [33mclass[39m=[32m"text-muted-foreground"[39m
+            [33mstyle[39m=[32m"font-size: 12px;"[39m
+          [36m>[39m
+            [0mOpened [0m
+            [0m2026-01-31[0m
+          [36m</span>[39m
+          [36m<span[39m
+            [33mstyle[39m=[32m"font-size: 13px;"[39m
+          [36m>[39m
+            [0m15[0m
+            [0m [0m
+            [0mdays[0m
+            [0m open[0m
+          [36m</span>[39m
+          [36m<span[39m
+            [33mclass[39m=[32m"text-muted-foreground"[39m
+            [33mstyle[39m=[32m"font-size: 13px;"[39m
+          [36m>[39m
+            [0m350 days left[0m
+          [36m</span>[39m
+          [36m<span[39m
+            [33mclass[39m=[32m"bg-card-muted"[39m
+            [33mdata-testid[39m=[32m"opened-window"[39m
+            [33mstyle[39m=[32m"margin-left: auto; padding: 2px 8px; border-radius: 999px; font-size: 12px;"[39m
+          [36m>[39m
+            [0m12-month default[0m
+          [36m</span>[39m
+        [36m</div>[39m
+      [36m</div>[39m
+    [36m</section>[39m
+  [36m</div>[39m
+[36m</body>[39m
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 3 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/components/OpenedCountdownSection.test.tsx > OpenedCountdownSection > an opened row shows Edit and Clear, not the no-date form
+TestingLibraryElementError: Unable to find an accessible element with the role "button" and name "Edit opened date for Serum"
+
+Here are the accessible roles:
+
+  region:
+
+  Name "Opened countdown":
+  [36m<section[39m
+    [33maria-label[39m=[32m"Opened countdown"[39m
+    [33mstyle[39m=[32m"margin-top: 20px;"[39m
+  [36m/>[39m
+
+  --------------------------------------------------
+  heading:
+
+  Name "Opened countdown":
+  [36m<h2[39m
+    [33mstyle[39m=[32m"font-size: 15px;"[39m
+  [36m/>[39m
+
+  --------------------------------------------------
+  paragraph:
+
+  Name "":
+  [36m<p[39m
+    [33mclass[39m=[32m"text-muted-foreground"[39m
+    [33mstyle[39m=[32m"font-size: 13px;"[39m
+  [36m/>[39m
+
+  --------------------------------------------------
+  link:
+
+  Name "Serum":
+  [36m<a[39m
+    [33mclass[39m=[32m"text-link focus-ring"[39m
+    [33mhref[39m=[32m"/assets/a1?household_id=hh-1"[39m
+    [33mstyle[39m=[32m"text-decoration: underline; font-weight: 600;"[39m
+  [36m/>[39m
+
+  --------------------------------------------------
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<section[39m
+      [33maria-label[39m=[32m"Opened countdown"[39m
+      [33mstyle[39m=[32m"margin-top: 20px;"[39m
+    [36m>[39m
+      [36m<h2[39m
+        [33mstyle[39m=[32m"font-size: 15px;"[39m
+      [36m>[39m
+        [0mOpened countdown[0m
+      [36m</h2>[39m
+      [36m<p[39m
+        [33mclass[39m=[32m"text-muted-foreground"[39m
+        [33mstyle[39m=[32m"font-size: 13px;"[39m
+      [36m>[39m
+        [0mDays since each cosmetics item was opened, counted against its category's after-opening window.[0m
+      [36m</p>[39m
+      [36m<div[39m
+        [33mstyle[39m=[32m"display: grid; gap: 8px;"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"bg-card border-border"[39m
+          [33mstyle[39m=[32m"display: flex; flex-wrap: wrap; gap: 12px; align-items: center; padding: 12px; border-style: solid; border-width: 1px; border-radius: 8px;"[39m
+        [36m>[39m
+          [36m<a[39m
+            [33mclass[39m=[32m"text-link focus-ring"[39m
+            [33mhref[39m=[32m"/assets/a1?household_id=hh-1"[39m
+            [33mstyle[39m=[32m"text-decoration: underline; font-weight: 600;"[39m
+          [36m>[39m
+            [0mSerum[0m
+          [36m</a>[39m
+          [36m<span[39m
+            [33mclass[39m=[32m"text-muted-foreground"[39m
+            [33mstyle[39m=[32m"font-size: 12px;"[39m
+          [36m>[39m
+            [0mOpened [0m
+            [0m2026-01-31[0m
+          [36m</span>[39m
+          [36m<span[39m
+            [33mstyle[39m=[32m"font-size: 13px;"[39m
+          [36m>[39m
+            [0m15[0m
+            [0m [0m
+            [0mdays[0m
+            [0m open[0m
+          [36m</span>[39m
+          [36m<span[39m
+            [33mclass[39m=[32m"text-muted-foreground"[39m
+            [33mstyle[39m=[32m"font-size: 13px;"[39m
+          [36m>[39m
+            [0m350 days left[0m
+          [36m</span>[39m
+          [36m<span[39m
+            [33mclass[39m=[32m"bg-card-muted"[39m
+            [33mdata-testid[39m=[32m"opened-window"[39m
+            [33mstyle[39m=[32m"margin-left: auto; padding: 2px 8px; border-radius: 999px; font-size: 12px;"[39m
+          [36m>[39m
+            [0m12-month default[0m
+          [36m</span>[39m
+        [36m</div>[39m
+      [36m</div>[39m
+    [36m</section>[39m
+  [36m</div>[39m
+[36m</body>[39m
+ ❯ Object.getElementError ../../../../home/andrei/StorageGenie/frontend/node_modules/@testing-library/dom/dist/config.js:37:19
+ ❯ ../../../../home/andrei/StorageGenie/frontend/node_modules/@testing-library/dom/dist/query-helpers.js:76:38
+ ❯ ../../../../home/andrei/StorageGenie/frontend/node_modules/@testing-library/dom/dist/query-helpers.js:52:17
+ ❯ ../../../../home/andrei/StorageGenie/frontend/node_modules/@testing-library/dom/dist/query-helpers.js:95:19
+ ❯ src/components/OpenedCountdownSection.test.tsx:214:14
+    212| 
+    213|     expect(
+    214|       screen.getByRole("button", { name: "Edit opened date for Serum" …
+       |              ^
+    215|     ).toBeInTheDocument();
+    216|     expect(
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/3]⎯
+
+ FAIL  src/components/OpenedCountdownSection.test.tsx > OpenedCountdownSection > editing an opened date posts it and re-reads
+TestingLibraryElementError: Unable to find an accessible element with the role "button" and name "Edit opened date for Serum"
+
+Here are the accessible roles:
+
+  region:
+
+  Name "Opened countdown":
+  [36m<section[39m
+    [33maria-label[39m=[32m"Opened countdown"[39m
+    [33mstyle[39m=[32m"margin-top: 20px;"[39m
+  [36m/>[39m
+
+  --------------------------------------------------
+  heading:
+
+  Name "Opened countdown":
+  [36m<h2[39m
+    [33mstyle[39m=[32m"font-size: 15px;"[39m
+  [36m/>[39m
+
+  --------------------------------------------------
+  paragraph:
+
+  Name "":
+  [36m<p[39m
+    [33mclass[39m=[32m"text-muted-foreground"[39m
+    [33mstyle[39m=[32m"font-size: 13px;"[39m
+  [36m/>[39m
+
+  --------------------------------------------------
+  link:
+
+  Name "Serum":
+  [36m<a[39m
+    [33mclass[39m=[32m"text-link focus-ring"[39m
+    [33mhref[39m=[32m"/assets/a1?household_id=hh-1"[39m
+    [33mstyle[39m=[32m"text-decoration: underline; font-weight: 600;"[39m
+  [36m/>[39m
+
+  --------------------------------------------------
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<section[39m
+      [33maria-label[39m=[32m"Opened countdown"[39m
+      [33mstyle[39m=[32m"margin-top: 20px;"[39m
+    [36m>[39m
+      [36m<h2[39m
+        [33mstyle[39m=[32m"font-size: 15px;"[39m
+      [36m>[39m
+        [0mOpened countdown[0m
+      [36m</h2>[39m
+      [36m<p[39m
+        [33mclass[39m=[32m"text-muted-foreground"[39m
+        [33mstyle[39m=[32m"font-size: 13px;"[39m
+      [36m>[39m
+        [0mDays since each cosmetics item was opened, counted against its category's after-opening window.[0m
+      [36m</p>[39m
+      [36m<div[39m
+        [33mstyle[39m=[32m"display: grid; gap: 8px;"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"bg-card border-border"[39m
+          [33mstyle[39m=[32m"display: flex; flex-wrap: wrap; gap: 12px; align-items: center; padding: 12px; border-style: solid; border-width: 1px; border-radius: 8px;"[39m
+        [36m>[39m
+          [36m<a[39m
+            [33mclass[39m=[32m"text-link focus-ring"[39m
+            [33mhref[39m=[32m"/assets/a1?household_id=hh-1"[39m
+            [33mstyle[39m=[32m"text-decoration: underline; font-weight: 600;"[39m
+          [36m>[39m
+            [0mSerum[0m
+          [36m</a>[39m
+          [36m<span[39m
+            [33mclass[39m=[32m"text-muted-foreground"[39m
+            [33mstyle[39m=[32m"font-size: 12px;"[39m
+          [36m>[39m
+            [0mOpened [0m
+            [0m2026-01-31[0m
+          [36m</span>[39m
+          [36m<span[39m
+            [33mstyle[39m=[32m"font-size: 13px;"[39m
+          [36m>[39m
+            [0m15[0m
+            [0m [0m
+            [0mdays[0m
+            [0m open[0m
+          [36m</span>[39m
+          [36m<span[39m
+            [33mclass[39m=[32m"text-muted-foreground"[39m
+            [33mstyle[39m=[32m"font-size: 13px;"[39m
+          [36m>[39m
+            [0m350 days left[0m
+          [36m</span>[39m
+          [36m<span[39m
+            [33mclass[39m=[32m"bg-card-muted"[39m
+            [33mdata-testid[39m=[32m"opened-window"[39m
+            [33mstyle[39m=[32m"margin-left: auto; padding: 2px 8px; border-radius: 999px; font-size: 12px;"[39m
+          [36m>[39m
+            [0m12-month default[0m
+          [36m</span>[39m
+        [36m</div>[39m
+      [36m</div>[39m
+    [36m</section>[39m
+  [36m</div>[39m
+[36m</body>[39m
+ ❯ Object.getElementError ../../../../home/andrei/StorageGenie/frontend/node_modules/@testing-library/dom/dist/config.js:37:19
+ ❯ ../../../../home/andrei/StorageGenie/frontend/node_modules/@testing-library/dom/dist/query-helpers.js:76:38
+ ❯ ../../../../home/andrei/StorageGenie/frontend/node_modules/@testing-library/dom/dist/query-helpers.js:52:17
+ ❯ ../../../../home/andrei/StorageGenie/frontend/node_modules/@testing-library/dom/dist/query-helpers.js:95:19
+ ❯ src/components/OpenedCountdownSection.test.tsx:232:28
+    230|     const initialGets = openedGetCount;
+    231| 
+    232|     fireEvent.click(screen.getByRole("button", { name: "Edit opened da…
+       |                            ^
+    233|     const input = screen.getByLabelText("Opened date for Serum");
+    234|     expect(input).toHaveValue("2026-01-31");
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/3]⎯
+
+ FAIL  src/components/OpenedCountdownSection.test.tsx > OpenedCountdownSection > clearing an opened date posts to the clear route and returns the row to the form
+TestingLibraryElementError: Unable to find an accessible element with the role "button" and name "Clear opened date for Serum"
+
+Here are the accessible roles:
+
+  region:
+
+  Name "Opened countdown":
+  [36m<section[39m
+    [33maria-label[39m=[32m"Opened countdown"[39m
+    [33mstyle[39m=[32m"margin-top: 20px;"[39m
+  [36m/>[39m
+
+  --------------------------------------------------
+  heading:
+
+  Name "Opened countdown":
+  [36m<h2[39m
+    [33mstyle[39m=[32m"font-size: 15px;"[39m
+  [36m/>[39m
+
+  --------------------------------------------------
+  paragraph:
+
+  Name "":
+  [36m<p[39m
+    [33mclass[39m=[32m"text-muted-foreground"[39m
+    [33mstyle[39m=[32m"font-size: 13px;"[39m
+  [36m/>[39m
+
+  --------------------------------------------------
+  link:
+
+  Name "Serum":
+  [36m<a[39m
+    [33mclass[39m=[32m"text-link focus-ring"[39m
+    [33mhref[39m=[32m"/assets/a1?household_id=hh-1"[39m
+    [33mstyle[39m=[32m"text-decoration: underline; font-weight: 600;"[39m
+  [36m/>[39m
+
+  --------------------------------------------------
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<section[39m
+      [33maria-label[39m=[32m"Opened countdown"[39m
+      [33mstyle[39m=[32m"margin-top: 20px;"[39m
+    [36m>[39m
+      [36m<h2[39m
+        [33mstyle[39m=[32m"font-size: 15px;"[39m
+      [36m>[39m
+        [0mOpened countdown[0m
+      [36m</h2>[39m
+      [36m<p[39m
+        [33mclass[39m=[32m"text-muted-foreground"[39m
+        [33mstyle[39m=[32m"font-size: 13px;"[39m
+      [36m>[39m
+        [0mDays since each cosmetics item was opened, counted against its category's after-opening window.[0m
+      [36m</p>[39m
+      [36m<div[39m
+        [33mstyle[39m=[32m"display: grid; gap: 8px;"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"bg-card border-border"[39m
+          [33mstyle[39m=[32m"display: flex; flex-wrap: wrap; gap: 12px; align-items: center; padding: 12px; border-style: solid; border-width: 1px; border-radius: 8px;"[39m
+        [36m>[39m
+          [36m<a[39m
+            [33mclass[39m=[32m"text-link focus-ring"[39m
+            [33mhref[39m=[32m"/assets/a1?household_id=hh-1"[39m
+            [33mstyle[39m=[32m"text-decoration: underline; font-weight: 600;"[39m
+          [36m>[39m
+            [0mSerum[0m
+          [36m</a>[39m
+          [36m<span[39m
+            [33mclass[39m=[32m"text-muted-foreground"[39m
+            [33mstyle[39m=[32m"font-size: 12px;"[39m
+          [36m>[39m
+            [0mOpened [0m
+            [0m2026-01-31[0m
+          [36m</span>[39m
+          [36m<span[39m
+            [33mstyle[39m=[32m"font-size: 13px;"[39m
+          [36m>[39m
+            [0m15[0m
+            [0m [0m
+            [0mdays[0m
+            [0m open[0m
+          [36m</span>[39m
+          [36m<span[39m
+            [33mclass[39m=[32m"text-muted-foreground"[39m
+            [33mstyle[39m=[32m"font-size: 13px;"[39m
+          [36m>[39m
+            [0m350 days left[0m
+          [36m</span>[39m
+          [36m<span[39m
+            [33mclass[39m=[32m"bg-card-muted"[39m
+            [33mdata-testid[39m=[32m"opened-window"[39m
+            [33mstyle[39m=[32m"margin-left: auto; padding: 2px 8px; border-radius: 999px; font-size: 12px;"[39m
+          [36m>[39m
+            [0m12-month default[0m
+          [36m</span>[39m
+        [36m</div>[39m
+      [36m</div>[39m
+    [36m</section>[39m
+  [36m</div>[39m
+[36m</body>[39m
+ ❯ Object.getElementError ../../../../home/andrei/StorageGenie/frontend/node_modules/@testing-library/dom/dist/config.js:37:19
+ ❯ ../../../../home/andrei/StorageGenie/frontend/node_modules/@testing-library/dom/dist/query-helpers.js:76:38
+ ❯ ../../../../home/andrei/StorageGenie/frontend/node_modules/@testing-library/dom/dist/query-helpers.js:52:17
+ ❯ ../../../../home/andrei/StorageGenie/frontend/node_modules/@testing-library/dom/dist/query-helpers.js:95:19
+ ❯ src/components/OpenedCountdownSection.test.tsx:261:28
+    259|     const initialGets = openedGetCount;
+    260| 
+    261|     fireEvent.click(screen.getByRole("button", { name: "Clear opened d…
+       |                            ^
+    262| 
+    263|     await waitFor(() => {
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/3]⎯
+
+ Test Files  1 failed (1)
+      Tests  3 failed | 5 passed (8)
+   Start at  21:10:28
+   Duration  1.59s (transform 130ms, setup 109ms, collect 247ms, tests 296ms, environment 585ms, prepare 112ms)
+
+rc=1

@@ -1,0 +1,108 @@
+SG-256 G3 backend FAIL run: candidate test file on BASE code
+base: 4942b3740401c6b97db73869293d1a569ba357e1
+candidate test file: b3c18f38d1bdd10c8258fc1c69f0198b53cb2a4a's tests/test_sg240_opened_countdown.py copied into the base worktree
+command: PATH=/home/andrei/StorageGenie/backend/venv/bin:$PATH PYTHONPATH=/tmp/opencode/sg256-base/backend python -m pytest tests/test_sg240_opened_countdown.py -q
+........FFFF.........                                                    [100%]
+=================================== FAILURES ===================================
+____________ test_clear_supersedes_the_date_and_nulls_the_countdown ____________
+
+sg240_db = (<sqlalchemy.orm.session.Session object at 0x7a671a2fad50>, '01a18459-a20d-73a1-b184-e4286be14ef8')
+
+    def test_clear_supersedes_the_date_and_nulls_the_countdown(sg240_db) -> None:  # type: ignore[no-untyped-def]
+        session, household_id = sg240_db
+        asset = make_asset(session, household_id, "Cleanser")
+        today = utc_today()
+        opened = (today - timedelta(days=10)).isoformat()
+        with TestClient(app) as client:
+            assert classify(client, asset.id, household_id, COSMETICS).status_code == 200
+            assert record_opened(client, asset.id, household_id, opened).status_code == 200
+            response = clear_opened(client, asset.id, household_id)
+            countdown = read_countdown(client, household_id, today.isoformat())
+    
+>       assert response.status_code == 200
+E       assert 405 == 200
+E        +  where 405 = <Response [405 Method Not Allowed]>.status_code
+
+tests/test_sg240_opened_countdown.py:257: AssertionError
+_______________ test_clear_leaves_an_audit_row_with_a_null_value _______________
+
+sg240_db = (<sqlalchemy.orm.session.Session object at 0x7a671a29fb60>, '01a18459-a2eb-7992-b382-d20f9e364955')
+
+    def test_clear_leaves_an_audit_row_with_a_null_value(sg240_db) -> None:  # type: ignore[no-untyped-def]
+        session, household_id = sg240_db
+        asset = make_asset(session, household_id)
+        opened = (utc_today() - timedelta(days=3)).isoformat()
+        with TestClient(app) as client:
+            assert classify(client, asset.id, household_id, COSMETICS).status_code == 200
+            assert record_opened(client, asset.id, household_id, opened).status_code == 200
+            response = clear_opened(client, asset.id, household_id)
+    
+>       assertion_id = response.json()["assertion"]["id"]
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       KeyError: 'assertion'
+
+tests/test_sg240_opened_countdown.py:296: KeyError
+_________________ test_clear_without_an_opened_date_is_a_no_op _________________
+
+sg240_db = (<sqlalchemy.orm.session.Session object at 0x7a671ac04230>, '01a18459-a391-7d00-8568-ed50fb24d575')
+
+    def test_clear_without_an_opened_date_is_a_no_op(sg240_db) -> None:  # type: ignore[no-untyped-def]
+        session, household_id = sg240_db
+        asset = make_asset(session, household_id)
+        with TestClient(app) as client:
+            assert classify(client, asset.id, household_id, COSMETICS).status_code == 200
+            session.expire_all()
+            assertions_before = (
+                session.query(Assertion)
+                .filter_by(asset_id=asset.id, field_path=OPENED_DATE_FIELD)
+                .count()
+            )
+            audits_before = session.query(AuditEvent).count()
+            response = clear_opened(client, asset.id, household_id)
+    
+>       assert response.status_code == 200
+E       assert 405 == 200
+E        +  where 405 = <Response [405 Method Not Allowed]>.status_code
+
+tests/test_sg240_opened_countdown.py:325: AssertionError
+______________ test_clear_uses_the_same_category_and_asset_guards ______________
+
+sg240_db = (<sqlalchemy.orm.session.Session object at 0x7a671a1cb080>, '01a18459-a41d-7650-8fd2-4c2b43812033')
+
+    def test_clear_uses_the_same_category_and_asset_guards(sg240_db) -> None:  # type: ignore[no-untyped-def]
+        session, household_id = sg240_db
+        food = make_asset(session, household_id, "Milk")
+        unclassified = make_asset(session, household_id, "Mystery")
+        dated = make_asset(session, household_id, "Cream")
+        opened = (utc_today() - timedelta(days=1)).isoformat()
+        with TestClient(app) as client:
+            assert classify(client, food.id, household_id, "food_beverages").status_code == 200
+            assert classify(client, dated.id, household_id, COSMETICS).status_code == 200
+            assert record_opened(client, dated.id, household_id, opened).status_code == 200
+            non_tracking = clear_opened(client, food.id, household_id)
+            unclassified_response = clear_opened(client, unclassified.id, household_id)
+            unknown = clear_opened(client, "does-not-exist", household_id)
+            mismatch = clear_opened(client, dated.id, "another-household")
+    
+>       assert non_tracking.status_code == 422
+E       assert 405 == 422
+E        +  where 405 = <Response [405 Method Not Allowed]>.status_code
+
+tests/test_sg240_opened_countdown.py:353: AssertionError
+=============================== warnings summary ===============================
+../../../../home/andrei/StorageGenie/backend/venv/lib/python3.12/site-packages/fastapi/testclient.py:1
+  /home/andrei/StorageGenie/backend/venv/lib/python3.12/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+../../../../home/andrei/StorageGenie/backend/venv/lib/python3.12/site-packages/starlette/testclient.py:53
+  /home/andrei/StorageGenie/backend/venv/lib/python3.12/site-packages/starlette/testclient.py:53: DeprecationWarning: The anyio.abc.BlockingPortal alias is deprecated, use anyio.from_thread.BlockingPortal instead.
+    _PortalFactoryType = Callable[[], AbstractContextManager[anyio.abc.BlockingPortal]]
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/test_sg240_opened_countdown.py::test_clear_supersedes_the_date_and_nulls_the_countdown
+FAILED tests/test_sg240_opened_countdown.py::test_clear_leaves_an_audit_row_with_a_null_value
+FAILED tests/test_sg240_opened_countdown.py::test_clear_without_an_opened_date_is_a_no_op
+FAILED tests/test_sg240_opened_countdown.py::test_clear_uses_the_same_category_and_asset_guards
+4 failed, 17 passed, 2 warnings in 4.31s
+rc=1
