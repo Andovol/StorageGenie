@@ -1,0 +1,37 @@
+=== SG-257 post-recreate verification (read-only) ===
+2026-10-28T21:27:06Z
+epoch=1793222826
+--- container state ---
+CONTAINER ID   IMAGE                  COMMAND                  CREATED          STATUS                    PORTS                      NAMES
+40bee778fa88   storagegenie-backend   "uvicorn app.server:…"   22 seconds ago   Up 20 seconds (healthy)   127.0.0.1:8003->8000/tcp   storagegenie-backend-1
+.Id=40bee778fa88dacb01236fff79d2ca0e5b3803b3cf0078cea76409c42e5049e2
+.Image=sha256:b2c42abd942aa541034d3ef29b5b411919488af604f12fd6caa60788e3672c4b
+.Config.Cmd=[uvicorn app.server:app --host 0.0.0.0 --port 8000]
+.RestartCount=0
+.State.Status=running
+.State.Health.Status=healthy
+.Created=2026-10-28T21:26:44.631444958Z
+.State.StartedAt=2026-10-28T21:26:45.567147289Z
+--- six health GETs after recreate ---
+health_1 {"status":"ok","db":"ok","storage":"ok"}http=200 time=0.003395
+health_2 {"status":"ok","db":"ok","storage":"ok"}http=200 time=0.003383
+health_3 {"status":"ok","db":"ok","storage":"ok"}http=200 time=0.003246
+health_4 {"status":"ok","db":"ok","storage":"ok"}http=200 time=0.003690
+health_5 {"status":"ok","db":"ok","storage":"ok"}http=200 time=0.003197
+health_6 {"status":"ok","db":"ok","storage":"ok"}http=200 time=0.003707
+--- served index + bundle (HTTP, post) ---
+index_http=200 bytes=944
+14f82a64c5164e6fe3098a3e26f96d995e3bfe4f04ce6b4e135d87e5ba9c52f7  /tmp/sg257-post/index.html
+/assets/index-BRl7CaJb.js http=200 bytes=327119
+457010d8da9ba8863a7a6459817206f40f858f2bff756aff4da8ef83387c6356  /tmp/sg257-post/index-BRl7CaJb.js
+/assets/index-C07VbG0m.css http=200 bytes=4535
+c3b58cda696a22970fc2a4a348849fc1359f2105f80f81304ed5dfd5ca31a557  /tmp/sg257-post/index-C07VbG0m.css
+--- pre vs post bundle byte comparison (cmp rc, 0 = identical) ---
+index.html pre_vs_post_cmp_rc=1
+js pre(index-CWp6nYu6.js)_vs_post(index-BRl7CaJb.js)_cmp_rc=1
+css pre_vs_post_cmp_rc=0
+--- served tree (running container /app/app) equals worktree backend/app ---
+served_cp_rc=0
+served_tree_vs_worktree_diff_rc=0
+served_py_files=100 worktree_py_files=100
+2026-10-28T21:27:12Z

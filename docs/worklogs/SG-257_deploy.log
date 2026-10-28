@@ -1,0 +1,21 @@
+=== SG-257 G1 one recreate ===
+recreate_start=2026-10-28T21:26:44Z epoch=1793222804
+ Container storagegenie-backend-1 Recreate 
+ Container storagegenie-backend-1 Recreated 
+ Container storagegenie-backend-1 Starting 
+ Container storagegenie-backend-1 Started 
+recreate_rc=0
+recreate_end=2026-10-28T21:26:45Z epoch=1793222805
+--- docker ps -a after recreate ---
+CONTAINER ID   IMAGE                   COMMAND                  CREATED        STATUS                                     PORTS                      NAMES
+40bee778fa88   storagegenie-backend    "uvicorn app.server:…"   1 second ago   Up Less than a second (health: starting)   127.0.0.1:8003->8000/tcp   storagegenie-backend-1
+1aabf2905704   storagegenie-frontend   "docker-entrypoint.s…"   6 weeks ago    Exited (0) 6 weeks ago                                                storagegenie-frontend-1
+--- container identity (inspect, post) ---
+.Id=40bee778fa88dacb01236fff79d2ca0e5b3803b3cf0078cea76409c42e5049e2
+.Image=sha256:b2c42abd942aa541034d3ef29b5b411919488af604f12fd6caa60788e3672c4b
+.Config.Cmd=[uvicorn app.server:app --host 0.0.0.0 --port 8000]
+.RestartCount=0
+.State.Status=running
+.State.Health.Status=starting
+.Created=2026-10-28T21:26:44.631444958Z
+.State.StartedAt=2026-10-28T21:26:45.567147289Z

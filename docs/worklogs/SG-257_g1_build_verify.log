@@ -1,0 +1,18 @@
+=== SG-257 G1 build was fully cache-satisfied: verify built image tree against worktree ===
+2026-10-28T21:26:37Z
+built_image=sha256:b2c42abd942aa541034d3ef29b5b411919488af604f12fd6caa60788e3672c4b
+created=2026-10-28T21:13:11.68900601Z
+create_rc=0
+cp_app_rc=0
+cp_static_rc=0
+built_image_app_py_files=100 worktree_app_py_files=100
+built_image_vs_worktree_diff_rc=0
+--- built image static bundle hashes/sizes ---
+14f82a64c5164e6fe3098a3e26f96d995e3bfe4f04ce6b4e135d87e5ba9c52f7  /tmp/sg257-post/image-static/index.html bytes=944
+457010d8da9ba8863a7a6459817206f40f858f2bff756aff4da8ef83387c6356  /tmp/sg257-post/image-static/assets/index-BRl7CaJb.js bytes=327119
+c3b58cda696a22970fc2a4a348849fc1359f2105f80f81304ed5dfd5ca31a557  /tmp/sg257-post/image-static/assets/index-C07VbG0m.css bytes=4535
+--- pre-serve vs built image static byte comparison ---
+index.html pre_vs_built_cmp_rc=1
+index-BRl7CaJb.js absent_from_pre_serve_bundle
+index-C07VbG0m.css pre_vs_built_cmp_rc=0
+2026-10-28T21:26:37Z

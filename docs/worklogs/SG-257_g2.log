@@ -1,0 +1,45 @@
+=== SG-257 G2 — the served bytes are SG-256's, and nothing else ===
+2026-10-28T21:29:54Z
+--- runtime diff: pre-serve image e8c73735 -> worktree, over the served Python tree backend/app ---
+pre_image=sha256:e8c7373577f9770bf486ae478e1a867b7ba41165aefa81d5f81d2b1d543d4ec3
+image_py_files=100 worktree_py_files=100
+measured_changed_files=2
+api/v1/plugins.py
+plugins/expiry_tracker.py
+--- SG-256 product commit b3c18f3 backend/app files ---
+backend/app/api/v1/plugins.py
+backend/app/plugins/expiry_tracker.py
+--- set comparison: measured vs SG-256 backend/app files ---
+set_diff_rc=0
+extra_files=0 missing_files=0
+SG-256's other product files (tests, not runtime):
+backend/tests/test_sg240_opened_countdown.py
+frontend/src/api/client.ts
+frontend/src/api/types.ts
+frontend/src/components/OpenedCountdownSection.test.tsx
+frontend/src/components/OpenedCountdownSection.tsx
+--- frontend bundle hashes and sizes (served over HTTP, pre and post) ---
+pre:
+index_http=200 bytes=944
+cec37cf5eecd12a9d23da6ccaa1bb40da306fd38ce7454c1daa59909b3825caf  /tmp/sg257-pre/index.html
+/assets/index-C07VbG0m.css http=200 bytes=4535
+c3b58cda696a22970fc2a4a348849fc1359f2105f80f81304ed5dfd5ca31a557  /tmp/sg257-pre/index-C07VbG0m.css
+/assets/index-CWp6nYu6.js http=200 bytes=326217
+fe7dff6e58dd934ec14f693d40166aee5117453c13cb8caee45f371d4a944b99  /tmp/sg257-pre/index-CWp6nYu6.js
+post:
+index_http=200 bytes=944
+14f82a64c5164e6fe3098a3e26f96d995e3bfe4f04ce6b4e135d87e5ba9c52f7  /tmp/sg257-post/index.html
+/assets/index-BRl7CaJb.js http=200 bytes=327119
+457010d8da9ba8863a7a6459817206f40f858f2bff756aff4da8ef83387c6356  /tmp/sg257-post/index-BRl7CaJb.js
+/assets/index-C07VbG0m.css http=200 bytes=4535
+c3b58cda696a22970fc2a4a348849fc1359f2105f80f81304ed5dfd5ca31a557  /tmp/sg257-post/index-C07VbG0m.css
+--- byte comparison (cmp rc, 0 = identical, 1 = changed) ---
+index.html pre_vs_post_cmp_rc=1
+js pre(index-CWp6nYu6.js)_vs_post(index-BRl7CaJb.js)_cmp_rc=1
+css pre_vs_post_cmp_rc=0
+JS changed: pre index-CWp6nYu6.js fe7dff6e58dd934ec14f693d40166aee5117453c13cb8caee45f371d4a944b99 326217 B -> post index-BRl7CaJb.js 457010d8da9ba8863a7a6459817206f40f858f2bff756aff4da8ef83387c6356 327119 B
+index.html changed too (it references the new content-hashed JS filename); CSS byte-identical (c3b58cda696a22970fc2a4a348849fc1359f2105f80f81304ed5dfd5ca31a557, 4535 B)
+--- served tree equals worktree after the build ---
+built image /app/app vs worktree: built_image_vs_worktree_diff_rc=0
+running container /app/app vs worktree: served_tree_vs_worktree_diff_rc=0
+2026-10-28T21:29:54Z

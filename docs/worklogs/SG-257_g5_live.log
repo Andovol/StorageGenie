@@ -1,0 +1,54 @@
+=== SG-257 G5 post-serve app answers + startup log ===
+2026-10-28T21:28:01Z
+--- six health GETs (end block) ---
+health_end_1 {"status":"ok","db":"ok","storage":"ok"}http=200 time=0.003572
+health_end_2 {"status":"ok","db":"ok","storage":"ok"}http=200 time=0.004328
+health_end_3 {"status":"ok","db":"ok","storage":"ok"}http=200 time=0.003313
+health_end_4 {"status":"ok","db":"ok","storage":"ok"}http=200 time=0.003958
+health_end_5 {"status":"ok","db":"ok","storage":"ok"}http=200 time=0.003577
+health_end_6 {"status":"ok","db":"ok","storage":"ok"}http=200 time=0.003449
+--- shell routes ---
+route / http=200
+route /expiry http=200
+route /inbox http=200
+route /planning http=200
+--- final health (end) ---
+{"status":"ok","db":"ok","storage":"ok"}
+http=200 time=0.003158
+--- served container startup log (first 40 lines) ---
+INFO:     Started server process [1]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+INFO:     app.services.reminders.daily - Daily reminder pass completed as_of=2026-10-28 households_visited=1 reminders_created=0 errors=0
+INFO:     127.0.0.1:51924 - "GET /v1/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60806 - "GET /v1/health HTTP/1.1" 200 OK
+INFO:     172.18.0.1:35174 - "GET /v1/health HTTP/1.1" 200 OK
+INFO:     172.18.0.1:35186 - "GET /v1/health HTTP/1.1" 200 OK
+INFO:     172.18.0.1:35194 - "GET /v1/health HTTP/1.1" 200 OK
+INFO:     172.18.0.1:35206 - "GET /v1/health HTTP/1.1" 200 OK
+INFO:     172.18.0.1:35214 - "GET /v1/health HTTP/1.1" 200 OK
+INFO:     172.18.0.1:35222 - "GET /v1/health HTTP/1.1" 200 OK
+INFO:     172.18.0.1:35228 - "GET / HTTP/1.1" 200 OK
+INFO:     172.18.0.1:35242 - "GET /assets/index-BRl7CaJb.js HTTP/1.1" 200 OK
+INFO:     172.18.0.1:35254 - "GET /assets/index-C07VbG0m.css HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56196 - "GET /v1/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57826 - "GET /v1/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60918 - "GET /v1/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:48374 - "GET /v1/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:42354 - "GET /v1/health HTTP/1.1" 200 OK
+INFO:     172.18.0.1:44260 - "GET /v1/health HTTP/1.1" 200 OK
+INFO:     172.18.0.1:44264 - "GET /v1/health HTTP/1.1" 200 OK
+INFO:     172.18.0.1:54132 - "GET /v1/health HTTP/1.1" 200 OK
+INFO:     172.18.0.1:54136 - "GET /v1/health HTTP/1.1" 200 OK
+INFO:     172.18.0.1:54144 - "GET /v1/health HTTP/1.1" 200 OK
+INFO:     172.18.0.1:54154 - "GET /v1/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54874 - "GET /v1/health HTTP/1.1" 200 OK
+INFO:     172.18.0.1:54164 - "GET / HTTP/1.1" 200 OK
+INFO:     172.18.0.1:54172 - "GET /expiry HTTP/1.1" 200 OK
+INFO:     172.18.0.1:54186 - "GET /inbox HTTP/1.1" 200 OK
+INFO:     172.18.0.1:54202 - "GET /planning HTTP/1.1" 200 OK
+INFO:     172.18.0.1:54212 - "GET /v1/health HTTP/1.1" 200 OK
+--- startup/error scan ---
+5:INFO:     app.services.reminders.daily - Daily reminder pass completed as_of=2026-10-28 households_visited=1 reminders_created=0 errors=0
+2026-10-28T21:28:07Z

@@ -1,0 +1,75 @@
+=== SG-257 G0 pre-serve state (read-only) ===
+2026-10-28T21:26:10Z
+--- docker ps -a ---
+CONTAINER ID   IMAGE                   COMMAND                  CREATED       STATUS                   PORTS                      NAMES
+a831fbd0f8d2   storagegenie-backend    "uvicorn app.server:…"   4 days ago    Up 24 hours (healthy)    127.0.0.1:8003->8000/tcp   storagegenie-backend-1
+1aabf2905704   storagegenie-frontend   "docker-entrypoint.s…"   6 weeks ago   Exited (0) 6 weeks ago                              storagegenie-frontend-1
+--- container identity (inspect) ---
+.Id=a831fbd0f8d2895d810efc4794f42166d194fa4e31c23403f02a8ff0cc19c2c1
+.Image=sha256:e8c7373577f9770bf486ae478e1a867b7ba41165aefa81d5f81d2b1d543d4ec3
+.Config.Cmd=[uvicorn app.server:app --host 0.0.0.0 --port 8000]
+.RestartCount=0
+.State.Status=running
+.State.Health.Status=healthy
+.Created=2026-10-24T19:25:04.308330921Z
+.State.StartedAt=2026-10-27T21:50:58.400659468Z
+--- health start ---
+{"status":"ok","db":"ok","storage":"ok"}
+http=200 time=0.003868
+--- served index + bundle (HTTP, pre) ---
+index_http=200 bytes=944
+cec37cf5eecd12a9d23da6ccaa1bb40da306fd38ce7454c1daa59909b3825caf  /tmp/sg257-pre/index.html
+/assets/index-C07VbG0m.css http=200 bytes=4535
+c3b58cda696a22970fc2a4a348849fc1359f2105f80f81304ed5dfd5ca31a557  /tmp/sg257-pre/index-C07VbG0m.css
+/assets/index-CWp6nYu6.js http=200 bytes=326217
+fe7dff6e58dd934ec14f693d40166aee5117453c13cb8caee45f371d4a944b99  /tmp/sg257-pre/index-CWp6nYu6.js
+--- pre-serve image runtime tree extraction ---
+pre_image=sha256:e8c7373577f9770bf486ae478e1a867b7ba41165aefa81d5f81d2b1d543d4ec3
+create_rc=0
+cp_rc=0
+pre_image_app_py_files=100 worktree_app_py_files=100
+--- pre-serve image app tree vs worktree backend/app (expected: SG-256's two files) ---
+-9b366d34e4a55f70252f8257fdee0deee460ea5622e0703be3d265975cbf794f  ./api/v1/plugins.py
++fe39353a0774678183cb0797e749efb561ec5dbd6faba0a0d3607ae60bc919a7  ./api/v1/plugins.py
+-9e33201d2eb4abd2a10aaad9f0b488c183db546c72b427cb3d2fbc28c23afac5  ./plugins/expiry_tracker.py
++7710f1afae1606653074979c8aa5253990de169fea0fb845b4f5445c0ed92872  ./plugins/expiry_tracker.py
+python_tree_diff_rc=1
+--- git log d0a87c6..HEAD -- backend/app ---
+b3c18f3 SG-256: clear an opened date through a null assertion; UI Edit/Clear
+--- production sqlite main-file (pre) ---
+424ac9d831daaae8c9d3e2a3684c7cad9724268f8688cff55c2e8e1f7673bc85  data/db/storagegenie.db
+db_bytes=765952 mtime=2026-10-27 21:50:55.516925932 +0000
+--- alembic head + census (read-only mode=ro, docker exec -i) ---
+head=20261023_sg233_reminder
+table_count=29
+alembic_version=1
+assertion=40
+asset=7
+asset_evidence=20
+asset_fts=7
+asset_fts_config=1
+asset_fts_data=9
+asset_fts_docsize=7
+asset_fts_idx=7
+asset_location=1
+asset_relation=1
+audit_event=104
+candidate=10
+enrich_snapshot=4
+evidence=27
+guardrail_event=2
+household=1
+idempotency_key=11
+job=11
+job_step=72
+location=1
+observation=20
+planning_suggestion=0
+provider_call=39
+reminder=4
+review_task=9
+saved_search=0
+source_attribution=0
+user=2
+census_rc=0
+2026-10-28T21:26:11Z

@@ -1,0 +1,52 @@
+=== SG-257 G3 served-artifact proofs (from the served image's own files, not the worktree) ===
+2026-10-28T21:27:24Z
+served_container=40bee778fa88dacb01236fff79d2ca0e5b3803b3cf0078cea76409c42e5049e2 served_image=sha256:b2c42abd942aa541034d3ef29b5b411919488af604f12fd6caa60788e3672c4b
+--- 1. served app/api/v1/plugins.py: /opened/clear route and clear_opened_date call ---
+242:@router.post("/assets/{asset_id}/opened/clear")
+243:def clear_opened_date(
+253:        assertion = expiry_tracker.clear_opened_date(db, asset)
+plugins_grep_rc=0
+--- 2. served app/plugins/expiry_tracker.py: clear_opened_date and the None passed to _write_assertion ---
+531:def clear_opened_date(db: Session, asset: Asset) -> Assertion | None:
+--- context (the return block) ---
+1:531:def clear_opened_date(db: Session, asset: Asset) -> Assertion | None:
+6:536-    opened date this is a no-op: nothing is written and ``None`` is returned.
+7:537-    Otherwise the existing ``_write_assertion`` path supersedes the old date with
+11:541-    if category is None:
+20:550-    if active is None or active.review_state != "accepted":
+21:551-        return None
+22:552-    return _write_assertion(
+23:553-        db, asset, OPENED_DATE_FIELD, None, "user", "accepted", None
+--- exact lines around the return ---
+531: def clear_opened_date(db: Session, asset: Asset) -> Assertion | None:
+532:     """Clear the active ``opened_date`` assertion (SG-256 D4).
+533: 
+534:     The asset must carry an accepted classification whose category tracks opened
+535:     dates, exactly as ``store_opened_date`` requires. With no active accepted
+536:     opened date this is a no-op: nothing is written and ``None`` is returned.
+537:     Otherwise the existing ``_write_assertion`` path supersedes the old date with
+538:     a new accepted assertion holding JSON ``null`` and records the same audit row.
+539:     """
+540:     category = _accepted_classification_category(db, asset.id)
+541:     if category is None:
+542:         raise ExpiryValidationError(
+543:             "Asset must have an accepted classification before clearing an opened date"
+544:         )
+545:     if not category.opened_date_tracking:
+546:         raise ExpiryValidationError(
+547:             f"Opened-date tracking is not enabled for category: {category.slug}"
+548:         )
+549:     active = _active_assertion(db, asset.id, OPENED_DATE_FIELD)
+550:     if active is None or active.review_state != "accepted":
+551:         return None
+552:     return _write_assertion(
+553:         db, asset, OPENED_DATE_FIELD, None, "user", "accepted", None
+554:     )
+555: 
+556: 
+--- 3. served frontend JS bundle: /opened/clear and Clear opened date ---
+sehold_id:t})}function Dx(e,t){return ne(`/v1/plugins/expiry-tracker/assets/${e}/opened/clear`,{},{household_id:t})}function Mx(e){return pe("/v1/reminders",{household_id:e}
+js_clear_path_hits=1
+_date??""),c(!0)},children:"Edit"}),o.jsx("button",{type:"button","aria-label":`Clear opened date for ${x}`,className:Z,style:K,disabled:s||a,onClick:()=>void b(),children:"Clea
+js_clear_label_hits=1
+2026-10-28T21:27:26Z
