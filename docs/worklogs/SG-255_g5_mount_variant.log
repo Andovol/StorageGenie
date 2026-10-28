@@ -1,0 +1,12 @@
+== date ==
+Wed Oct 28 20:35:32 UTC 2026
+== command: docker run --rm --network none -v "$PWD/backend:/app" -e SG_IMAGE_PROOF=1 storagegenie-backend:prover python -m pytest -q -m requires_native_libs tests/test_signals.py ==
+..                                                                       [100%]
+2 passed, 6 deselected in 1.65s
+rc=0
+wall_s=3
+== in-container sha256 of mounted /app/tests/test_signals.py ==
+9ef8616735a7fa3737e66c14bc5b18682af172e741a73091528b3d1fc183c3ed  /app/tests/test_signals.py
+sha_rc=0
+== worktree sha256 ==
+9ef8616735a7fa3737e66c14bc5b18682af172e741a73091528b3d1fc183c3ed  /home/andrei/StorageGenie/backend/tests/test_signals.py

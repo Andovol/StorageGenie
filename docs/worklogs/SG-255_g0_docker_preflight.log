@@ -1,0 +1,66 @@
+== date ==
+Wed Oct 28 20:29:41 UTC 2026
+== socket ==
+srw-rw---T 1 andrei 100987 0 Oct 27 21:50 /run/dispatch-storagegenie-SG-255/docker.sock
+== docker version ==
+Client: Docker Engine - Community
+ Version:           29.9.2
+ API version:       1.56
+ Go version:        go1.26.10
+ Git commit:        a82e528
+ Built:             Tue Oct 20 18:44:40 2026
+ OS/Arch:           linux/amd64
+ Context:           default
+
+Server: Docker Engine - Community
+ Engine:
+  Version:          29.9.2
+  API version:      1.56 (minimum version 1.40)
+  Go version:       go1.26.10
+  Git commit:       0367cbe
+  Built:            Tue Oct 20 18:44:40 2026
+  OS/Arch:          linux/amd64
+  Experimental:     false
+ containerd:
+  Version:          v2.4.2
+  GitCommit:        b7a25261e029d68978bbf290df0a62fc819b3c51
+ runc:
+  Version:          1.5.2
+  GitCommit:        v1.5.2-0-g29dd3dc2
+ docker-init:
+  Version:          0.19.0
+  GitCommit:        de40ad0
+ rootlesskit:
+  Version:          3.3.0
+  ApiVersion:       1.1.3
+  NetworkDriver:    slirp4netns
+  PortDriver:       builtin
+  StateDir:         /run/user/1000/dockerd-rootless
+ slirp4netns:
+  Version:          1.2.1
+  GitCommit:        09e31e92fa3d2a1d3ca261adaeb012c8d75a8194
+rc=0
+== docker images busybox/prover ==
+storagegenie-backend:prover d82a96fadfe7 2026-10-26 19:22:18 +0000 UTC
+storagegenie-backend:latest e8c7373577f9 2026-10-24 19:24:42 +0000 UTC
+storagegenie-backend:sg247-verify 0cb60586c19d 2026-10-24 15:40:06 +0000 UTC
+storagegenie-backend:sg240-proof ae1d292d7d3e 2026-10-24 15:40:06 +0000 UTC
+busybox:latest fd7dc98638c8 2026-05-13 02:21:49 +0000 UTC
+== docker run busybox ==
+
+real	0m0.665s
+user	0m0.022s
+sys	0m0.027s
+rc=0
+== health start (20:29:41Z) ==
+{"status":"ok","db":"ok","storage":"ok"}
+http=200
+== health end (2026-10-28T20:35:56Z) ==
+{"status":"ok","db":"ok","storage":"ok"}
+http=200
+== DOCKER_HOST ==
+unix:///run/dispatch-storagegenie-SG-255/docker.sock
+== DOCKER_CONFIG ==
+/tmp/opencode/sg255-docker
+== server version line ==
+Server.Version=29.9.2 Server.APIVersion=1.56

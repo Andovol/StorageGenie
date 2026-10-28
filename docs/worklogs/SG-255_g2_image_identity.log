@@ -1,0 +1,15 @@
+== date ==
+Wed Oct 28 20:30:13 UTC 2026
+== image list ==
+ID=sha256:e0960866c00a3cdfa79059ca2a2b0a78e4bde33c54be5b83975a2db8f09a0353 Created=2026-10-26 19:22:18 +0000 UTC Size=893MB
+== inspect ==
+Id=sha256:e0960866c00a3cdfa79059ca2a2b0a78e4bde33c54be5b83975a2db8f09a0353 Created=2026-10-26T19:22:18.200764265Z
+container=56e513a9302f3b6c4adc2861eb79d531b7ed5fe07e425a25340b9f332249e13f
+--- tests/test_signals.py
+9ef8616735a7fa3737e66c14bc5b18682af172e741a73091528b3d1fc183c3ed  /tmp/opencode/sg255-test_signals.py
+9ef8616735a7fa3737e66c14bc5b18682af172e741a73091528b3d1fc183c3ed  /home/andrei/StorageGenie/backend/tests/test_signals.py
+cmp=identical
+--- app/services/signals.py
+72942850348fdcf574eeb5da64daf9979c89fc91d0134fdc1ef8a1d2cb017494  /tmp/opencode/sg255-signals.py
+72942850348fdcf574eeb5da64daf9979c89fc91d0134fdc1ef8a1d2cb017494  /home/andrei/StorageGenie/backend/app/services/signals.py
+cmp=identical

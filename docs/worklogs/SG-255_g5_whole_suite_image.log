@@ -1,0 +1,1440 @@
+== date ==
+Wed Oct 28 20:34:10 UTC 2026
+== command: docker run --rm --network none storagegenie-backend:prover python -m pytest -q ==
+........................................................................ [  9%]
+........................................................................ [ 19%]
+................................FFF..................................... [ 28%]
+........................................................................ [ 38%]
+........FF.............................................................. [ 48%]
+........................................................................ [ 57%]
+.............................................................F.......... [ 67%]
+........................................................................ [ 77%]
+........................................................................ [ 86%]
+.......................................................FEEEEEFEEEEEEEEFF [ 96%]
+.........................                                                [100%]
+==================================== ERRORS ====================================
+_ ERROR at setup of test_sg233_due_fixture_creates_engine_shaped_unread_reminder _
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_sg233_due_fixture_creates0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7b83be02b0b0>
+
+    @pytest.fixture
+    def reminder_env(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):  # type: ignore[no-untyped-def]
+        url = f"sqlite:///{tmp_path / 'sg233.db'}"
+        monkeypatch.setattr(settings, "database_url", url)
+>       command.upgrade(_alembic_config(url), "head")
+
+tests/test_sg233_reminders.py:74: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/local/lib/python3.12/site-packages/alembic/command.py:467: in upgrade
+    script = ScriptDirectory.from_config(config)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.12/site-packages/alembic/script/base.py:180: in from_config
+    return ScriptDirectory(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <alembic.script.base.ScriptDirectory object at 0x7b83be029730>
+dir = PosixPath('/backend/alembic'), file_template = '%(rev)s_%(slug)s'
+truncate_slug_length = None, version_locations = None, sourceless = False
+output_encoding = 'utf-8', timezone = None, hooks = []
+recursive_version_locations = False
+messaging_opts = immutabledict({'quiet': False})
+
+    def __init__(
+        self,
+        dir: str | os.PathLike[str],  # noqa: A002
+        file_template: str = _default_file_template,
+        truncate_slug_length: int | None = 40,
+        version_locations: None | (Sequence[str | os.PathLike[str]]) = None,
+        sourceless: bool = False,
+        output_encoding: str = "utf-8",
+        timezone: str | None = None,
+        hooks: list[PostWriteHookConfig] = [],
+        recursive_version_locations: bool = False,
+        messaging_opts: MessagingOptions = cast(
+            "MessagingOptions", util.EMPTY_DICT
+        ),
+    ) -> None:
+        self.dir = _preserving_path_as_str(dir)
+        self.version_locations = [
+            _preserving_path_as_str(p) for p in version_locations or ()
+        ]
+        self.file_template = file_template
+        self.truncate_slug_length = truncate_slug_length or 40
+        self.sourceless = sourceless
+        self.output_encoding = output_encoding
+        self.revision_map = revision.RevisionMap(self._load_revisions)
+        self.timezone = timezone
+        self.hooks = hooks
+        self.recursive_version_locations = recursive_version_locations
+        self.messaging_opts = messaging_opts
+    
+        if not os.access(dir, os.F_OK):
+>           raise util.CommandError(
+                f"Path doesn't exist: {dir}.  Please use "
+                "the 'init' command to create a new "
+                "scripts folder."
+            )
+E           alembic.util.exc.CommandError: Path doesn't exist: /backend/alembic.  Please use the 'init' command to create a new scripts folder.
+
+/usr/local/lib/python3.12/site-packages/alembic/script/base.py:99: CommandError
+_____ ERROR at setup of test_sg233_record_due_defaults_to_the_live_utc_day _____
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_sg233_record_due_defaults0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7b83be06d100>
+
+    @pytest.fixture
+    def reminder_env(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):  # type: ignore[no-untyped-def]
+        url = f"sqlite:///{tmp_path / 'sg233.db'}"
+        monkeypatch.setattr(settings, "database_url", url)
+>       command.upgrade(_alembic_config(url), "head")
+
+tests/test_sg233_reminders.py:74: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/local/lib/python3.12/site-packages/alembic/command.py:467: in upgrade
+    script = ScriptDirectory.from_config(config)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.12/site-packages/alembic/script/base.py:180: in from_config
+    return ScriptDirectory(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <alembic.script.base.ScriptDirectory object at 0x7b83be06d2e0>
+dir = PosixPath('/backend/alembic'), file_template = '%(rev)s_%(slug)s'
+truncate_slug_length = None, version_locations = None, sourceless = False
+output_encoding = 'utf-8', timezone = None, hooks = []
+recursive_version_locations = False
+messaging_opts = immutabledict({'quiet': False})
+
+    def __init__(
+        self,
+        dir: str | os.PathLike[str],  # noqa: A002
+        file_template: str = _default_file_template,
+        truncate_slug_length: int | None = 40,
+        version_locations: None | (Sequence[str | os.PathLike[str]]) = None,
+        sourceless: bool = False,
+        output_encoding: str = "utf-8",
+        timezone: str | None = None,
+        hooks: list[PostWriteHookConfig] = [],
+        recursive_version_locations: bool = False,
+        messaging_opts: MessagingOptions = cast(
+            "MessagingOptions", util.EMPTY_DICT
+        ),
+    ) -> None:
+        self.dir = _preserving_path_as_str(dir)
+        self.version_locations = [
+            _preserving_path_as_str(p) for p in version_locations or ()
+        ]
+        self.file_template = file_template
+        self.truncate_slug_length = truncate_slug_length or 40
+        self.sourceless = sourceless
+        self.output_encoding = output_encoding
+        self.revision_map = revision.RevisionMap(self._load_revisions)
+        self.timezone = timezone
+        self.hooks = hooks
+        self.recursive_version_locations = recursive_version_locations
+        self.messaging_opts = messaging_opts
+    
+        if not os.access(dir, os.F_OK):
+>           raise util.CommandError(
+                f"Path doesn't exist: {dir}.  Please use "
+                "the 'init' command to create a new "
+                "scripts folder."
+            )
+E           alembic.util.exc.CommandError: Path doesn't exist: /backend/alembic.  Please use the 'init' command to create a new scripts folder.
+
+/usr/local/lib/python3.12/site-packages/alembic/script/base.py:99: CommandError
+_ ERROR at setup of test_sg233_unresolved_and_non_warning_rows_create_nothing __
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_sg233_unresolved_and_non_0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7b83bdfede80>
+
+    @pytest.fixture
+    def reminder_env(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):  # type: ignore[no-untyped-def]
+        url = f"sqlite:///{tmp_path / 'sg233.db'}"
+        monkeypatch.setattr(settings, "database_url", url)
+>       command.upgrade(_alembic_config(url), "head")
+
+tests/test_sg233_reminders.py:74: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/local/lib/python3.12/site-packages/alembic/command.py:467: in upgrade
+    script = ScriptDirectory.from_config(config)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.12/site-packages/alembic/script/base.py:180: in from_config
+    return ScriptDirectory(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <alembic.script.base.ScriptDirectory object at 0x7b83abd7a540>
+dir = PosixPath('/backend/alembic'), file_template = '%(rev)s_%(slug)s'
+truncate_slug_length = None, version_locations = None, sourceless = False
+output_encoding = 'utf-8', timezone = None, hooks = []
+recursive_version_locations = False
+messaging_opts = immutabledict({'quiet': False})
+
+    def __init__(
+        self,
+        dir: str | os.PathLike[str],  # noqa: A002
+        file_template: str = _default_file_template,
+        truncate_slug_length: int | None = 40,
+        version_locations: None | (Sequence[str | os.PathLike[str]]) = None,
+        sourceless: bool = False,
+        output_encoding: str = "utf-8",
+        timezone: str | None = None,
+        hooks: list[PostWriteHookConfig] = [],
+        recursive_version_locations: bool = False,
+        messaging_opts: MessagingOptions = cast(
+            "MessagingOptions", util.EMPTY_DICT
+        ),
+    ) -> None:
+        self.dir = _preserving_path_as_str(dir)
+        self.version_locations = [
+            _preserving_path_as_str(p) for p in version_locations or ()
+        ]
+        self.file_template = file_template
+        self.truncate_slug_length = truncate_slug_length or 40
+        self.sourceless = sourceless
+        self.output_encoding = output_encoding
+        self.revision_map = revision.RevisionMap(self._load_revisions)
+        self.timezone = timezone
+        self.hooks = hooks
+        self.recursive_version_locations = recursive_version_locations
+        self.messaging_opts = messaging_opts
+    
+        if not os.access(dir, os.F_OK):
+>           raise util.CommandError(
+                f"Path doesn't exist: {dir}.  Please use "
+                "the 'init' command to create a new "
+                "scripts folder."
+            )
+E           alembic.util.exc.CommandError: Path doesn't exist: /backend/alembic.  Please use the 'init' command to create a new scripts folder.
+
+/usr/local/lib/python3.12/site-packages/alembic/script/base.py:99: CommandError
+________ ERROR at setup of test_sg233_same_day_rerun_inserts_zero_rows _________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_sg233_same_day_rerun_inse0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7b83be02bec0>
+
+    @pytest.fixture
+    def reminder_env(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):  # type: ignore[no-untyped-def]
+        url = f"sqlite:///{tmp_path / 'sg233.db'}"
+        monkeypatch.setattr(settings, "database_url", url)
+>       command.upgrade(_alembic_config(url), "head")
+
+tests/test_sg233_reminders.py:74: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/local/lib/python3.12/site-packages/alembic/command.py:467: in upgrade
+    script = ScriptDirectory.from_config(config)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.12/site-packages/alembic/script/base.py:180: in from_config
+    return ScriptDirectory(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <alembic.script.base.ScriptDirectory object at 0x7b83be02a270>
+dir = PosixPath('/backend/alembic'), file_template = '%(rev)s_%(slug)s'
+truncate_slug_length = None, version_locations = None, sourceless = False
+output_encoding = 'utf-8', timezone = None, hooks = []
+recursive_version_locations = False
+messaging_opts = immutabledict({'quiet': False})
+
+    def __init__(
+        self,
+        dir: str | os.PathLike[str],  # noqa: A002
+        file_template: str = _default_file_template,
+        truncate_slug_length: int | None = 40,
+        version_locations: None | (Sequence[str | os.PathLike[str]]) = None,
+        sourceless: bool = False,
+        output_encoding: str = "utf-8",
+        timezone: str | None = None,
+        hooks: list[PostWriteHookConfig] = [],
+        recursive_version_locations: bool = False,
+        messaging_opts: MessagingOptions = cast(
+            "MessagingOptions", util.EMPTY_DICT
+        ),
+    ) -> None:
+        self.dir = _preserving_path_as_str(dir)
+        self.version_locations = [
+            _preserving_path_as_str(p) for p in version_locations or ()
+        ]
+        self.file_template = file_template
+        self.truncate_slug_length = truncate_slug_length or 40
+        self.sourceless = sourceless
+        self.output_encoding = output_encoding
+        self.revision_map = revision.RevisionMap(self._load_revisions)
+        self.timezone = timezone
+        self.hooks = hooks
+        self.recursive_version_locations = recursive_version_locations
+        self.messaging_opts = messaging_opts
+    
+        if not os.access(dir, os.F_OK):
+>           raise util.CommandError(
+                f"Path doesn't exist: {dir}.  Please use "
+                "the 'init' command to create a new "
+                "scripts folder."
+            )
+E           alembic.util.exc.CommandError: Path doesn't exist: /backend/alembic.  Please use the 'init' command to create a new scripts folder.
+
+/usr/local/lib/python3.12/site-packages/alembic/script/base.py:99: CommandError
+_ ERROR at setup of test_sg233_read_and_dismiss_round_trip_with_illegal_transitions _
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_sg233_read_and_dismiss_ro0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7b83bdfe8260>
+
+    @pytest.fixture
+    def reminder_env(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):  # type: ignore[no-untyped-def]
+        url = f"sqlite:///{tmp_path / 'sg233.db'}"
+        monkeypatch.setattr(settings, "database_url", url)
+>       command.upgrade(_alembic_config(url), "head")
+
+tests/test_sg233_reminders.py:74: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/local/lib/python3.12/site-packages/alembic/command.py:467: in upgrade
+    script = ScriptDirectory.from_config(config)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.12/site-packages/alembic/script/base.py:180: in from_config
+    return ScriptDirectory(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <alembic.script.base.ScriptDirectory object at 0x7b83be06ea80>
+dir = PosixPath('/backend/alembic'), file_template = '%(rev)s_%(slug)s'
+truncate_slug_length = None, version_locations = None, sourceless = False
+output_encoding = 'utf-8', timezone = None, hooks = []
+recursive_version_locations = False
+messaging_opts = immutabledict({'quiet': False})
+
+    def __init__(
+        self,
+        dir: str | os.PathLike[str],  # noqa: A002
+        file_template: str = _default_file_template,
+        truncate_slug_length: int | None = 40,
+        version_locations: None | (Sequence[str | os.PathLike[str]]) = None,
+        sourceless: bool = False,
+        output_encoding: str = "utf-8",
+        timezone: str | None = None,
+        hooks: list[PostWriteHookConfig] = [],
+        recursive_version_locations: bool = False,
+        messaging_opts: MessagingOptions = cast(
+            "MessagingOptions", util.EMPTY_DICT
+        ),
+    ) -> None:
+        self.dir = _preserving_path_as_str(dir)
+        self.version_locations = [
+            _preserving_path_as_str(p) for p in version_locations or ()
+        ]
+        self.file_template = file_template
+        self.truncate_slug_length = truncate_slug_length or 40
+        self.sourceless = sourceless
+        self.output_encoding = output_encoding
+        self.revision_map = revision.RevisionMap(self._load_revisions)
+        self.timezone = timezone
+        self.hooks = hooks
+        self.recursive_version_locations = recursive_version_locations
+        self.messaging_opts = messaging_opts
+    
+        if not os.access(dir, os.F_OK):
+>           raise util.CommandError(
+                f"Path doesn't exist: {dir}.  Please use "
+                "the 'init' command to create a new "
+                "scripts folder."
+            )
+E           alembic.util.exc.CommandError: Path doesn't exist: /backend/alembic.  Please use the 'init' command to create a new scripts folder.
+
+/usr/local/lib/python3.12/site-packages/alembic/script/base.py:99: CommandError
+_ ERROR at setup of test_sg235_pass_covers_every_household_with_engine_shaped_rows _
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_sg235_pass_covers_every_h0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7b83be06f140>
+
+    @pytest.fixture
+    def daily_env(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):  # type: ignore[no-untyped-def]
+        url = f"sqlite:///{tmp_path / 'sg235.db'}"
+        monkeypatch.setattr(settings, "database_url", url)
+>       command.upgrade(_alembic_config(url), "head")
+
+tests/test_sg235_daily_caller.py:69: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/local/lib/python3.12/site-packages/alembic/command.py:467: in upgrade
+    script = ScriptDirectory.from_config(config)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.12/site-packages/alembic/script/base.py:180: in from_config
+    return ScriptDirectory(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <alembic.script.base.ScriptDirectory object at 0x7b83be06f380>
+dir = PosixPath('/backend/alembic'), file_template = '%(rev)s_%(slug)s'
+truncate_slug_length = None, version_locations = None, sourceless = False
+output_encoding = 'utf-8', timezone = None, hooks = []
+recursive_version_locations = False
+messaging_opts = immutabledict({'quiet': False})
+
+    def __init__(
+        self,
+        dir: str | os.PathLike[str],  # noqa: A002
+        file_template: str = _default_file_template,
+        truncate_slug_length: int | None = 40,
+        version_locations: None | (Sequence[str | os.PathLike[str]]) = None,
+        sourceless: bool = False,
+        output_encoding: str = "utf-8",
+        timezone: str | None = None,
+        hooks: list[PostWriteHookConfig] = [],
+        recursive_version_locations: bool = False,
+        messaging_opts: MessagingOptions = cast(
+            "MessagingOptions", util.EMPTY_DICT
+        ),
+    ) -> None:
+        self.dir = _preserving_path_as_str(dir)
+        self.version_locations = [
+            _preserving_path_as_str(p) for p in version_locations or ()
+        ]
+        self.file_template = file_template
+        self.truncate_slug_length = truncate_slug_length or 40
+        self.sourceless = sourceless
+        self.output_encoding = output_encoding
+        self.revision_map = revision.RevisionMap(self._load_revisions)
+        self.timezone = timezone
+        self.hooks = hooks
+        self.recursive_version_locations = recursive_version_locations
+        self.messaging_opts = messaging_opts
+    
+        if not os.access(dir, os.F_OK):
+>           raise util.CommandError(
+                f"Path doesn't exist: {dir}.  Please use "
+                "the 'init' command to create a new "
+                "scripts folder."
+            )
+E           alembic.util.exc.CommandError: Path doesn't exist: /backend/alembic.  Please use the 'init' command to create a new scripts folder.
+
+/usr/local/lib/python3.12/site-packages/alembic/script/base.py:99: CommandError
+______ ERROR at setup of test_sg235_second_pass_same_day_creates_nothing _______
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_sg235_second_pass_same_da0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7b83be06ebd0>
+
+    @pytest.fixture
+    def daily_env(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):  # type: ignore[no-untyped-def]
+        url = f"sqlite:///{tmp_path / 'sg235.db'}"
+        monkeypatch.setattr(settings, "database_url", url)
+>       command.upgrade(_alembic_config(url), "head")
+
+tests/test_sg235_daily_caller.py:69: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/local/lib/python3.12/site-packages/alembic/command.py:467: in upgrade
+    script = ScriptDirectory.from_config(config)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.12/site-packages/alembic/script/base.py:180: in from_config
+    return ScriptDirectory(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <alembic.script.base.ScriptDirectory object at 0x7b83be06f6e0>
+dir = PosixPath('/backend/alembic'), file_template = '%(rev)s_%(slug)s'
+truncate_slug_length = None, version_locations = None, sourceless = False
+output_encoding = 'utf-8', timezone = None, hooks = []
+recursive_version_locations = False
+messaging_opts = immutabledict({'quiet': False})
+
+    def __init__(
+        self,
+        dir: str | os.PathLike[str],  # noqa: A002
+        file_template: str = _default_file_template,
+        truncate_slug_length: int | None = 40,
+        version_locations: None | (Sequence[str | os.PathLike[str]]) = None,
+        sourceless: bool = False,
+        output_encoding: str = "utf-8",
+        timezone: str | None = None,
+        hooks: list[PostWriteHookConfig] = [],
+        recursive_version_locations: bool = False,
+        messaging_opts: MessagingOptions = cast(
+            "MessagingOptions", util.EMPTY_DICT
+        ),
+    ) -> None:
+        self.dir = _preserving_path_as_str(dir)
+        self.version_locations = [
+            _preserving_path_as_str(p) for p in version_locations or ()
+        ]
+        self.file_template = file_template
+        self.truncate_slug_length = truncate_slug_length or 40
+        self.sourceless = sourceless
+        self.output_encoding = output_encoding
+        self.revision_map = revision.RevisionMap(self._load_revisions)
+        self.timezone = timezone
+        self.hooks = hooks
+        self.recursive_version_locations = recursive_version_locations
+        self.messaging_opts = messaging_opts
+    
+        if not os.access(dir, os.F_OK):
+>           raise util.CommandError(
+                f"Path doesn't exist: {dir}.  Please use "
+                "the 'init' command to create a new "
+                "scripts folder."
+            )
+E           alembic.util.exc.CommandError: Path doesn't exist: /backend/alembic.  Please use the 'init' command to create a new scripts folder.
+
+/usr/local/lib/python3.12/site-packages/alembic/script/base.py:99: CommandError
+_______ ERROR at setup of test_sg235_loop_does_not_backfill_missed_days ________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_sg235_loop_does_not_backf0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7b83abeff1d0>
+
+    @pytest.fixture
+    def daily_env(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):  # type: ignore[no-untyped-def]
+        url = f"sqlite:///{tmp_path / 'sg235.db'}"
+        monkeypatch.setattr(settings, "database_url", url)
+>       command.upgrade(_alembic_config(url), "head")
+
+tests/test_sg235_daily_caller.py:69: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/local/lib/python3.12/site-packages/alembic/command.py:467: in upgrade
+    script = ScriptDirectory.from_config(config)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.12/site-packages/alembic/script/base.py:180: in from_config
+    return ScriptDirectory(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <alembic.script.base.ScriptDirectory object at 0x7b83abd7bb30>
+dir = PosixPath('/backend/alembic'), file_template = '%(rev)s_%(slug)s'
+truncate_slug_length = None, version_locations = None, sourceless = False
+output_encoding = 'utf-8', timezone = None, hooks = []
+recursive_version_locations = False
+messaging_opts = immutabledict({'quiet': False})
+
+    def __init__(
+        self,
+        dir: str | os.PathLike[str],  # noqa: A002
+        file_template: str = _default_file_template,
+        truncate_slug_length: int | None = 40,
+        version_locations: None | (Sequence[str | os.PathLike[str]]) = None,
+        sourceless: bool = False,
+        output_encoding: str = "utf-8",
+        timezone: str | None = None,
+        hooks: list[PostWriteHookConfig] = [],
+        recursive_version_locations: bool = False,
+        messaging_opts: MessagingOptions = cast(
+            "MessagingOptions", util.EMPTY_DICT
+        ),
+    ) -> None:
+        self.dir = _preserving_path_as_str(dir)
+        self.version_locations = [
+            _preserving_path_as_str(p) for p in version_locations or ()
+        ]
+        self.file_template = file_template
+        self.truncate_slug_length = truncate_slug_length or 40
+        self.sourceless = sourceless
+        self.output_encoding = output_encoding
+        self.revision_map = revision.RevisionMap(self._load_revisions)
+        self.timezone = timezone
+        self.hooks = hooks
+        self.recursive_version_locations = recursive_version_locations
+        self.messaging_opts = messaging_opts
+    
+        if not os.access(dir, os.F_OK):
+>           raise util.CommandError(
+                f"Path doesn't exist: {dir}.  Please use "
+                "the 'init' command to create a new "
+                "scripts folder."
+            )
+E           alembic.util.exc.CommandError: Path doesn't exist: /backend/alembic.  Please use the 'init' command to create a new scripts folder.
+
+/usr/local/lib/python3.12/site-packages/alembic/script/base.py:99: CommandError
+_______ ERROR at setup of test_sg235_loop_cadence_survives_a_failed_pass _______
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_sg235_loop_cadence_surviv0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7b83be0ac590>
+
+    @pytest.fixture
+    def daily_env(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):  # type: ignore[no-untyped-def]
+        url = f"sqlite:///{tmp_path / 'sg235.db'}"
+        monkeypatch.setattr(settings, "database_url", url)
+>       command.upgrade(_alembic_config(url), "head")
+
+tests/test_sg235_daily_caller.py:69: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/local/lib/python3.12/site-packages/alembic/command.py:467: in upgrade
+    script = ScriptDirectory.from_config(config)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.12/site-packages/alembic/script/base.py:180: in from_config
+    return ScriptDirectory(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <alembic.script.base.ScriptDirectory object at 0x7b83be0af650>
+dir = PosixPath('/backend/alembic'), file_template = '%(rev)s_%(slug)s'
+truncate_slug_length = None, version_locations = None, sourceless = False
+output_encoding = 'utf-8', timezone = None, hooks = []
+recursive_version_locations = False
+messaging_opts = immutabledict({'quiet': False})
+
+    def __init__(
+        self,
+        dir: str | os.PathLike[str],  # noqa: A002
+        file_template: str = _default_file_template,
+        truncate_slug_length: int | None = 40,
+        version_locations: None | (Sequence[str | os.PathLike[str]]) = None,
+        sourceless: bool = False,
+        output_encoding: str = "utf-8",
+        timezone: str | None = None,
+        hooks: list[PostWriteHookConfig] = [],
+        recursive_version_locations: bool = False,
+        messaging_opts: MessagingOptions = cast(
+            "MessagingOptions", util.EMPTY_DICT
+        ),
+    ) -> None:
+        self.dir = _preserving_path_as_str(dir)
+        self.version_locations = [
+            _preserving_path_as_str(p) for p in version_locations or ()
+        ]
+        self.file_template = file_template
+        self.truncate_slug_length = truncate_slug_length or 40
+        self.sourceless = sourceless
+        self.output_encoding = output_encoding
+        self.revision_map = revision.RevisionMap(self._load_revisions)
+        self.timezone = timezone
+        self.hooks = hooks
+        self.recursive_version_locations = recursive_version_locations
+        self.messaging_opts = messaging_opts
+    
+        if not os.access(dir, os.F_OK):
+>           raise util.CommandError(
+                f"Path doesn't exist: {dir}.  Please use "
+                "the 'init' command to create a new "
+                "scripts folder."
+            )
+E           alembic.util.exc.CommandError: Path doesn't exist: /backend/alembic.  Please use the 'init' command to create a new scripts folder.
+
+/usr/local/lib/python3.12/site-packages/alembic/script/base.py:99: CommandError
+______ ERROR at setup of test_sg235_lifespan_starts_loop_once_and_cancels ______
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_sg235_lifespan_starts_loo0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7b83be0acfb0>
+
+    @pytest.fixture
+    def daily_env(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):  # type: ignore[no-untyped-def]
+        url = f"sqlite:///{tmp_path / 'sg235.db'}"
+        monkeypatch.setattr(settings, "database_url", url)
+>       command.upgrade(_alembic_config(url), "head")
+
+tests/test_sg235_daily_caller.py:69: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/local/lib/python3.12/site-packages/alembic/command.py:467: in upgrade
+    script = ScriptDirectory.from_config(config)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.12/site-packages/alembic/script/base.py:180: in from_config
+    return ScriptDirectory(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <alembic.script.base.ScriptDirectory object at 0x7b83be0ad220>
+dir = PosixPath('/backend/alembic'), file_template = '%(rev)s_%(slug)s'
+truncate_slug_length = None, version_locations = None, sourceless = False
+output_encoding = 'utf-8', timezone = None, hooks = []
+recursive_version_locations = False
+messaging_opts = immutabledict({'quiet': False})
+
+    def __init__(
+        self,
+        dir: str | os.PathLike[str],  # noqa: A002
+        file_template: str = _default_file_template,
+        truncate_slug_length: int | None = 40,
+        version_locations: None | (Sequence[str | os.PathLike[str]]) = None,
+        sourceless: bool = False,
+        output_encoding: str = "utf-8",
+        timezone: str | None = None,
+        hooks: list[PostWriteHookConfig] = [],
+        recursive_version_locations: bool = False,
+        messaging_opts: MessagingOptions = cast(
+            "MessagingOptions", util.EMPTY_DICT
+        ),
+    ) -> None:
+        self.dir = _preserving_path_as_str(dir)
+        self.version_locations = [
+            _preserving_path_as_str(p) for p in version_locations or ()
+        ]
+        self.file_template = file_template
+        self.truncate_slug_length = truncate_slug_length or 40
+        self.sourceless = sourceless
+        self.output_encoding = output_encoding
+        self.revision_map = revision.RevisionMap(self._load_revisions)
+        self.timezone = timezone
+        self.hooks = hooks
+        self.recursive_version_locations = recursive_version_locations
+        self.messaging_opts = messaging_opts
+    
+        if not os.access(dir, os.F_OK):
+>           raise util.CommandError(
+                f"Path doesn't exist: {dir}.  Please use "
+                "the 'init' command to create a new "
+                "scripts folder."
+            )
+E           alembic.util.exc.CommandError: Path doesn't exist: /backend/alembic.  Please use the 'init' command to create a new scripts folder.
+
+/usr/local/lib/python3.12/site-packages/alembic/script/base.py:99: CommandError
+____ ERROR at setup of test_sg235_health_answers_while_a_pass_is_in_flight _____
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_sg235_health_answers_whil0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7b83abc594c0>
+
+    @pytest.fixture
+    def daily_env(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):  # type: ignore[no-untyped-def]
+        url = f"sqlite:///{tmp_path / 'sg235.db'}"
+        monkeypatch.setattr(settings, "database_url", url)
+>       command.upgrade(_alembic_config(url), "head")
+
+tests/test_sg235_daily_caller.py:69: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/local/lib/python3.12/site-packages/alembic/command.py:467: in upgrade
+    script = ScriptDirectory.from_config(config)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.12/site-packages/alembic/script/base.py:180: in from_config
+    return ScriptDirectory(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <alembic.script.base.ScriptDirectory object at 0x7b83be06f320>
+dir = PosixPath('/backend/alembic'), file_template = '%(rev)s_%(slug)s'
+truncate_slug_length = None, version_locations = None, sourceless = False
+output_encoding = 'utf-8', timezone = None, hooks = []
+recursive_version_locations = False
+messaging_opts = immutabledict({'quiet': False})
+
+    def __init__(
+        self,
+        dir: str | os.PathLike[str],  # noqa: A002
+        file_template: str = _default_file_template,
+        truncate_slug_length: int | None = 40,
+        version_locations: None | (Sequence[str | os.PathLike[str]]) = None,
+        sourceless: bool = False,
+        output_encoding: str = "utf-8",
+        timezone: str | None = None,
+        hooks: list[PostWriteHookConfig] = [],
+        recursive_version_locations: bool = False,
+        messaging_opts: MessagingOptions = cast(
+            "MessagingOptions", util.EMPTY_DICT
+        ),
+    ) -> None:
+        self.dir = _preserving_path_as_str(dir)
+        self.version_locations = [
+            _preserving_path_as_str(p) for p in version_locations or ()
+        ]
+        self.file_template = file_template
+        self.truncate_slug_length = truncate_slug_length or 40
+        self.sourceless = sourceless
+        self.output_encoding = output_encoding
+        self.revision_map = revision.RevisionMap(self._load_revisions)
+        self.timezone = timezone
+        self.hooks = hooks
+        self.recursive_version_locations = recursive_version_locations
+        self.messaging_opts = messaging_opts
+    
+        if not os.access(dir, os.F_OK):
+>           raise util.CommandError(
+                f"Path doesn't exist: {dir}.  Please use "
+                "the 'init' command to create a new "
+                "scripts folder."
+            )
+E           alembic.util.exc.CommandError: Path doesn't exist: /backend/alembic.  Please use the 'init' command to create a new scripts folder.
+
+/usr/local/lib/python3.12/site-packages/alembic/script/base.py:99: CommandError
+________ ERROR at setup of test_sg235_pass_isolates_a_failing_household ________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_sg235_pass_isolates_a_fai0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7b83be0ac6e0>
+
+    @pytest.fixture
+    def daily_env(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):  # type: ignore[no-untyped-def]
+        url = f"sqlite:///{tmp_path / 'sg235.db'}"
+        monkeypatch.setattr(settings, "database_url", url)
+>       command.upgrade(_alembic_config(url), "head")
+
+tests/test_sg235_daily_caller.py:69: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/local/lib/python3.12/site-packages/alembic/command.py:467: in upgrade
+    script = ScriptDirectory.from_config(config)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.12/site-packages/alembic/script/base.py:180: in from_config
+    return ScriptDirectory(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <alembic.script.base.ScriptDirectory object at 0x7b83be0acfe0>
+dir = PosixPath('/backend/alembic'), file_template = '%(rev)s_%(slug)s'
+truncate_slug_length = None, version_locations = None, sourceless = False
+output_encoding = 'utf-8', timezone = None, hooks = []
+recursive_version_locations = False
+messaging_opts = immutabledict({'quiet': False})
+
+    def __init__(
+        self,
+        dir: str | os.PathLike[str],  # noqa: A002
+        file_template: str = _default_file_template,
+        truncate_slug_length: int | None = 40,
+        version_locations: None | (Sequence[str | os.PathLike[str]]) = None,
+        sourceless: bool = False,
+        output_encoding: str = "utf-8",
+        timezone: str | None = None,
+        hooks: list[PostWriteHookConfig] = [],
+        recursive_version_locations: bool = False,
+        messaging_opts: MessagingOptions = cast(
+            "MessagingOptions", util.EMPTY_DICT
+        ),
+    ) -> None:
+        self.dir = _preserving_path_as_str(dir)
+        self.version_locations = [
+            _preserving_path_as_str(p) for p in version_locations or ()
+        ]
+        self.file_template = file_template
+        self.truncate_slug_length = truncate_slug_length or 40
+        self.sourceless = sourceless
+        self.output_encoding = output_encoding
+        self.revision_map = revision.RevisionMap(self._load_revisions)
+        self.timezone = timezone
+        self.hooks = hooks
+        self.recursive_version_locations = recursive_version_locations
+        self.messaging_opts = messaging_opts
+    
+        if not os.access(dir, os.F_OK):
+>           raise util.CommandError(
+                f"Path doesn't exist: {dir}.  Please use "
+                "the 'init' command to create a new "
+                "scripts folder."
+            )
+E           alembic.util.exc.CommandError: Path doesn't exist: /backend/alembic.  Please use the 'init' command to create a new scripts folder.
+
+/usr/local/lib/python3.12/site-packages/alembic/script/base.py:99: CommandError
+___ ERROR at setup of test_sg235_pass_logs_one_success_line_with_real_counts ___
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_sg235_pass_logs_one_succe0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7b83be0adbb0>
+
+    @pytest.fixture
+    def daily_env(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):  # type: ignore[no-untyped-def]
+        url = f"sqlite:///{tmp_path / 'sg235.db'}"
+        monkeypatch.setattr(settings, "database_url", url)
+>       command.upgrade(_alembic_config(url), "head")
+
+tests/test_sg235_daily_caller.py:69: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/local/lib/python3.12/site-packages/alembic/command.py:467: in upgrade
+    script = ScriptDirectory.from_config(config)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.12/site-packages/alembic/script/base.py:180: in from_config
+    return ScriptDirectory(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <alembic.script.base.ScriptDirectory object at 0x7b83be0ac500>
+dir = PosixPath('/backend/alembic'), file_template = '%(rev)s_%(slug)s'
+truncate_slug_length = None, version_locations = None, sourceless = False
+output_encoding = 'utf-8', timezone = None, hooks = []
+recursive_version_locations = False
+messaging_opts = immutabledict({'quiet': False})
+
+    def __init__(
+        self,
+        dir: str | os.PathLike[str],  # noqa: A002
+        file_template: str = _default_file_template,
+        truncate_slug_length: int | None = 40,
+        version_locations: None | (Sequence[str | os.PathLike[str]]) = None,
+        sourceless: bool = False,
+        output_encoding: str = "utf-8",
+        timezone: str | None = None,
+        hooks: list[PostWriteHookConfig] = [],
+        recursive_version_locations: bool = False,
+        messaging_opts: MessagingOptions = cast(
+            "MessagingOptions", util.EMPTY_DICT
+        ),
+    ) -> None:
+        self.dir = _preserving_path_as_str(dir)
+        self.version_locations = [
+            _preserving_path_as_str(p) for p in version_locations or ()
+        ]
+        self.file_template = file_template
+        self.truncate_slug_length = truncate_slug_length or 40
+        self.sourceless = sourceless
+        self.output_encoding = output_encoding
+        self.revision_map = revision.RevisionMap(self._load_revisions)
+        self.timezone = timezone
+        self.hooks = hooks
+        self.recursive_version_locations = recursive_version_locations
+        self.messaging_opts = messaging_opts
+    
+        if not os.access(dir, os.F_OK):
+>           raise util.CommandError(
+                f"Path doesn't exist: {dir}.  Please use "
+                "the 'init' command to create a new "
+                "scripts folder."
+            )
+E           alembic.util.exc.CommandError: Path doesn't exist: /backend/alembic.  Please use the 'init' command to create a new scripts folder.
+
+/usr/local/lib/python3.12/site-packages/alembic/script/base.py:99: CommandError
+=================================== FAILURES ===================================
+_______ test_v4_prompt_loads_through_real_loader_as_v3_plus_block[food] ________
+
+category = 'food'
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7b83b5ea98b0>
+
+    @pytest.mark.parametrize("category", V4_CATEGORIES)
+    def test_v4_prompt_loads_through_real_loader_as_v3_plus_block(
+        category: str, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """v4 = v3 loader output + spec block + front-matter bump; v3 still on disk."""
+>       block = _spec_block()
+                ^^^^^^^^^^^^^
+
+tests/test_google_taxonomy.py:232: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_google_taxonomy.py:183: in _spec_block
+    text = SPEC_PATH.read_text(encoding="utf-8")
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.12/pathlib.py:1027: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/docs/superpowers/specs/2026-09-21-google-taxonomy-design.md')
+mode = 'r', buffering = -1, encoding = 'utf-8', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed to by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/docs/superpowers/specs/2026-09-21-google-taxonomy-design.md'
+
+/usr/local/lib/python3.12/pathlib.py:1013: FileNotFoundError
+_____ test_v4_prompt_loads_through_real_loader_as_v3_plus_block[medicine] ______
+
+category = 'medicine'
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7b83b5eabc80>
+
+    @pytest.mark.parametrize("category", V4_CATEGORIES)
+    def test_v4_prompt_loads_through_real_loader_as_v3_plus_block(
+        category: str, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """v4 = v3 loader output + spec block + front-matter bump; v3 still on disk."""
+>       block = _spec_block()
+                ^^^^^^^^^^^^^
+
+tests/test_google_taxonomy.py:232: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_google_taxonomy.py:183: in _spec_block
+    text = SPEC_PATH.read_text(encoding="utf-8")
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.12/pathlib.py:1027: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/docs/superpowers/specs/2026-09-21-google-taxonomy-design.md')
+mode = 'r', buffering = -1, encoding = 'utf-8', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed to by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/docs/superpowers/specs/2026-09-21-google-taxonomy-design.md'
+
+/usr/local/lib/python3.12/pathlib.py:1013: FileNotFoundError
+_____ test_v4_prompt_loads_through_real_loader_as_v3_plus_block[cosmetics] _____
+
+category = 'cosmetics'
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7b83b5eaacc0>
+
+    @pytest.mark.parametrize("category", V4_CATEGORIES)
+    def test_v4_prompt_loads_through_real_loader_as_v3_plus_block(
+        category: str, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """v4 = v3 loader output + spec block + front-matter bump; v3 still on disk."""
+>       block = _spec_block()
+                ^^^^^^^^^^^^^
+
+tests/test_google_taxonomy.py:232: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_google_taxonomy.py:183: in _spec_block
+    text = SPEC_PATH.read_text(encoding="utf-8")
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.12/pathlib.py:1027: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/docs/superpowers/specs/2026-09-21-google-taxonomy-design.md')
+mode = 'r', buffering = -1, encoding = 'utf-8', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed to by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/docs/superpowers/specs/2026-09-21-google-taxonomy-design.md'
+
+/usr/local/lib/python3.12/pathlib.py:1013: FileNotFoundError
+________________ test_readme_runbook_commands_match_sg086_form _________________
+
+    def test_readme_runbook_commands_match_sg086_form() -> None:
+>       text = readme_text()
+               ^^^^^^^^^^^^^
+
+tests/test_runbook_commands.py:94: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_runbook_commands.py:38: in readme_text
+    return README_PATH.read_text(encoding="utf-8")
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.12/pathlib.py:1027: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/README.md'), mode = 'r', buffering = -1, encoding = 'utf-8'
+errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed to by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/README.md'
+
+/usr/local/lib/python3.12/pathlib.py:1013: FileNotFoundError
+________________ test_guard_flags_the_doubled_data_suffix_drift ________________
+
+    def test_guard_flags_the_doubled_data_suffix_drift() -> None:
+        """Seen-to-fail property: the historical ``/_data`` doubling must be caught."""
+>       text = readme_text()
+               ^^^^^^^^^^^^^
+
+tests/test_runbook_commands.py:104: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_runbook_commands.py:38: in readme_text
+    return README_PATH.read_text(encoding="utf-8")
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.12/pathlib.py:1027: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/README.md'), mode = 'r', buffering = -1, encoding = 'utf-8'
+errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed to by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/README.md'
+
+/usr/local/lib/python3.12/pathlib.py:1013: FileNotFoundError
+_____________ test_worked_example_artifact_matches_the_real_driver _____________
+
+    def test_worked_example_artifact_matches_the_real_driver() -> None:
+        """SG-097: the committed worked example IS the request the REAL driver builds.
+    
+        The expected URL/params are derived from the real module constants
+        (`PG-SC-12`), never a re-typed copy; the artifact is names-only (the key is
+        added at send time and never appears in the example).
+        """
+        example = jina_mod.build_jina_request("Jacobs Cronat Gold", "Jacobs")
+        expected_params = tuple(
+            [("site", site) for site in jina_mod.SITE_FILTERS]
+            + [
+                ("num", jina_mod.JINA_NUM),
+                ("type", jina_mod.JINA_TYPE),
+                ("gl", jina_mod.JINA_GL),
+            ]
+        )
+        assert example.params == expected_params
+        assert example.url == f"{jina_mod.JINA_GLOBAL_BASE_URL}Jacobs+Jacobs+Cronat+Gold"
+        full_request = example.url + "?" + urllib.parse.urlencode(example.params)
+>       artifact = WORKED_EXAMPLE.read_text(encoding="utf-8")
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_sg082_enrich_jina.py:583: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/local/lib/python3.12/pathlib.py:1027: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/docs/enrich-jina-request-example.md'), mode = 'r'
+buffering = -1, encoding = 'utf-8', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed to by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/docs/enrich-jina-request-example.md'
+
+/usr/local/lib/python3.12/pathlib.py:1013: FileNotFoundError
+__________ test_sg233_migration_upgrade_downgrade_upgrade_and_unique ___________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_sg233_migration_upgrade_d0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7b83be021400>
+
+    def test_sg233_migration_upgrade_downgrade_upgrade_and_unique(
+        tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        url = f"sqlite:///{tmp_path / 'sg233_migration.db'}"
+        monkeypatch.setattr(settings, "database_url", url)
+        config = _alembic_config(url)
+>       command.upgrade(config, "head")
+
+tests/test_sg233_reminders.py:158: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/local/lib/python3.12/site-packages/alembic/command.py:467: in upgrade
+    script = ScriptDirectory.from_config(config)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.12/site-packages/alembic/script/base.py:180: in from_config
+    return ScriptDirectory(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <alembic.script.base.ScriptDirectory object at 0x7b83be35b4d0>
+dir = PosixPath('/backend/alembic'), file_template = '%(rev)s_%(slug)s'
+truncate_slug_length = None, version_locations = None, sourceless = False
+output_encoding = 'utf-8', timezone = None, hooks = []
+recursive_version_locations = False
+messaging_opts = immutabledict({'quiet': False})
+
+    def __init__(
+        self,
+        dir: str | os.PathLike[str],  # noqa: A002
+        file_template: str = _default_file_template,
+        truncate_slug_length: int | None = 40,
+        version_locations: None | (Sequence[str | os.PathLike[str]]) = None,
+        sourceless: bool = False,
+        output_encoding: str = "utf-8",
+        timezone: str | None = None,
+        hooks: list[PostWriteHookConfig] = [],
+        recursive_version_locations: bool = False,
+        messaging_opts: MessagingOptions = cast(
+            "MessagingOptions", util.EMPTY_DICT
+        ),
+    ) -> None:
+        self.dir = _preserving_path_as_str(dir)
+        self.version_locations = [
+            _preserving_path_as_str(p) for p in version_locations or ()
+        ]
+        self.file_template = file_template
+        self.truncate_slug_length = truncate_slug_length or 40
+        self.sourceless = sourceless
+        self.output_encoding = output_encoding
+        self.revision_map = revision.RevisionMap(self._load_revisions)
+        self.timezone = timezone
+        self.hooks = hooks
+        self.recursive_version_locations = recursive_version_locations
+        self.messaging_opts = messaging_opts
+    
+        if not os.access(dir, os.F_OK):
+>           raise util.CommandError(
+                f"Path doesn't exist: {dir}.  Please use "
+                "the 'init' command to create a new "
+                "scripts folder."
+            )
+E           alembic.util.exc.CommandError: Path doesn't exist: /backend/alembic.  Please use the 'init' command to create a new scripts folder.
+
+/usr/local/lib/python3.12/site-packages/alembic/script/base.py:99: CommandError
+_____________________ test_sg233_shipped_paths_still_exist _____________________
+
+    def test_sg233_shipped_paths_still_exist() -> None:
+        missing = _missing_shipped_paths(SHIPPED_PATHS)
+>       assert missing == [], f"SG-233 shipped paths missing or empty: {missing}"
+E       AssertionError: SG-233 shipped paths missing or empty: ['backend/alembic/versions/20261023_sg233_reminder.py', 'backend/app/models/reminder.py', 'backend/app/services/reminders/service.py', 'backend/app/api/v1/reminders.py', 'frontend/src/routes/ExpiryPage.tsx']
+E       assert ['backend/ale...piryPage.tsx'] == []
+E         
+E         Left contains 5 more items, first extra item: 'backend/alembic/versions/20261023_sg233_reminder.py'
+E         Use -v to get more diff
+
+tests/test_sg233_reminders.py:454: AssertionError
+__________ test_sg235_suite_starts_no_pass_and_creates_no_relative_db __________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_sg235_suite_starts_no_pas0')
+
+    def test_sg235_suite_starts_no_pass_and_creates_no_relative_db(
+        tmp_path: Path,
+    ) -> None:
+        from app.services.reminders import daily
+    
+        assert daily.DAILY_INTERVAL_SECONDS == 86400
+        assert list(tmp_path.iterdir()) == []
+        relative = ROOT / "backend" / "data" / "db" / "storagegenie.db"
+        assert not relative.exists()
+        assert not (ROOT / "backend" / "data").exists()
+    
+>       result = subprocess.run(
+            [sys.executable, "-c", "import app.main"],
+            cwd=str(ROOT / "backend"),
+            capture_output=True,
+            text=True,
+            timeout=60,
+            check=False,
+        )
+
+tests/test_sg235_daily_caller.py:530: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/local/lib/python3.12/subprocess.py:548: in run
+    with Popen(*popenargs, **kwargs) as process:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.12/subprocess.py:1026: in __init__
+    self._execute_child(args, executable, preexec_fn, close_fds,
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <Popen: returncode: 255 args: ['/usr/local/bin/python', '-c', 'import app.ma...>
+args = ['/usr/local/bin/python', '-c', 'import app.main']
+executable = b'/usr/local/bin/python', preexec_fn = None, close_fds = True
+pass_fds = (), cwd = '/backend', env = None, startupinfo = None
+creationflags = 0, shell = False, p2cread = -1, p2cwrite = -1, c2pread = 14
+c2pwrite = 15, errread = 16, errwrite = 19, restore_signals = True, gid = None
+gids = None, uid = None, umask = -1, start_new_session = False
+process_group = -1
+
+    def _execute_child(self, args, executable, preexec_fn, close_fds,
+                       pass_fds, cwd, env,
+                       startupinfo, creationflags, shell,
+                       p2cread, p2cwrite,
+                       c2pread, c2pwrite,
+                       errread, errwrite,
+                       restore_signals,
+                       gid, gids, uid, umask,
+                       start_new_session, process_group):
+        """Execute program (POSIX version)"""
+    
+        if isinstance(args, (str, bytes)):
+            args = [args]
+        elif isinstance(args, os.PathLike):
+            if shell:
+                raise TypeError('path-like args is not allowed when '
+                                'shell is true')
+            args = [args]
+        else:
+            args = list(args)
+    
+        if shell:
+            # On Android the default shell is at '/system/bin/sh'.
+            unix_shell = ('/system/bin/sh' if
+                      hasattr(sys, 'getandroidapilevel') else '/bin/sh')
+            args = [unix_shell, "-c"] + args
+            if executable:
+                args[0] = executable
+    
+        if executable is None:
+            executable = args[0]
+    
+        sys.audit("subprocess.Popen", executable, args, cwd, env)
+    
+        if (_USE_POSIX_SPAWN
+                and os.path.dirname(executable)
+                and preexec_fn is None
+                and not close_fds
+                and not pass_fds
+                and cwd is None
+                and (p2cread == -1 or p2cread > 2)
+                and (c2pwrite == -1 or c2pwrite > 2)
+                and (errwrite == -1 or errwrite > 2)
+                and not start_new_session
+                and process_group == -1
+                and gid is None
+                and gids is None
+                and uid is None
+                and umask < 0):
+            self._posix_spawn(args, executable, env, restore_signals,
+                              p2cread, p2cwrite,
+                              c2pread, c2pwrite,
+                              errread, errwrite)
+            return
+    
+        orig_executable = executable
+    
+        # For transferring possible exec failure from child to parent.
+        # Data format: "exception name:hex errno:description"
+        # Pickle is not used; it is complex and involves memory allocation.
+        errpipe_read, errpipe_write = os.pipe()
+        # errpipe_write must not be in the standard io 0, 1, or 2 fd range.
+        low_fds_to_close = []
+        while errpipe_write < 3:
+            low_fds_to_close.append(errpipe_write)
+            errpipe_write = os.dup(errpipe_write)
+        for low_fd in low_fds_to_close:
+            os.close(low_fd)
+        try:
+            try:
+                # We must avoid complex work that could involve
+                # malloc or free in the child process to avoid
+                # potential deadlocks, thus we do all this here.
+                # and pass it to fork_exec()
+    
+                if env is not None:
+                    env_list = []
+                    for k, v in env.items():
+                        k = os.fsencode(k)
+                        if b'=' in k:
+                            raise ValueError("illegal environment variable name")
+                        env_list.append(k + b'=' + os.fsencode(v))
+                else:
+                    env_list = None  # Use execv instead of execve.
+                executable = os.fsencode(executable)
+                if os.path.dirname(executable):
+                    executable_list = (executable,)
+                else:
+                    # This matches the behavior of os._execvpe().
+                    executable_list = tuple(
+                        os.path.join(os.fsencode(dir), executable)
+                        for dir in os.get_exec_path(env))
+                fds_to_keep = set(pass_fds)
+                fds_to_keep.add(errpipe_write)
+                self.pid = _fork_exec(
+                        args, executable_list,
+                        close_fds, tuple(sorted(map(int, fds_to_keep))),
+                        cwd, env_list,
+                        p2cread, p2cwrite, c2pread, c2pwrite,
+                        errread, errwrite,
+                        errpipe_read, errpipe_write,
+                        restore_signals, start_new_session,
+                        process_group, gid, gids, uid, umask,
+                        preexec_fn, _USE_VFORK)
+                self._child_created = True
+            finally:
+                # be sure the FD is closed no matter what
+                os.close(errpipe_write)
+    
+            self._close_pipe_fds(p2cread, p2cwrite,
+                                 c2pread, c2pwrite,
+                                 errread, errwrite)
+    
+            # Wait for exec to fail or succeed; possibly raising an
+            # exception (limited in size)
+            errpipe_data = bytearray()
+            while True:
+                part = os.read(errpipe_read, 50000)
+                errpipe_data += part
+                if not part or len(errpipe_data) > 50000:
+                    break
+        finally:
+            # be sure the FD is closed no matter what
+            os.close(errpipe_read)
+    
+        if errpipe_data:
+            try:
+                pid, sts = os.waitpid(self.pid, 0)
+                if pid == self.pid:
+                    self._handle_exitstatus(sts)
+                else:
+                    self.returncode = sys.maxsize
+            except ChildProcessError:
+                pass
+    
+            try:
+                exception_name, hex_errno, err_msg = (
+                        errpipe_data.split(b':', 2))
+                # The encoding here should match the encoding
+                # written in by the subprocess implementations
+                # like _posixsubprocess
+                err_msg = err_msg.decode()
+            except ValueError:
+                exception_name = b'SubprocessError'
+                hex_errno = b'0'
+                err_msg = 'Bad exception data from child: {!r}'.format(
+                              bytes(errpipe_data))
+            child_exception_type = getattr(
+                    builtins, exception_name.decode('ascii'),
+                    SubprocessError)
+            if issubclass(child_exception_type, OSError) and hex_errno:
+                errno_num = int(hex_errno, 16)
+                if err_msg == "noexec:chdir":
+                    err_msg = ""
+                    # The error must be from chdir(cwd).
+                    err_filename = cwd
+                elif err_msg == "noexec":
+                    err_msg = ""
+                    err_filename = None
+                else:
+                    err_filename = orig_executable
+                if errno_num != 0:
+                    err_msg = os.strerror(errno_num)
+                if err_filename is not None:
+>                   raise child_exception_type(errno_num, err_msg, err_filename)
+E                   FileNotFoundError: [Errno 2] No such file or directory: '/backend'
+
+/usr/local/lib/python3.12/subprocess.py:1955: FileNotFoundError
+_____________________ test_sg235_shipped_paths_still_exist _____________________
+
+    def test_sg235_shipped_paths_still_exist() -> None:
+        missing = _missing_shipped_paths(SHIPPED_PATHS)
+>       assert missing == [], f"SG-235 shipped paths missing or empty: {missing}"
+E       AssertionError: SG-235 shipped paths missing or empty: ['backend/app/services/reminders/daily.py', 'backend/app/server.py', 'backend/app/main.py', 'backend/Dockerfile', 'backend/tests/test_sg235_daily_caller.py', 'frontend/src/routes/ExpiryPage.tsx', 'frontend/src/routes/ExpiryPage.test.tsx']
+E       assert ['backend/app...age.tsx', ...] == []
+E         
+E         Left contains 7 more items, first extra item: 'backend/app/services/reminders/daily.py'
+E         Use -v to get more diff
+
+tests/test_sg235_daily_caller.py:545: AssertionError
+=============================== warnings summary ===============================
+../usr/local/lib/python3.12/site-packages/fastapi/testclient.py:1
+  /usr/local/lib/python3.12/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+../usr/local/lib/python3.12/site-packages/starlette/testclient.py:53
+  /usr/local/lib/python3.12/site-packages/starlette/testclient.py:53: DeprecationWarning: The anyio.abc.BlockingPortal alias is deprecated, use anyio.from_thread.BlockingPortal instead.
+    _PortalFactoryType = Callable[[], AbstractContextManager[anyio.abc.BlockingPortal]]
+
+tests/test_candidates.py: 3 warnings
+tests/test_foundations.py: 3 warnings
+tests/test_saved_searches.py: 3 warnings
+tests/test_search.py: 3 warnings
+tests/test_sg048_name_optional.py: 6 warnings
+tests/test_sg100_snapshot_persistence.py: 3 warnings
+tests/test_sg113_locations.py: 3 warnings
+tests/test_sg114_relations.py: 3 warnings
+tests/test_signals.py: 3 warnings
+  /usr/local/lib/python3.12/site-packages/alembic/config.py:604: DeprecationWarning: No path_separator found in configuration; falling back to legacy splitting on spaces, commas, and colons for prepend_sys_path.  Consider adding path_separator=os to Alembic config.
+    util.warn_deprecated(
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/test_google_taxonomy.py::test_v4_prompt_loads_through_real_loader_as_v3_plus_block[food]
+FAILED tests/test_google_taxonomy.py::test_v4_prompt_loads_through_real_loader_as_v3_plus_block[medicine]
+FAILED tests/test_google_taxonomy.py::test_v4_prompt_loads_through_real_loader_as_v3_plus_block[cosmetics]
+FAILED tests/test_runbook_commands.py::test_readme_runbook_commands_match_sg086_form
+FAILED tests/test_runbook_commands.py::test_guard_flags_the_doubled_data_suffix_drift
+FAILED tests/test_sg082_enrich_jina.py::test_worked_example_artifact_matches_the_real_driver
+FAILED tests/test_sg233_reminders.py::test_sg233_migration_upgrade_downgrade_upgrade_and_unique
+FAILED tests/test_sg233_reminders.py::test_sg233_shipped_paths_still_exist - ...
+FAILED tests/test_sg235_daily_caller.py::test_sg235_suite_starts_no_pass_and_creates_no_relative_db
+FAILED tests/test_sg235_daily_caller.py::test_sg235_shipped_paths_still_exist
+ERROR tests/test_sg233_reminders.py::test_sg233_due_fixture_creates_engine_shaped_unread_reminder
+ERROR tests/test_sg233_reminders.py::test_sg233_record_due_defaults_to_the_live_utc_day
+ERROR tests/test_sg233_reminders.py::test_sg233_unresolved_and_non_warning_rows_create_nothing
+ERROR tests/test_sg233_reminders.py::test_sg233_same_day_rerun_inserts_zero_rows
+ERROR tests/test_sg233_reminders.py::test_sg233_read_and_dismiss_round_trip_with_illegal_transitions
+ERROR tests/test_sg235_daily_caller.py::test_sg235_pass_covers_every_household_with_engine_shaped_rows
+ERROR tests/test_sg235_daily_caller.py::test_sg235_second_pass_same_day_creates_nothing
+ERROR tests/test_sg235_daily_caller.py::test_sg235_loop_does_not_backfill_missed_days
+ERROR tests/test_sg235_daily_caller.py::test_sg235_loop_cadence_survives_a_failed_pass
+ERROR tests/test_sg235_daily_caller.py::test_sg235_lifespan_starts_loop_once_and_cancels
+ERROR tests/test_sg235_daily_caller.py::test_sg235_health_answers_while_a_pass_is_in_flight
+ERROR tests/test_sg235_daily_caller.py::test_sg235_pass_isolates_a_failing_household
+ERROR tests/test_sg235_daily_caller.py::test_sg235_pass_logs_one_success_line_with_real_counts
+10 failed, 722 passed, 32 warnings, 13 errors in 72.56s (0:01:12)
+rc=1
+wall_s=77
