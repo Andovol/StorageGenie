@@ -14,6 +14,8 @@ Owner, 2026-10-30 (this chat), verbatim: **"d6 - approved"**
 
 **Process note (0.56.0):** the new `SECOND_OPINION.md` T3 trigger (a packet introducing a design choice no earlier review covered) binds every project. A blind pass runs before the SG-258 packet is committed; its review ID and disposition go into the packet, the review ledger and the next report. The pass is advisory, never a veto.
 
+**Second opinion (SG-260 blind · SG-261 critique, `muse-spark-1.3-contributor`):** picked **A1 / B1 / C1 / D1**, agreeing with the Architect. Strongest objection — a document's OCR date can be an issue date, and flipping the flag forces a date record on keepsakes — **accepted** by suppressing the observed-date proposal for documents, adding the category hint (keepsakes under Non-perishable) and keeping the owner's approved documents outcome. The critique's other six findings are accepted as refinements: optional `If-Match` on the classify/manual/clear routes, accepted-only date preservation plus a reverse-move clear, the classification-profile gate and exact-field/latest-`created_at` read, Clear parity with D4, and a `valid_until` date type. The keepsake scope risk is **noted**, not reopened; the owner's D6 approval is the decision. Full record: `docs/reviews/review-ledger.md`.
+
 ## D6a — contract 0.56.0 adopted
 
 **Question put:** adopt 0.56.0 or stay on 0.53.0. The start command reported every installed rule copy and the version line **BEHIND**, and the dispatch checklist requires recorded == published before any product work — so the approved stage could not dispatch on 0.53.0.
