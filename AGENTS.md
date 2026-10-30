@@ -1,7 +1,7 @@
 # StorageGenie — project configuration
 
 > Canonical for this repo. `CLAUDE.md` only points here — edit here, never there.
-> Rule-set version recorded here: 0.53.0. Past version notes, old values, and decision numbers moved to `docs/decisions/2026-10-23-agents-plain-language-history.md`.
+> Rule-set version recorded here: 0.56.0. Past version notes, old values, and decision numbers moved to `docs/decisions/2026-10-23-agents-plain-language-history.md`.
 
 Slices are numbered with the prefix SG, which stands for StorageGenie (for example SG-1, SG-2). Autonomy L3 means the owner approves a stage (a named set of slices toward one outcome); inside it the Architect packets, dispatches, audits and rates without asking, and the builder owns retries inside each slice.
 
