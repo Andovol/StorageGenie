@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useParams, useSearchParams, Link } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useAsset } from "../hooks/useAssets";
+import { useAsset, useTaxonomy } from "../hooks/useAssets";
 import { EvidenceGallery } from "../components/EvidenceGallery";
 import { ProvenanceBadge } from "../components/ProvenanceBadge";
 import { ExpiryEntryForm } from "../components/ExpiryEntryForm";
@@ -10,6 +10,7 @@ import {
   apiPatch,
   apiPost,
   assignAssetLocation,
+  classifyAsset,
   createRelation,
   deleteRelation,
   fetchHouseholdAssets,
@@ -22,6 +23,7 @@ import type {
   Asset,
   AssetListResponse,
   AssetRelation,
+  Assertion,
   EnrichResponse,
   LocationListResponse,
   RelationListResponse,
@@ -269,11 +271,30 @@ export function RelationsSection({
   );
 }
 
+function valueRecord(value: unknown): Record<string, unknown> | null {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return null;
+  return value as Record<string, unknown>;
+}
+
+function latestActiveAssertion(assertions: Assertion[], fieldPath: string): Assertion | null {
+  return (
+    assertions
+      .filter(
+        (item) =>
+          item.field_path === fieldPath &&
+          item.review_state !== "superseded" &&
+          item.review_state !== "rejected"
+      )
+      .sort((a, b) => (b.created_at ?? "").localeCompare(a.created_at ?? ""))[0] ?? null
+  );
+}
+
 export function AssetDetailPage() {
   const { id } = useParams();
   const [search] = useSearchParams();
   const householdId = search.get("household_id") || localStorage.getItem("household_id") || "";
   const { data: asset, isLoading } = useAsset(householdId, id || "");
+  const { data: taxonomy } = useTaxonomy();
   const qc = useQueryClient();
   const [editing, setEditing] = useState(false);
   const [editName, setEditName] = useState("");
@@ -282,6 +303,58 @@ export function AssetDetailPage() {
   const [editCondition, setEditCondition] = useState("");
   const [attachFiles, setAttachFiles] = useState<FileList | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [classificationChoice, setClassificationChoice] = useState<string | null>(null);
+  const [classificationMessage, setClassificationMessage] = useState<string | null>(null);
+  const [classificationError, setClassificationError] = useState<string | null>(null);
+
+  const assertions = asset?.assertions || [];
+  const classificationAssertion = latestActiveAssertion(
+    assertions,
+    "plugin:expiry-tracker/classification"
+  );
+  const classificationValue = valueRecord(classificationAssertion?.value);
+  const currentCategory =
+    typeof classificationValue?.category === "string" ? classificationValue.category : "";
+  const profile = valueRecord(classificationValue?.profile);
+  const hasProfileTierDefaults =
+    profile !== null && Object.prototype.hasOwnProperty.call(profile, "tier_defaults");
+  const profileTierDefaults = valueRecord(profile?.tier_defaults);
+  const taxonomyCategories =
+    taxonomy?.plugins.find((plugin) => plugin.plugin_id === "expiry-tracker")?.categories ?? [];
+  const activeCategories = taxonomyCategories.filter((category) => category.active);
+  const taxonomyCategory = activeCategories.find((category) => category.id === currentCategory);
+  const hasWindows =
+    classificationAssertion !== null &&
+    (hasProfileTierDefaults
+      ? Object.keys(profileTierDefaults ?? {}).length > 0
+      : (taxonomyCategory?.notification ?? "none") !== "none");
+  const selectedCategory = classificationChoice ?? currentCategory;
+  const expiryAssertion = latestActiveAssertion(
+    assertions,
+    "plugin:expiry-tracker/expiry_date"
+  );
+  const expiryValue = valueRecord(expiryAssertion?.value);
+  const hasActiveDate = typeof expiryValue?.expiry_date === "string";
+
+  const classifyMut = useMutation({
+    mutationFn: (category: string) =>
+      classifyAsset(asset?.id ?? "", householdId, category, classificationAssertion?.id),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["asset", id] });
+      setClassificationChoice(null);
+      setClassificationMessage("Category saved.");
+      setClassificationError(null);
+    },
+    onError: (caught: unknown) => {
+      const text = caught instanceof Error ? caught.message : String(caught);
+      setClassificationError(text);
+      setClassificationMessage(null);
+      if (/changed|409/i.test(text)) {
+        qc.invalidateQueries({ queryKey: ["asset", id] });
+        setClassificationChoice(null);
+      }
+    },
+  });
 
   const patchMut = useMutation({
     mutationFn: (payload: Record<string, unknown>) =>
@@ -326,10 +399,19 @@ export function AssetDetailPage() {
   if (!asset) return <div style={{ padding: 24 }}>Asset not found — <Link to="/">back to catalog</Link></div>;
 
   const evidence = (asset as unknown as { evidence: { id: string; storage_key: string; sha256: string; original_filename: string }[] }).evidence || [];
-  const assertions = asset.assertions || [];
-  const expiryAssertion = assertions.find((item) => item.field_path.endsWith("expiry_date"));
   const audits = (asset as unknown as { audit_events: { id: string; action: string; actor: string; timestamp: string; before: unknown; after: unknown }[] }).audit_events || [];
   const displayName = asset.display_name || UNTITLED_ASSET_NAME;
+  const saveClassification = () => {
+    if (!selectedCategory || classifyMut.isPending) return;
+    if (
+      selectedCategory === "non_perishable" &&
+      hasActiveDate &&
+      !window.confirm("This will clear the active date; the old value stays in the audit.")
+    ) {
+      return;
+    }
+    classifyMut.mutate(selectedCategory);
+  };
 
   return (
     <PageContainer className="text-foreground">
@@ -361,6 +443,55 @@ export function AssetDetailPage() {
       </div>
 
       <WebAlternates alternates={enrichMut.data?.web_alternates ?? []} />
+
+      <section style={{ marginBottom: 16 }}>
+        <h3>Classification</h3>
+        {activeCategories.length === 0 ? (
+          <div className="text-muted-foreground" style={{ fontSize: 13 }}>
+            No categories are available from the taxonomy.
+          </div>
+        ) : (
+          <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
+            <select
+              aria-label="Classification category"
+              value={selectedCategory}
+              onChange={(event) => setClassificationChoice(event.target.value)}
+              className="bg-background text-foreground border-border focus-ring"
+              style={{ padding: 6, borderRadius: 6, borderStyle: "solid", borderWidth: 1, fontSize: 13, maxWidth: "100%" }}
+            >
+              {selectedCategory === "" && <option value="">Select a category…</option>}
+              {activeCategories.map((category) => (
+                <option key={category.id} value={category.id}>{category.name}</option>
+              ))}
+            </select>
+            <button
+              type="button"
+              onClick={saveClassification}
+              disabled={!selectedCategory || classifyMut.isPending}
+              className="bg-primary text-primary-foreground focus-ring"
+              style={{ padding: "6px 12px", borderRadius: 6, border: "none", cursor: "pointer" }}
+            >
+              {classifyMut.isPending ? "Saving…" : "Save category"}
+            </button>
+          </div>
+        )}
+        {selectedCategory === "documents_other" && (
+          <div className="text-muted-foreground" style={{ fontSize: 12, marginTop: 6 }}>
+            Documents/other: renewal or validity dates. Keepsakes, letters and photos belong under Non-perishable.
+          </div>
+        )}
+        {selectedCategory === "non_perishable" && (
+          <div className="text-muted-foreground" style={{ fontSize: 12, marginTop: 6 }}>
+            No date; no expiry reminder.
+          </div>
+        )}
+        {classificationMessage && (
+          <div role="status" className="text-success" style={{ fontSize: 12, marginTop: 6 }}>{classificationMessage}</div>
+        )}
+        {classificationError && (
+          <div role="alert" className="text-danger" style={{ fontSize: 12, marginTop: 6 }}>{classificationError}</div>
+        )}
+      </section>
 
       <LocationsSection asset={asset} householdId={householdId} />
 
@@ -400,8 +531,22 @@ export function AssetDetailPage() {
 
       {error && <div className="text-danger" style={{ fontSize: 13, marginBottom: 12 }}>{error}</div>}
 
-      {expiryAssertion?.review_state === "needs_evidence" && (
-        <ExpiryEntryForm assetId={asset.id} householdId={householdId} evidenceIds={evidence.map((item) => item.id)} />
+      {hasWindows && hasActiveDate && expiryAssertion?.review_state === "accepted" && (
+        <div className="text-muted-foreground" style={{ fontSize: 12, marginTop: 8 }}>
+          The date is kept when the category changes; check it still applies.
+        </div>
+      )}
+
+      {classificationAssertion && hasWindows && (
+        <ExpiryEntryForm
+          key={expiryAssertion?.id ?? "no-expiry"}
+          assetId={asset.id}
+          householdId={householdId}
+          evidenceIds={evidence.map((item) => item.id)}
+          activeAssertion={expiryAssertion}
+          categorySlug={currentCategory}
+          hasWindows={hasWindows}
+        />
       )}
 
       <h3 className="detail-heading">Evidence</h3>

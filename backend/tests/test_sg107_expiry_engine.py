@@ -457,7 +457,7 @@ def test_route_shape_summary_reconciles_and_writes_nothing(engine_db) -> None:  
 
     unresolved = {row["asset_id"]: row["reason"] for row in body["unresolved_rows"]}
     assert unresolved[cream.id] == "needs_evidence"
-    assert unresolved[passport.id] == "dateless"
+    assert unresolved[passport.id] == "needs_evidence"
     assert unresolved[proposed.id] == "proposed"
     assert unresolved[unparseable.id] == "unparseable"
     assert all(set(row) == {"asset_id", "reason"} for row in body["unresolved_rows"])

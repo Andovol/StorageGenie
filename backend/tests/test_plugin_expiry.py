@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+from datetime import datetime, timezone
 from pathlib import Path
 
 import pytest
@@ -11,7 +12,8 @@ from sqlalchemy.orm import Session, sessionmaker
 from app.db import Base, get_db
 from app.main import app
 from app.models import Assertion, Asset, AuditEvent, Evidence, Household, ReviewTask, asset_evidence
-from app.plugins.expiry_tracker import EXPIRY_FIELD
+from app.plugins import expiry_tracker
+from app.plugins.expiry_tracker import CLASSIFICATION_FIELD, EXPIRY_FIELD
 from app.plugins.registry import PluginError, get_plugin
 from app.services.observations import Observation
 
@@ -49,11 +51,28 @@ def make_asset(session: Session, household_id: str, name: str = "Test item", ass
     return asset
 
 
-def classify(client: TestClient, asset_id: str, household_id: str, category: str) -> object:
+def classify(
+    client: TestClient,
+    asset_id: str,
+    household_id: str,
+    category: str,
+    headers: dict[str, str] | None = None,
+) -> object:
     return client.post(
         f"/v1/plugins/expiry-tracker/assets/{asset_id}/classification",
         params={"household_id": household_id},
         json={"category": category},
+        headers=headers or {},
+    )
+
+
+def expiry_rows(session: Session, asset_id: str) -> list[Assertion]:
+    session.expire_all()
+    return (
+        session.query(Assertion)
+        .filter_by(asset_id=asset_id, field_path=EXPIRY_FIELD)
+        .order_by(Assertion.created_at)
+        .all()
     )
 
 
@@ -111,7 +130,7 @@ def test_classification_profiles_round_trip_and_activated_phase(plugin_db) -> No
         documents_entry = client.post(
             f"/v1/plugins/expiry-tracker/assets/{documents.id}/expiry",
             params={"household_id": household_id},
-            json={"expiry_date": "2030-05-06"},
+            json={"expiry_date": "2030-05-06", "date_type": "valid_until"},
         )
     assert food_response.status_code == 200
     assert food_response.json()["classification"]["profile"]["tier_defaults"] == {
@@ -149,14 +168,17 @@ def test_classification_profiles_round_trip_and_activated_phase(plugin_db) -> No
     assert documents_profile["tier_defaults"] == {"long_lead": 60, "upcoming": 30}
     assert documents_profile["opened_date_tracking"] is False
     assert documents_response.json()["classification"]["category"] == "documents_other"
-    assert documents_response.json()["expiry_assertion"] is None
+    assert documents_response.json()["expiry_assertion"]["review_state"] == "needs_evidence"
+    assert documents_response.json()["review_task"] is not None
     assert documents_readback.status_code == 200
     assert documents_readback.json()["classification"]["category"] == "documents_other"
     assert household_entry.status_code == 200
     assert household_entry.json()["assertion"]["value"]["expiry_date"] == "2030-05-06"
     assert household_extensions.status_code == 200
     assert documents_extensions.status_code == 200
-    assert documents_entry.status_code == 422 and "non-perishable" in documents_entry.json()["detail"]
+    assert documents_entry.status_code == 200
+    assert documents_entry.json()["assertion"]["value"]["expiry_date"] == "2030-05-06"
+    assert documents_entry.json()["assertion"]["value"]["date_type"] == "valid_until"
 
 
 def test_cosmetics_classifies_without_a_new_task_type(plugin_db) -> None:  # type: ignore[no-untyped-def]
@@ -471,3 +493,384 @@ def test_manual_entry_resolves_own_and_split_origin_orphan_tasks(plugin_db) -> N
     )
     assert len(audit_rows) == 1
     assert json.loads(audit_rows[0].after_json)["resolution"]["manual_entry_orphan"] is True
+
+
+def test_documents_never_propose_an_observed_ocr_date(plugin_db) -> None:  # type: ignore[no-untyped-def]
+    session, household_id = plugin_db
+    asset = make_asset(session, household_id, "Passport")
+    evidence = Evidence(
+        household_id=household_id,
+        sha256="d" * 64,
+        storage_key="plugin/document.png",
+        media_type="image/png",
+        original_filename="document.png",
+        source_kind="upload",
+        size_bytes=1,
+    )
+    session.add(evidence)
+    session.commit()
+    session.execute(asset_evidence.insert().values(asset_id=asset.id, evidence_id=evidence.id))
+    session.add(
+        Observation(
+            evidence_id=evidence.id,
+            kind="ocr",
+            value_json=json.dumps({"text": "issued 2030-05-06"}),
+            confidence=1.0,
+        )
+    )
+    session.commit()
+
+    with TestClient(app) as client:
+        response = classify(client, asset.id, household_id, "Documents/other")
+
+    assert response.status_code == 200
+    body = response.json()
+    assert body["expiry_assertion"]["review_state"] == "needs_evidence"
+    assert body["expiry_assertion"]["value"] == {"status": "unknown"}
+    assert body["expiry_assertion"]["source_evidence_ids"] == []
+    assert body["review_task"] is not None
+
+
+def test_documents_manual_valid_until_is_accepted_and_read_back(plugin_db) -> None:  # type: ignore[no-untyped-def]
+    session, household_id = plugin_db
+    asset = make_asset(session, household_id, "Passport")
+    with TestClient(app) as client:
+        assert classify(client, asset.id, household_id, "documents").status_code == 200
+        entered = client.post(
+            f"/v1/plugins/expiry-tracker/assets/{asset.id}/expiry",
+            params={"household_id": household_id},
+            json={"expiry_date": "2031-01-01", "date_type": "valid_until"},
+        )
+        detail = client.get(f"/v1/assets/{asset.id}", params={"household_id": household_id})
+
+    assert entered.status_code == 200, entered.text
+    assert entered.json()["assertion"]["value"] == {
+        "expiry_date": "2031-01-01",
+        "date_type": "valid_until",
+    }
+    accepted = [
+        row
+        for row in detail.json()["assertions"]
+        if row["field_path"] == EXPIRY_FIELD and row["review_state"] == "accepted"
+    ]
+    assert len(accepted) == 1
+    assert accepted[0]["value"]["date_type"] == "valid_until"
+
+
+def test_reclassification_between_dated_categories_keeps_the_accepted_date(plugin_db) -> None:  # type: ignore[no-untyped-def]
+    session, household_id = plugin_db
+    asset = make_asset(session, household_id, "Canned beans")
+    with TestClient(app) as client:
+        assert classify(client, asset.id, household_id, "food").status_code == 200
+        entered = client.post(
+            f"/v1/plugins/expiry-tracker/assets/{asset.id}/expiry",
+            params={"household_id": household_id},
+            json={"expiry_date": "2030-05-06", "date_type": "use_by"},
+        )
+        moved = classify(client, asset.id, household_id, "documents")
+
+    assert entered.status_code == 200, entered.text
+    kept = entered.json()["assertion"]
+    assert moved.status_code == 200, moved.text
+    body = moved.json()
+    assert body["expiry_assertion"]["id"] == kept["id"]
+    assert body["expiry_assertion"]["review_state"] == "accepted"
+    assert body["expiry_assertion"]["value"] == kept["value"]
+    assert body["review_task"] is None
+    rows = expiry_rows(session, asset.id)
+    accepted = [row for row in rows if row.review_state == "accepted"]
+    assert len(accepted) == 1
+    assert accepted[0].id == kept["id"]
+    assert [row.review_state for row in rows if row.id != kept["id"]] == ["superseded"]
+
+
+def test_move_to_non_perishable_clears_the_active_date(plugin_db) -> None:  # type: ignore[no-untyped-def]
+    session, household_id = plugin_db
+    asset = make_asset(session, household_id, "Canned beans")
+    with TestClient(app) as client:
+        assert classify(client, asset.id, household_id, "food").status_code == 200
+        entered = client.post(
+            f"/v1/plugins/expiry-tracker/assets/{asset.id}/expiry",
+            params={"household_id": household_id},
+            json={"expiry_date": "2030-05-06"},
+        )
+        moved = classify(client, asset.id, household_id, "non_perishable")
+
+    assert entered.status_code == 200, entered.text
+    assert moved.status_code == 200, moved.text
+    body = moved.json()
+    assert body["expiry_assertion"]["review_state"] == "accepted"
+    assert body["expiry_assertion"]["value"] is None
+    rows = expiry_rows(session, asset.id)
+    assert len([row for row in rows if row.review_state == "superseded"]) == 2
+    active = [row for row in rows if row.review_state == "accepted"]
+    assert len(active) == 1
+    assert json.loads(active[0].value_json) is None
+
+    from app.services import expiry_engine
+
+    status = expiry_engine.compute_status(
+        session, household_id, datetime.now(timezone.utc).date()
+    )
+    assert all(row["asset_id"] != asset.id for row in status["rows"])
+    reasons = {row["asset_id"]: row["reason"] for row in status["unresolved_rows"]}
+    assert reasons[asset.id] == "dateless"
+
+
+def test_reclassification_over_a_needs_evidence_active_writes_placeholder_and_task(plugin_db) -> None:  # type: ignore[no-untyped-def]
+    session, household_id = plugin_db
+    asset = make_asset(session, household_id, "Canned beans")
+    with TestClient(app) as client:
+        first = classify(client, asset.id, household_id, "food")
+        moved = classify(client, asset.id, household_id, "household")
+
+    assert first.status_code == 200, first.text
+    assert moved.status_code == 200, moved.text
+    body = moved.json()
+    assert first.json()["expiry_assertion"]["review_state"] == "needs_evidence"
+    assert body["expiry_assertion"]["review_state"] == "needs_evidence"
+    assert body["review_task"] is not None
+    open_tasks = (
+        session.query(ReviewTask)
+        .filter_by(subject_ref=asset.id, task_type="expiry.manual_entry", status="open")
+        .all()
+    )
+    assert len(open_tasks) == 1
+
+
+def test_reclassification_after_a_clear_writes_placeholder_and_task(plugin_db) -> None:  # type: ignore[no-untyped-def]
+    session, household_id = plugin_db
+    asset = make_asset(session, household_id, "Canned beans")
+    with TestClient(app) as client:
+        assert classify(client, asset.id, household_id, "food").status_code == 200
+        assert (
+            client.post(
+                f"/v1/plugins/expiry-tracker/assets/{asset.id}/expiry",
+                params={"household_id": household_id},
+                json={"expiry_date": "2030-05-06"},
+            ).status_code
+            == 200
+        )
+        assert (
+            client.post(
+                f"/v1/plugins/expiry-tracker/assets/{asset.id}/expiry/clear",
+                params={"household_id": household_id},
+                json={},
+            ).status_code
+            == 200
+        )
+        moved = classify(client, asset.id, household_id, "household")
+
+    assert moved.status_code == 200, moved.text
+    body = moved.json()
+    assert body["expiry_assertion"]["review_state"] == "needs_evidence"
+    assert body["review_task"] is not None
+
+
+def test_classify_if_match_rejects_a_stale_classification_token(plugin_db) -> None:  # type: ignore[no-untyped-def]
+    session, household_id = plugin_db
+    asset = make_asset(session, household_id, "Canned beans")
+    with TestClient(app) as client:
+        assert classify(client, asset.id, household_id, "food").status_code == 200
+        current = client.get(
+            f"/v1/plugins/expiry-tracker/assets/{asset.id}/classification",
+            params={"household_id": household_id},
+        ).json()["assertion"]["id"]
+        stale = classify(client, asset.id, household_id, "household", headers={"If-Match": "stale"})
+        unchanged = client.get(
+            f"/v1/plugins/expiry-tracker/assets/{asset.id}/classification",
+            params={"household_id": household_id},
+        )
+        fresh = classify(client, asset.id, household_id, "household", headers={"If-Match": current})
+        changed = client.get(
+            f"/v1/plugins/expiry-tracker/assets/{asset.id}/classification",
+            params={"household_id": household_id},
+        )
+
+    assert stale.status_code == 409
+    assert unchanged.json()["classification"]["category"] == "food_beverages"
+    assert fresh.status_code == 200
+    assert changed.json()["classification"]["category"] == "household_chemicals"
+
+
+def test_manual_expiry_and_clear_if_match_reject_stale_tokens(plugin_db) -> None:  # type: ignore[no-untyped-def]
+    session, household_id = plugin_db
+    asset = make_asset(session, household_id, "Canned beans")
+    endpoint = f"/v1/plugins/expiry-tracker/assets/{asset.id}"
+    with TestClient(app) as client:
+        assert classify(client, asset.id, household_id, "food").status_code == 200
+        entered = client.post(
+            f"{endpoint}/expiry",
+            params={"household_id": household_id},
+            json={"expiry_date": "2030-05-06"},
+        )
+        current = entered.json()["assertion"]["id"]
+        stale_entry = client.post(
+            f"{endpoint}/expiry",
+            params={"household_id": household_id},
+            json={"expiry_date": "2031-01-01"},
+            headers={"If-Match": "stale"},
+        )
+        unchanged = client.get(f"/v1/assets/{asset.id}", params={"household_id": household_id})
+        stale_clear = client.post(
+            f"{endpoint}/expiry/clear",
+            params={"household_id": household_id},
+            json={},
+            headers={"If-Match": "stale"},
+        )
+        still_unchanged = client.get(f"/v1/assets/{asset.id}", params={"household_id": household_id})
+        fresh_entry = client.post(
+            f"{endpoint}/expiry",
+            params={"household_id": household_id},
+            json={"expiry_date": "2031-01-01"},
+            headers={"If-Match": current},
+        )
+        fresh_clear = client.post(
+            f"{endpoint}/expiry/clear",
+            params={"household_id": household_id},
+            json={},
+            headers={"If-Match": fresh_entry.json()["assertion"]["id"]},
+        )
+
+    def accepted(detail: object) -> list[dict[str, object]]:
+        payload = detail.json()  # type: ignore[attr-defined]
+        return [
+            row
+            for row in payload["assertions"]
+            if row["field_path"] == EXPIRY_FIELD and row["review_state"] == "accepted"
+        ]
+
+    assert stale_entry.status_code == 409
+    assert accepted(unchanged)[0]["value"]["expiry_date"] == "2030-05-06"
+    assert stale_clear.status_code == 409
+    assert accepted(still_unchanged)[0]["value"]["expiry_date"] == "2030-05-06"
+    assert fresh_entry.status_code == 200
+    assert fresh_clear.status_code == 200
+    assert fresh_clear.json()["assertion"]["value"] is None
+
+
+def test_served_active_categories_round_trip_through_canonical_category() -> None:
+    with TestClient(app) as client:
+        served = client.get("/v1/taxonomy")
+    assert served.status_code == 200
+    plugins = served.json()["plugins"]
+    expiry = next(plugin for plugin in plugins if plugin["plugin_id"] == "expiry-tracker")
+    active = [category["id"] for category in expiry["categories"] if category["active"]]
+    assert active
+    for category_id in active:
+        assert expiry_tracker.canonical_category(category_id).slug == category_id
+
+
+def test_clear_expiry_date_supersedes_and_resolves_the_manual_task(plugin_db) -> None:  # type: ignore[no-untyped-def]
+    session, household_id = plugin_db
+    asset = make_asset(session, household_id, "Canned beans")
+    with TestClient(app) as client:
+        assert classify(client, asset.id, household_id, "food").status_code == 200
+        entered = client.post(
+            f"/v1/plugins/expiry-tracker/assets/{asset.id}/expiry",
+            params={"household_id": household_id},
+            json={"expiry_date": "2030-05-06"},
+        )
+        task = ReviewTask(
+            task_type="expiry.manual_entry",
+            priority="high",
+            subject_ref=asset.id,
+            proposed_change=json.dumps({"prompt": "Enter expiry date manually"}),
+            status="open",
+            household_id=household_id,
+        )
+        session.add(task)
+        session.commit()
+        cleared = client.post(
+            f"/v1/plugins/expiry-tracker/assets/{asset.id}/expiry/clear",
+            params={"household_id": household_id},
+            json={},
+        )
+
+    assert entered.status_code == 200, entered.text
+    assert cleared.status_code == 200, cleared.text
+    cleared_assertion = cleared.json()["assertion"]
+    assert cleared_assertion["review_state"] == "accepted"
+    assert cleared_assertion["value"] is None
+    rows = expiry_rows(session, asset.id)
+    assert len([row for row in rows if row.review_state == "superseded"]) == 2
+    active = [row for row in rows if row.review_state == "accepted"]
+    assert len(active) == 1
+    assert json.loads(active[0].value_json) is None
+    audits = (
+        session.query(AuditEvent)
+        .filter_by(action="plugin.assertion.write", entity_type="assertion", entity_id=active[0].id)
+        .all()
+    )
+    assert len(audits) == 1
+    assert json.loads(audits[0].after_json)["value"] is None
+    session.refresh(task)
+    assert task.status == "resolved"
+
+    from app.services import expiry_engine
+
+    status = expiry_engine.compute_status(
+        session, household_id, datetime.now(timezone.utc).date()
+    )
+    assert all(row["asset_id"] != asset.id for row in status["rows"])
+    reasons = {row["asset_id"]: row["reason"] for row in status["unresolved_rows"]}
+    assert reasons[asset.id] == "dateless"
+
+
+def test_clear_expiry_date_with_no_active_expiry_writes_nothing(plugin_db) -> None:  # type: ignore[no-untyped-def]
+    session, household_id = plugin_db
+    asset = make_asset(session, household_id, "Canned beans")
+    session.add(
+        Assertion(
+            asset_id=asset.id,
+            field_path=CLASSIFICATION_FIELD,
+            value_json=json.dumps({"category": "food_beverages"}),
+            source_type="user",
+            review_state="accepted",
+        )
+    )
+    session.commit()
+    audit_before = session.query(AuditEvent).count()
+    with TestClient(app) as client:
+        cleared = client.post(
+            f"/v1/plugins/expiry-tracker/assets/{asset.id}/expiry/clear",
+            params={"household_id": household_id},
+            json={},
+        )
+    session.expire_all()
+    assert cleared.status_code == 200, cleared.text
+    assert cleared.json()["assertion"] is None
+    assert expiry_rows(session, asset.id) == []
+    assert session.query(AuditEvent).count() == audit_before
+
+
+def test_clear_expiry_date_rejects_unknown_asset_household_and_unclassified(plugin_db) -> None:  # type: ignore[no-untyped-def]
+    session, household_id = plugin_db
+    asset = make_asset(session, household_id, "Canned beans")
+    with TestClient(app) as client:
+        unknown = client.post(
+            "/v1/plugins/expiry-tracker/assets/missing/expiry/clear",
+            params={"household_id": household_id},
+            json={},
+        )
+        mismatch = client.post(
+            f"/v1/plugins/expiry-tracker/assets/{asset.id}/expiry/clear",
+            params={"household_id": "other-household"},
+            json={},
+        )
+        unclassified = client.post(
+            f"/v1/plugins/expiry-tracker/assets/{asset.id}/expiry/clear",
+            params={"household_id": household_id},
+            json={},
+        )
+        non_perishable = classify(client, asset.id, household_id, "non-perishable")
+        refused = client.post(
+            f"/v1/plugins/expiry-tracker/assets/{asset.id}/expiry/clear",
+            params={"household_id": household_id},
+            json={},
+        )
+    assert unknown.status_code == 404
+    assert mismatch.status_code == 403
+    assert unclassified.status_code == 422
+    assert non_perishable.status_code == 200
+    assert refused.status_code == 422

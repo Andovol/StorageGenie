@@ -13,6 +13,7 @@ import type {
   ExpiryStatusResponse,
   ReminderListResponse,
 } from "../api/types";
+import { DATE_TYPE_LABELS } from "../components/ExpiryEntryForm";
 import { OpenedCountdownSection } from "../components/OpenedCountdownSection";
 import { CONTROL_STYLE, THEMED_CONTROL_CLASS } from "../components/shell/CatalogToolbar";
 import { PageContainer } from "../components/shell/PageContainer";
@@ -254,7 +255,7 @@ export function ExpiryPage() {
                             <span className="text-muted-foreground" style={{ fontSize: 12 }}>{categoryName(row.category)}</span>
                             <span style={{ fontSize: 13 }}>
                               {row.expiry_date}
-                              {row.date_type ? ` · ${row.date_type}` : ""}
+                              {row.date_type ? ` · ${DATE_TYPE_LABELS[row.date_type] ?? row.date_type}` : ""}
                             </span>
                           </>
                         }

@@ -5,7 +5,7 @@ from __future__ import annotations
 import json
 from datetime import date, datetime, timezone
 
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, Header, HTTPException, Query
 from sqlalchemy.orm import Session
 
 from app.db import get_db
@@ -59,6 +59,11 @@ def _assertion_view(assertion: Assertion | None) -> dict[str, object] | None:
 
 def _error(exc: ExpiryValidationError) -> HTTPException:
     return HTTPException(status_code=422, detail=str(exc))
+
+
+def _require_if_match(if_match: str | None, active: Assertion | None) -> None:
+    if if_match is not None and (active is None or active.id != if_match):
+        raise HTTPException(status_code=409, detail="This item changed; reload the asset")
 
 
 @router.get("/status")
@@ -127,10 +132,12 @@ def classify(
     asset_id: str,
     payload: dict[str, object],
     household_id: str = Query(...),
+    if_match: str | None = Header(default=None, alias="If-Match"),
     db: Session = Depends(get_db),
 ) -> dict[str, object]:
     _plugin(payload)
     asset = _asset(db, asset_id, household_id)
+    _require_if_match(if_match, expiry_tracker.get_classification(db, asset.id))
     try:
         category = expiry_tracker.canonical_category(payload.get("category"))
         tier = payload.get("notification_tier")
@@ -177,10 +184,12 @@ def enter_expiry(
     asset_id: str,
     payload: dict[str, object],
     household_id: str = Query(...),
+    if_match: str | None = Header(default=None, alias="If-Match"),
     db: Session = Depends(get_db),
 ) -> dict[str, object]:
     _plugin(payload)
     asset = _asset(db, asset_id, household_id)
+    _require_if_match(if_match, expiry_tracker.get_active_expiry(db, asset.id))
     try:
         entry = expiry_tracker.parse_manual_entry(payload)
         source_ids = payload.get("source_evidence_ids", payload.get("evidence_ids"))
@@ -213,6 +222,29 @@ def enter_expiry(
         "asset_id": asset.id,
         "assertion": _assertion_view(assertion),
         "resolved_review_task_ids": [task.id for task in tasks],
+    }
+
+
+@router.post("/assets/{asset_id}/expiry/clear")
+def clear_expiry(
+    asset_id: str,
+    payload: dict[str, object],
+    household_id: str = Query(...),
+    if_match: str | None = Header(default=None, alias="If-Match"),
+    db: Session = Depends(get_db),
+) -> dict[str, object]:
+    """SG-258: clear the active expiry date by superseding it with null."""
+    _plugin(payload)
+    asset = _asset(db, asset_id, household_id)
+    _require_if_match(if_match, expiry_tracker.get_active_expiry(db, asset.id))
+    try:
+        assertion = expiry_tracker.clear_expiry_date(db, asset)
+    except ExpiryValidationError as exc:
+        raise _error(exc) from exc
+    db.commit()
+    return {
+        "asset_id": asset.id,
+        "assertion": _assertion_view(assertion),
     }
 
 

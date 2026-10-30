@@ -129,6 +129,13 @@ def _latest_active_expiry(db: Session, asset_id: str) -> Assertion | None:
     )
 
 
+def _is_null_value(value_json: str) -> bool:
+    try:
+        return json.loads(value_json) is None
+    except json.JSONDecodeError:
+        return False
+
+
 def _parse_expiry_value(value_json: str) -> tuple[date, str | None] | None:
     try:
         value = json.loads(value_json)
@@ -263,7 +270,8 @@ def compute_status(
         if accepted is not None:
             parsed = _parse_expiry_value(accepted.value_json)
             if parsed is None:
-                unresolved_rows.append({"asset_id": asset.id, "reason": "unparseable"})
+                reason = "dateless" if _is_null_value(accepted.value_json) else "unparseable"
+                unresolved_rows.append({"asset_id": asset.id, "reason": reason})
                 continue
             expiry, date_type = parsed
             d = days_remaining(expiry, as_of)

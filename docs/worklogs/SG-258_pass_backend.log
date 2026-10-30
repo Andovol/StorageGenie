@@ -1,0 +1,52 @@
+PASS half backend run 1 2026-10-30T13:17:29Z worktree candidate
+.............................                                            [100%]
+=============================== warnings summary ===============================
+venv/lib/python3.12/site-packages/fastapi/testclient.py:1
+  /home/andrei/StorageGenie/backend/venv/lib/python3.12/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+venv/lib/python3.12/site-packages/starlette/testclient.py:53
+  /home/andrei/StorageGenie/backend/venv/lib/python3.12/site-packages/starlette/testclient.py:53: DeprecationWarning: The anyio.abc.BlockingPortal alias is deprecated, use anyio.from_thread.BlockingPortal instead.
+    _PortalFactoryType = Callable[[], AbstractContextManager[anyio.abc.BlockingPortal]]
+
+tests/test_sg233_reminders.py::test_sg233_migration_upgrade_downgrade_upgrade_and_unique
+tests/test_sg233_reminders.py::test_sg233_migration_upgrade_downgrade_upgrade_and_unique
+tests/test_sg233_reminders.py::test_sg233_migration_upgrade_downgrade_upgrade_and_unique
+tests/test_sg233_reminders.py::test_sg233_due_fixture_creates_engine_shaped_unread_reminder
+tests/test_sg233_reminders.py::test_sg233_record_due_defaults_to_the_live_utc_day
+tests/test_sg233_reminders.py::test_sg233_unresolved_and_non_warning_rows_create_nothing
+tests/test_sg233_reminders.py::test_sg233_same_day_rerun_inserts_zero_rows
+tests/test_sg233_reminders.py::test_sg233_read_and_dismiss_round_trip_with_illegal_transitions
+tests/test_sg233_reminders.py::test_sg233_documents_and_household_windows_still_fire
+  /home/andrei/StorageGenie/backend/venv/lib/python3.12/site-packages/alembic/config.py:604: DeprecationWarning: No path_separator found in configuration; falling back to legacy splitting on spaces, commas, and colons for prepend_sys_path.  Consider adding path_separator=os to Alembic config.
+    util.warn_deprecated(
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+29 passed, 11 warnings in 7.36s
+run1 rc=0
+PASS half backend run 2 2026-10-30T13:17:38Z
+.............................                                            [100%]
+=============================== warnings summary ===============================
+venv/lib/python3.12/site-packages/fastapi/testclient.py:1
+  /home/andrei/StorageGenie/backend/venv/lib/python3.12/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+venv/lib/python3.12/site-packages/starlette/testclient.py:53
+  /home/andrei/StorageGenie/backend/venv/lib/python3.12/site-packages/starlette/testclient.py:53: DeprecationWarning: The anyio.abc.BlockingPortal alias is deprecated, use anyio.from_thread.BlockingPortal instead.
+    _PortalFactoryType = Callable[[], AbstractContextManager[anyio.abc.BlockingPortal]]
+
+tests/test_sg233_reminders.py::test_sg233_migration_upgrade_downgrade_upgrade_and_unique
+tests/test_sg233_reminders.py::test_sg233_migration_upgrade_downgrade_upgrade_and_unique
+tests/test_sg233_reminders.py::test_sg233_migration_upgrade_downgrade_upgrade_and_unique
+tests/test_sg233_reminders.py::test_sg233_due_fixture_creates_engine_shaped_unread_reminder
+tests/test_sg233_reminders.py::test_sg233_record_due_defaults_to_the_live_utc_day
+tests/test_sg233_reminders.py::test_sg233_unresolved_and_non_warning_rows_create_nothing
+tests/test_sg233_reminders.py::test_sg233_same_day_rerun_inserts_zero_rows
+tests/test_sg233_reminders.py::test_sg233_read_and_dismiss_round_trip_with_illegal_transitions
+tests/test_sg233_reminders.py::test_sg233_documents_and_household_windows_still_fire
+  /home/andrei/StorageGenie/backend/venv/lib/python3.12/site-packages/alembic/config.py:604: DeprecationWarning: No path_separator found in configuration; falling back to legacy splitting on spaces, commas, and colons for prepend_sys_path.  Consider adding path_separator=os to Alembic config.
+    util.warn_deprecated(
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+29 passed, 11 warnings in 5.66s
+run2 rc=0

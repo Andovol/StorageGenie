@@ -10,6 +10,8 @@ const api = vi.hoisted(() => ({
   apiPost: vi.fn(),
   uploadEvidence: vi.fn(),
   enterManualExpiry: vi.fn(),
+  clearExpiryDate: vi.fn(),
+  classifyAsset: vi.fn(),
   fetchLocations: vi.fn(),
   assignAssetLocation: vi.fn(),
   unassignAssetLocation: vi.fn(),
@@ -24,9 +26,61 @@ const evidence = [
   { id: "ev-1", sha256: "sha", storage_key: "key", original_filename: "photo.jpg" },
 ];
 
-function assertion(id: string, field_path: string, value: unknown, review_state: string) {
-  return { id, field_path, value, source_type: "user", review_state, confidence: null, source_evidence_ids: [], created_at: null };
+function assertion(
+  id: string,
+  field_path: string,
+  value: unknown,
+  review_state: string,
+  created_at: string | null = null
+) {
+  return { id, field_path, value, source_type: "user", review_state, confidence: null, source_evidence_ids: [], created_at };
 }
+
+function classificationAssertion(
+  id: string,
+  category: string,
+  tierDefaults: Record<string, number>,
+  created_at = "2026-10-01T00:00:00+00:00"
+) {
+  return assertion(
+    id,
+    "plugin:expiry-tracker/classification",
+    {
+      category,
+      label: category,
+      profile: {
+        notification_tier: Object.keys(tierDefaults)[0] ?? null,
+        notification_days: Object.values(tierDefaults)[0] ?? null,
+        tier_defaults: tierDefaults,
+        opened_date_tracking: false,
+        disposal_guidance: false,
+      },
+    },
+    "accepted",
+    created_at
+  );
+}
+
+const taxonomy = {
+  plugins: [
+    {
+      plugin_id: "expiry-tracker",
+      version: "1.0.0",
+      categories: [
+        { id: "food_beverages", name: "Food & beverages", active: true, notification: "tiered-30-7-1", opened_date_tracking: false, chat: "category" },
+        { id: "household_chemicals", name: "Household chemicals", active: true, notification: "basic-expiry", opened_date_tracking: false, chat: "fallback" },
+        { id: "documents_other", name: "Documents/other", active: true, notification: "long-lead-60-30", opened_date_tracking: false, chat: "fallback" },
+        { id: "non_perishable", name: "Non-perishable", active: true, notification: "none", opened_date_tracking: false, chat: "none" },
+        { id: "retired_category", name: "Retired category", active: false, notification: "none", opened_date_tracking: false, chat: "none" },
+      ],
+      date_types: ["expiry_date", "valid_until"],
+      units: ["piece"],
+    },
+  ],
+};
+
+let assetBody: Record<string, unknown>;
+let taxonomyBody: typeof taxonomy;
 
 const before = {
   id: "asset-1",
@@ -61,6 +115,7 @@ const needsEvidence = {
   ...before,
   assertions: [
     assertion("a-name", "display_name", "Milk", "accepted"),
+    classificationAssertion("a-class", "food_beverages", { critical: 1, urgent: 7, upcoming: 30 }),
     assertion("a-exp", "plugin:expiry-tracker/expiry_date", { status: "unknown" }, "needs_evidence"),
   ],
 };
@@ -82,6 +137,13 @@ afterEach(() => {
 });
 
 beforeEach(() => {
+  assetBody = before;
+  taxonomyBody = taxonomy;
+  // The asset and taxonomy reads share one client; route them by path.
+  api.apiGet.mockImplementation((path: string) => {
+    if (path.includes("/v1/taxonomy")) return Promise.resolve(taxonomyBody);
+    return Promise.resolve(assetBody);
+  });
   // Default: the location tree route is dormant (backend flag OFF -> 404), so
   // the section hides unless a test opts in with a resolved value.
   api.fetchLocations.mockRejectedValue(new Error("locations disabled"));
@@ -91,8 +153,11 @@ beforeEach(() => {
 
 describe("AssetDetailPage", () => {
   test("editing quantity patches via PATCH and shows the superseded prior value in history", async () => {
-    api.apiGet.mockResolvedValueOnce(before).mockResolvedValueOnce(after);
-    api.apiPatch.mockResolvedValue(after);
+    assetBody = before;
+    api.apiPatch.mockImplementation(() => {
+      assetBody = after;
+      return Promise.resolve(after);
+    });
     renderPage();
 
     fireEvent.click(await screen.findByRole("button", { name: "Edit" }));
@@ -112,12 +177,12 @@ describe("AssetDetailPage", () => {
   });
 
   test("a needs_evidence asset offers hand entry beside its detail and refuses an empty date", async () => {
-    api.apiGet.mockResolvedValue(needsEvidence);
+    assetBody = needsEvidence;
     api.enterManualExpiry.mockResolvedValue({ assertion: null, resolved_review_task_ids: [] });
     renderPage();
 
     expect(await screen.findByText("Manual expiry entry")).toBeInTheDocument();
-    const save = screen.getByRole("button", { name: "Save expiry" });
+    const save = screen.getByRole("button", { name: "Save date" });
     expect(save).toBeDisabled();
 
     fireEvent.change(screen.getByLabelText("Date"), { target: { value: "2030-05-06" } });
@@ -128,7 +193,8 @@ describe("AssetDetailPage", () => {
       expect(api.enterManualExpiry).toHaveBeenCalledWith(
         "asset-1",
         "hh",
-        expect.objectContaining({ expiry_date: "2030-05-06", source_evidence_ids: ["ev-1"] })
+        expect.objectContaining({ expiry_date: "2030-05-06", source_evidence_ids: ["ev-1"] }),
+        "a-exp"
       )
     );
   });
@@ -136,7 +202,7 @@ describe("AssetDetailPage", () => {
 
 describe("EnrichButton per-press cap (SG-082)", () => {
   test("the page renders the Enrich button with the last measured spend and cap", async () => {
-    api.apiGet.mockResolvedValue(before);
+    assetBody = before;
     renderPage();
 
     expect(await screen.findByRole("button", { name: "Enrich" })).toBeInTheDocument();
@@ -167,7 +233,7 @@ describe("EnrichButton per-press cap (SG-082)", () => {
   });
 
   test("the page's wired Enrich handler POSTs the enrich endpoint under the cap (SG-098)", async () => {
-    api.apiGet.mockResolvedValue(before);
+    assetBody = before;
     api.apiPost.mockResolvedValue({ candidate_id: "cand-1", state: "proposed" });
     renderPage();
 
@@ -179,7 +245,7 @@ describe("EnrichButton per-press cap (SG-082)", () => {
   });
 
   test("an enrich press renders the returned brand alternate with its source (SG-119 G2)", async () => {
-    api.apiGet.mockResolvedValue(before);
+    assetBody = before;
     api.apiPost.mockResolvedValue({
       candidate_id: "cand-1",
       state: "proposed",
@@ -209,7 +275,7 @@ describe("LocationsSection (SG-113)", () => {
   const freezer = { id: "loc-2", household_id: "hh", name: "Freezer", parent_id: null, created_at: null, updated_at: null };
 
   test("hides the whole section when the backend reports the tree disabled", async () => {
-    api.apiGet.mockResolvedValue(before);
+    assetBody = before;
     renderPage();
 
     await screen.findByRole("heading", { name: "Milk" });
@@ -217,7 +283,7 @@ describe("LocationsSection (SG-113)", () => {
   });
 
   test("shows the empty state for an asset with no assignments (never an error)", async () => {
-    api.apiGet.mockResolvedValue(before);
+    assetBody = before;
     api.fetchLocations.mockResolvedValueOnce({ items: [fridge] });
     renderPage();
 
@@ -226,7 +292,7 @@ describe("LocationsSection (SG-113)", () => {
   });
 
   test("lists assigned locations, assigns from the select and unassigns", async () => {
-    api.apiGet.mockResolvedValue({ ...before, locations: [fridge] });
+    assetBody = { ...before, locations: [fridge] };
     api.fetchLocations.mockResolvedValueOnce({ items: [fridge, freezer] });
     api.assignAssetLocation.mockResolvedValue({ status: "assigned", asset_id: "asset-1", location_id: "loc-2" });
     api.unassignAssetLocation.mockResolvedValue({ status: "unassigned", asset_id: "asset-1", location_id: "loc-1" });
@@ -275,7 +341,7 @@ describe("RelationsSection (SG-114)", () => {
   };
 
   test("hides the whole section when the backend reports relations disabled", async () => {
-    api.apiGet.mockResolvedValue(before);
+    assetBody = before;
     renderPage();
 
     await screen.findByRole("heading", { name: "Milk" });
@@ -283,7 +349,7 @@ describe("RelationsSection (SG-114)", () => {
   });
 
   test("shows the empty state for an unlinked asset (never an error)", async () => {
-    api.apiGet.mockResolvedValue(before);
+    assetBody = before;
     api.fetchRelations.mockResolvedValueOnce({ items: [] });
     api.fetchHouseholdAssets.mockResolvedValueOnce({ items: [before, screwdriver], next_cursor: null });
     renderPage();
@@ -293,7 +359,7 @@ describe("RelationsSection (SG-114)", () => {
   });
 
   test("lists both directions, creates a link and deletes one", async () => {
-    api.apiGet.mockResolvedValue({ ...before, relations: [relation] });
+    assetBody = { ...before, relations: [relation] };
     api.fetchRelations.mockResolvedValue({ items: [relation] });
     api.fetchHouseholdAssets.mockResolvedValue({ items: [before, screwdriver], next_cursor: null });
     api.createRelation.mockResolvedValue(relation);
@@ -315,5 +381,232 @@ describe("RelationsSection (SG-114)", () => {
     await waitFor(() =>
       expect(api.deleteRelation).toHaveBeenCalledWith("asset-1", "rel-1", "hh")
     );
+  });
+});
+
+const classifiedFood = {
+  ...before,
+  assertions: [
+    classificationAssertion("a-class", "food_beverages", { critical: 1, urgent: 7, upcoming: 30 }),
+    assertion(
+      "a-exp-old",
+      "plugin:expiry-tracker/expiry_date",
+      { expiry_date: "2020-01-01", date_type: "expiry_date" },
+      "superseded",
+      "2026-01-01T00:00:00+00:00"
+    ),
+    assertion(
+      "a-exp",
+      "plugin:expiry-tracker/expiry_date",
+      { expiry_date: "2030-05-06", date_type: "best_before" },
+      "accepted",
+      "2026-01-02T00:00:00+00:00"
+    ),
+  ],
+};
+
+function assetReads(): number {
+  return api.apiGet.mock.calls.filter(([path]) => String(path).includes("/v1/assets/asset-1")).length;
+}
+
+describe("classification control (SG-258)", () => {
+  test("lists active categories, shows the current one, saves with the token and re-reads", async () => {
+    assetBody = {
+      ...before,
+      assertions: [classificationAssertion("a-class", "food_beverages", { upcoming: 30 })],
+    };
+    api.classifyAsset.mockResolvedValue({});
+    renderPage();
+
+    const select = await screen.findByLabelText("Classification category");
+    const options = within(select).getAllByRole("option").map((option) => option.textContent);
+    expect(options).toEqual(
+      expect.arrayContaining([
+        "Food & beverages",
+        "Household chemicals",
+        "Documents/other",
+        "Non-perishable",
+      ])
+    );
+    expect(options).not.toContain("Retired category");
+    expect(select).toHaveValue("food_beverages");
+
+    const beforeReads = assetReads();
+    fireEvent.change(select, { target: { value: "documents_other" } });
+    assetBody = {
+      ...before,
+      assertions: [classificationAssertion("a-class-2", "documents_other", { upcoming: 30, long_lead: 60 })],
+    };
+    fireEvent.click(screen.getByRole("button", { name: "Save category" }));
+
+    await waitFor(() =>
+      expect(api.classifyAsset).toHaveBeenCalledWith("asset-1", "hh", "documents_other", "a-class")
+    );
+    await waitFor(() => expect(assetReads()).toBeGreaterThan(beforeReads));
+    expect(await screen.findByText("Category saved.")).toBeInTheDocument();
+  });
+
+  test("a 409 shows the reload message and re-reads the asset", async () => {
+    assetBody = {
+      ...before,
+      assertions: [classificationAssertion("a-class", "food_beverages", { upcoming: 30 })],
+    };
+    api.classifyAsset.mockRejectedValue(new Error("This item changed; reload the asset"));
+    renderPage();
+
+    const beforeReads = assetReads();
+    fireEvent.change(await screen.findByLabelText("Classification category"), {
+      target: { value: "household_chemicals" },
+    });
+    fireEvent.click(screen.getByRole("button", { name: "Save category" }));
+
+    expect(await screen.findByRole("alert")).toHaveTextContent(
+      "This item changed; reload the asset"
+    );
+    await waitFor(() => expect(assetReads()).toBeGreaterThan(beforeReads));
+  });
+
+  test("an empty taxonomy shows a message instead of an empty select", async () => {
+    taxonomyBody = { plugins: [] };
+    renderPage();
+
+    expect(
+      await screen.findByText("No categories are available from the taxonomy.")
+    ).toBeInTheDocument();
+    expect(screen.queryByLabelText("Classification category")).not.toBeInTheDocument();
+  });
+
+  test("a move to Non-perishable confirms before clearing the active date", async () => {
+    assetBody = classifiedFood;
+    api.classifyAsset.mockResolvedValue({});
+    const confirm = vi.spyOn(window, "confirm").mockReturnValue(false);
+    renderPage();
+
+    const select = await screen.findByLabelText("Classification category");
+    fireEvent.change(select, { target: { value: "non_perishable" } });
+    fireEvent.click(screen.getByRole("button", { name: "Save category" }));
+
+    expect(confirm).toHaveBeenCalledWith(
+      "This will clear the active date; the old value stays in the audit."
+    );
+    expect(api.classifyAsset).not.toHaveBeenCalled();
+
+    confirm.mockReturnValue(true);
+    fireEvent.click(screen.getByRole("button", { name: "Save category" }));
+    await waitFor(() =>
+      expect(api.classifyAsset).toHaveBeenCalledWith("asset-1", "hh", "non_perishable", "a-class")
+    );
+    confirm.mockRestore();
+  });
+});
+
+describe("ExpiryEntryForm integration (SG-258)", () => {
+  test("pre-fills the active expiry row, never the superseded one", async () => {
+    assetBody = classifiedFood;
+    renderPage();
+
+    expect(await screen.findByLabelText("Date")).toHaveValue("2030-05-06");
+    expect(screen.getByLabelText("Date type")).toHaveValue("best_before");
+    expect(screen.getByRole("button", { name: "Save date" })).toBeDisabled();
+    expect(
+      screen.getByText("The date is kept when the category changes; check it still applies.")
+    ).toBeInTheDocument();
+  });
+
+  test("Clear writes the null active and empties the form", async () => {
+    assetBody = classifiedFood;
+    api.clearExpiryDate.mockImplementation(() => {
+      assetBody = {
+        ...before,
+        assertions: [
+          classificationAssertion("a-class", "food_beverages", { critical: 1, urgent: 7, upcoming: 30 }),
+          assertion(
+            "a-exp",
+            "plugin:expiry-tracker/expiry_date",
+            { expiry_date: "2030-05-06", date_type: "best_before" },
+            "superseded",
+            "2026-01-02T00:00:00+00:00"
+          ),
+          assertion(
+            "a-exp-cleared",
+            "plugin:expiry-tracker/expiry_date",
+            null,
+            "accepted",
+            "2026-01-03T00:00:00+00:00"
+          ),
+        ],
+      };
+      return Promise.resolve({ asset_id: "asset-1", assertion: null });
+    });
+    renderPage();
+
+    fireEvent.click(await screen.findByRole("button", { name: "Clear expiry date" }));
+
+    await waitFor(() =>
+      expect(api.clearExpiryDate).toHaveBeenCalledWith("asset-1", "hh", "a-exp")
+    );
+    await waitFor(() => expect(screen.getByLabelText("Date")).toHaveValue(""));
+    expect(screen.queryByRole("button", { name: "Clear expiry date" })).not.toBeInTheDocument();
+  });
+
+  test("a proposed row offers Accept date and sends the active token", async () => {
+    api.enterManualExpiry.mockResolvedValue({});
+    assetBody = {
+      ...before,
+      assertions: [
+        classificationAssertion("a-class", "food_beverages", { critical: 1, urgent: 7, upcoming: 30 }),
+        assertion(
+          "a-proposed",
+          "plugin:expiry-tracker/expiry_date",
+          { expiry_date: "2030-05-06", date_type: "expiry_date" },
+          "proposed",
+          "2026-01-02T00:00:00+00:00"
+        ),
+      ],
+    };
+    renderPage();
+
+    fireEvent.click(await screen.findByRole("button", { name: "Accept date" }));
+
+    await waitFor(() =>
+      expect(api.enterManualExpiry).toHaveBeenCalledWith(
+        "asset-1",
+        "hh",
+        expect.objectContaining({ expiry_date: "2030-05-06" }),
+        "a-proposed"
+      )
+    );
+  });
+
+  test("a documents row shows the form with Valid until", async () => {
+    assetBody = {
+      ...before,
+      assertions: [
+        classificationAssertion("a-doc", "documents_other", { upcoming: 30, long_lead: 60 }),
+        assertion(
+          "a-doc-exp",
+          "plugin:expiry-tracker/expiry_date",
+          null,
+          "accepted",
+          "2026-01-02T00:00:00+00:00"
+        ),
+      ],
+    };
+    renderPage();
+
+    expect(await screen.findByRole("heading", { name: "Manual date entry" })).toBeInTheDocument();
+    expect(screen.getByLabelText("Date type")).toHaveValue("valid_until");
+  });
+
+  test("a non-perishable row hides the form", async () => {
+    assetBody = {
+      ...before,
+      assertions: [classificationAssertion("a-none", "non_perishable", {})],
+    };
+    renderPage();
+
+    await screen.findByRole("heading", { name: "Milk" });
+    expect(screen.queryByText("Manual expiry entry")).not.toBeInTheDocument();
+    expect(screen.queryByText("Manual date entry")).not.toBeInTheDocument();
   });
 });

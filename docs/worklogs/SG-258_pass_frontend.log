@@ -1,0 +1,62 @@
+PASS half frontend run 1 2026-10-30T13:17:30Z worktree candidate
+
+> storagegenie-frontend@0.1.0 test
+> vitest run --run src/components/ExpiryEntryForm.test.tsx src/routes/AssetDetailPage.test.tsx src/routes/ExpiryPage.test.tsx
+
+
+ RUN  v1.6.1 /home/andrei/StorageGenie/frontend
+
+stderr | src/routes/AssetDetailPage.test.tsx > AssetDetailPage > editing quantity patches via PATCH and shows the superseded prior value in history
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+stderr | src/routes/ExpiryPage.test.tsx > ExpiryPage > reads the SG-107 engine route with the household (and no category by default)
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+ ✓ src/components/ExpiryEntryForm.test.tsx  (6 tests) 290ms
+ ✓ src/routes/ExpiryPage.test.tsx  (14 tests) 850ms
+ ✓ src/routes/AssetDetailPage.test.tsx  (22 tests) 1320ms
+
+ Test Files  3 passed (3)
+      Tests  42 passed (42)
+   Start at  13:17:31
+   Duration  2.78s (transform 548ms, setup 325ms, collect 1.08s, tests 2.46s, environment 1.67s, prepare 344ms)
+
+npm notice
+npm notice New minor version of npm available! 11.11.0 -> 11.21.1
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v11.21.1
+npm notice To update run: npm install -g npm@11.21.1
+npm notice
+run1 rc=0
+PASS half frontend run 2 2026-10-30T13:17:34Z
+
+> storagegenie-frontend@0.1.0 test
+> vitest run --run src/components/ExpiryEntryForm.test.tsx src/routes/AssetDetailPage.test.tsx src/routes/ExpiryPage.test.tsx
+
+
+ RUN  v1.6.1 /home/andrei/StorageGenie/frontend
+
+stderr | src/routes/AssetDetailPage.test.tsx > AssetDetailPage > editing quantity patches via PATCH and shows the superseded prior value in history
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+stderr | src/routes/ExpiryPage.test.tsx > ExpiryPage > reads the SG-107 engine route with the household (and no category by default)
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+ ✓ src/components/ExpiryEntryForm.test.tsx  (6 tests) 235ms
+ ✓ src/routes/ExpiryPage.test.tsx  (14 tests) 763ms
+ ✓ src/routes/AssetDetailPage.test.tsx  (22 tests) 1260ms
+
+ Test Files  3 passed (3)
+      Tests  42 passed (42)
+   Start at  13:17:34
+   Duration  2.51s (transform 434ms, setup 216ms, collect 896ms, tests 2.26s, environment 1.38s, prepare 385ms)
+
+npm notice
+npm notice New minor version of npm available! 11.11.0 -> 11.21.1
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v11.21.1
+npm notice To update run: npm install -g npm@11.21.1
+npm notice
+run2 rc=0

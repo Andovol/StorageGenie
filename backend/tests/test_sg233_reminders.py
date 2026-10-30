@@ -114,11 +114,17 @@ def _classify(client: TestClient, asset_id: str, household_id: str) -> None:
     assert response.status_code == 200, response.text
 
 
-def _enter_expiry(client: TestClient, asset_id: str, household_id: str, day: date) -> None:
+def _enter_expiry(
+    client: TestClient,
+    asset_id: str,
+    household_id: str,
+    day: date,
+    date_type: str = "expiry_date",
+) -> None:
     response = client.post(
         f"/v1/plugins/expiry-tracker/assets/{asset_id}/expiry",
         params={"household_id": household_id},
-        json={"expiry_date": day.isoformat(), "date_type": "expiry_date"},
+        json={"expiry_date": day.isoformat(), "date_type": date_type},
     )
     assert response.status_code == 200, response.text
 
@@ -452,3 +458,41 @@ def test_sg233_read_and_dismiss_round_trip_with_illegal_transitions(
 def test_sg233_shipped_paths_still_exist() -> None:
     missing = _missing_shipped_paths(SHIPPED_PATHS)
     assert missing == [], f"SG-233 shipped paths missing or empty: {missing}"
+
+
+def test_sg233_documents_and_household_windows_still_fire(reminder_env) -> None:  # type: ignore[no-untyped-def]
+    session, household_id, _other = reminder_env
+    client = TestClient(app)
+    today = datetime.now(timezone.utc).date()
+    documents = _asset(session, household_id, "SG233 Passport")
+    household = _asset(session, household_id, "SG233 Bleach")
+    classified_documents = client.post(
+        f"/v1/plugins/expiry-tracker/assets/{documents.id}/classification",
+        params={"household_id": household_id},
+        json={"category": "documents_other"},
+    )
+    classified_household = client.post(
+        f"/v1/plugins/expiry-tracker/assets/{household.id}/classification",
+        params={"household_id": household_id},
+        json={"category": "household_chemicals"},
+    )
+    assert classified_documents.status_code == 200, classified_documents.text
+    assert classified_household.status_code == 200, classified_household.text
+    _enter_expiry(client, documents.id, household_id, today + timedelta(days=45), "valid_until")
+    _enter_expiry(client, household.id, household_id, today + timedelta(days=20))
+
+    from app.services.reminders.service import record_due
+
+    created = record_due(session, household_id, today)
+    by_asset = {row.asset_id: row for row in created}
+    assert set(by_asset) == {documents.id, household.id}
+    assert (by_asset[documents.id].tier, by_asset[documents.id].bucket, by_asset[documents.id].days_remaining) == (
+        "long_lead",
+        "safe",
+        45,
+    )
+    assert (by_asset[household.id].tier, by_asset[household.id].bucket, by_asset[household.id].days_remaining) == (
+        "upcoming",
+        "this-month",
+        20,
+    )

@@ -49,7 +49,7 @@ const statusFixture: ExpiryStatusResponse = {
     { asset_id: "a2", display_name: "Yogurt", category: "food_beverages", expiry_date: "2026-09-27", date_type: "best_before", days_remaining: 3, tier: "urgent", bucket: "this-week" },
     { asset_id: "a5", display_name: "Soap", category: "cosmetics_personal_care", expiry_date: "2026-10-01", date_type: "expiry_date", days_remaining: 7, tier: "critical", bucket: "this-week" },
     { asset_id: "a3", display_name: "Aspirin", category: "medicine_pharma", expiry_date: "2026-10-10", date_type: "use_by", days_remaining: 16, tier: "upcoming", bucket: "this-month" },
-    { asset_id: "a7", display_name: "Passport", category: "documents_other", expiry_date: "2026-11-08", date_type: "expiry_date", days_remaining: 45, tier: "long_lead", bucket: "safe" },
+    { asset_id: "a7", display_name: "Passport", category: "documents_other", expiry_date: "2026-11-08", date_type: "valid_until", days_remaining: 45, tier: "long_lead", bucket: "safe" },
     { asset_id: "a4", display_name: "Warranty", category: "documents_other", expiry_date: "2027-06-01", date_type: "expiry_date", days_remaining: 250, tier: "safe", bucket: "safe" },
     { asset_id: "a6", display_name: "Batteries", category: "non_perishable", expiry_date: "2026-12-01", date_type: "expiry_date", days_remaining: 68, tier: null, bucket: "safe" },
   ],
@@ -235,6 +235,13 @@ describe("ExpiryPage", () => {
     ]);
     expect(within(screen.getByRole("region", { name: "Expired" })).getByText("4 days overdue")).toBeInTheDocument();
     expect(within(screen.getByRole("region", { name: "This week" })).getByText("3 days remaining")).toBeInTheDocument();
+  });
+
+  test("labels valid_until with its human date-type label (SG-258)", async () => {
+    renderPage();
+    await screen.findByText("Milk");
+
+    expect(screen.getByText(/Valid until/)).toBeInTheDocument();
   });
 
   test("maps every tier to its pill label including No tier", async () => {

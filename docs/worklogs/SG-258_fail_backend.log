@@ -1,0 +1,526 @@
+FAIL half backend final 2026-10-30T13:17:12Z BASE worktree output/sg258-base 0d05310; final candidate tests
+.F.......FFFF.FFF.FFF.......F                                            [100%]
+=================================== FAILURES ===================================
+_________ test_classification_profiles_round_trip_and_activated_phase __________
+
+plugin_db = (<sqlalchemy.orm.session.Session object at 0x70e1826e00b0>, '01a18cf5-15d3-71e0-83aa-27bf9ea9e240')
+
+    def test_classification_profiles_round_trip_and_activated_phase(plugin_db) -> None:  # type: ignore[no-untyped-def]
+        """SG-073 G2: Household/Documents are activated (were 422 `Phase 3`), ride the
+        EXISTING classify + manual-entry + extension path, and the food/medicine/
+        cosmetics legs are byte-unchanged."""
+        session, household_id = plugin_db
+        food = make_asset(session, household_id, "Canned beans")
+        medicine = make_asset(session, household_id, "Medicine")
+        cosmetics = make_asset(session, household_id, "Moisturiser")
+        household = make_asset(session, household_id, "Bleach")
+        documents = make_asset(session, household_id, "Passport")
+        with TestClient(app) as client:
+            food_response = classify(client, food.id, household_id, "Food & beverages")
+            medicine_response = classify(client, medicine.id, household_id, "Medicine/pharma")
+            cosmetics_response = classify(client, cosmetics.id, household_id, "Cosmetics/personal care")
+            readback = client.get(
+                f"/v1/plugins/expiry-tracker/assets/{food.id}/classification",
+                params={"household_id": household_id},
+            )
+            household_response = classify(client, household.id, household_id, "Household chemicals")
+            documents_response = classify(client, documents.id, household_id, "Documents/other")
+            household_readback = client.get(
+                f"/v1/plugins/expiry-tracker/assets/{household.id}/classification",
+                params={"household_id": household_id},
+            )
+            documents_readback = client.get(
+                f"/v1/plugins/expiry-tracker/assets/{documents.id}/classification",
+                params={"household_id": household_id},
+            )
+            household_entry = client.post(
+                f"/v1/plugins/expiry-tracker/assets/{household.id}/expiry",
+                params={"household_id": household_id},
+                json={"expiry_date": "2030-05-06", "date_type": "use_by"},
+            )
+            household_extensions = client.post(
+                f"/v1/plugins/expiry-tracker/assets/{household.id}/extensions",
+                params={"household_id": household_id},
+                json={"attributes": {"storage_location": "garage_utility"}},
+            )
+            documents_extensions = client.post(
+                f"/v1/plugins/expiry-tracker/assets/{documents.id}/extensions",
+                params={"household_id": household_id},
+                json={"attributes": {"storage_location": "pantry"}},
+            )
+            documents_entry = client.post(
+                f"/v1/plugins/expiry-tracker/assets/{documents.id}/expiry",
+                params={"household_id": household_id},
+                json={"expiry_date": "2030-05-06", "date_type": "valid_until"},
+            )
+        assert food_response.status_code == 200
+        assert food_response.json()["classification"]["profile"]["tier_defaults"] == {
+            "critical": 1,
+            "urgent": 7,
+            "upcoming": 30,
+        }
+        assert food_response.json()["classification"]["profile"]["opened_date_tracking"] is False
+        assert medicine_response.status_code == 200
+        assert medicine_response.json()["classification"]["profile"]["tier_defaults"] == {
+            "critical": 1,
+            "urgent": 3,
+            "upcoming": 14,
+        }
+        assert medicine_response.json()["classification"]["profile"]["opened_date_tracking"] is False
+        assert cosmetics_response.status_code == 200
+        cosmetics_profile = cosmetics_response.json()["classification"]["profile"]
+        assert cosmetics_profile["tier_defaults"] == {"critical": 7, "urgent": 30, "upcoming": 90}
+        assert cosmetics_profile["opened_date_tracking"] is True
+        assert cosmetics_response.json()["classification"]["category"] == "cosmetics_personal_care"
+        assert readback.status_code == 200
+        assert readback.json()["classification"]["category"] == "food_beverages"
+        stored = session.query(Assertion).filter_by(asset_id=food.id, field_path="plugin:expiry-tracker/classification").one()
+        assert json.loads(stored.value_json)["category"] == readback.json()["classification"]["category"]
+        assert household_response.status_code == 200
+        household_profile = household_response.json()["classification"]["profile"]
+        assert household_profile["tier_defaults"] == {"upcoming": 30}
+        assert household_profile["opened_date_tracking"] is False
+        assert household_response.json()["classification"]["category"] == "household_chemicals"
+        assert household_response.json()["expiry_assertion"]["review_state"] == "needs_evidence"
+        assert household_readback.status_code == 200
+        assert household_readback.json()["classification"]["category"] == "household_chemicals"
+        assert documents_response.status_code == 200
+        documents_profile = documents_response.json()["classification"]["profile"]
+        assert documents_profile["tier_defaults"] == {"long_lead": 60, "upcoming": 30}
+        assert documents_profile["opened_date_tracking"] is False
+        assert documents_response.json()["classification"]["category"] == "documents_other"
+>       assert documents_response.json()["expiry_assertion"]["review_state"] == "needs_evidence"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: 'NoneType' object is not subscriptable
+
+tests/test_plugin_expiry.py:171: TypeError
+______________ test_documents_never_propose_an_observed_ocr_date _______________
+
+plugin_db = (<sqlalchemy.orm.session.Session object at 0x70e181b8cfe0>, '01a18cf5-1d26-7220-9df5-0d29ad8a4f52')
+
+    def test_documents_never_propose_an_observed_ocr_date(plugin_db) -> None:  # type: ignore[no-untyped-def]
+        session, household_id = plugin_db
+        asset = make_asset(session, household_id, "Passport")
+        evidence = Evidence(
+            household_id=household_id,
+            sha256="d" * 64,
+            storage_key="plugin/document.png",
+            media_type="image/png",
+            original_filename="document.png",
+            source_kind="upload",
+            size_bytes=1,
+        )
+        session.add(evidence)
+        session.commit()
+        session.execute(asset_evidence.insert().values(asset_id=asset.id, evidence_id=evidence.id))
+        session.add(
+            Observation(
+                evidence_id=evidence.id,
+                kind="ocr",
+                value_json=json.dumps({"text": "issued 2030-05-06"}),
+                confidence=1.0,
+            )
+        )
+        session.commit()
+    
+        with TestClient(app) as client:
+            response = classify(client, asset.id, household_id, "Documents/other")
+    
+        assert response.status_code == 200
+        body = response.json()
+>       assert body["expiry_assertion"]["review_state"] == "needs_evidence"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: 'NoneType' object is not subscriptable
+
+tests/test_plugin_expiry.py:528: TypeError
+_________ test_documents_manual_valid_until_is_accepted_and_read_back __________
+
+plugin_db = (<sqlalchemy.orm.session.Session object at 0x70e180733bf0>, '01a18cf5-1dc5-7423-9bdb-d7fe32504424')
+
+    def test_documents_manual_valid_until_is_accepted_and_read_back(plugin_db) -> None:  # type: ignore[no-untyped-def]
+        session, household_id = plugin_db
+        asset = make_asset(session, household_id, "Passport")
+        with TestClient(app) as client:
+            assert classify(client, asset.id, household_id, "documents").status_code == 200
+            entered = client.post(
+                f"/v1/plugins/expiry-tracker/assets/{asset.id}/expiry",
+                params={"household_id": household_id},
+                json={"expiry_date": "2031-01-01", "date_type": "valid_until"},
+            )
+            detail = client.get(f"/v1/assets/{asset.id}", params={"household_id": household_id})
+    
+>       assert entered.status_code == 200, entered.text
+E       AssertionError: {"type":"about:blank","title":"Unprocessable Entity","status":422,"detail":"Invalid date_type: valid_until"}
+E       assert 422 == 200
+E        +  where 422 = <Response [422 Unprocessable Entity]>.status_code
+
+tests/test_plugin_expiry.py:546: AssertionError
+____ test_reclassification_between_dated_categories_keeps_the_accepted_date ____
+
+plugin_db = (<sqlalchemy.orm.session.Session object at 0x70e1807f6510>, '01a18cf5-1e43-76b2-98de-f46ffc9e7879')
+
+    def test_reclassification_between_dated_categories_keeps_the_accepted_date(plugin_db) -> None:  # type: ignore[no-untyped-def]
+        session, household_id = plugin_db
+        asset = make_asset(session, household_id, "Canned beans")
+        with TestClient(app) as client:
+            assert classify(client, asset.id, household_id, "food").status_code == 200
+            entered = client.post(
+                f"/v1/plugins/expiry-tracker/assets/{asset.id}/expiry",
+                params={"household_id": household_id},
+                json={"expiry_date": "2030-05-06", "date_type": "use_by"},
+            )
+            moved = classify(client, asset.id, household_id, "documents")
+    
+        assert entered.status_code == 200, entered.text
+        kept = entered.json()["assertion"]
+        assert moved.status_code == 200, moved.text
+        body = moved.json()
+>       assert body["expiry_assertion"]["id"] == kept["id"]
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: 'NoneType' object is not subscriptable
+
+tests/test_plugin_expiry.py:576: TypeError
+______________ test_move_to_non_perishable_clears_the_active_date ______________
+
+plugin_db = (<sqlalchemy.orm.session.Session object at 0x70e18076c3e0>, '01a18cf5-1ecb-7102-9a6b-759889050da2')
+
+    def test_move_to_non_perishable_clears_the_active_date(plugin_db) -> None:  # type: ignore[no-untyped-def]
+        session, household_id = plugin_db
+        asset = make_asset(session, household_id, "Canned beans")
+        with TestClient(app) as client:
+            assert classify(client, asset.id, household_id, "food").status_code == 200
+            entered = client.post(
+                f"/v1/plugins/expiry-tracker/assets/{asset.id}/expiry",
+                params={"household_id": household_id},
+                json={"expiry_date": "2030-05-06"},
+            )
+            moved = classify(client, asset.id, household_id, "non_perishable")
+    
+        assert entered.status_code == 200, entered.text
+        assert moved.status_code == 200, moved.text
+        body = moved.json()
+>       assert body["expiry_assertion"]["review_state"] == "accepted"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: 'NoneType' object is not subscriptable
+
+tests/test_plugin_expiry.py:602: TypeError
+_______ test_reclassification_after_a_clear_writes_placeholder_and_task ________
+
+plugin_db = (<sqlalchemy.orm.session.Session object at 0x70e1808e49e0>, '01a18cf5-1fc4-7272-8cbc-ef93f059ec71')
+
+    def test_reclassification_after_a_clear_writes_placeholder_and_task(plugin_db) -> None:  # type: ignore[no-untyped-def]
+        session, household_id = plugin_db
+        asset = make_asset(session, household_id, "Canned beans")
+        with TestClient(app) as client:
+            assert classify(client, asset.id, household_id, "food").status_code == 200
+            assert (
+                client.post(
+                    f"/v1/plugins/expiry-tracker/assets/{asset.id}/expiry",
+                    params={"household_id": household_id},
+                    json={"expiry_date": "2030-05-06"},
+                ).status_code
+                == 200
+            )
+>           assert (
+                client.post(
+                    f"/v1/plugins/expiry-tracker/assets/{asset.id}/expiry/clear",
+                    params={"household_id": household_id},
+                    json={},
+                ).status_code
+                == 200
+            )
+E           AssertionError: assert 405 == 200
+E            +  where 405 = <Response [405 Method Not Allowed]>.status_code
+E            +    where <Response [405 Method Not Allowed]> = post('/v1/plugins/expiry-tracker/assets/01a18cf5-1fc6-7ee3-898f-da39543299e9/expiry/clear', params={'household_id': '01a18cf5-1fc4-7272-8cbc-ef93f059ec71'}, json={})
+E            +      where post = <starlette.testclient.TestClient object at 0x70e1808e6c90>.post
+
+tests/test_plugin_expiry.py:654: AssertionError
+_________ test_classify_if_match_rejects_a_stale_classification_token __________
+
+plugin_db = (<sqlalchemy.orm.session.Session object at 0x70e1808ddfa0>, '01a18cf5-2050-71a3-966e-f5114f3ddb1f')
+
+    def test_classify_if_match_rejects_a_stale_classification_token(plugin_db) -> None:  # type: ignore[no-untyped-def]
+        session, household_id = plugin_db
+        asset = make_asset(session, household_id, "Canned beans")
+        with TestClient(app) as client:
+            assert classify(client, asset.id, household_id, "food").status_code == 200
+            current = client.get(
+                f"/v1/plugins/expiry-tracker/assets/{asset.id}/classification",
+                params={"household_id": household_id},
+            ).json()["assertion"]["id"]
+            stale = classify(client, asset.id, household_id, "household", headers={"If-Match": "stale"})
+            unchanged = client.get(
+                f"/v1/plugins/expiry-tracker/assets/{asset.id}/classification",
+                params={"household_id": household_id},
+            )
+            fresh = classify(client, asset.id, household_id, "household", headers={"If-Match": current})
+            changed = client.get(
+                f"/v1/plugins/expiry-tracker/assets/{asset.id}/classification",
+                params={"household_id": household_id},
+            )
+    
+>       assert stale.status_code == 409
+E       assert 200 == 409
+E        +  where 200 = <Response [200 OK]>.status_code
+
+tests/test_plugin_expiry.py:690: AssertionError
+__________ test_manual_expiry_and_clear_if_match_reject_stale_tokens ___________
+
+plugin_db = (<sqlalchemy.orm.session.Session object at 0x70e18076e9c0>, '01a18cf5-20e3-7233-a43a-89fc33e3e182')
+
+    def test_manual_expiry_and_clear_if_match_reject_stale_tokens(plugin_db) -> None:  # type: ignore[no-untyped-def]
+        session, household_id = plugin_db
+        asset = make_asset(session, household_id, "Canned beans")
+        endpoint = f"/v1/plugins/expiry-tracker/assets/{asset.id}"
+        with TestClient(app) as client:
+            assert classify(client, asset.id, household_id, "food").status_code == 200
+            entered = client.post(
+                f"{endpoint}/expiry",
+                params={"household_id": household_id},
+                json={"expiry_date": "2030-05-06"},
+            )
+            current = entered.json()["assertion"]["id"]
+            stale_entry = client.post(
+                f"{endpoint}/expiry",
+                params={"household_id": household_id},
+                json={"expiry_date": "2031-01-01"},
+                headers={"If-Match": "stale"},
+            )
+            unchanged = client.get(f"/v1/assets/{asset.id}", params={"household_id": household_id})
+            stale_clear = client.post(
+                f"{endpoint}/expiry/clear",
+                params={"household_id": household_id},
+                json={},
+                headers={"If-Match": "stale"},
+            )
+            still_unchanged = client.get(f"/v1/assets/{asset.id}", params={"household_id": household_id})
+            fresh_entry = client.post(
+                f"{endpoint}/expiry",
+                params={"household_id": household_id},
+                json={"expiry_date": "2031-01-01"},
+                headers={"If-Match": current},
+            )
+            fresh_clear = client.post(
+                f"{endpoint}/expiry/clear",
+                params={"household_id": household_id},
+                json={},
+                headers={"If-Match": fresh_entry.json()["assertion"]["id"]},
+            )
+    
+        def accepted(detail: object) -> list[dict[str, object]]:
+            payload = detail.json()  # type: ignore[attr-defined]
+            return [
+                row
+                for row in payload["assertions"]
+                if row["field_path"] == EXPIRY_FIELD and row["review_state"] == "accepted"
+            ]
+    
+>       assert stale_entry.status_code == 409
+E       assert 200 == 409
+E        +  where 200 = <Response [200 OK]>.status_code
+
+tests/test_plugin_expiry.py:743: AssertionError
+________ test_clear_expiry_date_supersedes_and_resolves_the_manual_task ________
+
+plugin_db = (<sqlalchemy.orm.session.Session object at 0x70e180519af0>, '01a18cf5-2194-7633-a40e-051a2c163817')
+
+    def test_clear_expiry_date_supersedes_and_resolves_the_manual_task(plugin_db) -> None:  # type: ignore[no-untyped-def]
+        session, household_id = plugin_db
+        asset = make_asset(session, household_id, "Canned beans")
+        with TestClient(app) as client:
+            assert classify(client, asset.id, household_id, "food").status_code == 200
+            entered = client.post(
+                f"/v1/plugins/expiry-tracker/assets/{asset.id}/expiry",
+                params={"household_id": household_id},
+                json={"expiry_date": "2030-05-06"},
+            )
+            task = ReviewTask(
+                task_type="expiry.manual_entry",
+                priority="high",
+                subject_ref=asset.id,
+                proposed_change=json.dumps({"prompt": "Enter expiry date manually"}),
+                status="open",
+                household_id=household_id,
+            )
+            session.add(task)
+            session.commit()
+            cleared = client.post(
+                f"/v1/plugins/expiry-tracker/assets/{asset.id}/expiry/clear",
+                params={"household_id": household_id},
+                json={},
+            )
+    
+        assert entered.status_code == 200, entered.text
+>       assert cleared.status_code == 200, cleared.text
+E       AssertionError: {"detail":"Method Not Allowed"}
+E       assert 405 == 200
+E        +  where 405 = <Response [405 Method Not Allowed]>.status_code
+
+tests/test_plugin_expiry.py:791: AssertionError
+_________ test_clear_expiry_date_with_no_active_expiry_writes_nothing __________
+
+plugin_db = (<sqlalchemy.orm.session.Session object at 0x70e1806a5b80>, '01a18cf5-221d-7b21-8a06-2446a09213ae')
+
+    def test_clear_expiry_date_with_no_active_expiry_writes_nothing(plugin_db) -> None:  # type: ignore[no-untyped-def]
+        session, household_id = plugin_db
+        asset = make_asset(session, household_id, "Canned beans")
+        session.add(
+            Assertion(
+                asset_id=asset.id,
+                field_path=CLASSIFICATION_FIELD,
+                value_json=json.dumps({"category": "food_beverages"}),
+                source_type="user",
+                review_state="accepted",
+            )
+        )
+        session.commit()
+        audit_before = session.query(AuditEvent).count()
+        with TestClient(app) as client:
+            cleared = client.post(
+                f"/v1/plugins/expiry-tracker/assets/{asset.id}/expiry/clear",
+                params={"household_id": household_id},
+                json={},
+            )
+        session.expire_all()
+>       assert cleared.status_code == 200, cleared.text
+E       AssertionError: {"detail":"Method Not Allowed"}
+E       assert 405 == 200
+E        +  where 405 = <Response [405 Method Not Allowed]>.status_code
+
+tests/test_plugin_expiry.py:841: AssertionError
+___ test_clear_expiry_date_rejects_unknown_asset_household_and_unclassified ____
+
+plugin_db = (<sqlalchemy.orm.session.Session object at 0x70e1804fc980>, '01a18cf5-2293-7b13-a5a3-4d4b0635673e')
+
+    def test_clear_expiry_date_rejects_unknown_asset_household_and_unclassified(plugin_db) -> None:  # type: ignore[no-untyped-def]
+        session, household_id = plugin_db
+        asset = make_asset(session, household_id, "Canned beans")
+        with TestClient(app) as client:
+            unknown = client.post(
+                "/v1/plugins/expiry-tracker/assets/missing/expiry/clear",
+                params={"household_id": household_id},
+                json={},
+            )
+            mismatch = client.post(
+                f"/v1/plugins/expiry-tracker/assets/{asset.id}/expiry/clear",
+                params={"household_id": "other-household"},
+                json={},
+            )
+            unclassified = client.post(
+                f"/v1/plugins/expiry-tracker/assets/{asset.id}/expiry/clear",
+                params={"household_id": household_id},
+                json={},
+            )
+            non_perishable = classify(client, asset.id, household_id, "non-perishable")
+            refused = client.post(
+                f"/v1/plugins/expiry-tracker/assets/{asset.id}/expiry/clear",
+                params={"household_id": household_id},
+                json={},
+            )
+>       assert unknown.status_code == 404
+E       assert 405 == 404
+E        +  where 405 = <Response [405 Method Not Allowed]>.status_code
+
+tests/test_plugin_expiry.py:872: AssertionError
+____________ test_sg233_documents_and_household_windows_still_fire _____________
+
+reminder_env = (<sqlalchemy.orm.session.Session object at 0x70e1802133e0>, '01a18cf5-29af-7050-8bf2-97ff0e7a6f93', '01a18cf5-29af-7050-8bf2-98044d28d1ed')
+
+    def test_sg233_documents_and_household_windows_still_fire(reminder_env) -> None:  # type: ignore[no-untyped-def]
+        session, household_id, _other = reminder_env
+        client = TestClient(app)
+        today = datetime.now(timezone.utc).date()
+        documents = _asset(session, household_id, "SG233 Passport")
+        household = _asset(session, household_id, "SG233 Bleach")
+        classified_documents = client.post(
+            f"/v1/plugins/expiry-tracker/assets/{documents.id}/classification",
+            params={"household_id": household_id},
+            json={"category": "documents_other"},
+        )
+        classified_household = client.post(
+            f"/v1/plugins/expiry-tracker/assets/{household.id}/classification",
+            params={"household_id": household_id},
+            json={"category": "household_chemicals"},
+        )
+        assert classified_documents.status_code == 200, classified_documents.text
+        assert classified_household.status_code == 200, classified_household.text
+>       _enter_expiry(client, documents.id, household_id, today + timedelta(days=45), "valid_until")
+
+tests/test_sg233_reminders.py:481: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+client = <starlette.testclient.TestClient object at 0x70e180204ad0>
+asset_id = '01a18cf5-29b3-7660-bb76-5f652771efb2'
+household_id = '01a18cf5-29af-7050-8bf2-97ff0e7a6f93'
+day = datetime.date(2026, 12, 14), date_type = 'valid_until'
+
+    def _enter_expiry(
+        client: TestClient,
+        asset_id: str,
+        household_id: str,
+        day: date,
+        date_type: str = "expiry_date",
+    ) -> None:
+        response = client.post(
+            f"/v1/plugins/expiry-tracker/assets/{asset_id}/expiry",
+            params={"household_id": household_id},
+            json={"expiry_date": day.isoformat(), "date_type": date_type},
+        )
+>       assert response.status_code == 200, response.text
+E       AssertionError: {"type":"about:blank","title":"Unprocessable Entity","status":422,"detail":"Invalid date_type: valid_until"}
+E       assert 422 == 200
+E        +  where 422 = <Response [422 Unprocessable Entity]>.status_code
+
+tests/test_sg233_reminders.py:129: AssertionError
+---------------------------- Captured stderr setup -----------------------------
+INFO  [alembic.runtime.migration] Context impl SQLiteImpl.
+INFO  [alembic.runtime.migration] Will assume non-transactional DDL.
+INFO  [alembic.runtime.migration] Running upgrade  -> 0201cf10c56c, 001 core foundation
+INFO  [alembic.runtime.migration] Running upgrade 0201cf10c56c -> 20260908_sg013_observation, deterministic signal observations
+INFO  [alembic.runtime.migration] Running upgrade 20260908_sg013_observation -> 20260908_sg014_candidate, deduplication candidates
+INFO  [alembic.runtime.migration] Running upgrade 20260908_sg014_candidate -> 20260908_sg017_fts, SQLite FTS5 index for asset catalog search.
+INFO  [alembic.runtime.migration] Running upgrade 20260908_sg017_fts -> 20260912_sg025_provider_call, provider call ledger (SG-025, blueprint §3.3)
+INFO  [alembic.runtime.migration] Running upgrade 20260912_sg025_provider_call -> 20260914_sg035_foundations, data foundations: source attribution, planning suggestions, guardrail log (SG-035, Phase 3 S2/S3)
+INFO  [alembic.runtime.migration] Running upgrade 20260914_sg035_foundations -> 20260916_sg048_name_optional, name-optional capture: asset.display_name becomes nullable (SG-048, S2)
+INFO  [alembic.runtime.migration] Running upgrade 20260916_sg048_name_optional -> 20260917_sg068_saved_search, saved searches: named per-household filter sets (SG-068, Phase 4)
+INFO  [alembic.runtime.migration] Running upgrade 20260917_sg068_saved_search -> 20260923_sg100_enrich_snapshot, enrichment snapshot store (SG-100, Arc A)
+INFO  [alembic.runtime.migration] Running upgrade 20260923_sg100_enrich_snapshot -> 20260924_sg113_location, location tree + asset location assignment (SG-113, G3)
+INFO  [alembic.runtime.migration] Running upgrade 20260924_sg113_location -> 20260924_sg114_relation, asset relations: typed links (SG-114, G4)
+INFO  [alembic.runtime.migration] Running upgrade 20260924_sg114_relation -> 20261023_sg233_reminder, expiry reminders: durable per-asset daily rows (SG-233, G1)
+=============================== warnings summary ===============================
+../../../backend/venv/lib/python3.12/site-packages/fastapi/testclient.py:1
+  /home/andrei/StorageGenie/backend/venv/lib/python3.12/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+../../../backend/venv/lib/python3.12/site-packages/starlette/testclient.py:53
+  /home/andrei/StorageGenie/backend/venv/lib/python3.12/site-packages/starlette/testclient.py:53: DeprecationWarning: The anyio.abc.BlockingPortal alias is deprecated, use anyio.from_thread.BlockingPortal instead.
+    _PortalFactoryType = Callable[[], AbstractContextManager[anyio.abc.BlockingPortal]]
+
+tests/test_sg233_reminders.py::test_sg233_migration_upgrade_downgrade_upgrade_and_unique
+tests/test_sg233_reminders.py::test_sg233_migration_upgrade_downgrade_upgrade_and_unique
+tests/test_sg233_reminders.py::test_sg233_migration_upgrade_downgrade_upgrade_and_unique
+tests/test_sg233_reminders.py::test_sg233_due_fixture_creates_engine_shaped_unread_reminder
+tests/test_sg233_reminders.py::test_sg233_record_due_defaults_to_the_live_utc_day
+tests/test_sg233_reminders.py::test_sg233_unresolved_and_non_warning_rows_create_nothing
+tests/test_sg233_reminders.py::test_sg233_same_day_rerun_inserts_zero_rows
+tests/test_sg233_reminders.py::test_sg233_read_and_dismiss_round_trip_with_illegal_transitions
+tests/test_sg233_reminders.py::test_sg233_documents_and_household_windows_still_fire
+  /home/andrei/StorageGenie/backend/venv/lib/python3.12/site-packages/alembic/config.py:604: DeprecationWarning: No path_separator found in configuration; falling back to legacy splitting on spaces, commas, and colons for prepend_sys_path.  Consider adding path_separator=os to Alembic config.
+    util.warn_deprecated(
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/test_plugin_expiry.py::test_classification_profiles_round_trip_and_activated_phase
+FAILED tests/test_plugin_expiry.py::test_documents_never_propose_an_observed_ocr_date
+FAILED tests/test_plugin_expiry.py::test_documents_manual_valid_until_is_accepted_and_read_back
+FAILED tests/test_plugin_expiry.py::test_reclassification_between_dated_categories_keeps_the_accepted_date
+FAILED tests/test_plugin_expiry.py::test_move_to_non_perishable_clears_the_active_date
+FAILED tests/test_plugin_expiry.py::test_reclassification_after_a_clear_writes_placeholder_and_task
+FAILED tests/test_plugin_expiry.py::test_classify_if_match_rejects_a_stale_classification_token
+FAILED tests/test_plugin_expiry.py::test_manual_expiry_and_clear_if_match_reject_stale_tokens
+FAILED tests/test_plugin_expiry.py::test_clear_expiry_date_supersedes_and_resolves_the_manual_task
+FAILED tests/test_plugin_expiry.py::test_clear_expiry_date_with_no_active_expiry_writes_nothing
+FAILED tests/test_plugin_expiry.py::test_clear_expiry_date_rejects_unknown_asset_household_and_unclassified
+FAILED tests/test_sg233_reminders.py::test_sg233_documents_and_household_windows_still_fire
+12 failed, 17 passed, 11 warnings in 6.64s
+pytest rc=1

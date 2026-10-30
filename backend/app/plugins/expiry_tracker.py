@@ -43,6 +43,7 @@ class DateType(StrEnum):
     MANUFACTURE_DATE = "manufacture_date"
     PERIOD_AFTER_OPENING = "period_after_opening"
     BATCH_LOT_CODE = "batch_lot_code"
+    VALID_UNTIL = "valid_until"
 
 
 class Unit(StrEnum):
@@ -161,7 +162,7 @@ CATEGORIES: dict[str, Category] = {
         "documents_other",
         "Documents/other",
         True,
-        False,
+        True,
         DOCUMENTS_TIERS,
         NotificationTier.LONG_LEAD.value,
     ),
@@ -206,6 +207,7 @@ _DATE_ALIASES = {
     "manufacture": DateType.MANUFACTURE_DATE.value,
     "pao": DateType.PERIOD_AFTER_OPENING.value,
     "batch-lot": DateType.BATCH_LOT_CODE.value,
+    "valid-until": DateType.VALID_UNTIL.value,
 }
 
 
@@ -423,31 +425,63 @@ def apply_extraction_result(
     return assertion, _manual_task(db, asset)
 
 
+def _has_valid_expiry_date(value: object) -> bool:
+    if not isinstance(value, dict):
+        return False
+    raw = value.get("expiry_date")
+    if not isinstance(raw, str):
+        return False
+    try:
+        parsed = date.fromisoformat(raw)
+    except ValueError:
+        return False
+    return parsed.isoformat() == raw
+
+
+def _accepted_expiry_value(assertion: Assertion | None) -> object:
+    if assertion is None or assertion.review_state != "accepted":
+        return None
+    try:
+        return json.loads(assertion.value_json)
+    except json.JSONDecodeError:
+        return None
+
+
 def classify_asset(db: Session, asset: Asset, category: Category, tier: str | None) -> dict[str, object]:
     if tier is not None and tier not in category.tier_defaults:
         raise ExpiryValidationError(f"Invalid notification_tier: {tier}")
     profile = category.profile(tier)
     classification = {"category": category.slug, "label": category.label, "profile": profile}
     _write_assertion(db, asset, CLASSIFICATION_FIELD, classification, "user", "accepted", None)
+    active = _active_assertion(db, asset.id, EXPIRY_FIELD)
     expiry_assertion: Assertion | None = None
     task: ReviewTask | None = None
-    observed = _observed_date(db, asset) if category.has_expiry else None
     if category.has_expiry:
-        if observed is None:
-            expiry_assertion = _write_assertion(
-                db, asset, EXPIRY_FIELD, {"status": "unknown"}, "deterministic", "needs_evidence", None
-            )
-            task = _manual_task(db, asset)
+        if _has_valid_expiry_date(_accepted_expiry_value(active)):
+            expiry_assertion = active
         else:
-            expiry_assertion = _write_assertion(
-                db,
-                asset,
-                EXPIRY_FIELD,
-                {"expiry_date": observed[0], "date_type": DateType.EXPIRY_DATE.value},
-                "deterministic",
-                "proposed",
-                observed[1],
-            )
+            observed = None
+            if category.slug != "documents_other":
+                observed = _observed_date(db, asset)
+            if observed is None:
+                expiry_assertion = _write_assertion(
+                    db, asset, EXPIRY_FIELD, {"status": "unknown"}, "deterministic", "needs_evidence", None
+                )
+                task = _manual_task(db, asset)
+            else:
+                expiry_assertion = _write_assertion(
+                    db,
+                    asset,
+                    EXPIRY_FIELD,
+                    {"expiry_date": observed[0], "date_type": DateType.EXPIRY_DATE.value},
+                    "deterministic",
+                    "proposed",
+                    observed[1],
+                )
+    elif active is not None:
+        expiry_assertion = _write_assertion(
+            db, asset, EXPIRY_FIELD, None, "user", "accepted", None
+        )
     return {"classification": classification, "expiry_assertion": expiry_assertion, "review_task": task}
 
 
@@ -552,6 +586,56 @@ def clear_opened_date(db: Session, asset: Asset) -> Assertion | None:
     return _write_assertion(
         db, asset, OPENED_DATE_FIELD, None, "user", "accepted", None
     )
+
+
+def get_active_expiry(db: Session, asset_id: str) -> Assertion | None:
+    return _active_assertion(db, asset_id, EXPIRY_FIELD)
+
+
+def clear_expiry_date(db: Session, asset: Asset) -> Assertion | None:
+    """Clear the active ``expiry_date`` assertion (SG-258).
+
+    The asset must carry an accepted classification with expiry windows. With no
+    active expiry assertion this is a no-op: nothing is written and ``None`` is
+    returned. Otherwise the existing write path supersedes the old row with a
+    null accepted assertion, records the audit row, and resolves the open
+    ``expiry.manual_entry`` task because the user chose no date.
+    """
+    classification = get_classification(db, asset.id)
+    if classification is None:
+        raise ExpiryValidationError(
+            "Asset must be classified before clearing an expiry date"
+        )
+    try:
+        category_slug = json.loads(classification.value_json)["category"]
+    except (json.JSONDecodeError, KeyError, TypeError) as exc:
+        raise ExpiryValidationError(
+            "Asset must be classified before clearing an expiry date"
+        ) from exc
+    category = CATEGORIES.get(category_slug)
+    if category is None or not category.has_expiry:
+        raise ExpiryValidationError(
+            "Expiry date clearing is not applicable to non-perishable assets"
+        )
+    active = _active_assertion(db, asset.id, EXPIRY_FIELD)
+    if active is None:
+        return None
+    assertion = _write_assertion(
+        db, asset, EXPIRY_FIELD, None, "user", "accepted", None
+    )
+    tasks = (
+        db.query(ReviewTask)
+        .filter_by(
+            subject_ref=asset.id,
+            household_id=asset.household_id,
+            task_type="expiry.manual_entry",
+            status="open",
+        )
+        .all()
+    )
+    for task in tasks:
+        task.status = "resolved"
+    return assertion
 
 
 def _orphan_manual_tasks(

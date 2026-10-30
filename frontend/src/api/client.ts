@@ -231,12 +231,47 @@ export function resolveReviewTask(taskId: string, householdId: string) {
 export function enterManualExpiry(
   assetId: string,
   householdId: string,
-  payload: { expiry_date: string; date_type: string; source_evidence_ids?: string[] }
+  payload: { expiry_date: string; date_type: string; source_evidence_ids?: string[] },
+  versionToken?: string
 ) {
   return apiPost<{ asset_id: string; assertion: Assertion; resolved_review_task_ids: string[] }>(
     `/v1/plugins/expiry-tracker/assets/${assetId}/expiry`,
     payload,
-    { household_id: householdId }
+    { household_id: householdId },
+    versionToken ? { "If-Match": versionToken } : {}
+  );
+}
+
+export function clearExpiryDate(
+  assetId: string,
+  householdId: string,
+  versionToken?: string
+) {
+  return apiPost<{ asset_id: string; assertion: Assertion | null }>(
+    `/v1/plugins/expiry-tracker/assets/${assetId}/expiry/clear`,
+    {},
+    { household_id: householdId },
+    versionToken ? { "If-Match": versionToken } : {}
+  );
+}
+
+export function classifyAsset(
+  assetId: string,
+  householdId: string,
+  category: string,
+  versionToken?: string
+) {
+  return apiPost<{
+    plugin_id: string;
+    version: string;
+    classification: { category: string; label: string };
+    expiry_assertion: Assertion | null;
+    review_task: string | null;
+  }>(
+    `/v1/plugins/expiry-tracker/assets/${assetId}/classification`,
+    { category },
+    { household_id: householdId },
+    versionToken ? { "If-Match": versionToken } : {}
   );
 }
 
