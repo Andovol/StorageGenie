@@ -4,7 +4,7 @@ Stage: the household-and-document stage, approved by the owner on 2026-10-30 (`"
 
 Planned envelope: `SG-258 coder=opencode model=opencode-go/deepseek-v4.1-flash effort=max` — the project's model policy (the Coder's contract on the server; the Architect runs on `opencode-go/minimax-m3.1-flash`, so the work model is not the review model).
 
-Packet: `docs/packets/SG-258-household-documents.md` (commit `6e59d18`, pushed before the trigger). Context: the second-opinion reports `docs/worklogs/SG-260_report.md`, `docs/worklogs/SG-261_report.md`; the context pack `docs/reviews/2026-10-30-household-documents-context.md`.
+Packet: `docs/packets/SG-258-household-documents.md` (commit `c6bda4b`, pushed before the trigger). Context: the second-opinion reports `docs/worklogs/SG-260_report.md`, `docs/worklogs/SG-261_report.md`; the context pack `docs/reviews/2026-10-30-household-documents-context.md`.
 
 Trigger class: OpenCode `job_spawn`, wake on exit. ONE backgrounded call; call cap 2160 s (lane `RUN_BUDGET_S=2100` + 60 s stop window). SSH client, key `~/.ssh/storagegenie-architect-dispatch`, `-p 2222`, user `andrei`, host `87.106.66.242`, `-o BatchMode=yes`. The remote command carries the VERB only — no `dispatch` prefix.
 
@@ -12,7 +12,7 @@ Expected duration: ≈1500 s, bracketed from this lane's recent actuals (SG-240 
 
 Version chain: recorded `0.56.0` == published payload `contract-v0.56.0`; the host copy last echoed `0.53.0` at SG-257. The `0.53.0 → 0.56.0` delta is named in `docs/decisions/2026-10-30-session-approvals.md`; the Coder must echo its own copy's version and state it. The packet carries this chain.
 
-Checklist (`DISPATCH.md` §2): scope = the owner-approved D6 stage · Coder/model/effort stated (this note) · packet committed + pushed before the trigger (`6e59d18`) · worktree clean · no dispatch in flight (SG-261 exited; `SG-261 --status` checked) · nothing pushed while running · packet states expected conditions as hypotheses (`PB-1`) · expected duration recorded here · ONE backgrounded call · the version chain stated · the receipt commands are written out in the packet · the report requirement restated. No requirement pairs a runner action with in-slice proof.
+Checklist (`DISPATCH.md` §2): scope = the owner-approved D6 stage · Coder/model/effort stated (this note) · packet committed + pushed before the trigger (`c6bda4b`) · worktree clean · no dispatch in flight (SG-261 exited; `SG-261 --status` checked) · nothing pushed while running · packet states expected conditions as hypotheses (`PB-1`) · expected duration recorded here · ONE backgrounded call · the version chain stated · the receipt commands are written out in the packet · the report requirement restated. No requirement pairs a runner action with in-slice proof.
 
 Production basis (`G-K2`/`G-K3`): none for this slice. The work slice touches only the app code and tests; no host action, no database open, no provider, no credential, no live container, no deploy; $0. The rider SG-259 is the only host action, inside the D6-approved plan (one build, one recreate, read-only census, health checks, release record/tag).
 
