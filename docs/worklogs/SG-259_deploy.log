@@ -1,0 +1,30 @@
+=== SG-259 G1 build tree equality (Python tree only; worktree __pycache__ excluded) ===
+built_image_vs_worktree_python_diff_rc=0
+--- deploy gate: proceed only if rc=0 ---
+recreate_start=2026-10-30T13:39:22Z epoch=1793367562
+ Container storagegenie-backend-1 Recreate 
+ Container storagegenie-backend-1 Recreated 
+ Container storagegenie-backend-1 Starting 
+ Container storagegenie-backend-1 Started 
+recreate_rc=0
+recreate_end=2026-10-30T13:39:24Z epoch=1793367564 elapsed_s=2
+--- new container identity (inspect) ---
+waited_health_status=healthy wait_s=11
+Id=10f7fc586596ccca8443d07d565d87100b4531e7f32399a9488808b01cfa2e9a
+Image=sha256:d620e39da976ec169c10c87f71c21983384aa6c8a6361646a7d17720da1e6956
+Cmd=["uvicorn","app.server:app","--host","0.0.0.0","--port","8000"]
+RestartCount=0
+Status=running
+Health=healthy
+Created=2026-10-30T13:39:22.664569604Z
+StartedAt=2026-10-30T13:39:24.515696361Z
+--- alembic head after recreate ---
+head=20261023_sg233_reminder
+--- six health GETs after recreate ---
+health_1 {"status":"ok","db":"ok","storage":"ok"} http=200 time=0.004278
+health_2 {"status":"ok","db":"ok","storage":"ok"} http=200 time=0.016659
+health_3 {"status":"ok","db":"ok","storage":"ok"} http=200 time=0.003976
+health_4 {"status":"ok","db":"ok","storage":"ok"} http=200 time=0.004334
+health_5 {"status":"ok","db":"ok","storage":"ok"} http=200 time=0.003716
+health_6 {"status":"ok","db":"ok","storage":"ok"} http=200 time=0.004342
+2026-10-30T13:39:41Z

@@ -1,0 +1,76 @@
+=== SG-259 G2 — the served bytes are SG-258's, and nothing else ===
+2026-10-30T13:40:08Z
+--- runtime diff: pre-serve image b2c42abd -> worktree, over the served Python tree backend/app ---
+pre_image=sha256:b2c42abd942aa541034d3ef29b5b411919488af604f12fd6caa60788e3672c4b
+image_py_files=100 worktree_py_files=100
+measured_changed_files=3
+api/v1/plugins.py
+plugins/expiry_tracker.py
+services/expiry_engine.py
+files_only_in_image=0 files_only_in_worktree=0
+--- SG-258 product commit a9ede3e backend/app files ---
+backend/app/api/v1/plugins.py
+backend/app/plugins/expiry_tracker.py
+backend/app/services/expiry_engine.py
+--- set comparison: measured vs SG-258 backend/app files ---
+set_diff_rc=0
+extra_files=0 missing_files=0
+--- SG-258 other product files (not served runtime) ---
+backend/tests/test_plugin_expiry.py
+backend/tests/test_sg107_expiry_engine.py
+backend/tests/test_sg233_reminders.py
+docs/worklogs/SG-258_fail_backend.log
+docs/worklogs/SG-258_fail_frontend.log
+docs/worklogs/SG-258_g0.log
+docs/worklogs/SG-258_gate_backend.log
+docs/worklogs/SG-258_gate_frontend.log
+docs/worklogs/SG-258_health_end.log
+docs/worklogs/SG-258_pass_backend.log
+docs/worklogs/SG-258_pass_frontend.log
+docs/worklogs/SG-258_prestate.log
+docs/worklogs/SG-258_targeted_lint.log
+frontend/src/api/client.ts
+frontend/src/components/ExpiryEntryForm.test.tsx
+frontend/src/components/ExpiryEntryForm.tsx
+frontend/src/routes/AssetDetailPage.test.tsx
+frontend/src/routes/AssetDetailPage.tsx
+frontend/src/routes/ExpiryPage.test.tsx
+frontend/src/routes/ExpiryPage.tsx
+--- frontend bundle hashes and sizes (served over HTTP, pre and post) ---
+pre:
+14f82a64c5164e6fe3098a3e26f96d995e3bfe4f04ce6b4e135d87e5ba9c52f7  output/sg259/pre/index.html
+457010d8da9ba8863a7a6459817206f40f858f2bff756aff4da8ef83387c6356  output/sg259/pre/index-BRl7CaJb.js
+c3b58cda696a22970fc2a4a348849fc1359f2105f80f81304ed5dfd5ca31a557  output/sg259/pre/index-C07VbG0m.css
+output/sg259/pre/index.html bytes=944
+output/sg259/pre/index-BRl7CaJb.js bytes=327119
+output/sg259/pre/index-C07VbG0m.css bytes=4535
+post:
+index_http=200 bytes=944
+post_js_path=/assets/index-C3mGPvdC.js
+/assets/index-C3mGPvdC.js http=200 bytes=331565
+post_css_path=/assets/index-C07VbG0m.css
+/assets/index-C07VbG0m.css http=200 bytes=4535
+212dca3296ee6b4d10adb3af62a4f11324d491323ec6f294b68092c1d8a0df51  output/sg259/post/index.html
+348768ece7ed4c209c98114c29088bb0d157378db92770dc81e868306eb409df  output/sg259/post/index-C3mGPvdC.js
+c3b58cda696a22970fc2a4a348849fc1359f2105f80f81304ed5dfd5ca31a557  output/sg259/post/index-C07VbG0m.css
+output/sg259/post/index.html bytes=944
+output/sg259/post/index-C3mGPvdC.js bytes=331565
+output/sg259/post/index-C07VbG0m.css bytes=4535
+--- byte comparison (cmp rc, 0 = identical, 1 = changed) ---
+index.html pre_vs_post_cmp_rc=1
+js pre(index-BRl7CaJb.js)_vs_post(index-C3mGPvdC.js)_cmp_rc=0
+css pre_vs_post_cmp_rc=0
+post_index_vs_built_static_cmp_rc=0
+post_js_vs_built_static_cmp_rc=0
+post_css_vs_built_static_cmp_rc=0
+--- served tree equals worktree after the build ---
+cp_served_app_rc=0
+served_tree_vs_worktree_python_diff_rc=0
+served_py_files=100
+2026-10-30T13:40:08Z
+--- CORRECTION appended 2026-10-30T13:40:19Z (evidence-script artifact, no product effect) ---
+The earlier line js pre(...)_vs_post(...)_cmp_rc=0 was mis-measured: the two $(basename) expansions inside the same echo overwrote $? before it was read. Direct re-measurement:
+pre_js=output/sg259/pre/index-BRl7CaJb.js bytes=327119
+post_js=output/sg259/post/index-C3mGPvdC.js bytes=331565
+js_pre_vs_post_cmp_rc=1
+js_differing_bytes_cmp_l_lines=303963

@@ -1,0 +1,87 @@
+=== SG-259 G1 one build ===
+build_start=2026-10-30T13:38:58Z epoch=1793367538
+ Image storagegenie-backend Building 
+#1 [internal] load local bake definitions
+#1 reading from stdin 607B done
+#1 DONE 0.0s
+
+#2 [internal] load build definition from Dockerfile
+#2 transferring dockerfile: 1.06kB done
+#2 DONE 0.0s
+
+#3 [internal] load metadata for docker.io/library/node:20-alpine
+#3 DONE 0.0s
+
+#4 [internal] load metadata for docker.io/library/python:3.12.11-slim-bookworm@sha256:519591d6871b7bc437060736b9f7456b8731f1499a57e22e6c285135ae657bf7
+#4 DONE 0.7s
+
+#5 [internal] load .dockerignore
+#5 transferring context: 497B done
+#5 DONE 0.0s
+
+#6 [frontend-build 1/6] FROM docker.io/library/node:20-alpine@sha256:fb4cd12c85ee03686f6af5362a0b0d56d50c58a04632e6c0fb8363f609372293
+#6 resolve docker.io/library/node:20-alpine@sha256:fb4cd12c85ee03686f6af5362a0b0d56d50c58a04632e6c0fb8363f609372293 0.0s done
+#6 DONE 0.0s
+
+#7 [stage-1 1/9] FROM docker.io/library/python:3.12.11-slim-bookworm@sha256:519591d6871b7bc437060736b9f7456b8731f1499a57e22e6c285135ae657bf7
+#7 resolve docker.io/library/python:3.12.11-slim-bookworm@sha256:519591d6871b7bc437060736b9f7456b8731f1499a57e22e6c285135ae657bf7 0.0s done
+#7 DONE 0.0s
+
+#8 [internal] load build context
+#8 transferring context: 190.19MB 1.4s done
+#8 DONE 1.4s
+
+#9 [stage-1 7/9] RUN pip install --no-cache-dir "hatchling==1.32.0" "editables==0.6"
+#9 CACHED
+
+#10 [stage-1 8/9] RUN pip install --no-cache-dir --no-build-isolation --no-deps -e .
+#10 CACHED
+
+#11 [frontend-build 5/6] COPY frontend/ ./
+#11 CACHED
+
+#12 [frontend-build 6/6] RUN npm run build
+#12 CACHED
+
+#13 [stage-1 5/9] RUN pip install --no-cache-dir -r requirements.lock
+#13 CACHED
+
+#14 [stage-1 4/9] COPY backend/pyproject.toml backend/requirements.lock ./
+#14 CACHED
+
+#15 [frontend-build 4/6] RUN npm ci
+#15 CACHED
+
+#16 [stage-1 3/9] RUN apt-get update && apt-get install -y --no-install-recommends curl tesseract-ocr libzbar0 && rm -rf /var/lib/apt/lists/*
+#16 CACHED
+
+#17 [frontend-build 3/6] COPY frontend/package.json frontend/package-lock.json ./
+#17 CACHED
+
+#18 [frontend-build 2/6] WORKDIR /ui
+#18 CACHED
+
+#19 [stage-1 6/9] COPY backend/ ./
+#19 CACHED
+
+#20 [stage-1 2/9] WORKDIR /app
+#20 CACHED
+
+#21 [stage-1 9/9] COPY --from=frontend-build /ui/dist ./static
+#21 CACHED
+
+#22 exporting to image
+#22 exporting layers done
+#22 exporting manifest sha256:88e18a0b3deba616d877c2f57771352fd2ae2812950db7ae2545821e70f2c5e2 done
+#22 exporting config sha256:14f6ace701e1feb045d9bdcba20c2e3bc213297912c147d93775e1a5420b24b2 done
+#22 exporting attestation manifest sha256:732002c041f627b8630c70137e11eb324fbec2a409fafc28df891dda314c6ff3 0.0s done
+#22 exporting manifest list sha256:d620e39da976ec169c10c87f71c21983384aa6c8a6361646a7d17720da1e6956 done
+#22 naming to docker.io/library/storagegenie-backend:latest done
+#22 unpacking to docker.io/library/storagegenie-backend:latest done
+#22 DONE 0.1s
+
+#23 resolving provenance for metadata file
+#23 DONE 0.0s
+ Image storagegenie-backend Built 
+build_rc=0
+build_end=2026-10-30T13:39:01Z epoch=1793367541 elapsed_s=3

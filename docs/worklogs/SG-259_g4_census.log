@@ -1,0 +1,106 @@
+=== SG-259 G4 live census, post-serve (read-only mode=ro, docker exec -i) ===
+2026-10-30T13:40:54Z
+head=20261023_sg233_reminder
+table_count=29
+alembic_version=1
+assertion=40
+asset=7
+asset_evidence=20
+asset_fts=7
+asset_fts_config=1
+asset_fts_data=9
+asset_fts_docsize=7
+asset_fts_idx=7
+asset_location=1
+asset_relation=1
+audit_event=104
+candidate=10
+enrich_snapshot=4
+evidence=27
+guardrail_event=2
+household=1
+idempotency_key=11
+job=11
+job_step=72
+location=1
+observation=20
+planning_suggestion=0
+provider_call=39
+reminder=4
+review_task=9
+saved_search=0
+source_attribution=0
+user=2
+census_rc=0
+--- pre vs post census comparison ---
+pre_lines=31
+--- production sqlite main-file (post) ---
+424ac9d831daaae8c9d3e2a3684c7cad9724268f8688cff55c2e8e1f7673bc85  data/db/storagegenie.db
+db_bytes=765952 mtime=2026-10-27 21:50:55.516925932 +0000
+2026-10-30T13:40:54Z
+--- pre vs post census comparison (recomputed 2026-10-30T13:41:00Z) ---
+pre_lines=31 post_lines=0
+--- output/sg259/census_pre.txt	2026-10-30 13:41:00.354776163 +0000
++++ output/sg259/census_post.txt	2026-10-30 13:41:00.356776162 +0000
+@@ -1,31 +0,0 @@
+-alembic_version=1
+-assertion=40
+-asset=7
+-asset_evidence=20
+-asset_fts=7
+-asset_fts_config=1
+-asset_fts_data=9
+-asset_fts_docsize=7
+-asset_fts_idx=7
+-asset_location=1
+-asset_relation=1
+-audit_event=104
+-candidate=10
+-census_rc=0
+-enrich_snapshot=4
+-evidence=27
+-guardrail_event=2
+-household=1
+-idempotency_key=11
+-job=11
+-job_step=72
+-location=1
+-observation=20
+-planning_suggestion=0
+-provider_call=39
+-reminder=4
+-review_task=9
+-saved_search=0
+-source_attribution=0
+-table_count=29
+-user=2
+census_diff_rc=1
+pre_provider_call=39
+pre_reminder=4
+--- CORRECTION appended 2026-10-30T13:41:08Z (evidence-script artifact: the post extraction used a range header the G4 log does not contain, so census_post.txt was empty; no product effect) ---
+post_lines=30
+--- output/sg259/census_pre.txt	2026-10-30 13:41:00.354776163 +0000
++++ output/sg259/census_post.txt	2026-10-30 13:41:08.723772901 +0000
+@@ -11,7 +11,6 @@
+ asset_relation=1
+ audit_event=104
+ candidate=10
+-census_rc=0
+ enrich_snapshot=4
+ evidence=27
+ guardrail_event=2
+census_diff_rc=1
+pre_provider_call=39
+pre_reminder=4
+post_provider_call=39
+post_reminder=4
+post_table_count=table_count=29
+--- FINAL CORRECT COMPARISON appended 2026-10-30T13:41:14Z (both blocks parsed identically, census_rc excluded) ---
+pre_lines=30 post_lines=30
+census_diff_rc=0
+pre_provider_call=39
+pre_reminder=4
+pre_table_count=29
+post_provider_call=39
+post_reminder=4
+post_table_count=29

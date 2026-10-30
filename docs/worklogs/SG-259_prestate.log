@@ -1,0 +1,106 @@
+=== SG-259 G0 pre-serve state (read-only) ===
+2026-10-30T13:38:51Z
+--- git ---
+HEAD=bb4fae9da40983a0d018d0e4da85aab67c2c2173
+origin_automation=bb4fae9da40983a0d018d0e4da85aab67c2c2173
+?? docs/worklogs/SG-259_g0.log
+?? output/
+--- docker ps -a ---
+CONTAINER ID   IMAGE                   COMMAND                  CREATED        STATUS                   PORTS                      NAMES
+40bee778fa88   storagegenie-backend    "uvicorn app.server:…"   40 hours ago   Up 40 hours (healthy)    127.0.0.1:8003->8000/tcp   storagegenie-backend-1
+1aabf2905704   storagegenie-frontend   "docker-entrypoint.s…"   6 weeks ago    Exited (0) 6 weeks ago                              storagegenie-frontend-1
+--- container identity (inspect) ---
+Id=40bee778fa88dacb01236fff79d2ca0e5b3803b3cf0078cea76409c42e5049e2
+Image=sha256:b2c42abd942aa541034d3ef29b5b411919488af604f12fd6caa60788e3672c4b
+Cmd=["uvicorn","app.server:app","--host","0.0.0.0","--port","8000"]
+RestartCount=0
+Status=running
+Health=healthy
+Created=2026-10-28T21:26:44.631444958Z
+StartedAt=2026-10-28T21:26:45.567147289Z
+--- health start ---
+{"status":"ok","db":"ok","storage":"ok"}
+http=200 time=0.003696
+--- served index + bundle (HTTP, pre) ---
+index_http=200 bytes=944
+14f82a64c5164e6fe3098a3e26f96d995e3bfe4f04ce6b4e135d87e5ba9c52f7  output/sg259/pre/index.html
+js_path=/assets/index-BRl7CaJb.js
+/assets/index-BRl7CaJb.js http=200 bytes=327119
+457010d8da9ba8863a7a6459817206f40f858f2bff756aff4da8ef83387c6356  output/sg259/pre/index-BRl7CaJb.js
+css_path=/assets/index-C07VbG0m.css
+/assets/index-C07VbG0m.css http=200 bytes=4535
+c3b58cda696a22970fc2a4a348849fc1359f2105f80f81304ed5dfd5ca31a557  output/sg259/pre/index-C07VbG0m.css
+--- pre-serve image runtime tree extraction ---
+pre_image=sha256:b2c42abd942aa541034d3ef29b5b411919488af604f12fd6caa60788e3672c4b
+create_rc=0 cid=85842e6a9e73b7b7fb8bab0fb449f41d43be1418687cb4efe0574a292052f72c
+cp_rc=0
+rm_rc=0
+pre_image_app_py_files=100 worktree_app_py_files=100
+--- pre-serve image app tree vs worktree backend/app ---
+--- output/sg259/pre_app.sha	2026-10-30 13:38:51.779827394 +0000
++++ output/sg259/worktree_app.sha	2026-10-30 13:38:51.788827390 +0000
+@@ -14,7 +14,7 @@
+ a655659393c7bb2e912a4d45a7dd5bf604ce9e0a7354ca289fed55562e8f4019  ./api/v1/jobs.py
+ a7c0fbc0a63ba507c6ab96d1a8b72c08c32da3b7b6c3dae963cd1d749bc830e2  ./api/v1/locations.py
+ b7d39bc7b5db3ee7eb8d7e6ead164ef81169c6b1743ec58a0e3a2c19373e8a68  ./api/v1/planning.py
+-fe39353a0774678183cb0797e749efb561ec5dbd6faba0a0d3607ae60bc919a7  ./api/v1/plugins.py
++5a45d82f5f748b8173fe0a71c6a3db595df2af9db8d1eee2b975e35a73231054  ./api/v1/plugins.py
+ 4ef350eaf372a1cf35f9ce936a400702b97ef0a5c74bc1ffe36d12c74f365c0e  ./api/v1/relations.py
+ 98fcbd88d4acbd0720bba40f8fd0306b3f46fb5f790a83d6197bcc616bc8487e  ./api/v1/reminders.py
+ e394dc63b08a5dfa3ab23165e63aff99a29a7558081c2d06010c79e09c27d23f  ./api/v1/review_tasks.py
+@@ -46,7 +46,7 @@
+ 71429754f5a473a996088d4e2df33ad821a24bf23f59c816b41c282516e0c204  ./models/user.py
+ 5398ac06162dbb3b47ed05a5cd1fd44de88c6fc9c9867514ebc6a2accee13438  ./plugins/__init__.py
+ 13b11f7700a78709fac27feb8789d115c35d6ce6c0aaf6068fc782625d3acb26  ./plugins/descriptor.py
+-7710f1afae1606653074979c8aa5253990de169fea0fb845b4f5445c0ed92872  ./plugins/expiry_tracker.py
++ee726f31ffa1babd39b92c1d16276915d93e31748421e06b545a07b150818134  ./plugins/expiry_tracker.py
+ 315c2e74e7c6d1f207bce29df1b3cb8835df93e699dd0a0495687d847f7c2cae  ./plugins/registry.py
+ e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  ./schemas/__init__.py
+ e7562552dea07fb09ef4ab2cc1f51cfbb01efa5a5dd869ce97c2a9886136bb12  ./schemas/asset.py
+@@ -74,7 +74,7 @@
+ 8be4db240d66db3861aa1b0248ee159ad9e5508a3e17696d4382a360cd830aa8  ./services/enrich/snapshots.py
+ 7cfd13e50bb94ed80c8acd900a4cd4355f0b188b1824d4de8e4dbf6a8ad97a25  ./services/enrich/synthesize.py
+ a08b77683f965b7e85174b532689816c4bcbcc31dfe46c3f03b250a7b2efe617  ./services/evidence_service.py
+-00da03c6aa7b64f7cd80bf33ea4480b0f9a40bcffc3670337286a8dd10c135b1  ./services/expiry_engine.py
++e7deda1fb0487effffaad096b00b54fee72700d7863be5957cabdad7401364ca  ./services/expiry_engine.py
+ b7578a3f3fb327c4f2b3c3c1b7e63c9e0aa0d3cd9a4e3d502f2e443a0b6855f6  ./services/fts.py
+ 8802be0876669664f1849334f7ed747c5cd15022e17ee93958edc63943343a5c  ./services/google_taxonomy.py
+ 68518b019090e72de5582f18816a11377b38665942a6dad042b2c4669cc12ae5  ./services/job_service.py
+python_tree_diff_rc=1
+--- production sqlite main-file (pre) ---
+424ac9d831daaae8c9d3e2a3684c7cad9724268f8688cff55c2e8e1f7673bc85  data/db/storagegenie.db
+db_bytes=765952 mtime=2026-10-27 21:50:55.516925932 +0000
+--- alembic head + census (read-only mode=ro, docker exec -i) ---
+head=20261023_sg233_reminder
+table_count=29
+alembic_version=1
+assertion=40
+asset=7
+asset_evidence=20
+asset_fts=7
+asset_fts_config=1
+asset_fts_data=9
+asset_fts_docsize=7
+asset_fts_idx=7
+asset_location=1
+asset_relation=1
+audit_event=104
+candidate=10
+enrich_snapshot=4
+evidence=27
+guardrail_event=2
+household=1
+idempotency_key=11
+job=11
+job_step=72
+location=1
+observation=20
+planning_suggestion=0
+provider_call=39
+reminder=4
+review_task=9
+saved_search=0
+source_attribution=0
+user=2
+census_rc=0
+2026-10-30T13:38:51Z

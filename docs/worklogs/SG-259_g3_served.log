@@ -1,0 +1,59 @@
+=== SG-259 G3 served-artifact proofs (from the served image's own files, not the worktree) ===
+2026-10-30T13:40:37Z
+served_container=10f7fc586596ccca8443d07d565d87100b4531e7f32399a9488808b01cfa2e9a served_image=sha256:d620e39da976ec169c10c87f71c21983384aa6c8a6361646a7d17720da1e6956
+--- 1. served app/plugins/expiry_tracker.py: documents_other block, VALID_UNTIL, clear_expiry_date ---
+46:    VALID_UNTIL = "valid_until"
+161:    "documents_other": Category(
+162:        "documents_other",
+184:    "documents": "documents_other",
+185:    "documents/other": "documents_other",
+210:    "valid-until": DateType.VALID_UNTIL.value,
+464:            if category.slug != "documents_other":
+595:def clear_expiry_date(db: Session, asset: Asset) -> Assertion | None:
+--- block (served file lines 161-168) ---
+    "documents_other": Category(
+        "documents_other",
+        "Documents/other",
+        True,
+        True,
+        DOCUMENTS_TIERS,
+        NotificationTier.LONG_LEAD.value,
+    ),
+--- introspection of the served module ---
+documents_other.has_expiry=True
+DateType.VALID_UNTIL='valid_until'
+clear_expiry_date_callable=True
+introspection_rc=0
+--- 2. served app/api/v1/plugins.py: /expiry/clear route and _require_if_match ---
+64:def _require_if_match(if_match: str | None, active: Assertion | None) -> None:
+140:    _require_if_match(if_match, expiry_tracker.get_classification(db, asset.id))
+192:    _require_if_match(if_match, expiry_tracker.get_active_expiry(db, asset.id))
+228:@router.post("/assets/{asset_id}/expiry/clear")
+239:    _require_if_match(if_match, expiry_tracker.get_active_expiry(db, asset.id))
+plugins_grep_rc=0
+--- 3. served app/services/expiry_engine.py: _is_null_value and dateless ---
+132:def _is_null_value(value_json: str) -> bool:
+161:        return "dateless"
+166:    return "dateless"
+273:                reason = "dateless" if _is_null_value(accepted.value_json) else "unparseable"
+engine_grep_rc=0
+--- 4. served frontend JS bundle: classification control, Valid until, /expiry/clear ---
+served_js=output/sg259/post/index-C3mGPvdC.js sha256=348768ece7ed4c209c98114c29088bb0d157378db92770dc81e868306eb409df bytes=331565
+== Classification category hits=1 ==
+{display:"flex",gap:8,alignItems:"center",flexWrap:"wrap"},children:[o.jsxs("select",{"aria-label":"Classification category",value:V,onChange:T=>E(T.target.value),className:"bg-background text-foreground border-border focus-ring",style:{paddin
+== Save category hits=1 ==
+{padding:"6px 12px",borderRadius:6,border:"none",cursor:"pointer"},children:ce.isPending?"Saving…":"Save category"})]}),V==="documents_other"&&o.jsx("div",{className:"text-muted-foreground",style:{fontSize:12,marginTop:6},children:"D
+== Valid until hits=1 ==
+ture date",period_after_opening:"Period after opening",batch_lot_code:"Batch/lot code",valid_until:"Valid until"};function Y0(e){return!e||typeof e!="object"||Array.isArray(e)?null:e}function Mp({assetId:e,householdId:t,evidenceIds
+== /expiry/clear hits=1 ==
+hold_id:t},r?{"If-Match":r}:{})}function zx(e,t,n){return te(`/v1/plugins/expiry-tracker/assets/${e}/expiry/clear`,{},{household_id:t},n?{"If-Match":n}:{})}function Lx(e,t,n,r){return te(`/v1/plugins/expiry-tracker/assets/${e}/classi
+--- 5. served GET /v1/taxonomy ---
+taxonomy_http=200 bytes=1132
+plugin_id=expiry-tracker
+documents_other_present=True active=True notification='long-lead-60-30'
+valid_until_in_date_types=True
+date_types=expiry_date,best_before,use_by,manufacture_date,period_after_opening,batch_lot_code,valid_until
+taxonomy_assert_rc=0
+--- honest limit ---
+The live classification/date/clear writes are NOT exercised; the served code, bundle and taxonomy are the proof; the first real use awaits the owner.
+2026-10-30T13:40:48Z

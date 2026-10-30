@@ -1,0 +1,53 @@
+=== SG-259 G1 build-verify (cache-satisfied build: prove the image tree is current) ===
+2026-10-30T13:39:10Z
+--- built image identity ---
+Id=sha256:d620e39da976ec169c10c87f71c21983384aa6c8a6361646a7d17720da1e6956
+Created=2026-10-30T13:16:40.196570066Z
+RepoTags=["storagegenie-backend:latest"]
+built_id=sha256:d620e39da976ec169c10c87f71c21983384aa6c8a6361646a7d17720da1e6956
+--- extract built image /app/app and /app/static ---
+create_rc=0 cid=4744cfdb05290def66c7f9167b2313d757fe220c43289beccaca2b05ab516447
+cp_app_rc=0
+cp_static_rc=0
+rm_rc=0
+built_image_app_py_files=100 worktree_app_py_files=100
+--- built image app tree vs worktree backend/app (expect rc=0) ---
+Only in backend/app: __pycache__
+Only in backend/app/api: __pycache__
+Only in backend/app/api/v1: __pycache__
+Only in backend/app/models: __pycache__
+Only in backend/app/plugins: __pycache__
+Only in backend/app/schemas: __pycache__
+Only in backend/app/services: __pycache__
+Only in backend/app/services/analytics: __pycache__
+Only in backend/app/services/chat: __pycache__
+Only in backend/app/services/enrich: __pycache__
+Only in backend/app/services/planning: __pycache__
+Only in backend/app/services/providers: __pycache__
+Only in backend/app/services/reminders: __pycache__
+Only in backend/app/services/scene: __pycache__
+Only in backend/app/storage: __pycache__
+built_image_vs_worktree_diff_rc=1
+--- built image static bundle hashes/sizes ---
+assets/index-C07VbG0m.css bytes=4535
+assets/index-C3mGPvdC.js bytes=331565
+index.html bytes=944
+212dca3296ee6b4d10adb3af62a4f11324d491323ec6f294b68092c1d8a0df51  output/sg259/built_static/index.html
+c3b58cda696a22970fc2a4a348849fc1359f2105f80f81304ed5dfd5ca31a557  output/sg259/built_static/assets/index-C07VbG0m.css
+348768ece7ed4c209c98114c29088bb0d157378db92770dc81e868306eb409df  output/sg259/built_static/assets/index-C3mGPvdC.js
+--- built image static vs frontend/dist (worktree build output if present) ---
+Only in frontend/dist/assets: index-Bc0MxNy8.js
+Only in output/sg259/built_static/assets: index-C3mGPvdC.js
+diff -r output/sg259/built_static/index.html frontend/dist/index.html
+22c22
+<     <script type="module" crossorigin src="/assets/index-C3mGPvdC.js"></script>
+---
+>     <script type="module" crossorigin src="/assets/index-Bc0MxNy8.js"></script>
+built_vs_frontend_dist_rc=1
+--- pre-serve vs built static byte comparison ---
+index_html_pre_vs_built_cmp_rc=1
+pre_js=index-BRl7CaJb.js new_js=index-C3mGPvdC.js
+js_pre_vs_built_cmp_rc=1
+pre_css=index-C07VbG0m.css new_css=index-C07VbG0m.css
+css_pre_vs_built_cmp_rc=0
+2026-10-30T13:39:11Z
