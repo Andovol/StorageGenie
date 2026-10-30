@@ -1,5 +1,7 @@
 # StorageGenie — product roadmap
 
+> **UNDER RECALIBRATION since 2026-10-30.** The owner is resetting the product goals (D8): a beautiful, creative catalog of everything owned, with category modules (Pantry first, Wardrobe second), AI imagery and web enrichment. The rows below describe what is built; their order and "Next action" are **not** the plan until this file is rewritten. Owner words: `docs/decisions/2026-10-30-session-approvals.md`; open questions and research: `docs/research/2026-10-30-requirements-recalibration.md`.
+
 Date: 2026-10-23. Source: the product blueprint in `inception/generic_asset_catalog_expiry_tracker_blueprint.md` compared against the code at commit `54c387a` (branch `automation`). Rows 9 and 11 re-measured and updated 2026-10-24 against the served build (SG-240, SG-241, SG-244).
 
 Parked ideas that wait on a named trigger live in `docs/backlog.md`. This file holds what the product itself still needs.

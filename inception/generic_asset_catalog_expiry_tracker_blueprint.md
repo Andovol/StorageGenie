@@ -39,7 +39,7 @@ Personal, multi-user product. Users belong to households (a household is a share
 - Perfect object recognition in cluttered scenes.
 - Full inventory accounting, warehouse optimization, or ERP replacement.
 - A native mobile app; responsive web capture is sufficient initially.
-- Image generation as a core requirement (optional presentation plugin only, later).
+- Image generation as a core requirement (optional presentation plugin only, later). **Superseded 2026-10-30 by the owner's direction (D8, `docs/decisions/2026-10-30-session-approvals.md`): AI image generation plays a key role.**
 - Enforcing an expiry date on categories/assets that don't logically have one (e.g., clothing, tools, most documents).
 
 ---
