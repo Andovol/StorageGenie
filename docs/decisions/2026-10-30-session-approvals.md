@@ -77,3 +77,13 @@ Owner, 2026-10-30 (this chat), verbatim: **"D7 - as recommended. Lets close this
 ## ID note
 
 This session uses plain `D6` per `G-M6`'s session-local identifiers; the repo's date-qualified decision numbers (`D-1024-…`, `D-1026-…`) are for records that outlive the session and are not reused here. `D6` maps to the stage approval, `D6a` to the adoption, and `D7` to the three-fix stage.
+
+## Second session 2026-10-30 — the full audit (Claude as Architect)
+
+The owner asked for a full audit of the rules and the roadmap (*"I felt this project was not going in the right direction"*). The audit found: the live census (SG-259 G4) holds 7 assets, 10 candidates, 39 provider calls; about 1 in 5 of SG-200–SG-265 changed the product (derived from the slice titles); 1,088 of 1,299 commits touch `docs/`; the roadmap's "Next action" and row 9 contradict `STATE.md`.
+
+**D9 — process: keep Launcher at L3, unchanged.** Owner, verbatim: **"D9 - clearly B."** Option B was "keep the current Launcher L3 process: packets, remote builder, separate deploy riders, second opinion on 🟠/🔴". The lean-mode option A is rejected.
+
+**D8 — roadmap driver: not decided; the owner is recalibrating the goals.** Owner, verbatim: **"D8 - I want to recalibrate the goals of this project, so first I want you to first state your understanding of this project, and I will steer it forward."** The roadmap stays as written until the owner steers; nothing is dispatched on it meanwhile.
+
+**D10 — run D7 under the D9 process:** not yet answered; D7 (approved earlier today) is held behind the D8 recalibration.
