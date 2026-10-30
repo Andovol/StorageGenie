@@ -62,6 +62,18 @@ G-L1 VERSION CURRENT adopted=0.56.0 shared=0.56.0
 
 **Live-pointer updates:** `AGENTS.md:4` only. Every other hit of the old string is history (decision files, packets, worklogs, ratings rows) and stays byte-identical.
 
+## D7 — the three-fix stage, approved
+
+Owner, 2026-10-30 (this chat), verbatim: **"D7 - as recommended. Lets close this session and start a fresh one."**
+
+**Scope approved:** the three SG-258 findings, as recommended in the D7 message — **E2** (hide the review-workspace form when its caller has no asset data; the asset page is the date path), **F1 scoped** (the reverse move to Non-perishable resolves the open date-prompt task and reports the resolved ids; the extraction/split producers checked), **G2** ("No date" in the form's state line; pairs with "Date cleared."), **H1** (one work slice + one deploy rider). The stage is the three fixes only; no new feature; no migration; no production data write; no provider; $0. The rider deploys the work slice as its own slice.
+
+**Autonomy:** L3 — the owner approved the stage; the Architect packets, dispatches, audits and rates the slices without asking.
+
+**Second opinion:** SG-264 blind / SG-265 critique (`muse-spark-1.3-contributor`, xhigh, `agent=plan`) — Phase A picked E1/F1/G1/H1; the critique changed the recommendation on D-E to E2 and on D-G to G2; the dispositions are in `docs/reviews/review-ledger.md`. The blind pick agreed on D-F and D-H; the owner approved the final **E2/F1-scoped/G2/H1**.
+
+**Close:** the owner asked to close this session and start a fresh one; the close is `CLOSE_COMPLETE 2026-10-30`; the next session starts the D7 work slice.
+
 ## ID note
 
-This session uses plain `D6` per `G-M6`'s session-local identifiers; the repo's date-qualified decision numbers (`D-1024-…`, `D-1026-…`) are for records that outlive the session and are not reused here. `D6` maps to the stage approval and `D6a` to this adoption only.
+This session uses plain `D6` per `G-M6`'s session-local identifiers; the repo's date-qualified decision numbers (`D-1024-…`, `D-1026-…`) are for records that outlive the session and are not reused here. `D6` maps to the stage approval, `D6a` to the adoption, and `D7` to the three-fix stage.
