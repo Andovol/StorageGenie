@@ -16,6 +16,8 @@ Owner, 2026-10-30 (this chat), verbatim: **"d6 - approved"**
 
 **Second opinion (SG-260 blind · SG-261 critique, `muse-spark-1.3-contributor`):** picked **A1 / B1 / C1 / D1**, agreeing with the Architect. Strongest objection — a document's OCR date can be an issue date, and flipping the flag forces a date record on keepsakes — **accepted** by suppressing the observed-date proposal for documents, adding the category hint (keepsakes under Non-perishable) and keeping the owner's approved documents outcome. The critique's other six findings are accepted as refinements: optional `If-Match` on the classify/manual/clear routes, accepted-only date preservation plus a reverse-move clear, the classification-profile gate and exact-field/latest-`created_at` read, Clear parity with D4, and a `valid_until` date type. The keepsake scope risk is **noted**, not reopened; the owner's D6 approval is the decision. Full record: `docs/reviews/review-ledger.md`.
 
+**Outcome (2026-10-30):** SG-258 (93) + SG-259 (96) are live; release `docs/releases/2026-10-30-sg258.md`, tag `release-2026-10-30-sg258`; the served runtime diff is exactly the three SG-258 backend files, the JS bundle changed, the 29-table census identical, health 200. The three audit findings are the next stage (D7 and its second opinion SG-264/265).
+
 ## D6a — contract 0.56.0 adopted
 
 **Question put:** adopt 0.56.0 or stay on 0.53.0. The start command reported every installed rule copy and the version line **BEHIND**, and the dispatch checklist requires recorded == published before any product work — so the approved stage could not dispatch on 0.53.0.
