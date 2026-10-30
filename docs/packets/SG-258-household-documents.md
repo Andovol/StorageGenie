@@ -82,7 +82,7 @@ In `classify_asset` (`expiry_tracker.py:426-451`):
 
 **The gate:**
 
-- The new tests must be **seen to FAIL on the pre-change code** and pass on the candidate; commit both runs (`PG-EV-09`). The discriminating cases: documents manual entry 422 on base; the classify control absent; the clear route 404; the form gate absent; the exact-field active read absent.
+- The new tests must be **seen to FAIL on the pre-change code** and pass on the candidate; commit both runs (`PG-EV-09`). The base checkout uses the same temporary-SQLite test settings; no secret file is copied (`PG-EV-13`). The discriminating cases: documents manual entry 422 on base; the classify control absent; the clear route 404; the form gate absent; the exact-field active read absent.
 - `make backend-test` once: the host suite green, the two marked tests still **deselected**, then the image proof. Quote the exact counts; do not force a fixed number (`PG-IC-08`).
 - `make frontend-test` once: the full frontend suite green; quote its counts.
 - Run the affected backend test modules **twice consecutively** and the affected frontend test files **twice**; both runs pass (`PG-DP-04`, the new routes are entry points).
