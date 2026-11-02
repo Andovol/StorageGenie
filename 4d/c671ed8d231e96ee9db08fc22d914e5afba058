@@ -80,3 +80,5 @@ UNCLEAR DURING EXECUTION: source confirms the dead end but reveals split-child r
 UNCLEAR REMAINING: resolved BASE commit, runtime identity metadata, live affected rows, caller-level idempotency and extraction-flag semantics.
 Debug-Report-End
 moved=no
+
+Settings: coder=opencode coder_source=command model=openai/gpt-6.1-sol model_source=command effort=medium effort_source=command agent=plan agent_source=command
