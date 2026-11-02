@@ -22,6 +22,7 @@ Each stage needs the owner's approval. Pantry first and Wardrobe second are the 
 
 ### A. Clear the deck
 
+- **Done and live 2026-11-02:** SG-262, SG-263; `docs/releases/2026-11-02-sg262.md`.
 - The D7 fixes as approved: hide the review form when it has no asset data (E2); the reverse move resolves the open date task (F1 scoped); "No date" wording (G2); one work slice plus one deploy rider (H1).
 - The packet checks each fix against the expiry split (Q21). `UNVERIFIED — my inference`: none depends on it.
 
