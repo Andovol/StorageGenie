@@ -118,4 +118,8 @@ Read as: **the larger stage C approved**, as put to the owner: SG-270 to SG-273 
 
 Read as: build and deploy slices dispatched from now on run `coder=opencode model=opencode-go/muse-spark-1.3-contributor effort=xhigh` (`AGENTS.md` owns the value). SG-276 was already running on `deepseek-v4.1-flash` and is not touched. The review lane stays on Sol 6.1.
 
+**D16 and a close, 2026-11-02, verbatim:** *"D16 - ok. Lets close the session now"*
+
+Read as: **one migration widening the live `candidate` state constraint approved**, as put to the owner: build SG-279, a non-mutating check of the lane's rights and the live objects, then deploy SG-280 with a stopped app, a proven backup and the stated recovery states; 2 more builder runs on Muse 1.3 Contributor at xhigh. Second opinion: SG-277, SG-278.
+
 Read as (round 2): Pantry first, Wardrobe second, later modules chosen one at a time with the owner (Q6); one item = one module over a shared core (Q7); expiry design is the Architect's to propose (Q8); every product photo shares one cohesive look (Q9); recipes later (Q10); real quantities, quick to change or mark gone (Q11); garments by photo and by web lookup (Q12); outfits as flat-lay, plus an AI user avatar for virtual try-on later (Q13); outfit drivers open (Q14); AI imagery uses to be researched (Q15); spend frugal, no fixed cap (Q16); enrichment per module as proposed (Q17); phone capture, phone + desktop review (Q18); design references and "inspire creativity" to be researched (Q19, Q20).
