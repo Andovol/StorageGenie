@@ -102,3 +102,5 @@ UNCLEAR DURING EXECUTION: It does not expose `.git`; live DDL and restore capabi
 UNCLEAR REMAINING: Resolved BASE commit, exact PG-PR-05 wording, live schema/enforcement, migration rehearsal, and successful restore proof.
 Debug-Report-End
 moved=no
+
+Settings: coder=opencode coder_source=command model=openai/gpt-6.1-sol model_source=command effort=medium effort_source=command agent=plan agent_source=command
