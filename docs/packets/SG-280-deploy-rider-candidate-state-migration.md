@@ -36,7 +36,7 @@ The code writes candidate states `split` and `merged`, and the live table refuse
 - `DOCKER_CONFIG` to a writable directory under `output/SG-280-scratch/`, `DOCKER_HOST=unix:///run/dispatch-storagegenie-SG-280/docker.sock`, and `docker version` shows a **Server** section. Scratch stays in `output/SG-280-scratch/`, removed by exact path at the end; never touch `output/` itself or `output/dispatch`.
 - `curl -s http://127.0.0.1:8003/v1/health` quoted.
 - Expected, hypotheses from `docs/releases/2026-11-02-sg270.md`: container `d972bc75`, image `sha256:96a66241`, head `20261023_sg233_reminder`, 29 tables, `asset` 7, `candidate` 10. **Record the full old image id; it is the recovery image.** A running image you cannot account for is a STOP.
-- `git check-ignore` proves `data/db/` and `output/` are ignored (`PG-SC-10`). Otherwise STOP.
+- `git check-ignore` proves `data/db/SG-280-backup-probe.db` and `output/SG-280-scratch/x` are ignored (`PG-SC-10`). The first must match `data/db/*.db`. Otherwise STOP.
 - **Rights, proven only on your own throwaway objects (`PG-PR-01`):** run a scratch `busybox` container with a bind mount under the scratch path and a label `sg280-scratch`, stop it, remove it, and `docker tag` the old id to a scratch tag and remove that tag. Never probe by stopping or restarting anything of the app's. `docker compose stop` on the live service cannot be proven in advance; that is accepted.
 
 ## G1 — Build the new image, no recreate
@@ -71,7 +71,7 @@ Any step not as expected: **STOP in S0**, app untouched.
 Before starting, confirm no dispatch-unrelated container uses the file. Then:
 
 1. `docker compose stop backend`; confirm not running, and no restart over 15 s. **State S1.**
-2. Backup with SQLite's backup API to `data/db/backups/SG-280-<UTC>/storagegenie.db`, retained, not removed by you. Restore it to a scratch path and prove `integrity_check`, `foreign_key_check`, head and all table counts equal to the stopped live file.
+2. Backup with SQLite's backup API to `data/db/SG-280-backup-<UTC>.db`, retained, not removed by you. Restore it to a scratch path and prove `integrity_check`, `foreign_key_check`, head and all table counts equal to the stopped live file.
 3. `sha256` of the live file. **Now state S2.** One `docker compose run --rm --no-deps backend alembic upgrade head`.
 4. Compare: `alembic` revision `20261102_sg279_candidate_state`; the live `sqlite_master` differs from G2 only in `candidate`, by the same text diff as G3 step 1; all table counts equal; candidate row hash equal; `integrity_check`, `foreign_key_check`; no `_alembic_tmp_candidate`.
 5. `docker compose up -d --no-deps --force-recreate backend`. **Now state S3.** New container id, image id, `Cmd`, restart count, health status.
@@ -95,7 +95,7 @@ Before starting, confirm no dispatch-unrelated container uses the file. Then:
 
 ## Scope ceiling
 
-- **Written:** `docs/worklogs/SG-280*` only in git; `output/SG-280-scratch/`; `data/db/backups/SG-280-<UTC>/`; the live `candidate` table through the one migration, and the live file through S2's restore if it fires.
+- **Written:** `docs/worklogs/SG-280*` only in git; `output/SG-280-scratch/`; `data/db/SG-280-backup-<UTC>.db`; the live `candidate` table through the one migration, and the live file through S2's restore if it fires.
 - **No product, config, schema, migration, dependency or test byte.** No other service touched. No data repair. Stored photos and files are untouched: no real storage mount in scratch containers.
 - **The authorised runtimes:** the docker commands named here and the rehearsal script.
 
