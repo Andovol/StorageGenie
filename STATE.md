@@ -8,8 +8,8 @@
 
 **Ordered work for stage C, from the walk (`docs/worklogs/SG-269_findings.md`, disposition in `SG-269_audit.md`):**
 
-1. **SG-270, flow fixes: built, rated 91 (`docs/worklogs/SG-270_audit.md`), deploy held.** **SG-275 fixes I1** (accepting an older committed candidate makes a second item). **Then rider SG-276** deploys both and counts, read-only, live open date tasks by candidate state.
-2. **SG-271, carry the AI's work through, then its rider:** `needs_evidence` can open a false date task (SG-270 report); an accepted candidate reloaded has no link to its item; F4 keep the proposed date on classify and offer Accept; F5, F12 use the proposed category; F7 rename one "category" control; F8 stop a deliberately dateless item nagging; F11 if cheap.
+1. **SG-270, flow fixes: rated 91; SG-275, its repair: rated 97** (`docs/worklogs/SG-270_audit.md`, `SG-275_audit.md`). **Rider SG-276** deploys both and counts, read-only, live open date tasks by candidate state.
+2. **SG-271, carry the AI's work through, then its rider:** `needs_evidence` can open a false date task (SG-270 report); a candidate already committed links to its item, including on reload, and stops offering decisions (SG-275 audit I1); F4 keep the proposed date on classify and offer Accept; F5, F12 use the proposed category; F7 rename one "category" control; F8 stop a deliberately dateless item nagging; F11 if cheap.
 3. **SG-272, gone, put back, quantities, then its rider:** per the roadmap's stage C, with F3 and F13.
 4. **SG-273, the Pantry view, then its rider:** per the roadmap, with F9 and F10. Say in the packet how screens get seen (Chrome exists on the box, no driver).
 5. **The owner tries it on one real shelf**, then again after ordinary household use.
