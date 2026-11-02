@@ -1,0 +1,310 @@
+/home/andrei/StorageGenie/backend/venv/lib/python3.12/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+  from starlette.testclient import TestClient as TestClient  # noqa
+Barcode extraction unavailable: pyzbar/libzbar is not installed
+OCR extraction unavailable: tesseract is not installed or it's not in your PATH. See README file for more information.
+Barcode extraction unavailable: pyzbar/libzbar is not installed
+OCR extraction unavailable: tesseract is not installed or it's not in your PATH. See README file for more information.
+=== J3 scripted dated food ===
+RUN 200 AWAITING_REVIEW provider_invocations 1
+CANDIDATE {
+ "id": "01a19ca7-eaa0-73c3-8315-9dba4b1bc911",
+ "state": "proposed",
+ "fields": {
+  "display_name": {
+   "value": "Whole Milk",
+   "confidence": 0.97,
+   "source_type": "extraction",
+   "provider": "p2-scripted",
+   "model": "p2-scripted-model",
+   "prompt_template_version": "extract-food-v4",
+   "provider_call_id": "01a19ca7-ea98-78c0-9f05-413be84f5573"
+  },
+  "asset_type": {
+   "value": "unknown",
+   "confidence": null,
+   "source_type": "deterministic",
+   "provider": null,
+   "model": null,
+   "prompt_template_version": null,
+   "provider_call_id": null
+  },
+  "status": {
+   "value": "ACTIVE",
+   "confidence": null,
+   "source_type": "deterministic",
+   "provider": null,
+   "model": null,
+   "prompt_template_version": null,
+   "provider_call_id": null
+  },
+  "expiry_date": {
+   "value": "2030-01-15",
+   "confidence": 0.97,
+   "source_type": "extraction",
+   "provider": "p2-scripted",
+   "model": "p2-scripted-model",
+   "prompt_template_version": "extract-food-v4",
+   "provider_call_id": "01a19ca7-ea98-78c0-9f05-413be84f5573"
+  },
+  "lot": {
+   "value": "L-77",
+   "confidence": 0.97,
+   "source_type": "extraction",
+   "provider": "p2-scripted",
+   "model": "p2-scripted-model",
+   "prompt_template_version": "extract-food-v4",
+   "provider_call_id": "01a19ca7-ea98-78c0-9f05-413be84f5573"
+  }
+ },
+ "review_task_ids": []
+}
+CANDIDATE_READ {
+ "state": "proposed",
+ "asset_id": "01a19ca7-1ddb-7f03-be68-3e76aabe8493",
+ "review_task_ids": [],
+ "fields": {
+  "display_name": {
+   "value": "Whole Milk",
+   "confidence": 0.97,
+   "source_type": "extraction",
+   "provider": "p2-scripted",
+   "model": "p2-scripted-model",
+   "prompt_template_version": "extract-food-v4",
+   "provider_call_id": "01a19ca7-ea98-78c0-9f05-413be84f5573"
+  },
+  "asset_type": {
+   "value": "unknown",
+   "confidence": null,
+   "source_type": "deterministic",
+   "provider": null,
+   "model": null,
+   "prompt_template_version": null,
+   "provider_call_id": null
+  },
+  "status": {
+   "value": "ACTIVE",
+   "confidence": null,
+   "source_type": "deterministic",
+   "provider": null,
+   "model": null,
+   "prompt_template_version": null,
+   "provider_call_id": null
+  },
+  "expiry_date": {
+   "value": "2030-01-15",
+   "confidence": 0.97,
+   "source_type": "extraction",
+   "provider": "p2-scripted",
+   "model": "p2-scripted-model",
+   "prompt_template_version": "extract-food-v4",
+   "provider_call_id": "01a19ca7-ea98-78c0-9f05-413be84f5573"
+  },
+  "lot": {
+   "value": "L-77",
+   "confidence": 0.97,
+   "source_type": "extraction",
+   "provider": "p2-scripted",
+   "model": "p2-scripted-model",
+   "prompt_template_version": "extract-food-v4",
+   "provider_call_id": "01a19ca7-ea98-78c0-9f05-413be84f5573"
+  }
+ }
+}
+ACCEPT 200 {"state": "accepted", "asset_id": "01a19ca7-eae2-7a70-a812-c2bff1ce9557", "created": true}
+ASSET_AFTER_ACCEPT {
+ "asset_type": "unknown",
+ "assertions": [
+  [
+   "asset_type",
+   "unknown",
+   "proposed"
+  ],
+  [
+   "display_name",
+   "Whole Milk",
+   "accepted"
+  ],
+  [
+   "expiry_date",
+   "2030-01-15",
+   "proposed"
+  ],
+  [
+   "lot",
+   "L-77",
+   "proposed"
+  ],
+  [
+   "status",
+   "ACTIVE",
+   "accepted"
+  ]
+ ]
+}
+EXPIRY_AFTER_ACCEPT {"rows": ["Whole Milk"], "unresolved": [], "summary": {"by_tier": {"upcoming": 1}, "by_bucket": {"this-month": 1}, "unresolved": 0, "total": 1}}
+CLASSIFY 200 {"review_task": "01a19ca7-eb23-7e03-93a1-3645c2b34268", "resolved_review_task_ids": []}
+ASSET_AFTER_CLASSIFY {
+ "assertions": [
+  [
+   "asset_type",
+   "unknown",
+   "proposed"
+  ],
+  [
+   "display_name",
+   "Whole Milk",
+   "accepted"
+  ],
+  [
+   "expiry_date",
+   "2030-01-15",
+   "proposed"
+  ],
+  [
+   "lot",
+   "L-77",
+   "proposed"
+  ],
+  [
+   "plugin:expiry-tracker/classification",
+   {
+    "category": "food_beverages",
+    "label": "Food & beverages",
+    "profile": {
+     "notification_tier": "upcoming",
+     "notification_days": 30,
+     "tier_defaults": {
+      "critical": 1,
+      "urgent": 7,
+      "upcoming": 30
+     },
+     "opened_date_tracking": false,
+     "disposal_guidance": true
+    }
+   },
+   "accepted"
+  ],
+  [
+   "plugin:expiry-tracker/expiry_date",
+   {
+    "status": "unknown"
+   },
+   "needs_evidence"
+  ],
+  [
+   "status",
+   "ACTIVE",
+   "accepted"
+  ]
+ ]
+}
+EXPIRY_AFTER_CLASSIFY {"rows": ["Whole Milk"], "unresolved": [{"asset_id": "01a19ca7-eae2-7a70-a812-c2bff1ce9557", "reason": "needs_evidence"}]}
+TASKS_FOR_ASSET [
+ {
+  "id": "01a19ca7-eb23-7e03-93a1-3645c2b34268",
+  "task_type": "expiry.manual_entry",
+  "priority": "high",
+  "subject_ref": "01a19ca7-eae2-7a70-a812-c2bff1ce9557",
+  "proposed_change": {
+   "field_path": "plugin:expiry-tracker/expiry_date",
+   "prompt": "Enter expiry date manually"
+  },
+  "status": "open",
+  "household_id": "01a19ca5-61fb-7e31-91a8-6ababa435aac",
+  "created_at": "2026-11-02T14:26:52",
+  "updated_at": "2026-11-02T14:26:52"
+ }
+]
+MANUAL_DATE 200 {"resolved": ["01a19ca7-eb23-7e03-93a1-3645c2b34268"], "value": {"expiry_date": "2030-01-15", "date_type": "expiry_date"}}
+EXPIRY_AFTER_MANUAL {"rows": [["Whole Milk", "2026-11-20"], ["Whole Milk", "2030-01-15"]], "unresolved": []}
+=== J4 scripted needs_evidence ===
+RUN 200 AWAITING_REVIEW provider_invocations 1
+CANDIDATE {
+ "id": "01a19ca7-eba6-7d12-a386-ea91b2e6583d",
+ "state": "proposed",
+ "fields": {
+  "display_name": {
+   "value": "Mystery Yogurt",
+   "confidence": 0.4,
+   "source_type": "extraction",
+   "provider": "p2-scripted",
+   "model": "p2-scripted-model",
+   "prompt_template_version": "extract-food-v4",
+   "provider_call_id": "01a19ca7-eb9f-7002-9ea0-d36148ac7031"
+  },
+  "asset_type": {
+   "value": "unknown",
+   "confidence": null,
+   "source_type": "deterministic",
+   "provider": null,
+   "model": null,
+   "prompt_template_version": null,
+   "provider_call_id": null
+  },
+  "status": {
+   "value": "ACTIVE",
+   "confidence": null,
+   "source_type": "deterministic",
+   "provider": null,
+   "model": null,
+   "prompt_template_version": null,
+   "provider_call_id": null
+  }
+ },
+ "review_task_ids": [
+  "01a19ca7-eba7-7871-88d2-680889bc508d"
+ ]
+}
+TASK {
+ "id": "01a19ca7-eba7-7871-88d2-680889bc508d",
+ "task_type": "expiry.manual_entry",
+ "priority": "high",
+ "subject_ref": "01a19ca7-eba6-7d12-a386-ea91b2e6583d",
+ "proposed_change": {
+  "candidate_id": "01a19ca7-eba6-7d12-a386-ea91b2e6583d",
+  "prompt": "Enter expiry date manually"
+ },
+ "status": "open",
+ "household_id": "01a19ca5-61fb-7e31-91a8-6ababa435aac",
+ "created_at": "2026-11-02T14:26:52",
+ "updated_at": "2026-11-02T14:26:52"
+}
+BARE_RESOLVE 422 {"type":"about:blank","title":"Unprocessable Entity","status":422,"detail":"task requires the expiry_date before it can be resolved; enter it through the expiry manual-entry path"}
+ACCEPT_WITH_TASK 409 {"type":"about:blank","title":"Conflict","status":409,"detail":"Candidate has unresolved review tasks"}
+CANDIDATE_READ {
+ "state": "proposed",
+ "asset_id": "01a19ca7-1ddb-7f03-be68-3e76aabe8493",
+ "review_task_ids": [
+  "01a19ca7-eba7-7871-88d2-680889bc508d"
+ ],
+ "needs_evidence": null,
+ "fields": {
+  "display_name": {
+   "value": "Mystery Yogurt",
+   "confidence": 0.4,
+   "source_type": "extraction",
+   "provider": "p2-scripted",
+   "model": "p2-scripted-model",
+   "prompt_template_version": "extract-food-v4",
+   "provider_call_id": "01a19ca7-eb9f-7002-9ea0-d36148ac7031"
+  },
+  "asset_type": {
+   "value": "unknown",
+   "confidence": null,
+   "source_type": "deterministic",
+   "provider": null,
+   "model": null,
+   "prompt_template_version": null,
+   "provider_call_id": null
+  },
+  "status": {
+   "value": "ACTIVE",
+   "confidence": null,
+   "source_type": "deterministic",
+   "provider": null,
+   "model": null,
+   "prompt_template_version": null,
+   "provider_call_id": null
+  }
+ }
+}

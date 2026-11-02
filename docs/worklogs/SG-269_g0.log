@@ -1,0 +1,22 @@
+SG-269 G0 log — throwaway app proof (UTC)
+start_epoch=1793629312 stop_epoch=1793630082
+start_utc=2026-11-02T14:21:52Z stop_utc=2026-11-02T14:34:42Z
+cwd=/home/andrei/StorageGenie scratch=/home/andrei/StorageGenie/output/SG-269-scratch
+remote=git@github.com:Andovol/StorageGenie.git
+BASE ref=origin/automation BASE commit=4d1114a539ae8f6807d3641f89102117ec51ef24
+live_health_start_http=200 body={"status":"ok","db":"ok","storage":"ok"}
+live_health_end_http=200 body={"status":"ok","db":"ok","storage":"ok"}
+live_probe_only=http://127.0.0.1:8003/v1/health (read-only GET); no /data/db, container or storage access
+alembic=backend/venv/bin/alembic -c scratch/alembic.ini upgrade head (temporary file only)
+alembic_head=20261023_sg233_reminder (head)
+household=01a19ca5-61fb-7e31-91a8-6ababa435aac (app.seed; temporary DB)
+settings_proof:
+  database_url=sqlite:////home/andrei/StorageGenie/output/SG-269-scratch/data/sg269.db
+  storage_root=/home/andrei/StorageGenie/output/SG-269-scratch/storage
+  sg_provider_id=fake sg_consent=False
+  opencode_key_set=False jina_key_set=False openrouter_key_set=False
+  no .env exists in scratch cwd; backend/.env never read because cwd was scratch
+port=8011 (confirmed free by bind; live app stays on 8003)
+browser_check=google-chrome and google-chrome-stable exist on PATH; no Playwright/Puppeteer driver; no frontend server authorized, so no browser drive
+server_pid=3356668 throwaway uvicorn http://127.0.0.1:8011; stopped by that PID
+throwaway_db_size_bytes=479232

@@ -1,0 +1,167 @@
+SG-269 walk log — real HTTP routes on throwaway app (port 8011) and in-process TestClient for scripted AI
+
+### j1_create.json
+{"id":"01a19ca6-6682-7520-8173-04366bb8234e","household_id":"01a19ca5-61fb-7e31-91a8-6ababa435aac","display_name":"Whole Milk","asset_type":"product","status":"ACTIVE","quantity":1.0,"unit":"bottle","condition":null,"version":1,"created_at":"2026-11-02T14:25:13","updated_at":"2026-11-02T14:25:13","evidence":[],"assertions":[{"id":"01a19ca6-6685-7820-874d-663347d4dd5c","field_path":"asset_type","value":"product","source_type":"user","confidence":null,"review_state":"accepted","source_evidence_ids":null,"created_at":"2026-11-02T14:25:13"},{"id":"01a19ca6-6685-7820-874d-6673dca06979","field_path":"display_name","value":"Whole Milk","source_type":"user","confidence":null,"review_state":"accepted","source_evidence_ids":null,"created_at":"2026-11-02T14:25:13"},{"id":"01a19ca6-6685-7820-874d-66445461eb11","field_path":"quantity","value":1.0,"source_type":"user","confidence":null,"review_state":"accepted","source_evidence_ids":null,"created_at":"2026-11-02T14:25:13"},{"id":"01a19ca6-6685-7820-874d-666ef8e9d4a0","field_path":"status","value":"ACTIVE","source_type":"user","confidence":null,"review_state":"accepted","source_evidence_ids":null,"created_at":"2026-11-02T14:25:13"},{"id":"01a19ca6-6685-7820-874d-665e6227716f","field_path":"unit","value":"bottle","source_type":"user","confidence":null,"review_state":"accepted","source_evidence_ids":null,"created_at":"2026-11-02T14:25:13"}],"audit_events":[{"id":"01a19ca6-6687-70d3-bc6b-b2fc0de46aa4","actor":"api","action":"asset.create","before":null,"after":{"display_name":"Whole Milk","asset_type":"product","status":"ACTIVE","quantity":1.0,"unit":"bottle","condition":null,"evidence_ids":null},"timestamp":"2026-11-02T14:25:13.347960"},{"id":"01a19ca6-6687-70d3-bc6b-b3063b403b7c","actor":"api","action":"asset.accepted","before":null,"after":{"review_state":"accepted"},"timestamp":"2026-11-02T14:25:13.348049"}]}
+HTTP 201
+
+
+### j1_classify.json
+{"plugin_id":"expiry-tracker","version":"1.0.0","classification":{"category":"food_beverages","label":"Food & beverages","profile":{"notification_tier":"upcoming","notification_days":30,"tier_defaults":{"critical":1,"urgent":7,"upcoming":30},"opened_date_tracking":false,"disposal_guidance":true}},"expiry_assertion":{"id":"01a19ca6-de3d-7af2-a87b-36e970599eec","field_path":"plugin:expiry-tracker/expiry_date","value":{"status":"unknown"},"source_type":"deterministic","review_state":"needs_evidence","source_evidence_ids":[]},"review_task":"01a19ca6-de42-7470-a07c-ea7cf4af9099","resolved_review_task_ids":[]}
+HTTP 200
+
+
+### j1_expiry.json
+{"asset_id":"01a19ca6-6682-7520-8173-04366bb8234e","assertion":{"id":"01a19ca6-de8f-7651-9b62-d78b921d5a46","field_path":"plugin:expiry-tracker/expiry_date","value":{"expiry_date":"2026-11-20","date_type":"expiry_date"},"source_type":"user","review_state":"accepted","source_evidence_ids":[]},"resolved_review_task_ids":["01a19ca6-de42-7470-a07c-ea7cf4af9099"]}
+HTTP 200
+
+
+### j2_evidence.json
+{"id":"01a19ca6-fbec-70f3-80ca-7500f732803e","sha256":"a94fed8ad04bdd69b63508e15faa943a495e28387fbb7b1c5a96d26b71bff9e2","storage_key":"01a19ca5-61fb-7e31-91a8-6ababa435aac/a9/a94fed8ad04bdd69b63508e15faa943a495e28387fbb7b1c5a96d26b71bff9e2.jpg","media_type":"image/jpeg","size_bytes":10901,"original_filename":"j2_photo.jpg"}
+
+
+### j2_job_created.json
+{"id":"01a19ca6-fc25-7e20-ba2f-531de783a3d9","job_type":"import","state":"CREATED","household_id":"01a19ca5-61fb-7e31-91a8-6ababa435aac","created_at":"2026-11-02T14:25:51","updated_at":"2026-11-02T14:25:51","steps":[{"id":"01a19ca6-fc28-7e00-a488-78f517359c39","step_name":"VALIDATING_INPUT","state":"PENDING","attempts":0,"input":{"evidence_ids":["01a19ca6-fbec-70f3-80ca-7500f732803e"]},"output":null,"error":null},{"id":"01a19ca6-fc28-7e00-a488-79073e61656f","step_name":"NORMALIZING","state":"PENDING","attempts":0,"input":{"evidence_ids":["01a19ca6-fbec-70f3-80ca-7500f732803e"]},"output":null,"error":null},{"id":"01a19ca6-fc28-7e00-a488-791aa3579491","step_name":"EXTRACTING_DETERMINISTIC_SIGNALS","state":"PENDING","attempts":0,"input":{"evidence_ids":["01a19ca6-fbec-70f3-80ca-7500f732803e"]},"output":null,"error":null},{"id":"01a19ca6-fc28-7e00-a488-792d7ce67763","step_name":"ANALYZING_WITH_AI","state":"PENDING","attempts":0,"input":{"evidence_ids":["01a19ca6-fbec-70f3-80ca-7500f732803e"]},"output":null,"error":null},{"id":"01a19ca6-fc28-7e00-a488-7930d3f05b43","step_name":"BUILDING_CANDIDATES","state":"PENDING","attempts":0,"input":{"evidence_ids":["01a19ca6-fbec-70f3-80ca-7500f732803e"]},"output":null,"error":null},{"id":"01a19ca6-fc28-7e00-a488-794f09a39f73","step_name":"DEDUPLICATING","state":"PENDING","attempts":0,"input":{"evidence_ids":["01a19ca6-fbec-70f3-80ca-7500f732803e"]},"output":null,"error":null},{"id":"01a19ca6-fc28-7e00-a488-7955fd8e1384","step_name":"AWAITING_REVIEW","state":"PENDING","attempts":0,"input":{"evidence_ids":["01a19ca6-fbec-70f3-80ca-7500f732803e"]},"output":null,"error":null},{"id":"01a19ca6-fc28-7e00-a488-7964f354b0d1","step_name":"COMMITTING","state":"PENDING","attempts":0,"input":{"evidence_ids":["01a19ca6-fbec-70f3-80ca-7500f732803e"]},"output":null,"error":null}],"progress":{"completed":0,"total":8,"failed":0,"pending":8},"errors":[]}
+
+
+### j2_job_run.json
+{"id":"01a19ca6-fc25-7e20-ba2f-531de783a3d9","job_type":"import","state":"AWAITING_REVIEW","household_id":"01a19ca5-61fb-7e31-91a8-6ababa435aac","created_at":"2026-11-02T14:25:51","updated_at":"2026-11-02T14:25:51.794938+00:00","steps":[{"id":"01a19ca6-fc28-7e00-a488-78f517359c39","step_name":"VALIDATING_INPUT","state":"COMPLETED","attempts":1,"input":{"evidence_ids":["01a19ca6-fbec-70f3-80ca-7500f732803e"]},"output":{"status":"ok","step":"VALIDATING_INPUT","completed_at":"2026-11-02T14:25:51.721332+00:00"},"error":null},{"id":"01a19ca6-fc28-7e00-a488-79073e61656f","step_name":"NORMALIZING","state":"COMPLETED","attempts":1,"input":{"evidence_ids":["01a19ca6-fbec-70f3-80ca-7500f732803e"]},"output":{"status":"not_implemented","step":"NORMALIZING","completed_at":"2026-11-02T14:25:51.725194+00:00"},"error":null},{"id":"01a19ca6-fc28-7e00-a488-791aa3579491","step_name":"EXTRACTING_DETERMINISTIC_SIGNALS","state":"COMPLETED","attempts":1,"input":{"evidence_ids":["01a19ca6-fbec-70f3-80ca-7500f732803e"]},"output":{"status":"ok","step":"EXTRACTING_DETERMINISTIC_SIGNALS","observation_ids":["01a19ca6-fc9a-7000-8af9-3fa9ad95d35d"],"counts":{"phash":1},"completed_at":"2026-11-02T14:25:51.771866+00:00"},"error":null},{"id":"01a19ca6-fc28-7e00-a488-792d7ce67763","step_name":"ANALYZING_WITH_AI","state":"COMPLETED","attempts":1,"input":{"evidence_ids":["01a19ca6-fbec-70f3-80ca-7500f732803e"]},"output":{"status":"skipped","step":"ANALYZING_WITH_AI","reason":"consent_disabled","completed_at":"2026-11-02T14:25:51.774794+00:00"},"error":null},{"id":"01a19ca6-fc28-7e00-a488-7930d3f05b43","step_name":"BUILDING_CANDIDATES","state":"COMPLETED","attempts":1,"input":{"evidence_ids":["01a19ca6-fbec-70f3-80ca-7500f732803e"]},"output":{"status":"skipped","step":"BUILDING_CANDIDATES","reason":"consent_disabled","completed_at":"2026-11-02T14:25:51.778254+00:00"},"error":null},{"id":"01a19ca6-fc28-7e00-a488-794f09a39f73","step_name":"DEDUPLICATING","state":"COMPLETED","attempts":1,"input":{"evidence_ids":["01a19ca6-fbec-70f3-80ca-7500f732803e"]},"output":{"status":"ok","step":"DEDUPLICATING","candidate_id":"01a19ca6-fcad-73c3-8ff0-8a8053626056","kind":"new_asset","asset_id":null,"review_task_ids":[],"dedup_matches":[],"reused":false,"completed_at":"2026-11-02T14:25:51.790291+00:00"},"error":null},{"id":"01a19ca6-fc28-7e00-a488-7955fd8e1384","step_name":"AWAITING_REVIEW","state":"AWAITING_REVIEW","attempts":1,"input":{"evidence_ids":["01a19ca6-fbec-70f3-80ca-7500f732803e"]},"output":{"status":"awaiting_review","step":"AWAITING_REVIEW","completed_at":"2026-11-02T14:25:51.793677+00:00"},"error":null},{"id":"01a19ca6-fc28-7e00-a488-7964f354b0d1","step_name":"COMMITTING","state":"PENDING","attempts":0,"input":{"evidence_ids":["01a19ca6-fbec-70f3-80ca-7500f732803e"]},"output":null,"error":null}],"progress":{"completed":6,"total":8,"failed":0,"pending":1},"errors":[]}
+HTTP 200
+
+
+### j2_job_steps.json
+{
+ "state": "AWAITING_REVIEW",
+ "steps": [
+  [
+   "VALIDATING_INPUT",
+   "COMPLETED",
+   {
+    "status": "ok",
+    "step": "VALIDATING_INPUT",
+    "completed_at": "2026-11-02T14:25:51.721332+00:00"
+   }
+  ],
+  [
+   "NORMALIZING",
+   "COMPLETED",
+   {
+    "status": "not_implemented",
+    "step": "NORMALIZING",
+    "completed_at": "2026-11-02T14:25:51.725194+00:00"
+   }
+  ],
+  [
+   "EXTRACTING_DETERMINISTIC_SIGNALS",
+   "COMPLETED",
+   {
+    "status": "ok",
+    "step": "EXTRACTING_DETERMINISTIC_SIGNALS",
+    "observation_ids": [
+     "01a19ca6-fc9a-7000-8af9-3fa9ad95d35d"
+    ],
+    "counts": {
+     "phash": 1
+    },
+    "completed_at": "2026-11-02T14:25:51.771866+00:00"
+   }
+  ],
+  [
+   "ANALYZING_WITH_AI",
+   "COMPLETED",
+   {
+    "status": "skipped",
+    "step": "ANALYZING_WITH_AI",
+    "reason": "consent_disabled",
+    "completed_at": "2026-11-02T14:25:51.774794+00:00"
+   }
+  ],
+  [
+   "BUILDING_CANDIDATES",
+   "COMPLETED",
+   {
+    "status": "skipped",
+    "step": "BUILDING_CANDIDATES",
+    "reason": "consent_disabled",
+    "completed_at": "2026-11-02T14:25:51.778254+00:00"
+   }
+  ],
+  [
+   "DEDUPLICATING",
+   "COMPLETED",
+   {
+    "status": "ok",
+    "step": "DEDUPLICATING",
+    "candidate_id": "01a19ca6-fcad-73c3-8ff0-8a8053626056",
+    "kind": "new_asset",
+    "asset_id": null,
+    "review_task_ids": [],
+    "dedup_matches": [],
+    "reused": false,
+    "completed_at": "2026-11-02T14:25:51.790291+00:00"
+   }
+  ],
+  [
+   "AWAITING_REVIEW",
+   "AWAITING_REVIEW",
+   {
+    "status": "awaiting_review",
+    "step": "AWAITING_REVIEW",
+    "completed_at": "2026-11-02T14:25:51.793677+00:00"
+   }
+  ],
+  [
+   "COMMITTING",
+   "PENDING",
+   null
+  ]
+ ]
+}
+
+
+### j2_candidates.json
+{"items":[{"id":"01a19ca6-fcad-73c3-8ff0-8a8053626056","state":"proposed","job_id":"01a19ca6-fc25-7e20-ba2f-531de783a3d9","fields":{"display_name":"j2_photo","asset_type":"unknown","status":"ACTIVE"},"evidence_ids":["01a19ca6-fbec-70f3-80ca-7500f732803e"],"review_task_ids":[]}],"total":1}
+
+### j2_accept.json
+{"candidate_id":"01a19ca6-fcad-73c3-8ff0-8a8053626056","state":"accepted","job":{"id":"01a19ca6-fc25-7e20-ba2f-531de783a3d9","job_type":"import","state":"COMPLETED","household_id":"01a19ca5-61fb-7e31-91a8-6ababa435aac","created_at":"2026-11-02T14:25:51","updated_at":"2026-11-02T14:26:00.287914+00:00","steps":[{"id":"01a19ca6-fc28-7e00-a488-78f517359c39","step_name":"VALIDATING_INPUT","state":"COMPLETED","attempts":1,"input":{"evidence_ids":["01a19ca6-fbec-70f3-80ca-7500f732803e"]},"output":{"status":"ok","step":"VALIDATING_INPUT","completed_at":"2026-11-02T14:25:51.721332+00:00"},"error":null},{"id":"01a19ca6-fc28-7e00-a488-79073e61656f","step_name":"NORMALIZING","state":"COMPLETED","attempts":1,"input":{"evidence_ids":["01a19ca6-fbec-70f3-80ca-7500f732803e"]},"output":{"status":"not_implemented","step":"NORMALIZING","completed_at":"2026-11-02T14:25:51.725194+00:00"},"error":null},{"id":"01a19ca6-fc28-7e00-a488-791aa3579491","step_name":"EXTRACTING_DETERMINISTIC_SIGNALS","state":"COMPLETED","attempts":1,"input":{"evidence_ids":["01a19ca6-fbec-70f3-80ca-7500f732803e"]},"output":{"status":"ok","step":"EXTRACTING_DETERMINISTIC_SIGNALS","observation_ids":["01a19ca6-fc9a-7000-8af9-3fa9ad95d35d"],"counts":{"phash":1},"completed_at":"2026-11-02T14:25:51.771866+00:00"},"error":null},{"id":"01a19ca6-fc28-7e00-a488-792d7ce67763","step_name":"ANALYZING_WITH_AI","state":"COMPLETED","attempts":1,"input":{"evidence_ids":["01a19ca6-fbec-70f3-80ca-7500f732803e"]},"output":{"status":"skipped","step":"ANALYZING_WITH_AI","reason":"consent_disabled","completed_at":"2026-11-02T14:25:51.774794+00:00"},"error":null},{"id":"01a19ca6-fc28-7e00-a488-7930d3f05b43","step_name":"BUILDING_CANDIDATES","state":"COMPLETED","attempts":1,"input":{"evidence_ids":["01a19ca6-fbec-70f3-80ca-7500f732803e"]},"output":{"status":"skipped","step":"BUILDING_CANDIDATES","reason":"consent_disabled","completed_at":"2026-11-02T14:25:51.778254+00:00"},"error":null},{"id":"01a19ca6-fc28-7e00-a488-794f09a39f73","step_name":"DEDUPLICATING","state":"COMPLETED","attempts":1,"input":{"evidence_ids":["01a19ca6-fbec-70f3-80ca-7500f732803e"]},"output":{"status":"ok","step":"DEDUPLICATING","candidate_id":"01a19ca6-fcad-73c3-8ff0-8a8053626056","kind":"new_asset","asset_id":null,"review_task_ids":[],"dedup_matches":[],"reused":false,"completed_at":"2026-11-02T14:25:51.790291+00:00"},"error":null},{"id":"01a19ca6-fc28-7e00-a488-7955fd8e1384","step_name":"AWAITING_REVIEW","state":"COMPLETED","attempts":1,"input":{"evidence_ids":["01a19ca6-fbec-70f3-80ca-7500f732803e"]},"output":{"status":"decision","candidate_id":"01a19ca6-fcad-73c3-8ff0-8a8053626056"},"error":null},{"id":"01a19ca6-fc28-7e00-a488-7964f354b0d1","step_name":"COMMITTING","state":"COMPLETED","attempts":1,"input":{"evidence_ids":["01a19ca6-fbec-70f3-80ca-7500f732803e"]},"output":{"status":"committed","step":"COMMITTING","candidate_id":"01a19ca6-fcad-73c3-8ff0-8a8053626056","asset_id":"01a19ca7-1ddb-7f03-be68-3e76aabe8493","created":true,"completed_at":"2026-11-02T14:26:00.287454+00:00"},"error":null}],"progress":{"completed":8,"total":8,"failed":0,"pending":0},"errors":[]},"status":"committed","step":"COMMITTING","asset_id":"01a19ca7-1ddb-7f03-be68-3e76aabe8493","created":true,"completed_at":"2026-11-02T14:26:00.287454+00:00"}
+HTTP 200
+
+
+### j5_classify.json
+{"plugin_id":"expiry-tracker","version":"1.0.0","classification":{"category":"food_beverages","label":"Food & beverages","profile":{"notification_tier":"upcoming","notification_days":30,"tier_defaults":{"critical":1,"urgent":7,"upcoming":30},"opened_date_tracking":false,"disposal_guidance":true}},"expiry_assertion":{"id":"01a19ca8-1671-7750-b014-e84c80c27c60","field_path":"plugin:expiry-tracker/expiry_date","value":{"status":"unknown"},"source_type":"deterministic","review_state":"needs_evidence","source_evidence_ids":[]},"review_task":"01a19ca8-1673-7113-861b-f4208afd9ac3","resolved_review_task_ids":[]}
+
+### j5_manual.json
+{"asset_id":"01a19ca8-164a-7bc3-96f2-f6d0e7013d85","assertion":{"id":"01a19ca8-170e-7292-ba93-df794f019e7c","field_path":"plugin:expiry-tracker/expiry_date","value":{"expiry_date":"2027-06-01","date_type":"expiry_date"},"source_type":"user","review_state":"accepted","source_evidence_ids":[]},"resolved_review_task_ids":["01a19ca8-1673-7113-861b-f4208afd9ac3"]}
+HTTP 200
+
+
+### j6_dup_candidate.json
+{
+ "items": [
+  {
+   "id": "01a19ca9-de3f-7f82-9e9c-a246c850a7e1",
+   "state": "proposed",
+   "job_id": "01a19ca9-ddfe-7f20-a1b9-47718f786951",
+   "fields": {
+    "display_name": "j2_photo",
+    "asset_type": "unknown",
+    "status": "ACTIVE"
+   },
+   "evidence_ids": [
+    "01a19ca6-fbec-70f3-80ca-7500f732803e"
+   ],
+   "review_task_ids": []
+  }
+ ],
+ "total": 1
+}
+
+
+### j8_patch.json
+{"id":"01a19ca6-6682-7520-8173-04366bb8234e","household_id":"01a19ca5-61fb-7e31-91a8-6ababa435aac","display_name":"Whole Milk","asset_type":"product","status":"ACTIVE","quantity":0.5,"unit":"bottle","condition":null,"version":2,"created_at":"2026-11-02T14:25:13","updated_at":"2026-11-02T14:27:21","evidence":[],"assertions":[{"id":"01a19ca6-6685-7820-874d-663347d4dd5c","field_path":"asset_type","value":"product","source_type":"user","confidence":null,"review_state":"accepted","source_evidence_ids":null,"created_at":"2026-11-02T14:25:13"},{"id":"01a19ca6-6685-7820-874d-6673dca06979","field_path":"display_name","value":"Whole Milk","source_type":"user","confidence":null,"review_state":"superseded","source_evidence_ids":null,"created_at":"2026-11-02T14:25:13"},{"id":"01a19ca8-5a24-7712-81af-f551be43d3a6","field_path":"display_name","value":"Whole Milk","source_type":"user","confidence":null,"review_state":"accepted","source_evidence_ids":null,"created_at":"2026-11-02T14:27:21"},{"id":"01a19ca6-de3a-7940-b7d2-92abd9803b6c","field_path":"plugin:expiry-tracker/classification","value":{"category":"food_beverages","label":"Food & beverages","profile":{"notification_tier":"upcoming","notification_days":30,"tier_defaults":{"critical":1,"urgent":7,"upcoming":30},"opened_date_tracking":false,"disposal_guidance":true}},"source_type":"user","confidence":null,"review_state":"accepted","source_evidence_ids":null,"created_at":"2026-11-02T14:25:43"},{"id":"01a19ca6-de3d-7af2-a87b-36e970599eec","field_path":"plugin:expiry-tracker/expiry_date","value":{"status":"unknown"},"source_type":"deterministic","confidence":null,"review_state":"superseded","source_evidence_ids":null,"created_at":"2026-11-02T14:25:43"},{"id":"01a19ca6-de8f-7651-9b62-d78b921d5a46","field_path":"plugin:expiry-tracker/expiry_date","value":{"expiry_date":"2026-11-20","date_type":"expiry_date"},"source_type":"user","confidence":null,"review_state":"accepted","source_evidence_ids":null,"created_at":"2026-11-02T14:25:44"},{"id":"01a19ca6-6685-7820-874d-66445461eb11","field_path":"quantity","value":1.0,"source_type":"user","confidence":null,"review_state":"superseded","source_evidence_ids":null,"created_at":"2026-11-02T14:25:13"},{"id":"01a19ca8-5a26-7f90-8983-de2af64bfeb4","field_path":"quantity","value":0.5,"source_type":"user","confidence":null,"review_state":"accepted","source_evidence_ids":null,"created_at":"2026-11-02T14:27:21"},{"id":"01a19ca6-6685-7820-874d-666ef8e9d4a0","field_path":"status","value":"ACTIVE","source_type":"user","confidence":null,"review_state":"accepted","source_evidence_ids":null,"created_at":"2026-11-02T14:25:13"},{"id":"01a19ca6-6685-7820-874d-665e6227716f","field_path":"unit","value":"bottle","source_type":"user","confidence":null,"review_state":"superseded","source_evidence_ids":null,"created_at":"2026-11-02T14:25:13"},{"id":"01a19ca8-5a27-7660-9efe-6ea97098f7c2","field_path":"unit","value":"bottle","source_type":"user","confidence":null,"review_state":"accepted","source_evidence_ids":null,"created_at":"2026-11-02T14:27:21"}],"audit_events":[{"id":"01a19ca6-6687-70d3-bc6b-b2fc0de46aa4","actor":"api","action":"asset.create","before":null,"after":{"display_name":"Whole Milk","asset_type":"product","status":"ACTIVE","quantity":1.0,"unit":"bottle","condition":null,"evidence_ids":null},"timestamp":"2026-11-02T14:25:13.347960"},{"id":"01a19ca6-6687-70d3-bc6b-b3063b403b7c","actor":"api","action":"asset.accepted","before":null,"after":{"review_state":"accepted"},"timestamp":"2026-11-02T14:25:13.348049"},{"id":"01a19ca6-de93-7d43-90c5-a0eb5fc6536e","actor":"user","action":"expiry.manual_entry","before":{"review_state":"needs_evidence"},"after":{"review_state":"accepted","field_path":"plugin:expiry-tracker/expiry_date"},"timestamp":"2026-11-02T14:25:44.083388"},{"id":"01a19ca8-5a28-7bb0-9db9-cca634422f7d","actor":"api","action":"asset.update","before":{"display_name":"Whole Milk","version":1},"after":{"display_name":"Whole Milk","quantity":0.5,"unit":"bottle"},"timestamp":"2026-11-02T14:27:21.256069"}]}
+HTTP 200
+
+
+### j8_archive.json
+{"id":"01a19ca6-6682-7520-8173-04366bb8234e","household_id":"01a19ca5-61fb-7e31-91a8-6ababa435aac","display_name":"Whole Milk","asset_type":"product","status":"ARCHIVED","quantity":0.5,"unit":"bottle","condition":null,"version":3,"created_at":"2026-11-02T14:25:13","updated_at":"2026-11-02T14:27:21","evidence":[],"assertions":[{"id":"01a19ca6-6685-7820-874d-663347d4dd5c","field_path":"asset_type","value":"product","source_type":"user","confidence":null,"review_state":"accepted","source_evidence_ids":null,"created_at":"2026-11-02T14:25:13"},{"id":"01a19ca6-6685-7820-874d-6673dca06979","field_path":"display_name","value":"Whole Milk","source_type":"user","confidence":null,"review_state":"superseded","source_evidence_ids":null,"created_at":"2026-11-02T14:25:13"},{"id":"01a19ca8-5a24-7712-81af-f551be43d3a6","field_path":"display_name","value":"Whole Milk","source_type":"user","confidence":null,"review_state":"accepted","source_evidence_ids":null,"created_at":"2026-11-02T14:27:21"},{"id":"01a19ca6-de3a-7940-b7d2-92abd9803b6c","field_path":"plugin:expiry-tracker/classification","value":{"category":"food_beverages","label":"Food & beverages","profile":{"notification_tier":"upcoming","notification_days":30,"tier_defaults":{"critical":1,"urgent":7,"upcoming":30},"opened_date_tracking":false,"disposal_guidance":true}},"source_type":"user","confidence":null,"review_state":"accepted","source_evidence_ids":null,"created_at":"2026-11-02T14:25:43"},{"id":"01a19ca6-de3d-7af2-a87b-36e970599eec","field_path":"plugin:expiry-tracker/expiry_date","value":{"status":"unknown"},"source_type":"deterministic","confidence":null,"review_state":"superseded","source_evidence_ids":null,"created_at":"2026-11-02T14:25:43"},{"id":"01a19ca6-de8f-7651-9b62-d78b921d5a46","field_path":"plugin:expiry-tracker/expiry_date","value":{"expiry_date":"2026-11-20","date_type":"expiry_date"},"source_type":"user","confidence":null,"review_state":"accepted","source_evidence_ids":null,"created_at":"2026-11-02T14:25:44"},{"id":"01a19ca6-6685-7820-874d-66445461eb11","field_path":"quantity","value":1.0,"source_type":"user","confidence":null,"review_state":"superseded","source_evidence_ids":null,"created_at":"2026-11-02T14:25:13"},{"id":"01a19ca8-5a26-7f90-8983-de2af64bfeb4","field_path":"quantity","value":0.5,"source_type":"user","confidence":null,"review_state":"accepted","source_evidence_ids":null,"created_at":"2026-11-02T14:27:21"},{"id":"01a19ca6-6685-7820-874d-666ef8e9d4a0","field_path":"status","value":"ACTIVE","source_type":"user","confidence":null,"review_state":"superseded","source_evidence_ids":null,"created_at":"2026-11-02T14:25:13"},{"id":"01a19ca8-5a3f-7061-b443-50006daca6b0","field_path":"status","value":"ARCHIVED","source_type":"user","confidence":null,"review_state":"accepted","source_evidence_ids":null,"created_at":"2026-11-02T14:27:21"},{"id":"01a19ca6-6685-7820-874d-665e6227716f","field_path":"unit","value":"bottle","source_type":"user","confidence":null,"review_state":"superseded","source_evidence_ids":null,"created_at":"2026-11-02T14:25:13"},{"id":"01a19ca8-5a27-7660-9efe-6ea97098f7c2","field_path":"unit","value":"bottle","source_type":"user","confidence":null,"review_state":"accepted","source_evidence_ids":null,"created_at":"2026-11-02T14:27:21"}],"audit_events":[{"id":"01a19ca6-6687-70d3-bc6b-b2fc0de46aa4","actor":"api","action":"asset.create","before":null,"after":{"display_name":"Whole Milk","asset_type":"product","status":"ACTIVE","quantity":1.0,"unit":"bottle","condition":null,"evidence_ids":null},"timestamp":"2026-11-02T14:25:13.347960"},{"id":"01a19ca6-6687-70d3-bc6b-b3063b403b7c","actor":"api","action":"asset.accepted","before":null,"after":{"review_state":"accepted"},"timestamp":"2026-11-02T14:25:13.348049"},{"id":"01a19ca6-de93-7d43-90c5-a0eb5fc6536e","actor":"user","action":"expiry.manual_entry","before":{"review_state":"needs_evidence"},"after":{"review_state":"accepted","field_path":"plugin:expiry-tracker/expiry_date"},"timestamp":"2026-11-02T14:25:44.083388"},{"id":"01a19ca8-5a28-7bb0-9db9-cca634422f7d","actor":"api","action":"asset.update","before":{"display_name":"Whole Milk","version":1},"after":{"display_name":"Whole Milk","quantity":0.5,"unit":"bottle"},"timestamp":"2026-11-02T14:27:21.256069"},{"id":"01a19ca8-5a40-7043-9fe8-d1265b9b7e5e","actor":"api","action":"asset.update","before":{"display_name":"Whole Milk","version":2},"after":{"status":"ARCHIVED"},"timestamp":"2026-11-02T14:27:21.279806"}]}
+HTTP 200
+

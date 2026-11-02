@@ -1,0 +1,122 @@
+SG-269 scratch script source (copied as text; scratch removed)
+
+===== j3j4_script.py =====
+import importlib.util, io, json, os, sys
+from pathlib import Path
+from PIL import Image, ImageDraw
+
+spec = importlib.util.spec_from_file_location("t2", "/home/andrei/StorageGenie/backend/tests/test_phase2_e2e.py")
+t2 = importlib.util.module_from_spec(spec)
+sys.modules["t2"] = t2
+spec.loader.exec_module(t2)
+
+from fastapi.testclient import TestClient
+from app.main import app
+from app.config import settings
+from app.services.providers import reader as reader_mod
+
+H = "01a19ca5-61fb-7e31-91a8-6ababa435aac"
+OUT = Path("/home/andrei/StorageGenie/output/SG-269-scratch")
+
+def img(name, text):
+    im = Image.new("RGB", (640, 480), "white")
+    d = ImageDraw.Draw(im)
+    d.rectangle([20, 20, 620, 460], outline="black", width=3)
+    d.text((40, 60), text, fill="black")
+    p = OUT / name
+    im.save(p, "JPEG")
+    return p
+
+def enable(provider, category="food"):
+    reader_mod.provider_registry = lambda: {provider.provider_id: provider}
+    settings.sg_consent = True
+    settings.sg_provider_id = provider.provider_id
+    settings.sg_prompt_category = category
+    settings.sg_confidence_threshold = 0.9
+
+def upload_run(client, path, key):
+    with path.open("rb") as fh:
+        ev = client.post(f"/v1/evidence?household_id={H}", files={"file": (path.name, fh, "image/jpeg")}, headers={"Idempotency-Key": key+"-ev"})
+    evr = ev.json()
+    job = client.post(f"/v1/imports?household_id={H}", json={"evidence_ids": [evr["id"]], "config": {}}, headers={"Idempotency-Key": key+"-job"})
+    jid = job.json()["id"]
+    run = client.post(f"/v1/imports/{jid}/run?household_id={H}")
+    cands = client.get(f"/v1/jobs/{jid}/candidates?household_id={H}").json()["items"]
+    return evr, jid, run, cands
+
+with TestClient(app) as client:
+    print("=== J3 scripted dated food ===")
+    p = t2.ScriptedPhase2Provider([t2._food_output()])
+    enable(p)
+    evr, jid, run, cands = upload_run(client, img("j3_photo.jpg", "J3 Greek Yogurt 2030-01-15"), "sg269-j3")
+    c = cands[0]
+    print("RUN", run.status_code, run.json()["state"], "provider_invocations", p.invocations)
+    print("CANDIDATE", json.dumps({"id": c["id"], "state": c["state"], "fields": c["fields"], "review_task_ids": c["review_task_ids"]}, indent=1))
+    read = client.get(f"/v1/candidates/{c['id']}?household_id={H}").json()
+    print("CANDIDATE_READ", json.dumps({"state": read["state"], "asset_id": read["asset_id"], "review_task_ids": read["review_task_ids"], "fields": read["fields"]}, indent=1))
+    dec = client.post(f"/v1/candidates/{c['id']}/decision?household_id={H}", json={"action": "accept", "corrected_fields": {}})
+    print("ACCEPT", dec.status_code, json.dumps({k: dec.json().get(k) for k in ("state", "asset_id", "created")}))
+    aid = dec.json()["asset_id"]
+    asset = client.get(f"/v1/assets/{aid}?household_id={H}").json()
+    print("ASSET_AFTER_ACCEPT", json.dumps({"asset_type": asset["asset_type"], "assertions": [(a["field_path"], a["value"], a["review_state"]) for a in asset["assertions"]]}, indent=1))
+    st = client.get(f"/v1/plugins/expiry-tracker/status?household_id={H}").json()
+    print("EXPIRY_AFTER_ACCEPT", json.dumps({"rows": [r["display_name"] for r in st["rows"]], "unresolved": st["unresolved_rows"], "summary": st["summary"]}))
+    cls = client.post(f"/v1/plugins/expiry-tracker/assets/{aid}/classification?household_id={H}", json={"category": "food_beverages"})
+    print("CLASSIFY", cls.status_code, json.dumps({k: cls.json().get(k) for k in ("review_task", "resolved_review_task_ids")}))
+    asset = client.get(f"/v1/assets/{aid}?household_id={H}").json()
+    print("ASSET_AFTER_CLASSIFY", json.dumps({"assertions": [(a["field_path"], a["value"], a["review_state"]) for a in asset["assertions"]]}, indent=1))
+    st = client.get(f"/v1/plugins/expiry-tracker/status?household_id={H}").json()
+    print("EXPIRY_AFTER_CLASSIFY", json.dumps({"rows": [r["display_name"] for r in st["rows"]], "unresolved": st["unresolved_rows"]}))
+    tasks = client.get(f"/v1/review-tasks?household_id={H}").json()["items"]
+    mine = [t for t in tasks if t["subject_ref"] == aid and t["status"] == "open"]
+    print("TASKS_FOR_ASSET", json.dumps(mine, indent=1))
+    ent = client.post(f"/v1/plugins/expiry-tracker/assets/{aid}/expiry?household_id={H}", json={"expiry_date": "2030-01-15", "date_type": "expiry_date"})
+    print("MANUAL_DATE", ent.status_code, json.dumps({"resolved": ent.json().get("resolved_review_task_ids"), "value": ent.json().get("assertion", {}).get("value")}))
+    st = client.get(f"/v1/plugins/expiry-tracker/status?household_id={H}").json()
+    print("EXPIRY_AFTER_MANUAL", json.dumps({"rows": [(r["display_name"], r["expiry_date"]) for r in st["rows"]], "unresolved": st["unresolved_rows"]}))
+
+    print("=== J4 scripted needs_evidence ===")
+    p2 = t2.ScriptedPhase2Provider([t2._needs_output()])
+    enable(p2)
+    evr2, jid2, run2, cands2 = upload_run(client, img("j4_photo.jpg", "J4 Mystery Yogurt BLUR"), "sg269-j4")
+    c2 = cands2[0]
+    print("RUN", run2.status_code, run2.json()["state"], "provider_invocations", p2.invocations)
+    print("CANDIDATE", json.dumps({"id": c2["id"], "state": c2["state"], "fields": c2["fields"], "review_task_ids": c2["review_task_ids"]}, indent=1))
+    tasks = client.get(f"/v1/review-tasks?household_id={H}").json()["items"]
+    task = [t for t in tasks if t["subject_ref"] == c2["id"] and t["status"] == "open"][0]
+    print("TASK", json.dumps(task, indent=1))
+    resolve = client.post(f"/v1/review-tasks/{task['id']}/resolve?household_id={H}", json={})
+    print("BARE_RESOLVE", resolve.status_code, resolve.text)
+    dec2 = client.post(f"/v1/candidates/{c2['id']}/decision?household_id={H}", json={"action": "accept", "corrected_fields": {}})
+    print("ACCEPT_WITH_TASK", dec2.status_code, dec2.text)
+    read2 = client.get(f"/v1/candidates/{c2['id']}?household_id={H}").json()
+    print("CANDIDATE_READ", json.dumps({"state": read2["state"], "asset_id": read2["asset_id"], "review_task_ids": read2["review_task_ids"], "needs_evidence": read2.get("needs_evidence"), "fields": read2["fields"]}, indent=1))
+
+===== j3b_category.py =====
+import importlib.util, json, sys
+from pathlib import Path
+from PIL import Image, ImageDraw
+spec = importlib.util.spec_from_file_location("t2", "/home/andrei/StorageGenie/backend/tests/test_phase2_e2e.py")
+t2 = importlib.util.module_from_spec(spec); sys.modules["t2"]=t2; spec.loader.exec_module(t2)
+from fastapi.testclient import TestClient
+from app.main import app
+from app.config import settings
+from app.services.providers import reader as reader_mod
+H="01a19ca5-61fb-7e31-91a8-6ababa435aac"
+im=Image.new("RGB",(640,480),"white"); d=ImageDraw.Draw(im); d.text((40,60),"J3b category proposal",fill="black"); p=Path("j3b_photo.jpg"); im.save(p,"JPEG")
+payload=t2._food_output(); payload["items"][0]["category_proposed"]="food_beverages"
+prov=t2.ScriptedPhase2Provider([payload])
+reader_mod.provider_registry=lambda: {prov.provider_id: prov}
+settings.sg_consent=True; settings.sg_provider_id=prov.provider_id; settings.sg_prompt_category="food"; settings.sg_confidence_threshold=0.9
+with TestClient(app) as c:
+    with p.open("rb") as fh:
+        ev=c.post(f"/v1/evidence?household_id={H}",files={"file":(p.name,fh,"image/jpeg")}).json()
+    j=c.post(f"/v1/imports?household_id={H}",json={"evidence_ids":[ev["id"]],"config":{}}).json()
+    c.post(f"/v1/imports/{j['id']}/run?household_id={H}")
+    cand=c.get(f"/v1/jobs/{j['id']}/candidates?household_id={H}").json()["items"][0]
+    print("CANDIDATE_FIELDS", json.dumps({k:v["value"] if isinstance(v,dict) else v for k,v in cand["fields"].items()}))
+    dec=c.post(f"/v1/candidates/{cand['id']}/decision?household_id={H}",json={"action":"accept","corrected_fields":{}}).json()
+    aid=dec["asset_id"]; a=c.get(f"/v1/assets/{aid}?household_id={H}").json()
+    print("ASSET_ASSERTIONS", json.dumps([(x["field_path"],x["value"],x["review_state"]) for x in a["assertions"]],indent=1))
+    st=c.get(f"/v1/plugins/expiry-tracker/status?household_id={H}").json()
+    print("EXPIRY_ROWS", json.dumps({"rows":[r["display_name"] for r in st["rows"]],"unresolved":[r["asset_id"] for r in st["unresolved_rows"] if r["asset_id"]==aid]}))
