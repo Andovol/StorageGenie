@@ -5,7 +5,7 @@ import json
 from collections.abc import Mapping
 from pathlib import Path
 
-from sqlalchemy import ForeignKey, String, Text
+from sqlalchemy import CheckConstraint, ForeignKey, String, Text
 from sqlalchemy.orm import Mapped, Session, mapped_column
 
 from app.config import settings
@@ -495,6 +495,12 @@ def apply_web_fields_to_proposal(
 
 class Candidate(TimestampMixin, Base):
     __tablename__ = "candidate"
+    __table_args__ = (
+        CheckConstraint(
+            "state IN ('proposed', 'accepted', 'edited', 'held', 'rejected', 'split', 'merged')",
+            name="ck_candidate_state",
+        ),
+    )
 
     id: Mapped[str] = mapped_column(String(36), primary_key=True, default=new_id)
     job_id: Mapped[str] = mapped_column(

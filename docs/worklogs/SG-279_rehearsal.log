@@ -1,0 +1,126 @@
+INFO  [alembic.runtime.migration] Context impl SQLiteImpl.
+INFO  [alembic.runtime.migration] Will assume non-transactional DDL.
+INFO  [alembic.runtime.migration] Running upgrade  -> 0201cf10c56c, 001 core foundation
+INFO  [alembic.runtime.migration] Running upgrade 0201cf10c56c -> 20260908_sg013_observation, deterministic signal observations
+INFO  [alembic.runtime.migration] Running upgrade 20260908_sg013_observation -> 20260908_sg014_candidate, deduplication candidates
+INFO  [alembic.runtime.migration] Running upgrade 20260908_sg014_candidate -> 20260908_sg017_fts, SQLite FTS5 index for asset catalog search.
+INFO  [alembic.runtime.migration] Running upgrade 20260908_sg017_fts -> 20260912_sg025_provider_call, provider call ledger (SG-025, blueprint §3.3)
+INFO  [alembic.runtime.migration] Running upgrade 20260912_sg025_provider_call -> 20260914_sg035_foundations, data foundations: source attribution, planning suggestions, guardrail log (SG-035, Phase 3 S2/S3)
+INFO  [alembic.runtime.migration] Running upgrade 20260914_sg035_foundations -> 20260916_sg048_name_optional, name-optional capture: asset.display_name becomes nullable (SG-048, S2)
+INFO  [alembic.runtime.migration] Running upgrade 20260916_sg048_name_optional -> 20260917_sg068_saved_search, saved searches: named per-household filter sets (SG-068, Phase 4)
+INFO  [alembic.runtime.migration] Running upgrade 20260917_sg068_saved_search -> 20260923_sg100_enrich_snapshot, enrichment snapshot store (SG-100, Arc A)
+INFO  [alembic.runtime.migration] Running upgrade 20260923_sg100_enrich_snapshot -> 20260924_sg113_location, location tree + asset location assignment (SG-113, G3)
+INFO  [alembic.runtime.migration] Running upgrade 20260924_sg113_location -> 20260924_sg114_relation, asset relations: typed links (SG-114, G4)
+INFO  [alembic.runtime.migration] Running upgrade 20260924_sg114_relation -> 20261023_sg233_reminder, expiry reminders: durable per-asset daily rows (SG-233, G1)
+INFO  [alembic.runtime.migration] Context impl SQLiteImpl.
+INFO  [alembic.runtime.migration] Will assume non-transactional DDL.
+INFO  [alembic.runtime.migration] Running upgrade 20261023_sg233_reminder -> 20261102_sg279_candidate_state, widen candidate state constraint for split and merge (SG-279)
+INFO  [alembic.runtime.migration] Context impl SQLiteImpl.
+INFO  [alembic.runtime.migration] Will assume non-transactional DDL.
+INFO  [alembic.runtime.migration] Running downgrade 20261102_sg279_candidate_state -> 20261023_sg233_reminder, widen candidate state constraint for split and merge (SG-279)
+INFO  [alembic.runtime.migration] Context impl SQLiteImpl.
+INFO  [alembic.runtime.migration] Will assume non-transactional DDL.
+INFO  [alembic.runtime.migration] Running upgrade 20261023_sg233_reminder -> 20261102_sg279_candidate_state, widen candidate state constraint for split and merge (SG-279)
+INFO  [alembic.runtime.migration] Context impl SQLiteImpl.
+INFO  [alembic.runtime.migration] Will assume non-transactional DDL.
+INFO  [alembic.runtime.migration] Running downgrade 20261102_sg279_candidate_state -> 20261023_sg233_reminder, widen candidate state constraint for split and merge (SG-279)
+INFO  [alembic.runtime.migration] Context impl SQLiteImpl.
+INFO  [alembic.runtime.migration] Will assume non-transactional DDL.
+INFO  [alembic.runtime.migration] Running downgrade 20261102_sg279_candidate_state -> 20261023_sg233_reminder, widen candidate state constraint for split and merge (SG-279)
+
+SG279_REHEARSAL_DB=/tmp/pytest-of-andrei/pytest-9/test_sg279_rehearsal_upgrade_a0/rehearsal.db URL=sqlite:////tmp/pytest-of-andrei/pytest-9/test_sg279_rehearsal_upgrade_a0/rehearsal.db
+SG279_ALEMBIC_INVOCATION=command.upgrade(_alembic_config(url), '20261023_sg233_reminder') then command.upgrade(config, 'head')
+SG279_POPULATED_AT=20261023_sg233_reminder
+SG279_SEEDED candidates=5 states=proposed,accepted,edited,held,rejected asset=dda88e9a065a4bc9b7ce988bafdcd96a
+SG279_HOUSEHOLD=7cdecc3ae3ed491697bf06c989d0010c JOB=99e21e4179544bc1a4b202e2583154ca
+SG279_BEFORE rev=20261023_sg233_reminder candidate_rows=5 counts={'alembic_version': 1, 'assertion': 0, 'asset': 1, 'asset_evidence': 0, 'asset_fts': 1, 'asset_fts_config': 1, 'asset_fts_data': 3, 'asset_fts_docsize': 1, 'asset_fts_idx': 1, 'asset_location': 0, 'asset_relation': 0, 'audit_event': 0, 'candidate': 5, 'enrich_snapshot': 0, 'evidence': 0, 'guardrail_event': 0, 'household': 1, 'idempotency_key': 0, 'job': 1, 'job_step': 0, 'location': 0, 'observation': 0, 'planning_suggestion': 0, 'provider_call': 0, 'reminder': 0, 'review_task': 0, 'saved_search': 0, 'source_attribution': 0, 'user': 0}
+SG279_BEFORE_FTS=[('dda88e9a065a4bc9b7ce988bafdcd96a',)]
+SG279_AFTER rev=20261102_sg279_candidate_state candidate_rows=5 counts={'alembic_version': 1, 'assertion': 0, 'asset': 1, 'asset_evidence': 0, 'asset_fts': 1, 'asset_fts_config': 1, 'asset_fts_data': 3, 'asset_fts_docsize': 1, 'asset_fts_idx': 1, 'asset_location': 0, 'asset_relation': 0, 'audit_event': 0, 'candidate': 5, 'enrich_snapshot': 0, 'evidence': 0, 'guardrail_event': 0, 'household': 1, 'idempotency_key': 0, 'job': 1, 'job_step': 0, 'location': 0, 'observation': 0, 'planning_suggestion': 0, 'provider_call': 0, 'reminder': 0, 'review_task': 0, 'saved_search': 0, 'source_attribution': 0, 'user': 0}
+SG279_AFTER_FTS=[('dda88e9a065a4bc9b7ce988bafdcd96a',)]
+SG279_CHECK candidate row values unchanged: PASS
+SG279_CHECK indexes unchanged [('ix_candidate_household_id', 'CREATE INDEX ix_candidate_household_id ON candidate (household_id)'), ('ix_candidate_job_id', 'CREATE INDEX ix_candidate_job_id ON candidate (job_id)'), ('sqlite_autoindex_candidate_1', None)]: PASS
+SG279_NOTE FK PRAGMA id order differs but semantic set identical before=[(0, 0, 'household', 'household_id', 'id', 'NO ACTION', 'CASCADE', 'NONE'), (1, 0, 'job', 'job_id', 'id', 'NO ACTION', 'CASCADE', 'NONE')] after=[(0, 0, 'job', 'job_id', 'id', 'NO ACTION', 'CASCADE', 'NONE'), (1, 0, 'household', 'household_id', 'id', 'NO ACTION', 'CASCADE', 'NONE')] (non-semantic, ordering only): PASS
+SG279_CHECK foreign keys unchanged [(0, 0, 'job', 'job_id', 'id', 'NO ACTION', 'CASCADE', 'NONE'), (1, 0, 'household', 'household_id', 'id', 'NO ACTION', 'CASCADE', 'NONE')]: PASS
+SG279_CHECK table_info (columns/defaults) unchanged: PASS
+SG279_SCHEMA_DIFF_KEYS=[('table', 'candidate')]
+SG279_CANDIDATE_SQL_BEFORE:
+CREATE TABLE candidate (
+	id VARCHAR(36) NOT NULL, 
+	job_id VARCHAR(36) NOT NULL, 
+	evidence_ids_json TEXT NOT NULL, 
+	proposed_fields_json TEXT NOT NULL, 
+	state VARCHAR(30) NOT NULL, 
+	household_id VARCHAR(36) NOT NULL, 
+	created_at DATETIME DEFAULT (CURRENT_TIMESTAMP) NOT NULL, 
+	updated_at DATETIME DEFAULT (CURRENT_TIMESTAMP) NOT NULL, 
+	PRIMARY KEY (id), 
+	CONSTRAINT ck_candidate_state CHECK (state IN ('proposed', 'accepted', 'edited', 'held', 'rejected')), 
+	FOREIGN KEY(job_id) REFERENCES job (id) ON DELETE CASCADE, 
+	FOREIGN KEY(household_id) REFERENCES household (id) ON DELETE CASCADE
+)
+SG279_CANDIDATE_SQL_AFTER:
+CREATE TABLE "candidate" (
+	id VARCHAR(36) NOT NULL, 
+	job_id VARCHAR(36) NOT NULL, 
+	evidence_ids_json TEXT NOT NULL, 
+	proposed_fields_json TEXT NOT NULL, 
+	state VARCHAR(30) NOT NULL, 
+	household_id VARCHAR(36) NOT NULL, 
+	created_at DATETIME DEFAULT (CURRENT_TIMESTAMP) NOT NULL, 
+	updated_at DATETIME DEFAULT (CURRENT_TIMESTAMP) NOT NULL, 
+	PRIMARY KEY (id), 
+	CONSTRAINT ck_candidate_state CHECK (state IN ('proposed', 'accepted', 'edited', 'held', 'rejected', 'split', 'merged')), 
+	FOREIGN KEY(household_id) REFERENCES household (id) ON DELETE CASCADE, 
+	FOREIGN KEY(job_id) REFERENCES job (id) ON DELETE CASCADE
+)
+SG279_ACTUAL_TEXT_DIFF:
+--- 
++++ 
+@@ -1,4 +1,4 @@
+-CREATE TABLE candidate (
++CREATE TABLE "candidate" (
+ 	id VARCHAR(36) NOT NULL, 
+ 	job_id VARCHAR(36) NOT NULL, 
+ 	evidence_ids_json TEXT NOT NULL, 
+@@ -8,7 +8,7 @@
+ 	created_at DATETIME DEFAULT (CURRENT_TIMESTAMP) NOT NULL, 
+ 	updated_at DATETIME DEFAULT (CURRENT_TIMESTAMP) NOT NULL, 
+ 	PRIMARY KEY (id), 
+-	CONSTRAINT ck_candidate_state CHECK (state IN ('proposed', 'accepted', 'edited', 'held', 'rejected')), 
+-	FOREIGN KEY(job_id) REFERENCES job (id) ON DELETE CASCADE, 
+-	FOREIGN KEY(household_id) REFERENCES household (id) ON DELETE CASCADE
++	CONSTRAINT ck_candidate_state CHECK (state IN ('proposed', 'accepted', 'edited', 'held', 'rejected', 'split', 'merged')), 
++	FOREIGN KEY(household_id) REFERENCES household (id) ON DELETE CASCADE, 
++	FOREIGN KEY(job_id) REFERENCES job (id) ON DELETE CASCADE
+ )
+SG279_NO_CHECK_OLD=CREATE TABLE candidate ( id VARCHAR(36) NOT NULL, job_id VARCHAR(36) NOT NULL, evidence_ids_json TEXT NOT NULL, proposed_fields_json TEXT NOT NULL, state VARCHAR(30) NOT NULL, household_id VARCHAR(36) NOT NULL, created_at DATETIME DEFAULT (CURRENT_TIMESTAMP) NOT NULL, updated_at DATETIME DEFAULT (CURRENT_TIMESTAMP) NOT NULL, PRIMARY KEY (id), FOREIGN KEY(job_id) REFERENCES job (id) ON DELETE CASCADE, FOREIGN KEY(household_id) REFERENCES household (id) ON DELETE CASCADE )
+SG279_NO_CHECK_NEW=CREATE TABLE candidate ( id VARCHAR(36) NOT NULL, job_id VARCHAR(36) NOT NULL, evidence_ids_json TEXT NOT NULL, proposed_fields_json TEXT NOT NULL, state VARCHAR(30) NOT NULL, household_id VARCHAR(36) NOT NULL, created_at DATETIME DEFAULT (CURRENT_TIMESTAMP) NOT NULL, updated_at DATETIME DEFAULT (CURRENT_TIMESTAMP) NOT NULL, PRIMARY KEY (id), FOREIGN KEY(household_id) REFERENCES household (id) ON DELETE CASCADE, FOREIGN KEY(job_id) REFERENCES job (id) ON DELETE CASCADE )
+SG279_CHECK schema diff is only the accepted set plus FK ordering and quoting (both non-semantic): PASS
+SG279_NOTE FK clause order swapped but set identical {'FOREIGN KEY(job_id) REFERENCES job (id) ON DELETE CASCADE', 'FOREIGN KEY(household_id) REFERENCES household (id) ON DELETE CASCADE'}; quoting differs only on table name; PRAGMA set comparison above proves no semantic loss: PASS
+SG279_CHECK row counts unchanged {'alembic_version': 1, 'assertion': 0, 'asset': 1, 'asset_evidence': 0, 'asset_fts': 1, 'asset_fts_config': 1, 'asset_fts_data': 3, 'asset_fts_docsize': 1, 'asset_fts_idx': 1, 'asset_location': 0, 'asset_relation': 0, 'audit_event': 0, 'candidate': 5, 'enrich_snapshot': 0, 'evidence': 0, 'guardrail_event': 0, 'household': 1, 'idempotency_key': 0, 'job': 1, 'job_step': 0, 'location': 0, 'observation': 0, 'planning_suggestion': 0, 'provider_call': 0, 'reminder': 0, 'review_task': 0, 'saved_search': 0, 'source_attribution': 0, 'user': 0}: PASS
+SG279_CHECK FTS search returns seeded asset on both sides: PASS
+SG279_CHECK integrity_check=ok foreign_key_check=empty: PASS
+SG279_PG_EV01 deliberate row alteration detected (state edited -> bogus-altered): PASS
+SG279_PG_EV01 deliberate object alteration detected: PASS
+SG279_DOWNGRADE_OK rev=20261023_sg233_reminder
+SG279_CHECK downgrade success restores five-state and data intact: PASS
+SG279_REFUSAL_SPLIT pre rev=20261102_sg279_candidate_state rows=6
+SG279_CHECK downgrade refusal with split row leaves revision/data/schema unchanged: PASS
+SG279_REFUSAL_MERGED pre rev=20261102_sg279_candidate_state rows=6
+SG279_CHECK downgrade refusal with merged row leaves revision/data/schema unchanged: PASS
+SG279_NEW_REVISION=20261102_sg279_candidate_state
+SG279_TXN=non-transactional DDL (Alembic log: Will assume non-transactional DDL)
+SG279_ALEMBIC_INVOCATION_FOR_RIDER=command.upgrade(_alembic_config(url), 'head') with settings.database_url=sqlite:////tmp/pytest-of-andrei/pytest-9/test_sg279_rehearsal_upgrade_a0/rehearsal.db
+.
+=============================== warnings summary ===============================
+tests/test_sg279_rehearsal.py::test_sg279_rehearsal_upgrade_and_downgrade
+tests/test_sg279_rehearsal.py::test_sg279_rehearsal_upgrade_and_downgrade
+tests/test_sg279_rehearsal.py::test_sg279_rehearsal_upgrade_and_downgrade
+tests/test_sg279_rehearsal.py::test_sg279_rehearsal_upgrade_and_downgrade
+tests/test_sg279_rehearsal.py::test_sg279_rehearsal_upgrade_and_downgrade
+tests/test_sg279_rehearsal.py::test_sg279_rehearsal_upgrade_and_downgrade
+  /home/andrei/StorageGenie/backend/venv/lib/python3.12/site-packages/alembic/config.py:604: DeprecationWarning: No path_separator found in configuration; falling back to legacy splitting on spaces, commas, and colons for prepend_sys_path.  Consider adding path_separator=os to Alembic config.
+    util.warn_deprecated(
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+1 passed, 6 warnings in 0.98s

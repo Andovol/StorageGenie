@@ -1,0 +1,57 @@
+INFO  [alembic.runtime.migration] Context impl SQLiteImpl.
+INFO  [alembic.runtime.migration] Will assume non-transactional DDL.
+INFO  [alembic.runtime.migration] Running upgrade  -> 0201cf10c56c, 001 core foundation
+INFO  [alembic.runtime.migration] Running upgrade 0201cf10c56c -> 20260908_sg013_observation, deterministic signal observations
+INFO  [alembic.runtime.migration] Running upgrade 20260908_sg013_observation -> 20260908_sg014_candidate, deduplication candidates
+INFO  [alembic.runtime.migration] Running upgrade 20260908_sg014_candidate -> 20260908_sg017_fts, SQLite FTS5 index for asset catalog search.
+INFO  [alembic.runtime.migration] Running upgrade 20260908_sg017_fts -> 20260912_sg025_provider_call, provider call ledger (SG-025, blueprint §3.3)
+INFO  [alembic.runtime.migration] Running upgrade 20260912_sg025_provider_call -> 20260914_sg035_foundations, data foundations: source attribution, planning suggestions, guardrail log (SG-035, Phase 3 S2/S3)
+INFO  [alembic.runtime.migration] Running upgrade 20260914_sg035_foundations -> 20260916_sg048_name_optional, name-optional capture: asset.display_name becomes nullable (SG-048, S2)
+INFO  [alembic.runtime.migration] Running upgrade 20260916_sg048_name_optional -> 20260917_sg068_saved_search, saved searches: named per-household filter sets (SG-068, Phase 4)
+INFO  [alembic.runtime.migration] Running upgrade 20260917_sg068_saved_search -> 20260923_sg100_enrich_snapshot, enrichment snapshot store (SG-100, Arc A)
+INFO  [alembic.runtime.migration] Running upgrade 20260923_sg100_enrich_snapshot -> 20260924_sg113_location, location tree + asset location assignment (SG-113, G3)
+INFO  [alembic.runtime.migration] Running upgrade 20260924_sg113_location -> 20260924_sg114_relation, asset relations: typed links (SG-114, G4)
+INFO  [alembic.runtime.migration] Running upgrade 20260924_sg114_relation -> 20261023_sg233_reminder, expiry reminders: durable per-asset daily rows (SG-233, G1)
+INFO  [alembic.runtime.migration] Running upgrade 20261023_sg233_reminder -> 20261102_sg279_candidate_state, widen candidate state constraint for split and merge (SG-279)
+
+SG279_DB_PATH=/tmp/pytest-of-andrei/pytest-8/test_sg279_split_through_route0/sg279.db ALEMBIC_HEAD=20261102_sg279_candidate_state URL=sqlite:////tmp/pytest-of-andrei/pytest-8/test_sg279_split_through_route0/sg279.db
+SG279_FK_PRAGMA=1
+SG279_ALEMBIC_VERSION=20261102_sg279_candidate_state
+SG279_SPLIT_OK db=/tmp/pytest-of-andrei/pytest-8/test_sg279_split_through_route0/sg279.db head=20261102_sg279_candidate_state origin=split children=2
+.INFO  [alembic.runtime.migration] Context impl SQLiteImpl.
+INFO  [alembic.runtime.migration] Will assume non-transactional DDL.
+INFO  [alembic.runtime.migration] Running upgrade  -> 0201cf10c56c, 001 core foundation
+INFO  [alembic.runtime.migration] Running upgrade 0201cf10c56c -> 20260908_sg013_observation, deterministic signal observations
+INFO  [alembic.runtime.migration] Running upgrade 20260908_sg013_observation -> 20260908_sg014_candidate, deduplication candidates
+INFO  [alembic.runtime.migration] Running upgrade 20260908_sg014_candidate -> 20260908_sg017_fts, SQLite FTS5 index for asset catalog search.
+INFO  [alembic.runtime.migration] Running upgrade 20260908_sg017_fts -> 20260912_sg025_provider_call, provider call ledger (SG-025, blueprint §3.3)
+INFO  [alembic.runtime.migration] Running upgrade 20260912_sg025_provider_call -> 20260914_sg035_foundations, data foundations: source attribution, planning suggestions, guardrail log (SG-035, Phase 3 S2/S3)
+INFO  [alembic.runtime.migration] Running upgrade 20260914_sg035_foundations -> 20260916_sg048_name_optional, name-optional capture: asset.display_name becomes nullable (SG-048, S2)
+INFO  [alembic.runtime.migration] Running upgrade 20260916_sg048_name_optional -> 20260917_sg068_saved_search, saved searches: named per-household filter sets (SG-068, Phase 4)
+INFO  [alembic.runtime.migration] Running upgrade 20260917_sg068_saved_search -> 20260923_sg100_enrich_snapshot, enrichment snapshot store (SG-100, Arc A)
+INFO  [alembic.runtime.migration] Running upgrade 20260923_sg100_enrich_snapshot -> 20260924_sg113_location, location tree + asset location assignment (SG-113, G3)
+INFO  [alembic.runtime.migration] Running upgrade 20260924_sg113_location -> 20260924_sg114_relation, asset relations: typed links (SG-114, G4)
+INFO  [alembic.runtime.migration] Running upgrade 20260924_sg114_relation -> 20261023_sg233_reminder, expiry reminders: durable per-asset daily rows (SG-233, G1)
+INFO  [alembic.runtime.migration] Running upgrade 20261023_sg233_reminder -> 20261102_sg279_candidate_state, widen candidate state constraint for split and merge (SG-279)
+
+SG279_DB_PATH=/tmp/pytest-of-andrei/pytest-8/test_sg279_merge_through_route0/sg279.db ALEMBIC_HEAD=20261102_sg279_candidate_state URL=sqlite:////tmp/pytest-of-andrei/pytest-8/test_sg279_merge_through_route0/sg279.db
+SG279_FK_PRAGMA=1
+SG279_ALEMBIC_VERSION=20261102_sg279_candidate_state
+SG279_MERGE_OK db=/tmp/pytest-of-andrei/pytest-8/test_sg279_merge_through_route0/sg279.db head=20261102_sg279_candidate_state loser=merged survivor=proposed
+.
+=============================== warnings summary ===============================
+venv/lib/python3.12/site-packages/fastapi/testclient.py:1
+  /home/andrei/StorageGenie/backend/venv/lib/python3.12/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+venv/lib/python3.12/site-packages/starlette/testclient.py:53
+  /home/andrei/StorageGenie/backend/venv/lib/python3.12/site-packages/starlette/testclient.py:53: DeprecationWarning: The anyio.abc.BlockingPortal alias is deprecated, use anyio.from_thread.BlockingPortal instead.
+    _PortalFactoryType = Callable[[], AbstractContextManager[anyio.abc.BlockingPortal]]
+
+tests/test_sg279_candidate_state.py::test_sg279_split_through_route_commits_on_migrated_schema
+tests/test_sg279_candidate_state.py::test_sg279_merge_through_route_commits_on_migrated_schema
+  /home/andrei/StorageGenie/backend/venv/lib/python3.12/site-packages/alembic/config.py:604: DeprecationWarning: No path_separator found in configuration; falling back to legacy splitting on spaces, commas, and colons for prepend_sys_path.  Consider adding path_separator=os to Alembic config.
+    util.warn_deprecated(
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+2 passed, 2 deselected, 4 warnings in 1.71s
