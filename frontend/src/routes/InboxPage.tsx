@@ -2,12 +2,22 @@ import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
 import { apiGet, apiPost, resolveReviewTask } from "../api/client";
-import type { Job, JobListResponse } from "../api/types";
+import type { Job, JobCandidate, JobCandidateListResponse, JobListResponse } from "../api/types";
 import { JobCard } from "../components/JobCard";
 import { CONTROL_STYLE, THEMED_CONTROL_CLASS } from "../components/shell/CatalogToolbar";
 import { PageContainer } from "../components/shell/PageContainer";
 import { useReviewTasks } from "../hooks/useAssets";
 import { useHouseholdContext } from "../hooks/HouseholdContext";
+
+function candidateName(candidate: JobCandidate): string {
+  const raw = candidate.fields.display_name;
+  if (raw && typeof raw === "object" && !Array.isArray(raw)) {
+    const value = (raw as Record<string, unknown>).value;
+    if (value != null) return String(value);
+  }
+  if (raw != null) return String(raw);
+  return "Unnamed item";
+}
 
 export function InboxPage() {
   // SG-196 G1: household selection comes from the shared context.
@@ -22,6 +32,8 @@ export function InboxPage() {
   // SG-196 G3: shared with the nav badge through the same query key.
   const tasks = useReviewTasks(effectiveHousehold);
   const detail = useQuery<Job>({ queryKey: ["import", selectedJobId, effectiveHousehold], queryFn: () => apiGet<Job>(`/v1/imports/${selectedJobId}`, { household_id: effectiveHousehold }), enabled: !!selectedJobId && !!effectiveHousehold });
+  // SG-270 G3: the selected job's candidates, from the existing read route.
+  const jobCandidates = useQuery<JobCandidateListResponse>({ queryKey: ["job-candidates", selectedJobId, effectiveHousehold], queryFn: () => apiGet<JobCandidateListResponse>(`/v1/jobs/${selectedJobId}/candidates`, { household_id: effectiveHousehold }), enabled: !!selectedJobId && !!effectiveHousehold });
   const retry = useMutation({ mutationFn: (jobId: string) => apiPost<Job>(`/v1/imports/${jobId}/retry`, {}, { household_id: effectiveHousehold }), onSuccess: (_, jobId) => { qc.invalidateQueries({ queryKey: ["jobs", effectiveHousehold] }); qc.invalidateQueries({ queryKey: ["import", jobId, effectiveHousehold] }); } });
   // SG-187 G1: the modal's help promises an unchecked import "waits in the
   // Inbox until you run it there" — this is that run control.
@@ -37,7 +49,7 @@ export function InboxPage() {
     <h1 className="page-header text-foreground">Inbox</h1>
     <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(280px, 100%), 1fr))", gap: 20 }}>
       <section><h2>Import jobs</h2>{jobs.isError && <div role="alert">Could not load import jobs: {String(jobs.error)}</div>}{jobs.isLoading && <div>Loading jobs…</div>}{!jobs.isLoading && jobs.data?.items.length === 0 && <div role="status">No import jobs yet.</div>}<div style={{ display: "grid", gap: 8 }}>{jobs.data?.items.map((job) => <JobCard key={job.id} job={job} selected={selectedJobId === job.id} onSelect={() => setSelectedJobId(job.id)} />)}</div></section>
-      <section><h2>Selected job</h2>{!selectedJobId && <div>Select a job to see progress and errors.</div>}{detail.isError && <div role="alert">Could not load job detail: {String(detail.error)}</div>}{detail.isLoading && <div>Loading job detail…</div>}{detail.data && <div><div><strong>{detail.data.state}</strong> · {detail.data.progress?.completed || 0}/{detail.data.progress?.total || 0} complete · {detail.data.progress?.failed || 0} failed · {detail.data.progress?.pending || 0} pending</div>{detail.data.errors?.map((error) => <div key={error} role="alert" className="text-danger" style={{ marginTop: 8 }}>{error}</div>)}{detail.data.steps?.map((step) => <div key={step.id} className="bg-card-muted" style={{ marginTop: 8, padding: 8 }}><strong>{step.step_name}</strong>: {step.state}{step.error && <div role="alert">{step.error}</div>}</div>)}{detail.data.state === "CREATED" && <button type="button" onClick={() => run.mutate(detail.data!.id)} disabled={run.isPending} className={THEMED_CONTROL_CLASS} style={{ ...CONTROL_STYLE, marginTop: 12 }}>{run.isPending ? "Starting…" : "Start import job"}</button>}{detail.data.state === "FAILED" && <button type="button" onClick={() => retry.mutate(detail.data!.id)} disabled={retry.isPending} className={THEMED_CONTROL_CLASS} style={{ ...CONTROL_STYLE, marginTop: 12 }}>{retry.isPending ? "Retrying…" : "Retry failed job"}</button>}</div>}</section>
+      <section><h2>Selected job</h2>{!selectedJobId && <div>Select a job to see progress and errors.</div>}{detail.isError && <div role="alert">Could not load job detail: {String(detail.error)}</div>}{detail.isLoading && <div>Loading job detail…</div>}{detail.data && <div><div><strong>{detail.data.state}</strong> · {detail.data.progress?.completed || 0}/{detail.data.progress?.total || 0} complete · {detail.data.progress?.failed || 0} failed · {detail.data.progress?.pending || 0} pending</div>{detail.data.errors?.map((error) => <div key={error} role="alert" className="text-danger" style={{ marginTop: 8 }}>{error}</div>)}{detail.data.steps?.map((step) => <div key={step.id} className="bg-card-muted" style={{ marginTop: 8, padding: 8 }}><strong>{step.step_name}</strong>: {step.state}{step.error && <div role="alert">{step.error}</div>}</div>)}{detail.data.state === "CREATED" && <button type="button" onClick={() => run.mutate(detail.data!.id)} disabled={run.isPending} className={THEMED_CONTROL_CLASS} style={{ ...CONTROL_STYLE, marginTop: 12 }}>{run.isPending ? "Starting…" : "Start import job"}</button>}{detail.data.state === "FAILED" && <button type="button" onClick={() => retry.mutate(detail.data!.id)} disabled={retry.isPending} className={THEMED_CONTROL_CLASS} style={{ ...CONTROL_STYLE, marginTop: 12 }}>{retry.isPending ? "Retrying…" : "Retry failed job"}</button>}</div>}{selectedJobId && <div style={{ marginTop: 12 }}>{jobCandidates.isError && <div role="alert">Could not load job candidates: {String(jobCandidates.error)}</div>}{jobCandidates.isLoading && <div>Loading candidates…</div>}{!jobCandidates.isLoading && jobCandidates.data?.items.length === 0 && <div role="status">No candidates for this job.</div>}{jobCandidates.data && jobCandidates.data.items.length > 0 && <ul style={{ margin: 0, paddingLeft: 18 }}>{jobCandidates.data.items.map((candidate) => <li key={candidate.id} style={{ marginBottom: 6 }}><strong>{candidateName(candidate)}</strong> · {candidate.state}{candidate.state === "split" ? <span className="text-muted-foreground"> · retired split origin</span> : <>{candidate.state !== "rejected" && candidate.state !== "merged" ? <> · <Link className="text-link focus-ring" to={`/review/${candidate.id}?household_id=${effectiveHousehold}`}>Review</Link></> : null}</>}</li>)}</ul>}</div>}</section>
     </div>
     <section style={{ marginTop: 28 }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
@@ -47,7 +59,11 @@ export function InboxPage() {
       {tasks.isError && <div role="alert">Could not load review tasks: {String(tasks.error)}</div>}
       {!tasks.isLoading && totalTasks === 0 && <div role="status">No review tasks.</div>}
       {!tasks.isLoading && totalTasks > 0 && reviewTasks.length === 0 && <div role="status">No {reviewFilter} review tasks.</div>}
-      <div style={{ display: "grid", gap: 8 }}>{reviewTasks.map((task) => <div key={task.id} className="bg-card border-border" style={{ display: "flex", flexWrap: "wrap", justifyContent: "space-between", gap: 12, padding: 12, borderStyle: "solid", borderWidth: 1, borderRadius: 8 }}><div><strong>{task.task_type}</strong> · {task.priority} · {task.status}<div className="text-muted-foreground" style={{ fontSize: 12 }}>Task {task.id} · candidate {task.subject_ref}</div></div><div style={{ display: "flex", gap: 8, alignItems: "center" }}>{task.subject_ref && <Link className="text-link focus-ring" style={{ textDecoration: "underline" }} to={`/review/${task.subject_ref}?household_id=${effectiveHousehold}`}>Review</Link>}{task.status === "open" && <button type="button" onClick={() => resolve.mutate(task.id)} disabled={resolve.isPending} className={THEMED_CONTROL_CLASS} style={CONTROL_STYLE}>Resolve</button>}</div></div>)}</div>
+      <div style={{ display: "grid", gap: 8 }}>{reviewTasks.map((task) => {
+        const subjectKind = task.subject_kind ?? "candidate";
+        const subjectLabel = subjectKind === "asset" ? "item" : subjectKind === "candidate" ? "candidate" : "unknown subject";
+        return <div key={task.id} className="bg-card border-border" style={{ display: "flex", flexWrap: "wrap", justifyContent: "space-between", gap: 12, padding: 12, borderStyle: "solid", borderWidth: 1, borderRadius: 8 }}><div><strong>{task.task_type}</strong> · {task.priority} · {task.status}<div className="text-muted-foreground" style={{ fontSize: 12 }}>Task {task.id} · {subjectLabel} {task.subject_ref}</div></div><div style={{ display: "flex", gap: 8, alignItems: "center" }}>{subjectKind === "asset" && task.subject_ref && <Link className="text-link focus-ring" style={{ textDecoration: "underline" }} to={`/assets/${task.subject_ref}?household_id=${effectiveHousehold}`}>Review</Link>}{subjectKind === "candidate" && task.subject_ref && <Link className="text-link focus-ring" style={{ textDecoration: "underline" }} to={`/review/${task.subject_ref}?household_id=${effectiveHousehold}`}>Review</Link>}{task.status === "open" && !task.data_required && <button type="button" onClick={() => resolve.mutate(task.id)} disabled={resolve.isPending} className={THEMED_CONTROL_CLASS} style={CONTROL_STYLE}>Resolve</button>}</div></div>;
+      })}</div>
     </section>
   </PageContainer>;
 }

@@ -45,7 +45,9 @@ export function CandidateCard({
     Object.entries(candidate.fields).forEach(([key, raw]) => { initial[key] = fieldInfo(raw).value ?? ""; });
     return initial;
   });
-  const blocked = candidate.review_task_ids.length > 0;
+  const blockingTaskIds = candidate.blocking_review_task_ids ?? candidate.review_task_ids;
+  const blocked = blockingTaskIds.length > 0;
+  const dateOnly = !blocked && candidate.review_task_ids.length > 0;
   const evidenceUrls = useMemo(() => {
     const base = import.meta.env.VITE_API_BASE || "http://localhost:8003";
     return candidate.evidence_ids.map((id) => ({ id, url: `${base}/v1/evidence/${id}/thumb/256?household_id=${householdId}` }));
@@ -143,6 +145,9 @@ export function CandidateCard({
           Acceptance is blocked until the open review task(s) are resolved.{" "}
           <Link to={`/inbox?household_id=${householdId}`} className="text-link focus-ring">View them in the Inbox.</Link>
         </p>
+      )}
+      {dateOnly && (
+        <p style={{ marginTop: 10, marginBottom: 0 }}>The date can be added after accepting.</p>
       )}
     </article>
   );

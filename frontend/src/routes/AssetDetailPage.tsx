@@ -475,6 +475,11 @@ export function AssetDetailPage() {
             </button>
           </div>
         )}
+        {!classificationAssertion && (
+          <div role="status" className="text-muted-foreground" style={{ fontSize: 12, marginTop: 6 }}>
+            Choose a category, then add a date if it has one.
+          </div>
+        )}
         {selectedCategory === "documents_other" && (
           <div className="text-muted-foreground" style={{ fontSize: 12, marginTop: 6 }}>
             Documents/other: renewal or validity dates. Keepsakes, letters and photos belong under Non-perishable.

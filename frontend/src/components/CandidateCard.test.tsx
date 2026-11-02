@@ -8,7 +8,7 @@ import type { Candidate } from "../api/types";
 const candidate: Candidate = {
   id: "candidate-loaded-7", state: "proposed", job_id: "job-loaded-7", evidence_ids: ["evidence-loaded-7"],
   fields: { display_name: { value: "Camera", confidence: 0.94, source_type: "ocr" }, identifier: null },
-  dedup_matches: [{ type: "identifier_collision", identifier: "SN-7", asset_id: "asset-7" }], review_task_ids: ["task-loaded-7"],
+  dedup_matches: [{ type: "identifier_collision", identifier: "SN-7", asset_id: "asset-7" }], review_task_ids: ["task-loaded-7"], blocking_review_task_ids: ["task-loaded-7"],
 };
 
 function renderCard(ui: ReactElement) {
@@ -29,7 +29,7 @@ describe("CandidateCard", () => {
 
   test("hold is a first-class action and does not invent an Unknown value", () => {
     const onDecision = vi.fn();
-    renderCard(<CandidateCard candidate={{ ...candidate, review_task_ids: [], dedup_matches: [] }} householdId="h" onDecision={onDecision} />);
+    renderCard(<CandidateCard candidate={{ ...candidate, review_task_ids: [], blocking_review_task_ids: [], dedup_matches: [] }} householdId="h" onDecision={onDecision} />);
     fireEvent.click(screen.getByRole("button", { name: "Hold / Unknown" }));
     expect(onDecision).toHaveBeenCalledWith("hold");
     expect(screen.getByLabelText("identifier value")).toHaveValue("");
@@ -45,7 +45,7 @@ describe("CandidateCard", () => {
     const sourceUrl = "https://world.openfoodfacts.org/api/v2/search?search_terms=Jacobs";
     const withBrand: Candidate = {
       ...candidate,
-      review_task_ids: [],
+      review_task_ids: [], blocking_review_task_ids: [],
       dedup_matches: [],
       fields: {
         brand: { value: "Jacobs", source_type: "user" },
@@ -75,9 +75,9 @@ describe("CandidateCard", () => {
 
   test("split action appears only when a multi-item count is supplied and fires once", () => {
     const onSplit = vi.fn();
-    const { rerender } = renderCard(<CandidateCard candidate={{ ...candidate, review_task_ids: [] }} householdId="h" onDecision={vi.fn()} />);
+    const { rerender } = renderCard(<CandidateCard candidate={{ ...candidate, review_task_ids: [], blocking_review_task_ids: [] }} householdId="h" onDecision={vi.fn()} />);
     expect(screen.queryByRole("button", { name: /split/i })).toBeNull();
-    rerender(<MemoryRouter><CandidateCard candidate={{ ...candidate, review_task_ids: [] }} householdId="h" onDecision={vi.fn()} splitItemCount={2} onSplit={onSplit} /></MemoryRouter>);
+    rerender(<MemoryRouter><CandidateCard candidate={{ ...candidate, review_task_ids: [], blocking_review_task_ids: [] }} householdId="h" onDecision={vi.fn()} splitItemCount={2} onSplit={onSplit} /></MemoryRouter>);
     const button = screen.getByRole("button", { name: /split/i });
     expect(button).toHaveTextContent("2");
     fireEvent.click(button);
@@ -85,7 +85,7 @@ describe("CandidateCard", () => {
   });
 
   test("blocked candidate with zero dedup matches shows a visible reason and Inbox link without hover or alert (SG-171 G1)", () => {
-    renderCard(<CandidateCard candidate={{ ...candidate, review_task_ids: ["task-g1"], dedup_matches: [] }} householdId="household-g1" onDecision={vi.fn()} />);
+    renderCard(<CandidateCard candidate={{ ...candidate, review_task_ids: ["task-g1"], blocking_review_task_ids: ["task-g1"], dedup_matches: [] }} householdId="household-g1" onDecision={vi.fn()} />);
     const article = screen.getByRole("article");
     // The reason is visible text with no alert (no dedup matches) and no hover fired.
     expect(article).toHaveTextContent("Acceptance is blocked until the open review task(s) are resolved.");
@@ -96,14 +96,27 @@ describe("CandidateCard", () => {
     expect(screen.getByRole("button", { name: "Accept" })).toBeDisabled();
   });
 
+  test("a date-only task enables Accept and states the date can follow (SG-270 G5)", () => {
+    renderCard(<CandidateCard candidate={{ ...candidate, review_task_ids: ["task-date-1"], blocking_review_task_ids: [], blocking_review_task_ids: [], dedup_matches: [] }} householdId="h" onDecision={vi.fn()} />);
+    expect(screen.getByRole("button", { name: "Accept" })).toBeEnabled();
+    expect(screen.getByText("The date can be added after accepting.")).toBeInTheDocument();
+    expect(screen.queryByText("Acceptance is blocked until the open review task(s) are resolved.")).toBeNull();
+  });
+
+  test("a blocking task keeps Accept disabled even beside a date task (SG-270 G5)", () => {
+    renderCard(<CandidateCard candidate={{ ...candidate, review_task_ids: ["task-date-1", "task-multi-1"], blocking_review_task_ids: ["task-multi-1"], dedup_matches: [] }} householdId="h" onDecision={vi.fn()} />);
+    expect(screen.getByRole("button", { name: "Accept" })).toBeDisabled();
+    expect(screen.queryByText("The date can be added after accepting.")).toBeNull();
+  });
+
   test("unblocked candidate renders neither the reason sentence nor the Inbox link (SG-171 G1)", () => {
-    renderCard(<CandidateCard candidate={{ ...candidate, review_task_ids: [], dedup_matches: [] }} householdId="h" onDecision={vi.fn()} />);
+    renderCard(<CandidateCard candidate={{ ...candidate, review_task_ids: [], blocking_review_task_ids: [], dedup_matches: [] }} householdId="h" onDecision={vi.fn()} />);
     expect(screen.queryByText("Acceptance is blocked until the open review task(s) are resolved.")).toBeNull();
     expect(screen.queryByRole("link", { name: "View them in the Inbox." })).toBeNull();
   });
 
   test("one photo plus one imageless evidence renders one image and one focusable fallback (SG-171 G2)", () => {
-    renderCard(<CandidateCard candidate={{ ...candidate, review_task_ids: [], dedup_matches: [], evidence_ids: ["photo-g2", "transcript-g2"] }} householdId="h" onDecision={vi.fn()} />);
+    renderCard(<CandidateCard candidate={{ ...candidate, review_task_ids: [], blocking_review_task_ids: [], dedup_matches: [], evidence_ids: ["photo-g2", "transcript-g2"] }} householdId="h" onDecision={vi.fn()} />);
     const article = screen.getByRole("article");
     const imagesBefore = article.querySelectorAll("img");
     expect(imagesBefore).toHaveLength(2);
@@ -116,7 +129,7 @@ describe("CandidateCard", () => {
   });
 
   test("blocked candidate with dedup matches renders the blocked reason exactly once (SG-175 G2)", () => {
-    renderCard(<CandidateCard candidate={{ ...candidate, review_task_ids: ["task-g2"] }} householdId="household-g2" onDecision={vi.fn()} />);
+    renderCard(<CandidateCard candidate={{ ...candidate, review_task_ids: ["task-g2"], blocking_review_task_ids: ["task-g2"] }} householdId="household-g2" onDecision={vi.fn()} />);
     const article = screen.getByRole("article");
     expect(article.textContent?.split("Acceptance is blocked until the open review task(s) are resolved.").length).toBe(2);
     expect(article).toHaveTextContent("Identifier collision: SN-7");
@@ -125,7 +138,7 @@ describe("CandidateCard", () => {
   });
 
   test("unblocked candidate with dedup matches keeps the advisory and no blocked reason (SG-175 G2)", () => {
-    renderCard(<CandidateCard candidate={{ ...candidate, review_task_ids: [] }} householdId="h" onDecision={vi.fn()} />);
+    renderCard(<CandidateCard candidate={{ ...candidate, review_task_ids: [], blocking_review_task_ids: [] }} householdId="h" onDecision={vi.fn()} />);
     const article = screen.getByRole("article");
     expect(article.textContent?.split("Acceptance is blocked until the open review task(s) are resolved.").length).toBe(1);
     expect(article).toHaveTextContent("This match is advisory; review it before accepting.");
@@ -133,7 +146,7 @@ describe("CandidateCard", () => {
   });
 
   test("all-photo evidence renders zero fallback blocks (SG-171 G2)", () => {
-    renderCard(<CandidateCard candidate={{ ...candidate, review_task_ids: [], dedup_matches: [], evidence_ids: ["photo-a", "photo-b"] }} householdId="h" onDecision={vi.fn()} />);
+    renderCard(<CandidateCard candidate={{ ...candidate, review_task_ids: [], blocking_review_task_ids: [], dedup_matches: [], evidence_ids: ["photo-a", "photo-b"] }} householdId="h" onDecision={vi.fn()} />);
     const article = screen.getByRole("article");
     expect(article.querySelectorAll("img")).toHaveLength(2);
     expect(screen.queryByText("Thumbnail unavailable")).toBeNull();

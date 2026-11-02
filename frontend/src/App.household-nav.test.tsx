@@ -41,6 +41,8 @@ function reviewTask(id: string, status: string): ReviewTask {
     task_type: "identifier_collision",
     priority: "high",
     subject_ref: `cand-${id}`,
+    subject_kind: "candidate",
+    data_required: false,
     proposed_change: null,
     status,
     household_id: homeA.id,

@@ -609,4 +609,14 @@ describe("ExpiryEntryForm integration (SG-258)", () => {
     expect(screen.queryByText("Manual expiry entry")).not.toBeInTheDocument();
     expect(screen.queryByText("Manual date entry")).not.toBeInTheDocument();
   });
+
+  test("an unclassified item says what comes next and keeps the date form hidden (SG-270 G5)", async () => {
+    assetBody = before;
+    renderPage();
+    expect(
+      await screen.findByText("Choose a category, then add a date if it has one.")
+    ).toBeInTheDocument();
+    expect(screen.queryByText("Manual expiry entry")).not.toBeInTheDocument();
+    expect(screen.queryByText("Manual date entry")).not.toBeInTheDocument();
+  });
 });

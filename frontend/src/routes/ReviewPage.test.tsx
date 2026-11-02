@@ -108,6 +108,28 @@ describe("ReviewPage", () => {
     await waitFor(() => expect(api.candidateDecision).toHaveBeenCalledTimes(1));
   });
 
+  test("a date-only block allows keyboard accept and links to the item (SG-270 G5)", async () => {
+    api.apiGet.mockImplementation((path: string) => path.startsWith("/v1/candidates/") ? Promise.resolve({ ...candidate, review_task_ids: ["task-date-9"], blocking_review_task_ids: [], asset_id: null }) : Promise.resolve({ items: [], next_cursor: null, total: 0 }));
+    api.candidateDecision.mockResolvedValue({ candidate_id: candidate.id, state: "accepted", asset_id: "asset-new-9", status: "committed", created: true });
+    renderPage();
+    await screen.findByDisplayValue("Loaded item");
+    fireEvent.keyDown(window, { key: "a" });
+    await waitFor(() => expect(api.candidateDecision).toHaveBeenCalledWith(candidate.id, "household-loaded", "accept", expect.anything()));
+    const link = await screen.findByRole("link", { name: "Open the item" });
+    expect(link.getAttribute("href") || "").toContain("/assets/asset-new-9");
+    await waitFor(() => expect(api.apiGet.mock.calls.filter(([path]) => String(path).startsWith("/v1/review-tasks")).length).toBeGreaterThanOrEqual(2));
+  });
+
+  test("a duplicate decision links to the existing item (SG-270 G5)", async () => {
+    api.apiGet.mockImplementation((path: string) => path.startsWith("/v1/candidates/") ? Promise.resolve({ ...candidate, review_task_ids: [], blocking_review_task_ids: [], asset_id: null }) : Promise.resolve({ items: [], next_cursor: null, total: 0 }));
+    api.candidateDecision.mockResolvedValue({ candidate_id: candidate.id, state: "accepted", asset_id: "asset-existing-9", status: "duplicate_linked", created: false });
+    renderPage();
+    await screen.findByDisplayValue("Loaded item");
+    fireEvent.click(screen.getByRole("button", { name: "Accept" }));
+    const link = await screen.findByRole("link", { name: "Open the existing item" });
+    expect(link.getAttribute("href") || "").toContain("/assets/asset-existing-9");
+  });
+
   test("SG-198: the review-tasks list loads through the shared useReviewTasks wiring", async () => {
     // preserved behavior: one ["review-tasks", householdId] fetch for the URL
     // household, and the loaded task still drives the split affordance.

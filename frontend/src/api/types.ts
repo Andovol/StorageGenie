@@ -133,6 +133,9 @@ export type ReviewTask = {
   task_type: string;
   priority: string;
   subject_ref: string;
+  // SG-270 G4: batch-resolved from the live candidate/asset rows.
+  subject_kind: "candidate" | "asset" | "unknown";
+  data_required: boolean;
   proposed_change: unknown;
   status: string;
   household_id: string;
@@ -159,6 +162,8 @@ export type Candidate = {
   fields: Record<string, CandidateField>;
   dedup_matches: DedupMatch[];
   review_task_ids: string[];
+  // SG-270 G5: live open tasks minus the exempt date task; the accept gate.
+  blocking_review_task_ids: string[];
   evidence_ids: string[];
   asset_id?: string | null;
   // SG-119: served by GET /v1/candidates/{id}; absent on older payloads.
@@ -184,6 +189,16 @@ export type CandidateSplitChild = {
   evidence_ids: string[];
   split_item_index?: number | null;
 };
+export type JobCandidate = {
+  id: string;
+  state: string;
+  job_id: string;
+  fields: Record<string, CandidateField>;
+  evidence_ids: string[];
+  review_task_ids: string[];
+};
+export type JobCandidateListResponse = { items: JobCandidate[]; total: number };
+
 export type CandidateSplitResponse = {
   candidate_id: string;
   state: string;

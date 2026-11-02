@@ -201,7 +201,14 @@ export function candidateDecision(
   action: "accept" | "edit" | "hold" | "reject",
   correctedFields: Record<string, unknown> = {}
 ) {
-  return apiPost<{ candidate_id?: string; id?: string; state: string; asset_id?: string }>(
+  return apiPost<{
+    candidate_id?: string;
+    id?: string;
+    state: string;
+    asset_id?: string;
+    status?: string;
+    created?: boolean;
+  }>(
     `/v1/candidates/${candidateId}/decision`,
     { action, corrected_fields: correctedFields },
     { household_id: householdId }
@@ -267,6 +274,7 @@ export function classifyAsset(
     classification: { category: string; label: string };
     expiry_assertion: Assertion | null;
     review_task: string | null;
+    resolved_review_task_ids: string[];
   }>(
     `/v1/plugins/expiry-tracker/assets/${assetId}/classification`,
     { category },

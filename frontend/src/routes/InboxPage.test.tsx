@@ -146,4 +146,40 @@ describe("InboxPage", () => {
     fireEvent.change(screen.getByRole("combobox", { name: /review status/i }), { target: { value: "all" } });
     expect(await screen.findByText(/candidate-resolved-2/)).toBeInTheDocument();
   });
+
+  test("the selected job lists its candidates and labels a retired split origin (SG-270 G3)", async () => {
+    const proposed = { id: "candidate-270-1", state: "proposed", job_id: job.id, fields: { display_name: { value: "Milk carton" } }, evidence_ids: ["ev-270"], review_task_ids: [] };
+    const origin = { id: "candidate-270-origin", state: "split", job_id: job.id, fields: { display_name: { value: "Retired" } }, evidence_ids: ["ev-270"], review_task_ids: [] };
+    api.apiGet.mockImplementation((path: string) => {
+      if (path === "/v1/jobs") return Promise.resolve({ items: [job], next_cursor: null, total: 1 });
+      if (path === `/v1/imports/${job.id}`) return Promise.resolve({ ...detail, state: "AWAITING_REVIEW", errors: [] });
+      if (path === `/v1/jobs/${job.id}/candidates`) return Promise.resolve({ items: [proposed, origin], total: 2 });
+      return Promise.resolve({ items: [], next_cursor: null, total: 0 });
+    });
+    renderPage();
+    fireEvent.click(await screen.findByText("Import job-load"));
+    expect(await screen.findByText("Milk carton")).toBeInTheDocument();
+    expect(screen.getByText(/proposed/)).toBeInTheDocument();
+    const links = screen.getAllByRole("link", { name: "Review" });
+    expect(links).toHaveLength(1);
+    expect(links[0].getAttribute("href") || "").toContain("/review/candidate-270-1");
+    expect(screen.getByText(/retired split origin/)).toBeInTheDocument();
+  });
+
+  test("review tasks link by subject kind and hide Resolve on data-required rows (SG-270 G4)", async () => {
+    const assetTask = { id: "task-270-asset", task_type: "expiry.manual_entry", priority: "high", subject_ref: "asset-270", subject_kind: "asset", data_required: true, proposed_change: null, status: "open", household_id: household.id, created_at: null, updated_at: null };
+    const candidateTask = { id: "task-270-candidate", task_type: "identifier_collision", priority: "high", subject_ref: "candidate-270", subject_kind: "candidate", data_required: false, proposed_change: null, status: "open", household_id: household.id, created_at: null, updated_at: null };
+    const unknownTask = { id: "task-270-unknown", task_type: "expiry.manual_entry", priority: "high", subject_ref: "gone-270", subject_kind: "unknown", data_required: true, proposed_change: null, status: "open", household_id: household.id, created_at: null, updated_at: null };
+    api.apiGet.mockImplementation((path: string) => path === "/v1/jobs" ? Promise.resolve({ items: [], next_cursor: null, total: 0 }) : Promise.resolve({ items: [assetTask, candidateTask, unknownTask], next_cursor: null, total: 3 }));
+    renderPage();
+    expect(await screen.findByText(/item asset-270/)).toBeInTheDocument();
+    expect(screen.getByText(/candidate candidate-270/)).toBeInTheDocument();
+    expect(screen.getByText(/unknown subject gone-270/)).toBeInTheDocument();
+    const links = screen.getAllByRole("link", { name: "Review" });
+    expect(links.map((link) => link.getAttribute("href") || "")).toEqual([
+      `/assets/asset-270?household_id=${household.id}`,
+      `/review/candidate-270?household_id=${household.id}`,
+    ]);
+    expect(screen.getAllByRole("button", { name: "Resolve" })).toHaveLength(1);
+  });
 });
