@@ -35,7 +35,7 @@ Each stage needs the owner's approval. Pantry first and Wardrobe second are the 
 
 Build one thin Pantry end to end, then widen from what real use shows (SG-266 picked this over building the module framework first). The owner tries it on real items: capture, find, use up. The live census holds only 7 assets, and why is not known.
 
-Proposed after critique (SG-267, SG-268); awaiting the owner's approval (D14).
+Approved by the owner 2026-11-02 (D14), after critique (SG-267, SG-268). In progress.
 
 - **First slice, a read-only walk of the real flow, on a throwaway copy with test data:** both capture paths (by hand and by import), inbox, review, category, date, find the item. Record wrong turns and repeated entry as well as dead ends. Known suspects: no link from the review page to the item (`docs/worklogs/SG-262_audit.md`, I1), inbox date tasks that link to the wrong page (I6), and two controls that look like "category" but write different things (`frontend/src/components/shell/ItemInspectorDrawer.tsx:90-107`).
 - **Then the fixes the walk shows are needed.**
