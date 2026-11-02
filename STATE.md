@@ -4,17 +4,17 @@
 
 **The product goals are reset and the plan is `docs/ROADMAP.md`:** a beautiful catalog of everything owned, in modules, Pantry first, Wardrobe second. Owner words: `docs/decisions/2026-10-30-session-approvals.md`. **Stage A is live** (the three date fixes). **The look is chosen** (Linen Shelf, D13). **Stage C, the first real Pantry, is approved and in progress** (*"d14 ok"*, L3).
 
-**First thing next session, put to the owner (arose after the close was requested, so not asked yet) — D15, 🟡 Approve: the larger stage C.** I told the owner roughly 3–5 builder runs and that I would come back if the fixes grew beyond small repairs. The walk found three dead ends, so the honest count is four build slices plus their deploys, about 8 runs (`UNVERIFIED — my estimate`), still no new provider or image spend. Recommended: **approve**, because *the dead ends explain more than the look does and the Pantry cannot work on top of them*.
+**D15 approved 2026-11-02** (*"D15 - approved."*): the larger stage C, four build slices plus their deploys, about 8 runs (`UNVERIFIED — my estimate`), no new provider or image spend.
 
 **Ordered work for stage C, from the walk (`docs/worklogs/SG-269_findings.md`, disposition in `SG-269_audit.md`):**
 
-1. **SG-270, flow fixes, then its rider:** packet written (`docs/packets/SG-270-flow-fixes.md`), not dispatched: **it waits on D15**. F2's design went through the blind pass (SG-274, in `docs/reviews/review-ledger.md`). The rider counts, read-only, live open date tasks by candidate state. SG-274 took the first free ID after the four reserved here; a Phase B, if one is needed, takes SG-275.
+1. **SG-270, flow fixes, then its rider:** packet written (`docs/packets/SG-270-flow-fixes.md`), dispatched after D15. F2's design went through the blind pass (SG-274, in `docs/reviews/review-ledger.md`). The rider counts, read-only, live open date tasks by candidate state. SG-274 took the first free ID after the four reserved here; a Phase B, if one is needed, takes SG-275.
 2. **SG-271, carry the AI's work through, then its rider:** F4 keep the proposed date on classify and offer Accept; F5, F12 use the proposed category; F7 rename one "category" control; F8 stop a deliberately dateless item nagging; F11 if cheap.
 3. **SG-272, gone, put back, quantities, then its rider:** per the roadmap's stage C, with F3 and F13.
 4. **SG-273, the Pantry view, then its rider:** per the roadmap, with F9 and F10. Say in the packet how screens get seen (Chrome exists on the box, no driver).
 5. **The owner tries it on one real shelf**, then again after ordinary household use.
 
-**Owed:** amend the blueprint to the new direction (`inception/generic_asset_catalog_expiry_tracker_blueprint.md`; only its §1.4 non-goal is marked so far); a read-only review run keeps only 200 lines of its report, so keep review reports short.
+**Owed:** in this session's close report to Launcher (issue 62), ask the desk for its recommendation on trimming cold-start context (owner, 2026-11-02; carry the measured 205.8k breakdown from the session); amend the blueprint to the new direction (`inception/generic_asset_catalog_expiry_tracker_blueprint.md`; only its §1.4 non-goal is marked so far); a read-only review run keeps only 200 lines of its report, so keep review reports short.
 
 **Live:** container `c1beebf9`, image `3e0d49de`, schema head `20261023_sg233_reminder`; `docs/releases/2026-11-02-sg262.md` owns the detail. The new classify move has not been used live; the first real use is the owner's. Actual-cost logging and the consent gate are live.
 

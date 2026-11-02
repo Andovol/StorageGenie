@@ -110,4 +110,8 @@ Read as: **D13 = A, Linen Shelf** (the recommendation put to the owner; the boar
 
 Read as: **stage C of `docs/ROADMAP.md` approved at L3**, as put to the owner: the read-only walk on a throwaway copy, the fixes it shows are needed (back to the owner if they grow beyond small repairs), the "gone" and "put back" actions and quick quantities (a needed schema change stops and goes to the owner), the Pantry view in Linen Shelf, and a deploy of each app-changing slice. No new provider or image spend. Second opinion: SG-266, SG-267, SG-268.
 
+**D15 and a directive, 2026-11-02, verbatim:** *"Ask Launcher desk on recommendation for trimming down cold start context in your session close report. D15 - approved."*
+
+Read as: **the larger stage C approved**, as put to the owner: SG-270 to SG-273 plus their deploys, about 8 builder runs (`UNVERIFIED — my estimate`), no new provider or image spend. **Directive:** this session's close report to Launcher carries the question.
+
 Read as (round 2): Pantry first, Wardrobe second, later modules chosen one at a time with the owner (Q6); one item = one module over a shared core (Q7); expiry design is the Architect's to propose (Q8); every product photo shares one cohesive look (Q9); recipes later (Q10); real quantities, quick to change or mark gone (Q11); garments by photo and by web lookup (Q12); outfits as flat-lay, plus an AI user avatar for virtual try-on later (Q13); outfit drivers open (Q14); AI imagery uses to be researched (Q15); spend frugal, no fixed cap (Q16); enrichment per module as proposed (Q17); phone capture, phone + desktop review (Q18); design references and "inspire creativity" to be researched (Q19, Q20).
