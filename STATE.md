@@ -8,7 +8,7 @@
 
 **Ordered work for stage C, from the walk (`docs/worklogs/SG-269_findings.md`, disposition in `SG-269_audit.md`):**
 
-1. **SG-270, flow fixes: rated 91; SG-275, its repair: 97; rider SG-276: 97. Live** (`docs/releases/2026-11-02-sg270.md`). **Split and merge cannot work live:** the live `candidate` table refuses those states (`SG-276_audit.md` I1). A schema decision: blind pass SG-277, critique SG-278, then a decision item to the owner. Builds run on Muse 1.3 Contributor, xhigh (`AGENTS.md`).
+1. **SG-270, flow fixes: rated 91; SG-275, its repair: 97; rider SG-276: 97. Live** (`docs/releases/2026-11-02-sg270.md`). **Split and merge cannot work live:** the live `candidate` table refuses those states (`SG-276_audit.md` I1). **D16 is with the owner, OPEN, recommended not decided:** widen the constraint by one migration (SG-277, SG-278; `docs/reviews/review-ledger.md`), then build SG-279 and rider SG-280, before SG-271. Nothing is built until the owner answers. Builds run on Muse 1.3 Contributor, xhigh (`AGENTS.md`).
 2. **SG-271, carry the AI's work through, then its rider:** `needs_evidence` can open a false date task (SG-270 report); a candidate already committed links to its item, including on reload, and stops offering decisions (SG-275 audit I1); F4 keep the proposed date on classify and offer Accept; F5, F12 use the proposed category; F7 rename one "category" control; F8 stop a deliberately dateless item nagging; F11 if cheap.
 3. **SG-272, gone, put back, quantities, then its rider:** per the roadmap's stage C, with F3 and F13.
 4. **SG-273, the Pantry view, then its rider:** per the roadmap, with F9 and F10. Say in the packet how screens get seen (Chrome exists on the box, no driver).
