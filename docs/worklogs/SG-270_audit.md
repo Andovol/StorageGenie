@@ -2,7 +2,7 @@
 
 **Score 91/100; no flag. The deploy is held until SG-275 fixes I1.** Audited from the diff `efdedcf..24e9d38`. Gate counts read from the logs: host 777 passed, 2 deselected; frontend 336 passed per the report; FAIL run 11 failed, 2 passed, at assertion level; PASS run 13 passed; ruff clean; mypy 9 errors, the same 9 on base. Scope holds: no schema, migration, model or deploy byte. Elapsed 1608 s against ≈1500 s expected.
 
-The fourth dead end was real and is fixed (report (a); `SG-274_report.md` first raised it). Test bodies read: the journey, split, failure and duplicate tests drive the real routes and read rows back. No placebo.
+The fourth dead end was real and is fixed in the code and on the test schema (report (a); `SG-274_report.md` first raised it). **Corrected by `SG-276_audit.md` I1: it does not work live, because the live table refuses the state `split`.** Test bodies read: the journey, split, failure and duplicate tests drive the real routes and read rows back. No placebo.
 
 ## Findings
 

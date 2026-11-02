@@ -8,7 +8,7 @@
 
 **Ordered work for stage C, from the walk (`docs/worklogs/SG-269_findings.md`, disposition in `SG-269_audit.md`):**
 
-1. **SG-270, flow fixes: rated 91; SG-275, its repair: rated 97** (`docs/worklogs/SG-270_audit.md`, `SG-275_audit.md`). **Rider SG-276** deploys both and counts, read-only, live open date tasks by candidate state.
+1. **SG-270, flow fixes: rated 91; SG-275, its repair: 97; rider SG-276: 97. Live** (`docs/releases/2026-11-02-sg270.md`). **Split and merge cannot work live:** the live `candidate` table refuses those states (`SG-276_audit.md` I1). A schema decision: blind pass SG-277, critique SG-278, then a decision item to the owner. Builds run on Muse 1.3 Contributor, xhigh (`AGENTS.md`).
 2. **SG-271, carry the AI's work through, then its rider:** `needs_evidence` can open a false date task (SG-270 report); a candidate already committed links to its item, including on reload, and stops offering decisions (SG-275 audit I1); F4 keep the proposed date on classify and offer Accept; F5, F12 use the proposed category; F7 rename one "category" control; F8 stop a deliberately dateless item nagging; F11 if cheap.
 3. **SG-272, gone, put back, quantities, then its rider:** per the roadmap's stage C, with F3 and F13.
 4. **SG-273, the Pantry view, then its rider:** per the roadmap, with F9 and F10. Say in the packet how screens get seen (Chrome exists on the box, no driver).
@@ -16,7 +16,7 @@
 
 **Owed:** in this session's close report to Launcher (issue 62), ask the desk for its recommendation on trimming cold-start context (owner, 2026-11-02; carry the measured 205.8k breakdown from the session); amend the blueprint to the new direction (`inception/generic_asset_catalog_expiry_tracker_blueprint.md`; only its §1.4 non-goal is marked so far); a read-only review run keeps only 200 lines of its report, so keep review reports short.
 
-**Live:** container `c1beebf9`, image `3e0d49de`, schema head `20261023_sg233_reminder`; `docs/releases/2026-11-02-sg262.md` owns the detail. The new classify move has not been used live; the first real use is the owner's. Actual-cost logging and the consent gate are live.
+**Live:** container `d972bc75`, image `96a66241`, schema head `20261023_sg233_reminder`; `docs/releases/2026-11-02-sg270.md` owns the detail. The classify move and the flow fixes have not been used live; the first real use is the owner's. Actual-cost logging and the consent gate are live.
 
 **Owner decisions:** D9, D10–D14 and all requirement answers: `docs/decisions/2026-10-30-session-approvals.md`. Earlier: `docs/decisions/`. **D7 is done.** Row 14 of the roadmap stays narrowed by the owner (D-1024-17, -18, -19): no fallback yet, cloud only, log costs, predict none. The app's local barcode-and-text reader stays (D-1024-18 is about what we build).
 
