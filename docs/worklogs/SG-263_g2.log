@@ -1,0 +1,51 @@
+=== SG-263 G2 — the served bytes are SG-262's, and nothing else ===
+2026-11-02T13:40:30Z
+--- runtime diff: pre-serve image d620e39d -> worktree, over the served Python tree backend/app ---
+pre_image=sha256:d620e39da976ec169c10c87f71c21983384aa6c8a6361646a7d17720da1e6956
+image_py_files=100 worktree_py_files=100
+measured_changed_files=2
+api/v1/plugins.py
+plugins/expiry_tracker.py
+--- set comparison: measured vs SG-262 backend/app product files ---
+set_diff_rc=0
+extra_files=0
+missing_files=0
+--- files only in image / only in worktree ---
+files_only_in_image=0 files_only_in_worktree=0
+--- served tree (running container) vs worktree after build ---
+served_cp_rc=0
+served_tree_vs_worktree_diff_rc=0
+served_py_files=100 (the *.py find excludes __pycache__/*.pyc by construction)
+--- served tree vs built image tree ---
+served_tree_vs_built_diff_rc=0
+--- frontend bundle hashes and sizes (served over HTTP, pre and post) ---
+pre:
+212dca3296ee6b4d10adb3af62a4f11324d491323ec6f294b68092c1d8a0df51  output/sg263/pre/index.html
+348768ece7ed4c209c98114c29088bb0d157378db92770dc81e868306eb409df  output/sg263/pre/index-C3mGPvdC.js
+c3b58cda696a22970fc2a4a348849fc1359f2105f80f81304ed5dfd5ca31a557  output/sg263/pre/index-C07VbG0m.css
+   944 output/sg263/pre/index.html
+331565 output/sg263/pre/index-C3mGPvdC.js
+  4535 output/sg263/pre/index-C07VbG0m.css
+337044 total
+post:
+index_http=200
+post_js_path=/assets/index-ZzVJBHuk.js
+post_js_http=200
+post_css_path=/assets/index-C07VbG0m.css
+post_css_http=200
+7b11985d73d8636c10909f939a1dafd3145548a19373facc0c898ce70b8e0bdc  output/sg263/post/index.html
+a7e57d20b62db53965fad2ce722e62b0be94cd86423ed1144f25ad89d6f01281  output/sg263/post/index-ZzVJBHuk.js
+c3b58cda696a22970fc2a4a348849fc1359f2105f80f81304ed5dfd5ca31a557  output/sg263/post/index-C07VbG0m.css
+   944 output/sg263/post/index.html
+331377 output/sg263/post/index-ZzVJBHuk.js
+  4535 output/sg263/post/index-C07VbG0m.css
+336856 total
+--- byte comparison (cmp rc, 0 = identical, 1 = changed) ---
+index.html pre_vs_post_cmp_rc=1
+js pre_vs_post_cmp_rc=1
+css pre_vs_post_cmp_rc=0
+--- served values against the built image static ---
+7b11985d73d8636c10909f939a1dafd3145548a19373facc0c898ce70b8e0bdc  output/sg263/built/static/index.html
+a7e57d20b62db53965fad2ce722e62b0be94cd86423ed1144f25ad89d6f01281  output/sg263/built/static/assets/index-ZzVJBHuk.js
+c3b58cda696a22970fc2a4a348849fc1359f2105f80f81304ed5dfd5ca31a557  output/sg263/built/static/assets/index-C07VbG0m.css
+2026-11-02T13:40:30Z

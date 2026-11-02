@@ -1,0 +1,31 @@
+=== SG-263 G1 build tree equality (cache-satisfied build; Python tree; worktree __pycache__ excluded) ===
+2026-11-02T13:39:55Z
+built_image=sha256:3e0d49de6a71a92581f90a9f0e0fad3ed09e103ff8707e417dcbc85cea46805c
+Created=2026-11-02T13:34:41.002168361Z
+create_rc=0
+cp_app_rc=0
+cp_static_rc=0
+rm_rc=0
+built_image_vs_worktree_python_diff_rc=0
+built_py_files=100 worktree_py_files=100
+--- built image static (the bundle the serve will carry) ---
+total 332
+-rw-r--r-- 1 andrei andrei   4535 Nov  2 13:30 index-C07VbG0m.css
+-rw-r--r-- 1 andrei andrei 331377 Nov  2 13:30 index-ZzVJBHuk.js
+7b11985d73d8636c10909f939a1dafd3145548a19373facc0c898ce70b8e0bdc  output/sg263/built/static/index.html
+a7e57d20b62db53965fad2ce722e62b0be94cd86423ed1144f25ad89d6f01281  output/sg263/built/static/assets/index-ZzVJBHuk.js
+c3b58cda696a22970fc2a4a348849fc1359f2105f80f81304ed5dfd5ca31a557  output/sg263/built/static/assets/index-C07VbG0m.css
+   944 output/sg263/built/static/index.html
+331377 output/sg263/built/static/assets/index-ZzVJBHuk.js
+  4535 output/sg263/built/static/assets/index-C07VbG0m.css
+336856 total
+--- built bundle behaviour strings ---
+No date: 1
+Manual expiry entry: 1
+resolved_review_task_ids: 0
+--- built backend behaviour strings ---
+output/sg263/built/app/plugins/expiry_tracker.py:503:        "resolved_review_task_ids": [resolved_task.id for resolved_task in resolved_tasks],
+output/sg263/built/app/api/v1/plugins.py:152:    resolved_ids = result["resolved_review_task_ids"]
+output/sg263/built/app/api/v1/plugins.py:161:        "resolved_review_task_ids": resolved_ids if isinstance(resolved_ids, list) else [],
+output/sg263/built/app/api/v1/plugins.py:226:        "resolved_review_task_ids": [task.id for task in tasks],
+2026-11-02T13:39:56Z

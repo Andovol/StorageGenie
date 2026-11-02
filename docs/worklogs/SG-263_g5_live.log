@@ -1,0 +1,100 @@
+=== SG-263 G5 post-serve app answers + startup log ===
+2026-11-02T13:40:56Z
+--- six health GETs (end block) ---
+health_end_1 {"status":"ok","db":"ok","storage":"ok"} http=200 time=0.003556
+health_end_2 {"status":"ok","db":"ok","storage":"ok"} http=200 time=0.003870
+health_end_3 {"status":"ok","db":"ok","storage":"ok"} http=200 time=0.003413
+health_end_4 {"status":"ok","db":"ok","storage":"ok"} http=200 time=0.003530
+health_end_5 {"status":"ok","db":"ok","storage":"ok"} http=200 time=0.003609
+health_end_6 {"status":"ok","db":"ok","storage":"ok"} http=200 time=0.003345
+--- shell routes ---
+route / http=200
+route /expiry http=200
+route /inbox http=200
+route /planning http=200
+--- final health (end) ---
+{"status":"ok","db":"ok","storage":"ok"}
+http=200 time=0.003409
+--- served container startup log (first 40 lines) ---
+INFO:     Started server process [1]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+INFO:     app.services.reminders.daily - Daily reminder pass completed as_of=2026-11-02 households_visited=1 reminders_created=0 errors=0
+INFO:     127.0.0.1:44752 - "GET /v1/health HTTP/1.1" 200 OK
+INFO:     172.18.0.1:33186 - "GET /v1/health HTTP/1.1" 200 OK
+INFO:     172.18.0.1:33192 - "GET /v1/health HTTP/1.1" 200 OK
+INFO:     172.18.0.1:33194 - "GET /v1/health HTTP/1.1" 200 OK
+INFO:     172.18.0.1:33200 - "GET /v1/health HTTP/1.1" 200 OK
+INFO:     172.18.0.1:33204 - "GET /v1/health HTTP/1.1" 200 OK
+INFO:     172.18.0.1:33210 - "GET /v1/health HTTP/1.1" 200 OK
+INFO:     172.18.0.1:33218 - "GET / HTTP/1.1" 200 OK
+INFO:     172.18.0.1:33230 - "GET /assets/index-ZzVJBHuk.js HTTP/1.1" 200 OK
+INFO:     172.18.0.1:33240 - "GET /assets/index-C07VbG0m.css HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54496 - "GET /v1/health HTTP/1.1" 200 OK
+INFO:     172.18.0.1:35972 - "GET / HTTP/1.1" 200 OK
+INFO:     172.18.0.1:35982 - "GET /assets/index-ZzVJBHuk.js HTTP/1.1" 200 OK
+INFO:     172.18.0.1:35994 - "GET /assets/index-C07VbG0m.css HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50792 - "GET /v1/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:48426 - "GET /v1/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:34390 - "GET /v1/health HTTP/1.1" 200 OK
+INFO:     172.18.0.1:50198 - "GET /v1/health HTTP/1.1" 200 OK
+INFO:     172.18.0.1:50206 - "GET /v1/health HTTP/1.1" 200 OK
+INFO:     172.18.0.1:50222 - "GET /v1/health HTTP/1.1" 200 OK
+INFO:     172.18.0.1:50230 - "GET /v1/health HTTP/1.1" 200 OK
+INFO:     172.18.0.1:50240 - "GET /v1/health HTTP/1.1" 200 OK
+INFO:     172.18.0.1:50252 - "GET /v1/health HTTP/1.1" 200 OK
+INFO:     172.18.0.1:50256 - "GET / HTTP/1.1" 200 OK
+INFO:     172.18.0.1:50262 - "GET /expiry HTTP/1.1" 200 OK
+INFO:     172.18.0.1:50276 - "GET /inbox HTTP/1.1" 200 OK
+INFO:     172.18.0.1:50280 - "GET /planning HTTP/1.1" 200 OK
+INFO:     172.18.0.1:50296 - "GET /v1/health HTTP/1.1" 200 OK
+--- startup/error scan (case-insensitive; errors=0 is the daily pass's own counter) ---
+5:INFO:     app.services.reminders.daily - Daily reminder pass completed as_of=2026-11-02 households_visited=1 reminders_created=0 errors=0
+startup_scan_rc=0
+--- log tail ---
+INFO:     127.0.0.1:34390 - "GET /v1/health HTTP/1.1" 200 OK
+INFO:     172.18.0.1:50198 - "GET /v1/health HTTP/1.1" 200 OK
+INFO:     172.18.0.1:50206 - "GET /v1/health HTTP/1.1" 200 OK
+INFO:     172.18.0.1:50222 - "GET /v1/health HTTP/1.1" 200 OK
+INFO:     172.18.0.1:50230 - "GET /v1/health HTTP/1.1" 200 OK
+INFO:     172.18.0.1:50240 - "GET /v1/health HTTP/1.1" 200 OK
+INFO:     172.18.0.1:50252 - "GET /v1/health HTTP/1.1" 200 OK
+INFO:     172.18.0.1:50256 - "GET / HTTP/1.1" 200 OK
+INFO:     172.18.0.1:50262 - "GET /expiry HTTP/1.1" 200 OK
+INFO:     172.18.0.1:50276 - "GET /inbox HTTP/1.1" 200 OK
+INFO:     172.18.0.1:50280 - "GET /planning HTTP/1.1" 200 OK
+INFO:     172.18.0.1:50296 - "GET /v1/health HTTP/1.1" 200 OK
+--- final census re-check (whole-run window, read-only) ---
+head=20261023_sg233_reminder
+table_count=29
+alembic_version=1
+assertion=40
+asset=7
+asset_evidence=20
+asset_fts=7
+asset_fts_config=1
+asset_fts_data=9
+asset_fts_docsize=7
+asset_fts_idx=7
+asset_location=1
+asset_relation=1
+audit_event=104
+candidate=10
+enrich_snapshot=4
+evidence=27
+guardrail_event=2
+household=1
+idempotency_key=11
+job=11
+job_step=72
+location=1
+observation=20
+planning_suggestion=0
+provider_call=39
+reminder=4
+review_task=9
+saved_search=0
+source_attribution=0
+user=2
+2026-11-02T13:40:57Z

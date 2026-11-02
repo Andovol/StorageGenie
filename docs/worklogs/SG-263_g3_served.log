@@ -1,0 +1,55 @@
+=== SG-263 G3 — the new behaviour is in the served artifact ===
+2026-11-02T13:40:47Z
+--- extract the RUNNING container's own runtime files ---
+served_static_cp_rc=0
+served_js=output/sg263/served_static/assets/index-ZzVJBHuk.js
+a7e57d20b62db53965fad2ce722e62b0be94cd86423ed1144f25ad89d6f01281  output/sg263/served_static/assets/index-ZzVJBHuk.js
+served_static_vs_http_js_cmp_rc=0
+
+1) served app/plugins/expiry_tracker.py: classify_asset's return contains resolved_review_task_ids
+450:def classify_asset(db: Session, asset: Asset, category: Category, tier: str | None) -> dict[str, object]:
+            resolved_task.status = "resolved"
+    return {
+        "classification": classification,
+        "expiry_assertion": expiry_assertion,
+        "review_task": task,
+        "resolved_review_task_ids": [resolved_task.id for resolved_task in resolved_tasks],
+    }
+
+marker_occurrences=1
+
+2) served app/api/v1/plugins.py: the classify route's response contains resolved_review_task_ids
+131:def classify(
+    task = result["review_task"]
+    expiry_assertion = result["expiry_assertion"]
+    resolved_ids = result["resolved_review_task_ids"]
+    return {
+        "plugin_id": expiry_tracker.PLUGIN_ID,
+        "version": expiry_tracker.PLUGIN_VERSION,
+        "classification": result["classification"],
+        "expiry_assertion": _assertion_view(
+            expiry_assertion if isinstance(expiry_assertion, Assertion) else None
+        ),
+        "review_task": task.id if isinstance(task, ReviewTask) else None,
+        "resolved_review_task_ids": resolved_ids if isinstance(resolved_ids, list) else [],
+    }
+marker_occurrences=3
+
+3) served frontend JS contains the string No date
+E==="accepted"&&C===null?"No date":E
+No_date_occurrences_post=3
+No_date_occurrences_pre=2
+note: the pre-serve bundle already carried the literal in the non-perishable help copy (No date; no expiry reminder.); the SG-262 delta is the displayState ternary above, absent before and present now.
+
+4) served frontend JS still contains Manual expiry entry (the asset page keeps the form)
+Manual expiry entry
+Manual_expiry_entry_occurrences_post=1
+Manual_expiry_entry_occurrences_pre=1
+
+--- the review page's removal cannot be shown by a string search on a shared component ---
+ExpiryEntryForm is shared by the asset page (form kept) and was rendered by ReviewPage (form removed); a bundle grep for its strings cannot distinguish the callers. Proof: SG-262's frontend/src/routes/ReviewPage.test.tsx:18 test 'SG-262: the review workspace renders no dataless date form', recorded in the SG-262 gate log docs/worklogs/SG-262_gate_frontend.log.
+18:  test("SG-262: the review workspace renders no dataless date form", async () => {
+
+--- honest limit ---
+The live classify move is NOT exercised by this rider: doing so would write the owner's asset and review_task rows. The served code, bundle and the SG-262 test are the proof; the first real use awaits the owner.
+2026-11-02T13:40:47Z
