@@ -1,0 +1,32 @@
+result=done id=SG-268 inactive
+debug-report-begin
+SG-268 — Phase B Remainder: C-7 and Missing
+**Contract version: 0.56.0**
+
+Model and reasoning effort: unknown; process arguments/provider metadata were unavailable. Configured model policy is not evidence of the model served.
+BASE REF requested: `origin/automation`. Resolved commit: unknown; the supplied repository has no `.git` entry, so correspondence to that ref is unverified.
+Additional files read: `AGENTS.md`; `.contract/CODER.md`; `docs/ROADMAP.md`; `docs/reviews/2026-11-02-roadmap-modules-context.md`. Directory listings inspected: repository root and `.contract/`.
+
+**G1 — C-7: One Deploy Rider Per App-Changing Slice**
+(a) Strongest case against, labelled opinion: a deploy rider proves a release happened, not that the intermediate release is useful or coherent. Splitting coupled Pantry changes into individually deployable slices could expose unfinished interactions or consume effort without producing an owner-usable increment.
+
+Evidence for the distinction: the recommendation specifies deployment frequency (`docs/packets/SG-267-second-opinion-b-critique-first-pantry.md:29`), whereas the outcome is an end-to-end Pantry the owner uses on real items (`docs/ROADMAP.md:17,36-43`). Neither passage establishes that every intermediate app-changing slice independently preserves that journey. No deployment-duration or intermediate-regression measurements were inspected.
+
+This is an objection to treating C-7 as sufficient release acceptance, not to the already-required deployment policy. `AGENTS.md:25` explicitly requires a separate deploy after each rated app-changing slice; that decision remains closed.
+
+(b) Unverified premise: the proposed slice boundaries leave every intermediate live version coherent and compatible with existing items and unfinished follow-on work.
+
+(c) Settling observation: for each proposed boundary, identify the complete user journey that remains usable, then have its authorized deploy rider verify that journey against the actual live commit, including existing-item compatibility. Record deployment effort and any regression. A necessary companion change to complete the journey would show that the implementation boundary needs adjustment, not that deployments should be skipped.
+
+**G2 — Missing: Recovery From Inventory Drift**
+Opinion: the most consequential missing element is a cheap way to reconcile Pantry with the physical cupboard after household actions were not recorded. First-use success does not establish that the inventory will remain believable.
+
+Evidence: Pantry is shared (`docs/ROADMAP.md:39`; `docs/reviews/2026-11-02-roadmap-modules-context.md:47`). The picks cover recording packs and taking them off (`docs/packets/SG-267-second-opinion-b-critique-first-pantry.md:26-27`), but specify no recovery exercise for missed purchases, consumption or disposal. This is distinct from SG-267’s capture friction, classification omissions, ambiguous grouping and archive/restore semantics.
+
+Unverified premise: household members will consistently record changes, or correcting omissions will be easy enough that the owner keeps trusting the overview.
+
+Settling observation: during an authorized owner-use exercise, compare a small physical shelf with Pantry after ordinary household use. Observe whether the owner can spot and correct missing, extra and inaccurate stock without reconstructing every missed event; record correction effort and whether the owner still consults Pantry afterward. No automatic tracking or new household identity system is presumed.
+
+I wrote nothing. No delegation, database access, tests, host changes, credentials access, browser, external network, restart, commit or push occurred. No already-taken decision was reopened.
+This message is the report for engine publication and subsequent `SG-268 --status` read-back; I did not perform that read-back.
+debug-report-end

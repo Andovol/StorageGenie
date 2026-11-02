@@ -35,12 +35,16 @@ Each stage needs the owner's approval. Pantry first and Wardrobe second are the 
 
 Build one thin Pantry end to end, then widen from what real use shows (SG-266 picked this over building the module framework first). The owner tries it on real items: capture, find, use up. The live census holds only 7 assets, and why is not known.
 
-- **First slice, a read-only walk of the real flow:** capture, inbox, review, date entry, find the item; list every step that cannot complete. Known suspects: the review page has no link to the asset page, and inbox date tasks may have no working path (`docs/worklogs/SG-262_audit.md`, I1 and I6).
-- **Pantry view:** what you have and what to use soon, in the agreed look. Household pantry is shared (Q26).
-- **Quantities (Q22):** a count, or an amount with a unit. `asset.quantity` and `asset.unit` already exist, so this is mostly screen work. One tap takes off 1.
-- **"Gone" (Q22):** the ARCHIVED status plus a reason (used, thrown away, given away), so gone does not always mean waste. ARCHIVED has no way back today (`backend/app/services/lifecycle.py:43-49`), so a one-tap action needs an undo design.
-- **Repeat purchases, to decide in the stage's packet:** two packs with different dates in one item would make "use first" wrong.
-- **Modules, as far as this slice needs:** a module is a registered plugin (`backend/app/plugins/registry.py`), and one rule assigns an item to a module. Expiry is a capability modules use (Q21), and the stored paths stay as they are (`plugin:expiry-tracker/…`, `backend/app/plugins/expiry_tracker.py:29`): no data migration. Other dated categories keep working.
+Proposed after critique (SG-267, SG-268); awaiting the owner's approval (D14).
+
+- **First slice, a read-only walk of the real flow, on a throwaway copy with test data:** both capture paths (by hand and by import), inbox, review, category, date, find the item. Record wrong turns and repeated entry as well as dead ends. Known suspects: no link from the review page to the item (`docs/worklogs/SG-262_audit.md`, I1), inbox date tasks that link to the wrong page (I6), and two controls that look like "category" but write different things (`frontend/src/components/shell/ItemInspectorDrawer.tsx:90-107`).
+- **Then the fixes the walk shows are needed.**
+- **What enters Pantry:** accepted category `food_beverages`. Accepting an item does not classify it today (`backend/app/services/candidates.py:850-905`), so anything captured from Pantry counts as food, and unsorted items get a clear "Not sorted yet" prompt rather than vanishing. Shelf-stable food stays food with no date needed; the Non-perishable wording changes so it does not attract groceries.
+- **Pantry view:** what you have and what to use soon, in Linen Shelf, on this view only. Each pack is its own tile, with no grouping by name yet, because names are not reliable product identity. Household pantry is shared (Q26). Photos stay as captured until stage D, so the first version will look less even than the mood board. The menu link appears only when the journey works end to end.
+- **Quantities (Q22):** a count, or an amount with a unit. `asset.quantity` and `asset.unit` already exist. One tap takes off 1 where the item is counted; an amount such as 500 ml opens a quick edit, because taking off "1" means nothing there.
+- **"Gone" (Q22):** the ARCHIVED status plus a reason (used, thrown away, given away), with a "put back" undo, both through one dedicated all-or-nothing action; no schema migration expected. Tests compare the catalog, expiry, reminders, tasks and summaries across a gone-and-back cycle.
+- **Modules, for now:** a small category-to-module map read by the Pantry view, named as temporary. Wardrobe's stage registers the first real second plugin. Expiry is a capability modules use (Q21), and the stored paths stay as they are (`plugin:expiry-tracker/…`, `backend/app/plugins/expiry_tracker.py:29`). Other dated categories keep working.
+- **End of the stage:** the owner uses it on one real shelf, then checks it again after ordinary household use: can missing or wrong stock be corrected without much effort (SG-268)? A special "shelf check" mode gets built only if that shows the need.
 
 ### D. Pantry presentation
 
