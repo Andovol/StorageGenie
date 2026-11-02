@@ -29,6 +29,7 @@ Each stage needs the owner's approval. Pantry first and Wardrobe second are the 
 ### B. The look
 
 - **Done 2026-11-02:** the owner chose direction A, Linen Shelf (D13): beige ground, large photos, Fraunces and DM Sans, olive accent. Board: claude.ai/artifact/XR8roXa3Hv749RofRxgNTH. Its products are stand-in drawings. Real references (Q19) have not been looked at.
+- **Changed by the owner 2026-11-02:** the tandpfun Wardrobe theme (github.com/tandpfun/wardrobe, MIT) replaces Linen Shelf; which screens and when is open. Words: `docs/decisions/2026-10-30-session-approvals.md`. Linen Shelf is not in the code today (a search of `frontend` for its fonts found none).
 - The result becomes the design rules every later screen follows, in `frontend/src/theme/tokens.css`.
 
 ### C. First real Pantry

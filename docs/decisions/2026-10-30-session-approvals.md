@@ -123,3 +123,12 @@ Read as: build and deploy slices dispatched from now on run `coder=opencode mode
 Read as: **one migration widening the live `candidate` state constraint approved**, as put to the owner: build SG-279, a non-mutating check of the lane's rights and the live objects, then deploy SG-280 with a stopped app, a proven backup and the stated recovery states; 2 more builder runs on Muse 1.3 Contributor at xhigh. Second opinion: SG-277, SG-278.
 
 Read as (round 2): Pantry first, Wardrobe second, later modules chosen one at a time with the owner (Q6); one item = one module over a shared core (Q7); expiry design is the Architect's to propose (Q8); every product photo shares one cohesive look (Q9); recipes later (Q10); real quantities, quick to change or mark gone (Q11); garments by photo and by web lookup (Q12); outfits as flat-lay, plus an AI user avatar for virtual try-on later (Q13); outfit drivers open (Q14); AI imagery uses to be researched (Q15); spend frugal, no fixed cap (Q16); enrichment per module as proposed (Q17); phone capture, phone + desktop review (Q18); design references and "inspire creativity" to be researched (Q19, Q20).
+
+
+**Directive and inspiration, 2026-11-02, verbatim:** *"The inspiration for our project was this github repo "https://github.com/tandpfun/wardrobe"."* and *"I also want to use the theme and design of the tandpfun project, as I think its clean and visually attractive."*
+
+Read as: **the tandpfun Wardrobe look replaces Linen Shelf (D13) as the chosen direction**, so the Pantry view in D14 no longer takes Linen Shelf. **Open with the owner, not decided here:** which screens it covers and when. That repo is MIT licensed, so its notice travels with anything copied from it.
+
+**D17, D18, D19 and a directive, 2026-11-02, verbatim:** *"D17-D19 - approved. What is the "Family feed"? Get a 2nd opinion from Sol 6.1 for all important topics."*
+
+Read as: the recommendations put to the owner are approved: **D17** add V1–V7 and W1–W12 to the roadmap and record the not-worth-copying list; **D18** the new theme's colours, font and shapes everywhere, with the full design on the catalog, item panel and Pantry view; **D19** after stage C, shared images (D), then Wardrobe (E). **Directive:** a two-phase second opinion on Sol 6.1 covers these and the other important open topics, SG-282 and SG-283. Advisory: a finding goes back to the owner and changes nothing by itself.

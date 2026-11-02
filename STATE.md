@@ -2,7 +2,7 @@
 
 ## RESUME — closed 2026-11-02 (rules 0.56.0, `AGENTS.md:4`)
 
-**The product goals are reset and the plan is `docs/ROADMAP.md`:** a beautiful catalog of everything owned, in modules, Pantry first, Wardrobe second. Owner words: `docs/decisions/2026-10-30-session-approvals.md`. **Stage A is live** (the three date fixes). **The look is chosen** (Linen Shelf, D13). **Stage C, the first real Pantry, is approved and in progress** (*"d14 ok"*, L3).
+**The product goals are reset and the plan is `docs/ROADMAP.md`:** a beautiful catalog of everything owned, in modules, Pantry first, Wardrobe second. Owner words: `docs/decisions/2026-10-30-session-approvals.md`. **Stage A is live** (the three date fixes). **The look changed:** the owner wants the tandpfun Wardrobe theme instead of Linen Shelf (D13); its scope is open. **SG-279 is built and on `automation`, tip `ab4711a`, through recovery slice SG-281; neither is audited or rated, and SG-280 is not written. Every packet carries the literal `git push origin automation`.** **Stage C, the first real Pantry, is approved and in progress** (*"d14 ok"*, L3).
 
 **The next step is SG-279, approved by the owner (D16, *"D16 - ok."*):** write its packet and dispatch it. Stage C is about 8 runs plus D16's 2 (`UNVERIFIED — my estimate`), no new provider or image spend.
 
