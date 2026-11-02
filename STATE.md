@@ -8,7 +8,7 @@
 
 **Ordered work for stage C, from the walk (`docs/worklogs/SG-269_findings.md`, disposition in `SG-269_audit.md`):**
 
-1. **SG-270, flow fixes, then its rider:** F1 list a job's candidates in the inbox with a Review link, and prove whether AI-read items are also unreachable (audit I1); F2 unblock an AI-no-date candidate (recommended: accept the candidate and carry the date task to the new item's page; a blind second-opinion pass first, since no review covered it); F6 link asset date tasks to the item's page and hide Resolve where it is always refused; add the missing link from review to the item (SG-262 audit I1). Pick up `docs/backlog.md` W8.
+1. **SG-270, flow fixes, then its rider:** packet written (`docs/packets/SG-270-flow-fixes.md`), not dispatched: **it waits on D15**. F2's design went through the blind pass (SG-274, in `docs/reviews/review-ledger.md`). The rider counts, read-only, live open date tasks by candidate state. SG-274 took the first free ID after the four reserved here; a Phase B, if one is needed, takes SG-275.
 2. **SG-271, carry the AI's work through, then its rider:** F4 keep the proposed date on classify and offer Accept; F5, F12 use the proposed category; F7 rename one "category" control; F8 stop a deliberately dateless item nagging; F11 if cheap.
 3. **SG-272, gone, put back, quantities, then its rider:** per the roadmap's stage C, with F3 and F13.
 4. **SG-273, the Pantry view, then its rider:** per the roadmap, with F9 and F10. Say in the packet how screens get seen (Chrome exists on the box, no driver).
