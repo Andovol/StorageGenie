@@ -1,0 +1,28 @@
+Dispatch-ID: SG-279.dbg | Report: note
+Debug-Report-Begin
+STAGE: unknown
+CAUSE: unknown — the dispatcher's original classification record that marked SG-279 failed would settle the discrepancy.
+EVIDENCE:
+- "DISPATCH_EVIDENCE instance=SG-279.dbg failed_id=SG-279 utc=2026-11-02T16:31:53Z" — evidence file header.
+- "Result=success" — evidence file, [failed-unit-status].
+- "DISPATCH_RESULT id=SG-279 coder=opencode exit=0 head=a6bab9aec41822408c3c866ba3c8f21d30a7ba97 note=yes moved=yes rewrite=no dirty=no elapsed=818s budget=2100s stragglers=0 permission_denied=bash" — evidence file, [failed-unit-journal].
+- "P1_moved=PASS count=2", "P2_rewrite=PASS behind=0", "P3_note=PASS note=yes", "P5_receipt=PASS", and "P6_dirty=PASS dirty=no" — evidence file, [failed-unit-journal].
+- "dispatch-storagegenie@SG-279.service: Deactivated successfully." and "Finished dispatch-storagegenie@SG-279.service - Confined Coder slice SG-279." — evidence file, [failed-unit-journal].
+- "they must FAIL and the failure text must name `ck_candidate_state`" — packet, G2; the two route-test failures in the run log were the required pre-change test run, which ended "EXIT:0".
+- "A2 — FAIL names `ck_candidate_state`, PASS after; both logs committed: PASS." and "Verification: PASS" — `docs/worklogs/SG-279_report.md`.
+- "Verification: PASS" — `output/dispatch/SG-279.log`.
+- "Dispatch-ID: SG-279 | Report: docs/worklogs/SG-279_report.md | Work-HEAD: 3179eacdd0bb9516990ad584d48088690bf5f876" — receipt note on `refs/notes/storagegenie-coder-reports`.
+- "## automation...origin/automation [ahead 2]" — `git status --short --branch`; no modified or untracked entries.
+STRANDED WORK:
+- `refs/heads/automation`: two commits ahead of origin — `3179eac` (SG-279 work) and `a6bab9a` (SG-279 report); worktree clean.
+- `refs/quarantine/preserve-20260907T083833Z`: preserved ahead-of-origin commit `6d96856`, containing `docs/worklogs/SG-008_report.md`.
+- `refs/quarantine/preserve-20261017T171411Z`: preserved ahead-of-origin commit `7a99fc7`, containing the SG-208 G1 removal of household switching UI and its tests (19 files).
+- `refs/quarantine/SG-025-20260912T164340Z`: quarantined SG-025 debris, no receipt; provider-call migration/model and provider abstraction, tests, ADRs, and worklogs (15 files).
+- `refs/quarantine/SG-066-20260921T095958Z`: quarantined SG-066 debris, no receipt; analytics backend service/API, prompt, frontend route, and tests (11 files).
+- `refs/quarantine/SG-088-20260921T174803Z`: quarantined SG-088 debris, no receipt; plugin-taxonomy/Postgres test changes and worklogs (4 files).
+- `refs/quarantine/SG-208-20261017T171409Z`: quarantined SG-208 debris, no receipt; browser driver, UI screenshots, and smoke-test JSON (7 files).
+NEXT ACTION: needs the desk
+CONFIDENCE: high
+
+Debug-Report-End
+moved=no
