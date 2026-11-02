@@ -1,0 +1,51 @@
+SG280-G3-START app stays up; copies under scratch; counts/hashes only
++ docker run --rm --label sg280-scratch -v /home/andrei/StorageGenie/data/db:/data/db:ro storagegenie-backend:latest python -c import sqlite3;con=sqlite3.connect('file:/data/db/storagegenie.db?mode=ro',uri=True);print('ro-mount-ok', con.execute('SELECT COUNT(*) FROM candidate').fetchone()[0])
+ro-mount-ok 10
+
+
+RC=0
++ docker run --rm --label sg280-scratch -v /home/andrei/StorageGenie/data/db:/live:ro -v /home/andrei/StorageGenie/output/SG-280-scratch:/scratch storagegenie-backend:latest python -c import sqlite3;src=sqlite3.connect('file:/live/storagegenie.db?mode=ro',uri=True);dst=sqlite3.connect('/scratch/live-copy.db');src.backup(dst);dst.commit();print('backup-ok');
+backup-ok
+
+
+RC=0
+live-copy sha256=3aa4e1f5237f6e0a3ec15ce75a999c259e371917e5522a9debda2cb4b32eb4d2
+live-copy counts tables=29 candidate=10 rowhash=81af8de283e9fa34
++ docker run --rm --label sg280-scratch -v /home/andrei/StorageGenie/output/SG-280-scratch:/scratch -e DATABASE_URL=sqlite:////scratch/step1.db storagegenie-backend:latest alembic upgrade head
+
+INFO  [alembic.runtime.migration] Context impl SQLiteImpl.
+INFO  [alembic.runtime.migration] Will assume non-transactional DDL.
+INFO  [alembic.runtime.migration] Running upgrade 20261023_sg233_reminder -> 20261102_sg279_candidate_state, widen candidate state constraint for split and merge (SG-279)
+
+RC=0
+step1 rev=20261102_sg279_candidate_state integrity=ok fk_violations=0
+step1 counts_equal=True rowhash_equal=True
+step1 master_changed=[('table', 'candidate')] master_only=[]
+step1 split accepted
+step1 merged accepted
+step1 bogus refused ok=True
+SG280-G3-STEP1-PASS
++ docker run --rm --label sg280-scratch -v /home/andrei/StorageGenie/output/SG-280-scratch:/scratch -e DATABASE_URL=sqlite:////scratch/step2.db storagegenie-backend:latest python /scratch/kill_after_drop.py
+KILLPOINT rename seen; exiting
+
+INFO  [alembic.runtime.migration] Context impl SQLiteImpl.
+INFO  [alembic.runtime.migration] Will assume non-transactional DDL.
+INFO  [alembic.runtime.migration] Running upgrade 20261023_sg233_reminder -> 20261102_sg279_candidate_state, widen candidate state constraint for split and merge (SG-279)
+
+RC=99
+step2 killer rc=99
+step2 objects candidate_missing=False tmp_present=True rev=20261023_sg233_reminder
+step2 damage_landed=True
+SG280-G3-STEP2-PASS
+step3 hash_equal=True integrity=ok fk=0 rev=20261023_sg233_reminder counts_equal=True
+SG280-G3-STEP3-PASS
++ docker create --label sg280-scratch --name sg280-old-read -v /home/andrei/StorageGenie/output/SG-280-scratch:/scratch -e DATABASE_URL=sqlite:////scratch/step2.db -e STORAGE_ROOT=/scratch/storage sha256:96a662414c234074c5323665276610d45ba58d753c72027072c96c0a2dc25f22 python -c print('old-image-present')
+
+Error response from daemon: No such image: sha256:96a662414c234074c5323665276610d45ba58d753c72027072c96c0a2dc25f22
+
+RC=1
+SG280-G3-STEP4-OLD-IMAGE-MISSING STOP in S0
+step5 hash_equal=False
+step5 refused by exception ok=True DatabaseError
+SG280-G3-STEP5-PASS (manual: truncated copy refused by hash mismatch + DatabaseError)
+SG280-G3-END STATE=S0 app untouched; G4 never started
