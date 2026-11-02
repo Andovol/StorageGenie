@@ -226,3 +226,5 @@ UNCLEAR DURING EXECUTION: A delegated investigation attempted an outside-reposit
 UNCLEAR REMAINING: BASE provenance, deployed-schema compatibility and actual household usability remain unverified. All findings above are static analysis; I wrote nothing.
 Debug-Report-End
 moved=no
+
+Settings: coder=opencode coder_source=command model=openai/gpt-6.1-sol model_source=command effort=medium effort_source=command agent=plan agent_source=command
