@@ -102,4 +102,8 @@ Read as, each being the recommendation put to the owner on 2026-11-02: **Q21** e
 
 Read as: **D11 approved** — stage A of `docs/ROADMAP.md`: the independent review of the roadmap, the three D7 fixes (one work slice), one deploy rider. **D8 closes on this approval**; the roadmap is now the plan, and stages B onward each still need the owner's approval. **D12 = Option 1** — the focused imagery and creativity set. **Second opinion:** `openai/gpt-6.1-sol` at effort `medium` (`AGENTS.md` owns the value). **Autonomy:** L3 inside the stage.
 
+**D13 and a standing directive, 2026-11-02, verbatim:** *"D13- approved. Always get my approval before creating artifacts like this Mood Board."*
+
+Read as: **D13 = A, Linen Shelf** (the recommendation put to the owner; the board: claude.ai/artifact/XR8roXa3Hv749RofRxgNTH). **Standing:** no artifact is created without the owner's approval first (`AGENTS.md` owns the rule).
+
 Read as (round 2): Pantry first, Wardrobe second, later modules chosen one at a time with the owner (Q6); one item = one module over a shared core (Q7); expiry design is the Architect's to propose (Q8); every product photo shares one cohesive look (Q9); recipes later (Q10); real quantities, quick to change or mark gone (Q11); garments by photo and by web lookup (Q12); outfits as flat-lay, plus an AI user avatar for virtual try-on later (Q13); outfit drivers open (Q14); AI imagery uses to be researched (Q15); spend frugal, no fixed cap (Q16); enrichment per module as proposed (Q17); phone capture, phone + desktop review (Q18); design references and "inspire creativity" to be researched (Q19, Q20).

@@ -27,13 +27,14 @@ Each stage needs the owner's approval. Pantry first and Wardrobe second are the 
 
 ### B. The look
 
-- A mood-board page outside the app, so nothing is dispatched or deployed. It shows real references (Q19) and the warm-neutral photo style (Q23).
+- **Done 2026-11-02:** the owner chose direction A, Linen Shelf (D13): beige ground, large photos, Fraunces and DM Sans, olive accent. Board: claude.ai/artifact/XR8roXa3Hv749RofRxgNTH. Its products are stand-in drawings. Real references (Q19) have not been looked at.
 - The result becomes the design rules every later screen follows, in `frontend/src/theme/tokens.css`.
 
 ### C. First real Pantry
 
 Build one thin Pantry end to end, then widen from what real use shows (SG-266 picked this over building the module framework first). The owner tries it on real items: capture, find, use up. The live census holds only 7 assets, and why is not known.
 
+- **First slice, a read-only walk of the real flow:** capture, inbox, review, date entry, find the item; list every step that cannot complete. Known suspects: the review page has no link to the asset page, and inbox date tasks may have no working path (`docs/worklogs/SG-262_audit.md`, I1 and I6).
 - **Pantry view:** what you have and what to use soon, in the agreed look. Household pantry is shared (Q26).
 - **Quantities (Q22):** a count, or an amount with a unit. `asset.quantity` and `asset.unit` already exist, so this is mostly screen work. One tap takes off 1.
 - **"Gone" (Q22):** the ARCHIVED status plus a reason (used, thrown away, given away), so gone does not always mean waste. ARCHIVED has no way back today (`backend/app/services/lifecycle.py:43-49`), so a one-tap action needs an undo design.

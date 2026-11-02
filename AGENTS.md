@@ -57,6 +57,7 @@ The coder reads its own copy on the server and never reads from this repo.
 
 ## Project rules — small additions to the shared rules
 
+- **Artifacts** (owner, 2026-11-02): get the owner's approval before creating an artifact such as a mood board. *"Always get my approval before creating artifacts like this Mood Board."*
 - **Upload cap:** 20 megabytes in `backend/app/config.py` is a hard security limit. A larger upload gets a too-large answer, never a silent cut.
 - **No second copies:** where this repo repeats a shared rule, the shared rule wins and this copy is only a pointer.
 - **Sensitive areas:** the stored photos and files, the app database, and the dispatch key and host. Every plan touching one goes to the owner alone, at every autonomy level. An area not listed here is not declared safe — it is simply not declared.
