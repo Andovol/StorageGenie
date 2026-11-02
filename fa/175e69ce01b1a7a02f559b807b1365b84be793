@@ -1,0 +1,96 @@
+Dispatch-ID: SG-278 | Report: note
+Debug-Report-Begin
+SG-278 model=unknown; effort=unknown (process arguments/provider metadata unavailable within permitted reads); directory=/tmp/dispatch-review.fS9Bzn; remote=unverified; WORK_HEAD=unknown.
+BASE_REF_REQUESTED: origin/automation
+BASE_COMMIT_RESOLVED: unknown. The supplied repository snapshot has no `.git` entry; its resolved commit and equivalence to BASE cannot be independently established.
+**Contract version: 0.56.0** — **echo this line verbatim in your receipt.** It is the only proof that you
+Contract provenance: repository-local `.contract/CODER.md:3`; `.contract/SOURCE:1` records version 0.56.0. No external version command was run.
+Outcome: source critique completed; BASE provenance remains blocked. This report is not approval to migrate or evidence of executable recovery.
+
+**Extra Files**
+For completeness, this inventory includes named code as well as expansions beyond AGENTS.md, the context pack and SG-277_report.md. Search excerpts count as reads; not every file below was read in full.
+- `.contract/CODER.md`, `.contract/SOURCE`, `docker-compose.yml`, `Makefile`, `backend/Dockerfile`.
+- `backend/alembic/env.py`.
+- Under `backend/alembic/versions/`: `0201cf10c56c_001_core_foundation.py`, `20260908_sg013_observation.py`, `20260908_sg014_candidate.py`, `20260908_sg017_fts.py`.
+- Same directory: `20260912_sg025_provider_call.py`, `20260914_sg035_foundations.py`, `20260916_sg048_name_optional.py`, `20260917_sg068_saved_search.py`.
+- Same directory: `20260924_sg113_location.py`, `20260924_sg114_relation.py`, `20261023_sg233_reminder.py`.
+- `backend/app/db.py`, `backend/app/server.py`, `backend/app/config.py`.
+- `backend/app/services/candidates.py`, `backend/app/services/fts.py`, `backend/app/services/reminders/daily.py`.
+- `backend/app/services/observations.py`, `backend/app/services/dedup.py` (search excerpts).
+- `backend/app/api/v1/candidates.py`, `backend/app/api/v1/enrich.py`, `backend/app/api/v1/jobs.py` (the latter two: search excerpts).
+- `backend/app/models/review_task.py`, `backend/app/models/relation.py`, `backend/app/models/reminder.py` (the latter two: search excerpts).
+- `backend/app/plugins/expiry_tracker.py` (search excerpts).
+- `backend/tests/test_candidates.py`, `backend/tests/test_review_split.py`, `backend/tests/test_sg112_merge.py`, `backend/tests/test_sg270_flow.py`.
+- Under `docs/releases/`: `2026-10-17.md`, `2026-10-17-sg212.md`, `2026-10-21.md`, `2026-10-23.md`, `2026-10-24.md`, `2026-10-24-sg239.md`, `2026-10-24-sg240.md`, `2026-10-24-sg250.md`, `2026-10-28-sg256.md` (search excerpts).
+- Same directory: `2026-10-30-sg258.md`, `2026-11-02-sg262.md`, `2026-11-02-sg270.md` (full reads).
+- `docs/packets/SG-276-deploy-rider-for-sg270-sg275.md`, `docs/worklogs/SG-276_report.md`.
+Expansion triggers: establish FTS dependencies, incoming foreign keys, startup writers, actual deployment precedent and lane authorization.
+Directory listings: repository root, `.contract/`, `backend/alembic/versions/`, `docs/releases/`. Packet filename searches returned paths only.
+
+**R4: Deploy Rider, Most Serious Objection**
+Strongest case against: recovery is described more confidently than its executable authorization and failure boundaries justify.
+- Starting the new image immediately resumes a writer, before health/shell checks: `backend/app/server.py:32` starts the reminder task; `backend/app/services/reminders/daily.py:98-104` runs a pass “at once.” Thus a failed post-start health check is already outside the guaranteed no-writer restore window, even if user traffic remains closed.
+- This is not merely theoretical precedent: `docs/packets/SG-276-deploy-rider-for-sg270-sg275.md:52` explicitly allows startup reminders to add rows. SG-276_report.md:15 recorded zero additions on that particular run, not a permanent guarantee.
+- The documented deploy authorization covers one build and one recreate, with “no migration” (`SG-276` packet:26-30,82-84). Its lane socket answering `docker version` proves connectivity, not permission for stop, arbitrary one-shot containers, backup writes or restore.
+- `docker compose exec` cannot provide migration execution inside the stopped backend. A separate one-shot process is needed. The image contains backend/Alembic files (`backend/Dockerfile:13-19`), and Compose supplies the database mount/environment (`docker-compose.yml:9-18`), so that approach is source-plausible, not lane-proven.
+- `Makefile:28-29` instead runs host Python. It is not evidence of a stopped-container migration procedure; settings default to a relative database path (`backend/app/config.py:12`), and Alembic overrides its configured URL from settings (`backend/alembic/env.py:22-23`).
+- R4 does not explicitly cover a failed/ambiguous stop, interrupted migration, failed restore, failed old-image restart, or a permission denial during recovery. “Any failed step ... starts the old image” cannot be guaranteed. `.contract/CODER.md:80-94,559-560` requires STOP on denial, not an alternate route.
+Unverified premise: the future lane permits the exact stop, one-shot migration, backup and restore operations, and can recover using an identified old image.
+Settling observation: a non-mutating policy inspection establishing those rights, followed by an authorized isolated rehearsal of the exact commands and failure branches. No such inspection was possible from the supplied files.
+Required correction: distinguish pre-migration, migration-started-but-writers-still-stopped, and backend-started states. After backend start, presume writes possible; stop and obtain the new owner decision before restoring.
+Opinion: preserve the old image by immutable identity and specify how it is restarted without accidentally selecting the newly built tag. Pin backup/live/scratch destinations, WAL/SHM handling and recovery checks; a failed recovery leaves the service stopped with outcome UNKNOWN.
+PB-2: this critique lane authorizes none of these operations. I attempted none and encountered no privileged denial.
+
+**R1: Widen the Named Constraint**
+Strongest case against: “no other schema change” is the intended result, not yet a demonstrated property of SQLite's physical rebuild.
+Evidence: the founding migration defines the named five-state CHECK, two outgoing CASCADE foreign keys and two indexes (`backend/alembic/versions/20260908_sg014_candidate.py:23-37`). Candidate currently declares no CHECK (`backend/app/services/candidates.py:496-508`).
+FTS check: `backend/app/services/fts.py:46-82` defines its content view and all three triggers against `asset`, not `candidate`. The asset-rebuild workaround explains why its view must be removed when rebuilding asset (`20260916_sg048_name_optional.py:85-102`); it is not evidence that rebuilding candidate requires FTS teardown.
+Foreign-key check: the migration-directory search found no declared FK targeting candidate. `ReviewTask.subject_ref` is a plain string, not a candidate FK (`backend/app/models/review_task.py:14-18`). This reduces the expected cascade/rebuild hazard; it does not establish the live database has no additional objects.
+Unverified premise: live schema objects match the migration-defined inventory, with no custom candidate trigger, view or incoming FK.
+Settling observation: authorized preflight inventory of live tables, views, triggers, indexes and incoming FKs, plus a populated old-head rehearsal proving the sole intended DDL difference is the named CHECK's accepted set.
+Disposition: no source-backed reason to reject widening or to rebuild asset_fts. Preserve FTS unchanged and verify its definitions and behavior rather than importing the asset workaround without evidence.
+
+**R2: Targeted Migrated-Schema Tests**
+Strongest case against: an “Alembic at head” label and a route response can still test the wrong connection or stale ORM state.
+Evidence: Alembic overwrites its URL from `settings.database_url` (`backend/alembic/env.py:22-23`). Existing fixtures construct independent engines using `create_all` (`test_review_split.py:29-34`, `test_sg112_merge.py:40-46`, `test_sg270_flow.py:31-36`).
+The routes commit (`backend/app/api/v1/candidates.py:207,229`), so read-back should use a fresh session against the same migrated file, not only the seed session's identity map.
+A second gap is connection parity: the application enables FK enforcement on its own engine (`backend/app/db.py:22-27`), whereas the displayed test fixtures do not install that connection hook.
+Unverified premise: migrations, request sessions and read-back all target one isolated file, and the fixture enforces the relevant production connection behavior.
+Settling observation: record the temporary database identity and revision; capture each route test failing on old head specifically at `ck_candidate_state`, then passing at new head; independently verify committed origin/loser states and child/survivor records.
+The allowed-state test must isolate invalid-state failures so one failed transaction cannot invalidate later assertions.
+Disposition: retaining other tests' `create_all` is reasonable for this defect. The additional model CHECK also needs a small parity assertion; a migrated-only allowed-state test cannot detect its omission from metadata.
+
+**R3: Build and Rehearsal**
+Strongest case against: a successful upgrade and an empty downgrade do not demonstrate either refusal safety or collateral-object preservation.
+Evidence: existing migration coverage asserts only candidate table presence through upgrade/downgrade/upgrade (`backend/tests/test_candidates.py:154-166`). FTS views/triggers are separate DDL objects (`backend/app/services/fts.py:44-85`), outside candidate column/index comparisons.
+Also, Alembic creates its own engine (`backend/alembic/env.py:35-44`); importing the application's engine does not establish the migration connection's foreign-key setting.
+Unverified premise: the proposed rehearsal exercises representative populated rows, actual migration connection settings and both downgrade branches.
+Settling observation: upgrade populated old-head data covering all five existing states; compare every candidate value and relevant schema object; verify unrelated table contents/counts, FTS definitions and search behavior, and post-upgrade integrity/FK checks.
+Exercise downgrade success with no new-state rows and refusal with split/merged rows. Refusal must occur before mutation and preserve revision, data and schema.
+Opinion: include interruption/partial-failure recovery in the isolated deployment rehearsal. Successful forward/backward commands alone do not settle R4's recovery claims.
+Disposition: retain the build slice, but make these checks explicit rather than treating “rehearsal” as their proof.
+
+**R5: Defer General Export Restore**
+Strongest case against: this boundary becomes unsafe if “this backup proof” is interpreted as merely opening a scratch copy and counting rows.
+Evidence: the context pack:21 records “export exists but restore does not.” SG-277_report.md:84 correctly identifies executable recovery as the unverified premise. SQLite backup recovery and application export/import recovery are different paths.
+Unverified premise: the scratch restoration uses the same mechanism, destination replacement and operational permissions needed for live rollback, rather than only proving the backup is readable.
+Settling observation: isolated restore using the proposed rollback procedure, with schema/integrity/FK checks, complete data comparison and application-readable data; account separately for unchanged storage mounts.
+Disposition: no objection to leaving general export restoration in stage D. I checked that R4 proposes SQLite backup recovery, not export recovery; the narrower proof must remain a release blocker and must not be reported as general disaster-recovery completion.
+
+**R6: Before SG-271; Owner's First Real Use**
+Strongest case against: ordering the repair first does not establish SG-271's prerequisites or prove the deployed end-to-end workflow.
+Evidence: `docs/releases/2026-11-02-sg270.md:30` explicitly records split and merge as not working live. The operations also have independent validation gates before the affected state writes (`backend/app/services/candidates.py:1297-1316,1456-1486`).
+No SG-271 packet was returned by the filename search in `docs/packets`; its exact dependency contract therefore remains unverified here.
+Unverified premise: completing this migration and targeted tests is sufficient for SG-271 to proceed.
+Settling observation: SG-271's packet names the rated build and successful deployment evidence as dependencies; a temporary-data workflow proves split, child acceptance and merge semantics. The first use on owner data remains the owner's.
+Disposition: no objection to repairing first or avoiding live writes on the owner's records. I checked the release's known blocker and the service preconditions; neither justifies using the owner's first attempt as the regression test.
+
+**Close**
+Read the contract, AGENTS.md, supplied context and Phase A report, then the code, deployment evidence and search excerpts inventoried above. I did not read STATE.md, docs/decisions/, or SG-276_audit.md.
+No database, host, credentials, browser, network, health probe, tests, migration, restart, commit or push was accessed or executed. I wrote nothing.
+PB-6: BASE provenance could not be established; no write was attempted to remedy it. Publication is delegated to the engine as the packet requires.
+UNCLEAR FIRST READ: whether the supplied snapshot exposed a resolved BASE commit.
+UNCLEAR DURING EXECUTION: it exposes no `.git`; lane policy and the production overlay are absent from the supplied contract directory.
+UNCLEAR REMAINING: resolved BASE identity, exact operational rights, live object inventory, rehearsed recovery and SG-271's dependency contract.
+Debug-Report-End
+moved=no
