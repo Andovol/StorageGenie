@@ -94,3 +94,5 @@ UNCLEAR DURING EXECUTION: it exposes no `.git`; lane policy and the production o
 UNCLEAR REMAINING: resolved BASE identity, exact operational rights, live object inventory, rehearsed recovery and SG-271's dependency contract.
 Debug-Report-End
 moved=no
+
+Settings: coder=opencode coder_source=command model=openai/gpt-6.1-sol model_source=command effort=medium effort_source=command agent=plan agent_source=command
