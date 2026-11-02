@@ -1,0 +1,92 @@
+FFF                                                                      [100%]
+=================================== FAILURES ===================================
+___ test_move_to_non_perishable_resolves_open_date_tasks_with_an_active_row ____
+
+plugin_db = (<sqlalchemy.orm.session.Session object at 0x753751eb2060>, '01a19c76-320b-70b0-abb3-4b4a0f81bd48')
+
+    def test_move_to_non_perishable_resolves_open_date_tasks_with_an_active_row(plugin_db) -> None:  # type: ignore[no-untyped-def]
+        session, household_id = plugin_db
+        asset = make_asset(session, household_id, "Canned beans")
+        with TestClient(app) as client:
+            assert classify(client, asset.id, household_id, "food").status_code == 200
+            entered = client.post(
+                f"/v1/plugins/expiry-tracker/assets/{asset.id}/expiry",
+                params={"household_id": household_id},
+                json={"expiry_date": "2030-05-06"},
+            )
+            date_task = _open_task(session, household_id, asset.id)
+            unrelated_task = _open_task(session, household_id, asset.id, "candidate.multi_item")
+            moved = classify(client, asset.id, household_id, "non_perishable")
+    
+        assert entered.status_code == 200, entered.text
+        assert moved.status_code == 200, moved.text
+        session.expire_all()
+>       assert session.get(ReviewTask, date_task.id).status == "resolved"
+E       AssertionError: assert 'open' == 'resolved'
+E         
+E         - resolved
+E         + open
+
+tests/test_plugin_expiry.py:656: AssertionError
+___ test_move_to_non_perishable_resolves_the_open_task_without_an_active_row ___
+
+plugin_db = (<sqlalchemy.orm.session.Session object at 0x75375200b890>, '01a19c76-3361-7893-b869-80efff4f547d')
+
+    def test_move_to_non_perishable_resolves_the_open_task_without_an_active_row(plugin_db) -> None:  # type: ignore[no-untyped-def]
+        session, household_id = plugin_db
+        asset = make_asset(session, household_id, "Cordless drill", "tool")
+        date_task = _open_task(session, household_id, asset.id)
+        candidate_task = _open_task(session, household_id, "candidate-elsewhere")
+        with TestClient(app) as client:
+            moved = classify(client, asset.id, household_id, "non_perishable")
+    
+        assert moved.status_code == 200, moved.text
+        session.expire_all()
+>       assert session.get(ReviewTask, date_task.id).status == "resolved"
+E       AssertionError: assert 'open' == 'resolved'
+E         
+E         - resolved
+E         + open
+
+tests/test_plugin_expiry.py:675: AssertionError
+_____________ test_move_between_dated_categories_resolves_no_tasks _____________
+
+plugin_db = (<sqlalchemy.orm.session.Session object at 0x7537514a9fd0>, '01a19c76-33ee-7c91-a1f4-b2b39b8c061f')
+
+    def test_move_between_dated_categories_resolves_no_tasks(plugin_db) -> None:  # type: ignore[no-untyped-def]
+        session, household_id = plugin_db
+        asset = make_asset(session, household_id, "Canned beans")
+        with TestClient(app) as client:
+            assert classify(client, asset.id, household_id, "food").status_code == 200
+            entered = client.post(
+                f"/v1/plugins/expiry-tracker/assets/{asset.id}/expiry",
+                params={"household_id": household_id},
+                json={"expiry_date": "2030-05-06"},
+            )
+            date_task = _open_task(session, household_id, asset.id)
+            moved = classify(client, asset.id, household_id, "household")
+    
+        assert entered.status_code == 200, entered.text
+        assert moved.status_code == 200, moved.text
+        body = moved.json()
+>       assert body["resolved_review_task_ids"] == []
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       KeyError: 'resolved_review_task_ids'
+
+tests/test_plugin_expiry.py:699: KeyError
+=============================== warnings summary ===============================
+../../../../../../StorageGenie/backend/venv/lib/python3.12/site-packages/fastapi/testclient.py:1
+  /home/andrei/StorageGenie/backend/venv/lib/python3.12/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+../../../../../../StorageGenie/backend/venv/lib/python3.12/site-packages/starlette/testclient.py:53
+  /home/andrei/StorageGenie/backend/venv/lib/python3.12/site-packages/starlette/testclient.py:53: DeprecationWarning: The anyio.abc.BlockingPortal alias is deprecated, use anyio.from_thread.BlockingPortal instead.
+    _PortalFactoryType = Callable[[], AbstractContextManager[anyio.abc.BlockingPortal]]
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/test_plugin_expiry.py::test_move_to_non_perishable_resolves_open_date_tasks_with_an_active_row
+FAILED tests/test_plugin_expiry.py::test_move_to_non_perishable_resolves_the_open_task_without_an_active_row
+FAILED tests/test_plugin_expiry.py::test_move_between_dated_categories_resolves_no_tasks
+3 failed, 21 deselected, 2 warnings in 2.10s
+rc=1

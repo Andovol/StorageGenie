@@ -4,7 +4,6 @@ import { Link, useNavigate, useParams, useSearchParams } from "react-router-dom"
 import { apiGet, candidateDecision, candidateSplit } from "../api/client";
 import type { Candidate, CandidateSplitChild } from "../api/types";
 import { CandidateCard } from "../components/CandidateCard";
-import { ExpiryEntryForm } from "../components/ExpiryEntryForm";
 import { PageContainer } from "../components/shell/PageContainer";
 import { useReviewTasks } from "../hooks/useAssets";
 
@@ -33,7 +32,6 @@ export function ReviewPage() {
   const householdId = search.get("household_id") || localStorage.getItem("household_id") || "";
   const navigate = useNavigate();
   const qc = useQueryClient();
-  const [assetId, setAssetId] = useState<string | null>(null);
   const [keyboardAction, setKeyboardAction] = useState("");
   const [splitChildren, setSplitChildren] = useState<CandidateSplitChild[]>([]);
   const candidateQuery = useQuery<Candidate>({ queryKey: ["candidate", candidateId, householdId], queryFn: () => apiGet<Candidate>(`/v1/candidates/${candidateId}`, { household_id: householdId }), enabled: !!candidateId && !!householdId });
@@ -41,8 +39,7 @@ export function ReviewPage() {
   // definition — same key, same queryFn, same enabled flag; the invalidation
   // below is unchanged.
   const tasksQuery = useReviewTasks(householdId);
-  useEffect(() => { if (candidateQuery.data?.asset_id) setAssetId(candidateQuery.data.asset_id); }, [candidateQuery.data?.asset_id]);
-  const decision = useMutation({ mutationFn: ({ action, fields }: { action: "accept" | "edit" | "hold" | "reject"; fields?: Record<string, unknown> }) => candidateDecision(candidateId, householdId, action, fields), onSuccess: (result) => { if (result.asset_id) setAssetId(result.asset_id); qc.invalidateQueries({ queryKey: ["candidate", candidateId, householdId] }); } });
+  const decision = useMutation({ mutationFn: ({ action, fields }: { action: "accept" | "edit" | "hold" | "reject"; fields?: Record<string, unknown> }) => candidateDecision(candidateId, householdId, action, fields), onSuccess: () => { qc.invalidateQueries({ queryKey: ["candidate", candidateId, householdId] }); } });
   const splitItemCount = multiItemCount((tasksQuery.data?.items ?? []).find((task) => task.subject_ref === candidateId && task.task_type === "candidate.multi_item" && task.status === "open"));
   const split = useMutation({ mutationFn: (indexes: number[]) => candidateSplit(candidateId, householdId, indexes), onSuccess: (result) => { setSplitChildren(result.children); qc.invalidateQueries({ queryKey: ["candidate", candidateId, householdId] }); qc.invalidateQueries({ queryKey: ["review-tasks", householdId] }); } });
   const candidate = candidateQuery.data;
@@ -57,5 +54,5 @@ export function ReviewPage() {
     window.addEventListener("keydown", onKey); return () => window.removeEventListener("keydown", onKey);
   }, [candidate, decision, navigate]);
 
-  return <PageContainer className="text-foreground"><Link to={`/inbox?household_id=${householdId}`} className="text-link focus-ring">← Back to inbox</Link><h1 className="page-header text-foreground">Review workspace</h1>{candidateQuery.isLoading && <div>Loading candidate…</div>}{candidateQuery.error && <div role="alert">{candidateQuery.error.message}</div>}{candidate && <><CandidateCard candidate={candidate} householdId={householdId} busy={decision.isPending} onDecision={(action, fields) => decision.mutate({ action, fields })} splitItemCount={splitItemCount} onSplit={() => { if (splitItemCount != null) split.mutate(Array.from({ length: splitItemCount }, (_, index) => index)); }} splitBusy={split.isPending} />{decision.error && <div role="alert" style={{ marginTop: 10 }}>{decision.error.message}</div>}{split.error && <div role="alert" style={{ marginTop: 10 }}>{split.error.message}</div>}{splitChildren.length > 0 && <section aria-label="Split candidates" style={{ marginTop: 16 }}><h2>Split into {splitChildren.length} items</h2><ul>{splitChildren.map((child) => <li key={child.id}><Link className="text-link focus-ring" to={`/review/${child.id}?household_id=${householdId}`}>{splitChildLabel(child)}</Link></li>)}</ul></section>}{keyboardAction && <div role="status" data-testid="keyboard-action">Keyboard: {keyboardAction}</div>}{assetId && <ExpiryEntryForm assetId={assetId} householdId={householdId} evidenceIds={candidate.evidence_ids} />}</>}</PageContainer>;
+  return <PageContainer className="text-foreground"><Link to={`/inbox?household_id=${householdId}`} className="text-link focus-ring">← Back to inbox</Link><h1 className="page-header text-foreground">Review workspace</h1>{candidateQuery.isLoading && <div>Loading candidate…</div>}{candidateQuery.error && <div role="alert">{candidateQuery.error.message}</div>}{candidate && <><CandidateCard candidate={candidate} householdId={householdId} busy={decision.isPending} onDecision={(action, fields) => decision.mutate({ action, fields })} splitItemCount={splitItemCount} onSplit={() => { if (splitItemCount != null) split.mutate(Array.from({ length: splitItemCount }, (_, index) => index)); }} splitBusy={split.isPending} />{decision.error && <div role="alert" style={{ marginTop: 10 }}>{decision.error.message}</div>}{split.error && <div role="alert" style={{ marginTop: 10 }}>{split.error.message}</div>}{splitChildren.length > 0 && <section aria-label="Split candidates" style={{ marginTop: 16 }}><h2>Split into {splitChildren.length} items</h2><ul>{splitChildren.map((child) => <li key={child.id}><Link className="text-link focus-ring" to={`/review/${child.id}?household_id=${householdId}`}>{splitChildLabel(child)}</Link></li>)}</ul></section>}{keyboardAction && <div role="status" data-testid="keyboard-action">Keyboard: {keyboardAction}</div>}</>}</PageContainer>;
 }

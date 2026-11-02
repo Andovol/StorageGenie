@@ -149,6 +149,7 @@ def classify(
     db.commit()
     task = result["review_task"]
     expiry_assertion = result["expiry_assertion"]
+    resolved_ids = result["resolved_review_task_ids"]
     return {
         "plugin_id": expiry_tracker.PLUGIN_ID,
         "version": expiry_tracker.PLUGIN_VERSION,
@@ -157,6 +158,7 @@ def classify(
             expiry_assertion if isinstance(expiry_assertion, Assertion) else None
         ),
         "review_task": task.id if isinstance(task, ReviewTask) else None,
+        "resolved_review_task_ids": resolved_ids if isinstance(resolved_ids, list) else [],
     }
 
 

@@ -24,7 +24,7 @@ export function ExpiryEntryForm({
   evidenceIds = [],
   activeAssertion = null,
   categorySlug = "",
-  hasWindows = true,
+  hasWindows = false,
 }: {
   assetId: string;
   householdId: string;
@@ -53,6 +53,7 @@ export function ExpiryEntryForm({
   const state = activeAssertion?.review_state || "needs_evidence";
   const activeDate = typeof record?.expiry_date === "string" ? record.expiry_date : null;
   const activeDateType = typeof record?.date_type === "string" ? record.date_type : null;
+  const displayState = state === "accepted" && activeDate === null ? "No date" : state;
   const noOp =
     activeAssertion?.review_state === "accepted" &&
     activeDate !== null &&
@@ -106,7 +107,7 @@ export function ExpiryEntryForm({
   return (
     <section aria-label={title} className="bg-card border-border" style={{ marginTop: 18, padding: 14, borderStyle: "solid", borderWidth: 1, borderRadius: 8 }}>
       <h3 style={{ marginTop: 0 }}>{title}</h3>
-      <div>Expiry evidence state: <strong data-testid="expiry-state">{state}</strong></div>
+      <div>Expiry evidence state: <strong data-testid="expiry-state">{displayState}</strong></div>
       <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginTop: 10, alignItems: "end" }}>
         <label style={{ display: "flex", flexDirection: "column", gap: 4, fontSize: 13 }}>
           Date

@@ -51,6 +51,25 @@ def make_asset(session: Session, household_id: str, name: str = "Test item", ass
     return asset
 
 
+def _open_task(
+    session: Session,
+    household_id: str,
+    subject_ref: str,
+    task_type: str = "expiry.manual_entry",
+) -> ReviewTask:
+    task = ReviewTask(
+        task_type=task_type,
+        priority="high",
+        subject_ref=subject_ref,
+        proposed_change=json.dumps({"prompt": "Enter expiry date manually"}),
+        status="open",
+        household_id=household_id,
+    )
+    session.add(task)
+    session.commit()
+    return task
+
+
 def classify(
     client: TestClient,
     asset_id: str,
@@ -615,6 +634,72 @@ def test_move_to_non_perishable_clears_the_active_date(plugin_db) -> None:  # ty
     assert all(row["asset_id"] != asset.id for row in status["rows"])
     reasons = {row["asset_id"]: row["reason"] for row in status["unresolved_rows"]}
     assert reasons[asset.id] == "dateless"
+
+
+def test_move_to_non_perishable_resolves_open_date_tasks_with_an_active_row(plugin_db) -> None:  # type: ignore[no-untyped-def]
+    session, household_id = plugin_db
+    asset = make_asset(session, household_id, "Canned beans")
+    with TestClient(app) as client:
+        assert classify(client, asset.id, household_id, "food").status_code == 200
+        entered = client.post(
+            f"/v1/plugins/expiry-tracker/assets/{asset.id}/expiry",
+            params={"household_id": household_id},
+            json={"expiry_date": "2030-05-06"},
+        )
+        date_task = _open_task(session, household_id, asset.id)
+        unrelated_task = _open_task(session, household_id, asset.id, "candidate.multi_item")
+        moved = classify(client, asset.id, household_id, "non_perishable")
+
+    assert entered.status_code == 200, entered.text
+    assert moved.status_code == 200, moved.text
+    session.expire_all()
+    assert session.get(ReviewTask, date_task.id).status == "resolved"
+    assert session.get(ReviewTask, unrelated_task.id).status == "open"
+    body = moved.json()
+    assert body["resolved_review_task_ids"] == [date_task.id]
+    assert body["review_task"] is None
+    assert body["expiry_assertion"]["review_state"] == "accepted"
+    assert body["expiry_assertion"]["value"] is None
+
+
+def test_move_to_non_perishable_resolves_the_open_task_without_an_active_row(plugin_db) -> None:  # type: ignore[no-untyped-def]
+    session, household_id = plugin_db
+    asset = make_asset(session, household_id, "Cordless drill", "tool")
+    date_task = _open_task(session, household_id, asset.id)
+    candidate_task = _open_task(session, household_id, "candidate-elsewhere")
+    with TestClient(app) as client:
+        moved = classify(client, asset.id, household_id, "non_perishable")
+
+    assert moved.status_code == 200, moved.text
+    session.expire_all()
+    assert session.get(ReviewTask, date_task.id).status == "resolved"
+    assert session.get(ReviewTask, candidate_task.id).status == "open"
+    body = moved.json()
+    assert body["resolved_review_task_ids"] == [date_task.id]
+    assert body["review_task"] is None
+    assert body["expiry_assertion"] is None
+
+
+def test_move_between_dated_categories_resolves_no_tasks(plugin_db) -> None:  # type: ignore[no-untyped-def]
+    session, household_id = plugin_db
+    asset = make_asset(session, household_id, "Canned beans")
+    with TestClient(app) as client:
+        assert classify(client, asset.id, household_id, "food").status_code == 200
+        entered = client.post(
+            f"/v1/plugins/expiry-tracker/assets/{asset.id}/expiry",
+            params={"household_id": household_id},
+            json={"expiry_date": "2030-05-06"},
+        )
+        date_task = _open_task(session, household_id, asset.id)
+        moved = classify(client, asset.id, household_id, "household")
+
+    assert entered.status_code == 200, entered.text
+    assert moved.status_code == 200, moved.text
+    body = moved.json()
+    assert body["resolved_review_task_ids"] == []
+    assert body["review_task"] is None
+    session.expire_all()
+    assert session.get(ReviewTask, date_task.id).status == "open"
 
 
 def test_reclassification_over_a_needs_evidence_active_writes_placeholder_and_task(plugin_db) -> None:  # type: ignore[no-untyped-def]

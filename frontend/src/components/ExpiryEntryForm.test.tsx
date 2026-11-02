@@ -139,4 +139,35 @@ describe("ExpiryEntryForm", () => {
     const { container } = renderForm(assertion("a-empty", null, "accepted"), "non_perishable", false);
     expect(container).toBeEmptyDOMElement();
   });
+
+  test("hides itself when the caller omits hasWindows", () => {
+    const { container } = render(
+      <QueryClientProvider client={new QueryClient({ defaultOptions: { queries: { retry: false } } })}>
+        <ExpiryEntryForm assetId="asset-1" householdId="hh" activeAssertion={assertion("a-empty", null, "accepted")} />
+      </QueryClientProvider>
+    );
+    expect(container).toBeEmptyDOMElement();
+  });
+
+  test("an accepted row with no date shows No date and keeps the Save date label", () => {
+    renderForm(assertion("a-cleared", null, "accepted"));
+
+    expect(screen.getByTestId("expiry-state")).toHaveTextContent("No date");
+    expect(screen.getByRole("button", { name: "Save date" })).toBeInTheDocument();
+  });
+
+  test("an accepted row whose value is malformed shows No date", () => {
+    renderForm(assertion("a-malformed", { expiry_date: 20300506 }, "accepted"));
+
+    expect(screen.getByTestId("expiry-state")).toHaveTextContent("No date");
+  });
+
+  test("needs_evidence and proposed keep their display words", () => {
+    const { unmount } = renderForm(assertion("a-ne", { status: "unknown" }, "needs_evidence"));
+    expect(screen.getByTestId("expiry-state")).toHaveTextContent("needs_evidence");
+    unmount();
+
+    renderForm(assertion("a-proposed", { expiry_date: "2030-05-06", date_type: "expiry_date" }, "proposed"));
+    expect(screen.getByTestId("expiry-state")).toHaveTextContent("proposed");
+  });
 });

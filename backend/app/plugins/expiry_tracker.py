@@ -456,6 +456,7 @@ def classify_asset(db: Session, asset: Asset, category: Category, tier: str | No
     active = _active_assertion(db, asset.id, EXPIRY_FIELD)
     expiry_assertion: Assertion | None = None
     task: ReviewTask | None = None
+    resolved_tasks: list[ReviewTask] = []
     if category.has_expiry:
         if _has_valid_expiry_date(_accepted_expiry_value(active)):
             expiry_assertion = active
@@ -478,11 +479,29 @@ def classify_asset(db: Session, asset: Asset, category: Category, tier: str | No
                     "proposed",
                     observed[1],
                 )
-    elif active is not None:
-        expiry_assertion = _write_assertion(
-            db, asset, EXPIRY_FIELD, None, "user", "accepted", None
+    else:
+        if active is not None:
+            expiry_assertion = _write_assertion(
+                db, asset, EXPIRY_FIELD, None, "user", "accepted", None
+            )
+        resolved_tasks = (
+            db.query(ReviewTask)
+            .filter_by(
+                subject_ref=asset.id,
+                household_id=asset.household_id,
+                task_type="expiry.manual_entry",
+                status="open",
+            )
+            .all()
         )
-    return {"classification": classification, "expiry_assertion": expiry_assertion, "review_task": task}
+        for resolved_task in resolved_tasks:
+            resolved_task.status = "resolved"
+    return {
+        "classification": classification,
+        "expiry_assertion": expiry_assertion,
+        "review_task": task,
+        "resolved_review_task_ids": [resolved_task.id for resolved_task in resolved_tasks],
+    }
 
 
 def get_classification(db: Session, asset_id: str) -> Assertion | None:

@@ -1,0 +1,121 @@
+
+> storagegenie-frontend@0.1.0 test
+> vitest run --run src/components/ExpiryEntryForm.test.tsx src/routes/ReviewPage.test.tsx
+
+
+ RUN  v1.6.1 /home/andrei/.local/share/opencode/tool-output/sg262-base/frontend
+
+stderr | src/routes/ReviewPage.test.tsx > ReviewPage > SG-262: the review workspace renders no dataless date form
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+ ❯ src/components/ExpiryEntryForm.test.tsx  (10 tests | 3 failed) 292ms
+   ❯ src/components/ExpiryEntryForm.test.tsx > ExpiryEntryForm > hides itself when the caller omits hasWindows
+     → expect(element).toBeEmptyDOMElement()
+
+Received:
+  "<section aria-label="Manual expiry entry" class="bg-card border-border" style="margin-top: 18px; padding: 14px; border-style: solid; border-width: 1px; border-radius: 8px;"><h3 style="margin-top: 0px;">Manual expiry entry</h3><div>Expiry evidence state: <strong data-testid="expiry-state">accepted</strong></div><div style="display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; align-items: end;"><label style="display: flex; flex-direction: column; gap: 4px; font-size: 13px;">Date<input type="date" class="bg-background text-foreground border-border focus-ring" style="padding: 6px 10px; border-radius: 6px; border-style: solid; border-width: 1px;" value=""></label><label style="display: flex; flex-direction: column; gap: 4px; font-size: 13px;">Date type<select class="bg-background text-foreground border-border focus-ring" style="padding: 6px 10px; border-radius: 6px; border-style: solid; border-width: 1px;"><option value="expiry_date">Expiry date</option><option value="best_before">Best before</option><option value="use_by">Use by</option><option value="manufacture_date">Manufacture date</option><option value="period_after_opening">Period after opening</option><option value="batch_lot_code">Batch/lot code</option><option value="valid_until">Valid until</option></select></label><button type="button" disabled="" title="Select a date to save" class="bg-primary text-primary-foreground focus-ring" style="padding: 6px 12px; border-radius: 6px; cursor: not-allowed; font-weight: 500;">Save date</button></div></section>"
+   ❯ src/components/ExpiryEntryForm.test.tsx > ExpiryEntryForm > an accepted row with no date shows No date and keeps the Save date label
+     → expect(element).toHaveTextContent()
+
+Expected element to have text content:
+  No date
+Received:
+  accepted
+   ❯ src/components/ExpiryEntryForm.test.tsx > ExpiryEntryForm > an accepted row whose value is malformed shows No date
+     → expect(element).toHaveTextContent()
+
+Expected element to have text content:
+  No date
+Received:
+  accepted
+ ❯ src/routes/ReviewPage.test.tsx  (9 tests | 1 failed) 622ms
+   ❯ src/routes/ReviewPage.test.tsx > ReviewPage > SG-262: the review workspace renders no dataless date form
+     → expect(element).not.toBeInTheDocument()
+
+expected document not to contain element, found <strong
+  data-testid="expiry-state"
+>
+  needs_evidence
+</strong> instead
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 4 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/components/ExpiryEntryForm.test.tsx > ExpiryEntryForm > hides itself when the caller omits hasWindows
+Error: expect(element).toBeEmptyDOMElement()
+
+Received:
+  "<section aria-label="Manual expiry entry" class="bg-card border-border" style="margin-top: 18px; padding: 14px; border-style: solid; border-width: 1px; border-radius: 8px;"><h3 style="margin-top: 0px;">Manual expiry entry</h3><div>Expiry evidence state: <strong data-testid="expiry-state">accepted</strong></div><div style="display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; align-items: end;"><label style="display: flex; flex-direction: column; gap: 4px; font-size: 13px;">Date<input type="date" class="bg-background text-foreground border-border focus-ring" style="padding: 6px 10px; border-radius: 6px; border-style: solid; border-width: 1px;" value=""></label><label style="display: flex; flex-direction: column; gap: 4px; font-size: 13px;">Date type<select class="bg-background text-foreground border-border focus-ring" style="padding: 6px 10px; border-radius: 6px; border-style: solid; border-width: 1px;"><option value="expiry_date">Expiry date</option><option value="best_before">Best before</option><option value="use_by">Use by</option><option value="manufacture_date">Manufacture date</option><option value="period_after_opening">Period after opening</option><option value="batch_lot_code">Batch/lot code</option><option value="valid_until">Valid until</option></select></label><button type="button" disabled="" title="Select a date to save" class="bg-primary text-primary-foreground focus-ring" style="padding: 6px 12px; border-radius: 6px; cursor: not-allowed; font-weight: 500;">Save date</button></div></section>"
+ ❯ src/components/ExpiryEntryForm.test.tsx:149:23
+    147|       </QueryClientProvider>
+    148|     );
+    149|     expect(container).toBeEmptyDOMElement();
+       |                       ^
+    150|   });
+    151| 
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/4]⎯
+
+ FAIL  src/components/ExpiryEntryForm.test.tsx > ExpiryEntryForm > an accepted row with no date shows No date and keeps the Save date label
+Error: expect(element).toHaveTextContent()
+
+Expected element to have text content:
+  No date
+Received:
+  accepted
+ ❯ src/components/ExpiryEntryForm.test.tsx:155:48
+    153|     renderForm(assertion("a-cleared", null, "accepted"));
+    154| 
+    155|     expect(screen.getByTestId("expiry-state")).toHaveTextContent("No d…
+       |                                                ^
+    156|     expect(screen.getByRole("button", { name: "Save date" })).toBeInTh…
+    157|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/4]⎯
+
+ FAIL  src/components/ExpiryEntryForm.test.tsx > ExpiryEntryForm > an accepted row whose value is malformed shows No date
+Error: expect(element).toHaveTextContent()
+
+Expected element to have text content:
+  No date
+Received:
+  accepted
+ ❯ src/components/ExpiryEntryForm.test.tsx:162:48
+    160|     renderForm(assertion("a-malformed", { expiry_date: 20300506 }, "ac…
+    161| 
+    162|     expect(screen.getByTestId("expiry-state")).toHaveTextContent("No d…
+       |                                                ^
+    163|   });
+    164| 
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/4]⎯
+
+ FAIL  src/routes/ReviewPage.test.tsx > ReviewPage > SG-262: the review workspace renders no dataless date form
+Error: expect(element).not.toBeInTheDocument()
+
+expected document not to contain element, found <strong
+  data-testid="expiry-state"
+>
+  needs_evidence
+</strong> instead
+ ❯ src/routes/ReviewPage.test.tsx:23:54
+     21|     await screen.findByDisplayValue("Loaded item");
+     22| 
+     23|     expect(screen.queryByTestId("expiry-state")).not.toBeInTheDocument…
+       |                                                      ^
+     24|     expect(screen.queryByRole("heading", { name: "Manual expiry entry"…
+     25|     expect(screen.queryByRole("heading", { name: "Manual date entry" }…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/4]⎯
+
+ Test Files  2 failed (2)
+      Tests  4 failed | 15 passed (19)
+   Start at  13:24:39
+   Duration  2.01s (transform 243ms, setup 208ms, collect 503ms, tests 914ms, environment 1.19s, prepare 226ms)
+
+npm notice
+npm notice New minor version of npm available! 11.11.0 -> 11.21.1
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v11.21.1
+npm notice To update run: npm install -g npm@11.21.1
+npm notice
+rc=1

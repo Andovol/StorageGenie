@@ -15,6 +15,17 @@ function renderPage() {
 afterEach(() => { vi.clearAllMocks(); });
 
 describe("ReviewPage", () => {
+  test("SG-262: the review workspace renders no dataless date form", async () => {
+    api.apiGet.mockImplementation((path: string) => path.startsWith("/v1/candidates/") ? Promise.resolve(candidate) : Promise.resolve({ items: [], next_cursor: null, total: 0 }));
+    renderPage();
+    await screen.findByDisplayValue("Loaded item");
+
+    expect(screen.queryByTestId("expiry-state")).not.toBeInTheDocument();
+    expect(screen.queryByRole("heading", { name: "Manual expiry entry" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("heading", { name: "Manual date entry" })).not.toBeInTheDocument();
+    expect(api.apiGet.mock.calls.some(([path]) => String(path).startsWith("/v1/assets/"))).toBe(false);
+  });
+
   test("posts every decision with the loaded candidate id and supports keyboard actions", async () => {
     api.apiGet.mockImplementation((path: string) => path.startsWith("/v1/candidates/") ? Promise.resolve(candidate) : Promise.resolve({ id: "asset-loaded-31", assertions: [] }));
     api.candidateDecision.mockResolvedValue({ candidate_id: candidate.id, state: "held", asset_id: "asset-loaded-31" });
