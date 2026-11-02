@@ -51,6 +51,7 @@ const fixtures = vi.hoisted(() => {
     dedup_matches: [],
     evidence_ids: [],
     review_task_ids: [],
+    blocking_review_task_ids: [],
     asset_id: null,
     created_at: null,
     updated_at: null,

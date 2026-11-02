@@ -4,7 +4,7 @@ import { MemoryRouter, Route, Routes } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReviewPage } from "./ReviewPage";
 
-const candidate = { id: "candidate-loaded-31", state: "proposed", job_id: "job-loaded-31", fields: { display_name: "Loaded item" }, dedup_matches: [], review_task_ids: [], evidence_ids: ["evidence-loaded-31"], asset_id: "asset-loaded-31" };
+const candidate = { id: "candidate-loaded-31", state: "proposed", job_id: "job-loaded-31", fields: { display_name: "Loaded item" }, dedup_matches: [], review_task_ids: [], blocking_review_task_ids: [], evidence_ids: ["evidence-loaded-31"], asset_id: "asset-loaded-31" };
 const api = vi.hoisted(() => ({ apiGet: vi.fn(), candidateDecision: vi.fn(), candidateSplit: vi.fn() }));
 vi.mock("../api/client", () => api);
 
@@ -52,7 +52,7 @@ describe("ReviewPage", () => {
   test("multi-item task reveals the split action and presents the children after split", async () => {
     const task = { id: "task-multi-1", task_type: "candidate.multi_item", priority: "high", subject_ref: candidate.id, proposed_change: { candidate_id: candidate.id, item_count: 2 }, status: "open", household_id: "household-loaded", created_at: null, updated_at: null };
     api.apiGet.mockImplementation((path: string) => {
-      if (path.startsWith("/v1/candidates/")) return Promise.resolve({ ...candidate, review_task_ids: [task.id] });
+      if (path.startsWith("/v1/candidates/")) return Promise.resolve({ ...candidate, review_task_ids: [task.id], blocking_review_task_ids: [task.id] });
       if (path.startsWith("/v1/review-tasks")) return Promise.resolve({ items: [task], next_cursor: null, total: 1 });
       return Promise.resolve({});
     });
@@ -72,7 +72,7 @@ describe("ReviewPage", () => {
   test("split rejection surfaces an alert", async () => {
     const task = { id: "task-multi-2", task_type: "candidate.multi_item", priority: "high", subject_ref: candidate.id, proposed_change: { candidate_id: candidate.id, item_count: 2 }, status: "open", household_id: "household-loaded", created_at: null, updated_at: null };
     api.apiGet.mockImplementation((path: string) => {
-      if (path.startsWith("/v1/candidates/")) return Promise.resolve({ ...candidate, review_task_ids: [task.id] });
+      if (path.startsWith("/v1/candidates/")) return Promise.resolve({ ...candidate, review_task_ids: [task.id], blocking_review_task_ids: [task.id] });
       if (path.startsWith("/v1/review-tasks")) return Promise.resolve({ items: [task], next_cursor: null, total: 1 });
       return Promise.resolve({});
     });
@@ -84,7 +84,7 @@ describe("ReviewPage", () => {
   });
 
   test("blocked live response offers no accept from button or shortcut (SG-175 A2)", async () => {
-    api.apiGet.mockImplementation((path: string) => path.startsWith("/v1/candidates/") ? Promise.resolve({ ...candidate, review_task_ids: ["task-open-1"] }) : Promise.resolve({ items: [], next_cursor: null, total: 0 }));
+    api.apiGet.mockImplementation((path: string) => path.startsWith("/v1/candidates/") ? Promise.resolve({ ...candidate, review_task_ids: ["task-open-1"], blocking_review_task_ids: ["task-open-1"] }) : Promise.resolve({ items: [], next_cursor: null, total: 0 }));
     renderPage();
     await screen.findByDisplayValue("Loaded item");
     const accept = screen.getByRole("button", { name: "Accept" });
@@ -135,7 +135,7 @@ describe("ReviewPage", () => {
     // household, and the loaded task still drives the split affordance.
     const task = { id: "task-wiring-1", task_type: "candidate.multi_item", priority: "high", subject_ref: candidate.id, proposed_change: { candidate_id: candidate.id, item_count: 2 }, status: "open", household_id: "household-loaded", created_at: null, updated_at: null };
     api.apiGet.mockImplementation((path: string) => {
-      if (path.startsWith("/v1/candidates/")) return Promise.resolve({ ...candidate, review_task_ids: [task.id] });
+      if (path.startsWith("/v1/candidates/")) return Promise.resolve({ ...candidate, review_task_ids: [task.id], blocking_review_task_ids: [task.id] });
       if (path.startsWith("/v1/review-tasks")) return Promise.resolve({ items: [task], next_cursor: null, total: 1 });
       return Promise.resolve({});
     });
@@ -150,7 +150,7 @@ describe("ReviewPage", () => {
     api.apiGet.mockImplementation((path: string) => {
       if (path.startsWith("/v1/candidates/")) {
         candidateReads += 1;
-        return Promise.resolve(candidateReads === 1 ? { ...candidate, review_task_ids: ["task-open-2"] } : { ...candidate, review_task_ids: [] });
+        return Promise.resolve(candidateReads === 1 ? { ...candidate, review_task_ids: ["task-open-2"], blocking_review_task_ids: ["task-open-2"] } : { ...candidate, review_task_ids: [], blocking_review_task_ids: [] });
       }
       return Promise.resolve({ items: [], next_cursor: null, total: 0 });
     });

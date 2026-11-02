@@ -60,7 +60,7 @@ export function InboxPage() {
       {!tasks.isLoading && totalTasks === 0 && <div role="status">No review tasks.</div>}
       {!tasks.isLoading && totalTasks > 0 && reviewTasks.length === 0 && <div role="status">No {reviewFilter} review tasks.</div>}
       <div style={{ display: "grid", gap: 8 }}>{reviewTasks.map((task) => {
-        const subjectKind = task.subject_kind ?? "candidate";
+        const subjectKind = task.subject_kind;
         const subjectLabel = subjectKind === "asset" ? "item" : subjectKind === "candidate" ? "candidate" : "unknown subject";
         return <div key={task.id} className="bg-card border-border" style={{ display: "flex", flexWrap: "wrap", justifyContent: "space-between", gap: 12, padding: 12, borderStyle: "solid", borderWidth: 1, borderRadius: 8 }}><div><strong>{task.task_type}</strong> · {task.priority} · {task.status}<div className="text-muted-foreground" style={{ fontSize: 12 }}>Task {task.id} · {subjectLabel} {task.subject_ref}</div></div><div style={{ display: "flex", gap: 8, alignItems: "center" }}>{subjectKind === "asset" && task.subject_ref && <Link className="text-link focus-ring" style={{ textDecoration: "underline" }} to={`/assets/${task.subject_ref}?household_id=${effectiveHousehold}`}>Review</Link>}{subjectKind === "candidate" && task.subject_ref && <Link className="text-link focus-ring" style={{ textDecoration: "underline" }} to={`/review/${task.subject_ref}?household_id=${effectiveHousehold}`}>Review</Link>}{task.status === "open" && !task.data_required && <button type="button" onClick={() => resolve.mutate(task.id)} disabled={resolve.isPending} className={THEMED_CONTROL_CLASS} style={CONTROL_STYLE}>Resolve</button>}</div></div>;
       })}</div>

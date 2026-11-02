@@ -6,7 +6,7 @@ from pydantic import BaseModel, Field
 from sqlalchemy.orm import Session
 
 from app.db import get_db
-from app.models.job import Job
+from app.models.job import Job, JobStep
 from app.models.review_task import ReviewTask
 from app.services import audit_service, candidates, job_service
 
@@ -54,12 +54,38 @@ def _close_rejected_candidate_tasks(
         )
 
 
+def _created_asset_from_commit_step(
+    commit_step: JobStep | None, candidate_id: str
+) -> str | None:
+    """The asset id a pre-SG-270 commit wrote into its step output, if any."""
+    if commit_step is None or not commit_step.output_refs:
+        return None
+    try:
+        output = json.loads(commit_step.output_refs)
+    except ValueError:
+        return None
+    if not isinstance(output, dict):
+        return None
+    asset_id = output.get("asset_id")
+    if (
+        output.get("candidate_id") == candidate_id
+        and output.get("created") is True
+        and isinstance(asset_id, str)
+    ):
+        return asset_id
+    return None
+
+
 def _prepare_commit_steps(
     db: Session, job: Job, candidate: candidates.Candidate
 ) -> None:
     """Record the decided candidate and give the commit step a fresh pass."""
     review_step = next(
         (step for step in job_service._steps(db, job.id) if step.step_name == "AWAITING_REVIEW"),
+        None,
+    )
+    commit_step = next(
+        (step for step in job_service._steps(db, job.id) if step.step_name == "COMMITTING"),
         None,
     )
     if review_step is not None:
@@ -73,17 +99,21 @@ def _prepare_commit_steps(
                 previous_output = loaded
         review_output: dict[str, object] = {"status": "decision", "candidate_id": candidate.id}
         committed_assets = previous_output.get("committed_assets")
-        if isinstance(committed_assets, dict):
+        if not isinstance(committed_assets, dict):
+            committed_assets = {}
+        # SG-275: a commit made before the map existed left its asset only in the
+        # commit step's own output. Record that created asset before the reset
+        # below, so a repeat decision on the older row returns it, not a second.
+        prior_asset_id = _created_asset_from_commit_step(commit_step, candidate.id)
+        if prior_asset_id is not None:
+            committed_assets[candidate.id] = prior_asset_id
+        if committed_assets:
             review_output["committed_assets"] = committed_assets
         review_step.state = job_service.COMPLETED_STEP
         review_step.output_refs = json.dumps(review_output)
     # SG-270 G2: every accepted candidate (including a second split child) gets
     # its own commit pass; a repeat decision on the same candidate is idempotent
     # through the review step's committed_assets map.
-    commit_step = next(
-        (step for step in job_service._steps(db, job.id) if step.step_name == "COMMITTING"),
-        None,
-    )
     if commit_step is not None:
         commit_step.state = job_service.PENDING_STEP
         commit_step.output_refs = None

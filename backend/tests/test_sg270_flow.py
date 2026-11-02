@@ -19,7 +19,7 @@ from sqlalchemy.orm import Session, sessionmaker
 from app.config import settings
 from app.db import Base, get_db
 from app.main import app
-from app.models import Asset, Assertion, AuditEvent, Evidence, Household, ReviewTask
+from app.models import Asset, Assertion, AuditEvent, Evidence, Household, JobStep, ReviewTask
 from app.plugins.expiry_tracker import CLASSIFICATION_FIELD, EXPIRY_FIELD
 from app.services import candidates, job_service
 from app.services.candidates import Candidate, CandidateBlockedError
@@ -200,6 +200,33 @@ def _accept(client: TestClient, household_id: str, candidate_id: str) -> dict[st
     )
     assert response.status_code == 200, response.text
     return response.json()
+
+
+def _edit(
+    client: TestClient,
+    household_id: str,
+    candidate_id: str,
+    corrected_fields: dict[str, object],
+) -> dict[str, object]:
+    response = client.post(
+        f"/v1/candidates/{candidate_id}/decision",
+        params={"household_id": household_id},
+        json={"action": "edit", "corrected_fields": corrected_fields},
+    )
+    assert response.status_code == 200, response.text
+    return response.json()
+
+
+def _drop_committed_assets(session: Session, job_id: str) -> None:
+    """Leave a real commit's row as SG-270's base left it: no map, commit output intact."""
+    _fresh(session)
+    step = session.query(JobStep).filter_by(job_id=job_id, step_name="AWAITING_REVIEW").one()
+    output = json.loads(step.output_refs or "{}")
+    assert isinstance(output, dict)
+    assert "committed_assets" in output
+    output.pop("committed_assets")
+    step.output_refs = json.dumps(output)
+    session.commit()
 
 
 def _create_asset(
@@ -579,6 +606,113 @@ def test_split_children_commit_their_own_assets_and_the_same_child_twice_is_idem
     assert session.query(ReviewTask).filter_by(
         subject_ref=origin_id, task_type="expiry.manual_entry", status="open"
     ).count() == 0
+
+
+def test_pre_sg270_repeat_accept_returns_the_existing_item(
+    flow_db, monkeypatch: pytest.MonkeyPatch
+) -> None:  # type: ignore[no-untyped-def]
+    session, household_id, _ = flow_db
+    provider = ScriptedPhase2Provider([_dated_output()])
+    _enable(monkeypatch, provider)
+    with TestClient(app) as client:
+        evidence_id = _upload(client, household_id, "sg275-old-accept.png")
+        job = _run_import(client, household_id, [evidence_id], "sg275-old-accept")
+        candidate_id = _candidate_id(job)
+        first = _accept(client, household_id, candidate_id)
+        assert first["created"] is True
+        asset_id = str(first["asset_id"])
+        _drop_committed_assets(session, str(job["id"]))
+        repeat = _accept(client, household_id, candidate_id)
+
+    assert repeat["asset_id"] == asset_id
+    assert repeat["created"] is False
+    assert repeat["job"]["state"] == "COMPLETED"
+    _fresh(session)
+    assert session.query(Asset).filter_by(household_id=household_id).count() == 1
+
+
+def test_pre_sg270_repeat_edit_returns_the_existing_item(
+    flow_db, monkeypatch: pytest.MonkeyPatch
+) -> None:  # type: ignore[no-untyped-def]
+    session, household_id, _ = flow_db
+    provider = ScriptedPhase2Provider([_dated_output()])
+    _enable(monkeypatch, provider)
+    with TestClient(app) as client:
+        evidence_id = _upload(client, household_id, "sg275-old-edit.png")
+        job = _run_import(client, household_id, [evidence_id], "sg275-old-edit")
+        candidate_id = _candidate_id(job)
+        first = _accept(client, household_id, candidate_id)
+        assert first["created"] is True
+        asset_id = str(first["asset_id"])
+        _drop_committed_assets(session, str(job["id"]))
+        edited = _edit(
+            client, household_id, candidate_id, {"display_name": "Renamed older row"}
+        )
+
+    assert edited["asset_id"] == asset_id
+    assert edited["created"] is False
+    _fresh(session)
+    assert session.query(Asset).filter_by(household_id=household_id).count() == 1
+
+
+def test_failed_commit_retried_creates_exactly_one_item(
+    flow_db, monkeypatch: pytest.MonkeyPatch
+) -> None:  # type: ignore[no-untyped-def]
+    session, household_id, _ = flow_db
+    provider = ScriptedPhase2Provider([_dated_output()])
+    _enable(monkeypatch, provider)
+    with TestClient(app) as client:
+        evidence_id = _upload(client, household_id, "sg275-retry.png")
+        job = _run_import(client, household_id, [evidence_id], "sg275-retry")
+        candidate_id = _candidate_id(job)
+        original = candidates._create_asset_for_candidate
+
+        def fail_after_asset(*args: object, **kwargs: object):  # type: ignore[no-untyped-def]
+            original(*args, **kwargs)
+            raise RuntimeError("forced mid-commit failure")
+
+        monkeypatch.setattr(candidates, "_create_asset_for_candidate", fail_after_asset)
+        failed = _accept(client, household_id, candidate_id)
+        assert failed["job"]["state"] == "FAILED"
+        _fresh(session)
+        assert session.query(Asset).filter_by(household_id=household_id).count() == 0
+        commit_step = (
+            session.query(JobStep)
+            .filter_by(job_id=str(job["id"]), step_name="COMMITTING")
+            .one()
+        )
+        failed_output = json.loads(commit_step.output_refs or "{}")
+        assert "asset_id" not in failed_output
+
+        monkeypatch.setattr(candidates, "_create_asset_for_candidate", original)
+        retried = client.post(
+            f"/v1/imports/{job['id']}/retry", params={"household_id": household_id}
+        )
+        assert retried.status_code == 200, retried.text
+        assert retried.json()["state"] == "COMPLETED"
+
+    _fresh(session)
+    assert session.query(Asset).filter_by(household_id=household_id).count() == 1
+
+
+def test_new_row_repeat_accept_stays_one_item(
+    flow_db, monkeypatch: pytest.MonkeyPatch
+) -> None:  # type: ignore[no-untyped-def]
+    session, household_id, _ = flow_db
+    provider = ScriptedPhase2Provider([_dated_output()])
+    _enable(monkeypatch, provider)
+    with TestClient(app) as client:
+        evidence_id = _upload(client, household_id, "sg275-new-row.png")
+        job = _run_import(client, household_id, [evidence_id], "sg275-new-row")
+        candidate_id = _candidate_id(job)
+        first = _accept(client, household_id, candidate_id)
+        repeat = _accept(client, household_id, candidate_id)
+
+    assert first["created"] is True
+    assert repeat["asset_id"] == first["asset_id"]
+    assert repeat["created"] is False
+    _fresh(session)
+    assert session.query(Asset).filter_by(household_id=household_id).count() == 1
 
 
 def test_ai_read_dated_item_opens_no_review_task(

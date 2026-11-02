@@ -84,7 +84,7 @@ describe("InboxPage", () => {
   });
 
   test("lists a loaded review task and resolves its loaded id", async () => {
-    const task = { id: "task-loaded-44", task_type: "identifier_collision", priority: "high", subject_ref: "candidate-loaded-44", proposed_change: null, status: "open", household_id: household.id, created_at: null, updated_at: null };
+    const task = { id: "task-loaded-44", task_type: "identifier_collision", priority: "high", subject_ref: "candidate-loaded-44", subject_kind: "candidate", data_required: false, proposed_change: null, status: "open", household_id: household.id, created_at: null, updated_at: null };
     api.apiGet.mockImplementation((path: string) => path === "/v1/jobs" ? Promise.resolve({ items: [], next_cursor: null, total: 0 }) : Promise.resolve({ items: [task], next_cursor: null, total: 1 }));
     api.resolveReviewTask.mockResolvedValue({ id: task.id, status: "resolved" });
     renderPage();
@@ -126,7 +126,7 @@ describe("InboxPage", () => {
   });
 
   test("the review link carries the theme link treatment, not default purple (SG-105 G3)", async () => {
-    const task = { id: "task-open-1", task_type: "identifier_collision", priority: "high", subject_ref: "candidate-open-1", proposed_change: null, status: "open", household_id: household.id, created_at: null, updated_at: null };
+    const task = { id: "task-open-1", task_type: "identifier_collision", priority: "high", subject_ref: "candidate-open-1", subject_kind: "candidate", data_required: false, proposed_change: null, status: "open", household_id: household.id, created_at: null, updated_at: null };
     api.apiGet.mockImplementation((path: string) => path === "/v1/jobs" ? Promise.resolve({ items: [], next_cursor: null, total: 0 }) : Promise.resolve({ items: [task], next_cursor: null, total: 1 }));
     renderPage();
 
@@ -135,8 +135,8 @@ describe("InboxPage", () => {
   });
 
   test("resolved review tasks are hidden by default and revealed by the status filter (SG-105 G3)", async () => {
-    const open = { id: "task-open-2", task_type: "identifier_collision", priority: "high", subject_ref: "candidate-open-2", proposed_change: null, status: "open", household_id: household.id, created_at: null, updated_at: null };
-    const resolved = { id: "task-resolved-2", task_type: "identifier_collision", priority: "low", subject_ref: "candidate-resolved-2", proposed_change: null, status: "resolved", household_id: household.id, created_at: null, updated_at: null };
+    const open = { id: "task-open-2", task_type: "identifier_collision", priority: "high", subject_ref: "candidate-open-2", subject_kind: "candidate", data_required: false, proposed_change: null, status: "open", household_id: household.id, created_at: null, updated_at: null };
+    const resolved = { id: "task-resolved-2", task_type: "identifier_collision", priority: "low", subject_ref: "candidate-resolved-2", subject_kind: "candidate", data_required: false, proposed_change: null, status: "resolved", household_id: household.id, created_at: null, updated_at: null };
     api.apiGet.mockImplementation((path: string) => path === "/v1/jobs" ? Promise.resolve({ items: [], next_cursor: null, total: 0 }) : Promise.resolve({ items: [open, resolved], next_cursor: null, total: 2 }));
     renderPage();
 

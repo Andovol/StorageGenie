@@ -45,7 +45,7 @@ export function CandidateCard({
     Object.entries(candidate.fields).forEach(([key, raw]) => { initial[key] = fieldInfo(raw).value ?? ""; });
     return initial;
   });
-  const blockingTaskIds = candidate.blocking_review_task_ids ?? candidate.review_task_ids;
+  const blockingTaskIds = candidate.blocking_review_task_ids;
   const blocked = blockingTaskIds.length > 0;
   const dateOnly = !blocked && candidate.review_task_ids.length > 0;
   const evidenceUrls = useMemo(() => {

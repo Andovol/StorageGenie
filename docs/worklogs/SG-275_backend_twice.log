@@ -1,0 +1,10 @@
+SG-275 affected backend file RUN 1 2026-11-02T15:46:23Z
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+17 passed, 2 warnings in 5.98s
+run1_rc=0
+SG-275 affected backend file RUN 2 2026-11-02T15:46:30Z
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+17 passed, 2 warnings in 6.87s
+run2_rc=0
