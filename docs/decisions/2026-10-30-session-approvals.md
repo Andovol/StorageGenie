@@ -140,3 +140,7 @@ Read as: outfit suggestions and saved outfits are core to Wardrobe, not extras. 
 **Directive, 2026-11-02, verbatim:** *"Lets try to enrich other modules like "Pantry" with similar features, including AI and "intelligence" features."*
 
 Read as: the wardrobe-style features and AI are to be considered for Pantry and other modules too. Which ones, and when, is open with the owner.
+
+**D20, D21, D22 and a directive, 2026-11-02, verbatim:** *"D20 - ok. D21 - keep D19. D22 - approve. #### The design, look and feel are very important, so please make sure it very well executed and implemented."*
+
+Read as: **D20** SG-280 adds, as put to the owner: rehearse on a scratch copy while the app runs (interrupt the migration, restore the backup over it, the old image reads the result); compare all live objects with what the migration expects and stop on any difference; then deploy under D16's recovery states. **D21** the order stays D19: stage C, then stage D, then stage E; the owner heard the review's objection and kept this. **D22** P1–P10 enter the roadmap as candidates after the real-shelf trial, with the safety checks in code before any meal suggestion, no suitability claim before allergies can be entered, and honest wording; no spend until then. **Directive:** design quality is a first-class requirement of every theme and screen slice.

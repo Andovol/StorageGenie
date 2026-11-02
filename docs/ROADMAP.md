@@ -90,6 +90,10 @@ Approved by the owner as roadmap additions (*"D17-D19 - approved."*). **A place 
 | E | W11 garment fields, V4 colour as data, W6 wear log, W8 build around a piece, W13 suggest an outfit, W14 saved outfits, V7 outfit rules | Owner priority for W13 and W14: *"The Outfits suggestion and saved Outfits seems important features."* |
 | E | V6 tags, W7 gap report, W9 learning, W10 style settings, W12 wash tracking | Repeated need or enough wear history |
 
+**Pantry intelligence, candidates after the real-shelf trial (D22):** P1 use log · P2 check before you buy · P3 what can I make · P4 saved meals and a calendar · P5 running low and a shopping list · P6 shelf check · P7 add by typing · P8 household food settings · P9 label fields · P10 daily "use this today" push. **Before any meal suggestion, in code:** dates and item references checked; use-by, best-before and unknown dates treated differently. No claim that something suits a diet or allergy until allergies can be entered, and an allergy is never learned from accept or skip. AI never says food is safe past its date, never guesses an allergen or a date, and gives no dosing or interaction advice for medicine. Other modules take the same shape when the owner picks them.
+
+**Order (D21, the owner's choice, after hearing the review's objection):** stage C, then D, then E. The restore proof stays in D.
+
 **Not worth copying so far:** partner links, XP and streaks, credits and billing, local AI, eight languages. Family feed: the Architect's first read as covered by "no social feed" was too strong, because it is private to the household; it stays out unless the owner asks.
 
 ## What is already built
