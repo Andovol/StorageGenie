@@ -1,0 +1,106 @@
+result=done id=SG-282 inactive
+debug-report-begin
+SG-282 model=unknown; effort=unknown (process arguments/provider metadata unavailable within permitted repository reads); directory=/tmp/dispatch-review.4ZEAgR; remote=unverified; WORK_HEAD=unverified.
+BASE_REF_REQUESTED: origin/automation
+BASE_COMMIT_RESOLVED: unknown; this snapshot has no `.git`, so its resolved commit and equivalence to BASE cannot be independently established.
+**Contract version: 0.56.0** — **echo this line verbatim in your receipt.** It is the only proof that you
+Contract provenance: `.contract/CODER.md:3`; `.contract/SOURCE:1` records version 0.56.0. No external version command was run.
+
+**Picks**
+- Q1: (b), shared visual foundations everywhere, full treatment on catalog, inspector and Pantry; preserve accessible dark mode and honest source photos.
+- Q2: outside the list, finish the real-use gate for C, prove restore, then a bounded D image pilot before thin E. Do not make every D enhancement a prerequisite for Wardrobe.
+- Q3: first exploit existing typed capture and review; adopt image fidelity and approval safeguards when images begin. Defer speculative automation until real use identifies its value.
+- Q4: (a), foreground-preserving cut-out and deterministic composition, with original-photo fallback. Poor evidence should prompt recapture, not automatic regeneration.
+- Q5: (c), retain the built migration but add an explicit pre-migration recovery-proof gate to the rider. Source readiness is not operational readiness.
+
+**Extra Files**
+Beyond AGENTS.md, the context pack and its “Where it lives” files:
+- `.contract/CODER.md`, full read, to establish PB-1–PB-6 and the contract echo.
+- `.contract/SOURCE`, to establish the supplied contract’s recorded provenance.
+- `backend/app/services/lifecycle.py`, `backend/app/services/observations.py`, `backend/app/services/asset_service.py`, search excerpts only: the candidate-symbol search unexpectedly returned neighbouring service files; none informed the picks.
+Directory listing: `.contract/`, to identify available contract material; it contains only CODER.md and SOURCE.
+The initial root `CODER.md` read returned “File not found”; it was not a permission denial. No additional file content was obtained by the filename search.
+The production overlay is absent from the supplied contract directory; no deployment authority is inferred from that absence.
+
+**Q1: Theme Adoption**
+(a) PICK: (b). Apply paper/ink/accent, Instrument Sans and restrained square shapes through shared foundations; fully adapt catalog, inspector and Pantry first. Preserve the other screens’ established interactions.
+(b) WHY: The owner explicitly chose the tandpfun design, not merely a Pantry-only theme (context pack:13). Shared tokens already style the body and semantic helpers (`frontend/src/theme/tokens.css:75-99`), and screen adoption is an existing tested pattern (`frontend/src/routes/theme-adoption.test.tsx:163-221`).
+A token swap alone cannot reproduce the reference: cards have inline rounded borders (`frontend/src/components/catalog/ProductCard.tsx:108-127`), and the inspector has separately styled tabs and controls (`frontend/src/components/shell/ItemInspectorDrawer.tsx:224-243`). Opinion: a bounded component pass is more credible than promising a whole-app redesign in one slice.
+Keep dark mode. It exists in tokens and has persisted-toggle coverage (`frontend/src/theme/tokens.css:36-61`; `frontend/src/routes/theme-adoption.test.tsx:271-276`). The reference’s lack of dark styling is not evidence that existing users should lose it.
+Do not import the reference’s 9–11 px typography literally (context pack:21). Opinion: retain its visual hierarchy using readable relative sizes, adequate contrast and phone-sized controls; verify both themes and narrow layouts.
+Before cutouts exist, use equal-size neutral photo wells, `object-fit: contain`, visible item names and honest missing-image states. Existing containment and fallback provide a starting point (`frontend/src/components/catalog/ProductCard.tsx:140-155`); cutout URLs remain mock-only (`:6-14`).
+Do not imply a rectangular phone photo is already an isolated product. Opinion: even framing is achievable now; evenly isolated subjects are not.
+(c) MISSED OPTION: A short, owner-reviewed implementation checkpoint using representative existing photos before completing the component pass. I checked the shared-token architecture and raw-photo rendering; neither proves the reference works with household photos.
+(d) RISKIEST UNVERIFIED PREMISE: The owner’s attraction to the screenshot survives replacement of its polished garment cutouts with actual Pantry photos. A real-photo checkpoint would test this without reopening the chosen theme.
+
+**Q2: Sequence After C**
+(a) PICK: Outside the list: C real use → proven restore → bounded D photo pilot → thin E, with D improvements continuing only where justified.
+(b) WHY: D explicitly requires “C used on real items” (`docs/ROADMAP.md:18`), and C’s exit requires a real shelf followed by correction after ordinary household use (`:48`). The pack says the fixes have not been used live and only seven assets exist (context pack:15).
+Opinion: advancing directly to another large module would multiply assumptions before discovering why capture and maintenance have not become routine.
+Restore is a separate safety dependency, not a cosmetic image feature: the roadmap says it should work “before much more of the owner’s data goes in” (`docs/ROADMAP.md:54`). Bring that proof forward rather than letting the image-provider blocker park it.
+Do not require all image styling and enrichment work to finish before Wardrobe. E lists C and B, not D, as dependencies (`docs/ROADMAP.md:19`); D’s provider choice is explicitly blocked (`:56`).
+Opinion: once C is usable and recovery is proven, a small image experiment can establish a reusable media contract while Wardrobe begins with original photos if necessary.
+(c) MISSED OPTION: Separate D’s recovery work from provider-dependent presentation, and permit thin E without universal image processing. I checked the stage dependencies and blocker; they do not require a strictly serial D-then-E programme.
+(d) RISKIEST UNVERIFIED PREMISE: Low adoption is chiefly a workflow or presentation problem. The owner may instead find stock maintenance intrinsically too burdensome; a larger feature set would not settle that.
+
+**Q3: Feature Selection**
+(a) PICK: A thin capture/review loop first, fidelity safeguards with the first image work, then a minimal usable Wardrobe rather than the entire candidate list.
+(b) WHY AND FIRST SET: Creating items by hand and reviewing candidates are already built (`docs/ROADMAP.md:87-90`). W5 “add by typing” is therefore an adoption/usability check, not automatically a new feature; W2 should first improve the existing review desk only where observed friction requires it.
+The smallest first set is existing typed/photo capture, find/edit, Pantry quantity/gone/undo, and source-photo viewing. C already specifies the quantity and reversible gone actions (`docs/ROADMAP.md:45-46`). Opinion: add no new feature merely to populate this first set.
+For D’s first image pilot, include V3 no invented details and V5 approve/reject/regenerate with original fallback. These are integrity controls, not optional sophistication: original evidence is already required (`docs/ROADMAP.md:52`).
+V1 one-photo-to-many-items: defer broad automation until real capture shows a material advantage. Split mechanics exist but fail live pending migration (context pack:15); that does not prove automatic detection or useful crops.
+V2 phone installation: useful only if access/install friction is observed. W4 ntfy: defer until in-app reminders prove useful and their missed delivery is the problem; reminders already exist (`docs/ROADMAP.md:95`).
+W3 used/unused lists: require trustworthy lifecycle or wear history first. “Not logged” must not silently mean “never used.”
+For thin E, start with W11’s necessary garment fields, the required person picker, correction-capable colour data V4, outfit composition, W8 build-around-one-piece, and a lightweight W6 wear record. Separate wardrobes and flat-lay outfits are already stated requirements (`docs/ROADMAP.md:60-64`).
+V7 reasoned, non-duplicating suggestions should follow usable owned-item records; keep the first rules simple. Opinion: variety must not override weather, occasion or the wearer’s corrections.
+W9 learning and W10 elaborate style settings need repeated accept/skip/correction evidence. W12 wash tracking needs observed laundry friction. V6 tags need repeated retrieval failures that structured fields cannot solve.
+W1 check-before-buy and W7 gap reports are overvalued early: incomplete inventory and sparse wear evidence cannot reliably establish duplication or genuine gaps. Buying suggestions belong to F in the current roadmap (`docs/ROADMAP.md:67-71`); reconsider placement explicitly rather than sneaking them into D.
+(c) MISSED OPTION: Recovery and correction of stale inventory, including a simple reconciliation flow if needed. I checked the candidate list against C’s exit criterion: correcting wrong or missing stock is named there, but not among the feature candidates (`docs/ROADMAP.md:48`).
+Real use must first show that the owner returns voluntarily, finds the intended item, corrects quantities/status without disproportionate effort, and maintains recognisable records after normal household use.
+Opinion: expansion should address observed failures, not an arbitrary item-count target. Later recommendations need sufficiently complete relevant inventory and actual preference/wear feedback.
+(d) RISKIEST UNVERIFIED PREMISE: The household will maintain enough accurate stock and wear history to make downstream lists, learning and buying advice meaningful.
+
+**Q4: Product Images**
+(a) PICK: (a), provided “cut-out” preserves foreground content rather than regenerating the object. Keep the original and allow the original to remain the display image.
+(b) WHY: The stated house-style goal is cut-out, fixed backdrop, non-AI shadow and original evidence (`docs/ROADMAP.md:52`); it does not require synthesising a replacement product.
+Accuracy risks of (a): masking may erase transparent packaging, label edges, garment lace or straps; compositing can distort colour or apparent shape. Opinion: compare against the source and reject a bad mask rather than repairing missing identity through invention.
+Accuracy risks of (b): regeneration can change Pantry text, brand, size or label details, and garment seams, logos, texture or construction. Removing chroma afterwards cannot recover details already changed. The reference’s own workflow requires approval and explicitly avoids invented details (context pack:23).
+Accuracy risks of (c): it reserves the least faithful operation for the weakest source evidence, precisely where comparison is hardest. Opinion: “poor photo” is a reason to recapture or retain the source, not sufficient justification for regeneration.
+The existing scene client is not proof of identity-preserving extraction. Its server-tool route translates visual input into text (`backend/app/services/scene/openrouter.py:32-38`), and its preservation language is a prompt (`:79-85`), not an enforced fidelity guarantee.
+Even the reference-image request (`backend/app/services/scene/openrouter.py:174-192`) establishes input transport, not output correctness.
+Opinion: evaluate representative labels, reflective/transparent packs and fine garment details before approving batch use; keep derived imagery separate from authoritative metadata.
+(c) MISSED OPTION: Recapture/manual crop with original-photo fallback and no generation. I checked the three choices and current raw-image support; none explicitly treats “do not transform this item” as a successful outcome.
+(d) RISKIEST UNVERIFIED PREMISE: An owner-approved cloud service can preserve identifying foreground content reliably enough on the household’s actual photos at acceptable review effort and cost.
+No provider or model is selected. Existing privacy and owner-choice bindings remain unchanged.
+
+**Q5: SG-279 Deployment Readiness**
+(a) PICK: (c). Keep the built code; require the rider to prove its exact backup/recovery procedure in isolation before beginning the live rebuild. If already present in the rider, demand its evidence rather than duplicate the step.
+(b) WHY: The migration explicitly replaces only the named CHECK and preserves the declared table structure (`backend/alembic/versions/20261102_sg279_candidate_state.py:28-75`). The model declares the same seven states (`backend/app/services/candidates.py:496-503`).
+The route tests use migrated databases, enable FK enforcement and read back in fresh sessions (`backend/tests/test_sg279_candidate_state.py:59-98,198-254`). This is materially stronger than testing only metadata-created tables.
+The rehearsal log records preserved rows, indexes, defaults and FKs, only the candidate table definition changing, successful FTS lookup and clean integrity/FK checks (`docs/worklogs/SG-279_rehearsal.log:40-45,98-110`).
+The downgrade’s explicit refusal precedes DDL when split/merged rows exist (`backend/alembic/versions/20261102_sg279_candidate_state.py:78-94`). Downgrade is not a general recovery mechanism.
+However, the log explicitly says “Will assume non-transactional DDL” (`docs/worklogs/SG-279_rehearsal.log:2`). The rehearsal exercises successful upgrade/downgrade and refusal, not interruption and backup replacement (`backend/tests/test_sg279_rehearsal.py:115-117,224-271`).
+The earlier review already distinguishes readable backup from executable restoration (`docs/worklogs/SG-278_report.md:73-78`). Opinion: those are different release claims and should remain separate gates.
+Rider step: establish exact operational rights non-mutatingly; identify the immutable old image and database/storage destinations; rehearse the proposed backup and interrupted-migration restore on isolated data, including WAL/SHM handling and restored application readability.
+Before live DDL, require live revision/object inventory to match the migration’s hard-coded table description. Opinion: unexpected columns, triggers, incoming FKs or schema drift invalidate the rehearsal’s applicability.
+After migration, compare preserved data/schema objects and check integrity/FKs before starting the backend. Its startup immediately schedules a writer (`backend/app/server.py:27-34`); health is not a no-write boundary.
+Preserve the approved recovery states exactly: pre-migration old-image restart; migration-started with writers stopped permits approved backup restore; after new-image start return to the owner before restore; failed recovery leaves the app stopped. A denial is STOP, not a fallback route.
+(c) MISSED OPTION: Accept source readiness while withholding live readiness until rider evidence is complete. I checked the built migration, rehearsal and startup boundary; none alone proves the live recovery permissions or backup procedure.
+(d) RISKIEST UNVERIFIED PREMISE: The deployment lane can execute the exact authorised recovery procedure against a live database matching the rehearsed schema. Neither this snapshot nor a successful synthetic upgrade establishes that.
+No source-backed defect requiring a migration rewrite was found in the reviewed material. This is not deployment authorisation.
+
+**G3: Whole Approach**
+The observation that would invalidate this direction is a real shelf trial in which capture and ongoing correction remain too costly, so the household stops consulting or maintaining the catalog despite a working journey.
+Evidence for testing that possibility: seven assets with no known explanation, untried live fixes (context pack:15), and the roadmap’s explicit ordinary-use correction gate (`docs/ROADMAP.md:37,48`).
+Opinion: if that happens, pause feature breadth and investigate the specific burden; do not interpret attractive screenshots or another project’s feature inventory as evidence of household utility.
+Conversely, if repeated use shows that visual recognition or inconsistent photos are the dominant obstacle, the bounded theme/image pilot becomes justified. If recommendations are requested but fail for missing records, improve capture and correction before learning systems.
+No binding decision is reopened. Objection to an implementation assumption only: “no invented details” is an acceptance objective, not a property established by a preservation prompt or an approval button.
+Opinion: recovery, faithful records and low maintenance effort should constrain the attractive catalog, not become debts hidden behind it.
+
+**Close**
+Read AGENTS.md, the blind context, the relevant listed product/code/evidence files and the extra material inventoried above. Deliberately did not read STATE.md or docs/decisions/, follow their links, inspect outside projects, or use a current Architect recommendation.
+No tests, health probes, database access, network, credentials, host operations, migration, restart, commit or push. I wrote nothing. Final-message publication is delegated to the engine; no publication is claimed here.
+UNCLEAR FIRST READ: requested BASE resolution and local contract location.
+UNCLEAR DURING EXECUTION: root CODER.md was absent; `.contract/CODER.md` supplied version 0.56.0; the production overlay was unavailable.
+UNCLEAR REMAINING: BASE provenance, actual causes of low adoption, real-photo fidelity, live schema and exact recovery rights/proof.
+debug-report-end

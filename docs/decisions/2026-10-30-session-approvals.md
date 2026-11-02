@@ -132,3 +132,11 @@ Read as: **the tandpfun Wardrobe look replaces Linen Shelf (D13) as the chosen d
 **D17, D18, D19 and a directive, 2026-11-02, verbatim:** *"D17-D19 - approved. What is the "Family feed"? Get a 2nd opinion from Sol 6.1 for all important topics."*
 
 Read as: the recommendations put to the owner are approved: **D17** add V1–V7 and W1–W12 to the roadmap and record the not-worth-copying list; **D18** the new theme's colours, font and shapes everywhere, with the full design on the catalog, item panel and Pantry view; **D19** after stage C, shared images (D), then Wardrobe (E). **Directive:** a two-phase second opinion on Sol 6.1 covers these and the other important open topics, SG-282 and SG-283. Advisory: a finding goes back to the owner and changes nothing by itself.
+
+**Owner priority, 2026-11-02, verbatim, with a screenshot of wardrowbe's Suggest Outfit screen:** *"The Outfits suggestion and saved Outfits seems important features."*
+
+Read as: outfit suggestions and saved outfits are core to Wardrobe, not extras. D19's order is not changed by this. It goes to the second opinion's Phase B as evidence.
+
+**Directive, 2026-11-02, verbatim:** *"Lets try to enrich other modules like "Pantry" with similar features, including AI and "intelligence" features."*
+
+Read as: the wardrobe-style features and AI are to be considered for Pantry and other modules too. Which ones, and when, is open with the owner.
