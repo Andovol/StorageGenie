@@ -1,0 +1,24 @@
+# SG-276 startup log 2026-11-02T15:53:49Z
+INFO:     Started server process [1]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+INFO:     app.services.reminders.daily - Daily reminder pass completed as_of=2026-11-02 households_visited=1 reminders_created=0 errors=0
+INFO:     127.0.0.1:45458 - "GET /v1/health HTTP/1.1" 200 OK
+INFO:     172.18.0.1:54576 - "GET /v1/health HTTP/1.1" 200 OK
+INFO:     172.18.0.1:54584 - "GET /v1/health HTTP/1.1" 200 OK
+INFO:     172.18.0.1:54598 - "GET /v1/health HTTP/1.1" 200 OK
+INFO:     172.18.0.1:54606 - "GET /v1/health HTTP/1.1" 200 OK
+INFO:     172.18.0.1:56684 - "GET /v1/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55934 - "GET /v1/health HTTP/1.1" 200 OK
+INFO:     172.18.0.1:56694 - "GET /v1/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55942 - "GET /v1/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:33024 - "GET /v1/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:44536 - "GET /v1/health HTTP/1.1" 200 OK
+INFO:     172.18.0.1:50452 - "GET / HTTP/1.1" 200 OK
+INFO:     172.18.0.1:50460 - "GET /expiry HTTP/1.1" 200 OK
+INFO:     172.18.0.1:50476 - "GET /inbox HTTP/1.1" 200 OK
+INFO:     172.18.0.1:50478 - "GET /planning HTTP/1.1" 200 OK
+INFO:     172.18.0.1:50494 - "GET /v1/health HTTP/1.1" 200 OK
+--- scan ---
+INFO:     app.services.reminders.daily - Daily reminder pass completed as_of=2026-11-02 households_visited=1 reminders_created=0 errors=0

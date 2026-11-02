@@ -1,0 +1,6 @@
+# SG-276 runtime diff new image vs worktree 2026-11-02T15:52:35Z
+DIFF_RC=0
+--- served static listing ---
+571ad339c174af91c3103ffaa8c76181c7383d16b41821e9c61f6b41fc172e71	944	static/index.html
+c3b58cda696a22970fc2a4a348849fc1359f2105f80f81304ed5dfd5ca31a557	4535	static/assets/index-C07VbG0m.css
+8743733b15a8ade3c2ddff1e31eb5c9213ff65b965f9bd58a5ad1648ee5e78dd	333530	static/assets/index-FB7x-XIy.js

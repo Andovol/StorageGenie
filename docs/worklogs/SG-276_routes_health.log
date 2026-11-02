@@ -1,0 +1,14 @@
+# SG-276 shell routes and final health 2026-11-02T15:53:49Z
+ROUTE / HTTP=200
+ROUTE /expiry HTTP=200
+ROUTE /inbox HTTP=200
+ROUTE /planning HTTP=200
+--- health six ---
+HEALTH_1 2026-11-02T15:53:49Z {"status":"ok","db":"ok","storage":"ok"} HTTP=200
+HEALTH_2 2026-11-02T15:53:50Z {"status":"ok","db":"ok","storage":"ok"} HTTP=200
+HEALTH_3 2026-11-02T15:53:51Z {"status":"ok","db":"ok","storage":"ok"} HTTP=200
+HEALTH_4 2026-11-02T15:53:52Z {"status":"ok","db":"ok","storage":"ok"} HTTP=200
+HEALTH_5 2026-11-02T15:53:53Z {"status":"ok","db":"ok","storage":"ok"} HTTP=200
+HEALTH_6 2026-11-02T15:53:54Z {"status":"ok","db":"ok","storage":"ok"} HTTP=200
+--- final health ---
+HEALTH_FINAL 2026-11-02T15:53:55Z {"status":"ok","db":"ok","storage":"ok"} HTTP=200

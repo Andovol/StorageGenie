@@ -1,0 +1,447 @@
+# SG-276 runtime diff pre-serve image vs worktree 2026-11-02T15:52:19Z
+diff -r '--exclude=__pycache__' output/SG-276-scratch/pre/app/api/v1/candidates.py backend/app/api/v1/candidates.py
+9c9
+< from app.models.job import Job
+---
+> from app.models.job import Job, JobStep
+11c11
+< from app.services import candidates, job_service
+---
+> from app.services import audit_service, candidates, job_service
+29a30,121
+> def _close_rejected_candidate_tasks(
+>     db: Session, candidate: candidates.Candidate, household_id: str
+> ) -> None:
+>     """Close the candidate's open tasks, naming the rejection and never a date."""
+>     open_tasks = (
+>         db.query(ReviewTask)
+>         .filter_by(subject_ref=candidate.id, household_id=household_id, status="open")
+>         .all()
+>     )
+>     for task in open_tasks:
+>         before = {"status": task.status}
+>         task.status = "resolved"
+>         audit_service.record(
+>             db,
+>             actor="api",
+>             action="review_task.resolve",
+>             entity_type="review_task",
+>             entity_id=task.id,
+>             before=before,
+>             after={
+>                 "status": task.status,
+>                 "resolution": {"candidate_rejected": candidate.id},
+>             },
+>             household_id=task.household_id,
+>         )
+> 
+> 
+> def _created_asset_from_commit_step(
+>     commit_step: JobStep | None, candidate_id: str
+> ) -> str | None:
+>     """The asset id a pre-SG-270 commit wrote into its step output, if any."""
+>     if commit_step is None or not commit_step.output_refs:
+>         return None
+>     try:
+>         output = json.loads(commit_step.output_refs)
+>     except ValueError:
+>         return None
+>     if not isinstance(output, dict):
+>         return None
+>     asset_id = output.get("asset_id")
+>     if (
+>         output.get("candidate_id") == candidate_id
+>         and output.get("created") is True
+>         and isinstance(asset_id, str)
+>     ):
+>         return asset_id
+>     return None
+> 
+> 
+> def _prepare_commit_steps(
+>     db: Session, job: Job, candidate: candidates.Candidate
+> ) -> None:
+>     """Record the decided candidate and give the commit step a fresh pass."""
+>     review_step = next(
+>         (step for step in job_service._steps(db, job.id) if step.step_name == "AWAITING_REVIEW"),
+>         None,
+>     )
+>     commit_step = next(
+>         (step for step in job_service._steps(db, job.id) if step.step_name == "COMMITTING"),
+>         None,
+>     )
+>     if review_step is not None:
+>         previous_output: dict[str, object] = {}
+>         if review_step.output_refs:
+>             try:
+>                 loaded = json.loads(review_step.output_refs)
+>             except ValueError:
+>                 loaded = None
+>             if isinstance(loaded, dict):
+>                 previous_output = loaded
+>         review_output: dict[str, object] = {"status": "decision", "candidate_id": candidate.id}
+>         committed_assets = previous_output.get("committed_assets")
+>         if not isinstance(committed_assets, dict):
+>             committed_assets = {}
+>         # SG-275: a commit made before the map existed left its asset only in the
+>         # commit step's own output. Record that created asset before the reset
+>         # below, so a repeat decision on the older row returns it, not a second.
+>         prior_asset_id = _created_asset_from_commit_step(commit_step, candidate.id)
+>         if prior_asset_id is not None:
+>             committed_assets[candidate.id] = prior_asset_id
+>         if committed_assets:
+>             review_output["committed_assets"] = committed_assets
+>         review_step.state = job_service.COMPLETED_STEP
+>         review_step.output_refs = json.dumps(review_output)
+>     # SG-270 G2: every accepted candidate (including a second split child) gets
+>     # its own commit pass; a repeat decision on the same candidate is idempotent
+>     # through the review step's committed_assets map.
+>     if commit_step is not None:
+>         commit_step.state = job_service.PENDING_STEP
+>         commit_step.output_refs = None
+> 
+> 
+46a139,140
+>         if payload.action == "reject":
+>             _close_rejected_candidate_tasks(db, candidate, household_id)
+50c144
+<     if db.query(ReviewTask).filter_by(subject_ref=candidate.id, household_id=household_id, status="open").count():
+---
+>     if candidates.blocking_review_task_ids(db, candidate):
+69,72c163
+<     review_step = next((step for step in job_service._steps(db, job.id) if step.step_name == "AWAITING_REVIEW"), None)
+<     if review_step is not None:
+<         review_step.state = job_service.COMPLETED_STEP
+<         review_step.output_refs = json.dumps({"status": "decision", "candidate_id": candidate.id})
+---
+>     _prepare_commit_steps(db, job, candidate)
+164a256
+>     blocking_review_task_ids = candidates.blocking_review_task_ids(db, candidate)
+182a275
+>         "blocking_review_task_ids": blocking_review_task_ids,
+diff -r '--exclude=__pycache__' output/SG-276-scratch/pre/app/api/v1/review_tasks.py backend/app/api/v1/review_tasks.py
+8a9
+> from app.models.asset import Asset
+11a13
+> from app.services.candidates import Candidate
+63a66,83
+>     # SG-270 G4: resolve each page's subject kind with one batched lookup per
+>     # subject table, never one query per row.
+>     subject_refs = {item.subject_ref for item in items}
+>     candidate_ids: set[str] = set()
+>     asset_ids: set[str] = set()
+>     if subject_refs:
+>         candidate_ids = {
+>             str(row[0])
+>             for row in db.query(Candidate.id)
+>             .filter(Candidate.id.in_(subject_refs), Candidate.household_id == household_id)
+>             .all()
+>         }
+>         asset_ids = {
+>             str(row[0])
+>             for row in db.query(Asset.id)
+>             .filter(Asset.id.in_(subject_refs), Asset.household_id == household_id)
+>             .all()
+>         }
+70a91,98
+>                 "subject_kind": (
+>                     "candidate"
+>                     if item.subject_ref in candidate_ids
+>                     else "asset"
+>                     if item.subject_ref in asset_ids
+>                     else "unknown"
+>                 ),
+>                 "data_required": item.task_type in DATA_REQUIRED_TASK_TYPES,
+diff -r '--exclude=__pycache__' output/SG-276-scratch/pre/app/plugins/expiry_tracker.py backend/app/plugins/expiry_tracker.py
+32a33,39
+> MANUAL_ENTRY_TASK_TYPE = "expiry.manual_entry"
+> MANUAL_ENTRY_PROMPT = "Enter expiry date manually"
+> 
+> 
+> def manual_task_change() -> dict[str, object]:
+>     """The asset-side payload every `expiry.manual_entry` task carries (SG-270)."""
+>     return {"field_path": EXPIRY_FIELD, "prompt": MANUAL_ENTRY_PROMPT}
+380c387
+<             task_type="expiry.manual_entry",
+---
+>             task_type=MANUAL_ENTRY_TASK_TYPE,
+388c395
+<         task_type="expiry.manual_entry",
+---
+>         task_type=MANUAL_ENTRY_TASK_TYPE,
+391c398
+<         proposed_change=json.dumps({"field_path": EXPIRY_FIELD, "prompt": "Enter expiry date manually"}),
+---
+>         proposed_change=json.dumps(manual_task_change()),
+498a506,534
+>         # SG-270 W8: a non-expiry category also resolves a split origin's date
+>         # task, exactly as the manual-entry path does (audited orphan row).
+>         resolved_ids = {resolved_task.id for resolved_task in resolved_tasks}
+>         asset_evidence_ids = [
+>             row.evidence_id
+>             for row in db.execute(
+>                 asset_evidence.select().where(asset_evidence.c.asset_id == asset.id)
+>             ).fetchall()
+>         ]
+>         for orphan in _orphan_manual_tasks(db, asset, asset_evidence_ids):
+>             if orphan.id in resolved_ids:
+>                 continue
+>             before = {"status": orphan.status}
+>             orphan.status = "resolved"
+>             audit_service.record(
+>                 db,
+>                 actor="expiry-tracker",
+>                 action="review_task.resolve",
+>                 entity_type="review_task",
+>                 entity_id=orphan.id,
+>                 before=before,
+>                 after={
+>                     "status": orphan.status,
+>                     "resolution": {"manual_entry_orphan": True, "asset_id": asset.id},
+>                 },
+>                 household_id=orphan.household_id,
+>             )
+>             resolved_ids.add(orphan.id)
+>             resolved_tasks.append(orphan)
+611a648,656
+> 
+> 
+> def has_accepted_expiry_or_clear(db: Session, asset_id: str) -> bool:
+>     """True when the asset already carries an accepted date or an accepted null (SG-270)."""
+>     assertion = _active_assertion(db, asset_id, EXPIRY_FIELD)
+>     value = _accepted_expiry_value(assertion)
+>     if assertion is None or value is None:
+>         return assertion is not None and assertion.review_state == "accepted"
+>     return _has_valid_expiry_date(value)
+diff -r '--exclude=__pycache__' output/SG-276-scratch/pre/app/services/candidates.py backend/app/services/candidates.py
+18a19,23
+> from app.plugins.expiry_tracker import (
+>     MANUAL_ENTRY_TASK_TYPE,
+>     has_accepted_expiry_or_clear,
+>     manual_task_change,
+> )
+535a541,545
+> # SG-270: an open date-entry task on a candidate no longer blocks accept/edit.
+> # The task travels to the committed asset and is resolved by real date data.
+> # Every other open task type still blocks.
+> CANDIDATE_DECISION_EXEMPT_TASK_TYPES = frozenset({MANUAL_ENTRY_TASK_TYPE})
+> 
+965a976,1081
+> def blocking_review_task_ids(db: Session, candidate: Candidate) -> list[str]:
+>     """Live open task ids that still block accept/edit (SG-270).
+> 
+>     Same rows as `open_review_task_ids`, excluding the one exempt task type.
+>     """
+>     rows = (
+>         db.query(ReviewTask.id)
+>         .filter(
+>             ReviewTask.subject_ref == candidate.id,
+>             ReviewTask.household_id == candidate.household_id,
+>             ReviewTask.status == "open",
+>             ReviewTask.task_type.notin_(list(CANDIDATE_DECISION_EXEMPT_TASK_TYPES)),
+>         )
+>         .order_by(ReviewTask.created_at, ReviewTask.id)
+>         .all()
+>     )
+>     return [str(row[0]) for row in rows]
+> 
+> 
+> def _open_date_tasks(db: Session, candidate: Candidate) -> list[ReviewTask]:
+>     return (
+>         db.query(ReviewTask)
+>         .filter(
+>             ReviewTask.subject_ref == candidate.id,
+>             ReviewTask.household_id == candidate.household_id,
+>             ReviewTask.task_type == MANUAL_ENTRY_TASK_TYPE,
+>             ReviewTask.status == "open",
+>         )
+>         .order_by(ReviewTask.created_at, ReviewTask.id)
+>         .all()
+>     )
+> 
+> 
+> def _move_date_task(db: Session, task: ReviewTask, asset_id: str) -> None:
+>     before = {
+>         "subject_ref": task.subject_ref,
+>         "proposed_change": task.proposed_change,
+>     }
+>     task.subject_ref = asset_id
+>     task.proposed_change = json.dumps(manual_task_change())
+>     task.updated_at = datetime.datetime.now(datetime.timezone.utc)
+>     audit_service.record(
+>         db,
+>         actor="import-runner",
+>         action="review_task.move",
+>         entity_type="review_task",
+>         entity_id=task.id,
+>         before=before,
+>         after={
+>             "subject_ref": task.subject_ref,
+>             "proposed_change": task.proposed_change,
+>         },
+>         household_id=task.household_id,
+>     )
+> 
+> 
+> def _close_candidate_task(
+>     db: Session, task: ReviewTask, resolution: dict[str, object]
+> ) -> None:
+>     before = {"status": task.status}
+>     task.status = "resolved"
+>     task.updated_at = datetime.datetime.now(datetime.timezone.utc)
+>     audit_service.record(
+>         db,
+>         actor="import-runner",
+>         action="review_task.resolve",
+>         entity_type="review_task",
+>         entity_id=task.id,
+>         before=before,
+>         after={"status": task.status, "resolution": resolution},
+>         household_id=task.household_id,
+>     )
+> 
+> 
+> def _resolve_or_move_duplicate_date_tasks(
+>     db: Session, candidate: Candidate, target: Asset
+> ) -> None:
+>     target_has_date = has_accepted_expiry_or_clear(db, target.id)
+>     target_task = (
+>         db.query(ReviewTask)
+>         .filter_by(
+>             subject_ref=target.id,
+>             household_id=target.household_id,
+>             task_type=MANUAL_ENTRY_TASK_TYPE,
+>             status="open",
+>         )
+>         .first()
+>     )
+>     for task in _open_date_tasks(db, candidate):
+>         if target_has_date:
+>             _close_candidate_task(
+>                 db, task, {"duplicate_of_asset": target.id, "reason": "target_has_date"}
+>             )
+>         elif target_task is not None:
+>             _close_candidate_task(
+>                 db,
+>                 task,
+>                 {
+>                     "duplicate_of_asset": target.id,
+>                     "existing_review_task_id": target_task.id,
+>                 },
+>             )
+>         else:
+>             _move_date_task(db, task, target.id)
+> 
+> 
+974a1091
+>             ReviewTask.task_type.notin_(list(CANDIDATE_DECISION_EXEMPT_TASK_TYPES)),
+986c1103,1107
+<         return {"status": "duplicate_linked", "asset_id": asset_id, "created": False}
+---
+>         target = db.query(Asset).filter_by(id=asset_id).first()
+>         if target is None or target.household_id != candidate.household_id:
+>             raise CandidateBlockedError("duplicate target asset is not in this household")
+>         _resolve_or_move_duplicate_date_tasks(db, candidate, target)
+>         return {"status": "duplicate_linked", "asset_id": target.id, "created": False}
+989a1111,1115
+>     # SG-270: the date task follows the item, in the same transaction. No expiry
+>     # assertion is written here; the asset's own proposal fields stay untouched.
+>     for task in _open_date_tasks(db, candidate):
+>         _move_date_task(db, task, asset.id)
+>     db.flush()
+994c1120,1143
+<     candidate = db.query(Candidate).filter_by(job_id=job.id).order_by(Candidate.created_at).first()
+---
+>     review_step = db.query(JobStep).filter_by(job_id=job.id, step_name="AWAITING_REVIEW").first()
+>     output: dict[str, object] = {}
+>     if review_step is not None and review_step.output_refs:
+>         try:
+>             loaded = json.loads(review_step.output_refs)
+>         except ValueError:
+>             loaded = None
+>         if isinstance(loaded, dict):
+>             output = loaded
+>     decided_id = output.get("candidate_id")
+>     candidate = None
+>     if isinstance(decided_id, str):
+>         candidate = (
+>             db.query(Candidate)
+>             .filter_by(id=decided_id, job_id=job.id)
+>             .first()
+>         )
+>     if candidate is None:
+>         candidate = (
+>             db.query(Candidate)
+>             .filter_by(job_id=job.id)
+>             .order_by(Candidate.created_at)
+>             .first()
+>         )
+996a1146,1162
+>     raw_committed = output.get("committed_assets")
+>     committed_assets = raw_committed if isinstance(raw_committed, dict) else {}
+>     existing_id = committed_assets.get(candidate.id)
+>     if isinstance(existing_id, str):
+>         existing = (
+>             db.query(Asset)
+>             .filter_by(id=existing_id, household_id=candidate.household_id)
+>             .first()
+>         )
+>         if existing is not None:
+>             return {
+>                 "status": "committed",
+>                 "step": "COMMITTING",
+>                 "candidate_id": candidate.id,
+>                 "asset_id": existing.id,
+>                 "created": False,
+>             }
+997a1164,1168
+>     if result.get("created") is True and review_step is not None:
+>         committed_assets[candidate.id] = str(result["asset_id"])
+>         output["committed_assets"] = committed_assets
+>         review_step.output_refs = json.dumps(output, ensure_ascii=False)
+>         db.flush()
+1088a1260,1285
+> def _attach_split_child_date_tasks(db: Session, children: list[Candidate]) -> None:
+>     """Give each evidence-needing child its own open date task (SG-270)."""
+>     for child in children:
+>         child_proposal = load_proposal(child)
+>         if child_proposal.get("needs_evidence") is not True:
+>             continue
+>         child_task = ReviewTask(
+>             task_type=MANUAL_ENTRY_TASK_TYPE,
+>             priority="high",
+>             subject_ref=child.id,
+>             proposed_change=json.dumps(
+>                 {"candidate_id": child.id, "prompt": "Enter expiry date manually"}
+>             ),
+>             status="open",
+>             household_id=child.household_id,
+>         )
+>         db.add(child_task)
+>         db.flush()
+>         task_ids = child_proposal.get("review_task_ids")
+>         if not isinstance(task_ids, list):
+>             task_ids = []
+>         task_ids.append(child_task.id)
+>         child_proposal["review_task_ids"] = task_ids
+>         child.proposed_fields_json = json.dumps(child_proposal, ensure_ascii=False)
+> 
+> 
+1180,1184c1377,1381
+<         .filter_by(
+<             subject_ref=candidate.id,
+<             household_id=candidate.household_id,
+<             task_type="candidate.multi_item",
+<             status="open",
+---
+>         .filter(
+>             ReviewTask.subject_ref == candidate.id,
+>             ReviewTask.household_id == candidate.household_id,
+>             ReviewTask.task_type.in_(("candidate.multi_item", MANUAL_ENTRY_TASK_TYPE)),
+>             ReviewTask.status == "open",
+1202a1400,1403
+> 
+>     # SG-270: a child whose proposal still needs evidence carries its own open
+>     # date task, so the child's commit moves it to that child's asset.
+>     _attach_split_child_date_tasks(db, children)
+DIFF_RC=1

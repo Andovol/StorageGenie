@@ -1,0 +1,8 @@
+# SG-276 health post-recreate 2026-11-02T15:53:05Z
+HEALTH_1 2026-11-02T15:53:05Z {"status":"ok","db":"ok","storage":"ok"} HTTP=200
+HEALTH_2 2026-11-02T15:53:07Z {"status":"ok","db":"ok","storage":"ok"} HTTP=200
+HEALTH_3 2026-11-02T15:53:09Z {"status":"ok","db":"ok","storage":"ok"} HTTP=200
+HEALTH_4 2026-11-02T15:53:11Z {"status":"ok","db":"ok","storage":"ok"} HTTP=200
+HEALTH_5 2026-11-02T15:53:13Z {"status":"ok","db":"ok","storage":"ok"} HTTP=200
+HEALTH_6 2026-11-02T15:53:15Z {"status":"ok","db":"ok","storage":"ok"} HTTP=200
+CONTAINER_HEALTH="healthy"

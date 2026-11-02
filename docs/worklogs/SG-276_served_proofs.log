@@ -1,0 +1,16 @@
+# SG-276 served-artifact proofs 2026-11-02T15:53:27Z
+--- services/candidates.py: CANDIDATE_DECISION_EXEMPT_TASK_TYPES ---
+544:CANDIDATE_DECISION_EXEMPT_TASK_TYPES = frozenset({MANUAL_ENTRY_TASK_TYPE})
+987:            ReviewTask.task_type.notin_(list(CANDIDATE_DECISION_EXEMPT_TASK_TYPES)),
+1091:            ReviewTask.task_type.notin_(list(CANDIDATE_DECISION_EXEMPT_TASK_TYPES)),
+--- services/candidates.py: review_task.move ---
+1020:        action="review_task.move",
+--- api/v1/candidates.py: _created_asset_from_commit_step ---
+57:def _created_asset_from_commit_step(
+107:        prior_asset_id = _created_asset_from_commit_step(commit_step, candidate.id)
+--- api/v1/review_tasks.py: subject_kind ---
+91:                "subject_kind": (
+--- served JS strings ---
+The date can be added after accepting.	count=1
+retired split origin	count=1
+Choose a category, then add a date if it has one.	count=1

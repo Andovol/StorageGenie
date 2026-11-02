@@ -1,0 +1,9 @@
+# SG-276 runtime diff file names 2026-11-02T15:55:30Z
+--- pre-serve image vs worktree ---
+Files output/SG-276-scratch/pre/app/api/v1/candidates.py and backend/app/api/v1/candidates.py differ
+Files output/SG-276-scratch/pre/app/api/v1/review_tasks.py and backend/app/api/v1/review_tasks.py differ
+Files output/SG-276-scratch/pre/app/plugins/expiry_tracker.py and backend/app/plugins/expiry_tracker.py differ
+Files output/SG-276-scratch/pre/app/services/candidates.py and backend/app/services/candidates.py differ
+PRE_DIFFQ_RC=1
+--- new image vs worktree ---
+POST_DIFFQ_RC=0

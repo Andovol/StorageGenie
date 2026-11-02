@@ -1,0 +1,12 @@
+# SG-276 pre-serve state (captured in the first command window, 2026-11-02T15:51Z, before any build or recreate)
+container_id=c1beebf931e04c52ed0b886533633283d11808b2870ebf64146844587eb50bb0
+image_id=sha256:3e0d49de6a71a92581f90a9f0e0fad3ed09e103ff8707e417dcbc85cea46805c
+image_created=2026-11-02T13:34:41.002168361Z
+image_tags=["storagegenie-backend:latest"]
+Cmd=["uvicorn","app.server:app","--host","0.0.0.0","--port","8000"]
+RestartCount=0
+health="healthy"
+status=running
+started=2026-11-02T13:40:03.270801376Z
+alembic_head=20261023_sg233_reminder
+health_body={"status":"ok","db":"ok","storage":"ok"}

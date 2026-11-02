@@ -1,0 +1,19 @@
+# SG-276 G5 live counts (read-only, counts only) 2026-11-02T15:53:40Z
+-- open expiry.manual_entry by subject kind --
+-- open expiry.manual_entry on candidates by candidate state --
+-- open other-type tasks on rejected/split/merged candidates by type --
+-- candidates by state --
+state     n
+--------  -
+edited    6
+proposed  4
+-- accepted/edited candidates: commit output names a created asset --
+bucket                     n
+-------------------------  -
+with_created_asset_output  6
+-- context: all review_task status counts --
+status    n
+--------  -
+resolved  9
+-- context: total open review_task rows --
+0
