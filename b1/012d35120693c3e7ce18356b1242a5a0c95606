@@ -1,0 +1,104 @@
+Dispatch-ID: SG-277 | Report: note
+Debug-Report-Begin
+SG-277 PICKS: Q1 M1, widen the constraint; Q2 targeted migrated-schema split and merge integration tests; Q3 owner-approved, restore-proven, quiesced migration before service resumes.
+Identity: model=unknown; reasoning effort=unknown (process arguments/provider metadata unavailable); working directory=/tmp/dispatch-review.8c8qxd; remote=unverified.
+BASE_REF_REQUESTED: origin/automation
+BASE_COMMIT_RESOLVED: unknown. The supplied directory has no `.git` entry; neither the resolved commit nor the snapshot's equivalence to BASE is independently established.
+WORK_HEAD: unknown; no changes made.
+**Contract version: 0.56.0**
+Contract provenance: repository-local `.contract/CODER.md`; `.contract/SOURCE` records version 0.56.0. No external contract/version command was run because reads were confined to the repository.
+
+Picks below are source-based recommendations, not live verification or authorization to migrate. Required BASE provenance remains incomplete.
+
+**Extra Files**
+Beyond AGENTS.md, the context pack, and its “Where it lives” scope, I read these files or their returned search excerpts:
+- `.contract/CODER.md`, `.contract/SOURCE`.
+- `docker-compose.yml`, `backend/Dockerfile`.
+- `backend/app/main.py`, `backend/app/server.py`, `backend/app/db.py`, `backend/app/config.py`.
+- `backend/app/models/job.py`, `backend/app/models/review_task.py`.
+- `backend/app/api/v1/assets.py`, `backend/app/api/v1/enrich.py`, `backend/app/api/v1/relations.py`, `backend/app/api/v1/locations.py`, `backend/app/api/v1/plugins.py`, `backend/app/api/v1/exports.py`, `backend/app/api/v1/review_tasks.py`, `backend/app/api/v1/analytics.py`, `backend/app/api/v1/chat.py`.
+- `backend/app/services/observations.py`, `backend/app/services/fts.py`, `backend/app/services/asset_service.py`, `backend/app/services/scene/openrouter.py`, `backend/app/services/enrich/synthesize.py`, `backend/app/services/enrich/jina.py`, `backend/app/plugins/descriptor.py`.
+- `backend/tests/test_plugin_expiry.py`, `backend/tests/test_sg187_rejection_hygiene.py`, `backend/tests/test_sg119_brand_alternates.py`, `backend/tests/test_import_jobs.py`, `backend/tests/test_phase1_e2e.py`, `backend/tests/test_sg099_synthesis.py`, `backend/tests/test_settings.py`, `backend/tests/test_sg158_scene_render.py`, `backend/tests/test_sg188_semantics.py`, `backend/tests/test_sg080_ingest_pipeline.py`, `backend/tests/test_planning.py`.
+- `frontend/src/routes/AssetDetailPage.tsx`, `frontend/src/routes/ExpiryPage.tsx`, `frontend/src/routes/CapturePage.tsx`, `frontend/src/routes/CatalogPage.tsx`, `frontend/src/routes/ReviewPage.tsx`, `frontend/src/routes/PlanningPage.tsx`, `frontend/src/routes/ChatPage.tsx`.
+- `frontend/src/routes/theme-adoption.test.tsx`, `frontend/src/routes/AnalyticsPage.test.tsx`, `frontend/src/routes/InboxPage.test.tsx`, `frontend/src/routes/ChatPage.test.tsx`, `frontend/src/routes/ExpiryPage.test.tsx`, `frontend/src/routes/ReviewPage.test.tsx`.
+
+Expansion triggers: verify startup/schema behavior, compare nearby models with migrations, and locate state consumers and migration tests. Broad backend and frontend searches returned incidental excerpts listed above; some search outputs were truncated, so they do not establish an exhaustive inventory.
+Directory listings: repository root, `.contract/`, `backend/alembic/`, `docs/releases/`.
+The three release files read were `2026-11-02-sg270.md`, `2026-11-02-sg262.md`, and `2026-10-30-sg258.md`.
+
+**Q1: The Fix**
+(a) PICK: M1. Add a new migration preserving the five existing allowed states and adding exactly `split` and `merged`; retain the named CHECK. Also align the Candidate model's constraint with the migrated schema.
+
+(b) WHY:
+- `backend/alembic/versions/20260908_sg014_candidate.py:31` permits only `proposed`, `accepted`, `edited`, `held`, `rejected`.
+- `backend/app/services/candidates.py:1373` assigns `split`; `:1514` assigns `merged`; both operations flush before returning (`:1419`, `:1562`).
+- These are established lifecycle meanings, not arbitrary strings: merge losers are terminal while the survivor stays proposed (`:1429-1439`).
+- `backend/app/api/v1/candidates.py:134-135` already rejects decisions on split/merged origins. The expiry reader queries split origins explicitly (`backend/app/plugins/expiry_tracker.py:718-725`).
+- The model currently has no equivalent CHECK (`backend/app/services/candidates.py:496-508`).
+- Opinion: M1 is the smallest semantic repair. M2 drops useful validation; M3 repurposes an existing state and changes readers unnecessarily. M4 postpones approved functionality rather than repairing it.
+
+(c) MISSED OPTION: Keep M1 but make schema parity part of the fix, not migration-only. The option list does not explicitly address the unconstrained model that permits divergent test schemas. This complements M1 rather than introducing another lifecycle.
+
+(d) RISKIEST UNVERIFIED PREMISE: The served file really has the quoted constraint, enforced on request connections, with no additional schema drift. That is supplied evidence from the context pack, not a database observation made here.
+
+**Q2: The Gap**
+(a) PICK: Run a small candidate integration group against an Alembic-created temporary SQLite database at head: one real split and one real merge through their API/service paths, with committed read-back. Keep ordinary unit tests model-created; do not convert the entire suite.
+
+(b) WHY:
+- Split, SG-270 flow, and merge fixtures use `Base.metadata.create_all`: `backend/tests/test_review_split.py:28-34`, `test_sg270_flow.py:30-36`, `test_sg112_merge.py:40-46`.
+- Their model omits the CHECK, so these fixtures cannot detect this mismatch.
+- Existing migration coverage checks table presence after upgrade/downgrade/upgrade, not candidate transitions (`backend/tests/test_candidates.py:154-166`).
+- A real successful split requires writing the excluded state; the existing split test already asserts HTTP 200 and `state == "split"` (`backend/tests/test_review_split.py:206-220`). Running that behavior on the migrated schema would expose this defect.
+- Opinion: one split case is the literal minimum detector; one merge case is the smallest sensible additional coverage for the second affected writer.
+- Cost: two integration cases plus isolated Alembic setup, additional CI time, and fixture maintenance. Runtime is unmeasured here; no full-suite migration cost is justified by this defect.
+- Important targeting detail: `backend/alembic/env.py:22-23` overrides the configured URL from settings. The fixture must set `settings.database_url` to the temporary file, as the existing migration test does, not merely set Alembic's URL.
+
+(c) MISSED OPTION: Add an independent allowed-state contract test, asserting all seven legitimate values succeed and an invalid value fails on the migrated schema. This catches accidental constraint removal as well as missing states; it supplements, not replaces, real transition tests.
+
+(d) RISKIEST UNVERIFIED PREMISE: The selected integration fixture will truly exercise the migrated database without startup or setup replacing its schema. Require a captured failure on the old schema specifically attributable to `ck_candidate_state`, then success after the migration, not merely any red/green pair.
+
+**Q3: Safety**
+(a) PICK: Do not run on the live file until owner approval, verified recovery, a rehearsed migration, and an explicit maintenance/deploy sequence exist.
+
+(b) WHY AND REQUIRED SEQUENCE:
+1. Obtain approval for the exact migration and maintenance/recovery plan. The database is sensitive (`AGENTS.md:64`); the context pack explicitly reserves schema approval to the owner.
+2. Rehearse the populated old-head-to-new-head upgrade on an authorized isolated copy. Verify every existing candidate field, IDs, timestamps, indexes, FKs and unrelated tables survive, not just row counts.
+3. Establish a consistent SQLite backup and prove restoration into a separate destination, including integrity, foreign-key checks, schema revision, and application-readable data. Opinion: file existence, a checksum, or an export alone is not restore proof.
+4. Account for WAL: the application enables it (`backend/app/db.py:23-27`). Opinion: use a consistent SQLite backup mechanism or a proven quiesced/checkpointed procedure, not an unexplained copy of the main file while writers run.
+5. Build and verify the release before the maintenance window. Block new requests and stop every writer, including the reminder loop started by the served lifespan (`backend/app/server.py:27-38`).
+6. Explicitly prevent automatic restart during the rebuild. Compose declares `restart: unless-stopped` (`docker-compose.yml:19,38`); a crash alone is not quiescence.
+7. Confirm the intended database path and old revision, take the final recovery point, run the migration once using the verified migration environment, and inspect the resulting DDL and preserved data before resuming services.
+8. Start the verified compatible image, perform health/schema checks, then reopen traffic. Any live split/merge smoke test needs separately authorized disposable records, not the owner's existing candidates.
+
+Old-code behavior meanwhile:
+- Before widening, current split/merge code still attempts prohibited writes; hiding a button alone does not protect the API.
+- With writers stopped during migration, old code cannot race the table rebuild.
+- After widening, the inspected code already understands split/merged states and rejects decisions on them (`backend/app/api/v1/candidates.py:134-135`). This is source-based compatibility evidence, not proof about every historical rollback image.
+- Opinion: retain the widened schema for an application-only rollback to a proven-compatible image. A downgrade restoring the old CHECK must refuse if split/merged rows exist; never relabel or delete them silently.
+- Restoring the pre-migration backup after reopening writes would lose subsequent work. The recovery plan must state that boundary and require a new decision rather than silently discarding it.
+
+These are recommendations addressing the requested old/new-code window. `PG-PR-05` itself was not available in the repository-local contract files inspected; I do not claim its exact wording was verified.
+
+(c) MISSED OPTION: Application rollback without schema rollback. An additive CHECK widening can remain while a proven-compatible previous application image is restored; a destructive schema downgrade is not automatically necessary.
+
+(d) RISKIEST UNVERIFIED PREMISE: Recovery is executable, not merely documented. The pack says restore is unproven. Until a successful isolated restore and writer-quiescence rehearsal are evidenced, live execution should remain blocked.
+
+**G3: Whole-Approach Check**
+- The CHECK is a sufficient inferred blocker for a valid split reaching the origin update, not necessarily the first blocker for every request. Split first requires proposed state, a multi-item list, and exact item coverage (`backend/app/services/candidates.py:1297-1316`); merge validates states and unresolved tasks (`:1456-1486`). Fixing the CHECK does not prove the entire flow works.
+- No automatic migration or `create_all` appears in the inspected application entrypoints. The Docker command starts `uvicorn app.server:app` (`backend/Dockerfile:22`), whose lifespan starts reminders, not schema repair (`backend/app/server.py:27-38`). Migration is a separate Make target (`Makefile:28-29`).
+- Inference: startup therefore does not resolve this constraint mismatch. The latest release also records the old schema head and no migration (`docs/releases/2026-11-02-sg270.md:18`).
+- Database creation provenance still matters. A model-created database would omit this CHECK; a stamped revision alone would not prove its schema. If the actual served file differs from the quoted DDL, or connections disable CHECK enforcement, the causal claim needs rechecking before migration.
+- Additional drift: the Candidate model's `default="proposed"` is client-side (`backend/app/services/candidates.py:505`); the migration declares no server default (`backend/alembic/versions/20260908_sg014_candidate.py:27`). This is a schema-generation distinction, not evidence of another missing column or a split blocker.
+- The nearby Job, JobStep and ReviewTask columns inspected agree with their founding migration in relevant types/nullability. No additional missing column was established. This was a targeted source comparison, not an exhaustive schema-parity audit.
+- Opinion: the approach would be wrong if “widen CHECK” were treated as permission to migrate immediately, proof of restore, or proof that child acceptance and merge rollback work. Those require separate evidence.
+- No objection to the already-decided per-item split/commit behavior; it was not reopened.
+
+**Close**
+Read AGENTS.md first, then the context pack, then named evidence and disclosed expansions. I deliberately did not read STATE.md, docs/decisions/, or docs/worklogs/SG-276_audit.md. Release notes referenced excluded material, but I did not follow those references.
+No database, health probe, browser, external network, credentials, host operation, tests, migration, restart, commit or push was used. I wrote nothing.
+PB-6 limitation: BASE commit provenance could not be established in the supplied non-git snapshot. These recommendations are complete as a source review, but the required BASE identity is not verified; no write was attempted to remedy that.
+UNCLEAR FIRST READ: Whether the supplied snapshot carried verifiable BASE metadata.
+UNCLEAR DURING EXECUTION: It does not expose `.git`; live DDL and restore capability remain supplied/unverified premises.
+UNCLEAR REMAINING: Resolved BASE commit, exact PG-PR-05 wording, live schema/enforcement, migration rehearsal, and successful restore proof.
+Debug-Report-End
+moved=no
