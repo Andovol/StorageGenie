@@ -43,7 +43,7 @@ Whering ("stylish and elegant"; one reviewer: "too visually busy") · Indyx ("sl
 
 Recommended set: C1 + C2 + C5 for Wardrobe, C4 for Pantry; no social feed.
 
-## Round 3 — OPEN questions (asked 2026-10-30, unanswered at the reply-deadline close)
+## Round 3 — ANSWERED 2026-11-02: the owner accepted every recommendation below (verbatim: `docs/decisions/2026-10-30-session-approvals.md`). Q23 and Q24 were put as warm neutral, and yes in principle with final go-ahead when scheduled.
 
 | ID | Question | Recommendation |
 |---|---|---|
