@@ -1,0 +1,106 @@
+result=done id=SG-266 inactive
+debug-report-begin
+SG-266 — Phase A blind review. Model: unknown; reasoning effort: unknown (process arguments and provider metadata unavailable). Working directory: `/tmp/dispatch-review.Iyh9Fd`. Repository identity: `Andovol/StorageGenie`, as declared in `AGENTS.md:13`; remote not independently verified.
+
+**Contract version: 0.56.0**
+
+BASE REF requested: `origin/automation`.
+BASE resolved commit: **unknown**. The supplied directory has no `.git` entry, and the available tools provide file inspection but no Git execution. I cannot certify that these bytes match the requested ref. This is a provenance blocker under `PB-6`: the recommendations below are provisional analysis of the supplied tree, not a completed BASE-certified review. No write or publication was attempted.
+
+**Extra Files**
+Beyond `AGENTS.md`, the context pack, and its “Where it lives” table, I read exactly:
+- `.contract/CODER.md`: required contract and `PB-1`–`PB-6`.
+- `.contract/SOURCE`: contract-version provenance.
+- `backend/app/models/asset.py`: verify the quantity/unit premise and existing core fields.
+- `frontend/src/components/catalog/ProductCard.tsx`: verify the live-versus-mock imagery premise.
+
+I also listed the repository root and `.contract` directory. I read every file named in the “Where it lives” table; the old roadmap was used only as a record of built capabilities.
+
+**R-A: Delivery Order**
+(a) PICK: **A3**, a thin end-to-end Pantry slice, then widen.
+
+(b) WHY: The owner's requirement is not just prettier inventory: it combines pantry visibility, use-first guidance, easy quantities and inspiring presentation (`docs/decisions/2026-10-30-session-approvals.md:91,99,105`). Quantity/unit columns already exist (`backend/app/models/asset.py:29-30`), while the catalog card explicitly says derived imagery is mock-only (`frontend/src/components/catalog/ProductCard.tsx:6-9`). A real, styled Pantry journey tests whether these pieces work together rather than completing an invisible framework first or polishing a generic catalog without Pantry actions. This is an engineering recommendation, not measured evidence that A3 improves adoption.
+
+(c) MISSED OPTION: **A short observed-use exercise embedded in the thin slice**: have the owner capture, accept, find and decrement real pantry items, and record where they abandon the journey. Neither presentation-first nor core-first explicitly tests the maintenance burden.
+
+(d) RISKIEST UNVERIFIED PREMISE: The owner will keep quantities current if presentation and controls improve. If recording consumption is intrinsically too laborious, a beautiful accurate-at-entry inventory will rapidly become misleading.
+
+**R-B: Module Representation**
+(a) PICK: **B1**, registered domain plugins, with module membership defined separately through accepted classification. Registration is not itself an item-assignment mechanism.
+
+(b) WHY: The existing registry validates descriptors before exposing them, and `/taxonomy` reflects those registrations (`backend/app/plugins/registry.py:34-62`; `backend/app/api/v1/assets.py:35-67`). That is a useful existing extension point for genuinely different behavior. A stored module field alone does not provide behavior; a category map alone does not provide domain-specific workflows.
+
+However, the contract is not already a complete module framework. `BehaviorProfile` exposes notification, opened-date tracking and chat, not outfit composition or ownership (`backend/app/plugins/descriptor.py:60-87`). Planning and chat still hard-code expiry classification paths (`backend/app/services/planning/service.py:51-53`; `backend/app/services/chat/service.py:43-45`). B1 should mean a narrow extension of a working mechanism, not “Wardrobe is only another registration.”
+
+(c) MISSED OPTION: **Explicit separation of domain modules, reusable capabilities and item classification**. Pantry and Wardrobe supply workflows; expiry is a reusable capability; accepted classification assigns one module. B1/B2/B3 mix those different concerns. Recommendation: B1 as the implementation mechanism, with a single authoritative assignment rule rather than competing stored and derived values.
+
+(d) RISKIEST UNVERIFIED PREMISE: Existing accepted categories can unambiguously assign a module. `non_perishable` currently covers clothing, tools and other items in the blueprint (`inception/generic_asset_catalog_expiry_tracker_blueprint.md:385`); it cannot safely mean Wardrobe. Unknown and legacy items need an explicit unresolved assignment, not an invented mapping.
+
+**R-C: Expiry Field Paths**
+(a) PICK: **C1**, retain `plugin:expiry-tracker/…` paths.
+
+(b) WHY: These paths are persistence identifiers, not user-facing product names. The plugin defines them centrally (`backend/app/plugins/expiry_tracker.py:27-32`), but planning, chat and analytics also contain literal copies (`backend/app/services/planning/service.py:51-52`; `backend/app/services/chat/service.py:43-44`; `backend/app/services/analytics/service.py:60-61`). Renaming creates a coordinated data-and-consumer migration without demonstrating a user benefit. C3 adds indefinite dual-read ambiguity, including which assertion wins when both exist.
+
+The premise needs one correction: opened-date persistence is already the bare `opened_date`, not a prefixed expiry field (`backend/app/plugins/expiry_tracker.py:33-36`). An extraction plan must preserve both existing conventions.
+
+(c) MISSED OPTION: **Keep storage identifiers stable while introducing a capability-facing code interface**. Readers can stop depending on the historical plugin implementation name without rewriting stored assertions.
+
+(d) RISKIEST UNVERIFIED PREMISE: Shared expiry preserves one compatible meaning and value schema across modules. If future domains require incompatible meanings, retaining a common prefix alone does not resolve that semantic conflict.
+
+**R-D: “Gone”**
+(a) PICK: **D1**, ARCHIVED.
+
+(b) WHY: This already removes an item from the default catalog while preserving an explicit history query (`backend/app/api/v1/assets.py:295-298`). It is reachable directly from ACTIVE; DISPOSED is only reachable from ARCHIVED and is terminal (`backend/app/services/lifecycle.py:43-49`). Expiry reads only ACTIVE items (`backend/app/services/expiry_engine.py:248-255`), so D4 would leave zero-quantity items in expiry processing. D1 best matches the approved “history, not deletion” requirement (`docs/decisions/2026-10-30-session-approvals.md:99`).
+
+(c) MISSED OPTION: **ARCHIVED plus a reason/event**, distinguishing consumed, discarded, donated and other outcomes without multiplying core statuses. “Gone” must not automatically mean waste.
+
+(d) RISKIEST UNVERIFIED PREMISE: An irreversible archive is acceptable for a one-tap action. The transition map has no ARCHIVED-to-ACTIVE edge (`backend/app/services/lifecycle.py:43-49`). Opinion: accidental taps need an undo design before this becomes a prominent quick action. Replenishment also needs a clear rule: new stock versus restoration of the old tracked item.
+
+**R-E: Whose Wardrobe**
+(a) PICK: **E1**, a person reference selected through a picker.
+
+(b) WHY: Separate wardrobes and shared Pantry are approved (`docs/decisions/2026-10-30-session-approvals.md:99`), while sign-in is intentionally excluded (`docs/ROADMAP.md:37`). Separate households would misuse the existing shared-inventory boundary and complicate Pantry sharing. A person reference represents ownership without pretending to authenticate the person operating the device. The blueprint already treats household and user concepts as generic core concerns (`inception/generic_asset_catalog_expiry_tracker_blueprint.md:170-173`).
+
+(c) MISSED OPTION: **A wardrobe profile selected once per session/device, with per-item reassignment**. This retains E1's underlying ownership model but avoids asking the same question on every garment capture. Opinion: include an unassigned state rather than guessing ownership.
+
+(d) RISKIEST UNVERIFIED PREMISE: “Separate” means organizational separation, not confidentiality. A picker is not access control. If either person expects private photos, outfits or wear history, this framing fails and requires an owner decision; I do not reopen the no-sign-in decision here.
+
+**R-F: House-Style Photos**
+(a) PICK: **F2**, cloud cutout followed by a fixed non-generative backdrop/shadow composite, subject to the owner's provider/model choice.
+
+(b) WHY: The accepted visual requirement is one cohesive warm-neutral setting with originals retained (`docs/decisions/2026-10-30-session-approvals.md:99,105`). The research explicitly identifies cutout plus common backdrop/shadow as a house-style mechanism (`docs/research/2026-10-30-requirements-recalibration.md:20`). F2 targets the setting without requiring a model to redraw the product. Opinion: it offers a better starting tradeoff for identity fidelity and consistency than full restyling. F3 does not reliably satisfy the approved cohesive setting.
+
+This does not remove the approved role for image generation in creative scenes and later outfits.
+
+(c) MISSED OPTION: **Deterministic crop, scale and framing for all photos, with cloud cutout only where needed**. This can provide a coherent fallback when segmentation is poor or unavailable. It must not be presented as equivalent to the approved house style without visual acceptance.
+
+(d) RISKIEST UNVERIFIED PREMISE: Cloud cutout works acceptably on the owner's actual subjects and capture conditions. Transparent packaging, fine garment details, glare and overlapping objects may defeat it. Neither vendor claims nor a mock image proves this. Opinion: evaluate representative owner-approved samples before committing to automated batch processing.
+
+**Whole-Plan Check**
+The module direction is plausible, but the roadmap needs evidence at four boundaries:
+
+- **Visible differentiation:** Pantry should expose availability, quantities and use-first actions; Wardrobe should expose person-scoped composition and wear context. The owner explicitly requested different focus and handling (`docs/decisions/2026-10-30-session-approvals.md:91`). Opinion: if modules only change headings, colors and filters, the architectural split has not earned its cost.
+- **Second-domain feasibility:** The registry supports multiple registrations, but consumers remain expiry-specific, and analytics merges category descriptors by bare category ID (`backend/app/services/analytics/service.py:86-99`). Opinion: check category identity, capability dispatch and Wardrobe's exclusion from expiry before estimating a full second domain.
+- **Image economics:** Frugal spending is approved without a fixed cap (`docs/decisions/2026-10-30-session-approvals.md:95,105`). Actual-cost logging, not predicted-cost refusal, is the recorded policy (`docs/ROADMAP.md:34`). Opinion: judge actual cost per accepted usable image, including retries, regeneration and storage, rather than nominal price per call. No cost or latency was measured in this review.
+- **Basic usefulness:** The seven-asset census is recorded evidence, not proof of why adoption is low (`docs/decisions/2026-10-30-session-approvals.md:83`). Opinion: observe capture and repeated use before attributing the problem to missing modules, weak visuals or process overhead.
+
+Additional gaps:
+
+- **First use:** The blueprint sets a first-accepted-item target and a low manual-field burden (`inception/generic_asset_catalog_expiry_tracker_blueprint.md:69-79`), but the module pack does not define the first useful Pantry screen or return visit. Opinion: make capture-to-useful-item and subsequent consumption updates acceptance journeys, not just screen delivery.
+- **Empty and error states:** Existing chat distinguishes consent-disabled and empty-catalog paths without provider calls (`backend/app/services/chat/service.py:367-405`). Opinion: carry that discipline into empty modules, unknown quantities, failed cutouts, pending derivation and provider outages; the original photo and manual catalog should remain usable.
+- **Backups:** Export is recorded as built, restore as missing (`docs/ROADMAP.md:21,36`). The blueprint requires coordinated database/evidence backups (`inception/generic_asset_catalog_expiry_tracker_blueprint.md:470`). Opinion: a demonstrated restore is a named roadmap outcome before encouraging substantially more owner data.
+- **Privacy:** Avatar consent is only approval in principle, with a later provider-terms decision (`docs/decisions/2026-10-30-session-approvals.md:99`). Opinion: product-photo cutout also needs a defined send boundary, retention/deletion behavior and treatment of incidental people or identifying labels. E1 provides no confidentiality guarantee.
+- **Stock identity:** Quantity and unit exist, but an asset represents a real item or logically tracked unit (`backend/app/models/asset.py:29-30`; `inception/generic_asset_catalog_expiry_tracker_blueprint.md:150`). Opinion: decide how repeated purchases with different expiry dates are represented. Aggregating them into one quantity can make use-first guidance wrong.
+- **Accessible presentation:** The theme already contains dark-mode link and keyboard-focus accommodations (`frontend/src/theme/tokens.css:11-14,173-180`). Opinion: preserve those constraints through the mood board and styled Pantry slice, including phone controls and non-color expiry cues.
+
+I am not proposing reversal of any already-taken decision. No local models, new sign-in requirement, provider choice, autonomous purchase or recipe-first stage is introduced.
+
+**Close**
+I used the owner's recorded answers, the supplied context and the named implementation/design evidence. I deliberately did not read other reviews, the review ledger, worklogs, packets, session state or any Architect pick. No browser, external network, credentials, database, health endpoint or host operation was used. No tests or image-quality trials were run.
+
+I wrote nothing: no files, commits, pushes or receipt notes. This final message is the only report supplied for engine publication.
+
+UNCLEAR FIRST READ: The packet requires a resolved BASE commit; none was supplied.
+UNCLEAR DURING EXECUTION: File inspection showed a source directory without Git metadata; process identity and clock measurements were also unavailable.
+UNCLEAR REMAINING: BASE provenance blocks certification under `PB-6`; all six picks remain provisional until tied to the resolved `origin/automation` commit.
+debug-report-end

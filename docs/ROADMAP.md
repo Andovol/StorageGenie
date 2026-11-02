@@ -1,40 +1,97 @@
 # StorageGenie — product roadmap
 
-> **UNDER RECALIBRATION since 2026-10-30.** The owner is resetting the product goals (D8): a beautiful, creative catalog of everything owned, with category modules (Pantry first, Wardrobe second), AI imagery and web enrichment. The rows below describe what is built; their order and "Next action" are **not** the plan until this file is rewritten. Owner words: `docs/decisions/2026-10-30-session-approvals.md`; open questions and research: `docs/research/2026-10-30-requirements-recalibration.md`.
+Rewritten 2026-11-02 around the owner's direction (D8). **Stage A approved by the owner 2026-11-02 (D11), which closes D8; each later stage needs its own approval.** Reviewed blind by SG-266 (`docs/reviews/review-ledger.md`). Owner words: `docs/decisions/2026-10-30-session-approvals.md`. Research and answered questions (Q21–Q29): `docs/research/2026-10-30-requirements-recalibration.md`. Waiting items: `docs/backlog.md`. Where the blueprint (`inception/generic_asset_catalog_expiry_tracker_blueprint.md`) disagrees with this file, this file wins until the blueprint is amended.
 
-Date: 2026-10-23. Source: the product blueprint in `inception/generic_asset_catalog_expiry_tracker_blueprint.md` compared against the code at commit `54c387a` (branch `automation`). Rows 9 and 11 re-measured and updated 2026-10-24 against the served build (SG-240, SG-241, SG-244).
+## The product
 
-Parked ideas that wait on a named trigger live in `docs/backlog.md`. This file holds what the product itself still needs.
+A beautiful, easy catalog of everything a household owns, built to inspire creativity. One item belongs to one **module**, and each module has its own focus and actions over a shared core. AI imagery, AI suggestions and web enrichment play a key role. Capture is on the phone; review is on phone and desktop. English unless Romanian is needed (Q28). Spending is frugal, with no fixed cap (Q16).
 
-How to read the table: Status is Built (works today), Partly built (works halfway, one piece missing), or Missing (not built). Evidence names a file or screen that proves the status. Size is Small (a day or two), Medium (several days), or Large (a project of its own). Order is the recommended build sequence.
+## Stages
 
-## Next action
+Each stage needs the owner's approval. Pantry first and Wardrobe second are the owner's order (Q6); the order of the other stages is the Architect's proposal. Sizes are the Architect's judgement, not measured: S a day or two, M several days, L a project of its own.
 
-**Row 11 is done and served** (SG-240 with its close-deploy rider SG-241 and the owner's dismissal SG-244): the opened-date countdown is live, the daily pass line is in the served container's own log, and the Miso Soup row is dismissed.
+| Stage | Outcome | Size | Needs first |
+|---|---|---|---|
+| **A. Clear the deck** | The three approved D7 fixes are live | S | Owner approval of the stage |
+| **B. The look** | One agreed visual direction and photo style | S | Design mood-board page (Q29), owner's reaction |
+| **C. First real Pantry** | One styled Pantry you can use end to end: see it, use it up, quantities quick to change | M | B; second opinion (app database) |
+| **D. Pantry presentation** | Every photo shares one style; enrichment per module; restore from backup proven | M | C used on real items; the owner's image-provider choice |
+| **E. Wardrobe** | Garments catalogued, outfits composed and suggested | L | C, B |
+| **F. Later ideas** | Buying suggestions, recipes, the next module | M each | Owner picks, one at a time |
+| **G. Avatar try-on** | A person's AI avatar wears an outfit | L | Owner's final go-ahead (Q24) |
 
-**Now row 14 — narrowed by the owner on 2026-10-24 (D-1024-17, -18, -19):** the second photo reader and the fallback are **deferred**, there is **no local provider**, and the spending limits become **actual-cost logging**. The next slice is therefore a slimming one: remove the cost prediction and the cap machinery, keep and complete the actual-cost record, and log each call's real cost. The deferred parts wait in `docs/backlog.md` (W6, W7); rows 15, 16 and 8 stay parked behind row 14.
+### A. Clear the deck
 
-## Roadmap
+- The D7 fixes as approved: hide the review form when it has no asset data (E2); the reverse move resolves the open date task (F1 scoped); "No date" wording (G2); one work slice plus one deploy rider (H1).
+- The packet checks each fix against the expiry split (Q21). `UNVERIFIED — my inference`: none depends on it.
 
-| Order | Feature in plain words | Status | Evidence | Size |
-|---|---|---|---|---|
-| 1 | Create items by hand, attach photos, search them, export a backup | Built | `backend/app/api/v1/assets.py`, `backend/app/api/v1/evidence.py`, screens `frontend/src/routes/CatalogPage.tsx` and `AssetDetailPage.tsx`, test `backend/tests/test_phase0_e2e.py` | S |
-| 2 | Import box with retry (start an import, watch progress, resume after failure) | Built | `backend/app/api/v1/jobs.py`, `backend/app/services/job_service.py`, screen `frontend/src/routes/InboxPage.tsx`, test `backend/tests/test_phase1_e2e.py` | M |
-| 3 | Read labels automatically (text from photos, barcodes, photo dates, duplicate check) | Built | `backend/app/services/signals.py`, `backend/app/services/dedup.py`, test `backend/tests/test_signals.py` | M |
-| 4 | Review desk (photo beside the proposal, accept, edit, merge, split, hold, reject) | Built | Screen `frontend/src/routes/ReviewPage.tsx`, `backend/app/api/v1/candidates.py`, test `backend/tests/test_review_split.py` | M |
-| 5 | Expiry dates by hand (type the date, leave unknown when unsure, never guessed) | Built | Screen `frontend/src/routes/ExpiryPage.tsx`, form `frontend/src/components/ExpiryEntryForm.tsx`, rules `backend/app/plugins/expiry_tracker.py` | S |
-| 6 | Photo reading for food and medicine (the app proposes the item and date, the user corrects it) | Built | `backend/app/services/providers/router.py`, `backend/app/services/candidates.py`, test `backend/tests/test_phase2_e2e.py` | M |
-| 7 | Web lookup with sources shown (product facts carry their source, weak facts say unverified) | Built | `backend/app/services/enrich/`, `backend/app/api/v1/enrich.py`, component `frontend/src/components/WebAlternates.tsx` | M |
-| 8 | Daily use-up suggestions by manual run (user confirms each one, nothing runs itself) | Partly built | `backend/app/services/planning/service.py`, `backend/app/api/v1/planning.py`, screen `frontend/src/routes/PlanningPage.tsx`; runs only when tapped, no schedule | S |
-| 9 | Expiry reminders that reach the user (timed warnings before things expire) | Partly built | **In-app delivery and a daily schedule now exist and are proven live** (SG-238/240/241/244): the pass `backend/app/services/reminders/daily.py`, `record_due` in `backend/app/services/reminders/service.py`, the legal transitions and the read/dismiss routes in `backend/app/api/v1/reminders.py`, the unread block in `frontend/src/routes/ExpiryPage.tsx` — SG-241 observed the pass line in the **served container's own log** and SG-244 performed the owner's dismissal through the app's route. Still missing: delivery outside the app (no email — D-1024-2), no user-set schedule, and no actor or audit row on a transition (backlog W4) | M |
-| 10 | Category chat for food and medicine (answers from owned items only, with consent step) | Built | `backend/app/services/chat/service.py`, `backend/app/api/v1/chat.py`, screen `frontend/src/routes/ChatPage.tsx` | M |
-| 11 | Opened-date countdown for cosmetics plus household and document polish | Built | **The countdown and the edit/clear path are built and served** (SG-240, live in the SG-241 serve; SG-256 built the edit/clear, served live by SG-257 on 2026-10-28 as container `40bee778` / image `b2c42abd`): the write path `POST /v1/plugins/expiry-tracker/assets/{id}/opened` and the pure read path `GET /v1/plugins/expiry-tracker/opened` (`backend/app/services/opened_countdown.py`), the `opened_date` assertion in `backend/app/plugins/expiry_tracker.py`, the section `frontend/src/components/OpenedCountdownSection.tsx` on `frontend/src/routes/ExpiryPage.tsx`. The household-and-document half is built and live (SG-258 93 + SG-259 96, served 2026-10-30 as container `10f7fc58` / image `d620e39d`): Documents/other dates (60/30), the asset-page classification control, accepted-date preservation with a confirmed clear on Non-perishable, and the date form's profile gate/active read/pre-fill/Accept/Clear with the `valid_until` type. Three audit findings are the **D7 stage, approved 2026-10-30**: the `ReviewPage` form's data, the reverse-move task limbo, the `accepted`-with-no-date copy. The dedicated screen remains optional | S |
-| 12 | Home summaries (waste trends and category totals from the user's own data) | Built | `backend/app/services/analytics/service.py`, `backend/app/api/v1/analytics.py`, screen `frontend/src/routes/AnalyticsPage.tsx` | S |
-| 13 | Places, links between items, saved searches, and advanced filters | Built | `backend/app/api/v1/locations.py`, `backend/app/api/v1/relations.py`, saved-search model `backend/app/models/saved_search.py`, filters in `frontend/src/routes/CatalogPage.tsx` | M |
-| 14 | Second AI provider and local option with fallback and spending limits | Partly built | **Narrowed by the owner on 2026-10-24 (D-1024-17, -18, -19):** the second photo reader and the fallback are **deferred**, there is **no local provider** (no local models on the server — D-1024-15; the reading path is cloud only — D-1024-18), and the **spending limits become actual-cost logging** — the app predicts no call cost and refuses no call on a prediction; it records and logs what each call actually cost. What exists: the router with its fallback branch (built, unreachable in production), one real photo reader plus a test fake (`backend/app/services/providers/`), the `provider_call` ledger carrying each call's actual cost, and the scene-only web reader in `backend/app/services/scene/`. The deferred parts wait in `docs/backlog.md` (W6, W7) | S |
-| 15 | Category editor in settings (change lists without editing code) | Missing | Taxonomy is read-only through `backend/app/api/v1/plugins.py`; settings screen `frontend/src/routes/SettingsPage.tsx` has no editor | S |
-| 16 | Restore from backup (bring an exported file back) | Missing | Export only: `GET /v1/export` in `backend/app/api/v1/exports.py`; no restore path | S |
-| 17 | Sign-in and household enforcement | Intentionally out | Household scoping exists (`backend/app/api/v1/households.py`, `backend/app/api/v1/users.py`); no passwords by design for the single-household server | — |
-| 18 | Move database and storage later (only when this computer is no longer enough) | Intentionally later | Runs on local files today (`docker-compose.yml`, local data folders); move only when scale demands it | L |
+### B. The look
 
-Rows 1–8, 10, 12–13 are done and need no further work. Row 9 closed on 2026-10-24 (SG-235–SG-239: the in-app daily caller, the Expiry page's Read/Dismiss, one live reminder in production). Row 11's household-and-document half is live (SG-258/259, 2026-10-30); its three audit findings are the D7 stage (approved 2026-10-30), then row 14, 15, 16, then 8 on a schedule — **row 14 first after row 11**, by the owner's priority of 2026-10-24 (D-1024-12). Rows 17–18 stay as written until the owner says otherwise.
+- A mood-board page outside the app, so nothing is dispatched or deployed. It shows real references (Q19) and the warm-neutral photo style (Q23).
+- The result becomes the design rules every later screen follows, in `frontend/src/theme/tokens.css`.
+
+### C. First real Pantry
+
+Build one thin Pantry end to end, then widen from what real use shows (SG-266 picked this over building the module framework first). The owner tries it on real items: capture, find, use up. The live census holds only 7 assets, and why is not known.
+
+- **Pantry view:** what you have and what to use soon, in the agreed look. Household pantry is shared (Q26).
+- **Quantities (Q22):** a count, or an amount with a unit. `asset.quantity` and `asset.unit` already exist, so this is mostly screen work. One tap takes off 1.
+- **"Gone" (Q22):** the ARCHIVED status plus a reason (used, thrown away, given away), so gone does not always mean waste. ARCHIVED has no way back today (`backend/app/services/lifecycle.py:43-49`), so a one-tap action needs an undo design.
+- **Repeat purchases, to decide in the stage's packet:** two packs with different dates in one item would make "use first" wrong.
+- **Modules, as far as this slice needs:** a module is a registered plugin (`backend/app/plugins/registry.py`), and one rule assigns an item to a module. Expiry is a capability modules use (Q21), and the stored paths stay as they are (`plugin:expiry-tracker/…`, `backend/app/plugins/expiry_tracker.py:29`): no data migration. Other dated categories keep working.
+
+### D. Pantry presentation
+
+- **House-style photos:** every product photo cut out on one backdrop, the original kept as evidence (Q9, Q23). Recommended mechanism: a cloud cut-out with a fixed backdrop and shadow added without AI, tried first on real samples (provider is the owner's choice). A clean web image where the owner's photo is poor. The screens have cut-out and scene tabs, but those images are mock-only today (`frontend/src/components/catalog/ProductCard.tsx:9`).
+- **Web enrichment per module** (Q17): built on the existing web lookup (row 7).
+- **Restore from backup (row 16), proven:** export exists but restore does not, and this should work before much more of the owner's data goes in (SG-266).
+- **What a photo may carry to the cloud:** the send boundary, retention and deletion, and what happens to people or labels caught in a shot.
+- **Blocker:** image generation is parked on owner answers about the provider (`docs/backlog.md`, Context Scene row). Provider and model are the owner's choice (D-1024-16), and no local models run on the server (D-1024-15).
+
+### E. Wardrobe
+
+- **Capture:** garments by photo and by web lookup (Q12). No expiry (Q8).
+- **The module rule:** Non-perishable covers clothing and tools alike (blueprint line 385), so clothing needs its own category.
+- **Separate wardrobes per person (Q26):** needs a "whose item" field. There is no sign-in by design (row 17), so this is a person picker, remembered per device, with an unassigned state. It organises; it does not keep anything private from the other person.
+- **Outfits:** flat-lay collages from owned pieces (Q13).
+- **Suggestions (Q25):** weather, occasion, recent wear, colour harmony.
+- `backend/app` and the screens hold no wardrobe or outfit feature today (searched for outfit, wardrobe, garment, clothing; the one hit is a drawer's label).
+
+### F. Later ideas
+
+- Buying suggestions, never a purchase (Q27).
+- Recipes (Q10), with "what you could cook" pictures.
+- The next module, chosen with the owner one at a time (Q6).
+
+### G. Avatar try-on
+
+- Each person opts in, and the avatar can be deleted. The final go-ahead comes when this is scheduled and the provider's terms have been read (Q24). That item gets the second opinion.
+
+### AI imagery and creativity picks (D12)
+
+Owner chose the focused set: A1 + A2 in stage D, A3 in stage E, A4 in stage G, A5 + A8 in stage F, A6 + A7 not planned; C4 in stage D, C1 + C2 + C5 in stage E; no social feed. IDs are in the research file.
+
+## What is already built
+
+Row numbers are kept because older records cite them.
+
+| Row | Feature | Status | Evidence |
+|---|---|---|---|
+| 1 | Create items by hand, attach photos, search, export a backup | Built | `backend/app/api/v1/assets.py`, `evidence.py`, `frontend/src/routes/CatalogPage.tsx`, `AssetDetailPage.tsx` |
+| 2 | Import box with retry | Built | `backend/app/api/v1/jobs.py`, `frontend/src/routes/InboxPage.tsx` |
+| 3 | Read labels automatically (text, barcodes, photo dates, duplicates) | Built | `backend/app/services/signals.py`, `dedup.py` |
+| 4 | Review desk (accept, edit, merge, split, hold, reject) | Built | `frontend/src/routes/ReviewPage.tsx`, `backend/app/api/v1/candidates.py` |
+| 5 | Expiry dates by hand, never guessed | Built | `frontend/src/routes/ExpiryPage.tsx`, `backend/app/plugins/expiry_tracker.py` |
+| 6 | Photo reading for food and medicine | Built | `backend/app/services/providers/router.py`, `candidates.py` |
+| 7 | Web lookup with sources shown | Built | `backend/app/services/enrich/`, `frontend/src/components/WebAlternates.tsx` |
+| 8 | Use-up suggestions by manual run | Partly built | `backend/app/services/planning/service.py`; no schedule |
+| 9 | Expiry reminders | Partly built | In-app, daily, live (`backend/app/services/reminders/daily.py`). No email (D-1024-2), no user-set schedule, no actor on a transition (backlog W4) |
+| 10 | Category chat from owned items | Built | `backend/app/services/chat/service.py` |
+| 11 | Opened-date countdown; household and document dates | Built | `backend/app/services/opened_countdown.py`; release `docs/releases/2026-10-30-sg258.md`; findings are stage A |
+| 12 | Home summaries | Built | `backend/app/services/analytics/service.py` |
+| 13 | Places, links, saved searches, filters | Built | `backend/app/api/v1/locations.py`, `relations.py` |
+| 14 | One cloud photo reader with actual-cost logging | Partly built | `backend/app/services/providers/`. Fallback deferred (W6), no local provider (W7), per D-1024-17, -18, -19 |
+| 15 | Category editor in settings | Missing | Unscheduled; may be replaced by the modules |
+| 16 | Restore from backup | Missing | Export only (`backend/app/api/v1/exports.py`); stage D |
+| 17 | Sign-in | Intentionally out | No passwords by design; stage E needs a person picker |
+| 18 | Move database and storage | Intentionally later | Only when this computer is no longer enough |
