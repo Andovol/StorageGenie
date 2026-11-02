@@ -6,9 +6,11 @@ from sqlalchemy import and_, func, or_
 from sqlalchemy.orm import Session
 
 from app.db import get_db
+from app.models.asset import Asset
 from app.models.review_task import ReviewTask
 from app.schemas.common import decode_cursor, encode_cursor
 from app.services import audit_service
+from app.services.candidates import Candidate
 
 router = APIRouter()
 
@@ -61,6 +63,24 @@ def list_review_tasks(
         next_cursor = encode_cursor(last.created_at, last.id)
     else:
         next_cursor = None
+    # SG-270 G4: resolve each page's subject kind with one batched lookup per
+    # subject table, never one query per row.
+    subject_refs = {item.subject_ref for item in items}
+    candidate_ids: set[str] = set()
+    asset_ids: set[str] = set()
+    if subject_refs:
+        candidate_ids = {
+            str(row[0])
+            for row in db.query(Candidate.id)
+            .filter(Candidate.id.in_(subject_refs), Candidate.household_id == household_id)
+            .all()
+        }
+        asset_ids = {
+            str(row[0])
+            for row in db.query(Asset.id)
+            .filter(Asset.id.in_(subject_refs), Asset.household_id == household_id)
+            .all()
+        }
     return {
         "items": [
             {
@@ -68,6 +88,14 @@ def list_review_tasks(
                 "task_type": item.task_type,
                 "priority": item.priority,
                 "subject_ref": item.subject_ref,
+                "subject_kind": (
+                    "candidate"
+                    if item.subject_ref in candidate_ids
+                    else "asset"
+                    if item.subject_ref in asset_ids
+                    else "unknown"
+                ),
+                "data_required": item.task_type in DATA_REQUIRED_TASK_TYPES,
                 "proposed_change": json.loads(item.proposed_change) if item.proposed_change else None,
                 "status": item.status,
                 "household_id": item.household_id,
