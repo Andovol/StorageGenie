@@ -78,6 +78,20 @@ Approved by the owner 2026-11-02 (D14), after critique (SG-267, SG-268). In prog
 
 Owner chose the focused set: A1 + A2 in stage D, A3 in stage E, A4 in stage G, A5 + A8 in stage F, A6 + A7 not planned; C4 in stage D, C1 + C2 + C5 in stage E; no social feed. IDs are in the research file.
 
+## Feature candidates from the two reference projects (D17)
+
+Approved by the owner as roadmap additions (*"D17-D19 - approved."*). **A place in this list is not a commitment to build:** each is built only when real use supports it (second opinion SG-282, SG-283, `docs/reviews/review-ledger.md`). "Not recorded" never means "never used"; a stale catalog never means "you don't own this".
+
+| Stage | Candidates | Evidence needed first |
+|---|---|---|
+| D | V3 no invented details, V5 approve or regenerate each image | None: they ship with the first image work |
+| D | V1 one photo becomes many items, V2 install on the phone, W4 phone push | A capture, access or delivery problem seen in use |
+| D | W1 check before you buy, W2 review one at a time, W3 used and unused lists, W5 add by typing | W1: exact lookup can come early, advice only with a complete catalog. W2: correction proves costly. W3: real use events. W5: first compare with today's typed capture |
+| E | W11 garment fields, V4 colour as data, W6 wear log, W8 build around a piece, W13 suggest an outfit, W14 saved outfits, V7 outfit rules | Owner priority for W13 and W14: *"The Outfits suggestion and saved Outfits seems important features."* |
+| E | V6 tags, W7 gap report, W9 learning, W10 style settings, W12 wash tracking | Repeated need or enough wear history |
+
+**Not worth copying so far:** partner links, XP and streaks, credits and billing, local AI, eight languages. Family feed: the Architect's first read as covered by "no social feed" was too strong, because it is private to the household; it stays out unless the owner asks.
+
 ## What is already built
 
 Row numbers are kept because older records cite them.
