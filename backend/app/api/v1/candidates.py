@@ -8,7 +8,7 @@ from sqlalchemy.orm import Session
 from app.db import get_db
 from app.models.job import Job
 from app.models.review_task import ReviewTask
-from app.services import candidates, job_service
+from app.services import audit_service, candidates, job_service
 
 router = APIRouter()
 
@@ -25,6 +25,68 @@ class CandidateSplitRequest(BaseModel):
 class CandidateMergeRequest(BaseModel):
     winner_id: str
     loser_ids: list[str] = Field(default_factory=list)
+
+
+def _close_rejected_candidate_tasks(
+    db: Session, candidate: candidates.Candidate, household_id: str
+) -> None:
+    """Close the candidate's open tasks, naming the rejection and never a date."""
+    open_tasks = (
+        db.query(ReviewTask)
+        .filter_by(subject_ref=candidate.id, household_id=household_id, status="open")
+        .all()
+    )
+    for task in open_tasks:
+        before = {"status": task.status}
+        task.status = "resolved"
+        audit_service.record(
+            db,
+            actor="api",
+            action="review_task.resolve",
+            entity_type="review_task",
+            entity_id=task.id,
+            before=before,
+            after={
+                "status": task.status,
+                "resolution": {"candidate_rejected": candidate.id},
+            },
+            household_id=task.household_id,
+        )
+
+
+def _prepare_commit_steps(
+    db: Session, job: Job, candidate: candidates.Candidate
+) -> None:
+    """Record the decided candidate and give the commit step a fresh pass."""
+    review_step = next(
+        (step for step in job_service._steps(db, job.id) if step.step_name == "AWAITING_REVIEW"),
+        None,
+    )
+    if review_step is not None:
+        previous_output: dict[str, object] = {}
+        if review_step.output_refs:
+            try:
+                loaded = json.loads(review_step.output_refs)
+            except ValueError:
+                loaded = None
+            if isinstance(loaded, dict):
+                previous_output = loaded
+        review_output: dict[str, object] = {"status": "decision", "candidate_id": candidate.id}
+        committed_assets = previous_output.get("committed_assets")
+        if isinstance(committed_assets, dict):
+            review_output["committed_assets"] = committed_assets
+        review_step.state = job_service.COMPLETED_STEP
+        review_step.output_refs = json.dumps(review_output)
+    # SG-270 G2: every accepted candidate (including a second split child) gets
+    # its own commit pass; a repeat decision on the same candidate is idempotent
+    # through the review step's committed_assets map.
+    commit_step = next(
+        (step for step in job_service._steps(db, job.id) if step.step_name == "COMMITTING"),
+        None,
+    )
+    if commit_step is not None:
+        commit_step.state = job_service.PENDING_STEP
+        commit_step.output_refs = None
 
 
 @router.post("/candidates/{candidate_id}/decision")
@@ -44,10 +106,12 @@ def decide_candidate(
 
     if payload.action in {"hold", "reject"}:
         candidate.state = "held" if payload.action == "hold" else "rejected"
+        if payload.action == "reject":
+            _close_rejected_candidate_tasks(db, candidate, household_id)
         db.commit()
         return {"id": candidate.id, "state": candidate.state, "job_id": candidate.job_id}
 
-    if db.query(ReviewTask).filter_by(subject_ref=candidate.id, household_id=household_id, status="open").count():
+    if candidates.blocking_review_task_ids(db, candidate):
         raise HTTPException(status_code=409, detail="Candidate has unresolved review tasks")
 
     if payload.action == "edit":
@@ -66,10 +130,7 @@ def decide_candidate(
     job = db.query(Job).filter_by(id=candidate.job_id).first()
     if job is None or job.household_id != household_id:
         raise HTTPException(status_code=404, detail="Candidate job not found")
-    review_step = next((step for step in job_service._steps(db, job.id) if step.step_name == "AWAITING_REVIEW"), None)
-    if review_step is not None:
-        review_step.state = job_service.COMPLETED_STEP
-        review_step.output_refs = json.dumps({"status": "decision", "candidate_id": candidate.id})
+    _prepare_commit_steps(db, job, candidate)
     job_service._transition(db, job, "RUNNING")
     db.commit()
     result = job_service.run_job(db, db.query(Job).filter_by(id=job.id).one())
@@ -162,6 +223,7 @@ def get_candidate(
     if not isinstance(evidence_ids, list):
         raise HTTPException(status_code=500, detail="Candidate evidence is invalid")
     review_task_ids = candidates.open_review_task_ids(db, candidate)
+    blocking_review_task_ids = candidates.blocking_review_task_ids(db, candidate)
     dedup_matches = proposal.get("dedup_matches", [])
     if not isinstance(dedup_matches, list):
         dedup_matches = []
@@ -180,6 +242,7 @@ def get_candidate(
         "fields": fields,
         "dedup_matches": dedup_matches,
         "review_task_ids": review_task_ids,
+        "blocking_review_task_ids": blocking_review_task_ids,
         "evidence_ids": [str(item) for item in evidence_ids],
         "asset_id": asset_id if isinstance(asset_id, str) else None,
         "web_alternates": web_alternates,

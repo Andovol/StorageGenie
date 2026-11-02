@@ -30,6 +30,13 @@ FIELD_PREFIX = "plugin:expiry-tracker/"
 CLASSIFICATION_FIELD = f"{FIELD_PREFIX}classification"
 EXPIRY_FIELD = f"{FIELD_PREFIX}expiry_date"
 EXTENSION_PREFIX = f"{FIELD_PREFIX}extension/"
+MANUAL_ENTRY_TASK_TYPE = "expiry.manual_entry"
+MANUAL_ENTRY_PROMPT = "Enter expiry date manually"
+
+
+def manual_task_change() -> dict[str, object]:
+    """The asset-side payload every `expiry.manual_entry` task carries (SG-270)."""
+    return {"field_path": EXPIRY_FIELD, "prompt": MANUAL_ENTRY_PROMPT}
 # SG-240 D2: the opened date is a BARE field path carrying a bare JSON string
 # ("YYYY-MM-DD"), matching the convention candidates.py writes and the planning
 # and chat readers already expect.
@@ -377,7 +384,7 @@ def _manual_task(db: Session, asset: Asset) -> ReviewTask:
         .filter_by(
             subject_ref=asset.id,
             household_id=asset.household_id,
-            task_type="expiry.manual_entry",
+            task_type=MANUAL_ENTRY_TASK_TYPE,
             status="open",
         )
         .first()
@@ -385,10 +392,10 @@ def _manual_task(db: Session, asset: Asset) -> ReviewTask:
     if task is not None:
         return task
     task = ReviewTask(
-        task_type="expiry.manual_entry",
+        task_type=MANUAL_ENTRY_TASK_TYPE,
         priority="high",
         subject_ref=asset.id,
-        proposed_change=json.dumps({"field_path": EXPIRY_FIELD, "prompt": "Enter expiry date manually"}),
+        proposed_change=json.dumps(manual_task_change()),
         status="open",
         household_id=asset.household_id,
     )
@@ -496,6 +503,35 @@ def classify_asset(db: Session, asset: Asset, category: Category, tier: str | No
         )
         for resolved_task in resolved_tasks:
             resolved_task.status = "resolved"
+        # SG-270 W8: a non-expiry category also resolves a split origin's date
+        # task, exactly as the manual-entry path does (audited orphan row).
+        resolved_ids = {resolved_task.id for resolved_task in resolved_tasks}
+        asset_evidence_ids = [
+            row.evidence_id
+            for row in db.execute(
+                asset_evidence.select().where(asset_evidence.c.asset_id == asset.id)
+            ).fetchall()
+        ]
+        for orphan in _orphan_manual_tasks(db, asset, asset_evidence_ids):
+            if orphan.id in resolved_ids:
+                continue
+            before = {"status": orphan.status}
+            orphan.status = "resolved"
+            audit_service.record(
+                db,
+                actor="expiry-tracker",
+                action="review_task.resolve",
+                entity_type="review_task",
+                entity_id=orphan.id,
+                before=before,
+                after={
+                    "status": orphan.status,
+                    "resolution": {"manual_entry_orphan": True, "asset_id": asset.id},
+                },
+                household_id=orphan.household_id,
+            )
+            resolved_ids.add(orphan.id)
+            resolved_tasks.append(orphan)
     return {
         "classification": classification,
         "expiry_assertion": expiry_assertion,
@@ -609,6 +645,15 @@ def clear_opened_date(db: Session, asset: Asset) -> Assertion | None:
 
 def get_active_expiry(db: Session, asset_id: str) -> Assertion | None:
     return _active_assertion(db, asset_id, EXPIRY_FIELD)
+
+
+def has_accepted_expiry_or_clear(db: Session, asset_id: str) -> bool:
+    """True when the asset already carries an accepted date or an accepted null (SG-270)."""
+    assertion = _active_assertion(db, asset_id, EXPIRY_FIELD)
+    value = _accepted_expiry_value(assertion)
+    if assertion is None or value is None:
+        return assertion is not None and assertion.review_state == "accepted"
+    return _has_valid_expiry_date(value)
 
 
 def clear_expiry_date(db: Session, asset: Asset) -> Assertion | None:
