@@ -31,3 +31,5 @@ I wrote nothing. No delegation, database access, tests, host changes, credential
 This message is the report for engine publication and subsequent `SG-268 --status` read-back; I did not perform that read-back.
 Debug-Report-End
 moved=no
+
+Settings: coder=opencode coder_source=command model=openai/gpt-6.1-sol model_source=command effort=medium effort_source=command agent=plan agent_source=command
