@@ -97,7 +97,7 @@ describe("CandidateCard", () => {
   });
 
   test("a date-only task enables Accept and states the date can follow (SG-270 G5)", () => {
-    renderCard(<CandidateCard candidate={{ ...candidate, review_task_ids: ["task-date-1"], blocking_review_task_ids: [], blocking_review_task_ids: [], dedup_matches: [] }} householdId="h" onDecision={vi.fn()} />);
+    renderCard(<CandidateCard candidate={{ ...candidate, review_task_ids: ["task-date-1"], blocking_review_task_ids: [], dedup_matches: [] }} householdId="h" onDecision={vi.fn()} />);
     expect(screen.getByRole("button", { name: "Accept" })).toBeEnabled();
     expect(screen.getByText("The date can be added after accepting.")).toBeInTheDocument();
     expect(screen.queryByText("Acceptance is blocked until the open review task(s) are resolved.")).toBeNull();

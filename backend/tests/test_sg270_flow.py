@@ -20,11 +20,7 @@ from app.config import settings
 from app.db import Base, get_db
 from app.main import app
 from app.models import Asset, Assertion, AuditEvent, Evidence, Household, ReviewTask
-from app.plugins.expiry_tracker import (
-    CLASSIFICATION_FIELD,
-    EXPIRY_FIELD,
-    manual_task_change,
-)
+from app.plugins.expiry_tracker import CLASSIFICATION_FIELD, EXPIRY_FIELD
 from app.services import candidates, job_service
 from app.services.candidates import Candidate, CandidateBlockedError
 from app.services.observations import Observation
@@ -273,7 +269,7 @@ def test_date_only_candidate_journey_moves_task_and_reaches_the_expiry_page(
         )
         moved = session.query(ReviewTask).filter_by(id=task_id).one()
         assert moved.subject_ref == asset_id
-        assert json.loads(moved.proposed_change or "{}") == manual_task_change()
+        assert json.loads(moved.proposed_change or "{}") == {"field_path": EXPIRY_FIELD, "prompt": "Enter expiry date manually"}
         assert moved.status == "open"
         move_audit = (
             session.query(AuditEvent)
@@ -531,7 +527,7 @@ def test_duplicate_target_in_another_household_is_refused(flow_db) -> None:  # t
         task_type="expiry.manual_entry",
         priority="high",
         subject_ref=candidate.id,
-        proposed_change=json.dumps(manual_task_change()),
+        proposed_change=json.dumps({"field_path": EXPIRY_FIELD, "prompt": "Enter expiry date manually"}),
         status="open",
         household_id=household_id,
     )
@@ -660,7 +656,7 @@ def test_non_perishable_resolves_a_split_origin_orphan_with_audit(flow_db) -> No
             task_type="expiry.manual_entry",
             priority="high",
             subject_ref=origin.id,
-            proposed_change=json.dumps(manual_task_change()),
+            proposed_change=json.dumps({"field_path": EXPIRY_FIELD, "prompt": "Enter expiry date manually"}),
             status="open",
             household_id=household_id,
         )

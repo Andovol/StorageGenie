@@ -1,0 +1,484 @@
+FFFFFFFFFF..F                                                            [100%]
+=================================== FAILURES ===================================
+___ test_date_only_candidate_journey_moves_task_and_reaches_the_expiry_page ____
+
+flow_db = (<sqlalchemy.orm.session.Session object at 0x71eab458a420>, '01a19cdd-fb73-7fc3-bf2f-1edc192ddde0', '01a19cdd-fb73-7fc3-bf2f-1ee9c32fe075')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x71eab45cd6a0>
+
+    def test_date_only_candidate_journey_moves_task_and_reaches_the_expiry_page(
+        flow_db, monkeypatch: pytest.MonkeyPatch
+    ) -> None:  # type: ignore[no-untyped-def]
+        session, household_id, _ = flow_db
+        provider = ScriptedPhase2Provider([_needs_output()])
+        _enable(monkeypatch, provider)
+        with TestClient(app) as client:
+            evidence_id = _upload(client, household_id, "sg270-needs.png")
+            job = _run_import(client, household_id, [evidence_id], "sg270-needs")
+            candidate_id = _candidate_id(job)
+            candidate_read = client.get(
+                f"/v1/candidates/{candidate_id}", params={"household_id": household_id}
+            )
+            assert candidate_read.status_code == 200
+            body = candidate_read.json()
+            assert len(body["review_task_ids"]) == 1
+>           assert body["blocking_review_task_ids"] == []
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           KeyError: 'blocking_review_task_ids'
+
+tests/test_sg270_flow.py:241: KeyError
+------------------------------ Captured log call -------------------------------
+WARNING  app.services.signals:signals.py:104 Barcode extraction unavailable: pyzbar/libzbar is not installed
+WARNING  app.services.signals:signals.py:215 OCR extraction unavailable: tesseract is not installed or it's not in your PATH. See README file for more information.
+____________________ test_date_only_candidate_can_be_edited ____________________
+
+flow_db = (<sqlalchemy.orm.session.Session object at 0x71eab44552e0>, '01a19cdd-fd26-7340-9ba6-cf443741965f', '01a19cdd-fd26-7340-9ba6-cf548daada6f')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x71eab44564b0>
+
+    def test_date_only_candidate_can_be_edited(flow_db, monkeypatch: pytest.MonkeyPatch) -> None:  # type: ignore[no-untyped-def]
+        session, household_id, _ = flow_db
+        provider = ScriptedPhase2Provider([_needs_output()])
+        _enable(monkeypatch, provider)
+        with TestClient(app) as client:
+            evidence_id = _upload(client, household_id, "sg270-edit.png")
+            job = _run_import(client, household_id, [evidence_id], "sg270-edit")
+            candidate_id = _candidate_id(job)
+            edited = client.post(
+                f"/v1/candidates/{candidate_id}/decision",
+                params={"household_id": household_id},
+                json={"action": "edit", "corrected_fields": {"display_name": "Edited Yogurt"}},
+            )
+>       assert edited.status_code == 200, edited.text
+E       AssertionError: {"type":"about:blank","title":"Conflict","status":409,"detail":"Candidate has unresolved review tasks"}
+E       assert 409 == 200
+E        +  where 409 = <Response [409 Conflict]>.status_code
+
+tests/test_sg270_flow.py:329: AssertionError
+------------------------------ Captured log call -------------------------------
+WARNING  app.services.signals:signals.py:104 Barcode extraction unavailable: pyzbar/libzbar is not installed
+WARNING  app.services.signals:signals.py:215 OCR extraction unavailable: tesseract is not installed or it's not in your PATH. See README file for more information.
+________ test_shelf_stable_classification_resolves_the_moved_date_task _________
+
+flow_db = (<sqlalchemy.orm.session.Session object at 0x71eab31d3f50>, '01a19cdd-fe18-7eb0-9172-afdb97c5c6fa', '01a19cdd-fe18-7eb0-9172-afe57c38e414')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x71eab31d2f30>
+
+    def test_shelf_stable_classification_resolves_the_moved_date_task(
+        flow_db, monkeypatch: pytest.MonkeyPatch
+    ) -> None:  # type: ignore[no-untyped-def]
+        session, household_id, _ = flow_db
+        provider = ScriptedPhase2Provider([_needs_output()])
+        _enable(monkeypatch, provider)
+        with TestClient(app) as client:
+            evidence_id = _upload(client, household_id, "sg270-shelf.png")
+            job = _run_import(client, household_id, [evidence_id], "sg270-shelf")
+>           accepted = _accept(client, household_id, _candidate_id(job))
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_sg270_flow.py:347: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+client = <starlette.testclient.TestClient object at 0x71eab31d3d70>
+household_id = '01a19cdd-fe18-7eb0-9172-afdb97c5c6fa'
+candidate_id = '01a19cdd-fe6f-7b12-a39d-dbe6cbafab5a'
+
+    def _accept(client: TestClient, household_id: str, candidate_id: str) -> dict[str, object]:
+        response = client.post(
+            f"/v1/candidates/{candidate_id}/decision",
+            params={"household_id": household_id},
+            json={"action": "accept"},
+        )
+>       assert response.status_code == 200, response.text
+E       AssertionError: {"type":"about:blank","title":"Conflict","status":409,"detail":"Candidate has unresolved review tasks"}
+E       assert 409 == 200
+E        +  where 409 = <Response [409 Conflict]>.status_code
+
+tests/test_sg270_flow.py:201: AssertionError
+------------------------------ Captured log call -------------------------------
+WARNING  app.services.signals:signals.py:104 Barcode extraction unavailable: pyzbar/libzbar is not installed
+WARNING  app.services.signals:signals.py:215 OCR extraction unavailable: tesseract is not installed or it's not in your PATH. See README file for more information.
+___________ test_commit_failure_leaves_neither_asset_nor_moved_task ____________
+
+flow_db = (<sqlalchemy.orm.session.Session object at 0x71eab321adb0>, '01a19cdd-ff15-7e31-a021-0b4f62b0380f', '01a19cdd-ff15-7e31-a021-0b5061db6fcb')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x71eab30a85c0>
+
+    def test_commit_failure_leaves_neither_asset_nor_moved_task(
+        flow_db, monkeypatch: pytest.MonkeyPatch
+    ) -> None:  # type: ignore[no-untyped-def]
+        session, household_id, _ = flow_db
+        provider = ScriptedPhase2Provider([_needs_output()])
+        _enable(monkeypatch, provider)
+        with TestClient(app) as client:
+            evidence_id = _upload(client, household_id, "sg270-fail.png")
+            job = _run_import(client, household_id, [evidence_id], "sg270-fail")
+            candidate_id = _candidate_id(job)
+            task_id = _date_task(session, candidate_id).id
+            original = candidates._create_asset_for_candidate
+    
+            def fail_after_asset(*args: object, **kwargs: object):  # type: ignore[no-untyped-def]
+                original(*args, **kwargs)
+                raise RuntimeError("forced mid-commit failure")
+    
+            monkeypatch.setattr(candidates, "_create_asset_for_candidate", fail_after_asset)
+            failed = client.post(
+                f"/v1/candidates/{candidate_id}/decision",
+                params={"household_id": household_id},
+                json={"action": "accept"},
+            )
+>       assert failed.status_code == 200
+E       assert 409 == 200
+E        +  where 409 = <Response [409 Conflict]>.status_code
+
+tests/test_sg270_flow.py:380: AssertionError
+------------------------------ Captured log call -------------------------------
+WARNING  app.services.signals:signals.py:104 Barcode extraction unavailable: pyzbar/libzbar is not installed
+WARNING  app.services.signals:signals.py:215 OCR extraction unavailable: tesseract is not installed or it's not in your PATH. See README file for more information.
+_________ test_hold_keeps_the_task_and_reject_closes_it_without_a_date _________
+
+flow_db = (<sqlalchemy.orm.session.Session object at 0x71eab312ebd0>, '01a19cde-0002-7c92-93a4-a87ccb319557', '01a19cde-0002-7c92-93a4-a8819481e5a1')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x71eab312ef90>
+
+    def test_hold_keeps_the_task_and_reject_closes_it_without_a_date(
+        flow_db, monkeypatch: pytest.MonkeyPatch
+    ) -> None:  # type: ignore[no-untyped-def]
+        session, household_id, _ = flow_db
+        provider = ScriptedPhase2Provider([_needs_output()])
+        _enable(monkeypatch, provider)
+        with TestClient(app) as client:
+            evidence_id = _upload(client, household_id, "sg270-reject.png")
+            job = _run_import(client, household_id, [evidence_id], "sg270-reject")
+            candidate_id = _candidate_id(job)
+            task_id = _date_task(session, candidate_id).id
+            held = client.post(
+                f"/v1/candidates/{candidate_id}/decision",
+                params={"household_id": household_id},
+                json={"action": "hold"},
+            )
+            assert held.status_code == 200 and held.json()["state"] == "held"
+            _fresh(session)
+            assert session.query(ReviewTask).filter_by(id=task_id).one().status == "open"
+            rejected = client.post(
+                f"/v1/candidates/{candidate_id}/decision",
+                params={"household_id": household_id},
+                json={"action": "reject"},
+            )
+        assert rejected.status_code == 200 and rejected.json()["state"] == "rejected"
+        _fresh(session)
+        task = session.query(ReviewTask).filter_by(id=task_id).one()
+>       assert task.status == "resolved"
+E       AssertionError: assert 'open' == 'resolved'
+E         
+E         - resolved
+E         + open
+
+tests/test_sg270_flow.py:417: AssertionError
+------------------------------ Captured log call -------------------------------
+WARNING  app.services.signals:signals.py:104 Barcode extraction unavailable: pyzbar/libzbar is not installed
+WARNING  app.services.signals:signals.py:215 OCR extraction unavailable: tesseract is not installed or it's not in your PATH. See README file for more information.
+___ test_duplicate_target_with_accepted_date_or_clear_closes_the_task[date] ____
+
+flow_db = (<sqlalchemy.orm.session.Session object at 0x71eab2ffd5b0>, '01a19cde-00eb-7d40-ad54-2e3bff805535', '01a19cde-00eb-7d40-ad54-2e4f4779b55d')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x71eab2ffd640>
+mode = 'date'
+
+    @pytest.mark.parametrize("mode", ["date", "clear"])
+    def test_duplicate_target_with_accepted_date_or_clear_closes_the_task(
+        flow_db, monkeypatch: pytest.MonkeyPatch, mode: str
+    ) -> None:  # type: ignore[no-untyped-def]
+        session, household_id, _ = flow_db
+        provider = ScriptedPhase2Provider([_needs_output()])
+        _enable(monkeypatch, provider)
+        with TestClient(app) as client:
+            evidence_id = _upload(client, household_id, f"sg270-dup-{mode}.png")
+            target_id = _create_asset(client, household_id, "Existing target", [evidence_id])
+            assert _classify(client, target_id, household_id, "food").status_code == 200
+            if mode == "date":
+                entered = client.post(
+                    f"/v1/plugins/expiry-tracker/assets/{target_id}/expiry",
+                    params={"household_id": household_id},
+                    json={"expiry_date": "2030-05-06"},
+                )
+                assert entered.status_code == 200, entered.text
+            else:
+                cleared = client.post(
+                    f"/v1/plugins/expiry-tracker/assets/{target_id}/expiry/clear",
+                    params={"household_id": household_id},
+                    json={},
+                )
+                assert cleared.status_code == 200, cleared.text
+    
+            job = _run_import(client, household_id, [evidence_id], f"sg270-dup-{mode}")
+            candidate_id = _candidate_id(job)
+            task_id = _date_task(session, candidate_id).id
+>           accepted = _accept(client, household_id, candidate_id)
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_sg270_flow.py:457: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+client = <starlette.testclient.TestClient object at 0x71eab31e3170>
+household_id = '01a19cde-00eb-7d40-ad54-2e3bff805535'
+candidate_id = '01a19cde-0181-79b3-884f-d586e64d489a'
+
+    def _accept(client: TestClient, household_id: str, candidate_id: str) -> dict[str, object]:
+        response = client.post(
+            f"/v1/candidates/{candidate_id}/decision",
+            params={"household_id": household_id},
+            json={"action": "accept"},
+        )
+>       assert response.status_code == 200, response.text
+E       AssertionError: {"type":"about:blank","title":"Conflict","status":409,"detail":"Candidate has unresolved review tasks"}
+E       assert 409 == 200
+E        +  where 409 = <Response [409 Conflict]>.status_code
+
+tests/test_sg270_flow.py:201: AssertionError
+------------------------------ Captured log call -------------------------------
+WARNING  app.services.signals:signals.py:104 Barcode extraction unavailable: pyzbar/libzbar is not installed
+WARNING  app.services.signals:signals.py:215 OCR extraction unavailable: tesseract is not installed or it's not in your PATH. See README file for more information.
+___ test_duplicate_target_with_accepted_date_or_clear_closes_the_task[clear] ___
+
+flow_db = (<sqlalchemy.orm.session.Session object at 0x71eab2f3c230>, '01a19cde-0211-7342-a20c-ad22c6b838da', '01a19cde-0211-7342-a20c-ad3386fc21dc')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x71eab2f3ec00>
+mode = 'clear'
+
+    @pytest.mark.parametrize("mode", ["date", "clear"])
+    def test_duplicate_target_with_accepted_date_or_clear_closes_the_task(
+        flow_db, monkeypatch: pytest.MonkeyPatch, mode: str
+    ) -> None:  # type: ignore[no-untyped-def]
+        session, household_id, _ = flow_db
+        provider = ScriptedPhase2Provider([_needs_output()])
+        _enable(monkeypatch, provider)
+        with TestClient(app) as client:
+            evidence_id = _upload(client, household_id, f"sg270-dup-{mode}.png")
+            target_id = _create_asset(client, household_id, "Existing target", [evidence_id])
+            assert _classify(client, target_id, household_id, "food").status_code == 200
+            if mode == "date":
+                entered = client.post(
+                    f"/v1/plugins/expiry-tracker/assets/{target_id}/expiry",
+                    params={"household_id": household_id},
+                    json={"expiry_date": "2030-05-06"},
+                )
+                assert entered.status_code == 200, entered.text
+            else:
+                cleared = client.post(
+                    f"/v1/plugins/expiry-tracker/assets/{target_id}/expiry/clear",
+                    params={"household_id": household_id},
+                    json={},
+                )
+                assert cleared.status_code == 200, cleared.text
+    
+            job = _run_import(client, household_id, [evidence_id], f"sg270-dup-{mode}")
+            candidate_id = _candidate_id(job)
+            task_id = _date_task(session, candidate_id).id
+>           accepted = _accept(client, household_id, candidate_id)
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_sg270_flow.py:457: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+client = <starlette.testclient.TestClient object at 0x71eab2f3e1b0>
+household_id = '01a19cde-0211-7342-a20c-ad22c6b838da'
+candidate_id = '01a19cde-0284-7791-a88c-1ea9f5dcfbe6'
+
+    def _accept(client: TestClient, household_id: str, candidate_id: str) -> dict[str, object]:
+        response = client.post(
+            f"/v1/candidates/{candidate_id}/decision",
+            params={"household_id": household_id},
+            json={"action": "accept"},
+        )
+>       assert response.status_code == 200, response.text
+E       AssertionError: {"type":"about:blank","title":"Conflict","status":409,"detail":"Candidate has unresolved review tasks"}
+E       assert 409 == 200
+E        +  where 409 = <Response [409 Conflict]>.status_code
+
+tests/test_sg270_flow.py:201: AssertionError
+------------------------------ Captured log call -------------------------------
+WARNING  app.services.signals:signals.py:104 Barcode extraction unavailable: pyzbar/libzbar is not installed
+WARNING  app.services.signals:signals.py:215 OCR extraction unavailable: tesseract is not installed or it's not in your PATH. See README file for more information.
+__________ test_duplicate_target_with_an_open_date_task_joins_it_once __________
+
+flow_db = (<sqlalchemy.orm.session.Session object at 0x71eab2df9490>, '01a19cde-0318-7c71-9803-07173c0d2535', '01a19cde-0318-7c71-9803-072c9a77378b')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x71eab2dfa600>
+
+    def test_duplicate_target_with_an_open_date_task_joins_it_once(
+        flow_db, monkeypatch: pytest.MonkeyPatch
+    ) -> None:  # type: ignore[no-untyped-def]
+        session, household_id, _ = flow_db
+        provider = ScriptedPhase2Provider([_needs_output()])
+        _enable(monkeypatch, provider)
+        with TestClient(app) as client:
+            evidence_id = _upload(client, household_id, "sg270-dup-open.png")
+            target_id = _create_asset(client, household_id, "Dateless target", [evidence_id])
+            assert _classify(client, target_id, household_id, "food").status_code == 200
+            target_task = _date_task(session, target_id)
+            job = _run_import(client, household_id, [evidence_id], "sg270-dup-open")
+            candidate_id = _candidate_id(job)
+            candidate_task_id = _date_task(session, candidate_id).id
+>           accepted = _accept(client, household_id, candidate_id)
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_sg270_flow.py:488: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+client = <starlette.testclient.TestClient object at 0x71eab2dfa4b0>
+household_id = '01a19cde-0318-7c71-9803-07173c0d2535'
+candidate_id = '01a19cde-0392-77c2-8eea-fc9d7ec62696'
+
+    def _accept(client: TestClient, household_id: str, candidate_id: str) -> dict[str, object]:
+        response = client.post(
+            f"/v1/candidates/{candidate_id}/decision",
+            params={"household_id": household_id},
+            json={"action": "accept"},
+        )
+>       assert response.status_code == 200, response.text
+E       AssertionError: {"type":"about:blank","title":"Conflict","status":409,"detail":"Candidate has unresolved review tasks"}
+E       assert 409 == 200
+E        +  where 409 = <Response [409 Conflict]>.status_code
+
+tests/test_sg270_flow.py:201: AssertionError
+------------------------------ Captured log call -------------------------------
+WARNING  app.services.signals:signals.py:104 Barcode extraction unavailable: pyzbar/libzbar is not installed
+WARNING  app.services.signals:signals.py:215 OCR extraction unavailable: tesseract is not installed or it's not in your PATH. See README file for more information.
+____________ test_duplicate_target_in_another_household_is_refused _____________
+
+flow_db = (<sqlalchemy.orm.session.Session object at 0x71eab2cc7380>, '01a19cde-042d-7870-ab2d-def16b281ee9', '01a19cde-042d-7870-ab2d-df0bb3d3e558')
+
+    def test_duplicate_target_in_another_household_is_refused(flow_db) -> None:  # type: ignore[no-untyped-def]
+        session, household_id, other_id = flow_db
+        other_asset = Asset(household_id=other_id, display_name="Other home item", asset_type="product")
+        session.add(other_asset)
+        session.flush()
+        job = job_service.create_job(session, household_id, [])
+        candidate = Candidate(
+            job_id=job.id,
+            evidence_ids_json="[]",
+            proposed_fields_json=json.dumps(
+                {"kind": "duplicate_of_asset", "asset_id": other_asset.id, "fields": {}}
+            ),
+            state="accepted",
+            household_id=household_id,
+        )
+        session.add(candidate)
+        session.flush()
+        task = ReviewTask(
+            task_type="expiry.manual_entry",
+            priority="high",
+            subject_ref=candidate.id,
+            proposed_change=json.dumps({"field_path": EXPIRY_FIELD, "prompt": "Enter expiry date manually"}),
+            status="open",
+            household_id=household_id,
+        )
+        session.add(task)
+        session.commit()
+>       with pytest.raises(CandidateBlockedError, match="not in this household"):
+E       AssertionError: Regex pattern did not match.
+E         Expected regex: 'not in this household'
+E         Actual message: 'candidate has unresolved review tasks'
+
+tests/test_sg270_flow.py:536: AssertionError
+_ test_split_children_commit_their_own_assets_and_the_same_child_twice_is_idempotent _
+
+flow_db = (<sqlalchemy.orm.session.Session object at 0x71eab2eaeab0>, '01a19cde-04af-7d11-b8fb-3bc8e22aadde', '01a19cde-04af-7d11-b8fb-3bdfd69b8080')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x71eab2da1490>
+
+    def test_split_children_commit_their_own_assets_and_the_same_child_twice_is_idempotent(
+        flow_db, monkeypatch: pytest.MonkeyPatch
+    ) -> None:  # type: ignore[no-untyped-def]
+        session, household_id, _ = flow_db
+        provider = ScriptedPhase2Provider([_two_item_output()])
+        _enable(monkeypatch, provider)
+        with TestClient(app) as client:
+            evidence_id = _upload(client, household_id, "sg270-split.png")
+            job = _run_import(client, household_id, [evidence_id], "sg270-split")
+            origin_id = _candidate_id(job)
+            blocked = client.post(
+                f"/v1/candidates/{origin_id}/decision",
+                params={"household_id": household_id},
+                json={"action": "accept"},
+            )
+            assert blocked.status_code == 409
+            split = client.post(
+                f"/v1/candidates/{origin_id}/split",
+                params={"household_id": household_id},
+                json={"item_indexes": [0, 1]},
+            )
+            assert split.status_code == 200, split.text
+            children = split.json()["children"]
+            assert len(children) == 2
+            first, second = children
+>           first_asset = str(_accept(client, household_id, first["id"])["asset_id"])
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           KeyError: 'asset_id'
+
+tests/test_sg270_flow.py:567: KeyError
+------------------------------ Captured log call -------------------------------
+WARNING  app.services.signals:signals.py:104 Barcode extraction unavailable: pyzbar/libzbar is not installed
+WARNING  app.services.signals:signals.py:215 OCR extraction unavailable: tesseract is not installed or it's not in your PATH. See README file for more information.
+________ test_non_perishable_resolves_a_split_origin_orphan_with_audit _________
+
+flow_db = (<sqlalchemy.orm.session.Session object at 0x71eab2a89700>, '01a19cde-0771-7920-aed6-cf07f47861a9', '01a19cde-0771-7920-aed6-cf1667d97d93')
+
+    def test_non_perishable_resolves_a_split_origin_orphan_with_audit(flow_db) -> None:  # type: ignore[no-untyped-def]
+        session, household_id, _ = flow_db
+        evidence = Evidence(
+            household_id=household_id,
+            sha256="z" * 64,
+            storage_key="sg270/orphan.png",
+            media_type="image/png",
+            original_filename="orphan.png",
+            source_kind="upload",
+            size_bytes=1,
+        )
+        session.add(evidence)
+        session.commit()
+        with TestClient(app) as client:
+            asset_id = _create_asset(client, household_id, "Split child", [evidence.id])
+            job = job_service.create_job(session, household_id, [evidence.id])
+            origin = Candidate(
+                job_id=job.id,
+                evidence_ids_json=json.dumps([evidence.id]),
+                proposed_fields_json=json.dumps({"kind": "new_asset", "fields": {}}),
+                state="split",
+                household_id=household_id,
+            )
+            session.add(origin)
+            session.flush()
+            orphan = ReviewTask(
+                task_type="expiry.manual_entry",
+                priority="high",
+                subject_ref=origin.id,
+                proposed_change=json.dumps({"field_path": EXPIRY_FIELD, "prompt": "Enter expiry date manually"}),
+                status="open",
+                household_id=household_id,
+            )
+            session.add(orphan)
+            session.commit()
+            moved = _classify(client, asset_id, household_id, "non-perishable")
+    
+        assert moved.status_code == 200, moved.text
+>       assert orphan.id in moved.json()["resolved_review_task_ids"]
+E       AssertionError: assert '01a19cde-078c-78e0-96e2-e5347af05b05' in []
+E        +  where '01a19cde-078c-78e0-96e2-e5347af05b05' = <app.models.review_task.ReviewTask object at 0x71eab2b1efc0>.id
+
+tests/test_sg270_flow.py:668: AssertionError
+=============================== warnings summary ===============================
+../../../../backend/venv/lib/python3.12/site-packages/fastapi/testclient.py:1
+  /home/andrei/StorageGenie/backend/venv/lib/python3.12/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+../../../../backend/venv/lib/python3.12/site-packages/starlette/testclient.py:53
+  /home/andrei/StorageGenie/backend/venv/lib/python3.12/site-packages/starlette/testclient.py:53: DeprecationWarning: The anyio.abc.BlockingPortal alias is deprecated, use anyio.from_thread.BlockingPortal instead.
+    _PortalFactoryType = Callable[[], AbstractContextManager[anyio.abc.BlockingPortal]]
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/test_sg270_flow.py::test_date_only_candidate_journey_moves_task_and_reaches_the_expiry_page
+FAILED tests/test_sg270_flow.py::test_date_only_candidate_can_be_edited - Ass...
+FAILED tests/test_sg270_flow.py::test_shelf_stable_classification_resolves_the_moved_date_task
+FAILED tests/test_sg270_flow.py::test_commit_failure_leaves_neither_asset_nor_moved_task
+FAILED tests/test_sg270_flow.py::test_hold_keeps_the_task_and_reject_closes_it_without_a_date
+FAILED tests/test_sg270_flow.py::test_duplicate_target_with_accepted_date_or_clear_closes_the_task[date]
+FAILED tests/test_sg270_flow.py::test_duplicate_target_with_accepted_date_or_clear_closes_the_task[clear]
+FAILED tests/test_sg270_flow.py::test_duplicate_target_with_an_open_date_task_joins_it_once
+FAILED tests/test_sg270_flow.py::test_duplicate_target_in_another_household_is_refused
+FAILED tests/test_sg270_flow.py::test_split_children_commit_their_own_assets_and_the_same_child_twice_is_idempotent
+FAILED tests/test_sg270_flow.py::test_non_perishable_resolves_a_split_origin_orphan_with_audit
+11 failed, 2 passed, 2 warnings in 4.49s

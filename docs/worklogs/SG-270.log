@@ -1,0 +1,6 @@
+SG-270 worklog (append-only)
+start 2026-11-02T15:07:42Z health=200 docker preflight: Server present, busybox rc 0
+base efdedcf2171a9106a359dacb414d6a6fe0323aec (origin/automation)
+decisions: exempt set CANDIDATE_DECISION_EXEMPT_TASK_TYPES={expiry.manual_entry}; moved task audit action review_task.move; duplicate target states close/move/join; split child date tasks from needs_evidence; G2 commit uses review-step candidate_id with committed_assets idempotency map; no expiry assertion at commit; needs_evidence is provider-global and can be true for a non-date unknown.
+tests: new tests/test_sg270_flow.py 13 pass; fail log 11 failed/2 passed on base; affected backend 123 pass twice; backend gate 777 passed, 2 deselected; frontend 336 pass; affected frontend 59 pass twice; build rc 0.
+health end 2026-11-02T15:34:30Z = 200.

@@ -1,0 +1,10 @@
+app/models/base.py:8: error: Unused "type: ignore" comment  [unused-ignore]
+app/services/audit_service.py:16: error: Missing type arguments for generic type "dict"  [type-arg]
+app/services/audit_service.py:17: error: Missing type arguments for generic type "dict"  [type-arg]
+app/api/v1/review_tasks.py:38: error: Function is missing a return type annotation  [no-untyped-def]
+app/api/v1/review_tasks.py:42: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/review_tasks.py:43: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/review_tasks.py:86: error: Function is missing a return type annotation  [no-untyped-def]
+app/api/v1/review_tasks.py:90: error: Unused "type: ignore" comment  [unused-ignore]
+app/api/v1/review_tasks.py:91: error: Unused "type: ignore" comment  [unused-ignore]
+Found 9 errors in 3 files (checked 4 source files)
