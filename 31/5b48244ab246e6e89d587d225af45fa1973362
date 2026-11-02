@@ -105,3 +105,5 @@ UNCLEAR DURING EXECUTION: File inspection showed a source directory without Git 
 UNCLEAR REMAINING: BASE provenance blocks certification under `PB-6`; all six picks remain provisional until tied to the resolved `origin/automation` commit.
 Debug-Report-End
 moved=no
+
+Settings: coder=opencode coder_source=command model=openai/gpt-6.1-sol model_source=command effort=medium effort_source=command agent=plan agent_source=command
