@@ -135,3 +135,5 @@ UNCLEAR REMAINING: executable recovery proof, household adoption, inventory/hist
 Read: AGENTS.md, the direction context, SG-282, SG-279 audit, planning/chat services and planning prompt, plus every extra file inventoried above.
 Debug-Report-End
 moved=no
+
+Settings: coder=opencode coder_source=command model=openai/gpt-6.1-sol model_source=command effort=medium effort_source=command agent=plan agent_source=command
