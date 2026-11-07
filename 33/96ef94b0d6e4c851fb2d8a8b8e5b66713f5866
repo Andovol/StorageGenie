@@ -67,3 +67,5 @@ Constraints: repository file reads only; no denial or timeout observed. No host,
 Read the four G1 files and exactly the additional files listed above; no STATE.md or docs/decisions/ reads. I wrote nothing.
 Debug-Report-End
 moved=no
+
+Settings: coder=opencode coder_source=command model=openai/gpt-6.1-sol model_source=command effort=medium effort_source=command agent=plan agent_source=command
