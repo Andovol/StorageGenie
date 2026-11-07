@@ -8,10 +8,11 @@ Built from audits, one row per rated slice (owner, D25, 2026-11-07). Strengths a
 
 | Slice | Model, effort | Kind of work | Engine elapsed | Rating | Stop rules kept? | Defects the audit found | Attribution |
 |---|---|---|---|---|---|---|---|
+| SG-286 | haiku-5-5, high | ops, live host read-only | ~70 s | 96 | yes, first sign | none (packet rule wrong) | packet |
 
 ## Haiku 5.5 at `high` — profile
 
-No rated slice yet.
+**Strengths so far (1 slice):** keeps a hard stop rule at the first sign; reports evidence and options without acting on them; respects a permission denial. **Weaknesses so far:** none attributable; one self-inflicted output cut.
 
 ## Muse 1.3 Contributor at `xhigh` — profile
 
