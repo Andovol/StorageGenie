@@ -1,0 +1,74 @@
+result=done id=SG-284 inactive
+debug-report-begin
+SG-284 model=unknown effort=unknown (process arguments/provider metadata unavailable); working_directory=/tmp/dispatch-review.DeBWEK; remote=not inspected; BASE_REF=origin/automation; BASE_COMMIT=unknown (snapshot has no .git); WORK_HEAD=not applicable.
+**Contract version: 0.58.0** — **echo this line verbatim in your receipt.** It is the only proof that you
+
+PICKS: Q1: recover an existing image reference first; if none is usable, K1 with explicit safety and equivalence gates. Q2: a separate, owner-approved prerequisite slice. Q3: a release-specific retention tag plus immutable identity, verified before every live stop; no moving or deleting the retained recovery reference.
+
+Extra files read beyond G1 steps 1–3:
+- `.contract/CODER.md`, to establish PB-1–PB-6 and the contract version.
+- None else. `backend/app/main.py`, `backend/app/db.py`, and `backend/app/services/reminders/daily.py` fall under the table's “server.py and what it imports.”
+- Attempted `.contract/CODER_PRODUCTION.md`; file not found, so no contents read. No permission denial occurred.
+- Contract finding: available CODER version is 0.58.0; `AGENTS.md:4` records 0.56.0. No external version check was permitted or performed.
+
+**Q1**
+(a) PICK: First establish whether the existing image remains addressable under a platform manifest/config digest or another reference. If it does, retain and verify that image instead of manufacturing a replacement. If it does not, prefer K1 over K2–K4, subject to owner approval of capture behaviour and the proof below. This is a recommendation, not authorization to execute.
+
+(b) WHY: The observed failure establishes unavailability through one identifier, not deletion of every underlying object: `docs/worklogs/SG-280_rehearsal.log:42-47`. The context expressly leaves actual deletion unestablished (`docs/reviews/2026-11-07-recovery-image-context.md:37`).
+K1 is my fallback preference (opinion): capturing the current filesystem avoids rebuilding unpinned inputs and manually reconstructing image configuration.
+K2 cannot promise reproducibility: `backend/Dockerfile:3` uses an unpinned Node tag; line 14 fetches current apt packages. Python version pins in `backend/requirements.lock` do not pin those inputs.
+K3 adds configuration reconstruction risk (opinion), already acknowledged in the context's K3 description.
+K4 is not an equivalent recovery: the binding states require the old image (`docs/packets/SG-280-deploy-rider-candidate-state-migration.md:24-28`); a small source diff is not proof of old-schema compatibility.
+
+Exact equivalence comparison proposed:
+- Compare normalized filesystem inventories from the live container export and a never-started container created from the recovery image. Compare paths, file bytes by cryptographic hash, file types, symlink targets, ownership, modes, and preserved execution-relevant metadata.
+- Cover the complete executable environment, not only served Python: `/app/app`, `/app/alembic`, `/app/static`, Python/site-packages, native libraries, binaries, and supporting configuration.
+- Separately compare architecture/platform and effective launch configuration: Entrypoint, Cmd, working directory, user, environment, healthcheck, and other execution-relevant settings. Compare sensitive values privately; publish only equality results, never credentials.
+- Check actual mount destinations first. Mounted database and storage contents are outside image equivalence and must not enter the image or report. Compose declares them at `/data/db` and `/data/storage` (`docker-compose.yml:9-14`).
+- Accept a different image ID, layer history, creation timestamp, or manifest packaging if filesystem and effective runtime configuration match. Permit only explicitly inventoried, justified non-executable transient differences, such as disposable bytecode caches or logs; never a blanket exclusion of unexpected changes.
+- Any source, migration, static asset, dependency, native-library, permission, or effective configuration difference fails this proof unless separately reviewed and approved.
+- This proves filesystem/configuration equivalence, not literally the bytes already loaded into a Python process. “Current disk equals loaded code” remains an unverified premise unless runtime evidence establishes it.
+- Finally, the recovery image must actually start the old app against the isolated restored database and return health plus a read route, as the binding rehearsal requires. Filesystem equality alone is insufficient.
+
+(c) MISSED OPTION: Recover the original image through another existing reference or platform-specific digest. I checked the recorded manifest-list/config distinction (`docs/worklogs/SG-280_report.md:44`) against the single-ID failure; the record contains no exhaustive image-store inventory.
+
+(d) RISKIEST UNVERIFIED PREMISE: K1 can capture the live executable filesystem without an unapproved service interruption, unsafe concurrent filesystem changes, or sensitive material capture.
+Read-only host observations to reduce that uncertainty: inspect daemon version/store mode, container mounts, writable-layer diff, and effective configuration with secret-safe output. The Docker semantics below are memory, unverified: commit normally pauses the container and excludes mounted volumes; export also excludes mounted-volume contents. Verify those semantics before an execution packet relies on them.
+Read-only inspection cannot itself prove that an eventual commit will succeed or be interruption-free. Any pause must be explicitly authorized; disabling pause is not a substitute for establishing snapshot consistency.
+
+**Q2**
+(a) PICK: Make recovery-image discovery/retention or creation its own small slice before rerunning the rider, with its own report and owner-approved host scope.
+
+(b) WHY: The existing rider's authorized runtimes and write ceiling do not include committing/importing a recovery image (`docs/packets/SG-280-deploy-rider-candidate-state-migration.md:97-101`). Its S0 rule stops on unexpected results, rather than repairing them inline (`:24`, `:68`).
+Separating the prerequisite makes image identity, equivalence, retention, and capture impact explicit before the downtime budget begins (opinion). The rider must still revalidate the retained image and run the complete isolated recovery rehearsal; a prerequisite report cannot replace those gates.
+
+(c) MISSED OPTION: A discovery-only first phase that concludes “existing image recovered; no capture needed,” followed by creation only if necessary. I checked the rider's S0 scope and the context's unestablished-deletion statement; neither requires image creation before inspection.
+
+(d) RISKIEST UNVERIFIED PREMISE: The reported container and filesystem are still the current live baseline.
+Read-only host observation: inspect the container's full ID, image reference, creation/start timestamps, restart count, mounts and writable-layer diff, and inspect current image references. Any changed baseline invalidates the old comparison and returns the prerequisite for review.
+
+**Q3**
+(a) PICK: Before any build that can retag the live image, establish a unique release-specific recovery tag, record its full usable immutable identity and platform, and prohibit moving/removing that tag or pruning its image until its recovery obligation is explicitly retired. Before each live stop, revalidate identity and demonstrate the image can instantiate; rehearse real startup on the isolated restored copy.
+
+(b) WHY: `docker compose build backend` precedes recovery rehearsal (`docs/packets/SG-280-deploy-rider-candidate-state-migration.md:43-65`), and the report records mutable `:latest` as the new image (`docs/worklogs/SG-280_report.md:44`). The rehearsal also uses `:latest` directly (`docs/worklogs/SG-280_rehearse.py:18`).
+Opinion: a dedicated retention tag protects against ordinary retagging/untagged cleanup, while immutable identity prevents silently accepting a moved tag. Neither protects against arbitrary deletion by another actor; the stop-time gate remains necessary.
+Cost: one retained image reference, storage for otherwise-unshared layers, a small inspect/instantiation gate, and explicit retirement. No provider or registry spend is required.
+
+(c) MISSED OPTION: A checksummed local saved-image archive as independent recovery against daemon-store loss. I checked the rootless/local-only and no-new-spend constraints; this is compatible in principle but adds disk, sensitive-configuration handling, and restore proof, so it is not my smallest-rule pick.
+
+(d) RISKIEST UNVERIFIED PREMISE: The chosen reference/identity remains usable across this daemon's store semantics and intervening maintenance.
+Read-only host observation: inspect store mode, retained tag/digest/platform mappings, image metadata, and scheduled pruning/cleanup policy without exposing secrets. Successful instantiation is a later authorized throwaway-object test, not a read-only observation; fail closed until it is demonstrated.
+
+**G3**
+- The approach is wrong if it starts by asserting physical deletion. The evidence proves `No such image` for the recorded ID; store-wide loss and the garbage-collection explanation remain unverified (`docs/worklogs/SG-280_report.md:12-14`). Inspect existing references before selecting a reconstruction method.
+- A recovery image is not a database backup. Compose mounts the database and storage separately (`docker-compose.yml:9-14`); SQLite backup/restore and the owner's S0–S4 states remain binding. No objection to those decisions.
+- Capturing a mounted SQLite container is not automatically a SQLite snapshot problem if mounted data is excluded, but pausing the live writer is an operational effect. Unexpected database files elsewhere in the writable layer would also defeat that assumption. Inspect first; do not silently accept a default pause or capture owner data.
+- A restart of the existing container and recreation from an image are different operations (memory, unverified). Missing image lookup does not alone prove an existing container cannot restart. Read-only container/snapshot/store inspection and existing daemon logs can establish prerequisites or expose failure, but cannot conclusively guarantee a future restart. Do not test this by restarting live.
+- Concrete rehearsal defect: `docs/worklogs/SG-280_rehearse.py:272-285` only creates a container with `python -c print('old-image-present')`, then removes it. It never starts it, runs Uvicorn, or requests health/read routes. It therefore cannot satisfy packet G3 step 4 (`docs/packets/SG-280-deploy-rider-candidate-state-migration.md:65`), even after an image becomes available.
+- Startup launches an immediate reminder writer (`backend/app/server.py:27-34`; `backend/app/services/reminders/daily.py:98-104`). Successful new-app startup is therefore a real S3 boundary, not a harmless read probe.
+- No migration command appears in the inspected entrypoint/lifespan or database setup; migration is explicitly separate in `Makefile:28-29`. This is bounded evidence, not a claim that every transitive import was audited.
+- Present evidence does not establish the exact promised worst-point damage: the log records `candidate_missing=False`, temporary table present (`docs/worklogs/SG-280_rehearsal.log:35-38`). That satisfies the script's weaker predicate (`SG-280_rehearse.py:241-245`), but does not demonstrate durable loss of the original table before rename. Preserve the binding rehearsal; strengthen its observed-damage proof rather than treating this as settled.
+- No host, Docker, credential, browser, network, database, health, build or test command was run. No writes, commits, pushes, restarts, or state changes were performed. The final message is the report; engine publication was not independently observed.
+
+Read AGENTS.md, the context pack, named evidence/build/runtime files, startup imports, and CODER.md; deliberately did not use STATE.md, docs/decisions/, or SG-280_audit.md. I wrote nothing.
+debug-report-end
