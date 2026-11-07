@@ -1,0 +1,18 @@
+# SG-290 commit attempts — daemon refused, nothing written
+
+Packet step: G2 step 4, `docker commit --pause=false d972bc75 storagegenie-backend:recovery-sg270`.
+Socket: `unix:///run/dispatch-storagegenie-SG-290/docker.sock`. Container never paused by me beyond the flag's own behavior; the flag is deprecated (daemon warns, enabled by default).
+
+Attempt 1 — 2026-11-07T20:56Z:
+```
+$ docker commit --pause=false d972bc75 storagegenie-backend:recovery-sg270
+Flag --pause has been deprecated, and enabled by default. Use --no-pause to disable pausing during commit.
+Error response from daemon: NotFound: content digest sha256:93e35323fdb51faac3fc0c915d08e986951c036d9516a2a8fc6456fbd25b3a87: not found
+RC=1
+```
+
+Attempt 2 (builder's one retry, same literal command) — 2026-11-07T20:56Z: identical output, identical missing digest, RC=1.
+
+After both attempts: `storagegenie-backend:recovery-sg270` still answers `No such image`; container `d972bc75` unchanged (running, same start, restart 0); health `{"status":"ok","db":"ok","storage":"ok"}`; `docker diff` still 208 entries, set-equal to the pre-commit list (raw order differs between invocations; sorted comparison equal); image count still 62; no container labelled `sg290-scratch` exists.
+
+Inference (UNVERIFIED): the daemon cannot assemble the new image because content it needs — plausibly a blob of the long-gone parent `sha256:96a66241…` — is absent from the store. No further route is in the packet, so this is the STOP.
