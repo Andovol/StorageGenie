@@ -1,0 +1,84 @@
+result=done id=SG-285 inactive
+debug-report-begin
+SG-285 model=unknown effort=unknown (process arguments/provider metadata unavailable); working_directory=/tmp/dispatch-review.ZihhiL; remote=not inspected; BASE_REF=origin/automation; BASE_COMMIT=unknown (snapshot has no .git); WORK_HEAD=not applicable.
+**Contract version: 0.58.0** — **echo this line verbatim in your receipt.** It is the only proof that you
+
+Outcome: critique complete. R1 needs stronger capture/privacy gates and a corrected equality premise; R2 remains justified conditionally; R3 needs collision handling and stop-time usability checks. These are recommendations for D23, not authorization.
+
+Contract finding: `.contract/CODER.md:3` supplies 0.58.0; `AGENTS.md:4` records 0.56.0. No external version check was permitted or performed.
+
+Extra files read beyond the three mandatory G1 documents and the context pack's explicitly named evidence/build/runtime files:
+- `.contract/CODER.md`: PB-1–PB-6, identity, scope and reporting requirements.
+- `backend/app/main.py`, `backend/app/db.py`, `backend/app/services/reminders/daily.py`, `backend/app/logging_config.py`: direct imports of `server.py`.
+- `backend/app/config.py`: imported settings source; inspected to assess database paths and sensitive environment capture.
+No other file contents were read. `backend/app/services/candidates.py` was read through line 1367 only; the tool capped its output. Its inspected constraint is at lines 496–503. No excluded history was read.
+
+R1 — Most Serious: Capture Can Retain Sensitive Runtime Configuration
+
+Strongest case against:
+- Hashing Env values in the comparison protects the report, not necessarily the recovery image. Compose injects `.env` (`docker-compose.yml:17–18`); settings declare credential-bearing variables (`backend/app/config.py:35–42`). Phase A explicitly proposes retaining effective Env (`docs/worklogs/SG-284_report.md:26`).
+- Docker commit retaining container environment in image configuration is memory, unverified here. If that applies, K1 can persist runtime credentials in a long-lived image even when `docker diff` shows only harmless caches. Finding no database-like paths does not address that exposure.
+- Therefore explicitly approve the capture/retention of sensitive configuration, or STOP before commit if the required effective-configuration equivalence would persist secrets outside the approved boundary. Do not silently strip values and still claim equality. Actual credential presence is unverified.
+
+Other material objections:
+- `--pause=false` has a reasonable mounted-database argument, but the stronger conclusion “no consistency gain” is unsupported. Compose declares `/data/db` and `/data/storage` mounts (`docker-compose.yml:9–14`); that is not an inspection of this container's actual mounts or concurrent writable-layer activity.
+- A pre-commit diff is an observation at one time, not a write barrier. Even an allowed cache/log can change between diff, commit and export. Phase A already warned: “disabling pause is not a substitute for establishing snapshot consistency” (`SG-284_report.md:37`). Opinion: do not pause live without approval, but do not call an unpaused capture consistent merely because its earlier changed-path list looked transient.
+- The find-existing branch and the commit branch cannot share the same guaranteed-equality rationale. An original image does not contain later writable-layer changes; the context expressly distinguishes K1 as including runtime writes (`docs/reviews/2026-11-07-recovery-image-context.md:65`). Finding the original image may legitimately fail strict equality against its running container.
+- Rootless containerd equality is not established by the record. SG-280 proved only a served-tree export comparison (`SG-280_report.md:45`), not full-filesystem commit/export equivalence. Container-generated files and ownership/metadata treatment are possible differences (memory, unverified). Rootless UID mapping already produced a concrete operational mismatch (`SG-280_report.md:39`).
+- Keep “any difference stops” if strict equality is the approved gate, but replace “Expected: identical” with a hypothesis. A mismatch must be classified, not automatically diagnosed as wrong application code or silently excluded.
+- The proposed inventory also omits hard-link relationships and execution-relevant extended metadata from Phase A's broader requirement (`SG-284_report.md:24–29`). Opinion: establish whether those matter to this image before calling the listed fields complete filesystem equivalence.
+
+Unverified premise:
+- This daemon can capture and reinstantiate the intended filesystem/configuration without interruption, sensitive-data expansion, or unexplained metadata differences. Store mode remains unmeasured; the manifest-list evidence is suggestive only (`SG-280_report.md:44`).
+
+Settling observation:
+- In an authorized execution slice, inspect actual mounts, full container identity, store/version and secret-safe effective configuration; establish commit/export semantics on throwaway objects first.
+- Then obtain the exact changed-path inventory, capture-time evidence of relevant filesystem stability, complete normalized inventories and configuration equality results. Demonstrate that a deliberate mismatch is rejected.
+- Record every difference and STOP under the present strict gate. Finally start the exact retained identity on isolated restored data, override database/storage destinations explicitly, and obtain health plus a database-backed read-route 200 without publishing response bodies.
+
+Phase A disposition:
+- Keep find-first, K1-fallback. The Architect's reasoning supports avoiding an unauthorized pause, but does not resolve Phase A's consistency concern. Strict zero-difference proof is stronger than Phase A's explicitly justified transient allowances and may reject an authentic original image; that tradeoff needs explicit acknowledgement.
+
+R2 — Separate Slice Is Defensible, Not Intrinsically Safer
+
+Strongest case against:
+- Opinion: an owner-approved rider could perform discovery/capture in G0 while still in S0, with exactly the same gates. Separation adds a dispatch, review and handoff; it does not itself improve image correctness.
+- SG-280's cutoff is measured “since your start,” not since live stop (`docs/packets/SG-280-deploy-rider-candidate-state-migration.md:32`). Folding costly full-image proof into that rider consumes its 1200-second pre-G4 allowance. Conversely, separation requires revalidation because the baseline can change between slices (`SG-284_report.md:47–48`).
+- A G0 tag-to-recorded-ID check alone does not prove the running container is still the baseline SG-286 captured. Verify that binding too, and demonstrate recovery usability again before the live stop.
+- Removing the real-object rights probe and correcting step 4 are warranted: `SG-280_rehearse.py:272–285` only creates/removes a container running a print command; it never starts the old app.
+- Strengthening step 2 may expose an execution problem, not merely an assertion problem. The log says `candidate_missing=False tmp_present=True` (`SG-280_rehearsal.log:35–38`). Merely changing OR to AND cannot establish the promised durable post-DROP state; STOP if the exact damage cannot be demonstrated.
+- Dropping the forced scratch `--user` is supported by the recorded failure (`SG-280_report.md:39`), but does not justify overriding the recovery image's effective User or skipping a throwaway scratch-write/removal proof.
+
+Unverified premise:
+- SG-286's proof cost and authorization boundary justify a separate run, and SG-287 can revalidate its handoff within budget. No measured full-image proof duration exists in the inspected record.
+
+Settling observation:
+- Measure discovery/capture/inventory/startup durations in SG-286; publish full usable image identity/platform and the captured container baseline. SG-287 must reject a moved tag or changed baseline and rerun the real restored-database startup rehearsal.
+- If discovery simply finds a usable retained original and the same bounded G0 fits a newly approved rider, folding is technically defensible. Current SG-280 authorization does not include commit (`packet:97–101`).
+
+Phase A disposition:
+- Keep the separate prerequisite recommendation, chiefly for explicit scope and budget. The Architect's rationale reinforces it; the extra slice is not a replacement for rider gates.
+
+R3 — Retention Is Additional To Proof, But Two Tags Are Not Sufficient
+
+Strongest case against:
+- The stated prohibition on moving retained tags conflicts with unconditional tagging on a replay: an existing `recovery-<slice>` or `release-<slice>` could resolve elsewhere. Opinion: define absent/create, same-identity/no-op, different-identity/STOP; never overwrite as an implicit repair.
+- Retention by riders does not constrain other actors or daemon cleanup. Phase A expressly says a retention tag cannot protect against arbitrary deletion (`SG-284_report.md:54`).
+- One inspect is not a usability proof on this store. SG-280 recorded successful tagging in G0 (`SG-280_report.md:38`), then failed creation by the recorded old identifier (`SG-280_rehearsal.log:42–47`). This does not establish the cause, but defeats reliance on historical lookup success alone.
+- Opinion: two new references per rider may duplicate the same image already retained as the preceding release. The second name can improve provenance, but no inspected evidence establishes it as necessary for retention.
+
+Unverified premise:
+- All relevant cleanup respects these tags, their identity/platform mappings remain usable, and “never moved” includes reruns and other automation. Disk cost has not been measured.
+
+Settling observation:
+- Record full tag/usable-identity/platform mappings and the actual cleanup policy; verify collision refusal on throwaway objects. Immediately before live stop, recheck identity and retain the successful real startup rehearsal required by the rider.
+- Measure retained unique layers rather than multiplying tag count by image size. Any cleanup remains separately owner-approved.
+
+Phase A disposition:
+- Keep retention plus immutable identity and stop-time usability gates. R1 proves a particular recovery object's equivalence and startup at one time; R3 adds its lifecycle obligation across builds and later riders. It needs retention policy and revalidation, not repeated full-filesystem proof solely because another tag is added.
+- The Architect's two-tag convention is reasonable as provenance policy (opinion), but weaker than Phase A if interpreted as replacing pre-stop instantiation/rehearsal with one inspect.
+
+Constraints: repository reads only; no host commands, Docker, credentials, browser, network, database, health probes, builds or tests. No denial or read timeout was observed. No writes, commits, pushes, restarts or state changes; publication is engine-managed, not independently verified here.
+
+Read: AGENTS.md, the context pack, SG-284, SG-280 packet/report/script/log, SG-270 release, Dockerfile, Compose, Makefile, requirements lock, candidate service excerpt, migration, startup/settings files listed above, and CODER.md. I wrote nothing.
+debug-report-end
