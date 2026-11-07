@@ -1,0 +1,68 @@
+result=done id=SG-292 inactive
+debug-report-begin
+SG-292 model=unknown effort=unknown (process arguments/provider metadata unavailable within permitted reads); working_directory=/tmp/dispatch-review.zfB354; remote=not inspected; BASE_REF=origin/automation; BASE_COMMIT=unknown (snapshot has no .git); WORK_HEAD=not applicable.
+**Contract version: 0.58.0** — **echo this line verbatim in your receipt.** It is the only proof that you
+Version evidence: `.contract/CODER.md:3` agrees with `AGENTS.md:4`; published/host versions were not checked because external commands are prohibited.
+
+Outcome: critique complete. K3 remains a conditional recommendation, not an exact-recovery proof or authorization. The strongest objection is step 5's unspecified secret-handling path; step 3 also overstates what is known about image defaults. D26 remains the owner's decision.
+
+Extra files read beyond the four explicitly requested G1 files:
+- `.contract/CODER.md`
+- `docs/worklogs/SG-290_report.md`
+- `docs/worklogs/SG-290_audit.md`
+- `docs/worklogs/SG-290_commit.log`
+- `docs/worklogs/SG-286_report.md`
+- `docs/worklogs/SG-286_audit.md`
+- `docs/worklogs/SG-285_report.md`
+- `docs/worklogs/SG-284_report.md`
+- `docs/worklogs/SG-280_report.md`
+- `docs/releases/2026-11-02-sg270.md`
+- `backend/Dockerfile`
+- `docker-compose.yml`
+- `backend/app/server.py`
+- `backend/app/config.py`
+- `backend/app/logging_config.py`
+Triggers: named evidence/build/runtime references and Phase A's startup/settings references. No other file contents were read.
+
+R1 Step 5 — Most Serious: Create-Only Is Not A Secret-Output Boundary
+Against: Compose injects `.env` (`docker-compose.yml:17-18`); settings include credential variables (`backend/app/config.py:35-42`). The inherited packet says “no `.env` is opened by you” and “Scratch containers get no `env_file`” (`docs/packets/SG-290-recovery-image-rerun.md:10`). R1 deliberately changes that boundary and needs explicit authorization.
+Inference: creating without starting avoids application execution, not secret-bearing container configuration. R1 specifies safe final output but not the implementation that prevents intermediate output, command tracing, resolved Compose output, parser exceptions or diagnostics from entering Coder context. No actual leak was observed.
+Unverified: the environment comparator and container-creation path fail closed without emitting values on every failure path.
+Settles: approve the narrowly scoped secret injection; inspect the exact helper and demonstrate success plus malformed-input/failure cases using synthetic sentinel secrets. Permit only counts, key names and hashes at the tool boundary; no resolved configuration dump, secret-valued command arguments or secret-file copy. Apply `--network none` to every created container and remove the secret-bearing container by exact name.
+Against, fidelity: comparing two exports cannot detect metadata omitted by the first export. Phase A already requires establishing execution-relevant extended metadata (`docs/worklogs/SG-291_report.md:22-24`); “any extended attributes the tar carries” does not establish that coverage.
+Unverified: source capabilities/xattrs and other execution-relevant properties are represented and preserved.
+Settles: authorized source-metadata evidence plus a throwaway preservation fixture and negative control. Require successful parsing, nonzero entry/key counts and explicit missing/duplicate-key failures; equality of two empty or failed inputs is not proof.
+
+R1 Step 1 — Baseline First
+Against: unchanged identity and changed-path sets do not establish unchanged bytes. SG-290 itself records set equality despite unstable raw ordering (`docs/worklogs/SG-290_report.md:29-33`); Phase A explicitly distinguishes path stability from byte stability (`docs/worklogs/SG-291_report.md:24`).
+Unverified: the baseline remains unchanged through capture and later handoff.
+Settles: compare full identity/start/restarts/mounts and sorted diff sets against SG-290's recorded baseline (`:15-16,29-33,45`), then repeat around capture and before the rider stops live. A changed baseline must stop, not trigger an inline refresh.
+
+R1 Step 2 — Export, Inspect, Repeat
+Against: the second export must receive the same immediate `/data` exclusion gate as the first, before inventory processing or import. The inherited rule explicitly applies to both archives (`docs/packets/SG-290-recovery-image-rerun.md:54`); R1 only states the immediate gate for the first.
+Against: matching sequential captures reduce observed drift but do not prove an atomic snapshot (`docs/worklogs/SG-291_report.md:24`). Successful export was only a served-tree measurement, not full-fidelity proof (`docs/worklogs/SG-280_report.md:45-46`).
+Unverified: both archives are complete, owner-data-free and mutually stable across every compared property.
+Settles: validate export exit status and complete tar parsing, apply the exact three-directory gate to every archive before other processing, compare nonempty full inventories including represented metadata, and stop/delete affected archives by exact path on prohibited content. Do not introduce a live pause to resolve residual uncertainty.
+
+R1 Step 3 — Configuration From Two Sources
+Against: “only the Dockerfile's ENV” is inaccurate. The final Python stage has no explicit ENV instruction (`backend/Dockerfile:12-22`); its defaults can be inherited. The visible ENV at line 9 belongs to the separate frontend stage.
+Against: unchanged build-source files do not establish the provenance or immutability of the current `:latest` object. The recorded latest was built later than live (`docs/worklogs/SG-290_report.md:15,23`). The claimed historical git diff cannot be independently checked in this snapshot.
+Unverified: latest's defaults equal the lost image's defaults, and neither runtime overrides nor out-of-band image changes mask a difference.
+Settles: pin and record the donor's immutable identity and trusted build provenance; inspect defaults privately and compare them separately from runtime overrides. The pinned Python base (`backend/Dockerfile:12`) supports matching inherited defaults, but is not measured donor provenance. R1's per-key live comparison plus effective-environment equality proves current runtime compatibility, not historical default identity.
+Healthcheck disposition is reasonable but must be explicit: Compose owns it (`docker-compose.yml:20-24`), while the inherited gate compares image and container Healthcheck plus Os/Architecture (`SG-290-recovery-image-rerun.md:57`). Preserve platform proof and compare healthcheck at the effective deployment layer rather than silently dropping these gates.
+
+R1 Step 4 — Import And Collision Handling
+Against: “same” lacks an operational equality definition before import produces a candidate identity; the inherited collision rule assumes an identifiable object (`docs/packets/SG-290-recovery-image-rerun.md:46`). Opinion: byte-identical input/configuration need not imply repeat imports have identical image IDs.
+Unverified: every required launch field has a supported, correctly serialized `--change` representation, and replay cannot overwrite an existing different object.
+Settles: define the pre-existing-tag branch explicitly: never overwrite it; verify its recorded identity and run the same equivalence/startup gates, or STOP. On the absent branch, record the imported immutable identity and platform, validate JSON/null/empty launch fields on throwaway fixtures, and recheck tag resolution before acceptance.
+
+R1 Step 6 — Real Start
+Against: “scratch database copy” alone omits the safe-copy method and explicit storage override. Settings otherwise default to relative data paths and can load a local `.env` (`backend/app/config.py:12-13,63`); startup immediately schedules a writer (`backend/app/server.py:27-34`).
+Unverified: the image contains no embedded secret file, scratch permissions work under rootless execution, and the chosen route actually reads the restored database.
+Settles: retain SG-290 G4's SQLite backup API, read-only source mount, explicit scratch DATABASE_URL/STORAGE_ROOT, empty scratch storage, image User, no real storage mount or published port, and `--network none` (`SG-290-recovery-image-rerun.md:62`). Prove absence of embedded credential files without printing contents; obtain health and a named database-backed read-route 200, status codes only. Rootless write permissions need proof: SG-280 recorded a concrete mismatch (`docs/worklogs/SG-280_report.md:39`).
+
+Disposition: keep the separate prerequisite and rejection of K2/K7; K2's unpinned inputs remain visible (`backend/Dockerfile:3,14`), and K7 still substitutes newer code without old-schema recovery proof (`docs/worklogs/SG-291_report.md:51-54`). Neither rejection resolves the objections above. Haiku high is the proposed builder slot, not this review's measured identity.
+
+Constraints: repository file reads only; no denial or timeout observed. No host, Docker, credential, browser, network, database, health, build or test commands ran. No writes, commits, pushes or restarts occurred; final-message publication is engine-managed and not independently verified.
+Read the four G1 files and exactly the additional files listed above; no STATE.md or docs/decisions/ reads. I wrote nothing.
+debug-report-end
