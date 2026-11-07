@@ -1,6 +1,6 @@
 # StorageGenie — State
 
-## RESUME — closed 2026-11-02 (rules 0.56.0, `AGENTS.md:4`)
+## RESUME — closed 2026-11-02 (rules 0.58.0, `AGENTS.md:4`)
 
 **The product goals are reset and the plan is `docs/ROADMAP.md`:** a beautiful catalog of everything owned, in modules, Pantry first, Wardrobe second. Owner words: `docs/decisions/2026-10-30-session-approvals.md`. **Stage A is live** (the three date fixes). **The look changed:** the tandpfun Wardrobe theme replaces Linen Shelf (D18: colours, font and shapes everywhere; the full design on catalog, item panel and Pantry view; keep dark mode, enlarge the small type, check with real photos, measure contrast). **Design quality is a first-class requirement of every theme and screen slice (owner).** D17–D22 are decided and in the roadmap; order stays C, D, E. **Stage C, the first real Pantry, is approved and in progress** (*"d14 ok"*, L3).
 
