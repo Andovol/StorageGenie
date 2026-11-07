@@ -22,6 +22,8 @@ Deploy rider SG-280 stopped in S0 because its recovery image no longer answers b
 - **The container's environment holds the app's secrets.** Never print it. Never run a bare `docker inspect` or `docker image inspect` of the live container or of the recovery image: always pass `--format` with named fields that exclude `Env`. Compare environments **only** as `docker inspect --format '{{json .Config.Env}}' <obj> | sha256sum`, quoting the hash.
 - **The scratch database copy is the owner's data:** counts, hashes, schema text and HTTP status codes only. Never a name, id, field value or response body.
 - If any output you produced contains a secret or owner value, stop, do not commit it, and say so in the report without repeating it.
+- **Every container you create or start runs with `--network none`.** A committed image carries the container's environment, provider keys included (SG-285), so "no `env_file`" alone does not keep them out; with no network, no provider call can leave the container. Health and routes are read from inside it.
+- **Print only what each step needs:** the cleanup search reports file and matched word, never the whole line; a `docker diff` path outside `/app`, `/usr`, `/root` or `/tmp` is reported as a count per top-level directory, not by name.
 
 ## G0 — Socket, pre-state, changing nothing
 
@@ -29,7 +31,7 @@ Deploy rider SG-280 stopped in S0 because its recovery image no longer answers b
 - `curl -s http://127.0.0.1:8003/v1/health` quoted, at start and end.
 - Expected, hypotheses: container `d972bc752fa0`, `.Image` naming `sha256:96a66241…`, running, healthy, restart count 0, started before 2026-11-02T18:03Z. Quote `docker inspect --format '{{.Id}} {{.Image}} {{.Config.Image}} {{.State.Status}} {{.State.StartedAt}} {{.RestartCount}} {{json .Mounts}}' d972bc75`. **Expected mounts:** `/data/db` (bind) and `/data/storage` (volume). A different container, a restart or another mount is a STOP.
 - **`output/` is expected not to be in `.gitignore`.** Stage only by the exact path `docs/worklogs/SG-286*`, never `git add -A` or `git add .`; remove the scratch before your report commit; show `git status --short` clean and `git show --stat HEAD` holding only those paths.
-- **Scheduled cleanup, read-only:** quote any `prune`, `rmi` or `image rm` in the user's crontab, user systemd timers, the `Makefile` and `scripts/`. One found is a finding, not a stop.
+- **Scheduled cleanup, read-only:** search the user's crontab, user systemd timers, the `Makefile` and `scripts/` for `prune`, `rmi` or `image rm`; report file and matched word only. One found is a finding, not a stop.
 
 ## G1 — Find the original, changing nothing
 
@@ -56,7 +58,7 @@ Under the scratch path: `docker export d972bc75`, and `docker export` of a conta
 
 ## G4 — The recovery image actually starts
 
-Take a scratch copy of the live database with **SQLite's backup API** in a one-shot container with `data/db` mounted **read-only** (SG-280 proved this works: `SG-280_report.md:59`). Start a container **from the recovery tag**, recording the id it resolves to: label `sg286-scratch`, no published port, `DATABASE_URL` pointing at the scratch copy, `STORAGE_ROOT` at an empty scratch folder, no `env_file`, no real storage mount, the image's own user. Its startup may write reminders into the scratch copy; that is expected (`backend/app/server.py:27-34`). From inside it, `GET /v1/health` returns 200 and one read route that reads the database returns 200 — name the route; status codes only. Stop and remove it by name.
+Take a scratch copy of the live database with **SQLite's backup API** in a one-shot container with `data/db` mounted **read-only** (SG-280 proved this works: `SG-280_report.md:59`). Start a container **from the recovery tag**, recording the id it resolves to: label `sg286-scratch`, `--network none`, no published port, `DATABASE_URL` pointing at the scratch copy, `STORAGE_ROOT` at an empty scratch folder, no `env_file`, no real storage mount, the image's own user. Its startup may write reminders into the scratch copy; that is expected (`backend/app/server.py:27-34`). From inside it, `GET /v1/health` returns 200 and one read route that reads the database returns 200 — name the route; status codes only. Stop and remove it by name.
 
 ## G5 — Record and stop
 
