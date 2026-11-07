@@ -16,7 +16,7 @@ Built from audits, one row per rated slice (owner, D25, 2026-11-07). Strengths a
 
 ## Haiku 5.5 at `high` — profile
 
-**Strengths so far (2 slices):** keeps a hard stop rule at the first sign; reports evidence and options without acting on them; respects a permission denial. **Weaknesses so far:** report gaps (an output cut; phase timings not captured). Applies hard rules literally, which is right for stop rules but means the packet must be exact.
+**Strengths so far (3 slices):** carried a live migration through every recovery state exactly; keeps a hard stop rule at the first sign; reports evidence and options without acting on them; respects a permission denial. **Weaknesses so far:** report gaps (an output cut; phase timings not captured). Applies hard rules literally, which is right for stop rules but means the packet must be exact.
 
 ## Muse 1.3 Contributor at `xhigh` — profile
 
