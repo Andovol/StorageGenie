@@ -12,6 +12,7 @@ Built from audits, one row per rated slice (owner, D25, 2026-11-07). Strengths a
 | SG-290 | muse-1.3, xhigh | ops, live host, one write attempted | ~100 s | 96 | yes; one allowed retry | none (route closed by daemon) | packet |
 | SG-293 | haiku-5-5, high | ops, live host, exports | 162 s | 96 | yes, literally | none (packet rule too broad) | packet |
 | SG-294 | muse-1.3, xhigh | ops, live host, image created | ~355 s | 98 | yes | none | — |
+| SG-295 | haiku-5-5, high | deploy rider, live migration | 382 s | 97 | yes, every state | none | packet (small) |
 
 ## Haiku 5.5 at `high` — profile
 
