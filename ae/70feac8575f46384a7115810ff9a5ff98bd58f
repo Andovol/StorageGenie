@@ -71,3 +71,5 @@ Read-only host observation: compare full container identity, image reference, st
 Read root guidance, the context pack, the table-named files listed above and CODER.md; deliberately did not use STATE.md, docs/decisions/, or external/host evidence. I wrote nothing.
 Debug-Report-End
 moved=no
+
+Settings: coder=opencode coder_source=command model=openai/gpt-6.1-sol model_source=command effort=medium effort_source=command agent=plan agent_source=command
