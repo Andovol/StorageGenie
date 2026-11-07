@@ -1,0 +1,136 @@
+SG295-G2-START
+G2 journal_mode=wal
+G2 wal_present=True wal_bytes=0 shm_present=True shm_bytes=32768
+G2 live_rev=20261023_sg233_reminder
+G2 live_sqlite_master_rows=95
+MASTER index | ix_assertion_asset_id | assertion | CREATE INDEX ix_assertion_asset_id ON assertion (asset_id)
+MASTER index | ix_asset_household_id | asset | CREATE INDEX ix_asset_household_id ON asset (household_id)
+MASTER index | ix_asset_location_location_id | asset_location | CREATE INDEX ix_asset_location_location_id ON asset_location (location_id)
+MASTER index | ix_asset_relation_from_asset_id | asset_relation | CREATE INDEX ix_asset_relation_from_asset_id ON asset_relation (from_asset_id)
+MASTER index | ix_asset_relation_household_id | asset_relation | CREATE INDEX ix_asset_relation_household_id ON asset_relation (household_id)
+MASTER index | ix_asset_relation_to_asset_id | asset_relation | CREATE INDEX ix_asset_relation_to_asset_id ON asset_relation (to_asset_id)
+MASTER index | ix_audit_event_entity_id | audit_event | CREATE INDEX ix_audit_event_entity_id ON audit_event (entity_id)
+MASTER index | ix_audit_event_household_id | audit_event | CREATE INDEX ix_audit_event_household_id ON audit_event (household_id)
+MASTER index | ix_candidate_household_id | candidate | CREATE INDEX ix_candidate_household_id ON candidate (household_id)
+MASTER index | ix_candidate_job_id | candidate | CREATE INDEX ix_candidate_job_id ON candidate (job_id)
+MASTER index | ix_enrich_snapshot_source | enrich_snapshot | CREATE INDEX ix_enrich_snapshot_source ON enrich_snapshot (source)
+MASTER index | ix_evidence_household_id | evidence | CREATE INDEX ix_evidence_household_id ON evidence (household_id)
+MASTER index | ix_evidence_sha256 | evidence | CREATE UNIQUE INDEX ix_evidence_sha256 ON evidence (sha256)
+MASTER index | ix_guardrail_event_household_id | guardrail_event | CREATE INDEX ix_guardrail_event_household_id ON guardrail_event (household_id)
+MASTER index | ix_idempotency_key_key | idempotency_key | CREATE UNIQUE INDEX ix_idempotency_key_key ON idempotency_key ("key")
+MASTER index | ix_job_household_id | job | CREATE INDEX ix_job_household_id ON job (household_id)
+MASTER index | ix_job_step_job_id | job_step | CREATE INDEX ix_job_step_job_id ON job_step (job_id)
+MASTER index | ix_location_household_id | location | CREATE INDEX ix_location_household_id ON location (household_id)
+MASTER index | ix_location_parent_id | location | CREATE INDEX ix_location_parent_id ON location (parent_id)
+MASTER index | ix_observation_evidence_id | observation | CREATE INDEX ix_observation_evidence_id ON observation (evidence_id)
+MASTER index | ix_planning_suggestion_household_id | planning_suggestion | CREATE INDEX ix_planning_suggestion_household_id ON planning_suggestion (household_id)
+MASTER index | ix_planning_suggestion_status | planning_suggestion | CREATE INDEX ix_planning_suggestion_status ON planning_suggestion (status)
+MASTER index | ix_provider_call_job_id | provider_call | CREATE INDEX ix_provider_call_job_id ON provider_call (job_id)
+MASTER index | ix_provider_call_provider | provider_call | CREATE INDEX ix_provider_call_provider ON provider_call (provider)
+MASTER index | ix_reminder_asset_id | reminder | CREATE INDEX ix_reminder_asset_id ON reminder (asset_id)
+MASTER index | ix_reminder_household_id | reminder | CREATE INDEX ix_reminder_household_id ON reminder (household_id)
+MASTER index | ix_reminder_status | reminder | CREATE INDEX ix_reminder_status ON reminder (status)
+MASTER index | ix_review_task_household_id | review_task | CREATE INDEX ix_review_task_household_id ON review_task (household_id)
+MASTER index | ix_saved_search_household_id | saved_search | CREATE INDEX ix_saved_search_household_id ON saved_search (household_id)
+MASTER index | ix_source_attribution_assertion_id | source_attribution | CREATE INDEX ix_source_attribution_assertion_id ON source_attribution (assertion_id)
+MASTER index | ix_source_attribution_asset_id | source_attribution | CREATE INDEX ix_source_attribution_asset_id ON source_attribution (asset_id)
+MASTER index | ix_source_attribution_household_id | source_attribution | CREATE INDEX ix_source_attribution_household_id ON source_attribution (household_id)
+MASTER index | ix_user_household_id | user | CREATE INDEX ix_user_household_id ON user (household_id)
+MASTER index | sqlite_autoindex_alembic_version_1 | alembic_version | 
+MASTER index | sqlite_autoindex_assertion_1 | assertion | 
+MASTER index | sqlite_autoindex_asset_1 | asset | 
+MASTER index | sqlite_autoindex_asset_evidence_1 | asset_evidence | 
+MASTER index | sqlite_autoindex_asset_location_1 | asset_location | 
+MASTER index | sqlite_autoindex_asset_relation_1 | asset_relation | 
+MASTER index | sqlite_autoindex_asset_relation_2 | asset_relation | 
+MASTER index | sqlite_autoindex_audit_event_1 | audit_event | 
+MASTER index | sqlite_autoindex_candidate_1 | candidate | 
+MASTER index | sqlite_autoindex_enrich_snapshot_1 | enrich_snapshot | 
+MASTER index | sqlite_autoindex_evidence_1 | evidence | 
+MASTER index | sqlite_autoindex_evidence_2 | evidence | 
+MASTER index | sqlite_autoindex_guardrail_event_1 | guardrail_event | 
+MASTER index | sqlite_autoindex_household_1 | household | 
+MASTER index | sqlite_autoindex_idempotency_key_1 | idempotency_key | 
+MASTER index | sqlite_autoindex_job_1 | job | 
+MASTER index | sqlite_autoindex_job_2 | job | 
+MASTER index | sqlite_autoindex_job_step_1 | job_step | 
+MASTER index | sqlite_autoindex_location_1 | location | 
+MASTER index | sqlite_autoindex_observation_1 | observation | 
+MASTER index | sqlite_autoindex_planning_suggestion_1 | planning_suggestion | 
+MASTER index | sqlite_autoindex_provider_call_1 | provider_call | 
+MASTER index | sqlite_autoindex_reminder_1 | reminder | 
+MASTER index | sqlite_autoindex_reminder_2 | reminder | 
+MASTER index | sqlite_autoindex_review_task_1 | review_task | 
+MASTER index | sqlite_autoindex_saved_search_1 | saved_search | 
+MASTER index | sqlite_autoindex_source_attribution_1 | source_attribution | 
+MASTER index | sqlite_autoindex_user_1 | user | 
+MASTER index | sqlite_autoindex_user_2 | user | 
+MASTER table | alembic_version | alembic_version | CREATE TABLE alembic_version ( version_num VARCHAR(32) NOT NULL, CONSTRAINT alembic_version_pkc PRIMARY KEY (version_num) )
+MASTER table | assertion | assertion | CREATE TABLE assertion ( id VARCHAR(36) NOT NULL, asset_id VARCHAR(36) NOT NULL, field_path VARCHAR(200) NOT NULL, value_json TEXT NOT NULL, source_type VARCHAR(50) NOT NULL, confidence FLOAT, review_state VARCHAR(50) NOT NULL, source_evidence_ids TEXT, model_json TEXT, created_at DATETIME DEFAULT (CURRENT_TIMESTAMP) NOT NULL, updated_at DATETIME DEFAULT (CURRENT_TIMESTAMP) NOT NULL, PRIMARY KEY (id), FOREIGN KEY(asset_id) REFERENCES asset (id) ON DELETE CASCADE )
+MASTER table | asset | asset | CREATE TABLE "asset" ( id VARCHAR(36) NOT NULL, household_id VARCHAR(36) NOT NULL, display_name VARCHAR(300), asset_type VARCHAR(50) NOT NULL, status VARCHAR(30) NOT NULL, quantity FLOAT, unit VARCHAR(50), condition VARCHAR(50), version INTEGER NOT NULL, created_at DATETIME DEFAULT (CURRENT_TIMESTAMP) NOT NULL, updated_at DATETIME DEFAULT (CURRENT_TIMESTAMP) NOT NULL, PRIMARY KEY (id), FOREIGN KEY(household_id) REFERENCES household (id) ON DELETE CASCADE )
+MASTER table | asset_evidence | asset_evidence | CREATE TABLE asset_evidence ( asset_id VARCHAR(36) NOT NULL, evidence_id VARCHAR(36) NOT NULL, created_at DATETIME DEFAULT (CURRENT_TIMESTAMP) NOT NULL, PRIMARY KEY (asset_id, evidence_id), FOREIGN KEY(asset_id) REFERENCES asset (id) ON DELETE CASCADE, FOREIGN KEY(evidence_id) REFERENCES evidence (id) ON DELETE CASCADE )
+MASTER table | asset_fts | asset_fts | CREATE VIRTUAL TABLE asset_fts USING fts5( asset_id UNINDEXED, display_name, household_id, content='asset_fts_content', content_rowid='rowid' )
+MASTER table | asset_fts_config | asset_fts_config | CREATE TABLE 'asset_fts_config'(k PRIMARY KEY, v) WITHOUT ROWID
+MASTER table | asset_fts_data | asset_fts_data | CREATE TABLE 'asset_fts_data'(id INTEGER PRIMARY KEY, block BLOB)
+MASTER table | asset_fts_docsize | asset_fts_docsize | CREATE TABLE 'asset_fts_docsize'(id INTEGER PRIMARY KEY, sz BLOB)
+MASTER table | asset_fts_idx | asset_fts_idx | CREATE TABLE 'asset_fts_idx'(segid, term, pgno, PRIMARY KEY(segid, term)) WITHOUT ROWID
+MASTER table | asset_location | asset_location | CREATE TABLE asset_location ( asset_id VARCHAR(36) NOT NULL, location_id VARCHAR(36) NOT NULL, created_at DATETIME DEFAULT (CURRENT_TIMESTAMP) NOT NULL, PRIMARY KEY (asset_id, location_id), FOREIGN KEY(asset_id) REFERENCES asset (id) ON DELETE CASCADE, FOREIGN KEY(location_id) REFERENCES location (id) ON DELETE CASCADE )
+MASTER table | asset_relation | asset_relation | CREATE TABLE asset_relation ( id VARCHAR(36) NOT NULL, household_id VARCHAR(36) NOT NULL, from_asset_id VARCHAR(36) NOT NULL, to_asset_id VARCHAR(36) NOT NULL, relation_type VARCHAR(50) NOT NULL, created_at DATETIME DEFAULT (CURRENT_TIMESTAMP) NOT NULL, updated_at DATETIME DEFAULT (CURRENT_TIMESTAMP) NOT NULL, PRIMARY KEY (id), FOREIGN KEY(household_id) REFERENCES household (id) ON DELETE CASCADE, FOREIGN KEY(from_asset_id) REFERENCES asset (id) ON DELETE CASCADE, FOREIGN KEY(to_asset_id) REFERENCES asset (id) ON DELETE CASCADE, CONSTRAINT uq_asset_relation_from_to_type UNIQUE (from_asset_id, to_asset_id, relation_type) )
+MASTER table | audit_event | audit_event | CREATE TABLE audit_event ( id VARCHAR(36) NOT NULL, actor VARCHAR(200) NOT NULL, action VARCHAR(100) NOT NULL, entity_type VARCHAR(100) NOT NULL, entity_id VARCHAR(36) NOT NULL, before_json TEXT, after_json TEXT, household_id VARCHAR(36), timestamp DATETIME DEFAULT (CURRENT_TIMESTAMP) NOT NULL, PRIMARY KEY (id), FOREIGN KEY(household_id) REFERENCES household (id) ON DELETE CASCADE )
+MASTER table | candidate | candidate | CREATE TABLE candidate ( id VARCHAR(36) NOT NULL, job_id VARCHAR(36) NOT NULL, evidence_ids_json TEXT NOT NULL, proposed_fields_json TEXT NOT NULL, state VARCHAR(30) NOT NULL, household_id VARCHAR(36) NOT NULL, created_at DATETIME DEFAULT (CURRENT_TIMESTAMP) NOT NULL, updated_at DATETIME DEFAULT (CURRENT_TIMESTAMP) NOT NULL, PRIMARY KEY (id), CONSTRAINT ck_candidate_state CHECK (state IN ('proposed', 'accepted', 'edited', 'held', 'rejected')), FOREIGN KEY(job_id) REFERENCES job (id) ON DELETE CASCADE, FOREIGN KEY(household_id) REFERENCES household (id) ON DELETE CASCADE )
+MASTER table | enrich_snapshot | enrich_snapshot | CREATE TABLE enrich_snapshot ( id VARCHAR(36) NOT NULL, source VARCHAR(16) NOT NULL, "query" TEXT NOT NULL, request_url TEXT NOT NULL, retrieved_at VARCHAR(64) NOT NULL, status_code INTEGER, raw_body TEXT, raw_text TEXT, no_result_reason TEXT, version VARCHAR(64) NOT NULL, created_at DATETIME DEFAULT (CURRENT_TIMESTAMP) NOT NULL, updated_at DATETIME DEFAULT (CURRENT_TIMESTAMP) NOT NULL, PRIMARY KEY (id) )
+MASTER table | evidence | evidence | CREATE TABLE evidence ( id VARCHAR(36) NOT NULL, household_id VARCHAR(36) NOT NULL, sha256 VARCHAR(64) NOT NULL, media_type VARCHAR(100) NOT NULL, storage_key VARCHAR(500) NOT NULL, original_filename VARCHAR(500) NOT NULL, source_kind VARCHAR(50) NOT NULL, size_bytes INTEGER NOT NULL, created_at DATETIME DEFAULT (CURRENT_TIMESTAMP) NOT NULL, updated_at DATETIME DEFAULT (CURRENT_TIMESTAMP) NOT NULL, PRIMARY KEY (id), FOREIGN KEY(household_id) REFERENCES household (id) ON DELETE CASCADE, UNIQUE (storage_key) )
+MASTER table | guardrail_event | guardrail_event | CREATE TABLE guardrail_event ( id VARCHAR(36) NOT NULL, household_id VARCHAR(36) NOT NULL, kind VARCHAR(30) NOT NULL, ref_ids_json TEXT NOT NULL, detail_json TEXT NOT NULL, created_at DATETIME DEFAULT (CURRENT_TIMESTAMP) NOT NULL, updated_at DATETIME DEFAULT (CURRENT_TIMESTAMP) NOT NULL, PRIMARY KEY (id), FOREIGN KEY(household_id) REFERENCES household (id) ON DELETE CASCADE )
+MASTER table | household | household | CREATE TABLE household ( id VARCHAR(36) NOT NULL, name VARCHAR(200) NOT NULL, created_at DATETIME DEFAULT (CURRENT_TIMESTAMP) NOT NULL, updated_at DATETIME DEFAULT (CURRENT_TIMESTAMP) NOT NULL, PRIMARY KEY (id) )
+MASTER table | idempotency_key | idempotency_key | CREATE TABLE idempotency_key ( id VARCHAR(36) NOT NULL, "key" VARCHAR(200) NOT NULL, response_json VARCHAR(2000), created_at DATETIME DEFAULT (CURRENT_TIMESTAMP) NOT NULL, PRIMARY KEY (id) )
+MASTER table | job | job | CREATE TABLE job ( id VARCHAR(36) NOT NULL, job_type VARCHAR(100) NOT NULL, state VARCHAR(50) NOT NULL, idempotency_key VARCHAR(200), config_snapshot TEXT, household_id VARCHAR(36), created_at DATETIME DEFAULT (CURRENT_TIMESTAMP) NOT NULL, updated_at DATETIME DEFAULT (CURRENT_TIMESTAMP) NOT NULL, PRIMARY KEY (id), FOREIGN KEY(household_id) REFERENCES household (id) ON DELETE CASCADE, UNIQUE (idempotency_key) )
+MASTER table | job_step | job_step | CREATE TABLE job_step ( id VARCHAR(36) NOT NULL, job_id VARCHAR(36) NOT NULL, step_name VARCHAR(100) NOT NULL, state VARCHAR(50) NOT NULL, attempts INTEGER NOT NULL, input_refs TEXT, output_refs TEXT, PRIMARY KEY (id), FOREIGN KEY(job_id) REFERENCES job (id) ON DELETE CASCADE )
+MASTER table | location | location | CREATE TABLE location ( id VARCHAR(36) NOT NULL, household_id VARCHAR(36) NOT NULL, name VARCHAR(200) NOT NULL, parent_id VARCHAR(36), created_at DATETIME DEFAULT (CURRENT_TIMESTAMP) NOT NULL, updated_at DATETIME DEFAULT (CURRENT_TIMESTAMP) NOT NULL, PRIMARY KEY (id), FOREIGN KEY(household_id) REFERENCES household (id) ON DELETE CASCADE, FOREIGN KEY(parent_id) REFERENCES location (id) ON DELETE CASCADE )
+MASTER table | observation | observation | CREATE TABLE observation ( id VARCHAR(36) NOT NULL, evidence_id VARCHAR(36) NOT NULL, kind VARCHAR(30) NOT NULL, value_json TEXT NOT NULL, confidence FLOAT, created_at DATETIME DEFAULT (CURRENT_TIMESTAMP) NOT NULL, PRIMARY KEY (id), CONSTRAINT ck_observation_kind CHECK (kind IN ('ocr', 'barcode_qr', 'exif', 'phash')), FOREIGN KEY(evidence_id) REFERENCES evidence (id) ON DELETE CASCADE )
+MASTER table | planning_suggestion | planning_suggestion | CREATE TABLE planning_suggestion ( id VARCHAR(36) NOT NULL, household_id VARCHAR(36) NOT NULL, kind VARCHAR(50) NOT NULL, title VARCHAR(300) NOT NULL, body_json TEXT NOT NULL, backing_refs_json TEXT NOT NULL, status VARCHAR(20) NOT NULL, created_at DATETIME DEFAULT (CURRENT_TIMESTAMP) NOT NULL, updated_at DATETIME DEFAULT (CURRENT_TIMESTAMP) NOT NULL, PRIMARY KEY (id), FOREIGN KEY(household_id) REFERENCES household (id) ON DELETE CASCADE )
+MASTER table | provider_call | provider_call | CREATE TABLE provider_call ( id VARCHAR(36) NOT NULL, provider VARCHAR(100) NOT NULL, model VARCHAR(200) NOT NULL, prompt_template_version VARCHAR(100) NOT NULL, input_hashes TEXT, output_payload TEXT, cost FLOAT, usage_json TEXT, latency_ms FLOAT, error_state VARCHAR(200), job_id VARCHAR(36), created_at DATETIME DEFAULT (CURRENT_TIMESTAMP) NOT NULL, updated_at DATETIME DEFAULT (CURRENT_TIMESTAMP) NOT NULL, PRIMARY KEY (id), FOREIGN KEY(job_id) REFERENCES job (id) ON DELETE SET NULL )
+MASTER table | reminder | reminder | CREATE TABLE reminder ( id VARCHAR(36) NOT NULL, household_id VARCHAR(36) NOT NULL, asset_id VARCHAR(36) NOT NULL, as_of_day VARCHAR(10) NOT NULL, tier VARCHAR(50), bucket VARCHAR(20) NOT NULL, days_remaining INTEGER NOT NULL, status VARCHAR(20) NOT NULL, created_at DATETIME DEFAULT (CURRENT_TIMESTAMP) NOT NULL, updated_at DATETIME DEFAULT (CURRENT_TIMESTAMP) NOT NULL, PRIMARY KEY (id), FOREIGN KEY(household_id) REFERENCES household (id) ON DELETE CASCADE, FOREIGN KEY(asset_id) REFERENCES asset (id) ON DELETE CASCADE, CONSTRAINT uq_reminder_asset_as_of_day UNIQUE (asset_id, as_of_day) )
+MASTER table | review_task | review_task | CREATE TABLE review_task ( id VARCHAR(36) NOT NULL, task_type VARCHAR(100) NOT NULL, priority VARCHAR(20) NOT NULL, subject_ref VARCHAR(36) NOT NULL, proposed_change TEXT, status VARCHAR(30) NOT NULL, household_id VARCHAR(36), created_at DATETIME DEFAULT (CURRENT_TIMESTAMP) NOT NULL, updated_at DATETIME DEFAULT (CURRENT_TIMESTAMP) NOT NULL, PRIMARY KEY (id), FOREIGN KEY(household_id) REFERENCES household (id) ON DELETE CASCADE )
+MASTER table | saved_search | saved_search | CREATE TABLE saved_search ( id VARCHAR(36) NOT NULL, household_id VARCHAR(36) NOT NULL, name VARCHAR(80) NOT NULL, query_json TEXT NOT NULL, created_at DATETIME DEFAULT (CURRENT_TIMESTAMP) NOT NULL, updated_at DATETIME DEFAULT (CURRENT_TIMESTAMP) NOT NULL, PRIMARY KEY (id), FOREIGN KEY(household_id) REFERENCES household (id) ON DELETE CASCADE )
+MASTER table | source_attribution | source_attribution | CREATE TABLE source_attribution ( id VARCHAR(36) NOT NULL, household_id VARCHAR(36) NOT NULL, asset_id VARCHAR(36) NOT NULL, assertion_id VARCHAR(36), field_path VARCHAR(200) NOT NULL, uri TEXT NOT NULL, retrieved_at DATETIME NOT NULL, note TEXT, created_at DATETIME DEFAULT (CURRENT_TIMESTAMP) NOT NULL, updated_at DATETIME DEFAULT (CURRENT_TIMESTAMP) NOT NULL, PRIMARY KEY (id), FOREIGN KEY(household_id) REFERENCES household (id) ON DELETE CASCADE, FOREIGN KEY(asset_id) REFERENCES asset (id) ON DELETE CASCADE, FOREIGN KEY(assertion_id) REFERENCES assertion (id) ON DELETE SET NULL )
+MASTER table | user | user | CREATE TABLE user ( id VARCHAR(36) NOT NULL, household_id VARCHAR(36) NOT NULL, display_name VARCHAR(200) NOT NULL, email VARCHAR(320), created_at DATETIME DEFAULT (CURRENT_TIMESTAMP) NOT NULL, updated_at DATETIME DEFAULT (CURRENT_TIMESTAMP) NOT NULL, PRIMARY KEY (id), FOREIGN KEY(household_id) REFERENCES household (id) ON DELETE CASCADE, UNIQUE (email) )
+MASTER trigger | asset_fts_after_delete | asset | CREATE TRIGGER asset_fts_after_delete AFTER DELETE ON asset BEGIN INSERT INTO asset_fts(asset_fts, rowid, asset_id, display_name, household_id) VALUES ('delete', old.rowid, old.id, old.display_name, old.household_id); END
+MASTER trigger | asset_fts_after_insert | asset | CREATE TRIGGER asset_fts_after_insert AFTER INSERT ON asset BEGIN INSERT INTO asset_fts(rowid, asset_id, display_name, household_id) VALUES (new.rowid, new.id, new.display_name, new.household_id); END
+MASTER trigger | asset_fts_after_update | asset | CREATE TRIGGER asset_fts_after_update AFTER UPDATE OF id, display_name, household_id ON asset BEGIN INSERT INTO asset_fts(asset_fts, rowid, asset_id, display_name, household_id) VALUES ('delete', old.rowid, old.id, old.display_name, old.household_id); INSERT INTO asset_fts(rowid, asset_id, display_name, household_id) VALUES (new.rowid, new.id, new.display_name, new.household_id); END
+MASTER view | asset_fts_content | asset_fts_content | CREATE VIEW asset_fts_content AS SELECT rowid AS rowid, id AS asset_id, display_name, household_id FROM asset
+COUNT alembic_version=1
+COUNT assertion=40
+COUNT asset=7
+COUNT asset_evidence=20
+COUNT asset_fts=7
+COUNT asset_fts_config=1
+COUNT asset_fts_data=9
+COUNT asset_fts_docsize=7
+COUNT asset_fts_idx=7
+COUNT asset_location=1
+COUNT asset_relation=1
+COUNT audit_event=104
+COUNT candidate=10
+COUNT enrich_snapshot=4
+COUNT evidence=27
+COUNT guardrail_event=2
+COUNT household=1
+COUNT idempotency_key=11
+COUNT job=11
+COUNT job_step=72
+COUNT location=1
+COUNT observation=20
+COUNT planning_suggestion=0
+COUNT provider_call=39
+COUNT reminder=4
+COUNT review_task=9
+COUNT saved_search=0
+COUNT source_attribution=0
+COUNT user=2
+G2 reference_upgrade_rc=0
+G2 reference_rev=20261023_sg233_reminder
+G2 reference_sqlite_master_rows=95 live_rows=95
+G2 master_diff_count=0
+G2 live_candidate_equals_SG279_BEFORE=True reference_candidate_equals_SG279_BEFORE=True
+G2 elapsed_s=1.1
+SG295-G2-PASS

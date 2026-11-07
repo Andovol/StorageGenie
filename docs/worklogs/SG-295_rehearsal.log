@@ -1,0 +1,44 @@
+[    0.0s] SG295-G3-START app stays up; copies under output/SG-295-scratch; counts/hashes only
+[    0.0s] + docker run --rm --network none --label sg295-scratch -v /home/andrei/StorageGenie/data/db:/live:ro -v /home/andrei/StorageGenie/output/SG-295-scratch:/scratch storagegenie-backend:latest python -c import sqlite3;src=sqlite3.connect('file:/live/storagegenie.db?mode=ro',uri=True);dst=sqlite3.connect('/scratch/live-copy.db');src.backup(dst);dst.commit();dst.close();src.close();print('backup-ok');
+backup-ok
+RC=0
+[    0.4s] live-copy sha256=3aa4e1f5237f6e0a integrity=ok fk_violations=0 rev=20261023_sg233_reminder tables=29 candidate_rows=10 rowhash=81af8de283e9fa34 ok=True
+[    0.4s] + docker run --rm --network none --label sg295-scratch -v /home/andrei/StorageGenie/output/SG-295-scratch:/scratch -e DATABASE_URL=sqlite:////scratch/s1-upgrade.db storagegenie-backend:latest alembic upgrade head
+INFO  [alembic.runtime.migration] Context impl SQLiteImpl.
+INFO  [alembic.runtime.migration] Will assume non-transactional DDL.
+INFO  [alembic.runtime.migration] Running upgrade 20261023_sg233_reminder -> 20261102_sg279_candidate_state, widen candidate state constraint for split and merge (SG-279)
+RC=0
+[    1.6s] step1 verify integrity=ok fk_violations=0 rev=20261102_sg279_candidate_state ok=True
+[    1.6s] step1 counts_equal=True candidate_rows=10 rowhash_equal=True
+[    1.6s] step1 objects_changed=[('table', 'candidate')]
+[    1.6s] step1 states_after=['accepted', 'edited', 'held', 'merged', 'proposed', 'rejected', 'split'] fks_equal=True cols_equal=True
+[    1.6s] step1 counts_equal_to_live_copy=True rowhash_equal_to_live_copy=True
+[    1.6s] step1 in_transaction split_accepted=True merged_accepted=True bogus=refused_ck_candidate_state rolled_back_rowhash_equal=True
+[    1.6s] STEP1 PASS
+[    1.6s] + docker run --rm --network none --label sg295-scratch -v /home/andrei/StorageGenie/output/SG-295-scratch:/scratch -e DATABASE_URL=sqlite:////scratch/s2-interrupted.db storagegenie-backend:latest python /scratch/kill_after_drop.py
+KILLPOINT after drop of candidate; exiting
+INFO  [alembic.runtime.migration] Context impl SQLiteImpl.
+INFO  [alembic.runtime.migration] Will assume non-transactional DDL.
+INFO  [alembic.runtime.migration] Running upgrade 20261023_sg233_reminder -> 20261102_sg279_candidate_state, widen candidate state constraint for split and merge (SG-279)
+RC=99
+[    2.7s] step2 killer_rc=99 candidate_present=True tmp_candidate_present=True rev=20261023_sg233_reminder
+[    2.7s] STEP2 damage_landed=True
+[    2.7s] step3 hash_equal_to_backup=True integrity=ok fk_violations=0 rev=20261023_sg233_reminder ok=True counts_equal=True
+[    2.7s] STEP3 PASS
+[    2.7s] + docker run -d --name sg295-recovery-run --label sg295-scratch --network none -v /home/andrei/StorageGenie/output/SG-295-scratch:/scratch -e DATABASE_URL=sqlite:////scratch/s2-interrupted.db -e STORAGE_ROOT=/scratch/storage storagegenie-backend:recovery-sg270
+a03d98cf0367b687b57295804dbb8e2c8246f48b6d0db5d3de43365f6c9e4890
+RC=0
+[    2.9s] step4 container_image_is_recovery_tag_id=True
+[    5.3s] step4 GET /v1/health=200 GET /v1/households=200
+[    5.4s] step4 startup_log_traceback_count=0
+[    5.4s] + docker stop -t 20 sg295-recovery-run
+sg295-recovery-run
+RC=0
+[    5.9s] + docker rm sg295-recovery-run
+sg295-recovery-run
+RC=0
+[    6.0s] step4 scratch_container_removed_by_name=True
+[    6.0s] STEP4 PASS
+[    6.0s] step5 truncated_bytes=382976 hash_equal_to_backup=False verify_ok=False unreadable DatabaseError
+[    6.0s] STEP5 PASS (refused)
+[    6.0s] SG295-G3-ALL-PASS
