@@ -152,3 +152,7 @@ Read as: **D23** a slice SG-286 first looks for the original recovery image (`96
 **D25, 2026-11-07, verbatim:** *"D25 - we use the model rotation as suggested by Launcher desk, one slice using Haiku the next with Muse and so on. Your audits will start building a profile of each model, with strengths and weaknesses. If you see issues with either model, you will need to flag them to me and to the desk in your reports."*
 
 Read as: builder slices alternate `opencode-go/claude-haiku-5-5` at `high` and `opencode-go/muse-spark-1.3-contributor` at `xhigh`, starting with Haiku on SG-286. This is the owner's own list, which the contract allows (`CODERS.md` § Coder rotation), in place of the lane default that skips Muse; it was put to the owner with Muse's training risk stated (review SG-288, SG-289). Each audit adds to `docs/coder-profiles.md`; model issues go to the owner and to the desk in reports.
+
+**D26, 2026-11-07, verbatim:** *"D26 - approved"*
+
+Read as: a slice makes the recovery image by export and import, as put to the owner: baseline re-checked; the live container exported twice to scratch, each export gated for `/data` content before use; imported as `storagegenie-backend:recovery-sg270` with launch fields from the live container and image environment from `:latest`'s image configuration, no `.env` values in the image; an existing tag is a STOP; proved by full inventory, field-by-field configuration, per-key environment hashes and a real start with no network; then stop. Runs in the Haiku slot. Review: SG-291, SG-292.
