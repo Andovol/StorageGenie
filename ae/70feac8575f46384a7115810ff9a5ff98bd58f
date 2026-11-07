@@ -1,0 +1,73 @@
+Dispatch-ID: SG-291 | Report: note
+Debug-Report-Begin
+SG-291 model=unknown effort=unknown (process arguments/provider metadata not available within permitted repository reads); working_directory=/tmp/dispatch-review.gjZB3k; remote=not inspected; BASE_REF=origin/automation; BASE_COMMIT=unknown (snapshot has no .git); WORK_HEAD=not applicable.
+
+PICKS: Q1: K3, conditional on full equivalence and startup proof, not “same files by construction.” Q2: reconstruct from the live container’s non-secret effective configuration plus an evidenced image-default environment; compare runtime secrets separately by hash. Q3: keep the exact-recovery prerequisite; neither K2 nor K7 currently removes it safely.
+
+**Contract version: 0.58.0** — **echo this line verbatim in your receipt.** It is the only proof that you
+Contract evidence: `.contract/CODER.md:3`; recorded version agrees at `AGENTS.md:4`. Published/host version checking was outside this repository-only review and was not performed.
+
+Extra files read beyond G1 steps 1–3:
+- `.contract/CODER.md`, in full, to establish PB-1–PB-6, identity, scope and reporting requirements.
+- No other extra files. The SG-290 packet/report/audit/commit log, SG-286 audit, SG-284/285 reports, Dockerfile and Compose are all named in the context pack’s “Where it lives” table.
+
+**Q1**
+(a) PICK: K3, export/import, as a proposed owner-approved prerequisite. Retain the imported object only if its filesystem, effective launch configuration and isolated startup satisfy the binding proof.
+
+(b) WHY: Commit failed twice on the same missing digest (`docs/worklogs/SG-290_commit.log:8-14`); the recorded search found no usable original reference (`docs/worklogs/SG-290_report.md:22-25`). Export previously worked according to the context pack (`docs/reviews/2026-11-07-recovery-image-route-context.md:21`).
+Opinion: exporting the existing filesystem introduces fewer uncontrolled inputs than rebuilding. K2 has unpinned Node and apt inputs (`backend/Dockerfile:3,14`), so a release tag alone cannot establish equivalence.
+
+Proposed comparison:
+- Capture to a bounded local scratch archive first, rather than piping unchecked output directly into import. Inspect `/data` before importing; mounted contents must remain absent.
+- Compare nonempty, normalized full-filesystem inventories of the source export and an export from a never-started imported-image container: paths, types, modes, uid/gid, file sizes/hashes and link relationships.
+- Establish whether execution-relevant extended metadata is present and preserved; the listed inventory alone does not establish that (`docs/worklogs/SG-285_report.md:29`).
+- Compare against a second live export to detect observed capture drift; unchanged `docker diff` paths do not establish unchanged file bytes. Opinion: this reduces uncertainty but cannot prove an atomic snapshot without a write barrier.
+- Require the deliberately corrupted-inventory negative control, field-by-field configuration proof, and real isolated startup (`docs/packets/SG-290-recovery-image-rerun.md:52-62`). No unexplained difference is waived.
+
+(c) MISSED OPTION: recover from an already-existing trusted saved-image archive or another local image store. The recorded search covers this daemon’s image references, not every possible pre-existing archive (`SG-290_report.md:22-25`). This is conditional discovery, not permission for a broad host search or network access.
+
+(d) RISKIEST UNVERIFIED PREMISE: this daemon’s export/import round trip preserves every execution-relevant filesystem property without including owner data.
+Read-only host observation: inspect a bounded export’s metadata, mount destinations and filesystem inventories, including `/data` and extended metadata where represented. This settles source-content questions, not import fidelity; only a later authorized throwaway import/re-export/start test can settle the complete premise.
+
+**Q2**
+(a) PICK: use the live container’s named non-secret configuration fields as the launch baseline. Use an evidenced matching image only for genuine image defaults, especially inherited `ENV`; do not copy the container’s secret-bearing environment into the recovery image.
+
+(b) WHY: the proposal’s `CMD`, `WORKDIR`, `EXPOSE` and `ENV` list is incomplete relative to the binding comparison: Entrypoint, User, Healthcheck and platform also matter (`SG-290-recovery-image-rerun.md:57`). Compose supplies runtime environment and a healthcheck (`docker-compose.yml:12-24`), while the Dockerfile supplies workdir, exposed port and command (`backend/Dockerfile:13,21-22`).
+Opinion: “built from the same Dockerfile” is provenance evidence, not proof that another image has the original inherited defaults.
+
+Proof without exposing secrets:
+- Inspect only explicitly selected non-secret fields; never print bare inspect output or `Env`.
+- Establish the chosen donor’s default environment and provenance privately, reporting only hash/equality results. Do not infer the original defaults merely by subtracting today’s Compose keys from the live environment.
+- Compare image configuration separately from deployment overrides.
+- Compare the intended recovery container’s effective environment with the live container by hash only, using equivalent runtime injection. For the isolated startup test, account explicitly for the authorized database/storage overrides.
+- A sanitized image environment will not generally hash equal to the live container’s secret-bearing environment. Report that distinction; do not claim the existing literal image-versus-container environment equality gate passed.
+
+(c) MISSED OPTION: deploy the flat image with an explicit, retained runtime launch specification, keeping deployment-specific configuration outside the image. I checked the Dockerfile/Compose split: launch behavior already comes from both sources. Opinion: this may simplify reconstruction, but requires approval if it changes the binding image-configuration proof.
+
+(d) RISKIEST UNVERIFIED PREMISE: an available donor image supplies exactly the original image-default environment.
+Read-only host observation: inspect donor identity/provenance and compare default/effective configuration through equality results and environment hashes only. Without trusted original metadata or provenance, current live configuration cannot uniquely distinguish inherited defaults from runtime overrides; report that limitation rather than manufacturing certainty.
+
+**Q3**
+(a) PICK: no demonstrated reason makes the prerequisite unnecessary. K7 is not an established equivalent recovery; K3 is unsafe if import precedes content inspection, configuration equality is assumed, or secrets become embedded.
+
+(b) WHY: the pack explicitly binds full-filesystem proof, configuration proof and real isolated startup (`recovery-image-route-context.md:38-42`). Its reported small served-tree difference is not full-filesystem or old-schema compatibility proof (`:21`). K7 substitutes new code for the exact old recovery baseline (`:50`).
+Opinion: a small source diff cannot establish that the new application safely reads or writes the restored old schema.
+
+(c) MISSED OPTION: defer the migration/deploy while preserving the running baseline and completing a separately approved recovery prerequisite. I checked the pack’s urgency statement: Stage C waits on recovery; it does not authorize weakening recovery (`:4-5`).
+
+(d) RISKIEST UNVERIFIED PREMISE: the running container still matches the baseline described in the reports.
+Read-only host observation: compare full container identity, image reference, start time, restart count, mounts, selected configuration hashes and writable-layer inventory with `SG-290_report.md:15-16,29-33,45`. These observations detect baseline changes; they do not prove that a future recreation will succeed.
+
+**G3**
+- Opinion: the approach is reasonable only as filesystem/runtime equivalence, not original image identity or proof of bytes already loaded into the running process. A flat imported image necessarily has different packaging/provenance.
+- Reject “same files by construction” as a substitute for measurement. The previous run never reached full-filesystem proof (`SG-290_report.md:38-40`).
+- The inherited G3 environment comparison needs an explicit disposition before execution: sanitized image defaults and secret-bearing effective container configuration are different objects. This is a proof-specification objection, not a reopening of the binding requirement for effective configuration equivalence.
+- Mounted-data exclusion must be measured before import; absence of database-looking paths in `docker diff` does not independently establish an export is safe (`SG-290-recovery-image-rerun.md:44-54`).
+- Do not repair the daemon’s missing content store inline. The log establishes a missing digest, not a verified causal history of garbage collection (`SG-290_commit.log:18`).
+- Keep the real restored-copy startup, network isolation, retention identity/collision checks and rider’s pre-stop revalidation. An inspect or create-only success is not an application recovery demonstration (`SG-284_report.md:51-60,67`).
+- No objection to the binding no-live-stop/no-pause/no-restart/no-exec, secret protection, no-spend or full recovery-proof decisions.
+- Outcome: read-only review complete; no denial or timeout observed. No host, Docker, credential, network, browser, database, health, build or test commands ran. No writes, commits, pushes or restarts occurred; publication is engine-managed and not independently observed.
+
+Read root guidance, the context pack, the table-named files listed above and CODER.md; deliberately did not use STATE.md, docs/decisions/, or external/host evidence. I wrote nothing.
+Debug-Report-End
+moved=no
