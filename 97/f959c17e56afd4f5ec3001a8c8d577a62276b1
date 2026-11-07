@@ -83,3 +83,5 @@ Constraints: repository reads only; no host commands, Docker, credentials, brows
 Read: AGENTS.md, the context pack, SG-284, SG-280 packet/report/script/log, SG-270 release, Dockerfile, Compose, Makefile, requirements lock, candidate service excerpt, migration, startup/settings files listed above, and CODER.md. I wrote nothing.
 Debug-Report-End
 moved=no
+
+Settings: coder=opencode coder_source=command model=openai/gpt-6.1-sol model_source=command effort=medium effort_source=command agent=plan agent_source=command
