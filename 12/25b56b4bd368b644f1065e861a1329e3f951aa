@@ -1,0 +1,70 @@
+Dispatch-ID: SG-289 | Report: note
+Debug-Report-Begin
+SG-289 model=unknown effort=unknown (process arguments/provider metadata unavailable within permitted reads); working_directory=/tmp/dispatch-review.ALS6gq; remote=not inspected; BASE_REF=origin/automation; BASE_COMMIT/WORK_HEAD=unknown (snapshot has no .git).
+**Contract version: 0.58.0**
+Version evidence: `.contract/CODER.md:3`, `.contract/SOURCE:1`; no external version check permitted.
+Outcome: critique complete. C2 is defensible as a precautionary recommendation, not yet demonstrated safe or operationally qualified. Model/provider choice remains the owner's.
+
+Extra files read beyond the four named G1 files, including files reached through their references:
+- `.contract/CODER.md`, `.contract/SOURCE`
+- `docker-compose.yml`, `backend/Dockerfile`
+- `backend/app/config.py`, `backend/app/server.py`
+- `docs/ratings.md` (lines 1–132, 550–769, 940–1036; capped output and truncated long rows, not a complete ledger review)
+- `docs/reviews/2026-11-07-recovery-image-context.md`
+- `docs/packets/SG-280-deploy-rider-candidate-state-migration.md`
+- `docs/worklogs/SG-280_report.md`
+- `docs/worklogs/SG-284_report.md`, `docs/worklogs/SG-285_report.md`
+Directory listing: `.contract/` only. No repository-wide search performed.
+
+1. Most serious: “a weaker build model shows up as a stop, not as a silent defect” is not established.
+Evidence: SG-286 requires quoting raw mount metadata and cleanup-command lines (`docs/packets/SG-286-recovery-image.md:30–32`), complete changed paths (`:42–43`), and comparing configuration fields beyond Env (`:54`). These outputs are not inherently free of owner identifiers or embedded credentials. A STOP after exposure (`:24`) cannot retract context already sent.
+G4 also starts the recovery image on real-data scratch (`:59`). The context describes commit as preserving Env (`docs/reviews/2026-11-07-recovery-image-context.md:65`); inference: on the commit branch, “no env_file” does not remove inherited image secrets. Settings include provider keys and consent (`backend/app/config.py:33–46`), while startup launches application code (`backend/app/server.py:27–34`). No external-call isolation is specified in G4.
+These are concrete exposure paths, not proof that an actual secret will be emitted or an external call will occur. Docker inheritance semantics remain unverified here.
+Unverified premise: every dangerous mistake either trips a gate before harm or is detected by the same model implementing the gate.
+Settling observation: an independently reviewed, synthetic rehearsal exercising denial, sensitive metadata, raw exception, inherited-environment and unexpected-diff cases, with pre-context output capture and fail-closed controls. This requires separate authorization, not a live-host trial.
+Opinion: SG-286 is not a suitable first safety qualification merely because it changes no product code; it manipulates recovery assets and processes real data.
+
+2. C2 everywhere, starting SG-286, until the owner chooses otherwise.
+Strongest case against: the available evidence establishes a lane default, not the privacy properties of this Haiku account route. The quoted rule names `opencode-go/claude-haiku-5-5 high` (`docs/reviews/2026-11-07-coder-model-privacy-context.md:15`), but supplies no Haiku-specific training, retention, routing or contractual assurance.
+It also says “A slice command may still name Muse”; an owner may choose another list (`:15`). The existing owner policy explicitly names Muse (`AGENTS.md:21`). Therefore the default is not authority to silently replace that choice.
+Unverified premise: the actual Haiku route has acceptable privacy terms, serves the intended model, and supports effective `high`; the pack says an engine override is needed (`privacy-context.md:25`).
+Settling observation: owner approval after account-specific privacy evidence and non-secret runtime/served-model/effective-variant evidence, followed by an authorized synthetic qualification. Pending those, hold sensitive dispatches rather than infer safety from the model name.
+
+3. “The lane default already says so; this lane has both .env and personal data.”
+Strongest case against: Compose declares `env_file: .env` (`docker-compose.yml:17–18`), but declaration does not prove current checkout existence. The pack itself marks host `.env` presence “UNVERIFIED — inference” (`privacy-context.md:21`).
+Nevertheless, declared sensitive data independently supports the recommendation: `AGENTS.md:64` names stored files and the database, and the quoted default has an OR condition (`privacy-context.md:15`). No objection to that narrower rationale after checking both conditions.
+Unverified premise: current host file presence and whether the lane's sensitive-area declaration satisfies the quoted filing condition.
+Settling observation: an authorized boolean presence/classification result, without opening `.env`, plus confirmation of the applicable filing. Missing catalogue/rule files were explicitly waived as an evidence gap; their quotations are used as instructed.
+
+4. Rejecting C3 because code-only work loads .env and contains a household literal.
+Strongest case against: application-process access is not automatically model-context disclosure. `backend/app/config.py:63–66` configures `.env` loading on Settings construction; it does not itself print settings, and actual loading depends on runtime inputs and file presence.
+The household literal exists (`docker-compose.yml:15`; `backend/app/config.py:16`), but its attribution to the owner and privacy classification are unverified. A synthetic/default literal is not proof of owner identity.
+Thus C3 is unproven on this lane, not intrinsically impossible. A sanitized, isolated code workspace could make it safer than R1 implies (opinion); ordinary task wording cannot establish that boundary.
+Unverified premise: code slices necessarily expose private configuration, rather than merely having access to it.
+Settling observation: reviewed input classification and enforced separation from live files, inherited secrets, personal history and automatic instructions, with synthetic negative tests of tool-output/error paths. No such boundary was demonstrated by the files read.
+
+5. Rejecting C1 because training exposure is irreversible and packets constrain writing, not reading.
+Strongest case against: the account-specific training premise is not independently established. The supplied contract quotations state it (`privacy-context.md:15,17`), but no applicable account agreement or routing evidence is included.
+Also, packets do constrain reads: SG-286 forbids opening `.env` and bare inspect output (`:10,22`). Its hash pipeline is designed to keep raw Env out of tool output. Saying packets constrain only writing overstates the case.
+The stronger criticism remains valid: procedural read restrictions are not an enforced pre-context boundary. `.contract/CODER.md:271–274` supports the exception-leak mechanism, not a provider-training finding.
+Unverified premise: the quoted training policy applies without an account-specific exception.
+Settling observation: applicable provider/account terms and route evidence. A verified no-training agreement would weaken the training-based rejection of C1; it would not alone settle retention, disclosure or permission to read owner data.
+
+6. Keeping output prohibitions, hashes and no env_file either way.
+Strongest case against: these mitigations are useful but incomplete. SG-286's required raw metadata/path outputs remain disclosure channels (`:30–32,42–43`); inherited image Env remains distinct from `env_file` (`:45,54,59`).
+Unverified premise: every non-Env field, filename, schema fragment, exception and HTTP-status probe is safe before reaching context.
+Settling observation: independently reviewed output allowlists and synthetic leak controls covering stdout, stderr and failures, not merely the final report. Preserve the mitigations, but do not describe them as proof of exclusion.
+
+7. Comparing the first Haiku rating with recent Muse ratings before SG-271.
+Strongest case against: the inspected recent Muse rows score SG-279=90, SG-281=97 and SG-280=96 (`docs/ratings.md:1034–1036`), across different tasks and mixed/packet attribution. One operations rating is not a controlled comparison of code quality or safety.
+SG-280's report even records a permission-denied scratch attempt followed by an alternative execution path (`docs/worklogs/SG-280_report.md:39`), despite its 96 rating. This is evidence that the scalar score alone cannot establish stop-rule compliance.
+Unverified premise: Haiku at `high` reliably follows SG-286's rules, and performance on one operations slice predicts SG-271 code performance. No measured likelihood is supportable here; “likely adequate” would be opinion.
+Settling observation: record actual served identity/effort, completion, stop-rule violations, disclosure failures, audit-found defects and packet/environment attribution separately; qualify on synthetic cases first. Keep the proposed comparison as a checkpoint, not a safety certificate.
+
+Constraints: repository reads only; no host commands, Docker, credentials, browser, network, database, health probes, tests, restarts, writes, commits or pushes. No denial or read timeout observed. Final-message publication is engine-owned.
+UNCLEAR FIRST READ: rotation/catalogue/reviewer files absent as disclosed; supplied quotations accepted.
+UNCLEAR DURING EXECUTION: ratings output capped/truncated; no complete-history or comparative-performance claim made.
+UNCLEAR REMAINING: account privacy terms, runtime support, actual data classification and enforced pre-context controls.
+Closing: I read only the four G1 files and the extra repository files listed above; neither `STATE.md` nor `docs/decisions/` was read. I wrote nothing.
+Debug-Report-End
+moved=no
