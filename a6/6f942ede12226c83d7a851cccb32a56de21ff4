@@ -1,0 +1,78 @@
+Dispatch-ID: SG-288 | Report: note
+Debug-Report-Begin
+SG-288 | Provisional picks: Q1 C2, subject to owner approval and provider verification; Q2 No; Q3 No demonstrated code-only privacy boundary. Phase A outcome: STOPPED, blind-read integrity breached.
+Identity: model and effort not independently determinable from permitted repository reads; working directory `/tmp/dispatch-review.pODkmg`; remote not inspected.
+BASE ref: `origin/automation`; resolved commit / WORK_HEAD: unknown (snapshot has no `.git`).
+**Contract version: 0.58.0**
+Contract provenance: `.contract/CODER.md:3`; `.contract/SOURCE:1`. No external version check was permitted.
+
+**Read Integrity**
+The requested `.contract/CODERS.md`, `.contract/SECOND_OPINION.md`, and `.contract/coder_models.tsv` were absent, not permission-denied.
+I located and read `.contract/CODER.md` and `.contract/SOURCE` instead; the pack's rotation quotations remain secondary evidence.
+A grep requested against `docs/ratings.md` unexpectedly returned repository-wide excerpts, including prohibited decision files and prior review dispositions.
+Those excerpts entered context. I stopped further inspection; this report cannot be accepted as an uncontaminated blind opinion.
+The answers below are provisional analysis, not a successful Phase A completion. A fresh blind run is required.
+
+Extra files read beyond G1 steps 1–3, including search-result excerpts:
+- `.contract/CODER.md`
+- `.contract/SOURCE`
+- `docs/reviews/review-ledger.md`
+- `docs/reviews/2026-11-02-direction-after-stage-c-context.md`
+- `docs/reviews/2026-10-17-second-opinion-d5-d6-d7-context.md`
+- `docs/history/2026-10-13-state-decisions-preserved.md`
+- `docs/decisions/2026-10-24-session-approvals.md`
+- `docs/decisions/2026-10-17-d5-d6-d7-answers-l4-window.md`
+- `docs/decisions/2026-10-15-contract-050-adoption.md`
+- `docs/decisions/2026-10-23-agents-plain-language-history.md`
+- `docs/decisions/2026-10-30-session-approvals.md`
+- `docs/packets/SG-285-second-opinion-b-critique-recovery-image.md`
+- `docs/packets/SG-201-second-opinion-b-critique.md`
+- `docs/packets/SG-283-second-opinion-b-critique-direction.md`
+- `docs/packets/SG-157-comparison-xhigh.md`
+- `docs/packets/SG-284-second-opinion-a-blind-recovery-image.md`
+- `docs/packets/SG-279-widen-candidate-state-constraint.md`
+- `docs/packets/SG-281-publish-stranded-sg279-commits.md`
+- `docs/worklogs/SG-258_architect.md`
+- `docs/worklogs/SG-200_report.md`
+- `docs/worklogs/SG-027_verify.log`
+- `docs/worklogs/SG-261_architect.md`
+- `docs/worklogs/SG-248_architect.md`
+- `docs/worklogs/SG-279_rehearsal.log`
+- `docs/worklogs/SG-246_architect.md`
+- `docs/worklogs/SG-279_audit.md`
+Directory listings also inspected: repository root and `.contract/`. The ratings read was capped; it was not a complete ledger review.
+
+**Q1**
+(a) PICK: C2, Haiku 5.5 `high` everywhere on this mixed-sensitivity lane, conditional on the owner's choice and verified account terms and runtime support. Until then, hold sensitive dispatches rather than silently substitute.
+(b) WHY: the pack quotes a lane-wide privacy default, not merely a live-operation default (`docs/reviews/2026-11-07-coder-model-privacy-context.md:15`). The lane declares sensitive data (`AGENTS.md:64`), loads `.env` (`docker-compose.yml:17-18`), and settings load it on import (`backend/app/config.py:63-66`). Opinion: C3's exception is unsafe without an enforced clean workspace. This does not establish that Haiku's actual account route is privacy-safe.
+(c) MISSED OPTION: use C3 only with a separately provisioned, reviewed, sanitized code workspace that cannot access live resources. I checked the compose mounts, settings initialization, and rider scratch rules; none establishes that isolation.
+(d) RISKIEST PREMISE: Haiku's configured account route has acceptable training/retention terms and supports `high`. A separately authorized host review should inspect non-secret route and effective-variant metadata plus existing successful-run evidence. Account-specific contractual evidence is also needed; host settings alone cannot prove provider practice. No such observation was performed.
+
+**Q2**
+(a) PICK: outside the C1–C3 labels, No. Packet instructions alone cannot guarantee exclusion of secrets or owner data from model context.
+(b) WHY: the rider instructs “never print a name, id or field value,” yet grants work on real-data copies (`docs/packets/SG-280-deploy-rider-candidate-state-migration.md:58-65`). The contract explicitly warns that sanitized messages can still leak through raw exceptions (`.contract/CODER.md:271-274`). Inference: an instruction governs behavior but does not remove the capability to emit sensitive command output.
+(c) MISSED OPTION: a deterministic, independently reviewed tool interface that exposes only approved aggregate results and withholds unrestricted shell/data access. I checked the rider's permitted runtimes and output restrictions; they are procedural, not evidence of such an interface.
+(d) RISKIEST PREMISE: tools enforce a genuine pre-context boundary, rather than merely redacting the final report. An authorized read-only host review should inspect effective permissions and tool-output filtering paths, without reading credentials or raw owner records. Inspection could establish whether a boundary exists; proving it works also needs a separately authorized synthetic negative test.
+
+**Q3**
+(a) PICK: outside the C1–C3 labels, No demonstrated guarantee. “Code-only task” does not mean “no private context.”
+(b) WHY: repository configuration contains a household-name literal (`docker-compose.yml:15`; `backend/app/config.py:16`), and root guidance contains operational host/account details (`AGENTS.md:12-16`). Whether the household literal identifies the owner is unverified. Settings instantiate with `.env` loading (`backend/app/config.py:63-66`); inference: code/test execution can encounter private configuration unless isolated.
+(c) MISSED OPTION: classify actual accessible inputs and automatically loaded instructions, not the task's label, before granting the Muse exception. I checked root guidance, compose, settings, and rider scratch handling; neither sanitized repository contents nor inaccessible live data was proved.
+(d) RISKIEST PREMISE: a builder's checkout, inherited environment, reports, fixtures, and scratch contain nothing private. An authorized host observer should inspect mount/permission metadata, ignored-path presence, and environment-variable names only, then obtain a local classification result exposing no sensitive matches. A clean secret scan alone would not settle whether ordinary text is owner data.
+
+**G3**
+Training claim: supplied by the pack's contract quotation, not independently verified against this account's terms. If the route has an applicable no-training agreement, the training-based rationale changes; retention and disclosure still require separate assessment.
+Haiku viability: the pack says `max` fails and `high` needs an override (`privacy-context.md:25`). The relevant catalogue and rule files are absent here, so current support is unverified. Existing host run evidence could help; a new smoke run would require separate authorization.
+Repository owner data: the household literal is a concrete classification question, not proof that it is the owner's real name. Sensitive operational details are already present. Therefore C3's “only code” condition is not established.
+Opinion: model choice is one control, not a substitute for least privilege and pre-context output minimization. Hash-only reporting reduces exposure but cannot retract a raw value already returned to the model.
+Binding decisions remain closed: owner authority over providers/models, D23's recovery scope, and declared sensitive surfaces. No objection to those bindings is raised.
+The original SG-280 packet records contract 0.56.0 (`:14`), whereas current guidance and the available contract record 0.58.0. Treat its version line as historical, not current verification.
+No host command, Docker operation, credential read, browser, external network, database access, restart, write, commit, or push was performed. Health checks were excluded by this packet; publication is engine-owned.
+
+UNCLEAR FIRST READ: named rotation, reviewer-rule, and model-catalogue files were unavailable.
+UNCLEAR DURING EXECUTION: file-targeted grep expanded to repository-wide excerpts and breached the blind boundary.
+UNCLEAR REMAINING: account privacy terms, Haiku runtime support, and workspace data classification remain unverified.
+Closing: I read the listed repository material and wrote nothing; `STATE.md` was not read, but prohibited decision excerpts were exposed and deliberately not used as evidence for the provisional picks.
+Verification: STOPPED, blind Phase A must be rerun in a fresh context.
+Debug-Report-End
+moved=no
