@@ -73,3 +73,5 @@ Read-only host observation: inspect store mode, retained tag/digest/platform map
 Read AGENTS.md, the context pack, named evidence/build/runtime files, startup imports, and CODER.md; deliberately did not use STATE.md, docs/decisions/, or SG-280_audit.md. I wrote nothing.
 Debug-Report-End
 moved=no
+
+Settings: coder=opencode coder_source=command model=openai/gpt-6.1-sol model_source=command effort=medium effort_source=command agent=plan agent_source=command
