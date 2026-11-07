@@ -76,3 +76,5 @@ Closing: I read the listed repository material and wrote nothing; `STATE.md` was
 Verification: STOPPED, blind Phase A must be rerun in a fresh context.
 Debug-Report-End
 moved=no
+
+Settings: coder=opencode coder_source=command model=openai/gpt-6.1-sol model_source=command effort=medium effort_source=command agent=plan agent_source=command
