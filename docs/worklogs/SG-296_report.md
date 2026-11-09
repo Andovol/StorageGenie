@@ -84,10 +84,6 @@ Engine elapsed about 2.5 minutes (scratch created 20:44, cleanup 20:46), against
 
 None for the deploy. The first real use of the Expiry and classification flows is the owner's, per the honest limit above.
 
-Verification: PASS
-
----
-
 ## Run 1 (stopped in S0)
 
 ### SG-296 report — deploy rider for SG-271
@@ -153,3 +149,5 @@ Stopped at S0 early. The recreate-to-healthy time is not measured, because no re
 `STATE.md` was not changed (outside this slice's scope).
 
 Verification: STOPPED in S0 — contract chain unverified: the permission rule denies reading `/home/andrei/storagegenie-contract/CODER.md`, so the echo cannot be carried; the app was not touched.
+
+Verification: PASS
