@@ -13,6 +13,7 @@ Built from audits, one row per rated slice (owner, D25, 2026-11-07). Strengths a
 | SG-293 | haiku-5-5, high | ops, live host, exports | 162 s | 96 | yes, literally | none (packet rule too broad) | packet |
 | SG-294 | muse-1.3, xhigh | ops, live host, image created | ~355 s | 98 | yes | none | — |
 | SG-295 | haiku-5-5, high | deploy rider, live migration | 382 s | 97 | yes, every state | none | packet (small) |
+| SG-271 run 1 | muse-1.3, xhigh | build, backend + 4 screens | 2100 s (killed) | unrated, retried | **no** — passed the 1500 s publish point and started an optional goal | nothing pushed; work stranded on host | Coder (publish rule) and packet (slice too big, a droppable goal after the gate) |
 
 ## Haiku 5.5 at `high` — profile
 

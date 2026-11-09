@@ -11,6 +11,8 @@
 
 **Approval:** owner, stage C (*"d14 ok"*, L3); this slice is `STATE.md` ordered work item 2, re-stated by the owner on 2026-11-09.
 
+**RETRY — the one retry this slice gets.** The first run (2026-11-09) was killed at the 2100 s budget past its publish point, still in the optional screenshot goal, with nothing pushed (`SG-271.dbg`: *"NEXT ACTION: change the packet"*). Root-cause fixes here: the screenshot goal is removed, and the publish point is earlier and a stop rule. **Its unfinished work is on this host at `refs/wip/SG-271/20261109T201913Z`** (37 paths, tracked and untracked) and `refs/wip-tracked/SG-271/20261109T201913Z`. **Read it as a reference, never as verified work:** you may bring its changes across, but every test and gate in this packet runs again from the base, and the report says what you took and what you changed. Do not push, delete or move any `refs/wip/*` or `refs/quarantine/*` ref.
+
 **Previous reports' open items that are this slice:** `docs/worklogs/SG-270_report.md` (`needs_evidence` false date task; accepted-candidate reload has no `asset_id`), `docs/worklogs/SG-275_audit.md` I1, and SG-269 findings F4, F5, F7, F8, F11, F12 (`docs/worklogs/SG-269_findings.md`, table rows, read them). F3, F9, F10, F13 are **not** this slice.
 
 ## Design is a requirement, not polish
@@ -66,9 +68,9 @@ An item classified Non-perishable (accepted null expiry, reason `dateless`, `exp
 
 In the Inbox's Selected job (`InboxPage.tsx:~52`, `step.state` rendered raw), a step whose output is `{"status":"skipped", ...}` reads as skipped with its reason in plain words (for `consent_disabled`: the AI is turned off). No backend state change. **Drop this goal first if time is short**, and say so.
 
-## G7 — See the screens (droppable, after the gate)
+## G7 — retired in the retry
 
-Chrome is installed on the host; there is no browser driver. **Establish** whether `chrome --headless --screenshot` (or the installed binary's equivalent) can capture the changed screens from a locally built frontend against a temporary backend inside this slice, in light and dark. If yes, commit PNGs to `docs/worklogs/SG-271_screens/` (Review page committed candidate; asset page with proposed date and preselected shelf life; Expiry page; Inbox step row). If not, say exactly why; **that is not a failure and not a stop.** No network beyond localhost.
+Screenshots moved to SG-273 (the Pantry view), which owns how screens get seen. **Do not run Chrome or start a local app server in this slice.**
 
 ## Tests and the gate
 
@@ -85,7 +87,7 @@ Chrome is installed on the host; there is no browser driver. **Establish** wheth
 - **A3** — G3: a proposed date survives classification with Accept date; a proposed category preselects and is never applied without Confirm.
 - **A4** — G4: one name per concept, every occurrence listed; no API or value renamed.
 - **A5** — G5: the deliberate dateless item is off Unresolved; a truly missing date is still on it.
-- **A6** — Design: every touched screen uses tokens only, works in both themes, new colour pairs are in the contrast test, and the report's design section names each change and why. G7 screenshots or the exact reason none.
+- **A6** — Design: every touched screen uses tokens only, works in both themes, new colour pairs are in the contrast test, and the report's design section names each change and why.
 - **A7** — FAIL-then-PASS logs committed; suites green; affected files twice; `tsc`, lint and build clean; counts quoted.
 - **A8** — Scope is only the files below; zero schema, migration, Dockerfile, compose, lockfile, dependency, `.env`, live database, stored files, host, provider, running-container or deploy bytes.
 - **A9** — Preflight proven before the gate; health 200 at start and end.
@@ -95,22 +97,22 @@ Chrome is installed on the host; there is no browser driver. **Establish** wheth
 ## Scope ceiling
 
 - **Product files:** `backend/app/services/candidates.py`, `backend/app/api/v1/candidates.py`, `backend/app/plugins/expiry_tracker.py`, `backend/app/services/expiry_engine.py`, the candidate schema/serializer module they use, `frontend/src/routes/{ReviewPage,InboxPage,AssetDetailPage,ExpiryPage}.tsx`, `frontend/src/components/{CandidateCard,AssetForm}.tsx`, `frontend/src/components/shell/ItemInspectorDrawer.tsx`, the frontend API types/client, `frontend/src/theme/{tokens.css,theme.test.tsx}` (additions only), and their tests. Another file you find necessary: change it and name why; a product file outside `backend/app`, `backend/tests`, `frontend/src` is a STOP (the evidence paths below are not product files).
-- **Reads of any file are allowed.** Authorised runtimes: the preflight, the `make` gates, the tests, `tsc`, lint, the frontend build, a local temporary backend and frontend for G7 bound to `127.0.0.1`, and headless Chrome for G7. **No other container image is pulled or run.**
+- **Reads of any file are allowed.** Authorised runtimes: the preflight, the `make` gates, the tests, `tsc`, lint, and the frontend build. **No browser, no local app server, no other container image is pulled or run.**
 - Evidence: `docs/worklogs/SG-271*` only.
 - **No deploy, no restart, no touch of the running container or its image tag, the live database or the stored files.** Test rows live only in temporary files (`PG-EV-06`).
 - **A denied privileged operation is a STOP** (`PB-2`, `PG-PR-03`). "STOP and report" is not satisfied by disclosing and carrying on (`PG-EV-03`). Stopping on a false premise is a success.
 
 ## Hang bounds
 
-Preflight **120 s**; host suite **600 s**; frontend suite **600 s**; image proof **300 s**; one test file **300 s**; frontend build **300 s**; one headless Chrome capture **60 s**; ordinary commands **120 s**. No interactive command.
+Preflight **120 s**; host suite **600 s**; frontend suite **600 s**; image proof **300 s**; one test file **300 s**; frontend build **300 s**; ordinary commands **120 s**. No interactive command.
 
 ## Budget
 
-The lane's `RUN_BUDGET_S` (2100 s) is the ceiling. **Publish before the bound at 1500 s:** stop starting new goals, commit what is finished, write the report, publish the receipt. A partial slice with a receipt is a success. Order: G0, G1, G2, G3, G5, G4, gate, G6, G7. Report elapsed at each transition. Expected ≈1300 s (`UNVERIFIED — my estimate`; a larger multi-goal slice than SG-279).
+The lane's `RUN_BUDGET_S` (2100 s) is the ceiling. **THE PUBLISH POINT IS 1300 s ELAPSED, AND IT IS A STOP RULE, NOT A TARGET.** The first run passed its publish point, kept working on a droppable goal, and was killed at 2100 s with nothing pushed — a total loss. At 1300 s, **whatever goal you are in, stop it where it stands**: commit what passes, write the report (unfinished goals as `REMAINING`), push, publish the receipt. Check the elapsed time **before starting each goal and before each suite run**, and write it in the report. A partial slice with a receipt is a success; a complete slice with no receipt is a failure. Order: G0, G1, G2, G3, G5, G4, gate, G6. Expected ≈1100 s with the first run's work as a reference (`UNVERIFIED — my estimate`).
 
 ## Report
 
-Destination: `docs/worklogs/SG-271_report.md`, evidence beside it (`docs/worklogs/SG-271_*.log`, `docs/worklogs/SG-271_screens/`). The first line states the slice ID, model and effort read from the process arguments (never a system-prompt label), working directory, remote, BASE ref and resolved BASE commit, and WORK_HEAD. Then: a **design section** per screen; elapsed against ≈1300 s with every phase over 60 s named; changed files; test counts; logs; the contract echo; every `UNCLEAR` / `REMAINING` line; one line per constraint.
+Destination: `docs/worklogs/SG-271_report.md`, evidence beside it (`docs/worklogs/SG-271_*.log`). The first line states the slice ID, model and effort read from the process arguments (never a system-prompt label), working directory, remote, BASE ref and resolved BASE commit, and WORK_HEAD. Then: a **design section** per screen; elapsed against ≈1100 s with every phase over 60 s named; changed files; test counts; logs; the contract echo; every `UNCLEAR` / `REMAINING` line; one line per constraint.
 
 Commit with the trailer `Dispatch-ID: SG-271`, then `git push origin automation`. **Hash equality:** after the push, `git rev-parse HEAD` equals `git rev-parse origin/automation`; quote both.
 
