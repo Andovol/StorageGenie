@@ -195,6 +195,40 @@ export async function uploadEvidence(
   return r.json();
 }
 
+// SG-272 G1/G2: one all-or-nothing Gone action with a reason, and its Put-back undo.
+export function markGone(assetId: string, householdId: string, reason: string) {
+  return apiPost<import("./types").Asset>(
+    `/v1/assets/${assetId}/gone`,
+    { reason },
+    { household_id: householdId }
+  );
+}
+
+export function putBack(assetId: string, householdId: string) {
+  return apiPost<import("./types").Asset>(
+    `/v1/assets/${assetId}/put-back`,
+    {},
+    { household_id: householdId }
+  );
+}
+
+// SG-272 G3: server-side −1/+1 so two quick taps from a stale view cannot lose one.
+export function decrementQuantity(assetId: string, householdId: string) {
+  return apiPost<import("./types").Asset>(
+    `/v1/assets/${assetId}/quantity/decrement`,
+    {},
+    { household_id: householdId }
+  );
+}
+
+export function incrementQuantity(assetId: string, householdId: string) {
+  return apiPost<import("./types").Asset>(
+    `/v1/assets/${assetId}/quantity/increment`,
+    {},
+    { household_id: householdId }
+  );
+}
+
 export function candidateDecision(
   candidateId: string,
   householdId: string,

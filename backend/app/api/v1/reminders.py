@@ -16,7 +16,7 @@ from app.db import get_db
 from app.models.asset import Asset
 from app.models.household import Household
 from app.models.reminder import Reminder
-from app.services import expiry_engine
+from app.services import expiry_engine, lifecycle
 from app.services.reminders.service import window_days_for
 
 router = APIRouter()
@@ -69,12 +69,19 @@ def list_reminders(
     household_id: str = Query(...),
     db: Session = Depends(get_db),
 ) -> dict[str, object]:
-    """Every reminder for one household, unread first then most urgent first."""
+    """Every reminder for one household, unread first then most urgent first.
+
+    SG-272 G1/G2: a gone item shows no reminder until it is put back. Rows are
+    never mutated by gone/put-back; the list joins the asset and admits ACTIVE
+    assets only, so hiding and restoring are automatic and the cycle restores
+    the same visible state. `unread_count` is owned by this same visible set.
+    """
     if db.query(Household).filter_by(id=household_id).first() is None:
         raise HTTPException(status_code=404, detail="Household not found")
     rows = (
         db.query(Reminder)
-        .filter(Reminder.household_id == household_id)
+        .join(Asset, Asset.id == Reminder.asset_id)
+        .filter(Reminder.household_id == household_id, lifecycle.active_clause())
         .order_by(
             case((Reminder.status == "unread", 0), else_=1),
             Reminder.days_remaining,

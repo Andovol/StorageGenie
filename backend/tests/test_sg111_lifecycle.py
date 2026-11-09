@@ -2,7 +2,9 @@
 
 The transition expectations below are an INDEPENDENT oracle typed from the
 blueprint (``DRAFT -> PENDING_REVIEW -> ACTIVE -> ARCHIVED -> DISPOSED`` plus the
-reserved ``ACTIVE -> MERGED``), never imported from the module under test. The
+reserved ``ACTIVE -> MERGED``), never imported from the module under test, with
+the SG-272 owner-approved exception (Q22) that a gone item can be put back
+(``ARCHIVED -> ACTIVE``; DISPOSED and MERGED stay terminal). The
 API matrix drives every ordered pair through the REAL ``PATCH /v1/assets/{id}``
 route, so the fail half of the fail-then-pass is a genuine behaviour difference
 (base has no validation and answers 200), not a missing-module import error.
@@ -32,7 +34,8 @@ LEGAL: dict[str, set[str]] = {
     "DRAFT": {"PENDING_REVIEW"},
     "PENDING_REVIEW": {"ACTIVE"},
     "ACTIVE": {"ARCHIVED", "MERGED"},
-    "ARCHIVED": {"DISPOSED"},
+    # SG-272: the owner's approved undo (Q22) — a gone item can be put back.
+    "ARCHIVED": {"DISPOSED", "ACTIVE"},
     "DISPOSED": set(),
     "MERGED": set(),
 }

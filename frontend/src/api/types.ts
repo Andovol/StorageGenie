@@ -30,12 +30,30 @@ export type AuditEvent = {
   after: unknown;
   timestamp: string | null;
 };
+// SG-272 G1 (Q22): the three gone reasons. Stored as slugs; screens show
+// only plain words (Used up, Thrown away, Given away).
+export type GoneReason = "used_up" | "thrown_away" | "given_away";
+export const GONE_REASONS: readonly GoneReason[] = ["used_up", "thrown_away", "given_away"];
+export const GONE_REASON_LABELS: Record<GoneReason, string> = {
+  used_up: "Used up",
+  thrown_away: "Thrown away",
+  given_away: "Given away",
+};
+export function goneReasonLabel(reason: string | null | undefined): string | null {
+  if (reason === "used_up" || reason === "thrown_away" || reason === "given_away") {
+    return GONE_REASON_LABELS[reason];
+  }
+  return null;
+}
 export type Asset = {
   id: string;
   household_id: string;
   display_name: string | null;
   asset_type: string;
   status: string;
+  // SG-272 G1/G2 (`PG-SC-02` read-back): the gone reason rides the list and
+  // detail payloads; null on live or never-gone items.
+  gone_reason?: GoneReason | string | null;
   quantity: number | null;
   unit: string | null;
   condition: string | null;

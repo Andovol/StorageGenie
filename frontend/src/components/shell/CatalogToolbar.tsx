@@ -35,10 +35,14 @@ export function sortCatalog(items: ProductItem[], sort: SortOption): ProductItem
   return sorted;
 }
 
+export type CatalogStatusFilter = "live" | "gone";
+
 type CatalogToolbarProps = {
   categories: readonly string[];
   activeCategory: string;
   onCategoryChange: (category: string) => void;
+  statusFilter: CatalogStatusFilter;
+  onStatusFilterChange: (status: CatalogStatusFilter) => void;
   sort: SortOption;
   onSortChange: (sort: SortOption) => void;
   density: Density;
@@ -72,6 +76,8 @@ export function CatalogToolbar({
   categories,
   activeCategory,
   onCategoryChange,
+  statusFilter,
+  onStatusFilterChange,
   sort,
   onSortChange,
   density,
@@ -114,6 +120,24 @@ export function CatalogToolbar({
         borderBottomWidth: 1,
       }}
     >
+      <div role="group" aria-label="Live or gone" style={{ display: "inline-flex", gap: 4 }}>
+        {(["live", "gone"] as CatalogStatusFilter[]).map((option) => {
+          const active = option === statusFilter;
+          return (
+            <button
+              key={option}
+              type="button"
+              aria-pressed={active}
+              onClick={() => onStatusFilterChange(option)}
+              className={`${active ? "bg-primary text-primary-foreground" : "bg-card-muted text-muted-foreground"} focus-ring`}
+              style={{ ...CONTROL_STYLE, fontWeight: active ? 600 : 400 }}
+            >
+              {option === "live" ? "Live" : "Gone"}
+            </button>
+          );
+        })}
+      </div>
+
       {categories.map((category) => {
         const active = category === activeCategory;
         return (

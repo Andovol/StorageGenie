@@ -270,7 +270,7 @@ export function ExpiryPage() {
           <section aria-label="Unresolved" style={{ marginTop: 20 }}>
             <h2 style={{ fontSize: 15 }}>Unresolved ({unresolved.length})</h2>
             {(data.summary.dateless ?? 0) > 0 && (
-              <div role="status" className="text-muted-foreground" style={{ fontSize: 12, marginBottom: 6 }}>
+              <div role="status" className="text-muted-foreground" style={{ fontSize: 13, marginBottom: 6 }}>
                 {data.summary.dateless} {data.summary.dateless === 1 ? "item is" : "items are"} set to need no date — nothing to do here.
               </div>
             )}

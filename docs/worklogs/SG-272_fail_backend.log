@@ -1,0 +1,167 @@
+FFFFFF                                                                   [100%]
+=================================== FAILURES ===================================
+_________________ test_cycle_gone_and_back_restores_everything _________________
+
+gone_db = (<sqlalchemy.orm.session.Session object at 0x7921044f9220>, '01a1c227-127f-76f0-9966-6e3f4b9b3fb6', '01a1c227-127f-76f0-9966-6e435088e5f3')
+
+    def test_cycle_gone_and_back_restores_everything(gone_db) -> None:  # type: ignore[no-untyped-def]
+        session, household_id, _ = gone_db
+        with TestClient(app) as client:
+            asset_id = _live_asset(client, session, household_id)
+            first = _snapshot(client, household_id)
+            assert asset_id in first["catalog"]
+            assert asset_id in first["expiry_rows"]
+            assert asset_id in first["reminders"]
+            assert asset_id in first["tasks"]
+    
+            gone = client.post(
+                f"/v1/assets/{asset_id}/gone",
+                params={"household_id": household_id},
+                json={"reason": "used_up"},
+            )
+>           assert gone.status_code == 200, gone.text
+E           AssertionError: {"detail":"Method Not Allowed"}
+E           assert 405 == 200
+E            +  where 405 = <Response [405 Method Not Allowed]>.status_code
+
+tests/test_sg272_flow.py:148: AssertionError
+_________________ test_gone_all_or_nothing_on_injected_failure _________________
+
+gone_db = (<sqlalchemy.orm.session.Session object at 0x792103b254c0>, '01a1c227-13ec-7373-9dbb-57389c664d3a', '01a1c227-13ec-7373-9dbb-57497ce9f70d')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x792103b25850>
+
+    def test_gone_all_or_nothing_on_injected_failure(gone_db, monkeypatch: pytest.MonkeyPatch) -> None:  # type: ignore[no-untyped-def]
+        session, household_id, _ = gone_db
+        with TestClient(app) as client:
+            asset_id = _live_asset(client, session, household_id)
+            _fresh(session)
+            before_status = session.query(Asset).filter_by(id=asset_id).one().status
+            before_version = session.query(Asset).filter_by(id=asset_id).one().version
+            before_assertions = session.query(Assertion).filter_by(asset_id=asset_id).count()
+    
+            real_upsert = asset_service.upsert_assertion
+            calls = {"n": 0}
+    
+            def _failing_upsert(db: Session, asset_id_arg: str, field_path: str, value: object, household_id: str, **kwargs: object):  # type: ignore[no-untyped-def]
+                calls["n"] += 1
+                if field_path == asset_service.GONE_REASON_FIELD:
+                    raise RuntimeError("injected mid-action failure")
+                return real_upsert(db, asset_id_arg, field_path, value, household_id, **kwargs)
+    
+            monkeypatch.setattr(asset_service, "upsert_assertion", _failing_upsert)
+>           with pytest.raises(RuntimeError, match="injected mid-action failure"):
+E           Failed: DID NOT RAISE RuntimeError
+
+tests/test_sg272_flow.py:198: Failed
+____________________ test_three_reasons_store_and_read_back ____________________
+
+gone_db = (<sqlalchemy.orm.session.Session object at 0x7921039a3b30>, '01a1c227-1493-74a3-b056-77fb70155296', '01a1c227-1493-74a3-b056-7809fe22ae8d')
+
+    def test_three_reasons_store_and_read_back(gone_db) -> None:  # type: ignore[no-untyped-def]
+        _, household_id, _ = gone_db
+        with TestClient(app) as client:
+            for reason in ("used_up", "thrown_away", "given_away"):
+                asset = _create(client, household_id)
+                asset_id = str(asset["id"])
+                gone = client.post(
+                    f"/v1/assets/{asset_id}/gone",
+                    params={"household_id": household_id},
+                    json={"reason": reason},
+                )
+>               assert gone.status_code == 200, gone.text
+E               AssertionError: {"detail":"Method Not Allowed"}
+E               assert 405 == 200
+E                +  where 405 = <Response [405 Method Not Allowed]>.status_code
+
+tests/test_sg272_flow.py:226: AssertionError
+__________________ test_gone_refusals_terminals_and_household __________________
+
+gone_db = (<sqlalchemy.orm.session.Session object at 0x792102632c90>, '01a1c227-1508-79b0-9117-8ee33eee461d', '01a1c227-1508-79b0-9117-8ef9dd92626f')
+
+    def test_gone_refusals_terminals_and_household(gone_db) -> None:  # type: ignore[no-untyped-def]
+        session, household_id, other_id = gone_db
+        with TestClient(app) as client:
+            asset_id = str(_create(client, household_id)["id"])
+            unknown = client.post(
+                f"/v1/assets/{asset_id}/gone",
+                params={"household_id": household_id},
+                json={"reason": "recycled"},
+            )
+>           assert unknown.status_code == 422
+E           assert 405 == 422
+E            +  where 405 = <Response [405 Method Not Allowed]>.status_code
+
+tests/test_sg272_flow.py:252: AssertionError
+_________________ test_quantity_decrement_floor_and_increment __________________
+
+gone_db = (<sqlalchemy.orm.session.Session object at 0x792102812f60>, '01a1c227-157d-7d12-a295-cd1fd5615f8b', '01a1c227-157d-7d12-a295-cd2b3f100c5d')
+
+    def test_quantity_decrement_floor_and_increment(gone_db) -> None:  # type: ignore[no-untyped-def]
+        _, household_id, _ = gone_db
+        with TestClient(app) as client:
+            asset_id = str(_create(client, household_id, quantity=2, unit="pcs")["id"])
+            first = client.post(
+                f"/v1/assets/{asset_id}/quantity/decrement",
+                params={"household_id": household_id},
+            )
+>           assert first.status_code == 200, first.text
+E           AssertionError: {"detail":"Method Not Allowed"}
+E           assert 405 == 200
+E            +  where 405 = <Response [405 Method Not Allowed]>.status_code
+
+tests/test_sg272_flow.py:369: AssertionError
+________________ test_cleared_perishable_date_lists_as_no_date _________________
+
+gone_db = (<sqlalchemy.orm.session.Session object at 0x7921026a2ff0>, '01a1c227-15f8-7172-bcb7-8734a5a8ae43', '01a1c227-15f8-7172-bcb7-8747b7165398')
+
+    def test_cleared_perishable_date_lists_as_no_date(gone_db) -> None:  # type: ignore[no-untyped-def]
+        session, household_id, _ = gone_db
+        with TestClient(app) as client:
+            asset = _create(client, household_id, quantity=1)
+            asset_id = str(asset["id"])
+            _classify(client, asset_id, household_id, "food_beverages")
+            _enter_expiry(
+                client, asset_id, household_id, (date.today() + timedelta(days=9)).isoformat()
+            )
+            before = client.get(
+                "/v1/plugins/expiry-tracker/status", params={"household_id": household_id}
+            ).json()
+            assert asset_id in [row["asset_id"] for row in before["rows"]]
+    
+            cleared = client.post(
+                f"/v1/plugins/expiry-tracker/assets/{asset_id}/expiry/clear",
+                params={"household_id": household_id},
+                json={},
+            )
+            assert cleared.status_code == 200, cleared.text
+    
+            after = client.get(
+                "/v1/plugins/expiry-tracker/status", params={"household_id": household_id}
+            ).json()
+            assert asset_id not in [row["asset_id"] for row in after["rows"]]
+            unresolved = {row["asset_id"]: row["reason"] for row in after["unresolved_rows"]}
+>           assert unresolved.get(asset_id) == "dateless"
+E           AssertionError: assert None == 'dateless'
+E            +  where None = <built-in method get of dict object at 0x7921026d6400>('01a1c227-15ff-7911-ae78-21ba3a79da09')
+E            +    where <built-in method get of dict object at 0x7921026d6400> = {}.get
+
+tests/test_sg272_flow.py:438: AssertionError
+=============================== warnings summary ===============================
+venv/lib/python3.12/site-packages/fastapi/testclient.py:1
+  /home/andrei/StorageGenie/backend/venv/lib/python3.12/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+venv/lib/python3.12/site-packages/starlette/testclient.py:53
+  /home/andrei/StorageGenie/backend/venv/lib/python3.12/site-packages/starlette/testclient.py:53: DeprecationWarning: The anyio.abc.BlockingPortal alias is deprecated, use anyio.from_thread.BlockingPortal instead.
+    _PortalFactoryType = Callable[[], AbstractContextManager[anyio.abc.BlockingPortal]]
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/test_sg272_flow.py::test_cycle_gone_and_back_restores_everything
+FAILED tests/test_sg272_flow.py::test_gone_all_or_nothing_on_injected_failure
+FAILED tests/test_sg272_flow.py::test_three_reasons_store_and_read_back - Ass...
+FAILED tests/test_sg272_flow.py::test_gone_refusals_terminals_and_household
+FAILED tests/test_sg272_flow.py::test_quantity_decrement_floor_and_increment
+FAILED tests/test_sg272_flow.py::test_cleared_perishable_date_lists_as_no_date
+6 failed, 2 warnings in 2.12s
+PYTEST_RC=1

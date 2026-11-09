@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import type { SavedSearch } from "../../api/types";
 import { AppHeader } from "./AppHeader";
-import { CatalogToolbar, type Density, type SortOption } from "./CatalogToolbar";
+import { CatalogToolbar, type CatalogStatusFilter, type Density, type SortOption } from "./CatalogToolbar";
 import { PageContainer } from "./PageContainer";
 
 type AppShellProps = {
@@ -11,6 +11,8 @@ type AppShellProps = {
   categories: readonly string[];
   activeCategory: string;
   onCategoryChange: (category: string) => void;
+  statusFilter: CatalogStatusFilter;
+  onStatusFilterChange: (status: CatalogStatusFilter) => void;
   sort: SortOption;
   onSortChange: (sort: SortOption) => void;
   density: Density;
@@ -32,6 +34,8 @@ export function AppShell({
   categories,
   activeCategory,
   onCategoryChange,
+  statusFilter,
+  onStatusFilterChange,
   sort,
   onSortChange,
   density,
@@ -53,6 +57,8 @@ export function AppShell({
           categories={categories}
           activeCategory={activeCategory}
           onCategoryChange={onCategoryChange}
+          statusFilter={statusFilter}
+          onStatusFilterChange={onStatusFilterChange}
           sort={sort}
           onSortChange={onSortChange}
           density={density}

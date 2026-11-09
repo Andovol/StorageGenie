@@ -65,7 +65,25 @@ def list_review_tasks(
         next_cursor = None
     # SG-270 G4: resolve each page's subject kind with one batched lookup per
     # subject table, never one query per row.
+    # SG-272 G1/G2: a gone item's asset-subject tasks hide until it is put
+    # back. Rows are never mutated by gone/put-back; the list drops page items
+    # whose subject asset is non-ACTIVE (one batched status lookup), so hiding
+    # and restoring are automatic. `total` stays the household row count.
     subject_refs = {item.subject_ref for item in items}
+    gone_asset_refs: set[str] = set()
+    if subject_refs:
+        gone_asset_refs = {
+            str(row[0])
+            for row in db.query(Asset.id)
+            .filter(
+                Asset.id.in_(subject_refs),
+                Asset.household_id == household_id,
+                Asset.status != "ACTIVE",
+            )
+            .all()
+        }
+        if gone_asset_refs:
+            items = [item for item in items if item.subject_ref not in gone_asset_refs]
     candidate_ids: set[str] = set()
     asset_ids: set[str] = set()
     if subject_refs:

@@ -10,7 +10,8 @@ importing it from a reader would widen that graph for no reason. Here the only
 import is the model.
 
 Blueprint §4.3 legal flow: `DRAFT -> PENDING_REVIEW -> ACTIVE -> ARCHIVED ->
-DISPOSED`, plus the reserved `ACTIVE -> MERGED` redirect target. A `MERGED`
+DISPOSED`, plus the reserved `ACTIVE -> MERGED` redirect target and the SG-272
+owner-approved `ARCHIVED -> ACTIVE` put-back edge (Q22). A `MERGED`
 asset whose redirect has not been written yet (SG-112) reads as the terminal
 state, never a dangling pointer (`PG-SC-07`). A same-status request is a no-op,
 not a transition: it reaches no new state, so the map has nothing to forbid.
@@ -44,7 +45,9 @@ TRANSITIONS: dict[str, frozenset[str]] = {
     DRAFT: frozenset({PENDING_REVIEW}),
     PENDING_REVIEW: frozenset({ACTIVE}),
     ACTIVE: frozenset({ARCHIVED, MERGED}),
-    ARCHIVED: frozenset({DISPOSED}),
+    # SG-272 G1: the owner's approved undo (Q22) — a gone item can be put
+    # back. Only this edge is added; DISPOSED and MERGED stay terminal.
+    ARCHIVED: frozenset({DISPOSED, ACTIVE}),
     DISPOSED: frozenset(),
     MERGED: frozenset(),
 }

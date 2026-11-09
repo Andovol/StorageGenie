@@ -12,10 +12,14 @@ import {
   assignAssetLocation,
   classifyAsset,
   createRelation,
+  decrementQuantity,
   deleteRelation,
   fetchHouseholdAssets,
   fetchLocations,
   fetchRelations,
+  incrementQuantity,
+  markGone,
+  putBack,
   unassignAssetLocation,
   uploadEvidence,
 } from "../api/client";
@@ -25,9 +29,12 @@ import type {
   AssetRelation,
   Assertion,
   EnrichResponse,
+  GoneReason,
   LocationListResponse,
   RelationListResponse,
 } from "../api/types";
+import { goneReasonLabel } from "../api/types";
+import { CONTROL_STYLE, THEMED_CONTROL_CLASS } from "../components/shell/CatalogToolbar";
 import { WebAlternates } from "../components/WebAlternates";
 import { UNTITLED_ASSET_NAME } from "../types/product";
 
@@ -35,6 +42,31 @@ import { UNTITLED_ASSET_NAME } from "../types/product";
 // a stated ceiling, not a measured cost. The button shows the last measured
 // spend and refuses a press above the cap with a named reason.
 export const ENRICH_PER_PRESS_CAP_USD = 0.05;
+
+// SG-272 G3 (Q22): the counted rule. A unit of ml, l, g or kg (and their
+// written-out names) is an amount — taking off "1" means nothing there, so it
+// gets a quick edit instead of −1. Everything else (empty, pcs, bottles, cups,
+// piece, dose, tablet, …) is counted and gets the one-tap −1 with a way back
+// up. The rule is the design call, written down here and shared by the tests.
+const AMOUNT_UNITS = new Set([
+  "ml",
+  "milliliter",
+  "millilitre",
+  "l",
+  "liter",
+  "litre",
+  "g",
+  "gram",
+  "grams",
+  "kg",
+  "kilogram",
+  "kilograms",
+]);
+
+export function isCountedUnit(unit: string | null | undefined): boolean {
+  if (!unit || unit.trim() === "") return true;
+  return !AMOUNT_UNITS.has(unit.trim().toLowerCase());
+}
 
 export function enrichCapRefusal(
   projectedSpendUsd: number,
@@ -306,6 +338,10 @@ export function AssetDetailPage() {
   const [classificationChoice, setClassificationChoice] = useState<string | null>(null);
   const [classificationMessage, setClassificationMessage] = useState<string | null>(null);
   const [classificationError, setClassificationError] = useState<string | null>(null);
+  const [goneMessage, setGoneMessage] = useState<string | null>(null);
+  const [goneError, setGoneError] = useState<string | null>(null);
+  const [qtyMessage, setQtyMessage] = useState<string | null>(null);
+  const [qtyError, setQtyError] = useState<string | null>(null);
 
   const assertions = asset?.assertions || [];
   const classificationAssertion = latestActiveAssertion(
@@ -386,6 +422,63 @@ export function AssetDetailPage() {
     onError: (e: unknown) => setError(e instanceof Error ? e.message : String(e)),
   });
 
+  const goneMut = useMutation({
+    mutationFn: (reason: GoneReason) => markGone(asset?.id ?? "", householdId, reason),
+    onSuccess: (updated) => {
+      qc.invalidateQueries({ queryKey: ["asset", id] });
+      qc.invalidateQueries({ queryKey: ["assets"] });
+      const label = goneReasonLabel(updated.gone_reason) ?? "gone";
+      setGoneMessage(`Marked as ${label.toLowerCase()}. Undo with Put back.`);
+      setGoneError(null);
+    },
+    onError: (e: unknown) => {
+      setGoneError(e instanceof Error ? e.message : String(e));
+      setGoneMessage(null);
+    },
+  });
+
+  const putBackMut = useMutation({
+    mutationFn: () => putBack(asset?.id ?? "", householdId),
+    onSuccess: (updated) => {
+      qc.invalidateQueries({ queryKey: ["asset", id] });
+      qc.invalidateQueries({ queryKey: ["assets"] });
+      setGoneMessage(`“${updated.display_name || "Item"}” is back in your catalog.`);
+      setGoneError(null);
+    },
+    onError: (e: unknown) => {
+      setGoneError(e instanceof Error ? e.message : String(e));
+      setGoneMessage(null);
+    },
+  });
+
+  const decMut = useMutation({
+    mutationFn: () => decrementQuantity(asset?.id ?? "", householdId),
+    onSuccess: (updated) => {
+      qc.invalidateQueries({ queryKey: ["asset", id] });
+      qc.invalidateQueries({ queryKey: ["assets"] });
+      setQtyError(null);
+      setQtyMessage(updated.quantity != null ? `Now ${updated.quantity} left.` : "Quantity changed.");
+    },
+    onError: (e: unknown) => {
+      setQtyError(e instanceof Error ? e.message : String(e));
+      setQtyMessage(null);
+    },
+  });
+
+  const incMut = useMutation({
+    mutationFn: () => incrementQuantity(asset?.id ?? "", householdId),
+    onSuccess: (updated) => {
+      qc.invalidateQueries({ queryKey: ["asset", id] });
+      qc.invalidateQueries({ queryKey: ["assets"] });
+      setQtyError(null);
+      setQtyMessage(updated.quantity != null ? `Now ${updated.quantity} left.` : "Quantity changed.");
+    },
+    onError: (e: unknown) => {
+      setQtyError(e instanceof Error ? e.message : String(e));
+      setQtyMessage(null);
+    },
+  });
+
   const attachMut = useMutation({
     mutationFn: async () => {
       if (!attachFiles?.length || !id) throw new Error("No files selected");
@@ -421,6 +514,19 @@ export function AssetDetailPage() {
   const evidence = (asset as unknown as { evidence: { id: string; storage_key: string; sha256: string; original_filename: string }[] }).evidence || [];
   const audits = (asset as unknown as { audit_events: { id: string; action: string; actor: string; timestamp: string; before: unknown; after: unknown }[] }).audit_events || [];
   const displayName = asset.display_name || UNTITLED_ASSET_NAME;
+  const goneFromPayload = goneReasonLabel(asset.gone_reason);
+  const goneFromAssertion = (() => {
+    const entry = latestActiveAssertion(assertions, "gone.reason");
+    if (!entry) return null;
+    const value = valueRecord(entry.value);
+    const raw = value ? value["reason"] : entry.value;
+    return goneReasonLabel(typeof raw === "string" ? raw : null);
+  })();
+  const goneLabel = goneFromPayload ?? goneFromAssertion;
+  const isGone = asset.status === "ARCHIVED" || goneLabel !== null;
+  const counted = isCountedUnit(asset.unit);
+  const qtyValue = asset.quantity ?? null;
+  const noneLeft = !isGone && counted && (qtyValue ?? 0) <= 0;
   const saveClassification = () => {
     if (!effectiveCategory || classifyMut.isPending) return;
     if (
@@ -453,7 +559,7 @@ export function AssetDetailPage() {
         </button>
       </div>
       <div className="text-muted-foreground" style={{ marginBottom: 12, fontSize: 13 }}>
-        {asset.asset_type} · {asset.status} · v{asset.version} · {asset.household_id.slice(0, 8)}
+        {asset.asset_type} · {isGone ? `Gone${goneLabel ? ` — ${goneLabel}` : ""}` : "Live"} · v{asset.version} · {asset.household_id.slice(0, 8)}
         {asset.quantity != null && <> · qty {asset.quantity} {asset.unit || ""}</>}
         {asset.condition && <> · {asset.condition}</>}
       </div>
@@ -496,17 +602,17 @@ export function AssetDetailPage() {
           </div>
         )}
         {!classificationAssertion && suggestedName && (
-          <div role="status" className="text-muted-foreground" style={{ fontSize: 12, marginTop: 6 }}>
+          <div role="status" className="text-muted-foreground" style={{ fontSize: 13, marginTop: 6 }}>
             The AI suggests {suggestedName}. Confirm below, or pick another shelf life.
           </div>
         )}
         {!classificationAssertion && !suggestedName && proposedText && (
-          <div role="status" className="text-muted-foreground" style={{ fontSize: 12, marginTop: 6 }}>
+          <div role="status" className="text-muted-foreground" style={{ fontSize: 13, marginTop: 6 }}>
             The AI suggested “{proposedText}”, which matches no shelf life — pick the closest one below.
           </div>
         )}
         {!classificationAssertion && (
-          <div role="status" className="text-muted-foreground" style={{ fontSize: 12, marginTop: 6 }}>
+          <div role="status" className="text-muted-foreground" style={{ fontSize: 13, marginTop: 6 }}>
             Choose a shelf life, then add a date if it has one.
           </div>
         )}
@@ -525,6 +631,93 @@ export function AssetDetailPage() {
         )}
         {classificationError && (
           <div role="alert" className="text-danger" style={{ fontSize: 12, marginTop: 6 }}>{classificationError}</div>
+        )}
+      </section>
+
+      <section aria-label="Amount left" style={{ marginBottom: 16 }}>
+        <h3>Amount left</h3>
+        {counted ? (
+          <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
+            <button
+              type="button"
+              aria-label="Take off 1"
+              onClick={() => decMut.mutate()}
+              disabled={decMut.isPending || isGone || (qtyValue ?? 0) <= 0}
+              className={THEMED_CONTROL_CLASS}
+              style={{ ...CONTROL_STYLE, opacity: decMut.isPending || isGone || (qtyValue ?? 0) <= 0 ? 0.5 : 1 }}
+            >
+              {decMut.isPending ? "…" : "−1"}
+            </button>
+            <span className="text-foreground" style={{ fontSize: 13 }}>
+              {qtyValue != null ? `${qtyValue}${asset.unit ? ` ${asset.unit}` : ""} left` : "No count yet"}
+            </span>
+            <button
+              type="button"
+              aria-label="Put 1 back on the count"
+              onClick={() => incMut.mutate()}
+              disabled={incMut.isPending || isGone}
+              className={THEMED_CONTROL_CLASS}
+              style={{ ...CONTROL_STYLE, opacity: incMut.isPending || isGone ? 0.5 : 1 }}
+            >
+              {incMut.isPending ? "…" : "+1"}
+            </button>
+          </div>
+        ) : (
+          <div className="text-muted-foreground" style={{ fontSize: 13 }}>
+            {qtyValue != null ? `${qtyValue}${asset.unit ? ` ${asset.unit}` : ""} left` : "No amount yet"} — change the amount with Edit above.
+          </div>
+        )}
+        {noneLeft && (
+          <div role="status" className="text-muted-foreground" style={{ fontSize: 13, marginTop: 6 }}>
+            None left — mark it gone below.
+          </div>
+        )}
+        {qtyMessage && (
+          <div role="status" className="text-success" style={{ fontSize: 13, marginTop: 6 }}>{qtyMessage}</div>
+        )}
+        {qtyError && (
+          <div role="alert" className="text-danger" style={{ fontSize: 13, marginTop: 6 }}>{qtyError}</div>
+        )}
+      </section>
+
+      <section aria-label="Use it up" style={{ marginBottom: 16 }}>
+        <h3>Use it up</h3>
+        {isGone ? (
+          <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
+            <span role="status" className="text-muted-foreground" style={{ fontSize: 13 }}>
+              Gone{goneLabel ? ` — ${goneLabel.toLowerCase()}` : ""}
+            </span>
+            <button
+              type="button"
+              onClick={() => putBackMut.mutate()}
+              disabled={putBackMut.isPending}
+              className="bg-primary text-primary-foreground focus-ring"
+              style={{ padding: "6px 12px", borderRadius: 6, border: "none", cursor: "pointer" }}
+            >
+              {putBackMut.isPending ? "Putting back…" : "Put back"}
+            </button>
+          </div>
+        ) : (
+          <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
+            {(["used_up", "thrown_away", "given_away"] as GoneReason[]).map((reason) => (
+              <button
+                key={reason}
+                type="button"
+                onClick={() => goneMut.mutate(reason)}
+                disabled={goneMut.isPending}
+                className={THEMED_CONTROL_CLASS}
+                style={CONTROL_STYLE}
+              >
+                {goneReasonLabel(reason)}
+              </button>
+            ))}
+          </div>
+        )}
+        {goneMessage && (
+          <div role="status" className="text-success" style={{ fontSize: 13, marginTop: 6 }}>{goneMessage}</div>
+        )}
+        {goneError && (
+          <div role="alert" className="text-danger" style={{ fontSize: 13, marginTop: 6 }}>{goneError}</div>
         )}
       </section>
 

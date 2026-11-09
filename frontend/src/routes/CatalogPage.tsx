@@ -1,4 +1,6 @@
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
+import { Link } from "react-router-dom";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   useAssets,
   useDeleteSavedSearch,
@@ -6,6 +8,7 @@ import {
   useSaveSearch,
   useSavedSearches,
 } from "../hooks/useAssets";
+import { putBack } from "../api/client";
 import { useHouseholdContext } from "../hooks/HouseholdContext";
 import { ProductGrid } from "../components/catalog/ProductGrid";
 import { AppShell } from "../components/shell/AppShell";
@@ -14,9 +17,11 @@ import {
   CATEGORY_ALL,
   SORT_LABELS,
   sortCatalog,
+  type CatalogStatusFilter,
   type Density,
   type SortOption,
 } from "../components/shell/CatalogToolbar";
+import { goneReasonLabel } from "../api/types";
 import { assetToProductItem, toProductCategory } from "../types/product";
 import type { Asset, SavedSearchQuery } from "../api/types";
 
@@ -52,6 +57,9 @@ export function CatalogPage() {
   const [qRaw, setQRaw] = useState("");
   const q = useDebounced(qRaw, 200);
   const [category, setCategory] = useState<string>(CATEGORY_ALL);
+  // SG-272 G2 (F13): the Gone view asks the list for `status=ARCHIVED` and
+  // shows each gone row's reason with its Put back. Live is the default.
+  const [statusFilter, setStatusFilter] = useState<CatalogStatusFilter>("live");
   const [sort, setSort] = useState<SortOption>("recent");
   const [density, setDensity] = useState<Density>("grid");
   const contentColumnRef = useRef<HTMLDivElement | null>(null);
@@ -67,11 +75,27 @@ export function CatalogPage() {
   const [allItems, setAllItems] = useState<Asset[]>([]);
   const [selectedAssetId, setSelectedAssetId] = useState<string | null>(null);
   const [selectedSavedSearchId, setSelectedSavedSearchId] = useState("");
+  const qc = useQueryClient();
+  const [goneNotice, setGoneNotice] = useState<string | null>(null);
+  const [goneError, setGoneError] = useState<string | null>(null);
 
   const effectiveHousehold = useMemo(
     () => householdId || households?.[0]?.id || "",
     [householdId, households]
   );
+
+  const putBackMut = useMutation({
+    mutationFn: (assetId: string) => putBack(assetId, effectiveHousehold),
+    onSuccess: (restored) => {
+      setGoneNotice(`“${restored.display_name || "Item"}” is back in your catalog.`);
+      setGoneError(null);
+      qc.invalidateQueries({ queryKey: ["assets"] });
+    },
+    onError: (e: unknown) => {
+      setGoneError(e instanceof Error ? e.message : String(e));
+      setGoneNotice(null);
+    },
+  });
 
   const { data: savedSearchesData, isError: savedSearchesIsError, error: savedSearchesError } =
     useSavedSearches(effectiveHousehold);
@@ -134,13 +158,14 @@ export function CatalogPage() {
   useEffect(() => {
     setAllItems([]);
     setCursor(undefined);
-  }, [effectiveHousehold, q, category]);
+  }, [effectiveHousehold, q, category, statusFilter]);
 
   const { data, isLoading, isFetching, isError, error } = useAssets(
     effectiveHousehold,
     q,
     cursor,
-    category === CATEGORY_ALL ? undefined : category
+    category === CATEGORY_ALL ? undefined : category,
+    statusFilter === "gone" ? "ARCHIVED" : undefined
   );
 
   useEffect(() => {
@@ -179,13 +204,15 @@ export function CatalogPage() {
     const filters: string[] = [];
     if (qRaw.trim()) filters.push(`Search: ${qRaw.trim()}`);
     if (category !== CATEGORY_ALL) filters.push(toProductCategory(category));
+    if (statusFilter === "gone") filters.push("Gone");
     if (sort !== "recent") filters.push(SORT_LABELS[sort]);
     return filters;
-  }, [qRaw, category, sort]);
+  }, [qRaw, category, statusFilter, sort]);
 
   const clearAll = () => {
     setQRaw("");
     setCategory(CATEGORY_ALL);
+    setStatusFilter("live");
     setSort("recent");
     setSelectedSavedSearchId("");
   };
@@ -223,6 +250,8 @@ export function CatalogPage() {
       categories={categories}
       activeCategory={activeCategoryLabel}
       onCategoryChange={handleCategoryChange}
+      statusFilter={statusFilter}
+      onStatusFilterChange={setStatusFilter}
       sort={sort}
       onSortChange={setSort}
       density={density}
@@ -255,13 +284,59 @@ export function CatalogPage() {
           />
         ) : (
           <>
-            {!(isError && displayed.length === 0) && (
-              <ProductGrid
-                items={visibleItems}
-                density={density}
-                householdId={effectiveHousehold}
-                onSelect={setSelectedAssetId}
-              />
+            {statusFilter === "gone" ? (
+              <section aria-label="Gone items" style={{ display: "grid", gap: 8 }}>
+                {goneNotice && (
+                  <div role="status" className="text-success" style={{ fontSize: 13 }}>{goneNotice}</div>
+                )}
+                {goneError && (
+                  <div role="alert" className="text-danger" style={{ fontSize: 13 }}>{goneError}</div>
+                )}
+                {displayed.length === 0 && !isError && (
+                  <div role="status" className="text-muted-foreground" style={{ fontSize: 13 }}>
+                    Nothing is gone. Mark an item gone from its page and it will wait for you here.
+                  </div>
+                )}
+                {displayed.map((gone) => {
+                  const label = goneReasonLabel(gone.gone_reason);
+                  return (
+                    <div
+                      key={gone.id}
+                      className="bg-card border-border"
+                      style={{ display: "flex", flexWrap: "wrap", gap: 12, alignItems: "center", padding: 12, borderStyle: "solid", borderWidth: 1, borderRadius: 8 }}
+                    >
+                      <Link
+                        className="text-link focus-ring"
+                        style={{ fontWeight: 600 }}
+                        to={`/assets/${gone.id}?household_id=${effectiveHousehold}`}
+                      >
+                        {gone.display_name || "Untitled item"}
+                      </Link>
+                      <span className="text-muted-foreground" style={{ fontSize: 13 }}>
+                        Gone{label ? ` — ${label.toLowerCase()}` : ""}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => putBackMut.mutate(gone.id)}
+                        disabled={putBackMut.isPending}
+                        className="bg-card text-foreground border-border focus-ring"
+                        style={{ padding: "6px 12px", borderRadius: 6, borderStyle: "solid", borderWidth: 1, cursor: "pointer" }}
+                      >
+                        {putBackMut.isPending ? "Putting back…" : "Put back"}
+                      </button>
+                    </div>
+                  );
+                })}
+              </section>
+            ) : (
+              !(isError && displayed.length === 0) && (
+                <ProductGrid
+                  items={visibleItems}
+                  density={density}
+                  householdId={effectiveHousehold}
+                  onSelect={setSelectedAssetId}
+                />
+              )
             )}
             <div style={{ marginTop: 16, display: "flex", gap: 12, alignItems: "center" }}>
               {nextCursor && (

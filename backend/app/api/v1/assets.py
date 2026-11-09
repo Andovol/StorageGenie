@@ -21,10 +21,16 @@ from app.schemas.saved_search import SAVED_SEARCH_QUERY_MAX_BYTES, SavedSearchCr
 from app.services import audit_service, lifecycle
 from app.plugins.registry import iter_plugins
 from app.services.asset_service import (
+    AssetGoneError,
     AssetMergeError,
     attach_evidence,
     create_asset,
+    get_gone_reason,
+    mark_gone,
     merge_asset_redirect,
+    put_back,
+    adjust_quantity,
+    GONE_REASON_FIELD,
     update_asset,
 )
 from app.services.fts import ensure_asset_fts, sanitize_fts_query
@@ -172,6 +178,12 @@ def _asset_to_dict(asset: Asset, db: Session) -> dict:  # type: ignore[no-untype
         "assertions": assertions,
         "audit_events": audits,
     }
+    # SG-272 G1 (`PG-SC-02` read-back): the gone reason rides the assertion
+    # store, so the detail read carries it the same way the list does.
+    try:
+        out["gone_reason"] = get_gone_reason(db, asset.id)
+    except Exception:
+        out["gone_reason"] = None
     # SG-113: the reader half of the location write path (`PG-SC-02`). Only
     # added when the dormancy flag is ON, so the flag-OFF response stays
     # byte-identical to the pre-slice shape (no new key).
@@ -322,7 +334,34 @@ def list_assets(
     # SG-064 G3: the catalog card reads the first evidence id to build its
     # thumbnail; the list serializer previously sent no evidence field at all, so
     # that thumbnail (the "evidence badge") could never render from the live API.
+    # SG-272 G1/G2 (`PG-SC-02` read-back): the Gone view reads each gone row's
+    # reason from this same page payload — one batched assertion lookup for the
+    # page, never one query per row.
     asset_ids = [a.id for a in items]
+    from app.models.assertion import Assertion as _Assertion
+
+    gone_reason_by_asset: dict[str, str | None] = {}
+    if asset_ids:
+        for row in (
+            db.query(_Assertion)
+            .filter(
+                _Assertion.asset_id.in_(asset_ids),
+                _Assertion.field_path == GONE_REASON_FIELD,
+                _Assertion.review_state == "accepted",
+            )
+            .order_by(_Assertion.created_at.desc())
+            .all()
+        ):
+            if row.asset_id in gone_reason_by_asset:
+                continue
+            try:
+                _value = json.loads(row.value_json)
+            except ValueError:
+                _value = None
+            _reason = _value.get("reason") if isinstance(_value, dict) else None
+            gone_reason_by_asset[row.asset_id] = (
+                _reason if isinstance(_reason, str) and _reason else None
+            )
     evidence_ids_by_asset: dict[str, list[str]] = {}
     if asset_ids:
         for row in db.execute(
@@ -339,10 +378,11 @@ def list_assets(
                 "status": a.status,
                 "quantity": a.quantity,
                 "unit": a.unit,
-                "condition": a.condition,
-                "version": a.version,
-                "created_at": a.created_at.isoformat() if a.created_at else None,
-                "evidence_ids": evidence_ids_by_asset.get(a.id, []),
+            "condition": a.condition,
+            "version": a.version,
+            "created_at": a.created_at.isoformat() if a.created_at else None,
+            "gone_reason": gone_reason_by_asset.get(a.id),
+            "evidence_ids": evidence_ids_by_asset.get(a.id, []),
             }
             for a in items
         ],
@@ -510,6 +550,94 @@ def merge_asset(
         db.rollback()
         raise HTTPException(status_code=422, detail=str(exc)) from None
     except AssetMergeError as exc:
+        db.rollback()
+        raise HTTPException(status_code=exc.status_code, detail=str(exc)) from exc
+    return _asset_to_dict(a, db)
+
+
+class GoneRequest(BaseModel):
+    reason: str
+
+
+def _owned_asset(db: Session, asset_id: str, household_id: str):  # type: ignore[no-untyped-def]
+    a = db.query(Asset).filter_by(id=asset_id).first()
+    if not a:
+        raise HTTPException(status_code=404, detail="Asset not found")
+    if a.household_id != household_id:
+        raise HTTPException(status_code=403, detail="Household mismatch")
+    return a
+
+
+@router.post("/assets/{asset_id}/gone")
+def gone_asset(
+    asset_id: str,
+    payload: GoneRequest,
+    household_id: str = Query(...),
+    db: Session = Depends(get_db),
+) -> dict[str, Any]:
+    """SG-272 G1: mark one live item gone with a reason (used_up, thrown_away, given_away).
+
+    A dedicated route — not the generic PATCH — so the reason and the status
+    commit together or not at all, and a reason can never arrive without the
+    transition. No Idempotency-Key: a double tap repeats the same reason and
+    answers the same 200 (no-op), never a duplicate side effect.
+    """
+    a = _owned_asset(db, asset_id, household_id)
+    try:
+        a = mark_gone(db, a, payload.reason)
+    except AssetGoneError as exc:
+        db.rollback()
+        raise HTTPException(status_code=exc.status_code, detail=str(exc)) from exc
+    return _asset_to_dict(a, db)
+
+
+@router.post("/assets/{asset_id}/put-back")
+def put_back_asset(
+    asset_id: str,
+    household_id: str = Query(...),
+    db: Session = Depends(get_db),
+) -> dict[str, Any]:
+    """SG-272 G1: put one gone item back to ACTIVE (the owner's approved undo).
+
+    Dedicated, all-or-nothing, same idempotency shape as gone: a repeat on a
+    live item answers the same 200 with no new write.
+    """
+    a = _owned_asset(db, asset_id, household_id)
+    try:
+        a = put_back(db, a)
+    except AssetGoneError as exc:
+        db.rollback()
+        raise HTTPException(status_code=exc.status_code, detail=str(exc)) from exc
+    return _asset_to_dict(a, db)
+
+
+@router.post("/assets/{asset_id}/quantity/decrement")
+def decrement_quantity(
+    asset_id: str,
+    household_id: str = Query(...),
+    db: Session = Depends(get_db),
+) -> dict[str, Any]:
+    """SG-272 G3: one tap takes off 1, server-side so two quick taps from a stale view cannot lose one."""
+    a = _owned_asset(db, asset_id, household_id)
+    try:
+        a = adjust_quantity(db, a, -1)
+    except AssetGoneError as exc:
+        db.rollback()
+        raise HTTPException(status_code=exc.status_code, detail=str(exc)) from exc
+    return _asset_to_dict(a, db)
+
+
+@router.post("/assets/{asset_id}/quantity/increment")
+def increment_quantity(
+    asset_id: str,
+    household_id: str = Query(...),
+    db: Session = Depends(get_db),
+) -> dict[str, Any]:
+    """SG-272 G3: the way back up after a −1 tap (same server-side guard)."""
+    a = _owned_asset(db, asset_id, household_id)
+    try:
+        a = adjust_quantity(db, a, 1)
+    except AssetGoneError as exc:
         db.rollback()
         raise HTTPException(status_code=exc.status_code, detail=str(exc)) from exc
     return _asset_to_dict(a, db)

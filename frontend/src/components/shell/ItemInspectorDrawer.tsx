@@ -1,8 +1,10 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { ScanLine, Sparkles, X } from "lucide-react";
-import { apiGet, apiPatch } from "../../api/client";
-import type { Asset, Assertion, Evidence } from "../../api/types";
+import { apiGet, apiPatch, decrementQuantity, incrementQuantity, markGone, putBack } from "../../api/client";
+import type { Asset, Assertion, Evidence, GoneReason } from "../../api/types";
+import { goneReasonLabel } from "../../api/types";
+import { CONTROL_STYLE, THEMED_CONTROL_CLASS } from "./CatalogToolbar";
 import { useTaxonomy } from "../../hooks/useAssets";
 import { toProductCategory, UNTITLED_ASSET_NAME } from "../../types/product";
 
@@ -71,6 +73,10 @@ export function ItemInspectorDrawer({ asset, householdId, onClose }: ItemInspect
   const [condition, setCondition] = useState(asset.condition ?? "");
   const [notice, setNotice] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [goneMessage, setGoneMessage] = useState<string | null>(null);
+  const [goneError, setGoneError] = useState<string | null>(null);
+  const [qtyMessage, setQtyMessage] = useState<string | null>(null);
+  const [qtyError, setQtyError] = useState<string | null>(null);
 
   // The card/table rows carry the summary Asset; the detail route carries the
   // full one. Fetch by id so evidence + assertions are present, and so the
@@ -138,6 +144,76 @@ export function ItemInspectorDrawer({ asset, householdId, onClose }: ItemInspect
       setError(null);
     },
     onError: (e: unknown) => setError(e instanceof Error ? e.message : String(e)),
+  });
+
+  // SG-272 G2/G3: the panel mirrors the item page's Gone and −1 controls.
+  // The counted rule lives in `routes/AssetDetailPage.tsx` (`isCountedUnit`);
+  // this local copy keeps the drawer free of a route import.
+  const goneEntry = assertions.find(
+    (item) => item.field_path === "gone.reason" || item.field_path.endsWith("/gone.reason")
+  );
+  const goneRaw =
+    goneEntry && goneEntry.value && typeof goneEntry.value === "object" && !Array.isArray(goneEntry.value)
+      ? (goneEntry.value as Record<string, unknown>)["reason"]
+      : null;
+  const goneLabel = goneReasonLabel(current.gone_reason) ?? goneReasonLabel(typeof goneRaw === "string" ? goneRaw : null);
+  const isGone = current.status === "ARCHIVED" || goneLabel !== null;
+  const amountUnits = new Set(["ml", "milliliter", "millilitre", "l", "liter", "litre", "g", "gram", "grams", "kg", "kilogram", "kilograms"]);
+  const counted = !current.unit || current.unit.trim() === "" || !amountUnits.has(current.unit.trim().toLowerCase());
+  const qtyValue = current.quantity ?? null;
+
+  const goneMut = useMutation({
+    mutationFn: (reason: GoneReason) => markGone(asset.id, householdId, reason),
+    onSuccess: (updated) => {
+      qc.invalidateQueries({ queryKey: ["assets"] });
+      qc.invalidateQueries({ queryKey: ["asset", asset.id] });
+      const label = goneReasonLabel(updated.gone_reason) ?? "gone";
+      setGoneMessage(`Marked as ${label.toLowerCase()}. Undo with Put back.`);
+      setGoneError(null);
+    },
+    onError: (e: unknown) => {
+      setGoneError(e instanceof Error ? e.message : String(e));
+      setGoneMessage(null);
+    },
+  });
+  const putBackMut = useMutation({
+    mutationFn: () => putBack(asset.id, householdId),
+    onSuccess: (updated) => {
+      qc.invalidateQueries({ queryKey: ["assets"] });
+      qc.invalidateQueries({ queryKey: ["asset", asset.id] });
+      setGoneMessage(`“${updated.display_name || "Item"}” is back in your catalog.`);
+      setGoneError(null);
+    },
+    onError: (e: unknown) => {
+      setGoneError(e instanceof Error ? e.message : String(e));
+      setGoneMessage(null);
+    },
+  });
+  const decMut = useMutation({
+    mutationFn: () => decrementQuantity(asset.id, householdId),
+    onSuccess: (updated) => {
+      qc.invalidateQueries({ queryKey: ["assets"] });
+      qc.invalidateQueries({ queryKey: ["asset", asset.id] });
+      setQtyError(null);
+      setQtyMessage(updated.quantity != null ? `Now ${updated.quantity} left.` : "Quantity changed.");
+    },
+    onError: (e: unknown) => {
+      setQtyError(e instanceof Error ? e.message : String(e));
+      setQtyMessage(null);
+    },
+  });
+  const incMut = useMutation({
+    mutationFn: () => incrementQuantity(asset.id, householdId),
+    onSuccess: (updated) => {
+      qc.invalidateQueries({ queryKey: ["assets"] });
+      qc.invalidateQueries({ queryKey: ["asset", asset.id] });
+      setQtyError(null);
+      setQtyMessage(updated.quantity != null ? `Now ${updated.quantity} left.` : "Quantity changed.");
+    },
+    onError: (e: unknown) => {
+      setQtyError(e instanceof Error ? e.message : String(e));
+      setQtyMessage(null);
+    },
   });
 
   const firstEvidence: Evidence | undefined = evidence[0];
@@ -369,6 +445,85 @@ export function ItemInspectorDrawer({ asset, householdId, onClose }: ItemInspect
             </span>
           </div>
           {error && <div className="text-danger" style={{ fontSize: 13, marginTop: 8 }}>{error}</div>}
+        </section>
+
+        <section aria-label="Amount left" style={{ marginBottom: 20 }}>
+          <h3 style={{ fontSize: 14, marginBottom: 8 }}>Amount left</h3>
+          {counted ? (
+            <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
+              <button
+                type="button"
+                aria-label="Take off 1"
+                onClick={() => decMut.mutate()}
+                disabled={decMut.isPending || isGone || (qtyValue ?? 0) <= 0}
+                className={THEMED_CONTROL_CLASS}
+                style={{ ...CONTROL_STYLE, opacity: decMut.isPending || isGone || (qtyValue ?? 0) <= 0 ? 0.5 : 1 }}
+              >
+                {decMut.isPending ? "…" : "−1"}
+              </button>
+              <span style={{ fontSize: 13 }}>
+                {qtyValue != null ? `${qtyValue}${current.unit ? ` ${current.unit}` : ""} left` : "No count yet"}
+              </span>
+              <button
+                type="button"
+                aria-label="Put 1 back on the count"
+                onClick={() => incMut.mutate()}
+                disabled={incMut.isPending || isGone}
+                className={THEMED_CONTROL_CLASS}
+                style={{ ...CONTROL_STYLE, opacity: incMut.isPending || isGone ? 0.5 : 1 }}
+              >
+                {incMut.isPending ? "…" : "+1"}
+              </button>
+            </div>
+          ) : (
+            <div className="text-muted-foreground" style={{ fontSize: 13 }}>
+              {qtyValue != null ? `${qtyValue}${current.unit ? ` ${current.unit}` : ""} left` : "No amount yet"} — change the amount with Save changes above.
+            </div>
+          )}
+          {!isGone && counted && (qtyValue ?? 0) <= 0 && (
+            <div role="status" className="text-muted-foreground" style={{ fontSize: 13, marginTop: 6 }}>
+              None left — mark it gone below.
+            </div>
+          )}
+          {qtyMessage && <div role="status" className="text-success" style={{ fontSize: 13, marginTop: 6 }}>{qtyMessage}</div>}
+          {qtyError && <div role="alert" className="text-danger" style={{ fontSize: 13, marginTop: 6 }}>{qtyError}</div>}
+        </section>
+
+        <section aria-label="Use it up" style={{ marginBottom: 20 }}>
+          <h3 style={{ fontSize: 14, marginBottom: 8 }}>Use it up</h3>
+          {isGone ? (
+            <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
+              <span role="status" className="text-muted-foreground" style={{ fontSize: 13 }}>
+                Gone{goneLabel ? ` — ${goneLabel.toLowerCase()}` : ""}
+              </span>
+              <button
+                type="button"
+                onClick={() => putBackMut.mutate()}
+                disabled={putBackMut.isPending}
+                className="bg-primary text-primary-foreground focus-ring"
+                style={{ padding: "6px 12px", borderRadius: 6, border: "none", cursor: "pointer" }}
+              >
+                {putBackMut.isPending ? "Putting back…" : "Put back"}
+              </button>
+            </div>
+          ) : (
+            <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
+              {(["used_up", "thrown_away", "given_away"] as GoneReason[]).map((reason) => (
+                <button
+                  key={reason}
+                  type="button"
+                  onClick={() => goneMut.mutate(reason)}
+                  disabled={goneMut.isPending}
+                  className={THEMED_CONTROL_CLASS}
+                  style={CONTROL_STYLE}
+                >
+                  {goneReasonLabel(reason)}
+                </button>
+              ))}
+            </div>
+          )}
+          {goneMessage && <div role="status" className="text-success" style={{ fontSize: 13, marginTop: 6 }}>{goneMessage}</div>}
+          {goneError && <div role="alert" className="text-danger" style={{ fontSize: 13, marginTop: 6 }}>{goneError}</div>}
         </section>
 
         <section aria-labelledby="drawer-observed-heading" style={{ marginBottom: 20 }}>
