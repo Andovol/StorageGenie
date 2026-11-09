@@ -17,9 +17,15 @@ offline-authored references. `sg049` and `sg079` are scoring-only corpora and ar
 
 ## Numbers (this offline run)
 
+**Amendment SG-271 (G1):** `correction_created`/`audit_writes` moved 6→4 because an
+unknown `opened_date` no longer opens an `expiry.manual_entry` task
+(`sg029-09` and `sg029-10` carry only `items.0.opened_date` unknowns). The two
+dropped bridge tasks are the intended false-date-task fix, not a scoring drift;
+every fixture score above is unchanged.
+
 - `field_accuracy=0.833` over 10 fixtures
 - `unknown_rate=4/7=0.571`
-- `correction_rate=0/6=0.000` (`audit_event plugin.assertion.write` rows=6)
+- `correction_rate=0/4=0.000` (`audit_event plugin.assertion.write` rows=4)
 - Spend: **$0.000000** (zero provider calls; offline scoring of the committed cache)
 
 ```json
@@ -54,9 +60,9 @@ offline-authored references. `sg049` and `sg079` are scoring-only corpora and ar
   "unknown_cases": 7,
   "unknown_rate": 0.571,
   "correction_resolved": 0,
-  "correction_created": 6,
+  "correction_created": 4,
   "correction_rate": 0.0,
-  "audit_writes": 6
+  "audit_writes": 4
 }
 ```
 

@@ -137,7 +137,7 @@ describe("AssetForm", () => {
   test("the asset-type select carries the themed control treatment (SG-105 G2)", () => {
     render(<AssetForm householdId="hh-1" onCreated={() => {}} />);
 
-    const select = screen.getByLabelText("Asset type");
+    const select = screen.getByLabelText("Kind of item");
     expect(select).toHaveClass("bg-background", "text-foreground", "border-border");
   });
 

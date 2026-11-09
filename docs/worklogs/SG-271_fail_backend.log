@@ -1,0 +1,204 @@
+F.FF.FF                                                                  [100%]
+=================================== FAILURES ===================================
+____________ test_cosmetics_unknown_opened_date_opens_no_date_task _____________
+
+flow_db = (<sqlalchemy.orm.session.Session object at 0x780ac8086e70>, '01a1c201-efd7-7080-bdac-fe228da77c88', '01a1c201-efd7-7080-bdac-fe34cb34716d')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x780ac80e10a0>
+
+    def test_cosmetics_unknown_opened_date_opens_no_date_task(
+        flow_db, monkeypatch: pytest.MonkeyPatch
+    ) -> None:  # type: ignore[no-untyped-def]
+        session, household_id, _ = flow_db
+        payload = _out(
+            [_item("Face Cream", "2029-06-01", "expiry_date", None, 0.9, ["curvature"], opened_date=None)],
+            ["items.0.opened_date"],
+            True,
+        )
+        _enable(monkeypatch, ScriptedPhase2Provider([payload]), category="cosmetics")
+        with TestClient(app) as client:
+            evidence_id = _upload(client, household_id, "sg271-cream.png")
+            job = _run_import(client, household_id, [evidence_id], "sg271-cream")
+            candidate_id = _candidate_id(job)
+            read = client.get(f"/v1/candidates/{candidate_id}", params={"household_id": household_id})
+            assert read.status_code == 200, read.text
+        _fresh(session)
+        assert candidates.load_proposal(
+            session.query(candidates.Candidate).filter_by(id=candidate_id).one()
+        )["needs_evidence"] is True
+>       assert _open_date_task_count(session, candidate_id) == 0
+E       AssertionError: assert 1 == 0
+E        +  where 1 = _open_date_task_count(<sqlalchemy.orm.session.Session object at 0x780ac8086e70>, '01a1c201-f077-7062-ace8-0a22ba2d21ad')
+
+tests/test_sg271_flow.py:219: AssertionError
+------------------------------ Captured log call -------------------------------
+WARNING  app.services.signals:signals.py:104 Barcode extraction unavailable: pyzbar/libzbar is not installed
+WARNING  app.services.signals:signals.py:215 OCR extraction unavailable: tesseract is not installed or it's not in your PATH. See README file for more information.
+________ test_split_child_without_a_required_date_unknown_opens_no_task ________
+
+flow_db = (<sqlalchemy.orm.session.Session object at 0x780ac7712750>, '01a1c201-f21d-7020-94cc-998a9f78e570', '01a1c201-f21d-7020-94cc-999331b0612d')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x780ac6ce4ec0>
+
+    def test_split_child_without_a_required_date_unknown_opens_no_task(
+        flow_db, monkeypatch: pytest.MonkeyPatch
+    ) -> None:  # type: ignore[no-untyped-def]
+        session, household_id, _ = flow_db
+        payload = _out(
+            [
+                _item("Milk", None, None, "L-1", 0.8, ["angle"]),
+                _item("Cream", "2029-06-01", "expiry_date", "L-2", 0.9, ["curvature"], opened_date=None),
+            ],
+            ["items.0.expiry_date", "items.1.opened_date"],
+            True,
+        )
+        _enable(monkeypatch, ScriptedPhase2Provider([payload]))
+        with TestClient(app) as client:
+            evidence_id = _upload(client, household_id, "sg271-split.png")
+            job = _run_import(client, household_id, [evidence_id], "sg271-split")
+            origin_id = _candidate_id(job)
+            split = client.post(
+                f"/v1/candidates/{origin_id}/split",
+                params={"household_id": household_id},
+                json={"item_indexes": [0, 1]},
+            )
+            assert split.status_code == 200, split.text
+            first, second = split.json()["children"]
+        assert _open_date_task_count(session, first["id"]) == 1
+>       assert _open_date_task_count(session, second["id"]) == 0
+E       AssertionError: assert 1 == 0
+E        +  where 1 = _open_date_task_count(<sqlalchemy.orm.session.Session object at 0x780ac7712750>, '01a1c201-f288-7072-b7d7-d8582b56f1bc')
+
+tests/test_sg271_flow.py:260: AssertionError
+------------------------------ Captured log call -------------------------------
+WARNING  app.services.signals:signals.py:104 Barcode extraction unavailable: pyzbar/libzbar is not installed
+WARNING  app.services.signals:signals.py:215 OCR extraction unavailable: tesseract is not installed or it's not in your PATH. See README file for more information.
+______________ test_committed_candidate_read_carries_the_item_id _______________
+
+flow_db = (<sqlalchemy.orm.session.Session object at 0x780ac6b95730>, '01a1c201-f309-79e1-ace9-9a6195199779', '01a1c201-f309-79e1-ace9-9a746454f10c')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x780ac6b958b0>
+
+    def test_committed_candidate_read_carries_the_item_id(
+        flow_db, monkeypatch: pytest.MonkeyPatch
+    ) -> None:  # type: ignore[no-untyped-def]
+        session, household_id, other_id = flow_db
+        payload = _out([_item("Whole Milk", "2030-01-15", "expiry_date", "L-77", 0.97, ["faint lot"])])
+        _enable(monkeypatch, ScriptedPhase2Provider([payload]))
+        with TestClient(app) as client:
+            evidence_id = _upload(client, household_id, "sg271-committed.png")
+            job = _run_import(client, household_id, [evidence_id], "sg271-committed")
+            candidate_id = _candidate_id(job)
+            accepted = _accept(client, household_id, candidate_id)
+            asset_id = str(accepted["asset_id"])
+            _fresh(session)
+    
+            read = client.get(f"/v1/candidates/{candidate_id}", params={"household_id": household_id})
+            assert read.status_code == 200, read.text
+>           assert read.json()["asset_id"] == asset_id
+E           AssertionError: assert None == '01a1c201-f377-7722-a47f-96c8609d337a'
+
+tests/test_sg271_flow.py:281: AssertionError
+------------------------------ Captured log call -------------------------------
+WARNING  app.services.signals:signals.py:104 Barcode extraction unavailable: pyzbar/libzbar is not installed
+WARNING  app.services.signals:signals.py:215 OCR extraction unavailable: tesseract is not installed or it's not in your PATH. See README file for more information.
+___________ test_classify_keeps_the_proposed_date_and_opens_no_task ____________
+
+flow_db = (<sqlalchemy.orm.session.Session object at 0x780ac6b6a9c0>, '01a1c201-f4b0-7942-922a-319ee4ec9fd1', '01a1c201-f4b0-7942-922a-31ab5e08f109')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x780ac6d4a9f0>
+
+    def test_classify_keeps_the_proposed_date_and_opens_no_task(
+        flow_db, monkeypatch: pytest.MonkeyPatch
+    ) -> None:  # type: ignore[no-untyped-def]
+        session, household_id, _ = flow_db
+        payload = _out(
+            [_item("Whole Milk", "2030-01-15", "expiry_date", "L-77", 0.97, ["faint lot"], category_proposed="food_beverages")]
+        )
+        _enable(monkeypatch, ScriptedPhase2Provider([payload]))
+        with TestClient(app) as client:
+            evidence_id = _upload(client, household_id, "sg271-proposed.png")
+            job = _run_import(client, household_id, [evidence_id], "sg271-proposed")
+            candidate_id = _candidate_id(job)
+            accepted = _accept(client, household_id, candidate_id)
+            asset_id = str(accepted["asset_id"])
+            _fresh(session)
+            before = (
+                session.query(Assertion)
+                .filter_by(asset_id=asset_id, field_path="expiry_date")
+                .one()
+            )
+            assert before.review_state == "proposed"
+            assert json.loads(before.value_json) == "2030-01-15"
+            assert session.query(Assertion).filter_by(
+                asset_id=asset_id, field_path=CLASSIFICATION_FIELD
+            ).count() == 0
+            proposed = (
+                session.query(Assertion)
+                .filter_by(asset_id=asset_id, field_path="category_proposed")
+                .one()
+            )
+            assert proposed.review_state == "proposed"
+    
+            classified = _classify(client, asset_id, household_id, "food_beverages")
+            assert classified.status_code == 200, classified.text
+            body = classified.json()
+>           assert body["expiry_assertion"]["review_state"] == "proposed"
+E           AssertionError: assert 'needs_evidence' == 'proposed'
+E             
+E             - proposed
+E             + needs_evidence
+
+tests/test_sg271_flow.py:345: AssertionError
+------------------------------ Captured log call -------------------------------
+WARNING  app.services.signals:signals.py:104 Barcode extraction unavailable: pyzbar/libzbar is not installed
+WARNING  app.services.signals:signals.py:215 OCR extraction unavailable: tesseract is not installed or it's not in your PATH. See README file for more information.
+______ test_deliberate_dateless_item_leaves_unresolved_but_missing_stays _______
+
+flow_db = (<sqlalchemy.orm.session.Session object at 0x780ac69eede0>, '01a1c201-f626-7452-a6bf-d05289c36756', '01a1c201-f626-7452-a6bf-d06b71c18833')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x780ac6a1a570>
+
+    def test_deliberate_dateless_item_leaves_unresolved_but_missing_stays(
+        flow_db, monkeypatch: pytest.MonkeyPatch
+    ) -> None:  # type: ignore[no-untyped-def]
+        session, household_id, _ = flow_db
+        payload = _out([_item("Whole Milk", "2030-01-15", "expiry_date", "L-77", 0.97, ["faint lot"])])
+        _enable(monkeypatch, ScriptedPhase2Provider([payload, payload]))
+        with TestClient(app) as client:
+            first_evidence = _upload(client, household_id, "sg271-rice.png")
+            first_job = _run_import(client, household_id, [first_evidence], "sg271-rice")
+            first_asset = str(_accept(client, household_id, _candidate_id(first_job))["asset_id"])
+            classified = _classify(client, first_asset, household_id, "non_perishable")
+            assert classified.status_code == 200, classified.text
+    
+            second_evidence = _upload(client, household_id, "sg271-milk.png", "blue")
+            second_asset = _create_asset(client, household_id, "Plain Milk", [second_evidence])
+            missing = _classify(client, second_asset, household_id, "food_beverages")
+            assert missing.status_code == 200, missing.text
+    
+            status = client.get(
+                "/v1/plugins/expiry-tracker/status", params={"household_id": household_id}
+            )
+            assert status.status_code == 200, status.text
+            body = status.json()
+            unresolved = {row["asset_id"]: row["reason"] for row in body["unresolved_rows"]}
+>           assert first_asset not in unresolved
+E           AssertionError: assert '01a1c201-f698-7571-95e2-087d1b0749b1' not in {'01a1c201-f698-7571-95e2-087d1b0749b1': 'dateless', '01a1c201-f6b9-73e1-898f-40eee7154187': 'needs_evidence'}
+
+tests/test_sg271_flow.py:397: AssertionError
+------------------------------ Captured log call -------------------------------
+WARNING  app.services.signals:signals.py:104 Barcode extraction unavailable: pyzbar/libzbar is not installed
+WARNING  app.services.signals:signals.py:215 OCR extraction unavailable: tesseract is not installed or it's not in your PATH. See README file for more information.
+=============================== warnings summary ===============================
+venv/lib/python3.12/site-packages/fastapi/testclient.py:1
+  /home/andrei/StorageGenie/backend/venv/lib/python3.12/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+venv/lib/python3.12/site-packages/starlette/testclient.py:53
+  /home/andrei/StorageGenie/backend/venv/lib/python3.12/site-packages/starlette/testclient.py:53: DeprecationWarning: The anyio.abc.BlockingPortal alias is deprecated, use anyio.from_thread.BlockingPortal instead.
+    _PortalFactoryType = Callable[[], AbstractContextManager[anyio.abc.BlockingPortal]]
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/test_sg271_flow.py::test_cosmetics_unknown_opened_date_opens_no_date_task
+FAILED tests/test_sg271_flow.py::test_split_child_without_a_required_date_unknown_opens_no_task
+FAILED tests/test_sg271_flow.py::test_committed_candidate_read_carries_the_item_id
+FAILED tests/test_sg271_flow.py::test_classify_keeps_the_proposed_date_and_opens_no_task
+FAILED tests/test_sg271_flow.py::test_deliberate_dateless_item_leaves_unresolved_but_missing_stays
+5 failed, 2 passed, 2 warnings in 3.04s

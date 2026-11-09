@@ -1,0 +1,43 @@
+
+> storagegenie-frontend@0.1.0 test
+> vitest run --run src/routes/ReviewPage.sg271.test.tsx src/routes/InboxPage.sg271.test.tsx src/routes/AssetDetailPage.sg271.test.tsx src/routes/ExpiryPage.sg271.test.tsx src/components/CandidateCard.sg271.test.tsx
+
+
+ RUN  v1.6.1 /home/andrei/StorageGenie/frontend
+
+stderr | src/components/CandidateCard.sg271.test.tsx > CandidateCard SG-271 G4 > kind and shelf life never both read as category
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+ ✓ src/components/CandidateCard.sg271.test.tsx  (1 test) 111ms
+stderr | src/routes/ReviewPage.sg271.test.tsx > ReviewPage SG-271 > a committed candidate reads In your catalog with an Open item link and no decisions
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+stderr | src/routes/AssetDetailPage.sg271.test.tsx > AssetDetailPage SG-271 > a proposed date offers Accept date with the AI value prefilled
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+stderr | src/routes/InboxPage.sg271.test.tsx > InboxPage SG-271 > a committed candidate links to its item, not to Review
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+stderr | src/routes/ExpiryPage.sg271.test.tsx > ExpiryPage SG-271 > deliberate dateless items stay out of Unresolved with a quiet count
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+ ✓ src/routes/ExpiryPage.sg271.test.tsx  (1 test) 316ms
+ ✓ src/routes/ReviewPage.sg271.test.tsx  (2 tests) 374ms
+ ✓ src/routes/InboxPage.sg271.test.tsx  (2 tests) 373ms
+ ✓ src/routes/AssetDetailPage.sg271.test.tsx  (3 tests) 454ms
+
+ Test Files  5 passed (5)
+      Tests  9 passed (9)
+   Start at  20:31:59
+   Duration  2.26s (transform 859ms, setup 501ms, collect 1.84s, tests 1.63s, environment 3.90s, prepare 959ms)
+
+npm notice
+npm notice New minor version of npm available! 11.11.0 -> 11.21.2
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v11.21.2
+npm notice To update run: npm install -g npm@11.21.2
+npm notice

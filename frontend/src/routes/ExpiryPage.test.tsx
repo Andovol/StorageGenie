@@ -293,7 +293,7 @@ describe("ExpiryPage", () => {
     renderPage();
     await screen.findByText("Milk");
 
-    fireEvent.change(screen.getByLabelText("Category filter"), { target: { value: "food_beverages" } });
+    fireEvent.change(screen.getByLabelText("Shelf life filter"), { target: { value: "food_beverages" } });
 
     await waitFor(() =>
       expect(calledUrls().some((url) => url.includes("category=food_beverages"))).toBe(true)

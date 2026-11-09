@@ -329,6 +329,26 @@ export function AssetDetailPage() {
       ? Object.keys(profileTierDefaults ?? {}).length > 0
       : (taxonomyCategory?.notification ?? "none") !== "none");
   const selectedCategory = classificationChoice ?? currentCategory;
+  // SG-271 G3 (F5/F12): the AI's shelf-life suggestion preselects the control
+  // until the user confirms. It never classifies by itself — saving is the
+  // user's explicit Confirm.
+  const proposedAssertion =
+    assertions.find(
+      (entry) => entry.field_path === "category_proposed" || entry.field_path.endsWith("/category_proposed")
+    ) ?? null;
+  const proposedRaw =
+    valueRecord(proposedAssertion?.value)?.value ?? proposedAssertion?.value;
+  const proposedText = typeof proposedRaw === "string" ? proposedRaw : null;
+  const normalizeShelfLife = (text: string) => text.trim().toLowerCase().replace(/[_\-\s]+/g, "");
+  const suggestedCategory =
+    proposedText !== null
+      ? activeCategories.find((entry) => normalizeShelfLife(entry.id) === normalizeShelfLife(proposedText))?.id ?? null
+      : null;
+  const suggestedName =
+    suggestedCategory !== null
+      ? activeCategories.find((entry) => entry.id === suggestedCategory)?.name ?? suggestedCategory
+      : null;
+  const effectiveCategory = selectedCategory || suggestedCategory || "";
   const expiryAssertion = latestActiveAssertion(
     assertions,
     "plugin:expiry-tracker/expiry_date"
@@ -342,7 +362,7 @@ export function AssetDetailPage() {
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["asset", id] });
       setClassificationChoice(null);
-      setClassificationMessage("Category saved.");
+      setClassificationMessage("Shelf life saved.");
       setClassificationError(null);
     },
     onError: (caught: unknown) => {
@@ -402,15 +422,15 @@ export function AssetDetailPage() {
   const audits = (asset as unknown as { audit_events: { id: string; action: string; actor: string; timestamp: string; before: unknown; after: unknown }[] }).audit_events || [];
   const displayName = asset.display_name || UNTITLED_ASSET_NAME;
   const saveClassification = () => {
-    if (!selectedCategory || classifyMut.isPending) return;
+    if (!effectiveCategory || classifyMut.isPending) return;
     if (
-      selectedCategory === "non_perishable" &&
+      effectiveCategory === "non_perishable" &&
       hasActiveDate &&
       !window.confirm("This will clear the active date; the old value stays in the audit.")
     ) {
       return;
     }
-    classifyMut.mutate(selectedCategory);
+    classifyMut.mutate(effectiveCategory);
   };
 
   return (
@@ -445,21 +465,21 @@ export function AssetDetailPage() {
       <WebAlternates alternates={enrichMut.data?.web_alternates ?? []} />
 
       <section style={{ marginBottom: 16 }}>
-        <h3>Classification</h3>
+        <h3>Shelf life</h3>
         {activeCategories.length === 0 ? (
           <div className="text-muted-foreground" style={{ fontSize: 13 }}>
-            No categories are available from the taxonomy.
+            No shelf life options are available.
           </div>
         ) : (
           <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
             <select
-              aria-label="Classification category"
-              value={selectedCategory}
+              aria-label="Shelf life"
+              value={effectiveCategory}
               onChange={(event) => setClassificationChoice(event.target.value)}
               className="bg-background text-foreground border-border focus-ring"
               style={{ padding: 6, borderRadius: 6, borderStyle: "solid", borderWidth: 1, fontSize: 13, maxWidth: "100%" }}
             >
-              {selectedCategory === "" && <option value="">Select a category…</option>}
+              {effectiveCategory === "" && <option value="">Select a shelf life…</option>}
               {activeCategories.map((category) => (
                 <option key={category.id} value={category.id}>{category.name}</option>
               ))}
@@ -467,25 +487,35 @@ export function AssetDetailPage() {
             <button
               type="button"
               onClick={saveClassification}
-              disabled={!selectedCategory || classifyMut.isPending}
+              disabled={!effectiveCategory || classifyMut.isPending}
               className="bg-primary text-primary-foreground focus-ring"
               style={{ padding: "6px 12px", borderRadius: 6, border: "none", cursor: "pointer" }}
             >
-              {classifyMut.isPending ? "Saving…" : "Save category"}
+              {classifyMut.isPending ? "Saving…" : "Save shelf life"}
             </button>
+          </div>
+        )}
+        {!classificationAssertion && suggestedName && (
+          <div role="status" className="text-muted-foreground" style={{ fontSize: 12, marginTop: 6 }}>
+            The AI suggests {suggestedName}. Confirm below, or pick another shelf life.
+          </div>
+        )}
+        {!classificationAssertion && !suggestedName && proposedText && (
+          <div role="status" className="text-muted-foreground" style={{ fontSize: 12, marginTop: 6 }}>
+            The AI suggested “{proposedText}”, which matches no shelf life — pick the closest one below.
           </div>
         )}
         {!classificationAssertion && (
           <div role="status" className="text-muted-foreground" style={{ fontSize: 12, marginTop: 6 }}>
-            Choose a category, then add a date if it has one.
+            Choose a shelf life, then add a date if it has one.
           </div>
         )}
-        {selectedCategory === "documents_other" && (
+        {effectiveCategory === "documents_other" && (
           <div className="text-muted-foreground" style={{ fontSize: 12, marginTop: 6 }}>
             Documents/other: renewal or validity dates. Keepsakes, letters and photos belong under Non-perishable.
           </div>
         )}
-        {selectedCategory === "non_perishable" && (
+        {effectiveCategory === "non_perishable" && (
           <div className="text-muted-foreground" style={{ fontSize: 12, marginTop: 6 }}>
             No date; no expiry reminder.
           </div>

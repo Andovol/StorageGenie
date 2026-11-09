@@ -38,7 +38,7 @@ const TIER_LABELS: Record<string, string> = {
 };
 
 const REASON_LABELS: Record<string, string> = {
-  proposed: "Proposed",
+  proposed: "Date proposed",
   needs_evidence: "Needs evidence",
   unparseable: "Unparseable date",
   dateless: "No date",
@@ -152,9 +152,9 @@ export function ExpiryPage() {
         <h1 className="page-header text-foreground">Expiry</h1>
         <div style={{ display: "flex", gap: 12, alignItems: "center", flexWrap: "wrap" }}>
           <label style={{ fontSize: 13 }}>
-            Category filter{" "}
+            Shelf life filter{" "}
             <select
-              aria-label="Category filter"
+              aria-label="Shelf life filter"
               className={THEMED_CONTROL_CLASS}
               style={CONTROL_STYLE}
               value={category}
@@ -269,6 +269,11 @@ export function ExpiryPage() {
 
           <section aria-label="Unresolved" style={{ marginTop: 20 }}>
             <h2 style={{ fontSize: 15 }}>Unresolved ({unresolved.length})</h2>
+            {(data.summary.dateless ?? 0) > 0 && (
+              <div role="status" className="text-muted-foreground" style={{ fontSize: 12, marginBottom: 6 }}>
+                {data.summary.dateless} {data.summary.dateless === 1 ? "item is" : "items are"} set to need no date — nothing to do here.
+              </div>
+            )}
             {unresolved.length === 0 ? (
               <div className="text-muted-foreground" style={{ fontSize: 12 }}>None</div>
             ) : (

@@ -141,7 +141,7 @@ export function AssetForm({ householdId, onCreated }: Props) {
         <span className="text-muted-foreground" style={{ fontSize: 11 }}>Left blank, we use the photo's filename</span>
       </label>
       <label style={{ display: "flex", flexDirection: "column", gap: 4 }}>
-        <span>Asset type</span>
+        <span>Kind of item</span>
         <select className={THEMED_CONTROL_CLASS} value={assetType} onChange={(e) => setAssetType(e.target.value)} style={{ ...CONTROL_STYLE, width: "100%", padding: 8 }}>
           <option value="unknown">unknown</option>
           <option value="equipment">equipment</option>

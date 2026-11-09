@@ -196,6 +196,9 @@ export type JobCandidate = {
   fields: Record<string, CandidateField>;
   evidence_ids: string[];
   review_task_ids: string[];
+  // SG-271 G2: a committed candidate carries its item id, so the Inbox links
+  // to the item instead of Review. Absent on older payloads.
+  asset_id?: string | null;
 };
 export type JobCandidateListResponse = { items: JobCandidate[]; total: number };
 
@@ -399,6 +402,9 @@ export type ExpiryStatusResponse = {
     by_bucket: Record<string, number>;
     unresolved: number;
     total: number;
+    // SG-271 G5: items deliberately kept without a date (accepted null),
+    // off the unresolved list. Absent on older payloads.
+    dateless?: number;
   };
   unresolved_rows: ExpiryUnresolvedRow[];
 };

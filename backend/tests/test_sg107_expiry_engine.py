@@ -448,7 +448,7 @@ def test_route_shape_summary_reconciles_and_writes_nothing(engine_db) -> None:  
     assert rows[0]["asset_id"] == old.id
 
     summary = body["summary"]
-    assert set(summary) == {"by_tier", "by_bucket", "unresolved", "total"}
+    assert set(summary) == {"by_tier", "by_bucket", "unresolved", "total", "dateless"}
     assert sum(summary["by_bucket"].values()) == len(rows)
     assert sum(summary["by_tier"].values()) == len(rows)
     assert summary["unresolved"] == len(body["unresolved_rows"])
@@ -486,6 +486,7 @@ def test_route_empty_sets_are_200_and_zeroed(engine_db) -> None:  # type: ignore
             "by_bucket": {},
             "unresolved": 0,
             "total": 0,
+            "dateless": 0,
         }
 
 

@@ -245,6 +245,11 @@ def compute_status(
     """
     rows: list[dict[str, Any]] = []
     unresolved_rows: list[dict[str, Any]] = []
+    # SG-271 G5 (F8): a deliberately dateless item — an accepted null expiry,
+    # written when the user classifies Non-perishable or clears the date —
+    # is counted quietly and never listed as unresolved. A missing date with
+    # no such decision stays on the unresolved list.
+    dateless_count = 0
     # SG-111 ISS-2: the engine admits ACTIVE assets only. A non-ACTIVE asset is
     # lifecycle-terminal, not date-missing, so it is excluded from BOTH the
     # tiered rows and the unresolved rows (the dashboard needs no change).
@@ -270,7 +275,13 @@ def compute_status(
         if accepted is not None:
             parsed = _parse_expiry_value(accepted.value_json)
             if parsed is None:
-                reason = "dateless" if _is_null_value(accepted.value_json) else "unparseable"
+                # SG-271 G5 (F8): a deliberately dateless item — an accepted
+                # null expiry, or a Non-perishable classification with no date
+                # decision of its own — is counted quietly, never listed.
+                if _is_null_value(accepted.value_json) or slug == "non_perishable":
+                    dateless_count += 1
+                    continue
+                reason = "unparseable"
                 unresolved_rows.append({"asset_id": asset.id, "reason": reason})
                 continue
             expiry, date_type = parsed
@@ -317,6 +328,8 @@ def compute_status(
             "by_bucket": by_bucket,
             "unresolved": len(unresolved_rows),
             "total": len(rows) + len(unresolved_rows),
+            # SG-271 G5: deliberate dateless items, off the unresolved list.
+            "dateless": dateless_count,
         },
         "unresolved_rows": unresolved_rows,
     }
