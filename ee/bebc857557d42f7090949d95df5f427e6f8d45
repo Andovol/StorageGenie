@@ -1,0 +1,28 @@
+Dispatch-ID: SG-271.dbg | Report: note
+Debug-Report-Begin
+STAGE: budget kill (killed=term)
+CAUSE: The coder had passed the packet's 1,500-second publication point and was still attempting optional G7 at 20:15; systemd terminated it at the 2,100-second budget before the final report and receipt were completed.
+EVIDENCE:
+- [evidence file /var/lib/dispatch-debug-evidence/storagegenie/SG-271.dbg.txt:7,23] "Result=timeout"; "elapsed=2100s budget=2100s killed=term".
+- [packet docs/packets/SG-271-carry-the-ai-work-through.md:109] "Publish before the bound at 1500 s: stop starting new goals, commit what is finished, write the report, publish the receipt."
+- [log output/dispatch/SG-271.log:3032-3037] "[•] G7: headless chrome screenshots (droppable)"; "[ ] Report + commit + push + receipt".
+- [log output/dispatch/SG-271.log:3490-3494] G7's headless screenshot command ran at 20:15; "5169 bytes written to file output/SG-271-scratch/chrome-probe.png".
+- [evidence file /var/lib/dispatch-debug-evidence/storagegenie/SG-271.dbg.txt:60-66] "P3_note=FAIL note=no"; "P5_receipt=FAIL"; "partial_receipt=published"; "report_cited_missing=SKIPPED reason=p5_not_pass".
+- [ref refs/notes/storagegenie-coder-reports, target 954b898233672de483e6b4241092e3af4b79a196] "Partial-Receipt-ID: SG-271"; "pushed=0"; the partial note names WIP refs refs/wip/SG-271/20261109T201913Z and refs/wip-tracked/SG-271/20261109T201913Z.
+- [workspace check docs/worklogs/SG-271_report.md] "No such file or directory"; the failed-run audit at evidence file:71-72 records DIRTY and its uncommitted paths.
+STRANDED WORK:
+- refs/wip/SG-271/20261109T201913Z — snapshot of unfinished SG-271 work: 37 changed paths including product edits, tests, and work logs; includes tracked edits plus 16 untracked files.
+- refs/wip-tracked/SG-271/20261109T201913Z — tracked-only snapshot of the same run: 21 modified files.
+- refs/quarantine/preserve-* are preserved commits that were ahead of origin; the other refs/quarantine entries are quarantined debris.
+- refs/quarantine/SG-025-20260912T164340Z — SG-025 provider gateway/model migration, tests, ADRs, and report; no receipt.
+- refs/quarantine/SG-066-20260921T095958Z — SG-066 analytics API/service/page and tests; no receipt.
+- refs/quarantine/SG-088-20260921T174803Z — SG-088 test changes and verification logs; no receipt.
+- refs/quarantine/SG-208-20261017T171409Z — SG-208 driver, screenshots, and smoke evidence; no receipt.
+- refs/quarantine/preserve-20260907T083833Z — SG-008 report/receipt commit.
+- refs/quarantine/preserve-20261017T171411Z — SG-208 household-switching UI removal and tests; commit subject records 293 passing tests.
+- refs/quarantine/preserve-20261102T163542Z — SG-279 report commit.
+NEXT ACTION: change the packet
+CONFIDENCE: high
+
+Debug-Report-End
+moved=no
