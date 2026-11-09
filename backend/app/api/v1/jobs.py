@@ -151,7 +151,7 @@ def get_job(
     return {"id": j.id, "job_type": j.job_type, "state": j.state, "household_id": j.household_id}
 
 
-def _candidate_list_item(candidate: candidates.Candidate) -> dict[str, object]:
+def _candidate_list_item(db: Session, candidate: candidates.Candidate) -> dict[str, object]:
     proposal = candidates.load_proposal(candidate)
     fields = proposal.get("fields", {})
     raw_evidence = json.loads(candidate.evidence_ids_json)
@@ -166,6 +166,8 @@ def _candidate_list_item(candidate: candidates.Candidate) -> dict[str, object]:
         "fields": fields if isinstance(fields, dict) else {},
         "evidence_ids": evidence_ids,
         "review_task_ids": review_task_ids,
+        # SG-271 G2: a committed candidate links to its item, not to Review.
+        "asset_id": candidates.committed_asset_id(db, candidate),
     }
 
 
@@ -187,4 +189,4 @@ def list_job_candidates(
         .order_by(candidates.Candidate.created_at, candidates.Candidate.id)
         .all()
     )
-    return {"items": [_candidate_list_item(row) for row in rows], "total": len(rows)}
+    return {"items": [_candidate_list_item(db, row) for row in rows], "total": len(rows)}

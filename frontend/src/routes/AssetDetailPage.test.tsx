@@ -418,7 +418,7 @@ describe("classification control (SG-258)", () => {
     api.classifyAsset.mockResolvedValue({});
     renderPage();
 
-    const select = await screen.findByLabelText("Classification category");
+    const select = await screen.findByLabelText("Shelf life");
     const options = within(select).getAllByRole("option").map((option) => option.textContent);
     expect(options).toEqual(
       expect.arrayContaining([
@@ -437,13 +437,13 @@ describe("classification control (SG-258)", () => {
       ...before,
       assertions: [classificationAssertion("a-class-2", "documents_other", { upcoming: 30, long_lead: 60 })],
     };
-    fireEvent.click(screen.getByRole("button", { name: "Save category" }));
+    fireEvent.click(screen.getByRole("button", { name: "Save shelf life" }));
 
     await waitFor(() =>
       expect(api.classifyAsset).toHaveBeenCalledWith("asset-1", "hh", "documents_other", "a-class")
     );
     await waitFor(() => expect(assetReads()).toBeGreaterThan(beforeReads));
-    expect(await screen.findByText("Category saved.")).toBeInTheDocument();
+    expect(await screen.findByText("Shelf life saved.")).toBeInTheDocument();
   });
 
   test("a 409 shows the reload message and re-reads the asset", async () => {
@@ -455,10 +455,10 @@ describe("classification control (SG-258)", () => {
     renderPage();
 
     const beforeReads = assetReads();
-    fireEvent.change(await screen.findByLabelText("Classification category"), {
+    fireEvent.change(await screen.findByLabelText("Shelf life"), {
       target: { value: "household_chemicals" },
     });
-    fireEvent.click(screen.getByRole("button", { name: "Save category" }));
+    fireEvent.click(screen.getByRole("button", { name: "Save shelf life" }));
 
     expect(await screen.findByRole("alert")).toHaveTextContent(
       "This item changed; reload the asset"
@@ -471,9 +471,9 @@ describe("classification control (SG-258)", () => {
     renderPage();
 
     expect(
-      await screen.findByText("No categories are available from the taxonomy.")
+      await screen.findByText("No shelf life options are available.")
     ).toBeInTheDocument();
-    expect(screen.queryByLabelText("Classification category")).not.toBeInTheDocument();
+    expect(screen.queryByLabelText("Shelf life")).not.toBeInTheDocument();
   });
 
   test("a move to Non-perishable confirms before clearing the active date", async () => {
@@ -482,9 +482,9 @@ describe("classification control (SG-258)", () => {
     const confirm = vi.spyOn(window, "confirm").mockReturnValue(false);
     renderPage();
 
-    const select = await screen.findByLabelText("Classification category");
+    const select = await screen.findByLabelText("Shelf life");
     fireEvent.change(select, { target: { value: "non_perishable" } });
-    fireEvent.click(screen.getByRole("button", { name: "Save category" }));
+    fireEvent.click(screen.getByRole("button", { name: "Save shelf life" }));
 
     expect(confirm).toHaveBeenCalledWith(
       "This will clear the active date; the old value stays in the audit."
@@ -492,7 +492,7 @@ describe("classification control (SG-258)", () => {
     expect(api.classifyAsset).not.toHaveBeenCalled();
 
     confirm.mockReturnValue(true);
-    fireEvent.click(screen.getByRole("button", { name: "Save category" }));
+    fireEvent.click(screen.getByRole("button", { name: "Save shelf life" }));
     await waitFor(() =>
       expect(api.classifyAsset).toHaveBeenCalledWith("asset-1", "hh", "non_perishable", "a-class")
     );
@@ -614,7 +614,7 @@ describe("ExpiryEntryForm integration (SG-258)", () => {
     assetBody = before;
     renderPage();
     expect(
-      await screen.findByText("Choose a category, then add a date if it has one.")
+      await screen.findByText("Choose a shelf life, then add a date if it has one.")
     ).toBeInTheDocument();
     expect(screen.queryByText("Manual expiry entry")).not.toBeInTheDocument();
     expect(screen.queryByText("Manual date entry")).not.toBeInTheDocument();

@@ -37,6 +37,23 @@ MANUAL_ENTRY_PROMPT = "Enter expiry date manually"
 def manual_task_change() -> dict[str, object]:
     """The asset-side payload every `expiry.manual_entry` task carries (SG-270)."""
     return {"field_path": EXPIRY_FIELD, "prompt": MANUAL_ENTRY_PROMPT}
+
+
+def requires_date_task(unknowns: object) -> bool:
+    """True when an unknown names the expiry date itself (SG-271 G1).
+
+    `needs_evidence` is provider-global: food prompt v4 sets it for a null
+    `expiry_date`, cosmetics prompt v4 for an unknown `opened_date`. The date
+    task collects an expiry date, so only an `items.<n>.expiry_date` unknown
+    opens one. An unknown `opened_date` (or any other field) opens no task;
+    the opened-date decision has no task kind and gets none here.
+    """
+    if not isinstance(unknowns, list):
+        return False
+    return any(
+        isinstance(entry, str) and entry.split(".")[-1] == "expiry_date"
+        for entry in unknowns
+    )
 # SG-240 D2: the opened date is a BARE field path carrying a bare JSON string
 # ("YYYY-MM-DD"), matching the convention candidates.py writes and the planning
 # and chat readers already expect.
@@ -329,6 +346,7 @@ def _observed_date(db: Session, asset: Asset) -> tuple[str, list[str]] | None:
 
 
 def _active_assertion(db: Session, asset_id: str, field_path: str) -> Assertion | None:
+
     return (
         db.query(Assertion)
         .filter(
@@ -410,15 +428,16 @@ def apply_extraction_result(
     """Map a validated extraction output onto the EXISTING manual-entry path.
 
     Callable mapping only — not a job step, no pipeline changes (SG-028 owns
-    wiring). When the output carries needs_evidence, this writes the SAME
-    assertion kind classify_asset writes for a dateless asset (EXPIRY_FIELD,
-    {"status": "unknown"}, review_state "needs_evidence") and opens the SAME
-    "expiry.manual_entry" task via _manual_task — no new task type.
+    wiring). When the output carries needs_evidence AND names the expiry date
+    unknown, this writes the SAME assertion kind classify_asset writes for a
+    dateless asset (EXPIRY_FIELD, {"status": "unknown"}, review_state
+    "needs_evidence") and opens the SAME "expiry.manual_entry" task via
+    _manual_task — no new task type.
     source_type is "extraction" (not classify's "deterministic") so provenance
-    stays honest. Outputs without needs_evidence map to (None, None): nothing
-    written, no task opened.
+    stays honest. Outputs without a date unknown map to (None, None): nothing
+    written, no task opened (SG-271 G1 — an unknown opened date is no date task).
     """
-    if not result.needs_evidence:
+    if not result.needs_evidence or not requires_date_task(result.unknowns):
         return None, None
     assertion = _write_assertion(
         db,
@@ -454,6 +473,116 @@ def _accepted_expiry_value(assertion: Assertion | None) -> object:
         return None
 
 
+def _proposed_expiry_value(assertion: Assertion | None) -> object:
+    if assertion is None or assertion.review_state != "proposed":
+        return None
+    try:
+        return json.loads(assertion.value_json)
+    except json.JSONDecodeError:
+        return None
+
+
+def _candidate_committed_date(db: Session, asset: Asset) -> tuple[str, list[str] | None] | None:
+    """The candidate-committed short-path date, if active and proposed (SG-271 G3/F4).
+
+    Committed candidates store the AI's date under the bare `expiry_date` path,
+    which the prefixed plugin readers never match — the reason classification
+    used to treat the AI date as absent. Returns the date string plus its
+    evidence ids, or None when there is no usable committed date.
+    """
+    row = (
+        db.query(Assertion)
+        .filter(
+            Assertion.asset_id == asset.id,
+            Assertion.field_path == "expiry_date",
+            Assertion.review_state.not_in(("superseded", "rejected")),
+        )
+        .order_by(Assertion.created_at.desc())
+        .first()
+    )
+    if row is None or row.review_state != "proposed":
+        return None
+    try:
+        raw = json.loads(row.value_json)
+    except json.JSONDecodeError:
+        return None
+    if not isinstance(raw, str):
+        return None
+    try:
+        evidence = json.loads(row.source_evidence_ids) if row.source_evidence_ids else None
+    except json.JSONDecodeError:
+        evidence = None
+    return raw, evidence if isinstance(evidence, list) else None
+
+
+def _adopt_candidate_committed_date(db: Session, asset: Asset) -> Assertion | None:
+    """Adopt the committed AI date into the prefixed proposed slot (SG-271 G3/F4).
+
+    A valid date rides the existing write path as a proposed plugin assertion
+    (expiry-date kind, the AI's own evidence) and is returned; anything else
+    yields None so the caller falls through to observed/unknown. No task opens
+    for a date that is already on the item.
+    """
+    found = _candidate_committed_date(db, asset)
+    if found is None:
+        return None
+    raw, evidence = found
+    if not _has_valid_expiry_date({"expiry_date": raw}):
+        return None
+    return _write_assertion(
+        db,
+        asset,
+        EXPIRY_FIELD,
+        {"expiry_date": raw, "date_type": DateType.EXPIRY_DATE.value},
+        "extraction",
+        "proposed",
+        evidence,
+    )
+
+
+def _resolve_dated_expiry(
+    db: Session, asset: Asset, category: Category
+) -> tuple[Assertion | None, ReviewTask | None]:
+    """The expiry assertion and task for a category with expiry windows (SG-271).
+
+    An accepted date wins, then a proposed one (the observed kind or the
+    adopted AI kind — both stay proposed for the user to accept), then the
+    candidate-committed AI date, adopted into the prefixed proposed slot. Only
+    a genuinely dateless item writes `unknown` and opens a manual-entry task.
+    """
+    active = _active_assertion(db, asset.id, EXPIRY_FIELD)
+    if _has_valid_expiry_date(_accepted_expiry_value(active)):
+        return active, None
+    if _has_valid_expiry_date(_proposed_expiry_value(active)):
+        # SG-271 G3 (F4): the AI's proposed date survives classification.
+        # It stays proposed for the user to accept on the asset page; no
+        # manual-entry task opens for a date that is already on the item.
+        return active, None
+    adopted = _adopt_candidate_committed_date(db, asset)
+    if adopted is not None:
+        return adopted, None
+    observed = None
+    if category.slug != "documents_other":
+        observed = _observed_date(db, asset)
+    if observed is None:
+        assertion = _write_assertion(
+            db, asset, EXPIRY_FIELD, {"status": "unknown"}, "deterministic", "needs_evidence", None
+        )
+        return assertion, _manual_task(db, asset)
+    return (
+        _write_assertion(
+            db,
+            asset,
+            EXPIRY_FIELD,
+            {"expiry_date": observed[0], "date_type": DateType.EXPIRY_DATE.value},
+            "deterministic",
+            "proposed",
+            observed[1],
+        ),
+        None,
+    )
+
+
 def classify_asset(db: Session, asset: Asset, category: Category, tier: str | None) -> dict[str, object]:
     if tier is not None and tier not in category.tier_defaults:
         raise ExpiryValidationError(f"Invalid notification_tier: {tier}")
@@ -465,29 +594,12 @@ def classify_asset(db: Session, asset: Asset, category: Category, tier: str | No
     task: ReviewTask | None = None
     resolved_tasks: list[ReviewTask] = []
     if category.has_expiry:
-        if _has_valid_expiry_date(_accepted_expiry_value(active)):
-            expiry_assertion = active
-        else:
-            observed = None
-            if category.slug != "documents_other":
-                observed = _observed_date(db, asset)
-            if observed is None:
-                expiry_assertion = _write_assertion(
-                    db, asset, EXPIRY_FIELD, {"status": "unknown"}, "deterministic", "needs_evidence", None
-                )
-                task = _manual_task(db, asset)
-            else:
-                expiry_assertion = _write_assertion(
-                    db,
-                    asset,
-                    EXPIRY_FIELD,
-                    {"expiry_date": observed[0], "date_type": DateType.EXPIRY_DATE.value},
-                    "deterministic",
-                    "proposed",
-                    observed[1],
-                )
+        expiry_assertion, task = _resolve_dated_expiry(db, asset, category)
     else:
-        if active is not None:
+        # SG-271 G3/G5: the committed AI date counts as an active date signal,
+        # so Non-perishable still writes the deliberate accepted null for an
+        # imported item (the engine keys its quiet count to that null).
+        if active is not None or _candidate_committed_date(db, asset) is not None:
             expiry_assertion = _write_assertion(
                 db, asset, EXPIRY_FIELD, None, "user", "accepted", None
             )

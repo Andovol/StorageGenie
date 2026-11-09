@@ -314,7 +314,7 @@ export function ItemInspectorDrawer({ asset, householdId, onClose }: ItemInspect
               className="bg-background text-foreground border-border focus-ring"
               style={{ padding: 8, borderRadius: 6, borderStyle: "solid", borderWidth: 1 }}
             />
-            <label htmlFor="drawer-category-input" style={{ fontSize: 13 }}>Category</label>
+            <label htmlFor="drawer-category-input" style={{ fontSize: 13 }}>Kind of item</label>
             <input
               id="drawer-category-input"
               list="drawer-category-options"

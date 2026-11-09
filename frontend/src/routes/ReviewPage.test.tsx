@@ -4,7 +4,7 @@ import { MemoryRouter, Route, Routes } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReviewPage } from "./ReviewPage";
 
-const candidate = { id: "candidate-loaded-31", state: "proposed", job_id: "job-loaded-31", fields: { display_name: "Loaded item" }, dedup_matches: [], review_task_ids: [], blocking_review_task_ids: [], evidence_ids: ["evidence-loaded-31"], asset_id: "asset-loaded-31" };
+const candidate = { id: "candidate-loaded-31", state: "proposed", job_id: "job-loaded-31", fields: { display_name: "Loaded item" }, dedup_matches: [], review_task_ids: [], blocking_review_task_ids: [], evidence_ids: ["evidence-loaded-31"], asset_id: null };
 const api = vi.hoisted(() => ({ apiGet: vi.fn(), candidateDecision: vi.fn(), candidateSplit: vi.fn() }));
 vi.mock("../api/client", () => api);
 

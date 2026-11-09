@@ -263,7 +263,9 @@ def get_candidate(
     web_alternates = proposal.get("web_alternates", [])
     if not isinstance(web_alternates, list):
         web_alternates = []
-    asset_id = proposal.get("asset_id")
+    # SG-271 G2: a candidate that already led to an item says so on first load
+    # and on reload — derived from the commit rows, never stored.
+    asset_id = candidates.committed_asset_id(db, candidate)
     merged_into = proposal.get("merged_into")
     return {
         "id": candidate.id,

@@ -23,6 +23,13 @@ function matchLabel(match: DedupMatch) {
   return match.type;
 }
 
+// SG-271 G4: one name per concept. The capture kind and the AI's shelf-life
+// suggestion never both read as "category".
+const FIELD_LABELS: Record<string, string> = {
+  asset_type: "Kind of item",
+  category_proposed: "Suggested shelf life",
+};
+
 export function CandidateCard({
   candidate,
   householdId,
@@ -73,7 +80,7 @@ export function CandidateCard({
           {Object.entries(candidate.fields).map(([key, raw]) => {
             const info = fieldInfo(raw);
             return <div key={key} className="border-border" style={{ padding: "8px 0", borderBottomStyle: "solid", borderBottomWidth: 1 }}>
-              <label htmlFor={`candidate-field-${key}`} style={{ display: "block", fontWeight: 600 }}>{key}</label>
+              <label htmlFor={`candidate-field-${key}`} style={{ display: "block", fontWeight: 600 }}>{FIELD_LABELS[key] ?? key}</label>
               <input id={`candidate-field-${key}`} aria-label={`${key} value`} value={String(values[key] ?? "")} placeholder="Unknown" onChange={(event) => setValues((previous) => ({ ...previous, [key]: event.target.value }))} className="bg-background text-foreground border-border focus-ring" style={{ width: "100%", boxSizing: "border-box", padding: 7, marginTop: 4, borderStyle: "solid", borderWidth: 1, borderRadius: 5 }} />
               <div className="text-muted-foreground" style={{ fontSize: 11, marginTop: 3 }}>Confidence: {info.confidence == null ? "Unknown" : String(info.confidence)} · Source: {String(info.source)}</div>
             </div>;

@@ -165,7 +165,7 @@ describe("ItemInspectorDrawer", () => {
     await screen.findByTestId("inspector-drawer");
 
     fireEvent.change(screen.getByLabelText("Title"), { target: { value: "Renamed Drill" } });
-    fireEvent.change(screen.getByLabelText("Category"), { target: { value: "Home & Decor" } });
+    fireEvent.change(screen.getByLabelText("Kind of item"), { target: { value: "Home & Decor" } });
     fireEvent.click(screen.getByRole("button", { name: "Save changes" }));
 
     await waitFor(() =>
@@ -182,7 +182,7 @@ describe("ItemInspectorDrawer", () => {
     renderDrawer();
     await screen.findByTestId("inspector-drawer");
 
-    fireEvent.change(screen.getByLabelText("Category"), { target: { value: "Vintage Linens" } });
+    fireEvent.change(screen.getByLabelText("Kind of item"), { target: { value: "Vintage Linens" } });
     fireEvent.click(screen.getByRole("button", { name: "Save changes" }));
 
     await waitFor(() =>
@@ -312,7 +312,7 @@ describe("ItemInspectorDrawer", () => {
     await waitFor(() => expect(api.apiGet).toHaveBeenCalledWith("/v1/taxonomy"));
 
     expect(document.querySelectorAll("#drawer-category-options option")).toHaveLength(0);
-    fireEvent.change(screen.getByLabelText("Category"), { target: { value: "Vintage Linens" } });
+    fireEvent.change(screen.getByLabelText("Kind of item"), { target: { value: "Vintage Linens" } });
     fireEvent.click(screen.getByRole("button", { name: "Save changes" }));
     await waitFor(() =>
       expect(api.apiPatch).toHaveBeenCalledWith(

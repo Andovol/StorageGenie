@@ -20,6 +20,7 @@ from app.plugins.expiry_tracker import (
     MANUAL_ENTRY_TASK_TYPE,
     has_accepted_expiry_or_clear,
     manual_task_change,
+    requires_date_task,
 )
 from app.services import audit_service, lifecycle
 from app.services.enrich import scoring as enrich_scoring
@@ -770,7 +771,10 @@ def build_candidate_from_extraction(
         db.add(task)
         db.flush()
         task_ids.append(task.id)
-    if extraction.needs_evidence:
+    if extraction.needs_evidence and requires_date_task(extraction.unknowns):
+        # SG-271 G1: the date task opens only when the expiry date itself is
+        # unknown. needs_evidence is provider-global (cosmetics prompt v4 sets
+        # it for an unknown opened_date); an opened_date unknown opens nothing.
         task = ReviewTask(
             task_type="expiry.manual_entry",
             priority="high",
@@ -996,6 +1000,48 @@ def blocking_review_task_ids(db: Session, candidate: Candidate) -> list[str]:
         .all()
     )
     return [str(row[0]) for row in rows]
+
+
+def _household_asset(db: Session, candidate: Candidate, asset_id: object) -> str | None:
+    """The asset id when it names a live item of this candidate's household."""
+    if not isinstance(asset_id, str):
+        return None
+    target = db.query(Asset).filter_by(id=asset_id).first()
+    if target is None or target.household_id != candidate.household_id:
+        return None
+    return target.id
+
+
+def committed_asset_id(db: Session, candidate: Candidate) -> str | None:
+    """The item id this candidate already led to, if any (SG-271 G2).
+
+    Derived on every read from rows the commit already wrote — nothing is
+    stored: a duplicate proposal's own asset, the review step's
+    `committed_assets` map (SG-270), then the commit step's own output
+    (pre-SG-270 rows, SG-275). Every hop checks the household, as the commit
+    path does; a foreign-household id reads back as none.
+    """
+    proposal = load_proposal(candidate)
+    found = _household_asset(db, candidate, proposal.get("asset_id"))
+    if found is not None:
+        return found
+    review_output = _step_output(db, candidate.job_id, "AWAITING_REVIEW")
+    if isinstance(review_output, dict):
+        committed = review_output.get("committed_assets")
+        if isinstance(committed, dict):
+            found = _household_asset(db, candidate, committed.get(candidate.id))
+            if found is not None:
+                return found
+    commit_output = _step_output(db, candidate.job_id, "COMMITTING")
+    if (
+        isinstance(commit_output, dict)
+        and commit_output.get("candidate_id") == candidate.id
+        and commit_output.get("created") is True
+    ):
+        found = _household_asset(db, candidate, commit_output.get("asset_id"))
+        if found is not None:
+            return found
+    return None
 
 
 def _open_date_tasks(db: Session, candidate: Candidate) -> list[ReviewTask]:
@@ -1264,10 +1310,15 @@ def _split_child_fields(
 
 
 def _attach_split_child_date_tasks(db: Session, children: list[Candidate]) -> None:
-    """Give each evidence-needing child its own open date task (SG-270)."""
+    """Give each evidence-needing child its own open date task (SG-270).
+
+    SG-271 G1: only when that child's own unknowns name the expiry date. A
+    child whose only unknown is the opened date (or any other field) carries
+    needs_evidence but opens no date task.
+    """
     for child in children:
         child_proposal = load_proposal(child)
-        if child_proposal.get("needs_evidence") is not True:
+        if not requires_date_task(child_proposal.get("ai_unknowns")):
             continue
         child_task = ReviewTask(
             task_type=MANUAL_ENTRY_TASK_TYPE,

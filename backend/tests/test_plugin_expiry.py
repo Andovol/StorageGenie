@@ -632,8 +632,10 @@ def test_move_to_non_perishable_clears_the_active_date(plugin_db) -> None:  # ty
         session, household_id, datetime.now(timezone.utc).date()
     )
     assert all(row["asset_id"] != asset.id for row in status["rows"])
-    reasons = {row["asset_id"]: row["reason"] for row in status["unresolved_rows"]}
-    assert reasons[asset.id] == "dateless"
+    # SG-271 G5 (F8): a deliberately dateless item leaves Unresolved and is
+    # counted quietly instead of nagging with a "No date" row.
+    assert all(row["asset_id"] != asset.id for row in status["unresolved_rows"])
+    assert status["summary"]["dateless"] == 1
 
 
 def test_move_to_non_perishable_resolves_open_date_tasks_with_an_active_row(plugin_db) -> None:  # type: ignore[no-untyped-def]
@@ -898,8 +900,10 @@ def test_clear_expiry_date_supersedes_and_resolves_the_manual_task(plugin_db) ->
         session, household_id, datetime.now(timezone.utc).date()
     )
     assert all(row["asset_id"] != asset.id for row in status["rows"])
-    reasons = {row["asset_id"]: row["reason"] for row in status["unresolved_rows"]}
-    assert reasons[asset.id] == "dateless"
+    # SG-271 G5: a cleared date is a deliberate dateless decision — off the
+    # unresolved list, counted quietly.
+    assert all(row["asset_id"] != asset.id for row in status["unresolved_rows"])
+    assert status["summary"]["dateless"] == 1
 
 
 def test_clear_expiry_date_with_no_active_expiry_writes_nothing(plugin_db) -> None:  # type: ignore[no-untyped-def]
