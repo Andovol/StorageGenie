@@ -9,7 +9,9 @@
 **Restart: one recreate of the backend container**, as the standing rider does.
 **Provider: none.** No provider is called, no key is read or printed, no `.env` is opened by you, **no spend**.
 
-**Contract chain:** recorded `0.58.0` (`AGENTS.md`) == published `contract-v0.58.0` == the host's contract `0.58.0` (SG-271's echo) == the echo this report carries from `/home/andrei/storagegenie-contract/CODER.md` line 3.
+**Contract:** recorded `0.58.0` (`AGENTS.md`). **This lane denies reading the contract folder; do not try.** Your own contract's version line, as you received it, is the host evidence: echo it. A denial on that folder is expected and is not a STOP.
+
+**RETRY — the one retry this slice gets.** Run 1 stopped correctly in S0 because the earlier packet demanded a read of the contract folder, which this lane denies (`docs/worklogs/SG-296_report.md`). That was a packet defect; it is fixed above. Run 1's G0 pre-state and census are in that report; take them again, do not copy them. Write this run's report to `docs/worklogs/SG-296_report.md`, replacing run 1's, and keep run 1's text under a heading `## Run 1 (stopped in S0)` at the end.
 
 **Authority:** owner, stage C (*"d14 ok"*, L3); the standing rule deploys every app-changing slice as its own slice right after it is rated (`AGENTS.md`, Close-out). SG-271 was audited 90 with no flag (`docs/worklogs/SG-271_audit.md`); its two findings are folded into SG-272 and do not hold this deploy.
 
