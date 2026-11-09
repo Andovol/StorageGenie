@@ -1,0 +1,14 @@
+Partial-Receipt-ID: SG-271
+utc=2026-11-09T20:19:16Z
+invocation=562986c1a6bf49fba2bba81c4991dfb1
+killed=term
+pushed=0
+uncommitted=backend/app/api/v1/candidates.py,backend/app/api/v1/jobs.py,backend/app/plugins/expiry_tracker.py,backend/app/services/candidates.py,backend/app/services/expiry_engine.py,backend/eval/baseline_sg029_frozen.md,backend/tests/test_plugin_expiry.py,backend/tests/test_sg107_expiry_engine.py,frontend/src/api/types.ts,frontend/src/components/AssetForm.test.tsx,frontend/src/components/AssetForm.tsx,frontend/src/components/CandidateCard.tsx,frontend/src/components/shell/ItemInspectorDrawer.tsx,frontend/src/components/shell/drawer.test.tsx,frontend/src/routes/AssetDetailPage.test.tsx,frontend/src/routes/AssetDetailPage.tsx,frontend/src/routes/ExpiryPage.test.tsx,frontend/src/routes/ExpiryPage.tsx,frontend/src/routes/InboxPage.tsx,frontend/src/routes/ReviewPage.test.tsx,frontend/src/routes/ReviewPage.tsx,backend/tests/test_sg271_flow.py,docs/worklogs/SG-271_affected_twice.log,docs/worklogs/SG-271_backend_gate.log,docs/worklogs/SG-271_fail_frontend.log,docs/worklogs/SG-271_fail_new_tests.log,docs/worklogs/SG-271_frontend_affected_twice.log,docs/worklogs/SG-271_frontend_build.log,docs/worklogs/SG-271_frontend_gate.log,docs/worklogs/SG-271_mypy.log,docs/worklogs/SG-271_pass_frontend.log,docs/worklogs/SG-271_pass_new_tests.log,frontend/src/components/CandidateCard.sg271.test.tsx,frontend/src/routes/AssetDetailPage.sg271.test.tsx,frontend/src/routes/ExpiryPage.sg271.test.tsx,frontend/src/routes/InboxPage.sg271.test.tsx,frontend/src/routes/ReviewPage.sg271.test.tsx
+wip=a54dd4ecd5b3ac5ac16ff4bafde1c9805cf18261 refs/wip/SG-271/20261109T201913Z
+wip_elapsed_ms=1184
+wip_tracked=cdf2b20bb07d38f066eddbba7dd8dfec05689fb9 refs/wip-tracked/SG-271/20261109T201913Z
+wip_untracked=16 host_local
+DISPATCH_RESULT id=SG-271 coder=opencode exit=143 head=8c50a02bb0a7b75bf5966941167374fd60d28d9d note=no moved=no rewrite=no dirty=yes elapsed=2100s budget=2100s killed=term permission_denied=bash
+P1_moved=FAIL count=0
+P2_rewrite=PASS behind=0
+P6_dirty=FAIL dirty=yes
