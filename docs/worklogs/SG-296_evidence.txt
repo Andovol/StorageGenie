@@ -1,0 +1,36 @@
+SG-296 evidence (run 2). Raw key outputs, sha256 and sizes; no owner data.
+
+Containers
+  before: e2a10bded379 image sha256:6b86f5e09a11 restart 0 healthy
+  after:  0c4462ee5482 image sha256:dcc67781b938 restart 0 healthy (~12 s to healthy)
+Tags
+  storagegenie-backend:release-sg295 -> sha256:6b86f5e09a11 (unchanged)
+  storagegenie-backend:recovery-sg270 -> 2acd0c2438f3 (unchanged)
+  storagegenie-backend:release-sg296 -> sha256:dcc67781b938 (created)
+  storagegenie-backend:latest -> sha256:dcc67781b938 (moved by compose build)
+
+Runtime diff, release-sg295 image vs new image (app/, excl __pycache__)
+  app/api/v1/candidates.py
+  app/api/v1/jobs.py
+  app/plugins/expiry_tracker.py
+  app/services/candidates.py
+  app/services/expiry_engine.py
+  eval/baseline_sg029_frozen.md   (eval/ present in image)
+
+Static (before -> after)
+  static/index.html                         571ad339c174... 944 B -> 4b803f411674... 944 B
+  static/assets/index-FB7x-XIy.js           8743733b15a8... 333530 B -> (removed)
+  static/assets/index-aRzURpTy.js           (new) 80e565d27ab1... 336969 B
+  static/assets/index-C07VbG0m.css          c3b58cda696a... 4535 B (unchanged)
+
+Served tree vs worktree (backend/app, excl __pycache__): identical.
+
+Census (29 tables)
+  before: 418 rows total; after: 418 rows total; no table moved.
+  alembic head: 20261102_sg279_candidate_state (before and after).
+
+Health (six polls): {"status":"ok","db":"ok","storage":"ok"}
+Routes: / 200  /expiry 200  /inbox 200  /planning 200
+GET /v1/plugins/expiry-tracker/status: HTTP 200, summary.dateless present, value 0.
+Startup log: no traceback, no ERROR/WARNING lines.
+Daily pass: as_of=2026-11-09 households_visited=1 reminders_created=0 errors=0
