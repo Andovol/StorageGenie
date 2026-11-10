@@ -17,10 +17,11 @@ Built from audits, one row per rated slice (owner, D25, 2026-11-07). Strengths a
 | SG-271 run 2 | muse-1.3, xhigh | build, backend + 4 screens (retry) | ~420 s | 90 | yes, a 1300 s stop rule; but changed an out-of-scope eval file instead of stopping | cleared perishable dates hidden from Unresolved; new notes at 12 px | mixed |
 | SG-272 | muse-1.3, xhigh | build, lifecycle + 4 screens + quantities | ~1240 s (stopped by its rule) | 85 | **yes**, the 1300 s stop rule exactly | task list filtered after paging; a status literal | packet (scope vs budget) |
 | SG-296 | haiku-5-5, high | deploy rider, code only (2 runs) | run 1 stopped in S0; run 2 ~150 s | 96 | yes, at the first sign (run 1) | contract version line not echoed | packet (run 1) |
+| SG-297 | haiku-5-5, high | gate + small backend fix | ~406 s (trigger file) | 90 | yes, stopped on the two reds exactly as told | none in its own work; report had no timings (second time) | packet (stale oracle not named) |
 
 ## Haiku 5.5 at `high` — profile
 
-**Strengths so far (4 slices):** stopped at a denial in S0 without trying another route (SG-296 run 1); carried a live migration through every recovery state exactly; keeps a hard stop rule at the first sign; reports evidence and options without acting on them; respects a permission denial. **Weaknesses so far:** report gaps (an output cut; phase timings not captured). Applies hard rules literally, which is right for stop rules but means the packet must be exact.
+**Strengths so far (5 slices):** a clean in-scope fix with FAIL-then-PASS and unasked base-run attribution of every red (SG-297); stopped at a denial in S0 without trying another route (SG-296 run 1); carried a live migration through every recovery state exactly; keeps a hard stop rule at the first sign; reports evidence and options without acting on them; respects a permission denial. **Weaknesses so far:** report gaps (an output cut; phase timings not captured, twice: SG-296, SG-297). Packets for Haiku require a `date +%s` stamp at each phase. Applies hard rules literally, which is right for stop rules but means the packet must be exact.
 
 ## Muse 1.3 Contributor at `xhigh` — profile
 
