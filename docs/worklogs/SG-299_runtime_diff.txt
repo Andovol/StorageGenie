@@ -1,0 +1,47 @@
+# SG-299 runtime diff: running image dcc67781 (release-sg296) vs built image 62db28ab (release-sg299), /app tree (backend/ copy) excluding /app/static and __pycache__
+# sha256 of each file; expected set per packet G1 = 9 changed + 1 added, static changed as listed
+# CHANGED
+app/api/v1/assets.py
+  before 1955e1c91da517e0696fb81c3d4784ddb67faaa8a77fce463c67b1ea3af092a4
+  after  278e77093f49c31eb9ef1076813abbea778c3b9e68fe5be36168c337af94a480
+app/api/v1/reminders.py
+  before 98fcbd88d4acbd0720bba40f8fd0306b3f46fb5f790a83d6197bcc616bc8487e
+  after  219cbbb35e884e8b0c2bf4e48cc14ea6eb0793759a0341c0ac6304f9aa0d37a9
+app/api/v1/review_tasks.py
+  before 529443d9be3a03aab65c655ad7ebaaab6f3cdd69b7e2fa9298e07f0604894d49
+  after  a265773007cb2ffa2c974498a9358770a2ac87f5a2d8d618435810857d292199
+app/services/asset_service.py
+  before 9a1bebb15094569dd88fbdc74c3f823015dc58302e36ae5f9b673feee7bcba3b
+  after  41612e1f337472230e2bc549619e9bd7d5a60536c7a4af33371528428b3711bc
+app/services/expiry_engine.py
+  before ec8643dc9815d58a0f82d237444b07f79916cfedea91a1e3ae359e1d3a863818
+  after  3c2f3e16246d393529ffe33470e24c9e97cade105211adc3146b2c3207343f8e
+app/services/lifecycle.py
+  before 96093c94ed9ac9582ee101db510857aba1f533d2abd072ab322c3203366bb0fc
+  after  276c8933a92e904cdcdebcdb26acb89e49c21609c2f550c3b132ccddd50e0329
+tests/fixtures/sg136_asset_dict_baseline.json
+  before 6b5cfab8b4047e54cb6e0880bf0b90cad8b78e48eb975608566ae6b13b201d69
+  after  26a4e1cabc6a2f0c4789520571a216db9fef6dffa0039cb9c9b5c15d19239c30
+tests/test_plugin_expiry.py
+  before 9dfe15701f6c6ca77ba3e1b6a525c4ebefedad1790cdfae5a8a5b4536114a87d
+  after  9b39442a2c5401130fffe5a1786258647b596ddb9a5d27e2cc5f331529f90113
+tests/test_sg111_lifecycle.py
+  before e77329f9c802c33e035de9183b912315ddf2dcb2d607c0c3808e4924277ca7a5
+  after  d824fec1221562bfec2a6c546bedc71b7438b99f762c812bca7b2ff9c78b8929
+# ADDED
+tests/test_sg272_flow.py
+  after  0435c4fa8d341486f50eff24bb8532428a6b634662adf63af3386db3a69f7aa4
+# REMOVED: none
+# STATIC (served, /app/static)
+static/assets/index-C07VbG0m.css
+  before c3b58cda696a22970fc2a4a348849fc1359f2105f80f81304ed5dfd5ca31a557
+  after  c3b58cda696a22970fc2a4a348849fc1359f2105f80f81304ed5dfd5ca31a557
+static/assets/index-CjbyAByJ.js
+  before -
+  after  665dcb1191dee1ee8d14daf87fbe96fba04324140f5c96f06c27aafbfbf39588
+static/assets/index-aRzURpTy.js
+  before 80e565d27ab1b1dd14a3c9d74355cab46906938c20379e1562d6ce506c0c52aa
+  after  -
+static/index.html
+  before 4b803f411674a39418321a85a278932ad6bae7d7a914d2414be1c85075f826a5
+  after  97437d95a949a574acc77974e7a6d76a014910f6b26d27a3771711c7d5f318b4
