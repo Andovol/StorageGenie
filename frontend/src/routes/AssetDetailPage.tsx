@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useParams, useSearchParams, Link } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useAsset, useTaxonomy } from "../hooks/useAssets";
+import { quantityLeftText } from "../lib/quantityText";
 import { EvidenceGallery } from "../components/EvidenceGallery";
 import { ProvenanceBadge } from "../components/ProvenanceBadge";
 import { ExpiryEntryForm } from "../components/ExpiryEntryForm";
@@ -649,7 +650,7 @@ export function AssetDetailPage() {
               {decMut.isPending ? "…" : "−1"}
             </button>
             <span className="text-foreground" style={{ fontSize: 13 }}>
-              {qtyValue != null ? `${qtyValue}${asset.unit ? ` ${asset.unit}` : ""} left` : "No count yet"}
+              {quantityLeftText(qtyValue, asset.unit, counted)}
             </span>
             <button
               type="button"
@@ -664,7 +665,7 @@ export function AssetDetailPage() {
           </div>
         ) : (
           <div className="text-muted-foreground" style={{ fontSize: 13 }}>
-            {qtyValue != null ? `${qtyValue}${asset.unit ? ` ${asset.unit}` : ""} left` : "No amount yet"} — change the amount with Edit above.
+            {quantityLeftText(qtyValue, asset.unit, counted)} — change the amount with Edit above.
           </div>
         )}
         {noneLeft && (

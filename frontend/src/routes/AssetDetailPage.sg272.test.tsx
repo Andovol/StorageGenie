@@ -115,7 +115,7 @@ describe("AssetDetailPage SG-272 quantities", () => {
     renderPage();
     const minus = await screen.findByRole("button", { name: "Take off 1" });
     expect(screen.getByRole("button", { name: "Put 1 back on the count" })).toBeInTheDocument();
-    expect(screen.getByText("3 pcs left")).toBeInTheDocument();
+    expect(screen.getByText("3 left")).toBeInTheDocument();
     fireEvent.click(minus);
     await waitFor(() => expect(api.decrementQuantity).toHaveBeenCalledWith("asset-272", "hh"));
   });

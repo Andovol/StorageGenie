@@ -134,7 +134,7 @@ describe("PantryPage SG-273", () => {
     expect(screen.getByTestId("pantry-grid")).toHaveTextContent("Edge Out");
   });
 
-  test("-1 and Used up call the existing routes and the tile updates", async () => {
+  test("-1 and Use it up call the existing routes and the tile updates", async () => {
     client.apiGet.mockResolvedValue({ items: [foodLive], next_cursor: null });
     client.fetchExpiryStatus.mockResolvedValue({
       household_id: "hh",
@@ -150,11 +150,11 @@ describe("PantryPage SG-273", () => {
     renderPage();
     fireEvent.click(await screen.findByRole("button", { name: "Take off 1" }));
     await waitFor(() => expect(client.decrementQuantity).toHaveBeenCalledWith("food-1", "hh"));
-    fireEvent.click(screen.getByRole("button", { name: "Used up" }));
+    fireEvent.click(screen.getByRole("button", { name: "Use it up" }));
     await waitFor(() => expect(client.markGone).toHaveBeenCalledWith("food-1", "hh", "used_up"));
   });
 
-  test("journey: classified food appears, -1, Used up, gone from the grid", async () => {
+  test("journey: classified food appears, -1, Use it up, gone from the grid", async () => {
     client.apiGet
       .mockResolvedValueOnce({ items: [], next_cursor: null })
       .mockResolvedValue({ items: [foodLive], next_cursor: null });

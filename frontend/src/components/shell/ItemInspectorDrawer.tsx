@@ -7,6 +7,7 @@ import { goneReasonLabel } from "../../api/types";
 import { CONTROL_STYLE, THEMED_CONTROL_CLASS } from "./CatalogToolbar";
 import { useTaxonomy } from "../../hooks/useAssets";
 import { toProductCategory, UNTITLED_ASSET_NAME } from "../../types/product";
+import { quantityLeftText } from "../../lib/quantityText";
 
 type ViewerTab = "cutout" | "scene" | "source";
 
@@ -462,7 +463,7 @@ export function ItemInspectorDrawer({ asset, householdId, onClose }: ItemInspect
                 {decMut.isPending ? "…" : "−1"}
               </button>
               <span style={{ fontSize: 13 }}>
-                {qtyValue != null ? `${qtyValue}${current.unit ? ` ${current.unit}` : ""} left` : "No count yet"}
+                {quantityLeftText(qtyValue, current.unit, counted)}
               </span>
               <button
                 type="button"
@@ -477,7 +478,7 @@ export function ItemInspectorDrawer({ asset, householdId, onClose }: ItemInspect
             </div>
           ) : (
             <div className="text-muted-foreground" style={{ fontSize: 13 }}>
-              {qtyValue != null ? `${qtyValue}${current.unit ? ` ${current.unit}` : ""} left` : "No amount yet"} — change the amount with Save changes above.
+              {quantityLeftText(qtyValue, current.unit, counted)} — change the amount with Save changes above.
             </div>
           )}
           {!isGone && counted && (qtyValue ?? 0) <= 0 && (
