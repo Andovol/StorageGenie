@@ -1,0 +1,3 @@
+ERROR tests/test_sg136_assertion_batch.py::test_output_is_byte_identical_to_prechange_baseline
+ERROR tests/test_sg136_assertion_batch.py::test_empty_asset_world_issues_no_assertion_select
+4 failed, 32 passed, 2 warnings, 4 errors in 9.42s

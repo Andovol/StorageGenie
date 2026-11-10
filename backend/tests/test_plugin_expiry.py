@@ -900,10 +900,12 @@ def test_clear_expiry_date_supersedes_and_resolves_the_manual_task(plugin_db) ->
         session, household_id, datetime.now(timezone.utc).date()
     )
     assert all(row["asset_id"] != asset.id for row in status["rows"])
-    # SG-271 G5: a cleared date is a deliberate dateless decision — off the
-    # unresolved list, counted quietly.
-    assert all(row["asset_id"] != asset.id for row in status["unresolved_rows"])
-    assert status["summary"]["dateless"] == 1
+    # SG-272 G0b superseded SG-271 G5: a cleared perishable date lists on
+    # Unresolved as No date (reason dateless) and is counted openly; only a
+    # Non-perishable item is counted quietly.
+    unresolved = {row["asset_id"]: row["reason"] for row in status["unresolved_rows"]}
+    assert unresolved.get(asset.id) == "dateless"
+    assert status["summary"]["dateless"] == 0
 
 
 def test_clear_expiry_date_with_no_active_expiry_writes_nothing(plugin_db) -> None:  # type: ignore[no-untyped-def]

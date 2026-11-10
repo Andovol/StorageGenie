@@ -148,6 +148,21 @@ def test_cycle_gone_and_back_restores_everything(gone_db) -> None:  # type: igno
         assert gone.status_code == 200, gone.text
         assert gone.json()["status"] == "ARCHIVED"
         assert gone.json()["gone_reason"] == "used_up"
+        # SG-298 G1 rail: the serializer's gone_reason equals get_gone_reason.
+        from sqlalchemy.orm import selectinload
+
+        from app.api.v1.assets import _asset_to_dict
+
+        _fresh(session)
+        _db_gone = (
+            session.query(Asset)
+            .options(selectinload(Asset.assertions))
+            .filter_by(id=asset_id)
+            .one()
+        )
+        assert _asset_to_dict(_db_gone, session)["gone_reason"] == asset_service.get_gone_reason(
+            session, asset_id
+        ) == "used_up"
 
         mid = _snapshot(client, household_id)
         assert asset_id not in mid["catalog"]
@@ -169,6 +184,17 @@ def test_cycle_gone_and_back_restores_everything(gone_db) -> None:  # type: igno
         assert back.status_code == 200, back.text
         assert back.json()["status"] == "ACTIVE"
         assert back.json()["gone_reason"] is None
+        # SG-298 G1 rail: the serializer's gone_reason equals get_gone_reason.
+        _fresh(session)
+        _db_back = (
+            session.query(Asset)
+            .options(selectinload(Asset.assertions))
+            .filter_by(id=asset_id)
+            .one()
+        )
+        assert _asset_to_dict(_db_back, session)["gone_reason"] == asset_service.get_gone_reason(
+            session, asset_id
+        ) is None
 
         assert _snapshot(client, household_id) == first
 
@@ -213,8 +239,12 @@ def test_gone_all_or_nothing_on_injected_failure(gone_db, monkeypatch: pytest.Mo
 
 
 def test_three_reasons_store_and_read_back(gone_db) -> None:  # type: ignore[no-untyped-def]
-    _, household_id, _ = gone_db
+    session, household_id, _ = gone_db
     with TestClient(app) as client:
+        from sqlalchemy.orm import selectinload
+
+        from app.api.v1.assets import _asset_to_dict
+
         for reason in ("used_up", "thrown_away", "given_away"):
             asset = _create(client, household_id)
             asset_id = str(asset["id"])
@@ -225,6 +255,17 @@ def test_three_reasons_store_and_read_back(gone_db) -> None:  # type: ignore[no-
             )
             assert gone.status_code == 200, gone.text
             assert gone.json()["gone_reason"] == reason
+            # SG-298 G1 rail: the serializer's gone_reason equals get_gone_reason.
+            _fresh(session)
+            _db_gone = (
+                session.query(Asset)
+                .options(selectinload(Asset.assertions))
+                .filter_by(id=asset_id)
+                .one()
+            )
+            assert _asset_to_dict(_db_gone, session)["gone_reason"] == asset_service.get_gone_reason(
+                session, asset_id
+            ) == reason
             read = client.get(f"/v1/assets/{asset_id}", params={"household_id": household_id})
             assert read.status_code == 200, read.text
             assert read.json()["gone_reason"] == reason
@@ -238,6 +279,17 @@ def test_three_reasons_store_and_read_back(gone_db) -> None:  # type: ignore[no-
                 f"/v1/assets/{asset_id}/put-back", params={"household_id": household_id}
             )
             assert back.status_code == 200, back.text
+            # SG-298 G1 rail: after put-back the read-back clears both ways.
+            _fresh(session)
+            _db_back = (
+                session.query(Asset)
+                .options(selectinload(Asset.assertions))
+                .filter_by(id=asset_id)
+                .one()
+            )
+            assert _asset_to_dict(_db_back, session)["gone_reason"] == asset_service.get_gone_reason(
+                session, asset_id
+            ) is None
 
 
 def test_gone_refusals_terminals_and_household(gone_db) -> None:  # type: ignore[no-untyped-def]
@@ -505,3 +557,67 @@ def test_sg297_gone_task_hidden_before_pagination(gone_db) -> None:  # type: ign
         assert page2["total"] == 3
         listed_ids = {row["id"] for row in page1["items"] + page2["items"]}
         assert task_ids[gone] not in listed_ids
+
+
+# --- SG-298 G3: a candidate-subject task survives the gone-asset filter ---
+
+
+def test_candidate_subject_task_counted_despite_gone_asset_task(gone_db) -> None:  # type: ignore[no-untyped-def]
+    """SG-298 G3 (SG-297 UNCLEAR): candidate subjects are never Asset rows.
+
+    `ReviewTask` has no `subject_kind` column; the kind is derived after the
+    page by batched lookup. Candidate and Asset ids both default to uuid7
+    (`new_id`) in separate tables — independent random namespaces, so a
+    candidate id is not an Asset row and `_visible_tasks` (subject_ref NOT IN
+    non-ACTIVE asset ids) leaves it listed and counted.
+    """
+
+    import json
+
+    from app.services import job_service
+    from app.services.candidates import Candidate
+
+    session, household_id, _ = gone_db
+    with TestClient(app) as client:
+        gone_asset_id = str(_create(client, household_id)["id"])
+        job = job_service.create_job(session, household_id, [])
+        candidate = Candidate(
+            job_id=job.id,
+            evidence_ids_json="[]",
+            proposed_fields_json=json.dumps({"kind": "new_asset", "fields": {}}),
+            state="proposed",
+            household_id=household_id,
+        )
+        session.add(candidate)
+        session.commit()
+        assert candidate.id != gone_asset_id
+        assert session.query(Asset).filter_by(id=candidate.id).one_or_none() is None
+        candidate_task = ReviewTask(
+            household_id=household_id,
+            subject_ref=candidate.id,
+            task_type="custom.check",
+            priority="normal",
+            status="open",
+        )
+        gone_task = ReviewTask(
+            household_id=household_id,
+            subject_ref=gone_asset_id,
+            task_type="custom.check",
+            priority="normal",
+            status="open",
+        )
+        session.add_all([candidate_task, gone_task])
+        session.commit()
+        gone_response = client.post(
+            f"/v1/assets/{gone_asset_id}/gone",
+            params={"household_id": household_id},
+            json={"reason": "used_up"},
+        )
+        assert gone_response.status_code == 200, gone_response.text
+        listed = client.get("/v1/review-tasks", params={"household_id": household_id, "limit": 20})
+        assert listed.status_code == 200, listed.text
+        payload = listed.json()
+        subjects = [row["subject_ref"] for row in payload["items"]]
+        assert candidate.id in subjects
+        assert gone_asset_id not in subjects
+        assert payload["total"] == 1

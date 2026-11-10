@@ -25,12 +25,12 @@ from app.services.asset_service import (
     AssetMergeError,
     attach_evidence,
     create_asset,
-    get_gone_reason,
     mark_gone,
     merge_asset_redirect,
     put_back,
     adjust_quantity,
     GONE_REASON_FIELD,
+    GONE_REASONS,
     update_asset,
 )
 from app.services.fts import ensure_asset_fts, sanitize_fts_query
@@ -110,6 +110,37 @@ def post_asset(
     return _asset_to_dict(a, db)
 
 
+def _gone_reason_from_assertions(assertions: list) -> str | None:  # type: ignore[no-untyped-def]
+    """SG-298 G1 (R3): the gone reason from already-loaded assertion rows.
+
+    Same rule as `get_gone_reason`: field `GONE_REASON_FIELD`,
+    `review_state == "accepted"`, the latest by `created_at`, `value.reason`
+    when it names a known reason, else `None`. The relationship holds every
+    review state ordered by `field_path` (see `Asset.assertions`), so the
+    latest-by-`created_at` pick happens here. A malformed value gives `None`
+    by the same value checks `get_gone_reason` makes — no broad `except`.
+    Split out of `_asset_to_dict` so that handler stays in budget.
+    """
+    latest = None
+    for ass in assertions:
+        if ass.field_path != GONE_REASON_FIELD or ass.review_state != "accepted":
+            continue
+        if latest is None:
+            latest = ass
+        elif ass.created_at is not None and (
+            latest.created_at is None or ass.created_at > latest.created_at
+        ):
+            latest = ass
+    if latest is None:
+        return None
+    try:
+        value = json.loads(latest.value_json)
+    except ValueError:
+        value = None
+    reason = value.get("reason") if isinstance(value, dict) else None
+    return reason if isinstance(reason, str) and reason in GONE_REASONS else None
+
+
 def _asset_to_dict(asset: Asset, db: Session) -> dict:  # type: ignore[no-untyped-def]
     # Evidence: Join Evidence and asset_evidence to fetch linked evidence in a single query
     evs = (
@@ -178,12 +209,12 @@ def _asset_to_dict(asset: Asset, db: Session) -> dict:  # type: ignore[no-untype
         "assertions": assertions,
         "audit_events": audits,
     }
-    # SG-272 G1 (`PG-SC-02` read-back): the gone reason rides the assertion
-    # store, so the detail read carries it the same way the list does.
-    try:
-        out["gone_reason"] = get_gone_reason(db, asset.id)
-    except Exception:
-        out["gone_reason"] = None
+    # SG-298 G1 (R3): the gone reason rides the assertion store, so the
+    # detail read carries it from the assertions already loaded on the asset
+    # (`asset.assertions`, the relationship SG-136 reads) — never one SELECT
+    # per asset. `get_gone_reason` stays for its other caller
+    # (`asset_service.mark_gone`).
+    out["gone_reason"] = _gone_reason_from_assertions(asset.assertions)
     # SG-113: the reader half of the location write path (`PG-SC-02`). Only
     # added when the dormancy flag is ON, so the flag-OFF response stays
     # byte-identical to the pre-slice shape (no new key).
