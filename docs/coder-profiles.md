@@ -20,10 +20,11 @@ Built from audits, one row per rated slice (owner, D25, 2026-11-07). Strengths a
 | SG-297 | haiku-5-5, high | gate + small backend fix | ~406 s (trigger file) | 90 | yes, stopped on the two reds exactly as told | none in its own work; report had no timings (second time) | packet (stale oracle not named) |
 | SG-298 run 1 | muse-1.3, xhigh | gate + small backend fix | ~85 s | unrated, retried | stopped, but on a fault of its own | **typed the socket path wrong, then reported it as the packet's exact value** | coder |
 | SG-298 run 2 | muse-1.3, xhigh | gate + small backend fix (retry) | ~625 s | 92 | yes | none in the work; corrected a wrong packet premise with evidence | mixed |
+| SG-299 | haiku-5-5, high | deploy rider, code only (2 runs) | run 1 ~110 s stopped in S0; run 2 128 s | 96 | yes, S0 on a file outside the list (run 1) | publish hashes not quoted | packet (run 1) |
 
 ## Haiku 5.5 at `high` — profile
 
-**Strengths so far (5 slices):** a clean in-scope fix with FAIL-then-PASS and unasked base-run attribution of every red (SG-297); stopped at a denial in S0 without trying another route (SG-296 run 1); carried a live migration through every recovery state exactly; keeps a hard stop rule at the first sign; reports evidence and options without acting on them; respects a permission denial. **Weaknesses so far:** report gaps (an output cut; phase timings not captured, twice: SG-296, SG-297). Packets for Haiku require a `date +%s` stamp at each phase. Applies hard rules literally, which is right for stop rules but means the packet must be exact.
+**Strengths so far (6 slices):** stops in S0 rather than widen an expected list on its own authority (SG-299 run 1); records phase timings when the packet requires stamps (SG-299); a clean in-scope fix with FAIL-then-PASS and unasked base-run attribution of every red (SG-297); stopped at a denial in S0 without trying another route (SG-296 run 1); carried a live migration through every recovery state exactly; keeps a hard stop rule at the first sign; reports evidence and options without acting on them; respects a permission denial. **Weaknesses so far:** report gaps (an output cut; phase timings not captured, twice: SG-296, SG-297). Packets for Haiku require a `date +%s` stamp at each phase. Applies hard rules literally, which is right for stop rules but means the packet must be exact.
 
 ## Muse 1.3 Contributor at `xhigh` — profile
 
