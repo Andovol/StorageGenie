@@ -1,0 +1,19 @@
+SG-298 G0 preflight — BLOCKED (docker daemon unreachable)
+stamps: 1794341531 base-resolve, 1794341536 G0-start, 1794341552 docker-default, 1794341559 harness-check, 1794341589 preflight-retry, 1794341616 final-health
+DOCKER_CONFIG=/home/andrei/StorageGenie/output/SG-298-scratch/docker-config (writable dir under output/SG-298-scratch/)
+DOCKER_HOST=unix:///run/dispatch-storagegenie-SG-298.sock
+$ DOCKER_CONFIG=.../output/SG-298-scratch/docker-config DOCKER_HOST=unix:///run/dispatch-storagegenie-SG-298.sock docker version
+Client: Docker Engine - Community / Version 29.9.2 / API 1.56 / Go go1.26.10 / Git a82e528 / Built Tue Oct 20 18:44:40 2026 / OS/Arch linux/amd64 / Context default
+failed to connect to the docker API at unix:///run/dispatch-storagegenie-SG-298.sock; check if the path is correct and if the daemon is running: dial unix /run/dispatch-storagegenie-SG-298.sock: connect: no such file or directory
+RC1=1 (no Server section)
+$ DOCKER_CONFIG=... DOCKER_HOST=... docker run --rm busybox true
+failed to connect to the docker API at unix:///run/dispatch-storagegenie-SG-298.sock; check if the path is correct and if the daemon is running: dial unix /run/dispatch-storagegenie-SG-298.sock: connect: no such file or directory
+RC2=1
+$ PATH=$PWD/backend/venv/bin:$PATH backend/venv/bin/python --version
+Python 3.12.3 / backend/venv/bin/python present (symlink target /usr/bin/python3) RC-VENV=0
+$ curl -s http://127.0.0.1:8003/v1/health (start 1794341536, retry 1794341589, final 1794341616)
+{"status":"ok","db":"ok","storage":"ok"} 200 at start and end
+default docker (no override, DOCKER_CONFIG=/home/andrei/StorageGenie/output/dispatch/docker-config):
+permission denied while trying to connect to the docker API at unix:///var/run/docker.sock
+BASE ref origin/automation resolved d06fdc2088ba5128f694086cf1f2a97596dd0878 HEAD d06fdc2088ba5128f694086cf1f2a97596dd0878 clean
+scratch output/SG-298-scratch/ created, contains docker-config/, removed by exact path after report
