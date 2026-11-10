@@ -2,14 +2,14 @@ import datetime
 import json
 
 from fastapi import APIRouter, Depends, HTTPException, Query
-from sqlalchemy import and_, func, or_
+from sqlalchemy import and_, func, or_, select
 from sqlalchemy.orm import Session
 
 from app.db import get_db
 from app.models.asset import Asset
 from app.models.review_task import ReviewTask
 from app.schemas.common import decode_cursor, encode_cursor
-from app.services import audit_service
+from app.services import audit_service, lifecycle
 from app.services.candidates import Candidate
 
 router = APIRouter()
@@ -36,6 +36,25 @@ def _missing_data_name(task: ReviewTask) -> str:
     return "expiry_date"
 
 
+def _visible_tasks(db: Session, household_id: str):  # type: ignore[no-untyped-def]
+    """SG-297 I2/I3: the household's tasks, minus those whose subject asset is not ACTIVE.
+
+    SG-272 G1/G2: a gone item's asset-subject tasks hide until it is put back.
+    Rows are never mutated, so hiding and restoring are automatic. The filter
+    runs in the query, before pagination, so a page holds its full limit of
+    visible tasks, the cursor stays correct, and `total` counts what is listed.
+    Candidate subjects are never in the Asset table, so they are unaffected.
+    """
+    gone_asset_ids = select(Asset.id).where(
+        Asset.household_id == household_id,
+        ~lifecycle.active_clause(),
+    )
+    return db.query(ReviewTask).filter(
+        ReviewTask.household_id == household_id,
+        ReviewTask.subject_ref.notin_(gone_asset_ids),
+    )
+
+
 @router.get("/review-tasks")
 def list_review_tasks(
     household_id: str = Query(...),
@@ -43,7 +62,7 @@ def list_review_tasks(
     limit: int = Query(default=20, ge=1, le=100),
     db: Session = Depends(get_db),  # type: ignore[no-untyped-def]
 ):  # type: ignore[no-untyped-def]
-    query = db.query(ReviewTask).filter(ReviewTask.household_id == household_id)
+    query = _visible_tasks(db, household_id)
     # SG-188 (D7): a cursor that cannot be decoded is a 422, never a silent
     # page-1 repeat (the pre-slice `if decoded:` skipped the filter).
     if cursor is not None:
@@ -65,25 +84,9 @@ def list_review_tasks(
         next_cursor = None
     # SG-270 G4: resolve each page's subject kind with one batched lookup per
     # subject table, never one query per row.
-    # SG-272 G1/G2: a gone item's asset-subject tasks hide until it is put
-    # back. Rows are never mutated by gone/put-back; the list drops page items
-    # whose subject asset is non-ACTIVE (one batched status lookup), so hiding
-    # and restoring are automatic. `total` stays the household row count.
+    # SG-297 I2: gone-asset tasks are excluded in the query (see _visible_tasks),
+    # so no page is cut short and `total` excludes them.
     subject_refs = {item.subject_ref for item in items}
-    gone_asset_refs: set[str] = set()
-    if subject_refs:
-        gone_asset_refs = {
-            str(row[0])
-            for row in db.query(Asset.id)
-            .filter(
-                Asset.id.in_(subject_refs),
-                Asset.household_id == household_id,
-                Asset.status != "ACTIVE",
-            )
-            .all()
-        }
-        if gone_asset_refs:
-            items = [item for item in items if item.subject_ref not in gone_asset_refs]
     candidate_ids: set[str] = set()
     asset_ids: set[str] = set()
     if subject_refs:
@@ -123,7 +126,7 @@ def list_review_tasks(
             for item in items
         ],
         "next_cursor": next_cursor,
-        "total": db.query(ReviewTask).filter(ReviewTask.household_id == household_id).count(),
+        "total": _visible_tasks(db, household_id).count(),
     }
 
 

@@ -282,6 +282,38 @@ def _facet_queries(
     }
 
 
+def _gone_reasons(db: Session, asset_ids: list[str]) -> dict[str, str | None]:
+    """SG-272 G1/G2 (`PG-SC-02` read-back): each page asset's latest gone reason.
+
+    One batched assertion lookup for the page, never one query per row. Split
+    out of `list_assets` so that handler stays within the complexity budget.
+    """
+    from app.models.assertion import Assertion as _Assertion
+
+    gone_reason_by_asset: dict[str, str | None] = {}
+    if not asset_ids:
+        return gone_reason_by_asset
+    for row in (
+        db.query(_Assertion)
+        .filter(
+            _Assertion.asset_id.in_(asset_ids),
+            _Assertion.field_path == GONE_REASON_FIELD,
+            _Assertion.review_state == "accepted",
+        )
+        .order_by(_Assertion.created_at.desc())
+        .all()
+    ):
+        if row.asset_id in gone_reason_by_asset:
+            continue
+        try:
+            _value = json.loads(row.value_json)
+        except ValueError:
+            _value = None
+        _reason = _value.get("reason") if isinstance(_value, dict) else None
+        gone_reason_by_asset[row.asset_id] = _reason if isinstance(_reason, str) and _reason else None
+    return gone_reason_by_asset
+
+
 @router.get("/assets")
 def list_assets(
     household_id: str = Query(...),
@@ -338,30 +370,7 @@ def list_assets(
     # reason from this same page payload — one batched assertion lookup for the
     # page, never one query per row.
     asset_ids = [a.id for a in items]
-    from app.models.assertion import Assertion as _Assertion
-
-    gone_reason_by_asset: dict[str, str | None] = {}
-    if asset_ids:
-        for row in (
-            db.query(_Assertion)
-            .filter(
-                _Assertion.asset_id.in_(asset_ids),
-                _Assertion.field_path == GONE_REASON_FIELD,
-                _Assertion.review_state == "accepted",
-            )
-            .order_by(_Assertion.created_at.desc())
-            .all()
-        ):
-            if row.asset_id in gone_reason_by_asset:
-                continue
-            try:
-                _value = json.loads(row.value_json)
-            except ValueError:
-                _value = None
-            _reason = _value.get("reason") if isinstance(_value, dict) else None
-            gone_reason_by_asset[row.asset_id] = (
-                _reason if isinstance(_reason, str) and _reason else None
-            )
+    gone_reason_by_asset = _gone_reasons(db, asset_ids)
     evidence_ids_by_asset: dict[str, list[str]] = {}
     if asset_ids:
         for row in db.execute(

@@ -8,7 +8,7 @@ asset tests (`test_sg271_flow.py::flow_db`).
 from __future__ import annotations
 
 import os
-from datetime import date, timedelta
+from datetime import date, datetime, timedelta
 
 import pytest
 from fastapi.testclient import TestClient
@@ -452,3 +452,56 @@ def test_cleared_perishable_date_lists_as_no_date(gone_db) -> None:  # type: ign
         assert asset_id not in [row["asset_id"] for row in quiet["rows"]]
         assert asset_id not in [row["asset_id"] for row in quiet["unresolved_rows"]]
         assert quiet["summary"].get("dateless", 0) == 1
+
+
+# --- SG-297 I2: a gone item's task is hidden before the page is cut ---
+
+
+def test_sg297_gone_task_hidden_before_pagination(gone_db) -> None:  # type: ignore[no-untyped-def]
+    session, household_id, _ = gone_db
+    with TestClient(app) as client:
+        visible_new = str(_create(client, household_id)["id"])
+        gone = str(_create(client, household_id)["id"])
+        visible_mid = str(_create(client, household_id)["id"])
+        visible_old = str(_create(client, household_id)["id"])
+        gone_response = client.post(
+            f"/v1/assets/{gone}/gone",
+            params={"household_id": household_id},
+            json={"reason": "used_up"},
+        )
+        assert gone_response.status_code == 200, gone_response.text
+        # Newest first: visible_new, then the gone subject, then visible_mid, visible_old.
+        stamps = [(visible_new, 40), (gone, 30), (visible_mid, 20), (visible_old, 10)]
+        task_ids: dict[str, str] = {}
+        for subject, second in stamps:
+            task = ReviewTask(
+                household_id=household_id,
+                subject_ref=subject,
+                task_type="custom.check",
+                priority="normal",
+                status="open",
+                created_at=datetime(2026, 11, 9, 12, 0, second),
+            )
+            session.add(task)
+            session.flush()
+            task_ids[subject] = task.id
+        session.commit()
+
+        first = client.get("/v1/review-tasks", params={"household_id": household_id, "limit": 2})
+        assert first.status_code == 200, first.text
+        page1 = first.json()
+        assert [row["subject_ref"] for row in page1["items"]] == [visible_new, visible_mid]
+        assert page1["total"] == 3
+        assert page1["next_cursor"] is not None
+
+        second_page = client.get(
+            "/v1/review-tasks",
+            params={"household_id": household_id, "limit": 2, "cursor": page1["next_cursor"]},
+        )
+        assert second_page.status_code == 200, second_page.text
+        page2 = second_page.json()
+        assert [row["subject_ref"] for row in page2["items"]] == [visible_old]
+        assert page2["next_cursor"] is None
+        assert page2["total"] == 3
+        listed_ids = {row["id"] for row in page1["items"] + page2["items"]}
+        assert task_ids[gone] not in listed_ids
