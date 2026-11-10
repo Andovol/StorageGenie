@@ -27,9 +27,22 @@ SG-297 (`e845baf..dd9b1b6`, report `docs/worklogs/SG-297_report.md`) fixed the t
 5. List and detail asset payloads carry `gone_reason` (`assets.py`).
 6. Dedicated routes for gone, put back, decrement, increment (`assets.py`, `asset_service.py`).
 
+**RETRY — the one retry this slice gets.** Run 1 stopped as BLOCKED in G0 because it set `DOCKER_HOST=unix:///run/dispatch-storagegenie-SG-298.sock` — **not the path this packet names**: the socket is the file `docker.sock` **inside the directory** `/run/dispatch-storagegenie-SG-298/`. SG-297 reached the daemon with the same pattern. Its report also said it used the "exact packet values"; it did not. **This run copies the commands below verbatim**, and before any docker call prints `echo "$DOCKER_HOST"` and `ls -l /run/dispatch-storagegenie-SG-298/` into the log. Only if `docker version` still has no Server section **with the exact string below** is it a BLOCKED STOP. Write this run's report to `docs/worklogs/SG-298_report.md`, replacing run 1's, and keep run 1's text under `## Run 1 (stopped in G0, wrong socket path)` at the end.
+
 ## G0 — Preflight
 
-`DOCKER_CONFIG` to a writable directory under `output/SG-298-scratch/`, `DOCKER_HOST=unix:///run/dispatch-storagegenie-SG-298/docker.sock`, `docker version` shows a **Server** section, `docker run --rm busybox true` rc 0; otherwise **STOP as BLOCKED with the verbatim error** (`PB-2`, `PG-PR-03`). `PATH=$PWD/backend/venv/bin:$PATH` for every make and `ruff` call; if the venv `python` is missing, report the exact error and STOP — install nothing. `curl -s http://127.0.0.1:8003/v1/health` at start and end; both 200. Scratch only in `output/SG-298-scratch/`, removed by that exact path; never touch `output/` itself or `output/dispatch`. **Run `date +%s` at the start of every goal and gate step and quote the stamps** — the report computes each phase's seconds from them.
+Copy these lines exactly:
+
+```
+mkdir -p output/SG-298-scratch/docker-config
+export DOCKER_CONFIG="$PWD/output/SG-298-scratch/docker-config"
+export DOCKER_HOST="unix:///run/dispatch-storagegenie-SG-298/docker.sock"
+echo "$DOCKER_HOST"; ls -l /run/dispatch-storagegenie-SG-298/
+docker version
+docker run --rm busybox true
+```
+
+`docker version` shows a **Server** section and `docker run --rm busybox true` is rc 0; otherwise **STOP as BLOCKED with the verbatim error** (`PB-2`, `PG-PR-03`). `PATH=$PWD/backend/venv/bin:$PATH` for every make and `ruff` call; if the venv `python` is missing, report the exact error and STOP — install nothing. `curl -s http://127.0.0.1:8003/v1/health` at start and end; both 200. Scratch only in `output/SG-298-scratch/`, removed by that exact path; never touch `output/` itself or `output/dispatch`. **Run `date +%s` at the start of every goal and gate step and quote the stamps** — the report computes each phase's seconds from them.
 
 ## G1 — R3: the gone reason without a per-item query
 
