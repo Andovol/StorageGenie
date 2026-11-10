@@ -1,0 +1,40 @@
+3028: FAIL  src/lib/quantityText.sg300.test.ts [ src/lib/quantityText.sg300.test.ts ]
+3029:Error: Failed to resolve import "./quantityText" from "src/lib/quantityText.sg300.test.ts". Does the file exist?
+3042: FAIL  src/routes/PantryPage.sg300.test.tsx > PantryPage SG-300 order > expired first (most overdue first), then soonest, dateless last, then by name
+3043:AssertionError: expected [ 'a', 'b', 'c', 'd', 'e' ] to deeply equal [ 'b', 'd', 'e', 'a', 'c' ]
+3068: FAIL  src/routes/PantryPage.sg300.test.tsx > PantryPage SG-300 order > sortPantryItems: same order rule, and the Use soon grid uses it too
+3069:TypeError: sortPantryItems is not a function
+3080: FAIL  src/routes/PantryPage.sg300.test.tsx > PantryPage SG-300 time left > days_remaining 0 reads 2026-11-10
+3081: FAIL  src/routes/PantryPage.sg300.test.tsx > PantryPage SG-300 time left > days_remaining 1 reads 2026-11-11
+3082: FAIL  src/routes/PantryPage.sg300.test.tsx > PantryPage SG-300 time left > days_remaining 2 reads 2026-11-12
+3083: FAIL  src/routes/PantryPage.sg300.test.tsx > PantryPage SG-300 time left > days_remaining 14 reads 2026-11-24
+3084: FAIL  src/routes/PantryPage.sg300.test.tsx > PantryPage SG-300 time left > days_remaining 15 reads 2026-11-25
+3085: FAIL  src/routes/PantryPage.sg300.test.tsx > PantryPage SG-300 time left > days_remaining -1 reads 2026-11-09
+3086: FAIL  src/routes/PantryPage.sg300.test.tsx > PantryPage SG-300 time left > days_remaining -3 reads 2026-11-07
+3087:TypeError: pantryTimeLeftText is not a function
+3098: FAIL  src/routes/PantryPage.sg300.test.tsx > PantryPage SG-300 time left > no date reads No date; a date in a later year carries the year
+3099:TypeError: pantryTimeLeftText is not a function
+3110: FAIL  src/routes/PantryPage.sg300.test.tsx > PantryPage SG-300 time left > the time-left line is rendered from the engine days
+3111:TestingLibraryElementError: Found multiple elements by: [data-testid="pantry-tile"]
+3776: FAIL  src/routes/PantryPage.sg300.test.tsx > PantryPage SG-300 accent and EXPIRED label > accent at 2 days or less, EXPIRED label only when expired
+3777:TestingLibraryElementError: Found multiple elements by: [data-testid="pantry-tile"]
+4584: FAIL  src/routes/PantryPage.sg300.test.tsx > PantryPage SG-300 quantity wording > counted items read N left; amounts read N unit left
+4585:TestingLibraryElementError: Unable to find an element with the text: 1 left. This could be because the text is broken up by multiple elements. In this case, you can provide a function for your text matcher to make your matcher more flexible.
+4861: FAIL  src/routes/PantryPage.sg300.test.tsx > PantryPage SG-300 design > the tile wrapper has no border and no card background
+4862:AssertionError: expected 'solid' to be '' // Object.is equality
+4879: FAIL  src/routes/PantryPage.sg300.test.tsx > PantryPage SG-300 design > the grid track is two columns at 375 px and five or more at 1280 px
+4880:AssertionError: expected '\n.pantry-grid { display: grid; grid-…' to contain 'repeat(auto-fill, minmax(min(150px, c…'
+4902: FAIL  src/routes/PantryPage.sg300.test.tsx > PantryPage SG-300 design > the subtitle reads the owner's line
+4903:TestingLibraryElementError: Unable to find an element with the text: What you have, and what to use first.. This could be because the text is broken up by multiple elements. In this case, you can provide a function for your text matcher to make your matcher more flexible.
+5052: FAIL  src/routes/PantryPage.sg300.test.tsx > PantryPage SG-300 design > the actions sit in one row: counted gets -1 and Use it up, amount gets Edit and Use it up
+5053:TestingLibraryElementError: Unable to find an accessible element with the role "button" and name "Use it up"
+5185: FAIL  src/routes/PantryPage.sg300.test.tsx > PantryPage SG-300 notice > Use it up shows the notice; Put back calls the route and the tile returns
+5186:TestingLibraryElementError: Unable to find role="button" and name "Use it up"
+5503: FAIL  src/routes/PantryPage.sg300.test.tsx > PantryPage SG-300 notice > the notice clears after about six seconds
+5504:TestingLibraryElementError: Unable to find role="button" and name "Use it up"
+5653: FAIL  src/components/shell/ItemInspectorDrawer.sg300.test.tsx > ItemInspectorDrawer SG-300 shared quantity wording > a counted item reads 1 left, never 1 pcs left
+5654:TestingLibraryElementError: Unable to find an element with the text: 1 left. This could be because the text is broken up by multiple elements. In this case, you can provide a function for your text matcher to make your matcher more flexible.
+5951: FAIL  src/components/shell/ItemInspectorDrawer.sg300.test.tsx > ItemInspectorDrawer SG-300 shared quantity wording > an amount item reads 340 g left
+5952:TestingLibraryElementError: Unable to find an element with the text: 340 g left. This could be because the text is broken up by multiple elements. In this case, you can provide a function for your text matcher to make your matcher more flexible.
+6249: Test Files  3 failed (3)
+6250:      Tests  21 failed (21)
