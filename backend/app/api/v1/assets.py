@@ -345,6 +345,40 @@ def _gone_reasons(db: Session, asset_ids: list[str]) -> dict[str, str | None]:
     return gone_reason_by_asset
 
 
+def _category_asset_ids(db: Session, household_id: str, category: str) -> list[str] | None:  # type: ignore[no-untyped-def]
+    """SG-273 G1: asset ids with accepted classification `category`, None when unknown.
+
+    Split out of `list_assets` so that handler stays in budget. Unknown slug
+    yields `None` (the caller answers an empty 200 page, never a fallback).
+    """
+    from app.models.assertion import Assertion as _CatAssertion
+
+    from app.plugins.expiry_tracker import CATEGORIES as _CATEGORIES
+    from app.plugins.expiry_tracker import CLASSIFICATION_FIELD as _CLASS_FIELD
+
+    if category not in _CATEGORIES:
+        return None
+    rows = (
+        db.query(_CatAssertion)
+        .join(Asset, Asset.id == _CatAssertion.asset_id)
+        .filter(
+            Asset.household_id == household_id,
+            _CatAssertion.field_path == _CLASS_FIELD,
+            _CatAssertion.review_state == "accepted",
+        )
+        .all()
+    )
+    matched: list[str] = []
+    for row in rows:
+        try:
+            val = json.loads(row.value_json)
+        except ValueError:
+            continue
+        if isinstance(val, dict) and val.get("category") == category:
+            matched.append(row.asset_id)
+    return matched
+
+
 @router.get("/assets")
 def list_assets(
     household_id: str = Query(...),
@@ -352,11 +386,25 @@ def list_assets(
     asset_type: str | None = Query(default=None),
     status: str | None = Query(default=None),
     has_evidence: bool | None = Query(default=None),
+    category: str | None = Query(default=None),
     cursor: str | None = Query(default=None),
     limit: int = Query(default=20, ge=1, le=100),
     db: Session = Depends(get_db),  # type: ignore[no-untyped-def]
 ):  # type: ignore[no-untyped-def]
-    query = db.query(Asset).filter(Asset.household_id == household_id)
+    # SG-273 G1: optional read-only classification narrow (`category` is an
+    # accepted `plugin:expiry-tracker/classification` slug). No existing list
+    # filter fits — `asset_type` is the raw type, not the accepted
+    # classification — so this one param is added. Unknown slug yields an empty
+    # 200-shaped page, never a fallback (mirrors `compute_status`).
+    if category is not None:
+        matched = _category_asset_ids(db, household_id, category)
+        if not matched:
+            return {"items": [], "next_cursor": None}
+        query = db.query(Asset).filter(
+            Asset.household_id == household_id, Asset.id.in_(matched)
+        )
+    else:
+        query = db.query(Asset).filter(Asset.household_id == household_id)
     # The outer Asset query keeps the established serializer, ordering, and
     # cursor envelope unchanged. The same filter set backs `asset_facets`.
     query = _apply_asset_filters(

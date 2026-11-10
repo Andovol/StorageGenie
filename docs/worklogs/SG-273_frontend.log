@@ -1,0 +1,15 @@
+
+ ✓ src/components/CandidateCard.sg271.test.tsx  (1 test) 102ms
+ ✓ src/components/ChatTranscript.test.tsx  (2 tests) 169ms
+ ✓ src/components/ProvenanceBadge.test.tsx  (3 tests) 69ms
+
+ Test Files  40 passed (40)
+      Tests  364 passed (364)
+   Start at  20:49:17
+   Duration  13.52s (transform 1.71s, setup 2.92s, collect 9.21s, tests 19.82s, environment 20.51s, prepare 4.73s)
+
+npm notice
+npm notice New minor version of npm available! 11.11.0 -> 11.21.2
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v11.21.2
+npm notice To update run: npm install -g npm@11.21.2
+npm notice

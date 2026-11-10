@@ -31,6 +31,13 @@
 
   --font-sans: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+  /* SG-273 G1 (tandpfun D18): Pantry paper/ink/muted/line tokens. Light values
+     are tandpfun paper, ink, muted and line in HSL below. Font stays
+     var(--font-sans); a later slice swaps in Instrument Sans. */
+  --paper: 40 35.3% 93.3%;
+  --ink: 0 0% 9.8%;
+  --ink-muted: 33.3 4.6% 38.2%;
+  --line: 37.9 16.5% 77.5%;
 }
 
 .dark {
@@ -59,6 +66,12 @@
   --badge-proposed-fg: 48 96% 76%;
   --accent: 30 8.6% 16.5%;
   --accent-foreground: 60 4.8% 95.9%;
+  /* SG-273 G1 dark paper set (own design, same shapes): dark warm paper,
+     light ink, warm muted and line in HSL below. */
+  --paper: 26.7 16.4% 10.8%;
+  --ink: 40 35.3% 93.3%;
+  --ink-muted: 33.3 11.2% 68.6%;
+  --line: 30 11.5% 20.4%;
 }
 
 *,

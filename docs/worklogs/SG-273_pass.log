@@ -1,0 +1,17 @@
+SG-273 PASS on candidate.
+Stamps: backend-pass 1794343490-1794343493, frontend-pass 1794343474.
+
+Backend (backend/tests/test_sg273_pantry.py): 4 passed
+- test_only_active_food_listed_gone_leaves_and_returns
+- test_use_soon_matches_engine_window_both_sides_of_edge
+- test_tile_actions_hit_existing_routes
+- test_journey_hand_classify_pantry_minus_use_up_gone
+
+Frontend (frontend/src/routes/PantryPage.sg273.test.tsx): 5 passed
+- only ACTIVE food is listed; unsorted is counted in Not sorted yet
+- a gone item leaves the Pantry and Put back brings it back
+- Use soon holds exactly expired or this-week, either side of the 7-day edge
+- -1 and Used up call the existing routes and the tile updates
+- journey: classified food appears, -1, Used up, gone from the grid
+
+Journey test passes.

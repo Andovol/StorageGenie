@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link, Routes, Route, NavLink, useLocation } from "react-router-dom";
 import { Upload } from "lucide-react";
 import { CatalogPage } from "./routes/CatalogPage";
+import { PantryPage } from "./routes/PantryPage";
 import { CapturePage } from "./routes/CapturePage";
 import { AssetDetailPage } from "./routes/AssetDetailPage";
 import { SettingsPage } from "./routes/SettingsPage";
@@ -18,6 +19,7 @@ import { HouseholdProvider, useHouseholdContext } from "./hooks/HouseholdContext
 
 const NAV_DESTINATIONS: readonly { to: string; label: string; end?: boolean }[] = [
   { to: "/", label: "Catalog", end: true },
+  { to: "/pantry", label: "Pantry" },
   { to: "/capture", label: "Capture" },
   { to: "/inbox", label: "Inbox" },
   { to: "/planning", label: "Planning" },
@@ -177,6 +179,7 @@ export default function App() {
         <Nav />
         <Routes>
           <Route path="/" element={<CatalogPage />} />
+          <Route path="/pantry" element={<PantryPage />} />
           <Route path="/capture" element={<CapturePage />} />
           <Route path="/assets/:id" element={<AssetDetailPage />} />
           <Route path="/settings" element={<SettingsPage />} />

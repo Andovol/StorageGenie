@@ -1,0 +1,13 @@
+SG-273 FAIL on BASE (origin/automation def73a6) — new tests fail without the slice.
+Stamps: backend-base 1794343426-1794343429, frontend-base 1794343464.
+
+Backend (backend/tests/test_sg273_pantry.py, 2 failed, 2 passed):
+- test_only_active_food_listed_gone_leaves_and_returns — FAIL
+  AssertionError: assert non_food_id not in pantry_ids (non-food appears; category param ignored on base)
+- test_journey_hand_classify_pantry_minus_use_up_gone — FAIL
+  AssertionError: assert asset_id not in pantry_ids (unsorted appears on base)
+
+Frontend (frontend/src/routes/PantryPage.sg273.test.tsx, 0 tests):
+- FAIL — Failed to resolve import "./PantryPage" (no Pantry screen on base)
+
+Vacuity check (PB-3): a failure looks like non-food or unsorted in the Pantry — observed on base.
