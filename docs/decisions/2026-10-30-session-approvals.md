@@ -160,3 +160,7 @@ Read as: a slice makes the recovery image by export and import, as put to the ow
 **D27 and D28, 2026-11-10, verbatim:** *"Both approved."*
 
 Read as: **D27** — SG-300 on Haiku 5.5 `high` fixes SG-273's audit findings I1–I4 (Pantry design: urgency order with an expired mark, dates as time left, quantity wording, no developer copy, two columns on a phone, photos straight on the paper, even tiles, *Use it up*; every screenshot retaken with distinct files per state and the proving text named; the missing shots; the server scratch folder removed), then one rider serves SG-273 and SG-300, then SG-301 (the older screens' design and the Instrument Sans font). **D28** — at the next session start, read the contract change from 0.58.0 to 0.58.2 and bring its adoption to the owner with what changes.
+
+**D29, 2026-11-10, verbatim:** *"Yes, close"*
+
+Read as: close this session; a fresh session writes and dispatches SG-302 (dark-mode accent contrast, empty-state link, dark shots) on Muse, then rider SG-303 on Haiku, then SG-301; D28 runs at that session's start.
