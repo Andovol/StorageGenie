@@ -2,37 +2,37 @@ import { useState, type CSSProperties } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Package } from "lucide-react";
 import type { Density } from "../shell/CatalogToolbar";
-import { ProductCard, cardMedia, statusBadgeClass, STATUS_LABEL, type CatalogProduct } from "./ProductCard";
+import { ProductCard, cardMedia, statusBadgeClass, type CatalogProduct } from "./ProductCard";
+import { labelProductStatus } from "../../lib/labels";
 import { ProductCardSkeleton } from "./ProductCardSkeleton";
 import { AssetImportModal } from "../shell/AssetImportModal";
 
 /**
- * 2 cols mobile -> 3 tablet -> 4 desktop -> 5 ultrawide, gap-4 / md:gap-5.
- * Injected as plain classes because Tailwind is not installed (DQ2: the CSS
- * custom-property tokens are the requirement, utility classes are optional).
+ * SG-307 G1: the tandpfun grid — as many 165 px tracks as fit, Pantry parity.
+ * Injected as plain classes because Tailwind is not installed (DQ2).
  */
 const GRID_CSS = `
-.catalog-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
-@media (min-width: 768px) { .catalog-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; } }
-@media (min-width: 1024px) { .catalog-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
-@media (min-width: 1536px) { .catalog-grid { grid-template-columns: repeat(5, minmax(0, 1fr)); } }
+.catalog-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(165px, 1fr)); gap: 16px; }
 `;
 
 const emptyStyle: CSSProperties = {
   borderStyle: "dashed",
   borderWidth: 1,
-  borderRadius: 12,
+  borderColor: "hsl(var(--line))",
+  borderRadius: 0,
   padding: "56px 24px",
   display: "flex",
   flexDirection: "column",
   alignItems: "center",
   gap: 12,
   textAlign: "center",
+  backgroundColor: "hsl(var(--paper))",
+  color: "hsl(var(--ink))",
 };
 
 const ctaStyle: CSSProperties = {
   padding: "8px 16px",
-  borderRadius: 6,
+  borderRadius: 0,
   textDecoration: "none",
   fontWeight: 600,
   fontSize: 13,
@@ -58,14 +58,15 @@ export function formatRelativeDate(iso: string, nowMs: number = Date.now()): str
   const seconds = Math.round((nowMs - then) / 1000);
   if (seconds < 45) return "just now";
   const minutes = Math.round(seconds / 60);
-  if (minutes < 60) return `${minutes}m ago`;
+  if (minutes < 60) return minutes === 1 ? "1 min ago" : `${minutes} min ago`;
   const hours = Math.round(minutes / 60);
-  if (hours < 24) return `${hours}h ago`;
+  if (hours < 24) return hours === 1 ? "1 hour ago" : `${hours} hours ago`;
   const days = Math.round(hours / 24);
-  if (days < 30) return `${days}d ago`;
+  if (days < 30) return days === 1 ? "1 day ago" : `${days} days ago`;
   const months = Math.round(days / 30);
-  if (months < 12) return `${months}mo ago`;
-  return `${Math.round(months / 12)}y ago`;
+  if (months < 12) return months === 1 ? "1 month ago" : `${months} months ago`;
+  const years = Math.round(months / 12);
+  return years === 1 ? "1 year ago" : `${years} years ago`;
 }
 
 function TableThumb({ item, householdId }: { item: CatalogProduct; householdId: string }) {
@@ -73,15 +74,15 @@ function TableThumb({ item, householdId }: { item: CatalogProduct; householdId: 
   const media = cardMedia(item, householdId);
   return (
     <span
-      className="bg-card-muted"
       style={{
         display: "inline-flex",
         width: 40,
         height: 40,
-        borderRadius: 6,
+        borderRadius: 0,
         overflow: "hidden",
         alignItems: "center",
         justifyContent: "center",
+        backgroundColor: "hsl(var(--paper))",
       }}
     >
       {media && !broken ? (
@@ -130,18 +131,20 @@ function TableView({
           ))}
         </colgroup>
         <thead>
-          <tr className="border-border" style={{ borderBottomStyle: "solid", borderBottomWidth: 1 }}>
+          <tr className="border-border" style={{ borderBottomStyle: "solid", borderBottomWidth: 1, borderColor: "hsl(var(--line))" }}>
             {COLUMNS.map((column) => (
               <th
                 key={column.label}
                 scope="col"
-                className="text-muted-foreground"
                 style={{
                   textAlign: column.align ?? "left",
-                  fontSize: 11,
+                  fontSize: 13,
                   fontWeight: 600,
                   padding: "8px 10px",
                   whiteSpace: "nowrap",
+                  color: "hsl(var(--ink-muted))",
+                  textTransform: "uppercase",
+                  letterSpacing: "0.04em",
                 }}
               >
                 {column.label}
@@ -185,8 +188,7 @@ function TableView({
                 </td>
                 <td style={{ padding: "8px 10px" }}>
                   <span
-                    className="bg-card-muted text-muted-foreground font-mono"
-                    style={{ fontSize: 11, padding: "2px 6px", borderRadius: 4, whiteSpace: "nowrap" }}
+                    style={{ fontSize: 13, padding: "2px 8px", borderRadius: 0, whiteSpace: "nowrap", borderStyle: "solid", borderWidth: 1, borderColor: "hsl(var(--line))", backgroundColor: "hsl(var(--paper))", color: "hsl(var(--ink-muted))" }}
                   >
                     {item.category}
                   </span>
@@ -199,7 +201,7 @@ function TableView({
                       style={{
                         width: 8,
                         height: 8,
-                        borderRadius: 999,
+                        borderRadius: 0,
                       }}
                     />
                     <span
@@ -207,21 +209,20 @@ function TableView({
                       style={{
                         borderStyle: "solid",
                         borderWidth: 1,
-                        borderRadius: 999,
+                        borderRadius: 0,
                         padding: "2px 8px",
-                        fontSize: 11,
+                        fontSize: 13,
                         fontWeight: 600,
                         whiteSpace: "nowrap",
                       }}
                     >
-                      {STATUS_LABEL[item.status]}
+                      {labelProductStatus(item.status)}
                     </span>
                   </span>
                 </td>
-                <td style={{ padding: "8px 10px", whiteSpace: "nowrap" }}>{specs}</td>
+                <td style={{ padding: "8px 10px", whiteSpace: "nowrap", fontSize: 13 }}>{specs}</td>
                 <td
-                  className="font-mono text-muted-foreground"
-                  style={{ padding: "8px 10px", textAlign: "right", whiteSpace: "nowrap" }}
+                  style={{ padding: "8px 10px", textAlign: "right", whiteSpace: "nowrap", fontSize: 13, color: "hsl(var(--ink-muted))" }}
                 >
                   {formatRelativeDate(item.dateAdded)}
                 </td>
@@ -233,15 +234,18 @@ function TableView({
                       event.stopPropagation();
                       openDetail(item);
                     }}
-                    className="text-muted-foreground focus-ring"
+                    className="focus-ring"
                     style={{
-                      background: "none",
-                      border: "none",
+                      background: "hsl(var(--paper))",
+                      borderStyle: "solid",
+                      borderWidth: 1,
+                      borderColor: "hsl(var(--line))",
+                      color: "hsl(var(--ink))",
                       cursor: "pointer",
                       fontSize: 16,
                       lineHeight: 1,
                       padding: "4px 6px",
-                      borderRadius: 4,
+                      borderRadius: 0,
                     }}
                   >
                     ...
@@ -302,7 +306,7 @@ export function ProductGrid({
         className="border-border text-foreground"
         style={emptyStyle}
       >
-        <p className="text-muted-foreground" style={{ margin: 0 }}>
+        <p style={{ margin: 0, fontSize: 13, color: "hsl(var(--ink-muted))" }}>
           No items match the current view.
         </p>
         <Link
@@ -311,12 +315,12 @@ export function ProductGrid({
             event.preventDefault();
             setImportOpen(true);
           }}
-          className="bg-primary text-primary-foreground focus-ring"
-          style={ctaStyle}
+          className="focus-ring"
+          style={{ ...ctaStyle, backgroundColor: "hsl(var(--ink))", color: "hsl(var(--paper))" }}
         >
           Import New Item
         </Link>
-        <p className="text-muted-foreground" style={{ margin: 0, fontSize: 12 }}>
+        <p style={{ margin: 0, fontSize: 13, color: "hsl(var(--ink-muted))" }}>
           Opens the import dialog: drop, select or paste photos. The Capture route stays for direct
           navigation.
         </p>

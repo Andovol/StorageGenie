@@ -22,7 +22,8 @@ import {
   type SortOption,
 } from "../components/shell/CatalogToolbar";
 import { goneReasonLabel } from "../api/types";
-import { assetToProductItem, toProductCategory } from "../types/product";
+import { assetToProductItem } from "../types/product";
+import { labelAssetType } from "../lib/labels";
 import type { Asset, SavedSearchQuery } from "../api/types";
 
 function useDebounced<T>(value: T, delayMs: number): T {
@@ -119,9 +120,9 @@ export function CatalogPage() {
   const categoryCounts = useMemo(() => facets?.asset_type ?? {}, [facets]);
 
   // Pills come from the real `asset_type` population and speak the same
-  // vocabulary the cards show (`toProductCategory`): the raw `unknown` facet key
-  // renders as `Uncategorized`, while selecting that pill still sends the REAL
-  // server filter `asset_type=unknown`.
+  // vocabulary the cards show (`labelAssetType`, SG-307 plain words): the raw
+  // `unknown` facet key renders as `Uncategorized`, while selecting that pill
+  // still sends the REAL server filter `asset_type=unknown`.
   //
   // SG-118 G3: one pill per RAW facet key, never merged across keys. The server
   // filter is single-valued (`asset_type=<key>`), so a pill that merged two raw
@@ -136,7 +137,7 @@ export function CatalogPage() {
     ];
     const usedLabels = new Set<string>([options[0].label]);
     for (const key of Object.keys(categoryCounts).sort()) {
-      const display = toProductCategory(key);
+      const display = labelAssetType(key);
       let label = `${display} (${categoryCounts[key]})`;
       if (usedLabels.has(label)) label = `${display} · ${key} (${categoryCounts[key]})`;
       usedLabels.add(label);
@@ -203,7 +204,7 @@ export function CatalogPage() {
   const activeFilters = useMemo(() => {
     const filters: string[] = [];
     if (qRaw.trim()) filters.push(`Search: ${qRaw.trim()}`);
-    if (category !== CATEGORY_ALL) filters.push(toProductCategory(category));
+    if (category !== CATEGORY_ALL) filters.push(labelAssetType(category));
     if (statusFilter === "gone") filters.push("Gone");
     if (sort !== "recent") filters.push(SORT_LABELS[sort]);
     return filters;
@@ -302,8 +303,7 @@ export function CatalogPage() {
                   return (
                     <div
                       key={gone.id}
-                      className="bg-card border-border"
-                      style={{ display: "flex", flexWrap: "wrap", gap: 12, alignItems: "center", padding: 12, borderStyle: "solid", borderWidth: 1, borderRadius: 8 }}
+                      style={{ display: "flex", flexWrap: "wrap", gap: 12, alignItems: "center", padding: 12, borderStyle: "solid", borderWidth: 1, borderColor: "hsl(var(--line))", borderRadius: 0, backgroundColor: "hsl(var(--paper))", color: "hsl(var(--ink))" }}
                     >
                       <Link
                         className="text-link focus-ring"
@@ -312,15 +312,15 @@ export function CatalogPage() {
                       >
                         {gone.display_name || "Untitled item"}
                       </Link>
-                      <span className="text-muted-foreground" style={{ fontSize: 13 }}>
+                      <span style={{ fontSize: 13, color: "hsl(var(--ink-muted))" }}>
                         Gone{label ? ` — ${label.toLowerCase()}` : ""}
                       </span>
                       <button
                         type="button"
                         onClick={() => putBackMut.mutate(gone.id)}
                         disabled={putBackMut.isPending}
-                        className="bg-card text-foreground border-border focus-ring"
-                        style={{ padding: "6px 12px", borderRadius: 6, borderStyle: "solid", borderWidth: 1, cursor: "pointer" }}
+                        className="sg-paper-control focus-ring"
+                        style={{ padding: "6px 12px", borderRadius: 0, cursor: "pointer", fontSize: 13 }}
                       >
                         {putBackMut.isPending ? "Putting back…" : "Put back"}
                       </button>
@@ -330,12 +330,20 @@ export function CatalogPage() {
               </section>
             ) : (
               !(isError && displayed.length === 0) && (
-                <ProductGrid
-                  items={visibleItems}
-                  density={density}
-                  householdId={effectiveHousehold}
-                  onSelect={setSelectedAssetId}
-                />
+                <>
+                  <div
+                    data-testid="catalog-count"
+                    style={{ fontSize: 13, fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase", color: "hsl(var(--ink))", margin: "16px 0 8px" }}
+                  >
+                    {visibleItems.length} ITEMS
+                  </div>
+                  <ProductGrid
+                    items={visibleItems}
+                    density={density}
+                    householdId={effectiveHousehold}
+                    onSelect={setSelectedAssetId}
+                  />
+                </>
               )
             )}
             <div style={{ marginTop: 16, display: "flex", gap: 12, alignItems: "center" }}>
@@ -343,13 +351,13 @@ export function CatalogPage() {
                 <button
                   onClick={() => setCursor(nextCursor)}
                   disabled={isFetching}
-                  className="bg-card text-foreground border-border focus-ring"
-                  style={{ padding: "8px 16px", borderRadius: 6, borderStyle: "solid", borderWidth: 1, cursor: "pointer" }}
+                  className="sg-paper-control focus-ring"
+                  style={{ padding: "8px 16px", borderRadius: 0, cursor: "pointer", fontSize: 13 }}
                 >
                   {isFetching ? "Loading..." : "Load more"}
                 </button>
               )}
-              {isFetching && <span className="text-muted-foreground" style={{ fontSize: 12 }}>Fetching...</span>}
+              {isFetching && <span style={{ fontSize: 13, color: "hsl(var(--ink-muted))" }}>Fetching...</span>}
             </div>
             {selectedAsset ? (
               <ItemInspectorDrawer

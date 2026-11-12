@@ -50,8 +50,8 @@ export function AppShell({
   children,
 }: AppShellProps) {
   return (
-    <div className="bg-background text-foreground" style={{ minHeight: "100vh" }}>
-      <div className="bg-background" style={{ position: "sticky", top: 0, zIndex: 10 }}>
+    <div style={{ minHeight: "100vh", backgroundColor: "hsl(var(--paper))", color: "hsl(var(--ink))" }}>
+      <div style={{ position: "sticky", top: 0, zIndex: 10, backgroundColor: "hsl(var(--paper))" }}>
         <AppHeader loadedCount={loadedCount} searchValue={searchValue} onSearchChange={onSearchChange} />
         <CatalogToolbar
           categories={categories}

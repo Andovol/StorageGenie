@@ -202,6 +202,21 @@ textarea {
   outline-offset: 2px;
 }
 
+/* SG-307 G1+G3: the one shared paper control treatment. Buttons and selects
+   on a paper page take the paper ground (dark: the dark paper) with a --line
+   border, square corners and --ink text — never the white --card/--background.
+   The Pantry tiles, the theme toggle and the Inbox Review status select come
+   out of this rule: the toolbar constant THEMED_CONTROL_CLASS is this class,
+   and the Pantry/file-input overrides below reuse the same tokens. */
+.sg-paper-control {
+  background-color: hsl(var(--paper));
+  color: hsl(var(--ink));
+  border: 1px solid hsl(var(--line));
+  border-radius: 0;
+  font: inherit;
+  font-size: 13px;
+}
+
 /* SG-075 migration additions — semantic helpers for screens that previously
    carried hardcoded colour literals. Each maps to a token above. */
 .bg-accent {

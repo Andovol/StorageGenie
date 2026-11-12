@@ -56,8 +56,11 @@ const panelStyle: CSSProperties = {
   overflowY: "auto",
   borderStyle: "solid",
   borderWidth: 1,
-  borderRadius: 12,
+  borderColor: "hsl(var(--line))",
+  borderRadius: 0,
   padding: 20,
+  backgroundColor: "hsl(var(--paper))",
+  color: "hsl(var(--ink))",
 };
 
 export function AssetImportModal({ householdId, onClose }: AssetImportModalProps) {
@@ -269,7 +272,7 @@ export function AssetImportModal({ householdId, onClose }: AssetImportModalProps
             Pending queue ({staged.length})
           </h3>
           {staged.length === 0 ? (
-            <p data-testid="queue-empty" className="text-muted-foreground" style={{ margin: 0, fontSize: 12 }}>
+            <p data-testid="queue-empty" style={{ margin: 0, fontSize: 13, color: "hsl(var(--ink-muted))" }}>
               No files staged yet.
             </p>
           ) : (
@@ -278,31 +281,40 @@ export function AssetImportModal({ householdId, onClose }: AssetImportModalProps
                 <li
                   key={`${file.name}-${index}`}
                   data-testid="queue-item"
-                  className="bg-card-muted"
                   style={{
                     display: "flex",
                     alignItems: "center",
                     gap: 8,
                     padding: "6px 10px",
-                    borderRadius: 6,
-                    fontSize: 12,
+                    borderRadius: 0,
+                    borderStyle: "solid",
+                    borderWidth: 1,
+                    borderColor: "hsl(var(--line))",
+                    backgroundColor: "hsl(var(--paper))",
+                    color: "hsl(var(--ink))",
+                    fontSize: 13,
                   }}
                 >
                   <span style={{ flex: 1, minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                     {file.name}
                   </span>
-                  <span className="text-muted-foreground font-mono">{formatKb(file.size)}</span>
+                  <span style={{ fontSize: 13, color: "hsl(var(--ink-muted))" }}>{formatKb(file.size)}</span>
                   <span className="text-processed" style={{ fontWeight: 600 }}>Ready</span>
                   <button
                     type="button"
                     aria-label={`Remove ${file.name}`}
                     onClick={() => removeAt(index)}
-                    className="text-muted-foreground focus-ring"
+                    className="focus-ring"
                     style={{
-                      background: "none",
-                      border: "none",
+                      background: "hsl(var(--paper))",
+                      borderStyle: "solid",
+                      borderWidth: 1,
+                      borderColor: "hsl(var(--line))",
+                      borderRadius: 0,
                       cursor: "pointer",
-                      fontSize: 12,
+                      fontSize: 13,
+                      color: "hsl(var(--ink))",
+                      padding: "2px 8px",
                     }}
                   >
                     Remove

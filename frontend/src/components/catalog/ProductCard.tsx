@@ -2,6 +2,7 @@ import { memo, useState } from "react";
 import { Link } from "react-router-dom";
 import { AlertTriangle, Package } from "lucide-react";
 import type { ProductItem, ProductStatus } from "../../types/product";
+import { labelProductStatus } from "../../lib/labels";
 
 /**
  * A catalog card item: the DQ1 `ProductItem` plus the media the grid renders.
@@ -38,10 +39,10 @@ const STATUS_TOKEN_CLASS: Record<ProductStatus, string> = {
 };
 
 export const STATUS_LABEL: Record<ProductStatus, string> = {
-  raw: "Source Only",
-  processed: "Cutout Extracted",
-  rendered: "Scene Rendered",
-  failed: "Failed",
+  raw: "Photo only",
+  processed: "Cut-out ready",
+  rendered: "Scene ready",
+  failed: "Needs attention",
 };
 
 export function statusBadgeClass(status: ProductStatus): string {
@@ -105,30 +106,33 @@ export const ProductCard = memo(function ProductCard({
             }
           : undefined
       }
-      className="product-card bg-card border-border focus-ring"
+      className="product-card focus-ring"
       style={{
         display: "flex",
         flexDirection: "column",
         gap: 10,
         borderStyle: "solid",
         borderWidth: 1,
-        borderRadius: 12,
+        borderColor: "hsl(var(--line))",
+        borderRadius: 0,
         padding: 10,
         textDecoration: "none",
-        color: "inherit",
+        color: "hsl(var(--ink))",
+        backgroundColor: "hsl(var(--paper))",
       }}
     >
       <div
         data-testid="product-card-well"
-        className={`bg-card-muted${failed ? " border border-rose-500/30 border-danger" : ""}`}
+        className={failed ? "border border-rose-500/30 border-danger" : ""}
         style={{
           position: "relative",
           aspectRatio: "1 / 1",
-          borderRadius: 8,
+          borderRadius: 0,
           overflow: "hidden",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
+          backgroundColor: "hsl(var(--paper))",
           ...(failed
             ? {
                 borderStyle: "solid",
@@ -171,13 +175,13 @@ export const ProductCard = memo(function ProductCard({
             right: 8,
             borderStyle: "solid",
             borderWidth: 1,
-            borderRadius: 999,
+            borderRadius: 0,
             padding: "2px 8px",
-            fontSize: 11,
+            fontSize: 13,
             fontWeight: 600,
           }}
         >
-          {STATUS_LABEL[item.status]}
+          {labelProductStatus(item.status)}
         </span>
       </div>
       <div style={{ display: "flex", flexDirection: "column", gap: 6, minWidth: 0 }}>
@@ -187,6 +191,7 @@ export const ProductCard = memo(function ProductCard({
             style={{
               fontWeight: 600,
               fontSize: 14,
+              color: "hsl(var(--ink))",
               overflow: "hidden",
               textOverflow: "ellipsis",
               whiteSpace: "nowrap",
@@ -205,12 +210,17 @@ export const ProductCard = memo(function ProductCard({
           ) : null}
         </div>
         <span
-          className="bg-card-muted text-muted-foreground font-mono"
+          data-testid="product-category"
           style={{
             alignSelf: "flex-start",
-            fontSize: 11,
-            padding: "2px 6px",
-            borderRadius: 4,
+            fontSize: 13,
+            padding: "2px 8px",
+            borderRadius: 0,
+            borderStyle: "solid",
+            borderWidth: 1,
+            borderColor: "hsl(var(--line))",
+            backgroundColor: "hsl(var(--paper))",
+            color: "hsl(var(--ink-muted))",
             whiteSpace: "nowrap",
           }}
         >
@@ -219,18 +229,18 @@ export const ProductCard = memo(function ProductCard({
         {item.metadata.primaryColors?.length ? (
           <div data-testid="color-dots" style={{ display: "flex", gap: 4 }}>
             {item.metadata.primaryColors.map((color) => (
-              <span
-                key={color}
-                className="border-border"
-                style={{
-                  width: 8,
-                  height: 8,
-                  borderRadius: 999,
-                  backgroundColor: color,
-                  borderWidth: 1,
-                  borderStyle: "solid",
-                }}
-              />
+            <span
+              key={color}
+              className="border-border"
+              style={{
+                width: 8,
+                height: 8,
+                borderRadius: 0,
+                backgroundColor: color,
+                borderWidth: 1,
+                borderStyle: "solid",
+              }}
+            />
             ))}
           </div>
         ) : null}

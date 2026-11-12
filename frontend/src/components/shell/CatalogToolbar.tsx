@@ -57,15 +57,18 @@ type CatalogToolbarProps = {
 };
 
 /**
- * SG-105 G2: one themed control treatment. The class pair is the one the
- * toolbar's selects already carried; every other select/file picker reuses it
- * so no native white control leaks through the dark theme.
+ * SG-105 G2 + SG-307 G3: one shared paper control treatment. The single
+ * `.sg-paper-control` rule lives in `frontend/src/theme/tokens.css` (paper
+ * ground, `--line` border, square, `--ink` text); every select/button on a
+ * paper page reuses it so no white `--card`/`--background` control leaks
+ * through light or dark. Inbox's Review status select inherits it via this
+ * constant without touching `InboxPage.tsx`.
  */
-export const THEMED_CONTROL_CLASS = "bg-background text-foreground border-border focus-ring";
+export const THEMED_CONTROL_CLASS = "sg-paper-control focus-ring";
 
 export const CONTROL_STYLE: React.CSSProperties = {
   padding: "4px 10px",
-  borderRadius: 6,
+  borderRadius: 0,
   borderStyle: "solid",
   borderWidth: 1,
   fontSize: 13,
@@ -109,7 +112,7 @@ export function CatalogToolbar({
 
   return (
     <div
-      className="bg-card border-border"
+      data-testid="catalog-toolbar"
       style={{
         display: "flex",
         flexWrap: "wrap",
@@ -118,9 +121,12 @@ export function CatalogToolbar({
         padding: "8px 24px",
         borderBottomStyle: "solid",
         borderBottomWidth: 1,
+        borderColor: "hsl(var(--line))",
+        backgroundColor: "hsl(var(--paper))",
+        color: "hsl(var(--ink))",
       }}
     >
-      <div role="group" aria-label="Live or gone" style={{ display: "inline-flex", gap: 4 }}>
+      <div role="group" aria-label="Live or gone" style={{ display: "inline-flex", gap: 0 }}>
         {(["live", "gone"] as CatalogStatusFilter[]).map((option) => {
           const active = option === statusFilter;
           return (
@@ -129,8 +135,16 @@ export function CatalogToolbar({
               type="button"
               aria-pressed={active}
               onClick={() => onStatusFilterChange(option)}
-              className={`${active ? "bg-primary text-primary-foreground" : "bg-card-muted text-muted-foreground"} focus-ring`}
-              style={{ ...CONTROL_STYLE, fontWeight: active ? 600 : 400 }}
+              className="sg-paper-control focus-ring"
+              style={{
+                padding: "4px 10px",
+                borderRadius: 0,
+                fontSize: 13,
+                fontWeight: active ? 600 : 400,
+                cursor: "pointer",
+                backgroundColor: active ? "hsl(var(--ink))" : "hsl(var(--paper))",
+                color: active ? "hsl(var(--paper))" : "hsl(var(--ink))",
+              }}
             >
               {option === "live" ? "Live" : "Gone"}
             </button>
@@ -146,8 +160,16 @@ export function CatalogToolbar({
             type="button"
             aria-pressed={active}
             onClick={() => onCategoryChange(category)}
-            className={`${active ? "bg-primary text-primary-foreground" : "bg-card-muted text-muted-foreground"} focus-ring`}
-            style={{ ...CONTROL_STYLE, fontWeight: active ? 600 : 400 }}
+            className="sg-paper-control focus-ring"
+            style={{
+              padding: "4px 10px",
+              borderRadius: 0,
+              fontSize: 13,
+              fontWeight: active ? 600 : 400,
+              cursor: "pointer",
+              backgroundColor: active ? "hsl(var(--ink))" : "hsl(var(--paper))",
+              color: active ? "hsl(var(--paper))" : "hsl(var(--ink))",
+            }}
           >
             {category}
           </button>
@@ -168,7 +190,7 @@ export function CatalogToolbar({
         ))}
       </select>
 
-      <div role="group" aria-label="Density" style={{ display: "inline-flex", gap: 4 }}>
+      <div role="group" aria-label="Density" style={{ display: "inline-flex", gap: 0 }}>
         {(Object.keys(DENSITY_LABELS) as Density[]).map((option) => {
           const active = option === density;
           return (
@@ -177,8 +199,16 @@ export function CatalogToolbar({
               type="button"
               aria-pressed={active}
               onClick={() => onDensityChange(option)}
-              className={`${active ? "bg-primary text-primary-foreground" : "bg-card-muted text-muted-foreground"} focus-ring`}
-              style={{ ...CONTROL_STYLE, fontWeight: active ? 600 : 400 }}
+              className="sg-paper-control focus-ring"
+              style={{
+                padding: "4px 10px",
+                borderRadius: 0,
+                fontSize: 13,
+                fontWeight: active ? 600 : 400,
+                cursor: "pointer",
+                backgroundColor: active ? "hsl(var(--ink))" : "hsl(var(--paper))",
+                color: active ? "hsl(var(--paper))" : "hsl(var(--ink))",
+              }}
             >
               {DENSITY_LABELS[option]}
             </button>
@@ -192,8 +222,8 @@ export function CatalogToolbar({
         type="button"
         onClick={onSaveSearch}
         disabled={activeFilters.length === 0}
-        className="bg-card text-foreground border-border focus-ring"
-        style={{ ...CONTROL_STYLE, opacity: activeFilters.length === 0 ? 0.5 : 1 }}
+        className="sg-paper-control focus-ring"
+        style={{ padding: "4px 10px", borderRadius: 0, fontSize: 13, cursor: "pointer", opacity: activeFilters.length === 0 ? 0.5 : 1 }}
       >
         Save search
       </button>
@@ -214,7 +244,7 @@ export function CatalogToolbar({
           ))}
         </select>
       ) : (
-        <span className="text-muted-foreground" style={{ fontSize: 12 }}>
+        <span style={{ fontSize: 13, color: "hsl(var(--ink-muted))" }}>
           None yet
         </span>
       )}
@@ -224,8 +254,8 @@ export function CatalogToolbar({
           type="button"
           aria-label="Delete saved search"
           onClick={() => onSavedSearchDelete(selectedSavedSearch.id)}
-          className="text-link focus-ring"
-          style={{ ...CONTROL_STYLE, color: "inherit" }}
+          className="sg-paper-control focus-ring"
+          style={{ padding: "4px 10px", borderRadius: 0, fontSize: 13, cursor: "pointer" }}
         >
           Delete
         </button>
@@ -234,8 +264,7 @@ export function CatalogToolbar({
       {savedSearchLabels.map((label) => (
         <span
           key={label}
-          className="bg-card-muted text-muted-foreground"
-          style={{ fontSize: 11, padding: "2px 8px", borderRadius: 999 }}
+          style={{ fontSize: 13, padding: "2px 8px", borderRadius: 0, borderStyle: "solid", borderWidth: 1, borderColor: "hsl(var(--line))", backgroundColor: "hsl(var(--paper))", color: "hsl(var(--ink-muted))" }}
         >
           {label}
         </span>
@@ -246,8 +275,7 @@ export function CatalogToolbar({
           {activeFilters.map((filter) => (
             <span
               key={filter}
-              className="bg-card-muted text-muted-foreground"
-              style={{ fontSize: 11, padding: "2px 8px", borderRadius: 999 }}
+              style={{ fontSize: 13, padding: "2px 8px", borderRadius: 0, borderStyle: "solid", borderWidth: 1, borderColor: "hsl(var(--line))", backgroundColor: "hsl(var(--paper))", color: "hsl(var(--ink-muted))" }}
             >
               {filter}
             </span>
@@ -255,8 +283,8 @@ export function CatalogToolbar({
           <button
             type="button"
             onClick={onClearAll}
-            className="text-link focus-ring"
-            style={{ background: "none", border: "none", fontSize: 12, cursor: "pointer", textDecoration: "underline" }}
+            className="focus-ring"
+            style={{ background: "none", border: "none", fontSize: 13, cursor: "pointer", textDecoration: "underline", color: "hsl(var(--link))" }}
           >
             Clear all
           </button>

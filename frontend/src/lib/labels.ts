@@ -107,6 +107,23 @@ export function labelAssetType(assetType: string): string {
 export const UNNAMED_ITEM = "Unnamed item";
 
 /**
+ * SG-307 G1: the catalog's pipeline states in owner words. The card shows
+ * what exists for the owner, not the pipeline stage name: only the photo,
+ * a cut-out, or a scene. Failed matches the shared "Needs attention"
+ * wording used for job steps.
+ */
+export const PRODUCT_STATUS_LABELS: Record<string, string> = {
+  raw: "Photo only",
+  processed: "Cut-out ready",
+  rendered: "Scene ready",
+  failed: "Needs attention",
+};
+
+export function labelProductStatus(status: string): string {
+  return PRODUCT_STATUS_LABELS[status] ?? status.replace(/[_.]+/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+}
+
+/**
  * SG-312 G1.3 / G1.5: the plain words an owner sees for a job step, a job
  * date and an expiry state. Raw backend names never reach the screen.
  */
