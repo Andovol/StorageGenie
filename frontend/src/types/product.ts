@@ -25,9 +25,9 @@ export type ProductStatus = "raw" | "processed" | "rendered" | "failed";
 /**
  * Display-only fallback for an asset captured without a name and without a
  * photo to derive one from. Never written to the database and never a promise
- * of AI naming.
+ * of AI naming. SG-318 W6: one word everywhere — "Unnamed item".
  */
-export const UNTITLED_ASSET_NAME = "Untitled asset";
+export const UNTITLED_ASSET_NAME = "Unnamed item";
 
 export type ProductMetadata = {
   dimensions?: string;
@@ -91,9 +91,11 @@ export function toProductCategory(assetType: string): string {
 }
 
 export function assetToProductItem(asset: Asset): ProductItem {
+  const rawName = (asset.display_name ?? "").trim();
+  const name = !rawName || rawName.toLowerCase() === "noname" ? UNTITLED_ASSET_NAME : asset.display_name as string;
   return {
     id: asset.id,
-    name: asset.display_name || UNTITLED_ASSET_NAME,
+    name,
     category: toProductCategory(asset.asset_type),
     // description: not carried by Asset; the SG-047 import modal supplies it.
     // tags: populated by the SG-045 grid mocks / SG-047 import modal.

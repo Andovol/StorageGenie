@@ -95,7 +95,9 @@ export function ItemInspectorDrawer({ asset, householdId, onClose }: ItemInspect
   });
 
   const current = full ?? asset;
-  const displayName = current.display_name || UNTITLED_ASSET_NAME;
+  // SG-318 W6: a backend "noname" stem reads as no name on screen.
+  const rawCurrentName = (current.display_name ?? "").trim();
+  const displayName = !rawCurrentName || rawCurrentName.toLowerCase() === "noname" ? UNTITLED_ASSET_NAME : current.display_name as string;
   const assertions = useMemo(() => current.assertions ?? [], [current.assertions]);
   const evidence = useMemo(() => current.evidence ?? [], [current.evidence]);
 

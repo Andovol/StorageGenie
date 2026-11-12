@@ -19,13 +19,19 @@ import {
   labelTaskType,
 } from "../lib/labels";
 
+function plainSubjectName(raw: unknown): string {
+  const text = raw == null ? "" : String(raw).trim();
+  if (!text || text.toLowerCase() === "noname") return UNNAMED_ITEM;
+  return text;
+}
+
 function nameFromFields(fields: Record<string, unknown> | undefined): string {
   const raw = fields?.display_name;
   if (raw && typeof raw === "object" && !Array.isArray(raw)) {
     const value = (raw as Record<string, unknown>).value;
-    if (value != null) return String(value);
+    if (value != null) return plainSubjectName(value);
   }
-  if (raw != null) return String(raw);
+  if (raw != null) return plainSubjectName(raw);
   return UNNAMED_ITEM;
 }
 
@@ -39,7 +45,7 @@ function TaskSubjectName({ task, householdId }: { task: ReviewTask; householdId:
     queryFn: () => apiGet<Candidate>(`/v1/candidates/${task.subject_ref}`, { household_id: householdId }),
     enabled: task.subject_kind === "candidate" && !!task.subject_ref && !!householdId,
   });
-  if (task.subject_kind === "asset") return <>{asset.data?.display_name || UNNAMED_ITEM}</>;
+  if (task.subject_kind === "asset") return <>{plainSubjectName(asset.data?.display_name)}</>;
   if (task.subject_kind === "candidate") return <>{nameFromFields(candidate.data?.fields)}</>;
   return <>{UNNAMED_ITEM}</>;
 }

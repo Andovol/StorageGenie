@@ -230,7 +230,13 @@ export function RelationsSection({
   const [relationType, setRelationType] = useState("related_to");
   if (isError || !rels) return null;
   const items = rels.items;
-  const nameById = new Map((assets?.items ?? []).map((a) => [a.id, a.display_name || "Unnamed item"]));
+  // SG-318 W6: a backend "noname" stem reads as no name on screen.
+  const plainName = (raw: string | null | undefined): string => {
+    const trimmed = (raw ?? "").trim();
+    if (!trimmed || trimmed.toLowerCase() === "noname") return "Unnamed item";
+    return trimmed;
+  };
+  const nameById = new Map((assets?.items ?? []).map((a) => [a.id, plainName(a.display_name)]));
   const otherId = (rel: AssetRelation) =>
     rel.direction === "outgoing" ? rel.to_asset_id : rel.from_asset_id;
   const options = (assets?.items ?? []).filter((a) => a.id !== asset.id);
@@ -277,7 +283,7 @@ export function RelationsSection({
         >
           <option value="">Select asset…</option>
           {options.map((a) => (
-            <option key={a.id} value={a.id}>{a.display_name || "Unnamed item"}</option>
+            <option key={a.id} value={a.id}>{plainName(a.display_name)}</option>
           ))}
         </select>
         <select
@@ -609,7 +615,9 @@ export function AssetDetailPage() {
 
   const evidence = (asset as unknown as { evidence: { id: string; storage_key: string; sha256: string; original_filename: string }[] }).evidence || [];
   const audits = (asset as unknown as { audit_events: { id: string; action: string; actor: string; timestamp: string; before: unknown; after: unknown }[] }).audit_events || [];
-  const displayName = asset.display_name || UNTITLED_ASSET_NAME;
+  // SG-318 W6: "noname" (an evidence-file stem from the backend) reads as no name.
+  const rawDisplay = (asset.display_name ?? "").trim();
+  const displayName = !rawDisplay || rawDisplay.toLowerCase() === "noname" ? UNTITLED_ASSET_NAME : asset.display_name as string;
   const goneFromPayload = goneReasonLabel(asset.gone_reason);
   const goneFromAssertion = (() => {
     const entry = latestActiveAssertion(assertions, "gone.reason");

@@ -19,6 +19,7 @@ import { CONTROL_STYLE, THEMED_CONTROL_CLASS } from "../components/shell/Catalog
 import { PageContainer } from "../components/shell/PageContainer";
 import { useTaxonomy } from "../hooks/useAssets";
 import { useHouseholdContext } from "../hooks/HouseholdContext";
+import { UNNAMED_ITEM, formatPlainDate } from "../lib/labels";
 
 // Blueprint §11.2 screen 7: the fixed urgency buckets, in that order.
 const BUCKET_SECTIONS: { bucket: string; label: string }[] = [
@@ -66,6 +67,20 @@ type ExpiryRowItem = {
   tier: string | null;
 };
 
+/**
+ * SG-318 W8: a tier pill shows only for the two action tiers — "Use first"
+ * (critical) and "Use soon" (urgent). Upcoming, Long lead and Safe read
+ * their bucket heading plus "45 days remaining" already; repeating the tier
+ * would double the heading (SG-313 I2).
+ */
+const ACTION_TIER_PILL = new Set(["critical", "urgent"]);
+
+function plainRowName(raw: string | null | undefined): string {
+  const trimmed = (raw ?? "").trim();
+  if (!trimmed || trimmed.toLowerCase() === "noname") return UNNAMED_ITEM;
+  return trimmed;
+}
+
 function ExpiryRow({ row, householdId, detail }: { row: ExpiryRowItem; householdId: string; detail: ReactNode }) {
   return (
     <div
@@ -76,11 +91,11 @@ function ExpiryRow({ row, householdId, detail }: { row: ExpiryRowItem; household
         style={{ textDecoration: "underline", fontWeight: 600 }}
         to={`/assets/${row.asset_id}?household_id=${householdId}`}
       >
-        {row.display_name || "Untitled item"}
+        {plainRowName(row.display_name)}
       </Link>
       {detail}
       <span style={{ fontSize: 13, color: "hsl(var(--ink-muted))" }}>{daysLabel(row.days_remaining)}</span>
-      {row.tier ? (
+      {row.tier && ACTION_TIER_PILL.has(row.tier) ? (
         <span data-testid="tier-pill" style={{ fontSize: 13, color: "hsl(var(--ink-muted))" }}>
           {tierLabel(row.tier)}
         </span>
@@ -249,7 +264,7 @@ export function ExpiryPage() {
                           <>
                             <span className="text-muted-foreground" style={{ fontSize: 13 }}>{categoryName(row.category)}</span>
                             <span style={{ fontSize: 13 }}>
-                              {row.expiry_date}
+                              {formatPlainDate(row.expiry_date) || "No date"}
                               {row.date_type ? ` · ${DATE_TYPE_LABELS[row.date_type] ?? "Date"}` : ""}
                             </span>
                           </>

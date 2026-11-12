@@ -14,18 +14,21 @@ export const STEP_STATE_LABELS: Record<string, string> = {
   AWAITING_REVIEW: "Waiting for you",
   FAILED: "Needs attention",
   ERROR: "Needs attention",
-  PENDING: "In progress",
+  // SG-318 W9: PENDING only waits — "Not started". "In progress" is only
+  // for running states below; everything not started reads "Not started".
+  PENDING: "Not started",
+  QUEUED: "Not started",
+  CREATED: "Not started",
   RUNNING: "In progress",
   PROCESSING: "In progress",
   IN_PROGRESS: "In progress",
   RETRYING: "In progress",
-  CREATED: "In progress",
   CANCELLED: "Stopped",
 };
 
 export function labelStepState(state: string): string {
   const key = (state ?? "").toUpperCase();
-  return STEP_STATE_LABELS[key] ?? "In progress";
+  return STEP_STATE_LABELS[key] ?? "Not started";
 }
 
 export function labelJobState(state: string): string {
@@ -54,7 +57,7 @@ export const CANDIDATE_STATE_LABELS: Record<string, string> = {
 };
 
 export function labelCandidateState(state: string): string {
-  return CANDIDATE_STATE_LABELS[state] ?? "In progress";
+  return CANDIDATE_STATE_LABELS[state] ?? "Not started";
 }
 
 export const TASK_TYPE_LABELS: Record<string, string> = {
@@ -145,6 +148,15 @@ const STEP_NAME_LABELS: Record<string, string> = {
   DEDUPLICATING: "Looking for duplicates",
   COMMITTING: "Saving",
   AWAITING_REVIEW: "Your review",
+  // SG-318 W10: the three backend steps SG-313 I5 caught without a map.
+  // "Checking your upload" (it validates what you just sent, not a file in
+  // general); "Reading the photo" (the AI step reads the picture — the owner
+  // never needs the word AI or the -ing-with-underscore name); "Making items"
+  // (candidates become items in your catalog — "items" is the owner word,
+  // not "candidates").
+  VALIDATING_INPUT: "Checking your upload",
+  ANALYZING_WITH_AI: "Reading the photo",
+  BUILDING_CANDIDATES: "Making items",
 };
 
 function sentenceCase(text: string): string {
