@@ -33,6 +33,7 @@ Built from audits, one row per rated slice (owner, D25, 2026-11-07). Strengths a
 | SG-310 | muse-1.3, xhigh | deploy rider, live serve | 243 s | 90 | yes, S1 | passed a criterion its own evidence contradicted (font content type) | coder |
 | SG-312 | haiku-5-5, high | build, CSS and copy over 3 screens + gate | ~1223 s (stamps) | 82 | **no** — ≈120 s past 1100 s, from a 600 s hung foreground server start | no screenshots | mixed |
 | SG-313 | muse-1.3, xhigh | screenshots only, DOM-proven, design notes | 640 s (stamps) | 92 | yes, wide margin | identity line inferred, not read; design notes missed ISO dates, a misleading status word, a tier/heading clash | coder |
+| SG-314 | haiku-5-5, high | deploy rider, live serve | 159 s | 93 | yes, S1 | echoed the project file's version line as its own contract line | coder |
 
 ## Haiku 5.5 at `high` — profile
 

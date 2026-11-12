@@ -16,10 +16,10 @@ Fonts: heading, body and every named button compute to Instrument Sans (the Aria
 ## Findings (session IDs)
 
 I1. **Identity line inferred, not read** — the first line says model and effort were inferred from `STATE.md`, process arguments not exposed. Honestly labelled; the receipt note confirms the values. `PB-4`. **Coder, minor. Disposition: noted in the profile.**
-I2. **Design notes missed three things visible in the shots** (found by my own look): Expiry rows show **ISO dates** (*2026-11-07 · Expiry date*) while Inbox says *Today, 17:59*; the Inbox **Saving** step reads *In progress* while the job only waits for review (`frontend/src/lib/labels.ts:17` maps `PENDING` to *In progress*); the *Long lead* item sits under the **Safe** heading (bucket and tier names collide). **Coder, design-note depth. Disposition: all three into SG-307's packet.**
+I2. **Design notes missed three things visible in the shots** (found by my own look): Expiry rows show **ISO dates** (*2026-11-07 · Expiry date*) while Inbox says *Today, 17:59*; the Inbox **Saving** step reads *In progress* while the job only waits for review (`frontend/src/lib/labels.ts:17` maps `PENDING` to *In progress*); the *Long lead* item sits under the **Safe** heading (bucket and tier names collide). **Coder, design-note depth. Disposition: a small wording slice after SG-307 (queued in `STATE.md`); SG-307 is already a full build slice.**
 I3. **White controls measured, not guessed:** Pantry tile *Edit* / *Use it up* / *−1*, the theme toggle, the Inbox *Review status* select; on the dark asset page the native *Choose Files* control is white and *Attach evidence* floats far right. **Disposition: SG-307** (catalog and item panel own these surfaces).
 I4. **Header wraps at 375 px** — *Import Asset* drops under the logo row (93 px tall). Settles SG-312's open question. **Disposition: SG-307's design scope.**
-I5. **Fallback step names** *Validating input*, *Analyzing with ai*, *Building candidates* (lowercase *ai*, no map entry). Found by the Coder. **Disposition: SG-307's wording list.**
+I5. **Fallback step names** *Validating input*, *Analyzing with ai*, *Building candidates* (lowercase *ai*, no map entry). Found by the Coder. **Disposition: the same small wording slice.**
 
 ## Below 95
 
