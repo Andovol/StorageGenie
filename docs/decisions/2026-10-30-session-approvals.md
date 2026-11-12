@@ -172,3 +172,7 @@ Read as: **D30** — adopt contract 0.59.0 (covering 0.58.1 and 0.58.2; D28's re
 **2026-11-12, verbatim, directives:** *"What is the plan going forward? Can you review the plan using the 2nd decision model?"* · *"Continue in L3 mode"*
 
 Read as: the plan review ran as SG-305 (blind by instruction) and SG-306 (critique), ledger 2026-11-12; it changed the plan (SG-308 refresh fix first, SG-301 split, rotation counts riders). Work continued at L3 through SG-312. **D32** (close now with SG-312's deploy held for its screenshots) was put and not answered; the close ran on the reply deadline with D32 open.
+
+**2026-11-12, verbatim:** *"D33 approved."*
+
+Read as: **D33** — stage C's remaining order is SG-307 (catalog and item panel, white controls, 375 header; build and gate only) → its screenshots as their own slice → rider → a small wording slice (Expiry ISO dates, the *Saving* step's *In progress* while waiting, *Long lead* under *Safe*, fallback step names) → rider → SG-304 → rider → the owner's trial on one real shelf. D32 is moot: SG-312's screenshots came from SG-313 and it is live as `release-sg314`. Note: this re-sequencing went to the owner without D30's blind second opinion; the owner's approval settles it.
