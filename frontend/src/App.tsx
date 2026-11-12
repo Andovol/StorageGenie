@@ -88,7 +88,7 @@ function Nav() {
       </Link>
       <button
         type="button"
-        className="focus-ring"
+        className="focus-ring nav-menu-toggle"
         aria-expanded={menuOpen}
         aria-controls="sg-nav-menu"
         onClick={() => setMenuOpen((open) => !open)}
@@ -183,7 +183,7 @@ function Nav() {
 export default function App() {
   return (
     <HouseholdProvider>
-      <div className="bg-background text-foreground" style={{ minHeight: "100vh" }}>
+      <div className="text-foreground" style={{ minHeight: "100vh", backgroundColor: "hsl(var(--paper))" }}>
         <Nav />
         <Routes>
           <Route path="/" element={<CatalogPage />} />

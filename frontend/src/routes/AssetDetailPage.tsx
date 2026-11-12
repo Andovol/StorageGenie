@@ -92,7 +92,6 @@ export function EnrichButton({
   capUsd?: number;
 }) {
   const [refusal, setRefusal] = useState<string | null>(null);
-  const spendLabel = lastSpendUsd != null ? `$${lastSpendUsd.toFixed(6)}` : "$0.00";
   function handleClick() {
     const reason = enrichCapRefusal(lastSpendUsd ?? 0, capUsd);
     if (reason) {
@@ -113,7 +112,7 @@ export function EnrichButton({
         Enrich
       </button>
       <span className="text-muted-foreground" style={{ fontSize: 13 }}>
-        Last measured spend: {spendLabel} · per-press cap ${capUsd.toFixed(2)}
+        Enrich costs up to ${capUsd.toFixed(2)} a press
       </span>
       {refusal && (
         <span role="alert" className="text-danger" style={{ fontSize: 13 }}>
@@ -585,7 +584,7 @@ export function AssetDetailPage() {
       </div>
       <div style={{ marginBottom: 13, fontSize: 13, color: "hsl(var(--ink-muted))" }}>
         {isGone ? `Gone${goneLabel ? ` — ${goneLabel}` : ""}` : "Live"}
-        {asset.quantity != null && <> · qty {asset.quantity} {asset.unit || ""}</>}
+        {asset.quantity != null && <> · {quantityLeftText(asset.quantity, asset.unit, counted)}</>}
         {asset.condition && <> · {asset.condition}</>}
       </div>
 
@@ -751,7 +750,7 @@ export function AssetDetailPage() {
       <RelationsSection asset={asset} householdId={householdId} />
 
       {editing && (
-        <div className="bg-card-muted border-border" style={{ borderRadius: 0, padding: 12, marginBottom: 16, borderStyle: "solid", borderWidth: 1 }}>
+        <div style={{ borderRadius: 0, padding: 12, marginBottom: 16, borderStyle: "solid", borderWidth: 1, borderColor: "hsl(var(--line))", backgroundColor: "hsl(var(--paper))" }}>
           <div style={{ display: "grid", gridTemplateColumns: "110px 1fr", gap: 8, alignItems: "center" }}>
             <label htmlFor="edit-display-name" style={{ fontSize: 13 }}>Display name</label>
             <input id="edit-display-name" value={editName} onChange={(e) => setEditName(e.target.value)} className="bg-background text-foreground border-border focus-ring" style={{ padding: 8, borderRadius: 0, borderStyle: "solid", borderWidth: 1 }} />

@@ -168,8 +168,7 @@ function OpenedRow({
       )}
       <span
         data-testid="opened-window"
-        className="bg-card-muted"
-        style={{ marginLeft: "auto", padding: "2px 8px", borderRadius: 0, fontSize: 13 }}
+        style={{ marginLeft: "auto", padding: "2px 8px", borderRadius: 0, fontSize: 13, backgroundColor: "hsl(var(--paper))", border: "1px solid hsl(var(--line))" }}
       >
         {windowText(row)}
       </span>

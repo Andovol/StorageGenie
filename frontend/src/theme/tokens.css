@@ -86,9 +86,18 @@ body {
 }
 
 body {
-  background-color: hsl(var(--background));
+  background-color: hsl(var(--paper));
   color: hsl(var(--foreground));
   font-family: var(--font-sans);
+}
+
+/* SG-312 G1.2: buttons, inputs, selects and textareas take the page font.
+   Browsers default them to system Arial unless told to inherit. */
+button,
+input,
+select,
+textarea {
+  font: inherit;
 }
 
 .bg-background {

@@ -244,12 +244,13 @@ describe("ExpiryPage", () => {
     expect(screen.getByText(/Valid until/)).toBeInTheDocument();
   });
 
-  test("maps every tier to its pill label including No tier", async () => {
+  test("maps every tier to its plain-word pill; a row with no tier shows no pill", async () => {
     renderPage();
     await screen.findByText("Milk");
 
     const pills = screen.getAllByTestId("tier-pill").map((pill) => pill.textContent);
-    expect(pills).toEqual(expect.arrayContaining(["Critical", "Urgent", "Upcoming", "Long lead", "Safe", "No tier"]));
+    expect(pills).toEqual(expect.arrayContaining(["Use first", "Use soon", "Upcoming", "Long lead", "Safe"]));
+    expect(pills).not.toContain("No tier");
   });
 
   test("labels every unresolved reason", async () => {

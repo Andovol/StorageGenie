@@ -187,10 +187,11 @@ describe("InboxPage", () => {
     api.apiGet.mockImplementation((path: string) => path === "/v1/jobs" ? Promise.resolve({ items: [], next_cursor: null, total: 0 }) : Promise.resolve({ items: [assetTask, candidateTask, unknownTask], next_cursor: null, total: 3 }));
     renderPage();
     // SG-301 G2: subject refs and raw kinds are never shown — the rows carry
-    // the task's plain words plus the bare "item"/"candidate" kind label.
+    // the task's plain words plus the item's name, or "Unnamed item" when no read gives one (SG-312 G1.3; was the bare "item"/"candidate" kind label).
     expect((await screen.findAllByText("Date needed"))).toHaveLength(2);
-    expect(screen.getAllByText("item")).toHaveLength(2);
-    expect(screen.getByText("candidate")).toBeInTheDocument();
+    expect(screen.getAllByText("Unnamed item")).toHaveLength(3);
+    expect(screen.queryByText("item")).toBeNull();
+    expect(screen.queryByText("candidate")).toBeNull();
     const links = screen.getAllByRole("link", { name: "Review" });
     expect(links.map((link) => link.getAttribute("href") || "")).toEqual([
       `/assets/asset-270?household_id=${household.id}`,

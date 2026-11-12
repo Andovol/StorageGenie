@@ -203,12 +203,12 @@ describe("AssetDetailPage", () => {
 });
 
 describe("EnrichButton per-press cap (SG-082)", () => {
-  test("the page renders the Enrich button with the last measured spend and cap", async () => {
+  test("the page renders the Enrich button with the plain cost line", async () => {
     assetBody = before;
     renderPage();
 
     expect(await screen.findByRole("button", { name: "Enrich" })).toBeInTheDocument();
-    expect(screen.getByText(`Last measured spend: $0.00 · per-press cap $${ENRICH_PER_PRESS_CAP_USD.toFixed(2)}`)).toBeInTheDocument();
+    expect(screen.getByText(`Enrich costs up to $${ENRICH_PER_PRESS_CAP_USD.toFixed(2)} a press`)).toBeInTheDocument();
   });
 
   test("cap helper refuses above the cap with a named reason (seen-to-fail) and allows below", () => {
@@ -222,7 +222,7 @@ describe("EnrichButton per-press cap (SG-082)", () => {
     const run = vi.fn();
     const { rerender } = render(<EnrichButton lastSpendUsd={0.06} onRun={run} />);
 
-    expect(screen.getByText("Last measured spend: $0.060000 · per-press cap $0.05")).toBeInTheDocument();
+    expect(screen.getByText("Enrich costs up to $0.05 a press")).toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: "Enrich" }));
     expect(run).not.toHaveBeenCalled();
     expect(screen.getByRole("alert")).toHaveTextContent(

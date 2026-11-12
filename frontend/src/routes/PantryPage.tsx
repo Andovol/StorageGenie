@@ -319,7 +319,7 @@ export function PantryPage() {
   const isEmpty = !!assetsQuery.data && liveFood.length === 0 && !assetsQuery.isLoading;
 
   return (
-    <div style={{ backgroundColor: "hsl(var(--paper))", color: "hsl(var(--ink))", minHeight: "100vh" }}>
+    <div style={{ color: "hsl(var(--ink))", minHeight: "100vh" }}>
       <PageContainer className="text-foreground">
         <style data-testid="pantry-grid-style">{PANTRY_GRID_CSS}</style>
         <h1 className="page-header text-foreground">Pantry</h1>

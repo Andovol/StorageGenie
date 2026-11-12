@@ -1,5 +1,5 @@
 import type { Job } from "../api/types";
-import { labelJobState } from "../lib/labels";
+import { formatJobDate, labelJobState } from "../lib/labels";
 
 /**
  * SG-105 G3: status toned by state. The tones reuse the existing semantic
@@ -50,7 +50,7 @@ export function JobCard({ job, selected, onSelect }: { job: Job; selected: boole
         <strong>{labelJobKind(job.job_type)} job</strong>
         <span className={jobStateTone(job.state)}>{labelJobState(job.state)}</span>
       </div>
-      <div style={{ fontSize: 13, marginTop: 6, color: "hsl(var(--ink-muted))" }}>{job.created_at || ""}</div>
+      <div style={{ fontSize: 13, marginTop: 6, color: "hsl(var(--ink-muted))" }}>{formatJobDate(job.created_at)}</div>
       {job.progress && <div style={{ fontSize: 13, marginTop: 8 }}>Progress: {job.progress.completed}/{job.progress.total} complete · {job.progress.failed} failed · {job.progress.pending} pending</div>}
     </button>
   );

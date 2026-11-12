@@ -63,7 +63,7 @@ describe("ExpiryEntryForm", () => {
     api.enterManualExpiry.mockResolvedValue({});
     renderForm(assertion("a-active", { expiry_date: "2030-05-06", date_type: "best_before" }, "accepted"));
 
-    expect(screen.getByTestId("expiry-state")).toHaveTextContent("accepted");
+    expect(screen.getByTestId("expiry-state")).toHaveTextContent("Date confirmed");
     expect(screen.getByLabelText("Date")).toHaveValue("2030-05-06");
     expect(screen.getByLabelText("Date type")).toHaveValue("best_before");
     expect(screen.getByRole("button", { name: "Save date" })).toBeDisabled();
@@ -164,10 +164,10 @@ describe("ExpiryEntryForm", () => {
 
   test("needs_evidence and proposed keep their display words", () => {
     const { unmount } = renderForm(assertion("a-ne", { status: "unknown" }, "needs_evidence"));
-    expect(screen.getByTestId("expiry-state")).toHaveTextContent("needs_evidence");
+    expect(screen.getByTestId("expiry-state")).toHaveTextContent("Needs a date");
     unmount();
 
     renderForm(assertion("a-proposed", { expiry_date: "2030-05-06", date_type: "expiry_date" }, "proposed"));
-    expect(screen.getByTestId("expiry-state")).toHaveTextContent("proposed");
+    expect(screen.getByTestId("expiry-state")).toHaveTextContent("Date to confirm");
   });
 });

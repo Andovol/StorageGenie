@@ -30,8 +30,8 @@ const BUCKET_SECTIONS: { bucket: string; label: string }[] = [
 
 // The engine's tier names, labelled for display. A null tier is its own label.
 const TIER_LABELS: Record<string, string> = {
-  critical: "Critical",
-  urgent: "Urgent",
+  critical: "Use first",
+  urgent: "Use soon",
   upcoming: "Upcoming",
   long_lead: "Long lead",
   safe: "Safe",
@@ -45,7 +45,7 @@ const REASON_LABELS: Record<string, string> = {
 };
 
 function tierLabel(tier: string | null): string {
-  if (!tier) return "No tier";
+  if (!tier) return "";
   if (TIER_LABELS[tier]) return TIER_LABELS[tier];
   return tier.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
 }
@@ -80,12 +80,11 @@ function ExpiryRow({ row, householdId, detail }: { row: ExpiryRowItem; household
       </Link>
       {detail}
       <span style={{ fontSize: 13, color: "hsl(var(--ink-muted))" }}>{daysLabel(row.days_remaining)}</span>
-      <span
-        data-testid="tier-pill"
-        style={{ marginLeft: "auto", padding: "2px 8px", borderRadius: 0, fontSize: 13, backgroundColor: "hsl(var(--paper))", color: "hsl(var(--ink))", border: "1px solid hsl(var(--line))" }}
-      >
-        {tierLabel(row.tier)}
-      </span>
+      {row.tier ? (
+        <span data-testid="tier-pill" style={{ fontSize: 13, color: "hsl(var(--ink-muted))" }}>
+          {tierLabel(row.tier)}
+        </span>
+      ) : null}
     </div>
   );
 }

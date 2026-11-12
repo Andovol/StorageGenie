@@ -56,7 +56,7 @@ function jsonResponse(body: unknown): Response {
   return { ok: true, json: async () => body } as Response;
 }
 
-function withClient(node: React.ReactNode) {
+function withClient(node: ReactNode) {
   return (
     <QueryClientProvider client={new QueryClient({ defaultOptions: { queries: { retry: false } } })}>
       <HouseholdProvider>
@@ -112,11 +112,16 @@ describe("SG-312 Inbox in plain words (I3)", () => {
   test("review rows name the item when a read gives the name; no bare item or candidate word", async () => {
     const assetTask = { id: "task-312-a", task_type: "expiry.manual_entry", priority: "high", subject_ref: "asset-312", subject_kind: "asset", data_required: true, proposed_change: null, status: "open", household_id: household.id, created_at: null, updated_at: null };
     const candidateTask = { id: "task-312-c", task_type: "identifier_collision", priority: "high", subject_ref: "candidate-312", subject_kind: "candidate", data_required: false, proposed_change: null, status: "open", household_id: household.id, created_at: null, updated_at: null };
-    api.apiGet.mockImplementation((path: string) => (path === "/v1/jobs" ? Promise.resolve({ items: [], next_cursor: null, total: 0 }) : Promise.resolve({ items: [assetTask, candidateTask], next_cursor: null, total: 2 })));
-    api.fetchHouseholdAssets.mockResolvedValue({ items: [{ id: "asset-312", display_name: "Oat milk" }], next_cursor: null, total: 1 });
+    api.apiGet.mockImplementation((path: string) => {
+      if (path === "/v1/jobs") return Promise.resolve({ items: [], next_cursor: null, total: 0 });
+      if (path === "/v1/assets/asset-312") return Promise.resolve({ id: "asset-312", display_name: "Oat milk" });
+      if (path === "/v1/candidates/candidate-312") return Promise.resolve({ id: "candidate-312", fields: { display_name: { value: "Soup tin" } } });
+      return Promise.resolve({ items: [assetTask, candidateTask], next_cursor: null, total: 2 });
+    });
     render(withClient(<InboxPage />));
     expect(await screen.findByText("Oat milk")).toBeInTheDocument();
-    expect(screen.getByText("Unnamed item")).toBeInTheDocument();
+    expect(await screen.findByText("Soup tin")).toBeInTheDocument();
+    expect(screen.queryByText("Unnamed item")).toBeNull();
     expect(screen.queryByText("item")).toBeNull();
     expect(screen.queryByText("candidate")).toBeNull();
   });

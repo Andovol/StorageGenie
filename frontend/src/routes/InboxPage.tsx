@@ -2,25 +2,25 @@ import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
 import { apiGet, apiPost, resolveReviewTask } from "../api/client";
-import type { Job, JobCandidate, JobCandidateListResponse, JobListResponse } from "../api/types";
+import type { Candidate, Job, JobCandidateListResponse, JobListResponse, ReviewTask } from "../api/types";
 import { JobCard } from "../components/JobCard";
 import { CONTROL_STYLE, THEMED_CONTROL_CLASS } from "../components/shell/CatalogToolbar";
 import { PageContainer } from "../components/shell/PageContainer";
-import { useReviewTasks } from "../hooks/useAssets";
+import { useAsset, useReviewTasks } from "../hooks/useAssets";
 import { useHouseholdContext } from "../hooks/HouseholdContext";
 import {
   UNNAMED_ITEM,
   labelCandidateState,
   labelJobState,
+  labelStepName,
   labelStepStatus,
-  labelSubjectKind,
   labelTaskPriority,
   labelTaskStatus,
   labelTaskType,
 } from "../lib/labels";
 
-function candidateName(candidate: JobCandidate): string {
-  const raw = candidate.fields.display_name;
+function nameFromFields(fields: Record<string, unknown> | undefined): string {
+  const raw = fields?.display_name;
   if (raw && typeof raw === "object" && !Array.isArray(raw)) {
     const value = (raw as Record<string, unknown>).value;
     if (value != null) return String(value);
@@ -29,9 +29,19 @@ function candidateName(candidate: JobCandidate): string {
   return UNNAMED_ITEM;
 }
 
-function labelStepName(stepName: string): string {
-  if (stepName === "AWAITING_REVIEW") return "Review";
-  return stepName.replace(/[_.]+/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+// SG-312 G1.3: a review row's name comes from the subject's own existing read
+// (the item page and the review page use the same query keys, so the cache is
+// shared). A subject whose read gives no name keeps "Unnamed item".
+function TaskSubjectName({ task, householdId }: { task: ReviewTask; householdId: string }) {
+  const asset = useAsset(householdId, task.subject_kind === "asset" ? task.subject_ref : "");
+  const candidate = useQuery<Candidate>({
+    queryKey: ["candidate", task.subject_ref, householdId],
+    queryFn: () => apiGet<Candidate>(`/v1/candidates/${task.subject_ref}`, { household_id: householdId }),
+    enabled: task.subject_kind === "candidate" && !!task.subject_ref && !!householdId,
+  });
+  if (task.subject_kind === "asset") return <>{asset.data?.display_name || UNNAMED_ITEM}</>;
+  if (task.subject_kind === "candidate") return <>{nameFromFields(candidate.data?.fields)}</>;
+  return <>{UNNAMED_ITEM}</>;
 }
 
 export function InboxPage() {
@@ -64,7 +74,7 @@ export function InboxPage() {
     <h1 className="page-header text-foreground">Inbox</h1>
     <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(280px, 100%), 1fr))", gap: 20 }}>
       <section><h2>Import jobs</h2>{jobs.isError && <div role="alert">Could not load import jobs: {String(jobs.error)}</div>}{jobs.isLoading && <div>Loading jobs…</div>}{!jobs.isLoading && jobs.data?.items.length === 0 && <div role="status">No import jobs yet.</div>}<div style={{ display: "grid", gap: 8 }}>{jobs.data?.items.map((job) => <JobCard key={job.id} job={job} selected={selectedJobId === job.id} onSelect={() => setSelectedJobId(job.id)} />)}</div></section>
-      <section><h2>Selected job</h2>{!selectedJobId && <div>Select a job to see progress and errors.</div>}{detail.isError && <div role="alert">Could not load job detail: {String(detail.error)}</div>}{detail.isLoading && <div>Loading job detail…</div>}{detail.data && <div><div><strong>{labelJobState(detail.data.state)}</strong> · {detail.data.progress?.completed || 0}/{detail.data.progress?.total || 0} complete · {detail.data.progress?.failed || 0} failed · {detail.data.progress?.pending || 0} pending</div>{detail.data.errors?.map((error) => <div key={error} role="alert" className="text-danger" style={{ marginTop: 8 }}>{error}</div>)}{detail.data.steps?.map((step) => <div key={step.id} style={{ marginTop: 8, padding: 8, backgroundColor: "hsl(var(--paper))", border: "1px solid hsl(var(--line))", borderRadius: 0 }}><strong>{labelStepName(step.step_name)}</strong>: {labelStepStatus(step)}{step.error && <div role="alert">{step.error}</div>}</div>)}{detail.data.state === "CREATED" && <button type="button" onClick={() => run.mutate(detail.data!.id)} disabled={run.isPending} className={THEMED_CONTROL_CLASS} style={{ ...CONTROL_STYLE, marginTop: 12, borderRadius: 0 }}>{run.isPending ? "Starting…" : "Start import job"}</button>}{detail.data.state === "FAILED" && <button type="button" onClick={() => retry.mutate(detail.data!.id)} disabled={retry.isPending} className={THEMED_CONTROL_CLASS} style={{ ...CONTROL_STYLE, marginTop: 12, borderRadius: 0 }}>{retry.isPending ? "Retrying…" : "Retry failed job"}</button>}</div>}{selectedJobId && <div style={{ marginTop: 12 }}>{jobCandidates.isError && <div role="alert">Could not load job candidates: {String(jobCandidates.error)}</div>}{jobCandidates.isLoading && <div>Loading candidates…</div>}{!jobCandidates.isLoading && jobCandidates.data?.items.length === 0 && <div role="status">No candidates for this job.</div>}{jobCandidates.data && jobCandidates.data.items.length > 0 && <ul style={{ margin: 0, paddingLeft: 18 }}>{jobCandidates.data.items.map((candidate) => <li key={candidate.id} style={{ marginBottom: 6 }}><strong>{candidateName(candidate)}</strong> · {labelCandidateState(candidate.state)}{candidate.asset_id ? <> · <Link className="text-link focus-ring" to={`/assets/${candidate.asset_id}?household_id=${effectiveHousehold}`}>Open item</Link></> : candidate.state !== "rejected" && candidate.state !== "merged" && candidate.state !== "split" ? <> · <Link className="text-link focus-ring" to={`/review/${candidate.id}?household_id=${effectiveHousehold}`}>Review</Link></> : null}</li>)}</ul>}</div>}</section>
+      <section><h2>Selected job</h2>{!selectedJobId && <div>Select a job to see progress and errors.</div>}{detail.isError && <div role="alert">Could not load job detail: {String(detail.error)}</div>}{detail.isLoading && <div>Loading job detail…</div>}{detail.data && <div><div><strong>{labelJobState(detail.data.state)}</strong> · {detail.data.progress?.completed || 0}/{detail.data.progress?.total || 0} complete · {detail.data.progress?.failed || 0} failed · {detail.data.progress?.pending || 0} pending</div>{detail.data.errors?.map((error) => <div key={error} role="alert" className="text-danger" style={{ marginTop: 8 }}>{error}</div>)}{detail.data.steps?.map((step) => <div key={step.id} style={{ marginTop: 8, padding: 8, backgroundColor: "hsl(var(--paper))", border: "1px solid hsl(var(--line))", borderRadius: 0 }}><strong>{labelStepName(step.step_name)}</strong>: {labelStepStatus(step)}{step.error && <div role="alert">{step.error}</div>}</div>)}{detail.data.state === "CREATED" && <button type="button" onClick={() => run.mutate(detail.data!.id)} disabled={run.isPending} className={THEMED_CONTROL_CLASS} style={{ ...CONTROL_STYLE, marginTop: 12, borderRadius: 0 }}>{run.isPending ? "Starting…" : "Start import job"}</button>}{detail.data.state === "FAILED" && <button type="button" onClick={() => retry.mutate(detail.data!.id)} disabled={retry.isPending} className={THEMED_CONTROL_CLASS} style={{ ...CONTROL_STYLE, marginTop: 12, borderRadius: 0 }}>{retry.isPending ? "Retrying…" : "Retry failed job"}</button>}</div>}{selectedJobId && <div style={{ marginTop: 12 }}>{jobCandidates.isError && <div role="alert">Could not load job candidates: {String(jobCandidates.error)}</div>}{jobCandidates.isLoading && <div>Loading candidates…</div>}{!jobCandidates.isLoading && jobCandidates.data?.items.length === 0 && <div role="status">No candidates for this job.</div>}{jobCandidates.data && jobCandidates.data.items.length > 0 && <ul style={{ margin: 0, paddingLeft: 18 }}>{jobCandidates.data.items.map((candidate) => <li key={candidate.id} style={{ marginBottom: 6 }}><strong>{nameFromFields(candidate.fields)}</strong> · {labelCandidateState(candidate.state)}{candidate.asset_id ? <> · <Link className="text-link focus-ring" to={`/assets/${candidate.asset_id}?household_id=${effectiveHousehold}`}>Open item</Link></> : candidate.state !== "rejected" && candidate.state !== "merged" && candidate.state !== "split" ? <> · <Link className="text-link focus-ring" to={`/review/${candidate.id}?household_id=${effectiveHousehold}`}>Review</Link></> : null}</li>)}</ul>}</div>}</section>
     </div>
     <section style={{ marginTop: 28 }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
@@ -76,8 +86,7 @@ export function InboxPage() {
       {!tasks.isLoading && totalTasks > 0 && reviewTasks.length === 0 && <div role="status">No {reviewFilter} review tasks.</div>}
       <div style={{ display: "grid", gap: 8 }}>{reviewTasks.map((task) => {
         const subjectKind = task.subject_kind;
-        const subjectLabel = labelSubjectKind(subjectKind);
-        return <div key={task.id} style={{ display: "flex", flexWrap: "wrap", justifyContent: "space-between", gap: 12, padding: 12, backgroundColor: "hsl(var(--paper))", color: "hsl(var(--ink))", borderStyle: "solid", borderWidth: 1, borderColor: "hsl(var(--line))", borderRadius: 0 }}><div><strong>{labelTaskType(task.task_type)}</strong> · {labelTaskPriority(task.priority)} · {labelTaskStatus(task.status)}<div style={{ fontSize: 13, color: "hsl(var(--ink-muted))" }}>{subjectLabel}</div></div><div style={{ display: "flex", gap: 8, alignItems: "center" }}>{subjectKind === "asset" && task.subject_ref && <Link className="text-link focus-ring" style={{ textDecoration: "underline" }} to={`/assets/${task.subject_ref}?household_id=${effectiveHousehold}`}>Review</Link>}{subjectKind === "candidate" && task.subject_ref && <Link className="text-link focus-ring" style={{ textDecoration: "underline" }} to={`/review/${task.subject_ref}?household_id=${effectiveHousehold}`}>Review</Link>}{task.status === "open" && !task.data_required && <button type="button" onClick={() => resolve.mutate(task.id)} disabled={resolve.isPending} className={THEMED_CONTROL_CLASS} style={{ ...CONTROL_STYLE, borderRadius: 0 }}>Resolve</button>}</div></div>;
+        return <div key={task.id} style={{ display: "flex", flexWrap: "wrap", justifyContent: "space-between", gap: 12, padding: 12, backgroundColor: "hsl(var(--paper))", color: "hsl(var(--ink))", borderStyle: "solid", borderWidth: 1, borderColor: "hsl(var(--line))", borderRadius: 0 }}><div><strong>{labelTaskType(task.task_type)}</strong> · {labelTaskPriority(task.priority)} · {labelTaskStatus(task.status)}<div style={{ fontSize: 13, color: "hsl(var(--ink-muted))" }}><TaskSubjectName task={task} householdId={effectiveHousehold} /></div></div><div style={{ display: "flex", gap: 8, alignItems: "center" }}>{subjectKind === "asset" && task.subject_ref && <Link className="text-link focus-ring" style={{ textDecoration: "underline" }} to={`/assets/${task.subject_ref}?household_id=${effectiveHousehold}`}>Review</Link>}{subjectKind === "candidate" && task.subject_ref && <Link className="text-link focus-ring" style={{ textDecoration: "underline" }} to={`/review/${task.subject_ref}?household_id=${effectiveHousehold}`}>Review</Link>}{task.status === "open" && !task.data_required && <button type="button" onClick={() => resolve.mutate(task.id)} disabled={resolve.isPending} className={THEMED_CONTROL_CLASS} style={{ ...CONTROL_STYLE, borderRadius: 0 }}>Resolve</button>}</div></div>;
       })}</div>
     </section>
   </PageContainer>;

@@ -105,3 +105,57 @@ export function labelAssetType(assetType: string): string {
 }
 
 export const UNNAMED_ITEM = "Unnamed item";
+
+/**
+ * SG-312 G1.3 / G1.5: the plain words an owner sees for a job step, a job
+ * date and an expiry state. Raw backend names never reach the screen.
+ */
+const STEP_NAME_LABELS: Record<string, string> = {
+  EXTRACTING_DETERMINISTIC_SIGNALS: "Checking the file",
+  NORMALIZING: "Tidying the details",
+  DEDUPLICATING: "Looking for duplicates",
+  COMMITTING: "Saving",
+  AWAITING_REVIEW: "Your review",
+};
+
+function sentenceCase(text: string): string {
+  const lower = text.trim().toLowerCase();
+  return lower.charAt(0).toUpperCase() + lower.slice(1);
+}
+
+export function labelStepName(stepName: string): string {
+  const raw = stepName ?? "";
+  const key = raw.toUpperCase();
+  if (STEP_NAME_LABELS[key]) return STEP_NAME_LABELS[key];
+  return sentenceCase(raw.replace(/[_.]+/g, " "));
+}
+
+const MONTH_SHORT = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+
+/** "12 Nov, 14:42", or "Today, 14:42" for the current local day; "" when unreadable. */
+export function formatJobDate(value: string | null | undefined, now: Date = new Date()): string {
+  if (!value) return "";
+  const when = new Date(value);
+  if (Number.isNaN(when.getTime())) return "";
+  const time = `${String(when.getHours()).padStart(2, "0")}:${String(when.getMinutes()).padStart(2, "0")}`;
+  const sameDay =
+    when.getFullYear() === now.getFullYear() &&
+    when.getMonth() === now.getMonth() &&
+    when.getDate() === now.getDate();
+  if (sameDay) return `Today, ${time}`;
+  return `${when.getDate()} ${MONTH_SHORT[when.getMonth()]}, ${time}`;
+}
+
+const EXPIRY_STATE_LABELS: Record<string, string> = {
+  accepted: "Date confirmed",
+  proposed: "Date to confirm",
+  needs_evidence: "Needs a date",
+  superseded: "Replaced",
+  rejected: "Not kept",
+  "No date": "No date",
+};
+
+export function labelExpiryState(state: string): string {
+  if (EXPIRY_STATE_LABELS[state]) return EXPIRY_STATE_LABELS[state];
+  return sentenceCase((state ?? "").replace(/[_.]+/g, " "));
+}

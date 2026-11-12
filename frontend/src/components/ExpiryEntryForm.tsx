@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { clearExpiryDate, enterManualExpiry } from "../api/client";
 import type { Assertion } from "../api/types";
+import { labelExpiryState } from "../lib/labels";
 
 export const DATE_TYPE_LABELS: Record<string, string> = {
   expiry_date: "Expiry date",
@@ -105,9 +106,9 @@ export function ExpiryEntryForm({
   }
 
   return (
-    <section aria-label={title} className="bg-card border-border" style={{ marginTop: 18, padding: 14, borderStyle: "solid", borderWidth: 1, borderRadius: 8 }}>
+    <section aria-label={title} style={{ marginTop: 18, padding: 14, borderStyle: "solid", borderWidth: 1, borderColor: "hsl(var(--line))", borderRadius: 0, backgroundColor: "hsl(var(--paper))", color: "hsl(var(--ink))" }}>
       <h3 style={{ marginTop: 0 }}>{title}</h3>
-      <div>Expiry evidence state: <strong data-testid="expiry-state">{displayState}</strong></div>
+      <div><strong data-testid="expiry-state">{labelExpiryState(displayState)}</strong></div>
       <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginTop: 10, alignItems: "end" }}>
         <label style={{ display: "flex", flexDirection: "column", gap: 4, fontSize: 13 }}>
           Date
