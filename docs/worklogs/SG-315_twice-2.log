@@ -1,0 +1,50 @@
+
+ RUN  v1.6.1 /home/andrei/StorageGenie/frontend
+
+stderr | src/routes/InboxPage.test.tsx > InboxPage > renders failed loaded job detail and retries that loaded id
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+stderr | src/routes/sg307r1-fixes.sg307r1.test.tsx > SG-307r1 fix 1: Pantry tile buttons paper at the source > no tile button inline style names --card; buttons stay >= 40px tall
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+stderr | src/components/shell/import-modal.test.tsx > AssetImportModal staging > drop stages accepted files as Ready with a live count
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+ ✓ src/routes/InboxPage.test.tsx  (12 tests) 993ms
+stderr | src/components/shell/shell.test.tsx > Catalog shell > the header labels the LOADED item count, not a household total
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+ ✓ src/routes/sg307r1-fixes.sg307r1.test.tsx  (4 tests) 572ms
+ ✓ src/components/shell/import-modal.test.tsx  (18 tests) 1144ms
+ ✓ src/routes/theme-adoption.test.tsx  (12 tests) 982ms
+stderr | src/routes/theme-adoption.test.tsx > SG-075 screen adoption > App nav carries the paper/line tokens and surfaces the theme toggle
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+ ✓ src/components/catalog/catalog.sg307.test.tsx  (6 tests) 210ms
+stderr | src/components/catalog/catalog.sg307.test.tsx > SG-307 catalog plain words, no mono, square paper > no font-mono class and no developer status string in the rendered card
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+ ✓ src/components/AssetForm.test.tsx  (9 tests) 535ms
+stderr | src/components/shell/panel.sg307.test.tsx > SG-307 paper controls and 375 header > the shared rule exists and the toolbar, toggle and review select come out of it
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+ ✓ src/components/shell/panel.sg307.test.tsx  (6 tests) 500ms
+ ✓ src/components/shell/import-modal.sg315.test.tsx  (1 test) 113ms
+stderr | src/components/shell/import-modal.sg315.test.tsx > SG-315 drop-zone highlight (SG-307 dropped the dragOver read) > the drop zone border turns --primary while a file is dragged over it and returns to --line on drag-leave
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+ ✓ src/components/shell/shell.test.tsx  (23 tests) 3309ms
+
+ Test Files  9 passed (9)
+      Tests  91 passed (91)
+   Start at  18:59:00
+   Duration  5.75s (transform 1.74s, setup 883ms, collect 6.28s, tests 8.36s, environment 5.21s, prepare 1.15s)
+

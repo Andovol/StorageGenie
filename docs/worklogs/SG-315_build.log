@@ -1,0 +1,24 @@
+
+> storagegenie-frontend@0.1.0 build
+> tsc && vite build --outDir /home/andrei/StorageGenie/output/SG-315-scratch/build
+
+vite v5.4.21 building for production...
+
+(!) outDir /home/andrei/StorageGenie/output/SG-315-scratch/build is not inside project root and will not be emptied.
+Use --emptyOutDir to override.
+
+transforming...
+✓ 1973 modules transformed.
+rendering chunks...
+computing gzip size...
+../output/SG-315-scratch/build/index.html                                                     0.94 kB │ gzip:   0.48 kB
+../output/SG-315-scratch/build/assets/instrument-sans-latin-ext-wght-normal-B5bTHO_g.woff2   11.14 kB
+../output/SG-315-scratch/build/assets/instrument-sans-latin-wght-normal-BbzFLZTg.woff2       30.09 kB
+../output/SG-315-scratch/build/assets/index-BGbwuPTO.css                                      6.17 kB │ gzip:   1.89 kB
+../output/SG-315-scratch/build/assets/index-CAZn7_m4.js                                     362.47 kB │ gzip: 103.09 kB
+✓ built in 2.75s
+npm notice
+npm notice New minor version of npm available! 11.11.0 -> 11.21.2
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v11.21.2
+npm notice To update run: npm install -g npm@11.21.2
+npm notice
