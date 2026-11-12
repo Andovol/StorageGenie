@@ -1,0 +1,8 @@
+FAIL  src/routes/PantryPage.sg302.test.tsx > PantryPage SG-302 warning colour > EXPIRED label renders with var(--link), not var(--primary)
+AssertionError: expected 'font-size: 11px; font-weight: 700; color: hsl(var(--primary));' to contain 'var(--link)'
+FAIL  src/routes/PantryPage.sg302.test.tsx > PantryPage SG-302 warning colour > accent time-left line renders with var(--link), not var(--primary)
+AssertionError: expected 'font-size: 13px; color: hsl(var(--primary));' to contain 'var(--link)'
+FAIL  src/routes/PantryPage.sg302.test.tsx > PantryPage SG-302 empty state > empty state contains a Capture link to /capture
+TestingLibraryElementError: Unable to find role="link" and name "Capture"
+Test Files  1 failed (1)
+      Tests  3 failed (3)

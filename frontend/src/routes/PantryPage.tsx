@@ -193,7 +193,7 @@ function PantryTile({
         <span
           data-testid="pantry-expired"
           className="pantry-label"
-          style={{ fontSize: 11, fontWeight: 700, color: "hsl(var(--primary))" }}
+          style={{ fontSize: 11, fontWeight: 700, color: "hsl(var(--link))" }}
         >
           EXPIRED
         </span>
@@ -201,7 +201,7 @@ function PantryTile({
       <span
         data-testid="pantry-time-left"
         data-accent={accent ? "true" : "false"}
-        style={{ fontSize: 13, color: accent ? "hsl(var(--primary))" : "hsl(var(--ink-muted))" }}
+        style={{ fontSize: 13, color: accent ? "hsl(var(--link))" : "hsl(var(--ink-muted))" }}
       >
         {timeText}
       </span>
@@ -389,7 +389,15 @@ export function PantryPage() {
               </h2>
               {isEmpty ? (
                 <div role="status" style={{ fontSize: 13 }}>
-                  No food yet. Add an item from Capture and classify it as food to see it here.
+                  No food yet. Add an item from{" "}
+                  <Link
+                    to="/capture"
+                    className="focus-ring"
+                    style={{ color: "hsl(var(--link))", textDecoration: "underline" }}
+                  >
+                    Capture
+                  </Link>{" "}
+                  and classify it as food to see it here.
                 </div>
               ) : (
                 <div className="pantry-grid" data-testid="pantry-grid">

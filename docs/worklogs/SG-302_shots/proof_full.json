@@ -1,0 +1,221 @@
+{
+  "results": [
+    {
+      "name": "pantry-use-soon-dark-1280",
+      "sha12": "fa342ceb2a9e",
+      "bytes": 195420
+    },
+    {
+      "name": "pantry-use-soon-dark-375",
+      "sha12": "9f2dbfe66b5c",
+      "bytes": 115750
+    },
+    {
+      "name": "pantry-use-soon-light-375",
+      "sha12": "b451945c0bb4",
+      "bytes": 115226
+    },
+    {
+      "name": "pantry-notice-dark-375",
+      "sha12": "3e506593d834",
+      "bytes": 111434
+    },
+    {
+      "name": "catalog-gone-dark-1280",
+      "sha12": "d9f337ee6b06",
+      "bytes": 44278
+    }
+  ],
+  "proof": {
+    "useSoonDark1280": "JuiceEXPIREDExpired 5 days ago500 ml leftEditUse it upCheeseEXPIREDExpired 3 days ago1 left−1Use it upMilkEXPIREDExpired yesterday2 left−1Use it upYogurtUse today1 left−1Use it upApplesUse by tomorrow4 left−1Use it upEgg",
+    "expiredColorDark1280": "rgb(213, 156, 154)",
+    "expiredBgDark1280": "rgb(32, 27, 23)",
+    "bodyBgDark": "rgb(15, 14, 13)",
+    "useSoonDark375": "JuiceEXPIREDExpired 5 days ago500 ml leftEditUse it upCheeseEXPIREDExpired 3 days ago1 left−1Use it upMilkEXPIREDExpired yesterday2 left−1Use it upYogurtUse today1 left−1Use it upApplesUse by tomorrow4 left−1Use it upEgg",
+    "expiredColorDark375": "rgb(213, 156, 154)",
+    "useSoonLight375": "JuiceEXPIREDExpired 5 days ago500 ml leftEditUse it upCheeseEXPIREDExpired 3 days ago1 left−1Use it upMilkEXPIREDExpired yesterday2 left−1Use it upYogurtUse today1 left−1Use it upApplesUse by tomorrow4 left−1Use it upEgg",
+    "expiredColorLight375": "rgb(110, 48, 46)",
+    "darkPairs": {
+      "heading": {
+        "color": "rgb(245, 245, 244)",
+        "background": "rgb(32, 27, 23)",
+        "fontSize": "24px",
+        "fontWeight": "700"
+      },
+      "subtitle": {
+        "color": "rgb(184, 176, 166)",
+        "background": "rgb(32, 27, 23)",
+        "fontSize": "13px",
+        "fontWeight": "400"
+      },
+      "count": {
+        "color": "rgb(244, 240, 232)",
+        "background": "rgb(32, 27, 23)",
+        "fontSize": "13px",
+        "fontWeight": "700"
+      },
+      "unsorted": {
+        "color": "rgb(244, 240, 232)",
+        "background": "rgb(32, 27, 23)",
+        "fontSize": "13px",
+        "fontWeight": "400"
+      },
+      "unsortedLink": {
+        "color": "rgb(244, 240, 232)",
+        "background": "rgb(32, 27, 23)",
+        "fontSize": "13px",
+        "fontWeight": "400"
+      },
+      "sectionUseSoon": {
+        "color": "rgb(245, 245, 244)",
+        "background": "rgb(32, 27, 23)",
+        "fontSize": "13px",
+        "fontWeight": "700"
+      },
+      "tileName": {
+        "color": "rgb(244, 240, 232)",
+        "background": "rgb(32, 27, 23)",
+        "fontSize": "14px",
+        "fontWeight": "600"
+      },
+      "timeMuted": {
+        "color": "rgb(184, 176, 166)",
+        "background": "rgb(32, 27, 23)",
+        "fontSize": "13px",
+        "fontWeight": "400"
+      },
+      "timeAccent": {
+        "color": "rgb(213, 156, 154)",
+        "background": "rgb(32, 27, 23)",
+        "fontSize": "13px",
+        "fontWeight": "400"
+      },
+      "expired": {
+        "color": "rgb(213, 156, 154)",
+        "background": "rgb(32, 27, 23)",
+        "fontSize": "11px",
+        "fontWeight": "700"
+      },
+      "quantity": {
+        "color": "rgb(244, 240, 232)",
+        "background": "rgb(32, 27, 23)",
+        "fontSize": "13px",
+        "fontWeight": "400"
+      },
+      "noPhoto": {
+        "color": "rgb(244, 240, 232)",
+        "background": "rgb(32, 27, 23)",
+        "fontSize": "14px",
+        "fontWeight": "600"
+      },
+      "actionMinus": {
+        "color": "rgb(244, 240, 232)",
+        "background": "rgb(28, 26, 24)",
+        "fontSize": "13px",
+        "fontWeight": "400"
+      },
+      "actionUse": {
+        "color": "rgb(244, 240, 232)",
+        "background": "rgb(28, 26, 24)",
+        "fontSize": "13px",
+        "fontWeight": "400"
+      },
+      "pageBg": "rgb(32, 27, 23)"
+    },
+    "lightPairs": {
+      "heading": {
+        "color": "rgb(28, 25, 23)",
+        "background": "rgb(244, 240, 232)",
+        "fontSize": "24px",
+        "fontWeight": "700"
+      },
+      "subtitle": {
+        "color": "rgb(102, 98, 93)",
+        "background": "rgb(244, 240, 232)",
+        "fontSize": "13px",
+        "fontWeight": "400"
+      },
+      "count": {
+        "color": "rgb(25, 25, 25)",
+        "background": "rgb(244, 240, 232)",
+        "fontSize": "13px",
+        "fontWeight": "700"
+      },
+      "unsorted": {
+        "color": "rgb(25, 25, 25)",
+        "background": "rgb(244, 240, 232)",
+        "fontSize": "13px",
+        "fontWeight": "400"
+      },
+      "unsortedLink": {
+        "color": "rgb(25, 25, 25)",
+        "background": "rgb(244, 240, 232)",
+        "fontSize": "13px",
+        "fontWeight": "400"
+      },
+      "sectionUseSoon": {
+        "color": "rgb(28, 25, 23)",
+        "background": "rgb(244, 240, 232)",
+        "fontSize": "13px",
+        "fontWeight": "700"
+      },
+      "tileName": {
+        "color": "rgb(25, 25, 25)",
+        "background": "rgb(244, 240, 232)",
+        "fontSize": "14px",
+        "fontWeight": "600"
+      },
+      "timeMuted": {
+        "color": "rgb(102, 98, 93)",
+        "background": "rgb(244, 240, 232)",
+        "fontSize": "13px",
+        "fontWeight": "400"
+      },
+      "timeAccent": {
+        "color": "rgb(110, 48, 46)",
+        "background": "rgb(244, 240, 232)",
+        "fontSize": "13px",
+        "fontWeight": "400"
+      },
+      "expired": {
+        "color": "rgb(110, 48, 46)",
+        "background": "rgb(244, 240, 232)",
+        "fontSize": "11px",
+        "fontWeight": "700"
+      },
+      "quantity": {
+        "color": "rgb(25, 25, 25)",
+        "background": "rgb(244, 240, 232)",
+        "fontSize": "13px",
+        "fontWeight": "400"
+      },
+      "actionUse": {
+        "color": "rgb(25, 25, 25)",
+        "background": "rgb(255, 255, 255)",
+        "fontSize": "13px",
+        "fontWeight": "400"
+      },
+      "pageBg": "rgb(244, 240, 232)"
+    },
+    "useItUpClicked": true,
+    "noticeText": "Juice used up · Put back",
+    "noticePair": {
+      "color": "rgb(244, 240, 232)",
+      "background": "rgb(28, 26, 24)",
+      "fontSize": "13px",
+      "fontWeight": "400"
+    },
+    "noticeButton": {
+      "color": "rgb(244, 240, 232)",
+      "background": "rgb(28, 26, 24)",
+      "fontSize": "13px"
+    },
+    "expiredColorNotice": "rgb(213, 156, 154)",
+    "catalogGoneControl": "clicked",
+    "catalogGoneText": "Old Soup listed",
+    "catalogGoneLine": [
+      "Gone — used up",
+      "Gone — used up"
+    ]
+  }
+}

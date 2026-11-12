@@ -1,0 +1,33 @@
+{
+  "results": [
+    {
+      "name": "pantry-empty-dark-375",
+      "sha12": "ea0b32585cc4",
+      "bytes": 26575
+    },
+    {
+      "name": "pantry-empty-light-375",
+      "sha12": "718aecfea113",
+      "bytes": 26288
+    }
+  ],
+  "proof": {
+    "emptyDarkText": "\n    StorageGenieMenuCatalogPantryCaptureInbox0PlanningChatAnalyticsExpirySettingsImport AssetPhase 0 · local-first\n.pantry-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(150px, calc(50% - 8px)), 1fr)); gap: 16px; width: 100%; max-width: 100%; }\n.pantry-label { text-transform: uppercase; letter-spacing: 0.12em; }\nPantry0 ITEMSWhat you have, and what to use first.USE SOONNothing needs using soon.EVERYTHINGNo food yet. Add an item from Capture and classify it as food to see it here.\n  \n\n",
+    "emptyDarkCount": "0 ITEMS",
+    "emptyDarkStatus": [
+      "No food yet. Add an item from Capture and classify it as food to see it here."
+    ],
+    "captureLink": {
+      "href": "/capture",
+      "color": "rgb(245, 245, 244)",
+      "decoration": "none",
+      "outline": "rgb(245, 245, 244)"
+    },
+    "emptyDarkBg": "rgb(32, 27, 23)",
+    "emptyLightText": "\n    StorageGenieMenuCatalogPantryCaptureInbox0PlanningChatAnalyticsExpirySettingsImport AssetPhase 0 · local-first\n.pantry-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(150px, calc(50% - 8px)), 1fr)); gap: 16px; width: 100%; max-width: 100%; }\n.pantry-label { text-transform: uppercase; letter-spacing: 0.12em; }\nPantry0 ITEMSWhat you have, and what to use first.USE SOONNothing needs using soon.EVERYTHINGNo food yet. Add an item from Capture and classify it as food to see it here.\n  \n\n",
+    "captureLinkLight": {
+      "href": "/capture",
+      "color": "rgb(28, 25, 23)"
+    }
+  }
+}

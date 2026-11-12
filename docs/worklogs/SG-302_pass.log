@@ -1,0 +1,23 @@
+
+> storagegenie-frontend@0.1.0 test
+> vitest run --run src/routes/PantryPage.sg302.test.tsx
+
+
+ RUN  v1.6.1 /home/andrei/StorageGenie/frontend
+
+stderr | src/routes/PantryPage.sg302.test.tsx > PantryPage SG-302 warning colour > EXPIRED label renders with var(--link), not var(--primary)
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+ ✓ src/routes/PantryPage.sg302.test.tsx  (3 tests) 165ms
+
+ Test Files  1 passed (1)
+      Tests  3 passed (3)
+   Start at  12:48:55
+   Duration  1.60s (transform 342ms, setup 70ms, collect 607ms, tests 165ms, environment 434ms, prepare 85ms)
+
+npm notice
+npm notice New minor version of npm available! 11.11.0 -> 11.21.2
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v11.21.2
+npm notice To update run: npm install -g npm@11.21.2
+npm notice
