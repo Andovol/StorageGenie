@@ -76,6 +76,8 @@ export function ItemInspectorDrawer({ asset, householdId, onClose }: ItemInspect
   const [unit, setUnit] = useState(asset.unit ?? "");
   const [condition, setCondition] = useState(asset.condition ?? "");
   const [notice, setNotice] = useState<string | null>(null);
+  const [sourceBroken, setSourceBroken] = useState(false);
+  const [sceneBroken, setSceneBroken] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [goneMessage, setGoneMessage] = useState<string | null>(null);
   const [goneError, setGoneError] = useState<string | null>(null);
@@ -228,6 +230,14 @@ export function ItemInspectorDrawer({ asset, householdId, onClose }: ItemInspect
     ? `${import.meta.env.VITE_API_BASE || "http://localhost:8003"}/v1/evidence/${sceneEvidence.id}/file?household_id=${householdId}`
     : null;
 
+  // SG-318 W5: a photo that will not load reads the same "No photo yet"
+  // placeholder as the catalog card — the broken <img> is never left on
+  // screen. The flags reset when the record (and its URLs) changes.
+  useEffect(() => {
+    setSourceBroken(false);
+    setSceneBroken(false);
+  }, [sourceUrl, sceneUrl]);
+
   const colors = colorTags(assertions);
   const description = assertionFor(assertions, "description");
   const descriptionValue = description ? formatValue(description.value) : null;
@@ -356,25 +366,27 @@ export function ItemInspectorDrawer({ asset, householdId, onClose }: ItemInspect
             </p>
           )}
           {tab === "scene" &&
-            (sceneUrl ? (
+            (sceneUrl && !sceneBroken ? (
               <img
                 data-testid="scene-image"
                 src={sceneUrl}
                 alt={`${displayName} context scene`}
                 style={{ width: "100%", height: "100%", objectFit: "contain" }}
+                onError={() => setSceneBroken(true)}
               />
             ) : (
               <p data-testid="scene-honest-state" style={{ margin: 0, padding: 24, textAlign: "center", fontSize: 13, color: "hsl(var(--ink-muted))" }}>
-                No scene yet.
+                {sceneUrl ? "No photo yet." : "No scene yet."}
               </p>
             ))}
           {tab === "source" &&
-            (sourceUrl ? (
+            (sourceUrl && !sourceBroken ? (
               <img
                 data-testid="source-image"
                 src={sourceUrl}
                 alt={displayName}
                 style={{ width: "100%", height: "100%", objectFit: "contain" }}
+                onError={() => setSourceBroken(true)}
               />
             ) : (
               <p data-testid="source-empty" style={{ margin: 0, padding: 24, textAlign: "center", fontSize: 13, color: "hsl(var(--ink-muted))" }}>

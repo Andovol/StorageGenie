@@ -2,7 +2,7 @@ import { memo, useState } from "react";
 import { Link } from "react-router-dom";
 import { AlertTriangle, Package } from "lucide-react";
 import type { ProductItem, ProductStatus } from "../../types/product";
-import { labelProductStatus } from "../../lib/labels";
+import { labelAssetType, labelProductStatus } from "../../lib/labels";
 
 /**
  * A catalog card item: the DQ1 `ProductItem` plus the media the grid renders.
@@ -224,7 +224,7 @@ export const ProductCard = memo(function ProductCard({
             whiteSpace: "nowrap",
           }}
         >
-          {item.category}
+          {labelAssetType(item.category)}
         </span>
         {item.metadata.primaryColors?.length ? (
           <div data-testid="color-dots" style={{ display: "flex", gap: 4 }}>

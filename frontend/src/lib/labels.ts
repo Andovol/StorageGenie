@@ -160,6 +160,19 @@ export function labelStepName(stepName: string): string {
 }
 
 const MONTH_SHORT = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+const MONTH_LONG = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+
+/**
+ * SG-318 W2/W7: one shared date-only formatter — "7 Nov 2026", "" when
+ * unreadable. Used by the asset Details table and the Expiry rows so both
+ * read the same plain date (W3 keeps formatJobDate's Today/time form).
+ */
+export function formatPlainDate(value: string | null | undefined): string {
+  if (!value) return "";
+  const when = new Date(value);
+  if (Number.isNaN(when.getTime())) return "";
+  return `${when.getDate()} ${MONTH_LONG[when.getMonth()]} ${when.getFullYear()}`;
+}
 
 /** "12 Nov, 14:42", or "Today, 14:42" for the current local day; "" when unreadable. */
 export function formatJobDate(value: string | null | undefined, now: Date = new Date()): string {

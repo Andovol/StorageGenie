@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { Package } from "lucide-react";
 import type { Density } from "../shell/CatalogToolbar";
 import { ProductCard, cardMedia, statusBadgeClass, type CatalogProduct } from "./ProductCard";
-import { labelProductStatus } from "../../lib/labels";
+import { labelAssetType, labelProductStatus } from "../../lib/labels";
 import { ProductCardSkeleton } from "./ProductCardSkeleton";
 import { AssetImportModal } from "../shell/AssetImportModal";
 
@@ -190,7 +190,7 @@ function TableView({
                   <span
                     style={{ fontSize: 13, padding: "2px 8px", borderRadius: 0, whiteSpace: "nowrap", borderStyle: "solid", borderWidth: 1, borderColor: "hsl(var(--line))", backgroundColor: "hsl(var(--paper))", color: "hsl(var(--ink-muted))" }}
                   >
-                    {item.category}
+                    {labelAssetType(item.category)}
                   </span>
                 </td>
                 <td style={{ padding: "8px 10px" }}>

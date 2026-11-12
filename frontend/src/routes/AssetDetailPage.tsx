@@ -38,6 +38,7 @@ import { goneReasonLabel } from "../api/types";
 import { CONTROL_STYLE, THEMED_CONTROL_CLASS } from "../components/shell/CatalogToolbar";
 import { WebAlternates } from "../components/WebAlternates";
 import { UNTITLED_ASSET_NAME } from "../types/product";
+import { formatJobDate, formatPlainDate, labelAssetType, labelExpiryState } from "../lib/labels";
 
 // SG-082: per-press Enrich cap. UNCALIBRATED on purpose (`G-A9`): the value is
 // a stated ceiling, not a measured cost. The button shows the last measured
@@ -317,7 +318,14 @@ function plainFieldLabel(fieldPath: string): string {
   if (lower.includes("quantity")) return "Amount";
   if (lower.includes("condition")) return "Condition";
   if (lower.includes("location")) return "Location";
-  return "Detail";
+  if (lower.includes("asset_type") || lower === "category" || lower.endsWith("/category")) return "Kind of item";
+  if (lower.includes("status")) return "Status";
+  if (lower.includes("unit")) return "Unit";
+  // SG-318 W2: never the bare "Detail" — humanize the last segment instead.
+  const last = fieldPath.split("/").pop()?.split(":").pop() ?? fieldPath;
+  const words = last.replace(/[_.]+/g, " ").trim();
+  if (!words) return "Detail";
+  return words.replace(/\b\w/g, (c) => c.toUpperCase());
 }
 
 function plainSourceLabel(sourceType: string): string {
@@ -328,7 +336,71 @@ function plainSourceLabel(sourceType: string): string {
   return sourceType.replace(/[_.]+/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
 }
 
+function plainStatusLabel(status: string): string {
+  const key = (status ?? "").toUpperCase();
+  if (key === "ACTIVE") return "Live";
+  if (key === "ARCHIVED") return "Gone";
+  return (status ?? "").replace(/[_.]+/g, " ").replace(/\b\w/g, (c) => c.toUpperCase()) || "—";
+}
+
+/**
+ * SG-318 W2: every Details value in owner words — never "[object Object]".
+ * Objects unpack to their meaningful field (a category through
+ * labelAssetType, a date through the shared formatPlainDate, a status
+ * through the label map); anything else reads "—", never raw JSON.
+ */
+function plainDetailValue(fieldPath: string, value: unknown): string {
+  if (value === null || value === undefined) return "—";
+  if (typeof value === "string") {
+    const lower = fieldPath.toLowerCase();
+    if (lower.includes("classification") || lower.includes("category_proposed") || lower.includes("asset_type") || lower === "category" || lower.endsWith("/category"))
+      return labelAssetType(value);
+    if (lower.includes("expiry_date") || lower.includes("expiry")) {
+      const dated = formatPlainDate(value);
+      return dated || value;
+    }
+    if (lower.includes("status")) return plainStatusLabel(value);
+    return value === "" ? "—" : value;
+  }
+  if (typeof value === "number" || typeof value === "boolean") return String(value);
+  if (Array.isArray(value)) {
+    if (value.length === 0) return "—";
+    return value.map((entry) => plainDetailValue(fieldPath, entry)).join(", ");
+  }
+  if (typeof value === "object") {
+    const rec = value as Record<string, unknown>;
+    if (typeof rec.category === "string") return labelAssetType(rec.category);
+    if (typeof rec.expiry_date === "string") return formatPlainDate(rec.expiry_date) || "—";
+    if (typeof rec.value === "string" || typeof rec.value === "number") return plainDetailValue(fieldPath, rec.value);
+    if (typeof rec.label === "string") {
+      const lower = fieldPath.toLowerCase();
+      if (lower.includes("classification") || lower.includes("category") || lower.includes("asset_type")) return labelAssetType(rec.label);
+      return rec.label || "—";
+    }
+    if (typeof rec.status === "string") {
+      const lower = fieldPath.toLowerCase();
+      if (lower.includes("expiry")) return labelExpiryState(rec.status);
+      return plainStatusLabel(rec.status);
+    }
+    if (typeof rec.reason === "string") return plainStatusLabel(rec.reason);
+    return "—";
+  }
+  return String(value);
+}
+
 function plainActionLabel(action: string): string {
+  const key = (action ?? "").toLowerCase();
+  // SG-318 W3: audit actions in plain words.
+  if (key === "asset.create" || key === "asset.lifecycle.created" || key === "asset_create") return "Added";
+  if (key === "asset.accepted" || key === "asset_accepted") return "Accepted";
+  if (key === "asset.update" || key === "asset.lifecycle.updated") return "Updated";
+  if (key === "asset.attach_evidence") return "Photo added";
+  if (key === "asset.gone" || key === "asset.archive") return "Marked gone";
+  if (key === "asset.put_back") return "Put back";
+  if (key === "asset.quantity_adjust") return "Amount changed";
+  if (key === "asset.merge") return "Combined";
+  if (key.includes("expiry") && (key.includes("manual") || key.includes("enter"))) return "Date entered by you";
+  if (key.includes("expiry_date") || key.includes("expiry date")) return "Date entered by you";
   return action.replace(/[_.:]+/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
 }
 
@@ -833,7 +905,7 @@ export function AssetDetailPage() {
             {assertions.map((a) => (
               <tr key={a.id}>
                 <td className="border-border" style={{ padding: 6, borderBottomStyle: "solid", borderBottomWidth: 1, fontSize: 13 }}>{plainFieldLabel(a.field_path)}</td>
-                <td className="border-border" style={{ padding: 6, borderBottomStyle: "solid", borderBottomWidth: 1 }}>{String(a.value ?? "")}</td>
+                <td className="border-border" style={{ padding: 6, borderBottomStyle: "solid", borderBottomWidth: 1 }}>{plainDetailValue(a.field_path, a.value)}</td>
                 <td className="border-border" style={{ padding: 6, borderBottomStyle: "solid", borderBottomWidth: 1 }}>{plainSourceLabel(a.source_type)}</td>
                 <td className="border-border" style={{ padding: 6, borderBottomStyle: "solid", borderBottomWidth: 1 }}>
                   <ProvenanceBadge state={a.review_state} />
@@ -855,7 +927,7 @@ export function AssetDetailPage() {
         <ul style={{ fontSize: 13, paddingLeft: 18 }}>
           {audits.map((e) => (
             <li key={e.id} style={{ marginBottom: 4 }}>
-              {plainActionLabel(e.action)} — {e.timestamp || ""}
+              {plainActionLabel(e.action)} — {formatJobDate(e.timestamp) || "—"}
             </li>
           ))}
         </ul>

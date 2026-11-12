@@ -43,12 +43,12 @@ export function EvidenceGallery({ evidence, householdId }: { evidence: Ev[]; hou
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
-                  fontSize: 11,
+                  fontSize: 13,
                   padding: 4,
                   textAlign: "center",
                 }}
               >
-                Thumbnail unavailable
+                No photo yet
               </div>
             ) : (
               <img
