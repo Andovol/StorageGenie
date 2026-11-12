@@ -1,4 +1,4 @@
-# SG-301 — Older screens to the owner's design bar: Instrument Sans, no developer copy, the tandpfun look on catalog and item panel
+# SG-301 — Instrument Sans, the app header in the tandpfun look, and no developer copy on Inbox, Expiry and the asset page
 
 `PB-1`–`PB-6` bind (`CODER.md` §14). `PB-7` is not named: the full suites run.
 
@@ -7,18 +7,17 @@
 **Restart: none.** No deploy; a rider follows this slice.
 **Provider: none.** No key, no `.env`, no spend; the screenshot app runs with every provider off.
 
-**Contract:** recorded `0.59.0` (`AGENTS.md`, D30). **This lane denies reading the contract folder; do not try.** Echo your own contract's version line as you received it. A denial on that folder is expected and is not a STOP.
+**Contract:** recorded `0.59.0` (`AGENTS.md`, D30). **This lane denies reading the contract folder; do not try.** Echo **your own contract's** version line as you received it — not the project file's `Rule-set version recorded here` line. A denial on that folder is expected and is not a STOP.
 
-**Approval:** owner, 2026-11-10, D27 (*"Both approved."*): SG-301 is the design pass on the older screens plus the Instrument Sans font. Owner, 2026-11-12, D31 (*"D30 and D31 approved"*): the font is served self-hosted from the `@fontsource-variable/instrument-sans` package at an exact pinned version, **and this slice is authorised to run that one `npm install`**. D18: the tandpfun look's colours, font and shapes everywhere, the full design on the catalog and the item panel. Stage C (*"d14 ok"*, L3). The owner: *"design, look and feel are very important, so hold every screen to that."*
+**Approval:** owner, 2026-11-10, D27 (*"Both approved."*): SG-301 is the design pass on the older screens plus the Instrument Sans font. Owner, 2026-11-12, D31 (*"D30 and D31 approved"*): the font is served self-hosted from the `@fontsource-variable/instrument-sans` package at an exact pinned version, **and this slice is authorised to run that one `npm install`**. D18: the tandpfun look's colours, font and shapes everywhere, the full design on the catalog and the item panel. Stage C (*"d14 ok"*, L3). **Sliced by the plan review SG-305/SG-306** (`docs/reviews/review-ledger.md`, 2026-11-12): the catalog and the item panel move to SG-307, so this slice takes the font, the shared header and three screens. The owner: *"design, look and feel are very important, so hold every screen to that."*
 
 ## Why this exists
 
 The Pantry (SG-273, SG-300, SG-302) now meets the owner's bar; the screens around it do not. From the audits (`docs/worklogs/SG-300_audit.md` I2, `SG-269_findings.md`) and a grep on `automation` (`UNVERIFIED` until you confirm each):
 
-- **Item panel** `frontend/src/components/shell/ItemInspectorDrawer.tsx`: *"Bounding-box overlay omitted: no bounding-box data exists…"* (~`:380`), *"Uses If-Match: {version} for optimistic concurrency"* (~`:445`), *Kind of item* showing raw values such as `product` (~`:394`), and cut-out tabs.
-- **Asset page** `frontend/src/routes/AssetDetailPage.tsx`: the same If-Match line (~`:756`).
+- **Asset page** `frontend/src/routes/AssetDetailPage.tsx`: *"Uses If-Match: {version} for optimistic concurrency"* (~`:756`).
 - **Expiry page** `frontend/src/routes/ExpiryPage.tsx` (~`:171`): *"…in blueprint urgency order. Filtering a category narrows the read on the server; the uncategorized count below comes from the served analytics summary and is never merged into the expiry stream."*
-- **Catalog** `frontend/src/routes/CatalogPage.tsx` with `frontend/src/components/catalog/ProductCard.tsx` (~`:41`, `raw: "Source Only"`): enum words such as `product` and `Source Only` on cards.
+- **The app header and navigation** (`frontend/src/App.tsx` ~`:65-75` `bg-card`, white over the beige paper in light; ~`:123-126`, `:138`, `:165-166` 11–12 px text and developer wording such as *Phase 0 · local-first*) and the catalog's second header (`frontend/src/components/shell/AppHeader.tsx` ~`:38-59`, a 12 px rounded *Loaded* badge; rendered through `AppShell.tsx` ~`:55-73`) — SG-306's reading.
 - **Inbox** `frontend/src/routes/InboxPage.tsx`: raw ids and step states such as `COMPLETED` (F11).
 - **Font:** `--font-sans` in `frontend/src/theme/tokens.css` (~`:32`) is the system stack; the comment at ~`:36` reserves the swap for this slice.
 
@@ -47,20 +46,20 @@ docker run --rm busybox true
 
 ## G2 — No developer copy on the owner's screens
 
-**Criterion, not a list** (`DISPATCH.md` §2a): any text the owner can see that names an implementation detail — an id or UUID, an enum value (`product`, `unknown`, `Source Only`, `COMPLETED`, `AWAITING_REVIEW`, …), an HTTP or API term (`If-Match`, `PATCH`, `endpoint`, `served`, `stream`), a blueprint or slice reference, or a sentence explaining what the code does or omits. **Enumerate it yourself** on the Inbox, Expiry page, Catalog (cards and filters), item panel and asset page — grep and read the rendered DOM — and compare with the expectations above; report the difference either way in a table: screen · text · replaced with / removed.
+**Criterion, not a list** (`DISPATCH.md` §2a): any text the owner can see that names an implementation detail — an id or UUID, an enum value (`product`, `unknown`, `Source Only`, `COMPLETED`, `AWAITING_REVIEW`, …), an HTTP or API term (`If-Match`, `PATCH`, `endpoint`, `served`, `stream`), a blueprint or slice reference, or a sentence explaining what the code does or omits. **Enumerate it yourself** on the Inbox, Expiry page, asset page and the shared header (`App.tsx`, `AppHeader.tsx`, `AppShell.tsx`) — grep and read the rendered DOM — and compare with the expectations above; report the difference either way in a table: screen · text · replaced with / removed.
 
-- **Enum values** read as plain words through **one shared label map** (for example `frontend/src/lib/labels.ts`): `product` → *Product*, `Source Only` → *Photo only* (or your better plain word; say why), step states → *Done*, *Waiting for you*, *Skipped (AI off)* — a skipped step never reads as done (F11).
+- **Enum values** read as plain words through **one shared label map** (for example `frontend/src/lib/labels.ts`, which SG-307 will reuse for the catalog and item panel): step states → *Done*, *Waiting for you*, *Skipped (AI off)* — a skipped step never reads as done (F11).
 - **Developer sentences are removed**, not reworded. The Expiry page keeps at most one plain line of help, for example *"Food and other dated things, soonest first."*
 - **Ids are never shown**; where an id is the only label, show the item's name, or *"Unnamed item"*.
 - **Do not change** behaviour, routes, data, or the If-Match header itself — only what is displayed.
 
-## G3 — The tandpfun look on the catalog and the item panel (D18)
+## G3 — The shared header and the three screens in the look (D18)
 
-Catalog: the paper ground, the count header (*"23 ITEMS"*), joined square filter tabs, photos borderless on the paper in the grid, labels in the spaced uppercase style, square corners. Item panel: the same ground, square corners, no cut-out tabs (joined square tabs if tabs remain), labels in the label style, nothing under 13 px. Inbox and Expiry page: tokens, square corners, ≥ 13 px — no layout redesign. **Pantry, one line only:** the EXPIRED label in `frontend/src/routes/PantryPage.tsx` (~`:196`, `fontSize: 11`) becomes ≥ 13 px (SG-302 audit I1); nothing else on the Pantry changes. **Every text pair on these screens, light and dark, read from the DOM, into `docs/worklogs/SG-301_contrast.md`** (element · fg/bg · ratio, both themes · font size, checked against the 13 px floor · size class · pass at 4.5:1 / 3:1). A failing pair on these screens is fixed here.
+**Inventory first** (SG-306): before changing styles, list every component this goal touches, the existing test files that render them, and the rendered states the shots must prove; quote it in the report. Then: the app header and navigation on `--paper` with `--ink`, a `--line` rule beneath, square corners, nothing under 13 px, the selected item distinct by more than colour; the catalog's second header (`AppHeader.tsx`) in the same tokens and shapes — **its toolbar and the catalog body stay for SG-307**. Inbox, Expiry page and asset page: tokens, square corners, ≥ 13 px — no layout redesign. **Pantry, one line only:** the EXPIRED label in `frontend/src/routes/PantryPage.tsx` (~`:196`, `fontSize: 11`) becomes ≥ 13 px (SG-302 audit I1). **Every text pair on the header and these screens, light and dark, read from the DOM, into `docs/worklogs/SG-301_contrast.md`** (element · fg/bg · ratio, both themes · font size, checked against the 13 px floor · size class · pass at 4.5:1 / 3:1). A failing pair here is fixed here.
 
 ## G4 — Tests, FAIL-then-PASS
 
-New `*.sg301.test.tsx` files: `--font-sans` begins with `"Instrument Sans Variable"`; the label map turns each enum value you found into its plain word; none of the developer sentences you enumerated renders (one assertion each); the item panel and asset page render no `If-Match` text; an Inbox step whose output is skipped does not read *Done*. Logs `docs/worklogs/SG-301_fail.log`, `SG-301_pass.log` (`PG-EV-09`); FAIL logs hold names and first assertion only. An older test asserting removed text is updated here, each named.
+New `*.sg301.test.tsx` files: `--font-sans` begins with `"Instrument Sans Variable"`; the label map turns each enum value you found into its plain word; none of the developer sentences you enumerated renders (one assertion each); the asset page renders no `If-Match` text; the header renders no text under 13 px; an Inbox step whose output is skipped does not read *Done*. Logs `docs/worklogs/SG-301_fail.log`, `SG-301_pass.log` (`PG-EV-09`); FAIL logs hold names and first assertion only. An older test asserting removed text is updated here, each named.
 
 ## G5 — The full gate, once, on the candidate (before any screenshot)
 
@@ -68,15 +67,14 @@ In order, exact counts (`PG-IC-08`), each into `docs/worklogs/SG-301_<step>.log`
 
 ## G6 — Screenshots, after the gate
 
-Scratch app exactly as SG-300 and SG-302 did (`docs/worklogs/SG-300_shots/INDEX.md`): fresh SQLite under `output/SG-301-scratch/` by the project's migrations, test data through the API with generated images (food and non-food, one item with no name, one with a skipped AI step in the Inbox), every provider off; backend `127.0.0.1:18301`, frontend from the scratch build on `127.0.0.1:14301`, **built with `VITE_API_BASE=http://127.0.0.1:18301`** (a bundle pointing at 8003 is a STOP). DevTools via a Node script in scratch (built-in `WebSocket`, no install). **Stop servers by the PIDs you started; never `pkill -f`.**
+Scratch app exactly as SG-300 and SG-302 did (`docs/worklogs/SG-300_shots/INDEX.md`): fresh SQLite under `output/SG-301-scratch/` by the project's migrations, test data through the API with generated images (food and non-food, one item with no name, one with a skipped AI step in the Inbox, one expired food item), every provider off; backend `127.0.0.1:18301`, frontend from the scratch build on `127.0.0.1:14301`, **built with `VITE_API_BASE=http://127.0.0.1:18301`** (a bundle pointing at 8003 is a STOP). DevTools via a Node script in scratch (built-in `WebSocket`, no install). **Stop servers by the PIDs you started; never `pkill -f`.**
 
 Into `docs/worklogs/SG-301_shots/`, in this order:
 
 | Shot | Theme | Width |
 |---|---|---|
-| Catalog | light, dark | 1280 |
-| Catalog | dark | 375 |
-| Item panel open | light, dark | 1280 |
+| Pantry with the header (EXPIRED at 13 px) | light, dark | 1280 |
+| Pantry with the header | light | 375 |
 | Inbox with the skipped step | dark | 1280 |
 | Expiry page | dark | 1280 |
 | Asset page | light | 1280 |
@@ -86,8 +84,8 @@ Into `docs/worklogs/SG-301_shots/`, in this order:
 ## Acceptance criteria
 
 - **A1** — G1: version and licence quoted; exactly one dependency, exact version; lock diff limited to it; `@font-face` and the woff2 in the build output.
-- **A2** — G2: the enumeration table; the shared label map; no developer sentence, raw enum, id or HTTP term visible on the five screens.
-- **A3** — G3: catalog and item panel in the look; nothing under 13 px; `SG-301_contrast.md` from DOM-read values, every pair passing.
+- **A2** — G2: the enumeration table; the shared label map; no developer sentence, raw enum, id or HTTP term visible on the three screens or the header.
+- **A3** — G3: the inventory quoted; the header in the look; nothing under 13 px on the header, the three screens or the EXPIRED label; `SG-301_contrast.md` from DOM-read values, every pair passing.
 - **A4** — G4 tests FAIL on base, PASS on candidate; updated tests named.
 - **A5** — G5 gate green with counts; image build with `npm ci` passing.
 - **A6** — G6 shots with hash, size, proving text and DOM-read font family; distinct-hash check; servers stopped by PID; scratch removed.
@@ -98,7 +96,7 @@ Into `docs/worklogs/SG-301_shots/`, in this order:
 
 ## Scope ceiling
 
-- **Product:** `frontend/package.json`, `frontend/package-lock.json` (the font only); `frontend/src/main.tsx` (the import); `frontend/src/theme/tokens.css`; `frontend/src/routes/{InboxPage,ExpiryPage,CatalogPage,AssetDetailPage}.tsx`; `frontend/src/routes/PantryPage.tsx` (the EXPIRED label size only); `frontend/src/components/shell/ItemInspectorDrawer.tsx`; `frontend/src/components/catalog/*`; components those five screens render **only for displayed text and styling**; a new `frontend/src/lib/labels.ts`. Any other product file is a STOP and report (`PG-EV-03`).
+- **Product:** `frontend/package.json`, `frontend/package-lock.json` (the font only); `frontend/src/main.tsx` (the import); `frontend/src/theme/tokens.css`; `frontend/src/App.tsx`, `frontend/src/components/shell/{AppHeader,AppShell}.tsx` (the header only); `frontend/src/routes/{InboxPage,ExpiryPage,AssetDetailPage}.tsx`; `frontend/src/routes/PantryPage.tsx` (the EXPIRED label size only); components those three screens render **only for displayed text and styling**; **not** `CatalogPage.tsx`, `components/catalog/*` or `ItemInspectorDrawer.tsx` (SG-307); a new `frontend/src/lib/labels.ts`. Any other product file is a STOP and report (`PG-EV-03`).
 - **Tests:** new `*.sg301*` files; older frontend tests only where they assert removed or reworded text, each named.
 - **No backend file.**
 - **Authorised runtimes:** the preflight; the one `npm view` and the one `npm install` in G1; the `make` gates; tests; `eslint`; `tsc`; the frontend build; scratch servers on `127.0.0.1:18301` and `:14301`; the project's migrations on scratch files; headless Chrome; a Node DevTools script in scratch. No other install, image or port.
@@ -111,7 +109,7 @@ Preflight **120 s**; `npm view` and `npm install` **300 s** together; host suite
 
 ## Budget — a stop rule
 
-The lane's `RUN_BUDGET_S` (2100 s) is the ceiling. **At 1300 s elapsed by your `date +%s` stamps, stop whatever you are doing, commit, write the report, publish.** **There is no optional goal.** Order: G0, G1, G2, G3, G4, G5, then G6 in the table's order. A stop leaves the rest `REMAINING`, never described as done. Expected ≈1250 s (`UNVERIFIED — my estimate`: SG-273, one new screen with 17 shots, took 1277 s; this is copy and styling over five screens, one install and 8 shots) — near the stop line, so commit after each goal.
+The lane's `RUN_BUDGET_S` (2100 s) is the ceiling. **At 1300 s elapsed by your `date +%s` stamps, stop whatever you are doing, commit, write the report, publish.** **There is no optional goal.** Order: G0, G1, G2, G3, G4, G5, then G6 in the table's order. **Commit after each goal.** A stop leaves the rest `REMAINING`, never described as done. Expected ≈1050 s (`UNVERIFIED — my estimate`: SG-302, a two-line fix with a 16-pair table and 7 shots, took ≈973 s of which ≈511 s was scratch and shots; this is one install, copy on three screens, the header and 8 shots). Fit is settled by the run, not the estimate (SG-306).
 
 ## Report
 
