@@ -1,0 +1,14 @@
+23c23
+< 278e77093f49c31eb9ef1076813abbea778c3b9e68fe5be36168c337af94a480  ./app/api/v1/assets.py
+---
+> 3d2b5e179a63fc6e3844f47e6169fd28bf56e986ef0f0a4c15f515ad40b299b5  ./app/api/v1/assets.py
+195,197c195,197
+< c3b58cda696a22970fc2a4a348849fc1359f2105f80f81304ed5dfd5ca31a557  ./static/assets/index-C07VbG0m.css
+< 665dcb1191dee1ee8d14daf87fbe96fba04324140f5c96f06c27aafbfbf39588  ./static/assets/index-CjbyAByJ.js
+< 97437d95a949a574acc77974e7a6d76a014910f6b26d27a3771711c7d5f318b4  ./static/index.html
+---
+> 95b25525e050d1a07537a47dd1ca0c51aaf81ce2ebc7fb057a4d51aa9181b500  ./static/assets/index-Dl7Tsxob.css
+> 92c2fe7a58fc064b06070d52e2fc0b7157ce901a280639f7fbafb56e79fe2e1c  ./static/assets/index-gWdOr0um.js
+> c1fbfb2d296b50aa7df2dbfd2399825a5d484d938ec3ced69649fef5f6411cb5  ./static/index.html
+286a287
+> f375bb75fc5ff2bae61c0f5a6d35f1e71f8b564f8dfb68e8ddae975fe5e967f8  ./tests/test_sg273_pantry.py
