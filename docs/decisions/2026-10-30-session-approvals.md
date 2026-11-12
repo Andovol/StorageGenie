@@ -176,3 +176,7 @@ Read as: the plan review ran as SG-305 (blind by instruction) and SG-306 (critiq
 **2026-11-12, verbatim:** *"D33 approved."*
 
 Read as: **D33** — stage C's remaining order is SG-307 (catalog and item panel, white controls, 375 header; build and gate only) → its screenshots as their own slice → rider → a small wording slice (Expiry ISO dates, the *Saving* step's *In progress* while waiting, *Long lead* under *Safe*, fallback step names) → rider → SG-304 → rider → the owner's trial on one real shelf. D32 is moot: SG-312's screenshots came from SG-313 and it is live as `release-sg314`. Note: this re-sequencing went to the owner without D30's blind second opinion; the owner's approval settles it.
+
+**2026-11-12, verbatim:** *"D34 - yes. this was a pretty useless decision, wasting my time."*
+
+Read as: **D34** confirmed D33's order after SG-307's retry. **Directive:** do not put the owner a decision that only re-confirms an approved order or stage; retries, audits and riders inside an approval proceed and are reported.
