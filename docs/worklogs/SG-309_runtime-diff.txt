@@ -1,0 +1,5 @@
+running image sha256:1e139734 vs new image sha256:62e61689 (/app tree)
+changed:
+./static/index.html  running=c1fbfb2d296b50aa7df2dbfd2399825a5d484d938ec3ced69649fef5f6411cb5  new=e5bfc84f5c9fd41b0bd42d6e0ea97825437c2091db4f98e85e03224e957725c9
+added: ['./static/assets/index-BL66eLr6.js']
+removed: ['./static/assets/index-gWdOr0um.js']
