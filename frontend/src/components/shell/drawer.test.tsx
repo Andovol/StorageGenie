@@ -84,7 +84,7 @@ describe("ItemInspectorDrawer", () => {
     expect(await screen.findByTestId("inspector-drawer")).toBeInTheDocument();
     expect(screen.getByTestId("drawer-title")).toHaveTextContent("Cordless Drill");
     expect(screen.getByTestId("drawer-category")).toHaveTextContent("Hardware & Tools");
-    expect(screen.getByRole("tab", { name: "Source Photo" })).toHaveAttribute("aria-selected", "true");
+    expect(screen.getByRole("tab", { name: "Photo" })).toHaveAttribute("aria-selected", "true");
     expect(screen.getByTestId("source-image")).toHaveAttribute(
       "src",
       expect.stringContaining("/v1/evidence/ev-1/file?household_id=h1")
@@ -114,23 +114,24 @@ describe("ItemInspectorDrawer", () => {
     expect(onClose).toHaveBeenCalledTimes(1);
   });
 
-  test("the cutout tab states cutouts are not available, with no spinner", async () => {
+  test("the cutout tab states cutouts are not available, with no spinner (SG-307 plain)", async () => {
     renderDrawer();
     await screen.findByTestId("inspector-drawer");
-    fireEvent.click(screen.getByRole("tab", { name: "Isolated Cutout" }));
+    fireEvent.click(screen.getByRole("tab", { name: "Cut-out" }));
 
     const honest = screen.getByTestId("cutout-honest-state");
-    expect(honest).toHaveTextContent(/cutouts arrive with the AI stages/i);
+    expect(honest).toHaveTextContent("No cut-out yet.");
     expect(screen.queryByTestId("source-image")).not.toBeInTheDocument();
   });
 
-  test("the scene tab states scene rendering is not available and draws no bounding box", async () => {
+  test("the scene tab states no scene and keeps the bbox hook off-screen (SG-307)", async () => {
     renderDrawer();
     await screen.findByTestId("inspector-drawer");
-    fireEvent.click(screen.getByRole("tab", { name: "Scene / Context" }));
+    fireEvent.click(screen.getByRole("tab", { name: "In a scene" }));
 
-    expect(screen.getByTestId("scene-honest-state")).toHaveTextContent(/scene rendering arrives with the AI stages/i);
-    expect(screen.getByText(/bounding-box overlay omitted/i)).toBeInTheDocument();
+    expect(screen.getByTestId("scene-honest-state")).toHaveTextContent("No scene yet.");
+    expect(screen.queryByText(/bounding-box overlay omitted/i)).toBeNull();
+    expect(screen.getByTestId("viewer-well")).toHaveAttribute("data-bbox-omitted", "true");
   });
 
   test("the scene tab shows the linked scene render through the evidence file route", async () => {
@@ -149,7 +150,7 @@ describe("ItemInspectorDrawer", () => {
     api.apiGet.mockResolvedValue(sceneAsset);
     renderDrawer(sceneAsset);
     await screen.findByTestId("inspector-drawer");
-    fireEvent.click(screen.getByRole("tab", { name: "Scene / Context" }));
+    fireEvent.click(screen.getByRole("tab", { name: "In a scene" }));
 
     const image = await screen.findByTestId("scene-image");
     expect(image).toHaveAttribute(
@@ -195,12 +196,12 @@ describe("ItemInspectorDrawer", () => {
     );
   });
 
-  test("observed colors and description are read-only rows, with an honest absent state", async () => {
+  test("observed colors and description are read-only rows, with an honest absent state (SG-307 plain)", async () => {
     renderDrawer();
     await screen.findByTestId("inspector-drawer");
 
     expect(screen.getByTestId("drawer-colors")).toHaveTextContent("#1f2937, #f59e0b");
-    expect(screen.getByTestId("drawer-description")).toHaveTextContent(/no functional description assertion/i);
+    expect(screen.getByTestId("drawer-description")).toHaveTextContent("No description yet.");
     expect(screen.queryByLabelText(/colors/i)).not.toBeInTheDocument();
     expect(screen.queryByLabelText(/description/i)).not.toBeInTheDocument();
   });
@@ -227,10 +228,10 @@ describe("ItemInspectorDrawer", () => {
     expect(document.querySelector("pre")).toBeNull();
   });
 
-  test("an asset with no evidence shows the honest empty source state", async () => {
+  test("an asset with no evidence shows the honest empty source state (SG-307 plain)", async () => {
     renderDrawer({ ...baseAsset, evidence: [] });
     await screen.findByTestId("inspector-drawer");
-    expect(screen.getByTestId("source-empty")).toHaveTextContent(/no source photo is attached/i);
+    expect(screen.getByTestId("source-empty")).toHaveTextContent("No photo yet.");
   });
 
   test("a null display_name shows the Untitled asset fallback and an empty editable title", async () => {

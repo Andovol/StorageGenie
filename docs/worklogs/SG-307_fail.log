@@ -1,0 +1,24 @@
+SG-307 FAIL on base origin/automation 0dd3fa74c27de4d64a1f85778a1417f4469ef105 — 11 failed, 1 passed
+× catalog plain words — status enums read as owner words through labels.ts
+  first assertion: TypeError labelProductStatus is not a function
+× catalog plain words — no font-mono class and no developer status string in the rendered card
+  first assertion: expected font-mono element to be null
+× catalog plain words — every status renders its plain word with no mono
+  first assertion: Unable to find an element with the text Photo only (base has Source Only)
+× catalog plain words — time stamps are plain words in the body font, no mono
+  first assertion: expected 30m ago to be 30 min ago
+× catalog plain words — the grid uses the tandpfun track rule
+  first assertion: expected grid CSS to contain repeat(auto-fill, minmax(165px, 1fr)) (base has repeat(2)
+× catalog plain words — the card and well are square on the paper, category is plain 13px
+  first assertion: expected 12px to match /^0/ (base card radius 12)
+× panel plain words — plain tab names and one-line cut-out empty state
+  first assertion: Unable to find tab Cut-out (base has Isolated Cutout)
+× panel plain words — the bounding-box sentence is off the screen but kept as a data hook
+  first assertion: found bounding-box overlay omitted text (base renders the sentence)
+× panel plain words — no font-mono and no text under 13px in the rendered panel
+  first assertion: expected font-mono element to be null (base drawer category chip)
+× paper controls — the shared rule exists and the toolbar, toggle and review select come out of it
+  first assertion: expected THEMED_CONTROL_CLASS to contain sg-paper-control (base has bg-background)
+× paper controls — the 375 header rule
+  first assertion: Unable to find test id catalog-header (base header has no sg-header)
+✓ panel — Kind of item reads the asset_type field in plain words (passes on base: Uncategorized already plain)

@@ -1,0 +1,14 @@
+ ✓ src/components/catalog/catalog.sg307.test.tsx > SG-307 catalog plain words, no mono, square paper > status enums read as owner words through labels.ts
+ ✓ src/components/catalog/catalog.sg307.test.tsx > SG-307 catalog plain words, no mono, square paper > no font-mono class and no developer status string in the rendered card
+ ✓ src/components/catalog/catalog.sg307.test.tsx > SG-307 catalog plain words, no mono, square paper > every status renders its plain word with no mono
+ ✓ src/components/catalog/catalog.sg307.test.tsx > SG-307 catalog plain words, no mono, square paper > time stamps are plain words in the body font, no mono
+ ✓ src/components/catalog/catalog.sg307.test.tsx > SG-307 catalog plain words, no mono, square paper > the grid uses the tandpfun track rule
+ ✓ src/components/catalog/catalog.sg307.test.tsx > SG-307 catalog plain words, no mono, square paper > the card and well are square on the paper, category is plain 13px
+ ✓ src/components/shell/panel.sg307.test.tsx > SG-307 item panel plain words, square paper > plain tab names and one-line cut-out empty state, no developer sentences
+ ✓ src/components/shell/panel.sg307.test.tsx > SG-307 item panel plain words, square paper > the bounding-box sentence is off the screen but kept as a data hook
+ ✓ src/components/shell/panel.sg307.test.tsx > SG-307 item panel plain words, square paper > no font-mono and no text under 13px in the rendered panel
+ ✓ src/components/shell/panel.sg307.test.tsx > SG-307 item panel plain words, square paper > Kind of item reads the asset_type field in plain words
+ ✓ src/components/shell/panel.sg307.test.tsx > SG-307 paper controls and 375 header > the shared rule exists and the toolbar, toggle and review select come out of it
+ ✓ src/components/shell/panel.sg307.test.tsx > SG-307 paper controls and 375 header > the 375 header rule: icon-shortened Import with aria-label and one-row classes
+ Test Files  2 passed (2)
+      Tests  12 passed (12)

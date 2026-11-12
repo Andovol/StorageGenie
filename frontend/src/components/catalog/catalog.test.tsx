@@ -161,15 +161,11 @@ describe("ProductGrid", () => {
     expect(screen.getAllByTestId("product-card")).toHaveLength(MOCK_PRODUCTS.length);
   });
 
-  test("the grid stylesheet carries the 2/3/4/5 responsive breakpoints", () => {
+  test("the grid stylesheet carries the tandpfun auto-fill 165px rule (SG-307)", () => {
     renderWithRouter(<ProductGrid items={MOCK_PRODUCTS} density="grid" householdId="h1" />);
     const css = screen.getByTestId("catalog-grid-style").textContent ?? "";
 
-    expect(css).toContain("repeat(2");
-    expect(css).toContain("repeat(3");
-    expect(css).toContain("repeat(4");
-    expect(css).toContain("repeat(5");
-    expect(css).toContain("@media");
+    expect(css).toContain("repeat(auto-fill, minmax(165px, 1fr))");
   });
 
   test("the compact table renders the seven DQ5 columns in order", () => {
@@ -285,12 +281,12 @@ describe("ProductGrid", () => {
     expect(screen.getAllByTestId("product-skeleton")).toHaveLength(20);
   });
 
-  test("formatRelativeDate reads the live clock through an injectable now", () => {
+  test("formatRelativeDate reads the live clock through an injectable now (SG-307 plain words)", () => {
     const now = Date.parse("2026-09-16T12:00:00Z");
     expect(formatRelativeDate("2026-09-16T11:59:30Z", now)).toBe("just now");
-    expect(formatRelativeDate("2026-09-16T11:30:00Z", now)).toBe("30m ago");
-    expect(formatRelativeDate("2026-09-16T06:00:00Z", now)).toBe("6h ago");
-    expect(formatRelativeDate("2026-09-10T12:00:00Z", now)).toBe("6d ago");
+    expect(formatRelativeDate("2026-09-16T11:30:00Z", now)).toBe("30 min ago");
+    expect(formatRelativeDate("2026-09-16T06:00:00Z", now)).toBe("6 hours ago");
+    expect(formatRelativeDate("2026-09-10T12:00:00Z", now)).toBe("6 days ago");
     expect(formatRelativeDate("not-a-date", now)).toBe("—");
   });
 });
