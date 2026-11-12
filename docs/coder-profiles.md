@@ -36,6 +36,7 @@ Built from audits, one row per rated slice (owner, D25, 2026-11-07). Strengths a
 | SG-314 | haiku-5-5, high | deploy rider, live serve | 159 s | 93 | yes, S1 | echoed the project file's version line as its own contract line | coder |
 | SG-307 run 1 | muse-1.3, xhigh | build, catalog + item panel + shared controls + 375 header | ~1116 s (stamps) | unrated, retried | **no** — 16 s past 1100 s; skipped the full gate the packet said was never skipped | full gate not run; a `!important` band-aid where the packet kept the file out of scope; *Food Beverages* | mixed |
 | SG-307r1 | muse-1.3, xhigh | retry: three fixes + full gate | 649 s (stamps) | rated with SG-307 after SG-315 | yes, wide margin | used `/tmp` once against the packet; build path landed under `frontend/` (cleaned, disclosed); reported the reds honestly, did not fix out of scope | coder (minor) |
+| SG-315 | haiku-5-5, high | fix: one product line + 8 test assertions + full gate | 314 s (stamps) | 96 | yes, wide margin | none; said "not visible" for model and effort instead of inferring | — |
 
 ## Haiku 5.5 at `high` — profile
 
