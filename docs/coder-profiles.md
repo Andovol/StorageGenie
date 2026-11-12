@@ -28,6 +28,7 @@ Built from audits, one row per rated slice (owner, D25, 2026-11-07). Strengths a
 | SG-308 | muse-1.3, xhigh | build, small behaviour fix + 5-path test + runtime DOM check | ~1450 s (stamps) | 84 | **no** — ran ≈150 s past the 1300 s hard stop, then published | model/effort inferred, not read; a covered screenshot | mixed (estimate ≈800 s too low) |
 | SG-309 | haiku-5-5, high | deploy rider, live serve | 170 s | 96 | yes, S1 | none; corrected a wrong packet premise from source | packet (small) |
 | SG-301 run 1 | muse-1.3, xhigh | build, font package + copy on 3 screens + shared header | ~933 s (stamps) | unrated, retried | **yes**, stopped before the 1100 s line and reported G4–G6 `REMAINING` honestly | 26 old tests left failing on the branch (named, not updated); FAIL-on-base not run | packet (scope vs a 1100 s stop) |
+| SG-301r1 | muse-1.3, xhigh | retry: 26+11 old-test wording updates, FAIL on base, full gate | ~1031 s (stamps) | rated with SG-301 after SG-311 | yes — stopped before R3 rather than overrun; scratch removed before the report | said the 1200 s line was hit at ≈1031 s (it stopped early, mislabelled); found 11 reds run 1 missed | packet (shots did not fit) |
 
 ## Haiku 5.5 at `high` — profile
 
