@@ -41,7 +41,7 @@ describe("InboxPage", () => {
     expect((await screen.findAllByText("decoder failed on loaded image")).length).toBeGreaterThan(0);
     const retry = await screen.findByRole("button", { name: "Retry failed job" });
     expect(retry).toBeEnabled();
-    expect(retry).toHaveClass("bg-background", "text-foreground", "border-border");
+    expect(retry).toHaveClass("sg-paper-control", "focus-ring");
     fireEvent.click(retry);
     await waitFor(() => expect(api.apiPost).toHaveBeenCalledWith(`/v1/imports/${job.id}/retry`, {}, { household_id: household.id }));
   });
@@ -96,7 +96,7 @@ describe("InboxPage", () => {
     // is now "Possible duplicate").
     expect(await screen.findByText("Possible duplicate")).toBeInTheDocument();
     const resolveBtn = screen.getByRole("button", { name: "Resolve" });
-    expect(resolveBtn).toHaveClass("bg-background", "text-foreground", "border-border");
+    expect(resolveBtn).toHaveClass("sg-paper-control", "focus-ring");
     fireEvent.click(resolveBtn);
     await waitFor(() => expect(api.resolveReviewTask).toHaveBeenCalledWith(task.id, household.id));
   });

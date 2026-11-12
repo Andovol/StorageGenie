@@ -317,7 +317,9 @@ describe("Catalog shell", () => {
     fireEvent.click(pill);
 
     expect(pill).toHaveAttribute("aria-pressed", "true");
-    expect(pill).toHaveClass("bg-primary");
+    expect(pill).toHaveClass("sg-paper-control", "focus-ring");
+    expect(pill.style.backgroundColor).toBe("hsl(var(--ink))");
+    expect(screen.getByRole("button", { name: "All (4)" }).style.backgroundColor).toBe("hsl(var(--paper))");
     await waitFor(() => expect(screen.getByText("Zap")).toBeInTheDocument());
     expect(screen.queryByText("Drill")).not.toBeInTheDocument();
     const listCall = api.apiGet.mock.calls.find(
@@ -357,7 +359,8 @@ describe("Catalog shell", () => {
     fireEvent.click(await screen.findByRole("button", { name: "Electronics & Gadgets (1)" }));
     fireEvent.change(screen.getByLabelText("Sort catalog"), { target: { value: "name" } });
     const clearAll = screen.getByRole("button", { name: /clear all/i });
-    expect(clearAll).toHaveClass("text-link");
+    expect(clearAll.style.color).toBe("hsl(var(--link))");
+    expect(clearAll.style.textDecoration).toContain("underline");
     fireEvent.click(clearAll);
 
     expect(screen.getByLabelText("Search catalog")).toHaveValue("");
@@ -578,7 +581,7 @@ describe("Saved searches (SG-068)", () => {
     await screen.findByText("Drill");
 
     const none = await screen.findByText("None yet");
-    expect(none).toHaveClass("text-muted-foreground");
+    expect(none.style.color).toBe("hsl(var(--ink-muted))");
   });
 
   test("deleting from the dropdown DELETEs the saved search's id", async () => {

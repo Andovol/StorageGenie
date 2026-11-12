@@ -138,7 +138,7 @@ describe("AssetForm", () => {
     render(<AssetForm householdId="hh-1" onCreated={() => {}} />);
 
     const select = screen.getByLabelText("Kind of item");
-    expect(select).toHaveClass("bg-background", "text-foreground", "border-border");
+    expect(select).toHaveClass("sg-paper-control", "focus-ring");
   });
 
   test("the file pickers are real file inputs hidden behind themed labels (SG-105 G2)", () => {
@@ -149,12 +149,12 @@ describe("AssetForm", () => {
     expect(choose).toHaveAttribute("multiple");
     expect(choose).toHaveAttribute("accept", "image/*,.pdf");
     expect(choose.style.position).toBe("absolute");
-    expect(choose.closest("label")).toHaveClass("bg-background", "text-foreground", "border-border");
+    expect(choose.closest("label")).toHaveClass("sg-paper-control", "focus-ring", "file-pick");
 
     const camera = screen.getByLabelText("Take a photo");
     expect(camera).toHaveAttribute("type", "file");
     expect(camera).toHaveAttribute("capture", "environment");
     expect(camera.style.position).toBe("absolute");
-    expect(camera.closest("label")).toHaveClass("bg-background", "text-foreground", "border-border");
+    expect(camera.closest("label")).toHaveClass("sg-paper-control", "focus-ring", "file-pick");
   });
 });

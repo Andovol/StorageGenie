@@ -1,0 +1,7 @@
+SG-315 G1 FAIL on base
+base: origin/automation 7a1ded9 (product files unchanged; only the new sg315 test file present)
+command: ./node_modules/.bin/vitest run src/components/shell/import-modal.sg315.test.tsx   (cwd frontend/)
+result: Test Files 1 failed (1); Tests 1 failed (1)
+
+- FAIL src/components/shell/import-modal.sg315.test.tsx > SG-315 drop-zone highlight (SG-307 dropped the dragOver read) > the drop zone border turns --primary while a file is dragged over it and returns to --line on drag-leave
+  first assertion: import-modal.sg315.test.tsx:25 expected 'hsl(var(--line))' to be 'hsl(var(--primary))'

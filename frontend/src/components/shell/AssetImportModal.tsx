@@ -208,7 +208,7 @@ export function AssetImportModal({ householdId, onClose }: AssetImportModalProps
           style={{
             borderStyle: "dashed",
             borderWidth: 2,
-            borderColor: "hsl(var(--line))",
+            borderColor: dragOver ? "hsl(var(--primary))" : "hsl(var(--line))",
             borderRadius: 0,
             padding: 16,
             textAlign: "center",

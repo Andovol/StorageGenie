@@ -1,0 +1,12 @@
+SG-315 G1 PASS on candidate
+candidate: working tree after the G1 fix (AssetImportModal.tsx borderColor driven by dragOver; eight assertions in four old files changed)
+command: ./node_modules/.bin/vitest run src/components/shell/import-modal.sg315.test.tsx src/components/AssetForm.test.tsx src/routes/InboxPage.test.tsx src/routes/theme-adoption.test.tsx src/components/shell/shell.test.tsx   (cwd frontend/)
+result: Test Files 5 passed (5); Tests 57 passed (57); rc 0
+
+- PASS src/components/shell/import-modal.sg315.test.tsx (1 test)
+  SG-315 drop-zone highlight > the drop zone border turns --primary while a file is dragged over it and returns to --line on drag-leave
+  first assertion: import-modal.sg315.test.tsx:22 expect(zone.style.borderColor).toBe("hsl(var(--line))")
+- PASS src/components/AssetForm.test.tsx (9 tests)  - both themed-control and file-picker assertions changed (see report)
+- PASS src/routes/InboxPage.test.tsx (12 tests)     - retry and resolve assertions changed (see report)
+- PASS src/routes/theme-adoption.test.tsx (12 tests) - capture select assertion changed (see report)
+- PASS src/components/shell/shell.test.tsx (23 tests) - pill, Clear all, None yet assertions changed (see report)

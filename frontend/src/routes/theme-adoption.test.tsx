@@ -235,7 +235,7 @@ describe("SG-075 screen adoption", () => {
     // combobox), so the role query is proven live; no household combobox exists.
     const selects = screen.getAllByRole("combobox");
     expect(selects).toHaveLength(1);
-    expect(selects[0]).toHaveClass("bg-background", "text-foreground", "border-border");
+    expect(selects[0]).toHaveClass("sg-paper-control", "focus-ring");
     expect(screen.queryAllByRole("combobox", { name: /household/i })).toHaveLength(0);
   });
 
