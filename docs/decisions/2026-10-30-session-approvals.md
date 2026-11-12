@@ -168,3 +168,7 @@ Read as: close this session; a fresh session writes and dispatches SG-302 (dark-
 **D30, D31, 2026-11-12, verbatim:** *"D30 and D31 approved"*
 
 Read as: **D30** — adopt contract 0.59.0 (covering 0.58.1 and 0.58.2; D28's reading done): `.rules-cache` at `contract-v0.59.0`, `AGENTS.md` records 0.59.0, new packets record it; at L3 every consequential choice (🟡 or higher, or dropping, reordering or rescoping planned work) gets a blind second opinion before it is acted on; the reply wake counts from the end of the turn that waits. The lane's own contract copy is the desk's to update. **D31** — SG-301 serves Instrument Sans self-hosted through the `@fontsource-variable/instrument-sans` package at an exact pinned version; SG-301's packet authorises that one `npm install` and the `package.json` / `package-lock.json` change.
+
+**2026-11-12, verbatim, directives:** *"What is the plan going forward? Can you review the plan using the 2nd decision model?"* · *"Continue in L3 mode"*
+
+Read as: the plan review ran as SG-305 (blind by instruction) and SG-306 (critique), ledger 2026-11-12; it changed the plan (SG-308 refresh fix first, SG-301 split, rotation counts riders). Work continued at L3 through SG-312. **D32** (close now with SG-312's deploy held for its screenshots) was put and not answered; the close ran on the reply deadline with D32 open.
