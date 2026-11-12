@@ -180,3 +180,7 @@ Read as: **D33** — stage C's remaining order is SG-307 (catalog and item panel
 **2026-11-12, verbatim:** *"D34 - yes. this was a pretty useless decision, wasting my time."*
 
 Read as: **D34** confirmed D33's order after SG-307's retry. **Directive:** do not put the owner a decision that only re-confirms an approved order or stage; retries, audits and riders inside an approval proceed and are reported.
+
+**2026-11-12, verbatim:** *"D35 - ok"*
+
+Read as: **D35** — the recommendation stands: the rough edges P1–P8 (`docs/worklogs/SG-319_audit.md`) get one polish slice, with its screenshots and rider, **before** the owner's shelf trial, after SG-304. Order: SG-320 rider → SG-304 → shots → rider → polish → shots → rider → trial.
