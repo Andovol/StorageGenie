@@ -8,6 +8,7 @@ import { CONTROL_STYLE, THEMED_CONTROL_CLASS } from "./CatalogToolbar";
 import { useTaxonomy } from "../../hooks/useAssets";
 import { toProductCategory, UNTITLED_ASSET_NAME } from "../../types/product";
 import { quantityLeftText } from "../../lib/quantityText";
+import { invalidateAssetViews } from "../../lib/invalidateAssetViews";
 
 type ViewerTab = "cutout" | "scene" | "source";
 
@@ -140,8 +141,7 @@ export function ItemInspectorDrawer({ asset, householdId, onClose }: ItemInspect
     mutationFn: (payload: Record<string, unknown>) =>
       apiPatch(`/v1/assets/${asset.id}`, payload, { household_id: householdId }, { "If-Match": String(current.version ?? 1) }),
     onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ["assets"] });
-      qc.invalidateQueries({ queryKey: ["asset", asset.id] });
+      invalidateAssetViews(qc, asset.id);
       setError(null);
     },
     onError: (e: unknown) => setError(e instanceof Error ? e.message : String(e)),
@@ -166,8 +166,7 @@ export function ItemInspectorDrawer({ asset, householdId, onClose }: ItemInspect
   const goneMut = useMutation({
     mutationFn: (reason: GoneReason) => markGone(asset.id, householdId, reason),
     onSuccess: (updated) => {
-      qc.invalidateQueries({ queryKey: ["assets"] });
-      qc.invalidateQueries({ queryKey: ["asset", asset.id] });
+      invalidateAssetViews(qc, asset.id);
       const label = goneReasonLabel(updated.gone_reason) ?? "gone";
       setGoneMessage(`Marked as ${label.toLowerCase()}. Undo with Put back.`);
       setGoneError(null);
@@ -180,8 +179,7 @@ export function ItemInspectorDrawer({ asset, householdId, onClose }: ItemInspect
   const putBackMut = useMutation({
     mutationFn: () => putBack(asset.id, householdId),
     onSuccess: (updated) => {
-      qc.invalidateQueries({ queryKey: ["assets"] });
-      qc.invalidateQueries({ queryKey: ["asset", asset.id] });
+      invalidateAssetViews(qc, asset.id);
       setGoneMessage(`“${updated.display_name || "Item"}” is back in your catalog.`);
       setGoneError(null);
     },
@@ -193,8 +191,7 @@ export function ItemInspectorDrawer({ asset, householdId, onClose }: ItemInspect
   const decMut = useMutation({
     mutationFn: () => decrementQuantity(asset.id, householdId),
     onSuccess: (updated) => {
-      qc.invalidateQueries({ queryKey: ["assets"] });
-      qc.invalidateQueries({ queryKey: ["asset", asset.id] });
+      invalidateAssetViews(qc, asset.id);
       setQtyError(null);
       setQtyMessage(updated.quantity != null ? `Now ${updated.quantity} left.` : "Quantity changed.");
     },
@@ -206,8 +203,7 @@ export function ItemInspectorDrawer({ asset, householdId, onClose }: ItemInspect
   const incMut = useMutation({
     mutationFn: () => incrementQuantity(asset.id, householdId),
     onSuccess: (updated) => {
-      qc.invalidateQueries({ queryKey: ["assets"] });
-      qc.invalidateQueries({ queryKey: ["asset", asset.id] });
+      invalidateAssetViews(qc, asset.id);
       setQtyError(null);
       setQtyMessage(updated.quantity != null ? `Now ${updated.quantity} left.` : "Quantity changed.");
     },

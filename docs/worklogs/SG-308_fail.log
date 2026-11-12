@@ -1,0 +1,13 @@
+SG-308 FAIL on base (defect reproduced) — 5 failed
+date: 1794489948
+ FAIL  src/routes/PantryPage.sg308.test.tsx > PantryPage SG-308 panel refresh > panel -1 updates the rendered tile
+ FAIL  src/routes/PantryPage.sg308.test.tsx > PantryPage SG-308 panel refresh > panel +1 updates the rendered tile
+ FAIL  src/routes/PantryPage.sg308.test.tsx > PantryPage SG-308 panel refresh > panel save updates the rendered tile
+ FAIL  src/routes/PantryPage.sg308.test.tsx > PantryPage SG-308 panel refresh > panel gone removes the tile from Use soon
+ FAIL  src/routes/PantryPage.sg308.test.tsx > PantryPage SG-308 panel refresh > panel put back returns the tile to Use soon
+---first assertions---
+TestingLibraryElementError: Unable to find an element with the text: 3 left. This could be because the text is broken up by multiple elements. In this case, you can provide a function for your text matcher to make your matcher more flexible.
+TestingLibraryElementError: Unable to find an element with the text: 5 left. This could be because the text is broken up by multiple elements. In this case, you can provide a function for your text matcher to make your matcher more flexible.
+TestingLibraryElementError: Unable to find an element with the text: Milk Fresh. This could be because the text is broken up by multiple elements. In this case, you can provide a function for your text matcher to make your matcher more flexible.
+AssertionError: expected <div class="pantry-grid" …(1)>…(1)</div> to be null
+TestingLibraryElementError: Unable to find an element by: [data-testid="pantry-use-soon-grid"]

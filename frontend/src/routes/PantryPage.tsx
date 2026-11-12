@@ -10,6 +10,7 @@ import { ItemInspectorDrawer } from "../components/shell/ItemInspectorDrawer";
 import { thumbUrl } from "../components/catalog/ProductCard";
 import { isCountedUnit } from "./AssetDetailPage";
 import { quantityLeftText } from "../lib/quantityText";
+import { invalidateAssetViews } from "../lib/invalidateAssetViews";
 import { PANTRY_CATEGORY, pantryModuleForCategory } from "../modules/temporaryCategoryModuleMap";
 
 /**
@@ -123,9 +124,7 @@ function PantryTile({
   const decMut = useMutation({
     mutationFn: () => decrementQuantity(asset.id, householdId),
     onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ["pantry-assets"] });
-      qc.invalidateQueries({ queryKey: ["pantry-expiry"] });
-      qc.invalidateQueries({ queryKey: ["assets"] });
+      invalidateAssetViews(qc, asset.id);
       setTileError(null);
     },
     onError: (e: unknown) => setTileError(e instanceof Error ? e.message : String(e)),
@@ -133,9 +132,7 @@ function PantryTile({
   const goneMut = useMutation({
     mutationFn: () => markGone(asset.id, householdId, "used_up"),
     onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ["pantry-assets"] });
-      qc.invalidateQueries({ queryKey: ["pantry-expiry"] });
-      qc.invalidateQueries({ queryKey: ["assets"] });
+      invalidateAssetViews(qc, asset.id);
       setTileError(null);
       onUsedUp(asset);
     },
@@ -285,10 +282,8 @@ export function PantryPage() {
 
   const putBackMut = useMutation({
     mutationFn: (assetId: string) => putBack(assetId, effectiveHousehold),
-    onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ["pantry-assets"] });
-      qc.invalidateQueries({ queryKey: ["pantry-expiry"] });
-      qc.invalidateQueries({ queryKey: ["assets"] });
+    onSuccess: (_data, assetId) => {
+      invalidateAssetViews(qc, assetId);
       setNotice(null);
       setNoticeError(null);
     },

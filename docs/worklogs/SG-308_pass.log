@@ -1,0 +1,9 @@
+SG-308 PASS on candidate — 5 passed
+date: 1794490024
+ ✓ src/routes/PantryPage.sg308.test.tsx > PantryPage SG-308 panel refresh > panel -1 updates the rendered tile
+ ✓ src/routes/PantryPage.sg308.test.tsx > PantryPage SG-308 panel refresh > panel +1 updates the rendered tile
+ ✓ src/routes/PantryPage.sg308.test.tsx > PantryPage SG-308 panel refresh > panel save updates the rendered tile
+ ✓ src/routes/PantryPage.sg308.test.tsx > PantryPage SG-308 panel refresh > panel gone removes the tile from Use soon
+ ✓ src/routes/PantryPage.sg308.test.tsx > PantryPage SG-308 panel refresh > panel put back returns the tile to Use soon
+ Test Files  1 passed (1)
+      Tests  5 passed (5)

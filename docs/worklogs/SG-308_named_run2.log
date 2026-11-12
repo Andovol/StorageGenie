@@ -1,0 +1,164 @@
+
+> storagegenie-frontend@0.1.0 test
+> vitest run --run src/routes/PantryPage.sg308.test.tsx src/routes/PantryPage.sg302.test.tsx src/routes/PantryPage.sg300.test.tsx src/routes/PantryPage.sg273.test.tsx src/components/shell/drawer.test.tsx src/components/catalog/catalog.test.tsx src/components/shell/ItemInspectorDrawer.sg272.test.tsx src/components/shell/ItemInspectorDrawer.sg300.test.tsx --reporter=verbose
+
+
+ RUN  v1.6.1 /home/andrei/StorageGenie/frontend
+
+stderr | src/routes/PantryPage.sg308.test.tsx > PantryPage SG-308 panel refresh > panel -1 updates the rendered tile
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+stderr | src/routes/PantryPage.sg273.test.tsx > PantryPage SG-273 > only ACTIVE food is listed; unsorted is counted in Not sorted yet
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+stderr | src/routes/PantryPage.sg300.test.tsx > PantryPage SG-300 order > expired first (most overdue first), then soonest, dateless last, then by name
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+ ✓ src/routes/PantryPage.sg273.test.tsx > PantryPage SG-273 > only ACTIVE food is listed; unsorted is counted in Not sorted yet
+ ✓ src/components/shell/drawer.test.tsx > ItemInspectorDrawer > opens with the title, category badge and a source photo at full bleed
+ ✓ src/routes/PantryPage.sg273.test.tsx > PantryPage SG-273 > a gone item leaves the Pantry and Put back brings it back
+ ✓ src/routes/PantryPage.sg300.test.tsx > PantryPage SG-300 order > expired first (most overdue first), then soonest, dateless last, then by name
+ ✓ src/routes/PantryPage.sg300.test.tsx > PantryPage SG-300 order > sortPantryItems: same order rule, and the Use soon grid uses it too
+ ✓ src/routes/PantryPage.sg300.test.tsx > PantryPage SG-300 time left > days_remaining 0 reads 2026-11-10
+ ✓ src/routes/PantryPage.sg300.test.tsx > PantryPage SG-300 time left > days_remaining 1 reads 2026-11-11
+ ✓ src/routes/PantryPage.sg300.test.tsx > PantryPage SG-300 time left > days_remaining 2 reads 2026-11-12
+ ✓ src/routes/PantryPage.sg300.test.tsx > PantryPage SG-300 time left > days_remaining 14 reads 2026-11-24
+ ✓ src/routes/PantryPage.sg300.test.tsx > PantryPage SG-300 time left > days_remaining 15 reads 2026-11-25
+ ✓ src/routes/PantryPage.sg300.test.tsx > PantryPage SG-300 time left > days_remaining -1 reads 2026-11-09
+ ✓ src/routes/PantryPage.sg300.test.tsx > PantryPage SG-300 time left > days_remaining -3 reads 2026-11-07
+ ✓ src/routes/PantryPage.sg300.test.tsx > PantryPage SG-300 time left > no date reads No date; a date in a later year carries the year
+ ✓ src/components/shell/drawer.test.tsx > ItemInspectorDrawer > moves focus to the close button on open and back to the invoking element on close
+ ✓ src/components/shell/drawer.test.tsx > ItemInspectorDrawer > Esc closes the drawer
+ ✓ src/routes/PantryPage.sg300.test.tsx > PantryPage SG-300 time left > the time-left line is rendered from the engine days
+ ✓ src/routes/PantryPage.sg300.test.tsx > PantryPage SG-300 accent and EXPIRED label > accent at 2 days or less, EXPIRED label only when expired
+ ✓ src/components/shell/drawer.test.tsx > ItemInspectorDrawer > the cutout tab states cutouts are not available, with no spinner
+ ✓ src/routes/PantryPage.sg273.test.tsx > PantryPage SG-273 > Use soon holds exactly expired or this-week, either side of the 7-day edge
+ ✓ src/routes/PantryPage.sg300.test.tsx > PantryPage SG-300 quantity wording > counted items read N left; amounts read N unit left
+ ✓ src/routes/PantryPage.sg308.test.tsx > PantryPage SG-308 panel refresh > panel -1 updates the rendered tile 307ms
+ ✓ src/routes/PantryPage.sg300.test.tsx > PantryPage SG-300 design > the tile wrapper has no border and no card background
+ ✓ src/routes/PantryPage.sg300.test.tsx > PantryPage SG-300 design > the grid track is two columns at 375 px and five or more at 1280 px
+ ✓ src/routes/PantryPage.sg300.test.tsx > PantryPage SG-300 design > the subtitle reads the owner's line
+ ✓ src/components/shell/drawer.test.tsx > ItemInspectorDrawer > the scene tab states scene rendering is not available and draws no bounding box
+ ✓ src/components/shell/drawer.test.tsx > ItemInspectorDrawer > the scene tab shows the linked scene render through the evidence file route
+ ✓ src/routes/PantryPage.sg273.test.tsx > PantryPage SG-273 > -1 and Use it up call the existing routes and the tile updates
+ ✓ src/routes/PantryPage.sg273.test.tsx > PantryPage SG-273 > journey: classified food appears, -1, Use it up, gone from the grid
+ ✓ src/routes/PantryPage.sg308.test.tsx > PantryPage SG-308 panel refresh > panel +1 updates the rendered tile
+ ✓ src/components/shell/drawer.test.tsx > ItemInspectorDrawer > Title + Category save PATCHes display_name/asset_type with If-Match
+stderr | src/components/catalog/catalog.test.tsx > ProductCard > renders the name, the category micro-pill and the primary-color dots
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+ ✓ src/components/catalog/catalog.test.tsx > ProductCard > renders the name, the category micro-pill and the primary-color dots
+ ✓ src/components/catalog/catalog.test.tsx > ProductCard > omits the color dots when the metadata carries no colors (never placeholder dots)
+ ✓ src/components/catalog/catalog.test.tsx > ProductCard > uses the exact DQ3 badge class pair for every status
+ ✓ src/components/catalog/catalog.test.tsx > ProductCard > the failed card shows the rose badge, the hairline well border, and both warning icons
+ ✓ src/components/catalog/catalog.test.tsx > ProductCard > the whole card links to the existing asset detail route
+ ✓ src/components/catalog/catalog.test.tsx > ProductCard > a broken image falls back to the neutral glyph and never renders a broken icon
+ ✓ src/components/catalog/catalog.test.tsx > ProductCard > the fallback glyph shows only for a sourceless item and vanishes when media exists
+ ✓ src/components/catalog/catalog.test.tsx > ProductCard > cards size to their content: no fixed 3:4 dead space, the media well stays 1:1 (SG-105 G4)
+ ✓ src/components/catalog/catalog.test.tsx > ProductCardSkeleton > is aria-hidden, sizes to content like the loaded card, and pulses (SG-118 G0)
+ ✓ src/components/catalog/catalog.test.tsx > ProductGrid > the grid renders one card per item inside the responsive grid region
+ ✓ src/components/catalog/catalog.test.tsx > ProductGrid > the grid stylesheet carries the 2/3/4/5 responsive breakpoints
+ ✓ src/components/catalog/catalog.test.tsx > ProductGrid > the compact table renders the seven DQ5 columns in order
+ ✓ src/components/catalog/catalog.test.tsx > ProductGrid > a sourceless row renders the fallback glyph in the table thumb
+ ✓ src/components/catalog/catalog.test.tsx > ProductGrid > the compact table rides in a labelled horizontal scroll container (no page-level overflow)
+ ✓ src/components/catalog/catalog.test.tsx > ProductGrid > absent specs render an honest em dash, never an invented value
+ ✓ src/routes/PantryPage.sg300.test.tsx > PantryPage SG-300 design > the actions sit in one row: counted gets -1 and Use it up, amount gets Edit and Use it up
+ ✓ src/components/catalog/catalog.test.tsx > ProductGrid > a table row click navigates to the asset detail route
+ ✓ src/routes/PantryPage.sg300.test.tsx > PantryPage SG-300 notice > Use it up shows the notice; Put back calls the route and the tile returns
+ ✓ src/components/shell/drawer.test.tsx > ItemInspectorDrawer > a custom (passthrough) category is sent unchanged
+stderr | src/routes/PantryPage.sg300.test.tsx > PantryPage SG-300 notice > the notice clears after about six seconds
+Warning: An update to PantryPage inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at PantryPage (/home/andrei/StorageGenie/frontend/src/routes/PantryPage.tsx:310:36)
+    at Router (/home/andrei/StorageGenie/frontend/node_modules/react-router/dist/umd/react-router.development.js:1203:17)
+    at MemoryRouter (/home/andrei/StorageGenie/frontend/node_modules/react-router/dist/umd/react-router.development.js:1097:7)
+    at ThemeProvider (/home/andrei/StorageGenie/frontend/src/theme/ThemeProvider.tsx:22:26)
+    at QueryClientProvider (file:///home/andrei/StorageGenie/frontend/node_modules/@tanstack/react-query/build/modern/QueryClientProvider.js:12:32)
+Warning: An update to PantryPage inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at PantryPage (/home/andrei/StorageGenie/frontend/src/routes/PantryPage.tsx:310:36)
+    at Router (/home/andrei/StorageGenie/frontend/node_modules/react-router/dist/umd/react-router.development.js:1203:17)
+    at MemoryRouter (/home/andrei/StorageGenie/frontend/node_modules/react-router/dist/umd/react-router.development.js:1097:7)
+    at ThemeProvider (/home/andrei/StorageGenie/frontend/src/theme/ThemeProvider.tsx:22:26)
+    at QueryClientProvider (file:///home/andrei/StorageGenie/frontend/node_modules/@tanstack/react-query/build/modern/QueryClientProvider.js:12:32)
+
+ ✓ src/components/shell/drawer.test.tsx > ItemInspectorDrawer > observed colors and description are read-only rows, with an honest absent state
+ ✓ src/routes/PantryPage.sg300.test.tsx > PantryPage SG-300 notice > the notice clears after about six seconds
+ ✓ src/routes/PantryPage.sg308.test.tsx > PantryPage SG-308 panel refresh > panel save updates the rendered tile
+ ✓ src/components/shell/drawer.test.tsx > ItemInspectorDrawer > the AI buttons show the honest notice and send no request
+ ✓ src/components/catalog/catalog.test.tsx > ProductGrid > the ghost actions button opens the detail route and no delete control ships
+ ✓ src/components/catalog/catalog.test.tsx > ProductGrid > an empty result shows the dashed canvas whose Import New Item CTA opens the import dialog
+ ✓ src/components/catalog/catalog.test.tsx > ProductGrid > loading shows skeleton cards equal to the page limit and marks the region busy
+ ✓ src/components/catalog/catalog.test.tsx > ProductGrid > formatRelativeDate reads the live clock through an injectable now
+ ✓ src/components/catalog/catalog.test.tsx > mockProducts > spans at least four DQ1 categories and all four statuses via the real mapper
+ ✓ src/components/catalog/catalog.test.tsx > mockProducts > mock media is inline SVG data-URIs only (no network, no binaries)
+ ✓ src/components/catalog/catalog.test.tsx > mockProducts > the mapper output carries no rawResponse key
+ ✓ src/components/catalog/catalog.test.tsx > ProductCard onSelect > with onSelect, a click selects the asset id and does not navigate
+ ✓ src/components/catalog/catalog.test.tsx > ProductCard onSelect > with onSelect, Enter and Space select the asset id without navigating
+ ✓ src/components/catalog/catalog.test.tsx > ProductCard onSelect > without onSelect, a click still navigates to the detail route
+ ✓ src/components/catalog/catalog.test.tsx > ProductGrid onSelect > a table row click with onSelect selects instead of navigating
+ ✓ src/components/catalog/catalog.test.tsx > ProductGrid onSelect > Enter on a table row with onSelect selects instead of navigating
+ ✓ src/components/catalog/catalog.test.tsx > ProductGrid onSelect > the ... actions button with onSelect selects instead of navigating
+ ✓ src/components/catalog/catalog.test.tsx > ProductGrid onSelect > the grid density passes onSelect through to the cards
+ ✓ src/components/shell/drawer.test.tsx > ItemInspectorDrawer > the removed dev panel leaves no expand toggle and no JSON dump node (D-12)
+ ✓ src/components/shell/drawer.test.tsx > ItemInspectorDrawer > an asset with no evidence shows the honest empty source state
+ ✓ src/routes/PantryPage.sg308.test.tsx > PantryPage SG-308 panel refresh > panel gone removes the tile from Use soon
+ ✓ src/components/shell/drawer.test.tsx > ItemInspectorDrawer > a null display_name shows the Untitled asset fallback and an empty editable title
+ ✓ src/routes/PantryPage.sg308.test.tsx > PantryPage SG-308 panel refresh > panel put back returns the tile to Use soon
+ ✓ src/components/catalog/catalog.test.tsx > CatalogPage drawer wiring > a catalog card click opens the drawer for that asset and close clears it
+ ✓ src/components/shell/drawer.test.tsx > ItemInspectorDrawer > a successful save invalidates the assets and asset query keys
+ ✓ src/components/shell/drawer.test.tsx > ItemInspectorDrawer > category suggestions are served by /v1/taxonomy, not the hardcoded DQ1 list
+ ✓ src/components/shell/drawer.test.tsx > ItemInspectorDrawer > an empty served taxonomy leaves the category input as free text (PG-SC-07)
+ ✓ src/components/shell/drawer.test.tsx > SG-077 panel containment (presentation only) > the drawer panel carries a bounded width and the viewer well is capped to it
+ ✓ src/components/shell/drawer.test.tsx > SG-077 panel containment (presentation only) > no dead framework class survives on the drawer panel
+ ✓ src/components/catalog/catalog.test.tsx > CatalogPage drawer wiring > a save from the mounted drawer invalidates the assets + asset query keys
+ ✓ src/components/catalog/catalog.test.tsx > CatalogPage drawer wiring > an asset with evidence_ids renders its evidence thumbnail (the badge is reachable)
+ ✓ src/components/catalog/catalog.test.tsx > CatalogPage width-adaptive density default (SG-212 / D-21) > a content column >=860 px at mount initialises the table
+ ✓ src/components/catalog/catalog.test.tsx > CatalogPage width-adaptive density default (SG-212 / D-21) > a content column <860 px at mount initialises the grid
+ ✓ src/components/catalog/catalog.test.tsx > CatalogPage width-adaptive density default (SG-212 / D-21) > an unreadable measure (non-finite or zero) falls back to the grid
+ ✓ src/components/catalog/catalog.test.tsx > CatalogPage width-adaptive density default (SG-212 / D-21) > the toggle flips both ways after mount; a fresh navigation recomputes (no stored choice)
+stderr | src/routes/PantryPage.sg302.test.tsx > PantryPage SG-302 warning colour > EXPIRED label renders with var(--link), not var(--primary)
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+ ✓ src/routes/PantryPage.sg302.test.tsx > PantryPage SG-302 warning colour > EXPIRED label renders with var(--link), not var(--primary)
+ ✓ src/routes/PantryPage.sg302.test.tsx > PantryPage SG-302 warning colour > accent time-left line renders with var(--link), not var(--primary)
+ ✓ src/routes/PantryPage.sg302.test.tsx > PantryPage SG-302 empty state > empty state contains a Capture link to /capture
+ ✓ src/components/shell/ItemInspectorDrawer.sg272.test.tsx > ItemInspectorDrawer SG-272 > one tap takes off 1 on a counted item
+ ✓ src/components/shell/ItemInspectorDrawer.sg272.test.tsx > ItemInspectorDrawer SG-272 > an amount item takes a quick edit instead of −1
+ ✓ src/components/shell/ItemInspectorDrawer.sg272.test.tsx > ItemInspectorDrawer SG-272 > at 0 the panel reads None left
+ ✓ src/components/shell/ItemInspectorDrawer.sg272.test.tsx > ItemInspectorDrawer SG-272 > Mark gone with a reason, then Put back on the gone item
+ ✓ src/components/shell/ItemInspectorDrawer.sg300.test.tsx > ItemInspectorDrawer SG-300 shared quantity wording > a counted item reads 1 left, never 1 pcs left
+ ✓ src/components/shell/ItemInspectorDrawer.sg300.test.tsx > ItemInspectorDrawer SG-300 shared quantity wording > an amount item reads 340 g left
+
+ Test Files  8 passed (8)
+      Tests  93 passed (93)
+   Start at  13:30:45
+   Duration  4.03s (transform 1.32s, setup 774ms, collect 4.40s, tests 5.09s, environment 5.06s, prepare 1.07s)
+
+npm notice
+npm notice New minor version of npm available! 11.11.0 -> 11.21.2
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v11.21.2
+npm notice To update run: npm install -g npm@11.21.2
+npm notice
+rc=0
