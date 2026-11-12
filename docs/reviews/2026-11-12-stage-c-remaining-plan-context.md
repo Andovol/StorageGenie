@@ -66,7 +66,9 @@ The Architect's estimate for SG-301 as drafted: ≈1250 s (`UNVERIFIED`), agains
 - **O2b:** two slices: (i) font + developer text, (ii) the catalog and item-panel look.
 - **O2c:** one slice, but on the Haiku slot instead of Muse (swap rotation positions; the rotation is the owner's choice, D25).
 
-**Q3 — Anything the plan misses** before the owner's shelf trial (for example: a way for the owner to reach `/pantry` from the menu, real-photo checks, a restore-from-backup proof before real data goes in — roadmap §D lists restore under stage D).
+**SG-302 landed while this pack was written:** rated 93 (`docs/worklogs/SG-302_audit.md`, readable). Its shots show two things outside SG-301's draft as described above: the app header (shell) is white over the beige paper in light mode, and the Pantry's EXPIRED label is 11 px against the 13 px floor (now added to SG-301 as one line).
+
+**Q3 — Anything the plan misses** before the owner's shelf trial (for example: the app header, a way for the owner to reach `/pantry` from the menu, real-photo checks, a restore-from-backup proof before real data goes in — roadmap §D lists restore under stage D).
 
 ## What to return (Phase A)
 

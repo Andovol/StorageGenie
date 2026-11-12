@@ -56,7 +56,7 @@ docker run --rm busybox true
 
 ## G3 — The tandpfun look on the catalog and the item panel (D18)
 
-Catalog: the paper ground, the count header (*"23 ITEMS"*), joined square filter tabs, photos borderless on the paper in the grid, labels in the spaced uppercase style, square corners. Item panel: the same ground, square corners, no cut-out tabs (joined square tabs if tabs remain), labels in the label style, nothing under 13 px. Inbox and Expiry page: tokens, square corners, ≥ 13 px — no layout redesign. **Every text pair on these screens, light and dark, read from the DOM, into `docs/worklogs/SG-301_contrast.md`** (element · fg/bg · ratio, both themes · size class · pass at 4.5:1 / 3:1). A failing pair on these screens is fixed here.
+Catalog: the paper ground, the count header (*"23 ITEMS"*), joined square filter tabs, photos borderless on the paper in the grid, labels in the spaced uppercase style, square corners. Item panel: the same ground, square corners, no cut-out tabs (joined square tabs if tabs remain), labels in the label style, nothing under 13 px. Inbox and Expiry page: tokens, square corners, ≥ 13 px — no layout redesign. **Pantry, one line only:** the EXPIRED label in `frontend/src/routes/PantryPage.tsx` (~`:196`, `fontSize: 11`) becomes ≥ 13 px (SG-302 audit I1); nothing else on the Pantry changes. **Every text pair on these screens, light and dark, read from the DOM, into `docs/worklogs/SG-301_contrast.md`** (element · fg/bg · ratio, both themes · font size, checked against the 13 px floor · size class · pass at 4.5:1 / 3:1). A failing pair on these screens is fixed here.
 
 ## G4 — Tests, FAIL-then-PASS
 
@@ -98,7 +98,7 @@ Into `docs/worklogs/SG-301_shots/`, in this order:
 
 ## Scope ceiling
 
-- **Product:** `frontend/package.json`, `frontend/package-lock.json` (the font only); `frontend/src/main.tsx` (the import); `frontend/src/theme/tokens.css`; `frontend/src/routes/{InboxPage,ExpiryPage,CatalogPage,AssetDetailPage}.tsx`; `frontend/src/components/shell/ItemInspectorDrawer.tsx`; `frontend/src/components/catalog/*`; components those five screens render **only for displayed text and styling**; a new `frontend/src/lib/labels.ts`. Any other product file is a STOP and report (`PG-EV-03`).
+- **Product:** `frontend/package.json`, `frontend/package-lock.json` (the font only); `frontend/src/main.tsx` (the import); `frontend/src/theme/tokens.css`; `frontend/src/routes/{InboxPage,ExpiryPage,CatalogPage,AssetDetailPage}.tsx`; `frontend/src/routes/PantryPage.tsx` (the EXPIRED label size only); `frontend/src/components/shell/ItemInspectorDrawer.tsx`; `frontend/src/components/catalog/*`; components those five screens render **only for displayed text and styling**; a new `frontend/src/lib/labels.ts`. Any other product file is a STOP and report (`PG-EV-03`).
 - **Tests:** new `*.sg301*` files; older frontend tests only where they assert removed or reworded text, each named.
 - **No backend file.**
 - **Authorised runtimes:** the preflight; the one `npm view` and the one `npm install` in G1; the `make` gates; tests; `eslint`; `tsc`; the frontend build; scratch servers on `127.0.0.1:18301` and `:14301`; the project's migrations on scratch files; headless Chrome; a Node DevTools script in scratch. No other install, image or port.
