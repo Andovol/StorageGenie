@@ -217,6 +217,58 @@ textarea {
   font-size: 13px;
 }
 
+/* SG-307 G3: the native file input on a paper page (the dark asset page
+   measured white) takes the paper ground with a --line border, from this one
+   place — no product file is touched for it. */
+input[type="file"] {
+  background-color: hsl(var(--paper));
+  color: hsl(var(--ink));
+  border: 1px solid hsl(var(--line));
+  border-radius: 0;
+  font: inherit;
+  font-size: 13px;
+  max-width: 100%;
+}
+
+/* SG-307 G3: the Pantry tiles keep their inline ACTION_STYLE (white
+   --card) untouched — PantryPage.tsx is outside this slice's scope ceiling —
+   so the paper ground arrives here, in tokens.css, beating the inline white
+   with the same --paper/--line/--ink tokens the sg-paper-control rule uses. */
+[data-testid="pantry-tile"] button,
+[data-testid="pantry-notice"] button {
+  background-color: hsl(var(--paper)) !important;
+  border-color: hsl(var(--line)) !important;
+  color: hsl(var(--ink)) !important;
+  border-radius: 0 !important;
+}
+
+/* SG-307 G3: at 375 px the header fits one row. The Import text hides behind
+   its aria-label icon, the Showing count hides, the search shrinks — the
+   choice is icon-shortening (not moving the toggle into the menu) so the
+   toggle stays reachable on every route. */
+@media (max-width: 480px) {
+  .sg-import-label {
+    display: none;
+  }
+  .sg-header-count {
+    display: none;
+  }
+  .sg-header {
+    flex-wrap: nowrap !important;
+    gap: 8px !important;
+    padding: 10px 12px !important;
+  }
+  .sg-header-search {
+    flex: 1 1 auto !important;
+    min-width: 0 !important;
+  }
+  .sg-nav {
+    flex-wrap: nowrap !important;
+    gap: 8px !important;
+    padding: 12px !important;
+  }
+}
+
 /* SG-075 migration additions — semantic helpers for screens that previously
    carried hardcoded colour literals. Each maps to a token above. */
 .bg-accent {

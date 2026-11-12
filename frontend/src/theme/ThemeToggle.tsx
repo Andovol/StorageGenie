@@ -12,15 +12,14 @@ export function ThemeToggle() {
       aria-label={label}
       title={label}
       onClick={() => setTheme(next)}
-      className="bg-card text-foreground border-border focus-ring"
+      data-testid="theme-toggle"
+      className="sg-paper-control focus-ring"
       style={{
         display: "inline-flex",
         alignItems: "center",
         justifyContent: "center",
         padding: 6,
-        borderRadius: 6,
-        borderStyle: "solid",
-        borderWidth: 1,
+        borderRadius: 0,
         cursor: "pointer",
       }}
     >

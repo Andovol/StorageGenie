@@ -36,6 +36,8 @@ export function AppHeader({ loadedCount, searchValue, onSearchChange }: AppHeade
 
   return (
     <div
+      data-testid="catalog-header"
+      className="sg-header"
       style={{
         display: "flex",
         flexWrap: "wrap",
@@ -55,6 +57,8 @@ export function AppHeader({ loadedCount, searchValue, onSearchChange }: AppHeade
       <span
         aria-label={`Total loaded items: ${loadedCount}`}
         title="Items shown on this page"
+        data-testid="catalog-showing"
+        className="sg-header-count"
         style={{
           fontSize: 13,
           padding: "2px 8px",
@@ -62,6 +66,7 @@ export function AppHeader({ loadedCount, searchValue, onSearchChange }: AppHeade
           border: "1px solid hsl(var(--line))",
           backgroundColor: "hsl(var(--paper))",
           color: "hsl(var(--ink))",
+          whiteSpace: "nowrap",
         }}
       >
         Showing: {loadedCount} {loadedCount === 1 ? "item" : "items"}
@@ -77,17 +82,12 @@ export function AppHeader({ loadedCount, searchValue, onSearchChange }: AppHeade
         placeholder="Search…"
         value={searchValue}
         onChange={(event) => onSearchChange(event.target.value)}
-        className="focus-ring"
+        className="sg-paper-control focus-ring sg-header-search"
         style={{
           padding: "6px 10px",
           borderRadius: 0,
-          borderStyle: "solid",
-          borderWidth: 1,
-          borderColor: "hsl(var(--line))",
-          backgroundColor: "hsl(var(--paper))",
-          color: "hsl(var(--ink))",
-          flex: "1 1 180px",
-          minWidth: 180,
+          flex: "1 1 120px",
+          minWidth: 0,
           maxWidth: 420,
           fontSize: 13,
         }}
@@ -95,6 +95,7 @@ export function AppHeader({ loadedCount, searchValue, onSearchChange }: AppHeade
       <ThemeToggle />
       <Link
         to="/capture"
+        aria-label="Import Asset"
         onClick={(event) => {
           event.preventDefault();
           setImportOpen(true);
@@ -114,7 +115,7 @@ export function AppHeader({ loadedCount, searchValue, onSearchChange }: AppHeade
         }}
       >
         <Upload size={16} aria-hidden="true" />
-        Import Asset
+        <span className="sg-import-label">Import Asset</span>
       </Link>
       {importOpen ? (
         <AssetImportModal householdId={householdId} onClose={() => setImportOpen(false)} />

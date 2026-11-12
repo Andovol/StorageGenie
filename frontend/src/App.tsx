@@ -66,6 +66,8 @@ function Nav() {
   });
   return (
     <nav
+      data-testid="sg-nav"
+      className="sg-nav"
       style={{
         display: "flex",
         flexWrap: "wrap",
@@ -151,6 +153,7 @@ function Nav() {
       {showImport ? (
         <Link
           to="/capture"
+          aria-label="Import Asset"
           onClick={(event) => {
             event.preventDefault();
             setImportOpen(true);
@@ -170,7 +173,7 @@ function Nav() {
           }}
         >
           <Upload size={16} aria-hidden="true" />
-          Import Asset
+          <span className="sg-import-label">Import Asset</span>
         </Link>
       ) : null}
       {importOpen ? (
