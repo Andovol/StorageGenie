@@ -1,0 +1,16 @@
+
+ RUN  v1.6.1 /home/andrei/StorageGenie/frontend
+
+ ✓ src/lib/labels.sg301.test.ts  (10 tests) 5ms
+stderr | src/routes/sg301-screens.sg301.test.tsx > SG-301 header sizes > header renders no text under 13px and no Phase 0
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+Query data cannot be undefined. Please make sure to return a value other than undefined from your query function. Affected query key: ["ai-settings"]
+
+ ✓ src/routes/sg301-screens.sg301.test.tsx  (12 tests) 122ms
+
+ Test Files  2 passed (2)
+      Tests  22 passed (22)
+   Start at  14:05:40
+   Duration  1.97s (transform 589ms, setup 149ms, collect 973ms, tests 127ms, environment 895ms, prepare 229ms)
+

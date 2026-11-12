@@ -1,0 +1,4 @@
+SG-301 FAIL log: NOT RUN (REMAINING).
+New tests pass on candidate (SG-301_pass.log, 22 passed).
+On base origin/automation the new imports fail by construction (frontend/src/lib/labels.ts absent, font import absent, raw copy present).
+Base run not executed before the 1100 s hard stop.
