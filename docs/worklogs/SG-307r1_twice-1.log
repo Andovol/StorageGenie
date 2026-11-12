@@ -1,0 +1,30 @@
+
+ RUN  v1.6.1 /home/andrei/StorageGenie/frontend
+
+ ✓ src/components/catalog/catalog.sg307.test.tsx  (6 tests) 184ms
+stderr | src/components/catalog/catalog.sg307.test.tsx > SG-307 catalog plain words, no mono, square paper > no font-mono class and no developer status string in the rendered card
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+stderr | src/routes/sg307r1-fixes.sg307r1.test.tsx > SG-307r1 fix 1: Pantry tile buttons paper at the source > no tile button inline style names --card; buttons stay >= 40px tall
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+ ✓ src/routes/sg307r1-fixes.sg307r1.test.tsx  (4 tests) 341ms
+ ✓ src/components/shell/panel.sg307.test.tsx  (6 tests) 459ms
+stderr | src/components/shell/panel.sg307.test.tsx > SG-307 paper controls and 375 header > the shared rule exists and the toolbar, toggle and review select come out of it
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+stderr | src/components/catalog/catalog.test.tsx > ProductCard > renders the name, the category micro-pill and the primary-color dots
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+ ✓ src/components/shell/drawer.test.tsx  (18 tests) 1122ms
+ ✓ src/components/catalog/catalog.test.tsx  (37 tests) 1497ms
+
+ Test Files  5 passed (5)
+      Tests  71 passed (71)
+   Start at  18:51:06
+   Duration  3.59s (transform 1.22s, setup 481ms, collect 3.67s, tests 3.60s, environment 3.36s, prepare 1.25s)
+

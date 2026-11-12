@@ -124,7 +124,7 @@ describe("SG-307r1 fix 1: Pantry tile buttons paper at the source", () => {
 
   test("tokens.css has no pantry-tile rule and no !important for it", () => {
     expect(tokensCss).not.toContain("pantry-tile");
-    const pantryBlocks = tokensCss.split("}").filter((block) => block.includes("pantry-tile") || block.includes("pantry-notice"));
+    const pantryBlocks = tokensCss.split("}").filter((block: string) => block.includes("pantry-tile") || block.includes("pantry-notice"));
     expect(pantryBlocks).toEqual([]);
   });
 });

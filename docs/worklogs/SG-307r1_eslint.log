@@ -1,0 +1,9 @@
+
+/home/andrei/StorageGenie/frontend/src/App.household-nav.test.tsx
+  2:10  error  'fireEvent' is defined but never used  @typescript-eslint/no-unused-vars
+
+/home/andrei/StorageGenie/frontend/src/components/shell/AssetImportModal.tsx
+  76:10  error  'dragOver' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+✖ 2 problems (2 errors, 0 warnings)
+
