@@ -173,9 +173,9 @@ describe("AssetDetailPage", () => {
       )
     );
     // SG-301 G2: the raw enum/action read as plain words — "superseded" is the
-    // "Replaced" badge, "asset.update" is the "Asset Update" history row.
+    // "Replaced" badge; SG-318 W3: "asset.update" is the "Updated" history row (was "Asset Update").
     expect(await screen.findByText("Replaced")).toBeInTheDocument();
-    expect(await screen.findByText("Asset Update", { exact: false })).toBeInTheDocument();
+    expect(await screen.findByText("Updated", { exact: false })).toBeInTheDocument();
   });
 
   test("a needs_evidence asset offers hand entry beside its detail and refuses an empty date", async () => {

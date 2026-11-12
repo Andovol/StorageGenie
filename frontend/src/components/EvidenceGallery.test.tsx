@@ -55,6 +55,7 @@ describe("EvidenceGallery", () => {
     const img = screen.getByAltText("Evidence thumbnail for broken.png");
     fireEvent.error(img);
 
-    expect(screen.getByText("Thumbnail unavailable")).toBeInTheDocument();
+    // SG-318 W4: Thumbnail unavailable → No photo yet.
+    expect(screen.getByText("No photo yet")).toBeInTheDocument();
   });
 });

@@ -26,6 +26,7 @@ describe("JobCard", () => {
     expect(screen.getByText("In progress")).toHaveClass("text-processed");
 
     rerender(<JobCard job={{ ...base, state: "QUEUED" }} selected={false} onSelect={vi.fn()} />);
-    expect(screen.getByText("In progress")).toHaveClass("text-muted-foreground");
+    // SG-318 W9: QUEUED only waits — "Not started", never "In progress".
+    expect(screen.getByText("Not started")).toHaveClass("text-muted-foreground");
   });
 });

@@ -1,0 +1,12 @@
+ ✓ src/routes/sg318-plain-words.sg318.test.tsx > SG-318 W1 catalog chips in plain words > a food_beverages card reads Food & beverages, never the raw key
+ ✓ src/routes/sg318-plain-words.sg318.test.tsx > SG-318 W2 asset Details in plain words > objects never read [object Object]; dates, categories and statuses are plain
+ ✓ src/routes/sg318-plain-words.sg318.test.tsx > SG-318 W3 asset History in plain words > ISO stamps read Today/time; actions read Added and Accepted
+ ✓ src/routes/sg318-plain-words.sg318.test.tsx > SG-318 W4 asset photo fallback in plain words > a failed thumb reads No photo yet at 13px, never Thumbnail unavailable
+ ✓ src/routes/sg318-plain-words.sg318.test.tsx > SG-318 W5 item panel photo fallback > a broken source photo falls back to No photo yet, no broken img left
+ ✓ src/routes/sg318-plain-words.sg318.test.tsx > SG-318 W6 one nameless word everywhere > null, noname and Untitled asset all read Unnamed item
+ ✓ src/routes/sg318-plain-words.sg318.test.tsx > SG-318 W7 expiry dates in plain words > 7 Nov 2026 reads, never the ISO stamp
+ ✓ src/routes/sg318-plain-words.sg318.test.tsx > SG-318 W8 tier pills only for the two action tiers > Safe rows and Long lead rows show no pill; Use first and Use soon do
+ ✓ src/routes/sg318-plain-words.sg318.test.tsx > SG-318 W9 PENDING waits in plain words > PENDING reads Not started, never In progress
+ ✓ src/routes/sg318-plain-words.sg318.test.tsx > SG-318 W10 step names in plain words > the three missing steps never leak underscores or ai
+ Test Files  1 passed (1)
+      Tests  10 passed (10)

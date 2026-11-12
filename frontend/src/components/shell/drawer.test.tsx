@@ -234,12 +234,12 @@ describe("ItemInspectorDrawer", () => {
     expect(screen.getByTestId("source-empty")).toHaveTextContent("No photo yet.");
   });
 
-  test("a null display_name shows the Untitled asset fallback and an empty editable title", async () => {
+  test("a null display_name shows the Unnamed item fallback and an empty editable title (SG-318 W6: Untitled asset → Unnamed item)", async () => {
     const nameless: Asset = { ...baseAsset, display_name: null, evidence: [] };
     api.apiGet.mockResolvedValue(nameless);
     renderDrawer(nameless);
     await screen.findByTestId("inspector-drawer");
-    expect(screen.getByTestId("drawer-title")).toHaveTextContent("Untitled asset");
+    expect(screen.getByTestId("drawer-title")).toHaveTextContent("Unnamed item");
     expect(screen.getByLabelText("Title")).toHaveValue("");
   });
 

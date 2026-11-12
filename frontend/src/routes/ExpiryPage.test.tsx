@@ -244,13 +244,18 @@ describe("ExpiryPage", () => {
     expect(screen.getByText(/Valid until/)).toBeInTheDocument();
   });
 
-  test("maps every tier to its plain-word pill; a row with no tier shows no pill", async () => {
+  test("maps only the two action tiers to pills; Upcoming, Long lead and Safe show no pill (SG-318 W8: Upcoming, Long lead, Safe → no pill)", async () => {
     renderPage();
     await screen.findByText("Milk");
 
     const pills = screen.getAllByTestId("tier-pill").map((pill) => pill.textContent);
-    expect(pills).toEqual(expect.arrayContaining(["Use first", "Use soon", "Upcoming", "Long lead", "Safe"]));
+    // Two expiry action rows (Use first, Use soon) plus the unread reminder (Use soon).
+    expect(pills).toEqual(expect.arrayContaining(["Use first", "Use soon"]));
+    expect(pills).not.toContain("Upcoming");
+    expect(pills).not.toContain("Long lead");
+    expect(pills).not.toContain("Safe");
     expect(pills).not.toContain("No tier");
+    expect(pills).toHaveLength(3);
   });
 
   test("labels every unresolved reason", async () => {

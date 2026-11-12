@@ -87,10 +87,10 @@ describe("assetToProductItem", () => {
     expect(hasRawResponseKey(assetToProductItem(asset))).toBe(false);
   });
 
-  test("a null display_name falls back to the display-only Untitled asset constant", () => {
+  test("a null display_name falls back to the display-only Unnamed item constant (SG-318 W6: Untitled asset → Unnamed item)", () => {
     const item = assetToProductItem({ ...asset, display_name: null });
     expect(item.name).toBe(UNTITLED_ASSET_NAME);
-    expect(UNTITLED_ASSET_NAME).toBe("Untitled asset");
+    expect(UNTITLED_ASSET_NAME).toBe("Unnamed item");
   });
 });
 
