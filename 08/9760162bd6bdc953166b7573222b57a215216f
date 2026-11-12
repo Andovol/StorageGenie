@@ -1,0 +1,29 @@
+Dispatch-ID: SG-304r1.dbg | Report: note
+Debug-Report-Begin
+STAGE: idle kill (killed=idle)
+CAUSE: OpenCode Go rejected the build request with a usage-limit error; the title retries also failed, no further coder output was logged, and the idle watchdog terminated the run at 900 seconds.
+EVIDENCE:
+- [root-owned evidence /var/lib/dispatch-debug-evidence/storagegenie/SG-304r1.dbg.txt, failed-unit-status] “Result=exit-code”; “ExecMainStatus=143”.
+- [root-owned evidence, failed-unit-journal] “DISPATCH_RESULT id=SG-304r1 coder=opencode exit=143 head=335e1c87bf2685e1c8ce56c3f0ca057952e33c40 note=no moved=no rewrite=no dirty=no elapsed=903s budget=2100s killed=idle idle_s=900”.
+- [output/dispatch/SG-304r1.print-logs] “error.error=\"AI_APICallError: OpenCode Go usage limit reached\"” (build request, 20:46:29 UTC); “error.error=\"AI_RetryError: Failed after 3 attempts. Last error: OpenCode Go usage limit reached\"” (title retry, 20:46:35 UTC).
+- [packet docs/packets/SG-304r1-tests-and-gate.md, G2] “Write each test file in its own step and commit it at once (four files, four commits — never several files in one call).”
+- [root-owned evidence, audit lines] “P1_moved=FAIL count=0”; “P3_note=FAIL note=no”; “P5_receipt=FAIL”; “files: count=0”.
+- [refs/notes/storagegenie-coder-reports, partial receipt note on target 362d667c3b784eb70dac4c91a9c2c68a4ed88c16] “Partial-Receipt-ID: SG-304r1”; “killed=idle”; “pushed=0”; “uncommitted=none”; “wip=none”.
+- [output/dispatch/SG-304r1.log] “0 bytes”; [report check] “ls: cannot access 'docs/worklogs/SG-304r1_report.md': No such file or directory”.
+STRANDED WORK:
+- SG-304r1: no work commit or uncommitted files; no worklog report. A partial receipt note is recorded as cited above.
+- refs/quarantine/SG-025-20260912T164340Z: unreceipted provider-abstraction code, tests, ADRs, and worklogs (15 files).
+- refs/quarantine/SG-066-20260921T095958Z: unreceipted analytics implementation, API/UI, and tests (11 files).
+- refs/quarantine/SG-088-20260921T174803Z: unreceipted plugin-taxonomy test edits and verification worklogs (4 files).
+- refs/quarantine/SG-208-20261017T171409Z: unreceipted smoke-run driver, JSON evidence, and screenshots (7 files).
+- refs/quarantine/flag-SG-300-20261110T212535Z: dirt quarantined by SG-300 (last=SG-273); 588 files, including SG-273 test output and browser-profile scratch data.
+- refs/quarantine/flag-SG-301r1-20261112T141057Z: dirt quarantined by SG-301r1 (last=SG-301); 136 SG-301 scratch build/npm-cache files and a Vitest result.
+- refs/quarantine/flag-SG-311-20261112T143120Z: dirt quarantined by SG-311 (last=SG-301r1); five frontend npm-cache output files from SG-301r1.
+- refs/quarantine/preserve-20260907T083833Z: preserved ahead-of-origin SG-008 receipt report commit, docs/worklogs/SG-008_report.md.
+- refs/quarantine/preserve-20261017T171411Z: preserved ahead-of-origin SG-208 household-switching UI removal commit and tests (19 files).
+- refs/quarantine/preserve-20261102T163542Z: preserved ahead-of-origin SG-279 report commit, docs/worklogs/SG-279_report.md.
+NEXT ACTION: needs the desk
+CONFIDENCE: high
+
+Debug-Report-End
+moved=no
