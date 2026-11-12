@@ -31,6 +31,7 @@ Built from audits, one row per rated slice (owner, D25, 2026-11-07). Strengths a
 | SG-301r1 | muse-1.3, xhigh | retry: 26+11 old-test wording updates, FAIL on base, full gate | ~1031 s (stamps) | SG-301 rated 80 overall | yes — stopped before R3 rather than overrun; scratch removed before the report | said the 1200 s line was hit at ≈1031 s (it stopped early, mislabelled); found 11 reds run 1 missed | packet (shots did not fit) |
 | SG-311 | haiku-5-5, high | screenshots only, DOM-proven, design notes | (see report) | 96 | yes | none; a failed retake kept and labelled | — |
 | SG-310 | muse-1.3, xhigh | deploy rider, live serve | 243 s | 90 | yes, S1 | passed a criterion its own evidence contradicted (font content type) | coder |
+| SG-312 | haiku-5-5, high | build, CSS and copy over 3 screens + gate | ~1223 s (stamps) | 82 | **no** — ≈120 s past 1100 s, from a 600 s hung foreground server start | no screenshots | mixed |
 
 ## Haiku 5.5 at `high` — profile
 
