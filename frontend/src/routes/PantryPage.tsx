@@ -40,6 +40,10 @@ const NOTICE_MS = 6000;
 const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
 const ACTION_STYLE: CSSProperties = {
+  // SG-307r1 fix 1: the tile buttons take the paper ground at the source (the
+  // shared --paper/--line/--ink tokens of the sg-paper-control rule), so the
+  // tokens.css !important Pantry override is gone. Tile buttons stay >= 40 px
+  // tall (SG-300).
   flex: "1 1 0",
   minWidth: 0,
   minHeight: 40,
@@ -48,7 +52,7 @@ const ACTION_STYLE: CSSProperties = {
   borderStyle: "solid",
   borderWidth: 1,
   borderColor: "hsl(var(--line))",
-  backgroundColor: "hsl(var(--card))",
+  backgroundColor: "hsl(var(--paper))",
   color: "hsl(var(--ink))",
   fontSize: 13,
   whiteSpace: "nowrap",

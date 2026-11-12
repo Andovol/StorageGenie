@@ -97,6 +97,18 @@ export function labelSubjectKind(kind: string): string {
 export const ASSET_TYPE_LABELS: Record<string, string> = {
   product: "Product",
   unknown: "Uncategorized",
+  // SG-307r1 fix 2: the expiry category words in exactly the taxonomy's own
+  // spelling. The Expiry page reads these names from the served taxonomy
+  // (GET /v1/taxonomy, expiry-tracker plugin categories[].name — defined in
+  // backend/app/plugins/expiry_tracker.py CATEGORIES), so this map reuses
+  // that one source instead of title-casing the key (which read
+  // "Food Beverages" for food_beverages).
+  food_beverages: "Food & beverages",
+  medicine_pharma: "Medicine/pharma",
+  cosmetics_personal_care: "Cosmetics/personal care",
+  household_chemicals: "Household chemicals",
+  documents_other: "Documents/other",
+  non_perishable: "Non-perishable",
 };
 
 export function labelAssetType(assetType: string): string {

@@ -1,0 +1,14 @@
+# SG-307r1 FAIL on base (origin/automation 21d5761) — new file copied into a base worktree
+# Test Files 1 failed (1); Tests 4 failed (4). Names and first assertion only.
+
+FAIL src/routes/sg307r1-fixes.sg307r1.test.tsx > SG-307r1 fix 1: Pantry tile buttons paper at the source > no tile button inline style names --card; buttons stay >= 40px tall
+  AssertionError: expected 'flex: 1 1 0px; min-width: 0; min-heig…' not to contain '--card'
+
+FAIL src/routes/sg307r1-fixes.sg307r1.test.tsx > SG-307r1 fix 1: Pantry tile buttons paper at the source > tokens.css has no pantry-tile rule and no !important for it
+  AssertionError: expected ':root {\n  --background: 60 9.1% 97.8…' not to contain 'pantry-tile'
+
+FAIL src/routes/sg307r1-fixes.sg307r1.test.tsx > SG-307r1 fix 2: labelAssetType speaks the taxonomy's words > food_beverages reads as the Expiry page shows it, for every taxonomy key
+  AssertionError: expected 'Food Beverages' to be 'Food & beverages' // Object.is equality
+
+FAIL src/routes/sg307r1-fixes.sg307r1.test.tsx > SG-307r1 fix 3: no Version text on the item panel > the panel renders no Version text but keeps the value as data-version
+  AssertionError: expected <span …(1)></span> to be null

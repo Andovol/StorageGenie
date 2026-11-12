@@ -444,9 +444,10 @@ export function ItemInspectorDrawer({ asset, householdId, onClose }: ItemInspect
             >
               {patchMut.isPending ? "Saving..." : "Save changes"}
             </button>
-            <span style={{ fontSize: 13, color: "hsl(var(--ink-muted))" }}>
-              Version {current.version}
-            </span>
+            {/* SG-307r1 fix 3: the system version detail is off the screen; the
+                value stays in the DOM as data-version. The Save PATCH still
+                sends it as the If-Match header above. */}
+            <span data-version={current.version} style={{ display: "none" }} />
           </div>
           {error && <div className="text-danger" style={{ fontSize: 13, marginTop: 8 }}>{error}</div>}
         </section>

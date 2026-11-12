@@ -230,17 +230,9 @@ input[type="file"] {
   max-width: 100%;
 }
 
-/* SG-307 G3: the Pantry tiles keep their inline ACTION_STYLE (white
-   --card) untouched — PantryPage.tsx is outside this slice's scope ceiling —
-   so the paper ground arrives here, in tokens.css, beating the inline white
-   with the same --paper/--line/--ink tokens the sg-paper-control rule uses. */
-[data-testid="pantry-tile"] button,
-[data-testid="pantry-notice"] button {
-  background-color: hsl(var(--paper)) !important;
-  border-color: hsl(var(--line)) !important;
-  color: hsl(var(--ink)) !important;
-  border-radius: 0 !important;
-}
+/* SG-307r1 fix 1: the Pantry !important override is removed. PantryPage's
+   ACTION_STYLE now carries the paper ground at the source, so the tile and
+   notice buttons come out of the inline style — no band-aid rule here. */
 
 /* SG-307 G3: at 375 px the header fits one row. The Import text hides behind
    its aria-label icon, the Showing count hides, the search shrinks — the
