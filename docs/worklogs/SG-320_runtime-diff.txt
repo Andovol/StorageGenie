@@ -1,0 +1,11 @@
+Runtime diff: storagegenie-backend:release-sg317 (sha256:1bdf6799b90cd6797bf01333b4e75c0179cc48a4cb7b750fe84547878faadc5f) vs storagegenie-backend:latest (sha256:10d6064f670eb066437c47e0d7e06ed19df1483564edebca056c4a46874bf191). 4069 files in each image. Only static/ differs.
+./static/assets/index-C3KByf5V.js 12083486632f9b6d3521d129bf28f4bc2560c81d9fd7d75805556722cb1311e6 -> REMOVED (old JS, 362710 bytes)
+./static/assets/index-_brNCbOJ.js fc4efc6a5281084382d96e73e4a5af3210bb4a2206f1c95f70a59e7a0bb68cb3 -> ADDED (new JS, 365842 bytes)
+./static/index.html 5f02c9cef448686ecce27e8fd4d525a111ec9efa0dcf216209bbfa75a715f032 -> a0efc49b32b6dd5bf623902c72254f67e1453bed01bad99b87c35adb85ed44c3 (944 bytes after)
+Unchanged in static/:
+./static/assets/index-BGbwuPTO.css 90d6285326accc47e61b3073b951bb4e04234b582e495d2d8ec83c9144d6b6c0 (6172 bytes, same name and hash before and after; CSS content did not change in SG-318)
+./static/assets/instrument-sans-latin-ext-wght-normal-B5bTHO_g.woff2 c4fcfea41f2c1cfeea9211fa43679845454a1d0e0d7e95e069c7e73c4ae302d2 (11144 bytes, byte-identical)
+./static/assets/instrument-sans-latin-wght-normal-BbzFLZTg.woff2 2ee17598a98d8a59e4df8152d015bec9ab8e4d5672cc0ab42bef806b568e3971 (30092 bytes, byte-identical)
+No path outside static/ differs. Derived backend set (git diff --name-only b9b5f3e..HEAD -- backend/ ':!backend/alembic'): empty. Expectation (packet, labelled as such): empty. Matched.
+Derived alembic set (git diff --name-only b9b5f3e..HEAD -- backend/alembic): empty.
+Derived lock set (git diff --name-only b9b5f3e..HEAD -- frontend/package.json frontend/package-lock.json): empty.
