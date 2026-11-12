@@ -204,7 +204,7 @@ describe("Catalog shell", () => {
   test("the header labels the LOADED item count, not a household total", async () => {
     renderCatalog();
     expect(await screen.findByText("Drill")).toBeInTheDocument();
-    expect(screen.getByLabelText(/total loaded items: 4/i)).toHaveTextContent("Loaded: 4 items");
+    expect(screen.getByLabelText(/total loaded items: 4/i)).toHaveTextContent("Showing: 4 items");
   });
 
   test("the toolbar renders All plus one counted pill per real asset_type vocabulary", async () => {
@@ -428,14 +428,18 @@ describe("Catalog shell", () => {
     // the Catalog's own AppHeader no longer repeats the brand, so exactly one
     // brand row remains on the route.
     expect(await screen.findByRole("link", { name: "Analytics" })).toBeInTheDocument();
-    expect(screen.getByText("Phase 0 · local-first")).toBeInTheDocument();
+    // SG-301 G2: the "Phase 0 · local-first" nav footer is gone on purpose;
+    // the Inbox link (with its badge) proves the nav rendered instead.
+    expect(screen.getByRole("link", { name: /Inbox/ })).toBeInTheDocument();
     expect(screen.getAllByText("StorageGenie")).toHaveLength(1);
   });
 
   test("a non-catalog route keeps the shared legacy nav (now carrying Expiry)", async () => {
     renderApp(["/capture"]);
 
-    expect(await screen.findByText("Phase 0 · local-first")).toBeInTheDocument();
+    // SG-301 G2: the "Phase 0 · local-first" nav footer is gone on purpose;
+    // the Import Asset link proves the shared legacy nav rendered instead.
+    expect(await screen.findByRole("link", { name: "Import Asset" })).toBeInTheDocument();
     expect(screen.getByText("Capture — Manual Create")).toBeInTheDocument();
     expect(screen.getAllByText("StorageGenie")).toHaveLength(1);
     // SG-108: the /expiry route adds its nav entry; every other link is unchanged.
@@ -456,8 +460,9 @@ describe("Catalog shell", () => {
     renderCatalog();
     await screen.findByText("Drill");
 
-    expect(screen.getByText("Loaded: 1 item")).toBeInTheDocument();
-    expect(screen.queryByText("Loaded: 1 items")).not.toBeInTheDocument();
+    // SG-301 G2: the badge reads "Showing: N item(s)" instead of "Loaded: …".
+    expect(screen.getByText("Showing: 1 item")).toBeInTheDocument();
+    expect(screen.queryByText("Showing: 1 items")).not.toBeInTheDocument();
   });
 });
 

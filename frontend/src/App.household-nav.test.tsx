@@ -107,8 +107,10 @@ describe("SG-196 shared household context / SG-208 no switching UI", () => {
   test("the nav carries no household control; the first household is resolved and persisted (A1)", async () => {
     renderApp();
 
-    // Non-vacuity: the nav itself rendered (its footer), then the absence row.
-    expect(await screen.findByText("Phase 0 · local-first")).toBeInTheDocument();
+    // Non-vacuity: the nav itself rendered (its Inbox link with the badge),
+    // then the absence row. The "Phase 0 · local-first" footer is gone on
+    // purpose (SG-301 G2: developer copy removed from the shared header).
+    expect(await screen.findByRole("link", { name: /Inbox/ })).toBeInTheDocument();
     await waitFor(() => expect(window.localStorage.getItem("household_id")).toBe("hh-a"));
     expect(householdComboboxes()).toHaveLength(0);
     const householdCalls = api.apiGet.mock.calls.filter(([path]) => path === "/v1/households");
@@ -142,7 +144,8 @@ describe("SG-196 shared household context / SG-208 no switching UI", () => {
 
     const alert = await screen.findByRole("alert");
     expect(alert).toHaveTextContent("Could not load households");
-    expect(alert).toHaveTextContent("households read failed");
+    // The raw backend error ("households read failed") is gone on purpose
+    // (SG-301 G2: the nav alert carries the plain sentence only).
     expect(householdComboboxes()).toHaveLength(0);
   });
 

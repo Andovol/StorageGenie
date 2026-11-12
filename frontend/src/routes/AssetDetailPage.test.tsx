@@ -172,8 +172,10 @@ describe("AssetDetailPage", () => {
         { "If-Match": "1" }
       )
     );
-    expect(await screen.findByText("superseded")).toBeInTheDocument();
-    expect(await screen.findByText("asset.update")).toBeInTheDocument();
+    // SG-301 G2: the raw enum/action read as plain words — "superseded" is the
+    // "Replaced" badge, "asset.update" is the "Asset Update" history row.
+    expect(await screen.findByText("Replaced")).toBeInTheDocument();
+    expect(await screen.findByText("Asset Update", { exact: false })).toBeInTheDocument();
   });
 
   test("a needs_evidence asset offers hand entry beside its detail and refuses an empty date", async () => {
@@ -212,7 +214,7 @@ describe("EnrichButton per-press cap (SG-082)", () => {
   test("cap helper refuses above the cap with a named reason (seen-to-fail) and allows below", () => {
     expect(enrichCapRefusal(0.01)).toBeNull();
     expect(enrichCapRefusal(0.06)).toBe(
-      "per_press_cap_exceeded: last press cost $0.060000 exceeds cap $0.05"
+      "Last spend $0.060000 is over the $0.05 cap, so Enrich stays off."
     );
   });
 
@@ -224,7 +226,7 @@ describe("EnrichButton per-press cap (SG-082)", () => {
     fireEvent.click(screen.getByRole("button", { name: "Enrich" }));
     expect(run).not.toHaveBeenCalled();
     expect(screen.getByRole("alert")).toHaveTextContent(
-      "per_press_cap_exceeded: last press cost $0.060000 exceeds cap $0.05"
+      "Last spend $0.060000 is over the $0.05 cap, so Enrich stays off."
     );
 
     rerender(<EnrichButton lastSpendUsd={0.01} onRun={run} />);
@@ -264,9 +266,11 @@ describe("EnrichButton per-press cap (SG-082)", () => {
     fireEvent.click(await screen.findByRole("button", { name: "Enrich" }));
 
     const section = await screen.findByRole("region", { name: "Web alternates" });
-    expect(within(section).getByText("brand")).toBeInTheDocument();
+    // SG-301 G2: the raw field/source read as plain words — "brand" is the
+    // "Brand" label, "web:OpenFoodFacts" is the "Web" source.
+    expect(within(section).getByText("Brand")).toBeInTheDocument();
     expect(within(section).getByText("Jacobs Cronat Gold")).toBeInTheDocument();
-    expect(within(section).getByText("web:OpenFoodFacts")).toBeInTheDocument();
+    expect(within(section).getByText("Web")).toBeInTheDocument();
   });
 });
 
@@ -366,8 +370,9 @@ describe("RelationsSection (SG-114)", () => {
     api.deleteRelation.mockResolvedValue({ status: "deleted", id: "rel-1" });
     renderPage();
 
-    // The linked asset is named and its direction is labelled from this asset.
-    expect(await screen.findByText("(contains, outgoing)")).toBeInTheDocument();
+    // The linked asset is named and its type is labelled in plain words from
+    // this asset (SG-301 G2: the raw "(type, direction)" pair is gone).
+    expect(await screen.findByText("(Contains)")).toBeInTheDocument();
     expect(await screen.findByRole("option", { name: "Screwdriver" })).toBeInTheDocument();
 
     fireEvent.change(screen.getByLabelText("Related asset"), { target: { value: "asset-2" } });

@@ -1,4 +1,19 @@
-SG-301 FAIL log: NOT RUN (REMAINING).
-New tests pass on candidate (SG-301_pass.log, 22 passed).
-On base origin/automation the new imports fail by construction (frontend/src/lib/labels.ts absent, font import absent, raw copy present).
-Base run not executed before the 1100 s hard stop.
+SG-301 FAIL log (run on base): FAIL ON BASE = IMPORT ERROR (not a behavioural FAIL).
+Base tree: a15b76d (pre-run-1 tree; `git worktree add output/SG-301r1-scratch/base a15b76d`,
+`frontend/node_modules` symlinked from the main tree, the two new files copied to
+their same relative paths; `frontend/src/lib/labels.ts` NOT copied — it does not
+exist on base by construction).
+Command: `vitest run src/lib/labels.sg301.test.ts src/routes/sg301-screens.sg301.test.tsx`
+from `output/SG-301r1-scratch/base/frontend` (stamp 1794492949).
+
+- src/lib/labels.sg301.test.ts: FAILED TO COLLECT — Error: Failed to resolve
+  import "./labels" from "src/lib/labels.sg301.test.ts". Does the file exist?
+  (0 tests collected; first assertion never reached.)
+- src/routes/sg301-screens.sg301.test.tsx: FAILED TO COLLECT — Error: Failed to
+  resolve import "../lib/labels" from "src/routes/sg301-screens.sg301.test.tsx".
+  Does the file exist? (0 tests collected; first assertion never reached.)
+
+Result: 2 failed suites, 0 tests. Both new files fail on base by construction —
+the shared label map and its importers do not exist at a15b76d. Reported as an
+import error, not a behavioural FAIL, per the packet.
+On the candidate the same two files pass 22/22 (docs/worklogs/SG-301_pass.log).

@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, test, vi } from "vitest";
-import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { InboxPage } from "./InboxPage";
@@ -35,7 +35,9 @@ describe("InboxPage", () => {
     });
     api.apiPost.mockResolvedValue({ ...detail, state: "AWAITING_REVIEW" });
     renderPage();
-    fireEvent.click(await screen.findByText("Import job-load"));
+    // SG-301 G2: the job card no longer shows the id fragment ("Import
+    // job-load" is now "Import job").
+    fireEvent.click(await screen.findByText("Import job"));
     expect((await screen.findAllByText("decoder failed on loaded image")).length).toBeGreaterThan(0);
     const retry = await screen.findByRole("button", { name: "Retry failed job" });
     expect(retry).toBeEnabled();
@@ -57,11 +59,13 @@ describe("InboxPage", () => {
       return Promise.resolve({ ...detail, id: created.id, state, errors: [] });
     });
     renderPage();
-    fireEvent.click(await screen.findByText("Import job-star"));
+    fireEvent.click(await screen.findByText("Import job"));
     const start = await screen.findByRole("button", { name: "Start import job" });
     fireEvent.click(start);
     await waitFor(() => expect(api.apiPost).toHaveBeenCalledWith(`/v1/imports/${created.id}/run`, {}, { household_id: household.id }));
-    expect((await screen.findAllByText("AWAITING_REVIEW")).length).toBeGreaterThan(0);
+    // SG-301 G2: the terminal state reads as plain words ("AWAITING_REVIEW"
+    // is now "Waiting for you").
+    expect((await screen.findAllByText("Waiting for you")).length).toBeGreaterThan(0);
   });
 
   test("a FAILED job keeps Retry and offers no Start (no fake success)", async () => {
@@ -71,7 +75,7 @@ describe("InboxPage", () => {
       return Promise.resolve({ items: [], next_cursor: null, total: 0 });
     });
     renderPage();
-    fireEvent.click(await screen.findByText("Import job-load"));
+    fireEvent.click(await screen.findByText("Import job"));
     expect(await screen.findByRole("button", { name: "Retry failed job" })).toBeEnabled();
     expect(screen.queryByRole("button", { name: "Start import job" })).not.toBeInTheDocument();
   });
@@ -88,7 +92,9 @@ describe("InboxPage", () => {
     api.apiGet.mockImplementation((path: string) => path === "/v1/jobs" ? Promise.resolve({ items: [], next_cursor: null, total: 0 }) : Promise.resolve({ items: [task], next_cursor: null, total: 1 }));
     api.resolveReviewTask.mockResolvedValue({ id: task.id, status: "resolved" });
     renderPage();
-    expect(await screen.findByText("identifier_collision")).toBeInTheDocument();
+    // SG-301 G2: the raw task_type reads as plain words ("identifier_collision"
+    // is now "Possible duplicate").
+    expect(await screen.findByText("Possible duplicate")).toBeInTheDocument();
     const resolveBtn = screen.getByRole("button", { name: "Resolve" });
     expect(resolveBtn).toHaveClass("bg-background", "text-foreground", "border-border");
     fireEvent.click(resolveBtn);
@@ -102,7 +108,7 @@ describe("InboxPage", () => {
       return Promise.resolve({ items: [], next_cursor: null, total: 0 });
     });
     renderPage();
-    fireEvent.click(await screen.findByText("Import job-load"));
+    fireEvent.click(await screen.findByText("Import job"));
     await waitFor(() => expect(() => expect(screen.getByRole("alert")).toHaveTextContent("decoder failed on loaded image")).toThrow());
   });
 
@@ -140,11 +146,13 @@ describe("InboxPage", () => {
     api.apiGet.mockImplementation((path: string) => path === "/v1/jobs" ? Promise.resolve({ items: [], next_cursor: null, total: 0 }) : Promise.resolve({ items: [open, resolved], next_cursor: null, total: 2 }));
     renderPage();
 
-    expect(await screen.findByText("identifier_collision")).toBeInTheDocument();
+    expect(await screen.findByText("Possible duplicate")).toBeInTheDocument();
     expect(screen.queryByText(/candidate-resolved-2/)).not.toBeInTheDocument();
 
     fireEvent.change(screen.getByRole("combobox", { name: /review status/i }), { target: { value: "all" } });
-    expect(await screen.findByText(/candidate-resolved-2/)).toBeInTheDocument();
+    // SG-301 G2: subject refs are never shown, so the revealed resolved row
+    // reads "Possible duplicate" a second time instead of its ref.
+    expect((await screen.findAllByText("Possible duplicate"))).toHaveLength(2);
   });
 
   test("the selected job lists its candidates and labels a retired split origin (SG-270 G3)", async () => {
@@ -157,13 +165,19 @@ describe("InboxPage", () => {
       return Promise.resolve({ items: [], next_cursor: null, total: 0 });
     });
     renderPage();
-    fireEvent.click(await screen.findByText("Import job-load"));
-    expect(await screen.findByText("Milk carton")).toBeInTheDocument();
-    expect(screen.getByText(/proposed/)).toBeInTheDocument();
+    fireEvent.click(await screen.findByText("Import job"));
+    const milkItem = await screen.findByText("Milk carton");
+    expect(milkItem).toBeInTheDocument();
+    // SG-301 G2: the raw candidate state reads as plain words ("proposed" is
+    // now "Waiting for you", scoped to the candidate's row because the job
+    // header reads the same).
+    expect(within(milkItem.closest("li") as HTMLElement).getByText("Waiting for you", { exact: false })).toBeInTheDocument();
     const links = screen.getAllByRole("link", { name: "Review" });
     expect(links).toHaveLength(1);
     expect(links[0].getAttribute("href") || "").toContain("/review/candidate-270-1");
-    expect(screen.getByText(/retired split origin/)).toBeInTheDocument();
+    // The "retired split origin" note is gone on purpose (G2); the split
+    // candidate now reads "Split item" and carries no Review link.
+    expect(screen.getByText("Split item", { exact: false })).toBeInTheDocument();
   });
 
   test("review tasks link by subject kind and hide Resolve on data-required rows (SG-270 G4)", async () => {
@@ -172,9 +186,11 @@ describe("InboxPage", () => {
     const unknownTask = { id: "task-270-unknown", task_type: "expiry.manual_entry", priority: "high", subject_ref: "gone-270", subject_kind: "unknown", data_required: true, proposed_change: null, status: "open", household_id: household.id, created_at: null, updated_at: null };
     api.apiGet.mockImplementation((path: string) => path === "/v1/jobs" ? Promise.resolve({ items: [], next_cursor: null, total: 0 }) : Promise.resolve({ items: [assetTask, candidateTask, unknownTask], next_cursor: null, total: 3 }));
     renderPage();
-    expect(await screen.findByText(/item asset-270/)).toBeInTheDocument();
-    expect(screen.getByText(/candidate candidate-270/)).toBeInTheDocument();
-    expect(screen.getByText(/unknown subject gone-270/)).toBeInTheDocument();
+    // SG-301 G2: subject refs and raw kinds are never shown — the rows carry
+    // the task's plain words plus the bare "item"/"candidate" kind label.
+    expect((await screen.findAllByText("Date needed"))).toHaveLength(2);
+    expect(screen.getAllByText("item")).toHaveLength(2);
+    expect(screen.getByText("candidate")).toBeInTheDocument();
     const links = screen.getAllByRole("link", { name: "Review" });
     expect(links.map((link) => link.getAttribute("href") || "")).toEqual([
       `/assets/asset-270?household_id=${household.id}`,

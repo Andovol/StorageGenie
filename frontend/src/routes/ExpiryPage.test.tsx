@@ -281,7 +281,9 @@ describe("ExpiryPage", () => {
 
     const link = within(screen.getByRole("region", { name: "Unresolved" })).getByRole("link");
     expect(link).toHaveTextContent("No date");
-    expect(link).toHaveTextContent("#abcdef");
+    // SG-301 G2: the "#abcdef" short-id fragment is gone on purpose (ids are
+    // never shown); the link now reads "No date · Unnamed item".
+    expect(link).toHaveTextContent("Unnamed item");
     expect(link.textContent ?? "").not.toContain("asset-1234567890abcdef");
     expect(link).toHaveAttribute(
       "href",
@@ -320,24 +322,26 @@ describe("ExpiryPage", () => {
 describe("ExpiryPage reminder actions (SG-235)", () => {
   test("an unread reminder row shows Read and Dismiss; a read row shows none", async () => {
     renderPage();
-    const readButton = await screen.findByRole("button", { name: "Read reminder r1" });
-    const dismissButton = screen.getByRole("button", { name: "Dismiss reminder r1" });
+    // SG-301 G2: the reminder buttons no longer carry the reminder id in
+    // their accessible names ("Mark reminder read" / "Dismiss reminder").
+    const readButton = await screen.findByRole("button", { name: "Mark reminder read" });
+    const dismissButton = screen.getByRole("button", { name: "Dismiss reminder" });
 
     expect(readButton).toHaveTextContent("Read");
     expect(dismissButton).toHaveTextContent("Dismiss");
     expect(readButton).toHaveClass("focus-ring");
     expect(dismissButton).toHaveClass("focus-ring");
-    expect(screen.queryByRole("button", { name: "Read reminder r2" })).not.toBeInTheDocument();
-    expect(screen.queryByRole("button", { name: "Dismiss reminder r2" })).not.toBeInTheDocument();
+    expect(screen.getAllByRole("button", { name: "Mark reminder read" })).toHaveLength(1);
+    expect(screen.getAllByRole("button", { name: "Dismiss reminder" })).toHaveLength(1);
     expect(screen.getByText("Unread reminders (1)")).toBeInTheDocument();
   });
 
   test("Read posts the household and re-reads the list from the server", async () => {
     renderPage();
-    await screen.findByRole("button", { name: "Read reminder r1" });
+    await screen.findByRole("button", { name: "Mark reminder read" });
     const initialGets = remindersGetCount;
 
-    fireEvent.click(screen.getByRole("button", { name: "Read reminder r1" }));
+    fireEvent.click(screen.getByRole("button", { name: "Mark reminder read" }));
 
     await waitFor(() => {
       const call = fetchMock.mock.calls.find(
@@ -349,15 +353,15 @@ describe("ExpiryPage reminder actions (SG-235)", () => {
       expect(String(call?.[0])).toContain("household_id=hh-expiry");
     });
     await waitFor(() => expect(remindersGetCount).toBeGreaterThan(initialGets));
-    expect(await screen.findByRole("button", { name: "Read reminder r1" })).toBeInTheDocument();
+    expect(await screen.findByRole("button", { name: "Mark reminder read" })).toBeInTheDocument();
     expect(screen.getByText("Unread reminders (1)")).toBeInTheDocument();
   });
 
   test("Dismiss posts the household", async () => {
     renderPage();
-    await screen.findByRole("button", { name: "Dismiss reminder r1" });
+    await screen.findByRole("button", { name: "Dismiss reminder" });
 
-    fireEvent.click(screen.getByRole("button", { name: "Dismiss reminder r1" }));
+    fireEvent.click(screen.getByRole("button", { name: "Dismiss reminder" }));
 
     await waitFor(() => {
       const call = fetchMock.mock.calls.find(
@@ -373,14 +377,14 @@ describe("ExpiryPage reminder actions (SG-235)", () => {
   test("a 422 shows an error and leaves the server row in place", async () => {
     reminderActionStatus = 422;
     renderPage();
-    await screen.findByRole("button", { name: "Read reminder r1" });
+    await screen.findByRole("button", { name: "Mark reminder read" });
     const initialGets = remindersGetCount;
 
-    fireEvent.click(screen.getByRole("button", { name: "Read reminder r1" }));
+    fireEvent.click(screen.getByRole("button", { name: "Mark reminder read" }));
 
     const alert = await screen.findByRole("alert");
     expect(alert).toHaveTextContent("illegal transition");
-    expect(screen.getByRole("button", { name: "Read reminder r1" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Mark reminder read" })).toBeInTheDocument();
     expect(screen.getByText("Unread reminders (1)")).toBeInTheDocument();
     expect(remindersGetCount).toBe(initialGets);
   });

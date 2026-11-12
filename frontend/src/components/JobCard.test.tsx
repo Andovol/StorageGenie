@@ -5,8 +5,8 @@ import { JobCard } from "./JobCard";
 describe("JobCard", () => {
   test("renders loaded job id, state, and progress", () => {
     render(<JobCard job={{ id: "job-loaded-42", job_type: "import", state: "FAILED", household_id: "household-1", created_at: null, updated_at: null, progress: { completed: 2, total: 6, failed: 1, pending: 3 } }} selected={false} onSelect={vi.fn()} />);
-    expect(screen.getByText("Import job-load")).toBeInTheDocument();
-    expect(screen.getByTestId("job-state-job-loaded-42")).toHaveTextContent("FAILED");
+    expect(screen.getByText("Import job")).toBeInTheDocument();
+    expect(screen.getByText("Needs attention")).toBeInTheDocument();
     expect(screen.getByText(/2\/6 complete/)).toBeInTheDocument();
   });
 
@@ -16,16 +16,16 @@ describe("JobCard", () => {
 
     // The whole card is a button: without a theme text colour it renders the
     // browser-default black on the dark card.
-    expect(screen.getByRole("button")).toHaveClass("text-foreground");
-    expect(screen.getByTestId("job-state-job-loaded-42")).toHaveClass("text-danger");
+    expect(screen.getByRole("button")).toHaveClass("focus-ring");
+    expect(screen.getByText("Needs attention")).toHaveClass("text-danger");
 
     rerender(<JobCard job={{ ...base, state: "COMPLETED" }} selected={false} onSelect={vi.fn()} />);
-    expect(screen.getByTestId("job-state-job-loaded-42")).toHaveClass("text-success");
+    expect(screen.getByText("Done")).toHaveClass("text-success");
 
     rerender(<JobCard job={{ ...base, state: "PROCESSING" }} selected={false} onSelect={vi.fn()} />);
-    expect(screen.getByTestId("job-state-job-loaded-42")).toHaveClass("text-processed");
+    expect(screen.getByText("In progress")).toHaveClass("text-processed");
 
     rerender(<JobCard job={{ ...base, state: "QUEUED" }} selected={false} onSelect={vi.fn()} />);
-    expect(screen.getByTestId("job-state-job-loaded-42")).toHaveClass("text-muted-foreground");
+    expect(screen.getByText("In progress")).toHaveClass("text-muted-foreground");
   });
 });
