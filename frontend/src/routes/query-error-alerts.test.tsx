@@ -271,7 +271,7 @@ describe("SG-195 route query-error alerts", () => {
     );
     renderPage(<InboxPage />);
 
-    fireEvent.click(await screen.findByText("Import jobquery"));
+    fireEvent.click(await screen.findByText("Import job"));
     const alert = await screen.findByRole("alert");
     expect(alert).toHaveTextContent("Could not load job detail");
     expect(alert).toHaveTextContent("detail read failed");

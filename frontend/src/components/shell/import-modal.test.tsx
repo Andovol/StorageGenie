@@ -239,7 +239,8 @@ describe("AssetImportModal processing", () => {
     dropFiles(imageFile("a.png"));
     fireEvent.click(screen.getByRole("button", { name: "Process 1 Item" }));
 
-    expect(await screen.findByText("Import job-1")).toBeInTheDocument();
+    // SG-301 G2: the job card shows "Import job" (the id fragment is gone).
+    expect(await screen.findByText("Import job")).toBeInTheDocument();
     expect(api.apiGet).toHaveBeenCalledWith("/v1/jobs", { household_id: "h1" });
   });
 });

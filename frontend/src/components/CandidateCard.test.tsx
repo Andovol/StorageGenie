@@ -64,9 +64,10 @@ describe("CandidateCard", () => {
     renderCard(<CandidateCard candidate={withBrand} householdId="h" onDecision={vi.fn()} />);
 
     const section = screen.getByRole("region", { name: "Web alternates" });
-    expect(within(section).getByText("brand")).toBeInTheDocument();
+    // SG-301 G2: the raw field/source read as plain words.
+    expect(within(section).getByText("Brand")).toBeInTheDocument();
     expect(within(section).getByText("Jacobs Cronat Gold")).toBeInTheDocument();
-    expect(within(section).getByText("web:OpenFoodFacts")).toBeInTheDocument();
+    expect(within(section).getByText("Web")).toBeInTheDocument();
     const link = within(section).getByRole("link", { name: "source" });
     expect(link).toHaveAttribute("href", sourceUrl);
     // The full URL lives in the href/title, never as visible text (SG-118 discipline).

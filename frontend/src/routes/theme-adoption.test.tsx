@@ -161,12 +161,16 @@ function expectPageHeader(name: RegExp) {
 }
 
 describe("SG-075 screen adoption", () => {
-  test("App nav carries the card/border tokens and surfaces the theme toggle", () => {
+  test("App nav carries the paper/line tokens and surfaces the theme toggle", () => {
     renderWithProviders(<App />);
     const nav = document.querySelector("nav");
     expect(nav).not.toBeNull();
-    expect(nav).toHaveClass("bg-card");
-    expect(nav).toHaveClass("border-border");
+    // SG-301 G3: the nav left bg-card/border-border for paper/ink with a
+    // --line rule, square corners and >=13px text.
+    const style = nav?.getAttribute("style") || "";
+    expect(style).toContain("var(--paper)");
+    expect(style).toContain("var(--ink)");
+    expect(style).toContain("var(--line)");
     expect(screen.getByRole("button", { name: /switch to .* theme/i })).toBeInTheDocument();
   });
 

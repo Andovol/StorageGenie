@@ -9,7 +9,7 @@ describe("WebAlternates", () => {
     expect(container.firstChild).toBeNull();
   });
 
-  test("renders section title, explanation, and alternate details when alternates are provided", () => {
+  test("renders section title and alternate details when alternates are provided", () => {
     const alternates: WebAlternate[] = [
       {
         field: "brand",
@@ -25,16 +25,15 @@ describe("WebAlternates", () => {
     const section = screen.getByRole("region", { name: "Web alternates" });
     expect(section).toBeInTheDocument();
     expect(screen.getByRole("heading", { level: 3, name: "Web alternates" })).toBeInTheDocument();
-    expect(
-      screen.getByText(
-        "A label/web conflict keeps both values; the web value is shown here with its source, never silently dropped."
-      )
-    ).toBeInTheDocument();
+    // SG-301 G2: the label/web-conflict explanation sentence is removed on
+    // purpose; the field/source read as plain words ("brand" is now "Brand",
+    // "web:OpenFoodFacts" is now "Web").
+    expect(section.textContent ?? "").not.toContain("keeps both values");
 
     const listItem = screen.getByTestId("web-alternate-brand");
-    expect(within(listItem).getByText("brand")).toBeInTheDocument();
+    expect(within(listItem).getByText("Brand")).toBeInTheDocument();
     expect(within(listItem).getByText("Jacobs Cronat Gold")).toBeInTheDocument();
-    expect(within(listItem).getByText("web:OpenFoodFacts")).toBeInTheDocument();
+    expect(within(listItem).getByText("Web")).toBeInTheDocument();
 
     const link = within(listItem).getByRole("link", { name: "source" });
     expect(link).toHaveAttribute(
@@ -54,7 +53,7 @@ describe("WebAlternates", () => {
     expect(within(listItem).getByText(/2026-09-25T00:00:00\+00:00/)).toBeInTheDocument();
   });
 
-  test("falls back to 'unknown source' when source_type is omitted/undefined", () => {
+  test("falls back to 'Source not named' when source_type is omitted/undefined", () => {
     const alternates: WebAlternate[] = [
       {
         field: "model",
@@ -68,7 +67,8 @@ describe("WebAlternates", () => {
     render(<WebAlternates alternates={alternates} />);
 
     const listItem = screen.getByTestId("web-alternate-model");
-    expect(within(listItem).getByText("unknown source")).toBeInTheDocument();
+    // SG-301 G2: a missing source reads "Source not named", never "unknown source".
+    expect(within(listItem).getByText("Source not named")).toBeInTheDocument();
     expect(within(listItem).queryByRole("link")).toBeNull();
   });
 

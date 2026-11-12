@@ -1,0 +1,12 @@
+SG-301 backend log (R2 gate): `make backend-test` in two parts.
+Host suite: `python -m pytest -q -m "not requires_native_libs"` from backend/
+(stamp 1794493271): 805 passed, 2 deselected, 59 warnings in 82.31s, rc=0.
+Image proof: `docker build -f backend/Dockerfile -t
+storagegenie-backend:prover .` (stamp 1794493362): DONE, rc=0 — the image
+build runs `npm ci` against the new lockfile (with
+@fontsource-variable/instrument-sans 5.3.0), so a lockfile break would fail
+the build; it passed. Prover: `docker run --rm --network none -e
+SG_IMAGE_PROOF=1 storagegenie-backend:prover python -m pytest -q -m
+requires_native_libs tests/test_signals.py` (stamp 1794493445): 2 passed,
+6 deselected in 2.17s, rc=0. `ruff` on backend files: none changed (zero
+backend bytes), nothing to run — expected none.

@@ -1,0 +1,19 @@
+SG-301 eslint log (R2 gate): eslint on every frontend file changed in a15b76d..HEAD.
+Stamp: 1794493190. Command from frontend/: `./node_modules/.bin/eslint`
+on 21 files (App.household-nav.test.tsx, App.tsx, JobCard.test.tsx, JobCard.tsx,
+OpenedCountdownSection.tsx, ProvenanceBadge.tsx, WebAlternates.tsx,
+shell/AppHeader.tsx, shell/shell.test.tsx, labels.sg301.test.ts, labels.ts,
+main.tsx, AssetDetailPage.test.tsx, AssetDetailPage.tsx, ExpiryPage.test.tsx,
+ExpiryPage.tsx, InboxPage.test.tsx, InboxPage.tsx, PantryPage.tsx,
+sg301-screens.sg301.test.tsx). Exit rc=1 with exactly one error:
+
+/home/andrei/StorageGenie/frontend/src/App.household-nav.test.tsx
+  2:10  error  'fireEvent' is defined but never used  @typescript-eslint/no-unused-vars
+
+1 problem (1 error, 0 warnings). This error is PRE-EXISTING on a15b76d (the
+import line is byte-identical to base; verified by `git show
+a15b76d:frontend/src/App.household-nav.test.tsx`) and is OUT OF SCOPE per the
+packet. Fixed in this slice: the two sg301-screens.sg301.test.tsx unused-var
+errors from run 1 (unused `fireEvent` import, unused `renderInbox` helper and
+its now-unused `InboxPage` import) — removed; re-run shows no error in that file.
+Result: eslint GREEN except the one named out-of-scope pre-existing error.

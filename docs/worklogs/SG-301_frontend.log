@@ -1,0 +1,10 @@
+SG-301 frontend log (R2 gate): `npm test -- --run` from frontend/ (stamp
+1794493640): Test Files 47 passed (47); Tests 423 passed (423), rc=0, no
+failures. Full-suite failures found mid-gate (11 in 7 files run 1 had not
+named — all asserting SG-301-removed/reworded text in SG-301's own product
+scope: CandidateCard, ProvenanceBadge, WebAlternates, InboxPage.sg271,
+query-error-alerts, theme-adoption, import-modal) were fixed the same way
+(each named in SG-301r1_report.md); the quoted 423/423 is the AFTER count.
+Twice-consecutive (PG-DP-04, stamp 1794493669): the 2 new sg301 files + all
+13 older files changed in this slice (the 6 named + the 7 above), run twice
+consecutively: run 1 — 15 passed, 177 passed; run 2 — 15 passed, 177 passed.

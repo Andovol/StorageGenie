@@ -1,14 +1,16 @@
+// @ts-expect-error: node:fs is available in the vitest runtime; @types/node is intentionally not a project dependency
 import { readFileSync } from "node:fs";
+// @ts-expect-error: node:path is available in the vitest runtime; @types/node is intentionally not a project dependency
 import { join } from "node:path";
 import { describe, expect, test, vi, afterEach } from "vitest";
-import { render, screen, fireEvent } from "@testing-library/react";
+import { render, screen } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import App from "../App";
-import { InboxPage } from "./InboxPage";
 import { HouseholdProvider } from "../hooks/HouseholdContext";
 import { ThemeProvider } from "../theme/ThemeProvider";
 
+// @ts-expect-error: __dirname is available in the vitest runtime; @types/node is intentionally not a project dependency
 const root = join(__dirname, "..", "..", "..");
 function src(path: string): string {
   return readFileSync(join(root, path), "utf8");
@@ -62,32 +64,6 @@ vi.mock("../hooks/useAssets", async (importOriginal) => ({
   ...(await importOriginal<typeof import("../hooks/useAssets")>()),
   useHouseholds: () => ({ data: [household] }),
 }));
-
-function renderInbox(detailState = "FAILED") {
-  const job = { id: "job-sg301", job_type: "import", state: "FAILED", household_id: household.id, created_at: null, updated_at: null };
-  const detail = {
-    ...job,
-    state: detailState,
-    steps: [{ id: "step-sg301", step_name: "EXTRACT", state: "COMPLETED", attempts: 1, input: null, output: { status: "skipped", reason: "consent_disabled" }, error: null }],
-    progress: { completed: 1, total: 1, failed: 0, pending: 0 },
-    errors: [],
-  };
-  api.apiGet.mockImplementation((path: string) => {
-    if (path === "/v1/jobs") return Promise.resolve({ items: [job], next_cursor: null, total: 1 });
-    if (path === `/v1/imports/${job.id}`) return Promise.resolve(detail);
-    if (path === `/v1/jobs/${job.id}/candidates`) return Promise.resolve({ items: [], total: 0 });
-    return Promise.resolve({ items: [], next_cursor: null, total: 0 });
-  });
-  return render(
-    <QueryClientProvider client={new QueryClient({ defaultOptions: { queries: { retry: false } } })}>
-      <HouseholdProvider>
-        <MemoryRouter>
-          <InboxPage />
-        </MemoryRouter>
-      </HouseholdProvider>
-    </QueryClientProvider>
-  );
-}
 
 afterEach(() => { vi.clearAllMocks(); });
 

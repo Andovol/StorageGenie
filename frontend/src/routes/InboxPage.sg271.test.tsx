@@ -33,7 +33,7 @@ describe("InboxPage SG-271", () => {
       return Promise.resolve({ items: [], next_cursor: null, total: 0 });
     });
     renderPage();
-    fireEvent.click(await screen.findByText("Import job-271a"));
+    fireEvent.click(await screen.findByText("Import job"));
     expect(await screen.findByText("Milk carton")).toBeInTheDocument();
     const openItem = await screen.findByRole("link", { name: "Open item" });
     expect(openItem.getAttribute("href") || "").toContain("/assets/asset-271-c");
@@ -41,7 +41,7 @@ describe("InboxPage SG-271", () => {
     expect(review.getAttribute("href") || "").toContain("/review/candidate-271-p");
   });
 
-  test("a skipped step reads as skipped with the AI turned off", async () => {
+  test("a skipped step reads Skipped (AI off)", async () => {
     const detail = {
       ...job,
       steps: [{ id: "step-271", step_name: "ANALYZING_WITH_AI", state: "COMPLETED", attempts: 1, input: null, output: { status: "skipped", reason: "consent_disabled" }, error: null }],
@@ -54,7 +54,9 @@ describe("InboxPage SG-271", () => {
       return Promise.resolve({ items: [], next_cursor: null, total: 0 });
     });
     renderPage();
-    fireEvent.click(await screen.findByText("Import job-271a"));
-    expect(await screen.findByText("the AI is turned off", { exact: false })).toBeInTheDocument();
+    fireEvent.click(await screen.findByText("Import job"));
+    // SG-301 G2: the skipped step reads "Skipped (AI off)" (labelStepStatus),
+    // never the old consent sentence and never Done.
+    expect(await screen.findByText("Skipped (AI off)", { exact: false })).toBeInTheDocument();
   });
 });

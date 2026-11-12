@@ -1,0 +1,12 @@
+SG-301 tsc log (R2 gate): `tsc --noEmit` from frontend/, clean, rc=0, no output.
+Stamps: start 1794493200 (first run, 3 errors), end 1794493233 (clean re-run).
+
+The first run surfaced 3 errors, all in run 1's new file
+src/routes/sg301-screens.sg301.test.tsx (missing @types/node for the
+vitest-runtime node:fs/node:path/__dirname reads). Fixed within scope by
+following the repo's own convention (src/theme/theme.test.tsx): a
+`// @ts-expect-error` line above each of the three uses. Re-run: no output,
+rc=0. Comparison proving the fix: same command, same tree, before (3 errors
+quoted above) vs after (empty). `noUnusedLocals` is false in tsconfig, and the
+earlier unused-import cleanup (fireEvent/renderInbox/InboxPage) keeps eslint
+green too (SG-301_eslint.log).

@@ -1,0 +1,9 @@
+SG-301 build log (R2 gate): `vite build --outDir
+../output/SG-301r1-scratch/build-check` from frontend/, rc=0, built in 2.71s,
+1973 modules transformed. `frontend/dist` untouched (outDir is in scratch).
+Emitted: index.html (0.94 kB), index-PyJpCP1_.css (5.52 kB, contains 1
+@font-face + "Instrument Sans Variable"), index-Dp1pka_7.js (358.91 kB),
+instrument-sans-latin-wght-normal-BbzFLZTg.woff2 (30092 B),
+instrument-sans-latin-ext-wght-normal-B5bTHO_g.woff2 (11144 B).
+Stamp: start 1794493248. Comparison proving the font: the built CSS names
+"Instrument Sans Variable" and both woff2 files exist with the sizes above.
