@@ -25,7 +25,7 @@ SG-312 (`80011d0..58ba0ef`) changes **frontend files only** and **no dependency*
 | **S1** | New container started | If it is not healthy within **120 s**, or restarts, serve the previous image **once** by the override below, prove health, report. No other retry |
 | **S2** | A recovery step itself failed or was denied | Leave things as they are, report outcome `UNKNOWN`, no further attempt |
 
-**Serving the previous image (S1):** write `output/SG-314-scratch/rollback.override.yml` setting only `services.backend.image: storagegenie-backend:release-sg309`, then `docker compose -f docker-compose.yml -f output/SG-314-scratch/rollback.override.yml up -d --no-build --no-deps --force-recreate backend`. With no migration, the old image reads the database unchanged. **Never run `docker compose config` without `--images`:** it prints the resolved `.env` values.
+**Serving the previous image (S1):** write `output/SG-314-scratch/rollback.override.yml` setting only `services.backend.image: storagegenie-backend:release-sg310`, then `docker compose -f docker-compose.yml -f output/SG-314-scratch/rollback.override.yml up -d --no-build --no-deps --force-recreate backend`. With no migration, the old image reads the database unchanged. **Never run `docker compose config` without `--images`:** it prints the resolved `.env` values.
 
 **A denial is a STOP (`PB-2`, `PG-PR-03`), never a reason to try another route.**
 
