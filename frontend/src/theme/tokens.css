@@ -29,7 +29,7 @@
   --accent: 30 8% 92%;
   --accent-foreground: 24 9.8% 10%;
 
-  --font-sans: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --font-sans: "Instrument Sans Variable", system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
   /* SG-273 G1 (tandpfun D18): Pantry paper/ink/muted/line tokens. Light values
      are tandpfun paper, ink, muted and line in HSL below. Font stays

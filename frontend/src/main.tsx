@@ -4,6 +4,7 @@ import { BrowserRouter } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import App from "./App";
 import "./theme/tokens.css";
+import "@fontsource-variable/instrument-sans";
 import { ThemeProvider } from "./theme/ThemeProvider";
 
 const qc = new QueryClient({
