@@ -1,0 +1,33 @@
+Dispatch-ID: SG-304.dbg | Report: note
+Debug-Report-Begin
+STAGE: idle kill (killed=idle)
+CAUSE: unknown — the retained journal proves the idle kill but not why Coder output stopped; the Coder/provider transcript for the 900-second no-output interval would settle it.
+EVIDENCE:
+- [evidence file header, output/dispatch/debug-evidence.txt] "DISPATCH_EVIDENCE instance=SG-304.dbg failed_id=SG-304 utc=2026-11-12T20:33:58Z cap=400" (no evidence_staged= path is present, so the root-owned authority file is unidentified).
+- [evidence file, failed-unit-status] "Result=exit-code"; "ExecMainCode=1"; "ExecMainStatus=143".
+- [evidence file, retained journal] "DISPATCH_RESULT id=SG-304 coder=opencode exit=143 head=122a26931563a6c56264e4d6239b425d93cd3500 note=no moved=yes rewrite=no dirty=yes elapsed=1272s budget=2100s killed=idle idle_s=900".
+- [evidence file, retained journal] "transcript=unidentified"; "tokens_total=unknown"; "partial_receipt=published"; "P5_receipt=FAIL".
+- [packet, docs/packets/SG-304-same-item-twice.md] "# SG-304 — Buying the same thing twice: a same-name warning at manual capture, and a duplicate photo that can become another pack".
+- [packet, docs/packets/SG-304-same-item-twice.md] "Time rule: if G2 is not committed by 650 s by your stamps, commit what is done, mark the rest REMAINING, and run G3. G3 is never skipped." The packet also sets RUN_BUDGET_S to 2100 s and says to stop at 1100 s.
+- [log, output/dispatch/SG-304.log] "G2 is committed. For G3 I'll write the backend test file and the three frontend test files in one batch, since they are new, independent files."
+- [evidence file, retained journal cleanup] "Removing backend/tests/test_sg304_duplicate_pack.py"; the three frontend *.sg304.test.tsx files were also removed.
+- [git log] "122a269 SG-304 G2: a duplicate photo can become another pack; the review names the existing item"; "60ba8cd SG-304 G1: same-name warning before a manual capture creates an item".
+- [git status] "## automation...origin/automation"; the worktree is clean and the G1/G2 commits are at origin/automation. No SG-304 worklog report was found.
+- [notes ref check, local refs/notes] "no SG-304 match found". This is a local read only result; the journal separately records partial_receipt=published.
+STRANDED WORK:
+- SG-304: no SG-304 quarantine ref or uncommitted work remains; G1/G2 are on origin/automation, the G3 test files were removed after the kill, and docs/worklogs/SG-304_report.md is absent.
+- refs/quarantine/preserve-20260907T083833Z — SG-008 receipt commit; contains docs/worklogs/SG-008_report.md.
+- refs/quarantine/preserve-20261017T171411Z — SG-208 G1 household-switching UI removal and tests (19 files; commit says full suite 293 pass).
+- refs/quarantine/preserve-20261102T163542Z — SG-279 report commit; contains docs/worklogs/SG-279_report.md.
+- refs/quarantine/SG-025-20260912T164340Z — SG-025 provider-call abstraction, migration, tests, ADRs and worklogs; quarantined as no receipt.
+- refs/quarantine/SG-066-20260921T095958Z — SG-066 analytics API/service/UI and tests; quarantined as no receipt.
+- refs/quarantine/SG-088-20260921T174803Z — SG-088 taxonomy/Postgres test changes and verification logs; quarantined as no receipt.
+- refs/quarantine/SG-208-20261017T171409Z — SG-208 browser driver, screenshots and smoke JSON artifacts; quarantined as no receipt.
+- refs/quarantine/flag-SG-300-20261110T212535Z — SG-273 scratch residue, including Chrome profile/cache data, NSS databases, build output and backend logs.
+- refs/quarantine/flag-SG-301r1-20261112T141057Z — SG-301r1 scratch residue, including Vite results and build-check assets.
+- refs/quarantine/flag-SG-311-20261112T143120Z — npm cache debug logs and update marker from SG-301r1.
+NEXT ACTION: needs the desk
+CONFIDENCE: medium
+
+Debug-Report-End
+moved=no
