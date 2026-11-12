@@ -1,0 +1,77 @@
+SG-305: Q1 PICK O1a, with SG-301 split; Q2 PICK O2b; Q3 PICK a bounded trial-readiness gate, not another broad feature pass.
+Model: unknown; reasoning effort: unknown (process arguments/provider metadata unavailable within the permitted repository-only reads).
+Working directory: `/tmp/dispatch-review.Slrugz`; repository: `Andovol/StorageGenie` (AGENTS declaration, not remote verification).
+BASE REF requested: `origin/automation`.
+BASE resolved commit: unknown; this snapshot has no `.git`.
+WORK_HEAD: not applicable, read-only.
+**Contract version: 0.59.0** — **echo this line verbatim in your receipt.** It is the only proof that you
+read this file rather than assumed its contents.
+
+Extra Files
+- `.contract/CODER.md`: binding PB rules and report requirements.
+- `.contract/SOURCE`: provenance/version of the supplied contract cache.
+- `frontend/src/App.tsx`: triggered by Q3's menu/header questions and the Pantry route.
+- `frontend/src/components/shell/AppHeader.tsx`: triggered by CatalogPage's AppShell dependency and the header finding.
+- `frontend/src/components/shell/AppShell.tsx`: triggered by CatalogPage's import; establishes the catalog's shared presentation dependencies.
+- Attempted root `CODER.md`: absent; located and read `.contract/CODER.md` instead. No permission denial occurred.
+- Directory listings only: repository root, `.contract/`, `frontend/src/`, `frontend/src/components/shell/`. Filename glob only: `**/*CODER*`.
+- All other files read were named in the pack's “Where it lives” section or its explicit SG-302 audit allowance.
+
+Q1: Order
+(a) PICK: O1a, substituting two independently rated/deployed slices for SG-301.
+Sequence: completed SG-302 → Pantry rider → SG-301 foundation/text → its rider → catalog/item-panel design → its rider → SG-304 → its rider → formal shelf trial.
+Keep the binding rotation across every dispatched slice, including riders; do not reserve both design slices for Muse.
+
+(b) WHY: The immediate Pantry rider releases already-rated work rather than making it wait for unrelated redesign. SG-302 is now rated 93 with no flag (`docs/worklogs/SG-302_audit.md:3`), superseding the pack's earlier “running” row.
+O1b conflicts with the binding immediate-deploy rule (`AGENTS.md:25`); it is not an equally permissible optimization.
+The owner's quoted requirement is to “hold every screen” to the design standard (pack:26), while concrete remaining faults include raw task metadata (`frontend/src/routes/InboxPage.tsx:78`) and visible concurrency implementation text (`frontend/src/routes/AssetDetailPage.tsx:756`).
+F10 drops a second purchase's proposed date, not merely cosmetic information (`docs/worklogs/SG-269_findings.md:26`).
+Opinion: complete these known corrections before the formal household-use trial, rather than spend the owner's trial rediscovering them. This does not prohibit an informal look at the first deployed Pantry.
+
+(c) MISSED OPTION: Separate an early, non-destructive orientation from the formal shelf trial. I checked the roadmap's distinction between building the thin journey and evaluating correction after ordinary household use (`docs/ROADMAP.md:37,48`); an early look need not claim stage acceptance or defer approved fixes.
+
+(d) RISKIEST UNVERIFIED PREMISE: SG-304 is a bounded correction, not a larger purchase/batch-identity design problem.
+Settling read-only observation: inspect its actual duplicate-accept path, request schemas and tests to establish whether two same-name packs with different dates remain independently representable. F9/F10's historical findings alone do not settle the current implementation.
+
+Q2: Size
+(a) PICK: O2b. First deliver the pinned font and plain-language cleanup, explicitly including shared chrome and the known Pantry typography correction; then deliver the catalog/item-panel visual composition.
+Each slice must finish a coherent, usable intermediate state and receive its own rider. Set its proof states before dispatch, not after implementation.
+
+(b) WHY: The one-slice estimate leaves only 50 seconds between an unverified 1250-second estimate and the 1300-second stop (pack:40).
+Measured evidence is unfavorable: a small Pantry fix plus contrast/proof took about 973 seconds (`docs/coder-profiles.md:26`), and the earlier multi-screen slice exhausted its stop allowance (`docs/coder-profiles.md:18`).
+The actual surface is broader than five route files: CatalogPage delegates its header and toolbar through AppShell (`frontend/src/routes/CatalogPage.tsx:246-266`; `frontend/src/components/shell/AppShell.tsx:55-73`).
+The drawer contains editing, lifecycle actions, media states and inactive AI affordances, not just static copy (`frontend/src/components/shell/ItemInspectorDrawer.tsx:301-377,383-598`).
+Opinion: splitting reduces timeout and audit risk; it does not prove either half fits. O2c reopens the binding rotation and substitutes model preference for a scope reduction.
+
+(c) MISSED OPTION: Split by complete screen groups rather than horizontal concerns if the first inventory still exceeds budget: shared foundation/Inbox/Expiry/asset page, then catalog plus drawer. I checked the catalog-to-drawer and Pantry-to-drawer coupling (`CatalogPage.tsx:354-359`; `PantryPage.tsx:423-428`); this alternative reduces repeated work on the same visual surface.
+
+(d) RISKIEST UNVERIFIED PREMISE: Two slices suffice once screenshots, font effects and shared components are included.
+Settling read-only observation: inventory exact changed components, affected existing tests and required rendered states; compare their setup/proof costs with the recorded phase costs. Reject a near-stop estimate rather than silently cutting verification.
+
+Q3: Missing Work
+(a) PICK: Add explicit trial-entry criteria covering shared chrome, existing navigation, real-photo legibility and cross-screen stock consistency. Do not automatically pull restore or image processing into C.
+
+(b) WHY:
+The Pantry menu link already exists (`frontend/src/App.tsx:20-23`) and its route is registered (`:182`); this is a deployment verification requirement, not a missing-link implementation requirement.
+The global navigation uses `bg-card` (`App.tsx:65-75`), while the catalog has a second `bg-card` header (`AppHeader.tsx:38-49`). The SG-302 audit independently records the white header over beige paper (`docs/worklogs/SG-302_audit.md:34`). Shared chrome needs an explicit owner in the split.
+The EXPIRED label is still 11 px (`frontend/src/routes/PantryPage.tsx:192-198`), against the audit's cited 13 px rule (`SG-302_audit.md:24`).
+A further integration risk is visible: drawer saves invalidate `assets` and `asset`, but not `pantry-assets` (`ItemInspectorDrawer.tsx:139-145`); Pantry reads a distinct key (`PantryPage.tsx:255-264`). Its drawer lifecycle/quantity actions follow the same invalidation pattern.
+Inference: edits made from Pantry may leave its tiles/count stale until another refetch. A runtime observation is needed before calling this confirmed user-visible failure.
+Original photos are intentionally retained through C (`docs/ROADMAP.md:44`); their readability still needs checking without requiring D's cut-out pipeline.
+Restore explicitly remains in D by owner choice (`docs/ROADMAP.md:95`).
+
+(c) MISSED OPTION: Accept a documented small-shelf trial envelope rather than adding more features: original photos, independent packs, explicit correction/undo checks, and no bulk expansion before D's restore proof. I checked C's end condition and D's restore boundary (`docs/ROADMAP.md:48,54,95`); this respects both.
+
+(d) RISKIEST UNVERIFIED PREMISE: The owner can change stock in the drawer and immediately trust the Pantry display.
+Settling read-only observation: inspect existing integration-test evidence for edit/decrement/gone/put-back from Pantry's drawer and the resulting tile/count state. No such execution evidence was supplied or run here.
+
+G3: Whole-Approach Check
+- Opinion: the approach is sound if it stays a thin, styled capture-to-correction journey. It becomes unsound if “everything before trial” expands into an unbounded all-screen redesign.
+- Define trial success as correcting missing/wrong stock after ordinary use, not screenshots or initial loading alone; that is the actual stage end condition (`docs/ROADMAP.md:48`).
+- SG-304 must preserve the option to create another physical pack. Same name is not reliable product identity (`docs/ROADMAP.md:44`); an “update existing” offer must not silently merge quantities or overwrite a different pack's date.
+- Keep accessibility evidence state-specific: light/dark contrast, the 13 px floor, errors, empty states and selected-state distinctions. SG-302 left the tile-error contrast pair unrendered (`docs/worklogs/SG-302_audit.md:18`); do not call that pair proven.
+- Objection/risk, not a reopened decision: real-data use precedes a proven restore. Honor the owner's D placement, disclose the exposure, and keep C's trial small; export existence is not restore evidence (`docs/ROADMAP.md:54,95`).
+- No objection to the binding font package, design direction, rotation or separate immediate riders. No recommendation here authorizes host or owner-data operations.
+- Verification was source/document inspection only: no tests, browser, host commands, network, database access, restart, writes, commit or push. No invented gate PASS or publication claim; the engine handles this final report.
+
+Read the root rules, context pack, named evidence/source files and listed extras; deliberately did not use STATE.md, decisions, SG-301/SG-303 packets or other review files. I wrote nothing.
