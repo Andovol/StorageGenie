@@ -46,7 +46,8 @@ const REASON_LABELS: Record<string, string> = {
 
 function tierLabel(tier: string | null): string {
   if (!tier) return "No tier";
-  return TIER_LABELS[tier] ?? tier;
+  if (TIER_LABELS[tier]) return TIER_LABELS[tier];
+  return tier.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
 }
 
 function daysLabel(days: number): string {
@@ -68,8 +69,7 @@ type ExpiryRowItem = {
 function ExpiryRow({ row, householdId, detail }: { row: ExpiryRowItem; householdId: string; detail: ReactNode }) {
   return (
     <div
-      className="bg-card border-border"
-      style={{ display: "flex", flexWrap: "wrap", gap: 12, alignItems: "center", padding: 12, borderStyle: "solid", borderWidth: 1, borderRadius: 8 }}
+      style={{ display: "flex", flexWrap: "wrap", gap: 12, alignItems: "center", padding: 12, backgroundColor: "hsl(var(--paper))", color: "hsl(var(--ink))", borderStyle: "solid", borderWidth: 1, borderColor: "hsl(var(--line))", borderRadius: 0 }}
     >
       <Link
         className="text-link focus-ring"
@@ -79,11 +79,10 @@ function ExpiryRow({ row, householdId, detail }: { row: ExpiryRowItem; household
         {row.display_name || "Untitled item"}
       </Link>
       {detail}
-      <span className="text-muted-foreground" style={{ fontSize: 13 }}>{daysLabel(row.days_remaining)}</span>
+      <span style={{ fontSize: 13, color: "hsl(var(--ink-muted))" }}>{daysLabel(row.days_remaining)}</span>
       <span
         data-testid="tier-pill"
-        className="bg-card-muted"
-        style={{ marginLeft: "auto", padding: "2px 8px", borderRadius: 999, fontSize: 12 }}
+        style={{ marginLeft: "auto", padding: "2px 8px", borderRadius: 0, fontSize: 13, backgroundColor: "hsl(var(--paper))", color: "hsl(var(--ink))", border: "1px solid hsl(var(--line))" }}
       >
         {tierLabel(row.tier)}
       </span>
@@ -118,7 +117,7 @@ export function ExpiryPage() {
   });
 
   const categories = taxonomy?.plugins.find((plugin) => plugin.plugin_id === "expiry-tracker")?.categories ?? [];
-  const categoryName = (slug: string) => categories.find((entry) => entry.id === slug)?.name ?? slug;
+  const categoryName = (slug: string) => categories.find((entry) => entry.id === slug)?.name ?? "Other";
 
   const data = status.data;
   const rows = data?.rows ?? [];
@@ -156,7 +155,7 @@ export function ExpiryPage() {
             <select
               aria-label="Shelf life filter"
               className={THEMED_CONTROL_CLASS}
-              style={CONTROL_STYLE}
+              style={{ ...CONTROL_STYLE, borderRadius: 0 }}
               value={category}
               onChange={(event) => setCategory(event.target.value)}
             >
@@ -168,16 +167,14 @@ export function ExpiryPage() {
           </label>
         </div>
       </div>
-      <p className="text-muted-foreground" style={{ fontSize: 13 }}>
-        Items are grouped by the accepted expiry date each one carries, in blueprint urgency order.
-        Filtering a category narrows the read on the server; the uncategorized count below comes from
-        the served analytics summary and is never merged into the expiry stream.
+      <p style={{ fontSize: 13, color: "hsl(var(--ink-muted))" }}>
+        Food and other dated things, soonest first.
       </p>
 
       <div style={{ marginTop: 20 }}>
         <h2 style={{ fontSize: 15 }}>Unread reminders ({unreadCount})</h2>
         {unreadReminders.length === 0 ? (
-          <div className="text-muted-foreground" style={{ fontSize: 12 }}>None</div>
+          <div className="text-muted-foreground" style={{ fontSize: 13 }}>None</div>
         ) : (
           <div style={{ display: "grid", gap: 8 }}>
             {unreadReminders.map((reminder) => (
@@ -187,16 +184,15 @@ export function ExpiryPage() {
                 householdId={effectiveHousehold}
                 detail={
                   <>
-                    <span className="text-muted-foreground" style={{ fontSize: 12 }}>
-                      Computed {reminder.as_of_day}
-                      {reminder.window_days !== null ? ` · ${reminder.window_days}-day window` : ""}
+                    <span style={{ fontSize: 13, color: "hsl(var(--ink-muted))" }}>
+                      Checked {reminder.as_of_day}
                     </span>
                     <div style={{ display: "flex", gap: 8 }}>
                       <button
                         type="button"
-                        aria-label={`Read reminder ${reminder.id}`}
+                        aria-label="Mark reminder read"
                         className={THEMED_CONTROL_CLASS}
-                        style={CONTROL_STYLE}
+                        style={{ ...CONTROL_STYLE, borderRadius: 0 }}
                         disabled={pendingReminder?.id === reminder.id}
                         onClick={() => void transitionReminder(reminder.id, "read")}
                       >
@@ -204,9 +200,9 @@ export function ExpiryPage() {
                       </button>
                       <button
                         type="button"
-                        aria-label={`Dismiss reminder ${reminder.id}`}
+                        aria-label="Dismiss reminder"
                         className={THEMED_CONTROL_CLASS}
-                        style={CONTROL_STYLE}
+                        style={{ ...CONTROL_STYLE, borderRadius: 0 }}
                         disabled={pendingReminder?.id === reminder.id}
                         onClick={() => void transitionReminder(reminder.id, "dismiss")}
                       >
@@ -220,7 +216,7 @@ export function ExpiryPage() {
           </div>
         )}
         {reminderError && (
-          <div role="alert" className="text-danger" style={{ marginTop: 8, fontSize: 12 }}>
+          <div role="alert" className="text-danger" style={{ marginTop: 8, fontSize: 13 }}>
             {reminderError}
           </div>
         )}
@@ -242,7 +238,7 @@ export function ExpiryPage() {
               <section key={section.bucket} aria-label={section.label} style={{ marginTop: 20 }}>
                 <h2 style={{ fontSize: 15 }}>{section.label} ({sectionRows.length})</h2>
                 {sectionRows.length === 0 ? (
-                  <div className="text-muted-foreground" style={{ fontSize: 12 }}>None</div>
+                  <div className="text-muted-foreground" style={{ fontSize: 13 }}>None</div>
                 ) : (
                   <div style={{ display: "grid", gap: 8 }}>
                     {sectionRows.map((row) => (
@@ -252,10 +248,10 @@ export function ExpiryPage() {
                         householdId={effectiveHousehold}
                         detail={
                           <>
-                            <span className="text-muted-foreground" style={{ fontSize: 12 }}>{categoryName(row.category)}</span>
+                            <span className="text-muted-foreground" style={{ fontSize: 13 }}>{categoryName(row.category)}</span>
                             <span style={{ fontSize: 13 }}>
                               {row.expiry_date}
-                              {row.date_type ? ` · ${DATE_TYPE_LABELS[row.date_type] ?? row.date_type}` : ""}
+                              {row.date_type ? ` · ${DATE_TYPE_LABELS[row.date_type] ?? "Date"}` : ""}
                             </span>
                           </>
                         }
@@ -275,23 +271,19 @@ export function ExpiryPage() {
               </div>
             )}
             {unresolved.length === 0 ? (
-              <div className="text-muted-foreground" style={{ fontSize: 12 }}>None</div>
+              <div className="text-muted-foreground" style={{ fontSize: 13 }}>None</div>
             ) : (
               <ul style={{ margin: 0, paddingLeft: 18 }}>
                 {unresolved.map((row) => (
-                  <li key={row.asset_id}>
-                    <Link
-                      className="text-link focus-ring"
-                      to={`/assets/${row.asset_id}?household_id=${effectiveHousehold}`}
-                      title={row.asset_id}
-                    >
-                      {REASON_LABELS[row.reason] ?? row.reason}
-                      {" · "}
-                      <span className="text-muted-foreground font-mono">
-                        #{row.asset_id.slice(-6)}
-                      </span>
-                    </Link>
-                  </li>
+                    <li key={row.asset_id}>
+                      <Link
+                        className="text-link focus-ring"
+                        to={`/assets/${row.asset_id}?household_id=${effectiveHousehold}`}
+                      >
+                        {REASON_LABELS[row.reason] ?? "Needs a date"}
+                        {" · Unnamed item"}
+                      </Link>
+                    </li>
                 ))}
               </ul>
             )}
@@ -303,7 +295,7 @@ export function ExpiryPage() {
         <section aria-label="Uncategorized" style={{ marginTop: 20 }}>
           <h2 style={{ fontSize: 15 }}>Uncategorized</h2>
           <div style={{ display: "flex", justifyContent: "space-between", gap: 16 }}>
-            <span>Items outside the expiry stream (no accepted classification)</span>
+            <span>Items without a shelf life</span>
             <strong>{summary.data.categories.uncategorized}</strong>
           </div>
         </section>

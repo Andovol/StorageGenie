@@ -74,10 +74,10 @@ export function enrichCapRefusal(
   capUsd: number = ENRICH_PER_PRESS_CAP_USD
 ): string | null {
   if (!Number.isFinite(projectedSpendUsd)) {
-    return "per_press_cap_unknown: spend is not a finite number — refusing to press";
+    return "Cannot check the last spend, so Enrich stays off.";
   }
   if (projectedSpendUsd > capUsd) {
-    return `per_press_cap_exceeded: last press cost $${projectedSpendUsd.toFixed(6)} exceeds cap $${capUsd.toFixed(2)}`;
+    return `Last spend $${projectedSpendUsd.toFixed(6)} is over the $${capUsd.toFixed(2)} cap, so Enrich stays off.`;
   }
   return null;
 }
@@ -108,15 +108,15 @@ export function EnrichButton({
         type="button"
         onClick={handleClick}
         className="bg-primary text-primary-foreground focus-ring"
-        style={{ padding: "6px 12px", borderRadius: 6, border: "none", cursor: "pointer" }}
+        style={{ padding: "6px 12px", borderRadius: 0, border: "none", cursor: "pointer" }}
       >
         Enrich
       </button>
-      <span className="text-muted-foreground" style={{ fontSize: 12 }}>
+      <span className="text-muted-foreground" style={{ fontSize: 13 }}>
         Last measured spend: {spendLabel} · per-press cap ${capUsd.toFixed(2)}
       </span>
       {refusal && (
-        <span role="alert" className="text-danger" style={{ fontSize: 12 }}>
+        <span role="alert" className="text-danger" style={{ fontSize: 13 }}>
           {refusal}
         </span>
       )}
@@ -167,7 +167,7 @@ export function LocationsSection({
                 type="button"
                 onClick={() => unassignMut.mutate(l.id)}
                 className="bg-card text-foreground border-border focus-ring"
-                style={{ padding: "2px 8px", borderRadius: 6, borderStyle: "solid", borderWidth: 1, cursor: "pointer", fontSize: 12 }}
+                style={{ padding: "2px 8px", borderRadius: 0, borderStyle: "solid", borderWidth: 1, cursor: "pointer", fontSize: 13 }}
               >
                 Remove
               </button>
@@ -182,7 +182,7 @@ export function LocationsSection({
           if (e.target.value) assignMut.mutate(e.target.value);
         }}
         className="bg-background text-foreground border-border focus-ring"
-        style={{ padding: 6, borderRadius: 6, borderStyle: "solid", borderWidth: 1, fontSize: 13, maxWidth: "100%" }}
+        style={{ padding: 6, borderRadius: 0, borderStyle: "solid", borderWidth: 1, fontSize: 13, maxWidth: "100%" }}
       >
         <option value="">Assign to location…</option>
         {available.map((l) => (
@@ -230,13 +230,13 @@ export function RelationsSection({
   const [relationType, setRelationType] = useState("related_to");
   if (isError || !rels) return null;
   const items = rels.items;
-  const nameById = new Map((assets?.items ?? []).map((a) => [a.id, a.display_name || a.id]));
+  const nameById = new Map((assets?.items ?? []).map((a) => [a.id, a.display_name || "Unnamed item"]));
   const otherId = (rel: AssetRelation) =>
     rel.direction === "outgoing" ? rel.to_asset_id : rel.from_asset_id;
   const options = (assets?.items ?? []).filter((a) => a.id !== asset.id);
   const selectStyle = {
     padding: 6,
-    borderRadius: 6,
+    borderRadius: 0,
     borderStyle: "solid" as const,
     borderWidth: 1,
     fontSize: 13,
@@ -251,15 +251,15 @@ export function RelationsSection({
         <ul style={{ fontSize: 13, paddingLeft: 18 }}>
           {items.map((rel) => (
             <li key={rel.id} style={{ marginBottom: 4 }}>
-              {nameById.get(otherId(rel)) ?? otherId(rel)}{" "}
-              <span className="text-muted-foreground">
-                ({rel.relation_type}, {rel.direction})
+              {nameById.get(otherId(rel)) ?? "Unnamed item"}{" "}
+              <span style={{ color: "hsl(var(--ink-muted))" }}>
+                ({rel.relation_type === "contains" ? "Contains" : "Related"})
               </span>{" "}
               <button
                 type="button"
                 onClick={() => deleteMut.mutate(rel.id)}
                 className="bg-card text-foreground border-border focus-ring"
-                style={{ padding: "2px 8px", borderRadius: 6, borderStyle: "solid", borderWidth: 1, cursor: "pointer", fontSize: 12 }}
+                style={{ padding: "2px 8px", borderRadius: 0, borderStyle: "solid", borderWidth: 1, cursor: "pointer", fontSize: 13 }}
               >
                 Remove
               </button>
@@ -277,7 +277,7 @@ export function RelationsSection({
         >
           <option value="">Select asset…</option>
           {options.map((a) => (
-            <option key={a.id} value={a.id}>{a.display_name || a.id}</option>
+            <option key={a.id} value={a.id}>{a.display_name || "Unnamed item"}</option>
           ))}
         </select>
         <select
@@ -287,15 +287,15 @@ export function RelationsSection({
           className="bg-background text-foreground border-border focus-ring"
           style={selectStyle}
         >
-          <option value="related_to">related_to</option>
-          <option value="contains">contains</option>
+          <option value="related_to">Related</option>
+          <option value="contains">Contains</option>
         </select>
         <button
           type="button"
           disabled={!toAssetId || createMut.isPending}
           onClick={() => createMut.mutate({ toAssetId, relationType })}
           className={`${toAssetId ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"} border-border focus-ring`}
-          style={{ padding: "6px 12px", borderRadius: 6, borderStyle: "solid", borderWidth: 1, cursor: "pointer" }}
+          style={{ padding: "6px 12px", borderRadius: 0, borderStyle: "solid", borderWidth: 1, cursor: "pointer" }}
         >
           {createMut.isPending ? "Linking..." : "Link"}
         </button>
@@ -307,6 +307,30 @@ export function RelationsSection({
 function valueRecord(value: unknown): Record<string, unknown> | null {
   if (!value || typeof value !== "object" || Array.isArray(value)) return null;
   return value as Record<string, unknown>;
+}
+
+function plainFieldLabel(fieldPath: string): string {
+  const lower = fieldPath.toLowerCase();
+  if (lower.includes("classification") || lower.includes("category_proposed")) return "Shelf life";
+  if (lower.includes("expiry_date") || lower.includes("expiry")) return "Expiry date";
+  if (lower.includes("gone")) return "Gone reason";
+  if (lower.includes("display_name")) return "Name";
+  if (lower.includes("quantity")) return "Amount";
+  if (lower.includes("condition")) return "Condition";
+  if (lower.includes("location")) return "Location";
+  return "Detail";
+}
+
+function plainSourceLabel(sourceType: string): string {
+  if (sourceType === "user") return "You";
+  if (sourceType === "deterministic") return "Rule";
+  if (sourceType === "extraction") return "Photo read";
+  if (sourceType.startsWith("web:")) return "Web";
+  return sourceType.replace(/[_.]+/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+}
+
+function plainActionLabel(action: string): string {
+  return action.replace(/[_.:]+/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
 }
 
 function latestActiveAssertion(assertions: Assertion[], fieldPath: string): Assertion | null {
@@ -554,13 +578,13 @@ export function AssetDetailPage() {
             setEditing((v) => !v);
           }}
           className="bg-card text-foreground border-border focus-ring"
-          style={{ padding: "6px 12px", borderRadius: 6, borderStyle: "solid", borderWidth: 1, cursor: "pointer" }}
+          style={{ padding: "6px 12px", borderRadius: 0, borderStyle: "solid", borderWidth: 1, cursor: "pointer" }}
         >
           {editing ? "Cancel" : "Edit"}
         </button>
       </div>
-      <div className="text-muted-foreground" style={{ marginBottom: 12, fontSize: 13 }}>
-        {asset.asset_type} · {isGone ? `Gone${goneLabel ? ` — ${goneLabel}` : ""}` : "Live"} · v{asset.version} · {asset.household_id.slice(0, 8)}
+      <div style={{ marginBottom: 13, fontSize: 13, color: "hsl(var(--ink-muted))" }}>
+        {isGone ? `Gone${goneLabel ? ` — ${goneLabel}` : ""}` : "Live"}
         {asset.quantity != null && <> · qty {asset.quantity} {asset.unit || ""}</>}
         {asset.condition && <> · {asset.condition}</>}
       </div>
@@ -584,7 +608,7 @@ export function AssetDetailPage() {
               value={effectiveCategory}
               onChange={(event) => setClassificationChoice(event.target.value)}
               className="bg-background text-foreground border-border focus-ring"
-              style={{ padding: 6, borderRadius: 6, borderStyle: "solid", borderWidth: 1, fontSize: 13, maxWidth: "100%" }}
+              style={{ padding: 6, borderRadius: 0, borderStyle: "solid", borderWidth: 1, fontSize: 13, maxWidth: "100%" }}
             >
               {effectiveCategory === "" && <option value="">Select a shelf life…</option>}
               {activeCategories.map((category) => (
@@ -596,7 +620,7 @@ export function AssetDetailPage() {
               onClick={saveClassification}
               disabled={!effectiveCategory || classifyMut.isPending}
               className="bg-primary text-primary-foreground focus-ring"
-              style={{ padding: "6px 12px", borderRadius: 6, border: "none", cursor: "pointer" }}
+              style={{ padding: "6px 12px", borderRadius: 0, border: "none", cursor: "pointer" }}
             >
               {classifyMut.isPending ? "Saving…" : "Save shelf life"}
             </button>
@@ -618,20 +642,20 @@ export function AssetDetailPage() {
           </div>
         )}
         {effectiveCategory === "documents_other" && (
-          <div className="text-muted-foreground" style={{ fontSize: 12, marginTop: 6 }}>
+          <div className="text-muted-foreground" style={{ fontSize: 13, marginTop: 6 }}>
             Documents/other: renewal or validity dates. Keepsakes, letters and photos belong under Non-perishable.
           </div>
         )}
         {effectiveCategory === "non_perishable" && (
-          <div className="text-muted-foreground" style={{ fontSize: 12, marginTop: 6 }}>
+          <div className="text-muted-foreground" style={{ fontSize: 13, marginTop: 6 }}>
             No date; no expiry reminder.
           </div>
         )}
         {classificationMessage && (
-          <div role="status" className="text-success" style={{ fontSize: 12, marginTop: 6 }}>{classificationMessage}</div>
+          <div role="status" className="text-success" style={{ fontSize: 13, marginTop: 6 }}>{classificationMessage}</div>
         )}
         {classificationError && (
-          <div role="alert" className="text-danger" style={{ fontSize: 12, marginTop: 6 }}>{classificationError}</div>
+          <div role="alert" className="text-danger" style={{ fontSize: 13, marginTop: 6 }}>{classificationError}</div>
         )}
       </section>
 
@@ -693,7 +717,7 @@ export function AssetDetailPage() {
               onClick={() => putBackMut.mutate()}
               disabled={putBackMut.isPending}
               className="bg-primary text-primary-foreground focus-ring"
-              style={{ padding: "6px 12px", borderRadius: 6, border: "none", cursor: "pointer" }}
+              style={{ padding: "6px 12px", borderRadius: 0, border: "none", cursor: "pointer" }}
             >
               {putBackMut.isPending ? "Putting back…" : "Put back"}
             </button>
@@ -727,16 +751,16 @@ export function AssetDetailPage() {
       <RelationsSection asset={asset} householdId={householdId} />
 
       {editing && (
-        <div className="bg-card-muted border-border" style={{ borderRadius: 8, padding: 12, marginBottom: 16, borderStyle: "solid", borderWidth: 1 }}>
+        <div className="bg-card-muted border-border" style={{ borderRadius: 0, padding: 12, marginBottom: 16, borderStyle: "solid", borderWidth: 1 }}>
           <div style={{ display: "grid", gridTemplateColumns: "110px 1fr", gap: 8, alignItems: "center" }}>
             <label htmlFor="edit-display-name" style={{ fontSize: 13 }}>Display name</label>
-            <input id="edit-display-name" value={editName} onChange={(e) => setEditName(e.target.value)} className="bg-background text-foreground border-border focus-ring" style={{ padding: 8, borderRadius: 6, borderStyle: "solid", borderWidth: 1 }} />
+            <input id="edit-display-name" value={editName} onChange={(e) => setEditName(e.target.value)} className="bg-background text-foreground border-border focus-ring" style={{ padding: 8, borderRadius: 0, borderStyle: "solid", borderWidth: 1 }} />
             <label htmlFor="edit-quantity" style={{ fontSize: 13 }}>Quantity</label>
-            <input id="edit-quantity" type="number" value={editQuantity} onChange={(e) => setEditQuantity(e.target.value)} className="bg-background text-foreground border-border focus-ring" style={{ padding: 8, borderRadius: 6, borderStyle: "solid", borderWidth: 1 }} />
+            <input id="edit-quantity" type="number" value={editQuantity} onChange={(e) => setEditQuantity(e.target.value)} className="bg-background text-foreground border-border focus-ring" style={{ padding: 8, borderRadius: 0, borderStyle: "solid", borderWidth: 1 }} />
             <label htmlFor="edit-unit" style={{ fontSize: 13 }}>Unit</label>
-            <input id="edit-unit" value={editUnit} onChange={(e) => setEditUnit(e.target.value)} className="bg-background text-foreground border-border focus-ring" style={{ padding: 8, borderRadius: 6, borderStyle: "solid", borderWidth: 1 }} />
+            <input id="edit-unit" value={editUnit} onChange={(e) => setEditUnit(e.target.value)} className="bg-background text-foreground border-border focus-ring" style={{ padding: 8, borderRadius: 0, borderStyle: "solid", borderWidth: 1 }} />
             <label htmlFor="edit-condition" style={{ fontSize: 13 }}>Condition</label>
-            <input id="edit-condition" value={editCondition} onChange={(e) => setEditCondition(e.target.value)} className="bg-background text-foreground border-border focus-ring" style={{ padding: 8, borderRadius: 6, borderStyle: "solid", borderWidth: 1 }} />
+            <input id="edit-condition" value={editCondition} onChange={(e) => setEditCondition(e.target.value)} className="bg-background text-foreground border-border focus-ring" style={{ padding: 8, borderRadius: 0, borderStyle: "solid", borderWidth: 1 }} />
           </div>
           <div style={{ display: "flex", gap: 8, alignItems: "center", marginTop: 10 }}>
             <button
@@ -749,11 +773,10 @@ export function AssetDetailPage() {
               }}
               disabled={patchMut.isPending || !editName.trim()}
               className="bg-primary text-primary-foreground focus-ring"
-              style={{ padding: "6px 12px", borderRadius: 6, border: "none", cursor: "pointer" }}
+              style={{ padding: "6px 12px", borderRadius: 0, border: "none", cursor: "pointer" }}
             >
               {patchMut.isPending ? "Saving..." : "Save"}
             </button>
-            <span className="text-muted-foreground" style={{ fontSize: 11 }}>Uses If-Match: {asset.version} for optimistic concurrency</span>
           </div>
         </div>
       )}
@@ -761,7 +784,7 @@ export function AssetDetailPage() {
       {error && <div className="text-danger" style={{ fontSize: 13, marginBottom: 12 }}>{error}</div>}
 
       {hasWindows && hasActiveDate && expiryAssertion?.review_state === "accepted" && (
-        <div className="text-muted-foreground" style={{ fontSize: 12, marginTop: 8 }}>
+        <div className="text-muted-foreground" style={{ fontSize: 13, marginTop: 8 }}>
           The date is kept when the category changes; check it still applies.
         </div>
       )}
@@ -786,20 +809,20 @@ export function AssetDetailPage() {
           onClick={() => attachMut.mutate()}
           disabled={attachMut.isPending || !attachFiles?.length}
           className={`${attachFiles?.length ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"} border-border focus-ring`}
-          style={{ padding: "6px 12px", borderRadius: 6, borderStyle: "solid", borderWidth: 1, cursor: "pointer" }}
+          style={{ padding: "6px 12px", borderRadius: 0, borderStyle: "solid", borderWidth: 1, cursor: "pointer" }}
         >
           {attachMut.isPending ? "Attaching..." : "Attach evidence"}
         </button>
       </div>
 
-      <h3 className="detail-heading">Assertions (provenance)</h3>
+      <h3 className="detail-heading">Details</h3>
       {assertions.length === 0 ? (
-        <div className="text-muted-foreground" style={{ fontSize: 13 }}>No assertions</div>
+        <div style={{ fontSize: 13, color: "hsl(var(--ink-muted))" }}>No details</div>
       ) : (
         <table className="detail-table" style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
           <thead>
             <tr>
-              <th className="border-border" style={{ textAlign: "left", borderBottomStyle: "solid", borderBottomWidth: 1, padding: 6 }}>Field</th>
+              <th className="border-border" style={{ textAlign: "left", borderBottomStyle: "solid", borderBottomWidth: 1, padding: 6 }}>Detail</th>
               <th className="border-border" style={{ textAlign: "left", borderBottomStyle: "solid", borderBottomWidth: 1, padding: 6 }}>Value</th>
               <th className="border-border" style={{ textAlign: "left", borderBottomStyle: "solid", borderBottomWidth: 1, padding: 6 }}>Source</th>
               <th className="border-border" style={{ textAlign: "left", borderBottomStyle: "solid", borderBottomWidth: 1, padding: 6 }}>State</th>
@@ -810,15 +833,15 @@ export function AssetDetailPage() {
           <tbody>
             {assertions.map((a) => (
               <tr key={a.id}>
-                <td className="border-border font-mono" style={{ padding: 6, borderBottomStyle: "solid", borderBottomWidth: 1, fontSize: 12 }}>{a.field_path}</td>
+                <td className="border-border" style={{ padding: 6, borderBottomStyle: "solid", borderBottomWidth: 1, fontSize: 13 }}>{plainFieldLabel(a.field_path)}</td>
                 <td className="border-border" style={{ padding: 6, borderBottomStyle: "solid", borderBottomWidth: 1 }}>{String(a.value ?? "")}</td>
-                <td className="border-border" style={{ padding: 6, borderBottomStyle: "solid", borderBottomWidth: 1 }}>{a.source_type}</td>
+                <td className="border-border" style={{ padding: 6, borderBottomStyle: "solid", borderBottomWidth: 1 }}>{plainSourceLabel(a.source_type)}</td>
                 <td className="border-border" style={{ padding: 6, borderBottomStyle: "solid", borderBottomWidth: 1 }}>
                   <ProvenanceBadge state={a.review_state} />
                 </td>
                 <td className="border-border" style={{ padding: 6, borderBottomStyle: "solid", borderBottomWidth: 1 }}>{a.confidence != null ? String(a.confidence) : "—"}</td>
-                <td className="border-border text-muted-foreground" style={{ padding: 6, borderBottomStyle: "solid", borderBottomWidth: 1, fontSize: 11 }}>
-                  {a.source_evidence_ids?.length ? a.source_evidence_ids.join(", ").slice(0, 40) : "—"}
+                <td className="border-border" style={{ padding: 6, borderBottomStyle: "solid", borderBottomWidth: 1, fontSize: 13, color: "hsl(var(--ink-muted))" }}>
+                  {a.source_evidence_ids?.length ? `${a.source_evidence_ids.length} attached` : "—"}
                 </td>
               </tr>
             ))}
@@ -826,14 +849,14 @@ export function AssetDetailPage() {
         </table>
       )}
 
-      <h3 className="detail-heading">Audit history</h3>
+      <h3 className="detail-heading">History</h3>
       {audits.length === 0 ? (
-        <div className="text-muted-foreground" style={{ fontSize: 13 }}>No audit events</div>
+        <div style={{ fontSize: 13, color: "hsl(var(--ink-muted))" }}>No history</div>
       ) : (
-        <ul style={{ fontSize: 12, paddingLeft: 18 }}>
+        <ul style={{ fontSize: 13, paddingLeft: 18 }}>
           {audits.map((e) => (
             <li key={e.id} style={{ marginBottom: 4 }}>
-              <span className="font-mono">{e.action}</span> by {e.actor} — {e.timestamp || ""}
+              {plainActionLabel(e.action)} — {e.timestamp || ""}
             </li>
           ))}
         </ul>

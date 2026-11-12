@@ -36,7 +36,6 @@ export function AppHeader({ loadedCount, searchValue, onSearchChange }: AppHeade
 
   return (
     <div
-      className="bg-card border-border"
       style={{
         display: "flex",
         flexWrap: "wrap",
@@ -46,17 +45,26 @@ export function AppHeader({ loadedCount, searchValue, onSearchChange }: AppHeade
         padding: "10px 24px",
         borderBottomStyle: "solid",
         borderBottomWidth: 1,
+        borderBottomColor: "hsl(var(--line))",
+        backgroundColor: "hsl(var(--paper))",
+        color: "hsl(var(--ink))",
       }}
     >
       {/* SG-105 G4: the global nav already carries the brand on this route;
           the Catalog header does not repeat it. */}
       <span
-        className="bg-card-muted text-muted-foreground"
         aria-label={`Total loaded items: ${loadedCount}`}
-        title="Items loaded on this page, not the household total"
-        style={{ fontSize: 12, padding: "2px 8px", borderRadius: 999 }}
+        title="Items shown on this page"
+        style={{
+          fontSize: 13,
+          padding: "2px 8px",
+          borderRadius: 0,
+          border: "1px solid hsl(var(--line))",
+          backgroundColor: "hsl(var(--paper))",
+          color: "hsl(var(--ink))",
+        }}
       >
-        Loaded: {loadedCount} {loadedCount === 1 ? "item" : "items"}
+        Showing: {loadedCount} {loadedCount === 1 ? "item" : "items"}
       </span>
 
       {/* center stays reserved: category pills live in the toolbar, not here */}
@@ -69,12 +77,15 @@ export function AppHeader({ loadedCount, searchValue, onSearchChange }: AppHeade
         placeholder="Search…"
         value={searchValue}
         onChange={(event) => onSearchChange(event.target.value)}
-        className="bg-background text-foreground border-border focus-ring"
+        className="focus-ring"
         style={{
           padding: "6px 10px",
-          borderRadius: 6,
+          borderRadius: 0,
           borderStyle: "solid",
           borderWidth: 1,
+          borderColor: "hsl(var(--line))",
+          backgroundColor: "hsl(var(--paper))",
+          color: "hsl(var(--ink))",
           flex: "1 1 180px",
           minWidth: 180,
           maxWidth: 420,
@@ -88,16 +99,18 @@ export function AppHeader({ loadedCount, searchValue, onSearchChange }: AppHeade
           event.preventDefault();
           setImportOpen(true);
         }}
-        className="bg-primary text-primary-foreground focus-ring"
+        className="focus-ring"
         style={{
           padding: "6px 12px",
-          borderRadius: 6,
+          borderRadius: 0,
           textDecoration: "none",
           fontWeight: 600,
           fontSize: 13,
           display: "inline-flex",
           alignItems: "center",
           gap: 6,
+          backgroundColor: "hsl(var(--ink))",
+          color: "hsl(var(--paper))",
         }}
       >
         <Upload size={16} aria-hidden="true" />

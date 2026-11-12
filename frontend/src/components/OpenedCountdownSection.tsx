@@ -68,16 +68,18 @@ function OpenedRow({
 
   return (
     <div
-      className="bg-card border-border"
       style={{
         display: "flex",
         flexWrap: "wrap",
         gap: 12,
         alignItems: "center",
         padding: 12,
+        backgroundColor: "hsl(var(--paper))",
+        color: "hsl(var(--ink))",
         borderStyle: "solid",
         borderWidth: 1,
-        borderRadius: 8,
+        borderColor: "hsl(var(--line))",
+        borderRadius: 0,
       }}
     >
       <Link
@@ -89,12 +91,12 @@ function OpenedRow({
       </Link>
       {row.opened_date === null ? (
         <>
-          <span className="text-muted-foreground" style={{ fontSize: 12 }}>No opened date yet</span>
+          <span className="text-muted-foreground" style={{ fontSize: 13 }}>No opened date yet</span>
           <input
             type="date"
             aria-label={`Opened date for ${name}`}
             className={THEMED_CONTROL_CLASS}
-            style={CONTROL_STYLE}
+            style={{ ...CONTROL_STYLE, borderRadius: 0 }}
             value={value}
             onChange={(event) => setValue(event.target.value)}
           />
@@ -102,7 +104,7 @@ function OpenedRow({
             type="button"
             aria-label={`Save opened date for ${name}`}
             className={THEMED_CONTROL_CLASS}
-            style={CONTROL_STYLE}
+            style={{ ...CONTROL_STYLE, borderRadius: 0 }}
             disabled={!value || saving}
             onClick={() => void save()}
           >
@@ -111,7 +113,7 @@ function OpenedRow({
         </>
       ) : (
         <>
-          <span className="text-muted-foreground" style={{ fontSize: 12 }}>Opened {row.opened_date}</span>
+          <span className="text-muted-foreground" style={{ fontSize: 13 }}>Opened {row.opened_date}</span>
           <span style={{ fontSize: 13 }}>
             {row.days_open} {row.days_open === 1 ? "day" : "days"} open
           </span>
@@ -122,7 +124,7 @@ function OpenedRow({
                 type="date"
                 aria-label={`Opened date for ${name}`}
                 className={THEMED_CONTROL_CLASS}
-                style={CONTROL_STYLE}
+                style={{ ...CONTROL_STYLE, borderRadius: 0 }}
                 value={value}
                 onChange={(event) => setValue(event.target.value)}
               />
@@ -130,7 +132,7 @@ function OpenedRow({
                 type="button"
                 aria-label={`Save opened date for ${name}`}
                 className={THEMED_CONTROL_CLASS}
-                style={CONTROL_STYLE}
+                style={{ ...CONTROL_STYLE, borderRadius: 0 }}
                 disabled={!value || saving || clearing}
                 onClick={() => void save()}
               >
@@ -142,7 +144,7 @@ function OpenedRow({
               type="button"
               aria-label={`Edit opened date for ${name}`}
               className={THEMED_CONTROL_CLASS}
-              style={CONTROL_STYLE}
+              style={{ ...CONTROL_STYLE, borderRadius: 0 }}
               disabled={clearing}
               onClick={() => {
                 setValue(row.opened_date ?? "");
@@ -156,7 +158,7 @@ function OpenedRow({
             type="button"
             aria-label={`Clear opened date for ${name}`}
             className={THEMED_CONTROL_CLASS}
-            style={CONTROL_STYLE}
+            style={{ ...CONTROL_STYLE, borderRadius: 0 }}
             disabled={saving || clearing}
             onClick={() => void clear()}
           >
@@ -167,12 +169,12 @@ function OpenedRow({
       <span
         data-testid="opened-window"
         className="bg-card-muted"
-        style={{ marginLeft: "auto", padding: "2px 8px", borderRadius: 999, fontSize: 12 }}
+        style={{ marginLeft: "auto", padding: "2px 8px", borderRadius: 0, fontSize: 13 }}
       >
         {windowText(row)}
       </span>
       {error && (
-        <div role="alert" className="text-danger" style={{ flexBasis: "100%", fontSize: 12 }}>
+        <div role="alert" className="text-danger" style={{ flexBasis: "100%", fontSize: 13 }}>
           {error}
         </div>
       )}
@@ -198,12 +200,12 @@ export function OpenedCountdownSection({ householdId }: { householdId: string })
       </p>
       {query.isLoading && <div>Loading opened countdown…</div>}
       {query.isError && (
-        <div role="alert" className="text-danger" style={{ fontSize: 12 }}>
+        <div role="alert" className="text-danger" style={{ fontSize: 13 }}>
           {String(query.error)}
         </div>
       )}
       {query.data && rows.length === 0 && (
-        <div role="status" className="text-muted-foreground" style={{ fontSize: 12 }}>
+        <div role="status" className="text-muted-foreground" style={{ fontSize: 13 }}>
           No cosmetics items to track.
         </div>
       )}

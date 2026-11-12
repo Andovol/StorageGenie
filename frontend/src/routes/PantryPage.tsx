@@ -190,7 +190,7 @@ function PantryTile({
         <span
           data-testid="pantry-expired"
           className="pantry-label"
-          style={{ fontSize: 11, fontWeight: 700, color: "hsl(var(--link))" }}
+          style={{ fontSize: 13, fontWeight: 700, color: "hsl(var(--link))" }}
         >
           EXPIRED
         </span>

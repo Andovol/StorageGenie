@@ -38,7 +38,6 @@ function Nav() {
   const {
     households,
     isError: householdsIsError,
-    error: householdsError,
     householdId,
   } = useHouseholdContext();
   const effectiveHousehold = householdId || households?.[0]?.id || "";
@@ -53,17 +52,20 @@ function Nav() {
   const showToggle = pathname !== "/";
   const showImport = pathname !== "/";
   const linkClass = (active: boolean): string =>
-    `${active ? "bg-primary text-primary-foreground" : "text-foreground"} focus-ring`;
+    `${active ? "bg-primary text-primary-foreground" : ""} focus-ring`;
   const linkStyle = (active: boolean): React.CSSProperties => ({
     padding: "6px 10px",
-    borderRadius: 6,
-    textDecoration: "none",
+    borderRadius: 0,
+    textDecoration: active ? "underline" : "none",
+    textUnderlineOffset: 3,
     fontSize: 13,
     fontWeight: active ? 600 : 400,
+    backgroundColor: active ? "hsl(var(--ink))" : "transparent",
+    color: active ? "hsl(var(--paper))" : "hsl(var(--ink))",
+    border: active ? "none" : "1px solid transparent",
   });
   return (
     <nav
-      className="bg-card border-border"
       style={{
         display: "flex",
         flexWrap: "wrap",
@@ -71,27 +73,33 @@ function Nav() {
         padding: "12px 24px",
         borderBottomStyle: "solid",
         borderBottomWidth: 1,
+        borderBottomColor: "hsl(var(--line))",
+        backgroundColor: "hsl(var(--paper))",
+        color: "hsl(var(--ink))",
         alignItems: "center",
       }}
     >
       <Link
         to="/"
-        className="text-foreground focus-ring"
-        style={{ fontWeight: 700, textDecoration: "none", marginRight: 16 }}
+        className="focus-ring"
+        style={{ fontWeight: 700, textDecoration: "none", marginRight: 16, color: "hsl(var(--ink))", fontSize: 20 }}
       >
         StorageGenie
       </Link>
       <button
         type="button"
-        className="nav-menu-toggle bg-card text-foreground border-border focus-ring"
+        className="focus-ring"
         aria-expanded={menuOpen}
         aria-controls="sg-nav-menu"
         onClick={() => setMenuOpen((open) => !open)}
         style={{
           padding: "6px 10px",
-          borderRadius: 6,
+          borderRadius: 0,
           borderStyle: "solid",
           borderWidth: 1,
+          borderColor: "hsl(var(--line))",
+          backgroundColor: "hsl(var(--paper))",
+          color: "hsl(var(--ink))",
           fontSize: 13,
           cursor: "pointer",
         }}
@@ -102,16 +110,16 @@ function Nav() {
         {NAV_DESTINATIONS.map((destination) => {
           const badgeCount = destination.to === "/inbox" ? openTaskCount : undefined;
           return (
-            <NavLink
-              key={destination.to}
-              to={destination.to}
-              end={destination.end}
-              aria-label={
-                badgeCount !== undefined ? `Inbox, ${badgeCount} open review tasks` : undefined
-              }
-              className={({ isActive }) => linkClass(isActive)}
-              style={({ isActive }) => linkStyle(isActive)}
-            >
+              <NavLink
+                key={destination.to}
+                to={destination.to}
+                end={destination.end}
+                aria-label={
+                  badgeCount !== undefined ? `Inbox, ${badgeCount} open review tasks` : undefined
+                }
+                className={({ isActive }) => linkClass(isActive)}
+                style={({ isActive }) => linkStyle(isActive)}
+              >
               {destination.label}
               {badgeCount !== undefined ? (
                 <span
@@ -120,10 +128,11 @@ function Nav() {
                   style={{
                     marginLeft: 6,
                     padding: "0 6px",
-                    borderRadius: 999,
+                    borderRadius: 0,
                     borderStyle: "solid",
                     borderWidth: 1,
-                    fontSize: 11,
+                    borderColor: "currentColor",
+                    fontSize: 13,
                   }}
                 >
                   {badgeCount}
@@ -135,8 +144,8 @@ function Nav() {
       </div>
       {showToggle ? <ThemeToggle /> : null}
       {householdsIsError ? (
-        <div role="alert" style={{ fontSize: 12 }}>
-          Could not load households: {String(householdsError)}
+        <div role="alert" style={{ fontSize: 13 }}>
+          Could not load households.
         </div>
       ) : null}
       {showImport ? (
@@ -146,25 +155,24 @@ function Nav() {
             event.preventDefault();
             setImportOpen(true);
           }}
-          className="bg-primary text-primary-foreground focus-ring"
+          className="focus-ring"
           style={{
             padding: "6px 12px",
-            borderRadius: 6,
+            borderRadius: 0,
             textDecoration: "none",
             fontWeight: 600,
             fontSize: 13,
             display: "inline-flex",
             alignItems: "center",
             gap: 6,
+            backgroundColor: "hsl(var(--ink))",
+            color: "hsl(var(--paper))",
           }}
         >
           <Upload size={16} aria-hidden="true" />
           Import Asset
         </Link>
       ) : null}
-      <span className="text-muted-foreground" style={{ marginLeft: "auto", fontSize: 11 }}>
-        Phase 0 · local-first
-      </span>
       {importOpen ? (
         <AssetImportModal householdId={effectiveHousehold} onClose={() => setImportOpen(false)} />
       ) : null}
