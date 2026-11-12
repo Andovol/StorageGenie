@@ -56,3 +56,5 @@ Verification: repository file inspection only; no tests, browser, network, host 
 I wrote nothing.
 Debug-Report-End
 moved=no
+
+Settings: coder=opencode coder_source=command model=openai/gpt-6.1-sol model_source=command effort=medium effort_source=command agent=plan agent_source=command
