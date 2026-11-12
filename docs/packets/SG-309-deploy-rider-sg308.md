@@ -52,7 +52,7 @@ docker version
 ## G1 — ONE build, ONE recreate
 
 - One `docker compose build backend`, rc 0. If cache-satisfied, compare the image's runtime tree against the worktree; do not assume. Report where `storagegenie-backend:latest` points before and after.
-- **The runtime diff** between the running image and the new one, over the whole served `/app` tree. **Derive the expected backend set yourself:** `git diff --name-only cdbae72..HEAD -- backend/ ':!backend/alembic'` — my expectation, labelled as such: **empty**. Then only `static/` (`index.html`, JS, CSS may stay identical) may differ. Any measured backend file outside the derived set is a STOP in S0. **To hash the new image's tree before the recreate, this command is authorised:** `docker run --rm --network none --entrypoint sh storagegenie-backend:latest -c 'cd /app && find . -type f -exec sha256sum {} +'` — no mounts, no env file, no port.
+- **The runtime diff** between the running image and the new one, over the whole served `/app` tree. **Derive the expected backend set yourself:** `git diff --name-only cdbae72..HEAD -- backend/ ':!backend/alembic'` — my expectation, labelled as such: **empty**. Then only `static/` may differ, and the JS bundle must (SG-308 changes frontend code). Any measured backend file outside the derived set is a STOP in S0. **To hash the new image's tree before the recreate, this command is authorised:** `docker run --rm --network none --entrypoint sh storagegenie-backend:latest -c 'cd /app && find . -type f -exec sha256sum {} +'` — no mounts, no env file, no port.
 - Alembic head unchanged before and after; **no migration command**.
 - One `docker compose up -d --no-deps --force-recreate backend`, rc 0. **Now S1.** New container id, image id, `Cmd`, restart count, health; the measured recreate-to-healthy seconds.
 - **Tag what now serves:** `storagegenie-backend:release-sg309` on the new image id. Absent → create; resolves to the same id → nothing; resolves elsewhere → do not touch it, report it. Never remove or move any tag; `release-sg303`, `release-sg299`, `release-sg296`, `release-sg295` and `recovery-sg270` stay.
@@ -71,7 +71,7 @@ From the **served container's own files**: the served JS contains the query key 
 
 - **A1** — Socket-first proven with the literal block; pre-state quoted; the rollback override names `release-sg303`; no rights probe.
 - **A2** — One build, one recreate, rc 0; no migration (head unchanged, alembic diff empty); container and image ids before and after.
-- **A3** — Runtime diff equals the derived set (derived list and my expectation both quoted); JS, CSS and `index.html` hashes and sizes quoted (changed or identical, either is allowed); served tree equals worktree.
+- **A3** — Runtime diff equals the derived set (derived list and my expectation both quoted); JS changed (SG-308 changes frontend code), CSS and `index.html` hashes and sizes quoted; served tree equals worktree.
 - **A4** — G2's strings quoted from the served artifact; the honest-limit sentence.
 - **A5** — Health and routes 200; census compared; startup log clean.
 - **A6** — `release-sg309` tag's branch stated; no tag removed or moved; the state reached (S0, S1, S1 with rollback, S2) named.
