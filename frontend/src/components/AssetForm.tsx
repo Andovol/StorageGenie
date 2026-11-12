@@ -1,5 +1,8 @@
 import { useCallback, useEffect, useState } from "react";
-import { apiPost, uploadEvidence } from "../api/client";
+import { Link } from "react-router-dom";
+import { apiGet, apiPost, uploadEvidence } from "../api/client";
+import type { Asset, AssetListResponse } from "../api/types";
+import { expiryDateFrom, formatUseByDate } from "../lib/labels";
 import { CONTROL_STYLE, THEMED_CONTROL_CLASS } from "./shell/CatalogToolbar";
 import { SERVER_CAP_LABEL } from "./shell/AssetImportModal";
 
@@ -9,6 +12,43 @@ type Props = {
 };
 
 type PreviewFile = { file: File; shaPreview: string | null };
+
+/** SG-304 G1: a live item the typed name matches, with its date when it has one. */
+type SamePack = { id: string; name: string; expiry: string | null };
+
+// Items in these states are not live; the list read already hides ARCHIVED.
+const NOT_LIVE_STATUSES = new Set(["ARCHIVED", "DISPOSED", "MERGED"]);
+
+/**
+ * SG-304 G1: live items whose name equals the typed name (trimmed, case-
+ * insensitive). Uses the existing list read (`q` = FTS on display_name) and the
+ * existing detail read for each match's date. Same name is NOT identity: this
+ * only offers the existing item; the caller decides.
+ */
+async function findSameNamePacks(householdId: string, name: string): Promise<SamePack[]> {
+  const wanted = name.trim().toLowerCase();
+  const list = await apiGet<AssetListResponse>("/v1/assets", {
+    household_id: householdId,
+    q: name.trim(),
+    limit: "100",
+  });
+  const matches = list.items.filter(
+    (item) =>
+      (item.display_name ?? "").trim().toLowerCase() === wanted && !NOT_LIVE_STATUSES.has(item.status)
+  );
+  return Promise.all(
+    matches.map(async (item) => {
+      let expiry: string | null = null;
+      try {
+        const detail = await apiGet<Asset>(`/v1/assets/${item.id}`, { household_id: householdId });
+        expiry = expiryDateFrom(detail.assertions);
+      } catch {
+        expiry = null;
+      }
+      return { id: item.id, name: item.display_name ?? name.trim(), expiry };
+    })
+  );
+}
 
 /**
  * SG-105 G2: the real `<input type="file">` stays in the DOM (and stays
@@ -45,6 +85,7 @@ export function AssetForm({ householdId, onCreated }: Props) {
   const [dragOver, setDragOver] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [samePacks, setSamePacks] = useState<SamePack[] | null>(null);
 
   const addFiles = useCallback(async (files: FileList | File[]) => {
     const arr = Array.from(files);
@@ -92,6 +133,30 @@ export function AssetForm({ householdId, onCreated }: Props) {
       setError("Household not selected");
       return;
     }
+    // SG-304 G1: a live item with the same name is offered before anything is
+    // uploaded or created. A failed lookup never blocks the create (today's path).
+    const typedName = displayName.trim();
+    if (typedName) {
+      setSubmitting(true);
+      setError(null);
+      let matches: SamePack[] = [];
+      try {
+        matches = await findSameNamePacks(householdId, typedName);
+      } catch {
+        matches = [];
+      }
+      setSubmitting(false);
+      if (matches.length > 0) {
+        setSamePacks(matches);
+        return;
+      }
+    }
+    await createItem();
+  }
+
+  async function createItem() {
+    if (!householdId) return;
+    setSamePacks(null);
     setSubmitting(true);
     setError(null);
     try {
@@ -236,6 +301,42 @@ export function AssetForm({ householdId, onCreated }: Props) {
         )}
       </div>
 
+      {samePacks && samePacks.length > 0 && (
+        <div role="status" data-testid="same-name-warning" className="bg-accent border-accent" style={{ padding: 10, borderStyle: "solid", borderWidth: 1, borderRadius: 6, fontSize: 13 }}>
+          {samePacks.length === 1 ? (
+            <div>
+              You already have <strong>{samePacks[0].name}</strong>
+              {samePacks[0].expiry ? ` (use by ${formatUseByDate(samePacks[0].expiry)}).` : " (no date set)."}
+            </div>
+          ) : (
+            <>
+              <div>You already have these:</div>
+              <ul style={{ margin: "6px 0", paddingLeft: 18 }}>
+                {samePacks.map((pack) => (
+                  <li key={pack.id}>
+                    <strong>{pack.name}</strong>
+                    {pack.expiry ? ` (use by ${formatUseByDate(pack.expiry)})` : " (no date set)"}{" "}
+                    <Link to={`/assets/${pack.id}?household_id=${householdId}`} className="text-link focus-ring">Open it</Link>
+                  </li>
+                ))}
+              </ul>
+            </>
+          )}
+          <div style={{ display: "flex", gap: 12, flexWrap: "wrap", marginTop: 8 }}>
+            <button type="button" onClick={() => void createItem()} disabled={submitting} className="text-link focus-ring" style={{ fontSize: 13 }}>
+              Add another pack
+            </button>
+            {samePacks.length === 1 && (
+              <Link to={`/assets/${samePacks[0].id}?household_id=${householdId}`} className="text-link focus-ring" style={{ fontSize: 13 }}>
+                Open it
+              </Link>
+            )}
+            <button type="button" onClick={() => setSamePacks(null)} disabled={submitting} className="text-link focus-ring" style={{ fontSize: 13 }}>
+              Cancel
+            </button>
+          </div>
+        </div>
+      )}
       {error && <div className="text-danger" style={{ fontSize: 13 }}>{error}</div>}
       <button type="submit" disabled={submitting} className="bg-primary text-primary-foreground focus-ring" style={{ padding: "10px 16px", borderRadius: 6, border: "none", cursor: submitting ? "not-allowed" : "pointer" }}>
         {submitting ? "Creating..." : "Create asset"}

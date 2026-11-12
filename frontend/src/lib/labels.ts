@@ -186,6 +186,42 @@ export function formatPlainDate(value: string | null | undefined): string {
   return `${when.getDate()} ${MONTH_LONG[when.getMonth()]} ${when.getFullYear()}`;
 }
 
+/**
+ * SG-304: "10 Jan 2027" from an ISO date-only string, read by its parts so no
+ * timezone shifts the day; "" when unreadable.
+ */
+export function formatUseByDate(value: string | null | undefined): string {
+  const match = /^(\d{4})-(\d{2})-(\d{2})/.exec(value ?? "");
+  if (!match) return "";
+  const month = Number(match[2]);
+  if (month < 1 || month > 12) return "";
+  return `${Number(match[3])} ${MONTH_SHORT[month - 1]} ${match[1]}`;
+}
+
+/**
+ * SG-304: the date an item carries, read from its expiry assertion(s) (the
+ * candidate-committed `expiry_date` or the plugin's `expiry_date`). Accepted
+ * rows win; superseded and rejected rows never count; null when none is dated.
+ */
+export function expiryDateFrom(
+  assertions: ReadonlyArray<{ field_path: string; value: unknown; review_state: string }> | null | undefined
+): string | null {
+  if (!assertions) return null;
+  const accepted: string[] = [];
+  const other: string[] = [];
+  for (const row of assertions) {
+    if (!row.field_path.endsWith("expiry_date")) continue;
+    if (row.review_state === "superseded" || row.review_state === "rejected") continue;
+    let value: unknown = row.value;
+    if (value && typeof value === "object" && !Array.isArray(value)) {
+      value = (value as Record<string, unknown>).expiry_date;
+    }
+    if (typeof value !== "string" || !value) continue;
+    (row.review_state === "accepted" ? accepted : other).push(value);
+  }
+  return accepted[0] ?? other[0] ?? null;
+}
+
 /** "12 Nov, 14:42", or "Today, 14:42" for the current local day; "" when unreadable. */
 export function formatJobDate(value: string | null | undefined, now: Date = new Date()): string {
   if (!value) return "";
