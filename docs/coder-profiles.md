@@ -25,6 +25,7 @@ Built from audits, one row per rated slice (owner, D25, 2026-11-07). Strengths a
 | SG-300 | haiku-5-5, high | build, screen design fixes + gate + DOM-proven shots | ~964 s (trigger file) | 92 | yes, finished under the 1300 s stop | none of its own beyond a self-inflicted shell hang; found the live-port API default unasked | packet (dark contrast) |
 | SG-302 | muse-1.3, xhigh | build, small screen fix + contrast table + DOM-proven shots | ~973 s (stamps) | 93 | yes, finished under the 1300 s stop | wrong version line echoed; a `/tmp` file left (self-reported); oversized FAIL log | packet (11 px label carried) |
 | SG-303 | haiku-5-5, high | deploy rider, live serve | 128 s | 95 | yes, S1 | unlisted probe container (disclosed); two `/tmp` attempts (refused); over-broad log grep exposed a household id to its own output | packet (probe unnamed) |
+| SG-308 | muse-1.3, xhigh | build, small behaviour fix + 5-path test + runtime DOM check | ~1450 s (stamps) | 84 | **no** — ran ≈150 s past the 1300 s hard stop, then published | model/effort inferred, not read; a covered screenshot | mixed (estimate ≈800 s too low) |
 
 ## Haiku 5.5 at `high` — profile
 

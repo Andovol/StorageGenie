@@ -109,7 +109,7 @@ Preflight **120 s**; `npm view` and `npm install` **300 s** together; host suite
 
 ## Budget — a stop rule
 
-The lane's `RUN_BUDGET_S` (2100 s) is the ceiling. **At 1300 s elapsed by your `date +%s` stamps, stop whatever you are doing, commit, write the report, publish.** **There is no optional goal.** Order: G0, G1, G2, G3, G4, G5, then G6 in the table's order. **Commit after each goal.** A stop leaves the rest `REMAINING`, never described as done. Expected ≈1050 s (`UNVERIFIED — my estimate`: SG-302, a two-line fix with a 16-pair table and 7 shots, took ≈973 s of which ≈511 s was scratch and shots; this is one install, copy on three screens, the header and 8 shots). Fit is settled by the run, not the estimate (SG-306).
+The lane's `RUN_BUDGET_S` (2100 s) is the ceiling. **At 1100 s elapsed by your `date +%s` stamps, stop whatever you are doing, commit, write the report, publish** — a hard line, not a target; SG-308 ran past its line and is rated down for it. **There is no optional goal.** Order: G0, G1, G2, G3, G4, G5, then G6 in the table's order. **Commit after each goal.** A stop leaves the rest `REMAINING`, never described as done. Expected ≈1050 s (`UNVERIFIED — my estimate`: SG-302, a two-line fix with a 16-pair table and 7 shots, took ≈973 s of which ≈511 s was scratch and shots; this is one install, copy on three screens, the header and 8 shots). Fit is settled by the run, not the estimate (SG-306); the scratch app and shots alone cost ≈500–600 s on this lane (SG-302, SG-308), so G6 may well end `REMAINING` — that is an honest outcome, an overrun is not.
 
 ## Report
 
