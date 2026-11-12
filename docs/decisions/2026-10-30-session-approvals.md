@@ -164,3 +164,7 @@ Read as: **D27** — SG-300 on Haiku 5.5 `high` fixes SG-273's audit findings I1
 **D29, 2026-11-10, verbatim:** *"Yes, close"*
 
 Read as: close this session; a fresh session writes and dispatches SG-302 (dark-mode accent contrast, empty-state link, dark shots) on Muse, then rider SG-303 on Haiku, then SG-301; D28 runs at that session's start.
+
+**D30, D31, 2026-11-12, verbatim:** *"D30 and D31 approved"*
+
+Read as: **D30** — adopt contract 0.59.0 (covering 0.58.1 and 0.58.2; D28's reading done): `.rules-cache` at `contract-v0.59.0`, `AGENTS.md` records 0.59.0, new packets record it; at L3 every consequential choice (🟡 or higher, or dropping, reordering or rescoping planned work) gets a blind second opinion before it is acted on; the reply wake counts from the end of the turn that waits. The lane's own contract copy is the desk's to update. **D31** — SG-301 serves Instrument Sans self-hosted through the `@fontsource-variable/instrument-sans` package at an exact pinned version; SG-301's packet authorises that one `npm install` and the `package.json` / `package-lock.json` change.
