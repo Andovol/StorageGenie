@@ -30,6 +30,7 @@ Built from audits, one row per rated slice (owner, D25, 2026-11-07). Strengths a
 | SG-301 run 1 | muse-1.3, xhigh | build, font package + copy on 3 screens + shared header | ~933 s (stamps) | unrated, retried | **yes**, stopped before the 1100 s line and reported G4–G6 `REMAINING` honestly | 26 old tests left failing on the branch (named, not updated); FAIL-on-base not run | packet (scope vs a 1100 s stop) |
 | SG-301r1 | muse-1.3, xhigh | retry: 26+11 old-test wording updates, FAIL on base, full gate | ~1031 s (stamps) | SG-301 rated 80 overall | yes — stopped before R3 rather than overrun; scratch removed before the report | said the 1200 s line was hit at ≈1031 s (it stopped early, mislabelled); found 11 reds run 1 missed | packet (shots did not fit) |
 | SG-311 | haiku-5-5, high | screenshots only, DOM-proven, design notes | (see report) | 96 | yes | none; a failed retake kept and labelled | — |
+| SG-310 | muse-1.3, xhigh | deploy rider, live serve | 243 s | 90 | yes, S1 | passed a criterion its own evidence contradicted (font content type) | coder |
 
 ## Haiku 5.5 at `high` — profile
 
