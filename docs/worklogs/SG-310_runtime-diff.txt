@@ -1,0 +1,10 @@
+running image sha256:62e616895158 vs new image sha256:969ce26419f9 (/app tree)
+old_files=4067 new_files=4069
+changed:
+./static/index.html  running=e5bfc84f5c9f  new=31ecda559fb6
+added: ./static/assets/index-NSe2tTq7.js new=c135e1d391a4
+added: ./static/assets/index-PyJpCP1_.css new=e1eca724a61c
+added: ./static/assets/instrument-sans-latin-ext-wght-normal-B5bTHO_g.woff2 new=c4fcfea41f2c
+added: ./static/assets/instrument-sans-latin-wght-normal-BbzFLZTg.woff2 new=2ee17598a98d
+removed: ./static/assets/index-BL66eLr6.js old=095f99df799a
+removed: ./static/assets/index-Dl7Tsxob.css old=95b25525e050
