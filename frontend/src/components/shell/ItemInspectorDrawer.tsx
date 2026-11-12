@@ -6,16 +6,17 @@ import type { Asset, Assertion, Evidence, GoneReason } from "../../api/types";
 import { goneReasonLabel } from "../../api/types";
 import { CONTROL_STYLE, THEMED_CONTROL_CLASS } from "./CatalogToolbar";
 import { useTaxonomy } from "../../hooks/useAssets";
-import { toProductCategory, UNTITLED_ASSET_NAME } from "../../types/product";
+import { UNTITLED_ASSET_NAME } from "../../types/product";
+import { labelAssetType } from "../../lib/labels";
 import { quantityLeftText } from "../../lib/quantityText";
 import { invalidateAssetViews } from "../../lib/invalidateAssetViews";
 
 type ViewerTab = "cutout" | "scene" | "source";
 
 const TABS: readonly { id: ViewerTab; label: string }[] = [
-  { id: "cutout", label: "Isolated Cutout" },
-  { id: "scene", label: "Scene / Context" },
-  { id: "source", label: "Source Photo" },
+  { id: "source", label: "Photo" },
+  { id: "cutout", label: "Cut-out" },
+  { id: "scene", label: "In a scene" },
 ];
 
 // SG-077: the panel's width/padding/scroll/stacking used to come from Tailwind
@@ -23,7 +24,8 @@ const TABS: readonly { id: ViewerTab; label: string }[] = [
 // fixed-position aside had no width and the 1/1 viewer well blew up to viewport
 // scale, pushing every field below the fold. Width is now an explicit pixel
 // cap the project's own CSS honors; the well is capped to stay inside it.
-const EMPTY_PANEL = "border-border bg-card";
+// SG-307 G2: paper ground, --line rules, square corners — the Pantry parity.
+const EMPTY_PANEL = "";
 const PANEL_MAX_WIDTH = 440;
 const VIEWER_MAX_SIZE = 260;
 
@@ -69,7 +71,7 @@ export function ItemInspectorDrawer({ asset, householdId, onClose }: ItemInspect
 
   const [tab, setTab] = useState<ViewerTab>("source");
   const [title, setTitle] = useState(asset.display_name ?? "");
-  const [category, setCategory] = useState(toProductCategory(asset.asset_type));
+  const [category, setCategory] = useState(labelAssetType(asset.asset_type));
   const [quantity, setQuantity] = useState(asset.quantity != null ? String(asset.quantity) : "");
   const [unit, setUnit] = useState(asset.unit ?? "");
   const [condition, setCondition] = useState(asset.condition ?? "");
@@ -106,9 +108,13 @@ export function ItemInspectorDrawer({ asset, householdId, onClose }: ItemInspect
 
   // Reset the editable fields when the record changes underneath us (e.g. after
   // a successful PATCH or when a different asset is selected without unmount).
+  // SG-307 G2: the field reads `asset.asset_type` (see :390 label); a food
+  // item whose food kind lives only in the expiry classification assertion
+  // still reads Uncategorized here — that sync needs a backend change, so the
+  // field is left reading asset_type, in plain words via labelAssetType.
   useEffect(() => {
     setTitle(current.display_name ?? "");
-    setCategory(toProductCategory(current.asset_type));
+    setCategory(labelAssetType(current.asset_type));
     setQuantity(current.quantity != null ? String(current.quantity) : "");
     setUnit(current.unit ?? "");
     setCondition(current.condition ?? "");
@@ -268,18 +274,19 @@ export function ItemInspectorDrawer({ asset, householdId, onClose }: ItemInspect
           padding: 24,
           overflowY: "auto",
           zIndex: 50,
-          borderLeft: "1px solid hsl(var(--border))",
+          borderLeft: "1px solid hsl(var(--line))",
+          backgroundColor: "hsl(var(--paper))",
+          color: "hsl(var(--ink))",
         }}
       >
-        <header style={{ display: "flex", alignItems: "flex-start", gap: 8, marginBottom: 16 }}>
+        <header style={{ display: "flex", alignItems: "flex-start", gap: 8, marginBottom: 16, borderBottom: "1px solid hsl(var(--line))", paddingBottom: 12 }}>
           <div style={{ flex: 1, minWidth: 0 }}>
-            <h2 data-testid="drawer-title" style={{ margin: 0, fontSize: 20 }}>{displayName}</h2>
+            <h2 data-testid="drawer-title" style={{ margin: 0, fontSize: 20, color: "hsl(var(--ink))" }}>{displayName}</h2>
             <span
               data-testid="drawer-category"
-              className="bg-card-muted text-muted-foreground font-mono"
-              style={{ display: "inline-block", marginTop: 6, fontSize: 11, padding: "2px 6px", borderRadius: 4 }}
+              style={{ display: "inline-block", marginTop: 6, fontSize: 13, padding: "2px 8px", borderRadius: 0, borderStyle: "solid", borderWidth: 1, borderColor: "hsl(var(--line))", backgroundColor: "hsl(var(--paper))", color: "hsl(var(--ink-muted))" }}
             >
-              {toProductCategory(current.asset_type)}
+              {labelAssetType(current.asset_type)}
             </span>
           </div>
           <button
@@ -287,14 +294,14 @@ export function ItemInspectorDrawer({ asset, householdId, onClose }: ItemInspect
             type="button"
             aria-label="Close inspector"
             onClick={close}
-            className="text-muted-foreground focus-ring"
-            style={{ background: "none", border: "none", cursor: "pointer", padding: 4, borderRadius: 4 }}
+            className="sg-paper-control focus-ring"
+            style={{ cursor: "pointer", padding: 4, borderRadius: 0, fontSize: 13 }}
           >
             <X size={18} aria-hidden="true" />
           </button>
         </header>
 
-        <div role="tablist" aria-label="Viewer" style={{ display: "flex", gap: 4, marginBottom: 12 }}>
+        <div role="tablist" aria-label="Viewer" style={{ display: "flex", gap: 0, marginBottom: 12 }}>
           {TABS.map((entry) => {
             const active = entry.id === tab;
             return (
@@ -304,15 +311,16 @@ export function ItemInspectorDrawer({ asset, householdId, onClose }: ItemInspect
                 type="button"
                 aria-selected={active}
                 onClick={() => setTab(entry.id)}
-                className={`${active ? "bg-primary text-primary-foreground" : "bg-card-muted text-muted-foreground"} border-border focus-ring`}
+                className="sg-paper-control focus-ring"
                 style={{
                   padding: "6px 10px",
-                  borderRadius: 6,
-                  borderStyle: "solid",
-                  borderWidth: 1,
+                  borderRadius: 0,
                   cursor: "pointer",
-                  fontSize: 12,
+                  fontSize: 13,
                   fontWeight: active ? 600 : 400,
+                  backgroundColor: active ? "hsl(var(--ink))" : "hsl(var(--paper))",
+                  color: active ? "hsl(var(--paper))" : "hsl(var(--ink))",
+                  marginLeft: entry.id === "source" ? 0 : -1,
                 }}
               >
                 {entry.label}
@@ -323,7 +331,7 @@ export function ItemInspectorDrawer({ asset, householdId, onClose }: ItemInspect
 
         <div
           data-testid="viewer-well"
-          className="bg-card-muted"
+          data-bbox-omitted="true"
           style={{
             position: "relative",
             aspectRatio: "1 / 1",
@@ -332,17 +340,19 @@ export function ItemInspectorDrawer({ asset, householdId, onClose }: ItemInspect
             maxHeight: VIEWER_MAX_SIZE,
             marginLeft: "auto",
             marginRight: "auto",
-            borderRadius: 8,
+            borderRadius: 0,
             overflow: "hidden",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
             marginBottom: 20,
+            backgroundColor: "hsl(var(--paper))",
+            border: "1px solid hsl(var(--line))",
           }}
         >
           {tab === "cutout" && (
-            <p data-testid="cutout-honest-state" className="text-muted-foreground" style={{ margin: 0, padding: 24, textAlign: "center", fontSize: 13 }}>
-              No isolated cutout exists yet. Cutouts arrive with the AI stages — nothing is being processed.
+            <p data-testid="cutout-honest-state" style={{ margin: 0, padding: 24, textAlign: "center", fontSize: 13, color: "hsl(var(--ink-muted))" }}>
+              No cut-out yet.
             </p>
           )}
           {tab === "scene" &&
@@ -354,8 +364,8 @@ export function ItemInspectorDrawer({ asset, householdId, onClose }: ItemInspect
                 style={{ width: "100%", height: "100%", objectFit: "contain" }}
               />
             ) : (
-              <p data-testid="scene-honest-state" className="text-muted-foreground" style={{ margin: 0, padding: 24, textAlign: "center", fontSize: 13 }}>
-                No context scene exists yet. Scene rendering arrives with the AI stages — nothing is being rendered.
+              <p data-testid="scene-honest-state" style={{ margin: 0, padding: 24, textAlign: "center", fontSize: 13, color: "hsl(var(--ink-muted))" }}>
+                No scene yet.
               </p>
             ))}
           {tab === "source" &&
@@ -367,64 +377,61 @@ export function ItemInspectorDrawer({ asset, householdId, onClose }: ItemInspect
                 style={{ width: "100%", height: "100%", objectFit: "contain" }}
               />
             ) : (
-              <p data-testid="source-empty" className="text-muted-foreground" style={{ margin: 0, padding: 24, textAlign: "center", fontSize: 13 }}>
-                No source photo is attached to this asset.
+              <p data-testid="source-empty" style={{ margin: 0, padding: 24, textAlign: "center", fontSize: 13, color: "hsl(var(--ink-muted))" }}>
+                No photo yet.
               </p>
             ))}
         </div>
-        <p className="text-muted-foreground" style={{ margin: "-14px 0 20px", fontSize: 11 }}>
-          Bounding-box overlay omitted: no bounding-box data exists for this asset yet — a decorative box is never drawn.
-        </p>
 
-        <section aria-labelledby="drawer-metadata-heading" style={{ marginBottom: 20 }}>
-          <h3 id="drawer-metadata-heading" style={{ fontSize: 14, marginBottom: 8 }}>Metadata</h3>
+        <section aria-labelledby="drawer-metadata-heading" style={{ marginBottom: 20, borderTop: "1px solid hsl(var(--line))", paddingTop: 12 }}>
+          <h3 id="drawer-metadata-heading" style={{ fontSize: 14, marginBottom: 8, color: "hsl(var(--ink))" }}>Metadata</h3>
           <div style={{ display: "grid", gridTemplateColumns: "110px 1fr", gap: 8, alignItems: "center" }}>
-            <label htmlFor="drawer-title-input" style={{ fontSize: 13 }}>Title</label>
+            <label htmlFor="drawer-title-input" style={{ fontSize: 13, color: "hsl(var(--ink))" }}>Title</label>
             <input
               id="drawer-title-input"
               value={title}
               onChange={(event) => setTitle(event.target.value)}
-              className="bg-background text-foreground border-border focus-ring"
-              style={{ padding: 8, borderRadius: 6, borderStyle: "solid", borderWidth: 1 }}
+              className="sg-paper-control focus-ring"
+              style={{ padding: 8, borderRadius: 0, fontSize: 13 }}
             />
-            <label htmlFor="drawer-category-input" style={{ fontSize: 13 }}>Kind of item</label>
+            <label htmlFor="drawer-category-input" style={{ fontSize: 13, color: "hsl(var(--ink))" }}>Kind of item</label>
             <input
               id="drawer-category-input"
               list="drawer-category-options"
               value={category}
               onChange={(event) => setCategory(event.target.value)}
-              className="bg-background text-foreground border-border focus-ring"
-              style={{ padding: 8, borderRadius: 6, borderStyle: "solid", borderWidth: 1 }}
+              className="sg-paper-control focus-ring"
+              style={{ padding: 8, borderRadius: 0, fontSize: 13 }}
             />
             <datalist id="drawer-category-options">
               {categoryOptions.map((value) => (
                 <option key={value} value={value} />
               ))}
             </datalist>
-            <label htmlFor="drawer-quantity-input" style={{ fontSize: 13 }}>Quantity</label>
+            <label htmlFor="drawer-quantity-input" style={{ fontSize: 13, color: "hsl(var(--ink))" }}>Quantity</label>
             <input
               id="drawer-quantity-input"
               type="number"
               value={quantity}
               onChange={(event) => setQuantity(event.target.value)}
-              className="bg-background text-foreground border-border focus-ring"
-              style={{ padding: 8, borderRadius: 6, borderStyle: "solid", borderWidth: 1 }}
+              className="sg-paper-control focus-ring"
+              style={{ padding: 8, borderRadius: 0, fontSize: 13 }}
             />
-            <label htmlFor="drawer-unit-input" style={{ fontSize: 13 }}>Unit</label>
+            <label htmlFor="drawer-unit-input" style={{ fontSize: 13, color: "hsl(var(--ink))" }}>Unit</label>
             <input
               id="drawer-unit-input"
               value={unit}
               onChange={(event) => setUnit(event.target.value)}
-              className="bg-background text-foreground border-border focus-ring"
-              style={{ padding: 8, borderRadius: 6, borderStyle: "solid", borderWidth: 1 }}
+              className="sg-paper-control focus-ring"
+              style={{ padding: 8, borderRadius: 0, fontSize: 13 }}
             />
-            <label htmlFor="drawer-condition-input" style={{ fontSize: 13 }}>Condition</label>
+            <label htmlFor="drawer-condition-input" style={{ fontSize: 13, color: "hsl(var(--ink))" }}>Condition</label>
             <input
               id="drawer-condition-input"
               value={condition}
               onChange={(event) => setCondition(event.target.value)}
-              className="bg-background text-foreground border-border focus-ring"
-              style={{ padding: 8, borderRadius: 6, borderStyle: "solid", borderWidth: 1 }}
+              className="sg-paper-control focus-ring"
+              style={{ padding: 8, borderRadius: 0, fontSize: 13 }}
             />
           </div>
           <div style={{ display: "flex", gap: 8, alignItems: "center", marginTop: 10 }}>
@@ -432,20 +439,20 @@ export function ItemInspectorDrawer({ asset, householdId, onClose }: ItemInspect
               type="button"
               onClick={save}
               disabled={patchMut.isPending || !title.trim()}
-              className="bg-primary text-primary-foreground focus-ring"
-              style={{ padding: "6px 12px", borderRadius: 6, border: "none", cursor: "pointer" }}
+              className="focus-ring"
+              style={{ padding: "6px 12px", borderRadius: 0, cursor: "pointer", fontSize: 13, backgroundColor: "hsl(var(--ink))", color: "hsl(var(--paper))", border: "none" }}
             >
               {patchMut.isPending ? "Saving..." : "Save changes"}
             </button>
-            <span className="text-muted-foreground" style={{ fontSize: 11 }}>
-              Uses If-Match: {current.version} for optimistic concurrency
+            <span style={{ fontSize: 13, color: "hsl(var(--ink-muted))" }}>
+              Version {current.version}
             </span>
           </div>
           {error && <div className="text-danger" style={{ fontSize: 13, marginTop: 8 }}>{error}</div>}
         </section>
 
-        <section aria-label="Amount left" style={{ marginBottom: 20 }}>
-          <h3 style={{ fontSize: 14, marginBottom: 8 }}>Amount left</h3>
+        <section aria-label="Amount left" style={{ marginBottom: 20, borderTop: "1px solid hsl(var(--line))", paddingTop: 12 }}>
+          <h3 style={{ fontSize: 14, marginBottom: 8, color: "hsl(var(--ink))" }}>Amount left</h3>
           {counted ? (
             <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
               <button
@@ -486,19 +493,19 @@ export function ItemInspectorDrawer({ asset, householdId, onClose }: ItemInspect
           {qtyError && <div role="alert" className="text-danger" style={{ fontSize: 13, marginTop: 6 }}>{qtyError}</div>}
         </section>
 
-        <section aria-label="Use it up" style={{ marginBottom: 20 }}>
-          <h3 style={{ fontSize: 14, marginBottom: 8 }}>Use it up</h3>
+        <section aria-label="Use it up" style={{ marginBottom: 20, borderTop: "1px solid hsl(var(--line))", paddingTop: 12 }}>
+          <h3 style={{ fontSize: 14, marginBottom: 8, color: "hsl(var(--ink))" }}>Use it up</h3>
           {isGone ? (
             <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
-              <span role="status" className="text-muted-foreground" style={{ fontSize: 13 }}>
+              <span role="status" style={{ fontSize: 13, color: "hsl(var(--ink-muted))" }}>
                 Gone{goneLabel ? ` — ${goneLabel.toLowerCase()}` : ""}
               </span>
               <button
                 type="button"
                 onClick={() => putBackMut.mutate()}
                 disabled={putBackMut.isPending}
-                className="bg-primary text-primary-foreground focus-ring"
-                style={{ padding: "6px 12px", borderRadius: 6, border: "none", cursor: "pointer" }}
+                className="focus-ring"
+                style={{ padding: "6px 12px", borderRadius: 0, cursor: "pointer", fontSize: 13, backgroundColor: "hsl(var(--ink))", color: "hsl(var(--paper))", border: "none" }}
               >
                 {putBackMut.isPending ? "Putting back…" : "Put back"}
               </button>
@@ -512,7 +519,7 @@ export function ItemInspectorDrawer({ asset, householdId, onClose }: ItemInspect
                   onClick={() => goneMut.mutate(reason)}
                   disabled={goneMut.isPending}
                   className={THEMED_CONTROL_CLASS}
-                  style={CONTROL_STYLE}
+                  style={{ ...CONTROL_STYLE, borderRadius: 0, fontSize: 13 }}
                 >
                   {goneReasonLabel(reason)}
                 </button>
@@ -523,39 +530,38 @@ export function ItemInspectorDrawer({ asset, householdId, onClose }: ItemInspect
           {goneError && <div role="alert" className="text-danger" style={{ fontSize: 13, marginTop: 6 }}>{goneError}</div>}
         </section>
 
-        <section aria-labelledby="drawer-observed-heading" style={{ marginBottom: 20 }}>
-          <h3 id="drawer-observed-heading" style={{ fontSize: 14, marginBottom: 8 }}>Observed (read-only)</h3>
-          <div style={{ display: "grid", gridTemplateColumns: "110px 1fr", gap: 8, fontSize: 13 }}>
-            <span className="text-muted-foreground">Colors</span>
+        <section aria-labelledby="drawer-observed-heading" style={{ marginBottom: 20, borderTop: "1px solid hsl(var(--line))", paddingTop: 12 }}>
+          <h3 id="drawer-observed-heading" style={{ fontSize: 14, marginBottom: 8, color: "hsl(var(--ink))" }}>Observed (read-only)</h3>
+          <div style={{ display: "grid", gridTemplateColumns: "110px 1fr", gap: 8, fontSize: 13, color: "hsl(var(--ink))" }}>
+            <span style={{ color: "hsl(var(--ink-muted))" }}>Colors</span>
             <span data-testid="drawer-colors">
-              {colors.length ? colors.join(", ") : "No observed color data for this asset."}
+              {colors.length ? colors.join(", ") : "No colours yet."}
             </span>
-            <span className="text-muted-foreground">Description</span>
+            <span style={{ color: "hsl(var(--ink-muted))" }}>Description</span>
             <span data-testid="drawer-description">
-              {descriptionValue ?? "No functional description assertion for this asset."}
+              {descriptionValue ?? "No description yet."}
             </span>
           </div>
-          <p className="text-muted-foreground" style={{ margin: "6px 0 0", fontSize: 11 }}>
-            Read-only rows: these fields have no schema home yet, so they are never editable here (D65).
+          <p style={{ margin: "6px 0 0", fontSize: 13, color: "hsl(var(--ink-muted))" }}>
+            These stay read-only here.
           </p>
         </section>
 
-        <section aria-labelledby="drawer-ai-heading" style={{ marginBottom: 20 }}>
-          <h3 id="drawer-ai-heading" style={{ fontSize: 14, marginBottom: 8 }}>AI actions</h3>
+        <section aria-labelledby="drawer-ai-heading" style={{ marginBottom: 20, borderTop: "1px solid hsl(var(--line))", paddingTop: 12 }}>
+          <h3 id="drawer-ai-heading" style={{ fontSize: 14, marginBottom: 8, color: "hsl(var(--ink))" }}>AI actions</h3>
           <div style={{ display: "flex", gap: 8 }}>
             <button
               type="button"
               onClick={showAiNotice}
-              className="bg-card-muted text-muted-foreground border-border focus-ring"
+              className="sg-paper-control focus-ring"
               style={{
                 display: "inline-flex",
                 alignItems: "center",
                 gap: 6,
                 padding: "6px 12px",
-                borderRadius: 6,
-                borderStyle: "solid",
-                borderWidth: 1,
+                borderRadius: 0,
                 cursor: "pointer",
+                fontSize: 13,
               }}
             >
               <ScanLine size={16} aria-hidden="true" />
@@ -564,15 +570,18 @@ export function ItemInspectorDrawer({ asset, householdId, onClose }: ItemInspect
             <button
               type="button"
               onClick={showAiNotice}
-              className="bg-primary text-primary-foreground focus-ring"
+              className="focus-ring"
               style={{
                 display: "inline-flex",
                 alignItems: "center",
                 gap: 6,
                 padding: "6px 12px",
-                borderRadius: 6,
-                border: "none",
+                borderRadius: 0,
                 cursor: "pointer",
+                fontSize: 13,
+                backgroundColor: "hsl(var(--ink))",
+                color: "hsl(var(--paper))",
+                border: "none",
               }}
             >
               <Sparkles size={16} aria-hidden="true" />
@@ -583,14 +592,13 @@ export function ItemInspectorDrawer({ asset, householdId, onClose }: ItemInspect
             <div
               data-testid="ai-notice"
               role="status"
-              className="bg-card-muted text-muted-foreground"
-              style={{ marginTop: 8, padding: "6px 10px", borderRadius: 6, fontSize: 12 }}
+              style={{ marginTop: 8, padding: "6px 10px", borderRadius: 0, fontSize: 13, backgroundColor: "hsl(var(--paper))", color: "hsl(var(--ink-muted))", border: "1px solid hsl(var(--line))" }}
             >
               {notice}
             </div>
           )}
-          <p className="text-muted-foreground" style={{ margin: "6px 0 0", fontSize: 11 }}>
-            No model or cost text is shown: with no provider backend a model/cost string would be fabricated.
+          <p style={{ margin: "6px 0 0", fontSize: 13, color: "hsl(var(--ink-muted))" }}>
+            No model or cost shown.
           </p>
         </section>
       </aside>

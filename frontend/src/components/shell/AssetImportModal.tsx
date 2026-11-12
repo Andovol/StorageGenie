@@ -177,18 +177,17 @@ export function AssetImportModal({ householdId, onClose }: AssetImportModalProps
         role="dialog"
         aria-modal="true"
         aria-label="Import assets"
-        className="bg-card text-foreground border-border"
         style={panelStyle}
       >
         <header style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12 }}>
-          <h2 style={{ margin: 0, fontSize: 18, flex: 1 }}>Import assets</h2>
+          <h2 style={{ margin: 0, fontSize: 18, flex: 1, color: "hsl(var(--ink))" }}>Import assets</h2>
           <button
             ref={closeRef}
             type="button"
             aria-label="Close import dialog"
             onClick={cancel}
-            className="text-muted-foreground focus-ring"
-            style={{ background: "none", border: "none", cursor: "pointer", padding: 4, borderRadius: 4 }}
+            className="sg-paper-control focus-ring"
+            style={{ cursor: "pointer", padding: 4, borderRadius: 0, fontSize: 13 }}
           >
             <X size={18} aria-hidden="true" />
           </button>
@@ -206,16 +205,18 @@ export function AssetImportModal({ householdId, onClose }: AssetImportModalProps
             setDragOver(false);
             if (event.dataTransfer.files?.length) addFiles(event.dataTransfer.files);
           }}
-          className={`${dragOver ? "border-primary" : "border-border"} bg-card-muted`}
           style={{
             borderStyle: "dashed",
             borderWidth: 2,
-            borderRadius: 8,
+            borderColor: "hsl(var(--line))",
+            borderRadius: 0,
             padding: 16,
             textAlign: "center",
+            backgroundColor: "hsl(var(--paper))",
+            color: "hsl(var(--ink))",
           }}
         >
-          <p className="text-muted-foreground" style={{ margin: "0 0 10px", fontSize: 13 }}>
+          <p style={{ margin: "0 0 10px", fontSize: 13, color: "hsl(var(--ink-muted))" }}>
             Drag &amp; drop photos here, choose files, or paste (Ctrl+V / ⌘V).
           </p>
           <input
@@ -223,12 +224,13 @@ export function AssetImportModal({ householdId, onClose }: AssetImportModalProps
             multiple
             aria-label="Choose image files"
             accept="image/png,image/jpeg,image/webp,image/tiff,image/heic,image/heif,application/pdf"
+            className="sg-paper-control"
             onChange={(event) => {
               if (event.target.files?.length) addFiles(event.target.files);
               event.target.value = "";
             }}
           />
-          <p data-testid="import-size-note" className="text-muted-foreground" style={{ margin: "10px 0 0", fontSize: 11 }}>
+          <p data-testid="import-size-note" style={{ margin: "10px 0 0", fontSize: 13, color: "hsl(var(--ink-muted))" }}>
             PNG, JPG, WebP, TIFF, HEIC or PDF, up to {SERVER_CAP_LABEL} per file.
           </p>
         </div>
@@ -238,7 +240,7 @@ export function AssetImportModal({ householdId, onClose }: AssetImportModalProps
             role="alert"
             data-testid="rejected-files"
             className="text-danger"
-            style={{ marginTop: 12, fontSize: 12 }}
+            style={{ marginTop: 12, fontSize: 13 }}
           >
             <strong>
               Skipped {rejected.length} file{rejected.length === 1 ? "" : "s"}:
@@ -261,7 +263,7 @@ export function AssetImportModal({ householdId, onClose }: AssetImportModalProps
           />
           Automatically detect items and isolate cutouts
         </label>
-        <p data-testid="auto-detect-help" className="text-muted-foreground" style={{ margin: "4px 0 0 24px", fontSize: 11 }}>
+        <p data-testid="auto-detect-help" style={{ margin: "4px 0 0 24px", fontSize: 13, color: "hsl(var(--ink-muted))" }}>
           {autoDetect
             ? "Checked: the import job is created and run immediately."
             : "Unchecked: the job is created but not run — it waits in the Inbox until you run it there."}
@@ -335,8 +337,8 @@ export function AssetImportModal({ householdId, onClose }: AssetImportModalProps
           <button
             type="button"
             onClick={cancel}
-            className="bg-card text-foreground border-border focus-ring"
-            style={{ padding: "6px 12px", borderRadius: 6, borderStyle: "solid", borderWidth: 1, cursor: "pointer" }}
+            className="sg-paper-control focus-ring"
+            style={{ padding: "6px 12px", borderRadius: 0, cursor: "pointer", fontSize: 13 }}
           >
             Cancel
           </button>
@@ -345,15 +347,18 @@ export function AssetImportModal({ householdId, onClose }: AssetImportModalProps
             onClick={process}
             disabled={staged.length === 0 || processing}
             aria-busy={processing}
-            className="bg-primary text-primary-foreground focus-ring"
+            className="focus-ring"
             style={{
               padding: "6px 12px",
-              borderRadius: 6,
+              borderRadius: 0,
               border: "none",
               cursor: staged.length === 0 || processing ? "not-allowed" : "pointer",
               display: "inline-flex",
               alignItems: "center",
               gap: 6,
+              fontSize: 13,
+              backgroundColor: "hsl(var(--ink))",
+              color: "hsl(var(--paper))",
             }}
           >
             {processing ? (
