@@ -1,0 +1,58 @@
+Dispatch-ID: SG-306 | Report: note
+Debug-Report-Begin
+SG-306: Critique complete. Most serious objection: P1 exposes stock-changing drawer actions before their Pantry refresh is proven; “informal first look” does not itself bound that risk.
+Model / reasoning effort: unknown (process arguments and provider metadata unavailable within permitted repository-only reads).
+Working directory: `/tmp/dispatch-review.mB6tSQ`; repository: `Andovol/StorageGenie` (AGENTS declaration, not remote verification).
+BASE REF requested: `origin/automation`.
+BASE resolved commit: unknown; this lane’s snapshot has no `.git`.
+WORK_HEAD: not applicable, read-only.
+**Contract version: 0.59.0** — **echo this line verbatim in your receipt.** It is the only proof that you
+read this file rather than assumed its contents.
+
+**Extra Files**
+- `.contract/CODER.md`: read in full for the explicitly binding §14 rules and identity/report requirements.
+- Source paths resolved from the screen names in the pick: `frontend/src/routes/InboxPage.tsx`, `frontend/src/routes/ExpiryPage.tsx`, `frontend/src/routes/AssetDetailPage.tsx`, `frontend/src/routes/CatalogPage.tsx`. Listed conservatively because G1 does not spell out these paths.
+- Attempted root `CODER.md`: absent, not a permission denial; Phase A’s extra-files list identified the actual contract path.
+- No other files read beyond G1’s named documents and source files. No directory listings or broad searches.
+
+**P1: Order**
+Strongest case against: deploying now creates an interval in which a successful drawer mutation can leave the visible stock unchanged.
+Evidence: `frontend/src/components/shell/ItemInspectorDrawer.tsx:139-210` has five success handlers invalidating only `assets` and `asset`; `frontend/src/routes/PantryPage.tsx:255-268` reads separate `pantry-assets` and `pantry-expiry` keys.
+The exposure is reachable, not hypothetical navigation: Pantry opens that drawer at `PantryPage.tsx:423-428`, and non-counted items explicitly offer “Edit” through it at `:223-225`.
+Inference, not runtime confirmation: a user can save an amount or mark an item gone while the tile/count remains stale, potentially prompting a repeated action. The mismatch is established; its exact visible duration and consequences are not.
+Counterweight: Pantry’s own tile decrement/use-up handlers and notice undo already invalidate Pantry keys (`PantryPage.tsx:123-140,286-294`). This is not evidence that every Pantry action fails.
+Unverified premise: the owner’s early look will remain observational, or some uninspected refetch mechanism makes the mismatch harmless.
+Settling observation: with Pantry mounted and no navigation, focus change or manual reload, perform drawer save, decrement, increment, gone and put-back; observe the resulting tiles, count and Use soon membership against served responses.
+Disposition, opinion: preserve the immediate rider rule (`AGENTS.md:25`), but do not present SG-303 as stock-workflow-ready. An early look is acceptable only as an explicitly non-mutating orientation with this defect disclosed; otherwise repair and prove the defect before inviting use.
+No objection to separate immediate riders or deferring formal acceptance until the remaining work: I checked the binding deploy rule and the stage’s household-use end condition quoted in `docs/reviews/2026-11-12-stage-c-remaining-plan-context.md:8,22-27`.
+
+**P2: Slicing**
+Strongest case against: the claimed model assignment conflicts with rotation once riders are counted.
+Evidence: `AGENTS.md:21` requires alternating builder slices; the context pack `:25` puts Muse after SG-303; Phase A explicitly says rotation includes riders (`docs/worklogs/SG-305_report.md:23`).
+Thus SG-303 Haiku → SG-301 Muse → its rider Haiku → SG-307 Muse, not SG-307 Haiku. No exemption for riders is supplied. Recompute assignments without swapping or inserting filler slices.
+
+The 1300-second fit is also unproven, not rescued merely by naming two screen groups.
+Evidence: the old estimate was already 1250 seconds against 1300 (`context pack:40`); the much narrower SG-302 took approximately 973 seconds, including approximately 511 seconds of scratch/proof work (`docs/worklogs/SG-302_audit.md:3,48`).
+That old estimate cannot be reused for the revised scope: catalog/drawer design was removed, but shared chrome and a five-handler behavioural correction were added.
+Shared chrome also has more qualifying defects than the quoted background: `App.tsx:123-126,138,165-166` includes 11/12-pixel text and developer wording; `AppHeader.tsx:53-59` has a 12-pixel rounded “Loaded” badge.
+The “no surface is worked twice” premise is too strong: SG-301 changes drawer behaviour before SG-307 redesigns it, and changes the catalog’s header before SG-307’s catalog pass. This need not be wrong, but the boundary must name what is finished.
+Unverified premise: the exact copy inventory, font-induced layout checks, shared-chrome proof states and real FAIL-then-PASS integration test all fit with meaningful headroom.
+Settling observation: before dispatch, enumerate changed components, existing affected test files and required rendered states; budget implementation and proof separately using measured phase costs. Completion time, not an estimate, ultimately settles fit.
+Disposition, opinion: isolate the refresh repair as the next small corrective slice with its own rider, rather than making correctness wait on font/copy/design completion. It crosses the proposed screen boundary anyway and requires behavioural proof rather than presentation evidence (`.contract/CODER.md:167-175`).
+That alternative is a scope/order recommendation, not authorization to add work: if the stage’s “nothing beyond” ceiling forbids another slice, explicitly reslice the already-approved work before dispatch.
+Keeping it inside SG-301 is defensible only with a bounded integration test covering all five success paths and a revised inventory demonstrating headroom. A bare invalidation-spy assertion would not settle visible consistency.
+
+**P3: Trial Envelope**
+Strongest case against: “one small shelf” limits volume, not the correctness of recovery or the quality of the eventual acceptance observation.
+Evidence: the stage ends after the owner checks the shelf again following ordinary use (`context pack:8`); P3 specifies entry checks but no explicit reconciliation outcome. Phase A calls for correction/undo checks and no bulk expansion before restore proof (`SG-305_report.md:63,70,73`).
+Restore remains unproven by the pick’s own disclosure. Opinion: disclosure is necessary but is not evidence that recovery works; do not describe a small trial as data-safe.
+The SG-304 safeguards are appropriate, but a packet requirement is not implementation evidence. Phase A explicitly left independent representation of different-date packs unsettled (`SG-305_report.md:28,33-34,71`).
+Unverified premise: duplicate-photo handling can offer both update-existing and create-another without silently dropping the new pack’s date or changing an unrelated pack.
+Settling observation: SG-304’s gate uses two same-name physical packs with distinct dates; exercises both choices; verifies quantities, dates and unrelated fields before/after, including cancel. No such execution evidence was read here.
+Disposition, opinion: retain the bounded envelope without pulling restore or photo processing into C, but make trial success explicit: reconcile displayed stock with the shelf after ordinary use, correct discrepancies, and demonstrate undo without cross-pack changes.
+No objection to verifying existing navigation rather than rebuilding it: the Pantry link and route are present at `frontend/src/App.tsx:20-23,182`. Real-photo legibility remains an owner observation, not established by these source reads.
+
+Verification: repository file inspection only; no tests, browser, network, host commands, Docker, credentials, database access or restart. No denial or STOP occurred; publication is engine-owned, not claimed here.
+I wrote nothing.
+Debug-Report-End
+moved=no
