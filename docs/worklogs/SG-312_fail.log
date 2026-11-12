@@ -1,0 +1,40 @@
+SG-312 G2 - FAIL on base
+Tree: origin/automation 80011d0d8503e17daf9781d3add4106059469d57 (the three new files only are added; no product file changed yet)
+Command (in frontend/): ./node_modules/.bin/vitest run src/theme/sg312-design.sg312.test.tsx src/lib/labels.sg312.test.ts src/routes/sg312-screens.sg312.test.tsx
+Result: Test Files 3 failed (3); Tests 26 failed | 1 passed (27)
+Names and first assertion only:
+
+src/lib/labels.sg312.test.ts
+- FAIL step names: the five backend steps read as sentence-case owner words -> TypeError: labelStepName is not a function
+- FAIL step names: no backend step keeps an uppercase word or an underscore -> TypeError: labelStepName is not a function
+- FAIL step names: an unmapped step reads as sentence case, never raw -> TypeError: labelStepName is not a function
+- FAIL job date: a past date reads day, short month and time -> TypeError: formatJobDate is not a function
+- FAIL job date: a date from today reads Today and time -> TypeError: formatJobDate is not a function
+- FAIL job date: an empty or unreadable date reads nothing -> TypeError: formatJobDate is not a function
+- FAIL expiry state: accepted reads Date confirmed -> TypeError: labelExpiryState is not a function
+- FAIL expiry state: proposed reads Date to confirm -> TypeError: labelExpiryState is not a function
+- FAIL expiry state: needs_evidence reads Needs a date -> TypeError: labelExpiryState is not a function
+- FAIL expiry state: No date stays No date -> TypeError: labelExpiryState is not a function
+
+src/theme/sg312-design.sg312.test.tsx
+- FAIL paper ground: the body paints --paper -> AssertionError: expected ':root {...' to match /body\s*\{[^}]*background-color:\s*hsl\(var\(--paper\)\)/
+- FAIL paper ground: the body no longer paints --background -> AssertionError: expected ':root {...' not to match /body ... --background/   (base body paints --background at tokens.css:88-89)
+- FAIL paper ground: the app shell wrapper paints --paper inline -> AssertionError: expected 'min-height: 100vh;' to contain 'var(--paper)'
+- FAIL one font: tokens.css sets font: inherit on button, input, select and textarea -> AssertionError: expected ':root {...' to match /button,\s*input,\s*select,\s*textarea.../
+- FAIL one font: a rendered button is matched by that inherit-font rule -> AssertionError: expected undefined not to be undefined
+- FAIL Menu: the Menu button carries the nav-menu-toggle class -> Error: expect(element).toHaveClass("nav-menu-toggle")
+- PASS Menu: tokens.css hides nav-menu-toggle at every width by default (the rule already exists at tokens.css:276-278; kept as a guard, not a fix)
+
+src/routes/sg312-screens.sg312.test.tsx
+- FAIL Inbox: the job card shows the date as 5 Mar, 14:42 -> TestingLibraryElementError: Unable to find an element with the text: 5 Mar, 14:42
+- FAIL Inbox: the selected job lists its steps as Checking the file, Saving -> TestingLibraryElementError: Unable to find an element with the text: Checking the file
+- FAIL Inbox: review rows name the item -> TestingLibraryElementError: Unable to find an element with the text: Oat milk
+- FAIL JobCard: renders the formatted date from created_at -> TestingLibraryElementError: Unable to find an element with the text: 5 Mar, 14:42
+- FAIL Expiry tiers: critical reads Use first, urgent reads Use soon, no pill for no tier -> TestingLibraryElementError: Unable to find an element with the text: Use first
+- FAIL Expiry tiers: the tier word sits beside the date -> TestingLibraryElementError: Unable to find an element with the text: Use first
+- FAIL Asset page: the header reads 500 ml left, not qty -> TestingLibraryElementError: Unable to find an element with the text: Live · 500 ml left
+- FAIL Asset page: the Enrich line reads Enrich costs up to $0.05 a press -> TestingLibraryElementError: Unable to find an element with the text: Enrich costs up to $0.05 a press
+- FAIL Asset page: EnrichButton alone renders the plain line -> TestingLibraryElementError: Unable to find an element with the text: Enrich costs up to $0.05 a press
+- FAIL Asset page: the Manual expiry card reads Needs a date, sits on paper -> TestingLibraryElementError: Unable to find an element with the text: Needs a date
+
+Raw verbose output: output/SG-312-scratch/fail-raw.txt (scratch, removed before the report).
