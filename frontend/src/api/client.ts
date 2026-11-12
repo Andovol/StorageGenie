@@ -233,7 +233,8 @@ export function candidateDecision(
   candidateId: string,
   householdId: string,
   action: "accept" | "edit" | "hold" | "reject",
-  correctedFields: Record<string, unknown> = {}
+  correctedFields: Record<string, unknown> = {},
+  options: { asNewPack?: boolean } = {}
 ) {
   return apiPost<{
     candidate_id?: string;
@@ -244,7 +245,12 @@ export function candidateDecision(
     created?: boolean;
   }>(
     `/v1/candidates/${candidateId}/decision`,
-    { action, corrected_fields: correctedFields },
+    // SG-304 G2: `as_new_pack` rides only when asked; the default body is unchanged.
+    {
+      action,
+      corrected_fields: correctedFields,
+      ...(options.asNewPack ? { as_new_pack: true } : {}),
+    },
     { household_id: householdId }
   );
 }

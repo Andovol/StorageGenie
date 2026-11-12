@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import type { Candidate, CandidateField, DedupMatch } from "../api/types";
+import { formatUseByDate } from "../lib/labels";
 import { WebAlternates } from "./WebAlternates";
 import { CONTROL_STYLE, THEMED_CONTROL_CLASS } from "./shell/CatalogToolbar";
 
@@ -16,9 +17,18 @@ function fieldInfo(raw: CandidateField) {
   return { value: raw, confidence: null, source: "deterministic" };
 }
 
+/** SG-304 G2: the existing item a duplicate photo matches, by name and date. */
+export type DuplicateOf = { name: string; expiry: string | null };
+
+/** SG-304 G2: "This photo matches Olive Oil (use by 10 Jan 2027)." Never an id. */
+function duplicateLine(duplicateOf: DuplicateOf | null): string {
+  if (!duplicateOf || !duplicateOf.name) return "This photo matches an item you already have.";
+  const when = duplicateOf.expiry ? ` (use by ${formatUseByDate(duplicateOf.expiry)})` : " (no date set)";
+  return `This photo matches ${duplicateOf.name}${when}.`;
+}
+
 function matchLabel(match: DedupMatch) {
   if (match.type === "identifier_collision") return `Identifier collision: ${match.identifier || "unknown identifier"}`;
-  if (match.type === "duplicate_of_asset") return `Exact duplicate of asset ${match.asset_id || "unknown"}`;
   if (match.type === "similar") return `Similar to asset ${match.asset_id || "unknown"}${match.distance != null ? ` (distance ${match.distance})` : ""}`;
   return match.type;
 }
@@ -38,14 +48,20 @@ export function CandidateCard({
   splitItemCount = null,
   onSplit,
   splitBusy = false,
+  duplicateOf = null,
 }: {
   candidate: Candidate;
   householdId: string;
-  onDecision: (action: "accept" | "edit" | "hold" | "reject", correctedFields?: Record<string, unknown>) => void;
+  onDecision: (
+    action: "accept" | "edit" | "hold" | "reject",
+    correctedFields?: Record<string, unknown>,
+    options?: { asNewPack?: boolean }
+  ) => void;
   busy?: boolean;
   splitItemCount?: number | null;
   onSplit?: () => void;
   splitBusy?: boolean;
+  duplicateOf?: DuplicateOf | null;
 }) {
   const [values, setValues] = useState<Record<string, unknown>>(() => {
     const initial: Record<string, unknown> = {};
@@ -54,6 +70,9 @@ export function CandidateCard({
   });
   const blockingTaskIds = candidate.blocking_review_task_ids;
   const blocked = blockingTaskIds.length > 0;
+  // SG-304 G2: on a duplicate photo the three choices replace Accept and Hold.
+  const firstDuplicateIndex = candidate.dedup_matches.findIndex((match) => match.type === "duplicate_of_asset");
+  const isDuplicate = firstDuplicateIndex >= 0;
   const dateOnly = !blocked && candidate.review_task_ids.length > 0;
   const evidenceUrls = useMemo(() => {
     const base = import.meta.env.VITE_API_BASE || "http://localhost:8003";
@@ -70,7 +89,22 @@ export function CandidateCard({
       {candidate.dedup_matches.length > 0 && (
         <div role="alert" className="bg-accent border-accent" style={{ marginTop: 14, padding: 10, borderStyle: "solid", borderWidth: 1, borderRadius: 6 }}>
           <strong>Possible duplicates or collisions</strong>
-          {candidate.dedup_matches.map((match, index) => <div key={`${match.type}-${index}`}>{matchLabel(match)}</div>)}
+          {candidate.dedup_matches.map((match, index) => match.type === "duplicate_of_asset"
+            ? (index === firstDuplicateIndex ? <div key={`${match.type}-${index}`}>{duplicateLine(duplicateOf)}</div> : null)
+            : <div key={`${match.type}-${index}`}>{matchLabel(match)}</div>)}
+          {isDuplicate && (
+            <div role="group" aria-label="Duplicate choices" style={{ display: "flex", gap: 8, flexWrap: "wrap", marginTop: 8 }}>
+              <button type="button" onClick={() => onDecision("accept", values, { asNewPack: true })} disabled={busy || blocked} className="bg-primary text-primary-foreground focus-ring" style={{ ...CONTROL_STYLE, border: "none", opacity: busy || blocked ? 0.5 : 1, cursor: busy || blocked ? "not-allowed" : "pointer" }}>
+                {"It's another pack"}
+              </button>
+              <button type="button" onClick={() => onDecision("accept", values)} disabled={busy || blocked} className={THEMED_CONTROL_CLASS} style={{ ...CONTROL_STYLE, opacity: busy || blocked ? 0.5 : 1, cursor: busy || blocked ? "not-allowed" : "pointer" }}>
+                {"It's the same pack"}
+              </button>
+              <button type="button" onClick={() => onDecision("hold")} disabled={busy} className={THEMED_CONTROL_CLASS} style={{ ...CONTROL_STYLE, opacity: busy ? 0.5 : 1, cursor: busy ? "not-allowed" : "pointer" }}>
+                Decide later
+              </button>
+            </div>
+          )}
           <div style={{ marginTop: 4 }}>This match is advisory; review it before accepting.</div>
         </div>
       )}
@@ -97,6 +131,7 @@ export function CandidateCard({
       </div>
       <WebAlternates alternates={candidate.web_alternates ?? []} />
       <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginTop: 18 }}>
+        {!isDuplicate && (
         <span title={blocked ? "Acceptance is blocked until open review tasks are resolved" : undefined}>
           <button
             type="button"
@@ -108,6 +143,7 @@ export function CandidateCard({
             Accept
           </button>
         </span>
+        )}
         <button
           type="button"
           onClick={() => onDecision("edit", values)}
@@ -117,6 +153,7 @@ export function CandidateCard({
         >
           Save edits
         </button>
+        {!isDuplicate && (
         <button
           type="button"
           onClick={() => onDecision("hold")}
@@ -126,6 +163,7 @@ export function CandidateCard({
         >
           Hold / Unknown
         </button>
+        )}
         <button
           type="button"
           onClick={() => onDecision("reject")}

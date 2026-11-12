@@ -1131,6 +1131,25 @@ def _resolve_or_move_duplicate_date_tasks(
             _move_date_task(db, task, target.id)
 
 
+def take_as_new_pack(candidate: Candidate) -> bool:
+    """SG-304 G2: decide a duplicate photo as another pack (its own new item).
+
+    Only a `duplicate_of_asset` proposal changes: it becomes a normal new-item
+    proposal (`kind` new_asset, no `asset_id`), so the commit creates an item from
+    the candidate's own fields and date. The existing item is never written here.
+    The choice is recorded on the proposal as `as_new_pack`. Returns whether it
+    applied; any other proposal is left as it is.
+    """
+    proposal = load_proposal(candidate)
+    if proposal.get("kind") != "duplicate_of_asset":
+        return False
+    proposal["kind"] = "new_asset"
+    proposal["asset_id"] = None
+    proposal["as_new_pack"] = True
+    candidate.proposed_fields_json = json.dumps(proposal, ensure_ascii=False)
+    return True
+
+
 def commit_candidate(db: Session, candidate: Candidate) -> dict[str, object]:
     if candidate.state not in {"accepted", "edited"}:
         raise CandidateBlockedError(f"candidate state {candidate.state} is not committable")

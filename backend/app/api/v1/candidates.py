@@ -16,6 +16,9 @@ router = APIRouter()
 class CandidateDecision(BaseModel):
     action: Literal["accept", "edit", "hold", "reject"]
     corrected_fields: dict[str, object] = Field(default_factory=dict)
+    # SG-304 G2: on a duplicate photo, "It's another pack" commits it as a new item
+    # with its own fields and date. The default (false) keeps duplicate_linked.
+    as_new_pack: bool = False
 
 
 class CandidateSplitRequest(BaseModel):
@@ -143,6 +146,10 @@ def decide_candidate(
 
     if candidates.blocking_review_task_ids(db, candidate):
         raise HTTPException(status_code=409, detail="Candidate has unresolved review tasks")
+
+    # SG-304 G2: "It's another pack" turns a duplicate proposal into a new item.
+    if payload.as_new_pack:
+        candidates.take_as_new_pack(candidate)
 
     if payload.action == "edit":
         proposal = candidates.load_proposal(candidate)
