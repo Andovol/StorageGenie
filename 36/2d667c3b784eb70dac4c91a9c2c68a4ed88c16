@@ -1,0 +1,15 @@
+Partial-Receipt-ID: SG-304r1
+utc=2026-11-12T21:01:26Z
+invocation=3e6de30e940e4d52842967a2b38c6077
+killed=idle
+idle_s=900
+pushed=0
+uncommitted=none
+wip=none
+wip_elapsed_ms=78
+wip_tracked=none
+wip_untracked=0 host_local
+DISPATCH_RESULT id=SG-304r1 coder=opencode exit=143 head=335e1c87bf2685e1c8ce56c3f0ca057952e33c40 note=no moved=no rewrite=no dirty=no elapsed=903s budget=2100s killed=idle idle_s=900
+P1_moved=FAIL count=0
+P2_rewrite=PASS behind=0
+P6_dirty=PASS dirty=no
