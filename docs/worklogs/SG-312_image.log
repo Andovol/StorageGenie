@@ -1,0 +1,96 @@
+docker build -f backend/Dockerfile -t storagegenie-backend:prover .
+#0 building with "default" instance using docker driver
+
+#1 [internal] load build definition from Dockerfile
+#1 transferring dockerfile: 1.06kB done
+#1 DONE 0.0s
+
+#2 [internal] load metadata for docker.io/library/node:20-alpine
+#2 DONE 0.0s
+
+#3 [internal] load metadata for docker.io/library/python:3.12.11-slim-bookworm@sha256:519591d6871b7bc437060736b9f7456b8731f1499a57e22e6c285135ae657bf7
+#3 DONE 0.8s
+
+#4 [internal] load .dockerignore
+#4 transferring context: 497B done
+#4 DONE 0.0s
+
+#5 [frontend-build 1/6] FROM docker.io/library/node:20-alpine@sha256:fb4cd12c85ee03686f6af5362a0b0d56d50c58a04632e6c0fb8363f609372293
+#5 resolve docker.io/library/node:20-alpine@sha256:fb4cd12c85ee03686f6af5362a0b0d56d50c58a04632e6c0fb8363f609372293 0.0s done
+#5 DONE 0.0s
+
+#6 [stage-1 1/9] FROM docker.io/library/python:3.12.11-slim-bookworm@sha256:519591d6871b7bc437060736b9f7456b8731f1499a57e22e6c285135ae657bf7
+#6 resolve docker.io/library/python:3.12.11-slim-bookworm@sha256:519591d6871b7bc437060736b9f7456b8731f1499a57e22e6c285135ae657bf7 0.0s done
+#6 DONE 0.0s
+
+#7 [internal] load build context
+#7 transferring context: 190.52MB 1.8s done
+#7 DONE 1.9s
+
+#8 [frontend-build 2/6] WORKDIR /ui
+#8 CACHED
+
+#9 [frontend-build 3/6] COPY frontend/package.json frontend/package-lock.json ./
+#9 CACHED
+
+#10 [frontend-build 4/6] RUN npm ci
+#10 CACHED
+
+#11 [frontend-build 5/6] COPY frontend/ ./
+#11 DONE 0.4s
+
+#12 [frontend-build 6/6] RUN npm run build
+#12 0.486 
+#12 0.486 > storagegenie-frontend@0.1.0 build
+#12 0.486 > tsc && vite build
+#12 0.486 
+#12 9.141 vite v5.4.21 building for production...
+#12 9.237 transforming...
+#12 12.75 ✓ 1973 modules transformed.
+#12 13.03 rendering chunks...
+#12 13.04 computing gzip size...
+#12 13.05 dist/index.html                                                     0.94 kB │ gzip:   0.48 kB
+#12 13.05 dist/assets/instrument-sans-latin-ext-wght-normal-B5bTHO_g.woff2   11.14 kB
+#12 13.05 dist/assets/instrument-sans-latin-wght-normal-BbzFLZTg.woff2       30.09 kB
+#12 13.05 dist/assets/index-D9KTmi-1.css                                      5.55 kB │ gzip:   1.74 kB
+#12 13.06 dist/assets/index-DmXb2Y62.js                                     360.29 kB │ gzip: 103.07 kB
+#12 13.06 ✓ built in 3.87s
+#12 DONE 13.2s
+
+#13 [stage-1 6/9] COPY backend/ ./
+#13 CACHED
+
+#14 [stage-1 7/9] RUN pip install --no-cache-dir "hatchling==1.32.0" "editables==0.6"
+#14 CACHED
+
+#15 [stage-1 2/9] WORKDIR /app
+#15 CACHED
+
+#16 [stage-1 3/9] RUN apt-get update && apt-get install -y --no-install-recommends curl tesseract-ocr libzbar0 && rm -rf /var/lib/apt/lists/*
+#16 CACHED
+
+#17 [stage-1 4/9] COPY backend/pyproject.toml backend/requirements.lock ./
+#17 CACHED
+
+#18 [stage-1 5/9] RUN pip install --no-cache-dir -r requirements.lock
+#18 CACHED
+
+#19 [stage-1 8/9] RUN pip install --no-cache-dir --no-build-isolation --no-deps -e .
+#19 CACHED
+
+#20 [stage-1 9/9] COPY --from=frontend-build /ui/dist ./static
+#20 DONE 0.0s
+
+#21 exporting to image
+#21 exporting layers 0.1s done
+#21 exporting manifest sha256:b3c10b4d386bf63cd77b8a74d9997471511b3c97c9d33f58a37b6387acade9d7 done
+#21 exporting config sha256:cbf14dfdb05de5d99b2082f06910e73b26f54a54123d7f9f94d14e90be7713fe done
+#21 exporting attestation manifest sha256:c119acfdd025f7d55f8113eea624b8db1c888389c8841ac9bc72c52726636adc done
+#21 exporting manifest list sha256:665caf31f27b3e88181563ea27a72c44f28da690fe65719db07290b4eba6c3b6 done
+#21 naming to docker.io/library/storagegenie-backend:prover
+#21 naming to docker.io/library/storagegenie-backend:prover done
+#21 unpacking to docker.io/library/storagegenie-backend:prover 0.0s done
+#21 DONE 0.1s
+docker run --rm --network none -e SG_IMAGE_PROOF=1 storagegenie-backend:prover python -m pytest -q -m requires_native_libs tests/test_signals.py
+..                                                                       [100%]
+2 passed, 6 deselected in 1.70s
