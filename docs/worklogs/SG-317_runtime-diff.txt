@@ -1,0 +1,21 @@
+SG-317 runtime diff: running image release-sg314 (sha256:91b0969e9e0b...) vs new build (sha256:1bdf6799b90c...)
+Method: docker run --rm --network none --entrypoint sh <image> -c 'cd /app && find . -type f -exec sha256sum {} +' on each image.
+Whole /app tree: 4069 files in each image.
+
+Derived backend set (git diff --name-only 614f61b..HEAD -- backend/ ':!backend/alembic'): EMPTY (expectation was empty: matched)
+Alembic diff (git diff --name-only 614f61b..HEAD -- backend/alembic): EMPTY
+Dependency diff (frontend/package.json, frontend/package-lock.json): EMPTY
+
+Added (2):
+  static/assets/index-C3KByf5V.js      sha256 12083486632f9b6d3521d129bf28f4bc2560c81d9fd7d75805556722cb1311e6  362710 B
+  static/assets/index-BGbwuPTO.css     sha256 90d6285326accc47e61b3073b951bb4e04234b582e495d2d8ec83c9144d6b6c0    6172 B
+Removed (2):
+  static/assets/index-DmXb2Y62.js      sha256 26ce556ea0880617bc3dda3346ed5111fec951c2d3194511858582fc0111021a  360473 B
+  static/assets/index-D9KTmi-1.css     sha256 4325c8ff607dd3a8a37f261c621c6c098b6a311c4524b4fc287186fdc6905978    5554 B
+Changed (1):
+  static/index.html                    OLD sha256 2f624e68167f12e74879dee24b27e74d8ee83732021de732a76b392ea5cd18d0  NEW sha256 5f02c9cef448686ecce27e8fd4d525a111ec9efa0dcf216209bbfa75a715f032  944 B (both)
+Unchanged, byte-identical (same name, same hash):
+  static/assets/instrument-sans-latin-ext-wght-normal-B5bTHO_g.woff2  sha256 c4fcfea41f2c1cfeea9211fa43679845454a1d0e0d7e95e069c7e73c4ae302d2  11144 B
+  static/assets/instrument-sans-latin-wght-normal-BbzFLZTg.woff2      sha256 2ee17598a98d8a59e4df8152d015bec9ab8e4d5672cc0ab42bef806b568e3971  30092 B
+
+Paths changed outside static/: NONE. Paths removed/added outside static/: NONE.
