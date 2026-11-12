@@ -40,6 +40,7 @@ Built from audits, one row per rated slice (owner, D25, 2026-11-07). Strengths a
 | SG-316 | muse-1.3, xhigh | screenshots only, 7 shots, DOM-proven, design notes | 1296 s (stamps) | 85 | **no** — ≈196 s past 1100 s in write-up | two design-note claims contradicted by its own shots; found `[object Object]` unasked | coder |
 | SG-317 | haiku-5-5, high | deploy rider, live serve | 123 s | 97 | yes, S1 | none; contract line correctly "none received" | — |
 | SG-318 | muse-1.3, xhigh | build, ten wording fixes over 9 files + full gate | ~1040 s (stamps) | 88 | yes, inside 1100 s | edited one product file outside the scope ceiling, disclosed instead of stopping | mixed |
+| SG-319 | haiku-5-5, high | screenshots only, 6 shots, DOM-proven, design notes | 587 s (stamps) | 88 | yes | took the table view where the grid was asked, unflagged; some DOM reads missing (self-reported FAIL) | coder (minor) |
 
 ## Haiku 5.5 at `high` — profile
 
