@@ -1,0 +1,15 @@
+Partial-Receipt-ID: SG-304
+utc=2026-11-12T20:33:38Z
+invocation=45193e8bc0b04f9bb33cbed85e40aebe
+killed=idle
+idle_s=900
+pushed=2
+uncommitted=backend/tests/test_sg304_duplicate_pack.py,frontend/src/components/AssetForm.sg304.test.tsx,frontend/src/components/CandidateCard.sg304.test.tsx,frontend/src/routes/ReviewPage.sg304.test.tsx
+wip=f57857834700604073525db3bb767ec96959a42d refs/wip/SG-304/20261112T203336Z
+wip_elapsed_ms=1403
+wip_tracked=none
+wip_untracked=4 host_local
+DISPATCH_RESULT id=SG-304 coder=opencode exit=143 head=122a26931563a6c56264e4d6239b425d93cd3500 note=no moved=yes rewrite=no dirty=yes elapsed=1272s budget=2100s killed=idle idle_s=900
+P1_moved=PASS count=2
+P2_rewrite=PASS behind=0
+P6_dirty=FAIL dirty=yes
