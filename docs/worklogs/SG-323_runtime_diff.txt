@@ -1,0 +1,33 @@
+SG-323 runtime diff (served /app tree)
+Old: storagegenie-backend:release-sg320 = image sha256:10d6064f670e (container 07aa3de8b980, running before the recreate)
+New: storagegenie-backend:latest = image sha256:e2703987421f (served as release-sg323, container a92d27bba1cb)
+Method: sha256sum over the whole /app tree. Old: docker exec on the running container. New: docker run --rm --network none --entrypoint sh (no mounts, no env file, no port).
+Tree size: old 4176 files, new 4071 files.
+
+Derived expectation (git diff --name-only 7a24601..HEAD -- backend/ ':!backend/alembic'):
+  backend/app/api/v1/candidates.py, backend/app/services/candidates.py, backend/tests/test_sg304_duplicate_pack.py, backend/tests/test_sg322_duplicate_read.py
+  (the two test files count because the image ships tests/)
+My expectation (labelled as such, in the packet): app/api/v1/candidates.py and app/services/candidates.py, plus tests only if the image ships tests/.
+
+CHANGED (old sha256 -> new sha256, full hashes):
+  ./app/api/v1/candidates.py       aa7b44e8a194bb36ae8da814ef5faab6e2a1ad064f403541592883c295d8007a -> b063792f26804059dd75d18a68d504e047619bff7e6a41cc9d5ca28f469b3861  (11151 -> 11502 B)
+  ./app/services/candidates.py     76f59d83d09a677e81eb51b13298525fca1c6cea7ec325c18b4a696610301a3a -> e0e937f9c87895acf4b584d35694b11f5b9730049ceff203326e34f9fa03af57  (61434 -> 62709 B)
+  ./static/index.html              a0efc49b32b6dd5bf623902c72254f67e1453bed01bad99b87c35adb85ed44c3 -> 0fc1308548ede60eebc69aaec8b48a17a1df4e3fa5a0bd9a4659dd8de75f7094  (944 -> 944 B)
+
+ADDED:
+  ./static/assets/index-CVSFCg0Q.js          4238560f71403876961c5e116bbb3a515021148f186d130740b72cb29701bb2c  369594 B
+  ./tests/test_sg304_duplicate_pack.py       a696725a9a51af25e9596337eb7a616ea4fd21733544bdb5cd07616ee051390f  6744 B
+  ./tests/test_sg322_duplicate_read.py       a0c3b3417d08081e2bec024ec48a59ff29dd5185a7ec367d39d80e6b36785551  5202 B
+
+REMOVED:
+  ./static/assets/index-_brNCbOJ.js          fc4efc6a5281084382d96e73e4a5af3210bb4a2206f1c95f70a59e7a0bb68cb3  365842 B (old bundle)
+  107 __pycache__/*.pyc files that only the old running container had (runtime bytecode; .dockerignore excludes __pycache__ from the build). Not source.
+
+UNCHANGED, byte-identical (same hash both sides):
+  ./static/assets/index-BGbwuPTO.css                              90d6285326accc47e61b3073b951bb4e04234b582e495d2d8ec83c9144d6b6c0  6172 B
+  ./static/assets/instrument-sans-latin-ext-wght-normal-B5bTHO_g.woff2  c4fcfea41f2c1cfeea9211fa43679845454a1d0e0d7e95e069c7e73c4ae302d2  11144 B
+  ./static/assets/instrument-sans-latin-wght-normal-BbzFLZTg.woff2      2ee17598a98d8a59e4df8152d015bec9ab8e4d5672cc0ab42bef806b568e3971  30092 B
+  alembic/ (all files), venv/ (3777 files), every other app/ file
+
+Served app/ vs worktree backend/app (non-pycache, 117 files): all hashes identical to the new image.
+Alembic head: 20261102_sg279_candidate_state, before and after.
