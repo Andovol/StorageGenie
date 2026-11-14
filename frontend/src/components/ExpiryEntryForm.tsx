@@ -3,6 +3,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { clearExpiryDate, enterManualExpiry } from "../api/client";
 import type { Assertion } from "../api/types";
 import { labelExpiryState } from "../lib/labels";
+import { CONTROL_STYLE, THEMED_CONTROL_CLASS } from "./shell/CatalogToolbar";
 
 export const DATE_TYPE_LABELS: Record<string, string> = {
   expiry_date: "Expiry date",
@@ -154,8 +155,8 @@ export function ExpiryEntryForm({
             type="button"
             onClick={clear}
             disabled={clearing || submitting}
-            className="bg-card text-foreground border-border focus-ring"
-            style={{ padding: "6px 12px", borderRadius: 6, borderStyle: "solid", borderWidth: 1, cursor: "pointer" }}
+            className={THEMED_CONTROL_CLASS}
+            style={{ ...CONTROL_STYLE, cursor: "pointer" }}
           >
             {documents ? "Clear date" : "Clear expiry date"}
           </button>

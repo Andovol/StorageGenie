@@ -656,8 +656,8 @@ export function AssetDetailPage() {
             setEditCondition(asset.condition ?? "");
             setEditing((v) => !v);
           }}
-          className="bg-card text-foreground border-border focus-ring"
-          style={{ padding: "6px 12px", borderRadius: 0, borderStyle: "solid", borderWidth: 1, cursor: "pointer" }}
+          className={THEMED_CONTROL_CLASS}
+          style={{ ...CONTROL_STYLE, cursor: "pointer" }}
         >
           {editing ? "Cancel" : "Edit"}
         </button>

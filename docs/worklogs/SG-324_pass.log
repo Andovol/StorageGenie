@@ -1,0 +1,2 @@
+SG-324 P1 PASS: src/sg324-p1.sg324.test.tsx > SG-324 P1 themed controls > Clear expiry date uses the theme control class, not white card | expect(btn).toHaveClass(themedToken())
+SG-324 P1 PASS: src/sg324-p1.sg324.test.tsx > SG-324 P1 themed controls > asset Edit uses the theme control class, not white card | expect(btn).toHaveClass(themedToken())
