@@ -32,3 +32,7 @@
 ## Rating
 
 92 — clean, well-proven work with honest gaps found unasked (G-1, G-2). Deducted for the `/tmp` write. slowest_waste: none.
+
+## Later finding (2026-11-14, SG-321)
+
+**I6. The F10 card is unreachable in the real app:** an open duplicate reads with the matched item's `asset_id` (`committed_asset_id`, `candidates.py:1024-1027`, written by SG-271), so `ReviewPage` shows *In your catalog*. SG-304r2's tests rendered a hand-made candidate with no `asset_id`, so they could not see it. **Attribution: packet** — my SG-304 packets never named the read path. Fix: SG-322. The score stays 92: the coder tested what the packet asked.
