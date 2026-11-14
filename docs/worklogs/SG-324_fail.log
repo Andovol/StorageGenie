@@ -11,3 +11,4 @@ SG-324 P6 FAIL: src/sg324-p6.sg324.test.tsx > SG-324 P6 inbox > a job is named b
 SG-324 P6 FAIL: src/sg324-p6.sg324.test.tsx > SG-324 P6 inbox > a skipped step reads photo reading is off | expected Skipped (AI off)
 SG-324 P7 FAIL: src/sg324-p7.sg324.test.tsx > SG-324 P7 item panel > cut-out and styled photo | Unable to find Cut out the item again
 SG-324 T1 FAIL: src/sg324-t1.sg324.test.tsx > SG-324 T1 review card fallback > a failed thumb reads No photo yet | Unable to find No photo yet
+SG-324 T2 FAIL: src/sg324-t2.sg324.test.tsx > SG-324 T2 nameless reads Unnamed item > nameless opened row | Unable to find Unnamed item

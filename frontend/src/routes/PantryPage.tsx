@@ -187,7 +187,7 @@ function PantryTile({
           )}
         </span>
         <span style={{ display: "block", fontWeight: 600, fontSize: 14, color: "hsl(var(--ink))", marginTop: 8, overflowWrap: "anywhere" }}>
-          {asset.display_name || "Untitled item"}
+          {asset.display_name || "Unnamed item"}
         </span>
       </button>
       {expired ? (

@@ -34,7 +34,7 @@ function OpenedRow({
   const [clearing, setClearing] = useState(false);
   const [editing, setEditing] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const name = row.display_name || "Untitled item";
+  const name = row.display_name || "Unnamed item";
 
   const save = async () => {
     if (!value) return;

@@ -310,7 +310,7 @@ export function CatalogPage() {
                         style={{ fontWeight: 600 }}
                         to={`/assets/${gone.id}?household_id=${effectiveHousehold}`}
                       >
-                        {gone.display_name || "Untitled item"}
+                        {gone.display_name || "Unnamed item"}
                       </Link>
                       <span style={{ fontSize: 13, color: "hsl(var(--ink-muted))" }}>
                         Gone{label ? ` — ${label.toLowerCase()}` : ""}
