@@ -3,3 +3,5 @@ SG-324 P1 PASS: src/sg324-p1.sg324.test.tsx > SG-324 P1 themed controls > asset 
 SG-324 P3 PASS: src/sg324-p3.sg324.test.tsx > SG-324 P3 details rows > Shelf life hides when it repeats Kind of item | within(table).queryByText Shelf life null
 SG-324 P3 PASS: src/sg324-p3.sg324.test.tsx > SG-324 P3 details rows > a superseded Replaced row is hidden from Details | queryByText Replaced null
 SG-324 P3 PASS: src/sg324-p3.sg324.test.tsx > SG-324 P3 details rows > Amount and Unit read as one 300 ml row | findByText 300 ml
+SG-324 P4 PASS: src/sg324-p4.sg324.test.tsx > SG-324 P4 catalog table > Dimensions/Specs column is gone | queryByText Dimensions/Specs null
+SG-324 P4 PASS: src/sg324-p4.sg324.test.tsx > SG-324 P4 catalog table > row actions carry More actions | getByRole More actions for Olive Oil

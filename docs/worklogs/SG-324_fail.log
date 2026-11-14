@@ -3,3 +3,5 @@ SG-324 P1 FAIL: src/sg324-p1.sg324.test.tsx > SG-324 P1 themed controls > asset 
 SG-324 P3 FAIL: src/sg324-p3.sg324.test.tsx > SG-324 P3 details rows > Shelf life hides when it repeats Kind of item | expected <td> to be null
 SG-324 P3 FAIL: src/sg324-p3.sg324.test.tsx > SG-324 P3 details rows > a superseded Replaced row is hidden from Details | expected <span badge-grey> to be null
 SG-324 P3 FAIL: src/sg324-p3.sg324.test.tsx > SG-324 P3 details rows > Amount and Unit read as one 300 ml row | Unable to find element 300 ml
+SG-324 P4 FAIL: src/sg324-p4.sg324.test.tsx > SG-324 P4 catalog table > Dimensions/Specs column is gone | expected Dimensions/Specs null
+SG-324 P4 FAIL: src/sg324-p4.sg324.test.tsx > SG-324 P4 catalog table > row actions carry More actions | Unable to find More actions for Olive Oil

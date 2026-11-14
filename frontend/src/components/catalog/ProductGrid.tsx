@@ -43,7 +43,6 @@ const COLUMNS: { label: string; width: string; align?: "right" | "center" }[] = 
   { label: "Name", width: "200px" },
   { label: "Category", width: "140px" },
   { label: "Status", width: "130px" },
-  { label: "Dimensions/Specs", width: "120px" },
   { label: "Added", width: "110px", align: "right" },
   { label: "Actions", width: "48px", align: "center" },
 ];
@@ -154,7 +153,6 @@ function TableView({
         </thead>
         <tbody>
           {items.map((item) => {
-            const specs = item.metadata.dimensions ?? item.metadata.material ?? "—";
             return (
               <tr
                 key={item.id}
@@ -220,7 +218,6 @@ function TableView({
                     </span>
                   </span>
                 </td>
-                <td style={{ padding: "8px 10px", whiteSpace: "nowrap", fontSize: 13 }}>{specs}</td>
                 <td
                   style={{ padding: "8px 10px", textAlign: "right", whiteSpace: "nowrap", fontSize: 13, color: "hsl(var(--ink-muted))" }}
                 >
@@ -229,7 +226,8 @@ function TableView({
                 <td style={{ padding: "8px 10px", textAlign: "center" }}>
                   <button
                     type="button"
-                    aria-label={`Actions for ${item.name}`}
+                    aria-label={`More actions for ${item.name}`}
+                    title={`More actions for ${item.name}`}
                     onClick={(event) => {
                       event.stopPropagation();
                       openDetail(item);
