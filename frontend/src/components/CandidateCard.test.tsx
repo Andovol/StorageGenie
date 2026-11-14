@@ -124,7 +124,8 @@ describe("CandidateCard", () => {
     // The imageless (non-photo) evidence 404s its thumb; the broken img is replaced, not left as an icon.
     fireEvent.error(imagesBefore[1]);
     expect(article.querySelectorAll("img")).toHaveLength(1);
-    const fallback = screen.getByText("Thumbnail unavailable");
+    // SG-324 T1: the fallback reads "No photo yet", as everywhere else (was "Thumbnail unavailable").
+    const fallback = screen.getByText("No photo yet");
     expect(fallback).toHaveAttribute("tabindex", "0");
     expect(fallback).toHaveClass("focus-ring");
   });
@@ -150,6 +151,8 @@ describe("CandidateCard", () => {
     renderCard(<CandidateCard candidate={{ ...candidate, review_task_ids: [], blocking_review_task_ids: [], dedup_matches: [], evidence_ids: ["photo-a", "photo-b"] }} householdId="h" onDecision={vi.fn()} />);
     const article = screen.getByRole("article");
     expect(article.querySelectorAll("img")).toHaveLength(2);
+    // SG-324 T1: never "Thumbnail unavailable" — the fallback is "No photo yet".
     expect(screen.queryByText("Thumbnail unavailable")).toBeNull();
+    expect(screen.queryByText("No photo yet")).toBeNull();
   });
 });
