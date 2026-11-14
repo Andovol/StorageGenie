@@ -1,2 +1,5 @@
 SG-324 P1 PASS: src/sg324-p1.sg324.test.tsx > SG-324 P1 themed controls > Clear expiry date uses the theme control class, not white card | expect(btn).toHaveClass(themedToken())
 SG-324 P1 PASS: src/sg324-p1.sg324.test.tsx > SG-324 P1 themed controls > asset Edit uses the theme control class, not white card | expect(btn).toHaveClass(themedToken())
+SG-324 P3 PASS: src/sg324-p3.sg324.test.tsx > SG-324 P3 details rows > Shelf life hides when it repeats Kind of item | within(table).queryByText Shelf life null
+SG-324 P3 PASS: src/sg324-p3.sg324.test.tsx > SG-324 P3 details rows > a superseded Replaced row is hidden from Details | queryByText Replaced null
+SG-324 P3 PASS: src/sg324-p3.sg324.test.tsx > SG-324 P3 details rows > Amount and Unit read as one 300 ml row | findByText 300 ml

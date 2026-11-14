@@ -423,6 +423,37 @@ function latestActiveAssertion(assertions: Assertion[], fieldPath: string): Asse
   );
 }
 
+// SG-324 P3: the Details table shows the current record only. Superseded rows
+// (ProvenanceBadge "Replaced", the same word lib/labels.ts uses for the
+// superseded expiry state) are history and stay in History, not Details. A
+// Shelf life that repeats the Kind of item value adds no information, so it is
+// dropped. Amount and Unit render as one Amount row ("300 ml").
+export function visibleDetailAssertions(assertions: Assertion[]): Assertion[] {
+  const current = assertions.filter(
+    (item) => (item.review_state ?? "").toLowerCase() !== "superseded"
+  );
+  const kindValues = new Set(
+    current
+      .filter((item) => plainFieldLabel(item.field_path) === "Kind of item")
+      .map((item) => plainDetailValue(item.field_path, item.value).trim().toLowerCase())
+  );
+  return current.filter((item) => {
+    if (plainFieldLabel(item.field_path) !== "Shelf life") return true;
+    return !kindValues.has(plainDetailValue(item.field_path, item.value).trim().toLowerCase());
+  });
+}
+
+export function detailAmountText(quantityText: string, unitText: string): string {
+  const qty = (quantityText ?? "").trim();
+  const unit = (unitText ?? "").trim();
+  const qtyEmpty = !qty || qty === "—";
+  const unitEmpty = !unit || unit === "—";
+  if (qtyEmpty && unitEmpty) return "—";
+  if (qtyEmpty) return unit;
+  if (unitEmpty) return qty;
+  return `${qty} ${unit}`;
+}
+
 export function AssetDetailPage() {
   const { id } = useParams();
   const [search] = useSearchParams();
@@ -631,6 +662,16 @@ export function AssetDetailPage() {
   const counted = isCountedUnit(asset.unit);
   const qtyValue = asset.quantity ?? null;
   const noneLeft = !isGone && counted && (qtyValue ?? 0) <= 0;
+  const detailVisible = visibleDetailAssertions(assertions);
+  const detailQtyRow = detailVisible.find((item) => plainFieldLabel(item.field_path) === "Amount") ?? null;
+  const detailUnitRow = detailVisible.find((item) => plainFieldLabel(item.field_path) === "Unit") ?? null;
+  const detailCombined =
+    detailQtyRow && detailUnitRow
+      ? detailAmountText(
+          plainDetailValue(detailQtyRow.field_path, detailQtyRow.value),
+          plainDetailValue(detailUnitRow.field_path, detailUnitRow.value)
+        )
+      : null;
   const saveClassification = () => {
     if (!effectiveCategory || classifyMut.isPending) return;
     if (
@@ -910,10 +951,21 @@ export function AssetDetailPage() {
             </tr>
           </thead>
           <tbody>
-            {assertions.map((a) => (
+            {detailVisible
+              .filter((a) => {
+                if (plainFieldLabel(a.field_path) !== "Unit") return true;
+                return detailCombined === null;
+              })
+              .map((a) => {
+                const label = plainFieldLabel(a.field_path);
+                const value =
+                  label === "Amount" && detailCombined !== null && detailQtyRow && a.id === detailQtyRow.id
+                    ? detailCombined
+                    : plainDetailValue(a.field_path, a.value);
+                return (
               <tr key={a.id}>
-                <td className="border-border" style={{ padding: 6, borderBottomStyle: "solid", borderBottomWidth: 1, fontSize: 13 }}>{plainFieldLabel(a.field_path)}</td>
-                <td className="border-border" style={{ padding: 6, borderBottomStyle: "solid", borderBottomWidth: 1 }}>{plainDetailValue(a.field_path, a.value)}</td>
+                <td className="border-border" style={{ padding: 6, borderBottomStyle: "solid", borderBottomWidth: 1, fontSize: 13 }}>{label}</td>
+                <td className="border-border" style={{ padding: 6, borderBottomStyle: "solid", borderBottomWidth: 1 }}>{value}</td>
                 <td className="border-border" style={{ padding: 6, borderBottomStyle: "solid", borderBottomWidth: 1 }}>{plainSourceLabel(a.source_type)}</td>
                 <td className="border-border" style={{ padding: 6, borderBottomStyle: "solid", borderBottomWidth: 1 }}>
                   <ProvenanceBadge state={a.review_state} />
@@ -923,7 +975,8 @@ export function AssetDetailPage() {
                   {a.source_evidence_ids?.length ? `${a.source_evidence_ids.length} attached` : "—"}
                 </td>
               </tr>
-            ))}
+                );
+              })}
           </tbody>
         </table>
       )}

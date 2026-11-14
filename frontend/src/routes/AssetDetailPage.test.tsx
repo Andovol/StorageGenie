@@ -172,9 +172,9 @@ describe("AssetDetailPage", () => {
         { "If-Match": "1" }
       )
     );
-    // SG-301 G2: the raw enum/action read as plain words — "superseded" is the
-    // "Replaced" badge; SG-318 W3: "asset.update" is the "Updated" history row (was "Asset Update").
-    expect(await screen.findByText("Replaced")).toBeInTheDocument();
+    // SG-324 P3: superseded rows stay in History, not Details — the Details
+    // "Replaced" badge is gone; SG-318 W3: "asset.update" is the "Updated" history row (was "Asset Update").
+    expect(screen.queryByText("Replaced")).toBeNull();
     expect(await screen.findByText("Updated", { exact: false })).toBeInTheDocument();
   });
 

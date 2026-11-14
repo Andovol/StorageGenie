@@ -1,2 +1,5 @@
 SG-324 P1 FAIL: src/sg324-p1.sg324.test.tsx > SG-324 P1 themed controls > Clear expiry date uses the theme control class, not white card | expect(element).toHaveClass("sg-paper-control")
 SG-324 P1 FAIL: src/sg324-p1.sg324.test.tsx > SG-324 P1 themed controls > asset Edit uses the theme control class, not white card | expect(element).toHaveClass("sg-paper-control")
+SG-324 P3 FAIL: src/sg324-p3.sg324.test.tsx > SG-324 P3 details rows > Shelf life hides when it repeats Kind of item | expected <td> to be null
+SG-324 P3 FAIL: src/sg324-p3.sg324.test.tsx > SG-324 P3 details rows > a superseded Replaced row is hidden from Details | expected <span badge-grey> to be null
+SG-324 P3 FAIL: src/sg324-p3.sg324.test.tsx > SG-324 P3 details rows > Amount and Unit read as one 300 ml row | Unable to find element 300 ml
