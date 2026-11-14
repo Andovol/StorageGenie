@@ -580,7 +580,7 @@ export function ItemInspectorDrawer({ asset, householdId, onClose }: ItemInspect
               }}
             >
               <ScanLine size={16} aria-hidden="true" />
-              Re-isolate Asset
+              Cut out the item again
             </button>
             <button
               type="button"
@@ -600,7 +600,7 @@ export function ItemInspectorDrawer({ asset, householdId, onClose }: ItemInspect
               }}
             >
               <Sparkles size={16} aria-hidden="true" />
-              Generate Context Scene
+              Make a styled photo
             </button>
           </div>
           {notice && (

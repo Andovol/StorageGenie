@@ -10,3 +10,4 @@ SG-324 P5 PASS: src/sg324-p5.sg324.test.tsx > SG-324 P5 opened countdown > a row
 SG-324 P6 PASS: src/sg324-p6.sg324.test.tsx > SG-324 P6 inbox > progress excludes skipped steps | getByText 4 of 4 steps done
 SG-324 P6 PASS: src/sg324-p6.sg324.test.tsx > SG-324 P6 inbox > a job is named by when it was made | getByText Import · date
 SG-324 P6 PASS: src/sg324-p6.sg324.test.tsx > SG-324 P6 inbox > a skipped step reads photo reading is off | toBe Skipped — photo reading is off
+SG-324 P7 PASS: src/sg324-p7.sg324.test.tsx > SG-324 P7 item panel > cut-out and styled photo | getByRole Cut out the item again

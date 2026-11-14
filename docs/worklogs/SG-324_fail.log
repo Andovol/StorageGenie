@@ -9,3 +9,4 @@ SG-324 P5 FAIL: src/sg324-p5.sg324.test.tsx > SG-324 P5 opened countdown > empty
 SG-324 P6 FAIL: src/sg324-p6.sg324.test.tsx > SG-324 P6 inbox > progress excludes skipped steps | Unable to find 4 of 4 steps done
 SG-324 P6 FAIL: src/sg324-p6.sg324.test.tsx > SG-324 P6 inbox > a job is named by when it was made | Unable to find Import ·
 SG-324 P6 FAIL: src/sg324-p6.sg324.test.tsx > SG-324 P6 inbox > a skipped step reads photo reading is off | expected Skipped (AI off)
+SG-324 P7 FAIL: src/sg324-p7.sg324.test.tsx > SG-324 P7 item panel > cut-out and styled photo | Unable to find Cut out the item again
