@@ -36,7 +36,7 @@ export function labelJobState(state: string): string {
 }
 
 export function labelSkippedStep(): string {
-  return "Skipped (AI off)";
+  return "Skipped — photo reading is off";
 }
 
 export function labelStepStatus(step: JobStep): string {

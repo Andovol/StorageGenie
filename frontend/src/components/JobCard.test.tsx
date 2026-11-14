@@ -7,7 +7,8 @@ describe("JobCard", () => {
     render(<JobCard job={{ id: "job-loaded-42", job_type: "import", state: "FAILED", household_id: "household-1", created_at: null, updated_at: null, progress: { completed: 2, total: 6, failed: 1, pending: 3 } }} selected={false} onSelect={vi.fn()} />);
     expect(screen.getByText("Import job")).toBeInTheDocument();
     expect(screen.getByText("Needs attention")).toBeInTheDocument();
-    expect(screen.getByText(/2\/6 complete/)).toBeInTheDocument();
+    // SG-324 P6: done excludes skipped (none here) — "2 of 6 steps done · 1 failed · 3 pending" (was "2/6 complete").
+    expect(screen.getByText("2 of 6 steps done · 1 failed · 3 pending")).toBeInTheDocument();
   });
 
   test("title and status carry theme text classes with the state tone (SG-105 G3)", () => {

@@ -55,8 +55,8 @@ describe("InboxPage SG-271", () => {
     });
     renderPage();
     fireEvent.click(await screen.findByText("Import job"));
-    // SG-301 G2: the skipped step reads "Skipped (AI off)" (labelStepStatus),
+    // SG-324 P6: the skipped step reads "Skipped — photo reading is off" (was "Skipped (AI off)"),
     // never the old consent sentence and never Done.
-    expect(await screen.findByText("Skipped (AI off)", { exact: false })).toBeInTheDocument();
+    expect(await screen.findByText("Skipped — photo reading is off", { exact: false })).toBeInTheDocument();
   });
 });

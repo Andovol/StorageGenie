@@ -17,10 +17,10 @@ describe("SG-301 labels", () => {
   test("step AWAITING_REVIEW reads Waiting for you", () => {
     expect(labelJobState("AWAITING_REVIEW")).toBe("Waiting for you");
   });
-  test("skipped output reads Skipped (AI off)", () => {
+  test("skipped output reads Skipped — photo reading is off (SG-324 P6)", () => {
     expect(
       labelStepStatus({ id: "s", step_name: "X", state: "COMPLETED", attempts: 1, input: null, output: { status: "skipped", reason: "consent_disabled" }, error: null })
-    ).toBe("Skipped (AI off)");
+    ).toBe("Skipped — photo reading is off");
   });
   test("skipped output never reads Done", () => {
     const label = labelStepStatus({ id: "s", step_name: "X", state: "COMPLETED", attempts: 1, input: null, output: { status: "skipped" }, error: null });
