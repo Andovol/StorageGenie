@@ -184,3 +184,7 @@ Read as: **D34** confirmed D33's order after SG-307's retry. **Directive:** do n
 **2026-11-12, verbatim:** *"D35 - ok"*
 
 Read as: **D35** — the recommendation stands: the rough edges P1–P8 (`docs/worklogs/SG-319_audit.md`) get one polish slice, with its screenshots and rider, **before** the owner's shelf trial, after SG-304. Order: SG-320 rider → SG-304 → shots → rider → polish → shots → rider → trial.
+
+**2026-11-14, verbatim:** *"D36 - approved"*
+
+Read as: **D36** — adopt rule versions 0.60.0 and 0.61.0 (both `adoption: ask`), oldest first, at the next boundary with no dispatch in flight; update every place that names 0.59.0. The project keeps its own model rotation (D25); 0.60.0's default rotation does not apply.
