@@ -188,3 +188,11 @@ Read as: **D35** — the recommendation stands: the rough edges P1–P8 (`docs/w
 **2026-11-14, verbatim:** *"D36 - approved"*
 
 Read as: **D36** — adopt rule versions 0.60.0 and 0.61.0 (both `adoption: ask`), oldest first, at the next boundary with no dispatch in flight; update every place that names 0.59.0. The project keeps its own model rotation (D25); 0.60.0's default rotation does not apply.
+
+**2026-11-15, verbatim:** *"You gave me a starter without me asking and also without fully closing? Fully closing would have been smart, but this way the session expired."*
+
+Read as: **directive** — when every step is blocked by an outside wait (here OpenCode Go's quota), run the full close rather than ending on a question; never hand a starter except inside a close the owner asked for; arm the reply wake (`G-L2`) on every turn that waits on the owner.
+
+**2026-11-15, verbatim:** *"Close now and report everything to Desk, including your missteps."*
+
+Read as: **D37** (close now) taken by the owner; the END report to Launcher issue 62 lists the Architect's missteps.
