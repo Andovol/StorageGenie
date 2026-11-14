@@ -1,0 +1,27 @@
+============================= test session starts ==============================
+platform linux -- Python 3.12.3, pytest-9.1.1, pluggy-1.6.0 -- /home/andrei/StorageGenie/backend/venv/bin/python
+rootdir: /home/andrei/StorageGenie/backend
+configfile: pyproject.toml
+plugins: asyncio-1.4.0, anyio-4.15.0
+asyncio: mode=Mode.AUTO, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collecting ... collected 7 items
+
+tests/test_sg322_duplicate_read.py::test_open_duplicate_reads_with_no_asset_id PASSED [ 14%]
+tests/test_sg322_duplicate_read.py::test_held_duplicate_reads_with_no_asset_id PASSED [ 28%]
+tests/test_sg322_duplicate_read.py::test_same_pack_reads_the_existing_item PASSED [ 42%]
+tests/test_sg322_duplicate_read.py::test_another_pack_reads_the_new_item_not_the_existing_one PASSED [ 57%]
+tests/test_sg322_duplicate_read.py::test_inbox_read_agrees_with_the_candidate_read[open] PASSED [ 71%]
+tests/test_sg322_duplicate_read.py::test_inbox_read_agrees_with_the_candidate_read[same] PASSED [ 85%]
+tests/test_sg322_duplicate_read.py::test_inbox_read_agrees_with_the_candidate_read[another] PASSED [100%]
+
+=============================== warnings summary ===============================
+venv/lib/python3.12/site-packages/fastapi/testclient.py:1
+  /home/andrei/StorageGenie/backend/venv/lib/python3.12/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+venv/lib/python3.12/site-packages/starlette/testclient.py:53
+  /home/andrei/StorageGenie/backend/venv/lib/python3.12/site-packages/starlette/testclient.py:53: DeprecationWarning: The anyio.abc.BlockingPortal alias is deprecated, use anyio.from_thread.BlockingPortal instead.
+    _PortalFactoryType = Callable[[], AbstractContextManager[anyio.abc.BlockingPortal]]
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+======================== 7 passed, 2 warnings in 3.59s =========================

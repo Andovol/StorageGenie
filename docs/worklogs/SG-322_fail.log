@@ -1,0 +1,35 @@
+FF..F..                                                                  [100%]
+=================================== FAILURES ===================================
+E   AssertionError: {'id': '01a1dba5-ec94-7cc0-a18f-d86b397a9d30', 'state': 'proposed', 'job_id': '01a1dba5-ec4c-7d10-b725-fc78cafb7415', ...': {'value': '2031-02-03', 'confidence': 0.97, 'source_type': 'extraction', 'provider': 'p2-scripted', ...}, ...}, ...}
+    assert '01a1dba5-ebe5-7f52-8ea5-c8275b87c87f' is None
+------------------------------ Captured log call -------------------------------
+WARNING  app.services.signals:signals.py:104 Barcode extraction unavailable: pyzbar/libzbar is not installed
+WARNING  app.services.signals:signals.py:215 OCR extraction unavailable: tesseract is not installed or it's not in your PATH. See README file for more information.
+/home/andrei/StorageGenie/backend/tests/test_sg322_duplicate_read.py:50: AssertionError: {'id': '01a1dba5-ec94-7cc0-a18f-d86b397a9d30', 'state': 'proposed', 'job_id': '01a1dba5-ec4c-7d10-b725-fc78cafb7415', ...': {'value': '2031-02-03', 'confidence': 0.97, 'source_type': 'extraction', 'provider': 'p2-scripted', ...}, ...}, ...}
+E   AssertionError: {'id': '01a1dba5-ed89-7231-a5cf-3b6f6f40a93d', 'state': 'held', 'job_id': '01a1dba5-ed55-7200-a0b7-7ff53115b5b2', 'fie...': {'value': '2031-02-03', 'confidence': 0.97, 'source_type': 'extraction', 'provider': 'p2-scripted', ...}, ...}, ...}
+    assert '01a1dba5-ed29-7fb3-a065-274f7dec26c4' is None
+------------------------------ Captured log call -------------------------------
+WARNING  app.services.signals:signals.py:104 Barcode extraction unavailable: pyzbar/libzbar is not installed
+WARNING  app.services.signals:signals.py:215 OCR extraction unavailable: tesseract is not installed or it's not in your PATH. See README file for more information.
+/home/andrei/StorageGenie/backend/tests/test_sg322_duplicate_read.py:63: AssertionError: {'id': '01a1dba5-ed89-7231-a5cf-3b6f6f40a93d', 'state': 'held', 'job_id': '01a1dba5-ed55-7200-a0b7-7ff53115b5b2', 'fie...': {'value': '2031-02-03', 'confidence': 0.97, 'source_type': 'extraction', 'provider': 'p2-scripted', ...}, ...}, ...}
+E   AssertionError: ('open', {'id': '01a1dba5-f0d4-76f2-a7c8-fd2054e5a6df', 'state': 'proposed', 'job_id': '01a1dba5-f09f-74d3-ac40-e1f041...: {'value': '2031-02-03', 'confidence': 0.97, 'source_type': 'extraction', 'provider': 'p2-scripted', ...}, ...}, ...})
+    assert '01a1dba5-f075-7f43-bd3d-b48d6719d209' == None
+------------------------------ Captured log call -------------------------------
+WARNING  app.services.signals:signals.py:104 Barcode extraction unavailable: pyzbar/libzbar is not installed
+WARNING  app.services.signals:signals.py:215 OCR extraction unavailable: tesseract is not installed or it's not in your PATH. See README file for more information.
+/home/andrei/StorageGenie/backend/tests/test_sg322_duplicate_read.py:106: AssertionError: ('open', {'id': '01a1dba5-f0d4-76f2-a7c8-fd2054e5a6df', 'state': 'proposed', 'job_id': '01a1dba5-f09f-74d3-ac40-e1f041...: {'value': '2031-02-03', 'confidence': 0.97, 'source_type': 'extraction', 'provider': 'p2-scripted', ...}, ...}, ...})
+=============================== warnings summary ===============================
+venv/lib/python3.12/site-packages/fastapi/testclient.py:1
+  /home/andrei/StorageGenie/backend/venv/lib/python3.12/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+venv/lib/python3.12/site-packages/starlette/testclient.py:53
+  /home/andrei/StorageGenie/backend/venv/lib/python3.12/site-packages/starlette/testclient.py:53: DeprecationWarning: The anyio.abc.BlockingPortal alias is deprecated, use anyio.from_thread.BlockingPortal instead.
+    _PortalFactoryType = Callable[[], AbstractContextManager[anyio.abc.BlockingPortal]]
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/test_sg322_duplicate_read.py::test_open_duplicate_reads_with_no_asset_id
+FAILED tests/test_sg322_duplicate_read.py::test_held_duplicate_reads_with_no_asset_id
+FAILED tests/test_sg322_duplicate_read.py::test_inbox_read_agrees_with_the_candidate_read[open]
+3 failed, 4 passed, 2 warnings in 3.37s

@@ -1,0 +1,14 @@
+
+ RUN  v1.6.1 /home/andrei/StorageGenie/frontend
+
+stderr | src/routes/ReviewPage.sg322.test.tsx > ReviewPage SG-322 (open duplicate reads with no asset_id) > an open duplicate read shows the three choices and not In your catalog
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+ ✓ src/routes/ReviewPage.sg322.test.tsx  (2 tests) 187ms
+
+ Test Files  1 passed (1)
+      Tests  2 passed (2)
+   Start at  20:01:47
+   Duration  1.21s (transform 154ms, setup 71ms, collect 254ms, tests 187ms, environment 406ms, prepare 84ms)
+
