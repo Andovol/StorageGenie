@@ -5,3 +5,4 @@ SG-324 P3 FAIL: src/sg324-p3.sg324.test.tsx > SG-324 P3 details rows > a superse
 SG-324 P3 FAIL: src/sg324-p3.sg324.test.tsx > SG-324 P3 details rows > Amount and Unit read as one 300 ml row | Unable to find element 300 ml
 SG-324 P4 FAIL: src/sg324-p4.sg324.test.tsx > SG-324 P4 catalog table > Dimensions/Specs column is gone | expected Dimensions/Specs null
 SG-324 P4 FAIL: src/sg324-p4.sg324.test.tsx > SG-324 P4 catalog table > row actions carry More actions | Unable to find More actions for Olive Oil
+SG-324 P5 FAIL: src/sg324-p5.sg324.test.tsx > SG-324 P5 opened countdown > empty rows render nothing | expected Opened countdown null

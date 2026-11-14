@@ -189,6 +189,7 @@ export function OpenedCountdownSection({ householdId }: { householdId: string })
     enabled: !!householdId,
   });
   const rows = query.data?.rows ?? [];
+  if (query.data && rows.length === 0) return null;
 
   return (
     <section aria-label="Opened countdown" style={{ marginTop: 20 }}>
@@ -201,11 +202,6 @@ export function OpenedCountdownSection({ householdId }: { householdId: string })
       {query.isError && (
         <div role="alert" className="text-danger" style={{ fontSize: 13 }}>
           {String(query.error)}
-        </div>
-      )}
-      {query.data && rows.length === 0 && (
-        <div role="status" className="text-muted-foreground" style={{ fontSize: 13 }}>
-          No cosmetics items to track.
         </div>
       )}
       {rows.length > 0 && (

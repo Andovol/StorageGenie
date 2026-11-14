@@ -298,11 +298,14 @@ describe("OpenedCountdownSection", () => {
     ).not.toBeInTheDocument();
   });
 
-  test("renders the empty state when the household has no cosmetics item", async () => {
+  test("renders nothing when the household has no cosmetics item (SG-324 P5)", async () => {
     rows = [];
-    renderSection();
+    const { container } = renderSection();
 
-    expect(await screen.findByText("No cosmetics items to track.")).toBeInTheDocument();
+    await new Promise((resolve) => setTimeout(resolve, 300));
+    // SG-324 P5: the block shows only with rows; empty renders nothing, not even the heading.
+    expect(container.textContent ?? "").toBe("");
+    expect(screen.queryByText("Opened countdown")).toBeNull();
     expect(screen.queryByTestId("opened-window")).not.toBeInTheDocument();
     expect(screen.queryByRole("link")).not.toBeInTheDocument();
   });
