@@ -1,0 +1,49 @@
+
+ RUN  v1.6.1 /home/andrei/StorageGenie/frontend
+
+stderr | src/routes/ReviewPage.sg304.test.tsx > ReviewPage SG-304 G2 (duplicate photo) > shows the existing item by name and date and never its id
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+ ✓ src/components/CandidateCard.sg304.test.tsx  (4 tests) 304ms
+stderr | src/components/CandidateCard.sg304.test.tsx > CandidateCard SG-304 G2 (duplicate photo) > names the existing item by name and date, never by its id, and offers the three choices
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+stderr | src/components/AssetForm.sg304.test.tsx > AssetForm SG-304 G1 (same-name warning) > a live item with the typed name shows one line with its date and creates nothing yet
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+ ✓ src/routes/ReviewPage.sg304.test.tsx  (4 tests) 439ms
+ ✓ src/components/AssetForm.sg304.test.tsx  (8 tests) 632ms
+
+ Test Files  3 passed (3)
+      Tests  16 passed (16)
+   Start at  19:25:03
+   Duration  2.08s (transform 352ms, setup 255ms, collect 975ms, tests 1.38s, environment 1.58s, prepare 331ms)
+
+--- run 2
+
+ RUN  v1.6.1 /home/andrei/StorageGenie/frontend
+
+stderr | src/routes/ReviewPage.sg304.test.tsx > ReviewPage SG-304 G2 (duplicate photo) > shows the existing item by name and date and never its id
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+stderr | src/components/CandidateCard.sg304.test.tsx > CandidateCard SG-304 G2 (duplicate photo) > names the existing item by name and date, never by its id, and offers the three choices
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+ ✓ src/components/CandidateCard.sg304.test.tsx  (4 tests) 259ms
+stderr | src/components/AssetForm.sg304.test.tsx > AssetForm SG-304 G1 (same-name warning) > a live item with the typed name shows one line with its date and creates nothing yet
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+ ✓ src/routes/ReviewPage.sg304.test.tsx  (4 tests) 314ms
+ ✓ src/components/AssetForm.sg304.test.tsx  (8 tests) 464ms
+
+ Test Files  3 passed (3)
+      Tests  16 passed (16)
+   Start at  19:25:05
+   Duration  2.05s (transform 389ms, setup 312ms, collect 971ms, tests 1.04s, environment 1.59s, prepare 445ms)
+

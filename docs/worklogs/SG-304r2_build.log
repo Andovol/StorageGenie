@@ -1,0 +1,15 @@
+vite v5.4.21 building for production...
+
+(!) outDir /home/andrei/StorageGenie/output/SG-304r2-scratch/build is not inside project root and will not be emptied.
+Use --emptyOutDir to override.
+
+transforming...
+✓ 1973 modules transformed.
+rendering chunks...
+computing gzip size...
+../output/SG-304r2-scratch/build/index.html                                                     0.94 kB │ gzip:   0.48 kB
+../output/SG-304r2-scratch/build/assets/instrument-sans-latin-ext-wght-normal-B5bTHO_g.woff2   11.14 kB
+../output/SG-304r2-scratch/build/assets/instrument-sans-latin-wght-normal-BbzFLZTg.woff2       30.09 kB
+../output/SG-304r2-scratch/build/assets/index-BGbwuPTO.css                                      6.17 kB │ gzip:   1.89 kB
+../output/SG-304r2-scratch/build/assets/index-D3aOLhk7.js                                     369.33 kB │ gzip: 105.23 kB
+✓ built in 2.77s

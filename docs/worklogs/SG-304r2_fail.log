@@ -1,0 +1,37 @@
+# SG-304r2 FAIL on base 2221bc9 (before G1/G2): failing names and first assertion
+## backend (test_sg304_duplicate_pack.py)
+tests/test_sg304_duplicate_pack.py::test_another_pack_creates_its_own_item_and_leaves_the_existing_one FAILED [ 20%]
+E       AssertionError: {'candidate_id': '01a1db85-aaab-7ca1-a218-97d94552317d', 'state': 'accepted', 'job': {'id': '01a1db85-aa6c-7b73-86f7-7d5e9565f2af', 'job_type': 'import', 'state': 'COMPLETED', 'household_id': '01a1db85-a9bf-78e3-bf32-4ea3da10b472', ...}, 'status': 'duplicate_linked', ...}
+FAILED tests/test_sg304_duplicate_pack.py::test_another_pack_creates_its_own_item_and_leaves_the_existing_one
+## frontend af
+     → Unable to find an element by: [data-testid="same-name-warning"]
+     → Unable to find an element by: [data-testid="same-name-warning"]
+     → Unable to find an element by: [data-testid="same-name-warning"]
+     → Unable to find an element by: [data-testid="same-name-warning"]
+     → Unable to find role="link" and name "Open it"
+     → Unable to find an element by: [data-testid="same-name-warning"]
+ FAIL  src/components/AssetForm.sg304.test.tsx > AssetForm SG-304 G1 (same-name warning) > a live item with the typed name shows one line with its date and creates nothing yet
+TestingLibraryElementError: Unable to find an element by: [data-testid="same-name-warning"]
+ FAIL  src/components/AssetForm.sg304.test.tsx > AssetForm SG-304 G1 (same-name warning) > the match ignores case and surrounding spaces
+TestingLibraryElementError: Unable to find an element by: [data-testid="same-name-warning"]
+## frontend cc
+     → Unable to find an element with the text: This photo matches Olive Oil (use by 6 May 2030).. This could be because the text is broken up by multiple elements. In this case, you can provide a function for your text matcher to make your matcher more flexible.
+     → Unable to find an element with the text: This photo matches an item you already have.. This could be because the text is broken up by multiple elements. In this case, you can provide a function for your text matcher to make your matcher more flexible.
+     → Unable to find an accessible element with the role "button" and name "It's another pack"
+ FAIL  src/components/CandidateCard.sg304.test.tsx > CandidateCard SG-304 G2 (duplicate photo) > names the existing item by name and date, never by its id, and offers the three choices
+TestingLibraryElementError: Unable to find an element with the text: This photo matches Olive Oil (use by 6 May 2030).. This could be because the text is broken up by multiple elements. In this case, you can provide a function for your text matcher to make your matcher more flexible.
+ FAIL  src/components/CandidateCard.sg304.test.tsx > CandidateCard SG-304 G2 (duplicate photo) > with no loaded item the line still shows no id
+TestingLibraryElementError: Unable to find an element with the text: This photo matches an item you already have.. This could be because the text is broken up by multiple elements. In this case, you can provide a function for your text matcher to make your matcher more flexible.
+ FAIL  src/components/CandidateCard.sg304.test.tsx > CandidateCard SG-304 G2 (duplicate photo) > each choice sends its own decision: another pack with the new-pack option, the same pack plainly, decide later as hold
+TestingLibraryElementError: Unable to find an accessible element with the role "button" and name "It's another pack"
+## frontend rp
+     → Unable to find an element with the text: This photo matches Olive Oil (use by 6 May 2030).. This could be because the text is broken up by multiple elements. In this case, you can provide a function for your text matcher to make your matcher more flexible.
+     → Unable to find role="button" and name "It's another pack"
+     → Unable to find role="button" and name "It's the same pack"
+     → Unable to find role="button" and name "Decide later"
+ FAIL  src/routes/ReviewPage.sg304.test.tsx > ReviewPage SG-304 G2 (duplicate photo) > shows the existing item by name and date and never its id
+TestingLibraryElementError: Unable to find an element with the text: This photo matches Olive Oil (use by 6 May 2030).. This could be because the text is broken up by multiple elements. In this case, you can provide a function for your text matcher to make your matcher more flexible.
+ FAIL  src/routes/ReviewPage.sg304.test.tsx > ReviewPage SG-304 G2 (duplicate photo) > It's another pack sends accept with the new-pack option, and the new item opens
+TestingLibraryElementError: Unable to find role="button" and name "It's another pack"
+ FAIL  src/routes/ReviewPage.sg304.test.tsx > ReviewPage SG-304 G2 (duplicate photo) > It's the same pack sends the plain accept, as before
+TestingLibraryElementError: Unable to find role="button" and name "It's the same pack"

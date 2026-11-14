@@ -1,0 +1,12 @@
+# SG-304r2 PASS on candidate: test names and result
+tests/test_sg304_duplicate_pack.py::test_another_pack_creates_its_own_item_and_leaves_the_existing_one PASSED [ 20%]
+tests/test_sg304_duplicate_pack.py::test_same_pack_links_to_the_existing_item_and_keeps_its_date[body0] PASSED [ 40%]
+tests/test_sg304_duplicate_pack.py::test_same_pack_links_to_the_existing_item_and_keeps_its_date[body1] PASSED [ 60%]
+tests/test_sg304_duplicate_pack.py::test_hold_or_reject_with_the_new_option_changes_nothing[hold] PASSED [ 80%]
+tests/test_sg304_duplicate_pack.py::test_hold_or_reject_with_the_new_option_changes_nothing[reject] PASSED [100%]
+ ✓ src/components/AssetForm.sg304.test.tsx  (8 tests) 541ms
+      Tests  8 passed (8)
+ ✓ src/components/CandidateCard.sg304.test.tsx  (4 tests) 272ms
+      Tests  4 passed (4)
+ ✓ src/routes/ReviewPage.sg304.test.tsx  (4 tests) 299ms
+      Tests  4 passed (4)
