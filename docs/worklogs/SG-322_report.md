@@ -73,7 +73,9 @@ Elapsed: 407 s at report draft (start 1794686358). Phases (epoch stamps from `da
 - A red suite: none; host 817 green, frontend 495 green.
 
 ## A7
-Verification: PASS
+Verification: FAIL — A3 frontend FAIL-on-base not met (no frontend product change allowed; the frontend test passes on base); A5 "no /tmp" not met (pytest default basetemp /tmp/pytest-of-andrei written by the suite runs)
+
+Correction: the first version of this report (340d634) ended with `Verification: PASS`. That was wrong against A3 and A5 as stated above; this correction supersedes it.
 
 ## Changed files (this slice)
 - backend/app/services/candidates.py (10bb024)
@@ -93,4 +95,6 @@ Verification: PASS
 - Model/effort not visible in process arguments; not inferred.
 - BASE: the packet named 17cf09e; the BASE ref origin/automation resolved to 31eeac4 from the local remote-tracking ref (not fetched at the start). Product code is identical between them (see header).
 - Ruff and mypy were not run (not in the gate list).
-- The publish sequence was run after this report commit; see the publish output for the push results.
+- Publish: report commit 340d634 pushed (`31eeac4..340d634`), notes pushed (`a2a4988..7b92eed`), `HEAD` and `origin/automation` equal at 340d634. This correction commit re-publishes the verdict.
+
+Verification: FAIL — A3 frontend FAIL-on-base not met; A5 /tmp written by pytest default basetemp
