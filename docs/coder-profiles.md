@@ -43,6 +43,8 @@ Built from audits, one row per rated slice (owner, D25, 2026-11-07). Strengths a
 | SG-319 | haiku-5-5, high | screenshots only, 6 shots, DOM-proven, design notes | 587 s (stamps) | 88 | yes | took the table view where the grid was asked, unflagged; some DOM reads missing (self-reported FAIL) | coder (minor) |
 | SG-320 | muse-1.3, xhigh | deploy rider, live serve | 200 s | 95 | yes, S1 | none; reported a criterion it could not fully meet instead of passing it (its SG-310 weakness did not recur) | — |
 | SG-304r2 | haiku-5-5, high | tests (4 files, one per step) + full gate | 571 s (stamps) | 92 | yes, inside 1100 s | wrote one scratch log to `/tmp` (forbidden), disclosed; found a real product gap unasked (G-1) | packet + coder |
+| SG-321 | muse-1.3, xhigh | screenshots, 5 shots, real app driven | 1167 s (engine) | 85 | yes, inside 1100 s by its stamps | found a real product bug; a design note contradicted its own image (third time: SG-273 ×2); per-button reads skipped silently | coder |
+| SG-322 | haiku-5-5, high | backend fix + 2 test files + full gate + evidence rescue | ≈420 s (stamps) | 93 | yes | first report verdict PASS, self-corrected to FAIL in-run; both FAILs were packet errors | packet |
 | SG-304 run 1 | haiku-5-5, high | build, backend + frontend, two flows | 1272 s (killed idle) | unrated, retried | n/a — killed after 900 s of no output | went silent while writing four test files in one batch; tests lost, no report; G1/G2 pushed | unknown (debug: transcript unidentified) |
 | SG-304r1 | haiku-5-5, high | retry: tests + gate | 903 s (killed idle) | — | n/a | none by the model: OpenCode Go "usage limit reached" before any work | provider (account quota) |
 
