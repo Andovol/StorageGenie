@@ -1012,19 +1012,27 @@ def _household_asset(db: Session, candidate: Candidate, asset_id: object) -> str
     return target.id
 
 
+# SG-322 G2: the candidate states that mean "decided". Only a decided candidate
+# reads as in the catalog through its duplicate proposal's own asset; an open
+# ("proposed") or held duplicate reads with no asset_id, so its choices show.
+DECIDED_CANDIDATE_STATES = frozenset({"accepted", "edited"})
+
+
 def committed_asset_id(db: Session, candidate: Candidate) -> str | None:
     """The item id this candidate already led to, if any (SG-271 G2).
 
     Derived on every read from rows the commit already wrote — nothing is
-    stored: a duplicate proposal's own asset, the review step's
+    stored: a decided candidate's duplicate proposal asset (SG-322 G1: only once
+    the candidate is in DECIDED_CANDIDATE_STATES), the review step's
     `committed_assets` map (SG-270), then the commit step's own output
     (pre-SG-270 rows, SG-275). Every hop checks the household, as the commit
     path does; a foreign-household id reads back as none.
     """
     proposal = load_proposal(candidate)
-    found = _household_asset(db, candidate, proposal.get("asset_id"))
-    if found is not None:
-        return found
+    if candidate.state in DECIDED_CANDIDATE_STATES:
+        found = _household_asset(db, candidate, proposal.get("asset_id"))
+        if found is not None:
+            return found
     review_output = _step_output(db, candidate.job_id, "AWAITING_REVIEW")
     if isinstance(review_output, dict):
         committed = review_output.get("committed_assets")
