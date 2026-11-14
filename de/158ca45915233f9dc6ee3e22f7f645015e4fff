@@ -1,0 +1,42 @@
+Dispatch-ID: SG-321.dbg | Report: note
+Debug-Report-Begin
+STAGE: Coder or provider
+CAUSE: The Coder's verification failed at A3 because a proposed duplicate resolved to an existing asset, so the review page displayed “In your catalog” instead of the required duplicate card and the follow-up could not add a third Olive Oil.
+EVIDENCE:
+- [evidence file] “Result=success” and “ExecMainStatus=0”; the unit itself completed successfully.
+- [evidence file] “DISPATCH_RESULT id=SG-321 coder=opencode exit=0 head=2fcc629c34ed1e4d449c0af7dba13759cb223848 note=yes moved=yes rewrite=no dirty=no elapsed=1167s budget=2100s stragglers=0 published_head=no”.
+- [evidence file] “report_cited_missing=FAIL paths=output/SG-321-scratch/sg321.db,output/SG-321-scratch/seed.py” and “advisory_failed=report_cited_missing”. These scratch paths had been removed as the packet required.
+- [journal] “2026-11-14T19:30:02+00:00 ubuntu systemd[1]: Starting dispatch-storagegenie@SG-321.service - Confined Coder slice SG-321...” and “2026-11-14T19:49:29+00:00 ubuntu systemd[1]: Finished dispatch-storagegenie@SG-321.service - Confined Coder slice SG-321.”
+- [packet lookup] `docs/packets/SG-321.md` is absent; the SG-321 slice packet is `docs/packets/SG-321-sg304-screenshots.md`. [packet docs/packets/SG-321-sg304-screenshots.md] “A shot failing its proof is retaken once, then reported failed”; A3 requires five shots proving the named states.
+- [log output/dispatch/SG-321.log] “Verification: FAIL — A3: shots 03/04 show `In your catalog` not the duplicate card; shot 05 count 6->6 with 2 Olive Oils”.
+- [log output/dispatch/SG-321.log] “Product gap (PB-1): `ReviewPage` shows `In your catalog` when `candidate.asset_id` truthy, and `committed_asset_id` returns duplicate target for proposed duplicates”; the same log says the retake showed the card absent and click returned `click:no-btn`.
+- [log output/dispatch/SG-321.log] “! [rejected] automation -> automation (fetch first)” and “error: failed to push some refs”; the notes push succeeded, but final `HEAD` and `origin/automation` were `2fcc629c34ed1e4d449c0af7dba13759cb223848` and `17cf09e060c7c76964ce54bda170baafd2a1e15f` respectively. This is a separate publication failure.
+- [ref refs/notes/storagegenie-coder-reports at SG-321 report commit] “Dispatch-ID: SG-321 | Report: docs/worklogs/SG-321_report.md | Work-HEAD: 2fcc629c34ed1e4d449c0af7dba13759cb223848”; the receipt note exists and the run log records its push succeeded.
+- [evidence file] Header: “DISPATCH_EVIDENCE instance=SG-321.dbg failed_id=SG-321 utc=2026-11-14T19:49:44Z cap=400”. It has no `evidence_staged=` field, so the supplied copy does not identify the root-owned source path for independent verification.
+- [ref refs/quarantine/SG-025-20260912T164340Z] “quarantine: debris from SG-025 (no receipt)”.
+- [ref refs/quarantine/SG-066-20260921T095958Z] “quarantine: debris from SG-066 (no receipt)”.
+- [ref refs/quarantine/SG-088-20260921T174803Z] “quarantine: debris from SG-088 (no receipt)”.
+- [ref refs/quarantine/SG-208-20261017T171409Z] “quarantine: debris from SG-208 (no receipt)”.
+- [ref refs/quarantine/flag-SG-300-20261110T212535Z] “quarantine: dirt moved by SG-300 --quarantine (last=SG-273)”.
+- [ref refs/quarantine/flag-SG-301r1-20261112T141057Z] “quarantine: dirt moved by SG-301r1 --quarantine (last=SG-301)”.
+- [ref refs/quarantine/flag-SG-311-20261112T143120Z] “quarantine: dirt moved by SG-311 --quarantine (last=SG-301r1)”.
+- [ref refs/quarantine/preserve-20260907T083833Z] “receipt(SG-008)”.
+- [ref refs/quarantine/preserve-20261017T171411Z] “SG-208 G1: remove the household switching UI …; absence tests; full suite 293 pass”.
+- [ref refs/quarantine/preserve-20261102T163542Z] “SG-279 report”.
+STRANDED WORK:
+- `refs/heads/automation` at `2fcc629c34ed1e4d449c0af7dba13759cb223848` holds the SG-321 report and screenshot evidence; this commit was not pushed to `origin/automation`. The remote is at `17cf09e060c7c76964ce54bda170baafd2a1e15f` (D36), so the branch diverged.
+- `refs/quarantine/SG-025-20260912T164340Z` holds SG-025 provider-call model/service/router code, migration, tests, ADRs and work logs, quarantined with no receipt.
+- `refs/quarantine/SG-066-20260921T095958Z` holds the SG-066 analytics endpoint/service, frontend page and tests, quarantined with no receipt.
+- `refs/quarantine/SG-088-20260921T174803Z` holds SG-088 taxonomy/test changes and verification logs, quarantined with no receipt.
+- `refs/quarantine/SG-208-20261017T171409Z` holds the SG-208 driver, screenshots and smoke JSON, quarantined with no receipt.
+- `refs/quarantine/flag-SG-300-20261110T212535Z` holds SG-273 scratch debris, including backend logs and Chrome/profile state.
+- `refs/quarantine/flag-SG-301r1-20261112T141057Z` holds SG-301r1 build-check output, `.vite` state and generated assets/fonts.
+- `refs/quarantine/flag-SG-311-20261112T143120Z` holds SG-311 tool debris, including frontend debug logs and npm cache metadata.
+- `refs/quarantine/preserve-20260907T083833Z` preserves the SG-008 receipt report commit.
+- `refs/quarantine/preserve-20261017T171411Z` preserves SG-208 G1 household-switching UI removal and its tests.
+- `refs/quarantine/preserve-20261102T163542Z` preserves the SG-279 report commit.
+NEXT ACTION: needs the desk
+CONFIDENCE: medium
+
+Debug-Report-End
+moved=no
