@@ -83,7 +83,7 @@ function row(asset_id: string, display_name: string, expiry_date: string, days_r
     date_type: "expiry_date",
     days_remaining,
     tier: null,
-    bucket: "safe",
+    bucket: days_remaining < 0 ? "expired" : days_remaining <= 7 ? "this-week" : "safe",
   } as const;
 }
 
@@ -171,6 +171,103 @@ describe("SG-331 T1 kind-of-item text tabs", () => {
     expect(product).toHaveAttribute("aria-pressed", "false");
     expect(product.style.fontSize).toBe("15px");
     expect(product.style.color).toBe("hsl(var(--ink-muted))");
+  });
+});
+
+describe("SG-331 T6 one attention line", () => {
+  beforeEach(() => {
+    window.localStorage.clear();
+    api.apiGet.mockReset();
+    api.apiPatch.mockReset();
+    api.fetchExpiryStatus.mockReset();
+    mockApi();
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  test("live All view names past and this-week counts with a Show them link", async () => {
+    renderCatalog();
+    await screen.findAllByTestId("product-card");
+    const line = screen.getByTestId("catalog-attention");
+    expect(line.textContent).toContain("2 items are past their date and 1 runs out this week.");
+    const link = screen.getByRole("link", { name: "Show them" });
+    expect(link).toHaveAttribute("href", expect.stringContaining("/expiry"));
+  });
+
+  test("the line hides outside the live All view or when nothing needs you", async () => {
+    const first = renderCatalog();
+    await screen.findAllByTestId("product-card");
+    expect(screen.getByTestId("catalog-attention")).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "Product" }));
+    expect(screen.queryByTestId("catalog-attention")).not.toBeInTheDocument();
+    first.unmount();
+
+    api.apiGet.mockImplementation((path: string) => {
+      if (path === "/v1/households") {
+        return Promise.resolve([{ id: "h1", name: "Home", created_at: "2026-09-01T00:00:00Z" }]);
+      }
+      if (path === "/v1/assets/facets") {
+        return Promise.resolve({ asset_type: { product: 1 }, status: { ACTIVE: 1 }, has_evidence: {} });
+      }
+      if (path === "/v1/saved-searches") {
+        return Promise.resolve({ items: [] });
+      }
+      if (path === "/v1/assets") {
+        return Promise.resolve({ items: [asset("a-later", "Olive Oil", "2026-09-13T00:00:00Z")], next_cursor: null });
+      }
+      if (path === "/v1/plugins/expiry-tracker/status") {
+        return Promise.resolve({
+          household_id: "h1",
+          as_of: "2026-11-16",
+          category: null,
+          rows: [row("a-later", "Olive Oil", "2030-05-06", 100)],
+          summary: { by_tier: {}, by_bucket: {}, unresolved: 0, total: 1 },
+          unresolved_rows: [],
+        });
+      }
+      return Promise.resolve({ items: [], next_cursor: null, total: 0 });
+    });
+    renderCatalog();
+    await screen.findAllByTestId("product-card");
+    expect(screen.queryByTestId("catalog-attention")).not.toBeInTheDocument();
+  });
+
+  test("singular counts read 1 item is past its date and 1 runs out this week", async () => {
+    api.apiGet.mockImplementation((path: string) => {
+      if (path === "/v1/households") {
+        return Promise.resolve([{ id: "h1", name: "Home", created_at: "2026-09-01T00:00:00Z" }]);
+      }
+      if (path === "/v1/assets/facets") {
+        return Promise.resolve({ asset_type: { product: 2 }, status: { ACTIVE: 2 }, has_evidence: {} });
+      }
+      if (path === "/v1/saved-searches") {
+        return Promise.resolve({ items: [] });
+      }
+      if (path === "/v1/assets") {
+        return Promise.resolve({
+          items: [asset("a-past-old", "Milk", "2026-09-10T00:00:00Z"), asset("a-soon", "Yogurt", "2026-09-12T00:00:00Z")],
+          next_cursor: null,
+        });
+      }
+      if (path === "/v1/plugins/expiry-tracker/status") {
+        return Promise.resolve({
+          household_id: "h1",
+          as_of: "2026-11-16",
+          category: null,
+          rows: [row("a-past-old", "Milk", "2026-10-27", -20), row("a-soon", "Yogurt", "2026-11-21", 5)],
+          summary: { by_tier: {}, by_bucket: {}, unresolved: 0, total: 2 },
+          unresolved_rows: [],
+        });
+      }
+      return Promise.resolve({ items: [], next_cursor: null, total: 0 });
+    });
+    renderCatalog();
+    await screen.findAllByTestId("product-card");
+    expect(screen.getByTestId("catalog-attention").textContent).toContain(
+      "1 item is past its date and 1 runs out this week."
+    );
   });
 });
 

@@ -68,6 +68,19 @@ function useIsNarrow(): boolean {
   return narrow;
 }
 
+/**
+ * SG-331 T6: the one attention line. Past is `1 item is past its date`, soon
+ * is `2 run out this week` (singular and plural right); null when neither
+ * needs the owner, so no line renders.
+ */
+export function formatAttentionLine(past: number, soon: number): string | null {
+  if (past <= 0 && soon <= 0) return null;
+  const pastPart = past === 1 ? "1 item is past its date" : `${past} items are past their date`;
+  const soonPart = soon === 1 ? "1 runs out this week" : `${soon} run out this week`;
+  if (past > 0 && soon > 0) return `${pastPart} and ${soonPart}.`;
+  return `${past > 0 ? pastPart : soonPart}.`;
+}
+
 export function CatalogPage() {
   // SG-196 G1: household selection now comes from the shared context; the
   // effective-household derivation shape is unchanged.
@@ -229,6 +242,13 @@ export function CatalogPage() {
   const displayed = allItems.length ? allItems : (data?.items || []);
   const nextCursor = data?.next_cursor;
 
+  // SG-331 T6: "past" is the expiry row bucket `expired`, "this week" is the
+  // bucket `this-week` (api/types.ts ExpiryBucket — the same window the Pantry
+  // calls use-soon). Rows are counted, not summary.by_bucket.
+  const pastCount = (expiryQuery.data?.rows ?? []).filter((row) => row.bucket === "expired").length;
+  const soonCount = (expiryQuery.data?.rows ?? []).filter((row) => row.bucket === "this-week").length;
+  const attentionLine = formatAttentionLine(pastCount, soonCount);
+
   // The card/table rows hand back an id; the summary Asset for it is already in
   // the loaded page, which is all the drawer needs (it fetches the full record).
   const selectedAsset = useMemo(
@@ -388,6 +408,22 @@ export function CatalogPage() {
             ) : (
             !(isError && displayed.length === 0) && (
               <>
+                {statusFilter === "live" && category === CATEGORY_ALL && attentionLine ? (
+                  <div
+                    role="status"
+                    data-testid="catalog-attention"
+                    style={{ backgroundColor: "hsl(var(--past-bg))", color: "hsl(var(--past-fg))", padding: "8px 12px", fontSize: 13, marginBottom: 12 }}
+                  >
+                    {attentionLine}{" "}
+                    <Link
+                      className="focus-ring"
+                      style={{ color: "inherit", fontWeight: 600 }}
+                      to={`/expiry?household_id=${effectiveHousehold}`}
+                    >
+                      Show them
+                    </Link>
+                  </div>
+                ) : null}
                 <ProductGrid
                     items={visibleItems}
                     density={density}
