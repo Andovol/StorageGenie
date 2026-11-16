@@ -95,8 +95,6 @@ describe("SG-307 paper controls and 375 header", () => {
           categories={["All (1)"]}
           activeCategory="All (1)"
           onCategoryChange={() => {}}
-          statusFilter="live"
-          onStatusFilterChange={() => {}}
           sort="recent"
           onSortChange={() => {}}
           density="grid"

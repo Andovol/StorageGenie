@@ -62,12 +62,12 @@ export type CatalogStatusFilter = "live" | "gone";
 export const PER_ROW_WIDE = [4, 5, 6] as const;
 export const PER_ROW_NARROW = [3, 4] as const;
 
+// SG-331 T3: the Live / Gone boxes are gone from the toolbar — the title row
+// owns one quiet text link instead. The filter type stays for AppShell.
 type CatalogToolbarProps = {
   categories: readonly string[];
   activeCategory: string;
   onCategoryChange: (category: string) => void;
-  statusFilter: CatalogStatusFilter;
-  onStatusFilterChange: (status: CatalogStatusFilter) => void;
   sort: SortOption;
   onSortChange: (sort: SortOption) => void;
   density: Density;
@@ -109,8 +109,6 @@ export function CatalogToolbar({
   categories,
   activeCategory,
   onCategoryChange,
-  statusFilter,
-  onStatusFilterChange,
   sort,
   onSortChange,
   density,
@@ -161,32 +159,6 @@ export function CatalogToolbar({
         color: "hsl(var(--ink))",
       }}
     >
-      <div role="group" aria-label="Live or gone" style={{ display: "inline-flex", gap: 0 }}>
-        {(["live", "gone"] as CatalogStatusFilter[]).map((option) => {
-          const active = option === statusFilter;
-          return (
-            <button
-              key={option}
-              type="button"
-              aria-pressed={active}
-              onClick={() => onStatusFilterChange(option)}
-              className="sg-paper-control focus-ring"
-              style={{
-                padding: "4px 10px",
-                borderRadius: 0,
-                fontSize: 13,
-                fontWeight: active ? 600 : 400,
-                cursor: "pointer",
-                backgroundColor: active ? "hsl(var(--ink))" : "hsl(var(--paper))",
-                color: active ? "hsl(var(--paper))" : "hsl(var(--ink))",
-              }}
-            >
-              {option === "live" ? "Live" : "Gone"}
-            </button>
-          );
-        })}
-      </div>
-
       {/* SG-331 T1: text tabs — no border or fill; the active one is ink 600
           with a 2 px ink underline, the rest muted at 15 px. The row scrolls
           sideways instead of wrapping. Labels carry no counts. */}

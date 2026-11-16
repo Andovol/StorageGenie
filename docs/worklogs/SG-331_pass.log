@@ -3,3 +3,4 @@ SG-331 T2 PASS (unit+page): sortCatalog useby order ['Milk','Eggs','Yogurt','Oli
 SG-331 T1 PASS: pills become borderless text tabs — All pressed 600/2px ink underline, no (n) counts, overflowX auto (first assertion)
 SG-331 T6 PASS: live All line '2 items are past their date and 1 runs out this week.' + Show them link; hides off live-All/zero; singular line (first assertions)
 SG-331 T4 PASS: Photo grid pressed + List switches to table; Standard Grid/Compact Table buttons absent (first assertions)
+SG-331 T3 PASS: Gone (2) link in title row; gone view retitles to Gone with Back to your things; Live box and Live-or-gone group absent (first assertions)

@@ -160,6 +160,10 @@ export function CatalogPage() {
     q
   );
   const categoryCounts = useMemo(() => facets?.asset_type ?? {}, [facets]);
+  // SG-331 T3: the gone count rides the already-loaded facets read — the
+  // status facet ignores its own filter, so ARCHIVED is the household+q
+  // gone count with no new request (undefined until the read lands).
+  const goneCount = facets?.status?.ARCHIVED;
 
   // Pills come from the real `asset_type` population and speak the same
   // vocabulary the cards show (`labelAssetType`, SG-307 plain words): the raw
@@ -327,6 +331,7 @@ export function CatalogPage() {
       density={density}
       onDensityChange={setDensity}
       titleCount={displayed.length}
+      goneCount={goneCount}
       perRowWide={perRowWide}
       onPerRowWideChange={changePerRowWide}
       perRowNarrow={perRowNarrow}

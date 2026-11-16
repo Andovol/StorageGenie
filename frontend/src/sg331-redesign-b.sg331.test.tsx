@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
-import { fireEvent, render, screen } from "@testing-library/react";
+import { fireEvent, render, screen, within } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ThemeProvider } from "./theme/ThemeProvider";
@@ -109,7 +109,7 @@ function mockApi() {
     if (path === "/v1/assets/facets") {
       return Promise.resolve({
         asset_type: { product: 5 },
-        status: { ACTIVE: 5 },
+        status: { ACTIVE: 5, ARCHIVED: 2 },
         has_evidence: { with: 0, without: 5 },
       });
     }
@@ -157,8 +157,9 @@ describe("SG-331 T1 kind-of-item text tabs", () => {
     await screen.findAllByTestId("product-card");
     const tabs = screen.getByTestId("catalog-kind-tabs");
     expect(tabs.style.overflowX).toBe("auto");
-    // No counts anywhere in the tab labels.
-    for (const button of screen.getAllByRole("button")) {
+    // No counts in the tab labels (the title-row Gone link keeps its own
+    // facets count, SG-331 T3).
+    for (const button of within(tabs).getAllByRole("button")) {
       expect(button.textContent ?? "").not.toMatch(/\(\d+\)/);
     }
     const all = screen.getByRole("button", { name: "All" });
@@ -268,6 +269,32 @@ describe("SG-331 T6 one attention line", () => {
     expect(screen.getByTestId("catalog-attention").textContent).toContain(
       "1 item is past its date and 1 runs out this week."
     );
+  });
+});
+
+describe("SG-331 T3 gone is a quiet title-row link", () => {
+  beforeEach(() => {
+    window.localStorage.clear();
+    api.apiGet.mockReset();
+    api.apiPatch.mockReset();
+    api.fetchExpiryStatus.mockReset();
+    mockApi();
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  test("live view links Gone with the loaded count; gone view retitles and links back", async () => {
+    renderCatalog();
+    await screen.findAllByTestId("product-card");
+    expect(screen.getByRole("heading", { name: "Your things" })).toBeInTheDocument();
+    expect(screen.queryByRole("group", { name: "Live or gone" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Live" })).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "Gone (2)" }));
+    expect(await screen.findByRole("heading", { name: "Gone" })).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "Back to your things" }));
+    expect(await screen.findByRole("heading", { name: "Your things" })).toBeInTheDocument();
   });
 });
 
