@@ -216,3 +216,7 @@ Read as: **directive** — the catalog always opens in *Standard Grid*; the D-21
 **2026-11-16, verbatim:** *"Okay, lets do a mockup first."*
 
 Read as: **D40** — before any more look work, the Architect makes one private mockup (an artifact; this reply is the owner's approval under the project's artifact rule) of a photo-first catalog: shadcn-style components in the project's tokens, one focal point per page (the photos), light and dark. The owner reacts; the build follows in 2–3 slices only after that. The shelf trial waits for the redesign unless the owner says otherwise.
+
+**2026-11-16, verbatim (on the D40 mockup):** *"I don't like the color combination too much, maybe try something a bit more elegant? Also the mobile view is pretty bad, we need to have 3 or 4 items per row at least. Maybe items per row should be configurable desktop and mobile? Desktop view overall is pretty clean overall, font is fine too."*
+
+Read as: **mockup feedback** — keep the desktop layout and Instrument Sans; replace the maroon-on-paper colours with a more elegant palette (round 2 offers Stone & Ink, Sage, Midnight); phone catalog shows at least 3 items per row; items per row is a setting on desktop (4/5/6) and phone (3/4). Nothing is built until the owner picks.
