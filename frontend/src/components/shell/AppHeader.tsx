@@ -11,7 +11,10 @@ type AppHeaderProps = {
   onSearchChange: (value: string) => void;
 };
 
-export function AppHeader({ loadedCount, searchValue, onSearchChange }: AppHeaderProps) {
+// SG-330 R2 (D41 Midnight): the header speaks plain words — Add item is the
+// one filled main-action button; the search names your things; the count box
+// is gone (the live count sits under Your things, SG-330 R3).
+export function AppHeader({ searchValue, onSearchChange }: AppHeaderProps) {
   const searchRef = useRef<HTMLInputElement>(null);
   // SG-198 G1: the import-modal id comes from the shared household context;
   // preserved behavior: localStorage-first with the first-household fallback,
@@ -53,33 +56,15 @@ export function AppHeader({ loadedCount, searchValue, onSearchChange }: AppHeade
       }}
     >
       {/* SG-105 G4: the global nav already carries the brand on this route;
-          the Catalog header does not repeat it. */}
-      <span
-        aria-label={`Total loaded items: ${loadedCount}`}
-        title="Items shown on this page"
-        data-testid="catalog-showing"
-        className="sg-header-count"
-        style={{
-          fontSize: 13,
-          padding: "2px 8px",
-          borderRadius: 0,
-          border: "1px solid hsl(var(--line))",
-          backgroundColor: "hsl(var(--paper))",
-          color: "hsl(var(--ink))",
-          whiteSpace: "nowrap",
-        }}
-      >
-        Showing: {loadedCount} {loadedCount === 1 ? "item" : "items"}
-      </span>
-
+           the Catalog header does not repeat it. */}
       {/* center stays reserved: category pills live in the toolbar, not here */}
       <div style={{ flex: 1 }} aria-hidden="true" />
 
       <input
         ref={searchRef}
         type="search"
-        aria-label="Search catalog"
-        placeholder="Search…"
+        aria-label="Search your things"
+        placeholder="Search your things"
         value={searchValue}
         onChange={(event) => onSearchChange(event.target.value)}
         className="sg-paper-control focus-ring sg-header-search"
@@ -95,7 +80,7 @@ export function AppHeader({ loadedCount, searchValue, onSearchChange }: AppHeade
       <ThemeToggle />
       <Link
         to="/capture"
-        aria-label="Import Asset"
+        aria-label="Add item"
         onClick={(event) => {
           event.preventDefault();
           setImportOpen(true);
@@ -110,12 +95,12 @@ export function AppHeader({ loadedCount, searchValue, onSearchChange }: AppHeade
           display: "inline-flex",
           alignItems: "center",
           gap: 6,
-          backgroundColor: "hsl(var(--ink))",
-          color: "hsl(var(--paper))",
+          backgroundColor: "hsl(var(--primary))",
+          color: "hsl(var(--primary-foreground))",
         }}
       >
         <Upload size={16} aria-hidden="true" />
-        <span className="sg-import-label">Import Asset</span>
+        <span className="sg-import-label">Add item</span>
       </Link>
       {importOpen ? (
         <AssetImportModal householdId={householdId} onClose={() => setImportOpen(false)} />

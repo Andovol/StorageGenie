@@ -319,7 +319,7 @@ describe("AssetImportModal dialog behaviour", () => {
 });
 
 describe("CTA wiring (G2)", () => {
-  test("the header Import Asset link opens the dialog instead of routing to /capture", () => {
+  test("the header Add item link opens the dialog instead of routing to /capture (SG-330 R2: Import Asset -> Add item)", () => {
     render(
       <ThemeProvider>
         <MemoryRouter initialEntries={["/"]}>
@@ -344,7 +344,7 @@ describe("CTA wiring (G2)", () => {
       </ThemeProvider>
     );
 
-    fireEvent.click(screen.getByRole("link", { name: /import asset/i }));
+    fireEvent.click(screen.getByRole("link", { name: "Add item" }));
 
     expect(screen.getByRole("dialog", { name: "Import assets" })).toBeInTheDocument();
     expect(screen.getByText("catalog probe")).toBeInTheDocument();
@@ -367,7 +367,7 @@ describe("CTA wiring (G2)", () => {
       </ThemeProvider>
     );
 
-    fireEvent.click(screen.getByRole("link", { name: /import asset/i }));
+    fireEvent.click(screen.getByRole("link", { name: "Add item" }));
     dropFiles(imageFile("ctx.png"));
     fireEvent.click(screen.getByRole("button", { name: "Process 1 Item" }));
 

@@ -2,3 +2,4 @@ SG-330 R1 FAIL src/sg330-r1.sg330.test.tsx — light :root carries the exact Mid
 SG-330 R5 FAIL src/sg330-r5.sg330.test.tsx — past date reads Past its date | old badge reads 27 Oct 2026, no past wording
 SG-330 R4 FAIL src/sg330-r4.sg330.test.tsx — wide screens offer 4/5/6 | no Per row group on base
 SG-330 R3 FAIL src/sg330-r3.sg330.test.tsx — Your things heading | no h1 on base
+SG-330 R2 FAIL src/sg330-r2.sg330.test.tsx — Add item header | base still reads Import Asset

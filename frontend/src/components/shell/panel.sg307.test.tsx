@@ -123,7 +123,7 @@ describe("SG-307 paper controls and 375 header", () => {
     expect(toggle.className).not.toContain("bg-card");
   });
 
-  test("the 375 header rule: icon-shortened Import with aria-label and one-row classes", () => {
+  test("the 375 header rule: icon-shortened Add item with aria-label and one-row classes (SG-330 R2: Import -> Add item)", () => {
     render(
       <QueryClientProvider client={new QueryClient({ defaultOptions: { queries: { retry: false } } })}>
         <MemoryRouter>

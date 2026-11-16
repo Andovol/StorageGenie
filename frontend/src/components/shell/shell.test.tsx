@@ -201,10 +201,12 @@ describe("sortCatalog (real mapper data)", () => {
 });
 
 describe("Catalog shell", () => {
-  test("the header labels the LOADED item count, not a household total", async () => {
+  test("the header carries no count box; Your things names the LOADED item count (SG-330 R2+R3: Showing box -> heading)", async () => {
     renderCatalog();
     expect(await screen.findByText("Drill")).toBeInTheDocument();
-    expect(screen.getByLabelText(/total loaded items: 4/i)).toHaveTextContent("Showing: 4 items");
+    expect(screen.queryByText(/Showing:/)).not.toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Your things" })).toBeInTheDocument();
+    expect(screen.getByText("4 things")).toBeInTheDocument();
   });
 
   test("the toolbar renders All plus one counted pill per real asset_type vocabulary", async () => {
@@ -333,7 +335,7 @@ describe("Catalog shell", () => {
   test("typing in the header search narrows via the server-side query", async () => {
     renderCatalog();
     await screen.findByText("Drill");
-    fireEvent.change(screen.getByLabelText("Search catalog"), { target: { value: "shi" } });
+    fireEvent.change(screen.getByLabelText("Search your things"), { target: { value: "shi" } });
     expect(screen.getByText("Search: shi")).toBeInTheDocument();
 
     await waitFor(() => expect(screen.getByText("Shirt")).toBeInTheDocument());
@@ -355,7 +357,7 @@ describe("Catalog shell", () => {
   test("Clear all empties all three filters: query, pill and sort", async () => {
     renderCatalog();
     await screen.findByText("Drill");
-    fireEvent.change(screen.getByLabelText("Search catalog"), { target: { value: "zap" } });
+    fireEvent.change(screen.getByLabelText("Search your things"), { target: { value: "zap" } });
     fireEvent.click(await screen.findByRole("button", { name: "Electronics & Gadgets (1)" }));
     fireEvent.change(screen.getByLabelText("Sort catalog"), { target: { value: "name" } });
     const clearAll = screen.getByRole("button", { name: /clear all/i });
@@ -363,7 +365,7 @@ describe("Catalog shell", () => {
     expect(clearAll.style.textDecoration).toContain("underline");
     fireEvent.click(clearAll);
 
-    expect(screen.getByLabelText("Search catalog")).toHaveValue("");
+    expect(screen.getByLabelText("Search your things")).toHaveValue("");
     expect(screen.getByRole("button", { name: "All (4)" })).toHaveAttribute("aria-pressed", "true");
     expect(screen.getByLabelText("Sort catalog")).toHaveValue("recent");
   });
@@ -371,7 +373,7 @@ describe("Catalog shell", () => {
   test("Cmd/Ctrl+K moves focus to the header search field", async () => {
     renderCatalog();
     await screen.findByText("Drill");
-    const input = screen.getByLabelText("Search catalog");
+    const input = screen.getByLabelText("Search your things");
     (input as HTMLInputElement).blur();
     expect(document.activeElement).not.toBe(input);
 
@@ -390,7 +392,7 @@ describe("Catalog shell", () => {
     expect(document.documentElement.classList.contains("dark")).toBe(true);
   });
 
-  test("the header Import Asset CTA opens the import dialog and does not render /capture", async () => {
+  test("the header Add item CTA opens the import dialog and does not render /capture (SG-330 R2: Import Asset -> Add item)", async () => {
     render(
       <QueryClientProvider client={new QueryClient({ defaultOptions: { queries: { retry: false } } })}>
         <ThemeProvider>
@@ -405,7 +407,7 @@ describe("Catalog shell", () => {
     );
     await screen.findByText("Drill");
 
-    fireEvent.click(screen.getByRole("link", { name: /import asset/i }));
+    fireEvent.click(screen.getByRole("link", { name: "Add item" }));
 
     expect(screen.getByRole("dialog", { name: "Import assets" })).toBeInTheDocument();
     expect(screen.queryByText("capture probe")).not.toBeInTheDocument();
@@ -463,9 +465,10 @@ describe("Catalog shell", () => {
     renderCatalog();
     await screen.findByText("Drill");
 
-    // SG-301 G2: the badge reads "Showing: N item(s)" instead of "Loaded: …".
-    expect(screen.getByText("Showing: 1 item")).toBeInTheDocument();
-    expect(screen.queryByText("Showing: 1 items")).not.toBeInTheDocument();
+    // SG-330 R2+R3: the count lives under Your things (was SG-301 G2 "Showing: N item(s)").
+    expect(screen.queryByText(/Showing:/)).not.toBeInTheDocument();
+    expect(screen.getByText("1 thing")).toBeInTheDocument();
+    expect(screen.queryByText("1 things")).not.toBeInTheDocument();
   });
 });
 
@@ -524,7 +527,7 @@ describe("Saved searches (SG-068)", () => {
     const saveButton = screen.getByRole("button", { name: "Save search" });
     expect(saveButton).toBeDisabled();
 
-    fireEvent.change(screen.getByLabelText("Search catalog"), { target: { value: "shi" } });
+    fireEvent.change(screen.getByLabelText("Search your things"), { target: { value: "shi" } });
     await waitFor(() => expect(saveButton).not.toBeDisabled());
 
     const promptSpy = vi.spyOn(window, "prompt").mockReturnValue("Shirt searches");
@@ -549,7 +552,7 @@ describe("Saved searches (SG-068)", () => {
     expect(screen.getByText("Electronics")).toBeInTheDocument();
     fireEvent.change(select, { target: { value: "s1" } });
 
-    await waitFor(() => expect(screen.getByLabelText("Search catalog")).toHaveValue("zap"));
+    await waitFor(() => expect(screen.getByLabelText("Search your things")).toHaveValue("zap"));
     expect(screen.getByRole("button", { name: "Electronics & Gadgets (1)" })).toHaveAttribute(
       "aria-pressed",
       "true"
