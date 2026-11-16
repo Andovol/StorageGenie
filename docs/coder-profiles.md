@@ -51,6 +51,7 @@ Built from audits, one row per rated slice (owner, D25, 2026-11-07). Strengths a
 | SG-325 | muse-1.3, xhigh | 5 frontend polish items + tests + full gate | ~940 s (stamps) | 96 | yes, 750 s rule not reached | none material; named an unclear packet line (ACTIVE) instead of guessing | coder (minor) |
 | SG-326 | muse-1.3, xhigh | screenshots, 6 shots, real app driven | 605 s (stamps) | 95 | yes | none material; layout claim checked against the image (SG-321 weakness did not recur) | coder (minor) |
 | SG-327 | muse-1.3, xhigh | deploy rider, live serve | 152 s | 96 | yes, S1 | none; corrected a wrong packet premise (3 strings already present) instead of bending | packet (minor) |
+| SG-328 | muse-1.3, xhigh | minor frontend change + test + full gate | 456 s (stamps) | 96 | yes | none | — |
 | SG-304 run 1 | haiku-5-5, high | build, backend + frontend, two flows | 1272 s (killed idle) | unrated, retried | n/a — killed after 900 s of no output | went silent while writing four test files in one batch; tests lost, no report; G1/G2 pushed | unknown (debug: transcript unidentified) |
 | SG-304r1 | haiku-5-5, high | retry: tests + gate | 903 s (killed idle) | — | n/a | none by the model: OpenCode Go "usage limit reached" before any work | provider (account quota) |
 
