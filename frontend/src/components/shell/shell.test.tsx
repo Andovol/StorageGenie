@@ -418,12 +418,12 @@ describe("Catalog shell", () => {
     expect(screen.queryByText("capture probe")).not.toBeInTheDocument();
   });
 
-  test("Compact Table renders the real table view (the SG-045 note is gone)", async () => {
+  test("List renders the real table view (the SG-045 note is gone)", async () => {
     renderCatalog();
     await screen.findByText("Drill");
-    fireEvent.click(screen.getByRole("button", { name: "Compact Table" }));
+    fireEvent.click(screen.getByRole("button", { name: "List" }));
 
-    expect(screen.getByRole("button", { name: "Compact Table" })).toHaveAttribute("aria-pressed", "true");
+    expect(screen.getByRole("button", { name: "List" })).toHaveAttribute("aria-pressed", "true");
     expect(screen.queryByText(/table view arrives with the new cards/i)).not.toBeInTheDocument();
     expect(screen.getByRole("table", { name: "Product results" })).toBeInTheDocument();
     expect(screen.getByText("Drill")).toBeInTheDocument();

@@ -3,3 +3,4 @@ SG-331 T2 FAIL (unit): sortCatalog orders past oldest first — expected ['Milk'
 SG-331 T2 FAIL (page): the catalog defaults to Use by — Unable to find a label with the text of: Sort
 SG-331 T1 FAIL: pills become borderless text tabs — Unable to find an element by: [data-testid=catalog-kind-tabs] (first assertion)
 SG-331 T6 FAIL: live All view names past and this-week counts — Unable to find [data-testid=catalog-attention] (first assertion; all 3 T6 tests fail the same way)
+SG-331 T4 FAIL: two icon buttons switch views — Unable to find button Photo grid (first assertion; old Standard Grid/Compact Table text still rendered)

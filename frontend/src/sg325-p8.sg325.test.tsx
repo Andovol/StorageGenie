@@ -108,16 +108,16 @@ describe("SG-325 P8+P13 catalog Use by column", () => {
   });
 
   test("the table replaces Status with Use by: same-name rows show their own dates, dateless shows No date", async () => {
-    // SG-328: the catalog opens in Standard Grid, so reach the table through
-    // the Compact Table toggle (was: wide column 900 px opened the table).
+    // SG-328: the catalog opens in Photo grid, so reach the table through
+    // the List toggle (was: wide column 900 px opened the table).
     renderCatalog();
     await screen.findAllByTestId("product-card");
-    expect(screen.getByRole("button", { name: "Standard Grid" })).toHaveAttribute(
+    expect(screen.getByRole("button", { name: "Photo grid" })).toHaveAttribute(
       "aria-pressed",
       "true"
     );
 
-    fireEvent.click(screen.getByRole("button", { name: "Compact Table" }));
+    fireEvent.click(screen.getByRole("button", { name: "List" }));
     await screen.findAllByTestId("product-row");
 
     const headers = screen.getAllByRole("columnheader").map((cell) => cell.textContent);
@@ -137,8 +137,8 @@ describe("SG-325 P8+P13 catalog Use by column", () => {
   });
 
   test("the card view shows the same dates in place of the status badge", async () => {
-    // SG-328: Standard Grid is the default (was: 900 px column then click
-    // Standard Grid); the grid already shows the cards on first render.
+    // SG-328: Photo grid is the default (was: 900 px column then click
+    // Photo grid); the grid already shows the cards on first render.
     renderCatalog();
     const cards = await screen.findAllByTestId("product-card");
     expect(cards).toHaveLength(3);

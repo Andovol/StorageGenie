@@ -1,3 +1,4 @@
+import { LayoutGrid, List } from "lucide-react";
 import type { ProductItem } from "../../types/product";
 import type { SavedSearch } from "../../api/types";
 
@@ -12,10 +13,14 @@ export const SORT_LABELS: Record<SortOption, string> = {
   name: "Name, A to Z",
 };
 
+// SG-331 T4: the view switch is two icon buttons — Photo grid / List. The
+// map stays the single source for the accessible names and titles.
 export const DENSITY_LABELS: Record<Density, string> = {
-  grid: "Standard Grid",
-  table: "Compact Table",
+  grid: "Photo grid",
+  table: "List",
 };
+
+const DENSITY_ICONS = { grid: LayoutGrid, table: List } as const;
 
 // The "All" pill's key; category pills are otherwise the raw `asset_type`
 // facet keys (SG-064 G2: the UI follows the data, not the static DQ1 labels).
@@ -234,27 +239,36 @@ export function CatalogToolbar({
         ))}
       </select>
 
-      <div role="group" aria-label="Density" style={{ display: "inline-flex", gap: 0 }}>
+      {/* SG-331 T4: two icon buttons in one small bordered group. */}
+      <div
+        role="group"
+        aria-label="Density"
+        style={{ display: "inline-flex", gap: 0, alignItems: "center", borderStyle: "solid", borderWidth: 1, borderColor: "hsl(var(--line))", borderRadius: 0 }}
+      >
         {(Object.keys(DENSITY_LABELS) as Density[]).map((option) => {
           const active = option === density;
+          const Icon = DENSITY_ICONS[option];
           return (
             <button
               key={option}
               type="button"
               aria-pressed={active}
+              aria-label={DENSITY_LABELS[option]}
+              title={DENSITY_LABELS[option]}
               onClick={() => onDensityChange(option)}
-              className="sg-paper-control focus-ring"
+              className="focus-ring"
               style={{
-                padding: "4px 10px",
+                padding: "4px 8px",
+                background: "transparent",
+                border: "none",
                 borderRadius: 0,
-                fontSize: 13,
-                fontWeight: active ? 600 : 400,
                 cursor: "pointer",
-                backgroundColor: active ? "hsl(var(--ink))" : "hsl(var(--paper))",
-                color: active ? "hsl(var(--paper))" : "hsl(var(--ink))",
+                display: "inline-flex",
+                alignItems: "center",
+                color: active ? "hsl(var(--ink))" : "hsl(var(--ink-muted))",
               }}
             >
-              {DENSITY_LABELS[option]}
+              <Icon size={16} aria-hidden="true" />
             </button>
           );
         })}

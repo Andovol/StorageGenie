@@ -613,17 +613,17 @@ describe("CatalogPage grid default (SG-328; width rule retired)", () => {
     vi.restoreAllMocks();
   });
 
-  test("a wide content column (1280 px) opens in Standard Grid (was >=860 table)", async () => {
+  test("a wide content column (1280 px) opens in Photo grid (was >=860 table)", async () => {
     const spy = mockContentColumnWidth(1280);
     renderCatalog();
 
     // SG-328: no width measure; the grid is the initial state at every width.
     expect(screen.getByTestId("catalog-content-column")).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Standard Grid" })).toHaveAttribute(
+    expect(screen.getByRole("button", { name: "Photo grid" })).toHaveAttribute(
       "aria-pressed",
       "true"
     );
-    expect(screen.getByRole("button", { name: "Compact Table" })).toHaveAttribute(
+    expect(screen.getByRole("button", { name: "List" })).toHaveAttribute(
       "aria-pressed",
       "false"
     );
@@ -634,12 +634,12 @@ describe("CatalogPage grid default (SG-328; width rule retired)", () => {
     expect(screen.queryByTestId("table-scroll")).not.toBeInTheDocument();
   });
 
-  test("a narrow content column (320 px) still opens in Standard Grid (was <860 grid)", async () => {
+  test("a narrow content column (320 px) still opens in Photo grid (was <860 grid)", async () => {
     const spy = mockContentColumnWidth(320);
     renderCatalog();
 
     expect(screen.getByTestId("catalog-content-column")).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Standard Grid" })).toHaveAttribute(
+    expect(screen.getByRole("button", { name: "Photo grid" })).toHaveAttribute(
       "aria-pressed",
       "true"
     );
@@ -656,7 +656,7 @@ describe("CatalogPage grid default (SG-328; width rule retired)", () => {
       const view = renderCatalog();
 
       expect(screen.getByTestId("catalog-content-column")).toBeInTheDocument();
-      expect(screen.getByRole("button", { name: "Standard Grid" })).toHaveAttribute(
+      expect(screen.getByRole("button", { name: "Photo grid" })).toHaveAttribute(
         "aria-pressed",
         "true"
       );
@@ -674,35 +674,35 @@ describe("CatalogPage grid default (SG-328; width rule retired)", () => {
     mockContentColumnWidth(1280);
     const first = renderCatalog();
 
-    expect(screen.getByRole("button", { name: "Standard Grid" })).toHaveAttribute(
+    expect(screen.getByRole("button", { name: "Photo grid" })).toHaveAttribute(
       "aria-pressed",
       "true"
     );
     await screen.findByTestId("product-card");
 
-    fireEvent.click(screen.getByRole("button", { name: "Standard Grid" }));
-    expect(screen.getByRole("button", { name: "Standard Grid" })).toHaveAttribute(
+    fireEvent.click(screen.getByRole("button", { name: "Photo grid" }));
+    expect(screen.getByRole("button", { name: "Photo grid" })).toHaveAttribute(
       "aria-pressed",
       "true"
     );
     await screen.findByTestId("product-card");
     expect(screen.queryByTestId("table-scroll")).not.toBeInTheDocument();
 
-    fireEvent.click(screen.getByRole("button", { name: "Compact Table" }));
-    expect(screen.getByRole("button", { name: "Compact Table" })).toHaveAttribute(
+    fireEvent.click(screen.getByRole("button", { name: "List" }));
+    expect(screen.getByRole("button", { name: "List" })).toHaveAttribute(
       "aria-pressed",
       "true"
     );
     await screen.findByTestId("product-row");
 
     // Leave the session on the grid via the control, then remount: SG-328 keeps
-    // Standard Grid as the default, not the width and not any stored choice.
-    fireEvent.click(screen.getByRole("button", { name: "Standard Grid" }));
+    // Photo grid as the default, not the width and not any stored choice.
+    fireEvent.click(screen.getByRole("button", { name: "Photo grid" }));
     await screen.findByTestId("product-card");
     first.unmount();
 
     renderCatalog();
-    expect(screen.getByRole("button", { name: "Standard Grid" })).toHaveAttribute(
+    expect(screen.getByRole("button", { name: "Photo grid" })).toHaveAttribute(
       "aria-pressed",
       "true"
     );

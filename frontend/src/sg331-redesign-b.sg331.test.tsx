@@ -271,6 +271,36 @@ describe("SG-331 T6 one attention line", () => {
   });
 });
 
+describe("SG-331 T4 photo grid / list icon switch", () => {
+  beforeEach(() => {
+    window.localStorage.clear();
+    api.apiGet.mockReset();
+    api.apiPatch.mockReset();
+    api.fetchExpiryStatus.mockReset();
+    mockApi();
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  test("two icon buttons switch views; the old text labels are gone", async () => {
+    renderCatalog();
+    await screen.findAllByTestId("product-card");
+    const grid = screen.getByRole("button", { name: "Photo grid" });
+    expect(grid).toHaveAttribute("aria-pressed", "true");
+    expect(grid).toHaveAttribute("title", "Photo grid");
+    const list = screen.getByRole("button", { name: "List" });
+    expect(list).toHaveAttribute("aria-pressed", "false");
+    expect(list).toHaveAttribute("title", "List");
+    expect(screen.queryByRole("button", { name: "Standard Grid" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Compact Table" })).not.toBeInTheDocument();
+    fireEvent.click(list);
+    expect(await screen.findByRole("table", { name: "Product results" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "List" })).toHaveAttribute("aria-pressed", "true");
+  });
+});
+
 describe("SG-331 T2 use-by sort first", () => {
   beforeEach(() => {
     window.localStorage.clear();

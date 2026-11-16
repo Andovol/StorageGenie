@@ -85,15 +85,15 @@ describe("SG-328 catalog grid default", () => {
     vi.restoreAllMocks();
   });
 
-  test("a wide content column (1280 px) opens in Standard Grid", async () => {
+  test("a wide content column (1280 px) opens in Photo grid", async () => {
     mockContentColumnWidth(1280);
     renderCatalog();
 
-    expect(screen.getByRole("button", { name: "Standard Grid" })).toHaveAttribute(
+    expect(screen.getByRole("button", { name: "Photo grid" })).toHaveAttribute(
       "aria-pressed",
       "true"
     );
-    expect(screen.getByRole("button", { name: "Compact Table" })).toHaveAttribute(
+    expect(screen.getByRole("button", { name: "List" })).toHaveAttribute(
       "aria-pressed",
       "false"
     );
@@ -103,11 +103,11 @@ describe("SG-328 catalog grid default", () => {
     expect(screen.queryByTestId("table-scroll")).not.toBeInTheDocument();
   });
 
-  test("a narrow content column (320 px) opens in Standard Grid", async () => {
+  test("a narrow content column (320 px) opens in Photo grid", async () => {
     mockContentColumnWidth(320);
     renderCatalog();
 
-    expect(screen.getByRole("button", { name: "Standard Grid" })).toHaveAttribute(
+    expect(screen.getByRole("button", { name: "Photo grid" })).toHaveAttribute(
       "aria-pressed",
       "true"
     );
@@ -117,21 +117,21 @@ describe("SG-328 catalog grid default", () => {
     expect(screen.queryByTestId("table-scroll")).not.toBeInTheDocument();
   });
 
-  test("Compact Table still switches to the table and back", async () => {
+  test("List still switches to the table and back", async () => {
     mockContentColumnWidth(1280);
     renderCatalog();
     await screen.findByTestId("product-card");
 
-    fireEvent.click(screen.getByRole("button", { name: "Compact Table" }));
-    expect(screen.getByRole("button", { name: "Compact Table" })).toHaveAttribute(
+    fireEvent.click(screen.getByRole("button", { name: "List" }));
+    expect(screen.getByRole("button", { name: "List" })).toHaveAttribute(
       "aria-pressed",
       "true"
     );
     await screen.findByTestId("product-row");
     expect(screen.getByTestId("table-scroll")).toBeInTheDocument();
 
-    fireEvent.click(screen.getByRole("button", { name: "Standard Grid" }));
-    expect(screen.getByRole("button", { name: "Standard Grid" })).toHaveAttribute(
+    fireEvent.click(screen.getByRole("button", { name: "Photo grid" }));
+    expect(screen.getByRole("button", { name: "Photo grid" })).toHaveAttribute(
       "aria-pressed",
       "true"
     );
