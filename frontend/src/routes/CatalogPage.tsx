@@ -1,6 +1,6 @@
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   useAssets,
   useDeleteSavedSearch,
@@ -8,7 +8,7 @@ import {
   useSaveSearch,
   useSavedSearches,
 } from "../hooks/useAssets";
-import { putBack } from "../api/client";
+import { fetchExpiryStatus, putBack } from "../api/client";
 import { useHouseholdContext } from "../hooks/HouseholdContext";
 import { ProductGrid } from "../components/catalog/ProductGrid";
 import { AppShell } from "../components/shell/AppShell";
@@ -24,7 +24,7 @@ import {
 import { goneReasonLabel } from "../api/types";
 import { assetToProductItem } from "../types/product";
 import { labelAssetType } from "../lib/labels";
-import type { Asset, SavedSearchQuery } from "../api/types";
+import type { Asset, ExpiryStatusResponse, SavedSearchQuery } from "../api/types";
 
 function useDebounced<T>(value: T, delayMs: number): T {
   const [debounced, setDebounced] = useState(value);
@@ -169,6 +169,20 @@ export function CatalogPage() {
     statusFilter === "gone" ? "ARCHIVED" : undefined
   );
 
+  // SG-325 P8: the use-by date for every module's items. The status read with
+  // no category carries the whole household (fetchExpiryStatus drops the empty
+  // category param), joined here by asset id — the same join the Pantry uses.
+  const expiryQuery = useQuery<ExpiryStatusResponse>({
+    queryKey: ["expiry-status", effectiveHousehold],
+    queryFn: () => fetchExpiryStatus(effectiveHousehold),
+    enabled: !!effectiveHousehold,
+  });
+  const useByById = useMemo(() => {
+    const map = new Map<string, string>();
+    for (const row of expiryQuery.data?.rows ?? []) map.set(row.asset_id, row.expiry_date);
+    return map;
+  }, [expiryQuery.data]);
+
   useEffect(() => {
     if (data?.items) {
       if (!cursor) {
@@ -196,10 +210,11 @@ export function CatalogPage() {
     const items = displayed.map((asset) => {
       const item = assetToProductItem(asset);
       const firstEvidenceId = asset.evidence_ids?.[0];
-      return firstEvidenceId ? { ...item, evidenceId: firstEvidenceId } : item;
+      const withMedia = firstEvidenceId ? { ...item, evidenceId: firstEvidenceId } : item;
+      return { ...withMedia, useBy: useByById.get(asset.id) ?? null };
     });
     return sortCatalog(items, sort);
-  }, [displayed, sort]);
+  }, [displayed, sort, useByById]);
 
   const activeFilters = useMemo(() => {
     const filters: string[] = [];

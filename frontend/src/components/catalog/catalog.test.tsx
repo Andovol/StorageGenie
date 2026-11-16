@@ -8,7 +8,7 @@ import type { Asset } from "../../api/types";
 import { CatalogPage } from "../../routes/CatalogPage";
 import { ThemeProvider } from "../../theme/ThemeProvider";
 import { HouseholdProvider } from "../../hooks/HouseholdContext";
-import { BADGE_CLASS, ProductCard, type CatalogProduct } from "./ProductCard";
+import { ProductCard, type CatalogProduct } from "./ProductCard";
 import { ProductCardSkeleton } from "./ProductCardSkeleton";
 import { ProductGrid, formatRelativeDate } from "./ProductGrid";
 import { MOCK_PRODUCTS } from "./mockProducts";
@@ -16,47 +16,16 @@ import { MOCK_PRODUCTS } from "./mockProducts";
 const api = vi.hoisted(() => ({ apiGet: vi.fn(), apiPatch: vi.fn() }));
 vi.mock("../../api/client", () => api);
 
-const DQ3_PAIRS: Record<ProductStatus, string[]> = {
-  raw: [
-    "bg-stone-100",
-    "text-stone-700",
-    "border-stone-200",
-    "dark:bg-stone-800/50",
-    "dark:text-stone-400",
-    "dark:border-stone-700/50",
-  ],
-  processed: [
-    "bg-sky-50",
-    "text-sky-800",
-    "border-sky-200",
-    "dark:bg-sky-950/40",
-    "dark:text-sky-400",
-    "dark:border-sky-800/50",
-  ],
-  rendered: [
-    "bg-emerald-50",
-    "text-emerald-800",
-    "border-emerald-200",
-    "dark:bg-emerald-950/40",
-    "dark:text-emerald-400",
-    "dark:border-emerald-800/50",
-  ],
-  failed: [
-    "bg-rose-50",
-    "text-rose-800",
-    "border-rose-200",
-    "dark:bg-rose-950/40",
-    "dark:text-rose-400",
-    "dark:border-rose-800/50",
-  ],
-};
-
 function renderWithRouter(ui: ReactElement, initialEntries: string[] = ["/"]) {
   return render(<MemoryRouter initialEntries={initialEntries}>{ui}</MemoryRouter>);
 }
 
 function withStatus(status: ProductStatus): CatalogProduct {
   return { ...MOCK_PRODUCTS[0], status };
+}
+
+function withUseBy(useBy: string | null): CatalogProduct {
+  return { ...MOCK_PRODUCTS[0], useBy };
 }
 
 describe("ProductCard", () => {
@@ -77,20 +46,20 @@ describe("ProductCard", () => {
     expect(screen.queryByTestId("color-dots")).not.toBeInTheDocument();
   });
 
-  test("uses the exact DQ3 badge class pair for every status", () => {
-    for (const status of Object.keys(DQ3_PAIRS) as ProductStatus[]) {
-      const { unmount } = renderWithRouter(<ProductCard item={withStatus(status)} householdId="h1" />);
-      const badge = screen.getByTestId("status-badge");
-      expect(badge).toHaveClass(...DQ3_PAIRS[status]);
-      expect(BADGE_CLASS[status]).toBe(DQ3_PAIRS[status].join(" "));
-      unmount();
-    }
+  test("the card shows the item's use-by date in place of the status badge (SG-325 P8)", () => {
+    const { unmount } = renderWithRouter(<ProductCard item={withUseBy("2030-05-06")} householdId="h1" />);
+    expect(screen.getByTestId("use-by-date")).toHaveTextContent("6 May 2030");
+    expect(screen.queryByText("Photo only")).not.toBeInTheDocument();
+    unmount();
+
+    renderWithRouter(<ProductCard item={withUseBy(null)} householdId="h1" />);
+    expect(screen.getByTestId("use-by-date")).toHaveTextContent("No date");
   });
 
-  test("the failed card shows the rose badge, the hairline well border, and both warning icons", () => {
-    renderWithRouter(<ProductCard item={withStatus("failed")} householdId="h1" />);
+  test("the failed card keeps the hairline well border and both warning icons, with No date in the use-by spot (SG-325 P8)", () => {
+    renderWithRouter(<ProductCard item={{ ...withStatus("failed"), useBy: null }} householdId="h1" />);
 
-    expect(screen.getByTestId("status-badge")).toHaveClass("badge-failed");
+    expect(screen.getByTestId("use-by-date")).toHaveTextContent("No date");
     expect(screen.getByTestId("product-card-well").className).toContain("border-rose-500/30");
     expect(screen.getByTestId("failed-warning")).toBeInTheDocument();
     expect(screen.getByTestId("title-error-icon")).toBeInTheDocument();
@@ -168,7 +137,7 @@ describe("ProductGrid", () => {
     expect(css).toContain("repeat(auto-fill, minmax(165px, 1fr))");
   });
 
-  test("the compact table renders the six columns in order (no Dimensions/Specs)", () => {
+  test("the compact table renders the six columns in order (Use by, no Dimensions/Specs)", () => {
     renderWithRouter(<ProductGrid items={MOCK_PRODUCTS} density="table" householdId="h1" />);
 
     const headers = screen.getAllByRole("columnheader").map((cell) => cell.textContent);
@@ -176,7 +145,7 @@ describe("ProductGrid", () => {
       "Asset",
       "Name",
       "Category",
-      "Status",
+      "Use by",
       "Added",
       "Actions",
     ]);

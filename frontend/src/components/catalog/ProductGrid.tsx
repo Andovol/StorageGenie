@@ -2,8 +2,8 @@ import { useState, type CSSProperties } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Package } from "lucide-react";
 import type { Density } from "../shell/CatalogToolbar";
-import { ProductCard, cardMedia, statusBadgeClass, type CatalogProduct } from "./ProductCard";
-import { labelAssetType, labelProductStatus } from "../../lib/labels";
+import { ProductCard, cardMedia, type CatalogProduct } from "./ProductCard";
+import { formatUseByDate, labelAssetType } from "../../lib/labels";
 import { ProductCardSkeleton } from "./ProductCardSkeleton";
 import { AssetImportModal } from "../shell/AssetImportModal";
 
@@ -42,7 +42,7 @@ const COLUMNS: { label: string; width: string; align?: "right" | "center" }[] = 
   { label: "Asset", width: "56px", align: "center" },
   { label: "Name", width: "200px" },
   { label: "Category", width: "140px" },
-  { label: "Status", width: "130px" },
+  { label: "Use by", width: "130px" },
   { label: "Added", width: "110px", align: "right" },
   { label: "Actions", width: "48px", align: "center" },
 ];
@@ -192,30 +192,11 @@ function TableView({
                   </span>
                 </td>
                 <td style={{ padding: "8px 10px" }}>
-                  <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
-                    <span
-                      data-testid="status-dot"
-                      className={`dot-${item.status}`}
-                      style={{
-                        width: 8,
-                        height: 8,
-                        borderRadius: 0,
-                      }}
-                    />
-                    <span
-                      className={statusBadgeClass(item.status)}
-                      style={{
-                        borderStyle: "solid",
-                        borderWidth: 1,
-                        borderRadius: 0,
-                        padding: "2px 8px",
-                        fontSize: 13,
-                        fontWeight: 600,
-                        whiteSpace: "nowrap",
-                      }}
-                    >
-                      {labelProductStatus(item.status)}
-                    </span>
+                  <span
+                    data-testid="use-by-cell"
+                    style={{ fontSize: 13, whiteSpace: "nowrap", color: "hsl(var(--ink))" }}
+                  >
+                    {formatUseByDate(item.useBy) || "No date"}
                   </span>
                 </td>
                 <td

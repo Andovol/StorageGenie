@@ -25,28 +25,37 @@ describe("SG-307 catalog plain words, no mono, square paper", () => {
     expect(labelProductStatus("failed")).toBe("Needs attention");
   });
 
-  test("no font-mono class and no developer status string in the rendered card", () => {
-    const { container, unmount } = renderCard("raw");
+  test("no font-mono class and the card shows the date, never Photo only (SG-325 P8)", () => {
+    const item = { ...MOCK_PRODUCTS[0], useBy: "2030-05-06" };
+    const { container, unmount } = render(
+      <MemoryRouter>
+        <ProductCard item={item} householdId="h1" />
+      </MemoryRouter>
+    );
     expect(container.querySelector(".font-mono")).toBeNull();
-    expect(screen.getByText("Photo only")).toBeInTheDocument();
+    expect(screen.getByText("6 May 2030")).toBeInTheDocument();
+    expect(screen.queryByText("Photo only")).toBeNull();
     expect(screen.queryByText("Source Only")).toBeNull();
     expect(screen.queryByText("Cutout Extracted")).toBeNull();
     expect(screen.queryByText("Scene Rendered")).toBeNull();
     unmount();
   });
 
-  test("every status renders its plain word with no mono", () => {
-    for (const [status, word] of [
-      ["raw", "Photo only"],
-      ["processed", "Cut-out ready"],
-      ["rendered", "Scene ready"],
-      ["failed", "Needs attention"],
-    ] as const) {
+  test("every processing state shows its own date or No date with no mono (SG-325 P8)", () => {
+    for (const status of ["raw", "processed", "rendered", "failed"] as const) {
       const { container, unmount } = renderCard(status);
-      expect(screen.getByText(word)).toBeInTheDocument();
+      expect(screen.getByText("No date")).toBeInTheDocument();
+      expect(screen.queryByText("Photo only")).toBeNull();
       expect(container.querySelector(".font-mono")).toBeNull();
       unmount();
     }
+    const { unmount } = render(
+      <MemoryRouter>
+        <ProductCard item={{ ...MOCK_PRODUCTS[0], useBy: "2031-02-03" }} householdId="h1" />
+      </MemoryRouter>
+    );
+    expect(screen.getByText("3 Feb 2031")).toBeInTheDocument();
+    unmount();
   });
 
   test("time stamps are plain words in the body font, no mono", () => {

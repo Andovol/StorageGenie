@@ -2,7 +2,7 @@ import { memo, useState } from "react";
 import { Link } from "react-router-dom";
 import { AlertTriangle, Package } from "lucide-react";
 import type { ProductItem, ProductStatus } from "../../types/product";
-import { labelAssetType, labelProductStatus } from "../../lib/labels";
+import { formatUseByDate, labelAssetType } from "../../lib/labels";
 
 /**
  * A catalog card item: the DQ1 `ProductItem` plus the media the grid renders.
@@ -13,6 +13,9 @@ export type CatalogProduct = ProductItem & {
   cutoutUrl?: string;
   sceneUrl?: string;
   evidenceId?: string;
+  /** SG-325 P8: the item's use-by date (ISO YYYY-MM-DD) joined from the
+   * expiry status read; null when the item has no date. */
+  useBy?: string | null;
 };
 
 /**
@@ -167,8 +170,7 @@ export const ProductCard = memo(function ProductCard({
           />
         ) : null}
         <span
-          data-testid="status-badge"
-          className={statusBadgeClass(item.status)}
+          data-testid="use-by-date"
           style={{
             position: "absolute",
             top: 8,
@@ -179,9 +181,13 @@ export const ProductCard = memo(function ProductCard({
             padding: "2px 8px",
             fontSize: 13,
             fontWeight: 600,
+            whiteSpace: "nowrap",
+            borderColor: "hsl(var(--line))",
+            backgroundColor: "hsl(var(--paper))",
+            color: "hsl(var(--ink-muted))",
           }}
         >
-          {labelProductStatus(item.status)}
+          {formatUseByDate(item.useBy) || "No date"}
         </span>
       </div>
       <div style={{ display: "flex", flexDirection: "column", gap: 6, minWidth: 0 }}>
