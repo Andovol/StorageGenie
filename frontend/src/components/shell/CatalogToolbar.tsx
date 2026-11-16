@@ -281,15 +281,18 @@ export function CatalogToolbar({
 
       <div style={{ flex: 1 }} />
 
-      <button
-        type="button"
-        onClick={onSaveSearch}
-        disabled={activeFilters.length === 0}
-        className="sg-paper-control focus-ring"
-        style={{ padding: "4px 10px", borderRadius: 0, fontSize: 13, cursor: "pointer", opacity: activeFilters.length === 0 ? 0.5 : 1 }}
-      >
-        Save search
-      </button>
+      {/* SG-331 T5: Save search only when a search or a non-default filter
+          or sort is active; the menu only when a saved search exists. */}
+      {activeFilters.length > 0 ? (
+        <button
+          type="button"
+          onClick={onSaveSearch}
+          className="sg-paper-control focus-ring"
+          style={{ padding: "4px 10px", borderRadius: 0, fontSize: 13, cursor: "pointer" }}
+        >
+          Save search
+        </button>
+      ) : null}
 
       {savedSearches.length > 0 ? (
         <select
@@ -306,11 +309,7 @@ export function CatalogToolbar({
             </option>
           ))}
         </select>
-      ) : (
-        <span style={{ fontSize: 13, color: "hsl(var(--ink-muted))" }}>
-          None yet
-        </span>
-      )}
+      ) : null}
 
       {selectedSavedSearch && (
         <button

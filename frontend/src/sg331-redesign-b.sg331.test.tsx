@@ -328,6 +328,32 @@ describe("SG-331 T4 photo grid / list icon switch", () => {
   });
 });
 
+describe("SG-331 T5 quiet toolbar when nothing is active", () => {
+  beforeEach(() => {
+    window.localStorage.clear();
+    api.apiGet.mockReset();
+    api.apiPatch.mockReset();
+    api.fetchExpiryStatus.mockReset();
+    mockApi();
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  test("Save search and Clear all hide until a search or filter is active; no None yet", async () => {
+    renderCatalog();
+    await screen.findAllByTestId("product-card");
+    expect(screen.queryByRole("button", { name: "Save search" })).not.toBeInTheDocument();
+    expect(screen.queryByLabelText("Saved searches")).not.toBeInTheDocument();
+    expect(screen.queryByText("None yet")).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /clear all/i })).not.toBeInTheDocument();
+    fireEvent.change(screen.getByLabelText("Search your things"), { target: { value: "zap" } });
+    expect(await screen.findByRole("button", { name: "Save search" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /clear all/i })).toBeInTheDocument();
+  });
+});
+
 describe("SG-331 T2 use-by sort first", () => {
   beforeEach(() => {
     window.localStorage.clear();

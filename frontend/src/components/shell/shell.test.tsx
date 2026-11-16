@@ -526,14 +526,14 @@ describe("Saved searches (SG-068)", () => {
     });
   }
 
-  test("Save search stays disabled until a filter is active, then POSTs the filter set", async () => {
+  test("Save search hides until a filter is active, then POSTs the filter set (SG-331 T5: disabled -> hidden)", async () => {
     renderCatalog();
     await screen.findByText("Drill");
-    const saveButton = screen.getByRole("button", { name: "Save search" });
-    expect(saveButton).toBeDisabled();
+    expect(screen.queryByRole("button", { name: "Save search" })).not.toBeInTheDocument();
 
     fireEvent.change(screen.getByLabelText("Search your things"), { target: { value: "shi" } });
-    await waitFor(() => expect(saveButton).not.toBeDisabled());
+    const saveButton = await screen.findByRole("button", { name: "Save search" });
+    expect(saveButton).not.toBeDisabled();
 
     const promptSpy = vi.spyOn(window, "prompt").mockReturnValue("Shirt searches");
     fireEvent.click(saveButton);
@@ -584,12 +584,13 @@ describe("Saved searches (SG-068)", () => {
     expect(document.querySelector("derp")).toBeNull();
   });
 
-  test("an empty saved-search list renders a muted None yet, not an error", async () => {
+  test("an empty saved-search list renders no menu and no None yet, not an error (SG-331 T5)", async () => {
     renderCatalog();
     await screen.findByText("Drill");
 
-    const none = await screen.findByText("None yet");
-    expect(none.style.color).toBe("hsl(var(--ink-muted))");
+    expect(screen.queryByLabelText("Saved searches")).not.toBeInTheDocument();
+    expect(screen.queryByText("None yet")).not.toBeInTheDocument();
+    expect(screen.queryByRole("alert")).not.toBeInTheDocument();
   });
 
   test("deleting from the dropdown DELETEs the saved search's id", async () => {
