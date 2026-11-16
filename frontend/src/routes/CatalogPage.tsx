@@ -78,7 +78,8 @@ export function CatalogPage() {
   // SG-272 G2 (F13): the Gone view asks the list for `status=ARCHIVED` and
   // shows each gone row's reason with its Put back. Live is the default.
   const [statusFilter, setStatusFilter] = useState<CatalogStatusFilter>("live");
-  const [sort, setSort] = useState<SortOption>("recent");
+  // SG-331 T2: Use by, soonest first is the default sort.
+  const [sort, setSort] = useState<SortOption>("useby");
   const [density, setDensity] = useState<Density>("grid");
   const [cursor, setCursor] = useState<string | undefined>(undefined);
   const isNarrow = useIsNarrow();
@@ -252,7 +253,7 @@ export function CatalogPage() {
     if (qRaw.trim()) filters.push(`Search: ${qRaw.trim()}`);
     if (category !== CATEGORY_ALL) filters.push(labelAssetType(category));
     if (statusFilter === "gone") filters.push("Gone");
-    if (sort !== "recent") filters.push(SORT_LABELS[sort]);
+    if (sort !== "useby") filters.push(SORT_LABELS[sort]);
     return filters;
   }, [qRaw, category, statusFilter, sort]);
 
@@ -260,7 +261,7 @@ export function CatalogPage() {
     setQRaw("");
     setCategory(CATEGORY_ALL);
     setStatusFilter("live");
-    setSort("recent");
+    setSort("useby");
     setSelectedSavedSearchId("");
   };
 

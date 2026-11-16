@@ -1,1 +1,2 @@
 SG-331 T7 PASS: src/sg331-redesign-b.sg331.test.tsx > wide grid uses 40px 24px and narrow uses 16px 8px — gap '40px 24px' / '16px 8px' (first assertion)
+SG-331 T2 PASS (unit+page): sortCatalog useby order ['Milk','Eggs','Yogurt','Olive Oil','Black Beans'] + tie ['Amy','Zed']; select Sort=useby (first assertions)

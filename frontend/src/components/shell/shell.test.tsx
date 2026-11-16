@@ -6,7 +6,7 @@ import App from "../../App";
 import { CatalogPage } from "../../routes/CatalogPage";
 import { ThemeProvider } from "../../theme/ThemeProvider";
 import { HouseholdProvider } from "../../hooks/HouseholdContext";
-import { assetToProductItem, type ProductStatus } from "../../types/product";
+import { assetToProductItem } from "../../types/product";
 import { sortCatalog } from "./CatalogToolbar";
 import type { Asset } from "../../api/types";
 
@@ -175,7 +175,7 @@ afterEach(() => {
 describe("sortCatalog (real mapper data)", () => {
   // Filtering (query + category) moved to the server (SG-064 G2); the client
   // path only orders the loaded page now.
-  test("orders by recently added, name, and processing status", () => {
+  test("orders by use-by first, then recently added and name (SG-331 T2: status gone)", () => {
     expect(sortCatalog(products, "recent").map((i) => i.name)).toEqual([
       "Mystery",
       "Zap",
@@ -189,13 +189,18 @@ describe("sortCatalog (real mapper data)", () => {
       "Zap",
     ]);
 
-    const statuses: ProductStatus[] = ["processed", "raw", "rendered", "raw"];
-    const statusItems = products.map((item, index) => ({ ...item, status: statuses[index] }));
-    expect(sortCatalog(statusItems, "status").map((i) => i.status)).toEqual([
-      "processed",
-      "raw",
-      "raw",
-      "rendered",
+    // SG-331 T2: past oldest first, then soonest, then no-date, ties by name.
+    const dated = [
+      { ...products[0], useBy: "2030-05-06" },
+      { ...products[1], useBy: null },
+      { ...products[2], useBy: "2026-10-27" },
+      { ...products[3], useBy: "2026-11-21" },
+    ];
+    expect(sortCatalog(dated, "useby").map((i) => i.name)).toEqual([
+      "Shirt",
+      "Mystery",
+      "Drill",
+      "Zap",
     ]);
   });
 });
@@ -345,7 +350,7 @@ describe("Catalog shell", () => {
   test("the sort dropdown orders the loaded set client-side", async () => {
     renderCatalog();
     await screen.findByText("Drill");
-    fireEvent.change(screen.getByLabelText("Sort catalog"), { target: { value: "name" } });
+    fireEvent.change(screen.getByLabelText("Sort"), { target: { value: "name" } });
 
     const cards = renderedAssetCards();
     expect(cards[0].textContent).toContain("Drill");
@@ -359,7 +364,7 @@ describe("Catalog shell", () => {
     await screen.findByText("Drill");
     fireEvent.change(screen.getByLabelText("Search your things"), { target: { value: "zap" } });
     fireEvent.click(await screen.findByRole("button", { name: "Electronics & Gadgets (1)" }));
-    fireEvent.change(screen.getByLabelText("Sort catalog"), { target: { value: "name" } });
+    fireEvent.change(screen.getByLabelText("Sort"), { target: { value: "name" } });
     const clearAll = screen.getByRole("button", { name: /clear all/i });
     expect(clearAll.style.color).toBe("hsl(var(--link))");
     expect(clearAll.style.textDecoration).toContain("underline");
@@ -367,7 +372,7 @@ describe("Catalog shell", () => {
 
     expect(screen.getByLabelText("Search your things")).toHaveValue("");
     expect(screen.getByRole("button", { name: "All (4)" })).toHaveAttribute("aria-pressed", "true");
-    expect(screen.getByLabelText("Sort catalog")).toHaveValue("recent");
+    expect(screen.getByLabelText("Sort")).toHaveValue("useby");
   });
 
   test("Cmd/Ctrl+K moves focus to the header search field", async () => {
@@ -618,7 +623,7 @@ describe("Saved searches (SG-068)", () => {
     // Non-vacuity: the toolbar's own comboboxes render (sort + saved searches),
     // so the role query is proven live; no household combobox exists to reset
     // the selection, and the applied one stays.
-    expect(screen.getByLabelText("Sort catalog")).toBeInTheDocument();
+    expect(screen.getByLabelText("Sort")).toBeInTheDocument();
     expect(screen.queryAllByRole("combobox", { name: /household/i })).toHaveLength(0);
     expect((screen.getByLabelText("Saved searches") as HTMLSelectElement).value).toBe("s1");
   });

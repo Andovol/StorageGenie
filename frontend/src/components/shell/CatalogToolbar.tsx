@@ -1,13 +1,15 @@
 import type { ProductItem } from "../../types/product";
 import type { SavedSearch } from "../../api/types";
 
-export type SortOption = "recent" | "name" | "status";
+export type SortOption = "useby" | "recent" | "name";
 export type Density = "grid" | "table";
 
+// SG-331 T2: the one sort that puts what needs you first — past dates oldest
+// first, then soonest, then no-date, ties by name. It is the default sort.
 export const SORT_LABELS: Record<SortOption, string> = {
-  recent: "Recently Added",
-  name: "Name (A-Z)",
-  status: "Processing Status",
+  useby: "Use by, soonest first",
+  recent: "Recently added",
+  name: "Name, A to Z",
 };
 
 export const DENSITY_LABELS: Record<Density, string> = {
@@ -25,11 +27,21 @@ export const CATEGORY_ALL = "All";
  * `GET /v1/assets`; the former client-side re-filters are gone so the server is
  * the single authority (SG-064 G2).
  */
-export function sortCatalog(items: ProductItem[], sort: SortOption): ProductItem[] {
+export type SortableItem = ProductItem & { useBy?: string | null };
+
+export function sortCatalog<T extends SortableItem>(items: T[], sort: SortOption): T[] {
   const sorted = [...items];
   sorted.sort((a, b) => {
     if (sort === "name") return a.name.localeCompare(b.name);
-    if (sort === "status") return a.status.localeCompare(b.status);
+    if (sort === "useby") {
+      const da = a.useBy || "";
+      const db = b.useBy || "";
+      if (!da && !db) return a.name.localeCompare(b.name);
+      if (!da) return 1;
+      if (!db) return -1;
+      if (da !== db) return da < db ? -1 : 1;
+      return a.name.localeCompare(b.name);
+    }
     return b.dateAdded.localeCompare(a.dateAdded);
   });
   return sorted;
@@ -194,12 +206,13 @@ export function CatalogToolbar({
         );
       })}
 
+      {/* SG-331 T2: a plain select, no box — ink text with the native chevron. */}
       <select
-        aria-label="Sort catalog"
+        aria-label="Sort"
         value={sort}
         onChange={(event) => onSortChange(event.target.value as SortOption)}
-        className={THEMED_CONTROL_CLASS}
-        style={CONTROL_STYLE}
+        className="focus-ring"
+        style={{ background: "transparent", border: "none", fontSize: 13, color: "hsl(var(--ink))", cursor: "pointer" }}
       >
         {(Object.keys(SORT_LABELS) as SortOption[]).map((option) => (
           <option key={option} value={option}>
