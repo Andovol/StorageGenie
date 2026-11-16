@@ -109,7 +109,7 @@ describe("SG-318 W1 catalog chips in plain words", () => {
         <ProductCard item={item} householdId="hh-sg318" />
       </MemoryRouter>
     );
-    expect(screen.getByTestId("product-category")).toHaveTextContent("Food & beverages");
+    expect(screen.getByTestId("product-kind")).toHaveTextContent("Food & beverages");
     expect(screen.queryByText("food_beverages")).toBeNull();
   });
 });
