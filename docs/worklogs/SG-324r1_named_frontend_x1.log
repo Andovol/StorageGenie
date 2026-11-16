@@ -1,0 +1,13 @@
+SG-324r1 named files run x1 (every *sg324* + every older file changed)
+Stamp: 1794848960-
+Command (frontend/): npm test -- --run <19 files>
+Files (19):
+  src/sg324-p1.sg324.test.tsx src/sg324-p3.sg324.test.tsx src/sg324-p4.sg324.test.tsx
+  src/sg324-p5.sg324.test.tsx src/sg324-p6.sg324.test.tsx src/sg324-p7.sg324.test.tsx
+  src/sg324-t1.sg324.test.tsx src/sg324-t2.sg324.test.tsx
+  src/routes/AssetDetailPage.test.tsx src/components/OpenedCountdownSection.test.tsx
+  src/components/JobCard.test.tsx src/lib/labels.sg301.test.ts src/routes/InboxPage.sg271.test.tsx
+  src/components/CandidateCard.test.tsx src/routes/ExpiryPage.test.tsx
+  src/routes/sg301-screens.sg301.test.tsx src/routes/sg312-screens.sg312.test.tsx
+  src/components/catalog/catalog.test.tsx src/components/shell/drawer.test.tsx
+Result: Test Files 19 passed (19); Tests 164 passed (164); RC=0

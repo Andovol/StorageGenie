@@ -1,0 +1,19 @@
+SG-324r1 frontend-test (whole suite)
+First run (pre-fix, SG-324 as-committed + base older tests): RED
+  Test Files  5 failed | 62 passed (67)
+  Tests  8 failed | 502 passed (510)
+  Failed (8):
+    src/routes/ExpiryPage.test.tsx > renders the urgency sections in blueprint order with exact labels
+    src/routes/sg301-screens.sg301.test.tsx > SG-301 Inbox skipped step > skipped output does not read Done
+    src/routes/sg312-screens.sg312.test.tsx > SG-312 Inbox in plain words (I3) > the selected job lists its steps
+    src/components/catalog/catalog.test.tsx > the compact table renders the seven DQ5 columns in order
+    src/components/catalog/catalog.test.tsx > absent specs render an honest em dash
+    src/components/catalog/catalog.test.tsx > the ghost actions button opens the detail route
+    src/components/catalog/catalog.test.tsx > the ... actions button with onSelect selects instead of navigating
+    src/components/shell/drawer.test.tsx > the AI buttons show the honest notice and send no request
+Second run (post-fix, 5 test-alignment commits): GREEN
+  Stamp: 1794848928-1794848954
+  Command: make frontend-test (repo root)
+  Test Files  67 passed (67)
+  Tests  510 passed (510), 0 failed
+  RC: 0

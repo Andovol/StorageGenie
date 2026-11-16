@@ -1,0 +1,9 @@
+SG-324r1 backend-test (host + image proof; backend unchanged)
+Stamp: 1794848555-1794848672
+Command: make backend-test (repo root, DOCKER_HOST=unix:///run/dispatch-storagegenie-SG-324r1/docker.sock, TMPDIR=output/SG-324r1-scratch)
+Host: cd backend && python -m pytest -q -m "not requires_native_libs"
+  817 passed, 2 deselected, 59 warnings in 89.41s
+Image: docker build -f backend/Dockerfile -t storagegenie-backend:prover . (RC=0)
+  docker run --rm --network none -e SG_IMAGE_PROOF=1 storagegenie-backend:prover python -m pytest -q -m requires_native_libs tests/test_signals.py
+  2 passed, 6 deselected in 2.17s
+RC: 0

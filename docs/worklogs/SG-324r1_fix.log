@@ -1,0 +1,35 @@
+SG-324r1 fixes: 5 test-alignment commits (no product change; SG-324's 8 item commits judged correct, untouched)
+Each line: pre-fix FAIL name -> post-fix PASS name.
+
+1. ExpiryPage.test.tsx (P5 empty block)
+   FAIL: src/routes/ExpiryPage.test.tsx > ExpiryPage > renders the urgency sections in blueprint order with exact labels | expected regions to deeply equal [Opened countdown, Expired, ...] (empty opened mock still listed Opened countdown)
+   PASS: src/routes/ExpiryPage.test.tsx > ExpiryPage > renders the urgency sections in blueprint order with exact labels | regions [Expired, This week, This month, Safe, Unresolved, Uncategorized] (14 passed)
+   Commit: 1c5f48e1 SG-324r1 fix: ExpiryPage expects no empty Opened countdown region (P5)
+
+2. sg301-screens.sg301.test.tsx (P6 wording)
+   FAIL: src/routes/sg301-screens.sg301.test.tsx > SG-301 Inbox skipped step > skipped output does not read Done | expected 'Skipped — photo reading is off' to be 'Skipped (AI off)'
+   PASS: src/routes/sg301-screens.sg301.test.tsx > SG-301 Inbox skipped step > skipped output does not read Done | toBe 'Skipped — photo reading is off' (12 passed)
+   Commit: 83d73993 SG-324r1 fix: sg301 skipped step reads photo reading is off (P6)
+
+3. sg312-screens.sg312.test.tsx (P6 job name)
+   FAIL: src/routes/sg312-screens.sg312.test.tsx > SG-312 Inbox in plain words (I3) > the selected job lists its steps as Checking the file, Saving | Unable to find element with text: Import job (now 'Import · 5 Mar, 14:42')
+   PASS: src/routes/sg312-screens.sg312.test.tsx > SG-312 Inbox in plain words (I3) > the selected job lists its steps as Checking the file, Saving | click /Import ·/ (10 passed)
+   Commit: 1aa3a29a SG-324r1 fix: sg312 job named Import date, not Import job (P6)
+
+4. catalog.test.tsx (P4 column + label; 4 tests)
+   FAIL: src/components/catalog/catalog.test.tsx > the compact table renders the seven DQ5 columns in order | expected 7 headers incl. Dimensions/Specs
+   PASS: src/components/catalog/catalog.test.tsx > the compact table renders the six columns in order (no Dimensions/Specs) (37 passed)
+   FAIL: src/components/catalog/catalog.test.tsx > absent specs render an honest em dash, never an invented value | Unable to find element —
+   PASS: src/components/catalog/catalog.test.tsx > absent specs render no Dimensions/Specs column and no invented value
+   FAIL: src/components/catalog/catalog.test.tsx > the ghost actions button opens the detail route and no delete control ships | Unable to find button 'Actions for Cordless Drill'
+   PASS: ... | button 'More actions for Cordless Drill'
+   FAIL: src/components/catalog/catalog.test.tsx > onSelect > the ... actions button with onSelect selects instead of navigating | Unable to find button 'Actions for ...'
+   PASS: ... | button 'More actions for ...'
+   Commit: 9a6951e6 SG-324r1 fix: catalog table has no Dimensions/Specs, More actions label (P4)
+
+5. drawer.test.tsx (P7 wording)
+   FAIL: src/components/shell/drawer.test.tsx > ItemInspectorDrawer > the AI buttons show the honest notice and send no request | Unable to find button /re-isolate asset/i
+   PASS: src/components/shell/drawer.test.tsx > ItemInspectorDrawer > the AI buttons show the honest notice and send no request | buttons /cut out the item again/i + /make a styled photo/i (18 passed)
+   Commit: 950c64a1 SG-324r1 fix: drawer AI buttons read plain words (P7)
+
+SG-324 item tests on current tree (all PASS, no fix needed): P1 2, P3 3, P4 2, P5 2, P6 3, P7 1, T1 1, T2 1 = 15 passed.

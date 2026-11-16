@@ -1,0 +1,9 @@
+SG-324r1 build (frontend, scratch outDir)
+Stamp: 1794848548-1794848551
+Command: ./node_modules/.bin/vite build --outDir "/home/andrei/StorageGenie/output/SG-324r1-scratch/build" (frontend/)
+Result: RC=0
+  vite v5.4.21 building for production...
+  ✓ 1973 modules transformed.
+  ✓ built in 3.08s
+  outDir: output/SG-324r1-scratch/build (index.html + assets/, 5 files)
+Note: outDir is outside project root; --emptyOutDir not used (scratch only). frontend/dist untouched.

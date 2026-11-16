@@ -1,0 +1,4 @@
+SG-324r1 named files run x2 (every *sg324* + every older file changed)
+Stamp: -1794848977
+Command (frontend/): npm test -- --run <same 19 files>
+Result: Test Files 19 passed (19); Tests 164 passed (164); RC=0
