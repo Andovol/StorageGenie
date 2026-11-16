@@ -212,3 +212,7 @@ Read as: **D39** — the review card and capture form leftovers (SG-326 audit I8
 **2026-11-16, verbatim:** *"So what am I supposed to see? Why is the design still the same and so bad? The standard grid should be the default view."*
 
 Read as: **directive** — the catalog always opens in *Standard Grid*; the D-21 content-fit rule (table at ≥ 860 px, `CatalogPage.tsx` `resolveInitialDensity`, 2026-10-17) is retired; *Compact Table* stays one click away. First use: SG-328. **The owner finds the live design bad** (seen on `release-sg327`, catalog table, dark) — the design direction is reopened with the owner before any further look work.
+
+**2026-11-16, verbatim:** *"Okay, lets do a mockup first."*
+
+Read as: **D40** — before any more look work, the Architect makes one private mockup (an artifact; this reply is the owner's approval under the project's artifact rule) of a photo-first catalog: shadcn-style components in the project's tokens, one focal point per page (the photos), light and dark. The owner reacts; the build follows in 2–3 slices only after that. The shelf trial waits for the redesign unless the owner says otherwise.
