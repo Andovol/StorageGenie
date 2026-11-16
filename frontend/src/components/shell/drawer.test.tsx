@@ -211,8 +211,8 @@ describe("ItemInspectorDrawer", () => {
     await screen.findByTestId("inspector-drawer");
 
     const before = api.apiGet.mock.calls.length + api.apiPatch.mock.calls.length;
-    fireEvent.click(screen.getByRole("button", { name: /re-isolate asset/i }));
-    fireEvent.click(screen.getByRole("button", { name: /generate context scene/i }));
+    fireEvent.click(screen.getByRole("button", { name: /cut out the item again/i }));
+    fireEvent.click(screen.getByRole("button", { name: /make a styled photo/i }));
 
     expect(screen.getByTestId("ai-notice")).toHaveTextContent(
       "scene rendering lands with the AI stages — nothing was sent anywhere"
