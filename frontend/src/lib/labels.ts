@@ -199,6 +199,20 @@ export function formatUseByDate(value: string | null | undefined): string {
 }
 
 /**
+ * SG-330 R5: "27 Oct" (day + month, no year) from an ISO date-only string,
+ * read by its parts so no timezone shifts the day; "" when unreadable. Past
+ * and this-week lines name the near date without the year; the later line
+ * keeps the full year via formatUseByDate.
+ */
+export function formatUseByDayMonth(value: string | null | undefined): string {
+  const match = /^(\d{4})-(\d{2})-(\d{2})/.exec(value ?? "");
+  if (!match) return "";
+  const month = Number(match[2]);
+  if (month < 1 || month > 12) return "";
+  return `${Number(match[3])} ${MONTH_SHORT[month - 1]}`;
+}
+
+/**
  * SG-304: the date an item carries, read from its expiry assertion(s) (the
  * candidate-committed `expiry_date` or the plugin's `expiry_date`). Accepted
  * rows win; superseded and rejected rows never count; null when none is dated.

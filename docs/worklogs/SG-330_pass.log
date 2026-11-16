@@ -1,1 +1,2 @@
 SG-330 R1 PASS src/sg330-r1.sg330.test.tsx (4 tests) + src/theme/theme.test.tsx (11 tests) | first assertion: light :root carries the exact Midnight values
+SG-330 R5 PASS src/sg330-r5.sg330.test.tsx (5 tests) | first assertion: past date reads Past its date with the day and month

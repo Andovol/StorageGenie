@@ -1,8 +1,8 @@
 import { memo, useState } from "react";
 import { Link } from "react-router-dom";
-import { AlertTriangle, Package } from "lucide-react";
+import { Package } from "lucide-react";
 import type { ProductItem } from "../../types/product";
-import { formatUseByDate, labelAssetType } from "../../lib/labels";
+import { formatUseByDate, formatUseByDayMonth, labelAssetType } from "../../lib/labels";
 
 /**
  * A catalog card item: the DQ1 `ProductItem` plus the media the grid renders.
@@ -16,6 +16,10 @@ export type CatalogProduct = ProductItem & {
   /** SG-325 P8: the item's use-by date (ISO YYYY-MM-DD) joined from the
    * expiry status read; null when the item has no date. */
   useBy?: string | null;
+  /** SG-330 R5: days until the use-by date from the same join (negative when
+   * past its date); null when the item has no date. Carried the same way as
+   * `useBy` so the card can mark past and this-week dates. */
+  daysRemaining?: number | null;
 };
 
 /**
@@ -34,11 +38,60 @@ export function cardMedia(item: CatalogProduct, householdId: string): string | n
   return null;
 }
 
+export type CardDateTone = "past" | "soon" | "later" | "none";
+
+/**
+ * SG-330 R5: the date line in owner words. `narrow` selects the short phone
+ * wording; the wide wording is the default.
+ */
+export function cardDateLine(
+  useBy: string | null | undefined,
+  daysRemaining: number | null | undefined,
+  narrow: boolean
+): { text: string; tone: CardDateTone } {
+  if (!useBy) {
+    return narrow ? { text: "No date", tone: "none" } : { text: "No date yet", tone: "none" };
+  }
+  if (typeof daysRemaining === "number" && Number.isFinite(daysRemaining)) {
+    if (daysRemaining < 0) {
+      const dayMonth = formatUseByDayMonth(useBy) || formatUseByDate(useBy);
+      return narrow
+        ? { text: `Past · ${dayMonth}`, tone: "past" }
+        : { text: `Past its date · ${dayMonth}`, tone: "past" };
+    }
+    if (daysRemaining <= 7) {
+      const dayMonth = formatUseByDayMonth(useBy) || formatUseByDate(useBy);
+      if (narrow) return { text: dayMonth, tone: "soon" };
+      const count = daysRemaining === 1 ? "1 day" : `${daysRemaining} days`;
+      return { text: `Use by ${dayMonth} · ${count}`, tone: "soon" };
+    }
+  }
+  const full = formatUseByDate(useBy);
+  if (!full) {
+    return narrow ? { text: "No date", tone: "none" } : { text: "No date yet", tone: "none" };
+  }
+  // The later line keeps the full date with its year in both widths.
+  return { text: narrow ? full : `Use by ${full}`, tone: "later" };
+}
+
+const DATE_TONE_STYLE: Record<CardDateTone, { backgroundColor: string; color: string }> = {
+  past: { backgroundColor: "hsl(var(--past-bg))", color: "hsl(var(--past-fg))" },
+  soon: { backgroundColor: "hsl(var(--soon-bg))", color: "hsl(var(--soon-fg))" },
+  later: { backgroundColor: "transparent", color: "hsl(var(--ink))" },
+  none: { backgroundColor: "transparent", color: "hsl(var(--ink-muted))" },
+};
+
 /**
  * ⚡ Bolt Optimization: Memoize ProductCard to prevent re-rendering catalog grid items
  * when parent state changes (e.g. search input keystrokes before debounce, active filters,
  * or opening/closing the inspector drawer).
  * Expected Impact: Reduces catalog item re-renders by ~100% on search typing and drawer toggles.
+ *
+ * SG-330 R5 (D41 Midnight): photo first — a square tile filling the column
+ * (photo `object-fit: contain` on `--tile`), no border, no status dot or
+ * badge. The failed pipeline icons, the status dots and the category pill are
+ * gone on purpose; the date line below the name carries past/this-week in
+ * their washes. Same-name packs stay separate cards.
  */
 export const ProductCard = memo(function ProductCard({
   item,
@@ -50,8 +103,10 @@ export const ProductCard = memo(function ProductCard({
   onSelect?: (id: string) => void;
 }) {
   const [broken, setBroken] = useState(false);
-  const failed = item.status === "failed";
   const media = cardMedia(item, householdId);
+  const wide = cardDateLine(item.useBy, item.daysRemaining, false);
+  const narrow = cardDateLine(item.useBy, item.daysRemaining, true);
+  const wideStyle = DATE_TONE_STYLE[wide.tone];
 
   return (
     <Link
@@ -79,12 +134,10 @@ export const ProductCard = memo(function ProductCard({
       style={{
         display: "flex",
         flexDirection: "column",
-        gap: 10,
-        borderStyle: "solid",
-        borderWidth: 1,
-        borderColor: "hsl(var(--line))",
+        gap: 8,
+        borderStyle: "none",
         borderRadius: 0,
-        padding: 10,
+        padding: 0,
         textDecoration: "none",
         color: "hsl(var(--ink))",
         backgroundColor: "hsl(var(--paper))",
@@ -92,22 +145,16 @@ export const ProductCard = memo(function ProductCard({
     >
       <div
         data-testid="product-card-well"
-        className={failed ? "border border-rose-500/30 border-danger" : ""}
         style={{
           position: "relative",
           aspectRatio: "1 / 1",
+          borderStyle: "none",
           borderRadius: 0,
           overflow: "hidden",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          backgroundColor: "hsl(var(--paper))",
-          ...(failed
-            ? {
-                borderStyle: "solid",
-                borderWidth: 1,
-              }
-            : {}),
+          backgroundColor: "hsl(var(--tile))",
         }}
       >
         {media && !broken ? (
@@ -118,104 +165,52 @@ export const ProductCard = memo(function ProductCard({
             style={{ width: "100%", height: "100%", objectFit: "contain" }}
             onError={() => setBroken(true)}
           />
-        ) : null}
-        {!failed && (!media || broken) ? (
+        ) : (
           <Package
             data-testid="product-fallback-icon"
             aria-hidden="true"
             size={28}
             className="text-muted-foreground"
           />
-        ) : null}
-        {failed ? (
-          <AlertTriangle
-            data-testid="failed-warning"
-            aria-hidden="true"
-            size={28}
-            className="text-danger"
-          />
-        ) : null}
-        <span
-          data-testid="use-by-date"
-          style={{
-            position: "absolute",
-            top: 8,
-            right: 8,
-            borderStyle: "solid",
-            borderWidth: 1,
-            borderRadius: 0,
-            padding: "2px 8px",
-            fontSize: 13,
-            fontWeight: 600,
-            whiteSpace: "nowrap",
-            borderColor: "hsl(var(--line))",
-            backgroundColor: "hsl(var(--paper))",
-            color: "hsl(var(--ink-muted))",
-          }}
-        >
-          {formatUseByDate(item.useBy) || "No date"}
-        </span>
+        )}
       </div>
-      <div style={{ display: "flex", flexDirection: "column", gap: 6, minWidth: 0 }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 6, minWidth: 0 }}>
-          <span
-            title={item.name}
-            style={{
-              fontWeight: 600,
-              fontSize: 14,
-              color: "hsl(var(--ink))",
-              overflow: "hidden",
-              textOverflow: "ellipsis",
-              whiteSpace: "nowrap",
-            }}
-          >
-            {item.name}
-          </span>
-          {failed ? (
-            <AlertTriangle
-              data-testid="title-error-icon"
-              aria-hidden="true"
-              size={14}
-              className="text-danger"
-              style={{ flexShrink: 0 }}
-            />
-          ) : null}
-        </div>
+      <div style={{ display: "flex", flexDirection: "column", gap: 4, minWidth: 0 }}>
+        <span title={item.name} className="sg-card-name">
+          {item.name}
+        </span>
         <span
-          data-testid="product-category"
+          data-testid="product-date-wide"
+          className="sg-wide-only"
           style={{
             alignSelf: "flex-start",
             fontSize: 13,
-            padding: "2px 8px",
+            fontWeight: wide.tone === "later" || wide.tone === "none" ? 400 : 600,
+            padding: wide.tone === "past" || wide.tone === "soon" ? "2px 8px" : 0,
             borderRadius: 0,
-            borderStyle: "solid",
-            borderWidth: 1,
-            borderColor: "hsl(var(--line))",
-            backgroundColor: "hsl(var(--paper))",
-            color: "hsl(var(--ink-muted))",
             whiteSpace: "nowrap",
+            ...wideStyle,
           }}
         >
+          {wide.text}
+        </span>
+        <span
+          data-testid="product-date-narrow"
+          className="sg-narrow-only"
+          style={{
+            alignSelf: "flex-start",
+            fontSize: 13,
+            fontWeight: narrow.tone === "later" || narrow.tone === "none" ? 400 : 600,
+            padding: narrow.tone === "past" || narrow.tone === "soon" ? "2px 8px" : 0,
+            borderRadius: 0,
+            whiteSpace: "nowrap",
+            ...DATE_TONE_STYLE[narrow.tone],
+          }}
+        >
+          {narrow.text}
+        </span>
+        <span data-testid="product-kind" className="sg-card-kind">
           {labelAssetType(item.category)}
         </span>
-        {item.metadata.primaryColors?.length ? (
-          <div data-testid="color-dots" style={{ display: "flex", gap: 4 }}>
-            {item.metadata.primaryColors.map((color) => (
-            <span
-              key={color}
-              className="border-border"
-              style={{
-                width: 8,
-                height: 8,
-                borderRadius: 0,
-                backgroundColor: color,
-                borderWidth: 1,
-                borderStyle: "solid",
-              }}
-            />
-            ))}
-          </div>
-        ) : null}
       </div>
     </Link>
   );

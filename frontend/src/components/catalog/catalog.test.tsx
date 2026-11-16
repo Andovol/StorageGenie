@@ -29,14 +29,14 @@ function withUseBy(useBy: string | null): CatalogProduct {
 }
 
 describe("ProductCard", () => {
-  test("renders the name, the category micro-pill and the primary-color dots", () => {
+  test("renders the name and the kind line with no status dots (SG-330 R5: micro-pill + color-dots -> kind line, no dots)", () => {
     const item = MOCK_PRODUCTS.find((product) => product.metadata.primaryColors?.length)!;
     renderWithRouter(<ProductCard item={item} householdId="h1" />);
 
     expect(screen.getByText(item.name)).toBeInTheDocument();
-    expect(screen.getByText(item.category)).toBeInTheDocument();
-    expect(screen.getByTestId("color-dots")).toBeInTheDocument();
-    expect(screen.getByTestId("color-dots").children).toHaveLength(item.metadata.primaryColors!.length);
+    expect(screen.getByTestId("product-kind")).toHaveTextContent(item.category);
+    expect(screen.queryByTestId("color-dots")).not.toBeInTheDocument();
+    expect(screen.queryByTestId("product-category")).not.toBeInTheDocument();
   });
 
   test("omits the color dots when the metadata carries no colors (never placeholder dots)", () => {
@@ -46,23 +46,25 @@ describe("ProductCard", () => {
     expect(screen.queryByTestId("color-dots")).not.toBeInTheDocument();
   });
 
-  test("the card shows the item's use-by date in place of the status badge (SG-325 P8)", () => {
+  test("the card shows the item's use-by date line under the name (SG-330 R5: use-by-date badge -> product-date-wide/narrow)", () => {
     const { unmount } = renderWithRouter(<ProductCard item={withUseBy("2030-05-06")} householdId="h1" />);
-    expect(screen.getByTestId("use-by-date")).toHaveTextContent("6 May 2030");
+    expect(screen.getByTestId("product-date-wide")).toHaveTextContent("Use by 6 May 2030");
+    expect(screen.getByTestId("product-date-narrow")).toHaveTextContent("6 May 2030");
     expect(screen.queryByText("Photo only")).not.toBeInTheDocument();
     unmount();
 
     renderWithRouter(<ProductCard item={withUseBy(null)} householdId="h1" />);
-    expect(screen.getByTestId("use-by-date")).toHaveTextContent("No date");
+    expect(screen.getByTestId("product-date-wide")).toHaveTextContent("No date yet");
+    expect(screen.getByTestId("product-date-narrow")).toHaveTextContent("No date");
   });
 
-  test("the failed card keeps the hairline well border and both warning icons, with No date in the use-by spot (SG-325 P8)", () => {
+  test("the failed card carries no warning chrome, with No date yet on the date line (SG-330 R5: hairline border + warning icons -> no status chrome)", () => {
     renderWithRouter(<ProductCard item={{ ...withStatus("failed"), useBy: null }} householdId="h1" />);
 
-    expect(screen.getByTestId("use-by-date")).toHaveTextContent("No date");
-    expect(screen.getByTestId("product-card-well").className).toContain("border-rose-500/30");
-    expect(screen.getByTestId("failed-warning")).toBeInTheDocument();
-    expect(screen.getByTestId("title-error-icon")).toBeInTheDocument();
+    expect(screen.getByTestId("product-date-wide")).toHaveTextContent("No date yet");
+    expect(screen.queryByTestId("failed-warning")).not.toBeInTheDocument();
+    expect(screen.queryByTestId("title-error-icon")).not.toBeInTheDocument();
+    expect(screen.getByTestId("product-card-well").className).not.toContain("border-rose-500/30");
   });
 
   test("the whole card links to the existing asset detail route", () => {

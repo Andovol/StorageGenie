@@ -85,15 +85,16 @@ describe("SG-307 catalog plain words, no mono, square paper", () => {
     expect(css).toContain("repeat(auto-fill, minmax(165px, 1fr))");
   });
 
-  test("the card and well are square on the paper, category is plain 13px", () => {
+  test("the card and well are square on the paper, kind is plain 13px (SG-330 R5: product-category pill -> product-kind line)", () => {
     renderCard("raw");
     const card = screen.getByTestId("product-card");
     expect(card.style.borderRadius).toMatch(/^0/);
     expect(card.style.backgroundColor).toContain("paper");
     const well = screen.getByTestId("product-card-well");
     expect(well.style.borderRadius).toMatch(/^0/);
-    const chip = screen.getByTestId("product-category");
-    expect(chip.textContent).toBe(MOCK_PRODUCTS[0].category);
-    expect(chip.className).not.toContain("font-mono");
+    expect(well.style.backgroundColor).toContain("tile");
+    const kind = screen.getByTestId("product-kind");
+    expect(kind.textContent).toBe(MOCK_PRODUCTS[0].category);
+    expect(kind.className).not.toContain("font-mono");
   });
 });

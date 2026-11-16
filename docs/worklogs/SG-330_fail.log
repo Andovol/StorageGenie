@@ -1,1 +1,2 @@
 SG-330 R1 FAIL src/sg330-r1.sg330.test.tsx — light :root carries the exact Midnight values | expected --paper 45 14.3% 94.5%, got Stone paper
+SG-330 R5 FAIL src/sg330-r5.sg330.test.tsx — past date reads Past its date | old badge reads 27 Oct 2026, no past wording

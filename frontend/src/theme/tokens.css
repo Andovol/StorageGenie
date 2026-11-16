@@ -190,6 +190,44 @@ textarea {
   border-color: hsl(var(--primary));
 }
 
+/* SG-330 R5: photo-first card type — 16px/600 wide, 13px/600 narrow, one
+   line with ellipsis; the kind line shows wide only. */
+.sg-card-name {
+  font-weight: 600;
+  font-size: 16px;
+  color: hsl(var(--ink));
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sg-card-kind {
+  font-size: 13px;
+  color: hsl(var(--ink-muted));
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sg-narrow-only {
+  display: none;
+}
+
+@media (max-width: 639px) {
+  .sg-card-name {
+    font-size: 13px;
+  }
+  .sg-card-kind {
+    display: none;
+  }
+  .sg-wide-only {
+    display: none;
+  }
+  .sg-narrow-only {
+    display: inline-block;
+  }
+}
+
 /* SG-330 R1: utilities for the five new tokens. */
 .bg-past {
   background-color: hsl(var(--past-bg));

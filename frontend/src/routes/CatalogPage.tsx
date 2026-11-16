@@ -156,9 +156,11 @@ export function CatalogPage() {
     queryFn: () => fetchExpiryStatus(effectiveHousehold),
     enabled: !!effectiveHousehold,
   });
+  // SG-330 R5: the join carries the countdown too, the same way as the date.
   const useByById = useMemo(() => {
-    const map = new Map<string, string>();
-    for (const row of expiryQuery.data?.rows ?? []) map.set(row.asset_id, row.expiry_date);
+    const map = new Map<string, { date: string; days: number }>();
+    for (const row of expiryQuery.data?.rows ?? [])
+      map.set(row.asset_id, { date: row.expiry_date, days: row.days_remaining });
     return map;
   }, [expiryQuery.data]);
 
@@ -190,7 +192,8 @@ export function CatalogPage() {
       const item = assetToProductItem(asset);
       const firstEvidenceId = asset.evidence_ids?.[0];
       const withMedia = firstEvidenceId ? { ...item, evidenceId: firstEvidenceId } : item;
-      return { ...withMedia, useBy: useByById.get(asset.id) ?? null };
+      const dated = useByById.get(asset.id);
+      return { ...withMedia, useBy: dated?.date ?? null, daysRemaining: dated?.days ?? null };
     });
     return sortCatalog(items, sort);
   }, [displayed, sort, useByById]);
