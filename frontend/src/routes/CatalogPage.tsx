@@ -160,15 +160,17 @@ export function CatalogPage() {
   // (e.g. the `unknown` alias and a literal `Uncategorized`), the later one is
   // disambiguated with its raw key so every label maps to exactly one filter.
   const categoryOptions = useMemo(() => {
-    const total = Object.values(categoryCounts).reduce((sum, count) => sum + count, 0);
+    // SG-331 T1: text tabs carry no counts — the label is the display word.
+    // The SG-118 G3 one-pill-per-raw-key rule stays: a display collision is
+    // still disambiguated with its raw key so every label maps to one filter.
     const options: { display: string; key: string; label: string }[] = [
-      { display: CATEGORY_ALL, key: CATEGORY_ALL, label: `${CATEGORY_ALL} (${total})` },
+      { display: CATEGORY_ALL, key: CATEGORY_ALL, label: CATEGORY_ALL },
     ];
     const usedLabels = new Set<string>([options[0].label]);
     for (const key of Object.keys(categoryCounts).sort()) {
       const display = labelAssetType(key);
-      let label = `${display} (${categoryCounts[key]})`;
-      if (usedLabels.has(label)) label = `${display} · ${key} (${categoryCounts[key]})`;
+      let label = display;
+      if (usedLabels.has(label)) label = `${display} · ${key}`;
       usedLabels.add(label);
       options.push({ display, key, label });
     }

@@ -214,20 +214,16 @@ describe("Catalog shell", () => {
     expect(screen.getByText("4 things")).toBeInTheDocument();
   });
 
-  test("the toolbar renders All plus one counted pill per real asset_type vocabulary", async () => {
+  test("the toolbar renders All plus one text tab per real asset_type vocabulary, no counts (SG-331 T1: counted pill -> text tab)", async () => {
     renderCatalog();
     await screen.findByText("Drill");
-    const all = await screen.findByRole("button", { name: "All (4)" });
+    const all = await screen.findByRole("button", { name: "All" });
     expect(all).toHaveAttribute("aria-pressed", "true");
-    const counts: Record<string, number> = {
-      "Hardware & Tools": 1,
-      "Electronics & Gadgets": 1,
-      "Apparel & Textiles": 1,
-      Uncategorized: 1,
-    };
-    for (const [key, count] of Object.entries(counts)) {
-      expect(screen.getByRole("button", { name: `${key} (${count})` })).toBeInTheDocument();
+    expect(all.style.fontSize).toBe("15px");
+    for (const key of ["Hardware & Tools", "Electronics & Gadgets", "Apparel & Textiles", "Uncategorized"]) {
+      expect(screen.getByRole("button", { name: key })).toBeInTheDocument();
     }
+    expect(screen.queryByRole("button", { name: "All (4)" })).not.toBeInTheDocument();
   });
 
   test("category pills and cards share one vocabulary through the real server filter (SG-105 G4)", async () => {
@@ -236,8 +232,11 @@ describe("Catalog shell", () => {
 
     // The raw facet key is `unknown`; the pill must speak the same word the
     // card's `toProductCategory` mapping shows.
-    const pill = await screen.findByRole("button", { name: "Uncategorized (1)" });
-    expect(screen.getByText("Uncategorized")).toBeInTheDocument();
+    const pill = await screen.findByRole("button", { name: "Uncategorized" });
+    // SG-331 T1: the tab and the card now read the same word, so scope the
+    // card assertion to its kind line (was: getByText, unique when tabs
+    // carried counts).
+    expect(screen.getAllByTestId("product-kind").map((node) => node.textContent)).toContain("Uncategorized");
 
     fireEvent.click(pill);
 
@@ -280,8 +279,8 @@ describe("Catalog shell", () => {
     renderCatalog();
     await screen.findByText("Drill");
 
-    const literal = await screen.findByRole("button", { name: "Uncategorized (2)" });
-    const alias = await screen.findByRole("button", { name: "Uncategorized · unknown (2)" });
+    const literal = await screen.findByRole("button", { name: "Uncategorized" });
+    const alias = await screen.findByRole("button", { name: "Uncategorized · unknown" });
     expect(literal).toBeInTheDocument();
     expect(alias).toBeInTheDocument();
 
@@ -317,16 +316,17 @@ describe("Catalog shell", () => {
     expect(main).toHaveStyle({ maxWidth: "1100px", marginLeft: "auto", marginRight: "auto" });
   });
 
-  test("a category pill filters server-side and carries the primary style when active", async () => {
+  test("a category tab filters server-side and carries the underline style when active (SG-331 T1: pill -> tab)", async () => {
     renderCatalog();
     await screen.findByText("Drill");
-    const pill = await screen.findByRole("button", { name: "Electronics & Gadgets (1)" });
+    const pill = await screen.findByRole("button", { name: "Electronics & Gadgets" });
     fireEvent.click(pill);
 
     expect(pill).toHaveAttribute("aria-pressed", "true");
-    expect(pill).toHaveClass("sg-paper-control", "focus-ring");
-    expect(pill.style.backgroundColor).toBe("hsl(var(--ink))");
-    expect(screen.getByRole("button", { name: "All (4)" }).style.backgroundColor).toBe("hsl(var(--paper))");
+    expect(pill).toHaveClass("focus-ring");
+    expect(pill.style.fontWeight).toBe("600");
+    expect(pill.style.borderBottom).toContain("2px solid");
+    expect(screen.getByRole("button", { name: "All" }).style.color).toBe("hsl(var(--ink-muted))");
     await waitFor(() => expect(screen.getByText("Zap")).toBeInTheDocument());
     expect(screen.queryByText("Drill")).not.toBeInTheDocument();
     const listCall = api.apiGet.mock.calls.find(
@@ -363,7 +363,7 @@ describe("Catalog shell", () => {
     renderCatalog();
     await screen.findByText("Drill");
     fireEvent.change(screen.getByLabelText("Search your things"), { target: { value: "zap" } });
-    fireEvent.click(await screen.findByRole("button", { name: "Electronics & Gadgets (1)" }));
+    fireEvent.click(await screen.findByRole("button", { name: "Electronics & Gadgets" }));
     fireEvent.change(screen.getByLabelText("Sort"), { target: { value: "name" } });
     const clearAll = screen.getByRole("button", { name: /clear all/i });
     expect(clearAll.style.color).toBe("hsl(var(--link))");
@@ -371,7 +371,7 @@ describe("Catalog shell", () => {
     fireEvent.click(clearAll);
 
     expect(screen.getByLabelText("Search your things")).toHaveValue("");
-    expect(screen.getByRole("button", { name: "All (4)" })).toHaveAttribute("aria-pressed", "true");
+    expect(screen.getByRole("button", { name: "All" })).toHaveAttribute("aria-pressed", "true");
     expect(screen.getByLabelText("Sort")).toHaveValue("useby");
   });
 
@@ -558,7 +558,7 @@ describe("Saved searches (SG-068)", () => {
     fireEvent.change(select, { target: { value: "s1" } });
 
     await waitFor(() => expect(screen.getByLabelText("Search your things")).toHaveValue("zap"));
-    expect(screen.getByRole("button", { name: "Electronics & Gadgets (1)" })).toHaveAttribute(
+    expect(screen.getByRole("button", { name: "Electronics & Gadgets" })).toHaveAttribute(
       "aria-pressed",
       "true"
     );

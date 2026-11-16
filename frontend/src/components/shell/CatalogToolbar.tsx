@@ -182,29 +182,42 @@ export function CatalogToolbar({
         })}
       </div>
 
-      {categories.map((category) => {
-        const active = category === activeCategory;
-        return (
-          <button
-            key={category}
-            type="button"
-            aria-pressed={active}
-            onClick={() => onCategoryChange(category)}
-            className="sg-paper-control focus-ring"
-            style={{
-              padding: "4px 10px",
-              borderRadius: 0,
-              fontSize: 13,
-              fontWeight: active ? 600 : 400,
-              cursor: "pointer",
-              backgroundColor: active ? "hsl(var(--ink))" : "hsl(var(--paper))",
-              color: active ? "hsl(var(--paper))" : "hsl(var(--ink))",
-            }}
-          >
-            {category}
-          </button>
-        );
-      })}
+      {/* SG-331 T1: text tabs — no border or fill; the active one is ink 600
+          with a 2 px ink underline, the rest muted at 15 px. The row scrolls
+          sideways instead of wrapping. Labels carry no counts. */}
+      <div
+        data-testid="catalog-kind-tabs"
+        style={{ display: "flex", gap: 16, overflowX: "auto", flexWrap: "nowrap", alignItems: "center" }}
+      >
+        {categories.map((category) => {
+          const active = category === activeCategory;
+          return (
+            <button
+              key={category}
+              type="button"
+              aria-pressed={active}
+              onClick={() => onCategoryChange(category)}
+              className="focus-ring"
+              style={{
+                background: "transparent",
+                border: "none",
+                borderBottom: active
+                  ? "2px solid hsl(var(--ink))"
+                  : "2px solid transparent",
+                borderRadius: 0,
+                padding: "4px 2px",
+                fontSize: 15,
+                fontWeight: active ? 600 : 400,
+                cursor: "pointer",
+                whiteSpace: "nowrap",
+                color: active ? "hsl(var(--ink))" : "hsl(var(--ink-muted))",
+              }}
+            >
+              {category}
+            </button>
+          );
+        })}
+      </div>
 
       {/* SG-331 T2: a plain select, no box — ink text with the native chevron. */}
       <select

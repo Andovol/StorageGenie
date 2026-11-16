@@ -139,6 +139,41 @@ function renderCatalog() {
   );
 }
 
+describe("SG-331 T1 kind-of-item text tabs", () => {
+  beforeEach(() => {
+    window.localStorage.clear();
+    api.apiGet.mockReset();
+    api.apiPatch.mockReset();
+    api.fetchExpiryStatus.mockReset();
+    mockApi();
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  test("pills become borderless text tabs with no counts, active underlined", async () => {
+    renderCatalog();
+    await screen.findAllByTestId("product-card");
+    const tabs = screen.getByTestId("catalog-kind-tabs");
+    expect(tabs.style.overflowX).toBe("auto");
+    // No counts anywhere in the tab labels.
+    for (const button of screen.getAllByRole("button")) {
+      expect(button.textContent ?? "").not.toMatch(/\(\d+\)/);
+    }
+    const all = screen.getByRole("button", { name: "All" });
+    expect(all).toHaveAttribute("aria-pressed", "true");
+    expect(all.style.fontSize).toBe("15px");
+    expect(all.style.fontWeight).toBe("600");
+    expect(all.style.borderBottom).toContain("2px solid");
+    expect(all.style.color).toBe("hsl(var(--ink))");
+    const product = screen.getByRole("button", { name: "Product" });
+    expect(product).toHaveAttribute("aria-pressed", "false");
+    expect(product.style.fontSize).toBe("15px");
+    expect(product.style.color).toBe("hsl(var(--ink-muted))");
+  });
+});
+
 describe("SG-331 T2 use-by sort first", () => {
   beforeEach(() => {
     window.localStorage.clear();
