@@ -71,7 +71,7 @@ describe("SG-301 Inbox skipped step", () => {
   test("skipped output does not read Done", async () => {
     const { labelStepStatus } = await import("../lib/labels");
     const label = labelStepStatus({ id: "s", step_name: "EXTRACT", state: "COMPLETED", attempts: 1, input: null, output: { status: "skipped", reason: "consent_disabled" }, error: null });
-    expect(label).toBe("Skipped (AI off)");
+    expect(label).toBe("Skipped — photo reading is off");
     expect(label).not.toBe("Done");
   });
 });
