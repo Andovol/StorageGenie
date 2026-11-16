@@ -209,16 +209,16 @@ describe("ThemeToggle", () => {
 });
 
 describe("tokens.css", () => {
-  test("declares the exact DQ3 dark elevation layers", () => {
+  test("declares the exact Midnight dark elevation layers (SG-330 R1: DQ3 -> Midnight)", () => {
     const dark = darkBlock(tokensCss);
-    expect(hslToHex(tokenValue(dark, "background"))).toBe("#0F0E0D");
-    expect(hslToHex(tokenValue(dark, "card"))).toBe("#1C1A18");
-    expect(hslToHex(tokenValue(dark, "card-muted"))).toBe("#262320");
-    expect(hslToHex(tokenValue(dark, "border"))).toBe("#2C2926");
+    expect(hslToHex(tokenValue(dark, "background"))).toBe("#121419");
+    expect(hslToHex(tokenValue(dark, "card"))).toBe("#1A1D24");
+    expect(hslToHex(tokenValue(dark, "card-muted"))).toBe("#1F232B");
+    expect(hslToHex(tokenValue(dark, "border"))).toBe("#272B34");
   });
 
-  test("light canvas is Stone-50", () => {
-    expect(hslToHex(tokenValue(tokensCss, "background"))).toBe("#FAFAF9");
+  test("light canvas is Midnight ground (SG-330 R1: Stone-50 -> #F3F2EF)", () => {
+    expect(hslToHex(tokenValue(tokensCss, "background"))).toBe("#F3F2EF");
   });
 
   test("every colour rule references a token (no arbitrary hex)", () => {
@@ -241,7 +241,7 @@ describe("tokens.css", () => {
     }
   });
 
-  test("the link token clears WCAG AA on its real surfaces in both themes (SG-118 G1)", () => {
+  test("the link token clears WCAG AA on its real surfaces in both themes (SG-330 R1: SG-118 -> Midnight, link IS primary)", () => {
     const dark = darkBlock(tokensCss);
     const surfaces = {
       "light card": [tokenValue(tokensCss, "link"), tokenValue(tokensCss, "card")],
@@ -254,10 +254,11 @@ describe("tokens.css", () => {
       expect(ratio, `${name} link contrast ${ratio.toFixed(2)}:1`).toBeGreaterThanOrEqual(4.5);
     }
 
-    // The measurement that forced a dedicated token: the shared dark `--primary`
-    // is unreadable as link text on the dark card.
+    // SG-330 R1: Midnight retires the SG-118 split — dark `--primary` IS the
+    // pale tint, so it clears AA on the dark card (was < 4.5 maroon).
+    expect(tokenValue(dark, "primary")).toBe(tokenValue(dark, "link"));
     const primaryOnDarkCard = contrastRatio(tokenValue(dark, "primary"), tokenValue(dark, "card"));
-    expect(primaryOnDarkCard).toBeLessThan(4.5);
+    expect(primaryOnDarkCard, `dark primary contrast ${primaryOnDarkCard.toFixed(2)}:1`).toBeGreaterThanOrEqual(4.5);
 
     expect(tokensCss).toContain(".text-link {");
     expect(tokensCss).toContain("color: hsl(var(--link));");

@@ -1,77 +1,103 @@
 :root {
-  --background: 60 9.1% 97.8%;
-  --foreground: 24 9.8% 10%;
-  --card: 0 0% 100%;
-  --card-muted: 60 4.8% 95.9%;
-  --border: 20 5.9% 90%;
-  --muted: 60 4.8% 95.9%;
-  --muted-foreground: 25 5.3% 40%;
-  --primary: 2 41% 30.6%;
-  --primary-foreground: 60 9.1% 97.8%;
-  /* SG-118 G1: link text is its own token. In light the brand primary already
-     clears WCAG AA (~9.8:1 on card); in dark the same 30.6% primary sits at
-     ~1.8:1 on the dark card, so links take a lighter tint of the same hue. */
-  --link: 2 41% 30.6%;
+  /* SG-330 R1 (D41 Midnight): near-white ground, deep navy single action.
+     Ground (--paper/--background), field (--card), text (--ink/--foreground),
+     muted (--ink-muted/--muted-foreground), lines (--line/--border), main
+     action (--primary/--link) and on-action (--primary-foreground) share one
+     Midnight value per role, light and dark. */
+  --background: 45 14.3% 94.5%;
+  --foreground: 226.7 15.3% 11.6%;
+  --card: 40 27.3% 97.8%;
+  /* SG-330 R1 moved: the secondary surface is the Midnight tile (recessed
+     neutral); the nearest Midnight role, no blue-green tint left. */
+  --card-muted: 228 9.8% 90%;
+  --border: 228 7.2% 86.5%;
+  /* SG-330 R1 moved: the muted surface is the Midnight tile (neutral ground
+     for non-text washes); text on it stays the muted role. */
+  --muted: 228 9.8% 90%;
+  --muted-foreground: 225 5.9% 39.6%;
+  --primary: 222.2 37.4% 19.4%;
+  --primary-foreground: 45 14.3% 94.5%;
+  /* SG-330 R1: link IS the main action (Midnight navy clears AA on the
+     ground in both themes); the SG-118 split stays as one shared value. */
+  --link: 222.2 37.4% 19.4%;
 
-  --badge-raw-bg: 60 4.8% 95.9%;
-  --badge-raw-fg: 30 6.3% 25.1%;
-  --badge-processed-bg: 204 93.8% 93.7%;
-  --badge-processed-fg: 201 90% 27.5%;
-  --badge-rendered-bg: 149 80.4% 90%;
-  --badge-rendered-fg: 163 88.1% 19.8%;
-  --badge-failed-bg: 356 100% 94.7%;
-  --badge-failed-fg: 343.4 79.7% 34.7%;
-  /* SG-075 migration addition: amber "proposed" badge + soft accent surface,
-     needed by ProvenanceBadge and the chat/drag/duplicate surfaces that
-     previously carried hardcoded literals. Values stay on the Stone scale. */
-  --badge-proposed-bg: 48 96% 89%;
-  --badge-proposed-fg: 26 83% 14%;
-  --accent: 30 8% 92%;
-  --accent-foreground: 24 9.8% 10%;
+  /* SG-330 R1 moved: raw neutralizes to tile bg + muted fg (nearest neutral
+     role); processed/rendered blues/greens have no Midnight hue so they
+     neutralize to tile bg + ink fg; failed keeps the red meaning via the past
+     role; proposed keeps the amber meaning via the soon role. */
+  --badge-raw-bg: 228 9.8% 90%;
+  --badge-raw-fg: 225 5.9% 39.6%;
+  --badge-processed-bg: 228 9.8% 90%;
+  --badge-processed-fg: 226.7 15.3% 11.6%;
+  --badge-rendered-bg: 228 9.8% 90%;
+  --badge-rendered-fg: 226.7 15.3% 11.6%;
+  --badge-failed-bg: 10.9 47.8% 91%;
+  --badge-failed-fg: 8.2 56.4% 30.6%;
+  --badge-proposed-bg: 42.9 46.7% 88.2%;
+  --badge-proposed-fg: 40 69.6% 22%;
+  /* SG-330 R1 moved: the soft accent surface is the Midnight tile; text on it
+     is the ink role. */
+  --accent: 228 9.8% 90%;
+  --accent-foreground: 226.7 15.3% 11.6%;
 
   --font-sans: "Instrument Sans Variable", system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
-  /* SG-273 G1 (tandpfun D18): Pantry paper/ink/muted/line tokens. Light values
-     are tandpfun paper, ink, muted and line in HSL below. Font stays
-     var(--font-sans); a later slice swaps in Instrument Sans. */
-  --paper: 40 35.3% 93.3%;
-  --ink: 0 0% 9.8%;
-  --ink-muted: 33.3 4.6% 38.2%;
-  --line: 37.9 16.5% 77.5%;
+  /* SG-330 R1 (D41 Midnight) replaces the SG-273 tandpfun paper set. */
+  --paper: 45 14.3% 94.5%;
+  --ink: 226.7 15.3% 11.6%;
+  --ink-muted: 225 5.9% 39.6%;
+  --line: 228 7.2% 86.5%;
+  /* SG-330 R1 new: past-date wash + text, this-week wash + text, and the photo
+     tile behind a cut-out. */
+  --past-bg: 10.9 47.8% 91%;
+  --past-fg: 8.2 56.4% 30.6%;
+  --soon-bg: 42.9 46.7% 88.2%;
+  --soon-fg: 40 69.6% 22%;
+  --tile: 228 9.8% 90%;
 }
 
 .dark {
-  --background: 30 7.1% 5.5%;
-  --foreground: 60 4.8% 95.9%;
-  --card: 30 7.7% 10.2%;
-  --card-muted: 30 8.6% 13.7%;
-  --border: 30 7.3% 16.1%;
-  --muted: 30 8.6% 13.7%;
-  --muted-foreground: 24 5.7% 82.9%;
-  --primary: 2 41% 30.6%;
-  --primary-foreground: 60 9.1% 97.8%;
-  /* SG-118 G1: dark-theme link tint (~7.5:1 on card, ~8.3:1 on background). */
-  --link: 2 41% 72%;
+  --background: 222.9 16.3% 8.4%;
+  --foreground: 225 21.1% 92.5%;
+  --card: 222 16.1% 12.2%;
+  /* SG-330 R1 moved (dark): secondary surface -> tile. */
+  --card-muted: 220 16.2% 14.5%;
+  --border: 221.5 14.3% 17.8%;
+  /* SG-330 R1 moved (dark): muted surface -> tile. */
+  --muted: 220 16.2% 14.5%;
+  --muted-foreground: 224 8.8% 66.5%;
+  --primary: 222.1 50.5% 81.8%;
+  --primary-foreground: 222.9 16.3% 8.4%;
+  /* SG-330 R1: dark link IS the dark main action (pale navy tint, clears AA
+     on the dark ground); the SG-118 unreadable-primary premise is retired. */
+  --link: 222.1 50.5% 81.8%;
 
-  --badge-raw-bg: 30 8.6% 13.7%;
-  --badge-raw-fg: 24 5.7% 82.9%;
-  --badge-processed-bg: 204 80.2% 15.9%;
-  --badge-processed-fg: 199.4 95.5% 73.9%;
-  --badge-rendered-bg: 166 91.3% 9%;
-  --badge-rendered-fg: 156 71.6% 66.9%;
-  --badge-failed-bg: 343 87.7% 15.9%;
-  --badge-failed-fg: 353 95.7% 81.8%;
-  /* SG-075 migration addition: dark counterparts of the amber badge/accent. */
-  --badge-proposed-bg: 26 83% 14%;
-  --badge-proposed-fg: 48 96% 76%;
-  --accent: 30 8.6% 16.5%;
-  --accent-foreground: 60 4.8% 95.9%;
-  /* SG-273 G1 dark paper set (own design, same shapes): dark warm paper,
-     light ink, warm muted and line in HSL below. */
-  --paper: 26.7 16.4% 10.8%;
-  --ink: 40 35.3% 93.3%;
-  --ink-muted: 33.3 11.2% 68.6%;
-  --line: 30 11.5% 20.4%;
+  /* SG-330 R1 moved (dark): raw -> tile + muted; processed/rendered -> tile +
+     ink; failed -> past; proposed -> soon. */
+  --badge-raw-bg: 220 16.2% 14.5%;
+  --badge-raw-fg: 224 8.8% 66.5%;
+  --badge-processed-bg: 220 16.2% 14.5%;
+  --badge-processed-fg: 225 21.1% 92.5%;
+  --badge-rendered-bg: 220 16.2% 14.5%;
+  --badge-rendered-fg: 225 21.1% 92.5%;
+  --badge-failed-bg: 0 30.3% 17.5%;
+  --badge-failed-fg: 7.2 62.5% 84.3%;
+  --badge-proposed-bg: 45 34.1% 16.1%;
+  --badge-proposed-fg: 42.6 63.3% 78.6%;
+  /* SG-330 R1 moved (dark): accent surface -> tile, text -> ink. */
+  --accent: 220 16.2% 14.5%;
+  --accent-foreground: 225 21.1% 92.5%;
+  /* SG-330 R1 (D41 Midnight) dark set. */
+  --paper: 222.9 16.3% 8.4%;
+  --ink: 225 21.1% 92.5%;
+  --ink-muted: 224 8.8% 66.5%;
+  --line: 221.5 14.3% 17.8%;
+  /* SG-330 R1 new (dark). */
+  --past-bg: 0 30.3% 17.5%;
+  --past-fg: 7.2 62.5% 84.3%;
+  --soon-bg: 45 34.1% 16.1%;
+  --soon-fg: 42.6 63.3% 78.6%;
+  --tile: 220 16.2% 14.5%;
 }
 
 *,
@@ -162,6 +188,27 @@ textarea {
 
 .border-primary {
   border-color: hsl(var(--primary));
+}
+
+/* SG-330 R1: utilities for the five new tokens. */
+.bg-past {
+  background-color: hsl(var(--past-bg));
+}
+
+.text-past {
+  color: hsl(var(--past-fg));
+}
+
+.bg-soon {
+  background-color: hsl(var(--soon-bg));
+}
+
+.text-soon {
+  color: hsl(var(--soon-fg));
+}
+
+.bg-tile {
+  background-color: hsl(var(--tile));
 }
 
 .badge-raw {
