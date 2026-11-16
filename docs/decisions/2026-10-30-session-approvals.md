@@ -220,3 +220,7 @@ Read as: **D40** — before any more look work, the Architect makes one private 
 **2026-11-16, verbatim (on the D40 mockup):** *"I don't like the color combination too much, maybe try something a bit more elegant? Also the mobile view is pretty bad, we need to have 3 or 4 items per row at least. Maybe items per row should be configurable desktop and mobile? Desktop view overall is pretty clean overall, font is fine too."*
 
 Read as: **mockup feedback** — keep the desktop layout and Instrument Sans; replace the maroon-on-paper colours with a more elegant palette (round 2 offers Stone & Ink, Sage, Midnight); phone catalog shows at least 3 items per row; items per row is a setting on desktop (4/5/6) and phone (3/4). Nothing is built until the owner picks.
+
+**2026-11-16, verbatim:** *"Lets use Midnight."*
+
+Read as: **D41** — the app's palette becomes the mockup's *Midnight* (light: ground `#F3F2EF`, ink `#191B22`, muted `#5F626B`, line `#DADBDF`, main action `#1F2A44`; dark: ground `#121419`, ink `#E8EAF0`, muted `#A2A6B1`, line `#272B34`, main action `#B9C7E8`; soft red only for past dates, soft amber only for this week). It replaces the D18 maroon-on-paper colours; Instrument Sans and square corners stay. The redesign build follows the mockup (https://claude.ai/artifact/BswTM1Tj1LHdgcibTPeLTh): catalog first.
