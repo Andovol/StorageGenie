@@ -1,0 +1,15 @@
+Strings — from served container's own files (old release-sg329 JS vs new release-sg332 JS; old vs new CSS), counts via exact substring.
+JS `Your things` old=0 new=1 (>=1 after: yes)
+JS `Add item` old=0 new=2 (>=1 after: yes)
+JS `Search your things` old=0 new=2 (>=1 after: yes)
+JS `Use by, soonest first` old=0 new=1 (>=1 after: yes)
+JS `Per row` old=0 new=2 (>=1 after: yes)
+JS `Photo grid` old=0 new=1 (>=1 after: yes)
+JS `Show them` old=0 new=1 (>=1 after: yes)
+JS `Import Asset` old=4 new=2 (packet expected 0 after; measured 2 — Nav in App.tsx retains it for non-catalog routes showImport=pathname!=="/" lines 156/176, while CatalogToolbar copy removed 4→2; Processing Status and Recently Added below show catalog copy gone)
+JS `Processing Status` old=1 new=0 (0 after: yes)
+JS `Recently Added` old=1 new=0 (0 after: yes)
+CSS Midnight ground HSL `45 14.3% 94.5%` (HSL form of #F3F2EF from frontend/src/theme/tokens.css) old=0 new=3 (>=1 after: yes)
+CSS old paper `40 35.3% 93.3%` old=2 new=0 (0 after: yes)
+CSS woff2 names both in new CSS: instrument-sans-latin-wght-normal-BbzFLZTg.woff2, instrument-sans-latin-ext-wght-normal-B5bTHO_g.woff2.
+Honest limit: no screen is viewed in a browser here; no screenshot of the redesign exists yet (they follow next session); its tests are SG-330's and SG-331's; no candidate is decided on the live app here.

@@ -1,0 +1,12 @@
+Runtime diff — whole served /app tree, old image (storagegenie-backend:release-sg329 = 409bf8a1469a46ddca7e3a4bf6efd1c690547647c7972077ee2bc41220e92a35) vs new image (storagegenie-backend:latest at build = storagegenie-backend:release-sg332 = 0cd2437de56e1a6d96833c635bd0167b25d654641bde84ac89ccde311c1c2900), via authorised `docker run --rm --network none --entrypoint sh <image> -c 'cd /app && find . -type f -exec sha256sum {} +'` for both (sorted by path, no mounts/env/port).
+total_old=4071 total_new=4071 only_old=2 only_new=2 changed=1 (5 static paths)
+./static/assets/index-y4viF7r0.js old=f6f6a12e3f074d8352ab1a5572f08bab1f31e462d494ae2abd6a5333a5b336d6 new=None (OLD ONLY, size 369208)
+./static/assets/index-BGbwuPTO.css old=90d6285326accc47e61b3073b951bb4e04234b582e495d2d8ec83c9144d6b6c0 new=None (OLD ONLY, size 6172)
+./static/assets/index-DlqlGk8g.js old=None new=11e4ee1b6e4b8597818ae2c2c0a09e7be0974f9d4eb8a2c3f273b29fd8b0e0e0 (NEW ONLY, size 372812)
+./static/assets/index-e_BzCe-6.css old=None new=d0a1bbde2323a3ee73fa57f6639db3e6886e05a8467fe6318815110268141acb (NEW ONLY, size 7307)
+./static/index.html old=507116e37011c81fef89cdf58ba34bbc480ca97291d4583bedf58f827e1660d1 new=f5bf7b1f5cdbcc92ad99ef5eacb8c6ea81c4d117154ee185665b252e263c2134 (CHANGED, size 944 both)
+No backend/ file differs (BACKEND_LIKE []). Any measured backend file would have been STOP in S0; none found.
+JS must change: yes, different names and hashes (f6f6a12e… vs 11e4ee1b…).
+CSS must change: yes, different names and hashes (90d62853… vs d0a1bbde…), sizes 6172 vs 7307.
+woff2 byte-identical (same names, same hashes, measured not assumed): instrument-sans-latin-wght-normal-BbzFLZTg.woff2 hash 2ee17598a98d8a59e4df8152d015bec9ab8e4d5672cc0ab42bef806b568e3971 size 30092 both; instrument-sans-latin-ext-wght-normal-B5bTHO_g.woff2 hash c4fcfea41f2c1cfeea9211fa43679845454a1d0e0d7e95e069c7e73c4ae302d2 size 11144 both.
+Derived expected backend set (my expectation, quoted as empty): `git diff --name-only 0119a87..HEAD -- backend/ ':!backend/alembic'` → empty. `git diff --name-only 0119a87..HEAD -- backend/alembic` → empty. Frontend-only change confirmed (CatalogPage/toolbar/tokens plus SG-330/SG-331 tests).
