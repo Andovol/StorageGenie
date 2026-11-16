@@ -102,7 +102,7 @@ describe("SG-312 Inbox in plain words (I3)", () => {
       return Promise.resolve({ items: [], next_cursor: null, total: 0 });
     });
     render(withClient(<InboxPage />));
-    fireEvent.click(await screen.findByText("Import job"));
+    fireEvent.click(await screen.findByText(/Import ·/));
     expect(await screen.findByText("Checking the file")).toBeInTheDocument();
     expect(screen.getByText("Saving")).toBeInTheDocument();
     expect(screen.queryByText("COMMITTING")).toBeNull();
