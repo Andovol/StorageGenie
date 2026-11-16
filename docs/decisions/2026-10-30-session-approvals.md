@@ -200,3 +200,7 @@ Read as: **D37** (close now) taken by the owner; the END report to Launcher issu
 **2026-11-16, verbatim:** *"Stop using Haiku."*
 
 Read as: **directive** — `opencode-go/claude-haiku-5-5` leaves the builder rotation (D25) for every slice from now on; every builder slice runs on `opencode-go/muse-spark-1.3-contributor effort=xhigh` until the owner names another model. First use: SG-324r1 (previously slotted for Haiku). Second-opinion runs are unchanged (Sol 6.1 medium).
+
+**2026-11-16, verbatim:** *"D38 - leave it"*
+
+Read as: **D38** — the asset page's Details table keeps showing current values only (SG-324 P3 hides every *Replaced* value); no slice to show older values in History until after the owner's shelf trial, and only if the trial shows the need (SG-324r1 audit I4).
