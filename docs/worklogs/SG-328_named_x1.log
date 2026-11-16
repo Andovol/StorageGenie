@@ -1,0 +1,33 @@
+
+> storagegenie-frontend@0.1.0 test
+> vitest run --run src/sg328-grid-default.sg328.test.tsx src/components/catalog/catalog.test.tsx src/sg325-p8.sg325.test.tsx
+
+
+ RUN  v1.6.1 /home/andrei/StorageGenie/frontend
+
+stderr | src/sg325-p8.sg325.test.tsx > SG-325 P8+P13 catalog Use by column > the table replaces Status with Use by: same-name rows show their own dates, dateless shows No date
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+stderr | src/sg328-grid-default.sg328.test.tsx > SG-328 catalog grid default > a wide content column (1280 px) opens in Standard Grid
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+stderr | src/components/catalog/catalog.test.tsx > ProductCard > renders the name, the category micro-pill and the primary-color dots
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+ ✓ src/sg325-p8.sg325.test.tsx  (2 tests) 463ms
+ ✓ src/sg328-grid-default.sg328.test.tsx  (3 tests) 543ms
+ ✓ src/components/catalog/catalog.test.tsx  (37 tests) 1299ms
+
+ Test Files  3 passed (3)
+      Tests  42 passed (42)
+   Start at  18:25:10
+   Duration  2.89s (transform 411ms, setup 251ms, collect 1.76s, tests 2.31s, environment 1.51s, prepare 350ms)
+
+npm notice
+npm notice New minor version of npm available! 11.11.0 -> 11.21.2
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v11.21.2
+npm notice To update run: npm install -g npm@11.21.2
+npm notice
