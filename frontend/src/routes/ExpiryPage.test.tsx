@@ -225,7 +225,6 @@ describe("ExpiryPage", () => {
     await screen.findByText("Milk");
 
     expect(screen.getAllByRole("region").map((region) => region.getAttribute("aria-label"))).toEqual([
-      "Opened countdown",
       "Expired",
       "This week",
       "This month",
