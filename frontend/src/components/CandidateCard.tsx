@@ -144,6 +144,7 @@ export function CandidateCard({
           </button>
         </span>
         )}
+        {!isDuplicate && (
         <button
           type="button"
           onClick={() => onDecision("edit", values)}
@@ -153,6 +154,7 @@ export function CandidateCard({
         >
           Save edits
         </button>
+        )}
         {!isDuplicate && (
         <button
           type="button"
