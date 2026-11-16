@@ -189,9 +189,9 @@ describe("SG-075 screen adoption", () => {
     expectPageHeader(/theme asset/i);
   });
 
-  test("capture screen header is token-styled", () => {
+  test("capture screen header reads Add an item and is token-styled (SG-325 P11)", () => {
     renderWithProviders(<HouseholdProvider><CapturePage /></HouseholdProvider>);
-    expectPageHeader(/capture/i);
+    expectPageHeader(/add an item/i);
   });
 
   test("chat screen header is token-styled", () => {
