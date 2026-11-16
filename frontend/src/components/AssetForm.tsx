@@ -292,7 +292,7 @@ export function AssetForm({ householdId, onCreated }: Props) {
             {previewFiles.map((pf, i) => (
               <li key={i} style={{ fontSize: 12, marginBottom: 4 }}>
                 {pf.file.name} — {(pf.file.size / 1024).toFixed(1)} KB {pf.shaPreview && <span className="text-muted-foreground">SHA {pf.shaPreview}</span>}
-                <button type="button" onClick={() => setPreviewFiles((prev) => prev.filter((_, idx) => idx !== i))} style={{ marginLeft: 8, fontSize: 11 }}>
+                <button type="button" onClick={() => setPreviewFiles((prev) => prev.filter((_, idx) => idx !== i))} className={THEMED_CONTROL_CLASS} style={{ ...CONTROL_STYLE, marginLeft: 8 }}>
                   remove
                 </button>
               </li>
@@ -323,7 +323,7 @@ export function AssetForm({ householdId, onCreated }: Props) {
             </>
           )}
           <div style={{ display: "flex", gap: 12, flexWrap: "wrap", marginTop: 8 }}>
-            <button type="button" onClick={() => void createItem()} disabled={submitting} className="text-link focus-ring" style={{ fontSize: 13 }}>
+            <button type="button" onClick={() => void createItem()} disabled={submitting} className={THEMED_CONTROL_CLASS} style={CONTROL_STYLE}>
               Add another pack
             </button>
             {samePacks.length === 1 && (
@@ -331,7 +331,7 @@ export function AssetForm({ householdId, onCreated }: Props) {
                 Open it
               </Link>
             )}
-            <button type="button" onClick={() => setSamePacks(null)} disabled={submitting} className="text-link focus-ring" style={{ fontSize: 13 }}>
+            <button type="button" onClick={() => setSamePacks(null)} disabled={submitting} className={THEMED_CONTROL_CLASS} style={CONTROL_STYLE}>
               Cancel
             </button>
           </div>
