@@ -203,12 +203,12 @@ export function AssetForm({ householdId, onCreated }: Props) {
           style={{ width: "100%", padding: 8, borderStyle: "solid", borderWidth: 1, borderRadius: 6 }}
           placeholder="e.g. Hammer"
         />
-        <span className="text-muted-foreground" style={{ fontSize: 11 }}>Left blank, we use the photo's filename</span>
+        <span className="text-muted-foreground" style={{ fontSize: 13 }}>Leave it blank and we use the photo's file name</span>
       </label>
       <label style={{ display: "flex", flexDirection: "column", gap: 4 }}>
         <span>Kind of item</span>
         <select className={THEMED_CONTROL_CLASS} value={assetType} onChange={(e) => setAssetType(e.target.value)} style={{ ...CONTROL_STYLE, width: "100%", padding: 8 }}>
-          <option value="unknown">unknown</option>
+          <option value="unknown">not chosen yet</option>
           <option value="equipment">equipment</option>
           <option value="product">product</option>
           <option value="component">component</option>
@@ -339,7 +339,7 @@ export function AssetForm({ householdId, onCreated }: Props) {
       )}
       {error && <div className="text-danger" style={{ fontSize: 13 }}>{error}</div>}
       <button type="submit" disabled={submitting} className="bg-primary text-primary-foreground focus-ring" style={{ padding: "10px 16px", borderRadius: 6, border: "none", cursor: submitting ? "not-allowed" : "pointer" }}>
-        {submitting ? "Creating..." : "Create asset"}
+        {submitting ? "Adding…" : "Add to catalog"}
       </button>
     </form>
   );

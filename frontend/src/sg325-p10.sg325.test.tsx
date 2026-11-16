@@ -53,7 +53,7 @@ describe("SG-325 P10 warning and preview controls", () => {
     );
 
     fireEvent.change(screen.getByPlaceholderText("e.g. Hammer"), { target: { value: "Olive Oil" } });
-    fireEvent.click(screen.getByRole("button", { name: "Create asset" }));
+    fireEvent.click(screen.getByRole("button", { name: "Add to catalog" }));
     expect(await screen.findByTestId("same-name-warning")).toBeInTheDocument();
 
     themed(screen.getByRole("button", { name: "Add another pack" }));

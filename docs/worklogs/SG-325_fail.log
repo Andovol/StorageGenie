@@ -1,3 +1,4 @@
 SG-325 P9 FAIL 1794849502 src/sg325-p9.sg325.test.tsx 1 failed: a duplicate card shows no Save edits (found Save edits button on duplicate)
 SG-325 P8 FAIL 1794849589 src/sg325-p8.sg325.test.tsx 2 failed: headers lack Use by (Asset Name Category Status Added Actions)
 SG-325 P10 FAIL 1794849735 src/sg325-p10.sg325.test.tsx 1 failed: warning buttons lack sg-paper-control (text-link grey)
+SG-325 P11 FAIL 1794849767 src/sg325-p11.sg325.test.tsx 4 failed: Add an item / Add to catalog / file name hint / not chosen yet all absent

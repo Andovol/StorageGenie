@@ -50,7 +50,7 @@ function submit(name: string, quantity?: string) {
   if (quantity !== undefined) {
     fireEvent.change(screen.getByLabelText("Quantity"), { target: { value: quantity } });
   }
-  fireEvent.click(screen.getByRole("button", { name: "Create asset" }));
+  fireEvent.click(screen.getByRole("button", { name: "Add to catalog" }));
 }
 
 describe("AssetForm SG-304 G1 (same-name warning)", () => {

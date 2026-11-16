@@ -18,7 +18,7 @@ export function CapturePage() {
 
   return (
     <PageContainer className="text-foreground">
-      <h1 className="page-header text-foreground">Capture — Manual Create</h1>
+      <h1 className="page-header text-foreground">Add an item</h1>
       {householdsIsError ? (
         <div role="alert">Could not load households: {String(householdsError)}</div>
       ) : !effective ? (

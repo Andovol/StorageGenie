@@ -77,7 +77,7 @@ describe("AssetForm", () => {
     expect(await screen.findByText(/shot\.png/)).toBeInTheDocument();
 
     fireEvent.change(screen.getByPlaceholderText("e.g. Hammer"), { target: { value: "Drill" } });
-    fireEvent.click(screen.getByRole("button", { name: "Create asset" }));
+    fireEvent.click(screen.getByRole("button", { name: "Add to catalog" }));
 
     await waitFor(() =>
       expect(api.apiPost).toHaveBeenCalledWith(
@@ -90,11 +90,11 @@ describe("AssetForm", () => {
     expect(onCreated).toHaveBeenCalledWith("asset-1");
   });
 
-  test("the name field reads optional and explains the filename fallback", () => {
+  test("the name field reads optional and explains the file name fallback", () => {
     render(<AssetForm householdId="hh-1" onCreated={() => {}} />);
 
     expect(screen.getByText("Display name (optional)")).toBeInTheDocument();
-    expect(screen.getByText(/we use the photo's filename/i)).toBeInTheDocument();
+    expect(screen.getByText(/we use the photo's file name/i)).toBeInTheDocument();
     expect(screen.getByPlaceholderText("e.g. Hammer")).not.toBeRequired();
   });
 
@@ -115,7 +115,7 @@ describe("AssetForm", () => {
     });
     expect(await screen.findByText(/nameless\.png/)).toBeInTheDocument();
 
-    fireEvent.click(screen.getByRole("button", { name: "Create asset" }));
+    fireEvent.click(screen.getByRole("button", { name: "Add to catalog" }));
 
     await waitFor(() => expect(api.apiPost).toHaveBeenCalledTimes(1));
     const payload = api.apiPost.mock.calls[0][1] as Record<string, unknown>;
@@ -127,7 +127,7 @@ describe("AssetForm", () => {
   test("a nameless photoless submit is refused with a named error and sends nothing", async () => {
     render(<AssetForm householdId="hh-1" onCreated={() => {}} />);
 
-    fireEvent.click(screen.getByRole("button", { name: "Create asset" }));
+    fireEvent.click(screen.getByRole("button", { name: "Add to catalog" }));
 
     expect(await screen.findByText("Add a photo or a display name")).toBeInTheDocument();
     expect(api.uploadEvidence).not.toHaveBeenCalled();
