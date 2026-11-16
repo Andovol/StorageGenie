@@ -47,6 +47,7 @@ Built from audits, one row per rated slice (owner, D25, 2026-11-07). Strengths a
 | SG-322 | haiku-5-5, high | backend fix + 2 test files + full gate + evidence rescue | ≈420 s (stamps) | 93 | yes | first report verdict PASS, self-corrected to FAIL in-run; both FAILs were packet errors | packet |
 | SG-321r1 | muse-1.3, xhigh | screenshots retake, 5 shots, real app | ~940 s (stamps) | 88 | yes | every proof right; repeated a false layout claim (header wrap) despite an explicit packet rule — 4th instance | coder |
 | SG-323 | haiku-5-5, high | deploy rider, live serve | 167 s | 94 | yes, S1 | read the old container id after recreate, caught and redid it | coder (minor) |
+| SG-324r1 | muse-1.3, xhigh | gate: judge 8 commits + full gate + test alignment | 709 s (stamps) | 96 | yes | none material; one tautological test line | coder (minor) |
 | SG-304 run 1 | haiku-5-5, high | build, backend + frontend, two flows | 1272 s (killed idle) | unrated, retried | n/a — killed after 900 s of no output | went silent while writing four test files in one batch; tests lost, no report; G1/G2 pushed | unknown (debug: transcript unidentified) |
 | SG-304r1 | haiku-5-5, high | retry: tests + gate | 903 s (killed idle) | — | n/a | none by the model: OpenCode Go "usage limit reached" before any work | provider (account quota) |
 
