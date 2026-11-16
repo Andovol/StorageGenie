@@ -1,0 +1,49 @@
+# SG-330 Report — Redesign A (Midnight, photo-first cards, per-row, plain header)
+
+Slice SG-330. Model and effort: not visible in the process arguments received — stated as not visible, nothing inferred. Working directory: `/home/andrei/StorageGenie`. Remote: `git@github.com:Andovol/StorageGenie.git`. BASE REF: `origin/automation`. BASE resolved commit: `a436befa9da0aee405855cca6c3245af93c56359` (D41 Midnight palette). WORK_HEAD: `713479fc` (gate fixups on top of `6a9631c5`).
+
+Elapsed ≈ 1060 s by stamps. Phases (s): G0 preflight + premise reads ≈ 155; R1 ≈ 70; R5 ≈ 145; R4 ≈ 163; R3 ≈ 74; R2 ≈ 110; G2 gate + fixups + report ≈ 320. Health `curl -s http://127.0.0.1:8003/v1/health`: 200 at start (G0) and 200 at end (G2). No server started; no deploy; no provider/key spend.
+
+## Items — all done, none REMAINING
+
+R1 — Midnight tokens (`frontend/src/theme/tokens.css`, `:root` block and `.dark` block; utilities after `.border-primary`).
+Before: Stone/maroon scale — ground `40 35.3% 93.3%` paper, primary `2 41% 30.6%` maroon, dark link split `2 41% 72%`.
+After: exact packet hexes in HSL — light ground `45 14.3% 94.5%`, field `40 27.3% 97.8%`, text `226.7 15.3% 11.6%`, muted `225 5.9% 39.6%`, lines `228 7.2% 86.5%`, main `222.2 37.4% 19.4%`, on-main `45 14.3% 94.5%`, past `10.9 47.8% 91%`/`8.2 56.4% 30.6%`, soon `42.9 46.7% 88.2%`/`40 69.6% 22%`, tile `228 9.8% 90%`; dark ground `222.9 16.3% 8.4%`, field `222 16.1% 12.2%`, text `225 21.1% 92.5%`, muted `224 8.8% 66.5%`, lines `221.5 14.3% 17.8%`, main `222.1 50.5% 81.8%`, on-main `222.9 16.3% 8.4%`, past `0 30.3% 17.5%`/`7.2 62.5% 84.3%`, soon `45 34.1% 16.1%`/`42.6 63.3% 78.6%`, tile `220 16.2% 14.5%`. Five new tokens (`--past-bg/fg`, `--soon-bg/fg`, `--tile`) with `.bg-past/.text-past/.bg-soon/.text-soon/.bg-tile`.
+Moved tokens and chosen roles: `--card-muted`/`--muted`/`--accent` → tile (recessed/neutral surfaces; Midnight has no other neutral); `--accent-foreground` → ink; `--badge-raw` → tile bg + muted fg (neutral); `--badge-processed`/`--badge-rendered` → tile bg + ink fg (their blue/green hues have no Midnight role, neutralized but kept readable); `--badge-failed` → past role (red meaning preserved); `--badge-proposed` → soon role (amber meaning preserved). Same mapping in dark.
+Test: `frontend/src/sg330-r1.sg330.test.tsx` (4 tests; FAIL on base — old Stone values; PASS after). Contrast from token values read out of the file, all ≥ 4.5:1 — light ink 15.35, muted 5.44, link 12.74, on-main 12.74, past 7.42, soon 7.25; dark ink 15.31, muted 7.58, link 10.90, on-main 10.90, past 9.54, soon 9.23.
+
+R5 — photo-first card (`frontend/src/components/catalog/ProductCard.tsx` full rewrite; `useBy`+`daysRemaining` join in `frontend/src/routes/CatalogPage.tsx` `useByById`/visibleItems; `formatUseByDayMonth` added in `frontend/src/lib/labels.ts`; `.sg-card-*`/`.sg-wide/narrow-only` classes in tokens.css).
+Before: bordered card, tile with border, absolute `use-by-date` badge (`6 May 2030`/`No date`), category micro-pill, color dots, failed warning icons.
+After: no border, square `--tile` well filling the column (`object-fit: contain`), no dot/badge/icons; name 16px/600 (13px narrow, one-line ellipsis); date line — past `Past its date · 27 Oct` (past wash; narrow `Past · 27 Oct`), this week `Use by 21 Nov · 5 days` (soon wash; narrow `21 Nov`), later `Use by 6 May 2030` in ink (narrow `6 May 2030`), none `No date yet` muted (narrow `No date`); kind line (`labelAssetType`) muted 13px, wide only. Same-name packs stay separate (no grouping added).
+Test: `frontend/src/sg330-r5.sg330.test.tsx` (5 tests; FAIL on base — old badge text; PASS after). Items built the way CatalogPage builds them (real `Asset` → `assetToProductItem` + join).
+
+R4 — items per row (`ProductGrid.tsx` grid branch; established instead: `CatalogToolbar.tsx` Per-row group, `AppShell.tsx` pass-through props, `CatalogPage.tsx` narrow hook + per-device state — named here because the control lives in the toolbar component, not the grid file).
+Before: fixed `repeat(auto-fill, minmax(165px, 1fr))`, gap 16px.
+After: wide 4/5/6 (default 5), narrow (< 640 px) 3/4 (default 3); `repeat(n, minmax(0, 1fr))`; gaps wide `24px 40px`, narrow `8px 16px`. Toolbar `role="group" aria-label="Per row"`, buttons with `aria-pressed`, `min-height: 44` (+ `.sg-per-row-button` narrow rule). Keys `sg-per-row-wide`/`sg-per-row-narrow` in localStorage, read/written inside try/catch, fallback to defaults.
+Test: `frontend/src/sg330-r4.sg330.test.tsx` (4 tests; FAIL on base — no Per-row group; PASS after). Covers: default 5 pressed + `repeat(5,`; click 6 persists and is read back after remount; throwing getItem falls back to 5 without breaking the page; 500 px viewport offers 3/4 with 3 pressed and narrow gaps. Fed with real `AssetListResponse`/`ExpiryStatusResponse` shapes (past/soon/later/dateless).
+
+R3 — heading (`CatalogPage.tsx` titleCount prop; `AppShell.tsx` heading block between header and toolbar; `.sg-catalog-title` in tokens.css).
+Before: uppercase `N ITEMS` div inside content (`catalog-count`).
+After: `h1 Your things` (40px/600 wide, 28px narrow) + muted `N things` (`1 thing` singular) above the toolbar; `catalog-count` div removed.
+Test: `frontend/src/sg330-r3.sg330.test.tsx` (1 test; FAIL on base — no h1; PASS after).
+
+R2 — header (`frontend/src/components/shell/AppHeader.tsx`).
+Before: `Import Asset` filled ink-on-paper link, `Search…` with accessible name `Search catalog`, `Showing: N items` box.
+After: `Add item` filled `primary`/`primary-foreground` link, `Search your things` placeholder with the same accessible name, no count box (count moved to R3). One-row phone rule untouched (`.sg-header*` 480px block kept).
+Test: `frontend/src/sg330-r2.sg330.test.tsx` (1 test; FAIL on base — old wording; PASS after).
+
+Premises: all packet line hypotheses confirmed — tokens.css `:1`/`:43` blocks; AppHeader `:98`/`:118` Import Asset, `:82` Search…, `:72` Showing box; CatalogPage `useByById` SG-325 join; ProductGrid grid branch; ProductCard badge/pill/dots. One premise refined: the "catalog toolbar" control lives in `CatalogToolbar.tsx` (shell dir), so it plus `AppShell.tsx` were changed as established-instead files (why: toolbar component ≠ grid file; heading must sit between header and toolbar in the sticky stack). `App.tsx` legacy-nav `Import Asset` (non-catalog routes) is out of scope and unchanged — reported, not fixed (STOP boundary respected).
+
+Test changes, each named old → new, none loosened: `theme.test.tsx` (dark layers `0F0E0D…` → Midnight `121419…`; canvas `FAFAF9` → `F3F2EF`; link test keeps AA assertions and now asserts dark primary == link and clears AA, replacing the retired `<4.5` maroon premise); `catalog.test.tsx` (micro-pill+dots → kind line, no dots; badge testids → `product-date-wide/narrow` wording; failed chrome → no chrome); `catalog.sg307.test.tsx` (track rule → per-row repeat; pill chip → kind line + tile well); `shell.test.tsx` (`Showing:` count → heading count `4 things`/`1 thing`; `Search catalog` → `Search your things` ×6 incl. saved-search suites; Import Asset CTA → Add item); `import-modal.test.tsx` (Import Asset → Add item ×2); `panel.sg307.test.tsx` (test title Import → Add item); `sg318-plain-words.sg318.test.tsx` (`product-category` → `product-kind`, found by the full gate). One new shared file per item: `sg330-r1/-r5/-r4/-r3/-r2.sg330.test.tsx`.
+
+Gate: eslint — only the known `App.household-nav.test.tsx` fireEvent error (plus a fixed unused-directive warning); tsc clean; vite build into scratch green (1973 modules, 2.95 s); `make backend-test` green — backend unchanged, host suite passed (make proceeded to image proof), image proof `2 passed, 6 deselected`; `make frontend-test` final: 78 files, 544 tests, 0 failed (first run 543/1 — the sg318 pill test above — fixed, re-run green); named set (5 sg330 + 8 older suites) twice green: 13 files / 128 tests each run. Logs: `docs/worklogs/SG-330_{eslint,tsc,build,backend,frontend,named_x1,named_x2,fail,pass}.log`.
+
+Changed files: tokens.css, ProductCard.tsx, ProductGrid.tsx, CatalogToolbar.tsx, AppShell.tsx, CatalogPage.tsx, AppHeader.tsx, labels.ts, 5 new sg330 tests, 7 older tests (theme, catalog, catalog.sg307, sg325 untouched-green, shell, import-modal, panel.sg307, sg318). No backend, migration, Dockerfile, compose, lockfile, dependency, `.env`, live database, stored files, host, provider, container or deploy bytes. `frontend/dist` untouched; the stray `frontend/output/` build dir from a `$PWD`-relative `--outDir` was removed; `output/SG-330-scratch/` removed before the report; tree clean except `output/` (pre-existing `SG-324-scratch`, `dispatch` untouched).
+
+Contract line: I received no contract version line — stating exactly that, per instructions (never the line from AGENTS.md).
+
+UNCLEAR: none. REMAINING: none — R1, R5, R4, R3, R2 all landed and gated.
+
+A1 — preflight Server section present, busybox rc 0, health 200 start and end; phase seconds above. A2 — every item done with file and location; premises confirmed except the toolbar-location refinement named; moved tokens' roles named. A3 — each test FAIL before / PASS after, logs named; contrast pairs with ratios listed. A4 — gate green with exact counts; named set twice green. A5 — frontend only; no backend/infra/live-data bytes; no `/tmp`; scratch removed; tree clean except pre-existing `output/` entries. A6 — vacuity greps: `2 41% 30.6%|40 35.3% 93.3%` in tokens.css → 0 hits (stale comment fixed); `Showing:` in AppHeader/CatalogPage → 0 hits; `Import Asset` in AppHeader → 0 hits (App.tsx legacy nav retains it, out of scope, named); `color-dots|failed-warning|use-by-date|Photo only` in ProductCard → 0 hits; past/soon lines asserted in R5 test; per-row remount + broken-storage asserted in R4 test; API-shape feeding used in R4/R5 tests; full suite 0 failed.
+
+Verification: PASS

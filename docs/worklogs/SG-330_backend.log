@@ -1,0 +1,15 @@
+#20 DONE 0.0s
+
+#21 exporting to image
+#21 exporting layers 0.1s done
+#21 exporting manifest sha256:e41b1572a8eb9771b702b405ea36f3610a5b863e4d2fdd734deb96fa3a179634 done
+#21 exporting config sha256:8f94e3b87e68f919b92e28dd2a53520b1c95e1ef467212eb63f0a48d1bf887e6 done
+#21 exporting attestation manifest sha256:4b07c039c7d838dbcb37c8f3af3c02fed2781a0536b081a3d5729c5a4fc6de41 done
+#21 exporting manifest list sha256:7de14012bab81f9395a4bab7816b2700e06e27e4038bc70bf614d39bf4655099 done
+#21 naming to docker.io/library/storagegenie-backend:prover done
+#21 unpacking to docker.io/library/storagegenie-backend:prover 0.0s done
+#21 DONE 0.1s
+docker run --rm --network none -e SG_IMAGE_PROOF=1 storagegenie-backend:prover python -m pytest -q -m requires_native_libs tests/test_signals.py
+..                                                                       [100%]
+2 passed, 6 deselected in 2.14s
+make[1]: Leaving directory '/home/andrei/StorageGenie'

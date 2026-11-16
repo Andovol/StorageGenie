@@ -1,0 +1,10 @@
+
+/home/andrei/StorageGenie/frontend/src/App.household-nav.test.tsx
+  2:10  error  'fireEvent' is defined but never used  @typescript-eslint/no-unused-vars
+
+/home/andrei/StorageGenie/frontend/src/sg330-r1.sg330.test.tsx
+  130:7  warning  Unused eslint-disable directive (no problems were reported from 'no-console')
+
+✖ 2 problems (1 error, 1 warning)
+  0 errors and 1 warning potentially fixable with the `--fix` option.
+
