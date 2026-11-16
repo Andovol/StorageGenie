@@ -168,7 +168,7 @@ describe("ProductGrid", () => {
     expect(css).toContain("repeat(auto-fill, minmax(165px, 1fr))");
   });
 
-  test("the compact table renders the seven DQ5 columns in order", () => {
+  test("the compact table renders the six columns in order (no Dimensions/Specs)", () => {
     renderWithRouter(<ProductGrid items={MOCK_PRODUCTS} density="table" householdId="h1" />);
 
     const headers = screen.getAllByRole("columnheader").map((cell) => cell.textContent);
@@ -177,7 +177,6 @@ describe("ProductGrid", () => {
       "Name",
       "Category",
       "Status",
-      "Dimensions/Specs",
       "Added",
       "Actions",
     ]);
@@ -212,13 +211,15 @@ describe("ProductGrid", () => {
     }
   });
 
-  test("absent specs render an honest em dash, never an invented value", () => {
+  test("absent specs render no Dimensions/Specs column and no invented value", () => {
     const item = MOCK_PRODUCTS.find(
       (product) => !product.metadata.dimensions && !product.metadata.material
     )!;
     renderWithRouter(<ProductGrid items={[item]} density="table" householdId="h1" />);
 
-    expect(screen.getByText("—")).toBeInTheDocument();
+    expect(screen.queryByText("Dimensions/Specs")).toBeNull();
+    expect(screen.queryByText("DIMENSIONS/SPECS")).toBeNull();
+    expect(item.metadata.dimensions ?? item.metadata.material ?? null).toBeNull();
   });
 
   test("a table row click navigates to the asset detail route", async () => {
@@ -250,7 +251,7 @@ describe("ProductGrid", () => {
     );
 
     expect(screen.queryByRole("button", { name: /delete/i })).not.toBeInTheDocument();
-    fireEvent.click(screen.getByRole("button", { name: `Actions for ${item.name}` }));
+    fireEvent.click(screen.getByRole("button", { name: `More actions for ${item.name}` }));
     expect(await screen.findByText("detail probe")).toBeInTheDocument();
   });
 
@@ -431,7 +432,7 @@ describe("ProductGrid onSelect", () => {
     const onSelect = vi.fn();
     renderGrid("table", onSelect);
 
-    fireEvent.click(screen.getByRole("button", { name: `Actions for ${item.name}` }));
+    fireEvent.click(screen.getByRole("button", { name: `More actions for ${item.name}` }));
 
     expect(onSelect).toHaveBeenCalledWith(item.id);
     expect(screen.queryByText("detail probe")).not.toBeInTheDocument();
