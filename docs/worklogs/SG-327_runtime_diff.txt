@@ -1,0 +1,12 @@
+SG-327 runtime diff (served /app tree, old release-sg323 vs new release-sg327)
+old_files=4071 new_files=4071
+OLD-ONLY ./static/assets/index-CVSFCg0Q.js 4238560f71403876961c5e116bbb3a515021148f186d130740b72cb29701bb2c size 369594
+NEW-ONLY ./static/assets/index-MC93YmcZ.js 328d7367a1c35ba603d04e5928ee4f2cafef531d959abdd101f12185d9bd0ba1 size 369451
+CHANGED ./static/index.html old=0fc1308548ede60eebc69aaec8b48a17a1df4e3fa5a0bd9a4659dd8de75f7094 new=e5df1970cc80968fb67ff1044dd840e7b9f79573a644c7c6e1ffb841c8a4fe05 size 944 both
+UNCHANGED ./static/assets/index-BGbwuPTO.css 90d6285326accc47e61b3073b951bb4e04234b582e495d2d8ec83c9144d6b6c0 size 6172
+UNCHANGED ./static/assets/instrument-sans-latin-wght-normal-BbzFLZTg.woff2 2ee17598a98d8a59e4df8152d015bec9ab8e4d5672cc0ab42bef806b568e3971 size 30092
+UNCHANGED ./static/assets/instrument-sans-latin-ext-wght-normal-B5bTHO_g.woff2 c4fcfea41f2c1cfeea9211fa43679845454a1d0e0d7e95e069c7e73c4ae302d2 size 11144
+backend_like_changed=0
+derived backend set (git diff --name-only 4bf0e09..HEAD -- backend/ ':!backend/alembic'): empty
+derived dep set (frontend/package.json frontend/package-lock.json backend/requirements.txt backend/pyproject.toml): empty
+derived alembic set (backend/alembic): empty

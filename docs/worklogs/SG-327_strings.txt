@@ -1,0 +1,26 @@
+SG-327 G2 strings (from served container's own files via docker run --rm --network none, no mounts)
+PRESENT (new must be >=1):
+OLD index-CVSFCg0Q.js -> NEW index-MC93YmcZ.js
+[Use by]=3 -> 6
+[Check this item]=0 -> 1
+[This may already be in your catalog]=0 -> 1
+[Add to catalog]=0 -> 1
+[Add an item]=1 -> 2
+[Cut out the item again]=0 -> 1
+[Make a styled photo]=0 -> 1
+[More actions for]=0 -> 2
+[No photo yet]=4 -> 5
+Note: 6 of 9 are 0->>=1 as packet states; 3 ([Use by], [Add an item], [No photo yet]) were already present before and rose. All 9 are present after.
+ABSENT (must be 0 after):
+OLD -> NEW
+[Capture — Manual Create]=1 -> 0
+[Candidate review]=1 -> 0
+[Possible duplicates or collisions]=1 -> 0
+[Re-isolate Asset]=1 -> 0
+[Generate Context Scene]=1 -> 0
+[Thumbnail unavailable]=1 -> 0
+[Dimensions/Specs]=1 -> 0
+woff2 route:
+GET /assets/instrument-sans-latin-wght-normal-BbzFLZTg.woff2 -> 200 application/octet-stream size 30092 sha256 2ee17598a98d8a59e4df8152d015bec9ab8e4d5672cc0ab42bef806b568e3971
+GET /assets/instrument-sans-latin-ext-wght-normal-B5bTHO_g.woff2 -> 200 application/octet-stream
+CSS index-BGbwuPTO.css names both woff2 files.
