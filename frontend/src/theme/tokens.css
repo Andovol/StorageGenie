@@ -190,6 +190,15 @@ textarea {
   border-color: hsl(var(--primary));
 }
 
+/* SG-330 R3: the catalog heading — 40px/600 wide, 28px narrow. */
+.sg-catalog-title {
+  font-size: 40px;
+  font-weight: 600;
+  line-height: 1.1;
+  margin: 0;
+  color: hsl(var(--ink));
+}
+
 /* SG-330 R5: photo-first card type — 16px/600 wide, 13px/600 narrow, one
    line with ellipsis; the kind line shows wide only. */
 .sg-card-name {
@@ -214,6 +223,9 @@ textarea {
 }
 
 @media (max-width: 639px) {
+  .sg-catalog-title {
+    font-size: 28px;
+  }
   .sg-per-row-button {
     min-height: 44px;
   }

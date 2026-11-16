@@ -303,6 +303,7 @@ export function CatalogPage() {
       onSortChange={setSort}
       density={density}
       onDensityChange={setDensity}
+      titleCount={displayed.length}
       perRowWide={perRowWide}
       onPerRowWideChange={changePerRowWide}
       perRowNarrow={perRowNarrow}
@@ -382,15 +383,9 @@ export function CatalogPage() {
                 })}
               </section>
             ) : (
-              !(isError && displayed.length === 0) && (
-                <>
-                  <div
-                    data-testid="catalog-count"
-                    style={{ fontSize: 13, fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase", color: "hsl(var(--ink))", margin: "16px 0 8px" }}
-                  >
-                    {visibleItems.length} ITEMS
-                  </div>
-                  <ProductGrid
+            !(isError && displayed.length === 0) && (
+              <>
+                <ProductGrid
                     items={visibleItems}
                     density={density}
                     householdId={effectiveHousehold}

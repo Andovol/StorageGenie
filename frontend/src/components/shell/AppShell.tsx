@@ -22,6 +22,8 @@ type AppShellProps = {
   perRowNarrow?: number;
   onPerRowNarrowChange?: (n: number) => void;
   isNarrow?: boolean;
+  /** SG-330 R3: live items loaded; the Your-things heading sits above the toolbar. */
+  titleCount?: number;
   activeFilters: string[];
   onClearAll: () => void;
   savedSearches: SavedSearch[];
@@ -50,6 +52,7 @@ export function AppShell({
   perRowNarrow,
   onPerRowNarrowChange,
   isNarrow,
+  titleCount,
   activeFilters,
   onClearAll,
   savedSearches,
@@ -63,6 +66,14 @@ export function AppShell({
     <div style={{ minHeight: "100vh", backgroundColor: "hsl(var(--paper))", color: "hsl(var(--ink))" }}>
       <div style={{ position: "sticky", top: 0, zIndex: 10, backgroundColor: "hsl(var(--paper))" }}>
         <AppHeader loadedCount={loadedCount} searchValue={searchValue} onSearchChange={onSearchChange} />
+        {typeof titleCount === "number" ? (
+          <div style={{ padding: "16px 24px 4px" }}>
+            <h1 className="sg-catalog-title">Your things</h1>
+            <p style={{ margin: "4px 0 0", fontSize: 13, color: "hsl(var(--ink-muted))" }}>
+              {titleCount} {titleCount === 1 ? "thing" : "things"}
+            </p>
+          </div>
+        ) : null}
         <CatalogToolbar
           categories={categories}
           activeCategory={activeCategory}
