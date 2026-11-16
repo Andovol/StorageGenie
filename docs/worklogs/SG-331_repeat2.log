@@ -1,0 +1,78 @@
+
+> storagegenie-frontend@0.1.0 test
+> vitest run --run src/sg330-r1.sg330.test.tsx src/sg330-r2.sg330.test.tsx src/sg330-r3.sg330.test.tsx src/sg330-r4.sg330.test.tsx src/sg330-r5.sg330.test.tsx src/components/shell/shell.test.tsx src/components/catalog/catalog.test.tsx src/sg328-grid-default.sg328.test.tsx src/sg325-p8.sg325.test.tsx src/components/shell/panel.sg307.test.tsx
+
+
+ RUN  v1.6.1 /home/andrei/StorageGenie/frontend
+
+stdout | src/sg330-r1.sg330.test.tsx > SG-330 R1 Midnight tokens > every text-on-ground pair clears WCAG AA 4.5:1, light and dark
+SG-330 contrast light ink on ground: 15.35:1
+SG-330 contrast light muted on ground: 5.44:1
+SG-330 contrast light link on ground: 12.74:1
+SG-330 contrast light on-primary: 12.74:1
+SG-330 contrast light past: 7.42:1
+SG-330 contrast light soon: 7.25:1
+SG-330 contrast dark ink on ground: 15.31:1
+SG-330 contrast dark muted on ground: 7.58:1
+SG-330 contrast dark link on ground: 10.90:1
+SG-330 contrast dark on-primary: 10.90:1
+SG-330 contrast dark past: 9.54:1
+SG-330 contrast dark soon: 9.23:1
+
+ ✓ src/sg330-r1.sg330.test.tsx  (4 tests) 8ms
+stderr | src/sg325-p8.sg325.test.tsx > SG-325 P8+P13 catalog Use by column > the table replaces Status with Use by: same-name rows show their own dates, dateless shows No date
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+stderr | src/sg330-r4.sg330.test.tsx > SG-330 R4 items per row > wide screens offer 4/5/6 with 5 pressed and five columns
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+stderr | src/components/catalog/catalog.test.tsx > ProductCard > renders the name and the kind line with no status dots (SG-330 R5: micro-pill + color-dots -> kind line, no dots)
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+ ✓ src/sg325-p8.sg325.test.tsx  (2 tests) 567ms
+stderr | src/components/shell/shell.test.tsx > Catalog shell > the header carries no count box; Your things names the LOADED item count (SG-330 R2+R3: Showing box -> heading)
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+ ✓ src/sg330-r4.sg330.test.tsx  (4 tests) 873ms
+ ✓ src/components/shell/panel.sg307.test.tsx  (6 tests) 442ms
+stderr | src/components/shell/panel.sg307.test.tsx > SG-307 paper controls and 375 header > the shared rule exists and the toolbar, toggle and review select come out of it
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+ ✓ src/components/catalog/catalog.test.tsx  (37 tests) 1541ms
+stderr | src/sg328-grid-default.sg328.test.tsx > SG-328 catalog grid default > a wide content column (1280 px) opens in Photo grid
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+stderr | src/sg330-r5.sg330.test.tsx > SG-330 R5 photo-first card > a past date reads Past its date with the day and month, no status chrome
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+ ✓ src/sg330-r5.sg330.test.tsx  (5 tests) 132ms
+ ✓ src/sg328-grid-default.sg328.test.tsx  (3 tests) 640ms
+stderr | src/sg330-r2.sg330.test.tsx > SG-330 R2 header plain words > the header offers Add item, searches your things, and carries no count box
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+ ✓ src/sg330-r2.sg330.test.tsx  (1 test) 324ms
+stderr | src/sg330-r3.sg330.test.tsx > SG-330 R3 catalog heading > the catalog opens with Your things and the live count
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+ ✓ src/sg330-r3.sg330.test.tsx  (1 test) 291ms
+ ✓ src/components/shell/shell.test.tsx  (23 tests) 3160ms
+
+ Test Files  10 passed (10)
+      Tests  86 passed (86)
+   Start at  20:36:36
+   Duration  5.37s (transform 1.05s, setup 814ms, collect 4.81s, tests 7.98s, environment 5.88s, prepare 1.20s)
+
+npm notice
+npm notice New minor version of npm available! 11.11.0 -> 11.21.2
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v11.21.2
+npm notice To update run: npm install -g npm@11.21.2
+npm notice
