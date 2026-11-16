@@ -10,7 +10,8 @@ import { AssetImportModal } from "../shell/AssetImportModal";
 /**
  * SG-330 R4 (D41 Midnight): items per row is a setting — wide 4 / 5 / 6
  * (default 5), narrow 3 / 4 (default 3). The column count and the gaps ride
- * inline on the region (wide 40 x 24 px, narrow 16 x 8 px); the class only
+ * inline on the region (wide 40 x 24 px row x column, narrow 16 x 8 px row x
+ * column, SG-331 T7 — CSS `gap` is row column); the class only
  * carries `display: grid`. Injected as plain CSS because Tailwind is not
  * installed (DQ2).
  */
@@ -266,10 +267,10 @@ export function ProductGrid({
   narrow = false,
 }: ProductGridProps) {
   const [importOpen, setImportOpen] = useState(false);
-  // SG-330 R4: wide gaps 40 x 24 px (column x row), narrow 16 x 8 px.
+  // SG-331 T7: CSS `gap` is row column — wide 40 x 24 px, narrow 16 x 8 px.
   const gridStyle: CSSProperties = {
     gridTemplateColumns: `repeat(${perRow}, minmax(0, 1fr))`,
-    gap: narrow ? "8px 16px" : "24px 40px",
+    gap: narrow ? "16px 8px" : "40px 24px",
   };
 
   if (loading) {
