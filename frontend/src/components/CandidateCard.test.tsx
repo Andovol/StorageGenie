@@ -32,7 +32,7 @@ describe("CandidateCard", () => {
     renderCard(<CandidateCard candidate={{ ...candidate, review_task_ids: [], blocking_review_task_ids: [], dedup_matches: [] }} householdId="h" onDecision={onDecision} />);
     fireEvent.click(screen.getByRole("button", { name: "Hold / Unknown" }));
     expect(onDecision).toHaveBeenCalledWith("hold");
-    expect(screen.getByLabelText("identifier value")).toHaveValue("");
+    expect(screen.getByLabelText("Identifier")).toHaveValue("");
     expect(screen.getAllByText(/Confidence:/).some((element) => element.textContent?.includes("Unknown"))).toBe(true);
   });
 
@@ -139,11 +139,12 @@ describe("CandidateCard", () => {
     expect(screen.getByRole("button", { name: "Accept" })).toBeDisabled();
   });
 
-  test("unblocked candidate with dedup matches keeps the advisory and no blocked reason (SG-175 G2)", () => {
+  test("unblocked candidate with dedup matches keeps the plain-words warning and no blocked reason (SG-175 G2, SG-325 P12)", () => {
     renderCard(<CandidateCard candidate={{ ...candidate, review_task_ids: [], blocking_review_task_ids: [] }} householdId="h" onDecision={vi.fn()} />);
     const article = screen.getByRole("article");
     expect(article.textContent?.split("Acceptance is blocked until the open review task(s) are resolved.").length).toBe(1);
-    expect(article).toHaveTextContent("This match is advisory; review it before accepting.");
+    expect(article).toHaveTextContent("This may already be in your catalog");
+    expect(article).not.toHaveTextContent("This match is advisory; review it before accepting.");
     expect(screen.queryByRole("link", { name: "View them in the Inbox." })).toBeNull();
   });
 
