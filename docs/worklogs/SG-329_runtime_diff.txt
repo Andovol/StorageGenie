@@ -1,0 +1,7 @@
+Runtime diff — whole served /app tree, old image (storagegenie-backend:release-sg327 = 0cf8bdc1825a) vs new image (storagegenie-backend:latest at build = 409bf8a1469a), via authorised `docker run --rm --network none --entrypoint sh <image> -c 'cd /app && find . -type f -exec sha256sum {} +'` for both (sorted by path).
+total_old=4071 total_new=4071 changed=3
+./static/assets/index-MC93YmcZ.js old=328d7367a1c35ba603d04e5928ee4f2cafef531d959abdd101f12185d9bd0ba1 new=None (OLD ONLY, size 369451)
+./static/assets/index-y4viF7r0.js old=None new=f6f6a12e3f074d8352ab1a5572f08bab1f31e462d494ae2abd6a5333a5b336d6 (NEW ONLY, size 369208)
+./static/index.html old=e5df1970cc80968fb67ff1044dd840e7b9f79573a644c7c6e1ffb841c8a4fe05 new=507116e37011c81fef89cdf58ba34bbc480ca97291d4583bedf58f827e1660d1 (CHANGED, size 944 both)
+No backend/ file differs. CSS index-BGbwuPTO.css and both .woff2 files are absent from this changed list (byte-identical; hashes in SG-329_hashes.txt).
+Derived expected backend set (my expectation, quoted as empty): `git diff --name-only 1d7cb04..HEAD -- backend/ ':!backend/alembic'` → empty. `git diff --name-only 1d7cb04..HEAD -- backend/alembic` → empty.

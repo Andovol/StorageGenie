@@ -1,0 +1,8 @@
+Strings — from each image's own JS via `docker run --rm --network none --entrypoint sh <image> -c 'cat /app/static/assets/<bundle>.js'` + `grep -o -F`, counts OLD (index-MC93YmcZ.js, release-sg327) → NEW (index-y4viF7r0.js, serving).
+[Use by] 6→6
+[Check this item] 1→1
+[Add to catalog] 1→1
+[Cut out the item again] 1→1
+[More actions for] 2→2
+[Standard Grid] 1→1
+All six labels present before and after (counts >= 1). None missing.
