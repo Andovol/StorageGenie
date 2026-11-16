@@ -1,7 +1,7 @@
 import { memo, useState } from "react";
 import { Link } from "react-router-dom";
 import { AlertTriangle, Package } from "lucide-react";
-import type { ProductItem, ProductStatus } from "../../types/product";
+import type { ProductItem } from "../../types/product";
 import { formatUseByDate, labelAssetType } from "../../lib/labels";
 
 /**
@@ -17,40 +17,6 @@ export type CatalogProduct = ProductItem & {
    * expiry status read; null when the item has no date. */
   useBy?: string | null;
 };
-
-/**
- * DQ3 badge pairs, embedded verbatim. Tailwind is not installed (DQ2: the CSS
- * custom-property tokens are the requirement), so each pair is paired with the
- * SG-043 semantic token class below that carries the same light/dark swatches.
- * The raw DQ3 utility strings stay on the element so the palette is greppable.
- */
-export const BADGE_CLASS: Record<ProductStatus, string> = {
-  raw: "bg-stone-100 text-stone-700 border-stone-200 dark:bg-stone-800/50 dark:text-stone-400 dark:border-stone-700/50",
-  processed:
-    "bg-sky-50 text-sky-800 border-sky-200 dark:bg-sky-950/40 dark:text-sky-400 dark:border-sky-800/50",
-  rendered:
-    "bg-emerald-50 text-emerald-800 border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-400 dark:border-emerald-800/50",
-  failed:
-    "bg-rose-50 text-rose-800 border-rose-200 dark:bg-rose-950/40 dark:text-rose-400 dark:border-rose-800/50",
-};
-
-const STATUS_TOKEN_CLASS: Record<ProductStatus, string> = {
-  raw: "badge-raw",
-  processed: "badge-processed",
-  rendered: "badge-rendered",
-  failed: "badge-failed",
-};
-
-export const STATUS_LABEL: Record<ProductStatus, string> = {
-  raw: "Photo only",
-  processed: "Cut-out ready",
-  rendered: "Scene ready",
-  failed: "Needs attention",
-};
-
-export function statusBadgeClass(status: ProductStatus): string {
-  return `${STATUS_TOKEN_CLASS[status]} ${BADGE_CLASS[status]}`;
-}
 
 /**
  * The live-asset thumbnail route, mirrors `AssetCard.tsx:9` and
