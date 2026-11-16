@@ -127,7 +127,6 @@ describe("SG-330 R1 Midnight tokens", () => {
     ];
     for (const [name, fg, bg] of pairs) {
       const ratio = contrastRatio(fg, bg);
-      // eslint-disable-next-line no-console
       console.log(`SG-330 contrast ${name}: ${ratio.toFixed(2)}:1`);
       expect(ratio, `${name} contrast ${ratio.toFixed(2)}:1`).toBeGreaterThanOrEqual(4.5);
     }
