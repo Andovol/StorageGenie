@@ -204,3 +204,7 @@ Read as: **directive** — `opencode-go/claude-haiku-5-5` leaves the builder rot
 **2026-11-16, verbatim:** *"D38 - leave it"*
 
 Read as: **D38** — the asset page's Details table keeps showing current values only (SG-324 P3 hides every *Replaced* value); no slice to show older values in History until after the owner's shelf trial, and only if the trial shows the need (SG-324r1 audit I4).
+
+**2026-11-16, verbatim:** *"After the trial"*
+
+Read as: **D39** — the review card and capture form leftovers (SG-326 audit I8, I11–I13: raw `unknown`/`ACTIVE`, *Confidence · Source* lines, the extra *Review workspace* heading, the 11 px formats note) wait until after the owner's shelf trial, then go into one polish slice with whatever the trial turns up.
