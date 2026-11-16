@@ -534,7 +534,7 @@ describe("CatalogPage drawer wiring", () => {
   });
 });
 
-describe("CatalogPage width-adaptive density default (SG-212 / D-21)", () => {
+describe("CatalogPage grid default (SG-328; width rule retired)", () => {
   const catalogAsset: Asset = {
     id: "a-drill",
     household_id: "h1",
@@ -569,9 +569,9 @@ describe("CatalogPage width-adaptive density default (SG-212 / D-21)", () => {
   }
 
   /**
-   * jsdom lays nothing out, so clientWidth is 0 for every element. The rule
-   * reads the content column (data-testid="catalog-content-column"); mock that
-   * read only. The spy doubles as the "the rule consulted the column" guard.
+   * jsdom lays nothing out, so clientWidth is 0 for every element. SG-328
+   * retired the width read; the helper stays to prove a wide or narrow column
+   * no longer changes the default (the spy must never be consulted).
    */
   function mockContentColumnWidth(width: number) {
     const spy = vi.spyOn(Element.prototype, "clientWidth", "get");
@@ -609,26 +609,29 @@ describe("CatalogPage width-adaptive density default (SG-212 / D-21)", () => {
     vi.restoreAllMocks();
   });
 
-  test("a content column >=860 px at mount initialises the table", async () => {
-    const spy = mockContentColumnWidth(860);
+  test("a wide content column (1280 px) opens in Standard Grid (was >=860 table)", async () => {
+    const spy = mockContentColumnWidth(1280);
     renderCatalog();
 
-    // The read point exists and the mount-time measure has already settled the
-    // state (layout effect: no grid-first frame ever paints).
+    // SG-328: no width measure; the grid is the initial state at every width.
     expect(screen.getByTestId("catalog-content-column")).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Compact Table" })).toHaveAttribute(
+    expect(screen.getByRole("button", { name: "Standard Grid" })).toHaveAttribute(
       "aria-pressed",
       "true"
     );
-    expect(spy).toHaveBeenCalled();
+    expect(screen.getByRole("button", { name: "Compact Table" })).toHaveAttribute(
+      "aria-pressed",
+      "false"
+    );
+    expect(spy).not.toHaveBeenCalled();
 
-    await screen.findByTestId("product-row");
-    expect(screen.getByTestId("table-scroll")).toBeInTheDocument();
-    expect(screen.queryByTestId("catalog-grid")).not.toBeInTheDocument();
+    await screen.findByTestId("product-card");
+    expect(screen.getByTestId("catalog-grid")).toBeInTheDocument();
+    expect(screen.queryByTestId("table-scroll")).not.toBeInTheDocument();
   });
 
-  test("a content column <860 px at mount initialises the grid", async () => {
-    const spy = mockContentColumnWidth(859);
+  test("a narrow content column (320 px) still opens in Standard Grid (was <860 grid)", async () => {
+    const spy = mockContentColumnWidth(320);
     renderCatalog();
 
     expect(screen.getByTestId("catalog-content-column")).toBeInTheDocument();
@@ -636,14 +639,14 @@ describe("CatalogPage width-adaptive density default (SG-212 / D-21)", () => {
       "aria-pressed",
       "true"
     );
-    expect(spy).toHaveBeenCalled();
+    expect(spy).not.toHaveBeenCalled();
 
     await screen.findByTestId("product-card");
     expect(screen.getByTestId("catalog-grid")).toBeInTheDocument();
     expect(screen.queryByTestId("table-scroll")).not.toBeInTheDocument();
   });
 
-  test("an unreadable measure (non-finite or zero) falls back to the grid", async () => {
+  test("an unreadable measure still shows the grid (was fallback to grid)", async () => {
     for (const unreadable of [Number.NaN, 0]) {
       const spy = mockContentColumnWidth(unreadable);
       const view = renderCatalog();
@@ -653,7 +656,7 @@ describe("CatalogPage width-adaptive density default (SG-212 / D-21)", () => {
         "aria-pressed",
         "true"
       );
-      expect(spy).toHaveBeenCalled();
+      expect(spy).not.toHaveBeenCalled();
 
       await screen.findByTestId("product-card");
       expect(screen.queryByTestId("table-scroll")).not.toBeInTheDocument();
@@ -663,15 +666,15 @@ describe("CatalogPage width-adaptive density default (SG-212 / D-21)", () => {
     }
   });
 
-  test("the toggle flips both ways after mount; a fresh navigation recomputes (no stored choice)", async () => {
-    mockContentColumnWidth(900);
+  test("the toggle flips both ways after mount; a fresh navigation stays on the grid (was recomputes from width)", async () => {
+    mockContentColumnWidth(1280);
     const first = renderCatalog();
 
-    expect(screen.getByRole("button", { name: "Compact Table" })).toHaveAttribute(
+    expect(screen.getByRole("button", { name: "Standard Grid" })).toHaveAttribute(
       "aria-pressed",
       "true"
     );
-    await screen.findByTestId("product-row");
+    await screen.findByTestId("product-card");
 
     fireEvent.click(screen.getByRole("button", { name: "Standard Grid" }));
     expect(screen.getByRole("button", { name: "Standard Grid" })).toHaveAttribute(
@@ -688,18 +691,18 @@ describe("CatalogPage width-adaptive density default (SG-212 / D-21)", () => {
     );
     await screen.findByTestId("product-row");
 
-    // Leave the session on the grid via the control, then remount: the default
-    // must come from the width again, not from any kept or stored choice.
+    // Leave the session on the grid via the control, then remount: SG-328 keeps
+    // Standard Grid as the default, not the width and not any stored choice.
     fireEvent.click(screen.getByRole("button", { name: "Standard Grid" }));
     await screen.findByTestId("product-card");
     first.unmount();
 
     renderCatalog();
-    expect(screen.getByRole("button", { name: "Compact Table" })).toHaveAttribute(
+    expect(screen.getByRole("button", { name: "Standard Grid" })).toHaveAttribute(
       "aria-pressed",
       "true"
     );
-    await screen.findByTestId("product-row");
+    await screen.findByTestId("product-card");
     expect(Object.keys(window.localStorage).filter((key) => /densit/i.test(key))).toEqual([]);
   });
 });

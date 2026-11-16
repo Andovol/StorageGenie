@@ -1,0 +1,18 @@
+# SG-328 FAIL log (pre-change, 2026-11-16)
+
+Test file: frontend/src/sg328-grid-default.sg328.test.tsx
+Run: npm --prefix frontend run test -- --run src/sg328-grid-default.sg328.test.tsx
+Result: 2 failed | 1 passed (3)
+
+Failing tests:
+- SG-328 catalog grid default > a wide content column (1280 px) opens in Standard Grid
+- SG-328 catalog grid default > Compact Table still switches to the table and back
+
+Passing (already grid):
+- SG-328 catalog grid default > a narrow content column (320 px) opens in Standard Grid
+
+First assertion (wide test, src/sg328-grid-default.sg328.test.tsx:92):
+  expect(screen.getByRole("button", { name: "Standard Grid" })).toHaveAttribute("aria-pressed", "true")
+Got: aria-pressed="false" (wide column opened Compact Table via the SG-212 width rule).
+
+Raw: output/SG-328-scratch/logs/sg328-fail-raw2.log

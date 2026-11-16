@@ -1,0 +1,16 @@
+# SG-328 PASS log (post-change, 2026-11-16)
+
+Test file: frontend/src/sg328-grid-default.sg328.test.tsx
+Run: npm --prefix frontend run test -- --run src/sg328-grid-default.sg328.test.tsx
+Result: 3 passed (3)
+
+Passing tests:
+- SG-328 catalog grid default > a wide content column (1280 px) opens in Standard Grid
+- SG-328 catalog grid default > a narrow content column (320 px) opens in Standard Grid
+- SG-328 catalog grid default > Compact Table still switches to the table and back
+
+First assertion (wide test, src/sg328-grid-default.sg328.test.tsx:92):
+  expect(screen.getByRole("button", { name: "Standard Grid" })).toHaveAttribute("aria-pressed", "true")
+Got: PASS — Standard Grid pressed true at 1280 px; catalog-grid present, table-scroll absent.
+
+Raw: output/SG-328-scratch/logs/sg328-pass-raw.log
