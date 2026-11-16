@@ -17,6 +17,11 @@ type AppShellProps = {
   onSortChange: (sort: SortOption) => void;
   density: Density;
   onDensityChange: (density: Density) => void;
+  perRowWide?: number;
+  onPerRowWideChange?: (n: number) => void;
+  perRowNarrow?: number;
+  onPerRowNarrowChange?: (n: number) => void;
+  isNarrow?: boolean;
   activeFilters: string[];
   onClearAll: () => void;
   savedSearches: SavedSearch[];
@@ -40,6 +45,11 @@ export function AppShell({
   onSortChange,
   density,
   onDensityChange,
+  perRowWide,
+  onPerRowWideChange,
+  perRowNarrow,
+  onPerRowNarrowChange,
+  isNarrow,
   activeFilters,
   onClearAll,
   savedSearches,
@@ -63,6 +73,11 @@ export function AppShell({
           onSortChange={onSortChange}
           density={density}
           onDensityChange={onDensityChange}
+          perRowWide={perRowWide}
+          onPerRowWideChange={onPerRowWideChange}
+          perRowNarrow={perRowNarrow}
+          onPerRowNarrowChange={onPerRowNarrowChange}
+          isNarrow={isNarrow}
           activeFilters={activeFilters}
           onClearAll={onClearAll}
           savedSearches={savedSearches}

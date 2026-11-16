@@ -38,6 +38,36 @@ function useDebounced<T>(value: T, delayMs: number): T {
 // SG-328 (owner 2026-11-16): the catalog always opens in Standard Grid. The
 // SG-212 / D-21 width rule is retired: no measure, no layout effect, no stored
 // choice. The density toggle stays one click away.
+//
+// SG-330 R4: items per row is a setting, remembered per device. Wide screens
+// offer 4 / 5 / 6 (default 5), narrow screens (< 640 px) offer 3 / 4
+// (default 3). The choice is read and written inside try/catch so a denied
+// store falls back to the default instead of breaking the page.
+const PER_ROW_WIDE_KEY = "sg-per-row-wide";
+const PER_ROW_NARROW_KEY = "sg-per-row-narrow";
+
+function readPerRow(key: string, valid: readonly number[], fallback: number): number {
+  try {
+    const n = Number(window.localStorage.getItem(key));
+    if (valid.includes(n)) return n;
+  } catch {
+    /* storage denied: fall through to the default */
+  }
+  return fallback;
+}
+
+function useIsNarrow(): boolean {
+  const [narrow, setNarrow] = useState(
+    () => typeof window !== "undefined" && window.innerWidth < 640
+  );
+  useEffect(() => {
+    const onResize = () => setNarrow(window.innerWidth < 640);
+    window.addEventListener("resize", onResize);
+    return () => window.removeEventListener("resize", onResize);
+  }, []);
+  return narrow;
+}
+
 export function CatalogPage() {
   // SG-196 G1: household selection now comes from the shared context; the
   // effective-household derivation shape is unchanged.
@@ -51,6 +81,25 @@ export function CatalogPage() {
   const [sort, setSort] = useState<SortOption>("recent");
   const [density, setDensity] = useState<Density>("grid");
   const [cursor, setCursor] = useState<string | undefined>(undefined);
+  const isNarrow = useIsNarrow();
+  const [perRowWide, setPerRowWide] = useState(() => readPerRow(PER_ROW_WIDE_KEY, [4, 5, 6], 5));
+  const [perRowNarrow, setPerRowNarrow] = useState(() => readPerRow(PER_ROW_NARROW_KEY, [3, 4], 3));
+  const changePerRowWide = (n: number) => {
+    setPerRowWide(n);
+    try {
+      window.localStorage.setItem(PER_ROW_WIDE_KEY, String(n));
+    } catch {
+      /* storage denied: the page keeps the in-memory choice */
+    }
+  };
+  const changePerRowNarrow = (n: number) => {
+    setPerRowNarrow(n);
+    try {
+      window.localStorage.setItem(PER_ROW_NARROW_KEY, String(n));
+    } catch {
+      /* storage denied: the page keeps the in-memory choice */
+    }
+  };
 
   const [allItems, setAllItems] = useState<Asset[]>([]);
   const [selectedAssetId, setSelectedAssetId] = useState<string | null>(null);
@@ -254,6 +303,11 @@ export function CatalogPage() {
       onSortChange={setSort}
       density={density}
       onDensityChange={setDensity}
+      perRowWide={perRowWide}
+      onPerRowWideChange={changePerRowWide}
+      perRowNarrow={perRowNarrow}
+      onPerRowNarrowChange={changePerRowNarrow}
+      isNarrow={isNarrow}
       activeFilters={activeFilters}
       onClearAll={clearAll}
       savedSearches={savedSearches}
@@ -279,6 +333,8 @@ export function CatalogPage() {
             householdId={effectiveHousehold}
             loading
             limit={20}
+            perRow={isNarrow ? perRowNarrow : perRowWide}
+            narrow={isNarrow}
           />
         ) : (
           <>
@@ -339,6 +395,8 @@ export function CatalogPage() {
                     density={density}
                     householdId={effectiveHousehold}
                     onSelect={setSelectedAssetId}
+                    perRow={isNarrow ? perRowNarrow : perRowWide}
+                    narrow={isNarrow}
                   />
                 </>
               )

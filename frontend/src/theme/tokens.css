@@ -214,6 +214,9 @@ textarea {
 }
 
 @media (max-width: 639px) {
+  .sg-per-row-button {
+    min-height: 44px;
+  }
   .sg-card-name {
     font-size: 13px;
   }

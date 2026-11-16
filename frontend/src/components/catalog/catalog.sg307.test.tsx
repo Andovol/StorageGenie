@@ -75,14 +75,16 @@ describe("SG-307 catalog plain words, no mono, square paper", () => {
     expect(screen.queryByText(/^\d+d ago$/)).toBeNull();
   });
 
-  test("the grid uses the tandpfun track rule", () => {
+  test("the grid uses the per-row track rule (SG-330 R4: tandpfun auto-fill 165px -> repeat(n, minmax(0, 1fr)))", () => {
     render(
       <MemoryRouter>
         <ProductGrid items={MOCK_PRODUCTS} density="grid" householdId="h1" />
       </MemoryRouter>
     );
     const css = screen.getByTestId("catalog-grid-style").textContent ?? "";
-    expect(css).toContain("repeat(auto-fill, minmax(165px, 1fr))");
+    expect(css).toContain("display: grid");
+    expect(css).not.toContain("minmax(165px, 1fr)");
+    expect(screen.getByTestId("catalog-grid").style.gridTemplateColumns).toContain("repeat(5,");
   });
 
   test("the card and well are square on the paper, kind is plain 13px (SG-330 R5: product-category pill -> product-kind line)", () => {

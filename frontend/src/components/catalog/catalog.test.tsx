@@ -132,11 +132,13 @@ describe("ProductGrid", () => {
     expect(screen.getAllByTestId("product-card")).toHaveLength(MOCK_PRODUCTS.length);
   });
 
-  test("the grid stylesheet carries the tandpfun auto-fill 165px rule (SG-307)", () => {
+  test("the grid carries the per-row repeat rule with the default five columns (SG-330 R4: tandpfun auto-fill 165px -> repeat(n, minmax(0, 1fr)))", () => {
     renderWithRouter(<ProductGrid items={MOCK_PRODUCTS} density="grid" householdId="h1" />);
     const css = screen.getByTestId("catalog-grid-style").textContent ?? "";
 
-    expect(css).toContain("repeat(auto-fill, minmax(165px, 1fr))");
+    expect(css).toContain("display: grid");
+    expect(css).not.toContain("minmax(165px, 1fr)");
+    expect(screen.getByTestId("catalog-grid").style.gridTemplateColumns).toContain("repeat(5,");
   });
 
   test("the compact table renders the six columns in order (Use by, no Dimensions/Specs)", () => {

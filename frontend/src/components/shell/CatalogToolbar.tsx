@@ -37,6 +37,14 @@ export function sortCatalog(items: ProductItem[], sort: SortOption): ProductItem
 
 export type CatalogStatusFilter = "live" | "gone";
 
+/**
+ * SG-330 R4: items per row. Wide viewports offer 4 / 5 / 6 (default 5),
+ * narrow viewports (< 640 px) offer 3 / 4 (default 3). The choice is kept per
+ * device in localStorage; the toolbar only shows the set for the live width.
+ */
+export const PER_ROW_WIDE = [4, 5, 6] as const;
+export const PER_ROW_NARROW = [3, 4] as const;
+
 type CatalogToolbarProps = {
   categories: readonly string[];
   activeCategory: string;
@@ -47,6 +55,11 @@ type CatalogToolbarProps = {
   onSortChange: (sort: SortOption) => void;
   density: Density;
   onDensityChange: (density: Density) => void;
+  perRowWide?: number;
+  onPerRowWideChange?: (n: number) => void;
+  perRowNarrow?: number;
+  onPerRowNarrowChange?: (n: number) => void;
+  isNarrow?: boolean;
   activeFilters: string[];
   onClearAll: () => void;
   savedSearches: SavedSearch[];
@@ -85,6 +98,11 @@ export function CatalogToolbar({
   onSortChange,
   density,
   onDensityChange,
+  perRowWide = 5,
+  onPerRowWideChange,
+  perRowNarrow = 3,
+  onPerRowNarrowChange,
+  isNarrow = false,
   activeFilters,
   onClearAll,
   savedSearches,
@@ -211,6 +229,39 @@ export function CatalogToolbar({
               }}
             >
               {DENSITY_LABELS[option]}
+            </button>
+          );
+        })}
+      </div>
+
+      <div role="group" aria-label="Per row" style={{ display: "inline-flex", gap: 0, alignItems: "center" }}>
+        <span aria-hidden="true" style={{ fontSize: 13, color: "hsl(var(--ink-muted))", marginRight: 4 }}>
+          Per row
+        </span>
+        {(isNarrow ? PER_ROW_NARROW : PER_ROW_WIDE).map((option) => {
+          const active = option === (isNarrow ? perRowNarrow : perRowWide);
+          return (
+            <button
+              key={option}
+              type="button"
+              name={String(option)}
+              aria-pressed={active}
+              onClick={() =>
+                isNarrow ? onPerRowNarrowChange?.(option) : onPerRowWideChange?.(option)
+              }
+              className="sg-paper-control focus-ring sg-per-row-button"
+              style={{
+                padding: "4px 10px",
+                borderRadius: 0,
+                fontSize: 13,
+                fontWeight: active ? 600 : 400,
+                cursor: "pointer",
+                minHeight: 44,
+                backgroundColor: active ? "hsl(var(--ink))" : "hsl(var(--paper))",
+                color: active ? "hsl(var(--paper))" : "hsl(var(--ink))",
+              }}
+            >
+              {option}
             </button>
           );
         })}

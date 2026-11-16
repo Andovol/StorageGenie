@@ -8,11 +8,14 @@ import { ProductCardSkeleton } from "./ProductCardSkeleton";
 import { AssetImportModal } from "../shell/AssetImportModal";
 
 /**
- * SG-307 G1: the tandpfun grid — as many 165 px tracks as fit, Pantry parity.
- * Injected as plain classes because Tailwind is not installed (DQ2).
+ * SG-330 R4 (D41 Midnight): items per row is a setting — wide 4 / 5 / 6
+ * (default 5), narrow 3 / 4 (default 3). The column count and the gaps ride
+ * inline on the region (wide 40 x 24 px, narrow 16 x 8 px); the class only
+ * carries `display: grid`. Injected as plain CSS because Tailwind is not
+ * installed (DQ2).
  */
 const GRID_CSS = `
-.catalog-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(165px, 1fr)); gap: 16px; }
+.catalog-grid { display: grid; }
 `;
 
 const emptyStyle: CSSProperties = {
@@ -246,6 +249,10 @@ type ProductGridProps = {
   loading?: boolean;
   limit?: number;
   onSelect?: (id: string) => void;
+  /** SG-330 R4: resolved items-per-row count (CatalogPage owns the setting). */
+  perRow?: number;
+  /** SG-330 R4: live narrow flag (< 640 px) for the narrow gaps. */
+  narrow?: boolean;
 };
 
 export function ProductGrid({
@@ -255,8 +262,15 @@ export function ProductGrid({
   loading = false,
   limit = 20,
   onSelect,
+  perRow = 5,
+  narrow = false,
 }: ProductGridProps) {
   const [importOpen, setImportOpen] = useState(false);
+  // SG-330 R4: wide gaps 40 x 24 px (column x row), narrow 16 x 8 px.
+  const gridStyle: CSSProperties = {
+    gridTemplateColumns: `repeat(${perRow}, minmax(0, 1fr))`,
+    gap: narrow ? "8px 16px" : "24px 40px",
+  };
 
   if (loading) {
     return (
@@ -266,6 +280,7 @@ export function ProductGrid({
         aria-busy="true"
         data-testid="catalog-grid"
         className="catalog-grid"
+        style={gridStyle}
       >
         <style data-testid="catalog-grid-style">{GRID_CSS}</style>
         {Array.from({ length: limit }, (_, index) => (
@@ -321,6 +336,7 @@ export function ProductGrid({
       aria-busy="false"
       data-testid="catalog-grid"
       className="catalog-grid"
+      style={gridStyle}
     >
       <style data-testid="catalog-grid-style">{GRID_CSS}</style>
       {items.map((item) => (
