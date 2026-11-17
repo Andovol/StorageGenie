@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { fireEvent, render, screen, within } from "@testing-library/react";
 import { MemoryRouter, Route, Routes } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { AssetDetailPage } from "./AssetDetailPage";
@@ -86,11 +86,30 @@ afterEach(() => {
 beforeEach(() => {
   api.apiGet.mockImplementation((path: string) => {
     if (path.includes("/v1/taxonomy")) return Promise.resolve(taxonomy);
+    if (path === "/v1/assets") {
+      const b = assetBody as Record<string, unknown>;
+      return Promise.resolve({
+        items: [{ id: b["id"], display_name: b["display_name"], status: b["status"] }],
+        next_cursor: null,
+      });
+    }
     return Promise.resolve(assetBody);
   });
+
   api.fetchLocations.mockRejectedValue(new Error("locations disabled"));
   api.fetchRelations.mockRejectedValue(new Error("relations disabled"));
 });
+
+async function openPackEditor() {
+  await screen.findAllByTestId("pack-date");
+  const row = screen.getByTestId("pack-row-asset-271");
+  fireEvent.click(within(row).getByRole("button", { name: "Edit" }));
+  return row;
+}
+
+function openMore() {
+  fireEvent.click(screen.getByRole("button", { name: "More about this item" }));
+}
 
 describe("AssetDetailPage SG-271", () => {
   test("a proposed date offers Accept date with the AI value prefilled", async () => {
@@ -103,9 +122,11 @@ describe("AssetDetailPage SG-271", () => {
     };
     api.enterManualExpiry.mockResolvedValue({ assertion: null, resolved_review_task_ids: [] });
     renderPage();
-    const accept = await screen.findByRole("button", { name: "Accept date" });
+    // SG-338: the manual date form now lives in the pack row's Edit.
+    const row = await openPackEditor();
+    const accept = await within(row).findByRole("button", { name: "Accept date" });
     expect(accept).toBeInTheDocument();
-    expect(screen.getByDisplayValue("2030-01-15")).toBeInTheDocument();
+    expect(within(row).getByDisplayValue("2030-01-15")).toBeInTheDocument();
   });
 
   test("the AI shelf life preselects the control with a confirm note", async () => {
@@ -114,6 +135,9 @@ describe("AssetDetailPage SG-271", () => {
       assertions: [assertion("a-cat", "category_proposed", "food_beverages", "proposed")],
     };
     renderPage();
+    // SG-338: the shelf-life control now lives behind More about this item.
+    await screen.findAllByTestId("pack-date");
+    openMore();
     const select = (await screen.findByLabelText("Shelf life")) as HTMLSelectElement;
     expect(select.value).toBe("food_beverages");
     expect(await screen.findByText(/The AI suggests Food & beverages/)).toBeInTheDocument();
@@ -126,6 +150,9 @@ describe("AssetDetailPage SG-271", () => {
       assertions: [assertion("a-cat", "category_proposed", "dairy", "proposed")],
     };
     renderPage();
+    // SG-338: the shelf-life control now lives behind More about this item.
+    await screen.findAllByTestId("pack-date");
+    openMore();
     expect(await screen.findByText(/matches no shelf life/)).toBeInTheDocument();
     const select = (await screen.findByLabelText("Shelf life")) as HTMLSelectElement;
     expect(select.value).toBe("");
