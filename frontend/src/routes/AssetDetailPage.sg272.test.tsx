@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
-import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { MemoryRouter, Route, Routes } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { AssetDetailPage, isCountedUnit } from "./AssetDetailPage";
@@ -87,11 +87,26 @@ afterEach(() => {
 beforeEach(() => {
   api.apiGet.mockImplementation((path: string) => {
     if (path.includes("/v1/taxonomy")) return Promise.resolve(taxonomy);
+    if (path === "/v1/assets") {
+      const b = assetBody as Record<string, unknown>;
+      return Promise.resolve({
+        items: [{ id: b["id"], display_name: b["display_name"], status: b["status"] }],
+        next_cursor: null,
+      });
+    }
     return Promise.resolve(assetBody);
   });
   api.fetchLocations.mockRejectedValue(new Error("locations disabled"));
   api.fetchRelations.mockRejectedValue(new Error("relations disabled"));
 });
+
+function openMore() {
+  fireEvent.click(screen.getByRole("button", { name: "More about this item" }));
+}
+
+function useItUpRegion() {
+  return screen.getByRole("region", { name: "Use it up" });
+}
 
 describe("AssetDetailPage SG-272 counted rule", () => {
   test("empty, pcs and bottles count; ml, g, kg and l are amounts", () => {
@@ -113,6 +128,9 @@ describe("AssetDetailPage SG-272 quantities", () => {
     api.decrementQuantity.mockResolvedValue(shell({ quantity: 2, unit: "pcs" }));
     api.incrementQuantity.mockResolvedValue(shell({ quantity: 4, unit: "pcs" }));
     renderPage();
+    // SG-338: the amount controls now live behind More about this item.
+    await screen.findAllByTestId("pack-date");
+    openMore();
     const minus = await screen.findByRole("button", { name: "Take off 1" });
     expect(screen.getByRole("button", { name: "Put 1 back on the count" })).toBeInTheDocument();
     expect(screen.getByText("3 left")).toBeInTheDocument();
@@ -123,6 +141,9 @@ describe("AssetDetailPage SG-272 quantities", () => {
   test("an amount item takes a quick edit instead of −1", async () => {
     assetBody = shell({ quantity: 500, unit: "ml" });
     renderPage();
+    // SG-338: the amount section now lives behind More about this item.
+    await screen.findAllByTestId("pack-date");
+    openMore();
     expect(await screen.findByText(/change the amount with Edit above/)).toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "Take off 1" })).toBeNull();
   });
@@ -130,6 +151,9 @@ describe("AssetDetailPage SG-272 quantities", () => {
   test("at 0 a counted item reads None left with −1 refused", async () => {
     assetBody = shell({ quantity: 0, unit: "" });
     renderPage();
+    // SG-338: the amount section now lives behind More about this item.
+    await screen.findAllByTestId("pack-date");
+    openMore();
     expect(await screen.findByText("None left — mark it gone below.")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Take off 1" })).toBeDisabled();
   });
@@ -140,9 +164,14 @@ describe("AssetDetailPage SG-272 gone and put back", () => {
     assetBody = shell({});
     api.markGone.mockResolvedValue(shell({ status: "ARCHIVED", gone_reason: "used_up" }));
     renderPage();
-    const usedUp = await screen.findByRole("button", { name: "Used up" });
-    expect(screen.getByRole("button", { name: "Thrown away" })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Given away" })).toBeInTheDocument();
+    // SG-338: the three reasons now live in More > Use it up (pack rows
+    // carry their own per-pack Used up, so scope to the region).
+    await screen.findAllByTestId("pack-date");
+    openMore();
+    const region = useItUpRegion();
+    const usedUp = await within(region).findByRole("button", { name: "Used up" });
+    expect(within(region).getByRole("button", { name: "Thrown away" })).toBeInTheDocument();
+    expect(within(region).getByRole("button", { name: "Given away" })).toBeInTheDocument();
     fireEvent.click(usedUp);
     await waitFor(() => expect(api.markGone).toHaveBeenCalledWith("asset-272", "hh", "used_up"));
   });
@@ -151,7 +180,10 @@ describe("AssetDetailPage SG-272 gone and put back", () => {
     assetBody = shell({ status: "ARCHIVED", gone_reason: "used_up" });
     api.putBack.mockResolvedValue(shell({ status: "ACTIVE", gone_reason: null }));
     renderPage();
-    expect(await screen.findByText("Gone — used up")).toBeInTheDocument();
+    // SG-338: the gone state now reads in More > Use it up.
+    await screen.findAllByTestId("pack-date").catch(() => []);
+    openMore();
+    expect(await within(useItUpRegion()).findByText("Gone — used up")).toBeInTheDocument();
     expect(screen.queryByText("ARCHIVED", { exact: true })).toBeNull();
     fireEvent.click(screen.getByRole("button", { name: "Put back" }));
     await waitFor(() => expect(api.putBack).toHaveBeenCalledWith("asset-272", "hh"));
@@ -164,6 +196,9 @@ describe("AssetDetailPage SG-272 G0b I2", () => {
       assertions: [assertion("a-cat", "category_proposed", "food_beverages", "proposed")],
     });
     renderPage();
+    // SG-338: the shelf-life note now lives behind More about this item.
+    await screen.findAllByTestId("pack-date");
+    openMore();
     const note = await screen.findByText(/The AI suggests Food & beverages/);
     expect(note).toHaveStyle({ fontSize: "13px" });
   });
