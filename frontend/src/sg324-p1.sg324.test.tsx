@@ -1,5 +1,5 @@
 import { describe, expect, test, vi, beforeEach, afterEach } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { render, screen, within } from "@testing-library/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { MemoryRouter, Route, Routes } from "react-router-dom";
 import { ExpiryEntryForm } from "./components/ExpiryEntryForm";
@@ -97,6 +97,11 @@ describe("SG-324 P1 themed controls", () => {
     };
     api.apiGet.mockImplementation((path: string) => {
       if (String(path).includes("/v1/taxonomy")) return Promise.resolve(taxonomyBody);
+      if (path === "/v1/assets")
+        return Promise.resolve({
+          items: [{ id: "asset-1", display_name: "Milk", status: "ACTIVE" }],
+          next_cursor: null,
+        });
       return Promise.resolve(assetBody);
     });
     render(
@@ -108,7 +113,9 @@ describe("SG-324 P1 themed controls", () => {
         </MemoryRouter>
       </QueryClientProvider>
     );
-    const btn = await screen.findByRole("button", { name: "Edit" });
+    // SG-338: Edit now lives on each pack row — same control, same class.
+    const row = await screen.findByTestId("pack-row-asset-1");
+    const btn = within(row).getByRole("button", { name: "Edit" });
     expect(btn).toHaveClass(themedToken());
   });
 });

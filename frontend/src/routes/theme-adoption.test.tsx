@@ -186,7 +186,12 @@ describe("SG-075 screen adoption", () => {
       </Routes>,
       ["/assets/asset-theme?household_id=hh-theme"]
     );
-    expectPageHeader(/theme asset/i);
+    // SG-338: the redesign mockup sets the item title at 44px/600 inline —
+    // no page-header class remains on the new page.
+    const heading = screen.getByRole("heading", { level: 1, name: /theme asset/i });
+    expect(heading).toHaveClass("text-foreground");
+    expect(heading).not.toHaveClass("page-header");
+    expect(heading).toHaveStyle({ fontSize: "44px", fontWeight: "600" });
   });
 
   test("capture screen header reads Add an item and is token-styled (SG-325 P11)", () => {
