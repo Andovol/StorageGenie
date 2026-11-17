@@ -1,5 +1,5 @@
 import { describe, expect, test, vi, afterEach, beforeEach } from "vitest";
-import { fireEvent, render, screen } from "@testing-library/react";
+import { fireEvent, render, screen, within } from "@testing-library/react";
 import { MemoryRouter, Route, Routes } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { HouseholdProvider } from "../hooks/HouseholdContext";
@@ -152,10 +152,18 @@ describe("SG-318 W2 asset Details in plain words", () => {
         assertion("a-exp", "plugin:expiry-tracker/expiry_date", { expiry_date: "2026-11-07" }),
       ],
     };
-    api.apiGet.mockImplementation((path: string) =>
-      path.includes("/v1/taxonomy") ? Promise.resolve(taxonomy) : Promise.resolve(asset)
-    );
+    api.apiGet.mockImplementation((path: string) => {
+      if (path.includes("/v1/taxonomy")) return Promise.resolve(taxonomy);
+      if (path === "/v1/assets")
+        return Promise.resolve({
+          items: [{ id: asset.id, display_name: asset.display_name, status: asset.status }],
+          next_cursor: null,
+        });
+      return Promise.resolve(asset);
+    });
     render(withClient(<AssetDetailPage />, `/assets/asset-318-w2?household_id=${household.id}`));
+    // SG-338: Details now lives behind More about this item — same rows.
+    fireEvent.click(await screen.findByRole("button", { name: "More about this item" }));
     // Category through the label map (select option plus Details rows)
     const foodLabels = await screen.findAllByText("Food & beverages");
     expect(foodLabels.length).toBeGreaterThanOrEqual(1);
@@ -165,10 +173,12 @@ describe("SG-318 W2 asset Details in plain words", () => {
     // Status through the label map
     expect(screen.getByText("Live")).toBeInTheDocument();
     expect(screen.queryByText("ACTIVE")).toBeNull();
-    // Rows named for what they are
-    expect(screen.getByText("Kind of item")).toBeInTheDocument();
-    expect(screen.getByText("Status")).toBeInTheDocument();
-    expect(screen.getByText("Unit")).toBeInTheDocument();
+    // Rows named for what they are (scoped to the Details table: the
+    // Kind of item heading fact above the packs reads the same words).
+    const details = await screen.findByRole("table");
+    expect(within(details).getByText("Kind of item")).toBeInTheDocument();
+    expect(within(details).getByText("Status")).toBeInTheDocument();
+    expect(within(details).getByText("Unit")).toBeInTheDocument();
     // No object dump anywhere
     expect(screen.queryByText("[object Object]")).toBeNull();
     expect(document.body.textContent ?? "").not.toContain("[object Object]");
@@ -198,13 +208,23 @@ describe("SG-318 W3 asset History in plain words", () => {
       ],
       assertions: [],
     };
-    api.apiGet.mockImplementation((path: string) =>
-      path.includes("/v1/taxonomy") ? Promise.resolve(taxonomy) : Promise.resolve(asset)
-    );
+    api.apiGet.mockImplementation((path: string) => {
+      if (path.includes("/v1/taxonomy")) return Promise.resolve(taxonomy);
+      if (path === "/v1/assets")
+        return Promise.resolve({
+          items: [{ id: asset.id, display_name: asset.display_name, status: asset.status }],
+          next_cursor: null,
+        });
+      return Promise.resolve(asset);
+    });
     render(withClient(<AssetDetailPage />, `/assets/asset-318-w3?household_id=${household.id}`));
-    const history = await screen.findByText("Added", { exact: false });
+    // SG-338: History now stays folded until opened — same entries.
+    fireEvent.click(await screen.findByRole("button", { name: /History \(/ }));
+    // SG-338: anchored to the History row start — the pack row's
+    // "added <day>" muted line would also match a loose "Added".
+    const history = await screen.findByText(/^Added \u2014/);
     expect(history).toBeInTheDocument();
-    expect(screen.getByText("Accepted", { exact: false })).toBeInTheDocument();
+    expect(screen.getByText(/^Accepted \u2014/)).toBeInTheDocument();
     expect(screen.queryByText("Asset Create")).toBeNull();
     expect(screen.queryByText("Asset Accepted")).toBeNull();
     expect(screen.queryByText(isoToday)).toBeNull();
