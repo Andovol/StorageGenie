@@ -1,0 +1,14 @@
+
+ RUN  v1.6.1 /home/andrei/StorageGenie/frontend
+
+stderr | src/components/shell/shell.test.tsx > Catalog shell > the header carries no count box; Your things names the LOADED item count (SG-330 R2+R3: Showing box -> heading)
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+ ✓ src/components/shell/shell.test.tsx  (23 tests) 2234ms
+
+ Test Files  1 passed (1)
+      Tests  23 passed (23)
+   Start at  21:54:45
+   Duration  3.95s (transform 553ms, setup 79ms, collect 878ms, tests 2.23s, environment 416ms, prepare 99ms)
+
