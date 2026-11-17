@@ -1,0 +1,68 @@
+
+> storagegenie-frontend@0.1.0 test
+> vitest run --run src/sg336-item-page.sg336.test.tsx src/routes/AssetDetailPage.test.tsx src/components/ExpiryEntryForm.test.tsx src/sg324-p1.sg324.test.tsx
+
+
+ RUN  v1.6.1 /home/andrei/StorageGenie/frontend
+
+stderr | src/routes/AssetDetailPage.test.tsx > AssetDetailPage > editing quantity patches via PATCH and shows the superseded prior value in history
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+stderr | src/sg336-item-page.sg336.test.tsx > SG-336 item page, one row per pack > T1 three live Olive Oil packs in date order, Rice nowhere, muted line ends 3 packs
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+stderr | src/sg324-p1.sg324.test.tsx > SG-324 P1 themed controls > asset Edit uses the theme control class, not white card
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+ ✓ src/sg324-p1.sg324.test.tsx  (2 tests) 266ms
+ ✓ src/components/ExpiryEntryForm.test.tsx  (10 tests) 376ms
+ ✓ src/sg336-item-page.sg336.test.tsx  (10 tests) 955ms
+ ✓ src/routes/AssetDetailPage.test.tsx  (23 tests) 2312ms
+
+ Test Files  4 passed (4)
+      Tests  45 passed (45)
+   Start at  23:03:47
+   Duration  3.79s (transform 533ms, setup 339ms, collect 2.17s, tests 3.91s, environment 1.93s, prepare 429ms)
+
+npm notice
+npm notice New minor version of npm available! 11.11.0 -> 11.21.2
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v11.21.2
+npm notice To update run: npm install -g npm@11.21.2
+npm notice
+
+> storagegenie-frontend@0.1.0 test
+> vitest run --run src/sg336-item-page.sg336.test.tsx src/routes/AssetDetailPage.test.tsx src/components/ExpiryEntryForm.test.tsx src/sg324-p1.sg324.test.tsx
+
+
+ RUN  v1.6.1 /home/andrei/StorageGenie/frontend
+
+stderr | src/sg336-item-page.sg336.test.tsx > SG-336 item page, one row per pack > T1 three live Olive Oil packs in date order, Rice nowhere, muted line ends 3 packs
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+stderr | src/routes/AssetDetailPage.test.tsx > AssetDetailPage > editing quantity patches via PATCH and shows the superseded prior value in history
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+stderr | src/sg324-p1.sg324.test.tsx > SG-324 P1 themed controls > asset Edit uses the theme control class, not white card
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+ ✓ src/sg324-p1.sg324.test.tsx  (2 tests) 260ms
+ ✓ src/components/ExpiryEntryForm.test.tsx  (10 tests) 383ms
+ ✓ src/sg336-item-page.sg336.test.tsx  (10 tests) 966ms
+ ✓ src/routes/AssetDetailPage.test.tsx  (23 tests) 2087ms
+
+ Test Files  4 passed (4)
+      Tests  45 passed (45)
+   Start at  23:04:06
+   Duration  3.92s (transform 856ms, setup 441ms, collect 2.87s, tests 3.70s, environment 2.30s, prepare 524ms)
+
+npm notice
+npm notice New minor version of npm available! 11.11.0 -> 11.21.2
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v11.21.2
+npm notice To update run: npm install -g npm@11.21.2
+npm notice
