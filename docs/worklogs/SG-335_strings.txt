@@ -1,0 +1,22 @@
+String counts in the served JS (grep -o, from the image's own files):
+BEFORE (release-sg332, static/assets/index-DlqlGk8g.js 11e4ee1b 372812 B):
+Add item: 2
+Your things: 1
+Use by, soonest first: 1
+Import Asset: 2
+AFTER (served, static/assets/index-DIkDaL1_.js 8e7afeb6 372821 B):
+Add item: 4
+Your things: 1
+Use by, soonest first: 1
+Import Asset: 0
+
+Local vite build of HEAD (VITE_API_BASE=https://storagegenie.dynv6.net, outDir into scratch, since removed):
+assets/index-DIkDaL1_.js 8e7afeb62d335762ed519ee1f92b41fccd1c092e0530feaa035b6e237fade8f5 (372821 B) — name and hash equal the served JS
+assets/index-e_BzCe-6.css d0a1bbde2323a3ee73fa57f6639db3e6886e05a8467fe6318815110268141acb (7307 B) — byte-identical
+assets/instrument-sans-latin-ext-wght-normal-B5bTHO_g.woff2 c4fcfea41f2c1cfeea9211fa43679845454a1d0e0d7e95e069c7e73c4ae302d2 (11144 B) — byte-identical
+assets/instrument-sans-latin-wght-normal-BbzFLZTg.woff2 2ee17598a98d8a59e4df8152d015bec9ab8e4d5672cc0ab42bef806b568e3971 (30092 B) — byte-identical
+index.html 7173830a1116f47b040d9b9f15c029c96363df85f4e4b7516c40a6c6043c5d90 — name and hash equal the served index.html
+
+Served font over HTTP: GET /assets/instrument-sans-latin-wght-normal-BbzFLZTg.woff2 on 127.0.0.1:8003
+returns 200, content type application/octet-stream (W11, not a STOP), 30092 bytes,
+sha256 2ee17598a98d8a59e4df8152d015bec9ab8e4d5672cc0ab42bef806b568e3971 — equals the image's file.

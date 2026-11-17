@@ -1,0 +1,24 @@
+/v1/health six times (each quoted, G3):
+{"status":"ok","db":"ok","storage":"ok"}
+{"status":"ok","db":"ok","storage":"ok"}
+{"status":"ok","db":"ok","storage":"ok"}
+{"status":"ok","db":"ok","storage":"ok"}
+{"status":"ok","db":"ok","storage":"ok"}
+{"status":"ok","db":"ok","storage":"ok"}
+
+Shell routes (GET, 127.0.0.1:8003):
+/: 200
+/pantry: 200
+/expiry: 200
+/inbox: 200
+/planning: 200
+/capture: 200
+
+API (household id taken from the database and never printed):
+GET /v1/assets?household_id=<redacted>&category=food_beverages&limit=5 -> 200, items on the first page: 1 (response keys: items, next_cursor; no total)
+GET /v1/plugins/expiry-tracker/status?household_id=<redacted>&category=food_beverages -> 200 (response keys: as_of, category, household_id, rows, summary, unresolved_rows)
+
+Startup log (docker logs --since 10m, named lines only — grep -E 'Traceback|Application startup complete|Daily reminder pass'):
+INFO:     Application startup complete.
+INFO:     app.services.reminders.daily - Daily reminder pass completed as_of=2026-11-17 households_visited=1 reminders_created=0 errors=0
+No Traceback line. No household id, query string, or owner value quoted above.
