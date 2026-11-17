@@ -960,6 +960,8 @@ export function AssetDetailPage() {
   // The opened item's places ride along through the existing assign-location
   // call, one per assigned location. The new row opens with Edit so the date
   // can be typed.
+  // SG-338 G2: the new pack also copies the opened item's shelf-life category
+  // through the existing classification write, when the opened item has one.
   const addPackMut = useMutation({
     mutationFn: async () => {
       if (!asset) throw new Error("No item loaded");
@@ -975,6 +977,20 @@ export function AssetDetailPage() {
         } catch {
           // The pack stays; a place that will not assign is reported below.
           setAddError(`Kept the new pack, but a place would not assign.`);
+        }
+      }
+      const openedEntry = latestActiveAssertion(
+        asset.assertions || [],
+        "plugin:expiry-tracker/classification"
+      );
+      const openedValue = valueRecord(openedEntry?.value);
+      const openedCategory =
+        typeof openedValue?.category === "string" ? openedValue.category : "";
+      if (openedCategory) {
+        try {
+          await classifyAsset(created.id, householdId, openedCategory);
+        } catch {
+          setAddError(`Kept the new pack, but its shelf life would not copy.`);
         }
       }
       return created;

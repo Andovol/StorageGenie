@@ -269,4 +269,20 @@ describe("SG-336 item page, one row per pack", () => {
     const img = within(tile).getByRole("img");
     expect((img as HTMLImageElement).src).toContain("ev-2");
   });
+
+  test("T8 Add another pack copies the opened item's shelf-life category onto the new pack", async () => {
+    renderPack1();
+    await screen.findAllByTestId("pack-date");
+    fireEvent.click(screen.getByRole("button", { name: /Add another pack/ }));
+    await waitFor(() => expect(api.apiPost).toHaveBeenCalledWith(
+      "/v1/assets",
+      expect.objectContaining({ display_name: "Olive Oil", asset_type: "product" }),
+      { household_id: "hh" },
+      expect.objectContaining({ "Idempotency-Key": expect.any(String) })
+    ));
+    // The create is followed by one classification write for the new id with
+    // the opened item's category, and none for any other id.
+    await waitFor(() => expect(api.classifyAsset).toHaveBeenCalledWith("pack-4", "hh", "food_beverages"));
+    expect(api.classifyAsset.mock.calls.filter(([id]) => id !== "pack-4")).toEqual([]);
+  });
 });

@@ -1,0 +1,330 @@
+
+> storagegenie-frontend@0.1.0 test
+> vitest run src/sg336-item-page.sg336.test.tsx
+
+
+ RUN  v1.6.1 /home/andrei/StorageGenie/frontend
+
+stderr | src/sg336-item-page.sg336.test.tsx > SG-336 item page, one row per pack > T1 three live Olive Oil packs in date order, Rice nowhere, muted line ends 3 packs
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+ ❯ src/sg336-item-page.sg336.test.tsx  (8 tests | 1 failed) 1733ms
+   ❯ src/sg336-item-page.sg336.test.tsx > SG-336 item page, one row per pack > T8 Add another pack copies the opened item's shelf-life category onto the new pack
+     → expected "spy" to be called with arguments: [ 'pack-4', 'hh', 'food_beverages' ]
+
+Received: 
+
+
+
+Number of calls: 0
+
+
+Ignored nodes: comments, script, style
+[36m<html>[39m
+  [36m<head />[39m
+  [36m<body>[39m
+    [36m<div>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"page-container text-foreground"[39m
+        [33mdata-testid[39m=[32m"page-container"[39m
+        [33mdata-variant[39m=[32m"page"[39m
+        [33mstyle[39m=[32m"width: 100%; max-width: 1100px; margin-left: auto; margin-right: auto; padding: 24px;"[39m
+      [36m>[39m
+        [36m<a[39m
+          [33mclass[39m=[32m"text-link focus-ring"[39m
+          [33mhref[39m=[32m"/?household_id=hh"[39m
+          [33mstyle[39m=[32m"font-size: 13px;"[39m
+        [36m>[39m
+          [0m‹ Your things[0m
+        [36m</a>[39m
+        [36m<div[39m
+          [33mstyle[39m=[32m"display: flex; gap: 24px; flex-wrap: wrap; margin-top: 8px; align-items: flex-start;"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mstyle[39m=[32m"flex: 0 1 520px; width: 100%; max-width: 520px; min-width: 0;"[39m
+          [36m>[39m
+            [36m<div[39m
+              [33mdata-testid[39m=[32m"item-photo"[39m
+              [33mstyle[39m=[32m"aspect-ratio: 1 / 1; width: 100%; background-color: hsl(var(--tile)); display: flex; align-items: center; justify-content: center; overflow: hidden; border-radius: 0;"[39m
+            [36m>[39m
+              [36m<img[39m
+                [33malt[39m=[32m"Photo of Olive Oil"[39m
+                [33msrc[39m=[32m"http://localhost:8003/v1/evidence/ev-2/thumb/256?household_id=hh"[39m
+                [33mstyle[39m=[32m"width: 100%; height: 100%; object-fit: contain; display: block;"[39m
+              [36m/>[39m
+            [36m</div>[39m
+            [36m<div[39m
+              [33mstyle[39m=[32m"display: flex; gap: 16px; flex-wrap: wrap; margin-top: 8px;"[39m
+            [36m>[39m
+              [36m<a[39m
+                [33mclass[39m=[32m"text-link focus-ring"[39m
+                [33mhref[39m=[32m"http://localhost:8003/v1/evidence/ev-2/file?household_id=hh"[39m
+                [33mrel[39m=[32m"noreferrer"[39m
+                [33mstyle[39m=[32m"font-size: 13px;"[39m
+                [33mtarget[39m=[32m"_blank"[39m
+              [36m>[39m
+                [0mOpen full size[0m
+              [36m</a>[39m
+              [36m<label[39m
+                [33mclass[39m=[32m"text-link focus-ring"[39m
+                [33mstyle[39m=[32m"font-size: 13px; cursor: pointer;"[39m
+              [36m>[39m
+                [0mAttach a photo[0m
+                [36m<input[39m
+                  [33maccept[39m=[32m"image/*,.pdf"[39m
+                  [33mmultiple[39m=[32m""[39m
+                  [33mstyle[39m=[32m"position: absolute; width: 1px; height: 1px; overflow: hidden;"[39m
+                  [33mtype[39m=[32m"file"[39m
+                [36m/>[39m
+              [36m</label>[39m
+            [36m</div>[39m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mstyle[39m=[32m"flex: 1 1 320px; min-width: 0;"[39m
+          [36m>[39m
+            [36m<h1[39m
+              [33mclass[39m=[32m"text-foreground"[39m
+              [33mstyle[39m=[32m"font-size: 44px; font-weight: 600; margin: 0px; min-width: 0; overflow-wrap: anywhere;"[39m
+            [36m>[39m
+              [0mOlive Oil[0m
+            [36m</h1>[39m
+            [36m<div[39m
+              [33mdata-testid[39m=[32m"packs-muted"[39m
+              [33mstyle[39m=[32m"margin-top: 4px; margin-bottom: 13px; font-size: 13px; color: hsl(var(--ink-muted));"[39m
+            [36m>[39m
+              [0mProduct · 4 packs[0m
+            [36m</div>[39m
+            [36m<section[39m
+              [33maria-label[39m=[32m"Packs"[39m
+            [36m>[39m
+              [36m<div[39m
+                [33mdata-testid[39m=[32m"pack-row-pack-1"[39m
+                [33mstyle[39m=[32m"padding: 12px 0px; border-top: 1px solid hsl(var(--line));"[39m
+              [36m>[39m
+                [36m<div[39m
+                  [33mstyle[39m=[32m"display: flex; gap: 12px; flex-wrap: wrap; align-items: center; justify-content: space-between;"[39m
+                [36m>[39m
+                  [36m<div[39m
+                    [33mclass[39m=[32m"text-foreground"[39m
+                    [33mdata-testid[39m=[32m"pack-date"[39m
+                    [33mstyle[39m=[32m"font-weight: 700; font-size: 15px;"[39m
+                  [36m>[39m
+                    [0mUse by 6 May 2030[0m
+                  [36m</div>[39m
+                  [36m<div[39m
+                    [33mstyle[39m=[32m"display: flex; gap: 8px; flex-wrap: wrap;"[39m
+                  [36m>[39m
+                    [36m<button[39m
+                      [33maria-expanded[39m=[32m"false"[39m
+                      [33mclass[39m=[32m"sg-paper-control focus-ring focus-ring"[39m
+                      [33mstyle[39m=[32m"padding: 4px 10px; border-radius: 0; border-style: solid; border-width: 1px; font-size: 13px; cursor: pointer; min-height: 44px;"[39m
+                      [33mtype[39m=[32m"button"[39m
+                    [36m>[39m
+                      [0mEdit[0m
+                    [36m</button>[39m
+                    [36m<button[39m
+                      [33mclass[39m=[32m"sg-paper-control focus-ring focus-ring"[39m
+                      [33mstyle[39m=[32m"padding: 4px 10px; border-radius: 0; border-style: solid; border-width: 1px; font-size: 13px; cursor: pointer; min-height: 44px;"[39m
+                      [33mtype[39m=[32m"button"[39m
+                    [36m>[39m
+                      [0mUsed up[0m
+                    [36m</button>[39m
+                  [36m</div>[39m
+                [36m</div>[39m
+                [36m<div[39m
+                  [33mclass[39m=[32m"text-muted-foreground"[39m
+                  [33mstyle[39m=[32m"font-size: 13px; margin-top: 4px;"[39m
+                [36m>[39m
+                  [0m500 ml · added 1 May[0m
+                [36m</div>[39m
+              [36m</div>[39m
+              [36m<div[39m
+                [33mdata-testid[39m=[32m"pack-row-pack-2"[39m
+                [33mstyle[39m=[32m"padding: 12px 0px; border-top: 1px solid hsl(var(--line));"[39m
+              [36m>[39m
+                [36m<div[39m
+                  [33mstyle[39m=[32m"display: flex; gap: 12px; flex-wrap: wrap; align-items: center; justify-content: space-between;"[39m
+                [36m>[39m
+                  [36m<div[39m
+                    [33mclass[39m=[32m"text-foreground"[39m
+                    [33mdata-testid[39m=[32m"pack-date"[39m
+                    [33mstyle[39m=[32m"font-weight: 700; font-size: 15px;"[39m
+                  [36m>[39m
+                    [0mUse by 3 Feb 2031[0m
+                  [36m</div>[39m
+                  [36m<div[39m
+                    [33mstyle[39m=[32m"display: flex; gap: 8px; flex-wrap: wrap;"[39m
+      ...
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/sg336-item-page.sg336.test.tsx > SG-336 item page, one row per pack > T8 Add another pack copies the opened item's shelf-life category onto the new pack
+AssertionError: expected "spy" to be called with arguments: [ 'pack-4', 'hh', 'food_beverages' ]
+
+Received: 
+
+
+
+Number of calls: 0
+
+
+Ignored nodes: comments, script, style
+[36m<html>[39m
+  [36m<head />[39m
+  [36m<body>[39m
+    [36m<div>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"page-container text-foreground"[39m
+        [33mdata-testid[39m=[32m"page-container"[39m
+        [33mdata-variant[39m=[32m"page"[39m
+        [33mstyle[39m=[32m"width: 100%; max-width: 1100px; margin-left: auto; margin-right: auto; padding: 24px;"[39m
+      [36m>[39m
+        [36m<a[39m
+          [33mclass[39m=[32m"text-link focus-ring"[39m
+          [33mhref[39m=[32m"/?household_id=hh"[39m
+          [33mstyle[39m=[32m"font-size: 13px;"[39m
+        [36m>[39m
+          [0m‹ Your things[0m
+        [36m</a>[39m
+        [36m<div[39m
+          [33mstyle[39m=[32m"display: flex; gap: 24px; flex-wrap: wrap; margin-top: 8px; align-items: flex-start;"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mstyle[39m=[32m"flex: 0 1 520px; width: 100%; max-width: 520px; min-width: 0;"[39m
+          [36m>[39m
+            [36m<div[39m
+              [33mdata-testid[39m=[32m"item-photo"[39m
+              [33mstyle[39m=[32m"aspect-ratio: 1 / 1; width: 100%; background-color: hsl(var(--tile)); display: flex; align-items: center; justify-content: center; overflow: hidden; border-radius: 0;"[39m
+            [36m>[39m
+              [36m<img[39m
+                [33malt[39m=[32m"Photo of Olive Oil"[39m
+                [33msrc[39m=[32m"http://localhost:8003/v1/evidence/ev-2/thumb/256?household_id=hh"[39m
+                [33mstyle[39m=[32m"width: 100%; height: 100%; object-fit: contain; display: block;"[39m
+              [36m/>[39m
+            [36m</div>[39m
+            [36m<div[39m
+              [33mstyle[39m=[32m"display: flex; gap: 16px; flex-wrap: wrap; margin-top: 8px;"[39m
+            [36m>[39m
+              [36m<a[39m
+                [33mclass[39m=[32m"text-link focus-ring"[39m
+                [33mhref[39m=[32m"http://localhost:8003/v1/evidence/ev-2/file?household_id=hh"[39m
+                [33mrel[39m=[32m"noreferrer"[39m
+                [33mstyle[39m=[32m"font-size: 13px;"[39m
+                [33mtarget[39m=[32m"_blank"[39m
+              [36m>[39m
+                [0mOpen full size[0m
+              [36m</a>[39m
+              [36m<label[39m
+                [33mclass[39m=[32m"text-link focus-ring"[39m
+                [33mstyle[39m=[32m"font-size: 13px; cursor: pointer;"[39m
+              [36m>[39m
+                [0mAttach a photo[0m
+                [36m<input[39m
+                  [33maccept[39m=[32m"image/*,.pdf"[39m
+                  [33mmultiple[39m=[32m""[39m
+                  [33mstyle[39m=[32m"position: absolute; width: 1px; height: 1px; overflow: hidden;"[39m
+                  [33mtype[39m=[32m"file"[39m
+                [36m/>[39m
+              [36m</label>[39m
+            [36m</div>[39m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mstyle[39m=[32m"flex: 1 1 320px; min-width: 0;"[39m
+          [36m>[39m
+            [36m<h1[39m
+              [33mclass[39m=[32m"text-foreground"[39m
+              [33mstyle[39m=[32m"font-size: 44px; font-weight: 600; margin: 0px; min-width: 0; overflow-wrap: anywhere;"[39m
+            [36m>[39m
+              [0mOlive Oil[0m
+            [36m</h1>[39m
+            [36m<div[39m
+              [33mdata-testid[39m=[32m"packs-muted"[39m
+              [33mstyle[39m=[32m"margin-top: 4px; margin-bottom: 13px; font-size: 13px; color: hsl(var(--ink-muted));"[39m
+            [36m>[39m
+              [0mProduct · 4 packs[0m
+            [36m</div>[39m
+            [36m<section[39m
+              [33maria-label[39m=[32m"Packs"[39m
+            [36m>[39m
+              [36m<div[39m
+                [33mdata-testid[39m=[32m"pack-row-pack-1"[39m
+                [33mstyle[39m=[32m"padding: 12px 0px; border-top: 1px solid hsl(var(--line));"[39m
+              [36m>[39m
+                [36m<div[39m
+                  [33mstyle[39m=[32m"display: flex; gap: 12px; flex-wrap: wrap; align-items: center; justify-content: space-between;"[39m
+                [36m>[39m
+                  [36m<div[39m
+                    [33mclass[39m=[32m"text-foreground"[39m
+                    [33mdata-testid[39m=[32m"pack-date"[39m
+                    [33mstyle[39m=[32m"font-weight: 700; font-size: 15px;"[39m
+                  [36m>[39m
+                    [0mUse by 6 May 2030[0m
+                  [36m</div>[39m
+                  [36m<div[39m
+                    [33mstyle[39m=[32m"display: flex; gap: 8px; flex-wrap: wrap;"[39m
+                  [36m>[39m
+                    [36m<button[39m
+                      [33maria-expanded[39m=[32m"false"[39m
+                      [33mclass[39m=[32m"sg-paper-control focus-ring focus-ring"[39m
+                      [33mstyle[39m=[32m"padding: 4px 10px; border-radius: 0; border-style: solid; border-width: 1px; font-size: 13px; cursor: pointer; min-height: 44px;"[39m
+                      [33mtype[39m=[32m"button"[39m
+                    [36m>[39m
+                      [0mEdit[0m
+                    [36m</button>[39m
+                    [36m<button[39m
+                      [33mclass[39m=[32m"sg-paper-control focus-ring focus-ring"[39m
+                      [33mstyle[39m=[32m"padding: 4px 10px; border-radius: 0; border-style: solid; border-width: 1px; font-size: 13px; cursor: pointer; min-height: 44px;"[39m
+                      [33mtype[39m=[32m"button"[39m
+                    [36m>[39m
+                      [0mUsed up[0m
+                    [36m</button>[39m
+                  [36m</div>[39m
+                [36m</div>[39m
+                [36m<div[39m
+                  [33mclass[39m=[32m"text-muted-foreground"[39m
+                  [33mstyle[39m=[32m"font-size: 13px; margin-top: 4px;"[39m
+                [36m>[39m
+                  [0m500 ml · added 1 May[0m
+                [36m</div>[39m
+              [36m</div>[39m
+              [36m<div[39m
+                [33mdata-testid[39m=[32m"pack-row-pack-2"[39m
+                [33mstyle[39m=[32m"padding: 12px 0px; border-top: 1px solid hsl(var(--line));"[39m
+              [36m>[39m
+                [36m<div[39m
+                  [33mstyle[39m=[32m"display: flex; gap: 12px; flex-wrap: wrap; align-items: center; justify-content: space-between;"[39m
+                [36m>[39m
+                  [36m<div[39m
+                    [33mclass[39m=[32m"text-foreground"[39m
+                    [33mdata-testid[39m=[32m"pack-date"[39m
+                    [33mstyle[39m=[32m"font-weight: 700; font-size: 15px;"[39m
+                  [36m>[39m
+                    [0mUse by 3 Feb 2031[0m
+                  [36m</div>[39m
+                  [36m<div[39m
+                    [33mstyle[39m=[32m"display: flex; gap: 8px; flex-wrap: wrap;"[39m
+      ...
+ ❯ src/sg336-item-page.sg336.test.tsx:285:51
+    283|     // The create is followed by one classification write for the new …
+    284|     // the opened item's category, and none for any other id.
+    285|     await waitFor(() => expect(api.classifyAsset).toHaveBeenCalledWith…
+       |                                                   ^
+    286|     expect(api.classifyAsset.mock.calls.filter(([id]) => id !== "pack-…
+    287|   });
+ ❯ runWithExpensiveErrorDiagnosticsDisabled node_modules/@testing-library/dom/dist/config.js:47:12
+ ❯ checkCallback node_modules/@testing-library/dom/dist/wait-for.js:124:77
+ ❯ Timeout.checkRealTimersCallback node_modules/@testing-library/dom/dist/wait-for.js:118:16
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 7 passed (8)
+   Start at  22:41:35
+   Duration  3.36s (transform 389ms, setup 73ms, collect 707ms, tests 1.73s, environment 504ms, prepare 87ms)
+
+npm notice
+npm notice New minor version of npm available! 11.11.0 -> 11.21.2
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v11.21.2
+npm notice To update run: npm install -g npm@11.21.2
+npm notice
