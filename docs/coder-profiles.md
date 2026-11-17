@@ -58,6 +58,7 @@ Built from audits, one row per rated slice (owner, D25, 2026-11-07). Strengths a
 | SG-332 | muse-1.3, xhigh | deploy rider, live serve | 233 s | 95 | yes, S1 | named its model from AGENTS.md again (PB-4), source stated; reported a string the packet wrongly expected gone | mixed (minor) |
 | SG-333 | muse-1.3, xhigh | screenshots, 6 shots, real app driven | ≈970 s (stamps) | 90 | yes, inside 1100 s | design notes missed two defects visible in its own images (chip overflow at 4/row, desktop grid inset) — design-notes-vs-image weakness, 4th time | coder (minor) |
 | SG-334 | muse-1.3, xhigh | minor frontend change + test + full gate | ≈410 s (stamps) | 96 | yes | none | — |
+| SG-335 | muse-1.3, xhigh | deploy rider, live serve | ≈214 s (phase stamps) | 94 | yes, S1 | left its elapsed line as a placeholder "≈ N s" | coder (minor) |
 | SG-304 run 1 | haiku-5-5, high | build, backend + frontend, two flows | 1272 s (killed idle) | unrated, retried | n/a — killed after 900 s of no output | went silent while writing four test files in one batch; tests lost, no report; G1/G2 pushed | unknown (debug: transcript unidentified) |
 | SG-304r1 | haiku-5-5, high | retry: tests + gate | 903 s (killed idle) | — | n/a | none by the model: OpenCode Go "usage limit reached" before any work | provider (account quota) |
 
