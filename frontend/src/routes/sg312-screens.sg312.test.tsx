@@ -211,19 +211,31 @@ describe("SG-312 asset page and Enrich wording (I1, I5)", () => {
   };
 
   beforeEach(() => {
-    api.apiGet.mockImplementation((path: string) => (path.includes("/v1/taxonomy") ? Promise.resolve(taxonomy) : Promise.resolve(asset)));
+    api.apiGet.mockImplementation((path: string) => {
+      if (path.includes("/v1/taxonomy")) return Promise.resolve(taxonomy);
+      if (path === "/v1/assets")
+        return Promise.resolve({
+          items: [{ id: asset.id, display_name: asset.display_name, status: asset.status }],
+          next_cursor: null,
+        });
+      return Promise.resolve(asset);
+    });
     api.fetchLocations.mockRejectedValue(new Error("locations disabled"));
     api.fetchRelations.mockRejectedValue(new Error("relations disabled"));
   });
 
-  test("the header reads 500 ml left, not qty", async () => {
+  test("the pack row reads 500 ml, not qty", async () => {
     render(withClient(<AssetDetailPage />));
-    expect(await screen.findByText("Live · 500 ml left")).toBeInTheDocument();
+    // SG-338: the amount now reads on the pack row · same words, same no-qty rule.
+    const row = await screen.findByTestId("pack-row-asset-312");
+    expect(within(row).getByText("500 ml · added 14 Sep")).toBeInTheDocument();
     expect(screen.queryByText(/qty/)).toBeNull();
   });
 
   test("the Enrich line reads Enrich costs up to $0.05 a press, with no per-press or last-spend wording", async () => {
     render(withClient(<AssetDetailPage />));
+    // SG-338: Enrich now lives behind More about this item — same line.
+    fireEvent.click(await screen.findByRole("button", { name: "More about this item" }));
     expect(await screen.findByText("Enrich costs up to $0.05 a press")).toBeInTheDocument();
     expect(screen.queryByText(/per-press/)).toBeNull();
     expect(screen.queryByText(/Last measured spend/)).toBeNull();
@@ -236,7 +248,11 @@ describe("SG-312 asset page and Enrich wording (I1, I5)", () => {
 
   test("the Manual expiry card reads Needs a date, not the evidence-state sentence, and sits on paper", async () => {
     render(withClient(<AssetDetailPage />));
-    const card = await screen.findByLabelText("Manual expiry entry");
+    // SG-338: the manual date form now lives in the pack row's Edit.
+    await screen.findAllByTestId("pack-date");
+    const row = screen.getByTestId("pack-row-asset-312");
+    fireEvent.click(within(row).getByRole("button", { name: "Edit" }));
+    const card = await within(row).findByLabelText("Manual expiry entry");
     expect(within(card).getByText("Needs a date")).toBeInTheDocument();
     expect(screen.queryByText(/evidence state/)).toBeNull();
     expect(card.className).not.toContain("bg-card");
