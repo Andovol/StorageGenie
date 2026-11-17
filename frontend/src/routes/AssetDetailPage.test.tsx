@@ -132,6 +132,21 @@ function renderPage() {
   );
 }
 
+async function openMore() {
+  fireEvent.click(await screen.findByRole("button", { name: "More about this item" }));
+}
+
+async function openHistory() {
+  fireEvent.click(await screen.findByRole("button", { name: /History \(/ }));
+}
+
+async function openPackEdit(packId: string) {
+  await screen.findAllByTestId("pack-date");
+  const row = screen.getByTestId(`pack-row-${packId}`);
+  fireEvent.click(within(row).getByRole("button", { name: "Edit" }));
+  return row;
+}
+
 afterEach(() => {
   vi.clearAllMocks();
 });
@@ -142,6 +157,13 @@ beforeEach(() => {
   // The asset and taxonomy reads share one client; route them by path.
   api.apiGet.mockImplementation((path: string) => {
     if (path.includes("/v1/taxonomy")) return Promise.resolve(taxonomyBody);
+    if (path === "/v1/assets") {
+      const b = assetBody as Record<string, unknown>;
+      return Promise.resolve({
+        items: [{ id: b["id"], display_name: b["display_name"], status: b["status"] }],
+        next_cursor: null,
+      });
+    }
     return Promise.resolve(assetBody);
   });
   // Default: the location tree route is dormant (backend flag OFF -> 404), so
@@ -160,7 +182,10 @@ describe("AssetDetailPage", () => {
     });
     renderPage();
 
-    fireEvent.click(await screen.findByRole("button", { name: "Edit" }));
+    // SG-338: name/amount editing now lives in More > Edit name and amount.
+    await screen.findByRole("heading", { name: "Milk" });
+    await openMore();
+    fireEvent.click(await screen.findByRole("button", { name: "Edit name and amount" }));
     fireEvent.change(await screen.findByLabelText("Quantity"), { target: { value: "3" } });
     fireEvent.click(screen.getByRole("button", { name: "Save" }));
 
@@ -174,6 +199,8 @@ describe("AssetDetailPage", () => {
     );
     // SG-324 P3: superseded rows stay in History, not Details — the Details
     // "Replaced" badge is gone; SG-318 W3: "asset.update" is the "Updated" history row (was "Asset Update").
+    // SG-338: History now stays folded until opened — same entries.
+    await openHistory();
     expect(screen.queryByText("Replaced")).toBeNull();
     expect(await screen.findByText("Updated", { exact: false })).toBeInTheDocument();
   });
@@ -183,11 +210,13 @@ describe("AssetDetailPage", () => {
     api.enterManualExpiry.mockResolvedValue({ assertion: null, resolved_review_task_ids: [] });
     renderPage();
 
-    expect(await screen.findByText("Manual expiry entry")).toBeInTheDocument();
-    const save = screen.getByRole("button", { name: "Save date" });
+    // SG-338: the manual date form now lives in the pack row's Edit.
+    const row = await openPackEdit("asset-1");
+    expect(await within(row).findByText("Manual expiry entry")).toBeInTheDocument();
+    const save = within(row).getByRole("button", { name: "Save date" });
     expect(save).toBeDisabled();
 
-    fireEvent.change(screen.getByLabelText("Date"), { target: { value: "2030-05-06" } });
+    fireEvent.change(within(row).getByLabelText("Date"), { target: { value: "2030-05-06" } });
     await waitFor(() => expect(save).not.toBeDisabled());
     fireEvent.click(save);
 
@@ -207,6 +236,8 @@ describe("EnrichButton per-press cap (SG-082)", () => {
     assetBody = before;
     renderPage();
 
+    // SG-338: Enrich now lives behind More about this item — same button.
+    await openMore();
     expect(await screen.findByRole("button", { name: "Enrich" })).toBeInTheDocument();
     expect(screen.getByText(`Enrich costs up to $${ENRICH_PER_PRESS_CAP_USD.toFixed(2)} a press`)).toBeInTheDocument();
   });
@@ -239,6 +270,8 @@ describe("EnrichButton per-press cap (SG-082)", () => {
     api.apiPost.mockResolvedValue({ candidate_id: "cand-1", state: "proposed" });
     renderPage();
 
+    // SG-338: Enrich now lives behind More about this item — same call.
+    await openMore();
     fireEvent.click(await screen.findByRole("button", { name: "Enrich" }));
 
     await waitFor(() =>
@@ -263,6 +296,8 @@ describe("EnrichButton per-press cap (SG-082)", () => {
     });
     renderPage();
 
+    // SG-338: Enrich now lives behind More about this item — same region.
+    await openMore();
     fireEvent.click(await screen.findByRole("button", { name: "Enrich" }));
 
     const section = await screen.findByRole("region", { name: "Web alternates" });
@@ -283,6 +318,8 @@ describe("LocationsSection (SG-113)", () => {
     renderPage();
 
     await screen.findByRole("heading", { name: "Milk" });
+    // SG-338: Locations now lives behind More — still hidden when dormant.
+    await openMore();
     await waitFor(() => expect(screen.queryByText("Locations")).not.toBeInTheDocument());
   });
 
@@ -291,6 +328,8 @@ describe("LocationsSection (SG-113)", () => {
     api.fetchLocations.mockResolvedValueOnce({ items: [fridge] });
     renderPage();
 
+    // SG-338: Locations now lives behind More — same empty state.
+    await openMore();
     expect(await screen.findByText("Locations")).toBeInTheDocument();
     expect(await screen.findByText("No locations assigned")).toBeInTheDocument();
   });
@@ -302,9 +341,13 @@ describe("LocationsSection (SG-113)", () => {
     api.unassignAssetLocation.mockResolvedValue({ status: "unassigned", asset_id: "asset-1", location_id: "loc-1" });
     renderPage();
 
-    expect(await screen.findByText("Fridge")).toBeInTheDocument();
-    // The already-assigned location is not offered again in the select.
-    const select = screen.getByLabelText("Assign location");
+    // SG-338: Locations now lives behind More — same rows. (The Where
+    // heading fact above the packs also reads Fridge, so wait for the
+    // section's own select and scope the row to it.)
+    await openMore();
+    const select = await screen.findByLabelText("Assign location");
+    const locSection = select.closest("section") as HTMLElement;
+    expect(within(locSection).getByText("Fridge")).toBeInTheDocument();
     expect(screen.queryByRole("option", { name: "Fridge" })).not.toBeInTheDocument();
 
     fireEvent.change(select, { target: { value: "loc-2" } });
@@ -349,6 +392,8 @@ describe("RelationsSection (SG-114)", () => {
     renderPage();
 
     await screen.findByRole("heading", { name: "Milk" });
+    // SG-338: relations now live behind More — still hidden when dormant.
+    await openMore();
     await waitFor(() => expect(screen.queryByText("Related assets")).not.toBeInTheDocument());
   });
 
@@ -358,6 +403,8 @@ describe("RelationsSection (SG-114)", () => {
     api.fetchHouseholdAssets.mockResolvedValueOnce({ items: [before, screwdriver], next_cursor: null });
     renderPage();
 
+    // SG-338: relations now live behind More — same empty state.
+    await openMore();
     expect(await screen.findByText("Related assets")).toBeInTheDocument();
     expect(await screen.findByText("No related assets")).toBeInTheDocument();
   });
@@ -370,6 +417,8 @@ describe("RelationsSection (SG-114)", () => {
     api.deleteRelation.mockResolvedValue({ status: "deleted", id: "rel-1" });
     renderPage();
 
+    // SG-338: relations now live behind More — same rows.
+    await openMore();
     // The linked asset is named and its type is labelled in plain words from
     // this asset (SG-301 G2: the raw "(type, direction)" pair is gone).
     expect(await screen.findByText("(Contains)")).toBeInTheDocument();
@@ -423,6 +472,8 @@ describe("classification control (SG-258)", () => {
     api.classifyAsset.mockResolvedValue({});
     renderPage();
 
+    // SG-338: the shelf-life control now lives behind More — same control.
+    await openMore();
     const select = await screen.findByLabelText("Shelf life");
     const options = within(select).getAllByRole("option").map((option) => option.textContent);
     expect(options).toEqual(
@@ -459,6 +510,8 @@ describe("classification control (SG-258)", () => {
     api.classifyAsset.mockRejectedValue(new Error("This item changed; reload the asset"));
     renderPage();
 
+    // SG-338: the shelf-life control now lives behind More — same control.
+    await openMore();
     const beforeReads = assetReads();
     fireEvent.change(await screen.findByLabelText("Shelf life"), {
       target: { value: "household_chemicals" },
@@ -475,6 +528,8 @@ describe("classification control (SG-258)", () => {
     taxonomyBody = { plugins: [] };
     renderPage();
 
+    // SG-338: the shelf-life section now lives behind More — same message.
+    await openMore();
     expect(
       await screen.findByText("No shelf life options are available.")
     ).toBeInTheDocument();
@@ -487,6 +542,8 @@ describe("classification control (SG-258)", () => {
     const confirm = vi.spyOn(window, "confirm").mockReturnValue(false);
     renderPage();
 
+    // SG-338: the shelf-life control now lives behind More — same control.
+    await openMore();
     const select = await screen.findByLabelText("Shelf life");
     fireEvent.change(select, { target: { value: "non_perishable" } });
     fireEvent.click(screen.getByRole("button", { name: "Save shelf life" }));
@@ -510,9 +567,13 @@ describe("ExpiryEntryForm integration (SG-258)", () => {
     assetBody = classifiedFood;
     renderPage();
 
-    expect(await screen.findByLabelText("Date")).toHaveValue("2030-05-06");
-    expect(screen.getByLabelText("Date type")).toHaveValue("best_before");
-    expect(screen.getByRole("button", { name: "Save date" })).toBeDisabled();
+    // SG-338: the manual date form now lives in the pack row's Edit; the
+    // kept-date note stays in More — same form, same note.
+    const row = await openPackEdit("asset-1");
+    expect(await within(row).findByLabelText("Date")).toHaveValue("2030-05-06");
+    expect(within(row).getByLabelText("Date type")).toHaveValue("best_before");
+    expect(within(row).getByRole("button", { name: "Save date" })).toBeDisabled();
+    await openMore();
     expect(
       screen.getByText("The date is kept when the category changes; check it still applies.")
     ).toBeInTheDocument();
@@ -545,6 +606,8 @@ describe("ExpiryEntryForm integration (SG-258)", () => {
     });
     renderPage();
 
+    // SG-338: the manual date form now lives in the pack row's Edit.
+    await openPackEdit("asset-1");
     fireEvent.click(await screen.findByRole("button", { name: "Clear expiry date" }));
 
     await waitFor(() =>
@@ -571,6 +634,8 @@ describe("ExpiryEntryForm integration (SG-258)", () => {
     };
     renderPage();
 
+    // SG-338: the manual date form now lives in the pack row's Edit.
+    await openPackEdit("asset-1");
     fireEvent.click(await screen.findByRole("button", { name: "Accept date" }));
 
     await waitFor(() =>
@@ -599,8 +664,10 @@ describe("ExpiryEntryForm integration (SG-258)", () => {
     };
     renderPage();
 
-    expect(await screen.findByRole("heading", { name: "Manual date entry" })).toBeInTheDocument();
-    expect(screen.getByLabelText("Date type")).toHaveValue("valid_until");
+    // SG-338: the manual date form now lives in the pack row's Edit.
+    const docRow = await openPackEdit("asset-1");
+    expect(await within(docRow).findByRole("heading", { name: "Manual date entry" })).toBeInTheDocument();
+    expect(within(docRow).getByLabelText("Date type")).toHaveValue("valid_until");
   });
 
   test("a non-perishable row hides the form", async () => {
@@ -610,14 +677,22 @@ describe("ExpiryEntryForm integration (SG-258)", () => {
     };
     renderPage();
 
+    // SG-338: a non-perishable pack keeps the date form hidden even with
+    // its row editor open — same rule, opened editor.
+    const npRow = await openPackEdit("asset-1");
     await screen.findByRole("heading", { name: "Milk" });
-    expect(screen.queryByText("Manual expiry entry")).not.toBeInTheDocument();
+    expect(within(npRow).queryByText("Manual expiry entry")).not.toBeInTheDocument();
     expect(screen.queryByText("Manual date entry")).not.toBeInTheDocument();
   });
 
   test("an unclassified item says what comes next and keeps the date form hidden (SG-270 G5)", async () => {
     assetBody = before;
     renderPage();
+    // SG-338: the guidance now reads in More about this item; no date form
+    // intrudes before a pack row's Edit is opened. (The opened per-pack
+    // editor deliberately offers a date field even unclassified — T3 —
+    // so the form check stays at page level here.)
+    await openMore();
     expect(
       await screen.findByText("Choose a shelf life, then add a date if it has one.")
     ).toBeInTheDocument();
