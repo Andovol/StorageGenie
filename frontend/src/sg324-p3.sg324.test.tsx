@@ -1,5 +1,5 @@
 import { describe, expect, test, vi, beforeEach, afterEach } from "vitest";
-import { render, screen, within } from "@testing-library/react";
+import { fireEvent, render, screen, within } from "@testing-library/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { MemoryRouter, Route, Routes } from "react-router-dom";
 import { AssetDetailPage } from "./routes/AssetDetailPage";
@@ -47,6 +47,11 @@ const taxonomy = {
 function renderWithAsset(assetBody: Record<string, unknown>) {
   api.apiGet.mockImplementation((path: string) => {
     if (String(path).includes("/v1/taxonomy")) return Promise.resolve(taxonomy);
+    if (path === "/v1/assets")
+      return Promise.resolve({
+        items: [{ id: "asset-1", display_name: "Juice", status: "ACTIVE" }],
+        next_cursor: null,
+      });
     return Promise.resolve(assetBody);
   });
   return render(
@@ -58,6 +63,10 @@ function renderWithAsset(assetBody: Record<string, unknown>) {
       </MemoryRouter>
     </QueryClientProvider>
   );
+}
+
+function openMore() {
+  fireEvent.click(screen.getByRole("button", { name: "More about this item" }));
 }
 
 function baseAsset(assertions: unknown[]) {
@@ -95,7 +104,9 @@ describe("SG-324 P3 details rows", () => {
     ]);
     renderWithAsset(assetBody);
     await screen.findByRole("heading", { name: "Juice" });
-    const table = (await screen.findByText("Kind of item")).closest("table") as HTMLElement;
+    // SG-338: Details now lives behind More about this item — same table.
+    openMore();
+    const table = await screen.findByRole("table");
     expect(within(table).queryByText("Shelf life")).toBeNull();
     expect(within(table).getByText("Kind of item")).toBeInTheDocument();
   });
@@ -108,6 +119,8 @@ describe("SG-324 P3 details rows", () => {
     ]);
     renderWithAsset(assetBody);
     await screen.findByRole("heading", { name: "Juice" });
+    // SG-338: Details now lives behind More about this item — same rows.
+    openMore();
     await screen.findAllByText("Amount");
     expect(screen.queryByText("Replaced")).toBeNull();
   });
@@ -119,6 +132,8 @@ describe("SG-324 P3 details rows", () => {
     ]);
     renderWithAsset(assetBody);
     await screen.findByRole("heading", { name: "Juice" });
+    // SG-338: Details now lives behind More about this item — same combined row.
+    openMore();
     expect(await screen.findByText("300 ml")).toBeInTheDocument();
     const table = screen.getByText("300 ml").closest("table") as HTMLElement;
     expect(within(table).queryByText("Unit")).toBeNull();
