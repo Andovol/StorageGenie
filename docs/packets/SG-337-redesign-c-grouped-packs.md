@@ -7,7 +7,7 @@
 **Restart: none.** No deploy; screenshots and a rider follow.
 **Provider: none.** No key, no `.env`, no spend.
 
-**Contract:** recorded `0.61.0` (`AGENTS.md`, D36). **This lane denies reading the contract folder; do not try.** Your **own** contract's version line, as you received it, is the host evidence: echo it — **never the project file's line (`AGENTS.md`); if you received none, say exactly that.** A denial on that folder is expected and is not a STOP.
+**Contract:** recorded `0.63.0` (`AGENTS.md`, D42). **This lane denies reading the contract folder; do not try.** Your **own** contract's version line, as you received it, is the host evidence: echo it — **never the project file's line (`AGENTS.md`); if you received none, say exactly that.** A denial on that folder is expected and is not a STOP.
 
 **Approval:** owner, 2026-11-17: *"Then: redesign C — item page as in the mockup (one row per pack, Used up, Add another pack) and same-name packs grouped as one card"*. Stage C (*"d14 ok"*, L3).
 
