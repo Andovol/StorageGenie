@@ -81,6 +81,8 @@ export function ExpiryEntryForm({
         activeAssertion?.id
       );
       await qc.invalidateQueries({ queryKey: ["asset", assetId, householdId] });
+      await qc.invalidateQueries({ queryKey: ["item-packs"] });
+      await qc.invalidateQueries({ queryKey: ["assets"] });
       setMessage("Date saved and re-read from the asset.");
     } catch (caught) {
       setError(caught instanceof Error ? caught.message : String(caught));
@@ -97,6 +99,8 @@ export function ExpiryEntryForm({
     try {
       await clearExpiryDate(assetId, householdId, activeAssertion?.id);
       await qc.invalidateQueries({ queryKey: ["asset", assetId, householdId] });
+      await qc.invalidateQueries({ queryKey: ["item-packs"] });
+      await qc.invalidateQueries({ queryKey: ["assets"] });
       setDate("");
       setMessage("Date cleared.");
     } catch (caught) {

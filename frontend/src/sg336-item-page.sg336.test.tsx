@@ -280,9 +280,78 @@ describe("SG-336 item page, one row per pack", () => {
       { household_id: "hh" },
       expect.objectContaining({ "Idempotency-Key": expect.any(String) })
     ));
-    // The create is followed by one classification write for the new id with
-    // the opened item's category, and none for any other id.
+    // The create is followed by one classification write for the new id only,
+    // and none for any other id.
     await waitFor(() => expect(api.classifyAsset).toHaveBeenCalledWith("pack-4", "hh", "food_beverages"));
     expect(api.classifyAsset.mock.calls.filter(([id]) => id !== "pack-4")).toEqual([]);
+  });
+
+  test("T9 saving a new date re-reads the packs list and the row shows the new date", async () => {
+    api.enterManualExpiry.mockImplementation(async (assetId: string, _householdId: string, payload: unknown) => {
+      const body = store[assetId];
+      const nextDate = (payload as Record<string, unknown>)["expiry_date"] as string;
+      const nextType = (payload as Record<string, unknown>)["date_type"] ?? "expiry_date";
+      const assertions = (body["assertions"] as unknown[]).map((entry) => {
+        const rec = entry as Record<string, unknown>;
+        if (
+          typeof rec["field_path"] === "string" &&
+          (rec["field_path"] as string).endsWith("expiry_date") &&
+          rec["review_state"] === "accepted"
+        ) {
+          return { ...rec, value: { expiry_date: nextDate, date_type: nextType } };
+        }
+        return rec;
+      });
+      store[assetId] = { ...body, assertions };
+      return { asset_id: assetId, assertion: null };
+    });
+    renderPack1();
+    await screen.findAllByTestId("pack-date");
+    const listReadsBefore = api.apiGet.mock.calls.filter(([path]) => path === "/v1/assets").length;
+    const row1 = screen.getByTestId("pack-row-pack-1");
+    fireEvent.click(within(row1).getByRole("button", { name: "Edit" }));
+    const dateInput = within(row1).getByLabelText("Date") as HTMLInputElement;
+    expect(dateInput.value).toBe("2030-05-06");
+    fireEvent.change(dateInput, { target: { value: "2031-02-03" } });
+    fireEvent.click(within(row1).getByRole("button", { name: "Save date" }));
+    await waitFor(() => expect(api.enterManualExpiry).toHaveBeenCalledWith(
+      "pack-1", "hh", expect.objectContaining({ expiry_date: "2031-02-03" }), "a-exp-1"
+    ));
+    await waitFor(() => {
+      const after = api.apiGet.mock.calls.filter(([path]) => path === "/v1/assets").length;
+      expect(after).toBeGreaterThan(listReadsBefore);
+    });
+    await waitFor(() =>
+      expect(within(screen.getByTestId("pack-row-pack-1")).getByTestId("pack-date")).toHaveTextContent("Use by 3 Feb 2031")
+    );
+  });
+
+  test("T10 clearing the date re-reads the packs list and the row reads No date", async () => {
+    api.clearExpiryDate.mockImplementation(async (assetId: string) => {
+      const body = store[assetId];
+      const kept = (body["assertions"] as unknown[]).filter((entry) => {
+        const rec = entry as Record<string, unknown>;
+        return (rec["field_path"] as string) === "plugin:expiry-tracker/classification";
+      });
+      store[assetId] = {
+        ...body,
+        assertions: [...kept, assertion("a-exp-cleared", "plugin:expiry-tracker/expiry_date", null, "accepted")],
+      };
+      return { asset_id: assetId, assertion: null };
+    });
+    renderPack1();
+    await screen.findAllByTestId("pack-date");
+    const listReadsBefore = api.apiGet.mock.calls.filter(([path]) => path === "/v1/assets").length;
+    const row1 = screen.getByTestId("pack-row-pack-1");
+    fireEvent.click(within(row1).getByRole("button", { name: "Edit" }));
+    fireEvent.click(within(row1).getByRole("button", { name: "Clear expiry date" }));
+    await waitFor(() => expect(api.clearExpiryDate).toHaveBeenCalledWith("pack-1", "hh", "a-exp-1"));
+    await waitFor(() => {
+      const after = api.apiGet.mock.calls.filter(([path]) => path === "/v1/assets").length;
+      expect(after).toBeGreaterThan(listReadsBefore);
+    });
+    await waitFor(() =>
+      expect(within(screen.getByTestId("pack-row-pack-1")).getByTestId("pack-date")).toHaveTextContent("No date")
+    );
   });
 });
