@@ -1,8 +1,9 @@
 import { useCallback, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { apiGet, apiPost, uploadEvidence } from "../api/client";
-import type { Asset, AssetListResponse } from "../api/types";
-import { expiryDateFrom, formatUseByDate } from "../lib/labels";
+import { apiPost, uploadEvidence } from "../api/client";
+import { formatUseByDate } from "../lib/labels";
+import { findSameNamePacks } from "../lib/sameNamePacks";
+import type { SamePack } from "../lib/sameNamePacks";
 import { CONTROL_STYLE, THEMED_CONTROL_CLASS } from "./shell/CatalogToolbar";
 import { SERVER_CAP_LABEL } from "./shell/AssetImportModal";
 
@@ -12,43 +13,6 @@ type Props = {
 };
 
 type PreviewFile = { file: File; shaPreview: string | null };
-
-/** SG-304 G1: a live item the typed name matches, with its date when it has one. */
-type SamePack = { id: string; name: string; expiry: string | null };
-
-// Items in these states are not live; the list read already hides ARCHIVED.
-const NOT_LIVE_STATUSES = new Set(["ARCHIVED", "DISPOSED", "MERGED"]);
-
-/**
- * SG-304 G1: live items whose name equals the typed name (trimmed, case-
- * insensitive). Uses the existing list read (`q` = FTS on display_name) and the
- * existing detail read for each match's date. Same name is NOT identity: this
- * only offers the existing item; the caller decides.
- */
-async function findSameNamePacks(householdId: string, name: string): Promise<SamePack[]> {
-  const wanted = name.trim().toLowerCase();
-  const list = await apiGet<AssetListResponse>("/v1/assets", {
-    household_id: householdId,
-    q: name.trim(),
-    limit: "100",
-  });
-  const matches = list.items.filter(
-    (item) =>
-      (item.display_name ?? "").trim().toLowerCase() === wanted && !NOT_LIVE_STATUSES.has(item.status)
-  );
-  return Promise.all(
-    matches.map(async (item) => {
-      let expiry: string | null = null;
-      try {
-        const detail = await apiGet<Asset>(`/v1/assets/${item.id}`, { household_id: householdId });
-        expiry = expiryDateFrom(detail.assertions);
-      } catch {
-        expiry = null;
-      }
-      return { id: item.id, name: item.display_name ?? name.trim(), expiry };
-    })
-  );
-}
 
 /**
  * SG-105 G2: the real `<input type="file">` stays in the DOM (and stays

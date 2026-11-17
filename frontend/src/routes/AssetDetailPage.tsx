@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useParams, useSearchParams, Link } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { Plus, ChevronDown, Package } from "lucide-react";
 import { useAsset, useTaxonomy } from "../hooks/useAssets";
 import { quantityLeftText } from "../lib/quantityText";
 import { EvidenceGallery } from "../components/EvidenceGallery";
@@ -8,6 +9,7 @@ import { ProvenanceBadge } from "../components/ProvenanceBadge";
 import { ExpiryEntryForm } from "../components/ExpiryEntryForm";
 import { PageContainer } from "../components/shell/PageContainer";
 import {
+  apiGet,
   apiPatch,
   apiPost,
   assignAssetLocation,
@@ -33,12 +35,23 @@ import type {
   GoneReason,
   LocationListResponse,
   RelationListResponse,
+  TaxonomyResponse,
 } from "../api/types";
 import { goneReasonLabel } from "../api/types";
 import { CONTROL_STYLE, THEMED_CONTROL_CLASS } from "../components/shell/CatalogToolbar";
 import { WebAlternates } from "../components/WebAlternates";
 import { UNTITLED_ASSET_NAME } from "../types/product";
-import { formatJobDate, formatPlainDate, labelAssetType, labelExpiryState } from "../lib/labels";
+import {
+  expiryDateFrom,
+  formatJobDate,
+  formatPlainDate,
+  formatUseByDate,
+  formatUseByDayMonth,
+  labelAssetType,
+  labelExpiryState,
+} from "../lib/labels";
+import { findSameNamePacks, NOT_LIVE_STATUSES } from "../lib/sameNamePacks";
+import type { SamePack } from "../lib/sameNamePacks";
 
 // SG-082: per-press Enrich cap. UNCALIBRATED on purpose (`G-A9`): the value is
 // a stated ceiling, not a measured cost. The button shows the last measured
@@ -454,6 +467,224 @@ export function detailAmountText(quantityText: string, unitText: string): string
   return `${qty} ${unit}`;
 }
 
+// SG-336: whole days from the local today to an ISO date-only string.
+// Negative when past, null when unreadable. Read by parts so no timezone
+// shifts the day (the same reason formatUseByDate reads parts).
+function daysUntilDateOnly(value: string | null | undefined): number | null {
+  const match = /^(\d{4})-(\d{2})-(\d{2})/.exec(value ?? "");
+  if (!match) return null;
+  const now = new Date();
+  const start = Date.UTC(Number(match[1]), Number(match[2]) - 1, Number(match[3]));
+  const today = Date.UTC(now.getFullYear(), now.getMonth(), now.getDate());
+  return Math.round((start - today) / 86400000);
+}
+
+// SG-336: one pack row's date line. A dated row reads "Use by 6 May 2030"; a
+// past date reads the catalog's past wording (ProductCard.tsx:59, the narrow
+// "Past · 6 May") in the catalog's past wash; none reads "No date".
+function packDateLine(expiry: string | null): { text: string; past: boolean } {
+  if (!expiry) return { text: "No date", past: false };
+  const full = formatUseByDate(expiry);
+  if (!full) return { text: "No date", past: false };
+  const days = daysUntilDateOnly(expiry);
+  if (typeof days === "number" && days < 0) {
+    return { text: `Past · ${formatUseByDayMonth(expiry) || full}`, past: true };
+  }
+  return { text: `Use by ${full}`, past: false };
+}
+
+type EvidenceRef = { id: string; storage_key: string; sha256?: string; original_filename?: string };
+
+function evidenceOf(detail: Asset | null): EvidenceRef[] {
+  return (
+    (detail as unknown as { evidence?: EvidenceRef[] } | null)?.evidence || []
+  );
+}
+
+function thumbUrl(evidenceId: string, householdId: string, size = 256): string {
+  const base = import.meta.env.VITE_API_BASE || "http://localhost:8003";
+  return `${base}/v1/evidence/${evidenceId}/thumb/${size}?household_id=${householdId}`;
+}
+
+function fileUrl(evidenceId: string, householdId: string): string {
+  const base = import.meta.env.VITE_API_BASE || "http://localhost:8003";
+  return `${base}/v1/evidence/${evidenceId}/file?household_id=${householdId}`;
+}
+
+// SG-336: the per-pack expiry context the inline editor needs — the same
+// classification/windows read the old page did for its one item, run per pack.
+// A pack with no classification at all gets hasWindows true so a date can be
+// typed; a non-perishable pack keeps the form hidden, as before.
+function packExpiryContext(
+  detail: Asset,
+  taxonomy: TaxonomyResponse | undefined
+): {
+  activeAssertion: Assertion | null;
+  categorySlug: string;
+  hasWindows: boolean;
+} {
+  const assertions = detail.assertions || [];
+  const classificationAssertion = latestActiveAssertion(
+    assertions,
+    "plugin:expiry-tracker/classification"
+  );
+  const classificationValue = valueRecord(classificationAssertion?.value);
+  const currentCategory =
+    typeof classificationValue?.category === "string" ? classificationValue.category : "";
+  const profile = valueRecord(classificationValue?.profile);
+  const hasProfileTierDefaults =
+    profile !== null && Object.prototype.hasOwnProperty.call(profile, "tier_defaults");
+  const profileTierDefaults = valueRecord(profile?.tier_defaults);
+  const taxonomyCategories =
+    taxonomy?.plugins.find((plugin) => plugin.plugin_id === "expiry-tracker")?.categories ?? [];
+  const activeCategories = taxonomyCategories.filter((category) => category.active);
+  const taxonomyCategory = activeCategories.find((category) => category.id === currentCategory);
+  const computed =
+    classificationAssertion !== null &&
+    (hasProfileTierDefaults
+      ? Object.keys(profileTierDefaults ?? {}).length > 0
+      : (taxonomyCategory?.notification ?? "none") !== "none");
+  return {
+    activeAssertion: latestActiveAssertion(assertions, "plugin:expiry-tracker/expiry_date"),
+    categorySlug: currentCategory,
+    hasWindows: computed || classificationAssertion === null,
+  };
+}
+
+// SG-336: one pack's inline editor — the existing ExpiryEntryForm (date) and
+// the existing amount controls (−1/+1 for counted packs, quantity/unit fields
+// with Save for every pack), all writing that pack's id only.
+function PackEditor({
+  detail,
+  householdId,
+  taxonomy,
+}: {
+  detail: Asset;
+  householdId: string;
+  taxonomy: TaxonomyResponse | undefined;
+}) {
+  const qc = useQueryClient();
+  const ctx = packExpiryContext(detail, taxonomy);
+  const counted = isCountedUnit(detail.unit);
+  const qtyValue = detail.quantity ?? null;
+  const [quantity, setQuantity] = useState(detail.quantity != null ? String(detail.quantity) : "");
+  const [unit, setUnit] = useState(detail.unit ?? "");
+  const [amountError, setAmountError] = useState<string | null>(null);
+
+  const invalidatePacks = () => {
+    qc.invalidateQueries({ queryKey: ["item-packs"] });
+    qc.invalidateQueries({ queryKey: ["asset", detail.id] });
+  };
+
+  const decMut = useMutation({
+    mutationFn: () => decrementQuantity(detail.id, householdId),
+    onSuccess: invalidatePacks,
+    onError: (e: unknown) => setAmountError(e instanceof Error ? e.message : String(e)),
+  });
+  const incMut = useMutation({
+    mutationFn: () => incrementQuantity(detail.id, householdId),
+    onSuccess: () => {
+      setAmountError(null);
+      invalidatePacks();
+    },
+    onError: (e: unknown) => setAmountError(e instanceof Error ? e.message : String(e)),
+  });
+  const patchMut = useMutation({
+    mutationFn: (payload: Record<string, unknown>) =>
+      apiPatch(`/v1/assets/${detail.id}`, payload, { household_id: householdId }, { "If-Match": String(detail.version ?? 1) }),
+    onSuccess: () => {
+      setAmountError(null);
+      invalidatePacks();
+    },
+    onError: (e: unknown) => setAmountError(e instanceof Error ? e.message : String(e)),
+  });
+
+  return (
+    <div style={{ marginTop: 8 }}>
+      <ExpiryEntryForm
+        key={ctx.activeAssertion?.id ?? `no-expiry-${detail.id}`}
+        assetId={detail.id}
+        householdId={householdId}
+        evidenceIds={evidenceOf(detail).map((item) => item.id)}
+        activeAssertion={ctx.activeAssertion}
+        categorySlug={ctx.categorySlug}
+        hasWindows={ctx.hasWindows}
+      />
+      <section aria-label="Pack amount" style={{ marginTop: 12 }}>
+        {counted ? (
+          <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
+            <button
+              type="button"
+              aria-label="Take off 1"
+              onClick={() => decMut.mutate()}
+              disabled={decMut.isPending || (qtyValue ?? 0) <= 0}
+              className={THEMED_CONTROL_CLASS}
+              style={{ ...CONTROL_STYLE, minHeight: 44 }}
+            >
+              {decMut.isPending ? "…" : "−1"}
+            </button>
+            <span className="text-foreground" style={{ fontSize: 13 }}>
+              {quantityLeftText(qtyValue, detail.unit, counted)}
+            </span>
+            <button
+              type="button"
+              aria-label="Put 1 back on the count"
+              onClick={() => incMut.mutate()}
+              disabled={incMut.isPending}
+              className={THEMED_CONTROL_CLASS}
+              style={{ ...CONTROL_STYLE, minHeight: 44 }}
+            >
+              {incMut.isPending ? "…" : "+1"}
+            </button>
+          </div>
+        ) : (
+          <div className="text-muted-foreground" style={{ fontSize: 13 }}>
+            {quantityLeftText(qtyValue, detail.unit, counted)}
+          </div>
+        )}
+        <div style={{ display: "flex", gap: 8, alignItems: "end", flexWrap: "wrap", marginTop: 8 }}>
+          <label style={{ display: "flex", flexDirection: "column", gap: 4, fontSize: 13 }}>
+            Quantity
+            <input
+              type="number"
+              value={quantity}
+              onChange={(e) => setQuantity(e.target.value)}
+              className="bg-background text-foreground border-border focus-ring"
+              style={{ padding: 8, borderRadius: 0, borderStyle: "solid", borderWidth: 1, minHeight: 44 }}
+            />
+          </label>
+          <label style={{ display: "flex", flexDirection: "column", gap: 4, fontSize: 13 }}>
+            Unit
+            <input
+              value={unit}
+              onChange={(e) => setUnit(e.target.value)}
+              className="bg-background text-foreground border-border focus-ring"
+              style={{ padding: 8, borderRadius: 0, borderStyle: "solid", borderWidth: 1, minHeight: 44 }}
+            />
+          </label>
+          <button
+            type="button"
+            onClick={() => {
+              const payload: Record<string, unknown> = {};
+              if (quantity.trim() !== "") payload.quantity = Number(quantity);
+              if (unit.trim() !== "") payload.unit = unit.trim();
+              patchMut.mutate(payload);
+            }}
+            disabled={patchMut.isPending}
+            className="bg-primary text-primary-foreground focus-ring"
+            style={{ padding: "6px 12px", borderRadius: 0, border: "none", cursor: "pointer", minHeight: 44 }}
+          >
+            {patchMut.isPending ? "Saving…" : "Save amount"}
+          </button>
+        </div>
+        {amountError && (
+          <div role="alert" className="text-danger" style={{ fontSize: 13, marginTop: 6 }}>{amountError}</div>
+        )}
+      </section>
+    </div>
+  );
+}
+
 export function AssetDetailPage() {
   const { id } = useParams();
   const [search] = useSearchParams();
@@ -461,12 +692,16 @@ export function AssetDetailPage() {
   const { data: asset, isLoading } = useAsset(householdId, id || "");
   const { data: taxonomy } = useTaxonomy();
   const qc = useQueryClient();
+  // SG-336: the opened item's own sections, now folded under "More about this
+  // item" below History. Their state and handlers are unchanged; they still
+  // read and write the opened item.
   const [editing, setEditing] = useState(false);
   const [editName, setEditName] = useState("");
   const [editQuantity, setEditQuantity] = useState("");
   const [editUnit, setEditUnit] = useState("");
   const [editCondition, setEditCondition] = useState("");
   const [attachFiles, setAttachFiles] = useState<FileList | null>(null);
+  const [leftAttaching, setLeftAttaching] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [classificationChoice, setClassificationChoice] = useState<string | null>(null);
   const [classificationMessage, setClassificationMessage] = useState<string | null>(null);
@@ -475,6 +710,14 @@ export function AssetDetailPage() {
   const [goneError, setGoneError] = useState<string | null>(null);
   const [qtyMessage, setQtyMessage] = useState<string | null>(null);
   const [qtyError, setQtyError] = useState<string | null>(null);
+  // SG-336: the packs UI — which pack rows stay, the one notice, the open
+  // editor, the two folds.
+  const [goneIds, setGoneIds] = useState<string[]>([]);
+  const [notice, setNotice] = useState<{ name: string; assetId: string } | null>(null);
+  const [editingPackId, setEditingPackId] = useState<string | null>(null);
+  const [historyOpen, setHistoryOpen] = useState(false);
+  const [moreOpen, setMoreOpen] = useState(false);
+  const [addError, setAddError] = useState<string | null>(null);
 
   const assertions = asset?.assertions || [];
   const classificationAssertion = latestActiveAssertion(
@@ -524,6 +767,51 @@ export function AssetDetailPage() {
   );
   const expiryValue = valueRecord(expiryAssertion?.value);
   const hasActiveDate = typeof expiryValue?.expiry_date === "string";
+
+  // SG-336: every live pack with the opened item's name, by the shared
+  // findSameNamePacks rule, each with its full detail for amount, photo,
+  // added date and inline editing.
+  const nameKey = (asset?.display_name ?? "").trim();
+  const packsQuery = useQuery({
+    queryKey: ["item-packs", householdId, nameKey.toLowerCase()],
+    queryFn: async (): Promise<{ packs: SamePack[]; details: (Asset | null)[] }> => {
+      const packs = await findSameNamePacks(householdId, nameKey);
+      const details = await Promise.all(
+        packs.map(async (pack) => {
+          try {
+            return await apiGet<Asset>(`/v1/assets/${pack.id}`, { household_id: householdId });
+          } catch {
+            return null;
+          }
+        })
+      );
+      return { packs, details };
+    },
+    enabled: !!asset && !!nameKey && !!householdId,
+    retry: false,
+  });
+
+  type PackRow = { pack: SamePack; detail: Asset | null };
+  const allRows: PackRow[] = (packsQuery.data?.packs ?? []).map((pack, index) => ({
+    pack,
+    detail: packsQuery.data?.details[index] ?? null,
+  }));
+  const liveRows = allRows
+    .filter(
+      (row) =>
+        !goneIds.includes(row.pack.id) &&
+        (row.detail ? !NOT_LIVE_STATUSES.has(row.detail.status) : true)
+    )
+    .sort((a, b) => {
+      // SG-336: soonest date first, no date last. ISO date-only strings
+      // compare lexically; a missing date always sorts after a dated one.
+      const aExp = (a.detail ? expiryDateFrom(a.detail.assertions) : null) ?? a.pack.expiry;
+      const bExp = (b.detail ? expiryDateFrom(b.detail.assertions) : null) ?? b.pack.expiry;
+      if (!aExp && !bExp) return 0;
+      if (!aExp) return 1;
+      if (!bExp) return -1;
+      return aExp < bExp ? -1 : aExp > bExp ? 1 : 0;
+    });
 
   const classifyMut = useMutation({
     mutationFn: (category: string) =>
@@ -624,6 +912,7 @@ export function AssetDetailPage() {
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["asset", id] });
+      qc.invalidateQueries({ queryKey: ["item-packs"] });
       setAttachFiles(null);
       (document.getElementById("attach-input") as HTMLInputElement | null)?.value &&
         ((document.getElementById("attach-input") as HTMLInputElement).value = "");
@@ -640,6 +929,84 @@ export function AssetDetailPage() {
     mutationFn: () => apiPost<EnrichResponse>(`/v1/enrich/${id}`, {}, { household_id: householdId }),
     onError: (e: unknown) => setError(e instanceof Error ? e.message : String(e)),
   });
+
+  // SG-336: one pack's Used up — the existing mark-gone call with used_up for
+  // that pack id only. The row leaves at once; the notice offers Undo.
+  const packGoneMut = useMutation({
+    mutationFn: (vars: { packId: string; name: string }) => markGone(vars.packId, householdId, "used_up"),
+    onSuccess: (_updated, vars) => {
+      setGoneIds((prev) => (prev.includes(vars.packId) ? prev : [...prev, vars.packId]));
+      setNotice({ name: vars.name, assetId: vars.packId });
+      qc.invalidateQueries({ queryKey: ["item-packs"] });
+      qc.invalidateQueries({ queryKey: ["assets"] });
+    },
+  });
+
+  // SG-336: Undo restores that pack only — no other pack's date, amount or
+  // status changes.
+  const packUndoMut = useMutation({
+    mutationFn: (packId: string) => putBack(packId, householdId),
+    onSuccess: (_updated, packId) => {
+      setGoneIds((prev) => prev.filter((item) => item !== packId));
+      setNotice((current) => (current?.assetId === packId ? null : current));
+      qc.invalidateQueries({ queryKey: ["item-packs"] });
+      qc.invalidateQueries({ queryKey: ["assets"] });
+    },
+  });
+
+  // SG-336: Add another pack — the same create call the capture form's
+  // "Add another pack" uses (AssetForm.tsx "Add another pack" button):
+  // display_name + asset_type with an Idempotency-Key, no date, no photo.
+  // The opened item's places ride along through the existing assign-location
+  // call, one per assigned location. The new row opens with Edit so the date
+  // can be typed.
+  const addPackMut = useMutation({
+    mutationFn: async () => {
+      if (!asset) throw new Error("No item loaded");
+      const created = await apiPost<{ id: string }>(
+        "/v1/assets",
+        { display_name: nameKey, asset_type: asset.asset_type },
+        { household_id: householdId },
+        { "Idempotency-Key": crypto.randomUUID() }
+      );
+      for (const loc of asset.locations ?? []) {
+        try {
+          await assignAssetLocation(created.id, loc.id, householdId);
+        } catch {
+          // The pack stays; a place that will not assign is reported below.
+          setAddError(`Kept the new pack, but a place would not assign.`);
+        }
+      }
+      return created;
+    },
+    onSuccess: (created) => {
+      qc.invalidateQueries({ queryKey: ["item-packs"] });
+      qc.invalidateQueries({ queryKey: ["assets"] });
+      setEditingPackId(created.id);
+      if (!addError) setAddError(null);
+    },
+    onError: (e: unknown) => setAddError(e instanceof Error ? e.message : String(e)),
+  });
+
+  async function attachLeftFiles(files: FileList | null) {
+    if (!files?.length || !id) return;
+    setLeftAttaching(true);
+    setError(null);
+    try {
+      const ids: string[] = [];
+      for (const f of Array.from(files)) {
+        const ev = await uploadEvidence(householdId, f);
+        ids.push(ev.id);
+      }
+      await apiPost(`/v1/assets/${id}/evidence`, { evidence_ids: ids }, { household_id: householdId });
+      qc.invalidateQueries({ queryKey: ["asset", id] });
+      qc.invalidateQueries({ queryKey: ["item-packs"] });
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : String(e));
+    } finally {
+      setLeftAttaching(false);
+    }
+  }
 
   if (isLoading) return <div style={{ padding: 24 }}>Loading...</div>;
   if (!asset) return <div style={{ padding: 24 }}>Asset not found — <Link to="/">back to catalog</Link></div>;
@@ -684,315 +1051,579 @@ export function AssetDetailPage() {
     classifyMut.mutate(effectiveCategory);
   };
 
+  // SG-336: the heading facts. Kind from the record, Where from the assigned
+  // places, Brand from the current brand assertion — each only when known.
+  const kindLabel =
+    asset.asset_type && asset.asset_type !== "unknown" ? labelAssetType(asset.asset_type) : null;
+  const whereLabel = (asset.locations ?? []).map((l) => l.name).filter(Boolean).join(", ") || null;
+  const brandAssertion =
+    assertions
+      .filter(
+        (item) =>
+          (item.field_path === "brand" || item.field_path.endsWith("/brand")) &&
+          (item.review_state ?? "").toLowerCase() !== "superseded" &&
+          (item.review_state ?? "").toLowerCase() !== "rejected"
+      )
+      .sort((a, b) => (b.created_at ?? "").localeCompare(a.created_at ?? ""))[0] ?? null;
+  const brandLabel = brandAssertion
+    ? plainDetailValue(brandAssertion.field_path, brandAssertion.value)
+    : "—";
+  const mutedParts = [
+    kindLabel,
+    whereLabel,
+    `${liveRows.length} pack${liveRows.length === 1 ? "" : "s"}`,
+  ].filter((part): part is string => !!part);
+
+  // SG-336: the tile photo — the opened item's photo, else the first pack in
+  // the list that has one.
+  const openedPhoto = evidence[0] ?? null;
+  const fallbackPhoto =
+    openedPhoto ??
+    liveRows.map((row) => evidenceOf(row.detail)[0]).find(Boolean) ??
+    null;
+
+  const openEditor = (row: PackRow) => {
+    setEditingPackId((current) => (current === row.pack.id ? null : row.pack.id));
+  };
+
   return (
     <PageContainer className="text-foreground">
-      <Link to={`/?household_id=${householdId}`} className="text-link focus-ring" style={{ fontSize: 13 }}>← Back to catalog</Link>
-      <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "space-between", alignItems: "center", gap: 12, marginTop: 8 }}>
-        <h1 className="page-header text-foreground" style={{ margin: 0, minWidth: 0, overflowWrap: "anywhere" }}>{displayName}</h1>
-        <button
-          onClick={() => {
-            setEditName(asset.display_name ?? "");
-            setEditQuantity(asset.quantity != null ? String(asset.quantity) : "");
-            setEditUnit(asset.unit ?? "");
-            setEditCondition(asset.condition ?? "");
-            setEditing((v) => !v);
-          }}
-          className={THEMED_CONTROL_CLASS}
-          style={{ ...CONTROL_STYLE, cursor: "pointer" }}
-        >
-          {editing ? "Cancel" : "Edit"}
-        </button>
-      </div>
-      <div style={{ marginBottom: 13, fontSize: 13, color: "hsl(var(--ink-muted))" }}>
-        {isGone ? `Gone${goneLabel ? ` — ${goneLabel}` : ""}` : "Live"}
-        {asset.quantity != null && <> · {quantityLeftText(asset.quantity, asset.unit, counted)}</>}
-        {asset.condition && <> · {asset.condition}</>}
-      </div>
-
-      <div style={{ marginBottom: 16 }}>
-        <EnrichButton lastSpendUsd={null} onRun={() => enrichMut.mutate()} />
-      </div>
-
-      <WebAlternates alternates={enrichMut.data?.web_alternates ?? []} />
-
-      <section style={{ marginBottom: 16 }}>
-        <h3>Shelf life</h3>
-        {activeCategories.length === 0 ? (
-          <div className="text-muted-foreground" style={{ fontSize: 13 }}>
-            No shelf life options are available.
+      <Link to={`/?household_id=${householdId}`} className="text-link focus-ring" style={{ fontSize: 13 }}>‹ Your things</Link>
+      <div style={{ display: "flex", gap: 24, flexWrap: "wrap", marginTop: 8, alignItems: "flex-start" }}>
+        <div style={{ flex: "0 1 520px", width: "100%", maxWidth: 520, minWidth: 0 }}>
+          <div
+            data-testid="item-photo"
+            style={{
+              aspectRatio: "1 / 1",
+              width: "100%",
+              backgroundColor: "hsl(var(--tile))",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              overflow: "hidden",
+              borderRadius: 0,
+            }}
+          >
+            {fallbackPhoto ? (
+              <img
+                src={thumbUrl(fallbackPhoto.id, householdId)}
+                alt={fallbackPhoto.original_filename ? `Photo of ${displayName}` : `Photo of ${displayName}`}
+                style={{ width: "100%", height: "100%", objectFit: "contain", display: "block" }}
+              />
+            ) : (
+              <Package aria-hidden="true" size={48} className="text-muted-foreground" />
+            )}
           </div>
-        ) : (
-          <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
-            <select
-              aria-label="Shelf life"
-              value={effectiveCategory}
-              onChange={(event) => setClassificationChoice(event.target.value)}
-              className="bg-background text-foreground border-border focus-ring"
-              style={{ padding: 6, borderRadius: 0, borderStyle: "solid", borderWidth: 1, fontSize: 13, maxWidth: "100%" }}
-            >
-              {effectiveCategory === "" && <option value="">Select a shelf life…</option>}
-              {activeCategories.map((category) => (
-                <option key={category.id} value={category.id}>{category.name}</option>
-              ))}
-            </select>
-            <button
-              type="button"
-              onClick={saveClassification}
-              disabled={!effectiveCategory || classifyMut.isPending}
-              className="bg-primary text-primary-foreground focus-ring"
-              style={{ padding: "6px 12px", borderRadius: 0, border: "none", cursor: "pointer" }}
-            >
-              {classifyMut.isPending ? "Saving…" : "Save shelf life"}
-            </button>
-          </div>
-        )}
-        {!classificationAssertion && suggestedName && (
-          <div role="status" className="text-muted-foreground" style={{ fontSize: 13, marginTop: 6 }}>
-            The AI suggests {suggestedName}. Confirm below, or pick another shelf life.
-          </div>
-        )}
-        {!classificationAssertion && !suggestedName && proposedText && (
-          <div role="status" className="text-muted-foreground" style={{ fontSize: 13, marginTop: 6 }}>
-            The AI suggested “{proposedText}”, which matches no shelf life — pick the closest one below.
-          </div>
-        )}
-        {!classificationAssertion && (
-          <div role="status" className="text-muted-foreground" style={{ fontSize: 13, marginTop: 6 }}>
-            Choose a shelf life, then add a date if it has one.
-          </div>
-        )}
-        {effectiveCategory === "documents_other" && (
-          <div className="text-muted-foreground" style={{ fontSize: 13, marginTop: 6 }}>
-            Documents/other: renewal or validity dates. Keepsakes, letters and photos belong under Non-perishable.
-          </div>
-        )}
-        {effectiveCategory === "non_perishable" && (
-          <div className="text-muted-foreground" style={{ fontSize: 13, marginTop: 6 }}>
-            No date; no expiry reminder.
-          </div>
-        )}
-        {classificationMessage && (
-          <div role="status" className="text-success" style={{ fontSize: 13, marginTop: 6 }}>{classificationMessage}</div>
-        )}
-        {classificationError && (
-          <div role="alert" className="text-danger" style={{ fontSize: 13, marginTop: 6 }}>{classificationError}</div>
-        )}
-      </section>
-
-      <section aria-label="Amount left" style={{ marginBottom: 16 }}>
-        <h3>Amount left</h3>
-        {counted ? (
-          <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
-            <button
-              type="button"
-              aria-label="Take off 1"
-              onClick={() => decMut.mutate()}
-              disabled={decMut.isPending || isGone || (qtyValue ?? 0) <= 0}
-              className={THEMED_CONTROL_CLASS}
-              style={{ ...CONTROL_STYLE, opacity: decMut.isPending || isGone || (qtyValue ?? 0) <= 0 ? 0.5 : 1 }}
-            >
-              {decMut.isPending ? "…" : "−1"}
-            </button>
-            <span className="text-foreground" style={{ fontSize: 13 }}>
-              {quantityLeftText(qtyValue, asset.unit, counted)}
-            </span>
-            <button
-              type="button"
-              aria-label="Put 1 back on the count"
-              onClick={() => incMut.mutate()}
-              disabled={incMut.isPending || isGone}
-              className={THEMED_CONTROL_CLASS}
-              style={{ ...CONTROL_STYLE, opacity: incMut.isPending || isGone ? 0.5 : 1 }}
-            >
-              {incMut.isPending ? "…" : "+1"}
-            </button>
-          </div>
-        ) : (
-          <div className="text-muted-foreground" style={{ fontSize: 13 }}>
-            {quantityLeftText(qtyValue, asset.unit, counted)} — change the amount with Edit above.
-          </div>
-        )}
-        {noneLeft && (
-          <div role="status" className="text-muted-foreground" style={{ fontSize: 13, marginTop: 6 }}>
-            None left — mark it gone below.
-          </div>
-        )}
-        {qtyMessage && (
-          <div role="status" className="text-success" style={{ fontSize: 13, marginTop: 6 }}>{qtyMessage}</div>
-        )}
-        {qtyError && (
-          <div role="alert" className="text-danger" style={{ fontSize: 13, marginTop: 6 }}>{qtyError}</div>
-        )}
-      </section>
-
-      <section aria-label="Use it up" style={{ marginBottom: 16 }}>
-        <h3>Use it up</h3>
-        {isGone ? (
-          <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
-            <span role="status" className="text-muted-foreground" style={{ fontSize: 13 }}>
-              Gone{goneLabel ? ` — ${goneLabel.toLowerCase()}` : ""}
-            </span>
-            <button
-              type="button"
-              onClick={() => putBackMut.mutate()}
-              disabled={putBackMut.isPending}
-              className="bg-primary text-primary-foreground focus-ring"
-              style={{ padding: "6px 12px", borderRadius: 0, border: "none", cursor: "pointer" }}
-            >
-              {putBackMut.isPending ? "Putting back…" : "Put back"}
-            </button>
-          </div>
-        ) : (
-          <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
-            {(["used_up", "thrown_away", "given_away"] as GoneReason[]).map((reason) => (
-              <button
-                key={reason}
-                type="button"
-                onClick={() => goneMut.mutate(reason)}
-                disabled={goneMut.isPending}
-                className={THEMED_CONTROL_CLASS}
-                style={CONTROL_STYLE}
+          <div style={{ display: "flex", gap: 16, flexWrap: "wrap", marginTop: 8 }}>
+            {fallbackPhoto && (
+              <a
+                href={fileUrl(fallbackPhoto.id, householdId)}
+                target="_blank"
+                rel="noreferrer"
+                className="text-link focus-ring"
+                style={{ fontSize: 13 }}
               >
-                {goneReasonLabel(reason)}
-              </button>
-            ))}
+                Open full size
+              </a>
+            )}
+            <label className="text-link focus-ring" style={{ fontSize: 13, cursor: "pointer" }}>
+              {leftAttaching ? "Attaching…" : "Attach a photo"}
+              <input
+                type="file"
+                multiple
+                accept="image/*,.pdf"
+                disabled={leftAttaching}
+                onChange={(e) => void attachLeftFiles(e.target.files)}
+                style={{ position: "absolute", width: 1, height: 1, overflow: "hidden", clip: "rect(0 0 0 0)" }}
+              />
+            </label>
           </div>
-        )}
-        {goneMessage && (
-          <div role="status" className="text-success" style={{ fontSize: 13, marginTop: 6 }}>{goneMessage}</div>
-        )}
-        {goneError && (
-          <div role="alert" className="text-danger" style={{ fontSize: 13, marginTop: 6 }}>{goneError}</div>
-        )}
-      </section>
-
-      <LocationsSection asset={asset} householdId={householdId} />
-
-      <RelationsSection asset={asset} householdId={householdId} />
-
-      {editing && (
-        <div style={{ borderRadius: 0, padding: 12, marginBottom: 16, borderStyle: "solid", borderWidth: 1, borderColor: "hsl(var(--line))", backgroundColor: "hsl(var(--paper))" }}>
-          <div style={{ display: "grid", gridTemplateColumns: "110px 1fr", gap: 8, alignItems: "center" }}>
-            <label htmlFor="edit-display-name" style={{ fontSize: 13 }}>Display name</label>
-            <input id="edit-display-name" value={editName} onChange={(e) => setEditName(e.target.value)} className="bg-background text-foreground border-border focus-ring" style={{ padding: 8, borderRadius: 0, borderStyle: "solid", borderWidth: 1 }} />
-            <label htmlFor="edit-quantity" style={{ fontSize: 13 }}>Quantity</label>
-            <input id="edit-quantity" type="number" value={editQuantity} onChange={(e) => setEditQuantity(e.target.value)} className="bg-background text-foreground border-border focus-ring" style={{ padding: 8, borderRadius: 0, borderStyle: "solid", borderWidth: 1 }} />
-            <label htmlFor="edit-unit" style={{ fontSize: 13 }}>Unit</label>
-            <input id="edit-unit" value={editUnit} onChange={(e) => setEditUnit(e.target.value)} className="bg-background text-foreground border-border focus-ring" style={{ padding: 8, borderRadius: 0, borderStyle: "solid", borderWidth: 1 }} />
-            <label htmlFor="edit-condition" style={{ fontSize: 13 }}>Condition</label>
-            <input id="edit-condition" value={editCondition} onChange={(e) => setEditCondition(e.target.value)} className="bg-background text-foreground border-border focus-ring" style={{ padding: 8, borderRadius: 0, borderStyle: "solid", borderWidth: 1 }} />
+        </div>
+        <div style={{ flex: "1 1 320px", minWidth: 0 }}>
+          <h1 className="text-foreground" style={{ fontSize: 44, fontWeight: 600, margin: 0, minWidth: 0, overflowWrap: "anywhere" }}>{displayName}</h1>
+          <div data-testid="packs-muted" style={{ marginTop: 4, marginBottom: 13, fontSize: 13, color: "hsl(var(--ink-muted))" }}>
+            {mutedParts.join(" · ")}
           </div>
-          <div style={{ display: "flex", gap: 8, alignItems: "center", marginTop: 10 }}>
-            <button
-              onClick={() => {
-                const payload: Record<string, unknown> = { display_name: editName.trim() };
-                if (editQuantity.trim() !== "") payload.quantity = Number(editQuantity);
-                if (editUnit.trim() !== "") payload.unit = editUnit.trim();
-                if (editCondition.trim() !== "") payload.condition = editCondition.trim();
-                patchMut.mutate(payload);
+
+          <section aria-label="Packs">
+            {packsQuery.isLoading && (
+              <div className="text-muted-foreground" style={{ fontSize: 13 }}>Loading packs…</div>
+            )}
+            {packsQuery.isError && (
+              <div role="alert" className="text-danger" style={{ fontSize: 13 }}>
+                The packs would not load.
+              </div>
+            )}
+            {!packsQuery.isLoading && liveRows.map((row) => {
+              const detail = row.detail;
+              const expiry = (detail ? expiryDateFrom(detail.assertions) : null) ?? row.pack.expiry;
+              const line = packDateLine(expiry);
+              const qtyText = detail?.quantity != null ? String(detail.quantity) : "—";
+              const unitText = (detail?.unit ?? "").trim() || "—";
+              const amount = detailAmountText(qtyText, unitText);
+              const added = detail ? formatUseByDayMonth(detail.created_at) : "";
+              const amountParts = [
+                amount === "—" ? null : amount,
+                added ? `added ${added}` : null,
+              ].filter((part): part is string => !!part);
+              const isEditing = editingPackId === row.pack.id;
+              return (
+                <div
+                  key={row.pack.id}
+                  data-testid={`pack-row-${row.pack.id}`}
+                  style={{ padding: "12px 0", borderTop: "1px solid hsl(var(--line))" }}
+                >
+                  <div style={{ display: "flex", gap: 12, flexWrap: "wrap", alignItems: "center", justifyContent: "space-between" }}>
+                    <div
+                      data-testid="pack-date"
+                      className={line.past ? "bg-past text-past" : "text-foreground"}
+                      style={{
+                        fontWeight: 700,
+                        fontSize: 15,
+                        ...(line.past ? { padding: "2px 8px", borderRadius: 0 } : null),
+                      }}
+                    >
+                      {line.text}
+                    </div>
+                    <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+                      <button
+                        type="button"
+                        onClick={() => openEditor(row)}
+                        className={`${THEMED_CONTROL_CLASS} focus-ring`}
+                        style={{ ...CONTROL_STYLE, cursor: "pointer", minHeight: 44 }}
+                        aria-expanded={isEditing}
+                      >
+                        Edit
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() =>
+                          packGoneMut.mutate({ packId: row.pack.id, name: (detail?.display_name ?? row.pack.name) as string })
+                        }
+                        disabled={packGoneMut.isPending}
+                        className={`${THEMED_CONTROL_CLASS} focus-ring`}
+                        style={{ ...CONTROL_STYLE, cursor: "pointer", minHeight: 44 }}
+                      >
+                        Used up
+                      </button>
+                    </div>
+                  </div>
+                  {amountParts.length > 0 && (
+                    <div className="text-muted-foreground" style={{ fontSize: 13, marginTop: 4 }}>
+                      {amountParts.join(" · ")}
+                    </div>
+                  )}
+                  {isEditing && detail && (
+                    <PackEditor detail={detail} householdId={householdId} taxonomy={taxonomy} />
+                  )}
+                </div>
+              );
+            })}
+            {!packsQuery.isLoading && !packsQuery.isError && liveRows.length === 0 && (
+              <div style={{ padding: "12px 0", borderTop: "1px solid hsl(var(--line))", fontSize: 13 }}>
+                No live packs left for {displayName}.{" "}
+                <Link to={`/?household_id=${householdId}`} className="text-link focus-ring">
+                  Back to Your things
+                </Link>
+              </div>
+            )}
+          </section>
+
+          {notice && (
+            <div
+              data-testid="pack-notice"
+              role="status"
+              style={{
+                display: "flex",
+                flexWrap: "wrap",
+                alignItems: "center",
+                gap: 6,
+                padding: "12px 0",
+                fontSize: 13,
+                color: "hsl(var(--ink))",
               }}
-              disabled={patchMut.isPending || !editName.trim()}
-              className="bg-primary text-primary-foreground focus-ring"
-              style={{ padding: "6px 12px", borderRadius: 0, border: "none", cursor: "pointer" }}
             >
-              {patchMut.isPending ? "Saving..." : "Save"}
+              <span>{notice.name} used up · </span>
+              <button
+                type="button"
+                onClick={() => packUndoMut.mutate(notice.assetId)}
+                disabled={packUndoMut.isPending}
+                className="text-link focus-ring"
+                style={{ background: "none", border: "none", padding: 0, cursor: "pointer", fontSize: 13 }}
+              >
+                {packUndoMut.isPending ? "…" : "Undo"}
+              </button>
+            </div>
+          )}
+
+          <div style={{ marginTop: 12 }}>
+            <button
+              type="button"
+              onClick={() => addPackMut.mutate()}
+              disabled={addPackMut.isPending}
+              className="bg-primary text-primary-foreground focus-ring"
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 8,
+                padding: "6px 12px",
+                borderRadius: 0,
+                border: "none",
+                cursor: "pointer",
+                minHeight: 44,
+              }}
+            >
+              <Plus size={16} aria-hidden="true" /> {addPackMut.isPending ? "Adding…" : "Add another pack"}
             </button>
+            {addError && (
+              <div role="alert" className="text-danger" style={{ fontSize: 13, marginTop: 6 }}>{addError}</div>
+            )}
+          </div>
+
+          <dl style={{ marginTop: 16, fontSize: 13, display: "grid", gap: 4 }}>
+            {kindLabel && (
+              <div style={{ display: "flex", gap: 8 }}>
+                <dt className="text-muted-foreground">Kind of item</dt>
+                <dd style={{ margin: 0 }}>{kindLabel}</dd>
+              </div>
+            )}
+            {whereLabel && (
+              <div style={{ display: "flex", gap: 8 }}>
+                <dt className="text-muted-foreground">Where</dt>
+                <dd style={{ margin: 0 }}>{whereLabel}</dd>
+              </div>
+            )}
+            {brandLabel !== "—" && (
+              <div style={{ display: "flex", gap: 8 }}>
+                <dt className="text-muted-foreground">Brand</dt>
+                <dd style={{ margin: 0 }}>{brandLabel}</dd>
+              </div>
+            )}
+          </dl>
+
+          <div style={{ marginTop: 16 }}>
+            <button
+              type="button"
+              onClick={() => setHistoryOpen((v) => !v)}
+              aria-expanded={historyOpen}
+              className="text-link focus-ring"
+              style={{ background: "none", border: "none", padding: 0, cursor: "pointer", fontSize: 13, display: "inline-flex", alignItems: "center", gap: 4 }}
+            >
+              History ({audits.length} change{audits.length === 1 ? "" : "s"})
+              <ChevronDown size={16} aria-hidden="true" style={{ transform: historyOpen ? "rotate(180deg)" : undefined }} />
+            </button>
+            {historyOpen && (
+              <div style={{ marginTop: 8 }}>
+                {audits.length === 0 ? (
+                  <div style={{ fontSize: 13, color: "hsl(var(--ink-muted))" }}>No history</div>
+                ) : (
+                  <ul style={{ fontSize: 13, paddingLeft: 18, margin: 0 }}>
+                    {audits.map((e) => (
+                      <li key={e.id} style={{ marginBottom: 4 }}>
+                        {plainActionLabel(e.action)} — {formatJobDate(e.timestamp) || "—"}
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+            )}
+          </div>
+
+          <div style={{ marginTop: 16 }}>
+            <button
+              type="button"
+              onClick={() => setMoreOpen((v) => !v)}
+              aria-expanded={moreOpen}
+              className="text-link focus-ring"
+              style={{ background: "none", border: "none", padding: 0, cursor: "pointer", fontSize: 13, display: "inline-flex", alignItems: "center", gap: 4 }}
+            >
+              More about this item
+              <ChevronDown size={16} aria-hidden="true" style={{ transform: moreOpen ? "rotate(180deg)" : undefined }} />
+            </button>
+            {moreOpen && (
+              <div style={{ marginTop: 8 }}>
+                <section style={{ marginBottom: 16 }}>
+                  <h3>Shelf life</h3>
+                  {activeCategories.length === 0 ? (
+                    <div className="text-muted-foreground" style={{ fontSize: 13 }}>
+                      No shelf life options are available.
+                    </div>
+                  ) : (
+                    <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
+                      <select
+                        aria-label="Shelf life"
+                        value={effectiveCategory}
+                        onChange={(event) => setClassificationChoice(event.target.value)}
+                        className="bg-background text-foreground border-border focus-ring"
+                        style={{ padding: 6, borderRadius: 0, borderStyle: "solid", borderWidth: 1, fontSize: 13, maxWidth: "100%" }}
+                      >
+                        {effectiveCategory === "" && <option value="">Select a shelf life…</option>}
+                        {activeCategories.map((category) => (
+                          <option key={category.id} value={category.id}>{category.name}</option>
+                        ))}
+                      </select>
+                      <button
+                        type="button"
+                        onClick={saveClassification}
+                        disabled={!effectiveCategory || classifyMut.isPending}
+                        className="bg-primary text-primary-foreground focus-ring"
+                        style={{ padding: "6px 12px", borderRadius: 0, border: "none", cursor: "pointer" }}
+                      >
+                        {classifyMut.isPending ? "Saving…" : "Save shelf life"}
+                      </button>
+                    </div>
+                  )}
+                  {!classificationAssertion && suggestedName && (
+                    <div role="status" className="text-muted-foreground" style={{ fontSize: 13, marginTop: 6 }}>
+                      The AI suggests {suggestedName}. Confirm below, or pick another shelf life.
+                    </div>
+                  )}
+                  {!classificationAssertion && !suggestedName && proposedText && (
+                    <div role="status" className="text-muted-foreground" style={{ fontSize: 13, marginTop: 6 }}>
+                      The AI suggested “{proposedText}”, which matches no shelf life — pick the closest one below.
+                    </div>
+                  )}
+                  {!classificationAssertion && (
+                    <div role="status" className="text-muted-foreground" style={{ fontSize: 13, marginTop: 6 }}>
+                      Choose a shelf life, then add a date if it has one.
+                    </div>
+                  )}
+                  {effectiveCategory === "documents_other" && (
+                    <div className="text-muted-foreground" style={{ fontSize: 13, marginTop: 6 }}>
+                      Documents/other: renewal or validity dates. Keepsakes, letters and photos belong under Non-perishable.
+                    </div>
+                  )}
+                  {effectiveCategory === "non_perishable" && (
+                    <div className="text-muted-foreground" style={{ fontSize: 13, marginTop: 6 }}>
+                      No date; no expiry reminder.
+                    </div>
+                  )}
+                  {classificationMessage && (
+                    <div role="status" className="text-success" style={{ fontSize: 13, marginTop: 6 }}>{classificationMessage}</div>
+                  )}
+                  {classificationError && (
+                    <div role="alert" className="text-danger" style={{ fontSize: 13, marginTop: 6 }}>{classificationError}</div>
+                  )}
+                </section>
+
+                <section aria-label="Amount left" style={{ marginBottom: 16 }}>
+                  <h3>Amount left</h3>
+                  {counted ? (
+                    <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
+                      <button
+                        type="button"
+                        aria-label="Take off 1"
+                        onClick={() => decMut.mutate()}
+                        disabled={decMut.isPending || isGone || (qtyValue ?? 0) <= 0}
+                        className={THEMED_CONTROL_CLASS}
+                        style={{ ...CONTROL_STYLE, opacity: decMut.isPending || isGone || (qtyValue ?? 0) <= 0 ? 0.5 : 1 }}
+                      >
+                        {decMut.isPending ? "…" : "−1"}
+                      </button>
+                      <span className="text-foreground" style={{ fontSize: 13 }}>
+                        {quantityLeftText(qtyValue, asset.unit, counted)}
+                      </span>
+                      <button
+                        type="button"
+                        aria-label="Put 1 back on the count"
+                        onClick={() => incMut.mutate()}
+                        disabled={incMut.isPending || isGone}
+                        className={THEMED_CONTROL_CLASS}
+                        style={{ ...CONTROL_STYLE, opacity: incMut.isPending || isGone ? 0.5 : 1 }}
+                      >
+                        {incMut.isPending ? "…" : "+1"}
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="text-muted-foreground" style={{ fontSize: 13 }}>
+                      {quantityLeftText(qtyValue, asset.unit, counted)} — change the amount with Edit above.
+                    </div>
+                  )}
+                  {noneLeft && (
+                    <div role="status" className="text-muted-foreground" style={{ fontSize: 13, marginTop: 6 }}>
+                      None left — mark it gone below.
+                    </div>
+                  )}
+                  {qtyMessage && (
+                    <div role="status" className="text-success" style={{ fontSize: 13, marginTop: 6 }}>{qtyMessage}</div>
+                  )}
+                  {qtyError && (
+                    <div role="alert" className="text-danger" style={{ fontSize: 13, marginTop: 6 }}>{qtyError}</div>
+                  )}
+                </section>
+
+                <section aria-label="Use it up" style={{ marginBottom: 16 }}>
+                  <h3>Use it up</h3>
+                  {isGone ? (
+                    <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
+                      <span role="status" className="text-muted-foreground" style={{ fontSize: 13 }}>
+                        Gone{goneLabel ? ` — ${goneLabel.toLowerCase()}` : ""}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => putBackMut.mutate()}
+                        disabled={putBackMut.isPending}
+                        className="bg-primary text-primary-foreground focus-ring"
+                        style={{ padding: "6px 12px", borderRadius: 0, border: "none", cursor: "pointer" }}
+                      >
+                        {putBackMut.isPending ? "Putting back…" : "Put back"}
+                      </button>
+                    </div>
+                  ) : (
+                    <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
+                      {(["used_up", "thrown_away", "given_away"] as GoneReason[]).map((reason) => (
+                        <button
+                          key={reason}
+                          type="button"
+                          onClick={() => goneMut.mutate(reason)}
+                          disabled={goneMut.isPending}
+                          className={THEMED_CONTROL_CLASS}
+                          style={CONTROL_STYLE}
+                        >
+                          {goneReasonLabel(reason)}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                  {goneMessage && (
+                    <div role="status" className="text-success" style={{ fontSize: 13, marginTop: 6 }}>{goneMessage}</div>
+                  )}
+                  {goneError && (
+                    <div role="alert" className="text-danger" style={{ fontSize: 13, marginTop: 6 }}>{goneError}</div>
+                  )}
+                </section>
+
+                <LocationsSection asset={asset} householdId={householdId} />
+
+                <RelationsSection asset={asset} householdId={householdId} />
+
+                <section style={{ marginBottom: 16 }}>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setEditName(asset.display_name ?? "");
+                      setEditQuantity(asset.quantity != null ? String(asset.quantity) : "");
+                      setEditUnit(asset.unit ?? "");
+                      setEditCondition(asset.condition ?? "");
+                      setEditing((v) => !v);
+                    }}
+                    className={`${THEMED_CONTROL_CLASS} focus-ring`}
+                    style={{ ...CONTROL_STYLE, cursor: "pointer" }}
+                    aria-expanded={editing}
+                  >
+                    {editing ? "Cancel" : "Edit name and amount"}
+                  </button>
+                  {editing && (
+                    <div style={{ borderRadius: 0, padding: 12, marginTop: 8, marginBottom: 16, borderStyle: "solid", borderWidth: 1, borderColor: "hsl(var(--line))", backgroundColor: "hsl(var(--paper))" }}>
+                      <div style={{ display: "grid", gridTemplateColumns: "110px 1fr", gap: 8, alignItems: "center" }}>
+                        <label htmlFor="edit-display-name" style={{ fontSize: 13 }}>Display name</label>
+                        <input id="edit-display-name" value={editName} onChange={(e) => setEditName(e.target.value)} className="bg-background text-foreground border-border focus-ring" style={{ padding: 8, borderRadius: 0, borderStyle: "solid", borderWidth: 1 }} />
+                        <label htmlFor="edit-quantity" style={{ fontSize: 13 }}>Quantity</label>
+                        <input id="edit-quantity" type="number" value={editQuantity} onChange={(e) => setEditQuantity(e.target.value)} className="bg-background text-foreground border-border focus-ring" style={{ padding: 8, borderRadius: 0, borderStyle: "solid", borderWidth: 1 }} />
+                        <label htmlFor="edit-unit" style={{ fontSize: 13 }}>Unit</label>
+                        <input id="edit-unit" value={editUnit} onChange={(e) => setEditUnit(e.target.value)} className="bg-background text-foreground border-border focus-ring" style={{ padding: 8, borderRadius: 0, borderStyle: "solid", borderWidth: 1 }} />
+                        <label htmlFor="edit-condition" style={{ fontSize: 13 }}>Condition</label>
+                        <input id="edit-condition" value={editCondition} onChange={(e) => setEditCondition(e.target.value)} className="bg-background text-foreground border-border focus-ring" style={{ padding: 8, borderRadius: 0, borderStyle: "solid", borderWidth: 1 }} />
+                      </div>
+                      <div style={{ display: "flex", gap: 8, alignItems: "center", marginTop: 10 }}>
+                        <button
+                          onClick={() => {
+                            const payload: Record<string, unknown> = { display_name: editName.trim() };
+                            if (editQuantity.trim() !== "") payload.quantity = Number(editQuantity);
+                            if (editUnit.trim() !== "") payload.unit = editUnit.trim();
+                            if (editCondition.trim() !== "") payload.condition = editCondition.trim();
+                            patchMut.mutate(payload);
+                          }}
+                          disabled={patchMut.isPending || !editName.trim()}
+                          className="bg-primary text-primary-foreground focus-ring"
+                          style={{ padding: "6px 12px", borderRadius: 0, border: "none", cursor: "pointer" }}
+                        >
+                          {patchMut.isPending ? "Saving..." : "Save"}
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </section>
+
+                <section style={{ marginBottom: 16 }}>
+                  <div style={{ marginBottom: 16 }}>
+                    <EnrichButton lastSpendUsd={null} onRun={() => enrichMut.mutate()} />
+                  </div>
+                  <WebAlternates alternates={enrichMut.data?.web_alternates ?? []} />
+                </section>
+
+                {error && <div className="text-danger" style={{ fontSize: 13, marginBottom: 12 }}>{error}</div>}
+
+                {hasWindows && hasActiveDate && expiryAssertion?.review_state === "accepted" && (
+                  <div className="text-muted-foreground" style={{ fontSize: 13, marginTop: 8 }}>
+                    The date is kept when the category changes; check it still applies.
+                  </div>
+                )}
+
+                <h3 className="detail-heading">Evidence</h3>
+                <EvidenceGallery evidence={evidence} householdId={householdId} />
+                <div style={{ marginTop: 12, display: "flex", flexWrap: "wrap", gap: 8, alignItems: "center" }}>
+                  <input id="attach-input" type="file" multiple accept="image/*,.pdf" onChange={(e) => setAttachFiles(e.target.files)} />
+                  <button
+                    onClick={() => attachMut.mutate()}
+                    disabled={attachMut.isPending || !attachFiles?.length}
+                    className={`${attachFiles?.length ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"} border-border focus-ring`}
+                    style={{ padding: "6px 12px", borderRadius: 0, borderStyle: "solid", borderWidth: 1, cursor: "pointer" }}
+                  >
+                    {attachMut.isPending ? "Attaching..." : "Attach evidence"}
+                  </button>
+                </div>
+
+                <h3 className="detail-heading">Details</h3>
+                {assertions.length === 0 ? (
+                  <div style={{ fontSize: 13, color: "hsl(var(--ink-muted))" }}>No details</div>
+                ) : (
+                  <table className="detail-table" style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
+                    <thead>
+                      <tr>
+                        <th className="border-border" style={{ textAlign: "left", borderBottomStyle: "solid", borderBottomWidth: 1, padding: 6 }}>Detail</th>
+                        <th className="border-border" style={{ textAlign: "left", borderBottomStyle: "solid", borderBottomWidth: 1, padding: 6 }}>Value</th>
+                        <th className="border-border" style={{ textAlign: "left", borderBottomStyle: "solid", borderBottomWidth: 1, padding: 6 }}>Source</th>
+                        <th className="border-border" style={{ textAlign: "left", borderBottomStyle: "solid", borderBottomWidth: 1, padding: 6 }}>State</th>
+                        <th className="border-border" style={{ textAlign: "left", borderBottomStyle: "solid", borderBottomWidth: 1, padding: 6 }}>Confidence</th>
+                        <th className="border-border" style={{ textAlign: "left", borderBottomStyle: "solid", borderBottomWidth: 1, padding: 6 }}>Evidence</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {detailVisible
+                        .filter((a) => {
+                          if (plainFieldLabel(a.field_path) !== "Unit") return true;
+                          return detailCombined === null;
+                        })
+                        .map((a) => {
+                          const label = plainFieldLabel(a.field_path);
+                          const value =
+                            label === "Amount" && detailCombined !== null && detailQtyRow && a.id === detailQtyRow.id
+                              ? detailCombined
+                              : plainDetailValue(a.field_path, a.value);
+                          return (
+                            <tr key={a.id}>
+                              <td className="border-border" style={{ padding: 6, borderBottomStyle: "solid", borderBottomWidth: 1, fontSize: 13 }}>{label}</td>
+                              <td className="border-border" style={{ padding: 6, borderBottomStyle: "solid", borderBottomWidth: 1 }}>{value}</td>
+                              <td className="border-border" style={{ padding: 6, borderBottomStyle: "solid", borderBottomWidth: 1 }}>{plainSourceLabel(a.source_type)}</td>
+                              <td className="border-border" style={{ padding: 6, borderBottomStyle: "solid", borderBottomWidth: 1 }}>
+                                <ProvenanceBadge state={a.review_state} />
+                              </td>
+                              <td className="border-border" style={{ padding: 6, borderBottomStyle: "solid", borderBottomWidth: 1 }}>{a.confidence != null ? String(a.confidence) : "—"}</td>
+                              <td className="border-border" style={{ padding: 6, borderBottomStyle: "solid", borderBottomWidth: 1, fontSize: 13, color: "hsl(var(--ink-muted))" }}>
+                                {a.source_evidence_ids?.length ? `${a.source_evidence_ids.length} attached` : "—"}
+                              </td>
+                            </tr>
+                          );
+                        })}
+                    </tbody>
+                  </table>
+                )}
+              </div>
+            )}
           </div>
         </div>
-      )}
-
-      {error && <div className="text-danger" style={{ fontSize: 13, marginBottom: 12 }}>{error}</div>}
-
-      {hasWindows && hasActiveDate && expiryAssertion?.review_state === "accepted" && (
-        <div className="text-muted-foreground" style={{ fontSize: 13, marginTop: 8 }}>
-          The date is kept when the category changes; check it still applies.
-        </div>
-      )}
-
-      {classificationAssertion && hasWindows && (
-        <ExpiryEntryForm
-          key={expiryAssertion?.id ?? "no-expiry"}
-          assetId={asset.id}
-          householdId={householdId}
-          evidenceIds={evidence.map((item) => item.id)}
-          activeAssertion={expiryAssertion}
-          categorySlug={currentCategory}
-          hasWindows={hasWindows}
-        />
-      )}
-
-      <h3 className="detail-heading">Evidence</h3>
-      <EvidenceGallery evidence={evidence} householdId={householdId} />
-      <div style={{ marginTop: 12, display: "flex", flexWrap: "wrap", gap: 8, alignItems: "center" }}>
-        <input id="attach-input" type="file" multiple accept="image/*,.pdf" onChange={(e) => setAttachFiles(e.target.files)} />
-        <button
-          onClick={() => attachMut.mutate()}
-          disabled={attachMut.isPending || !attachFiles?.length}
-          className={`${attachFiles?.length ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"} border-border focus-ring`}
-          style={{ padding: "6px 12px", borderRadius: 0, borderStyle: "solid", borderWidth: 1, cursor: "pointer" }}
-        >
-          {attachMut.isPending ? "Attaching..." : "Attach evidence"}
-        </button>
       </div>
-
-      <h3 className="detail-heading">Details</h3>
-      {assertions.length === 0 ? (
-        <div style={{ fontSize: 13, color: "hsl(var(--ink-muted))" }}>No details</div>
-      ) : (
-        <table className="detail-table" style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
-          <thead>
-            <tr>
-              <th className="border-border" style={{ textAlign: "left", borderBottomStyle: "solid", borderBottomWidth: 1, padding: 6 }}>Detail</th>
-              <th className="border-border" style={{ textAlign: "left", borderBottomStyle: "solid", borderBottomWidth: 1, padding: 6 }}>Value</th>
-              <th className="border-border" style={{ textAlign: "left", borderBottomStyle: "solid", borderBottomWidth: 1, padding: 6 }}>Source</th>
-              <th className="border-border" style={{ textAlign: "left", borderBottomStyle: "solid", borderBottomWidth: 1, padding: 6 }}>State</th>
-              <th className="border-border" style={{ textAlign: "left", borderBottomStyle: "solid", borderBottomWidth: 1, padding: 6 }}>Confidence</th>
-              <th className="border-border" style={{ textAlign: "left", borderBottomStyle: "solid", borderBottomWidth: 1, padding: 6 }}>Evidence</th>
-            </tr>
-          </thead>
-          <tbody>
-            {detailVisible
-              .filter((a) => {
-                if (plainFieldLabel(a.field_path) !== "Unit") return true;
-                return detailCombined === null;
-              })
-              .map((a) => {
-                const label = plainFieldLabel(a.field_path);
-                const value =
-                  label === "Amount" && detailCombined !== null && detailQtyRow && a.id === detailQtyRow.id
-                    ? detailCombined
-                    : plainDetailValue(a.field_path, a.value);
-                return (
-              <tr key={a.id}>
-                <td className="border-border" style={{ padding: 6, borderBottomStyle: "solid", borderBottomWidth: 1, fontSize: 13 }}>{label}</td>
-                <td className="border-border" style={{ padding: 6, borderBottomStyle: "solid", borderBottomWidth: 1 }}>{value}</td>
-                <td className="border-border" style={{ padding: 6, borderBottomStyle: "solid", borderBottomWidth: 1 }}>{plainSourceLabel(a.source_type)}</td>
-                <td className="border-border" style={{ padding: 6, borderBottomStyle: "solid", borderBottomWidth: 1 }}>
-                  <ProvenanceBadge state={a.review_state} />
-                </td>
-                <td className="border-border" style={{ padding: 6, borderBottomStyle: "solid", borderBottomWidth: 1 }}>{a.confidence != null ? String(a.confidence) : "—"}</td>
-                <td className="border-border" style={{ padding: 6, borderBottomStyle: "solid", borderBottomWidth: 1, fontSize: 13, color: "hsl(var(--ink-muted))" }}>
-                  {a.source_evidence_ids?.length ? `${a.source_evidence_ids.length} attached` : "—"}
-                </td>
-              </tr>
-                );
-              })}
-          </tbody>
-        </table>
-      )}
-
-      <h3 className="detail-heading">History</h3>
-      {audits.length === 0 ? (
-        <div style={{ fontSize: 13, color: "hsl(var(--ink-muted))" }}>No history</div>
-      ) : (
-        <ul style={{ fontSize: 13, paddingLeft: 18 }}>
-          {audits.map((e) => (
-            <li key={e.id} style={{ marginBottom: 4 }}>
-              {plainActionLabel(e.action)} — {formatJobDate(e.timestamp) || "—"}
-            </li>
-          ))}
-        </ul>
-      )}
     </PageContainer>
   );
 }
