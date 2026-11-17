@@ -224,3 +224,9 @@ Read as: **mockup feedback** — keep the desktop layout and Instrument Sans; re
 **2026-11-16, verbatim:** *"Lets use Midnight."*
 
 Read as: **D41** — the app's palette becomes the mockup's *Midnight* (light: ground `#F3F2EF`, ink `#191B22`, muted `#5F626B`, line `#DADBDF`, main action `#1F2A44`; dark: ground `#121419`, ink `#E8EAF0`, muted `#A2A6B1`, line `#272B34`, main action `#B9C7E8`; soft red only for past dates, soft amber only for this week). It replaces the D18 maroon-on-paper colours; Instrument Sans and square corners stay. The redesign build follows the mockup (https://claude.ai/artifact/BswTM1Tj1LHdgcibTPeLTh): catalog first.
+
+**2026-11-17, verbatim:** *"D42 yes, D43 later"*
+
+Read as: **D42** — adopt contract 0.62.0 and 0.63.0 **except 0.62.0's Coder roster rotation**: every builder slice stays on `opencode-go/muse-spark-1.3-contributor` xhigh (owner, 2026-11-16 and 2026-11-17: *"All builder slices on Muse xhigh."*); second opinion moves to `openai/gpt-6.2-sol` medium (0.63.0); the Launcher desk is asked to record the Muse-only choice. Adopted at the first boundary with no dispatch in flight.
+
+Read as: **D43** — no Tailwind or shadcn now; the component-library question returns when menus, dialogs and the item panel are rebuilt. SG-336 (item page) is built in the current tokens.
