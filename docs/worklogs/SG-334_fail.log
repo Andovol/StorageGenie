@@ -1,0 +1,520 @@
+
+ RUN  v1.6.1 /home/andrei/StorageGenie/frontend
+
+stderr | src/sg334-add-item-nav.sg334.test.tsx > SG-334 non-catalog nav Add item > the shared nav carries Add item in catalog-header colours and opens the import dialog
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+ ❯ src/sg334-add-item-nav.sg334.test.tsx  (1 test | 1 failed) 1082ms
+   ❯ src/sg334-add-item-nav.sg334.test.tsx > SG-334 non-catalog nav Add item > the shared nav carries Add item in catalog-header colours and opens the import dialog
+     → Unable to find role="link" and name "Add item"
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<div[39m
+      [33mclass[39m=[32m"text-foreground"[39m
+      [33mstyle[39m=[32m"min-height: 100vh; background-color: hsl(var(--paper));"[39m
+    [36m>[39m
+      [36m<nav[39m
+        [33mclass[39m=[32m"sg-nav"[39m
+        [33mdata-testid[39m=[32m"sg-nav"[39m
+        [33mstyle[39m=[32m"display: flex; flex-wrap: wrap; gap: 8px; padding: 12px 24px; border-bottom-style: solid; border-bottom-width: 1px; border-bottom-color: hsl(var(--line)); background-color: hsl(var(--paper)); color: hsl(var(--ink)); align-items: center;"[39m
+      [36m>[39m
+        [36m<a[39m
+          [33mclass[39m=[32m"focus-ring"[39m
+          [33mhref[39m=[32m"/"[39m
+          [33mstyle[39m=[32m"font-weight: 700; text-decoration: none; margin-right: 16px; color: hsl(var(--ink)); font-size: 20px;"[39m
+        [36m>[39m
+          [0mStorageGenie[0m
+        [36m</a>[39m
+        [36m<button[39m
+          [33maria-controls[39m=[32m"sg-nav-menu"[39m
+          [33maria-expanded[39m=[32m"false"[39m
+          [33mclass[39m=[32m"focus-ring nav-menu-toggle"[39m
+          [33mstyle[39m=[32m"padding: 6px 10px; border-radius: 0; border-style: solid; border-width: 1px; border-color: hsl(var(--line)); background-color: hsl(var(--paper)); color: hsl(var(--ink)); font-size: 13px; cursor: pointer;"[39m
+          [33mtype[39m=[32m"button"[39m
+        [36m>[39m
+          [0mMenu[0m
+        [36m</button>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"nav-menu"[39m
+          [33mdata-open[39m=[32m"false"[39m
+          [33mid[39m=[32m"sg-nav-menu"[39m
+        [36m>[39m
+          [36m<a[39m
+            [33mclass[39m=[32m" focus-ring"[39m
+            [33mhref[39m=[32m"/"[39m
+            [33mstyle[39m=[32m"padding: 6px 10px; border-radius: 0; text-decoration: none; text-underline-offset: 3px; font-size: 13px; font-weight: 400; background-color: transparent; color: hsl(var(--ink)); border: 1px solid transparent;"[39m
+          [36m>[39m
+            [0mCatalog[0m
+          [36m</a>[39m
+          [36m<a[39m
+            [33mclass[39m=[32m" focus-ring"[39m
+            [33mhref[39m=[32m"/pantry"[39m
+            [33mstyle[39m=[32m"padding: 6px 10px; border-radius: 0; text-decoration: none; text-underline-offset: 3px; font-size: 13px; font-weight: 400; background-color: transparent; color: hsl(var(--ink)); border: 1px solid transparent;"[39m
+          [36m>[39m
+            [0mPantry[0m
+          [36m</a>[39m
+          [36m<a[39m
+            [33maria-current[39m=[32m"page"[39m
+            [33mclass[39m=[32m"bg-primary text-primary-foreground focus-ring"[39m
+            [33mhref[39m=[32m"/capture"[39m
+            [33mstyle[39m=[32m"padding: 6px 10px; border-radius: 0; text-decoration: underline; text-underline-offset: 3px; font-size: 13px; font-weight: 600; background-color: hsl(var(--ink)); color: hsl(var(--paper));"[39m
+          [36m>[39m
+            [0mCapture[0m
+          [36m</a>[39m
+          [36m<a[39m
+            [33mclass[39m=[32m" focus-ring"[39m
+            [33mhref[39m=[32m"/inbox"[39m
+            [33mstyle[39m=[32m"padding: 6px 10px; border-radius: 0; text-decoration: none; text-underline-offset: 3px; font-size: 13px; font-weight: 400; background-color: transparent; color: hsl(var(--ink)); border: 1px solid transparent;"[39m
+          [36m>[39m
+            [0mInbox[0m
+          [36m</a>[39m
+          [36m<a[39m
+            [33mclass[39m=[32m" focus-ring"[39m
+            [33mhref[39m=[32m"/planning"[39m
+            [33mstyle[39m=[32m"padding: 6px 10px; border-radius: 0; text-decoration: none; text-underline-offset: 3px; font-size: 13px; font-weight: 400; background-color: transparent; color: hsl(var(--ink)); border: 1px solid transparent;"[39m
+          [36m>[39m
+            [0mPlanning[0m
+          [36m</a>[39m
+          [36m<a[39m
+            [33mclass[39m=[32m" focus-ring"[39m
+            [33mhref[39m=[32m"/chat"[39m
+            [33mstyle[39m=[32m"padding: 6px 10px; border-radius: 0; text-decoration: none; text-underline-offset: 3px; font-size: 13px; font-weight: 400; background-color: transparent; color: hsl(var(--ink)); border: 1px solid transparent;"[39m
+          [36m>[39m
+            [0mChat[0m
+          [36m</a>[39m
+          [36m<a[39m
+            [33mclass[39m=[32m" focus-ring"[39m
+            [33mhref[39m=[32m"/analytics"[39m
+            [33mstyle[39m=[32m"padding: 6px 10px; border-radius: 0; text-decoration: none; text-underline-offset: 3px; font-size: 13px; font-weight: 400; background-color: transparent; color: hsl(var(--ink)); border: 1px solid transparent;"[39m
+          [36m>[39m
+            [0mAnalytics[0m
+          [36m</a>[39m
+          [36m<a[39m
+            [33mclass[39m=[32m" focus-ring"[39m
+            [33mhref[39m=[32m"/expiry"[39m
+            [33mstyle[39m=[32m"padding: 6px 10px; border-radius: 0; text-decoration: none; text-underline-offset: 3px; font-size: 13px; font-weight: 400; background-color: transparent; color: hsl(var(--ink)); border: 1px solid transparent;"[39m
+          [36m>[39m
+            [0mExpiry[0m
+          [36m</a>[39m
+          [36m<a[39m
+            [33mclass[39m=[32m" focus-ring"[39m
+            [33mhref[39m=[32m"/settings"[39m
+            [33mstyle[39m=[32m"padding: 6px 10px; border-radius: 0; text-decoration: none; text-underline-offset: 3px; font-size: 13px; font-weight: 400; background-color: transparent; color: hsl(var(--ink)); border: 1px solid transparent;"[39m
+          [36m>[39m
+            [0mSettings[0m
+          [36m</a>[39m
+        [36m</div>[39m
+        [36m<button[39m
+          [33maria-label[39m=[32m"Switch to dark theme"[39m
+          [33mclass[39m=[32m"sg-paper-control focus-ring"[39m
+          [33mdata-testid[39m=[32m"theme-toggle"[39m
+          [33mstyle[39m=[32m"display: inline-flex; align-items: center; justify-content: center; padding: 6px; border-radius: 0; cursor: pointer;"[39m
+          [33mtitle[39m=[32m"Switch to dark theme"[39m
+          [33mtype[39m=[32m"button"[39m
+        [36m>[39m
+          [36m<svg[39m
+            [33maria-hidden[39m=[32m"true"[39m
+            [33mclass[39m=[32m"lucide lucide-moon"[39m
+            [33mfill[39m=[32m"none"[39m
+            [33mheight[39m=[32m"18"[39m
+            [33mstroke[39m=[32m"currentColor"[39m
+            [33mstroke-linecap[39m=[32m"round"[39m
+            [33mstroke-linejoin[39m=[32m"round"[39m
+            [33mstroke-width[39m=[32m"2"[39m
+            [33mviewBox[39m=[32m"0 0 24 24"[39m
+            [33mwidth[39m=[32m"18"[39m
+            [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+          [36m>[39m
+            [36m<path[39m
+              [33md[39m=[32m"M20.985 12.486a9 9 0 1 1-9.473-9.472c.405-.022....
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<div[39m
+      [33mclass[39m=[32m"text-foreground"[39m
+      [33mstyle[39m=[32m"min-height: 100vh; background-color: hsl(var(--paper));"[39m
+    [36m>[39m
+      [36m<nav[39m
+        [33mclass[39m=[32m"sg-nav"[39m
+        [33mdata-testid[39m=[32m"sg-nav"[39m
+        [33mstyle[39m=[32m"display: flex; flex-wrap: wrap; gap: 8px; padding: 12px 24px; border-bottom-style: solid; border-bottom-width: 1px; border-bottom-color: hsl(var(--line)); background-color: hsl(var(--paper)); color: hsl(var(--ink)); align-items: center;"[39m
+      [36m>[39m
+        [36m<a[39m
+          [33mclass[39m=[32m"focus-ring"[39m
+          [33mhref[39m=[32m"/"[39m
+          [33mstyle[39m=[32m"font-weight: 700; text-decoration: none; margin-right: 16px; color: hsl(var(--ink)); font-size: 20px;"[39m
+        [36m>[39m
+          [0mStorageGenie[0m
+        [36m</a>[39m
+        [36m<button[39m
+          [33maria-controls[39m=[32m"sg-nav-menu"[39m
+          [33maria-expanded[39m=[32m"false"[39m
+          [33mclass[39m=[32m"focus-ring nav-menu-toggle"[39m
+          [33mstyle[39m=[32m"padding: 6px 10px; border-radius: 0; border-style: solid; border-width: 1px; border-color: hsl(var(--line)); background-color: hsl(var(--paper)); color: hsl(var(--ink)); font-size: 13px; cursor: pointer;"[39m
+          [33mtype[39m=[32m"button"[39m
+        [36m>[39m
+          [0mMenu[0m
+        [36m</button>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"nav-menu"[39m
+          [33mdata-open[39m=[32m"false"[39m
+          [33mid[39m=[32m"sg-nav-menu"[39m
+        [36m>[39m
+          [36m<a[39m
+            [33mclass[39m=[32m" focus-ring"[39m
+            [33mhref[39m=[32m"/"[39m
+            [33mstyle[39m=[32m"padding: 6px 10px; border-radius: 0; text-decoration: none; text-underline-offset: 3px; font-size: 13px; font-weight: 400; background-color: transparent; color: hsl(var(--ink)); border: 1px solid transparent;"[39m
+          [36m>[39m
+            [0mCatalog[0m
+          [36m</a>[39m
+          [36m<a[39m
+            [33mclass[39m=[32m" focus-ring"[39m
+            [33mhref[39m=[32m"/pantry"[39m
+            [33mstyle[39m=[32m"padding: 6px 10px; border-radius: 0; text-decoration: none; text-underline-offset: 3px; font-size: 13px; font-weight: 400; background-color: transparent; color: hsl(var(--ink)); border: 1px solid transparent;"[39m
+          [36m>[39m
+            [0mPantry[0m
+          [36m</a>[39m
+          [36m<a[39m
+            [33maria-current[39m=[32m"page"[39m
+            [33mclass[39m=[32m"bg-primary text-primary-foreground focus-ring"[39m
+            [33mhref[39m=[32m"/capture"[39m
+            [33mstyle[39m=[32m"padding: 6px 10px; border-radius: 0; text-decoration: underline; text-underline-offset: 3px; font-size: 13px; font-weight: 600; background-color: hsl(var(--ink)); color: hsl(var(--paper));"[39m
+          [36m>[39m
+            [0mCapture[0m
+          [36m</a>[39m
+          [36m<a[39m
+            [33mclass[39m=[32m" focus-ring"[39m
+            [33mhref[39m=[32m"/inbox"[39m
+            [33mstyle[39m=[32m"padding: 6px 10px; border-radius: 0; text-decoration: none; text-underline-offset: 3px; font-size: 13px; font-weight: 400; background-color: transparent; color: hsl(var(--ink)); border: 1px solid transparent;"[39m
+          [36m>[39m
+            [0mInbox[0m
+          [36m</a>[39m
+          [36m<a[39m
+            [33mclass[39m=[32m" focus-ring"[39m
+            [33mhref[39m=[32m"/planning"[39m
+            [33mstyle[39m=[32m"padding: 6px 10px; border-radius: 0; text-decoration: none; text-underline-offset: 3px; font-size: 13px; font-weight: 400; background-color: transparent; color: hsl(var(--ink)); border: 1px solid transparent;"[39m
+          [36m>[39m
+            [0mPlanning[0m
+          [36m</a>[39m
+          [36m<a[39m
+            [33mclass[39m=[32m" focus-ring"[39m
+            [33mhref[39m=[32m"/chat"[39m
+            [33mstyle[39m=[32m"padding: 6px 10px; border-radius: 0; text-decoration: none; text-underline-offset: 3px; font-size: 13px; font-weight: 400; background-color: transparent; color: hsl(var(--ink)); border: 1px solid transparent;"[39m
+          [36m>[39m
+            [0mChat[0m
+          [36m</a>[39m
+          [36m<a[39m
+            [33mclass[39m=[32m" focus-ring"[39m
+            [33mhref[39m=[32m"/analytics"[39m
+            [33mstyle[39m=[32m"padding: 6px 10px; border-radius: 0; text-decoration: none; text-underline-offset: 3px; font-size: 13px; font-weight: 400; background-color: transparent; color: hsl(var(--ink)); border: 1px solid transparent;"[39m
+          [36m>[39m
+            [0mAnalytics[0m
+          [36m</a>[39m
+          [36m<a[39m
+            [33mclass[39m=[32m" focus-ring"[39m
+            [33mhref[39m=[32m"/expiry"[39m
+            [33mstyle[39m=[32m"padding: 6px 10px; border-radius: 0; text-decoration: none; text-underline-offset: 3px; font-size: 13px; font-weight: 400; background-color: transparent; color: hsl(var(--ink)); border: 1px solid transparent;"[39m
+          [36m>[39m
+            [0mExpiry[0m
+          [36m</a>[39m
+          [36m<a[39m
+            [33mclass[39m=[32m" focus-ring"[39m
+            [33mhref[39m=[32m"/settings"[39m
+            [33mstyle[39m=[32m"padding: 6px 10px; border-radius: 0; text-decoration: none; text-underline-offset: 3px; font-size: 13px; font-weight: 400; background-color: transparent; color: hsl(var(--ink)); border: 1px solid transparent;"[39m
+          [36m>[39m
+            [0mSettings[0m
+          [36m</a>[39m
+        [36m</div>[39m
+        [36m<button[39m
+          [33maria-label[39m=[32m"Switch to dark theme"[39m
+          [33mclass[39m=[32m"sg-paper-control focus-ring"[39m
+          [33mdata-testid[39m=[32m"theme-toggle"[39m
+          [33mstyle[39m=[32m"display: inline-flex; align-items: center; justify-content: center; padding: 6px; border-radius: 0; cursor: pointer;"[39m
+          [33mtitle[39m=[32m"Switch to dark theme"[39m
+          [33mtype[39m=[32m"button"[39m
+        [36m>[39m
+          [36m<svg[39m
+            [33maria-hidden[39m=[32m"true"[39m
+            [33mclass[39m=[32m"lucide lucide-moon"[39m
+            [33mfill[39m=[32m"none"[39m
+            [33mheight[39m=[32m"18"[39m
+            [33mstroke[39m=[32m"currentColor"[39m
+            [33mstroke-linecap[39m=[32m"round"[39m
+            [33mstroke-linejoin[39m=[32m"round"[39m
+            [33mstroke-width[39m=[32m"2"[39m
+            [33mviewBox[39m=[32m"0 0 24 24"[39m
+            [33mwidth[39m=[32m"18"[39m
+            [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+          [36m>[39m
+            [36m<path[39m
+              [33md[39m=[32m"M20.985 12.486a9 9 0 1 1-9.473-9.472c.405-.022....
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/sg334-add-item-nav.sg334.test.tsx > SG-334 non-catalog nav Add item > the shared nav carries Add item in catalog-header colours and opens the import dialog
+TestingLibraryElementError: Unable to find role="link" and name "Add item"
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<div[39m
+      [33mclass[39m=[32m"text-foreground"[39m
+      [33mstyle[39m=[32m"min-height: 100vh; background-color: hsl(var(--paper));"[39m
+    [36m>[39m
+      [36m<nav[39m
+        [33mclass[39m=[32m"sg-nav"[39m
+        [33mdata-testid[39m=[32m"sg-nav"[39m
+        [33mstyle[39m=[32m"display: flex; flex-wrap: wrap; gap: 8px; padding: 12px 24px; border-bottom-style: solid; border-bottom-width: 1px; border-bottom-color: hsl(var(--line)); background-color: hsl(var(--paper)); color: hsl(var(--ink)); align-items: center;"[39m
+      [36m>[39m
+        [36m<a[39m
+          [33mclass[39m=[32m"focus-ring"[39m
+          [33mhref[39m=[32m"/"[39m
+          [33mstyle[39m=[32m"font-weight: 700; text-decoration: none; margin-right: 16px; color: hsl(var(--ink)); font-size: 20px;"[39m
+        [36m>[39m
+          [0mStorageGenie[0m
+        [36m</a>[39m
+        [36m<button[39m
+          [33maria-controls[39m=[32m"sg-nav-menu"[39m
+          [33maria-expanded[39m=[32m"false"[39m
+          [33mclass[39m=[32m"focus-ring nav-menu-toggle"[39m
+          [33mstyle[39m=[32m"padding: 6px 10px; border-radius: 0; border-style: solid; border-width: 1px; border-color: hsl(var(--line)); background-color: hsl(var(--paper)); color: hsl(var(--ink)); font-size: 13px; cursor: pointer;"[39m
+          [33mtype[39m=[32m"button"[39m
+        [36m>[39m
+          [0mMenu[0m
+        [36m</button>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"nav-menu"[39m
+          [33mdata-open[39m=[32m"false"[39m
+          [33mid[39m=[32m"sg-nav-menu"[39m
+        [36m>[39m
+          [36m<a[39m
+            [33mclass[39m=[32m" focus-ring"[39m
+            [33mhref[39m=[32m"/"[39m
+            [33mstyle[39m=[32m"padding: 6px 10px; border-radius: 0; text-decoration: none; text-underline-offset: 3px; font-size: 13px; font-weight: 400; background-color: transparent; color: hsl(var(--ink)); border: 1px solid transparent;"[39m
+          [36m>[39m
+            [0mCatalog[0m
+          [36m</a>[39m
+          [36m<a[39m
+            [33mclass[39m=[32m" focus-ring"[39m
+            [33mhref[39m=[32m"/pantry"[39m
+            [33mstyle[39m=[32m"padding: 6px 10px; border-radius: 0; text-decoration: none; text-underline-offset: 3px; font-size: 13px; font-weight: 400; background-color: transparent; color: hsl(var(--ink)); border: 1px solid transparent;"[39m
+          [36m>[39m
+            [0mPantry[0m
+          [36m</a>[39m
+          [36m<a[39m
+            [33maria-current[39m=[32m"page"[39m
+            [33mclass[39m=[32m"bg-primary text-primary-foreground focus-ring"[39m
+            [33mhref[39m=[32m"/capture"[39m
+            [33mstyle[39m=[32m"padding: 6px 10px; border-radius: 0; text-decoration: underline; text-underline-offset: 3px; font-size: 13px; font-weight: 600; background-color: hsl(var(--ink)); color: hsl(var(--paper));"[39m
+          [36m>[39m
+            [0mCapture[0m
+          [36m</a>[39m
+          [36m<a[39m
+            [33mclass[39m=[32m" focus-ring"[39m
+            [33mhref[39m=[32m"/inbox"[39m
+            [33mstyle[39m=[32m"padding: 6px 10px; border-radius: 0; text-decoration: none; text-underline-offset: 3px; font-size: 13px; font-weight: 400; background-color: transparent; color: hsl(var(--ink)); border: 1px solid transparent;"[39m
+          [36m>[39m
+            [0mInbox[0m
+          [36m</a>[39m
+          [36m<a[39m
+            [33mclass[39m=[32m" focus-ring"[39m
+            [33mhref[39m=[32m"/planning"[39m
+            [33mstyle[39m=[32m"padding: 6px 10px; border-radius: 0; text-decoration: none; text-underline-offset: 3px; font-size: 13px; font-weight: 400; background-color: transparent; color: hsl(var(--ink)); border: 1px solid transparent;"[39m
+          [36m>[39m
+            [0mPlanning[0m
+          [36m</a>[39m
+          [36m<a[39m
+            [33mclass[39m=[32m" focus-ring"[39m
+            [33mhref[39m=[32m"/chat"[39m
+            [33mstyle[39m=[32m"padding: 6px 10px; border-radius: 0; text-decoration: none; text-underline-offset: 3px; font-size: 13px; font-weight: 400; background-color: transparent; color: hsl(var(--ink)); border: 1px solid transparent;"[39m
+          [36m>[39m
+            [0mChat[0m
+          [36m</a>[39m
+          [36m<a[39m
+            [33mclass[39m=[32m" focus-ring"[39m
+            [33mhref[39m=[32m"/analytics"[39m
+            [33mstyle[39m=[32m"padding: 6px 10px; border-radius: 0; text-decoration: none; text-underline-offset: 3px; font-size: 13px; font-weight: 400; background-color: transparent; color: hsl(var(--ink)); border: 1px solid transparent;"[39m
+          [36m>[39m
+            [0mAnalytics[0m
+          [36m</a>[39m
+          [36m<a[39m
+            [33mclass[39m=[32m" focus-ring"[39m
+            [33mhref[39m=[32m"/expiry"[39m
+            [33mstyle[39m=[32m"padding: 6px 10px; border-radius: 0; text-decoration: none; text-underline-offset: 3px; font-size: 13px; font-weight: 400; background-color: transparent; color: hsl(var(--ink)); border: 1px solid transparent;"[39m
+          [36m>[39m
+            [0mExpiry[0m
+          [36m</a>[39m
+          [36m<a[39m
+            [33mclass[39m=[32m" focus-ring"[39m
+            [33mhref[39m=[32m"/settings"[39m
+            [33mstyle[39m=[32m"padding: 6px 10px; border-radius: 0; text-decoration: none; text-underline-offset: 3px; font-size: 13px; font-weight: 400; background-color: transparent; color: hsl(var(--ink)); border: 1px solid transparent;"[39m
+          [36m>[39m
+            [0mSettings[0m
+          [36m</a>[39m
+        [36m</div>[39m
+        [36m<button[39m
+          [33maria-label[39m=[32m"Switch to dark theme"[39m
+          [33mclass[39m=[32m"sg-paper-control focus-ring"[39m
+          [33mdata-testid[39m=[32m"theme-toggle"[39m
+          [33mstyle[39m=[32m"display: inline-flex; align-items: center; justify-content: center; padding: 6px; border-radius: 0; cursor: pointer;"[39m
+          [33mtitle[39m=[32m"Switch to dark theme"[39m
+          [33mtype[39m=[32m"button"[39m
+        [36m>[39m
+          [36m<svg[39m
+            [33maria-hidden[39m=[32m"true"[39m
+            [33mclass[39m=[32m"lucide lucide-moon"[39m
+            [33mfill[39m=[32m"none"[39m
+            [33mheight[39m=[32m"18"[39m
+            [33mstroke[39m=[32m"currentColor"[39m
+            [33mstroke-linecap[39m=[32m"round"[39m
+            [33mstroke-linejoin[39m=[32m"round"[39m
+            [33mstroke-width[39m=[32m"2"[39m
+            [33mviewBox[39m=[32m"0 0 24 24"[39m
+            [33mwidth[39m=[32m"18"[39m
+            [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+          [36m>[39m
+            [36m<path[39m
+              [33md[39m=[32m"M20.985 12.486a9 9 0 1 1-9.473-9.472c.405-.022....
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<div[39m
+      [33mclass[39m=[32m"text-foreground"[39m
+      [33mstyle[39m=[32m"min-height: 100vh; background-color: hsl(var(--paper));"[39m
+    [36m>[39m
+      [36m<nav[39m
+        [33mclass[39m=[32m"sg-nav"[39m
+        [33mdata-testid[39m=[32m"sg-nav"[39m
+        [33mstyle[39m=[32m"display: flex; flex-wrap: wrap; gap: 8px; padding: 12px 24px; border-bottom-style: solid; border-bottom-width: 1px; border-bottom-color: hsl(var(--line)); background-color: hsl(var(--paper)); color: hsl(var(--ink)); align-items: center;"[39m
+      [36m>[39m
+        [36m<a[39m
+          [33mclass[39m=[32m"focus-ring"[39m
+          [33mhref[39m=[32m"/"[39m
+          [33mstyle[39m=[32m"font-weight: 700; text-decoration: none; margin-right: 16px; color: hsl(var(--ink)); font-size: 20px;"[39m
+        [36m>[39m
+          [0mStorageGenie[0m
+        [36m</a>[39m
+        [36m<button[39m
+          [33maria-controls[39m=[32m"sg-nav-menu"[39m
+          [33maria-expanded[39m=[32m"false"[39m
+          [33mclass[39m=[32m"focus-ring nav-menu-toggle"[39m
+          [33mstyle[39m=[32m"padding: 6px 10px; border-radius: 0; border-style: solid; border-width: 1px; border-color: hsl(var(--line)); background-color: hsl(var(--paper)); color: hsl(var(--ink)); font-size: 13px; cursor: pointer;"[39m
+          [33mtype[39m=[32m"button"[39m
+        [36m>[39m
+          [0mMenu[0m
+        [36m</button>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"nav-menu"[39m
+          [33mdata-open[39m=[32m"false"[39m
+          [33mid[39m=[32m"sg-nav-menu"[39m
+        [36m>[39m
+          [36m<a[39m
+            [33mclass[39m=[32m" focus-ring"[39m
+            [33mhref[39m=[32m"/"[39m
+            [33mstyle[39m=[32m"padding: 6px 10px; border-radius: 0; text-decoration: none; text-underline-offset: 3px; font-size: 13px; font-weight: 400; background-color: transparent; color: hsl(var(--ink)); border: 1px solid transparent;"[39m
+          [36m>[39m
+            [0mCatalog[0m
+          [36m</a>[39m
+          [36m<a[39m
+            [33mclass[39m=[32m" focus-ring"[39m
+            [33mhref[39m=[32m"/pantry"[39m
+            [33mstyle[39m=[32m"padding: 6px 10px; border-radius: 0; text-decoration: none; text-underline-offset: 3px; font-size: 13px; font-weight: 400; background-color: transparent; color: hsl(var(--ink)); border: 1px solid transparent;"[39m
+          [36m>[39m
+            [0mPantry[0m
+          [36m</a>[39m
+          [36m<a[39m
+            [33maria-current[39m=[32m"page"[39m
+            [33mclass[39m=[32m"bg-primary text-primary-foreground focus-ring"[39m
+            [33mhref[39m=[32m"/capture"[39m
+            [33mstyle[39m=[32m"padding: 6px 10px; border-radius: 0; text-decoration: underline; text-underline-offset: 3px; font-size: 13px; font-weight: 600; background-color: hsl(var(--ink)); color: hsl(var(--paper));"[39m
+          [36m>[39m
+            [0mCapture[0m
+          [36m</a>[39m
+          [36m<a[39m
+            [33mclass[39m=[32m" focus-ring"[39m
+            [33mhref[39m=[32m"/inbox"[39m
+            [33mstyle[39m=[32m"padding: 6px 10px; border-radius: 0; text-decoration: none; text-underline-offset: 3px; font-size: 13px; font-weight: 400; background-color: transparent; color: hsl(var(--ink)); border: 1px solid transparent;"[39m
+          [36m>[39m
+            [0mInbox[0m
+          [36m</a>[39m
+          [36m<a[39m
+            [33mclass[39m=[32m" focus-ring"[39m
+            [33mhref[39m=[32m"/planning"[39m
+            [33mstyle[39m=[32m"padding: 6px 10px; border-radius: 0; text-decoration: none; text-underline-offset: 3px; font-size: 13px; font-weight: 400; background-color: transparent; color: hsl(var(--ink)); border: 1px solid transparent;"[39m
+          [36m>[39m
+            [0mPlanning[0m
+          [36m</a>[39m
+          [36m<a[39m
+            [33mclass[39m=[32m" focus-ring"[39m
+            [33mhref[39m=[32m"/chat"[39m
+            [33mstyle[39m=[32m"padding: 6px 10px; border-radius: 0; text-decoration: none; text-underline-offset: 3px; font-size: 13px; font-weight: 400; background-color: transparent; color: hsl(var(--ink)); border: 1px solid transparent;"[39m
+          [36m>[39m
+            [0mChat[0m
+          [36m</a>[39m
+          [36m<a[39m
+            [33mclass[39m=[32m" focus-ring"[39m
+            [33mhref[39m=[32m"/analytics"[39m
+            [33mstyle[39m=[32m"padding: 6px 10px; border-radius: 0; text-decoration: none; text-underline-offset: 3px; font-size: 13px; font-weight: 400; background-color: transparent; color: hsl(var(--ink)); border: 1px solid transparent;"[39m
+          [36m>[39m
+            [0mAnalytics[0m
+          [36m</a>[39m
+          [36m<a[39m
+            [33mclass[39m=[32m" focus-ring"[39m
+            [33mhref[39m=[32m"/expiry"[39m
+            [33mstyle[39m=[32m"padding: 6px 10px; border-radius: 0; text-decoration: none; text-underline-offset: 3px; font-size: 13px; font-weight: 400; background-color: transparent; color: hsl(var(--ink)); border: 1px solid transparent;"[39m
+          [36m>[39m
+            [0mExpiry[0m
+          [36m</a>[39m
+          [36m<a[39m
+            [33mclass[39m=[32m" focus-ring"[39m
+            [33mhref[39m=[32m"/settings"[39m
+            [33mstyle[39m=[32m"padding: 6px 10px; border-radius: 0; text-decoration: none; text-underline-offset: 3px; font-size: 13px; font-weight: 400; background-color: transparent; color: hsl(var(--ink)); border: 1px solid transparent;"[39m
+          [36m>[39m
+            [0mSettings[0m
+          [36m</a>[39m
+        [36m</div>[39m
+        [36m<button[39m
+          [33maria-label[39m=[32m"Switch to dark theme"[39m
+          [33mclass[39m=[32m"sg-paper-control focus-ring"[39m
+          [33mdata-testid[39m=[32m"theme-toggle"[39m
+          [33mstyle[39m=[32m"display: inline-flex; align-items: center; justify-content: center; padding: 6px; border-radius: 0; cursor: pointer;"[39m
+          [33mtitle[39m=[32m"Switch to dark theme"[39m
+          [33mtype[39m=[32m"button"[39m
+        [36m>[39m
+          [36m<svg[39m
+            [33maria-hidden[39m=[32m"true"[39m
+            [33mclass[39m=[32m"lucide lucide-moon"[39m
+            [33mfill[39m=[32m"none"[39m
+            [33mheight[39m=[32m"18"[39m
+            [33mstroke[39m=[32m"currentColor"[39m
+            [33mstroke-linecap[39m=[32m"round"[39m
+            [33mstroke-linejoin[39m=[32m"round"[39m
+            [33mstroke-width[39m=[32m"2"[39m
+            [33mviewBox[39m=[32m"0 0 24 24"[39m
+            [33mwidth[39m=[32m"18"[39m
+            [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+          [36m>[39m
+            [36m<path[39m
+              [33md[39m=[32m"M20.985 12.486a9 9 0 1 1-9.473-9.472c.405-.022....
+ ❯ waitForWrapper node_modules/@testing-library/dom/dist/wait-for.js:163:27
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:86:33
+ ❯ src/sg334-add-item-nav.sg334.test.tsx:61:31
+     59| 
+     60|     // Visible label and accessible name are Add item.
+     61|     const link = await screen.findByRole("link", { name: "Add item" });
+       |                               ^
+     62|     expect(link).toBeInTheDocument();
+     63| 
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+ Test Files  1 failed (1)
+      Tests  1 failed (1)
+   Start at  21:50:33
+   Duration  2.78s (transform 526ms, setup 81ms, collect 868ms, tests 1.08s, environment 427ms, prepare 92ms)
+

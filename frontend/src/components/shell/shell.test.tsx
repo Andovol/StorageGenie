@@ -448,8 +448,8 @@ describe("Catalog shell", () => {
     renderApp(["/capture"]);
 
     // SG-301 G2: the "Phase 0 · local-first" nav footer is gone on purpose;
-    // the Import Asset link proves the shared legacy nav rendered instead.
-    expect(await screen.findByRole("link", { name: "Import Asset" })).toBeInTheDocument();
+    // the Add item link proves the shared legacy nav rendered instead.
+    expect(await screen.findByRole("link", { name: "Add item" })).toBeInTheDocument();
     expect(screen.getByText("Add an item")).toBeInTheDocument();
     expect(screen.getAllByText("StorageGenie")).toHaveLength(1);
     // SG-108: the /expiry route adds its nav entry; every other link is unchanged.

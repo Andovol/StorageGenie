@@ -153,7 +153,7 @@ function Nav() {
       {showImport ? (
         <Link
           to="/capture"
-          aria-label="Import Asset"
+          aria-label="Add item"
           onClick={(event) => {
             event.preventDefault();
             setImportOpen(true);
@@ -168,12 +168,12 @@ function Nav() {
             display: "inline-flex",
             alignItems: "center",
             gap: 6,
-            backgroundColor: "hsl(var(--ink))",
-            color: "hsl(var(--paper))",
+            backgroundColor: "hsl(var(--primary))",
+            color: "hsl(var(--primary-foreground))",
           }}
         >
           <Upload size={16} aria-hidden="true" />
-          <span className="sg-import-label">Import Asset</span>
+          <span className="sg-import-label">Add item</span>
         </Link>
       ) : null}
       {importOpen ? (
