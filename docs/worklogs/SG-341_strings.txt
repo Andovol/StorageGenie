@@ -1,0 +1,30 @@
+String counts in the served JS (grep -o -F, from the image's own files):
+BEFORE (release-sg335, static/assets/index-DIkDaL1_.js 8e7afeb6 372821 B):
+More about this item: 0
+Add another pack: 1
+Your things: 1
+Add item: 4
+Use by, soonest first: 1
+ packs: 0
+Import Asset: 0
+AFTER (served, static/assets/index-lfQJ5nAV.js f70939f7 387775 B):
+More about this item: 1
+Add another pack: 2
+Your things: 3
+Add item: 4
+Use by, soonest first: 1
+ packs: 4
+Import Asset: 0
+
+Packs-line template (frontend/src/components/catalog/ProductCard.tsx:235): `{item.packCount} packs` inside data-testid="product-packs"; counted as " packs" above (0 before, 4 after, at least 1 after).
+
+Local vite build of HEAD (VITE_API_BASE=https://storagegenie.dynv6.net, outDir into scratch, since removed):
+assets/index-lfQJ5nAV.js f70939f781c67a4382a18d2213f54cbbea12845259d397e956bf06bff09a7082 (387775 B) — name and hash equal the served JS
+assets/index-e_BzCe-6.css d0a1bbde2323a3ee73fa57f6639db3e6886e05a8467fe6318815110268141acb (7307 B) — byte-identical
+assets/instrument-sans-latin-ext-wght-normal-B5bTHO_g.woff2 c4fcfea41f2c1cfeea9211fa43679845454a1d0e0d7e95e069c7e73c4ae302d2 (11144 B) — byte-identical
+assets/instrument-sans-latin-wght-normal-BbzFLZTg.woff2 2ee17598a98d8a59e4df8152d015bec9ab8e4d5672cc0ab42bef806b568e3971 (30092 B) — byte-identical
+index.html 32c599412539cafcb94e34c251c157486521ef1f35cd07859cf3c31960492ac4 (944 B) — name and hash equal the served index.html
+
+Served font over HTTP: GET /assets/instrument-sans-latin-wght-normal-BbzFLZTg.woff2 on 127.0.0.1:8003
+returns 200, content type application/octet-stream (W11, not a STOP), 30092 bytes,
+sha256 2ee17598a98d8a59e4df8152d015bec9ab8e4d5672cc0ab42bef806b568e3971 — equals the image's file.

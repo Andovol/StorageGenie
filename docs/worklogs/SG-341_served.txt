@@ -1,0 +1,29 @@
+Health (six consecutive, each quoted):
+{"status":"ok","db":"ok","storage":"ok"}
+{"status":"ok","db":"ok","storage":"ok"}
+{"status":"ok","db":"ok","storage":"ok"}
+{"status":"ok","db":"ok","storage":"ok"}
+{"status":"ok","db":"ok","storage":"ok"}
+{"status":"ok","db":"ok","storage":"ok"}
+
+Shell routes (each 200):
+/ -> 200
+/pantry -> 200
+/expiry -> 200
+/inbox -> 200
+/planning -> 200
+/capture -> 200
+
+API (household id taken from the database and never printed):
+GET /v1/assets?household_id=<redacted>&category=food_beverages&limit=5 -> 200, items on the first page: 1 (response keys: items, next_cursor; no total)
+GET /v1/plugins/expiry-tracker/status?household_id=<redacted>&category=food_beverages -> 200
+
+Containers and images:
+before: container 76faf17879d339084983e09b60c98061c82d1c96a5b78a72749d4c5c92c38149, image sha256:a1e3fbf196ce44adb189449f6e9f617be37d2f90ce6b3ca29aae8dcf5887ca47 (a1e3fbf196ce)
+after: container c0f5faebd4e3b190ed2a65f0fe61f6820b0d0965913f9beb5bde67e178796114, image sha256:85728f2ea2036e54892a51c9ed5f049449a0a1d0d45fae056d92be174c90d4f7 (85728f2ea203)
+Cmd [uvicorn app.server:app --host 0.0.0.0 --port 8000] both; RestartCount 0 both; recreate-to-healthy ~4 s (recreate 1794995925, first 200 at 1794995929).
+
+Startup log, read by named lines only (grep -E 'Traceback|Application startup complete|Daily reminder pass' on docker logs --since 10m):
+INFO:     Application startup complete.
+INFO:     app.services.reminders.daily - Daily reminder pass completed as_of=2026-11-18 households_visited=1 reminders_created=0 errors=0
+No Traceback. No household id, query string, or owner value in this output.

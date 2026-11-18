@@ -1,0 +1,20 @@
+Runtime diff: image a1e3fbf196ce (release-sg335, running before) vs 85728f2ea203 (latest after build, served after recreate).
+
+Derived backend set (git diff --name-only a5b00728..HEAD -- backend/ ':!backend/alembic'):
+(empty — the packet's expectation, quoted: empty)
+Alembic diff (git diff --name-only a5b00728..HEAD -- backend/alembic):
+(empty)
+
+Changed paths (full hashes):
+REMOVED ./static/assets/index-DIkDaL1_.js 8e7afeb62d335762ed519ee1f92b41fccd1c092e0530feaa0356b6e237fade8f5 (372821 B)
+ADDED   ./static/assets/index-lfQJ5nAV.js f70939f781c67a4382a18d2213f54cbbea12845259d397e956bf06bff09a7082 (387775 B)
+CHANGED ./static/index.html 7173830a1116f47b040d9b9f15c029c96363df85f4e4b7516c40a6c6043c5d90 -> 32c599412539cafcb94e34c251c157486521ef1f35cd07859cf3c31960492ac4 (944 B both)
+
+Unchanged (same name, same hash, size):
+./static/assets/index-e_BzCe-6.css d0a1bbde2323a3ee73fa57f6639db3e6886e05a8467fe6318815110268141acb (7307 B)
+./static/assets/instrument-sans-latin-ext-wght-normal-B5bTHO_g.woff2 c4fcfea41f2c1cfeea9211fa43679845454a1d0e0d7e95e069c7e73c4ae302d2 (11144 B)
+./static/assets/instrument-sans-latin-wght-normal-BbzFLZTg.woff2 2ee17598a98d8a59e4df8152d015bec9ab8e4d5672cc0ab42bef806b568e3971 (30092 B)
+
+Tree size: 4071 files before, 4071 after. No backend/ path in the diff.
+Served backend .py (217 files, venv/__pycache__ excluded both sides) equals worktree backend/ .py (217 files): zero path mismatches, zero hash mismatches after ./ normalisation.
+Local vite build of HEAD (VITE_API_BASE=https://storagegenie.dynv6.net, from the Dockerfile) equals served static/: JS, CSS, both .woff2 and index.html names and hashes identical (see SG-341_strings.txt).
