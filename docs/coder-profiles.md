@@ -63,6 +63,7 @@ Built from audits, one row per rated slice (owner, D25, 2026-11-07). Strengths a
 | SG-338 | muse-1.3, xhigh | test alignment (37 across 8 files) + small fix + full gate | ≈1024 s (stamps) | 95 | yes, inside 1100 s | none; stopped on a real defect instead of weakening a test (stale pack row after Clear) | — |
 | SG-339 | muse-1.3, xhigh | minor fix + 2 tests + full gate | ≈351 s (stamps) | 97 | yes | none | — |
 | SG-337 | muse-1.3, xhigh | grid grouping + 2 layout fixes + tests + full gate | ≈622 s (stamps; run 1 died at 52 s on provider server_error) | 96 | yes | none; named both layout causes before fixing | provider (run 1) |
+| SG-340 | muse-1.3, xhigh | screenshots, 9 shots, real app driven, one scratch write + undo | ≈550 s (stamps) | 94 | yes | design notes still under-call visible gaps (5th time), better than SG-333 | coder (minor) |
 | SG-304 run 1 | haiku-5-5, high | build, backend + frontend, two flows | 1272 s (killed idle) | unrated, retried | n/a — killed after 900 s of no output | went silent while writing four test files in one batch; tests lost, no report; G1/G2 pushed | unknown (debug: transcript unidentified) |
 | SG-304r1 | haiku-5-5, high | retry: tests + gate | 903 s (killed idle) | — | n/a | none by the model: OpenCode Go "usage limit reached" before any work | provider (account quota) |
 
