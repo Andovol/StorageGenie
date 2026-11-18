@@ -15,7 +15,7 @@
 
 ## Why this exists
 
-Two *Olive Oil* bottles are two cards today (`frontend/src/components/catalog/ProductGrid.tsx:259` `ProductGrid`, `ProductCard.tsx:96`). The same-name rule already exists and, after SG-336, lives in one shared module (`findSameNamePacks`'s rule: name trimmed and lower-cased, exact match, live items only — `UNVERIFIED`, establish it from SG-336's commit). Use **that rule's matching function**, never a second copy.
+Two *Olive Oil* bottles are two cards today (`frontend/src/components/catalog/ProductGrid.tsx:259` `ProductGrid`, `ProductCard.tsx:96`). The same-name rule already exists and, after SG-336, lives in `frontend/src/lib/sameNamePacks.ts` (`findSameNamePacks`'s rule: name trimmed and lower-cased, exact match, live items only — `UNVERIFIED`, establish it from SG-336's commit). Use **that rule's matching function**, never a second copy.
 
 | ID | Change |
 |---|---|
