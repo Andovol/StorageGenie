@@ -2,7 +2,6 @@ import type { ReactNode } from "react";
 import type { SavedSearch } from "../../api/types";
 import { AppHeader } from "./AppHeader";
 import { CatalogToolbar, type CatalogStatusFilter, type Density, type SortOption } from "./CatalogToolbar";
-import { PageContainer } from "./PageContainer";
 
 type AppShellProps = {
   loadedCount: number;
@@ -122,7 +121,22 @@ export function AppShell({
           onSaveSearch={onSaveSearch}
         />
       </div>
-      <PageContainer as="main">{children}</PageContainer>
+      {/*
+       * SG-337 G5: the catalog content used to ride the shared centered
+       * container (max-width 1100, auto margins, 24 padding), which inset the
+       * attention line and grid to x~114 at 1280 while the title and toolbar
+       * sit full-bleed at x~24. The catalog is the only AppShell user, so its
+       * main is full-width with the same 24 px sides as the title — the grid
+       * and the attention line share the title's left edge and content width.
+       * Other pages keep PageContainer unchanged.
+       */}
+      <main
+        data-testid="page-container"
+        className="page-container"
+        style={{ width: "100%", paddingTop: 0, paddingRight: 24, paddingBottom: 24, paddingLeft: 24 }}
+      >
+        {children}
+      </main>
     </div>
   );
 }

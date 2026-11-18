@@ -307,13 +307,18 @@ describe("Catalog shell", () => {
     );
   });
 
-  test("the catalog main rides the shared centered container (SG-105 G1)", async () => {
+  test("the catalog main is full-bleed with the title's 24 px sides (SG-337 G5, was: shared centered container SG-105 G1)", async () => {
     renderCatalog();
     await screen.findByText("Drill");
 
     const main = document.querySelector("main.page-container") as HTMLElement;
     expect(main).not.toBeNull();
-    expect(main).toHaveStyle({ maxWidth: "1100px", marginLeft: "auto", marginRight: "auto" });
+    // SG-337 G5: no 1100 px cap, no auto centering — the grid and the
+    // attention line share the title's left edge (was: maxWidth 1100 px with
+    // auto margins, insetting the content to x~114 at 1280).
+    expect(main.style.maxWidth).toBe("");
+    expect(main.style.marginLeft).not.toBe("auto");
+    expect(main.style.paddingLeft).toBe("24px");
   });
 
   test("a category tab filters server-side and carries the underline style when active (SG-331 T1: pill -> tab)", async () => {

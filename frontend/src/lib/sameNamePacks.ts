@@ -9,6 +9,21 @@ export type SamePack = { id: string; name: string; expiry: string | null };
 export const NOT_LIVE_STATUSES = new Set(["ARCHIVED", "DISPOSED", "MERGED"]);
 
 /**
+ * SG-337: the pure same-name key both the async finder below and the
+ * catalog grid grouping (`components/catalog/groupPacks.ts`) share — one
+ * rule, never a second copy. Trimmed, case-insensitive, exact.
+ */
+export function sameNameKey(name: string | null | undefined): string {
+  return (name ?? "").trim().toLowerCase();
+}
+
+/** SG-337: two display names match when their keys are equal and non-empty. */
+export function isSameName(a: string | null | undefined, b: string | null | undefined): boolean {
+  const ka = sameNameKey(a);
+  return ka !== "" && ka === sameNameKey(b);
+}
+
+/**
  * SG-304 G1: live items whose name equals the typed name (trimmed,
  * case-insensitive). Uses the existing list read (`q` = FTS on display_name)
  * and the existing detail read for each match's date. Same name is NOT
@@ -18,7 +33,7 @@ export const NOT_LIVE_STATUSES = new Set(["ARCHIVED", "DISPOSED", "MERGED"]);
  * the item page share the one rule — no copy. Both callers import it.
  */
 export async function findSameNamePacks(householdId: string, name: string): Promise<SamePack[]> {
-  const wanted = name.trim().toLowerCase();
+  const wanted = sameNameKey(name);
   const list = await apiGet<AssetListResponse>("/v1/assets", {
     household_id: householdId,
     q: name.trim(),
@@ -26,7 +41,7 @@ export async function findSameNamePacks(householdId: string, name: string): Prom
   });
   const matches = list.items.filter(
     (item) =>
-      (item.display_name ?? "").trim().toLowerCase() === wanted && !NOT_LIVE_STATUSES.has(item.status)
+      sameNameKey(item.display_name) === wanted && !NOT_LIVE_STATUSES.has(item.status)
   );
   return Promise.all(
     matches.map(async (item) => {

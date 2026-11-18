@@ -13,6 +13,10 @@ export type CatalogProduct = ProductItem & {
   cutoutUrl?: string;
   sceneUrl?: string;
   evidenceId?: string;
+  /** SG-337: set on grid representatives only — the number of live
+   * same-name packs this card stands for. The card shows `<N> packs` when
+   * N >= 2 and no packs line for a single pack. */
+  packCount?: number;
   /** SG-325 P8: the item's use-by date (ISO YYYY-MM-DD) joined from the
    * expiry status read; null when the item has no date. */
   useBy?: string | null;
@@ -91,7 +95,11 @@ const DATE_TONE_STYLE: Record<CardDateTone, { backgroundColor: string; color: st
  * (photo `object-fit: contain` on `--tile`), no border, no status dot or
  * badge. The failed pipeline icons, the status dots and the category pill are
  * gone on purpose; the date line below the name carries past/this-week in
- * their washes. Same-name packs stay separate cards.
+ * their washes.
+ *
+ * SG-337: in the grid, live same-name packs share one card (the soonest
+ * pack's name, date, photo and id, with a muted `<N> packs` line). The table
+ * view still renders one row per pack.
  */
 export const ProductCard = memo(function ProductCard({
   item,
@@ -183,11 +191,16 @@ export const ProductCard = memo(function ProductCard({
           className="sg-wide-only"
           style={{
             alignSelf: "flex-start",
+            // SG-337 G4: the chip never extends past the card's right edge —
+            // capped at the card width with wrapping allowed (was nowrap,
+            // which overflowed a 79.5 px column at 4 per row).
+            maxWidth: "100%",
+            whiteSpace: "normal",
+            overflowWrap: "break-word",
             fontSize: 13,
             fontWeight: wide.tone === "later" || wide.tone === "none" ? 400 : 600,
             padding: wide.tone === "past" || wide.tone === "soon" ? "2px 8px" : 0,
             borderRadius: 0,
-            whiteSpace: "nowrap",
             ...wideStyle,
           }}
         >
@@ -198,16 +211,30 @@ export const ProductCard = memo(function ProductCard({
           className="sg-narrow-only"
           style={{
             alignSelf: "flex-start",
+            // SG-337 G4: same cap as the wide line (see above).
+            maxWidth: "100%",
+            whiteSpace: "normal",
+            overflowWrap: "break-word",
             fontSize: 13,
             fontWeight: narrow.tone === "later" || narrow.tone === "none" ? 400 : 600,
             padding: narrow.tone === "past" || narrow.tone === "soon" ? "2px 8px" : 0,
             borderRadius: 0,
-            whiteSpace: "nowrap",
             ...DATE_TONE_STYLE[narrow.tone],
           }}
         >
           {narrow.text}
         </span>
+        {(item.packCount ?? 0) >= 2 ? (
+          <span
+            data-testid="product-packs"
+            style={{
+              fontSize: 13,
+              color: "hsl(var(--ink-muted))",
+            }}
+          >
+            {item.packCount} packs
+          </span>
+        ) : null}
         <span data-testid="product-kind" className="sg-card-kind">
           {labelAssetType(item.category)}
         </span>

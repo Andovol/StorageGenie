@@ -214,7 +214,7 @@ describe("SG-337 grouped same-name packs in the grid", () => {
     await screen.findAllByTestId("product-card");
     fireEvent.click(screen.getByRole("button", { name: "List" }));
     const rows = await screen.findAllByTestId("product-row");
-    expect(rows).toHaveLength(6 - 1);
+    expect(rows).toHaveLength(5);
     expect(rows.filter((row) => /olive/i.test(row.textContent ?? ""))).toHaveLength(3);
   });
 

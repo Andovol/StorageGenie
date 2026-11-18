@@ -11,6 +11,7 @@ import {
 import { fetchExpiryStatus, putBack } from "../api/client";
 import { useHouseholdContext } from "../hooks/HouseholdContext";
 import { ProductGrid } from "../components/catalog/ProductGrid";
+import { groupCatalogPacks } from "../components/catalog/groupPacks";
 import { AppShell } from "../components/shell/AppShell";
 import { ItemInspectorDrawer } from "../components/shell/ItemInspectorDrawer";
 import {
@@ -263,6 +264,12 @@ export function CatalogPage() {
   // Server owns `q` (FTS MATCH on `display_name`) and the category filter
   // (`asset_type`); this only orders the loaded page. The evidence id the card
   // thumbnail reads comes from the list serializer's `evidence_ids` (SG-064 G3).
+  //
+  // SG-337: `visibleItems` stays one entry per pack — the table view and the
+  // counts below read it. The grid reads `groupedItems`: live same-name packs
+  // (already narrowed by the server `q`) folded into one card per name, the
+  // group ordered by the same sort. The attention line and the title count
+  // keep counting packs, not cards.
   const visibleItems = useMemo(() => {
     const items = displayed.map((asset) => {
       const item = assetToProductItem(asset);
@@ -273,6 +280,10 @@ export function CatalogPage() {
     });
     return sortCatalog(items, sort);
   }, [displayed, sort, useByById]);
+  const groupedItems = useMemo(
+    () => groupCatalogPacks(visibleItems, sort),
+    [visibleItems, sort]
+  );
 
   const activeFilters = useMemo(() => {
     const filters: string[] = [];
@@ -430,7 +441,7 @@ export function CatalogPage() {
                   </div>
                 ) : null}
                 <ProductGrid
-                    items={visibleItems}
+                    items={density === "table" ? visibleItems : groupedItems}
                     density={density}
                     householdId={effectiveHousehold}
                     onSelect={setSelectedAssetId}
