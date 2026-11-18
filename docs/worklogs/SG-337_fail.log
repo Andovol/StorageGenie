@@ -1,0 +1,1496 @@
+
+> storagegenie-frontend@0.1.0 test
+> vitest run --run src/sg337-grouped-packs.sg337.test.tsx
+
+
+ RUN  v1.6.1 /home/andrei/StorageGenie/frontend
+
+stderr | src/sg337-grouped-packs.sg337.test.tsx > SG-337 grouped same-name packs in the grid > T1 grid: one Olive Oil card reading 3 packs with the 6 May 2030 date line; one Rice card with no packs line; 3 cards total
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+ ❯ src/sg337-grouped-packs.sg337.test.tsx  (8 tests | 6 failed) 3552ms
+   ❯ src/sg337-grouped-packs.sg337.test.tsx > SG-337 grouped same-name packs in the grid > T1 grid: one Olive Oil card reading 3 packs with the 6 May 2030 date line; one Rice card with no packs line; 3 cards total
+     → expected [ <a …(4)>…(2)</a>, …(4) ] to have a length of 3 but got 5
+   ❯ src/sg337-grouped-packs.sg337.test.tsx > SG-337 grouped same-name packs in the grid > T2 the Olive Oil card shows the 3 Feb 2031 pack photo (the soonest pack has none)
+     → Unable to find an element with the text: 3 packs. This could be because the text is broken up by multiple elements. In this case, you can provide a function for your text matcher to make your matcher more flexible.
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<div[39m
+      [33mstyle[39m=[32m"min-height: 100vh; background-color: hsl(var(--paper)); color: hsl(var(--ink));"[39m
+    [36m>[39m
+      [36m<div[39m
+        [33mstyle[39m=[32m"position: sticky; top: 0px; z-index: 10; background-color: hsl(var(--paper));"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"sg-header"[39m
+          [33mdata-testid[39m=[32m"catalog-header"[39m
+          [33mstyle[39m=[32m"display: flex; flex-wrap: wrap; align-items: center; gap: 12px; row-gap: 8px; padding: 10px 24px; border-bottom-style: solid; border-bottom-width: 1px; border-bottom-color: hsl(var(--line)); background-color: hsl(var(--paper)); color: hsl(var(--ink));"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33maria-hidden[39m=[32m"true"[39m
+            [33mstyle[39m=[32m"flex: 1 1 0%;"[39m
+          [36m/>[39m
+          [36m<input[39m
+            [33maria-label[39m=[32m"Search your things"[39m
+            [33mclass[39m=[32m"sg-paper-control focus-ring sg-header-search"[39m
+            [33mplaceholder[39m=[32m"Search your things"[39m
+            [33mstyle[39m=[32m"padding: 6px 10px; border-radius: 0; flex: 1 1 120px; min-width: 0; max-width: 420px; font-size: 13px;"[39m
+            [33mtype[39m=[32m"search"[39m
+            [33mvalue[39m=[32m""[39m
+          [36m/>[39m
+          [36m<button[39m
+            [33maria-label[39m=[32m"Switch to dark theme"[39m
+            [33mclass[39m=[32m"sg-paper-control focus-ring"[39m
+            [33mdata-testid[39m=[32m"theme-toggle"[39m
+            [33mstyle[39m=[32m"display: inline-flex; align-items: center; justify-content: center; padding: 6px; border-radius: 0; cursor: pointer;"[39m
+            [33mtitle[39m=[32m"Switch to dark theme"[39m
+            [33mtype[39m=[32m"button"[39m
+          [36m>[39m
+            [36m<svg[39m
+              [33maria-hidden[39m=[32m"true"[39m
+              [33mclass[39m=[32m"lucide lucide-moon"[39m
+              [33mfill[39m=[32m"none"[39m
+              [33mheight[39m=[32m"18"[39m
+              [33mstroke[39m=[32m"currentColor"[39m
+              [33mstroke-linecap[39m=[32m"round"[39m
+              [33mstroke-linejoin[39m=[32m"round"[39m
+              [33mstroke-width[39m=[32m"2"[39m
+              [33mviewBox[39m=[32m"0 0 24 24"[39m
+              [33mwidth[39m=[32m"18"[39m
+              [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+            [36m>[39m
+              [36m<path[39m
+                [33md[39m=[32m"M20.985 12.486a9 9 0 1 1-9.473-9.472c.405-.022.617.46.402.803a6 6 0 0 0 8.268 8.268c.344-.215.825-.004.803.401"[39m
+              [36m/>[39m
+            [36m</svg>[39m
+          [36m</button>[39m
+          [36m<a[39m
+            [33maria-label[39m=[32m"Add item"[39m
+            [33mclass[39m=[32m"focus-ring"[39m
+            [33mhref[39m=[32m"/capture"[39m
+            [33mstyle[39m=[32m"padding: 6px 12px; border-radius: 0; text-decoration: none; font-weight: 600; font-size: 13px; display: inline-flex; align-items: center; gap: 6px; background-color: hsl(var(--primary)); color: hsl(var(--primary-foreground));"[39m
+          [36m>[39m
+            [36m<svg[39m
+              [33maria-hidden[39m=[32m"true"[39m
+              [33mclass[39m=[32m"lucide lucide-upload"[39m
+              [33mfill[39m=[32m"none"[39m
+              [33mheight[39m=[32m"16"[39m
+              [33mstroke[39m=[32m"currentColor"[39m
+              [33mstroke-linecap[39m=[32m"round"[39m
+              [33mstroke-linejoin[39m=[32m"round"[39m
+              [33mstroke-width[39m=[32m"2"[39m
+              [33mviewBox[39m=[32m"0 0 24 24"[39m
+              [33mwidth[39m=[32m"16"[39m
+              [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+            [36m>[39m
+              [36m<path[39m
+                [33md[39m=[32m"M12 3v12"[39m
+              [36m/>[39m
+              [36m<path[39m
+                [33md[39m=[32m"m17 8-5-5-5 5"[39m
+              [36m/>[39m
+              [36m<path[39m
+                [33md[39m=[32m"M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"[39m
+              [36m/>[39m
+            [36m</svg>[39m
+            [36m<span[39m
+              [33mclass[39m=[32m"sg-import-label"[39m
+            [36m>[39m
+              [0mAdd item[0m
+            [36m</span>[39m
+          [36m</a>[39m
+        [36m</div>[39m
+        [36m<div[39m
+          [33mstyle[39m=[32m"padding: 16px 24px 4px; display: flex; align-items: baseline; gap: 12px;"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mstyle[39m=[32m"flex: 1 1 0%;"[39m
+          [36m>[39m
+            [36m<h1[39m
+              [33mclass[39m=[32m"sg-catalog-title"[39m
+            [36m>[39m
+              [0mYour things[0m
+            [36m</h1>[39m
+            [36m<p[39m
+              [33mstyle[39m=[32m"margin: 4px 0px 0px; font-size: 13px; color: hsl(var(--ink-muted));"[39m
+            [36m>[39m
+              [0m5[0m
+              [0m [0m
+              [0mthings[0m
+            [36m</p>[39m
+          [36m</div>[39m
+          [36m<button[39m
+            [33mclass[39m=[32m"focus-ring"[39m
+            [33mstyle[39m=[32m"background: none; font-size: 13px; cursor: pointer; text-decoration: underline; color: hsl(var(--ink)); white-space: nowrap;"[39m
+            [33mtype[39m=[32m"button"[39m
+          [36m>[39m
+            [0mGone[0m
+          [36m</button>[39m
+        [36m</div>[39m
+        [36m<div[39m
+          [33mdata-testid[39m=[32m"catalog-toolbar"[39m
+          [33mstyle[39m=[32m"display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 8px 24px; border-bottom-style: solid; border-bottom-width: 1px; border-color: hsl(var(--line)); background-color: hsl(var(--paper)); color: hsl(var(--ink));"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mdata-testid[39m=[32m"catalog-kind-tabs"[39m
+            [33mstyle[39m=[32m"display: flex; gap: 16px; overflow-x: auto; flex-wrap: nowrap; align-items: center;"[39m
+          [36m>[39m
+            [36m<button[39m
+              [33maria-pressed[39m=[32m"true"[39m
+              [33mclass[39m=[32m"focus-ring"[39m
+              [33mstyle[39m=[32m"background: transparent; border-bottom: 2px solid hsl(var(--ink)); border-radius: 0; padding: 4px 2px; font-size: 15px; font-weight: 600; cursor: pointer; white-space: nowrap; color: hsl(var(--ink));"[39m
+              [33mtype[39m=[32m"button"[39m
+            [36m>[39m
+              [0mAll[0m
+            [36m</button>[39m
+            [36m<button[39m
+              [33maria-pressed[39m=[32m"false"[39m
+              [33mclass[39m=[32m"focus-ring"[39m
+              [33mstyle[39m=[32m"background: transparent; border-bottom: ...
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<div[39m
+      [33mstyle[39m=[32m"min-height: 100vh; background-color: hsl(var(--paper)); color: hsl(var(--ink));"[39m
+    [36m>[39m
+      [36m<div[39m
+        [33mstyle[39m=[32m"position: sticky; top: 0px; z-index: 10; background-color: hsl(var(--paper));"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"sg-header"[39m
+          [33mdata-testid[39m=[32m"catalog-header"[39m
+          [33mstyle[39m=[32m"display: flex; flex-wrap: wrap; align-items: center; gap: 12px; row-gap: 8px; padding: 10px 24px; border-bottom-style: solid; border-bottom-width: 1px; border-bottom-color: hsl(var(--line)); background-color: hsl(var(--paper)); color: hsl(var(--ink));"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33maria-hidden[39m=[32m"true"[39m
+            [33mstyle[39m=[32m"flex: 1 1 0%;"[39m
+          [36m/>[39m
+          [36m<input[39m
+            [33maria-label[39m=[32m"Search your things"[39m
+            [33mclass[39m=[32m"sg-paper-control focus-ring sg-header-search"[39m
+            [33mplaceholder[39m=[32m"Search your things"[39m
+            [33mstyle[39m=[32m"padding: 6px 10px; border-radius: 0; flex: 1 1 120px; min-width: 0; max-width: 420px; font-size: 13px;"[39m
+            [33mtype[39m=[32m"search"[39m
+            [33mvalue[39m=[32m""[39m
+          [36m/>[39m
+          [36m<button[39m
+            [33maria-label[39m=[32m"Switch to dark theme"[39m
+            [33mclass[39m=[32m"sg-paper-control focus-ring"[39m
+            [33mdata-testid[39m=[32m"theme-toggle"[39m
+            [33mstyle[39m=[32m"display: inline-flex; align-items: center; justify-content: center; padding: 6px; border-radius: 0; cursor: pointer;"[39m
+            [33mtitle[39m=[32m"Switch to dark theme"[39m
+            [33mtype[39m=[32m"button"[39m
+          [36m>[39m
+            [36m<svg[39m
+              [33maria-hidden[39m=[32m"true"[39m
+              [33mclass[39m=[32m"lucide lucide-moon"[39m
+              [33mfill[39m=[32m"none"[39m
+              [33mheight[39m=[32m"18"[39m
+              [33mstroke[39m=[32m"currentColor"[39m
+              [33mstroke-linecap[39m=[32m"round"[39m
+              [33mstroke-linejoin[39m=[32m"round"[39m
+              [33mstroke-width[39m=[32m"2"[39m
+              [33mviewBox[39m=[32m"0 0 24 24"[39m
+              [33mwidth[39m=[32m"18"[39m
+              [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+            [36m>[39m
+              [36m<path[39m
+                [33md[39m=[32m"M20.985 12.486a9 9 0 1 1-9.473-9.472c.405-.022.617.46.402.803a6 6 0 0 0 8.268 8.268c.344-.215.825-.004.803.401"[39m
+              [36m/>[39m
+            [36m</svg>[39m
+          [36m</button>[39m
+          [36m<a[39m
+            [33maria-label[39m=[32m"Add item"[39m
+            [33mclass[39m=[32m"focus-ring"[39m
+            [33mhref[39m=[32m"/capture"[39m
+            [33mstyle[39m=[32m"padding: 6px 12px; border-radius: 0; text-decoration: none; font-weight: 600; font-size: 13px; display: inline-flex; align-items: center; gap: 6px; background-color: hsl(var(--primary)); color: hsl(var(--primary-foreground));"[39m
+          [36m>[39m
+            [36m<svg[39m
+              [33maria-hidden[39m=[32m"true"[39m
+              [33mclass[39m=[32m"lucide lucide-upload"[39m
+              [33mfill[39m=[32m"none"[39m
+              [33mheight[39m=[32m"16"[39m
+              [33mstroke[39m=[32m"currentColor"[39m
+              [33mstroke-linecap[39m=[32m"round"[39m
+              [33mstroke-linejoin[39m=[32m"round"[39m
+              [33mstroke-width[39m=[32m"2"[39m
+              [33mviewBox[39m=[32m"0 0 24 24"[39m
+              [33mwidth[39m=[32m"16"[39m
+              [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+            [36m>[39m
+              [36m<path[39m
+                [33md[39m=[32m"M12 3v12"[39m
+              [36m/>[39m
+              [36m<path[39m
+                [33md[39m=[32m"m17 8-5-5-5 5"[39m
+              [36m/>[39m
+              [36m<path[39m
+                [33md[39m=[32m"M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"[39m
+              [36m/>[39m
+            [36m</svg>[39m
+            [36m<span[39m
+              [33mclass[39m=[32m"sg-import-label"[39m
+            [36m>[39m
+              [0mAdd item[0m
+            [36m</span>[39m
+          [36m</a>[39m
+        [36m</div>[39m
+        [36m<div[39m
+          [33mstyle[39m=[32m"padding: 16px 24px 4px; display: flex; align-items: baseline; gap: 12px;"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mstyle[39m=[32m"flex: 1 1 0%;"[39m
+          [36m>[39m
+            [36m<h1[39m
+              [33mclass[39m=[32m"sg-catalog-title"[39m
+            [36m>[39m
+              [0mYour things[0m
+            [36m</h1>[39m
+            [36m<p[39m
+              [33mstyle[39m=[32m"margin: 4px 0px 0px; font-size: 13px; color: hsl(var(--ink-muted));"[39m
+            [36m>[39m
+              [0m5[0m
+              [0m [0m
+              [0mthings[0m
+            [36m</p>[39m
+          [36m</div>[39m
+          [36m<button[39m
+            [33mclass[39m=[32m"focus-ring"[39m
+            [33mstyle[39m=[32m"background: none; font-size: 13px; cursor: pointer; text-decoration: underline; color: hsl(var(--ink)); white-space: nowrap;"[39m
+            [33mtype[39m=[32m"button"[39m
+          [36m>[39m
+            [0mGone[0m
+          [36m</button>[39m
+        [36m</div>[39m
+        [36m<div[39m
+          [33mdata-testid[39m=[32m"catalog-toolbar"[39m
+          [33mstyle[39m=[32m"display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 8px 24px; border-bottom-style: solid; border-bottom-width: 1px; border-color: hsl(var(--line)); background-color: hsl(var(--paper)); color: hsl(var(--ink));"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mdata-testid[39m=[32m"catalog-kind-tabs"[39m
+            [33mstyle[39m=[32m"display: flex; gap: 16px; overflow-x: auto; flex-wrap: nowrap; align-items: center;"[39m
+          [36m>[39m
+            [36m<button[39m
+              [33maria-pressed[39m=[32m"true"[39m
+              [33mclass[39m=[32m"focus-ring"[39m
+              [33mstyle[39m=[32m"background: transparent; border-bottom: 2px solid hsl(var(--ink)); border-radius: 0; padding: 4px 2px; font-size: 15px; font-weight: 600; cursor: pointer; white-space: nowrap; color: hsl(var(--ink));"[39m
+              [33mtype[39m=[32m"button"[39m
+            [36m>[39m
+              [0mAll[0m
+            [36m</button>[39m
+            [36m<button[39m
+              [33maria-pressed[39m=[32m"false"[39m
+              [33mclass[39m=[32m"focus-ring"[39m
+              [33mstyle[39m=[32m"background: transparent; border-bottom: ...
+   ❯ src/sg337-grouped-packs.sg337.test.tsx > SG-337 grouped same-name packs in the grid > T3 clicking the card opens the 6 May 2030 pack (pack-1)
+     → Unable to find an element with the text: 3 packs. This could be because the text is broken up by multiple elements. In this case, you can provide a function for your text matcher to make your matcher more flexible.
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<div[39m
+      [33mstyle[39m=[32m"min-height: 100vh; background-color: hsl(var(--paper)); color: hsl(var(--ink));"[39m
+    [36m>[39m
+      [36m<div[39m
+        [33mstyle[39m=[32m"position: sticky; top: 0px; z-index: 10; background-color: hsl(var(--paper));"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"sg-header"[39m
+          [33mdata-testid[39m=[32m"catalog-header"[39m
+          [33mstyle[39m=[32m"display: flex; flex-wrap: wrap; align-items: center; gap: 12px; row-gap: 8px; padding: 10px 24px; border-bottom-style: solid; border-bottom-width: 1px; border-bottom-color: hsl(var(--line)); background-color: hsl(var(--paper)); color: hsl(var(--ink));"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33maria-hidden[39m=[32m"true"[39m
+            [33mstyle[39m=[32m"flex: 1 1 0%;"[39m
+          [36m/>[39m
+          [36m<input[39m
+            [33maria-label[39m=[32m"Search your things"[39m
+            [33mclass[39m=[32m"sg-paper-control focus-ring sg-header-search"[39m
+            [33mplaceholder[39m=[32m"Search your things"[39m
+            [33mstyle[39m=[32m"padding: 6px 10px; border-radius: 0; flex: 1 1 120px; min-width: 0; max-width: 420px; font-size: 13px;"[39m
+            [33mtype[39m=[32m"search"[39m
+            [33mvalue[39m=[32m""[39m
+          [36m/>[39m
+          [36m<button[39m
+            [33maria-label[39m=[32m"Switch to dark theme"[39m
+            [33mclass[39m=[32m"sg-paper-control focus-ring"[39m
+            [33mdata-testid[39m=[32m"theme-toggle"[39m
+            [33mstyle[39m=[32m"display: inline-flex; align-items: center; justify-content: center; padding: 6px; border-radius: 0; cursor: pointer;"[39m
+            [33mtitle[39m=[32m"Switch to dark theme"[39m
+            [33mtype[39m=[32m"button"[39m
+          [36m>[39m
+            [36m<svg[39m
+              [33maria-hidden[39m=[32m"true"[39m
+              [33mclass[39m=[32m"lucide lucide-moon"[39m
+              [33mfill[39m=[32m"none"[39m
+              [33mheight[39m=[32m"18"[39m
+              [33mstroke[39m=[32m"currentColor"[39m
+              [33mstroke-linecap[39m=[32m"round"[39m
+              [33mstroke-linejoin[39m=[32m"round"[39m
+              [33mstroke-width[39m=[32m"2"[39m
+              [33mviewBox[39m=[32m"0 0 24 24"[39m
+              [33mwidth[39m=[32m"18"[39m
+              [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+            [36m>[39m
+              [36m<path[39m
+                [33md[39m=[32m"M20.985 12.486a9 9 0 1 1-9.473-9.472c.405-.022.617.46.402.803a6 6 0 0 0 8.268 8.268c.344-.215.825-.004.803.401"[39m
+              [36m/>[39m
+            [36m</svg>[39m
+          [36m</button>[39m
+          [36m<a[39m
+            [33maria-label[39m=[32m"Add item"[39m
+            [33mclass[39m=[32m"focus-ring"[39m
+            [33mhref[39m=[32m"/capture"[39m
+            [33mstyle[39m=[32m"padding: 6px 12px; border-radius: 0; text-decoration: none; font-weight: 600; font-size: 13px; display: inline-flex; align-items: center; gap: 6px; background-color: hsl(var(--primary)); color: hsl(var(--primary-foreground));"[39m
+          [36m>[39m
+            [36m<svg[39m
+              [33maria-hidden[39m=[32m"true"[39m
+              [33mclass[39m=[32m"lucide lucide-upload"[39m
+              [33mfill[39m=[32m"none"[39m
+              [33mheight[39m=[32m"16"[39m
+              [33mstroke[39m=[32m"currentColor"[39m
+              [33mstroke-linecap[39m=[32m"round"[39m
+              [33mstroke-linejoin[39m=[32m"round"[39m
+              [33mstroke-width[39m=[32m"2"[39m
+              [33mviewBox[39m=[32m"0 0 24 24"[39m
+              [33mwidth[39m=[32m"16"[39m
+              [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+            [36m>[39m
+              [36m<path[39m
+                [33md[39m=[32m"M12 3v12"[39m
+              [36m/>[39m
+              [36m<path[39m
+                [33md[39m=[32m"m17 8-5-5-5 5"[39m
+              [36m/>[39m
+              [36m<path[39m
+                [33md[39m=[32m"M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"[39m
+              [36m/>[39m
+            [36m</svg>[39m
+            [36m<span[39m
+              [33mclass[39m=[32m"sg-import-label"[39m
+            [36m>[39m
+              [0mAdd item[0m
+            [36m</span>[39m
+          [36m</a>[39m
+        [36m</div>[39m
+        [36m<div[39m
+          [33mstyle[39m=[32m"padding: 16px 24px 4px; display: flex; align-items: baseline; gap: 12px;"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mstyle[39m=[32m"flex: 1 1 0%;"[39m
+          [36m>[39m
+            [36m<h1[39m
+              [33mclass[39m=[32m"sg-catalog-title"[39m
+            [36m>[39m
+              [0mYour things[0m
+            [36m</h1>[39m
+            [36m<p[39m
+              [33mstyle[39m=[32m"margin: 4px 0px 0px; font-size: 13px; color: hsl(var(--ink-muted));"[39m
+            [36m>[39m
+              [0m5[0m
+              [0m [0m
+              [0mthings[0m
+            [36m</p>[39m
+          [36m</div>[39m
+          [36m<button[39m
+            [33mclass[39m=[32m"focus-ring"[39m
+            [33mstyle[39m=[32m"background: none; font-size: 13px; cursor: pointer; text-decoration: underline; color: hsl(var(--ink)); white-space: nowrap;"[39m
+            [33mtype[39m=[32m"button"[39m
+          [36m>[39m
+            [0mGone[0m
+          [36m</button>[39m
+        [36m</div>[39m
+        [36m<div[39m
+          [33mdata-testid[39m=[32m"catalog-toolbar"[39m
+          [33mstyle[39m=[32m"display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 8px 24px; border-bottom-style: solid; border-bottom-width: 1px; border-color: hsl(var(--line)); background-color: hsl(var(--paper)); color: hsl(var(--ink));"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mdata-testid[39m=[32m"catalog-kind-tabs"[39m
+            [33mstyle[39m=[32m"display: flex; gap: 16px; overflow-x: auto; flex-wrap: nowrap; align-items: center;"[39m
+          [36m>[39m
+            [36m<button[39m
+              [33maria-pressed[39m=[32m"true"[39m
+              [33mclass[39m=[32m"focus-ring"[39m
+              [33mstyle[39m=[32m"background: transparent; border-bottom: 2px solid hsl(var(--ink)); border-radius: 0; padding: 4px 2px; font-size: 15px; font-weight: 600; cursor: pointer; white-space: nowrap; color: hsl(var(--ink));"[39m
+              [33mtype[39m=[32m"button"[39m
+            [36m>[39m
+              [0mAll[0m
+            [36m</button>[39m
+            [36m<button[39m
+              [33maria-pressed[39m=[32m"false"[39m
+              [33mclass[39m=[32m"focus-ring"[39m
+              [33mstyle[39m=[32m"background: transparent; border-bottom: ...
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<div[39m
+      [33mstyle[39m=[32m"min-height: 100vh; background-color: hsl(var(--paper)); color: hsl(var(--ink));"[39m
+    [36m>[39m
+      [36m<div[39m
+        [33mstyle[39m=[32m"position: sticky; top: 0px; z-index: 10; background-color: hsl(var(--paper));"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"sg-header"[39m
+          [33mdata-testid[39m=[32m"catalog-header"[39m
+          [33mstyle[39m=[32m"display: flex; flex-wrap: wrap; align-items: center; gap: 12px; row-gap: 8px; padding: 10px 24px; border-bottom-style: solid; border-bottom-width: 1px; border-bottom-color: hsl(var(--line)); background-color: hsl(var(--paper)); color: hsl(var(--ink));"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33maria-hidden[39m=[32m"true"[39m
+            [33mstyle[39m=[32m"flex: 1 1 0%;"[39m
+          [36m/>[39m
+          [36m<input[39m
+            [33maria-label[39m=[32m"Search your things"[39m
+            [33mclass[39m=[32m"sg-paper-control focus-ring sg-header-search"[39m
+            [33mplaceholder[39m=[32m"Search your things"[39m
+            [33mstyle[39m=[32m"padding: 6px 10px; border-radius: 0; flex: 1 1 120px; min-width: 0; max-width: 420px; font-size: 13px;"[39m
+            [33mtype[39m=[32m"search"[39m
+            [33mvalue[39m=[32m""[39m
+          [36m/>[39m
+          [36m<button[39m
+            [33maria-label[39m=[32m"Switch to dark theme"[39m
+            [33mclass[39m=[32m"sg-paper-control focus-ring"[39m
+            [33mdata-testid[39m=[32m"theme-toggle"[39m
+            [33mstyle[39m=[32m"display: inline-flex; align-items: center; justify-content: center; padding: 6px; border-radius: 0; cursor: pointer;"[39m
+            [33mtitle[39m=[32m"Switch to dark theme"[39m
+            [33mtype[39m=[32m"button"[39m
+          [36m>[39m
+            [36m<svg[39m
+              [33maria-hidden[39m=[32m"true"[39m
+              [33mclass[39m=[32m"lucide lucide-moon"[39m
+              [33mfill[39m=[32m"none"[39m
+              [33mheight[39m=[32m"18"[39m
+              [33mstroke[39m=[32m"currentColor"[39m
+              [33mstroke-linecap[39m=[32m"round"[39m
+              [33mstroke-linejoin[39m=[32m"round"[39m
+              [33mstroke-width[39m=[32m"2"[39m
+              [33mviewBox[39m=[32m"0 0 24 24"[39m
+              [33mwidth[39m=[32m"18"[39m
+              [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+            [36m>[39m
+              [36m<path[39m
+                [33md[39m=[32m"M20.985 12.486a9 9 0 1 1-9.473-9.472c.405-.022.617.46.402.803a6 6 0 0 0 8.268 8.268c.344-.215.825-.004.803.401"[39m
+              [36m/>[39m
+            [36m</svg>[39m
+          [36m</button>[39m
+          [36m<a[39m
+            [33maria-label[39m=[32m"Add item"[39m
+            [33mclass[39m=[32m"focus-ring"[39m
+            [33mhref[39m=[32m"/capture"[39m
+            [33mstyle[39m=[32m"padding: 6px 12px; border-radius: 0; text-decoration: none; font-weight: 600; font-size: 13px; display: inline-flex; align-items: center; gap: 6px; background-color: hsl(var(--primary)); color: hsl(var(--primary-foreground));"[39m
+          [36m>[39m
+            [36m<svg[39m
+              [33maria-hidden[39m=[32m"true"[39m
+              [33mclass[39m=[32m"lucide lucide-upload"[39m
+              [33mfill[39m=[32m"none"[39m
+              [33mheight[39m=[32m"16"[39m
+              [33mstroke[39m=[32m"currentColor"[39m
+              [33mstroke-linecap[39m=[32m"round"[39m
+              [33mstroke-linejoin[39m=[32m"round"[39m
+              [33mstroke-width[39m=[32m"2"[39m
+              [33mviewBox[39m=[32m"0 0 24 24"[39m
+              [33mwidth[39m=[32m"16"[39m
+              [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+            [36m>[39m
+              [36m<path[39m
+                [33md[39m=[32m"M12 3v12"[39m
+              [36m/>[39m
+              [36m<path[39m
+                [33md[39m=[32m"m17 8-5-5-5 5"[39m
+              [36m/>[39m
+              [36m<path[39m
+                [33md[39m=[32m"M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"[39m
+              [36m/>[39m
+            [36m</svg>[39m
+            [36m<span[39m
+              [33mclass[39m=[32m"sg-import-label"[39m
+            [36m>[39m
+              [0mAdd item[0m
+            [36m</span>[39m
+          [36m</a>[39m
+        [36m</div>[39m
+        [36m<div[39m
+          [33mstyle[39m=[32m"padding: 16px 24px 4px; display: flex; align-items: baseline; gap: 12px;"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mstyle[39m=[32m"flex: 1 1 0%;"[39m
+          [36m>[39m
+            [36m<h1[39m
+              [33mclass[39m=[32m"sg-catalog-title"[39m
+            [36m>[39m
+              [0mYour things[0m
+            [36m</h1>[39m
+            [36m<p[39m
+              [33mstyle[39m=[32m"margin: 4px 0px 0px; font-size: 13px; color: hsl(var(--ink-muted));"[39m
+            [36m>[39m
+              [0m5[0m
+              [0m [0m
+              [0mthings[0m
+            [36m</p>[39m
+          [36m</div>[39m
+          [36m<button[39m
+            [33mclass[39m=[32m"focus-ring"[39m
+            [33mstyle[39m=[32m"background: none; font-size: 13px; cursor: pointer; text-decoration: underline; color: hsl(var(--ink)); white-space: nowrap;"[39m
+            [33mtype[39m=[32m"button"[39m
+          [36m>[39m
+            [0mGone[0m
+          [36m</button>[39m
+        [36m</div>[39m
+        [36m<div[39m
+          [33mdata-testid[39m=[32m"catalog-toolbar"[39m
+          [33mstyle[39m=[32m"display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 8px 24px; border-bottom-style: solid; border-bottom-width: 1px; border-color: hsl(var(--line)); background-color: hsl(var(--paper)); color: hsl(var(--ink));"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mdata-testid[39m=[32m"catalog-kind-tabs"[39m
+            [33mstyle[39m=[32m"display: flex; gap: 16px; overflow-x: auto; flex-wrap: nowrap; align-items: center;"[39m
+          [36m>[39m
+            [36m<button[39m
+              [33maria-pressed[39m=[32m"true"[39m
+              [33mclass[39m=[32m"focus-ring"[39m
+              [33mstyle[39m=[32m"background: transparent; border-bottom: 2px solid hsl(var(--ink)); border-radius: 0; padding: 4px 2px; font-size: 15px; font-weight: 600; cursor: pointer; white-space: nowrap; color: hsl(var(--ink));"[39m
+              [33mtype[39m=[32m"button"[39m
+            [36m>[39m
+              [0mAll[0m
+            [36m</button>[39m
+            [36m<button[39m
+              [33maria-pressed[39m=[32m"false"[39m
+              [33mclass[39m=[32m"focus-ring"[39m
+              [33mstyle[39m=[32m"background: transparent; border-bottom: ...
+   ❯ src/sg337-grouped-packs.sg337.test.tsx > SG-337 grouped same-name packs in the grid > T6 search narrows first: olive shows one card, 3 packs
+     → expected [ <a …(4)>…(2)</a>, …(2) ] to have a length of 1 but got 3
+
+Ignored nodes: comments, script, style
+[36m<html[39m
+  [33mclass[39m=[32m"light"[39m
+[36m>[39m
+  [36m<head />[39m
+  [36m<body>[39m
+    [36m<div>[39m
+      [36m<div[39m
+        [33mstyle[39m=[32m"min-height: 100vh; background-color: hsl(var(--paper)); color: hsl(var(--ink));"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mstyle[39m=[32m"position: sticky; top: 0px; z-index: 10; background-color: hsl(var(--paper));"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"sg-header"[39m
+            [33mdata-testid[39m=[32m"catalog-header"[39m
+            [33mstyle[39m=[32m"display: flex; flex-wrap: wrap; align-items: center; gap: 12px; row-gap: 8px; padding: 10px 24px; border-bottom-style: solid; border-bottom-width: 1px; border-bottom-color: hsl(var(--line)); background-color: hsl(var(--paper)); color: hsl(var(--ink));"[39m
+          [36m>[39m
+            [36m<div[39m
+              [33maria-hidden[39m=[32m"true"[39m
+              [33mstyle[39m=[32m"flex: 1 1 0%;"[39m
+            [36m/>[39m
+            [36m<input[39m
+              [33maria-label[39m=[32m"Search your things"[39m
+              [33mclass[39m=[32m"sg-paper-control focus-ring sg-header-search"[39m
+              [33mplaceholder[39m=[32m"Search your things"[39m
+              [33mstyle[39m=[32m"padding: 6px 10px; border-radius: 0; flex: 1 1 120px; min-width: 0; max-width: 420px; font-size: 13px;"[39m
+              [33mtype[39m=[32m"search"[39m
+              [33mvalue[39m=[32m"olive"[39m
+            [36m/>[39m
+            [36m<button[39m
+              [33maria-label[39m=[32m"Switch to dark theme"[39m
+              [33mclass[39m=[32m"sg-paper-control focus-ring"[39m
+              [33mdata-testid[39m=[32m"theme-toggle"[39m
+              [33mstyle[39m=[32m"display: inline-flex; align-items: center; justify-content: center; padding: 6px; border-radius: 0; cursor: pointer;"[39m
+              [33mtitle[39m=[32m"Switch to dark theme"[39m
+              [33mtype[39m=[32m"button"[39m
+            [36m>[39m
+              [36m<svg[39m
+                [33maria-hidden[39m=[32m"true"[39m
+                [33mclass[39m=[32m"lucide lucide-moon"[39m
+                [33mfill[39m=[32m"none"[39m
+                [33mheight[39m=[32m"18"[39m
+                [33mstroke[39m=[32m"currentColor"[39m
+                [33mstroke-linecap[39m=[32m"round"[39m
+                [33mstroke-linejoin[39m=[32m"round"[39m
+                [33mstroke-width[39m=[32m"2"[39m
+                [33mviewBox[39m=[32m"0 0 24 24"[39m
+                [33mwidth[39m=[32m"18"[39m
+                [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+              [36m>[39m
+                [36m<path[39m
+                  [33md[39m=[32m"M20.985 12.486a9 9 0 1 1-9.473-9.472c.405-.022.617.46.402.803a6 6 0 0 0 8.268 8.268c.344-.215.825-.004.803.401"[39m
+                [36m/>[39m
+              [36m</svg>[39m
+            [36m</button>[39m
+            [36m<a[39m
+              [33maria-label[39m=[32m"Add item"[39m
+              [33mclass[39m=[32m"focus-ring"[39m
+              [33mhref[39m=[32m"/capture"[39m
+              [33mstyle[39m=[32m"padding: 6px 12px; border-radius: 0; text-decoration: none; font-weight: 600; font-size: 13px; display: inline-flex; align-items: center; gap: 6px; background-color: hsl(var(--primary)); color: hsl(var(--primary-foreground));"[39m
+            [36m>[39m
+              [36m<svg[39m
+                [33maria-hidden[39m=[32m"true"[39m
+                [33mclass[39m=[32m"lucide lucide-upload"[39m
+                [33mfill[39m=[32m"none"[39m
+                [33mheight[39m=[32m"16"[39m
+                [33mstroke[39m=[32m"currentColor"[39m
+                [33mstroke-linecap[39m=[32m"round"[39m
+                [33mstroke-linejoin[39m=[32m"round"[39m
+                [33mstroke-width[39m=[32m"2"[39m
+                [33mviewBox[39m=[32m"0 0 24 24"[39m
+                [33mwidth[39m=[32m"16"[39m
+                [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+              [36m>[39m
+                [36m<path[39m
+                  [33md[39m=[32m"M12 3v12"[39m
+                [36m/>[39m
+                [36m<path[39m
+                  [33md[39m=[32m"m17 8-5-5-5 5"[39m
+                [36m/>[39m
+                [36m<path[39m
+                  [33md[39m=[32m"M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"[39m
+                [36m/>[39m
+              [36m</svg>[39m
+              [36m<span[39m
+                [33mclass[39m=[32m"sg-import-label"[39m
+              [36m>[39m
+                [0mAdd item[0m
+              [36m</span>[39m
+            [36m</a>[39m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mstyle[39m=[32m"padding: 16px 24px 4px; display: flex; align-items: baseline; gap: 12px;"[39m
+          [36m>[39m
+            [36m<div[39m
+              [33mstyle[39m=[32m"flex: 1 1 0%;"[39m
+            [36m>[39m
+              [36m<h1[39m
+                [33mclass[39m=[32m"sg-catalog-title"[39m
+              [36m>[39m
+                [0mYour things[0m
+              [36m</h1>[39m
+              [36m<p[39m
+                [33mstyle[39m=[32m"margin: 4px 0px 0px; font-size: 13px; color: hsl(var(--ink-muted));"[39m
+              [36m>[39m
+                [0m3[0m
+                [0m [0m
+                [0mthings[0m
+              [36m</p>[39m
+            [36m</div>[39m
+            [36m<button[39m
+              [33mclass[39m=[32m"focus-ring"[39m
+              [33mstyle[39m=[32m"background: none; font-size: 13px; cursor: pointer; text-decoration: underline; color: hsl(var(--ink)); white-space: nowrap;"[39m
+              [33mtype[39m=[32m"button"[39m
+            [36m>[39m
+              [0mGone[0m
+            [36m</button>[39m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mdata-testid[39m=[32m"catalog-toolbar"[39m
+            [33mstyle[39m=[32m"display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 8px 24px; border-bottom-style: solid; border-bottom-width: 1px; border-color: hsl(var(--line)); background-color: hsl(var(--paper)); color: hsl(var(--ink));"[39m
+          [36m>[39m
+            [36m<div[39m
+              [33mdata-testid[39m=[32m"catalog-kind-tabs"[39m
+              [33mstyle[39m=[32m"display: flex; gap: 16px; overflow-x: auto; flex-wrap: nowrap; align-items: center;"[39m
+            [36m>[39m
+              [36m<button[39m
+                [33maria-pressed[39m=[32m"true"[39m
+                [33mclass[39m=[32m"focus-ring"[39m
+                [33mstyle[39m=[32m"background: transparent; border-bottom: 2px solid hsl(var(--ink)); border-radius: 0; padding: 4px 2px; font-size: 15px; font-weight: 600; cursor: pointer; white-space: nowrap; color: hsl(var(--ink));"[39m
+  ...
+   ❯ src/sg337-grouped-packs.sg337.test.tsx > SG-337 grouped same-name packs in the grid > T7 G4: a card at 79.5 px width keeps its past chip inside the card
+     → expected '' to be '100%' // Object.is equality
+   ❯ src/sg337-grouped-packs.sg337.test.tsx > SG-337 grouped same-name packs in the grid > T8 G5: the grid and attention line carry no inset the title does not
+     → expected '1100px' to be '' // Object.is equality
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 6 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/sg337-grouped-packs.sg337.test.tsx > SG-337 grouped same-name packs in the grid > T1 grid: one Olive Oil card reading 3 packs with the 6 May 2030 date line; one Rice card with no packs line; 3 cards total
+AssertionError: expected [ <a …(4)>…(2)</a>, …(4) ] to have a length of 3 but got 5
+
+- Expected
++ Received
+
+- 3
++ 5
+
+ ❯ src/sg337-grouped-packs.sg337.test.tsx:161:19
+    159|     renderCatalog();
+    160|     const cards = await screen.findAllByTestId("product-card");
+    161|     expect(cards).toHaveLength(3);
+       |                   ^
+    162| 
+    163|     const olive = cards.find((card) => within(card).queryByText("3 pac…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/6]⎯
+
+ FAIL  src/sg337-grouped-packs.sg337.test.tsx > SG-337 grouped same-name packs in the grid > T2 the Olive Oil card shows the 3 Feb 2031 pack photo (the soonest pack has none)
+TestingLibraryElementError: Unable to find an element with the text: 3 packs. This could be because the text is broken up by multiple elements. In this case, you can provide a function for your text matcher to make your matcher more flexible.
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<div[39m
+      [33mstyle[39m=[32m"min-height: 100vh; background-color: hsl(var(--paper)); color: hsl(var(--ink));"[39m
+    [36m>[39m
+      [36m<div[39m
+        [33mstyle[39m=[32m"position: sticky; top: 0px; z-index: 10; background-color: hsl(var(--paper));"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"sg-header"[39m
+          [33mdata-testid[39m=[32m"catalog-header"[39m
+          [33mstyle[39m=[32m"display: flex; flex-wrap: wrap; align-items: center; gap: 12px; row-gap: 8px; padding: 10px 24px; border-bottom-style: solid; border-bottom-width: 1px; border-bottom-color: hsl(var(--line)); background-color: hsl(var(--paper)); color: hsl(var(--ink));"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33maria-hidden[39m=[32m"true"[39m
+            [33mstyle[39m=[32m"flex: 1 1 0%;"[39m
+          [36m/>[39m
+          [36m<input[39m
+            [33maria-label[39m=[32m"Search your things"[39m
+            [33mclass[39m=[32m"sg-paper-control focus-ring sg-header-search"[39m
+            [33mplaceholder[39m=[32m"Search your things"[39m
+            [33mstyle[39m=[32m"padding: 6px 10px; border-radius: 0; flex: 1 1 120px; min-width: 0; max-width: 420px; font-size: 13px;"[39m
+            [33mtype[39m=[32m"search"[39m
+            [33mvalue[39m=[32m""[39m
+          [36m/>[39m
+          [36m<button[39m
+            [33maria-label[39m=[32m"Switch to dark theme"[39m
+            [33mclass[39m=[32m"sg-paper-control focus-ring"[39m
+            [33mdata-testid[39m=[32m"theme-toggle"[39m
+            [33mstyle[39m=[32m"display: inline-flex; align-items: center; justify-content: center; padding: 6px; border-radius: 0; cursor: pointer;"[39m
+            [33mtitle[39m=[32m"Switch to dark theme"[39m
+            [33mtype[39m=[32m"button"[39m
+          [36m>[39m
+            [36m<svg[39m
+              [33maria-hidden[39m=[32m"true"[39m
+              [33mclass[39m=[32m"lucide lucide-moon"[39m
+              [33mfill[39m=[32m"none"[39m
+              [33mheight[39m=[32m"18"[39m
+              [33mstroke[39m=[32m"currentColor"[39m
+              [33mstroke-linecap[39m=[32m"round"[39m
+              [33mstroke-linejoin[39m=[32m"round"[39m
+              [33mstroke-width[39m=[32m"2"[39m
+              [33mviewBox[39m=[32m"0 0 24 24"[39m
+              [33mwidth[39m=[32m"18"[39m
+              [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+            [36m>[39m
+              [36m<path[39m
+                [33md[39m=[32m"M20.985 12.486a9 9 0 1 1-9.473-9.472c.405-.022.617.46.402.803a6 6 0 0 0 8.268 8.268c.344-.215.825-.004.803.401"[39m
+              [36m/>[39m
+            [36m</svg>[39m
+          [36m</button>[39m
+          [36m<a[39m
+            [33maria-label[39m=[32m"Add item"[39m
+            [33mclass[39m=[32m"focus-ring"[39m
+            [33mhref[39m=[32m"/capture"[39m
+            [33mstyle[39m=[32m"padding: 6px 12px; border-radius: 0; text-decoration: none; font-weight: 600; font-size: 13px; display: inline-flex; align-items: center; gap: 6px; background-color: hsl(var(--primary)); color: hsl(var(--primary-foreground));"[39m
+          [36m>[39m
+            [36m<svg[39m
+              [33maria-hidden[39m=[32m"true"[39m
+              [33mclass[39m=[32m"lucide lucide-upload"[39m
+              [33mfill[39m=[32m"none"[39m
+              [33mheight[39m=[32m"16"[39m
+              [33mstroke[39m=[32m"currentColor"[39m
+              [33mstroke-linecap[39m=[32m"round"[39m
+              [33mstroke-linejoin[39m=[32m"round"[39m
+              [33mstroke-width[39m=[32m"2"[39m
+              [33mviewBox[39m=[32m"0 0 24 24"[39m
+              [33mwidth[39m=[32m"16"[39m
+              [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+            [36m>[39m
+              [36m<path[39m
+                [33md[39m=[32m"M12 3v12"[39m
+              [36m/>[39m
+              [36m<path[39m
+                [33md[39m=[32m"m17 8-5-5-5 5"[39m
+              [36m/>[39m
+              [36m<path[39m
+                [33md[39m=[32m"M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"[39m
+              [36m/>[39m
+            [36m</svg>[39m
+            [36m<span[39m
+              [33mclass[39m=[32m"sg-import-label"[39m
+            [36m>[39m
+              [0mAdd item[0m
+            [36m</span>[39m
+          [36m</a>[39m
+        [36m</div>[39m
+        [36m<div[39m
+          [33mstyle[39m=[32m"padding: 16px 24px 4px; display: flex; align-items: baseline; gap: 12px;"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mstyle[39m=[32m"flex: 1 1 0%;"[39m
+          [36m>[39m
+            [36m<h1[39m
+              [33mclass[39m=[32m"sg-catalog-title"[39m
+            [36m>[39m
+              [0mYour things[0m
+            [36m</h1>[39m
+            [36m<p[39m
+              [33mstyle[39m=[32m"margin: 4px 0px 0px; font-size: 13px; color: hsl(var(--ink-muted));"[39m
+            [36m>[39m
+              [0m5[0m
+              [0m [0m
+              [0mthings[0m
+            [36m</p>[39m
+          [36m</div>[39m
+          [36m<button[39m
+            [33mclass[39m=[32m"focus-ring"[39m
+            [33mstyle[39m=[32m"background: none; font-size: 13px; cursor: pointer; text-decoration: underline; color: hsl(var(--ink)); white-space: nowrap;"[39m
+            [33mtype[39m=[32m"button"[39m
+          [36m>[39m
+            [0mGone[0m
+          [36m</button>[39m
+        [36m</div>[39m
+        [36m<div[39m
+          [33mdata-testid[39m=[32m"catalog-toolbar"[39m
+          [33mstyle[39m=[32m"display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 8px 24px; border-bottom-style: solid; border-bottom-width: 1px; border-color: hsl(var(--line)); background-color: hsl(var(--paper)); color: hsl(var(--ink));"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mdata-testid[39m=[32m"catalog-kind-tabs"[39m
+            [33mstyle[39m=[32m"display: flex; gap: 16px; overflow-x: auto; flex-wrap: nowrap; align-items: center;"[39m
+          [36m>[39m
+            [36m<button[39m
+              [33maria-pressed[39m=[32m"true"[39m
+              [33mclass[39m=[32m"focus-ring"[39m
+              [33mstyle[39m=[32m"background: transparent; border-bottom: 2px solid hsl(var(--ink)); border-radius: 0; padding: 4px 2px; font-size: 15px; font-weight: 600; cursor: pointer; white-space: nowrap; color: hsl(var(--ink));"[39m
+              [33mtype[39m=[32m"button"[39m
+            [36m>[39m
+              [0mAll[0m
+            [36m</button>[39m
+            [36m<button[39m
+              [33maria-pressed[39m=[32m"false"[39m
+              [33mclass[39m=[32m"focus-ring"[39m
+              [33mstyle[39m=[32m"background: transparent; border-bottom: ...
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<div[39m
+      [33mstyle[39m=[32m"min-height: 100vh; background-color: hsl(var(--paper)); color: hsl(var(--ink));"[39m
+    [36m>[39m
+      [36m<div[39m
+        [33mstyle[39m=[32m"position: sticky; top: 0px; z-index: 10; background-color: hsl(var(--paper));"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"sg-header"[39m
+          [33mdata-testid[39m=[32m"catalog-header"[39m
+          [33mstyle[39m=[32m"display: flex; flex-wrap: wrap; align-items: center; gap: 12px; row-gap: 8px; padding: 10px 24px; border-bottom-style: solid; border-bottom-width: 1px; border-bottom-color: hsl(var(--line)); background-color: hsl(var(--paper)); color: hsl(var(--ink));"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33maria-hidden[39m=[32m"true"[39m
+            [33mstyle[39m=[32m"flex: 1 1 0%;"[39m
+          [36m/>[39m
+          [36m<input[39m
+            [33maria-label[39m=[32m"Search your things"[39m
+            [33mclass[39m=[32m"sg-paper-control focus-ring sg-header-search"[39m
+            [33mplaceholder[39m=[32m"Search your things"[39m
+            [33mstyle[39m=[32m"padding: 6px 10px; border-radius: 0; flex: 1 1 120px; min-width: 0; max-width: 420px; font-size: 13px;"[39m
+            [33mtype[39m=[32m"search"[39m
+            [33mvalue[39m=[32m""[39m
+          [36m/>[39m
+          [36m<button[39m
+            [33maria-label[39m=[32m"Switch to dark theme"[39m
+            [33mclass[39m=[32m"sg-paper-control focus-ring"[39m
+            [33mdata-testid[39m=[32m"theme-toggle"[39m
+            [33mstyle[39m=[32m"display: inline-flex; align-items: center; justify-content: center; padding: 6px; border-radius: 0; cursor: pointer;"[39m
+            [33mtitle[39m=[32m"Switch to dark theme"[39m
+            [33mtype[39m=[32m"button"[39m
+          [36m>[39m
+            [36m<svg[39m
+              [33maria-hidden[39m=[32m"true"[39m
+              [33mclass[39m=[32m"lucide lucide-moon"[39m
+              [33mfill[39m=[32m"none"[39m
+              [33mheight[39m=[32m"18"[39m
+              [33mstroke[39m=[32m"currentColor"[39m
+              [33mstroke-linecap[39m=[32m"round"[39m
+              [33mstroke-linejoin[39m=[32m"round"[39m
+              [33mstroke-width[39m=[32m"2"[39m
+              [33mviewBox[39m=[32m"0 0 24 24"[39m
+              [33mwidth[39m=[32m"18"[39m
+              [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+            [36m>[39m
+              [36m<path[39m
+                [33md[39m=[32m"M20.985 12.486a9 9 0 1 1-9.473-9.472c.405-.022.617.46.402.803a6 6 0 0 0 8.268 8.268c.344-.215.825-.004.803.401"[39m
+              [36m/>[39m
+            [36m</svg>[39m
+          [36m</button>[39m
+          [36m<a[39m
+            [33maria-label[39m=[32m"Add item"[39m
+            [33mclass[39m=[32m"focus-ring"[39m
+            [33mhref[39m=[32m"/capture"[39m
+            [33mstyle[39m=[32m"padding: 6px 12px; border-radius: 0; text-decoration: none; font-weight: 600; font-size: 13px; display: inline-flex; align-items: center; gap: 6px; background-color: hsl(var(--primary)); color: hsl(var(--primary-foreground));"[39m
+          [36m>[39m
+            [36m<svg[39m
+              [33maria-hidden[39m=[32m"true"[39m
+              [33mclass[39m=[32m"lucide lucide-upload"[39m
+              [33mfill[39m=[32m"none"[39m
+              [33mheight[39m=[32m"16"[39m
+              [33mstroke[39m=[32m"currentColor"[39m
+              [33mstroke-linecap[39m=[32m"round"[39m
+              [33mstroke-linejoin[39m=[32m"round"[39m
+              [33mstroke-width[39m=[32m"2"[39m
+              [33mviewBox[39m=[32m"0 0 24 24"[39m
+              [33mwidth[39m=[32m"16"[39m
+              [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+            [36m>[39m
+              [36m<path[39m
+                [33md[39m=[32m"M12 3v12"[39m
+              [36m/>[39m
+              [36m<path[39m
+                [33md[39m=[32m"m17 8-5-5-5 5"[39m
+              [36m/>[39m
+              [36m<path[39m
+                [33md[39m=[32m"M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"[39m
+              [36m/>[39m
+            [36m</svg>[39m
+            [36m<span[39m
+              [33mclass[39m=[32m"sg-import-label"[39m
+            [36m>[39m
+              [0mAdd item[0m
+            [36m</span>[39m
+          [36m</a>[39m
+        [36m</div>[39m
+        [36m<div[39m
+          [33mstyle[39m=[32m"padding: 16px 24px 4px; display: flex; align-items: baseline; gap: 12px;"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mstyle[39m=[32m"flex: 1 1 0%;"[39m
+          [36m>[39m
+            [36m<h1[39m
+              [33mclass[39m=[32m"sg-catalog-title"[39m
+            [36m>[39m
+              [0mYour things[0m
+            [36m</h1>[39m
+            [36m<p[39m
+              [33mstyle[39m=[32m"margin: 4px 0px 0px; font-size: 13px; color: hsl(var(--ink-muted));"[39m
+            [36m>[39m
+              [0m5[0m
+              [0m [0m
+              [0mthings[0m
+            [36m</p>[39m
+          [36m</div>[39m
+          [36m<button[39m
+            [33mclass[39m=[32m"focus-ring"[39m
+            [33mstyle[39m=[32m"background: none; font-size: 13px; cursor: pointer; text-decoration: underline; color: hsl(var(--ink)); white-space: nowrap;"[39m
+            [33mtype[39m=[32m"button"[39m
+          [36m>[39m
+            [0mGone[0m
+          [36m</button>[39m
+        [36m</div>[39m
+        [36m<div[39m
+          [33mdata-testid[39m=[32m"catalog-toolbar"[39m
+          [33mstyle[39m=[32m"display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 8px 24px; border-bottom-style: solid; border-bottom-width: 1px; border-color: hsl(var(--line)); background-color: hsl(var(--paper)); color: hsl(var(--ink));"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mdata-testid[39m=[32m"catalog-kind-tabs"[39m
+            [33mstyle[39m=[32m"display: flex; gap: 16px; overflow-x: auto; flex-wrap: nowrap; align-items: center;"[39m
+          [36m>[39m
+            [36m<button[39m
+              [33maria-pressed[39m=[32m"true"[39m
+              [33mclass[39m=[32m"focus-ring"[39m
+              [33mstyle[39m=[32m"background: transparent; border-bottom: 2px solid hsl(var(--ink)); border-radius: 0; padding: 4px 2px; font-size: 15px; font-weight: 600; cursor: pointer; white-space: nowrap; color: hsl(var(--ink));"[39m
+              [33mtype[39m=[32m"button"[39m
+            [36m>[39m
+              [0mAll[0m
+            [36m</button>[39m
+            [36m<button[39m
+              [33maria-pressed[39m=[32m"false"[39m
+              [33mclass[39m=[32m"focus-ring"[39m
+              [33mstyle[39m=[32m"background: transparent; border-bottom: ...
+ ❯ waitForWrapper node_modules/@testing-library/dom/dist/wait-for.js:163:27
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:86:33
+ ❯ src/sg337-grouped-packs.sg337.test.tsx:177:18
+    175|   test("T2 the Olive Oil card shows the 3 Feb 2031 pack photo (the soo…
+    176|     renderCatalog();
+    177|     await screen.findByText("3 packs");
+       |                  ^
+    178|     const olive = (await screen.findAllByTestId("product-card")).find(…
+    179|       within(card).queryByText("3 packs")
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/6]⎯
+
+ FAIL  src/sg337-grouped-packs.sg337.test.tsx > SG-337 grouped same-name packs in the grid > T3 clicking the card opens the 6 May 2030 pack (pack-1)
+TestingLibraryElementError: Unable to find an element with the text: 3 packs. This could be because the text is broken up by multiple elements. In this case, you can provide a function for your text matcher to make your matcher more flexible.
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<div[39m
+      [33mstyle[39m=[32m"min-height: 100vh; background-color: hsl(var(--paper)); color: hsl(var(--ink));"[39m
+    [36m>[39m
+      [36m<div[39m
+        [33mstyle[39m=[32m"position: sticky; top: 0px; z-index: 10; background-color: hsl(var(--paper));"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"sg-header"[39m
+          [33mdata-testid[39m=[32m"catalog-header"[39m
+          [33mstyle[39m=[32m"display: flex; flex-wrap: wrap; align-items: center; gap: 12px; row-gap: 8px; padding: 10px 24px; border-bottom-style: solid; border-bottom-width: 1px; border-bottom-color: hsl(var(--line)); background-color: hsl(var(--paper)); color: hsl(var(--ink));"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33maria-hidden[39m=[32m"true"[39m
+            [33mstyle[39m=[32m"flex: 1 1 0%;"[39m
+          [36m/>[39m
+          [36m<input[39m
+            [33maria-label[39m=[32m"Search your things"[39m
+            [33mclass[39m=[32m"sg-paper-control focus-ring sg-header-search"[39m
+            [33mplaceholder[39m=[32m"Search your things"[39m
+            [33mstyle[39m=[32m"padding: 6px 10px; border-radius: 0; flex: 1 1 120px; min-width: 0; max-width: 420px; font-size: 13px;"[39m
+            [33mtype[39m=[32m"search"[39m
+            [33mvalue[39m=[32m""[39m
+          [36m/>[39m
+          [36m<button[39m
+            [33maria-label[39m=[32m"Switch to dark theme"[39m
+            [33mclass[39m=[32m"sg-paper-control focus-ring"[39m
+            [33mdata-testid[39m=[32m"theme-toggle"[39m
+            [33mstyle[39m=[32m"display: inline-flex; align-items: center; justify-content: center; padding: 6px; border-radius: 0; cursor: pointer;"[39m
+            [33mtitle[39m=[32m"Switch to dark theme"[39m
+            [33mtype[39m=[32m"button"[39m
+          [36m>[39m
+            [36m<svg[39m
+              [33maria-hidden[39m=[32m"true"[39m
+              [33mclass[39m=[32m"lucide lucide-moon"[39m
+              [33mfill[39m=[32m"none"[39m
+              [33mheight[39m=[32m"18"[39m
+              [33mstroke[39m=[32m"currentColor"[39m
+              [33mstroke-linecap[39m=[32m"round"[39m
+              [33mstroke-linejoin[39m=[32m"round"[39m
+              [33mstroke-width[39m=[32m"2"[39m
+              [33mviewBox[39m=[32m"0 0 24 24"[39m
+              [33mwidth[39m=[32m"18"[39m
+              [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+            [36m>[39m
+              [36m<path[39m
+                [33md[39m=[32m"M20.985 12.486a9 9 0 1 1-9.473-9.472c.405-.022.617.46.402.803a6 6 0 0 0 8.268 8.268c.344-.215.825-.004.803.401"[39m
+              [36m/>[39m
+            [36m</svg>[39m
+          [36m</button>[39m
+          [36m<a[39m
+            [33maria-label[39m=[32m"Add item"[39m
+            [33mclass[39m=[32m"focus-ring"[39m
+            [33mhref[39m=[32m"/capture"[39m
+            [33mstyle[39m=[32m"padding: 6px 12px; border-radius: 0; text-decoration: none; font-weight: 600; font-size: 13px; display: inline-flex; align-items: center; gap: 6px; background-color: hsl(var(--primary)); color: hsl(var(--primary-foreground));"[39m
+          [36m>[39m
+            [36m<svg[39m
+              [33maria-hidden[39m=[32m"true"[39m
+              [33mclass[39m=[32m"lucide lucide-upload"[39m
+              [33mfill[39m=[32m"none"[39m
+              [33mheight[39m=[32m"16"[39m
+              [33mstroke[39m=[32m"currentColor"[39m
+              [33mstroke-linecap[39m=[32m"round"[39m
+              [33mstroke-linejoin[39m=[32m"round"[39m
+              [33mstroke-width[39m=[32m"2"[39m
+              [33mviewBox[39m=[32m"0 0 24 24"[39m
+              [33mwidth[39m=[32m"16"[39m
+              [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+            [36m>[39m
+              [36m<path[39m
+                [33md[39m=[32m"M12 3v12"[39m
+              [36m/>[39m
+              [36m<path[39m
+                [33md[39m=[32m"m17 8-5-5-5 5"[39m
+              [36m/>[39m
+              [36m<path[39m
+                [33md[39m=[32m"M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"[39m
+              [36m/>[39m
+            [36m</svg>[39m
+            [36m<span[39m
+              [33mclass[39m=[32m"sg-import-label"[39m
+            [36m>[39m
+              [0mAdd item[0m
+            [36m</span>[39m
+          [36m</a>[39m
+        [36m</div>[39m
+        [36m<div[39m
+          [33mstyle[39m=[32m"padding: 16px 24px 4px; display: flex; align-items: baseline; gap: 12px;"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mstyle[39m=[32m"flex: 1 1 0%;"[39m
+          [36m>[39m
+            [36m<h1[39m
+              [33mclass[39m=[32m"sg-catalog-title"[39m
+            [36m>[39m
+              [0mYour things[0m
+            [36m</h1>[39m
+            [36m<p[39m
+              [33mstyle[39m=[32m"margin: 4px 0px 0px; font-size: 13px; color: hsl(var(--ink-muted));"[39m
+            [36m>[39m
+              [0m5[0m
+              [0m [0m
+              [0mthings[0m
+            [36m</p>[39m
+          [36m</div>[39m
+          [36m<button[39m
+            [33mclass[39m=[32m"focus-ring"[39m
+            [33mstyle[39m=[32m"background: none; font-size: 13px; cursor: pointer; text-decoration: underline; color: hsl(var(--ink)); white-space: nowrap;"[39m
+            [33mtype[39m=[32m"button"[39m
+          [36m>[39m
+            [0mGone[0m
+          [36m</button>[39m
+        [36m</div>[39m
+        [36m<div[39m
+          [33mdata-testid[39m=[32m"catalog-toolbar"[39m
+          [33mstyle[39m=[32m"display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 8px 24px; border-bottom-style: solid; border-bottom-width: 1px; border-color: hsl(var(--line)); background-color: hsl(var(--paper)); color: hsl(var(--ink));"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mdata-testid[39m=[32m"catalog-kind-tabs"[39m
+            [33mstyle[39m=[32m"display: flex; gap: 16px; overflow-x: auto; flex-wrap: nowrap; align-items: center;"[39m
+          [36m>[39m
+            [36m<button[39m
+              [33maria-pressed[39m=[32m"true"[39m
+              [33mclass[39m=[32m"focus-ring"[39m
+              [33mstyle[39m=[32m"background: transparent; border-bottom: 2px solid hsl(var(--ink)); border-radius: 0; padding: 4px 2px; font-size: 15px; font-weight: 600; cursor: pointer; white-space: nowrap; color: hsl(var(--ink));"[39m
+              [33mtype[39m=[32m"button"[39m
+            [36m>[39m
+              [0mAll[0m
+            [36m</button>[39m
+            [36m<button[39m
+              [33maria-pressed[39m=[32m"false"[39m
+              [33mclass[39m=[32m"focus-ring"[39m
+              [33mstyle[39m=[32m"background: transparent; border-bottom: ...
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<div[39m
+      [33mstyle[39m=[32m"min-height: 100vh; background-color: hsl(var(--paper)); color: hsl(var(--ink));"[39m
+    [36m>[39m
+      [36m<div[39m
+        [33mstyle[39m=[32m"position: sticky; top: 0px; z-index: 10; background-color: hsl(var(--paper));"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"sg-header"[39m
+          [33mdata-testid[39m=[32m"catalog-header"[39m
+          [33mstyle[39m=[32m"display: flex; flex-wrap: wrap; align-items: center; gap: 12px; row-gap: 8px; padding: 10px 24px; border-bottom-style: solid; border-bottom-width: 1px; border-bottom-color: hsl(var(--line)); background-color: hsl(var(--paper)); color: hsl(var(--ink));"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33maria-hidden[39m=[32m"true"[39m
+            [33mstyle[39m=[32m"flex: 1 1 0%;"[39m
+          [36m/>[39m
+          [36m<input[39m
+            [33maria-label[39m=[32m"Search your things"[39m
+            [33mclass[39m=[32m"sg-paper-control focus-ring sg-header-search"[39m
+            [33mplaceholder[39m=[32m"Search your things"[39m
+            [33mstyle[39m=[32m"padding: 6px 10px; border-radius: 0; flex: 1 1 120px; min-width: 0; max-width: 420px; font-size: 13px;"[39m
+            [33mtype[39m=[32m"search"[39m
+            [33mvalue[39m=[32m""[39m
+          [36m/>[39m
+          [36m<button[39m
+            [33maria-label[39m=[32m"Switch to dark theme"[39m
+            [33mclass[39m=[32m"sg-paper-control focus-ring"[39m
+            [33mdata-testid[39m=[32m"theme-toggle"[39m
+            [33mstyle[39m=[32m"display: inline-flex; align-items: center; justify-content: center; padding: 6px; border-radius: 0; cursor: pointer;"[39m
+            [33mtitle[39m=[32m"Switch to dark theme"[39m
+            [33mtype[39m=[32m"button"[39m
+          [36m>[39m
+            [36m<svg[39m
+              [33maria-hidden[39m=[32m"true"[39m
+              [33mclass[39m=[32m"lucide lucide-moon"[39m
+              [33mfill[39m=[32m"none"[39m
+              [33mheight[39m=[32m"18"[39m
+              [33mstroke[39m=[32m"currentColor"[39m
+              [33mstroke-linecap[39m=[32m"round"[39m
+              [33mstroke-linejoin[39m=[32m"round"[39m
+              [33mstroke-width[39m=[32m"2"[39m
+              [33mviewBox[39m=[32m"0 0 24 24"[39m
+              [33mwidth[39m=[32m"18"[39m
+              [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+            [36m>[39m
+              [36m<path[39m
+                [33md[39m=[32m"M20.985 12.486a9 9 0 1 1-9.473-9.472c.405-.022.617.46.402.803a6 6 0 0 0 8.268 8.268c.344-.215.825-.004.803.401"[39m
+              [36m/>[39m
+            [36m</svg>[39m
+          [36m</button>[39m
+          [36m<a[39m
+            [33maria-label[39m=[32m"Add item"[39m
+            [33mclass[39m=[32m"focus-ring"[39m
+            [33mhref[39m=[32m"/capture"[39m
+            [33mstyle[39m=[32m"padding: 6px 12px; border-radius: 0; text-decoration: none; font-weight: 600; font-size: 13px; display: inline-flex; align-items: center; gap: 6px; background-color: hsl(var(--primary)); color: hsl(var(--primary-foreground));"[39m
+          [36m>[39m
+            [36m<svg[39m
+              [33maria-hidden[39m=[32m"true"[39m
+              [33mclass[39m=[32m"lucide lucide-upload"[39m
+              [33mfill[39m=[32m"none"[39m
+              [33mheight[39m=[32m"16"[39m
+              [33mstroke[39m=[32m"currentColor"[39m
+              [33mstroke-linecap[39m=[32m"round"[39m
+              [33mstroke-linejoin[39m=[32m"round"[39m
+              [33mstroke-width[39m=[32m"2"[39m
+              [33mviewBox[39m=[32m"0 0 24 24"[39m
+              [33mwidth[39m=[32m"16"[39m
+              [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+            [36m>[39m
+              [36m<path[39m
+                [33md[39m=[32m"M12 3v12"[39m
+              [36m/>[39m
+              [36m<path[39m
+                [33md[39m=[32m"m17 8-5-5-5 5"[39m
+              [36m/>[39m
+              [36m<path[39m
+                [33md[39m=[32m"M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"[39m
+              [36m/>[39m
+            [36m</svg>[39m
+            [36m<span[39m
+              [33mclass[39m=[32m"sg-import-label"[39m
+            [36m>[39m
+              [0mAdd item[0m
+            [36m</span>[39m
+          [36m</a>[39m
+        [36m</div>[39m
+        [36m<div[39m
+          [33mstyle[39m=[32m"padding: 16px 24px 4px; display: flex; align-items: baseline; gap: 12px;"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mstyle[39m=[32m"flex: 1 1 0%;"[39m
+          [36m>[39m
+            [36m<h1[39m
+              [33mclass[39m=[32m"sg-catalog-title"[39m
+            [36m>[39m
+              [0mYour things[0m
+            [36m</h1>[39m
+            [36m<p[39m
+              [33mstyle[39m=[32m"margin: 4px 0px 0px; font-size: 13px; color: hsl(var(--ink-muted));"[39m
+            [36m>[39m
+              [0m5[0m
+              [0m [0m
+              [0mthings[0m
+            [36m</p>[39m
+          [36m</div>[39m
+          [36m<button[39m
+            [33mclass[39m=[32m"focus-ring"[39m
+            [33mstyle[39m=[32m"background: none; font-size: 13px; cursor: pointer; text-decoration: underline; color: hsl(var(--ink)); white-space: nowrap;"[39m
+            [33mtype[39m=[32m"button"[39m
+          [36m>[39m
+            [0mGone[0m
+          [36m</button>[39m
+        [36m</div>[39m
+        [36m<div[39m
+          [33mdata-testid[39m=[32m"catalog-toolbar"[39m
+          [33mstyle[39m=[32m"display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 8px 24px; border-bottom-style: solid; border-bottom-width: 1px; border-color: hsl(var(--line)); background-color: hsl(var(--paper)); color: hsl(var(--ink));"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mdata-testid[39m=[32m"catalog-kind-tabs"[39m
+            [33mstyle[39m=[32m"display: flex; gap: 16px; overflow-x: auto; flex-wrap: nowrap; align-items: center;"[39m
+          [36m>[39m
+            [36m<button[39m
+              [33maria-pressed[39m=[32m"true"[39m
+              [33mclass[39m=[32m"focus-ring"[39m
+              [33mstyle[39m=[32m"background: transparent; border-bottom: 2px solid hsl(var(--ink)); border-radius: 0; padding: 4px 2px; font-size: 15px; font-weight: 600; cursor: pointer; white-space: nowrap; color: hsl(var(--ink));"[39m
+              [33mtype[39m=[32m"button"[39m
+            [36m>[39m
+              [0mAll[0m
+            [36m</button>[39m
+            [36m<button[39m
+              [33maria-pressed[39m=[32m"false"[39m
+              [33mclass[39m=[32m"focus-ring"[39m
+              [33mstyle[39m=[32m"background: transparent; border-bottom: ...
+ ❯ waitForWrapper node_modules/@testing-library/dom/dist/wait-for.js:163:27
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:86:33
+ ❯ src/sg337-grouped-packs.sg337.test.tsx:187:18
+    185|   test("T3 clicking the card opens the 6 May 2030 pack (pack-1)", asyn…
+    186|     renderCatalog();
+    187|     await screen.findByText("3 packs");
+       |                  ^
+    188|     const olive = (await screen.findAllByTestId("product-card")).find(…
+    189|       within(card).queryByText("3 packs")
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/6]⎯
+
+ FAIL  src/sg337-grouped-packs.sg337.test.tsx > SG-337 grouped same-name packs in the grid > T6 search narrows first: olive shows one card, 3 packs
+AssertionError: expected [ <a …(4)>…(2)</a>, …(2) ] to have a length of 1 but got 3
+
+Ignored nodes: comments, script, style
+[36m<html[39m
+  [33mclass[39m=[32m"light"[39m
+[36m>[39m
+  [36m<head />[39m
+  [36m<body>[39m
+    [36m<div>[39m
+      [36m<div[39m
+        [33mstyle[39m=[32m"min-height: 100vh; background-color: hsl(var(--paper)); color: hsl(var(--ink));"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mstyle[39m=[32m"position: sticky; top: 0px; z-index: 10; background-color: hsl(var(--paper));"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"sg-header"[39m
+            [33mdata-testid[39m=[32m"catalog-header"[39m
+            [33mstyle[39m=[32m"display: flex; flex-wrap: wrap; align-items: center; gap: 12px; row-gap: 8px; padding: 10px 24px; border-bottom-style: solid; border-bottom-width: 1px; border-bottom-color: hsl(var(--line)); background-color: hsl(var(--paper)); color: hsl(var(--ink));"[39m
+          [36m>[39m
+            [36m<div[39m
+              [33maria-hidden[39m=[32m"true"[39m
+              [33mstyle[39m=[32m"flex: 1 1 0%;"[39m
+            [36m/>[39m
+            [36m<input[39m
+              [33maria-label[39m=[32m"Search your things"[39m
+              [33mclass[39m=[32m"sg-paper-control focus-ring sg-header-search"[39m
+              [33mplaceholder[39m=[32m"Search your things"[39m
+              [33mstyle[39m=[32m"padding: 6px 10px; border-radius: 0; flex: 1 1 120px; min-width: 0; max-width: 420px; font-size: 13px;"[39m
+              [33mtype[39m=[32m"search"[39m
+              [33mvalue[39m=[32m"olive"[39m
+            [36m/>[39m
+            [36m<button[39m
+              [33maria-label[39m=[32m"Switch to dark theme"[39m
+              [33mclass[39m=[32m"sg-paper-control focus-ring"[39m
+              [33mdata-testid[39m=[32m"theme-toggle"[39m
+              [33mstyle[39m=[32m"display: inline-flex; align-items: center; justify-content: center; padding: 6px; border-radius: 0; cursor: pointer;"[39m
+              [33mtitle[39m=[32m"Switch to dark theme"[39m
+              [33mtype[39m=[32m"button"[39m
+            [36m>[39m
+              [36m<svg[39m
+                [33maria-hidden[39m=[32m"true"[39m
+                [33mclass[39m=[32m"lucide lucide-moon"[39m
+                [33mfill[39m=[32m"none"[39m
+                [33mheight[39m=[32m"18"[39m
+                [33mstroke[39m=[32m"currentColor"[39m
+                [33mstroke-linecap[39m=[32m"round"[39m
+                [33mstroke-linejoin[39m=[32m"round"[39m
+                [33mstroke-width[39m=[32m"2"[39m
+                [33mviewBox[39m=[32m"0 0 24 24"[39m
+                [33mwidth[39m=[32m"18"[39m
+                [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+              [36m>[39m
+                [36m<path[39m
+                  [33md[39m=[32m"M20.985 12.486a9 9 0 1 1-9.473-9.472c.405-.022.617.46.402.803a6 6 0 0 0 8.268 8.268c.344-.215.825-.004.803.401"[39m
+                [36m/>[39m
+              [36m</svg>[39m
+            [36m</button>[39m
+            [36m<a[39m
+              [33maria-label[39m=[32m"Add item"[39m
+              [33mclass[39m=[32m"focus-ring"[39m
+              [33mhref[39m=[32m"/capture"[39m
+              [33mstyle[39m=[32m"padding: 6px 12px; border-radius: 0; text-decoration: none; font-weight: 600; font-size: 13px; display: inline-flex; align-items: center; gap: 6px; background-color: hsl(var(--primary)); color: hsl(var(--primary-foreground));"[39m
+            [36m>[39m
+              [36m<svg[39m
+                [33maria-hidden[39m=[32m"true"[39m
+                [33mclass[39m=[32m"lucide lucide-upload"[39m
+                [33mfill[39m=[32m"none"[39m
+                [33mheight[39m=[32m"16"[39m
+                [33mstroke[39m=[32m"currentColor"[39m
+                [33mstroke-linecap[39m=[32m"round"[39m
+                [33mstroke-linejoin[39m=[32m"round"[39m
+                [33mstroke-width[39m=[32m"2"[39m
+                [33mviewBox[39m=[32m"0 0 24 24"[39m
+                [33mwidth[39m=[32m"16"[39m
+                [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+              [36m>[39m
+                [36m<path[39m
+                  [33md[39m=[32m"M12 3v12"[39m
+                [36m/>[39m
+                [36m<path[39m
+                  [33md[39m=[32m"m17 8-5-5-5 5"[39m
+                [36m/>[39m
+                [36m<path[39m
+                  [33md[39m=[32m"M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"[39m
+                [36m/>[39m
+              [36m</svg>[39m
+              [36m<span[39m
+                [33mclass[39m=[32m"sg-import-label"[39m
+              [36m>[39m
+                [0mAdd item[0m
+              [36m</span>[39m
+            [36m</a>[39m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mstyle[39m=[32m"padding: 16px 24px 4px; display: flex; align-items: baseline; gap: 12px;"[39m
+          [36m>[39m
+            [36m<div[39m
+              [33mstyle[39m=[32m"flex: 1 1 0%;"[39m
+            [36m>[39m
+              [36m<h1[39m
+                [33mclass[39m=[32m"sg-catalog-title"[39m
+              [36m>[39m
+                [0mYour things[0m
+              [36m</h1>[39m
+              [36m<p[39m
+                [33mstyle[39m=[32m"margin: 4px 0px 0px; font-size: 13px; color: hsl(var(--ink-muted));"[39m
+              [36m>[39m
+                [0m3[0m
+                [0m [0m
+                [0mthings[0m
+              [36m</p>[39m
+            [36m</div>[39m
+            [36m<button[39m
+              [33mclass[39m=[32m"focus-ring"[39m
+              [33mstyle[39m=[32m"background: none; font-size: 13px; cursor: pointer; text-decoration: underline; color: hsl(var(--ink)); white-space: nowrap;"[39m
+              [33mtype[39m=[32m"button"[39m
+            [36m>[39m
+              [0mGone[0m
+            [36m</button>[39m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mdata-testid[39m=[32m"catalog-toolbar"[39m
+            [33mstyle[39m=[32m"display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 8px 24px; border-bottom-style: solid; border-bottom-width: 1px; border-color: hsl(var(--line)); background-color: hsl(var(--paper)); color: hsl(var(--ink));"[39m
+          [36m>[39m
+            [36m<div[39m
+              [33mdata-testid[39m=[32m"catalog-kind-tabs"[39m
+              [33mstyle[39m=[32m"display: flex; gap: 16px; overflow-x: auto; flex-wrap: nowrap; align-items: center;"[39m
+            [36m>[39m
+              [36m<button[39m
+                [33maria-pressed[39m=[32m"true"[39m
+                [33mclass[39m=[32m"focus-ring"[39m
+                [33mstyle[39m=[32m"background: transparent; border-bottom: 2px solid hsl(var(--ink)); border-radius: 0; padding: 4px 2px; font-size: 15px; font-weight: 600; cursor: pointer; white-space: nowrap; color: hsl(var(--ink));"[39m
+  ...
+
+- Expected
++ Received
+
+- 1
++ 3
+
+ ❯ src/sg337-grouped-packs.sg337.test.tsx:227:71
+    225|       target: { value: "olive" },
+    226|     });
+    227|     await waitFor(() => expect(screen.getAllByTestId("product-card")).…
+       |                                                                       ^
+    228|     expect(screen.getByText("3 packs")).toBeInTheDocument();
+    229|   });
+ ❯ runWithExpensiveErrorDiagnosticsDisabled node_modules/@testing-library/dom/dist/config.js:47:12
+ ❯ checkCallback node_modules/@testing-library/dom/dist/wait-for.js:124:77
+ ❯ Timeout.checkRealTimersCallback node_modules/@testing-library/dom/dist/wait-for.js:118:16
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/6]⎯
+
+ FAIL  src/sg337-grouped-packs.sg337.test.tsx > SG-337 grouped same-name packs in the grid > T7 G4: a card at 79.5 px width keeps its past chip inside the card
+AssertionError: expected '' to be '100%' // Object.is equality
+
+- Expected
++ Received
+
+- 100%
+
+ ❯ src/sg337-grouped-packs.sg337.test.tsx:252:35
+    250|       // The style that guarantees the chip never extends past the car…
+    251|       // right edge: capped at the card width with wrapping allowed.
+    252|       expect(chip.style.maxWidth).toBe("100%");
+       |                                   ^
+    253|       expect(chip.style.whiteSpace).not.toBe("nowrap");
+    254|     }
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/6]⎯
+
+ FAIL  src/sg337-grouped-packs.sg337.test.tsx > SG-337 grouped same-name packs in the grid > T8 G5: the grid and attention line carry no inset the title does not
+AssertionError: expected '1100px' to be '' // Object.is equality
+
+- Expected
++ Received
+
++ 1100px
+
+ ❯ src/sg337-grouped-packs.sg337.test.tsx:264:33
+    262|     // No 1100 px cap and no auto centering: the content shares the ti…
+    263|     // full-bleed 24 px left edge instead of the old 114 px inset.
+    264|     expect(main.style.maxWidth).toBe("");
+       |                                 ^
+    265|     expect(main.style.marginLeft).not.toBe("auto");
+    266|     expect(main.style.paddingLeft).toBe("24px");
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/6]⎯
+
+ Test Files  1 failed (1)
+      Tests  6 failed | 2 passed (8)
+   Start at  09:34:14
+   Duration  5.01s (transform 321ms, setup 92ms, collect 578ms, tests 3.55s, environment 474ms, prepare 89ms)
+
+npm notice
+npm notice New minor version of npm available! 11.11.0 -> 11.21.3
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v11.21.3
+npm notice To update run: npm install -g npm@11.21.3
+npm notice
