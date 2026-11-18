@@ -230,3 +230,7 @@ Read as: **D41** — the app's palette becomes the mockup's *Midnight* (light: g
 Read as: **D42** — adopt contract 0.62.0 and 0.63.0 **except 0.62.0's Coder roster rotation**: every builder slice stays on `opencode-go/muse-spark-1.3-contributor` xhigh (owner, 2026-11-16 and 2026-11-17: *"All builder slices on Muse xhigh."*); second opinion moves to `openai/gpt-6.2-sol` medium (0.63.0); the Launcher desk is asked to record the Muse-only choice. Adopted at the first boundary with no dispatch in flight.
 
 Read as: **D43** — no Tailwind or shadcn now; the component-library question returns when menus, dialogs and the item panel are rebuilt. SG-336 (item page) is built in the current tokens.
+
+**2026-11-18, verbatim:** *"D44 after the trial. Lets close this session now and give me a summary of the roadmap ahead."*
+
+Read as: **D44** — the pack *Edit* panel (SG-340 I39) is tidied in the post-trial polish slice (D39), with I40–I42 and whatever the trial finds; the owner's shelf trial runs on redesign C as served by SG-341. Close requested.
