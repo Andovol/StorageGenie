@@ -1,0 +1,9 @@
+Negative-Receipt-ID: SG-337
+utc=2026-11-18T09:28:43Z
+invocation=079001ffe745493db000934392281330
+DISPATCH_RESULT id=SG-337 coder=opencode exit=1 head=c52e74048afbb3b09700611bf2637279bf00428e note=no moved=no rewrite=no dirty=no elapsed=52s budget=2100s stragglers=0 published_head=yes
+P1_moved=FAIL count=0
+P2_rewrite=PASS behind=0
+P3_note=FAIL note=no
+P5_receipt=FAIL
+P6_dirty=PASS dirty=no
