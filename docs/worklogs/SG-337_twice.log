@@ -1,0 +1,200 @@
+=== src/sg337-grouped-packs.sg337.test.tsx run 1 ===
+
+> storagegenie-frontend@0.1.0 test
+> vitest run --run src/sg337-grouped-packs.sg337.test.tsx
+
+
+ RUN  v1.6.1 /home/andrei/StorageGenie/frontend
+
+stderr | src/sg337-grouped-packs.sg337.test.tsx > SG-337 grouped same-name packs in the grid > T1 grid: one Olive Oil card reading 3 packs with the 6 May 2030 date line; one Rice card with no packs line; 3 cards total
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+ ✓ src/sg337-grouped-packs.sg337.test.tsx  (8 tests) 1061ms
+
+ Test Files  1 passed (1)
+      Tests  8 passed (8)
+   Start at  09:40:04
+   Duration  2.86s (transform 394ms, setup 99ms, collect 739ms, tests 1.06s, environment 521ms, prepare 132ms)
+
+npm notice
+npm notice New minor version of npm available! 11.11.0 -> 11.21.3
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v11.21.3
+npm notice To update run: npm install -g npm@11.21.3
+npm notice
+rc=0 src/sg337-grouped-packs.sg337.test.tsx run 1
+=== src/sg337-grouped-packs.sg337.test.tsx run 2 ===
+
+> storagegenie-frontend@0.1.0 test
+> vitest run --run src/sg337-grouped-packs.sg337.test.tsx
+
+
+ RUN  v1.6.1 /home/andrei/StorageGenie/frontend
+
+stderr | src/sg337-grouped-packs.sg337.test.tsx > SG-337 grouped same-name packs in the grid > T1 grid: one Olive Oil card reading 3 packs with the 6 May 2030 date line; one Rice card with no packs line; 3 cards total
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+ ✓ src/sg337-grouped-packs.sg337.test.tsx  (8 tests) 1094ms
+
+ Test Files  1 passed (1)
+      Tests  8 passed (8)
+   Start at  09:40:08
+   Duration  2.65s (transform 358ms, setup 81ms, collect 637ms, tests 1.09s, environment 464ms, prepare 104ms)
+
+npm notice
+npm notice New minor version of npm available! 11.11.0 -> 11.21.3
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v11.21.3
+npm notice To update run: npm install -g npm@11.21.3
+npm notice
+rc=0 src/sg337-grouped-packs.sg337.test.tsx run 2
+=== src/sg336-item-page.sg336.test.tsx run 1 ===
+
+> storagegenie-frontend@0.1.0 test
+> vitest run --run src/sg336-item-page.sg336.test.tsx
+
+
+ RUN  v1.6.1 /home/andrei/StorageGenie/frontend
+
+stderr | src/sg336-item-page.sg336.test.tsx > SG-336 item page, one row per pack > T1 three live Olive Oil packs in date order, Rice nowhere, muted line ends 3 packs
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+ ✓ src/sg336-item-page.sg336.test.tsx  (10 tests) 694ms
+
+ Test Files  1 passed (1)
+      Tests  10 passed (10)
+   Start at  09:40:11
+   Duration  2.21s (transform 341ms, setup 86ms, collect 566ms, tests 694ms, environment 511ms, prepare 103ms)
+
+npm notice
+npm notice New minor version of npm available! 11.11.0 -> 11.21.3
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v11.21.3
+npm notice To update run: npm install -g npm@11.21.3
+npm notice
+rc=0 src/sg336-item-page.sg336.test.tsx run 1
+=== src/sg336-item-page.sg336.test.tsx run 2 ===
+
+> storagegenie-frontend@0.1.0 test
+> vitest run --run src/sg336-item-page.sg336.test.tsx
+
+
+ RUN  v1.6.1 /home/andrei/StorageGenie/frontend
+
+stderr | src/sg336-item-page.sg336.test.tsx > SG-336 item page, one row per pack > T1 three live Olive Oil packs in date order, Rice nowhere, muted line ends 3 packs
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+ ✓ src/sg336-item-page.sg336.test.tsx  (10 tests) 790ms
+
+ Test Files  1 passed (1)
+      Tests  10 passed (10)
+   Start at  09:40:14
+   Duration  2.43s (transform 430ms, setup 111ms, collect 686ms, tests 790ms, environment 502ms, prepare 101ms)
+
+npm notice
+npm notice New minor version of npm available! 11.11.0 -> 11.21.3
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v11.21.3
+npm notice To update run: npm install -g npm@11.21.3
+npm notice
+rc=0 src/sg336-item-page.sg336.test.tsx run 2
+=== src/components/shell/shell.test.tsx run 1 ===
+
+> storagegenie-frontend@0.1.0 test
+> vitest run --run src/components/shell/shell.test.tsx
+
+
+ RUN  v1.6.1 /home/andrei/StorageGenie/frontend
+
+stderr | src/components/shell/shell.test.tsx > Catalog shell > the header carries no count box; Your things names the LOADED item count (SG-330 R2+R3: Showing box -> heading)
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+ ✓ src/components/shell/shell.test.tsx  (23 tests) 2609ms
+
+ Test Files  1 passed (1)
+      Tests  23 passed (23)
+   Start at  09:40:18
+   Duration  4.64s (transform 719ms, setup 71ms, collect 1.07s, tests 2.61s, environment 481ms, prepare 121ms)
+
+npm notice
+npm notice New minor version of npm available! 11.11.0 -> 11.21.3
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v11.21.3
+npm notice To update run: npm install -g npm@11.21.3
+npm notice
+rc=0 src/components/shell/shell.test.tsx run 1
+=== src/components/shell/shell.test.tsx run 2 ===
+
+> storagegenie-frontend@0.1.0 test
+> vitest run --run src/components/shell/shell.test.tsx
+
+
+ RUN  v1.6.1 /home/andrei/StorageGenie/frontend
+
+stderr | src/components/shell/shell.test.tsx > Catalog shell > the header carries no count box; Your things names the LOADED item count (SG-330 R2+R3: Showing box -> heading)
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+ ✓ src/components/shell/shell.test.tsx  (23 tests) 2572ms
+
+ Test Files  1 passed (1)
+      Tests  23 passed (23)
+   Start at  09:40:23
+   Duration  4.53s (transform 671ms, setup 86ms, collect 1.01s, tests 2.57s, environment 481ms, prepare 107ms)
+
+npm notice
+npm notice New minor version of npm available! 11.11.0 -> 11.21.3
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v11.21.3
+npm notice To update run: npm install -g npm@11.21.3
+npm notice
+rc=0 src/components/shell/shell.test.tsx run 2
+=== src/sg325-p8.sg325.test.tsx run 1 ===
+
+> storagegenie-frontend@0.1.0 test
+> vitest run --run src/sg325-p8.sg325.test.tsx
+
+
+ RUN  v1.6.1 /home/andrei/StorageGenie/frontend
+
+stderr | src/sg325-p8.sg325.test.tsx > SG-325 P8+P13 catalog Use by column > the table replaces Status with Use by: same-name rows show their own dates, dateless shows No date
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+ ✓ src/sg325-p8.sg325.test.tsx  (2 tests) 476ms
+
+ Test Files  1 passed (1)
+      Tests  2 passed (2)
+   Start at  09:40:28
+   Duration  2.10s (transform 332ms, setup 77ms, collect 627ms, tests 476ms, environment 461ms, prepare 121ms)
+
+npm notice
+npm notice New minor version of npm available! 11.11.0 -> 11.21.3
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v11.21.3
+npm notice To update run: npm install -g npm@11.21.3
+npm notice
+rc=0 src/sg325-p8.sg325.test.tsx run 1
+=== src/sg325-p8.sg325.test.tsx run 2 ===
+
+> storagegenie-frontend@0.1.0 test
+> vitest run --run src/sg325-p8.sg325.test.tsx
+
+
+ RUN  v1.6.1 /home/andrei/StorageGenie/frontend
+
+stderr | src/sg325-p8.sg325.test.tsx > SG-325 P8+P13 catalog Use by column > the table replaces Status with Use by: same-name rows show their own dates, dateless shows No date
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+ ✓ src/sg325-p8.sg325.test.tsx  (2 tests) 365ms
+
+ Test Files  1 passed (1)
+      Tests  2 passed (2)
+   Start at  09:40:31
+   Duration  1.88s (transform 327ms, setup 80ms, collect 616ms, tests 365ms, environment 440ms, prepare 97ms)
+
+npm notice
+npm notice New minor version of npm available! 11.11.0 -> 11.21.3
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v11.21.3
+npm notice To update run: npm install -g npm@11.21.3
+npm notice
+rc=0 src/sg325-p8.sg325.test.tsx run 2

@@ -136,14 +136,21 @@ describe("SG-325 P8+P13 catalog Use by column", () => {
     expect(dated).toHaveLength(2);
   });
 
-  test("the card view shows the same dates in place of the status badge", async () => {
+  test("the card view groups same-name packs: one Olive Oil card with the soonest date and 2 packs (SG-337, was: one card per pack)", async () => {
     // SG-328: Photo grid is the default (was: 900 px column then click
     // Photo grid); the grid already shows the cards on first render.
+    // SG-337: the two Olive Oil packs share one card — the soonest date
+    // plus a muted "2 packs" line. The later date lives on the item page
+    // and the table, not on the grid card (was: 3 cards, both dates shown).
     renderCatalog();
     const cards = await screen.findAllByTestId("product-card");
-    expect(cards).toHaveLength(3);
-    expect(screen.getByText("6 May 2030")).toBeInTheDocument();
-    expect(screen.getByText("3 Feb 2031")).toBeInTheDocument();
+    expect(cards).toHaveLength(2);
+    const olive = cards.find((card) =>
+      within(card as HTMLElement).queryByText("2 packs")
+    ) as HTMLElement;
+    expect(olive).toBeTruthy();
+    expect(within(olive).getByText("6 May 2030")).toBeInTheDocument();
+    expect(screen.queryByText("3 Feb 2031")).not.toBeInTheDocument();
     expect(screen.getByText("No date")).toBeInTheDocument();
     expect(screen.queryByText("Photo only")).not.toBeInTheDocument();
   });
