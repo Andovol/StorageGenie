@@ -1,0 +1,20 @@
+Dispatch-ID: SG-337.dbg | Report: note
+Debug-Report-Begin
+STAGE: Coder or provider
+CAUSE: Provider-side transient failure mid-run: `response.failed / server_error "The model failed to generate a response"` after ~52s of groundwork, before any file change, commit, or report.
+EVIDENCE:
+- evidence file header (output/dispatch/debug-evidence.txt:1): `DISPATCH_EVIDENCE instance=SG-337.dbg failed_id=SG-337 utc=2026-11-18T09:29:17Z`
+- evidence file unit status (debug-evidence.txt:7,12-13): `Result=exit-code` / `ExecMainCode=1` + `ExecMainStatus=1` (not killed=term/idle, not timeout: `TimeoutStartUSec=35min`, `RuntimeMaxUSec=infinity`)
+- evidence file journal (debug-evidence.txt:22): `DISPATCH_RESULT id=SG-337 coder=opencode exit=1 head=c52e74048afbb3b09700611bf2637279bf00428e note=no moved=no rewrite=no dirty=no elapsed=52s budget=2100s stragglers=0 published_head=yes` — elapsed 52s << budget 2100s, so not a budget kill
+- evidence file audit (debug-evidence.txt:25-26,42-48): `START=c52e74048afbb3b09700611bf2637279bf00428e` / `END=c52e74048afbb3b09700611bf2637279bf00428e` (no movement); `P1_moved=FAIL count=0`; `P5_receipt=FAIL`; `negative_receipt=published`; `files: count=0`
+- evidence file journal log_tail (debug-evidence.txt:85): `Error: {"type":"response.failed","sequence_number":13,"response":{"error":{"code":"server_error","message":"The model failed to generate a response."},"incomplete_details":null}}`
+- failed-unit log (output/dispatch/SG-337.log:179): same terminal line `Error: {"type":"response.failed",...,"code":"server_error","message":"The model failed to generate a response."}` immediately after reads of `sg336-item-page.sg336.test.tsx`, `types/product.ts`, `PageContainer.tsx`; prior lines 78-142 show preflight green (docker Server section present, `200` health, base verified at `c52e7404`)
+- print-logs stream error (output/dispatch/SG-337.print-logs): `level=ERROR ... message="stream error" providerID=opencode-go modelID=muse-spark-1.3-contributor ... error.error.response.error.code=server_error error.error.response.error.message="The model failed to generate a response."`
+- packet (docs/packets/SG-337-redesign-c-grouped-packs.md): slice SG-337 is frontend-only grouped-packs grid work (G0 preflight, G1 tests-then-change, G2 gate); the failed run never reached test writing — log shows only G0 + premise reads, no `sg337` file created (`ls frontend/src/*sg337*` → `No such file or directory`, debug-evidence.txt:80)
+- leftovers: `git status --porcelain` empty (clean); `ls docs/worklogs/SG-337*` → `No such file or directory` (no partial report); `git notes --ref=storagegenie-coder-reports show c52e7404` → `error: no note found for object c52e7404` (no SG-337 receipt; only negative-receipt anchor `Negative-Receipt-ID: SG-337 ... exit=1 ... published_head=yes` exists)
+STRANDED WORK: none from SG-337. `git for-each-ref refs/quarantine/` holds 12 pre-existing refs, unmodified by this run: SG-025, SG-066, SG-088, SG-208, SG-324 debris refs; flag-SG-300/301r1/311 dirt-moved refs; preserve-20260907 (receipt SG-008), preserve-20261017 (SG-208 G1), preserve-20261102 (SG-279 report), preserve-20261114 (SG-321 shots). No quarantine ref mentions SG-337; tree is clean so nothing stranded in the workdir.
+NEXT ACTION: retry as is
+CONFIDENCE: high
+
+Debug-Report-End
+moved=no
